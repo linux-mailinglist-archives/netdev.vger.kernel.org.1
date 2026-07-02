@@ -1,245 +1,263 @@
-Return-Path: <netdev+bounces-304019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304020-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id RvHdBNYXRmrEJgsAu9opvQ
-	(envelope-from <netdev+bounces-304019-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 09:48:38 +0200
+	id i8yIFwMcRmp9KAsAu9opvQ
+	(envelope-from <netdev+bounces-304020-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 10:06:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CF4A6F45E8
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 09:48:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A75636F48F9
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 10:06:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304019-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304019-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=EX4m0bpx;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304020-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304020-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3529B3011E91
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 07:45:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 430453039CBB
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 07:49:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81EB73B27F4;
-	Thu,  2 Jul 2026 07:45:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39A853C4540;
+	Thu,  2 Jul 2026 07:49:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948963A9861
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 07:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D74C3C415E
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 07:49:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782978315; cv=none; b=guNLN2Yn1S4UeGHtI/hJtLn/Ze/IlDXmu2v4IPh9F77/1UZwzNWpxvW2jYvvIsS+ng951qZBJXR53Q0ix+nhBhEDnyY/RVommn3yNF3ymGCZzWaY4Il+9ZAeH1sxbZ6IaPhbT5MmNb9B07f3V91sqmtTVGvSLI2g+5gRczpDXqQ=
+	t=1782978579; cv=none; b=uYJrx5Wwd9buXEN4wdCkimHpDcC9RSBei1LxPfWLxDKLHPgeOShG3L/fEh4LUE9seDv9TF7x+5V3Fvj4biTFcVri7s3Yr/Ulh+D2RogdLOGVT2C7/Q8Ew4vM8Z15F++s7n4AB4Z4qgdVQY8f3eCCytX6rEk5q/1MsIB2XY2F93c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782978315; c=relaxed/simple;
-	bh=9v/bwCtbQ+tZr2fp0KR9gXhUXe24ytcZG+/0nu/Tsec=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=SJOyVFetAiqXaozi+gYif912B/xzYpz5zgjcyYBepPvwfsyQvl2wqxfje9vWFDKS98uSubPjKsAuhFBhV9EEj12XceDqEhHl/GGEe+fGHguFg8Y4sHUPZ+GrI2BlBRrLJH9EkjWJhXYcBaU+jpx4iEbdMX/VvKiRAKCF5PDVH3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.69
-Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-6a17ce8b08dso774671eaf.3
-        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 00:45:11 -0700 (PDT)
+	s=arc-20240116; t=1782978579; c=relaxed/simple;
+	bh=5aY6jgDGxHHuKKofEbdBbN3i11i7tJ7gyBsJWfhgjYc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B9P67Leh+mGS4wkGmbVnKqe0sIlS/tS48qCXHzj8qACzOMnoaZ6GmafS4gEZKUx78UiV0ScFo3IQFo3A/98DgXtvQgOegzV929pKQKOyNQyP/8w8d8gulxQjZXcC+2FSgeoOOA5WU2QXIjWZI4ysue+5nvPhNMa9C1bJ0QhpukI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EX4m0bpx; arc=none smtp.client-ip=209.85.128.177
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-80dd4766206so17239447b3.3
+        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 00:49:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782978575; x=1783583375; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/dNM3gzN7WGtyObjROoTO4V+/DlyZKbxSjH6yLNERms=;
+        b=EX4m0bpxQWZ/juNcvvXLXkKF234lViBrLwwWbMNOdHL1AomnlmAqIzQYyfx1EBdcwv
+         EVE9EG1uaA7kYXJjh1qCjOO36mC85Wpewr31iB7+3vqFl9yEW0lfF5UOYZvxNF3Qh0fT
+         Vq0ItcxxbUNjHwPgPAqv7hlMBoJlCyq9dy6CP8wVhyYiMcoW0kufGV0F5TQFOd7xOpE6
+         9+ab+n+KXUH+P6ybuVgtwuDoiaN57NHbyNwaDJFsmUWbt35wLU3HGiPnIcuZqQubzF6q
+         aECRKLwtQu0psrWEvqmBiLid/k/tA7YbKPRUQ0g89Gh64JYPjWA8woMcdzwRqhSi/WCv
+         ueBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782978310; x=1783583110;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Me/2AKraw1ra1681YXvJ/43x71zgfTRdKV5wbNjIw/w=;
-        b=tUOEP4+Rzito2e2W0Msi7FDnUW5MSMq+IkWfKg6bLoQsjzhXLpfLD4SDT7Tin+VK0k
-         CNtRxKAsv0TeLEViiCIz+L7XuvQY5Ssjp7w2yL6YYXR5rjYdEbYrfi3Emux4ruZxHLi3
-         eNkr2lURkpI8X0ogySCYJgCogCmUlLf3J+3W7KcbKOA4Tw87hp9sa2/1mibWG/GuiHfZ
-         RxDo3Z/reRaMeqLL1DS3nG2n58vstzSEtlpfqiLfdFD2NjeCRQgKWB6QfMgY3TISxj8R
-         2m79rAT6vLM+fRpBd/kkPmcnhvmu1U8WuaERCsG4parouRuBisFqoFLt9301Gf9AZxqb
-         zY0g==
-X-Forwarded-Encrypted: i=1; AFNElJ91MfCYYoS4eSd3E9EFMjl5+7twrdc4PW+3dRERxxi7VIKkn6t9siaL6908jGSeHVrS02htles=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0+llAGIvZjWn728GceKBPEo1SAFUgoymfseZe+FhvtVDZKyQM
-	JRkyOQrzqnV9A46Z/VYv40cs7tCU4+KvtCSl80f4xh0AOzMGTlsTc7RP/MGmjPQWiMO80FKkx2h
-	1V4d0SsJsfSAVeb8crZGNZ3bWVpgM8VXNoipTUvPVMFbv9PNC/T3Up9lOUJQ=
+        d=1e100.net; s=20251104; t=1782978575; x=1783583375;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/dNM3gzN7WGtyObjROoTO4V+/DlyZKbxSjH6yLNERms=;
+        b=qAEOl+ATtUofj56kTFXI+qEratEJFlWJhbERN7TN3jdudaxMWqUFsgfVSNOC1wqgGY
+         q9o5MEmyA0G397U9V2Bc6ISrJT8gxVxLGUsTwHdpq5GbmP5lKFaKY8r6UEhZLUOfRAqY
+         Bj+a/4PUF5nL1urpKAhtSomz/MIr+BZBDUAho9IQgopVaxwM1ee9VknD9ugN9SlBzT+1
+         Qt20MnbFRu943tKs3WKUNOXohtfkOOYw4Wz33q2Fsd4eXuQHpqqef9QLusklp+74NEN/
+         eZzk9aUkJXjkjnDHDB602dwkZJ6cKKpifbVRUuuMR7nfqOmRk0jhHbgaaEko6e4TBh2u
+         K6yQ==
+X-Gm-Message-State: AOJu0Yzf76mS4uI7b0gL3lRBfMIZ5lZzZOxxYalHaCJYcFWiqkxoXYDJ
+	AsmerTJD2q6aelAabjWqCK0txlLi/nastKlNO7WcHOw7GP2igdEVwRjamhJOSw==
+X-Gm-Gg: AfdE7cmgVjRvWWOa5WMzXBYtLzFTJZiuwBnxrupJl3K9THBK2jGah3sZWlWApmTvUmd
+	haOG8UELU2Q7a1pXBw3qWKqUCNyRcdYm5mKHXQ+f8+ygMudiXzAp24miil028kLXtOWfROvIMZM
+	0s12GQuhoO8hzb9znp07LwkvAr3fPpk96VA8QMPj6WQjw7a7iWN1QXE2+cP2N2zeljICPRxRe7E
+	ngn8OIP6cpUNNR7jK5JaUds/B4/YHKPyLwCiTfZ/Ll8opT51xhHNT9QDYC+pWzfRiivuWiV+7PF
+	7ChD3102DsxXLAXZ1FOZRQiTnP5BBNOvNuFCYbrd7ArvcDiy9hh/S823hxHzCnhZQtbQ4YNIcCJ
+	tG5lKa7kM0+NJbprS/FF1sTtLLgyENEcVLNId3WFSSg9O5FW3V1MuO0NwrHpVu3ZTCrXGViiMN/
+	gC3Xwa
+X-Received: by 2002:a05:690c:670c:b0:7f8:7e50:638d with SMTP id 00721157ae682-812eb1790c2mr60976337b3.47.1782978575064;
+        Thu, 02 Jul 2026 00:49:35 -0700 (PDT)
+Received: from houminxi ([23.133.88.228])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-8144af52bd6sm9417827b3.28.2026.07.02.00.49.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jul 2026 00:49:33 -0700 (PDT)
+From: Minxi Hou <houminxi@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Minxi Hou <houminxi@gmail.com>,
+	aconole@redhat.com,
+	echaudro@redhat.com,
+	i.maximets@ovn.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org,
+	dev@openvswitch.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next v3] selftests/net/openvswitch: add output truncation test
+Date: Thu,  2 Jul 2026 03:49:26 -0400
+Message-ID: <20260702074926.1174810-1-houminxi@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:1c81:b0:6a1:3699:4ca5 with SMTP id
- 006d021491bc7-6a309ae7853mr2843353eaf.44.1782978310554; Thu, 02 Jul 2026
- 00:45:10 -0700 (PDT)
-Date: Thu, 02 Jul 2026 00:45:10 -0700
-In-Reply-To: <20260701214334.266991-1-kuniyu@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a461706.52c20a74.1f8b39.0008.GAE@google.com>
-Subject: [syzbot ci] Re: net: Support per-netns device unregistration
-From: syzbot ci <syzbot+ci052b96c9bf56ca1d@syzkaller.appspotmail.com>
-To: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, kuni1840@gmail.com, kuniyu@google.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.36 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304019-lists,netdev=lfdr.de,ci052b96c9bf56ca1d];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:kuba@kernel.org,m:kuni1840@gmail.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:syzbot@lists.linux.dev,m:syzkaller-bugs@googlegroups.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[gmail.com,redhat.com,ovn.org,davemloft.net,google.com,kernel.org,openvswitch.org,vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-304020-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:houminxi@gmail.com,m:aconole@redhat.com,m:echaudro@redhat.com,m:i.maximets@ovn.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:dev@openvswitch.org,m:linux-kselftest@vger.kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,gmail.com,vger.kernel.org,redhat.com];
-	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,appspotmail.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9CF4A6F45E8
+X-Rspamd-Queue-Id: A75636F48F9
 
-syzbot ci has tested the following series
+Add test_trunc exercising the OVS_ACTION_ATTR_TRUNC action. The test
+verifies truncation limits in four steps: reject trunc(1) and
+trunc(13) which are below ETH_HLEN, confirm normal forwarding works,
+apply trunc(14) which truncates packets to the Ethernet header and
+verify ping fails, then restore normal forwarding and verify recovery.
 
-[v1] net: Support per-netns device unregistration
-https://lore.kernel.org/all/20260701214334.266991-1-kuniyu@google.com
-* [PATCH v1 net-next 01/14] rtnetlink: Lock sock_net(skb->sk) in rtnl_newlink().
-* [PATCH v1 net-next 02/14] rtnetlink: Call unregister_netdevice_many() only once in rtnl_link_unregister().
-* [PATCH v1 net-next 03/14] rtnetlink: Add per-netns rtnl_work.
-* [PATCH v1 net-next 04/14] net: Wrap default_device_exit_net() with __rtnl_net_lock().
-* [PATCH v1 net-next 05/14] net: Hold __rtnl_net_lock() in netdev_wait_allrefs_any().
-* [PATCH v1 net-next 06/14] net: Add per-netns netdev unregistration infra.
-* [PATCH v1 net-next 07/14] net: Call unregister_netdevice_many() per netns.
-* [PATCH v1 net-next 08/14] veth: Support per-netns device unregistration.
-* [PATCH v1 net-next 09/14] bareudp: Protect bareudp_list with mutex.
-* [PATCH v1 net-next 10/14] bareudp: Support per-netns netdev unregistration.
-* [PATCH v1 net-next 11/14] ipvlan: Convert ipvl_port.count to refcount_t.
-* [PATCH v1 net-next 12/14] ipvlan: Synchronise ipvlan_init() and ipvlan_uninit() for the same lower dev.
-* [PATCH v1 net-next 13/14] ipvlan: Protect ipvl_port.ipvlans with mutex.
-* [PATCH v1 net-next 14/14] ipvlan: Support per-netns netdev unregistration.
+The kernel requires max_len >= ETH_HLEN (14 bytes). trunc(14) sets
+OVS_CB(skb)->cutlen so pskb_trim strips the IP payload at output
+time; the receiver drops the runt frame and no echo reply is
+generated.
 
-and found the following issue:
-possible deadlock in __dev_change_net_namespace
-
-Full report is available here:
-https://ci.syzbot.org/series/a744b257-d741-4780-8a53-f156b2a7afc9
-
-***
-
-possible deadlock in __dev_change_net_namespace
-
-tree:      net-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
-base:      d6e81529749190123aa0040626c7e5dbc20fdc9a
-arch:      amd64
-compiler:  Debian clang version 22.1.6 (++20260514074242+fc4aad7b5db3-1~exp1~20260514074407.73), Debian LLD 22.1.6
-config:    https://ci.syzbot.org/builds/243cd0ec-28f9-4d21-8f16-3d2fbad8388d/config
-syz repro: https://ci.syzbot.org/findings/a8a0740d-fdec-4a20-9aa5-7cb955707913/syz_repro
-
-veth0_macvtap: left promiscuous mode
-============================================
-WARNING: possible recursive locking detected
-syzkaller #0 Not tainted
---------------------------------------------
-syz.1.18/5814 is trying to acquire lock:
-ffffffff9a9b0418 (&net->dev_unreg_lock){+.+.}-{3:3}, at: spin_lock include/linux/spinlock.h:342 [inline]
-ffffffff9a9b0418 (&net->dev_unreg_lock){+.+.}-{3:3}, at: unregister_netdevice_move_net net/core/dev.c:-1 [inline]
-ffffffff9a9b0418 (&net->dev_unreg_lock){+.+.}-{3:3}, at: __dev_change_net_namespace+0x1479/0x2200 net/core/dev.c:12768
-
-but task is already holding lock:
-ffff88810b6cf8d8 (&net->dev_unreg_lock){+.+.}-{3:3}, at: spin_lock include/linux/spinlock.h:342 [inline]
-ffff88810b6cf8d8 (&net->dev_unreg_lock){+.+.}-{3:3}, at: unregister_netdevice_move_net net/core/dev.c:-1 [inline]
-ffff88810b6cf8d8 (&net->dev_unreg_lock){+.+.}-{3:3}, at: __dev_change_net_namespace+0x146a/0x2200 net/core/dev.c:12768
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(&net->dev_unreg_lock);
-  lock(&net->dev_unreg_lock);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-4 locks held by syz.1.18/5814:
- #0: ffffffff8fdeb0c0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
- #0: ffffffff8fdeb0c0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock+0x2a/0x2b0 net/core/rtnetlink.c:366
- #1: ffffffff9a9b0380 (&net->rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock+0x76/0x2b0 net/core/rtnetlink.c:369
- #2: ffff88810b6cf840 (&net->rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock+0xbf/0x2b0 net/core/rtnetlink.c:369
- #3: ffff88810b6cf8d8 (&net->dev_unreg_lock){+.+.}-{3:3}, at: spin_lock include/linux/spinlock.h:342 [inline]
- #3: ffff88810b6cf8d8 (&net->dev_unreg_lock){+.+.}-{3:3}, at: unregister_netdevice_move_net net/core/dev.c:-1 [inline]
- #3: ffff88810b6cf8d8 (&net->dev_unreg_lock){+.+.}-{3:3}, at: __dev_change_net_namespace+0x146a/0x2200 net/core/dev.c:12768
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 5814 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_deadlock_bug+0x279/0x290 kernel/locking/lockdep.c:3041
- check_deadlock kernel/locking/lockdep.c:3093 [inline]
- validate_chain kernel/locking/lockdep.c:3895 [inline]
- __lock_acquire+0x24df/0x2cf0 kernel/locking/lockdep.c:5237
- lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5868
- __raw_spin_lock include/linux/spinlock_api_smp.h:158 [inline]
- _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:158
- spin_lock include/linux/spinlock.h:342 [inline]
- unregister_netdevice_move_net net/core/dev.c:-1 [inline]
- __dev_change_net_namespace+0x1479/0x2200 net/core/dev.c:12768
- do_setlink+0x2d1/0x4670 net/core/rtnetlink.c:3148
- rtnl_changelink net/core/rtnetlink.c:3880 [inline]
- __rtnl_newlink net/core/rtnetlink.c:4053 [inline]
- rtnl_newlink+0x1612/0x1b50 net/core/rtnetlink.c:4192
- rtnetlink_rcv_msg+0x802/0xc00 net/core/rtnetlink.c:7109
- netlink_rcv_skb+0x226/0x4a0 net/netlink/af_netlink.c:2556
- netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
- netlink_unicast+0x7bb/0x940 net/netlink/af_netlink.c:1345
- netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1900
- sock_sendmsg_nosec+0x13a/0x180 net/socket.c:775
- __sock_sendmsg net/socket.c:790 [inline]
- ____sys_sendmsg+0x54e/0x850 net/socket.c:2684
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2738
- __sys_sendmsg net/socket.c:2770 [inline]
- __do_sys_sendmsg net/socket.c:2775 [inline]
- __se_sys_sendmsg net/socket.c:2773 [inline]
- __x64_sys_sendmsg+0x1b1/0x290 net/socket.c:2773
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fbdc639ce59
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fbdc59fe028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fbdc6615fa0 RCX: 00007fbdc639ce59
-RDX: 0000000000000000 RSI: 0000200000000740 RDI: 0000000000000003
-RBP: 00007fbdc6432e6f R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fbdc6616038 R14: 00007fbdc6615fa0 R15: 00007ffd94dcb1f8
- </TASK>
-syz.1.18 (5814) used greatest stack depth: 19864 bytes left
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
+Signed-off-by: Minxi Hou <houminxi@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+ .../selftests/net/openvswitch/openvswitch.sh  | 87 +++++++++++++++++++
+ 1 file changed, 87 insertions(+)
 
-To test a patch for this bug, please reply with `#syz test`
-(should be on a separate line).
+diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+index 2954245129a2..f75ee723415a 100755
+--- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
++++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+@@ -32,6 +32,7 @@ tests="
+ 	dec_ttl					ttl: dec_ttl decrements IP TTL
+ 	flow_set				flow-set: Flow modify
+ 	action_set				set: SET action rewrites fields
++	trunc					trunc: output truncation
+ 	psample					psample: Sampling packets with psample"
+ 
+ info() {
+@@ -443,6 +444,92 @@ test_action_set() {
+ 	return 0
+ }
+ 
++# trunc test
++# - trunc(14): truncate to ETH_HLEN, strips IP payload, ping fails
++# - trunc(1) and trunc(13): kernel rejects below ETH_HLEN (EINVAL)
++# - restore normal forwarding and verify recovery
++test_trunc() {
++	sbx_add "test_trunc" || return $?
++	ovs_add_dp "test_trunc" trunctest || return 1
++
++	info "create namespaces"
++	for ns in client server; do
++		ovs_add_netns_and_veths "test_trunc" "trunctest" \
++		    "$ns" "${ns:0:1}0" "${ns:0:1}1" || return 1
++	done
++
++	ip netns exec client ip addr add 10.0.0.1/24 dev c1
++	ip netns exec client ip link set c1 up
++	ip netns exec server ip addr add 10.0.0.2/24 dev s1
++	ip netns exec server ip link set s1 up
++
++	ovs_add_flow "test_trunc" trunctest \
++	    'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
++	ovs_add_flow "test_trunc" trunctest \
++	    'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
++	ovs_add_flow "test_trunc" trunctest \
++	    'in_port(1),eth(),eth_type(0x0800),ipv4()' \
++	    '2' || return 1
++	ovs_add_flow "test_trunc" trunctest \
++	    'in_port(2),eth(),eth_type(0x0800),ipv4()' \
++	    '1' || return 1
++
++	info "verify connectivity without truncation"
++	ovs_sbx "test_trunc" ip netns exec client \
++	    ping -c 1 -W 2 10.0.0.2 || return 1
++
++	# trunc below ETH_HLEN must be rejected by the kernel
++	info "verify trunc(1) is rejected"
++	ovs_add_flow "test_trunc" trunctest \
++	    'in_port(1),eth(),eth_type(0x0800),ipv4()' \
++	    'trunc(1),2' &> /dev/null \
++	    && { info "trunc(1) should be rejected"; return 1; }
++
++	info "verify trunc(13) is rejected"
++	ovs_add_flow "test_trunc" trunctest \
++	    'in_port(1),eth(),eth_type(0x0800),ipv4()' \
++	    'trunc(13),2' &> /dev/null \
++	    && { info "trunc(13) should be rejected"; return 1; }
++
++	ovs_del_flows "test_trunc" trunctest
++	ovs_add_flow "test_trunc" trunctest \
++	    'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
++	ovs_add_flow "test_trunc" trunctest \
++	    'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
++
++	info "add trunc(14) forwarding flow"
++	ovs_add_flow "test_trunc" trunctest \
++	    'in_port(1),eth(),eth_type(0x0800),ipv4()' \
++	    'trunc(14),2' || return 1
++	ovs_add_flow "test_trunc" trunctest \
++	    'in_port(2),eth(),eth_type(0x0800),ipv4()' \
++	    '1' || return 1
++
++	info "verify ping fails with trunc(14)"
++	ovs_sbx "test_trunc" ip netns exec client \
++	    ping -c 1 -W 2 10.0.0.2 >/dev/null 2>&1 \
++	    && { info "ping should fail with trunc(14)"
++	         return 1; }
++
++	ovs_del_flows "test_trunc" trunctest
++	ovs_add_flow "test_trunc" trunctest \
++	    'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
++	ovs_add_flow "test_trunc" trunctest \
++	    'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
++	ovs_add_flow "test_trunc" trunctest \
++	    'in_port(1),eth(),eth_type(0x0800),ipv4()' \
++	    '2' || return 1
++	ovs_add_flow "test_trunc" trunctest \
++	    'in_port(2),eth(),eth_type(0x0800),ipv4()' \
++	    '1' || return 1
++
++	info "verify connectivity restored"
++	ovs_sbx "test_trunc" ip netns exec client \
++	    ping -c 1 -W 2 10.0.0.2 || return 1
++
++	return 0
++}
++
+ # psample test
+ # - use psample to observe packets
+ test_psample() {
+-- 
+2.54.0
 
-The patch should be attached to the email.
-Note: arguments like custom git repos and branches are not supported.
 
