@@ -1,39 +1,40 @@
-Return-Path: <netdev+bounces-303960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303962-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id O6BEDWHlRWrAGQsAu9opvQ
-	(envelope-from <netdev+bounces-303960-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 06:13:21 +0200
+	id Fp27K8DlRWrcGQsAu9opvQ
+	(envelope-from <netdev+bounces-303962-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 06:14:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B0106F3629
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 06:13:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 058D16F3658
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 06:14:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=microsoft.com (policy=reject);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303960-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303960-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303962-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303962-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 50ED53004615
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 04:13:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 92227302BB91
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 04:13:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 204E434EEEA;
-	Thu,  2 Jul 2026 04:13:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 376F63546F5;
+	Thu,  2 Jul 2026 04:13:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 042C22E0901;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0435030F52A;
 	Thu,  2 Jul 2026 04:13:13 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782965595; cv=none; b=SJv4yN0Fw8xIIJ66uHxA1zjkzwpLbpr11Ejz3EeT9uZBO+qrt/5Ql7FbRwTezXCRfIaTgmexRK0gXjb6qJk9RnllN1IIUoAEzrKvB8JDV8lJtzKYn4uhtcZ7+zDLEmUYHH9gg/kv5Ya7CjwHUiwbMWUTXMw9R/bpIKWRaIIxZfQ=
+	t=1782965596; cv=none; b=dCmvPtATfNHyKMRiPVG4LyQe+3p/j9ga/NUX/JVwnjYBpHO9xcw5QseHg2pmby4PH0QbOScpX2LPcW/teLKwtD3t4RPB2B68NHJIKPFjrt4GPJ3rUoUEpT7FjsXp9r2X0+gkbFMvw207LKh1nbey8+zMghVKhsT1QwUMJamqqLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782965595; c=relaxed/simple;
-	bh=gZPjvKr3IxnQ6hiSUc3ilImgoP+GuC2xkdc+CgjbSWs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iFnk5cW6ouFj6lBWVq4CSffzb2BaLnpLxa2XS5/aOCJDmQ5NVV4RV52I/bh+Fb3czZncd0SM+1svtUAkZShzoLir9dMPuhMIwVlzvAYw6+RGbE9oIvAuYqyjcO60vrKcqGVi6Rs7MV5vbhZz6c9KRbJtvP7rDVoigxXg8jgFCQM=
+	s=arc-20240116; t=1782965596; c=relaxed/simple;
+	bh=vs7M0jz0kRMap2+sAU5WykdXVE2EY5ReVy9axOv3eX0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AMiVacAAZRE8zh8CashQC+kkorO2oTeYAKeeHHgIruf98x6T8WqHG+ureMc9QD8RZE6JOD3iVeDRKlcdiGZsNVzuG1mGwgp41vm80Jny+PJsEb4tlM3y8MX4h5tYm8Lw6kUGZDY3U+FXbo6+WJuJRDgGsHE3BjDDCs8uZLYOD3E=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; arc=none smtp.client-ip=13.77.154.182
 Received: by linux.microsoft.com (Postfix, from userid 1009)
-	id ED9F320B7169; Wed,  1 Jul 2026 21:13:05 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com ED9F320B7169
+	id 091BC20B716C; Wed,  1 Jul 2026 21:13:05 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 091BC20B716C
 From: Dexuan Cui <decui@microsoft.com>
 To: kys@microsoft.com,
 	haiyangz@microsoft.com,
@@ -57,10 +58,12 @@ To: kys@microsoft.com,
 	linux-kernel@vger.kernel.org,
 	linux-rdma@vger.kernel.org
 Cc: stable@vger.kernel.org
-Subject: [PATCH net v3 0/2] Fix MANA RX with bounce buffering
-Date: Wed,  1 Jul 2026 21:12:35 -0700
-Message-ID: <20260702041237.617719-1-decui@microsoft.com>
+Subject: [PATCH net v3 1/2] net: mana: Validate the packet length reported by the NIC
+Date: Wed,  1 Jul 2026 21:12:36 -0700
+Message-ID: <20260702041237.617719-2-decui@microsoft.com>
 X-Mailer: git-send-email 2.43.7
+In-Reply-To: <20260702041237.617719-1-decui@microsoft.com>
+References: <20260702041237.617719-1-decui@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,14 +78,14 @@ X-Spamd-Result: default: False [3.54 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_RECIPIENTS(0.00)[m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kotaranov@microsoft.com,m:horms@kernel.org,m:ernis@linux.microsoft.com,m:dipayanroy@linux.microsoft.com,m:kees@kernel.org,m:jacob.e.keller@intel.com,m:ssengar@linux.microsoft.com,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303960-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303962-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER(0.00)[decui@microsoft.com,netdev@vger.kernel.org];
@@ -92,53 +95,72 @@ X-Spamd-Result: default: False [3.54 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
 	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	R_DKIM_NA(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[22];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_SENDER_FORWARDING(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2B0106F3629
+X-Rspamd-Queue-Id: 058D16F3658
 
-With swiotlb=force, the MANA NIC fails to work properly due to commit
-730ff06d3f5c ("net: mana: Use page pool fragments for RX buffers instead
-of full pages to improve memory efficiency.").
+Validate the packet length reported in the RX CQE before passing it
+to skb processing. The CQE is supplied by the NIC device and should
+not be blindly trusted.
 
-This happens because, with the standard MTU=1500, the aforementioned
-commit uses page pool frags with PP_FLAG_DMA_MAP, but fails to call
-page_pool_dma_sync_for_cpu() to sync the received packet for CPU acces
-before handing the RX buffer to the stack.
+Cc: stable@vger.kernel.org
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+Signed-off-by: Dexuan Cui <decui@microsoft.com>
+---
 
-Here patch #2 adds the required page_pool_dma_sync_for_cpu().
+Changes since v1:
+    v1 is split into two patches in the v2.
+    Add Haiyang's Reviewed-by.
 
-Patch #1 validates the packet length reported by the NIC. With patch #2,
-page_pool_dma_sync_for_cpu() uses the packet length, so we don't want
-to blindly trust the packet length, just in case.
+Changes since v2:
+    Swapped the order of the 2 patches in v2.
+    No extra change.
 
-There is no change between v2 and v3.
-v3 just swaps the order of the 2 patches in v2, as suggested by Simon [3].
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 23 +++++++++++++++----
+ 1 file changed, 18 insertions(+), 5 deletions(-)
 
-Please review.
-
-Thanks,
-Dexuan
-
-References:
-[1] v1: https://lore.kernel.org/netdev/20260618035029.249361-1-decui@microsoft.com/
-[2] v2: https://lore.kernel.org/netdev/20260624222605.1794719-1-decui@microsoft.com/
-[3] https://lore.kernel.org/netdev/20260626145048.GB1310988@horms.kernel.org/
-
-Dexuan Cui (2):
-  net: mana: Validate the packet length reported by the NIC
-  net: mana: Sync page pool RX frags for CPU
-
- drivers/net/ethernet/microsoft/mana/mana_en.c | 61 +++++++++++++++----
- include/net/mana/mana.h                       |  8 +++
- 2 files changed, 58 insertions(+), 11 deletions(-)
-
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index c9b1df1ed109..edc504b2447a 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -2170,12 +2170,25 @@ static void mana_process_rx_cqe(struct mana_rxq *rxq, struct mana_cq *cq,
+ 		rxbuf_oob = &rxq->rx_oobs[curr];
+ 		WARN_ON_ONCE(rxbuf_oob->wqe_inf.wqe_size_in_bu != 1);
+ 
+-		mana_refill_rx_oob(dev, rxq, rxbuf_oob, &old_buf, &old_fp);
++		if (unlikely(pktlen > rxq->datasize)) {
++			/* Increase it even if mana_rx_skb() isn't called. */
++			rxq->rx_cq.work_done++;
+ 
+-		/* Unsuccessful refill will have old_buf == NULL.
+-		 * In this case, mana_rx_skb() will drop the packet.
+-		 */
+-		mana_rx_skb(old_buf, old_fp, oob, rxq, i);
++			++ndev->stats.rx_dropped;
++			netdev_warn_once(ndev,
++				"Dropped oversized RX packet: len=%u, datasize=%u\n",
++				pktlen, rxq->datasize);
++
++			/* Reuse the RX buffer since rxbuf_oob is unchanged. */
++		} else {
++
++			mana_refill_rx_oob(dev, rxq, rxbuf_oob, &old_buf, &old_fp);
++
++			/* Unsuccessful refill will have old_buf == NULL.
++			 * In this case, mana_rx_skb() will drop the packet.
++			 */
++			mana_rx_skb(old_buf, old_fp, oob, rxq, i);
++		}
+ 
+ 		mana_move_wq_tail(rxq->gdma_rq,
+ 				  rxbuf_oob->wqe_inf.wqe_size_in_bu);
 -- 
 2.34.1
 
