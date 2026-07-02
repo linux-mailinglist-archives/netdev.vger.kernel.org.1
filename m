@@ -1,171 +1,130 @@
-Return-Path: <netdev+bounces-304239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304237-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lMojFuqpRmoMbQsAu9opvQ
-	(envelope-from <netdev+bounces-304239-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 20:11:54 +0200
+	id DLp9JSGdRmq9aAsAu9opvQ
+	(envelope-from <netdev+bounces-304237-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 19:17:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABAD36FBE0C
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 20:11:53 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08B2A6FB323
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 19:17:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.alibaba.com header.s=default header.b=YhTkq2iH;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304239-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304239-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.alibaba.com;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=qZtCO5ww;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304237-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-304237-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5671E335F38D
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 17:12:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 39DF530038CC
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 17:12:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D85B340408;
-	Thu,  2 Jul 2026 17:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5673C2F8EBF;
+	Thu,  2 Jul 2026 17:12:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 232FD3093DD;
-	Thu,  2 Jul 2026 17:12:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8F52E2DD2
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 17:12:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783012357; cv=none; b=owAoE5bTKOpg5zXw6Ni3dOS7XNQrgiTo6GGLAyLb8QC5k6Voy4cvJyrqU/iVPD6hjqsGF47i2ZFfv2nVXaY0FubcondEIAsaw10pL/Q/z3lfrY4hIxr8TeKiVL7IMeFRBHhzX4aJJjDU1UD6y5C8WxaSwbmXabth0s1EV+YB8II=
+	t=1783012326; cv=none; b=p3ypcLgrpH45dJn8STmt2wDGUn4ONbQjVJtCpHQaBcn2uIFofCawnc2CajZjzTW+95AYDVNt5eYLNi94RSeKZqsimsJaFCQInt29TJQSkGusnO+mQiTpM7iZL1j/Q+PG/CjnucgXGsndpqFr6OoPHEbJzc6kwFwDsmzgAZUa3yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783012357; c=relaxed/simple;
-	bh=ui7Wvq31+bmhfdGiaQu1nVRQtVBuT+2jB1IXxK1XaZE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ITOdGhBajQvzsgT/bOcQ7jSpVNcxv9TmKhyYDvaEpZNI8h84oA0ywA77mMtki0vXP9Jtpck2WJ1y2H4mjJxkblcybIApcU7wX11Dt1YOMdCLxQIF7Qhy4BEyvBvfHsj+lj4xrAobylzln0FXKS/yZSOXlqkVW6fsndVM4n97gHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=YhTkq2iH; arc=none smtp.client-ip=115.124.30.131
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1783012350; h=From:To:Subject:Date:Message-ID:MIME-Version;
-	bh=vQZAChbuoVsas+C9SU6lXSqc6Mn3Gbl8B75Pqg5FD4w=;
-	b=YhTkq2iHhHmU++xvPZsVB2ZQGz8P4XtjWJZ3mpuGaK6L9pfXRxx/2+lzSdlk7FgN9a1bXR3431akmVBklKT3+tetK4/Xr5psX9GuYLNBa4aHW8qD1P3rTHeUVCXHhS6cg/mzXvQw+EK//40U4hj9y9x08JD1i4DnX9pv600uJBI=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037009110;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0X6FdVAf_1783012348;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0X6FdVAf_1783012348 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 03 Jul 2026 01:12:29 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: "D. Wythe" <alibuda@linux.alibaba.com>,
-	Dust Li <dust.li@linux.alibaba.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Simon Horman <horms@kernel.org>,
-	Ursula Braun <ubraun@linux.vnet.ibm.com>,
-	Hans Wippel <hwippel@linux.ibm.com>,
-	linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net] net/smc: ignore peer-supplied rmbe_idx and dmbe_idx
-Date: Fri,  3 Jul 2026 01:11:38 +0800
-Message-ID: <20260702171137.1099051-2-dust.li@linux.alibaba.com>
-X-Mailer: git-send-email 2.43.7
+	s=arc-20240116; t=1783012326; c=relaxed/simple;
+	bh=of+IMlpL/ueIYjyYjfkeQwS01D5npHn3fFrdzcOeoxA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XSXVnu85GbrXEnu8i9niah9dIIXh4pXW1eBD4rt0HENxDSnSGAWO6exA+aTzAzNNLW+DOAA81vt6BCOzKB4/RjyipNxKgey44oVjN3nfARMd14AgT/OS6H04pMObNogHbkTDdgTmMJa7cYEE7EtmFGlJ97whEITBNJ7ZAZWLLUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qZtCO5ww; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=4kYkWk7jJTX5/rLh389qM70iGgCvsYRDdhOQSw+Cpp0=; b=qZtCO5wwC9pY2Ql3t2EyCjzQgF
+	8lR3jDAW7r6hzfu2tMvRoFDDig4k3Vrrk/Ma0kxpM4oJ9jvwe2TXuqddbmhGRxbHafNVm7G9ydUS/
+	MwNU/7cWO/ygSLFZls86N/eLRYnqwCUa2/YWWLsLaxojco36tOGXjV1dinzqjj2J4N0k=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wfKx1-00APCb-Ik; Thu, 02 Jul 2026 19:11:47 +0200
+Date: Thu, 2 Jul 2026 19:11:47 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Siddaraju DH <siddaraju.dh@intel.com>
+Cc: Michal Kubecek <mkubecek@suse.cz>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, kuba@kernel.org,
+	netdev@vger.kernel.org, Shubham Das <Shubham.Das@intel.com>,
+	Balaji Chintalapalle <balaji.chintalapalle@intel.com>,
+	Vijay Srinivasan <vijay.srinivasan@intel.com>,
+	Magnus Lindberg <magnus.k.lindberg@ericsson.com>,
+	Niklas Damberg <niklas.damberg@ericsson.com>,
+	Jonas Wirandi <jonas.wirandi@ericsson.com>,
+	Siddaraju DH <siddarajudh@gmail.com>
+Subject: Re: [PATCH net-next] ethtool: link 10000baseCR to SFF-8431,
+ Appendix-E SFP+ DA
+Message-ID: <e9349915-df99-4d93-bb2b-f17686266a38@lunn.ch>
+References: <20260702145326.1024800-1-siddaraju.dh@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260702145326.1024800-1-siddaraju.dh@intel.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-10.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	WHITELIST_SPF_DKIM(-3.00)[alibaba.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-304237-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:siddaraju.dh@intel.com,m:mkubecek@suse.cz,m:maxime.chevallier@bootlin.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:Shubham.Das@intel.com,m:balaji.chintalapalle@intel.com,m:vijay.srinivasan@intel.com,m:magnus.k.lindberg@ericsson.com,m:niklas.damberg@ericsson.com,m:jonas.wirandi@ericsson.com,m:siddarajudh@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[suse.cz,bootlin.com,kernel.org,vger.kernel.org,intel.com,ericsson.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FORGED_SENDER(0.00)[dust.li@linux.alibaba.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:horms@kernel.org,m:ubraun@linux.vnet.ibm.com,m:hwippel@linux.ibm.com,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-304239-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dust.li@linux.alibaba.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:dkim,linux.alibaba.com:mid,linux.alibaba.com:from_mime,xbow.com:email,alibaba.com:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,lunn.ch:dkim,lunn.ch:mid,lunn.ch:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: ABAD36FBE0C
+X-Rspamd-Queue-Id: 08B2A6FB323
 
-Linux always uses exactly one RMBE per RMB (index 1 for SMC-R) and
-one DMBE per DMB (index 0 for SMC-D), so conn->tx_off is always zero.
-Hardcode these fixed values instead of deriving tx_off from the
-peer-supplied rmbe_idx / dmbe_idx in the CLC Accept/Confirm message.
+On Thu, Jul 02, 2026 at 08:23:26PM +0530, Siddaraju DH wrote:
+> Add comment to clarify the physical media 10000baseCR follows.
+> 
+> 10000baseCR does not correspond to any IEEE 802.3 *base-CR PMD.
+> It has no autonegotiation, no link training, and no mandatory FEC.
+> The industry standard for this media type is SFF-8431 Appendix-E
+> Direct Attach cable, also known as 10G_SFI_DA.
+> 
+> This change follows the conversation from netdev mail thread with
+> subject: "the confusing 10000base_CR. Shouldn't it be 10000_SFI_DA?"
 
-Fixes: e6727f39004b ("smc: send data (through RDMA)")
-Fixes: 413498440e30 ("net/smc: add SMC-D support in af_smc")
-Cc: stable@vger.kernel.org
-Reported-by: Federico Kirschbaum <federico.kirschbaum@xbow.com>
-Signed-off-by: Dust Li <dust.li@linux.alibaba.com>
+Please add a link to lore, it makes it a lot easier to get to the
+discussion.
+
+Link: https://lore.kernel.org/r/[Message-ID]
+
+    Andrew
+
 ---
- net/smc/af_smc.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
-
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index b5db69073e20..3706e8ac49e0 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -729,11 +729,15 @@ static void smcr_conn_save_peer_info(struct smc_sock *smc,
- {
- 	int bufsize = smc_uncompress_bufsize(clc->r0.rmbe_size);
+pw-bot: cr
  
--	smc->conn.peer_rmbe_idx = clc->r0.rmbe_idx;
-+	/* Linux uses exactly one RMBE per RMB (always index 1); ignore the
-+	 * peer-supplied rmbe_idx to prevent a malicious peer from setting an
-+	 * out-of-bounds tx_off.
-+	 */
-+	smc->conn.peer_rmbe_idx = 1;
- 	smc->conn.local_tx_ctrl.token = ntohl(clc->r0.rmbe_alert_token);
- 	smc->conn.peer_rmbe_size = bufsize;
- 	atomic_set(&smc->conn.peer_rmbe_space, smc->conn.peer_rmbe_size);
--	smc->conn.tx_off = bufsize * (smc->conn.peer_rmbe_idx - 1);
-+	smc->conn.tx_off = 0;
- }
- 
- static void smcd_conn_save_peer_info(struct smc_sock *smc,
-@@ -741,12 +745,16 @@ static void smcd_conn_save_peer_info(struct smc_sock *smc,
- {
- 	int bufsize = smc_uncompress_bufsize(clc->d0.dmbe_size);
- 
--	smc->conn.peer_rmbe_idx = clc->d0.dmbe_idx;
-+	/* Linux uses exactly one DMBE per DMB (always index 0); ignore the
-+	 * peer-supplied dmbe_idx to prevent a malicious peer from deriving an
-+	 * out-of-bounds tx_off that causes an OOB write.
-+	 */
-+	smc->conn.peer_rmbe_idx = 0;
- 	smc->conn.peer_token = ntohll(clc->d0.token);
- 	/* msg header takes up space in the buffer */
- 	smc->conn.peer_rmbe_size = bufsize - sizeof(struct smcd_cdc_msg);
- 	atomic_set(&smc->conn.peer_rmbe_space, smc->conn.peer_rmbe_size);
--	smc->conn.tx_off = bufsize * smc->conn.peer_rmbe_idx;
-+	smc->conn.tx_off = 0;
- }
- 
- static void smc_conn_save_peer_info(struct smc_sock *smc,
--- 
-2.43.7
-
 
