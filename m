@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-304286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304287-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cApDKQzqRmrSfQsAu9opvQ
-	(envelope-from <netdev+bounces-304286-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 00:45:32 +0200
+	id GDmGBlPqRmrefQsAu9opvQ
+	(envelope-from <netdev+bounces-304287-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 00:46:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EDAE6FD47D
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 00:45:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5FA56FD49C
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 00:46:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=NeTiiQm0;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304286-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304286-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=je7Am6hs;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304287-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304287-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 550A8303741D
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 22:42:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5B2EA3078F8C
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 22:42:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05EDF3D349F;
-	Thu,  2 Jul 2026 22:42:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 047FC3D4105;
+	Thu,  2 Jul 2026 22:42:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pz2-f1.google.com (mail-pz2-f1.google.com [74.125.228.1])
+Received: from mail-pj2-f1.google.com (mail-pj2-f1.google.com [74.125.227.129])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 579631A3AB0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50CEC3CFF68
 	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 22:41:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783032119; cv=none; b=QG4KCDZgPISRPibK8Erfn3wm3Z/hmbZ8J9aBWyTtfgQFHdeldabod6spFsSTqSj/+j6DLC8kFi2hbFD6Hib7jwdPl8YyS8cSPzVigpQiy+lTD+Nv3N3Z3FlpnNwZbmnmucL3oztVZDT92aiLOtijjjr8Li0c/A767Fe5RyilKiw=
+	t=1783032120; cv=none; b=FcItpRCN/lXI6wLUfk3dSKpBEf9/EebKrKdocvalC8tL2zhsu9IbC4xISD5EzgrQUCk+gvPMZllHUuOx8jdRXjvM8eflZej3XqRiYCJn0xwUN19m4cCBofVZl5/cPiGJgxnIteP8Jn//VfQsiowWEZQ7/E0r+v80H0X6MJJlDrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783032119; c=relaxed/simple;
-	bh=R0j/qNYveSeY8vyL0/e5npQklgus96CIbETe93stoCQ=;
+	s=arc-20240116; t=1783032120; c=relaxed/simple;
+	bh=gVRvszlKjC051AeWdIy0Pxn+2sjC6Uwq/oT9l7DyrWA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ImOjU5fzfZBihCErNH1Zi5OL1hV82bRdzvXpZJC+ehmPBWOyp1jXavoC9Tsrzsv0gT1LYGLTGrDljnOkdZ6EQNe51pmGKf30m5JbfU/b50WdHhx+PKZeAul7jrCLOx+lUtgz44HaHo3eB2Thq4khHADOoLJhowyEQAzUzJim294=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NeTiiQm0; arc=none smtp.client-ip=74.125.228.1
-Received: by mail-pz2-f1.google.com with SMTP id 41be03b00d2f7-ca00ea47337so82487a12.0
+	 MIME-Version; b=Qgrj+fTDGiqY/JqraRBCfA26Bq1IlpKYXSgDkNITUNJGTSqf8rmxCPj+wycGJc4CE9OehZJ28vd+PjJvh3w/6IUse4oYimEfSdkD1gQx38MEOmYsJQWw/XQWly5VNhbkHQbtlRAveZWL0UdEDIRaVLvmnOJmkTR2EkG6DnDIpDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=je7Am6hs; arc=none smtp.client-ip=74.125.227.129
+Received: by mail-pj2-f1.google.com with SMTP id d9443c01a7336-2cac634f921so2147695ad.0
         for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 15:41:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783032115; x=1783636915; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783032116; x=1783636916; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=mZhuHYG8y80lULc2rLkcuyGBpLEov+tMve8Tm1aOgdM=;
-        b=NeTiiQm0iKSV1DQwy8xf4OrDLdbx8EzBT9m8yftJlaWxK2HQDyrxMrMKfUZC7NpwwB
-         rjSyqs2LW7F7JFRk++7pR15GNbj6zWDpFk/V0cHvvoB/88IrCx5Y47NT7t2N5rhTywWg
-         I67JUZpkYYCw/+nBqii7xAzXwZohHPFW8AxVdepnEs3Xf2/jnJ7tTJ9cp03MV10rloZJ
-         BcWsm8Hr8oXv9zPC8gh05HFabXrhqlTuSk0HVCG8fSQ40q2L2mICn61X4It7gNwWFAAb
-         y9r6F6MaXWPcG/vSVXY8j/KZSuhRzTxRSXvqJSrmHYbc1FJ1XjU2kKOFw+5dQbsjgN8/
-         lN0w==
+         :message-id:reply-to;
+        bh=ZkbORPm7iZJ0a/v7NZ/ujLdsQdGoEPvg/+GU5QgGmcU=;
+        b=je7Am6hs3ZDNF69y2jD62IIWyAvHDms/02p3OznNrFr69cxz1uZ+romB/l0KZBvT2X
+         qzst3tx5PUOc/fqObjdx/QyZxMq8c0IcJZKGTVwLUKyMHwSsS3S+NL1rn7K3CGUz/Jgq
+         LrtgYVGcx7GQPil07g792+F8DDPadtQR9mLxJP3mriH+nMVl8W6FZ8a4CsqNyZhWZDZU
+         aEQ2bL4j8ZGfjxmMKIUS/h+IAXRFuekd7DPXEOoMuoJp20K9JRRLYY2fzOkq/Asd9b+E
+         ElzIAZbI6ujyoICLKEib7UNHwxS3TaLXYTDCeCNSJoNM9wxmEB9KwTVE/D+7WEqOnr9s
+         rCZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783032115; x=1783636915;
+        d=1e100.net; s=20251104; t=1783032116; x=1783636916;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=mZhuHYG8y80lULc2rLkcuyGBpLEov+tMve8Tm1aOgdM=;
-        b=CEHJRw53Ippc6HAnH3NJ1DO9yFHTfJkLq07d4t9UaVqbZszqSmC+C7ndM3+nFda2ZS
-         kaMnUMmR0cbfbOejSy0YuUp+VcYGVc/c0U9NvkuUFSmg+K6B/FJpRle0lU7F8ldcHbWT
-         Lh2vMCdfpMX6hMxOjUwcc3wXaqgVK4bzddTv7WdugjNcF01Lz+VYHDiLBzWx0AJYpWvc
-         h4/mC2svzl47rCWHmXKQgj/D7e/Yn8iwZs4TYX5K2q/FKu+z/dF5vEW1dqjXD5EJF3Wq
-         V/4YD2k69WlZD4detdBl/3zIRoOVXe8tVzFKPWe07JyKUfxECL1JP1BN22rHIQ9igxOa
-         EYKw==
-X-Gm-Message-State: AOJu0YykeZHw1x93bLvOGkJg0NLzvNnYmmuyM10DIMo8cJFOwB6N9brR
-	yUVP8ZdIvEpLTcNL5qfAzc+/xEuT7UVj+lI4YVYBy5IplPwNIjEqwhkvMHcpRiVx
-X-Gm-Gg: AfdE7clqv1IE04nmrcwknhK4JmkwnxwlUJaSno/mpJC4mqIuqrOCH/sCDjw3+paU8Fp
-	7qbD+bzrZaa80X9lT/l4oDuXULVsQGELs+glq448mE4Qt1I7YXpwS7nPaMTPLE8YiipzOa5pivh
-	XErUCuCDXSPmSrpCtKSoHyQbgG67yFI6msRW8iuF5UiaD8dqQ/HNRTjikFremYQfZ6BhcgzgXDW
-	DPxTTrLkqMbdAZVQOw7HhHwVjU5KyXTFU2HE65NJwFXcvXtfocyZCqKStoyT1XQkSVbXElbZnxA
-	o5B2aZbZqG/EfWsbZ62byBRnHMAOjd6hJ3RPPvXhakGgCAYGoOgvtmrAxs1umu4rXcV6EMOYiB5
-	dXxc+lA6j89OHatDFg+CKLvgrAH72Zi3LT8BazvbDEJl9hIjuRWg9jmr2+sqauAAVk/7xAVWdbg
-	fHgQ0Yf6cUBQk9HURN
-X-Received: by 2002:a05:6a00:3902:b0:845:d285:3b6e with SMTP id d2e1a72fcca58-847c5208e29mr6591848b3a.58.1783032115126;
-        Thu, 02 Jul 2026 15:41:55 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:4b::])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c9e8f1ddd7fsm1823013a12.8.2026.07.02.15.41.54
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ZkbORPm7iZJ0a/v7NZ/ujLdsQdGoEPvg/+GU5QgGmcU=;
+        b=DaGYzxvL86F5L/HvE890GIhX/Pns/j2otVFrMbgTlGfI4Jjq5v4w0k8fnm4IgwFfT6
+         qE380hAeGINQlo5pzOMNhzxMbZlx/QgKYzKfIYh0DjdPyNHXQnw8i1e1WbbXgdHZtWzD
+         lgykjYhg7XB8Zqlcgs82irZUtXx3SA65mcSp16nzF6GvYF6Cx9LUT9eUp0ITwJJRss0/
+         QIqfi2WhA1hAZ2brxyqsSqCNngjbR/cQX9iWFxb3qbsG243AJDMz2P6tJuoJ2FMCaGJ1
+         ciyP4CIV5Ncs7SzdzgdSLo36L6ekrSeCqOqfHiXr/wYHQrRnlrxZXqWQf/nWeS0/nrdY
+         Skzw==
+X-Gm-Message-State: AOJu0Yxk+Uu1XPGY2k27Cl7Nc7pVvgBh30Ww/iftWxYQh7hDOYwseKtR
+	BLAsRfYra/l3mOe46UUViMD+jvcs4Y2swG4KRMTuJNwSb0e845OWjklCkRm4BDCo
+X-Gm-Gg: AfdE7cknxF7bu8r5hsk79wILT4yo1/q+hahJEou67vh6CG7JumPF5jo1u9gdk/1aOBd
+	ZuaEFs+eTgLsQNwJYMcLlfq9v6ii1ko0mILd9t5NmALN071cMBVW9n4GgGm/0YsoQkeOO4m1jzX
+	MrnXgwHSr6JA3DHT0KMMaTDCuSsEUnwo5OYaSo9sV2rGmV8CU6GoLBZhoHk4kUfrhfI62A/AT21
+	VWmDWvoIYhjBeYUZCrOMHuuLmcarFTVDvuZJ+xm8cPbKMJp91c/f6yGjDNAIszsiP/OAIltB9Db
+	Ww2GzvmQNFzTN80mmaiChS80CVer6BdCrzq2jt9wtJvLrJlNc02/GRW2Yhwdt8bAznfgomkSPGT
+	4LbnSNCeaBo4K0KDYz0B8io0Bq0xP67fv78QjtN1MhW4XDQxFDPCvqSPOghVjxVLzSJRgYt3ZsW
+	ugqhZMFA==
+X-Received: by 2002:a05:6a20:94cf:b0:3b3:1c7b:ff7 with SMTP id adf61e73a8af0-3bfed47e012mr9186089637.46.1783032116021;
+        Thu, 02 Jul 2026 15:41:56 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:59::])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c9e926a4294sm1831204a12.26.2026.07.02.15.41.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jul 2026 15:41:54 -0700 (PDT)
+        Thu, 02 Jul 2026 15:41:55 -0700 (PDT)
 From: Stanislav Fomichev <sdf.kernel@gmail.com>
 X-Google-Original-From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
@@ -82,9 +82,9 @@ Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Subject: [PATCH net-next v2 4/6] net: rtnetlink: take instance lock inside rtnl_configure_link
-Date: Thu,  2 Jul 2026 15:41:48 -0700
-Message-ID: <20260702224150.3730033-5-sdf@fomichev.me>
+Subject: [PATCH net-next v2 5/6] net: require instance lock for NETDEV_DOWN/GOING_DOWN notifiers
+Date: Thu,  2 Jul 2026 15:41:49 -0700
+Message-ID: <20260702224150.3730033-6-sdf@fomichev.me>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260702224150.3730033-1-sdf@fomichev.me>
 References: <20260702224150.3730033-1-sdf@fomichev.me>
@@ -100,7 +100,7 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -112,7 +112,7 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-304286-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304287-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
@@ -126,81 +126,78 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,fomichev.me:mid,fomichev.me:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,fomichev.me:mid,fomichev.me:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3EDAE6FD47D
+X-Rspamd-Queue-Id: A5FA56FD49C
 
-rtnl_configure_link calls __dev_change_flags() and __dev_notify_flags,
-both need the instance lock. rtnl_newlink_create grabs it but stacked
-devices do not. Move the lock inside rtnl_configure_link.
+Sprinkle a few asserts about ops lock: netif_close_many and __dev_notify_flags
+should now consistently run under the lock
 
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- net/core/rtnetlink.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+ Documentation/networking/netdevices.rst | 2 ++
+ net/core/dev.c                          | 3 +++
+ net/core/lock_debug.c                   | 4 ++--
+ 3 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 12aa3aa1688b..1b7d6f6b8b68 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -3660,14 +3660,16 @@ int rtnl_configure_link(struct net_device *dev, const struct ifinfomsg *ifm,
- 			u32 portid, const struct nlmsghdr *nlh)
+diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
+index d2a238f8cc8b..1bb68a73bb67 100644
+--- a/Documentation/networking/netdevices.rst
++++ b/Documentation/networking/netdevices.rst
+@@ -421,6 +421,8 @@ For devices with locked ops, currently only the following notifiers are
+ * ``NETDEV_CHANGENAME``
+ * ``NETDEV_REGISTER``
+ * ``NETDEV_UP``
++* ``NETDEV_DOWN``
++* ``NETDEV_GOING_DOWN``
+ 
+ The following notifiers are running without the lock:
+ * ``NETDEV_UNREGISTER``
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 9d49493f4fb5..714d05283500 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -1802,6 +1802,7 @@ void netif_close_many(struct list_head *head, bool unlink)
+ 	__dev_close_many(head);
+ 
+ 	list_for_each_entry_safe(dev, tmp, head, close_list) {
++		netdev_assert_locked_ops_compat(dev);
+ 		rtmsg_ifinfo(RTM_NEWLINK, dev, IFF_UP | IFF_RUNNING, GFP_KERNEL, 0, NULL);
+ 		call_netdevice_notifiers(NETDEV_DOWN, dev);
+ 		if (unlink)
+@@ -9787,6 +9788,8 @@ void __dev_notify_flags(struct net_device *dev, unsigned int old_flags,
  {
- 	unsigned int old_flags, changed;
--	int err;
-+	int err = 0;
+ 	unsigned int changes = dev->flags ^ old_flags;
+ 
++	netdev_assert_locked_ops_compat(dev);
 +
-+	netdev_lock_ops(dev);
+ 	if (gchanges)
+ 		rtmsg_ifinfo(RTM_NEWLINK, dev, gchanges, GFP_ATOMIC, portid, nlh);
  
- 	old_flags = dev->flags;
- 	if (ifm && (ifm->ifi_flags || ifm->ifi_change)) {
- 		err = __dev_change_flags(dev, rtnl_dev_combine_flags(dev, ifm),
- 					 NULL);
- 		if (err < 0)
--			return err;
-+			goto out;
- 	}
- 
- 	changed = old_flags ^ dev->flags;
-@@ -3677,7 +3679,10 @@ int rtnl_configure_link(struct net_device *dev, const struct ifinfomsg *ifm,
- 	}
- 
- 	__dev_notify_flags(dev, old_flags, changed, portid, nlh);
--	return 0;
-+
-+out:
-+	netdev_unlock_ops(dev);
-+	return err;
- }
- EXPORT_SYMBOL(rtnl_configure_link);
- 
-@@ -3918,22 +3923,20 @@ static int rtnl_newlink_create(struct sk_buff *skb, struct ifinfomsg *ifm,
- 		goto out;
- 	}
- 
--	netdev_lock_ops(dev);
--
- 	err = rtnl_configure_link(dev, ifm, portid, nlh);
- 	if (err < 0)
- 		goto out_unregister;
- 	if (tb[IFLA_MASTER]) {
-+		netdev_lock_ops(dev);
- 		err = do_set_master(dev, nla_get_u32(tb[IFLA_MASTER]), extack);
-+		netdev_unlock_ops(dev);
- 		if (err)
- 			goto out_unregister;
- 	}
- 
--	netdev_unlock_ops(dev);
- out:
- 	return err;
- out_unregister:
--	netdev_unlock_ops(dev);
- 	if (ops->newlink) {
- 		LIST_HEAD(list_kill);
- 
+diff --git a/net/core/lock_debug.c b/net/core/lock_debug.c
+index 8a81c5430705..abc4c00728b1 100644
+--- a/net/core/lock_debug.c
++++ b/net/core/lock_debug.c
+@@ -24,15 +24,15 @@ int netdev_debug_event(struct notifier_block *nb, unsigned long event,
+ 	case NETDEV_CHANGE:
+ 	case NETDEV_REGISTER:
+ 	case NETDEV_UP:
++	case NETDEV_DOWN:
++	case NETDEV_GOING_DOWN:
+ 		netdev_assert_locked_ops_compat(dev);
+ 		fallthrough;
+-	case NETDEV_DOWN:
+ 	case NETDEV_REBOOT:
+ 	case NETDEV_UNREGISTER:
+ 	case NETDEV_CHANGEMTU:
+ 	case NETDEV_CHANGEADDR:
+ 	case NETDEV_PRE_CHANGEADDR:
+-	case NETDEV_GOING_DOWN:
+ 	case NETDEV_FEAT_CHANGE:
+ 	case NETDEV_BONDING_FAILOVER:
+ 	case NETDEV_PRE_UP:
 -- 
 2.53.0-Meta
 
