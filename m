@@ -1,188 +1,219 @@
-Return-Path: <netdev+bounces-304274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304275-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DAtpMLXPRmoieAsAu9opvQ
-	(envelope-from <netdev+bounces-304274-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 22:53:09 +0200
+	id FXD+GHDYRmolegsAu9opvQ
+	(envelope-from <netdev+bounces-304275-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 23:30:24 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19E686FCD6A
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 22:53:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EF2B6FCF81
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 23:30:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Ej8i8WDa;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304274-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304274-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=onsemi.com header.s=mimecast20250127 header.b=U96LO76x;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304275-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304275-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=onsemi.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5EE77300DF5F
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 20:53:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 94FF5302E41E
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 21:24:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8F42370AF0;
-	Thu,  2 Jul 2026 20:53:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2343638E8A4;
+	Thu,  2 Jul 2026 21:24:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from usb-smtp-delivery-120.mimecast.com (usb-smtp-delivery-120.mimecast.com [170.10.153.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7569E1A6835
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 20:53:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5DDD3845AE
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 21:24:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783025586; cv=none; b=S5YXFCJsfXDx3wXilXOfhAWvdgERr5SE3V+4hhGZNPFiEC7EPayPRD36heyy3etbw3hf2rxxI4Y0X2mHg4iwYurzD2uQC1HXKnbGeBSD0D/BvKFW5oSdwoT0UNTNzE4s7PgcxvMLRspE8p7eFR3/gP+zoINpvXMo/d1x1oJnrAk=
+	t=1783027443; cv=none; b=hMVN2Ynwre+OzVIhV2KE3uBTyD48U3cDInc1492X9bnpjlIXXNbgxnBlJb0bkuKuI/l3De8WwkebGJW9Q5U2tDQurf2xh7G4GxySOnDGGagTypa3F5V9Ohw1obOKmAXtolaNgOsW+Ep/tl9F9YIl9VTj2lhrs/azqF7c2XzjwwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783025586; c=relaxed/simple;
-	bh=90X6nwoMcrMyfEKMt542bHgq7hQLvNHeiApFXnkbcls=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JQv4+pUKDgTDNAOcmbwvzgIcGQh0jSArbV88Drf+6zTlU5tsdpLpREWEeJgvr2N/RBeHi5pbuaSPvQXR9QPlrKhWnr4lJP8mIyGLbk/jJW4sIQnviQUNukcBiHscaIprR0MnUEDVHkXZw93xPLRUb23nAJAgLvEP0g6O398LiDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ej8i8WDa; arc=none smtp.client-ip=209.85.161.45
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-6a0c7c4f55fso1575617eaf.2
-        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 13:53:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783025584; x=1783630384; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OUUT9U/zE34DOVJLI19IRKYtBuKLwinorFscWJ3YAUg=;
-        b=Ej8i8WDaiCF8QhuUucg46HRkTgyDFK4XLMMhz07Cm/BDxjqAARpU6kiy4uYGFbePiy
-         13fccyYoGUCd8x8B9Wqt/mGFU2Uct7Ziqb3LYsMULCp43t7x9DBk6l8ywKglfw+X5iAh
-         ExNFilcHLxiL08I/TXkUyOywfdcsFTKNtzznRLZL7CszwsLf+4mAvZ8yo+hIEEWgQ+n4
-         Mj6FbJLqmvsGSR9GDc6klI92qQ45FlTuqUCt3qASMNr6q/W0R78sjlwPa33JYX+LGeT1
-         4SEQRqO8RC9oxDFqol6XErRaaNvPaiys0p1oxmpG3C/LlAN1jFrevh38PtuXnK9+S+ay
-         a0VA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783025584; x=1783630384;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OUUT9U/zE34DOVJLI19IRKYtBuKLwinorFscWJ3YAUg=;
-        b=erhKoS2/wQ3DA5mnwCwQwLuMSNgFzCPdIM8f4YeLVULWf/BofyXcDty+DBZ2XmslFV
-         X62AnQBmNoO9lHuZHI3TPmhJoJUL3demryUT49ahh6XzaSQaFmOHvMGbGkMhtwuHuz3S
-         VIzhqRcXkJ8vS47BUaRFYO21ykGb+CJrHbGHn2VCc8zlzOu7tENdI778v4XeFiXh6wZK
-         wQVqsGn6W4fXnueNsrHgR3C2/sj55O1OcALuRHU4oNJw1Sj4EsYCJRMUsiV/y2OiTUSb
-         8dhvT9Mfh1nwfuI0no5o9hWFy5fMzTMy9o/zS+YSL56f57SCWLwxEJhR0+affMvUwvOe
-         sqWA==
-X-Forwarded-Encrypted: i=1; AFNElJ8cvCEn+feCBE2pn3xZz+wxaoW0P/kjZV2hQAAOCQk6Z/R7PmmXDyqC2vT1D4L2IEbadNUknB8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiUYxmTcHRUwX++aCxersHQ+sqrusN8S8PWdaijOoQ045mtdKw
-	SFuoiHZgP6cnBQ0dwdUOpCDfmD1oPd8MEurjws67u1oYcMCwRficFO8K
-X-Gm-Gg: AfdE7ckkHPW5lLW9Ue4Z7LkrCP675QWP7zzjiVpUMgib99eXwPfhQmuH+FIhrRE31AX
-	yMLIhdVg2xaOWsnVPmlWpcUkuyCh4cog1rv1osoti2vwvEtrFQ/Z4ig5j6wTNXxY2H8M4TTRkTG
-	X2VyTO8F/g9QHtTmGLjVzr+37y5eVKhMZpqKtud0uhEK1x8B+6AsI458NPDZB7VRH/dU3w6qrBf
-	LXTcn96q/0uJL/aH+OLAQH1n+c2SKD24Wxe3LkY4WGZP+cH2f1MjEZw3Od1w+iv2w111z9W96n9
-	/8UyzfQHRTWio2u7uG0KoYDGiqHG746jPrKaUIBNyuhdbTVACgnWfNFi+Fyh0WRS8ENuQ0ZuR/6
-	H0ypLOX+d0EnADnNtVXGXy7p+e8Uf3DJ+R+4PMkiNzuDNcLehVxYtEHOVHsIrAR83OJttid7wWo
-	e6zLgijqltU8BdCnm6hNWm/5nzutkAdC7N
-X-Received: by 2002:a05:6820:1512:b0:6a1:50eb:2110 with SMTP id 006d021491bc7-6a309b831e1mr4672517eaf.69.1783025584368;
-        Thu, 02 Jul 2026 13:53:04 -0700 (PDT)
-Received: from devvm29614.prn0.facebook.com ([2a03:2880:ff:8::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7eb54534789sm3393061a34.26.2026.07.02.13.53.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jul 2026 13:53:03 -0700 (PDT)
-Date: Thu, 2 Jul 2026 13:53:00 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: "T.J. Mercier" <tjmercier@google.com>
-Cc: kraxel@redhat.com, vivek.kasireddy@intel.com, kuba@kernel.org,
-	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH v2] selftests: Open /dev/udmabuf O_RDONLY
-Message-ID: <akbPrI67h5btdI44@devvm29614.prn0.facebook.com>
-References: <20260701192210.2997769-1-tjmercier@google.com>
+	s=arc-20240116; t=1783027443; c=relaxed/simple;
+	bh=7jXDJM1QUEP/DWJdvvppnZaO2IP9MOm/HKIejCGQDeM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=tCaiVg/Ab215QkbfYuo/M5WiBti22F8C6AXsHk97A5PTf0QIsEVWXL2zE0vzKi2fmLZhyb41QrgR3mk1cV9ivTBA6wvOhcpHb8WVANjbk/NuoGKNs2ULAa7QCr2s0PTZ0h3qa7PyfrmDNttuoKClMsKrCp3DPqQ2GCP32Bb0D+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com; spf=pass smtp.mailfrom=onsemi.com; dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b=U96LO76x; arc=none smtp.client-ip=170.10.153.120
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onsemi.com;
+	s=mimecast20250127; t=1783027435;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7jXDJM1QUEP/DWJdvvppnZaO2IP9MOm/HKIejCGQDeM=;
+	b=U96LO76xEz9VKII9fdFX9Z2hCWmurCyPuDz2XcbIerN+XfoFzcOfPcDLcrzOg5uD6rkvpt
+	qSRLhCinUvo3V8rSumoAqlgO+pogtacgGy2zYCjVJQjVcRrq1SZvN7Z9fVrihrKLAb5H3v
+	nNEOgVDGSHhEdIpbfoKDvG0yPp+RpNawlfHE8hAhaRD5m0b4iymH7JHmRZaPdTUETYaaxX
+	XAEWwKCkA7FK72nY8i6BQMaSXFZvd4KkxY3IMw+Kj/mXvyVAYibHuQUoUTdGAjcbv6CpbF
+	sTvQTbBXr+v/6jWmS2pB/i2DtDtiwM9VrcP2AJpI0jX0Gk74xNJYgK4J+5SgHQ==
+Received: from PH8PR06CU001.outbound.protection.outlook.com
+ (mail-westus3azon11012003.outbound.protection.outlook.com [40.107.209.3])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id usb-mta-50-e97GZKnkOtiz9hllbi6IaQ-1; Thu,
+ 02 Jul 2026 14:23:49 -0700
+X-MC-Unique: e97GZKnkOtiz9hllbi6IaQ-1
+X-Mimecast-MFC-AGG-ID: e97GZKnkOtiz9hllbi6IaQ_1783027424
+Received: from CYYPR02MB9828.namprd02.prod.outlook.com (2603:10b6:930:b8::20)
+ by DS0PR02MB9500.namprd02.prod.outlook.com (2603:10b6:8:f1::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.181.8; Thu, 2 Jul 2026 21:23:39 +0000
+Received: from CYYPR02MB9828.namprd02.prod.outlook.com
+ ([fe80::2767:f7d2:778c:8dca]) by CYYPR02MB9828.namprd02.prod.outlook.com
+ ([fe80::2767:f7d2:778c:8dca%4]) with mapi id 15.21.0181.009; Thu, 2 Jul 2026
+ 21:23:39 +0000
+From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+To: Julian Braha <julianbraha@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Piergiorgio Beruto <Pier.Beruto@onsemi.com>, Heiner Kallweit
+	<hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, Parthiban Veerasooran
+	<parthiban.veerasooran@microchip.com>, Richard Cochran
+	<richardcochran@gmail.com>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Simon
+ Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
+	<skhan@linuxfoundation.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, Jerry Ray
+	<jerry.ray@microchip.com>
+Subject: RE: [PATCH net-next v6 12/15] onsemi: s2500: Add driver support for
+ TS2500 MAC-PHY
+Thread-Topic: [PATCH net-next v6 12/15] onsemi: s2500: Add driver support for
+ TS2500 MAC-PHY
+Thread-Index: AQHdB+wZw4OihCeBzE+Ub6CPdp8aWLZaol4AgAAfP2A=
+Date: Thu, 2 Jul 2026 21:23:39 +0000
+Message-ID: <CYYPR02MB9828BFBEE2BC55DF7D4F675183F52@CYYPR02MB9828.namprd02.prod.outlook.com>
+References: <20260629-s2500-mac-phy-support-v6-0-18ce79500371@onsemi.com>
+ <20260629-s2500-mac-phy-support-v6-12-18ce79500371@onsemi.com>
+ <d6a56d05-0c6f-49a5-9281-1194b62ab86e@gmail.com>
+In-Reply-To: <d6a56d05-0c6f-49a5-9281-1194b62ab86e@gmail.com>
+Accept-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CYYPR02MB9828:EE_|DS0PR02MB9500:EE_
+x-ms-office365-filtering-correlation-id: 9aa45b97-0d8c-4733-36c7-08ded8802f62
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|7416014|23010399003|1800799024|22082099003|18002099003|921020|38070700021|11063799006|56012099006|4143699003
+x-microsoft-antispam-message-info: HgqipnCuebMURcAUxQtHqPB6MqR86HkA7wjIJS0IGQRjLkLW10HgO5ITajtnVaZOY7o6JgE4e/LuHrJT0feUl85FtTJjC69iLS9TxwJlb6Pd6V0/F6OxJ89Eqvx9UBu/x/2vq7UJE9UvOV3uULuQUEigqn25tJ5WZ1qb1E8ifQiC2dNT5+wK/TxAwAW5N8UpNVirma9GA0v7KEGvQJC+m4agVRrv9FE38Aa0YOUxSOTIPSE57EKDyxs8StmTFY9SMRF0eAQ+cB8WrzKKiB847qdxz/HU29J4dVsKzgH97R5YRW+uBClHNx+WVoSFRLurciRXoUluj3dKcVBvmDRduQhoC22vwuqj8MyaNDLIOX84t8ISzONBHMSLzt5byVPgLJbm2W1oYV0kVYcgj4HqalZ4OGT0j5JmXkVuG2zr25fBal87bGirbcl9QUpmcmwjHyeHxhGCS4orModPhMZRT4DR0CbCNSerHfInLXr4ZvCP47Xk1S3sZfejFOgjZPN8FZldzI+O73sxYHpTG29X1WKQSHzV9ywsIO9XS9vje0F2Si6xmogErm4bXhy2lKhZNUVSM7vvx7baZ8KQyd6yW4XpfkN4IWHU1DLH8hZ5hxwpzj+cvxqGolSwG0UpX7oMCs+O4kieP7WJ/zHULpazhkMX72GTwybrpliBuVPOVCVpSQpuBL0AFjogVzgfW9jHI0QZ5CNlM3h5yDGyLLOE4whafJIWkiYJUqBiFGHlTUE3VDbHUZ+1fh4DT9s78vA/
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR02MB9828.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(23010399003)(1800799024)(22082099003)(18002099003)(921020)(38070700021)(11063799006)(56012099006)(4143699003);DIR:OUT;SFP:1101
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?QWJ4NDNhR0VGU1o1UEx0eVdwdlVNNmVQak5tNmhnTVZFTWZKVi9RL1o4TTJm?=
+ =?utf-8?B?aGFoR2Ixb2Nxd3FBZW45MEY4alZqL1k5VG14QmxEa0ZpVVk1OUhnK09ka2Fi?=
+ =?utf-8?B?UjY4dkJIMTBnVjY1TjVQRVVPdTZwNEpjQ1p2TDUwblQxR2tpT0xrSk80em1V?=
+ =?utf-8?B?a2QwZVN5MDgrcXVlWHJKMHlSUWQzRzNYbmNyQ0xDVlZuSEY3RGNBTW9COFhs?=
+ =?utf-8?B?VmM5dlpsOVhKNFNpejZnZkt2blVQcXU4K05TMTNEc3A4OGFoSVlFWC93VTZH?=
+ =?utf-8?B?Vm10L3FzMERWMGNEdVBranhGb2FUUTNQZldSSXhIZHZKelQwNG4ydnduRFEy?=
+ =?utf-8?B?QkpiNVJEeXRhaExXQ000T2tZWWVUb1VINnl4ck5hVzhOeloybkpyZEgrSlQ1?=
+ =?utf-8?B?ZnRHaW1OMVdxNU1LV0xUSzdwdkRFYXpyTGc4WjlWdm1WOFNpRFBDRlRnb0RZ?=
+ =?utf-8?B?Wmx2OWFuQkRnMllibXFzaUFtTmdWc3FiZC9TeUtGYTF6MWRrZ0NVbHJkOHl0?=
+ =?utf-8?B?dWJzZ3Q4OEEraDJzT09kU2hDcFdpb0doQmdraWc4cDFxcGZ4cktXNjZoSU5X?=
+ =?utf-8?B?eC9aR0dGOXUzMnYrSlEyRU0xa0NVUnA0RnlJbkF3aDFheEc1dDFaQ2JROVJ6?=
+ =?utf-8?B?U3lxSi9nN2VUcjc2MEEzL0NtRzA5dlVYU2lSSnY1N3JKVks5VTIrMVhoVWp4?=
+ =?utf-8?B?eE1DTEtzblh1N3ptczJ0YzFrdGRibU5wemZoWUlMdlVhN2xJZ2wwSUV2SWU0?=
+ =?utf-8?B?S0dhN2J3b2F1M0Fwd3ZsaGpMdERyY3J0L0Q3cHlqQUU1ZkVDb0hFbDBnbUNv?=
+ =?utf-8?B?cys3MUc1eHpLa3FQSmN6Sm5CdlpmMFZSY1lURlZCalV3WnZyOTJUQW1KU2xE?=
+ =?utf-8?B?NjY3elVvREJKS2dieW9kNnNDamU3T1ZEdHpHNGVBQ3hHU2dHNlgyVjJOSTZt?=
+ =?utf-8?B?dG95U2xCYkMyWjFPMlkzYmp2Kyt3RVRBT3BUeWZ0dTVaN1RhOWl3NFRjMHYv?=
+ =?utf-8?B?bytQZ1JmcmJLWVRXQkpad1crczdKcnZjT2VkYnFhbDFBdFplVzhQTGFJM1VP?=
+ =?utf-8?B?dXhBMHRpRUZQdVBYQ2kyTkt0bXQ1WHhSOWQ5YmhzTFhoV1ZrM0JjOUhWeDNW?=
+ =?utf-8?B?WGc0b1lRTXpNRE9hYjBDNWpWR2dyMG1SUDh0emNlVU9OcGkrNnlpdU5ZYURp?=
+ =?utf-8?B?Ky9sRFVaRGZqRFBFckdHdXZFMTZWZmx1Mkk0S0MzSTdkeWI5QWdTR2JGdnpz?=
+ =?utf-8?B?R2t1aFNzWjgvUzFSb3JaSGJWVWpRZnZkMGU2Q3VUYXlBaXRrM0pxMGhUb0Zn?=
+ =?utf-8?B?RmE1ZWptU2gzS2EvQXQ3clh1cEpjUEY2U3FXZGZkbWg5Z3c0WGRzTnkwdzVu?=
+ =?utf-8?B?aWhSRDlrWFg1SHZieURWb1NRZ3Z0NmlNN2pHYUxjSDFRelB1Q2oydEdJUzA2?=
+ =?utf-8?B?Zi9iZ0kzckVPenBQZVhRRDArYVEwMm1yME4xUnpGcHl6K0NackVnUzQ2L1Rk?=
+ =?utf-8?B?ZjVIMUtHbVlITDRyTDJWU0tHTUhNN2YwMWp3NDVGSlp3dVQ0bzg4Uk9Scm9p?=
+ =?utf-8?B?N1RsWFBuU0tiM0VSOUhSd1VSaFErTWtYbXkzenlEMWJRQmxHK2NZdElVZGI5?=
+ =?utf-8?B?U2lPd1lnWndwRDRXcDdNL3RkYkhXUlBNdmxWblpwdmR6MnovM3F3b1hlVnhJ?=
+ =?utf-8?B?MjZoRGNBUks4NHNVN1V5ZEEvVWJNeDV5ZDRRUGdCS0dnUWovMUZoQ1FtQVZ1?=
+ =?utf-8?B?S25GSHNUZVd2eVIya0tnczFJdU9aejdENFd6enpUbmprcnh1Z3VqcTFYd3RG?=
+ =?utf-8?B?ZTBudFlXVDJnb09LcTk4YjF4aW9Sa0tWU3VMVitxVEhVUVVWTzRaeGJPTVZo?=
+ =?utf-8?B?REtybzQxd2l1S3dlR2JwR3FwR0JQemI1L29tNzRaRVZ1RFFpNDlIanVUNzhk?=
+ =?utf-8?B?bUN1S3BIQ0IwSENielB2d0YrMFZBWVM3UVVOdzRCRDdqZ3lweDNNa3JnV2t4?=
+ =?utf-8?B?RUpRb2djbW9rUWJNUC9malpLc29DOGlIYVNzTVFRYnlFYklnK050SUNmQVpm?=
+ =?utf-8?B?MVIzTTBCeDVTSWJNTkxiSUcwUTdqOHZjSEU5Q0pUaGQ5TDJybXd3aWgzbEVz?=
+ =?utf-8?B?WU9PWWg0WXBxM3BOMkZ1d1pIQUI0VDZPK2tOTnlNVVhsSFVtYkVIbkpxdzZh?=
+ =?utf-8?B?TzdHNktlRnFZN1RGS2RJQkxoQ3Jsd1dGVVdzd1JGS0tubEdHbHp1N3BlTUoz?=
+ =?utf-8?B?eGFCTkQ5dWRwa0lHYk1hR3J1QWdWcEhRcVp4UC8zTmhxc3NZNC9Fb2pybkVs?=
+ =?utf-8?B?SHFJbHZ6aDhsbVdZVERHNlYwbk44R3A5UDcxZDViOHVoYTBPdDZTbitqTDlR?=
+ =?utf-8?Q?Qr853f+1r/BmKqWI=3D?=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260701192210.2997769-1-tjmercier@google.com>
+X-Exchange-RoutingPolicyChecked: Yu3DV94oVd/fUl3hsnukDP3q9kPVgnjouXKmbCGi5W7KvR8GY8AFz+T7u7TwL6abfXtY94YEe21eelXZa7VMa4eMz0hBSbUdo5mEiCRZ27M4vXeHhTQexmJ4aDA6/H52PCNFHOd0OFt6gJyPdVeOg9GxCjzU34wiY9J8m2yZXNnn9x0sY2nsqTaSMz1lwayKON8Bc+L573ItB9XmvIevUz6Rc5NmUB99n92UYtaSybceTzTBeWxYbzCcjLKNKpnbAhnYmEccEgABIgL5lqtl4V/+hi0vpfnslenq3bnCVE7+/pUYGY1OVnHGpgRKC+0PKcSkTwpBtiPtBePRyEPXcg==
+X-OriginatorOrg: onsemi.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CYYPR02MB9828.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9aa45b97-0d8c-4733-36c7-08ded8802f62
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Jul 2026 21:23:39.3867
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 04e1674b-7af5-4d13-a082-64fc6e42384c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: tq56GtHJUlRYQENPNpTIzX+u+8CyPKcYXC4H91d+8cvH9O748Rvy2gapPKamDgJ3rQEsKL04ToO9BlC9VhxgwojFd70NMqsS7wNmprmeSdQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR02MB9500
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: yhz4xTXRYNJfAB5EN_Sa3qMsS9sozZ4oMjLEZSgOgnA_1783027424
+X-Mimecast-Originator: onsemi.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.44 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[onsemi.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[onsemi.com:s=mimecast20250127];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-304274-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:tjmercier@google.com,m:kraxel@redhat.com,m:vivek.kasireddy@intel.com,m:kuba@kernel.org,m:shuah@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304275-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:julianbraha@gmail.com,m:andrew@lunn.ch,m:Pier.Beruto@onsemi.com,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:parthiban.veerasooran@microchip.com,m:richardcochran@gmail.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-doc@vger.kernel.org,m:jerry.ray@microchip.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,onsemi.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,lwn.net,linuxfoundation.org];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[onsemi.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,meta.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 19E686FCD6A
+X-Rspamd-Queue-Id: 9EF2B6FCF81
 
-On Wed, Jul 01, 2026 at 12:22:08PM -0700, T.J. Mercier wrote:
-> Write permissions on the /dev/udmabuf device file are not required to
-> issue ioctls and allocate udmabufs. Applications should be opening this
-> file as O_RDONLY. The BPF dmabuf_iter selftest already does this. [1]
-> 
-> Users are pointing to these selftests as examples of how use udmabuf,
-> and encountering permission errors on systems where write permissions
-> are not available on /dev/udmabuf. Apply the principle of least
-> privilege to selftests which use udmabuf by removing the write access
-> mode from drivers/dma-buf/udmabuf.c and drivers/net/hw/ncdevmem.c.
-> 
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/testing/selftests/bpf/prog_tests/dmabuf_iter.c?h=v7.1#n49
-> 
-> Signed-off-by: T.J. Mercier <tjmercier@google.com>
-> ---
->  tools/testing/selftests/drivers/dma-buf/udmabuf.c | 2 +-
->  tools/testing/selftests/drivers/net/hw/ncdevmem.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/drivers/dma-buf/udmabuf.c b/tools/testing/selftests/drivers/dma-buf/udmabuf.c
-> index d78aec662586..ced0b95c876c 100644
-> --- a/tools/testing/selftests/drivers/dma-buf/udmabuf.c
-> +++ b/tools/testing/selftests/drivers/dma-buf/udmabuf.c
-> @@ -140,7 +140,7 @@ int main(int argc, char *argv[])
->  	ksft_print_header();
->  	ksft_set_plan(7);
->  
-> -	devfd = open("/dev/udmabuf", O_RDWR);
-> +	devfd = open("/dev/udmabuf", O_RDONLY);
->  	if (devfd < 0) {
->  		ksft_print_msg(
->  			"%s: [skip,no-udmabuf: Unable to access DMA buffer device file]\n",
-> diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-> index e098d6534c3c..8114a29692fd 100644
-> --- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-> +++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-> @@ -149,7 +149,7 @@ static struct memory_buffer *udmabuf_alloc(size_t size)
->  
->  	ctx->size = size;
->  
-> -	ctx->devfd = open("/dev/udmabuf", O_RDWR);
-> +	ctx->devfd = open("/dev/udmabuf", O_RDONLY);
->  	if (ctx->devfd < 0) {
->  		pr_err("[skip,no-udmabuf: Unable to access DMA buffer device file]");
->  		goto err_free_ctx;
-> 
-> base-commit: fbb7ad31ab376c5101b2ac7205fad0344fd2de60
-> -- 
-> 2.55.0.rc0.799.gd6f94ed593-goog
-> 
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEp1bGlhbiBCcmFoYSA8anVs
+aWFuLmJyYWhhQGdtYWlsLmNvbT4gT24gQmVoYWxmIE9mIEp1bGlhbiBCcmFoYQ0KPiBTdWJqZWN0
+OiBSZTogW1BBVENIIG5ldC1uZXh0IHY2IDEyLzE1XSBvbnNlbWk6IHMyNTAwOiBBZGQgZHJpdmVy
+IHN1cHBvcnQgZm9yIFRTMjUwMCBNQUMtUEhZDQo+IA0KPiA+ICtlbmRpZiAjIE5FVF9WRU5ET1Jf
+T05TRU1JDQo+IA0KPiBTMjUwMF9NQUNQSFkgc3RpbGwgaGFzIHRoYXQgZHVwbGljYXRlIGRlcGVu
+ZGVuY3kgZnJvbSBiZWluZyBpbnNpZGUgdHdvDQo+IG9mIHRoZXNlOg0KPiAnaWYgTkVUX1ZFTkRP
+Ul9PTlNFTUkuLmVuZGlmJw0KPiANCj4gQW5kIEkgYWxyZWFkeSBwb2ludGVkIGl0IG91dCBvbiB2
+NToNCg0KU29tZWhvdywgSSBtaXNzZWQgeW91ciBmZWVkYmFjay4gU29ycnkgYWJvdXQgdGhhdC4g
+V2lsbCByZW1vdmUgdGhlIGR1cGxpY2F0aW9uLg0KKEFsc28gd2lsbCBnbyBvdmVyIGFsbCB0aGUg
+cmVzcG9uc2VzIHRvIHNlZSBpZiBJIG1pc3NlZCBhbnl0aGluZyBlbHNlKQ0KDQoNCj4gOigNCj4g
+DQo+IC0gSnVsaWFuIEJyYWhhDQoNCg==
 
-Reviewed-by: Bobby Eshleman <bobbyeshleman@meta.com>
 
