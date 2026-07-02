@@ -1,216 +1,229 @@
-Return-Path: <netdev+bounces-304148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304149-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id PErfHPpTRmqLQwsAu9opvQ
-	(envelope-from <netdev+bounces-304148-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 14:05:14 +0200
+	id P6liBBtRRmqeQgsAu9opvQ
+	(envelope-from <netdev+bounces-304149-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 13:52:59 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7F6A6F7475
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 14:05:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 71F766F710A
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 13:52:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ssi.bg header.s=ssi header.b=yCrjjBRw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304148-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304148-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=ssi.bg;
+	dkim=pass header.d=tipi-net.de header.s=dkim header.b="hpqU/3DM";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304149-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304149-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1372331F9D31
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 11:32:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id ED4BD306F203
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 11:36:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20B884189DE;
-	Thu,  2 Jul 2026 11:31:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A84842A7BB;
+	Thu,  2 Jul 2026 11:36:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28394189DD;
-	Thu,  2 Jul 2026 11:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4EA3C1F54;
+	Thu,  2 Jul 2026 11:36:18 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782991902; cv=none; b=r88YPtFoLqKvK2PHkH202q+78HcDwtE9/IkdPDs53kI4noWt0LZ2sCTgRpksPbLTjNuXZzI+J/YmLy8rTpi9139wBtpPeQOr62037rystVTUxlRaweuBavZA2BfiWJkgNtxxQVYC151NSAjR0Vu5mrJUa9ceZl3T1PfrL35h+N0=
+	t=1782992181; cv=none; b=o7c1lnKF/uPsG/yNjh9NusHd5JR7r5ih2f+qNfXJ6+x83TNX2LmPz3dNQTQdTCMOD26rr2JuY5YYgwLSjcg5EYoi6Qq1UqIkka6H61Fhb9zFiEnt/iO2J9hk3S7tRbP2xZBfn4dF+mBh1eaIpAhbkitvLeUfg4vLGVCM7clRwgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782991902; c=relaxed/simple;
-	bh=tXGbtkdTZWAv2pqpZGDXd8E3ARFn2KxITER5JobuThU=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=G4RksqvHGS3Ud7cGOGkarkv4i1QG5u8to5WYw4A7t/8+r8qgV9QwTOnk8/AP6Zf8Af3odEA5eA3evI8Cv5Dof4wFttomxw8jxPECeOylW/MckuWEmYk822T1Dx5u9aoaCurk+ZLyHfL9bQrRY8Efuw60UuueGX7H6BL1MR6DIJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=yCrjjBRw; arc=none smtp.client-ip=193.238.174.39
-Received: from mx.ssi.bg (localhost [127.0.0.1])
-	by mx.ssi.bg (Potsfix) with ESMTP id C0191229E7;
-	Thu, 02 Jul 2026 14:31:32 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
-	:content-type:content-type:date:from:from:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
-	 bh=vNIDsZvLWhESGHi31+8av3uZRVUZwCUmNhPwcwKeGuY=; b=yCrjjBRw9gkC
-	LC0pjNMVHtdLgT+4Z7rzrnM45BFpaAYiM1fTte9FYqoza4tc7UhtwWV5yKLzdJFu
-	yS6z3o/hlGo1Ig5qIxdv+Ozdokki15BT/xRE2fbrMUJA5cy7ikGFc997M458VIy3
-	/pzXisJostq8f8Yn70GP1BwAnPiJQCcZa60K7uqETuRgTRXTAY/J5/mShiRPIBNH
-	9ja+3JvqKfUssVsF91rSdYfKTLV3/ScVZbKjWCougWdrEf4fDXoMGpj2UxNysA28
-	dWK7/dli4y236S0Aw/E9By1Uhh799Y3wtCrHqwg6eQ+EPR+5W41iZ19t5XzKXbBv
-	7UT2cVNSY4F+pk+cDyolaMiLDhacfPlelmxWet3200LZB0Wo8Uq/v/Hh0uJo2BTL
-	Baw43tgfw9HGGQ77Ne6Vi0vb+/pkPQrQnVc6hDaFiSwXLqf6wCXbKwq97YougY+z
-	MQgR/BcjqELSCnEzOHF86PtXfBoaWO/OJJrLcg0Rmn8LSJIofO4YmHAXxQ01lmCw
-	YPnSD1Gw5hTCIdKvJhB38jGiHQxrgo6EbFWQsDHEmtRD5Z/d/abbcredtURottvE
-	vQsDL5vuT80dMFCTzcBOP9SIe2itXhfyxe7Ygdogc8M1RiT9Cyjn4rLMZeLgzuEP
-	pPThQRfH7D540qdMGw0pr7mSZ4qVF70=
-Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
-	by mx.ssi.bg (Potsfix) with ESMTPS;
-	Thu, 02 Jul 2026 14:31:32 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by box.ssi.bg (Potsfix) with ESMTPSA id 7602C60B21;
-	Thu,  2 Jul 2026 14:31:31 +0300 (EEST)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.2/8.18.2) with ESMTP id 662BVT4K038906;
-	Thu, 2 Jul 2026 14:31:29 +0300
-Date: Thu, 2 Jul 2026 14:31:29 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-cc: netdev@vger.kernel.org, Simon Horman <horms@verge.net.au>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, lvs-devel@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
-        Ao Wang <wangao@seu.edu.cn>, Xuewei Feng <fengxw06@126.com>,
-        Qi Li <qli01@tsinghua.edu.cn>, Ke Xu <xuke@tsinghua.edu.cn>
-Subject: Re: [PATCH net v2] ipvs: fix PMTU for GUE/GRE tunnel ICMP errors
-In-Reply-To: <20260702073430.67680-1-zhaoyz24@mails.tsinghua.edu.cn>
-Message-ID: <c6664a17-eea8-edf3-30bc-9997265c9b57@ssi.bg>
-References: <20260702073430.67680-1-zhaoyz24@mails.tsinghua.edu.cn>
+	s=arc-20240116; t=1782992181; c=relaxed/simple;
+	bh=WBsZvj1YrnX58paoW/oC3TjZ0/Gv4u7ilYA7XgCMMMw=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=MnK4DFxvB3IwSlrIdz9XMyIc3LWC2/hORPtfccC3Fxnnvu12+Jo/cmPtwout0/BVnHXjobXKbutDxeTuDdStP9V86WKlLm5TR21S6hpHwv7qCCSY640MehIc1P/tXTtxdiAyJ2i1MFTJxbhW1QX46zkeWcR8FUVy11hMiqY1Tb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=hpqU/3DM; arc=none smtp.client-ip=194.13.80.246
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 18A6BA47CD;
+	Thu,  2 Jul 2026 13:36:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1782992175; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=j6ZsQauM6gIautaKWkv5Fv+2Mz2AdmTwz4GLhRe+aUc=;
+	b=hpqU/3DMkCZCsAsjBZI3GxR2NCPAAiTnokDwocmGf1poIdcqxEiz7nqpfEgkL4SpBfFbJ1
+	j565OgfUzUjczyl1/RC/Iv1kWXVhZIL0Ye8rOtKCkItf9J9jTAd/f9vWC3iKjEQleYUizs
+	ugeeJzaATWnuLko+8OlmTMIEa5NlX7CcbJuOlMKMmWQGdnJ6puHGF86zHz1VOU44ZstNJv
+	d6VF7T3RelbZxH8LAQFK/WShQpqjcveSevoeHoHD7yHfH+N8GdX3nFcNvB+9kc7oIPxpmP
+	kX/FFLwBfkUuUt32vpIr9QCBd6R+imD3mMQyNXxSByphMKascWAMCHtVMoxWrA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Date: Thu, 02 Jul 2026 13:36:13 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: enrico.pozzobon@dissecto.com
+Cc: Thangaraj Samynathan <Thangaraj.S@microchip.com>, Rengarajan
+ Sundararajan <Rengarajan.S@microchip.com>, UNGLinuxDriver@microchip.com,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Woojung.Huh@microchip.com, netdev@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] net: usb: lan78xx: disable VLAN filter in
+ promiscuous mode
+In-Reply-To: <20260701-lan78xx-vlan-promisc-v2-1-fe3b18066728@dissecto.com>
+References: <20260701-lan78xx-vlan-promisc-v2-1-fe3b18066728@dissecto.com>
+Message-ID: <aef78533a81c88a362885c24928a7c60@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
-	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,verge.net.au,netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
-	TAGGED_FROM(0.00)[bounces-304148-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FORGED_RECIPIENTS(0.00)[m:zhaoyz24@mails.tsinghua.edu.cn,m:netdev@vger.kernel.org,m:horms@verge.net.au,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lvs-devel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,s:lists@lfdr.de];
+	DMARC_NA(0.00)[tipi-net.de];
+	FORGED_RECIPIENTS(0.00)[m:enrico.pozzobon@dissecto.com,m:Thangaraj.S@microchip.com,m:Rengarajan.S@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:Woojung.Huh@microchip.com,m:netdev@vger.kernel.org,m:linux-usb@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-304149-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[ssi.bg:+];
-	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,sashiko.dev:url,msgid.link:url,vger.kernel.org:from_smtp,lunn.ch:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C7F6A6F7475
+X-Rspamd-Queue-Id: 71F766F710A
 
+Hi Enrico
 
-	Hello,
-
-On Thu, 2 Jul 2026, Yizhou Zhao wrote:
-
-> When an ICMP Fragmentation Needed error is received for a tunneled IPVS
-> connection, ip_vs_in_icmp() recomputes the MTU that the original packet
-> can use by subtracting the tunnel overhead from the reported next-hop
-> MTU.
+On 1.7.2026 15:09, Enrico Pozzobon via B4 Relay wrote:
+> From: Enrico Pozzobon <enrico.pozzobon@dissecto.com>
 > 
-> The current code always subtracts sizeof(struct iphdr), which is only
-> the IPIP overhead. For GUE and GRE tunnels, ipvs_udp_decap() and
-> ipvs_gre_decap() already compute the additional tunnel header length,
-> but that value is scoped to the decapsulation block and is lost before
-> the ICMP_FRAG_NEEDED handling. As a result, the ICMP error sent back to
-> the client advertises an MTU that is too large, so PMTUD can fail to
-> converge for GUE/GRE-tunneled real servers.
+> The hardware VLAN filter (RFE_CTL_VLAN_FILTER_) drops VLAN-tagged 
+> frames
+> whose VID has not been registered via lan78xx_vlan_rx_add_vid(). It is
+> left enabled in promiscuous mode, so packet capture (e.g. tcpdump or
+> Wireshark) does not see tagged frames for unregistered VIDs.
 > 
-> With a reported next-hop MTU of 1400, a GUE tunnel currently returns
-> 1380 to the client. The correct value is 1368:
+> Clear the filter while the interface is promiscuous and restore it from
+> NETIF_F_HW_VLAN_CTAG_FILTER otherwise. Enforce the same condition in
+> lan78xx_set_features() so netdev_update_features() cannot re-enable the
+> filter while promiscuous.
 > 
->   1400 - sizeof(struct iphdr) - sizeof(struct udphdr) -
->   sizeof(struct guehdr)
-> 
-> Hoist the tunnel header length into the main ip_vs_in_icmp() scope and
-> subtract sizeof(struct iphdr) + ulen in the Fragmentation Needed path.
-> The IPIP path keeps ulen as 0, so its existing 1400 - 20 = 1380 result
-> is unchanged.
-> 
-> Fixes: 508f744c0de3 ("ipvs: strip udp tunnel headers from icmp errors")
-> Cc: stable@vger.kernel.org
-> Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-> Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
-> Reported-by: Ao Wang <wangao@seu.edu.cn>
-> Reported-by: Xuewei Feng <fengxw06@126.com>
-> Reported-by: Qi Li <qli01@tsinghua.edu.cn>
-> Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
-> Assisted-by: Claude-Code:GLM-5.2
-> Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-
-	Looks good to me for the nf tree, thanks!
-
-Acked-by: Julian Anastasov <ja@ssi.bg>
-
+> Fixes: 55d7de9de6c3 ("Microchip's LAN7800 family USB 2/3 to 10/100/1000 
+> Ethernet device driver")
+> Signed-off-by: Enrico Pozzobon <enrico.pozzobon@dissecto.com>
+> ---
+> Currently, on microchip lan7801, enabling promiscuous mode does not
+> result in VLAN tagged packets being captured. This patch fixes this,
+> forcing the RFE_CTL_VLAN_FILTER_ flag to be off when promiscuous mode 
+> is
+> enabled.
 > ---
 > Changes in v2:
->   - Use the short first hunk context so patch applies without fuzz.
->   - Adjust Assisted-by to checkpatch's agent-name format.
->   - Suggested by Julian.
->   - Link to v1: https://lore.kernel.org/netdev/20260701065941.46249-1-zhaoyz24@mails.tsinghua.edu.cn/
-> ---
->  net/netfilter/ipvs/ip_vs_core.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+> - moved VLAN filter logic into lan78xx_update_vlan_filter()
+> - Link to v1: 
+> https://patch.msgid.link/20260630-lan78xx-vlan-promisc-v1-1-fbf0f903bd8f@dissecto.com
 > 
-> diff --git a/net/netfilter/ipvs/ip_vs_core.c b/net/netfilter/ipvs/ip_vs_core.c
-> index d40b404c1bf6..906f2c361676 100644
-> --- a/net/netfilter/ipvs/ip_vs_core.c
-> +++ b/net/netfilter/ipvs/ip_vs_core.c
-> @@ -1767,6 +1767,7 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
->  	bool tunnel, new_cp = false;
->  	union nf_inet_addr *raddr;
->  	char *outer_proto = "IPIP";
-> +	int ulen = 0;
->  
->  	*related = 1;
->  
-> @@ -1831,7 +1832,6 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
->  		   /* Error for our tunnel must arrive at LOCAL_IN */
->  		   (skb_rtable(skb)->rt_flags & RTCF_LOCAL)) {
->  		__u8 iproto;
-> -		int ulen;
->  
->  		/* Non-first fragment has no UDP/GRE header */
->  		if (unlikely(cih->frag_off & htons(IP_OFFSET)))
-> @@ -1936,8 +1936,8 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
->  				if (dest_dst)
->  					mtu = dst_mtu(dest_dst->dst_cache);
->  			}
-> -			if (mtu > 68 + sizeof(struct iphdr))
-> -				mtu -= sizeof(struct iphdr);
-> +			if (mtu > 68 + sizeof(struct iphdr) + ulen)
-> +				mtu -= sizeof(struct iphdr) + ulen;
->  			info = htonl(mtu);
+> To: Thangaraj Samynathan <Thangaraj.S@microchip.com>
+> To: Rengarajan Sundararajan <Rengarajan.S@microchip.com>
+> To: UNGLinuxDriver@microchip.com
+> To: Andrew Lunn <andrew+netdev@lunn.ch>
+> To: "David S. Miller" <davem@davemloft.net>
+> To: Eric Dumazet <edumazet@google.com>
+> To: Jakub Kicinski <kuba@kernel.org>
+> To: Paolo Abeni <pabeni@redhat.com>
+> To: Woojung.Huh@microchip.com
+> Cc: netdev@vger.kernel.org
+> Cc: linux-usb@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> ---
+>  drivers/net/usb/lan78xx.c | 18 ++++++++++++++----
+>  1 file changed, 14 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
+> index c4cebacabcb5..cb782d81d84f 100644
+> --- a/drivers/net/usb/lan78xx.c
+> +++ b/drivers/net/usb/lan78xx.c
+> @@ -1499,6 +1499,17 @@ static void 
+> lan78xx_deferred_multicast_write(struct work_struct *param)
+>  	return;
+>  }
+> 
+> +static void lan78xx_update_vlan_filter(struct lan78xx_priv *pdata,
+> +				       struct net_device *netdev,
+> +				       netdev_features_t features)
+> +{
+> +	if ((features & NETIF_F_HW_VLAN_CTAG_FILTER) &&
+> +	    !(netdev->flags & IFF_PROMISC))
+> +		pdata->rfe_ctl |= RFE_CTL_VLAN_FILTER_;
+> +	else
+> +		pdata->rfe_ctl &= ~RFE_CTL_VLAN_FILTER_;
+> +}
+> +
+>  static void lan78xx_set_multicast(struct net_device *netdev)
+>  {
+>  	struct lan78xx_net *dev = netdev_priv(netdev);
+> @@ -1533,6 +1544,8 @@ static void lan78xx_set_multicast(struct 
+> net_device *netdev)
 >  		}
->  		/* Strip outer IP, ICMP and IPIP/UDP/GRE, go to IP header of
+>  	}
+> 
+> +	lan78xx_update_vlan_filter(pdata, dev->net, dev->net->features);
+> +
+>  	if (netdev_mc_count(dev->net)) {
+>  		struct netdev_hw_addr *ha;
+>  		int i;
+> @@ -3074,10 +3087,7 @@ static int lan78xx_set_features(struct 
+> net_device *netdev,
+>  	else
+>  		pdata->rfe_ctl &= ~RFE_CTL_VLAN_STRIP_;
+> 
+> -	if (features & NETIF_F_HW_VLAN_CTAG_FILTER)
+> -		pdata->rfe_ctl |= RFE_CTL_VLAN_FILTER_;
+> -	else
+> -		pdata->rfe_ctl &= ~RFE_CTL_VLAN_FILTER_;
+> +	lan78xx_update_vlan_filter(pdata, netdev, features);
+> 
+>  	spin_unlock_irqrestore(&pdata->rfe_ctl_lock, flags);
+> 
+> 
+> ---
+> base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
+> change-id: 20260623-lan78xx-vlan-promisc-83af8a48a7ec
+> 
+> Best regards,
+> --
+> Enrico Pozzobon <enrico.pozzobon@dissecto.com>
 
-Regards
+AFAIU the findings from Sashiko [1] on v1 are either false positives or 
+pre-existing
+issues unrelated to this change, so LGTM.
 
---
-Julian Anastasov <ja@ssi.bg>
+@Thangaraj / maintainers:
+The mails to Rengarajan are bouncing since a few series - does the 
+MAINTAINERS entry need an update?
 
+Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
+
+[1] 
+https://sashiko.dev/#/patchset/20260630-lan78xx-vlan-promisc-v1-1-fbf0f903bd8f%40dissecto.com
+
+Thanks
+Nicolai
 
