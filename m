@@ -1,242 +1,219 @@
-Return-Path: <netdev+bounces-304542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304543-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5Y7LK5S0R2oxdwAAu9opvQ
-	(envelope-from <netdev+bounces-304542-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:09:40 +0200
+	id aqVoDMK0R2pBdwAAu9opvQ
+	(envelope-from <netdev+bounces-304543-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:10:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA8B2702B0D
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:09:39 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2B47702B27
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:10:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=noxgY4nM;
-	dmarc=pass (policy=none) header.from=intel.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304542-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-304542-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=walle.cc header.s=mail2022082101 header.b=nbrNh1zR;
+	dmarc=pass (policy=quarantine) header.from=walle.cc;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304543-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304543-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 519703019A9A
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 13:04:15 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3A289301A042
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 13:05:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A1003D0914;
-	Fri,  3 Jul 2026 13:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C70F3D34B9;
+	Fri,  3 Jul 2026 13:05:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from mail.3ffe.de (0001.3ffe.de [159.69.201.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E7B933B975;
-	Fri,  3 Jul 2026 13:04:11 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783083853; cv=fail; b=jOg17zcAYWpNB7X8ZDyXva4epco7bBGOJl7TyKOqGyVRJmHJH9dmGmmvMl7cW4brZI3BYdSlUc1giPFkT17aCjxEoBb3BGaZ1jzYTQuHboouvsc4L2N0/cn+hs2dbLdll6OAS0RHlJgZFFefUe0kOTJvuPqTV/c6oXWQmBVU/w0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783083853; c=relaxed/simple;
-	bh=jsWxs8dZydzioeAs1o42bk/ZsXNuC1uiGC9e3Nbmsj0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=VALGwqD2w6ZlEuhJE7nfYfrCeO1BIyScxnjEnc0X2x2cPH4Y+d8qFkYmyCDGyjkfvUUnt+PtOSSbzhqbgRuKbLZfa2OHBpNZTNOHmlfnVzlqU0nou0nfp58Vdv506bw5ALLwoQQIdx33hXwvZIQM8EZyWk+GYIN6JuMgNfI3dYs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=noxgY4nM; arc=fail smtp.client-ip=198.175.65.18
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1783083852; x=1814619852;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=jsWxs8dZydzioeAs1o42bk/ZsXNuC1uiGC9e3Nbmsj0=;
-  b=noxgY4nMSWODDkgJB/H6ppR4RdsLZMLrfc91kNgeUUcbrnzIpEuablxA
-   YpFag6R67aagqoE6/mt6HZ5FFifru3UIn8UypgFqjGfIPpQuaTvE4GEFU
-   Ej2uPRk6eT2ncFBbe0VNDZILeYSpuyi/IRlj3nYEdFn6L9X54f9kRK8B7
-   JyFUuNCuUNByNea0pAZIFzPfQq/t5bD6ges4NbkxA516Y71uzTCq9xIyQ
-   7/AYmKMUNI5zMckrfb2isjmjquKsC6sYssB0YYya9CowyxOipTNi5cBC0
-   tnKyPk0Lg1zeQdlOzGYalLoMscdZOg+TlEo1lEsCtdw+ptsM99MvP2Siw
-   Q==;
-X-CSE-ConnectionGUID: +Rjze+z8SomKMMqL+DOCUw==
-X-CSE-MsgGUID: GRxoENpnSG6Mg0/YkORRVw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11835"; a="83930599"
-X-IronPort-AV: E=Sophos;i="6.25,145,1779174000"; 
-   d="scan'208";a="83930599"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2026 06:04:11 -0700
-X-CSE-ConnectionGUID: Gd92jBzYT0mdF+TVdq6I/g==
-X-CSE-MsgGUID: oYTbSDkeR/ekiXk52mcXZA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,145,1779174000"; 
-   d="scan'208";a="249754694"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2026 06:04:11 -0700
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Fri, 3 Jul 2026 06:04:10 -0700
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43 via Frontend Transport; Fri, 3 Jul 2026 06:04:10 -0700
-Received: from CH5PR02CU005.outbound.protection.outlook.com (40.107.200.35) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Fri, 3 Jul 2026 06:04:10 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fjIFLGOij/fcHIAyy7PW9zZ200iByaK1+JofQz6tMaymNVp/y5LeJtrmnDqUcNy2GQ+uXbiofGZMq1oG6MrY5NC++zUssC9pdKlFQnyigQ/Toxi1puFWccxxin39PlJsRzPdvvu2bVpp6l5xjbskQGP+F/w1v1VeuPUW/WV7dl4vS6uQMqePppdmSTy3MbJMjxu/ZdqYp/qTMkgq/E0Z358nNJXaykNqlvqFhFim8fNc5aAPaJ9x34/IUiyVSnYbHjhAXp6FsWkY+ucMwsgTM7zCumUktcqFz/CB/+MOAxJ8zc9tmcdp+eBLHG8qfDwHbXRLo5GKJzBQguhqmS33ag==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jsWxs8dZydzioeAs1o42bk/ZsXNuC1uiGC9e3Nbmsj0=;
- b=uMEMbEPyw5Bzcna72ZJhmS9/qSMf/aT7kLrWL/vSbxlTU/phBk0syKQLBTu8kckMjzgP8qhhFhdBJDFfUV8l0ZoUdq8UJ+BB75/IPVWeMfmZC+J2wmXS1EFjwJrdCT5sx7r0pCqT82GCjWHSAILcBdGeeVlmSYZEO5e87lyBkGMH+vb43oMlkQmVG1M0RgHG+U9gSb9ijycLbkDjUYHZRSiBcb0qYupLLITlTsf3jhsF/bOIsfEVrfoe6883JzKVLSIhjNvf99Cl63fChHjBwaDoTnX2rQTSsEiUiTvw9hIoVizFPxRYmQmNgFT67GL8lK98KeIywDPMht4d3LmQNQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB5902.namprd11.prod.outlook.com (2603:10b6:510:14d::19)
- by PH8PR11MB7119.namprd11.prod.outlook.com (2603:10b6:510:215::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Fri, 3 Jul 2026
- 13:04:06 +0000
-Received: from PH0PR11MB5902.namprd11.prod.outlook.com
- ([fe80::f95a:602a:34d3:5d37]) by PH0PR11MB5902.namprd11.prod.outlook.com
- ([fe80::f95a:602a:34d3:5d37%5]) with mapi id 15.21.0181.009; Fri, 3 Jul 2026
- 13:04:06 +0000
-From: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
-To: Luke Howard <lukeh@padl.com>, Andrew Lunn <andrew@lunn.ch>, "Vladimir
- Oltean" <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Russell King
-	<linux@armlinux.org.uk>, Richard Cochran <richardcochran@gmail.com>, "Florian
- Fainelli" <f.fainelli@gmail.com>
-CC: Cedric Jehasse <cedric.jehasse@gmail.com>, Max Holtmann <mh@rme-audio.de>,
-	Max Hunter <max@huntershome.org>, "Tyrrell, Kieran" <kieran@sienda.com>, Ryan
- Wilkins <Ryan.Wilkins@telosalliance.com>, Mattias Forsblad
-	<mattias.forsblad@gmail.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net-next 02/17] net: dsa: mv88e6xxx: Introduce Marvell dsa
- tagger data operation.
-Thread-Topic: [PATCH net-next 02/17] net: dsa: mv88e6xxx: Introduce Marvell
- dsa tagger data operation.
-Thread-Index: AQHdCsFu9CrBenNRN0eYojK7REXBDLZbwyzg
-Date: Fri, 3 Jul 2026 13:04:06 +0000
-Message-ID: <PH0PR11MB5902B205AE515BD59B756312F0F42@PH0PR11MB5902.namprd11.prod.outlook.com>
-References: <20260703-net-next-mv88e6xxx-rmu-v1-0-991a27d78bca@padl.com>
- <20260703-net-next-mv88e6xxx-rmu-v1-2-991a27d78bca@padl.com>
-In-Reply-To: <20260703-net-next-mv88e6xxx-rmu-v1-2-991a27d78bca@padl.com>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB5902:EE_|PH8PR11MB7119:EE_
-x-ms-office365-filtering-correlation-id: 2f6957dd-02c8-408c-3d59-08ded903908c
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|23010399003|376014|7416014|366016|1800799024|22082099003|18002099003|921020|38070700021|4143699003|56012099006|11063799006;
-x-microsoft-antispam-message-info: IWjA3FjCq+ZjaK5JgUMD7fUuUhh36jOuUOzhnNWzJPNfXHmmdTSHKhj778gsZtDn3BKFcuNEjc89acgMJyvD5of0v07PkkE4QJZntqNihc8ZZzZwudULAO+w6H7USNVNLw2iLZwbz/wJ2ZpBHrJtetRwvGlub3YNtEdbeRwxdCNErVlz/UZfOhFXhTWa2FA9N0p46Dlz337ycHnKbURe66gXvMNv1u+wS8OFVN6+ZqNccmf7A28hfnu4A1eGSxzprt6vDoQz7GL6V+TrQUbyvMohASYdbdtNCHV3OzRvy8Sd1LTa0UtGcCdQ8y6+VhVY2SZzI8nKDtTE85gVj9/r8NPFPk/0iq9e3rdfnvBznUXd+BCxduMD73mD69h/3ufEltq4mzQ9HF5tALb26A4EzK8RbeDNKo7eeifbV/8Gxomk49jZNMyrxCRUMaxRPAZ6l7jYOqgyWh7ilLOikf8ZuLtpugBNiDBTw0ECOaFVkZomWrsupW1LA9LxraKgkzCbDILoRaYzJ8dGUigJjew7/ib7zh3NaIyYA3qf8eKx1hNKpmdzWVX9lrLGpIfNq6L4IViYpr1lXNeeZcfTabBnJGMGWpkl36OLvPG4rRx6bBcOybDz/+iuGf5+GDQi4eACWW0FZNZx4c3Nd8MSl5Iw9RGEy0wwIPSKbYT6pGITGSorDF2p2gznlI3xYejOO5SbSZ1F+MYKCYK44ehSfgNM70qFPWjpBGPq3aMwrFLIopZEdPeoIs0JyHDYpF8vhvzz
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5902.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(7416014)(366016)(1800799024)(22082099003)(18002099003)(921020)(38070700021)(4143699003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?cWRzYUxWNmlCY095d1RIS3llaTkxU0cyenJPMWh6c1prMERmSlZFTmhJdG5h?=
- =?utf-8?B?ZDN1dU1UaitrbVJjbUFCWTRvTElvZFJ5K21uQTBvcHVHSFRxT2pYdk5pQ0xJ?=
- =?utf-8?B?TVVXOUwxMFdwQ253aUZRZmJpM21wdHJQSDBYc2lpVzhEcjZBZ1dGM1NCVDdt?=
- =?utf-8?B?ZysyUkFwdlFjU0JuWkVQVU9Eb1dITFFrVzdua1NiWHZSQWc4ZGlIdkdialFJ?=
- =?utf-8?B?MFNmdUMrd0ZpQ3V3c280Z21nSHdhYzJkYVFHOU56TWFnUEcyTlY5UXNLTGx1?=
- =?utf-8?B?cjN2akVKMFFNL2wyOUQrelhGeGNtUWNJd1k5aTQxWWJ3KzkxVDRKTjlpL1pS?=
- =?utf-8?B?eVFKTUlyRi9DV0VWeEE1eW1oc0dyV3lIU0tPRW1ZV2JXZXovZC9JcWkyYjZr?=
- =?utf-8?B?ZlpCZC9zMHYySFhvM0xSYzR3bFhpaVNLbWhOZzNsUnVvRWNOM1ZNSm1DZDlQ?=
- =?utf-8?B?c3IxUnlsQWZCb0Z0SzdOSWMrYUJqOVVCTzQ1SUVGTjR0eXZNRyswRVBnQkRC?=
- =?utf-8?B?NS8xeDBYTlpuRVg0cHcvNWUrNVFCUnVyUXhBNS9HL01FdW5xUjA3YmNVRmZq?=
- =?utf-8?B?dVN5MkdkMGErMmxqckRIY2JrclNPUnJJRUVLa0NFWEJPaUNrR3NnN0VOdDJI?=
- =?utf-8?B?azhQRFZHMXRVQTR5Sm5uQXhRRmJuV2h6UUdZMWQ3RUc1YWZUTVZZbWUxQlZX?=
- =?utf-8?B?OVYwdktlSDJxcXo0ZlJIRTBNVXdLUUkxaGNXTlVReTU5U2tNWmpBNEFpR2M5?=
- =?utf-8?B?Wkc3Q0Y0V3prM0hPdG9PT2VXZEEycEs5b1I2bUVKNjI2RVUyT1EwcVA4dVVQ?=
- =?utf-8?B?VlRFTEhOZGdYMEh2VG9jY21xSVNxdEdNK0Q1b096cCtaVlE3NGJBNWVINUNK?=
- =?utf-8?B?anE3RnJ0NWNwM2VPLzVpVEI0cnNhNlZsV1RWQjE0TTFianF6czhwVDgyd1Ux?=
- =?utf-8?B?cmNRRmFaRVVsRjZWSExNUlFSWkgrZHU3SksyM2hCUm9QanVkclFGc0owWXNi?=
- =?utf-8?B?ZmJURnZTeVZna3RhRjVZdEkySGV5eFh6T3NzMFJQd2NsTWI0VThvUmVld3cx?=
- =?utf-8?B?RSsyNzhaZVRwanJDMjRVWFRGb2RYaVpyaGRBZnk1ZGRrdGZBL1B0ekVOaERY?=
- =?utf-8?B?OWpoMWVLUWtYMkx5dTFOek9SZTZURjVVaE5vUm9JNlQ3NldJSHphM1pGTmQ4?=
- =?utf-8?B?ajM5cm1FVXM5N0VNd2ZVVy83N3V5Sy9nSkRSeitJNDJwS1c4R3lJdGhwV0RM?=
- =?utf-8?B?SXBsQWtRNUI5UXZXbFNuYnoyT2Y0dFlFdENLM1o5cHplYnVUOUhTZnR2elJO?=
- =?utf-8?B?T1BqVVd5ZjMreW95N2NTaG1LMWZSMjNQQ1REODRXNDR3L3JLbi9FTzNqS2s2?=
- =?utf-8?B?UXBydjh5U01tRjNMMDZjMlFKN2pucjNwMTlHdHJhSkNRaEhUM2VFR2dJdUZN?=
- =?utf-8?B?c1dXWmhvUTFrNmxESnp5WWhHSFdtRkltUXFYeHVEWkh2RXVGVmdpQ0dUdGhB?=
- =?utf-8?B?dzNnaTRid1BHSWFsOUI2VVhSQkxXbEpKV1JLWkZtc3RpZjFFU0kwaG8rTi84?=
- =?utf-8?B?OFg4RmFOTFk1S005bk1hcEJxd0J0VmhQRC81L1hFMnFSZGZqVWFQUWN1WmRW?=
- =?utf-8?B?NDEzQ1B6Y3FhZlRycExzei9FcDZMSWNnSnJSWjQramRPcW1lTExCU3VWQUY4?=
- =?utf-8?B?ZmNacTN4NjI0dnZ3UFZJNU1JQ21rWEl0MnNIbDJVN3hqTm5GRHlVZExIZm56?=
- =?utf-8?B?QkhmNkNneFB2WlgwaDF3Z3pZTDgxVU1oaldOYTVTRHJVaXNJcXlXT05PVklo?=
- =?utf-8?B?UXh5ViszdUNTeDZ6eWZuSXFCWFF4cXZROEhEcW40Q3pkWTh5SEt4UUZVd095?=
- =?utf-8?B?OFZ6OFoxMXRMalNuaVBoM2RuRW02U0JJaXVpazRiUXA0VTlhZTJ3WGpMMDZD?=
- =?utf-8?B?RG4xMlVhU2RCT21Tb05EZENIbEc4cHVxeVVoREVGZXNPY2ZsSGdHRER6Zzds?=
- =?utf-8?B?TERPMXcySURiZXdlZ2w1YnczQ3VlVnNxaFJxdHBUSXNzMzNaQ2NOR0VwR1hx?=
- =?utf-8?B?SWRMdGp6RnZBeU84ekppaU1BTHRJYnB2bFV6WVd3cnRaZnJFeG1WQUJ0WTh4?=
- =?utf-8?B?eFRvYVk5SDdKN1l6b3RSZE11STZCWGJrV016aVBMcldLd05LeWZtSVF6ekdY?=
- =?utf-8?B?bVBpR2xVL3RPc1ZybXdYNHFCR0RjalZkQklqcDFMMFlaUUYxeTdFN1g2RVNC?=
- =?utf-8?B?bnlHcnphbzVyM1hoOTYzcHlraE81OThIYjRDVWZQcVBvNU4ra3pyMllwc2RU?=
- =?utf-8?B?U1QyZlhWMjhkWTVvdnNyMFdtV2FIa09xK3hSWFBHOWJGektRMWtxdz09?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0E31E5207;
+	Fri,  3 Jul 2026 13:05:28 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783083930; cv=none; b=H4Xn5AoYPaQrSAAWwPYLs6CnAmzKJtQoPwDwqjx8VBBgGSDRRBQL3Hfo/YhLnW8SFz6rDUYYs+yr8zj88r2HUgbHbWf6pQf/qqu92EiqGuoqa3g+vLBIhEeT/FLWt6PQQBCKz3jk3aiaXOilPQqswYLbgFaEQyyIU/HjxwAVe1w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783083930; c=relaxed/simple;
+	bh=pkRciNKbQ0ifl/vl6bLmmiWMxJohwsx+I+xkNEl8x9k=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:From:To:
+	 References:In-Reply-To; b=s63VMeNIJFSJK/tbXW/+RZzXnhVfspjtt+DfqrrEfeO4YTruDYXhBlf3/dqApkKTD25FeQT8n6qpekwIjWnJKGUJ6eWY0J0W9UdjAXtiaTfi0BWs2ETYmrb+by1WJSPLV5fS4v4578550qlxXjLjQsxS883q4JvtazgeM/y6mms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=walle.cc; spf=pass smtp.mailfrom=walle.cc; dkim=pass (2048-bit key) header.d=walle.cc header.i=@walle.cc header.b=nbrNh1zR; arc=none smtp.client-ip=159.69.201.130
+Received: from localhost (unknown [IPv6:2a02:810b:4320:1000:4685:ff:fe12:5967])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.3ffe.de (Postfix) with ESMTPSA id 08A4D4E2;
+	Fri,  3 Jul 2026 15:05:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=walle.cc; s=mail2022082101;
+	t=1783083920;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OreQQ0XdKsQWlU/ho4QuvNgm2eEyh+R1RO2QdadtGn8=;
+	b=nbrNh1zRQhB03C1yi+przXweH4RnERZffAT3vCSDaaxFgOrgAE3JWwxbVruloGmMtqMku6
+	T0AD0QKO85hwr06F2IJL9gKTBfGEYHPc9gCGM9BAbBkT9GLr6KFcq80FuRVMVlFY84ZJ01
+	/ZT59/9gw0hoskPrAhdBxSIlLd857e/7CKd0ZAYJ9GBaqAgTDBOp1pWkJR3y0eyVwj2C21
+	Wl+VrFYl3v7WRGDz8sjsns9LPSiqfPnjo2mf1c8lqxtacN2yZRDbCgvSHOFh1CVV6IH5ga
+	XVRmYNWdAmYfOXvdAT8gY979h7ypsdOF0e3iWSproq2mdHOZqf/rcwxsygAS6A==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: GVgZJvuba0LjlqQZUqSsTxUnzVdDFy+1dBJYgEkWsDwELD2/gs/GOtrFwPy7CvpLXZR+DIJAIiQhha8vH3FcqSW/K85sGvsbHxX6du4LAf84G6iFyhVSfe12jiS3KM4wR5TVqj9w4CS7a8tois+jfOEjmvQBVTXwZZOwWlvySZ9W5pZmp6g34KBh61n3Rdn1RWHEJ/EVbT6xv8Q5VuCIds8CTPOM37xQB6BoHdSSEo74QKX3vB7bN/fTDEbuyuEEH9jj8QuYGUZTFrePZj6TgQHvCoQuxtxop29qWE+4eESwKp5B0mkdum21CR0hZX+Y0xGgY/IvIBH0mXz7FcuUvg==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5902.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2f6957dd-02c8-408c-3d59-08ded903908c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jul 2026 13:04:06.5881
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: EGYfS9ELH1ABOH85szMJDE6jjEmREcLuXtQDsH5OSoeN13Dx/2+7Mgo7HsGuydLjDmat5ctUGVq4bLje/iSFX1y5u1yx3SQCiPZImCPkBSc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB7119
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 03 Jul 2026 15:05:19 +0200
+Message-Id: <DJOYHWDYJUT1.2PIRY8CG488AY@walle.cc>
+Subject: Re: [PATCH v4 1/7] dt-bindings: mtd: jedec,spi-nor: allow the SFDP
+ to be exposed via NVMEM
+Cc: <Manikandan.M@microchip.com>, <krzk@kernel.org>, <pratyush@kernel.org>,
+ <mwalle@kernel.org>, <takahiro.kuwano@infineon.com>, <richard@nod.at>,
+ <vigneshr@ti.com>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
+ <srini@kernel.org>, <Nicolas.Ferre@microchip.com>,
+ <alexandre.belloni@bootlin.com>, <claudiu.beznea@tuxon.dev>,
+ <linux@armlinux.org.uk>, <richardcochran@gmail.com>, <linusw@kernel.org>,
+ <arnd@arndb.de>, <linux-mtd@lists.infradead.org>,
+ <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>
+From: "Michael Walle" <michael@walle.cc>
+To: "Miquel Raynal" <miquel.raynal@bootlin.com>, "Rob Herring"
+ <robh@kernel.org>
+X-Mailer: aerc 0.20.0
+References: <20260630092406.150587-1-manikandan.m@microchip.com>
+ <20260630092406.150587-2-manikandan.m@microchip.com>
+ <20260702-utopian-termite-of-perfection-f1f3ec@quoll>
+ <860213fd-6a4b-42d4-a8f7-7308e070f09e@microchip.com>
+ <20260702163723.GA227454-robh@kernel.org> <8733y0penb.fsf@bootlin.com>
+In-Reply-To: <8733y0penb.fsf@bootlin.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.56 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[walle.cc,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+	R_DKIM_ALLOW(-0.20)[walle.cc:s=mail2022082101];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304542-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[19];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:lukeh@padl.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux@armlinux.org.uk,m:richardcochran@gmail.com,m:f.fainelli@gmail.com,m:cedric.jehasse@gmail.com,m:mh@rme-audio.de,m:max@huntershome.org,m:kieran@sienda.com,m:Ryan.Wilkins@telosalliance.com,m:mattias.forsblad@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ffainelli@gmail.com,m:cedricjehasse@gmail.com,m:mattiasforsblad@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[jedrzej.jagielski@intel.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-304543-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[michael@walle.cc,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	FORGED_RECIPIENTS(0.00)[m:Manikandan.M@microchip.com,m:krzk@kernel.org,m:pratyush@kernel.org,m:mwalle@kernel.org,m:takahiro.kuwano@infineon.com,m:richard@nod.at,m:vigneshr@ti.com,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:srini@kernel.org,m:Nicolas.Ferre@microchip.com,m:alexandre.belloni@bootlin.com,m:claudiu.beznea@tuxon.dev,m:linux@armlinux.org.uk,m:richardcochran@gmail.com,m:linusw@kernel.org,m:arnd@arndb.de,m:linux-mtd@lists.infradead.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:netdev@vger.kernel.org,m:miquel.raynal@bootlin.com,m:robh@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[padl.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lunn.ch:email,padl.com:email,PH0PR11MB5902.namprd11.prod.outlook.com:mid,vger.kernel.org:from_smtp,intel.com:from_mime,intel.com:dkim];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jedrzej.jagielski@intel.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,rme-audio.de,huntershome.org,sienda.com,telosalliance.com,vger.kernel.org];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	DKIM_TRACE(0.00)[walle.cc:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[michael@walle.cc,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[microchip.com,kernel.org,infineon.com,nod.at,ti.com,bootlin.com,tuxon.dev,armlinux.org.uk,gmail.com,arndb.de,lists.infradead.org,vger.kernel.org];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,microchip.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AA8B2702B0D
+X-Rspamd-Queue-Id: F2B47702B27
 
-RnJvbTogTHVrZSBIb3dhcmQgPGx1a2VoQHBhZGwuY29tPiANClNlbnQ6IEZyaWRheSwgSnVseSAz
-LCAyMDI2IDk6NDcgQU0NCg0KPkZyb206IE1hdHRpYXMgRm9yc2JsYWQgPG1hdHRpYXMuZm9yc2Js
-YWRAZ21haWwuY29tPg0KPg0KPlN1cHBvcnQgY29ubmVjdGluZyBNYXJ2ZWxsIGRzYSB0YWdnZXIg
-dG8gdGhlIHN3aXRjaCBkcml2ZXIgZnJhbWUycmVnDQo+ZnVuY3Rpb24gdG8gZGVjb2RlIHJlY2Vp
-dmVkIFJNVSBmcmFtZXMuDQo+DQo+KE5vdGU6IGR1cmluZyB0ZWFyZG93biBvciBmYWlsZWQgc2V0
-dXAsIHRhZ2dlcl9kYXRhIG1heSBiZSBOVUxMIHdoZW4NCj5hIGxhdGUgRlJBTUUyUkVHIGZyYW1l
-IGFycml2ZXMuKQ0KPg0KPlNpZ25lZC1vZmYtYnk6IEx1a2UgSG93YXJkIDxsdWtlaEBwYWRsLmNv
-bT4NCj5TaWduZWQtb2ZmLWJ5OiBNYXR0aWFzIEZvcnNibGFkIDxtYXR0aWFzLmZvcnNibGFkQGdt
-YWlsLmNvbT4NCj5TaWduZWQtb2ZmLWJ5OiBBbmRyZXcgTHVubiA8YW5kcmV3QGx1bm4uY2g+DQoN
-CkhpLA0KDQppIGJlbGlldmUgeW91ciBzb2IgdGFnIHNob3VsZCBiZSB0aGUgbGFzdCBvbmUNCg==
+On Fri Jul 3, 2026 at 12:10 PM CEST, Miquel Raynal wrote:
+> On 02/07/2026 at 11:37:23 -05, Rob Herring <robh@kernel.org> wrote:
+>
+>> On Thu, Jul 02, 2026 at 06:55:15AM +0000, Manikandan.M@microchip.com wro=
+te:
+>>> Hi Krzysztof,
+>>>=20
+>>> On 7/2/26 11:46 AM, Krzysztof Kozlowski wrote:
+>>> > EXTERNAL EMAIL: Do not click links or open attachments unless you kno=
+w the content is safe
+>>> >=20
+>>> > On Tue, Jun 30, 2026 at 02:54:00PM +0530, Manikandan Muralidharan wro=
+te:
+>>> >> Add an optional "sfdp" child node (compatible "jedec,sfdp") that
+>>> >> describes the SFDP as a read-only NVMEM provider via nvmem.yaml, so =
+its
+>>> >=20
+>>> > What is SFDP?
+>>> >=20
+>>> SFDP is the Serial Flash Discoverable Parameters -- a JEDEC-standardise=
+d
+>>> (JESD216) read-only parameter table present in most SPI NOR flashes, th=
+e=20
+>>> table contents provide basic information about the flash. There are=20
+>>> standard tables which are specified by the JEDEC standard and there are=
+=20
+>>> vendor tables.
+>>
+>> Is SFDP present or not discoverable? Or we have a table of discoverable=
+=20
+>> parameters that itself is not discoverable.
+>
+> SFDP is almost always there. I don't think there are any non SFDP chips
+> manufactured today (?).
+
+Oh i bet there are, and IIRC there were some additions lately. Not
+sure if the chip was new though.
+
+> The thing is, even if we don't need to define it
+> in DT, we might need to point to it in order to extract eg. a unique ID
+> or a MAC address through the NVMEM interface.
+
+Exactly. We can detect whether is a SFDP table or not, by trying to
+read its signature using the RDSFDP opcode. But as Miquel pointed
+out, that's not what this is about. For the nvmem part being useful,
+we have to have some node to point to. At the moment, there are
+three different kind of NVMEM devices an spi nor flash can create:
+ - partitions
+ - factory OTP (i.e. OTP by the flash manufacturer)
+ - user OTP (i.e. what an OEM could write to)
+
+Now there's a fourth one: SFDP. It can contain vendor specific
+tables, which in the mchp case is used to store a mac address,
+which is then used for a NIC.
+
+So we somehow has to organize all of them, thus the sfdp node. A
+more complete example would be:
+
+flash@0 {
+	compatible =3D "jedec,spi-nor";
+
+	partitions {
+		compatible =3D "fixed-partitions";
+
+		partition@0 {
+			compatible =3D "nvmem-cells";
+		};
+	};
+
+	otp-1 {
+		compatible =3D "factory-otp";
+	};
+
+	otp-2 {
+		compatible =3D "user-otp";
+	};
+
+	sfdp {
+		compatile =3D "jedec,sfdp";
+	};
+};
+
+All being NVMEM devices and expose some kind of data used for
+drivers.
+
+HTH
+-michael
+
+> SFDP is split into several sub-tables, the first one is mandatory, but
+> then there are optional tables which can be discovered dynamically.
+>
+> Thanks,
+> Miqu=C3=A8l
+
 
