@@ -1,55 +1,93 @@
-Return-Path: <netdev+bounces-304452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304453-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mcRuNKV4R2owYwAAu9opvQ
-	(envelope-from <netdev+bounces-304452-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 10:53:57 +0200
+	id lzezKPB4R2pOYwAAu9opvQ
+	(envelope-from <netdev+bounces-304453-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 10:55:12 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49C5A7004EB
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 10:53:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F0ACA700534
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 10:55:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=WFh57eHd;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304452-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304452-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Di6ZMyIH;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304453-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304453-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A9053308C302
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 08:35:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F011930477F5
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 08:39:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12421339719;
-	Fri,  3 Jul 2026 08:35:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2734E33A9DA;
+	Fri,  3 Jul 2026 08:39:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05D483019AA
-	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 08:35:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F2633D6C0
+	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 08:38:58 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783067752; cv=none; b=RKXZN+LxZLxPDdu96Pdzn+gTvXG3HcHcLck4pm9fHsnAyJYyCbOLkO7MiqSyI+s2oovCXpfNerXpTAN467JS3oXLMGzpXrP67iSWQzanjYGzY7+jKAs3f/iEVfAKP4aI9oEhNRHwZGlo1tyNQKdGWM+lZ5viisxsFts9UjcYw+c=
+	t=1783067940; cv=none; b=nuylgvYHQxzdoVSlDQNIofjBSiwSNWFARl3zyydWvtigQg/QwzgU3A/0koY+nUJjPlqkJwbaKb+H02CYp5tUMq8Wv1EXiJSWz2kLlb1PePHbPyK0Gg3Vn9qHAyAKqxzKUZqtaqWmKCh9paBcuXoOyToRdY/IzjRDSsXtr8+Ds5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783067752; c=relaxed/simple;
-	bh=ZedgvzdroAmWQAwpAKO4f979IxRCT0NG79Cg9IVYYcw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LldqkDmNUOeRZ4M0hg/brUXz2Wi1rhSaZzHUYfbY4sl7c8QowIy0wNszXkziJD8HtVz8G8QCZTiRRzJPL4r+1FNrRta8NjZ/5cu1CE9iAhQKG7/+C8PVIZ23ayU7z54Y7cygUHJUQGqCgz77WqwaghpbUfdr6yc3pQUWIFQuhH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WFh57eHd; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E00D71F000E9;
-	Fri,  3 Jul 2026 08:35:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783067750;
-	bh=CxxMVJB72QyFg1TyIOBoEzRg14WUyK0zXhkZQEr6HLk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=WFh57eHdP7yWWbPme4JBazmDrmR5yIOXktbZ1JNPU24skMzPP7ytgG0APBwvTRbZF
-	 AfTLPs0X9iFasExx5EWWztjr+YsAlOZ+OgxHMjdqejcAoi00OLOWncPASEQUWP6upu
-	 /nMPmNjn+olALWIfGkL4XyYTLh3tlZvpHiaU6bTC/ZtKMFMYu95AIUM744XCqaa91d
-	 5HHzS192r5QBacImc/66jkvUwbearukISuOpsTP8kBqando2P4Hu+T5AKGjJRhG7ox
-	 2OJPNoj0A+OzOxKHe9PAmYxGDLleUrEDnH0mVDx/0WUj11vbALJzz45MPNK9Tmssu9
-	 gp8ckl+sacZCQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93AF039389FB;
-	Fri,  3 Jul 2026 08:35:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1783067940; c=relaxed/simple;
+	bh=2Mw4C8cP0ikdSYP87ULxE42c8XBOd2yv7kzUvLAoAOs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KjUL3sCMgJ64gNNKmdeg+1xuDni0KUtDP5Gz4fkewKZxywl1ZdNVrE5W2ZcaVC5tupx1RCGRGdZLAUEcasHlfvZOmubj9DVj1kFUjgadEQFz2Lq63hpfFhVmsX+t1S08e9rVtbVfGUkZOt+5/fz6VbPkDVXGKPNoBJPN8SgY3d8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Di6ZMyIH; arc=none smtp.client-ip=209.85.214.175
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2cace7da66eso2874105ad.0
+        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 01:38:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783067938; x=1783672738; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=S9S390maFuLWYl6z3JcBWyDaB6H00jCR0tOf9HccGvs=;
+        b=Di6ZMyIH8ltZYvdBkB8JanOcWS5t64BqqK1pGO7MhaI30a7OkWCZbuwU9H0EM8wUXq
+         zX7Hsg3p1l+RYBkuOf91Q13Z3I7q2Z6hbyov7Yw66YELd05K6gFH2KJLr2e9cjZYPa0/
+         AkNTpGRSbpRftEa2ixMQCaagKvcXTmvj35M/iW9YZyjxHsMXeRNLjI5LoqwAuNyGbQmC
+         gkpPGbiRYDlKZMx0TEHRBdwsudeGzXp3JFAiVQw2BBCVrf+SWFdc7w/u9QVBlRgKehrA
+         16b56Ec/PX1ty+VM3NFT34HSGBPoBQrhd6c9gqGcpXv6GlV3nIdvtkxwKda6nc/AYdOm
+         WS8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783067938; x=1783672738;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S9S390maFuLWYl6z3JcBWyDaB6H00jCR0tOf9HccGvs=;
+        b=ScaURC/9tgoI+1cn2Ssl2Il9a2VVYRIHdyZ/c6ZrkP8s7X/v5SRBmia8bNwXtNmzyh
+         /t2qdbuhPnozs5h4NHdRbS9wNpnCdbzUOPFtF5Pr46MsiMpxAiJ1EyK+psQGdcPEBdYt
+         47dy6/a0FYV6ufccR8C46fFb23FqMuF2wBWIOPzYe5/UcM7yL9GOFYILEo50DiPKSqyl
+         KffEIUdFBH/DJmWVoog76loA0ct4zQiQ1iPDbMrt2wN9EPkuMmhBOPETHNn8R0wfdOmW
+         WLDI972eE9L7FQhgFRvPXGlkq17vrf9Q5C0tp2i1+mKsOK+oms3Qts0oHWvuaDGC/gHa
+         Q73g==
+X-Gm-Message-State: AOJu0YwELlFVuJaStSdYktOJHLXoU+fx920BMA7P0AEVopU4HJUytdNE
+	KYezkmcJyd/jtbylWm5S1b+LDJvrwQCiN9uk4k5KikKak/msLFs9Cx0k9RYxm7G1
+X-Gm-Gg: AfdE7ckD6MwoEf5o9p0+Xt3pLeJ+HDiDMn2J16b6TiL1IjKPJg3drBobB22/98xWhnZ
+	3yy0hbYqgWEYo94sbdOZ2EH1YOkHA1pzacxfoKLygUEsMVXAvuHDj8pcBXuypto2Sngyj0KuLUh
+	4XsnfbYEL0ozAvnDACp7GKw0a8dt4p6fIjUD/8Ou9Hugew/++pcw3fiB0jNnp0S4NaXCLD+dfkB
+	1gsTWwLIL+0DGxXjQ4MAM0xnLtBPlMS42vYg2Zn3sVcWm1GbX9JJtEkWipVnfI+jqRhIfJFlCey
+	6ba3oYcLsRAMA+pHbLfp1T5PDD6GkgEdmoZKZXGsh3MHUFOujIS8KKW/tlaZJXjSJAhHuV52OPQ
+	Q2DCLnbfJTNCZsDh+lpIVYBAUkfPvvcUPbDtvYNTl84KCxcjDe1vmBlygo9wUUdXusPEzH+rRao
+	yt+ptrSNdMDJstj5MR7r0fW3hg
+X-Received: by 2002:a17:902:ef07:b0:2c9:b1ed:eb5d with SMTP id d9443c01a7336-2ca7e8ebde3mr113691185ad.47.1783067937746;
+        Fri, 03 Jul 2026 01:38:57 -0700 (PDT)
+Received: from ancienth-X870E-Nova-WiFi ([125.186.72.2])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cad6f23061sm5954145ad.5.2026.07.03.01.38.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Jul 2026 01:38:57 -0700 (PDT)
+From: Daehyeon Ko <4ncienth@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Sabrina Dubroca <sd@queasysnail.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Daehyeon Ko <4ncienth@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net] macsec: don't read an unset MAC header in macsec_encrypt()
+Date: Fri,  3 Jul 2026 17:36:33 +0900
+Message-ID: <20260703083634.2035145-1-4ncienth@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,80 +95,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] gue: validate REMCSUM private option length
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178306773313.2512156.14413228998878751784.git-patchwork-notify@kernel.org>
-Date: Fri, 03 Jul 2026 08:35:33 +0000
-References: <20260701022617.53171-1-q.h.hack.winter@gmail.com>
-In-Reply-To: <20260701022617.53171-1-q.h.hack.winter@gmail.com>
-To: Qihang <q.h.hack.winter@gmail.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
- davem@davemloft.net, pabeni@redhat.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304452-lists,netdev=lfdr.de,netdevbpf];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[queasysnail.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304453-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:sd@queasysnail.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:4ncienth@gmail.com,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:q.h.hack.winter@gmail.com,m:netdev@vger.kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:davem@davemloft.net,m:pabeni@redhat.com,m:qhhackwinter@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER(0.00)[4ncienth@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[4ncienth@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[davemloft.net:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 49C5A7004EB
+X-Rspamd-Queue-Id: F0ACA700534
 
-Hello:
+macsec_encrypt() reads the Ethernet header via eth_hdr(skb)
+(skb->head + skb->mac_header) to memmove() the 12 source/destination MAC
+bytes forward and make room for the SecTAG.
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+On the AF_PACKET SOCK_RAW + PACKET_QDISC_BYPASS transmit path the skb
+reaches the macsec ndo_start_xmit() with the MAC header unset, so
+eth_hdr(skb) resolves to skb->head + (u16)~0 and the read is out of
+bounds: a 12-byte heap over-read that is also emitted on the wire as the
+frame's outer source/destination MAC. KASAN reports a slab-out-of-bounds
+read in macsec_start_xmit() on 6.0; on current mainline a CONFIG_DEBUG_NET
+build flags it as an unset mac header in skb_mac_header().
 
-On Wed,  1 Jul 2026 10:26:17 +0800 you wrote:
-> GUE private flags can indicate that remote checksum offload metadata is
-> present. The private flags field itself is accounted for by
-> guehdr_flags_len(), but guehdr_priv_flags_len() currently returns 0 even
-> when GUE_PFLAG_REMCSUM is set.
-> 
-> This lets a packet with only the private flags field pass
-> validate_gue_flags(), after which gue_remcsum() and gue_gro_remcsum()
-> read the missing REMCSUM start/offset fields from the following bytes.
-> 
-> [...]
+On the TX path the L2 header is at skb->data, so use skb_eth_hdr(), added
+by commit 96cc4b69581d ("macvlan: do not assume mac_header is set in
+macvlan_broadcast()") for exactly this purpose.
 
-Here is the summary with links:
-  - [net] gue: validate REMCSUM private option length
-    https://git.kernel.org/netdev/net/c/d335dcc6f521
+Fixes: c09440f7dcb3 ("macsec: introduce IEEE 802.1AE driver")
+Cc: stable@vger.kernel.org
+Signed-off-by: Daehyeon Ko <4ncienth@gmail.com>
+---
+ drivers/net/macsec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-You are awesome, thank you!
+diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
+index fb009120a924..dd89282f0179 100644
+--- a/drivers/net/macsec.c
++++ b/drivers/net/macsec.c
+@@ -646,7 +646,7 @@ static struct sk_buff *macsec_encrypt(struct sk_buff *skb,
+ 	}
+ 
+ 	unprotected_len = skb->len;
+-	eth = eth_hdr(skb);
++	eth = skb_eth_hdr(skb);
+ 	sci_present = macsec_send_sci(secy);
+ 	hh = skb_push(skb, macsec_extra_len(sci_present));
+ 	memmove(hh, eth, 2 * ETH_ALEN);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.54.0
 
 
