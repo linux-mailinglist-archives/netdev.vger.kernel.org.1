@@ -1,160 +1,155 @@
-Return-Path: <netdev+bounces-304482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304483-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id KZDfMTiMR2q1awAAu9opvQ
-	(envelope-from <netdev+bounces-304482-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 12:17:28 +0200
+	id ha6PBTaOR2qibAAAu9opvQ
+	(envelope-from <netdev+bounces-304483-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 12:25:58 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2077B70118D
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 12:17:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6110C701312
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 12:25:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=suse.com header.s=google header.b=JDTjjL7C;
-	dmarc=pass (policy=quarantine) header.from=suse.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304482-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304482-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=intel.com header.s=Intel header.b=FyDJGArv;
+	dmarc=pass (policy=none) header.from=intel.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304483-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304483-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BB9B4300DDFB
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 10:16:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 84C78300DF73
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 10:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AD8E3B71A6;
-	Fri,  3 Jul 2026 10:16:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7E103B27CF;
+	Fri,  3 Jul 2026 10:20:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E83F3B47F0
-	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 10:16:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2384437883D
+	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 10:20:25 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783073784; cv=none; b=Q2eCm2sBfXyz1mo/WyGYVxpeJTECnhaJS83j6jPi7FdkFdd4H0VvXe1rttApKvCOTu6LFphocVABp8P9yNA2CX1XAef4O3zOnNjXgnmB76YXNeXLP0SD+yJZIp2yiDzVBWIC+bgp/9XJJm+uCOp5gI8fjAjEbElWiFMzPQ/mNnI=
+	t=1783074027; cv=none; b=nqj6K1dAYmX+RKkzG5YnlqOSLsyjmvZ2XCm+ezG63ovgToli7nGUNIPPUsZALw8fDxoMEUkIUCE305mEXc6z5vJ7EnglkdDLqowrHECGeIva1G8TuvhO9FcgOHLzwuRMiicwN45UTToAn+6R5Vc+B31veN4GGdEUj2A++5qXvyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783073784; c=relaxed/simple;
-	bh=3GRubamd8c/lHAxEWGx9EZ3mJAcdA7pvo8/S2YUqvXw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ifmduIsQS5zbyPot3LAPMs2bN9c6vx7kPaProH26pWAaYckIagw7rPeCaPrb0EwyXJRbadfUJ7SmEgAOuYEkfD82wVs4tcLLMXZfqYvmV8ftzPBvxns0A1H9LISvxFrgk+yPjZTqSOP/44mNTy1gjlErt4PSc9UJBjRtWMeaw/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=JDTjjL7C; arc=none smtp.client-ip=209.85.221.43
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-472055b0efaso287740f8f.2
-        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 03:16:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1783073782; x=1783678582; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=TgYxzP4S3yg5Ik0kspfuMX+5NxuodFksLhrI6YPSMK8=;
-        b=JDTjjL7Cn4wMv/TZpFWGRryM9C/pOLw7DlwEuzVNZuM+EJL1f/UvGAR0CcYKaBxHyN
-         csYl+DIE7lXSLQMd3F98LwCKvFI0DXZqf0h2n2ZdLNc92DfThmf86/7Za2Za5ibW7Y4G
-         2v2g4WbqiXHf3Zcc346guWeJG4S7I0pbzU5fdnFJ0xK/dlyQKJvnHsLNdGgQwHG8sHaW
-         7XRmCmKSyyH7T0os/cQjUn5o4N9oXJB+t+1fo/pcmD42iCKhu+Uqya/ky44SBtgzJCbI
-         XN+LkmuUQJbC08JOWv75UUTzkeHrAvaeQGRKiXNRZ65BkPA97aI5nKVMgKaA7CuYrEiq
-         gYyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783073782; x=1783678582;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=TgYxzP4S3yg5Ik0kspfuMX+5NxuodFksLhrI6YPSMK8=;
-        b=Q6sXl45qzhKt7ir5EKI8QYxk785+v+jm1wJRo8/T3o7EkNfARUm2FCoZOiNooN/oRG
-         tWWBhsRQs2MYnHhXk6+xLkMpHoVek2w7NLttbYIF9RTIEJNLeDp4AZJzeLb0Gd5e5dPu
-         JXnzgpSTSkH6A2fClBLc18fCZ/TsKSzCgH9HTuVw+3rLjSs7HnxbHXjOZhqs4l9epf71
-         WamYVcNI/th1srM0J1ogt8ie8z4ruuMdX+08wQZNRIv+XXFZtPPX+rO2yqKZKX8VJm4e
-         ZhODSTtgBwx5IhSWHy+7OLZ3oV3uDzNKpkAf/kAaOXIgu2rU2nyd2V5QCHQpxuH+MCPu
-         8jcA==
-X-Forwarded-Encrypted: i=1; AHgh+Rp3t1/23uaY9ttHyO7MKvgO6ltZVnnd2F7MsOVTIgiGnMPx8H5wLiNyYz1pR/L7NAUe9gPmTLo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVQU2QHg/pOAxvkpvDjUKgKScebabYU9cxpyTQQzBe2GOm/JuQ
-	jaYAocD3Zl3VQqieXmr3uwec5AgkZgfkmcn1YmwrDQ3rtW6ntcM6proYQPnHPMDfNMp8UT2RJlk
-	SKqDj
-X-Gm-Gg: AfdE7ckL4DzzspBi0SA5+Zrss1iJOh3toRjixCQtZq2B/FQVauLpel9PKHnerKeY+vj
-	CMN3SzBS3Z6dKQOP/kGWKQK8EhcWGXCuzu1xuGr1sGNwjwi/f8EwUuWCAAkXioNtlCBK3DsNBsh
-	9CQBR8nJBQIucz2qf19gpKDDvZ3Xlr6HJoORkgjk5IMhNS7infkVyRbESeaS9c5ewBQsUmxU8SD
-	jW8NCu0a6aXuUgzZf+2y3OXK9vs0JkBLrZwoCN3kpd+JUuI2BQplK3V5nskrw9h4XGNLhbI3HPh
-	NownOH6Gt6zcWR4tOF78H9kRKfDgvDWQHqiheg4j6Ow/h8UO5ZTSAJ2No8epgz9BbENHZSdH2d8
-	3Vc+v+UZeCZ4uIGWeuhttzeOaSCLy9CwQPZqidp0taYgpg+WJWfK95Y10cACnUZBCuD5PE96MqZ
-	W8gj8omVggR8kMxAl4JpGvHmiwEimHOIh1DFoqV2qMkc+/G/zBOFgPM6dbGmDARtXUXw==
-X-Received: by 2002:a05:6000:310a:b0:475:5e4b:588c with SMTP id ffacd0b85a97d-477573b7cdcmr14057641f8f.1.1783073781856;
-        Fri, 03 Jul 2026 03:16:21 -0700 (PDT)
-Received: from ?IPV6:2001:a61:134e:e801:4abc:8076:7fbf:d0bc? ([2001:a61:134e:e801:4abc:8076:7fbf:d0bc])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-477db3dbc75sm17654391f8f.5.2026.07.03.03.16.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Jul 2026 03:16:21 -0700 (PDT)
-Message-ID: <c3d3c7a0-5d47-4e73-a46b-2fd610f4cd59@suse.com>
-Date: Fri, 3 Jul 2026 12:16:20 +0200
+	s=arc-20240116; t=1783074027; c=relaxed/simple;
+	bh=Yu1wHrTkR0HEuMsmwqJOjbY9Vm4RrjA9Z7iaBCKZBlA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XhmTsTNV7gHubAgYcYvHkQddeLvXBgHdZrIkzSbKD8g/AXOYrEjg159g5C5F0hNVjWtg3aAzppVf+Rr35lj7rXg8b3O2W6SZHY9zpI5HMISBZvB1TA3MCwywCz7vzaPzHvpymv/xI1mIc/vQI5uZs5n7FUjvuML1oNbALoygFXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FyDJGArv; arc=none smtp.client-ip=192.198.163.14
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1783074026; x=1814610026;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Yu1wHrTkR0HEuMsmwqJOjbY9Vm4RrjA9Z7iaBCKZBlA=;
+  b=FyDJGArvPUkaNru/3h4rAFAjRFwZ5mPGkyBHC53qfJ/8Dx6fdkxPMwSi
+   yBx2J2GFPIheqeGwDUoRjMT1pU4/z/1ONY4sqs3xLOUFF4hhjOyV0Px8i
+   RVRDcP9rTR9waiPIFukiE2/kuQLJvGCzwAMW6kNELqnc1P5osAfD//T/Q
+   hXMgW8OlGu1F8bkGBLQ+RvH5rQYfUovU/1R382Zk2nmaJAFi9Kk78MGoK
+   6+0LwDH6P173nQ0/v8Y3VKt/oVvJgROCh00RMSmfSSPpGKgCnVrjyVcxX
+   KNIkRDG2rxhMhklQnsB1E48E3d0CQ1KomfhUtMzfX3shgr0Kt9OThdL3L
+   w==;
+X-CSE-ConnectionGUID: gsNRod2fQf2m4J0sSWmqAA==
+X-CSE-MsgGUID: mgMx3jTZQV26Zi+NeZ4u8g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11835"; a="83880923"
+X-IronPort-AV: E=Sophos;i="6.25,145,1779174000"; 
+   d="scan'208";a="83880923"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2026 03:20:25 -0700
+X-CSE-ConnectionGUID: PzjsYPqQSWuocwtLnT+HfA==
+X-CSE-MsgGUID: zh/rahnySXKbhZg+P0CQJQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,145,1779174000"; 
+   d="scan'208";a="291221630"
+Received: from axxiablr1.iind.intel.com (HELO axxiablr1.gar.corp.intel.com) ([10.190.162.100])
+  by orviesa001.jf.intel.com with ESMTP; 03 Jul 2026 03:20:22 -0700
+From: Siddaraju DH <siddaraju.dh@intel.com>
+To: Michal Kubecek <mkubecek@suse.cz>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org
+Cc: Shubham Das <Shubham.Das@intel.com>,
+	Balaji Chintalapalle <balaji.chintalapalle@intel.com>,
+	Vijay Srinivasan <vijay.srinivasan@intel.com>,
+	Magnus Lindberg <magnus.k.lindberg@ericsson.com>,
+	Niklas Damberg <niklas.damberg@ericsson.com>,
+	Jonas Wirandi <jonas.wirandi@ericsson.com>,
+	Siddaraju DH <siddarajudh@gmail.com>,
+	Siddaraju DH <siddaraju.dh@intel.com>
+Subject: [PATCH v2 ethtool] man: ethtool: link 10000baseCR to SFF-8431, Appendix-E SFP+ DA
+Date: Fri,  3 Jul 2026 15:50:04 +0530
+Message-Id: <20260703102004.1111597-1-siddaraju.dh@intel.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/4] net: usb: move exported code to usbnet
-To: Andrew Lunn <andrew@lunn.ch>, Oliver Neukum <oneukum@suse.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, shaoxul@foxmail.com,
- netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260702143142.890654-1-oneukum@suse.com>
- <ea92d680-39f6-4dde-b558-4008ffbee587@lunn.ch>
-Content-Language: en-US
-From: Oliver Neukum <oneukum@suse.com>
-In-Reply-To: <ea92d680-39f6-4dde-b558-4008ffbee587@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,foxmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-304482-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[oneukum@suse.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:oneukum@suse.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:shaoxul@foxmail.com,m:netdev@vger.kernel.org,m:linux-usb@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304483-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[intel.com,ericsson.com,gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS(0.00)[m:mkubecek@suse.cz,m:andrew@lunn.ch,m:maxime.chevallier@bootlin.com,m:netdev@vger.kernel.org,m:Shubham.Das@intel.com,m:balaji.chintalapalle@intel.com,m:vijay.srinivasan@intel.com,m:magnus.k.lindberg@ericsson.com,m:niklas.damberg@ericsson.com,m:jonas.wirandi@ericsson.com,m:siddarajudh@gmail.com,m:siddaraju.dh@intel.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[oneukum@suse.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[siddaraju.dh@intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[siddaraju.dh@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,suse.com:from_mime,suse.com:dkim,suse.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:from_mime,intel.com:email,intel.com:mid,intel.com:dkim,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2077B70118D
+X-Rspamd-Queue-Id: 6110C701312
 
-On 02.07.26 20:15, Andrew Lunn wrote:
-> On Thu, Jul 02, 2026 at 04:25:29PM +0200, Oliver Neukum wrote:
->> Some drivers are reusing common code originating in other drivers.
->> This means that two drivers need to be loaded for one device.
-> 
-> Maybe consider using 'framework' or 'library', rather than driver,
-> when referring to the shared code?
-> 
-> I tend to think of a driver as the leaf node which probes based on
-> enumeration of a bus. But usbnet.c itself is never probed.
+Annotate the 10000baseCR entry in the advertise mask table so users
+understand what physical media this mode it actually represents.
 
-Yes, I also think of a leaf node when a "driver" is referred to.
-That is the very point. Currently you need _two_ drivers and
-usbnet for some devices.
-Should I reformulate? If so, how exactly?
+10000baseCR does not correspond to any IEEE 802.3 *base-CR PMD.
+It has no autonegotiation, no link training, and no mandatory FEC.
+The industry standard for this media type is SFF-8431 Appendix-E
+Direct Attach cable, also known as 10G_SFI_DA.
 
-	Regards
-		Oliver
+Link: https://lore.kernel.org/r/SN7PR11MB69003D33489DB1D6B17EF72A9AF52@SN7PR11MB6900.namprd11.prod.outlook.com
+
+Signed-off-by: Siddaraju DH <siddaraju.dh@intel.com>
+---
+ ethtool.8.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ethtool.8.in b/ethtool.8.in
+index 3173287..604de9e 100644
+--- a/ethtool.8.in
++++ b/ethtool.8.in
+@@ -937,7 +937,7 @@ lB	l	lB.
+ 0x40000	10000baseKX4 Full
+ 0x80000	10000baseKR Full
+ 0x100000	10000baseR_FEC
+-0x40000000000	10000baseCR Full
++0x40000000000	10000baseCR Full	(a.k.a 10G_SFI_DA, SFF-8431 Appendix-E)
+ 0x80000000000	10000baseSR Full
+ 0x100000000000	10000baseLR Full
+ 0x200000000000	10000baseLRM Full
+-- 
+2.25.1
 
 
