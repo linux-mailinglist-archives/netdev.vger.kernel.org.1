@@ -1,93 +1,52 @@
-Return-Path: <netdev+bounces-304531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304532-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id jciAEPmzR2oTdwAAu9opvQ
-	(envelope-from <netdev+bounces-304531-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:07:05 +0200
+	id dv8aHxq2R2qbdwAAu9opvQ
+	(envelope-from <netdev+bounces-304532-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:16:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E82F702AC1
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:07:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C4D6702BFE
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:16:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=W01Sqmtj;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304531-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304531-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304532-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304532-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4E27E310F7A3
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 12:55:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6A242313441D
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 12:57:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03BE63D3CEB;
-	Fri,  3 Jul 2026 12:55:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 004FD3D525B;
+	Fri,  3 Jul 2026 12:57:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33543D0BE1
-	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 12:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB2703D1AA4;
+	Fri,  3 Jul 2026 12:57:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783083328; cv=none; b=Jgk8rg61GoUjtm9NiCblrPDPeYdMakOuaX64c283tXqUXMihj7y8DIOr1dfg+bLJFisIYTKIM9axybW5S8jWvtYSS7Dm1UspPpFnOpZzrfexCS5JMmh654Ep8b0mrx57CprNZJyF+l5YnvK++ErkTkwg1u7IkVi4yGfGWOSkWzE=
+	t=1783083438; cv=none; b=YBCWlITqiroiUieKKv9YtFT3+xWQv3cMlno5kk0aig40uAjP52ZeTdlOc+D59SdkSAzgAjazfiRWEmLDwIFirnP46ppik5y2JmIW9WI9WC5sS82qQDr6+N/de16ecMn8Nf9dF9z18qcVCJwH7SOyo0MV7Zepyug+wUW3GLac4dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783083328; c=relaxed/simple;
-	bh=gbHF45bAfLovgDxu690VkVZ1Bt91kozMINPDxI7ZBnA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NdAzot1HAKY7k6/kKYg3GQ4N5PMK6GyMToW7BXNVKuU9VkAwXDvyLCqdvicYax5s/0gGFtT9nuhWQy1+hNLI+2c49+bt/sTCp/KXTzB/ZRAf6uPhqGtVag10sId+H7WST2R+RkipzD3IaIkd8wCAJiVGNSeo9KdFuTzSJ2NMxaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W01Sqmtj; arc=none smtp.client-ip=209.85.215.171
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-c9cf07d2df6so351873a12.2
-        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 05:55:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783083326; x=1783688126; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rtkvg+7eDDRCJghynF4cAnUvilYztgxfeU42PhGZCQs=;
-        b=W01SqmtjWJn8t3x0kLFGaRlZtGrx7sI7zy9DIIHDZlexa1CE5v+ig6pVmOeBVMZD6m
-         G/Y52SKsBpLsu28eFtfhYAw/5P+0nNRc98M1L1DRlALvaH9aUjqY20l5CCs2vEaZwXan
-         IieRx7ci/GuRC2WhlB39/7a15BQ0SsUo+13+G1v+Aq/nImXuKThyG0jPNgtQ87aS35kJ
-         RtA0i1YrcRBHGLYaX5HkJKeHQyCtGIjLPHu3FGk4XWloWucWiVR8XIcQYUVPqaksUN+/
-         jvS/7QC9VEJ/hf+7V1rfTMtaVZLOvgDC2qlGlOMsuiGA6EdNla4HKfrLAInP7sHSt8Dm
-         QcUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783083326; x=1783688126;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rtkvg+7eDDRCJghynF4cAnUvilYztgxfeU42PhGZCQs=;
-        b=cWm4jlXUHQ686I9DX0VZjobCmlNh0obEtlVl8mM55Dp3mQ+Tvh1G2ZpwbWZUUSrWl5
-         jy+HXPsmcX46pHBwBJAiGskNbqNM9Y076GGlVz+XU7wtdYcvOq81Jl1lNj5whilMqoXh
-         rzz92jvXDdM1n7cJRLQUEBD2T14AMU1DzTJWpLnVJzmMW0cx2EUx516LfSLFtdl6o9gS
-         u194PD2P4PHYN6j3EYGbJ9vBtDjVdgNE4+07+ETIM0HQ2xHsqfWPev7+xebQ5mTgc/24
-         r1yBKHH0EIPvAVRl8MIzs2MsyE+eR4hfqp8EjA7nlGHe8iOm4hXkfX2vkC6fN3cqXQsp
-         JGWQ==
-X-Gm-Message-State: AOJu0YzpUdCHfHtkhLeSeEpgm4zhagIK7CezifyHp4bV5EYSJELnvjgn
-	ECHcOpkAveRPGkeBveyFhfdq7JUQJMatEKC0H74QVXGdLFP2z1SX37fLywsJ7V4/
-X-Gm-Gg: AfdE7cmB9JywPROBUSQgjImCqiMCKE9Ur3tCzzQ/QYp/Jcf/T1haNF7uoqeC1K5qULp
-	hsIInJUvfAL9nABP89r4jGiuMfGdeJzFraAsguD/VoVHjrtq7oH1+BVKqTWpkSjkSigHXWhsmDE
-	9+xca+U+qozRvBSS8GKNpiBF14dKD5KOa9xfGYvYd9p7WmtKHxmmP8k02DOn+FhLjgGRaI48v0i
-	G9s+uY4ASTv7sLLudZHR0ImsTPHPQQ0CtS8gNM1QNgnk7tZ17n2OuxXvlcJxJeW1lHdJiiTYbbW
-	Audg8oy+j1DcawkQ7lfthMJesMVs3C0msvnMEZIW7HQ/BLls1971VJYQNJ3JuCM3fF0W2gAL0bf
-	SftKnOKY7e5kjDUdouDlewLjPmTd8Kw6KdkASLaDi9UJQZTfhwbTJSkGSsbWQzcl+xhCh286lXJ
-	4nbvvV08lJL9iXQHyto1SvRoYWjss=
-X-Received: by 2002:a05:6a21:748b:b0:3bf:d1f9:b1db with SMTP id adf61e73a8af0-3bfed5e1001mr12898834637.52.1783083326089;
-        Fri, 03 Jul 2026 05:55:26 -0700 (PDT)
-Received: from amd.com ([165.204.156.251])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f290b6bc2sm7260818eec.27.2026.07.03.05.55.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jul 2026 05:55:25 -0700 (PDT)
-From: Paritosh Potukuchi <paritoshpotukuchi@gmail.com>
-X-Google-Original-From: Paritosh Potukuchi <paritosh.potukuchi@amd.com>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	jv@jvosburgh.net,
-	paritosh.potukuchi@amd.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1783083438; c=relaxed/simple;
+	bh=Qh2AebDPP6V334mO4EbGUQK1Q97xupx09IiP6HcnOU8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l26r8nVxcnaeX3OyJcCFnX10l2ZjyRoFkOpwX6wplDmY1ZrSOoBAIYvzcDwzagTZYNvLKHPQE5q5cIIR2TZGtkiC4I0oDup/W4lVgel2BcA/ih9pO8AU5SZkujgwCToL3HcszIoq0DH8DPWr78fnM3JV1XB0R+3NBiNltThu3kY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 4511360687; Fri, 03 Jul 2026 14:57:14 +0200 (CEST)
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH] net : bonding : Remove TODO comment about retrying setting the MAC
-Date: Fri,  3 Jul 2026 12:55:12 +0000
-Message-ID: <20260703125513.694324-1-paritosh.potukuchi@amd.com>
-X-Mailer: git-send-email 2.43.0
+	<netfilter-devel@vger.kernel.org>,
+	pablo@netfilter.org
+Subject: [PATCH net 0/9] netfilter: updates for net
+Date: Fri,  3 Jul 2026 14:57:00 +0200
+Message-ID: <20260703125709.16493-1-fw@strlen.de>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,78 +55,128 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304531-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jv@jvosburgh.net,m:paritosh.potukuchi@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER(0.00)[paritoshpotukuchi@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-304532-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[strlen.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:netfilter-devel@vger.kernel.org,m:pablo@netfilter.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[fw@strlen.de,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[paritoshpotukuchi@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ALIAS_RESOLVED(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	R_DKIM_NA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,amd.com:mid,amd.com:email]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,strlen.de:mid,strlen.de:from_mime,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8E82F702AC1
+X-Rspamd-Queue-Id: 0C4D6702BFE
 
-As correctly pointed out by Jay Vosburgh,
+Hi,
 
-"This comment dates to sometime before git, when it was common for
-network device drivers to lack the ability to change the MAC while the
-interface is up.  To the best of my knowledge, that isn't a issue
-today."
+The following patchset contains Netfilter fixes for *net*, all
+for ancient problems.  Patch 7 raised drive-by sashiko findings,
+but those are not related to the change itself.
 
-Based on the discussion in the RFC linked below, I am removing the
-TODO.
+1) Rebuild the nf_nat_sip data pointer to prevent stale access after SKB
+reallocation. Restrict UDP mangling to UDP streams to avoid TCP packet
+corruption.
 
-Link to the RFC:
-https://lore.kernel.org/netdev/2001256.1782860341@famine/T/#t
+2) Prevent undefined behavior in xt_u32 caused by invalid shift counts.
+From Wyatt Feng.
 
-Signed-off-by: Paritosh Potukuchi <paritosh.potukuchi@amd.com>
----
- drivers/net/bonding/bond_main.c | 6 ------
- 1 file changed, 6 deletions(-)
+3) Use u64 variables to prevent incorrect comparisons on links exceeding
+34 Gbps in xt_rateest.  From Feng Wu.
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index d2e4dae4e97c..d5c19dc4bc07 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -4865,12 +4865,6 @@ static int bond_set_mac_address(struct net_device *bond_dev, void *addr)
- 			  __func__, slave);
- 		res = dev_set_mac_address(slave->dev, addr, NULL);
- 		if (res) {
--			/* TODO: consider downing the slave
--			 * and retry ?
--			 * User should expect communications
--			 * breakage anyway until ARP finish
--			 * updating, so...
--			 */
- 			slave_dbg(bond_dev, slave->dev, "%s: err %d\n",
- 				  __func__, res);
- 			goto unwind;
+4) Cap the number of expectations per master during nfnetlink_cthelper
+updates. From Pablo Neira Ayuso.
+
+5) Mark malformed IPv6 extension headers for hotdrop in ip6tables.
+From Zhixing Chen.
+
+6) Skip the end element of an open interval during the get command when its
+closest match is the interval's start element. Also from Pablo Neira Ayuso.
+
+7) Fix PMTU calculation for GUE/GRE tunnels in IPVS during ICMP fragmentation
+error handling. Include additional tunnel header length when computing the
+new MTU. From Yizhou Zhao.
+
+8) Reset full ip_vs_seq structures in ip_vs_conn_new. Also from Yizhou Zhao.
+
+9) Reject invalid shift parameters in xt_connmark. Also from Wyatt Feng.
+
+Please, pull these changes from:
+The following changes since commit d335dcc6f521571d57117b8deeebc940836e5450:
+
+  gue: validate REMCSUM private option length (2026-07-03 09:34:53 +0100)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-26-07-03
+
+for you to fetch changes up to 1b47026fb4b35bac850ad6e8a4ad7fc018e09ebc:
+
+  netfilter: xt_connmark: reject invalid shift parameters (2026-07-03 14:45:21 +0200)
+
+----------------------------------------------------------------
+netfilter pull request nf-26-07-03
+
+----------------------------------------------------------------
+
+Feng Wu (1):
+  netfilter: xt_rateest: fix u64 truncation in xt_rateest_mt()
+
+Florian Westphal (1):
+  netfilter: nf_nat_sip: reload possible stale data pointer
+
+Pablo Neira Ayuso (2):
+  netfilter: nfnetlink_cthelper: cap to maximum number of expectation
+    per master on updates
+  netfilter: nft_set_rbtree: get command skips end element with open
+    interval
+
+Wyatt Feng (2):
+  netfilter: xt_u32: reject invalid shift counts
+  netfilter: xt_connmark: reject invalid shift parameters
+
+Yizhou Zhao (2):
+  ipvs: fix PMTU for GUE/GRE tunnel ICMP errors
+  ipvs: reset full ip_vs_seq structs in ip_vs_conn_new
+
+Zhixing Chen (1):
+  netfilter: ip6tables: mark malformed IPv6 extension headers for hotdrop
+
+ net/ipv6/netfilter/ip6t_ah.c       |  5 +++++
+ net/ipv6/netfilter/ip6t_hbh.c      |  1 +
+ net/ipv6/netfilter/ip6t_rt.c       |  3 ++-
+ net/netfilter/ipvs/ip_vs_conn.c    |  4 ++--
+ net/netfilter/ipvs/ip_vs_core.c    |  6 +++---
+ net/netfilter/nf_nat_sip.c         | 11 +++++++++++
+ net/netfilter/nf_tables_api.c      |  3 +++
+ net/netfilter/nfnetlink_cthelper.c |  2 ++
+ net/netfilter/nft_set_rbtree.c     |  8 ++++++--
+ net/netfilter/xt_connmark.c        | 14 ++++++++++++--
+ net/netfilter/xt_rateest.c         |  2 +-
+ net/netfilter/xt_u32.c             | 12 +++++++++++-
+ 12 files changed, 59 insertions(+), 12 deletions(-)
+
 -- 
-2.43.0
+2.54.0
 
 
