@@ -1,180 +1,401 @@
-Return-Path: <netdev+bounces-304623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304624-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vFbkFfvpR2oHhgAAu9opvQ
-	(envelope-from <netdev+bounces-304623-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 18:57:31 +0200
+	id llDYAnXsR2qwhgAAu9opvQ
+	(envelope-from <netdev+bounces-304624-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 19:08:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E765E704716
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 18:57:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B03A704898
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 19:08:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mojatatu.com header.s=google header.b=rh7LLvA2;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304623-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304623-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=secunet.com header.s=202301 header.b=LMuPNf6P;
+	dmarc=pass (policy=none) header.from=secunet.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304624-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304624-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EB2FE30046A5
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 16:57:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 642483019509
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 17:08:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB3E307AF4;
-	Fri,  3 Jul 2026 16:57:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84AE42BEFEE;
+	Fri,  3 Jul 2026 17:08:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5B0730676C
-	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 16:57:18 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783097840; cv=pass; b=sTYHX2PVh/XxDoT6EPnfVaiSu5svP3WOvDTcg5ell8gclP3TLZf7UMLBav4FDglhZNRzBzV9v5yqARC/PQBZbBP2cBfFaIL1NVblENsbA4vRmZTRBc1hV46m2zeeGb5E8dWiE/hHIS/CcMd+syCuszoQu71FMd+h5/cb3eUk2Qs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783097840; c=relaxed/simple;
-	bh=vx6yrIftedLbQYWFX/9co2pg7fVskRhzDGpsvdqv894=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=euhoyOiWxQv7bDftD8oF5BXwfkOkpe1+CWS9xyzJB9wNtuwfvciuE5UToQ1qXPhNwaYSIfWP/yfBomeYtCjQ57DD4ut4zWDhuX//qSBb3bbDPhTdwWWTWiC+87zEQOMKMLxh++ns0oJCc3r6J4P4tLpZmD5pH7qc41KZxpwgksk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=rh7LLvA2; arc=pass smtp.client-ip=74.125.224.41
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-664cdeab266so1043786d50.3
-        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 09:57:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783097838; cv=none;
-        d=google.com; s=arc-20260327;
-        b=DdTmFha1391MfB/bSNeFSTUWzz7bdzcv9E6S6DpY6Jgs2uEmJFKrvcvnwNs/4cSpvg
-         dW7ZSZeuQHmDSofB0axmMlo3vMcf5aRUF5VSiIswXdZrkqC/QSX03Un89pF9YHHKREb7
-         4L95tNPk4K9IpIEkWIIuc8VvjXVDa/HREtwDcMBf5T351OOhX32S/TgLjopJbZBDDrbX
-         duAcmrYUic0IbN6AVP0QmAtK0pgWnMvTT/beQ24bbKaavOH6FPfYLc1I0NkSRSoHQX/y
-         S8YGevZrYmKnuEXTQeTJfVuZYM4hJgcn8CfqYVzFuMj3fIYPm80aUzLbNIH9h900yaqN
-         cjfw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=vx6yrIftedLbQYWFX/9co2pg7fVskRhzDGpsvdqv894=;
-        fh=KToyB22D+HmJyeHdAQJymgExWRC6+3lkCyvMxL03KH4=;
-        b=H8uGVJ9MTB6wxwJwLOYjKKvIflb7jiRTzm1tw3qbHVoNahdJrxyzOMK+oTYBWXraOu
-         KSVsHk0Oft5mkkHSlzYSC6svhDLdEJt0AsqqzGuWvT8vRWiPabpyRGQUt++GYPdnOWoU
-         3SY224YP1NJfCiz3gkgMZE6nG8DtnSulYAzj5WU4sqk/NMD0IEKn3gvs/KZngfMEf/oF
-         ttLKc05lt6pS9EyhpT5pUAjqC6zTlzuQo7RIGCJqxIPtQLofpztPxyf+rg2sCMbuT5gB
-         ssphsXAFzqyAblm73ZoDYTtOdKVTsipjSQw+uyanky9NQ1fYmy6vB1L2NkYaG1uFouGj
-         1H6A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu.com; s=google; t=1783097838; x=1783702638; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vx6yrIftedLbQYWFX/9co2pg7fVskRhzDGpsvdqv894=;
-        b=rh7LLvA22oliSxC4WPJdctztFNc1JEJKEOrsdFJFzKwsnsvBnCCcbvc3np+EEqdYl0
-         n95AoZLBIYmdnxdSZj6Yn97/tI60evdGaMkzLrEGR7wu03Xk1coTMcz30BUMgEDXjcNk
-         LiO1nYEXmJPch6viZ8/+I+4+bS6+Ld2wsOVfQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783097838; x=1783702638;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=vx6yrIftedLbQYWFX/9co2pg7fVskRhzDGpsvdqv894=;
-        b=Ft2zzFW8UD3u9wNChMbOaYT46IZ0xEDUs2QHUbucsCAyqAnDXQSn6h3nUmFLUN7nvw
-         KGY064KVDKkGll0KUq9eyldLBWGygrXDWfrsVvP/yCVrYcQGBc9VsYLzlNGOguol5Prd
-         fbKY5cfXuRQrSg04t6E7hrp8DC/ykv6640QBSDvNPt5sShY6uLG7W6Zb+YTRIvc7r9O9
-         gceOQwpkiSB53HdIWSqMZgGelOyjYk8d9npMsABGACdRCaxVpBLI5qmTd3SwYeeS8Q0F
-         gBZqDRDKfgvgerImHglWCln6HR72rgb3gA7gQueudocDpxAxvd7ec3/+fQsVbBYEb1rs
-         9v8g==
-X-Gm-Message-State: AOJu0YyhHkFUBAHJdZwHooS/9skDN3GO1oCBdNhBZCzFS4+ni5jW9M/u
-	aydqWmG3aWl7CCvy3x8wQh4yYtVKLMqAtCEQWpNai0k03t9lBOOzR4Qvh6cH9JuSLhtCoi9ny2i
-	1YE3fUwJ7wfuW7/oN7BtZkCn/286N4voh8ME8QjKS
-X-Gm-Gg: AfdE7cmKGeWwTXZN4QyE+UxnUZTkCc2P0iPhgNahMmnbLKAGvNgsX+tApmVVD9Z/cvU
-	1Yb3vznH29iPlR/yc8nvL0zbbZV6EYpa0wB1MGWXgSftPMWOLzTkMdpBKMvw480ip08A6msJ2T4
-	MLPcjBGXFxeQy5/vqwplqlzFI6BFpnmYl3fEJ2amV9XGsRwJW+KZ60jn7DUCAo1jQ/xtzM/hUYd
-	ENDQ0pNjMcSIcr/dne3NXGara1i6cdcpBY1b87dwqAxVXxat6k4Ekf/xGWSSz0q9o/3K908DN1l
-	wBHxJ8GRN+K2lWCIQhEbyw==
-X-Received: by 2002:a05:690e:150d:b0:665:6e1:9ea with SMTP id
- 956f58d0204a3-66650c76104mr594117d50.8.1783097837582; Fri, 03 Jul 2026
- 09:57:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4F4433E92;
+	Fri,  3 Jul 2026 17:07:58 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783098482; cv=none; b=qRD7SE+ZVOb4jQtQtF4+VJuYiR4YNM+OkN2XwEO6Zr4GuZDuuuSlN5OEokWXUCz1ew2Js78hk8KgEy0sMFVVdy7siXbYXAHRsaiOvNz6/srcAGH/njQhDvVq6JekPjJAbcph1ZEJ9Vx3mkj/uYZ8DfYUDkHcdSl267QdByOr584=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783098482; c=relaxed/simple;
+	bh=PMiOeVqxr5FlSVi/VMmRMEA6bAxsr47i0e2W+DkOtHQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MZ6FxkAzx6Plea1M1jCa4bl+sQN5408UKQ5zGoTA2kwjaFMnE0FVysfrDdhhQGGc4crltdNPV7u6WCbf66OSfUILZ5IMtx6N2HLAZU7ecGq2nP3pJTZIEd5wUutMQtLeoWquqWItlD8Bae3Qzxq3LuQq/PPS1r4BgNP6vRym9/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=LMuPNf6P; arc=none smtp.client-ip=62.96.220.36
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id C65C1206D2;
+	Fri,  3 Jul 2026 19:07:50 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id yEFN8pRTWpjr; Fri,  3 Jul 2026 19:07:49 +0200 (CEST)
+Received: from EXCH-02.secunet.de (rl2.secunet.de [10.32.0.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id D009920612;
+	Fri,  3 Jul 2026 19:07:49 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com D009920612
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1783098469;
+	bh=XK6tcWJtHkBmnDkcInoIAHg4SGs9356CMyKVHhkn7GY=;
+	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+	b=LMuPNf6PKknxhZSsKRkzxhb+lzrxTOxFAguCwXjfGzmfZIXsDZdbRngfVG68/nbJa
+	 sXxOnyF/l9t2EApIBPesl/9sJ7BKT4ptFo+UrSKqkCRA7Ik39B4kc0Xgi7Hel+8if1
+	 ThdrOivxcG0EbHrAT0wrRamqnCs8WQolH7FjcPZ0WVC6o7aS09nqmevfru3WJQWH6x
+	 3cF8CIECq72TuTl/h4+uq1LlPYxc2F0A8Cdw1pYwGZ1C7BAcmckh6pg4NkQaNBgvbW
+	 ARHtgFSEMBu/eyWQQ1iOVZklYqiODxA56efPBFlXPUQXU+teGgEiTDW1YMxM6oIQF4
+	 BgHtIwW1CBNSQ==
+Received: from moon.secunet.de (172.18.149.1) by EXCH-02.secunet.de
+ (10.32.0.172) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Fri, 3 Jul
+ 2026 19:07:49 +0200
+From: Antony Antony <antony.antony@secunet.com>
+To: Antony Antony <antony.antony@secunet.com>, Steffen Klassert
+	<steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, Jamal Hadi Salim
+	<hadi@cyberus.ca>, Shuah Khan <shuah@kernel.org>
+CC: Sabrina Dubroca <sd@queasysnail.net>, <netdev@vger.kernel.org>, Yan Yan
+	<evitayan@google.com>, Tobias Brunner <tobias@strongswan.org>, Florian
+ Westphal <fw@strlen.de>, <linux-kselftest@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>
+Subject: [PATCH ipsec 1/8] xfrm: state: exact mark/mask match for SPI-keyed control-plane SA lookups
+Date: Fri, 3 Jul 2026 19:07:34 +0200
+Message-ID: <migrate-state-fixes-v0-1-a69e8637ba3b@secunet.com>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <migrate-state-fixes-v0-0-a69e8637ba3b@secunet.com>
+References: <migrate-state-fixes-v0-0-a69e8637ba3b@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260630153651.249752-1-victor@mojatatu.com> <e3f99de6-cf19-451f-8175-50fa30012f7f@redhat.com>
-In-Reply-To: <e3f99de6-cf19-451f-8175-50fa30012f7f@redhat.com>
-From: Victor Nogueira <victor@mojatatu.com>
-Date: Fri, 3 Jul 2026 13:57:05 -0300
-X-Gm-Features: AVVi8CcpmtGS4kPwtxRIPw-uyWSinnHwF5IROirsevjHl9oZ80q_4ZiZHSmoSjY
-Message-ID: <CA+NMeC_TrGVJwePRht=xB3qk3YV1tXUTkjW-+WwwwznTmy5=HA@mail.gmail.com>
-Subject: Re: [PATCH net] selftests/tc-testing: Add tests that force multiq and
- taprio to enqueue to child's gso_skb
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, hexlabsecurity@proton.me, pctammela@mojatatu.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, jhs@mojatatu.com, 
-	jiri@resnulli.us
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Mailer: b4 0.16-dev
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-02.secunet.de
+ (10.32.0.172)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:hexlabsecurity@proton.me,m:pctammela@mojatatu.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:jhs@mojatatu.com,m:jiri@resnulli.us,s:lists@lfdr.de];
-	DMARC_NA(0.00)[mojatatu.com];
-	FORGED_SENDER(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-304623-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:antony.antony@secunet.com,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:dsahern@kernel.org,m:hadi@cyberus.ca,m:shuah@kernel.org,m:sd@queasysnail.net,m:netdev@vger.kernel.org,m:evitayan@google.com,m:tobias@strongswan.org,m:fw@strlen.de,m:linux-kselftest@vger.kernel.org,m:linux-doc@vger.kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[antony.antony@secunet.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-304624-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[antony.antony@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[secunet.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mojatatu.com:from_mime,mojatatu.com:email,mojatatu.com:dkim]
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E765E704716
+X-Rspamd-Queue-Id: 9B03A704898
 
-On Fri, Jul 3, 2026 at 1:37=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On 6/30/26 5:36 PM, Victor Nogueira wrote:
-> > Add test cases to reproduce scenarios fixed recently [1] where
-> > multiqueue and taprio forced their children into enqueueing an skb to
-> > gso_skb (during peek), but failed to dequeue from gso_skb because they
-> > called the child's dequeue callback directly. This causes a desync in t=
-he
-> > child's qlen/backlog and results in an eventual null-ptr-deref (with a
-> > qfq or dualpi2 child).
-> >
-> > Test cases are the following:
-> >
-> > - Force multiq to dequeue from its child's gso_skb with qfq leaf (fb6c)
-> > - Force multiq to dequeue from its child's gso_skb with dualpi2 leaf (1=
-922)
-> > - Force taprio to dequeue from its child's gso_skb with qfq leaf (476f)
-> > - Force taprio to dequeue from its child's gso_skb with dualpi2 leaf (0=
-235)
-> >
-> > [1] https://lore.kernel.org/netdev/20260625-b4-disp-31bcb279-v1-0-85c40=
-b83c529@proton.me/
-> >
-> > Signed-off-by: Victor Nogueira <victor@mojatatu.com>
->
-> Since the fix has been propagated to net-next, this is net-next
-> material, right? no need to repost, just ack/nack, thanks!
+Add __xfrm_state_lookup_exact(), an identity-match like
+__xfrm_state_lookup().
 
-Sorry, I didn't realise the fix had propagated.
-Yes, this should go to net-next then.
+Wire it into every SPI-keyed control-plane path: DELSA/GETSA, UPDSA,
+GETAE/NEWAE, EXPIRE, MIGRATE_STATE.
 
-cheers,
-Victor
+xfrm_state_add()'s duplicate-detect keeps the wildcard
+__xfrm_state_locate() - unrelated, unchanged.
+
+Fixes: 3d6acfa7641f ("xfrm: SA lookups with mark")
+Signed-off-by: Antony Antony <antony.antony@secunet.com>
+---
+ include/net/xfrm.h    |  3 ++
+ net/xfrm/xfrm_state.c | 80 ++++++++++++++++++++++++++++++++++++++++++++-------
+ net/xfrm/xfrm_user.c  | 29 ++++++++++---------
+ 3 files changed, 88 insertions(+), 24 deletions(-)
+
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index 519a0156a05c..f6ed590cb2ff 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -1746,6 +1746,9 @@ struct xfrm_state *xfrm_state_lookup_byaddr(struct net *net, u32 mark,
+ 					    const xfrm_address_t *saddr,
+ 					    u8 proto,
+ 					    unsigned short family);
++struct xfrm_state *xfrm_state_lookup_exact(struct net *net, const struct xfrm_mark *mark,
++					   const xfrm_address_t *daddr, __be32 spi,
++					   u8 proto, unsigned short family);
+ #ifdef CONFIG_XFRM_SUB_POLICY
+ void xfrm_tmpl_sort(struct xfrm_tmpl **dst, struct xfrm_tmpl **src, int n,
+ 		    unsigned short family);
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index c58cd024e3c6..df761ce1c290 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -1172,11 +1172,22 @@ static struct xfrm_state *__xfrm_state_lookup_all(const struct xfrm_hash_state_p
+ 	return NULL;
+ }
+ 
+-static struct xfrm_state *__xfrm_state_lookup(const struct xfrm_hash_state_ptrs *state_ptrs,
+-					      u32 mark,
+-					      const xfrm_address_t *daddr,
+-					      __be32 spi, u8 proto,
+-					      unsigned short family)
++/* exact=false: data-plane wildcard match against x's mask. exact=true:
++ * control-plane identity match, mark and mask must both match exactly.
++ */
++static bool xfrm_state_mark_matches(const struct xfrm_state *x, u32 mark, u32 mask, bool exact)
++{
++	if (exact)
++		return x->mark.v == mark && x->mark.m == mask;
++	return (mark & x->mark.m) == x->mark.v;
++}
++
++static struct xfrm_state *
++__xfrm_state_lookup(const struct xfrm_hash_state_ptrs *state_ptrs,
++		    u32 mark, u32 mask, bool exact,
++		    const xfrm_address_t *daddr,
++		    __be32 spi, u8 proto,
++		    unsigned short family)
+ {
+ 	unsigned int h = __xfrm_spi_hash(daddr, spi, proto, family, state_ptrs->hmask);
+ 	struct xfrm_state *x;
+@@ -1188,7 +1199,7 @@ static struct xfrm_state *__xfrm_state_lookup(const struct xfrm_hash_state_ptrs
+ 		    !xfrm_addr_equal(&x->id.daddr, daddr, family))
+ 			continue;
+ 
+-		if ((mark & x->mark.m) != x->mark.v)
++		if (!xfrm_state_mark_matches(x, mark, mask, exact))
+ 			continue;
+ 		if (!xfrm_state_hold_rcu(x))
+ 			continue;
+@@ -1198,6 +1209,17 @@ static struct xfrm_state *__xfrm_state_lookup(const struct xfrm_hash_state_ptrs
+ 	return NULL;
+ }
+ 
++static struct xfrm_state *
++__xfrm_state_lookup_exact(const struct xfrm_hash_state_ptrs *state_ptrs,
++			  const struct xfrm_mark *mark,
++			  const xfrm_address_t *daddr,
++			  __be32 spi, u8 proto,
++			  unsigned short family)
++{
++	return __xfrm_state_lookup(state_ptrs, mark->v, mark->m, true,
++				   daddr, spi, proto, family);
++}
++
+ struct xfrm_state *xfrm_input_state_lookup(struct net *net, u32 mark,
+ 					   const xfrm_address_t *daddr,
+ 					   __be32 spi, u8 proto,
+@@ -1228,7 +1250,7 @@ struct xfrm_state *xfrm_input_state_lookup(struct net *net, u32 mark,
+ 
+ 	xfrm_hash_ptrs_get(net, &state_ptrs);
+ 
+-	x = __xfrm_state_lookup(&state_ptrs, mark, daddr, spi, proto, family);
++	x = __xfrm_state_lookup(&state_ptrs, mark, 0, false, daddr, spi, proto, family);
+ 	if (x) {
+ 		spin_lock(&net->xfrm.xfrm_state_lock);
+ 		if (x->km.state != XFRM_STATE_VALID) {
+@@ -1288,7 +1310,7 @@ __xfrm_state_locate(struct xfrm_state *x, int use_spi, int family)
+ 	xfrm_hash_ptrs_get(net, &state_ptrs);
+ 
+ 	if (use_spi)
+-		return __xfrm_state_lookup(&state_ptrs, mark, &x->id.daddr,
++		return __xfrm_state_lookup(&state_ptrs, mark, 0, false, &x->id.daddr,
+ 					   x->id.spi, x->id.proto, family);
+ 	else
+ 		return __xfrm_state_lookup_byaddr(&state_ptrs, mark,
+@@ -1297,6 +1319,27 @@ __xfrm_state_locate(struct xfrm_state *x, int use_spi, int family)
+ 						  x->id.proto, family);
+ }
+ 
++/* Used by xfrm_state_update() only; xfrm_state_add()'s dup check keeps
++ * using the wildcard __xfrm_state_locate() above.
++ */
++static inline struct xfrm_state *
++__xfrm_state_locate_exact(struct xfrm_state *x, int use_spi, int family)
++{
++	struct xfrm_hash_state_ptrs state_ptrs;
++	struct net *net = xs_net(x);
++
++	xfrm_hash_ptrs_get(net, &state_ptrs);
++
++	if (use_spi)
++		return __xfrm_state_lookup_exact(&state_ptrs, &x->mark, &x->id.daddr,
++						 x->id.spi, x->id.proto, family);
++	else
++		return __xfrm_state_lookup_byaddr(&state_ptrs, x->mark.v & x->mark.m,
++						  &x->id.daddr,
++						  &x->props.saddr,
++						  x->id.proto, family);
++}
++
+ static void xfrm_hash_grow_check(struct net *net, int have_hash_collision)
+ {
+ 	if (have_hash_collision &&
+@@ -2229,7 +2272,7 @@ int xfrm_state_update(struct xfrm_state *x)
+ 	to_put = NULL;
+ 
+ 	spin_lock_bh(&net->xfrm.xfrm_state_lock);
+-	x1 = __xfrm_state_locate(x, use_spi, x->props.family);
++	x1 = __xfrm_state_locate_exact(x, use_spi, x->props.family);
+ 
+ 	err = -ESRCH;
+ 	if (!x1)
+@@ -2374,7 +2417,7 @@ xfrm_state_lookup(struct net *net, u32 mark, const xfrm_address_t *daddr, __be32
+ 	rcu_read_lock();
+ 	xfrm_hash_ptrs_get(net, &state_ptrs);
+ 
+-	x = __xfrm_state_lookup(&state_ptrs, mark, daddr, spi, proto, family);
++	x = __xfrm_state_lookup(&state_ptrs, mark, 0, false, daddr, spi, proto, family);
+ 	rcu_read_unlock();
+ 	return x;
+ }
+@@ -2398,6 +2441,23 @@ xfrm_state_lookup_byaddr(struct net *net, u32 mark,
+ }
+ EXPORT_SYMBOL(xfrm_state_lookup_byaddr);
+ 
++struct xfrm_state *
++xfrm_state_lookup_exact(struct net *net, const struct xfrm_mark *mark,
++			const xfrm_address_t *daddr, __be32 spi,
++			u8 proto, unsigned short family)
++{
++	struct xfrm_hash_state_ptrs state_ptrs;
++	struct xfrm_state *x;
++
++	rcu_read_lock();
++	xfrm_hash_ptrs_get(net, &state_ptrs);
++
++	x = __xfrm_state_lookup_exact(&state_ptrs, mark, daddr, spi, proto, family);
++	rcu_read_unlock();
++	return x;
++}
++EXPORT_SYMBOL(xfrm_state_lookup_exact);
++
+ struct xfrm_state *
+ xfrm_find_acq(struct net *net, const struct xfrm_mark *mark, u8 mode, u32 reqid,
+ 	      u32 if_id, u32 pcpu_num, u8 proto, const xfrm_address_t *daddr,
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index 6384795ee6b2..b56fca666b89 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -1089,11 +1089,12 @@ static struct xfrm_state *xfrm_user_state_lookup(struct net *net,
+ 	struct xfrm_state *x = NULL;
+ 	struct xfrm_mark m;
+ 	int err;
+-	u32 mark = xfrm_mark_get(attrs, &m);
++
++	xfrm_mark_get(attrs, &m);
+ 
+ 	if (xfrm_id_proto_match(p->proto, IPSEC_PROTO_ANY)) {
+ 		err = -ESRCH;
+-		x = xfrm_state_lookup(net, mark, &p->daddr, p->spi, p->proto, p->family);
++		x = xfrm_state_lookup_exact(net, &m, &p->daddr, p->spi, p->proto, p->family);
+ 	} else {
+ 		xfrm_address_t *saddr = NULL;
+ 
+@@ -1104,7 +1105,7 @@ static struct xfrm_state *xfrm_user_state_lookup(struct net *net,
+ 		}
+ 
+ 		err = -ESRCH;
+-		x = xfrm_state_lookup_byaddr(net, mark,
++		x = xfrm_state_lookup_byaddr(net, m.v & m.m,
+ 					     &p->daddr, saddr,
+ 					     p->proto, p->family);
+ 	}
+@@ -2788,14 +2789,13 @@ static int xfrm_get_ae(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	struct sk_buff *r_skb;
+ 	int err;
+ 	struct km_event c;
+-	u32 mark;
+ 	struct xfrm_mark m;
+ 	struct xfrm_aevent_id *p = nlmsg_data(nlh);
+ 	struct xfrm_usersa_id *id = &p->sa_id;
+ 
+-	mark = xfrm_mark_get(attrs, &m);
++	xfrm_mark_get(attrs, &m);
+ 
+-	x = xfrm_state_lookup(net, mark, &id->daddr, id->spi, id->proto, id->family);
++	x = xfrm_state_lookup_exact(net, &m, &id->daddr, id->spi, id->proto, id->family);
+ 	if (x == NULL)
+ 		return -ESRCH;
+ 
+@@ -2836,7 +2836,6 @@ static int xfrm_new_ae(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	struct xfrm_state *x;
+ 	struct km_event c;
+ 	int err = -EINVAL;
+-	u32 mark = 0;
+ 	struct xfrm_mark m;
+ 	struct xfrm_aevent_id *p = nlmsg_data(nlh);
+ 	struct nlattr *rp = attrs[XFRMA_REPLAY_VAL];
+@@ -2856,9 +2855,10 @@ static int xfrm_new_ae(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 		return err;
+ 	}
+ 
+-	mark = xfrm_mark_get(attrs, &m);
++	xfrm_mark_get(attrs, &m);
+ 
+-	x = xfrm_state_lookup(net, mark, &p->sa_id.daddr, p->sa_id.spi, p->sa_id.proto, p->sa_id.family);
++	x = xfrm_state_lookup_exact(net, &m, &p->sa_id.daddr, p->sa_id.spi,
++				    p->sa_id.proto, p->sa_id.family);
+ 	if (x == NULL)
+ 		return -ESRCH;
+ 
+@@ -2992,9 +2992,10 @@ static int xfrm_add_sa_expire(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	struct xfrm_user_expire *ue = nlmsg_data(nlh);
+ 	struct xfrm_usersa_info *p = &ue->state;
+ 	struct xfrm_mark m;
+-	u32 mark = xfrm_mark_get(attrs, &m);
+ 
+-	x = xfrm_state_lookup(net, mark, &p->id.daddr, p->id.spi, p->id.proto, p->family);
++	xfrm_mark_get(attrs, &m);
++
++	x = xfrm_state_lookup_exact(net, &m, &p->id.daddr, p->id.spi, p->id.proto, p->family);
+ 
+ 	err = -ENOENT;
+ 	if (x == NULL)
+@@ -3361,9 +3362,9 @@ static int xfrm_do_migrate_state(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 
+ 	copy_from_user_migrate_state(&m, um);
+ 
+-	x = xfrm_state_lookup(net, m.old_mark.v & m.old_mark.m,
+-			      &um->id.daddr, um->id.spi,
+-			      um->id.proto, um->id.family);
++	x = xfrm_state_lookup_exact(net, &m.old_mark,
++				    &um->id.daddr, um->id.spi,
++				    um->id.proto, um->id.family);
+ 	if (!x) {
+ 		NL_SET_ERR_MSG(extack, "Can not find state");
+ 		return -ESRCH;
+
+-- 
+2.47.3
+
 
