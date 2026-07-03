@@ -1,195 +1,219 @@
-Return-Path: <netdev+bounces-304466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304474-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id SU1VMQqCR2pMZwAAu9opvQ
-	(envelope-from <netdev+bounces-304466-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 11:34:02 +0200
+	id NBueDdSDR2qrZwAAu9opvQ
+	(envelope-from <netdev+bounces-304474-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 11:41:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B69CB700AF5
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 11:34:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0A2F700BD8
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 11:41:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=microchip.com header.s=selector1 header.b="pqr/k9oq";
-	dmarc=pass (policy=reject) header.from=microchip.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304466-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304466-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=e9MFh+yA;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304474-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304474-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C47E1305AAD6
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 09:25:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 08985304C065
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 09:32:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E38E3B14A5;
-	Fri,  3 Jul 2026 09:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8505A3B14A3;
+	Fri,  3 Jul 2026 09:32:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011053.outbound.protection.outlook.com [40.93.194.53])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 066CE37DE98;
-	Fri,  3 Jul 2026 09:25:18 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783070720; cv=fail; b=WQYW5LhVWgSpYcjRO38Vt62iup3o6DpgW4qnqLUCS2oO+BSORWHfBBMUeRehe4vST9SewXSfkhhroXMK63zDKMf5e01m9cDM46hVcm+G5D+8nDgEaVPoNVby9fxHcjS08JDPpVMDtJ79nxADDE3B8H817Poz1L2CZmqt9tK18iU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783070720; c=relaxed/simple;
-	bh=UgLhq7k12hMRKps5npOFotutqPfT/sVRkZXcjJgMs0M=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=lJIL/wf6G6Q3s/KlGcqL77cCG+WchiKgSBHrWIBZhSMK7iRPY8tlQw6uJvL1RO+KITA9yzcIi65+suQvG5j1Qn1UD8qiJT9eJI14V//KrO5LB8L9kHpG3K9KXymcOINeHv0kDbzqF4mIO4DgVuU/f6FYqH5yj6lh/U7FgCxzsh0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=pqr/k9oq; arc=fail smtp.client-ip=40.93.194.53
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=T0dHSOldu2TPzU+GxFbhcSNFpz2EeGAE+gEU1eDnndwi3tsfxkjjiSqWHPqDO4Q5fnnT59QBRcG3cBf+t5+ZNP/MkrtXzYjrbiLrBNABdKUkVQ2LYZwkm0W1pExPMUzn4UjlSbFWSeznP3mKbNZWMk/vkhq8UXRqNeC2ZjgjxxbH862qkxJHmsBzTQBPXU8VY2JakfuB8U4nhKBroL1gy2Nrj3FSgNNkxDBGJeCqDMJh/QpTIrYacN3o4rDB/StGuu9lN+JMOALsQ53mMWvsGTNsIkYQvhk8I+MBeS7khs42jjJYsBh7CUU5F0A5RYe5Om8tTSysd85Jii13Eq7Ggw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UgLhq7k12hMRKps5npOFotutqPfT/sVRkZXcjJgMs0M=;
- b=jdFW7rDh/9Yjm4qPpzFn0Dtpo/6jLTDUrnOhohKffd/eD5s0ODkLTDoA9GwlLev0uamEjx7/fOLaXj0sdTenIoDeJVMntGqYBG+zE6/eDV0fMrnT9S9v+1iGbIyGhYDZMkg85yRvDDlob9MwWTYT/NO5PJ8Cvux1Lxrgj6bFdXGf10FU3eTWTV0wC4qYFiysu8w0mts27tsBWv8Facd8do026LZ75tL72BHwFD01/UHOe1ZVomrX3Dj63Z0TbXHvpiRt7ckLJ1trevb4FqhPuPocjjzRyZyrepq4hQ0JiM4Ci4RgTm0qgi8Cgeod/2ma2spQK0kU765HgDFheghD+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UgLhq7k12hMRKps5npOFotutqPfT/sVRkZXcjJgMs0M=;
- b=pqr/k9oqLq7EDzIO7ZIkbgHklkfETuJ6lHttt/Jirn5kUQlLp8UG0+Tb5N1RIPCp9LHnnalLIfjmwXGht10+YjG2U+wSIivSglSDFrg0bj566J7ZG6xEfq8LzAGCtHm9J/umSAO3s138ZvP70bwGp2j9Q+DuYGmtUjQmySIPGSY5BjW0pn/rhqHsCnXwqlipKXXXlFVWP4rKk9U2WyR31YKNOD1G9htKH47NDIpfBpnFnYOuL4cRXjFNXidlWz6ssDQ5TwGtmrUJQV2fHX5h/ecHd/kC5yUpWtcUqMI8m9GYGoGrZB42gz96Nhy6lMmxvnrcHSwlns4H1WB4qcw10w==
-Received: from DSWPR11MB9715.namprd11.prod.outlook.com (2603:10b6:8:355::17)
- by BL1PR11MB6049.namprd11.prod.outlook.com (2603:10b6:208:391::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.11; Fri, 3 Jul
- 2026 09:25:16 +0000
-Received: from DSWPR11MB9715.namprd11.prod.outlook.com
- ([fe80::25ec:56c9:f864:9139]) by DSWPR11MB9715.namprd11.prod.outlook.com
- ([fe80::25ec:56c9:f864:9139%6]) with mapi id 15.21.0181.010; Fri, 3 Jul 2026
- 09:25:16 +0000
-From: <Thangaraj.S@microchip.com>
-To: <nb@tipi-net.de>, <enrico.pozzobon@dissecto.com>
-CC: <UNGLinuxDriver@microchip.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <Woojung.Huh@microchip.com>, <netdev@vger.kernel.org>,
-	<linux-usb@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net v2] net: usb: lan78xx: disable VLAN filter in
- promiscuous mode
-Thread-Topic: [PATCH net v2] net: usb: lan78xx: disable VLAN filter in
- promiscuous mode
-Thread-Index: AQHdCVrhM8TwHwQcjUewNeORXPxyHLZaG0KAgAFrxVA=
-Date: Fri, 3 Jul 2026 09:25:15 +0000
-Message-ID:
- <DSWPR11MB971547088066C2CA91638F3BECF42@DSWPR11MB9715.namprd11.prod.outlook.com>
-References: <20260701-lan78xx-vlan-promisc-v2-1-fe3b18066728@dissecto.com>
- <aef78533a81c88a362885c24928a7c60@tipi-net.de>
-In-Reply-To: <aef78533a81c88a362885c24928a7c60@tipi-net.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DSWPR11MB9715:EE_|BL1PR11MB6049:EE_
-x-ms-office365-filtering-correlation-id: fcf23763-a3a3-4954-7152-08ded8e4fe12
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|23010399003|366016|7416014|376014|1800799024|38070700021|56012099006|11063799006|4143699003|18002099003|22082099003;
-x-microsoft-antispam-message-info:
- fXz5RNaSwEXkdOHuYAN08NFx5tOwAuPGoTKxXvjkx75XHlWkAS4n7EJ/P7Sq/0Th1bN3b2OCcw/YAHRLJfesVnkeyEqjqm0WsLVcrIu0jY08cXaaP4g+TpFRvO5PcDvNrOmQtItEwCha40NfGTEXXtxRqqZ5JzqeVjlabx8IHyEC2zQotlyGSqKIQs6s+JacalHq/VCt2biOdEOf24TG/39NMNyXJBcBfPdfgYGNz/DwwETumVaLVF9wr5Dja8GuT/2PdxTe+vNcSlMx48zwtatoPGsBTSWwJZsyuyIrgk5MeA/9+T5XgmIacCxmOg4laU/pin2TBXw2CTeYROB0rscHUbYrnHvMw1XvcXP+A3p3s+bOxzOt+BUwamIXLMm6VwL2fLM5fJ5siXRST2a3zmm0tgKKHD7+KJvCh8j/GLTRL1aoRtLZTj0WB4jXM7/RV6IXT1BASudFYDtA0jX4YhgqDV9I8HCeuJjUdJ0baszFWybNk0GK898xnJvaTogyu3ljmbqwSYQtufTEiVV5DuP7PvPf4Q8gtHDyZDYU9dVfUuv1/GZlMfZhB3NenJFUexMVPBK83Jhac6SJEC51U9TmmVSnClIG0Os8yTfku6m2223XY2YQ/Qu9gvQ7eDOAzq8qHGzZyiQI1ePPqaBt26V8tOavYK6OPcjAoiEOxLEWDqYUfJ59VFzaSH/HGdXap/BhraCQoP50wox9HlEHBxnxVZnqCsUWGnpqbhq5CPQ=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DSWPR11MB9715.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(7416014)(376014)(1800799024)(38070700021)(56012099006)(11063799006)(4143699003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?uuc1JMPcHfXhrl2BUNogFzpD7SpUJDVmkq+rOqwTfXYcKf0BAt713MZbEPDY?=
- =?us-ascii?Q?AzGuo2DRur2zD84ckXNYTisiCItyuuBkY0/aTICAn5tBbYfG7ms4tzFB13MU?=
- =?us-ascii?Q?mU3XHhsqIrilWh7Em04Q78ci1KVX1oVleS98B8YEzesSps9pHDSCMEjvy5TQ?=
- =?us-ascii?Q?AyWIW+ry09KwWvn32ntB4IYo0vLzry4rWEoDfy2cCxEmbyDFeKDydddFClEg?=
- =?us-ascii?Q?MQRAJESmJTDE0QY+u8NLTJZ7n1x+ap5fGPVrVQHpEf8irNQWnJeabt1OaPND?=
- =?us-ascii?Q?mo3oB9gLTWQgmsc8Ojt4vqf5Y3N1H1vw7BWCteAqZ2vxAAGn2RlQgJCM00xw?=
- =?us-ascii?Q?j0NQ6RT8lG3KPnHXBXimIvkWwS86bke/bVKbjOkp1sXuASyguOmWV+AXEdOw?=
- =?us-ascii?Q?fLw0HFAeoY1QCMsoc4pERYdN7jJfYikvvQ3oo+c6uEOB0iYghYaPJSym+Pgy?=
- =?us-ascii?Q?DMBQofyCfU121ddz8c7S+eLGCkG0tM/y1XTh1Dh68tjGLTxZ9RhoDyJbOat3?=
- =?us-ascii?Q?YL6uC1y0NLdokOFIBos508qGQPqhwwYjei8PjufFyzW4RJ0wYesrC7PHEpml?=
- =?us-ascii?Q?Xj7qpgE1MK66rw66+ClQFwYS69NRAj1ysfFTbMHHperGHumupOTzc/bbmTsJ?=
- =?us-ascii?Q?gzsutN0d794cyT3IWqUnb2Ah1c6D+j7all4/Kdp/op7Cy+vu4cyKc8NNv98n?=
- =?us-ascii?Q?w0k+9kt+YiNwUQ2WIJnFnUwkdUGEnOVTXjloBwquNFklerup87bKqdvUrWXc?=
- =?us-ascii?Q?S9IrZoIgoSSXntw82FFNGM1j+3/eg/do4FyvHpT/i1t2GdB+E2QxqcbIEKdK?=
- =?us-ascii?Q?81dmzLxju5i+AcZOXTNLPWMjQMSNVQ/QuhdAAi/R0Jy9Bd0jczbHs6X+hpfT?=
- =?us-ascii?Q?TD2L3rBJt1PNlWKrNiMJPfFpslov9389KD1OqaZG42hJWezA3rxhpDb6p5ZI?=
- =?us-ascii?Q?ZGL5ex5/MGUasd188DLcSK0p91GOtVkmgwpiC8cWiz9XUpXeVS0ApkKDlpkb?=
- =?us-ascii?Q?Tay5AcwHmL5/Q0iHwXQtpExIJFkDp0wkV9Tm/qFePte79CC8O0i3EWgVqdvs?=
- =?us-ascii?Q?z2JO445RQIbqa49iQIW0OSINDUXTxDAcY6GgchWefpqzJT9sKmIs+aY0K5iF?=
- =?us-ascii?Q?L6G0UfyHxWOy6L4ug/pHdTewVr5/AWbPgVIYDBpY2huJ4wI4+Eo1o+QYfu53?=
- =?us-ascii?Q?5J6lUWm/7Uujg7YcJOYL+0Kwqjf9rn1m8u2BpQsTWUl7lVeaU8cAwnF1v49m?=
- =?us-ascii?Q?QkButYQ3Yfb12oNEPBr52vMJGARiK5tV6d0YiCWGKiXBNmD6irUO9an6yy0U?=
- =?us-ascii?Q?9bcKsAmJbR/PNSekgZgANfCd1YWPXh/o5wzTldpqhugLT3slt/koF4bVcX8U?=
- =?us-ascii?Q?lOHOPdgOS5xUd4OL60NuAa32fLAt0mL4dBWfpVW5S9KLGP7S3rsos2aLDkoW?=
- =?us-ascii?Q?50B8rw6nEHM3eU1TcvOXjgt/VpjtciZHhINUXi2LbN3dkJdtjB8nSuCXqQ7V?=
- =?us-ascii?Q?vtHnVwoAsMyhiWzZOG8xkdR+6dJ6qflxdeYI71tOh2xlbGRU9jCPvBC07q6T?=
- =?us-ascii?Q?l/1F/pd/h2cH5q3DMA0rSU5fL/J2zig8a5GKOswkPqI+TPev5MV4ywSNHyR4?=
- =?us-ascii?Q?XdL4jIf/K+x2CiSx4wWdGxLrcw75sMTIIwQhPvUrnGxDqXHUfF1rLzQNne0P?=
- =?us-ascii?Q?buN5MiynuVZQyYITKLP94Yc8fJrAw+30Gkc4AgVWJ/Pph68QdeCfQIMGv0pQ?=
- =?us-ascii?Q?zsSpVOlClA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56DC7381EBB;
+	Fri,  3 Jul 2026 09:32:05 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783071126; cv=none; b=cIJhCax6Mj3/vWxVNkM3+8b/HtJs9roilF4sbBLaMk+3FrWbKSakv6dMFy/gp+AU0OoskC+qzTMqF+aOdUbTGYQK+vADjVhQq5trEba07VPigWNDiP4RDIJXUyRE4zR58dKbEeABdvZCK/Cy/UmbazdddGYo5mhNiH8VToiazPw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783071126; c=relaxed/simple;
+	bh=n9XJEkc+DowG9Obr4NUQaCy1/3OPEUMahQYjpJe65oU=;
+	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
+	 References:Date:Message-Id; b=a+zXmJJC5jywlA2hq6mgI5wiagtiNsLpdiEmmgelvtRsT1/Q12ov0PSEu9CC415dXx2DdBXZdXNE58mrnqVb7xF4V2ZjdHcIuik6Mb+qAQsNs/1dI9KiQLZtGoIoNWhnCPTSEEk7Qi3YM2oW8spvrmFiJqkiOtzswNBQ58rrw9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e9MFh+yA; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C19821F000E9;
+	Fri,  3 Jul 2026 09:32:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783071124;
+	bh=ARJjvdhtSZCnWgEd0trqgpLbvyNLpvUgzO6qa5p73UM=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date;
+	b=e9MFh+yABLy2CPe8HOcWFFQvIivncfb0irowyxUQghRkows1pifnaZW05tS6k7K4a
+	 0on7bvVhK5eZSdywVJLzlsMo3wKv8kymFppmegCgr4r0fcB4t/jxZjQHBoyYeX6vSt
+	 vQlDfcpRVWJ5H7pZEx1h2R7LoSK1OA7fhQa6gmfVtuD9zMYmR3Euri9B7ey7Jf14wf
+	 eFKivx9mqjKYdSNG1UXaem/s9lKgeQ9qac7qs8+ac4TKM3lliutOM5FcAZS/9f2uiB
+	 A09lj9LBbVwsyfxrdPvzVbugEZBbE4SIopUb/K9TLBNTuruASCJrDXoE9m5QISPJle
+	 sOc20WO/NzHxg==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microchip.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DSWPR11MB9715.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fcf23763-a3a3-4954-7152-08ded8e4fe12
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jul 2026 09:25:15.9914
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: R1FiVT7K9/kIhkJCJ889e3nXcUtELxellSjkGLN1AfOzVYJJg/QxYWhE8yKi8fii6etAy4+rHfywbTunDy7FgqAUJ7r4EtVn7TDHZbqlRhk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB6049
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [RFC PATCH 3/3] coredump, net: remove `SOCK_COREDUMP`
+From: Christian Brauner <brauner@kernel.org>
+To: John Ericson <mail@johnericson.me>
+Cc: Christian Brauner <brauner@kernel.org>, 
+ John Ericson <John.Ericson@obsidian.systems>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Cong Wang <cwang@multikernel.io>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, Simon Horman <horms@kernel.org>, 
+ David Rheinsberg <david@readahead.eu>, Andy Lutomirski <luto@kernel.org>, 
+ Sergei Zimmerman <sergei@zimmerman.foo>, 
+ network dev <netdev@vger.kernel.org>, 
+ linux-fsdevel <linux-fsdevel@vger.kernel.org>, 
+ =?utf-8?q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>, 
+ =?utf-8?q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
+ Paul Moore <paul@paul-moore.com>, linux-security-module@vger.kernel.org, 
+ LKML <linux-kernel@vger.kernel.org>
+In-Reply-To: <7acb650b-a0de-4244-861f-4dda70ca8993@app.fastmail.com>
+References: <20260703073948.2541875-1-John.Ericson@Obsidian.Systems>
+ <20260703073948.2541875-4-John.Ericson@Obsidian.Systems>
+ <20260703-umgehen-auftun-anlagen-826bf59dfcb5@brauner>
+ <7acb650b-a0de-4244-861f-4dda70ca8993@app.fastmail.com>
+Date: Fri, 03 Jul 2026 11:31:58 +0200
+Message-Id: <20260703-karierte-gemolken-restaurant-fb5a0601423c@brauner>
+X-Mailer: b4 0.16-dev-4217c
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4247; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=n9XJEkc+DowG9Obr4NUQaCy1/3OPEUMahQYjpJe65oU=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWS5N05I/Hj03KVPvdeemq/pa1qy9dqFSff5HoqKHl3zs
+ +pzXeujhI5SFgYxLgZZMUUWh3aTcLnlPBWbjTI1YOawMoEMYeDiFICJNOkw/C/OeRxxsn6jQbXh
+ j2q5vgvxm7pypm/4djB3yZ99ghdX+B5n+GekG3v229WtIfk1AjveWj34nsv+11Wj3WwN25akkyY
+ FR7kA
+X-Developer-Key: i=brauner@kernel.org; a=openpgp;
+ fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=selector1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304466-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Thangaraj.S@microchip.com,netdev@vger.kernel.org];
-	FORGED_SENDER(0.00)[Thangaraj.S@microchip.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:nb@tipi-net.de,m:enrico.pozzobon@dissecto.com,m:UNGLinuxDriver@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:Woojung.Huh@microchip.com,m:netdev@vger.kernel.org,m:linux-usb@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:mail@johnericson.me,m:brauner@kernel.org,m:John.Ericson@obsidian.systems,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:cwang@multikernel.io,m:kuniyu@google.com,m:horms@kernel.org,m:david@readahead.eu,m:luto@kernel.org,m:sergei@zimmerman.foo,m:netdev@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:mic@digikod.net,m:gnoack@google.com,m:paul@paul-moore.com,m:linux-security-module@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[brauner@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TO_DN_NONE(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[brauner@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-304474-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,microchip.com:from_mime,microchip.com:dkim,tipi-net.de:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,DSWPR11MB9715.namprd11.prod.outlook.com:mid]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,brauner:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B69CB700AF5
+X-Rspamd-Queue-Id: A0A2F700BD8
 
-Hi Nicolai,
+On 2026-07-03 05:08 -0400, John Ericson wrote:
+> On Fri, Jul 3, 2026, at 4:11 AM, Christian Brauner wrote:
+> > I don't think dragging the bowels of net/ into fs/coredump.c just for
+> > the sake of getting a purely internal SOCK_COREDUMP flag out of the way
+> > is the right way to go.
+> >
+> > I suspect the saner thing to do would be to introduce a primitive for
+> > connecting to an AF_UNIX path-based socket directly instead of this
+> > weird dance here, no?
+> >
+> > int kernel_unix_connect(const char *path, struct socket *socket, unsigned int o_flags, int type)
+> >
+> > then my kthread changes would collapse this into:
+> >
+> > scoped_with_init_fs()
+> > retval = kernel_unix_connect(path, socket, O_NONBLOCK, SOCK_STREAM);
+> 
+> That works for this case, but the destination I am trying to eventually
+> reach is being allowed (in userspace) to connect to unbound sockets by
+> their fd --- no path, no abstract socket name.
 
-> AFAIU the findings from Sashiko [1] on v1 are either false positives or p=
-re-
-> existing issues unrelated to this change, so LGTM.
->=20
-> @Thangaraj / maintainers:
-> The mails to Rengarajan are bouncing since a few series - does the
-> MAINTAINERS entry need an update?
->=20
-[Thangaraj Samynathan] Yes, Rengarajan has left Microchip. His name needs
-to be removed from maintainer.=20
-> Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
->=20
-Thanks,
-Thangaraj Samynathan - I53494
+But these are orthogonal changes. It sill doesn't mean we should sprawl
+net internals over coredump code anymore than we already have to. I'm
+fond of kernel_unix_connect() int dfd, const char *path even would be
+fine.
+
+>     unix_connectat(int fd, const char *path, struct socket *socket,
+>                    unsigned int at_flags, unsigned int o_flags,
+>                    int type)
+> 
+> is a mouthful, but it would work. Still, there is a subtlety about the
+> retry logic. When one does something like:
+> 
+> > connect(..."/dev/fd/N",...)
+> 
+> it will repeatedly re-lookup "/dev/fd/N" until the timeout is reached. I
+> consider that pretty terrible --- the rest of the program could race to
+> change what that file descriptor (number) refers to. Therefore, I think
+> table stakes to make a good `unix_connectat` is to make the
+> `AT_EMPTY_PATH` case not re-lookup the socket.
+
+I have no idea how this has any bearong on the three helper split.
+
+> (making a sockfs file descriptor work is separate, I already have the
+> patch for that, I can include it.)
+> 
+> > The two helpers also make no sense to me and force a bunch of cleanup on
+> > the caller as well.
+> 
+> I am fine with `unix_connectat`, but just for reference, me breaking up
+> the steps is because I generally like the decomposition of `fverb`
+> rather than `verbat` system calls, since the latter would typically be
+> used with `openat` or so. It seems the `kernel_*` "syscalls" generally
+> take `struct path` rather than strings, which seems good and in the
+
+There's a time to follow precedence and there's a time to do what the
+maintainability demands. I think here clearly we don't want to pass a
+struct path. That makes no sense because we don't care about using that
+object at all. It's merely an intermediate jumping point. This is
+fundamentally about connecting from the kernel to a specific pathname
+that functions as a socket address. Intermediary objects don't matter
+(yet).
+
+> spirit of that decomposition, but then even `struct path` is overkill to
+> refer to a socket. So putting all that together, the final composition I
+> had was:
+> 
+> 1. string path (from /proc/...) -> `struct path`
+> 2. `struct path` -> `struct sock *`
+> 3. connect to `struct sock *`
+> 
+> So I quite liked those 3 orthogonal knobs, vs an all-singing-all-dancing
+> `unix_connectat`. (I suppose making it `struct socket *` would make it
+> slightly less internals-y?) But again, anything that puts us on track to
+> being able to connect to an unbound socket without procfs is good enough
+> for me.
+
+To me this reads like you're introducing moving parts for the sake of a
+philosophical argument. I couldn't care less about that. What matters is
+maintainability. Having three knobs that introduce potentially three
+separate cleanup requirements and exposing three different objects when
+it's not needed is just a burden.
+
+> 
+> > I'm not sure why we would go on altering all kinds of LSM hooks as well.
+> 
+> That's in the commit message, it is because without `SOCK_COREDUMP`
+> those are all dead code. Instead of removing them in this commit, I can
+> just keep those flags, or remove them in a separate commit. Fine
+
+Do it as a separte commit once we've decided to do this, I think.
+
 
