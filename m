@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-304625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304626-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Z23+KYPsR2q2hgAAu9opvQ
-	(envelope-from <netdev+bounces-304625-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 19:08:19 +0200
+	id WJfhKn/sR2qyhgAAu9opvQ
+	(envelope-from <netdev+bounces-304626-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 19:08:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EC357048B5
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 19:08:19 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A2537048A3
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 19:08:15 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=secunet.com header.s=202301 header.b="s8DEf/8f";
+	dkim=pass header.d=secunet.com header.s=202301 header.b=utavVG5T;
 	dmarc=pass (policy=none) header.from=secunet.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304625-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304625-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304626-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-304626-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 66B9830210E9
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 17:08:04 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BDB9730090A5
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 17:08:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C19330ACE3;
-	Fri,  3 Jul 2026 17:08:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C77A2F12D4;
+	Fri,  3 Jul 2026 17:08:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4120284693;
-	Fri,  3 Jul 2026 17:08:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22732433E92;
+	Fri,  3 Jul 2026 17:08:09 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783098483; cv=none; b=oCdC/UmIlJpQy+irR09vsB8HC8JumQf6Vprbga0Rn26Z6nOnO/m5H45hQ0p4GovV6i5W60aH3f4Gk44GGK6cqiTR9xsetHsm8fuAUyZGLasJvLMFTw3cchiz1DHr6J3PI0Y/XFjFa60Ejnpl3l2Urc1zApEocAO2sOz6M3+4T34=
+	t=1783098491; cv=none; b=KmD3PvT6sQMckpT7CrYXQnbbKq9VtkMa+PtY2UuzDQcc5dfoZe4N3FoU9ukRLX/wlRGfwE4yddKnOlJeZsI814S68eUwenxYvLbVGLDwVxuF/MaRD5ArSC3OVKkmwApJwMwuhaqmU7qDaKIk2jQcHtnLvM4YzHF0ltdt+PhTbqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783098483; c=relaxed/simple;
-	bh=J3igiEbV3KEx6voxs4xRIMgkyu5KFuebdfd5CHM7nLQ=;
+	s=arc-20240116; t=1783098491; c=relaxed/simple;
+	bh=WfDcRHrrn1C53/AqE6buzuqC5wFhmhjqZXuZWSisB08=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tMSDdMI6jvJisbHcg92nRIMyZghzfhfiGohblrnpH9kHWwLw2jFQxC2564S/hL1EKRpN+5AhNiFCry1CbQr8TNQ1HWl42f39ok9NqiBuTFC6LCIXkR+3OA1h+HtYAKpM7vSqTs3FuzIMSSrwpjxWuIDrIPR5l6meYVBY9nJyfpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=s8DEf/8f; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=ECiQOb+avWw1DDQtSHTcz/+TBt2t5wqJp9d7Nat3yScN/syQyeTVhJPx0qnTFOhY9DVJ1H/L2DxWJjYELQgeGYOYtK2qRWaI/xniNm1wMaRQq6rr3cYU+UWDZg8KG4K3zphGWHXlxS9OMnMOBxnv0ziztwt/TnM3g0NJ5Cj1rbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=utavVG5T; arc=none smtp.client-ip=62.96.220.36
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 6CB0120758;
-	Fri,  3 Jul 2026 19:07:59 +0200 (CEST)
+	by mx1.secunet.com (Postfix) with ESMTP id D072E207AC;
+	Fri,  3 Jul 2026 19:08:08 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id M39QVIGzHfUp; Fri,  3 Jul 2026 19:07:58 +0200 (CEST)
+ with ESMTP id XQ25rSmV7EGl; Fri,  3 Jul 2026 19:08:08 +0200 (CEST)
 Received: from EXCH-02.secunet.de (rl2.secunet.de [10.32.0.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id AA20A20612;
-	Fri,  3 Jul 2026 19:07:58 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com AA20A20612
+	by mx1.secunet.com (Postfix) with ESMTPS id ECD2120612;
+	Fri,  3 Jul 2026 19:08:07 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com ECD2120612
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1783098478;
-	bh=WA43NGR7HNtVKpWbckRUcJPfniSRs7TtAz50BGBroys=;
+	s=202301; t=1783098488;
+	bh=Y7UMbN2CF/xS/+neuLhhWkvrGxC+dbf1FpNGBgSvO+E=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=s8DEf/8fDcMELZmOgSyjMRR+GQtP9iI1j8NvycGJId49msxN/Nigr/YqXHKvy9GGR
-	 jilD2AhxCykeGKJy7jptWHaMdU04e3hpDCcDmxJ6sAd3THbEuLkygf3IJRLnEmnY56
-	 WdV7uGIrMUs4UFKalqm2cJH9lEIV0TOi10gong0WJGydW5GSHUyIDL6r4AEkmJ5dU8
-	 V4DDouluAtR6gbg1mryDnUvLPFGgJAur57lSkV4p8RTLrauNVEd2KLG4yuyhZbUO62
-	 KqyQE+C/xIJfZBZz1Pgb3S6AjdLxsSbm5nbcMsF3P7CfQBYlZ58NL7rbhywNOOiooj
-	 yeAT6qtPRFouQ==
+	b=utavVG5T5YAHcjF/Gc04u3CgYo4yYMYODMrmFFyCCFy0sGu8QvHTS40yq5OYXnP3h
+	 VaCwBP/JPHAbcyHNWUpyTqg3RYdSyOJwK5RT0yIPyApXuXx146q+ZZ9QwEZkDHp76u
+	 4fzgunaBIB8ow6Ekt4yrlLGqV9v6QcxP4SQbTLUHOtMOeO5zqYohfVgjAJzuWtSkwM
+	 fxQfzx+FMej5Q0kD+N1E1immDMzReIbzEI4j9yWfNvNKY4TVoiQSrk5beoEZstv5EQ
+	 KnK3w/daP2sk6ajSPl6Gibd4HYJih1TI1Ised65zIR/GBC2GrdYKL6p3YqdX2le5my
+	 EbxDePaClvSLg==
 Received: from moon.secunet.de (172.18.149.1) by EXCH-02.secunet.de
  (10.32.0.172) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Fri, 3 Jul
- 2026 19:07:57 +0200
+ 2026 19:08:07 +0200
 From: Antony Antony <antony.antony@secunet.com>
 To: Antony Antony <antony.antony@secunet.com>, Steffen Klassert
 	<steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
@@ -72,9 +72,9 @@ CC: Sabrina Dubroca <sd@queasysnail.net>, <netdev@vger.kernel.org>, Yan Yan
 	<evitayan@google.com>, Tobias Brunner <tobias@strongswan.org>, Florian
  Westphal <fw@strlen.de>, <linux-kselftest@vger.kernel.org>,
 	<linux-doc@vger.kernel.org>
-Subject: [PATCH ipsec 2/8] xfrm: state: exact mark/mask match for by-address control-plane SA lookups
-Date: Fri, 3 Jul 2026 19:07:49 +0200
-Message-ID: <migrate-state-fixes-v0-2-a69e8637ba3b@secunet.com>
+Subject: [PATCH ipsec 3/8] selftests: net: xfrm_state: add mark shadowing tests for state lookups
+Date: Fri, 3 Jul 2026 19:07:58 +0200
+Message-ID: <migrate-state-fixes-v0-3-a69e8637ba3b@secunet.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <migrate-state-fixes-v0-0-a69e8637ba3b@secunet.com>
 References: <migrate-state-fixes-v0-0-a69e8637ba3b@secunet.com>
@@ -87,13 +87,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 X-Mailer: b4 0.16-dev
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-02.secunet.de
+X-ClientProxiedBy: EXCH-02.secunet.de (10.32.0.172) To EXCH-02.secunet.de
  (10.32.0.172)
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -106,9 +106,9 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FORGED_RECIPIENTS(0.00)[m:antony.antony@secunet.com,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:dsahern@kernel.org,m:hadi@cyberus.ca,m:shuah@kernel.org,m:sd@queasysnail.net,m:netdev@vger.kernel.org,m:evitayan@google.com,m:tobias@strongswan.org,m:fw@strlen.de,m:linux-kselftest@vger.kernel.org,m:linux-doc@vger.kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER(0.00)[antony.antony@secunet.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-304625-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-304626-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -122,130 +122,191 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4EC357048B5
+X-Rspamd-Queue-Id: 4A2537048A3
 
-Add mark/mask/exact parameters directly to __xfrm_state_lookup_byaddr(),
-reusing the SPI-keyed lookup's comparison.
+Add SPI and by-address wildcard-mark shadowing tests.
 
-Use __xfrm_state_locate_exact()'s by-address branch UPDSA
-and xfrm_user_state_lookup()'s by-address branch
-(DELSA/GETSA for non-SPI-keyed lookups).
-
-Fixes: 3d6acfa7641f ("xfrm: SA lookups with mark")
 Signed-off-by: Antony Antony <antony.antony@secunet.com>
 ---
- include/net/xfrm.h     |  2 +-
- net/ipv6/xfrm6_input.c |  2 +-
- net/xfrm/xfrm_state.c  | 21 +++++++++++----------
- net/xfrm/xfrm_user.c   |  2 +-
- 4 files changed, 14 insertions(+), 13 deletions(-)
+ tools/testing/selftests/net/xfrm_state.sh | 130 +++++++++++++++++++++++++++++-
+ 1 file changed, 129 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-index f6ed590cb2ff..ebe514376254 100644
---- a/include/net/xfrm.h
-+++ b/include/net/xfrm.h
-@@ -1741,7 +1741,7 @@ struct xfrm_state *xfrm_input_state_lookup(struct net *net, u32 mark,
- 					   const xfrm_address_t *daddr,
- 					   __be32 spi, u8 proto,
- 					   unsigned short family);
--struct xfrm_state *xfrm_state_lookup_byaddr(struct net *net, u32 mark,
-+struct xfrm_state *xfrm_state_lookup_byaddr(struct net *net, u32 mark, u32 mask, bool exact,
- 					    const xfrm_address_t *daddr,
- 					    const xfrm_address_t *saddr,
- 					    u8 proto,
-diff --git a/net/ipv6/xfrm6_input.c b/net/ipv6/xfrm6_input.c
-index 89d0443b5307..2dd347fece52 100644
---- a/net/ipv6/xfrm6_input.c
-+++ b/net/ipv6/xfrm6_input.c
-@@ -272,7 +272,7 @@ int xfrm6_input_addr(struct sk_buff *skb, xfrm_address_t *daddr,
- 			break;
- 		}
+diff --git a/tools/testing/selftests/net/xfrm_state.sh b/tools/testing/selftests/net/xfrm_state.sh
+index f6c54a6496d7..f202073726a9 100755
+--- a/tools/testing/selftests/net/xfrm_state.sh
++++ b/tools/testing/selftests/net/xfrm_state.sh
+@@ -42,7 +42,11 @@ tests="
+ 	mtu_ipv4_r2			IPv4 MTU exceeded from ESP router r2
+ 	mtu_ipv6_r2			IPv6 MTU exceeded from ESP router r2
+ 	mtu_ipv4_r3			IPv4 MTU exceeded from router r3
+-	mtu_ipv6_r3			IPv6 MTU exceeded from router r3"
++	mtu_ipv6_r3			IPv6 MTU exceeded from router r3
++	mark_wildcard_shadow		mark: wildcard SA in by-spi state get lookup
++	mark_wildcard_delete		mark: wildcard SA in by-spi state delete
++	mark_wildcard_get_addr		mark: wildcard SA in by-address get lookup
++	mark_wildcard_delete_addr	mark: wildcard SA in by-address delete"
  
--		x = xfrm_state_lookup_byaddr(net, skb->mark, dst, src, proto, AF_INET6);
-+		x = xfrm_state_lookup_byaddr(net, skb->mark, 0, false, dst, src, proto, AF_INET6);
- 		if (!x)
- 			continue;
+ prefix4="10.1"
+ prefix6="fc00"
+@@ -101,6 +105,10 @@ run_test() {
+ 		mtu_ipv6_r2)         test_mtu_ipv6_r2 ;;
+ 		mtu_ipv4_r3)         test_mtu_ipv4_r3 ;;
+ 		mtu_ipv6_r3)         test_mtu_ipv6_r3 ;;
++		mark_wildcard_shadow)      test_mark_wildcard_shadow ;;
++		mark_wildcard_delete)      test_mark_wildcard_delete ;;
++		mark_wildcard_get_addr)    test_mark_wildcard_get_addr ;;
++		mark_wildcard_delete_addr) test_mark_wildcard_delete_addr ;;
+ 		esac
+ 		ret=$?
  
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index df761ce1c290..d78cfe481f75 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -1274,11 +1274,12 @@ struct xfrm_state *xfrm_input_state_lookup(struct net *net, u32 mark,
+@@ -167,6 +175,8 @@ setup_namespaces() {
+ 	[ -n "${NS_S2}" ] && ns_s2=(ip netns exec "${NS_S2}") && ns_active="${ns_active} $NS_S2"
+ 	[ -n "${NS_R3}" ] && ns_r3=(ip netns exec "${NS_R3}") && ns_active="${ns_active} $NS_R3"
+ 	[ -n "${NS_B}" ] && ns_active="${ns_active} $NS_B"
++
++	return 0
  }
- EXPORT_SYMBOL(xfrm_input_state_lookup);
  
--static struct xfrm_state *__xfrm_state_lookup_byaddr(const struct xfrm_hash_state_ptrs *state_ptrs,
--						     u32 mark,
--						     const xfrm_address_t *daddr,
--						     const xfrm_address_t *saddr,
--						     u8 proto, unsigned short family)
-+static struct xfrm_state *
-+__xfrm_state_lookup_byaddr(const struct xfrm_hash_state_ptrs *state_ptrs,
-+			   u32 mark, u32 mask, bool exact,
-+			   const xfrm_address_t *daddr,
-+			   const xfrm_address_t *saddr,
-+			   u8 proto, unsigned short family)
- {
- 	unsigned int h = __xfrm_src_hash(daddr, saddr, family, state_ptrs->hmask);
- 	struct xfrm_state *x;
-@@ -1290,7 +1291,7 @@ static struct xfrm_state *__xfrm_state_lookup_byaddr(const struct xfrm_hash_stat
- 		    !xfrm_addr_equal(&x->props.saddr, saddr, family))
- 			continue;
- 
--		if ((mark & x->mark.m) != x->mark.v)
-+		if (!xfrm_state_mark_matches(x, mark, mask, exact))
- 			continue;
- 		if (!xfrm_state_hold_rcu(x))
- 			continue;
-@@ -1313,7 +1314,7 @@ __xfrm_state_locate(struct xfrm_state *x, int use_spi, int family)
- 		return __xfrm_state_lookup(&state_ptrs, mark, 0, false, &x->id.daddr,
- 					   x->id.spi, x->id.proto, family);
- 	else
--		return __xfrm_state_lookup_byaddr(&state_ptrs, mark,
-+		return __xfrm_state_lookup_byaddr(&state_ptrs, mark, 0, false,
- 						  &x->id.daddr,
- 						  &x->props.saddr,
- 						  x->id.proto, family);
-@@ -1334,7 +1335,7 @@ __xfrm_state_locate_exact(struct xfrm_state *x, int use_spi, int family)
- 		return __xfrm_state_lookup_exact(&state_ptrs, &x->mark, &x->id.daddr,
- 						 x->id.spi, x->id.proto, family);
- 	else
--		return __xfrm_state_lookup_byaddr(&state_ptrs, x->mark.v & x->mark.m,
-+		return __xfrm_state_lookup_byaddr(&state_ptrs, x->mark.v, x->mark.m, true,
- 						  &x->id.daddr,
- 						  &x->props.saddr,
- 						  x->id.proto, family);
-@@ -2424,7 +2425,7 @@ xfrm_state_lookup(struct net *net, u32 mark, const xfrm_address_t *daddr, __be32
- EXPORT_SYMBOL(xfrm_state_lookup);
- 
- struct xfrm_state *
--xfrm_state_lookup_byaddr(struct net *net, u32 mark,
-+xfrm_state_lookup_byaddr(struct net *net, u32 mark, u32 mask, bool exact,
- 			 const xfrm_address_t *daddr, const xfrm_address_t *saddr,
- 			 u8 proto, unsigned short family)
- {
-@@ -2435,7 +2436,7 @@ xfrm_state_lookup_byaddr(struct net *net, u32 mark,
- 
- 	xfrm_hash_ptrs_get(net, &state_ptrs);
- 
--	x = __xfrm_state_lookup_byaddr(&state_ptrs, mark, daddr, saddr, proto, family);
-+	x = __xfrm_state_lookup_byaddr(&state_ptrs, mark, mask, exact, daddr, saddr, proto, family);
- 	rcu_read_unlock();
- 	return x;
+ addr_add() {
+@@ -295,6 +305,18 @@ setup_ns_set_v6x() {
+ 	set_xfrm_params
  }
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index b56fca666b89..11ec3b14a42f 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -1105,7 +1105,7 @@ static struct xfrm_state *xfrm_user_state_lookup(struct net *net,
- 		}
  
- 		err = -ESRCH;
--		x = xfrm_state_lookup_byaddr(net, m.v & m.m,
-+		x = xfrm_state_lookup_byaddr(net, m.v, m.m, true,
- 					     &p->daddr, saddr,
- 					     p->proto, p->family);
- 	}
++setup_ns_set_simple() {
++	# Single namespace, no veths/routes.
++	ns_set="a"
++	imax=1
++	src="10.1.1.1"
++	dst="10.1.1.2"
++	src_net="10.1.0.0/24"
++	dst_net="10.2.0.0/24"
++
++	set_xfrm_params
++}
++
+ setup_network() {
+ 	# Create veths and add addresses
+ 	local -a ns_cmd
+@@ -403,6 +425,7 @@ setup() {
+ 		ns_set_v4x)    setup_ns_set_v4x ;;
+ 		ns_set_v6)     setup_ns_set_v6 ;;
+ 		ns_set_v6x)    setup_ns_set_v6x ;;
++		ns_set_simple) setup_ns_set_simple ;;
+ 		namespaces)    setup_namespaces ;;
+ 		network)       setup_network ;;
+ 		xfrm)          setup_xfrm ;;
+@@ -548,6 +571,111 @@ test_mtu_ipv6_r3() {
+ 	return "${rc}"
+ }
+ 
++# SA_decoy (mark 0/0, added second) shadows SA_target (mark 1/1) on a
++# wildcard mark lookup. No traffic sent; these only exercise the SAD.
++
++test_mark_wildcard_shadow() {
++	setup ns_set_simple namespaces || return "$ksft_skip"
++	local result=0
++
++	run_cmd "${ns_a[@]}" ip xfrm state add \
++		src "${src}" dst "${dst}" proto esp spi 0x1000 \
++		reqid 100 mode tunnel \
++		aead 'rfc4106(gcm(aes))' 0x1111111111111111111111111111111111111111 96 \
++		mark 1 mask 1
++
++	run_cmd "${ns_a[@]}" ip xfrm state add \
++		src "${src}" dst "${dst}" proto esp spi 0x1000 \
++		reqid 100 mode tunnel \
++		aead 'rfc4106(gcm(aes))' 0x2222222222222222222222222222222222222222 96 \
++		mark 0 mask 0
++
++	run_cmd_err "${ns_a[@]}" ip xfrm state get \
++		dst "${dst}" proto esp spi 0x1000 \
++		mark 1 mask 1
++
++	# Expected: SA_target (mark 0x1/0x1). Actual (bug): SA_decoy (mark 0/0).
++	echo "$out" | grep -q "mark 0x1/0x1" || result=1
++
++	return "${result}"
++}
++
++test_mark_wildcard_delete() {
++	setup ns_set_simple namespaces || return "$ksft_skip"
++	local result=0
++
++	run_cmd "${ns_a[@]}" ip xfrm state add \
++		src "${src}" dst "${dst}" proto esp spi 0x1000 \
++		reqid 100 mode tunnel \
++		aead 'rfc4106(gcm(aes))' 0x1111111111111111111111111111111111111111 96 \
++		mark 1 mask 1
++
++	run_cmd "${ns_a[@]}" ip xfrm state add \
++		src "${src}" dst "${dst}" proto esp spi 0x1000 \
++		reqid 100 mode tunnel \
++		aead 'rfc4106(gcm(aes))' 0x2222222222222222222222222222222222222222 96 \
++		mark 0 mask 0
++
++	run_cmd "${ns_a[@]}" ip xfrm state delete \
++		dst "${dst}" proto esp spi 0x1000 \
++		mark 1 mask 1
++
++	run_cmd_err "${ns_a[@]}" ip xfrm state show
++	echo "$out" | grep -q "mark 0x1/0x1" && result=1
++
++	return "${result}"
++}
++
++# by-address counterpart: proto route2/hao (IPv6 mobility) have no SPI,
++# so xfrm_user_state_lookup() resolves them by address instead.
++
++test_mark_wildcard_get_addr() {
++	setup ns_set_simple namespaces || return "$ksft_skip"
++	local result=0
++	local src6="fc00:9::1"
++	local dst6="fc00:9::2"
++
++	run_cmd "${ns_a[@]}" ip xfrm state add \
++		src "${src6}" dst "${dst6}" proto route2 mode ro coa fc00:9::3 \
++		mark 1 mask 1
++
++	run_cmd "${ns_a[@]}" ip xfrm state add \
++		src "${src6}" dst "${dst6}" proto route2 mode ro coa fc00:9::4 \
++		mark 0 mask 0
++
++	run_cmd_err "${ns_a[@]}" ip xfrm state get \
++		src "${src6}" dst "${dst6}" proto route2 \
++		mark 1 mask 1
++
++	echo "$out" | grep -q "mark 0x1/0x1" || result=1
++
++	return "${result}"
++}
++
++test_mark_wildcard_delete_addr() {
++	setup ns_set_simple namespaces || return "$ksft_skip"
++	local result=0
++	local src6="fc00:9::1"
++	local dst6="fc00:9::2"
++
++	run_cmd "${ns_a[@]}" ip xfrm state add \
++		src "${src6}" dst "${dst6}" proto route2 mode ro coa fc00:9::3 \
++		mark 1 mask 1
++
++	run_cmd "${ns_a[@]}" ip xfrm state add \
++		src "${src6}" dst "${dst6}" proto route2 mode ro coa fc00:9::4 \
++		mark 0 mask 0
++
++	run_cmd "${ns_a[@]}" ip xfrm state delete \
++		src "${src6}" dst "${dst6}" proto route2 \
++		mark 1 mask 1
++
++	run_cmd_err "${ns_a[@]}" ip xfrm state show
++	echo "$out" | grep -q "mark 0x1/0x1" && result=1
++
++	return "${result}"
++}
++
+ ################################################################################
+ #
+ usage() {
 
 -- 
 2.47.3
