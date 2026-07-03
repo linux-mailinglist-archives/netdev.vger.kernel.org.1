@@ -1,177 +1,194 @@
-Return-Path: <netdev+bounces-304632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304633-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 947fKivtR2rlhgAAu9opvQ
-	(envelope-from <netdev+bounces-304632-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 19:11:07 +0200
+	id xWZrFPrwR2qhhwAAu9opvQ
+	(envelope-from <netdev+bounces-304633-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 19:27:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB989704933
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 19:11:06 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAC42704A55
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 19:27:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=Zpw7WSx8;
-	dmarc=pass (policy=reject) header.from=bootlin.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304632-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304632-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=phenome.org header.s=oak1 header.b=H5ik6g7d;
+	dmarc=pass (policy=none) header.from=phenome.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304633-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-304633-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D9440300620A
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 17:11:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 48CEB300D4D0
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 17:27:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2853A2F12D4;
-	Fri,  3 Jul 2026 17:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01DFD2F7F16;
+	Fri,  3 Jul 2026 17:27:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from oak.phenome.org (oak.phenome.org [193.110.157.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD8913790B;
-	Fri,  3 Jul 2026 17:10:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 660212F7EEF
+	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 17:27:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783098661; cv=none; b=t9he+ZgFY9go/ydsiHVuwl68+LlZ3YRGCfH88+RCyS1qsvTXtNazpsPogCE52NF6rAlWyAUUIsCWZUds9F3hwPT7UpAURKLj3gvFYB/h/jwm2+EbLvnZ3bcLo1XDBoTWsYntOzmvDeHXXaKgjWtBeJwrMvkZsXT491XFZR1B9cY=
+	t=1783099638; cv=none; b=DvNA6vxZs41eMNz71Kh3PKKD6PF/jmSlF7GK2tlKbOs25PJmD52ClcrYbFFfHiL8AnO4Y4MZYHN3mQk994GQBqltZ7tkkbwmC/bkRC22ifkxpeJUi04g/t102PFmgIFPb3UYnfN/H78qIS2q+NGi6oT/iUw+eIEtQdekxWroupQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783098661; c=relaxed/simple;
-	bh=SEfbOECHAdKd83Z5IkP2W3jwSNcRYDhl0qhI0MI8yTg=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=uKt4Z8Yw9zS2oQmmxJ27Z4RjgoyxZR543CTXvQugweUahFmO2LFeSgc5LSSCbQaBdEarSjmzpOjzdg0BNyBWrOgnDcrkVZV68nqFbQknAbvOTj6E9v2BMPadL3tgoEKzd5VIUnHrQGqFEPGG+W0/5L1rEr6I+UeWBtSl3izLyKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Zpw7WSx8; arc=none smtp.client-ip=185.246.84.56
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 0F3681A0E1C;
-	Fri,  3 Jul 2026 17:10:57 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id CBD8860300;
-	Fri,  3 Jul 2026 17:10:56 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B4009102F0D61;
-	Fri,  3 Jul 2026 19:10:50 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1783098655; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=Vl/CpkA15dwhlWKWUEJmdCMHqy3wFCEAENf0qKRdApM=;
-	b=Zpw7WSx88EVftjo9ghC4KRZ8LKx++T9mOU8X/aoCe9irhfrR3BsJVErM60W5lIGDUKkMkm
-	t+n2B8KtWEO4ZFXRhflphQMPMKnUadnUyYvJxFxCz0aGR2fvB1HEfCAS660YPCsfn+5nfR
-	z+ldhjq4MKY9vO6QEU1ziNsSSUYeSSr1HbRNuMm2rDxsXAaCZxGC0CkzfqhceCWCp/S68C
-	VFw3nAiSdC08+kwA4/WplaquwL+7Zmnwu3sZ5Gd+PRAqd8DjQD7W+r+5dSLWr14cVpXUhb
-	5z6QQ4lOfzimDAnX0XLUhWYZ7pimgd8is46TgaqA2ZHS9aoACAkTT6gc6Ek9Wg==
+	s=arc-20240116; t=1783099638; c=relaxed/simple;
+	bh=5UFznE4iYiNEzfMpidbDCXoe8Z+zxMSziclq+prtSas=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rnaurdh/LNAYXMPgW0DCGnoXq9xtSsPkHQV6oM5Wmzx/CwmDf8zIMycZ4vzpxJ2n7lj/L+3IkkMRhqNFICjGyuAIVK2E3J5zGW/B+M+6/UV1ZDuF8ZxkIXMQ7dCLCuh8y+WZZBFjHbyZ1AXi0097xztE8wUus0gjN4RKAYqSDJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=H5ik6g7d; arc=none smtp.client-ip=193.110.157.52
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=phenome.org; h=
+	in-reply-to:content-transfer-encoding:content-disposition
+	:content-type:content-type:mime-version:references:message-id
+	:subject:subject:from:from:date:date:received; s=oak1; t=
+	1783099260; x=1783963261; bh=5UFznE4iYiNEzfMpidbDCXoe8Z+zxMSzicl
+	q+prtSas=; b=H5ik6g7dacRyC71/jNg4+TwHcab1UVe9vyeYr9JtP7xtXvls6/q
+	Nl8ZMkhdpmauga84WY5dxVxkvhp3XfwW4U/Ldb3NIKzkbhaUe9AqZjv6bwQ2SUmQ
+	d8TIWYDiK0/gaadVLeOf3KPbPpXhvQ2k7+f8PI395XMtrQDkl44zg7WpbDRYV4F4
+	+hEuISHh3NiRiayw3PzL+gC5zoikgjGygalB+p8qw6A1nj8/YuG0z3QnWgxLIaZY
+	gUPPXLzuO9LToCKWRROV5LdEobMr4NtwSZrumqPgse1nxsjGwvUr5rUpSCSgRSmg
+	BvuJleZpJxJB68BckM745VvxqIgmx2y1djw==
+X-Virus-Scanned: amavisd at oak.phenome.org
+Received: by oak.phenome.org (Postfix);
+	Fri, 03 Jul 2026 19:20:58 +0200 (CEST)
+Date: Fri, 3 Jul 2026 19:20:56 +0200
+From: Antony Antony <antony@phenome.org>
+To: Yan Yan <evitayan@google.com>
+Cc: Antony Antony <antony@phenome.org>, Jakub Kicinski <kuba@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Nathan Harold <nharold@google.com>,
+	Antony Antony <antony.antony@secunet.com>,
+	David Miller <davem@davemloft.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+	Tobias Brunner <tobias@strongswan.org>,
+	Sabrina Dubroca <sd@queasysnail.net>
+Subject: Re: [PATCH 0/18] pull request (net-next): ipsec-next 2026-06-12
+Message-ID: <akfveJrtxW9yMLXK@Antony2201.local>
+References: <20260612074725.1760473-1-steffen.klassert@secunet.com>
+ <20260613131552.2562d433@kernel.org>
+ <ajDlFUhMfJP36qA8@Antony2201.local>
+ <ajvzbVLCce1p86i6@Antony2201.local>
+ <CADHa2dAtGVsph3Kq0id7QqgNdJww0Q=Z1PK+=fomVxKE-Mmvjg@mail.gmail.com>
+ <CADHa2dB9e=O_thTEPo3Bwtj9qRxE0UJd_MBriC8qqrPFB+x9rw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 03 Jul 2026 19:10:49 +0200
-Message-Id: <DJP3PVA1932B.3CPW2F5QYOAXM@bootlin.com>
-Subject: Re: [PATCH net-next v3 04/15] net: macb: unify queue index variable
- naming convention and types
-Cc: "Conor Dooley" <conor.dooley@microchip.com>, "Andrew Lunn"
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, "Richard Cochran" <richardcochran@gmail.com>,
- "Russell King" <linux@armlinux.org.uk>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, "Nicolas Ferre"
- <nicolas.ferre@microchip.com>, "Claudiu Beznea" <claudiu.beznea@tuxon.dev>,
- "Paolo Valerio" <pvalerio@redhat.com>, "Nicolai Buchwitz" <nb@tipi-net.de>,
- "Vladimir Kondratiev" <vladimir.kondratiev@mobileye.com>, "Gregory CLEMENT"
- <gregory.clement@bootlin.com>, =?utf-8?q?Beno=C3=AEt_Monin?=
- <benoit.monin@bootlin.com>, "Tawfik Bayouk" <tawfik.bayouk@mobileye.com>,
- "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>, "Maxime Chevallier"
- <maxime.chevallier@bootlin.com>
-To: "Conor Dooley" <conor@kernel.org>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260701-macb-context-v3-0-00268d5b1502@bootlin.com>
- <20260701-macb-context-v3-4-00268d5b1502@bootlin.com>
- <20260703-monogram-unable-2eaeaf79676f@spud>
-In-Reply-To: <20260703-monogram-unable-2eaeaf79676f@spud>
-X-Last-TLS-Session-Version: TLSv1.3
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADHa2dB9e=O_thTEPo3Bwtj9qRxE0UJd_MBriC8qqrPFB+x9rw@mail.gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[phenome.org,none];
+	R_DKIM_ALLOW(-0.20)[phenome.org:s=oak1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-304633-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304632-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FORGED_SENDER(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org,tuxon.dev,tipi-net.de,mobileye.com,bootlin.com];
-	FORGED_RECIPIENTS(0.00)[m:conor.dooley@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:nicolas.ferre@microchip.com,m:claudiu.beznea@tuxon.dev,m:pvalerio@redhat.com,m:nb@tipi-net.de,m:vladimir.kondratiev@mobileye.com,m:gregory.clement@bootlin.com,m:benoit.monin@bootlin.com,m:tawfik.bayouk@mobileye.com,m:thomas.petazzoni@bootlin.com,m:maxime.chevallier@bootlin.com,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[antony@phenome.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:evitayan@google.com,m:antony@phenome.org,m:kuba@kernel.org,m:steffen.klassert@secunet.com,m:nharold@google.com,m:antony.antony@secunet.com,m:davem@davemloft.net,m:herbert@gondor.apana.org.au,m:netdev@vger.kernel.org,m:tobias@strongswan.org,m:sd@queasysnail.net,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[phenome.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FROM_NEQ_ENVFROM(0.00)[antony@phenome.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,bootlin.com:from_mime,bootlin.com:url,bootlin.com:mid,bootlin.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,phenome.org:from_mime,phenome.org:dkim,Antony2201.local:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AB989704933
+X-Rspamd-Queue-Id: CAC42704A55
 
-Hello Conor,
+Hi Yan,
 
-On Fri Jul 3, 2026 at 1:34 PM CEST, Conor Dooley wrote:
-> On Wed, Jul 01, 2026 at 05:59:07PM +0200, Th=C3=A9o Lebrun wrote:
->> Variables are named q or queue_index. Types are int, unsigned int, u32
->> and u16. Use `unsigned int q` everywhere.
->>=20
->> Skip over taprio functions. They use `u8 queue_id` which fits with the
->> `struct macb_queue_enst_config` field. Using `queue_id` everywhere
->> would be too verbose.
->
-> I'm not sure that I agree about the verbosity, and "q" isn't a letter I
-> would naturally associate with indexing, in the way ijk etc are. Perhaps
-> in netdev it is a natural choice however?
+thanks for testing. Would you please test on a new series?
 
-The question wasn't much if q made sense in netdev land, more about what
-the MACB code used and to unify the naming convention.
+On Thu, Jun 25, 2026 at 06:58:47PM -0700, Yan Yan wrote:
+> Hi Antony,
+> 
+> I ran the following test cases and two—4.2 and 6—are worth disucssing:
+> 
+> 1.  Mark Inheritance: Creates one SA and migrates it without
+> specifying a new mark. [PASSED]
+> 2.  Mark Update: Creates one SA with a specific mark and migrates it
+> to a new specific mark. [PASSED]
+> 3.  State Update Isolation: Creates two SAs differing only by mark and
+> verifies that migrating one does not affect the other. [PASSED]
+> 4.  Mark Collision:
+>     4.1 [Specific Mark] Creates two SAs differing only by mark: SA
+> (mark_1) and an SA (mark_2). Verifies migrating SA (mark_1) to mark_2
+> fails with EEXIST and both SAs intact. [PASSED]
+>     4.2 [Wildcard Mark] Creates two SAs differing only by mark: SA
+> (mark_1) and an SA (mark_none). Migrate the mark_none to mark_1.
+> Expecting failure with EEXIST and both SAs intact. [FAILED: SA
+> (mark_none) ends up being deleted]
+> 5.  Mark Mismatch:
+>     5.1 Creates only a wildcard SA and verifying migration using a
+> specific mark fails with ESRCH; SA intact [PASSED]
+>     5.2 Creates only one SA (mark_1) and verifying migration using a
+> mark_2 fails with ESRCH; SA intact [PASSED]
+> 6.  Mark Shadowing Failure:: Creates two SAs differing only by mark:
+> the first SA (mark_1) and the second SA (mark None). Migrating the SA
+> (mark_1) fails with ESRCH, two SAs remain untouched [PASSED]
+> 
+> --------------------------------
+> My questions are as follows:
+> 
+> Regarding 4.2 I believe is a kernel bug. During the pre-migration
+> collision check, the lookup for the mark_1 matches the wildcard SA
+> itself first, causing the kernel to miss the collision with the
+> existing specific SA with mark_1
+> 
+> At https://github.com/antonyantony/linux/blob/migrate-state-fixes-v0/net/xfrm/xfrm_user.c#L3450
+> 
+> x_new = xfrm_state_lookup(net, new_mark_key, &m.new_daddr, ----> BUG:
+> We are looking for the existence of SA (mark_1) but SA (mark_none) is
+> returned.
+> um->id.spi, um->id.proto, m.new_family);
+> if (x_new) {
+>     xfrm_state_put(x_new);
+>     if (x_new != x) { ----> BUG: We end up having x_new == x
+>     NL_SET_ERR_MSG(extack, "New SA tuple already occupied");
+>     err = -EEXIST;
+>     goto out;
+> }
+this should be fixed no. Would please try again?
 
-                           Before  After
-struct macb_queue * q           1      0
-int q                           1      0
-u32 queue_index                 1      0
-u16 queue_index                 2      0
-unsigned int q                  4     12
-struct macb_queue * queue      29     25
 
-`q` that could be an index (5 times) or a `struct macb_queue *`
-(29 times) was the most annoying to me. As `queue` was often the
-pointer, I used that.
+> /* self-match via wide mark mask; not a collision */
+> 
+> Would it be possible to traverse the entire list or create a lookup
+> method for an exact match?
+> 
+> Regarding  6.  I wrote the tests as per the kernel implementation but
+> I'm not sure it is intended. Intuitively, this migration should
+> succeed by finding and updating the specific SA (mark_1) instead of
+> failing. Is this failure considered an acceptable limit, or should we
+> aim to support exact-match lookup here?
 
-`queue_id` or `queue_index` for the stack felt too descriptive for no
-valid reason. If it was green-field code I'd name it `qid` but that
-name doesn't appear anywhere in MACB so I avoided introducing new
-jargon.
 
-If you have a name proposal I will probably agree with you and go that
-route!
+While trying to fix MIGRATE_STATE I fell into a rabbit hole:)
+I realized many methods have this issue. Just never noticed, as it would be
+a misconfiguration, and would likely cause operational issues rather than 
+crashes.
+However, given that xfrm accepts multiple identical SAs differing only in mark,
+a proper fix is to add __xfrm_state_locate_exact() for both spi and byaddr 
+lookups.  This should be used in all calls from userspace.
 
-# command to extract counts
-ctags -o - --kinds-c=3D'{local}{member}{parameter}' \
-      --fields=3D'{typeref}' drivers/net/ethernet/cadence/* | \
-awk -F"\t" '$1=3D=3D"q" || $1 ~ /queue/ {print $NF, $1}' | \
-sort | uniq -c | sort -n
+I just send a new series.
+https://patchwork.kernel.org/project/netdevbpf/patch/migrate-state-fixes-v0-1-a69e8637ba3b@secunet.com/
 
-Thanks,
-
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+-antony
 
