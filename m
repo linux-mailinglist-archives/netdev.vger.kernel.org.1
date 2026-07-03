@@ -1,58 +1,96 @@
-Return-Path: <netdev+bounces-304334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304335-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /4RDBkpDR2rhUwAAu9opvQ
-	(envelope-from <netdev+bounces-304334-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 07:06:18 +0200
+	id 80JkJ5BFR2p8VAAAu9opvQ
+	(envelope-from <netdev+bounces-304335-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 07:16:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45DCC6FE8F0
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 07:06:17 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C38A26FE9F5
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 07:15:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304334-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304334-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="tJl/oIGT";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304335-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304335-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 139CF302A0EC
+	by sin.lore.kernel.org (Postfix) with ESMTP id 753C4302332A
 	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 05:05:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18648352016;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 333DD33CE80;
 	Fri,  3 Jul 2026 05:03:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCB3E346E60;
-	Fri,  3 Jul 2026 05:03:31 +0000 (UTC)
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E77C348C78
+	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 05:03:38 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783055029; cv=none; b=o0Q2pLj3WC4xtMQ/z+UkwGqlHH+nttY3PK1WfG86iuBWsAiNZd8YSwOunjyVZL+o+O4L2jj3sijJQG81Kse099yXxq6H7it06DM3tHDeCGL9f7TJef+isNId71WTskEv6grl0Zjr/Ua7zY1fz5wdihE2Qcww1lY3OGy8UqWihe0=
+	t=1783055029; cv=none; b=sqPT8w00mE+mxJycRDZZxfmElK8imT98Q3H9gbnTTXHDPlDKW/CqIbLm85zAC05fukCoNRDiPf6YAJiRcKg1AgnY5ebl0Mvau2KFnElrMmUHZZrtvkKqN89d8VXWKmfnzcmo5NdY2UEGZ2jnf9kYKzRX/7pUZYcatGKxAnMa1Dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783055029; c=relaxed/simple;
-	bh=XuAkwMQLiDTOuqdGjbfLJAtaJbzsqn7J3Vva0H9Ss7M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dvhUxXm2qD/GxmGe2TF4n0q6ZxiZWL4XZYRGw5yADGyL3hVByuup9zfzSAv5eHac0fZuZBw6UXhG6ub9l4YrbiEOESxiC+BPS9fYdjbfI7i5ULD9Z36rrx/1+rLgSQBeUMCMtN+Iv4mY5KUgZb/8dkcSSwFXZd6CVgOawpmwmoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=162.243.164.118
-Received: from zju.edu.cn (unknown [10.98.66.117])
-	by mtasvr (Coremail) with SMTP id _____wA3UVmdQkdqvQYAAA--.68S3;
-	Fri, 03 Jul 2026 13:03:26 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.98.66.117])
-	by mail-app3 (Coremail) with SMTP id zS_KCgCHcndkQkdq6c3KAg--.21423S2;
-	Fri, 03 Jul 2026 13:02:28 +0800 (CST)
-From: Fan Wu <fanwu01@zju.edu.cn>
-To: netdev@vger.kernel.org
-Cc: shenjian15@huawei.com,
-	salil.mehta@huawei.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
+	bh=TuAAEPv2FnYqfxCkiAndHbEEgXy00kllWlsTVXvwO0A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uv0f66MweNvH6sstyUbdQYnyEGAiqC8Z+3in4mFqRcTriZOCble27dzrmCckVkkMCcpw3XadvBEE+wewfWvizjU4nM8W5vCSMEq/DdHmkE/lDwfQILEvHNG9LPEqY/QydNUizBUKhkbzWk2D9fuOh0c5b2a4MsluwyF884x5Mbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=tJl/oIGT; arc=none smtp.client-ip=209.85.219.41
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-8efcfdb2b43so1038316d6.3
+        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 22:03:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783055017; x=1783659817; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4mjd3S3mD4H3ly0J/O0woiYTVd9pmAc7B7F5gVF6+rg=;
+        b=tJl/oIGTGD+lO0KDWPtrlFYl6y4dGEv0kDXOjHu4LH2NE9lhmcYe0MlJncT4LKPO5c
+         bPBdrzBe88tsjqUu0gc1KZ43fTyYzkzoCRde8pMyt7gOCaIKVTwKNS4rSpqTnUmzBUdR
+         nw6C8e+1FbY7qdhE4NrUtzLzSu9UuxJM+NbAVHM/2T60byP606fD9UVR+sHAkiAnc9/k
+         Goq/kPgDkXCSMG49hPfgGSrOakQt1X4iawgWICVzXsgRjzgGNQ0tNoGkAoTaxd0Jvcey
+         7eaSL3IRmwOHEwgKq1eQuEt7YbTgegTanxL6mRgcLt0w0IPtPZQ0HBKBNY/49xpXwqVK
+         3pyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783055017; x=1783659817;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4mjd3S3mD4H3ly0J/O0woiYTVd9pmAc7B7F5gVF6+rg=;
+        b=Zc+M4Pohk0EOumX/z0mc8heLan5n7cHAHqupa/fGUteJltH/Muj1tiUjx0iEWQnes7
+         WLGfzcVO4KI1b1CHfp7+9mdNBKx8+rl+dlMFWjExzeu6HeRe4DZrTSV45XDMyvLOd0j2
+         7owJuwmQKPHckZyLHd/LsibSVXexD2nMxrIe+Z91s1XcNmYjDyJxg2F2JqrAAqQ+QK4X
+         gaukPVqTR65nwOzZRSvUbB6k30BORn67kc0/+i6Qi9gGdWv2yoMDp0/JkUwA8NW7H8Sf
+         TuokejRhUba08/ZsJvxAdFukdrVFqDhmXAN7H8DpW+Esd4rWYj5wIa3thDyZhH+AYynz
+         yECQ==
+X-Forwarded-Encrypted: i=1; AHgh+RqOihDWVtp+EKsvXu4PM3E2jWy0ugHEAScEQNKbdAyXZ4y6yxLjEVSJF7YA4AaS462aADAHjGM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSLVYbznS7G49EWEIIn6coAP2Y4tmdS6NOs1bvVP6sKeRaFxXT
+	80V6ddN+D2O1HDBrT7hue+bsHBsM9CuxlzduX+NqUwboN9jCTiaz77+I
+X-Gm-Gg: AfdE7cmUjpMSBeZ1IBWnG52/GJcxe4YNjDsFpC5b0+0tuJoYZYSbBjijVPhzCAqjri9
+	DFaqkhYVOZYB56R3G2pJVhUobRVqt5pjwjVry0oAQKi3msBgaui4b0imhIDxZe2ZUMxIi2u+j8n
+	NEYY+tRlA9U9IJHPWlWas5AVOM9s6ebh5csH7+YiJN/yhLdArPsu04MfNpY7tIdpqr8E30PcNp8
+	OUBGMj2UciHK7pUaD7Lo4RQYsbO8+lvwUTBAmTrjzpPt9//fiekZEOTgDFY+zoSxlMPT3K6MU/a
+	MBfpUy8xmAdvtY337+0/H71DLa10OCjSRN0Fb4E0KBOBEX5u9wc/UPfrttVIok1KAvkARrwKWn9
+	D+rpcHzz1gGEcOMbdnaclBqNS13MnZLlB+32HX/vrhRgRlnGJlI8ydb7aQ2/umRxVGDRmUorvl/
+	bFK2lpQNfc0TmhJX2EV9ouF4MO+SmiRl7fBOkgqDlTSzOMz6eb/Bdvlpc+Zx5uYhJLGSjvnqaQ/
+	n4N1LjTKZoVwjM=
+X-Received: by 2002:a05:6214:4302:b0:8e7:d752:ab34 with SMTP id 6a1803df08f44-8f3c66c558amr133708806d6.12.1783055017034;
+        Thu, 02 Jul 2026 22:03:37 -0700 (PDT)
+Received: from i4-gl-tmk5904.ad.psu.edu ([130.203.156.186])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8f46e27d53fsm46576866d6.5.2026.07.02.22.03.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jul 2026 22:03:36 -0700 (PDT)
+From: Yuho Choi <dbgh9129@gmail.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Fan Wu <fanwu01@zju.edu.cn>
-Subject: [PATCH] net: hip04: quiesce tx coalesce timer before teardown
-Date: Fri,  3 Jul 2026 05:01:33 +0000
-Message-Id: <20260703050133.2445155-1-fanwu01@zju.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	Yuho Choi <dbgh9129@gmail.com>
+Subject: [PATCH net v2] idpf: Fix mailbox IRQ name leak on request failure
+Date: Fri,  3 Jul 2026 01:03:32 -0400
+Message-ID: <20260703050332.121551-1-dbgh9129@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,147 +98,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zS_KCgCHcndkQkdq6c3KAg--.21423S2
-X-CM-SenderInfo: qrstjiaswqq6lmxovvfxof0/
-X-CM-DELIVERINFO: =?B?/0WH1gXKKxbFmtjJiESix3B1w3vZ3A9ovKVTomAyoQazvoRs/NHSP8GI2EvgeEEW7R
-	sfnZPoDCNGYdHSfuFmYJL54WMVfScoz1GQkz7Jrk8/nqQJcpY11kKBiwOKJAC2sjCqpSvc
-	IZLUjRXXY3mEfk5bYd2p9E6mavGmQbzmcFsnzP86
-X-Coremail-Antispam: 1Uk129KBj93XoWxWF1DKFyktFWkCr4ruw1fKrX_yoW5Zry3pa
-	y5KayxKF4vyrWaqrWkAF4UtFy8ta1UJFWkG3W8G39Y9wnIyr10qrWkKFW5XF48AFWvyFZI
-	9r4F9w4DurZ8J3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AK
-	xVW0oVCq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc804V
-	CY07AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AK
-	xVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48Icx
-	kI7VAKI48JM4x0Y48IcxkI7VAKI48G6xCjnVAKz4kxM4IIrI8v6xkF7I0E8cxan2IY04v7
-	MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr
-	0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0E
-	wIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJV
-	W8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAI
-	cVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxU7gAwDUUUU
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.54 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304334-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[zju.edu.cn];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:shenjian15@huawei.com,m:salil.mehta@huawei.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:fanwu01@zju.edu.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_SENDER(0.00)[fanwu01@zju.edu.cn,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fanwu01@zju.edu.cn,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[lists.osuosl.org,vger.kernel.org,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304335-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:dbgh9129@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[dbgh9129@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dbgh9129@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,zju.edu.cn:from_mime,zju.edu.cn:email,zju.edu.cn:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 45DCC6FE8F0
+X-Rspamd-Queue-Id: C38A26FE9F5
 
-hip04_start_tx_timer() arms priv->tx_coalesce_timer from both the
-TX path and the NAPI poll path. The timer callback, tx_done(), derives
-priv from the timer and touches priv->napi, priv->reg_inten and
-priv->base before scheduling NAPI.
+idpf_mb_intr_req_irq() allocates the mailbox IRQ name before calling
+request_irq(). On success, the name is released later through
+kfree(free_irq()), but request_irq() failure returns without freeing it.
 
-The remove path currently frees the TX/RX rings before unregistering the
-netdev. If the interface is still up, unregister_netdev() will run
-.ndo_stop only after those rings have already been freed, while a pending
-TX coalesce timer or NAPI instance can still reach the ring state. The
-timer is also never cancelled before free_netdev() releases the netdev
-private area.
+Free the allocated name on the request_irq() failure path.
 
-Cancel the timer from hip04_mac_stop() after NAPI and the TX queue have
-been disabled. In hip04_remove(), unregister the netdev first, drain the
-timeout work and timer, and only then free the rings.
-
-hip04_tx_timeout_task() can also restart the device by calling
-hip04_mac_stop() followed by hip04_mac_open(). Serialize that restart with
-rtnl_lock(), matching the netdev core's .ndo_stop locking, and skip it if
-the device is no longer running.
-
-Fixes: a41ea46a9a12 ("net: hisilicon: new hip04 ethernet driver")
-Cc: stable@vger.kernel.org
-Signed-off-by: Fan Wu <fanwu01@zju.edu.cn>
+Fixes: 4930fbf419a7 ("idpf: add core init and interrupt request")
+Signed-off-by: Yuho Choi <dbgh9129@gmail.com>
 ---
-diff --git a/drivers/net/ethernet/hisilicon/hip04_eth.c b/drivers/net/ethernet/hisilicon/hip04_eth.c
-index 18376bc..cb9b01c 100644
---- a/drivers/net/ethernet/hisilicon/hip04_eth.c
-+++ b/drivers/net/ethernet/hisilicon/hip04_eth.c
-@@ -15,6 +15,7 @@
- #include <linux/of_net.h>
- #include <linux/mfd/syscon.h>
- #include <linux/regmap.h>
-+#include <linux/rtnetlink.h>
+Changes in v2:
+- Add net tag for the patch subject line.
+ drivers/net/ethernet/intel/idpf/idpf_lib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+index cf966fe6c759..bb81e620c5c8 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+@@ -139,7 +139,7 @@ static int idpf_mb_intr_req_irq(struct idpf_adapter *adapter)
+ 	if (err) {
+ 		dev_err(&adapter->pdev->dev,
+ 			"IRQ request for mailbox failed, error: %d\n", err);
+-
++		kfree(name);
+ 		return err;
+ 	}
  
- #define SC_PPE_RESET_DREQ		0x026C
- 
-@@ -761,6 +762,13 @@ static int hip04_mac_stop(struct net_device *ndev)
- 
- 	napi_disable(&priv->napi);
- 	netif_stop_queue(ndev);
-+
-+	/* Cancel the TX-coalesce timer after the arming paths (xmit via the
-+	 * queue, rx poll via NAPI) are disabled, so a pending tx_done()
-+	 * (which dereferences priv) is drained before the device is freed.
-+	 */
-+	hrtimer_cancel(&priv->tx_coalesce_timer);
-+
- 	hip04_mac_disable(ndev);
- 	hip04_tx_reclaim(ndev, true);
- 	hip04_reset_ppe(priv);
-@@ -791,8 +799,15 @@ static void hip04_tx_timeout_task(struct work_struct *work)
- 	struct hip04_priv *priv;
- 
- 	priv = container_of(work, struct hip04_priv, tx_timeout_task);
-+
-+	rtnl_lock();
-+	if (!netif_running(priv->ndev))
-+		goto out;
-+
- 	hip04_mac_stop(priv->ndev);
- 	hip04_mac_open(priv->ndev);
-+out:
-+	rtnl_unlock();
- }
- 
- static int hip04_get_coalesce(struct net_device *netdev,
-@@ -1029,10 +1044,15 @@ static void hip04_remove(struct platform_device *pdev)
- 	if (priv->phy)
- 		phy_disconnect(priv->phy);
- 
--	hip04_free_ring(ndev, d);
- 	unregister_netdev(ndev);
--	of_node_put(priv->phy_node);
- 	cancel_work_sync(&priv->tx_timeout_task);
-+	hrtimer_cancel(&priv->tx_coalesce_timer);
-+	/* Free the rings only after the interface is stopped (.ndo_stop via
-+	 * unregister_netdev) and the work/timer are drained; the TX/NAPI
-+	 * paths touch them while the device is up.
-+	 */
-+	hip04_free_ring(ndev, d);
-+	of_node_put(priv->phy_node);
- 	free_netdev(ndev);
- }
- 
+-- 
+2.43.0
 
 
