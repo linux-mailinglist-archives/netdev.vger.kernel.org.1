@@ -1,314 +1,184 @@
-Return-Path: <netdev+bounces-304652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304653-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id SWDDOdoASGpDjAAAu9opvQ
-	(envelope-from <netdev+bounces-304652-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 20:35:06 +0200
+	id ERKGOU0CSGoejQAAu9opvQ
+	(envelope-from <netdev+bounces-304653-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 20:41:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25D9F704F67
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 20:35:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5121C704FBB
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 20:41:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=j7LOSUA2;
-	dmarc=pass (policy=reject) header.from=nvidia.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304652-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304652-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=RRUXU661;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304653-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-304653-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 84161300639D
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 18:32:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2E065301441D
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 18:41:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 020B02DB7B8;
-	Fri,  3 Jul 2026 18:32:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B10E3128D5;
+	Fri,  3 Jul 2026 18:41:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011033.outbound.protection.outlook.com [52.101.62.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807221DDC35;
-	Fri,  3 Jul 2026 18:32:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 716B630C165
+	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 18:41:11 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783103541; cv=fail; b=tHTY5far1vtOS3Kf6QVi2jtoZaTXI96Snv2SNPA5TPlFL6Y4kiVMAiYn8xVggQjyd90r2HiNzk8ivPPMGJbN/OzL88FQYIib+ZS2KlMbWMBFf8GcxCHnSDIwZRnhWZvf3LQFs0NCieUhBmqwuK8E1L0IP55Sl1zsbBAsFrqj6Ho=
+	t=1783104073; cv=pass; b=dUykBjUZTkiYrueKBHEeqLMF5zmnXeQkF9LAgHC07v4peXoNUdpGNTvItjyHV4m0Ic0FrYY4uCUbPbeHmZYP4QgE01B0Q2yBXdCV6oP6kveP7w8gpQrr7CinodLdnuTiX/PkZPHffw626d/8IXGCc2SsTof4jrnys0nQYe5FHNU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783103541; c=relaxed/simple;
-	bh=UZRv//56MJmqaUpR+jhih1Bs7HrvkUMmoFsiqNQAwAg=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Ym8WNyz2znyFEZvV98w/9qQ/DIFU4m/rxmVZr0VTifBFOwgan7xX2vbNqbrgcLYew4/4VjFi9V06V9Fs7lqNSu+mApqfsQOV7LUofjHonSN3hEOZJY2achBBNgKe2WxjHS8pCZtj8NDq6j4ROwzR+EYwEGng8VQ12ApxPEXKmuE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=j7LOSUA2; arc=fail smtp.client-ip=52.101.62.33
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mHE2IuUhwprNYVDns2N/w8qoKFcyCde5sF6I6pDmjCf0qEp78KBZDvTbq19xOJPeO1hOD4yChHgDtpubEdr71mzrxgZs7xyU1MlsyCK2h8TnHEfOrEJboiYdvv9gc54oGI/JDxq6Cd9ZS1TEZnUZA2T0HBdpdebltOniFH44W1JlUQB+hRzPfOZdNkC7mVx41MAVV7ZbmLJlRjWn6osj6YXmrfGADZU4t++X4GEDevcGPX9PYYVmMbYj7ELiQWFhaUEF4BbUEBNzpuld4R8eVTrSYgoEyJFLxC8H1BNMTAneItD5fU64A0i046WKHlTvAjT/4Av1JzS54KxGfQFOuA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZmIyN+CZ6DtyT4FcRNI4vco9tv5tcMQQZzmsDFRueIE=;
- b=OgP1ASnjZK5OjFsCoJYlFnHAhFMJvP1cpWeCjHF8YIbNC/l/3A6hh4DLDFFyzWrgaNZh9GbiDDv6g+/WaYsyHNKChitMGRINbWp0ICUKaNB2lipayE1W95bgM13Yuqr9yb3ebQW8x85gIaI7KUbW8JCSnSLQpCi/48imavoAQSlw3Uvghei63Yv167ERo0GHpWVPHBkvM4Zl52R2do+WS5LmVGCMckQu9i0ubW5YHIvAQq9I44j5C+CSjyAC9ITVqA3a39Zu/gd1k/766o/Dro4cpQL0X+ES8/djHlsPvOPz3o3iYWnDzLIzjNmEhOLXxnaYzJUy6h6DfXvwc9+VOA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZmIyN+CZ6DtyT4FcRNI4vco9tv5tcMQQZzmsDFRueIE=;
- b=j7LOSUA2PnfnKMd7o70vNGjx/F65gIdk8ROWs2VIfiz7vu969rvWUuG6ZHu1EjdkyIbvOPLtNtccTeUfdsQPVvqMrDeQRWyRBJppn05lLBDi0eTaY9KJ1KNX0otysIVx89MdnSoDp51A3SEi5fhhhpQtaSl+DNpXidqegj2I/BHcQHQboagPM20qy48YmP5FWyCpNl4UyUHEVk6QH6DkMtFJZogBQHN3twJVafL3Nb6OKh/ItcfhGfv2X5l3qWra7yMhgao0HriaAaYooiW5zEAhKHlA7ySDlVhiurB7rU3tqibz905Xy1RqUKrPBdTJgPw42sOOulaqd7kzzWSDBw==
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com (2603:10b6:610:144::12)
- by SA1PR12MB9247.namprd12.prod.outlook.com (2603:10b6:806:3af::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.10; Fri, 3 Jul
- 2026 18:32:16 +0000
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::b710:d6a1:ab16:76de]) by CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::b710:d6a1:ab16:76de%6]) with mapi id 15.21.0181.009; Fri, 3 Jul 2026
- 18:32:16 +0000
-Message-ID: <9bd07013-0d59-43a9-a5c2-0bbb8fa6a47b@nvidia.com>
-Date: Fri, 3 Jul 2026 21:32:14 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V4 4/6] devlink: Apply eswitch mode boot defaults
-To: Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org, linux-doc@vger.kernel.org
-References: <20260629182102.245150-1-mbloch@nvidia.com>
- <20260629182102.245150-5-mbloch@nvidia.com>
- <b8ff6104-790e-441f-a095-d50843d241c4@redhat.com>
-Content-Language: en-US
-From: Mark Bloch <mbloch@nvidia.com>
-In-Reply-To: <b8ff6104-790e-441f-a095-d50843d241c4@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0213.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:e4::13) To CH3PR12MB7548.namprd12.prod.outlook.com
- (2603:10b6:610:144::12)
+	s=arc-20240116; t=1783104073; c=relaxed/simple;
+	bh=0Qbt2nm81MoSrawX+7rKawGZQFGLjf8FPMXtAFGMjLM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h0WRoBQgw5Lxp0bVkvtI9p5SRmjFOw/sM1PXbav0Vzbrfo0fJwx9MqP8x7AW2XYQCvdAnbktxAtPBKTwnBoGyz8hHHVqJrrvVTTdGivn4HSHnoKgULrR1vodG8gmiz7RYvytWF40WBp6isKp6DoKH5DVHHKtXFPb6ZwV92ZTDIE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RRUXU661; arc=pass smtp.client-ip=209.85.208.47
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-6976b0c5adbso1451542a12.2
+        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 11:41:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783104070; cv=none;
+        d=google.com; s=arc-20260327;
+        b=D6wrybvKRtSIKviv5WrvM4hinJ29wTlX1B1DMx21OzDg7inWQjH6Ctsv8btReuFvJ/
+         8wDa/uLaogCIGcp4nvny7o6Xt9K0Mblj5/NpTs4czQZ62zXgq/gokKppxICvaDAY/4mW
+         JrIEIoluEBebFuvezpn8CcDaPfI6zE5mFoAjhZ3gn21UVCipbef2WwpckMkHOWfSZ9oD
+         Gg3Y/suTYrP5bhmSkLDl1cRn65ikQFyXphY8ycPslLeG3gPSMjdLPWtOiz/mmkq5HoOX
+         GH8mUR0YBFXCBGeJ1p6Z5v2Ytwv8jL7nUgAdEBwiGo2J49MmCINTOEdPxlDFPQ070ixx
+         gsDA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=WBbHXOwzJl7j9yIFimPWLD+hLfRc6OqC6nXJMgCD74M=;
+        fh=9qs7J2ij9l1jwcrECCkxzrXUjTRTgACkgSN7OSp4xq4=;
+        b=CooDcTs+i/Rytq1s7untRfdIpwyeCCMP2ULTh9WOKDqLaTg6f4slheHUOMVnsTbrHq
+         mVZ7v/MkpddhOR4eIkcXo0cmfN+vkPYE69Va70YsJa4wGnJjttfsV1D96eCKf71pvpAG
+         eaA5mC9XoMreCOvjcgGS6r0Ux+AZIZ49IUfw6GqlS9EKnzCYj/xgeLxRxzZr59Mc5Z0F
+         p7Aux08BVMtSUa4AT0inFvg7/L4ZgDrphoIATc5XZsKkDVYJFKpVbV3PGCJ+MVeW7+SD
+         titQNy2qSot/qx+nzf+w/Y/ji8CLs7kOTDsnvnr6IHFo4+MqsnDBNVSeUfyFRbCbh1wx
+         URnA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783104070; x=1783708870; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WBbHXOwzJl7j9yIFimPWLD+hLfRc6OqC6nXJMgCD74M=;
+        b=RRUXU661NlgEp7+AyaYJPcOn1kBlwAryr32Um06ftuURlGaR3lL6r8oaMAjyFXSwRy
+         uSUg1tbfyYvOrxnfksXniOw0SQf7EyLQpJJzb8LDymAMJ9HWwWvh2cg0ZXyN53aCb9m+
+         PLOH/w4vT7OOyyqDfJuPOdRP7l8UY8xloEGslrdGQpyc2HK5R8qGpMNc23WEQAXKob94
+         27AP6344Lv0HcJ75FTFUrPxg+owy7hirgcMlQiRuu3QC3MRkDFo6C3Y/kR1AmmWVE2iD
+         tcsrNgLVmAw9V+fjE5eStsEQ7STV9bu2sicumZm6frDgwC+Ec3Z8SyjsRXOHYjPjPM82
+         NwtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783104070; x=1783708870;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=WBbHXOwzJl7j9yIFimPWLD+hLfRc6OqC6nXJMgCD74M=;
+        b=VlN6fwPwWCw4AyBOjx60FlDmTaquAtKFwi4cZ37fWHrV5d80Z3tIB8smlC+cBtV2V6
+         DpuzcILfwUOUmkHgECwv5O+f3FkVn4PmHmNE/gBb2YXAc7WFNlFTUiwu+TMvdUwdnHLe
+         DRjRsGo8K64o7p6cT9WUnhPCPm+obTgVufe+J6j/3nPMEcc+zVYVTy4aGXfZS8dWpgD8
+         JlQF68RZpEnH4N2Kizy1Dzz6TKejJOSPCW5aZISL67qtMqyDZNhr7noyK3bEt8LVZx/J
+         xMmzLcr4sDXA7+iVS3g00HiIbgjI6N93cQGdjXOqDsykqZ6vOs6Mg/drN/zKv9BUZCGr
+         sRHw==
+X-Gm-Message-State: AOJu0YxXpJiEaTifpox8sUca0hOAvSsJsXxNWHmHqXorUkPJ8ilB+O4u
+	EI802NCPu0ulZ5x1BuI+m18aKvQntsxz4jtyXDSrRs+bELL7cdjgy62tkJgrT4kC4RrNiGwczXO
+	1fHpo3CF3Ghcx1doofmn/+oqHz2w8+VavPA==
+X-Gm-Gg: AfdE7cn+sWPp/Iina1BuJx/CXukdFZmb1Z6TMD6F5mjG57zjLie4XfCD2uPsDrA+SrD
+	vJGYyAs25rs0gWsSIY28md1PcdLSfW5XN7+vMupqHZtVoB+oK4dbppsRyZgbzjrTAPFX7Hrx1fl
+	3Yv/JYE6qiJYNsGTZ7oQtvXuknmkvF/oGoXBAR4OO2SZb4y2p9ZnNuab5A8ktUCkgEW/aAlNot0
+	pSYm1rl8jd06OAy1X1lJJpTe1ErnYI9c++RdDxcwKptCRSPL8/rXgVUw6KAdNYVeSb9NnYYNMDG
+	EE9JRwqZNcxLKf/rpb3D6gOc3Y2szwXIrhgOdnK9pEk0NHVs0wlwMYs9a8jX7ExWFnZTpxeFt+p
+	cE/JBtTrgsjSEDs1tP7SG9O/yPWM=
+X-Received: by 2002:a05:6402:4497:b0:66e:abe5:ab22 with SMTP id
+ 4fb4d7f45d1cf-69a1a258591mr177686a12.5.1783104069517; Fri, 03 Jul 2026
+ 11:41:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7548:EE_|SA1PR12MB9247:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0998f519-bedd-4366-2ac7-08ded931683e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|376014|7416014|366016|1800799024|6133799003|56012099006|11063799006|4143699003|18002099003|22082099003|3023799007;
-X-Microsoft-Antispam-Message-Info:
-	06KA1MM6oV0OnVRzrbErpuYzujHhAv9iOsx6cQVJseCBGQSKdTAFlC10uBHakW1zL3a5LsE1UpO7U2akqjQWNooeH5fV4ChkQ2ZTcMUB7RJuVVA5BOYAuOAHBiq/4sKuNDrNY3rvGTC4yvTYspx3iGUZE4UgSKoeevwDkJPM8vL+xJAS33yaO+WrEHBBgT86U4iQxSHbfWdC/jUaUpvYneQuD4VDTpns4Ap1/NJz7sFsRDiMLhse8PFEbYQVX7rWhXXzmhfZ4IP+hTxv5cXT5jYrAGbGd6RlutxTYFwAeAYyolB86iY4/XND6W/FfSW9auUdVRI2aqrU0lkTo0jGVaYZJ2rlDEv7Lp6J69+fkViytR0FPGl+7UeiEWEOYgj68Mf7mESrXBzIKqwzMmmdk5fk2beQH/9Sai0xgrZ4TPFr7iMN7rXBOepwNpu0ekyHOxvPMf6HknoFSMkjmI15lxoD9CaBdKHdnxQabqtZCJeMWu0u3IHNI/aDsgoucNhEuLXrgujJJBeBkNtS4KnO/Z4Knqz96NxNMi6fqRRBgqp6igapYdrBssiUXr0I70uv2FNX788XETB3wZaTiKuO3re4D5OoJeKW90el5h/D5u/DugOVG9vhZaRgPr07aOG4cdjtrUDrVMTjB3ELg9H8kxFxcHgmVUCq8ZSBJ12ss6A=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7548.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(7416014)(366016)(1800799024)(6133799003)(56012099006)(11063799006)(4143699003)(18002099003)(22082099003)(3023799007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?OUp5cmJweGx0WFVKUmp4R2UvY1ZNQ0FPN01aZm5MbDlMM0plNWhkMC9zLzcw?=
- =?utf-8?B?c2UyNnozK2lPV0xKSUlGbStmaS80Wm1uYjZCQ2dBNWhLaFBKMDhQd25ta1FN?=
- =?utf-8?B?Rk1zdnBNd2k0ajNhOEFzVG5ia1BDWGVPakpOUEJCWTZDL1hkQjE0b0IrbkJB?=
- =?utf-8?B?eG9LUXdqRGVGSkZ0Y0ZYVzl0Y0JPVUhJWXVueE5WWFJGK0JpS3FhQWY0SUsz?=
- =?utf-8?B?U3dISVdoVEhRZXpUMnoyK3NVUWxlNGVzQUVqWGtNdGovSmFvbzdUWERNdWlN?=
- =?utf-8?B?Tzl1MFJrMCtqNW92ZDZaWjluZVMzaDlDZ3JrWmw5dnUwMjlJQmQxeTFhcHVn?=
- =?utf-8?B?MHpRc0x5UVBtR1JhaFdYMUVDeThpcTVUTll6YWpaUS9YTURndVZiUGErd29k?=
- =?utf-8?B?WFdMb2hvaTNvMUx5QmlTWEdUd0J6WnlsUDlkV3BoUXFuRThWWXdyMHFBWkRv?=
- =?utf-8?B?QWtKWmliY2wxZmJTbmIraDROb3RuMWlpeUFpTjJ2cTFkczZJa3lGdUJhMzlT?=
- =?utf-8?B?dkhUdzN6VG1tSTNHRTd3TDFhWGl2cXRPbkpXZWJuWWFNZTBVUDlYRkZrVkFQ?=
- =?utf-8?B?dDFTL3VYOXFVZm9Wa3pGbExPb21RQ1JDNVEyTHlSNUVWUEZNMUxYN2NZalli?=
- =?utf-8?B?YlB5ZGNZOWhVZUZRTmluOU1sRXdDKzhiYkQ2MUhNbUZRNTVGWWNHOWNqb1Bo?=
- =?utf-8?B?clJNMTFMZkFlU3I5S3Y4Y0piajVlTzFsMndWdElXbmtOODN0Qk5mR2tPY1dC?=
- =?utf-8?B?bU1tTHg3TnJKb0VsWXpRbWVEVkQ5aXRSWnIraVVuemxpL3htTm5HZnh5eDZE?=
- =?utf-8?B?c3JiK2lONFMrM2ttVWdQZTNSWlVKdG15YlBJenJiZjRyNTNJYzY0K250a21z?=
- =?utf-8?B?NXBzU2Zqa3g0a3U3R0RXdW1pUzFsSHBQaGhhdkh3Nzl3NnZyUFhSdjIzL2ZC?=
- =?utf-8?B?c0EzN3FpQi9rTkNxZmtSOTJXSUFLTWVKZ2ZqYnpxZnBoVXEwRzdzQXc4QzJW?=
- =?utf-8?B?aDVROWpuTmFVSG5TT05VdHQ4ZTYxc3o4cldETm5HQzZ2eUJNczZwUm4rNk5T?=
- =?utf-8?B?V1lmcFAvSms1Wnl4L1hCb1c0NlYvMm9YaDBpWlVjRzlheHlvYTFGeDlDMjNL?=
- =?utf-8?B?Y1lQVmN0YkVZbXhyMmt4RnM0OUxSSmE3bVgvVWlua25XdGNMZjcya3VDVzJx?=
- =?utf-8?B?VFVhQ1hxOVhsRU5oc00wMUF6MzdWNDFNNlJUVkNLY2hZRU1DNXI4S0tXeXF2?=
- =?utf-8?B?dVQyZ0hEc3dXYVE2WmdvdnVuU3JGKzhzYTVzNHkrS3JHTXpQMzdyakZQL25a?=
- =?utf-8?B?Sk4xVVRVdUZlUUEwUUI3UzdKcklMT0d2Vyt3YVU1VEJvWWRQZ2ZaRW9ibjBP?=
- =?utf-8?B?SFBMOUswZGU1VHZ4ZmRuV0p4S0E4eHlSTlVOd3hCK3RXOFRQNnhvQjhQaU1t?=
- =?utf-8?B?cGZzd1BBSVo0L2RWWk9kTlVVcjZqQ2Y2bllkajJZWnd6ODJWd1FuRzFUS3ds?=
- =?utf-8?B?eUZpbVVyTmhhelVON1pJbGJXZ2VVcTQyUHB4YVJDK0JxOERJUnZUYnNVcHRp?=
- =?utf-8?B?dEJQdTFJL2FsbXdUYUZKaFE1Ync3ejZOcmYvek40WUZSNThoZGF0d2s4LzNL?=
- =?utf-8?B?eU5KcStOV3k1WXowd25IYVNhRjJxYUtScFpWUVVCczQxMEl0ODdHdUthUUw1?=
- =?utf-8?B?bjlySG9IeFk2TUVqNDRFTHJMTS9LQWF3UFdRTC9mK0QyTUo2U2wxZmZKK0My?=
- =?utf-8?B?dzE3Uyt5ajRKWDRaa2orbE0yYWZzSy9tTmVLck5xOHlDeHl0UFNNWG1zZzhH?=
- =?utf-8?B?cXFwK01DL2VjazdSS2RCZ0s3N1g1VUhXclJQNlpMRi9OTjY5Y2FRVFVrNDdL?=
- =?utf-8?B?MUVjcWlrU3E1L1pZWkd2c0tOcWtFVm80c3BTWWN4ZUR6L2g1eXpwTzZoQWkw?=
- =?utf-8?B?QWFZMmY5ZnBwc00vUDEyZzBVM21HMjg1WkZUcXNod2FOVzVxK3JKMEdSOUhX?=
- =?utf-8?B?a2xMWFdCdTZtcko3SzdNZWR4dllscTFKSTBJd3FDb0tnQUVQTTdGN1R5ZFdI?=
- =?utf-8?B?NFQ2UG5lbkV0Mkt0TlpVa0gvTUZFVnlxMWlJbGUvYkxLTjV5RERFbEp3REhn?=
- =?utf-8?B?YTlBeTJWWnhlaDZaYjlHVVh4SmJzdUZkdWtLVWVRY0x5VE9hQ2g0OTY2cXpB?=
- =?utf-8?B?UjhpM3JISzVuZGg1K3hZeXEzdzB3ZE1VeWFxLzArYXYzajJUQlgyOGVOemRX?=
- =?utf-8?B?eWlyQmNGcW9RamZPVUh5NE5Jc0grK3FaUnVmMXg5RnR1bHBsQmJ1Sm1HM2NI?=
- =?utf-8?Q?hoxaP01Aauy0oqjO36?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0998f519-bedd-4366-2ac7-08ded931683e
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7548.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2026 18:32:16.0263
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8NZJLGt6Om/jALDhS2RjUoS6nQIkSb0i+00kywHAqbNzKJM0K7uy7ArljFz3YDGRjw3NI+HJRUi85HRET6q9WQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB9247
+References: <20260702235045.1326384-1-rosenp@gmail.com> <fa4fa65e-1635-4313-a5e0-56a5208272e2@lunn.ch>
+In-Reply-To: <fa4fa65e-1635-4313-a5e0-56a5208272e2@lunn.ch>
+From: Rosen Penev <rosenp@gmail.com>
+Date: Fri, 3 Jul 2026 11:40:56 -0700
+X-Gm-Features: AVVi8Cf-ThBbJ_GxDQuvIOAkN2ONONkbVPiSWXn2EbeilUdDtgaMKDLY5jg8bJs
+Message-ID: <CAKxU2N-eRQLw4NqTVXuZPvT78Cu22Z3YC2FD3jrghy1VEJ5vpQ@mail.gmail.com>
+Subject: Re: [PATCH net] net: emac: mal: replace devm_request_irq with
+ request_irq to fix probe error race
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304652-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[mbloch@nvidia.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:jiri@resnulli.us,m:edumazet@google.com,m:kuba@kernel.org,m:horms@kernel.org,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:andrew+netdev@lunn.ch,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-doc@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304653-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mbloch@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,Nvidia.com:dkim,nvidia.com:from_mime,nvidia.com:email,nvidia.com:mid]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 25D9F704F67
+X-Rspamd-Queue-Id: 5121C704FBB
 
-
-
-On 02/07/2026 10:41, Paolo Abeni wrote:
-> On 6/29/26 8:20 PM, Mark Bloch wrote:
->> Apply parsed devlink_eswitch_mode= defaults after devlink registration
->> and after successful reload.
->>
->> devl_register() may still be called before the device is ready for an
->> eswitch mode change, so keep a per-devlink delayed work item and pending
->> flag for the registration path. Registration queues the work, and the
->> worker tries to take the devlink instance lock.
->>
->> If the lock is busy, the worker requeues itself with a delay.
->>
->> For successful reloads that performed DRIVER_REINIT, devlink_reload()
->> already holds the devlink instance lock and the driver has completed
->> reload_up(). Clear pending work and apply the default directly from the
->> reload path instead of queueing work.
->>
->> If a user sets eswitch mode through netlink before the pending
->> registration work runs, clear the pending flag so the queued default does
->> not override that user request. Cancel pending default apply work when
->> freeing the devlink instance.
->>
->> Signed-off-by: Mark Bloch <mbloch@nvidia.com>
->> ---
->>  net/devlink/core.c          | 198 +++++++++++++++++++++++++++++++-----
->>  net/devlink/dev.c           |   6 ++
->>  net/devlink/devl_internal.h |   5 +
->>  3 files changed, 182 insertions(+), 27 deletions(-)
->>
->> diff --git a/net/devlink/core.c b/net/devlink/core.c
->> index 5126509a9c4e..998e4ffd5dce 100644
->> --- a/net/devlink/core.c
->> +++ b/net/devlink/core.c
->> @@ -5,6 +5,7 @@
->>   */
->>  
->>  #include <linux/init.h>
->> +#include <linux/jiffies.h>
->>  #include <linux/list.h>
->>  #include <linux/slab.h>
->>  #include <linux/string.h>
->> @@ -22,8 +23,12 @@ DEFINE_XARRAY_FLAGS(devlinks, XA_FLAGS_ALLOC);
->>  
->>  static char *devlink_default_esw_mode_param;
->>  static bool devlink_default_esw_mode_match_all;
->> +static bool devlink_default_esw_mode_enabled;
->>  static enum devlink_eswitch_mode devlink_default_esw_mode;
->>  static LIST_HEAD(devlink_default_esw_mode_nodes);
->> +static struct workqueue_struct *devlink_default_esw_mode_wq;
->> +
->> +#define DEVLINK_DEFAULT_ESW_MODE_APPLY_DELAY msecs_to_jiffies(100)
->>  
->>  struct devlink_default_esw_mode_node {
->>  	struct list_head list;
->> @@ -166,6 +171,7 @@ static void __init devlink_default_esw_mode_nodes_clear(void)
->>  	}
->>  
->>  	devlink_default_esw_mode_match_all = false;
->> +	devlink_default_esw_mode_enabled = false;
->>  }
->>  
->>  static int __init devlink_default_esw_mode_parse(char *str)
->> @@ -192,14 +198,113 @@ static int __init devlink_default_esw_mode_parse(char *str)
->>  		return err;
->>  
->>  	err = devlink_default_esw_mode_handles_parse(handles);
->> -	if (err)
->> +	if (err) {
->>  		devlink_default_esw_mode_nodes_clear();
->> -	else
->> +	} else {
->>  		devlink_default_esw_mode = esw_mode;
->> +		devlink_default_esw_mode_enabled = true;
->> +	}
->>  
->>  	return err;
->>  }
->>  
->> +static bool devlink_default_esw_mode_match(struct devlink *devlink)
->> +{
->> +	const char *bus_name = devlink_bus_name(devlink);
->> +	const char *dev_name = devlink_dev_name(devlink);
->> +	struct devlink_default_esw_mode_node *node;
->> +
->> +	if (devlink_default_esw_mode_match_all)
->> +		return true;
->> +
->> +	node = devlink_default_esw_mode_node_find(bus_name, dev_name);
->> +	return !!node;
->> +}
->> +
->> +void devlink_default_esw_mode_apply(struct devlink *devlink)
->> +{
->> +	const struct devlink_ops *ops = devlink->ops;
->> +	int err;
->> +
->> +	devl_assert_locked(devlink);
->> +
->> +	if (!devlink_default_esw_mode_match(devlink))
->> +		return;
->> +
->> +	if (!ops->eswitch_mode_set) {
->> +		if (!devlink_default_esw_mode_match_all)
->> +			devl_warn(devlink,
->> +				  "devlink_eswitch_mode= selected this device but eswitch mode setting is not supported\n");
-> 
-> Not a very strong opinion on my side, but I *think* it would be more
-> consistent to emit this warning even for devlink_default_esw_mode_match_all
-> 
-
-I kept it only for the explicit handle case intentionally.
-
-With "*" most devlink instances are not expected
-to support eswitch mode. In the current tree I see 9 drivers 
-that do, and many more devlink users without it.
-
-So warning for every unsupported instance in the "*" case would be noisy
-and would look like errors for devices this knob was never meant for.
-
-Mark
-
-> /P
-> 
-
+On Fri, Jul 3, 2026 at 9:38=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Thu, Jul 02, 2026 at 04:50:45PM -0700, Rosen Penev wrote:
+> > devm_request_irq() is a managed resource: the IRQ is not freed until
+> > devres_release_all() runs after the probe function returns.  In the
+> > probe error path, free_netdev(mal->dummy_dev) and dcr_unmap() execute
+> > while the IRQ is still live.  If the shared IRQ fires during cleanup,
+> > the handler accesses unmapped DCR registers (crash) or the already-
+> > freed dummy_dev (use-after-free).
+> >
+> > Switch to plain request_irq() with per-IRQ error labels that tear down
+> > only the IRQs that were successfully registered, and add the matching
+> > free_irq() calls in mal_remove().
+> >
+> > Fixes: 14f59154ff0b ("net: ibm: emac: mal: use devm for request_irq")
+> > Assisted-by: opencode:big-pickle
+> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
+>
+> You seemed to of sent the same patch within 24 hours. Please don't do
+> that.
+Yeah local error. Sent within a few seconds of each other.
+>
+> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+>
+> Send a self NACK to the broken version, wait 24 hours, and send v2.
+>
+>     Andrew
+>
+> ---
+> pw-bot: cr
 
