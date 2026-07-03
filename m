@@ -1,208 +1,150 @@
-Return-Path: <netdev+bounces-304635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304636-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id AgF2Nmn2R2qliAAAu9opvQ
-	(envelope-from <netdev+bounces-304635-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 19:50:33 +0200
+	id mPtDFH32R2qoiAAAu9opvQ
+	(envelope-from <netdev+bounces-304636-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 19:50:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAE13704B61
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 19:50:32 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEAAF704B6C
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 19:50:52 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ssi.bg header.s=ssi header.b=jxTfnnh7;
-	dmarc=pass (policy=reject) header.from=ssi.bg;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304635-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-304635-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Lu5Zs+90;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304636-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-304636-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 083DD300E146
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 17:50:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4FF4F30363EA
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 17:50:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F27B3002B9;
-	Fri,  3 Jul 2026 17:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6D763016F7;
+	Fri,  3 Jul 2026 17:50:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62D02E65D;
-	Fri,  3 Jul 2026 17:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC46A2E65D;
+	Fri,  3 Jul 2026 17:50:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783101027; cv=none; b=XEvD7hj/iTGeNY4nogT85RQPIW9praHVqext8V1N0GYcilzr0KbSrOLyuAQNIZZUUL+oKYWOT8JqLkAs5L+Z86CrszZFo+fYPLPB+YEpKOFuBB8JV2I9ZPF6k0WfuXUEAjfD/ZbEAQGhKOrkNnVuAJx5NssAKXxARlEUjI5lMyU=
+	t=1783101037; cv=none; b=cY7Wm/lJA5LlBEp5k/VBNzp3C0qFbYWuZXnlTH8VkanxhCbe+pSaVhmz9I8ZF1rzbjmMf6kSZbfUFuVo9tjRRWvMU75JnlSTcAruJD2QthVYGCXcS8fWNw635xFhpB8E0pAxAi4+4decuCFDxyY24+i1WyCVCbAJHJ+uwVw9rI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783101027; c=relaxed/simple;
-	bh=XNY10VlSAsNcW1UZpUqX2cHR5kCif4Qb1vkXpzOQomw=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=tqQmtQ4BThYexS2KFNkjJwmdPyfGIS6pST25EclVq/pDE7iqlBubEtSA6ZpmNi75/FXsrt1Eu+GXTN+j9kDZsMMWU7icVTuQpz9tk0QnSTY8Ob9kfXXDrngzPRKlyD3sOwxEpYe3lHrk6y3CMY6CIZ/et2miPurLsMfZ+Zc/7KY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=jxTfnnh7; arc=none smtp.client-ip=193.238.174.39
-Received: from mx.ssi.bg (localhost [127.0.0.1])
-	by mx.ssi.bg (Potsfix) with ESMTP id C0CD021062;
-	Fri, 03 Jul 2026 20:50:11 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
-	:content-type:content-type:date:from:from:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
-	 bh=WzUixPFbnBAwfBwijwe0GaTTubztee6+Drj+wooRJdA=; b=jxTfnnh76xjr
-	aTxkpERuVP4FjWj1xGm00BrtDKlzMep6sHu6bqyQhN68SiZIbjXB9FRCsbXZMV5u
-	KfMsydBNhmVfvJd3YGCX059Em7krOwEf6Y6azhDxYkDPXvrKDjDlC/saeEUp0e+n
-	UIbNpEb0bD1iRHSntCJqQE1PFd1WR/ENULNfRSRwazYZ9BjTU6IvwLVadX/qHEB8
-	Ojy/Ero2/KI+T+pHLoseW41HN5LWUHkqWR1RTeKhgp/9zjLUMo0vQON0aUtH8I/b
-	3WbW+K2SbMv1zZYf6bR7fbPBmwf8H8pic/MrYPOJn+hdAEadA4/iVDQyj0wepoPn
-	KkL0ma7gsWTJGmlubUxgAukSO/fLI9Zg1cDn+n9Fu71mzTwPSVcveCExSZnGuJPE
-	NOfkFsbEQ7IotvNb+jSK1cgWFSuAT221DgGJYxtuKLpGjpeJ8DSl0B8ZI3QOgu8O
-	nHOILMsMK2QmGpwjiMG3SDLiaywLJXP4FNFoUlBi7XWdT0LcsUj6RoLGwoZHWMfY
-	rhPfr/s4F5+r3vuraBBlG9oz91XDJZO8rjrl8jIRnRYNlpGeG2sbQHmFbYIz5gQV
-	of1zKd5o1CCW156HBn+I5MwTA3xGUDtI4TykSRpL0awUlt1boSHbiB7Q9qvdrskh
-	xh7BG7Zy9hVupybyGLxriD7ayxiHSrY=
-Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
-	by mx.ssi.bg (Potsfix) with ESMTPS;
-	Fri, 03 Jul 2026 20:50:11 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by box.ssi.bg (Potsfix) with ESMTPSA id 680506008D;
-	Fri,  3 Jul 2026 20:50:11 +0300 (EEST)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.2/8.18.2) with ESMTP id 663HntcL065717;
-	Fri, 3 Jul 2026 20:49:56 +0300
-Date: Fri, 3 Jul 2026 20:49:55 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: Ismael Luceno <iluceno@suse.de>
-cc: linux-kernel@vger.kernel.org, Marco Crivellari <marco.crivellari@suse.com>,
-        Tejun Heo <tj@kernel.org>, Simon Horman <horms@verge.net.au>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "open list:IPVS" <netdev@vger.kernel.org>,
-        "open list:IPVS" <lvs-devel@vger.kernel.org>,
-        "open list:NETFILTER" <netfilter-devel@vger.kernel.org>,
-        "open list:NETFILTER" <coreteam@netfilter.org>
-Subject: Re: [PATCH v2 nf-next] ipvs: Move defense_work and est_reload_work
- to system_dfl_long_wq
-In-Reply-To: <20260702101100.24256-2-iluceno@suse.de>
-Message-ID: <c55ca48c-1f38-7f59-1ea8-632177079dcf@ssi.bg>
-References: <20260702101100.24256-2-iluceno@suse.de>
+	s=arc-20240116; t=1783101037; c=relaxed/simple;
+	bh=e8ROssInUC8cAOJY8FlT/EeEUg67NelAmFdP67IdmDs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=nYSU5BYc4fVPMurFzrp+lyJ2KProL2stKgtpSF7RbD7/dRjx7K+29qU0gKVZPs5sk/SfysZUlsa8oS0IWGQGEtDDirGZ5By/cGU45ek5XKdMlAr1PLRGH81d5rfTZLNddBZMB+nlQIitUtw8MRrctB5tJrMmf9ZM0zX3rzU4dBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lu5Zs+90; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 948ED1F000E9;
+	Fri,  3 Jul 2026 17:50:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783101036;
+	bh=UXY9f3144yNMxxvr45Rv9SY5qq28xWdbWONKKiDTI6k=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=Lu5Zs+90zQqRAiiStB3tbMWNOBMfwPFbftC3XLW2PE2d284cP7XMWKQJCbejHqTEG
+	 /iQ1Soxz9zrzPx63M4CogMR2ev+mBTWWcYJXbUbg4vigROn9zu3NluaPU4C7OwAqLY
+	 HZ7O42NZMawqr7kPhalT+/TRTQ1MgAoi7Em4xVw2RYtMuAhtc7IVPwqRhEPVNIkgQN
+	 HxMe2TWQLLqlzqRBL7XTPsJbqKV146rFZla2yKDVY7cn+YarnP4+jC74RFBI31ROm9
+	 1ZjxiriQ+Y/MwwEqW7tu/9xkOW78T8sp7vyogbwKJ3OF0p2+mPtRoQ/w0BfuGM+6JW
+	 gvtpG6pG3Fdnw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 19CE3393935A;
+	Fri,  3 Jul 2026 17:50:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net V4 0/3] net/mlx5e: Fix crashes in dynamic per-channel
+ stats and HV VHCA agent
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178310101889.3259859.10475454048684619212.git-patchwork-notify@kernel.org>
+Date: Fri, 03 Jul 2026 17:50:18 +0000
+References: <20260630115151.729219-1-tariqt@nvidia.com>
+In-Reply-To: <20260630115151.729219-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ cratiu@nvidia.com, eranbe@nvidia.com, feliu@nvidia.com,
+ haiyangz@microsoft.com, lkayal@nvidia.com, leon@kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, mbloch@nvidia.com,
+ noren@nvidia.com, saeedm@nvidia.com, gal@nvidia.com, alazar@nvidia.com,
+ horms@kernel.org, cjubran@nvidia.com, kees@kernel.org, eranbe@mellanox.com,
+ saeedm@mellanox.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304635-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304636-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:iluceno@suse.de,m:linux-kernel@vger.kernel.org,m:marco.crivellari@suse.com,m:tj@kernel.org,m:horms@verge.net.au,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:lvs-devel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,s:lists@lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,vger.kernel.org:from_smtp,suse.de:email,ssi.bg:from_mime,ssi.bg:email,ssi.bg:mid,ssi.bg:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
-	FORGED_SENDER(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	DKIM_TRACE(0.00)[ssi.bg:+];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	FORGED_RECIPIENTS(0.00)[m:tariqt@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:cratiu@nvidia.com,m:eranbe@nvidia.com,m:feliu@nvidia.com,m:haiyangz@microsoft.com,m:lkayal@nvidia.com,m:leon@kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:mbloch@nvidia.com,m:noren@nvidia.com,m:saeedm@nvidia.com,m:gal@nvidia.com,m:alazar@nvidia.com,m:horms@kernel.org,m:cjubran@nvidia.com,m:kees@kernel.org,m:eranbe@mellanox.com,m:saeedm@mellanox.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FROM_NO_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CAE13704B61
+X-Rspamd-Queue-Id: CEAAF704B6C
 
+Hello:
 
-	Hello,
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On Thu, 2 Jul 2026, Ismael Luceno wrote:
-
-> Under synflood conditions binding these handlers to system_long_wq may
-> pin them to a saturated CPU.
+On Tue, 30 Jun 2026 14:51:48 +0300 you wrote:
+> Hi,
 > 
-> We've observed improved throughtput on a DPDK/VPP application with this
-> change, which we attribute to the reduced context switching.
+> Since per-channel stats were converted to be allocated and published
+> lazily at first channel open in commit fa691d0c9c08 ("net/mlx5e:
+> Allocate per-channel stats dynamically at first usage"),
+> priv->channel_stats[] and priv->stats_nch are filled in
+> incrementally during interface bring-up. This opened a window in
+> which the various stats readers - most of them reachable from
+> userspace via netlink/netdev stats queries - can race with
+> mlx5e_open_channel() on another CPU and observe partially
+> initialized state. The HV VHCA stats agent, which is created
+> before the channels are opened, hits related problems of its own.
 > 
-> Neither handler has per-CPU data dependencies nor cache locality
-> requirements that would prevent this change.
-> 
-> Signed-off-by: Ismael Luceno <iluceno@suse.de>
+> [...]
 
-	Looks good to me, thanks!
+Here is the summary with links:
+  - [net,V4,1/3] net/mlx5e: Fix HV VHCA stats zero-sized buffer allocation
+    https://git.kernel.org/netdev/net/c/25f6b929c7e3
+  - [net,V4,2/3] net/mlx5e: Fix HV VHCA stats agent registration race
+    https://git.kernel.org/netdev/net/c/89b25b5f46f4
+  - [net,V4,3/3] net/mlx5e: Fix publication race for priv->channel_stats[]
+    https://git.kernel.org/netdev/net/c/5a799714e8ca
 
-Acked-by: Julian Anastasov <ja@ssi.bg>
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> ---
-> CC: Marco Crivellari <marco.crivellari@suse.com>
-> CC: Tejun Heo <tj@kernel.org>
-> 
-> Changes since v1:
-> * Rebased on nf-next
-> * Reworded commit message
-> 
->  net/netfilter/ipvs/ip_vs_ctl.c | 6 +++---
->  net/netfilter/ipvs/ip_vs_est.c | 2 +-
->  2 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
-> index bcf40b8c41cf..d7e669efab4d 100644
-> --- a/net/netfilter/ipvs/ip_vs_ctl.c
-> +++ b/net/netfilter/ipvs/ip_vs_ctl.c
-> @@ -235,7 +235,7 @@ #define DEFENSE_TIMER_PERIOD	1*HZ
->  	update_defense_level(ipvs);
->  	if (atomic_read(&ipvs->dropentry))
->  		ip_vs_random_dropentry(ipvs);
-> -	queue_delayed_work(system_long_wq, &ipvs->defense_work,
-> +	queue_delayed_work(system_dfl_long_wq, &ipvs->defense_work,
->  			   DEFENSE_TIMER_PERIOD);
->  }
->  #endif
-> @@ -290,7 +290,7 @@ #define DEFENSE_TIMER_PERIOD	1*HZ
->  	atomic_set(&ipvs->est_genid_done, genid);
->  
->  	if (repeat)
-> -		queue_delayed_work(system_long_wq, &ipvs->est_reload_work,
-> +		queue_delayed_work(system_dfl_long_wq, &ipvs->est_reload_work,
->  				   delay);
->  
->  unlock:
-> @@ -5126,7 +5126,7 @@ do_ip_vs_get_ctl(struct sock *sk, int cmd, void __user *user, int *len)
->  		goto err;
->  
->  	/* Schedule defense work */
-> -	queue_delayed_work(system_long_wq, &ipvs->defense_work,
-> +	queue_delayed_work(system_dfl_long_wq, &ipvs->defense_work,
->  			   DEFENSE_TIMER_PERIOD);
->  
->  	return 0;
-> diff --git a/net/netfilter/ipvs/ip_vs_est.c b/net/netfilter/ipvs/ip_vs_est.c
-> index ab09f5182951..78964aa861e9 100644
-> --- a/net/netfilter/ipvs/ip_vs_est.c
-> +++ b/net/netfilter/ipvs/ip_vs_est.c
-> @@ -243,7 +243,7 @@ #define pr_fmt(fmt) "IPVS: " fmt
->  	/* Bump the kthread configuration genid if stopping is requested */
->  	if (restart)
->  		atomic_inc(&ipvs->est_genid);
-> -	queue_delayed_work(system_long_wq, &ipvs->est_reload_work, 0);
-> +	queue_delayed_work(system_dfl_long_wq, &ipvs->est_reload_work, 0);
->  }
->  
->  /* Start kthread task with current configuration */
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
 
 
