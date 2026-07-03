@@ -1,205 +1,126 @@
-Return-Path: <netdev+bounces-304607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304608-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id orZBEoPmR2pJhQAAu9opvQ
-	(envelope-from <netdev+bounces-304607-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 18:42:43 +0200
+	id 9yYZE0zlR2rzhAAAu9opvQ
+	(envelope-from <netdev+bounces-304608-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 18:37:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AEF87045BC
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 18:42:42 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCB377044D9
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 18:37:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=mcn6H4pS;
-	dmarc=pass (policy=none) header.from=intel.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304607-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304607-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b="IG6/o3sA";
+	dmarc=pass (policy=none) header.from=debian.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304608-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-304608-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 70251301186A
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 16:36:41 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 84F313021776
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 16:36:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D712D6E5A;
-	Fri,  3 Jul 2026 16:36:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40EB0274658;
+	Fri,  3 Jul 2026 16:36:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E0C29E10F;
-	Fri,  3 Jul 2026 16:36:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEED42D6E5A;
+	Fri,  3 Jul 2026 16:36:51 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783096600; cv=none; b=CElqiXFyy1HvUhner/m0KvgBWydvzrCO7BbkmNXfTrfz6oWBWtqXGGB4bqiQi4HgPgRNdHw4i79gZmqViI33A6vtFqoD82+7C2W4FcKofWGDKspZRWEgjuqRbYPac+6j+rY76ne44y8FNHypP4zKg4TyncX6LAgRmkpL0FDW9Pc=
+	t=1783096613; cv=none; b=q2X/BCUQ3tyM0k/6HxJbNvmnYM6FxCJjs42rpDsL/CREJraVTfVdKMRbWpulR9YhkmMGIrcV3kDu74jkh9mRODS7xyNoArpBbwT8364JXkdW+sIN5Uw4hr1AjZ6n3bq+3ZCz4oWgK4Rp90GHAV9tqbsrIRlm1crEnqiilU12JX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783096600; c=relaxed/simple;
-	bh=29xT4vkcKmHxrTf6qx3zrNdyKkjGrMapqEpiRhALOy0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tWnN4LKP9RXZ1WzdwNJsOyBwHY3v0otPXDQ2lHGCH6PplDpfS58DCergNpPyvrMKjeN1lfImj1KvborgoyxEWcmCYPCXmWL4y/Od7Qur/qpoRV+v+mRmEUmGnrdPPsWrXVCcBIeeqt2FIIQvK4cUEP8Orl5EJCX1/C15AJoxXWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mcn6H4pS; arc=none smtp.client-ip=192.198.163.19
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1783096599; x=1814632599;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=29xT4vkcKmHxrTf6qx3zrNdyKkjGrMapqEpiRhALOy0=;
-  b=mcn6H4pSD43JCg4Uu0MY7xnSMDN9UuDyuPTrO1GNsl4nDAfReuIQ8ghY
-   gWK4DClv/CEX27uzvC9vBtQYUGq1OmfmRQRlTxYtopqOXD3fnSLYX3DpK
-   mFozm7j1gTcHPy+7DmFEDzLjsnJP23d1vznN8N1ungtDB/xRFBzJPMG4p
-   81RTXYb63ZKAt/NtJRgayqAKMWwc+sCGNndO88hftNyN57VLbf687a9k/
-   putLh02+92KWk8izEkwuQzn8IWbcuezsRzcQ42HrYqzEPPWjSrIEmGUep
-   t+8mszmz7O3wgusftKj5iDDAmAaAAnD7hHpI2n7ca+wwlKg1tSXXwxymJ
-   A==;
-X-CSE-ConnectionGUID: p0vOm+M4QjiCgu/fZl9+5A==
-X-CSE-MsgGUID: slRsOOnfSPeXvtgfO+TreQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11836"; a="82837555"
-X-IronPort-AV: E=Sophos;i="6.25,145,1779174000"; 
-   d="scan'208";a="82837555"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2026 09:36:38 -0700
-X-CSE-ConnectionGUID: kTgdviOcSVG9Z0ZrkPudPg==
-X-CSE-MsgGUID: +/9m0MYCTgq+9jyOZTWnQA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,145,1779174000"; 
-   d="scan'208";a="253283438"
-Received: from mszycik-mobl1.ger.corp.intel.com (HELO [10.245.114.103]) ([10.245.114.103])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2026 09:36:34 -0700
-Message-ID: <a0017c22-8885-4e2b-92d2-b5d876da725c@linux.intel.com>
-Date: Fri, 3 Jul 2026 18:36:31 +0200
+	s=arc-20240116; t=1783096613; c=relaxed/simple;
+	bh=9qdvugQqW/YvFxRkzkxJHKUoAeLRag7HTh/mZandEKs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kMAvxk46Ayebv/118qCI7yfqOQ8hSED7JluBHFIMt3fle0ThWZYR6+IwXOggxm0t/gBnMZoyxg5r5ZUBeGzVOeDF5dL5rnurlmIec8ZzeE7043wATpt77ZDQEzla/ftaxCpUw5ZeepMdNc4sM2l7PcsE11lQ4nTUByCsUTGJWgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=IG6/o3sA; arc=none smtp.client-ip=82.195.75.108
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=NaKbXiUjcXXEQM+KivlGkp7ACDkK1uRPQEC/3PlVlnw=; b=IG6/o3sAg3yzjuLyCkfgfMR5Pe
+	12axx2uV2uA1a8fj5Vc7VmTAmNxWHr6vf+BDctuuBfdPNPZjmMwbaC1IcMSzoQjWs7dtVdqguXzOV
+	ZPXf5211Mj8NjrsOm+9043eSQsILpIIf48FzcJ1KelsdT6EwYQ6lIrEdcdGIVWMf0+pVwH3K0ZPYk
+	/kuc2DoGcR2MRn1IDuHqOxk+riKR6LykMyowCwpC1Yfl/BHI6Zv627WPzfM8l9EUDFYmfiiwv4NX0
+	+CjdeAAW+bcrYrKvQMp6YPMJmRs/y5z4THETVHGO61Eb0/dOlWeaso2UCrBBnAoXnicxIOpM1LX4I
+	2X3YubxQ==;
+Received: from authenticated-user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1wfgsg-009XAY-0K;
+	Fri, 03 Jul 2026 16:36:46 +0000
+Date: Fri, 3 Jul 2026 09:36:42 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, 
+	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, stable@vger.kernel.org, 
+	zdi-disclosures@trendmicro.com
+Subject: Re: [PATCH ipsec] xfrm: espintcp: fix UAF during close
+Message-ID: <akfkd_1yI_G4cVoc@gmail.com>
+References: <50e2ab4348eb8177581058f0152394cfae6a8d27.1783071494.git.sd@queasysnail.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v3 2/2] ice: preserve uplink
- DFLT Rx rule on switchdev release
-To: Petr Oros <poros@redhat.com>, netdev@vger.kernel.org
-Cc: Ivan Vecera <ivecera@redhat.com>, Alice Michael
- <alice.michael@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org,
- Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Simon Horman <horms@kernel.org>,
- intel-wired-lan@lists.osuosl.org, Jacob Keller <jacob.e.keller@intel.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>
-References: <20260701133601.2118382-1-poros@redhat.com>
- <20260701133601.2118382-3-poros@redhat.com>
-Content-Language: en-US
-From: Marcin Szycik <marcin.szycik@linux.intel.com>
-In-Reply-To: <20260701133601.2118382-3-poros@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <50e2ab4348eb8177581058f0152394cfae6a8d27.1783071494.git.sd@queasysnail.net>
+X-Debian-User: leitao
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304607-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FORGED_SENDER(0.00)[marcin.szycik@linux.intel.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:poros@redhat.com,m:netdev@vger.kernel.org,m:ivecera@redhat.com,m:alice.michael@intel.com,m:przemyslaw.kitszel@intel.com,m:edumazet@google.com,m:linux-kernel@vger.kernel.org,m:martyna.szapar-mudlaw@linux.intel.com,m:andrew+netdev@lunn.ch,m:anthony.l.nguyen@intel.com,m:horms@kernel.org,m:intel-wired-lan@lists.osuosl.org,m:jacob.e.keller@intel.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:sd@queasysnail.net,m:netdev@vger.kernel.org,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:stable@vger.kernel.org,m:zdi-disclosures@trendmicro.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[leitao@debian.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304608-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marcin.szycik@linux.intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[debian.org:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:mid,linux.intel.com:from_mime,vger.kernel.org:from_smtp,intel.com:email,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8AEF87045BC
+X-Rspamd-Queue-Id: CCB377044D9
 
+Hello Sabrina,
 
+On Fri, Jul 03, 2026 at 04:21:12PM +0200, Sabrina Dubroca wrote:
+> diff --git a/net/xfrm/espintcp.c b/net/xfrm/espintcp.c
+> index 374e1b964438..f09b5dd85db8 100644
+> --- a/net/xfrm/espintcp.c
+> +++ b/net/xfrm/espintcp.c
+> @@ -517,6 +517,8 @@ static void espintcp_close(struct sock *sk, long timeout)
+>  	sk->sk_prot = &tcp_prot;
+>  	barrier();
+>  
+> +	synchronize_rcu();
 
-On 01.07.2026 15:36, Petr Oros wrote:
-> When the uplink PF is promiscuous, ice_vsi_sync_fltr() installs an
-> ICE_SW_LKUP_DFLT catch-all Rx rule on the uplink VSI. Entering switchdev
-> re-affirms it through the idempotent ice_set_dflt_vsi(), but
-> ice_eswitch_release_env() removed both the Rx and Tx DFLT rules
-> unconditionally on teardown. That clobbered a promisc-owned Rx rule: it
-> disappeared while IFF_PROMISC was still set and the sync path was not
-> retriggered, leaving the uplink without the catch-all the netdev
-> requested.
-> 
-> Skip the Rx DFLT removal when the uplink is promiscuous, both in
-> ice_eswitch_release_env() and the err_def_tx unwind of
-> ice_eswitch_setup_env(); the Tx leg, owned by switchdev, is still removed.
-> Test the live netdev->flags, the same value ena_rx_filtering() ->
-> ice_cfg_vlan_pruning() above already keys on, so the preserved rule and
-> the pruning state stay consistent, including for a promisc change made
-> while switchdev ran (which never reached the gated filter sync).
-> 
-> Fixes: 5c07be96d8b3 ("ice: Avoid setting default Rx VSI twice in switchdev setup")
-> Signed-off-by: Petr Oros <poros@redhat.com>
+I've got the impression netdev usually prefers synchronize_net() instead
+of synchornize_rcu(). Is there any reason for synchronize_net() not
+being used here?
 
-Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-
-> ---
-> v3:
-> - Corrected the Fixes tag from 1a1c40df2e80 ("ice: set and release
->   switchdev environment") to 5c07be96d8b3 ("ice: Avoid setting default
->   Rx VSI twice in switchdev setup"), the commit that made
->   ice_eswitch_setup_env() use the idempotent ice_set_dflt_vsi(); before
->   it a pre-existing promisc DFLT rule made setup fail with -EEXIST so the
->   release path was never reached. No code change.
-> 
-> v2: https://lore.kernel.org/all/20260622113428.2565255-3-poros@redhat.com/
-> v1: https://lore.kernel.org/all/deef5756e534ef06c12d910c5305d3fd205d30a0.1781786935.git.poros@redhat.com/
-> ---
->  drivers/net/ethernet/intel/ice/ice_eswitch.c | 18 ++++++++++++++----
->  1 file changed, 14 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-> index c30e27bbfe6e25..07e2016fb9481f 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-> @@ -66,8 +66,10 @@ static int ice_eswitch_setup_env(struct ice_pf *pf)
->  	ice_cfg_dflt_vsi(uplink_vsi->port_info, uplink_vsi->idx, false,
->  			 ICE_FLTR_TX);
->  err_def_tx:
-> -	ice_cfg_dflt_vsi(uplink_vsi->port_info, uplink_vsi->idx, false,
-> -			 ICE_FLTR_RX);
-> +	/* keep the Rx DFLT rule if the uplink is promiscuous (see release_env) */
-> +	if (!(uplink_vsi->netdev->flags & IFF_PROMISC))
-> +		ice_cfg_dflt_vsi(uplink_vsi->port_info, uplink_vsi->idx,
-> +				 false, ICE_FLTR_RX);
->  err_def_rx:
->  	ice_vsi_del_vlan_zero(uplink_vsi);
->  err_vlan_zero:
-> @@ -276,8 +278,16 @@ static void ice_eswitch_release_env(struct ice_pf *pf)
->  	vlan_ops->ena_rx_filtering(uplink_vsi);
->  	ice_cfg_dflt_vsi(uplink_vsi->port_info, uplink_vsi->idx, false,
->  			 ICE_FLTR_TX);
-> -	ice_cfg_dflt_vsi(uplink_vsi->port_info, uplink_vsi->idx, false,
-> -			 ICE_FLTR_RX);
-> +
-> +	/* Keep the Rx DFLT rule if the uplink is promiscuous; it must outlive
-> +	 * the session. Test the live netdev->flags, the same value
-> +	 * ena_rx_filtering() -> ice_cfg_vlan_pruning() above keys its decision
-> +	 * on, so the preserved DFLT rule and the pruning state stay consistent.
-> +	 */
-> +	if (!(uplink_vsi->netdev->flags & IFF_PROMISC))
-> +		ice_cfg_dflt_vsi(uplink_vsi->port_info, uplink_vsi->idx,
-> +				 false, ICE_FLTR_RX);
-> +
->  	ice_fltr_add_mac_and_broadcast(uplink_vsi,
->  				       uplink_vsi->port_info->mac.perm_addr,
->  				       ICE_FWD_TO_VSI);
-
+Also, given you have a explicit synchronize_rcu() here, should the
+barrier() above be dropped?
 
