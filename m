@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-304369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304370-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id UteLOFBaR2rmWgAAu9opvQ
-	(envelope-from <netdev+bounces-304369-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 08:44:32 +0200
+	id p0ftJHVaR2r9WgAAu9opvQ
+	(envelope-from <netdev+bounces-304370-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 08:45:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47E866FF2A2
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 08:44:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E07206FF2AB
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 08:45:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=padl.com header.s=default header.b=FS0XqQbE;
+	dkim=pass header.d=padl.com header.s=default header.b=IHdv5FzI;
 	dmarc=pass (policy=reject) header.from=padl.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304369-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304369-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304370-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304370-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 29A7B302D53C
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 06:43:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 36A0D3036636
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 06:43:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3A9838331D;
-	Fri,  3 Jul 2026 06:43:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14CBB3845BD;
+	Fri,  3 Jul 2026 06:43:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from us.padl.com (us.padl.com [216.154.215.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C5035E1A2;
-	Fri,  3 Jul 2026 06:43:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B2C37DEA4;
+	Fri,  3 Jul 2026 06:43:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783060993; cv=none; b=Eek+EAyZ+AYm0ODbWpVFIyfes7W3vWru+bMtHkxZfGMA+mvO3O/9AB0XsILQs3x/iTQaedpwI52IWHR8D6Xij21bOg8NqVuvJoL9dXPrimz9GAX/2xDUyO5URruvMpEKT70vdWoeZE4Iul+qhctASltNdpvbYZcbZHcYrmDr8EY=
+	t=1783060996; cv=none; b=sJbBK/wiscyQlm8MT5KmN2G3egvfvqCmDZf8m3mrUJYtwyLympWVb6kb4ODb6yQu8P9LMPet3WThAGajVrpqzs2roT1BCHjdYTqxvb3RWuhkVcffwm6Ra5fyjxzSZKhkxvgakSCr+n2ksR1PbqmuvLvn6D/tzU/OS9FleNWtDp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783060993; c=relaxed/simple;
-	bh=Kt5zJaj+PnfaguwPDZKUcMOpIkJM+xW/jEzTFJvjzow=;
+	s=arc-20240116; t=1783060996; c=relaxed/simple;
+	bh=c9uf0pu6UF7qvElQMOsdcLzQ5NtMp7huDoIEjoaG0Bo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Wa8wUSiJ1hIBkoez2gkpLIC3L8pJzUjN9ZE9aTI82cfz5GZCFl/P0yZwh0vvzz1G1geuoYGyl6QsZ3FEGuVPb4RSqZgX7u8Uw9tqEz4ZK2g7QrqHcMm0Bu7+rC87TePXzJde2Mt+Jl1z5/NLhALM5TdQ0QB+ZMw6RCNhNwFZLFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=FS0XqQbE; arc=none smtp.client-ip=216.154.215.154
+	 In-Reply-To:To:Cc; b=g6kyOE1iFHSORoUr/3SgAItF64kJPmxMgNI2KzI76ME0l3kTgibttuho4KP609mUzIco9k3HJUES2nt2lCpDVDs0nB8mtphUUrO8ASmUh+f33mqb4hfwUawq9Ys4thI1Ch/U2crifjQ/RtLBGvsLB65w0Z9LVr63VVg7wwv358w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=IHdv5FzI; arc=none smtp.client-ip=216.154.215.154
 Received: from [127.0.1.1] (border.lukktone.com [139.130.100.52])
-	by us.padl.com (Postfix) with ESMTPSA id E866D60D3C;
-	Fri,  3 Jul 2026 02:43:05 -0400 (EDT)
+	by us.padl.com (Postfix) with ESMTPSA id 1A27960D44;
+	Fri,  3 Jul 2026 02:43:09 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=padl.com; s=default;
-	t=1783060989; bh=Fd6rR34ZFWY1pXqW7f4KT/kNbZgfsgQgITd2aZ0VAwU=;
+	t=1783060993; bh=wqKtKtpaqZQnbkh9Y0smahooXHfeCJZ9/llRvSIvbDs=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=FS0XqQbE7RN1v1mqbt4C56Wrxk7E6D3hAPfcxUWDC90eUkR6wbJq4EFQF5kdLNqlC
-	 dLmCpigGWEE6Z9SHX34amXlNLu66DviSkZx7+SBg0oZaZHW/GizxBeiR1xSYF0dMOb
-	 A6U3twOb/LBl/yDUWG8SCGR4PZNjSFcHDcurkMdKC9pNGrmOR0ydIh39rCtlzgW/V3
-	 OVtuyhAB2G61VXiXHDBhAeKlrLL1rJgv5OrDepF4s0XBh6trlgY+8TH8cYZVM5Eggs
-	 Kgnqijk7A8h8PBiDf4tHz6vxghGj59sAxS4QkkGfTdRNUhyohjsvqtgVIx1EmmImOJ
-	 8uDbYsR/NOWQA==
+	b=IHdv5FzIzszmvNN7W/vnAL6OJReRlev2nb1SkXsPU0X4fyBvL8fxmOmmTqelsCHw7
+	 hGADFOaOYt3/dksEbdrt6RiBqu1cL+HKeEMOkL0CbJQrtZIB0B3e0cZ0Xk05fnQ8+C
+	 vLVzox86QAjWAx/ELG5/DjlT0R0G5WVKd/k+GaWXgs51UMIUoeD4DiUeSRRgcDzUxf
+	 Me5lacX+atnDsdJvrXyLptINQEKMUvq+mJPBbfPpYzIzvCdX9buYzQVVdCtRiUqmWH
+	 Ej9SuxSQP0HNfFhLlCXmJxozXYYoZj+ERlhsTDSF4qJziXNCCX7E/q6gbIHxB/GCgr
+	 koH72ekyv4vnw==
 From: Luke Howard <lukeh@padl.com>
-Date: Fri, 03 Jul 2026 16:42:55 +1000
-Subject: [PATCH net-next 1/2] net: dsa: mv88e6xxx: write the ATU FID
- register on 88E6141/88E6341
+Date: Fri, 03 Jul 2026 16:42:56 +1000
+Subject: [PATCH net-next 2/2] net: dsa: mv88e6xxx: use direct ATU hash on
+ 88E6141/6341
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,7 +58,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260703-mv88e6x41-fixes-v1-1-fbd3a1bf8965@padl.com>
+Message-Id: <20260703-mv88e6x41-fixes-v1-2-fbd3a1bf8965@padl.com>
 References: <20260703-mv88e6x41-fixes-v1-0-fbd3a1bf8965@padl.com>
 In-Reply-To: <20260703-mv88e6x41-fixes-v1-0-fbd3a1bf8965@padl.com>
 To: Vladimir Oltean <olteanv@gmail.com>, 
@@ -73,11 +73,11 @@ Cc: Cedric Jehasse <cedric.jehasse@gmail.com>,
  Simon Gapp <simon.gapp@gapp-audio.com>, netdev@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Luke Howard <lukeh@padl.com>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1783060981; l=2859;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1783060981; l=2155;
  i=lukeh@padl.com; s=20260701; h=from:subject:message-id;
- bh=Kt5zJaj+PnfaguwPDZKUcMOpIkJM+xW/jEzTFJvjzow=;
- b=1vuifhAxmwEH/o/uEXswqvULZoXcFti7e7jfkIZWOmKXzkTguU01cXqWgQRcV6+LjCyk0WH/t
- bHrspaUGvF2DEYpamezvBFuoH36VJWCiM0ICksunVPo1sVCElueEv8+
+ bh=c9uf0pu6UF7qvElQMOsdcLzQ5NtMp7huDoIEjoaG0Bo=;
+ b=yUdQrAaCqsYXsjTYMNIxCCsTJ35y3DNAxYbZlYuskAQSv2FLRnpjjnBCdWcAxCIgP4PrkXvem
+ cOn6uU76plhBHRlpX1gApRastUKji9LG6E2iJfkJGqVd17ZOdA/9uij
 X-Developer-Key: i=lukeh@padl.com; a=ed25519;
  pk=D6YgUnH9/OzSZsduYm9XDbvXn1IHDwKwI1hLTsKNRLw=
 X-Rspamd-Action: no action
@@ -86,17 +86,17 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[padl.com,reject];
 	R_DKIM_ALLOW(-0.20)[padl.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304369-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:vivien.didelot@gmail.com,m:gregory.clement@bootlin.com,m:andrew@lunn.ch,m:cedric.jehasse@gmail.com,m:kieran@sienda.com,m:mh@rme-audio.de,m:max@huntershome.org,m:christoph.mellauner@joyned.at,m:simon.gapp@gapp-audio.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:lukeh@padl.com,m:viviendidelot@gmail.com,m:cedricjehasse@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304370-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,lunn.ch];
 	FORGED_SENDER(0.00)[lukeh@padl.com,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:vivien.didelot@gmail.com,m:gregory.clement@bootlin.com,m:andrew@lunn.ch,m:cedric.jehasse@gmail.com,m:kieran@sienda.com,m:mh@rme-audio.de,m:max@huntershome.org,m:christoph.mellauner@joyned.at,m:simon.gapp@gapp-audio.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:lukeh@padl.com,m:viviendidelot@gmail.com,m:cedricjehasse@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -112,82 +112,67 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,padl.com:from_mime,padl.com:email,padl.com:mid,padl.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 47E866FF2A2
+X-Rspamd-Queue-Id: E07206FF2AB
 
-The existing code assumed the 88E6141/88E6341 did not have a dedicated
-ATU FID register because of its database count (256), instead taking
-the legacy path which resulted in the FID register never being set.
+The default 88E6341/88E6141 ATU hash algorithm appears to result
+in frequent collisions, evicting permanent registrations (including
+the broadcast address) out of the ATU.
 
-This resulted in every FDB entry being loaded into FID 0, breaking
-VLAN aware bridging.
+This workaround disables hasing in the ATU control register. It may
+have a performance impact (the data sheet notes this is for testing
+only), but it also enables correctness, at least in local testing.
 
-Fixes: a75961d0ebfd ("net: dsa: mv88e6xxx: Add support for ethernet switch 88E6341")
 Assisted-by: Claude:claude-opus-4-8
 Signed-off-by: Luke Howard <lukeh@padl.com>
 ---
- drivers/net/dsa/mv88e6xxx/chip.c        | 2 ++
- drivers/net/dsa/mv88e6xxx/chip.h        | 1 +
- drivers/net/dsa/mv88e6xxx/global1_atu.c | 4 ++--
- 3 files changed, 5 insertions(+), 2 deletions(-)
+ drivers/net/dsa/mv88e6xxx/chip.c    | 12 ++++++++++++
+ drivers/net/dsa/mv88e6xxx/global1.h |  6 +++++-
+ 2 files changed, 17 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 80b877c74513d..60d46680fb50e 100644
+index 60d46680fb50e..53ed2b9e30979 100644
 --- a/drivers/net/dsa/mv88e6xxx/chip.c
 +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -5863,6 +5863,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.family = MV88E6XXX_FAMILY_6341,
- 		.name = "Marvell 88E6141",
- 		.num_databases = 256,
-+		.atu_fid_reg = true,
- 		.num_macs = 2048,
- 		.num_ports = 6,
- 		.num_internal_phys = 5,
-@@ -6350,6 +6351,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.family = MV88E6XXX_FAMILY_6341,
- 		.name = "Marvell 88E6341",
- 		.num_databases = 256,
-+		.atu_fid_reg = true,
- 		.num_macs = 2048,
- 		.num_internal_phys = 5,
- 		.num_ports = 6,
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
-index e966e7c4cc5de..9f23d2a7165f0 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.h
-+++ b/drivers/net/dsa/mv88e6xxx/chip.h
-@@ -131,6 +131,7 @@ struct mv88e6xxx_info {
- 	u16 prod_num;
- 	const char *name;
- 	unsigned int num_databases;
-+	bool atu_fid_reg;
- 	unsigned int num_macs;
- 	unsigned int num_ports;
- 	unsigned int num_internal_phys;
-diff --git a/drivers/net/dsa/mv88e6xxx/global1_atu.c b/drivers/net/dsa/mv88e6xxx/global1_atu.c
-index c47f068f56b32..aa5adc78607ca 100644
---- a/drivers/net/dsa/mv88e6xxx/global1_atu.c
-+++ b/drivers/net/dsa/mv88e6xxx/global1_atu.c
-@@ -135,7 +135,7 @@ static int mv88e6xxx_g1_atu_op(struct mv88e6xxx_chip *chip, u16 fid, u16 op)
+@@ -1699,6 +1699,18 @@ static int mv88e6xxx_atu_setup(struct mv88e6xxx_chip *chip)
+ {
  	int err;
  
- 	/* FID bits are dispatched all around gradually as more are supported */
--	if (mv88e6xxx_num_databases(chip) > 256) {
-+	if (mv88e6xxx_num_databases(chip) > 256 || chip->info->atu_fid_reg) {
- 		err = mv88e6xxx_g1_atu_fid_write(chip, fid);
- 		if (err)
- 			return err;
-@@ -179,7 +179,7 @@ static int mv88e6xxx_g1_atu_fid_read(struct mv88e6xxx_chip *chip, u16 *fid)
- 	u16 val = 0, upper = 0, op = 0;
- 	int err = -EOPNOTSUPP;
++	/* Avoid collisions on the 6341 family by disabling hashing. */
++	if (chip->info->family == MV88E6XXX_FAMILY_6341 &&
++	    chip->info->ops->atu_set_hash) {
++		u8 hash = MV88E6161_G1_ATU_CTL_HASH_DIRECT;
++
++		err = chip->info->ops->atu_set_hash(chip, hash);
++		if (err)
++			return err;
++
++		dev_info(chip->dev, "ATU hash mode set to 0x%x\n", hash);
++	}
++
+ 	err = mv88e6xxx_g1_atu_flush(chip, 0, true);
+ 	if (err)
+ 		return err;
+diff --git a/drivers/net/dsa/mv88e6xxx/global1.h b/drivers/net/dsa/mv88e6xxx/global1.h
+index 3dbb7a1b8fe11..e2a54eac64832 100644
+--- a/drivers/net/dsa/mv88e6xxx/global1.h
++++ b/drivers/net/dsa/mv88e6xxx/global1.h
+@@ -112,7 +112,11 @@
+ /* Offset 0x0A: ATU Control Register */
+ #define MV88E6XXX_G1_ATU_CTL		0x0a
+ #define MV88E6XXX_G1_ATU_CTL_LEARN2ALL	0x0008
+-#define MV88E6161_G1_ATU_CTL_HASH_MASK	0x0003
++#define MV88E6161_G1_ATU_CTL_HASH_MASK		0x0003
++#define MV88E6161_G1_ATU_CTL_HASH_RESERVED_0	0x0000
++#define MV88E6161_G1_ATU_CTL_HASH_DEFAULT	0x0001
++#define MV88E6161_G1_ATU_CTL_HASH_RESERVED_1	0x0002
++#define MV88E6161_G1_ATU_CTL_HASH_DIRECT	0x0003
  
--	if (mv88e6xxx_num_databases(chip) > 256) {
-+	if (mv88e6xxx_num_databases(chip) > 256 || chip->info->atu_fid_reg) {
- 		err = mv88e6xxx_g1_read(chip, MV88E6352_G1_ATU_FID, &val);
- 		val &= 0xfff;
- 		if (err)
+ /* Offset 0x0B: ATU Operation Register */
+ #define MV88E6XXX_G1_ATU_OP				0x0b
 
 -- 
 2.43.0
