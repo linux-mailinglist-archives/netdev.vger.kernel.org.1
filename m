@@ -1,93 +1,94 @@
-Return-Path: <netdev+bounces-304453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304454-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lzezKPB4R2pOYwAAu9opvQ
-	(envelope-from <netdev+bounces-304453-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 10:55:12 +0200
+	id oYGVCQN6R2rQYwAAu9opvQ
+	(envelope-from <netdev+bounces-304454-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 10:59:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0ACA700534
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 10:55:11 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 213D67005E5
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 10:59:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Di6ZMyIH;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=fkr5j0Jw;
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304453-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304453-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304454-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-304454-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F011930477F5
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 08:39:00 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 691DB30AE0D2
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 08:43:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2734E33A9DA;
-	Fri,  3 Jul 2026 08:39:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C77376BF4;
+	Fri,  3 Jul 2026 08:43:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F2633D6C0
-	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 08:38:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B17B376A1C
+	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 08:43:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783067940; cv=none; b=nuylgvYHQxzdoVSlDQNIofjBSiwSNWFARl3zyydWvtigQg/QwzgU3A/0koY+nUJjPlqkJwbaKb+H02CYp5tUMq8Wv1EXiJSWz2kLlb1PePHbPyK0Gg3Vn9qHAyAKqxzKUZqtaqWmKCh9paBcuXoOyToRdY/IzjRDSsXtr8+Ds5Y=
+	t=1783068208; cv=none; b=ABgXGUeJULYZ51k1HbBNsrFf6K6IWqm/JWWPssOLJs8qLbsD8M4VrgNUREbgDI0ymE+ctFgn/jkkBFYLqz9wqbG9PdcjP/uXHMj/pxCpGgHtNlZa2BaMPO+4RUTR1I0Ivc4CkuYAdhuRrJ5uy+CezRPPEIEmBdhSU6eszalSXfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783067940; c=relaxed/simple;
-	bh=2Mw4C8cP0ikdSYP87ULxE42c8XBOd2yv7kzUvLAoAOs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KjUL3sCMgJ64gNNKmdeg+1xuDni0KUtDP5Gz4fkewKZxywl1ZdNVrE5W2ZcaVC5tupx1RCGRGdZLAUEcasHlfvZOmubj9DVj1kFUjgadEQFz2Lq63hpfFhVmsX+t1S08e9rVtbVfGUkZOt+5/fz6VbPkDVXGKPNoBJPN8SgY3d8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Di6ZMyIH; arc=none smtp.client-ip=209.85.214.175
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2cace7da66eso2874105ad.0
-        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 01:38:58 -0700 (PDT)
+	s=arc-20240116; t=1783068208; c=relaxed/simple;
+	bh=vHupzGcfiJvpM/I9iEn7dBod4dqnm3lOVYkDwrDCc3M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GyMmEDFNtnA+PTE4siGdzYErErQrVECuT0zw6IaHy6fFyZLsFut8UIPj6rVfoJkFHdWPbYBoGGPe3/B2ZvzZ1W8SLcsr1maXT7pAKviREsbbinvzynXsqPTQgEazMwSIvlzc5uvTFhHklQydLWpsLDDmkDj46x2Kckj0ZO2+fIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fkr5j0Jw; arc=none smtp.client-ip=209.85.214.176
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2c9ed0c7fc7so4441785ad.1
+        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 01:43:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783067938; x=1783672738; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783068206; x=1783673006; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=S9S390maFuLWYl6z3JcBWyDaB6H00jCR0tOf9HccGvs=;
-        b=Di6ZMyIH8ltZYvdBkB8JanOcWS5t64BqqK1pGO7MhaI30a7OkWCZbuwU9H0EM8wUXq
-         zX7Hsg3p1l+RYBkuOf91Q13Z3I7q2Z6hbyov7Yw66YELd05K6gFH2KJLr2e9cjZYPa0/
-         AkNTpGRSbpRftEa2ixMQCaagKvcXTmvj35M/iW9YZyjxHsMXeRNLjI5LoqwAuNyGbQmC
-         gkpPGbiRYDlKZMx0TEHRBdwsudeGzXp3JFAiVQw2BBCVrf+SWFdc7w/u9QVBlRgKehrA
-         16b56Ec/PX1ty+VM3NFT34HSGBPoBQrhd6c9gqGcpXv6GlV3nIdvtkxwKda6nc/AYdOm
-         WS8g==
+        bh=5VXURkCEYViaWPT/JzQ/mNL6thE51vnZMEoFTaUOdy0=;
+        b=fkr5j0Jw4bAqLFQ4oevXfjtRffjV6JhbCix3WnFQgM33EtEgcMZzg6pAnUWnLf7gqV
+         MggvdpzAf8lBHCzSCB/Vvh1fcuJdXigTJnPTXsL0CQFURfcHsmrTK8gMEMpblyKwLDX6
+         T3nhFN4SJj3ycetVejclRtK2oph54cmMsuYyQ8LhGsZBzoGcooLUq41OG0GKNt866Lak
+         gO8ep66BOTxZ4semVOTvob7COkPYxG8o8A84wB5OlGA5iA7if+bEn7l0Ka0OcwGabVuI
+         3iX/LW5FLPCd4+n8iBayLTuREBaq4d2LwapdVEBNHkr+TqaYjZ28xcGnNnO75l4Xl1cY
+         Rzwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783067938; x=1783672738;
+        d=1e100.net; s=20251104; t=1783068206; x=1783673006;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=S9S390maFuLWYl6z3JcBWyDaB6H00jCR0tOf9HccGvs=;
-        b=ScaURC/9tgoI+1cn2Ssl2Il9a2VVYRIHdyZ/c6ZrkP8s7X/v5SRBmia8bNwXtNmzyh
-         /t2qdbuhPnozs5h4NHdRbS9wNpnCdbzUOPFtF5Pr46MsiMpxAiJ1EyK+psQGdcPEBdYt
-         47dy6/a0FYV6ufccR8C46fFb23FqMuF2wBWIOPzYe5/UcM7yL9GOFYILEo50DiPKSqyl
-         KffEIUdFBH/DJmWVoog76loA0ct4zQiQ1iPDbMrt2wN9EPkuMmhBOPETHNn8R0wfdOmW
-         WLDI972eE9L7FQhgFRvPXGlkq17vrf9Q5C0tp2i1+mKsOK+oms3Qts0oHWvuaDGC/gHa
-         Q73g==
-X-Gm-Message-State: AOJu0YwELlFVuJaStSdYktOJHLXoU+fx920BMA7P0AEVopU4HJUytdNE
-	KYezkmcJyd/jtbylWm5S1b+LDJvrwQCiN9uk4k5KikKak/msLFs9Cx0k9RYxm7G1
-X-Gm-Gg: AfdE7ckD6MwoEf5o9p0+Xt3pLeJ+HDiDMn2J16b6TiL1IjKPJg3drBobB22/98xWhnZ
-	3yy0hbYqgWEYo94sbdOZ2EH1YOkHA1pzacxfoKLygUEsMVXAvuHDj8pcBXuypto2Sngyj0KuLUh
-	4XsnfbYEL0ozAvnDACp7GKw0a8dt4p6fIjUD/8Ou9Hugew/++pcw3fiB0jNnp0S4NaXCLD+dfkB
-	1gsTWwLIL+0DGxXjQ4MAM0xnLtBPlMS42vYg2Zn3sVcWm1GbX9JJtEkWipVnfI+jqRhIfJFlCey
-	6ba3oYcLsRAMA+pHbLfp1T5PDD6GkgEdmoZKZXGsh3MHUFOujIS8KKW/tlaZJXjSJAhHuV52OPQ
-	Q2DCLnbfJTNCZsDh+lpIVYBAUkfPvvcUPbDtvYNTl84KCxcjDe1vmBlygo9wUUdXusPEzH+rRao
-	yt+ptrSNdMDJstj5MR7r0fW3hg
-X-Received: by 2002:a17:902:ef07:b0:2c9:b1ed:eb5d with SMTP id d9443c01a7336-2ca7e8ebde3mr113691185ad.47.1783067937746;
-        Fri, 03 Jul 2026 01:38:57 -0700 (PDT)
-Received: from ancienth-X870E-Nova-WiFi ([125.186.72.2])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cad6f23061sm5954145ad.5.2026.07.03.01.38.54
+        bh=5VXURkCEYViaWPT/JzQ/mNL6thE51vnZMEoFTaUOdy0=;
+        b=Y2HdYVudW+t6bDeh7vLkwZqBybGohbdPvUVSifxDXKJ2RDtGxzVPGuCrykNEQUWApt
+         hhegJBaU0svT1VqjG1Vv8XdxpziHTBvN8fmK/+jW0aAT4g+NWMiUERk/8d+G5D0GA6wY
+         VVj9oaBZHbpaYdj7Ld92jAW11roWICuQ3or83lYBM/r63Ms0mcK0qDO2TtXb/vvcgGaB
+         yTzKv02jliUe5rRhJwI2J/RT0zypGCWOjunapUcB4cjj1oGJ4OUayQEdasDjQYFT+qIz
+         y+vrPiyiesxErgH3Of949gvI5aMoREmomb9xPI37PkRYNxNH0XAWstBGb79ZadVZBaqt
+         85nA==
+X-Forwarded-Encrypted: i=1; AHgh+RpmJDz1qFNPz2nYEaIBmamB+l+6oBQLZR6gsMfgc9blT24qvFs41Hk/m/UwLWRcaEV4YQ4pDRs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzp541DQ/d9qZxJt4EIktmW9IH/CottSVDLytFnUVXvB0ACaGos
+	DY45+03pF7Bo7TwW30GS42iFIgAj6U3TcBxnX5a54tyga7nUBEHINgKR
+X-Gm-Gg: AfdE7cnVtqSDNmjTmhJsyyN4/eSop/n4cdzSND+TC9D9lf1u35E6zcVVQ5kUDhyE5DJ
+	BiOtPiAtiLQj4xXWt2PZdL0kGT2ncZfMyC3c1JgSy8bE7DIxPn/m7Ab9ZZOXQlPbjBispzeCPVr
+	gDd2O9XhHfBF95LNRO0W4GmtRpzMx+aGtGWnl6WJwDolRL+P0aCvfB9UvCp8H7ao1ZE8MxqAF5S
+	VFHNZHiuqfxvfLWtDNP6NWRz4NljI/xu0neq97WIJ8vv8N4W+eogoKqKwdzSHo2iqSnWOXTKgVB
+	OHouHBj9IsSSZakTjaMdNcH8z2xmJyaMVTYxgfTMd+/8eVp4bVOLEtM1XP3apPjOqKoxc55Kz54
+	ZWY2iTUfbIej2cflLSO835cRLZ1+TJGOp+ONT6YUtqwT2tfXuB9iub+HZ6SvNSk8JETMlBoUtEw
+	PzilrNkPsZqOWdQWoEYsD1
+X-Received: by 2002:a17:902:f684:b0:2be:1c3c:72ba with SMTP id d9443c01a7336-2ca7e8728f5mr102068555ad.32.1783068206275;
+        Fri, 03 Jul 2026 01:43:26 -0700 (PDT)
+Received: from c79ofce.localdomain ([204.3.140.65])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cad71270e5sm6115575ad.23.2026.07.03.01.43.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jul 2026 01:38:57 -0700 (PDT)
-From: Daehyeon Ko <4ncienth@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Sabrina Dubroca <sd@queasysnail.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+        Fri, 03 Jul 2026 01:43:25 -0700 (PDT)
+From: Zhixing Chen <running910@gmail.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Harald Welte <laforge@gnumonks.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Daehyeon Ko <4ncienth@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net] macsec: don't read an unset MAC header in macsec_encrypt()
-Date: Fri,  3 Jul 2026 17:36:33 +0900
-Message-ID: <20260703083634.2035145-1-4ncienth@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	osmocom-net-gprs@lists.osmocom.org,
+	netdev@vger.kernel.org,
+	Zhixing Chen <running910@gmail.com>
+Subject: [PATCH net] gtp: parse extension headers before reading inner protocol
+Date: Fri,  3 Jul 2026 16:42:44 +0800
+Message-Id: <20260703084244.59077-1-running910@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,79 +99,138 @@ Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lists.osmocom.org,vger.kernel.org,gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:laforge@gnumonks.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:osmocom-net-gprs@lists.osmocom.org,m:netdev@vger.kernel.org,m:running910@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[queasysnail.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304453-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:sd@queasysnail.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:4ncienth@gmail.com,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[4ncienth@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304454-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[running910@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[4ncienth@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[running910@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RWL_MAILSPIKE_POSSIBLE(0.00)[104.64.211.4:from];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,gtp_nsroot_recv.py:url,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F0ACA700534
+X-Rspamd-Queue-Id: 213D67005E5
 
-macsec_encrypt() reads the Ethernet header via eth_hdr(skb)
-(skb->head + skb->mac_header) to memmove() the 12 source/destination MAC
-bytes forward and make room for the SecTAG.
+GTPv1-U packets may carry a chain of extension headers before the inner
+IP packet. The receive path already parses and skips these extension
+headers, but it currently reads the inner protocol before doing so.
 
-On the AF_PACKET SOCK_RAW + PACKET_QDISC_BYPASS transmit path the skb
-reaches the macsec ndo_start_xmit() with the MAC header unset, so
-eth_hdr(skb) resolves to skb->head + (u16)~0 and the read is out of
-bounds: a 12-byte heap over-read that is also emitted on the wire as the
-frame's outer source/destination MAC. KASAN reports a slab-out-of-bounds
-read in macsec_start_xmit() on 6.0; on current mainline a CONFIG_DEBUG_NET
-build flags it as an unset mac header in skb_mac_header().
+As a result, the first extension header byte is interpreted as the inner
+IP version. Packets with extension headers are then dropped before PDP
+lookup.
 
-On the TX path the L2 header is at skb->data, so use skb_eth_hdr(), added
-by commit 96cc4b69581d ("macvlan: do not assume mac_header is set in
-macvlan_broadcast()") for exactly this purpose.
+Parse the extension header chain before calling gtp_inner_proto(), so the
+inner protocol is read from the actual inner IP header.
 
-Fixes: c09440f7dcb3 ("macsec: introduce IEEE 802.1AE driver")
-Cc: stable@vger.kernel.org
-Signed-off-by: Daehyeon Ko <4ncienth@gmail.com>
+Signed-off-by: Zhixing Chen <running910@gmail.com>
 ---
- drivers/net/macsec.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
-index fb009120a924..dd89282f0179 100644
---- a/drivers/net/macsec.c
-+++ b/drivers/net/macsec.c
-@@ -646,7 +646,7 @@ static struct sk_buff *macsec_encrypt(struct sk_buff *skb,
+I noticed this while running a few GTP tunnel tests with a veth pair and a
+peer network namespace.
+
+The commands below only set up a small GTPv1-U demo and verify that the
+plain tunnel works as expected:
+
+  ip link add vroot type veth peer name vpeer
+  ip a a 172.0.0.1/24 dev vroot
+  ip link set vroot up
+  ip a a 172.99.0.1/32 dev lo
+  gtp-link add gtp0 ip 172.0.0.1 &
+  gtp-tunnel add gtp0 v1 200 100 172.99.0.2 172.0.0.2
+  ip r a 172.99.0.2/32 dev gtp0
+  ip link set gtp0 mtu 1500
+
+  ip netns add nspeer
+  ip link set vpeer netns nspeer
+  ip netns exec nspeer ip a a 172.0.0.2/24 dev vpeer
+  ip netns exec nspeer ip link set vpeer up
+  ip netns exec nspeer ip a a 172.99.0.2/32 dev lo
+  ip netns exec nspeer ip link set lo up
+
+  ip netns exec nspeer gtp-link add gtp1 ip 172.0.0.2 &
+  ip netns exec nspeer gtp-tunnel add gtp1 v1 100 200 172.99.0.1 172.0.0.1
+  ip netns exec nspeer ip r a 172.99.0.1/32 dev gtp1
+  ip netns exec nspeer ip link set gtp1 mtu 1500
+
+With this setup, plain traffic between 172.99.0.1 and 172.99.0.2 goes
+through the GTP tunnel.
+
+After that, I used a small sender in the peer namespace to build two
+UDP/2152 packets for the root namespace GTP endpoint. Both packets use TEID
+200 and carry an inner UDP packet from 172.99.0.2:12345 to
+172.99.0.1:9999. The first packet is a plain GTPv1-U T-PDU. The second
+packet carries the same inner UDP packet after a GTP extension header.
+
+Before this fix, a receiver bound to 172.99.0.1:9999 only receives the
+plain packet:
+
+  root@vm:/# python gtp_nsroot_recv.py
+  listening on 172.99.0.1:9999
+  received #1 from ('172.99.0.2', 12345): b'plain'
+
+After this fix, it receives both packets:
+
+  root@vm:/# python gtp_nsroot_recv.py
+  listening on 172.99.0.1:9999
+  received #1 from ('172.99.0.2', 12345): b'plain'
+  received #2 from ('172.99.0.2', 12345): b'extension'
+
+---
+ drivers/net/gtp.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
+index a60ef32b35b8..4a8b00548673 100644
+--- a/drivers/net/gtp.c
++++ b/drivers/net/gtp.c
+@@ -826,6 +826,10 @@ static int gtp1u_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
+ 	if (!pskb_may_pull(skb, hdrlen))
+ 		return -1;
+ 
++	if (gtp1->flags & GTP1_F_EXTHDR &&
++	    gtp_parse_exthdrs(skb, &hdrlen) < 0)
++		return -1;
++
+ 	if (gtp_inner_proto(skb, hdrlen, &inner_proto) < 0) {
+ 		netdev_dbg(gtp->dev, "GTP packet does not encapsulate an IP packet\n");
+ 		return -1;
+@@ -840,10 +844,6 @@ static int gtp1u_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
+ 		return 1;
  	}
  
- 	unprotected_len = skb->len;
--	eth = eth_hdr(skb);
-+	eth = skb_eth_hdr(skb);
- 	sci_present = macsec_send_sci(secy);
- 	hh = skb_push(skb, macsec_extra_len(sci_present));
- 	memmove(hh, eth, 2 * ETH_ALEN);
+-	if (gtp1->flags & GTP1_F_EXTHDR &&
+-	    gtp_parse_exthdrs(skb, &hdrlen) < 0)
+-		return -1;
+-
+ 	return gtp_rx(pctx, skb, hdrlen, gtp->role, inner_proto);
+ }
+ 
 -- 
-2.54.0
+2.34.1
 
 
