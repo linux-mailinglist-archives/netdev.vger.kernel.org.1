@@ -1,105 +1,70 @@
-Return-Path: <netdev+bounces-304417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304419-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 9YPJKr1pR2qwXwAAu9opvQ
-	(envelope-from <netdev+bounces-304417-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:50:21 +0200
+	id yPeyOaBpR2qpXwAAu9opvQ
+	(envelope-from <netdev+bounces-304419-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:49:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F3186FFBD1
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:50:21 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB2356FFBB7
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:49:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=messagingengine.com header.s=fm2 header.b=keHmE7Lx;
-	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=obsidian.systems (policy=none);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304417-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304417-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=uniontech.com header.s=onoh2408 header.b=c1rjlkYn;
+	dmarc=pass (policy=none) header.from=uniontech.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304419-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304419-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 377E830E694B
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 07:41:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CD9CA302333C
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 07:46:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89AAA371860;
-	Fri,  3 Jul 2026 07:40:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E25883546FF;
+	Fri,  3 Jul 2026 07:46:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-a4-smtp.messagingengine.com (flow-a4-smtp.messagingengine.com [103.168.172.139])
+Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B4336F411;
-	Fri,  3 Jul 2026 07:40:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 646D036DA08;
+	Fri,  3 Jul 2026 07:46:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783064454; cv=none; b=kS4TBWpRvrwbhvJiVS+lDsZ9V9c+znG+vf3eTiYiuw3tU2puErSz4kTrRwWCI1CGJrBIs0P/QFbXYR4morTlQmHBNJjQt72+6BH0ZYJ8oVoKqR3wJ8vnLnBAjSN4KRrH77R+lauVzcId44qXgn9j2upW4m/qTgiI3vw55h8fKaU=
+	t=1783064797; cv=none; b=HlXq+7IMC/iG5BkZCLK5R9K5baFUb6H1V/hoI0gD4uiwENqYqE+1pTPk9EEVeywb8xs6xUViBzjmci8G7x0MY4u2CYbnq1zK5Q1cABSqTzZ3anhwc+w8qVgzsKqn4Irt/C8YysMaL11SdKJWv3JboaludYyqcyDY4rhWVK4mX2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783064454; c=relaxed/simple;
-	bh=mm7P2sqBAF6bXKS3oZrmBAByBli5vv7qn3sSyLLB2G8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uWSUSeq/WStjfC85pS8h4D7FVhJkqOsOBZR967jyMOeumKj8vuyKd1OH8LDP6z/xIF+MZejFmAbxcrPSRxaPygG7v9mpi0dKey1I6XTm1rJazWZvux2nBIuGwjFddUqWsuA3GjyrJLQGhoUmhSo3/PL+HGviLYxgK9mZEei1RLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=Obsidian.Systems; spf=fail smtp.mailfrom=Obsidian.Systems; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=keHmE7Lx; arc=none smtp.client-ip=103.168.172.139
-Received: from phl-compute-08.internal (phl-compute-08.internal [10.202.2.48])
-	by mailflow.phl.internal (Postfix) with ESMTP id BA575138025A;
-	Fri,  3 Jul 2026 03:40:51 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-08.internal (MEProxy); Fri, 03 Jul 2026 03:40:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm2; t=1783064451; x=1783071651; bh=G
-	5IdncEZMttblUkdvDrma7vZ1fMX6xFFr5IUmHWIufs=; b=keHmE7LxlimZWhiDp
-	HalzhOiSqZ+LL53trdkqZ8Wd76H8b3ERTGWdLo8udomhsBgxGdJhh7lcFufwlF/l
-	NXxZSyOhvKyTKUZbJ7ViRwh86VdBEM8boyfmRKHn3GysEmiSwLrE0daDSsG+SABc
-	7NEud9nsMkY4xNzJa/FIf7M9QdbwLJg+2eskWWeF3qCjNXPtcI8yHJ0SUzbEBURX
-	ZZYnUBLTVtagpxVgtpcv9m3wIjPESvpCeUn8I1vDuINeGCZozeZyIT2M4mxDo+Ng
-	4cOTpip5t97/0cbdk02e+qIxIphAH938ssz6P6tGtQgcK9Lp4g6Vx9ZS/oUHjdTo
-	VmIUw==
-X-ME-Sender: <xms:g2dHavx0c1Fe7m2Nn1ps4LkAPn9VUaBoRZhwnn56il7NmEC90J1keg>
-    <xme:g2dHauOUdt7-ZzAi5edF8o62XjZ9V8gjoF-oKpQdkVmNK4zrWv3mibI5AHVu15F3S
-    9R29S-5539O03GyoPra2rMS52XNTz95DBqAx2aR6JeDwqQei0luBeg>
-X-ME-Received: <xmr:g2dHauaodA-zPB2IgBuPkYFFCqkn4I_JPD1sxniHRsB84I-zb7mVwCtqH0KUjYFOWq447O8zy2V4ic0lThdGOXzylj84dHEpPEoHTA>
-X-ME-Proxy-Cause: dmFkZTGD+55Le//f3h8RLTETwVa3bWav1dX8jX0sV5Dck/InRGicx/GeEaHwqqbxMviI6N
-    J4Rea78NzJDlLaY60f+CVXfCs8Fg3Y5Cj+iTaTnWbo1ZA1zfFl+/deVfj6Sx7MBhcLuoUf
-    1TRfB2c4wSGdKmPVmKaM/8miAneWrUINp9zV+LGN/NRIiyitqqExNDSbDFTI1l7pjIIX55
-    gRvZ7TIcOkkZ+HtVWGJk7fOJgyWuHezOnrtpQZEnWIemAOLNlzSb88VMbbYhPEx5dpvfSX
-    VpT7QCtPf88Qdki/FMnoISyPb+gXe0xwNYQyO+kTF+erVXDOhNquzZcEaIby0s7Z+TYTmm
-    x4L1dtVnooR12YB9B4VjPYqPV6Uj2VCUbKSChFIWCfhRhOAAwFGdTplQUpLcl1OI5sEbBZ
-    xZbXHacJrTJqbT+WFbP52p3pUZPMQaP0OJy+VDVJMFYLBGvr20WhETfZVW+HtMFvh3VkRc
-    qwh9kb5O7GG8AHIuKrWeM8GLe2rlmWrkfxGAM2j1fmHms5J3ne+8Ar5wM7EzAQMFLIkC38
-    B6ZoBzMp73aSGQoGre1Ea9wTLz9oQ/+P1A5hLv5/Y6PT6qZVrv995WjzREfG3d1OVurcBV
-    nco+ItqNmrCJtZHE9pJ1iy1tYCprxGoOzKhfPHkXj7QNnnCudTSppbQ578lQ
-X-ME-Proxy: <xmx:g2dHagrGKLEXZ3DLaLzb0uxFH38uoUa3V9kTfX9vK2DivLiatG7gzQ>
-    <xmx:g2dHarxC4GdklIRng3P7ED1MKaVvsLXC6BjBv-0ksmaUek3uZAJdpQ>
-    <xmx:g2dHaoIpk8CVizG0v0mH7LsRtFoL_EykU5tcdWI8Zwqrm_2siUCYpA>
-    <xmx:g2dHat7AF2mvkNZBjWZtjSg_vqiYZOw892uHcaICYSqV_ksMWZoQew>
-    <xmx:g2dHapSIwNlvuBaQ0Zy6DfttWG3UF6LlzNJkLTwoprkCqPLxHnmj06Tn>
-Feedback-ID: i91b946ab:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 3 Jul 2026 03:40:50 -0400 (EDT)
-From: John Ericson <John.Ericson@Obsidian.Systems>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: John Ericson <mail@JohnEricson.me>,
-	Cong Wang <cwang@multikernel.io>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Simon Horman <horms@kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	David Rheinsberg <david@readahead.eu>,
-	Andy Lutomirski <luto@kernel.org>,
-	Sergei Zimmerman <sergei@zimmerman.foo>,
-	netdev@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	=?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
-	=?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
-	Paul Moore <paul@paul-moore.com>,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 3/3] coredump, net: remove `SOCK_COREDUMP`
-Date: Fri,  3 Jul 2026 03:39:44 -0400
-Message-ID: <20260703073948.2541875-4-John.Ericson@Obsidian.Systems>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260703073948.2541875-1-John.Ericson@Obsidian.Systems>
-References: <20260703073948.2541875-1-John.Ericson@Obsidian.Systems>
+	s=arc-20240116; t=1783064797; c=relaxed/simple;
+	bh=wcuzXrutR1yKkosiSzqg8/qrxTaD6IuQNUeJhV2FWD0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kBVnQgug3z+bCLWU+9J1IsAvo6jWvElGSVRvfpYBknzaJH1eXTnkj64PVZjF7W+9V7IOEfnngj6SDHFyRN+2U5X7rVlKTyJRrmy370JadcPkK8TXk+PRX6MLKmU+jAmlZ64PD550ZYNlRrQrmwxqWeDbUP+XoC5bybrMGyeD6sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=c1rjlkYn; arc=none smtp.client-ip=54.206.34.216
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1783064635;
+	bh=qjpBK8rQaJa09VTkZk4KSzbrMj5EsnN04kVz9p+YHVU=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version;
+	b=c1rjlkYnF8rHOjd5RSZdmfFtErJOCzYDHQCmeYexrcFNgW/W2kt2bpbXRDjD2HX2b
+	 zyRi6L1O9MFQkNQQQ23PYuG8a0PRZXurt1yNS7ImwhozoH2Sr7h8761mfp5bbdpjaq
+	 JTOuEbPOVFUJKhtbUfeYlMIgzoidXLJQhR48aC4w=
+X-QQ-mid: zesmtpsz5t1783064616tb83c8e2b
+X-QQ-Originating-IP: pnOTIEx+1nS0UPWtePjvhT8HyKya6ICSMD2OKRR7or4=
+Received: from localhost.localdomain ( [124.126.19.250])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 03 Jul 2026 15:43:28 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 18083885935449274578
+EX-QQ-RecipientCnt: 11
+From: ZhaoJinming <zhaojinming@uniontech.com>
+To: madalin.bucur@nxp.com,
+	sean.anderson@linux.dev
+Cc: netdev@vger.kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	igal.liberman@freescale.com,
+	linux-kernel@vger.kernel.org,
+	ZhaoJinming <zhaojinming@uniontech.com>
+Subject: [PATCH net v2 1/2] net: fman: move IRQ registration after init to prevent NULL deref and UAF
+Date: Fri,  3 Jul 2026 15:43:23 +0800
+Message-Id: <20260703074324.907294-1-zhaojinming@uniontech.com>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -107,374 +72,221 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4b-0
+X-QQ-XMAILINFO: MbjVwinFRr/ec95eazuMpxpjer8n+OSDmWaAhK9x7J8XNx+XpBcZO0/r
+	HZ3/znMoBwQqpSZ1OGSMhPLhiVWXducWYg0MlL95+0MuEHw4SUjqGiyb/I4RvSZKpOiXSFp
+	9CtY9vJtCTHF2X0uTnsvuuYt/RkA9LkyRNiO7EP/ozIeWOGs8hF4f8FVkL4zXEUI8us3enO
+	q6U/IJiRKzU0UFwOovvBVyUAnVbN/Sbv2jWVzDvaaj9RbE28p949dJGGrnGS3bv9pKbAP7t
+	8agj3Es8mItPEKuRL0UoXQxdVSYFbfYPenSp5Wk4Egk+stKV8/p5jZNUwl5zLZAhKOYOu4R
+	tppRdD6uQqZdRCKEKzxeRGyjYzpLQycifShyE9ZztvXnA0dgzQ+8nSTBBi35O/X6IX/+Ugz
+	8B8WOt2r0Cd4DM8V4uTy1t/Yz8Ays2X/8+j3+NiZMFiIgFkZ3Hmoub+nCih7Uxym8KzTcGV
+	PwMszS1roaulXTQ6NFUV05Vz5nj7v8hLwkEmfcpooiU7VSWkCAKST6roxwZd5XPLbnpwRGF
+	/12DRAj8dTL+ApW3OUVJxjER8dIYrfWCgvcc1EUuyxXJTSpyk2tBwy1KZgmsyKAsjBm/y4U
+	nPs8RENK6rj/O4PCzeajXAd9q38mY1/XV+kWBcF9VWXwHObPTsmdEvaz+CdnSjHrDMOSpPF
+	cloG4WL1Up+Boh6FiCnDy62Dq5QLX/WY9K4t0ebPZieJQnsxvufOosW6ZEbFzGaBLOqZEAh
+	OPGi3D/ccni8Z5rOPI+X86vhC6hwzLTKqEG6OhJGoN6F+RgWcaBvjWxEoB7629vpbI3Hzge
+	VdobZFloDwcdfly6RAR28bJ9xIFJFBtaAUeInosVqQo1FyzWCaI83utybNBe+q36uRnUx/d
+	Mic8F+7K8EOF6FYm4DkPeqeWyBQ5dnbXvalXolzsQA0c6et6e3gP5QFZZqAR7cPvQYOGXYX
+	s0V6ubHaBgykWntmtdfFE/hBJThE651+iwWfCgIg1B/MjKy++5Y/2+jCwtEtragmMFzm2Km
+	j06mUONPU56rdHEyGGuwWE1VzppMKLeHKzgw/NLOvMoph1ZhieOXRsmP/8Hv5+h6E4QWp6U
+	zjI8Ycnen2awm4iCHjlMhixH7eyvmSZQw==
+X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
+X-QQ-RECHKSPAM: 0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.06 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[messagingengine.com:s=fm2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[uniontech.com,none];
+	R_DKIM_ALLOW(-0.20)[uniontech.com:s=onoh2408];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[obsidian.systems : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	TAGGED_FROM(0.00)[bounces-304417-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[John.Ericson@Obsidian.Systems,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mail@JohnEricson.me,m:cwang@multikernel.io,m:kuniyu@google.com,m:horms@kernel.org,m:brauner@kernel.org,m:david@readahead.eu,m:luto@kernel.org,m:sergei@zimmerman.foo,m:netdev@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:mic@digikod.net,m:gnoack@google.com,m:paul@paul-moore.com,m:linux-security-module@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-304419-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[zhaojinming@uniontech.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:madalin.bucur@nxp.com,m:sean.anderson@linux.dev,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:igal.liberman@freescale.com,m:linux-kernel@vger.kernel.org,m:zhaojinming@uniontech.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[John.Ericson@Obsidian.Systems,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[zhaojinming@uniontech.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[uniontech.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,messagingengine.com:dkim,johnericson.me:email,vger.kernel.org:from_smtp,Obsidian.Systems:mid,Obsidian.Systems:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[uniontech.com:from_mime,uniontech.com:email,uniontech.com:mid,uniontech.com:dkim,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4F3186FFBD1
+X-Rspamd-Queue-Id: DB2356FFBB7
 
-From: John Ericson <mail@JohnEricson.me>
+read_dts_node() registers shared interrupt handlers via
+devm_request_irq() with fman as dev_id. Two bugs exist in the
+current code:
 
-The utility of the refactors of the last two commits is demonstrated by
-fixing this glaring layer violation: the unix socket implementation
-knowing about the coredump socket caller.
+1) Pre-init NULL dereference: at registration time fman is only
+partially initialized -- kzalloc_obj() zero-initializes all fields,
+so fman->cfg and fman->fpm_regs are NULL. The handlers check
+is_init_done(fman->cfg) to guard against incomplete init, but
+is_init_done(NULL) returns true (intended to mean cfg was freed
+after successful init), so the guard is bypassed and fpm_regs is
+dereferenced. If another device on the same shared IRQ line fires
+during the window between devm_request_irq() and fman_init(), the
+handler accesses NULL fpm_regs via ioread32be(), causing a crash.
 
-Before, when the only way to connect to a socket was via the UAPI
-`struct sockaddr_un`, the only way to implement the proper logic that
-the kernel needs to resolve the coredump socket path was via hacking it
-into the socket implementation.
+2) Use-after-free on probe failure: fman is allocated with
+kzalloc_obj() (not devm), so on error paths in read_dts_node()
+(ioremap failure, of_platform_populate failure) and fman_config(),
+kfree(fman) is called while the devm IRQ handlers remain
+registered. The driver core's subsequent devres_release_all() frees
+the IRQ handlers, but during the window between kfree(fman) and
+devm_free_irq(), a shared-IRQ spurious firing will dereference
+the already-freed fman.
 
-In addition to being quite ugly, this layer violation is not great for
-security. The intent is that `SOCK_COREDUMP` can only be used by the
-kernel, and to be clear, I have no reason to believe this is not
-correctly enforced today. But because of the many functions with flags
-arguments, this is not a locally-enforced invariant. Some change, at
-some point, could mess up, and allow user-provided flags to sneak in,
-and this strikes me as a mistake waiting to happen. At that point, a
-user could exploit this to connect to any socket it likes, bypassing
-permission checks.
+A previous attempt to fix issue #1 with an irq_ready flag protected
+by READ_ONCE()/WRITE_ONCE() is insufficient on weakly-ordered
+architectures. READ_ONCE()/WRITE_ONCE() only prevent compiler
+optimization; they do not provide the memory ordering guarantees
+(e.g., smp_store_release/smp_load_acquire) needed to ensure that
+writes to register pointers are visible to the IRQ handler before
+it observes the flag as true.
 
-Now, with the two functions we've just previously factored out, we can
-fix the layering. The custom path lookup logic lives with the coredump
-caller, where it belongs. Once the right `struct path` is found
-(actually just the inode is needed), the coredump caller can resolve a
-`struct sock *` from it, and then directly connect to it. With this
-change, `SOCK_COREDUMP` is no longer needed at all, and can be deleted.
-The layer violation is gone, and the security footgun is gone with it.
+Fix both issues by moving devm_request_irq() out of read_dts_node()
+and into fman_probe(), after both fman_config() and fman_init()
+have completed. This eliminates both race windows: by the time the
+handlers are registered, all register pointers are initialized
+(preventing the NULL dereference), and since fman is never freed
+after this point, the use-after-free cannot occur either.
 
-As an added bonus, remove `flags` parameters from a number of internal
-functions that no longer need them. They were just taking flags
-parameters for the sake of `SOCK_COREDUMP`, and so with that gone, those
-flag parameters are also no longer needed. If or when there is a new
-flag that motivates them, they can be added back.
+Add an 'irq' field to struct fman_dts_params so that the primary IRQ
+number parsed in read_dts_node() is available to fman_probe().
 
-Tested that `coredump_socket_protocol_test` still passes.
+This replaces the previous approach (irq_ready flag with READ_ONCE)
+and also supersedes the separate UAF fix patch ("fsl_fman: fix
+use-after-free on IRQF_SHARED handler after probe failure" v3),
+as moving IRQ registration after init resolves both issues
+in a single change.
 
-Assisted-by: Claude:claude-opus-4-8
-Signed-off-by: John Ericson <mail@JohnEricson.me>
+v2:
+- move devm_request_irq() to fman_probe() after init (replaces
+  irq_ready + READ_ONCE approach from v1)
+- supersede the separate UAF fix patch (v3), as this patch
+  resolves both issues in a single change
+
+Fixes: 414fd46e7762 ("fsl/fman: Add FMan support")
+Link: https://lore.kernel.org/netdev/20260626162323.GE1310988@horms.kernel.org/
+Signed-off-by: ZhaoJinming <zhaojinming@uniontech.com>
 ---
- fs/coredump.c                 | 47 ++++++++++++++++++++++++-----------
- include/linux/lsm_hook_defs.h |  3 +--
- include/linux/net.h           |  1 -
- include/linux/security.h      |  4 +--
- net/unix/af_unix.c            | 42 ++++++++++---------------------
- security/landlock/fs.c        |  7 +-----
- security/security.c           |  5 ++--
- 7 files changed, 51 insertions(+), 58 deletions(-)
+ drivers/net/ethernet/freescale/fman/fman.c | 52 +++++++++++++---------
+ drivers/net/ethernet/freescale/fman/fman.h |  1 +
+ 2 files changed, 32 insertions(+), 21 deletions(-)
 
-diff --git a/fs/coredump.c b/fs/coredump.c
-index e68a76ff92a3..e1452021218e 100644
---- a/fs/coredump.c
-+++ b/fs/coredump.c
-@@ -14,6 +14,7 @@
- #include <linux/perf_event.h>
- #include <linux/highmem.h>
- #include <linux/spinlock.h>
-+#include <linux/cred.h>
- #include <linux/key.h>
- #include <linux/personality.h>
- #include <linux/binfmts.h>
-@@ -21,6 +22,7 @@
- #include <linux/sort.h>
- #include <linux/sched/coredump.h>
- #include <linux/sched/signal.h>
-+#include <linux/sched/task.h>
- #include <linux/sched/task_stack.h>
- #include <linux/utsname.h>
- #include <linux/pid_namespace.h>
-@@ -50,7 +52,6 @@
- #include <net/net_namespace.h>
- #include <net/sock.h>
- #include <uapi/linux/pidfd.h>
--#include <uapi/linux/un.h>
- #include <uapi/linux/coredump.h>
+diff --git a/drivers/net/ethernet/freescale/fman/fman.c b/drivers/net/ethernet/freescale/fman/fman.c
+index 299bab043175..6947f3bc7c87 100644
+--- a/drivers/net/ethernet/freescale/fman/fman.c
++++ b/drivers/net/ethernet/freescale/fman/fman.c
+@@ -2695,7 +2695,7 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
+ 	void __iomem *base_addr;
+ 	struct resource *res;
+ 	u32 val, range[2];
+-	int err, irq;
++	int err;
+ 	struct clk *clk;
+ 	u32 clk_rate;
  
- #include <linux/uaccess.h>
-@@ -668,17 +669,10 @@ static int umh_coredump_setup(struct subprocess_info *info, struct cred *new)
- static bool coredump_sock_connect(struct core_name *cn, struct coredump_params *cprm)
- {
- 	struct file *file __free(fput) = NULL;
--	struct sockaddr_un addr = {
--		.sun_family = AF_UNIX,
--	};
--	ssize_t addr_len;
--	int retval;
-+	struct path root, path;
- 	struct socket *socket;
--
--	addr_len = strscpy(addr.sun_path, cn->corename);
--	if (addr_len < 0)
--		return false;
--	addr_len += offsetof(struct sockaddr_un, sun_path) + 1;
-+	struct sock *sk;
-+	int retval;
+@@ -2717,7 +2717,7 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
+ 	err = platform_get_irq(of_dev, 0);
+ 	if (err < 0)
+ 		goto fman_node_put;
+-	irq = err;
++	fman->dts_params.irq = err;
  
- 	/*
- 	 * It is possible that the userspace process which is supposed
-@@ -710,14 +704,37 @@ static bool coredump_sock_connect(struct core_name *cn, struct coredump_params *
- 	 */
- 	pidfs_coredump(cprm);
+ 	/* Get the FM error interrupt */
+ 	err = platform_get_irq(of_dev, 1);
+@@ -2773,25 +2773,6 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
  
--	retval = kernel_connect(socket, (struct sockaddr_unsized *)(&addr), addr_len,
--				O_NONBLOCK | SOCK_COREDUMP);
-+	/*
-+	 * Resolve the socket path relative to init's root and with kernel
-+	 * credentials, and with symlinks, magic links and escaping the
-+	 * root all forbidden, so the dumping process cannot use its own
-+	 * filesystem view to redirect its core to an arbitrary socket.
-+	 */
-+	task_lock(&init_task);
-+	get_fs_root(init_task.fs, &root);
-+	task_unlock(&init_task);
-+
-+	scoped_with_kernel_creds()
-+		retval = vfs_path_lookup(root.dentry, root.mnt, cn->corename,
-+					 LOOKUP_BENEATH | LOOKUP_NO_SYMLINKS |
-+					 LOOKUP_NO_MAGICLINKS, &path);
-+	path_put(&root);
-+	if (retval)
-+		return false;
-+
-+	/* Connect directly to the socket bound there, by fd not by name. */
-+	sk = unix_lookup_bsd_path(&path, SOCK_STREAM);
-+	path_put(&path);
-+	if (IS_ERR(sk))
-+		return false;
+ 	of_node_put(muram_node);
  
-+	retval = kernel_unix_connect_direct(sk, socket, O_NONBLOCK);
-+	sock_put(sk);
- 	if (retval) {
- 		if (retval == -EAGAIN)
--			coredump_report_failure("Coredump socket %s receive queue full", addr.sun_path);
-+			coredump_report_failure("Coredump socket %s receive queue full", cn->corename);
- 		else
--			coredump_report_failure("Coredump socket connection %s failed %d", addr.sun_path, retval);
-+			coredump_report_failure("Coredump socket connection %s failed %d", cn->corename, retval);
- 		return false;
- 	}
- 
-diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
-index 65c9609ec207..3d6fbb6d2628 100644
---- a/include/linux/lsm_hook_defs.h
-+++ b/include/linux/lsm_hook_defs.h
-@@ -323,8 +323,7 @@ LSM_HOOK(int, 0, watch_key, struct key *key)
- #endif /* CONFIG_SECURITY && CONFIG_KEY_NOTIFICATIONS */
- 
- #if defined(CONFIG_SECURITY_NETWORK) && defined(CONFIG_SECURITY_PATH)
--LSM_HOOK(int, 0, unix_find, const struct path *path, struct sock *other,
--	 int flags)
-+LSM_HOOK(int, 0, unix_find, const struct path *path, struct sock *other)
- #endif /* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
- 
- #ifdef CONFIG_SECURITY_NETWORK
-diff --git a/include/linux/net.h b/include/linux/net.h
-index f268f395ce47..285cb67927f0 100644
---- a/include/linux/net.h
-+++ b/include/linux/net.h
-@@ -102,7 +102,6 @@ enum sock_type {
- #ifndef SOCK_NONBLOCK
- #define SOCK_NONBLOCK	O_NONBLOCK
- #endif
--#define SOCK_COREDUMP	O_NOCTTY
- 
- /**
-  * enum sock_shutdown_cmd - Shutdown types
-diff --git a/include/linux/security.h b/include/linux/security.h
-index 153e9043058f..9797bd29c916 100644
---- a/include/linux/security.h
-+++ b/include/linux/security.h
-@@ -1957,10 +1957,10 @@ static inline int security_mptcp_add_subflow(struct sock *sk, struct sock *ssk)
- 
- #if defined(CONFIG_SECURITY_NETWORK) && defined(CONFIG_SECURITY_PATH)
- 
--int security_unix_find(const struct path *path, struct sock *other, int flags);
-+int security_unix_find(const struct path *path, struct sock *other);
- 
- #else /* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
--static inline int security_unix_find(const struct path *path, struct sock *other, int flags)
-+static inline int security_unix_find(const struct path *path, struct sock *other)
- {
- 	return 0;
- }
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index aa94da1f8c24..7cb537b404cc 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -1220,7 +1220,7 @@ struct sock *unix_lookup_bsd_path(const struct path *path, int type)
- EXPORT_SYMBOL_GPL(unix_lookup_bsd_path);
- 
- static struct sock *unix_find_bsd(struct sockaddr_un *sunaddr, int addr_len,
--				  int type, int flags)
-+				  int type)
- {
- 	struct path path;
- 	struct sock *sk;
-@@ -1228,29 +1228,13 @@ static struct sock *unix_find_bsd(struct sockaddr_un *sunaddr, int addr_len,
- 
- 	unix_mkname_bsd(sunaddr, addr_len);
- 
--	if (flags & SOCK_COREDUMP) {
--		struct path root;
--
--		task_lock(&init_task);
--		get_fs_root(init_task.fs, &root);
--		task_unlock(&init_task);
--
--		scoped_with_kernel_creds()
--			err = vfs_path_lookup(root.dentry, root.mnt, sunaddr->sun_path,
--					      LOOKUP_BENEATH | LOOKUP_NO_SYMLINKS |
--					      LOOKUP_NO_MAGICLINKS, &path);
--		path_put(&root);
--		if (err)
--			goto fail;
--	} else {
--		err = kern_path(sunaddr->sun_path, LOOKUP_FOLLOW, &path);
--		if (err)
--			goto fail;
-+	err = kern_path(sunaddr->sun_path, LOOKUP_FOLLOW, &path);
-+	if (err)
-+		goto fail;
- 
--		err = path_permission(&path, MAY_WRITE);
--		if (err)
--			goto path_put;
+-	err = devm_request_irq(&of_dev->dev, irq, fman_irq, IRQF_SHARED,
+-			       "fman", fman);
+-	if (err < 0) {
+-		dev_err(&of_dev->dev, "%s: irq %d allocation failed (error = %d)\n",
+-			__func__, irq, err);
+-		goto fman_free;
 -	}
-+	err = path_permission(&path, MAY_WRITE);
-+	if (err)
-+		goto path_put;
- 
- 	sk = unix_lookup_bsd_path(&path, type);
- 	if (IS_ERR(sk)) {
-@@ -1258,7 +1242,7 @@ static struct sock *unix_find_bsd(struct sockaddr_un *sunaddr, int addr_len,
- 		goto path_put;
- 	}
- 
--	err = security_unix_find(&path, sk, flags);
-+	err = security_unix_find(&path, sk);
- 	if (err)
- 		goto sock_put;
- 
-@@ -1297,12 +1281,12 @@ static struct sock *unix_find_abstract(struct net *net,
- 
- static struct sock *unix_find_other(struct net *net,
- 				    struct sockaddr_un *sunaddr,
--				    int addr_len, int type, int flags)
-+				    int addr_len, int type)
- {
- 	struct sock *sk;
- 
- 	if (sunaddr->sun_path[0])
--		sk = unix_find_bsd(sunaddr, addr_len, type, flags);
-+		sk = unix_find_bsd(sunaddr, addr_len, type);
- 	else
- 		sk = unix_find_abstract(net, sunaddr, addr_len, type);
- 
-@@ -1558,7 +1542,7 @@ static int unix_dgram_connect(struct socket *sock, struct sockaddr_unsized *addr
- 		}
- 
- restart:
--		other = unix_find_other(sock_net(sk), sunaddr, alen, sock->type, 0);
-+		other = unix_find_other(sock_net(sk), sunaddr, alen, sock->type);
- 		if (IS_ERR(other)) {
- 			err = PTR_ERR(other);
- 			goto out;
-@@ -1897,7 +1881,7 @@ static int unix_stream_connect(struct socket *sock, struct sockaddr_unsized *uad
- 	 * unix_stream_connect_commit() means "retry": the peer had died,
- 	 * or its backlog was full and we slept -- so re-resolve the name.
- 	 */
--	other = unix_find_other(net, sunaddr, addr_len, sk->sk_type, flags);
-+	other = unix_find_other(net, sunaddr, addr_len, sk->sk_type);
- 	if (IS_ERR(other)) {
- 		err = PTR_ERR(other);
- 		goto out_free;
-@@ -2330,7 +2314,7 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
- 	if (msg->msg_namelen) {
- lookup:
- 		other = unix_find_other(sock_net(sk), msg->msg_name,
--					msg->msg_namelen, sk->sk_type, 0);
-+					msg->msg_namelen, sk->sk_type);
- 		if (IS_ERR(other)) {
- 			err = PTR_ERR(other);
- 			goto out_free;
-diff --git a/security/landlock/fs.c b/security/landlock/fs.c
-index f7e5e4ef9eac..d77080438c01 100644
---- a/security/landlock/fs.c
-+++ b/security/landlock/fs.c
-@@ -1641,8 +1641,7 @@ static void unmask_scoped_access(const struct landlock_ruleset *const client,
- 	}
- }
- 
--static int hook_unix_find(const struct path *const path, struct sock *other,
--			  int flags)
-+static int hook_unix_find(const struct path *const path, struct sock *other)
- {
- 	const struct landlock_ruleset *dom_other;
- 	const struct landlock_cred_security *subject;
-@@ -1652,10 +1651,6 @@ static int hook_unix_find(const struct path *const path, struct sock *other,
- 		.fs = LANDLOCK_ACCESS_FS_RESOLVE_UNIX,
- 	};
- 
--	/* Lookup for the purpose of saving coredumps is OK. */
--	if (unlikely(flags & SOCK_COREDUMP))
--		return 0;
 -
- 	subject = landlock_get_applicable_subject(current_cred(),
- 						  fs_resolve_unix, NULL);
+-	if (fman->dts_params.err_irq != 0) {
+-		err = devm_request_irq(&of_dev->dev, fman->dts_params.err_irq,
+-				       fman_err_irq, IRQF_SHARED,
+-				       "fman-err", fman);
+-		if (err < 0) {
+-			dev_err(&of_dev->dev, "%s: irq %d allocation failed (error = %d)\n",
+-				__func__, fman->dts_params.err_irq, err);
+-			goto fman_free;
+-		}
+-	}
+-
+ 	base_addr = devm_platform_get_and_ioremap_resource(of_dev, 0, &res);
+ 	if (IS_ERR(base_addr)) {
+ 		err = PTR_ERR(base_addr);
+@@ -2848,6 +2829,35 @@ static int fman_probe(struct platform_device *of_dev)
+ 		return -EINVAL;
+ 	}
  
-diff --git a/security/security.c b/security/security.c
-index 71aea8fdf014..fabb75c88254 100644
---- a/security/security.c
-+++ b/security/security.c
-@@ -4839,16 +4839,15 @@ int security_mptcp_add_subflow(struct sock *sk, struct sock *ssk)
-  * security_unix_find() - Check if a named AF_UNIX socket can connect
-  * @path: path of the socket being connected to
-  * @other: peer sock
-- * @flags: flags associated with the socket
-  *
-  * This hook is called to check permissions before connecting to a named
-  * AF_UNIX socket. The caller does not hold any locks on @other.
-  *
-  * Return: Returns 0 if permission is granted.
-  */
--int security_unix_find(const struct path *path, struct sock *other, int flags)
-+int security_unix_find(const struct path *path, struct sock *other)
- {
--	return call_int_hook(unix_find, path, other, flags);
-+	return call_int_hook(unix_find, path, other);
- }
- EXPORT_SYMBOL(security_unix_find);
++	/* Register IRQ handlers only after initialization is complete.
++	 * This prevents two issues:
++	 * 1) Pre-init NULL dereference: is_init_done(NULL) returns true,
++	 *    so a shared-IRQ spurious firing before fpm_regs is set would
++	 *    dereference NULL.
++	 * 2) Use-after-free on probe failure: fman was kzalloc'd (not devm),
++	 *    so on error paths kfree(fman) ran before devm_free_irq, leaving
++	 *    a window where the handler could fire with a freed dev_id.
++	 * By registering here, both problems are eliminated.
++	 */
++	err = devm_request_irq(dev, fman->dts_params.irq, fman_irq,
++			       IRQF_SHARED, "fman", fman);
++	if (err < 0) {
++		dev_err(dev, "%s: irq %d allocation failed (error = %d)\n",
++			__func__, fman->dts_params.irq, err);
++		return err;
++	}
++
++	if (fman->dts_params.err_irq != 0) {
++		err = devm_request_irq(dev, fman->dts_params.err_irq,
++				       fman_err_irq, IRQF_SHARED,
++				       "fman-err", fman);
++		if (err < 0) {
++			dev_err(dev, "%s: irq %d allocation failed (error = %d)\n",
++				__func__, fman->dts_params.err_irq, err);
++			return err;
++		}
++	}
++
+ 	if (fman->dts_params.err_irq == 0) {
+ 		fman_set_exception(fman, FMAN_EX_DMA_BUS_ERROR, false);
+ 		fman_set_exception(fman, FMAN_EX_DMA_READ_ECC, false);
+diff --git a/drivers/net/ethernet/freescale/fman/fman.h b/drivers/net/ethernet/freescale/fman/fman.h
+index 74eb62eba0d7..630d57c3144c 100644
+--- a/drivers/net/ethernet/freescale/fman/fman.h
++++ b/drivers/net/ethernet/freescale/fman/fman.h
+@@ -286,6 +286,7 @@ struct fman_dts_params {
+ 	struct resource *res;                   /* FMan memory resource */
+ 	u8 id;                                  /* FMan ID */
  
++	int irq;                                /* FMan IRQ */
+ 	int err_irq;                            /* FMan Error IRQ */
+ 
+ 	u16 clk_freq;                           /* FMan clock freq (In Mhz) */
 -- 
-2.54.0
+2.20.1
 
 
