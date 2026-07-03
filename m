@@ -1,40 +1,41 @@
-Return-Path: <netdev+bounces-304532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304533-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id dv8aHxq2R2qbdwAAu9opvQ
-	(envelope-from <netdev+bounces-304532-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:16:10 +0200
+	id SLbyH+61R2qLdwAAu9opvQ
+	(envelope-from <netdev+bounces-304533-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:15:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C4D6702BFE
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:16:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FA0F702BC6
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:15:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304532-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304532-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304533-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304533-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6A242313441D
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 12:57:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3DB2B3142D26
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 12:57:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 004FD3D525B;
-	Fri,  3 Jul 2026 12:57:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F6E3D6487;
+	Fri,  3 Jul 2026 12:57:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB2703D1AA4;
-	Fri,  3 Jul 2026 12:57:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434C73D6465;
+	Fri,  3 Jul 2026 12:57:20 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783083438; cv=none; b=YBCWlITqiroiUieKKv9YtFT3+xWQv3cMlno5kk0aig40uAjP52ZeTdlOc+D59SdkSAzgAjazfiRWEmLDwIFirnP46ppik5y2JmIW9WI9WC5sS82qQDr6+N/de16ecMn8Nf9dF9z18qcVCJwH7SOyo0MV7Zepyug+wUW3GLac4dg=
+	t=1783083442; cv=none; b=aFCxGwr0xExF9tkUQgGpmcKQ2rjqDT1yK0Bh9/TvoCEgvK09EM5BQd861UiAmh8epv0UOqdONtjSEaMtCttSndGlf95aRMI9Ju7sQfXeq6Xs8z+ARjkHWHr2cw0QGBQD3qSBL1JpC2dzTICC5p8ZPD91R8iCquVuVzSpnM02IB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783083438; c=relaxed/simple;
-	bh=Qh2AebDPP6V334mO4EbGUQK1Q97xupx09IiP6HcnOU8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l26r8nVxcnaeX3OyJcCFnX10l2ZjyRoFkOpwX6wplDmY1ZrSOoBAIYvzcDwzagTZYNvLKHPQE5q5cIIR2TZGtkiC4I0oDup/W4lVgel2BcA/ih9pO8AU5SZkujgwCToL3HcszIoq0DH8DPWr78fnM3JV1XB0R+3NBiNltThu3kY=
+	s=arc-20240116; t=1783083442; c=relaxed/simple;
+	bh=rnJWMTNtLDaeTSueQX1fYUjkcjKkKnTUMEUDUT320Y0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Je/P0i9WlI/tq5HaLJ6QLuuXqrVg7QTxU4eWHNCg24Iq68/0ue9ykAdgR0sHBaAGROM6av5kxRZ2kC5WSLD3iLgFS1/XGCjwdtF3iw+v74DDGzYhQxL48Z4j8IX57D9XTw3k98KGeDUMAruvzjjgtiHp6/Poc46oTimFpB9I9DQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
 Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 4511360687; Fri, 03 Jul 2026 14:57:14 +0200 (CEST)
+	id 86D3E6078D; Fri, 03 Jul 2026 14:57:18 +0200 (CEST)
 From: Florian Westphal <fw@strlen.de>
 To: <netdev@vger.kernel.org>
 Cc: Paolo Abeni <pabeni@redhat.com>,
@@ -43,10 +44,12 @@ Cc: Paolo Abeni <pabeni@redhat.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	<netfilter-devel@vger.kernel.org>,
 	pablo@netfilter.org
-Subject: [PATCH net 0/9] netfilter: updates for net
-Date: Fri,  3 Jul 2026 14:57:00 +0200
-Message-ID: <20260703125709.16493-1-fw@strlen.de>
+Subject: [PATCH net 1/9] netfilter: nf_nat_sip: reload possible stale data pointer
+Date: Fri,  3 Jul 2026 14:57:01 +0200
+Message-ID: <20260703125709.16493-2-fw@strlen.de>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260703125709.16493-1-fw@strlen.de>
+References: <20260703125709.16493-1-fw@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,12 +62,12 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304532-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304533-lists,netdev=lfdr.de];
 	DMARC_NA(0.00)[strlen.de];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:netfilter-devel@vger.kernel.org,m:pablo@netfilter.org,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[fw@strlen.de,netdev@vger.kernel.org];
@@ -73,7 +76,7 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
@@ -84,98 +87,81 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,strlen.de:mid,strlen.de:from_mime,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,strlen.de:from_mime,strlen.de:email,strlen.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0C4D6702BFE
+X-Rspamd-Queue-Id: 6FA0F702BC6
 
-Hi,
+quoting sashiko:
+ ------------------------------------------------------------------------
+ [..] noticed a potential memory bug and header corruption involving the
+ SIP NAT helper.
 
-The following patchset contains Netfilter fixes for *net*, all
-for ancient problems.  Patch 7 raised drive-by sashiko findings,
-but those are not related to the change itself.
+ In net/netfilter/nf_nat_sip.c:nf_nat_sip():
+	if (skb_ensure_writable(skb, skb->len)) {
+		nf_ct_helper_log(skb, ct, "cannot mangle packet");
+		return NF_DROP;
+	}
+	uh = (void *)skb->data + protoff;
+	uh->dest = ct_sip_info->forced_dport;
+	if (!nf_nat_mangle_udp_packet(skb, ct, ctinfo, protoff,
+				      0, 0, NULL, 0)) {
 
-1) Rebuild the nf_nat_sip data pointer to prevent stale access after SKB
-reallocation. Restrict UDP mangling to UDP streams to avoid TCP packet
-corruption.
+ If a cloned or fragmented SKB is reallocated by skb_ensure_writable(), the
+ old data buffer is freed. However, nf_nat_sip() fails to update *dptr to
+ point to the new buffer.
 
-2) Prevent undefined behavior in xt_u32 caused by invalid shift counts.
-From Wyatt Feng.
+ It also appears to use nf_nat_mangle_udp_packet() on what could be a TCP
+ packet, which would overwrite the sequence number with a checksum update.
+ ------------------------------------------------------------------------
 
-3) Use u64 variables to prevent incorrect comparisons on links exceeding
-34 Gbps in xt_rateest.  From Feng Wu.
+nf_conntrack_sip linerizes skbs, hence no fragmented skb can be seen.
+But clones are possible, so rebuild dptr.
 
-4) Cap the number of expectations per master during nfnetlink_cthelper
-updates. From Pablo Neira Ayuso.
+Disable nf_nat_mangle_udp_packet() branch for TCP streams.
+It doesn't look like this can ever happen, else we should have received
+bug reports about this, so just check the conntrack is UDP and drop
+otherwise.
 
-5) Mark malformed IPv6 extension headers for hotdrop in ip6tables.
-From Zhixing Chen.
+The calling conntrack_sip set ->forced_dport for SIP_HDR_VIA_UDP messages,
+so I don't think this is ever expected to be true for a TCP stream.
 
-6) Skip the end element of an open interval during the get command when its
-closest match is the interval's start element. Also from Pablo Neira Ayuso.
+Fixes: 7266507d8999 ("netfilter: nf_ct_sip: support Cisco 7941/7945 IP phones")
+Cc: stable@vger.kernel.org
+Assisted-by: Claude:claude-sonnet-4-6
+Signed-off-by: Florian Westphal <fw@strlen.de>
+---
+ net/netfilter/nf_nat_sip.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-7) Fix PMTU calculation for GUE/GRE tunnels in IPVS during ICMP fragmentation
-error handling. Include additional tunnel header length when computing the
-new MTU. From Yizhou Zhao.
-
-8) Reset full ip_vs_seq structures in ip_vs_conn_new. Also from Yizhou Zhao.
-
-9) Reject invalid shift parameters in xt_connmark. Also from Wyatt Feng.
-
-Please, pull these changes from:
-The following changes since commit d335dcc6f521571d57117b8deeebc940836e5450:
-
-  gue: validate REMCSUM private option length (2026-07-03 09:34:53 +0100)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-26-07-03
-
-for you to fetch changes up to 1b47026fb4b35bac850ad6e8a4ad7fc018e09ebc:
-
-  netfilter: xt_connmark: reject invalid shift parameters (2026-07-03 14:45:21 +0200)
-
-----------------------------------------------------------------
-netfilter pull request nf-26-07-03
-
-----------------------------------------------------------------
-
-Feng Wu (1):
-  netfilter: xt_rateest: fix u64 truncation in xt_rateest_mt()
-
-Florian Westphal (1):
-  netfilter: nf_nat_sip: reload possible stale data pointer
-
-Pablo Neira Ayuso (2):
-  netfilter: nfnetlink_cthelper: cap to maximum number of expectation
-    per master on updates
-  netfilter: nft_set_rbtree: get command skips end element with open
-    interval
-
-Wyatt Feng (2):
-  netfilter: xt_u32: reject invalid shift counts
-  netfilter: xt_connmark: reject invalid shift parameters
-
-Yizhou Zhao (2):
-  ipvs: fix PMTU for GUE/GRE tunnel ICMP errors
-  ipvs: reset full ip_vs_seq structs in ip_vs_conn_new
-
-Zhixing Chen (1):
-  netfilter: ip6tables: mark malformed IPv6 extension headers for hotdrop
-
- net/ipv6/netfilter/ip6t_ah.c       |  5 +++++
- net/ipv6/netfilter/ip6t_hbh.c      |  1 +
- net/ipv6/netfilter/ip6t_rt.c       |  3 ++-
- net/netfilter/ipvs/ip_vs_conn.c    |  4 ++--
- net/netfilter/ipvs/ip_vs_core.c    |  6 +++---
- net/netfilter/nf_nat_sip.c         | 11 +++++++++++
- net/netfilter/nf_tables_api.c      |  3 +++
- net/netfilter/nfnetlink_cthelper.c |  2 ++
- net/netfilter/nft_set_rbtree.c     |  8 ++++++--
- net/netfilter/xt_connmark.c        | 14 ++++++++++++--
- net/netfilter/xt_rateest.c         |  2 +-
- net/netfilter/xt_u32.c             | 12 +++++++++++-
- 12 files changed, 59 insertions(+), 12 deletions(-)
-
+diff --git a/net/netfilter/nf_nat_sip.c b/net/netfilter/nf_nat_sip.c
+index 67c04d8143ab..aea02f6aff09 100644
+--- a/net/netfilter/nf_nat_sip.c
++++ b/net/netfilter/nf_nat_sip.c
+@@ -289,13 +289,24 @@ static unsigned int nf_nat_sip(struct sk_buff *skb, unsigned int protoff,
+ 
+ 	/* Mangle destination port for Cisco phones, then fix up checksums */
+ 	if (dir == IP_CT_DIR_REPLY && ct_sip_info->forced_dport) {
++		int doff = *dptr - (const char *)skb->data;
+ 		struct udphdr *uh;
+ 
++		if (doff <= 0) {
++			DEBUG_NET_WARN_ON_ONCE(1);
++			return NF_DROP;
++		}
++
++		/* ct_sip_info->forced_dport only expected with UDP */
++		if (nf_ct_protonum(ct) != IPPROTO_UDP)
++			return NF_DROP;
++
+ 		if (skb_ensure_writable(skb, skb->len)) {
+ 			nf_ct_helper_log(skb, ct, "cannot mangle packet");
+ 			return NF_DROP;
+ 		}
+ 
++		*dptr = skb->data + doff;
+ 		uh = (void *)skb->data + protoff;
+ 		uh->dest = ct_sip_info->forced_dport;
+ 
 -- 
 2.54.0
 
