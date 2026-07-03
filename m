@@ -1,178 +1,201 @@
-Return-Path: <netdev+bounces-304338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304339-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id wyLFCv9GR2ryVAAAu9opvQ
-	(envelope-from <netdev+bounces-304338-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 07:22:07 +0200
+	id ZD90BTdHR2oLVQAAu9opvQ
+	(envelope-from <netdev+bounces-304339-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 07:23:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A76206FEAA6
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 07:22:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64E966FEAC5
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 07:23:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=h+kVEf1z;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304338-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304338-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=asu.edu header.s=google header.b=KzH9HkZY;
+	dmarc=pass (policy=none) header.from=asu.edu;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304339-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304339-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7EFD93027129
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 05:21:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 186AA3012C7A
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 05:22:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 932BB346FD2;
-	Fri,  3 Jul 2026 05:21:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8AB7331A6E;
+	Fri,  3 Jul 2026 05:22:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB28357CF8
-	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 05:21:43 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783056108; cv=none; b=B1TvYTE3I0VsWJcEAC6Ig9qQjK4D10wPP+uVW3JkOuKrvDjlj7XFDghTDHhX4s2exlKS+0JjjOGfaDKrKtiTSW9Zd8L1pypwb6StVte4K18PEr7OL9w5ZuEsNeOhnM3Ad4b2pI52FgE0ZN0hDrQLYiqXLtYMm7vtOX78gBFHWnY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783056108; c=relaxed/simple;
-	bh=ungXM+pGccTPmY4MYi+TOmQLabp5apMUzorBXrm5qVo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QZzHBeSGwDta+1MAGqjrzHbQNQjTp1M2rQdW8/ZPmJ8XmgRnYz5VLqbz3Czhk23COtWL28e0t1mdT2FZlOgsbt5YP2IRIEfMyCWQAheHC2gmEh9+oes3K/rpgUPb09LdhKYUTdrkLqIEPS9u6xTv7ogVkS6iwTinSHy9gcZig9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h+kVEf1z; arc=none smtp.client-ip=209.85.160.49
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-44ce674ed17so115320fac.0
-        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 22:21:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDE8332720C
+	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 05:22:16 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783056143; cv=pass; b=Cu9rCwRqwbHI9DB1P9JgKOgHMGacih9DEzQdlCCqOWVuaMyseO5FKwIt1EiVSN6iAGoiuBn1Nuh+qeopUu9naIi2WgU1kD7cV/QCY+jH8XklMdcsvm8E5z9L4nKRa5sbIl96Pk/itIbCdlB13gT/zcq0cNoFskbb1FJonApStrU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783056143; c=relaxed/simple;
+	bh=4xQxJeqEqnlHLED88GC1k092LnUJjBEqAI3h102NWE0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gSId5MYGUozI+hQPgE4im0djps1pSpyOFqL/N377sKhufRu6mG8VjZ1nBti0mB3Xd1b6pcivwJq1nDQD6wbBXe92MqLGThkh80DuF0ghsdrUMqPUEOrsrSkwanzkbx59gBhGS4pGleHNJhTb3f5aaqDI8vt+zNIbQftKM3YeSoI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=KzH9HkZY; arc=pass smtp.client-ip=209.85.210.179
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-842338c18e0so153114b3a.1
+        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 22:22:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783056134; cv=none;
+        d=google.com; s=arc-20260327;
+        b=ktgo8FgTG7cZn36q+St1NdeOTz4vfyahGYUUMwWXhiXRo1eSOnGCvbml81WvziuujR
+         fm3eIOd1nreibDwFcE3cpJasFIXE5yQgH+6gqdp/F4fuaJk/WByq6+JMxvnRF2bDxlz7
+         KEtvvX+giKsFX341aQCbhRHSk+qqQzLoWeteQS27kg2qlx1rOpwSQJTU2Numstyu9RP3
+         ZJgcbLukpxGyioYc9LhjgK4j3Nf4ubOGweKpDT5HkJEz6LFj2gSGRBxygUthbjKnRraz
+         UEnkuGFO1NzuzvTkG2BeCUEwCbaY9tGfl0BV3+MoOQX/+DNtLihq+3PetXFSpUVLHE8B
+         liyQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=2wbqJ7L0QFPhUQW/bHhoRwKm6QgSOLcKgZmEvKfbKvI=;
+        fh=NyotppbMKleIdfo2bvL+w5CT887/abE9eBPy5Y0NEa8=;
+        b=Zi1Fc5U1JxIBgr4b+WnluUHezctHmYcoAPjBQTjdBg/YUNv/b8NZXqHNHHmrNQDo8j
+         2Ra0sGlr5rzjn5i7wzKeXuft4L5PFs2VK7juSAMirZqRu6nujsfnv5RmMyYjWdjTDffs
+         9ttd46mLCqwb2zBRmMuW1MJIMB9uA3Ezj4Bb2/xLXrFkeOTIK+TPImWpqEZUcbeeI3Lk
+         AkuunjIRQ3MkY6L+za+Ay4mPVtixVDkD0/M11KTW12/dkJdODPH/9U8tHE1a9khiFR1O
+         eEjzyk0PAWQQkoAnIRB+FTH7zAcSI0eGJLeYKv9po//aN9YQ43iVhoJblfk9GJ4meoF9
+         npgQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783056101; x=1783660901; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=rbrF5PgluXo296yF8wu1iDrFOX+6QVWi9u8cpBpxPXM=;
-        b=h+kVEf1z6+OUrrAyxKRdwJjeEEDGg+rG8cF484EV4vUNX33SgP84/tqzO/tWZcxZZG
-         lLqZtJMpLTplvc5dNg09j5raiJ0qFSOMpngjR1Cv6YoO3+WP1vyenhsHoRMwIuZ05Cni
-         lC4VzpI+njML3iNw5w0E1aZRA2T5eOaRJU7uJAUCKhYf19vVLw/ZrcnDdS+qUtIZ/QG7
-         N/lOKYdlgHJeQ/VntPRGTXyJ0y94ci6Xk0T3JrQKK687yEEQ9s31ZApWcpdii4Y2hIq3
-         OLRIe7iHrAQScSLI1sg8oT89oDNPl+JGr4b4NaU7P2mZTofRTSCTvnLQK1JcV7XKomx9
-         Pzgw==
+        d=asu.edu; s=google; t=1783056134; x=1783660934; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2wbqJ7L0QFPhUQW/bHhoRwKm6QgSOLcKgZmEvKfbKvI=;
+        b=KzH9HkZYxoONaI0HxGneRtIwpVigk+d9jnskHtHuV4Z42nyokTiF0+ppi9POnyecGI
+         HozQtFcuQQkZmY09twThbmkBOAghhL2Y3R0n2yVh5OTbSL3AbT+F+WrffkBFlTrLUzSD
+         1vrCVUlwSSn7Q1uFF2hU2Vr7ntnyu1Cp+wJG9G7KE7yACMT0/W77kA1Uzmbo6nxJxfta
+         8fzU+HGNLCkzGuAb6m2DoS6MQBOCjPRqlvoDGfpwDWPCdKtCVNcrPqQCYDqLJsW7GRj1
+         nTZwmV1MXPORBYJ8sWhEbx3iqD2kKzR1s/AhKVHiWARWt6ECUUZbmobVAcziQOhh/DrM
+         GZSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783056101; x=1783660901;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=rbrF5PgluXo296yF8wu1iDrFOX+6QVWi9u8cpBpxPXM=;
-        b=XXRbKqTvLmgxNcZQxBzU4VeXZrQ2RgIetsoF0BHPS6ymp/OZWAgwHQJ43j7vacEW9r
-         Y6n/hJXq6TgoG1TopQQYDCqTzCfMoNALbGlUu4kK9Uffa+t4s5IndQEEGf7BnsqmaQ0y
-         o3mYuF6ZWsfRzSwOsl593S5JMcKo7MapvcUFZ+ZLbQ/zjJAc5KxrHIhvYDszqa/EPFDU
-         w9HSr3C1hegCZjjc5PsAU4tTRAHk2QtwS/gd6aggx5YbtMrhIyaL4d9zxgLQMQt0p4Zl
-         KwYvtxcPnwVRjJpIPwnRokC9P1bzMUd84Zfdf7yszupNMbmYxNx566zoqZsqe+TtfWEc
-         lKmQ==
-X-Forwarded-Encrypted: i=1; AFNElJ930Ja6owq8Kdxl8SiXZ0lkFknK+5Pnx9yuaAKMrwdZT7WvoFTa6zvGixnn4F8WXYpzvPpNTrM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywj0PGT9FrFZqIkNn89sWVlsd5abi7ZHbQK1T9R3V0g22z0lKqP
-	35RTqgKH/j32PLZkqZlUmYmIpM+sdBSwMVVev6n9g83h2BSaRoAad6EQ
-X-Gm-Gg: AfdE7ckYzTVBMxbWlXrA4v5TZ3i0nEyLPnGpAo3qj+2mmDGsj29wpXIY8JCb+Yyko9d
-	u37X0fz/o9+mtBgHNWvVGmM32ZJ8BZhXJApIcAco+Dm+I3E+IOKO+ThJwp4hIuttbGuU/wQXotk
-	N6Dzs1BmDB/CnaYqy4e6IhNBKHXKCGobP1ehQ+vXxPFrr9nz+I6NGaswhTfYcStQ8BueKXVfnpI
-	G+FBMGNAqCjQ9GI0VPGvK/KfWH2zjY3cycDtpBc3alVxU+XINLwJ+rr4KYsCDQtcI0fc8uAkNfZ
-	tUcog3AQKD1kSszmphmk/D8UC4L7V5wru8k/On7R7jJZQbGs46C5sW6q9vf+RQsFqcisCRdhUyg
-	YHILfJTgIfMZUt5LTyJ6gCIvvxGErm2l8N4rD6a8pSBU3RcZrrbXviB+CaCjA2MuRq3aeQpBHck
-	ZFK3CdgD9egzGgUWoy+8Bd
-X-Received: by 2002:a05:6820:4c01:b0:6a3:9ce:5412 with SMTP id 006d021491bc7-6a30d887c40mr4436494eaf.38.1783056101413;
-        Thu, 02 Jul 2026 22:21:41 -0700 (PDT)
-Received: from gmail.com ([2600:1702:56e9:4b40:ff21:65e6:6e3:5b43])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-44cfb1d011asm894391fac.8.2026.07.02.22.21.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jul 2026 22:21:41 -0700 (PDT)
-Date: Fri, 3 Jul 2026 00:21:38 -0500
-From: Akash Sukhavasi <akash.sukhavasi@gmail.com>
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
-	Jonathan Hunter <jonathanh@nvidia.com>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
-	linux-input@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Eric Dumazet <edumazet@google.com>, devicetree@vger.kernel.org, Simon Horman <horms@kernel.org>, 
-	Mauro Carvalho Chehab <mchehab@kernel.org>, linux-media@vger.kernel.org, linux-tegra@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>, 
-	Andrew Lunn <andrew@lunn.ch>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Russell King <linux@armlinux.org.uk>, linux-doc@vger.kernel.org, netdev@vger.kernel.org, 
-	Vladimir Oltean <olteanv@gmail.com>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
-	Thierry Reding <thierry.reding@kernel.org>
-Subject: Re: [PATCH v2 2/4] dt-bindings: media: remove obsolete rc.txt
-Message-ID: <akc_pO_ctTiZmbFw@gmail.com>
-References: <20260603-b4-remove-redirect-stubs-v2-0-c8c19876ab64@gmail.com>
- <20260603-b4-remove-redirect-stubs-v2-2-c8c19876ab64@gmail.com>
- <178052520503.2279647.12293343206224505400.robh@kernel.org>
+        d=1e100.net; s=20251104; t=1783056134; x=1783660934;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=2wbqJ7L0QFPhUQW/bHhoRwKm6QgSOLcKgZmEvKfbKvI=;
+        b=Z1wLauYPUJKoA0lcoaWz7HKL/kSulKAYz65GjOmXYqdmK5RNk6T8/8TvjXuXvUFtug
+         ntgeD9C0Ax8DcF+zKDAvCO6OW0NA0E4kgrOElWn36EUWESXbzaxiFb5FQfWoRCUrI1tf
+         LCFRxTdivtYfdvgTTe3+5nA0UrtROWvUc80d3S0Kd1c/2TUDvBHUoEVSet3aPPOIeBGT
+         rYj9u5Lja/Egzr8pYDQLg3tHI1tShMIDVYFAs670JVAgAwEfQkQg7YJBsQ8j7StJ4SFP
+         9HstavCw/CR12x1ZOHqqU5PDx4Yf7vAiPC/eIftImVrviNlxJh+euprHf3cay/lhe4jP
+         i9ww==
+X-Forwarded-Encrypted: i=1; AFNElJ9BY+6m1/8P+CEzWCPk3Ukhk8v0xVCANrWB/PXpz6ciCBneQrPryH8JNalW7/0/5jT2qE9v6LM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkG6w5CoHJCKPC2kTp91a4wz0RWiTkqvFj/nenAnOLq94upDwK
+	niz9JK7VyHxipINqWlw/MEQzoSAR4HZ+ibWiCpkZF7gtKNQBuMqgwDIQ+oBA9UEANHSdJ2GooSL
+	0V8jrHtdvCNkGf0XhAXKppy/M4sX6fcb16UhLvx2y
+X-Gm-Gg: AfdE7cmjM2IDB3S19TFTivOBfVmnLpVZ13vGa7YGicTbPMs4f6J3bSA/GV4PWBF9hr3
+	KnvSvc2pTlW9DpKQa+NDfJulhp0rBLTWCerf7mtP8mHwHVrhIEY0FkmWcwfRwJDuUCFj0Zuz4uG
+	lIQfKcxKQLb1vi1edL5Hej5QmcR2n4vpns4GJagXca0apxwvI27l+N/lthpB95wJVJLx+BHv8Xq
+	Mixi1DWFbv36fgqDsQ93e+uL8nsSnl4aDBmDShhrE6obUDeHt2VrfvYlXFM/PxFqzWYBqFUJOPa
+	9Nkp/5ku0kR4Ngyi5xxStOHhhugW
+X-Received: by 2002:a05:6a00:815:b0:845:e9e8:645c with SMTP id
+ d2e1a72fcca58-847c074eda4mr8938571b3a.6.1783056133878; Thu, 02 Jul 2026
+ 22:22:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <178052520503.2279647.12293343206224505400.robh@kernel.org>
+References: <20260702185805.615241-1-xmei5@asu.edu> <aka5pwAGGI56QrrS@strlen.de>
+ <CAPpSM+RshE2OFZCJjM0mRumWt3cixu9QBNh+rmS0z=AKPR25LQ@mail.gmail.com> <akczZMzVg7l6tUnU@strlen.de>
+In-Reply-To: <akczZMzVg7l6tUnU@strlen.de>
+From: Xiang Mei <xmei5@asu.edu>
+Date: Thu, 2 Jul 2026 22:22:01 -0700
+X-Gm-Features: AVVi8CfoWRh8jpEdVOxkBHVkWhj5TjfKJ6bTq63LYAwvkdSbkU3jz5U4B1aUrjU
+Message-ID: <CAPpSM+SJoeLhh12GnFN0MgMcmxqcOYzBw2_aX2=5E-3HjSFicQ@mail.gmail.com>
+Subject: Re: [PATCH ipsec] xfrm: policy: use hlist_del_init_rcu in
+ xfrm_hash_rebuild to avoid bydst poison
+To: Florian Westphal <fw@strlen.de>
+Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, netdev@vger.kernel.org, horms@kernel.org, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	AutonomousCodeSecurity@microsoft.com, tgopinath@linux.microsoft.com, 
+	kys@microsoft.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304338-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:robh@kernel.org,m:kuba@kernel.org,m:jonathanh@nvidia.com,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:linux-input@vger.kernel.org,m:hkallweit1@gmail.com,m:edumazet@google.com,m:devicetree@vger.kernel.org,m:horms@kernel.org,m:mchehab@kernel.org,m:linux-media@vger.kernel.org,m:linux-tegra@vger.kernel.org,m:davem@davemloft.net,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:conor+dt@kernel.org,m:lee@kernel.org,m:andrew@lunn.ch,m:krzk+dt@kernel.org,m:linux@armlinux.org.uk,m:linux-doc@vger.kernel.org,m:netdev@vger.kernel.org,m:olteanv@gmail.com,m:dmitry.torokhov@gmail.com,m:thierry.reding@kernel.org,m:conor@kernel.org,m:krzk@kernel.org,m:dmitrytorokhov@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[akashsukhavasi@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:fw@strlen.de,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:horms@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,redhat.com,vger.kernel.org,gmail.com,google.com,davemloft.net,lwn.net,linuxfoundation.org,lunn.ch,armlinux.org.uk];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	FORWARDED(0.00)[lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-304339-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[akashsukhavasi@gmail.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[asu.edu:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,strlen.de:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A76206FEAA6
+X-Rspamd-Queue-Id: 64E966FEAC5
 
-On Wed, Jun 03, 2026 at 05:20:05PM -0500, Rob Herring (Arm) wrote:
-> 
-> On Wed, 03 Jun 2026 15:42:19 -0500, Akash Sukhavasi wrote:
-> > rc.txt has been a single-line redirect to rc.yaml since
-> > commit 7c31b9d67342 ("media: dt-bindings: media: Add YAML schemas for
-> > the generic RC bindings"), which introduced the .yaml schema and
-> > reduced the .txt to a stub in the same change. The .yaml has the same
-> > filename in the same directory, making this redirect unnecessary
-> > for discoverability.
-> > 
-> > One file still references rc.txt, forcing readers through an extra
-> > hop to reach the .yaml. The stub has not been touched since August
-> > 2019. Update the reference in hix5hd2-ir.txt to point directly to
-> > rc.yaml and remove the stub.
-> > 
-> > Signed-off-by: Akash Sukhavasi <akash.sukhavasi@gmail.com>
-> > ---
-> >  Documentation/devicetree/bindings/media/hix5hd2-ir.txt | 2 +-
-> >  Documentation/devicetree/bindings/media/rc.txt         | 1 -
-> >  2 files changed, 1 insertion(+), 2 deletions(-)
-> > 
-> 
-> Acked-by: Rob Herring (Arm) <robh@kernel.org>
-> 
+On Thu, Jul 2, 2026 at 8:58=E2=80=AFPM Florian Westphal <fw@strlen.de> wrot=
+e:
+>
+> Xiang Mei <xmei5@asu.edu> wrote:
+> > Agreed, and my patch hides it instead of avoiding it. The problem is
+> > the prep loop's guard is inverted:
+> >
+> >         if (policy->selector.prefixlen_d < dbits ||
+> >             policy->selector.prefixlen_s < sbits)
+> >                 continue;
+> >
+> > That skips exactly the policies reinserted via the tree (prefixlen <
+> > threshold =3D> policy_hash_bysel() NULL =3D> xfrm_policy_inexact_insert=
+()),
+>
+> Indeed.
+>
+> > locates for the exact ones instead, which never allocate and get
+> > pruned again at out_unlock. So the inexact bin/node is allocated GFP_AT=
+OMIC
+> > after the hlist_del_rcu(), and that's the failure the WARN catches.
+> >
+> > The reproducer lowers then raises the threshold so those bins are prune=
+d
+> > and reallocated during reinsert; failslab just makes the failure
+> > deterministic, OOM would do the same.
+> >
+> > v2 inverts the guard so prep prepares the set that's actually reinserte=
+d:
+> >
+> >         -       if (policy->selector.prefixlen_d < dbits ||
+> >         -           policy->selector.prefixlen_s < sbits)
+> >         +       if (policy->selector.prefixlen_d >=3D dbits &&
+> >         +           policy->selector.prefixlen_s >=3D sbits)
+> >                         continue;
+>
+> Much better!
+>
+> > I checked the new patch on the reproducer, and the crash can't be trigg=
+ered.
+> > If you agree with this new patch, I'll send this as v2.
+>
+> Please do, thanks!
 
-Friendly ping on this one. Rob's Acked-by has been on v2 since June 3
-and the patch still applies cleanly.
+Thanks for checking with me. The v2 has been sent at:
+https://lore.kernel.org/netdev/20260703051932.966884-1-xmei5@asu.edu/
 
--- 
-Thanks,
-Akash
+Xiang
 
