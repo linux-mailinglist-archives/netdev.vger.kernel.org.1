@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-304460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304461-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id fVkIOSGAR2qaZgAAu9opvQ
-	(envelope-from <netdev+bounces-304460-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 11:25:53 +0200
+	id MlBeOth+R2ooZgAAu9opvQ
+	(envelope-from <netdev+bounces-304461-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 11:20:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6461C7009C5
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 11:25:53 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88B597008DE
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 11:20:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=VezMYE1D;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="I98B/Hgu";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304460-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304460-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304461-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-304461-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 256823017017
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 09:20:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A356F3009F64
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 09:20:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 366A03B1029;
-	Fri,  3 Jul 2026 09:20:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C9733B1022;
+	Fri,  3 Jul 2026 09:20:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1283F381EBB
-	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 09:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20953ADB98
+	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 09:20:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783070413; cv=none; b=lqLJHG0PzGUN9CeO4za1UCkl+vpbqOPnROt1yhgcVnrT/gAuwlqzWfYBwk6aO0L+mRdVCl86tEou/khP6vyXoAUGYQltcYBOWJRCLpdOIKb968hLPfm1FKSec8m1hJT5/N75XO/pNe5wMTbRQA+sziqAApD05uxgoz/QZ75PRFI=
+	t=1783070416; cv=none; b=TJcnkkUg3f11ilsoQ5UjG5KUwZx4vO7H4ZAhLAm3WmYa4L/b+AkLbxMrhdqFCPo5YEo8Hi9WH2byJegPRx2OUwLpstzqhT6sfjJS3685mj0aQ1AfJC+MKsnJNpR8B6s0cWh1oOtRiwObl1tW3jV2FBQAGgO9thdTpLTNybhmpWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783070413; c=relaxed/simple;
-	bh=TywI3dqnCaH5sAyd+uERxevzqdj0M/r4D3Urh2q5oa8=;
+	s=arc-20240116; t=1783070416; c=relaxed/simple;
+	bh=9tfKi82+gKl4NuEAu+9otAM9qL+evCA7f5THgkApNP4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=kdKsi5NPm23hDrNC0Ym0etYza1rkUP8HegjDwKpBJDqFKjUBp5XQyHFa/ojpAL2HsBWIWcNF1oHtj7gugtFGjbZVOqn0L6fW1RyOJlyOKVGus/WWEcx7n4M5mQKUhDubxltiN0m+ahfZzPx+o+R9WfdtRo5ZdLl7bSQkNmlziik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VezMYE1D; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F1691F000E9;
-	Fri,  3 Jul 2026 09:20:11 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=IQczfA2xfGZTrzkVzY3G2slkKWYPAe/qGWb/YEwym10GUp7hWcjUlyaIgv93i6DyDLPXpfhgwdkQHxuN5qwiQKA3mjrtLqQSw71p7R/ON3lyKFyab1dTG5yU2x775HGy1J0WQCzTs1IcFnkSED5oBUkFZdDDkqwcbxcaNB815rY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I98B/Hgu; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B53B41F00A3E;
+	Fri,  3 Jul 2026 09:20:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783070411;
-	bh=m752NnhF/FP6qFoaKmhQ5C6VfsVRyP9iPgdm+CBcUqE=;
+	s=k20260515; t=1783070414;
+	bh=RVGZpzobJnt83rgDwOsAgyqT+FGaaTXUCKerOjXE5Cc=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=VezMYE1DbX4icY0ru2G4bOVLPr1r0BkrgFbU0nHy9GSdpa1gdiSSh9JZUVV3MPKGX
-	 NhA7zUNGAhFs5yLaMtyamhTMNHP9glRLiRAtBundyq2jUFLv+KpWNg1gBcaPQhXNxJ
-	 sx2U5Iy4naApcJE3dKPAYu09wL1Wqq2W5yzSIJC59Qw7kVEdwwsLx8yXrmwXhBwjBA
-	 ow2DN3HmTTlCK2D5bny3MR1V5pGsxdSyMeyGFIy4RnlUb/o9+0rt56iFmC/Lr3MwPy
-	 nNSWjCCtHTORjwB30xbpV8HualtAcvAfeu46OD8SL3+4k0G3wMdcizTnGl621/+38t
-	 bqJugp98SIwow==
+	b=I98B/Hgujpl5cokwi18qnCTkz4LtT4AvbdZQG0/sX9pxIeX/nBDyIkdza0gD9UTOg
+	 lijlUW7cAWCE49XrpxmsyJGkbbIf0hGkBL3Sb5j2owQA3YfrtOdOi8ysFF80QHLanp
+	 4WvOf10DfSkYf4VzTocndiTEkI0xfXyNHIzq1SkSH7sGGPEqZPjjU35J9u9xD9i3uu
+	 +FOq82Jh3TDMhj9SDuCvMT8kLY9xnQVPQatlXS9o5r09tLyxElH5j+aVlJaH8b3fOV
+	 kRKwCKiZBlxebXvERLcQIj7fCuWam+VksCB2RRFcNBcvHTmibnojCxK3Fsgg5Ex/QV
+	 JLAxz93cbB5+w==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Fri, 03 Jul 2026 11:19:25 +0200
-Subject: [PATCH net-next v8 1/3] net: airoha: rename airoha_priv_flags to
- airoha_dev_flags
+Date: Fri, 03 Jul 2026 11:19:26 +0200
+Subject: [PATCH net-next v8 2/3] net: airoha: fix ETS QoS stats counter
+ underflow and cross-channel corruption
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,7 +58,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260703-airoha-ethtool-priv_flags-v8-1-015ba5ac89ee@kernel.org>
+Message-Id: <20260703-airoha-ethtool-priv_flags-v8-2-015ba5ac89ee@kernel.org>
 References: <20260703-airoha-ethtool-priv_flags-v8-0-015ba5ac89ee@kernel.org>
 In-Reply-To: <20260703-airoha-ethtool-priv_flags-v8-0-015ba5ac89ee@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -76,16 +76,16 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304460-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304461-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lorenzo@kernel.org,m:horms@kernel.org,m:aleksander.lobakin@intel.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lorenzo@kernel.org,m:horms@kernel.org,m:aleksander.lobakin@intel.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -101,62 +101,89 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6461C7009C5
+X-Rspamd-Queue-Id: 88B597008DE
 
-Rename the airoha_priv_flags enum to airoha_dev_flags and the
-AIROHA_PRIV_F_WAN flag to AIROHA_DEV_F_WAN. The "priv_flags" naming
-dates back to an earlier design that used ethtool private flags; since
-this series switched to tc qdisc offload for LAN/WAN configuration,
-align the naming to reflect that these are per-device flags rather than
-ethtool private flags. No functional change.
+airoha_qdma_get_tx_ets_stats() has two bugs:
+- The hardware counters read via airoha_qdma_rr() are 32-bit values
+  but are stored in u64 locals and subtracted from u64 baselines. When
+  a 32-bit hardware counter wraps around, the subtraction produces a
+  large underflow value passed to _bstats_update().
+- The baseline counters (cpu_tx_packets, fwd_tx_packets) are stored as
+  single per-device fields, but airoha_qdma_get_tx_ets_stats() is
+  called with different channel values (0-3). Each call reads a
+  different channel's hardware counter but overwrites the same
+  baseline, corrupting the delta computation for other channels.
 
+Fix both by:
+- Narrowing the counter locals and baselines to u32 so that 32-bit
+  unsigned subtraction handles wrap-around naturally.
+- Grouping the baselines into a per-channel qos_stats array so each
+  channel tracks its own previous counter value independently.
+- Splitting the delta addition into two statements so the first u32
+  delta is widened to u64 on assignment and the second is added in
+  u64 arithmetic, preventing overflow when both deltas are large.
+
+Fixes: 20bf7d07c956 ("net: airoha: Add sched ETS offload support")
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/ethernet/airoha/airoha_eth.c | 2 +-
- drivers/net/ethernet/airoha/airoha_eth.h | 6 +++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/airoha/airoha_eth.c | 18 +++++++++++-------
+ drivers/net/ethernet/airoha/airoha_eth.h |  7 ++++---
+ 2 files changed, 15 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 59001fd4b6f7..41c1a0ffbdd8 100644
+index 41c1a0ffbdd8..aaf2a4717d12 100644
 --- a/drivers/net/ethernet/airoha/airoha_eth.c
 +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -2039,7 +2039,7 @@ static int airoha_dev_init(struct net_device *netdev)
- 		fallthrough;
- 	case AIROHA_GDM2_IDX:
- 		/* GDM2 is always used as wan */
--		dev->flags |= AIROHA_PRIV_F_WAN;
-+		dev->flags |= AIROHA_DEV_F_WAN;
- 		break;
- 	default:
- 		break;
+@@ -2482,16 +2482,20 @@ static int airoha_qdma_get_tx_ets_stats(struct net_device *netdev, int channel,
+ {
+ 	struct airoha_gdm_dev *dev = netdev_priv(netdev);
+ 	struct airoha_qdma *qdma = dev->qdma;
++	u32 cpu_tx_packets, fwd_tx_packets;
++	u64 tx_packets;
+ 
+-	u64 cpu_tx_packets = airoha_qdma_rr(qdma, REG_CNTR_VAL(channel << 1));
+-	u64 fwd_tx_packets = airoha_qdma_rr(qdma,
+-					    REG_CNTR_VAL((channel << 1) + 1));
+-	u64 tx_packets = (cpu_tx_packets - dev->cpu_tx_packets) +
+-			 (fwd_tx_packets - dev->fwd_tx_packets);
++	cpu_tx_packets = airoha_qdma_rr(qdma, REG_CNTR_VAL(channel << 1));
++	fwd_tx_packets = airoha_qdma_rr(qdma,
++					REG_CNTR_VAL((channel << 1) + 1));
++	tx_packets = (u32)(cpu_tx_packets -
++			   dev->qos_stats[channel].cpu_tx_packets);
++	tx_packets += (u32)(fwd_tx_packets -
++			    dev->qos_stats[channel].fwd_tx_packets);
+ 
+ 	_bstats_update(opt->stats.bstats, 0, tx_packets);
+-	dev->cpu_tx_packets = cpu_tx_packets;
+-	dev->fwd_tx_packets = fwd_tx_packets;
++	dev->qos_stats[channel].cpu_tx_packets = cpu_tx_packets;
++	dev->qos_stats[channel].fwd_tx_packets = fwd_tx_packets;
+ 
+ 	return 0;
+ }
 diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index f6d01a8e8da1..bf1c249255bd 100644
+index bf1c249255bd..bf44be9f0954 100644
 --- a/drivers/net/ethernet/airoha/airoha_eth.h
 +++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -543,8 +543,8 @@ struct airoha_qdma {
- 	DECLARE_BITMAP(qos_channel_map, AIROHA_NUM_QOS_CHANNELS);
- };
+@@ -553,9 +553,10 @@ struct airoha_gdm_dev {
+ 	struct airoha_eth *eth;
  
--enum airoha_priv_flags {
--	AIROHA_PRIV_F_WAN = BIT(0),
-+enum airoha_dev_flags {
-+	AIROHA_DEV_F_WAN = BIT(0),
- };
+ 	DECLARE_BITMAP(qos_sq_bmap, AIROHA_NUM_QOS_CHANNELS);
+-	/* qos stats counters */
+-	u64 cpu_tx_packets;
+-	u64 fwd_tx_packets;
++	struct {
++		u32 cpu_tx_packets;
++		u32 fwd_tx_packets;
++	} qos_stats[AIROHA_NUM_QOS_CHANNELS];
  
- struct airoha_gdm_dev {
-@@ -667,7 +667,7 @@ static inline u16 airoha_qdma_get_txq(struct airoha_qdma *qdma, u16 qid)
- 
- static inline bool airoha_is_lan_gdm_dev(struct airoha_gdm_dev *dev)
- {
--	return !(dev->flags & AIROHA_PRIV_F_WAN);
-+	return !(dev->flags & AIROHA_DEV_F_WAN);
- }
- 
- static inline bool airoha_is_7581(struct airoha_eth *eth)
+ 	u32 flags;
+ 	int nbq;
 
 -- 
 2.55.0
