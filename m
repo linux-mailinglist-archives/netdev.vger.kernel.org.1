@@ -1,205 +1,226 @@
-Return-Path: <netdev+bounces-304361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304362-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id fJtwEGlUR2otWQAAu9opvQ
-	(envelope-from <netdev+bounces-304361-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 08:19:21 +0200
+	id iL4KOvtVR2q8WQAAu9opvQ
+	(envelope-from <netdev+bounces-304362-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 08:26:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1E0A6FF063
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 08:19:20 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E88716FF10A
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 08:26:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=efGWudIF;
-	dmarc=pass (policy=reject) header.from=mailbox.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304361-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304361-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=JhIJJE4+;
+	dmarc=pass (policy=reject) header.from=google.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304362-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304362-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9389C302837D
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 06:19:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 00A7D30074E4
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 06:26:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A5C836495F;
-	Fri,  3 Jul 2026 06:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFD9837F8CA;
+	Fri,  3 Jul 2026 06:25:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDAAE359A81
-	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 06:19:14 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783059557; cv=none; b=rihHFDAAozFE2zUUxr+tdUlPRQgvvzTMwvnqtQfU5LVm69pRSQXHUuv4uvIe9b5RZSL5lIlE6M1PKjYPQN3RAaTD81aM6t4SJwnobb87y8cfdu5aGU7p9B19gxIeQU3p2j5gjSUCt8DcfpomvaKt3u2WY4WS/F1hNFtiZF+e8Jo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783059557; c=relaxed/simple;
-	bh=PCllz5nHJ2tib46eIPG3MxrpirCyDKKbKNazLzWwuCA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=f536bYljbF158HdhjH8JxFVvALXy+88Vdr9b/1XOdqqYMYbK16E4/EsX2Qkgx6B9LSy/TDoi9jS5Lra4QiO86dMsFrN/zo4kTNjruTdNac9b9uoOfrj/Fv2M+AvVKBuZqVHhlsHLp414BWzoQBp91dfnvMCilKJheNbMjy45I1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=efGWudIF; arc=none smtp.client-ip=80.241.56.172
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4gs3Vd3jv4z9tfx;
-	Fri,  3 Jul 2026 08:19:05 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1783059545;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K1zRePlccUePUxm+KZeJ7YE1zD4I6nNtO+kgWLOfu8Q=;
-	b=efGWudIFqLA7zpIZoBE7KGxd9t7Zp4gbVCOizImnY/t2whl1VmKbcjWuRoyNQvWJ9yBU8b
-	yZEkbkAPANSQX5Rdt/B9pdSni/9aA/2KpgO+nafqD4QKmAws9b/aQrP6lmXwnoSpWRP06/
-	+/YbyujQb1g3VyP69tfKKlYDyPOkAtV5HzYftvlotyHajvrPInrg4a5Fyy2X093/ry+J3L
-	2NvR7EhmJlZfxvXJ5nuwb1EYK6/7bpLrS9KFhcD76rjvfQZofu3n8bQx1mPeHz3YoAhJuq
-	/MbrywV1Fzata8jFv7Qq3q9J8EMJ6mODHLr9wf9Y4fOR09vqE7+9nB/196hcOw==
-Message-ID: <d6cfd7bd90001af215ba456ab81404a60fbea1c4.camel@mailbox.org>
-Subject: Re: [PATCH ipsec v2] xfrm: policy: preallocate inexact bins before
- xfrm_hash_rebuild reinsert
-From: Manuel Ebner <manuelebner@mailbox.org>
-To: "Xiang Mei (Microsoft)" <xmei5@asu.edu>, fw@strlen.de, 
-	steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
- davem@davemloft.net, 	netdev@vger.kernel.org
-Cc: horms@kernel.org, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, 	AutonomousCodeSecurity@microsoft.com,
- tgopinath@linux.microsoft.com, 	kys@microsoft.com
-Date: Fri, 03 Jul 2026 08:18:58 +0200
-In-Reply-To: <20260703051932.966884-1-xmei5@asu.edu>
-References: <20260703051932.966884-1-xmei5@asu.edu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 491D537B400
+	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 06:25:55 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783059956; cv=pass; b=ARqbLABnTus2CiC9T6hTgW8FqyStm4w9hbnCHYtdyivnKhFNVZq7fNtNjXUkNyOBRIe9tnwl/yHrXNx7F10IqZcxDdFe7jw+jHxWKedTUpbdfn2tvxud/3DKzR4DA7gCvOh+FCHkoj4rZkD142+b372blmc59sM7WaykwUq28LU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783059956; c=relaxed/simple;
+	bh=gu23m3G9I8LRrXwsMirKiBM83umbvVFeycfI4F8fQoU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ORWHGPW8NEDaW/4lSLBLxWqRnxwLPkZummROJTRy4erJPYitLZEYrgzs0myYItI9/4y/3j6TA1j43X1M9aOpUHOoVxvcsI9j9mNS8eZOgaZUe0Z2Qx4lchsfOplVLrdpAxwifh9J3mywIBodkg2I3eRyvTnFQ9dFJ9M0wnMELt0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JhIJJE4+; arc=pass smtp.client-ip=209.85.215.181
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-c9672e02e05so129586a12.3
+        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 23:25:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783059954; cv=none;
+        d=google.com; s=arc-20260327;
+        b=ai1lPEW02G0fpJ6OuTpm8RjtIT/LlB0wt6F2m5KYKe/GYWDt//bjOJHuXwXLyZQVmo
+         yU7LGaJqsvvKarpcTBKC4hl4bzn//mo09kkKQqB63ysfbweZDxTNrSOzUPosGE8VKqBH
+         WkLFrnTLSOmuc456bceLz3EGEd1v2HzjHZkZz3OPTw+gjsh5uCcYKFBUIc3sCk2Y8e3A
+         fPXN0wjn3KxhlviojM3+bd5iNmnYVw/rX+pDHP5h+46prhfkR2MeDaJfkIxzx4wiGNmH
+         ZFca227jgLTF7Xpun79XIgBHaxd7XuW5vG6Qbp0eqlRJBRimb+vuaelFduDkP8uyYfuY
+         Ylqw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=BSF6P/7OY1gFGFz/Cqzg8XWTkIoYPCEYs2S/9aAkdwU=;
+        fh=NtdMffIPji6pGWrYl623L3Ar2063xHA4jw0/3+YwMPU=;
+        b=kiwEGUm2Qq2g74h8tEQiZsExTL9ZU9HZH7IdACL34kxtsIj4LTmu79jtIzInNFP8he
+         p9TIMl7EKdTlh6BwhHbpVRB5oakyB6es/Tm2j7d91J7mMDKCcKN2qNhS+ygAU3n69kBw
+         kMKCm9I9Fz1XHAUjr6Aby/CMcXATDs8UzpG59yd76THgKorltVtHnfHu5WvmHUMh3IxK
+         AjBrgKHc/Ea3d7ZDbkf2+YlSnXR8KPvKZrpI4qOeCOCzqP05Wu3MK4yeDgYO1cxse6dH
+         t2PUh1aUuNjjOt11amOzgpSWDAbe1Z1iaHetapq1Ty/ggLRtaC2VLa80YFcb4wOyWG0g
+         LvAA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1783059954; x=1783664754; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BSF6P/7OY1gFGFz/Cqzg8XWTkIoYPCEYs2S/9aAkdwU=;
+        b=JhIJJE4+piKTJlV1hwDPUJjKLc8Nc/naNjthHuU6EFI//+HZhV5TMHPFTRqBoSGwiR
+         wiW8G23vJAPyMGcJ1afE44N+gGgCGMZ64Co1wqMlFEAOk1Jf4qTJWnoS5fPOR0I/qnbH
+         mtKvv6vpW3GTpUr2spOf/r6HsxwvJjRbrI2ecIZvzHADhDwRtvnkuWBnCp693PaX680C
+         a+kS7/f3wky5yzLXk97NhJId/2zcu3nymNS4iThd534jnxdeHdHmUFbCLLG51aeiDnzn
+         SP0odUvTPQ8MFqvossZmLSpn4NAOQFQmnhDCxlbbFLwhTKxDZrDA+uRJgp3cWzrgGfl/
+         r5sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783059954; x=1783664754;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=BSF6P/7OY1gFGFz/Cqzg8XWTkIoYPCEYs2S/9aAkdwU=;
+        b=jEPAsKJRc9WrmYRnKrakiQ4wusZT+qvg6wP2kS9FoFhiniqBaqhIk43SwMPy9TEp3E
+         UEp7J4aJFjAk6T632YuKbIRIOSERbcnORZv6LcjZmCiJsyqAFLWGdp7oLyDPEdJ0cxCD
+         Ysn45uc9AtZbnaRhs+APQVPv6Y+DxZlxgMBElscg4jC4KfCb6Dgzfbe0AcCEiUpgN1NH
+         frp6Slm/p69csHRiaKfCkE8r1srnOFP0wFOtUDhA4zP4qjIsxetbfG1lTafz4TU7y8Tn
+         hbIdcz07lYk+WP3TL/syDvNrY0xxSv2n/6NAy2y0EW3PwuhJfYCiiPNdUY3pLEEDz7xD
+         KiRQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+NNMpnxeBPSYAbqqpXgSs+cHZa1urgT8X2ootHszL9+HQOfBYeq+erYyiTp4+mX5wB/H9S4qA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUSOwrTbtSRTyMzjboXn5c5MGwuqWtt9tRNFraG6fA27IiM5xI
+	u2plvbu4T3MrglFLfG65odtgLAUB7vJ07tt9f19dZDdZv7SbTAJm/6q9uuCHwXOHT1x8xw5d5Jp
+	aK4UwhTtxCb1HymXEaKvhMSkYHkng2uyhiGTTnv4y
+X-Gm-Gg: AfdE7ckZS89ezpGEvMawDX9RGBWkz9nUFEKMamKH4N1XqVNM590H7yal7lVbBjUmsnM
+	hPC/SGZkGvrmo8AZJplBiN3B8sp0rv2Nx5qSAHFXzb5u/MDu3ILrM4zC0Fx3Ib9bfxlZyfJZXPY
+	hmcXX7gzk0pabzbNp4aNGbYkAXrvhO00yGsFJlPmvyZWKW5QlBUVzUaLw/A7TUpDocVm9aBM+zy
+	sFXvEZuyZ6faxBAjALxIEJQfQ+REnDorHx741P59/XFI/8zR4Xn17pVv+vfWfurADaDwUAM/Rl/
+	Oyal7XqUa9FoVfD9+0+e/cudmm8+Qucx99HPHzqkgClhfWpjPYv4iRJsBZEE339JpyKUMBmHI4w
+	ZqFHw3sFd+F7nnA6MnDUfzo9S6gYfzEF1m0vUVT1J
+X-Received: by 2002:a05:6a21:400d:b0:3b7:d8d5:2326 with SMTP id
+ adf61e73a8af0-3bfed0e290fmr10485150637.1.1783059953937; Thu, 02 Jul 2026
+ 23:25:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MBO-RS-ID: 9a84f4646fb108d8bf4
-X-MBO-RS-META: grrz9945e56khhr5uuybxy9gb8d6w3eb
+References: <cover.1782922354.git.namcao@linutronix.de> <e663a83195f3d9f6d7ad4907c37ae3e45c151062.1782922354.git.namcao@linutronix.de>
+ <20260702163608.0207A1F00A3A@smtp.kernel.org> <87mrw8sjo3.fsf@yellow.woof>
+In-Reply-To: <87mrw8sjo3.fsf@yellow.woof>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Thu, 2 Jul 2026 23:25:42 -0700
+X-Gm-Features: AVVi8CffnuaY4KiLN4AyhU_3QHylM_R_UciFhQADgsvWNfXQqFEwJUoE2kfoIl0
+Message-ID: <CAAVpQUB+LDxRrF66=NKwLAdLN8kt+Hssm_KBc2oc_q6FTJF0VA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] af_unix: Do not wait for garbage collector in sendmsg()
+To: Nam Cao <namcao@linutronix.de>
+Cc: sashiko-reviews@lists.linux.dev, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rt-devel@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-304362-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:xmei5@asu.edu,m:fw@strlen.de,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:horms@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[manuelebner@mailbox.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-304361-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:namcao@linutronix.de,m:sashiko-reviews@lists.linux.dev,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rt-devel@lists.linux.dev,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[manuelebner@mailbox.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mailbox.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mailbox.org:from_mime,mailbox.org:dkim,mailbox.org:mid]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linutronix.de:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A1E0A6FF063
+X-Rspamd-Queue-Id: E88716FF10A
 
-Hi Xiang Mei
+On Thu, Jul 2, 2026 at 10:53=E2=80=AFPM Nam Cao <namcao@linutronix.de> wrot=
+e:
+>
+> sashiko-bot@kernel.org writes:
+> > Thank you for your contribution! Sashiko AI review found 1 potential is=
+sue(s) to consider:
+> > - [High] Garbage collector is no longer scheduled when creating new inf=
+light FDs, leading to permanent cycle accumulation and -ETOOMANYREFS failur=
+es in isolated environments.
+> > --
+> >
+> > commit 506189bd29f8ad56f5d9e51f3e0216203ebad5ec
+> > Author: Nam Cao <namcao@linutronix.de>
+> >
+> > af_unix: Do not wait for garbage collector in sendmsg()
+> >
+> > This patch removes the garbage collector scheduling and waiting from th=
+e
+> > sendmsg() path for AF_UNIX sockets. It aims to prevent priority inversi=
+on
+> > by relying on RLIMIT_NOFILE limits and asynchronous garbage collection.
+> >
+> >> diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+> >> index 0783555e25266..f180c59b3da9d 100644
+> >> --- a/net/unix/garbage.c
+> >> +++ b/net/unix/garbage.c
+> >> @@ -300,8 +300,6 @@ int unix_prepare_fpl(struct scm_fp_list *fpl)
+> >>      if (!fpl->edges)
+> >>              goto err;
+> >>
+> >> -    unix_schedule_gc(fpl->user);
+> >> -
+> >
+> > [Severity: High]
+> > Does this removal prevent the garbage collector from running when a pro=
+cess
+> > creates isolated socket cycles?
+> >
+> > If a process continuously creates socket cycles (e.g., passing FDs to e=
+ach
+> > other) and closes its local FDs, the sockets reference each other in th=
+eir
+> > receive queues, so their file reference counts will not reach zero.
+> >
+> > Because the refcounts do not drop to zero, unix_release_sock() is never
+> > triggered. By removing unix_schedule_gc() from unix_prepare_fpl() here,
+> > unix_release_sock() is left as the only trigger for garbage collection.
+> >
+> > This could allow the inflight count to accumulate indefinitely until it
+> > hits RLIMIT_NOFILE, causing subsequent sendmsg() calls to fail with
+> > -ETOOMANYREFS and permanently leaking the network namespace unless an
+> > unrelated AF_UNIX socket is closed system-wide.
+>
+> Sashiko found a valid issue here.
 
-On Fri, 2026-07-03 at 05:19 +0000, Xiang Mei (Microsoft) wrote:
-> xfrm_hash_rebuild()'s first loop preallocates the bins/chains the reinser=
-t
-> loop needs, so the reinsert (after hlist_del_rcu()) cannot allocate or
-> fail.=C2=A0
+This is same with my point, and
 
-This sentence is difficult to understand for me. Can it be simplified or ch=
-anged?=20
-This would help a little:
+> But this is a pre-existing issue. It
+> is not introduced in this patch.
 
-xfrm_hash_rebuild()'s first loop preallocates the bins/chains which the rei=
-nsert
-loop needs. In this case the reinsert ...
+your patch makes it much easier to abuse.
+UNIX_INFLIGHT_SANE_USER is usually much smaller than
+RLIMIT_NOFILE.
 
+unix_schedule_gc() in sendmsg() is to self-regulate malicious users,
+otherwise GC relies on unrelated AF_UNIX socket's close() and could
+be triggered too late since GC is system-wide.
 
-> But its guard is inverted: it skips policies with prefixlen <
-> threshold and preallocates for the rest.
->=20
-> prefixlen < threshold is exactly when policy_hash_bysel() returns NULL an=
-d
-> the reinsert takes the allocating xfrm_policy_inexact_insert() path. So t=
-he
-> loop preallocates for the exact policies (which never allocate) and skips
-> the inexact ones, whose bin/node is then allocated GFP_ATOMIC during
-> reinsert. On failure the error path only WARN_ONCE()s and continues,
-> leaving a poisoned bydst node;=C2=A0
+Previously every sendmsg() had to wait for GC, and now it's only when
+there is a circular reference AND user has too many inflight sockets.
 
-what's 'bydst'?
-
-> the next rebuild's hlist_del_rcu()
-> dereferences LIST_POISON2 and takes a GPF.=C2=A0
-
-/GPF/GFP/
-
-Thanks
- Manuel
-
-> Reachable under memory pressure,
-> deterministic via failslab.
->=20
-> Invert the guard so preallocation covers exactly the reinserted policies;
-> the reinsert then allocates nothing and cannot fail.
->=20
-> Crash:
-> =C2=A0 Oops: general protection fault, probably for non-canonical address
-> =C2=A0 0xfbd59c0000000024: 0000 [#1] SMP KASAN NOPTI
-> =C2=A0 KASAN: maybe wild-memory-access in range [0xdead...]
-> =C2=A0 ...
-> =C2=A0 Workqueue: events xfrm_hash_rebuild
-> =C2=A0 RIP: 0010:xfrm_hash_rebuild+0x5b3/0x1190
-> =C2=A0 RAX: dead000000000122=C2=A0=C2=A0 (LIST_POISON2 + offset)
-> =C2=A0 ...
-> =C2=A0 Call Trace:
-> =C2=A0=C2=A0 hlist_del_rcu (include/linux/rculist.h:599)
-> =C2=A0=C2=A0 xfrm_hash_rebuild (net/xfrm/xfrm_policy.c:1365)
-> =C2=A0=C2=A0 process_one_work (kernel/workqueue.c:3322)
-> =C2=A0=C2=A0 worker_thread (kernel/workqueue.c:3486)
-> =C2=A0=C2=A0 kthread (kernel/kthread.c:436)
-> =C2=A0=C2=A0 ret_from_fork (arch/x86/kernel/process.c:158)
-> =C2=A0=C2=A0 ret_from_fork_asm (arch/x86/entry/entry_64.S:245)
-> =C2=A0=C2=A0 ...
-> =C2=A0 Kernel panic - not syncing: Fatal exception in interrupt
->=20
-> Fixes: 24969facd704 ("xfrm: policy: store inexact policies in an rhashtab=
-le")
-> Reported-by: AutonomousCodeSecurity@microsoft.com
-> Signed-off-by: Xiang Mei (Microsoft) <xmei5@asu.edu>
-> ---
-> v2: fix the inverted preallocation guard (root cause)
-> =C2=A0=C2=A0=C2=A0 instead of avoiding crash
->=20
-> =C2=A0net/xfrm/xfrm_policy.c | 4 ++--
-> =C2=A01 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-> index 7ef861a0e823..932a313b9460 100644
-> --- a/net/xfrm/xfrm_policy.c
-> +++ b/net/xfrm/xfrm_policy.c
-> @@ -1329,8 +1329,8 @@ static void xfrm_hash_rebuild(struct work_struct *w=
-ork)
-> =C2=A0			}
-> =C2=A0		}
-> =C2=A0
-> -		if (policy->selector.prefixlen_d < dbits ||
-> -		=C2=A0=C2=A0=C2=A0 policy->selector.prefixlen_s < sbits)
-> +		if (policy->selector.prefixlen_d >=3D dbits &&
-> +		=C2=A0=C2=A0=C2=A0 policy->selector.prefixlen_s >=3D sbits)
-> =C2=A0			continue;
-> =C2=A0
-> =C2=A0		bin =3D xfrm_policy_inexact_alloc_bin(policy, dir);
+Please fix the root cause; the former condition on your system.
+--
+pw-bot: cr
 
