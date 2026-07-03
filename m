@@ -1,177 +1,211 @@
-Return-Path: <netdev+bounces-304598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304599-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id gW1ECqffR2pjgwAAu9opvQ
-	(envelope-from <netdev+bounces-304598-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 18:13:27 +0200
+	id eiYFHJ3gR2rfgwAAu9opvQ
+	(envelope-from <netdev+bounces-304599-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 18:17:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A7657042E2
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 18:13:26 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC7EB704302
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 18:17:32 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=coralogix.com header.s=google header.b=OGPXOgjn;
-	dmarc=pass (policy=reject) header.from=coralogix.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304598-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304598-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=johnericson.me header.s=fm1 header.b=cfsKI79L;
+	dkim=pass header.d=messagingengine.com header.s=fm2 header.b="P Q6I+9k";
+	dmarc=pass (policy=none) header.from=johnericson.me;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304599-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304599-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E7B41304D255
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 16:10:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6D837300F544
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 16:17:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BAE82F1FDE;
-	Fri,  3 Jul 2026 16:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD815305047;
+	Fri,  3 Jul 2026 16:17:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21C1E265CD9
-	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 16:10:29 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783095030; cv=pass; b=dqJJ4sCQxdGixek0tWY2nGsA1R4bxWHw/cKYXKYsClTeUyoY85/2qSKp+C1xNdLT7o0OxMW64ijjwAd4+aieYmlkGQpDb9S8O/LysnLRiU0fwWBYGX5j2EKr3MfkAZt/xtBaMhmpZcWT7f5h9uMoBF6ytarVCBkwOGa78QPMEYs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783095030; c=relaxed/simple;
-	bh=xT/W1+CiZkDKLa+FnudJAe36lqY2hX16tIX2AHkVVoA=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=H+FlnYMqdG5xvrB6Mx/UaklEJIO2ft5oPsxIweqq/URyhrNpznuhULdNcr18+mZNuLOQ55jkYoQ0bYDBHyHGIAdIzGaUG53/KS33ifgRfB3o+Vy66h6R2qBnnbLmgOx3Qct4VSX4ZQFtNslLZqoM3QYdRp3Q0TJAfR+8+6T7qkI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=coralogix.com; spf=pass smtp.mailfrom=coralogix.com; dkim=pass (2048-bit key) header.d=coralogix.com header.i=@coralogix.com header.b=OGPXOgjn; arc=pass smtp.client-ip=209.85.221.174
-Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-5bbc6c99b5cso187348e0c.1
-        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 09:10:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783095028; cv=none;
-        d=google.com; s=arc-20260327;
-        b=TBSb2BdorjPAGY35P5CGw24Hu8ucG0Kiug36WHmql60H3IpGDSU1V7oN8wZuD+XbK8
-         TTnoLSI+DZr6rvMy5NnB+kDJtQPBF4GuJtdywmiNWtDPURDzK0TliD8VtXgh/Q6POD/D
-         ZiQrx0Mv+NgFSBu974IIJjrFamVOQa3FJ5M2EzLDNmjiGJxnVQD0ZuPLAlB9AQUuNWkg
-         kJRlcn0PHjXWZF+tjo2WQ706TEEDM0aeI+O5MkBUVr72Ley84qAsHuJF4k/T8HseuA9Y
-         XynnpxhXuHH4Vx+jUw/KfwILNet489za/JXifnxaP56PAT8Hf+O0l3OEccj1JyarB7bE
-         EdGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=gm26QgpnvRtdkKGeFLWfs6QgocR5OAy7gnfY6eH1ivM=;
-        fh=qp7E4f5n0u6cegU9kZtEgcrF+sB11K4/mgAjvmRT6S8=;
-        b=YRFeqjLcjYjHy5j42ApC2BZPl5JZgTwo8WqV8xs0pr7FQg+pzEPhMKqzf+uN1qJpn9
-         P3ZG6vJsxFamux4z7UPEypX+TeZnUXVD4mmKPGueLPjRNVCCPxGgitytwkGdI/dkBonZ
-         HpZNPOCeoc7+H6yI9Xif2w2dcqT5Y9L2QR44NPzg8ZjOX6tqDD3JWx3x2Xpi1FFc6An7
-         FkwtIDGfToVsKiprzFGOJ6MNBbUUt7d5riXcSGu5ZoI3XZuxO8eJJgkiFQyy0MVVFAC4
-         EH3hJb35HaRWq7x1aNKaeH3Zdc7MMkzhGlR05DtOcwf3brdGwgrQmPrKS1RzdzkyTL2p
-         FH7Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=coralogix.com; s=google; t=1783095028; x=1783699828; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=gm26QgpnvRtdkKGeFLWfs6QgocR5OAy7gnfY6eH1ivM=;
-        b=OGPXOgjn1pf5lz6XfYUA6oJtbp+WaHDf/ry2adx3Wd/NQL21ZXABVNY3kcqFqWE+l3
-         V3oeAONwSqw0yvynZLdbHjU25A89/4NS7vTgwjL39/J0FGHvO8NgbY7NL8XtpnX4jgVG
-         MEC6v+uEo2Vw42nxgE6bkYCCUiMv5s+vi2KMHZPpR5m/adnkbFmyLvmW4QClk6YgAJys
-         SWivxiSYsQcKWrEWP2jvuj413WImJ93cRq6H5coB4gHJHg8HZ1/nefqkaCLHpaHy3xTN
-         FoTGpCmOBNQ1OL0c9CUMM9BgHd8N5eGE6nGGyMeX8kCwv9v7uce1/BIf4DklDfz8FATU
-         ayTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783095028; x=1783699828;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gm26QgpnvRtdkKGeFLWfs6QgocR5OAy7gnfY6eH1ivM=;
-        b=LCpYskTublpoHWvTVOpram6H+Cd4J1+mNkozCN3lFFF0zp2K0EDI8o/jMlCnnKYJW6
-         nlluZWe+bW6eu2M0AjjlFkwydUn8zLYLQiBbu+K84AEQfsiKotZ4Ag4sdR9vC3R38Jt/
-         vyZBoQFAdnFKZyS8xWNedODs32g+o3dEcOM7eykKncHEfUetcM8YnVDJ/Q5o4MsIKSwT
-         Okh8ULzlaeZneUmQ6pdzvDSIllM69ixCCKLl/v78+NvBSvks7PmY33Mz6vWOUiCfC6Ao
-         qZ/NWJMhbkW4Yi+j8Fx38ogmITKK/2m88Tiw0rUNCW+YiQhFIygw3h9paQ5UCE+cIplY
-         jJ2A==
-X-Gm-Message-State: AOJu0YyGMg8ZeL8FInWsAgVUMXTQBC52dTIut29etg0Z5IA6Dri9Y7J+
-	TXR2iyuCbC9Ngko48H2iTshcY5lYkxFWHLTvuUd6kunDEQq9ad5TBjgL+gr2bqImtjII9bIwd4H
-	LFTNK1tMIpsZN9dStofaQHv2Sc3xJ24A5lgIOWmFEXQ==
-X-Gm-Gg: AfdE7cnu+905u/VZ5IVtSiXK5tuwFXbwns+bwPt2abfvpMX7R348lYdhInfXuLFXnG3
-	4tdIItjHT5LjzNBFh5oqm0A5NMeMzmlNgQ18M7aDI31qaL47Lq6dPsHAYdbszf3NU5oFvbbF5Bl
-	5IRXt9rCBpRtuqA8rtA5xolsQDd/AYbMmHAz4BRcyCBNNzoHGy6jHW0FuFGZs+TSAwGI8SkENYw
-	aV5bqgviXfztiEEUYszMditUJXCDAwEftX5FT5sgQR8sls4dHRl47Uhy4t+1hpF1V2HAbccEA==
-X-Received: by 2002:a05:6122:4892:b0:5a4:ac74:f5ba with SMTP id
- 71dfb90a1353d-5be1025e3ccmr107911e0c.11.1783095028060; Fri, 03 Jul 2026
- 09:10:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D307428488F;
+	Fri,  3 Jul 2026 16:17:24 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783095446; cv=none; b=WdR41GH4RGSHXL0l+PxZ13Nzy/gKeBxhf3E4L+BsY9TZ/WrVInXp+wFuQpCCWJicynR0gtZDwdHPYhADE50VeS9nl2n+nKoBFLaWAmDsT3+5KhSZdLLrTC3XrBNaevPYSKefxoxygv59MDGnE8Px1sNhjql6gxehkR1SL/qvt+o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783095446; c=relaxed/simple;
+	bh=K1t3DU4zFcvSE8I0dwtDprBpNqurf09pmHflUdwBuys=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=H2rYNX0pvbTnQZIUUsw9bEtGHqAVje11mVQpMsw/ZB7ZdKKLD7gt6j3l89IrGbpb8Ru2XsdOnjCoVvkMTDQUKvbdfh04DqlvuyRDy6IrG8jAyVdHhEO5hc+FeUhXlR1SbeZBa32JEumWn2pFEAnGiNo0+Hg5Stfbd9e57Whw4oc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=johnericson.me; spf=pass smtp.mailfrom=johnericson.me; dkim=pass (2048-bit key) header.d=johnericson.me header.i=@johnericson.me header.b=cfsKI79L; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=PQ6I+9kD; arc=none smtp.client-ip=202.12.124.159
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 082EE7A00F6;
+	Fri,  3 Jul 2026 12:17:24 -0400 (EDT)
+Received: from phl-imap-16 ([10.202.2.88])
+  by phl-compute-05.internal (MEProxy); Fri, 03 Jul 2026 12:17:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=johnericson.me;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
+	 t=1783095443; x=1783181843; bh=/QkTsC6xUCqstWYZjMorpu7FsivaniwM
+	rj3YB4WHzmo=; b=cfsKI79L64bxgB2ZcJAK1CbGnDSLy2vUki9GL8slWLaZ/aWX
+	LidakxnQpqpYtO+54qsr2aqF7YNAg2RXZBdSI84S5HljSiznbQjXbuWVTRuNE0VE
+	J1kUOcZlJv5LQs4+OjcKifB7xd0WZTnD8YkVjM0a0GD5AovKopNWvM1YcmIpmVSp
+	VYSS32vokAx/g2fP1o/Lj6kmMKdKbMI2RRnX0Lv34saG1t6fiyI3/23ohR6bhnyA
+	4SYU+lRON0BTxgqLYDXKsvojQqnmunDP48tH+1Y7K9LD8nb1TPs411dEmqcMzaV0
+	ynOTh+b+VVk+Vft+OvjzYxfYYwnjEIhoUfUPfw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1783095443; x=
+	1783181843; bh=/QkTsC6xUCqstWYZjMorpu7FsivaniwMrj3YB4WHzmo=; b=P
+	Q6I+9kD3wRrmPqYjdP3gsMfH7ZEEucHm/uMDCyDvsvtKTOD+GG0wtkRcrKfkonDm
+	3l6Mtq/9UY6LRywL0vSME/zMLboz5MeEfsV0w2w3QXo3jTteyU4jPSH7EFDDbcUe
+	eQY1RS/GOg0wY3yfO4IQPchVQYe3HvIysqc7I9Wlqe/WLUaRZjF5IR51xkMMygns
+	kmum/pvDNmDV5qHonKmGx6b78JPq1pC6co1Yl81hA+FhayrEyDi96yA4ASDryGWP
+	GJRVuNZmqSkvHfTw8ZmUMx+/oIKv+FnRhidRDaey1j+nT9z6G6i/WasPfkYnWGNt
+	yKa0kqc6C8X25E8GVeu+Q==
+X-ME-Sender: <xms:k-BHalN8nVmWy9qyXGkLmJp8fH_qAuOXmt26m4vN_6KmxSicSNgoPA>
+    <xme:k-BHaixV0xebXUsHD1J-YadkGLqNnWru-vaT-CCjNXAN77j7S5N7npoDTb1_1kJvq
+    6FYWQ6hNmtwm0yBT58N-Bk0L8pLBA0qVbBte7lmHGAxD01eMXA2Ew>
+X-ME-Proxy-Cause: dmFkZTEHAn6vndmOrj8IzKI2Nn3VxCG9OTqVQkt3NAfPiyVOpRMCwxACZcym0E6KH1SVfT
+    KSwRVE1Moc8ZkzCS4inuCam+9NFdxD0BRVJALPF5sfR2v18mVzRGEZMO05pLvfRpJFW3TQ
+    /QwLTKLvlXoW8uYIMwNG7/sWYd1ljrXF7AmqkGQo3n+0/FX8CXgpiH3ZUsnc1s/nTjeT3I
+    jl/xWsSJ7qnH5jHfctA80WM2pTu3g8+btt2M1wlMn0171BAkv6CCFjPwuoeIlAzdo2plBW
+    rwQC5NKpuj3Ia1PQd6xr2zbdeJmFeZbntI6Nmael1LDPrqWdc2sIPx/9z3J4L+AbjY/zql
+    NgNYZXPycBAtn4Gfi7e1RmQ85qkjuSxrxBfT8DPn307Hu7ZV35ZPQbZwnei8Hqa7kF1QDz
+    pvAQfieRL4drk4A/KnQkl2hkNX6YfhWTRRT6KIoTkXNULDMxPUcRlRx8D/msEpSLZXZQII
+    FXl84qmHJnv0dK8apxUgDKhwK1xGkyKzmOTk3+cL1DrW1MQr04NBzxxAk7FT+4o3LC96dy
+    FE+tKBE+7ObnmY5IT6yd23ElaFhAnP/kuHXVCyC04Hpgnfedml72X1cV3tVvfo4BRm5uwb
+    moLYJ9Bi+ShSdYHFVdxk68hdwW3dgeZPMPyysABPzK0b6Gr0/YwSeTyZYq+A
+X-ME-Proxy: <xmx:k-BHast_yMGc90-_Bk77eTn32SA9hSt45a9Ji5t-F5CMytjvFxBJJA>
+    <xmx:k-BHalfJCl8H2Uvwf7z4TtHFBKjaM_vsOvXpLQuGSh2iQlF46g0dYQ>
+    <xmx:k-BHap80c7ltQz3UaTf7eoVrRNALcapkByBo2-MyLEUPwDdXPHYLiQ>
+    <xmx:k-BHagQinA6A6nztAm3YEtMTM8B8JU_JnR8u3PHIA-dH8Khu_-npSw>
+    <xmx:k-BHagUJaVIamL4C0eghZycH9ShgTTDHMlHQOkyjyA4P2iiX8V_pEjnV>
+Feedback-ID: ieb4144f1:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id EBEBB2CC0083; Fri,  3 Jul 2026 12:17:22 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Mattia Meleleo <mattia.meleleo@coralogix.com>
-Date: Fri, 3 Jul 2026 18:10:16 +0200
-X-Gm-Features: AVVi8CeAWA_f68Kki9hfUbY5C4CtuCmcJbPuxzmZ-mdiwT2SUSQ6DXPA9ual2KM
-Message-ID: <CAOvpEWN6xgFx4GWFnnWLGCB+_1auDcAZPYPSv1PDu3UfXkcriw@mail.gmail.com>
-Subject: bpf, sockmap: FIONREAD returns 0 for TCP sockets in a sockmap without
- a verdict program
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org, 
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "jakub@cloudflare.com" <jakub@cloudflare.com>, jiayuan.chen@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+X-ThreadId: Aqzxz9K-cSE-
+Date: Fri, 03 Jul 2026 12:17:02 -0400
+From: "John Ericson" <mail@johnericson.me>
+To: "Christian Brauner" <brauner@kernel.org>
+Cc: "Cong Wang" <cwang@multikernel.io>, "Li Chen" <me@linux.beauty>,
+ "Andy Lutomirski" <luto@kernel.org>, "Jens Axboe" <axboe@kernel.dk>,
+ "network dev" <netdev@vger.kernel.org>,
+ linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+ "Sergei Zimmerman" <sergei@zimmerman.foo>
+Message-Id: <6b7eadeb-5b4d-482c-972b-bfb9f6b56548@app.fastmail.com>
+In-Reply-To: <20260703-teamgeist-ganoven-kundig-eff19aa92e38@brauner>
+References: <b1af80fc-a57c-408d-bdfe-fa6bae26eaca@app.fastmail.com>
+ <aicbyQIC2qEveNd-@pop-os.localdomain>
+ <455281ec-3ee1-4f27-989b-c239f0690d8b@app.fastmail.com>
+ <aixU_RccxS_BKhgX@pop-os.localdomain>
+ <66eb8227-85b6-4684-a4fa-e3e17ac2fa45@app.fastmail.com>
+ <e396ce86-ec84-4189-9da2-98af7cfa6c41@app.fastmail.com>
+ <20260703-teamgeist-ganoven-kundig-eff19aa92e38@brauner>
+Subject: Re: [RFC] connectat()/bindat() or an alternative design
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[coralogix.com,reject];
-	R_DKIM_ALLOW(-0.20)[coralogix.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-2.15 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[johnericson.me,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[johnericson.me:s=fm1,messagingengine.com:s=fm2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	XM_UA_NO_VERSION(0.01)[];
+	TO_DN_ALL(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304599-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER(0.00)[mattia.meleleo@coralogix.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304598-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[coralogix.com:+];
-	RCPT_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER(0.00)[mail@johnericson.me,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:brauner@kernel.org,m:cwang@multikernel.io,m:me@linux.beauty,m:luto@kernel.org,m:axboe@kernel.dk,m:netdev@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:sergei@zimmerman.foo,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[johnericson.me:+,messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mattia.meleleo@coralogix.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,cloudflare.com,linux.dev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[mail@johnericson.me,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,coralogix.com:from_mime,coralogix.com:dkim,mail.gmail.com:mid]
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,johnericson.me:from_mime,johnericson.me:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7A7657042E2
+X-Rspamd-Queue-Id: AC7EB704302
 
-Hi,
+On Fri, Jul 3, 2026, at 9:35 AM, Christian Brauner wrote:
+> Please stop sending a bunch of disparate patch series that all do
+> slightly related or overlapping things and point back at each other.
+> 
+> It's completely impossible to follow for anyone what's going on without
+> chasing down discussion state across multiple subsystems. The net people
+> have zero insight onto the fs struct discussions and it's completely
+> pointless to try and design all of this based on thin air. Nothing is
+> locked-in yet. This is not how this goes.
+> 
+> This frantic pushing of various features doesn't scale. It is requesting
+> costly review time for multiple RFC series
 
-in OpenTelemetry eBPF instrumentation we use a sockhash to track
-outgoing TCP sockets for trace context propagation. Sockets are added
-from a sock_ops program, and the map only has an sk_msg program
-attached on the egress side - there is no ingress verdict program.
+I'm sorry for the confusion and the demands on your review time from
+concurrently spreading my various Capsicum-like ideas across too many
+threads. I can hereafter make things more single-threaded, as I'll
+propose below. I hope that helps.
 
-Since commit 929e30f93125 ("bpf, sockmap: Fix FIONREAD for sockmap"),
-ioctl(FIONREAD) returns 0 for these sockets even though read() returns
-data. tcp_bpf_ioctl() answers from psock->msg_tot_len, which only
-accounts for bytes in ingress_msg. Without a verdict program, data
-never lands there: it stays in sk_receive_queue and is read through
-the tcp_bpf_recvmsg() fallback, so FIONREAD always reports 0.
+Just so we are all on the same page, at the moment I believe I have
+created two RFC discussion threads, and submitted one RFC patch series:
 
-The commit message explains that sk_receive_queue is intentionally not
-counted because a verdict program may redirect or drop its contents.
-Without a verdict program, however, all of that data is readable, and
-applications that use FIONREAD to size their reads (nginx, Java, .NET)
-hang or truncate transfers once their sockets are in the map.
+- discussion thread: [RFC] Null Namespaces
+  URL: https://lore.kernel.org/all/a49ce818-f38d-41b0-bbf7-80b8aad998b1@app.fastmail.com/
+  Current status:
+    - You (Christian) are writing nullfs/failfs FDs.
+    - I am submitting nothing else (e.g. the actual null namespaces)
+      until that is done.
 
-Observed on mainline and on 6.12.75+, 6.6.128+, 6.18.14+.
+- discussion thread: [RFC] connectat()/bindat() or an alternative design
+  (this one)
+  URL: https://lore.kernel.org/all/b1af80fc-a57c-408d-bdfe-fa6bae26eaca@app.fastmail.com/
+  Current status: Working on one patch:
+    - Patch Series: [RFC PATCH 0/3] coredump, net: fix layer violation
+      with direct connection
+      URL: https://lore.kernel.org/all/20260703073948.2541875-1-John.Ericson@Obsidian.Systems/
+    - I am not submitting any UAPI changes until that is done.
+  (Note: This thread had some code in the first message, but I never
+  meant for that to be a formal submission, just a discussion aid, and
+  the conversation moved on from that original design anyways.)
 
-Reproducer: https://github.com/mmat11/fionread-repro
+To make things maximally single-threaded, I could pause working on
+"coredump, net: fix layer violation" (i.e. preparing a v2 based on what
+you requested in your review) until you are done implementing
+nullfs/failfs FDs. I am actually quite happy to do that if you want; I
+should spend less time on the computer the next few days anyways, so the
+timing is very good for that.
 
-  pre-insert     FIONREAD=4096 (expect 4096) OK
-  in-sockhash    FIONREAD=0 (expect 4096) BROKEN
-  post-delete    FIONREAD=4096 (expect 4096) OK
+Either way, I can also henceforth not refer to yet-unwritten and
+-unmerged patches like nullfs/failfs FDs in the motivation for other
+things.
 
-Is this intended for psocks without a verdict program? If not, would
-falling back to tcp_inq() (plus msg_tot_len) in that case be an
-acceptable fix? Happy to send a patch and test it.
+John
 
-Thanks,
-Mattia
+P.S. There is also my non-RFC bugfix series:
+
+[PATCH net] af_unix: fix listen() succeeding on sockets in the wrong state
+URL: https://lore.kernel.org/all/20260703081416.2583118-1-John.Ericson@Obsidian.Systems/
+
+but I don't believe you were referring to that one, since I think
+bugfixes are supposed to be submitted separately and immediately. Do
+correct me if I am wrong.
 
