@@ -1,286 +1,169 @@
-Return-Path: <netdev+bounces-304447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304448-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id etDuI5hyR2pyYQAAu9opvQ
-	(envelope-from <netdev+bounces-304447-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 10:28:08 +0200
+	id Gm+fLSh0R2rTYQAAu9opvQ
+	(envelope-from <netdev+bounces-304448-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 10:34:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3E167000BB
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 10:28:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C0107001E1
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 10:34:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=j5YhX3kQ;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304447-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304447-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=messagingengine.com header.s=fm2 header.b=k5SzCKGO;
+	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=obsidian.systems (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304448-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304448-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4F7203146151
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 08:11:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 98D2E30E080D
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 08:15:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16298367285;
-	Fri,  3 Jul 2026 08:11:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23540372076;
+	Fri,  3 Jul 2026 08:15:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from flow-a6-smtp.messagingengine.com (flow-a6-smtp.messagingengine.com [103.168.172.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF4513603D5;
-	Fri,  3 Jul 2026 08:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A075A36E48E;
+	Fri,  3 Jul 2026 08:15:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783066288; cv=none; b=OftlEDTop0ty5apui7tM+IAxFcjGTREeDCdN5UfuQ/VBjRuVITQVz9kpnR/Pvb85PvV/n90818vCx1ITOhPgKmM32+eZKyn0KTN9e4LjwzFZ8m1mOWZ/zGGU+TcVSW53qaB2B1aRzh2wA8dViGd8L+B2tUjrMLSOejoBJziTAsQ=
+	t=1783066508; cv=none; b=KCc8e5b1LS2LKkKjhTYdE8awKfbCje9/9DFjJLdKJR81mMk/G4KgYZDyhVa/wZfJzgu2SkOovooYxASmykrRzxKyPzssPPuFQhgTlxr0SY/fsi/iHq7xGsYC8DWjRpwy9Cz36V9oBCPn65JPt3GB382gaQGj5WZSIrWi4EJ4mUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783066288; c=relaxed/simple;
-	bh=JX03iTHrikR9VJkoRUoLi2VdEbthp71g9eD2Ync+wV8=;
-	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=qSnUH8AwBsA7nHgqet3twjQMhLlh87H0MgxwC127yY4LKqxd7HJnaiP8JepsaRv07aG4YxaXJcQI8oxSeECjv3WZCMjjxv6YgHwD9H9JQA/aRi9lgpcqwlFt7v/pkDURCMujCh91u2JvKO6wEppscYmiiQ8ftTJnPAfXyw/P51w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j5YhX3kQ; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F39131F00A3D;
-	Fri,  3 Jul 2026 08:11:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783066286;
-	bh=Ro3wnGG38KDFb6ihthy3CeKILdGmcUHT/i7PDCPWBlM=;
-	h=Subject:From:To:Cc:In-Reply-To:References:Date;
-	b=j5YhX3kQ4j+JL24vYWVliFbx2reqcLtkKZNj/KvNuamnJJZXRnzNZ0YsFe6IvR4F1
-	 /8IrlRhkVueayUweMGKsylr6bFuryvIA4aNCqyOyQhvHkpQolQMA36ts6Dlbk1iIGL
-	 1OO6TCkHxfZdmlkv4on6+grDtq5W7zvTqmPmO2h1Nnkmm3UGHKwJi9aqcrZ83xQ7Gw
-	 Ot8jhIuBdv49vuAS94kgMUbHyI9Ar7O2KcZyRDiBvu3koDkb/1lR2QtXHslvDi1eXq
-	 7LB3KtzC9drJ61NC2Unz5Q00A4jlLVFxfl/ROXLkaHab5YpDbdEcrT2D4NyXiDTxj9
-	 l6N+Bw1So6h7g==
+	s=arc-20240116; t=1783066508; c=relaxed/simple;
+	bh=uKklMmX/FarzYD76ncNoGsncDBQVTvDMxsz7RuvpMaI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dZuCW+TIwmTvqRwr+rBLWGDPp+zvRtILsTvDd9jWLr90/t4EpkRJQT0UPnpEPdyMIh85RygE3D0Vjoa4tAu0qKYy6ncHPj6V6DK9BYwbI7Rrm16UjSmpq3u2nbdlhkhv54ORxai1FmrmVKVlArRbeh70OF8JDdf+jLfo7MzLF8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=Obsidian.Systems; spf=fail smtp.mailfrom=Obsidian.Systems; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=k5SzCKGO; arc=none smtp.client-ip=103.168.172.141
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailflow.phl.internal (Postfix) with ESMTP id A653F138013D;
+	Fri,  3 Jul 2026 04:15:05 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-05.internal (MEProxy); Fri, 03 Jul 2026 04:15:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1783066505; x=1783073705; bh=L8AaH8HEaSsvrShwQdsU0LGffFk34FHqZnC
+	RLR8S6rI=; b=k5SzCKGOBMEOg1CpKv6ASW03gLjL8lI06DrVhv2EvNbdSQ/kh/7
+	lQT9qLXUJ0cUu+NFPuPn0GAWiGU+h6zNOKIFwDvnF8BeX7uAaoc5S2je96awYJCX
+	wyCVXdrdVJ9Rz16D3FkGIP39qmaSLkcUkubR1istaW2alEOLmBqTjpkvy+7TJVSe
+	jm9m1MREx6Zbgx8Vw3dNc/V2NHJcecfMBdxJaD9D0Oa6opSBZQ8OD7Ucqkihr95s
+	boAyxwpz/SAXmbhW9jyBC8x7DfPwsnCRU6ZwhCHM5k3MhYi6W2ihfPJNh7NtVNrV
+	8a5hueULJ9raJYwPJQFBGwp3/ohMeGpm2kA==
+X-ME-Sender: <xms:iW9Han4nj0Fnx6pfhsW402Ug31szY6J7RVDEza0HzHnGGQdAz--MWQ>
+    <xme:iW9HaiFMF2S4ve6fFd8DrF4AKl79cVcH9EzGS16OiLMy7rKZ_NhBrGx5l867rFK1q
+    5_C2hvBeABZ8AizMoZXjlDcruS3a1D6uaBdpTGVyvWHCuWVhtcs6A>
+X-ME-Received: <xmr:iW9Hah2YJ3jIbeQ6vzyRYmfoGX5ko2PHyC7_wQqzhZkFk1hle0NyTuk96_1hbgyVT8YtC_59KeDi-uIZIhzmWSBDY6koLZDrS8_IEw>
+X-ME-Proxy-Cause: dmFkZTE6NBtyOFYvJtG20mXpmAN9Q+T0LNWwFE3JEIVEwC7/Pz/zlIYHrvx3tLNcd9tQQg
+    AsCHjA+F31FQIOa/MdmHQqvcY7IAn7yvh9fd+Ryqr1sY1HOXChPshIuyC93WvW7n1gz35m
+    pey9hVdoLBc+iUpNs++OHOY+PayYYoryPESMj85FZZtf/AKSIFyNrh2ljbn5JYPgszaGWE
+    NHSA6B7AiLm/ekSqmVe6gVZURQGxsI9paM4PUXBCecQe2Tgg1aglrpMJC/f/iUZk56HxFD
+    7WGuTiqnxqVqLslwIOWvF5+xBVZjM6mX6X/7g/WNj/kxEhwAlq5PsmllPXIQaozbBIbkjF
+    kE8LVnrDKLS6yK4NXgnV9L1RsT6DDrPDiiU79l8FF8MstwZ4d8JcWUrFWrjKUFkIg5/Ar5
+    Hq2R1XBx4tzRNqmNkB+8518sgJjGJqKUt4HkK6IKAUxf4wHWzEa7oryB1YirW612v88U3C
+    1o/ThSFlwrQT2YTEkiNGQj6BLNF9KrQe/xBaj35AGH15i+9PDFN9k9lSRo9xceQgt3yGdn
+    EKuHDsgbCNFmT0moadw9yqSKnDS8e0BX9DXDrizNWJ1Q0pHJUll1Q7xFUcii2GR++4QN7y
+    Z6xwKVrMExl27tqLgzSDOPASITqBXnJvTgGmA3BQFrFe8AGi6cmZjWlJM3jw
+X-ME-Proxy: <xmx:iW9HanoRYLph2IsaCbqYv6-Jek-isnJDvo28UfXiu3_KA_xQ140GqA>
+    <xmx:iW9HamOgjnVEN6xsy5heKWTMYoscxsca_lgODEYnAPqx06-iTYsAJA>
+    <xmx:iW9HahW89yfSFZjKRJ2WkJCEeOt_gU3-b-bBiceCAE8x_O-SKsd8Hg>
+    <xmx:iW9HahuEjXOylJgkIY4zzOFYaeoOHROhA__lztZmrEiLSJPUBFJCtA>
+    <xmx:iW9HapnnADvAyO2Q3U6i7vebWD7TWUM-rEilG_QY5zHJ4cs3nCH8QczV>
+Feedback-ID: i91b946ab:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 3 Jul 2026 04:15:01 -0400 (EDT)
+From: John Ericson <John.Ericson@Obsidian.Systems>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>
+Cc: John Ericson <mail@johnericson.me>,
+	Simon Horman <horms@kernel.org>,
+	Christian Brauner <brauner@kernel.org>,
+	David Rheinsberg <david@readahead.eu>,
+	Cong Wang <cwang@multikernel.io>,
+	John Ericson <john.ericson@obsidian.systems>,
+	Sergei Zimmerman <sergei@zimmerman.foo>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v2 1/3] af_unix: fix listen() succeeding on sockets in the wrong state
+Date: Fri,  3 Jul 2026 04:14:10 -0400
+Message-ID: <20260703081416.2583118-1-John.Ericson@Obsidian.Systems>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [RFC PATCH 3/3] coredump, net: remove `SOCK_COREDUMP`
-From: Christian Brauner <brauner@kernel.org>
-To: John Ericson <John.Ericson@Obsidian.Systems>
-Cc: "David S . Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, John Ericson <mail@JohnEricson.me>, 
- Cong Wang <cwang@multikernel.io>, Kuniyuki Iwashima <kuniyu@google.com>, 
- Simon Horman <horms@kernel.org>, Christian Brauner <brauner@kernel.org>, 
- David Rheinsberg <david@readahead.eu>, Andy Lutomirski <luto@kernel.org>, 
- Sergei Zimmerman <sergei@zimmerman.foo>, netdev@vger.kernel.org, 
- linux-fsdevel@vger.kernel.org, 
- =?utf-8?q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>, 
- =?utf-8?q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
- Paul Moore <paul@paul-moore.com>, linux-security-module@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20260703073948.2541875-4-John.Ericson@Obsidian.Systems>
-References: <20260703073948.2541875-1-John.Ericson@Obsidian.Systems>
- <20260703073948.2541875-4-John.Ericson@Obsidian.Systems>
-Date: Fri, 03 Jul 2026 10:11:17 +0200
-Message-Id: <20260703-umgehen-auftun-anlagen-826bf59dfcb5@brauner>
-X-Mailer: b4 0.16-dev-4217c
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6629; i=brauner@kernel.org;
- h=from:subject:message-id; bh=JX03iTHrikR9VJkoRUoLi2VdEbthp71g9eD2Ync+wV8=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWS5562s2lpsMeOa1UeBlV1NOsYHJLb7n9vzq3f+ji9uF
- ibhqVHLO0pZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACaS3Mvw3/Ph/YzHP3y4kr46
- hZ03MpzI1FVqpmgxy8epYpewVKSzHyPD1hlfqr2jl3768S5U4+PhLadOzpy9TDCbqZt735NpM5W
- bOQA=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.06 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[messagingengine.com:s=fm2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[obsidian.systems : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:John.Ericson@Obsidian.Systems,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mail@JohnEricson.me,m:cwang@multikernel.io,m:kuniyu@google.com,m:horms@kernel.org,m:brauner@kernel.org,m:david@readahead.eu,m:luto@kernel.org,m:sergei@zimmerman.foo,m:netdev@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:mic@digikod.net,m:gnoack@google.com,m:paul@paul-moore.com,m:linux-security-module@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[brauner@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-304448-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[John.Ericson@Obsidian.Systems,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kuniyu@google.com,m:mail@johnericson.me,m:horms@kernel.org,m:brauner@kernel.org,m:david@readahead.eu,m:cwang@multikernel.io,m:john.ericson@obsidian.systems,m:sergei@zimmerman.foo,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	DKIM_TRACE(0.00)[messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[brauner@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-304447-lists,netdev=lfdr.de];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[John.Ericson@Obsidian.Systems,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,brauner:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,johnericson.me:email,messagingengine.com:dkim,Obsidian.Systems:mid,Obsidian.Systems:from_mime,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D3E167000BB
+X-Rspamd-Queue-Id: 0C0107001E1
 
-> The utility of the refactors of the last two commits is demonstrated by
-> fixing this glaring layer violation: the unix socket implementation
-> knowing about the coredump socket caller.
-> 
-> Before, when the only way to connect to a socket was via the UAPI
-> `struct sockaddr_un`, the only way to implement the proper logic that
-> the kernel needs to resolve the coredump socket path was via hacking it
-> into the socket implementation.
-> 
-> In addition to being quite ugly, this layer violation is not great for
-> security. The intent is that `SOCK_COREDUMP` can only be used by the
-> kernel, and to be clear, I have no reason to believe this is not
-> correctly enforced today. But because of the many functions with flags
-> arguments, this is not a locally-enforced invariant. Some change, at
-> some point, could mess up, and allow user-provided flags to sneak in,
-> and this strikes me as a mistake waiting to happen. At that point, a
-> user could exploit this to connect to any socket it likes, bypassing
-> permission checks.
-> 
-> Now, with the two functions we've just previously factored out, we can
-> fix the layering. The custom path lookup logic lives with the coredump
-> caller, where it belongs. Once the right `struct path` is found
-> (actually just the inode is needed), the coredump caller can resolve a
-> `struct sock *` from it, and then directly connect to it. With this
-> change, `SOCK_COREDUMP` is no longer needed at all, and can be deleted.
-> The layer violation is gone, and the security footgun is gone with it.
-> 
-> As an added bonus, remove `flags` parameters from a number of internal
-> functions that no longer need them. They were just taking flags
-> parameters for the sake of `SOCK_COREDUMP`, and so with that gone, those
-> flag parameters are also no longer needed. If or when there is a new
-> flag that motivates them, they can be added back.
-> 
-> Tested that `coredump_socket_protocol_test` still passes.
-> 
-> Signed-off-by: John Ericson <mail@JohnEricson.me>
->
-> diff --git a/fs/coredump.c b/fs/coredump.c
-> index e68a76ff92a3..e1452021218e 100644
-> --- a/fs/coredump.c
-> +++ b/fs/coredump.c
-> @@ -14,6 +14,7 @@
->  #include <linux/perf_event.h>
->  #include <linux/highmem.h>
->  #include <linux/spinlock.h>
-> +#include <linux/cred.h>
->  #include <linux/key.h>
->  #include <linux/personality.h>
->  #include <linux/binfmts.h>
-> @@ -21,6 +22,7 @@
->  #include <linux/sort.h>
->  #include <linux/sched/coredump.h>
->  #include <linux/sched/signal.h>
-> +#include <linux/sched/task.h>
->  #include <linux/sched/task_stack.h>
->  #include <linux/utsname.h>
->  #include <linux/pid_namespace.h>
-> @@ -50,7 +52,6 @@
->  #include <net/net_namespace.h>
->  #include <net/sock.h>
->  #include <uapi/linux/pidfd.h>
-> -#include <uapi/linux/un.h>
->  #include <uapi/linux/coredump.h>
->  
->  #include <linux/uaccess.h>
-> @@ -668,17 +669,10 @@ static int umh_coredump_setup(struct subprocess_info *info, struct cred *new)
->  static bool coredump_sock_connect(struct core_name *cn, struct coredump_params *cprm)
->  {
->  	struct file *file __free(fput) = NULL;
-> -	struct sockaddr_un addr = {
-> -		.sun_family = AF_UNIX,
-> -	};
-> -	ssize_t addr_len;
-> -	int retval;
-> +	struct path root, path;
->  	struct socket *socket;
-> -
-> -	addr_len = strscpy(addr.sun_path, cn->corename);
-> -	if (addr_len < 0)
-> -		return false;
-> -	addr_len += offsetof(struct sockaddr_un, sun_path) + 1;
-> +	struct sock *sk;
-> +	int retval;
->  
->  	/*
->  	 * It is possible that the userspace process which is supposed
-> @@ -710,14 +704,37 @@ static bool coredump_sock_connect(struct core_name *cn, struct coredump_params *
->  	 */
->  	pidfs_coredump(cprm);
->  
-> -	retval = kernel_connect(socket, (struct sockaddr_unsized *)(&addr), addr_len,
-> -				O_NONBLOCK | SOCK_COREDUMP);
-> +	/*
-> +	 * Resolve the socket path relative to init's root and with kernel
-> +	 * credentials, and with symlinks, magic links and escaping the
-> +	 * root all forbidden, so the dumping process cannot use its own
-> +	 * filesystem view to redirect its core to an arbitrary socket.
-> +	 */
-> +	task_lock(&init_task);
-> +	get_fs_root(init_task.fs, &root);
-> +	task_unlock(&init_task);
-> +
-> +	scoped_with_kernel_creds()
-> +		retval = vfs_path_lookup(root.dentry, root.mnt, cn->corename,
-> +					 LOOKUP_BENEATH | LOOKUP_NO_SYMLINKS |
-> +					 LOOKUP_NO_MAGICLINKS, &path);
-> +	path_put(&root);
-> +	if (retval)
-> +		return false;
-> +
-> +	/* Connect directly to the socket bound there, by fd not by name. */
-> +	sk = unix_lookup_bsd_path(&path, SOCK_STREAM);
-> +	path_put(&path);
-> +	if (IS_ERR(sk))
-> +		return false;
->  
-> +	retval = kernel_unix_connect_direct(sk, socket, O_NONBLOCK);
+From: John Ericson <mail@johnericson.me>
 
-I don't think dragging the bowels of net/ into fs/coredump.c just for
-the sake of getting a purely internal SOCK_COREDUMP flag out of the way
-is the right way to go.
+Commit fd0a109a0f6b ("net, pidfs: prepare for handing out pidfds for
+reaped sk->sk_peer_pid") inserted a `prepare_peercred()` call between
+`err = -EINVAL` and the socket-state check in `unix_listen()`. Since
+`prepare_peercred()` leaves `err` at 0 on success, `listen()` on an
+AF_UNIX socket that is not in `TCP_CLOSE` or `TCP_LISTEN` state (e.g.
+one that is already connected) now silently returns success without
+doing anything, instead of failing with `EINVAL` as it did before.
 
-The two helpers also make no sense to me and force a bunch of cleanup on
-the caller as well.
+Fixes: fd0a109a0f6b ("net, pidfs: prepare for handing out pidfds for reaped sk->sk_peer_pid")
+Assisted-by: Claude:claude-fable-5
+Signed-off-by: John Ericson <mail@johnericson.me>
+---
+ net/unix/af_unix.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-I suspect the saner thing to do would be to introduce a primitive for
-connecting to an AF_UNIX path-based socket directly instead of this
-weird dance here, no?
-
-int kernel_unix_connect(const char *path, struct socket *socket, unsigned int o_flags, int type)
-
-then my kthread changes would collapse this into:
-
-scoped_with_init_fs()
-	retval = kernel_unix_connect(path, socket, O_NONBLOCK, SOCK_STREAM);
-
-> +	sock_put(sk);
->  	if (retval) {
->  		if (retval == -EAGAIN)
-> -			coredump_report_failure("Coredump socket %s receive queue full", addr.sun_path);
-> +			coredump_report_failure("Coredump socket %s receive queue full", cn->corename);
->  		else
-> -			coredump_report_failure("Coredump socket connection %s failed %d", addr.sun_path, retval);
-> +			coredump_report_failure("Coredump socket connection %s failed %d", cn->corename, retval);
->  		return false;
->  	}
->  
-> diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
-> index 65c9609ec207..3d6fbb6d2628 100644
-> --- a/include/linux/lsm_hook_defs.h
-> +++ b/include/linux/lsm_hook_defs.h
-> @@ -323,8 +323,7 @@ LSM_HOOK(int, 0, watch_key, struct key *key)
->  #endif /* CONFIG_SECURITY && CONFIG_KEY_NOTIFICATIONS */
->  
->  #if defined(CONFIG_SECURITY_NETWORK) && defined(CONFIG_SECURITY_PATH)
-> -LSM_HOOK(int, 0, unix_find, const struct path *path, struct sock *other,
-> -	 int flags)
-> +LSM_HOOK(int, 0, unix_find, const struct path *path, struct sock *other)
-
-I'm not sure why we would go on altering all kinds of LSM hooks as well.
-
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index f7a9d55eee8a..10ed9421e43a 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -823,6 +823,7 @@ static int unix_listen(struct socket *sock, int backlog)
+ 	if (err)
+ 		goto out;
+ 	unix_state_lock(sk);
++	err = -EINVAL;
+ 	if (sk->sk_state != TCP_CLOSE && sk->sk_state != TCP_LISTEN)
+ 		goto out_unlock;
+ 	if (backlog > sk->sk_max_ack_backlog)
 -- 
-Christian Brauner <brauner@kernel.org>
+2.54.0
+
 
