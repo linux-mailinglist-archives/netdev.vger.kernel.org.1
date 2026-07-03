@@ -1,144 +1,132 @@
-Return-Path: <netdev+bounces-304549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304552-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id uvOLFJq4R2qOeAAAu9opvQ
-	(envelope-from <netdev+bounces-304549-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:26:50 +0200
+	id OX8oHqm3R2oreAAAu9opvQ
+	(envelope-from <netdev+bounces-304552-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:22:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7007702D85
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:26:49 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB144702CE1
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:22:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b="P7 2ZYwP";
-	dmarc=pass (policy=none) header.from=lunn.ch;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304549-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304549-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=eSxTZz2t;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304552-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304552-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A562B3075C23
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 13:15:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A89DD30699C5
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 13:18:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4020D22068D;
-	Fri,  3 Jul 2026 13:15:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 160AD3D75A9;
+	Fri,  3 Jul 2026 13:18:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59DB3C4565;
-	Fri,  3 Jul 2026 13:15:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6B253D6470;
+	Fri,  3 Jul 2026 13:18:02 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783084543; cv=none; b=TUr9baBXIrKh0N8EwISV+uAw2kOqO05HITBGg8+e8CAb9Nd/EWbi9xpron1mIAKeaWk7PbPMu9oNqtJ2xkudjr7Z5/7bIWO+Ln0TE9B6b1wvj4QfpaevzlcH3fs4DHgZRXJjrJLrgd6Ufa5l32UURp0keN6QD0k+om8Fudh0kE8=
+	t=1783084684; cv=none; b=GePoaYAmdtZmVFzwG0CrEYyuPkZ4iNsn81qNkpw3epo9kGQeQaFcQA1KqE2zM4trYh5qytmVSyN/1RnSBDj78T2s2dYaoWUo0FUPXFkkPIkNwajPMGOPpkE/6CCQ5aiJRMTKEl3mH8aufhIM9q1kl3Ex96OgLHXVrr8dGqRWoZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783084543; c=relaxed/simple;
-	bh=RYg6kCZO5wRTfwr04gc+rpzVWy6lUwNGegOPJDpIylA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dokm85WBZX0YFgzMCohYyt9oMSiObOFeMz8XCR2T5n3VR80zXcoHStPpM3emhIVc2nYU2Zc+Na2HMJ9ha2yp4BZSAoh73mUocqZm8atXG0GiGMC6TmJpNEI4f+ST8BWiOaq04jwkfuS0WuKv5X4Av5Q4fMXL7Ic4MIbXUAOfVtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=P72ZYwPK; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=7LVuA3dES9xFx01S3/rxFghM+Ukg8seLr4y0mol4SSE=; b=P7
-	2ZYwPK/KAxOnzSjzznp2JAnJbCPV2klqZCb5350KPiIZlkqaEQLcfSKPmwhh2e4BegFSUar3DXaT1
-	runiP28UqE3/sCRPPK3XArNnSdZTY7DFj52dbkvuFrZeuoasojH2d3FiGlM7kYEw58A4E07ZdesGN
-	n+7Ta2fCBAuVcPc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wfdjw-00AYEi-Ix; Fri, 03 Jul 2026 15:15:32 +0200
-Date: Fri, 3 Jul 2026 15:15:32 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Nazle Asmade, Muhammad Nazim Amirul" <muhammad.nazim.amirul.nazle.asmade@altera.com>
-Cc: "dinguyen@kernel.org" <dinguyen@kernel.org>,
-	"maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
-	"rmk+kernel@armlinux.org.uk" <rmk+kernel@armlinux.org.uk>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"robh@kernel.org" <robh@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 3/3] net: stmmac: dwmac-socfpga: Add mac-mode DT property
- support
-Message-ID: <431e5388-8406-467a-8053-7104b3a62a76@lunn.ch>
-References: <20260630133108.27244-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
- <20260630133108.27244-4-muhammad.nazim.amirul.nazle.asmade@altera.com>
- <e489be4a-5940-46e5-ae06-b78f1c919352@lunn.ch>
- <f31704f2-cd98-481f-8290-203e3052b738@altera.com>
+	s=arc-20240116; t=1783084684; c=relaxed/simple;
+	bh=6W21t04zsig41ZGK4yP5vmdeiSeuqMAWNJ/8tz/1jF0=;
+	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
+	 References:Date:Message-Id; b=dhLMZoz+En60f0HXizAjQkuUa868XHE86QsTzbpEpODphELsFxJUMr8yXiBOZ54e2LRVJUr9EM1BfRtRf5xFlO7qtn1u94R7UHZ1XOr4Lsjkpn+OUcO0yBeTQaXAyKM63BrBAMlRHAfFz9nrT5sFb/Q2kBwBV/K9UjBfd3az+w0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eSxTZz2t; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B29CB1F000E9;
+	Fri,  3 Jul 2026 13:17:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783084682;
+	bh=4uzDfoTwkfdbFHkCUQ1tshn8zcfMCx855BQAs0GpqXw=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date;
+	b=eSxTZz2tETgzCCPZR7nAkwKRL3WdbxS1Eij5f/SQeD1puzmaMpa3AnxcSk+PkMYSc
+	 va31yRhgj6fo3vhhqiIoj8byX+cG7nSsgWDTqZieRE2+TvpLCnGbpHDvs8dVoVr8lk
+	 7wQ3vTr7ZlYVH4REPgeq2g3N9VobPBdH2M7CfhjPijyWodk50oXrym2JnfUvmO+9sy
+	 tQQNkPKqwLdKV6xNtJ0hTQ0wLCEf/7ksAcBmlFtGtv0zD51aBVANaIXOyetLqMl8jW
+	 pIxLek2mvLOPkbw8EZ3nVnG9QU6RAmcpzAOX1gGUmtM6D+dAbB3Sy/r3s1prrnMLoW
+	 0JGfsRGVdH/0A==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f31704f2-cd98-481f-8290-203e3052b738@altera.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH net-next v2 3/3] af_unix: Clean up error handling in
+ unix_listen()
+From: Christian Brauner <brauner@kernel.org>
+To: John Ericson <John.Ericson@Obsidian.Systems>
+Cc: "David S . Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+ John Ericson <mail@johnericson.me>, Simon Horman <horms@kernel.org>, 
+ Christian Brauner <brauner@kernel.org>, 
+ David Rheinsberg <david@readahead.eu>, Cong Wang <cwang@multikernel.io>, 
+ Sergei Zimmerman <sergei@zimmerman.foo>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+In-Reply-To: <20260703081416.2583118-3-John.Ericson@Obsidian.Systems>
+References: <20260703081416.2583118-1-John.Ericson@Obsidian.Systems>
+ <20260703081416.2583118-3-John.Ericson@Obsidian.Systems>
+Date: Fri, 03 Jul 2026 15:17:46 +0200
+Message-Id: <20260703-nachzahlen-plagt-tierwelt-38485ce22091@brauner>
+X-Mailer: b4 0.16-dev-4217c
+X-Developer-Signature: v=1; a=openpgp-sha256; l=516; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=6W21t04zsig41ZGK4yP5vmdeiSeuqMAWNJ/8tz/1jF0=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWS5b2uI1vNsTb7z4bwQ59udnq9jTD4+33P6z7nDugw5Y
+ jNmMUeKdJSyMIhxMciKKbI4tJuEyy3nqdhslKkBM4eVCWQIAxenAExk2TlGhv/1KQq/jpm1dRzl
+ V/iqvY3vztkTk8O1jcXmr929x/f9xLOMDLNeP9yiF2vwekWUuo39Rj6NZeL1mU/X1/WKpfdzbT2
+ xnh8A
+X-Developer-Key: i=brauner@kernel.org; a=openpgp;
+ fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-304549-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:muhammad.nazim.amirul.nazle.asmade@altera.com,m:dinguyen@kernel.org,m:maxime.chevallier@bootlin.com,m:rmk+kernel@armlinux.org.uk,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:robh@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:devicetree@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:rmk@armlinux.org.uk,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
+	FORGED_RECIPIENTS(0.00)[m:John.Ericson@Obsidian.Systems,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kuniyu@google.com,m:mail@johnericson.me,m:horms@kernel.org,m:brauner@kernel.org,m:david@readahead.eu,m:cwang@multikernel.io,m:sergei@zimmerman.foo,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[brauner@kernel.org,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[brauner@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-304552-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,kernel,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:from_mime,lunn.ch:dkim,lunn.ch:mid]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,brauner:mid,johnericson.me:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A7007702D85
+X-Rspamd-Queue-Id: DB144702CE1
 
-> > I don't actually see a need for mac-mode. From what you are saying,
-> > there is no choice. The MAC is hard wired to the converter block. So
-> > you can just look at the compatible. You are going to need to use the
-> > compatible anyway, to mask the phy-mode to handle the "MAC" doing the
-> > RGMII delays.
-> > 
-> >        Andrew
-> > 
-> Hi Maxime, Andrew
+> To avoid the sort of bug that was just fixed going forward, switch to a
+> style where `err = -E...;` instead happens right before the `goto`.
+> (`err = other_function(...);` is not changed.) Then there is no
+> spooky-action-at-a-distance between the `err` initialization and the
+> `goto`, something which is easier to slip by code review.
 > 
-> Thanks for the reviews!
-> 
-> Hi Andrew,
-> 
-> The challenge with using compatible is that the TSN Config2 board has 
-> two ports — only gmac1 uses the GMII-to-RGMII converter, while gmac2 
-> connects directly to its PHY.
+> Signed-off-by: John Ericson <mail@johnericson.me>
 
-The two MACs are not compatible then, and each should have its own
-compatible string. This is all in the SoC .dtsi file, so not really a
-problem.
+Reviewed-by: Christian Brauner (Amutable) <brauner@kernel.org>
 
-       Andrew
+-- 
+Christian Brauner <brauner@kernel.org>
 
