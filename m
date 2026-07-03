@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-304425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304426-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id JagzOrtpR2quXwAAu9opvQ
-	(envelope-from <netdev+bounces-304425-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:50:19 +0200
+	id 60kUHuFpR2qzXwAAu9opvQ
+	(envelope-from <netdev+bounces-304426-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:50:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 397556FFBCB
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:50:19 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7E1C6FFBDE
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:50:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=padl.com header.s=default header.b=HHHmyP2e;
+	dkim=pass header.d=padl.com header.s=default header.b=s+2UcFyI;
 	dmarc=pass (policy=reject) header.from=padl.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304425-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304425-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304426-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-304426-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 131113086D63
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 07:47:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9FD70309832F
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 07:47:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19E036EA9F;
-	Fri,  3 Jul 2026 07:47:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23BD736F434;
+	Fri,  3 Jul 2026 07:47:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from us.padl.com (us.padl.com [216.154.215.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CDB136EAA8;
-	Fri,  3 Jul 2026 07:47:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9299436E468;
+	Fri,  3 Jul 2026 07:47:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783064823; cv=none; b=dSjAQMFyKzRnj8LD6YtIenMcxK8/mN7/tuQDcJO4/CMXlCu80JoS+wX9svDN/LLzPQAgh6reHoS5R0XJrxUsECAibKK0JaS0oxc30Hc0I5O+9lOuuqgL2Ok0+aXCrTIJTZ5wXJzf8BjgCvwY1SkZcV7oySLkvqt5azjmdKSahXU=
+	t=1783064828; cv=none; b=hC/gzuVWMZs+iZ+HE66UdTM6kfu/2DWA67L08FuLywQIJqGjFKE8UdFwk9KykPGpiScX38Pv/2jsfNUw45Ax3IIgsvVOmaDzoVs/g1C+U8Rg/j+5vfAZTEHv8fh8VtE7wFsPK/x1eERAEIV8T8w+MUussqmosVK5Ut1VmceDozw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783064823; c=relaxed/simple;
-	bh=A+OrHpxl3i924ZDfOh/C8alqLemRcchf9B8XQyqyloU=;
+	s=arc-20240116; t=1783064828; c=relaxed/simple;
+	bh=CyUivMR8Llv06EhRIKDpn3Fe3pNlH0ueFS4t4ZoiLf4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=jp+Nosu8miYIxEX1omeUH7p2I644Mnl6FsFPJuV6BH9Og+sv1sk0db0T8nL+aI3S9I453vw5uNs/d+CYKm3rMjsLxXjaEsKcQQ6jZzl5GBEP473rcU38Ow6Z//ADRMtCZ74e4S4YpmImmaiSteETxJ2UQWjiSQcK3Z3edcHKWrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=HHHmyP2e; arc=none smtp.client-ip=216.154.215.154
+	 In-Reply-To:To:Cc; b=QlilFj+zRax1UtrcaN7AAw187HMndiqoBdoutYzX0ScRo5bR6eqsfkMv/GI7QEYEBrcU1bLzXg/9nZsZTaXyHuUfAbhuf0xj332nOb05no9Jt+NrQaeXZh/rvFJ6LCbOb4n04QoeZYP8hH0J8QYL8Btv/o+ufbrqE5JISfOsrI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=s+2UcFyI; arc=none smtp.client-ip=216.154.215.154
 Received: from [127.0.1.1] (border.lukktone.com [139.130.100.52])
-	by us.padl.com (Postfix) with ESMTPSA id 1522560C0B;
-	Fri,  3 Jul 2026 03:46:56 -0400 (EDT)
+	by us.padl.com (Postfix) with ESMTPSA id 9DC1B60C04;
+	Fri,  3 Jul 2026 03:47:01 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=padl.com; s=default;
-	t=1783064821; bh=M7yI4KAXWQaoiMtxUn5QT5Uy5CCrj2dviQlLVLroyg0=;
+	t=1783064825; bh=bJMr/qHc7ymioqh7BOmXgJGPVRBK1nh6eJFKKNpkeIs=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=HHHmyP2ezA8lqoQovKj12Z6r+8U1U9jA2w0vu51KCRi7+/cZbgRpZszFRPjAPaOZv
-	 A9jrWWYaOymKB+Eqm5U1q5aPO0Ww1G/Mmq6KQTYM2gQgtRNdX6y4sPuqKwLmgJpyhx
-	 59pvj7AXnc0gLHZGlvQuwXhJmL1MPRtT8RlvK13wNXgGKo39Sd5dmnw0cpijlT4lob
-	 Oh7ktNxY3cJgE+WU9qU5c+9lOZ4VA4Pd3yoQNYAQvc1YelRYU433krN5UXWqLlvwZw
-	 N/fGdyqnfsI/b1otHjmgLLJuP0jFqPQ7MnBPR4llbBqU7RMDxGOw+Idc2B/tm7Txfp
-	 6dgM9Ycoezmcg==
+	b=s+2UcFyIzPmJKj4pUmtz/nKV8pDbVdtH96IK/ia8uPnCsufaQrPWvzS9CyAC4oEna
+	 5DqfltRdxhRc95vwpHviZ79zrKx/g8jH54zgsAEmhmBCSHvMSCiPYjmPC+zKjXo/WX
+	 CSvxtTz1GIba1regAKBsToGkNb1nvWCyF4tkI0gOI344p+V4mBbMWzNf3tpGddXgqJ
+	 s1UWBZaWpGCueYj/7kFC04cwMu2xsx49FHcWQupDBJAcvwWPWaFvDki7Hq3a/ckPVC
+	 bWcsaaB+Whn9RsNvf+z8P3Y1ljno20WX9QnOXYDOVPMcWScA/Q11vdNS/7Nk2AjfKT
+	 EaZSc/EqzDPRA==
 From: Luke Howard <lukeh@padl.com>
-Date: Fri, 03 Jul 2026 17:46:38 +1000
-Subject: [PATCH net-next 04/17] net: dsa: mv88e6xxx: Add RMU enable/disable
- for select switches.
+Date: Fri, 03 Jul 2026 17:46:39 +1000
+Subject: [PATCH net-next 05/17] net: dsa: mv88e6xxx: Add conduit state
+ change handler
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,7 +58,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260703-net-next-mv88e6xxx-rmu-v1-4-991a27d78bca@padl.com>
+Message-Id: <20260703-net-next-mv88e6xxx-rmu-v1-5-991a27d78bca@padl.com>
 References: <20260703-net-next-mv88e6xxx-rmu-v1-0-991a27d78bca@padl.com>
 In-Reply-To: <20260703-net-next-mv88e6xxx-rmu-v1-0-991a27d78bca@padl.com>
 To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
@@ -74,11 +74,11 @@ Cc: Cedric Jehasse <cedric.jehasse@gmail.com>,
  Mattias Forsblad <mattias.forsblad@gmail.com>, netdev@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Luke Howard <lukeh@padl.com>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1783064798; l=10173;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1783064798; l=4698;
  i=lukeh@padl.com; s=20260701; h=from:subject:message-id;
- bh=yreUrDsX1iTtqcJqfMKMbacHMjKALCkkN9158jCV0zo=;
- b=pJ1lOJ1PjFaF1AMRbKJQIIadFxEao07QyxBJHxk1TiybbLP8L8H8bWdUWxT7eHsg/Vbm0PCxe
- V6idAyiPfZUB7278H43u//Rj6H5kChrxUnx0wMyumABIJKzYBo3CUT/
+ bh=Dq6jpBuZlPa/OHY/Kpn4yyE39BjKNkXf/FngrDh8eUc=;
+ b=XimQFpWDaVAfYNi3CEWZeRQ1h+FUNfWLnNig4GivUKTFOoremhmYJUPJ7VSYFoI6zrkaW8lqM
+ 1bGXmarK4NTARvVww4RikrRkmlf1NubL9B+lhhFtpc+uNx/qApSlJxH
 X-Developer-Key: i=lukeh@padl.com; a=ed25519;
  pk=D6YgUnH9/OzSZsduYm9XDbvXn1IHDwKwI1hLTsKNRLw=
 X-Rspamd-Action: no action
@@ -87,11 +87,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[padl.com,reject];
 	R_DKIM_ALLOW(-0.20)[padl.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304425-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304426-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux@armlinux.org.uk,m:richardcochran@gmail.com,m:f.fainelli@gmail.com,m:cedric.jehasse@gmail.com,m:mh@rme-audio.de,m:max@huntershome.org,m:kieran@sienda.com,m:Ryan.Wilkins@telosalliance.com,m:mattias.forsblad@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:lukeh@padl.com,m:ffainelli@gmail.com,m:cedricjehasse@gmail.com,m:mattiasforsblad@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
@@ -113,267 +113,158 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,padl.com:from_mime,padl.com:dkim,padl.com:mid,lunn.ch:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,padl.com:from_mime,padl.com:dkim,padl.com:mid,lunn.ch:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 397556FFBCB
+X-Rspamd-Queue-Id: D7E1C6FFBDE
 
-From: Mattias Forsblad <mattias.forsblad@gmail.com>
+From: Andrew Lunn <andrew@lunn.ch>
 
-Add RMU enable and disable functionality for some Marvell SOHO
-switches.
+When the conduit interface comes up, try to enable the RMU.  Failing to
+enable the remote management unit is not fatal, not all chips support
+it, and some boards have chips which do support RMU, but with wrong
+port is connected to the CPU.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
+When the conduit interface goes down, disable the RMU.
+
+Keep track of the conduit interface, so that RMU frames can be sent to
+it.
+
+Co-developed: Mattias Forsblad <mattias.forsblad@gmail.com>
 Signed-off-by: Mattias Forsblad <mattias.forsblad@gmail.com>
 Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 ---
- drivers/net/dsa/mv88e6xxx/chip.c    | 15 +++++++++
- drivers/net/dsa/mv88e6xxx/chip.h    |  1 +
- drivers/net/dsa/mv88e6xxx/global1.c | 64 +++++++++++++++++++++++++++++++++++++
- drivers/net/dsa/mv88e6xxx/global1.h |  3 ++
- 4 files changed, 83 insertions(+)
+ drivers/net/dsa/mv88e6xxx/Makefile |  1 +
+ drivers/net/dsa/mv88e6xxx/chip.c   |  2 ++
+ drivers/net/dsa/mv88e6xxx/chip.h   |  3 +++
+ drivers/net/dsa/mv88e6xxx/rmu.c    | 50 ++++++++++++++++++++++++++++++++++++++
+ drivers/net/dsa/mv88e6xxx/rmu.h    | 15 ++++++++++++
+ 5 files changed, 71 insertions(+)
 
+diff --git a/drivers/net/dsa/mv88e6xxx/Makefile b/drivers/net/dsa/mv88e6xxx/Makefile
+index b0b08c6f159c6..1f3571061a550 100644
+--- a/drivers/net/dsa/mv88e6xxx/Makefile
++++ b/drivers/net/dsa/mv88e6xxx/Makefile
+@@ -17,6 +17,7 @@ mv88e6xxx-objs += phy.o
+ mv88e6xxx-objs += port.o
+ mv88e6xxx-objs += port_hidden.o
+ mv88e6xxx-$(CONFIG_NET_DSA_MV88E6XXX_PTP) += ptp.o
++mv88e6xxx-objs += rmu.o
+ mv88e6xxx-objs += serdes.o
+ mv88e6xxx-objs += smi.o
+ mv88e6xxx-objs += switchdev.o
 diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index eada2f71cb7b3..dbfbdb982fc00 100644
+index dbfbdb982fc00..d6c6834cca2cb 100644
 --- a/drivers/net/dsa/mv88e6xxx/chip.c
 +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -4265,6 +4265,7 @@ static const struct mv88e6xxx_ops mv88e6085_ops = {
- 	.ppu_disable = mv88e6185_g1_ppu_disable,
- 	.reset = mv88e6185_g1_reset,
- 	.rmu_disable = mv88e6085_g1_rmu_disable,
-+	.rmu_enable = mv88e6085_g1_rmu_enable,
- 	.vtu_getnext = mv88e6352_g1_vtu_getnext,
- 	.vtu_loadpurge = mv88e6352_g1_vtu_loadpurge,
- 	.stu_getnext = mv88e6352_g1_stu_getnext,
-@@ -4343,6 +4344,7 @@ static const struct mv88e6xxx_ops mv88e6097_ops = {
- 	.pot_clear = mv88e6xxx_g2_pot_clear,
- 	.reset = mv88e6352_g1_reset,
- 	.rmu_disable = mv88e6085_g1_rmu_disable,
-+	.rmu_enable = mv88e6085_g1_rmu_enable,
- 	.vtu_getnext = mv88e6352_g1_vtu_getnext,
- 	.vtu_loadpurge = mv88e6352_g1_vtu_loadpurge,
- 	.phylink_get_caps = mv88e6095_phylink_get_caps,
-@@ -4477,6 +4479,7 @@ static const struct mv88e6xxx_ops mv88e6141_ops = {
- 	.hardware_reset_post = mv88e6xxx_g2_eeprom_wait,
- 	.reset = mv88e6352_g1_reset,
- 	.rmu_disable = mv88e6390_g1_rmu_disable,
-+	.rmu_enable = mv88e6390_g1_rmu_enable,
- 	.atu_get_hash = mv88e6165_g1_atu_get_hash,
- 	.atu_set_hash = mv88e6165_g1_atu_set_hash,
- 	.vtu_getnext = mv88e6352_g1_vtu_getnext,
-@@ -4670,6 +4673,7 @@ static const struct mv88e6xxx_ops mv88e6172_ops = {
- 	.hardware_reset_post = mv88e6xxx_g2_eeprom_wait,
- 	.reset = mv88e6352_reset,
- 	.rmu_disable = mv88e6352_g1_rmu_disable,
-+	.rmu_enable = mv88e6352_g1_rmu_enable,
- 	.atu_get_hash = mv88e6165_g1_atu_get_hash,
- 	.atu_set_hash = mv88e6165_g1_atu_set_hash,
- 	.vtu_getnext = mv88e6352_g1_vtu_getnext,
-@@ -4774,6 +4778,7 @@ static const struct mv88e6xxx_ops mv88e6176_ops = {
- 	.hardware_reset_post = mv88e6xxx_g2_eeprom_wait,
- 	.reset = mv88e6352_reset,
- 	.rmu_disable = mv88e6352_g1_rmu_disable,
-+	.rmu_enable = mv88e6352_g1_rmu_enable,
- 	.atu_get_hash = mv88e6165_g1_atu_get_hash,
- 	.atu_set_hash = mv88e6165_g1_atu_set_hash,
- 	.vtu_getnext = mv88e6352_g1_vtu_getnext,
-@@ -4869,6 +4874,7 @@ static const struct mv88e6xxx_ops mv88e6190_ops = {
- 	.hardware_reset_post = mv88e6xxx_g2_eeprom_wait,
- 	.reset = mv88e6352_g1_reset,
- 	.rmu_disable = mv88e6390_g1_rmu_disable,
-+	.rmu_enable = mv88e6390_g1_rmu_enable,
- 	.atu_get_hash = mv88e6165_g1_atu_get_hash,
- 	.atu_set_hash = mv88e6165_g1_atu_set_hash,
- 	.vtu_getnext = mv88e6390_g1_vtu_getnext,
-@@ -4928,6 +4934,7 @@ static const struct mv88e6xxx_ops mv88e6190x_ops = {
- 	.hardware_reset_post = mv88e6xxx_g2_eeprom_wait,
- 	.reset = mv88e6352_g1_reset,
- 	.rmu_disable = mv88e6390_g1_rmu_disable,
-+	.rmu_enable = mv88e6390_g1_rmu_enable,
- 	.atu_get_hash = mv88e6165_g1_atu_get_hash,
- 	.atu_set_hash = mv88e6165_g1_atu_set_hash,
- 	.vtu_getnext = mv88e6390_g1_vtu_getnext,
-@@ -4985,6 +4992,7 @@ static const struct mv88e6xxx_ops mv88e6191_ops = {
- 	.hardware_reset_post = mv88e6xxx_g2_eeprom_wait,
- 	.reset = mv88e6352_g1_reset,
- 	.rmu_disable = mv88e6390_g1_rmu_disable,
-+	.rmu_enable = mv88e6390_g1_rmu_enable,
- 	.atu_get_hash = mv88e6165_g1_atu_get_hash,
- 	.atu_set_hash = mv88e6165_g1_atu_set_hash,
- 	.vtu_getnext = mv88e6390_g1_vtu_getnext,
-@@ -5047,6 +5055,7 @@ static const struct mv88e6xxx_ops mv88e6240_ops = {
- 	.hardware_reset_post = mv88e6xxx_g2_eeprom_wait,
- 	.reset = mv88e6352_reset,
- 	.rmu_disable = mv88e6352_g1_rmu_disable,
-+	.rmu_enable = mv88e6352_g1_rmu_enable,
- 	.atu_get_hash = mv88e6165_g1_atu_get_hash,
- 	.atu_set_hash = mv88e6165_g1_atu_set_hash,
- 	.vtu_getnext = mv88e6352_g1_vtu_getnext,
-@@ -5150,6 +5159,7 @@ static const struct mv88e6xxx_ops mv88e6290_ops = {
- 	.hardware_reset_post = mv88e6xxx_g2_eeprom_wait,
- 	.reset = mv88e6352_g1_reset,
- 	.rmu_disable = mv88e6390_g1_rmu_disable,
-+	.rmu_enable = mv88e6390_g1_rmu_enable,
- 	.atu_get_hash = mv88e6165_g1_atu_get_hash,
- 	.atu_set_hash = mv88e6165_g1_atu_set_hash,
- 	.vtu_getnext = mv88e6390_g1_vtu_getnext,
-@@ -5330,6 +5340,7 @@ static const struct mv88e6xxx_ops mv88e6341_ops = {
- 	.hardware_reset_post = mv88e6xxx_g2_eeprom_wait,
- 	.reset = mv88e6352_g1_reset,
- 	.rmu_disable = mv88e6390_g1_rmu_disable,
-+	.rmu_enable = mv88e6390_g1_rmu_enable,
- 	.atu_get_hash = mv88e6165_g1_atu_get_hash,
- 	.atu_set_hash = mv88e6165_g1_atu_set_hash,
- 	.vtu_getnext = mv88e6352_g1_vtu_getnext,
-@@ -5488,6 +5499,7 @@ static const struct mv88e6xxx_ops mv88e6352_ops = {
- 	.hardware_reset_post = mv88e6xxx_g2_eeprom_wait,
- 	.reset = mv88e6352_reset,
- 	.rmu_disable = mv88e6352_g1_rmu_disable,
-+	.rmu_enable = mv88e6352_g1_rmu_enable,
- 	.atu_get_hash = mv88e6165_g1_atu_get_hash,
- 	.atu_set_hash = mv88e6165_g1_atu_set_hash,
- 	.vtu_getnext = mv88e6352_g1_vtu_getnext,
-@@ -5551,6 +5563,7 @@ static const struct mv88e6xxx_ops mv88e6390_ops = {
- 	.hardware_reset_post = mv88e6xxx_g2_eeprom_wait,
- 	.reset = mv88e6352_g1_reset,
- 	.rmu_disable = mv88e6390_g1_rmu_disable,
-+	.rmu_enable = mv88e6390_g1_rmu_enable,
- 	.atu_get_hash = mv88e6165_g1_atu_get_hash,
- 	.atu_set_hash = mv88e6165_g1_atu_set_hash,
- 	.vtu_getnext = mv88e6390_g1_vtu_getnext,
-@@ -5615,6 +5628,7 @@ static const struct mv88e6xxx_ops mv88e6390x_ops = {
- 	.hardware_reset_post = mv88e6xxx_g2_eeprom_wait,
- 	.reset = mv88e6352_g1_reset,
- 	.rmu_disable = mv88e6390_g1_rmu_disable,
-+	.rmu_enable = mv88e6390_g1_rmu_enable,
- 	.atu_get_hash = mv88e6165_g1_atu_get_hash,
- 	.atu_set_hash = mv88e6165_g1_atu_set_hash,
- 	.vtu_getnext = mv88e6390_g1_vtu_getnext,
-@@ -5682,6 +5696,7 @@ static const struct mv88e6xxx_ops mv88e6393x_ops = {
- 	.hardware_reset_post = mv88e6xxx_g2_eeprom_wait,
- 	.reset = mv88e6352_g1_reset,
- 	.rmu_disable = mv88e6390_g1_rmu_disable,
-+	.rmu_enable = mv88e6390_g1_rmu_enable,
- 	.atu_get_hash = mv88e6165_g1_atu_get_hash,
- 	.atu_set_hash = mv88e6165_g1_atu_set_hash,
- 	.vtu_getnext = mv88e6390_g1_vtu_getnext,
+@@ -41,6 +41,7 @@
+ #include "phy.h"
+ #include "port.h"
+ #include "ptp.h"
++#include "rmu.h"
+ #include "serdes.h"
+ #include "smi.h"
+ #include "tcam.h"
+@@ -7265,6 +7266,7 @@ static const struct dsa_switch_ops mv88e6xxx_switch_ops = {
+ 	.crosschip_lag_change	= mv88e6xxx_crosschip_lag_change,
+ 	.crosschip_lag_join	= mv88e6xxx_crosschip_lag_join,
+ 	.crosschip_lag_leave	= mv88e6xxx_crosschip_lag_leave,
++	.conduit_state_change	= mv88e6xxx_rmu_conduit_state_change,
+ };
+ 
+ static int mv88e6xxx_register_switch(struct mv88e6xxx_chip *chip)
 diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
-index e966e7c4cc5de..12fdcb63252eb 100644
+index 12fdcb63252eb..76958b588a908 100644
 --- a/drivers/net/dsa/mv88e6xxx/chip.h
 +++ b/drivers/net/dsa/mv88e6xxx/chip.h
-@@ -701,6 +701,7 @@ struct mv88e6xxx_ops {
+@@ -457,6 +457,9 @@ struct mv88e6xxx_chip {
  
- 	/* Remote Management Unit operations */
- 	int (*rmu_disable)(struct mv88e6xxx_chip *chip);
-+	int (*rmu_enable)(struct mv88e6xxx_chip *chip, int port);
- 
- 	/* Precision Time Protocol operations */
- 	const struct mv88e6xxx_ptp_ops *ptp_ops;
-diff --git a/drivers/net/dsa/mv88e6xxx/global1.c b/drivers/net/dsa/mv88e6xxx/global1.c
-index 9820cd5967574..ae0b6e5628184 100644
---- a/drivers/net/dsa/mv88e6xxx/global1.c
-+++ b/drivers/net/dsa/mv88e6xxx/global1.c
-@@ -536,18 +536,82 @@ int mv88e6085_g1_rmu_disable(struct mv88e6xxx_chip *chip)
- 				      MV88E6085_G1_CTL2_RM_ENABLE, 0);
- }
- 
-+int mv88e6085_g1_rmu_enable(struct mv88e6xxx_chip *chip, int port)
-+{
-+	int val = MV88E6352_G1_CTL2_RMU_MODE_DISABLED;
+ 	/* Global2 scratch register config data3 */
+ 	u8 g2_scratch_config3;
 +
-+	switch (port) {
-+	case 9:
-+		val = MV88E6085_G1_CTL2_RM_ENABLE;
-+		break;
-+	case 10:
-+		val = MV88E6085_G1_CTL2_RM_ENABLE | MV88E6085_G1_CTL2_P10RM;
-+		break;
-+	default:
-+		return -EOPNOTSUPP;
++	/* Remote Management Unit state. */
++	struct net_device *rmu_conduit;
+ };
+ 
+ #define TCAM_MATCH_SIZE 96
+diff --git a/drivers/net/dsa/mv88e6xxx/rmu.c b/drivers/net/dsa/mv88e6xxx/rmu.c
+new file mode 100644
+index 0000000000000..64e93e2eaf550
+--- /dev/null
++++ b/drivers/net/dsa/mv88e6xxx/rmu.c
+@@ -0,0 +1,50 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Marvell 88E6xxx Switch Remote Management Unit Support
++ *
++ * Copyright (c) 2022 Mattias Forsblad <mattias.forsblad@gmail.com>
++ *
++ */
++
++#include <net/dsa.h>
++#include "chip.h"
++#include "global1.h"
++#include "rmu.h"
++
++void mv88e6xxx_rmu_conduit_state_change(struct dsa_switch *ds,
++					const struct net_device *conduit,
++					bool operational)
++{
++	struct dsa_port *cpu_dp = conduit->dsa_ptr;
++	struct mv88e6xxx_chip *chip = ds->priv;
++	int port;
++	int ret;
++
++	port = dsa_towards_port(ds, cpu_dp->ds->index, cpu_dp->index);
++
++	mv88e6xxx_reg_lock(chip);
++
++	if (operational && chip->info->ops->rmu_enable) {
++		ret = chip->info->ops->rmu_enable(chip, port);
++		if (ret == -EOPNOTSUPP) {
++			dev_info(chip->dev, "RMU: not usable on this board");
++			goto out;
++		} else if (ret < 0) {
++			dev_err(chip->dev, "RMU: unable to enable on port %d %pe",
++				port, ERR_PTR(ret));
++			goto out;
++		}
++
++		WRITE_ONCE(chip->rmu_conduit, (struct net_device *)conduit);
++
++		dev_dbg(chip->dev, "RMU: Enabled on port %d", port);
++	} else {
++		if (chip->info->ops->rmu_disable)
++			chip->info->ops->rmu_disable(chip);
++
++		WRITE_ONCE(chip->rmu_conduit, NULL);
 +	}
 +
-+	return mv88e6xxx_g1_ctl2_mask(chip, MV88E6085_G1_CTL2_P10RM |
-+				      MV88E6085_G1_CTL2_RM_ENABLE, val);
++out:
++	mv88e6xxx_reg_unlock(chip);
 +}
+diff --git a/drivers/net/dsa/mv88e6xxx/rmu.h b/drivers/net/dsa/mv88e6xxx/rmu.h
+new file mode 100644
+index 0000000000000..71c4fc1d4113f
+--- /dev/null
++++ b/drivers/net/dsa/mv88e6xxx/rmu.h
+@@ -0,0 +1,15 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Marvell 88E6xxx Switch Remote Management Unit Support
++ *
++ * Copyright (c) 2022 Mattias Forsblad <mattias.forsblad@gmail.com>
++ *
++ */
 +
- int mv88e6352_g1_rmu_disable(struct mv88e6xxx_chip *chip)
- {
- 	return mv88e6xxx_g1_ctl2_mask(chip, MV88E6352_G1_CTL2_RMU_MODE_MASK,
- 				      MV88E6352_G1_CTL2_RMU_MODE_DISABLED);
- }
- 
-+int mv88e6352_g1_rmu_enable(struct mv88e6xxx_chip *chip, int port)
-+{
-+	int val = MV88E6352_G1_CTL2_RMU_MODE_DISABLED;
++#ifndef _MV88E6XXX_RMU_H_
++#define _MV88E6XXX_RMU_H_
 +
-+	switch (port) {
-+	case 4:
-+		val = MV88E6352_G1_CTL2_RMU_MODE_PORT_4;
-+		break;
-+	case 5:
-+		val = MV88E6352_G1_CTL2_RMU_MODE_PORT_5;
-+		break;
-+	case 6:
-+		val = MV88E6352_G1_CTL2_RMU_MODE_PORT_6;
-+		break;
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return mv88e6xxx_g1_ctl2_mask(chip, MV88E6352_G1_CTL2_RMU_MODE_MASK, val);
-+}
-+
- int mv88e6390_g1_rmu_disable(struct mv88e6xxx_chip *chip)
- {
- 	return mv88e6xxx_g1_ctl2_mask(chip, MV88E6390_G1_CTL2_RMU_MODE_MASK,
- 				      MV88E6390_G1_CTL2_RMU_MODE_DISABLED);
- }
- 
-+int mv88e6390_g1_rmu_enable(struct mv88e6xxx_chip *chip, int port)
-+{
-+	int val = MV88E6390_G1_CTL2_RMU_MODE_DISABLED;
-+
-+	switch (port) {
-+	case 0:
-+		val = MV88E6390_G1_CTL2_RMU_MODE_PORT_0;
-+		break;
-+	case 1:
-+		val = MV88E6390_G1_CTL2_RMU_MODE_PORT_1;
-+		break;
-+	case 9:
-+		val = MV88E6390_G1_CTL2_RMU_MODE_PORT_9;
-+		break;
-+	case 10:
-+		val = MV88E6390_G1_CTL2_RMU_MODE_PORT_10;
-+		break;
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return mv88e6xxx_g1_ctl2_mask(chip, MV88E6390_G1_CTL2_RMU_MODE_MASK, val);
-+}
-+
- int mv88e6390_g1_stats_set_histogram(struct mv88e6xxx_chip *chip)
- {
- 	return mv88e6xxx_g1_ctl2_mask(chip, MV88E6390_G1_CTL2_HIST_MODE_MASK,
-diff --git a/drivers/net/dsa/mv88e6xxx/global1.h b/drivers/net/dsa/mv88e6xxx/global1.h
-index 3dbb7a1b8fe11..4624d1bdfc243 100644
---- a/drivers/net/dsa/mv88e6xxx/global1.h
-+++ b/drivers/net/dsa/mv88e6xxx/global1.h
-@@ -316,8 +316,11 @@ int mv88e6250_g1_ieee_pri_map(struct mv88e6xxx_chip *chip);
- int mv88e6185_g1_set_cascade_port(struct mv88e6xxx_chip *chip, int port);
- 
- int mv88e6085_g1_rmu_disable(struct mv88e6xxx_chip *chip);
-+int mv88e6085_g1_rmu_enable(struct mv88e6xxx_chip *chip, int port);
- int mv88e6352_g1_rmu_disable(struct mv88e6xxx_chip *chip);
-+int mv88e6352_g1_rmu_enable(struct mv88e6xxx_chip *chip, int port);
- int mv88e6390_g1_rmu_disable(struct mv88e6xxx_chip *chip);
-+int mv88e6390_g1_rmu_enable(struct mv88e6xxx_chip *chip, int port);
- 
- int mv88e6xxx_g1_set_device_number(struct mv88e6xxx_chip *chip, int index);
- 
++void mv88e6xxx_rmu_conduit_state_change(struct dsa_switch *ds,
++					const struct net_device *conduit,
++					bool operational);
++#endif /* _MV88E6XXX_RMU_H_ */
 
 -- 
 2.43.0
