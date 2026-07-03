@@ -1,140 +1,191 @@
-Return-Path: <netdev+bounces-304582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304583-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /4/JMPzHR2rGfAAAu9opvQ
-	(envelope-from <netdev+bounces-304582-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 16:32:28 +0200
+	id 4r38FU7IR2rtfAAAu9opvQ
+	(envelope-from <netdev+bounces-304583-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 16:33:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 032C27036EE
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 16:32:28 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EC92703726
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 16:33:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=baidu.com header.s=selector1 header.b=mZdPJwmG;
-	dmarc=pass (policy=quarantine) header.from=baidu.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304582-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304582-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b="i/VoiBVh";
+	dkim=pass header.d=redhat.com header.s=google header.b="etpmCV/g";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304583-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304583-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D532C300FECC
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 14:15:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F26783145CA4
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 14:19:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 562E63DCD84;
-	Fri,  3 Jul 2026 14:15:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11A433DD51A;
+	Fri,  3 Jul 2026 14:19:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.baidu.com (mx15.baidu.com [111.202.115.100])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id 75E7D3DA7E4;
-	Fri,  3 Jul 2026 14:14:55 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C30D344D86
+	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 14:19:47 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783088106; cv=none; b=oF6DyvquZpS1lNCQkB7WsZMk/ljUt9TvZAgdGdgILp0mqsh5TVTd1d7x2R/jfwFL5Ni+gPGvbmeoLNhYxa3cyC41prT3CtJZn1Uf2T5JCqpJ/QvpbVxPiYbLhab6A+d7E5/ilNr2oGvzxylV2bDrkmRWZqX23uRyzXtOFgq6MqY=
+	t=1783088389; cv=none; b=s1cGyq0Guj89Y9bgDTbE/N1l/cvPXzFrYsVAitgc19tAkvV7ib/tha3ulRDCzwcXPmfqVyEW27IWry3WxIJxgKUEidIo4r4ehzFlalsMV0Nzu9EjpkIFG0SA+rrwNtdaVQMXFaY2YBBd8NNHhAMZQwmp/CxkR1jyu12pdJkXt2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783088106; c=relaxed/simple;
-	bh=twwAxQPdUmab4X/guhrl6yiP2j3wT1GqyqKE26e3swc=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XURfhHr5KjJHrxhosqyU8fE5eI6U+kO1e4bliaglcBKe1myd1KBZUsmV8gAvALzVt15CahTOXOL9ugDpcYO4P8JY/duCfJYB5TsRCodOtMD/C4QLXReO/Ry6pLZd4XjU2+HGdmS3/U/Yx8pB7dQlO9S6kaMmkHrbhqb28KFbjLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; dkim=pass (2048-bit key) header.d=baidu.com header.i=@baidu.com header.b=mZdPJwmG; arc=none smtp.client-ip=111.202.115.100
-X-MD-Sfrom: lirongqing@baidu.com
-X-MD-SrcIP: 172.31.50.47
-From: lirongqing <lirongqing@baidu.com>
-To: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Li RongQing <lirongqing@baidu.com>, Simon Horman
-	<horms@kernel.org>, Eli Britstein <elibr@mellanox.com>, Roi Dayan
-	<roid@mellanox.com>, Eli Cohen <eli@mellanox.com>, <netdev@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [RESEND PATCH] net/mlx5: Fix L3 tunnel entropy refcount leak
-Date: Fri, 3 Jul 2026 22:14:23 +0800
-Message-ID: <20260703141423.1723-1-lirongqing@baidu.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1783088389; c=relaxed/simple;
+	bh=q/RPtCBDsRXrN8eZhZjqfLHvK5UsV4Ryp4HYWQUEoaY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eJ+NVKKX6FRTMka3fbc+VtwSc2J+jl0O1MwkbYDFC5tpJkbonavdozPlD5DLBqYI6e4docQ1FvHUeiYy2D3LpS0D0zLbT5j1KCHr5Vm8nFFb89safo7h0JFliEZ8cGW+qWyZKb2cILwD1Q3PXmuLbOdMmeVl8z+a2sqDjadL0Ug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i/VoiBVh; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=etpmCV/g; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783088386;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gGk+ND3tT9bnKaJWndsC0fSRrq9dDoIDpmvUwc1Tfsc=;
+	b=i/VoiBVhgOFVPQZWBMZqdyX/XqdlatwUGUaPwgg08obG/EJ/doQeOC7Mn3WZDvpxgaVMfu
+	gMecXHbIDsA+w85Vt6ldjKXb5rmYN/559ENt12hqXkQnwoSJYdFVJzrJ3AIxvBXQZNQp/O
+	sz84Uda7yA7eGU4cT3STLCt6g5OQC1w=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-351-spFpfieAMEONBkf_Eayeww-1; Fri, 03 Jul 2026 10:19:45 -0400
+X-MC-Unique: spFpfieAMEONBkf_Eayeww-1
+X-Mimecast-MFC-AGG-ID: spFpfieAMEONBkf_Eayeww_1783088384
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-493b54823bdso11297635e9.0
+        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 07:19:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1783088384; x=1783693184; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gGk+ND3tT9bnKaJWndsC0fSRrq9dDoIDpmvUwc1Tfsc=;
+        b=etpmCV/gLITc/y4JCqoi+/yOT0y9zmrp72h7bREPw+WzZuJZjmxRMJe9A6EgQ6n+2e
+         TpbCpgE+2iWiFCJ1iAtGn8F+cafT/sgKG8qaCFeuZnA4cm2RWtmLef4Dn9lpBSl7QSKB
+         eZgXPaYlbjR/eEHJz0QXyhRcaop1AocSCKVcZ45Eb2QiX601eoTfH4103s0ZIESBlrcs
+         RQCvrgDo5j+jnLfLe5UC8Gk8T49KIKnnq2LZSNqSvznBT6oCbzIw6wbFKdhSKUx45Qis
+         M+HCMcZYRZUInD83E7lRySbPXkL0brB7gVN1goS3sFA8FgMsA2WLl2kBbEvHxBXXPy/p
+         uUXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783088384; x=1783693184;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gGk+ND3tT9bnKaJWndsC0fSRrq9dDoIDpmvUwc1Tfsc=;
+        b=pwO3PRfzR/c0rjbF453p1pfIVfthYY3XmZqevlGApBAd906/WgEcZDR3FkbG1xJpja
+         8K9xm4PmO0WZEkaQ9m02PlGb/D05aRshuJQF+50fpef1SOCN7v+4mTRcAf0BvBntuI77
+         2HoMcXqHL+TdnRBYBpiHTMEpKizmYGDXzGt4Xs1owgUfH+p1e5h8zAeqCJeXtnY8JipW
+         aaEH7KypBHkVldJheHZwtCd1XPExUKz5j1AFDpWpJnxIriCbySaf6lzupemdq2+ZSCs2
+         v8lwQJKY5BppmGIvGnjRD+z2RZ7uyHPCjlYpkwf3raY9Ro5CNmgOxCxJRHctTRM6LYLo
+         0UFQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9h/9qjXoH202jGQhnR/6fPEzCabT/25rnODtn6oHtYf9D/DlQ2/FnWjDXttX7ukwBGX1r5HFg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrX6vui3vWFTxnO4L/xmwdwFiGwF8YcDIe+kO71wJYP4Z4W2ik
+	3ggaecuXAQXkyG2TjP+BWlWatSk2M8cpWzIPcylqubGGqe7jY1PeEnBkfFnlZ3qYLqApBrEewkM
+	IRhXrVtEf4U3aF/d4LH6wT0D+CLl/8mOv6FXhtGSpzObYAzG2Exl0op8NVg==
+X-Gm-Gg: AfdE7cm8qOdKRbmHx0My55JaVCIjsgYngimI2e8CUnDHqacHTzkcUZC4GD3IgnKjXZb
+	D3cY24wEm79YX6GzPldfc6Kvn896enjyBlmfIqB3ukANMGoUrX9hnBUN6xUniTfi3QHXgeV5uEv
+	rNHauaS+akYbc4ZEHq0rEY7Tx/9TdcE35cs6zZUG6bcZHHWMNkwB2Xh0sXobkgwZE5zohLhvXMg
+	NIo41t+D8UUxxEr8IbIbAdEjvKC3VRzVP8pNZjfBWHYpYRAdKfb65hXRDtFXMp25EG0DPZi9mb0
+	rV8i75Vx1rngbJ/4r/FYbF+amf5J3jTgcbe5/0IFLN158Qe51aYq0YmioGP8YZqvx7faIQkMMeL
+	tA3eCNVvnUu+n2CTVM1izUlZkB8lf6Ui+
+X-Received: by 2002:a05:600c:34ca:b0:490:b26c:64ad with SMTP id 5b1f17b1804b1-493c9b4d759mr50356785e9.5.1783088384271;
+        Fri, 03 Jul 2026 07:19:44 -0700 (PDT)
+X-Received: by 2002:a05:600c:34ca:b0:490:b26c:64ad with SMTP id 5b1f17b1804b1-493c9b4d759mr50356475e9.5.1783088383785;
+        Fri, 03 Jul 2026 07:19:43 -0700 (PDT)
+Received: from redhat.com (IGLD-80-230-68-31.inter.net.il. [80.230.68.31])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493c63bfba1sm156369225e9.15.2026.07.03.07.19.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Jul 2026 07:19:43 -0700 (PDT)
+Date: Fri, 3 Jul 2026 10:19:40 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Brett Sheffield <bacs@librecast.net>
+Cc: Simon Schippers <simon.schippers@tu-dortmund.de>,
+	regressions@lists.linux.dev, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Tim Gebauer <tim.gebauer@tu-dortmund.de>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [REGRESSION][BISECTED] tun/tap & vhost-net: multi-threaded
+ network performance
+Message-ID: <20260703101823-mutt-send-email-mst@kernel.org>
+References: <akVnoOYQOrt8k-Gu@karahi.librecast.net>
+ <20260701165359-mutt-send-email-mst@kernel.org>
+ <ef33f0a7-f0b7-4bc4-9263-10d2b480d717@tu-dortmund.de>
+ <akZGg96-Xu9VeGrw@karahi.librecast.net>
+ <20260702185420-mutt-send-email-mst@kernel.org>
+ <akfDnfkgorxJ_Q6G@karahi.librecast.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: bjkjy-exc5.internal.baidu.com (172.31.50.49) To
- bjkjy-exc3.internal.baidu.com (172.31.50.47)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=baidu.com;
-	s=selector1; t=1783088088;
-	bh=vbfPrz0d7bTAVwsqhRMTbt+9bVqsG0XKEvVVATU9zyQ=;
-	h=From:To:Subject:Date:Message-ID:Content-Type;
-	b=mZdPJwmGfGlCms0y1sYpKDG6xoyJ1MKSHaxOK+43ff19GUnuErIgM2fgYxWNSg2gs
-	 6pH9xF5Oir+Ua0M9DnKluew3bEVYrhFZfS0z+Imv8VTFIf2FQpl55hEkIw0uzwuL3X
-	 ws+EamDrtztPTtiD0oD85VFYph9CKfO2VoYomZzbbo8sOTb9QdP4e8NPFP7eBgEvmY
-	 OtB1rBxXi/Qjzbbbhl0mghpvnpCexNHrUE2pl2xviGEoB0Kodl5+ncgVuoQBbnVATW
-	 moWP4zc+BzNZqiPtXSw6S06uNwGoXhQq2ZUmUV7vYYVzGRKvS5LzQxkExYtDAdcCwV
-	 hI3dS+njE6JlQ==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <akfDnfkgorxJ_Q6G@karahi.librecast.net>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[baidu.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[baidu.com:s=selector1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	TAGGED_FROM(0.00)[bounces-304582-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[lirongqing@baidu.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-304583-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:bacs@librecast.net,m:simon.schippers@tu-dortmund.de,m:regressions@lists.linux.dev,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:tim.gebauer@tu-dortmund.de,m:willemdebruijn.kernel@gmail.com,m:jasowang@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lirongqing@baidu.com,m:horms@kernel.org,m:elibr@mellanox.com,m:roid@mellanox.com,m:eli@mellanox.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	DKIM_TRACE(0.00)[baidu.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lirongqing@baidu.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[tu-dortmund.de,lists.linux.dev,vger.kernel.org,kernel.org,gmail.com,redhat.com,lunn.ch,davemloft.net,google.com];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 032C27036EE
+X-Rspamd-Queue-Id: 2EC92703726
 
-From: Li RongQing <lirongqing@baidu.com>
+On Fri, Jul 03, 2026 at 04:13:49PM +0200, Brett Sheffield wrote:
+> On 2026-07-02 18:55, Michael S. Tsirkin wrote:
+> > On Thu, Jul 02, 2026 at 01:07:47PM +0200, Brett Sheffield wrote:
+> > > On 2026-07-02 09:24, Simon Schippers wrote:
+> > > > On 7/1/26 22:56, Michael S. Tsirkin wrote:
+> > > > > - does it help to increase the tun queue size?
+> > > > 
+> > > > I agree, this would be great to know.
+> 
+> I tried adding a queue (qdisc pfifo limit 500) on both host and guest - no
+> apparent difference in drops or performance.
+> 
+> If there's any other setting you want me to try, let me know.
+> 
+> > Maybe it's the supposedly rare case? Does this change anything
+> > for you?
+> 
+> I also tried both patches, but again, no noticable difference.
+> 
 
-mlx5_tun_entropy_refcount_inc() counts both VXLAN and L2-to-L3
-tunnel reformat entries as entropy-enabling users. The matching
-decrement path only handled VXLAN, leaving L2-to-L3 tunnel entries
-counted after release.
+Thank you. Simon pointed out issues with the patches but he also said his
+intuition is strongly that it's not the way to go.
+Let's wait for him to post the backpressure patch, we'll see.
 
-Handle MLX5_REFORMAT_TYPE_L2_TO_L3_TUNNEL in
-mlx5_tun_entropy_refcount_dec() as well so the enabling entry
-refcount remains balanced.
-
-Fixes: f828ca6a2fb6 ("net/mlx5e: Add support for hw encapsulation of MPLS over UDP")
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/lib/port_tun.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/port_tun.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/port_tun.c
-index 4571c56..97f6097 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/port_tun.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/port_tun.c
-@@ -176,7 +176,8 @@ void mlx5_tun_entropy_refcount_dec(struct mlx5_tun_entropy *tun_entropy,
- 				   int reformat_type)
- {
- 	mutex_lock(&tun_entropy->lock);
--	if (reformat_type == MLX5_REFORMAT_TYPE_L2_TO_VXLAN)
-+	if (reformat_type == MLX5_REFORMAT_TYPE_L2_TO_VXLAN ||
-+	    reformat_type == MLX5_REFORMAT_TYPE_L2_TO_L3_TUNNEL)
- 		tun_entropy->num_enabling_entries--;
- 	else if (reformat_type == MLX5_REFORMAT_TYPE_L2_TO_NVGRE &&
- 		 --tun_entropy->num_disabling_entries == 0)
 -- 
-2.9.4
+MST
 
 
