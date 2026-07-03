@@ -1,99 +1,92 @@
-Return-Path: <netdev+bounces-304585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304586-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id SNhpFMXHR2q+fAAAu9opvQ
-	(envelope-from <netdev+bounces-304585-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 16:31:33 +0200
+	id DLSMGIHKR2qCfQAAu9opvQ
+	(envelope-from <netdev+bounces-304586-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 16:43:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C5987036D4
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 16:31:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E8CC703897
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 16:43:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=queasysnail.net header.s=fm3 header.b=Uk1UU94Q;
-	dkim=pass header.d=messagingengine.com header.s=fm2 header.b=ixfGLEG7;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304585-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304585-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=dSkwlRJU;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304586-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304586-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3E31B3003BE5
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 14:21:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 640AF305EA44
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 14:32:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 685DA3DD516;
-	Fri,  3 Jul 2026 14:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4F3B3E5EFB;
+	Fri,  3 Jul 2026 14:32:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C4E834D382;
-	Fri,  3 Jul 2026 14:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC4D1175A9B
+	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 14:32:48 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783088507; cv=none; b=ZWDVp2FwmFFk0oqj+pRWOpsMX9yrhXDvU1rtuyDtVbzu6/zxugJVjN6J6MTfNUgSgF5FP/wIPfmLARTG9k65SJqomkAhjqsiELRJDuKuWurc1aMluGCPmncDr34pG00EShAgmSNSWxOChYUblWOQrrZplwc9gkZEOWEWp4s+gNU=
+	t=1783089171; cv=none; b=pwT6hLXe3WzyA729dQhL/EE7KSDeNtcTqjXwKsbbE9IWDIl3wBp+1Ips2fQ2aauTYAh/zU2w739eCvZjfNRw0XU+rkdLa1ZuWprv2eTJoyqdatds2GcmrxLFjeapSs/Hw7/Za7sOV1e3Sdk63zvimDqGWZxHbAVYh3gYRn0+Y7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783088507; c=relaxed/simple;
-	bh=ZmUcwKm+KZlq7WK01NO6SHAJ0Ds1ZzGQwUBqhcTvqLE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LlSRiNo/05gZS2xJG794Z4R5uNhpFWjEgG1SMsX5vEGES0pWDefF6yaCAg9QKolTuqrBRfmdZikfCCAu7GSlS8AyG3bmboh7/03wruo9WjxA9KBsdeU5xytjd6ZTMc8671znlRY/m0gRUgWnEmhmF+XjbnQVNhrt605mH6DjNEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Uk1UU94Q; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ixfGLEG7; arc=none smtp.client-ip=103.168.172.149
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfout.phl.internal (Postfix) with ESMTP id 31015EC0101;
-	Fri,  3 Jul 2026 10:21:43 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Fri, 03 Jul 2026 10:21:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
-	:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to; s=fm3; t=1783088503; x=1783174903; bh=ezhtSL7HtG
-	xakgLsRNQdK22QsTbck77uvJplT2Hy5Ig=; b=Uk1UU94Qv+hlVzhtf+/wInMJyC
-	sYbVCezliz75pUwMKdT77oNF/tQ7Qotp69eI16R0WzlROVtFUlOTPgf43PHCJTdO
-	6tHAFExY6b87CsGlwJA5JoFrRtCMWPvSEy/Bq7RxAUHQEul0RTXR53kvIL4ElA5I
-	mTdgZhJqSdmjP7KzRW2rZmFLip2C0ymEifSS1mGe91zeJwrGZG74Qgg2/SmTtO3d
-	vON6yTHxj+1+5vl7RN1TuoYw8xJT0jnToSS6BOLeOCN5pRSkmcgDva6cT+dD5z94
-	FKhkRdKh5hIlRQiEWymifHQOZG6gPHXNYit3Lx63b/ytFsQ7HhynGyM88spQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1783088503; x=1783174903; bh=ezhtSL7HtGxakgLsRNQdK22QsTbck77uvJp
-	lT2Hy5Ig=; b=ixfGLEG7DIzH9I7dGoS+UsNa2EfRgPOcx+zJbwne3O4k0eWl1PA
-	ofPPJZMNIDQhp7XMTzFQUdI9ncJnl5+K92KuG6ERdGAV3iF/M6l48x+Pp5ZppbpN
-	anBjKRe+GKr3qWc0V84R6bzqR5fA22Syq2ZmkFYIj4hUjr5ng25SJM/0Z7lw36DD
-	ogtFYyaKyOuLDDLxfc4eB92lG7CQPS8iT0q2lN4xuxCJy0LVUdUI1l9vwoQJNbJo
-	BZTABBAam2WT3nXqb+55KiIGEeBUvdW712LAnU92hBySDLrhDL4XUz879afinqa9
-	ovUiGN1KYr1dA4HuGZBtSYQmNcjjWB2nxsQ==
-X-ME-Sender: <xms:dcVHaobJL9paqhZCPoD5yM7ME6ALw2J4IKQmYf8f1vwNhEomd71D4Q>
-    <xme:dcVHalo2vc9hz1t8Jou9h2HcWVTdPEY-z8hKhSKECDnr0fr3fLeInsCP2rdEuZhan
-    r8FD-_yCad8ntuMvqF-03QvNJ8hCyzrspk7KEAvWZ2B-2tSvSMV7Q>
-X-ME-Received: <xmr:dcVHalPcoIRfwhibxrGH5PH8JzwvegrM7Z8XRFhrS9jB_LpRdSUhJC1oN2M>
-X-ME-Proxy-Cause: dmFkZTE55wu+goJ+54ULjU+dqcMmSK9JX7q3Vn7pvd4IIGhTmEmsQSvaa60mz4vZKDJO/p
-    u2rhjkZfH7OGrOfkEAAEjvTcBQyihQZOWlEf9DlP1guTg6EXI5GB97bwjXsKR0rTXax4/R
-    FQCUxSqJqgJjcjkoZKImUUU22pVg5PiViqMG8lrDH8PFaTwHAV/D5dWkOjOu7LOQuH+Iy0
-    AQVgrkhgBztJrjKWmGhRPihmQN1wQXHclY6s0ApvFkNa3vbWK1Cn9LcMns1Gu9IoTbV33t
-    2QDtWATBLOjJMLJzGocWeBU65FA9NxZcXyqU4h4nhUY2qhQcxJ+qYSORTDWkswCxfX5ZZr
-    nKiicGCDjWrYRNidpJ7XRSYohQMSZtR06Oz8BYNWQYxBC001WtPCQG0IoOyo3Nu4H7cPPa
-    wx3ps7ZMwtJLBLPrjPT89jHgVfI5mTKhECmUqUOA+mDlRNi1KwSJpCP713HhPhK+N2xJdL
-    dRKxeShCvLjwRVT6FC2memB4PKPEBBclC/zjkdnEMhoJ0TaiWYaiIbQaabGieglqdpVRr1
-    HnMQdVgO7VXowi4nN2QALGH4RrlX5DMCE4Y+o6K362esWnu8+lA0dJNNntRLJZ5Z0pPxuH
-    xMWNjGm36SX4+JRXoXTYMK8EtBrzkNBCwz7kz+Aq4p/Am7tGK/ATVVFkq/Zw
-X-ME-Proxy: <xmx:dcVHaorPo6NljBu8OlvSi5eacJWZy3SOdMYQ3LwsUGl6ZJbpjWMR5w>
-    <xmx:dcVHaicuIiD2zPByMWOeZWO0aCCLFh-rq1cEXsKcmZoyhdyjchTQeQ>
-    <xmx:dcVHamQQRhTxQpqAHgNFRstRLeUQKR2kzMFlKkTBzSJJTQ_jujlHew>
-    <xmx:dcVHajYumdzVXcRkqKq81UPmlm3SIUua52sz151C1wZB5XhedQximQ>
-    <xmx:d8VHaivjeW9_3TgzYYnoxYyqBDcUL5x_L5NqT579nbJv7TqxCrHhkQAb>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 3 Jul 2026 10:21:41 -0400 (EDT)
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: netdev@vger.kernel.org
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	stable@vger.kernel.org,
-	zdi-disclosures@trendmicro.com
-Subject: [PATCH ipsec] xfrm: espintcp: fix UAF during close
-Date: Fri,  3 Jul 2026 16:21:12 +0200
-Message-ID: <50e2ab4348eb8177581058f0152394cfae6a8d27.1783071494.git.sd@queasysnail.net>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1783089171; c=relaxed/simple;
+	bh=GBYvkBVUce+JzLYW8I88F4pVwYG4jSAXUAl7quLV+zg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u7w+JHjzkHM5YvYDTzqTrgxjlBN09+LWGgPckONB+bcx0No6L8BhPrC1F7oCOKhviSFuU/lLwReIBLBXJz/Pe30CXFy9owWtuOMjQaIKfaxi7/hJoOBQuxdRdEcA4kCYN+CO+9pmkWFEf/wuURdlyrJTLSFP6Rn3l0U5Fo4nXVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dSkwlRJU; arc=none smtp.client-ip=209.85.214.174
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2c9b42be8feso5910705ad.2
+        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 07:32:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783089168; x=1783693968; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YJ+nbxbgqMeY9SFwzZ4UdU77iZcfjD9QE3SIimOIp9A=;
+        b=dSkwlRJUyzgrHkYHq3nHS7640tE43KGXSOVOfrzgPZ0GMncI2qfsrO5KUsgAUInBj3
+         kQbySXkOiDQ8sTrXlcuDAbH+QOxXkRKRfRH7pmwnsvetJYmGDi/s1w7JJFHIWbi2vCCj
+         /CN6I+4BxhDUtcIQ1CaWyn7g/+Ujira502mPA99PnFyRjoMPtMQ5EQf8iht3JffmcFQA
+         4fjioHKM6zBB/LCnz/CpbW4p+/Xq+pQbGHQoYXv1q8vyp90Ja0DvH1QtnvIqZSDExKw1
+         0PoN85AlcYQzz3pfdKZDpY+BNdi2jVWb95DH9Xq6r/h0Kzk414hZ9bsS/6FGQ1/BfoK9
+         KojQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783089168; x=1783693968;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YJ+nbxbgqMeY9SFwzZ4UdU77iZcfjD9QE3SIimOIp9A=;
+        b=eJCRTC9e+jM1dtjqbMLYp55ZoFk7vp1Kum0uTCG7fn1ZEuAY/5cJqNd4Qt3PKoVSSg
+         jH/QG92inPnNLU5oMZ+G4YWL2oZKYaWcVVpwcET7+Id44Yo3zdLgPnpSSEd08fRJjFyP
+         WFwtIA7VS8i5FFEi01dWp0JmbQ7R7SLKyhfhrmhd5/rNicpA1mnDYihgSQUoPFfi7W0Y
+         DbLW7y5vuMmlckMot9zwsIlvFxxAgthZGOd0X4st8GsotJMFoEBCPUez0/XHp3R1vN5Q
+         RdUVr51pfPw2yP121TP1txFH/8PQwL2gO8PfrRlXscICKtSLUl8tqn1ZB8SXBznrB06z
+         pNcw==
+X-Gm-Message-State: AOJu0Yy5zzgZoOTRY1hZrEwvET6kM1srbNXmLwMlYzrxMdIo2YxAZDwe
+	gUg8VRI145+284Gb+5WbRMcpCtyQ6q8/2QAKGc0JfyWjarSESquWpmZv
+X-Gm-Gg: AfdE7ckhpr6BWXDn7v7ccf8Su5VI4ZZBzDEhk3E5NV2G6eofrBAnLdlOwzDJstfVCs6
+	PxzW8VJYQ2U8qRBfX44QNzKfoHu2j0Tbhlosg4lO0uibaO+npf3HCEsUYEc3ubbOVA4rtneloK8
+	VOPPhV9/0JksCltfjWGE1saHd89u6MfnFLBSWGmljQ8vIJFE1iilseVe+LotcNcxkfDBEnkQwZP
+	1Z63/1aFDlUFlo9f7oNNgZH7M1fZf5sJsBx208QpHllCELIVIZ9K+52c0GV/MFC5/MjLvlul9oG
+	LrFmOv2CaC6mDoXRx1H19pQEInTLR75k3SBeDUzkfSmJRoWhrj/rZAgA8vGLVihQy0QnqF2ZNR+
+	Wl2WLG9J2wfyqFG1eVcQseamjSlRmYoQOtvsW6NCnw3pgIxmyv+WcGBOm7e0AqfR1RIbHbKSkXh
+	v+Fu5lR8U5O/1100J/jjZzzcGKFww9F75HgndxdijttQ9ag9x0wgPiqVlY4vE4/5pQtMPaDUaxn
+	NZI05LPUrQ=
+X-Received: by 2002:a17:902:dacf:b0:2ca:d7a3:371f with SMTP id d9443c01a7336-2cad7a3392emr29599295ad.22.1783089167877;
+        Fri, 03 Jul 2026 07:32:47 -0700 (PDT)
+Received: from fedora.localdomain ([152.58.57.44])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13b3ececfe4sm22740417c88.8.2026.07.03.07.32.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Jul 2026 07:32:47 -0700 (PDT)
+From: Praveen Rajendran <praveenrajendran2009@gmail.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Praveen Rajendran <praveenrajendran2009@gmail.com>
+Subject: [PATCH] net: qed: Fix spelling typo in qed_dcbx.c comment
+Date: Fri,  3 Jul 2026 20:01:30 +0530
+Message-ID: <20260703143130.3685-1-praveenrajendran2009@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,78 +95,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304585-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:sd@queasysnail.net,m:stable@vger.kernel.org,m:zdi-disclosures@trendmicro.com,s:lists@lfdr.de];
-	DMARC_NA(0.00)[queasysnail.net];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304586-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:praveenrajendran2009@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[praveenrajendran2009@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[praveenrajendran2009@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[trendmicro.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,messagingengine.com:dkim,queasysnail.net:from_mime,queasysnail.net:email,queasysnail.net:mid,queasysnail.net:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4C5987036D4
+X-Rspamd-Queue-Id: 7E8CC703897
 
-ZDI reported and analyzed a race condition during close for espintcp
-sockets:
+Correct a minor spelling error inside a comment block of the QLogic
+Core module where "successfully" was misspelled as "successfuly".
 
-    espintcp_close() frees emsg->skb via kfree_skb() without holding
-    any socket lock. Concurrently, the xfrm_trans_reinject work queue
-    invokes esp_output_tcp_finish() -> espintcp_push_skb() ->
-    espintcp_push_msgs() -> skb_send_sock_locked(), which reads the
-    same skb as a data source.
-
-Fix this by adding a synchronize_rcu() call after resetting sk_prot,
-since esp_output_tcp_finish() runs under RCU and won't use a socket
-with sk_prot == &tcp_prot.  Simply taking the socket lock in
-espintcp_close() could lead to leaks, if esp_output_tcp_finish()
-re-adds an skb in the slot we just freed.
-
-Cc: stable@vger.kernel.org
-Fixes: e27cca96cd68 ("xfrm: add espintcp (RFC 8229)")
-Reported-by: zdi-disclosures@trendmicro.com
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+Signed-off-by: Praveen Rajendran <praveenrajendran2009@gmail.com>
 ---
- net/xfrm/espintcp.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/net/ethernet/qlogic/qed/qed_dcbx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/xfrm/espintcp.c b/net/xfrm/espintcp.c
-index 374e1b964438..f09b5dd85db8 100644
---- a/net/xfrm/espintcp.c
-+++ b/net/xfrm/espintcp.c
-@@ -517,6 +517,8 @@ static void espintcp_close(struct sock *sk, long timeout)
- 	sk->sk_prot = &tcp_prot;
- 	barrier();
+diff --git a/drivers/net/ethernet/qlogic/qed/qed_dcbx.c b/drivers/net/ethernet/qlogic/qed/qed_dcbx.c
+index 3a5c25026858..19c2b870feed 100644
+--- a/drivers/net/ethernet/qlogic/qed/qed_dcbx.c
++++ b/drivers/net/ethernet/qlogic/qed/qed_dcbx.c
+@@ -639,7 +639,7 @@ qed_dcbx_get_operational_params(struct qed_hwfn *p_hwfn,
+ 	flags = p_hwfn->p_dcbx_info->operational.flags;
  
-+	synchronize_rcu();
-+
- 	disable_work_sync(&ctx->work);
- 	strp_done(&ctx->strp);
- 
+ 	/* If DCBx version is non zero, then negotiation
+-	 * was successfuly performed
++	 * was successfully performed
+ 	 */
+ 	p_operational = &params->operational;
+ 	enabled = !!(QED_MFW_GET_FIELD(flags, DCBX_CONFIG_VERSION) !=
 -- 
-2.54.0
+2.50.1
 
 
