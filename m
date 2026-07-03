@@ -1,321 +1,253 @@
-Return-Path: <netdev+bounces-304322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304323-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id SeurFq8hR2pSTgAAu9opvQ
-	(envelope-from <netdev+bounces-304322-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 04:42:55 +0200
+	id CV9TEiEpR2prTwAAu9opvQ
+	(envelope-from <netdev+bounces-304323-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 05:14:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A01506FDFD3
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 04:42:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90E066FE221
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 05:14:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=A0pyxCih;
-	dmarc=pass (policy=quarantine) header.from=marvell.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304322-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304322-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=nxp.com header.s=selector1 header.b=gZCNRmKY;
+	dmarc=pass (policy=none) header.from=nxp.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304323-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304323-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 34ABF301BCCF
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 02:42:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A7C0331A93D8
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 03:07:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E2E265CD9;
-	Fri,  3 Jul 2026 02:42:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1487C2F3C3D;
+	Fri,  3 Jul 2026 03:03:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013006.outbound.protection.outlook.com [52.101.72.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34188233949;
-	Fri,  3 Jul 2026 02:42:17 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783046539; cv=none; b=BdBqZ8xVfhztarrJWjU37CPanTViY19ndn5vMwhIpPUWMiL578wO19hHWWY/VDoEw2SYfYihf9OAMM7Ts/+ley4VRWREsc/OliET8K46xa5OvYowu2k1FTrMiycxPR6kX0jpXIsYGxSR8u1RGIcxC23B+uGR0VKlx5paA5253Dk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783046539; c=relaxed/simple;
-	bh=GGcWgRVfe7dMFD8GzD97QKIc0oRyn8DKjnDUdEjL+xY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OzoKCq3DfZWieQQmuNwqFEjequhT8ymnKE7coYmVo1BiYoBVOQ9afc7wvz5aP5iunw/MNSmhz0tdBpzeld1/Ze9ssGnF0q61o0ekOHwDKTEK+GrQwnuCGw8Z3tzNxRbxKkSCRT0W5uERBHjKKqHTFbFdKGEsGPgXY1AAl0bX5R4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=A0pyxCih; arc=none smtp.client-ip=67.231.148.174
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66317JRw3278250;
-	Thu, 2 Jul 2026 19:42:09 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=GupIOOp63EkSNDE3tP/PWU5
-	PdpqTe29NIhNwpzCfDYY=; b=A0pyxCihDTvmy0GLHXvyhTSqpXDkDimprhw3q7/
-	4w+BCmgnylW1o8cjnnXXQtspfxFyVtnFdj/DV27Qyr+rrTrlCiWNY873V6ONjwou
-	AmcC9jMrg4Iep+UrT1+zwJnFUa+55iS7G8p6IryqUjXcR45YIzKh7q8P5zq1STWW
-	t0550LgTU76Qb0FwVxs3ALIYeP9/4Cuzk0LXiqqrECNpoVs7Khxi2KWn9kD5Ze5N
-	/+Al35s+Dao96tk73dVoR3Yr4b79Ykg0YmHWypKmZ2+n+kuG0hpYnOgkYazBYqQq
-	tkg2d8s/oHxlKX/dRIgHKoSIpUqHT2l6AG1gJLokl6s5k1A==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4f5b995ahd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 02 Jul 2026 19:42:08 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Thu, 2 Jul 2026 19:42:07 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Thu, 2 Jul 2026 19:42:07 -0700
-Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id D0C543F7086;
-	Thu,  2 Jul 2026 19:42:03 -0700 (PDT)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <davem@davemloft.net>, <gakula@marvell.com>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <sgoutham@marvell.com>
-CC: <andrew+netdev@lunn.ch>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, Hariprasad Kelam <hkelam@marvell.com>,
-        Ratheesh Kannoth
-	<rkannoth@marvell.com>
-Subject: [PATCH v2 net] octeontx2-af: Block VFs from clobbering special CGX PKIND state
-Date: Fri, 3 Jul 2026 08:11:57 +0530
-Message-ID: <20260703024157.3526879-1-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301BE2F25F0;
+	Fri,  3 Jul 2026 03:03:14 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783047797; cv=fail; b=iXgM7lDuKHsxc2usHxeAySXxXD7WgzK5uIzXSv+XG2HO0x96jgUTNyLtGBbZsmrTflWo0GRGkg3uIOn3+Mz2mmrejcv/gEBs5PbDgvla+NGx6BiPD+FB3LQ1ROppQDXFKRaUDXgC6CMd8pANMjwbkpEEOkyaH6Lz5G9qXiDdMLY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783047797; c=relaxed/simple;
+	bh=uH0YhEH5TPYpbuMlMwgKQRQrvzDxSPI0EDNrjI5L1No=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=VGcDIiiNGQh7uIC5O5R8eBKm7kewUZYJXAsSCQ+BuH9J3gHRx5LhNPOWiWYUGOwYzgtj2O1ZOMlS80269J9MgC3NX8ngVYkZynxnRl22AiaklqLvjmg/fKZaCNHZV1r7kZWe3BlTScA5zvYyvAqGOM9Dy5Pd7fQrZH3DTN85YDI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=gZCNRmKY; arc=fail smtp.client-ip=52.101.72.6
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xjcz+jdwGOM5nglXv/X7QEDUmdoXai3L9MVqRYPUcEAGKS4JNF4HAJWp9Z23rnFAlLadN/GfroPuoHjz4vQdmuTqQzumnieHofez76dIiynZefp32IroECaOWKxQNa8OQaQSw3zgxZ7sXDOQ5rzkhkOytVX6++eGXuI2hUQOkyrnnWs11n1C/juEYTNPgXGjFx9JkEYwk7I2V0gHuloh+d7qHnRhChMWqxtxzHdvayyZWLC3kOJ1BZTQ9MCehWynf+MiI7989qrD4BZ0IRMG45mtISUA43Gui0KKTcGzsSYl6K/YTkgyi9l6E0aYTp4eHIDcSpPjRakLGkpASgLPOQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WJ6DIqeoaRU7Hxv9fhJp4sR24eQofwp34G+2ExJx/qk=;
+ b=aP9FClduVXYTuQM2YWDU+9Pe3Ft4oXZPBIVUB/UJn/4kJoPlV7z9Xe8FC9nq64WLxjfnK+w/X7SGUf4M+Ip7nmsomqHi6Ptlx+2fMy8DqTZiLmVAc8sk9vng+SqDBV8Aa1e+aAVuC//annYzJDyxhdlnkljCCi/65YsiqeJW5xRTXRcVjUjMNNkjSUANZ349md1FpB08JsxfYWbNn9S6V/wMWRtfh8z1gxy54FK8rH2G6lUY2wbbXcezk6dKR/WkBx8grvywcKshL/zFs9zcOSVr3jzmpL2EcaWEWO44KReY0jY2SwbGQM9f7qc2YTdWhsirWMWnlE4F7PmqzWRaBw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WJ6DIqeoaRU7Hxv9fhJp4sR24eQofwp34G+2ExJx/qk=;
+ b=gZCNRmKYbXrvGNqWBCcn50ReQ79Z5nep0vavFNALz9cYogWCSG0LgMZp11AqXWCSJPMgHdWN2gP/JIMBz4WrwhEGCUu/SYqjtyIbkAIH3tMopHKf0/GRmZ0cCE3x+qFMFOrNCLb5P+aVYi3mmUESopXM5ML4p0rc7r+n4HjIWBeo5Sf9GpxPp/ZVhVnqN2mKXs94sA4Wk7yT/q8jhIwEfEnn3ixb9ZtDvRTyEWhDWxV+1rFaYuIXXgbRAR60YVhb6fW1sC5oW7lV7i0LNKBg2JmE3Igh0RBOOfqqLFsfHZCzAV3eqOEXcJbAqvaLMR2mEaH7UAnSjVvuts1YEqrOLw==
+Received: from GV2PR04MB12213.eurprd04.prod.outlook.com
+ (2603:10a6:150:336::11) by PAXPR04MB8206.eurprd04.prod.outlook.com
+ (2603:10a6:102:1cb::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.11; Fri, 3 Jul
+ 2026 03:03:10 +0000
+Received: from GV2PR04MB12213.eurprd04.prod.outlook.com
+ ([fe80::52ff:eacf:430f:494]) by GV2PR04MB12213.eurprd04.prod.outlook.com
+ ([fe80::52ff:eacf:430f:494%4]) with mapi id 15.21.0159.018; Fri, 3 Jul 2026
+ 03:03:10 +0000
+From: Clark Wang <xiaoning.wang@nxp.com>
+To: Andrew Lunn <andrew@lunn.ch>, Breno Leitao <leitao@debian.org>
+CC: "Clark Wang (OSS)" <xiaoning.wang@oss.nxp.com>, "Frank.Sae@motor-comm.com"
+	<Frank.Sae@motor-comm.com>, "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>
+Subject: RE: [PATCH net] net: phy: motorcomm: read EEE abilities in
+ yt8521_get_features()
+Thread-Topic: [PATCH net] net: phy: motorcomm: read EEE abilities in
+ yt8521_get_features()
+Thread-Index: AQHdCS9Kh6EXypCdTUSz62mUjSw8ybZYUCuAgAAAPRCAAGorgIACXYLA
+Date: Fri, 3 Jul 2026 03:03:10 +0000
+Message-ID:
+ <GV2PR04MB12213049BA728917B95133052F3F42@GV2PR04MB12213.eurprd04.prod.outlook.com>
+References: <20260701075730.133707-1-xiaoning.wang@oss.nxp.com>
+ <akTLmyF0r70Jyn9m@gmail.com>
+ <GV2PR04MB12213F4758648CD71F5D5B3B7F3F62@GV2PR04MB12213.eurprd04.prod.outlook.com>
+ <677882ca-16cb-4fd7-86d9-b00d62147bf9@lunn.ch>
+In-Reply-To: <677882ca-16cb-4fd7-86d9-b00d62147bf9@lunn.ch>
+Accept-Language: en-US, zh-CN
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: GV2PR04MB12213:EE_|PAXPR04MB8206:EE_
+x-ms-office365-filtering-correlation-id: d3e16a68-71b7-46b7-d38f-08ded8af9d4e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|23010399003|7416014|366016|376014|1800799024|19092799006|38070700021|56012099006|11063799006|4143699003|22082099003|18002099003;
+x-microsoft-antispam-message-info:
+ P77Zg2L0gegkyT+Och/rqt74myf9ITlcDcJH6vFyPulmxbJKPB9Bpb+f/qz9sHUddJUONAE5lrcU5W6rGBeZWJL3RxDtIX/ZikogOojUuGGgmlXI2e1dqyBdBIVS8fLtTsjkyuilyyc4EmX2OjxedGgNIhqUZOmT5hV/b/4ZJD66jbyaIQvFXp3u+BnXFr62bccFbdxiCxQTE/t0kMP01IhfsU/FSGGii3N8qO38RxCPzenjQLuOKGzBS8cbFm68ID4h1Z752diWZ0EEPELgo/PnCwjU14GI/54PqN21ggPqbgQx+Wo8NiEqz/FDnJS8ICNSTaxy7IV7/LkYxoMFYS9rDe2Ge5p0oOcFL9KqjaaqdaNILV+6Vti3M9eLXJ/BK1AhvEEiv0EqEmUE+B7W28wt9zaxedPmylt5UeXRN1LCgJJZARK8H5aVTAiDoKHTyyi+zXkF7wS9UjKDhtEncZXpFNzV6Fn+xZO1gt7tQR8roauVBdvDGo3fhU+rAtie63atJwe/RqzX2v96VBcbAWRGA/YRP1qrjMiUPelJoQ7ned2zilHG5fycgXeUBUrB8E93NMxHP/C6k6+k/y1OWX8K0Gb5nMlFR1e7JX8RM324G/2S0CQuggHZhVOG8EPvDCYGx6b9HTHldUW7mBlRmEraqkzruQ2Xwm+zKj5VYDU4+ztHmQ7hNx9GP1EVvlN7JD152SmfIJSU4Iq/QCJBs435x2JUDUqE+3xWt7fx2dY=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV2PR04MB12213.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(366016)(376014)(1800799024)(19092799006)(38070700021)(56012099006)(11063799006)(4143699003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?vXtVRPxXrId+Lf70VKagTRduXeZsDeP0Oilt2zLf4o92NawK9NaS6MiZbjtA?=
+ =?us-ascii?Q?D7RcRAOSRZ8R+OztotW/0i9XnZvwFANmq5c/F37JQ0XpuI/UzvxNCuqwBq0/?=
+ =?us-ascii?Q?UurQowkt07brbo4sCnGILTPoTOTUHC4sby1e1avkbyBS0a4npNvyDx3JxUQp?=
+ =?us-ascii?Q?7KsanTsaOKqCwL7UJfHVoLuO+zLyUEjslDeMF9juXkHfkHc7W4WDPiJjd7Md?=
+ =?us-ascii?Q?5PDGRZAunwEHoWz29CsDXXuwt9qvjQT3RM1Z1SnBNbJESnG2A8nosWMieVzT?=
+ =?us-ascii?Q?lHriUlI+8N+0QpZrzPChXMTOEBt7ZAPbu94cegRVoilpAMcMDP0wg8zoDMQX?=
+ =?us-ascii?Q?RSpdXxOZIN4LMaa/QVS2YenXj03sA2cUG8j62foKgAiBIbxNXbVgpS7uWfy7?=
+ =?us-ascii?Q?9f+WdvjqO1eVnkTGGOqcgBg1/FsrlngVQLK1ocDqXipDe2LdOhfWG0Yi3sxr?=
+ =?us-ascii?Q?Y+gwGGUDkiE/dhJiqxPbqNNQa446mO3h/rvpBKZkherRHH3icn12LHa5m0ro?=
+ =?us-ascii?Q?l8z7Fg6Ts2NgVwznvGIwaTrr1qRZSRSQYtFVM+gDy+qk9DhLokEF6GclMdGQ?=
+ =?us-ascii?Q?xTMAY7GEke1vswShGxT64bReWZG68CNHTDAaAsnBftSCzWGq1dHeequqcPTq?=
+ =?us-ascii?Q?0k56oPhC6kMVJ+0li+GAT/hwDwBmMk6/SOD4CDUcR3wCnr9/YRaa9So2NuZj?=
+ =?us-ascii?Q?Gx93I6utaD1hpOXBtdj/umDgPan9AD1qBAmZAFDmDmidTXcl+4ygyNIhyFn4?=
+ =?us-ascii?Q?6vYfPz43UwXTDFv+fCbEzhjWHtWXdDZOTpuNiOOuqOKQ4clzn0lPC3J/X7/9?=
+ =?us-ascii?Q?89/xy+nrBk3KbxqxIUPpliSiO7TUtmFkPlSp6He/5ZhT8iaL15IF+slS+yno?=
+ =?us-ascii?Q?Zo90kS0F4goT3E/4CfiiTFZOWR/KiL1BK+bQ6uGHNV5gj6dUBCckXWzqTAHq?=
+ =?us-ascii?Q?x8Fj83Nb060emdfve0B9CYBtRyUsNd2Fctpa7IBVWoymGV0lMMOAbqx+6Zwq?=
+ =?us-ascii?Q?QLK+ckHL2faX9Zs/kXv/zexHY0rq/3ets+TbTtHefwWiZPBFrZ8+Aoqf4JoE?=
+ =?us-ascii?Q?LStD52hc9tdS1Z1VUO39ciKD8i34fFd9079kG/gE8oD6i8QsPbLQg1Hfz2jU?=
+ =?us-ascii?Q?/Nu77AsaUQdRvMIbOfTwEEOnf8O7MZHu7kDUzsYZJQmW9SaTp4oqrSVbNPl1?=
+ =?us-ascii?Q?V3QbTvCI4+V+FORnbB8dDRWf9/StaMuaC8O0A702x8lvcaVzewAbeh5nbaCU?=
+ =?us-ascii?Q?FUsdU4afWUkpwHlCbm/+uXmyq+Hya0pssUpAOyQJLoP72OVFXfhtNPN9+CAL?=
+ =?us-ascii?Q?XgazEgbRDKonKLovCr1xHd5NLA5BMvZm1wfQuznAgYkHcE6g49y2EqyoBVPi?=
+ =?us-ascii?Q?o+r0jxZn6Ad0gBHx6rIej7FPeLGyZf38PBDpSVa0FOLUqS7GqEyW3NunQ5P8?=
+ =?us-ascii?Q?rm/ragaiPowrwu1ft7+ovbI04t6r/v66Ym1qMvXbT4xSh9qW2g7EiZnuHAEc?=
+ =?us-ascii?Q?p/5r+xM3KCmBWOqKp6fTYQlCDTVsYH2VakNdaLDrC4vl1zNUB+95VHQ7aeqI?=
+ =?us-ascii?Q?0B527tpwuSxyqrgBZo2bBc+vy+c5ee0/Nu4kL4vsA1B/Tcl67dK0nh5TRe/S?=
+ =?us-ascii?Q?x7M9mbDDE5v1+jTPAMs+kovCWtM70jFth0iXeihG2o0GGt82heZjJyLWe6T5?=
+ =?us-ascii?Q?Ea6gRnts3LXdyo1UcQBdpmgzNIcOMBimtW/IxkcfU9R37cgrxSISWzLbNSfz?=
+ =?us-ascii?Q?Q9M9uWSP7g=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: yZ7wuBH8PWR6jYOBwbkBmTkBIh5h1UIc
-X-Authority-Analysis: v=2.4 cv=GPk41ONK c=1 sm=1 tr=0 ts=6a472180 cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=EAYMVhzMl8SCOHhVQcBL:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
- a=LrO3M-Q9EsTHprfRnCQA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: yZ7wuBH8PWR6jYOBwbkBmTkBIh5h1UIc
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzAzMDAyNCBTYWx0ZWRfX6yIMwgApDKKU
- it03ynTVN7NQ+2b7BEFdE/e+wSp5r5IcbJc3OPNC89ONiUhU2Cs37exgfQUXvlx2PfTdKxbszl7
- zfscbYlJn7BvoqEKBtZXeHWq2JUmpnOpjTu1ulyMtUmGobS8yKPVvquiqP+Gs6H9yI3hujXgTRa
- KVa5T1QDu/Q2ZI32HptOjZHkkUpru0aU2ZYdYsFGLd0KDYkMYt4Imtbfa2XaW/VaJ2VT2oc/T56
- 1z6plWQWytNPnbbZ7ZiJR19h8FrV6GrVsN18a4DxvSaGaK49Q+o0Dsn3q/I2n/DwA6knyGsb/TA
- yURuw4NyW441fAsnHLce4c10Ut5Q1fH7Q2CdgnKNAv5LXfdx1+EqKpaOr4c3Cbe3EAmvW7OWb2y
- QQMeZjWbwOknMZQMd9cFhLnt0qTZIzB9ulbdEZh4yi8OKoaOJey6X5sQsGV6RH+B7c/v26UuxbE
- hXrjpaJiEvEuFFGO+rQ==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzAzMDAyNCBTYWx0ZWRfX6nGjlxsK8cja
- 6paXXfxqoxrnsDVoCGh88GF8JcU7DbAd07lxtJ9kYxVyN41Aktngf2QkWVJIZ/a+DoS/2rGjLo7
- wfh4ARv1x1C2Jk5dWN/CQ59L73pujEU=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-07-03_01,2026-06-26_01,2025-10-01_01
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: GV2PR04MB12213.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d3e16a68-71b7-46b7-d38f-08ded8af9d4e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jul 2026 03:03:10.3024
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: qhVc3PZ/elOWEo0kGfQTdNH+Aa/b00TDPhNO0TtkgNCsFG3S7rTe1dpMBVTh7/zBTlP7/nc8pOls9LqIppfD0A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8206
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-304323-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:leitao@debian.org,m:xiaoning.wang@oss.nxp.com,m:Frank.Sae@motor-comm.com,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:imx@lists.linux.dev,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[xiaoning.wang@nxp.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[oss.nxp.com,motor-comm.com,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,lists.linux.dev];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304322-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:gakula@marvell.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:sgoutham@marvell.com,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:hkelam@marvell.com,m:rkannoth@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,marvell.com:from_mime,marvell.com:email,marvell.com:mid,marvell.com:dkim];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[xiaoning.wang@nxp.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	MISSING_XM_UA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:from_mime,nxp.com:email,nxp.com:dkim,GV2PR04MB12213.eurprd04.prod.outlook.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A01506FDFD3
+X-Rspamd-Queue-Id: 90E066FE221
 
-From: Hariprasad Kelam <hkelam@marvell.com>
+> > > > In phy_probe(), genphy_c45_read_eee_abilities() is only called
+> > > > when a driver uses phydrv->features. Drivers that implement
+> > > > .get_features are responsible for reading the EEE abilities themsel=
+ves.
+> > > >
+> > > > yt8521_get_features() does not do this, so phydev->supported_eee
+> > > > stays empty for YT8521/YT8531S and "ethtool --show-eee" reports
+> "EEE status:
+> > > > not supported", even though the PHY has the standard EEE
+> > > > capability registers.
+> > > >
+> > > > Call genphy_c45_read_eee_abilities() at the end of
+> > > > yt8521_get_features() to populate supported_eee.
+> > > >
+> > > > Fixes: 70479a40954c ("net: phy: Add driver for Motorcomm yt8521
+> > > > gigabit ethernet phy")
+> > > > Signed-off-by: Clark Wang <xiaoning.wang@nxp.com>
+> > > > ---
+> > > >  drivers/net/phy/motorcomm.c | 3 +++
+> > > >  1 file changed, 3 insertions(+)
+> > > >
+> > > > diff --git a/drivers/net/phy/motorcomm.c
+> > > b/drivers/net/phy/motorcomm.c
+> > > > index b49897500a59..46efa3406841 100644
+> > > > --- a/drivers/net/phy/motorcomm.c
+> > > > +++ b/drivers/net/phy/motorcomm.c
+> > > > @@ -2439,6 +2439,9 @@ static int yt8521_get_features(struct
+> > > > phy_device
+> > > *phydev)
+> > > >  		/* add fiber's features to phydev->supported */
+> > > >  		yt8521_prepare_fiber_features(phydev, phydev->supported);
+> > > >  	}
+> > > > +
+> > > > +	genphy_c45_read_eee_abilities(phydev);
+> > >
+> > > Don't you want to return error if genphy_c45_read_eee_abilities() fai=
+ls?
+> >
+> > EEE is an optional functionality, and the call in genphy_read_abilities=
+() has
+> the following comment. Therefore, I do not return its error here either.
+> > "
+> > 	/* This is optional functionality. If not supported, we may get an err=
+or
+> > 	 * which should be ignored.
+> > 	 */
+> > "
+>=20
+> This conversation then raises the question, should this be a void functio=
+n?
+>=20
 
-PF and VF NIX LFs that share a CGX LMAC reuse the same hardware PKIND
-programming. When HiGig2 or EDSA parsing is enabled, a VF NIX LF alloc must
-not reset the LMAC RX PKIND or default TX parse config over the PF setup.
+Hi Andrew and Breno,
 
-Add cgx_get_pkind() and rvu_cgx_is_pkind_config_permitted() so VFs skip
-cgx_set_pkind(), rvu_npc_set_pkind(), and NIX_AF_LFX_TX_PARSE_CFG updates
-when the LMAC is using NPC_RX_HIGIG_PKIND or NPC_RX_EDSA_PKIND.
+On second thought, I think it should stay int. The "ignore errors" rational=
+e
+in phy_device.c applies to the generic path where the PHY may not have EEE
+registers at all. But if this function is called within a specific PHY driv=
+er which
+we have already confirmed its support for EEE, need to handle the potential
+MDIO bus errors.
 
-Fixes: 94d942c5fb97 ("octeontx2-af: Config pkind for CGX mapped PFs")
-Cc: Geetha sowjanya <gakula@marvell.com>
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+If there's no problem. I'll send a v2 that changes the call to:
 
----
-v1 -> v2: Addressed simon comments
-	https://lore.kernel.org/netdev/20260619041002.1773822-1-rkannoth@marvell.com/
----
- .../net/ethernet/marvell/octeontx2/af/cgx.c   | 12 +++++++
- .../net/ethernet/marvell/octeontx2/af/cgx.h   |  1 +
- .../net/ethernet/marvell/octeontx2/af/rvu.h   |  1 +
- .../ethernet/marvell/octeontx2/af/rvu_cgx.c   | 32 +++++++++++++++++++
- .../ethernet/marvell/octeontx2/af/rvu_nix.c   | 29 ++++++++++++++---
- 5 files changed, 71 insertions(+), 4 deletions(-)
+	return ret ? : genphy_c45_read_eee_abilities(phydev);
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-index 2e94d5105016..f5fd6138c352 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-@@ -518,6 +518,18 @@ int cgx_set_pkind(void *cgxd, u8 lmac_id, int pkind)
- 	return 0;
- }
- 
-+int cgx_get_pkind(void *cgxd, u8 lmac_id, int *pkind)
-+{
-+	struct cgx *cgx = cgxd;
-+
-+	if (!is_lmac_valid(cgx, lmac_id))
-+		return -ENODEV;
-+
-+	*pkind = cgx_read(cgx, lmac_id, cgx->mac_ops->rxid_map_offset);
-+	*pkind = *pkind & 0x3F;
-+	return 0;
-+}
-+
- static u8 cgx_get_lmac_type(void *cgxd, int lmac_id)
- {
- 	struct cgx *cgx = cgxd;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.h b/drivers/net/ethernet/marvell/octeontx2/af/cgx.h
-index 92ccf343dfe0..8411a75dd723 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.h
-@@ -141,6 +141,7 @@ int cgx_get_cgxid(void *cgxd);
- int cgx_get_lmac_cnt(void *cgxd);
- void *cgx_get_pdata(int cgx_id);
- int cgx_set_pkind(void *cgxd, u8 lmac_id, int pkind);
-+int cgx_get_pkind(void *cgxd, u8 lmac_id, int *pkind);
- int cgx_lmac_evh_register(struct cgx_event_cb *cb, void *cgxd, int lmac_id);
- int cgx_lmac_evh_unregister(void *cgxd, int lmac_id);
- int cgx_get_tx_stats(void *cgxd, int lmac_id, int idx, u64 *tx_stat);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-index 7f3505ae6860..bb671e2150aa 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-@@ -1115,6 +1115,7 @@ void npc_read_mcam_entry(struct rvu *rvu, struct npc_mcam *mcam,
- 			 u8 *intf, u8 *ena);
- int npc_config_cntr_default_entries(struct rvu *rvu, bool enable);
- bool is_cgx_config_permitted(struct rvu *rvu, u16 pcifunc);
-+bool rvu_cgx_is_pkind_config_permitted(struct rvu *rvu, u16 pcifunc);
- bool is_mac_feature_supported(struct rvu *rvu, int pf, int feature);
- u32  rvu_cgx_get_fifolen(struct rvu *rvu);
- void *rvu_first_cgx_pdata(struct rvu *rvu);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-index 4ff3935ed3fe..2be1da3476ac 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-@@ -1355,3 +1355,35 @@ void rvu_mac_reset(struct rvu *rvu, u16 pcifunc)
- 	if (mac_ops->mac_reset(cgxd, lmac, !is_vf(pcifunc)))
- 		dev_err(rvu->dev, "Failed to reset MAC\n");
- }
-+
-+/* Do not allow CGX-mapped VFs to overwrite PKIND when special parse kinds
-+ * (HiGig, EDSA, etc.) are in use on the shared LMAC.
-+ */
-+bool rvu_cgx_is_pkind_config_permitted(struct rvu *rvu, u16 pcifunc)
-+{
-+	int pf, err, rxpkind;
-+	u8 cgx_id, lmac_id;
-+	void *cgxd;
-+
-+	pf = rvu_get_pf(rvu->pdev, pcifunc);
-+
-+	if (!(pcifunc & RVU_PFVF_FUNC_MASK))
-+		return true;
-+
-+	if (!is_pf_cgxmapped(rvu, pf))
-+		return true;
-+
-+	rvu_get_cgx_lmac_id(rvu->pf2cgxlmac_map[pf], &cgx_id, &lmac_id);
-+	cgxd = rvu_cgx_pdata(cgx_id, rvu);
-+	err = cgx_get_pkind(cgxd, lmac_id, &rxpkind);
-+	if (err)
-+		return false;
-+
-+	switch (rxpkind) {
-+	case NPC_RX_HIGIG_PKIND:
-+	case NPC_RX_EDSA_PKIND:
-+		return false;
-+	default:
-+		return true;
-+	}
-+}
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-index 0297c7ab0614..4e72d6e072d5 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-@@ -338,6 +338,7 @@ static int nix_interface_init(struct rvu *rvu, u16 pcifunc, int type, int nixlf,
- 	struct sdp_node_info *sdp_info;
- 	int pkind, pf, vf, lbkid, vfid;
- 	u8 cgx_id, lmac_id;
-+	struct cgx *cgxd;
- 	bool from_vf;
- 	int err;
- 
-@@ -363,8 +364,15 @@ static int nix_interface_init(struct rvu *rvu, u16 pcifunc, int type, int nixlf,
- 		pfvf->tx_chan_cnt = 1;
- 		rsp->tx_link = cgx_id * hw->lmac_per_cgx + lmac_id;
- 
--		cgx_set_pkind(rvu_cgx_pdata(cgx_id, rvu), lmac_id, pkind);
--		rvu_npc_set_pkind(rvu, pkind, pfvf);
-+		cgxd = rvu_cgx_pdata(cgx_id, rvu);
-+
-+		mutex_lock(&cgxd->lock);
-+		if (rvu_cgx_is_pkind_config_permitted(rvu, pcifunc)) {
-+			cgx_set_pkind(rvu_cgx_pdata(cgx_id, rvu), lmac_id,
-+				      pkind);
-+			rvu_npc_set_pkind(rvu, pkind, pfvf);
-+		}
-+		mutex_unlock(&cgxd->lock);
- 		break;
- 	case NIX_INTF_TYPE_LBK:
- 		vf = (pcifunc & RVU_PFVF_FUNC_MASK) - 1;
-@@ -1509,11 +1517,14 @@ int rvu_mbox_handler_nix_lf_alloc(struct rvu *rvu,
- 	u16 bcast, mcast, promisc, ucast;
- 	struct rvu_hwinfo *hw = rvu->hw;
- 	u16 pcifunc = req->hdr.pcifunc;
-+	u8 cgx_id = 0, lmac_id = 0;
- 	bool rules_created = false;
- 	struct rvu_block *block;
- 	struct rvu_pfvf *pfvf;
- 	u64 cfg, ctx_cfg;
-+	struct cgx *cgxd;
- 	int blkaddr;
-+	int pf;
- 
- 	if (!req->rq_cnt || !req->sq_cnt || !req->cq_cnt)
- 		return NIX_AF_ERR_PARAM;
-@@ -1685,8 +1696,18 @@ int rvu_mbox_handler_nix_lf_alloc(struct rvu *rvu,
- 	rvu_write64(rvu, blkaddr, NIX_AF_LFX_RX_CFG(nixlf), req->rx_cfg);
- 
- 	/* Configure pkind for TX parse config */
--	cfg = NPC_TX_DEF_PKIND;
--	rvu_write64(rvu, blkaddr, NIX_AF_LFX_TX_PARSE_CFG(nixlf), cfg);
-+	if (is_pf_cgxmapped(rvu, rvu_get_pf(rvu->pdev, pcifunc))) {
-+		pf = rvu_get_pf(rvu->pdev, pcifunc);
-+		rvu_get_cgx_lmac_id(rvu->pf2cgxlmac_map[pf], &cgx_id, &lmac_id);
-+		cgxd = rvu_cgx_pdata(cgx_id, rvu);
-+
-+		mutex_lock(&cgxd->lock);
-+		if (rvu_cgx_is_pkind_config_permitted(rvu, pcifunc)) {
-+			cfg = NPC_TX_DEF_PKIND;
-+			rvu_write64(rvu, blkaddr, NIX_AF_LFX_TX_PARSE_CFG(nixlf), cfg);
-+		}
-+		mutex_unlock(&cgxd->lock);
-+	}
- 
- 	if (is_rep_dev(rvu, pcifunc)) {
- 		pfvf->tx_chan_base = RVU_SWITCH_LBK_CHAN;
--- 
-2.43.0
-
+Thanks!
+Clark
 
