@@ -1,117 +1,118 @@
-Return-Path: <netdev+bounces-304653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304654-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ERKGOU0CSGoejQAAu9opvQ
-	(envelope-from <netdev+bounces-304653-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 20:41:17 +0200
+	id YgdhIBkDSGqKjQAAu9opvQ
+	(envelope-from <netdev+bounces-304654-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 20:44:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5121C704FBB
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 20:41:17 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15DBA704FD9
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 20:44:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=RRUXU661;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=fUKRYuVa;
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304653-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-304653-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304654-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-304654-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2E065301441D
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 18:41:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 84A3530328C9
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 18:44:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B10E3128D5;
-	Fri,  3 Jul 2026 18:41:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAC4232143D;
+	Fri,  3 Jul 2026 18:44:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 716B630C165
-	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 18:41:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41D22273D77
+	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 18:44:38 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783104073; cv=pass; b=dUykBjUZTkiYrueKBHEeqLMF5zmnXeQkF9LAgHC07v4peXoNUdpGNTvItjyHV4m0Ic0FrYY4uCUbPbeHmZYP4QgE01B0Q2yBXdCV6oP6kveP7w8gpQrr7CinodLdnuTiX/PkZPHffw626d/8IXGCc2SsTof4jrnys0nQYe5FHNU=
+	t=1783104279; cv=pass; b=f/lA0034Yu8Pqxujh9wUyixmSpozPjR2E4oRBNbZVXMrmfvoVqf6iYiS+wyaqAwM/dYGlxrJQ6qsGE2u42/Irbm9z3j+zYkHna2MKWRMiNZ5ODUnKj20M5kEEDmmSieNFAJE866/NFL3UiWZsTeNXC1tdQys4MnnfAmYYDQh1DU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783104073; c=relaxed/simple;
-	bh=0Qbt2nm81MoSrawX+7rKawGZQFGLjf8FPMXtAFGMjLM=;
+	s=arc-20240116; t=1783104279; c=relaxed/simple;
+	bh=6P6fDiWSB3kdTNl9U0SiUY0ZMUVbpm+b855g/OS6yfo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=h0WRoBQgw5Lxp0bVkvtI9p5SRmjFOw/sM1PXbav0Vzbrfo0fJwx9MqP8x7AW2XYQCvdAnbktxAtPBKTwnBoGyz8hHHVqJrrvVTTdGivn4HSHnoKgULrR1vodG8gmiz7RYvytWF40WBp6isKp6DoKH5DVHHKtXFPb6ZwV92ZTDIE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RRUXU661; arc=pass smtp.client-ip=209.85.208.47
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-6976b0c5adbso1451542a12.2
-        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 11:41:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783104070; cv=none;
+	 To:Cc:Content-Type; b=frrBRVW2fFNePVrmbpXdYEX/2muXb9aSLERjBJJ8z4FCRVW9V2iY5ByDdpjyDwjFe5bAbmmY2rCKkiPyjKDNpAPxmhLIkMHbuV0jI38SrF8zJRTqrZXyFMaA0tVM4rzWslkolrMIJnwAlDKpa+vhvlymPR5KZY8xTykdMQFGD8Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fUKRYuVa; arc=pass smtp.client-ip=209.85.208.52
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-698b899b4c8so814136a12.0
+        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 11:44:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783104277; cv=none;
         d=google.com; s=arc-20260327;
-        b=D6wrybvKRtSIKviv5WrvM4hinJ29wTlX1B1DMx21OzDg7inWQjH6Ctsv8btReuFvJ/
-         8wDa/uLaogCIGcp4nvny7o6Xt9K0Mblj5/NpTs4czQZ62zXgq/gokKppxICvaDAY/4mW
-         JrIEIoluEBebFuvezpn8CcDaPfI6zE5mFoAjhZ3gn21UVCipbef2WwpckMkHOWfSZ9oD
-         Gg3Y/suTYrP5bhmSkLDl1cRn65ikQFyXphY8ycPslLeG3gPSMjdLPWtOiz/mmkq5HoOX
-         GH8mUR0YBFXCBGeJ1p6Z5v2Ytwv8jL7nUgAdEBwiGo2J49MmCINTOEdPxlDFPQ070ixx
-         gsDA==
+        b=lacDDM3dPr8jkOd75dxzNvpMTfHRYnydr6ZCa5sSO5EWdkkF0Dc6qHWowhBpgNjviN
+         UlNrnwG3sqRmn90peupsAIn7QACD2bN2eGWTBg5GpCa/1wPJAGKpvHVS9JPRzKNXW4h4
+         3rPojnKE5Y4aQg35iShEmMqnX4av0V7LMi9fIPSVQ+OsVh7xdPqz1dQ5mDPhOzKBlvei
+         4r+7L/Iqt8g59fbs2RLGOpMiq79wg1wxJZNLlZ9jDT+PyHgaIvLg192fdgEtWuGhpmVm
+         3IiR/6q2EGQJxZ7z3CKUtvlmZ1t6jpjYCMsyBf99Fa2AUsZpIxfQy7HEEU6XvB4L5iae
+         tX9g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=WBbHXOwzJl7j9yIFimPWLD+hLfRc6OqC6nXJMgCD74M=;
-        fh=9qs7J2ij9l1jwcrECCkxzrXUjTRTgACkgSN7OSp4xq4=;
-        b=CooDcTs+i/Rytq1s7untRfdIpwyeCCMP2ULTh9WOKDqLaTg6f4slheHUOMVnsTbrHq
-         mVZ7v/MkpddhOR4eIkcXo0cmfN+vkPYE69Va70YsJa4wGnJjttfsV1D96eCKf71pvpAG
-         eaA5mC9XoMreCOvjcgGS6r0Ux+AZIZ49IUfw6GqlS9EKnzCYj/xgeLxRxzZr59Mc5Z0F
-         p7Aux08BVMtSUa4AT0inFvg7/L4ZgDrphoIATc5XZsKkDVYJFKpVbV3PGCJ+MVeW7+SD
-         titQNy2qSot/qx+nzf+w/Y/ji8CLs7kOTDsnvnr6IHFo4+MqsnDBNVSeUfyFRbCbh1wx
-         URnA==;
+        bh=kVsx1Lt5j2+xhQiEpkE6HWCMfpz4vvUckdBMfTth9dw=;
+        fh=nIv6pSZr9ozNTJcPUkoK74qqlj726jGA8mSIF/RzEbs=;
+        b=hvIyukNaJYQMUWYBqcCc+aCzAjtMyAQ63FsBzTevwZnoQNychBBjHFtv2k1ueQJc1A
+         zpoLYd6awZWbw8ltW4uQ0gPYCcSaik4wWRKY7tVU435+48UZkn/IO+c6O1jjr4fXV4vo
+         suMLRkrsCNcyNIO1fbmQUgIov6rxConEMn9bKqqcFEyIZEzo9CKuHQXHCGzBP+hKFNex
+         H5xNlFjjMg8QRO5IsbGOoP9vxZ2kLjl68Q1JLCPyP0zOKO8KQgmc7yPuVfAGo1fwOnyQ
+         b7QyuyVBXHf+LswSTyzqypMtTLEMC+xumBlximxO3MYc9Ts9+jkPnrHy5xXLo85Q7Ivc
+         7Uyg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783104070; x=1783708870; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783104277; x=1783709077; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WBbHXOwzJl7j9yIFimPWLD+hLfRc6OqC6nXJMgCD74M=;
-        b=RRUXU661NlgEp7+AyaYJPcOn1kBlwAryr32Um06ftuURlGaR3lL6r8oaMAjyFXSwRy
-         uSUg1tbfyYvOrxnfksXniOw0SQf7EyLQpJJzb8LDymAMJ9HWwWvh2cg0ZXyN53aCb9m+
-         PLOH/w4vT7OOyyqDfJuPOdRP7l8UY8xloEGslrdGQpyc2HK5R8qGpMNc23WEQAXKob94
-         27AP6344Lv0HcJ75FTFUrPxg+owy7hirgcMlQiRuu3QC3MRkDFo6C3Y/kR1AmmWVE2iD
-         tcsrNgLVmAw9V+fjE5eStsEQ7STV9bu2sicumZm6frDgwC+Ec3Z8SyjsRXOHYjPjPM82
-         NwtQ==
+        bh=kVsx1Lt5j2+xhQiEpkE6HWCMfpz4vvUckdBMfTth9dw=;
+        b=fUKRYuVap64eeiCSHCmFMz6QHJ386Zemz3bRt+0oKfQ1F2x++H1HABLLV58IPWe1ur
+         M94yVAIDuwtftnQTR9uvTR2BIZ63NPYsvV0jcdCgPnCFR37G69n0yV2Q6pDbeWqVTRnu
+         oHQrtHqBjnQZKeR/iNH8qdkOM0DITumSjm9TG1NskoylUGKqeTbVnBaBJqGKviwtQUNx
+         nEYddBYXPbtqmZ9OmbnYPYrAmJ8SZMMan7vKGSzS/QBa0JmKTdYjH0y1VMapjVPzAO8A
+         PIWJtk8MqpD1ypqvi6Ln8DAvRPsW2QpSjdaBfXA6gHvgx/E/hjnBLkuDiQvl4umtoC7W
+         sG5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783104070; x=1783708870;
+        d=1e100.net; s=20251104; t=1783104277; x=1783709077;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=WBbHXOwzJl7j9yIFimPWLD+hLfRc6OqC6nXJMgCD74M=;
-        b=VlN6fwPwWCw4AyBOjx60FlDmTaquAtKFwi4cZ37fWHrV5d80Z3tIB8smlC+cBtV2V6
-         DpuzcILfwUOUmkHgECwv5O+f3FkVn4PmHmNE/gBb2YXAc7WFNlFTUiwu+TMvdUwdnHLe
-         DRjRsGo8K64o7p6cT9WUnhPCPm+obTgVufe+J6j/3nPMEcc+zVYVTy4aGXfZS8dWpgD8
-         JlQF68RZpEnH4N2Kizy1Dzz6TKejJOSPCW5aZISL67qtMqyDZNhr7noyK3bEt8LVZx/J
-         xMmzLcr4sDXA7+iVS3g00HiIbgjI6N93cQGdjXOqDsykqZ6vOs6Mg/drN/zKv9BUZCGr
-         sRHw==
-X-Gm-Message-State: AOJu0YxXpJiEaTifpox8sUca0hOAvSsJsXxNWHmHqXorUkPJ8ilB+O4u
-	EI802NCPu0ulZ5x1BuI+m18aKvQntsxz4jtyXDSrRs+bELL7cdjgy62tkJgrT4kC4RrNiGwczXO
-	1fHpo3CF3Ghcx1doofmn/+oqHz2w8+VavPA==
-X-Gm-Gg: AfdE7cn+sWPp/Iina1BuJx/CXukdFZmb1Z6TMD6F5mjG57zjLie4XfCD2uPsDrA+SrD
-	vJGYyAs25rs0gWsSIY28md1PcdLSfW5XN7+vMupqHZtVoB+oK4dbppsRyZgbzjrTAPFX7Hrx1fl
-	3Yv/JYE6qiJYNsGTZ7oQtvXuknmkvF/oGoXBAR4OO2SZb4y2p9ZnNuab5A8ktUCkgEW/aAlNot0
-	pSYm1rl8jd06OAy1X1lJJpTe1ErnYI9c++RdDxcwKptCRSPL8/rXgVUw6KAdNYVeSb9NnYYNMDG
-	EE9JRwqZNcxLKf/rpb3D6gOc3Y2szwXIrhgOdnK9pEk0NHVs0wlwMYs9a8jX7ExWFnZTpxeFt+p
-	cE/JBtTrgsjSEDs1tP7SG9O/yPWM=
-X-Received: by 2002:a05:6402:4497:b0:66e:abe5:ab22 with SMTP id
- 4fb4d7f45d1cf-69a1a258591mr177686a12.5.1783104069517; Fri, 03 Jul 2026
- 11:41:09 -0700 (PDT)
+        bh=kVsx1Lt5j2+xhQiEpkE6HWCMfpz4vvUckdBMfTth9dw=;
+        b=hn6kqNW/B1NYzVXTmeKPLLZgKkROfeZSIMZGsdf8RWsDLY4wH2NQ0jSb8v+uo25lja
+         euNU5X2qKUAjFW0WCsEK7tF9LPJWKYdMYtaezdRos96tJxCvg24zk64tfipEZym+USTC
+         Oh9yP6jGDqQAwFQoUa+xKBtAcK842og3NiTOTr7T0DhK4pZQSzdTxtv0coBgSv6p6790
+         dtDGXleF7omLfTN1Dyl6rwx77rWSrnknDT9bOGeZmtKc8E8LmM/7vvMrXLiN5Qezbee4
+         ePMPbRoyN+08zbXjLfxuqy5dd4wF9j2Mc0p/dE4Ico242cuy3kOiuA65Gji7NQJ7/KI9
+         UWSw==
+X-Forwarded-Encrypted: i=1; AHgh+RpWyqTft/axv2UwBofUt4FgkVxr9ssyYynLKhzKuFUllyPplt/xYGY10oTK2hP8U36DYnF/jvE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx07nnjAzTrSNXDajU3fUKY9uJzatkB6ixOO7wt6B2NuoUUbqx/
+	ox1mcvvNj32DHqlbAwDPoFMlinwnqfd1Of7rYfERngGZ1D6pbMtpbzxgbGpoYPLDTIhqirssBf7
+	JW8JqeENPNat57Ou4t2Cr3FsoLnGS+jk=
+X-Gm-Gg: AfdE7cle+SrlKUncWVZd6dzxL2MSOa9UlOfStcAyEZ4tbtfMsli6k31VQfo1ORfuTt/
+	8yjXEnm8Y3+A3IvkPXygIsXMRnmlZluJEFuxpaICnlThnEOXfTyrq2bHXwnkN53+fmgktfgrGsV
+	ZNSZe/u4yHb7P9S6AxMIU1yQ2iscTtwerhOpQo9PhpLaLqPzN4VmbsVluA4Cq5lipcg+96j6uuu
+	fMTH6iQFKB9PE0YviHm+vY95q6g6001PhaYD3Yxi94psjvQj5gTUOQJfQSnD1VsNzD06ELDsqds
+	c+ScX01WAIehGHDioiVXo2ATh5n9wgZU9AsbK/J/QyMbqq2rwpAK8qyVWKYHxwXH4GodtmNmrag
+	I/Iy+OFYYRIprehWovrwvriWH2uk=
+X-Received: by 2002:a05:6402:51c8:b0:698:6084:db7f with SMTP id
+ 4fb4d7f45d1cf-69a1a261fe0mr176049a12.10.1783104276671; Fri, 03 Jul 2026
+ 11:44:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260702235045.1326384-1-rosenp@gmail.com> <fa4fa65e-1635-4313-a5e0-56a5208272e2@lunn.ch>
-In-Reply-To: <fa4fa65e-1635-4313-a5e0-56a5208272e2@lunn.ch>
+References: <20260702234923.1320412-1-rosenp@gmail.com> <akcnQEiJYfAtPqN1@zatzit>
+ <3a9bdad9-3755-4efd-8de4-a3ce3ff30b69@lunn.ch>
+In-Reply-To: <3a9bdad9-3755-4efd-8de4-a3ce3ff30b69@lunn.ch>
 From: Rosen Penev <rosenp@gmail.com>
-Date: Fri, 3 Jul 2026 11:40:56 -0700
-X-Gm-Features: AVVi8Cf-ThBbJ_GxDQuvIOAkN2ONONkbVPiSWXn2EbeilUdDtgaMKDLY5jg8bJs
-Message-ID: <CAKxU2N-eRQLw4NqTVXuZPvT78Cu22Z3YC2FD3jrghy1VEJ5vpQ@mail.gmail.com>
-Subject: Re: [PATCH net] net: emac: mal: replace devm_request_irq with
- request_irq to fix probe error race
+Date: Fri, 3 Jul 2026 11:44:25 -0700
+X-Gm-Features: AVVi8Cc07KyShVpyVVtvw9efIQGWbywZyUZHgPqSRZnDG8s3j2pD7mPY21n4Tlo
+Message-ID: <CAKxU2N8u+psVg4aqcm9Pooo92XsxTT12r02dNt6GttZZ_NkHPg@mail.gmail.com>
+Subject: Re: [PATCH net] net: emac: mal: fix W1C write race in ICINTSTAT clearing
 To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	open list <linux-kernel@vger.kernel.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, netdev@vger.kernel.org, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jeff Garzik <jeff@garzik.org>, open list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
@@ -120,17 +121,17 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304653-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-304654-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:david@gibson.dropbear.id.au,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jeff@garzik.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
@@ -141,44 +142,74 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:email]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,lunn.ch:email,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5121C704FBB
+X-Rspamd-Queue-Id: 15DBA704FD9
 
-On Fri, Jul 3, 2026 at 9:38=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+On Fri, Jul 3, 2026 at 9:37=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
 >
-> On Thu, Jul 02, 2026 at 04:50:45PM -0700, Rosen Penev wrote:
-> > devm_request_irq() is a managed resource: the IRQ is not freed until
-> > devres_release_all() runs after the probe function returns.  In the
-> > probe error path, free_netdev(mal->dummy_dev) and dcr_unmap() execute
-> > while the IRQ is still live.  If the shared IRQ fires during cleanup,
-> > the handler accesses unmapped DCR registers (crash) or the already-
-> > freed dummy_dev (use-after-free).
+> On Fri, Jul 03, 2026 at 01:06:40PM +1000, David Gibson wrote:
+> > On Thu, Jul 02, 2026 at 04:49:23PM -0700, Rosen Penev wrote:
+> > > The ICINTSTAT register is write-1-to-clear (W1C).  The read-modify-wr=
+ite
+> > > pattern in both mal_txeob() and mal_rxeob() can lose interrupts: if a=
+ bit
+> > > that should not be cleared is already asserted when mfdcri() reads th=
+e
+> > > register, it is included in the read value, retained by the bitwise O=
+R, and
+> > > then written back as 1 - inadvertently clearing a pending but unhandl=
+ed
+> > > interrupt.
+> > >
+> > > Fix by writing only the specific bit to clear (ICINTSTAT_ICTX for TXE=
+OB,
+> > > ICINTSTAT_ICRX for RXEOB).  W1C semantics guarantee that writing 0 to=
+ the
+> > > other bits has no effect.
 > >
-> > Switch to plain request_irq() with per-IRQ error labels that tear down
-> > only the IRQs that were successfully registered, and add the matching
-> > free_irq() calls in mal_remove().
+> > Wow, it's a long time since I thought about the MAL.
 > >
-> > Fixes: 14f59154ff0b ("net: ibm: emac: mal: use devm for request_irq")
-> > Assisted-by: opencode:big-pickle
-> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> > > Fixes: 1d3bb996481e ("Device tree aware EMAC driver")
+> >
+> > This doesn't appear correct.  The lines in question were added by
+> > fbcc4bacee30c ("ibm_newemac: MAL support for PowerPC 405EZ")
+> >
+> > > Assisted-by: opencode:big-pickle
+> > > Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> >
+> > Assuming ICINTSTAT is indeed a W1C register (or "read/clear" as I
+> > believe they were termed in the 405 documentation) the change looks
+> > correct.  However, I no longer have access to the documentation that
+> > would let me verify that.  I would absolutely not trust an LLM to know
+> > if that's the case, since it's a fairly arbitrary and specific detail
+> > of an obscure CPU.
 >
-> You seemed to of sent the same patch within 24 hours. Please don't do
-> that.
-Yeah local error. Sent within a few seconds of each other.
+> I agree. If this is pure LLM, we need some form of verification.
+Only verification I have is the hardware and whether or not something break=
+s.
+
+Sashiko reports:
+
+This isn't a bug introduced by this patch, but does this read-modify-write
+pattern on a write-1-to-clear interrupt status register cause lost
+interrupts?
+If another interrupt occurs and its bit is set before the mfdcri() read, th=
+e
+read value will include that bit as a 1. The bitwise OR retains this 1, and
+the subsequent mtdcri() will write it back, inadvertently clearing the newl=
+y
+pending interrupt without processing it.
+
+This is a pre-existing issue, but does this suffer from the same
+write-1-to-clear read-modify-write problem as mal_txeob() where concurrent
+interrupts might be accidentally cleared?
 >
-> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
->
-> Send a self NACK to the broken version, wait 24 hours, and send v2.
->
->     Andrew
->
-> ---
-> pw-bot: cr
+>   Andrew
 
