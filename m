@@ -1,175 +1,171 @@
-Return-Path: <netdev+bounces-304665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304666-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +dVpB54dSGr8mQAAu9opvQ
-	(envelope-from <netdev+bounces-304665-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 22:37:50 +0200
+	id hfnMEYgkSGo5mwAAu9opvQ
+	(envelope-from <netdev+bounces-304666-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 23:07:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 123D4705897
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 22:37:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A363705AF7
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 23:07:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=kDtPeHY8;
-	dmarc=pass (policy=none) header.from=lunn.ch;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304665-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304665-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=szelinsky.de header.s=mail header.b=TFLXXZaS;
+	dmarc=pass (policy=quarantine) header.from=szelinsky.de;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304666-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304666-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 29C07300BD65
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 20:37:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E61A4302A531
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 21:07:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0047E352C28;
-	Fri,  3 Jul 2026 20:37:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F00E230ACFB;
+	Fri,  3 Jul 2026 21:07:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from szelinsky.de (szelinsky.de [85.214.127.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F2F348C4B;
-	Fri,  3 Jul 2026 20:37:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D2291A6835;
+	Fri,  3 Jul 2026 21:07:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783111064; cv=none; b=jfeWUybPNCxxswrgQysLrBSZXgeiuHI5ybrutj1QCCOvzKkRDoVWH1wVUznju+pxagdwUgwdui8EzB95NxzzIag3H+djV2TERyGhdJ3DSgaCQxLIrMEEtkEX7pBZn/UVibDaWj8/Z9uMN0Pb8XsUkB8g6LZ+qqby+ovvw+SyzGU=
+	t=1783112835; cv=none; b=fwVnNLPqg/AeFP6K3iACXPNC7cYDp4OvgI8QEtdyxP0rIqKvgItsF950DJacFCX2mcMM8W54qUSfs/foeHTZP/FERjoMCLho54yUeIsxksuzMeI8hCuMO3FV8PsQk8eYEQNZqzZRLlsvDnsnwvpqrr82FQnaJZiigUw1w3Gu/QQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783111064; c=relaxed/simple;
-	bh=Gu/0HMyu/VRKn+7s9pXyNtz7xFiVrICskxvLGDADA4o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=huKVvWxZT9tiHpYiWGB9bz9bvfKxfOE7HOB4rdMBpB4du9SSFN2cKXOkl0lrmHTAVkSfZQaolfW9PbNXOIZ2yNsvI9juJ45pX5Nif2PaPWhUAQbM4jUY2VJ7N4j6vjcRJl6oD6G4u82WGzuYWrVmrsm171n7h1ilcEoPOekzSTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kDtPeHY8; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=XRM9uENndVb9k8FDKtQxbN4i2xsVS7kwtcnJa3qVais=; b=kDtPeHY8J/uTFtszkVtL01Knah
-	g5VSNO5X+1KNoDB+WgXIRri+0noH6dBNaO+UXcQ+LY4UiZqPSa7mRQxy9TjWdPs5NQ7lIQztkNzGO
-	10UnuIxvz0IQk/fF517RGoXOBv3blU1xF2tgn11z1fA5mS7v/voSubZhS71Mj+4oU7sc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wfkde-00AbYr-9b; Fri, 03 Jul 2026 22:37:30 +0200
-Date: Fri, 3 Jul 2026 22:37:30 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: javen <javen_xu@realsil.com.cn>
-Cc: hkallweit1@gmail.com, nic_swsd@realtek.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 2/6] r8169: add support for phylink
-Message-ID: <e9cadf1a-94f3-45e8-9b59-22082ee5c2da@lunn.ch>
-References: <20260703092459.1124-1-javen_xu@realsil.com.cn>
- <20260703092459.1124-3-javen_xu@realsil.com.cn>
+	s=arc-20240116; t=1783112835; c=relaxed/simple;
+	bh=6Mb/5Sypu6E/ZiOsb1JdxqLJhirbFsKR/gwQDmZOFMI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=PkvUcCjnHXrkbrkj4mwBkZ4JlNT2ybCgHrgU6BSyFQhEWEo+sjzLsYLaamh9qBJZJhVixb6J2YtSAiiOu9UWu3nkpaiiJdLX6OQkkErrAZc/jh0qKUAjbeujczikFUL1bPV+O8uCDZHB/+rsVRV6AfhQV6gvS46jgmjkQPhiLZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de; spf=pass smtp.mailfrom=szelinsky.de; dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b=TFLXXZaS; arc=none smtp.client-ip=85.214.127.56
+Received: from localhost (localhost [127.0.0.1])
+	by szelinsky.de (Postfix) with ESMTP id DA615E83A30;
+	Fri, 03 Jul 2026 23:07:05 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=szelinsky.de;
+	s=mail; t=1783112825;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ir5B0QRGK3HXwOvCc8TrvXpYHnIhWl7QYZS6Kqo90c8=;
+	b=TFLXXZaSoZ1UZt7FMiv4aepP049a1+QCJBVHp5AQLzwHFPV5FrDRA5A2ANZAubdDvJ/3Aq
+	F0mDh6PBND4TmGFCmNJmT5J1k+8TWMNO2mocz9dPLgOY8kYhO55DSgUq7Fpc94Zn4E1AA7
+	E4AdFCDTApmNT1Jt8uslkZfs1idxBjlCs2UogXyRHjYO4l0dlYaLDz+2dblJuVnFYMnFvk
+	p2t6qvNjwzOMRbXkFmtZX7jfKs/VbA88aKX3oxtkqXfcxvCvvXmMiWlb8UAdVk8VWjYW84
+	2fhZcm+7mW0U57KIw5sTzI8IX1S7Tg/yYKlmkQDQWEhy7lTAHC1FI+3mNMDt/w==
+X-Virus-Scanned: Debian amavis at szelinsky.de
+Received: from szelinsky.de ([127.0.0.1])
+ by localhost (szelinsky.de [127.0.0.1]) (amavis, port 10025) with ESMTP
+ id eb4NlK7Q6ZAX; Fri,  3 Jul 2026 23:07:05 +0200 (CEST)
+Received: from p14sgen5.lan (p5784dea5.dip0.t-ipconnect.de [87.132.222.165])
+	by szelinsky.de (Postfix) with ESMTPSA;
+	Fri, 03 Jul 2026 23:07:04 +0200 (CEST)
+From: Carlo Szelinsky <github@szelinsky.de>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Corey Leavitt <corey@leavitt.info>,
+	Jonas Jelonek <jelonek.jonas@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Carlo Szelinsky <github@szelinsky.de>
+Subject: Re: [PATCH net-next v4 3/3] net: phy: own phydev->psec via PSE notifier and remove fwnode_mdio hook
+Date: Fri,  3 Jul 2026 23:06:51 +0200
+Message-ID: <20260703210651.63197-1-github@szelinsky.de>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260703071025.100797-1-pabeni@redhat.com>
+References: <20260703071025.100797-1-pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260703092459.1124-3-javen_xu@realsil.com.cn>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[szelinsky.de,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[szelinsky.de:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304665-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:javen_xu@realsil.com.cn,m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[pengutronix.de,bootlin.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,leavitt.info,vger.kernel.org,szelinsky.de];
+	TAGGED_FROM(0.00)[bounces-304666-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:o.rempel@pengutronix.de,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:horms@kernel.org,m:corey@leavitt.info,m:jelonek.jonas@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:github@szelinsky.de,m:andrew@lunn.ch,m:jelonekjonas@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[github@szelinsky.de,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lunn.ch:from_mime,lunn.ch:dkim,lunn.ch:mid,vger.kernel.org:from_smtp]
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[github@szelinsky.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[szelinsky.de:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,szelinsky.de:from_mime,szelinsky.de:dkim,szelinsky.de:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 123D4705897
+X-Rspamd-Queue-Id: 8A363705AF7
 
-> +	if (jumbo) {
-> +		if (!tp->jumbo_pause_saved) {
-> +			struct ethtool_link_ksettings cmd = {};
-> +			bool adv_pause, adv_asym;
-> +
-> +			phylink_ethtool_get_pauseparam(tp->phylink, &tp->saved_pause);
-> +			if (tp->saved_pause.autoneg) {
-> +				phylink_ethtool_ksettings_get(tp->phylink, &cmd);
-> +				adv_pause = ethtool_link_ksettings_test_link_mode(&cmd,
-> +										  advertising,
-> +										  Pause);
-> +				adv_asym  = ethtool_link_ksettings_test_link_mode(&cmd,
-> +										  advertising,
-> +										  Asym_Pause);
-> +				if (adv_pause && !adv_asym) {
-> +					tp->saved_pause.rx_pause = 1;
-> +					tp->saved_pause.tx_pause = 1;
+Hi Paolo,
 
-This does not look correct. Pause is negotiated. In order to determine
-how to program the MAC you need to look at what the local side is
-advertising, and what the link peer is advertising. I don't see
-anything here about lp_.
+Thanks, I traced this and I think the review is right.
 
-I forget what the issues is. Is it something like, if you are using a
-normal MTU, pause is supported? But with jumbo MTU it is not?
+A phy that has been device_del()'d but is still pinned (an attached
+netdev holds a get_device() from phy_attach_direct()) is off the
+mdio_bus_type klist, so the PSE_UNREGISTERED walk (bus_for_each_dev)
+does not see it and phy_pse_detach_one() never clears its phydev->psec.
+When it is finally released, after pse_release_pis() has already freed
+pcdev->pi, __pse_control_release() reads pcdev->pi[] and pcdev->owner
+-> use-after-free. So the commit message is wrong for the off-klist
+case: bus_for_each_dev() only defers the release for phys it can still
+reach.
 
-For this to work correctly, i would expect a change of MTU to trigger
-a new autoneg, with the local advertisement changed. That might
-require changes in phylink, since it does not expect this sort of
-thing.
+A few questions so I fix it the right way:
 
-> @@ -5288,6 +5326,8 @@ static void rtl_remove_one(struct pci_dev *pdev)
->  		r8169_remove_leds(tp->leds);
->  
->  	unregister_netdev(tp->dev);
-> +	if (tp->phylink)
-> +		phylink_destroy(tp->phylink);
+1. The trigger I can see is unbinding the MDIO bus while a netdev still
+   has the phy attached (mdiobus_unregister -> phy_device_remove ->
+   device_del, and the phy stays alive on the netdev's reference), and
+   then the PSE controller unbinds. Is that the path you have in mind,
+   or is there an easier one I am missing?
 
+2. On keeping pse_control_put() in phy_device_remove(): wouldn't that
+   bring back the reason it was moved out? phy_device_remove() and the
+   walk's phy_pse_detach_one() would both touch phydev->psec, and
+   serializing them means taking rtnl in phy_device_remove() - which
+   the sfp caller already holds, so it would deadlock. Did you mean a
+   plain put there, or something narrower?
 
-I've not looked in detail, but is tp->phylink optional? I would expect
-the probe to fail if it could not create it.
+3. Simon raised the same psec-vs-pcdev lifetime on the net regulator
+   patch [1] and suggested either draining the references on unregister
+   or having pse_control hold a refcount on pcdev. This series does the
+   drain, which (as you show) misses off-klist phys. Would having
+   pse_control pin pcdev; so pcdev->pi and pcdev->owner cannot be
+   freed while any pse_control is still out... be the direction you
+   prefer? That makes the deferred put safe no matter what the klist
+   walk sees.
 
-> +static int rtl_mac_enable_tx_lpi(struct phylink_config *config, u32 timer, bool tx_clk_stop)
-> +{
-> +	struct rtl8169_private *tp = container_of(config, struct rtl8169_private, phylink_config);
-> +
-> +	if (!rtl_supports_eee(tp))
-> +		return -EOPNOTSUPP;
+I'll send a v5 once the direction is clear.
 
-Can that happen? You should only be telling phylink EEE is supported
-if EEE is actually supported.
+Thanks,
+Carlo
 
-> +static int rtl_init_phylink(struct rtl8169_private *tp)
-> +{
-> +	struct phylink *pl;
-> +	phy_interface_t phy_mode;
-> +
-> +	tp->phylink_config.dev = &tp->dev->dev;
-> +	tp->phylink_config.type = PHYLINK_NETDEV;
-> +	tp->phylink_config.mac_managed_pm = true;
-> +	tp->phylink_config.lpi_capabilities = rtl8169_get_lpi_caps(tp);
-> +	tp->phylink_config.mac_capabilities |= MAC_ASYM_PAUSE | MAC_SYM_PAUSE;
-> +
-> +	if (tp->sfp_mode) {
-> +		phy_mode = PHY_INTERFACE_MODE_INTERNAL;
-> +		tp->phylink_config.mac_capabilities |= MAC_10000FD;
-
-Only 10G? Is it not possible to slow down to 1G for a 1G SFP?
-
-	Andrew
+[1] https://lore.kernel.org/netdev/20260624151251.1137250-1-horms@kernel.org/
 
