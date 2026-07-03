@@ -1,401 +1,195 @@
-Return-Path: <netdev+bounces-304470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304466-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mxcQLE+CR2pZZwAAu9opvQ
-	(envelope-from <netdev+bounces-304470-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 11:35:11 +0200
+	id SU1VMQqCR2pMZwAAu9opvQ
+	(envelope-from <netdev+bounces-304466-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 11:34:02 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B21B3700B30
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 11:35:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B69CB700AF5
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 11:34:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=jTRkjFYC;
-	dmarc=pass (policy=none) header.from=realsil.com.cn;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304470-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304470-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=microchip.com header.s=selector1 header.b="pqr/k9oq";
+	dmarc=pass (policy=reject) header.from=microchip.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304466-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304466-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9A4493064E02
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 09:25:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C47E1305AAD6
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 09:25:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9286B3B3898;
-	Fri,  3 Jul 2026 09:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E38E3B14A5;
+	Fri,  3 Jul 2026 09:25:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011053.outbound.protection.outlook.com [40.93.194.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1433637DE98;
-	Fri,  3 Jul 2026 09:25:29 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783070732; cv=none; b=DUZUI/pGHRrFsDoz58GeACrBpipMBgYNyEjXXY0f0d+nixT4ed66gy0zbkbsj9lh2yYKn+NtQ4VIOokp1u3cYnobcR/GhuBi+EkiEhHRbt5c/zvFjIUbhHqOish96UU0/xeMZNNORwv3ykPgTWWJOnT54VJ2ANTt0XgavGANzZE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783070732; c=relaxed/simple;
-	bh=9lxA5H6Neh0tnKGi3JJZ1Lkte3q3o9Qz1i9Cx1poQ54=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cDEqFWo8nmXVGb6Mzd3wHQ0wjbt+p8WkW8ci3Ug5ph17GxfHNz6EMhewGPHOtuRkS5Ao1o+zYZjpa0fMhnfQiyDUXKGCXk4ycCyTKBoACZHO5q45nPRFIypP3ToLECXKcI4byie34vmGEwh9KK4Ky3CKcaxQDYbE74K5FXkM3fA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=jTRkjFYC; arc=none smtp.client-ip=211.75.126.72
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6639P3SR02572104, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1783070704;
-	bh=pQ09MgTX/hy2ByAFqk6g8xCymtf0wxDqp0rCvLxddcU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=jTRkjFYCnPEKMxvQd5rZOahPUlKhnloPt68It+7fiOMYFHMy2TBtOyGQjtOqyLqIE
-	 TjRsIgMgQE/7RZPgbyHPIHj9FK6r0HiI/9pX/DYFxr88QEYwZPIWr5rgmsHkbo4RUn
-	 uSzmRGXbbOy0Aisf14cgiUQWFOICLFojtZHGuBoRp3IixUq5LZF24dPX4OYluUyXZG
-	 i6ovOOFGHE/Xt9cJs0zuQLa0+znQ15G/hnmehKAgUvRV9wt16tRLQdFye6Fzr2H5fE
-	 BBNBdKnI7sjmsyG6yLsINfDEL15cpH38MqjGoW2xV849vBz6gje4tRqPLrA0g5Gf0p
-	 18s8VZVDOL2Cw==
-Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
-	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 6639P3SR02572104
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 3 Jul 2026 17:25:03 +0800
-Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
- RS-EX-MBS2.realsil.com.cn (172.29.17.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Fri, 3 Jul 2026 17:25:03 +0800
-Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS1.realsil.com.cn
- (172.29.17.101) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Fri, 3 Jul 2026 17:25:03 +0800
-From: javen <javen_xu@realsil.com.cn>
-To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 066CE37DE98;
+	Fri,  3 Jul 2026 09:25:18 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783070720; cv=fail; b=WQYW5LhVWgSpYcjRO38Vt62iup3o6DpgW4qnqLUCS2oO+BSORWHfBBMUeRehe4vST9SewXSfkhhroXMK63zDKMf5e01m9cDM46hVcm+G5D+8nDgEaVPoNVby9fxHcjS08JDPpVMDtJ79nxADDE3B8H817Poz1L2CZmqt9tK18iU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783070720; c=relaxed/simple;
+	bh=UgLhq7k12hMRKps5npOFotutqPfT/sVRkZXcjJgMs0M=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=lJIL/wf6G6Q3s/KlGcqL77cCG+WchiKgSBHrWIBZhSMK7iRPY8tlQw6uJvL1RO+KITA9yzcIi65+suQvG5j1Qn1UD8qiJT9eJI14V//KrO5LB8L9kHpG3K9KXymcOINeHv0kDbzqF4mIO4DgVuU/f6FYqH5yj6lh/U7FgCxzsh0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=pqr/k9oq; arc=fail smtp.client-ip=40.93.194.53
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=T0dHSOldu2TPzU+GxFbhcSNFpz2EeGAE+gEU1eDnndwi3tsfxkjjiSqWHPqDO4Q5fnnT59QBRcG3cBf+t5+ZNP/MkrtXzYjrbiLrBNABdKUkVQ2LYZwkm0W1pExPMUzn4UjlSbFWSeznP3mKbNZWMk/vkhq8UXRqNeC2ZjgjxxbH862qkxJHmsBzTQBPXU8VY2JakfuB8U4nhKBroL1gy2Nrj3FSgNNkxDBGJeCqDMJh/QpTIrYacN3o4rDB/StGuu9lN+JMOALsQ53mMWvsGTNsIkYQvhk8I+MBeS7khs42jjJYsBh7CUU5F0A5RYe5Om8tTSysd85Jii13Eq7Ggw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UgLhq7k12hMRKps5npOFotutqPfT/sVRkZXcjJgMs0M=;
+ b=jdFW7rDh/9Yjm4qPpzFn0Dtpo/6jLTDUrnOhohKffd/eD5s0ODkLTDoA9GwlLev0uamEjx7/fOLaXj0sdTenIoDeJVMntGqYBG+zE6/eDV0fMrnT9S9v+1iGbIyGhYDZMkg85yRvDDlob9MwWTYT/NO5PJ8Cvux1Lxrgj6bFdXGf10FU3eTWTV0wC4qYFiysu8w0mts27tsBWv8Facd8do026LZ75tL72BHwFD01/UHOe1ZVomrX3Dj63Z0TbXHvpiRt7ckLJ1trevb4FqhPuPocjjzRyZyrepq4hQ0JiM4Ci4RgTm0qgi8Cgeod/2ma2spQK0kU765HgDFheghD+A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UgLhq7k12hMRKps5npOFotutqPfT/sVRkZXcjJgMs0M=;
+ b=pqr/k9oqLq7EDzIO7ZIkbgHklkfETuJ6lHttt/Jirn5kUQlLp8UG0+Tb5N1RIPCp9LHnnalLIfjmwXGht10+YjG2U+wSIivSglSDFrg0bj566J7ZG6xEfq8LzAGCtHm9J/umSAO3s138ZvP70bwGp2j9Q+DuYGmtUjQmySIPGSY5BjW0pn/rhqHsCnXwqlipKXXXlFVWP4rKk9U2WyR31YKNOD1G9htKH47NDIpfBpnFnYOuL4cRXjFNXidlWz6ssDQ5TwGtmrUJQV2fHX5h/ecHd/kC5yUpWtcUqMI8m9GYGoGrZB42gz96Nhy6lMmxvnrcHSwlns4H1WB4qcw10w==
+Received: from DSWPR11MB9715.namprd11.prod.outlook.com (2603:10b6:8:355::17)
+ by BL1PR11MB6049.namprd11.prod.outlook.com (2603:10b6:208:391::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.11; Fri, 3 Jul
+ 2026 09:25:16 +0000
+Received: from DSWPR11MB9715.namprd11.prod.outlook.com
+ ([fe80::25ec:56c9:f864:9139]) by DSWPR11MB9715.namprd11.prod.outlook.com
+ ([fe80::25ec:56c9:f864:9139%6]) with mapi id 15.21.0181.010; Fri, 3 Jul 2026
+ 09:25:16 +0000
+From: <Thangaraj.S@microchip.com>
+To: <nb@tipi-net.de>, <enrico.pozzobon@dissecto.com>
+CC: <UNGLinuxDriver@microchip.com>, <andrew+netdev@lunn.ch>,
 	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Javen Xu
-	<javen_xu@realsil.com.cn>
-Subject: [PATCH net-next v4 6/6] r8169: add phylink support for RTL8127atf
-Date: Fri, 3 Jul 2026 17:24:59 +0800
-Message-ID: <20260703092459.1124-7-javen_xu@realsil.com.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
-In-Reply-To: <20260703092459.1124-1-javen_xu@realsil.com.cn>
-References: <20260703092459.1124-1-javen_xu@realsil.com.cn>
+	<pabeni@redhat.com>, <Woojung.Huh@microchip.com>, <netdev@vger.kernel.org>,
+	<linux-usb@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH net v2] net: usb: lan78xx: disable VLAN filter in
+ promiscuous mode
+Thread-Topic: [PATCH net v2] net: usb: lan78xx: disable VLAN filter in
+ promiscuous mode
+Thread-Index: AQHdCVrhM8TwHwQcjUewNeORXPxyHLZaG0KAgAFrxVA=
+Date: Fri, 3 Jul 2026 09:25:15 +0000
+Message-ID:
+ <DSWPR11MB971547088066C2CA91638F3BECF42@DSWPR11MB9715.namprd11.prod.outlook.com>
+References: <20260701-lan78xx-vlan-promisc-v2-1-fe3b18066728@dissecto.com>
+ <aef78533a81c88a362885c24928a7c60@tipi-net.de>
+In-Reply-To: <aef78533a81c88a362885c24928a7c60@tipi-net.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DSWPR11MB9715:EE_|BL1PR11MB6049:EE_
+x-ms-office365-filtering-correlation-id: fcf23763-a3a3-4954-7152-08ded8e4fe12
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|23010399003|366016|7416014|376014|1800799024|38070700021|56012099006|11063799006|4143699003|18002099003|22082099003;
+x-microsoft-antispam-message-info:
+ fXz5RNaSwEXkdOHuYAN08NFx5tOwAuPGoTKxXvjkx75XHlWkAS4n7EJ/P7Sq/0Th1bN3b2OCcw/YAHRLJfesVnkeyEqjqm0WsLVcrIu0jY08cXaaP4g+TpFRvO5PcDvNrOmQtItEwCha40NfGTEXXtxRqqZ5JzqeVjlabx8IHyEC2zQotlyGSqKIQs6s+JacalHq/VCt2biOdEOf24TG/39NMNyXJBcBfPdfgYGNz/DwwETumVaLVF9wr5Dja8GuT/2PdxTe+vNcSlMx48zwtatoPGsBTSWwJZsyuyIrgk5MeA/9+T5XgmIacCxmOg4laU/pin2TBXw2CTeYROB0rscHUbYrnHvMw1XvcXP+A3p3s+bOxzOt+BUwamIXLMm6VwL2fLM5fJ5siXRST2a3zmm0tgKKHD7+KJvCh8j/GLTRL1aoRtLZTj0WB4jXM7/RV6IXT1BASudFYDtA0jX4YhgqDV9I8HCeuJjUdJ0baszFWybNk0GK898xnJvaTogyu3ljmbqwSYQtufTEiVV5DuP7PvPf4Q8gtHDyZDYU9dVfUuv1/GZlMfZhB3NenJFUexMVPBK83Jhac6SJEC51U9TmmVSnClIG0Os8yTfku6m2223XY2YQ/Qu9gvQ7eDOAzq8qHGzZyiQI1ePPqaBt26V8tOavYK6OPcjAoiEOxLEWDqYUfJ59VFzaSH/HGdXap/BhraCQoP50wox9HlEHBxnxVZnqCsUWGnpqbhq5CPQ=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DSWPR11MB9715.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(7416014)(376014)(1800799024)(38070700021)(56012099006)(11063799006)(4143699003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?uuc1JMPcHfXhrl2BUNogFzpD7SpUJDVmkq+rOqwTfXYcKf0BAt713MZbEPDY?=
+ =?us-ascii?Q?AzGuo2DRur2zD84ckXNYTisiCItyuuBkY0/aTICAn5tBbYfG7ms4tzFB13MU?=
+ =?us-ascii?Q?mU3XHhsqIrilWh7Em04Q78ci1KVX1oVleS98B8YEzesSps9pHDSCMEjvy5TQ?=
+ =?us-ascii?Q?AyWIW+ry09KwWvn32ntB4IYo0vLzry4rWEoDfy2cCxEmbyDFeKDydddFClEg?=
+ =?us-ascii?Q?MQRAJESmJTDE0QY+u8NLTJZ7n1x+ap5fGPVrVQHpEf8irNQWnJeabt1OaPND?=
+ =?us-ascii?Q?mo3oB9gLTWQgmsc8Ojt4vqf5Y3N1H1vw7BWCteAqZ2vxAAGn2RlQgJCM00xw?=
+ =?us-ascii?Q?j0NQ6RT8lG3KPnHXBXimIvkWwS86bke/bVKbjOkp1sXuASyguOmWV+AXEdOw?=
+ =?us-ascii?Q?fLw0HFAeoY1QCMsoc4pERYdN7jJfYikvvQ3oo+c6uEOB0iYghYaPJSym+Pgy?=
+ =?us-ascii?Q?DMBQofyCfU121ddz8c7S+eLGCkG0tM/y1XTh1Dh68tjGLTxZ9RhoDyJbOat3?=
+ =?us-ascii?Q?YL6uC1y0NLdokOFIBos508qGQPqhwwYjei8PjufFyzW4RJ0wYesrC7PHEpml?=
+ =?us-ascii?Q?Xj7qpgE1MK66rw66+ClQFwYS69NRAj1ysfFTbMHHperGHumupOTzc/bbmTsJ?=
+ =?us-ascii?Q?gzsutN0d794cyT3IWqUnb2Ah1c6D+j7all4/Kdp/op7Cy+vu4cyKc8NNv98n?=
+ =?us-ascii?Q?w0k+9kt+YiNwUQ2WIJnFnUwkdUGEnOVTXjloBwquNFklerup87bKqdvUrWXc?=
+ =?us-ascii?Q?S9IrZoIgoSSXntw82FFNGM1j+3/eg/do4FyvHpT/i1t2GdB+E2QxqcbIEKdK?=
+ =?us-ascii?Q?81dmzLxju5i+AcZOXTNLPWMjQMSNVQ/QuhdAAi/R0Jy9Bd0jczbHs6X+hpfT?=
+ =?us-ascii?Q?TD2L3rBJt1PNlWKrNiMJPfFpslov9389KD1OqaZG42hJWezA3rxhpDb6p5ZI?=
+ =?us-ascii?Q?ZGL5ex5/MGUasd188DLcSK0p91GOtVkmgwpiC8cWiz9XUpXeVS0ApkKDlpkb?=
+ =?us-ascii?Q?Tay5AcwHmL5/Q0iHwXQtpExIJFkDp0wkV9Tm/qFePte79CC8O0i3EWgVqdvs?=
+ =?us-ascii?Q?z2JO445RQIbqa49iQIW0OSINDUXTxDAcY6GgchWefpqzJT9sKmIs+aY0K5iF?=
+ =?us-ascii?Q?L6G0UfyHxWOy6L4ug/pHdTewVr5/AWbPgVIYDBpY2huJ4wI4+Eo1o+QYfu53?=
+ =?us-ascii?Q?5J6lUWm/7Uujg7YcJOYL+0Kwqjf9rn1m8u2BpQsTWUl7lVeaU8cAwnF1v49m?=
+ =?us-ascii?Q?QkButYQ3Yfb12oNEPBr52vMJGARiK5tV6d0YiCWGKiXBNmD6irUO9an6yy0U?=
+ =?us-ascii?Q?9bcKsAmJbR/PNSekgZgANfCd1YWPXh/o5wzTldpqhugLT3slt/koF4bVcX8U?=
+ =?us-ascii?Q?lOHOPdgOS5xUd4OL60NuAa32fLAt0mL4dBWfpVW5S9KLGP7S3rsos2aLDkoW?=
+ =?us-ascii?Q?50B8rw6nEHM3eU1TcvOXjgt/VpjtciZHhINUXi2LbN3dkJdtjB8nSuCXqQ7V?=
+ =?us-ascii?Q?vtHnVwoAsMyhiWzZOG8xkdR+6dJ6qflxdeYI71tOh2xlbGRU9jCPvBC07q6T?=
+ =?us-ascii?Q?l/1F/pd/h2cH5q3DMA0rSU5fL/J2zig8a5GKOswkPqI+TPev5MV4ywSNHyR4?=
+ =?us-ascii?Q?XdL4jIf/K+x2CiSx4wWdGxLrcw75sMTIIwQhPvUrnGxDqXHUfF1rLzQNne0P?=
+ =?us-ascii?Q?buN5MiynuVZQyYITKLP94Yc8fJrAw+30Gkc4AgVWJ/Pph68QdeCfQIMGv0pQ?=
+ =?us-ascii?Q?zsSpVOlClA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+X-OriginatorOrg: microchip.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DSWPR11MB9715.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fcf23763-a3a3-4954-7152-08ded8e4fe12
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jul 2026 09:25:15.9914
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: R1FiVT7K9/kIhkJCJ889e3nXcUtELxellSjkGLN1AfOzVYJJg/QxYWhE8yKi8fii6etAy4+rHfywbTunDy7FgqAUJ7r4EtVn7TDHZbqlRhk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB6049
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-304466-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-304470-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[Thangaraj.S@microchip.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[Thangaraj.S@microchip.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:nb@tipi-net.de,m:enrico.pozzobon@dissecto.com,m:UNGLinuxDriver@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:Woojung.Huh@microchip.com,m:netdev@vger.kernel.org,m:linux-usb@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:javen_xu@realsil.com.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[realsil.com.cn:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[realsil.com.cn:from_mime,realsil.com.cn:email,realsil.com.cn:mid,realsil.com.cn:dkim,vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,microchip.com:from_mime,microchip.com:dkim,tipi-net.de:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,DSWPR11MB9715.namprd11.prod.outlook.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B21B3700B30
+X-Rspamd-Queue-Id: B69CB700AF5
 
-From: Javen Xu <javen_xu@realsil.com.cn>
+Hi Nicolai,
 
-RTL8127 ATF is a 10G SFP mode of RTL8127. Like RTL8116af, it has no
-internal phy, so phylink uses a pcs to get the link status from the
-serdes registers instead of standard phy registers.
-
-The interface mode is PHY_INTERFACE_MODE_10GBASER. rtl_mac_select_pcs()
-returns tp->pcs for it, and the serdes is configured for 10G in
-pcs_config() via r8127_sfp_init_10g(). Speed and duplex are hardcoded
-to 10Gbps Full-Duplex.
-
-Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
----
-Changes in v3:
- - No changes. New file.
-
-Changes in v4:
- - remove DUMMY_PHY in driver/net/phy/realtek/realtek_main.c and related
-   function
----
- drivers/net/ethernet/realtek/r8169_main.c | 80 ++++++++++-------------
- drivers/net/phy/realtek/realtek_main.c    | 53 ---------------
- include/net/phy/realtek_phy.h             |  7 --
- 3 files changed, 35 insertions(+), 105 deletions(-)
- delete mode 100644 include/net/phy/realtek_phy.h
-
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 0dd805f0d613..26d96edb3c42 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -102,6 +102,7 @@
- #define OCP_SDS_DATA_REG		0xEB14
- #define SDS_CMD_READ			0x0001
- #define RTL_SDS_C22_BASE		0x40
-+#define RTL_SDS_C45_BASE		0x0080
- #define RTL_PKG_DETECT			0xdc00
- #define RTL_PKG_DETECT_MASK		0x0078
- #define RTL_PKG_DETECT_8116AF		0x0030
-@@ -1158,10 +1159,6 @@ static int r8168_phy_ocp_read(struct rtl8169_private *tp, u32 reg)
- 	if (rtl_ocp_reg_failure(reg))
- 		return 0;
- 
--	/* Return dummy MII_PHYSID2 in SFP mode to match SFP PHY driver */
--	if (tp->sfp_mode == RTL_SFP_8127_ATF && reg == (OCP_STD_PHY_BASE + 2 * MII_PHYSID2))
--		return PHY_ID_RTL_DUMMY_SFP & 0xffff;
--
- 	RTL_W32(tp, GPHY_OCP, reg << 15);
- 
- 	return rtl_loop_wait_high(tp, &rtl_ocp_gphy_cond, 25, 10) ?
-@@ -1247,12 +1244,6 @@ static void r8127_sfp_init_10g(struct rtl8169_private *tp)
- 	r8168_phy_ocp_write(tp, 0xc804, (val & ~0x000f) | 0x000c);
- }
- 
--static void rtl_sfp_init(struct rtl8169_private *tp)
--{
--	if (tp->mac_version == RTL_GIGA_MAC_VER_80)
--		r8127_sfp_init_10g(tp);
--}
--
- static void rtl_sfp_reset(struct rtl8169_private *tp)
- {
- 	if (tp->mac_version == RTL_GIGA_MAC_VER_80)
-@@ -2442,30 +2433,8 @@ static int rtl8169_set_link_ksettings(struct net_device *ndev,
- 				      const struct ethtool_link_ksettings *cmd)
- {
- 	struct rtl8169_private *tp = netdev_priv(ndev);
--	struct phy_device *phydev = tp->phydev;
--	int duplex = cmd->base.duplex;
--	int speed = cmd->base.speed;
--
--	if (tp->sfp_mode != RTL_SFP_8127_ATF)
--		return phylink_ethtool_ksettings_set(tp->phylink, cmd);
--
--	if (cmd->base.autoneg != AUTONEG_DISABLE)
--		return -EINVAL;
- 
--	if (!phy_check_valid(speed, duplex, phydev->supported))
--		return -EINVAL;
--
--	mutex_lock(&phydev->lock);
--
--	phydev->autoneg = AUTONEG_DISABLE;
--	phydev->speed = speed;
--	phydev->duplex = duplex;
--
--	rtl_sfp_init(tp);
--
--	mutex_unlock(&phydev->lock);
--
--	return 0;
-+	return phylink_ethtool_ksettings_set(tp->phylink, cmd);
- }
- 
- static int rtl8169_nway_reset(struct net_device *dev)
-@@ -2614,9 +2583,6 @@ static void rtl8169_init_phy(struct rtl8169_private *tp)
- 	    tp->pci_dev->subsystem_device == 0xe000)
- 		phy_write_paged(tp->phydev, 0x0001, 0x10, 0xf01b);
- 
--	if (tp->sfp_mode == RTL_SFP_8127_ATF)
--		rtl_sfp_init(tp);
--
- 	/* We may have called phy_speed_down before */
- 	phy_speed_up(tp->phydev);
- 
-@@ -5036,7 +5002,7 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
- 	if (status & LinkChg) {
- 		if (tp->phydev)
- 			phy_mac_interrupt(tp->phydev);
--		else if (tp->sfp_mode == RTL_SFP_8168_AF)
-+		else if (tp->sfp_mode)
- 			phylink_mac_change(tp->phylink,
- 					   !!(RTL_R8(tp, PHYstatus) & LinkStatus));
- 	}
-@@ -5767,7 +5733,8 @@ static struct phylink_pcs *rtl_mac_select_pcs(struct phylink_config *config,
- 	if (!tp->pcs.ops)
- 		return NULL;
- 
--	if (interface == PHY_INTERFACE_MODE_1000BASEX)
-+	if (interface == PHY_INTERFACE_MODE_1000BASEX ||
-+	    interface == PHY_INTERFACE_MODE_10GBASER)
- 		return &tp->pcs;
- 
- 	return NULL;
-@@ -5797,12 +5764,28 @@ static void rtl8169_pcs_get_state(struct phylink_pcs *pcs,
- 				  struct phylink_link_state *state)
- {
- 	struct rtl8169_private *tp = container_of(pcs, struct rtl8169_private, pcs);
--	u16 bmsr, lpa;
- 
--	bmsr = rtl8169_sds_read(tp, RTL_SDS_C22_BASE + MII_BMSR);
--	lpa = rtl8169_sds_read(tp, RTL_SDS_C22_BASE + MII_LPA);
-+	if (tp->sfp_mode == RTL_SFP_8127_ATF) {
-+		u16 stat1;
-+
-+		stat1 = rtl8169_sds_read(tp, RTL_SDS_C45_BASE + MDIO_STAT1);
-+
-+		if (!(stat1 & MDIO_STAT1_LSTATUS))
-+			stat1 = rtl8169_sds_read(tp, RTL_SDS_C45_BASE + MDIO_STAT1);
-+
-+		state->link = !!(stat1 & MDIO_STAT1_LSTATUS);
-+		if (!state->link)
-+			return;
- 
--	phylink_mii_c22_pcs_decode_state(state, neg_mode, bmsr, lpa);
-+		state->duplex = DUPLEX_FULL;
-+		state->speed = SPEED_10000;
-+	} else {
-+		u16 bmsr, lpa;
-+
-+		bmsr = rtl8169_sds_read(tp, RTL_SDS_C22_BASE + MII_BMSR);
-+		lpa = rtl8169_sds_read(tp, RTL_SDS_C22_BASE + MII_LPA);
-+		phylink_mii_c22_pcs_decode_state(state, neg_mode, bmsr, lpa);
-+	}
- }
- 
- static int rtl8169_pcs_config(struct phylink_pcs *pcs, unsigned int mode,
-@@ -5810,6 +5793,11 @@ static int rtl8169_pcs_config(struct phylink_pcs *pcs, unsigned int mode,
- 			      const unsigned long *advertising,
- 			      bool permit_pause_to_mac)
- {
-+	struct rtl8169_private *tp = container_of(pcs, struct rtl8169_private, pcs);
-+
-+	if (tp->sfp_mode == RTL_SFP_8127_ATF)
-+		r8127_sfp_init_10g(tp);
-+
- 	return 0;
- }
- 
-@@ -5855,7 +5843,7 @@ static unsigned long rtl8169_get_lpi_caps(struct rtl8169_private *tp)
- {
- 	unsigned long caps = 0;
- 
--	if (!rtl_supports_eee(tp))
-+	if (!rtl_supports_eee(tp) || tp->sfp_mode == RTL_SFP_8127_ATF)
- 		return 0;
- 
- 	caps |= MAC_100FD | MAC_1000FD;
-@@ -5899,7 +5887,9 @@ static int rtl_init_phylink(struct rtl8169_private *tp)
- 		tp->phylink_config.mac_capabilities |= MAC_1000FD;
- 		break;
- 	case RTL_SFP_8127_ATF:
--		phy_mode = PHY_INTERFACE_MODE_INTERNAL;
-+		tp->pcs.ops = &r8169_pcs_ops;
-+		phy_mode = PHY_INTERFACE_MODE_10GBASER;
-+		tp->phylink_config.default_an_inband = true;
- 		tp->phylink_config.mac_capabilities |= MAC_10000FD;
- 		break;
- 	default:
-@@ -6129,7 +6119,7 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	if (rc)
- 		return rc;
- 
--	if (tp->sfp_mode != RTL_SFP_8168_AF) {
-+	if (tp->sfp_mode == RTL_SFP_NONE) {
- 		rc = r8169_mdio_register(tp);
- 		if (rc) {
- 			phylink_destroy(tp->phylink);
-diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index b65d0f5fa1a0..7f904de583e0 100644
---- a/drivers/net/phy/realtek/realtek_main.c
-+++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -2646,45 +2646,6 @@ static irqreturn_t rtl8221b_handle_interrupt(struct phy_device *phydev)
- 	return IRQ_HANDLED;
- }
- 
--static int rtlgen_sfp_get_features(struct phy_device *phydev)
--{
--	linkmode_set_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
--			 phydev->supported);
--
--	/* set default mode */
--	phydev->speed = SPEED_10000;
--	phydev->duplex = DUPLEX_FULL;
--
--	phydev->port = PORT_FIBRE;
--
--	return 0;
--}
--
--static int rtlgen_sfp_read_status(struct phy_device *phydev)
--{
--	int val, err;
--
--	err = genphy_update_link(phydev);
--	if (err)
--		return err;
--
--	if (!phydev->link)
--		return 0;
--
--	val = phy_read(phydev, RTL_PHYSR);
--	if (val < 0)
--		return val;
--
--	rtlgen_decode_physr(phydev, val);
--
--	return 0;
--}
--
--static int rtlgen_sfp_config_aneg(struct phy_device *phydev)
--{
--	return 0;
--}
--
- static struct phy_driver realtek_drvs[] = {
- 	{
- 		PHY_ID_MATCH_EXACT(0x00008201),
-@@ -2934,20 +2895,6 @@ static struct phy_driver realtek_drvs[] = {
- 		.write_page	= rtl821x_write_page,
- 		.read_mmd	= rtl822x_read_mmd,
- 		.write_mmd	= rtl822x_write_mmd,
--	}, {
--		PHY_ID_MATCH_EXACT(PHY_ID_RTL_DUMMY_SFP),
--		.name		= "Realtek SFP PHY Mode",
--		.flags		= PHY_IS_INTERNAL,
--		.probe		= rtl822x_probe,
--		.get_features	= rtlgen_sfp_get_features,
--		.config_aneg	= rtlgen_sfp_config_aneg,
--		.read_status	= rtlgen_sfp_read_status,
--		.suspend	= genphy_suspend,
--		.resume		= rtlgen_resume,
--		.read_page	= rtl821x_read_page,
--		.write_page	= rtl821x_write_page,
--		.read_mmd	= rtl822x_read_mmd,
--		.write_mmd	= rtl822x_write_mmd,
- 	}, {
- 		PHY_ID_MATCH_EXACT(0x001ccad0),
- 		.name		= "RTL8224 2.5Gbps PHY",
-diff --git a/include/net/phy/realtek_phy.h b/include/net/phy/realtek_phy.h
-deleted file mode 100644
-index d683bc1b0659..000000000000
---- a/include/net/phy/realtek_phy.h
-+++ /dev/null
-@@ -1,7 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--#ifndef _REALTEK_PHY_H
--#define _REALTEK_PHY_H
--
--#define	PHY_ID_RTL_DUMMY_SFP	0x001ccbff
--
--#endif /* _REALTEK_PHY_H */
--- 
-2.43.0
-
+> AFAIU the findings from Sashiko [1] on v1 are either false positives or p=
+re-
+> existing issues unrelated to this change, so LGTM.
+>=20
+> @Thangaraj / maintainers:
+> The mails to Rengarajan are bouncing since a few series - does the
+> MAINTAINERS entry need an update?
+>=20
+[Thangaraj Samynathan] Yes, Rengarajan has left Microchip. His name needs
+to be removed from maintainer.=20
+> Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
+>=20
+Thanks,
+Thangaraj Samynathan - I53494
 
