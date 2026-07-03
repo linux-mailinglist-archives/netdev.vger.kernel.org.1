@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-304428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304429-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id BMiqDzpqR2rZXwAAu9opvQ
-	(envelope-from <netdev+bounces-304428-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:52:26 +0200
+	id /yjfLGJqR2rkXwAAu9opvQ
+	(envelope-from <netdev+bounces-304429-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:53:06 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2A336FFC3E
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:52:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 005066FFC4D
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:53:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=padl.com header.s=default header.b=QREQeZRm;
+	dkim=pass header.d=padl.com header.s=default header.b="zP0xZ24/";
 	dmarc=pass (policy=reject) header.from=padl.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304428-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304428-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304429-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304429-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 07CCF30C24E4
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 07:47:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 217AB30CCB8E
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 07:47:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0F7936E48D;
-	Fri,  3 Jul 2026 07:47:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90A2C370ACD;
+	Fri,  3 Jul 2026 07:47:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from us.padl.com (us.padl.com [216.154.215.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746AC36E493;
-	Fri,  3 Jul 2026 07:47:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258BD36E47A;
+	Fri,  3 Jul 2026 07:47:20 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783064836; cv=none; b=HDJ7q8R4LwCGWYrJUPFWWrgBBDLmOs9cCO36FSLd1CLv7zPL1N5iIe+dnsrWHjIrEVn0Ds26MxCLHKckm29x/UsCfQcnueVti1a9PqyCYieAv7ECLvAzHA3wwlL/K9L+3FSLBIsrmtv4iXEGHq0jCd+Qy0uSYMTL6mgJDt/w4N4=
+	t=1783064841; cv=none; b=dzXf2v/3sKIKPUGnmAWJKx/6MVc3FwqBYPb3By5zvU//JuA8aEH5B0rc/2aR6wSc5u2mWnGBlBXzGUaGQsHSNfifr3UBIWsEjRqX+0OzIzEkhAv6dnQjkLxLTIkGqJGJPQcZUNqFEafWDuLnqvnPE7oZjsYALh/luxJsxH3RGPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783064836; c=relaxed/simple;
-	bh=UtX+rnVxCFQjBJAeDBA77t0nlZ5Yl2mdZFKHUOYt9bQ=;
+	s=arc-20240116; t=1783064841; c=relaxed/simple;
+	bh=1/CXYLygFfSGiImNSMUDbUscII26rhZ1NOaf0/xa+5Q=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Z1trNv7FXj5uTlHendXtOvCxNnoRHHQoqDV2sbVVfrwnZ7A1j2g6MBcSfab88HUmyQH+MW+JqiLWLfZKu/dJllhf0I21T9+RToTWLoah86JN5GH1JteD8y70WDmxzPydRVK6x4J0tJ96N6yD7H67fqTPahSPPLC0zsIwoLukKsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=QREQeZRm; arc=none smtp.client-ip=216.154.215.154
+	 In-Reply-To:To:Cc; b=MAE8Mn59VlVQyNO2HmfeKPb5c/YN1YnobPcFNO2ICN6hQG2jaqu3gupEFJZbT9wqfl9LSxQcdu9TqQkxaxTQxOJLrFbv2uE7n8kvdeALr2nUdN8BRKpA2Tf1MQWNXv5d9Yjd0idWtnDuNCwv/ZH6ePuKgXse+FWfX1FajB+NQ9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=zP0xZ24/; arc=none smtp.client-ip=216.154.215.154
 Received: from [127.0.1.1] (border.lukktone.com [139.130.100.52])
-	by us.padl.com (Postfix) with ESMTPSA id B7A0960C04;
-	Fri,  3 Jul 2026 03:47:10 -0400 (EDT)
+	by us.padl.com (Postfix) with ESMTPSA id 4C0C060C0B;
+	Fri,  3 Jul 2026 03:47:15 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=padl.com; s=default;
-	t=1783064834; bh=mKhbLXywwOD2VGYD12Jk5gTk2yEHSOolJGcEBp5BAtE=;
+	t=1783064839; bh=8TIjk6Pnyvlv5Fo93rKGV8mOYnXt33g6tJwvmNEhSLI=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=QREQeZRmJvKPzPfL7OIa7iQfhlcTdfomaHH8WJBV/1VGgi7B+qjQdn+xGg8XBONKw
-	 nADrmxhWlcOCu+rr6jse+QWHydqqlPd2+BhBSq8W0jfPJFQY6Yd1GF/YEvp8e979F4
-	 zgcSn74OHEbsi13hCRfEGUpWHWBCLe1jwnlell95ydWcSIJDEnoi1CAZsbIOzmN2h7
-	 df6/cBSNj89KGD8Z+3UXLY0SYJz/cN1iLbjIzBGvjrjNGRAwiPpnNsWFlwN+HhNDlx
-	 +OpEbUORHNWw2WNS8H/zz9OeawCnG+ojrjZyGWUjaCouSOGNY9avzI+PS8/tP3wA0d
-	 l0L1wp6sunVAQ==
+	b=zP0xZ24/rReJlusdKgeohS3sqQ9jjEGhvCD2YDLSRpSQKjwoJiHuH3IDO8f9KNmoL
+	 RFT+wxL8j9/uivPl5n7L4es50wfPlCUQzK6DcbtujYYRjay3vPr2DIk9NxQPlNwMKK
+	 NoawHePExS8uW8e2BsnkCAUkZXwNmJeZk2ROR6toBq95vXZ2/JPsMyqOMcRzWqXhh+
+	 qriUy5owvaUcnN8w6YO7L5G/XdVbYVUgBub8/D5QtoHZu02tV2Inh++RvkL3Def9AV
+	 XUhS0FrXyVYo8lDNTu0TsR/U7WAxh0lmoCFsOBkuyyT0B8FsCpHvtzSz9iRUwS+5Vl
+	 Q4dsT7JlsWbNg==
 From: Luke Howard <lukeh@padl.com>
-Date: Fri, 03 Jul 2026 17:46:41 +1000
-Subject: [PATCH net-next 07/17] net: dsa: mv88e6xxx: Add
- connect_tag_protocol handler
+Date: Fri, 03 Jul 2026 17:46:42 +1000
+Subject: [PATCH net-next 08/17] net: dsa: mv88e6xxx: Add sanity check of
+ received RMU frame
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,7 +58,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260703-net-next-mv88e6xxx-rmu-v1-7-991a27d78bca@padl.com>
+Message-Id: <20260703-net-next-mv88e6xxx-rmu-v1-8-991a27d78bca@padl.com>
 References: <20260703-net-next-mv88e6xxx-rmu-v1-0-991a27d78bca@padl.com>
 In-Reply-To: <20260703-net-next-mv88e6xxx-rmu-v1-0-991a27d78bca@padl.com>
 To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
@@ -74,11 +74,11 @@ Cc: Cedric Jehasse <cedric.jehasse@gmail.com>,
  Mattias Forsblad <mattias.forsblad@gmail.com>, netdev@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Luke Howard <lukeh@padl.com>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1783064798; l=2891;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1783064798; l=3899;
  i=lukeh@padl.com; s=20260701; h=from:subject:message-id;
- bh=RQETTvt3i6TyYXYwmalAOn2+jY5l3ulKJa1Vr+1qbmA=;
- b=cRVX46GejgSKmrmdukgWE7AlfYBQ6E9+k7hK2S7kT5yoISikZ76FPp/VooAenYk/oFj9l2E3U
- uWVjI++txY4CdJGPFflXTeLob+5n6EJYWyCxpKY+sWqHWuzOsx5dafa
+ bh=qgr39fMhvgTTz3ETrk/OjFwMcglv2wp3SlYztlqJUvg=;
+ b=McqwKq4ncg+wxqc227cpiU6hSHqyPotZFT9Fg5Lvyqmgbolrl1Ke0QFmYfS0s1Xuaq/2Wh64F
+ s9tMZBc3sfsCNrJJrJlW4NaZEB/yrQQZtJrhiiG8oPCd01Vyb1mlJSI
 X-Developer-Key: i=lukeh@padl.com; a=ed25519;
  pk=D6YgUnH9/OzSZsduYm9XDbvXn1IHDwKwI1hLTsKNRLw=
 X-Rspamd-Action: no action
@@ -87,11 +87,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[padl.com,reject];
 	R_DKIM_ALLOW(-0.20)[padl.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304428-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304429-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
@@ -115,88 +115,123 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,padl.com:from_mime,padl.com:dkim,padl.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,padl.com:from_mime,padl.com:email,padl.com:mid,padl.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A2A336FFC3E
+X-Rspamd-Queue-Id: 005066FFC4D
 
 From: Andrew Lunn <andrew@lunn.ch>
 
-When the tagging protocol handler is attached to the DSA driver, it
-can validate it is a supported tagging protocol. It can also setup
-data shared between the tagger and the switch driver. Ensure a Mavell
-DSA tagger is being connected, and setup the handler from RMU in the
-shared data. At this point, the handler is just an empty stub, but
-later patches will add the needed functionality.
+The received RMU frame is expected to be addressed to the MAC address
+of the master interface. The sequence number should also match. Two
+formats codes are accepted. Add these basic sanity checks, and drop
+the frame is they are incorrect.  To aid sequence number checking
+introduce the use of the DSA inband helpers and its data structures.
 
 Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Luke Howard <lukeh@padl.com>
 ---
- drivers/net/dsa/mv88e6xxx/chip.c | 18 ++++++++++++++++++
- drivers/net/dsa/mv88e6xxx/rmu.c  |  6 ++++++
- drivers/net/dsa/mv88e6xxx/rmu.h  |  3 +++
- 3 files changed, 27 insertions(+)
+ drivers/net/dsa/mv88e6xxx/chip.c |  2 ++
+ drivers/net/dsa/mv88e6xxx/chip.h |  1 +
+ drivers/net/dsa/mv88e6xxx/rmu.c  | 42 ++++++++++++++++++++++++++++++++++++++++
+ drivers/net/dsa/mv88e6xxx/rmu.h  |  9 +++++++++
+ 4 files changed, 54 insertions(+)
 
 diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 72c93cb84b7e1..fe0d0eb8f0813 100644
+index fe0d0eb8f0813..88cc2326ecc0c 100644
 --- a/drivers/net/dsa/mv88e6xxx/chip.c
 +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -7183,6 +7183,23 @@ static int mv88e6xxx_crosschip_lag_leave(struct dsa_switch *ds, int sw_index,
- 	return err_sync ? : err_pvt;
- }
+@@ -7462,6 +7462,8 @@ static int mv88e6xxx_probe(struct mdio_device *mdiodev)
+ 	if (err)
+ 		goto out_g1_atu_prob_irq;
  
-+static int mv88e6xxx_connect_tag_protocol(struct dsa_switch *ds,
-+					  enum dsa_tag_protocol proto)
-+{
-+	struct dsa_tagger_data *tagger_data = ds->tagger_data;
++	dsa_inband_init(&chip->rmu_inband, U8_MAX);
 +
-+	switch (proto) {
-+	case DSA_TAG_PROTO_DSA:
-+	case DSA_TAG_PROTO_EDSA:
-+		tagger_data->rmu_frame2reg = mv88e6xxx_rmu_frame2reg_handler;
-+		break;
-+	default:
-+		return -EPROTONOSUPPORT;
-+	}
-+
-+	return 0;
-+}
-+
- static const struct phylink_mac_ops mv88e6xxx_phylink_mac_ops = {
- 	.mac_select_pcs		= mv88e6xxx_mac_select_pcs,
- 	.mac_prepare		= mv88e6xxx_mac_prepare,
-@@ -7255,6 +7272,7 @@ static const struct dsa_switch_ops mv88e6xxx_switch_ops = {
- 	.crosschip_lag_join	= mv88e6xxx_crosschip_lag_join,
- 	.crosschip_lag_leave	= mv88e6xxx_crosschip_lag_leave,
- 	.conduit_state_change	= mv88e6xxx_rmu_conduit_state_change,
-+	.connect_tag_protocol	= mv88e6xxx_connect_tag_protocol,
+ 	err = mv88e6xxx_register_switch(chip);
+ 	if (err)
+ 		goto out_g1_vtu_prob_irq;
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
+index 76958b588a908..940ae698659fc 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.h
++++ b/drivers/net/dsa/mv88e6xxx/chip.h
+@@ -460,6 +460,7 @@ struct mv88e6xxx_chip {
+ 
+ 	/* Remote Management Unit state. */
+ 	struct net_device *rmu_conduit;
++	struct dsa_inband rmu_inband;
  };
  
- static int mv88e6xxx_register_switch(struct mv88e6xxx_chip *chip)
+ #define TCAM_MATCH_SIZE 96
 diff --git a/drivers/net/dsa/mv88e6xxx/rmu.c b/drivers/net/dsa/mv88e6xxx/rmu.c
-index 64e93e2eaf550..bae0ca6564f7a 100644
+index bae0ca6564f7a..49d67d512fb0f 100644
 --- a/drivers/net/dsa/mv88e6xxx/rmu.c
 +++ b/drivers/net/dsa/mv88e6xxx/rmu.c
-@@ -48,3 +48,9 @@ void mv88e6xxx_rmu_conduit_state_change(struct dsa_switch *ds,
- out:
- 	mv88e6xxx_reg_unlock(chip);
- }
+@@ -53,4 +53,46 @@ void mv88e6xxx_rmu_frame2reg_handler(struct dsa_switch *ds,
+ 				     struct sk_buff *skb,
+ 				     u8 seqno)
+ {
++	struct mv88e6xxx_rmu_header *rmu_header;
++	struct mv88e6xxx_chip *chip = ds->priv;
++	struct net_device *conduit;
++	unsigned char *ethhdr;
++	u8 expected_seqno;
 +
-+void mv88e6xxx_rmu_frame2reg_handler(struct dsa_switch *ds,
-+				     struct sk_buff *skb,
-+				     u8 seqno)
-+{
-+}
++	/* Check received destination MAC is the conduit MAC address */
++	conduit = READ_ONCE(chip->rmu_conduit);
++	if (!conduit)
++		goto drop;
++
++	ethhdr = skb_mac_header(skb);
++	if (!ether_addr_equal(conduit->dev_addr, ethhdr)) {
++		dev_dbg_ratelimited(ds->dev, "RMU: mismatched MAC address for request: rx %pM expecting %pM\n",
++				    ethhdr, conduit->dev_addr);
++		goto drop;
++	}
++
++	expected_seqno = dsa_inband_seqno(&chip->rmu_inband);
++	if (seqno != expected_seqno) {
++		dev_dbg_ratelimited(ds->dev, "RMU: mismatched seqno for request: rx %d expecting %d\n",
++				    seqno, expected_seqno);
++		goto drop;
++	}
++
++	if (skb->len < 4 + sizeof(*rmu_header)) {
++		dev_dbg_ratelimited(ds->dev, "RMU: response too short (%d bytes)\n",
++				    skb->len);
++		dsa_inband_complete(&chip->rmu_inband, NULL, 0, -ETIMEDOUT);
++		goto drop;
++	}
++
++	rmu_header = (struct mv88e6xxx_rmu_header *)(skb->data + 4);
++	if (rmu_header->format != MV88E6XXX_RMU_RESP_FORMAT_1 &&
++	    rmu_header->format != MV88E6XXX_RMU_RESP_FORMAT_2) {
++		dev_dbg_ratelimited(ds->dev, "RMU: invalid format: rx %d\n",
++				    be16_to_cpu(rmu_header->format));
++		goto drop;
++	}
++
++drop:
++	return;
+ }
 diff --git a/drivers/net/dsa/mv88e6xxx/rmu.h b/drivers/net/dsa/mv88e6xxx/rmu.h
-index 71c4fc1d4113f..c60f32480e317 100644
+index c60f32480e317..69cd3c2636f3d 100644
 --- a/drivers/net/dsa/mv88e6xxx/rmu.h
 +++ b/drivers/net/dsa/mv88e6xxx/rmu.h
-@@ -12,4 +12,7 @@
+@@ -9,6 +9,15 @@
+ #ifndef _MV88E6XXX_RMU_H_
+ #define _MV88E6XXX_RMU_H_
+ 
++#define MV88E6XXX_RMU_RESP_FORMAT_1		htons(0x0001)
++#define MV88E6XXX_RMU_RESP_FORMAT_2		htons(0x0002)
++
++struct mv88e6xxx_rmu_header {
++	__be16 format;
++	__be16 prodnr;
++	__be16 code;
++} __packed;
++
  void mv88e6xxx_rmu_conduit_state_change(struct dsa_switch *ds,
  					const struct net_device *conduit,
  					bool operational);
-+void mv88e6xxx_rmu_frame2reg_handler(struct dsa_switch *ds,
-+				     struct sk_buff *skb,
-+				     u8 seqno);
- #endif /* _MV88E6XXX_RMU_H_ */
 
 -- 
 2.43.0
