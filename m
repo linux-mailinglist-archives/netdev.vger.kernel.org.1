@@ -1,332 +1,232 @@
-Return-Path: <netdev+bounces-304646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304650-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id WdptAkz8R2oyigAAu9opvQ
-	(envelope-from <netdev+bounces-304646-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 20:15:40 +0200
+	id t5+iBhj/R2o2iwAAu9opvQ
+	(envelope-from <netdev+bounces-304650-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 20:27:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74DAB704D14
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 20:15:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63B2B704ECC
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 20:27:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=cisco.com header.s=iport01 header.b=MpkZQ+AT;
-	dmarc=pass (policy=reject) header.from=cisco.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304646-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-304646-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b=G4qSAURq;
+	dmarc=pass (policy=none) header.from=intel.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304650-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304650-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8DC3330B912A
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 18:10:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D430A3021E91
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 18:18:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E23DB3290B9;
-	Fri,  3 Jul 2026 18:09:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05D7430E0D5;
+	Fri,  3 Jul 2026 18:18:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rcdn-iport-8.cisco.com (rcdn-iport-8.cisco.com [173.37.86.79])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020CB31353C;
-	Fri,  3 Jul 2026 18:09:25 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783102167; cv=none; b=iO24B9FEufs9QoW8+BK8GlgBbeO2NYtm61CarJK5Aa1aZBYL6OhjKLkd/F/JxkWOwK8ZhdPX9ZZRfjAuC2b+6SPkYM2A5C9Yp3l0nuVmGW3O7+j9wJNlsZAoXKHBW3LIbLYCpAOymU4FRB5VZTOTxQTPuWuoYivEMt2KtldmMcA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783102167; c=relaxed/simple;
-	bh=FdWRKYYtk0FuUUegGgtNhjQIkPVlYiHEZ4/j6/h3dCk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Pj91er26SsGaBVPhLWCZEADAjQskNViM1bIbWJ16uKI8puX7/bsZ3zYU8s/azscr1hapRj0t3YfP9mmDiR6ohTZXnaNgjUXxsI0Iw0mE9LgU+9xB0VsWh+7mzAWSYwMBlGGebeqONfE66CZGESWJLNDesXaQXfL/5A/K13OX9dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (2048-bit key) header.d=cisco.com header.i=@cisco.com header.b=MpkZQ+AT; arc=none smtp.client-ip=173.37.86.79
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=cisco.com; i=@cisco.com; l=6579; q=dns/txt;
-  s=iport01; t=1783102166; x=1784311766;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=r7xz+wdOM2LeRCY3jPvIhQ2Pkga6rs6A23prvlcG3s0=;
-  b=MpkZQ+ATSNQqfyV+abRIqZWzaArwfkpM8qM7GahorrlLpVYFbfiVXWgY
-   njzaLiy/nC4fETAQidX+cQ0vxLwvY6PDI2H8IVcT5vrU6w7VM7IBe/ybK
-   vnPxHGg1h/muHZpitQo6xto/86XYTZmW+9ti373wF9bky5Ne914wv2lI3
-   vOvgALdLc3mpAzK/NY49+iMGUnOAy605cgSwqLpfqC4FcUPnPdXCI8hz4
-   5KtCH2WvemW9WR2piYgQPmPrQJYCbat1V+XqStfEzm7osE6K+5FkPenbs
-   Npeqni0O5ez7nG3mY5o07z47zPFXvoqIxSqYsxi/PcKNsR6IV7fp7FC+U
-   w==;
-X-CSE-ConnectionGUID: nY9JYPKWS0ChhHmyS1lI7Q==
-X-CSE-MsgGUID: uqAkR2pjTrGr2m464X2gWg==
-X-IPAS-Result: =?us-ascii?q?A0D8AgBN+kdq/5P/Ja1aHgEBCxIMggULgleBUkNJhFePU?=
- =?us-ascii?q?4Ihnh4UgWoPAQEBD1EEAQGFBgKNSwImNgcOAQIEAwIDAQEBAQEBAQEBAQELA?=
- =?us-ascii?q?QEFAQEBAgEHBYEOE4ZchlsCAQMjBFIQJQImAgJGEAYBEoMCgnQDvAp6fzOBA?=
- =?us-ascii?q?d5DgWYBCxQBgQouhXGCagGBcIQGO4RBJxuBSUSBFYNphCqDdIJqBIMcEpEfC?=
- =?us-ascii?q?T+BAhwDWSwBVRMNCgsHBWFSMwMgCgsSEhgVAhQcEw8EFjIdcAwnEiwXNFgbB?=
- =?us-ascii?q?wWBHYEVMQQhgQSEeSMfAzl/gTB1SnkzgQIBEh4KgVKBJgMLGA1IESw3Bg4bB?=
- =?us-ascii?q?D0BbgeNABcPgUxxATwdNBRoMw6BZh+SRBGDbY1fa4E1n1qEJ4FmoA8BMpdnk?=
- =?us-ascii?q?wWZCCOkN4RogW8GL4FZMxoIGxWDIlMZD44tFhzSHicyPQEBBwIHDgMLgWiRf?=
- =?us-ascii?q?QEB?=
-IronPort-Data: A9a23:ecjbWaLOMalAsxSKFE+REZQlxSXFcZb7ZxGr2PjKsXjdYENS3mBSz
- 2AZUDvQaK6IazH9et0kPYi/9RhSscTXzYVhSlYd+CA2RRqmiyZq6fd1j6vUF3nPRiEWZBs/t
- 63yUvGZcoZsCCSa/kvxWlTYhSEU/bmSQbbhA/LzNCl0RAt1IA8skhsLd9QR2uaEuvDnRVnQ0
- T/Oi5eHYgH9hGYvajh8B5+r8XuDgtyj4Fv0gXRmDRx7lAe2v2UYCpsZOZawIxPQKqFIHvS3T
- vr017qw+GXU5X8FUrtJRZ6iLyXm6paLVeS/oiI+t5qK23CulQRuukoPD8fwXG8M49m/c3+d/
- /0W3XC4YV9B0qQhA43xWTEAe811FfUuFLMqvRFTvOTLp3AqfUcAzN1oPRAUDLU7xd0vKmFO1
- fkJE2kJT0+60rfeLLKTEoGAh+w5J8XteYdasXZ6wHSAVbAtQIvIROPB4towMDUY358VW62BI
- ZBENHw2MEuojx5nYj/7DLollfupnXn8cxVTqUmeouw85G27IAlZjOmzaYeFJ4TXLSlTtluBj
- 2H8pXz7Pgs1LoaalWTZwiijueCayEsXX6pXTtVU7MVCjFSNy2k7BBQIWF6/pvelzEizR7p3J
- kAJ/yM8oLQa+0usQd3wGRa/pRasvQMWUvJTHvc85QXLzbDbiy6QAGQeQyECbtE6uMIobTg30
- FnPlNOBLSRmurCTSFqH+7uUpC/0Mi8QRUcGZCkZXU4G7sPlrYUbkB3CVJBgHbSzg9mzHiv/q
- xiMoTQyiqs7k8EGzeO48ErBjjbqoYLGJjPZ/S3NVW6jqwc8b4m/asnxsR7Q7O1LK8CSSVzpU
- GU4pvVyJdsmVfml/BFhis1SdF11z55p6AHhvGM=
-IronPort-HdrOrdr: A9a23:9laY2aABb8m4qEPlHela55DYdb4zR+YMi2TDGXoBLSC9Ffb4qy
- nOppomPHDP5Qr5NEtLpTnEAtjjfZq+z/FICPcqXYtKNTOO0ACVxcNZnOjfKlbbdxEWmNQtsJ
- tIQuxSBML9CF5igd2/wgWpeuxQueWvweSEifjTynF1QRovUaFv6A9lFh2We3cGIjWufaBJc6
- a0145guyeqf2gRY4CQA3kIWPWGmvjw/aiWGSLvw3UcmXOzZfTC0s+ALySl
-X-Talos-CUID: =?us-ascii?q?9a23=3AdGNzP2hs8xvOfr3WE3c2treZqTJudEyM7kboAHC?=
- =?us-ascii?q?DUU1pSJ2QWGTJ/II7qp87?=
-X-Talos-MUID: =?us-ascii?q?9a23=3A5hrTbg6s99Yoa+w4bTKEXHGCxox1+o2tMhoVk6k?=
- =?us-ascii?q?clNPeMHAuZwfHgwu4F9o=3D?=
-X-IronPort-Anti-Spam-Filtered: true
-X-IronPort-AV: E=Sophos;i="6.25,145,1779148800"; 
-   d="scan'208";a="496158505"
-Received: from rcdn-l-core-10.cisco.com ([173.37.255.147])
-  by rcdn-iport-8.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 03 Jul 2026 18:09:04 +0000
-Received: from [127.0.0.1] (unknown [10.25.130.254])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by rcdn-l-core-10.cisco.com (Postfix) with ESMTPS id E550F180008AC;
-	Fri,  3 Jul 2026 18:09:03 +0000 (GMT)
-From: Satish Kharat <satishkh@cisco.com>
-Date: Fri, 03 Jul 2026 11:09:01 -0700
-Subject: [PATCH net-next v11 12/12] enic: re-establish V2 VF admin channel
- and PF registration after reset
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42432C375A
+	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 18:18:16 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783102701; cv=fail; b=tYp//CHAXndouuwr8IBhLmBHHmr3oAb/BM+28f0e2mKqIOVIwkBJxephnRh5zwREb1/+kIZKaQz3u0aaa3WIuPU6vje6WGJmcaA44Ni9Tu8CizhhLPVdx0mtUGgrhhlFYf36GEI4tErVRrEAKge9RzG5c85LwcyShsReLU+zrtE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783102701; c=relaxed/simple;
+	bh=J+ndoHE6GWfgSGRERdVwktyNQQiSOwqLejkERlbA7JQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=npNsLemZF8Z/wVUVINMhLABgKO6cNjF5YwhJj0Ox4gutOC+tY5Mg0d07JANq1E1yXiQv11gEVCnRs4gOMvMKGT4T2jTR2P21tMIFg8E/ZZToe7dVRcn367aJCiroAk+BNKFp7TxgC/QYT7oKhjp5wrFKQrTRmnZuNDzXlUg1SFQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G4qSAURq; arc=fail smtp.client-ip=198.175.65.18
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1783102696; x=1814638696;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=J+ndoHE6GWfgSGRERdVwktyNQQiSOwqLejkERlbA7JQ=;
+  b=G4qSAURqKz45AYcMF0yEp28Ev3bFKSdOwIMH9aZmnEe4qE2NJnGMf/+h
+   c83ghB0qF3h4JOwZW4tuByg8Whzkumtjfk3Wp8MTxYXj6Ex+Vz0WCxm3o
+   +fpvR86Yim3n9DpETKoBGVnU8CUB6f8GhRcFOD0WB7Y3lTDvq5as0ijP0
+   QHbYpBnkpCeOo/BbvPIMgDVu7GM+1E+/OHrcLuEAoop2Nh3pNdFRtn2Vu
+   XF4YvUQkplJBOnFFBwkBsnQMJCEowK+6ipEGPApdrmnFQI2tgjk1zs0lv
+   J/lnekFHUyrsfo4N7uBo17V3mJ2aRMgIITBn/dCMcUmebYidyiOvfHE9N
+   g==;
+X-CSE-ConnectionGUID: 3JcvA6PeQqO3H94PMiNFAQ==
+X-CSE-MsgGUID: kv1EBsqUT3GUoPQx3g07uQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11836"; a="83948695"
+X-IronPort-AV: E=Sophos;i="6.25,145,1779174000"; 
+   d="scan'208";a="83948695"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2026 11:18:16 -0700
+X-CSE-ConnectionGUID: +7EWBAESTui0QwFzg+F5Rg==
+X-CSE-MsgGUID: GC7Xrc16RDWyJK3WIuL+VA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,145,1779174000"; 
+   d="scan'208";a="252697910"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2026 11:18:16 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Fri, 3 Jul 2026 11:18:15 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43 via Frontend Transport; Fri, 3 Jul 2026 11:18:15 -0700
+Received: from CH4PR04CU002.outbound.protection.outlook.com (40.107.201.12) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Fri, 3 Jul 2026 11:18:15 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jiJ1o8JBwrj6KD0QCib4u2bGC6U1PI5Tozg6MTkkugc3tCfdKCjpo3gl+4KL5KC/iqNJizM58Atdledk0aHGPsHw5nu8iBt7QFjJxJnkjnwzZn168ZHGrbTZT3ZoTt+1LI2bPxPrgZ45cM2YePb7HOb5wIjt5EFL5obU911Dpsfx6hlcpDntjI2LU1GqNKp/EMwdoHtF2TZ+chWCNOPtdBoH6v3794GlX/TaDXjnerywi+1Y8PnhjSXINTGh0TbOym4ln2CF4W2ELoAPO3nJAT0NHBQuTpOD41gJdc57lf+kw4NG1B8txWfzSpwT7V/VNN0sD+wTMII3otq5gTh3YA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=J+ndoHE6GWfgSGRERdVwktyNQQiSOwqLejkERlbA7JQ=;
+ b=eGhaxEOSY7O8cDzQ+RE6vnQQycCjiHv54F+J5d0gYmL5/engeksoxtq9bMYeX23xI/9irRgIm0/qbmr0Wi2SDE59XJGtmrcsmgCuJFIh+nkaywAybzyseCFqbzH/Xu1xDT98UCKnnycnJLG9Oygu2/apVgGy1v/axzhLwBV8mFm2cOYaymqfgSQF3tF5ANfGzhWoHBVU18ZhH1TcWPw5DLqzeYKilBGUzJuCaXQozPjoLtKJnzo+Vayg5Gvf8yEOUfoGctXtXXGP7wJgm6Ycd8IMXTb2V9Og6tdLYWd2AosGIA2IV2eJkL5zZRPzQ0MCbBZor7hsc5IdTYQnbOKiMw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SN7PR11MB6900.namprd11.prod.outlook.com (2603:10b6:806:2a8::7)
+ by SJ0PR11MB5021.namprd11.prod.outlook.com (2603:10b6:a03:2dc::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.13; Fri, 3 Jul
+ 2026 18:18:06 +0000
+Received: from SN7PR11MB6900.namprd11.prod.outlook.com
+ ([fe80::65da:530d:6803:83e0]) by SN7PR11MB6900.namprd11.prod.outlook.com
+ ([fe80::65da:530d:6803:83e0%4]) with mapi id 15.21.0159.018; Fri, 3 Jul 2026
+ 18:18:06 +0000
+From: "D H, Siddaraju" <siddaraju.dh@intel.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Michal Kubecek <mkubecek@suse.cz>, Maxime Chevallier
+	<maxime.chevallier@bootlin.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Das, Shubham"
+	<shubham.das@intel.com>, "Chintalapalle, Balaji"
+	<balaji.chintalapalle@intel.com>, "Srinivasan, Vijay"
+	<vijay.srinivasan@intel.com>, "Lindberg, Magnus"
+	<magnus.k.lindberg@ericsson.com>, Niklas Damberg
+	<niklas.damberg@ericsson.com>, "Wirandi, Jonas" <jonas.wirandi@ericsson.com>,
+	Siddaraju DH <siddarajudh@gmail.com>
+Subject: RE: [PATCH net-next] ethtool: link 10000baseCR to SFF-8431,
+ Appendix-E SFP+ DA
+Thread-Topic: [PATCH net-next] ethtool: link 10000baseCR to SFF-8431,
+ Appendix-E SFP+ DA
+Thread-Index: AQHdCjKZOnuy/lyO1E+kBZrP8uUH1bZad1WAgAGh7LA=
+Date: Fri, 3 Jul 2026 18:18:06 +0000
+Message-ID: <SN7PR11MB69004F5688F0AFFDA9039DFA9AF42@SN7PR11MB6900.namprd11.prod.outlook.com>
+References: <20260702145326.1024800-1-siddaraju.dh@intel.com>
+ <e9349915-df99-4d93-bb2b-f17686266a38@lunn.ch>
+In-Reply-To: <e9349915-df99-4d93-bb2b-f17686266a38@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN7PR11MB6900:EE_|SJ0PR11MB5021:EE_
+x-ms-office365-filtering-correlation-id: 4340cad3-96f5-494c-d65b-08ded92f6dd6
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|23010399003|38070700021|56012099006|11063799006|4143699003|18002099003|22082099003;
+x-microsoft-antispam-message-info: 4TAwQjVzjgT4fELuLDsK5Kxjh9H3R3q1mHE6cqwx0Jyz8HTDBTw/TZZSgFzqfy9h3WlKHZ4ynk5w7s646Va4iGvIOYviKGDdUkH9PfdKJlfw87SwqiYzYGBZN13u5Jliz7LQ61w6eEMNYjWXCqEBXX1u00xi3AsihS4/OtlVENMoCPUQoPBfYVMb9Jt4I1UjXiEilPRdk20yI785eObkfFsJRbEXWv533AfAeNA37lmBe7GjO7Fox/dd7oduunpFAFnEe58G7Rx1jrUdW4cRWb/letQe+F0OV3v4TDJW8dKUzZpTw/8iun7hvdK2Zt5px/EoAt2uFw0oAbpgLk8Prw5T4rWjHrQlpm/O0h6mzp9LZalNZvAaydDPNu1q9sz0HQHKKjXlqmVkhvFVIFnKQwxxzAii1kfQpdH4dLbed4IcqBwIriAUmYDygtjXoeqP3DBRZZKxKNtvHycBfQ6zwUFU+biuk3Hq9GBUnUwt92SzgPBPKjRCKNrkUUchtVNPzz32INLNlANieOA5GXjhZG2V2R9CHyXntZvSOLE7aQVFLYCylKypAN6CGchRy5ha74OmrHBGosYhyFSYTigsmiGdLE+D6MoluuHoEgcYlZLUm+UG+qBAEqz0N6S9XqU2C4e2O28DDqr51xumoat982VT+bUnFWJ6VMCKUdMq9vtk9ct4hXQ9yLfEItZgDQbv0NzHTbNYEH4L2oEmTqJcS3i/FEmjibh5DZVnHflOtlU=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB6900.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(23010399003)(38070700021)(56012099006)(11063799006)(4143699003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?8vKPPM2iSNoEULemP/dzKMlNYF7Iseyw6FKkKS0KaKQmZTExjcb5yoUBxcB2?=
+ =?us-ascii?Q?i+YsV3hPGfZxG8Hs6yRyg45OwAI0oWGWjC4NqI37gCoqU6lnArxf9sC/mqcw?=
+ =?us-ascii?Q?DbCVIEJzqf/J1hLJMy1AV7U+p2kehHzOsB9YyhW/PCxnwszO6hBh4tIa5CI1?=
+ =?us-ascii?Q?cBL3nLEyfHprr6Ft9GChaFprRvgZEAEJreLJOjO+YEQbIKMx0fx1zCuVKJBD?=
+ =?us-ascii?Q?evBllua8MngXHA4+TnFtSdv9YjKUuXmbwX7fEQ3baKKn1sV3FybQTBRg6pQV?=
+ =?us-ascii?Q?4fhFi6nSH2K3viJgvAq0xcB8Z32Qg1S0g9CsRyzlK85MAoTyBvawfBJZ1FGo?=
+ =?us-ascii?Q?32yijvbrybebvaRNae6rZDjqjyh7P8QAj2ZVyvu+qSwo2caNoSAgJCFm6rk8?=
+ =?us-ascii?Q?NG05gcxLzdLRCBx1LxSr3T8yzmYjfjG+9vioecZXEU66/FJhb1pMDVH48x1c?=
+ =?us-ascii?Q?rL8oKRwwHNWur7qq6GEqhC6S0S1ddFZRgNt0ugB1llZNtIL5RY0rXIkCBDsm?=
+ =?us-ascii?Q?iN1yAXnNd9pXNRSHzTkIu6oRAPmrenYOiXYGZH71KvZNJ8Hv8nBWqH9PJ4PD?=
+ =?us-ascii?Q?lyuFw+Q+oV93CHU/D0wSxkEgnYDOIIMejFFnDMi3lmSSCwT4AAIq7FdBdG2k?=
+ =?us-ascii?Q?VLqblcey2FQn4Xe0banGgIB6mGy8Ldm9kwOoI+m/mlcvc8hVuhy/ENqk41lp?=
+ =?us-ascii?Q?ke8jzUD0erU6dREeqPjshUZ/o86XhmYSpkfN8Kbalmqnnuaeg5gqtnVjg5zP?=
+ =?us-ascii?Q?hZpJwYq2sW4XH1OqB+L64feEGVaNZ0LvRdCdjs662kDaAyg12ETeEBmJJKuY?=
+ =?us-ascii?Q?zsuWaoHJA0LbXWQJ080mBZ0ji60VGziya+0RmKVUvBK6FKKqb9lMkYNedBNK?=
+ =?us-ascii?Q?YEJvqqhZLXGPGLop12Ck7QcMgCagqU/prhgFZmbta2eB1WivlbjL4ampI29X?=
+ =?us-ascii?Q?JhyWYOi/uqamHiO8nZtF8djCWCO3oYOxH74C/i0lUO9DCfeO0y15a/wcVD/X?=
+ =?us-ascii?Q?BDVeS2tNqFDVCzCjxbO3dEGe2qJbn6qyvkF8yVjpDpKvkhFUJbBSKIizpHOn?=
+ =?us-ascii?Q?POV6lvyzA92Y7gxnNI211RWTW+iRYguAD21ZTnYllcZwbUMoae3x/cU9qZ/w?=
+ =?us-ascii?Q?oLVhGKSYeOgmVQ16XSzgNPZGXfkMyT88hanRsRDQXYwt+7U2PMf6YuRnSwmJ?=
+ =?us-ascii?Q?uczdH2L6dMXhZWRSAdMe3txrFke/dRIHbH5tIGarKl+KAcuIWqjLxzoiDPKW?=
+ =?us-ascii?Q?XBF4f8dxaygZ213UnSfwrJTDDst/f61TJzKsVS7u7oEBlOmHfUbRAY9MHiQq?=
+ =?us-ascii?Q?7SGqfNwn8IFkw2QiWt+Vv0kMOzBVOQdES6XABXvsJwvzqQ+LiKCOpxkNEGri?=
+ =?us-ascii?Q?IeoXHvrOlK6YiRFJOPKO2uXuOxvNIqzFWn8xt11yV4vC+oGO2Q8mmrhAiZNH?=
+ =?us-ascii?Q?a82OPfAfYAJbLKwsDHi5l8IFBPXt7EtVWV2Y5Wli6fhcFWpla89rhow6CnnO?=
+ =?us-ascii?Q?o/lW+8wGoP+Tjqdvt7Vq4GbrCTCDJt+lwO7mf4vYn+Xjxm6y+LFuOC/Yo6oQ?=
+ =?us-ascii?Q?Rdq63vzGno7r+9mUt8Rv81IJfNXAyXc3ZEbhLHTSRsgj395MQoaOl/epYplu?=
+ =?us-ascii?Q?tY6EgIFkZj4NXrh7C/c7bqc5AFim8rjyUMCammANyc08T6UHcOX5zSeek5Pw?=
+ =?us-ascii?Q?JT0OmREHlfSf+YKgivp4izkAULPgx6kqExHbw0x6CFDH3i4sTck8dv7wUcGc?=
+ =?us-ascii?Q?VkRiinOjaw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260703-enic-sriov-v2-admin-channel-v2-v11-12-5b739f1fe9e5@cisco.com>
-References: <20260703-enic-sriov-v2-admin-channel-v2-v11-0-5b739f1fe9e5@cisco.com>
-In-Reply-To: <20260703-enic-sriov-v2-admin-channel-v2-v11-0-5b739f1fe9e5@cisco.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Sesidhar Baddela <sebaddel@cisco.com>, Satish Kharat <satishkh@cisco.com>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1783102134; l=6769;
- i=satishkh@cisco.com; h=from:subject:message-id;
- bh=FdWRKYYtk0FuUUegGgtNhjQIkPVlYiHEZ4/j6/h3dCk=;
- b=pbzGV22FbyLgzcmY+XKE3XVzVCXGp453SNRyaBsYGhUj1t0i0Zjn3/uvqGDHBP9hF4yKW5oVq
- APiI7xZCH5TAI+X79NX6n17d+1S/ey3MpxX8GB5jPTEUqp43Dkk6kpr
-X-Developer-Key: i=satishkh@cisco.com; a=ed25519;
- pk=4BxbLoCGvHeIMH/PbpiNVx8/2IcTjFvqcr0AD8K6WLY=
-X-Outbound-Client-TLS: ANONYMOUS;unknown [10.25.130.254];TLSv1.3;TLS_AES_256_GCM_SHA384;256
-X-Outbound-SMTP-Client: 10.25.130.254, [10.25.130.254]
-X-Outbound-Node: rcdn-l-core-10.cisco.com
+X-Exchange-RoutingPolicyChecked: eUZX9ptZMtgDSsCDUuPEti9MrHIziPiElhMOcCEXaQZP1UrW7OUuvUvhYQCHuNPsnOdnqN1urk9I1GF2Omtg11cEkwYyrTeTSUPpeuAdYPGtnvYQcOBjwE+nqG67X/6ZTfN0M1Rergmz/MY6fro+iISNVskHwhDKdzHzekkvvySyTe+8SpLzWarv6zGkXaSb+EeZmwDC6gL3KnO2DBMMN/DnwtrOLe4tWdu2TB3w3xIZ9W0Ufvsozo4+CFThNlAM0dugu9yW4GNEiVdTiX1PnZ1jP/fEKYJH3pxOnE8H02FzZQMLp+mR/KPCJX2TjBYq1z+cv4wZIalxaPdeIZS4NQ==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB6900.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4340cad3-96f5-494c-d65b-08ded92f6dd6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jul 2026 18:18:06.2232
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 6Wj03VKW+yVEWMp5+myD/yLH7aSaX11ixnqEO56cEjkwc21SFpljzgH4hyCzYj+PWM3y5EQvFlQKWy8M7YhxmQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5021
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[cisco.com:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[cisco.com,reject];
-	R_DKIM_ALLOW(-0.20)[cisco.com:s=iport01];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-3.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-304646-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304650-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[satishkh@cisco.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:sebaddel@cisco.com,m:satishkh@cisco.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:mkubecek@suse.cz,m:maxime.chevallier@bootlin.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:shubham.das@intel.com,m:balaji.chintalapalle@intel.com,m:vijay.srinivasan@intel.com,m:magnus.k.lindberg@ericsson.com,m:niklas.damberg@ericsson.com,m:jonas.wirandi@ericsson.com,m:siddarajudh@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[suse.cz,bootlin.com,kernel.org,vger.kernel.org,intel.com,ericsson.com,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER(0.00)[siddaraju.dh@intel.com,netdev@vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:from_mime,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[satishkh@cisco.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[cisco.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[siddaraju.dh@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,cisco.com:from_mime,cisco.com:email,cisco.com:mid,cisco.com:dkim,vger.kernel.org:from_smtp]
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 74DAB704D14
+X-Rspamd-Queue-Id: 63B2B704ECC
 
-The reset paths (enic_reset/enic_tx_hang_reset) tore down and re-opened
-the V2 admin/MBOX channel only for the PF: the close/reopen was gated on
-enic_sriov_enabled() && vf_type == ENIC_VF_TYPE_V2, which is never true on
-a VF (vf_type is set only on the PF; VFs are identified by
-enic_is_sriov_vf_v2()).  A VF-initiated reset therefore left the VF admin
-QP wiped by the reset but never re-opened, and the VF never re-registered
-with the PF, so VF<->PF MBOX traffic (link state, MAC, packet filter)
-stopped working until the VF was re-probed.
+On Thu, Jul 02, 2026, Andrew Lunn wrote:
+> Please add a link to lore, it makes it a lot easier to get to the discuss=
+ion.
+>=20
+> Link: https://lore.kernel.org/r/[Message-ID]
 
-Factor the decision into enic_has_admin_chan() (true for a V2 PF while
-SR-IOV is enabled and for every V2 VF) and the reopen sequence into
-enic_admin_chan_reopen().  For a VF the helper additionally re-runs the
-probe-time handshake (enic_mbox_vf_capability_check() +
-enic_mbox_vf_register()) so the PF learns about the VF again; for a PF it
-re-pushes the current link state as before.
+To be honest with you Andrew, I was so confused since this Link: <URL>
+was exceeding the 75 char limit and I attempted to at least link it
+through the subject. Thank you for taking time to re-clarify it, Andrew.
+It's clear to me now. Have sent v2 patches with "Link: <URL>".
+Please make some time to re-review.
 
-Signed-off-by: Satish Kharat <satishkh@cisco.com>
----
- drivers/net/ethernet/cisco/enic/enic_main.c | 105 +++++++++++++++++-----------
- 1 file changed, 65 insertions(+), 40 deletions(-)
-
-diff --git a/drivers/net/ethernet/cisco/enic/enic_main.c b/drivers/net/ethernet/cisco/enic/enic_main.c
-index 99c06a049800..be3ae0a57af3 100644
---- a/drivers/net/ethernet/cisco/enic/enic_main.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_main.c
-@@ -2171,6 +2171,57 @@ static void enic_set_api_busy(struct enic *enic, bool busy)
- 	spin_unlock(&enic->enic_api_lock);
- }
- 
-+/* The admin/MBOX channel exists on a V2 PF while SR-IOV is enabled and on
-+ * every V2 VF.  A reset wipes the admin WQ/RQ/CQ, so such devices must tear
-+ * the channel down before the reset and re-establish it afterwards.
-+ */
-+static bool enic_has_admin_chan(struct enic *enic)
-+{
-+	return enic_is_sriov_vf_v2(enic) ||
-+	       (enic_sriov_enabled(enic) && enic->vf_type == ENIC_VF_TYPE_V2);
-+}
-+
-+/* Re-establish the admin/MBOX channel after a reset has re-created the data
-+ * path.  Mirrors the relevant part of the probe / SR-IOV-enable sequence:
-+ * reopen the channel and reinitialise MBOX, then for a VF re-run the PF
-+ * handshake (its admin QP and PF-side registration were torn down by the
-+ * reset), or for a PF re-push the current link state to registered VFs.
-+ */
-+static void enic_admin_chan_reopen(struct enic *enic)
-+{
-+	int err;
-+
-+	err = enic_admin_channel_open(enic);
-+	if (err) {
-+		netdev_err(enic->netdev,
-+			   "admin channel reopen after reset failed: %d\n", err);
-+		return;
-+	}
-+
-+	enic_mbox_init(enic);
-+
-+	if (enic_is_sriov_vf_v2(enic)) {
-+		err = enic_mbox_vf_capability_check(enic);
-+		if (err) {
-+			netdev_err(enic->netdev,
-+				   "MBOX capability check after reset failed: %d\n",
-+				   err);
-+			return;
-+		}
-+		err = enic_mbox_vf_register(enic);
-+		if (err)
-+			netdev_err(enic->netdev,
-+				   "MBOX VF re-registration after reset failed: %d\n",
-+				   err);
-+	} else {
-+		/* The link came back up during enic_open() above while MBOX
-+		 * sends were still disabled (channel not yet reopened), so that
-+		 * link-notify was dropped.  Re-push current link state now.
-+		 */
-+		schedule_work(&enic->link_notify_work);
-+	}
-+}
-+
- static void enic_reset(struct work_struct *work)
- {
- 	struct enic *enic = container_of(work, struct enic, reset);
-@@ -2189,8 +2240,7 @@ static void enic_reset(struct work_struct *work)
- 	 * DMAs from the about-to-be-reset rings) and frees the admin resources
- 	 * so they are cleanly re-allocated afterwards.
- 	 */
--	if (enic_sriov_enabled(enic) &&
--	    enic->vf_type == ENIC_VF_TYPE_V2)
-+	if (enic_has_admin_chan(enic))
- 		enic_admin_channel_close(enic);
- 
- 	enic_stop(enic->netdev);
-@@ -2204,25 +2254,13 @@ static void enic_reset(struct work_struct *work)
- 
- 	enic_open(enic->netdev);
- 
--	/* Re-establish the admin/MBOX channel after the data path is back up,
--	 * mirroring the SR-IOV enable path (channel open + mbox init).  The
--	 * channel was fully torn down by enic_admin_channel_close() above.
-+	/* Re-establish the admin/MBOX channel after the data path is back up.
-+	 * It was fully torn down by enic_admin_channel_close() above;
-+	 * enic_admin_chan_reopen() reopens it and, for a PF re-pushes link
-+	 * state, or for a VF re-runs the probe-time PF handshake.
- 	 */
--	if (enic_sriov_enabled(enic) &&
--	    enic->vf_type == ENIC_VF_TYPE_V2) {
--		if (enic_admin_channel_open(enic)) {
--			netdev_err(enic->netdev,
--				   "admin channel reopen after reset failed\n");
--		} else {
--			enic_mbox_init(enic);
--			/* The link came back up during enic_open() above
--			 * while MBOX sends were still disabled (channel not
--			 * yet reopened), so that link-notify was dropped.
--			 * Re-push current link state to registered VFs now.
--			 */
--			schedule_work(&enic->link_notify_work);
--		}
--	}
-+	if (enic_has_admin_chan(enic))
-+		enic_admin_chan_reopen(enic);
- 
- 	/* Allow infiniband to fiddle with the device again */
- 	enic_set_api_busy(enic, false);
-@@ -2245,8 +2283,7 @@ static void enic_tx_hang_reset(struct work_struct *work)
- 	 * the same reason as the soft reset path: stop the admin QP and free
- 	 * the admin resources before the hardware queues are wiped.
- 	 */
--	if (enic_sriov_enabled(enic) &&
--	    enic->vf_type == ENIC_VF_TYPE_V2)
-+	if (enic_has_admin_chan(enic))
- 		enic_admin_channel_close(enic);
- 
- 	enic_dev_hang_notify(enic);
-@@ -2261,25 +2298,13 @@ static void enic_tx_hang_reset(struct work_struct *work)
- 
- 	enic_open(enic->netdev);
- 
--	/* Re-establish the admin/MBOX channel after the data path is back up,
--	 * mirroring the SR-IOV enable path (channel open + mbox init).  The
--	 * channel was fully torn down by enic_admin_channel_close() above.
-+	/* Re-establish the admin/MBOX channel after the data path is back up.
-+	 * It was fully torn down by enic_admin_channel_close() above;
-+	 * enic_admin_chan_reopen() reopens it and, for a PF re-pushes link
-+	 * state, or for a VF re-runs the probe-time PF handshake.
- 	 */
--	if (enic_sriov_enabled(enic) &&
--	    enic->vf_type == ENIC_VF_TYPE_V2) {
--		if (enic_admin_channel_open(enic)) {
--			netdev_err(enic->netdev,
--				   "admin channel reopen after reset failed\n");
--		} else {
--			enic_mbox_init(enic);
--			/* The link came back up during enic_open() above
--			 * while MBOX sends were still disabled (channel not
--			 * yet reopened), so that link-notify was dropped.
--			 * Re-push current link state to registered VFs now.
--			 */
--			schedule_work(&enic->link_notify_work);
--		}
--	}
-+	if (enic_has_admin_chan(enic))
-+		enic_admin_chan_reopen(enic);
- 
- 	/* Allow infiniband to fiddle with the device again */
- 	enic_set_api_busy(enic, false);
-
--- 
-2.43.0
+- Thank you,
+Siddaraju D H
 
 
