@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-304617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304618-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id LwdRMOroR2rPhQAAu9opvQ
-	(envelope-from <netdev+bounces-304617-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 18:52:58 +0200
+	id +5kEHSDpR2rbhQAAu9opvQ
+	(envelope-from <netdev+bounces-304618-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 18:53:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D6EC7046D0
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 18:52:58 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA71E7046E2
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 18:53:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="mBiD/Bit";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="ZuF1S/Nq";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304617-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304617-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304618-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304618-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E84B6301C892
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 16:50:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 69426302AE1F
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 16:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EFEF304976;
-	Fri,  3 Jul 2026 16:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B246305047;
+	Fri,  3 Jul 2026 16:50:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F415A2D5937;
-	Fri,  3 Jul 2026 16:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F03472E542C
+	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 16:50:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783097429; cv=none; b=YN7c3xOMSClO5s7t5lPBUYuIyCFoiPdX3Pm4gbVnvhzrGWHRcunTc1aw7egw9IO9CcvMxS6UoLEduMJlkD+61P1KVPNxy5CrZd33U1bGO0/zAyZYKmzPUXiTdCZqDFH3EphwzG/pQCixsNa66r7Vbf06YSCIJNKqCGd5bFfQX+w=
+	t=1783097434; cv=none; b=Ou/v4pk2WiPNrE11kDDO8JPhIIiJtOnrs76rtJMmLaHJlbIvI1W4I85uqxxvyRm1dKBIhMCwhB1Ey0WAn68wsKB/RuahuTzJFpo05fQM1m6a3+wZfeIbsVt/+rZ+ep3JqixKGVHz2jk8EB1XpuONuDF5nJ46s4XJUD0OB7dXbYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783097429; c=relaxed/simple;
-	bh=RtRXNN/V0/X0eR9cUP2zfRsYDCjS2hjSq/47L8qXT0E=;
+	s=arc-20240116; t=1783097434; c=relaxed/simple;
+	bh=JIQUjt3S7+YB0FzPt5VEq0f9aVEvS0xnobxdpTDN9bA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GtAmBCk3ZVvOPe9ujWTgTsWf0Hch+0usAqJeD54LQfZSW1neoUcju7mo9zxW/81U24v4hpprhj/fs0WowwNT0nznctu7TyORVNCoPsOBWY9ghfbmtl5GyGErI537w8jS7Xqe+m4xITS/Ngj1gneZl52SRQn9cgJPL1sHC0nhXS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mBiD/Bit; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9048A1F000E9;
-	Fri,  3 Jul 2026 16:50:27 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Frq+nx7Z8DWT7elSHyv/UIqHGuabJVl6T4ekaJoCZwwv/iZjyd9EYwxlA0BGwWWGN3LeIwhUwo3OIRErXO+jeCn91FWgh2aYMm5gH4KsnSw+AR3sOqNS5buCdoOOSHVux2T2xzgKgRly39ZB38Vy5FlIThQhM1WisLec/K6ki0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZuF1S/Nq; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6BE91F000E9;
+	Fri,  3 Jul 2026 16:50:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783097427;
-	bh=WrF9vn0S3KoWGPkz3iUHZ+WnoOW53RPQRuaD93GH6vk=;
+	s=k20260515; t=1783097431;
+	bh=0qH8rEh+l3GjUTgMfTCZKgAE36ueMmwrHG2H14CpK1U=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=mBiD/Bite7zNPhxE8kCnAS9CU9i4lU9tn8H+8A+IEc72CKcc6NtCXaGjM15hKFfNo
-	 mp0FCyuxThyLYK0Ra7zmRLFmGBNTe4+IaMRndfi8VaCooeL+H/p6Bf0ysHl3Owvgay
-	 srwX2MIXoabivUd8opyuHDyTm85p+nogZpv7y0PgQNFvxzjsbE44CKH44+FKslbQBA
-	 pGMXxxwNbd0pToaIm5PLTz3hxeFgKWmf5sWRTKsSrMGAQy6VbUz41zZTi3VfRCYxOv
-	 Qg+15oWgz9OaIcrunMWknbZV1bfmlQI6Qdox23ouW/3CUL6HQRvbrsTuiVcGVcfq0h
-	 eSFT5OtzNom3Q==
+	b=ZuF1S/NqVo5v4rt75MSOUDQXDGI7eHedaXmmdbqYfoD6krrrqn+D+RIAQpJVx7sfl
+	 6PTTlleyYXlkCLw8D1LQFZPOIOYhpZXbkThzXWiNmVXjRdS2gBwBEdDUZrz/ID3XS7
+	 CjEOx5T8lwZ/JNNvqKiLIdbVuqbNlsMI2qgcys2UM43DieNoabBA9oNDTFKQ3QJTC1
+	 w+TqzSQPypDC6UMDCRACyi36d0GvCcaWU/txp+X5xGqqKAEFsac31s1wNwwQRTyRkV
+	 /GmE0vvSEiq6bHYnP4yrVbRikQuCPCypVzbY7b7VuB0OcsqOTbyYc5Aappx62IhzTO
+	 uM6nY+myqEt0w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 199B83939356;
-	Fri,  3 Jul 2026 16:50:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 312B23939356;
+	Fri,  3 Jul 2026 16:50:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,21 +57,18 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net V2 0/3] net/mlx5: LAG bug fixes
+Subject: Re: [PATCH net-next] macsec: no longer rely on RTNL in
+ macsec_fill_info()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178309740989.3239271.7935908979849887301.git-patchwork-notify@kernel.org>
-Date: Fri, 03 Jul 2026 16:50:09 +0000
-References: <20260630112917.698313-1-tariqt@nvidia.com>
-In-Reply-To: <20260630112917.698313-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- edwards@nvidia.com, jacob.e.keller@intel.com, kees@kernel.org,
- leon@kernel.org, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- msanalla@nvidia.com, mbloch@nvidia.com, moshe@nvidia.com,
- ohartoov@nvidia.com, rongweil@nvidia.com, saeedm@nvidia.com,
- shayd@nvidia.com, horms@kernel.org
+ <178309741388.3239271.4567949142803609843.git-patchwork-notify@kernel.org>
+Date: Fri, 03 Jul 2026 16:50:13 +0000
+References: <20260701094341.3218199-1-edumazet@google.com>
+In-Reply-To: <20260701094341.3218199-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ kuniyu@google.com, netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ sd@queasysnail.net, andrew+netdev@lunn.ch
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
@@ -79,62 +76,65 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304617-lists,netdev=lfdr.de,netdevbpf];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FORGED_RECIPIENTS(0.00)[m:tariqt@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:edwards@nvidia.com,m:jacob.e.keller@intel.com,m:kees@kernel.org,m:leon@kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:msanalla@nvidia.com,m:mbloch@nvidia.com,m:moshe@nvidia.com,m:ohartoov@nvidia.com,m:rongweil@nvidia.com,m:saeedm@nvidia.com,m:shayd@nvidia.com,m:horms@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com,queasysnail.net,lunn.ch];
+	TAGGED_FROM(0.00)[bounces-304618-lists,netdev=lfdr.de,netdevbpf];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:sd@queasysnail.net,m:andrew+netdev@lunn.ch,m:ericdumazet@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_NO_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0D6EC7046D0
+X-Rspamd-Queue-Id: DA71E7046E2
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Tue, 30 Jun 2026 14:29:14 +0300 you wrote:
-> Hi,
+On Wed,  1 Jul 2026 09:43:41 +0000 you wrote:
+> Add READ_ONCE()/WRITE_ONCE() annotations on fields that can be
+> changed concurrently in macsec_changelink() and macsec_update_offload():
 > 
-> Three bug fixes by Shay in the mlx5 LAG subsystem.
-> 
-> Patch 1 fixes an off-by-one in the error rollback path of
-> mlx5_lag_create_single_fdb_filter(): the loop started from the
-> failed index i, potentially operating on uninitialized state or
-> double-tearing-down an entry that had already self-rolled-back.
-> The rollback should start from i - 1.
+> - secy->key_len
+> - secy->xpn
+> - tx_sc->encoding_sa
+> - tx_sc->encrypt
+> - secy->protect_frames
+> - tx_sc->send_sci
+> - tx_sc->end_station
+> - tx_sc->scb
+> - secy->replay_protect
+> - secy->validate_frames
+> - secy->replay_window
+> - macsec->offload
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,V2,1/3] net/mlx5: LAG, Fix off-by-one in single-FDB error rollback
-    https://git.kernel.org/netdev/net/c/0f0e4ae6975c
-  - [net,V2,2/3] net/mlx5: LAG, MPESW, Fix missing complete() on devcom error
-    https://git.kernel.org/netdev/net/c/d4b85f9a668b
-  - [net,V2,3/3] net/mlx5e: TC, skip peer flow cleanup when LAG seq is unavailable
-    https://git.kernel.org/netdev/net/c/7bed4af0ced8
+  - [net-next] macsec: no longer rely on RTNL in macsec_fill_info()
+    https://git.kernel.org/netdev/net-next/c/5a5ebefdab9d
 
 You are awesome, thank you!
 -- 
