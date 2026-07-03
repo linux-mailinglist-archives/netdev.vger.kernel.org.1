@@ -1,190 +1,177 @@
-Return-Path: <netdev+bounces-304631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304632-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lQWlGtPsR2rJhgAAu9opvQ
-	(envelope-from <netdev+bounces-304631-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 19:09:39 +0200
+	id 947fKivtR2rlhgAAu9opvQ
+	(envelope-from <netdev+bounces-304632-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 19:11:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BF7F7048F5
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 19:09:39 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB989704933
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 19:11:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=secunet.com header.s=202301 header.b=Hh9gBKB1;
-	dmarc=pass (policy=none) header.from=secunet.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304631-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304631-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=Zpw7WSx8;
+	dmarc=pass (policy=reject) header.from=bootlin.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304632-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304632-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 196503034838
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 17:09:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D9440300620A
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 17:11:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE02E305047;
-	Fri,  3 Jul 2026 17:09:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2853A2F12D4;
+	Fri,  3 Jul 2026 17:11:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4F4233939;
-	Fri,  3 Jul 2026 17:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD8913790B;
+	Fri,  3 Jul 2026 17:10:58 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783098571; cv=none; b=VQ0nMRZVbdK1R0AU/AOoTex8woeTGGhcw5GcXdwNxtgtkJp8RLbL/bBvh9Nlt15jNMI/NvKYPWAQpmtEAkwoo3UFgXFcs6eqewKFRo/oLpt/zYw/GUoV/cwMRjweRv4HUVptVCWNxuNEy+7HTJni1bvC8U6rkccuCMBNJYZPk68=
+	t=1783098661; cv=none; b=t9he+ZgFY9go/ydsiHVuwl68+LlZ3YRGCfH88+RCyS1qsvTXtNazpsPogCE52NF6rAlWyAUUIsCWZUds9F3hwPT7UpAURKLj3gvFYB/h/jwm2+EbLvnZ3bcLo1XDBoTWsYntOzmvDeHXXaKgjWtBeJwrMvkZsXT491XFZR1B9cY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783098571; c=relaxed/simple;
-	bh=Tx3uRpemsitIxjfP5pQUSxiDpjnD442Pkjg/xS/Hyb0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Tvk7gUksedpTJNdIrVEpGl5i5PkT+FKLc6/d462L0qrgNMFUpLwrCRvaKCDwzIaVeKC/PaTmbNnhxgNJoQolDILus0t/eiLiif4VDAbwDRsnEmnrhaatK4l9wPTT7jhV8PijDOGhGmWS62T0fbOyXYmbSd4+ndjVVT+8hx4DWMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=Hh9gBKB1; arc=none smtp.client-ip=62.96.220.36
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id C1F8C20758;
-	Fri,  3 Jul 2026 19:09:28 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DTdLDSgXdy9q; Fri,  3 Jul 2026 19:09:28 +0200 (CEST)
-Received: from EXCH-02.secunet.de (rl2.secunet.de [10.32.0.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 296BB20612;
-	Fri,  3 Jul 2026 19:09:28 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 296BB20612
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1783098568;
-	bh=d1mKac98hSvJt1X++COIe0eebE6Eji+lJ/iqhJWOsV0=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=Hh9gBKB1l7BZOmQ/9w5+qK1fNRx5zuQBdlWcSM4GXbEEP+I5u7fjqu7nl+gAs7cga
-	 qvi8JZhT5f7FBnjMLl8ZMoFyNzbqrdlB7K+VubbEJyzNyZw3SppjZhstJndEST7Wse
-	 26vOMqgwZzwHMRDC+koIvWZ/7vaUJIzD0S0+Co/L3HNZ/AmHYQgETVRZNKcefSlb6z
-	 tDe5A/MFWnObCDFzT/SjuJmMSvCTL6adCifXDtnowinR3N0ZTTHvcKW4/1dUWos2jz
-	 FAEYQ4BpafbVOzLA/mgsADHJSVKKMY0du2M/MLHaKyUMMEN2rwDiC64hEiAqboJQML
-	 Ej7yqlNHD8gBA==
-Received: from moon.secunet.de (172.18.149.1) by EXCH-02.secunet.de
- (10.32.0.172) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Fri, 3 Jul
- 2026 19:09:27 +0200
-From: Antony Antony <antony.antony@secunet.com>
-To: Antony Antony <antony.antony@secunet.com>, Steffen Klassert
-	<steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, Jamal Hadi Salim
-	<hadi@cyberus.ca>, Shuah Khan <shuah@kernel.org>
-CC: Sabrina Dubroca <sd@queasysnail.net>, <netdev@vger.kernel.org>, Yan Yan
-	<evitayan@google.com>, Tobias Brunner <tobias@strongswan.org>, Florian
- Westphal <fw@strlen.de>, <linux-kselftest@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>
-Subject: [PATCH ipsec 8/8] docs: xfrm: include mark in XFRM_MSG_MIGRATE_STATE EEXIST tuple
-Date: Fri, 3 Jul 2026 19:09:16 +0200
-Message-ID: <migrate-state-fixes-v0-8-a69e8637ba3b@secunet.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <migrate-state-fixes-v0-0-a69e8637ba3b@secunet.com>
-References: <migrate-state-fixes-v0-0-a69e8637ba3b@secunet.com>
+	s=arc-20240116; t=1783098661; c=relaxed/simple;
+	bh=SEfbOECHAdKd83Z5IkP2W3jwSNcRYDhl0qhI0MI8yTg=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=uKt4Z8Yw9zS2oQmmxJ27Z4RjgoyxZR543CTXvQugweUahFmO2LFeSgc5LSSCbQaBdEarSjmzpOjzdg0BNyBWrOgnDcrkVZV68nqFbQknAbvOTj6E9v2BMPadL3tgoEKzd5VIUnHrQGqFEPGG+W0/5L1rEr6I+UeWBtSl3izLyKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Zpw7WSx8; arc=none smtp.client-ip=185.246.84.56
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 0F3681A0E1C;
+	Fri,  3 Jul 2026 17:10:57 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id CBD8860300;
+	Fri,  3 Jul 2026 17:10:56 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B4009102F0D61;
+	Fri,  3 Jul 2026 19:10:50 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1783098655; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=Vl/CpkA15dwhlWKWUEJmdCMHqy3wFCEAENf0qKRdApM=;
+	b=Zpw7WSx88EVftjo9ghC4KRZ8LKx++T9mOU8X/aoCe9irhfrR3BsJVErM60W5lIGDUKkMkm
+	t+n2B8KtWEO4ZFXRhflphQMPMKnUadnUyYvJxFxCz0aGR2fvB1HEfCAS660YPCsfn+5nfR
+	z+ldhjq4MKY9vO6QEU1ziNsSSUYeSSr1HbRNuMm2rDxsXAaCZxGC0CkzfqhceCWCp/S68C
+	VFw3nAiSdC08+kwA4/WplaquwL+7Zmnwu3sZ5Gd+PRAqd8DjQD7W+r+5dSLWr14cVpXUhb
+	5z6QQ4lOfzimDAnX0XLUhWYZ7pimgd8is46TgaqA2ZHS9aoACAkTT6gc6Ek9Wg==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Mailer: b4 0.16-dev
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-02.secunet.de
- (10.32.0.172)
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 03 Jul 2026 19:10:49 +0200
+Message-Id: <DJP3PVA1932B.3CPW2F5QYOAXM@bootlin.com>
+Subject: Re: [PATCH net-next v3 04/15] net: macb: unify queue index variable
+ naming convention and types
+Cc: "Conor Dooley" <conor.dooley@microchip.com>, "Andrew Lunn"
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, "Richard Cochran" <richardcochran@gmail.com>,
+ "Russell King" <linux@armlinux.org.uk>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, "Nicolas Ferre"
+ <nicolas.ferre@microchip.com>, "Claudiu Beznea" <claudiu.beznea@tuxon.dev>,
+ "Paolo Valerio" <pvalerio@redhat.com>, "Nicolai Buchwitz" <nb@tipi-net.de>,
+ "Vladimir Kondratiev" <vladimir.kondratiev@mobileye.com>, "Gregory CLEMENT"
+ <gregory.clement@bootlin.com>, =?utf-8?q?Beno=C3=AEt_Monin?=
+ <benoit.monin@bootlin.com>, "Tawfik Bayouk" <tawfik.bayouk@mobileye.com>,
+ "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>, "Maxime Chevallier"
+ <maxime.chevallier@bootlin.com>
+To: "Conor Dooley" <conor@kernel.org>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260701-macb-context-v3-0-00268d5b1502@bootlin.com>
+ <20260701-macb-context-v3-4-00268d5b1502@bootlin.com>
+ <20260703-monogram-unable-2eaeaf79676f@spud>
+In-Reply-To: <20260703-monogram-unable-2eaeaf79676f@spud>
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304632-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FORGED_SENDER(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:antony.antony@secunet.com,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:dsahern@kernel.org,m:hadi@cyberus.ca,m:shuah@kernel.org,m:sd@queasysnail.net,m:netdev@vger.kernel.org,m:evitayan@google.com,m:tobias@strongswan.org,m:fw@strlen.de,m:linux-kselftest@vger.kernel.org,m:linux-doc@vger.kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[antony.antony@secunet.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-304631-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:from_mime,secunet.com:email,secunet.com:mid,secunet.com:dkim,vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antony.antony@secunet.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org,tuxon.dev,tipi-net.de,mobileye.com,bootlin.com];
+	FORGED_RECIPIENTS(0.00)[m:conor.dooley@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:nicolas.ferre@microchip.com,m:claudiu.beznea@tuxon.dev,m:pvalerio@redhat.com,m:nb@tipi-net.de,m:vladimir.kondratiev@mobileye.com,m:gregory.clement@bootlin.com,m:benoit.monin@bootlin.com,m:tawfik.bayouk@mobileye.com,m:thomas.petazzoni@bootlin.com,m:maxime.chevallier@bootlin.com,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[secunet.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,bootlin.com:from_mime,bootlin.com:url,bootlin.com:mid,bootlin.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4BF7F7048F5
+X-Rspamd-Queue-Id: AB989704933
 
-Document mark as part of the EEXIST tuple and update the SA lookup
-description to match.
+Hello Conor,
 
-Fixes: c13c0cc6f52e ("xfrm: add documentation for XFRM_MSG_MIGRATE_STATE")
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
----
- Documentation/networking/xfrm/xfrm_migrate_state.rst | 20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
+On Fri Jul 3, 2026 at 1:34 PM CEST, Conor Dooley wrote:
+> On Wed, Jul 01, 2026 at 05:59:07PM +0200, Th=C3=A9o Lebrun wrote:
+>> Variables are named q or queue_index. Types are int, unsigned int, u32
+>> and u16. Use `unsigned int q` everywhere.
+>>=20
+>> Skip over taprio functions. They use `u8 queue_id` which fits with the
+>> `struct macb_queue_enst_config` field. Using `queue_id` everywhere
+>> would be too verbose.
+>
+> I'm not sure that I agree about the verbosity, and "q" isn't a letter I
+> would naturally associate with indexing, in the way ijk etc are. Perhaps
+> in netdev it is a natural choice however?
 
-diff --git a/Documentation/networking/xfrm/xfrm_migrate_state.rst b/Documentation/networking/xfrm/xfrm_migrate_state.rst
-index 9d53cb22b007..905e3f0c4ee0 100644
---- a/Documentation/networking/xfrm/xfrm_migrate_state.rst
-+++ b/Documentation/networking/xfrm/xfrm_migrate_state.rst
-@@ -27,15 +27,18 @@ SA Identification
- =================
- 
- The struct is defined in ``include/uapi/linux/xfrm.h``. The SA is looked
--up using ``xfrm_state_lookup()`` with ``id.spi``,
--``id.daddr``, ``id.proto``, ``id.family``, and
--``old_mark.v & old_mark.m`` as the mark key::
-+up using ``xfrm_state_lookup_exact()`` with ``id.spi``, ``id.daddr``,
-+``id.proto``, ``id.family``, and an exact match against ``old_mark.v``
-+and ``old_mark.m``. Unlike the data path, which uses a masked
-+comparison, this requires the SA's mark and mask to equal ``old_mark``
-+exactly, so a broad-mask SA is never matched when a more specific one
-+was intended. If no such SA exists, ``-ESRCH`` is returned.::
- 
-     struct xfrm_user_migrate_state {
-         struct xfrm_usersa_id  id;       /* spi, daddr, proto, family */
-         xfrm_address_t         new_daddr;
-         xfrm_address_t         new_saddr;
--        struct xfrm_mark       old_mark; /* SA lookup: key = v & m */
-+        struct xfrm_mark       old_mark; /* SA lookup key (exact v/m match) */
-         struct xfrm_selector   new_sel;  /* new selector (see Flags) */
-         __u32                  new_reqid;
-         __u32                  flags;    /* XFRM_MIGRATE_STATE_* */
-@@ -72,8 +75,8 @@ inherits the value from the existing SA (omit-to-inherit).
-      - Description
-    * - ``XFRMA_MARK``
-      - Mark on the migrated SA (``struct xfrm_mark``). Absent inherits
--       ``old_mark``. To use no mark on the new SA, send ``XFRMA_MARK``
--       with ``{0, 0}``.
-+       the mark of the existing SA. To use no mark on the new SA, send
-+       ``XFRMA_MARK`` with ``{0, 0}``.
-    * - ``XFRMA_ENCAP``
-      - UDP encapsulation template; only ``UDP_ENCAP_ESPINUDP`` is supported.
-        Set ``encap_type=0`` to remove encap.
-@@ -259,8 +262,9 @@ Attributes in the notification
- Error Handling
- ==============
- 
--If the target SA tuple (new daddr, SPI, proto, new family) is already
--occupied, the operation returns ``-EEXIST`` before the migration begins.
-+If the target SA tuple (new daddr, SPI, proto, new family, mark) is
-+already occupied, the operation returns ``-EEXIST`` before the migration
-+begins.
- The old SA remains intact and the operation is safe to retry after
- resolving the conflict.
- 
+The question wasn't much if q made sense in netdev land, more about what
+the MACB code used and to unify the naming convention.
 
--- 
-2.47.3
+                           Before  After
+struct macb_queue * q           1      0
+int q                           1      0
+u32 queue_index                 1      0
+u16 queue_index                 2      0
+unsigned int q                  4     12
+struct macb_queue * queue      29     25
+
+`q` that could be an index (5 times) or a `struct macb_queue *`
+(29 times) was the most annoying to me. As `queue` was often the
+pointer, I used that.
+
+`queue_id` or `queue_index` for the stack felt too descriptive for no
+valid reason. If it was green-field code I'd name it `qid` but that
+name doesn't appear anywhere in MACB so I avoided introducing new
+jargon.
+
+If you have a name proposal I will probably agree with you and go that
+route!
+
+# command to extract counts
+ctags -o - --kinds-c=3D'{local}{member}{parameter}' \
+      --fields=3D'{typeref}' drivers/net/ethernet/cadence/* | \
+awk -F"\t" '$1=3D=3D"q" || $1 ~ /queue/ {print $NF, $1}' | \
+sort | uniq -c | sort -n
+
+Thanks,
+
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
 
