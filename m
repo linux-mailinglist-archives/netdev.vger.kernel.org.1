@@ -1,54 +1,55 @@
-Return-Path: <netdev+bounces-304391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304387-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id wEHpFWdiR2oKXgAAu9opvQ
-	(envelope-from <netdev+bounces-304391-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:19:03 +0200
+	id 9LRIHoFhR2rjXQAAu9opvQ
+	(envelope-from <netdev+bounces-304387-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:15:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C7786FF7C1
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:19:02 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E719C6FF75B
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:15:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=NaF7RUd2;
+	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=d32y7Bhy;
 	dmarc=pass (policy=none) header.from=realsil.com.cn;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304391-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304391-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304387-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304387-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8D607304E6E7
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 07:15:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C219C3022F57
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 07:15:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C91E384CDD;
-	Fri,  3 Jul 2026 07:15:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D0F38B131;
+	Fri,  3 Jul 2026 07:15:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E229D38B7D9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE22385D75;
 	Fri,  3 Jul 2026 07:15:04 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783062908; cv=none; b=hzxgfyNKcGXuLkjvypCqctvbpLVvpXMXJ8INPwLILCCDiy0sppOTUeLlvDarWZ8D48NZIbaByU3hOaQhM88AheET7g+ITXNAkZytpQxlXZHVMey9N/jI3raRaHuIaCkjbIP/E8725AoE64Asn0pdIfXDloQvjHbinpWE3rRCiAA=
+	t=1783062907; cv=none; b=fdYfoLGi3t4It5TVhwzgfQwY/lAbJAi1ZzWrZWtROB6VUQ5dzTWg9e8aZgMksAA3vZZaKBXAA5YcYXjTyebY+1iz1r1IPKX63z4M4AEskncEc9GlsYA82NXI+NSrEJlQX7iiFtkXAVp+rFXr4rDewlNzSCnzQ2DFCu/puLX+1Q4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783062908; c=relaxed/simple;
-	bh=T7TwC6I7F04pJ1LiNyj/ksTC5KZcDW80Vv5siEJTcqg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BINySZ/hxX6Y9p6cpAJfjto/76TyGmRS/r9tpT3nLkyWlptJYttDdbIa/N7zpFw6q1YF4NU0DPjqJwgcGJSvgnue4gxK1htAdQkHRy7AANp6HUUjcg+4YE3rN9QIx+x5RhJ41DxtnBxshmSv7OAxMG+cmXiAcNXyChZUJmczDfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=NaF7RUd2; arc=none smtp.client-ip=211.75.126.72
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6637DXlR42503821, This message is accepted by code: ctloc85258
+	s=arc-20240116; t=1783062907; c=relaxed/simple;
+	bh=9Y+VtSZ5+2FDTJYqL6iqvKkS5LLuHdMfWyEtf4vQIVQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tNltssHXIgUf0uzth44OxOcmvbwhSnoUNd9l1kRTo2i7PNxciJW0wNk/VkFHZuduzT1JUKjXafz0Fa41kqndYh8ywTtAqB8HC1vVA/pamcix1DbDpvwd5TOUJeY5Dt8qyA6HgFDuj6Ht1xhzb7PhbPTatMeTVzVHRYQae//PkLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=d32y7Bhy; arc=none smtp.client-ip=211.75.126.72
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6637DXlT42503821, This message is accepted by code: ctloc85258
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1783062813;
-	bh=qTBnfNNVBQoyQDLB6p5atxzJLtTCh2IBAA9uId3jshY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=NaF7RUd2T4FUIbobBAFoJHeKbiSejnKa0koiW97OgghI/fvtomUC9APidLQNpfPqs
-	 SNbtVKnK4lUEMbIJCXDp4UkS/U58GT5EeLYMBkRVFo+W6tzqfgP48FERohZ6Xe7skQ
-	 +IqrHWkd1v/lxmD8FcwtJIR+Du4eETpViQHX4jxmwWQUu1wASB/zF0SsimPto2e5tP
-	 zc9KfGpBGQT2/8jhcs8Vt6dcfeLqXRK/ZZZBgQDAB1u2UoutSGs8MotbOZMDhabeXu
-	 JkIFcIS5xUn4OKI2sp2kb239S2G5ZbAyDYk6tboz6wEE1abDGFgxOhYq3WIS+5/SRe
-	 3pQ1+I5g+Aphg==
+	s=dkim; t=1783062814;
+	bh=CUgf1xo/HXVyBqs+SDToFOxYBjeBnyuC4ZTFl7Ul17w=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding:Content-Type;
+	b=d32y7Bhy6u8yjETnKvGBC+SMMW/+Uoh0906t2WHCe0e+nrLIJjLdNVQIHbJAv5egI
+	 pP2eez+jTThJD8hQnDvRDSw2EPtBoml76PAx3a3viYJsam4ZOc/O6Nlq4xQ7Xik3tt
+	 dQu9oZOlg7Ze/MsbQR3iHFm1XjcvYwY72MH4PXCGuw9Ac4iAjXcH7rUhhAEiG60H/6
+	 C6V33wPOEwJeRecxR6KAq91W6HuJCydFKQPl8TmAUMPdoIp3R6TlcIszLEckvDLKDN
+	 IchbmEcHP4HVEnvmWh2ZVzFMWcQ6jQs+29l/qs1Gi2+9HqYdCZGUV+qz1pIhMUa5IU
+	 fZHHln50g1huw==
 Received: from RS-EX-MBS4.realsil.com.cn ([172.29.17.104])
-	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 6637DXlR42503821
+	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 6637DXlT42503821
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 3 Jul 2026 15:13:33 +0800
+	Fri, 3 Jul 2026 15:13:34 +0800
 Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
  RS-EX-MBS4.realsil.com.cn (172.29.17.104) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -64,10 +65,12 @@ To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<daniel@makrotopia.org>, <vladimir.oltean@nxp.com>, Javen Xu
 	<javen_xu@realsil.com.cn>
-Subject: [PATCH net-next v9 0/4] Add support for RTL8261C_CG
-Date: Fri, 3 Jul 2026 15:13:26 +0800
-Message-ID: <20260703071330.1707-1-javen_xu@realsil.com.cn>
+Subject: [PATCH net-next v9 1/4] net: phy: c45: add genphy_c45_pma_soft_reset()
+Date: Fri, 3 Jul 2026 15:13:27 +0800
+Message-ID: <20260703071330.1707-2-javen_xu@realsil.com.cn>
 X-Mailer: git-send-email 2.50.1.windows.1
+In-Reply-To: <20260703071330.1707-1-javen_xu@realsil.com.cn>
+References: <20260703071330.1707-1-javen_xu@realsil.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,14 +85,14 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304391-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304387-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:freddy_gu@realsil.com.cn,m:nb@tipi-net.de,m:maxime.chevallier@bootlin.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:vladimir.oltean@nxp.com,m:javen_xu@realsil.com.cn,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
@@ -106,28 +109,94 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,realsil.com.cn:from_mime,realsil.com.cn:email,realsil.com.cn:mid,realsil.com.cn:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8C7786FF7C1
+X-Rspamd-Queue-Id: E719C6FF75B
 
 From: Javen Xu <javen_xu@realsil.com.cn>
 
-Add support for RTL8261C_CG and add support for loading firmware.
+Add a generic Clause 45 software reset helper. The helper sets the reset
+bit in the PMA/PMD control register and waits until the bit is cleared by
+hardware.
 
-Javen Xu (4):
-  net: phy: c45: add genphy_c45_pma_soft_reset()
-  net: phy: c45: add setup and read master/slave helpers
-  net: phy: realtek: add support for RTL8261C_CG
-  net: phy: realtek: load firmware for RTL8261C_CG
+Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
+Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
+---
+Changes in v2:
+ - no changes, new file
 
- drivers/net/phy/phy-c45.c              | 125 ++++++++
- drivers/net/phy/realtek/realtek_main.c | 406 +++++++++++++++++++++++++
- include/linux/phy.h                    |   1 +
- include/uapi/linux/mdio.h              |   5 +
- 4 files changed, 537 insertions(+)
+Changes in v3:
+ - re-order function according to the order in phy-c45.c
 
+Changes in v4:
+ - no changes
+
+Changes in v5:
+ - no changes
+
+Changes in v6:
+ - increase timeout to 600ms
+
+Changes in v7:
+ - no changes
+
+Changes in v8:
+ - no changes
+
+Changes in v9:
+ - rename genphy_c45_soft_reset to genphy_c45_pma_soft_reset
+---
+ drivers/net/phy/phy-c45.c | 22 ++++++++++++++++++++++
+ include/linux/phy.h       |  1 +
+ 2 files changed, 23 insertions(+)
+
+diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
+index 126951741428..c1f817a59739 100644
+--- a/drivers/net/phy/phy-c45.c
++++ b/drivers/net/phy/phy-c45.c
+@@ -384,6 +384,28 @@ int genphy_c45_check_and_restart_aneg(struct phy_device *phydev, bool restart)
+ }
+ EXPORT_SYMBOL_GPL(genphy_c45_check_and_restart_aneg);
+ 
++/**
++ * genphy_c45_pma_soft_reset - software reset the PHY via Clause 45 PMA/PMD control register
++ * @phydev: target phy_device struct
++ *
++ * Return: 0 on success, negative errno on failure.
++ */
++int genphy_c45_pma_soft_reset(struct phy_device *phydev)
++{
++	int ret, val;
++
++	ret = phy_set_bits_mmd(phydev, MDIO_MMD_PMAPMD, MDIO_CTRL1,
++			       MDIO_CTRL1_RESET);
++	if (ret < 0)
++		return ret;
++
++	return phy_read_mmd_poll_timeout(phydev, MDIO_MMD_PMAPMD,
++					 MDIO_CTRL1, val,
++					 !(val & MDIO_CTRL1_RESET),
++					 5000, 600000, true);
++}
++EXPORT_SYMBOL_GPL(genphy_c45_pma_soft_reset);
++
+ /**
+  * genphy_c45_aneg_done - return auto-negotiation complete status
+  * @phydev: target phy_device struct
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index 199a7aaa341b..d6bc19931fb8 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -2309,6 +2309,7 @@ int genphy_c37_read_status(struct phy_device *phydev, bool *changed);
+ /* Clause 45 PHY */
+ int genphy_c45_restart_aneg(struct phy_device *phydev);
+ int genphy_c45_check_and_restart_aneg(struct phy_device *phydev, bool restart);
++int genphy_c45_pma_soft_reset(struct phy_device *phydev);
+ int genphy_c45_aneg_done(struct phy_device *phydev);
+ int genphy_c45_read_link(struct phy_device *phydev);
+ int genphy_c45_read_lpa(struct phy_device *phydev);
 -- 
 2.43.0
 
