@@ -1,137 +1,173 @@
-Return-Path: <netdev+bounces-304530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304531-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lhaPAFy1R2pldwAAu9opvQ
-	(envelope-from <netdev+bounces-304530-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:13:00 +0200
+	id jciAEPmzR2oTdwAAu9opvQ
+	(envelope-from <netdev+bounces-304531-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:07:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65E1F702B79
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:12:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E82F702AC1
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 15:07:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=0U6BXOu6;
-	dmarc=pass (policy=reject) header.from=bootlin.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304530-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304530-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=W01Sqmtj;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304531-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304531-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5173F307CEEF
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 12:54:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4E27E310F7A3
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 12:55:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFD0B3D3D1D;
-	Fri,  3 Jul 2026 12:54:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03BE63D3CEB;
+	Fri,  3 Jul 2026 12:55:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 885D1253340
-	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 12:54:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33543D0BE1
+	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 12:55:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783083250; cv=none; b=nKvaG3RMOZo+epTavH2d4rDEIul98ZTkOB7Ey7zYqbwNc6gia243ILb7yGYfbbdRJtzoaFZ02jNxkzKTFl6pTuX3nzGPWPl8eoaYFxh1HK6EOhkF5ePbid7k/dGXBt2ZYZFosy5JfVhX/rezELdQnBxm2FyfBgsHCeRMZcUSXdA=
+	t=1783083328; cv=none; b=Jgk8rg61GoUjtm9NiCblrPDPeYdMakOuaX64c283tXqUXMihj7y8DIOr1dfg+bLJFisIYTKIM9axybW5S8jWvtYSS7Dm1UspPpFnOpZzrfexCS5JMmh654Ep8b0mrx57CprNZJyF+l5YnvK++ErkTkwg1u7IkVi4yGfGWOSkWzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783083250; c=relaxed/simple;
-	bh=dP4keFqcGIcVxoOluJS1CYQ6CA55rLPGoADd2TXq/VM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a5R33PiIhJBO1GXWUmHhvznLK9UVPdIgxaUXqNuV5IdVPGulxyJhbs8dA9oJHaenSyzwYtZe4QaW0RpDwZA5QPpY4fDJHgTOh9+SxanzNM2E+Yz/cHqoSIeJccZ8DCnbV94Ap1AjG1e8BocprWlkqHCseacSscEM6ijvUOEspfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=0U6BXOu6; arc=none smtp.client-ip=185.246.85.4
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 2B2FE4E40C68;
-	Fri,  3 Jul 2026 12:54:00 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id EAE4F60300;
-	Fri,  3 Jul 2026 12:53:59 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BD365104C959A;
-	Fri,  3 Jul 2026 14:53:55 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1783083239; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=H0+4/bDzyyuZHOvz9wvuQdiXal71eINzazokI7lhRE8=;
-	b=0U6BXOu6ixgZYen+TxOzjAnNiLE2Qsx2Sjud9hJINrfUJ9ph15zE1zptVrqpenSmbXrcOn
-	OxY1ZQKbB/TDtNrTbV+i39OI36E6jletRIBaBQ7KtX6rdIZ5467zKSxSWOPMwmSFNJ++6b
-	b+Y7Wga9WbnFuynfmjz3wDPUJt9pllTu8X0+KF3kwS+ofAAwuXOSTIckwnZDC7+pBG+0bp
-	sxIKErBBa2iGofJ2d3Bq8cL1/XDnbFd3djAZhW39RCif3kVcbEqTgME8A1qfS/YLBuDswo
-	yyMfwvX7oUeCN/2Q5YoVspkvZO9Rzs86O6bF+71dqz7WY8aMXu7i+66Zdqjo/A==
-Message-ID: <48978897-2349-49bb-8c0c-35ffd05681c6@bootlin.com>
-Date: Fri, 3 Jul 2026 14:53:54 +0200
+	s=arc-20240116; t=1783083328; c=relaxed/simple;
+	bh=gbHF45bAfLovgDxu690VkVZ1Bt91kozMINPDxI7ZBnA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NdAzot1HAKY7k6/kKYg3GQ4N5PMK6GyMToW7BXNVKuU9VkAwXDvyLCqdvicYax5s/0gGFtT9nuhWQy1+hNLI+2c49+bt/sTCp/KXTzB/ZRAf6uPhqGtVag10sId+H7WST2R+RkipzD3IaIkd8wCAJiVGNSeo9KdFuTzSJ2NMxaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W01Sqmtj; arc=none smtp.client-ip=209.85.215.171
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-c9cf07d2df6so351873a12.2
+        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 05:55:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783083326; x=1783688126; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rtkvg+7eDDRCJghynF4cAnUvilYztgxfeU42PhGZCQs=;
+        b=W01SqmtjWJn8t3x0kLFGaRlZtGrx7sI7zy9DIIHDZlexa1CE5v+ig6pVmOeBVMZD6m
+         G/Y52SKsBpLsu28eFtfhYAw/5P+0nNRc98M1L1DRlALvaH9aUjqY20l5CCs2vEaZwXan
+         IieRx7ci/GuRC2WhlB39/7a15BQ0SsUo+13+G1v+Aq/nImXuKThyG0jPNgtQ87aS35kJ
+         RtA0i1YrcRBHGLYaX5HkJKeHQyCtGIjLPHu3FGk4XWloWucWiVR8XIcQYUVPqaksUN+/
+         jvS/7QC9VEJ/hf+7V1rfTMtaVZLOvgDC2qlGlOMsuiGA6EdNla4HKfrLAInP7sHSt8Dm
+         QcUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783083326; x=1783688126;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rtkvg+7eDDRCJghynF4cAnUvilYztgxfeU42PhGZCQs=;
+        b=cWm4jlXUHQ686I9DX0VZjobCmlNh0obEtlVl8mM55Dp3mQ+Tvh1G2ZpwbWZUUSrWl5
+         jy+HXPsmcX46pHBwBJAiGskNbqNM9Y076GGlVz+XU7wtdYcvOq81Jl1lNj5whilMqoXh
+         rzz92jvXDdM1n7cJRLQUEBD2T14AMU1DzTJWpLnVJzmMW0cx2EUx516LfSLFtdl6o9gS
+         u194PD2P4PHYN6j3EYGbJ9vBtDjVdgNE4+07+ETIM0HQ2xHsqfWPev7+xebQ5mTgc/24
+         r1yBKHH0EIPvAVRl8MIzs2MsyE+eR4hfqp8EjA7nlGHe8iOm4hXkfX2vkC6fN3cqXQsp
+         JGWQ==
+X-Gm-Message-State: AOJu0YzpUdCHfHtkhLeSeEpgm4zhagIK7CezifyHp4bV5EYSJELnvjgn
+	ECHcOpkAveRPGkeBveyFhfdq7JUQJMatEKC0H74QVXGdLFP2z1SX37fLywsJ7V4/
+X-Gm-Gg: AfdE7cmB9JywPROBUSQgjImCqiMCKE9Ur3tCzzQ/QYp/Jcf/T1haNF7uoqeC1K5qULp
+	hsIInJUvfAL9nABP89r4jGiuMfGdeJzFraAsguD/VoVHjrtq7oH1+BVKqTWpkSjkSigHXWhsmDE
+	9+xca+U+qozRvBSS8GKNpiBF14dKD5KOa9xfGYvYd9p7WmtKHxmmP8k02DOn+FhLjgGRaI48v0i
+	G9s+uY4ASTv7sLLudZHR0ImsTPHPQQ0CtS8gNM1QNgnk7tZ17n2OuxXvlcJxJeW1lHdJiiTYbbW
+	Audg8oy+j1DcawkQ7lfthMJesMVs3C0msvnMEZIW7HQ/BLls1971VJYQNJ3JuCM3fF0W2gAL0bf
+	SftKnOKY7e5kjDUdouDlewLjPmTd8Kw6KdkASLaDi9UJQZTfhwbTJSkGSsbWQzcl+xhCh286lXJ
+	4nbvvV08lJL9iXQHyto1SvRoYWjss=
+X-Received: by 2002:a05:6a21:748b:b0:3bf:d1f9:b1db with SMTP id adf61e73a8af0-3bfed5e1001mr12898834637.52.1783083326089;
+        Fri, 03 Jul 2026 05:55:26 -0700 (PDT)
+Received: from amd.com ([165.204.156.251])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f290b6bc2sm7260818eec.27.2026.07.03.05.55.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Jul 2026 05:55:25 -0700 (PDT)
+From: Paritosh Potukuchi <paritoshpotukuchi@gmail.com>
+X-Google-Original-From: Paritosh Potukuchi <paritosh.potukuchi@amd.com>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	jv@jvosburgh.net,
+	paritosh.potukuchi@amd.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH] net : bonding : Remove TODO comment about retrying setting the MAC
+Date: Fri,  3 Jul 2026 12:55:12 +0000
+Message-ID: <20260703125513.694324-1-paritosh.potukuchi@amd.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next] ethtool: link 10000baseCR to SFF-8431,
- Appendix-E SFP+ DA
-To: Siddaraju DH <siddaraju.dh@intel.com>, Michal Kubecek <mkubecek@suse.cz>,
- Andrew Lunn <andrew@lunn.ch>, kuba@kernel.org, netdev@vger.kernel.org
-Cc: Shubham Das <Shubham.Das@intel.com>,
- Balaji Chintalapalle <balaji.chintalapalle@intel.com>,
- Vijay Srinivasan <vijay.srinivasan@intel.com>,
- Magnus Lindberg <magnus.k.lindberg@ericsson.com>,
- Niklas Damberg <niklas.damberg@ericsson.com>,
- Jonas Wirandi <jonas.wirandi@ericsson.com>,
- Siddaraju DH <siddarajudh@gmail.com>
-References: <20260703100537.1109838-1-siddaraju.dh@intel.com>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <20260703100537.1109838-1-siddaraju.dh@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-304530-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:siddaraju.dh@intel.com,m:mkubecek@suse.cz,m:andrew@lunn.ch,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:Shubham.Das@intel.com,m:balaji.chintalapalle@intel.com,m:vijay.srinivasan@intel.com,m:magnus.k.lindberg@ericsson.com,m:niklas.damberg@ericsson.com,m:jonas.wirandi@ericsson.com,m:siddarajudh@gmail.com,s:lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[intel.com,ericsson.com,gmail.com];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304531-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jv@jvosburgh.net,m:paritosh.potukuchi@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER(0.00)[paritoshpotukuchi@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[paritoshpotukuchi@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:from_mime,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim,intel.com:email]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,amd.com:mid,amd.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 65E1F702B79
+X-Rspamd-Queue-Id: 8E82F702AC1
 
-Hi
+As correctly pointed out by Jay Vosburgh,
 
-On 7/3/26 12:05, Siddaraju DH wrote:
-> Add comment to clarify the physical media 10000baseCR follows.
-> 
-> 10000baseCR does not correspond to any IEEE 802.3 *base-CR PMD.
-> It has no autonegotiation, no link training, and no mandatory FEC.
-> The industry standard for this media type is SFF-8431 Appendix-E
-> Direct Attach cable, also known as 10G_SFI_DA.
-> 
-> Link: https://lore.kernel.org/r/SN7PR11MB69003D33489DB1D6B17EF72A9AF52@SN7PR11MB6900.namprd11.prod.outlook.com
-> 
-> Signed-off-by: Siddaraju DH <siddaraju.dh@intel.com>
+"This comment dates to sometime before git, when it was common for
+network device drivers to lack the ability to change the MAC while the
+interface is up.  To the best of my knowledge, that isn't a issue
+today."
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Based on the discussion in the RFC linked below, I am removing the
+TODO.
 
-Maxime
+Link to the RFC:
+https://lore.kernel.org/netdev/2001256.1782860341@famine/T/#t
 
+Signed-off-by: Paritosh Potukuchi <paritosh.potukuchi@amd.com>
+---
+ drivers/net/bonding/bond_main.c | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index d2e4dae4e97c..d5c19dc4bc07 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -4865,12 +4865,6 @@ static int bond_set_mac_address(struct net_device *bond_dev, void *addr)
+ 			  __func__, slave);
+ 		res = dev_set_mac_address(slave->dev, addr, NULL);
+ 		if (res) {
+-			/* TODO: consider downing the slave
+-			 * and retry ?
+-			 * User should expect communications
+-			 * breakage anyway until ARP finish
+-			 * updating, so...
+-			 */
+ 			slave_dbg(bond_dev, slave->dev, "%s: err %d\n",
+ 				  __func__, res);
+ 			goto unwind;
+-- 
+2.43.0
 
 
