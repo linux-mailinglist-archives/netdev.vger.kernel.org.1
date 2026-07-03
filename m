@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-304355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304354-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id wT/IJ+BNR2pMVwAAu9opvQ
-	(envelope-from <netdev+bounces-304355-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 07:51:28 +0200
+	id gmNZGk1OR2pyVwAAu9opvQ
+	(envelope-from <netdev+bounces-304354-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 07:53:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 356626FED8E
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 07:51:28 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 196186FEDBE
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 07:53:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=codeconstruct.com.au header.s=2022a header.b=ayZaZwHJ;
+	dkim=pass header.d=codeconstruct.com.au header.s=2022a header.b=JkkaJfHF;
 	dmarc=pass (policy=none) header.from=codeconstruct.com.au;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304355-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-304355-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304354-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304354-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 530F93031904
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 05:50:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 152243099701
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 05:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F038B388363;
-	Fri,  3 Jul 2026 05:48:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C9A537C916;
+	Fri,  3 Jul 2026 05:48:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC0137A82D;
-	Fri,  3 Jul 2026 05:48:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 603F835DA7B;
+	Fri,  3 Jul 2026 05:48:19 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783057711; cv=none; b=QsVin5FujFbNpeDDbyF67jDV6QqGL8hfGrDwJMZmgC3sSOUr0AEoAw15dAL2FRY9rpUSev3+2OkTV4jXwlDZUYphe93YKCNGSPOA3wpYVG4FaQBord/4EV2KNy1EykvWn1ofU9T7hTD/n7udEtPIpjA+yMhNXgaY8ksY5uK4/kc=
+	t=1783057708; cv=none; b=IZeS4EHbSsN3VjWHoDnahMMU0aZowm1FR9wrBeeyu7axUvjsijDYoEwA5CCKmO8KHgCXghJpgzBayPr55fv9CY2phOe4EAaI7YobJpQcuthcn3X2lFRoe8tc56rgo9TQtkVQOfQi41rEwmpwQJv4VqC1jeBEODVHLKzlEsy8Tpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783057711; c=relaxed/simple;
-	bh=8z/8/IYXD+GAAbZDDugRV9ofo7FOPESv0OxCEvxpTcQ=;
+	s=arc-20240116; t=1783057708; c=relaxed/simple;
+	bh=Vg5QlpeMx6grGgAbQ/B1RAAXNno/1oepvL0oK3ZcNMU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Vgribr0gcwoPyNm0jqK3kCrgKrzzifhut5dWFqWu4rgtPmEyLy8PQUaWOFXq50rD5XetzAswnGYAI6K0XcmL73qMNB/yrElu1snrpzeu3tvBGJkpkUw34Sceojr1gkzOaxcI3/YjuOd3KGLNuFqbKNADtlKD8vuTbi2yofRtc4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=ayZaZwHJ; arc=none smtp.client-ip=203.29.241.158
+	 In-Reply-To:To:Cc; b=cqhu/RM+GAqFhB0TgyC+yYrFg6LyLKP15wkmyKZOfEoRShmu/JDcSAl+MR/7PFYWf3pFYdv2aDo5rVNc8OVx78HYxijGQEUSvwutemf5URD7jOVt1mQmQnCVPylvLwsS44Ooaa0dbsSyGpaBORD3n0m/Z+Qf9LAwGH/mZ3g5YeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=JkkaJfHF; arc=none smtp.client-ip=203.29.241.158
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=codeconstruct.com.au; s=2022a; t=1783057673;
-	bh=MUQ95yMyKJD1s3lExqEHHR/s+SqEo3gcwnIsA/XOS3A=;
+	bh=iTEx5nKp4NPbBwWpxo+sjo4mO4x/txPKBi9q1yQAwsE=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=ayZaZwHJ2TEoUVtjec+KdjBIbCQFql+Q9/87vkO9dfjYpFMujRDuMYlqB1Wj060r6
-	 Iy8yI3qXzMmvHBHK+d6HjUzOr6EYPK29Oi58lcR1Bn3dHZf6TE56fWd/kqgl/KPgzF
-	 UymY/wf9H36r2GYjh9hDTUIfrLgdcclHHad1XU6viO14qZfQ7cDjQinlw6xQ4Mvlem
-	 s3n/ry4GPGmaXZpjEoEu8ByOvv0HIOxGdyTsuAHz07fRXh5aR/CPycZXaVb/p7lcZj
-	 kQaU0QHyMy9XWABHgf3CAc2Jt7A7Hd5moYkeu8heXW++pL/u/Nxk10HvIm0iOG7Mqm
-	 n0BQ8ARCrrKYQ==
+	b=JkkaJfHFam7HUTI6w9LW2hsoimYwUt3lEV9mrRy8f9bBVT2CXtusLjkCWDzczTji8
+	 5Z/PRuhIyFfxQ3+UPrz6quGK4tc811yq6bY2u7s+G8wSQ90z2lz1xdCXZOnfMfM/Zp
+	 ANRmBau4S4TjlzjXkThgs4ywodTHpA2WaEgMW6Gg+T8ld58MKRa67UhkldDkrUZp4A
+	 jolM7u7j8W8OZknV4ana+iaoRlaIpk0mtCg5USKs7qc5jd+1DWGDNny3f9wOoD1yuy
+	 xWiNY1BdQvoVjLEhJsQpwTO3jbDz+rxxb9w/ayuVJeGZCO5ikINGSca04SFHjL+Jgh
+	 YjFomjV9E8zYQ==
 Received: by codeconstruct.com.au (Postfix, from userid 10000)
-	id 0ACB966296; Fri,  3 Jul 2026 13:47:53 +0800 (AWST)
+	id 50F6366297; Fri,  3 Jul 2026 13:47:53 +0800 (AWST)
 From: Jeremy Kerr <jk@codeconstruct.com.au>
-Date: Fri, 03 Jul 2026 13:47:31 +0800
-Subject: [PATCH net-next v2 11/12] net: mctp: usb: enable v1.1 packet
- spanning
+Date: Fri, 03 Jul 2026 13:47:32 +0800
+Subject: [PATCH net-next v2 12/12] net: mctp: usb: Allow multiple urbs in
+ flight
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,7 +58,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260703-dev-mctp-usb-1-1-v2-11-60367b861b33@codeconstruct.com.au>
+Message-Id: <20260703-dev-mctp-usb-1-1-v2-12-60367b861b33@codeconstruct.com.au>
 References: <20260703-dev-mctp-usb-1-1-v2-0-60367b861b33@codeconstruct.com.au>
 In-Reply-To: <20260703-dev-mctp-usb-1-1-v2-0-60367b861b33@codeconstruct.com.au>
 To: Matt Johnston <matt@codeconstruct.com.au>, 
@@ -73,12 +73,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304355-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304354-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
@@ -98,115 +98,121 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[codeconstruct.com.au:from_mime,codeconstruct.com.au:email,codeconstruct.com.au:mid,codeconstruct.com.au:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,dmtf.org:url,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[codeconstruct.com.au:from_mime,codeconstruct.com.au:email,codeconstruct.com.au:mid,codeconstruct.com.au:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 356626FED8E
+X-Rspamd-Queue-Id: 196186FEDBE
 
-Now that mctp-usblib supports DSP0283 v1.1 packet spanning, enable it in
-our host-side transport driver.
+Currently, we stop tx queues when we have one urb submitted. This means
+we will immediately hit dev_hard_start_xmit's tx-queues-off ->
+NETDEV_TX_BUSY case, and revert to the requeue -> gso_skb single-dequeue
+path, and no longer be able to pack skbs without an xmit_more
+indication.
 
-Add a match for the new device subclass (0x02), and indicating spanning
-mode to the usblib rx/tx implementation.
+Instead, allow a few urbs to be in-flight, with a limit of 16kB of data
+outstanding (after which we will disable queues). With this, the tx path
+will cause fewer requeues (and therefore non-packed transfers) under
+normal loads.
 
 Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
 ---
- drivers/net/mctp/mctp-usb.c | 26 +++++++++++++++++++++-----
- 1 file changed, 21 insertions(+), 5 deletions(-)
+v2:
+ - rework tx_qmem locking, prevent race between completion and
+   submission for stopping/waking the tx queues; perform the wake while
+   locked
+ - only wake if netif_running()
+---
+ drivers/net/mctp/mctp-usb.c | 33 +++++++++++++++++++++++++++++----
+ 1 file changed, 29 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/mctp/mctp-usb.c b/drivers/net/mctp/mctp-usb.c
-index e071c2f6daea..4bf5546d520c 100644
+index 4bf5546d520c..fd33f1b97e23 100644
 --- a/drivers/net/mctp/mctp-usb.c
 +++ b/drivers/net/mctp/mctp-usb.c
-@@ -3,9 +3,9 @@
-  * mctp-usb.c - MCTP-over-USB (DMTF DSP0283) transport binding driver.
-  *
-  * DSP0283 is available at:
-- * https://www.dmtf.org/sites/default/files/standards/documents/DSP0283_1.0.1.pdf
-+ * https://www.dmtf.org/sites/default/files/standards/documents/DSP0283_1.1.0.pdf
-  *
-- * Copyright (C) 2024-2025 Code Construct Pty Ltd
-+ * Copyright (C) 2024-2026 Code Construct Pty Ltd
-  */
+@@ -39,6 +39,9 @@ struct mctp_usb {
  
- #include <linux/module.h>
-@@ -22,6 +22,7 @@
- struct mctp_usb {
- 	struct usb_device *usbdev;
- 	struct usb_interface *intf;
-+	bool span;
- 
- 	struct net_device *netdev;
- 
-@@ -40,6 +41,11 @@ struct mctp_usb {
+ 	struct mctp_usblib_tx tx;
  	struct usb_anchor tx_anchor;
++	/* serialises tx_qmem updates to netdev queue states */
++	spinlock_t tx_qmem_lock;
++	int tx_qmem;
  };
  
-+enum {
-+	MCTP_USB_SUBCLASS_BASE = 0x00,
-+	MCTP_USB_SUBCLASS_SPAN = 0x02,
-+};
+ enum {
+@@ -46,23 +49,41 @@ enum {
+ 	MCTP_USB_SUBCLASS_SPAN = 0x02,
+ };
+ 
++/* We use a total-size limit for outstanding URBs, as the transfer counts
++ * may vary a lot between spanning- and non-spanning modes. In spanning mode,
++ * this will allow for a couple of max-sized transfers to be in flight. In
++ * non-spanning mode, 32.
++ *
++ * We want to avoid disabling the tx queue if possible; doing so will end up
++ * requeueing to gso_skb, and we only dequeue from that one skb at a time,
++ * so can no longer perform transfer packing.
++ */
++static const unsigned int TX_QMEM_MAX = 16384;
 +
  static void mctp_usb_out_complete(struct urb *urb)
  {
  	struct mctp_usblib_tx_ctx *tx_ctx = urb->context;
-@@ -68,6 +74,9 @@ static int mctp_usb_tx_send(struct mctp_usblib_tx_ctx *tx_ctx,
- 			  usb_sndbulkpipe(mctp_usb->usbdev, mctp_usb->ep_out),
- 			  data, len, mctp_usb_out_complete, tx_ctx);
+ 	struct mctp_usb *mctp_usb = mctp_usblib_tx_ctx_priv(tx_ctx);
++	unsigned int len = urb->transfer_buffer_length;
+ 	struct net_device *netdev = mctp_usb->netdev;
++	unsigned long flags;
  
-+	if (mctp_usb->span)
-+		urb->transfer_flags |= URB_ZERO_PACKET;
-+
- 	netif_stop_queue(mctp_usb->netdev);
+ 	mctp_usblib_tx_send_complete(tx_ctx, netdev, urb->status == 0);
  
- 	usb_anchor_urb(urb, &mctp_usb->tx_anchor);
-@@ -246,6 +255,7 @@ static int mctp_usb_probe(struct usb_interface *intf,
- 	struct usb_host_interface *iface_desc;
- 	struct net_device *netdev;
- 	struct mctp_usb *dev;
-+	bool span;
- 	int rc;
+ 	usb_free_urb(urb);
  
- 	/* only one alternate */
-@@ -257,6 +267,8 @@ static int mctp_usb_probe(struct usb_interface *intf,
- 		return rc;
- 	}
- 
-+	span = iface_desc->desc.bInterfaceSubClass == MCTP_USB_SUBCLASS_SPAN;
-+
- 	netdev = alloc_netdev(sizeof(*dev), "mctpusb%d", NET_NAME_ENUM,
- 			      mctp_usb_netdev_setup);
- 	if (!netdev)
-@@ -264,14 +276,17 @@ static int mctp_usb_probe(struct usb_interface *intf,
- 
- 	SET_NETDEV_DEV(netdev, &intf->dev);
- 	dev = netdev_priv(netdev);
-+	dev->span = span;
- 	dev->netdev = netdev;
- 	dev->usbdev = interface_to_usbdev(intf);
- 	dev->intf = intf;
-+	if (dev->span)
-+		netdev->max_mtu = MCTP_USB_1_1_MTU_MAX;
- 	spin_lock_init(&dev->rx_lock);
- 	usb_set_intfdata(intf, dev);
- 
--	mctp_usblib_rx_init(&dev->rx, false);
--	mctp_usblib_tx_init(&dev->tx, &tx_ops, dev, false);
-+	mctp_usblib_rx_init(&dev->rx, dev->span);
-+	mctp_usblib_tx_init(&dev->tx, &tx_ops, dev, dev->span);
- 	init_usb_anchor(&dev->tx_anchor);
- 
- 	dev->ep_in = ep_in->bEndpointAddress;
-@@ -312,7 +327,8 @@ static void mctp_usb_disconnect(struct usb_interface *intf)
+-	netif_wake_queue(netdev);
++	spin_lock_irqsave(&mctp_usb->tx_qmem_lock, flags);
++	mctp_usb->tx_qmem -= len;
++	if (mctp_usb->tx_qmem < TX_QMEM_MAX && netif_running(netdev))
++		netif_wake_queue(netdev);
++	spin_unlock_irqrestore(&mctp_usb->tx_qmem_lock, flags);
  }
  
- static const struct usb_device_id mctp_usb_devices[] = {
--	{ USB_INTERFACE_INFO(USB_CLASS_MCTP, 0x0, 0x1) },
-+	{ USB_INTERFACE_INFO(USB_CLASS_MCTP, MCTP_USB_SUBCLASS_BASE, 0x1) },
-+	{ USB_INTERFACE_INFO(USB_CLASS_MCTP, MCTP_USB_SUBCLASS_SPAN, 0x1) },
- 	{ 0 },
- };
+ static int mctp_usb_tx_send(struct mctp_usblib_tx_ctx *tx_ctx,
+ 			    void *data, size_t len)
+ {
+ 	struct mctp_usb *mctp_usb = mctp_usblib_tx_ctx_priv(tx_ctx);
++	unsigned long flags;
+ 	struct urb *urb;
+ 	int rc;
  
+@@ -77,8 +98,6 @@ static int mctp_usb_tx_send(struct mctp_usblib_tx_ctx *tx_ctx,
+ 	if (mctp_usb->span)
+ 		urb->transfer_flags |= URB_ZERO_PACKET;
+ 
+-	netif_stop_queue(mctp_usb->netdev);
+-
+ 	usb_anchor_urb(urb, &mctp_usb->tx_anchor);
+ 
+ 	rc = usb_submit_urb(urb, GFP_ATOMIC);
+@@ -86,7 +105,12 @@ static int mctp_usb_tx_send(struct mctp_usblib_tx_ctx *tx_ctx,
+ 		netdev_dbg(mctp_usb->netdev, "TX urb submit failed, %d\n", rc);
+ 		usb_unanchor_urb(urb);
+ 		usb_free_urb(urb);
+-		netif_start_queue(mctp_usb->netdev);
++	} else {
++		spin_lock_irqsave(&mctp_usb->tx_qmem_lock, flags);
++		mctp_usb->tx_qmem += len;
++		if (mctp_usb->tx_qmem >= TX_QMEM_MAX)
++			netif_stop_queue(mctp_usb->netdev);
++		spin_unlock_irqrestore(&mctp_usb->tx_qmem_lock, flags);
+ 	}
+ 
+ 	return rc;
+@@ -283,6 +307,7 @@ static int mctp_usb_probe(struct usb_interface *intf,
+ 	if (dev->span)
+ 		netdev->max_mtu = MCTP_USB_1_1_MTU_MAX;
+ 	spin_lock_init(&dev->rx_lock);
++	spin_lock_init(&dev->tx_qmem_lock);
+ 	usb_set_intfdata(intf, dev);
+ 
+ 	mctp_usblib_rx_init(&dev->rx, dev->span);
 
 -- 
 2.47.3
