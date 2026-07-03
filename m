@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-304490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304491-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ++vfJY2UR2o4bgAAu9opvQ
-	(envelope-from <netdev+bounces-304490-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 12:53:01 +0200
+	id C4wsHAqWR2qYbgAAu9opvQ
+	(envelope-from <netdev+bounces-304491-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 12:59:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E34E701758
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 12:53:01 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 602C970186E
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 12:59:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=NXP1.onmicrosoft.com header.s=selector1-NXP1-onmicrosoft-com header.b="HhVz3/Qz";
+	dkim=pass header.d=NXP1.onmicrosoft.com header.s=selector1-NXP1-onmicrosoft-com header.b=gESXRTmo;
 	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=nxp.com (policy=none);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304490-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304490-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304491-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304491-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 466A23075F95
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 10:44:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 13C32305B973
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 10:45:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D42E3B14AD;
-	Fri,  3 Jul 2026 10:41:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF2793C278B;
+	Fri,  3 Jul 2026 10:42:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011004.outbound.protection.outlook.com [52.101.65.4])
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013035.outbound.protection.outlook.com [40.107.159.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B39DF3CE489;
-	Fri,  3 Jul 2026 10:41:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF6ED3C1F5E;
+	Fri,  3 Jul 2026 10:42:03 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783075318; cv=fail; b=bgQR/XmzwOJZQZ2bwvh1P9revL9CbJlSp3TYldmXLeZkK3oEJD0K9ip8khqTOV0ZTreSkT6GHtTE/Fg2LFV3bluOiSyTmnKns9b6QMzScjNTQCf+t7AJ2dCScnUto7OjldHiOyd02WwGUeDYPUXYA6BbG0rLhtq5e1284NmMEik=
+	t=1783075325; cv=fail; b=gqn0QOfsvZjD5jB6sShLELufnrYtJ62BY6G+fVLT3obaOvCvq6+lO1JDnYboC5wZF7b7LmfmVZvRgdFo2kwYQq65jTz+eIjhykuZMmoatVyTmp7ZX46WlCDw0Du8rFLExg09mf+lUCbfWFkOXtoWJMdzsWvb4ildJ/vBYfZfqyo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783075318; c=relaxed/simple;
-	bh=2VYtLzTkftiZXDSlxK1E+Bp/iE2Qdr0gmMRr/6DAznY=;
+	s=arc-20240116; t=1783075325; c=relaxed/simple;
+	bh=Ui0fPZpEKH2pqDQlGtaewPxbsv7L8xlm378do7zLBFc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=iGZk2Qo/A8kyx7JccBHi/6SGHVmYZWqIqNazXCSQMPAk4oJvV0CKon7kNYzO7vH9DBt23kX3U835FsqQHutilsFhC/pS3d+8wRYXP5JdaPfwHup/luoX0lQmSlSVXhGdcY+cvyw1lv25J2l2GTpYhdTn43I9xcVJsxGHI9nIG8k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=HhVz3/Qz; arc=fail smtp.client-ip=52.101.65.4
+	 Content-Type:MIME-Version; b=Nw2bqEq8JaOWiDc1E21mUhLt7INwXiuR1Y07jfoGZLTjFa01mHQ9TawaL9BZlK66vXg3I93cJPPDQwi1pvxymVZ3ZLhpJNebKMoAT6DtW9VrHOqK7F9s/9MrOUOqF54R+FhTsaQ9JPCDRk+ZGzd4RTVsFxIX3D9gA8mRfjmnl/M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=gESXRTmo; arc=fail smtp.client-ip=40.107.159.35
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Wnq3Za8U6InH5eHpwmti/viM+1h8V/Hnd8xyC2gv/C8XM8czp7ZkUhCP8gCB9NS25w2feeThV40H+1GdxTQt+x1Hal+WbViiyOJqPpRVHcPvs/7POUsc0rJY5Rkg2E+M0yzKFoFvfD8oA88nCxf9t/JjgDYjZ2FFRUy76nnsmsd4QP/896MFivDSuUGaRpPp2Hfjbtiw2j1sYoJxhE8W/BMatls0VlMn/P6hK4Wd7rEkzB08v1z6Ffw+DH4mtV5TPmoOvyfUx6MlcpYzRS4Vst9XagGi4/+ESE0LusGS17UlgS5NwP1ySQDoJ4qxwD4AoB6S/rL9e+aeznvVHX/5hA==
+ b=g5Ka6XgY5QL8F77NIe/88/QcYPGxvR29KEQgHPQyoL+YNgBV5JNByBvAUe0yGORQSts7NHLD0aSBKM6M6GA82bt+HctIfBv6L6jv4vYLKTB7T2Ql6QIKVbd0/M+gh0WffD8Vo4qwNzb1NmCkWHFL0EYtUHjNExKuj9gMhKebPOKcDZw2nNiGCI7rH8bMeH2X4mIvkqenBO1WBENogMF8E3EWRmKI1EIljDbvBoyw5biIoEfBb8zXIUtUk/a7Fdv7F9Y8RVlkcMLI/NAJ4w4cjC4ddH2x3Q2960epPfYdMtLKS7iDwuEk6pjnoxX5bH7lupZJYpsqLG8zUDeSe/UcnQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GCXpVfilOobuwtQo1MG+AfHJM40d4RwVXZ+w/PwLVOY=;
- b=PBUzB9SVuMM1CXnaPrd/aTbXsEDls9HQx8lBs8a/Mqwxr+LVfBopOR8kD+jqN9LjWgmsnuH2ycWlABozgX0TiDmwB//9Tx+mT91XKXQ8b4k0jTDHzshvXw5Q4WUszsU7e5W0Ut8x2rjIxH+t43BRbw1brCjgVYmDXbeSvf+LodbITxIX76U1ILWvcLBBF8tUdJN420fDT7DZQDn28VOgRqyQdlgm4C7kV7GthK4V2eFTufcqu9qWjCXA6+CrFJOQcVkYVQs30IYpef/OJW1YEkFVO9xwWV7S3sBYCzcUIbhP8/q210wJ/jlD1tNigifuGAn7gonrB3UbZHmh7JeFMQ==
+ bh=uf7R3hDgk51Q5WBhT1WZQt5pblRb/WvzPKESaRYdXgs=;
+ b=khJsHxC7MBD18Lus9dl1gRugP1OZhSs2XvpJ4LBW5BWW+g0Vqj70ZAsuxkZK6EqLEOr/wV+w92VPXQS0n1Ozp1UIDCosNRFGDOej2UIo/D6u0/K00b0fkI5EYQEiz374nmJp4bZZNZbvnvTblbvJwvl2DdtUSIWoQ2tJSflCun99IEbpMMTOXJpusbaKrshlnnBfcE2xCQ6sWNL15EjXpf1x6rliEMBGtF7AK8GiYimmP03RPUGCpSTv/aGilcF4hi4mnqbNiZ+VbfX43T1AEht5iL4uJJIrklSXbqc4WrEUYcJPC6q+U/mCLo+zJURk4wcruHAChiBzG4CNObRgpQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
  dkim=pass header.d=oss.nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
  s=selector1-NXP1-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GCXpVfilOobuwtQo1MG+AfHJM40d4RwVXZ+w/PwLVOY=;
- b=HhVz3/Qz/g14vXiJ4QSTPqR8wEhDWCV97oXlc85MU3wVBaclKjYxL61DQcc1xyXGosmu5i0tDhDZK17bkw3725j+6wBzGTUzhOtvy4BQGkyHQQ0N0cxOmmi8iHBVBsJkwIaXSUPyZDZEyAAfKFzBXGtGLcKJ7tBYPe0O1+gQOX5LudbZJraMnPNoOgNxvmIZrf4GloUI+n5pyv944adVD9yA3WTKkuFMLEMM4XCiS4WqtgCOscBsJrDvbdu943cJlUjXI5d1ntR8OpTpYn9g3A/FOpA9ZpPhEMA7yEV4NfWpFxS1c94u2ZgxTvyDdmdc0LxV7kbchhGtk7dm4XOhEQ==
+ bh=uf7R3hDgk51Q5WBhT1WZQt5pblRb/WvzPKESaRYdXgs=;
+ b=gESXRTmoQFVT4+GG3PkqgdnkBVd8+fQ4xI9AhfWNT31OMazZpHWWi1owV8M25tNNX1ftEEbb1idSAm1iMyglX01FCnOdIQqCY0K2e/X51Jb2Xn3SYxm6tNiudGy/ekIQzxD+aCu6HWeFXcmDmJP+Ie5x3tjpGBTri5vYC/ufdyFPrcRAc5O3wZ1ht4gy7FiwyI5DIfDfYw8TDNiR/8HLdEpV7UsywfhOpShrSV1RGr7U0G6kyHbBxVt636Tvr34md57AzfckZLjnEvyTS/nzeKSjrU6aLOUBbl2HePF+CFfkMykMjmyOBRba9ihPIkiWzzPG/KQOxZOGPiruuGLcPg==
 Received: from VE1PR04MB7216.eurprd04.prod.outlook.com (2603:10a6:800:1b0::22)
  by DU4PR04MB10741.eurprd04.prod.outlook.com (2603:10a6:10:581::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.11; Fri, 3 Jul
- 2026 10:41:54 +0000
+ 2026 10:42:00 +0000
 Received: from VE1PR04MB7216.eurprd04.prod.outlook.com
  ([fe80::a9a5:cf83:dbe8:1f74]) by VE1PR04MB7216.eurprd04.prod.outlook.com
  ([fe80::a9a5:cf83:dbe8:1f74%3]) with mapi id 15.21.0181.010; Fri, 3 Jul 2026
- 10:41:53 +0000
+ 10:42:00 +0000
 From: wei.fang@oss.nxp.com
 To: claudiu.manoil@nxp.com,
 	vladimir.oltean@nxp.com,
@@ -76,16 +76,16 @@ Cc: imx@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	linuxppc-dev@lists.ozlabs.org,
 	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v3 net-next 01/14] net: enetc: extract common helpers for MAC promiscuous mode setting
-Date: Fri,  3 Jul 2026 18:13:15 +0800
-Message-Id: <20260703101328.550714-2-wei.fang@oss.nxp.com>
+Subject: [PATCH v3 net-next 02/14] net: enetc: extract common helpers for MAC hash filter configuration
+Date: Fri,  3 Jul 2026 18:13:16 +0800
+Message-Id: <20260703101328.550714-3-wei.fang@oss.nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260703101328.550714-1-wei.fang@oss.nxp.com>
 References: <20260703101328.550714-1-wei.fang@oss.nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: MA0P287CA0009.INDP287.PROD.OUTLOOK.COM
- (2603:1096:a01:d9::9) To VE1PR04MB7216.eurprd04.prod.outlook.com
+X-ClientProxiedBy: MA5P287CA0264.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:a01:1f1::15) To VE1PR04MB7216.eurprd04.prod.outlook.com
  (2603:10a6:800:1b0::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -95,57 +95,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: VE1PR04MB7216:EE_|DU4PR04MB10741:EE_
-X-MS-Office365-Filtering-Correlation-Id: af745f1d-1738-4b78-9ea7-08ded8efb28d
+X-MS-Office365-Filtering-Correlation-Id: 1fb47b3e-04db-4748-65e9-08ded8efb696
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|376014|7416014|1800799024|19092799006|23010399003|366016|921020|22082099003|18002099003|56012099006|11063799006|6133799003;
 X-Microsoft-Antispam-Message-Info:
-	E4+KiU2he3zAD1b3QSVe7x6NZNe9LgrG2WYmDUrNW8b91O+2NbG0LhGziBdmygKUVlQloJYyEuqy64yjpUxAswr1X6tIQ2m9coEaovFKrq4b0N4bV5H1ZhugSm0jrcGdWybUbCTt4Hmnim9pxD7ZEr1eM4inP47sTEr0JKPdyo91/DNxlGvInZvMQl5ivyhn5xE+bJNBmz7qQRlnpVFvYiOdzYCt/j2D7IxRPE95MrEbwMQeQuJKkj7hZkBN+2iUMrTYfUab64Iox80NKCnunGN0bEVowt0OPDfBhrOtIh+3JkyHCOmEmRp8ORLJrEDBAbRbtffRFO77z8bgzy0Z4WO/Lk5GV5dSMu1/8jTyn/EJw79xaftzMS6lwb9TaGCzzXakYkk3xxVr0yBCr8euwgFL6t/ARsavN4j1FZqy3BimKSul7H1OnRZ2TIb23BIgZ0DrJ00xkxoOSYSB6Nx3WSjk66wcRi4O4bGeCEaK406zsXZMwnEHpn+TlmWidbSTFG63GvonB/R0MKZBvXTD0iqE9FlS19n9Tk5y1Mfc2tLD21fwE0PZ96J8cVxxpRjDEweiusPaDEJFY8CtB0B4BQO/j8M0WU+7A1PYrBFVU7/j5a6POieAingG3Al8ZPAGBS2kdynoHeXzZQfz8sBDtg0jeY1borYQIbywDwP0c3SFDZq1QQZa41u1HB6uI1/x8HdJ9UO5CLZtUGEWDh6MVg==
+	Kg4ssAX88A51/TYdvj3y5Mg1E4Dbygqv365I/hoIf1FJxrlEwJ3e+631ozzm+pc8OtdHldO2J7caQ5Mmb6IsIi6PG2T+1rBu9OCqbUtRRrWqd/xQiPMf5qmK5WNLZF74RtLOodQvNqZLGXN98Dnpmj3Fdn8qa19OA+uyo5g5IJrl/C96w/c7mjSCdLaC9hyQuqShc7G/lNOZ653cLLAjlqO6UV+gi7Kjb8wmQ0YqdysUooPvX010JrgEdsdqgrECegav2tfvpb90nsDOyuaO5wi+wHXZnNO3x5iboOLLiQpXYRxMeSDW0qct2mq//Lcfg5dtUMibAshcqkmxlJuW6Gkr4ViV+Qf1+j9klMsPJECXeMNYnabztPH4oQnwbN6vQPgzz0ghewk8sXaFjx/a64FnfSM5Zbxbrh3hOxCzCTv41y7IO2+yAPUuiQXL+yJ9LbpJwkmAYuzs9IrA52IP6A4Iu+SpIHiJQrJOVjsmoLWtph0ko1fhKs6z15DC1muScWKzXGnE1I0nFeOKKM4IU4sUGNd6UCja4xlu5aBxATl9H7gDYjiQT4hSSwZkb5ZZQbdtXZPOqpL52TAWTegxErTllr4bcyrR5d7+I6wtTDimGbuf4w2wOlH8R+whVaq/796nOIILIIpL7OOR1r+6gMkNOWeCeK41vzl9p20u2AA5TbtUvZGAuUZulvVpk9nct+0/XWDybjx1ftIU7N6NuQ==
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB7216.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(19092799006)(23010399003)(366016)(921020)(22082099003)(18002099003)(56012099006)(11063799006)(6133799003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?rRv2Xt3sa+fGiDfpCxr+7uNAXzjSugjhmXmyogiYttS/Vlz0HISnjrhf4d9G?=
- =?us-ascii?Q?+JUy41/5Be0/wewivONiJrtO8waqrBUK9B90gDeucFj2UYlhxKskoBBAAB87?=
- =?us-ascii?Q?lIEdLQ3Hs6jFHMI8v1gzNixkxIMhIm9ryUPWdq6HZiBi3zD4R9rXDST1qhxG?=
- =?us-ascii?Q?qSBl4p8sqyPejxZLZaklYbAL8PgZLKrkhVoo2EM/R/qCRV2NEihC5r47c3qT?=
- =?us-ascii?Q?wsmZZYmVR3hO8R0h+IsalP3FPA0XS/cbCZrvkDuElEm1SEHkQi5UI+8abyzx?=
- =?us-ascii?Q?uNTtZTfXpAzgUCGzdWsjqC34dQZ0f1NtOgMcCHTR8tT4AWN/fPH47nPDIiQt?=
- =?us-ascii?Q?ES898VxoRalfI/MI9Qz3rcPfVfdj6v+bT9LcI+x++r9PPTcaodIgIygxxYjK?=
- =?us-ascii?Q?WjqUKtMZkQs0Sqc/ct8KYQzAPN9qLSivpR7xRqeI8hXVGlMyD0lFKZR3vQJX?=
- =?us-ascii?Q?gVTcxZGHR6dDOCn0a8D2NIiqq1VaOWKXuj/YZ9uFpRswABb9AevHxkMFBcC0?=
- =?us-ascii?Q?F0MC7A+7QimAG9vDBkjCeLDWHYR5bca4ixW6pZOAWGohTus7Qh3cXja159RM?=
- =?us-ascii?Q?YObx4uHqjnGRfUCYSjrdlRbEl2S4b/yZhk14PHYiV8owj0T6WMEdntkWlzTm?=
- =?us-ascii?Q?Ge8qqFJTd8tK1WqX+4xG+mq8NCSV/maoTi1uQpxPyX4+7uBvodJmZK7qyeZo?=
- =?us-ascii?Q?NxZ3dxNXXZFWhPq2NHFaHfQMzRgfb2TlhqlS0lcYi/JRGbGtwHy/6/Qs0s4Q?=
- =?us-ascii?Q?Bmfe0knpLCZXIQEw45p058HDvbNrNKwR9tEyItYeX1RSp5p7b4SxWNVP14Ou?=
- =?us-ascii?Q?GH/MytTK10pRDD1qrNAOJ4NoiD2e1pjQAYSx3PGGXZ5ammi5fszOHMiVx/jD?=
- =?us-ascii?Q?o4kOQcNw9/iQWDvGR7LPcu19Z3JIHS+ELP/MrKaamLkUKZEcFk6Ss3Wn6Wod?=
- =?us-ascii?Q?bFEVGbGR5Y1PFzvyIM77MN6HxXryOMaIXN0wh5EpwvjsjEvaISSs4pzBMgUp?=
- =?us-ascii?Q?GHoKXU1gpiuNZHjNj2KTRhLmd47FjmVNJyKXLKx3wzBAnS9l7PVQ72/UNDT5?=
- =?us-ascii?Q?wk3EkGHVJVRTiU5DqwAielvuSg+YilUbbOiJ4MLufVGgiTs97XNkXUt5uzow?=
- =?us-ascii?Q?nR9CEKEk7LDLUR0iNbIGAmWOXLWGq68ZBXn5daCrFxV1mMq4LDkwuhq/vI6Q?=
- =?us-ascii?Q?I5A+hX97A+BH+uGf6FqeSKhdEvAw0hDCihNpfMwOLw73o3hoYAW4SokR+/Gy?=
- =?us-ascii?Q?WdyKz+W3jWJhfH9WkLdNxbP6Rvbqm8Cd2O3csiPzxxaipcOJWe9HHjQYJhR9?=
- =?us-ascii?Q?GUP77we5APDsTq6EstNeBFquiOiMyT9HRG3BO6eSnFmJGoc5togKzQ+T0714?=
- =?us-ascii?Q?d6XphIMfLKFoBz05O+IKPxfSHe8Ria2jdEP5/yrTMnPkJk1Z0FSUCulumwgx?=
- =?us-ascii?Q?NAxA78dISZQMhQsH2uY74YyHErFjGEgy6Lkv+fW6wn72CTHe7LR234ba1J2m?=
- =?us-ascii?Q?BBd7VqwxnhBfqYd5l3dY0RUDlAeWez6F0fLGZOEs0ROOzwhobNS//HpiBHjr?=
- =?us-ascii?Q?pGpDve2SjC53H9HCwsJ27enzHQ6SDdb9h88c41SAfgZ4ilV7c6cc/sQScqy3?=
- =?us-ascii?Q?ZV0ZkSYNEp+J643Xt7ud+O8VX37K12zeLe5BL4DjRsCd5GfvtsjOO6eCFwKi?=
- =?us-ascii?Q?+aqVTSXI9vytZRE8z7w3z/MzegJzlwyUjaZ8ZAJQVq/x8ndUeeHtvUSpKtTr?=
- =?us-ascii?Q?e9/kP+NGRrLMQj2SioJC+P6P6uDt9Rithz7lPNWQEar+mknc5d2B?=
+	=?us-ascii?Q?58GhElenC9wiZ/fpLwgQZEkJv3MpK4dkbju4yJWE0CAf4PHv0lWemCeqkL0Q?=
+ =?us-ascii?Q?09IEFVas61drEazB1wbSv02WNlxhGjrYjD32Sg+2TzkMmWvFcZUJsQ6fvUth?=
+ =?us-ascii?Q?XW2tDQDzWaiGPghivjyKtYiwu4FHqxTIaCrStZObjAus+pkYeMK7tlzzJvKo?=
+ =?us-ascii?Q?apz4/IlbBWtDS2G/sswn6M5Dvt2cxAty+fPaRKPDKvzRH1QJwtpcqvLO9tgA?=
+ =?us-ascii?Q?Pznzoc1/Q8B5BR175CQaYVxnQEjtAZ+qbfseDo+Q5fGIrqqG0pAFj5MMJ3e+?=
+ =?us-ascii?Q?5PuM6eQUpalEiCSC1UB0NT3qDqLBAPb9V6CQojxLa3DxlZ4HOCOGITBtmCdz?=
+ =?us-ascii?Q?YlWz9u4Fus6QtPQ7ajlB3QEyVekF3bkppgK9ETcmIsEV9t03e3ovSz4K/lyE?=
+ =?us-ascii?Q?9TUhQUGRA7t9herMt/aDuenm3C3v14E7xKC5Gv7tsse9s+Sq2FqZeVzSziPe?=
+ =?us-ascii?Q?fD4pT9PhvQRrhMcXv7X6Q6mx5KFO/tLRVV2mTXSaMiJA+GyXPPhzgA3pkTc4?=
+ =?us-ascii?Q?4NTzdpaxrimm0apcUBfpnWNntaWaf6yC1XKE2prHXpv60zMdbkO/bET6hif+?=
+ =?us-ascii?Q?fr0VCh+lr0Kyb3LfeVqE7E5JVrWifUFYLRSKP38CC6Yx4dq+i0f2VMmxzWX6?=
+ =?us-ascii?Q?7oIzOcheisuXcpBo8leKwYBja4yVDM+jas+POkKAaWHhYRsR/Dnk/N+9UyJ8?=
+ =?us-ascii?Q?+ng4xzyL2Th35VV459owdxHM1R02Cb9k8mHl9Cb5geuFiMnmUfMbsIqNQdNs?=
+ =?us-ascii?Q?zp6QRienY+yN509V4hiVUC60yn5LBfBQUBcLSnwi0TvLe8//VmyelOIfAHdL?=
+ =?us-ascii?Q?TOedeHwHFioOCMaaNkw/GcW/aVXDSvT8IZitB2MQoYrodg/VtT6zbBXe9klx?=
+ =?us-ascii?Q?jtMOE8p5PEcPyaGGzE0eQEm9v36SXKn73s5yucm++OwDoosNH2UyQ+wwarRA?=
+ =?us-ascii?Q?CSXxJJhsbuuHGlUZ7gM/x/Woa1AiQxJPIltKlht6TjqdTvGcxBYYoeaSntKA?=
+ =?us-ascii?Q?+SwPdAO3lyZD54+Lmz0SCvu742qyU76hlxEl70lJzTQgvejL991LyTU2uq9g?=
+ =?us-ascii?Q?JWKkfXJL5trTLRUdKvauVG5cWTr+DGoB1WkqLLPbV6R6V7KLAkNXqSBnOwOQ?=
+ =?us-ascii?Q?Ry7GQRYjdYWFeZqG6lUOXeQ6D6fBLz8jHTqKMRaFYeV7FNB2NjyXheFfb183?=
+ =?us-ascii?Q?SISr4FmaMrEmX6kBgNqdAqodglmWHhkBm+71a4HBW8AHLxO9Need9HfldFdA?=
+ =?us-ascii?Q?RcQIUczhEJAy74j6RewBvgXsg8s2e4neeyqpauroXKNHnJgC/acZp3koJUZ/?=
+ =?us-ascii?Q?hRT0kS1Uh5zKXpIbBX8Iao3pHRs3gakuE8BTHbh3CAzSd0eWIyqt0agPnkcc?=
+ =?us-ascii?Q?Ypug9PtGESRC1zRbofuJWfHdUbwlUEjD3JkYjhrYE1wut8QhaY/JSCOLVsbx?=
+ =?us-ascii?Q?uAbaM3OR2bpWAuoKGVTyZplhYZRES7rP+pBGH/LgNwFHhoLZrdBUp5yBLdYF?=
+ =?us-ascii?Q?S+++aN3V3Ut80u+alBtVjPZsxL7UDaKlq3tXpdVgej94s2rF9gwv3qbdqEMX?=
+ =?us-ascii?Q?0ve43W/S+77T2RnhKSAyVP2u6iwruZ9FzP+9x5F+Rnuqp6bdCkMG2Vmo++5s?=
+ =?us-ascii?Q?hYaaonAnuZc/SHGDJYfODiRFK4ITgZK8LdlKWzbpzEH09WmeeqXE5nzt4O6R?=
+ =?us-ascii?Q?GXDeFSsWb0BOyo59F9CYA9GgceaRl8LoA32aAxYpp1Z6MJrSJA/osXMycu9z?=
+ =?us-ascii?Q?PNPNPTxbwUdOk+xUn9y0gdVm3qXKgj0WUQDszV5lLmDM+XhJ+qst?=
 X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: af745f1d-1738-4b78-9ea7-08ded8efb28d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1fb47b3e-04db-4748-65e9-08ded8efb696
 X-MS-Exchange-CrossTenant-AuthSource: VE1PR04MB7216.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2026 10:41:53.9513
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2026 10:42:00.7246
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YBQWrBXG6aPD26U8OM8mxX+GBVsqWXAy0M6eJLTg0/X2wg/rFLhMGrdbVpu6gp96z2957UXBllUlYSh4VtHY0bjHCbCS4JV3xUb4Yw1AorquecVAURFF7uyBr7aYFUP9
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7RmqmB5ZdoInCski2PYUXsySKx2QG+5NK4fNI/NTOCOhJxpQP3uqbefYlPqakR3CcMcIhp2aapCG5opfAJKYyogf712A0QFd6c59ZHjbwXMdXM5qDqWp95qISVlqI2x+
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR04MB10741
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [3.44 / 15.00];
@@ -154,12 +154,12 @@ X-Spamd-Result: default: False [3.44 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[NXP1.onmicrosoft.com:s=selector1-NXP1-onmicrosoft-com];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304490-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304491-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER(0.00)[wei.fang@oss.nxp.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -177,240 +177,310 @@ X-Spamd-Result: default: False [3.44 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FROM_NO_DN(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,NXP1.onmicrosoft.com:dkim,nxp.com:email,oss.nxp.com:mid,oss.nxp.com:from_mime,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,oss.nxp.com:mid,oss.nxp.com:from_mime,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,NXP1.onmicrosoft.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6E34E701758
+X-Rspamd-Queue-Id: 602C970186E
 
 From: Wei Fang <wei.fang@nxp.com>
 
-The PSIPMMR (Port Station Interface Promiscuous MAC Mode Register) in
-ENETC v4 has the same bit layout as the PSIPMR register in ENETC v1: bit
-n controls unicast promiscuous mode for SI n, and bit (n + 16) controls
-multicast promiscuous mode for SI n. The only difference between the two
-hardware generations is the register address offset.
+The PSIUMHFR and PSIMMHFR registers in ENETC v4 have the same bit layout
+as in ENETC v1. The only difference between the two hardware generations
+is the register address offsets.
 
-Since the register functionality is identical, the MAC promiscuous mode
-setting code can be shared between ENETC v1 and v4 drivers.
-
-Rename ENETC_PSIPMR to ENETC_PSIPMMR in enetc_hw.h to match the actual
-register name used in the reference manual, and extract two new common
-helper functions, enetc_set_si_uc_promisc() and
-enetc_set_si_mc_promisc(), into enetc_pf_common.c. These helpers select
-the correct register offset based on the hardware revision via
+Since the register functionality is identical, the MAC hash filter
+configuration code can be shared between the ENETC v1 and v4 drivers.
+Extract two new common helper functions, enetc_set_si_uc_hash_filter()
+and enetc_set_si_mc_hash_filter(), into enetc_pf_common.c. These helpers
+select the correct register offset based on the hardware revision via
 is_enetc_rev1().
 
-Remove the v4-specific enetc4_pf_set_si_mac_promisc() function from
-enetc4_pf.c and the duplicate PSIPMMR_SI_MAC_UP/MP macro definitions
-from enetc4_hw.h, as they are now superseded by the shared code.
+Remove v1-specific enetc_clear_mac_ht_flt() and enetc_set_mac_ht_flt()
+from enetc_pf.c, and v4-specific enetc4_pf_set_si_uc_hash_filter() and
+enetc4_pf_set_si_mc_hash_filter() from enetc4_pf.c, as they are now
+superseded by the shared implementations.
 
 Signed-off-by: Wei Fang <wei.fang@nxp.com>
 ---
- .../net/ethernet/freescale/enetc/enetc4_hw.h  |  2 -
- .../net/ethernet/freescale/enetc/enetc4_pf.c  | 21 +--------
- .../ethernet/freescale/enetc/enetc_ethtool.c  |  2 +-
- .../net/ethernet/freescale/enetc/enetc_hw.h   |  7 +--
- .../net/ethernet/freescale/enetc/enetc_pf.c   | 11 ++---
- .../freescale/enetc/enetc_pf_common.c         | 44 +++++++++++++++++++
+ .../net/ethernet/freescale/enetc/enetc4_pf.c  | 43 +++++++---------
+ .../net/ethernet/freescale/enetc/enetc_pf.c   | 51 +++++--------------
+ .../freescale/enetc/enetc_pf_common.c         | 40 +++++++++++++++
  .../freescale/enetc/enetc_pf_common.h         |  2 +
- 7 files changed, 56 insertions(+), 33 deletions(-)
+ 4 files changed, 73 insertions(+), 63 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc4_hw.h b/drivers/net/ethernet/freescale/enetc/enetc4_hw.h
-index f18437556a0e..6a8f2ed56017 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc4_hw.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc4_hw.h
-@@ -69,8 +69,6 @@
- 
- /* Port Station interface promiscuous MAC mode register */
- #define ENETC4_PSIPMMR			0x200
--#define  PSIPMMR_SI_MAC_UP(a)		BIT(a) /* a = SI index */
--#define  PSIPMMR_SI_MAC_MP(a)		BIT((a) + 16)
- 
- /* Port Station interface promiscuous VLAN mode register */
- #define ENETC4_PSIPVMR			0x204
 diff --git a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-index 437a15bbb47b..304ec069654d 100644
+index 304ec069654d..48a74db90ed5 100644
 --- a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
 +++ b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-@@ -75,24 +75,6 @@ static void enetc4_pf_get_si_primary_mac(struct enetc_hw *hw, int si,
+@@ -75,20 +75,6 @@ static void enetc4_pf_get_si_primary_mac(struct enetc_hw *hw, int si,
  	put_unaligned_le16(lower, addr + 4);
  }
  
--static void enetc4_pf_set_si_mac_promisc(struct enetc_hw *hw, int si,
--					 bool uc_promisc, bool mc_promisc)
+-static void enetc4_pf_set_si_uc_hash_filter(struct enetc_hw *hw, int si,
+-					    u64 hash)
 -{
--	u32 val = enetc_port_rd(hw, ENETC4_PSIPMMR);
--
--	if (uc_promisc)
--		val |= PSIPMMR_SI_MAC_UP(si);
--	else
--		val &= ~PSIPMMR_SI_MAC_UP(si);
--
--	if (mc_promisc)
--		val |= PSIPMMR_SI_MAC_MP(si);
--	else
--		val &= ~PSIPMMR_SI_MAC_MP(si);
--
--	enetc_port_wr(hw, ENETC4_PSIPMMR, val);
+-	enetc_port_wr(hw, ENETC4_PSIUMHFR0(si), lower_32_bits(hash));
+-	enetc_port_wr(hw, ENETC4_PSIUMHFR1(si), upper_32_bits(hash));
 -}
 -
- static void enetc4_pf_set_si_uc_hash_filter(struct enetc_hw *hw, int si,
- 					    u64 hash)
- {
-@@ -515,7 +497,8 @@ static void enetc4_psi_do_set_rx_mode(struct work_struct *work)
- 		type = ENETC_MAC_FILTER_TYPE_ALL;
- 	}
- 
--	enetc4_pf_set_si_mac_promisc(hw, 0, uc_promisc, mc_promisc);
-+	enetc_set_si_uc_promisc(si, 0, uc_promisc);
-+	enetc_set_si_mc_promisc(si, 0, mc_promisc);
- 
- 	if (uc_promisc) {
- 		enetc4_pf_set_si_uc_hash_filter(hw, 0, 0);
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c b/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-index 71f376ef1be1..07b7832f2427 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-@@ -29,7 +29,7 @@ static const u32 enetc_rxbdr_regs[] = {
- };
- 
- static const u32 enetc_port_regs[] = {
--	ENETC_PMR, ENETC_PSR, ENETC_PSIPMR, ENETC_PSIPMAR0(0),
-+	ENETC_PMR, ENETC_PSR, ENETC_PSIPMMR, ENETC_PSIPMAR0(0),
- 	ENETC_PSIPMAR1(0), ENETC_PTXMBAR, ENETC_PCAPR0, ENETC_PCAPR1,
- 	ENETC_PSICFGR0(0), ENETC_PRFSCAPR, ENETC_PTCMSDUR(0),
- 	ENETC_PM0_CMD_CFG, ENETC_PM0_MAXFRM, ENETC_PM0_IF_MODE
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_hw.h b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-index bf99b65d7598..66bfda60da9c 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-@@ -180,9 +180,10 @@ enum enetc_bdr_type {TX, RX};
- #define ENETC_PMR_PSPEED_1000M	BIT(9)
- #define ENETC_PMR_PSPEED_2500M	BIT(10)
- #define ENETC_PSR		0x0004 /* RO */
--#define ENETC_PSIPMR		0x0018
--#define ENETC_PSIPMR_SET_UP(n)	BIT(n) /* n = SI index */
--#define ENETC_PSIPMR_SET_MP(n)	BIT((n) + 16)
-+#define ENETC_PSIPMMR		0x0018
-+#define  PSIPMMR_SI_MAC_UP(n)	BIT(n) /* n = SI index */
-+#define  PSIPMMR_SI_MAC_MP(n)	BIT((n) + 16)
-+
- #define ENETC_PSIPVMR		0x001c
- #define ENETC_VLAN_PROMISC_MAP_ALL	0x7
- #define ENETC_PSIPVMR_SET_VP(simap)	((simap) & 0x7)
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.c b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-index 2d687bb8c3a0..a97d2e2dd07b 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-@@ -159,21 +159,17 @@ static void enetc_pf_set_rx_mode(struct net_device *ndev)
+-static void enetc4_pf_set_si_mc_hash_filter(struct enetc_hw *hw, int si,
+-					    u64 hash)
+-{
+-	enetc_port_wr(hw, ENETC4_PSIMMHFR0(si), lower_32_bits(hash));
+-	enetc_port_wr(hw, ENETC4_PSIMMHFR1(si), upper_32_bits(hash));
+-}
+-
+ static void enetc4_pf_set_loopback(struct net_device *ndev, bool en)
  {
  	struct enetc_ndev_priv *priv = netdev_priv(ndev);
- 	struct enetc_pf *pf = enetc_si_priv(priv->si);
--	struct enetc_hw *hw = &priv->si->hw;
- 	bool uprom = false, mprom = false;
- 	struct enetc_mac_filter *filter;
+@@ -147,11 +133,12 @@ static int enetc4_pf_set_uc_exact_filter(struct enetc_pf *pf)
+ 	int max_num_mfe = pf->caps.mac_filter_num;
+ 	struct enetc_mac_filter mac_filter = {};
+ 	struct net_device *ndev = pf->si->ndev;
+-	struct enetc_hw *hw = &pf->si->hw;
+ 	struct enetc_mac_addr *mac_tbl;
++	struct enetc_si *si = pf->si;
  	struct netdev_hw_addr *ha;
--	u32 psipmr = 0;
- 	bool em;
+ 	int i = 0, err;
+ 	int mac_cnt;
++	u64 hash;
  
- 	if (ndev->flags & IFF_PROMISC) {
- 		/* enable promisc mode for SI0 (PF) */
--		psipmr = ENETC_PSIPMR_SET_UP(0) | ENETC_PSIPMR_SET_MP(0);
- 		uprom = true;
- 		mprom = true;
- 	} else if (ndev->flags & IFF_ALLMULTI) {
- 		/* enable multi cast promisc mode for SI0 (PF) */
--		psipmr = ENETC_PSIPMR_SET_MP(0);
- 		mprom = true;
+ 	netif_addr_lock_bh(ndev);
+ 
+@@ -159,7 +146,7 @@ static int enetc4_pf_set_uc_exact_filter(struct enetc_pf *pf)
+ 	if (!mac_cnt) {
+ 		netif_addr_unlock_bh(ndev);
+ 		/* clear both MAC hash and exact filters */
+-		enetc4_pf_set_si_uc_hash_filter(hw, 0, 0);
++		enetc_set_si_uc_hash_filter(si, 0, 0);
+ 		enetc4_pf_clear_maft_entries(pf);
+ 
+ 		return 0;
+@@ -186,11 +173,13 @@ static int enetc4_pf_set_uc_exact_filter(struct enetc_pf *pf)
+ 	/* Set temporary unicast hash filters in case of Rx loss when
+ 	 * updating MAC address filter table
+ 	 */
+-	enetc4_pf_set_si_uc_hash_filter(hw, 0, *mac_filter.mac_hash_table);
++	bitmap_to_arr64(&hash, mac_filter.mac_hash_table,
++			ENETC_MADDR_HASH_TBL_SZ);
++	enetc_set_si_uc_hash_filter(si, 0, hash);
+ 	enetc4_pf_clear_maft_entries(pf);
+ 
+ 	if (!enetc4_pf_add_maft_entries(pf, mac_tbl, i))
+-		enetc4_pf_set_si_uc_hash_filter(hw, 0, 0);
++		enetc_set_si_uc_hash_filter(si, 0, 0);
+ 
+ 	kfree(mac_tbl);
+ 
+@@ -206,8 +195,9 @@ static void enetc4_pf_set_mac_hash_filter(struct enetc_pf *pf, int type)
+ {
+ 	struct net_device *ndev = pf->si->ndev;
+ 	struct enetc_mac_filter *mac_filter;
+-	struct enetc_hw *hw = &pf->si->hw;
++	struct enetc_si *si = pf->si;
+ 	struct netdev_hw_addr *ha;
++	u64 hash;
+ 
+ 	netif_addr_lock_bh(ndev);
+ 	if (type & ENETC_MAC_FILTER_TYPE_UC) {
+@@ -216,8 +206,9 @@ static void enetc4_pf_set_mac_hash_filter(struct enetc_pf *pf, int type)
+ 		netdev_for_each_uc_addr(ha, ndev)
+ 			enetc_add_mac_addr_ht_filter(mac_filter, ha->addr);
+ 
+-		enetc4_pf_set_si_uc_hash_filter(hw, 0,
+-						*mac_filter->mac_hash_table);
++		bitmap_to_arr64(&hash, mac_filter->mac_hash_table,
++				ENETC_MADDR_HASH_TBL_SZ);
++		enetc_set_si_uc_hash_filter(si, 0, hash);
  	}
  
-@@ -211,9 +207,8 @@ static void enetc_pf_set_rx_mode(struct net_device *ndev)
- 		/* update PF entries */
- 		enetc_sync_mac_filters(pf);
+ 	if (type & ENETC_MAC_FILTER_TYPE_MC) {
+@@ -226,8 +217,9 @@ static void enetc4_pf_set_mac_hash_filter(struct enetc_pf *pf, int type)
+ 		netdev_for_each_mc_addr(ha, ndev)
+ 			enetc_add_mac_addr_ht_filter(mac_filter, ha->addr);
  
--	psipmr |= enetc_port_rd(hw, ENETC_PSIPMR) &
--		  ~(ENETC_PSIPMR_SET_UP(0) | ENETC_PSIPMR_SET_MP(0));
--	enetc_port_wr(hw, ENETC_PSIPMR, psipmr);
-+	enetc_set_si_uc_promisc(priv->si, 0, uprom);
-+	enetc_set_si_mc_promisc(priv->si, 0, mprom);
+-		enetc4_pf_set_si_mc_hash_filter(hw, 0,
+-						*mac_filter->mac_hash_table);
++		bitmap_to_arr64(&hash, mac_filter->mac_hash_table,
++				ENETC_MADDR_HASH_TBL_SZ);
++		enetc_set_si_mc_hash_filter(si, 0, hash);
+ 	}
+ 	netif_addr_unlock_bh(ndev);
+ }
+@@ -480,7 +472,6 @@ static void enetc4_psi_do_set_rx_mode(struct work_struct *work)
+ 	struct enetc_si *si = container_of(work, struct enetc_si, rx_mode_task);
+ 	struct enetc_pf *pf = enetc_si_priv(si);
+ 	struct net_device *ndev = si->ndev;
+-	struct enetc_hw *hw = &si->hw;
+ 	bool uc_promisc = false;
+ 	bool mc_promisc = false;
+ 	int type = 0;
+@@ -501,12 +492,12 @@ static void enetc4_psi_do_set_rx_mode(struct work_struct *work)
+ 	enetc_set_si_mc_promisc(si, 0, mc_promisc);
+ 
+ 	if (uc_promisc) {
+-		enetc4_pf_set_si_uc_hash_filter(hw, 0, 0);
++		enetc_set_si_uc_hash_filter(si, 0, 0);
+ 		enetc4_pf_clear_maft_entries(pf);
+ 	}
+ 
+ 	if (mc_promisc)
+-		enetc4_pf_set_si_mc_hash_filter(hw, 0, 0);
++		enetc_set_si_mc_hash_filter(si, 0, 0);
+ 
+ 	/* Set new MAC filter */
+ 	enetc4_pf_set_mac_filter(pf, type);
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.c b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
+index a97d2e2dd07b..db2a800a7aaf 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc_pf.c
++++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
+@@ -80,37 +80,6 @@ static void enetc_add_mac_addr_em_filter(struct enetc_mac_filter *filter,
+ 	filter->mac_addr_cnt++;
  }
  
- static void enetc_set_loopback(struct net_device *ndev, bool en)
-@@ -474,7 +469,7 @@ static void enetc_configure_port(struct enetc_pf *pf)
- 	pf->vlan_promisc_simap = ENETC_VLAN_PROMISC_MAP_ALL;
- 	enetc_set_vlan_promisc(hw, pf->vlan_promisc_simap);
+-static void enetc_clear_mac_ht_flt(struct enetc_si *si, int si_idx, int type)
+-{
+-	bool err = si->errata & ENETC_ERR_UCMCSWP;
+-
+-	if (type == UC) {
+-		enetc_port_wr(&si->hw, ENETC_PSIUMHFR0(si_idx, err), 0);
+-		enetc_port_wr(&si->hw, ENETC_PSIUMHFR1(si_idx), 0);
+-	} else { /* MC */
+-		enetc_port_wr(&si->hw, ENETC_PSIMMHFR0(si_idx, err), 0);
+-		enetc_port_wr(&si->hw, ENETC_PSIMMHFR1(si_idx), 0);
+-	}
+-}
+-
+-static void enetc_set_mac_ht_flt(struct enetc_si *si, int si_idx, int type,
+-				 unsigned long hash)
+-{
+-	bool err = si->errata & ENETC_ERR_UCMCSWP;
+-
+-	if (type == UC) {
+-		enetc_port_wr(&si->hw, ENETC_PSIUMHFR0(si_idx, err),
+-			      lower_32_bits(hash));
+-		enetc_port_wr(&si->hw, ENETC_PSIUMHFR1(si_idx),
+-			      upper_32_bits(hash));
+-	} else { /* MC */
+-		enetc_port_wr(&si->hw, ENETC_PSIMMHFR0(si_idx, err),
+-			      lower_32_bits(hash));
+-		enetc_port_wr(&si->hw, ENETC_PSIMMHFR1(si_idx),
+-			      upper_32_bits(hash));
+-	}
+-}
+-
+ static void enetc_sync_mac_filters(struct enetc_pf *pf)
+ {
+ 	struct enetc_mac_filter *f = pf->mac_filter;
+@@ -122,12 +91,16 @@ static void enetc_sync_mac_filters(struct enetc_pf *pf)
+ 	for (i = 0; i < MADDR_TYPE; i++, f++) {
+ 		bool em = (f->mac_addr_cnt == 1) && (i == UC);
+ 		bool clear = !f->mac_addr_cnt;
++		u64 hash;
  
--	enetc_port_wr(hw, ENETC_PSIPMR, 0);
-+	enetc_port_wr(hw, ENETC_PSIPMMR, 0);
+ 		if (clear) {
+-			if (i == UC)
++			if (i == UC) {
+ 				enetc_clear_mac_flt_entry(si, pos);
++				enetc_set_si_uc_hash_filter(si, 0, 0);
++			} else {
++				enetc_set_si_mc_hash_filter(si, 0, 0);
++			}
  
- 	/* enable port */
- 	enetc_port_wr(hw, ENETC_PMR, ENETC_PMR_EN);
+-			enetc_clear_mac_ht_flt(si, 0, i);
+ 			continue;
+ 		}
+ 
+@@ -135,7 +108,7 @@ static void enetc_sync_mac_filters(struct enetc_pf *pf)
+ 		if (em) {
+ 			int err;
+ 
+-			enetc_clear_mac_ht_flt(si, 0, UC);
++			enetc_set_si_uc_hash_filter(si, 0, 0);
+ 
+ 			err = enetc_set_mac_flt_entry(si, pos, f->mac_addr,
+ 						      BIT(0));
+@@ -147,11 +120,15 @@ static void enetc_sync_mac_filters(struct enetc_pf *pf)
+ 				 err);
+ 		}
+ 
++		bitmap_to_arr64(&hash, f->mac_hash_table,
++				ENETC_MADDR_HASH_TBL_SZ);
+ 		/* hash table filter, clear EM filter for UC entries */
+-		if (i == UC)
++		if (i == UC) {
+ 			enetc_clear_mac_flt_entry(si, pos);
+-
+-		enetc_set_mac_ht_flt(si, 0, i, *f->mac_hash_table);
++			enetc_set_si_uc_hash_filter(si, 0, hash);
++		} else {
++			enetc_set_si_mc_hash_filter(si, 0, hash);
++		}
+ 	}
+ }
+ 
 diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-index 6e5d2f869915..b0c0dc668e34 100644
+index b0c0dc668e34..3597cb81a7cc 100644
 --- a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
 +++ b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-@@ -87,6 +87,50 @@ int enetc_setup_mac_addresses(struct device_node *np, struct enetc_pf *pf)
+@@ -131,6 +131,46 @@ void enetc_set_si_mc_promisc(struct enetc_si *si, int si_id, bool promisc)
  }
- EXPORT_SYMBOL_GPL(enetc_setup_mac_addresses);
+ EXPORT_SYMBOL_GPL(enetc_set_si_mc_promisc);
  
-+void enetc_set_si_uc_promisc(struct enetc_si *si, int si_id, bool promisc)
++void enetc_set_si_uc_hash_filter(struct enetc_si *si, int si_id, u64 hash)
 +{
++	int psiumhfr0_off, psiumhfr1_off;
 +	struct enetc_hw *hw = &si->hw;
-+	int psipmmr_off;
-+	u32 val;
 +
-+	if (is_enetc_rev1(si))
-+		psipmmr_off = ENETC_PSIPMMR;
-+	else
-+		psipmmr_off = ENETC4_PSIPMMR;
++	if (is_enetc_rev1(si)) {
++		bool err = si->errata & ENETC_ERR_UCMCSWP;
 +
-+	val = enetc_port_rd(hw, psipmmr_off);
++		psiumhfr0_off = ENETC_PSIUMHFR0(si_id, err);
++		psiumhfr1_off = ENETC_PSIUMHFR1(si_id);
++	} else {
++		psiumhfr0_off = ENETC4_PSIUMHFR0(si_id);
++		psiumhfr1_off = ENETC4_PSIUMHFR1(si_id);
++	}
 +
-+	if (promisc)
-+		val |= PSIPMMR_SI_MAC_UP(si_id);
-+	else
-+		val &= ~PSIPMMR_SI_MAC_UP(si_id);
-+
-+	enetc_port_wr(hw, psipmmr_off, val);
++	enetc_port_wr(hw, psiumhfr0_off, lower_32_bits(hash));
++	enetc_port_wr(hw, psiumhfr1_off, upper_32_bits(hash));
 +}
-+EXPORT_SYMBOL_GPL(enetc_set_si_uc_promisc);
++EXPORT_SYMBOL_GPL(enetc_set_si_uc_hash_filter);
 +
-+void enetc_set_si_mc_promisc(struct enetc_si *si, int si_id, bool promisc)
++void enetc_set_si_mc_hash_filter(struct enetc_si *si, int si_id, u64 hash)
 +{
++	int psimmhfr0_off, psimmhfr1_off;
 +	struct enetc_hw *hw = &si->hw;
-+	int psipmmr_off;
-+	u32 val;
 +
-+	if (is_enetc_rev1(si))
-+		psipmmr_off = ENETC_PSIPMMR;
-+	else
-+		psipmmr_off = ENETC4_PSIPMMR;
++	if (is_enetc_rev1(si)) {
++		bool err = si->errata & ENETC_ERR_UCMCSWP;
 +
-+	val = enetc_port_rd(hw, psipmmr_off);
++		psimmhfr0_off = ENETC_PSIMMHFR0(si_id, err);
++		psimmhfr1_off = ENETC_PSIMMHFR1(si_id);
++	} else {
++		psimmhfr0_off = ENETC4_PSIMMHFR0(si_id);
++		psimmhfr1_off = ENETC4_PSIMMHFR1(si_id);
++	}
 +
-+	if (promisc)
-+		val |= PSIPMMR_SI_MAC_MP(si_id);
-+	else
-+		val &= ~PSIPMMR_SI_MAC_MP(si_id);
-+
-+	enetc_port_wr(hw, psipmmr_off, val);
++	enetc_port_wr(hw, psimmhfr0_off, lower_32_bits(hash));
++	enetc_port_wr(hw, psimmhfr1_off, upper_32_bits(hash));
 +}
-+EXPORT_SYMBOL_GPL(enetc_set_si_mc_promisc);
++EXPORT_SYMBOL_GPL(enetc_set_si_mc_hash_filter);
 +
  void enetc_pf_netdev_setup(struct enetc_si *si, struct net_device *ndev,
  			   const struct net_device_ops *ndev_ops)
  {
 diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h
-index 57d2e0ebd2b0..a619fb8fed9c 100644
+index a619fb8fed9c..bf9029b0a017 100644
 --- a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h
 +++ b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h
-@@ -17,6 +17,8 @@ void enetc_set_default_rss_key(struct enetc_pf *pf);
- int enetc_vlan_rx_add_vid(struct net_device *ndev, __be16 prot, u16 vid);
- int enetc_vlan_rx_del_vid(struct net_device *ndev, __be16 prot, u16 vid);
+@@ -19,6 +19,8 @@ int enetc_vlan_rx_del_vid(struct net_device *ndev, __be16 prot, u16 vid);
  int enetc_init_sriov_resources(struct enetc_pf *pf);
-+void enetc_set_si_uc_promisc(struct enetc_si *si, int si_id, bool promisc);
-+void enetc_set_si_mc_promisc(struct enetc_si *si, int si_id, bool promisc);
+ void enetc_set_si_uc_promisc(struct enetc_si *si, int si_id, bool promisc);
+ void enetc_set_si_mc_promisc(struct enetc_si *si, int si_id, bool promisc);
++void enetc_set_si_uc_hash_filter(struct enetc_si *si, int si_id, u64 hash);
++void enetc_set_si_mc_hash_filter(struct enetc_si *si, int si_id, u64 hash);
  
  static inline u16 enetc_get_ip_revision(struct enetc_hw *hw)
  {
