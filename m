@@ -1,271 +1,452 @@
-Return-Path: <netdev+bounces-304395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304397-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id s3L/Ne5kR2qOXgAAu9opvQ
-	(envelope-from <netdev+bounces-304395-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:29:50 +0200
+	id VwhzH55lR2rFXgAAu9opvQ
+	(envelope-from <netdev+bounces-304397-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:32:46 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B5BF6FF8BC
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:29:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E71886FF966
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 09:32:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=vQhrBIiu;
-	dmarc=pass (policy=reject) header.from=bootlin.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304395-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304395-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b="n/+pesQd";
+	dmarc=pass (policy=none) header.from=intel.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304397-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304397-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CC6583016C8D
-	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 07:29:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 41E0F304B2B2
+	for <lists+netdev@lfdr.de>; Fri,  3 Jul 2026 07:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77EC235675F;
-	Fri,  3 Jul 2026 07:29:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F35F35A39F;
+	Fri,  3 Jul 2026 07:30:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C5C73546CB
-	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 07:29:44 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783063787; cv=none; b=hN8p1Znugn2l0r7oFP/oRqVHPdk6twhsBscIIGpPKh0JXhqrgbMCL4Gb4WA4dPWONefXkeshWk0CKUFr5zwzLEj0mB+DCAVvPZ07+XDLs1TyUXKQXQvTgepAtT7xW9wOUOxhun/1kdhBSDoJx0AEf81u5FllTyg6Hh/jCi8nN+w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783063787; c=relaxed/simple;
-	bh=6PBOPsqWE1sG+bif+HMfRbzq1/+2yhRA2YSURmJvnco=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i21WXX9Dpe3t9qFAZxzfoLsX8y0Wb1sseyjUK1FVh8cWs8EguRc/25U85FvfdJNRERxJS+eyit5PAgV52nlwM76+YbSePrett7Acaqhz5rubNTXQ/NwSu/IobZoGU/zGfOHzE9XeW5L1H05wX6FlMao2XmDnB/3PspsdvCXkzRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=vQhrBIiu; arc=none smtp.client-ip=185.171.202.116
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 11DCEC49F49;
-	Fri,  3 Jul 2026 07:29:54 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 579FA60300;
-	Fri,  3 Jul 2026 07:29:42 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 19C4C104C8399;
-	Fri,  3 Jul 2026 09:29:35 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1783063781; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=cSZ/xQ3jdLNEzAhovYV6wMXxKB3N/2vb+tOcH1bKHWQ=;
-	b=vQhrBIiu90ze/KSbq2jZmN6ymjPqGrbJeI3A+pJsISSPMw2cO/Z0n7hfy96sME6LQ0/iPz
-	npePBKehuvxy/c+dSTSiif6kES1VEfrYtrzHuRm5qliy9DbCpn4u1udoGoE+2WMXzj9KDT
-	y6RCHafMnaiADSk2dVt2m568CuR3wGXwaY1JKaHlu06eWbDG5VT1olCEdciW3RlFrr3Dkb
-	dM0baZYJ6OawEzHmRRIRzuIS0rCFCJ2LypXDbft3yVgT0zg8xzw3U4fMozEKQFPvRq1VDq
-	BqsMjeRQ2CI8VRl9ktkUzFiG6sSBAb8uaubStH6F5pcZGx1MWFTvivVZt7hb4Q==
-Message-ID: <e4e1d392-2430-4403-91b1-5be59d6a9895@bootlin.com>
-Date: Fri, 3 Jul 2026 09:29:34 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9474433E7B
+	for <netdev@vger.kernel.org>; Fri,  3 Jul 2026 07:30:33 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783063836; cv=fail; b=UAEaoKTTRJyNG/YjIX/+3p/MSAwmH+GXagI1mso9N4GxhgYaksUFkb9rtTz5tVWPNlIvsiEs5QDmKVwzYFkx4RFkLg4nplObxitozmDXYhSlHhALKe85IkJBrn9iJQHd3DZA7/UtKYaQOPIxQnelrI/DhuMA2Z7vmn8vfYAUe1g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783063836; c=relaxed/simple;
+	bh=UGuPR1VVW3ZjU8rkGx87GeVoMk2E48fHzoyA6gLxUNY=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=UXE4N1YF4/Jku4gdrpnxWDJQNrlorjjvh9YSseGA51VYKNfGjh4BlKNUoeDENVou/WIJru38z3bo2UwivtogG51uJXfVqlAa6r4jmifKT9IKsAK8pEaEx/UD6ddyyS+qMhNCAEakJfK9gmT4dg2t7kftoSS/almv6C208x2KjBU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n/+pesQd; arc=fail smtp.client-ip=192.198.163.8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1783063834; x=1814599834;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=UGuPR1VVW3ZjU8rkGx87GeVoMk2E48fHzoyA6gLxUNY=;
+  b=n/+pesQdCAKu5v6nMi88pZZv6C64lFuroogCwrrGStalXfMrZ3SXkEE+
+   rj5GIowLQIwn9RfYOibVUvTWyoQV1xwVEMKblZuoogFAvaoncai+5ThTu
+   aGLzdA37VtmY6LWQ2FgIMl1hKF4mdA7L+g8bplX50Mb+uix4z8KQJ1H4W
+   y4myJAfqLptMXlywQbwVAWIn/CxcO6JLFOuzeKTZgdpWR3eIEmuyE+8FR
+   qgzkzhetQuFtsN+WHCmPj1WKE41tER8MBa0zgqcBmsuWCexeY4vIdetes
+   ThurrnVduqd+zcjqyEaFcglN8WWiYnyRJu43B0ViqLRSGOURWziSaSKb+
+   A==;
+X-CSE-ConnectionGUID: iEQuC9IwRe22yVfXsRqmAA==
+X-CSE-MsgGUID: /xHWjd/KRWuXgq1lqHN6Ig==
+X-IronPort-AV: E=McAfee;i="6800,10657,11835"; a="101352119"
+X-IronPort-AV: E=Sophos;i="6.25,145,1779174000"; 
+   d="scan'208";a="101352119"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2026 00:30:33 -0700
+X-CSE-ConnectionGUID: q/E1PI+NSG2e3E8LGsO8JQ==
+X-CSE-MsgGUID: Grwi0Q6hR3ugxAP2j1eipw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,145,1779174000"; 
+   d="scan'208";a="277371772"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2026 00:30:32 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Fri, 3 Jul 2026 00:30:32 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43 via Frontend Transport; Fri, 3 Jul 2026 00:30:32 -0700
+Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.27) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Fri, 3 Jul 2026 00:30:31 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=M4wNEuJk8DlEzBjTmme3BdKlH7Lt+CIeO8GcLbL9Gq++1U4fEsbUAYIhertIW2DafXNNYn6WfnDjEcLnec7Swk4DfRX3E/0Umt9320xn891EZXOx35OQIkUnqLimZzBoOF6oIj7zzGPAztYRzLaluOPat96WDYBfvefVpOXiRruy/3Pu9PkP5ta+fEUJ3PqB7V+3154Up3UEgLWNL78722EyM7HSd/jNNBANBzFau3xYS3pOYRuYg0I3YqpwfMR5MkDXE+u9fe3/xEa5MfJeJQsGsZvP5cUnfFVWhmIboBq/cCWnlc6iXJSfefSjEfLp2Ep2GPNXFeexzNBqlv6GPw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=164yM0u9oDXnO+BJ3JlqOgpgAZm5e+ROMlW2JFnpJfk=;
+ b=iMlwgslA9KWbDPRkWRJE7iiWNhastJItb90fmf9q55a8NIa5/1hZ6m46yq/F4XvyMsQoqbTjULDsuLaIu1qKyAe0n6QtQ2RMFI0aEGT907Erd/aVHN8cdPUiBL+ia8qNmUpM8UfcoYu0fZ7umW5FrEfHNbxcVixgZhJR78XASx5pb2H8oaKuLrlDCgBV3RV8hzcb7kU29Hik5gLzJD2mEfNYmHwzw78MxSrdXTDrTckv89mePVADV3/CU95gwWl+ZLcFcDxBj7F6QdGx1ZqunjCJcE2rCk24Ho6ELvGSw8499Fe+Jwb6vn1XnqRq/vKPMjja76uYbifZAHRpQA76kg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB7958.namprd11.prod.outlook.com (2603:10b6:8:f9::19) by
+ DS7PR11MB5967.namprd11.prod.outlook.com (2603:10b6:8:72::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.181.8; Fri, 3 Jul 2026 07:30:27 +0000
+Received: from DS0PR11MB7958.namprd11.prod.outlook.com
+ ([fe80::8cb2:cffc:b684:9a99]) by DS0PR11MB7958.namprd11.prod.outlook.com
+ ([fe80::8cb2:cffc:b684:9a99%4]) with mapi id 15.21.0181.009; Fri, 3 Jul 2026
+ 07:30:27 +0000
+Message-ID: <09869e95-4526-428d-808e-74c6b1ebc207@intel.com>
+Date: Fri, 3 Jul 2026 13:00:16 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 3/5] drm/xe/ras: Add support for error threshold
+To: Raag Jadav <raag.jadav@intel.com>, <intel-xe@lists.freedesktop.org>,
+	<dri-devel@lists.freedesktop.org>, <netdev@vger.kernel.org>
+CC: <simona.vetter@ffwll.ch>, <airlied@gmail.com>, <kuba@kernel.org>,
+	<lijo.lazar@amd.com>, <Hawking.Zhang@amd.com>, <davem@davemloft.net>,
+	<pabeni@redhat.com>, <edumazet@google.com>, <dev@lankhorst.se>,
+	<zachary.mckevitt@oss.qualcomm.com>, <rodrigo.vivi@intel.com>,
+	<michal.wajdeczko@intel.com>, <matthew.d.roper@intel.com>,
+	<mallesh.koujalagi@intel.com>
+References: <20260623101043.255897-1-raag.jadav@intel.com>
+ <20260623101043.255897-4-raag.jadav@intel.com>
+Content-Language: en-US
+From: "Tauro, Riana" <riana.tauro@intel.com>
+In-Reply-To: <20260623101043.255897-4-raag.jadav@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MA5PR01CA0254.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a01:223::19) To DS0PR11MB7958.namprd11.prod.outlook.com
+ (2603:10b6:8:f9::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 1/2] net: dsa: realtek: rtl8365mb: add SGMII
- support for RTL8367S
-To: Johan Alvarado <contact@c127.dev>, linusw@kernel.org,
- alsi@bang-olufsen.dk, andrew@lunn.ch, olteanv@gmail.com, kuba@kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- linux@armlinux.org.uk
-Cc: luizluca@gmail.com, namiltd@yahoo.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260702204648.276112-1-contact@c127.dev>
- <0100019f2496091c-0bf7417f-aa27-4465-972b-f9a9b156506a-000000@email.amazonses.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <0100019f2496091c-0bf7417f-aa27-4465-972b-f9a9b156506a-000000@email.amazonses.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7958:EE_|DS7PR11MB5967:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7269c36e-0e7f-4363-7d78-08ded8d4f3bc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|23010399003|22082099003|18002099003|4143699003|11063799006|56012099006;
+X-Microsoft-Antispam-Message-Info: hKtbdrXXXmmmxICqTxEadRNdb0+Q4CH/46ZUNkM4CM/RtD5+00lONhxPWco+a6/cTg99sqDTcrD8K8ljEu+FYPnFM67PW+H3VJ16XBBvz3g7XY08dHH+o1OWNeEvkNd1s6xfmiUaHE+KPqEP2VL92hXsYDuDi83uDuN0qnhwUk+oXgLJBDubYACTE3wr+p9OImHWxH8IUMMqpB2st7HJsCjt4UXpCpENVGVn89npArWtfndi26BZ4hStLno+8/qmgapMh6CX9hQnPzUjKHvrqfDUigJ7VeLD+fHU95/wMZgA9d/CZoyG3zieqCUX02R4atvoMVY0V4sJUwqByVMf2FFIk7eR+50FdgLMuSiOHFJS3btiqioHvhseXudW0NxMGskBvNKA3toF9CgvZi0YcdgCkWoWfkejKws9LMnPd10+nU05+1hG8SwAr4rTRzWIgv02mnKeRj4ovvIyzQRfMF8wixi5apGhhP7x+YaTr7AK8Q/sdst1Uku1+leIYJjMhZiF8+82PfGaEtFQFM/J46ETJoF3kF6c0HwwQcW0Ax8IDbuHrZoE2iWqtNm7K5j/yVnZ5YOyUUPV2K94jKXZmAaOHaZANgdkAEy+tEuE+4zuhFZuA0eDWdK/jO6LvW0vyVAxsumXolZviiDdOzUt0HASEFPJLel/EiHdNdAqGdQ=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7958.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(23010399003)(22082099003)(18002099003)(4143699003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SWJUM3lPTk9GeHhLMnpJd0o4bU1wOVl1SHprTGorbFBtODFya2M4N29zZDRm?=
+ =?utf-8?B?amVLVGFEQ0xqQk8xNVhKMGpWbWFmekFYQzJhbTlBWklnRXVkRWJXa3Zja0Vq?=
+ =?utf-8?B?SFhtUmJMSnVpWUhNLzJSMHRBR0d6U1J2WWYxd3c3VVNLbGQ2cUxhS1llcmZr?=
+ =?utf-8?B?VUd5UjBUTytrL1Rnb3BZWmR1VDZPTXlPSkJCRHlYb0lwWjhUWnJnM0ZvUnpW?=
+ =?utf-8?B?UFVzMFV6Wm5HY3Y4dDFFdzhvdDl5blYweTRocVIwcXpzcFhEWk5CdlpBU01q?=
+ =?utf-8?B?K2R0bDh0eEMyTTBKYWNxMjNrSWpZdGxoSWhwMmFoRldCeU1qVjlpZXBtNG5r?=
+ =?utf-8?B?ZnJ6ZHgzUWs5VEdTVVplZG5GQTRPdU9ZVm5PT0w2bXBJd1Z2Y1RnaFlyZ0R3?=
+ =?utf-8?B?b1ZxeERQVmN5NkJ5ZEZwTmRES2x2TW9YVkdCbE5sdU5qRk9pc3Q5ZkRjdzdh?=
+ =?utf-8?B?RUgxdFFMcmR5SU9BVDJaRExxZ1JmbVhuL01MMm9sbTFwNUs4aGZMVXJYQkJn?=
+ =?utf-8?B?VGRnNkdZL2dlT3IrZmNQRFMyV2U3ZFNPVVZCZlIyK3RoWklBajMrZWgzbHFy?=
+ =?utf-8?B?UFl0NnVLNk5WeGo0dnMveFRSMllZaUtLcWMvNHl3YVZyZFFYRHR3TmlVakMx?=
+ =?utf-8?B?ekc1ZGtNYnc3TXdsUHpaZEg3Q21ESHp2T1RpSkpoTjlKVDNFMGQwSEY1Z1Fi?=
+ =?utf-8?B?NVB1b0pBdVhhRmJKOHkvdzRzQkZ2NXJwZHM2aTJZeURaaS9WRkptdlJyTCts?=
+ =?utf-8?B?SjNvYUtiT1NDRi9nTzFBcHNvN2FZQzhKWWRIRlNYdWtVd0VDUi9xanBZU1RX?=
+ =?utf-8?B?Z1phbmZ6VElVRkhMakF4UXhMejhnZFlXSlZUQzU0cG5DMU8wdG0vNUlzYlJM?=
+ =?utf-8?B?SHJuMU5KOUMrbXJSVEZlMk0xVzEvOXd2aEMxQkYxUy8rcGVLRmFac3lSQWdT?=
+ =?utf-8?B?N2dvMHN1MzNScXlyZlowTURoRG13VlFacXJnQWdSWmZneDRyL0c3VEIrMDM1?=
+ =?utf-8?B?eU5JMFNUUmJBL2ZSdmFrTGIza0RQQWtvdjBKQXBHTmM4dEdkZWdmcUExdXln?=
+ =?utf-8?B?aUpMc3IvNmgwVEpqRTdOc29CWjRCeEpkS1BaQWJOZFd6Q1BWdm8zMmhlZnh6?=
+ =?utf-8?B?N2NvdXYyWlVwYXUyTklCMVYrQlB1RjFGNW5hcU1JbGlDWUNGZmJsQmh4Y2No?=
+ =?utf-8?B?eUp3T1F0U3haYXh0ZlFJUW9Uekxxbnk3ZDh2ZmJXN2NjRkNHZWhRd2JMbUVh?=
+ =?utf-8?B?UFd2R09KdGUxOUdBMStvWmVTNThSbjhuU2tHT3pJSUl2d0o5VFJ4QzlFSjF4?=
+ =?utf-8?B?Z2EyTUFMTzU4TU12SUw2K0NPZ2tmcTRZZmNkRWpUZlRHVzBGem9oQnIwVndR?=
+ =?utf-8?B?Nkc1ZDdqcmNKTWpWT0ZpZVB3anBvZTJTaE5yZXlqcnE4ZUdaa2I1YVhoeFNV?=
+ =?utf-8?B?WDZpcDBSNzIrRFB6WThRcXhwMDVpN3RzNFp4VWlrR2xqdTBsenFyWVgydHcr?=
+ =?utf-8?B?eE5kbFdReHk0dFpjc1JOYkwyY2pOMVpKSW8yK1lENGxXNDJZT2tpa3MzUEly?=
+ =?utf-8?B?M1V6SU95Q2NUMkE4WEhGYzJmMWxMa3Mxc1JFZ0o0TFhWQ2YvZzRUYXVWbVk1?=
+ =?utf-8?B?aWE4NUFIendpcjdyYlRiUTg4M2V0eG9pQmVia3BhRzFSVXFDdmg2Ums0UzZL?=
+ =?utf-8?B?anlzOXJoS0dzcjh2UGxJaXRSRThLSUhuT3k2ODdxKzhnZ05YUkZMUTZ3czk1?=
+ =?utf-8?B?alQ5NmlZckNuMmlNajM0WHpXTVgxekE4S1J0Z0hyUkxWQ24rQzI2ZytQZStN?=
+ =?utf-8?B?ZFMyNFRJb1FDNXFwQlRnSmVrbFZpalg4TGVCQUhYeWR4d1ZBaWNMNm0vRkVk?=
+ =?utf-8?B?cWZTR1dPRUxsdlJEdnlmSkpCODQ1RHI3cHo4dU1Rd1RFWURSNXZac3RpNVhs?=
+ =?utf-8?B?VDdkcURXYlRNYkJtc1ZQbkVGcm50RFhZMkZSdTh0c1krQWZHWElJUmtUVEti?=
+ =?utf-8?B?bGxrRGluV1Y0S0R2UzNWeEVBY0UxSldlM0V6QmV4cVJDakdlWDZUb1p2RnZZ?=
+ =?utf-8?B?MktSZktmdVNITkFtZ21sQ2U2QkV3T1Z4Nk12SXZ5bTh3WE5PZVB1UDh6akd6?=
+ =?utf-8?B?aUpyRWRrQktOcHBvYWk1aWU5U2FVcVRTSjlhQjFGL1d3M041V29iMkk3dDlK?=
+ =?utf-8?B?cmMzeFp4MXpLQmR2RUNMb0tYU05tZVVNY2ViZlQvdWNzV0wxa2xNSThuTFdx?=
+ =?utf-8?B?SU1MRXJXVGRSN3BuVG1SbnZtMjJyWFE1TFNoUTJqNTVsOTNpdE1HZWpLdWlr?=
+ =?utf-8?B?RUlicHFTSGpML2VRbDRURU9mZks0VVJXeGZISFhxRmpaeGhvRzVSUT09?=
+X-Exchange-RoutingPolicyChecked: cZij+jdVoxz1V59RK9rGkKCVtJdP/wPOYpCcD51XGTkG3dZQ5lpdQ0uCClRISpEQnLvjV5UlQD8HC4qPGCPet2gYjxJeIEn22SSp6gSVlhuQ5t8lB7m/YyhX9gbDpXC2Ga+pLGELdfxaH+9S6tSVgZNuY2weLAQMKW8WB86PZE0qz9SXSBnz/SvD/zdJB62GKHOffPUlFJq0cQQRAPlbqIUC/qMkgkdFbgW+jf5lPy9RtXcMrW9DXOnxgt/c+eQdu+O7rz6zVPGMEc0nWCQPMOMVES0NnpBxjoztZeT+fRO3oa8T9dkgH/n9IbAuTtvmHJpadNvApYTorv09WAPgyg==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7269c36e-0e7f-4363-7d78-08ded8d4f3bc
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7958.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2026 07:30:26.9766
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: W3XGXF9BV+SHCRenbtT9Ut0ufx4dFnEMWGljHjY4DZ3qW1F5nA7kPe4eGcSl26yIPvNpBg9hM4xqrAbd4TSszw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB5967
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+X-Spamd-Result: default: False [-3.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-304397-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304395-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:contact@c127.dev,m:linusw@kernel.org,m:alsi@bang-olufsen.dk,m:andrew@lunn.ch,m:olteanv@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:luizluca@gmail.com,m:namiltd@yahoo.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[c127.dev,kernel.org,bang-olufsen.dk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[gmail.com,yahoo.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:raag.jadav@intel.com,m:intel-xe@lists.freedesktop.org,m:dri-devel@lists.freedesktop.org,m:netdev@vger.kernel.org,m:simona.vetter@ffwll.ch,m:airlied@gmail.com,m:kuba@kernel.org,m:lijo.lazar@amd.com,m:Hawking.Zhang@amd.com,m:davem@davemloft.net,m:pabeni@redhat.com,m:edumazet@google.com,m:dev@lankhorst.se,m:zachary.mckevitt@oss.qualcomm.com,m:rodrigo.vivi@intel.com,m:michal.wajdeczko@intel.com,m:matthew.d.roper@intel.com,m:mallesh.koujalagi@intel.com,s:lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:from_mime,intel.com:email,intel.com:mid,intel.com:dkim,vger.kernel.org:from_smtp];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_SENDER(0.00)[riana.tauro@intel.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[ffwll.ch,gmail.com,kernel.org,amd.com,davemloft.net,redhat.com,google.com,lankhorst.se,oss.qualcomm.com,intel.com];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[riana.tauro@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:from_mime,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim,c127.dev:email]
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2B5BF6FF8BC
+X-Rspamd-Queue-Id: E71886FF966
 
-Hi Johan,
 
-On 7/2/26 22:47, Johan Alvarado wrote:
-> The RTL8367S can mux its embedded SerDes to external interface 1,
-> which is typically used to connect the switch to a CPU port. The chip
-> info table already declares SGMII as a supported interface mode for
-> this chip, but the driver only implements RGMII so far.
-> 
-> Implement SGMII support as a phylink PCS, with the configuration
-> sequence derived from the GPL-licensed Realtek rtl8367c vendor driver
-> as distributed in the Mercusys MR80X GPL code drop:
-> 
->  - Add accessors for the SerDes indirect access registers (SDS_INDACS),
->    through which the SerDes internal registers are reached.
-> 
->  - Register a phylink_pcs for the SerDes, selected from mac_select_pcs
->    for the SGMII interface, so the SerDes handling lives in the PCS
->    operations rather than in the MAC operations.
-> 
->  - Probe the SerDes tuning variant from the chip option register once
->    at setup. The vendor driver keeps two sets of SerDes tuning
->    parameters and selects between them based on this option; only the
->    variant for a non-zero option (which all RTL8367S parts seen so far
->    report) has been validated on hardware, so the SerDes interface
->    modes are only advertised in that case. An unsupported variant thus
->    fails at phylink validation time instead of at link configuration
->    time.
-> 
->  - Keep the embedded DW8051 microcontroller in reset and disabled. The
->    vendor driver loads firmware into it to manage the SerDes link, but
->    analysis of that firmware shows it only duplicates the link
->    management phylink already performs: it polls the port status and
->    writes the external interface force registers behind the driver's
->    back.
-> 
->  - Clear the line rate bypass bit for the external interface, tune the
->    SerDes with the vendor-prescribed parameters, mux the SerDes to MAC8
->    in SGMII mode and only then take the SerDes out of reset, as the
->    vendor driver does.
-> 
->  - After deasserting the SerDes reset, reset the SerDes data path via
->    the SerDes BMCR register to flush the FIFOs and resync the PLL.
->    This mirrors what the vendor firmware does right after deasserting
->    the SerDes reset, and ensures a clean link state from cold boot.
-> 
->  - Force the SGMII link parameters (link, speed, duplex) in the SDS_MISC
->    register from pcs_link_up(). SGMII in-band autonegotiation is not
->    implemented, so only fixed-link and conventional PHY setups are
->    supported, just like RGMII. This is reported to phylink through
->    pcs_inband_caps() returning LINK_INBAND_DISABLE, so phylink never
->    selects an in-band-enabled negotiation mode for this PCS.
-> 
->  - Program the SerDes pause controls in SDS_MISC from the resolved
->    pause modes when forcing the MAC external interface in mac_link_up,
->    as the vendor driver does, rather than leaving whatever state the
->    boot firmware left there. This is done in the MAC layer because
->    pcs_link_up() carries no pause information.
-> 
->  - Implement pcs_get_state() by reading the link status from the
->    SerDes, with the forced speed and duplex read back from SDS_MISC.
->    Although the supported fixed-link and conventional PHY setups do not
->    use it, the PCS owns the SerDes link state, and phylink consults
->    pcs_get_state() to track the physical link when operating in in-band
->    mode with autonegotiation disabled. The SerDes has no link interrupt
->    wired up, so the PCS sets its poll flag.
-> 
-> Tested on a Mercusys MR80X v2.20, where the RTL8367S is connected to
-> the SoC over SGMII.
+On 23-06-2026 15:39, Raag Jadav wrote:
+> System controller allows getting/setting per counter threshold for
+> correctable errors, which it uses to raise error events to the driver.
+> Get/set it using the respective mailbox command.
+>
+> Signed-off-by: Raag Jadav <raag.jadav@intel.com>
 
-Ah nice conversion to phylink PCS :) I have a few comments below
 
-> 
-> Suggested-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-> Suggested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> Suggested-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
-> Signed-off-by: Johan Alvarado <contact@c127.dev>
+Reviewed-by: Riana Tauro <riana.tauro@intel.com>
+
 > ---
-
-[...]
-
-> +static int rtl8365mb_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
-> +				phy_interface_t interface,
-> +				const unsigned long *advertising,
-> +				bool permit_pause_to_mac)
+> v2: Add RAS operation status codes (Riana)
+> v3: Reuse status codes and uapi mapping from counter series (Riana)
+>      Access request/response counter using local pointer (Riana)
+>      Mark unused field as reserved (Riana)
+> v4: Make debug logs consistent (Riana)
+>      Update kdoc (Riana)
+> ---
+>   drivers/gpu/drm/xe/xe_ras.c                   | 105 ++++++++++++++++++
+>   drivers/gpu/drm/xe/xe_ras.h                   |   2 +
+>   drivers/gpu/drm/xe/xe_ras_types.h             |  51 +++++++++
+>   drivers/gpu/drm/xe/xe_sysctrl_mailbox_types.h |   4 +
+>   4 files changed, 162 insertions(+)
+>
+> diff --git a/drivers/gpu/drm/xe/xe_ras.c b/drivers/gpu/drm/xe/xe_ras.c
+> index 44f4e1a3455b..afee8202d24e 100644
+> --- a/drivers/gpu/drm/xe/xe_ras.c
+> +++ b/drivers/gpu/drm/xe/xe_ras.c
+> @@ -270,6 +270,111 @@ int xe_ras_clear_counter(struct xe_device *xe, u8 severity, u8 component)
+>   	return 0;
+>   }
+>   
+> +/**
+> + * xe_ras_get_threshold() - Get error counter threshold
+> + * @xe: Xe device instance
+> + * @severity: Error severity to be queried (&enum drm_xe_ras_error_severity)
+> + * @component: Error component to be queried (&enum drm_xe_ras_error_component)
+> + * @threshold: Counter threshold
+> + *
+> + * This function retrieves the error threshold of a specific counter based on
+> + * severity and component.
+> + *
+> + * Return: 0 on success, negative error code on failure.
+> + */
+> +int xe_ras_get_threshold(struct xe_device *xe, u8 severity, u8 component, u32 *threshold)
 > +{
-> +	const int id = RTL8365MB_SDS_EXT_INTERFACE_ID;
-> +	struct rtl8365mb *mb = pcs_to_rtl8365mb(pcs);
-> +	struct realtek_priv *priv;
-> +	u16 val;
+> +	struct xe_ras_get_threshold_response response = {};
+> +	struct xe_ras_get_threshold_request request = {};
+> +	struct xe_sysctrl_mailbox_command command = {};
+> +	struct xe_ras_error_class *counter;
+> +	size_t len;
 > +	int ret;
-> +	int i;
 > +
-> +	priv = mb->priv;
+> +	counter = &request.counter;
+> +	counter->common.severity = drm_to_xe_ras_severity(severity);
+> +	counter->common.component = drm_to_xe_ras_component(component);
 > +
-> +	/* This driver does not implement SGMII in-band autonegotiation yet, so
-> +	 * the link parameters are forced from rtl8365mb_pcs_link_up() instead.
-> +	 * rtl8365mb_pcs_inband_caps() reports this to phylink, which should
-> +	 * therefore never select an in-band-enabled negotiation mode.
-> +	 */
-> +	if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED)
-> +		return -EOPNOTSUPP;
-
-As you implement the .pcs_inband_caps() method, phylink will pass you a valid
-mode, no need for that check :)
-
-[...]
-> @@ -1218,14 +1680,46 @@ static void rtl8365mb_phylink_mac_link_up(struct phylink_config *config,
->  	p = &mb->ports[port];
->  	schedule_delayed_work(&p->mib_work, 0);
->  
-> -	if (phy_interface_mode_is_rgmii(interface)) {
-> +	/* The SerDes forced link state is programmed by the PCS in
-> +	 * rtl8365mb_pcs_link_up(); here only the MAC external interface force
-> +	 * is configured, for both RGMII and SerDes.
-> +	 */
-> +	if (phy_interface_mode_is_rgmii(interface) ||
-> +	    rtl8365mb_interface_is_serdes(interface)) {
->  		ret = rtl8365mb_ext_config_forcemode(priv, port, true, speed,
->  						     duplex, tx_pause,
->  						     rx_pause);
-> -		if (ret)
-> +		if (ret) {
->  			dev_err(priv->dev,
->  				"failed to force mode on port %d: %pe\n", port,
->  				ERR_PTR(ret));
-> +			return;
-> +		}
+> +	xe_sysctrl_create_command(&command, XE_SYSCTRL_GROUP_GFSP, XE_SYSCTRL_CMD_GET_THRESHOLD,
+> +				  &request, sizeof(request), &response, sizeof(response));
 > +
-> +		/* The SerDes has its own pause controls; program them from
-> +		 * the resolved pause modes, as the vendor driver does when
-> +		 * forcing the link on a SerDes external interface. This is
-> +		 * done here rather than in rtl8365mb_pcs_link_up() because
-> +		 * pcs_link_up() carries no pause information.
-> +		 */
-> +		if (rtl8365mb_interface_is_serdes(interface)) {
-> +			u32 val = 0;
+> +	guard(xe_pm_runtime)(xe);
+> +	ret = xe_sysctrl_send_command(&xe->sc, &command, &len);
+> +	if (ret) {
+> +		xe_err(xe, "sysctrl: failed to get threshold %d\n", ret);
+> +		return ret;
+> +	}
 > +
-> +			if (tx_pause)
-> +				val |= RTL8365MB_SDS_MISC_SGMII_TXFC_MASK;
-> +			if (rx_pause)
-> +				val |= RTL8365MB_SDS_MISC_SGMII_RXFC_MASK;
-
-Do you know what this does in HW ? Is this so that the PCS lets the Pause frames through
-in either directions ?
-
-I suspect this is something that would be only used for inband advertising
-of pause settings (in such case, you don't even need that), but ofc I'm not sure :)
-
-You already configure the MAC pause settings, can you test that these bits actually do
-anything by exercising a bit flow control and checking if these registers are used ?
-
-Otherwise, this is looking pretty good :)
-
-Maxime
+> +	if (len != sizeof(response)) {
+> +		xe_err(xe, "sysctrl: unexpected get threshold response length %zu (expected %zu)\n",
+> +		       len, sizeof(response));
+> +		return -EIO;
+> +	}
+> +
+> +	counter = &response.counter;
+> +	*threshold = response.threshold;
+> +
+> +	xe_dbg(xe, "[RAS]: get threshold %u for %s %s\n", *threshold,
+> +	       comp_to_str(counter->common.component), sev_to_str(counter->common.severity));
+> +	return 0;
+> +}
+> +
+> +/**
+> + * xe_ras_set_threshold() - Set error counter threshold
+> + * @xe: Xe device instance
+> + * @severity: Error severity to be set (&enum drm_xe_ras_error_severity)
+> + * @component: Error component to be set (&enum drm_xe_ras_error_component)
+> + * @threshold: Counter threshold
+> + *
+> + * This function sets the error threshold of a specific counter based on
+> + * severity and component.
+> + *
+> + * Return: 0 on success, negative error code on failure.
+> + */
+> +int xe_ras_set_threshold(struct xe_device *xe, u8 severity, u8 component, u32 threshold)
+> +{
+> +	struct xe_ras_set_threshold_response response = {};
+> +	struct xe_ras_set_threshold_request request = {};
+> +	struct xe_sysctrl_mailbox_command command = {};
+> +	struct xe_ras_error_class *counter;
+> +	size_t len;
+> +	int ret;
+> +
+> +	counter = &request.counter;
+> +	counter->common.severity = drm_to_xe_ras_severity(severity);
+> +	counter->common.component = drm_to_xe_ras_component(component);
+> +	request.threshold = threshold;
+> +
+> +	xe_sysctrl_create_command(&command, XE_SYSCTRL_GROUP_GFSP, XE_SYSCTRL_CMD_SET_THRESHOLD,
+> +				  &request, sizeof(request), &response, sizeof(response));
+> +
+> +	guard(xe_pm_runtime)(xe);
+> +	ret = xe_sysctrl_send_command(&xe->sc, &command, &len);
+> +	if (ret) {
+> +		xe_err(xe, "sysctrl: failed to set threshold %d\n", ret);
+> +		return ret;
+> +	}
+> +
+> +	if (len != sizeof(response)) {
+> +		xe_err(xe, "sysctrl: unexpected set threshold response length %zu (expected %zu)\n",
+> +		       len, sizeof(response));
+> +		return -EIO;
+> +	}
+> +
+> +	ret = ras_status_to_errno(response.status);
+> +	if (ret) {
+> +		xe_err(xe, "sysctrl: set threshold command failed with status %#x\n",
+> +		       response.status);
+> +		return ret;
+> +	}
+> +
+> +	counter = &response.counter;
+> +
+> +	xe_dbg(xe, "[RAS]: set threshold %u for %s %s\n", response.threshold,
+> +	       comp_to_str(counter->common.component), sev_to_str(counter->common.severity));
+> +	return 0;
+> +}
+> +
+>   /**
+>    * xe_ras_init - Initialize Xe RAS
+>    * @xe: xe device instance
+> diff --git a/drivers/gpu/drm/xe/xe_ras.h b/drivers/gpu/drm/xe/xe_ras.h
+> index ba0b0224df23..1aa43c54b710 100644
+> --- a/drivers/gpu/drm/xe/xe_ras.h
+> +++ b/drivers/gpu/drm/xe/xe_ras.h
+> @@ -15,6 +15,8 @@ void xe_ras_counter_threshold_crossed(struct xe_device *xe,
+>   				      struct xe_sysctrl_event_response *response);
+>   int xe_ras_get_counter(struct xe_device *xe, u8 severity, u8 component, u32 *value);
+>   int xe_ras_clear_counter(struct xe_device *xe, u8 severity, u8 component);
+> +int xe_ras_get_threshold(struct xe_device *xe, u8 severity, u8 component, u32 *threshold);
+> +int xe_ras_set_threshold(struct xe_device *xe, u8 severity, u8 component, u32 threshold);
+>   void xe_ras_init(struct xe_device *xe);
+>   
+>   #endif
+> diff --git a/drivers/gpu/drm/xe/xe_ras_types.h b/drivers/gpu/drm/xe/xe_ras_types.h
+> index 6688e11f57a8..747b651880cd 100644
+> --- a/drivers/gpu/drm/xe/xe_ras_types.h
+> +++ b/drivers/gpu/drm/xe/xe_ras_types.h
+> @@ -121,4 +121,55 @@ struct xe_ras_clear_counter_response {
+>   	/** @reserved1: Reserved for future use */
+>   	u32 reserved1[3];
+>   } __packed;
+> +
+> +/**
+> + * struct xe_ras_get_threshold_request - Request structure for get threshold
+> + */
+> +struct xe_ras_get_threshold_request {
+> +	/** @counter: Counter to get threshold for */
+> +	struct xe_ras_error_class counter;
+> +	/** @reserved: Reserved for future use */
+> +	u32 reserved;
+> +} __packed;
+> +
+> +/**
+> + * struct xe_ras_get_threshold_response - Response structure for get threshold
+> + */
+> +struct xe_ras_get_threshold_response {
+> +	/** @counter: Counter ID */
+> +	struct xe_ras_error_class counter;
+> +	/** @threshold: Current threshold of the counter */
+> +	u32 threshold;
+> +	/** @reserved: Reserved for future use */
+> +	u32 reserved[4];
+> +} __packed;
+> +
+> +/**
+> + * struct xe_ras_set_threshold_request - Request structure for set threshold
+> + */
+> +struct xe_ras_set_threshold_request {
+> +	/** @counter: Counter to set threshold for */
+> +	struct xe_ras_error_class counter;
+> +	/** @threshold: Threshold to be set */
+> +	u32 threshold;
+> +	/** @reserved: Reserved for future use */
+> +	u32 reserved;
+> +} __packed;
+> +
+> +/**
+> + * struct xe_ras_set_threshold_response - Response structure for set threshold
+> + */
+> +struct xe_ras_set_threshold_response {
+> +	/** @counter: Counter ID */
+> +	struct xe_ras_error_class counter;
+> +	/** @reserved: Reserved */
+> +	u32 reserved;
+> +	/** @threshold: Updated threshold */
+> +	u32 threshold;
+> +	/** @status: Operation status */
+> +	u32 status;
+> +	/** @reserved1: Reserved for future use */
+> +	u32 reserved1[2];
+> +} __packed;
+> +
+>   #endif
+> diff --git a/drivers/gpu/drm/xe/xe_sysctrl_mailbox_types.h b/drivers/gpu/drm/xe/xe_sysctrl_mailbox_types.h
+> index 6e3753554510..10f06aa5c4b5 100644
+> --- a/drivers/gpu/drm/xe/xe_sysctrl_mailbox_types.h
+> +++ b/drivers/gpu/drm/xe/xe_sysctrl_mailbox_types.h
+> @@ -24,11 +24,15 @@ enum xe_sysctrl_group {
+>    *
+>    * @XE_SYSCTRL_CMD_GET_COUNTER: Get error counter value
+>    * @XE_SYSCTRL_CMD_CLEAR_COUNTER: Clear error counter value
+> + * @XE_SYSCTRL_CMD_GET_THRESHOLD: Retrieve error threshold
+> + * @XE_SYSCTRL_CMD_SET_THRESHOLD: Set error threshold
+>    * @XE_SYSCTRL_CMD_GET_PENDING_EVENT: Retrieve pending event
+>    */
+>   enum xe_sysctrl_gfsp_cmd {
+>   	XE_SYSCTRL_CMD_GET_COUNTER		= 0x03,
+>   	XE_SYSCTRL_CMD_CLEAR_COUNTER		= 0x04,
+> +	XE_SYSCTRL_CMD_GET_THRESHOLD		= 0x05,
+> +	XE_SYSCTRL_CMD_SET_THRESHOLD		= 0x06,
+>   	XE_SYSCTRL_CMD_GET_PENDING_EVENT	= 0x07,
+>   };
+>   
 
