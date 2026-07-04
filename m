@@ -1,95 +1,97 @@
-Return-Path: <netdev+bounces-304731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304732-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /wNzHbN/SWqy2QAAu9opvQ
-	(envelope-from <netdev+bounces-304731-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 23:48:35 +0200
+	id GeIIAsiHSWob2wAAu9opvQ
+	(envelope-from <netdev+bounces-304732-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 00:23:04 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E9A9708852
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 23:48:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E39D7088C2
+	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 00:23:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=H09rEDa7;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304731-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-304731-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=asu.edu header.s=google header.b=AsNWhC8k;
+	dmarc=pass (policy=none) header.from=asu.edu;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304732-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-304732-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 116AD3015A59
-	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 21:48:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E0501301548A
+	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 22:23:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A80534B1A7;
-	Sat,  4 Jul 2026 21:48:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4F23B7744;
+	Sat,  4 Jul 2026 22:23:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f195.google.com (mail-pf1-f195.google.com [209.85.210.195])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3842F2F28EA
-	for <netdev@vger.kernel.org>; Sat,  4 Jul 2026 21:48:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C853397E8A
+	for <netdev@vger.kernel.org>; Sat,  4 Jul 2026 22:22:59 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783201702; cv=none; b=bdc/umQbNOzgI7dUelETZxYmlTvkIE5285hbs1tumIS/z1a6pDZMx5cQ0vr7Z9rMh1HNgqFt3hDNlo8MOet9DLPbCYNaYazREXh8q+wtT+lsyaCyLwlqM8HL55pqooYuVbogKU/BFf/jf5jITAlLJkpN9/WIsVwT7NyJQ3ZN318=
+	t=1783203780; cv=none; b=j5eFL1lFA0rhzim8mD4KX6fwQedgum2Sj77nHvDkyR0ApiBBAeCfnBWGgaBNLiWsbr5bDmgq1EmuFk6sVYxPqQsOyt4kfXwg0iYZX6eSkWgVFV6rJU17SfDkQSpuzcQPv1S3AqE/vbap6lV79Oj8BGact4HYY3hCYWUZBo7/Too=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783201702; c=relaxed/simple;
-	bh=z3R8AtQftcGwlO+0IEJHngliyLgsjvnUXbrOecFxsMU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jG79ZjM0TxVN3Tg6rUtVnflyasJdlvZGaqeq0nQjl+4mjs1GHK6tOe5JY46L36WAASy7Wb0aW+QvxNr+FrWwZuFXZ5oG5zSWEN/4N0BUcqekg7zFS3KnYIo2UbjbCOuip4izF/fFzCJzu08XaZDPaFqGSXWIUlZtm2JprwQB9hM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H09rEDa7; arc=none smtp.client-ip=209.85.210.195
-Received: by mail-pf1-f195.google.com with SMTP id d2e1a72fcca58-845e363246aso1852845b3a.1
-        for <netdev@vger.kernel.org>; Sat, 04 Jul 2026 14:48:20 -0700 (PDT)
+	s=arc-20240116; t=1783203780; c=relaxed/simple;
+	bh=4qvXCceyH6zuN3hy7lanVxkYiDgB7NLTyjSDVr5VmfQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GbDwm9SluwPVZYxUlSK4HOO+D6z5IKg5auRNm2EPVquN/kjum+N7R00SSpKEfpGaqr9rA984AubXXyHFA3bCIIxtZo3+R78Px3SSpwdYnzF+m2vwBhWTbwJVFb2XAA6XHWLg3yNae88tgmOqpN+ANLd8MinH0l76pTQpkNdfpfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=AsNWhC8k; arc=none smtp.client-ip=209.85.210.169
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-847aa193d98so1370146b3a.3
+        for <netdev@vger.kernel.org>; Sat, 04 Jul 2026 15:22:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783201700; x=1783806500; darn=vger.kernel.org;
+        d=asu.edu; s=google; t=1783203779; x=1783808579; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=xBu8eLtgFyfxE/8WdHQMx0CxcKxhtWNKmO3kujqn2EI=;
-        b=H09rEDa7gp8sOwQykueObeZ6ssJ4RVFZZXj3KTrtnQyR2tUrcI9PiX9U9hKtf37D5o
-         KLDz2V10LefoucH4U77U+owPeilkuJgiSmiwumjv9lLa+YWmQ+TODPDxW1y2dG4FQseW
-         g5f+HEeSd7WT0I7C4k8OjAlDKDimRXtkWlNgJtOhqlIdB62biGKzASg6fc54LT4Wa3Fw
-         up3ifqcICcZSdBwkVamfhHWpfWvtKjxfWQkkE3BXXT2ZS7A1c9dqMcHF/HJVZyOaHZKP
-         /t5fh9NWGZsJdNCllExB2/1F7+S84bbRyK9KFGCKcEpEuo9Mo3f4Csz7WUuo1/RCNonL
-         pOpA==
+        bh=70dWq0Alk4Cssp1Jlc+lKIuB3dScjeAA+8YF2YRZQ6U=;
+        b=AsNWhC8k7R0WWEKIfGofTKSIDrAPehoeazwfk9psRH118/yAOzV7KIj0JbSrJ5bS7w
+         3oI6WLy2Sx5L+HYb984Y0AxZjsRF0K2FCMGqUiGOZDqcgg1M5JG8hkwFT3917gXR4lpd
+         IPrtMrf+jz4dmDHXuRjcfsMMn6cSWqdqac9d49oFc8DgJvcgZ3B6jJLxqAuomFTbRqdu
+         CiR6YpTG/E00QSxsy7Q3WQpDQBMEV8pYQNP4dY1cPl9y6rYrMSkjXno5lB7gtPkwlk+4
+         hjsPce3jAT76Y/ncv5AT9+nzD6ACI+/C6fwob4zAhsJt36QFCcWRvlmtCjjImDDHsxoi
+         e/qQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783201700; x=1783806500;
+        d=1e100.net; s=20251104; t=1783203779; x=1783808579;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xBu8eLtgFyfxE/8WdHQMx0CxcKxhtWNKmO3kujqn2EI=;
-        b=fNU3D8SqrSLh9Fw9vvG9HbBnA7z74rNHVlSZJuLwQaMkO5Ra4CJvjMskpSX8JIa7AR
-         Ty4ZVs78r7QBRQp03voHEjTtf92mIoPTmnqUZ1UOkQXm+cshd+I8qHLh/g+mqA1R2wVK
-         buYb5Cai8erotnDUrCpeB2De+QHK6cLqDNKeDQbUg79Gg/xZkBiIS3JjlGDzRkruJxXm
-         1DIYooOQFi3fuYip1sF0LdfWBuS27IyMNHWGg26uK5Kh+eb0NBGWVleIzu2dPdWoeO2H
-         R/b6rHZSJCcreC5CmDt7fWgcjWWsjgfZhJFSOd4wZqYHIz60xdSOO+bc+RCGy6wFCjNu
-         UFkA==
-X-Gm-Message-State: AOJu0YzoCbOx08Oiq2iBskrvydRuLBObBS32lgoWpTq4LRJji2NIy0kg
-	TIbrIVvIJcHAmVyJCbPhsCNvCKC7sDxavr7teVa1YqLkp5PKejwKZiM3LWOUlfXZrLyupg==
-X-Gm-Gg: AfdE7cncvXH3KFvrFz2EYW+EZki0ZKqBgMqzNOs0U4VmWQhYGelMjfWZTFf/yhbilpO
-	5FSJgkjEpJq4jhrPX3OKr67GEihdp/rsRl/QeKZCVYRTzqrHvvbqid6hHAeiLHD3rF5uJn3hh8p
-	h/Y8F0lwV1XrWXWXghzkKoSwvarj4BS9546mEbulFwQwu+JdsN1bcFBsst5T7f9xVK7klkgbWGF
-	x8ywzgaShnwVLQjLZxANV8YJLto7oHnsaHCHm0HwGVaG9QZvMJ0KSNRSvKEDguZo45y8YznVGtp
-	HfHq4stBsBxoCL1siPeZiqsPSgfrmqvpSDrUTt+wTaa/8ylFdPtpMcettDUB3ujIyp0wd7plNex
-	6VVmzvahNpk3RTcdHMCSygOEJt/M91RbKNURnNpUqO6YqJ7K2mi+SnLWriEtjL28GWKuU1YVKSb
-	NgYz7opZguq58=
-X-Received: by 2002:a05:6a00:1805:b0:845:ce2c:2a2e with SMTP id d2e1a72fcca58-847f6dc1003mr4199953b3a.17.1783201699536;
-        Sat, 04 Jul 2026 14:48:19 -0700 (PDT)
-Received: from server.lan ([150.230.217.250])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-847f6bcf03bsm1570479b3a.26.2026.07.04.14.48.13
+        bh=70dWq0Alk4Cssp1Jlc+lKIuB3dScjeAA+8YF2YRZQ6U=;
+        b=EEBYNuXhI9wwIYBXLqoyTG94SbyGYJgyYZ6U3kx+w3hJ5HcdCvEFc32i++zSS2EXOi
+         BwiKo5NkkQHaBoMIknFxvTEWioV9pUDTYT5xHE/WVJEbZxZ9cZiaNnBEXpE1U+yVIrYO
+         eA6JVaSz3YqkPTsBvv4kpmUZaasx0mZ4Cmi35g2FtTxaNoYf24jHWvo/sbR7ULWmGBN2
+         n2YTfHDNWuPhUZPIshN5csPvPVPh6pUfF+P0cy/5CKVv6RnhQJu1vOhZhWeoCKoqvsuo
+         ccpK26oIyspLwoR8p6fw1JfVs18AufDAHiBgSl1WHr0gETIYl0fCe/JSBKAvwuwat+AC
+         6S0Q==
+X-Gm-Message-State: AOJu0Yw7M3N5Lfqi38oGE8H7+Px3wlP7/OPQZaaSALIc6pljZ7c97PuQ
+	yTddcIfNclx0/Z5i5b5XAtfQlrVFkf8s3/Z1itzeItsXhPjjwdzJCEb0tM1nVjvPrA==
+X-Gm-Gg: AfdE7ckhYBs5421B//2w4VzauSxMBlO6AAPWDOm6EE2d9yRssPF0c+1I+QT+xKT+w3f
+	btVZijVZTRatJgqbt5Ck2KCxrxLGhWZAElc40Wj/uE6O9zX3Ku/tzWKDYlWMVve5gqR2bpEG/7J
+	QH72Wf0dMWzNBytctkbAY59+ouqrvz7XF/1PBLE34rOg1Y7fTy2302JbdxBVPlFbuEbTvVmIfoD
+	h2E6q1Z/djQ89tGpyFVCOksb3vZsttgnEI3YESlqwS7eBjAMmTHunGhkbr4tDDtE8JpxTyj5Mvy
+	YauY5hK29Y7wYCFJESDDx7BWfAapksGxwNgLCfWPWMEuF1D0zNP6wgeOkHNHBSTw0BpNIcILWb6
+	NkTNrBGCBx1UjzBqyQqvdlRwhBNf3MkcxWLs1UizaWMPeG5vyUblHSncpJHX5vqycuDex/M+xfd
+	Y=
+X-Received: by 2002:a05:6a00:1894:b0:847:8625:f7bb with SMTP id d2e1a72fcca58-847f6faa023mr4130520b3a.60.1783203778712;
+        Sat, 04 Jul 2026 15:22:58 -0700 (PDT)
+Received: from p1.. ([172.56.105.253])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-847f6dbdc8dsm1575890b3a.55.2026.07.04.15.22.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 Jul 2026 14:48:17 -0700 (PDT)
-From: Coia Prant <coiaprant@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+        Sat, 04 Jul 2026 15:22:58 -0700 (PDT)
+From: Xiang Mei <xmei5@asu.edu>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Serge Semin <fancer.lancer@gmail.com>,
+	Roopa Prabhu <roopa@nvidia.com>
+Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Coia Prant <coiaprant@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] net: pcs: xpcs-plat: fix runtime PM initialization
-Date: Sun,  5 Jul 2026 05:48:08 +0800
-Message-ID: <20260704214808.1566710-1-coiaprant@gmail.com>
-X-Mailer: git-send-email 2.47.3
+	Petr Machata <petrm@nvidia.com>,
+	Andy Roulin <aroulin@nvidia.com>,
+	David Yang <mmyangfl@gmail.com>,
+	Kees Cook <kees@kernel.org>,
+	Weiming Shi <bestswngs@gmail.com>,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH net] vxlan: vnifilter: enforce exact length of GROUP/GROUP6 attributes
+Date: Sat,  4 Jul 2026 15:22:54 -0700
+Message-ID: <20260704222254.914567-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,76 +104,76 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304731-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[coiaprant@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:fancer.lancer@gmail.com,m:linux-kernel@vger.kernel.org,m:coiaprant@gmail.com,m:stable@vger.kernel.org,m:fancerlancer@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,gmail.com,kernel.org,asu.edu];
 	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304732-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:roopa@nvidia.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:petrm@nvidia.com,m:aroulin@nvidia.com,m:mmyangfl@gmail.com,m:kees@kernel.org,m:bestswngs@gmail.com,m:xmei5@asu.edu,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[coiaprant@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[asu.edu:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2E9A9708852
+X-Rspamd-Queue-Id: 5E39D7088C2
 
-The driver calls `pm_runtime_set_active()` before runtime PM is enabled,
-and before the clock is prepared and enabled.
+The VXLAN VNI filter entry policy declares the GROUP/GROUP6 address
+attributes as NLA_BINARY with only a maximum length, so validate_nla()
+accepts a payload shorter than the address. The GROUP consumer reads it
+with nla_get_in_addr(), an unconditional 4-byte load, so a short
+attribute over-reads up to 3 bytes of uninitialised slab data, which are
+stored into remote_ip and echoed back via RTM_GETTUNNEL, disclosing
+kernel memory.
 
-This causes the clock to be unprepared/disabled later in the suspend
-callback even though it was never prepared/enabled, resulting in warnings:
+Switch both entries to NLA_POLICY_EXACT_LEN() so the validator rejects
+any GROUP/GROUP6 that is not exactly 4 / 16 bytes; a valid address is
+always sent at full width.
 
-clk_csr already disabled
-clk_csr already unprepared
-
-Fix this by setting the initial runtime PM status to SUSPENDED instead
-of ACTIVE.
-
-The clock will be properly enabled when the device is first resumed
-via runtime PM (e.g., during MDIO access).
-
-Fixes: f6bb3e9d98c2 ("net: pcs: xpcs: Add Synopsys DW xPCS platform device driver")
-Cc: stable@vger.kernel.org
-Signed-off-by: Coia Prant <coiaprant@gmail.com>
+Fixes: f9c4bb0b245c ("vxlan: vni filtering support on collect metadata device")
+Reported-by: Weiming Shi <bestswngs@gmail.com>
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
 ---
- drivers/net/pcs/pcs-xpcs-plat.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/vxlan/vxlan_vnifilter.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/pcs/pcs-xpcs-plat.c b/drivers/net/pcs/pcs-xpcs-plat.c
-index f4b1b8246ce96..fb80773379df5 100644
---- a/drivers/net/pcs/pcs-xpcs-plat.c
-+++ b/drivers/net/pcs/pcs-xpcs-plat.c
-@@ -285,7 +285,7 @@ static int xpcs_plat_init_clk(struct dw_xpcs_plat *pxpcs)
- 		return dev_err_probe(dev, PTR_ERR(pxpcs->cclk),
- 				     "Failed to get CSR clock\n");
+diff --git a/drivers/net/vxlan/vxlan_vnifilter.c b/drivers/net/vxlan/vxlan_vnifilter.c
+index 3e76f4e21094..dd94085e0886 100644
+--- a/drivers/net/vxlan/vxlan_vnifilter.c
++++ b/drivers/net/vxlan/vxlan_vnifilter.c
+@@ -462,10 +462,8 @@ static int vxlan_vnifilter_dump(struct sk_buff *skb, struct netlink_callback *cb
+ static const struct nla_policy vni_filter_entry_policy[VXLAN_VNIFILTER_ENTRY_MAX + 1] = {
+ 	[VXLAN_VNIFILTER_ENTRY_START] = { .type = NLA_U32 },
+ 	[VXLAN_VNIFILTER_ENTRY_END] = { .type = NLA_U32 },
+-	[VXLAN_VNIFILTER_ENTRY_GROUP]	= { .type = NLA_BINARY,
+-					    .len = sizeof_field(struct iphdr, daddr) },
+-	[VXLAN_VNIFILTER_ENTRY_GROUP6]	= { .type = NLA_BINARY,
+-					    .len = sizeof(struct in6_addr) },
++	[VXLAN_VNIFILTER_ENTRY_GROUP]	= NLA_POLICY_EXACT_LEN(sizeof_field(struct iphdr, daddr)),
++	[VXLAN_VNIFILTER_ENTRY_GROUP6]	= NLA_POLICY_EXACT_LEN(sizeof(struct in6_addr)),
+ };
  
--	pm_runtime_set_active(dev);
-+	pm_runtime_set_suspended(dev);
- 	ret = devm_pm_runtime_enable(dev);
- 	if (ret) {
- 		dev_err(dev, "Failed to enable runtime-PM\n");
+ static const struct nla_policy vni_filter_policy[VXLAN_VNIFILTER_MAX + 1] = {
 -- 
-2.47.3
+2.43.0
 
 
