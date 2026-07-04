@@ -1,98 +1,92 @@
-Return-Path: <netdev+bounces-304688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304689-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id iYIXOFOlSGoPsQAAu9opvQ
-	(envelope-from <netdev+bounces-304688-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 08:16:51 +0200
+	id rbRENrimSGo4sQAAu9opvQ
+	(envelope-from <netdev+bounces-304689-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 08:22:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D630706DA9
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 08:16:51 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 743F1706DC3
+	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 08:22:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=p66X7s8F;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=aY66fWrH;
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304688-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304688-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304689-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304689-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C4060301454D
-	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 06:15:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BDD6D3019499
+	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 06:22:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A366388863;
-	Sat,  4 Jul 2026 06:15:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD17E389DF0;
+	Sat,  4 Jul 2026 06:22:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48DCC3559D6
-	for <netdev@vger.kernel.org>; Sat,  4 Jul 2026 06:15:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC261D5174
+	for <netdev@vger.kernel.org>; Sat,  4 Jul 2026 06:22:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783145727; cv=none; b=CPwpLiK+X+h5uCMUBmh1A/fa4kZHKPuYja1lDk9y7XczNzMnQj2r41XxdEMmI+ovxKoFPOv55ZyqB4+6rgOEmUWne76BPS7MY1DY3hHcVc2I5EZTQ1K7BOOwJ0byyu3DjmAHGL0Ah0cncYFuNi99KiJqfTTSjNkvp41QQlGgufk=
+	t=1783146163; cv=none; b=djg3/DGTnYPriwDG0qeVAKcCcLVhqf6FBUKmLqRfSrjvbLXiQlVdrdS+s5+z59FhB/ObjKjm3qOOAwTUOeQPy9RYaMs7Iej2ZyXmRylVCoo/6wcdPu42bo6Z6Bxlt9iA7HA4IkOjVEMrHSlQ7iRbxPzmNWwRgZf96g7d2C/cWSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783145727; c=relaxed/simple;
-	bh=TiLsgiF9D1zaS0XWGamni2xuyhVi0f9tNKG3ox9Xkl4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=W3xvd1EBUdUBKr2ZiW/DsJ5djH+Xe8jQYQdFwrrm0VeyzpAMbOMG8WuTtyF3Q34sVpkG/2zksT8qg9FW3WKiuWlFbfTW7UiuQUIePY9N0FApzBeF8HqY2vgr9iRou+rgJXrWK+8aznBOHvpexD/UG5V6Cd0WZt5pgd25jLMt/v8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=p66X7s8F; arc=none smtp.client-ip=209.85.216.50
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-37f816d01e3so1304005a91.2
-        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 23:15:24 -0700 (PDT)
+	s=arc-20240116; t=1783146163; c=relaxed/simple;
+	bh=PnJrAFYi+mj1ieNKLV2GXIZw3gO7mdCTwfIOv48ITqU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pLC0JqcRyVrPgQSDK6/o2IsYDyNfmdOR4ifn7khQuWQUf7IZWuJX9wQAm/RpW9dkfVJdzbdkGNWUARt1pCuR3zHlebQywvSFnHCF1ibYv2Qp5mHu/c1u+j5lwJnUwzKHFRCzoqnQ54q3fNe9+ZnknmHM7HBQdMRvU/40Rz7ZszQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aY66fWrH; arc=none smtp.client-ip=209.85.215.180
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-c96c92c0980so636347a12.3
+        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 23:22:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783145723; x=1783750523; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y1QMnSMN4LeVAhN51TBt+vF95rU9z7m18HWe4vyd23k=;
-        b=p66X7s8FPgESfMffAGdIainaXdxr9z+bx/qAhXt3uMMQ1/ge5ZUxFA/DZC9eb9/BFM
-         dmcMh2WHr3eXCENk6N0P0mULqrxEHtuOKcld/JsQUo43WyNdFUtOp1gXjNy8iKg2fZdU
-         R4Os2+R8LZFP4Ggma4kIryOc6J/VPcPAjuqhAOfHTsK3WrshWeYUb5cd2xBWRfQkZH0i
-         Mq64r86ADZYsfzj2jVONBHg9ny2hmKs4eVmEiXQWe/1lqOzTl2NkiDUHQWLZmCFdgOrz
-         7Ek6xzoUhWlAEXhfqgHW/3ZW5A9qqbI6ll3hqAk/QeHFrM8ammRIqbAvOxfJZ2pSIMlO
-         7iEw==
+        d=gmail.com; s=20251104; t=1783146161; x=1783750961; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Q6Y3yMjx6909BBBSsLtnHC5GrGrYvCid6v9Tt9MQtbg=;
+        b=aY66fWrH/A0Lz1YSnOhkTehXX6xaOSlCmRsfhgIrFwnw6q1SGuBnl2eMNEUphg8ts5
+         0umS7/ynuDFzRXalHs+8BHFtknhdHPbMQh3gCSgeTuIrlY91V+oXa05/k0T9A96+7K+L
+         4xb+v+frU+LicBtc5U98rL8O4JsDi5iqFDskq+rv0ExB7vQ6bKTiSuPS5j5N3iBUsl6D
+         TZ6mZ6Wi8FA6I9JjMcM7hvtruuFc1J4jYyb6db7cQ+ZIQZalRssiKSg9ZA0XupPjLWnz
+         mZnvpHSi2cG2g1dRnNu/hdqNmdx93AMJfxU/zle+oPCKUBQpYnLGhCouB1hRoQBEp64U
+         sz+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783145723; x=1783750523;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Y1QMnSMN4LeVAhN51TBt+vF95rU9z7m18HWe4vyd23k=;
-        b=Edx4tuQ7uubiKWFKarEaLWX1+zbOBJenv7rz8Ea75lzt0A8U4tkFlkXnjIpu2wXwXz
-         IwQlACHoPxbYjoeSqTnTBGFZInJ5lOzKfWEHqtLmPGvABPgAcwQfq3gfiA1hbDN1OX3r
-         0v5ftDk/TypzZClnu93Nx/dRZh0Psxc6L1a8Iy9ONgGTvz4f64ISqC2OQdpmq/IaaHfP
-         CBhmGkUR6qPTIpVrERpFAYW5+yOhp6LupGBGLXBSAQexra4V1ZFHvFOHV2CqbfvvzcRT
-         /W98pUKIcjvNDLQoiH66k7UsJCAz1hgFNwIFeNGIydM70Wq47UThxWRRoqMgbQZQRaNU
-         8kyg==
-X-Forwarded-Encrypted: i=1; AHgh+RquCy5JcL4u6bFZnTbcPRp1mRjQ5XaNRjSxb7mLJ3em3TOi5B2SLfYbSbQOTHqJ/RDG5CZmUSo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzq7++qbAE2ckVyNLcbRzyenUn1zL3fb8iQnTq+BMzIyWhBwX67
-	sLEVhWiAU93LX9d6zkLHELiMdKbU40i0lbcQkqwXRTsN6u8W5FnXVbOw
-X-Gm-Gg: AfdE7ckrY8W/hO54fHMYdvwjeSn74i4ocVDegdDEffvkxjaf2DHOfCTLvalB1HcLQsY
-	9UQ/rF/67DvMLDpzq2Bo4sCrYkgYMsTVjojToY8YzRcUzJHgBDHUwhgmU9X95/NIz+aSlcbRmc+
-	GgvH5dSvobxcojKDW6uXFSQSWmziBcla5dXwAD4uOXxGZjL5dv7vjM5N1iyU+T28kvIlS/dFQjo
-	xDBh5tLT8tSbpUL7pGlFF5CQjNyPgB/+VlQkLEttc7fnLX1HvsVZGK1VSV0FAMfCnkmNW9bE/uW
-	+i4/hSsLS7rFT50KqxqMAGcQ9NpkRA1xbnIt9dYPzUyiA/LeSrqls0T1klcynanaJz5s/u4iwey
-	7qj8D1nsQlPeighpe48C4HHKcApcPIEjL1+RFX1+QQMsReMH0SkeUt+bL0wYtI775t3wYkIzlfu
-	h09d1vMwnokNAaUhafeKM17Vdr53liixFQ9G0fpQ==
-X-Received: by 2002:a17:90b:2743:b0:37f:e1af:df22 with SMTP id 98e67ed59e1d1-3829ef00938mr2430492a91.17.1783145723348;
-        Fri, 03 Jul 2026 23:15:23 -0700 (PDT)
-Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38127ae6e2bsm1983825a91.2.2026.07.03.23.15.20
+        d=1e100.net; s=20251104; t=1783146161; x=1783750961;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Q6Y3yMjx6909BBBSsLtnHC5GrGrYvCid6v9Tt9MQtbg=;
+        b=ftPSsP8rzz/49wSYwN2aBunny6yhEniiUgeeNSp/5db7FPY5MseDfQFxyPMsV2dkZ4
+         wQGD1doAt8D6ahoTkHj6CbMShj7Sc6nLKsHWbjVO9U53NHItSX/lwfruf52qFhxW0/Mk
+         /LNQhFmQzMz7fXvYrsMRPm+jT952dI0PP55RPj/RnL8jqMjVEb93/53HerPYaOqsGMS1
+         30rzqHiwq8iS0bBCuZEV3DmxpqkHFyqFM+ib71kE3MspVaKCDy+nI+hZiI8Re0GSf8vI
+         SM7iBE1L85jDB651GlnC8x+T6wUvl0pWV95j8NCaOaSjBrtNuJGHQ4M9kkOGC+UK0/BS
+         lkOw==
+X-Forwarded-Encrypted: i=1; AFNElJ86PJRS/b7mi8Dasl8GBtvklEk1Wr6gpWnasr5x9clWc//ZCs6DJpqu2UJTjenCL+0k0xoBdnc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+yan1JIyE7v/zBRVZIg7xZM1UwZ5MVuusaiZQGGlGQurVt9wL
+	oYkIg15rBqknJo6xc3KgW0DanBEqZMmlDsvqlecJtZKEcC54Tpw3J2fi
+X-Gm-Gg: AfdE7clr9c3U9+H5BOX8tY/Ugt2nTeL6CuX6PGLArymsfS4D80NI7J+oqRppJQLhO3p
+	MJRBLWa2xQ/ubWgzStHzFal007jx6rI/hEk4IP/rE+ycoMv+08KZD7MiVEkauYPVx2hnXb02l0g
+	Qv3FHkLoZyma4w/rl3ERP6Zil76bKRiHIedFELSiLc58hAsEN4SRRWzQGdtftWU7zr+3O/1V0LQ
+	kgZimPRD08qnpDwsTT0CyFSOEYyELUED572lnrH7nhBnx4+9G6DDOgEbH2WE9vXob/AIPrmrtoP
+	bn99O8mhQEplfDoJSy0mYb9eA2IRwh2ewrjQEW8QMCMNK+DhAMYCafiUR3yRZPZ3YfwBDFgztfJ
+	Z9KoFc77TzNF/GexDHpdduHLlw3Y1CvzafpJBeEY2SyGO17rpWsPgHBaR+y3C9oydq+mRLu0oYL
+	w7XvvoVDQID19jb7CTOdOgE1julfFUI20ot3ZSXLdknPc0SWMTVrEo1Fy4Qg==
+X-Received: by 2002:a05:6a21:390:b0:3bd:4698:e7c4 with SMTP id adf61e73a8af0-3c03e5747ccmr2328719637.42.1783146160612;
+        Fri, 03 Jul 2026 23:22:40 -0700 (PDT)
+Received: from fx.tailc0aff1.ts.net ([206.206.192.132])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f44581df4sm3898287eec.16.2026.07.03.23.22.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jul 2026 23:15:22 -0700 (PDT)
-From: Maoyi Xie <maoyixie.tju@gmail.com>
-To: Veerasenareddy Burru <vburru@marvell.com>,
-	Sathesh Edara <sedara@marvell.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+        Fri, 03 Jul 2026 23:22:39 -0700 (PDT)
+From: Weiming Shi <bestswngs@gmail.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v3 2/2] octeon_ep_vf: fix skb frags overflow in the RX path
-Date: Sat,  4 Jul 2026 14:15:11 +0800
-Message-Id: <20260704061511.2350737-3-maoyixie.tju@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260704061511.2350737-1-maoyixie.tju@gmail.com>
-References: <20260704061511.2350737-1-maoyixie.tju@gmail.com>
+	linux-kernel@vger.kernel.org,
+	Xiang Mei <xmei5@asu.edu>,
+	Weiming Shi <bestswngs@gmail.com>
+Subject: [PATCH nf] netfilter: ipset: skip extension destroy on hash resize replay
+Date: Fri,  3 Jul 2026 23:22:34 -0700
+Message-ID: <20260704062234.2625208-1-bestswngs@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,131 +95,104 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,netfilter.org,asu.edu,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-304688-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-304689-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:vburru@marvell.com,m:sedara@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:maciej.fijalkowski@intel.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:kadlec@netfilter.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:xmei5@asu.edu,m:bestswngs@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ntu.edu.sg:email,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3D630706DA9
+X-Rspamd-Queue-Id: 743F1706DC3
 
-__octep_vf_oq_process_rx() has the same unbounded fragment loop as the PF
-driver. buff_info->len comes from the device response header, and one
-fragment is added per buffer_size chunk with no check against
-MAX_SKB_FRAGS. A long packet yields about 18 fragments, one past the
-default MAX_SKB_FRAGS of 17, so skb_add_rx_frag() writes past
-shinfo->frags[].
+During a hash set resize, mtype_resize() copies each element into the
+new table with memcpy(), so the new-table element shares the old-table
+element's comment extension.  An xt_SET delete on the old table during
+the resize destroys that shared comment via ip_set_ext_destroy() and
+queues a replayed delete on h->ad.  After the table swap mtype_resize()
+replays it with mtype_del() on the new table, whose copy still points at
+the freed comment, so ip_set_ext_destroy() frees it a second time:
 
-The fragment count is now checked before napi_build_skb(). A packet that
-needs more fragments than the skb can hold is dropped.
-octep_vf_oq_drop_rx() drains its descriptors. The napi_build_skb()
-failure path now uses the same helper.
+ ODEBUG: activate active (active state 1) object: ... object type: rcu_head
+ WARNING: CPU: 3 PID: 5311 at lib/debugobjects.c:514 debug_print_object
+ Call Trace:
+  <IRQ>
+  kvfree_call_rcu (kernel/rcu/tree.c:3825)
+  ip_set_comment_free (net/netfilter/ipset/ip_set_core.c:397)
+  hash_ip4_del (net/netfilter/ipset/ip_set_hash_gen.h:1098)
+  hash_ip4_kadt (net/netfilter/ipset/ip_set_hash_ip.c:96)
+  ip_set_del (net/netfilter/ipset/ip_set_core.c:813)
+  set_target_v3 (net/netfilter/xt_set.c:412)
+  ipt_do_table (net/ipv4/netfilter/ip_tables.c:346)
+  __ip_local_out (net/ipv4/ip_output.c:119)
+  icmp_push_reply (net/ipv4/icmp.c:397)
+  __icmp_send (net/ipv4/icmp.c:804)
+  __udp4_lib_rcv (net/ipv4/udp.c:2521)
+  ip_local_deliver (net/ipv4/ip_input.c:254)
+  ip_rcv (net/ipv4/ip_input.c:569)
+  </IRQ>
 
-Fixes: 1cd3b407977c ("octeon_ep_vf: add Tx/Rx processing and interrupt support")
-Co-developed-by: Kaixuan Li <kaixuan.li@ntu.edu.sg>
-Signed-off-by: Kaixuan Li <kaixuan.li@ntu.edu.sg>
-Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
+The replay passes a NULL ext (the kernel-side delete that queued it
+already destroyed the extensions), so skip ip_set_ext_destroy() when ext
+is NULL.  This also avoids the NULL ext->target dereference that was only
+kept safe by the new table's ref being zero.
+
+Reachable from an unprivileged user namespace.
+
+Fixes: f66ee0410b1c ("netfilter: ipset: Fix \"INFO: rcu detected stall in hash_xxx\" reports")
+Reported-by: Xiang Mei <xmei5@asu.edu>
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Weiming Shi <bestswngs@gmail.com>
 ---
- .../marvell/octeon_ep_vf/octep_vf_rx.c        | 46 ++++++++++++-------
- 1 file changed, 30 insertions(+), 16 deletions(-)
+ net/netfilter/ipset/ip_set_hash_gen.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
-index d982474082..aa77b673ae 100644
---- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
-@@ -357,6 +357,29 @@ static inline u32 octep_vf_oq_next_idx(struct octep_vf_oq *oq, u32 idx)
- 	return (idx + 1 == oq->max_count) ? 0 : idx + 1;
- }
+diff --git a/net/netfilter/ipset/ip_set_hash_gen.h b/net/netfilter/ipset/ip_set_hash_gen.h
+index 5e4453e9e..bc909ae2d 100644
+--- a/net/netfilter/ipset/ip_set_hash_gen.h
++++ b/net/netfilter/ipset/ip_set_hash_gen.h
+@@ -1080,9 +1080,11 @@ mtype_del(struct ip_set *set, void *value, const struct ip_set_ext *ext,
+ 			mtype_del_cidr(set, h,
+ 				       NCIDR_PUT(DCIDR_GET(d->cidr, j)), j);
+ #endif
+-		ip_set_ext_destroy(set, data);
++		/* On a resize replay the extensions were already destroyed. */
++		if (ext)
++			ip_set_ext_destroy(set, data);
  
-+static void octep_vf_oq_drop_rx(struct octep_vf_oq *oq,
-+				struct octep_vf_rx_buffer *buff_info,
-+				u32 *read_idx, u32 *desc_used)
-+{
-+	u16 data_len = buff_info->len - oq->max_single_buffer_size;
-+
-+	(*desc_used)++;
-+	*read_idx = octep_vf_oq_next_idx(oq, *read_idx);
-+	while (data_len) {
-+		dma_unmap_page(oq->dev, oq->desc_ring[*read_idx].buffer_ptr,
-+			       PAGE_SIZE, DMA_FROM_DEVICE);
-+		buff_info = (struct octep_vf_rx_buffer *)
-+			    &oq->buff_info[*read_idx];
-+		buff_info->page = NULL;
-+		if (data_len < oq->buffer_size)
-+			data_len = 0;
-+		else
-+			data_len -= oq->buffer_size;
-+		(*desc_used)++;
-+		*read_idx = octep_vf_oq_next_idx(oq, *read_idx);
-+	}
-+}
-+
- /**
-  * __octep_vf_oq_process_rx() - Process hardware Rx queue and push to stack.
-  *
-@@ -431,25 +454,16 @@ static int __octep_vf_oq_process_rx(struct octep_vf_device *oct,
- 			struct skb_shared_info *shinfo;
- 			u16 data_len;
- 
-+			data_len = buff_info->len - oq->max_single_buffer_size;
-+			if (DIV_ROUND_UP(data_len, oq->buffer_size) > MAX_SKB_FRAGS) {
-+				octep_vf_oq_drop_rx(oq, buff_info, &read_idx, &desc_used);
-+				continue;
-+			}
-+
- 			skb = napi_build_skb((void *)resp_hw, PAGE_SIZE);
- 			if (!skb) {
- 				oq->stats->alloc_failures++;
--				desc_used++;
--				read_idx = octep_vf_oq_next_idx(oq, read_idx);
--				data_len = buff_info->len - oq->max_single_buffer_size;
--				while (data_len) {
--					dma_unmap_page(oq->dev, oq->desc_ring[read_idx].buffer_ptr,
--						       PAGE_SIZE, DMA_FROM_DEVICE);
--					buff_info = (struct octep_vf_rx_buffer *)
--						    &oq->buff_info[read_idx];
--					buff_info->page = NULL;
--					if (data_len < oq->buffer_size)
--						data_len = 0;
--					else
--						data_len -= oq->buffer_size;
--					desc_used++;
--					read_idx = octep_vf_oq_next_idx(oq, read_idx);
--				}
-+				octep_vf_oq_drop_rx(oq, buff_info, &read_idx, &desc_used);
- 				continue;
- 			}
- 			rx_bytes += buff_info->len;
+-		if (atomic_read(&t->ref) && ext->target) {
++		if (ext && atomic_read(&t->ref) && ext->target) {
+ 			/* Resize is in process and kernel side del,
+ 			 * save values
+ 			 */
 -- 
-2.34.1
+2.43.0
 
 
