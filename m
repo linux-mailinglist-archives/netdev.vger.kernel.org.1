@@ -1,149 +1,257 @@
-Return-Path: <netdev+bounces-304682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304683-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id i9GKHOqMSGqurQAAu9opvQ
-	(envelope-from <netdev+bounces-304682-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 06:32:42 +0200
+	id S+1UDDeeSGrxrwAAu9opvQ
+	(envelope-from <netdev+bounces-304683-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 07:46:31 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C72817069D0
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 06:32:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ACB8706B3E
+	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 07:46:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304682-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304682-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304683-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304683-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9A2B3300A13C
-	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 04:32:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4B785301F7BD
+	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 05:46:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E19388E74;
-	Sat,  4 Jul 2026 04:32:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FF88304976;
+	Sat,  4 Jul 2026 05:46:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com [209.85.210.72])
+Received: from mail-oi1-f207.google.com (mail-oi1-f207.google.com [209.85.167.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C72E381B1D
-	for <netdev@vger.kernel.org>; Sat,  4 Jul 2026 04:32:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF5A1E5207
+	for <netdev@vger.kernel.org>; Sat,  4 Jul 2026 05:46:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783139554; cv=none; b=NG5V4EKmRYDVWwDmvKwv/CKe30r+/MAA9hxcPyVZ0Lw9YOsp+yBNTRBx74kkW/vo+gZsQJdYVEY+Rl2Fqros8kmTN152N+SHZKg6drl67NxjuFtNrjLpqPT0n1duc9VYxS0I4pDQzDYrU00P6aOFOVUX7JG+TKZn8tLrIh2ztkY=
+	t=1783143988; cv=none; b=pdJyTo0Q0gpn8AqtJku0vjMip66Z4i5Agxf+g2Igtp6JHYjIgh+IQiCpxCWL1KWRuk1nPtPHERGRWBirpJbDqM6wy0xqfqX2NMAoVZPv/lY3pY6BR3RUBKm9jxZSDL8yfYMPpjvOlh/smsrD2O3iFuVegAccG1wBEHaZlk3xafM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783139554; c=relaxed/simple;
-	bh=DVZrScrCHFw0e9W9NPMorP7NbJVBjjcPdL3WSxs98rA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Hsi6fC5a61NEZkLDByXrbXfRrcpMigDWk9y0Ik9IZMCoz20kB+2qrPM/Gt+r4RkrLH3lzPvBJXe48TT/i32Km+ZIoflfv04Yiv8pmtYIdOcTnmq6wDty7yi+eJMZG1aHIX85bFSb1FeKrYdDW9McjBJViG5YDb55r6UbUsAlBEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.72
-Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-7e94dffa918so1401570a34.1
-        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 21:32:27 -0700 (PDT)
+	s=arc-20240116; t=1783143988; c=relaxed/simple;
+	bh=0ri+rowBsuVRd7CmY/EhESOItOnZmOR+KG5jtsNKqLs=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=XJWlyWswLJegcqr7/Io71TnRCtCtPuMbZight6rjygI5DhglatXArN5Cq0N0DkWRJaLI995GH5w/enk1rg2Jq074P24YQmpa7/g4lNBMeIG2guG5eFgok2yohd1JuBR4jRCM5oArbYpTdXbVIUU6EXD04kGFGSuDhQuLPiujtUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.207
+Received: by mail-oi1-f207.google.com with SMTP id 5614622812f47-495f637105eso1985350b6e.2
+        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 22:46:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783139544; x=1783744344;
+        d=1e100.net; s=20251104; t=1783143985; x=1783748785;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=KPiNMJouXk269z6DwL82Ol478mu/GZzWA83cGd2gkyw=;
-        b=CTRKj21DSUhI8yKBOD1IBhTPZM808mz4dIJgH13T/KOupK/6JDetT7D8GJtBlwlMpm
-         agm7UUOn8QicS2XEHxnHEhi90eQUsVyKpCB/fdCbm/RohfbhUQv2tamUdZvL9Dk/Zi+c
-         p0uKh0L6CNt09DUT2f4EZ+iPfdRbI36c1Aw8TaVzpl3cAplTwOQbGcT1Ig6isW+C1XLE
-         +qi0cXPCDYFTNVJ1n/IQsrWmccP1aoS0mkhuUmGZeRAbRKZ83/hSETHSfTde/3FGpgAe
-         Yz1N0RxG+whNxfRGnqeeu7rCDrRks+MOCC4jMxcYvwwpFPW1d3ggUOn4PHHXtf++5SLj
-         fhKQ==
-X-Forwarded-Encrypted: i=1; AFNElJ886Iu3H2Aav55AYh/UPFkgDT+QH1lc0NYMPMGuf1ONkW2gStmCl6BRjGYgaIngISD2m8GhpAg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCkl2NMaAwlxyJCWnTZI69C14JHQj72KqDe2wLXb/NJH1K9CWK
-	+eZccX1GPPwV+UOnHRIlNeyf4Tpknp7wz7nQdR2ejCL+H1CWaUliiY5PQPk//bbCKiOShUb8lE3
-	cDLrW4CsbMLon6kLfnzR8OmxPkZz+wMy/0LEbnDaD+7kcvqdR6b5vmYaEz3w=
+        bh=Z5D6qQPtf4IgRIFQ0tZG2NJ5fIoyh7VlwEwJvfwLdf4=;
+        b=peBBD3BXv4wjC3ySzgrMnJqvqzDZJ/t5BOE3JcHYyonP7ycSXJcgwnrLUcnxW7sAJ5
+         fbRsXAXAUmmKa6l5qJDALD6yy0xljGwI/FSa6vDJvxuOj0Jt+pwFIti0zopA9S2z6h8B
+         G6zwNJEFTOogvjvAwfKySc4bRRb/0n72GttgmavXIyX8s+7hDQG1xHlLmTxogZfFEqDA
+         S11zQSessW5ziy4PWc4YLkxakPLjtW6USEeZkMxkl77c/P2m4gyPPyR1eNr+p2oSRyLS
+         1TQxxHFPAJzb7mmdOcVNue6zJE7MuWNhly4ofebt9vs+1etxhdvyJk0338YyScKO9+IN
+         aQGg==
+X-Forwarded-Encrypted: i=1; AFNElJ/2MNkWlltVKYPEMAPgVO+Tt62wn2aOz6Y0sFN33VRzqWJkvOE0tzq5UQYiTfPwhZ85c3SmvSg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxd6zCyX4ZgoW/0SCbHgC04td/ynowcwJ12Q1eEuEeW/zD5eTCM
+	da86aQJUSnNybN9r+MO3JUsWEaEKoT+hpKNffs0+UwcbNVYSc1VNTBwiS0QKr1e6psNB1yI/1F1
+	RGkQsC4230zva87kgp37HfWjNU/G3Zey2IklVhbe7w7mwBJH49Z8vnUGwRME=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:168f:b0:6a1:44aa:86ce with SMTP id
- 006d021491bc7-6a32f4c1cbfmr967723eaf.22.1783139544198; Fri, 03 Jul 2026
- 21:32:24 -0700 (PDT)
-Date: Fri, 03 Jul 2026 21:32:24 -0700
+X-Received: by 2002:a05:6808:1903:b0:496:dfe1:6d91 with SMTP id
+ 5614622812f47-499bc606a8dmr1167270b6e.42.1783143985519; Fri, 03 Jul 2026
+ 22:46:25 -0700 (PDT)
+Date: Fri, 03 Jul 2026 22:46:25 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a488cd8.b42ede87.8bd1.0008.GAE@google.com>
-Subject: [syzbot] Monthly wireless report (Jul 2026)
-From: syzbot <syzbot+list7ac59e6c13deeebf868b@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+Message-ID: <6a489e31.b42ede87.8bd1.0009.GAE@google.com>
+Subject: [syzbot] [wireless?] [usb?] WARNING in __carl9170_tx_process_status
+From: syzbot <syzbot+381102a7292a374fe8a7@syzkaller.appspotmail.com>
+To: chunkeey@googlemail.com, linux-kernel@vger.kernel.org, 
+	linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org, 
 	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.36 / 15.00];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=6ec4d592e55f7960];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304682-lists,netdev=lfdr.de,list7ac59e6c13deeebf868b];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:netdev@vger.kernel.org,m:syzkaller-bugs@googlegroups.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304683-lists,netdev=lfdr.de,381102a7292a374fe8a7];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_TO(0.00)[googlemail.com,vger.kernel.org,googlegroups.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:chunkeey@googlemail.com,m:linux-kernel@vger.kernel.org,m:linux-usb@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:netdev@vger.kernel.org,m:syzkaller-bugs@googlegroups.com,m:chunkeey@gmail.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_NONE(0.00)[];
 	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	ALIAS_RESOLVED(0.00)[];
 	REDIRECTOR_URL(0.00)[goo.gl];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[goo.gl:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	SUBJECT_HAS_QUESTION(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C72817069D0
+X-Rspamd-Queue-Id: 7ACB8706B3E
 
-Hello wireless maintainers/developers,
+Hello,
 
-This is a 31-day syzbot report for the wireless subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wireless
+syzbot found the following issue on:
 
-During the period, 3 new issues were detected and 0 were fixed.
-In total, 30 issues are still open and 178 have already been fixed.
-There are also 17 low-priority issues.
+HEAD commit:    dc59e4fea9d8 Linux 7.2-rc1
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
+console output: https://syzkaller.appspot.com/x/log.txt?x=1792f9fe580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6ec4d592e55f7960
+dashboard link: https://syzkaller.appspot.com/bug?extid=381102a7292a374fe8a7
+compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1125c289580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17049e89580000
 
-Some of the still happening issues:
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/8540695a33d7/disk-dc59e4fe.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e144bb9cdc33/vmlinux-dc59e4fe.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/6e3051bf9301/bzImage-dc59e4fe.xz
 
-Ref Crashes Repro Title
-<1> 6964    Yes   WARNING in __cfg80211_ibss_joined (2)
-                  https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
-<2> 1243    Yes   INFO: task hung in reg_process_self_managed_hints
-                  https://syzkaller.appspot.com/bug?extid=1f16507d9ec05f64210a
-<3> 327     Yes   INFO: task hung in ath9k_hif_usb_firmware_cb (3)
-                  https://syzkaller.appspot.com/bug?extid=e9b1ff41aa6a7ebf9640
-<4> 65      Yes   WARNING in cfg80211_scan_done
-                  https://syzkaller.appspot.com/bug?extid=189dcafc06865d38178d
-<5> 42      Yes   WARNING: ODEBUG bug in ieee80211_led_exit (2)
-                  https://syzkaller.appspot.com/bug?extid=e84ecca6d1fa09a9b3d9
-<6> 1032    Yes   INFO: task hung in reg_check_chans_work (7)
-                  https://syzkaller.appspot.com/bug?extid=a2de4763f84f61499210
-<7> 204     Yes   WARNING in ieee80211_free_ack_frame (2)
-                  https://syzkaller.appspot.com/bug?extid=ac648b0525be1feba506
-<8> 44      Yes   possible deadlock in zd_chip_disable_rxtx
-                  https://syzkaller.appspot.com/bug?extid=0ec3d1a6cf1fbe79c153
-<9> 21      Yes   WARNING in mac80211_hwsim_tx (2)
-                  https://syzkaller.appspot.com/bug?extid=435fdb053cf98bfa5778
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+381102a7292a374fe8a7@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+__lockdep_enabled && !this_cpu_read(hardirqs_enabled)
+WARNING: kernel/softirq.c:430 at __local_bh_enable_ip+0xbd/0x120 kernel/softirq.c:430, CPU#0: swapper/0/0
+Modules linked in:
+CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted syzkaller #0 PREEMPT(lazy) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/09/2026
+RIP: 0010:__local_bh_enable_ip+0xbd/0x120 kernel/softirq.c:430
+Code: 00 e8 a7 d1 0b 00 e8 62 10 45 00 fb 65 8b 05 7a c3 86 0b 85 c0 74 50 5b 5d c3 cc cc cc cc 65 8b 05 04 03 87 0b 85 c0 75 a0 90 <0f> 0b 90 eb 9a e8 59 12 45 00 eb 9b 48 89 ef e8 0f 0b 19 00 eb a4
+RSP: 0018:ffffc90000007aa8 EFLAGS: 00010046
+RAX: 0000000000000000 RBX: 0000000000000201 RCX: 1ffffffff15e7114
+RDX: 0000000000000001 RSI: 0000000000000201 RDI: ffffffff8446537b
+RBP: ffffffff8446537b R08: 0000000000000000 R09: ffffed1023c03a8b
+R10: ffff88811e01d45b R11: 0000000000000000 R12: ffff88811c516705
+R13: dffffc0000000000 R14: ffff88811e01b220 R15: ffff88811e01d440
+FS:  0000000000000000(0000) GS:ffff888268640000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ffdd9de6dc4 CR3: 00000001197ae000 CR4: 00000000003506f0
+Call Trace:
+ <IRQ>
+ spin_unlock_bh include/linux/spinlock.h:396 [inline]
+ carl9170_get_queued_skb drivers/net/wireless/ath/carl9170/tx.c:531 [inline]
+ __carl9170_tx_process_status+0x13b/0x620 drivers/net/wireless/ath/carl9170/tx.c:668
+ carl9170_tx_process_status+0xf6/0x230 drivers/net/wireless/ath/carl9170/tx.c:701
+ carl9170_handle_command_response+0x3c8/0xc50 drivers/net/wireless/ath/carl9170/rx.c:219
+ carl9170_usb_rx_irq_complete+0xfc/0x1b0 drivers/net/wireless/ath/carl9170/usb.c:307
+ __usb_hcd_giveback_urb+0x38d/0x610 drivers/usb/core/hcd.c:1657
+ usb_hcd_giveback_urb+0x3ca/0x4a0 drivers/usb/core/hcd.c:1741
+ dummy_timer+0xda1/0x36c0 drivers/usb/gadget/udc/dummy_hcd.c:2005
+ __run_hrtimer kernel/time/hrtimer.c:2032 [inline]
+ __hrtimer_run_queues+0x462/0x9c0 kernel/time/hrtimer.c:2096
+ hrtimer_run_softirq+0x17d/0x2c0 kernel/time/hrtimer.c:2113
+ handle_softirqs+0x1dd/0x990 kernel/softirq.c:622
+ __do_softirq kernel/softirq.c:656 [inline]
+ invoke_softirq kernel/softirq.c:496 [inline]
+ __irq_exit_rcu+0x160/0x210 kernel/softirq.c:735
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:752
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1062 [inline]
+ sysvec_apic_timer_interrupt+0x8f/0xb0 arch/x86/kernel/apic/apic.c:1062
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:674
+RIP: 0010:pv_native_safe_halt+0xf/0x20 arch/x86/kernel/paravirt.c:64
+Code: 90 ac 01 c3 cc cc cc cc 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 66 90 0f 00 2d 03 8f 0b 00 fb f4 <e9> 3c f6 02 00 66 2e 0f 1f 84 00 00 00 00 00 66 90 90 90 90 90 90
+RSP: 0018:ffffffff89407e20 EFLAGS: 00000242
+RAX: 0000000000096967 RBX: ffffffff8942c8c0 RCX: ffffffff877af8e5
+RDX: 0000000000000000 RSI: ffffffff890edf5a RDI: ffffffff87b15200
+RBP: fffffbfff1285918 R08: 0000000000000001 R09: ffffed103eac670d
+R10: ffff8881f563386b R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000000000 R14: 1ffffffff1280fc8 R15: dffffc0000000000
+ arch_safe_halt arch/x86/include/asm/paravirt.h:62 [inline]
+ default_idle+0x9/0x10 arch/x86/kernel/process.c:768
+ default_idle_call+0x6c/0xb0 kernel/sched/idle.c:122
+ cpuidle_idle_call kernel/sched/idle.c:199 [inline]
+ do_idle+0x3a7/0x5b0 kernel/sched/idle.c:355
+ cpu_startup_entry+0x4f/0x60 kernel/sched/idle.c:454
+ rest_init+0x251/0x260 init/main.c:717
+ start_kernel+0x489/0x490 init/main.c:1175
+ x86_64_start_reservations+0x24/0x30 arch/x86/kernel/head64.c:310
+ x86_64_start_kernel+0x12b/0x130 arch/x86/kernel/head64.c:291
+ common_startup_64+0x13e/0x158
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	90                   	nop
+   1:	ac                   	lods   %ds:(%rsi),%al
+   2:	01 c3                	add    %eax,%ebx
+   4:	cc                   	int3
+   5:	cc                   	int3
+   6:	cc                   	int3
+   7:	cc                   	int3
+   8:	0f 1f 00             	nopl   (%rax)
+   b:	90                   	nop
+   c:	90                   	nop
+   d:	90                   	nop
+   e:	90                   	nop
+   f:	90                   	nop
+  10:	90                   	nop
+  11:	90                   	nop
+  12:	90                   	nop
+  13:	90                   	nop
+  14:	90                   	nop
+  15:	90                   	nop
+  16:	90                   	nop
+  17:	90                   	nop
+  18:	90                   	nop
+  19:	90                   	nop
+  1a:	90                   	nop
+  1b:	f3 0f 1e fa          	endbr64
+  1f:	66 90                	xchg   %ax,%ax
+  21:	0f 00 2d 03 8f 0b 00 	verw   0xb8f03(%rip)        # 0xb8f2b
+  28:	fb                   	sti
+  29:	f4                   	hlt
+* 2a:	e9 3c f6 02 00       	jmp    0x2f66b <-- trapping instruction
+  2f:	66 2e 0f 1f 84 00 00 	cs nopw 0x0(%rax,%rax,1)
+  36:	00 00 00
+  39:	66 90                	xchg   %ax,%ax
+  3b:	90                   	nop
+  3c:	90                   	nop
+  3d:	90                   	nop
+  3e:	90                   	nop
+  3f:	90                   	nop
+
 
 ---
 This report is generated by a bot. It may contain errors.
 See https://goo.gl/tpsmEJ for more information about syzbot.
 syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-You may send multiple commands in a single email message.
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
