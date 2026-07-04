@@ -1,191 +1,114 @@
-Return-Path: <netdev+bounces-304717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304718-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ROGFHHs/SWp4zgAAu9opvQ
-	(envelope-from <netdev+bounces-304717-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 19:14:35 +0200
+	id SPgMA0lSSWpp0QAAu9opvQ
+	(envelope-from <netdev+bounces-304718-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 20:34:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF87C7080AB
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 19:14:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69E95708310
+	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 20:34:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Jqkj9LAV;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304717-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304717-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=m538+Iqz;
+	dmarc=pass (policy=none) header.from=lunn.ch;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304718-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304718-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1EE9F3005AD7
-	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 17:14:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 21E5C301C150
+	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 18:34:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7095F35E1A5;
-	Sat,  4 Jul 2026 17:14:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 705EC36C0CE;
+	Sat,  4 Jul 2026 18:34:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E355433E7F
-	for <netdev@vger.kernel.org>; Sat,  4 Jul 2026 17:14:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E02C288C30;
+	Sat,  4 Jul 2026 18:34:19 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783185272; cv=none; b=d294LrXeKVWIK4GvmzhXNlPmIxIxGk1lER33EK2D7CIzUasqb3Q+4K0uncURKOYyaPQjBU+lMTNCikxljyRrYRgeFiJMFFkon3Xyi9LHB2e/TkEj4aDKBhqZakzn3wzd/9MM3pOG0hrmgEkMOWULnHTf3GnTXAKPDU4Emjo+S+0=
+	t=1783190061; cv=none; b=O4gfqa94QQROJRfRpDn4PiWZknIbks/TerKXog8GX8MD44cdcdYvx3D5GHdOxJr5JaIa3q4QzNwzCKVNb+/6uIhwAIUabW192M2qVAW0O/baIhvWTbAaze1nfACaySexcdODg4YEwNygRyQiUK5jE6B50p83c8CtKMtyrbtyOoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783185272; c=relaxed/simple;
-	bh=7uyRPvzkXYfs2wmtaHMDG+n85HN/ZOLukoEk4n9DqyE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ecPxE0I5ZF2HYYD9IFYMnJF8vv7CPcI2RAmsM1ZGIo4+0q3i4f0jzsfn/597q8kHldkzLHZG93LePSjID1qQphHoH38ospPT3uATG5dJcQUCAcqPkM8WipKLyH3yWurWgiQ7qPf77FmRjyz72NOlIHK0RZ0GOXUs34dQtegiu2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jqkj9LAV; arc=none smtp.client-ip=209.85.214.182
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2c9b42be8feso16005565ad.2
-        for <netdev@vger.kernel.org>; Sat, 04 Jul 2026 10:14:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783185270; x=1783790070; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lmrMGneNXYFXj/2nN+KzQAgQlOxhvv+qqZjYjmSo2X4=;
-        b=Jqkj9LAVOrNovQ3dXVETqcNxFMeImz3XGUpDl5pAPkfsUB/rVa0FeJUl2c8pOpeV/Q
-         20TsBv8Gbj2HBXsAgcrp+2gGSyEVEHpA8NymzzVsr1SQ4Hr3i1H2Bv0DZK5rozNXgsLn
-         8bo+4yQF+IuRiCLet4j05GWMWbnYH/kZO8VjWy1yx9LImWnzgIrwJVusgSYiJh2EE6Wr
-         yVU93uX5qmDJg1xLydFzfaVoidPKt1v8XcZ9xmUb65Fuqyth1WvQvBw+aMc3grzqo2XC
-         /FbcnWidxP8dxp/f+cA8jOLM/HWsh3TAGR154wAkzBh666YAHMpXZJLLd345+YewJ9H6
-         GWAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783185270; x=1783790070;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lmrMGneNXYFXj/2nN+KzQAgQlOxhvv+qqZjYjmSo2X4=;
-        b=Bprm404ru0+aQKocgKrkJN7P194jfWUk+cy+I75JQVsISVhAGpGGEMgLSe3cQnP/44
-         4lkvAELIjoO8vRX/K+WzfA66y3gQJSQ2hH8Bd5gYdQLFT7xg9FMn6fXHNV+BRA8DUnBS
-         NWCQdl42wLuAeVuGAIdMQXhnboxM9t3idgXesu9pTq7wvO2IKXdjDAB8ZSvUNRY9fiK8
-         3PM8x5XZ2JnWNIAct6zDP0Uf+V4/K5JXaGztD7BazRW5nhRrbXN4aos/PdwDnaFxC04S
-         OFwfV8ytzOIUEDtkLU3wF0LuhNpZnMyMkUVLdzvTeIPe0j+VTZduoIUzXeiX/eYKCzSV
-         hGVg==
-X-Gm-Message-State: AOJu0Yzk2t1nMFYe5z3gOi0Fr6BkGV9DPRQUQ8kY5BbfotcEN2OTitnz
-	lUQpE0TNiN9f4AEH9ndpFIBn0HxKD/1yH47v38nKZ4o2aa1rpAjjRPeUaQIASj3USUc=
-X-Gm-Gg: AfdE7cljMm97/48+5CNLLExD8I8d6LVEHUH10MiFUgG7SdRwMDonCxrDjwXKlTYVbHr
-	9tuKyabBQRxUca9Q9TvtteRt4+rigVJzBREp8b0TYGGPz/dKswc/C5/XLptHULIe6sIzQSE/EOU
-	LcxcVcyUjpKExqsEXMiVqU79NIEX/NPuQUNVbRtBwYty724pDbuOzQtm151NobcUoPzmA54LVIN
-	PoVICuAbKyXhqOnyxqnd7pXyBVO5fCTJxWvzH9k6wg4FmMy59C48LjHQTUjC8bLXLPzKl3F0evi
-	3DUYOlxpD0lQw/c1zRun3pfHkxPLcJ8zOfp9rn8q8alramhkojC+L9YTL6UlP/8vnwLyYXp8MoM
-	Fbqtz61guSn8RM7pqajF1WOnV1HTMSRefL9qrIopQF0NeOJ5UmxxmymzMjyqtaTMLkyrH2T8DW3
-	4BTrb0THJG4nWdRXa7HSbiJiKTQfMdJzxYdQ/tEpsMISkS1rJF0geIlFPJDQ==
-X-Received: by 2002:a17:903:b8f:b0:2c9:cf41:adf9 with SMTP id d9443c01a7336-2cbb9f0eb2amr39212645ad.47.1783185270387;
-        Sat, 04 Jul 2026 10:14:30 -0700 (PDT)
-Received: from fx.tailc0aff1.ts.net ([206.206.192.132])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13b446a766asm35140615c88.7.2026.07.04.10.14.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 Jul 2026 10:14:29 -0700 (PDT)
-From: Weiming Shi <bestswngs@gmail.com>
-To: netdev@vger.kernel.org
-Cc: dsahern@kernel.org,
-	idosch@nvidia.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	horms@kernel.org,
-	xmei5@asu.edu,
-	linux-kernel@vger.kernel.org,
-	Weiming Shi <bestswngs@gmail.com>
-Subject: [PATCH net] ipv4: fib: free fib_alias with kfree_rcu() on insert error path
-Date: Sat,  4 Jul 2026 10:14:21 -0700
-Message-ID: <20260704171421.1786806-1-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1783190061; c=relaxed/simple;
+	bh=t4uLipmtTHy4TWILekTxNplI5i8nYUWkrj5/SDDiN8c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cuu4j0dmU7TA01uJcNwNJxFoymmX3BmMj+4TtptChR+7mjBohQUXTruuF4Iyk+kYBUW/jjJ8+j5dvcMlqpT2kgGXyTNxJSq0gdIPhARRLTguqNBl/Hcb1nUa8BXfz9M+v0aURau+ITRq2NuXdvAWQ1LAOKg2K09NkCjGV5FBryQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=m538+Iqz; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=E8SM0kUCm63/KA5auRY+06ic1R1eaIh69eRXGvfr/9c=; b=m538+IqzX64c8XRC/KO4zFNtgr
+	XEBwPOZ17t5enfp6bSfr2TxY9bbwG4nmCNsndLuCed5R+Q0+SBoWU9vEaZqcPJp+G2hY+V9pavMCT
+	53bcv1DR6Cm05dUdK1gi0n8bw+NO3lhKrrihbDoIu8VUS8VT2BSmdluikB+n/Ed7iFlw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wg5Bk-00AiZ5-8P; Sat, 04 Jul 2026 20:34:04 +0200
+Date: Sat, 4 Jul 2026 20:34:04 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vikas Gupta <vikas.gupta@broadcom.com>, gg@lunn.ch
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, leonro@nvidia.com, jgg@nvidia.com,
+	bhargava.marreddy@broadcom.com, rahul-rg.gupta@broadcom.com,
+	vsrama-krishna.nemani@broadcom.com,
+	rajashekar.hudumula@broadcom.com, ajit.khaparde@broadcom.com,
+	Siva Reddy Kallam <siva.kallam@broadcom.com>,
+	Dharmender Garg <dharmender.garg@broadcom.com>,
+	Yendapally Reddy Dhananjaya Reddy <yendapally.reddy@broadcom.com>
+Subject: Re: [PATCH net v2] bnge/bng_re: fix ring ID widths
+Message-ID: <13ce47bb-c8e2-4ad6-8942-e0b4f8ff9e49@lunn.ch>
+References: <20260704164747.1995227-1-vikas.gupta@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260704164747.1995227-1-vikas.gupta@broadcom.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,google.com,redhat.com,davemloft.net,asu.edu,vger.kernel.org,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-304717-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:dsahern@kernel.org,m:idosch@nvidia.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:horms@kernel.org,m:xmei5@asu.edu,m:linux-kernel@vger.kernel.org,m:bestswngs@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-304718-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:vikas.gupta@broadcom.com,m:gg@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:leonro@nvidia.com,m:jgg@nvidia.com,m:bhargava.marreddy@broadcom.com,m:rahul-rg.gupta@broadcom.com,m:vsrama-krishna.nemani@broadcom.com,m:rajashekar.hudumula@broadcom.com,m:ajit.khaparde@broadcom.com,m:siva.kallam@broadcom.com,m:dharmender.garg@broadcom.com,m:yendapally.reddy@broadcom.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,asu.edu:email]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AF87C7080AB
+X-Rspamd-Queue-Id: 69E95708310
 
-fib_table_insert() publishes new_fa into the leaf's fa_list with
-fib_insert_alias() before calling the fib entry notifiers. When a
-notifier fails, the error path removes new_fa with fib_remove_alias()
-(hlist_del_rcu) and frees it right away with kmem_cache_free().
+> - Backward compatibility with older firmware is not a concern.
 
-fib_table_lookup() walks that list under rcu_read_lock() only, so a
-concurrent lookup that already reached new_fa keeps reading it after the
-free:
+Could you expand on that please.
 
- BUG: KASAN: slab-use-after-free in fib_table_lookup (net/ipv4/fib_trie.c:1601)
- Read of size 1 at addr ffff88810676d4eb by task exploit/297
- Call Trace:
-  fib_table_lookup (net/ipv4/fib_trie.c:1601)
-  ip_route_output_key_hash_rcu (net/ipv4/route.c:2814)
-  ip_route_output_key_hash (net/ipv4/route.c:2705)
-  __ip4_datagram_connect (net/ipv4/datagram.c:49)
-  udp_connect (net/ipv4/udp.c:2144)
-  __sys_connect (net/socket.c:2167)
-  __x64_sys_connect (net/socket.c:2173)
-  do_syscall_64
-  entry_SYSCALL_64_after_hwframe
- which belongs to the cache ip_fib_alias of size 56
-
-Triggering the error path needs CAP_NET_ADMIN and a registered fib
-notifier that can reject a route; a netdevsim device whose IPv4 FIB
-resource is exhausted is enough.
-
-Free new_fa with alias_free_mem_rcu(), as fib_table_delete() already
-does for a fib_alias removed from the trie.
-
-Fixes: a6c76c17df02 ("ipv4: Notify route after insertion to the routing table")
-Reported-by: Xiang Mei <xmei5@asu.edu>
-Assisted-by: Claude:claude-opus-4-8
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
----
- net/ipv4/fib_trie.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
-index 1308213791f1..2dc87e2156d3 100644
---- a/net/ipv4/fib_trie.c
-+++ b/net/ipv4/fib_trie.c
-@@ -1385,7 +1385,7 @@ int fib_table_insert(struct net *net, struct fib_table *tb,
- out_remove_new_fa:
- 	fib_remove_alias(t, tp, l, new_fa);
- out_free_new_fa:
--	kmem_cache_free(fn_alias_kmem, new_fa);
-+	alias_free_mem_rcu(new_fa);
- out:
- 	fib_release_info(fi);
- err:
--- 
-2.43.0
-
+      Andrew
 
