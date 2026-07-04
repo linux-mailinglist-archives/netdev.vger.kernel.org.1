@@ -1,208 +1,167 @@
-Return-Path: <netdev+bounces-304685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304686-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id f3EEAyOjSGq4sAAAu9opvQ
-	(envelope-from <netdev+bounces-304685-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 08:07:31 +0200
+	id F6kVLPqkSGoCsQAAu9opvQ
+	(envelope-from <netdev+bounces-304686-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 08:15:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 551F7706D05
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 08:07:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09E7A706D98
+	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 08:15:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linutronix.de header.s=2020 header.b=byBM+RDc;
-	dkim=pass header.d=linutronix.de header.s=2020e header.b=8fc0NOUQ;
-	dmarc=pass (policy=none) header.from=linutronix.de;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304685-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304685-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=mAHM1MtG;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304686-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304686-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 60E9E301A924
-	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 06:04:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C78893012C72
+	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 06:15:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01F4638D414;
-	Sat,  4 Jul 2026 06:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C39B388E69;
+	Sat,  4 Jul 2026 06:15:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787903064B2;
-	Sat,  4 Jul 2026 06:04:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0B5E38C2C3
+	for <netdev@vger.kernel.org>; Sat,  4 Jul 2026 06:15:17 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783145042; cv=none; b=XxfJp8J7/I7CZ8/pmn5lZU97IpgPkfJSoKOElvXDPSd1jL1A3G3XgYUDrIR35dLx+CZQisEzA8z4ohwPk0K6O4b+7FRUXWNrDzLZzDKR8nZU8XtQJamBzQP0WsazlsV/coslp0o2zh3PVIuyATbeVjTONsjbgqKo8UBFUi17quw=
+	t=1783145719; cv=none; b=GswhDQfRhQvE+7R/nWKgukan1sud8b+D/zwyIeJen6Gev+DD6I05CHXVtdQO2g9ma2AqxKilrQg4aB3QJF8MO3wVz+zouK3PKiuc/o/+D0KttD4OoWNiNrNqipC9UDtEfSEnogRSpR1AoZ0/LWlpNNEX/k5Y5C47Ksft/7mHyX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783145042; c=relaxed/simple;
-	bh=jIMGvQqsIvIyUCsNTGB+vuaIlrGlYDapnlkWplv0DVg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Deba3RZrGOoaCLiaUNMZTnClHF0nstxe7+Em4vmaVtHsdc6Dw2fiJLNGUfg/njh8PNFr8f4BDZKUzpwVhvPzTTVI3ND+UXDkQTYSqYYOw1Bv1YLN1ajFiCCiySnOC7Jpn1PUEazINEQZvJaek4IQThFcN//0paMaGoKfF28PvpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=byBM+RDc; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=8fc0NOUQ; arc=none smtp.client-ip=193.142.43.55
-From: Nam Cao <namcao@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1783145039;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SpfS25J8dv9TjWmef95+8RlZGNip6QMU6GFSfOmOoq8=;
-	b=byBM+RDcZ2xkcau9XQkczUfq3+pZGm3Pfqey7HMu/GzJ6kO5Y7BHF6M4raL9W4hBhhQ4yF
-	cSVNrMyMeFi699K62CwfoYSQ1mInkFFPBiwp01ZxUgPa99K5/jiE9Za8nAA14uaGY6sFR7
-	El7BcvJC3aXlIK0/apV5Xs6jYkkljOfHEhhWugdiRdEYvATHxHE5bkt2pPuXqhZBOLyHGH
-	xmhRoxqQRZx59cAqVSOk3ArRSawFsxk7fkSwEpdoBNzh+faf2XQ9pb3/6rVwzcS1w11lkY
-	7sO4zNLTwo9i8hTD/WYkunhW7ZDIbdJX4/GfNxfoD9jdrN9E66oL3isI1Q9U+g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1783145039;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SpfS25J8dv9TjWmef95+8RlZGNip6QMU6GFSfOmOoq8=;
-	b=8fc0NOUQCgRXYPdMXlGSRmvZ/kH8U8FCpujnYHmtwirY66tx4b7MSlp+5RuTqWSL7kmmwH
-	y/d7LS6BUiDd5XCw==
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: sashiko-reviews@lists.linux.dev, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH 1/2] af_unix: Do not wait for garbage collector in
- sendmsg()
-In-Reply-To: <CAAVpQUB+LDxRrF66=NKwLAdLN8kt+Hssm_KBc2oc_q6FTJF0VA@mail.gmail.com>
-References: <cover.1782922354.git.namcao@linutronix.de>
- <e663a83195f3d9f6d7ad4907c37ae3e45c151062.1782922354.git.namcao@linutronix.de>
- <20260702163608.0207A1F00A3A@smtp.kernel.org> <87mrw8sjo3.fsf@yellow.woof>
- <CAAVpQUB+LDxRrF66=NKwLAdLN8kt+Hssm_KBc2oc_q6FTJF0VA@mail.gmail.com>
-Date: Sat, 04 Jul 2026 08:03:56 +0200
-Message-ID: <87wlvbmgtv.fsf@yellow.woof>
+	s=arc-20240116; t=1783145719; c=relaxed/simple;
+	bh=WA2orcqFwjasE4YunpW0wC2ZXMXVQO9Id3jt2BqbbG4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hInL4dXWdfhY9TwMzSzGNmwj6fWjifc0pzvIH7422xR3OJzdJEpXzpf7VwLQs1nVp8AsCeo6Vbrhthrw9Ee//Ynko6DtEsPjnEVnYPYZBdA95KHdxvxucIYamRLsFY88v24DDNZ1DhLhU2KiGIvvF9CEHEW9CIl78eD8+1ypPRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mAHM1MtG; arc=none smtp.client-ip=209.85.216.46
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-38426d04bb4so60258a91.1
+        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 23:15:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783145717; x=1783750517; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HY4Ay5Nu5ZJl55Ny6GfPN3/o65u/V2603CFmGcLq4yM=;
+        b=mAHM1MtG4bmwDi7lNUHdyJ5TX85FYyZb3r/5CZwhxosJxDYfFAsMsXNzwXMbrXGjNd
+         lxcs0BC9i069oDgv40BfxJMhzWi6fi/8tQCrR2DmEcKldWLG4H195NSbxoiVaFIac2mG
+         g2yj7cUxx/VQ4QpM7DC01q+ZxjDyJQsGOQdAX+GpUcpcTnlmS5Kox4rYhTqwxDF8//p8
+         ojjsIRvJhqtLxbr4I+g4+QcI+72h+EZ27iyffn2NRuMcVkPDtXFNHolzeAH+bDM7DmyJ
+         4KxD0bcC6w5owbKWbJ0VCaezRi3EbbohBbe+ToWhiUrwW+nXDiqcoME5F7D2OkJhRxMF
+         bz/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783145717; x=1783750517;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HY4Ay5Nu5ZJl55Ny6GfPN3/o65u/V2603CFmGcLq4yM=;
+        b=A8ENHPqKQFayMIArVZoM+4Um+0qkWuDIDIyGR0YapoBPrLVp3QPnWW06IRpFWas852
+         H4bWoir0XZ0uzvA2p+Wuo25UCtMnowpmoNGHeb+oiseIRoc9Vens7PFjybsOpscenzKI
+         eW+vhOd4Cg6QZKbnuPL53Z8hnwnKDq0iIYUZiZ8yVsB7akWC4hFw6bBqv2nnphCjfhDs
+         lEhEyTWfbhqinI6cNEQiiHtJpHrlmgeIzqIDT5YDim/mGop+mrr5yOONILe1BeItiEeb
+         6Y9vJJRfo0XJnFn+qcvUt5DvesAkn4sSObr9UtWy7tq25DcCxurVJk8309cj4dguLoRT
+         xmsw==
+X-Forwarded-Encrypted: i=1; AHgh+Rp0m3/3sKXdSyTf9wrYBDTTJEOSaVHFOQ40Wgllp+wIiZJpJk95CmJnmOgiVcJQ8le1hqR7zT0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1H7mDfD7GXlNnYLrsMQ31OMLd40SaLzNql7XXqT7OyD87DNn0
+	T+F8GDHM9FWJfAjnf+/s1vaMuewdN26J5PILTz/P0UIxHLIF/SC1oYLykkwJMg==
+X-Gm-Gg: AfdE7cn+Y9bILnEW/mPhBF6ko8Sbw5f2lXURYf4UmR+1M1vtEIxwVT052hG6quWrjVW
+	PrZw3NGx2FmCumNv0upPbvx0ktbngVZ1Yatlqv4nHMnV4uGxCkmnbARAr5NIN3/RdTCiLBuItku
+	B8MPmgiKI0Y+YjTd+27dqKKLkLs3hzbiAVvRCpgv4MsBGjFq1rrGtYQPOkfqfAnxYYZPFwXCft+
+	HR2oIdVxzb9X/FHEwtL8/ImczxqPZldcfD0Dkh8tSK0vqG/wRLLSW/fu+Nlf4fzvqcbrp9DkE5F
+	fsLnyU3EEuv9SHAOxEvrE06esQOmpVDrJrVbeLcMoevYGg/637fSqYxRkcEewi7xPWyOvGb2KjY
+	8WFOr/tuYzMl9mkgJMl/oNDZWsNutP0e9cPmASD2YhbL9IYFKX8G9UO3GRnIIsjk7U/HYERUpGP
+	HdtEsnIXWm958epAO/rWSfLQIyqF6p00rKTdvBxQ==
+X-Received: by 2002:a17:90b:50cc:b0:381:2709:545d with SMTP id 98e67ed59e1d1-383394cf58bmr1480889a91.1.1783145717032;
+        Fri, 03 Jul 2026 23:15:17 -0700 (PDT)
+Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38127ae6e2bsm1983825a91.2.2026.07.03.23.15.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Jul 2026 23:15:16 -0700 (PDT)
+From: Maoyi Xie <maoyixie.tju@gmail.com>
+To: Veerasenareddy Burru <vburru@marvell.com>,
+	Sathesh Edara <sedara@marvell.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v3 0/2] octeon_ep, octeon_ep_vf: fix skb frags overflow in the RX path
+Date: Sat,  4 Jul 2026 14:15:09 +0800
+Message-Id: <20260704061511.2350737-1-maoyixie.tju@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-304685-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuniyu@google.com,m:sashiko-reviews@lists.linux.dev,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rt-devel@lists.linux.dev,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER(0.00)[namcao@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-304686-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:vburru@marvell.com,m:sedara@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:maciej.fijalkowski@intel.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[namcao@linutronix.de,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,linutronix.de:from_mime,linutronix.de:dkim]
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 551F7706D05
+X-Rspamd-Queue-Id: 09E7A706D98
 
-Kuniyuki Iwashima <kuniyu@google.com> writes:
-> your patch makes it much easier to abuse.
-> UNIX_INFLIGHT_SANE_USER is usually much smaller than
-> RLIMIT_NOFILE.
->
-> unix_schedule_gc() in sendmsg() is to self-regulate malicious users,
-> otherwise GC relies on unrelated AF_UNIX socket's close() and could
-> be triggered too late since GC is system-wide.
+Both octeon_ep and octeon_ep_vf build an skb for a multi-buffer RX packet
+by adding one fragment per buffer_size chunk of a device-reported length.
+Neither bounds the count against MAX_SKB_FRAGS. A long packet yields about
+18 fragments, one past the default MAX_SKB_FRAGS of 17, so
+skb_add_rx_frag() writes past shinfo->frags[].
 
-About the abuse, the scenario where inflight sockets bypass
-UNIX_INFLIGHT_SANE_USER and delay GC until an unrelated AF_UNIX socket
-closes actually exists today.
+Each driver now checks the fragment count before it builds the skb and
+drops a packet that would not fit.
 
-For example, the following program creates far more than
-UNIX_INFLIGHT_SANE_USER inflight sockets, which persists indefinitely
-until another unrelated AF_UNIX close().
+v3:
+ - octeon_ep_vf: pull the drop drain into octep_vf_oq_drop_rx().
+   The overflow drop and the napi_build_skb failure path both use it.
+   Suggested by Maciej Fijalkowski.
+ - octeon_ep: add Maciej's Reviewed-by.
 
-#include <sys/mount.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <sys/wait.h>
+v1: https://lore.kernel.org/r/20260701112825.1653044-1-maoyixie.tju@gmail.com
+v2: https://lore.kernel.org/r/20260702180518.2013324-1-maoyixie.tju@gmail.com
 
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 
-static int send_fd(int unix_fd, int fd)
-{
-        struct msghdr msgh;
-        struct cmsghdr *cmsg;
-        char buf[CMSG_SPACE(sizeof(fd))];
+Maoyi Xie (2):
+  octeon_ep: fix skb frags overflow in the RX path
+  octeon_ep_vf: fix skb frags overflow in the RX path
 
-        memset(&msgh, 0, sizeof(msgh));
+ .../net/ethernet/marvell/octeon_ep/octep_rx.c |  9 ++++
+ .../marvell/octeon_ep_vf/octep_vf_rx.c        | 46 ++++++++++++-------
+ 2 files changed, 39 insertions(+), 16 deletions(-)
 
-        memset(buf, 0, sizeof(buf));
-        msgh.msg_control = buf;
-        msgh.msg_controllen = sizeof(buf);
+-- 
+2.34.1
 
-        cmsg = CMSG_FIRSTHDR(&msgh);
-        cmsg->cmsg_len = CMSG_LEN(sizeof(fd));
-        cmsg->cmsg_level = SOL_SOCKET;
-        cmsg->cmsg_type = SCM_RIGHTS;
-
-        msgh.msg_controllen = cmsg->cmsg_len;
-
-        memcpy(CMSG_DATA(cmsg), &fd, sizeof(fd));
-        return sendmsg(unix_fd, &msgh, 0);
-}
-
-int main(int argc, char *argv[])
-{
-	int fd[2];
-	int i;
-
-	for (int n = 0; n < 100; ++n) {
-		if (socketpair(PF_UNIX, SOCK_SEQPACKET, 0, fd) == -1)
-			goto out_error;
-
-		for (i = 0; i < 100; ++i) {
-			if (send_fd(fd[0], fd[0]) == -1)
-				goto out_error;
-
-			if (send_fd(fd[1], fd[1]) == -1)
-				goto out_error;
-		}
-	}
-
-	return 0;
-
-out_error:
-	fprintf(stderr, "error: %s\n", strerror(errno));
-}
-
-To address this properly, we can schedule the GC at task exit. I can
-include that patch in my series, if that sounds good to you.
-
-> Previously every sendmsg() had to wait for GC, and now it's only when
-> there is a circular reference AND user has too many inflight sockets.
->
-> Please fix the root cause; the former condition on your system.
-
-Can you clarify what you mean by fixing the former condition on my
-system. Do you mean ensuring that no application creates a circular
-reference?
-
-I am afraid we cannot rely on all users and applications to behave. We
-do not want a buggy program or a malicious program to harm another
-time-critical task.
-
-Nam
 
