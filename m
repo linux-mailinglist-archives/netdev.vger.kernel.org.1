@@ -1,234 +1,213 @@
-Return-Path: <netdev+bounces-304680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304681-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3yIxJ6V/SGr5qwAAu9opvQ
-	(envelope-from <netdev+bounces-304680-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 05:36:05 +0200
+	id iIxsGcSCSGqBrAAAu9opvQ
+	(envelope-from <netdev+bounces-304681-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 05:49:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDBE670689E
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 05:36:04 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B56F57068DE
+	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 05:49:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b="THW046e/";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304680-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304680-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=fastmail.org header.s=fm2 header.b="cFYJ/gs0";
+	dkim=pass header.d=messagingengine.com header.s=fm2 header.b="N FguQlY";
+	dmarc=pass (policy=none) header.from=fastmail.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304681-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304681-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3F5B6301BF56
-	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 03:36:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 564E0302E0C6
+	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 03:49:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88BDC2EEE62;
-	Sat,  4 Jul 2026 03:36:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B3BB33ADB1;
+	Sat,  4 Jul 2026 03:49:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from flow-b2-smtp.messagingengine.com (flow-b2-smtp.messagingengine.com [202.12.124.137])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5652C2363
-	for <netdev@vger.kernel.org>; Sat,  4 Jul 2026 03:35:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D42E3372B27;
+	Sat,  4 Jul 2026 03:49:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783136161; cv=none; b=ijd5N4ufdElcZQaqvLXhSVSrd082Ir95mJtrIq/Ix5FYBQlJygEzNxUNVXu0dl9tiFCg8+zteaI1UGRWo/xoW4jnh9AGzbkD2yO7ys2cnmegg6P8nFsDd6K7uXeVn5pB8Mcur9cnn0WeEp4a4GsLkVdHbSQloyyexFg/qIBA6DI=
+	t=1783136955; cv=none; b=o2XhQQ6zQgVj5JdviMjacw6SFXdblMGh1uNERpjgAwWZzQ/87TPnaGok04PT+VoM3ulpU8vLMYp1GGg66dsEHZaXCJmVPYRvvDRgIHnsfatCOUa4dC3yqAD2AJZaEqMrCBKtuiSpb+JfIH2G2pYpz2W91uPexUFVpheBm+Zm7YQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783136161; c=relaxed/simple;
-	bh=ThuPvzUSoYy43zilZk9Przuhu7j/1v83Yf48qsTni30=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U0qRpMG8Zr7Qjtv5KQI+kWcqxlfAIp4oz9ZNNvHpIZTyi+0cKHJPel99foc0NCWobkyLqwcwhBjYkKS4LNVr32MQiPbidfs380vDqDF48Nrzh45ATA5ZUd/hqACvIRSAhpuINR7E+SyyvzypGd4+PdzvM9w7C4MBs6cHfx3n9cQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=THW046e/; arc=none smtp.client-ip=209.85.210.175
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-84780c95e2eso802167b3a.3
-        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 20:35:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783136159; x=1783740959; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=troEzZKmFC4zyspQLdq3bYm3HWpLnTsTSmm94slF8L0=;
-        b=THW046e/WRq56mbmEGdJWLfhVVqPPBVG4C8nsaSrpSgPLeXWyv4mexUyYGMjOnDs4U
-         QQQW0YCX5Maiq9TCoKzETlAUjwEig1ZkvYjsAuBgyjigaLLa5CwIpB7OxLTQ6nLU7449
-         pxCZzsI30B+5BFm+aHlTEHA7X3KBBHgr2P3n1XZW5PE4QdXSbQEN8vY/0Khk2Paz2M9H
-         7CwmNpVT+JhqxZneq7R30nBTwUu5ZOySquhRLthVAwKFB1Bq08zWPI5NpXZH45cjjAUB
-         ycOIeOs4Lu3doNysvUzKpxCQzjhKKRCFhFGoErzF1bWmzLfP/3L5pbA2HelD+lbd/5Jo
-         97jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783136159; x=1783740959;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=troEzZKmFC4zyspQLdq3bYm3HWpLnTsTSmm94slF8L0=;
-        b=SSlZrvThzY1f6Ky8PdLhJC9+xFwEng8rNf9Gyco5063qJPtcR5AGP+Q++K8Gez8sus
-         gWWAgmR9ub6dzqMxkfkdq8w/vsV2viRiNOzgJDGVa5Fwsx3gO9T9j+m64Yzb6TurtbI9
-         6ASRflQknMwfj+CnYL1ksJwHFQ/UOcxD44Guo/LGfQVuT9D9FQi+0U1WRI/Atk77AKex
-         fj5BVC+raWXrreR+jrF048FvGp/SOxE60xMNfyvXmzRwstUQnI9IXmkD35X+OJGgxKhU
-         Tiv/Fl3Mbydq1s5dxsDMH47JfyAryrTh8eOEmoMxNTNvW6OHseYIn5XBilBOeAg69qbn
-         Se1Q==
-X-Forwarded-Encrypted: i=1; AFNElJ+hTcY82ZIA9jTvOy9YjCcvBlXWVRhNnpmRf0fV5Hok0tSqLGyWPadZXJvxsaMgLZ/b2dfNHMI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBNt3zMHERq8p4pF9E7GAogbiHRScaaLVodvQyWh/i66OJjWbp
-	r9G41mDYGJGtfCW+mxVPai4KfqZip9+x/nOaBjGCcIurPzBlJFyniUiF
-X-Gm-Gg: AfdE7cmQJsLGY/yzmp7qeZnNCcgYVqseWjpx78roQ0l64FqJkAu7u4aAFRm+6bJWJ5c
-	4pK+QeYzRrMveKZ0yZ4nvhe/8J8Ws4nm+wo2Wzgne9vvzLKVJTqCo2QcJ2zBcttW3V0p8OAVwcN
-	JPykGRMrlSx4HeA1g3yjPtcifWREwNvgc6uKYemZIlyB34jdiIOxjuCa5ZHcr2fcauP26/vCxXc
-	NtYrlH1B32s6MWHHlTyOSF/+VFMEL66OQU2Mo5goaNHkwtxOrnqDNXrngS6lIhzVwSnUZTtUIRC
-	4m9FmrIB7Fpbr+e+SjRofzU4YKiI7kjB/bqhOgM9/MOeTHzIg+hjuKwezWTjljYoXgm9kRlC/4j
-	S96uSakbM1+HKT/jGuUmGHwB/cDAxKQ3/6xlewyk/B9FIIUHWRhCBH/31TQ9ufHa8RmUJU2/d2I
-	F9I+vXKSzYz8XGiQXvhGGT8PslbXBvcsXNFAbDiPBeAOnqTWMpkwmyyCiWKw==
-X-Received: by 2002:a05:6a21:1507:b0:3bf:9fe1:c24 with SMTP id adf61e73a8af0-3c03e1eeaa7mr2184488637.2.1783136159260;
-        Fri, 03 Jul 2026 20:35:59 -0700 (PDT)
-Received: from fx.tailc0aff1.ts.net ([206.206.192.132])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f1595e912sm26868465eec.31.2026.07.03.20.35.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jul 2026 20:35:58 -0700 (PDT)
-From: Weiming Shi <bestswngs@gmail.com>
-To: linux-sctp@vger.kernel.org
-Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1783136955; c=relaxed/simple;
+	bh=TFjQbWyzAMxvKwNbnP4LPBome1ljwijs1AcHQbPY+JY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=uWu5WrH/IV14RYicx/1/3paQF4uQUEKIAaK/Fzaby1AQOKZiHv4oombYnjlgn66G8rEp/ZXDDPNEQKofSoLh93Jo9RJg12+va70wjRmegRtLJ5TxorjSY1xpDbMAYNVSwhkwb51V1tVE7D/IVHSVpuh82LKJyyjnTOEWzyfl3zU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org; spf=pass smtp.mailfrom=fastmail.org; dkim=pass (2048-bit key) header.d=fastmail.org header.i=@fastmail.org header.b=cFYJ/gs0; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=NFguQlYX; arc=none smtp.client-ip=202.12.124.137
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailflow.stl.internal (Postfix) with ESMTP id B7CD31300346;
+	Fri,  3 Jul 2026 23:49:11 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-10.internal (MEProxy); Fri, 03 Jul 2026 23:49:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
+	cc:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:message-id:mime-version:reply-to:subject:subject:to:to; s=fm2;
+	 t=1783136951; x=1783140551; bh=jnB0rrYn5mUvHmZaVe+grQm+cXzwfP+A
+	6jxeO42NYT4=; b=cFYJ/gs08qFzAnN03zhzf8lHC9u6XVaD7hOGSEhoWn4SyZRf
+	yImUouOYPWtTpKfUiZ0vzFYSzvt2NW6+3hC162pdAydia/R8JZfGe01AsAYU2nd5
+	qAAfPRBWak8FbRniTTTXTX3N+nsWCWsoOqLg8ywyaOCRkggaEJxnkzlPBd381sTb
+	ibauz/UFD4VFBVHwklSEKXOMg0FJ9BjtAU4EGtxUa+UuOMYdbrzmrM8EvhJJLe7X
+	zt3mPs/8Oscz/0GWvJ+zLU3OQUwxylxDiGhLWjYy56M0KbqsqIy/xu/TfjeMO80x
+	wvK1sxKyVo7WujuAdzWKsb6oURoL10LYPfmuYA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:message-id
+	:mime-version:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1783136951; x=
+	1783140551; bh=jnB0rrYn5mUvHmZaVe+grQm+cXzwfP+A6jxeO42NYT4=; b=N
+	FguQlYXZcwJalNytBcM/7oKA554ATa9pJNRu+VloSFtW9rf3ZmNmHXULrDh575wG
+	nZ2NtiTxMWlEh5uJUL2SKpIn6MEwI4iX7OFrzM4ETZpfBk5SFq/Vk4ujrqlGY3Py
+	4hKKdvIEDJVtEqVEikwij2VoSEErs+K8+mHsWkWtUcaAdfuDtRp9Nl59za0AtQ7Q
+	76Xi4yNf9kzw8cUoQgk6L8zh9zinPfljAWL/jtouczL+iy50yPA8ol7UH6CnVu8m
+	Gg2uqPOmoq2+9Hep7kWJRIt4e73Q+6qvzT7++p4WvMdk2A1BwTU5hpPEpIxGLB3u
+	l+yeBPPY9v0eavk1owIIQ==
+X-ME-Sender: <xms:toJIalMSfUibPoJzysy-7_w3tkaGwKgYvicchOotFFiE8aVS2EVerg>
+    <xme:toJIaoYV3St34wcBatPVZm2m-ZeI4Dk8mvkGlHCZPEqqB97oa_lEU_4duEse2oT7v
+    CZ-H3wvKUY-NA3Ogh1p1NKKYA9Y3U3rkQZRks7RMRy36fC614HhliQ>
+X-ME-Received: <xmr:toJIak-KByOFbIzU5qgJJ8ryymovCjErn3DJa73rwKHpyGx_OyW4N76lErg>
+X-ME-Proxy-Cause: dmFkZTE1RLNBESqud5IguXj7/320U/Hq5bUFrR0Cl8gmtcPFAstBi1qVUiCwERepb4Y5H/
+    +AueLB/rBNEbeIXMrek2vZdfXG13T2L9ww075AZAxwR248H/VVyySljgycYsKcxCq5gobT
+    HYZhFQta2WT9ZHmGMb90K8gV2hwvSp5yTQfA3bxaJE3arrYvxz0yacC/q9bmt9t3ge47aQ
+    WJco6X38hD5UgAdeGOKvHclcHvC1+r3sX1nileT9M8gIy1q7lCw6z1zVDWf6DlDyy21KKU
+    lXHTWmXrecqFDhiKREu5ptUV3OBPs0oCd4e6thX/W/mRKfl/QiOuI8JsMAde7dHDTrcytG
+    tRqJ/WTutim5EaJr+sWtoix6Zj5/Qd2buJ66+X+8teMwBUMDVdJSw3WAZoLi1X8TWQ8zU9
+    aEByZmsurYV/8hPOK6mKZmwBIpb6ysgosE0nN0WNb/dgUL03rwsifAue/wdudQdTBKcIY/
+    iPeImB6wJ7tgF7Sb7nKiRzIbL/KG4J22MH6aoS9MLGV9id7I/Cn6pQ5i5D+Wt5NMzQEcAD
+    1HxN/5EIHBS7/7Nnt1i+Fc+rMFbiRRpE92dvFom5A6O/SKSzTdz3IXlG+ziM/3JsMp9Iy4
+    l4anNeonj9M3Cm7erGpUY6914Wy3ssmHI46oWJMNw1kWRgZ5n2K5T/Pv5xPw
+X-ME-Proxy: <xmx:toJIapTEGCtHPmA18Syzsqw39iK2P-JAxEkfb5YLST-a1KicaPUQUQ>
+    <xmx:toJIaufjPp7jDOT0cnfSrUBSGhDJOXhYxA-Z_y_Bd4kYTNspQtH4xg>
+    <xmx:toJIarSU8XzUCaeTxCH1xYaStWWwKKX5YGerTxkywgG8IpyQzqvieA>
+    <xmx:toJIaqLgg8hawmezWth0uZDdCtcnRiHNJwU14ZeZzib_DQLV4t9gqw>
+    <xmx:t4JIajmkERby9x6hzupmMKWURlRgQIrdXH3CMnTidKGZa9Kgfr89-Apv>
+Feedback-ID: ib53e4b78:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 3 Jul 2026 23:49:10 -0400 (EDT)
+Date: Fri, 3 Jul 2026 22:49:08 -0500
+From: Ian Bridges <icb@fastmail.org>
+To: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	Xiang Mei <xmei5@asu.edu>,
-	Weiming Shi <bestswngs@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net] sctp: validate STALE_COOKIE cause length before reading staleness
-Date: Fri,  3 Jul 2026 20:35:46 -0700
-Message-ID: <20260704033545.2438373-2-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH net-next] devlink: Replace strlcat() with seq_buf
+Message-ID: <akiCtALVjd9TF8Xl@dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[fastmail.org,none];
+	R_DKIM_ALLOW(-0.20)[fastmail.org:s=fm2,messagingengine.com:s=fm2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,asu.edu];
+	TAGGED_FROM(0.00)[bounces-304681-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304680-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:linux-sctp@vger.kernel.org,m:marcelo.leitner@gmail.com,m:lucien.xin@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:xmei5@asu.edu,m:bestswngs@gmail.com,m:stable@vger.kernel.org,m:marceloleitner@gmail.com,m:lucienxin@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS(0.00)[m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-hardening@vger.kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[fastmail.org:+,messagingengine.com:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[icb@fastmail.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[icb@fastmail.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,dev:mid,messagingengine.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DDBE670689E
+X-Rspamd-Queue-Id: B56F57068DE
 
-When an ERROR chunk with a STALE_COOKIE cause is received in the
-COOKIE_ECHOED state, sctp_sf_do_5_2_6_stale() reads the 4-byte Measure
-of Staleness that follows the cause header:
+In preparation for removing the strlcat() API[1], replace its uses in
+__devlink_compat_running_version().
 
-	err   = (struct sctp_errhdr *)(chunk->skb->data);
-	stale = ntohl(*(__be32 *)((u8 *)err + sizeof(*err)));
+The function accumulates a variable number of version strings into a
+fixed buffer, which is what seq_buf is for. The seq_buf is anchored at
+the end of any existing string in the buffer and each version string
+is appended with a single seq_buf_printf(). The output is unchanged,
+including under truncation.
 
-err is the first cause in the chunk, not the STALE_COOKIE cause that
-caused the dispatch, and nothing guarantees the staleness field is
-present. sctp_walk_errors() only requires a cause to be as long as the
-4-byte header, so for a STALE_COOKIE cause of length 4 the read runs
-past the cause, and for a minimal ERROR chunk past skb->tail. The value
-is echoed to the peer in the Cookie Preservative of the reply INIT,
-leaking uninitialized memory.
-
-sctp_sf_cookie_echoed_err() already walks to the STALE_COOKIE cause, so
-check its length there and pass it to sctp_sf_do_5_2_6_stale(), which
-reads that cause instead of the first one. A STALE_COOKIE cause too
-short to hold the staleness field is discarded.
-
-The read is reachable by any peer that can drive an association into
-COOKIE_ECHOED, including an unprivileged process using a raw SCTP socket
-in a user and network namespace.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: Xiang Mei <xmei5@asu.edu>
-Assisted-by: Claude:claude-opus-4-8
-Cc: stable@vger.kernel.org
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+Link: https://github.com/KSPP/linux/issues/370 [1]
+Signed-off-by: Ian Bridges <icb@fastmail.org>
 ---
- net/sctp/sm_statefuns.c | 23 ++++++++++++++---------
- 1 file changed, 14 insertions(+), 9 deletions(-)
+The patch was tested as follows, on top of net-next:
+ - x86_64 allmodconfig and allyesconfig builds of net/devlink/dev.o at
+   W=1 produce no warnings.
+ - A userspace comparison of the old and new construction ran with
+   randomized version lists and buffer contents across all buffer
+   fill levels. The outputs are byte-identical in every case,
+   including on overflow.
+ - The changed path was exercised in a QEMU guest through the ethtool
+   GDRVINFO ioctl against a netdevsim device, before and after the
+   change, with identical fw_version output.
 
-diff --git a/net/sctp/sm_statefuns.c b/net/sctp/sm_statefuns.c
-index d23d935e128e..3893b44448b3 100644
---- a/net/sctp/sm_statefuns.c
-+++ b/net/sctp/sm_statefuns.c
-@@ -74,7 +74,8 @@ static enum sctp_disposition sctp_sf_do_5_2_6_stale(
- 					const struct sctp_association *asoc,
- 					const union sctp_subtype type,
- 					void *arg,
--					struct sctp_cmd_seq *commands);
-+					struct sctp_cmd_seq *commands,
-+					struct sctp_errhdr *err);
- static enum sctp_disposition sctp_sf_shut_8_4_5(
- 					struct net *net,
- 					const struct sctp_endpoint *ep,
-@@ -2529,9 +2530,15 @@ enum sctp_disposition sctp_sf_cookie_echoed_err(
- 	 * errors.
- 	 */
- 	sctp_walk_errors(err, chunk->chunk_hdr) {
--		if (SCTP_ERROR_STALE_COOKIE == err->cause)
--			return sctp_sf_do_5_2_6_stale(net, ep, asoc, type,
--							arg, commands);
-+		if (err->cause != SCTP_ERROR_STALE_COOKIE)
-+			continue;
-+		/* The staleness is only meaningful if the cause is long
-+		 * enough to hold it; a shorter one is malformed.
-+		 */
-+		if (ntohs(err->length) < sizeof(*err) + sizeof(__be32))
-+			break;
-+		return sctp_sf_do_5_2_6_stale(net, ep, asoc, type,
-+					      arg, commands, err);
- 	}
+ net/devlink/dev.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/net/devlink/dev.c b/net/devlink/dev.c
+index 57b2b8f03543..0d4301267171 100644
+--- a/net/devlink/dev.c
++++ b/net/devlink/dev.c
+@@ -5,6 +5,7 @@
+  */
  
- 	/* It is possible to have malformed error causes, and that
-@@ -2573,13 +2580,13 @@ static enum sctp_disposition sctp_sf_do_5_2_6_stale(
- 					const struct sctp_association *asoc,
- 					const union sctp_subtype type,
- 					void *arg,
--					struct sctp_cmd_seq *commands)
-+					struct sctp_cmd_seq *commands,
-+					struct sctp_errhdr *err)
+ #include <linux/device.h>
++#include <linux/seq_buf.h>
+ #include <net/genetlink.h>
+ #include <net/sock.h>
+ #include "devl_internal.h"
+@@ -1188,8 +1189,10 @@ static void __devlink_compat_running_version(struct devlink *devlink,
+ 					     char *buf, size_t len)
  {
- 	int attempts = asoc->init_err_counter + 1;
--	struct sctp_chunk *chunk = arg, *reply;
- 	struct sctp_cookie_preserve_param bht;
- 	struct sctp_bind_addr *bp;
--	struct sctp_errhdr *err;
-+	struct sctp_chunk *reply;
- 	u32 stale;
+ 	struct devlink_info_req req = {};
++	size_t used = strnlen(buf, len);
+ 	const struct nlattr *nlattr;
+ 	struct sk_buff *msg;
++	struct seq_buf sb;
+ 	int rem, err;
  
- 	if (attempts > asoc->max_init_attempts) {
-@@ -2590,8 +2597,6 @@ static enum sctp_disposition sctp_sf_do_5_2_6_stale(
- 		return SCTP_DISPOSITION_DELETE_TCB;
+ 	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+@@ -1201,6 +1204,8 @@ static void __devlink_compat_running_version(struct devlink *devlink,
+ 	if (err)
+ 		goto free_msg;
+ 
++	seq_buf_init(&sb, buf + used, len - used);
++
+ 	nla_for_each_attr_type(nlattr, DEVLINK_ATTR_INFO_VERSION_RUNNING,
+ 			       (void *)msg->data, msg->len, rem) {
+ 		const struct nlattr *kv;
+@@ -1208,8 +1213,8 @@ static void __devlink_compat_running_version(struct devlink *devlink,
+ 
+ 		nla_for_each_nested_type(kv, DEVLINK_ATTR_INFO_VERSION_VALUE,
+ 					 nlattr, rem_kv) {
+-			strlcat(buf, nla_data(kv), len);
+-			strlcat(buf, " ", len);
++			seq_buf_printf(&sb, "%s ",
++				       (const char *)nla_data(kv));
+ 		}
  	}
- 
--	err = (struct sctp_errhdr *)(chunk->skb->data);
--
- 	/* When calculating the time extension, an implementation
- 	 * SHOULD use the RTT information measured based on the
- 	 * previous COOKIE ECHO / ERROR exchange, and should add no
+ free_msg:
 -- 
-2.43.0
+2.47.3
 
 
