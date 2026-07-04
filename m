@@ -1,148 +1,131 @@
-Return-Path: <netdev+bounces-304711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304712-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 6SJABQYXSWoyyQAAu9opvQ
-	(envelope-from <netdev+bounces-304711-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 16:21:58 +0200
+	id 0FPfGqYZSWpxyQAAu9opvQ
+	(envelope-from <netdev+bounces-304712-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 16:33:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A241707BF9
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 16:21:57 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34240707C27
+	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 16:33:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=mF4XiaXo;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304711-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304711-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=wz4MjcxG;
+	dmarc=pass (policy=none) header.from=lunn.ch;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304712-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-304712-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DCD63300CE71
-	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 14:21:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 05B333016B89
+	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 14:33:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F29F72494FE;
-	Sat,  4 Jul 2026 14:21:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A66726B08F;
+	Sat,  4 Jul 2026 14:33:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D71031E32A2
-	for <netdev@vger.kernel.org>; Sat,  4 Jul 2026 14:21:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F43523FC41;
+	Sat,  4 Jul 2026 14:33:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783174913; cv=none; b=pGEBkFPOzORdFD5LAx5BvNIbt1ZflY5mZvl/1MVk6E3btrhIaJoh9yNX12ZjMZn+7sI+39Rhnq6FcBIVARos7z1OHnuu6UdtkwsVSnVlJu3kxHTD/fwgDPvYoZi1G1z2hB5fT7u36ztLa7AQRvs+JZz/q3ntl51hTbUqwkvOzno=
+	t=1783175586; cv=none; b=VeoLsN+oMeVxFAXCtf3k1JBNsm6gkUL9/DTZblRgLzCL+cQm1kQo7yyywV5ZrQhMCYtXUtMHnQb+Ah+Tn5qVa9xLMdUhVNMcrh0E8UYfMXLmtkUhesUVlGM9n7bIaFmT6OvFUjGK0MKBWGgse07dIlMST/QaZLt6tKXGZPOYetE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783174913; c=relaxed/simple;
-	bh=mORA4zjsxRpSHR9UQCNydGxZe6yKU6hERFkNGs6MMuQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=FPmkQSMwO3mwKk29QWUz1WDXB0I/azskO856rGVWKSN7ssyuhm5HyxeaN/qUC3Vx7dAVwprbzJ4To3rvLE6NMHExGikZ/3d+RyQUupzesSE6cEWzWC1ydGwun09wvhOjtIgJRZaUjgGyaX1AFSjaSwlp5hXfp9H1J+3+KrRW19Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mF4XiaXo; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE1991F000E9;
-	Sat,  4 Jul 2026 14:21:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783174912;
-	bh=gKSm7rIc5n9tWg7a0XJc9GGyaUYz7rX65FqoNZLGJqQ=;
-	h=From:Date:Subject:To:Cc;
-	b=mF4XiaXojCm4JUT+iUgovxPxOtZwrJUZJ/KN4x5HdunoTS2k5X5N6UhaZWfyrdRox
-	 ZxMWjJqfjbnaa1zL5YgTuEEvkNvM9BXSHlaE87MHXgF4PkpBd1S/sHKWBQ7DOiLLFA
-	 NDz/hnlCcgT/x9AialtNBhoH1N1SM/0vnxYHMM5OxumRHJUvajGc4mcp70/ZtMP7pP
-	 /CRyLrbPRvrqLFagKdVQUHxWeMVT9mFBBlcGrNrF4imTNCUYq0Zuo5gXiyqHuO1yUu
-	 qlyRQ95c5TSo5UIxJWZ7yk5OWafRCHIoLmUALBEVX7F89NBJC2mU92Sx/z0S21MXIM
-	 W4XaxqIi7HGyw==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Sat, 04 Jul 2026 16:21:38 +0200
-Subject: [PATCH net] net: airoha: fix ETS channel derivation in
- airoha_tc_setup_qdisc_ets()
+	s=arc-20240116; t=1783175586; c=relaxed/simple;
+	bh=tvI5JOsvpDRmCWWyARj2I37gEvj5kUG9aFrEUSVvt0k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sarXB4u7JtLw8unh3qQKVnMsiZMCIj0DOw83XoRGzPklGaAL9xTEaWaCduejQ17xZkx1sKvQxvQLa6XiOxwrVkwtekzsWyD6+EDIIgyznDUDOn4apEbsDsxPHYVl0j1gn+gEbc1NgIoo+3L/TedfZXZfDuASGSMiFnlnxE1fEH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wz4MjcxG; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=yW5k92GuanvOc/spliKd4PBqyruUpvA9bFqK5s+OfrQ=; b=wz4MjcxGnqSVWlQt6GtY3OFLKT
+	dQyEOunAkVmFU5Lu+fKu1F6f4hanPmD0woI5fTP0NDsLwVQlY20Ax4y7G8uRxQzQQsYrcdDnb/NDs
+	LeVdorUbbOfgLso9QI2ejww+8xgkxNo+8kOk4Jia7PrXY6GWyBqneD1Sj2h34yh1mo7Q=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wg1QR-00AhhO-B7; Sat, 04 Jul 2026 16:32:59 +0200
+Date: Sat, 4 Jul 2026 16:32:59 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Hanson Wang <hanson.wang@ugreen.com>
+Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org, oneukum@suse.com
+Subject: Re: [PATCH 1/1] net: usb: aqc111: fix set_mac_address return value
+ for bonding
+Message-ID: <7417ea73-879f-4b50-8736-805080c51f49@lunn.ch>
+References: <43a0904c-de59-4b40-b186-edd130f6c0cb@lunn.ch>
+ <20260703073936.462231-1-hanson.wang@ugreen.com>
+ <20260704084258.3513069-1-hanson.wang@ugreen.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260704-airoha-ets-handle-fix-v1-1-42516b3549a1@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2MSwqEMBAFrxJ6bUP80OJcZXARzFMbJA6JDILk7
- tPMsl7x6qGCrCj0cg9lfLXomQzaxtGyh7SBNRpT5zvxox84aD73wLgKm48HeNWbZWlFIvrYT0L
- 2/WTY/O++KeGiudYfUjnaemwAAAA=
-X-Change-ID: 20260704-airoha-ets-handle-fix-6c166de3d396
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-X-Mailer: b4 0.14.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260704084258.3513069-1-hanson.wang@ugreen.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304711-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304712-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lorenzo@kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:hanson.wang@ugreen.com,m:netdev@vger.kernel.org,m:linux-usb@vger.kernel.org,m:oneukum@suse.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4A241707BF9
+X-Rspamd-Queue-Id: 34240707C27
 
-Derive the hardware QoS channel from opt->parent instead of opt->handle
-in airoha_tc_setup_qdisc_ets(). The ETS qdisc handle is either
-user-specified or auto-allocated by qdisc_alloc_handle() and bears no
-relation to the HTB leaf classid that identifies the hardware channel.
-HTB derives the channel from TC_H_MIN(opt->classid), and ETS is always
-attached as a child of an HTB leaf, so its opt->parent matches that
-classid. Using opt->handle instead can cause two ETS qdiscs on different
-HTB leaves to collide on the same hardware channel, corrupting scheduler
-configuration and stats.
+On Sat, Jul 04, 2026 at 04:42:58PM +0800, Hanson Wang wrote:
+> Hi Andrew,
+> 
+> Thanks for the review. You are right that this is not bonding-specific -
+> any caller of ndo_set_mac_address() (including netif_set_mac_address()
+> and "ip link set address") expects 0 on success and treats any non-zero
+> return value as failure.
+> 
+> I audited all drivers under drivers/net/usb/ that implement a custom
+> ndo_set_mac_address callback:
+> 
+>   aqc111.c        - BUG: returns usb_control_msg byte count (6) [this patch]
+>   ax88179_178a.c  - OK: returns 0 after ax_write_cmd()
+>   asix_common.c   - OK: returns 0 (async write to hardware)
+>   ch397.c         - OK: returns 0
+>   dm9601.c        - OK: returns 0 (async write)
+>   lan78xx.c       - OK: returns 0
+>   mcs7830.c       - OK: returns 0
+>   qmi_wwan.c      - OK: returns 0
+>   r8152.c/r8157.c - OK: returns 0 on success (via usb_autopm_get_interface)
+>   rtl8150.c       - OK: returns 0
+>   sr9700.c        - OK: returns 0 (async write)
+>   sr9800.c        - OK: returns 0 (async write)
 
-Fixes: 20bf7d07c956 ("net: airoha: Add sched ETS offload support")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_eth.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Thanks for reviewing these drivers.
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 59001fd4b6f7..fac2aaefffff 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -2504,8 +2504,7 @@ static int airoha_tc_setup_qdisc_ets(struct net_device *dev,
- 	if (opt->parent == TC_H_ROOT)
- 		return -EINVAL;
- 
--	channel = TC_H_MAJ(opt->handle) >> 16;
--	channel = channel % AIROHA_NUM_QOS_CHANNELS;
-+	channel = TC_H_MIN(opt->parent) % AIROHA_NUM_QOS_CHANNELS;
- 
- 	switch (opt->command) {
- 	case TC_ETS_REPLACE:
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
----
-base-commit: d6456743424721a837e1509b912f362caaeecd97
-change-id: 20260704-airoha-ets-handle-fix-6c166de3d396
-
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
-
+    Andrew
 
