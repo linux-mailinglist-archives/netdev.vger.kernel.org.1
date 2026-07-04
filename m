@@ -1,205 +1,217 @@
-Return-Path: <netdev+bounces-304675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304676-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id SbivK21lSGpRpwAAu9opvQ
-	(envelope-from <netdev+bounces-304675-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 03:44:13 +0200
+	id dcLSJgRmSGplpwAAu9opvQ
+	(envelope-from <netdev+bounces-304676-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 03:46:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D1C17065FC
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 03:44:13 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59530706609
+	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 03:46:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=t4lHBtkQ;
+	dkim=pass header.d=google.com header.s=20251104 header.b=junQqYkC;
 	dmarc=pass (policy=reject) header.from=google.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304675-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304675-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304676-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-304676-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BF5D6301303C
-	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 01:44:11 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4BA303009824
+	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 01:46:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F10837187F;
-	Sat,  4 Jul 2026 01:44:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5B6372680;
+	Sat,  4 Jul 2026 01:46:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C212319E968
-	for <netdev@vger.kernel.org>; Sat,  4 Jul 2026 01:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194EF33C51D
+	for <netdev@vger.kernel.org>; Sat,  4 Jul 2026 01:46:34 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783129449; cv=pass; b=f5pRmli86+X6xz2tbF3kV0alD1OU6h5z7JBd663Biw4jkBrFMnZUBiTnsLmb4u7X6Um/ZgZTierEGcSFbMmIR5C2xr5xfOR5MGGjJBb3umka85izMRo4UEC2/NBGh5qkO9XLbUEMZnblzZMNJoOTwvDUkRJSBmDJA3PyoQkQP1c=
+	t=1783129597; cv=pass; b=coferP8V9Caa7moMZL2xsa1U+LROWke08mRE25lNhfJ5NISCE2Pdjt1/SKSRjXQ/apzmn8oIAbgRGI8eJoSV59CkSs6FuXG2HMLwKPdmJZljTnVQi6qYBKctiOnNtf8ddDYWDDbRwuuQMCmfQyIJ6U+G42Y43Y99CNiQDzQdu/w=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783129449; c=relaxed/simple;
-	bh=8fCmQy6ML7ezv8pk2jK71Y9cUzBUA7pu4GfaSx91aD8=;
+	s=arc-20240116; t=1783129597; c=relaxed/simple;
+	bh=U+qGK5MjawjgwtTJjBHTt+Flr9aONnZub9He/eYH6LA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=scpNlJUYnsIW5l1K3e0Z2+yPm9DOkuCPCagO5UVKMoWveSjsMh+GFTxix9NWaWEGAD+D0nxOUr7fQkvt8s8WOLYzqaDOHCOhsvU6l9s+SIHVnBdS7vqc5KiHZK1gVDhsRbMF6vyvbtalDa/iXpa2gHaqtfWY2MEhKgezkJ/AgOI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t4lHBtkQ; arc=pass smtp.client-ip=209.85.215.178
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-c88cc025f54so702067a12.1
-        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 18:44:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783129447; cv=none;
+	 To:Cc:Content-Type; b=EKM/08vQas0slmLeyFrJCcWpbhzofjbuQXKJjO2Qca+FTEyF245cD7TEsOv1pouTrYqkBS0Xnbfa0zWi/hJ6QMHfcURfvqtY9MmAYnbVpNnJ66VIwRPLKnZNbQkAwCVnQOv9ptRI54hsURH7yR69ipNXC87BfnrRjzB//bvur+Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=junQqYkC; arc=pass smtp.client-ip=209.85.214.171
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2cac59f8b64so11429075ad.0
+        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 18:46:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783129594; cv=none;
         d=google.com; s=arc-20260327;
-        b=SMU0qMl9Y1n8mzOa31+g9+6Codtb17wIy3OQ4ix6JHopz7rVCE+3wADT8ugDtrqzNx
-         R0csK8w2w/TAiGZdl6BD2qRfspZxdcJXJ4g/Q//L7u9vPQARHL5Yq3B/URa7Wg9Pv+me
-         0SwHv/Znvt0DNM5g0lNxn8i/n+aGAQ9lgkPh3W/xawwX8mf2/oIkyIduoYrZea31TM8X
-         f1zshcs6gKMHMkQQciUxYrNOiDINuf1I1w8HISjpJmi8QBSybm09A3FbkiJtqg6t+qyr
-         yyiQvUr15GHBxLu2aIvqubvWu0UymW70rCRgC8bxByNxkZi6NvhV0pWwW17nWg3mb5nw
-         Q2uw==
+        b=VbFnIqs+Vl/Kdixdo+4M6yfnDZc6S1G8eLjgXiwszIOxgmYmOofV2b3+N0EbudwHgg
+         79fXKJREfcj1t0taTNkcqVKrUk8cJWGwtvi4ArtnvOAMXGPcObZTRzzyG6BAUFM5vCSl
+         dVPnRRhEmHM/0WX0BQgdUqch9AB5q8yIwygQTJUZ/5W9d03QlPCSwOFVr2IYxvxemDv+
+         eBHC6UDCFF6y2KzmS/tlcUfES8O/yHNF8p/W3wL5dU0KOkKJ1feUpkyDB2btOCyUcNpv
+         EkKKanms48ZOyb5HGX40w83LAn8LENmgextKKQzkHbNDObJgKgGeC9f+0WO7641jpBfj
+         qMOQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=BxQy9j5/rhqYFhoIBk1TW9Ac42e+EECea0GJDCa97bw=;
-        fh=0ZEtUzf7AY7FhGn645bc9njZaQB5hytJZNoZt990akk=;
-        b=DIL4uaCXXDGS8Pt0qB/7FghDx+KXv1dyP9gOOouJG7MRZJBj55FPk84MoDlvDr+Dpd
-         88hPCHl2dJvoQ4vgkp3JZ98Sx2RXWK2HxxpV3rCamSCTUWimZJ0VK7k1bKtIqvLekgGr
-         oxOxfcap0pzFY2vMyT2hYjaH1kYLdbQz1TxuLVDf7EwztekoMCLiuhPsY1Ghsav0hu/P
-         HyayhQkUnJOplaZPmObl+U7c3r4w1zaJj8oIksh85Vv/7EENCUA24Schmj25MD2SZIGZ
-         tPDWNpDaA+RN89oRMkUy8k0SIy6PWMOOizD8B6ZJ/qsaSVu57s0uv8mxG9o/JvKMJw/+
-         d2ZA==;
+        bh=OcpY4WJ6GwM2ej5g/SmfwoTPc6u8g8skrNTUakBxWU8=;
+        fh=mVq4BLOg+hGkvNcnu2JX9cQFJxa5F/1PGP2QF5S6tCw=;
+        b=CP08XECKqASRjeVjWoTXJWa0ZeUWF9dKvfrsZXwgJKJmZhmbbAXEKu+kSMnO0Sp+iA
+         jWv33UuT0aultLgrZrO51jYUOBJek8/MB+a/EIVnTpgAn+wGwOzB75n/hyE/ojoZ2wB+
+         ZK/TMVypwEY26QQ6Rf2uzLhT2tmqkpBQewEEwNBrnUCpEILgi+r+ZnxmqqobzkUql2B3
+         1QknqBNhcq0a3Xi0+gCIDVMstDx73uEfQGH3IH8MPfMlzUuetwXR/zqvK2xf8PQYzr0o
+         BVwnnnKS6mHtqyU1if1B5YfVL5fqrGvR0iNG0+bCY0y7+PR9llNQliyUheHYf5f613Wb
+         g2Vg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783129447; x=1783734247; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1783129594; x=1783734394; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BxQy9j5/rhqYFhoIBk1TW9Ac42e+EECea0GJDCa97bw=;
-        b=t4lHBtkQ/CGvSe3u/qOmEIWZcVC3VFff5O4u7YAGWdn7QBFrLep7EK7rv8NN0OJVkj
-         8X9AX+xD7uFU+LPtMhOTAywtRDEimQuuHXF7N526F0PaHTUSJFhNa8dAfuZ9Bgctn7wY
-         czFOznvFXhadEvMQ0o0VmiV/beudMyyJ5y7nvfwpnKaIO56pAq/XqiQobkmuWa2BT6Rr
-         qkEzJOSVuYE99ZwMB2ZVbUkMXIpVZzCRtPyNXesazeGpMc07KwsREkj1JidNX8tIUE7F
-         DBczCxyrGhf30S2EdtD7MNgKPIOoeVh+sQlZoCyjEgaesc6zKy+G7QqWwc51Xbiuzr/U
-         5/zQ==
+        bh=OcpY4WJ6GwM2ej5g/SmfwoTPc6u8g8skrNTUakBxWU8=;
+        b=junQqYkCoLGIRnLl0P6FmyWhYzMHkWbdbotxGeldnUREwddx5gbTqNDd0apO88yTcd
+         TJFbIG17+ZgAiBfpygaJqg6WLbVP1261HK3ufiqDlxqalKN/bbWwb/9TmOZy23gX+zcH
+         har08CbhlkqEmfxtJ7kNfBJ8kKinAWMLoO2HeM5NjlnH9OpVAFHjspA19I1HTNHB4Z2a
+         23MXFMnaDA7dz5U7notp8xoEbQhQ/DQhmCrRpQKye1fZpD6+8LBcClUqyMSN/9IU7ZW8
+         gDxSZUIGhLFDBpVbQpPKuC0rE0Fk6hqZi5xrGtn7mPDB9Gzrr+iyrHKsm8F/nSUD4aox
+         MNIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783129447; x=1783734247;
+        d=1e100.net; s=20251104; t=1783129594; x=1783734394;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=BxQy9j5/rhqYFhoIBk1TW9Ac42e+EECea0GJDCa97bw=;
-        b=L/ykyiZwxuCXnrsKbxWj/g+lmsCzpSZY0LPcen+mM9224GUx90Z+Devyr3vPB1/bmL
-         I+y7kxtREFQt7Hw34H45w4oLlXVQkWvcMGz62wh1DNSfDEDW41zOFl7u3wJRc12adE89
-         bpUGV199uGstt+wh7CGqB3GnD8mVsERbvbNCByFpDWtad8cO5DlBKdo9Jqx2g283aYP5
-         gMBrGX2FTdK45ixiF+OBX9oQXA0X6jWYY9nVN6wwTcR24Wx16/+KdGRVR2JeAegmSU6I
-         jPeDAgBVNByp4eleoIJxKsYaSfqEbkZ9E5SJ3vZJfNSxIqCHxNw6WKCqnJR4iHg97okb
-         ITfw==
-X-Gm-Message-State: AOJu0Ywyv8cPfkEsmr8WK5K4KwEPEF5YhsmQUBcersqIBH+Mk9xltGHC
-	THZqkDhkdPZOqw6YDm9Ppbi3BKlAPqLukw61ToZlczyciAapLpLYnpHe6GULelpmFkG4rIslJux
-	V9ovEsQd/iDwIZO1Cm76jtzC0bfxAkSl/8NG5vpfX
-X-Gm-Gg: AfdE7cl1WdaxcBNr1QMJxEBKWnQqODjb2dd28938Xi50sgPnm7YCvcyzPfJem/q6pCI
-	xIF4xr03chySsKdXDhUGgODzEDjWKBr14t/OHY5FBm321XoDpG6IPme0QzTXfHJdhEybIikaQJa
-	4mueI3A+++2GrpPF8Q4IMZdCqp3XRPakeGdeXPQq/M9Y7A5h/c/VUQUFEGz92o6+bzTPHnM0OGJ
-	05V/yuVkI4uJV3o/i0w6DQcqbVGCdE/zJDg5O9KPav5AtInFfXq8rwg5z1BtngDvVmgpnlQZQ6a
-	pLK0cFp1CnAKsFcokjBYXpvhXKVRmCANo2ZMAcWffzfeHd86sVg3Y1MwrdQfCIItCK1JGQrNFzl
-	uGagp3mhHACfG6pFY17Ngabr0STiiCvf3LvmYJL+4fUGgBjVP6k4=
-X-Received: by 2002:a05:6300:2287:b0:3bf:b3d5:ce1b with SMTP id
- adf61e73a8af0-3c03e20875emr1669167637.12.1783129446528; Fri, 03 Jul 2026
- 18:44:06 -0700 (PDT)
+        bh=OcpY4WJ6GwM2ej5g/SmfwoTPc6u8g8skrNTUakBxWU8=;
+        b=FifW/2gnEDVXBfkaxdnCZsMCZf5AzbK7Ln/gsBGwfLxD1RSmqNPopcb4N+DSwedeYC
+         lFsW4qy1RE7KofL6S1NxKup8LPk9tWY00/jCaYDQ5NPXLJ4wzTNBN1tiatcHEBNAbxT+
+         SQQBr4yZxJuNnzlqmcly1pKzV7er4UBUAWEdBN0IMoaPMoZ3M2c+9WI0X/+/6cxJ1LtA
+         dIUVkeWVm9gD+rlTkxj69FumYHwbApuAMOgDR5DvxvgNyWdfqThPIRLHgNLvSfpOQvHk
+         IiBFvr/pqwx2aCh4em6PThVgP9ztfIXWIx7+m4h+y0tvLt5hLJKMJxyr0I1tG0Do5Oe/
+         tFIg==
+X-Forwarded-Encrypted: i=1; AHgh+RqcZzn5gr4jtV8fjwJz3kf2J+Bsk09RowZQg6Uc/lFK0in+4h1aUl58syXcGphsdGZbvLf3ZgI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFrxUWQ/6zjr2Fj8DF9a4uTXnrlia5yENnYHl4VEGsPhjtEJfI
+	WzhGjG2GsfuF58VxBixivTXntHkpCOKpiwGAH7mn1b/uclyQvWnqiCglrY3w7fdw5aM7FzXLewt
+	SDwIp63fzPXPYf5NeXq+LGD9mRfnLBfjnlgI5oA7l
+X-Gm-Gg: AfdE7cmMFYuf6wjquzbQVP6NTDaEBqXpQxoRsAwPB3IUtlG4KUpFmML4jZ7FMh+MM6T
+	zmP6Xp9kJZuQaPDT+JTtLe3zybH2x0ok1OmB3iStccUOpK6eac+HIq/jOTcYUd7yrce3AiNG727
+	sDi/k73g4zVB7+dbnjXl3UAvyt0xDlIQx/johxiOgXTxn+R1jjn4coQL1cKxd+pw1WItWZrg/AE
+	SyzQKSoRQjVAj50LT8LEPzyMO0DwX6i4eRGCJ0GbhuAS6Lu4L7I5W9AbU9Oefjmpocl8JsOrz3f
+	djg9kHw32gNUUGTUyElVz2Dpx2nQEtOzNodQBcvANcF2YfUA6VfLcn/SYYAU3mTVTodSCRV5ZcH
+	h0E7NbX/l+5MU+1IpNy2HZguM+TGcszrHD7OnL6Qk
+X-Received: by 2002:a17:902:f546:b0:2ca:3df2:919a with SMTP id
+ d9443c01a7336-2cbb9ec4ebfmr14082885ad.33.1783129593207; Fri, 03 Jul 2026
+ 18:46:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260703064109.1836070-1-kuniyu@google.com> <20260703094735.678916-1-paritosh.potukuchi@amd.com>
-In-Reply-To: <20260703094735.678916-1-paritosh.potukuchi@amd.com>
+References: <20260703081416.2583118-1-John.Ericson@Obsidian.Systems> <20260703081416.2583118-3-John.Ericson@Obsidian.Systems>
+In-Reply-To: <20260703081416.2583118-3-John.Ericson@Obsidian.Systems>
 From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Fri, 3 Jul 2026 18:43:54 -0700
-X-Gm-Features: AVVi8CfBSm5BVhMfBG6yfFVb8SaeeXYRAY16cYIVFHc_BiaAnf2EgPAQXgaDJXc
-Message-ID: <CAAVpQUChEhWDxVPXOOQQcPMBLNocCACKNiX6AZwy5O-3+wgbtw@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] bonding: reuse neigh_setup from slave neigh_parms
-To: Paritosh Potukuchi <paritoshpotukuchi@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org, 
-	edumazet@google.com, andrew+netdev@lunn.ch, jv@jvosburgh.net, 
-	davem@davemloft.net, pabeni@redhat.com, paritosh.potukuchi@amd.com
+Date: Fri, 3 Jul 2026 18:46:21 -0700
+X-Gm-Features: AVVi8CcRbbqpU2rHLUwjNHh_m262QeOOgbH1PDJGpXN6hTgHv8KX5C8DwoJd8Jo
+Message-ID: <CAAVpQUDvHQp+Y6+y0b8_Oec3nf1o3FLDRtjJCN=ys0wu02Kp4w@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/3] af_unix: Clean up error handling in unix_listen()
+To: John Ericson <John.Ericson@obsidian.systems>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, John Ericson <mail@johnericson.me>, 
+	Simon Horman <horms@kernel.org>, Christian Brauner <brauner@kernel.org>, 
+	David Rheinsberg <david@readahead.eu>, Cong Wang <cwang@multikernel.io>, 
+	Sergei Zimmerman <sergei@zimmerman.foo>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304675-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:John.Ericson@obsidian.systems,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mail@johnericson.me,m:horms@kernel.org,m:brauner@kernel.org,m:david@readahead.eu,m:cwang@multikernel.io,m:sergei@zimmerman.foo,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:paritoshpotukuchi@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:kuba@kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:jv@jvosburgh.net,m:davem@davemloft.net,m:pabeni@redhat.com,m:paritosh.potukuchi@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-304676-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,vger.kernel.org:from_smtp,obsidian.systems:email,johnericson.me:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0D1C17065FC
+X-Rspamd-Queue-Id: 59530706609
 
-On Fri, Jul 3, 2026 at 2:47=E2=80=AFAM Paritosh Potukuchi
-<paritoshpotukuchi@gmail.com> wrote:
+On Fri, Jul 3, 2026 at 1:15=E2=80=AFAM John Ericson
+<John.Ericson@obsidian.systems> wrote:
 >
-> Hi Kuniyuki,
+> From: John Ericson <mail@johnericson.me>
 >
-> >This introduces O(n) list traversal while it can be done
-> >with fixed costs (3 dereferences + 1 call).
->
-> >Since neigh_table is global (arp_tbl or nd_tbl), the O(n)
-> >list traversal could take longer and rather de-optimise.
->
-> Yes, that is true. One reason why I chose to do that is
-> because ndo_neigh_setup is a function primarily meant
-> to setup the neigh_parms structure, when neigh_parms does
-> not exist.
-> On the other hand, lookup_neigh_parms is meant
-> to search for a near-complete neigh_parms structure,
-> that is already associated with a netdev.
-> Even if we want to use ndo_neigh_setup, since it takes
-> less time, I would suggest using it as a fallback to
-> not finding an already existing parms, setup.
->
-> Moreover, time complexity might not be an issue in this
-> path since, this is rarely used aggresively.
+> To avoid the sort of bug that was just fixed going forward, switch to a
+> style where `err =3D -E...;` instead happens right before the `goto`.
+> (`err =3D other_function(...);` is not changed.) Then there is no
+> spooky-action-at-a-distance between the `err` initialization and the
+> `goto`, something which is easier to slip by code review.
 
-The real user is qeth_l3_main.c only and it's not compiled
-on 99% host.
+Sorry, I meant posting this separately to net-next.git after the
+patch 1 is merged to net.git and lands net-next.git.
 
-We usually bail out at if (!slave_ops->ndo_neigh_setup),
-which is called after your neigh_parms_lookup_dev(), and
-there is no need to do O(n) traversal.
+Also could you remove markdown `` ?
 
-With 2K netns, it could incur unnecessary 4K traversal (lo
-+ another dev) for each neigh creation, which is done under
-RTNL or from interrupt context.
-
-So, it will be a problem.
 
 >
+> Assisted-by: Claude:claude-fable-5
+> Signed-off-by: John Ericson <mail@johnericson.me>
+> ---
+>  net/unix/af_unix.c | 15 +++++++++------
+>  1 file changed, 9 insertions(+), 6 deletions(-)
 >
-> One issue with ndo_neigh_setup in bond-like devices is
-> that, to get the underlying netdevs neigh_setup function,
-> it expects us to pass a dummy neigh_parms structure that
-> has been zeroed out. This seems to be fragile as suggested
-> in a TODO in bond_neigh_init().
-> Generally its main goal is to fill the parms.neigh_setup
-> field.
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index 10ed9421e43a..7878b27bbaf8 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -813,19 +813,22 @@ static int unix_listen(struct socket *sock, int bac=
+klog)
+>         struct unix_sock *u =3D unix_sk(sk);
+>         struct unix_peercred peercred =3D {};
 >
-> Can we populate a few more fields in the zeroed-
-> out parms structure, before passing to the driver in
-> ndo_neigh_setup? That seems to be a much safer approach.
-
-It does not help.  Just populating fields does not change the
-loop detection logic.
+> -       err =3D -EOPNOTSUPP;
+> -       if (sock->type !=3D SOCK_STREAM && sock->type !=3D SOCK_SEQPACKET=
+)
+> +       if (sock->type !=3D SOCK_STREAM && sock->type !=3D SOCK_SEQPACKET=
+) {
+> +               err =3D -EOPNOTSUPP;
+>                 goto out;       /* Only stream/seqpacket sockets accept *=
+/
+> -       err =3D -EINVAL;
+> -       if (!READ_ONCE(u->addr))
+> +       }
+> +       if (!READ_ONCE(u->addr)) {
+> +               err =3D -EINVAL;
+>                 goto out;       /* No listens on an unbound socket */
+> +       }
+>         err =3D prepare_peercred(&peercred);
+>         if (err)
+>                 goto out;
+>         unix_state_lock(sk);
+> -       err =3D -EINVAL;
+> -       if (sk->sk_state !=3D TCP_CLOSE && sk->sk_state !=3D TCP_LISTEN)
+> +       if (sk->sk_state !=3D TCP_CLOSE && sk->sk_state !=3D TCP_LISTEN) =
+{
+> +               err =3D -EINVAL;
+>                 goto out_unlock;
+> +       }
+>         if (backlog > sk->sk_max_ack_backlog)
+>                 wake_up_interruptible_all(&u->peer_wait);
+>         sk->sk_max_ack_backlog  =3D backlog;
+> --
+> 2.54.0
+>
 
