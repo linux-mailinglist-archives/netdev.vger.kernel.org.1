@@ -1,238 +1,230 @@
-Return-Path: <netdev+bounces-304719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304720-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kwG+IyJaSWqH0gAAu9opvQ
-	(envelope-from <netdev+bounces-304719-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 21:08:18 +0200
+	id TO7EFYZhSWrM0wAAu9opvQ
+	(envelope-from <netdev+bounces-304720-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 21:39:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 120FF708384
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 21:08:18 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A6A0708443
+	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 21:39:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=SRFolpZQ;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304719-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-304719-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=F7ym3FDR;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304720-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304720-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6B6D03008C02
-	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 19:08:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5B43A300623C
+	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 19:39:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0896835BDA8;
-	Sat,  4 Jul 2026 19:08:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CA762E7F20;
+	Sat,  4 Jul 2026 19:39:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8057C277029
-	for <netdev@vger.kernel.org>; Sat,  4 Jul 2026 19:08:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000472C15A5;
+	Sat,  4 Jul 2026 19:39:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783192093; cv=none; b=bVeM1BYbkA1YrkVO46tP1//9dSgtERa5kBG+w/0+mimWt+daiywlaSWrYnvrkPLsQ+qs4rpd5sxupA4rYjbHeKr1L0GNWNIhPVMO8gtLK1OK38SjBFNwqcIuLHDP5AM7sBxquelBYfYShfV4nEqIIJDSfh2euaACWlxXupT5s6E=
+	t=1783193983; cv=none; b=VUZsdqmy6QyKemHddLKfOvAS4etJ1ZLM126J3MpNxcxDUzMB2FCQE8V1sCWWJk1p7Hq07FqI0CH2V3L5Jl0S/GealRrt3J3aFgP7LCaxTgNNyUn2fvVeucZrljcvTWIjtCemwbjHSpYEJy8X6kSde1GcIqfowPMDjahGw7sREBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783192093; c=relaxed/simple;
-	bh=YNzXT3aqH9Fv7w8avj+C4EBMB5oQXh9FSLCur/rtAMk=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Ql1Bb7/qkr6wTU+p3/XDu3mSz39cVq6Cf4YgMhUTSQ7Ah2rmOo9t7KpOGs3DKCHuHocWvm9D2JojYvhZh+U3jxzvIfxb4YofpgwAKwppE5BvS2S87YmnJ0RsY85XQVX8D8w0zD2ULSDuFznoahYCXjHcgfNORa5tAelsChtZXyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SRFolpZQ; arc=none smtp.client-ip=209.85.128.178
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-81086f7abaaso19147497b3.0
-        for <netdev@vger.kernel.org>; Sat, 04 Jul 2026 12:08:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783192091; x=1783796891; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Gm/Rge7I0kflCRggw6lmJbxqV6a3OPZp5P4k8oCntmo=;
-        b=SRFolpZQoqwIBPxqTJkNbLRhXfv8jn8fmRsIYzTxQKruvuCMl61MK7iwggYjk1CbDi
-         B0gos9yQniqU4CSN/AqS6vI50ge+FJNuOFGJBvmkfCj+DIQ9WbHlL8+8VFBuUk+IFwx5
-         +7dutaWCgewmXen3U+wNfnBggayI9+kJPhOn/TKjHVsXV+D276pqJFwIKhD0rUmoS/Im
-         Aud18RIrunwAG7Sgc9tgevEQ/cEpsLRDCHqOkMczau8B9jQK8THnKKeK+X2VOgNx7yNB
-         Q9LvAlQRLJZnk2cU+VqkM8Hv2BbSBAk0nK4aPo/o34IyyA7ukw/u90DKN0yfBFpcdPX7
-         QbBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783192091; x=1783796891;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Gm/Rge7I0kflCRggw6lmJbxqV6a3OPZp5P4k8oCntmo=;
-        b=BxECEK8Z3LneYmHWflGKCOeKD/Rh3CD4LXbN17TfWrypP/qciC9kB1zeo/e8SlzIqI
-         pGJI0ucpc0BDo3inVn1jWuiJyty+nM7FK0ZPJa8V8eRUWZy71n0xJiUd2YIPXmGK8Nfl
-         VDXmnZjrAMrNq/wnHFWPKqdhT4I+UjJ16QO3RCk4RgyEXNe9Wfm9sQz/p1iPWjnOc+eu
-         Ea7F4/F2GXXetZbrgX+esJjE5uzZYHqZm4SChs6X0wvUldUDrkQ1nmhfQMJ6JUlDN+pq
-         sCEM/5lpjCLapySzMaiz6vEObhullJcjT/z/MP1OWH5vDxDpTFDqDgtIvuzOhCKsay/8
-         qS0g==
-X-Forwarded-Encrypted: i=1; AHgh+RrQJreB5YetJGJuz3zMSMAJHOnTC7MEG+pAyLPdDaFqCt/337F+USMTMGV2dQxguL7dN7T7t6E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLRPjxBIYMLWPaPSCHfaTKXaCLlQa0sKABKwsz550rv2i2b+0U
-	nb9/RcgWgKNwdiISU24HhnO8/nfsJ1Ugei78MH7OFzqY+LqBVG4VEpze
-X-Gm-Gg: AfdE7cnSXLavG8muiVxotU8hGgCVgQzwjIy7rMtCGvOXtkEExQZeKnbMCgzQEOpn+20
-	si9ebWLslPQlvu+YtMOGpVFxCdbQlVTmfXTnbGv263uXPYAQv0slAEnmwTYmxkShqN/2iCXl5fZ
-	kqeBxDsGs0+uoIOPcznKGKaC/PF3S3d2wTxAN63E/gIlO/AqzNhb6BLfSXQbBaTC6MqKUp8I+yB
-	MtgPJh9K1bWSXgC+k0udqzLfCMKs4/ZcoMLLq8Qi9941BjIym4loyJBrs5TBf05HC2BFdqqzhu5
-	mDlTJ/BM5zLVGOIujepl/gVpTo0JC70CBy8pqbyXqqJWGQRWnb17v4pKXc1+bM5hySPR+D6wHs0
-	I59NhhHVwgU0UN4BiaxfghOLJ4Z0Bp9zAgEd9D58IdqJVF+aaHovWQUT53/kBZhXJe3f+BOLOeY
-	twTPgFmuj/5m6yYQMzjIBsILXbA+xUB6/FsMFuQGit/8xZpxZYuoVK3A6wTTxzgqDVJA==
-X-Received: by 2002:a05:690c:2789:b0:7f5:ec53:b4ce with SMTP id 00721157ae682-81737544143mr49405597b3.16.1783192091451;
-        Sat, 04 Jul 2026 12:08:11 -0700 (PDT)
-Received: from gmail.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-81448dd0217sm37817917b3.22.2026.07.04.12.08.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 Jul 2026 12:08:10 -0700 (PDT)
-Date: Sat, 04 Jul 2026 15:08:09 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Anton Danilov <littlesmilingcloud@gmail.com>, 
- netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemb@google.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
- Kuniyuki Iwashima <kuniyu@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- linux-kselftest@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.1f71507524703@gmail.com>
-In-Reply-To: <a196b53a2829da66c982f88e82805afc498ea13b.1782945956.git.littlesmilingcloud@gmail.com>
-References: <cover.1782945956.git.littlesmilingcloud@gmail.com>
- <a196b53a2829da66c982f88e82805afc498ea13b.1782945956.git.littlesmilingcloud@gmail.com>
-Subject: Re: [PATCH net-next v4 2/2] selftests: net: add FOU multicast
- encapsulation resubmit test
+	s=arc-20240116; t=1783193983; c=relaxed/simple;
+	bh=JjRpRO7NwqoABk5ZPGMoaY4cLUVJ5TD2zxG7Y9xij/8=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=YIFRmeWryx2BmIzvebocxF4vacMoiJdZF03Jp8wGKMVO64KRmj/4oSa3i+sWsp44VQBLct7WvmOB3V/GACXuoRajuYD7g5KxM0haT9RHM87XnPujGY8tmY2poNE0PYDIgl7kG6MF7wxDDFzXzneaPFXhvRo6DId0+L80k3nPTmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F7ym3FDR; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D82F1F000E9;
+	Sat,  4 Jul 2026 19:39:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783193981;
+	bh=tHdy471i05c0QrpAe/LbUWSkBra3lAcqZ5uBIQozFDI=;
+	h=From:Subject:Date:To:Cc;
+	b=F7ym3FDRCVHooc2IE5ilOWnHgUJs+UeANKrc16NYRvN8t/NkrHoXFP6pZUopM3M7U
+	 PP6p+SbyAPUzCsm0TN25vxl5QOB2e5mHM9+9e2u2ws9Vdt/LEnp27Fu2sgmsMlL/yJ
+	 EdO+hCQVTiVZSJWZlFT6NgHsEtUc2r/LK03APnQ/zc8lFLPuwAFmtGF3zZQ/yddlyS
+	 r+zVSwzJCrQ11vHmf/bk+PYlVzMMeV//2ZOc6y2xi+SmYGiJDeKfLyAYLU5A5urnRk
+	 Nc6gosV/9pZPMyFq4DABnmNCAAx1iY72IxpX/5CM5VndSck8AgwtgPvncKJovLgyIy
+	 vYWVmt2tECXOA==
+From: Linus Walleij <linusw@kernel.org>
+Subject: [PATCH net-next v7 0/5] net: dsa: microchip: Add support for
+ KSZ8995XA/KS8995XA
+Date: Sat, 04 Jul 2026 21:39:32 +0200
+Message-Id: <20260704-ks8995-to-ksz8-v7-0-2af0eaa545a8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/2XOz07EIBAG8FfZcBbDAMMfT76H8dDSYRfXtAZqs
+ 7rpu8t2D1a5zWT4fR9XVignKuzpcGWZllTSNNbFPhxYOHXjkXga6s6kkEag8PxcnPfI56lO344
+ DRhV9cNJCZBV9ZIrpsgW+sJFmPtJlZq/3S/ns3yjMt7zb21Mq85S/tu4FNnGvAfO/ZgEuuBWDo
+ Ki7DqN+PlMe6f1xysctfZE7L2XjZfVoQQYxBE8WG6/2vu1X1QdUIhoE73xsvP71RqjG6+oJELS
+ nKIFs43HvdeOxeu/6jnqNZEz7f7P3rvGm+sFD5YqGEP76dV1/AAdjsgMJAgAA
+X-Change-ID: 20260509-ks8995-to-ksz8-15f3f9c8271f
+To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Marek Vasut <marex@denx.de>, 
+ Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, Woojung Huh <Woojung.Huh@microchip.com>, 
+ devicetree@vger.kernel.org, Linus Walleij <linusw@kernel.org>, 
+ Nicolai Buchwitz <nb@tipi-net.de>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+X-Mailer: b4 0.15.2
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:marex@denx.de,m:horms@kernel.org,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:Woojung.Huh@microchip.com,m:devicetree@vger.kernel.org,m:linusw@kernel.org,m:nb@tipi-net.de,m:krzysztof.kozlowski@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:littlesmilingcloud@gmail.com,m:netdev@vger.kernel.org,m:willemb@google.com,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:kuniyu@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:linux-kselftest@vger.kernel.org,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-304719-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,denx.de,armlinux.org.uk];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304720-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[gre_ipv6_lladdr.sh:url,fou_mcast_encap.sh:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 120FF708384
+X-Rspamd-Queue-Id: 5A6A0708443
 
-Anton Danilov wrote:
-> Add a selftest to verify that FOU-encapsulated packets addressed to a
-> multicast destination are correctly resubmitted to the inner protocol
-> handler (GRE) via the UDP multicast delivery path.
-> 
-> The test creates two network namespaces connected by a veth pair with
-> a FOU/GRETAP tunnel using a multicast remote address (239.0.0.1).
-> Ping is sent through the tunnel and received packets are counted on
-> the receiver's tunnel interface.
-> 
-> A static neighbor entry is configured on the sender because ARP
-> replies from the receiver cannot traverse the unidirectional multicast
-> tunnel back to the sender.
-> 
-> The early demux optimization (net.ipv4.ip_early_demux) is disabled on
-> the receiver to force packets through __udp4_lib_mcast_deliver(),
-> which is the code path being tested.
-> 
-> Signed-off-by: Anton Danilov <littlesmilingcloud@gmail.com>
-> Assisted-by: Claude:claude-opus-4-6
-> ---
->  tools/testing/selftests/net/Makefile          |   1 +
->  .../testing/selftests/net/fou_mcast_encap.sh  | 112 ++++++++++++++++++
->  2 files changed, 113 insertions(+)
->  create mode 100755 tools/testing/selftests/net/fou_mcast_encap.sh
-> 
-> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-> index 708d960ae07d..7e9ae937cffa 100644
-> --- a/tools/testing/selftests/net/Makefile
-> +++ b/tools/testing/selftests/net/Makefile
-> @@ -39,6 +39,7 @@ TEST_PROGS := \
->  	fib_rule_tests.sh \
->  	fib_tests.sh \
->  	fin_ack_lat.sh \
-> +	fou_mcast_encap.sh \
->  	fq_band_pktlimit.sh \
->  	gre_gso.sh \
->  	gre_ipv6_lladdr.sh \
-> diff --git a/tools/testing/selftests/net/fou_mcast_encap.sh b/tools/testing/selftests/net/fou_mcast_encap.sh
-> new file mode 100755
-> index 000000000000..8db9633f4c28
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/fou_mcast_encap.sh
-> @@ -0,0 +1,112 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-2.0
-> +#
-> +# Test that UDP encapsulation (FOU) correctly handles packet resubmit
-> +# when packets are delivered via the multicast UDP delivery path.
-> +#
-> +# When a FOU-encapsulated packet arrives with a multicast destination IP,
-> +# __udp4_lib_mcast_deliver() must resubmit it to the inner protocol
-> +# handler (e.g., GRE) rather than consuming it. This test verifies that
-> +# by creating a FOU/GRETAP tunnel with a multicast remote address and
-> +# sending ping through it.
-> +#
-> +# The early demux optimization can mask this issue by routing packets via
-> +# the unicast path (udp_unicast_rcv_skb), so we disable it to force
-> +# packets through __udp4_lib_mcast_deliver().
-> +
-> +source lib.sh
-> +
-> +NSENDER=""
-> +NRECV=""
-> +
-> +cleanup() {
-> +	cleanup_all_ns
-> +}
-> +
-> +trap cleanup EXIT
-> +
-> +setup() {
-> +	setup_ns NSENDER NRECV
-> +
-> +	ip link add veth_s type veth peer name veth_r
-> +	ip link set veth_s netns "$NSENDER"
-> +	ip link set veth_r netns "$NRECV"
+This series breaks with the dated attempt to polish the old
+KS8995 driver, and instead implement support for the KS8995XA
+in the KSZ driver, and after that delete the old KS8995 driver.
 
-Sashiko points out that names in the root namespace may collide with
-other devices. Unexpected here, but it's just as easy to immediately
-assign the new veth nodes to the netns. See for instance sctp_vrf.sh.
+The hardware clearly has the same ancestry, the KSZ8995XA is
+just a rebrand of the much older Micrel KX8995XA switch.
 
-> +
-> +	ip -n "$NSENDER" addr add 10.0.0.1/24 dev veth_s
+The old drivers referce to "KS8995" was actually KS8995XA only,
+it never supported the sibling devices KS8995E or KS8995MA.
+This is reflected in this patch set.
 
-More importantly, have you also tested IPv6? Can you expand the
-test with IPv6.
+Add new compatibles, add special code paths for the KSZ8995XA
+and add a new tagger for the special front tag found in the
+KSZ8995XA.
 
-Again, sashiko points to an important issue: ip_protocol_deliver_rcu
-and ip6_protocol_deliver_rcu are not equivalent. From a quick scan it
-appears that the latter does not resubmit on negative return code.
+The patches were tested with the Actiontec MI424WR rev D (which
+has the KS8995XA) and OpenWrt as userspace.
+
+Signed-off-by: Linus Walleij <linusw@kernel.org>
+---
+Changes in v7:
+- Rebased on v7.2-rc1
+- Rebased on top of Bastiens cleanups.
+- Rebased and reworked on top of my patch changing the SKB ownership
+  model in the taggers.
+- Drop bogus reset routine, keep per-port reset but use the right
+  defines.
+- Properly implement the 2way queue split support (low/hi prio)
+- Drop bogus surplus ops assignment.
+- Link to v6: https://patch.msgid.link/20260608-ks8995-to-ksz8-v6-0-d91eb43edcc5@kernel.org
+
+Changes in v6:
+- Provide a prompt along with the transition symbol NET_DSA_KS8995
+  so that oldconfig works.
+- Clarify in commit message that the platform data probe path is
+  unused in the kernel and it is fine to delete this mechanism.
+- Link to v5: https://patch.msgid.link/20260604-ks8995-to-ksz8-v5-0-98baeb45e665@kernel.org
+
+Changes in v5:
+- Rebase on net-next again to be sure we apply.
+- Fix the codepath where DCB was set up per-port, damaging KS8995XA
+  port registers.
+- Fix up the transitional symbol NET_DSA_KS8995 to depend on
+  SPI and select both NET_DSA_MICROCHIP_KSZ_COMMON and
+  NET_DSA_MICROCHIP_KSZ_SPI.
+- Link to v4: https://patch.msgid.link/20260603-ks8995-to-ksz8-v4-0-e15149ef21e7@kernel.org
+
+Changes in v4:
+- Create a stub symbol for NET_DSA_KS8995 to phase over users to
+  the new driver.
+- Link to v3: https://patch.msgid.link/20260526-ks8995-to-ksz8-v3-0-c530f651989f@kernel.org
+
+Changes in v3:
+- Rebase on net-next again, moving target!
+- Fix a netdev_info() print in the tagger to be netdev_debug()
+- Add net/dsa/tag_ks8995.c to MAINTAINERS
+- Link to v2: https://patch.msgid.link/20260522-ks8995-to-ksz8-v2-0-5712c0dc9e75@kernel.org
+
+Changes in v2:
+- Avoid trying to configure TOS priority settings (DCB) on the KSZ8995XA.
+  It does have some support for this, but let's add that later.
+- Pick up Krzysztof's ACK on the new DT bindings.
+- Reset the KSZ8995XA by disabling and enabling the switch like the old
+  driver does.
+- Move mutually exclusive Kconfig over to the patch introducing the
+  old Micrel compatibles to the Microchip ksz_spi driver.
+  (this complaint from Sashiko.)
+- Use __be16 instead of u16 when casting into the SKB in the tagger
+  (this complaint from Sashiko.)
+- Do not modify the hdr->h_vlan_TCI if no hardware accelerated tag
+  is detected, it would get nullified. Use whatever the Linux network stack
+  assigned to TCI there.
+  (this complaint from Sashiko.)
+- Avoid dereference of NULL in debug prints in the tagger.
+  (this complaint from Sashiko.)
+- Ignored comment: Sashiko complains about ilog2(0) being potentially
+  undefined but that is clearly defined as 0 in the Linux kernel.
+- Link to v1: https://patch.msgid.link/20260516-ks8995-to-ksz8-v1-0-70d0ef4aa5f4@kernel.org
+
+---
+Linus Walleij (5):
+      net: dsa: microchip: Add fallback Micrel compatibles
+      dt-bindings: net: dsa: microchip: Add KSZ8995XA
+      net: dsa: tag_ks8995: Add the KS8995 tag handling
+      net: dsa: microchip: Support Microchip KSZ8995XA / KS8995XA
+      net: dsa: ks8995: Delete surplus driver
+
+ .../devicetree/bindings/net/dsa/microchip,ksz.yaml |   1 +
+ MAINTAINERS                                        |   1 +
+ drivers/net/dsa/Kconfig                            |   9 +-
+ drivers/net/dsa/Makefile                           |   1 -
+ drivers/net/dsa/ks8995.c                           | 857 ---------------------
+ drivers/net/dsa/microchip/Kconfig                  |   1 +
+ drivers/net/dsa/microchip/ksz8.c                   | 187 ++++-
+ drivers/net/dsa/microchip/ksz8.h                   |   2 +
+ drivers/net/dsa/microchip/ksz8_reg.h               |   7 +
+ drivers/net/dsa/microchip/ksz_common.c             |  54 +-
+ drivers/net/dsa/microchip/ksz_common.h             |  11 +-
+ drivers/net/dsa/microchip/ksz_spi.c                |  33 +-
+ include/linux/platform_data/microchip-ksz.h        |   1 +
+ include/net/dsa.h                                  |   2 +
+ net/dsa/Kconfig                                    |   6 +
+ net/dsa/Makefile                                   |   1 +
+ net/dsa/tag_ks8995.c                               | 137 ++++
+ 17 files changed, 408 insertions(+), 903 deletions(-)
+---
+base-commit: b73bc9ca3686b78b642fb35dcc1fdf874ecb74a1
+change-id: 20260509-ks8995-to-ksz8-15f3f9c8271f
+
+Best regards,
+--  
+Linus Walleij <linusw@kernel.org>
+
 
