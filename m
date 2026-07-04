@@ -1,92 +1,95 @@
-Return-Path: <netdev+bounces-304679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304680-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id jRs4MdR+SGrRqwAAu9opvQ
-	(envelope-from <netdev+bounces-304679-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 05:32:36 +0200
+	id 3yIxJ6V/SGr5qwAAu9opvQ
+	(envelope-from <netdev+bounces-304680-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 05:36:05 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15259706892
-	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 05:32:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DDBE670689E
+	for <lists+netdev@lfdr.de>; Sat, 04 Jul 2026 05:36:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=g3q2tUFe;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="THW046e/";
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304679-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304679-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304680-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304680-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B90F6301B934
-	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 03:32:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3F5B6301BF56
+	for <lists+netdev@lfdr.de>; Sat,  4 Jul 2026 03:36:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 747E22472A2;
-	Sat,  4 Jul 2026 03:32:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88BDC2EEE62;
+	Sat,  4 Jul 2026 03:36:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199BF13C918
-	for <netdev@vger.kernel.org>; Sat,  4 Jul 2026 03:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5652C2363
+	for <netdev@vger.kernel.org>; Sat,  4 Jul 2026 03:35:59 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783135953; cv=none; b=Qf8WUW5b3CtapPMOBpNPi8IgjcMjglMdxbtUGAtcinfRNGuUAdNGz3l25DYQktGCgh8AngfEdYtXIwty8gJvUFl22xpgs9TjfqvBUy0fdSrjT0aXo00iVAohIod01EtvrCfEZp+TRvTlgm7cmZkemu0xUi6BMWDu6Mw6E5YH7Oc=
+	t=1783136161; cv=none; b=ijd5N4ufdElcZQaqvLXhSVSrd082Ir95mJtrIq/Ix5FYBQlJygEzNxUNVXu0dl9tiFCg8+zteaI1UGRWo/xoW4jnh9AGzbkD2yO7ys2cnmegg6P8nFsDd6K7uXeVn5pB8Mcur9cnn0WeEp4a4GsLkVdHbSQloyyexFg/qIBA6DI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783135953; c=relaxed/simple;
-	bh=QQAbitMkQ0qBRMMilwe/GvLXplVQttu88olFEYFJdqg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IZqatKdqmfK8kb/r1/Fzg/bOyeJyYvFRMRiO3vgE62asKpxZhgQvs6YYaQKQSFEJSP6QIq/dDCTNVtFZXa/0KEwO0iFpoKGOCCY36nLp7sIrBd/3t2NqgD1nkvZ2hvLaj0rQ6Ob9jV3+zUjXLG8RFgXWj7fqmQ6bYLGi31j8czk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g3q2tUFe; arc=none smtp.client-ip=209.85.214.172
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2caced6038eso11989955ad.0
-        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 20:32:31 -0700 (PDT)
+	s=arc-20240116; t=1783136161; c=relaxed/simple;
+	bh=ThuPvzUSoYy43zilZk9Przuhu7j/1v83Yf48qsTni30=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U0qRpMG8Zr7Qjtv5KQI+kWcqxlfAIp4oz9ZNNvHpIZTyi+0cKHJPel99foc0NCWobkyLqwcwhBjYkKS4LNVr32MQiPbidfs380vDqDF48Nrzh45ATA5ZUd/hqACvIRSAhpuINR7E+SyyvzypGd4+PdzvM9w7C4MBs6cHfx3n9cQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=THW046e/; arc=none smtp.client-ip=209.85.210.175
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-84780c95e2eso802167b3a.3
+        for <netdev@vger.kernel.org>; Fri, 03 Jul 2026 20:35:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783135951; x=1783740751; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783136159; x=1783740959; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=etYBcZKNvedguZcZzxJlv9Nayc7uz+fWkzLHt0ZOgn4=;
-        b=g3q2tUFesZJA76leE/wv6vXOFXbA9urWhEjFBZlwNnZRONbeB/QJLpND3BOvMm2Bzb
-         feOuQAF/Ryu5d/aw/Vir3dIRdEvToMctaGiVOMGeugoSwM+qfocQ/LMYDSBp2INP4BQw
-         qaRG3s/CzyFuIBZSsB9QhSR9A+PcFAFlzx8bAjSH2bkMY/DWjRCvfW3/5tulb1nEkKFW
-         WLxz+pw2s4wZpedVl62XXhDNtQUNR0TD/kwiRl6bQCNb6nQjs52frcK8dxG+6WOdNPm7
-         +Hpg2wJLefdlVpJkdYiJc5tNMk1MJZSf8Es1kcBCahD1fuUfmGVMjWO16tH6teiR4T23
-         5Wtg==
+        bh=troEzZKmFC4zyspQLdq3bYm3HWpLnTsTSmm94slF8L0=;
+        b=THW046e/WRq56mbmEGdJWLfhVVqPPBVG4C8nsaSrpSgPLeXWyv4mexUyYGMjOnDs4U
+         QQQW0YCX5Maiq9TCoKzETlAUjwEig1ZkvYjsAuBgyjigaLLa5CwIpB7OxLTQ6nLU7449
+         pxCZzsI30B+5BFm+aHlTEHA7X3KBBHgr2P3n1XZW5PE4QdXSbQEN8vY/0Khk2Paz2M9H
+         7CwmNpVT+JhqxZneq7R30nBTwUu5ZOySquhRLthVAwKFB1Bq08zWPI5NpXZH45cjjAUB
+         ycOIeOs4Lu3doNysvUzKpxCQzjhKKRCFhFGoErzF1bWmzLfP/3L5pbA2HelD+lbd/5Jo
+         97jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783135951; x=1783740751;
+        d=1e100.net; s=20251104; t=1783136159; x=1783740959;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=etYBcZKNvedguZcZzxJlv9Nayc7uz+fWkzLHt0ZOgn4=;
-        b=HRzdmczXzPE/nAV0r99GqAaM+BoV+SqqFcjc6v+9NbalR7+HoW0JcOdaBhSpzAIjNi
-         /ZtPWGWfR1VpKLu25lSK9lDASsebsjrxGI7+EtiXfL1YgoNfSMT2IkhVD1zcnSXm7Ewd
-         jXZjJVfhrj7J4So1kolNz99gKSZbnHHbJx/HINMH/p817KQml4+KCaF4VgxpxCtaHm22
-         C91LxgQN1xIy1FjVVGX8KQiGx1kilDE9k/wIBHSsMLVdAAkVaA/i7cSrnDuhmtAJNcdy
-         IUYoBmEkW+QzCwVClYF4HXLy85gwN3wwExaIvO5MasfIIG1Yet/Dy2Z15LQ5eYOVvhTa
-         3ygw==
-X-Gm-Message-State: AOJu0YzGFfcIDvy513tavyx+XlOsi3L9LBXlO+eRZBFRHUy0cW7mFDld
-	jI3I12vzppQGB1+ubTnFyPV5l4jOqMbElTD8K3AjUSghilygf87o2M5EdQ05/Q==
-X-Gm-Gg: AfdE7clDtD9LRPEPhgA0HprBY1s4N3A179hlxEC4apUufVBUr8TuEdfLMwo1uf1CnfZ
-	5s3bNI+503z45tycDpJCAnXltjyIYBkOEjSRvsVTwY1foowYz1tsvxfcsSFtaH+YP7KsZwM1od0
-	l1d0W4/9aKRlNcx532H8vtojg8pJ5aRPBjp5yeqdN+oQcmj6o7PNzbkRQAWyQHIL9TKuNOPETEw
-	X2FYFQuam5MaS1CPCYxEn6Z79rnwB4jshZAQpIBsz2uHoOUelLbqXJlIs7aGpZQlCMnUVVUXqon
-	lpmxvqCbYn7SzzoLroWkWHFgcUmR6lu/772TkdDo1VxD0b1bgxr56HH2eTYwZWQWmKNC3LMYJZ6
-	C6+gldSr53pvLtkC90Ss//CnYouDyn5Fn+B4p1utlsSaBrV3ZGPHRCMsNZ7KvXM1By1ne4oMJeX
-	xHBv1Fyzw1n5NQQSaKV9C73HAIo6CfZGQgMxP1g0hisVZrsa/Y6RQ9e8hEbq3nlPtPSegp17RxO
-	tiIh4vZtg==
-X-Received: by 2002:a17:902:d4c1:b0:2c9:b42e:444e with SMTP id d9443c01a7336-2cbea1a3905mr12865425ad.1.1783135951228;
-        Fri, 03 Jul 2026 20:32:31 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8000:7a86::e34])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cad6f25f7bsm17448625ad.7.2026.07.03.20.32.29
+        bh=troEzZKmFC4zyspQLdq3bYm3HWpLnTsTSmm94slF8L0=;
+        b=SSlZrvThzY1f6Ky8PdLhJC9+xFwEng8rNf9Gyco5063qJPtcR5AGP+Q++K8Gez8sus
+         gWWAgmR9ub6dzqMxkfkdq8w/vsV2viRiNOzgJDGVa5Fwsx3gO9T9j+m64Yzb6TurtbI9
+         6ASRflQknMwfj+CnYL1ksJwHFQ/UOcxD44Guo/LGfQVuT9D9FQi+0U1WRI/Atk77AKex
+         fj5BVC+raWXrreR+jrF048FvGp/SOxE60xMNfyvXmzRwstUQnI9IXmkD35X+OJGgxKhU
+         Tiv/Fl3Mbydq1s5dxsDMH47JfyAryrTh8eOEmoMxNTNvW6OHseYIn5XBilBOeAg69qbn
+         Se1Q==
+X-Forwarded-Encrypted: i=1; AFNElJ+hTcY82ZIA9jTvOy9YjCcvBlXWVRhNnpmRf0fV5Hok0tSqLGyWPadZXJvxsaMgLZ/b2dfNHMI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBNt3zMHERq8p4pF9E7GAogbiHRScaaLVodvQyWh/i66OJjWbp
+	r9G41mDYGJGtfCW+mxVPai4KfqZip9+x/nOaBjGCcIurPzBlJFyniUiF
+X-Gm-Gg: AfdE7cmQJsLGY/yzmp7qeZnNCcgYVqseWjpx78roQ0l64FqJkAu7u4aAFRm+6bJWJ5c
+	4pK+QeYzRrMveKZ0yZ4nvhe/8J8Ws4nm+wo2Wzgne9vvzLKVJTqCo2QcJ2zBcttW3V0p8OAVwcN
+	JPykGRMrlSx4HeA1g3yjPtcifWREwNvgc6uKYemZIlyB34jdiIOxjuCa5ZHcr2fcauP26/vCxXc
+	NtYrlH1B32s6MWHHlTyOSF/+VFMEL66OQU2Mo5goaNHkwtxOrnqDNXrngS6lIhzVwSnUZTtUIRC
+	4m9FmrIB7Fpbr+e+SjRofzU4YKiI7kjB/bqhOgM9/MOeTHzIg+hjuKwezWTjljYoXgm9kRlC/4j
+	S96uSakbM1+HKT/jGuUmGHwB/cDAxKQ3/6xlewyk/B9FIIUHWRhCBH/31TQ9ufHa8RmUJU2/d2I
+	F9I+vXKSzYz8XGiQXvhGGT8PslbXBvcsXNFAbDiPBeAOnqTWMpkwmyyCiWKw==
+X-Received: by 2002:a05:6a21:1507:b0:3bf:9fe1:c24 with SMTP id adf61e73a8af0-3c03e1eeaa7mr2184488637.2.1783136159260;
+        Fri, 03 Jul 2026 20:35:59 -0700 (PDT)
+Received: from fx.tailc0aff1.ts.net ([206.206.192.132])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f1595e912sm26868465eec.31.2026.07.03.20.35.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jul 2026 20:32:30 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+        Fri, 03 Jul 2026 20:35:58 -0700 (PDT)
+From: Weiming Shi <bestswngs@gmail.com>
+To: linux-sctp@vger.kernel.org
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Rosen Penev <rosenp@gmail.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCHv2 net] net: emac: mal: replace devm_request_irq with request_irq to fix probe error race
-Date: Fri,  3 Jul 2026 20:32:29 -0700
-Message-ID: <20260704033229.2447410-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.55.0
+	netdev@vger.kernel.org,
+	Xiang Mei <xmei5@asu.edu>,
+	Weiming Shi <bestswngs@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net] sctp: validate STALE_COOKIE cause length before reading staleness
+Date: Fri,  3 Jul 2026 20:35:46 -0700
+Message-ID: <20260704033545.2438373-2-bestswngs@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,134 +104,131 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,asu.edu];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304679-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:rosenp@gmail.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304680-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:linux-sctp@vger.kernel.org,m:marcelo.leitner@gmail.com,m:lucien.xin@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:xmei5@asu.edu,m:bestswngs@gmail.com,m:stable@vger.kernel.org,m:marceloleitner@gmail.com,m:lucienxin@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 15259706892
+X-Rspamd-Queue-Id: DDBE670689E
 
-devm_request_irq() is a managed resource: the IRQ is not freed until
-devres_release_all() runs after the probe function returns.  In the
-probe error path, free_netdev(mal->dummy_dev) and dcr_unmap() execute
-while the IRQ is still live.  If the shared IRQ fires during cleanup,
-the handler accesses unmapped DCR registers (crash) or the already-
-freed dummy_dev (use-after-free).
+When an ERROR chunk with a STALE_COOKIE cause is received in the
+COOKIE_ECHOED state, sctp_sf_do_5_2_6_stale() reads the 4-byte Measure
+of Staleness that follows the cause header:
 
-Switch to plain request_irq() with per-IRQ error labels that tear down
-only the IRQs that were successfully registered, and add the matching
-free_irq() calls in mal_remove().
+	err   = (struct sctp_errhdr *)(chunk->skb->data);
+	stale = ntohl(*(__be32 *)((u8 *)err + sizeof(*err)));
 
-Tested on Cisco Meraki MX60
+err is the first cause in the chunk, not the STALE_COOKIE cause that
+caused the dispatch, and nothing guarantees the staleness field is
+present. sctp_walk_errors() only requires a cause to be as long as the
+4-byte header, so for a STALE_COOKIE cause of length 4 the read runs
+past the cause, and for a minimal ERROR chunk past skb->tail. The value
+is echoed to the peer in the Cookie Preservative of the reply INIT,
+leaking uninitialized memory.
 
-Fixes: 14f59154ff0b ("net: ibm: emac: mal: use devm for request_irq")
-Assisted-by: opencode:big-pickle
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
+sctp_sf_cookie_echoed_err() already walks to the STALE_COOKIE cause, so
+check its length there and pass it to sctp_sf_do_5_2_6_stale(), which
+reads that cause instead of the first one. A STALE_COOKIE cause too
+short to hold the staleness field is discarded.
+
+The read is reachable by any peer that can drive an association into
+COOKIE_ECHOED, including an unprivileged process using a raw SCTP socket
+in a user and network namespace.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: Xiang Mei <xmei5@asu.edu>
+Assisted-by: Claude:claude-opus-4-8
+Cc: stable@vger.kernel.org
+Signed-off-by: Weiming Shi <bestswngs@gmail.com>
 ---
- v2: rebase and add tested comment
- drivers/net/ethernet/ibm/emac/mal.c | 43 +++++++++++++++++++----------
- 1 file changed, 29 insertions(+), 14 deletions(-)
+ net/sctp/sm_statefuns.c | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/ethernet/ibm/emac/mal.c b/drivers/net/ethernet/ibm/emac/mal.c
-index e88e4a1ddcd4..b42ba53671fd 100644
---- a/drivers/net/ethernet/ibm/emac/mal.c
-+++ b/drivers/net/ethernet/ibm/emac/mal.c
-@@ -656,26 +656,26 @@ static int mal_probe(struct platform_device *ofdev)
- 		hdlr_rxde = mal_rxde;
+diff --git a/net/sctp/sm_statefuns.c b/net/sctp/sm_statefuns.c
+index d23d935e128e..3893b44448b3 100644
+--- a/net/sctp/sm_statefuns.c
++++ b/net/sctp/sm_statefuns.c
+@@ -74,7 +74,8 @@ static enum sctp_disposition sctp_sf_do_5_2_6_stale(
+ 					const struct sctp_association *asoc,
+ 					const union sctp_subtype type,
+ 					void *arg,
+-					struct sctp_cmd_seq *commands);
++					struct sctp_cmd_seq *commands,
++					struct sctp_errhdr *err);
+ static enum sctp_disposition sctp_sf_shut_8_4_5(
+ 					struct net *net,
+ 					const struct sctp_endpoint *ep,
+@@ -2529,9 +2530,15 @@ enum sctp_disposition sctp_sf_cookie_echoed_err(
+ 	 * errors.
+ 	 */
+ 	sctp_walk_errors(err, chunk->chunk_hdr) {
+-		if (SCTP_ERROR_STALE_COOKIE == err->cause)
+-			return sctp_sf_do_5_2_6_stale(net, ep, asoc, type,
+-							arg, commands);
++		if (err->cause != SCTP_ERROR_STALE_COOKIE)
++			continue;
++		/* The staleness is only meaningful if the cause is long
++		 * enough to hold it; a shorter one is malformed.
++		 */
++		if (ntohs(err->length) < sizeof(*err) + sizeof(__be32))
++			break;
++		return sctp_sf_do_5_2_6_stale(net, ep, asoc, type,
++					      arg, commands, err);
  	}
  
--	err = devm_request_irq(&ofdev->dev, mal->serr_irq, hdlr_serr, irqflags,
--			       "MAL SERR", mal);
-+	err = request_irq(mal->serr_irq, hdlr_serr, irqflags,
-+			  "MAL SERR", mal);
- 	if (err)
- 		goto fail2;
--	err = devm_request_irq(&ofdev->dev, mal->txde_irq, hdlr_txde, irqflags,
--			       "MAL TX DE", mal);
-+	err = request_irq(mal->txde_irq, hdlr_txde, irqflags,
-+			  "MAL TX DE", mal);
- 	if (err)
--		goto fail2;
--	err = devm_request_irq(&ofdev->dev, mal->txeob_irq, mal_txeob, 0,
--			       "MAL TX EOB", mal);
-+		goto fail_serr_irq;
-+	err = request_irq(mal->txeob_irq, mal_txeob, 0,
-+			  "MAL TX EOB", mal);
- 	if (err)
--		goto fail2;
--	err = devm_request_irq(&ofdev->dev, mal->rxde_irq, hdlr_rxde, irqflags,
--			       "MAL RX DE", mal);
-+		goto fail_txde_irq;
-+	err = request_irq(mal->rxde_irq, hdlr_rxde, irqflags,
-+			  "MAL RX DE", mal);
- 	if (err)
--		goto fail2;
--	err = devm_request_irq(&ofdev->dev, mal->rxeob_irq, mal_rxeob, 0,
--			       "MAL RX EOB", mal);
-+		goto fail_txeob_irq;
-+	err = request_irq(mal->rxeob_irq, mal_rxeob, 0,
-+			  "MAL RX EOB", mal);
- 	if (err)
--		goto fail2;
-+		goto fail_rxde_irq;
+ 	/* It is possible to have malformed error causes, and that
+@@ -2573,13 +2580,13 @@ static enum sctp_disposition sctp_sf_do_5_2_6_stale(
+ 					const struct sctp_association *asoc,
+ 					const union sctp_subtype type,
+ 					void *arg,
+-					struct sctp_cmd_seq *commands)
++					struct sctp_cmd_seq *commands,
++					struct sctp_errhdr *err)
+ {
+ 	int attempts = asoc->init_err_counter + 1;
+-	struct sctp_chunk *chunk = arg, *reply;
+ 	struct sctp_cookie_preserve_param bht;
+ 	struct sctp_bind_addr *bp;
+-	struct sctp_errhdr *err;
++	struct sctp_chunk *reply;
+ 	u32 stale;
  
- 	/* Enable all MAL SERR interrupt sources */
- 	set_mal_dcrn(mal, MAL_IER, MAL_IER_EVENTS);
-@@ -694,6 +694,14 @@ static int mal_probe(struct platform_device *ofdev)
+ 	if (attempts > asoc->max_init_attempts) {
+@@ -2590,8 +2597,6 @@ static enum sctp_disposition sctp_sf_do_5_2_6_stale(
+ 		return SCTP_DISPOSITION_DELETE_TCB;
+ 	}
  
- 	return 0;
- 
-+ fail_rxde_irq:
-+	free_irq(mal->rxde_irq, mal);
-+ fail_txeob_irq:
-+	free_irq(mal->txeob_irq, mal);
-+ fail_txde_irq:
-+	free_irq(mal->txde_irq, mal);
-+ fail_serr_irq:
-+	free_irq(mal->serr_irq, mal);
-  fail2:
- 	dma_free_coherent(&ofdev->dev, bd_size, mal->bd_virt, mal->bd_dma);
-  fail_dummy:
-@@ -720,6 +728,13 @@ static void mal_remove(struct platform_device *ofdev)
- 
- 	mal_reset(mal);
- 
-+	/* Free IRQs before freeing resources they access */
-+	free_irq(mal->serr_irq, mal);
-+	free_irq(mal->txde_irq, mal);
-+	free_irq(mal->txeob_irq, mal);
-+	free_irq(mal->rxde_irq, mal);
-+	free_irq(mal->rxeob_irq, mal);
-+
- 	free_netdev(mal->dummy_dev);
- 
- 	dcr_unmap(mal->dcr_host, 0x100);
+-	err = (struct sctp_errhdr *)(chunk->skb->data);
+-
+ 	/* When calculating the time extension, an implementation
+ 	 * SHOULD use the RTT information measured based on the
+ 	 * previous COOKIE ECHO / ERROR exchange, and should add no
 -- 
-2.55.0
+2.43.0
 
 
