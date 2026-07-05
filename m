@@ -1,82 +1,100 @@
-Return-Path: <netdev+bounces-304816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304817-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id XJHIDb3OSmqHHwEAu9opvQ
-	(envelope-from <netdev+bounces-304816-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 23:38:05 +0200
+	id 7uF8MH7TSmrSIAEAu9opvQ
+	(envelope-from <netdev+bounces-304817-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 23:58:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FD0D70B7D8
-	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 23:38:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E661B70B84D
+	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 23:58:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=yahoo.com header.s=s2048 header.b=N3SsMR5d;
-	dmarc=pass (policy=reject) header.from=yahoo.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304816-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304816-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=asu.edu header.s=google header.b=kdxxNFdj;
+	dmarc=pass (policy=none) header.from=asu.edu;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304817-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304817-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4E30A30063B0
-	for <lists+netdev@lfdr.de>; Sun,  5 Jul 2026 21:38:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6DEF63008238
+	for <lists+netdev@lfdr.de>; Sun,  5 Jul 2026 21:58:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3900359A90;
-	Sun,  5 Jul 2026 21:38:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FC0135DA53;
+	Sun,  5 Jul 2026 21:58:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic303-22.consmr.mail.sg3.yahoo.com (sonic303-22.consmr.mail.sg3.yahoo.com [106.10.242.39])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CF5C2DC792
-	for <netdev@vger.kernel.org>; Sun,  5 Jul 2026 21:38:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54C630216D
+	for <netdev@vger.kernel.org>; Sun,  5 Jul 2026 21:58:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783287482; cv=none; b=bUE9LrD2TctWa/Y18wLsFotLAU71v3bH3SfRELhu7hf/PQfxwoAXTSywSScmvnF5UFp3BfeeQKdpDK4vVg4rM/fyAoOZCsaRcsJaFE+ZVxPeVs6CuBRSyJay4SH6dH5W7HDd2RvEN76ik+ElheMeMy/3sT3bD2aVQ1zl83P9BSM=
+	t=1783288698; cv=none; b=EbDwTYyB7e2QRnTwT4DIJuNCbMvUthlQEgEygoSjxCMAYe+5tqaoR9pCSZMTJoGmQ7bJunYIwm7D6YCyMBrQw1CyZTz9x9GXrvoknjkel7imFZ5wB6oprzdwBTJuov9N68VX3NqH4Wv3LjhnJ9TB9yCcJuvRpVDIMOIdh1MlaQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783287482; c=relaxed/simple;
-	bh=bJ7PaBfd3x3lBU5h7Ebcue4yo4GBvdL+kOqYGQ9V98U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:References; b=SKQ3fssfmqwlPLqUpEN4fK38KzFV4HrbHi10oerk02CtHfzcRCXQ7/tFeFJfLRlUkqYmBlMXUyd0wHO0I7AvON8yuLvawLghwuJ9qHP5ZuS3desNecnmLL2ljmOGU6ZoJOPeIP+6PAJv9J1DGGgKYcJQNZve2RtgaqhkXA4eBlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=N3SsMR5d; arc=none smtp.client-ip=106.10.242.39
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1783287479; bh=ev6TcxQOxq4IjUViXN87CoQCMCwqYIDTzOXWg/41fPc=; h=From:To:Cc:Subject:Date:References:From:Subject:Reply-To; b=N3SsMR5ds2VOKGT/cWTh4T+LbMULRwvJqslLuR+ePMSUSSWx9xVm+3AHsgPRlpC9OKRZ0KGmkadFsjvsWZsvTOcPMkku4D9Pyc7tWykkhJCIfwZCuSO5ZlXxPLHE02uz6IGIVAom7PEIHPOxNuQHjGRXwiAoT0o1ELwZYuJeU+ThUrOrF2s9uLWk5ZE4jE51XRhdEh+FEdT1mzCibSCRGHtulTiqdfCgUisuiqDPW5gVNLC8r4a/ZRdpd2PVzeoHesJ3kJ0pzM/NGho5ULdeyCaxvgNg3UL93GpzKUnl5h5iP+dyRPPeyzrLXjYbvbyKzbxYGlJzDOGkQ2x9aCkwyw==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1783287479; bh=Th4JhHIaHz+QDkTgU1pMaqUn9/PClF86LSuyyQ6zZ9W=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=nAFQWri9EI3ZL75JgqO80I1xGBUqN138mNVniRKP7tFPPaj4nZJw3mmUkDtWu9JzqsMVwBG+Pu/ovbcMJ8OlVD6SJhrjp8VbA2A1Bvxdnru/M/e6P4iX0mTDVvYeBYe7bvqm+iHcslQerJGb5CCBvQm899dF/ec0qugJxuj7S8m7vN2KcWNzej5Z/Dh2/i2zrkhKa9fcOmeGnfHAr8kY583+U0J5x7wmeuwu2BACKe52w3Z7EJXS037YJKoEjQ2Xkyn/kIJXEtcPl05zal/3NPbmAJi0buomGxisTB1bDBnZJuOkgq8/YysYnHUiCXIqg7UIf8UsvDe/Aqogdr/SrA==
-X-YMail-OSG: HM.Q6A0VM1lfAGCWbf_Uvvb52dMZH2uNYTpFcLQ4KKxzbDQh9BNAdCNzQEfJYht
- 7Uz.wrtdj1WOA0O4YcgmFkwEpqU3Bv2NHOhfISwbbvCKhDLgPy0mQHz_UtaDdVSDFVcclueov.NO
- gCj5vwSFpviUTPpbW0JIWlGkfKtDt5rhK.wMUvGO4qBP.Y9fEHTJdwhgJ.P1YSaaYRB4zX32E7C6
- NKrSIPhgTnwWANMf4QPoeQv5zQ85WmJZdTYdxSi5SOoE93LEyt7pRFOv334ihggKp1bZiVkvDgkw
- u2UjB9IldkZ0FYF1XOimr1fTL.VcQV.2AIlrMg7gNeL7URaohP8hARfE37wfkQ4sxy2t7P6o541u
- kQndZ3180jZKxWruddxf352JjgM571Bw2toHKD6UXXTEftK0mOEXWmHP6h7sWKy8POrFN6mf0SiK
- y2mhEjJZocjtIyLN2z7j2Xvq7RA2IEPjLVXq.6UY01ef.ksJTzxyjdQQLNBY1ItkWuoVHjQn8.8j
- PIvnUiX_xBQHjmUZlPiqRCGNGM6fD3tP77CwuKmBh2YlNSiVCTjOOrbwkyGNFUjaz85.zakKghft
- dL12WLj2BUEE3.WOjEzMPB22HXvCt84R0eWC2dOA9prlXO3.zA6CLW6figUhgs8FF4KaYnhl0slt
- 7oSryq6hKR919s8U10ZmZV_JNDYqNPogpr7UkHA3bMPEqAEvm4T79Wya2c.ec9bTCeieIqFCfyNd
- lslqsnJuw7QY_dM0dIcVIDZDf1DYZiESsMLsXPB.rDnp7X2Q9QIoZEYfUrevw2lFlwPNVZicI3Kq
- VsXrdvgSRJLCOVxt43GayUAEky4DkSZ7bvb4ttDj8lzhblyIaQDoku6yYtOmermEp.59E5FyiNy.
- 3WW3UzY2OudHn3cmWaewALO0hCkPwDYjlT6n7MpMq_q69VmMYn4ba9SbGLGPc5tMqOvkoQSr4kTx
- Dg0BfCwTXNC9fZpFRuGCXm3MMvZKDsUX0ZFaMHbRu5V1zXU5Gnlfi6_8R3a9HTrkGV1oLJBj0dZa
- sEwC6SAI5NTCw42MEwrSNB5ugpNAtqR4VfYsGW9Q1RFVZQ6cbK_ApoDmmjHJiNqsRxQfutXtlrkM
- bFJKxxW2TrY7U1sFI.0iQIf4y9Plen5AFdv7S7mX4wpdgRRBTrNY3YtSXbuSEmrP48it3Iy5tHqG
- jsnWmUFD6l9iBmcL7cU6QNXRb88y9nUL4H.f1dXw1kVvLTo7CFIRma5U4OrW.WBnIa7vpGXjRHMl
- Gg9oR0m1x2tAaTtIicFgISic3rAEmizeCZrRVLqiqoEHYLJPF.BQwG28ZlWoxaHSyumdy_APgI4v
- IH3rfXaN3Kv_y0iVphiR_KpG.RI3wCG6nqjBeLzQZMHmzcJwIj3svwA0GSE7YqMI7Fys1bJHRa23
- R3DozQJ0.2TPRx.6T3Sxp4w0fHM4tyMKxOV3lGDboiQ1wg5TQbYHVjszmq3tBKvUl0ZEVt5lG.MP
- ORtpqXe1fDegEA_JS9EdIUw8APRF_iKFnNjjG9aQUqzrGp0eBMmS_3FQeWjyXPx602NECOgfqqs6
- _sRbdCjrV8c15da98.UHlsAThKaiRNY0bR.BoKIm8BDfpiMzH0XQkP3t4IOzLQYuv8x1MXpWAYpc
- oKi3wCkG_zKm.2bXlbIBE91AwwKp4p6ilBroUWJ4UaX3pbXRJPpayYVgeJLxrdBX6jCeHLOuZuJN
- KKnVkyMxy5FPG9DqmhNXUItoBsozs9fWJGESLTv3gc2ElaZ2CaEu1fSsExUiQBPttMLKwQaTv9oQ
- dkjzBhlegOLt2xBVjDLn3rvF.XO9uD5Iv6aNH5C_JV8fSLz7bhgWI6vXrGcFnhcXTpiJSCXJIBEf
- qCoe5SCMXuqjIrNsZxAgL7r_pgbZPNbkoaeRdn7IRB569TbiT2PusdsJ.7IgvzLwnShHsHkg5jnv
- NIyHljDDJVbWuwoxLOkwLJePBqbJ55olCejvI0GWo8BCLWwXTJEiCt9J0lEjkuu53TnBifpVoGcr
- u8Oi0GF9Gj7HdRG_nPOHarmbvjhYSS37sRbKsI7p3KDXqSGpQkosCTIPF.6cYJVuC5tfQn0CesTg
- 2c15RNZcDrMX_aA15KLlomPRtFQHsKFNY0CzslE4KMY3YxJbZu8SdcXogLgRgUB5w8maxAQKrDn3
- AtN7cAVREZc3l7tYqpf1Ce1Ut3fXfd9S0ox1lCkhkBcohKg9fgGNODdtVe9COLHolOJatuPDzPpX
- 8BS7ic0BSOU1CZO5yIbYRHF6wLj1FjjJvWbnnZV70j.PfbiHVCkT89d2z3zoOCqP86ks-
-X-Sonic-MF: <dharmikparmar2004@yahoo.com>
-X-Sonic-ID: 9accaf53-6f2f-4d39-8e71-58640a4ac3ea
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic303.consmr.mail.sg3.yahoo.com with HTTP; Sun, 5 Jul 2026 21:37:59 +0000
-Received: by hermes--production-sg3-847cd67bd4-92cbz (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 5d2170ff3249e7e6e43152568d545afc;
-          Sun, 05 Jul 2026 20:43:06 +0000 (UTC)
-From: Dharmik Parmar <dharmikparmar2004@yahoo.com>
-To: netdev@vger.kernel.org
-Cc: Dharmik Parmar <dharmikparmar2004@yahoo.com>
-Subject: [PATCH net] selftests: netfilter: conntrack_resize.sh: fix skip exit code
-Date: Mon,  6 Jul 2026 02:12:52 +0530
-Message-ID: <20260705204252.630729-1-dharmikparmar2004@yahoo.com>
+	s=arc-20240116; t=1783288698; c=relaxed/simple;
+	bh=fsLQWYx9S7rh9aWQvUIiOdoCnDPWNE+xTofZODHUeqM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UPDi8mF+w2XGgEy+JAQi1CC+uLL9/W/3LEIWqJ1p+27Ke9QRJdUO6A9l/mq9uCcgBkqRTdG+5ZoDqI7whtcp8oNTFWYWfyQldPmuM6jxDFpASoVy9b7PR5OQ+gA8O75JnCiUCzXhLxn+fuw8v/rAEWUnC6wxnKD6/n1Pil3Jh8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=kdxxNFdj; arc=none smtp.client-ip=209.85.216.41
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-36b9d265355so1610159a91.2
+        for <netdev@vger.kernel.org>; Sun, 05 Jul 2026 14:58:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1783288696; x=1783893496; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=utKDtKTqMmc6gZ7doveiePDIjTFwLL4HY/v+gdcdSqY=;
+        b=kdxxNFdjGl4a7Vvb8AuYYNCB/TPlsjNNg6+eklBHP7Ztv8g95kLJKYe+PgggYx8lVY
+         7yohz/cm7Ojb3CoxSdpi5S0gvkNSE7IRKkMaPaFBSxuY72wWwyDcN1AmdSXlByhzCQqi
+         yJ2mIA9AhkN6z3ODvWcI6Wc2YoWUBvqeJ2W87SFO9cBpN1IzRFYeSgtd6tLe/HHI6jlw
+         t8CbpJBQL5iMSr3G+3YS7/e/ACWOeeeno3l7sPspgs66X6b+ygnGiu6NqIOig9NHoMQd
+         TTrFIPTPZUWpQEa9ZCLlPYbaG5laus6LzBYUCGvFoF7k7xp0+GtcKU2lL2Fe08/N3CEk
+         KG2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783288696; x=1783893496;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=utKDtKTqMmc6gZ7doveiePDIjTFwLL4HY/v+gdcdSqY=;
+        b=Nk408IrYwQlykXrxwC+Ec2tR7TBdv58llu8wPDSMyTBX/K8co1y+Bm94SaqtJv/0sK
+         uMA6PmZi6f6oSKSl04t5Z6b0t5NSnBLqYwizUE9IVnHMiaPUhazRjl5h+X2yE1gNE4SP
+         WMi5AYVKsq1zt09dR0bDjYUozEI1HNV7Pl2SIAt/hEYhtD9lYFmZxLrcBsflMXRQFKti
+         gCOSijWgDmuosoNlZcZQbOX5fY3CYK5jvhT4udt4Xswa4p8Ay2qlmczcF++R1hCMPt+x
+         RXUajPaN5QQeM51lfT67ymEJq05o63SDrcl1N6MeVLEEWH0jV8GPgduISr+2AltgX/FL
+         EhvA==
+X-Forwarded-Encrypted: i=1; AHgh+Rrj07EF+epmnrTEPhy/voxinFQKCm8EvWBgO1Yh+AtRCLAFCQd6vMVUgv1uRKaQiyehxpm+7P8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsWmav0zuKne8qEZ65y5by+fgnKe4mtFLshchJ8jkKQLg8poJa
+	oOeEnJ7o7Pg/XTIKZI8pPE7qVsx0BRiiG5qWRAgpPekIpiCGW9+cBmk4EUijUzcgZA==
+X-Gm-Gg: AfdE7cnbiVlHjB2gHiQGY2tpBh2zs64CcNtVf0Vw4/UTZSa/MTPLTku5iEpOQ8aEBJ3
+	72uLNkmM4rWJPTljxa0rPHOInwPmHKHMCc4v497+Q7vnbYzLih/GZRZmeuLDSMByiaadC4hxjjQ
+	CnxCVOrCKo3jmVk+wsZyXXdIqdXmApijGCaRfi1JKvel3JyXWKl5yl5iIUq2H58l7NdZ3KDzAq1
+	YWOUD7tELjXpq0sAiREeXzCw0WNkBeZ0pFom+mwyvWx9jipyAvbtvcANhkoqs/CMBf7Bl7Cfjk8
+	gmLVwxZ4hFtHE/mrGT76I4UZ//N/z1/fpXm3SIG8SnTXmE0wpVIMyKicgCgQ2SQmt/7AoYuA6YP
+	iPy7t0hes09pW9KZLmbpOSxoa+8VyiqkrTN/GH3qr8wygHREgjBSew/f95drsDo3qnNHUIS3o1O
+	k1oFS86jXz
+X-Received: by 2002:a17:90b:510e:b0:37f:133a:3e09 with SMTP id 98e67ed59e1d1-382803b483amr7241574a91.3.1783288696081;
+        Sun, 05 Jul 2026 14:58:16 -0700 (PDT)
+Received: from p1.. ([2607:fb91:152b:9c50:23c1:1e1c:319e:7007])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38097da1a0fsm3210495a91.2.2026.07.05.14.58.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 Jul 2026 14:58:15 -0700 (PDT)
+From: Xiang Mei <xmei5@asu.edu>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	bridge@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Xiang Mei <xmei5@asu.edu>,
+	Weiming Shi <bestswngs@gmail.com>
+Subject: [PATCH nf] netfilter: ebtables: terminate table name before find_table_lock()
+Date: Sun,  5 Jul 2026 14:58:00 -0700
+Message-ID: <20260705215800.2223145-1-xmei5@asu.edu>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -85,70 +103,110 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-References: <20260705204252.630729-1-dharmikparmar2004.ref@yahoo.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[yahoo.com,reject];
-	R_DKIM_ALLOW(-0.20)[yahoo.com:s=s2048];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
+	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[yahoo.com];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304816-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[dharmikparmar2004@yahoo.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:dharmikparmar2004@yahoo.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWO(0.00)[2];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-304817-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,netfilter.org,lists.linux.dev,asu.edu,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:razor@blackwall.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:bridge@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:xmei5@asu.edu,m:bestswngs@gmail.com,s:lists@lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[yahoo.com];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dharmikparmar2004@yahoo.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[yahoo.com:+];
+	DKIM_TRACE(0.00)[asu.edu:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,asu.edu:from_mime,asu.edu:email,asu.edu:mid,asu.edu:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7FD0D70B7D8
+X-Rspamd-Queue-Id: E661B70B84D
 
-When conntrack sysctls are unavailable, the test prints SKIP but exits
-with $KSFT_SKIP.  lib.sh defines ksft_skip instead, so the kselftest
-runner did not see a proper skip.
+update_counters() and compat_update_counters() forward a user-supplied
+32-byte table name to find_table_lock() without NUL-terminating it. On a
+lookup miss, find_inlist_lock() calls try_then_request_module(..., "%s%s",
+"ebtable_", name), and vsnprintf() reads past the name field and the
+stack object until it hits a zero byte.
 
-Use ksft_skip.
+  BUG: KASAN: stack-out-of-bounds in string (lib/vsprintf.c:648 lib/vsprintf.c:730)
+  Read of size 1 at addr ffff8880119dfb20 by task exploit/147
+  Call Trace:
+  ...
+   string (lib/vsprintf.c:648 lib/vsprintf.c:730)
+   vsnprintf (lib/vsprintf.c:2945)
+   __request_module (kernel/module/kmod.c:150)
+   do_update_counters.isra.0 (net/bridge/netfilter/ebtables.c:371 net/bridge/netfilter/ebtables.c:380)
+   update_counters (net/bridge/netfilter/ebtables.c:1440)
+   do_ebt_set_ctl (net/bridge/netfilter/ebtables.c:2573)
+   nf_setsockopt (net/netfilter/nf_sockopt.c:101)
+   ip_setsockopt (net/ipv4/ip_sockglue.c:1424)
+   raw_setsockopt (net/ipv4/raw.c:847)
+   __sys_setsockopt (net/socket.c:2393)
+  ...
 
-Fixes: d33f889fd80c ("selftests: netfilter: add conntrack stress test")
-Signed-off-by: Dharmik Parmar <dharmikparmar2004@yahoo.com>
+compat_do_replace() shares the same unterminated name via
+compat_copy_ebt_replace_from_user(); terminate it there too so all
+find_table_lock() callers behave alike. The other callers already
+terminate the name after the copy.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Fixes: 81e675c227ec ("netfilter: ebtables: add CONFIG_COMPAT support")
+Reported-by: Weiming Shi <bestswngs@gmail.com>
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
 ---
- tools/testing/selftests/net/netfilter/conntrack_resize.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bridge/netfilter/ebtables.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/tools/testing/selftests/net/netfilter/conntrack_resize.sh b/tools/testing/selftests/net/netfilter/conntrack_resize.sh
-index 615fe3c6f405..51564092cec4 100755
---- a/tools/testing/selftests/net/netfilter/conntrack_resize.sh
-+++ b/tools/testing/selftests/net/netfilter/conntrack_resize.sh
-@@ -22,7 +22,7 @@ insert_count=2000
- modprobe -q nf_conntrack
- if ! sysctl -q net.netfilter.nf_conntrack_max >/dev/null;then
- 	echo "SKIP: conntrack sysctls not available"
--	exit $KSFT_SKIP
-+	exit $ksft_skip
- fi
+diff --git a/net/bridge/netfilter/ebtables.c b/net/bridge/netfilter/ebtables.c
+index f20c039e44c8..5b74ff827493 100644
+--- a/net/bridge/netfilter/ebtables.c
++++ b/net/bridge/netfilter/ebtables.c
+@@ -1434,6 +1434,8 @@ static int update_counters(struct net *net, sockptr_t arg, unsigned int len)
+ 	if (copy_from_sockptr(&hlp, arg, sizeof(hlp)))
+ 		return -EFAULT;
  
- init_net_max=$(sysctl -n net.netfilter.nf_conntrack_max) || exit 1
++	hlp.name[sizeof(hlp.name) - 1] = '\0';
++
+ 	if (len != sizeof(hlp) + hlp.num_counters * sizeof(struct ebt_counter))
+ 		return -EINVAL;
+ 
+@@ -2273,6 +2275,8 @@ static int compat_copy_ebt_replace_from_user(struct ebt_replace *repl,
+ 
+ 	memcpy(repl, &tmp, offsetof(struct ebt_replace, hook_entry));
+ 
++	repl->name[sizeof(repl->name) - 1] = '\0';
++
+ 	/* starting with hook_entry, 32 vs. 64 bit structures are different */
+ 	for (i = 0; i < NF_BR_NUMHOOKS; i++)
+ 		repl->hook_entry[i] = compat_ptr(tmp.hook_entry[i]);
+@@ -2395,6 +2399,8 @@ static int compat_update_counters(struct net *net, sockptr_t arg,
+ 	if (copy_from_sockptr(&hlp, arg, sizeof(hlp)))
+ 		return -EFAULT;
+ 
++	hlp.name[sizeof(hlp.name) - 1] = '\0';
++
+ 	/* try real handler in case userland supplied needed padding */
+ 	if (len != sizeof(hlp) + hlp.num_counters * sizeof(struct ebt_counter))
+ 		return update_counters(net, arg, len);
 -- 
 2.43.0
 
