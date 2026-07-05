@@ -1,118 +1,118 @@
-Return-Path: <netdev+bounces-304812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304813-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5PiFG56sSmp7FwEAu9opvQ
-	(envelope-from <netdev+bounces-304812-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 21:12:30 +0200
+	id FsItAgStSmqPFwEAu9opvQ
+	(envelope-from <netdev+bounces-304813-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 21:14:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA1FF70AE12
-	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 21:12:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 582A070AE2C
+	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 21:14:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=lKNqQ7lj;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=VjmgcWQD;
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304812-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-304812-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304813-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304813-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D1ADF3012BCB
-	for <lists+netdev@lfdr.de>; Sun,  5 Jul 2026 19:12:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 049CD3013A9E
+	for <lists+netdev@lfdr.de>; Sun,  5 Jul 2026 19:13:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B90A3783B4;
-	Sun,  5 Jul 2026 19:12:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E647381EB8;
+	Sun,  5 Jul 2026 19:13:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A944B37DAA9
-	for <netdev@vger.kernel.org>; Sun,  5 Jul 2026 19:12:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E281B369D67
+	for <netdev@vger.kernel.org>; Sun,  5 Jul 2026 19:13:16 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783278744; cv=pass; b=Va/2zOBPx6rB74o5gmqdNGKHhDHIJ17h23OZxpbFo/DaaPXjV0CdMeIoC4TIzOTcsSrIl4elqy9jDsNc8JGNS10pQbO9rg5yKnyJQUjw25kdRv9DBwr93oCXMt2/LBq6UzLkM3O5jKHKDaDVG75ebI7BtaSkXQ/qKbUE+LbisA4=
+	t=1783278798; cv=pass; b=llgV49Mg00naONQpxYy2WHcKcXKSD/FdgKlxvNgH6xABWpVWHz5ehNpRKbXIme15fBvj5hZh2O5DbBhqK/U9Na+X00y64D0IB9mdSnMS/rQMhrt5dx2Zn58Z4EKYoXgkIltQGtgma3zn7LyXApfuKfKZOTbZgnL41yEoOBNwTGw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783278744; c=relaxed/simple;
-	bh=kzBIwScZkxmJaAbRIZn89+TPiZbPYudZb4JFa930OGg=;
+	s=arc-20240116; t=1783278798; c=relaxed/simple;
+	bh=FSJgX2aJq38TJqvi01KAyCAWflKXEkyZJPxt103MZhg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sM6QsdKUoflmFRm4QB45kdSIdyVTwnGhSgrnntF6MtcQ7i4ssutQ94zABdYzk4J1xTp9SWfTrzieDPGAm4wc3u/e0d9IzHnzfygGMFL415RcbhQ6QJE+AR8YsHFGOvPMoYHjqTsQ+BheTmm4spQjyTanP8hdeGlBaEUHgQ+C3vw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lKNqQ7lj; arc=pass smtp.client-ip=209.85.210.169
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-845e363246aso2490303b3a.1
-        for <netdev@vger.kernel.org>; Sun, 05 Jul 2026 12:12:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783278742; cv=none;
+	 To:Cc:Content-Type; b=HulpRyXSL5XCz4WTKWBVzi62cfo2hNK9ERFNgGz+mioynwV7E8xwnPF2UqQIUjmdqB+SXKmKaEP/wtbtXz3+IAqtPVEv/xY89i9jC2wcpEGKJmfpJeKvNZiPNv9V/RZssNPeMg+b0o2S6FdWbv3yh5B6OZSFPm5uF75XEtA8O/0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VjmgcWQD; arc=pass smtp.client-ip=209.85.210.171
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-8479f1a86ecso1381683b3a.1
+        for <netdev@vger.kernel.org>; Sun, 05 Jul 2026 12:13:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783278796; cv=none;
         d=google.com; s=arc-20260327;
-        b=LZG6gqBTooFSKjb4McKF99jH8U3s826961nAxrYLvmavGI8z8Vw/aW9oraW3tEwLDj
-         gMfBtkYiy+RwlgwbP7jLFYyevCfjZ8oprwJ5xTBthYVXiFofrq8REcupECKzaP//R3AJ
-         PG+ha3hE7nyS3XTx6gMhsCJxeik7RvDHqbUVd15MHKrwtW5QP4zdXiLTIyCwQrcjIOkM
-         Y+t8U62s1TM89MjJ8frLRc1A0uqp1lpjBKkugAcpb+L7/88Sb1MdGjCt0uZbxAmHll3k
-         w7N1rgjk5lLNZDcqI1hWn8Z6n+44goBxxbPLknSbUMw1ThpRtHpHKqq/gdiezlhJzQfe
-         IXqA==
+        b=T5cKUCl+Pi+faDCqZIU70hDooDdXicWOOOu66fHLYtIzIgbpeouuF3m9byJbuLNstK
+         2Uu6LZfPqxqg6w2JOp/ErkRy5fg5NZrE4YRsqPCwUBFBB2z7LcL4GT0//AymxBw8hfXC
+         ylGRArAuT2/HRYg0XK/Q+erHfCun4p3KxLos3E4DTzA0hu4uTIleWnac9UTEQVGF+izq
+         VCx3ADjDFSRVCMUXRSIn7B4Z7f78X+/xVaSEdJT+Wo5msCl3bLZBVl7x8HlGkrgKMBZN
+         pK3M+ZeY5ySDw15Q3WdWoBQEerkzH5vHRSgGADpdg8NDR3hdtR7pWTQNITUu/WCA53IJ
+         1oAA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=HYplnZoZM9QLJ4q2m4G26mYUAV9oJQFImSbHJW3ZRgs=;
-        fh=/SPI++w1w2FS7HK8XcBq2m9xyMSFz0RgAclVYrC9rOM=;
-        b=I7FzfyOwnOgs+6ciYhLGozRgVmHqKO0x3j8A16tlm/pdBO/ka0dz68wYgJWHvjXKpp
-         zKv8ju8ne38V32setBDIxW3i9fIvldgGWpqKEgfAKHQycDvNGyzn+yx1otQ416gT6wlg
-         /cEhK9zZm6QxpZHTCAJGDBQImTkCfTReBrOUwuUEhwsGq2cMNPLbV0kbkq8wcg4yKhkA
-         1FgOl4uty1XW3j96VA9fV4lHjQO1RqeFSseNcHUgcKm6EOTvvcuBeOggx+kHCrYk3Vld
-         0hfA7ARYLThr6fj0oxNLnwmDfRDm7clbKMNlGZyLa9XHWx8HebmY3t8zt7ux5xnmJEFQ
-         S9CQ==;
+        bh=JQ9CpAFvWWrF141vt/3zJnBZKZaAv9ntmcauJ7Q288Y=;
+        fh=Nhevv084E/r3t24sBGxWWH4duP/zhNiqQhyJUK+dQwc=;
+        b=F0QCqU9wKLyr7qPAKNnTwz3/liqT71uyVQcfoEaDTwNOWExx4UHcHvGLFSThO11e69
+         D9IpGncPZ3PPFLWawtCHBxu45GX7PlrBq8cqOr6aFC3zpQORzBCh+K4KPSTNK0yxUMjj
+         KoUppp7O4po5SW0NAR+c+j+KKJ0jAkpgqWIDHYXirEuTKw/0eb+/IJIc67z47KNtktjC
+         UrS0bcT0bDsLUaXXcYiEJlY7ywlswlNViUeBKLp4/RpZ7h+DaRhlMhVU3AcuZ45J8odj
+         yBv2x5pHZUL3PfClfSOjsvMJWuOlkoWqTR3iSQFdbjDv0ZnEB7TobUzKC0Wzch+kpw7i
+         3URg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783278742; x=1783883542; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783278796; x=1783883596; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HYplnZoZM9QLJ4q2m4G26mYUAV9oJQFImSbHJW3ZRgs=;
-        b=lKNqQ7ljm0Q2s+uh5ZBmKjNi6BfodIrdl24723FeBhzQvFumO+GY0kVFGYH8mMU1ra
-         Y4rR0pmxeLK7qjOinA+wYWkM9Z9u5d+1eEfve5Vnvc3qLc5doWdrqLCeUJxhO/9uwHbB
-         puNO3wiY6Nf+IXn+0jYXlRoCaqL/zeNI8dv9mPelgESkhGkuH58N0mXDjRSIb8p2jaOB
-         XMusjDqZnGCHeMbkWdLjm8lVVQKFYW0lFTvvrOYoDrxIkXkEHd+kYpT+WoEuFEm8+9NZ
-         2xcjdGDNHa+RpUjrm2WYGdvahUBdCI8k6gNSBahham6UsAE7uHtEbS0ot4k9clpeK6X5
-         KQyg==
+        bh=JQ9CpAFvWWrF141vt/3zJnBZKZaAv9ntmcauJ7Q288Y=;
+        b=VjmgcWQDKJccj00sMqosFkl0FIniSEhMby3zQTA5tkVVbLdSZI0hoA8OsBs16d9x56
+         uvHo8z1xaTEp8sV02sUtq3XEOxp2XMCOcG/0Cn6nDk7hjtTBgqWHEyAXK7RuuA99Adst
+         Q6psl0zMHnjwVNKDoDDbtZ2nvY9Pf74u+9QkucXgKUEniormolplgd1u2px+oDz/g/L8
+         FCTiem0NhyhL2CZZrc0zsFZRykSvn+SNrRk0VWRq3+0RrWyfPQv4MgpbSg8qVpim3GGt
+         xLx9lCMgnfKQdduNKkJOrTZCEg7ckgvlDJdoEZhskN+BOCFMJAMMjM4fZbNuKl6QA2X3
+         C+BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783278742; x=1783883542;
+        d=1e100.net; s=20251104; t=1783278796; x=1783883596;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=HYplnZoZM9QLJ4q2m4G26mYUAV9oJQFImSbHJW3ZRgs=;
-        b=Me5gvy2WcdFcbC8AxCo0GsMGkqB8PAB1UkBAKPTWuLfecTqR3kwYMnXYwHJA7mNRQ5
-         HaJK+TKtZmqzuwr/37OmTpHPnYHWoEmHUan69b4Hn725KACS0HtOtV48eOctKUtpRf9H
-         Xn+iD+ANB1M1K1cbdPtfs3s6Seymv5V2VP4VwJsyu0jkJiumD4Jj7qN+vVS4nJzz3urZ
-         3Z0z0QyRIrG+F/e0bFf2OvmnsChvBZlXXLzWUTHV1c9DYTDKCcWjB47Ct08bo9ED6uwg
-         dJTJnuJNFzQ7s9q//dEUYclFLxUgCqjy1qOydCzBsGsCjS1DSCnZVw1eESVhB2RyYLUC
-         ixaw==
-X-Forwarded-Encrypted: i=1; AHgh+Ro4v6+XQ8P6u4pDSD7Xp5qUwL6LWQ8nV1KmMlQWptaiKG6eAeWP145hqNX84U1fiKVQrdIpxbs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz++rkhQ8cGI/9ukuKBPxG4hy4a+TAwc01ZWfmtxnR2I2phx33d
-	EE0Rqi5YA3UWFzuDy56KU4WKDPiM9ThPEcPQVXW+72bZ24ZkFX0zITXnvapjCzh2TAZRxOmqgbx
-	vRX2asrVGX/b6DKcYoZZ2R9D6FO96xaU=
-X-Gm-Gg: AfdE7ckqsMF+lLIMl2RdewINTArk5jm8AORuGRtk2Dn9lpwuMR6DnsbnF0DUNDzZ4FV
-	R3K2uL7oxBRDX75fH1uLL/s07qOKkK49wu4zPq9HyLwWTa+MbdfmKoPmdZBB+aGVRH/ORCh4VPF
-	XVLlEyVlkPVEfa4E6O0BIzynJSHGD2Fe2G35Q32ULaVXqLi58+lGORqZjBm3gQO3GGzoyhMBLjA
-	PuCjBV060+CRwWSI1IcibO3fisTq/xHps89N8pVwz7UhciavUj6SL2qV61zf0KUrWySESfdMw1g
-	CGgyNJABNcLrMYsj2gOgfiJTfw+rTQ0IV+JgUNYTrjMQfLp0kR++eZQTf5QowyFDo1bvR6rTSg=
-	=
-X-Received: by 2002:a05:6a00:4b4b:b0:847:77e7:6f6b with SMTP id
- d2e1a72fcca58-847f6f96baemr6642867b3a.59.1783278741837; Sun, 05 Jul 2026
- 12:12:21 -0700 (PDT)
+        bh=JQ9CpAFvWWrF141vt/3zJnBZKZaAv9ntmcauJ7Q288Y=;
+        b=AhwfR9h39LU08YUL5NYsKX7kCIFCr3/JpQNIQDPtz+CkkVMs9Yv/pU7hneh8hLUU72
+         lhqnMYVYia6//f3wFdE9+DIDEUlUUB974H8421SurFaDorBZt7Tr2CJoz1Qbl2SCjlgJ
+         b82W8fEBRckPSVfUDqe+5EJ0O0GBLeBaKt5ldv2ZrkKFW28rSmQ1SsCQ2qiAiWf5RJVj
+         tkrU/rF+AeKKuNSZ46UIcnKHP0MA8kouYzCStgyF6X2kf15HztRPAjqLETPFfbbXCzZX
+         fJ9kADNn+K9p7W1GCYM9cfP/Fsr6LvzGNyQNmI0P3OoKigl+VnsTYjHgcmRqvfVxChvh
+         07Tw==
+X-Forwarded-Encrypted: i=1; AHgh+RqjfLByX71mf6EkNAFKpM5mMOoO1ECRd4lKaoUEZ+0b6dFxxjvEsc6AOruFBm5U4QbS2skogOI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMVgj7EwzgqMzPOM3IC2kimD3FIZCE+5Jvs+bqmmWFVtfjkBGy
+	VndXyOvLzftd2aljHhQbDsGbawSd+kWxC1VJudPrhAJxVQDron1RA0ehGxF8e7ze3/WpYtRIbYP
+	J/Qm/l1XGkksQKB3RHnJpH4xppckzkshC/oYR
+X-Gm-Gg: AfdE7cllQcIgjt+1TmDpN4e5rsnjk7huNCiDos+GLLeYYiaYw/fUogTdoFVymM4IUn4
+	unHPNaBbAOOD2Arpb6XA1B2ploT2vpluIeusy85/FUavVAkYW8zRuWBs5oUYd4zbWHvB7oghN2s
+	/wOl0B8K8Q+lqC73Y7QCV7zoyXwTIPW/Tttenc1r20olacqEyz8t902fAz9/GW/VedPnEtN1RKA
+	tvaKF1Max7wtyuHtGhK9hiL6qJKv6vW/aNR1pM8ThmX0js/zV1D5zlw2Z5WEXzqRdMy//jf2q0L
+	8MDdyR6h6oSiI0K52nT1jeqvyIV8ky0areuTUcgbp+ff5ds2U516JBsHLU/40BXRjwFUFr37G6M
+	sH0scV/nc
+X-Received: by 2002:a05:6a00:440c:b0:846:d484:945a with SMTP id
+ d2e1a72fcca58-847f6f737c0mr6874374b3a.53.1783278796335; Sun, 05 Jul 2026
+ 12:13:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260704033545.2438373-2-bestswngs@gmail.com>
-In-Reply-To: <20260704033545.2438373-2-bestswngs@gmail.com>
+References: <20260705003013.1134430-1-xmei5@asu.edu>
+In-Reply-To: <20260705003013.1134430-1-xmei5@asu.edu>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Sun, 5 Jul 2026 15:12:10 -0400
-X-Gm-Features: AVVi8CfHA-j0EDc3OlrYh1r7n_r_L9jvhfkZenL3RS3ltcoq4Bgp2Uu1c7Bg_Sw
-Message-ID: <CADvbK_eJ+qePAuDF0u=rmQ2brixwmxhJRrUHi=jnbWoh169OfQ@mail.gmail.com>
-Subject: Re: [PATCH net] sctp: validate STALE_COOKIE cause length before
- reading staleness
-To: Weiming Shi <bestswngs@gmail.com>
-Cc: linux-sctp@vger.kernel.org, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
+Date: Sun, 5 Jul 2026 15:13:04 -0400
+X-Gm-Features: AVVi8Cfte7ya4M0inTOXBNlj7tfEYuc9tp7a8uuizOHEqaE06iX2_70pA9HTj90
+Message-ID: <CADvbK_cWUT2ygfBSW6qjgx9_y=bvksqG87Lp8edQcFT+3p9fOA@mail.gmail.com>
+Subject: Re: [PATCH net] sctp: validate the body of a STALE_COOKIE error
+ before reading it
+To: Xiang Mei <xmei5@asu.edu>
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, Xiang Mei <xmei5@asu.edu>, stable@vger.kernel.org
+	Simon Horman <horms@kernel.org>, linux-sctp@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bestswngs@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
@@ -120,23 +120,22 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304812-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:bestswngs@gmail.com,m:linux-sctp@vger.kernel.org,m:marcelo.leitner@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:xmei5@asu.edu,m:stable@vger.kernel.org,m:marceloleitner@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304813-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:xmei5@asu.edu,m:marcelo.leitner@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-sctp@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bestswngs@gmail.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,asu.edu];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -144,48 +143,72 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,asu.edu:email]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AA1FF70AE12
+X-Rspamd-Queue-Id: 582A070AE2C
 
-On Fri, Jul 3, 2026 at 11:35=E2=80=AFPM Weiming Shi <bestswngs@gmail.com> w=
-rote:
+On Sat, Jul 4, 2026 at 8:31=E2=80=AFPM Xiang Mei <xmei5@asu.edu> wrote:
 >
-> When an ERROR chunk with a STALE_COOKIE cause is received in the
-> COOKIE_ECHOED state, sctp_sf_do_5_2_6_stale() reads the 4-byte Measure
-> of Staleness that follows the cause header:
+> sctp_sf_do_5_2_6_stale() reads the 32-bit Measure of Staleness that
+> follows the error header:
 >
->         err   =3D (struct sctp_errhdr *)(chunk->skb->data);
 >         stale =3D ntohl(*(__be32 *)((u8 *)err + sizeof(*err)));
 >
-> err is the first cause in the chunk, not the STALE_COOKIE cause that
-> caused the dispatch, and nothing guarantees the staleness field is
-> present. sctp_walk_errors() only requires a cause to be as long as the
-> 4-byte header, so for a STALE_COOKIE cause of length 4 the read runs
-> past the cause, and for a minimal ERROR chunk past skb->tail. The value
-> is echoed to the peer in the Cookie Preservative of the reply INIT,
-> leaking uninitialized memory.
+> without checking that the STALE_COOKIE cause actually carries that
+> 4-byte body. sctp_walk_errors() in the caller only requires
+> err->length >=3D sizeof(struct sctp_errhdr), so a peer can send an 8-byte
+> ERROR chunk whose sole STALE_COOKIE cause has length =3D=3D 4 and no body=
+.
+> It passes sctp_chunk_length_valid() (>=3D 8) and the error walk, yet the
+> staleness read reaches past the validated cause.
 >
-> sctp_sf_cookie_echoed_err() already walks to the STALE_COOKIE cause, so
-> check its length there and pass it to sctp_sf_do_5_2_6_stale(), which
-> reads that cause instead of the first one. A STALE_COOKIE cause too
-> short to hold the staleness field is discarded.
+> When that is the only chunk in the packet the cause ends exactly at
+> skb_tail (sctp_inq_pop() discards only when chunk_end > skb_tail), so
+> the read stays in-bounds of the skb head slab object but past the packet
+> data. The value is folded into the COOKIE_PRESERVATIVE parameter of the
+> retransmitted INIT and reflected to the peer, leaking adjacent kernel
+> slab bytes.
 >
-> The read is reachable by any peer that can drive an association into
-> COOKIE_ECHOED, including an unprivileged process using a raw SCTP socket
-> in a user and network namespace.
+> Discard the chunk when the staleness field falls outside the validated
+> chunk data.
 >
 > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: Xiang Mei <xmei5@asu.edu>
+> Reported-by: Weiming Shi <bestswngs@gmail.com>
 > Assisted-by: Claude:claude-opus-4-8
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+> Signed-off-by: Xiang Mei <xmei5@asu.edu>
+> ---
+>  net/sctp/sm_statefuns.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/net/sctp/sm_statefuns.c b/net/sctp/sm_statefuns.c
+> index d23d935e128e..e4b4b63162cf 100644
+> --- a/net/sctp/sm_statefuns.c
+> +++ b/net/sctp/sm_statefuns.c
+> @@ -2592,6 +2592,9 @@ static enum sctp_disposition sctp_sf_do_5_2_6_stale=
+(
+>
+>         err =3D (struct sctp_errhdr *)(chunk->skb->data);
+>
+> +       if ((u8 *)err + sizeof(*err) + sizeof(__be32) > chunk->chunk_end)
+> +               return sctp_sf_pdiscard(net, ep, asoc, type, arg, command=
+s);
+> +
+>         /* When calculating the time extension, an implementation
+>          * SHOULD use the RTT information measured based on the
+>          * previous COOKIE ECHO / ERROR exchange, and should add no
+> --
+> 2.43.0
+>
 
-Acked-by: Xin Long <lucien.xin@gmail.com>
+I think this is a dup of
+https://lore.kernel.org/netdev/20260704033545.2438373-2-bestswngs@gmail.com=
+/.
+
+Thanks.
 
