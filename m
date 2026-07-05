@@ -1,146 +1,243 @@
-Return-Path: <netdev+bounces-304787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304788-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id C/3PGG1ySmo1DQEAu9opvQ
-	(envelope-from <netdev+bounces-304787-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 17:04:13 +0200
+	id 6Ho6OBJ+SmpqEAEAu9opvQ
+	(envelope-from <netdev+bounces-304788-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 17:53:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5232A70A689
-	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 17:04:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B99270A82C
+	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 17:53:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=u7Fb4+hm;
-	dmarc=pass (policy=none) header.from=lunn.ch;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304787-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-304787-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=IMGwhpQC;
+	dkim=pass header.d=redhat.com header.s=google header.b="DR/GCL+x";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304788-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304788-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5546330072BB
-	for <lists+netdev@lfdr.de>; Sun,  5 Jul 2026 15:04:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4A6FA3009153
+	for <lists+netdev@lfdr.de>; Sun,  5 Jul 2026 15:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E5153815CC;
-	Sun,  5 Jul 2026 15:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBFD6389111;
+	Sun,  5 Jul 2026 15:53:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 711CFB672;
-	Sun,  5 Jul 2026 15:04:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67C033890E0
+	for <netdev@vger.kernel.org>; Sun,  5 Jul 2026 15:53:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783263845; cv=none; b=uEuTgJm8mZUIXfhxr3YJY8+sMwIEqECabpD7NvCE5jksnVT9ZzTyUKlI7CyiLX5/96aDuK8SqdBqzLwdIxnpAFjA3FO0LFbaGk1lSkUtFsTD12dEWC3lazCn89Ymi1rxaWwIUPR8yjafyuLt1u9VHApVZKD5/59SCc+5DLanfbQ=
+	t=1783266831; cv=none; b=VZETRUKauyuqa8Lr0gWjLac8vtXF1nMyb7x3MWI/ZjGFWswd2agSah7NQxJTLc3J51Hn/hBqZqUQOxKlJ1BfGjEiL4LsmnY0V2X4SmMhYLewMg7LfYrBF+GXoChNHvaB9Y7bpu6l2BpiNnQI5T+dQRiqmJNB3K2EeHuMRuxPq4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783263845; c=relaxed/simple;
-	bh=wo4lqtA47GkxIAmoMhie9KkYyvnhazyJKrtTvigul0M=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sh0/Gu9Q/f0WMtOIm7rMg2DFAtdz5mFuV99VaT9+ILzau34agBSmNEIzvpMMrVhpgKuwm6/rHKA2IGvtYsKIvSYa0MdbDrVG/cMoGvWg5v/MkddQg6Jnny34ehEWvheI0Y4shUbeuoYlFVHk/MZZNHXtqNrxIMToXAYHuv7LA1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=u7Fb4+hm; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:To:From:Date:From:Sender:Reply-To:Subject:Date:
-	Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=MjFyE/GuY4zCXOCWmZjS9nf5WEwFKlMosakxlzzhgKA=; b=u7Fb4+hmzFx3UipHSwoWedWBaU
-	KSTZCMZWLVdMdrU31XEcUPWdZlHdz0ghtvmlN3vYOq03ljvEGr7J1v8LIogoINE9dgA7GCnG4mXCJ
-	WS9CcL5vZF6JVFEG5lvN5eyR1iIHx3Uu1oP70Kxkp4a5WTenUj/5s6GW+Oe8Akb6oPZw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wgONV-00AqQj-DU; Sun, 05 Jul 2026 17:03:29 +0200
-Date: Sun, 5 Jul 2026 17:03:29 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Miguel Ojeda <ojeda@kernel.org>, rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Danilo Krummrich <dakr@kernel.org>,
-	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	Tamir Duberstein <tamird@kernel.org>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
-	Drew Fustini <fustini@kernel.org>, Guo Ren <guoren@kernel.org>,
-	Fu Wei <wefu@redhat.com>,
-	Michal Wilczynski <m.wilczynski@samsung.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	driver-core@lists.linux.dev, linux-riscv@lists.infradead.org,
-	linux-pwm@vger.kernel.org, linux-pm@vger.kernel.org,
-	linux-block@vger.kernel.org, netdev@vger.kernel.org,
-	nova-gpu@lists.linux.dev, dri-devel@lists.freedesktop.org
-Subject: Re: [PATCH 0/7] rust: Use kernel style vertical imports in various
- drivers
-Message-ID: <66d3d69d-0974-49e1-ad93-9295407f4b78@lunn.ch>
-References: <20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev>
- <c89a1bc8-6cc1-4e16-ac95-add389e45a2b@lunn.ch>
- <akmnh0AKFfu9-OYn@gurudas.dev>
+	s=arc-20240116; t=1783266831; c=relaxed/simple;
+	bh=5osjXumUGZ4Ch7vHbMYiDu8fWQgkHqYQPGL4m3IyHOo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Gm5EXht1L0x+V3x5Oxe1M7HrfWYF5YhK8aWnqh2yshREXYHM4CwHg07fmzEj7NayiYTk8bwQ3P6jepaStTzmduPYe1lVQlUxToVnAwDb5hXp4bX/0ZLbqV0u3S/OwwnMBv5LirV2xuUqfe9WN5D5Yxd6MUrvW0VgpVos9sJtfcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IMGwhpQC; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=DR/GCL+x; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783266829;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Pj3JZzJSw3Gi4lnK7zsIQuSgeOctWdp7FV6jLpJ7PaE=;
+	b=IMGwhpQC30H931t9OEmze19TyNrpDLm8c/s3Qvyu8VIuNBQ9T2wPoSuj9RU40SqUazUCTp
+	2LAscdpNEijZFOaXNQP3HL28wwgPO/Z6nID3GNb/QmsOI7EaFV7it5Y0pFyhyNprZUCZf/
+	0kecw2H/WzUYZVAv3Ntv6FsC9Sa/9Is=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-526-qrBIt4EONruc0gAGXbqRyQ-1; Sun, 05 Jul 2026 11:53:48 -0400
+X-MC-Unique: qrBIt4EONruc0gAGXbqRyQ-1
+X-Mimecast-MFC-AGG-ID: qrBIt4EONruc0gAGXbqRyQ_1783266827
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2c9b71388fbso51173565ad.1
+        for <netdev@vger.kernel.org>; Sun, 05 Jul 2026 08:53:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1783266827; x=1783871627; darn=vger.kernel.org;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Pj3JZzJSw3Gi4lnK7zsIQuSgeOctWdp7FV6jLpJ7PaE=;
+        b=DR/GCL+xSPzPUXlzyNf7fpHsNpEJaxSTGR7ijzQhh+woS3V4McNqCf/i7/4TFit5hA
+         Gmeo8DwWKYVkbyy1/kE96jRAHjJQI5JfhVrSMf+zr1v3JgDijALhtUbMAoSjUw1agzZv
+         +1WEhPgKyi5vWrJJkvvFnrhSw+hLArOi3COy1qc6xOea2xUkKfr+pSzKSDTFbaJC1Xz1
+         l7MO14iGcK0mx019uHiHsQrafVsXBip7sSjhOpSkegQHgYwtihW42Qp1WseWGToaZ0fk
+         AgNiKB+iG7PaKJqXIpw9as38FdyczEseltK/AdqlZSUgcrIPf3v4k2sUvPgDNwL0SNQi
+         PNsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783266827; x=1783871627;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Pj3JZzJSw3Gi4lnK7zsIQuSgeOctWdp7FV6jLpJ7PaE=;
+        b=Bv1oS3j3/ZStQzDtIxGTjT9wQ9HOytx4/XDqt4gwjPurisGdzD8V7RuxfDFGXhxOWq
+         VLaToyiQJURjOVxizQ5dNy01VcS6HjmdD0+G1rfOmP09mwkTCg0WjUKIRSGj2Dk5kk6u
+         6NyS+/YLHgcavQ+7FAQrqGorTNFTlTYnGwm0jkdPX0BMJ4WV+POO99xWHIcctmOLMEsa
+         jUoIXgILhra5VQi5wXti6ZfIPPEtolvs/3iN+WTtt6HyaKvM/T363wFW4WYAbcXFFBKj
+         fK1thPTvWUN7aWvKxlZO2xrdd3FgANYcH2J/SV6XNajHpuszcRF7d5WPe91ZdB8Up6Nt
+         2GRg==
+X-Forwarded-Encrypted: i=1; AHgh+Rq+v5NzPU9d4e9bQ3NnVFKJS5XiISgPgF6kFb8PXwYlP/xmvTr4Pa4wae/mXevPVO0iPDvXWEM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyssY32cS8GYSLOzHarE9SQt5U8Jp0HBjII+2ldDVJIiep7gTpQ
+	914RqJUS9IY4SBG1s3vK44wHE16zuAVCIoU+dV3TLlFz+HSjcMEYTP36UpOuvQHawmbsz0pRUZs
+	ycrEYd+FzoUbbveDoDu2n6qTqP8OERXAWrxTho3ewB9ftVoWued6+Gq10CQ==
+X-Gm-Gg: AfdE7cnvy/6lbGrc4hT4nKWtkJzjI7gYNj0DBE77P/iiQOvjIQeGhSxMoBdxFTvA7ux
+	78XQzdLalvo3idaKtFJTeevPYa92TNOZcasAeuUuPr79V32airr0eNbO9s9AlGmPdEzvQpprhKJ
+	3RJnhTYk+nIKWjpfBzW5xoRxt9DQrfzcARtWRQmf4hEZmg/67X62XBmvZDdCSwoCKswHVy/FwN3
+	EIhsW+etf46rHABMzeNq8AkUgiWYnkvcdyYavYlovwIpibu6sUYtkeBeZrkofORtEohxG3abcfn
+	uly8FfHOebOYBgCkTBHemYnH3gbGm2oJVVYbOIZDslJEyM0Encedno/ulX4SoT6Un3TXbamSmo7
+	VKA++MtBO
+X-Received: by 2002:a17:903:19e7:b0:2ca:73aa:b48f with SMTP id d9443c01a7336-2cbb9ec43cemr65027805ad.35.1783266826963;
+        Sun, 05 Jul 2026 08:53:46 -0700 (PDT)
+X-Received: by 2002:a17:903:19e7:b0:2ca:73aa:b48f with SMTP id d9443c01a7336-2cbb9ec43cemr65027605ad.35.1783266826464;
+        Sun, 05 Jul 2026 08:53:46 -0700 (PDT)
+Received: from localhost ([240d:1a:c0d:9f00:be24:11ff:fe35:71b3])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cad6f25e15sm34473835ad.13.2026.07.05.08.53.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 Jul 2026 08:53:45 -0700 (PDT)
+From: Shigeru Yoshida <syoshida@redhat.com>
+To: Jamie Bainbridge <jamie.bainbridge@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Matvey
+ Kovalev <matvey.kovalev@ispras.ru>,  Pavel Zhigulin
+ <Pavel.Zhigulin@kaspersky.com>,  netdev@vger.kernel.org,
+  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] qede: fix off-by-one in BD ring consumption on
+ build_skb failure
+In-Reply-To: <CAAvyFNjLcVRQBuMsd31neQpo6BY4HBP-hNMHh=RtFeiWBo96ZA@mail.gmail.com>
+	(Jamie Bainbridge's message of "Fri, 3 Jul 2026 09:55:40 +1000")
+References: <20260630164623.3152625-1-syoshida@redhat.com>
+	<CAAvyFNhY2Jp5aH6YPrtfc0mBpwuSeT-8u8bODqq=pootpQffmw@mail.gmail.com>
+	<CAAvyFNjLcVRQBuMsd31neQpo6BY4HBP-hNMHh=RtFeiWBo96ZA@mail.gmail.com>
+User-Agent: mu4e 1.12.12; emacs 30.2
+Date: Mon, 06 Jul 2026 00:53:44 +0900
+Message-ID: <875x2te8l3.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <akmnh0AKFfu9-OYn@gurudas.dev>
+Content-Type: text/plain
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:ojeda@kernel.org,m:rust-for-linux@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:dakr@kernel.org,m:abdiel.janulgue@gmail.com,m:daniel.almeida@collabora.com,m:robin.murphy@arm.com,m:a.hindborg@kernel.org,m:boqun@kernel.org,m:gary@garyguo.net,m:bjorn3_gh@protonmail.com,m:lossin@kernel.org,m:aliceryhl@google.com,m:tmgross@umich.edu,m:tamird@kernel.org,m:acourbot@nvidia.com,m:work@onurozkan.dev,m:fustini@kernel.org,m:guoren@kernel.org,m:wefu@redhat.com,m:m.wilczynski@samsung.com,m:ukleinek@kernel.org,m:rafael@kernel.org,m:viresh.kumar@linaro.org,m:axboe@kernel.dk,m:fujita.tomonori@gmail.com,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:airlied@gmail.com,m:simona@ffwll.ch,m:driver-core@lists.linux.dev,m:linux-riscv@lists.infradead.org,m:linux-pwm@vger.kernel.org,m:linux-pm@vger.kernel.org,m:linux-block@vger.kernel.org,m:netdev@vger.kernel.org,m:nova-gpu@lists.linux.dev,m:dri-d
- evel@lists.freedesktop.org,m:abdieljanulgue@gmail.com,m:fujitatomonori@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-304787-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,vger.kernel.org,gmail.com,collabora.com,arm.com,garyguo.net,protonmail.com,google.com,umich.edu,nvidia.com,onurozkan.dev,redhat.com,samsung.com,linaro.org,kernel.dk,armlinux.org.uk,davemloft.net,ffwll.ch,lists.linux.dev,lists.infradead.org,lists.freedesktop.org];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[42];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-304788-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER(0.00)[syoshida@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:jamie.bainbridge@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:matvey.kovalev@ispras.ru,m:Pavel.Zhigulin@kaspersky.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jamiebainbridge@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:from_mime,lunn.ch:dkim,lunn.ch:mid,vger.kernel.org:from_smtp]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syoshida@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5232A70A689
+X-Rspamd-Queue-Id: 0B99270A82C
 
-> Is that reasoning off-base, or is the right path to split these out per subsystem
-> regardless?
+Jamie Bainbridge <jamie.bainbridge@gmail.com> writes:
 
-Adding to what others have said, some subsystems have there own CI
-system which tests every patch. Does it build? Does it add new
-warning, is sparse happy, are there more self test failures. What do
-different AIs think of the patch etc. Cross subsystem patches don't
-always hit the per subsystem CI tests.
+> On Fri, 3 Jul 2026 at 09:52, Jamie Bainbridge
+> <jamie.bainbridge@gmail.com> wrote:
+>>
+>> On Wed, 1 Jul 2026 at 02:47, Shigeru Yoshida <syoshida@redhat.com> wrote:
+>> >
+>> > qede_rx_build_skb() and qede_tpa_rx_build_skb() do not check for a
+>> > NULL return from qede_build_skb(). When it returns NULL under memory
+>> > pressure, the functions still consume a BD from the ring before
+>> > returning NULL. The callers then recycle additional BDs, resulting in
+>> > one extra BD being consumed (off-by-one). This desynchronizes the BD
+>> > ring, which can corrupt DMA page reference counts and lead to SLUB
+>> > freelist corruption.
+>>
+>> Good catch.
+>>
+>> Reviewed-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
+>
+> Sorry for the double mail.
+>
+> I believe the Fixes: should be against the problematic original code:
+>
+> Fixes: 8a8633978b842 ("qede: Add build_skb() support.")
+>
+> because that is what you are fixing.
 
-So in general, it is better to submit per subsystem.
+Thank you for your review.
 
-       Andrew
+The problematic code was introduced in commit 8a8633978b84 ("qede: Add
+build_skb() support."), so putting this in the Fixes tag would be
+correct.
+
+I'll send the v2 patch with the modified Fixes tag.
+
+Thank you,
+Shigeru
+
+> Jamie
+>
+>> > Commit 4e910dbe3650 ("qede: confirm skb is allocated before using")
+>> > added a NULL check inside qede_build_skb() to prevent a NULL pointer
+>> > dereference, but did not address the missing NULL checks in the
+>> > callers, making this off-by-one reachable.
+>> >
+>> > Fix this by adding NULL checks for the return value of
+>> > qede_build_skb() in both qede_rx_build_skb() and
+>> > qede_tpa_rx_build_skb(), returning NULL immediately before any BD ring
+>> > manipulation.
+>> >
+>> > Fixes: 4e910dbe3650 ("qede: confirm skb is allocated before using")
+>> > Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+>> > ---
+>> >  drivers/net/ethernet/qlogic/qede/qede_fp.c | 5 +++++
+>> >  1 file changed, 5 insertions(+)
+>> >
+>> > diff --git a/drivers/net/ethernet/qlogic/qede/qede_fp.c b/drivers/net/ethernet/qlogic/qede/qede_fp.c
+>> > index 33e18bb69774..c11e0d8f98aa 100644
+>> > --- a/drivers/net/ethernet/qlogic/qede/qede_fp.c
+>> > +++ b/drivers/net/ethernet/qlogic/qede/qede_fp.c
+>> > @@ -765,6 +765,9 @@ qede_tpa_rx_build_skb(struct qede_dev *edev,
+>> >         struct sk_buff *skb;
+>> >
+>> >         skb = qede_build_skb(rxq, bd, len, pad);
+>> > +       if (unlikely(!skb))
+>> > +               return NULL;
+>> > +
+>> >         bd->page_offset += rxq->rx_buf_seg_size;
+>> >
+>> >         if (bd->page_offset == PAGE_SIZE) {
+>> > @@ -812,6 +815,8 @@ qede_rx_build_skb(struct qede_dev *edev,
+>> >         }
+>> >
+>> >         skb = qede_build_skb(rxq, bd, len, pad);
+>> > +       if (unlikely(!skb))
+>> > +               return NULL;
+>> >
+>> >         if (unlikely(qede_realloc_rx_buffer(rxq, bd))) {
+>> >                 /* Incr page ref count to reuse on allocation failure so
+>> > --
+>> > 2.54.0
+>> >
+
 
