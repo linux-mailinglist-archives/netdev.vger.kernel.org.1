@@ -1,164 +1,184 @@
-Return-Path: <netdev+bounces-304822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304823-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id TqUhGO7hSmpkJAEAu9opvQ
-	(envelope-from <netdev+bounces-304822-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 00:59:58 +0200
+	id xVbDFobqSmrCJgEAu9opvQ
+	(envelope-from <netdev+bounces-304823-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 01:36:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 072A870BB11
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 00:59:58 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99C7470BBB1
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 01:36:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=eYXpedqj;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304822-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304822-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=asu.edu header.s=google header.b="IbOtp/yG";
+	dmarc=pass (policy=none) header.from=asu.edu;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304823-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304823-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1F2043008201
-	for <lists+netdev@lfdr.de>; Sun,  5 Jul 2026 22:59:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5A82B3008767
+	for <lists+netdev@lfdr.de>; Sun,  5 Jul 2026 23:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55DF371D15;
-	Sun,  5 Jul 2026 22:59:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF2B036403A;
+	Sun,  5 Jul 2026 23:36:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DAB1346AF1;
-	Sun,  5 Jul 2026 22:59:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F13C2E2DDD
+	for <netdev@vger.kernel.org>; Sun,  5 Jul 2026 23:36:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783292390; cv=none; b=rMLPiDDTn98TuyKtkwl3oVEnRJu9b23fLzvk4kFaYpa5Hk1ewUWeojDWLRxb3ChUmUcFpzv7o6qz0Y6zleW6i/SmM9yOqanzLTykLTZ+HTruPuMmWghJvZxB5WgduhqmIWffPp64totkg8wkARlEj5+9VL0mV/ZNPnIJBVWRbHc=
+	t=1783294595; cv=none; b=ECIHrCo0gz6ajMMFzcGtf2tkng1O1pHcdR9lyuxKJGA3sfEciuEozvMRI2iVTyoRjwgbl0TzDD8AK5VnDt9QwbP7sQJhKRgPko4tJuCO2AxpEiVeL7JMadyrNDNDoNgikEyLdrRS5xT+DLH49ODQVWGxQaqq8WKTwFHkUFFwwkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783292390; c=relaxed/simple;
-	bh=JPym60sbHBQASzrFWRvRJOym/0pZRagJ/0UPMEFJQBM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dpzqOaFOcoGk1VtiHBYkZ3of6J75dAAJUX7ltvzN0zq+PNrHsI3VeYJBolUABBRHnRP6EZN8Ij92wssPtFceRNM881FTcIHD0G8xmvhqi/kMmuuSp0LWfGUUx4j+U6Y/YXQGiosPCLl8+WEmHpFyxLmwY93OIYvV9yrxW0EosRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eYXpedqj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6515BC2BCFC;
-	Sun,  5 Jul 2026 22:59:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1783292390;
-	bh=JPym60sbHBQASzrFWRvRJOym/0pZRagJ/0UPMEFJQBM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=eYXpedqjUK2ZqjRJnaRa41gu3y0UPHpSW/tFAw8IvaZTQ2fznhqIGVrl/DT4z59b3
-	 7OQ2UUBWZmqf4w/fFhdZMwhlTjKTYYt+EnbTqYvJX6L4wkIcklgGenHCkscegZUVg6
-	 xQchvD83E7pzckXt1VyXpOIF95dDV3O0IcRAwwSsOXQNARf0wBI9OfBIRoDKIuUhJA
-	 dX7zeSCLxDtaFYniSIsb3fO1YZXdHOOw8ziOl3zl3c3ikFqIdSeGjrUFF7kNHzct5F
-	 hwx5JAURwveV/g/StWN1qBSr6E9JTjUrrakkZBkwwLae+59IOgmtm2LVsrdL2Gilds
-	 RpzS1Ck2kQyqg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53967C44501;
-	Sun,  5 Jul 2026 22:59:50 +0000 (UTC)
-From: Selvamani Rajagopal via B4 Relay <devnull+Selvamani.Rajagopal.onsemi.com@kernel.org>
-Date: Sun, 05 Jul 2026 15:59:51 -0700
-Subject: [PATCH net v3 3/3] net: ethernet: oa_tc6: Carrier off when
- disable_traffic is set
+	s=arc-20240116; t=1783294595; c=relaxed/simple;
+	bh=oowJ0/pwMLpK+2FBTaTr7SQOcKOb4MiuA70vmsgUgiw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SwmdbQm2upqm5bBSQoSGBi03xmYW9W0KTIoLUqMSD1sm0DKIV0S6iOhvkKI4RcD2wGKxqXEswxJcZDHhryRB9M1JPUMQ0LHQnzyKiu/g4a/ywOieRAZg5VSrT0TtbYw7YzLgDlxP3vfLPe/qSpa9l1N5i3KM2rYwLg0Gjzq1u5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=IbOtp/yG; arc=none smtp.client-ip=209.85.214.172
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2caea3f742bso30250015ad.0
+        for <netdev@vger.kernel.org>; Sun, 05 Jul 2026 16:36:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1783294594; x=1783899394; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wagndnGVb7E87oGYXUV2CXr6Jt9C4YXqmzSMkRBdYcU=;
+        b=IbOtp/yGL43TB71pl2LIxr7TJYxD6/IH7fr3+xoM2BcumWs2EunymlOXLZnhID5EXh
+         LLoNpf1jaEnsawRfXTJJ+zNX8qqi6X2x32yhIjXJEpzSViPGdoG6SjRCkPT+qvKpGk+m
+         7wcnT06sU67vKv5kptQW0woFGw9WrtQeu7YoupEJQBoViPPcJ9SRG/IrO4rs/TSYFV1A
+         mwBCtYgyN00MJU5uQh1ysEoaQhqBj/t8BHlR1GQ1PjuU+bLKRgl2hfJMquDoKkxBVCen
+         lrPT6AA4RJ59rmrO+tj2epvaPgN+xfLvUEhL5vBShLTUqA6qBTmC5Np7aDkZx5g7nODg
+         nzDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783294594; x=1783899394;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wagndnGVb7E87oGYXUV2CXr6Jt9C4YXqmzSMkRBdYcU=;
+        b=Ero/SG9mVLaJ/2OPcAfqeekvafEUOgIpZVQSrrhnN80rGYzrOENXmKoVHhS2bX+OXT
+         h1QHHeV4leeRwDsGwiNqiI5K0yEN9Akgzy5tGQ0dn6OzcangIUF6YCY8DukM6DyEEuiB
+         WlpV2KzfRW+OcaHtKy1AKxF7f78mEP3HQRYIUhxaUcqF+iVYDGfglYWLKC2bowa1ph4A
+         yBdq0rUyFr9JHAef+nli6GIcwlNZJ6RWkFD7w8SA9yLynQLXvLR5EvD6+FmdfSVEFvSy
+         dc0ycUpE0w0LhV628F/DNOvJdelAI016PWH4RwgFOxBRZUAAu/MsSyzEW0hT+8V7+3Ez
+         Htjg==
+X-Forwarded-Encrypted: i=1; AHgh+RpuHuEkj1lYLfE6dgnf+UYwpd5uQPsKedUjWoyWUHpTSh4H42FJuyi+YZ1aeO/2+xTGFYcX0C8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAXvzplE3vUjeMnjijqfpaiQj0ygm693pRBXnKc8WkziSOfjiV
+	6kGf3VrBWpdSlCyjKgxSIsPHMHlVKqrlVtLLoL7SjgAAAWyewHT4Snw7vkCKt0e8NYG9u4DqWDI
+	fZZ0rDQg1
+X-Gm-Gg: AfdE7cnxHEDsbwHGEPyPwKSnPbJH8+Yf5JHokLA64sMjUPnFgPYSvZkXAgkt4XCs20d
+	VqohZ+rLcwWZlBMTRrNy2GE5zDaFbP+QMwc45hnwUqT3VgGGULYaHIUbjuo5abykkUBI5+EaXx2
+	N4PJs0YP5zXcKX5SOsxZkQ9gvjD5QaNbwHpc4FI6SwOmmD28BHmr6ue9oGUUIL0b6g14R0ldLLv
+	GeI98S19irsITB6HEKKS2G0Aej1Bp9W1QMtzKKNvzF67TsZLK3bM3JDb6zxBd1vB/hdIRPwUYvN
+	KfBDgsu4ee21wCy56r35KGjwXkpXL3b0OizPtwqf9l3+fK5PiOwOAXn6UlgABtbKSR+m1d7f3j5
+	TkIqu+ijbXRzT0YhHJKkpXL5+CLMLwGhJXJIZQInK3M8OlD/2J+Tc0cunyX8F5rXn61lH7E3r2w
+	==
+X-Received: by 2002:a17:902:db05:b0:2c9:a247:171 with SMTP id d9443c01a7336-2cb97e47b64mr75072215ad.1.1783294593851;
+        Sun, 05 Jul 2026 16:36:33 -0700 (PDT)
+Received: from p1.. ([2607:fb91:1529:e46a:7f70:6a22:47e0:673d])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cad7870f58sm38938695ad.59.2026.07.05.16.36.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 Jul 2026 16:36:33 -0700 (PDT)
+From: Xiang Mei <xmei5@asu.edu>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Xiang Mei <xmei5@asu.edu>,
+	Weiming Shi <bestswngs@gmail.com>
+Subject: [PATCH nf] netfilter: nf_conntrack_reasm: guard mac_header adjustment after IPv6 defrag
+Date: Sun,  5 Jul 2026 16:36:29 -0700
+Message-ID: <20260705233629.2287813-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260705-fix-race-condition-and-crash-v3-3-3e51841e4d08@onsemi.com>
-References: <20260705-fix-race-condition-and-crash-v3-0-3e51841e4d08@onsemi.com>
-In-Reply-To: <20260705-fix-race-condition-and-crash-v3-0-3e51841e4d08@onsemi.com>
-To: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- Piergiorgio Beruto <pier.beruto@onsemi.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Andrew Lunn <andrew@lunn.ch>, 
- Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>, 
- Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1783292390; l=1223;
- i=Selvamani.Rajagopal@onsemi.com; s=20260531; h=from:subject:message-id;
- bh=fNI1NVyKoYyZnDQNpci4/tI7Q3qwlBNxuPkcCrOJOJM=;
- b=/5hBii1gvF3WT6RANyqjnO7pr3NqB5dvqbpkjNbaaNlUEnJn76BILkd8kC3Y3ZSRk85V8Tm3D
- 9F2DYTaCkvXB3EonDB2pYnEQkIMMPr027qcezlO7koit1D4sImWGOku
-X-Developer-Key: i=Selvamani.Rajagopal@onsemi.com; a=ed25519;
- pk=5QRdM0HS/LGWWcUZZ9hVfZ+qbPQGZCumcTXOiN7Fyug=
-X-Endpoint-Received: by B4 Relay for
- Selvamani.Rajagopal@onsemi.com/20260531 with auth_id=803
-X-Original-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-Reply-To: Selvamani.Rajagopal@onsemi.com
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
+	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304822-lists,netdev=lfdr.de,Selvamani.Rajagopal.onsemi.com];
-	FORGED_RECIPIENTS(0.00)[m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:pier.beruto@onsemi.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:Parthiban.Veerasooran@microchip.com,m:Selvamani.Rajagopal@onsemi.com,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304823-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,netfilter.org,asu.edu,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	HAS_REPLYTO(0.00)[Selvamani.Rajagopal@onsemi.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:xmei5@asu.edu,m:bestswngs@gmail.com,s:lists@lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,onsemi.com:replyto,onsemi.com:mid,onsemi.com:email]
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[asu.edu:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,asu.edu:from_mime,asu.edu:email,asu.edu:mid,asu.edu:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 072A870BB11
+X-Rspamd-Queue-Id: 99C7470BBB1
 
-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+nf_ct_frag6_reasm() slides the packet head forward to drop the IPv6
+fragment header and then unconditionally advances skb->mac_header:
 
-Previously, TX queue interface was stopped when
-disable_traffic flag was set. It is more appropriate to
-disable the queue as there is no recovery, once
-disable_traffic is set. Carrier is also marked off
+	skb->mac_header += sizeof(struct frag_hdr);
 
-Fixes: b542d13fab0f ("net: ethernet: oa_tc6: Interrupt is active low, level triggered.")
-Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+On the NF_INET_LOCAL_OUT defrag path the skb has no link-layer header
+yet, so skb->mac_header is still the "not set" sentinel (u16)~0U. Adding
+sizeof(struct frag_hdr) wraps it to a small value (0xffff + 8 == 7),
+after which skb_mac_header_was_set() wrongly reports a MAC header is
+present and skb_mac_header() points into the headroom.
 
-changes in v3
-  - New patch. Carrier marked off once disable_traffic is set
+The reassembler has done this unconditional add since it was introduced;
+it was harmless while mac_header was a bare pointer, but wrong once
+mac_header became a u16 offset whose unset state is the ~0U sentinel
+tested by skb_mac_header_was_set(). The sibling net/ipv6/reassembly.c
+does the same relocation and does guard the adjustment; mirror the
+guard here.
+
+Fixes: 9fb9cbb1082d ("[NETFILTER]: Add nf_conntrack subsystem.")
+Reported-by: Weiming Shi <bestswngs@gmail.com>
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
 ---
- drivers/net/ethernet/oa_tc6.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ net/ipv6/netfilter/nf_conntrack_reasm.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
-index a6b8762f6052..1f8564779025 100644
---- a/drivers/net/ethernet/oa_tc6.c
-+++ b/drivers/net/ethernet/oa_tc6.c
-@@ -730,6 +730,12 @@ static void oa_tc6_disable_traffic(struct oa_tc6 *tc6)
- 	skb = oa_tc6_detach_waiting_tx_skb(tc6);
- 	spin_unlock_bh(&tc6->tx_skb_lock);
+diff --git a/net/ipv6/netfilter/nf_conntrack_reasm.c b/net/ipv6/netfilter/nf_conntrack_reasm.c
+index 64ab23ff559b..3637b20d3fa4 100644
+--- a/net/ipv6/netfilter/nf_conntrack_reasm.c
++++ b/net/ipv6/netfilter/nf_conntrack_reasm.c
+@@ -348,7 +348,8 @@ static int nf_ct_frag6_reasm(struct frag_queue *fq, struct sk_buff *skb,
+ 	skb_network_header(skb)[fq->nhoffset] = skb_transport_header(skb)[0];
+ 	memmove(skb->head + sizeof(struct frag_hdr), skb->head,
+ 		(skb->data - skb->head) - sizeof(struct frag_hdr));
+-	skb->mac_header += sizeof(struct frag_hdr);
++	if (skb_mac_header_was_set(skb))
++		skb->mac_header += sizeof(struct frag_hdr);
+ 	skb->network_header += sizeof(struct frag_hdr);
  
-+	/* disable_traffic, when set, is a point of no
-+	 * return to working state. Better to mark
-+	 * the carrier off.
-+	 */
-+	netif_carrier_off(tc6->netdev);
-+	netif_tx_disable(tc6->netdev);
- 	oa_tc6_drop_tx_skb(tc6, skb);
- 	oa_tc6_free_ongoing_skbs(tc6);
- 	oa_tc6_write_register(tc6, OA_TC6_REG_INT_MASK0, regval);
-
+ 	skb_reset_transport_header(skb);
 -- 
 2.43.0
-
 
 
