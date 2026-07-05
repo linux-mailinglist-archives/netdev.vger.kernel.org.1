@@ -1,95 +1,93 @@
-Return-Path: <netdev+bounces-304767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304768-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FZPiJ9FBSmrLAAEAu9opvQ
-	(envelope-from <netdev+bounces-304767-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 13:36:49 +0200
+	id TkzMHGFGSmr4AgEAu9opvQ
+	(envelope-from <netdev+bounces-304768-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 13:56:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1815709D4C
-	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 13:36:48 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5848709E11
+	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 13:56:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=ct0Y3cFT;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304767-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-304767-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=fail ("headers rsa verify failed") header.d=0sec.ai header.s=google header.b=IysM5M3d;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304768-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-304768-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E882F3003BC9
-	for <lists+netdev@lfdr.de>; Sun,  5 Jul 2026 11:36:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DD0443005152
+	for <lists+netdev@lfdr.de>; Sun,  5 Jul 2026 11:56:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A38ED3783BE;
-	Sun,  5 Jul 2026 11:36:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6DD637D11C;
+	Sun,  5 Jul 2026 11:56:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8270C433E74
-	for <netdev@vger.kernel.org>; Sun,  5 Jul 2026 11:36:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DECD3377023
+	for <netdev@vger.kernel.org>; Sun,  5 Jul 2026 11:56:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783251402; cv=none; b=CovA1nRzw/fj3/CQUxjWg65NLlAt/DtlTSS5kU8EB/W4fKR8Ho7vopzsAulsy4ipBeq6uEywbt7ssOOQ2Uv8dnR0QHX0DwgKqw171P3W9ZW0yO03xVfPSDbDl4h9cWPxZmzIHyxO3QUIKCT6WQeUZ//qIhFKkSQOkBTOvPbz7bo=
+	t=1783252573; cv=none; b=KIY6mtCF6SKw898cffZ3qFTEC96aP3CSmYy7diUkyh1zF1KAEfQ3DddeM9CCWUjMXKf5cyN6AE0bWUyIph4P+D8TyD4/MOmxWhVePnoziFbYhw9fbA7e1Q3uc2aVd+ypne7g5/ez5aUAgLh9vMC4egNlIKUOmIbcSGv/FN3UlEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783251402; c=relaxed/simple;
-	bh=bue3ZQS+aizj088Dq7mN65FaV07jnc8viFfDXWJsK+M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ELjGh75DB2kRHXBgS2K8R0B3+346MK50x736Q11oM4zmRIUgEdnlWbL3truR0R40WWUjv5EqXOqsBWxwVNYGFX9UBx2l7XGLPQ1whC25KzzJy5vG8QdsFEwlwQbzFxl8MLE1oX+Mv8RzHyZaEaheRmCzb0zA2pZ8QzSJz1JlGsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ct0Y3cFT; arc=none smtp.client-ip=209.85.214.173
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2c7cfa17fedso20542575ad.3
-        for <netdev@vger.kernel.org>; Sun, 05 Jul 2026 04:36:39 -0700 (PDT)
+	s=arc-20240116; t=1783252573; c=relaxed/simple;
+	bh=dBpnb2fM61zTI/cG7NhoPrseEWXO8kRPd0pZvs4NtWU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=j8LpRttqv8c3y7O9sMohVidZDYdiy6hW0foaBmC72lKz+gpuy4UC4T2cBvnyiWMwjXRaaFQJV4c+NNuA+iyrj7KC3tTb89LsqBMGJtai7i6qlfRQM7uoUXLHCMwFxwGbkbk+UkFVUmxMGiPShZX+gnHXWPb1tUmCYpqDp9LN3Pc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=IysM5M3d; arc=none smtp.client-ip=209.85.128.46
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-493c2c0b9a8so18434075e9.1
+        for <netdev@vger.kernel.org>; Sun, 05 Jul 2026 04:56:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783251398; x=1783856198; darn=vger.kernel.org;
+        d=0sec.ai; s=google; t=1783252570; x=1783857370; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=s8VIdU9IBO7hgfq4VBSOw6X3+441BJc4uvQfo52qhLE=;
-        b=ct0Y3cFTcE1umFD6lW3qtil1AVDWfPiyFhnSUVy5DxVVKmU+sYqCWtWlgOq06ZXZ5C
-         YxqhNBaLXQFsrDAY0CiRoRIOUgJNKWEm7UD6puPN2Bdf+QV5IZRbFnCWlLy0j94TJaO0
-         YOug7xHMEiEqbPqeGjyNgcFH6Es+DLXkfgyH+gdWvRfKhZ0dA6uijXVoI2XSsji1kFxK
-         Pp9vpKQy1FwVKAA8QxRCfrPgn12QatGVZqYE2VBRClDk6T1ufrFYXGU5WacaxH0a+lkb
-         Q6dWxLwyHVsvxDy3W+w8T6kJ5zJzpnMAzWIqdN8O+Qrq1NgpyR2dWHGAviiKCJDrcc9r
-         Tj0A==
+        bh=y6MQ/Phyg5U0tAZtVc1qJn1y5CxtgrlUlppyaWvPwJg=;
+        b=IysM5M3dkEkyMBbtvzo/S2qj2GG0nUFRE/LErv+XYJYiS9y+Us3RVm6BkUI76T5phr
+         geg3ntAoa0FFJ3tYAL524n0lvn9oFmOmee3Oa2s2qgxrxLk6f9Lcmgl0sh4ucWpS0aFl
+         FJiQe6WP18rRRzdKem7wseX8n7hBQa0qgkTtD1BSzJrZSfVkezmJjrxHjb852ELHZSzT
+         sA8XwO3y9gzR9m9Up5ikUHCP03/jfVYsiQ0G/rGpxmhqKmOMtebz5kvCvr5TgX9Syor2
+         a2OXRH577BLsIKkmz2hzKwMwd37Yals/QTvo3nPyAKs2fzHfVOk/teFBY4taEdvffqWC
+         xmPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783251398; x=1783856198;
+        d=1e100.net; s=20251104; t=1783252570; x=1783857370;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=s8VIdU9IBO7hgfq4VBSOw6X3+441BJc4uvQfo52qhLE=;
-        b=RAautQlgZmCVvUEQdKAQFkQvEDv9wRgkW2LVSx+0bTjJ5ONrxmGuO+ErwYGcsvXDsl
-         H7OhB+y8qRDPanIDMS1J6L7Lj4sVHz/WlX4ET3E+spcbhY4bIxcHLkjh98K9sEduklRG
-         YpL+iJKcbzNtI5dD1mltvMDA41ruVziNFe4fp9E5KImDW5fjk7LYAN7VOz9wFgGL2ayu
-         r6oE9TzIL8P01jtsoiRDF0/MdhVIB/KQTbia3qZGOVddAGiafCop6QCrhnb/lIGbCrbw
-         76J1H2yZ/uisKVL0iJ933Bos7eJeW76a3EY7l4Ekc6mnXixcMi70Vu4pGk31Qp17i18Y
-         WMZA==
-X-Forwarded-Encrypted: i=1; AHgh+Rpz4gWaadjjbKQy/fIYMUEuau7SD2zcjCOBp8wz7Uv2Q6UtBBVlkYgrPLNnZNAbFBPLtvyusfA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjuKNmwXPtPOckdunJO3awqRyOIc2AzWC6Shd5rxdnf0Knu4Db
-	9C17J0wLebL2GTtZ/5k+ExgO4wZ8UDrP9H/0G1R+/dkTivSXaiNfDh25
-X-Gm-Gg: AfdE7cm90cQoGs78wuHaMbgDn7ONXhPGKkvrCga91SwP8MBAr4JJGmCnGIGW7310JwO
-	vvbYgOddufh9DOgnMCybiXBtOxqLibQs10s+twEeL+/WvdZUATZpnPAY1z/fSpD8QIKJwQ78eBV
-	4ECCwkUyZVxxO4oypAMB8tBPw5Gaqw4lRgMFguGaKILkhWOFUr7vwhLVxyWp4SiR+6XxHkbiWos
-	HDhdQqmLo/ZHxPFQVISVvu37JcRypyI7gHHiIvJxM5Km3xDAdyqn7EDnx1tdo+KHimUTQFw2HEw
-	YJRCwhaOZAW0C1ek1oU+UTShgkisPdQHHk05mp24MzhH29B8pBred6rpG5N/X/SLjoYZtsG1Ttw
-	4NmElPwtf+AVuvRLWNobVj5+aSdqghF0coobobJ4Ar1G01n6PI03iOi6G9HqV7p5zMzyPwL7Q5Q
-	S9UEOPMglrOayjQu0Rl2d17SIEopZXKhihiZN54w==
-X-Received: by 2002:a17:902:dacf:b0:2c9:97a8:afe5 with SMTP id d9443c01a7336-2cbb9edf365mr59496035ad.40.1783251398363;
-        Sun, 05 Jul 2026 04:36:38 -0700 (PDT)
-Received: from JRT-PC.. (bb116-15-8-251.singnet.com.sg. [116.15.8.251])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cad789e7ebsm32921335ad.81.2026.07.05.04.36.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Jul 2026 04:36:37 -0700 (PDT)
-From: James Raphael Tiovalen <jamestiotio@gmail.com>
-To: Sabrina Dubroca <sd@queasysnail.net>,
-	netdev@vger.kernel.org
-Cc: James Raphael Tiovalen <jamestiotio@gmail.com>,
+        bh=y6MQ/Phyg5U0tAZtVc1qJn1y5CxtgrlUlppyaWvPwJg=;
+        b=nlog2j3iKDHWEJjlTMnUsFaoxxeuo3OU4gLqnqqv0xPZL/8wM9wbt3nF5bZVOkIEHk
+         aHuyaycEuveXsYyWahL84D5UN+sajSRx5faGGYOHPTe73bHYYsTuokCPhhYuCPtGryg+
+         vrni6A3ICMP1cyuHtzorwEVM4yLMWTd3rp2NjdYK61RNKY+ddiofLg6sG+IuaXH6kGHr
+         7Jygs1wBfCDrkmkqqOwO0G2iNcPpuD5AldTKUIxyTbgRKa9eb+cuH82wKnULbkneg+5f
+         pexgifbotNuvMad1weCe0iPDA6DrRkPVt3dLWmQIB7Y5Qko5qFcKpoyzjYs8XHXiWwPe
+         TXPw==
+X-Forwarded-Encrypted: i=1; AFNElJ8e2FLAx/sj3ZKVG0PpvA+ev7YmtTEgbxL49KbXuHHOQ4W4OUIk1YB58eekRX5lyA+ZYenfINg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTQdWXkL2E1IPSJsuxxVsBfyGd/wvQp9x1GJG94YHlyp+p78sQ
+	BMZEDWemZQDUBOv5dEOan/9mEcnq8qMQ+srjsrIkvZJ6vOShJSbVZ27b/Jqfy2lOxIIA
+X-Gm-Gg: AfdE7ckwki+5bWPi14Wt29DaLsF5mqIgCQggcp+q6Fg0msCypWnNi3X+gjHLskVhqNh
+	EvDG9Wb01b/UAnHMddPgBtNNgo9nIhjebS2Pz3tvk60tYqKKFrGgwMf/NPEz2hbmRzFO3Wm9aFu
+	cEewomiaaiLUcykFIyxV/Y9invHKUuwElPNBR2cxRWuMMwUBncqcHt5Ak7W4/73Lk8RLqKxcXjt
+	qHseCss0BbjLjcEZ+wJgt7XbXNUc2NmAX5HeKQR2B1ESW0GdWlzSHmoasFFQpobnABTCAXqTAH2
+	JEz6Vx0sZDyeZaMAoBtj7tDknI0f+MFXGJAO9w6MdJGmu768ua83waFCGmGU06gvqH01//oe1+k
+	IPZh8XJXKdzMJljuiw6mfbbOv6caBp2hIi9uVvHbrwytpSCTdhkFQUdWREImvrGhURbtcOdSUdx
+	c9mYa0KuffTGEb6OmI/yn10ROVnEpbZ9lNKxsYJ2L+Ml2Im2DE4Hfd8hgmsXJCDilDCGPb2p4hS
+	s1FO1PTd2tDC+E2/63eoc5QrwIv57mgaio=
+X-Received: by 2002:a05:600c:6288:b0:493:bef8:ba8 with SMTP id 5b1f17b1804b1-493d1201f26mr70435525e9.39.1783252569812;
+        Sun, 05 Jul 2026 04:56:09 -0700 (PDT)
+Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.219.178])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493c636ec8asm238396105e9.1.2026.07.05.04.56.08
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sun, 05 Jul 2026 04:56:09 -0700 (PDT)
+From: Doruk Tan Ozturk <doruk@0sec.ai>
+To: David Heidelberg <david@ixit.cz>,
+	oe-linux-nfc@lists.linux.dev
+Cc: Simon Horman <horms@kernel.org>,
+	David Laight <david.laight.linux@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Antoine Tenart <atenart@kernel.org>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] macsec: fix promiscuity refcount leak in macsec_dev_open()
-Date: Sun,  5 Jul 2026 19:36:29 +0800
-Message-ID: <20260705113629.187490-1-jamestiotio@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	Doruk Tan Ozturk <doruk@0sec.ai>
+Subject: [PATCH net] nfc: llcp: bound the remaining LLCP TLV parsers to their buffers
+Date: Sun,  5 Jul 2026 13:56:07 +0200
+Message-ID: <20260705115607.60844-1-doruk@0sec.ai>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,94 +96,192 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [2.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
+	R_DKIM_REJECT(1.00)[0sec.ai:s=google];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304767-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:sd@queasysnail.net,m:netdev@vger.kernel.org,m:jamestiotio@gmail.com,m:stable@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:atenart@kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,0sec.ai];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[jamestiotio@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304768-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[0sec.ai];
+	FORGED_RECIPIENTS(0.00)[m:david@ixit.cz,m:oe-linux-nfc@lists.linux.dev,m:horms@kernel.org,m:david.laight.linux@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:doruk@0sec.ai,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[0sec.ai:-];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jamestiotio@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A1815709D4C
+X-Rspamd-Queue-Id: D5848709E11
 
-When a MACsec interface with IFF_PROMISC set is brought up on top of a
-device that has hardware offload enabled, macsec_dev_open() first calls
-dev_set_promiscuity(real_dev, 1) and then propagates the open to the
-offload device. If that propagation fails, the error path jumps to the
-clear_allmulti label, which only reverts allmulti and the unicast
-address. The promiscuity taken on the lower device is never dropped, so
-real_dev is left permanently stuck in promiscuous mode. Its promiscuity
-count can no longer be balanced from software.
+Commit 27256cdb290e ("nfc: llcp: bound SNL TLV parsing to the skb and
+add length checks") fixed the unbounded TLV walk in
+nfc_llcp_recv_snl(), but three sibling parsers that share the exact
+same pattern were left unbounded:
 
-Add a clear_promisc label that drops the promiscuity reference and
-route the two offload failure paths to it. The dev_set_promiscuity()
-failure itself still jumps to clear_allmulti, since on that failure the
-count was not incremented.
+  - nfc_llcp_parse_gb_tlv()
+  - nfc_llcp_parse_connection_tlv()
+  - nfc_llcp_connect_sn()
 
-Fixes: 3cf3227a21d1 ("net: macsec: hardware offloading infrastructure")
+Each walks a TLV list, reading a two-byte header (type, length)
+followed by length bytes of value, without checking that the two
+header bytes or the declared length stay within the buffer.
+nfc_llcp_connect_sn() then returns a pointer to a service name of up to
+255 bytes that may point past the end of the skb; it is subsequently
+consumed by memcmp() in nfc_llcp_sock_from_sn().
+
+nfc_llcp_parse_connection_tlv() is worse: it tracks the walk offset in
+a u8, so a single crafted TLV with length == 254 advances the offset by
+256, which wraps to 0. The loop condition "offset < tlv_array_len" then
+never makes progress while the tlv pointer keeps marching forward,
+producing an infinite loop with a runaway out-of-bounds read and a
+guaranteed oops even without KASAN.
+
+nfc_llcp_parse_connection_tlv() and nfc_llcp_connect_sn() are reachable
+from nfc_llcp_recv_connect() and nfc_llcp_recv_cc(), i.e. from received
+CONNECT and CC PDUs. A nearby NFC device can reach this without
+authentication; LLCP link activation happens automatically after
+NFC-DEP, and the nfc_llcp_rx_skb() dispatcher applies no minimum-length
+guard.
+
+Walk each TLV list by pointer, bounded by the end of the buffer
+(skb_tail_pointer() for connect_sn, tlv_array + tlv_array_len for the
+gb and connection parsers), and validate each declared length before
+use, matching the approach already used for nfc_llcp_recv_snl().
+Dropping the u8 offset also removes the wrap, and for very short
+connect frames this avoids the size_t underflow of
+"skb->len - LLCP_HEADER_SIZE".
+
+Found by 0sec automated security-research tooling (https://0sec.ai).
+
+Fixes: d646960f7986 ("NFC: Initial LLCP support")
 Cc: stable@vger.kernel.org
-Signed-off-by: James Raphael Tiovalen <jamestiotio@gmail.com>
+Assisted-by: 0sec:claude-opus-4-8
+Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
 ---
- drivers/net/macsec.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ net/nfc/llcp_commands.c | 18 ++++++++++++------
+ net/nfc/llcp_core.c     | 10 ++++++----
+ 2 files changed, 18 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
-index fb009120a924..71e4676b1dd9 100644
---- a/drivers/net/macsec.c
-+++ b/drivers/net/macsec.c
-@@ -3615,19 +3615,22 @@ static int macsec_dev_open(struct net_device *dev)
- 		ops = macsec_get_ops(netdev_priv(dev), &ctx);
- 		if (!ops) {
- 			err = -EOPNOTSUPP;
--			goto clear_allmulti;
-+			goto clear_promisc;
+diff --git a/net/nfc/llcp_commands.c b/net/nfc/llcp_commands.c
+index 291f26facbf3..1a0a2f4aca70 100644
+--- a/net/nfc/llcp_commands.c
++++ b/net/nfc/llcp_commands.c
+@@ -193,17 +193,21 @@ int nfc_llcp_parse_gb_tlv(struct nfc_llcp_local *local,
+ 			  const u8 *tlv_array, u16 tlv_array_len)
+ {
+ 	const u8 *tlv = tlv_array;
+-	u8 type, length, offset = 0;
++	const u8 *tlv_end = tlv_array + tlv_array_len;
++	u8 type, length;
+ 
+ 	pr_debug("TLV array length %d\n", tlv_array_len);
+ 
+ 	if (local == NULL)
+ 		return -ENODEV;
+ 
+-	while (offset < tlv_array_len) {
++	while (tlv + 2 < tlv_end) {
+ 		type = tlv[0];
+ 		length = tlv[1];
+ 
++		if (tlv + 2 + length > tlv_end)
++			break;
++
+ 		pr_debug("type 0x%x length %d\n", type, length);
+ 
+ 		switch (type) {
+@@ -227,7 +231,6 @@ int nfc_llcp_parse_gb_tlv(struct nfc_llcp_local *local,
+ 			break;
  		}
  
- 		ctx.secy = &macsec->secy;
- 		err = macsec_offload(ops->mdo_dev_open, &ctx);
- 		if (err)
--			goto clear_allmulti;
-+			goto clear_promisc;
+-		offset += length + 2;
+ 		tlv += length + 2;
  	}
  
- 	if (netif_carrier_ok(real_dev))
- 		netif_carrier_on(dev);
+@@ -243,17 +246,21 @@ int nfc_llcp_parse_connection_tlv(struct nfc_llcp_sock *sock,
+ 				  const u8 *tlv_array, u16 tlv_array_len)
+ {
+ 	const u8 *tlv = tlv_array;
+-	u8 type, length, offset = 0;
++	const u8 *tlv_end = tlv_array + tlv_array_len;
++	u8 type, length;
  
- 	return 0;
-+clear_promisc:
-+	if (dev->flags & IFF_PROMISC)
-+		dev_set_promiscuity(real_dev, -1);
- clear_allmulti:
- 	if (dev->flags & IFF_ALLMULTI)
- 		dev_set_allmulti(real_dev, -1);
+ 	pr_debug("TLV array length %d\n", tlv_array_len);
+ 
+ 	if (sock == NULL)
+ 		return -ENOTCONN;
+ 
+-	while (offset < tlv_array_len) {
++	while (tlv + 2 < tlv_end) {
+ 		type = tlv[0];
+ 		length = tlv[1];
+ 
++		if (tlv + 2 + length > tlv_end)
++			break;
++
+ 		pr_debug("type 0x%x length %d\n", type, length);
+ 
+ 		switch (type) {
+@@ -270,7 +277,6 @@ int nfc_llcp_parse_connection_tlv(struct nfc_llcp_sock *sock,
+ 			break;
+ 		}
+ 
+-		offset += length + 2;
+ 		tlv += length + 2;
+ 	}
+ 
+diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+index aed5fe1afef0..0de20279e046 100644
+--- a/net/nfc/llcp_core.c
++++ b/net/nfc/llcp_core.c
+@@ -849,13 +849,16 @@ static struct nfc_llcp_sock *nfc_llcp_sock_get_sn(struct nfc_llcp_local *local,
+ static const u8 *nfc_llcp_connect_sn(const struct sk_buff *skb, size_t *sn_len)
+ {
+ 	u8 type, length;
+-	const u8 *tlv = &skb->data[2];
+-	size_t tlv_array_len = skb->len - LLCP_HEADER_SIZE, offset = 0;
++	const u8 *tlv = &skb->data[LLCP_HEADER_SIZE];
++	const u8 *tlv_end = skb_tail_pointer(skb);
+ 
+-	while (offset < tlv_array_len) {
++	while (tlv + 2 < tlv_end) {
+ 		type = tlv[0];
+ 		length = tlv[1];
+ 
++		if (tlv + 2 + length > tlv_end)
++			break;
++
+ 		pr_debug("type 0x%x length %d\n", type, length);
+ 
+ 		if (type == LLCP_TLV_SN) {
+@@ -863,7 +866,6 @@ static const u8 *nfc_llcp_connect_sn(const struct sk_buff *skb, size_t *sn_len)
+ 			return &tlv[2];
+ 		}
+ 
+-		offset += length + 2;
+ 		tlv += length + 2;
+ 	}
+ 
 -- 
 2.43.0
 
