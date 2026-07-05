@@ -1,57 +1,96 @@
-Return-Path: <netdev+bounces-304739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304740-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kdYkA0mjSWoL5QAAu9opvQ
-	(envelope-from <netdev+bounces-304739-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 02:20:25 +0200
+	id MzzHGtalSWo65gAAu9opvQ
+	(envelope-from <netdev+bounces-304740-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 02:31:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B908708B32
-	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 02:20:24 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6162708B58
+	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 02:31:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304739-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304739-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=asu.edu header.s=google header.b="Ym/Z9T8X";
+	dmarc=pass (policy=none) header.from=asu.edu;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304740-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304740-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8391C3017246
-	for <lists+netdev@lfdr.de>; Sun,  5 Jul 2026 00:20:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1C2A2301859E
+	for <lists+netdev@lfdr.de>; Sun,  5 Jul 2026 00:31:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61F0013A3F7;
-	Sun,  5 Jul 2026 00:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A80E31CAA78;
+	Sun,  5 Jul 2026 00:31:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE901DF254;
-	Sun,  5 Jul 2026 00:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9216169AD2
+	for <netdev@vger.kernel.org>; Sun,  5 Jul 2026 00:31:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783210803; cv=none; b=WknlCo8NkE8OsxwhbMqA/QAcWUOK5QCt/lbr8kctAfFHCgBXiNmXE6XBsR+mY0Ok+D4mqjqhefcmWNYQ945y5jFcHtgSn8xX8IUnS1xQVcaoFgeLoqsBfgeqlEjjeoFsTkVcZ1Eue6o8XcR56hN3j/BidYDZdWvOhvmfceD+Fzs=
+	t=1783211470; cv=none; b=Fj0u/zB9iVF2RRVgWXAjghmzD83yIWBC59O2VWP2+PQe8uDwqztmFwCewS2QpnidsSPCvlIa/YD65tc5UQNHBF+d88nxVfoiVt8E++/ND2Qy9SjcRGyoAlEnWnSLfjELXAswyT12OU/01rgYgmc+GSxuf6QN0dyMeybxxaMgVC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783210803; c=relaxed/simple;
-	bh=kgMc9g+pxOPxK9/+qSBTj+MnFouZB3dcAINJP7NEqV0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c26DSnJPmfSEveNIlFGJDhLrJWOYKb8hWbfe/LqnungQtVGX3PcC75+AinvjQB7an7deK4CfRkx6dyhPoL7URnUY8b/i6cT2kOsyX6zdy4QtojmT1Zp2qBz7LLIPYoAZXb2jxjaJRQ232U8r7laN8EOB4qK153iEO+yuRQl6yeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Received: from localhost.localdomain (unknown [111.196.245.140])
-	by APP-03 (Coremail) with SMTP id rQCowADX69IVo0lqH9PfFg--.16085S2;
-	Sun, 05 Jul 2026 08:19:33 +0800 (CST)
-From: Pengpeng Hou <pengpeng@iscas.ac.cn>
-To: Linus Walleij <linusw@kernel.org>,
-	Imre Kaloz <kaloz@openwrt.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1783211470; c=relaxed/simple;
+	bh=XRrOAqGo1SaWPhRhkBK20y6xrteJRGYUgMAh4pyUKQI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oMZKDBwH3M5HgqEVlqIvkeXO0SBZKmVhUYq5qxCSKFYkX66PC2AOHTMDGC+jHnLUbwvRECTn7DrkdRRTeDJa5Qn7PrMHmGVlzrEJFSXbNyRpZAsAFkDZiXcpiFMgvb77V6MtcH6Ww0p3QKZHy7xBQIylsPXMp7tZpwl17QN5u5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=Ym/Z9T8X; arc=none smtp.client-ip=209.85.214.178
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2caced6038eso18000915ad.0
+        for <netdev@vger.kernel.org>; Sat, 04 Jul 2026 17:31:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1783211468; x=1783816268; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QzR86rL+Wq9WPxMLO6rL2wU+CKuwRy8NRTc65AlFuAc=;
+        b=Ym/Z9T8XJpUzuUdgCivJOLT8tICgp/hA+Zvq2Br86qXrvX49dZrGmrSbGM3CONerZk
+         R5mk/GDYFNYYAEv3XHINKQJXHm9QKrAOxhAhZ2hRcMLJEs4J3jmJwVA7jHms9KzukYOs
+         bh3p1y9p31sNumFpIhCykx56uDKGMhkFjo8D2gS43vsx79BWYnB3jrdn8dKCgSKW0d2A
+         67THDxQk2AM192CRpyWlM0TCqWbP6n0sH3RQWnL17b6eO7Oa3BFvXBG3QZ2bJLMXCZpB
+         /XAJ2yW2RA6o5ESFXzPAGju7VGir2+aGmG94hUXiNV6teLpH4fDwC9tEPQ9YyhINCGwU
+         0ayQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783211468; x=1783816268;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QzR86rL+Wq9WPxMLO6rL2wU+CKuwRy8NRTc65AlFuAc=;
+        b=MRRmVW3OStSAsh8WvSKEzuZmizA9MsNsjIgle0U9T5AWVfeI9XNIihf9OGhXk5BaC1
+         hiNUTazK0nVVqH/VxAxL6cifkEu4rwB42H8pJcIKs2CNXw0kMTjpqWJQdpM7xFg3TQo0
+         8C6wzCRdUlTQmrLt2CjUfFo798faF15oxM/Rrjo5zwVZH2q4R8XdGc8uLld5jaoYNN8K
+         TMjlASQ3dDd9Apm0r8R+CllXUHtTkSrCaPx+iCkFoghyQvXyw7PB5CtgBRjy1Hk610N1
+         yixxrBsLwMhBlv4G7jNyEQZF0LMj6sn5YSF5H4J42l3cjZj3Rn4IRPdvlsrQEpy9gyGI
+         zsWQ==
+X-Forwarded-Encrypted: i=1; AHgh+RrZSHW4O0gQj57trUC1lqydwuxicxx+UiCCowEDT0baVQ65IsQopIEjkAT85XnPmFCtrfKFuuY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYWXqCZx9044f6qSi4xgHN+tnYAEbJrGpR5z/gs25XfpISzQ3i
+	Mf5edaac1naafHDNUvURJ9WRDTug7hG3mn8LJrU+Qxw0iUqMBHi6e7NojY/q1qilxA==
+X-Gm-Gg: AfdE7clEb1u9xIorbmfuT+C+VjaPq4fDOfeywqu4t2qd1uPP/7lNfe0eIWbd8507GZu
+	MGP7s1W1FmNitCE5B7i2vHebB43Q8IZ+mTvRHXd3BwoBXdUUgynIOkmHJ2gE1qS4nbhIZRxiTwF
+	LuUj/BmOeHsp8jXq0kZdwmho3imzZT4CSoTNjJ7VKFPqoyuIeQ2rXEQdYcf42EPFagy/PM8L0Qj
+	xe/GxokiYKdyR8sqo8I3aFZPrtwemsZMPlLV72ReWB3FK4566KDc5uwUpLVJGVkvkC1ErhVJE1e
+	93zBIXi6qsQl6VUNkjMrZyD/PV2D0+3U/seZSDjjjCn+nt6UvOgh9sL5l96SbBohuGaICUSUkaP
+	ahM4LNhjAZw6OMBVpZHNP8UIECty/ZZBneBGZy9NzRTFyCK7CDISPt1ikcUdcCkYxVsHlQtEzBQ
+	==
+X-Received: by 2002:a17:903:284:b0:2bf:13af:b077 with SMTP id d9443c01a7336-2cc09dd66a9mr35384805ad.14.1783211467991;
+        Sat, 04 Jul 2026 17:31:07 -0700 (PDT)
+Received: from p1.. ([2607:fb91:152f:d935:c8f0:3f07:a1a1:8c92])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cad712b12fsm27782795ad.25.2026.07.04.17.31.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 04 Jul 2026 17:31:07 -0700 (PDT)
+From: Xiang Mei <xmei5@asu.edu>
+To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Pengpeng Hou <pengpeng@iscas.ac.cn>,
-	linux-arm-kernel@lists.infradead.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: linux-sctp@vger.kernel.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: xscale: ixp4xx: add missing MODULE_DEVICE_TABLE()
-Date: Sun,  5 Jul 2026 08:19:31 +0800
-Message-ID: <20260705001931.74149-1-pengpeng@iscas.ac.cn>
-X-Mailer: git-send-email 2.50.1
+	linux-kernel@vger.kernel.org,
+	bestswngs@gmail.com,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH net] sctp: validate the body of a STALE_COOKIE error before reading it
+Date: Sat,  4 Jul 2026 17:30:13 -0700
+Message-ID: <20260705003013.1134430-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,88 +98,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowADX69IVo0lqH9PfFg--.16085S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7Xw47WF43Aw43JF17XrWkWFg_yoWkGFcE9r
-	W8WrWfua1UCF90ka1akrsxZry09aykWrn3tryIqrWYqFy3Xr17JrZ5Crn3JwnxGr18KF98
-	Jr9rXF10ka42yjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbaxFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-	Gr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr
-	1j6F4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv
-	7VC0I7IYx2IY67AKxVWUAVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r
-	1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02
-	628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4
-	IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1r
-	MI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJV
-	WUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j
-	6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
-	BIdaVFxhVjvjDU0xZFpf9x0JUL0edUUUUU=
-X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.54 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-304740-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,asu.edu];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-304739-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
-	DMARC_NA(0.00)[iscas.ac.cn];
+	FORGED_RECIPIENTS(0.00)[m:marcelo.leitner@gmail.com,m:lucien.xin@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-sctp@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bestswngs@gmail.com,m:xmei5@asu.edu,m:marceloleitner@gmail.com,m:lucienxin@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:linusw@kernel.org,m:kaloz@openwrt.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:pengpeng@iscas.ac.cn,m:linux-arm-kernel@lists.infradead.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[asu.edu:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	R_DKIM_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,iscas.ac.cn:from_mime,iscas.ac.cn:email,iscas.ac.cn:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,asu.edu:from_mime,asu.edu:email,asu.edu:mid,asu.edu:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4B908708B32
+X-Rspamd-Queue-Id: C6162708B58
 
-The driver has a match table for the of bus wired into its driver
-structure, but the table is not exported with MODULE_DEVICE_TABLE().
+sctp_sf_do_5_2_6_stale() reads the 32-bit Measure of Staleness that
+follows the error header:
 
-Add the missing MODULE_DEVICE_TABLE() entry so module alias information
-is generated for automatic module loading.
+	stale = ntohl(*(__be32 *)((u8 *)err + sizeof(*err)));
 
-This is a source-level fix.  It does not claim dynamic hardware
-reproduction; the evidence is the driver-owned match table, its use by
-the driver registration structure, and the missing module alias
-publication.
+without checking that the STALE_COOKIE cause actually carries that
+4-byte body. sctp_walk_errors() in the caller only requires
+err->length >= sizeof(struct sctp_errhdr), so a peer can send an 8-byte
+ERROR chunk whose sole STALE_COOKIE cause has length == 4 and no body.
+It passes sctp_chunk_length_valid() (>= 8) and the error walk, yet the
+staleness read reaches past the validated cause.
 
-Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
+When that is the only chunk in the packet the cause ends exactly at
+skb_tail (sctp_inq_pop() discards only when chunk_end > skb_tail), so
+the read stays in-bounds of the skb head slab object but past the packet
+data. The value is folded into the COOKIE_PRESERVATIVE parameter of the
+retransmitted INIT and reflected to the peer, leaking adjacent kernel
+slab bytes.
+
+Discard the chunk when the staleness field falls outside the validated
+chunk data.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: Weiming Shi <bestswngs@gmail.com>
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
 ---
- drivers/net/ethernet/xscale/ixp4xx_eth.c | 1 +
- 1 file changed, 1 insertion(+)
+ net/sctp/sm_statefuns.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/ethernet/xscale/ixp4xx_eth.c b/drivers/net/ethernet/xscale/ixp4xx_eth.c
-index b0faa0f1780d..3c6a300386c5 100644
---- a/drivers/net/ethernet/xscale/ixp4xx_eth.c
-+++ b/drivers/net/ethernet/xscale/ixp4xx_eth.c
-@@ -1606,6 +1606,7 @@ static const struct of_device_id ixp4xx_eth_of_match[] = {
- 	},
- 	{ },
- };
-+MODULE_DEVICE_TABLE(of, ixp4xx_eth_of_match);
+diff --git a/net/sctp/sm_statefuns.c b/net/sctp/sm_statefuns.c
+index d23d935e128e..e4b4b63162cf 100644
+--- a/net/sctp/sm_statefuns.c
++++ b/net/sctp/sm_statefuns.c
+@@ -2592,6 +2592,9 @@ static enum sctp_disposition sctp_sf_do_5_2_6_stale(
  
- static struct platform_driver ixp4xx_eth_driver = {
- 	.driver = {
+ 	err = (struct sctp_errhdr *)(chunk->skb->data);
+ 
++	if ((u8 *)err + sizeof(*err) + sizeof(__be32) > chunk->chunk_end)
++		return sctp_sf_pdiscard(net, ep, asoc, type, arg, commands);
++
+ 	/* When calculating the time extension, an implementation
+ 	 * SHOULD use the RTT information measured based on the
+ 	 * previous COOKIE ECHO / ERROR exchange, and should add no
 -- 
-2.53.0
+2.43.0
 
 
