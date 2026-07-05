@@ -1,86 +1,90 @@
-Return-Path: <netdev+bounces-304802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304803-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id xit/OumfSmrFFAEAu9opvQ
-	(envelope-from <netdev+bounces-304802-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 20:18:17 +0200
+	id xcuPIfyfSmrJFAEAu9opvQ
+	(envelope-from <netdev+bounces-304803-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 20:18:36 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BE9670AC9F
-	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 20:18:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D146570ACA2
+	for <lists+netdev@lfdr.de>; Sun, 05 Jul 2026 20:18:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=DIS6HoDA;
+	dkim=pass header.d=google.com header.s=20251104 header.b=C+zyHLWc;
 	dmarc=pass (policy=reject) header.from=google.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304802-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304802-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304803-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304803-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D2ACE30078DC
-	for <lists+netdev@lfdr.de>; Sun,  5 Jul 2026 18:18:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5A23A3007CB1
+	for <lists+netdev@lfdr.de>; Sun,  5 Jul 2026 18:18:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A5239EF24;
-	Sun,  5 Jul 2026 18:18:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DC9E39E9D5;
+	Sun,  5 Jul 2026 18:18:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8E034F492
-	for <netdev@vger.kernel.org>; Sun,  5 Jul 2026 18:17:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C40F239EF11
+	for <netdev@vger.kernel.org>; Sun,  5 Jul 2026 18:18:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783275480; cv=none; b=Ee2d5cSzwcA5FAULq8bnEb4Sf/mMZTMHNkXDD42ottvePwJcw66HVOabsvNEvKugKLrK90hfsxw8Vx/rdxTV5uCeh0c+rPIs5oVc1+DUwAy+Wz1dh8CvPQkhg3tJMJdGJn35euyX95gJ1QaQeLUds/XS7RhDDgVofZ5/9uwBXSo=
+	t=1783275483; cv=none; b=KFz/hgHKJ5x5mMUviFt6XN8E8a1aRnxjE32zhIOkP8gEd+yOKPUUPDw1j8MmQPLSIHsSUXtRuLQkxDaLWQYRxsRxC6ElSDfa05fbwf1nSNUygEH0jY7W3b+JjmwnOYlMzKMB5f0apCbJph8mAKWvBDv/3EhbYW6FwUrbOAkcbcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783275480; c=relaxed/simple;
-	bh=jZQMbkqUKzgpB0N8LQscTBMu/tXkWJKyxlt06Wn+VMQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=oL4LG+6bp1TGdZ/APcRpL9h3W+Ln521f0IAl5jvId5lv5XchNNp8DzYMfRPQ1FpaXYYDd1bLJ4SMZvOZo2jn/O5MDs9DO1zt7lJowdLQzck4FfcrsmcWbxXi0nkCv+gGe1Nlzp1QB09kI52JvVDZSV+43kAP4jdQjTd0ZPK9qYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DIS6HoDA; arc=none smtp.client-ip=209.85.160.201
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-51bfe3fa93bso26525911cf.2
-        for <netdev@vger.kernel.org>; Sun, 05 Jul 2026 11:17:58 -0700 (PDT)
+	s=arc-20240116; t=1783275483; c=relaxed/simple;
+	bh=8qkaK9CJewoSBHJsNGqdS9I798dwSpqf9f5A6hyIKWw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=dv1RN6NiuIgYdTYfxamYOgCZ96FSD2mszpjzXY4X+vUZaFfoq81aoKDaCrJGR3ZHNAgrX2c1I1/+mx8IR4vOTjZhLFDib9df9Fb67zCtykfbyD9Q07tz13Vz9sZvmQIGr5Xp+wqAY49tcOf4cl5TLLldb3qwsQiOUxbALLG/lyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C+zyHLWc; arc=none smtp.client-ip=209.85.219.74
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-8efc093d7e5so19331626d6.2
+        for <netdev@vger.kernel.org>; Sun, 05 Jul 2026 11:18:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783275478; x=1783880278; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4+JQduAhv8Nx+27EMZDv1egevlAnkPWlHznsmTvYV8Y=;
-        b=DIS6HoDA5nncqs5JSbHvyblAki4VAQHV4mnDMxB6R2oc4OBl0fYlaJj6rHOVxOxA6i
-         44yRnrVJGQwwtFjF223x7Qusjrt/0u4Ti48ejCJwUtA6DssKGCRqHM33/8LGt78gqZZh
-         jHUGbx4xZEIcLUJCZjJLdVR1jYP9Yna2verRGKY09MCfsdJOnO9GEDCFvL9Of9tIviLX
-         O6+XyUYHNAdxicnfA6lpfUbjuJtj83jfes8VAvPcJcH5hFgtig+X7eiJNnEaAXlbG/RG
-         l6MuTFN9J6UJlxidQzp0snCfCjPZYFCAAPaul+CCnslfndXTNWzwHRDd0cszuJnDEd1t
-         Myeg==
+        d=google.com; s=20251104; t=1783275481; x=1783880281; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VOkxqmtWVMJorKeOZAzUaMm6nv2RJ475cStWQHNl+sc=;
+        b=C+zyHLWcPbO4dUFm/JYE0Ht1EArpAKtdRpSs2Pfjn1N6XtoCTdEZ5U2mbY5BHHrgoZ
+         ox4VcgqFyHYugvHau6i5+fAhr2+sQapqr9UuY2CLd1XzHvcq/SRuUpYHDJUxtwlMXSBS
+         9kKb5gU+H9tFD2Pt7c5+9+wt0UAhzrcFrXqcmTJuv8dcIslT2Cjy6P/4GdVoK4FKFbUk
+         b5TaoWwp2iFJS1etIqb8mwmVYaNzUhbRMSQKF6JM05He8dYX5ReeczQZBAJmu3L/uOyP
+         sVRyzOinohuCvAc7HXhzOBMHVqBQBxPlDuaqxvBfSlq3Vl5+5W7YHwNX5Lr/Y5vWo9rQ
+         h6iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783275478; x=1783880278;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4+JQduAhv8Nx+27EMZDv1egevlAnkPWlHznsmTvYV8Y=;
-        b=ZDnKV0kf/G+LWdQqxX6eqTnU5qsYmXqpbCU/GqdbQywLGDN9Bh2WYaDCI1X68D25QO
-         ZftXamYvMGnw9Risk0jLnR1naFNWFvLwmFv5/rKMjyEdgjoAF7547TvbMHVfw26k+BS+
-         dnhvtWAJt5yoFIAhPgDpAmbYL419TNcDADmFUi0OdmvNNoBzglbx/nufZGyIFdA0aYX9
-         Vow7MHvLslIxAa1X3V16tslSWiSrZYgZ885DJGcVDrgYztV3HAnuZ/K0xHgVG4UL6nxc
-         yTLk9fUWkp/ywyP1YLrV08cwFB5yqBtH0rAgtPvwFoe0YGijNuakxUucaysSPFPe+Fv9
-         LnZg==
-X-Forwarded-Encrypted: i=1; AHgh+RoEgf74oHjPUhBcZIvNaI7mbhHXciBrb+bTthqGhZn8R9oT/mzfKp6Re166yjJJ8qvOau7uTgg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtRUeK9I8xSHACGoFbeiMLJ1adl28IR6ZzZyGu38zd+Vr9Gqid
-	BFtCs+qBWSqByiNOdrP23nEyAk6KjNCXB4Llx+GR9TANr58YxtjxR98pkR4boHJTA8tSEfisB0T
-	iUNrGSY+ctX5xtw==
-X-Received: from qtbby27-n2.prod.google.com ([2002:a05:622a:95b:20b0:51c:1681:1a6])
+        d=1e100.net; s=20251104; t=1783275481; x=1783880281;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VOkxqmtWVMJorKeOZAzUaMm6nv2RJ475cStWQHNl+sc=;
+        b=oFOiX9b1sAuAsUwE6dug4vKhO+zCPnVR9mUYLIaUHDYLbm4jC1CG3MRq8s4fPZua5v
+         SV/i70g/1Lbzi8131IbQ74o3PWGLE65dmZwSg2fjTbQ1rP8GJuD90PncSUlJ9+nIKmbj
+         uGxE5oCKwbFRZ5+iYg4yWr5Nw5LPPme8+JidKkmTcpBTAS9mvj4hpM4090Tzt8ro73pA
+         dz4/4LqCHl/4XUDJrT8hsYAtnmG8lOa+mIiibbFL+q9ZsL10Xt6t4Fi5D2Iu9iM92SdF
+         qOEZmYFyWl68NXQnfsu7vJS5yk6O3gEIcGifcxxtrvpk+3dSfvMW8kuJDRwJpLp6gD/z
+         eM5w==
+X-Forwarded-Encrypted: i=1; AHgh+RqJMYREvzuN+0OSigLJ8Tq0gmPTAaxeNrnGuPnk4kCdrutBpPkl/oa8OpYWPabONBj78s0bPXg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdeIyz+PLsJkdX8lWQQXBrpux/bvDyL+6eNDlk2TzUk7nnyBL4
+	FrgSZPYsx1YAAAckztnbxF++SrVt82KGyZgQijox+nC2tzop/FG/yRJi7n1rHxc9tCx0RcZBT/m
+	9jfclNxjc9fSRPA==
+X-Received: from qvww19-n1.prod.google.com ([2002:a05:6214:80d3:10b0:8dc:9073:dce4])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:5903:0:b0:51c:504:2ef7 with SMTP id d75a77b69052e-51c4c351ae2mr105160041cf.67.1783275477766;
- Sun, 05 Jul 2026 11:17:57 -0700 (PDT)
-Date: Sun,  5 Jul 2026 18:17:53 +0000
+ 2002:ad4:5f86:0:b0:8df:1814:3a1d with SMTP id 6a1803df08f44-8f74a519bdemr118689006d6.22.1783275480484;
+ Sun, 05 Jul 2026 11:18:00 -0700 (PDT)
+Date: Sun,  5 Jul 2026 18:17:54 +0000
+In-Reply-To: <20260705181756.963063-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260705181756.963063-1-edumazet@google.com>
 X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
-Message-ID: <20260705181756.963063-1-edumazet@google.com>
-Subject: [PATCH v2 net 0/3] ipv4/ipv6: Fix UAF and memory leak in IGMP/MLD
+Message-ID: <20260705181756.963063-2-edumazet@google.com>
+Subject: [PATCH v2 net 1/3] ipv4: igmp: Fix potential UAF in igmp_gq_start_timer()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
 Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
 	Ido Schimmel <idosch@nvidia.com>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
+	Zero Day Initiative <zdi-disclosures@trendmicro.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -95,15 +99,15 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304802-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304803-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuniyu@google.com,m:idosch@nvidia.com,m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuniyu@google.com,m:idosch@nvidia.com,m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:zdi-disclosures@trendmicro.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,nvidia.com,vger.kernel.org,gmail.com];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,nvidia.com,vger.kernel.org,gmail.com,trendmicro.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -112,46 +116,93 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,trendmicro.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4BE9670AC9F
+X-Rspamd-Queue-Id: D146570ACA2
 
-This series addresses two potential UAF vulnerabilities
-and memory leaks in the IPv4 IGMP and IPv6 MLD subsystems.
+A race condition exists between device teardown (inetdev_destroy) and
+incoming IGMP query processing (igmp_rcv), leading to a Use-After-Free
+in the IGMP timer callback.
 
-The first two patches fix a UAF where the packet receive path races with
-device teardown. If the device refcount has already hit 0 (but the memory
-is still held by RCU), incoming IGMP/MLD packets trying to schedule delayed
-work or timers would call refcount_inc() on the 0 refcount, triggering a
-warning and eventually leading to a UAF when the work runs after the device
-has been freed. This is fixed by introducing safe hold helpers using
-refcount_inc_not_zero(). In MLD, we also ensure we only enqueue the skb
-if we successfully acquired the device reference, to avoid leaking skbs
-when the device is being destroyed.
+During device destruction, inetdev_destroy() drops the primary reference
+to in_device, which can drop its refcount to 0. The actual freeing of
+in_device memory is deferred via RCU (using call_rcu()).
 
-The third patch fixes memory leaks in IPv4 IGMP when timers are deleted or
-stopped. When a timer is deleted (in igmp_mod_timer) or stopped (in
-igmp_stop_timer) and not re-armed, the code dropped the group refcount using
-refcount_dec(). However, if the group was concurrently removed from the list,
-this decrement could drop the refcount to 0 without triggering the
-cleanup/free path, leaking the group structure. This is fixed by using
-ip_ma_put() instead, and deferring the put until after the lock is released.
+Concurrently, igmp_rcv() runs under RCU read lock and obtains the
+in_device pointer. Because the memory is RCU-protected, CPU-0 can safely
+dereference in_device even if its refcount has hit 0.
 
-Eric Dumazet (3):
-  ipv4: igmp: Fix potential UAF in igmp_gq_start_timer()
-  ipv6: mcast: Fix potential UAF in MLD delayed work
-  ipv4: igmp: Fix potential memory leaks in igmp_mod_timer() and
-    igmp_stop_timer()
+However, if CPU-0 calls igmp_gq_start_timer() and re-arms the timer, it
+attempts to acquire a reference using in_dev_hold(). This increments the
+refcount from 0 to 1, triggering a "refcount_t: addition on 0" warning.
+Since the in_device memory is still scheduled to be freed after the RCU
+grace period (as the free callback does not check the refcount again),
+the device is freed while the timer is still armed. When the timer
+expires, it accesses the freed memory, causing a kernel panic.
 
+Fix this by using refcount_inc_not_zero() (via a new helper
+in_dev_hold_safe()) to prevent acquiring a reference if the device is
+already being destroyed. If the refcount is 0, we do not arm the timer.
+
+A similar issue in IPv6 MLD is fixed in a subsequent patch.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: Zero Day Initiative <zdi-disclosures@trendmicro.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
  include/linux/inetdevice.h |  5 +++++
- include/net/addrconf.h     |  5 +++++
- net/ipv4/igmp.c            | 28 +++++++++++++++++++-------
- net/ipv6/mcast.c           | 40 ++++++++++++++++++++++++++------------
- 4 files changed, 59 insertions(+), 19 deletions(-)
+ net/ipv4/igmp.c            | 14 +++++++++-----
+ 2 files changed, 14 insertions(+), 5 deletions(-)
 
+diff --git a/include/linux/inetdevice.h b/include/linux/inetdevice.h
+index dccbeb25f70141982160c776f3cc727296def2b7..6032eea2539a60d0476d85667bda3bfcad8f1425 100644
+--- a/include/linux/inetdevice.h
++++ b/include/linux/inetdevice.h
+@@ -293,6 +293,11 @@ static inline void in_dev_put(struct in_device *idev)
+ #define __in_dev_put(idev)  refcount_dec(&(idev)->refcnt)
+ #define in_dev_hold(idev)   refcount_inc(&(idev)->refcnt)
+ 
++static inline bool in_dev_hold_safe(struct in_device *idev)
++{
++	return refcount_inc_not_zero(&idev->refcnt);
++}
++
+ #endif /* __KERNEL__ */
+ 
+ static __inline__ __be32 inet_make_mask(int logmask)
+diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+index b6337a47c1418589bf8ef31e00fd98b6187f5271..f5f9763895641bf86bfcf9fd7fd7b06012fa4ece 100644
+--- a/net/ipv4/igmp.c
++++ b/net/ipv4/igmp.c
+@@ -248,16 +248,20 @@ static void igmp_gq_start_timer(struct in_device *in_dev)
+ 		return;
+ 
+ 	in_dev->mr_gq_running = 1;
+-	if (!mod_timer(&in_dev->mr_gq_timer, exp))
+-		in_dev_hold(in_dev);
++	if (in_dev_hold_safe(in_dev)) {
++		if (mod_timer(&in_dev->mr_gq_timer, exp))
++			in_dev_put(in_dev);
++	}
+ }
+ 
+ static void igmp_ifc_start_timer(struct in_device *in_dev, int delay)
+ {
+-	int tv = get_random_u32_below(delay);
++	if (in_dev_hold_safe(in_dev)) {
++		int tv = get_random_u32_below(delay);
+ 
+-	if (!mod_timer(&in_dev->mr_ifc_timer, jiffies+tv+2))
+-		in_dev_hold(in_dev);
++		if (mod_timer(&in_dev->mr_ifc_timer, jiffies + tv + 2))
++			in_dev_put(in_dev);
++	}
+ }
+ 
+ static void igmp_mod_timer(struct ip_mc_list *im, int max_delay)
 -- 
 2.55.0.rc0.799.gd6f94ed593-goog
 
