@@ -1,184 +1,164 @@
-Return-Path: <netdev+bounces-305202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305203-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VOQfMWkNTGrSfQEAu9opvQ
-	(envelope-from <netdev+bounces-305202-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 22:17:45 +0200
+	id UCdUO8cPTGrsfgEAu9opvQ
+	(envelope-from <netdev+bounces-305203-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 22:27:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BBC97155B5
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 22:17:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 758557156D2
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 22:27:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=la8yTxww;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305202-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305202-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=c127.dev header.s=resend header.b=hL0wCrsm;
+	dkim=pass header.d=amazonses.com header.s=224i4yxa5dv7c2xz3womw6peuasteono header.b=gVnWzwzw;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305203-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305203-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 71F6C301327D
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 19:16:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6B8953105567
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 19:35:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94C3F2D6409;
-	Mon,  6 Jul 2026 19:16:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A583290D1;
+	Mon,  6 Jul 2026 19:35:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from a9-15.smtp-out.amazonses.com (a9-15.smtp-out.amazonses.com [54.240.9.15])
+	(using TLSv1.2 with cipher AES128-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723CD2BDC2F
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 19:16:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF0D3254A8;
+	Mon,  6 Jul 2026 19:35:37 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783365404; cv=none; b=LnDXLE3blgq0/kU1A+XmfBHLYrZrJydqjLy9bF7oPIWFzdOGFgS+vUhTsOI5jVDpr7rnHrV1UFUjwFJHmmtu/WHi5bwApu4o8ByT38ObfEbqBzDUfGkO4YG3zS/mRZ1LEjZU0J/7cbREERRH8eRtlMtRebhUBGtd9IA4EqIYf7E=
+	t=1783366539; cv=none; b=E3O0Mo6w6+LbNLOvsVtuHv/OEhz7UnHckZeVYk8Q4S4JFa4Q1GVpfLCZEe1Tcsu+abzKdCaH2vny1+j1C3wqujF3nwo4EVbaIQi0JpshZ27daaHbZWVf9Gvxa3I5IHAkzk9+oRSPW7DsYTGRjqOe1irHwTi0/SZTZnX4/tp5cZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783365404; c=relaxed/simple;
-	bh=A+Sr2VynmXdoTXKZwHbUOadCumXVatA01FJJ3sCZ6x0=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=QDBjtqtvjNlTwUkEEwjhUi+ZVYEZ2zMi6QzRY0824/3CDsDPEzjmGbWD8tkfncEEJBuAG0kH0JaYBYx+3EmffPtPAc7+nrxcSrDnOKfw+Qf1mPmIEm48p95BFZa5zH3UnyL61Xz6IPlOrOo9yULShXUGdKsbHkBA+XPwFwfPOdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=la8yTxww; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92AFD1F00A3A;
-	Mon,  6 Jul 2026 19:16:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783365403;
-	bh=XuI53TKgeRFxh3+8Kup+/6jQDMPPLdn6lqAtSfTOSII=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=la8yTxwwt+BV1f6ZBCB0HgXbAjYn8iWQks9707NTQB6K8WVdQU7TVPohmLxZywL/3
-	 1WH7lGV+9qB563iXWiz7tNjwQla0jxfJ2YCTBcZ1pUSaJueDjJsTwnSZHNR2qr8qkS
-	 jQbMA/9XYX+8e57ZWK+HTQpVdJXEIhYlQVA9XeR8riHUGFByuWI+7ef31aij4gBDsz
-	 uxCrZSt/auDOtZhknzEPbPut/n3GkCCwAL0V2ZruMWfsYqj+KK50klVNUraTZF8E3S
-	 II2aS48Q0kpCQTnvYlBuKDayE8Llyng3UfrX6ZlW+NVCXlMsrxKTvFO4DmfTdNRv1a
-	 5Ligtels5OrmQ==
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 8BA4AF4006A;
-	Mon,  6 Jul 2026 15:16:41 -0400 (EDT)
-Received: from phl-imap-15 ([10.202.2.104])
-  by phl-compute-10.internal (MEProxy); Mon, 06 Jul 2026 15:16:41 -0400
-X-ME-Sender: <xms:Gf9LanZlMOgbC8DN9KJmgua7uY3zANLPFnP2fc3OuBfVWJQ7CuR91Q>
-    <xme:Gf9LahMLGhDc08IFswe2YV1oz-Ixc_3JUXSlOFjjWBZNL7bAWwx7_mDX7em_2Cwik
-    vIT-vpCOZfmcPC1dl6xB_kULbsl2lOlMri1HPPFxDRvZ82hLWhVehY>
-X-ME-Proxy-Cause: dmFkZTELdIGXvKeHFyBM08bJ5pFSQvjjd5Ldr5RAefSlY32C0PAI+cB4CtkREBHFR2BXtM
-    bcOJGPZGeqR43S18Fme5V1nl/P4nzlJJcmJauvo1cS1YOmEJgBayCFUNcuFfLcyBNV3nsZ
-    ixa1BcEuPdLpDiUNqHX6LZm6Me/Ui+Fi6x+cP4AOMQgYdbbm/Sl9g5TqwF3E936tlZN4Wy
-    yiVbB/T+pDNQP8OI88lR9Zn8TZaeJHOogwxRtm8JeE4ZuznI+4EcRXlEtqgUOHCC0zyXby
-    MnUncEJLX4DVtl7jLJQqMNRWaHPcJKV2PzdzObYXSL9uCqT5FKnJ3Ym9oocl8lkAFvgud2
-    5PmTrH2O1tMf6wLSMljC1GUZgCVji6LJxslNhvC4Kv5oheyfUetz3pngHjb6sq8mgyckZA
-    CLnzUx5qP5kMU7mvDDGjVdw9+WDu/GpU7o/Mvp5B6Y62JC/LM/lY/txmGlH8F/gh5Xffp4
-    ZDV8oJFAuNsfWiz3VaP7AjsWD98BLe5BZTxofuTc8joE0jPpD7d5eVX0HYBQO2q4FSNYjS
-    jvg3xaUdxLXdD16CGXBJYxdxSDH70cZ4dgpKdwjl+LjJUuDFWI0HRUAASOhxniDvuhL5zE
-    qT2JE6L2kwJTe6KNVLvPtqjaHrQ26ZFbhOmg8gPzoj32zPK4uwKQoYRcI16Q
-X-ME-Proxy: <xmx:Gf9Lanu9yY97Z-4W5ZRHpufXFy0vx0S5fde73EdhKBKWyz49XpvxZw>
-    <xmx:Gf9LaidNb0WfC0Ddm2hE7f0olnR8ELqAOXhT1TPgmJLdQOrTkw2zUA>
-    <xmx:Gf9LahZy56lTxd1GrgUiNZmf6H4o9S1O5ub90g8q0-f8AI5WzGhREw>
-    <xmx:Gf9LakZVC2m1tnvyvrCX0rK028CtkLR_OyCqcMxbDdVldtLFMTO1kQ>
-    <xmx:Gf9LamKDu7sHTbEFmmTwHFQB4y7bqR1M60lVO8OAGesMeA8QcJ7-VIPK>
-Feedback-ID: ifa6e4810:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 6AC99780AB5; Mon,  6 Jul 2026 15:16:41 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1783366539; c=relaxed/simple;
+	bh=+yaV2nYwgAaxNIV72gm61ALSOYBmm7bDIUElv0EL4As=;
+	h=In-Reply-To:From:To:Cc:Subject:Message-ID:Date:MIME-Version:
+	 Content-Type; b=sOB/A2pNowCblAx5H+v/FOmMf/R3yhFX8nJoj7n6VHE5/cDb6wh5v9RAkTVXzSFyFkIw8mWT0kewRfLd6kJZe2AUhkAdythSspwvQK4JNcI/UpqfLqpCClbb7sObKravS9vo9SwqzrXVUuL6cpojrn+ZBiQrdyueq1FvRCybenQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c127.dev; spf=pass smtp.mailfrom=send.c127.dev; dkim=pass (1024-bit key) header.d=c127.dev header.i=@c127.dev header.b=hL0wCrsm; dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b=gVnWzwzw; arc=none smtp.client-ip=54.240.9.15
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple; s=resend;
+	d=c127.dev; t=1783366537;
+	h=In-Reply-To:From:To:Cc:Subject:Message-ID:Content-Transfer-Encoding:Date:MIME-Version:Content-Type;
+	bh=+yaV2nYwgAaxNIV72gm61ALSOYBmm7bDIUElv0EL4As=;
+	b=hL0wCrsmMvM/WL3klErCI7+e6LOjEUUctPNEZaFkHnTRBojfAVNZrLQMzvq1Mwhm
+	bhJTmtTGMYZ2Xg5XTwzuLXCUW5jY4sg7JTmzPlFMqQCXd/x+lveUo+Es1081OR1wrBO
+	jB+MwlBXsKA/oYmVCdWHcps6XG4e8J/XFBk4hS8c=
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=224i4yxa5dv7c2xz3womw6peuasteono; d=amazonses.com; t=1783366537;
+	h=In-Reply-To:From:To:Cc:Subject:Message-ID:Content-Transfer-Encoding:Date:MIME-Version:Content-Type:Feedback-ID;
+	bh=+yaV2nYwgAaxNIV72gm61ALSOYBmm7bDIUElv0EL4As=;
+	b=gVnWzwzwHjUX9eiYko7eUirjGQIErf3nRIOYjarUqELpOAatA3LR7ojnEBez5MT5
+	WdsfIlUvD2FVQALsgRhw605ngZ4vLE7iOdb6NclAoB7FqJb3wBBzk4i077i8kwn7tqy
+	G5igf6jTNVFWPmAQ5hRv3IfX+2Kpgnh+wSRtxd6s=
+In-Reply-To: <akuLzI9GVGn4eI1j@boxer>
+From: Johan Alvarado <contact@c127.dev>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com, 
+	alexandre.torgue@foss.st.com, Jose.Abreu@synopsys.com, pavel@ucw.cz, 
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: stmmac: raise TX completion interrupt at the
+ end of an xmit burst
+Message-ID: <0100019f38edce40-fcb1cb45-6136-4563-8289-df75ca13eaa1-000000@email.amazonses.com>
+Content-Transfer-Encoding: 7bit
+Date: Mon, 6 Jul 2026 19:35:36 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AZOB0wyakXwF
-Date: Mon, 06 Jul 2026 15:16:21 -0400
-From: "Chuck Lever" <cel@kernel.org>
-To: "Sabrina Dubroca" <sd@queasysnail.net>
-Cc: john.fastabend@gmail.com, "Jakub Kicinski" <kuba@kernel.org>,
- davem@davemloft.net, edumazet@google.com, "Paolo Abeni" <pabeni@redhat.com>,
- "Simon Horman" <horms@kernel.org>, netdev@vger.kernel.org
-Message-Id: <d036b6fa-4f53-444c-b376-83e122982f1d@app.fastmail.com>
-In-Reply-To: <akbdFcQP7oTp_n3s@krikkit>
-References: <20260630191551.875664-1-cel@kernel.org>
- <akaoXcfamBp8_mYe@krikkit>
- <0a03d16e-d4ce-422d-9492-3e31d910d8e5@app.fastmail.com>
- <akbdFcQP7oTp_n3s@krikkit>
-Subject: Re: [PATCH net] net/tls: Consume empty data records in tls_sw_read_sock()
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Feedback-ID: :1.us-east-1.z4rHY0qbNtjoW80ZyzVy+DEul17RQEOMT7FC66S60ffkhLWkV35D8ZWXVyxJY1/89bAuLCem4GFJq1VXsxM0u6ZfZbvT1qSjDUeuZG9/Lxk1uINIqi7CenEa93u+fNllqnJMZ0quaBrclhnmtzdFllG4KHSjZOEcaGLa1BWoSpA=:1.us-east-1.epbACCJLarUaEI78XZoGREJ9LamRjxMH5pM2kZb64rA=:AmazonSES
+X-SES-Outgoing: 2026.07.06-54.240.9.15
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.65 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_DKIM_ALLOW(-0.20)[c127.dev:s=resend,amazonses.com:s=224i4yxa5dv7c2xz3womw6peuasteono];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS(0.00)[m:maciej.fijalkowski@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:Jose.Abreu@synopsys.com,m:pavel@ucw.cz,m:netdev@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305202-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:sd@queasysnail.net,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[contact@c127.dev,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-305203-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DMARC_NA(0.00)[c127.dev];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,queasysnail.net:email];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	DKIM_TRACE(0.00)[c127.dev:+,amazonses.com:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[contact@c127.dev,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,synopsys.com,ucw.cz,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,email.amazonses.com:mid,c127.dev:from_mime,c127.dev:dkim,amazonses.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0BBC97155B5
+X-Rspamd-Queue-Id: 758557156D2
 
+On Mon, Jul 06, 2026 at 01:04:44PM +0200, Maciej Fijalkowski wrote:
+> Very messy thread. To reiterate - does tx coalescing do any good in this
+> driver?
 
+It does, but today only for traffic that queues deeply enough. Within an
+xmit_more batch the frame counter reduces the IC density to one descriptor
+per tx_coal_frames, and that keeps working with this patch applied: in the
+447 Mbit/s test from the changelog the NIC raised ~3.3k IRQs/s for ~40 kpps
+on the wire, i.e. roughly 12 packets per interrupt, because qdisc bulk
+dequeue, TSO and the intra-batch frame counter still coalesce. What was
+broken is only the case where a flow never accumulates tx_coal_frames
+in-flight frames; there the timer was the sole completion mechanism.
 
-On Thu, Jul 2, 2026, at 5:50 PM, Sabrina Dubroca wrote:
-> 2026-07-02, 15:52:49 -0400, Chuck Lever wrote:
->> 
->> 
->> On Thu, Jul 2, 2026, at 2:05 PM, Sabrina Dubroca wrote:
->> > 2026-06-30, 15:15:51 -0400, Chuck Lever wrote:
->> >> A peer may send a zero-length TLS application_data record; TLS 1.3
->> >> explicitly permits these as a traffic-analysis countermeasure (RFC
->> >> 8446, Section 5.1). After decryption such a record has full_len ==
->> >> 0. tls_sw_read_sock() hands it to the read_actor, which has no
->> >> payload to consume and returns zero. The loop treats a zero return
->> >> as backpressure (used <= 0), requeues the skb at the head of
->> >> rx_list, and stops. rx_list is serviced head-first on the next
->> >> call, so the empty record is dequeued, fails the same way, and is
->> >> requeued again; every later record on the connection is blocked
->> >> behind it.
->> >> 
->> >> tls_sw_recvmsg() does not stall on this: a zero-length data record
->> >> copies nothing and falls through to consume_skb(). Mirror that in
->> >> the read_sock() path by recognizing an empty data record before
->> >> the actor runs, consuming it, and continuing.
->> >> 
->> >> Fixes: 662fbcec32f4 ("net/tls: implement ->read_sock()")
->> >> Signed-off-by: Chuck Lever <cel@kernel.org>
->> >> ---
->> >>  net/tls/tls_sw.c | 11 +++++++++++
->> >>  1 file changed, 11 insertions(+)
->> >
->> > Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
->> >
->> > I think tls_sw_splice_read() suffers from a similar issue (returning 0
->> > even though more data may be available). Sashiko agrees, and also
->> > found a few more pre-existing issues.
->> 
->> Do you want a v2 series with those issues addressed?
->
-> I'd be ok with this patch going in on its own, and the other issues
-> being addressed separately. If you have time to look into those,
-> that'd be great.
+> I did some digging and seems there was a rework of coalescing in 2018 and
+> then some more polishing happened in 2023 (net: stmmac: improve TX timer
+> arm logic).
 
-patchwork shows this patch continues to be marked as "New". Is there
-something I need to do to help move it forward?
+The 2023 change only avoids re-arming the timer while NAPI is already
+scheduled, which helps the loaded case. For a lightly queued flow NAPI is
+idle, so the timer still gets armed and the completion still waits out the
+full tx_coal_timer. That is the path this patch addresses.
 
+> Wouldn't your change imply that tx coalescing could be dropped altogether?
+> I do agree that each single batch of tx descs should be signalled with ic
+> bit at the end.
 
--- 
-Chuck Lever
+I don't think it can be dropped, for one correctness reason and two
+practical ones.
+
+The correctness one: the frame counter enforces an upper bound of
+tx_coal_frames descriptors on the distance between IC bits in the TX ring.
+If coalescing were dropped and the IC bit only set on batch tails, that
+distance becomes unbounded, and a batch larger than the ring can fill it
+without a single IC descriptor: every frame queued had xmit_more set, and
+the tail frame that would have carried the IC bit is never queued because
+stmmac_xmit stops the queue first. The hardware drains the entire ring
+without raising a completion interrupt, and only the coalesce timer can
+restart the queue - reintroducing the same timer-bound stall this patch
+removes, now on the bulk path and once per ring drain. With the bound in
+place a full ring always contains at least dma_tx_size / tx_coal_frames
+completion points; even the minimum 64-descriptor ring (DMA_MIN_TX_SIZE)
+still holds two.
+
+The practical ones: the frame counter is what keeps IC density low inside
+large batches (one IC per 25 descriptors rather than a single one at the
+tail with nothing in between), and tx-frames / tx-usecs are user-visible
+ethtool knobs on this driver that users can rely on.
+
+Dropping the frame/timer machinery would also be a rework rather than a
+fix. If there is appetite for that I would rather keep this patch minimal
+for net and discuss a rework separately for net-next.
+
+Best regards,
+Johan
 
