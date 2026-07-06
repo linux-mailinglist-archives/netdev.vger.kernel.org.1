@@ -1,246 +1,280 @@
-Return-Path: <netdev+bounces-305220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305221-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MLj0C4UTTGoSgAEAu9opvQ
-	(envelope-from <netdev+bounces-305220-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 22:43:49 +0200
+	id BVt4JYkSTGrjfwEAu9opvQ
+	(envelope-from <netdev+bounces-305221-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 22:39:37 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DB4D715841
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 22:43:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E1AFD7157F8
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 22:39:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=mCBN0EUb;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=eJGIyTzP;
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305220-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305220-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305221-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305221-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 61A16302AE19
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 20:21:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E51B93080BDA
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 20:30:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5D33DEAC1;
-	Mon,  6 Jul 2026 20:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 975583E3C5F;
+	Mon,  6 Jul 2026 20:30:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852873DE439
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 20:21:36 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783369297; cv=pass; b=GfGXGPRiTtPsA3qNHwDrPb31UfGJAL89coP5zEiqOk0OVgHpvWxf6APnAUGNbC42qA0zGS+rI7OgVUARX/3wH03zmJBLLWkXbjuc1nzjNnNMUnfX+LurJmQjUZzgXiHOnXVgQOhFU/tgfOaPZUsIXH526iWVV2w2VJ4M3poZpwg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783369297; c=relaxed/simple;
-	bh=prmM21//B9sPKYo5WgVpAv0RCpCNoPqxT9f76VlMleI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T+UvjLPMfOMz9XBHavsoGXjIQgvFGW/A0zCG6ZpAcEN21KdOcNDqaNNJKTjluMQ7YcrLx0o1tCA5MfBl12Ft8AVTxZklg6Eik27scK84py+lgUS86wthM1zY2ZpISURCAOV2R7DjyFcbN9pHs8UtMj34Wl2v76WaLX6s7O/2JOo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mCBN0EUb; arc=pass smtp.client-ip=74.125.224.43
-Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-66780d9d901so773053d50.0
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 13:21:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783369295; cv=none;
-        d=google.com; s=arc-20260327;
-        b=XQju20WR6Yr84SSSKfpHS6qAQJ9KRWCA/AbkITPzh3hRbeMwV0gYYsHzn0P8Npub9c
-         eliKHyQZp7ta7snjrhbO1hbwRWKwQM3cWTZQ7Hl99uE0I49dlPSLRyKOvZOILr1nD0IF
-         0q0F7D3GxDZ9p7ry9fTNw3iQUuZH0cPfdWOc03y2trv8jSQep44Xfcok6irVqgC3qjLf
-         WzhBygB/SBZNeeDhcO3QZgBh2ufsu6MchNo9ZqMf9IQXf2nhQUyrarBU8Vn7j3xSoQTc
-         fMG21RzOgSRBLKexp8Z5k+Zw6kBG6iP/4j7gjaQGIygXg2rNpg8oquRcsM/s2DEt9snT
-         CG9w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=4bzkzQjedlM/WHqa+XHjmbIeat2b4Ekopu5HBj7jW+I=;
-        fh=G/3bCH/i5VorMmL+fyTYbuBvx5virqlE9PlfsU/q3XU=;
-        b=aTAeC+b5spNW8lhkb/bx25w3WVrdgRKUBWYhaE67eB8VEmibv7KEdjCb24j19UUCJ0
-         93xc35qXEz5HFmmEuKbJkKnhkdnxjGOdnAEJgMGjdXKxDtt4X0n5bfQPRW/yHv0H41i5
-         IOspUkGtJwE6rpBnre9jqKs8H6pSzKtJTG5MGrErQfaKA3W1qUvH6LM3ZFEPSD2I4cEV
-         gCfEo5vj8E2hrAtPq+HSQnJ9S7G7pN9gRH019Q5IWZ6veky47v4omKJfsLo8vTUW8PDz
-         A2FeJxHHsP7T3b1KfVRwbtQQFIWPBimXFLeKk0fwt6PGQEBnF8X4DaoqG+2AkNe9GIgU
-         bb0Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 877783E2AB9
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 20:30:03 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783369806; cv=none; b=Six/X1toYFbBdSsg5arwDVhZnWDxqh/8ITH9n7eH7KXFKPcL6Ptmulc0vXWdz0s/eh45UYF3rRZ5P+B4NIhr3FkbC+A+lud2QEmN7LrgCDD3Qb6ew04h5qlGYIfI9IgrWU5pmK2gbU/VGGap/y0Ts/PKKpjQ78kT4+yhzSUP9es=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783369806; c=relaxed/simple;
+	bh=cuuGRQ9ikVr5K2JDWNiMw8FokA6lvFe5ZtfeL7kRoKQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LC3kmrT/hg8g3tpAFdosWaeVAgvMYOsIFFbp1LtPBG47BwvooR7bWi6qKdN5amnauWkJJ6ZLZY1IIV/RNhZXwinfJ6waWwmq26IXcFnnP+41a20RnjNzdE5uYanQkkJnnGGK16gV9nYbUoMramUXAax4gbQ3UV0NX+ZlXetL8gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eJGIyTzP; arc=none smtp.client-ip=209.85.128.44
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-493b7612475so32295575e9.3
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 13:30:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783369295; x=1783974095; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4bzkzQjedlM/WHqa+XHjmbIeat2b4Ekopu5HBj7jW+I=;
-        b=mCBN0EUbn33fcF6zK8G6OvRRr9Y0DlwJaBcOzQS+88PUsanPJsfSISJsOGgOjfuDwu
-         dq/3Fowg3PZrVCtELtw6QfLJ1lgb0zfvuq02RBqR8jD7k0/RuwBbXXC61YfFc6ez18og
-         gGVBqzUbKyTGMbsGeurRbRDqc0bhBHP0wfG1dOtuhTz3kQqoCWJqmEJ8ZLET6cMGO9tv
-         qHsVmN8+L4PMMc3jkuvgE0ignf7G4ytIGNHOIws35nyhOmOTLE9um+RMNmcJXUPYG/S0
-         JJOFRmkZci49ugpfADS+ySdKUxYi9+Xfxk0+Yxe0YJEeAS+jMquJG8OFkcy30Hzyvd13
-         E3cQ==
+        d=gmail.com; s=20251104; t=1783369802; x=1783974602; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6q/pZi6Akagjc5HROiArP01SOpU9gOVMCKwxAzqUAfM=;
+        b=eJGIyTzP+kAhRwtL2dHxTzMmBiNXlTHECGSUZmGjTm280+XxFxOA9JykXQ4o8xQs1L
+         TEGrgs5HBCCdEv1yRBF0RarZH8fsYGCtuozKKNDRRkvpkBsssbChORPHOpDnDFBr3wit
+         PMTKLTDkJwV8gFPjN7rBTiqCHHJuR7wWPi65tkD5VkussP6NjBGpuzOUhn6ws9XgCOP1
+         ceCT/WT0yRZAQxxuP1hdSTgriFQWfqqd8ISR5AAmw6tv6pVFIGzE0LjafrRdgM/2vSVo
+         5PL5rRW0pZHLT1A1iARx19k5IAjfuKWGczByQPYGT6QBTIvvPSYFY96Oenm1e3owWLX5
+         HAMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783369295; x=1783974095;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=4bzkzQjedlM/WHqa+XHjmbIeat2b4Ekopu5HBj7jW+I=;
-        b=nirT0fjfJXFtuNEex4M5aGtn9+4jiJ6lUibXYsUyzrCRSRVV/1Ua18Reyp8LJeDeE7
-         6skbZrsPKJYajhR8pHPvjj250AdM5LooWXScp5H5iBoiU2tUXi+lYWNfQMbiUyv6hcbf
-         +JFGast9c4iEDWTdkZlxXx+Y4BdQ9pfYwc0kNIS7DKXDzBZylNM4PV6x8coa/zw+OC/V
-         XpjYN3SyOtQV8IpwxUSE1L8O+IYDt6EqAnjGzDTeDKM1IHSAsM+WMYHAgr07rXCRW0gw
-         0JMVCThm2KqUBgmGul8Tv5ltPjajrz+69ayUEa2yGi5W1DmcfyPjc7w5VlLWjRTkXuhZ
-         RcqQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rpj9qbBnXXM5tsBYsDA1JYf2pVi55kaC9X2i/mZaecOqyvcz+4Wfe8ys/3RS+FeHx3ZqCTdgJc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyh5nu0dMQNOUdwfnQNb80V8f03nDF38OR+O+qdSIGoNOkgsc/m
-	MuCwD8oxxX9KlMmVW9Y0QFSZDUOHq3s//50fyNnJSAWq8e7THZJzpOMBEx/Wt7JtsT4XvZED/Yp
-	h1AMu+AIW8HiE9sofGjzWbIC0+FA7KsI=
-X-Gm-Gg: AfdE7cm3TkK0EaGLIl8JSvUtLKR8B8M0Lsvfu8Ci+cAAZudNlrJEwowycjLJeTqWdBL
-	DdXh09Au1CPz/nD/ZbyyTSk8sNl52DMb/n3/XjxHfEe6CQ3AzfkDqwiB1Qge7AW/SUMokPUpTiZ
-	UYHZlKKTVrWH+sqUmJrCLYc3yjU/s0ru4mU67cS85KL3qIV7fNK0vbPVvBzsngQytdkqbFD1PHQ
-	3YGZvw5l4CpQxB0RNbgySxOST+M7aulw89mdek+X24S8wdw53KcGxFbQKGkcquZUsOxoCLv
-X-Received: by 2002:a05:690e:4842:b0:665:6f1e:cad2 with SMTP id
- 956f58d0204a3-6677fc26633mr1331309d50.56.1783369295329; Mon, 06 Jul 2026
- 13:21:35 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1783369802; x=1783974602;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6q/pZi6Akagjc5HROiArP01SOpU9gOVMCKwxAzqUAfM=;
+        b=QZThkrY2CRWlq1mh2CclClcbx60UHTru2MSxZzUb5+XQKyesIpO5jrf3+Cfz9zfCs3
+         GhE9plvRkHkfu6/OU7O8YCjY6Y1IaWY6dLBpACYmF075NCkYVs/fOH9EfZ5tbzHgrND8
+         fzewQ9HNnmVweoBaqr5Q+j4lLmN4g0+NaxQ4BDik49n6/M21NNtQdUY3AV5WwV2+bqSh
+         x5iWAA+iwp0WbfOatUBr0/DBpoxJt7LF30Z0SgEKg/JpmaOpseGj0iDt8Sjy7Vp2sYZk
+         ypkPGjGq2BmdYrkZs4G7gVTHafsUwGfvLPk3tBa2gjKLWhoBEAuRv9SUL3UtspOhyMlw
+         9dAA==
+X-Forwarded-Encrypted: i=1; AHgh+RobiWCMOKsWz33Af6Xk2F3Pm2hrpZloVYGsjiXGtRMsF41hKriG+Cr5H5nObfhhCtXB+3rqum4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXcKdXOImNBR0lmd14pqPAP3zvVljR5fURx3D0Zobh2QkVII5S
+	PRMZWbfTLSsQOzfQ06zgUocC257oW4gDNd8fH3Ukp0B3rw2Fth40XEYA
+X-Gm-Gg: AfdE7cn4rmlWl9ui813FQiu/z9CQzWi3Fc4taX/jR4cjXOx0XFFb+BKNJNHABdg20m5
+	G2MuAlmxw2lafltDgpaOdAR5nBqtWQ0zEAgNDv2XIsWDrBY3tVfT5GR5vJO7g8uoHeSeCBxLSNl
+	gdtRgLnEOMEqlTcAtojUUiEL12Qv1boEKeB9eGVS1nyvME29wKoN5992BPRBNlSE5XPi1FQFxWh
+	VAUeZL81I2wzj6Lc3E0RS1/bJgNxVtcWCXMqD6KUuaVNDlDW3d8qo8tC0gJHiMfnSZj8T7aLg28
+	2eWX5YL3/mqVyV0pHYOwQHrgAdWnU4dWdRbLKl7sngEfU3Owqs4z21D7xgIyEnqy6OaM90kiDKM
+	35ty3vNX9tga4rrWKAFSbK1pKzUg9dHj3fnQy6E4Xim7A32cZHZivj78IX3h3ccCUpVniBjTnGP
+	xbVhHV4xWiN3Bw5beqgoi8KF3vAN11RMZunyy1H158O/t1OkRvU3uy4dSdNoJovM5uB4NYS4fX0
+	FlkC5Jog43YBCQ=
+X-Received: by 2002:a7b:c5cb:0:b0:493:c535:3934 with SMTP id 5b1f17b1804b1-493df09c294mr16563235e9.36.1783369801698;
+        Mon, 06 Jul 2026 13:30:01 -0700 (PDT)
+Received: from ?IPV6:2001:9e8:f13c:d501:a53d:1108:c6d3:af16? ([2001:9e8:f13c:d501:a53d:1108:c6d3:af16])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9de1e6ccsm27931062f8f.5.2026.07.06.13.30.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Jul 2026 13:30:01 -0700 (PDT)
+Message-ID: <c19e563a-8931-4f31-b05a-ff8def4a5161@gmail.com>
+Date: Mon, 6 Jul 2026 22:30:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260706093525.13030-1-mahe.tardy@gmail.com> <20260706093525.13030-3-mahe.tardy@gmail.com>
- <akvdsqFhq0x19cu2@devvm7509.cco0.facebook.com> <akvlWB6AkP6kQ7xO@gmail.com>
-In-Reply-To: <akvlWB6AkP6kQ7xO@gmail.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Mon, 6 Jul 2026 13:21:21 -0700
-X-Gm-Features: AVVi8CfZRlGTvWxUUfHSVDzobBUdmJmQJRm0dIoZ7u2Wc5w-j_dRvm0qI4-zD7w
-Message-ID: <CAMB2axPrEo0uwRkLr1fw+ycCJMGckbo4j27+_it7qqARs-9BzA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 2/6] bpf: Add ksock kfuncs
-To: Mahe Tardy <mahe.tardy@gmail.com>
-Cc: Stanislav Fomichev <sdf.kernel@gmail.com>, bpf@vger.kernel.org, andrew+netdev@lunn.ch, 
-	andrii@kernel.org, ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net, 
-	eddyz87@gmail.com, edumazet@google.com, john.fastabend@gmail.com, 
-	kuba@kernel.org, liamwisehart@meta.com, martin.lau@linux.dev, 
-	pabeni@redhat.com, song@kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 1/4] dt-bindings: net: pse-pd: add bindings
+ for Realtek/Broadcom PSE MCU
+Content-Language: en-US
+To: Conor Dooley <conor@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+ Kory Maincent <kory.maincent@bootlin.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Daniel Golle <daniel@makrotopia.org>, =?UTF-8?Q?Bj=C3=B8rn_Mork?=
+ <bjorn@mork.no>
+References: <20260706112425.3149226-1-jelonek.jonas@gmail.com>
+ <20260706112425.3149226-2-jelonek.jonas@gmail.com>
+ <20260706-player-handwash-0a3fe95cf5ec@spud>
+From: Jonas Jelonek <jelonek.jonas@gmail.com>
+In-Reply-To: <20260706-player-handwash-0a3fe95cf5ec@spud>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:mahe.tardy@gmail.com,m:sdf.kernel@gmail.com,m:bpf@vger.kernel.org,m:andrew+netdev@lunn.ch,m:andrii@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:davem@davemloft.net,m:eddyz87@gmail.com,m:edumazet@google.com,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:liamwisehart@meta.com,m:martin.lau@linux.dev,m:pabeni@redhat.com,m:song@kernel.org,m:netdev@vger.kernel.org,m:mahetardy@gmail.com,m:sdfkernel@gmail.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-305221-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-305220-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:conor@kernel.org,m:o.rempel@pengutronix.de,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:bjorn@mork.no,m:andrew@lunn.ch,m:krzk@kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,lunn.ch,kernel.org,iogearbox.net,davemloft.net,google.com,meta.com,linux.dev,redhat.com];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,vger.kernel.org:from_smtp]
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,zyxel.com:url,linksys.com:url,svanheule.net:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4DB4D715841
+X-Rspamd-Queue-Id: E1AFD7157F8
 
-On Mon, Jul 6, 2026 at 12:04=E2=80=AFPM Mahe Tardy <mahe.tardy@gmail.com> w=
-rote:
->
-> On Mon, Jul 06, 2026 at 09:58:09AM -0700, Stanislav Fomichev wrote:
-> > On 07/06, Mahe Tardy wrote:
-> > > Add BPF kfuncs that allow BPF LSM programs to create and use sockets =
-for
-> > > sending data. This provides a mechanism for BPF programs to emit
-> > > telemetry. For this first patch set, it's restricted to SOCK_DGRAM
-> > > socket types with IPPROTO_UDP protocol but could be easily extended t=
-o
-> > > SOCK_STREAM and IPPROTO_TCP in the future.
-> > >
-> > > The API consists of six kfuncs:
-> > >
-> > >   bpf_ksock_create()   - Create a socket (sleepable)
-> >
-> > [..]
-> >
-> > >   bpf_ksock_bind()     - Bind socket to local address (sleepable)
-> > >   bpf_ksock_connect()  - Connect socket to remote address (sleepable)
-> >
-> > Since you're doing only UDP for now, maybe you don't need bind/connect?=
- The
-> > kernel should autobind (by default) when you sendmsg over UDP socket (I=
-IRC).
->
-> Yep indeed, I kinda overlooked that as I started with UDP & TCP supports
-> and mostly added the args checks. Another thing is that send is simpler
-> since only used on connected sockets, so you just pass the struct
-> bpf_ksock and data. So on one side it would simplify the current
-> UDP-only API for now by removing the kfuncs but we might need a more
-> complex send kfunc (something like sendto).
+Hi Conor,
 
-I also have the same question about the necessity of bind(), but
-connect() + send() make sense to me. In the stated use case, the dst
-addr probably doesn't change often and I think avoiding route lookup
-everytime should be a good thing.
+On 06.07.26 19:35, Conor Dooley wrote:
+> On Mon, Jul 06, 2026 at 11:24:21AM +0000, Jonas Jelonek wrote:
+>> [...]
+>> +
+>> +description: |
+>> +  Microcontroller (MCU) that fronts the PSE hardware on switches using
+>> +  Realtek (RTL8238B, RTL8239, RTL8239C) or Broadcom (BCM59111, BCM59121)
+>> +  PSE chips. The MCU exposes a small message-based protocol over either
+>> +  I2C/SMBus or UART; the actual PSE silicon is not accessed directly. The
+>> +  Realtek and Broadcom variants share this device tree contract but use
+>> +  different protocol opcodes, selected by the compatible.
+>> +
+>> +  The compatible identifies the PSE-MCU protocol dialect, not a specific
+>> +  part. The device here is the MCU: it presents a stable message protocol
+>> +  documented by Realtek, with the PSE silicon behind it - Broadcom on
+>> +  older boards, Realtek on newer - detected at runtime and not described
+>> +  here. The MCU's own silicon is general-purpose and varies across
+>> +  boards, so the 'realtek' vendor prefix names the protocol front-end
+>> +  (following the google,cros-ec pattern); the '-rtk'/'-brcm' suffix
+>> +  selects the Realtek or Broadcom dialect.
+>> +
+>> +  A single compatible per dialect covers both the I2C/SMBus and UART
+>> +  attachments: the wire protocol is identical across them and the
+>> +  transport is already expressed by the node's parent bus, so it is not
+>> +  encoded in the compatible. Transport-specific properties differ
+>> +  accordingly - the I2C attachment carries 'reg' (and, for Realtek,
+>> +  'realtek,i2c-protocol'), while the UART attachment carries the serial
+>> +  peripheral properties such as 'current-speed'.
+> I'm not really convinced by the arguments here.
+>
+> If the switch vendors are running different software on their MCUs to
+> the point that they behave differently, then yes it makes sense to have
+> different compatibles.
+>
+> The first thing I don't understand is why realtek is considered the
+> main vendor here? Is it their MCU that broadcom are re-using with some
+> protocol tweaks?
 
+The protocol and firmware on the MCU, most likely the whole "solution",
+is from Realtek. The setup is always the same on most Realtek-based
+switches (saying most because a few counterexamples use completely
+different setups, not even Broadcom or Realtek PSE silicon). The host
+interface is always the same (except for I2C vs. SMBus vs. UART, which
+is likely just a config in the MCU firmware). Therefore "realtek," is the
+right prefix for all of these.
+
+Broadcom is not really involved here except for their PSE silicon being
+used. Maybe Realtek modeled their MCU host protocol after the one that
+Broadcom PSE silicon uses as host interface, but this is rather guessing.
+
+Maybe a historical view might help. Older RTL83xx-based switches with
+PoE shipped with this setup using Broadcom PSE silicon. From what I know,
+at this point Realtek didn't design their own PSE silicon. They used the
+Broadcom silicon, put a MCU as a manager in front of it with their firmware
+and a host protocol based on what Broadcom PSE itself uses. At some
+point Realtek started to design their own PSE silicon which then was
+used in newer switches instead of Broadcom PSE.
+
+> If it is, then having the vendor as a suffix like wheel reinvention to
+> me, and if the MCU and/or protocol aren't something that broadcom
+> borrowed from realtek then having a realtek vendor prefix is strange
+> altogether. The mention of old boards being broadcom while the protocol
+> is documented by realtek is confusing me.
 >
-> >
-> > >   bpf_ksock_send()     - Send data through the socket (sleepable)
-> > >   bpf_ksock_acquire()  - Acquire a reference to a socket context
-> > >   bpf_ksock_release()  - Release a reference (cleanup via
-> > >                          queue_rcu_work since sock_release sleeps)
-> > >
-> > > The setup kfuncs bpf_ksock_create, bpf_ksock_bind, bpf_ksock_connect,
-> > > can be called from SYSCALL programs only. While bpf_ksock_acquire,
-> > > bpf_ksock_release and bpf_ksock_send can be called from SYSCALL and L=
-SM
-> > > programs.
-> > >
-> > > The implementation follows the established kfunc lifecycle pattern
-> > > (create/acquire/release with refcounting, kptr map storage, dtor
-> > > registration). The kernel socket is wrapped in a refcounted bpf_ksock
-> > > struct. Cleanup is deferred via queue_rcu_work() because sock_release=
-()
-> > > may sleep.
-> > >
-> > > The kfuncs are only compiled when CONFIG_INET is enabled, as they
-> > > specifically support AF_INET and AF_INET6 sockets.
-> > >
-> > > The socket operations go through the expected LSM hooks instead of
-> > > by-passing them like many kernel sockets since those are created by B=
-PF
-> > > programs and thus system users. Thus bpf_ksock_send() kfunc, which is
-> > > exposed to LSM progs, has a re-entering protection to avoid recursion=
-.
-> > > Also, because of the LSM checks, we prevent the use of the kfuncs fro=
-m
-> > > asynchronous workqueue as the current value would then be invalid.
-> >
-> > [..]
-> >
-> > > A bpf_ksock_max sysctl is added to limit the maximum number of BPF
-> > > kernel sockets that may exist in each network namespace. Out of
-> > > simplicity for now, the settings is host wide but the counters are pe=
-r
-> > > network namespace.
-> >
-> > What is this guarding against? Rogue bpf programs creating too many soc=
-kets?
+> Either way, encoding the vendor without using the vendor prefix seems
+> very odd me to.
+
+I'm open for suggestions here. This has been the hardest issue in this
+whole series, to be honest. It basically boils down to differentiating
+these two protocol generations. I cannot say why Realtek did that on
+the transition to their own PSE silicon but vendors doing weird stuff
+shouldn't be surprising and this is the reality now.
+
+Is something like "-gen1" and "-gen2" better, with a clear description
+somewhere in the bindings how that maps to actual device setups
+(gen1 = older/MCU fronts Broadcom PSE, gen2 = newer/MCU fronts
+Realtek PSE)? This would drop Broadcom and the confusion around it
+here. I admit, using a vendor suffix isn't great and still attributes
+Broadcom too much in this context here.
+
+> Secondly, the compatibles you do provide seem too generic. Is it really
+> possible for a given board to use smbus AND i2c, or do specific boards
+> only ever use i2c OR smbus (or uart for that matter).
+> I find it more believable that a board would support i2c and uart than
+> supporting both i2c and smbus fwiw.
+
+Only one at a time is used, but not combined in any way. All switches
+I've seen so far always have a single management MCU for PoE, not
+multiple. Thus, only a single variant is used. Which variant is used
+likely depends on the board vendor which then tells Realtek "I want your
+PoE solution, I can attach it via (I2C/SMBus/UART)". At least for UART vs.
+I2C/SMBus there are sometimes valid reasons to use UART over the other.
+
+There is only a single switch (from Linksys) where the MCU expects raw
+I2C messages. SMBus transaction fail actually. But I don't see the reason
+why Linksys did it that way. The reason can't be that the MCU is attached
+on a bit-banged I2C because another switch uses SMBus transaction on
+a bit-banged I2C.
+
+> Can you provide a link to the actual devices somewhere? It is
+> completely non-obvious to me what the binding actually represents.
+
+I hope I get your request correctly. Find some links to devices and/or
+to my commits wiring that up in actual DTS (WIP, hashes may change).
+
+Zyxel XMG1915-10EP (UART with Realtek PSE silicon):
+https://svanheule.net/switches/xmg1915-10ep
+https://github.com/jonasjelonek/openwrt/commit/d173e64730a511e04b68271289be23ae4e98a02f
+
+Zyxel XS1930-12HP (SMBus with Realtek PSE silicon):
+https://www.zyxel.com/de/de/products/switch/10-12-port-10g-multi-gigabit-lite-l3-smart-managed-switch-xs1930-series
+https://github.com/jonasjelonek/openwrt/commit/74339c9a002032fc204b6b1fe07af259d8f51787
+
+Zyxel GS1900-10HPv1 (UART with Broadcom PSE silicon):
+https://svanheule.net/switches/gs1900-10hp
+
+Linksys LGS328MPC (I2C raw, not SMBus, with Realtek PSE silicon):
+https://support.linksys.com/kb/article/5133-en/
+
+(mostly Zyxel devices but that's just the main devices I work with)
+
+> Cheers,
+> Conor.
 >
-> Yes. AI review raised this because users are prevented from creating too
-> many sockets by bumping against the max number of fd and this would
-> allow them to create way more sockets. I kind of agreed that having "a
-> limit" on resource creation would make sense but maybe it doesn't and we
-> can simplify this!
 >
->
+>> [...]
+>>
+
+Best regards,
+Jonas
 
