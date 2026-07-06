@@ -1,175 +1,182 @@
-Return-Path: <netdev+bounces-305045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305047-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id xFYMN5bHS2qBaAEAu9opvQ
-	(envelope-from <netdev+bounces-305045-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 17:19:50 +0200
+	id TNkoHk25S2rxZAEAu9opvQ
+	(envelope-from <netdev+bounces-305047-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 16:18:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F3127127C6
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 17:19:50 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 635C2711DC9
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 16:18:52 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=queasysnail.net header.s=fm3 header.b="d OJKes6";
-	dkim=pass header.d=messagingengine.com header.s=fm2 header.b=UF+TIdiw;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305045-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305045-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=bYtPyQdY;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305047-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305047-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 53C8D30B61DD
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 13:31:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 56C173229F98
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 13:34:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9236A242D97;
-	Mon,  6 Jul 2026 13:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA212BEC52;
+	Mon,  6 Jul 2026 13:34:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7793717BCA;
-	Mon,  6 Jul 2026 13:31:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45FB63033FE
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 13:34:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783344673; cv=none; b=KOP5bk28Qq+6/GvUdFFLqp8nS2bV3PJ3Qb518Vwv7KW7NTYocHaRvOEwtwtkQ4hs28vO5ApI3WSyn6wOZSVLEGOzPjjMwluR8BspIvKzBUzVRzgHI9aQ21tE4fDGUrbgha0aRDpfO9DPNVO4IKRuwbjO50rv2/e1NeFnZQojhtc=
+	t=1783344881; cv=none; b=tJblsQ9xSQYxPBvmcdQkVwLZpCktv5fSFw8AwY+gzVwttKJ5+F4EMz7WyyfvJv9R3z9rJyd0LCOH3YSYaYAtBiA4n/uwTpe/WVqFFyoQatAqUuFY/Alc2PLMwggO297yzkJI/ksFMU/UXsh2ZYUTmLhHa34mOX5NS5g5Ja0Pq0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783344673; c=relaxed/simple;
-	bh=7x9awA5nmoyx1UqwnEAd0FflOuYZ1NXGJFmepI2KkUs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q0L6MTR4m82wvRs3jmzTbGohxxL+8QLuz4DQYhKVOxli2Pbt02OMr+Y95Xkm7bAjdgCsvGwbEwD5zGrSgCzICrfQGcKF6JoycWRqiyeIE1zc9tdC4xoOGcq9M5T0Hq9NKXbjB57dihyKLis/BZrhXpPml9udmFRvvSJdBQ9iS/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=dOJKes6/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=UF+TIdiw; arc=none smtp.client-ip=202.12.124.155
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 553B87A0084;
-	Mon,  6 Jul 2026 09:31:09 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Mon, 06 Jul 2026 09:31:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1783344669; x=
-	1783431069; bh=DFUGFQyQzVPK09g2DuqR4kS0HKfrvSeKc/J6SUbSCZM=; b=d
-	OJKes6/uCU7WGHG0Ngj3ZtwdbZuAoyUtO6GmM4b1pXMsQ5mfQ03C5q44GkT6Synr
-	3Ax3znTFT0w/T1bc28rt9O+0/lJrozTxVpU2EYhEpimf6Kb+oVibbq9mroePku5V
-	w8vXNj2YOnvrMEXVXrEB1kNiaWSTRcJIPUdxHU+v0LNfVacolFdlsWOZKkmxhBHn
-	qORL1NxGhDAsdWPl9NA3gkfiTwBrwQxsVzcPF4bpD+hfDMJ+Resy8fXVYpfCrgm2
-	2YzwQMuJ51JSRtz8ep3j2ATq0BgZ0UFocG2bfJQFQ1hlEuMfBIHfctmKrGZ8ibKx
-	4sEeIjMZz1QfYDC8NQJPw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1783344669; x=1783431069; bh=DFUGFQyQzVPK09g2DuqR4kS0HKfrvSeKc/J
-	6SUbSCZM=; b=UF+TIdiw31W9QOHNCeIqqZzECs+quEagkAirzVlEkULRUpvOjJy
-	WzzJUV/5lFLfrTuSadYFMaCxj7WQ30RP63b0anxGFUoS05nzAiLWsofFEurBC38Q
-	lvrXMqE2Jxzgmgcz3MQlgtUr6Gw+870SWrWleormz7Em2Fi8l9G2nFir4B/Rjf19
-	acZtWgiNDNSsEHjmIcsCWKjXPI/HVVnO0jaiguGwGM/i7qR462Y1Q6rVe4QPRRKA
-	JRRRIg9gQ0UoyyxbaLwELURwWiIBFvDreB6OD7GlOTlTc363oiAINltRkupD2YvG
-	fRtdZlkEIuYzrpGgUouE0Sxr/EXFf1wVHww==
-X-ME-Sender: <xms:HK5LatxvxsNO4CRyVM11tMJIMFJRmLJazsFhdTh41iyPOWedtjQMzw>
-    <xme:HK5Latv-bpxCNMvitKc8eGwAG8-RMJcY4KCJoyZo7gLVkJnNljVA0GybW5zKGvaUO
-    _ZWj5ieNv9yyB7j5q8XyUwc5YRNqBwKIRmzL_TRu-VjDYATro1aHlQ>
-X-ME-Received: <xmr:HK5LaoBBJvlJPA5mjEV4RPVEPnPseTnrgp285oGxYRiJTsR0wIEoBu00o1Q>
-X-ME-Proxy-Cause: dmFkZTFD7wJ3IvjMz1MIxwtJ6Wnrm2HM6x/4TCwRPWChgA+dgF6zRTZ95J23b4iSQHLSGM
-    WwBHaXUIeiaOTXXzS1mVPLK1lj7Gtw//28L+z+hap+rJbT+kuxH0zTWrHUWq33UqAY7Dw1
-    MAqea8gDL1DMqYf5gpipWAWnW3aqydoNu2Eg2VGpmLIOWo1OaUKEh6h1hTJOIseya2JDTQ
-    U0IzsR5vVlg9AtCI/n2i3V9Bdu+Djd2RStBrEY4qu0hrQZgGw2QYAZQutJv1NmS9KICom4
-    9ch+GMNCsGMsDCLPIBlTdBtjTS5m2FOv40caTkNObC9g3f6FadUD+ZuSJ+9sO6jknmVDGK
-    5+6ddZFQ6jUCpfZyu+03ySDjE4OjpyQV9D7e8PyqcsPX8C1uvDtX1m8Adxll32w7psjdGv
-    YlOCfwzlvGQT+9jTyild7bLeH1fl7lTI4zD5NzHQWR9im+7RivF918oDp5JUfJrww2HMdq
-    /ZvST1/0qbsY9vilB0iqkEksndN4O7KwuowXaJQNsPJXatLH9yGqa8ObK6PsJSUNKQcUbJ
-    TESbf8SlP0KXmCFJg+5MNG47MPuqvGTZQFzdEtyLDdiJSA+5h+T5Fn/qo/oAjbuwd2dzlj
-    LZrOTpJgoBukGwLVlzl80en+rX4uznz2sQQq8jm3f8Y7a55cPC4yPWNaU0mQ
-X-ME-Proxy: <xmx:HK5LanHK7k1Q5FPku9uzTd8tkovMuAe9v6Amb7EbV1KjeazkQMgYqA>
-    <xmx:HK5LagDxX8oVPgWKSDEHzx5Ds4GXENiQLciT04OpkKNHkBLRHZMv2g>
-    <xmx:HK5Lalme1Llgur9qLk4Xb3lHWdikjIQZ8P-H8dGBboMAW6FOBb_Veg>
-    <xmx:HK5LauM59amSlS0KEh7hABM8BeQH7KVtKYbxVwJvl6-mOB6CkSP8iQ>
-    <xmx:Ha5LalNUBIHgb0rJK6bQwaW-7DlTB2x5SUsokqcwxcrTkpQsifIFRaNS>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 6 Jul 2026 09:31:08 -0400 (EDT)
-Date: Mon, 6 Jul 2026 15:31:06 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Daehyeon Ko <4ncienth@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net] macsec: don't read an unset MAC header in
- macsec_encrypt()
-Message-ID: <akuuGhf4aR7V33eO@krikkit>
-References: <20260703083634.2035145-1-4ncienth@gmail.com>
+	s=arc-20240116; t=1783344881; c=relaxed/simple;
+	bh=fwgmvkKPQBqOq5X1JUbObzAQUFrQH49yNVzsze80QK8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AY3SW/AIAuqnR9sVqJ1ktPxDuYi/j5DWzeAuidqPmRvcEfTelckqHg+jVu2hFc60IH6ya+jH6O9RcZbeVxBQ2xmcdVkRdrDpffWwmfQaNMgNvRcpCyFLKrfaPZZiBp5Es743Sc2Lvqg3ZTsBzeX6Zy8ptBLCPfTM1z2M35ijjOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bYtPyQdY; arc=none smtp.client-ip=74.125.224.43
+Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-6651bc57458so1861309d50.2
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 06:34:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783344879; x=1783949679; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=uq26SOoIyTGHeDsOjuTjnwQxJZMXbFIik+DfAya0+/w=;
+        b=bYtPyQdYpKGGRIWbFEtyefmLIJvbmoOu8RVdQTfwd1mhgPhCT3MAEII0WWZLKi7RhD
+         fEpucYIgVEa7/5A891SZqXCMCWkDmzNydx28G75a/xsVYpIzrLBV867YAtwEcxiWucIj
+         +F1q2yB20LX3GZOiBBrQs80wNrR4dmHsrgt1dw5gS21fQE7CbbkP13c/08auyYxYcX8x
+         kMklEw/X7lQDibMOyi1uguAjt7V8RoZviVczDGbL2zhq9KRwO+okdL3mySTP3FCsCmec
+         yr2Vpr56ymH8h/mgO+ajZFGp2pYEpgTuKZqJPrw2R/kUu3u+Ov+CJ/Lkjbw6cs7iYVTU
+         Gggg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783344879; x=1783949679;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=uq26SOoIyTGHeDsOjuTjnwQxJZMXbFIik+DfAya0+/w=;
+        b=BMPOS8QmCJybc6W70Uvt+BDRJjbBELLD2Bjy60JiyqiNFjhAmHQgzzPnX1JVCH+77U
+         9Hnz8aqxnaPTRZLyr1Ara7n08NFAvKdmJnyHpzN5KEVB5AiH1l5YVZCC0oRQPgi65Chd
+         85tUKsvIgLMhpVX0uwCsSpPqbKhcjpxBIlWiCj/QJlrCBorDmi+u/YX9ZxouiFALeWfP
+         zjKHwgaugvF5W0yU+AqOanoSndZC4dkaCXblZ0WwcjVB6oU/2wfNRmxmJHCf812OkxF7
+         XXTHK0EFFw0IVvhJ2zcZpHvl41M1D7mutaa4BJPWkdaIOkuX0VjAstkHOWmW1BKgcvE6
+         WOjg==
+X-Gm-Message-State: AOJu0YzO6Jh3gpM79wyIV9mnfD4JsOup644uTMS9jgvA/b/mR+p5HBop
+	xhvj62QRB4wjHZRGcFoFMhLgvOr16nVbexqwGnKVcyi++MNB/RRnKqNttQNYpQ==
+X-Gm-Gg: AfdE7ckeoVvUJgjEtPX+sxuPx489oPKeZfnZHFQtGSOrQbzyPSTXVv/c9aFiIPz/rYN
+	3MVzZSXJ9C3PZyLSFGpsf1k20iNUhxG93Ddp2yL2i3mNZ+QPEKt9u/FzLyNxeJVqot+BGNdyO2b
+	8nB/KBql/Ukyt2dCKVuwib8gbkssWsabKSSGN2QNnr8y9+4DK2LipNKuxALeW+dBtcnsnNm65BL
+	2KUtpJkkRHz5oK5AnEbiiMY0dZjZcBLrCm9skla9xfRVrXDhX1KVfZwboFMQI1LHTYCOghhAbFh
+	bLnaySjGoBd76LwxPZScDhnUdx7lzj39Da7YaAWN3Ap2dZWjp+xrA0t3kuwvmyxwNSqnUHSvwrq
+	bVj9ofRHiGgt8fJIALykGOwZbkDIFL05ob8tLT2mMa8ztnoQv6XnHljEpnViRxSZZrvCrGuvBRw
+	GKv5eT1cman5QkHKdeQdyc1Czhy/b1r2ldiLJlJ6WpVfaBHhr/iDprpGvb6Q5kyj1gZF0uo9jby
+	/FEQSINPD7AKVKy
+X-Received: by 2002:a05:690c:d8c:b0:80d:d2ea:452f with SMTP id 00721157ae682-81be319d89bmr1992087b3.46.1783344878970;
+        Mon, 06 Jul 2026 06:34:38 -0700 (PDT)
+Received: from willemb.c.googlers.com.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-8144b537e3asm57002827b3.34.2026.07.06.06.34.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jul 2026 06:34:38 -0700 (PDT)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	andrew@lunn.ch,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next 0/7] hardware pacing offload
+Date: Mon,  6 Jul 2026 09:34:02 -0400
+Message-ID: <20260706133433.3142805-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.55.0.795.g602f6c329a-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260703083634.2035145-1-4ncienth@gmail.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305045-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:4ncienth@gmail.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305047-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew@lunn.ch,m:willemb@google.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[krikkit:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,messagingengine.com:dkim,queasysnail.net:from_mime,queasysnail.net:email,queasysnail.net:dkim]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5F3127127C6
+X-Rspamd-Queue-Id: 635C2711DC9
 
-2026-07-03, 17:36:33 +0900, Daehyeon Ko wrote:
-> macsec_encrypt() reads the Ethernet header via eth_hdr(skb)
-> (skb->head + skb->mac_header) to memmove() the 12 source/destination MAC
-> bytes forward and make room for the SecTAG.
-> 
-> On the AF_PACKET SOCK_RAW + PACKET_QDISC_BYPASS transmit path the skb
-> reaches the macsec ndo_start_xmit() with the MAC header unset, so
-> eth_hdr(skb) resolves to skb->head + (u16)~0 and the read is out of
-> bounds: a 12-byte heap over-read that is also emitted on the wire as the
-> frame's outer source/destination MAC. KASAN reports a slab-out-of-bounds
-> read in macsec_start_xmit() on 6.0; on current mainline a CONFIG_DEBUG_NET
-> build flags it as an unset mac header in skb_mac_header().
-> 
-> On the TX path the L2 header is at skb->data, so use skb_eth_hdr(), added
-> by commit 96cc4b69581d ("macvlan: do not assume mac_header is set in
-> macvlan_broadcast()") for exactly this purpose.
-> 
-> Fixes: c09440f7dcb3 ("macsec: introduce IEEE 802.1AE driver")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Daehyeon Ko <4ncienth@gmail.com>
-> ---
->  drivers/net/macsec.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+From: Willem de Bruijn <willemb@google.com>
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+Enable safe hardware pacing offload on a first device (idpf), plus support.
+
+- Add ethtool support for admin control over the device feature
+- Add device support to the idpf driver
+
+Besides the main feature, also
+
+- Small optimization to FQ offload: avoid unnecessary ktime_.._get().
+- Expand so_txtime drv-net test with hw offload testcases.
+- Expand pktgen with txtime feature.
+
+Details in the individual patches.
+
+Willem de Bruijn (7):
+  net: ethtool: add hardware pacing offload support to rings
+  net_sched: sch_fq: clear past skb->tstamp if offloading pacing
+  idpf: support pacing offload
+  selftests: drv-net: refactor so_txtime errqueue handling
+  selftests: drv-net: in so_txtime tell apart sw from hw pacing
+  selftests: drv-net: extend so_txtime with hw offload
+  net: pktgen: add support for SO_TXTIME
+
+ Documentation/netlink/specs/ethtool.yaml      |   6 +
+ .../networking/net_cachelines/net_device.rst  |   3 +-
+ .../net/ethernet/intel/idpf/idpf_ethtool.c    |   3 +-
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    |   5 +
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  63 +++++++-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   |   2 +
+ include/linux/ethtool.h                       |   6 +
+ include/linux/netdevice.h                     |   6 +-
+ .../uapi/linux/ethtool_netlink_generated.h    |   2 +
+ net/core/pktgen.c                             |  85 ++++++++++
+ net/core/rtnetlink.c                          |   2 +-
+ net/ethtool/common.c                          |   3 +
+ net/ethtool/netlink.h                         |   2 +-
+ net/ethtool/rings.c                           |  30 +++-
+ net/sched/sch_fq.c                            |  21 ++-
+ tools/testing/selftests/drivers/net/settings  |   1 +
+ .../testing/selftests/drivers/net/so_txtime.c | 147 +++++++++++++-----
+ .../selftests/drivers/net/so_txtime.py        |  72 ++++++++-
+ 18 files changed, 399 insertions(+), 60 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/settings
 
 -- 
-Sabrina
+2.55.0.795.g602f6c329a-goog
+
 
