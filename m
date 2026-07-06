@@ -1,209 +1,234 @@
-Return-Path: <netdev+bounces-305061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305062-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ii4jJLO3S2qTZAEAu9opvQ
-	(envelope-from <netdev+bounces-305061-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 16:12:03 +0200
+	id +S8RHMOyS2rhYgEAu9opvQ
+	(envelope-from <netdev+bounces-305062-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 15:50:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23581711CA2
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 16:12:03 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0843C711803
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 15:50:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=suse.com header.s=google header.b=P5zsbP1R;
-	dmarc=pass (policy=quarantine) header.from=suse.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305061-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305061-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=garyguo.net header.s=selector1 header.b=caM4cf91;
+	dmarc=pass (policy=none) header.from=garyguo.net;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305062-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305062-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 16ABC311C062
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 13:41:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6940630739B8
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 13:41:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92F3841613B;
-	Mon,  6 Jul 2026 13:40:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43DB241A785;
+	Mon,  6 Jul 2026 13:40:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CWXP265CU008.outbound.protection.outlook.com (mail-ukwestazon11020108.outbound.protection.outlook.com [52.101.195.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875E5373BE9
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 13:40:48 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783345250; cv=none; b=EAkJsm7umkBaluceObc8LhWDclSPhfXAqzKzwbO0g0zni68nMx3vDk5X+5og3ntA8iQoSxXXP4Fqnpbnw5238PMXeWYjYuKgkt2UjXguLmUQJHtjg4stUFMM/cF98zf6T1ugEcgjh7V2jrbBrZOApB4UIr/niGSQ5yer0QDK9zg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783345250; c=relaxed/simple;
-	bh=2viZWvH6/+46Pl78pc14Y4zP+oD7vA7rv2Yat9sU6W4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d2pznPxjcGWI0cUWADEOIWoBeQd569in8ExTlYcJMSRs7kv1KB8wTPT36HIx2OUz3E6RSTp0DUyEvtsyqSCvEXAtM7Q9DS3AsUSW73qM3G4mxNM971hyRRpBhJsT8cFal5VJZXczk4EF+i1dyE4T/uI7LhmG2yXe71n4P2s+w4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=P5zsbP1R; arc=none smtp.client-ip=209.85.128.51
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-493b7612475so28422295e9.3
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 06:40:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1783345247; x=1783950047; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hAtyS+TPO1WR/0zgU9PmtjKVpg47XvcTOZ7PAzXPVhc=;
-        b=P5zsbP1RmXMQZnFuOjKlFxnOj4MiKe8c3H5tJ/SU2VYnNwRNoXbhoFJcMNSSyWUdTd
-         qAmi02P7MFCe8gRBzYsmI9DJt+wDp/GKRD58yGm/oZDj9IRI2tcvdkH/poG0TYPeFEwx
-         xu49ARapyE9Ep1adV4HC93x7+mS/tIXOvQs02ZOUT92GbtSR7jSqXS20VqFkJ+sW7+22
-         9ocZIIQYkjD9yYKZZ2xdgxEkEnVyaLwa/Ofc58WJRhldFTXj7EDhsCwj5gPpdXwoBrEY
-         EM9kaNFQFImhpliGjtgvCbvDSX9A/hvIBrDATWY4NtRR8ZU+N9j96r2Gxryi2mvIOyE2
-         fWQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783345247; x=1783950047;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=hAtyS+TPO1WR/0zgU9PmtjKVpg47XvcTOZ7PAzXPVhc=;
-        b=tCKKnrhECd+SwpyhWrV8bPpC2VuNV/MvD0nAbSQrCeub7z3WLrFYuWTTYYcqSsSkaP
-         3yfFh3G/tIHm+KLkMffvCbrprRpeHr+tWCfb5ofKHQeoVxkQ4c1sgjXyDcJ2q+MF25vo
-         noQlpVmykRNIa9DuxoQtrb1hdlf6HwLQoyHQ2CwHdjYtgLUeehcIRnISR9w9iA4K4/p0
-         QjE+meBjn/GW0l1ifioBUXcfcUQSs3UX+0FGNTYjHimyTFafxpzW87fKPWQWmEYCaGCU
-         /KuIhIa02kDtln5N+WEK7/naJ1dGluxPVf00Upb3MOA+gfE5jJHEq+gufwoSrlgAgTbD
-         J7BA==
-X-Forwarded-Encrypted: i=1; AHgh+RpGJhLfb47GXXnLknDT6Z2b42HytwI4C9s+N1IAHLXa1NUCjBiiSyowH2v++tG2nQpJwHtji6g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIdwbl+K9Wlc0CzhOTcDq/hOk9Q7HkaZpr/FoC2fgbYqVkkmOW
-	X7cdKHW53y+WfhInaxCQgbmDzvUbjAdgVhUfnOnxPNuuR372ANIl0ChASYr2M/iiLPA=
-X-Gm-Gg: AfdE7cni9AFRxN/X1O0zeJHRk+UaAJuaPOrNlLudVwgAZ2br768+uAhppl1Xg/IdolD
-	DgdOHY06tkRtHb4iPr/keZPeLC36JABS+mToazDjn7LbLv032fV/HeAb15FoeMLftMLAZ4ObV4q
-	NL+CiPNlXc9/F48X/j34ZIHENb4/AxP6BGna4GratLFuid/T/8G/7qqI+TkNuYRhTgNrEH/jjvF
-	uj0H3uh0JsywCWNEVz0NDqfUu926sH6YVHPJwSpstQT9Xybv84uhWkM243glCc7CibN4tp7EIXq
-	L9KGiA7rjs12Gn/qRVbk2HeQnNZgutdzcM21AiqJLH4Klo6zMYTxE3sjY4KzSuOExZqjzC9w41f
-	zyGKzWj7uu9by1JYpC6dgoAn6fItK6CZaN5Agg7PVFNrWNF3TNcSBT5QoptstWtzeHe8t+MMOpu
-	NZUkRIuemT6J3DNqmPmd7TqykEarXJNTWHZYJ77BPh1hdRZA==
-X-Received: by 2002:a05:600c:1909:b0:493:cfe8:5b36 with SMTP id 5b1f17b1804b1-493df062b57mr7704775e9.8.1783345246965;
-        Mon, 06 Jul 2026 06:40:46 -0700 (PDT)
-Received: from localhost.localdomain ([2a00:6d43:105:c401:e307:1a37:2e76:ce91])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa0f214d2sm24424868f8f.33.2026.07.06.06.40.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jul 2026 06:40:46 -0700 (PDT)
-From: Marco Crivellari <marco.crivellari@suse.com>
-To: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Tejun Heo <tj@kernel.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	linux-usb@vger.kernel.org
-Subject: [PATCH net-next v2 5/5] net: usb: r8152: Move long delayed work on system_dfl_long_wq
-Date: Mon,  6 Jul 2026 15:40:28 +0200
-Message-ID: <20260706134033.244295-6-marco.crivellari@suse.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260706134033.244295-1-marco.crivellari@suse.com>
-References: <20260706134033.244295-1-marco.crivellari@suse.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B6F3FC5B5;
+	Mon,  6 Jul 2026 13:40:49 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783345251; cv=fail; b=qvKy4tvhCBlRMj5KmsneGQA66N2/pyCvRyphgtUSUf4uIYPe4qBwa+ILJ3FmcSC0dxqVVyU1vpHSxjCQizEA0nwk5ZFcdNRWkneSwuYl1ahfeZA1cTjfck1JWNL59SEIuPx1ch+/yxZuEQinQNZPpSCa5duBFBcvCROMb/y3wss=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783345251; c=relaxed/simple;
+	bh=9TdsMc/PGlZWldJp9jtgbiz0F6Kd7oNkHeQxy8Gm5mE=;
+	h=Content-Type:Date:Message-Id:Cc:Subject:From:To:References:
+	 In-Reply-To:MIME-Version; b=YWu38s5vgCjOaj1o5fSiTNoVJq3EjtUS9nuOZVqnZlRgLJrcDQ1PjHs7NmpCorYKAtecP1c1k90bim3GNrjQihtzVVeeeopWCzpigvZgPso3lZeYPFN/Wcvcpw7RZ+dIz0EnHgbZzb7Ygcom7bZH123zMVr8Hkps3EPmu4NWpro=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=caM4cf91; arc=fail smtp.client-ip=52.101.195.108
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YwemvyILRMRgdROR16ZHOYUz+/OBR2YZk/3iN3FanHjDbXThmuANdoz3rYJqiOR/LFrriseNx5DdTVZh2zNs8z54pP8QQCeaUTpONvyDccRy01M4oJy9AVuk0uVA48oMWzJ3clJrPaLVtsTtGAdIIrV0pPOqpa6byr1Ba9ui7bAY8F1ozkNY7bxidmrBojMzIlgBR7nxij9bqP66A6k1paAlCRmAbKCYdofcw05FEYkzKp2YhHQH2ZuEzbCNTRHEGsnLcRIxeF/Q1zU55iR+L495Yt+piwoQ9LXwuEmV//kLQ2ptGG6bmW8+F/19Xa+Uxc5KS0Mx/ouonPQ8a6wZRg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zS1nrMkQ+n+ifHk9bsVXL+95RAP2c4oUGjTve5ol22o=;
+ b=OWRQcnU7NCPUzp0yEysvApGfHRNRK1dPAcpTtf02regDTjnNfBa2uuZYaj/ZwPEAYlozdna9Z4BnSsbANho5g599Pp69w+4zX/oyrVc3nQnZWWlpNCa77TODmnQfPcnpG46daG7Bu4lXm9Mg9w083+TfFGWYO6JQeJ26lxCMdUh/+nSMotf621WpVF0zETDQ+E3Yg1jlmS4GVaOCQ8UcTVSqs9qVDf9Z1mxPQzHIuLK2YiFRwTI4DXejk++knp3TuvqanFC2K2Qhk2suh3FQ2F4gyRHa6mfP0tX9pliAxUOOXdBWUg0AvkKpGx8skEf9AJEYO+KgfQisiJ/RJlld7A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
+ dkim=pass header.d=garyguo.net; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zS1nrMkQ+n+ifHk9bsVXL+95RAP2c4oUGjTve5ol22o=;
+ b=caM4cf913k915+JM/9zgY1sWcY4FNcdZJ+80FFBEOZr31RainAdDLtvsoG5HpW7Dd9Cys6oY1bPiCdawG0bIK7bRRfTg/WcInst2dIsVlO9VvhEvxylhczIdyT9qDIQrFlfTENEcd7xpPXbYxTrca4/ZXUpXOJVtGKawRN2UdGQ=
+Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
+ by CWXP265MB2886.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:c6::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.13; Mon, 6 Jul
+ 2026 13:40:45 +0000
+Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1c3:ceba:21b4:9986%4]) with mapi id 15.21.0181.008; Mon, 6 Jul 2026
+ 13:40:44 +0000
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 06 Jul 2026 14:40:44 +0100
+Message-Id: <DJRJ4N9UQUR8.1GSF8WWG5WO2Q@garyguo.net>
+Cc: "FUJITA Tomonori" <fujita.tomonori@gmail.com>, "Trevor Gross"
+ <tmgross@umich.edu>, "Heiner Kallweit" <hkallweit1@gmail.com>, "Russell
+ King" <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+ <rust-for-linux@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 1/2] net: phy: ax88796b: Use vertical import
+ style
+From: "Gary Guo" <gary@garyguo.net>
+To: "Andrew Lunn" <andrew@lunn.ch>, "Guru Das Srinagesh" <linux@gurudas.dev>
+X-Mailer: aerc 0.21.0
+References: <20260705-net-vert-imp-v1-0-95a35ddff411@gurudas.dev>
+ <20260705-net-vert-imp-v1-1-95a35ddff411@gurudas.dev>
+ <8376fc86-be9d-4e3a-a51e-4d9ecda1b648@lunn.ch>
+In-Reply-To: <8376fc86-be9d-4e3a-a51e-4d9ecda1b648@lunn.ch>
+X-ClientProxiedBy: LO3P265CA0007.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:bb::12) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:488::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|CWXP265MB2886:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1874fb46-0e59-4ca4-ed7c-08dedb642df0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|23010399003|7416014|10070799003|366016|1800799024|22082099003|18002099003|4143699003|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	XtyDwG9qlfHUrxgrXzpu4i6BRU+kOkiUxmiBb6Y15jCyFuhSPtTPS887nPgqf4fIGY4RP191MNmNLdba33yOU+5SaiBKHUdXpAlnDFo/Dlsh93icXZ7fmuZhLfbppRo62EYPHYmjoECJcnB9UYe30WmYjgsuhKuESNczOkKMtCqwNy/v55mAgazd+nPcJrMuaUHHzAuUgqeqTfU56vrjj823JLGd+xZ3kYRXXpyfabYV5ALRlLQbm4Z7TFd536m/61tAK1qBr3VQ/2hcsJBS1b3ygO79h/XIUPtcwu0G4EB50nt3RvRtgJ/yvuBOGA6e5ec7uXGYyvidCNBZGU8tKNCWFd91PbttUvCUkQYzjcxlW25K5AS7R7rSa/LuO73RJkmDZSaSuVzLScfTLrvXV3wb0h5nnH1jDK4Bwo25oPbDb1EAYqQxqU4AyBJNnMGIiWU518wHJ4Fx4xpaSThYqTMhyuglIzwrHYkBKdNJQKAzEqvCwUAxCKOqqvBB38Ls84GO+4HYQIVQ+B22ao9/00jAgoFcSwPq9LbcNEIOcyDqPPVAuUqKnd6GcTpJXxoDktP/YI7Hr6X33dmAgIE3Q9W5E9wSFHbIpjXY8FYKDHVJkWZ6yBExBW8wVNPGaBaubvo1RGXJVoKlY8kG5au2Lz8zliJn7YkPh0dzWEzelN0=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(23010399003)(7416014)(10070799003)(366016)(1800799024)(22082099003)(18002099003)(4143699003)(56012099006);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?YjBlSVpmaEQyYytmcUlqVEtkK2NGRGF6WndOaUV1QThrT1VOMlZwR25mdVlO?=
+ =?utf-8?B?UCtxNEFqdmVBVjRxS3NMYkhQYkVZeXpHNEx0RHV6K0tuZEkxdTA0VGQrRXRo?=
+ =?utf-8?B?bnhTOUhiNGh6RWRWbVp1cUZXUVhaY0hOYXRlcHd0ZmFkNXBGejF1SlhDd1ZE?=
+ =?utf-8?B?KzR2am4weEFvM2ZiYVhjRjdjQkFMbkhNcFhzc2NhUThEOTRDUk5sWjRqMksx?=
+ =?utf-8?B?UDhuYVlnM2VsdWt6WnJ1Q2RKRUhXRVIyM1BralZybDJwcFRDTW9vcUNpZGJ5?=
+ =?utf-8?B?SjVJeVJac3UyZ0dtZjhPTld0bk40ellRSmVlRWNTalkvUDJtOXhOdFhvaHlJ?=
+ =?utf-8?B?QUc1QTFNMUVmL010WWxnQmliUktwZk1jQUFZcldLaExrdWxmdDd2YTYxVjMv?=
+ =?utf-8?B?NmQ0RERXVXU3YVZHRTZpekp5UnJ6TERlZnlHTlVDWmozYituUlpMaGk3MHcw?=
+ =?utf-8?B?MERmQjZuUE9uTTFVRUp1SlBiK2JKU2hvSTVWdmlFblJKaEt2bmpIMnVwUGc2?=
+ =?utf-8?B?d0h3ejNFTjA0bFFBQkJLdkM1L1FtcnZ3NE5RSjc5VW15MkpEZ2JiVGVOTzQv?=
+ =?utf-8?B?UnRLTTltaTN5a1pMVXpXQXI1U3lOQ082dm5nT2o1c1Q0c0xWTmZONHBLcmNV?=
+ =?utf-8?B?NzBTSm1wTXZPY3pIMUUwOUh5blpySjlTdkkvcjdUSkxwWEpNM0hLSzFCTHRD?=
+ =?utf-8?B?d3AyUzhZZWNrVm4zZkNQa1BEcWJ0MUdxL1poenJwRWZNZ214RGFvU0RzZlNu?=
+ =?utf-8?B?dktDM1BqdEVCdk96L3RjeE42T2grVUpoektaVHZCRVFQRzNKa1RURzd2Um5R?=
+ =?utf-8?B?cDNwbmVoam81RHFhVWo5STFhRnFJUTZPWUlGZ2UvNkMxQjRYYXVuMTRuVGJZ?=
+ =?utf-8?B?cWpNWmpuVVJHa2plYUtPanF4MjQ0TUNPdTd5REY2N3o2UGVtZW9pYkphalF4?=
+ =?utf-8?B?Wm9uYW8rWWQ2d05kdG5OZG9lZGY4NlhhRTVBaXBlNmptL3VQWnUzOHBsSlpT?=
+ =?utf-8?B?WHZDRmQ4bzA3WGQybWxMaWx6VG1obDZLWUE3UnFBZ09mZ2ZlMnRiNHcyNzdv?=
+ =?utf-8?B?L2wrOXkwQ3VtSFJiUGpKMWx4VHhQa1dXOU1wY3NjOTNxME40UnVTZWtPR2N2?=
+ =?utf-8?B?UzZ4NHFxY3dBS2Z4dDZ5bVRlMktxL2syT1JsL3I1OFNMV1VHVmQwc2ZGdUpn?=
+ =?utf-8?B?QjhaU3lwT3ZGbm5neCtqM21QdnVwaXd5USs0Ukl5ZzV6QlFkM0RIR2ViSFBy?=
+ =?utf-8?B?MDVPeG5rdnJwNktwc2MwUC9NL0M5UXFyeUx4U3N0eVNXSWFwakk1T2lmMDUz?=
+ =?utf-8?B?Q0lobDdQNDh0cDRmQW9SbkpMZUJ0NG9JbFczVHl1ajRjU0NDemo5NTRVcTFv?=
+ =?utf-8?B?UDB2QlpBdUdDK1hwa0pPY0p0TmRzQ0phck9paC94VG1jUTAvVFF0ZUcvckpl?=
+ =?utf-8?B?YWsvLzFTaThxNEFCWW5sVGI5MlR4OHcyUXE3ck5OTDhCWGV2K2YxSHI1RG1W?=
+ =?utf-8?B?VW9uT2VFOGFHY1ZjbEpvTEFidkpURUp1OGVxRm5LMEZRd1NnYVhISCsyNzZ5?=
+ =?utf-8?B?b3M0QVVIT1JkNitudktpQmNRSWxGd1BlenlvNDNhdGZIeUxrYWpiakRsRHNa?=
+ =?utf-8?B?MGJ5NWlEVi8vcXMzbVkwT01lQkxhNVJlZU5NUHNwOHVxOEFwenBXQUhkcmlr?=
+ =?utf-8?B?STc3amdVeDdQOEMrVlh2SnorSWFwY2ZpK3NCUVlac1VYRStWYzY4YjdXQlVF?=
+ =?utf-8?B?eU9Nakl2K2JMdGlhVElBL2pLQkh5ZDR3SFMvM2o4NDhxand4VDZiVnhZRGJD?=
+ =?utf-8?B?Lzl0eVFOYWdrc2x0QXRLZHQ3RG9UUHpJeCtZVHJJTmh5U3VRV0pjMCt5cTJR?=
+ =?utf-8?B?dnE2MWFubGJWUXladGdqczZBNEhrOXBzMVhXOGl1TkN4UGx5QlU2bDIrQWFK?=
+ =?utf-8?B?SE94NFBsbXVlVTFHNDAyMXhUTWlXVm1pS2NHN1UrMUlvYVJhZFROeVVlQUJi?=
+ =?utf-8?B?QTd4b3dzdVB0SklOZ21VUTRQYU1HZU1ZNWZLMXhaVDdwVHo2NDE4aGdtN1Zp?=
+ =?utf-8?B?K0RzbFJPTTRibmsvZlBuZzZRdGFPUy9ZOGVOMk9SNWdTL1pJWjV2aERVazFJ?=
+ =?utf-8?B?Yk9SZ3Zrc2ptNVhZTnUyVEhWSGp5N0ZSVGJMQ3V3eFUrMVF6d0NraFRPczJo?=
+ =?utf-8?B?eTg2b1h3am5EY2wzM3BGWXpzVFVpOGpsTXR2aFhFZVRFSk8rYUZpaFdXbGNI?=
+ =?utf-8?B?SER3YzVtc2M2RVZjQU5nN1liMDBKQURRNmZQaTVHNG5qbXpacTRaRkRHeTFo?=
+ =?utf-8?B?Z25GQnlBSVZ2YmtVNnBEeTZibkY3L3REa296R3A4eXRXZi9CMnFXUT09?=
+X-OriginatorOrg: garyguo.net
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1874fb46-0e59-4ca4-ed7c-08dedb642df0
+X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2026 13:40:44.8119
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BF/9vs+JX/eDMdLGNMH+331VRe5HlpOQgkcnDfEgWQew3xhFd4A5cUKI5+oYIv7LOQbiOlD7Pis5+8JN5OKT+Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWXP265MB2886
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[garyguo.net,none];
+	R_DKIM_ALLOW(-0.20)[garyguo.net:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-305062-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linutronix.de,suse.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-305061-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:tj@kernel.org,m:jiangshanlai@gmail.com,m:frederic@kernel.org,m:bigeasy@linutronix.de,m:marco.crivellari@suse.com,m:mhocko@suse.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:enelsonmoore@gmail.com,m:linux-usb@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_SENDER(0.00)[marco.crivellari@suse.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[gary@garyguo.net,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_RECIPIENTS(0.00)[m:fujita.tomonori@gmail.com,m:tmgross@umich.edu,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:rust-for-linux@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:linux@gurudas.dev,m:fujitatomonori@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,umich.edu,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[garyguo.net:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marco.crivellari@suse.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[suse.com:+];
+	FROM_NEQ_ENVFROM(0.00)[gary@garyguo.net,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,suse.com:from_mime,suse.com:email,suse.com:mid,suse.com:dkim]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,garyguo.net:from_mime,garyguo.net:dkim,garyguo.net:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 23581711CA2
+X-Rspamd-Queue-Id: 0843C711803
 
-Currently the code enqueue work items using {queue|mod}_delayed_work(),
-using system_long_wq. This workqueue should be used when long works are
-expected and it is a per-cpu workqueue.
+On Mon Jul 6, 2026 at 2:05 PM BST, Andrew Lunn wrote:
+> On Sun, Jul 05, 2026 at 10:38:40PM -0700, Guru Das Srinagesh wrote:
+>> Convert `use` imports to vertical layout for better readability and
+>> maintainability.
+>>=20
+>> Signed-off-by: Guru Das Srinagesh <linux@gurudas.dev>
+>> ---
+>>  drivers/net/phy/ax88796b_rust.rs | 7 ++++++-
+>>  1 file changed, 6 insertions(+), 1 deletion(-)
+>>=20
+>> diff --git a/drivers/net/phy/ax88796b_rust.rs b/drivers/net/phy/ax88796b=
+_rust.rs
+>> index 2d24628a4e58..5a21fe09bd62 100644
+>> --- a/drivers/net/phy/ax88796b_rust.rs
+>> +++ b/drivers/net/phy/ax88796b_rust.rs
+>> @@ -5,7 +5,12 @@
+>>  //!
+>>  //! C version of this driver: [`drivers/net/phy/ax88796b.c`](./ax88796b=
+.c)
+>>  use kernel::{
+>> -    net::phy::{self, reg::C22, DeviceId, Driver},
+>> +    net::phy::{
+>> +        self,
+>> +        reg::C22,
+>> +        DeviceId,
+>> +        Driver, //
+>> +    },
+>
+> A question from somebody who does not know rust. Does the order of the
+> elements in the list matter?
+>
+> Linux has a pattern of sorting multi line lists, because it reduces
+> merge conflicts. Can this list be sorted?
+>
+>       Andrew
 
-The function(s) end up calling __queue_delayed_work(), which set a global
-timer that could fire anywhere, enqueuing the work where the timer fired.
+This is sorted list, albeit in ASCIIbetical order instead of alphabetical. =
+The
+order is enforced by rustfmt. This is not optimal so in Rust style edition =
+2024
+it is actually recommended to use alphabetical instead, however we haven't =
+opted
+into that style edition yet.
 
-Unbound works could benefit from scheduler task placement, to optimize
-performance and power consumption. Long work shouldn't stick to a single
-CPU.
-
-Recently, a new unbound workqueue specific for long running work has
-been added:
-
-    c116737e972e ("workqueue: Add system_dfl_long_wq for long unbound works")
-
-Since the workqueue work doesn't rely on per-cpu variables, there is no
-obvious reason that justify the use of a per-cpu workqueue. So change
-system_long_wq with system_dfl_long_wq so that the work may benefit from
-scheduler task placement.
-
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Cc: linux-usb@vger.kernel.org
-Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
----
- drivers/net/usb/r8152.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index f61686433031..f6af66f294db 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -7072,7 +7072,8 @@ static void rtl_hw_phy_work_func_t(struct work_struct *work)
- 
- 		/* Delay execution in case request_firmware() is not ready yet.
- 		 */
--		queue_delayed_work(system_long_wq, &tp->hw_phy_work, HZ * 10);
-+		queue_delayed_work(system_dfl_long_wq, &tp->hw_phy_work,
-+				   HZ * 10);
- 		goto ignore_once;
- 	}
- 
-@@ -8840,7 +8841,7 @@ static int rtl8152_reset_resume(struct usb_interface *intf)
- 	clear_bit(SELECTIVE_SUSPEND, &tp->flags);
- 	rtl_reset_ocp_base(tp);
- 	tp->rtl_ops.init(tp);
--	queue_delayed_work(system_long_wq, &tp->hw_phy_work, 0);
-+	queue_delayed_work(system_dfl_long_wq, &tp->hw_phy_work, 0);
- 	set_ethernet_addr(tp, true);
- 	return rtl8152_resume(intf);
- }
-@@ -10295,7 +10296,7 @@ static int rtl8152_probe_once(struct usb_interface *intf,
- 	/* Retry in case request_firmware() is not ready yet. */
- 	tp->rtl_fw.retry = true;
- #endif
--	queue_delayed_work(system_long_wq, &tp->hw_phy_work, 0);
-+	queue_delayed_work(system_dfl_long_wq, &tp->hw_phy_work, 0);
- 	set_ethernet_addr(tp, false);
- 
- 	usb_set_intfdata(intf, tp);
--- 
-2.54.0
-
+Best,
+Gary
 
