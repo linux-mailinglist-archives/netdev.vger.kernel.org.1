@@ -1,250 +1,237 @@
-Return-Path: <netdev+bounces-305148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305149-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id GJxdJ6zZS2qfbQEAu9opvQ
-	(envelope-from <netdev+bounces-305148-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 18:37:00 +0200
+	id 3vCjE8/eS2ohbwEAu9opvQ
+	(envelope-from <netdev+bounces-305149-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 18:58:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 342A77135B9
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 18:37:00 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD82F7139B5
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 18:58:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=V4X877jB;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305148-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305148-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=ZRL2yyMO;
+	dmarc=pass (policy=reject) header.from=google.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305149-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305149-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 20BD43001036
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 16:36:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C6646305FF04
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 16:44:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D6F433BD0;
-	Mon,  6 Jul 2026 16:36:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91CA241DEF1;
+	Mon,  6 Jul 2026 16:44:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB017432BDA
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 16:36:53 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783355815; cv=none; b=I23svI0acAQCzfabRIutqB5zKW1UyZ3+QDYuoqFVXgmMUZxLfQF56epXru6/enjbCR9SFSNYQ6KpS8bt8Sqyh3OWQgJh9DcvNAoQ3iGQ/gjB6ZuGC/oft+ewEh3GreLrIial4/t3fKncRMMQHFy4vEVI0Qz6qFABUxBdWIVrsXg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783355815; c=relaxed/simple;
-	bh=Rq2wwkYTiUr3Hh85G7r77JXihYNgK7FBfHMZJMmDOgw=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=lihuySsYgYTW2L3vgfMskLWnPNq9ueUE4uauaOO8jTbVCtBWn+aElN0V7VRvg8U5uG+/547Wkx0soob0/OhY1Iads3/JBY5o8dkOjCG0r6xyK5Yjd/2j9IqtuN2Y4jnjJBpZdekYKX7osmDdPaUBSso8s/atthRGhjaqX/AusgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V4X877jB; arc=none smtp.client-ip=209.85.128.181
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-806449d108aso47294737b3.2
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 09:36:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4340736B076
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 16:44:07 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783356248; cv=pass; b=Lx/3eFcCIkREMBT1bh1XYGkJF5PM4Op9EZkgTUCZQcMztbLeGeDZG8iujkSMO4acsHv3OAi/VFxeHmVzywVdhawL/BGuhYS73lBu2c3SIhb9BJ4tOcdPm16EC2uWvLpfzH2eRmiUpA809dt/EG5CFSZ6/mJzHnR60NJp4L+/BaY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783356248; c=relaxed/simple;
+	bh=f1cTRPDXrlXxt4mMgoIONkuKgGwr+hbfRilAL7nUegE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dK3SCQpQB/Vg1gAa5VX7g/qSVqUmwi9f9V2blL2tuYh3ll1DcM7w44hrPOpqlHuWAa7wpftLXWx5pJvulXqSh2x6CpWu2Xgr1CrjqKokMGPb6rdBP9BiDsh3UM/2l0DPTtEQuT9EJ/WkIutQtwVP7R3xzlMEkgje+cXn/pD4U4Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZRL2yyMO; arc=pass smtp.client-ip=209.85.215.172
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-ca00f126b7eso1632124a12.2
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 09:44:07 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783356247; cv=none;
+        d=google.com; s=arc-20260327;
+        b=FjE7QsAZdW0LFENAMZ5xruoZBlY8cKUga1Lt8K3DEDKiIT4WrUaPCFm3PwlWBKyaPG
+         RINo3dg2QovPi8OPJBZn80DLg+Ii7jDvUUNphUlqPEecaCKmpNFP8lddIPVfa7I6zucz
+         E8QQKwZgreZ4zsqXpEbHluotp43OoS9kVCMB4URDTOnBL05TeAee8/gUN9+xd+F6ToEV
+         t/b4z9sAGDny3OITDJ1Rkt56xtnKDkAw457UGqVdjA7oUhzT84R17uj9LwPY1HeynqOH
+         hbe11QqLdS0VimPB1K2kQ0Qstt9QLZgzr1ehRqaNYHyOaMvQ6N62cHyPh20UsH1n9H+6
+         iEmw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=HHookk8ffpYVCb/FWfnrW294xs9Ci52IkQD9J1vWqvk=;
+        fh=YBuMc+Am9tQG3e/WYgZiqv30Qc2kVKgWoHVAPj+7Zlo=;
+        b=Zrriou28ec9zbYgRvynAojM+f8HIoXIT71izcwHRKOnhTwInX+gnEeNeBmjvNwkEgg
+         EOtzeLO8IJcFzt6yXpODUZJT3mEpRhcAqERTl6q68c+JBKYSgXiDTNMae2NMcJLov9dO
+         bao3OGjPssrshWJBrRw4h13D8spk608ur5p9qFws2QcDv0bP/AZENC9sKzBrSKKhwgzC
+         1YD1LEyynO+id+uK+lndBCuk+MmYgQcwUb9IrP/uri2oPmitl+XfzLPxxSG5qTxfLJtH
+         NvTyZNZeBKYGseub0wVMliI82DdThimbs6q6oXgxlz4QEMZ2VtoSfJGb6iWC5t1yr2iu
+         61Sw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783355813; x=1783960613; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:subject
-         :references:in-reply-to:message-id:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=0pJcWvIhqLuJxPO4aE4cyY/xCREGxJtBF+FRAD54hro=;
-        b=V4X877jBA9oDVQfacZTHh6TmZK3jJb0jUWyEPTuOKLpq+ELFkbFePRD98+hhojR5kL
-         s9XkPqndgB4AqsaztKYHkFrg7Q+rvIOYa6CBwYpqduAbYwauX9TB7dPjsNUYhwD2XrMz
-         GIMijs/flIefi7urgK/1KKVqQ4SD6C7A2zpLZnOQrAXtYshud5kFACcGvd1/vwbMUN+Y
-         xGlyY0ToXXN9EZamR1giZj5FLOzY/Ry/TYPjPf+6u5xMrMld432ZXpKcmT2crC6p8O2o
-         PxOpQLtmDglTb83OtDo7XTC2ERQpBYiLjXEqpFkwzNV+uAe+xSKbV4WTpSdsBc9Sz14f
-         /ufA==
+        d=google.com; s=20251104; t=1783356247; x=1783961047; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HHookk8ffpYVCb/FWfnrW294xs9Ci52IkQD9J1vWqvk=;
+        b=ZRL2yyMOK9LS46IT4/6xFnr6yLJbqrKHxz2oB6BIddDFS5d0SBcx3jRhWpshGa2IAn
+         dUmFLOa65KU2mwNpw0pGUnVZGNI6TcpslUt8maYxfMQP8qNUR8K9jg0ECIKwAkw0NMLE
+         n+3OfAZDmD6mavpqfN+3gRMjdVLcsFDEWOCTcm3C7FYYLWUHUjf5FKE3+njCOZx/waX9
+         ib9X+aso0/DJ+74OJAnnHv7tVPRqaQ47iMHTipr0d66q6xrlQ+J/FHk6Q2BWoFRDVKHT
+         7A2fFNye0lDj9pKZRnS+QlSUvd/VQyTsvuxQWfvJ5yDbgRexwbOUc/DDHpykvxTp8K8T
+         0vag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783355813; x=1783960613;
-        h=content-transfer-encoding:content-type:mime-version:subject
-         :references:in-reply-to:message-id:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=0pJcWvIhqLuJxPO4aE4cyY/xCREGxJtBF+FRAD54hro=;
-        b=ZXpJRxn6N4BfEG9bQBzg/t2tlzKC3Vag17nkJkv/1NOGFPK8+gIKYqcT0XvSVX3KgX
-         eoTYNlxMrbLxkiLdTzaKFSbqZwsPKA10SX5hcrnReSlRfeg5YtWtYIKDvSVjf3E6opGW
-         ZvjjuVF26qPe/MNuTwGKtTEdtmEaYWHStzOkFsRAJwbhSf9HRgjjyjQrIhLvW0MEKAev
-         3abYt+mWKVTihwlsFTQPtvTewvRoRlwwY2JYtXyzrqV1IV8UPJJjvIc+ZblcxacippL7
-         lOidyxpVRgjCpex+lAtU80mEBeqqaPSnfHBwtzgPVAYYTzPWfa4ssV1r7Nz+knEdxo+S
-         E4aw==
-X-Forwarded-Encrypted: i=1; AHgh+Rr81dbdgI07khdnJqIwT5R3cCbpMGysWlZIH5MtUciA5zWivU7PN2BR8j1OYi5X9khIkyJFLqY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZoUImm9xUzvOXIuaaj1NzISxCP5ItTx9v9xV15XpKNRRg7+tU
-	5WYkMQDOXIZYVIWvolrZ5OL29tyHYi4aGwPuyfyuO7D+XZHb/9RQIH/F
-X-Gm-Gg: AfdE7cmzLlMBWM1d/LY8BT7xGAG2bBNJU6Wf38WeSxMUrcHqu5oKT4Ics7vT0fLl0ib
-	+c3GBEuhHEswTL1t7DuDghvwkH/srizgHcHcZaz7RbqVp2dUdYNKiaTnGOiJgpRAl7/24GwPk/c
-	omuwA7vRs01OEa7xyY7ZJjlizpWtFSSmm7B+BhPUNeDsb8zDiymWLr1Lg4DGlGryyok3WAEwKRv
-	bfbYJyE6G9iCiZXfQ8YJ8FL9C2SLHkatIPRe5toLTpMG5dGBZLr+eyvtvb6i7ZrKQ8kk3CcNr53
-	empUp0xWWPaL0ocZ99CREbfmC1MCzbllzeE5ga/0BRZImuhq4RAfOhN0T5vGvVrJInRiK+nHFZi
-	PYLnzgxdF8+I1gmrCcTUn0Hs0HUSlvmbyi5ynChNhNYGN8j1tKTi0g3YBJ1KN2BUufCIKMhsO/P
-	UvopIewFPMdlZcl+xFskIdv8jtKjBDyYtt2HORCXD6R2cwI8Wxu5pGNePGISQc9/YJXg==
-X-Received: by 2002:a05:690c:ed6:b0:80c:85e5:8750 with SMTP id 00721157ae682-81be33a3727mr8097857b3.57.1783355812853;
-        Mon, 06 Jul 2026 09:36:52 -0700 (PDT)
-Received: from gmail.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-8144bd26ebfsm59805817b3.48.2026.07.06.09.36.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jul 2026 09:36:52 -0700 (PDT)
-Date: Mon, 06 Jul 2026 12:36:51 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Shiming Cheng <shiming.cheng@mediatek.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- horms@kernel.org, 
- matthias.bgg@gmail.com, 
- angelogioacchino.delregno@collabora.com, 
- willemb@google.com, 
- daniel.zahka@gmail.com, 
- alice@isovalent.com, 
- sd@queasysnail.net, 
- eilaimemedsnaimel@gmail.com, 
- imv4bel@gmail.com, 
- nbd@nbd.name, 
- dsahern@kernel.org, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, 
- steffen.klassert@secunet.com
-Cc: stable@vger.kernel.org, 
- lena.wang@mediatek.com, 
- shiming.cheng@mediatek.com
-Message-ID: <willemdebruijn.kernel.27b4940999026@gmail.com>
-In-Reply-To: <20260706034611.360-1-shiming.cheng@mediatek.com>
-References: <20260706034611.360-1-shiming.cheng@mediatek.com>
-Subject: Re: [PATCH v5] net: gro: fix double aggregation of flush-marked skbs
+        d=1e100.net; s=20251104; t=1783356247; x=1783961047;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=HHookk8ffpYVCb/FWfnrW294xs9Ci52IkQD9J1vWqvk=;
+        b=ERq33aZDae6WXRsdneIYqBznZ0hMTYIS/sbr2p4k6ty9SUu8pFUZzf2WvGl7d4kC+X
+         yR6FaaEMg92fzBAaitH1bCd5jirkDb/HSawb0myD6WmFNYSIiRxTLJcPj6NnuMHNRCZI
+         h6sGjxx294iQ33mdlgeOXvEBByvIBK0tJ7WDelwD5ksnh+0/RhnCu+NCkUvJ4ryNy8E0
+         CC6tkzcRClOUPeeAVS12qYCoa+wEnTgZylfHXJ0H5chmdnO5sFCiSbO4WJ9/IzNZGuRU
+         ATBXQnJUpuJr5H9Y0EVkStnZvTFIRQJGgllkth8bvlJjwkWpKkv3fN7KuhO0VYwDCVlV
+         1igQ==
+X-Forwarded-Encrypted: i=1; AHgh+RooVOonjbIs2BW8nFPM3cYzMQB+o4qSDqbLg+fRc9B/RFFHBA58cpraYBegC5PG7v5efSJY7yo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjJhxoO/vMP1b0i5L/6v8c5Aj/mRZDs+K8T01yslSb05ARNjIE
+	J6ycU7XulxyOffj9C+CzAakt1zvTlbbQ30XyH7gLuvvWHNKiV4gjVYjlGSP0jP42K3lyRP/DmTq
+	VT+0fbB7pUS30EWOEqSPx5EumQm4Jzlirfd4haMPH
+X-Gm-Gg: AfdE7ckpDVGc+hvJ6cxyVCR3RNpiD8UwH/TEqxckfTvWcUhY7BdkwKBquPh59xtZVLR
+	DIziFpBKMxNKtSESjp45UJwU61F8/giOcdQRAC9n3mYDDp8OVkipDEpVgyUgkIKLn86Ca4YIZep
+	WWs2u4QziTDlUxXQazZ4YI9jVZw5yjFfL/rzSNWqEBzp/CN/dJ4QchCaox2xitvvld5v58viQR/
+	Bu26eVQUHrK+ip35l/WkP/YTsYtscm5+nfEREgBVRJOCDymFpxvQehn71Ko9W6KppGI75XGO5OG
+	yeLUuAkq3LRiyF85C5blRvoFX8YSdDGlFOAX4La+bMAfOMRxp5Bf4BysSIze/uVbykY2wXKCd2o
+	jnWt1gLi4198gur6ArJAicGk403f4iQZ2DTP+4fY=
+X-Received: by 2002:a05:6a20:6a28:b0:3b4:b6d7:a992 with SMTP id
+ adf61e73a8af0-3c08ec8fb76mr1679048637.8.1783356246054; Mon, 06 Jul 2026
+ 09:44:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20260703001009.1572444-1-kuniyu@google.com> <20260703001009.1572444-9-kuniyu@google.com>
+In-Reply-To: <20260703001009.1572444-9-kuniyu@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Mon, 6 Jul 2026 09:43:54 -0700
+X-Gm-Features: AVVi8Ce4GimsgdD3VXvRqjcvcW6-TtfgzHTxJCTw3-MI3RMVw5SOtQe3I6tBClk
+Message-ID: <CAAVpQUB5NwkZGETmWCH_RMoaideKFCPNW9OyWz4C5Kc=j2t2Dw@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 08/14] veth: Support per-netns device unregistration.
+To: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[24];
+	TAGGED_FROM(0.00)[bounces-305149-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305148-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[mediatek.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,collabora.com,isovalent.com,queasysnail.net,nbd.name,vger.kernel.org,lists.infradead.org,secunet.com];
-	FORGED_RECIPIENTS(0.00)[m:shiming.cheng@mediatek.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:willemb@google.com,m:daniel.zahka@gmail.com,m:alice@isovalent.com,m:sd@queasysnail.net,m:eilaimemedsnaimel@gmail.com,m:imv4bel@gmail.com,m:nbd@nbd.name,m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:steffen.klassert@secunet.com,m:stable@vger.kernel.org,m:lena.wang@mediatek.com,m:matthiasbgg@gmail.com,m:danielzahka@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:kuni1840@gmail.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 342A77135B9
+X-Rspamd-Queue-Id: BD82F7139B5
 
-[PATCH net v5]
+Replying to Sashiko review,
 
-Shiming Cheng wrote:
-> The skb_gro_receive_list() function is missing a critical safety check
-> that exists in the skb_gro_receive() implementation. Specifically, it
-> does not validate NAPI_GRO_CB(skb)->flush before allowing packet
-> aggregation
+On Thu, Jul 2, 2026 at 5:10=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.com=
+> wrote:
+[...]
+> @@ -1901,15 +1902,17 @@ static int veth_newlink(struct net_device *dev,
+>
+>         priv =3D netdev_priv(dev);
+>         rcu_assign_pointer(priv->peer, peer);
+> +       netdev_hold(peer, &priv->peer_tracker, GFP_KERNEL);
 
-In v3 I requested referring to the commit that fixed this in
-skb_gro_receive: commit 0ab03f353d36 ("net-gro: Fix GRO flush when
-receiving a GSO packet."). That explains the issue well.
-> 
-> This allows already-GRO'd packets with existing frag_list to be
-> re-aggregated into a new GRO session, corrupting the frag_list chain
-> structure. When skb_segment() attempts to unpack these malformed packets,
-> it encounters invalid state and triggers a kernel panic.
-> 
-> Scenario (Tethering/Device forwarding):
->   1. Driver: Generated aggregated packet P1 via LRO with frag_list
->   2. Dev A: Receives aggregated fraglist packet and flush flag set
->   3. Dev A: Re-enters GRO, skb_gro_receive_list() is called
->   4. Missing flush check allows re-aggregation despite flush flag
->   5. Frag_list chain becomes corrupted (loops or dangling refs)
->   6. Dev B: TX path calls skb_segment(), crashes on corrupted frag_list
-> 
-> Root cause in skb_segment():
->   The check at line ~4891:
->     if (hsize <= 0 && i >= nfrags && skb_headlen(list_skb) &&
->         (skb_headlen(list_skb) == len || sg)) {
-> 
->   When frag_list is corrupted by double aggregation, when list_skb is
->   a NULL pointer from skb->next, skb_headlen(list_skb) dereference
->   NULL/corrupted pointers occurs.
-> 
-> Call Trace:
->  skb_headlen(NULL skb)
->  skb_segment
->  tcp_gso_segment
->  tcp4_gso_segment
->  inet_gso_segment
->  skb_mac_gso_segment
->  __skb_gso_segment
->  skb_gso_segment
->  validate_xmit_skb
->  validate_xmit_skb_list
->  sch_direct_xmit
->  qdisc_restart
->  __qdisc_run
->  qdisc_run
->  net_tx_action
-> 
-> Fix: Add NAPI_GRO_CB(skb)->flush validation to the early-return check in
-> skb_gro_receive_list(), matching the defensive programming pattern of
-> skb_gro_receive().
-> 
-> Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
-> ---
->  net/core/gro.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/core/gro.c b/net/core/gro.c
-> index 35f2f708f010..b1573d98f3a5 100644
-> --- a/net/core/gro.c
-> +++ b/net/core/gro.c
-> @@ -229,7 +229,14 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
->  
->  int skb_gro_receive_list(struct sk_buff *p, struct sk_buff *skb)
+---8<---
+Because the devices are already registered and visible to the system at thi=
+s
+point, could a concurrent ip link del trigger veth_dellink() right after
+rcu_assign_pointer() publishes priv->peer, but before netdev_hold() is
+called?
+---8<---
+
+No, ->newlink() and ->dellink() are serialised with the same rtnl_net_lock(=
+).
+
+
+>         err =3D veth_init_queues(dev, tb);
+>         if (err)
+>                 goto err_queues;
+>
+>         priv =3D netdev_priv(peer);
+>         rcu_assign_pointer(priv->peer, dev);
+> +       netdev_hold(dev, &priv->peer_tracker, GFP_KERNEL);
+>         err =3D veth_init_queues(peer, tb);
+>         if (err)
+> -               goto err_queues;
+> +               goto err_peer_queues;
+>
+>         veth_disable_gro(dev);
+>         /* update XDP supported features */
+> @@ -1918,7 +1921,11 @@ static int veth_newlink(struct net_device *dev,
+>
+>         return 0;
+>
+> +err_peer_queues:
+> +       netdev_put(dev, &priv->peer_tracker);
+> +       priv =3D netdev_priv(dev);
+>  err_queues:
+> +       netdev_put(peer, &priv->peer_tracker);
+>         unregister_netdevice(dev);
+
+---8<---
+If veth_init_queues() fails, does this error path safely handle a concurren=
+t
+veth_dellink()?
+---8<---
+
+This depends on the same wrong assumption, so no, ->newlink() holds
+multiple rtnl_net_lock() so that the concurrent ->dellink() never occurs.
+
+
+>  err_register_dev:
+>         /* nothing to do */
+> @@ -1933,24 +1940,25 @@ static int veth_newlink(struct net_device *dev,
+>
+>  static void veth_dellink(struct net_device *dev, struct list_head *head)
 >  {
-> -	if (unlikely(p->len + skb->len >= 65536))
-> +	/*
-> +	 * Packets marked with NAPI_GRO_CB(skb)->flush have already gone
-> +	 * through GRO/LRO processing and must not be aggregated again.
-> +	 * Re-entering frag_list GRO may corrupt the frag_list chain and
-> +	 * later crash during GSO segmentaiont.
-> +	 */
+> -       struct veth_priv *priv;
+> +       netdevice_tracker *peer_tracker;
+>         struct net_device *peer;
+> +       struct veth_priv *priv;
+>
+>         priv =3D netdev_priv(dev);
+> -       peer =3D rtnl_dereference(priv->peer);
+> +       peer_tracker =3D &priv->peer_tracker;
+> +       peer =3D unrcu_pointer(xchg(&priv->peer, NULL));
 
-Such a verbose comment is not needed. Code would be overwhelmed by
-comments if done everywhere.
+---8<---
+Does changing this to use xchg() introduce a data race with read paths?
+Functions like veth_set_xdp_features() still use rtnl_dereference(),
+...
+Might this need READ_ONCE() or rcu_dereference() to safely handle the
+concurrent xchg() writes?
+---8<---
 
-> +	if (unlikely(p->len + skb->len >= 65536 ||
-> +		     NAPI_GRO_CB(skb)->flush))
->  		return -E2BIG;
->  
->  	if (!pskb_may_pull(skb, skb_gro_offset(skb))) {
-> -- 
-> 2.45.2
-> 
+Yes, but with another series before removing RTNL.
 
-
+As mentioned in the cover letter, the device unreg path is the only target
+of this series, and we need more changes in other paths.
 
