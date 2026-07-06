@@ -1,219 +1,368 @@
-Return-Path: <netdev+bounces-305177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305178-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Q6MzI9r0S2q5dgEAu9opvQ
-	(envelope-from <netdev+bounces-305177-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 20:32:58 +0200
+	id U1onI0b+S2oceQEAu9opvQ
+	(envelope-from <netdev+bounces-305178-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 21:13:10 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D70E87148B8
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 20:32:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E2DE714D83
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 21:13:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=fEQ2pZpX;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305177-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305177-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=XsVpgY3Q;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305178-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305178-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 256D8362F87F
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 17:35:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 23BAE311F601
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 17:36:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50AF73A380F;
-	Mon,  6 Jul 2026 17:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8BF73AF678;
+	Mon,  6 Jul 2026 17:36:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33543B2FD6
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 17:35:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ADAB3ACA65;
+	Mon,  6 Jul 2026 17:35:59 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783359327; cv=none; b=L19rnpKkk4+Pr/Gt7kT+6B8NY/+XLObFgiO865LmqcMqyRfyAAM6Ab+MaIN0BAfDbpvrJel0H4mIncummLUE5LQLI33R4/L9aGAuDEYrvsguW4TOwy7L7tLpAR6kfEXiSnJinyp+LFcuWQPggE0s7ScHW/xFczizuUqJdyp/Akc=
+	t=1783359360; cv=none; b=MxlFKzSwbaZzuyrtWP9286aqy08O+v5T66gjxmdITWWa4W+WrA2DH080Zft4LYuaKDkMJcD2+fVECCyFkVJCsrRmga7O0sjTneKUrsIljPKNrQmBpMfivJfAivQ/OL19qNuZPVmEMCVB8VTljxd8NW6JOW59WYW28787o/gd40Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783359327; c=relaxed/simple;
-	bh=XyJ6/jCk0lvpWQQi1qBmAqNhDAOjnyk1oXshJsoZz0Q=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=a0BviSSvoQIh51fX4T88NS3RJ6BxQLGAlud8btfPKWO6+JdOXGoXDRvWPyNWczfzeUF5Yk/fRdet2q8tFhmznq1Rd5UekO5XA2e40NE6uZrtcLXY3UGosI7+n45l4p/ZFLt22arSMnhsZZBjTkWBBfC/R0+m/hNwA7Eqj5WwbII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fEQ2pZpX; arc=none smtp.client-ip=209.85.128.172
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-7dbcb505578so27550277b3.3
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 10:35:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783359325; x=1783964125; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:subject
-         :references:in-reply-to:message-id:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=9PYIrjiLcLJRMsJz3MN9nJHHGWlJH+U5Otv0B9TwQZQ=;
-        b=fEQ2pZpXIdC93SrHgHXDogxfxhKgqG/cmqzIgJhpUq1TjxF9C/SabN0AvV76Yxsj65
-         MySJtqHULhCUozAUCxQf3eSywksLKLjSOBvivOKNuFslS0eMyBKaDZ2ejRtNce1zW9fU
-         +vpNvIcazHfHaHj/OMohzbNhiWZV4jIkQ3KRNd2nUVXSNp5LqTkKma4NtFIa2bY7T7ui
-         1i8hWeDRDq8RH8wicPlEKpftFisZe07CPwP21MU7B7oLkIreV9cheH/+yfpcqLL7i+NI
-         b0gBNmGkZ+0BNIP3PQuA+uWM95CdsjuuCvDIAlwLpZCzx7v0Ocx4w5qL/PqvFkw+JPmV
-         lj8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783359325; x=1783964125;
-        h=content-transfer-encoding:content-type:mime-version:subject
-         :references:in-reply-to:message-id:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=9PYIrjiLcLJRMsJz3MN9nJHHGWlJH+U5Otv0B9TwQZQ=;
-        b=MhdEt0CugUg27gqmlnF8sQ5rC+PbmEgUziChlMTsbz+PVAGGg2HNcjnCulCtwe/jiQ
-         Dk7Z8Bu9erwHvAc4qHWQ6MEHEA+pKi/pwBnesgthTY/D+8xU3gjy14BJaXNrFmiGJjNF
-         4rz/TqnzIfh4JgTI8wyaF6PhRSgNZDVB0DjLAkUZEVkkyeYxAKTBkn/bceJXIG3ikkgX
-         sZKTNTSk9goMc6/lXM8P54FGeC1wUyOjdMcwxqzP/KOB4HRD70GF6RXHRIxZj0pS8O5o
-         e7xkrsEkEvC0cdaqGRWUa52p6f0RzHE9sOqyedq7kAxG5f8uc+Ex7boRDwqbEE6W2D+3
-         r2Rw==
-X-Forwarded-Encrypted: i=1; AHgh+RpjM0lEh2FpZwI9AJ5Nnt+xomTARHAYSJ1PrBGF0JFOHwNQGtVel5s3fAimoewx5FNqzTIyiiM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhHYTQAlz/mXexlxH3ektEIa120Ub+mpYKlQKVwvMaU0/BDjlj
-	56jKB4DzI5/AZsThLjfQoa1u0XSgwR2juyS0mvvFe2dct1nTbbljjVMU
-X-Gm-Gg: AfdE7ckVgLiVfEnOGxjr5yaEs/hGJYZiD+BvhqWAIXqKiZySBrc/SYrTKK/jW4O2vzD
-	sL6HtnOsbNJESaBwRhY+1a4omEYeoPN6u+l81wLv4xd7q5mnXg9tXJvyTamLQAXGVAuWWhZy9s9
-	9NcAkU1W70HAR6pAFlU9E689gtEJt4Mk3U5c+M3hYd2UY1Adyppks1M3BJc1LisuJ7WwAYXfDUm
-	aqYpvGJmnKBqBZNONk9H9W0nt1RCYU871o5M+14m7ORACn3shOkbvA6N2OlbWpXfn9TNuUMhpiO
-	1X7/hcmFaj6gA9rZzeMNQJiC4iJgXyXl/nXnHz8VzKsgyvwsbumooVsPRm6RWpfIm1Rg+WGNoAu
-	6osLx2M9WzVpIoR73XUjJy2KMCdKsfFyq97QT/FZjSK8VjdSloARnthav1oOLDt3IXXm/wKfIKh
-	+oycvPWfEVbTxUxcVUwLYkmiwkI1it9+ZKLLB8Wm08ZsSNgxfV3dOiwsRIPGjSYq2MuQ==
-X-Received: by 2002:a05:690c:62c8:b0:7dd:3f36:59f1 with SMTP id 00721157ae682-81be319d964mr10253497b3.45.1783359324738;
-        Mon, 06 Jul 2026 10:35:24 -0700 (PDT)
-Received: from gmail.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-8144783cc7fsm60947197b3.5.2026.07.06.10.35.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jul 2026 10:35:24 -0700 (PDT)
-Date: Mon, 06 Jul 2026 13:35:23 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: David Lee <david.lee@trailofbits.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: David Lee <david.lee@trailofbits.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Dominik 'Disconnect3d' Czarnota <dominik.czarnota@trailofbits.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.31a7e80dcad9d@gmail.com>
-In-Reply-To: <20260706111226.309506-1-david.lee@trailofbits.com>
-References: <20260706111226.309506-1-david.lee@trailofbits.com>
-Subject: Re: [PATCH net v2] packet: avoid re-registering fanout hook after
- device unregister
+	s=arc-20240116; t=1783359360; c=relaxed/simple;
+	bh=uf9k0lwi4OR9Ahwj7N6pv5lJVtG1ItErD4ZRXKHHX5s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kiPjLponld6Gh6AfOiukw90rQxcjPAzdkaJfM5jdehZFAV0vQaWb+UXrrIa3+HjOEDfOlIJTLsXWW2YRO1yGuCLlT1MwuKuW7/FAQMd0iQpSOJvM/4IV5S6wcYxlJ+zT8hVSEohXB7xKP/RwcVtzA+fbgkwXG9b8Eop75+oEd8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XsVpgY3Q; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 119A51F00A3A;
+	Mon,  6 Jul 2026 17:35:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783359359;
+	bh=zRpw/4G81Ngpv3cHDhu/5hiK4+GxmEEf2lmP3foOJQY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=XsVpgY3QEgW+wkQpXnwd+tM6hqF6fjg5KUIt4Y3YdhcUFSrokZCiHKA60irFAIGIp
+	 AoOvfRk4TNLzVeLY0cS/8/IRJMVFuDmeP49iroeQMfp2U+YnpC/NwWGPBngvB+moyZ
+	 b1k5nvQk2oCWgzcgiUGI8MMFK0vBt+X3RM4ADBKO2i1IfZJxv94Wc+M2L2mgaavDjz
+	 uZ/bad/hGjuuTDgfdpape4KOhvDzAaUEPU+GCoRbKA0gnLy9VRzvbzreaQoHp/yRuU
+	 Ebsc3ZnquCRvdjHKZRzEkfksjKnOYXwaQqrsEe3LgsaEgeJBli9ut/exKStF8/aU0D
+	 ND1gi46rVlfhA==
+Date: Mon, 6 Jul 2026 18:35:53 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Jonas Jelonek <jelonek.jonas@gmail.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Daniel Golle <daniel@makrotopia.org>,
+	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
+Subject: Re: [PATCH net-next v5 1/4] dt-bindings: net: pse-pd: add bindings
+ for Realtek/Broadcom PSE MCU
+Message-ID: <20260706-player-handwash-0a3fe95cf5ec@spud>
+References: <20260706112425.3149226-1-jelonek.jonas@gmail.com>
+ <20260706112425.3149226-2-jelonek.jonas@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="1GUQUF22i6sgqNzV"
+Content-Disposition: inline
+In-Reply-To: <20260706112425.3149226-2-jelonek.jonas@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-5.26 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305177-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:david.lee@trailofbits.com,m:willemdebruijn.kernel@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:dominik.czarnota@trailofbits.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:willemdebruijnkernel@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:jelonek.jonas@gmail.com,m:o.rempel@pengutronix.de,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:bjorn@mork.no,m:jelonekjonas@gmail.com,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_TO(0.00)[trailofbits.com,gmail.com];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[conor@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-305178-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,spud:mid,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D70E87148B8
+X-Rspamd-Queue-Id: 0E2DE714D83
 
-David Lee wrote:
-> packet_set_ring() temporarily detaches a socket from packet delivery while
-> reconfiguring its ring. It records the previous running state, clears
-> po->num, unregisters the protocol hook when needed, drops po->bind_lock,
-> and later restores po->num and re-registers the hook from the saved
-> was_running value.
-> 
-> That unlocked window can race with NETDEV_UNREGISTER. The notifier can
-> observe the socket as not running, skip __unregister_prot_hook(), and
-> invalidate the per-socket binding by setting po->ifindex to -1 and clearing
-> po->prot_hook.dev. A one-member fanout group can still retain its shared
-> fanout hook device pointer. When packet_set_ring() resumes, re-registering
-> solely from the stale was_running state can re-add the fanout hook after
-> the device has been unregistered.
-> 
-> Treat po->ifindex == -1 as an invalidated binding after reacquiring
-> po->bind_lock. Restore po->num as before, but do not re-register the hook
-> if device unregister already detached the socket.
-> 
-> Fixes: dc99f600698d ("packet: Add fanout support.")
-> Reported-by: David Lee <david.lee@trailofbits.com>
-> Signed-off-by: David Lee <david.lee@trailofbits.com>
+--1GUQUF22i6sgqNzV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-My suggestion of a Reported-by was becaused the Signed-off-by was from
-a different author. Both tags from the same author is generally
-discouraged.
-
-Perhaps also add a Link to the discussion in the first patch, which
-adds some more rationale. The crux to me is that ifindex -1 is not
-just the default for detached sockets, it is a special invalidated
-condition.
-
-Link: https://lore.kernel.org/netdev/20260701113947.23180-1-david.lee@trailofbits.com/
-
-With those asides
-
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-
-
-> Assisted-by: Codex:gpt-5
+On Mon, Jul 06, 2026 at 11:24:21AM +0000, Jonas Jelonek wrote:
+> Add a binding for the microcontroller (MCU) that fronts the PSE silicon
+> on a range of managed switches. The host talks only to the MCU, over
+> I2C/SMBus or UART, using a fixed message-based protocol; the PSE chips
+> behind it never appear on the bus.
+>=20
+> The compatible names the MCU front-end, not a specific part. These
+> boards front the PSE silicon with an MCU that presents a stable
+> message protocol Realtek documents. The PSE chip behind it varies
+> - Broadcom on older boards, Realtek on newer - and is detected at
+> runtime; the arrangement appears to be a Realtek MCU-based PoE design
+> carried across those PSE-chip generations. So the 'realtek' prefix
+> names that front-end (Realtek's protocol and firmware), not the
+> general-purpose MCU silicon or the PSE chip - the google,cros-ec-*
+> model. The '-rtk'/'-brcm' suffix selects the Realtek or Broadcom dialect.
+>=20
+> A single compatible per dialect covers both the I2C/SMBus and UART
+> attachments: the wire protocol is identical across them and the transport
+> is expressed by the node's parent bus, so it is not encoded in the
+> compatible.
+>=20
+> Both dialects share one protocol family and one device tree contract, so
+> they are documented in a single binding under the one 'realtek' prefix,
+> with the '-rtk'/'-brcm' suffix distinguishing the dialect.
+>=20
+> Signed-off-by: Jonas Jelonek <jelonek.jonas@gmail.com>
 > ---
-> Changes in v2:
-> - Add Fixes and Reported-by tags.
-> - Fix the incorrect Signed-off-by tag from v1.
-> 
-> Trail of Bits has a PoC that achieves local privilege escalation using this
-> bug on a custom kernel config with CONFIG_LIST_HARDENED disabled, which can
-> be shared further if needed.
-> 
->  net/packet/af_packet.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-> --- a/net/packet/af_packet.c
-> +++ b/net/packet/af_packet.c
-> @@ -4561,7 +4561,11 @@ static int packet_set_ring(struct sock *sk, union tpacket_req_u *req_u,
->  
->  	spin_lock(&po->bind_lock);
->  	WRITE_ONCE(po->num, num);
-> -	if (was_running)
-> +	/*
-> +	 * NETDEV_UNREGISTER may have invalidated the binding while bind_lock
-> +	 * was dropped above.  Do not re-add a fanout hook to a dead device.
-> +	 */
-> +	if (was_running && READ_ONCE(po->ifindex) != -1)
->  		register_prot_hook(sk);
->  
->  	spin_unlock(&po->bind_lock);
-> -- 
-> 2.43.0
+>  .../bindings/net/pse-pd/realtek,pse-mcu.yaml  | 154 ++++++++++++++++++
+>  1 file changed, 154 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/pse-pd/realtek,=
+pse-mcu.yaml
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/pse-pd/realtek,pse-mcu=
+=2Eyaml b/Documentation/devicetree/bindings/net/pse-pd/realtek,pse-mcu.yaml
+> new file mode 100644
+> index 000000000000..d0dfae220dc1
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/pse-pd/realtek,pse-mcu.yaml
+> @@ -0,0 +1,154 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/pse-pd/realtek,pse-mcu.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Realtek/Broadcom PSE MCU
+> +
+> +maintainers:
+> +  - Jonas Jelonek <jelonek.jonas@gmail.com>
+> +
+> +description: |
+> +  Microcontroller (MCU) that fronts the PSE hardware on switches using
+> +  Realtek (RTL8238B, RTL8239, RTL8239C) or Broadcom (BCM59111, BCM59121)
+> +  PSE chips. The MCU exposes a small message-based protocol over either
+> +  I2C/SMBus or UART; the actual PSE silicon is not accessed directly. The
+> +  Realtek and Broadcom variants share this device tree contract but use
+> +  different protocol opcodes, selected by the compatible.
+> +
+> +  The compatible identifies the PSE-MCU protocol dialect, not a specific
+> +  part. The device here is the MCU: it presents a stable message protocol
+> +  documented by Realtek, with the PSE silicon behind it - Broadcom on
+> +  older boards, Realtek on newer - detected at runtime and not described
+> +  here. The MCU's own silicon is general-purpose and varies across
+> +  boards, so the 'realtek' vendor prefix names the protocol front-end
+> +  (following the google,cros-ec pattern); the '-rtk'/'-brcm' suffix
+> +  selects the Realtek or Broadcom dialect.
+> +
+> +  A single compatible per dialect covers both the I2C/SMBus and UART
+> +  attachments: the wire protocol is identical across them and the
+> +  transport is already expressed by the node's parent bus, so it is not
+> +  encoded in the compatible. Transport-specific properties differ
+> +  accordingly - the I2C attachment carries 'reg' (and, for Realtek,
+> +  'realtek,i2c-protocol'), while the UART attachment carries the serial
+> +  peripheral properties such as 'current-speed'.
+
+I'm not really convinced by the arguments here.
+
+If the switch vendors are running different software on their MCUs to
+the point that they behave differently, then yes it makes sense to have
+different compatibles.
+
+The first thing I don't understand is why realtek is considered the
+main vendor here? Is it their MCU that broadcom are re-using with some
+protocol tweaks?
+If it is, then having the vendor as a suffix like wheel reinvention to
+me, and if the MCU and/or protocol aren't something that broadcom
+borrowed from realtek then having a realtek vendor prefix is strange
+altogether. The mention of old boards being broadcom while the protocol
+is documented by realtek is confusing me.
+
+Either way, encoding the vendor without using the vendor prefix seems
+very odd me to.
+
+Secondly, the compatibles you do provide seem too generic. Is it really
+possible for a given board to use smbus AND i2c, or do specific boards
+only ever use i2c OR smbus (or uart for that matter).
+I find it more believable that a board would support i2c and uart than
+supporting both i2c and smbus fwiw.
+
+Can you provide a link to the actual devices somewhere? It is
+completely non-obvious to me what the binding actually represents.
+
+Cheers,
+Conor.
 
 
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - realtek,pse-mcu-rtk
+> +      - realtek,pse-mcu-brcm
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  power-supply:
+> +    description: Regulator supplying the PoE power rail.
+> +
+> +  enable-gpios:
+> +    maxItems: 1
+> +
+> +  realtek,i2c-protocol:
+> +    $ref: /schemas/types.yaml#/definitions/string
+> +    enum: [ i2c, smbus ]
+> +    description: |
+> +      Wire framing the MCU firmware expects on the I2C bus. "smbus" means
+> +      reads carry a leading command byte (0x00) and a repeated start; "i=
+2c"
+> +      means bare 12-byte writes and reads with no command prefix. Only
+> +      applies to the Realtek I2C attachment.
+> +
+> +required:
+> +  - compatible
+> +
+> +allOf:
+> +  - $ref: pse-controller.yaml#
+> +  - $ref: /schemas/serial/serial-peripheral-props.yaml#
+> +  # The I2C attachment (identified by 'reg') cannot carry serial bus pro=
+ps.
+> +  - if:
+> +      required: [reg]
+> +    then:
+> +      properties:
+> +        current-speed: false
+> +        max-speed: false
+> +  # 'realtek,i2c-protocol' is meaningful only for the Realtek I2C attach=
+ment;
+> +  # the Broadcom variant and any UART attachment must not carry it.
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            const: realtek,pse-mcu-rtk
+> +      required: [reg]
+> +    then:
+> +      required:
+> +        - realtek,i2c-protocol
+> +    else:
+> +      properties:
+> +        "realtek,i2c-protocol": false
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  # Realtek PSE chip, I2C attachment (SMBus framing).
+> +  - |
+> +    i2c {
+> +        #address-cells =3D <1>;
+> +        #size-cells =3D <0>;
+> +
+> +        ethernet-pse@20 {
+> +            compatible =3D "realtek,pse-mcu-rtk";
+> +            reg =3D <0x20>;
+> +            realtek,i2c-protocol =3D "smbus";
+> +
+> +            pse-pis {
+> +                #address-cells =3D <1>;
+> +                #size-cells =3D <0>;
+> +
+> +                pse-pi@0 {
+> +                    reg =3D <0>;
+> +                    #pse-cells =3D <0>;
+> +                };
+> +            };
+> +        };
+> +    };
+> +
+> +  # Broadcom PSE chip, I2C attachment.
+> +  - |
+> +    i2c {
+> +        #address-cells =3D <1>;
+> +        #size-cells =3D <0>;
+> +
+> +        ethernet-pse@20 {
+> +            compatible =3D "realtek,pse-mcu-brcm";
+> +            reg =3D <0x20>;
+> +
+> +            pse-pis {
+> +                #address-cells =3D <1>;
+> +                #size-cells =3D <0>;
+> +
+> +                pse-pi@0 {
+> +                    reg =3D <0>;
+> +                    #pse-cells =3D <0>;
+> +                };
+> +            };
+> +        };
+> +    };
+> +
+> +  # Realtek PSE chip, UART attachment.
+> +  - |
+> +    serial {
+> +        ethernet-pse {
+> +            compatible =3D "realtek,pse-mcu-rtk";
+> +            current-speed =3D <115200>;
+> +
+> +            pse-pis {
+> +                #address-cells =3D <1>;
+> +                #size-cells =3D <0>;
+> +
+> +                pse-pi@0 {
+> +                    reg =3D <0>;
+> +                    #pse-cells =3D <0>;
+> +                };
+> +            };
+> +        };
+> +    };
+> --=20
+> 2.51.0
+>=20
+
+--1GUQUF22i6sgqNzV
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCakvneQAKCRB4tDGHoIJi
+0v68AQCZWdQajqx/aJaQN57kMtKybmti7bHapdjulp0RucHc/gD+OnJj3pQDIoMU
+hUU3VqfbSdYUCcM+N6ctaZPht90THwQ=
+=if7B
+-----END PGP SIGNATURE-----
+
+--1GUQUF22i6sgqNzV--
 
