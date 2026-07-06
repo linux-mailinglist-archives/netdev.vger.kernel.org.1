@@ -1,190 +1,218 @@
-Return-Path: <netdev+bounces-305181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305182-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id AUjcGnfsS2oEdAEAu9opvQ
-	(envelope-from <netdev+bounces-305181-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 19:57:11 +0200
+	id 7aplG8TuS2rWdAEAu9opvQ
+	(envelope-from <netdev+bounces-305182-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 20:07:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09EE07142DE
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 19:57:11 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 289F5714474
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 20:06:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=isovalent.com header.s=google header.b=X7Ao9rwo;
-	dmarc=pass (policy=none) header.from=isovalent.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305181-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305181-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=infradead.org header.s=casper.20170209 header.b=CNyUy7kr;
+	dmarc=pass (policy=none) header.from=infradead.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305182-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305182-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C71F730756A9
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 17:54:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 54868302BBCF
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 18:06:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C6F3EDAC6;
-	Mon,  6 Jul 2026 17:54:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F129F433BC8;
+	Mon,  6 Jul 2026 18:06:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 122043C1090
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 17:54:36 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783360478; cv=pass; b=L1vQ4v/uir1YDljUzK0P0QjjkBuYGLyPE1s08BVt7aWTRxcRhqYgBMTdeJ+NNmcw9rpWMfRUaI3unjFEM1zHOKsG9I122WKIFHZRMBy7dH0plF/J+wHkQgTfJsMOMQNjOutrFhC+5bTLganR9391eGHNef1RcEsYMrpfl/8Fiwk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783360478; c=relaxed/simple;
-	bh=cRfc/QaU5QXqQWriDe7bBcszgQMf/vLtgDAQyxrgu2g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Mf4oVzggzCN0x9H+NYvFcUiG/yze+ID1kFI+mrDNzvR0kWIfuxkzodb+Nq43UFzt6wRWBjApK3QmD1jwM2xOvIQuauFdi1shfJGR/6Iv6axj11doi5EaMkhSu4NMZLM/VmH8y/0aAbd101RRTyiMlY/IQKOUaX5WVsUZpPIaIbg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=isovalent.com; spf=pass smtp.mailfrom=isovalent.com; dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b=X7Ao9rwo; arc=pass smtp.client-ip=209.85.215.170
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-c89636920a3so1592722a12.1
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 10:54:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783360476; cv=none;
-        d=google.com; s=arc-20260327;
-        b=mOalZpJRHzGxClBqeyUl4Nn65Vakqh6jtMOgzNUTcxmAfjzwR3h1GUIrryJFyGRT8p
-         5jF6nL88TNbIsK8fMRUgRlx5d/wmF3vA6ThZzMYyD622ioI5RNiWY5daJUezREASGY9W
-         uIxP0jKUvfZPkdD23hj2a7MPZXPnNEEDBkWFSSyoyGI/gbkoIwG8hp7JpCJR1dNgyn33
-         /E5Kag+Lkr987OEXhlllrCaDf4m9cN5wcSgRnjp0o7BTEl1b4/GcMVWDGzU6f3bbHhiP
-         FwPqz4jtxEQ5pcKmpO9HJ0U3RUs/FeMc+lKKlI/81p253J6k9PJVjFCRNkEYGZ1JnH51
-         zKig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=S+HjSggw8tQDkDKIfCm1yOxtLYYzrIetkGeZyiNmdXo=;
-        fh=oH9Tx+podRF7DEj3LsJFg09mgx0C3WCDnzuPaRRhFEw=;
-        b=lQ5ZQRlRhm7/K6fspIf8Apd2HCP8u4Av3F57rzqkSGgVdLHM4iOVFmY0iv+fOeXwPv
-         l+F9IbeKg38VaCxuXtz3xeJXPvIPWFUUDuaSocl7rvQM2WEGMSiZui+cjH6PAl2SpI/1
-         n0cCXpe9JvzVaqy+BCX0rYTDL9DGYLsTnfogptWUHVFv8O+wt2GRydDqao5pdvUznOT5
-         59JRrSUru9nCVUl95DoHTgFsWCFdKW11mB446YmXFZXmpSoKVTLUYQrtToucGSF/ppwm
-         60DXjktE5ampQ7eD8Y3EMMihgy3TFgARdlfcqVVZXAwe6VM25GiXnyvl4KI9qveYEcNt
-         56lg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=isovalent.com; s=google; t=1783360476; x=1783965276; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=S+HjSggw8tQDkDKIfCm1yOxtLYYzrIetkGeZyiNmdXo=;
-        b=X7Ao9rwoxnm/VTvmsFnz0nqaTCDY5UY1+qP5ICH9Ndh32r8B73rH4bp2sk2sh2mHRt
-         hkjEm59w0GgW5SgNQIHFz2ZbmtyR91R1NrMMdVgOMyIVZEOkjsvQe7FeynD2E70uL9Zi
-         AcTw+XhB9TfZE3QjgugH/jHgtiHBKWhVGXNMD+tCZWWm2Jad3BvsvoL+N6/agD+cv8HJ
-         EEhtyjZ3nA9kO6p0xc3OHDB0D8ozt685KyiYgUuU8DBMM05eckLDa20/G4FTyf3IKqGa
-         r6PKrXWcYD/1ZLHtSewU1Gdlck8ePwjBPs9ShveqC4SD64ltgigDTz+EUyLL7UINyc8Q
-         wr9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783360476; x=1783965276;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=S+HjSggw8tQDkDKIfCm1yOxtLYYzrIetkGeZyiNmdXo=;
-        b=L2kkkAbJSNx3O0pDVgixvubUBM0zbW5Tz72XRtUvpBmn6DfQ0gdR4sq3bzfVIqjlJt
-         fm6tuuwleeAQg68X0ySxNYU49Bq+z6IXNDd1mpH2PGAjs4JMU/hN38HvwykKzkjtbAvh
-         qoJuxkZmO1lhZR14ZqLZTuNCVf6AObxTWwfhN2fl4yQxxirelX5D75sKWeYK69hxGQAd
-         4FrLS/6nDQNshRCxSnzUODLQlFdk3Iq0JHXJFE6Gg0UpLiksSvz890lU06/387DALxs7
-         VBhP7muaCEiFWGcHwn50dV982RKSr3VhHaGuRafCGbYKFeuUZ3DWNSH70DaXV2kUMNnv
-         3a3w==
-X-Forwarded-Encrypted: i=1; AHgh+RoBJ//ilclMyvNouj2EdrT3mnizVDgCd2S2b9MdxOpzBv3mXs1rrdjrvuxkdO/JzSmUi2srhUk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwqqUaXJ6pCB5z+b/tPFwbToNIi+9dk8sIQ7DtEhBEgukIPcm0
-	C363VJJQ/zPNzCWa5Av5UTPU5kJKMODLb8J1GY29DOD9dJM5mvMoW1I8nuaevtuey7JTSt+ZnLn
-	f+DR4ioKF2P+TLWmH9cI1/9FhFBupR0RCuW4EFaI50w==
-X-Gm-Gg: AfdE7clDTaJ+LB6gwuiuWLAAgnDVXAWHJoMbYIXaijw2DpOgzbXbQjunSknJKyxt3wM
-	7Io8wpCrQEByU0sIkuvjyxNoHeP+kfZDlVW78yBOH7TC2yeC7KnZkLqSa/IQL3q/1Rdg6/AJSSo
-	SvlUg85mHqsUngfDekNWGYcm5smcuCS9R7OR2qSvZBXsZSSSDi72a09Cj7p0bsuz1ocpUwUsfuD
-	1h/61cCK3fa1kY21pN9drn9Ny80zWqyDauQnZj/57Fvk4CH43bwQhUxdToLnk6zLVxbciwm/3lr
-	xNOqpOod4hdjPNmfpafVwwrcn74RSHix9Ouzg4Mc1LSZK8ymtN0bVLjkxiAyfeu5wVZ9BQ==
-X-Received: by 2002:a05:6a20:d494:b0:3bf:a11c:176e with SMTP id
- adf61e73a8af0-3c08efab30emr2114739637.57.1783360475954; Mon, 06 Jul 2026
- 10:54:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F549422549;
+	Mon,  6 Jul 2026 18:06:15 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783361181; cv=none; b=lWre/ScDu8bT9gcIMlHG8tm5k0HuwM6UmfwWIzQE0Ng7b4wkTP2b0JrZVmvAF7kKCHD7p+uWXQsIAXw0GhKFPT3gngU4XZ3W8pZ6lxkzYU5yam4xSGy+CID8JH6+7zCOQVL12kLtmTFpQgjXxA9CySY7LaiQppt2vMWHKn5BEio=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783361181; c=relaxed/simple;
+	bh=WSrxhZ3K3aHd+oacRAsc/khrD9rBmmLfoF539Nq0u78=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=govuGuGGEytB6D5rxJrZaN1xwVOXsq2EzjnD9vP922e/ybGk/aqV/nudPbCgA9/54xz4qS9n/ZbY9ruVJ8l4X8SG46so3IMjJKISMjE00YcIfaeBwGj+FV3Mo8n4JqZ4rRzHHHAibMO6jSPv+R4zfthXjbFrZwu8D59Lqcwho38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=CNyUy7kr; arc=none smtp.client-ip=90.155.50.34
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=7OW/CenuU9P13pzjhjZutuMsDUz3ebL4YDkxxEUpTq8=; b=CNyUy7krT2KWgEwmWVKxtIQ+mF
+	Vb+1q+gyB5yQGtWUUUTFfkVXSRepuw7fyFqIY66jb6ov+a2TSQuU6Oeko21f10IdvUo87ND796N2s
+	r4dJq4T0v6JLzeGf9VmqXcqhhRS0zxb+AYnr/OkLGsRdGJ59LoP8x6HtyxyIaDGX/UNF4eV4mx/6j
+	9DFL/3RA2rxLGItPLNRlN3OyyNrc4LrBZnn6Z3pAqvn4XXv6D9Sm5JmxAl/Nx6Vi/43ITWBd3Tatn
+	UF0bFlXL9IwSqecAJqVY3MLm3w3NDEriZxsXwEytou0y28YZK6qZ/ZV3pvVIppH/oIVxHPm218vXX
+	ibjZRXUw==;
+Received: from willy by casper.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wgnhQ-0000000GLqy-1n2W;
+	Mon, 06 Jul 2026 18:05:44 +0000
+Date: Mon, 6 Jul 2026 19:05:44 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Byungchul Park <byungchul@sk.com>
+Cc: linux-kernel@vger.kernel.org, max.byungchul.park@gmail.com,
+	kernel_team@skhynix.com, torvalds@linux-foundation.org,
+	damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+	mingo@redhat.com, peterz@infradead.org, will@kernel.org,
+	tglx@linutronix.de, rostedt@goodmis.org, joel@joelfernandes.org,
+	sashal@kernel.org, daniel.vetter@ffwll.ch, duyuyang@gmail.com,
+	johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+	david@fromorbit.com, amir73il@gmail.com, gregkh@linuxfoundation.org,
+	kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
+	mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
+	vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
+	dennis@kernel.org, cl@linux.com, penberg@kernel.org,
+	rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
+	linux-block@vger.kernel.org, josef@toxicpanda.com,
+	linux-fsdevel@vger.kernel.org, jack@suse.cz, jlayton@kernel.org,
+	dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
+	dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
+	melissa.srw@gmail.com, hamohammed.sa@gmail.com,
+	harry.yoo@oracle.com, chris.p.wilson@intel.com,
+	gwan-gyeong.mun@intel.com, boqun.feng@gmail.com, longman@redhat.com,
+	yunseong.kim@ericsson.com, ysk@kzalloc.com, yeoreum.yun@arm.com,
+	netdev@vger.kernel.org, matthew.brost@intel.com,
+	her0gyugyu@gmail.com, corbet@lwn.net, catalin.marinas@arm.com,
+	bp@alien8.de, x86@kernel.org, hpa@zytor.com, luto@kernel.org,
+	sumit.semwal@linaro.org, gustavo@padovan.org,
+	christian.koenig@amd.com, andi.shyti@kernel.org, arnd@arndb.de,
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
+	rppt@kernel.org, surenb@google.com, mcgrof@kernel.org,
+	petr.pavlu@suse.com, da.gomez@kernel.org, samitolvanen@google.com,
+	paulmck@kernel.org, frederic@kernel.org, neeraj.upadhyay@kernel.org,
+	joelagnelf@nvidia.com, josh@joshtriplett.org, urezki@gmail.com,
+	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
+	qiang.zhang@linux.dev, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
+	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
+	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
+	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
+	clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
+	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
+	broonie@kernel.org, kevin.brodsky@arm.com, dwmw@amazon.co.uk,
+	shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com,
+	yuzhao@google.com, baolin.wang@linux.alibaba.com,
+	usamaarif642@gmail.com, joel.granados@kernel.org,
+	richard.weiyang@gmail.com, geert+renesas@glider.be,
+	tim.c.chen@linux.intel.com, linux@treblig.org,
+	alexander.shishkin@linux.intel.com, lillian@star-ark.net,
+	chenhuacai@kernel.org, francesco@valla.it,
+	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
+	masahiroy@kernel.org, brauner@kernel.org,
+	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
+	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
+	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev, 2407018371@qq.com, dakr@kernel.org,
+	miguel.ojeda.sandonis@gmail.com, neilb@ownmail.net,
+	bagasdotme@gmail.com, wsa+renesas@sang-engineering.com,
+	dave.hansen@intel.com, geert@linux-m68k.org, ojeda@kernel.org,
+	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
+	lossin@kernel.org, a.hindborg@kernel.org, aliceryhl@google.com,
+	tmgross@umich.edu, rust-for-linux@vger.kernel.org
+Subject: Re: [PATCH v19 22/40] dept: track PG_locked with dept
+Message-ID: <akvueAxPl8aoLvMR@casper.infradead.org>
+References: <20260706061928.66713-1-byungchul@sk.com>
+ <20260706061928.66713-23-byungchul@sk.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260611192955.604661-1-alice.kernel@fastmail.im>
- <20260611192955.604661-4-alice.kernel@fastmail.im> <aiw8JPsgG1K4D3z_@zx2c4.com>
-In-Reply-To: <aiw8JPsgG1K4D3z_@zx2c4.com>
-From: Alice Mikityanska <alice@isovalent.com>
-Date: Mon, 6 Jul 2026 20:54:17 +0300
-X-Gm-Features: AVVi8Cdu3scUO05R-2_TzrJL7PiQ7EzfbyGo_F5p6iQj7fzVgepF5A5_oIM-_xU
-Message-ID: <CAD0BsJXLPELBROKq=tf6FbDEbFqfpiDBfow_ZeVa9z=vH--dFA@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 03/11] net: Use helpers to get/set UDP len tree-wide
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Alice Mikityanska <alice.kernel@fastmail.im>, Daniel Borkmann <daniel@iogearbox.net>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Xin Long <lucien.xin@gmail.com>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Willem de Bruijn <willemb@google.com>, 
-	David Ahern <dsahern@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>, Shuah Khan <shuah@kernel.org>, 
-	Stanislav Fomichev <stfomichev@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260706061928.66713-23-byungchul@sk.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[isovalent.com,none];
-	R_DKIM_ALLOW(-0.20)[isovalent.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-305181-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[alice@isovalent.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_RECIPIENTS(0.00)[m:Jason@zx2c4.com,m:alice.kernel@fastmail.im,m:daniel@iogearbox.net,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lucien.xin@gmail.com,m:willemdebruijn.kernel@gmail.com,m:willemb@google.com,m:dsahern@kernel.org,m:razor@blackwall.org,m:shuah@kernel.org,m:stfomichev@gmail.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:fw@strlen.de,m:netdev@vger.kernel.org,m:lucienxin@gmail.com,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305182-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:byungchul@sk.com,m:linux-kernel@vger.kernel.org,m:max.byungchul.park@gmail.com,m:kernel_team@skhynix.com,m:torvalds@linux-foundation.org,m:damien.lemoal@opensource.wdc.com,m:linux-ide@vger.kernel.org,m:adilger.kernel@dilger.ca,m:linux-ext4@vger.kernel.org,m:mingo@redhat.com,m:peterz@infradead.org,m:will@kernel.org,m:tglx@linutronix.de,m:rostedt@goodmis.org,m:joel@joelfernandes.org,m:sashal@kernel.org,m:daniel.vetter@ffwll.ch,m:duyuyang@gmail.com,m:johannes.berg@intel.com,m:tj@kernel.org,m:tytso@mit.edu,m:david@fromorbit.com,m:amir73il@gmail.com,m:gregkh@linuxfoundation.org,m:kernel-team@lge.com,m:linux-mm@kvack.org,m:akpm@linux-foundation.org,m:mhocko@kernel.org,m:minchan@kernel.org,m:hannes@cmpxchg.org,m:vdavydov.dev@gmail.com,m:sj@kernel.org,m:jglisse@redhat.com,m:dennis@kernel.org,m:cl@linux.com,m:penberg@kernel.org,m:rientjes@google.com,m:vbabka@suse.cz,m:ngupta@vflare.org,m:linux-block@vger.kernel.org,m:josef@toxicpanda.com,m:linux-fsdevel@vger.kernel.
+ org,m:jack@suse.cz,m:jlayton@kernel.org,m:dan.j.williams@intel.com,m:hch@infradead.org,m:djwong@kernel.org,m:dri-devel@lists.freedesktop.org,m:rodrigosiqueiramelo@gmail.com,m:melissa.srw@gmail.com,m:hamohammed.sa@gmail.com,m:harry.yoo@oracle.com,m:chris.p.wilson@intel.com,m:gwan-gyeong.mun@intel.com,m:boqun.feng@gmail.com,m:longman@redhat.com,m:yunseong.kim@ericsson.com,m:ysk@kzalloc.com,m:yeoreum.yun@arm.com,m:netdev@vger.kernel.org,m:matthew.brost@intel.com,m:her0gyugyu@gmail.com,m:corbet@lwn.net,m:catalin.marinas@arm.com,m:bp@alien8.de,m:x86@kernel.org,m:hpa@zytor.com,m:luto@kernel.org,m:sumit.semwal@linaro.org,m:gustavo@padovan.org,m:christian.koenig@amd.com,m:andi.shyti@kernel.org,m:arnd@arndb.de,m:lorenzo.stoakes@oracle.com,m:Liam.Howlett@oracle.com,m:rppt@kernel.org,m:surenb@google.com,m:mcgrof@kernel.org,m:petr.pavlu@suse.com,m:da.gomez@kernel.org,m:samitolvanen@google.com,m:paulmck@kernel.org,m:frederic@kernel.org,m:neeraj.upadhyay@kernel.org,m:joelagnelf@nvidia.com,m:josh@
+ joshtriplett.org,m:urezki@gmail.com,m:mathieu.desnoyers@efficios.com,m:jiangshanlai@gmail.com,m:qiang.zhang@linux.dev,m:juri.lelli@redhat.com,m:vincent.guittot@linaro.org,m:dietmar.eggemann@arm.com,m:bsegall@google.com,m:mgorman@suse.de,m:vschneid@redhat.com,m:chuck.lever@oracle.com,m:neil@brown.name,m:okorniev@redhat.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[willy@infradead.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,skhynix.com,linux-foundation.org,opensource.wdc.com,dilger.ca,redhat.com,infradead.org,kernel.org,linutronix.de,goodmis.org,joelfernandes.org,ffwll.ch,intel.com,mit.edu,fromorbit.com,linuxfoundation.org,lge.com,kvack.org,cmpxchg.org,linux.com,google.com,suse.cz,vflare.org,toxicpanda.com,lists.freedesktop.org,oracle.com,ericsson.com,kzalloc.com,arm.com,lwn.net,alien8.de,zytor.com,linaro.org,padovan.org,amd.com,arndb.de,suse.com,nvidia.com,joshtriplett.org,efficios.com,linux.dev,suse.de,brown.name,talpey.com,huawei.com,amazon.co.uk,linux.alibaba.com,glider.be,linux.intel.com,treblig.org,star-ark.net,valla.it,vivo.com,baidu.com,lists.infradead.org,lists.linaro.org,lists.linux.dev,qq.com,ownmail.net,sang-engineering.com,linux-m68k.org,garyguo.net,protonmail.com,umich.edu];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[isovalent.com:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alice@isovalent.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[fastmail.im,iogearbox.net,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,blackwall.org,lunn.ch,strlen.de,vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[165];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willy@infradead.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,vger.kernel.org:from_smtp,zx2c4.com:email]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[casper.infradead.org:mid,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,infradead.org:from_mime,infradead.org:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 09EE07142DE
+X-Rspamd-Queue-Id: 289F5714474
 
-On Fri, 12 Jun 2026 at 20:04, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> On Thu, Jun 11, 2026 at 09:29:47PM +0200, Alice Mikityanska wrote:
-> > diff --git a/drivers/net/wireguard/receive.c b/drivers/net/wireguard/receive.c
-> > index eb8851113654..275fe1bc994c 100644
-> > --- a/drivers/net/wireguard/receive.c
-> > +++ b/drivers/net/wireguard/receive.c
-> > @@ -62,7 +62,7 @@ static int prepare_skb_header(struct sk_buff *skb, struct wg_device *wg)
-> >                * to have UDP fields.
-> >                */
-> >               return -EINVAL;
-> > -     data_len = ntohs(udp->len);
-> > +     data_len = udp_get_len_short(udp); /* GRO not expected here. */
->
-> Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
->
-> However, I don't think that comment is necessary and you can remove it if you
-> wind up needing to roll a v+1.
+On Mon, Jul 06, 2026 at 03:19:10PM +0900, Byungchul Park wrote:
+> Makes dept able to track PG_locked waits and events, which will be
+> useful in practice.  See the following link that shows dept worked with
+> PG_locked and detected real issues in practice:
+> 
+>    https://lore.kernel.org/lkml/1674268856-31807-1-git-send-email-byungchul.park@lge.com/
 
-Thanks! Removing the comment before resubmitting.
+> @@ -219,6 +220,7 @@ struct page {
+>  	struct page *kmsan_shadow;
+>  	struct page *kmsan_origin;
+>  #endif
+> +	struct dept_ext_wgen pg_locked_wgen;
+>  } _struct_page_alignment;
 
-> But also, I was thinking:
->
-> > +static inline unsigned int udp_get_len_short(const struct udphdr *uh)
-> > +{
-> > +     return ntohs(uh->len);
-> > +}
-> > +
->
-> Do you think it'd be better to call this udp_get_len_nogro(), which would then
-> make its usage rules more explicitly without needing to litter comments?
+I may not understand this quite correctly, but I think that tracking
+PG_locked dependencies in the struct page has both false positive and
+false negative problems.
 
-I'll probably keep the original name; "short [packet]" sounds better
-to me than nogro/nogso, and this naming doesn't exclude the usage of
-udp_get_len_short to get the raw value of len even in GSO packets.
+Imagine we have a file mapping M1 containing folio F1 at index 0 and F2
+at index 1.  It is correct locking order to lock F1 before locking F2
+(for example when doing writeback).  Later, M1 has its folios reclaimed
+and returned to the free pool.  Then each is added to mapping M2, this
+time with folio F2 at index 8 and F1 at index 9.  Now the correct order
+to lock these folios in the order F2 followed by F1.
+
+I don't see a part of this patch where we clear pg_locked_wgen when the
+page is returned to the page allocator.  Maybe I missed that.
+
+I think we should be tracking PG_locked dependencies in the owner
+of the folio.  For files, that would be in the struct address_space.
+For anon memory, I think that's in the anon_vma, but if somebody told
+me it was in some other structure, I wouldn't argue with them.
+
+This requires slightly more complexity than lockdep currently has.
+We don't want to use a lockdep class for each folio, obviously.  So we
+need something to say "I already have folio F1 locked, is it OK to lock
+folio F2?".  Essentially figuring out how we can track all folios in a
+given mapping the same way, and making sure that we don't deadlock on
+folios in the same mapping.
+
+If F1 and F2 are in different mappings, it's not a deadlock if F1 is in a
+filesystem mapping and F2 is in its backing dev.  It's also not a deadlock
+if F1 and F2 are both filesystem folios and the inodes are both locked.
+See vfs_lock_two_folios() in fs/remap_range.c.
+
+I have much less knowledge about anonymous memory locking order.
+Maybe it doesn't happen.  Or about locking one anon and one file folio.
+For slab memory, we don't sleep on PG_locked (it's used as a spinlock bit).
+For other kinds of memory ... I don't know.  Page migration is fun.
 
