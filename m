@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-304851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304852-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 1MnIJDZaS2qLPwEAu9opvQ
-	(envelope-from <netdev+bounces-304851-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 09:33:10 +0200
+	id j8RLN61KS2oUOwEAu9opvQ
+	(envelope-from <netdev+bounces-304852-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 08:26:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DC6F70D959
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 09:33:10 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FCB370CF2E
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 08:26:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=sk.com (policy=none);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304851-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304851-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304852-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304852-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7C65230378B0
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 06:24:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F086130568BC
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 06:25:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF1B23D9DCD;
-	Mon,  6 Jul 2026 06:20:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 205793DB63D;
+	Mon,  6 Jul 2026 06:20:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78FC73D45DF;
-	Mon,  6 Jul 2026 06:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3FD83D5C26;
+	Mon,  6 Jul 2026 06:20:05 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783318812; cv=none; b=DOBIkfYM7GGZyBSMeFzzz6neyNx1NCRkIgFK7wSphI6/lhOsJgCNBytmeKD9zObDIMuLRewyKP/YW8jQNM4ITxZJpF0TQeTFdanqU6jY6TAjy/Fxyxe/t7Az+FwcqKp2cQlq6TaRg8SAfSGy0HTz7jk+xwWu4vKojb/n5/H6LxI=
+	t=1783318814; cv=none; b=VkL3Pz/1Z4if6WpScsbDt+331BqIJO2oL6goVYtBWxwV2CMyhHWWy8Qg0fe5+uQMDHp+fdNssOzRLL+WDc7OjVA6wcC+ESd6drdTfyGkKcD1TxNW2Y6NWQ8bHDm+euobXlabX7Yg0OISfIWbnG5WFHv4wgLx1Qpua0yoCyyg2+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783318812; c=relaxed/simple;
-	bh=mVczWw5AJvTGaUa2k+kGuAdITLqzYAqLiO2CNQ+CNGE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=ArKgQpbgtDAg9D/kuCCJcyCoZnmnCe+kKB37s08eWLC8sboxnHl348ftxzk7tj7ydfQ0wH61BXUPTGZ8UXuL00u+16EazEwB6tJhB1Unzs0MTW2Fh1NrmB7OZZOQAZZQ1WV/L3KkIu0C2A815WrYxChYI0ILKhvsTbnJxzamfGA=
+	s=arc-20240116; t=1783318814; c=relaxed/simple;
+	bh=pLUSXjgVOyB6ewzDMD2B/aTj2n2b3ii/EXLHyurcTzs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=lWEAEpYcw/ktbFmtO8T5/93rvokspmz+0umsDypaBgzX83HQSj2uxcpkzkGfT1t7v+bd66ySsTJcsBCKe7eja/5Ekju8UQAoIpt6bHp250Q78J5Dq4tACkFw2PfFUi9Ezb4mmCUUTfT88ZEcshs1Pv50EAXhIrhF6o9MfBP6mmM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-X-AuditID: a67dfc5b-c2dff70000001609-6d-6a4b48fd550e
+X-AuditID: a67dfc5b-c2dff70000001609-8c-6a4b48fecb9f
 From: Byungchul Park <byungchul@sk.com>
 To: linux-kernel@vger.kernel.org
 Cc: max.byungchul.park@gmail.com,
@@ -198,45 +198,45 @@ Cc: max.byungchul.park@gmail.com,
 	aliceryhl@google.com,
 	tmgross@umich.edu,
 	rust-for-linux@vger.kernel.org
-Subject: [PATCH v19 10/40] dept: apply sdt_might_sleep_{start,end}() to wait_for_completion()/complete()
-Date: Mon,  6 Jul 2026 15:18:58 +0900
-Message-Id: <20260706061928.66713-11-byungchul@sk.com>
+Subject: [PATCH v19 11/40] dept: apply sdt_might_sleep_{start,end}() to swait
+Date: Mon,  6 Jul 2026 15:18:59 +0900
+Message-Id: <20260706061928.66713-12-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20260706061928.66713-1-byungchul@sk.com>
 References: <20260706061928.66713-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSbUxTZxTH99z73Bca6+4q07uajaXJnJtOh/HlZLiFLFt4osaZ+U0/uEYu
-	tqwtpBUEk8UaARGhOBbohNQgLZVBcR2dA3RFKPFlAh1suCHFiJgVCNBO5EVbkFHNvv3yP//z
-	O18OTysCjJLXGo5KRoNap2JlWDa1ouaDJbI7/cNHHSIU5p+AxapmDuajVTTkty5hWCy7ycHM
-	swAHFX1lNDxxP2dhonMagXX8JIawsxjBRMW/LER7fqehfzbMQsjNQl/3BILgoJeCU/YfWWgd
-	vspB38QCBQ+cQQxV1jEKuu1DGO6XlmNoNg9z4CoO0uAd3AAXCxwYit1XGOht72Lgj4ZeDIGe
-	Ug5q/+6jwNPTTcOcZS00hmpY+C4UXD4/56ThnnWSA+dsmIOTHXYMdY+tDPzg7WHhZvVqcOdV
-	cnB67BoLBY6fKOi/dw1BW+EwBaOVNgo6ZyeXvU3lNEQu3UBwJ3KHghHLFAfTtucMnM2vwHDl
-	xjwHeUPbwOJPgafuRwzYZhKhcfEvBKFzM0xyMpnPt2DiuuBCJBopQ6S2a5Ilkdm7LHGciVCk
-	tfI+R/LaBjlS3ZRF7L+OU6Sp/gxLQn4/R25/H8XE11mIyEVzOU2u21zcvoQDsp2pkk6bLRk3
-	f/KVTBP1FVGZ3tdyxu72IjPyrCxCcbwobBVdJX62CPEveOHhnljMCu+KAwPP6BjHC2+LnpIg
-	U4RkPC38mSAWO0twrL9K0Ihdp4/FOlh4R3Q4fsExlgvbxcZvx9FLfYLY4G5/4Ylbzi8v2KgY
-	K4RtYiB8C8ecouCJE9t9/ezLhTfEjroBfA7Jq9Er9UihNWTr1Vrd1k2aXIM2Z9PhDH0TWn45
-	5zcLB1vQdO9+HxJ4pFohh+Rd6QpGnW3K1fuQyNOqePm69bvTFfJUde5xyZhxyJilk0w+tJbH
-	qjXyLXPHUhXCEfVR6WtJypSM/08pPk5pRprRSwV18ebjt0+NhvX7thx8r1YhtDQ8TVLiA9JY
-	jtZ/eSStodmqet1uejWpa+fn9Wlp/bWLxBD49HFmllI5VUFGds3lZJSd/fmz8x8Zd5QmtcxY
-	7MbS0MalVaM1H+u8v/nOf5GyI7Gt6sibK1u+bNu7ec+w/lCK54lMtr77n7faLwypsEmjTnyf
-	NprU/wG0T82WbgMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0xTWRCAPeee3l661lxrozds1kc3ovG1LgGdjWZ9ROVE1JhoYqI/pNG7
-	tlCQtAhiYhBqY0UlpUlLtKIsQiXlIVJFURuxruCK7ILoShBEYkUraNcKGh4VWxP/TL6Z+WYy
-	P4ZjFPWSaE6bliHq09Q6FSsjsi0rjItDNDF5qb8yBsymHOju9Ungv9xGAsNDZgJnL1WxEHJc
-	k4K57rQE7j/NI9BWU4mgd9iM4POYgwFTwwSBkLVJCkMjz6Rgy0Uw4WlCYG+3MtDZdpuBqiu5
-	GD7WfmFh4G4Qga3Px0KRP5dAwHkSwZl+hxT89xLgXe9NCUz0vMbw9NMgAqfvCwZf4zEEIXsK
-	nC91h8ft/7Mw1vovA0W2NgR/9vUwEPS/QHCl6TkCT0UeC68sVxno8E2Bx8MBFv62nWDhXftZ
-	DO9rWSjJ80ig/eEAgmKHFUF/lweD8cIlFuzFdQQaXtyQQvvAOIZuuxVDZd1m6HX2E2ixlOLw
-	uWHr8gxwFBlxOLzBYKu+iWHE6ZKuLkf0s6mAUJe7HlPToxBLq85VITo2akV0qNzIUJMlnN4d
-	DDD0qDuLlrcMsnR0+AlLPZ9KCH1QKtCy46OYFrYupg1neqRb1+yUrdwr6rSZov6X35NkmjFv
-	Pk73TD345kkbOoLcU/IRxwl8nDDetykfRXEsP0/o7BxhIqzkZwvuU/2SfCTjGL5jlnDSeYpE
-	/Gm8Rmg5lhVxCD9XKCurJxGW88uE6kI/irDAzxIqaxu/7YkK12vGi3GEFXy88CzQTCxIVoIm
-	uZBSm5aZqtbq4pcYUjTZadqDS/bsT61D4W9yHh4vvI6GOhK8iOeQarIcVm9MVkjUmYbsVC8S
-	OEallMfMT0xWyPeqsw+J+v279Qd0osGLfuSIaoZ84w4xScHvU2eIKaKYLuq/dzEXFX0E3S+y
-	ZEVXX3UpD2z46bd/ZD+YNk+yXWhaXpDgDV5sTsw5rFNeW3Ti0byVyT9PD0TlXF7/h/FDkut9
-	gSW24mXf9pnb1sbpg493zWbNSmdw+m59fOivD0lYIqbfWXduQ2tzRheRrVtaqj7dPedo3MOu
-	WPz21sShNe6FWbF07YNVg6tiXmtUxKBR/7qA0RvUXwEVU+f6SQMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSbUxTdxTG97/3f//30niTm07cVZO5NXOgm6JG3Vlmln7Yh7uZLSSTDw4T
+	bex1LePFlZfJ3DLqnAPWKjFCY7uCL9C1WsW0EgZpGasgYmTSgKVAKyITwptsBcteHKyw+eXk
+	l+c5ec7z4XC0Msqs4fS5BbIhV5OtIgqsmF5xftOitDtri6khDULGVgz/2BpZmP/bRsOi/yYC
+	93UjBZM3YghmHCYE1lEbC33xKQQ1F7wEJqt+I2Cp7Ebgdx4j8KiigYbgnUkEX1+sJ1Bl92Bo
+	etDMwpBjFINlnICtq4eBh04rC9FTlRg674cYmBw9TWCo4wQDnv52BHO9wxR4RhKGf+A1OFsd
+	IeDzd2Loaf6eQIltnoH6sTAFnVYXhsGuUyzU9QUpCFc8QnDl8QUC/ZYpFpy/Wxhw+bsI3Dy3
+	Clw1PyCI1cYxnJhdYKDD3EpB5OQEhpbSBxS01TcmDrpDBMasdgpuPJmi4HZ0loXLQQw240kE
+	331ThaG0LU5DQ/s8C8bZIQTHIzvgj2sjDNjntqrVkrvajaTasr8oqckaZaXjLQOJ0TbNSF7n
+	Rumib5ySPJfKiFQ+3UtJkZCPSE3Db0q/9loo6XxJJS39ZHezkrf2K2lwYYROX/2RYpdWztYX
+	yYa0tw8odLHhe8zhdu5IuK6ZLUG/kHKUxInCdnExcBY9475+47JOhBQxHP6TXuKVwkui1zzK
+	lCMFRws960STw4yXjOeF98Vwa3R5CQvrxVuub5eZF3aKwTM+9r/QdeLla63LelJCv/rUTi2x
+	UtghDs504KVQUfAmiXftjf+3WC3+7AzjCsSfQ89dQkp9blGORp+9fbOuOFd/ZPPBvBwPSjyd
+	48unmT+iWPeHASRwSLWCB/V7WUpGU5RfnBNAIkerVvKvpu7OUvJaTfHnsiFvv6EwW84PoLUc
+	Vr3Ab4t/plUKH2sK5E9k+bBseOZSXNKaEpS8fm3f62MZMaKOu4bTS/lDR1MLZ5LNKQWzx6rf
+	CXYnv+vz7W3Rpm6qDCRn7iwzP3x5w6cv6h5fydtbk174AZ9ZODF3/a3xJwu34nzp6bK4/o3y
+	L1aFtHfPHG1iiyyOgRR6V04k47664BXTIb3bqsHFhv7exTrtngyTbd/ttIkJnQrn6zRbN9KG
+	fM2/2XUSonADAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSfUxTZxTGfe+9vffS2HlTSbx+JLpGJzETNQ5yokYlW8IbGWrMnImZH43e
+	QKFUbLVadZul66hMDXZrEQqKMJoJDGvBD9DGAgEdzElFpCoVa2odA1aHBcNHZYVl/5z8zvM8
+	5+T8cVhSelM0j1WoDglqlVwpo8WUePNaw/IITslYWVyYCCbjt9DTGxDBY72bguGwiYLiK9U0
+	RGw3GDA5C0VwrzuHgo6aKgS9wyYE78ZtJBjrJymImFsZCI8+Y8CiRzDpakVg9ZhJ8HbcIaG6
+	Tk/AW8d7GvqbhxBY/AEaCvr0FITspxEUBW0M9LUkw2DvLRFM+l4T0D0ygMAeeE9AwJ2LIGLN
+	hItltdFx6xsaxu8/IKHA0oHgkt9HwlDfCwR1rc8RuH7JoeFV/jUSOgMfwKPhEA2/WX6gYdBT
+	TMDfDhpKc1wi8Pzej6DEZkYQfOoiwFB+hQZriZOC+hcNDHj6JwjosZoJqHKmQq89SEF7fhkR
+	PTeaujoHbAUGIlr+JMDy6y0CRu2VzMYKhN8Zz1K4svY6gY0PIzSuvlCN8PiYGeFwhYHExvxo
+	2zwQIvF3tUdwRfsAjceGu2jsGimlcFsZj38+NUbgc/eX4/oiH7M1aad43X5BqdAK6hXr94rT
+	h/xdouwW9qi3ooE5if6g81AMy3Of8N1P9NNMc0t5r3eUnOJYbhFfeyYoykNiluQ6F/Kn7Weo
+	KWM2l8p73b7pEMUt4e9dzp1mCZfIe366zfy3dCFf5XBP6zFRvWaihJhiKZfAPwvdpfKRuBTN
+	qESxCpU2S65QJsRrMtN1KsXR+H0Hspwo+k/2ryfO3UThzuQmxLFINlMCGzdlSEVyrUaX1YR4
+	lpTFSj6KS8mQSvbLdccE9YE96sNKQdOE5rOUbI5k0w5hr5RLkx8SMgUhW1D/7xJszLyTyJaw
+	uLB1g2lB6tDxtpTtiyuteJby4Mu+a+ttufrzjbr6uT/u9umS2z5TheyOoCb8ffvnH5ebkjSO
+	uLe5RVvefDUoXP1rRwtkaHNMq7/oGVlQN368sdh54oR/TVq33hD/VAsfDshnL9rp9k9uk3Wd
+	mnX2n7xdNb5v5n+ags6/XJ305XYZpUmXr1pGqjXyfwH4BuCSSwMAAA==
 X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -249,7 +249,7 @@ X-Spamd-Result: default: False [1.64 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	DMARC_POLICY_SOFTFAIL(0.10)[sk.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
@@ -261,11 +261,11 @@ X-Spamd-Result: default: False [1.64 / 15.00];
  el.org,m:jack@suse.cz,m:jlayton@kernel.org,m:dan.j.williams@intel.com,m:hch@infradead.org,m:djwong@kernel.org,m:dri-devel@lists.freedesktop.org,m:rodrigosiqueiramelo@gmail.com,m:melissa.srw@gmail.com,m:hamohammed.sa@gmail.com,m:harry.yoo@oracle.com,m:chris.p.wilson@intel.com,m:gwan-gyeong.mun@intel.com,m:boqun.feng@gmail.com,m:longman@redhat.com,m:yunseong.kim@ericsson.com,m:ysk@kzalloc.com,m:yeoreum.yun@arm.com,m:netdev@vger.kernel.org,m:matthew.brost@intel.com,m:her0gyugyu@gmail.com,m:corbet@lwn.net,m:catalin.marinas@arm.com,m:bp@alien8.de,m:x86@kernel.org,m:hpa@zytor.com,m:luto@kernel.org,m:sumit.semwal@linaro.org,m:gustavo@padovan.org,m:christian.koenig@amd.com,m:andi.shyti@kernel.org,m:arnd@arndb.de,m:lorenzo.stoakes@oracle.com,m:Liam.Howlett@oracle.com,m:rppt@kernel.org,m:surenb@google.com,m:mcgrof@kernel.org,m:petr.pavlu@suse.com,m:da.gomez@kernel.org,m:samitolvanen@google.com,m:paulmck@kernel.org,m:frederic@kernel.org,m:neeraj.upadhyay@kernel.org,m:joelagnelf@nvidia.com,m:jo
  sh@joshtriplett.org,m:urezki@gmail.com,m:mathieu.desnoyers@efficios.com,m:jiangshanlai@gmail.com,m:qiang.zhang@linux.dev,m:juri.lelli@redhat.com,m:vincent.guittot@linaro.org,m:dietmar.eggemann@arm.com,m:bsegall@google.com,m:mgorman@suse.de,m:vschneid@redhat.com,m:chuck.lever@oracle.com,m:neil@brown.name,m:okorniev@redhat.com,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[byungchul@sk.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-304851-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304852-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -277,82 +277,45 @@ X-Spamd-Result: default: False [1.64 / 15.00];
 	RCPT_COUNT_GT_50(0.00)[165];
 	TAGGED_RCPT(0.00)[netdev,renesas];
 	R_DKIM_NA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sk.com:from_mime,sk.com:email,sk.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sk.com:from_mime,sk.com:email,sk.com:mid,vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1DC6F70D959
+X-Rspamd-Queue-Id: 7FCB370CF2E
 
-Make dept able to track dependencies by wait_for_completion()/complete().
+Make dept able to track dependencies by swaits.
 
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- include/linux/completion.h | 30 +++++++++++++++++++++++++-----
- 1 file changed, 25 insertions(+), 5 deletions(-)
+ include/linux/swait.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/include/linux/completion.h b/include/linux/completion.h
-index fb2915676574..bd2c207481d6 100644
---- a/include/linux/completion.h
-+++ b/include/linux/completion.h
-@@ -10,6 +10,7 @@
-  */
- 
- #include <linux/swait.h>
+diff --git a/include/linux/swait.h b/include/linux/swait.h
+index d324419482a0..277ac74f61c3 100644
+--- a/include/linux/swait.h
++++ b/include/linux/swait.h
+@@ -6,6 +6,7 @@
+ #include <linux/stddef.h>
+ #include <linux/spinlock.h>
+ #include <linux/wait.h>
 +#include <linux/dept_sdt.h>
+ #include <asm/current.h>
  
  /*
-  * struct completion - structure used to maintain state for a "completion"
-@@ -26,14 +27,33 @@
- struct completion {
- 	unsigned int done;
- 	struct swait_queue_head wait;
-+	struct dept_map dmap;
- };
+@@ -161,6 +162,7 @@ extern void finish_swait(struct swait_queue_head *q, struct swait_queue *wait);
+ 	struct swait_queue __wait;					\
+ 	long __ret = ret;						\
+ 									\
++	sdt_might_sleep_start(NULL);					\
+ 	INIT_LIST_HEAD(&__wait.task_list);				\
+ 	for (;;) {							\
+ 		long __int = prepare_to_swait_event(&wq, &__wait, state);\
+@@ -176,6 +178,7 @@ extern void finish_swait(struct swait_queue_head *q, struct swait_queue *wait);
+ 		cmd;							\
+ 	}								\
+ 	finish_swait(&wq, &__wait);					\
++	sdt_might_sleep_end();						\
+ __out:	__ret;								\
+ })
  
-+#define init_completion(x)				\
-+do {							\
-+	sdt_map_init(&(x)->dmap);			\
-+	__init_completion(x);				\
-+} while (0)
-+
-+/*
-+ * XXX: No use cases for now. Fill the body when needed.
-+ */
- #define init_completion_map(x, m) init_completion(x)
--static inline void complete_acquire(struct completion *x) {}
--static inline void complete_release(struct completion *x) {}
-+
-+static inline void complete_acquire(struct completion *x)
-+{
-+	sdt_might_sleep_start(&x->dmap);
-+}
-+
-+static inline void complete_release(struct completion *x)
-+{
-+	sdt_might_sleep_end();
-+}
- 
- #define COMPLETION_INITIALIZER(work) \
--	{ 0, __SWAIT_QUEUE_HEAD_INITIALIZER((work).wait) }
-+	{ 0, __SWAIT_QUEUE_HEAD_INITIALIZER((work).wait), \
-+	  .dmap = DEPT_MAP_INITIALIZER(work, NULL), }
- 
- #define COMPLETION_INITIALIZER_ONSTACK_MAP(work, map) \
- 	(*({ init_completion_map(&(work), &(map)); &(work); }))
-@@ -75,13 +95,13 @@ static inline void complete_release(struct completion *x) {}
- #endif
- 
- /**
-- * init_completion - Initialize a dynamically allocated completion
-+ * __init_completion - Initialize a dynamically allocated completion
-  * @x:  pointer to completion structure that is to be initialized
-  *
-  * This inline function will initialize a dynamically created completion
-  * structure.
-  */
--static inline void init_completion(struct completion *x)
-+static inline void __init_completion(struct completion *x)
- {
- 	x->done = 0;
- 	init_swait_queue_head(&x->wait);
 -- 
 2.17.1
 
