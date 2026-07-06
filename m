@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-304943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304944-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ZjoKDdWCS2qjSgEAu9opvQ
-	(envelope-from <netdev+bounces-304943-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 12:26:29 +0200
+	id 5fDQFuCHS2o5UwEAu9opvQ
+	(envelope-from <netdev+bounces-304944-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 12:48:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 945C370F239
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 12:26:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B57ED70F743
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 12:47:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304943-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304943-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304944-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304944-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6F8753278E32
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 09:56:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5AC46316F0EE
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 09:57:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57C9E41DEC4;
-	Mon,  6 Jul 2026 09:36:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577A541D4C2;
+	Mon,  6 Jul 2026 09:37:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA0A41737F;
-	Mon,  6 Jul 2026 09:36:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A889E43F4B7;
+	Mon,  6 Jul 2026 09:37:13 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783330576; cv=none; b=XitwKyOSs8uRyCqmENr417ftXuYgxUlcQPgk0T2ILeYk28a1nXHyVvUt4RxPaHc8PtpfQHamrk0WiHM0pDp2wMU/5cVWhFqt/2DFxvtnNTJiM38MYZr+ZPYAsgvYXqTYS2RJZTiZyP8FQJJmcQDmYHKwObo7w2DBYcZReuAE4KM=
+	t=1783330637; cv=none; b=cpr815QeTWIvPw5Zp5oErcOLe4f4YAH3tRIjKywgVLwc0AhQED/BKY0unaZG1pd2R8eb8i4IcQasc4DeGWEapcM6QbL8UtIeFIKZpqJX6kemGiin34UUwpcXvSk/r42jh5BiReaAQ4cf4tEVqGKTHYDS87G3Oi85NOyBoKEkPvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783330576; c=relaxed/simple;
-	bh=PYYRvH1dgOxxiEVlhMI1AbBTjbuhgaa8i1Hz7Vtb9t4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U3F0/GxgMnP5Skmn3PmIfyADIcoBgY6X6lD2VhatiTK+p92d92KzSvUClek+SLl02RGavsfytY8uP39Tl4r3Px/noFKRGQ5YGeZbCfew06H3yz/McPAV165vcLagpPR38ccwL3xa7dPtdF8pCvZh9co0jBfW/UR6FohV0FPFZw4=
+	s=arc-20240116; t=1783330637; c=relaxed/simple;
+	bh=LOhRgOu6/jzWJQSkmgyN3ITZ3cd4kesyN5c2Yg+91S4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n8IItw4HPvXFxuOYQOf3r9J5IQUimz85w7PCKm42+b3G0OSsuONhhsGMa6au0c5p29sNF9f9Ab1ORWzgFC/Q8GkiPO+sfeTxOm11Tzhjv6TiFGUlSkublO+shEzjxXo5+Q3ajh6R6OIRyoXf+4wN8i0G4AQfTFKkgPmGpEmtC6k=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
 Received: from localhost.localdomain (unknown [111.196.245.140])
-	by APP-01 (Coremail) with SMTP id qwCowAAnxs4Bd0tqi5nxBA--.35395S2;
-	Mon, 06 Jul 2026 17:36:02 +0800 (CST)
+	by APP-01 (Coremail) with SMTP id qwCowABH6NA+d0tqEKHxBA--.1322S2;
+	Mon, 06 Jul 2026 17:37:02 +0800 (CST)
 From: Pengpeng Hou <pengpeng@iscas.ac.cn>
-To: Shahed Shaikh <shshaikh@marvell.com>
+To: Manish Chopra <manishc@marvell.com>
 Cc: Pengpeng Hou <pengpeng@iscas.ac.cn>,
-	Manish Chopra <manishc@marvell.com>,
+	Rahul Verma <rahulv@marvell.com>,
 	GR-Linux-NIC-Dev@marvell.com,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -48,9 +48,9 @@ Cc: Pengpeng Hou <pengpeng@iscas.ac.cn>,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: qlcnic: validate unified ROM directory bounds
-Date: Mon,  6 Jul 2026 17:36:01 +0800
-Message-ID: <20260706093601.81535-1-pengpeng@iscas.ac.cn>
+Subject: [PATCH] netxen: validate unified ROM directory bounds
+Date: Mon,  6 Jul 2026 17:37:02 +0800
+Message-ID: <20260706093702.81687-1-pengpeng@iscas.ac.cn>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -59,10 +59,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowAAnxs4Bd0tqi5nxBA--.35395S2
-X-Coremail-Antispam: 1UD129KBjvJXoW3XF43Xw47ZrWxXF15CFW5trb_yoWfCFWDpF
-	98GFyxtr4YvF4aqw48Jw1vyFZxua9xtrWkKFyj93s3tFs7Grn29Fn8trWFkry8ArWDCr1r
-	Aan0ga15Zr47Ar7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+X-CM-TRANSID:qwCowABH6NA+d0tqEKHxBA--.1322S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxtrWkJFy3Jr43Gr18WrW5Awb_yoWfZr4UpF
+	W5CFy0gw13ZF42gw4xJF18tFZxuFWIqrn5Kayj934UKrZ3Kr1ktFyDJrWfKF93ZrZ09rn5
+	Aayq9a13AF4xArJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
 	9KBjDU0xBIdaVrnRJUUU9I14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
 	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
@@ -88,14 +88,14 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-304943-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304944-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
 	DMARC_NA(0.00)[iscas.ac.cn];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:shshaikh@marvell.com,m:pengpeng@iscas.ac.cn,m:manishc@marvell.com,m:GR-Linux-NIC-Dev@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:manishc@marvell.com,m:pengpeng@iscas.ac.cn,m:rahulv@marvell.com,m:GR-Linux-NIC-Dev@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -108,12 +108,12 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	R_DKIM_NA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:from_mime,iscas.ac.cn:email,iscas.ac.cn:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,iscas.ac.cn:from_mime,iscas.ac.cn:email,iscas.ac.cn:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 945C370F239
+X-Rspamd-Queue-Id: B57ED70F743
 
-The unified ROM parser walks directory and data descriptor tables from the
-firmware file. The existing checks compute table and data limits with
+The unified ROM parser walks directory and data descriptor tables from
+the firmware file. The existing checks compute table and data limits with
 base + count * size or base + size before comparing with the firmware
 size. Those calculations use fields from the firmware image and can wrap
 before the comparison.
@@ -126,31 +126,30 @@ entries before their descriptor fields are used.
 
 Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
 ---
- .../net/ethernet/qlogic/qlcnic/qlcnic_init.c  | 135 +++++++++++-------
- 1 file changed, 86 insertions(+), 49 deletions(-)
+ .../ethernet/qlogic/netxen/netxen_nic_init.c  | 148 +++++++++++-------
+ 1 file changed, 90 insertions(+), 58 deletions(-)
 
-diff --git a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_init.c b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_init.c
-index 9192c5ad5a16..56620aed804b 100644
---- a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_init.c
-+++ b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_init.c
-@@ -740,21 +740,55 @@ qlcnic_has_mn(struct qlcnic_adapter *adapter)
+diff --git a/drivers/net/ethernet/qlogic/netxen/netxen_nic_init.c b/drivers/net/ethernet/qlogic/netxen/netxen_nic_init.c
+index 8bc4e2b69569..5722c55fa0cc 100644
+--- a/drivers/net/ethernet/qlogic/netxen/netxen_nic_init.c
++++ b/drivers/net/ethernet/qlogic/netxen/netxen_nic_init.c
+@@ -561,20 +561,55 @@ int netxen_pinit_from_rom(struct netxen_adapter *adapter)
  	return 0;
  }
  
--static
--struct uni_table_desc *qlcnic_get_table_desc(const u8 *unirom, int section)
-+#define QLCNIC_UNI_DIR_TYPE_OFF		8
-+#define QLCNIC_UNI_DIR_ENTRY_MIN_SIZE \
-+	((QLCNIC_UNI_DIR_TYPE_OFF + 1) * sizeof(__le32))
-+#define QLCNIC_UNI_PRODUCT_ENTRY_MIN_SIZE \
-+	((QLCNIC_UNI_FIRMWARE_IDX_OFF + 1) * sizeof(__le32))
+-static struct uni_table_desc *nx_get_table_desc(const u8 *unirom, int section)
++#define NX_UNI_DIR_TYPE_OFF		8
++#define NX_UNI_DIR_ENTRY_MIN_SIZE \
++	((NX_UNI_DIR_TYPE_OFF + 1) * sizeof(u32))
++#define NX_UNI_PRODUCT_ENTRY_MIN_SIZE \
++	((NX_UNI_FIRMWARE_IDX_OFF + 1) * sizeof(u32))
 +
-+static bool qlcnic_rom_range_valid(size_t fw_size, u32 offset, u32 len)
++static bool netxen_rom_range_valid(size_t size, u32 off, u32 len)
 +{
-+	return offset <= fw_size && len <= fw_size - offset;
++	return off <= size && len <= size - off;
 +}
 +
-+static bool qlcnic_rom_table_valid(size_t size, u32 off, u32 n, u32 esz)
++static bool netxen_rom_table_valid(size_t size, u32 off, u32 n, u32 esz)
 +{
 +	if (off > size)
 +		return false;
@@ -160,7 +159,7 @@ index 9192c5ad5a16..56620aed804b 100644
 +	return n <= (size - off) / esz;
 +}
 +
-+static bool qlcnic_rom_entry_valid(size_t size, u32 off, u32 esz, u32 idx)
++static bool netxen_rom_entry_valid(size_t size, u32 off, u32 esz, u32 idx)
 +{
 +	if (!esz || off > size)
 +		return false;
@@ -168,29 +167,29 @@ index 9192c5ad5a16..56620aed804b 100644
 +	return idx < (size - off) / esz;
 +}
 +
-+static struct uni_table_desc *qlcnic_get_table_desc(const u8 *unirom,
-+						    size_t fw_size, int section)
++static struct uni_table_desc *
++nx_get_table_desc(const u8 *unirom, size_t fw_size, int section)
  {
--	u32 i, entries;
+-	uint32_t i;
  	struct uni_table_desc *directory = (struct uni_table_desc *) &unirom[0];
--	entries = le32_to_cpu(directory->num_entries);
-+	u32 entries = le32_to_cpu(directory->num_entries);
-+	u32 entry_size = le32_to_cpu(directory->entry_size);
-+	u32 findex = le32_to_cpu(directory->findex);
+-	__le32 entries = cpu_to_le32(directory->num_entries);
++	u32 entries = cpu_to_le32(directory->num_entries);
++	u32 entry_size = cpu_to_le32(directory->entry_size);
++	u32 findex = cpu_to_le32(directory->findex);
 +	u32 i;
  
 -	for (i = 0; i < entries; i++) {
-+	if (entry_size < QLCNIC_UNI_DIR_ENTRY_MIN_SIZE ||
-+	    !qlcnic_rom_table_valid(fw_size, findex, entries, entry_size))
++	if (entry_size < NX_UNI_DIR_ENTRY_MIN_SIZE ||
++	    !netxen_rom_table_valid(fw_size, findex, entries, entry_size))
 +		return NULL;
  
--		u32 offs = le32_to_cpu(directory->findex) +
--			   i * le32_to_cpu(directory->entry_size);
--		u32 tab_type = le32_to_cpu(*((__le32 *)&unirom[offs] + 8));
+-		__le32 offs = cpu_to_le32(directory->findex) +
+-				(i * cpu_to_le32(directory->entry_size));
+-		__le32 tab_type = cpu_to_le32(*((u32 *)&unirom[offs] + 8));
 +	for (i = 0; i < entries; i++) {
 +		size_t offs = findex + (size_t)i * entry_size;
-+		u32 tab_type = le32_to_cpu(*((__le32 *)&unirom[offs] +
-+						QLCNIC_UNI_DIR_TYPE_OFF));
++		u32 tab_type = cpu_to_le32(*((u32 *)&unirom[offs] +
++						NX_UNI_DIR_TYPE_OFF));
  
  		if (tab_type == section)
 -			return (struct uni_table_desc *) &unirom[offs];
@@ -198,161 +197,166 @@ index 9192c5ad5a16..56620aed804b 100644
  	}
  
  	return NULL;
-@@ -766,19 +800,18 @@ static int
- qlcnic_validate_header(struct qlcnic_adapter *adapter)
+@@ -586,20 +621,18 @@ static int
+ netxen_nic_validate_header(struct netxen_adapter *adapter)
  {
  	const u8 *unirom = adapter->fw->data;
 -	struct uni_table_desc *directory = (struct uni_table_desc *) &unirom[0];
--	u32 entries, entry_size, tab_size, fw_file_size;
--
--	fw_file_size = adapter->fw->size;
 +	struct uni_table_desc *directory = (struct uni_table_desc *)&unirom[0];
-+	u32 fw_file_size = adapter->fw->size;
+ 	u32 fw_file_size = adapter->fw->size;
+-	u32 tab_size;
+-	__le32 entries;
+-	__le32 entry_size;
 +	u32 entries, entry_size, findex;
  
- 	if (fw_file_size < FILEHEADER_SIZE)
+ 	if (fw_file_size < QLCNIC_FILEHEADER_SIZE)
  		return -EINVAL;
  
- 	entries = le32_to_cpu(directory->num_entries);
- 	entry_size = le32_to_cpu(directory->entry_size);
--	tab_size = le32_to_cpu(directory->findex) + (entries * entry_size);
-+	findex = le32_to_cpu(directory->findex);
+ 	entries = cpu_to_le32(directory->num_entries);
+ 	entry_size = cpu_to_le32(directory->entry_size);
+-	tab_size = cpu_to_le32(directory->findex) + (entries * entry_size);
++	findex = cpu_to_le32(directory->findex);
  
 -	if (fw_file_size < tab_size)
-+	if (!qlcnic_rom_table_valid(fw_file_size, findex, entries, entry_size))
++	if (!netxen_rom_table_valid(fw_file_size, findex, entries, entry_size))
  		return -EINVAL;
  
  	return 0;
-@@ -789,31 +822,33 @@ qlcnic_validate_bootld(struct qlcnic_adapter *adapter)
- {
+@@ -611,30 +644,30 @@ netxen_nic_validate_bootld(struct netxen_adapter *adapter)
  	struct uni_table_desc *tab_desc;
  	struct uni_data_desc *descr;
--	u32 offs, tab_size, data_size, idx;
  	const u8 *unirom = adapter->fw->data;
-+	size_t offs;
+-	__le32 idx = cpu_to_le32(*((int *)&unirom[adapter->file_prd_off] +
+-				NX_UNI_BOOTLD_IDX_OFF));
+-	u32 offs;
+-	u32 tab_size;
+-	u32 data_size;
 +	u32 data_len, data_off, entry_size, findex, idx;
- 	__le32 temp;
++	u32 section = NX_UNI_DIR_SECT_BOOTLD;
++	size_t offs;
  
- 	temp = *((__le32 *)&unirom[adapter->file_prd_off] +
- 		 QLCNIC_UNI_BOOTLD_IDX_OFF);
- 	idx = le32_to_cpu(temp);
--	tab_desc = qlcnic_get_table_desc(unirom, QLCNIC_UNI_DIR_SECT_BOOTLD);
-+	tab_desc = qlcnic_get_table_desc(unirom, adapter->fw->size,
-+					 QLCNIC_UNI_DIR_SECT_BOOTLD);
+-	tab_desc = nx_get_table_desc(unirom, NX_UNI_DIR_SECT_BOOTLD);
++	idx = cpu_to_le32(*((int *)&unirom[adapter->file_prd_off] +
++			     NX_UNI_BOOTLD_IDX_OFF));
++	tab_desc = nx_get_table_desc(unirom, adapter->fw->size, section);
  
  	if (!tab_desc)
  		return -EINVAL;
  
--	tab_size = le32_to_cpu(tab_desc->findex) +
--		   le32_to_cpu(tab_desc->entry_size) * (idx + 1);
+-	tab_size = cpu_to_le32(tab_desc->findex) +
+-			(cpu_to_le32(tab_desc->entry_size) * (idx + 1));
 -
 -	if (adapter->fw->size < tab_size)
-+	entry_size = le32_to_cpu(tab_desc->entry_size);
-+	findex = le32_to_cpu(tab_desc->findex);
++	entry_size = cpu_to_le32(tab_desc->entry_size);
++	findex = cpu_to_le32(tab_desc->findex);
 +	if (entry_size < sizeof(*descr) ||
-+	    !qlcnic_rom_entry_valid(adapter->fw->size, findex, entry_size,
++	    !netxen_rom_entry_valid(adapter->fw->size, findex, entry_size,
 +				     idx))
  		return -EINVAL;
  
--	offs = le32_to_cpu(tab_desc->findex) +
--	       le32_to_cpu(tab_desc->entry_size) * idx;
+-	offs = cpu_to_le32(tab_desc->findex) +
+-		(cpu_to_le32(tab_desc->entry_size) * (idx));
 +	offs = findex + (size_t)entry_size * idx;
  	descr = (struct uni_data_desc *)&unirom[offs];
-+	data_off = le32_to_cpu(descr->findex);
-+	data_len = le32_to_cpu(descr->size);
++	data_off = cpu_to_le32(descr->findex);
++	data_len = cpu_to_le32(descr->size);
  
--	data_size = le32_to_cpu(descr->findex) + le32_to_cpu(descr->size);
+-	data_size = cpu_to_le32(descr->findex) + cpu_to_le32(descr->size);
 -
 -	if (adapter->fw->size < data_size)
-+	if (!qlcnic_rom_range_valid(adapter->fw->size, data_off, data_len))
++	if (!netxen_rom_range_valid(adapter->fw->size, data_off, data_len))
  		return -EINVAL;
  
  	return 0;
-@@ -825,29 +860,31 @@ qlcnic_validate_fw(struct qlcnic_adapter *adapter)
+@@ -646,29 +679,30 @@ netxen_nic_validate_fw(struct netxen_adapter *adapter)
  	struct uni_table_desc *tab_desc;
  	struct uni_data_desc *descr;
  	const u8 *unirom = adapter->fw->data;
--	u32 offs, tab_size, data_size, idx;
-+	size_t offs;
+-	__le32 idx = cpu_to_le32(*((int *)&unirom[adapter->file_prd_off] +
+-				NX_UNI_FIRMWARE_IDX_OFF));
+-	u32 offs;
+-	u32 tab_size;
+-	u32 data_size;
 +	u32 data_len, data_off, entry_size, findex, idx;
- 	__le32 temp;
++	u32 section = NX_UNI_DIR_SECT_FW;
++	size_t offs;
  
- 	temp = *((__le32 *)&unirom[adapter->file_prd_off] +
- 		 QLCNIC_UNI_FIRMWARE_IDX_OFF);
- 	idx = le32_to_cpu(temp);
--	tab_desc = qlcnic_get_table_desc(unirom, QLCNIC_UNI_DIR_SECT_FW);
-+	tab_desc = qlcnic_get_table_desc(unirom, adapter->fw->size,
-+					 QLCNIC_UNI_DIR_SECT_FW);
+-	tab_desc = nx_get_table_desc(unirom, NX_UNI_DIR_SECT_FW);
++	idx = cpu_to_le32(*((int *)&unirom[adapter->file_prd_off] +
++			     NX_UNI_FIRMWARE_IDX_OFF));
++	tab_desc = nx_get_table_desc(unirom, adapter->fw->size, section);
  
  	if (!tab_desc)
  		return -EINVAL;
  
--	tab_size = le32_to_cpu(tab_desc->findex) +
--		   le32_to_cpu(tab_desc->entry_size) * (idx + 1);
+-	tab_size = cpu_to_le32(tab_desc->findex) +
+-			(cpu_to_le32(tab_desc->entry_size) * (idx + 1));
 -
 -	if (adapter->fw->size < tab_size)
-+	entry_size = le32_to_cpu(tab_desc->entry_size);
-+	findex = le32_to_cpu(tab_desc->findex);
++	entry_size = cpu_to_le32(tab_desc->entry_size);
++	findex = cpu_to_le32(tab_desc->findex);
 +	if (entry_size < sizeof(*descr) ||
-+	    !qlcnic_rom_entry_valid(adapter->fw->size, findex, entry_size,
++	    !netxen_rom_entry_valid(adapter->fw->size, findex, entry_size,
 +				     idx))
  		return -EINVAL;
  
--	offs = le32_to_cpu(tab_desc->findex) +
--	       le32_to_cpu(tab_desc->entry_size) * idx;
+-	offs = cpu_to_le32(tab_desc->findex) +
+-		(cpu_to_le32(tab_desc->entry_size) * (idx));
 +	offs = findex + (size_t)entry_size * idx;
  	descr = (struct uni_data_desc *)&unirom[offs];
--	data_size = le32_to_cpu(descr->findex) + le32_to_cpu(descr->size);
--
+-	data_size = cpu_to_le32(descr->findex) + cpu_to_le32(descr->size);
++	data_off = cpu_to_le32(descr->findex);
++	data_len = cpu_to_le32(descr->size);
+ 
 -	if (adapter->fw->size < data_size)
-+	data_off = le32_to_cpu(descr->findex);
-+	data_len = le32_to_cpu(descr->size);
-+	if (!qlcnic_rom_range_valid(adapter->fw->size, data_off, data_len))
++	if (!netxen_rom_range_valid(adapter->fw->size, data_off, data_len))
  		return -EINVAL;
  
  	return 0;
-@@ -859,30 +896,30 @@ qlcnic_validate_product_offs(struct qlcnic_adapter *adapter)
- 	struct uni_table_desc *ptab_descr;
+@@ -682,39 +716,37 @@ netxen_nic_validate_product_offs(struct netxen_adapter *adapter)
  	const u8 *unirom = adapter->fw->data;
- 	int mn_present = qlcnic_has_mn(adapter);
--	u32 entries, entry_size, tab_size, i;
+ 	int mn_present = (NX_IS_REVISION_P2(adapter->ahw.revision_id)) ?
+ 			1 : netxen_p3_has_mn(adapter);
+-	__le32 entries;
+-	__le32 entry_size;
+-	u32 tab_size;
+-	u32 i;
 +	u32 entries, entry_size, findex, i;
-+	u32 section = QLCNIC_UNI_DIR_SECT_PRODUCT_TBL;
- 	__le32 temp;
++	u32 section = NX_UNI_DIR_SECT_PRODUCT_TBL;
  
--	ptab_descr = qlcnic_get_table_desc(unirom,
--				QLCNIC_UNI_DIR_SECT_PRODUCT_TBL);
-+	ptab_descr = qlcnic_get_table_desc(unirom, adapter->fw->size, section);
- 	if (!ptab_descr)
+-	ptab_descr = nx_get_table_desc(unirom, NX_UNI_DIR_SECT_PRODUCT_TBL);
++	ptab_descr = nx_get_table_desc(unirom, adapter->fw->size, section);
+ 	if (ptab_descr == NULL)
  		return -EINVAL;
  
- 	entries = le32_to_cpu(ptab_descr->num_entries);
- 	entry_size = le32_to_cpu(ptab_descr->entry_size);
--	tab_size = le32_to_cpu(ptab_descr->findex) + (entries * entry_size);
+ 	entries = cpu_to_le32(ptab_descr->num_entries);
+ 	entry_size = cpu_to_le32(ptab_descr->entry_size);
+-	tab_size = cpu_to_le32(ptab_descr->findex) + (entries * entry_size);
 -
 -	if (adapter->fw->size < tab_size)
-+	findex = le32_to_cpu(ptab_descr->findex);
-+	if (entry_size < QLCNIC_UNI_PRODUCT_ENTRY_MIN_SIZE ||
-+	    !qlcnic_rom_table_valid(adapter->fw->size, findex, entries,
++	findex = cpu_to_le32(ptab_descr->findex);
++	if (entry_size < NX_UNI_PRODUCT_ENTRY_MIN_SIZE ||
++	    !netxen_rom_table_valid(adapter->fw->size, findex, entries,
 +				     entry_size))
  		return -EINVAL;
  
  nomn:
  	for (i = 0; i < entries; i++) {
 -
--		u32 flags, file_chiprev, offs;
+-		__le32 flags, file_chiprev, offs;
 +		size_t offs;
-+		u32 flags, file_chiprev;
- 		u8 chiprev = adapter->ahw->revision_id;
- 		u32 flagbit;
++		__le32 flags, file_chiprev;
+ 		u8 chiprev = adapter->ahw.revision_id;
+ 		uint32_t flagbit;
  
--		offs = le32_to_cpu(ptab_descr->findex) +
--		       i * le32_to_cpu(ptab_descr->entry_size);
+-		offs = cpu_to_le32(ptab_descr->findex) +
+-				(i * cpu_to_le32(ptab_descr->entry_size));
 +		offs = findex + (size_t)i * entry_size;
- 		temp = *((__le32 *)&unirom[offs] + QLCNIC_UNI_FLAGS_OFF);
- 		flags = le32_to_cpu(temp);
- 		temp = *((__le32 *)&unirom[offs] + QLCNIC_UNI_CHIP_REV_OFF);
-@@ -891,7 +928,7 @@ qlcnic_validate_product_offs(struct qlcnic_adapter *adapter)
+ 		flags = cpu_to_le32(*((int *)&unirom[offs] + NX_UNI_FLAGS_OFF));
+ 		file_chiprev = cpu_to_le32(*((int *)&unirom[offs] +
+-							NX_UNI_CHIP_REV_OFF));
++						    NX_UNI_CHIP_REV_OFF));
+ 
  		flagbit = mn_present ? 1 : 2;
  
  		if ((chiprev == file_chiprev) &&
@@ -361,12 +365,12 @@ index 9192c5ad5a16..56620aed804b 100644
  			adapter->file_prd_off = offs;
  			return 0;
  		}
-@@ -945,7 +982,7 @@ struct uni_data_desc *qlcnic_get_data_desc(struct qlcnic_adapter *adapter,
- 	temp = *((__le32 *)&unirom[adapter->file_prd_off] + idx_offset);
- 	idx = le32_to_cpu(temp);
+@@ -767,7 +799,7 @@ static struct uni_data_desc *nx_get_data_desc(struct netxen_adapter *adapter,
+ 	struct uni_table_desc *tab_desc;
+ 	__le32 offs;
  
--	tab_desc = qlcnic_get_table_desc(unirom, section);
-+	tab_desc = qlcnic_get_table_desc(unirom, adapter->fw->size, section);
+-	tab_desc = nx_get_table_desc(unirom, section);
++	tab_desc = nx_get_table_desc(unirom, adapter->fw->size, section);
  
  	if (tab_desc == NULL)
  		return NULL;
