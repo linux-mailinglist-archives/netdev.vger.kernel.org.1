@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-304975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304976-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 1hPSCHyiS2q3XQEAu9opvQ
-	(envelope-from <netdev+bounces-304975-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 14:41:32 +0200
+	id L+5FB92kS2qmXgEAu9opvQ
+	(envelope-from <netdev+bounces-304976-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 14:51:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BDE1710A56
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 14:41:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82DF4710C9F
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 14:51:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=W8tOvrpS;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=KfUM2rTd;
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304975-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304975-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304976-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304976-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 78C0A34CDEF6
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 10:51:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5954735C59D1
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 11:00:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A3B03F58D6;
-	Mon,  6 Jul 2026 10:50:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B67323EFFC5;
+	Mon,  6 Jul 2026 11:00:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51613F39E8;
-	Mon,  6 Jul 2026 10:50:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51953A6F1A;
+	Mon,  6 Jul 2026 11:00:27 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783335043; cv=none; b=ijkJC5Wsvzq93AK2G8SWX9thg8ZwRpVewOQ8/ynDIynQCAhjxZ+PKT30mxtka7Qvv2auSQrij4QC49AeonvviYwmsQq9n3zZOcYvNaTrTcvYssVZTmnQ9gv1mVICPXtcB4fVJX/oTtglUt2doBbqmoXWMrXVs4TxgCE9CRDEAVg=
+	t=1783335629; cv=none; b=W+FquI9U5zysQofb9DX99n/JAnwoGWtLUPyYVXcgccU8WgUFDa7ufbZypytos5KosBObdwE3ACwUqir/Yxcznrf7we/cdb6CGt1kiyLMNaTkeuQ1D9LlBsXMATzoh/TwRewwIbD1JC2gZQAO7cGY5zoZnTxUvMV9Vwf4RMpLEGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783335043; c=relaxed/simple;
-	bh=yctoVFD91OFx4fFlRA1MPazNYejGlaXFotK29gkw3PE=;
+	s=arc-20240116; t=1783335629; c=relaxed/simple;
+	bh=9NE9im4wJR7qAsR8878UQoNkn+kFS1EWide76Zi/MW0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JJLZ4WLeEpfQOBUIQjx+PhyZYn/heMQj1l5DPvu5DmDn/CGoP7j3olM74l9DcIfu0+6JCjs3xGpg45prqoNGp1BrYAAoBqOTmmxhurKUV/D3oQmCLfiMHhCrPsmd11VZP8cLWoA5z/cHeP4RdXn5jhR0Xj7EXPMnFajx0O7D5GM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W8tOvrpS; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 817EE1F000E9;
-	Mon,  6 Jul 2026 10:50:41 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=CL5cdAO69+fLWHCJaVVn4LJY0GrQfz0YD/CaUFl5/AQhzQ9+w4XHjlrLxyyDzTvaUhQCFup71Px7C5xtQ+6XcrahG+trv5pwZ7ymjLeF4wlmI3swhPpw9LM0Hgse0uJNlpb73Witc6oNfot/ZymfMbgr2HyB7M02Y5RNIcHnUNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KfUM2rTd; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 082FF1F000E9;
+	Mon,  6 Jul 2026 11:00:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783335041;
-	bh=yHJBd2n2Sa1J667oouse/pt4NTBKScB7z7klNN5CAW4=;
+	s=k20260515; t=1783335627;
+	bh=LWYxhLz7Wktw2+hz9+SkbYBDVl0Ct3OosWMIW+3lDmM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=W8tOvrpS0wE/XmOlbNX/4iDM9O9oBpzhAYZB9E4myqREVCZvlpm2ENicf4Umj1wgm
-	 J+z78r96kEnsPoRAsugoIt0xPxGMxkje/OzsxYuTFeloZVOPjl6d4sGzE80X7ahbmC
-	 9pQSe9gKu7dVDsuw7NolP6hD7mybDC+C6e8NImZHR30zndQ3Jv7RHJnbvThLjYsyLe
-	 iFa/30wzdk4eqdYVWdX+vZbFnsjtNYNedX5FS4WnyioozbL4Jhs7SF6di65iWEG08/
-	 dS7zZQVtGTbGDyqsx9bEOqnimCZiX8eKSM/SDGY0UXsRet013wt3w0TXdzg0gvGb3H
-	 EiPO7dmRYfBaQ==
+	b=KfUM2rTdzHvqLH5A/Qf7UvXe6G8E9j089g3MmVE8/17TxyIp5XaFyWVWKp2vtwXOW
+	 CXOzGRIufApQbxMjyUI5oe47QimQs8+0vHy7tm9dSmg4aaOMNX6r4+Jf/b2kSWs+/R
+	 IGtE2//DlxGS4PfQYk0EPV/uaQIKkkfrL5t3ygyVThy7YLs8D0iZGs4Ju+k7KOJIzo
+	 hugzI92DZB4udeJQS31/8tsa6+5kU0i5D1UPwuskoO0wHXocZDbNBimVI+7UbALygi
+	 Ctdf/SvpriNAFoR461O0AZlFs+kUC3SAbemS5Ec/Pe3BdEUBHJh9KSa7uXaRL/teCM
+	 jrFjgCm8MWZjg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 56B3C3ABD2A5;
-	Mon,  6 Jul 2026 10:50:23 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D09773ABD2A5;
+	Mon,  6 Jul 2026 11:00:08 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,38 +57,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] ipvs: fix PMTU for GUE/GRE tunnel ICMP errors
+Subject: Re: [PATCH net v2] net/smc: fix UAF in smc_cdc_rx_handler() by
+ pinning
+ the socket
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178333502188.500093.18161993584904393152.git-patchwork-notify@kernel.org>
-Date: Mon, 06 Jul 2026 10:50:21 +0000
-References: <20260702073430.67680-1-zhaoyz24@mails.tsinghua.edu.cn>
-In-Reply-To: <20260702073430.67680-1-zhaoyz24@mails.tsinghua.edu.cn>
-To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Cc: netdev@vger.kernel.org, horms@verge.net.au, ja@ssi.bg,
- pablo@netfilter.org, fw@strlen.de, phil@nwl.cc, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org,
- yangyx22@mails.tsinghua.edu.cn, wangao@seu.edu.cn, fengxw06@126.com,
- qli01@tsinghua.edu.cn, xuke@tsinghua.edu.cn
+ <178333560738.503923.14185605009995781053.git-patchwork-notify@kernel.org>
+Date: Mon, 06 Jul 2026 11:00:07 +0000
+References: <20260630183227.2044998-1-xmei5@asu.edu>
+In-Reply-To: <20260630183227.2044998-1-xmei5@asu.edu>
+To: Xiang Mei <xmei5@asu.edu>
+Cc: sidraya@linux.ibm.com, alibuda@linux.alibaba.com,
+ dust.li@linux.alibaba.com, wenjia@linux.ibm.com, mjambigi@linux.ibm.com,
+ tonylu@linux.alibaba.com, guwen@linux.alibaba.com, netdev@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, hwippel@linux.ibm.com, linux-rdma@vger.kernel.org,
+ linux-s390@vger.kernel.org, bestswngs@gmail.com
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-5.16 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304975-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[vger.kernel.org,verge.net.au,ssi.bg,netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
+	TAGGED_FROM(0.00)[bounces-304976-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[linux.ibm.com,linux.alibaba.com,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FORGED_RECIPIENTS(0.00)[m:zhaoyz24@mails.tsinghua.edu.cn,m:netdev@vger.kernel.org,m:horms@verge.net.au,m:ja@ssi.bg,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lvs-devel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_RECIPIENTS(0.00)[m:xmei5@asu.edu,m:sidraya@linux.ibm.com,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:wenjia@linux.ibm.com,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:hwippel@linux.ibm.com,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:bestswngs@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -104,36 +105,36 @@ X-Spamd-Result: default: False [-5.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_NO_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,strlen.de:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5BDE1710A56
+X-Rspamd-Queue-Id: 82DF4710C9F
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
-by Florian Westphal <fw@strlen.de>:
+by Paolo Abeni <pabeni@redhat.com>:
 
-On Thu,  2 Jul 2026 15:34:28 +0800 you wrote:
-> When an ICMP Fragmentation Needed error is received for a tunneled IPVS
-> connection, ip_vs_in_icmp() recomputes the MTU that the original packet
-> can use by subtracting the tunnel overhead from the reported next-hop
-> MTU.
+On Tue, 30 Jun 2026 11:32:27 -0700 you wrote:
+> smc_cdc_rx_handler() looks up the connection by token under the link
+> group's conns_lock, drops the lock, and then dereferences conn and the
+> smc_sock derived from it, ending in sock_hold(&smc->sk) inside
+> smc_cdc_msg_recv(). No reference is held across the lock release.
 > 
-> The current code always subtracts sizeof(struct iphdr), which is only
-> the IPIP overhead. For GUE and GRE tunnels, ipvs_udp_decap() and
-> ipvs_gre_decap() already compute the additional tunnel header length,
-> but that value is scoped to the decapsulation block and is lost before
-> the ICMP_FRAG_NEEDED handling. As a result, the ICMP error sent back to
-> the client advertises an MTU that is too large, so PMTUD can fail to
-> converge for GUE/GRE-tunneled real servers.
+> The only reference pinning the socket while the connection is
+> discoverable in the link group is taken in smc_lgr_register_conn()
+> (sock_hold) and dropped in __smc_lgr_unregister_conn() (sock_put), both
+> under conns_lock. Once the handler drops conns_lock, a concurrent
+> close() -> smc_release() -> smc_conn_free() -> smc_lgr_unregister_conn()
+> can drop that reference and free the smc_sock, so the handler's later
+> sock_hold() runs on freed memory:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] ipvs: fix PMTU for GUE/GRE tunnel ICMP errors
-    https://git.kernel.org/netdev/net/c/6b335af0d0d1
+  - [net,v2] net/smc: fix UAF in smc_cdc_rx_handler() by pinning the socket
+    https://git.kernel.org/netdev/net/c/9d160b35cc34
 
 You are awesome, thank you!
 -- 
