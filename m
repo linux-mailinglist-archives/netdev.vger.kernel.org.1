@@ -1,182 +1,251 @@
-Return-Path: <netdev+bounces-304827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304828-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id T5IlGr8bS2oRMAEAu9opvQ
-	(envelope-from <netdev+bounces-304827-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 05:06:39 +0200
+	id 0uxkBSQcS2ogMAEAu9opvQ
+	(envelope-from <netdev+bounces-304828-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 05:08:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA72670C446
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 05:06:38 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66E7570C450
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 05:08:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=N9KJmBnr;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304827-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304827-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=realsil.com.cn header.s=dkim header.b="FG/d9k56";
+	dmarc=pass (policy=none) header.from=realsil.com.cn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304828-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-304828-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8C09F30086CF
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 03:06:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 739A63006F07
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 03:08:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0325F3ACA6F;
-	Mon,  6 Jul 2026 03:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8BF335BDA8;
+	Mon,  6 Jul 2026 03:08:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAE1435B645
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 03:06:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC4A1EE01A;
+	Mon,  6 Jul 2026 03:08:13 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783307196; cv=none; b=T8W+df3tIG82mQCbeo/9ydsC4uQiL0mDLY28u/1AvdgLwEnt5RWn2IR8j6J8waSy5S9CN25vXAEnhrMtbrZ5Z9yY9QVshw+nalo6nPVt0rWW82RmfOv+535bqXldV9RzJPOtdR78I8RjDaJJ9sLyaAsVS8VKk9H25MFNM+yWlg8=
+	t=1783307296; cv=none; b=FtZlHpEnfd4JMDqWCAr6icirSUvx57Vo/31mdQ5DLJnlE3RQMaNAv7lVp72FMkiNbAe3PY05rvG3oTSscafj83xqJ+6dNfFsEJbjUY2ok6wEAGuil761ViOargAnzuFEI+JBW+kUXRKXPkvycVqWZS3k3E9sBqTvX/ISOeFTcDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783307196; c=relaxed/simple;
-	bh=XOfCdFUKFIo7HMCTJ7WSzTMTIpbQEXqIsg/t6NcO5Y0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OGk2KdqBdN8Y+JFa2i+HK7CwRJn7aH/5w+AIE2EEHcvcaGj0hvIrLJ40kJxsX7rXpEdfjvmrFBMMurxKgkvY/6tnykMGpJTva1l8HBh4C2vV6GN0gbscl7Zh7ji2nqNPHsBR4rjWrEHbfMauO0Dsu+hcyCIDYcRchQ+RroEphn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N9KJmBnr; arc=none smtp.client-ip=209.85.216.52
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-38511175ad3so647133a91.2
-        for <netdev@vger.kernel.org>; Sun, 05 Jul 2026 20:06:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783307195; x=1783911995; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=qZgDyLyNz2cPWa9DlLdj8DZ7TG8u0RQDUWdSZBVgwfo=;
-        b=N9KJmBnrkOchfyBIJHDL4otrhfrzoz1347qnNNbQJbo2ympIkrOLI4dtalw8U3dumi
-         sRbaN3sPYkVojDYZZOMGXTXlrO0LFX3bQpzgZRuV+UpqtyfOS07kwenhfGMgdtE4GIcf
-         lVlV7Yd6UzxYilTTYe+TMcc55uR2XwiI9hOSBKNmF8HlED1NTpjLC9JCdricgR5BF0No
-         H+vmBkzAdoRYUk23sGuvAHEVtMjBItV88m+Ckdz4x+Vgppm1CjqzZ+PHVu7wOvBT+idv
-         ufcCfkVmmFiVqWM7Qf0jnDw6QQo94rSCsWq/CfMlQng24ETcZ45LDqAkUiqJkhfDhtWZ
-         WP7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783307195; x=1783911995;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qZgDyLyNz2cPWa9DlLdj8DZ7TG8u0RQDUWdSZBVgwfo=;
-        b=oln7wCpoFoAdoyh94P8FUcp6iqor3N4bxnHY2Y+uWvgM1Cz/5RC3KlCvoKTowQTWAr
-         XEpuoQr/A5SYB67ulH0/6d0IVDILMqz9XlAisKMb390Yhh10OYF+RkDWDEfcT4r37CK8
-         +T6OXyGL56Wt5RszCcAMd+uhlzh7oMWa7go1/Fy2ag57TJpx0ATQrYFSJhpbjxqdFRRK
-         WbsLgysKL0H0hUlYP/LrLMsltcxxQ2nqtd/DNpmU3a/4PLRX952Hd0YLBr445+SM0QL5
-         El02B0vgTvDoR4wYKjvuGTlz0sAyKM/Z3NlXfLIsmMmX0D/gsuAIfjtyiCMl/NN5f1WJ
-         x83w==
-X-Gm-Message-State: AOJu0YwBfIVFsaHOHJRME8HSYj1+15w54JcFWzrtBXZjAI5znRcBQY4n
-	uTRwfhwQ51yqWP90zNjmFUTFGapnowcj7ZGbjUvO7w9BZ+HjgzccfRhAVZGkig==
-X-Gm-Gg: AfdE7cnGVzXfy6TMNNkklSq6wiiQe+RO4AwNcWmE6JLmHNPhAPKPu7i7gZY2OCD9iVD
-	AsFhNDRf+mqvjLxu4J4N5NSgcL/sEVoTB8ZW/AiZIu9J0OUEsX7VaIxkgmQXXwy68HeeDY7qXNN
-	i0pKygAxQUpp90NL8yXFzjUggGO/U2yuFdK+jGZt6jG5ghvgVZ1e0p2p7mgnHOtND83jbdBd1wR
-	h3QbV8yek2tWmvh4JrFqLvr5a2mmKnarbY+lWT5hFIYwSE3yXgBiPO1S4GWRV2HQHy3Z7cuzC+N
-	kPxFy3nCBvckDdNCCBGYfwEUHCT0/HDDS3zWoKvmrw8jP+XiHP1cVewM5ZGplXKnGK9cD7uXmoG
-	5WsnKRgrn/DpDM/H81r4Y87fxLPfBYUJ9j3uja6JXO/dDv87Dl2wJ2PYnvsjJQShDm50Nc+x7Zb
-	uyP7XlHy3GhJcTMW0WA8OZcUHWbqC3O578wlhRF8t5iFFBuVING/4z2toKiNsO5TQgs5tImMWG3
-	EUYZa9/TQ==
-X-Received: by 2002:a17:90b:48c6:b0:37f:9ce3:ca93 with SMTP id 98e67ed59e1d1-3829f8e55d2mr8819064a91.28.1783307194975;
-        Sun, 05 Jul 2026 20:06:34 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8000:7a86::e35])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38127ae1333sm4056699a91.4.2026.07.05.20.06.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Jul 2026 20:06:34 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Madalin Bucur <madalin.bucur@nxp.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next] net: dpaa_eth: convert to napi_gro_receive
-Date: Sun,  5 Jul 2026 20:06:32 -0700
-Message-ID: <20260706030632.1826810-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.55.0
+	s=arc-20240116; t=1783307296; c=relaxed/simple;
+	bh=SXa+Zp9hBj2e+vSF0SJ0YFOW31mLUh/RaDaNgpF7I3Q=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=SP1SLkSXtcdpJU1hRXjnBj652skh3PkmrYNIaoMo8iFcfAs1FPJg1ZZo+1Y4VLHqbfceJ28hxlfHfTnVdI/GYZ+BuCLWui5Kvrb9awZvvUNkmSZw99chnRhGWei7QcULNd1af0C3bhwCxAl5rzqGhctHQTlIFkNWvBXl68ZPjOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=FG/d9k56; arc=none smtp.client-ip=211.75.126.72
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 66637U4N0125118, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
+	s=dkim; t=1783307251;
+	bh=al1sZ+uv8HDns43vM0txuyuzzLEBdfuTzUipioXzjV0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=FG/d9k56JsoAniYi1V5wYJOj7CO5s0THZFHleLpurH6MwPE22SaFSb8SIrczKCcBW
+	 glCFHNivVjj10ReletkpqhAsXGNrkND+b7VSIphfJZl1j/XXgweOWoDJF/mLd+mqjS
+	 +/OFffS1lADTKluQZT7ib3nMDFOmj+7M+xAvriC34sQLgQ9cRngJ5SUcwZXuEnESTO
+	 Go5fXDtrDEzFp/CjsugGeKe6LXZpRtNkGAQpFwC7DGrwbC/vkMKikn2wGunPjQbLKH
+	 5sJXoe7+7vgrV30PYrD2wPB8qrDk2YePh3esTbcgCrEERGKybgnR+IajofEQQVL5hz
+	 I4FpUFECdJxCQ==
+Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103])
+	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 66637U4N0125118
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 6 Jul 2026 11:07:31 +0800
+Received: from RS-EX-MBS3.realsil.com.cn (172.29.17.103) by
+ RS-EX-MBS3.realsil.com.cn (172.29.17.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 6 Jul 2026 11:07:30 +0800
+Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) by
+ RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) with mapi id 15.02.2562.017; Mon,
+ 6 Jul 2026 11:07:30 +0800
+From: Javen <javen_xu@realsil.com.cn>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "hkallweit1@gmail.com" <hkallweit1@gmail.com>, "nic_swsd@realtek.com"
+	<nic_swsd@realtek.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "horms@kernel.org"
+	<horms@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH net-next v4 2/6] r8169: add support for phylink
+Thread-Topic: [PATCH net-next v4 2/6] r8169: add support for phylink
+Thread-Index: AQHdCs3TJl12zyZG4k+Q4Ne2oWyVWrZbu9EAgAQTiYA=
+Date: Mon, 6 Jul 2026 03:07:30 +0000
+Message-ID: <1f09de5536004055ba63862ca7088eeb@realsil.com.cn>
+References: <20260703092459.1124-1-javen_xu@realsil.com.cn>
+ <20260703092459.1124-3-javen_xu@realsil.com.cn>
+ <e9cadf1a-94f3-45e8-9b59-22082ee5c2da@lunn.ch>
+In-Reply-To: <e9cadf1a-94f3-45e8-9b59-22082ee5c2da@lunn.ch>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
+	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:madalin.bucur@nxp.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304827-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-304828-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[realsil.com.cn:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,realsil.com.cn:from_mime,realsil.com.cn:dkim,realsil.com.cn:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BA72670C446
+X-Rspamd-Queue-Id: 66E7570C450
 
-Replace netif_receive_skb() with napi_gro_receive() to improve receive
-performance for this driver. It has rx checksum support so routing speed
-shouldn't suffer.
+>
+>> +     if (jumbo) {
+>> +             if (!tp->jumbo_pause_saved) {
+>> +                     struct ethtool_link_ksettings cmd =3D {};
+>> +                     bool adv_pause, adv_asym;
+>> +
+>> +                     phylink_ethtool_get_pauseparam(tp->phylink, &tp-
+>>saved_pause);
+>> +                     if (tp->saved_pause.autoneg) {
+>> +                             phylink_ethtool_ksettings_get(tp->phylink,=
+ &cmd);
+>> +                             adv_pause =3D ethtool_link_ksettings_test_=
+link_mode(&cmd,
+>> +                                                                       =
+        advertising,
+>> +                                                                       =
+        Pause);
+>> +                             adv_asym  =3D ethtool_link_ksettings_test_=
+link_mode(&cmd,
+>> +                                                                       =
+        advertising,
+>> +                                                                       =
+        Asym_Pause);
+>> +                             if (adv_pause && !adv_asym) {
+>> +                                     tp->saved_pause.rx_pause =3D 1;
+>> +                                     tp->saved_pause.tx_pause =3D 1;
+>
+>This does not look correct. Pause is negotiated. In order to determine how=
+ to
+>program the MAC you need to look at what the local side is advertising, an=
+d
+>what the link peer is advertising. I don't see anything here about lp_.
+>
+>I forget what the issues is. Is it something like, if you are using a norm=
+al MTU,
+>pause is supported? But with jumbo MTU it is not?
 
-Tested on a WatchGuard Firebox M300.
+Yes, exactly. Pause is supported with normal MTU, but not with jumbo MTU.
 
-iperf3 bidir speed test:
+The old non-phylink code handled this by clearing Pause and Asym_Pause
+from phydev->advertising when jumbo MTU was enabled, and then restarting
+autoneg:
 
-[ ID][Role]   Interval         Transfer      Bitrate        Retr
-[  5][TX-C]   0.00-60.01  sec  5.35 GBytes   766 Mbits/sec  184    sender
-[  5][TX-C]   0.00-60.02  sec  5.35 GBytes   766 Mbits/sec         receiver
-[  7][RX-C]   0.00-60.01  sec  5.50 GBytes   787 Mbits/sec  124    sender
-[  7][RX-C]   0.00-60.02  sec  5.49 GBytes   786 Mbits/sec         receiver
+        linkmode_clear_bit(ETHTOOL_LINK_MODE_Pause_BIT,
+                           tp->phydev->advertising);
+        linkmode_clear_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT,
+                           tp->phydev->advertising);
+        phy_start_aneg(tp->phydev);
 
-After:
+With phylink, directly modifying phydev->advertising does not look like
+the right thing to do, since phylink owns the advertised link modes.
 
-[ ID][Role]   Interval         Transfer      Bitrate        Retr
-[  5][TX-C]   0.00-60.01  sec  6.49 GBytes   929 Mbits/sec    0    sender
-[  5][TX-C]   0.00-60.02  sec  6.49 GBytes   928 Mbits/sec         receiver
-[  7][RX-C]   0.00-60.01  sec  6.55 GBytes   938 Mbits/sec    0    sender
-[  7][RX-C]   0.00-60.02  sec  6.55 GBytes   937 Mbits/sec         receiver
+What would be the correct phylink model for this?
 
-Assisted-by: Opencode:big-pickle
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/ethernet/freescale/dpaa/dpaa_eth.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+Is there an existing phylink API which allows a MAC driver to update the
+local advertisement and trigger autoneg after an MTU change? Or would this
+require a new phylink helper/hook for dynamic MAC pause capabilities,
+since the pause capability depends on the current MTU?
 
-diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-index ad2d8256eb8d..83191f636ec7 100644
---- a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-+++ b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-@@ -2824,10 +2824,7 @@ static enum qman_cb_dqrr_result rx_default_dqrr(struct qman_portal *portal,
- 
- 	skb_len = skb->len;
- 
--	if (unlikely(netif_receive_skb(skb) == NET_RX_DROP)) {
--		percpu_stats->rx_dropped++;
--		return qman_cb_dqrr_consume;
--	}
-+	napi_gro_receive(&np->napi, skb);
- 
- 	percpu_stats->rx_packets++;
- 	percpu_stats->rx_bytes += skb_len;
--- 
-2.55.0
+>
+>For this to work correctly, i would expect a change of MTU to trigger a ne=
+w
+>autoneg, with the local advertisement changed. That might require changes =
+in
+>phylink, since it does not expect this sort of thing.
+>
+>> @@ -5288,6 +5326,8 @@ static void rtl_remove_one(struct pci_dev *pdev)
+>>               r8169_remove_leds(tp->leds);
+>>
+>>       unregister_netdev(tp->dev);
+>> +     if (tp->phylink)
+>> +             phylink_destroy(tp->phylink);
+>
+>
+>I've not looked in detail, but is tp->phylink optional? I would expect the=
+ probe
+>to fail if it could not create it.
 
+Yes. I will remove this check.
+
+>
+>> +static int rtl_mac_enable_tx_lpi(struct phylink_config *config, u32
+>> +timer, bool tx_clk_stop) {
+>> +     struct rtl8169_private *tp =3D container_of(config, struct
+>> +rtl8169_private, phylink_config);
+>> +
+>> +     if (!rtl_supports_eee(tp))
+>> +             return -EOPNOTSUPP;
+>
+>Can that happen? You should only be telling phylink EEE is supported if EE=
+E is
+>actually supported.
+
+Agreed. rtl8169_get_lpi_caps() returns 0 when EEE is not supported, so
+phylink should not call mac_enable_tx_lpi() for such devices.
+I will remove the redundant check.
+
+>
+>> +static int rtl_init_phylink(struct rtl8169_private *tp) {
+>> +     struct phylink *pl;
+>> +     phy_interface_t phy_mode;
+>> +
+>> +     tp->phylink_config.dev =3D &tp->dev->dev;
+>> +     tp->phylink_config.type =3D PHYLINK_NETDEV;
+>> +     tp->phylink_config.mac_managed_pm =3D true;
+>> +     tp->phylink_config.lpi_capabilities =3D rtl8169_get_lpi_caps(tp);
+>> +     tp->phylink_config.mac_capabilities |=3D MAC_ASYM_PAUSE |
+>> + MAC_SYM_PAUSE;
+>> +
+>> +     if (tp->sfp_mode) {
+>> +             phy_mode =3D PHY_INTERFACE_MODE_INTERNAL;
+>> +             tp->phylink_config.mac_capabilities |=3D MAC_10000FD;
+>
+>Only 10G? Is it not possible to slow down to 1G for a 1G SFP?
+
+It can support 1G SFP as well.
+
+I only added MAC_10000FD here because the original code path only added
+the 10G capability, and I was trying to keep the behavior unchanged in
+this conversion patch.
+
+BRs,
+Javen
+>
+>        Andrew
 
