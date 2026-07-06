@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-305169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305170-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +OugICT6S2rRdwEAu9opvQ
-	(envelope-from <netdev+bounces-305169-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 20:55:32 +0200
+	id 2TqwJpblS2pScQEAu9opvQ
+	(envelope-from <netdev+bounces-305170-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 19:27:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4370714B79
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 20:55:31 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23016713DBA
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 19:27:50 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=dvD+YAbY;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=grpmSs8f;
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305169-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305169-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305170-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305170-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C3EAA33AA94E
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 17:21:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 23C913048A26
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 17:21:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 587FF3B3BF3;
-	Mon,  6 Jul 2026 17:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B9BC424668;
+	Mon,  6 Jul 2026 17:19:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 588813B2FD6
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 17:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D13EC3B27F8
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 17:19:52 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783358390; cv=none; b=Y2yKvpTNXhLl0aFQBj6p6DTUHYXSFc/YMmW1jUvFv84QWCI4ZS1S9LAOVGQ+SCt4DgLbq+bkmYyo7AJjx4CSK0ZVtzJSkHT+EY7XBo1TvJ5/coxfQlR14SlSMobawwCAMLhkun1by7fmtKQPVbNMYId5U/H/0dZUM8vfZnmO83g=
+	t=1783358395; cv=none; b=TsMie7eE7qbn5vrayNyrGrMM1BUper6X3mzYwmSHvuTUmFvR8h7Ze8WAWk8smqdCAQXTo/K+NxtrF4CaUHkEkcadwCcKt9ANGNfo85QpO4+0CXladUZWN5FiEp4Z6hmh73Q9yz7mUge4YceZzagAfcbLCrEAFii6HzsOifF71Pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783358390; c=relaxed/simple;
-	bh=p0CwclzJRZIoa7wHNIZjI0kyp3LcocRuWIHx6Q07PUc=;
+	s=arc-20240116; t=1783358395; c=relaxed/simple;
+	bh=h8x4Bc50n4ZBeC1RTx6Z+NkqQXx/W8P5t5hi/hZ8imo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PuGqwkejiGxujySv3VbhVyuQS86XMel/GoK8k4zWIHhgMElgOmi4TWcpU1ZoNInTcG7mTTtXk0GhUrW4Cnceo+STtpWXcLv4Hrm25CxXCUNfrh5OKzXG0kLCKeE1TXJnEu2FXoOT/gkl/TfXiqajYTGecWzK9gV5GWPPugu+hy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dvD+YAbY; arc=none smtp.client-ip=209.85.161.54
-Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-6a18e363d52so45924eaf.0
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 10:19:48 -0700 (PDT)
+	 MIME-Version; b=WER5dYp6skE4JI6gXt5oWnRepmADkkjaFDc/702AaLRo+7axFPdcmU1HKaE+0rmcmwiMbKK6/ZMjuyu2pebfDB/5zhhlcSpN+lyPTxFYnY0afa5Lc9snrdKWw7mbcCTxs+xSPa70E4r6hzWTREpRl5vxca8rI354tdGXmrhGLzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=grpmSs8f; arc=none smtp.client-ip=209.85.160.45
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-43b7e186a0cso1220574fac.0
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 10:19:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783358387; x=1783963187; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783358392; x=1783963192; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9+ZNLOlwxwz08HKOBTTMS0oVpW8kpSzr2tAgT6LGER8=;
-        b=dvD+YAbYNhltSNh88RX7Tsenu6xRHVWpewNFqMlkzYt/NlgF3ygWhKzv3shYyS5OYG
-         6eVVW9FfvKf/2R1msoswXb56XdTj43j/Xy3/eVLUyNObIzcsbM98P2xCOJn2srFaByOD
-         sauf/l7t3cgRLAbtzSJGv+u8Vay2fJtPVBrEugr48BINZL/lOfsYEIyIpxek8L66222n
-         M+v6dokpz7zJlBJoILKvKqc5xhsx5+36RBQ523Ss2pSKP3Y8wU8yLMFzsezK7ZSVTD9c
-         QDbys+ioIv5vHL2zMwHlNEASgMtOoJ1EH4x/2iuV5R+eCE9EmL0cXPatv7blHqrCuors
-         lphw==
+        bh=ktWVFUaJwtxvn6kXlC3ace7fLUIaqzfkcwFXS8UmBDU=;
+        b=grpmSs8f/ZaCovb0qTT+JlOl1yu01r13g4gqg6ZO1u2Ww+HA8lSFU8JFJzfJKzYtuf
+         1DFpSPY8ydDa+RWVeiUTyaDNytyi2iuNs1bnVZwxShWMin3Z8jDC4pnNkXYgH7jAL2P2
+         fdAOxFkXM/ZjYVg2hw6wA62r1jjpiCMoD2CVgRY3TG4/do9cA3YhABWWalSWKNQOakMb
+         lXoWJQqDMoVKDtwXe+eMoTIw24EtDcJJXXy925YrXgJoHiWBHE6jb+dAe9QWbSSOJ1gy
+         pHfQVVhLO8Xqf0SpCDfQ3yRkpYrNZImO3e7ITHYY3BYdWHGkdFM+s5zF+4XEgguQtQ9S
+         MlaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783358387; x=1783963187;
+        d=1e100.net; s=20251104; t=1783358392; x=1783963192;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=9+ZNLOlwxwz08HKOBTTMS0oVpW8kpSzr2tAgT6LGER8=;
-        b=qnpOc/D3kt2ByrEj+wNvprsAASluj0f6ARI5asuZMpzPtQZ6gqgaNrH2Sz9og1mJ1Q
-         uoPi65yOiytsmCg7fRWqzacEHrJcuyhVBVhX5aRAYxZcYxMUhbxfzQYRsL+s5GUTTheq
-         Zq4TMXEB5bcfB9THpBRI95i8UbAfF89W3Gzj/gxpdwETnQmCFd+glkAG2p/6X6wqEQFU
-         q+khpumIJA5Ze+sJKOCB+RdC9Y1MNhWJXs6trb85bhY/6HP0tsVRCt1Xcy34P2ZH+6wj
-         GI+lt66o9BBozPlZL/xLsm8z7CzAHha28/n067TYEuJ9Yn7oVcPplf19mBGbI4oAUU6C
-         4Haw==
-X-Gm-Message-State: AOJu0YzZR0/LQlfvRLPGYBnGcf2tWKh0F45i5PWKvg4Q5yVegyxxbH3p
-	2sbIiCkiKwAq63VIhfuZ1owHMvBcs4cSNa5iAIm+5+jqwdhMubwoyxKY
-X-Gm-Gg: AfdE7cke83nYu3EIazasmS59QYZ+q7xVbuBOvNMNC3cxwfL66kPmcko++5EasA4jewl
-	V1smYUpufwdvKYjMctLcSEKOKUKe+zMhNJqu+egtTxnidRkX/W7yVtah4HBJcLVqXtgJ1uzCiH8
-	Ipk/2/9nPOonccvUhSKqZhQ+unrLZi7VqyldZ3aljxw29aObHoneFuvIRnlBYVe2bOwJrkSENVe
-	mX6xOi3gWP670ylRSCxRNJO3nXuc7JECV6diqiatk8PAcwaCLWETGrR5tJC6MqI2H0fux6I5NPG
-	0uqTspe+uNEeKyQjb8GmkXLxtjqryKuncMsudYW4VCm2w09DIOQe3A6hLyYbTBZmvZIyhgH//Yz
-	ny/acUh4uTMvqZIsAdp6vBd+mOw6hOz38TmOn4ACM2UT6oJuxTTfQsmZeSnwrwgNcsRIO0ixbPt
-	JHZQ==
-X-Received: by 2002:a05:6820:161e:b0:6a1:50f8:abb5 with SMTP id 006d021491bc7-6a35480d671mr755889eaf.32.1783358386742;
-        Mon, 06 Jul 2026 10:19:46 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:4::])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6a310003927sm8478665eaf.6.2026.07.06.10.19.45
+        bh=ktWVFUaJwtxvn6kXlC3ace7fLUIaqzfkcwFXS8UmBDU=;
+        b=nzzi1Oowkga998MC+rF4dd5LriN8TMyNRiJqRo0x8Uk3RRcpGs7+jDVfipTQBEYsyn
+         AzEBzecOn04/NTKvPX2IB1xY7WQR67yH15ZJyLdTDVIm3Q2Aam6981XXcGJA0wh590T6
+         02GsrgTIkdaImKQupNqilmZCIDWBGIqQ6D8O65KDZB7zc/1Rn/YtsfVppH/BVSNNm19E
+         FkPmP8F+wMprJAVeuln3rdNfYLBasmkUciITSYPXPUUx7HsnA2E8LLYv6y47C9e6fJpw
+         QUs+NFl/2vGoly26xj754I1wK36OwIcIYf5dtpiHa+Dk0doirRAR5o6/XQVn8LQ0LdH1
+         AjTw==
+X-Gm-Message-State: AOJu0YzNhIDbHhl+A1ULy0bwUdY64nxWX9td6vWI2j6swHWEURwoCH8H
+	wi/7MyJG1TfUAE80BOnmR70VkK4QyRxBFXOvnQnFDdc/KZOa5pyRl7Aa
+X-Gm-Gg: AfdE7ckC90qs/Ij4e1Rg0nDBqyhRUrcyrs7p+a44IZ5YmJBMVxmNb9vmIilBZgoj1ZC
+	2kDcd4QgW60nXH1VZb7ta8NCGTJfXUfaGv7XkM0oy8wVcFK/tgPvM5NSHpjtvJd23hfJjXBX/86
+	1M/qbLtzqvS8KoWLORGy3d9doemINPzd352b/U8y8PSJ5apcx4F7PycaK7D/+zWlqxyUAwjJu1K
+	FoWySZg2cZQjfS+05vPVMOpRrMMmv9Q4zaqpD1vyyGxuxswEYqaYgefvGucyRjIYvstb/L2mkCp
+	h7K/f1qwja+T8uALPxoBN57rM/XSwAv9wqM8YSPMe720Y10zMHdKmmzRIdL2TTMdVLWOTshT6RR
+	ghZT+1QWn/YfqlE3f6mYXFyyH+xJFX1tqZNl/vqCCsvU7RN0wQFPah9vUqgLOr9oASV6ihPfSqt
+	zFh1inDQS1NRxfQA==
+X-Received: by 2002:a05:6870:8e18:b0:448:8a94:b86c with SMTP id 586e51a60fabf-4510665455amr859159fac.30.1783358391381;
+        Mon, 06 Jul 2026 10:19:51 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:51::])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-44cfb6691d1sm11044160fac.17.2026.07.06.10.19.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jul 2026 10:19:45 -0700 (PDT)
+        Mon, 06 Jul 2026 10:19:49 -0700 (PDT)
 From: Amery Hung <ameryhung@gmail.com>
 To: bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org,
@@ -90,9 +90,9 @@ Cc: netdev@vger.kernel.org,
 	kerneljasonxing@gmail.com,
 	ameryhung@gmail.com,
 	kernel-team@meta.com
-Subject: [PATCH bpf-next v3 11/15] bpf: tcp: Support selected sock_ops callbacks as struct_ops
-Date: Mon,  6 Jul 2026 10:19:13 -0700
-Message-ID: <20260706171918.317102-12-ameryhung@gmail.com>
+Subject: [PATCH bpf-next v3 12/15] bpf: tcp: Support parse/len/write header option hooks in bpf_tcp_ops
+Date: Mon,  6 Jul 2026 10:19:14 -0700
+Message-ID: <20260706171918.317102-13-ameryhung@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260706171918.317102-1-ameryhung@gmail.com>
 References: <20260706171918.317102-1-ameryhung@gmail.com>
@@ -111,7 +111,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -119,7 +119,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[14];
 	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,linux.dev,google.com,meta.com];
-	TAGGED_FROM(0.00)[bounces-305169-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305170-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -135,517 +135,712 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D4370714B79
+X-Rspamd-Queue-Id: 23016713DBA
 
-In LSFMMBPF 2025, I have talked about moving the BPF_PROG_TYPE_SOCK_OPS
-to a struct_ops interface [1].
+Add the TCP header option callbacks to the bpf_tcp_ops struct_ops type:
 
-The BPF_SOCK_OPS_*_CB enum interface has grown over time as new TCP
-callback points were added. A BPF_PROG_TYPE_SOCK_OPS program now
-commonly needs a large switch on sock_ops->op, and the shared
-bpf_sock_ops_kern context has become harder to extend because different
-callbacks have different locking, argument, skb, and helper
-requirements. The existing 'union { u32 args[4]; u32 replylong[4]; }' is
-also not reliable in passing args to bpf prog when there are multiple
-progs attached to a cgroup.
+  parse_hdr     - parse the options of an incoming skb on an established
+                  connection
+  hdr_opt_len   - reserve space in the TCP header for bpf options
+  write_hdr_opt - write the reserved bpf options
 
-The above has already been solved in struct_ops. Add a TCP-specific
-struct_ops type, bpf_tcp_ops, and support attaching it to cgroups.
-This allows each callback have its own func signature and allows
-the verifier to select kfuncs/helpers based on the specific
-struct_ops member being implemented.
+These mirror the BPF_SOCK_OPS_PARSE_HDR_OPT_CB, _HDR_OPT_LEN_CB and
+_WRITE_HDR_OPT_CB legacy sockops callbacks, but are exposed as struct_ops
+members so a program can implement them with normal function signatures
+and per-member helper sets.
 
-This patch wires up the following existing sock_ops callbacks:
-- BPF_SOCK_OPS_TIMEOUT_INIT
-- BPF_SOCK_OPS_RWND_INIT
-- BPF_SOCK_OPS_RTT_CB
-- BPF_SOCK_OPS_STATE_CB
-- BPF_SOCK_OPS_RETRANS_CB
-- BPF_SOCK_OPS_TCP_CONNECT_CB
-- BPF_SOCK_OPS_TCP_LISTEN_CB
-- BPF_SOCK_OPS_RTO_CB
-- BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB
-- BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB
+The reserved header window is shared between the legacy sockops and
+bpf_tcp_ops paths. tcp_{syn,synack,established}_options() first run the
+legacy BPF_SOCK_OPS_HDR_OPT_LEN_CB and then call hdr_opt_len, so both
+sources accumulate into opts->bpf_opt_len; at write time the legacy
+options are emitted first and bpf_tcp_ops writes after them.
 
-BASE_RTT is ignored as it is not particularly useful. NEEDS_ECN should
-be done in bpf-tcp-cc instead. The tstamp ones should be a separate
-struct_ops (e.g. "bpf_sock_ops") that can work in both TCP and UDP.
+API design
 
-timeout_init and rwnd_init could have a request_sock pointer. This patch
-tries a different API and direclty passes the request_sock pointer as
-an arg.
+bpf_tcp_ops overloads the sock_ops header-option helpers rather than
+introducing a new API: bpf_reserve_hdr_opt(), bpf_store_hdr_opt() and
+bpf_load_hdr_opt() are exposed per-member (reserve for hdr_opt_len,
+store/load for write_hdr_opt, load for parse_hdr) and share the existing
+kernel option-walking core via _bpf_sock_ops{store,load}hdr_opt(), with
+the bpf_tcp_ops wrappers synthesizing a temporary bpf_sock_ops_kern from
+the program ctx. This keeps a port from the legacy
+BPF_SOCK_OPS*_HDR_OPT_CB callbacks mechanical (same helper calls) and
+adds no new UAPI helper/kfunc surface.
 
-Two other approaches were considered before settling on having
-bpf_get_retval() read the dispatcher's run_ctx via saved_run_ctx. The
-first was to inherit the retval in the trampoline itself: add a helper
-in the four __bpf_prog_enter*() paths that, for struct_ops programs,
-copies the chained value from the caller's run_ctx (now saved_run_ctx)
-into the program's own run_ctx. It works but puts a per-enter
-program-type check on the generic trampoline fast path, taxing all
-fentry/fexit/lsm callers for a cgroup-struct_ops-only feature. The
-second was to do that same inherit only for the int-returning members
-via a gen_prologue that emits a hidden kfunc at the start of
-timeout_init/rwnd_init; this keeps the cost off the generic path and
-scoped to bpf_tcp_ops, but needs a kfunc + BTF_ID + prologue-emission
-machinery. The chosen approach avoids both: it touches neither the
-trampoline nor the program, since saved_run_ctx already points at the
-dispatcher's run_ctx that carries the value.
+An alternative considered was to drop the option helpers entirely: have
+hdr_opt_len reserve space purely through its return value, and introduce
+a dedicated TCP-header-option dynptr used for both reading and writing.
+That is a cleaner, more self-contained interface, but it is a larger
+change and does not reuse the legacy helpers, making a port from sockops
+less mechanical. It can be pursued as a follow-up; the helper-based
+interface here keeps this series focused on moving the hooks to
+struct_ops.
 
-[1], page 13: https://drive.google.com/file/d/1wjKZth6T0llLJ_ONPAL_6Q_jbxbAjByp/view?usp=sharing
+The hdr_opt_len fast path in tcp_established_options() is gated by
+cgroup_bpf_enabled(CGROUP_TCP_SOCK_OPS). Note this is a global,
+per-attach-type static branch: it is enabled whenever any bpf_tcp_ops is
+attached, even one that does not implement hdr_opt_len or that is attached
+to a different cgroup. In those cases the block still runs but
+bpf_tcp_ops_hdr_opt_len() no-ops via the per-member check in the dispatch
+macro. A per-member/per-cgroup gate could be added later if the extra
+fast-path work proves measurable.
 
-Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
 Signed-off-by: Amery Hung <ameryhung@gmail.com>
 ---
- include/linux/bpf.h    |   1 +
- include/net/tcp.h      | 113 ++++++++++++++++++++++++-
- net/ipv4/Makefile      |   1 +
- net/ipv4/af_inet.c     |   1 +
- net/ipv4/bpf_tcp_ops.c | 188 +++++++++++++++++++++++++++++++++++++++++
- net/ipv4/tcp.c         |   1 +
- net/ipv4/tcp_input.c   |   4 +
- net/ipv4/tcp_output.c  |   2 +
- net/ipv4/tcp_timer.c   |   1 +
- 9 files changed, 310 insertions(+), 2 deletions(-)
- create mode 100644 net/ipv4/bpf_tcp_ops.c
+ include/linux/filter.h         |   5 ++
+ include/net/tcp.h              |  40 ++++++++++
+ include/uapi/linux/bpf.h       |  35 +++++---
+ net/core/filter.c              |  32 +++++---
+ net/ipv4/bpf_tcp_ops.c         | 142 ++++++++++++++++++++++++++++++++-
+ net/ipv4/tcp_input.c           |  13 +++
+ net/ipv4/tcp_output.c          |  46 +++++++++++
+ tools/include/uapi/linux/bpf.h |  35 +++++---
+ 8 files changed, 309 insertions(+), 39 deletions(-)
 
-diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-index df95ae690da5..91024d2da4ea 100644
---- a/include/linux/bpf.h
-+++ b/include/linux/bpf.h
-@@ -2597,6 +2597,7 @@ struct bpf_trace_run_ctx {
- struct bpf_tramp_run_ctx {
- 	struct bpf_run_ctx run_ctx;
- 	u64 bpf_cookie;
-+	int retval;
- 	struct bpf_run_ctx *saved_run_ctx;
- };
+diff --git a/include/linux/filter.h b/include/linux/filter.h
+index 67d337ede91b..fe28db65fb6a 100644
+--- a/include/linux/filter.h
++++ b/include/linux/filter.h
+@@ -1843,6 +1843,11 @@ static __always_inline long __bpf_xdp_redirect_map(struct bpf_map *map, u64 inde
+ 	return XDP_REDIRECT;
+ }
  
++int __bpf_sock_ops_load_hdr_opt(struct bpf_sock_ops_kern *bpf_sock,
++				void *search_res, u32 len, u64 flags);
++int __bpf_sock_ops_store_hdr_opt(struct bpf_sock_ops_kern *bpf_sock,
++				 const void *from, u32 len, u64 flags);
++
+ #ifdef CONFIG_NET
+ int __bpf_skb_load_bytes(const struct sk_buff *skb, u32 offset, void *to, u32 len);
+ int __bpf_skb_store_bytes(struct sk_buff *skb, u32 offset, const void *from,
 diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 6d376ea4d1c0..2102f9f2afd6 100644
+index 2102f9f2afd6..7bf702117602 100644
 --- a/include/net/tcp.h
 +++ b/include/net/tcp.h
-@@ -2953,12 +2953,120 @@ static inline void tcp_clear_sock_ops_cb_flags(struct sock *sk)
+@@ -3005,6 +3005,45 @@ struct bpf_tcp_ops {
  
- #endif
- 
-+#if defined(CONFIG_BPF_JIT) && defined(CONFIG_CGROUP_BPF)
+ 	/* Called on listen(2), right after the socket enters TCP_LISTEN. */
+ 	void (*listen)(struct sock *sk);
 +
-+struct bpf_tcp_ops {
-+	/* Should return the initial SYN (active open) or SYN-ACK (passive open)
-+	 * retransmission timeout. Return the timeout in jiffies, or <= 0 for
-+	 * the kernel default.
++	/* Parse the TCP header options of an incoming skb received on an
++	 * established connection. Use bpf_dynptr_from_skb()/bpf_skb_load_bytes()
++	 * to access the options.
++	 */
++	void (*parse_hdr)(struct sock *sk, struct sk_buff *skb);
++
++	/* Reserve space in the outgoing TCP header for options to be written
++	 * later by write_hdr_opt(). Call bpf_reserve_hdr_opt() to reserve bytes.
 +	 *
-+	 * @req: request_sock on the passive (synack) path; NULL otherwise.
++	 * @skb: outgoing packet. NULL when called from tcp_current_mss()
++	 *       (MSS sizing).
++	 * @req: request_sock on the synack path; NULL otherwise.
++	 * @syn_skb: incoming SYN on the synack path; NULL otherwise.
++	 * @synack_type: TCP_SYNACK_COOKIE indicates a stateless syncookie.
++	 * @remaining: pointer to the size of space still available; cast it
++	 *             using bpf_rdonly_cast() before dereferencing.
 +	 */
-+	int (*timeout_init)(struct sock *sk, struct request_sock *req);
++	void (*hdr_opt_len)(struct sock *sk, struct sk_buff *skb,
++			    struct request_sock *req, struct sk_buff *syn_skb,
++			    enum tcp_synack_type synack_type,
++			    unsigned int *remaining);
 +
-+	/* Should return the initial advertised receive window, in packets,
-+	 * or < 0 for the kernel default. @req as in timeout_init().
++	/* Write header options into the space reserved earlier by hdr_opt_len().
++	 * Use bpf_store_hdr_opt() to write; it appends within the reserved window
++	 * shared with legacy SOCKOPS.
++	 *
++	 * @skb: outgoing packet.
++	 * @req: request_sock on the synack path; NULL otherwise.
++	 * @syn_skb: incoming SYN on the synack path; NULL otherwise.
++	 * @synack_type: TCP_SYNACK_COOKIE indicates a stateless syncookie.
++	 * @opt_off: offset in the outgoing @skb's TCP header where the
++	 *	     bpf_tcp_ops portion of the reserved window begins, i.e. after
++	 *	     the kernel and legacy options.
 +	 */
-+	int (*rwnd_init)(struct sock *sk, struct request_sock *req);
-+
-+	/* Called when an active connection becomes established.
-+	 * @skb is the SYNACK that completed the 3WHS, or NULL for a
-+	 * TCP_REPAIR socket (tcp_finish_connect() with no skb).
-+	 */
-+	void (*active_established)(struct sock *sk, struct sk_buff *skb__nullable);
-+
-+	/* Called when a passive connection becomes established.
-+	 * @skb is the ACK that completed the 3WHS.
-+	 */
-+	void (*passive_established)(struct sock *sk, struct sk_buff *skb);
-+
-+	/* Called when the retransmission timer fires. */
-+	void (*rto)(struct sock *sk);
-+
-+	/* Called on every RTT sample.
-+	 * @mrtt: the measured RTT, in microseconds.
-+	 * @srtt: the updated smoothed RTT.
-+	 */
-+	void (*rtt)(struct sock *sk, long mrtt, u32 srtt);
-+
-+	/* Called when the connection changes TCP state.
-+	 * @state: the new state (one of the TCP_* states).
-+	 */
-+	void (*set_state)(struct sock *sk, int state);
-+
-+	/* Called when an skb is retransmitted.
-+	 * @skb: the retransmitted skb.
-+	 * @err: tcp_transmit_skb() return value (0 on success).
-+	 */
-+	void (*retrans)(struct sock *sk, struct sk_buff *skb, int err);
-+
-+	/* Called right before an active connection is initialized. */
-+	void (*connect)(struct sock *sk);
-+
-+	/* Called on listen(2), right after the socket enters TCP_LISTEN. */
-+	void (*listen)(struct sock *sk);
-+};
-+
-+#define bpf_tcp_ops_call(op, sk, ...)					\
-+do {									\
-+	if (cgroup_bpf_enabled(CGROUP_TCP_SOCK_OPS)) {			\
-+		const struct bpf_prog_array_item *item;			\
-+		const struct bpf_tcp_ops *tcp_ops;			\
-+		struct cgroup *cgrp;					\
-+									\
-+		cgrp = sock_cgroup_ptr(&sk->sk_cgrp_data);		\
-+		rcu_read_lock_dont_migrate();				\
-+		bpf_cgroup_struct_ops_foreach(tcp_ops, item, cgrp,	\
-+					      CGROUP_TCP_SOCK_OPS) {	\
-+			if (tcp_ops->op)				\
-+				tcp_ops->op(sk, ##__VA_ARGS__);		\
-+		}							\
-+		rcu_read_unlock_migrate();				\
-+	}								\
-+} while (0)
-+
-+#define bpf_tcp_ops_call_int(op, init_retval, sk, ...)			\
-+({									\
-+	int __retval = (init_retval);					\
-+	if (cgroup_bpf_enabled(CGROUP_TCP_SOCK_OPS)) {			\
-+		const struct bpf_prog_array_item *item;			\
-+		const struct bpf_tcp_ops *tcp_ops;			\
-+		struct bpf_tramp_run_ctx run_ctx;			\
-+		struct bpf_run_ctx *old_run_ctx;			\
-+		struct sock *__sk = sk_to_full_sk(sk);                  \
-+		struct request_sock *req = NULL;			\
-+		struct cgroup *cgrp;					\
-+									\
-+		if (__sk) {						\
-+			run_ctx.retval = (init_retval);			\
-+			cgrp = sock_cgroup_ptr(&__sk->sk_cgrp_data);	\
-+			if (!sk_fullsock(sk))				\
-+				req = (struct request_sock *)sk;	\
-+			rcu_read_lock_dont_migrate();			\
-+			old_run_ctx = bpf_set_run_ctx(&run_ctx.run_ctx);\
-+			bpf_cgroup_struct_ops_foreach(tcp_ops, item, cgrp, \
-+						      CGROUP_TCP_SOCK_OPS) { \
-+				if (tcp_ops->op)			\
-+					run_ctx.retval = tcp_ops->op(__sk, req, ##__VA_ARGS__); \
-+			}						\
-+			bpf_reset_run_ctx(old_run_ctx);			\
-+			rcu_read_unlock_migrate();			\
-+			__retval = run_ctx.retval;			\
-+		}							\
-+	}								\
-+	__retval;							\
-+})
-+#else
-+#define bpf_tcp_ops_call(op, sk, ...)		do { } while (0)
-+#define bpf_tcp_ops_call_int(op, init_retval, sk, ...)	(init_retval)
-+#endif
-+
- static inline u32 tcp_timeout_init(struct sock *sk)
- {
- 	int timeout;
++	void (*write_hdr_opt)(struct sock *sk, struct sk_buff *skb,
++			      struct request_sock *req, struct sk_buff *syn_skb,
++			      enum tcp_synack_type synack_type,
++			      u32 opt_off);
+ };
  
- 	timeout = tcp_call_bpf(sk, BPF_SOCK_OPS_TIMEOUT_INIT, 0, NULL);
--
-+	timeout = bpf_tcp_ops_call_int(timeout_init, timeout, sk);
- 	if (timeout <= 0)
- 		timeout = TCP_TIMEOUT_INIT;
- 	return min_t(int, timeout, TCP_RTO_MAX);
-@@ -2969,7 +3077,7 @@ static inline u32 tcp_rwnd_init_bpf(struct sock *sk)
- 	int rwnd;
- 
- 	rwnd = tcp_call_bpf(sk, BPF_SOCK_OPS_RWND_INIT, 0, NULL);
--
-+	rwnd = bpf_tcp_ops_call_int(rwnd_init, rwnd, sk);
- 	if (rwnd < 0)
- 		rwnd = 0;
- 	return rwnd;
-@@ -2984,6 +3092,7 @@ static inline void tcp_bpf_rtt(struct sock *sk, long mrtt, u32 srtt)
- {
- 	if (BPF_SOCK_OPS_TEST_FLAG(tcp_sk(sk), BPF_SOCK_OPS_RTT_CB_FLAG))
- 		tcp_call_bpf_2arg(sk, BPF_SOCK_OPS_RTT_CB, mrtt, srtt);
-+	bpf_tcp_ops_call(rtt, sk, mrtt, srtt);
+ #define bpf_tcp_ops_call(op, sk, ...)					\
+@@ -3056,6 +3095,7 @@ do {									\
+ 	}								\
+ 	__retval;							\
+ })
++
+ #else
+ #define bpf_tcp_ops_call(op, sk, ...)		do { } while (0)
+ #define bpf_tcp_ops_call_int(op, init_retval, sk, ...)	(init_retval)
+diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+index c982801ec7db..fb1b2cb72fd2 100644
+--- a/include/uapi/linux/bpf.h
++++ b/include/uapi/linux/bpf.h
+@@ -4799,15 +4799,18 @@ union bpf_attr {
+  * 		The non-negative copied *buf* length equal to or less than
+  * 		*size* on success, or a negative error in case of failure.
+  *
+- * long bpf_load_hdr_opt(struct bpf_sock_ops *skops, void *searchby_res, u32 len, u64 flags)
++ * long bpf_load_hdr_opt(void *ctx, void *searchby_res, u32 len, u64 flags)
+  *	Description
+  *		Load header option.  Support reading a particular TCP header
+- *		option for bpf program (**BPF_PROG_TYPE_SOCK_OPS**).
++ *		option for bpf program (**BPF_PROG_TYPE_SOCK_OPS**).  For the
++ *		**bpf_tcp_ops** struct_ops, this helper can be called from the
++ *		**parse_hdr**\ () and **write_hdr_opt**\ () operators.
+  *
+- *		If *flags* is 0, it will search the option from the
+- *		*skops*\ **->skb_data**.  The comment in **struct bpf_sock_ops**
+- *		has details on what skb_data contains under different
+- *		*skops*\ **->op**.
++ *		If *flags* is 0, it will search the option from the packet
++ *		associated with the current operation.  For
++ *		**BPF_PROG_TYPE_SOCK_OPS**, the comment in
++ *		**struct bpf_sock_ops** has details on what skb_data
++ *		contains under different *op*.
+  *
+  *		The first byte of the *searchby_res* specifies the
+  *		kind that it wants to search.
+@@ -4840,6 +4843,8 @@ union bpf_attr {
+  *
+  *		* **BPF_LOAD_HDR_OPT_TCP_SYN** to search from the
+  *		  saved_syn packet or the just-received syn packet.
++ *		  Not supported by the **bpf_tcp_ops** struct_ops, which
++ *		  rejects all flags.
+  *
+  *	Return
+  *		> 0 when found, the header option is copied to *searchby_res*.
+@@ -4860,9 +4865,9 @@ union bpf_attr {
+  *		packet.
+  *
+  *		**-EPERM** if the helper cannot be used under the current
+- *		*skops*\ **->op**.
++ *		operation.
+  *
+- * long bpf_store_hdr_opt(struct bpf_sock_ops *skops, const void *from, u32 len, u64 flags)
++ * long bpf_store_hdr_opt(void *ctx, const void *from, u32 len, u64 flags)
+  *	Description
+  *		Store header option.  The data will be copied
+  *		from buffer *from* with length *len* to the TCP header.
+@@ -4878,7 +4883,9 @@ union bpf_attr {
+  *		by searching the same option in the outgoing skb.
+  *
+  *		This helper can only be called during
+- *		**BPF_SOCK_OPS_WRITE_HDR_OPT_CB**.
++ *		**BPF_SOCK_OPS_WRITE_HDR_OPT_CB**, or from the
++ *		**write_hdr_opt**\ () operator of the **bpf_tcp_ops**
++ *		struct_ops.
+  *
+  *	Return
+  *		0 on success, or negative error in case of failure:
+@@ -4893,9 +4900,9 @@ union bpf_attr {
+  *		**-EFAULT** on failure to parse the existing header options.
+  *
+  *		**-EPERM** if the helper cannot be used under the current
+- *		*skops*\ **->op**.
++ *		operation.
+  *
+- * long bpf_reserve_hdr_opt(struct bpf_sock_ops *skops, u32 len, u64 flags)
++ * long bpf_reserve_hdr_opt(void *ctx, u32 len, u64 flags)
+  *	Description
+  *		Reserve *len* bytes for the bpf header option.  The
+  *		space will be used by **bpf_store_hdr_opt**\ () later in
+@@ -4905,7 +4912,9 @@ union bpf_attr {
+  *		the total number of bytes will be reserved.
+  *
+  *		This helper can only be called during
+- *		**BPF_SOCK_OPS_HDR_OPT_LEN_CB**.
++ *		**BPF_SOCK_OPS_HDR_OPT_LEN_CB**, or from the
++ *		**hdr_opt_len**\ () operator of the **bpf_tcp_ops**
++ *		struct_ops.
+  *
+  *	Return
+  *		0 on success, or negative error in case of failure:
+@@ -4915,7 +4924,7 @@ union bpf_attr {
+  *		**-ENOSPC** if there is not enough space in the header.
+  *
+  *		**-EPERM** if the helper cannot be used under the current
+- *		*skops*\ **->op**.
++ *		operation.
+  *
+  * void *bpf_inode_storage_get(struct bpf_map *map, void *inode, void *value, u64 flags)
+  *	Description
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 05f492c215e0..1ce958ed73dc 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -7887,17 +7887,14 @@ static const u8 *bpf_search_tcp_opt(const u8 *op, const u8 *opend,
+ 	return ERR_PTR(-ENOMSG);
  }
  
- #if IS_ENABLED(CONFIG_SMC)
-diff --git a/net/ipv4/Makefile b/net/ipv4/Makefile
-index 06e21c26b76f..afbac63d1cb4 100644
---- a/net/ipv4/Makefile
-+++ b/net/ipv4/Makefile
-@@ -70,6 +70,7 @@ obj-$(CONFIG_TCP_AO) += tcp_ao.o
+-BPF_CALL_4(bpf_sock_ops_load_hdr_opt, struct bpf_sock_ops_kern *, bpf_sock,
+-	   void *, search_res, u32, len, u64, flags)
++int __bpf_sock_ops_load_hdr_opt(struct bpf_sock_ops_kern *bpf_sock,
++				void *search_res, u32 len, u64 flags)
+ {
+ 	bool eol, load_syn = flags & BPF_LOAD_HDR_OPT_TCP_SYN;
+ 	const u8 *op, *opend, *magic, *search = search_res;
+ 	u8 search_kind, search_len, copy_len, magic_len;
+ 	int ret;
  
- ifeq ($(CONFIG_BPF_JIT),y)
- obj-$(CONFIG_BPF_SYSCALL) += bpf_tcp_ca.o
-+obj-$(CONFIG_CGROUP_BPF) += bpf_tcp_ops.o
- endif
+-	if (!is_locked_tcp_sock_ops(bpf_sock))
+-		return -EOPNOTSUPP;
+-
+ 	/* 2 byte is the minimal option len except TCPOPT_NOP and
+ 	 * TCPOPT_EOL which are useless for the bpf prog to learn
+ 	 * and this helper disallow loading them also.
+@@ -7958,6 +7955,15 @@ BPF_CALL_4(bpf_sock_ops_load_hdr_opt, struct bpf_sock_ops_kern *, bpf_sock,
+ 	return ret;
+ }
  
- ifdef CONFIG_GCOV_PROFILE_NETFILTER
-diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-index 32d006c1a8ee..ac8431da67f4 100644
---- a/net/ipv4/af_inet.c
-+++ b/net/ipv4/af_inet.c
-@@ -227,6 +227,7 @@ int __inet_listen_sk(struct sock *sk, int backlog)
- 			return err;
++BPF_CALL_4(bpf_sock_ops_load_hdr_opt, struct bpf_sock_ops_kern *, bpf_sock,
++	   void *, search_res, u32, len, u64, flags)
++{
++	if (!is_locked_tcp_sock_ops(bpf_sock))
++		return -EOPNOTSUPP;
++
++	return __bpf_sock_ops_load_hdr_opt(bpf_sock, search_res, len, flags);
++}
++
+ static const struct bpf_func_proto bpf_sock_ops_load_hdr_opt_proto = {
+ 	.func		= bpf_sock_ops_load_hdr_opt,
+ 	.gpl_only	= false,
+@@ -7968,17 +7974,14 @@ static const struct bpf_func_proto bpf_sock_ops_load_hdr_opt_proto = {
+ 	.arg4_type	= ARG_ANYTHING,
+ };
  
- 		tcp_call_bpf(sk, BPF_SOCK_OPS_TCP_LISTEN_CB, 0, NULL);
-+		bpf_tcp_ops_call(listen, sk);
- 	}
+-BPF_CALL_4(bpf_sock_ops_store_hdr_opt, struct bpf_sock_ops_kern *, bpf_sock,
+-	   const void *, from, u32, len, u64, flags)
++int __bpf_sock_ops_store_hdr_opt(struct bpf_sock_ops_kern *bpf_sock,
++				 const void *from, u32 len, u64 flags)
+ {
+ 	u8 new_kind, new_kind_len, magic_len = 0, *opend;
+ 	const u8 *op, *new_op, *magic = NULL;
+ 	struct sk_buff *skb;
+ 	bool eol;
+ 
+-	if (bpf_sock->op != BPF_SOCK_OPS_WRITE_HDR_OPT_CB)
+-		return -EPERM;
+-
+ 	if (len < 2 || flags)
+ 		return -EINVAL;
+ 
+@@ -8036,6 +8039,15 @@ BPF_CALL_4(bpf_sock_ops_store_hdr_opt, struct bpf_sock_ops_kern *, bpf_sock,
  	return 0;
  }
+ 
++BPF_CALL_4(bpf_sock_ops_store_hdr_opt, struct bpf_sock_ops_kern *, bpf_sock,
++	   const void *, from, u32, len, u64, flags)
++{
++	if (bpf_sock->op != BPF_SOCK_OPS_WRITE_HDR_OPT_CB)
++		return -EPERM;
++
++	return __bpf_sock_ops_store_hdr_opt(bpf_sock, from, len, flags);
++}
++
+ static const struct bpf_func_proto bpf_sock_ops_store_hdr_opt_proto = {
+ 	.func		= bpf_sock_ops_store_hdr_opt,
+ 	.gpl_only	= false,
 diff --git a/net/ipv4/bpf_tcp_ops.c b/net/ipv4/bpf_tcp_ops.c
-new file mode 100644
-index 000000000000..3febbc8dd1a0
---- /dev/null
+index 3febbc8dd1a0..b27613898337 100644
+--- a/net/ipv4/bpf_tcp_ops.c
 +++ b/net/ipv4/bpf_tcp_ops.c
-@@ -0,0 +1,188 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2026 Meta Platforms, Inc. and affiliates. */
-+
-+#include <linux/bpf.h>
-+#include <linux/btf_ids.h>
-+#include <linux/bpf_verifier.h>
-+#include <net/bpf_sk_storage.h>
-+#include <net/tcp.h>
-+
-+static int timeout_init_stub(struct sock *sk, struct request_sock *req__nullable)
-+{
-+	struct bpf_tramp_run_ctx *ctx =
-+		container_of(current->bpf_ctx, struct bpf_tramp_run_ctx, run_ctx);
-+
-+	return ctx->retval;
-+}
-+
-+static int rwnd_init_stub(struct sock *sk, struct request_sock *req__nullable)
-+{
-+	struct bpf_tramp_run_ctx *ctx =
-+		container_of(current->bpf_ctx, struct bpf_tramp_run_ctx, run_ctx);
-+
-+	return ctx->retval;
-+}
-+
-+static void active_established_stub(struct sock *sk, struct sk_buff *skb__nullable)
+@@ -4,6 +4,7 @@
+ #include <linux/bpf.h>
+ #include <linux/btf_ids.h>
+ #include <linux/bpf_verifier.h>
++#include <linux/filter.h>
+ #include <net/bpf_sk_storage.h>
+ #include <net/tcp.h>
+ 
+@@ -55,6 +56,26 @@ static void listen_stub(struct sock *sk)
+ {
+ }
+ 
++static void parse_hdr_stub(struct sock *sk, struct sk_buff *skb)
 +{
 +}
 +
-+static void passive_established_stub(struct sock *sk, struct sk_buff *skb)
++static void hdr_opt_len_stub(struct sock *sk, struct sk_buff *skb__nullable,
++			     struct request_sock *req__nullable,
++			     struct sk_buff *syn_skb__nullable,
++			     enum tcp_synack_type synack_type,
++			     unsigned int *remaining)
 +{
 +}
 +
-+static void rto_stub(struct sock *sk)
++static void write_hdr_opt_stub(struct sock *sk, struct sk_buff *skb,
++			       struct request_sock *req__nullable,
++			       struct sk_buff *syn_skb__nullable,
++			       enum tcp_synack_type synack_type,
++			       u32 opt_off)
 +{
 +}
 +
-+static void rtt_stub(struct sock *sk, long mrtt, u32 srtt)
-+{
-+}
-+
-+static void set_state_stub(struct sock *sk, int state)
-+{
-+}
-+
-+static void retrans_stub(struct sock *sk, struct sk_buff *skb, int err)
-+{
-+}
-+
-+static void connect_stub(struct sock *sk)
-+{
-+}
-+
-+static void listen_stub(struct sock *sk)
-+{
-+}
-+
-+static struct bpf_tcp_ops __bpf_tcp_ops = {
-+	.timeout_init = timeout_init_stub,
-+	.rwnd_init = rwnd_init_stub,
-+	.active_established = active_established_stub,
-+	.passive_established = passive_established_stub,
-+	.rto = rto_stub,
-+	.rtt = rtt_stub,
-+	.set_state = set_state_stub,
-+	.retrans = retrans_stub,
-+	.connect = connect_stub,
-+	.listen = listen_stub,
+ static struct bpf_tcp_ops __bpf_tcp_ops = {
+ 	.timeout_init = timeout_init_stub,
+ 	.rwnd_init = rwnd_init_stub,
+@@ -66,6 +87,102 @@ static struct bpf_tcp_ops __bpf_tcp_ops = {
+ 	.retrans = retrans_stub,
+ 	.connect = connect_stub,
+ 	.listen = listen_stub,
++	.parse_hdr = parse_hdr_stub,
++	.hdr_opt_len = hdr_opt_len_stub,
++	.write_hdr_opt = write_hdr_opt_stub,
 +};
 +
-+BPF_CALL_0(bpf_tcp_ops_get_retval)
++BPF_CALL_4(bpf_tcp_ops_store_hdr_opt, void *, ctx, const void *, from,
++	   u32, len, u64, flags)
 +{
-+	struct bpf_tramp_run_ctx *ctx =
-+		container_of(current->bpf_ctx, struct bpf_tramp_run_ctx, run_ctx);
++	u64 *args = ctx;
++	struct sk_buff *skb = (void *)(unsigned long)args[1];
++	struct bpf_sock_ops_kern sock_ops = {};
++	u32 opt_off = args[5];
++	u8 *op, *opend;
 +
-+	/* bpf_get_retval() is only exposed to timeout_init/rwnd_init, which
-+	 * always run via bpf_tcp_ops_call_int(). Its run_ctx carries the int
-+	 * return value chained across the bpf_tcp_ops attached to the cgroup
-+	 * and is this program's saved_run_ctx.
++	/* bpf_tcp_ops does not keep track of the end of the written TCP header
++	 * options, so search for it every time the helper is called. The free
++	 * space is NOP-filled, so a TCPOPT_NOP ends the search rather than being
++	 * skipped as in a normal option walk in sockops.
 +	 */
-+	if (WARN_ON_ONCE(!ctx->saved_run_ctx))
-+		return 0;
++	op = skb->data + opt_off;
++	opend = skb->data + tcp_hdrlen(skb);
++	while (op < opend && *op != TCPOPT_NOP) {
++		if (*op == TCPOPT_EOL || op + 1 >= opend || op[1] < 2)
++			break;
++		op += op[1];
++	}
 +
-+	return container_of(ctx->saved_run_ctx, struct bpf_tramp_run_ctx,
-+			    run_ctx)->retval;
++	sock_ops.skb = skb;
++	sock_ops.skb_data_end = op;
++	sock_ops.remaining_opt_len = opend - op;
++
++	return __bpf_sock_ops_store_hdr_opt(&sock_ops, from, len, flags);
 +}
 +
-+const struct bpf_func_proto bpf_tcp_ops_get_retval_proto = {
-+	.func		= bpf_tcp_ops_get_retval,
++static const struct bpf_func_proto bpf_tcp_ops_store_hdr_opt_proto = {
++	.func		= bpf_tcp_ops_store_hdr_opt,
 +	.gpl_only	= false,
 +	.ret_type	= RET_INTEGER,
++	.arg1_type	= ARG_PTR_TO_CTX,
++	.arg2_type	= ARG_PTR_TO_MEM | MEM_RDONLY,
++	.arg3_type	= ARG_CONST_SIZE,
++	.arg4_type	= ARG_ANYTHING,
 +};
 +
-+static const struct bpf_func_proto *
-+get_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
++BPF_CALL_4(bpf_tcp_ops_load_hdr_opt, void *, ctx, void *, search_res,
++	   u32, len, u64, flags)
 +{
-+	u32 moff = prog->aux->attach_st_ops_member_off;
++	u64 *args = ctx;
++	struct sk_buff *skb = (void *)(unsigned long)args[1];
++	struct bpf_sock_ops_kern sock_ops = {};
 +
-+	switch (func_id) {
-+	case BPF_FUNC_sk_storage_get:
-+		return &bpf_sk_storage_get_proto;
-+	case BPF_FUNC_sk_storage_delete:
-+		return &bpf_sk_storage_delete_proto;
-+	case BPF_FUNC_setsockopt:
-+		/* The listener is not locked. */
-+		if (moff == offsetof(struct bpf_tcp_ops, rwnd_init) ||
-+		    moff == offsetof(struct bpf_tcp_ops, timeout_init))
-+			return NULL;
-+		return &bpf_sk_setsockopt_proto;
-+	case BPF_FUNC_getsockopt:
-+		if (moff == offsetof(struct bpf_tcp_ops, rwnd_init) ||
-+		    moff == offsetof(struct bpf_tcp_ops, timeout_init))
-+			return NULL;
-+		return &bpf_sk_getsockopt_proto;
-+	case BPF_FUNC_get_retval:
-+		if (moff == offsetof(struct bpf_tcp_ops, timeout_init) ||
-+		    moff == offsetof(struct bpf_tcp_ops, rwnd_init))
-+			return &bpf_tcp_ops_get_retval_proto;
-+		return NULL;
-+	default:
-+		return bpf_base_func_proto(func_id, prog);
-+	}
-+}
-+
-+static bool is_valid_access(int off, int size, enum bpf_access_type type,
-+			    const struct bpf_prog *prog, struct bpf_insn_access_aux *info)
-+{
-+	if (!bpf_tracing_btf_ctx_access(off, size, type, prog, info))
-+		return false;
-+
-+	if (base_type(info->reg_type) == PTR_TO_BTF_ID &&
-+	    !bpf_type_has_unsafe_modifiers(info->reg_type) &&
-+	    info->btf_id == btf_sock_ids[BTF_SOCK_TYPE_SOCK])
-+		/* promote it to tcp_sock */
-+		info->btf_id = btf_sock_ids[BTF_SOCK_TYPE_TCP];
-+
-+	return true;
-+}
-+
-+static int bpf_tcp_ops_init_member(const struct btf_type *t,
-+				   const struct btf_member *member,
-+				   void *kdata, const void *udata)
-+{
-+	return 0;
-+}
-+
-+static int bpf_tcp_ops_check_member(const struct btf_type *t,
-+				    const struct btf_member *member,
-+				    const struct bpf_prog *prog)
-+{
-+	if (prog->sleepable)
++	/* No flags supported. In particular BPF_LOAD_HDR_OPT_TCP_SYN, which
++	 * loads from the saved SYN, is not available because bpf_tcp_ops has no
++	 * carrier to track the SYN source across the hooks.
++	 */
++	if (flags)
 +		return -EINVAL;
 +
-+	return 0;
++	sock_ops.skb = skb;
++	sock_ops.skb_data_end = skb->data + tcp_hdrlen(skb);
++
++	return __bpf_sock_ops_load_hdr_opt(&sock_ops, search_res, len, flags);
 +}
 +
-+static int bpf_tcp_ops_init(struct btf *btf)
-+{
-+	return 0;
-+}
-+
-+static int bpf_tcp_ops_validate(void *kdata)
-+{
-+	return 0;
-+}
-+
-+static const struct bpf_verifier_ops bpf_tcp_ops_verifier = {
-+	.get_func_proto		= get_func_proto,
-+	.is_valid_access	= is_valid_access,
++static const struct bpf_func_proto bpf_tcp_ops_load_hdr_opt_proto = {
++	.func		= bpf_tcp_ops_load_hdr_opt,
++	.gpl_only	= false,
++	.ret_type	= RET_INTEGER,
++	.arg1_type	= ARG_PTR_TO_CTX,
++	.arg2_type	= ARG_PTR_TO_MEM | MEM_WRITE,
++	.arg3_type	= ARG_CONST_SIZE,
++	.arg4_type	= ARG_ANYTHING,
 +};
 +
-+static struct bpf_struct_ops bpf_tcp_ops = {
-+	.verifier_ops = &bpf_tcp_ops_verifier,
-+	.init_member = bpf_tcp_ops_init_member,
-+	.check_member = bpf_tcp_ops_check_member,
-+	.init = bpf_tcp_ops_init,
-+	.validate = bpf_tcp_ops_validate,
-+	.name = "bpf_tcp_ops",
-+	.cgroup_atype = CGROUP_TCP_SOCK_OPS,
-+	.cfi_stubs = &__bpf_tcp_ops,
-+	.owner = THIS_MODULE,
-+};
-+
-+static int __init __bpf_tcp_ops_init(void)
++BPF_CALL_3(bpf_tcp_ops_reserve_hdr_opt, void *, ctx, u32, len, u64, flags)
 +{
-+	return register_bpf_struct_ops(&bpf_tcp_ops, bpf_tcp_ops);
++	u64 *args = ctx;
++	unsigned int *remaining = (void *)(unsigned long)args[5];
++
++	if (flags || len < 2)
++		return -EINVAL;
++
++	if (len > *remaining)
++		return -ENOSPC;
++
++	*remaining -= len;
++	return 0;
 +}
-+late_initcall(__bpf_tcp_ops_init);
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 455441f1b694..94ed1ac2abc1 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -2996,6 +2996,7 @@ void tcp_set_state(struct sock *sk, int state)
++
++static const struct bpf_func_proto bpf_tcp_ops_reserve_hdr_opt_proto = {
++	.func		= bpf_tcp_ops_reserve_hdr_opt,
++	.gpl_only	= false,
++	.ret_type	= RET_INTEGER,
++	.arg1_type	= ARG_PTR_TO_CTX,
++	.arg2_type	= ARG_ANYTHING,
++	.arg3_type	= ARG_ANYTHING,
+ };
  
- 	if (BPF_SOCK_OPS_TEST_FLAG(tcp_sk(sk), BPF_SOCK_OPS_STATE_CB_FLAG))
- 		tcp_call_bpf_2arg(sk, BPF_SOCK_OPS_STATE_CB, oldstate, state);
-+	bpf_tcp_ops_call(set_state, sk, state);
- 
- 	switch (state) {
- 	case TCP_ESTABLISHED:
+ BPF_CALL_0(bpf_tcp_ops_get_retval)
+@@ -102,14 +219,20 @@ get_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
+ 	case BPF_FUNC_sk_storage_delete:
+ 		return &bpf_sk_storage_delete_proto;
+ 	case BPF_FUNC_setsockopt:
+-		/* The listener is not locked. */
++		/* The sk may be an unlocked listener (synack path) or NULL
++		 * fullsock; disable for members that can run unlocked.
++		 */
+ 		if (moff == offsetof(struct bpf_tcp_ops, rwnd_init) ||
+-		    moff == offsetof(struct bpf_tcp_ops, timeout_init))
++		    moff == offsetof(struct bpf_tcp_ops, timeout_init) ||
++		    moff == offsetof(struct bpf_tcp_ops, hdr_opt_len) ||
++		    moff == offsetof(struct bpf_tcp_ops, write_hdr_opt))
+ 			return NULL;
+ 		return &bpf_sk_setsockopt_proto;
+ 	case BPF_FUNC_getsockopt:
+ 		if (moff == offsetof(struct bpf_tcp_ops, rwnd_init) ||
+-		    moff == offsetof(struct bpf_tcp_ops, timeout_init))
++		    moff == offsetof(struct bpf_tcp_ops, timeout_init) ||
++		    moff == offsetof(struct bpf_tcp_ops, hdr_opt_len) ||
++		    moff == offsetof(struct bpf_tcp_ops, write_hdr_opt))
+ 			return NULL;
+ 		return &bpf_sk_getsockopt_proto;
+ 	case BPF_FUNC_get_retval:
+@@ -117,6 +240,19 @@ get_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
+ 		    moff == offsetof(struct bpf_tcp_ops, rwnd_init))
+ 			return &bpf_tcp_ops_get_retval_proto;
+ 		return NULL;
++	case BPF_FUNC_reserve_hdr_opt:
++		if (moff == offsetof(struct bpf_tcp_ops, hdr_opt_len))
++			return &bpf_tcp_ops_reserve_hdr_opt_proto;
++		return NULL;
++	case BPF_FUNC_load_hdr_opt:
++		if (moff == offsetof(struct bpf_tcp_ops, parse_hdr) ||
++		    moff == offsetof(struct bpf_tcp_ops, write_hdr_opt))
++			return &bpf_tcp_ops_load_hdr_opt_proto;
++		return NULL;
++	case BPF_FUNC_store_hdr_opt:
++		if (moff == offsetof(struct bpf_tcp_ops, write_hdr_opt))
++			return &bpf_tcp_ops_store_hdr_opt_proto;
++		return NULL;
+ 	default:
+ 		return bpf_base_func_proto(func_id, prog);
+ 	}
 diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 61045a8886e4..12fb690d21c4 100644
+index 12fb690d21c4..a36146789138 100644
 --- a/net/ipv4/tcp_input.c
 +++ b/net/ipv4/tcp_input.c
-@@ -6694,6 +6694,10 @@ void tcp_init_transfer(struct sock *sk, int bpf_op, struct sk_buff *skb)
- 	tp->snd_cwnd_stamp = tcp_jiffies32;
+@@ -208,6 +208,18 @@ static void bpf_skops_established(struct sock *sk, int bpf_op,
+ }
+ #endif
  
- 	bpf_skops_established(sk, bpf_op, skb);
-+	if (bpf_op == BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB)
-+		bpf_tcp_ops_call(active_established, sk, skb);
-+	else
-+		bpf_tcp_ops_call(passive_established, sk, skb);
- 	/* Initialize congestion control unless BPF initialized it already: */
- 	if (!icsk->icsk_ca_initialized)
- 		tcp_init_congestion_control(sk);
++static void bpf_tcp_ops_parse_hdr(struct sock *sk, struct sk_buff *skb)
++{
++	switch (sk->sk_state) {
++	case TCP_SYN_RECV:
++	case TCP_SYN_SENT:
++	case TCP_LISTEN:
++		return;
++	}
++
++	bpf_tcp_ops_call(parse_hdr, sk, skb);
++}
++
+ static __cold void tcp_gro_dev_warn(const struct sock *sk, const struct sk_buff *skb,
+ 				    unsigned int len)
+ {
+@@ -6431,6 +6443,7 @@ static bool tcp_validate_incoming(struct sock *sk, struct sk_buff *skb,
+ 
+ pass:
+ 	bpf_skops_parse_hdr(sk, skb);
++	bpf_tcp_ops_parse_hdr(sk, skb);
+ 
+ 	return true;
+ 
 diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 00ec4b5900f2..a91770adfb3a 100644
+index a91770adfb3a..9025008819ba 100644
 --- a/net/ipv4/tcp_output.c
 +++ b/net/ipv4/tcp_output.c
-@@ -3678,6 +3678,7 @@ int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
- 	if (BPF_SOCK_OPS_TEST_FLAG(tp, BPF_SOCK_OPS_RETRANS_CB_FLAG))
- 		tcp_call_bpf_3arg(sk, BPF_SOCK_OPS_RETRANS_CB,
- 				  TCP_SKB_CB(skb)->seq, segs, err);
-+	bpf_tcp_ops_call(retrans, sk, skb, err);
+@@ -573,6 +573,13 @@ static void bpf_skops_write_hdr_opt(struct sock *sk, struct sk_buff *skb,
+ 	if (nr_written < max_opt_len)
+ 		memset(skb->data + first_opt_off + nr_written, TCPOPT_NOP,
+ 		       max_opt_len - nr_written);
++
++	/* bpf_tcp_ops portion is NOP-filled (everything past the sockops
++	 * writer's bytes). The writer find the append point by scanning from
++	 * first_opt_off + nr_written to the first NOP.
++	 */
++	bpf_tcp_ops_call(write_hdr_opt, sk, skb, req, syn_skb, synack_type,
++			 first_opt_off + nr_written);
+ }
+ #else
+ static u32 bpf_skops_hdr_opt_len(struct sock *sk, struct sk_buff *skb,
+@@ -594,6 +601,32 @@ static void bpf_skops_write_hdr_opt(struct sock *sk, struct sk_buff *skb,
+ }
+ #endif
  
- 	if (unlikely(err) && err != -EBUSY)
- 		NET_ADD_STATS(sock_net(sk), LINUX_MIB_TCPRETRANSFAIL, segs);
-@@ -4298,6 +4299,7 @@ int tcp_connect(struct sock *sk)
- 	int err;
++static u32 bpf_tcp_ops_hdr_opt_len(struct sock *sk, struct sk_buff *skb,
++				   struct request_sock *req,
++				   struct sk_buff *syn_skb,
++				   enum tcp_synack_type synack_type,
++				   struct tcp_out_options *opts,
++				   u32 remaining)
++{
++	unsigned int remaining_out = remaining, reserved;
++
++	if (!remaining)
++		return 0;
++
++	/* bpf_tcp_ops_reserve_hdr_opt() reserves space via remaining_out */
++	bpf_tcp_ops_call(hdr_opt_len, sk, skb, req, syn_skb, synack_type, &remaining_out);
++
++	reserved = remaining - remaining_out;
++	if (!reserved)
++		return remaining;
++
++	/* round up to 4 bytes */
++	reserved = (reserved + 3) & ~3;
++
++	opts->bpf_opt_len += reserved;
++	return remaining - reserved;
++}
++
+ static __be32 *process_tcp_ao_options(struct tcp_sock *tp,
+ 				      const struct tcp_request_sock *tcprsk,
+ 				      struct tcp_out_options *opts,
+@@ -1053,6 +1086,8 @@ static unsigned int tcp_syn_options(struct sock *sk, struct sk_buff *skb,
  
- 	tcp_call_bpf(sk, BPF_SOCK_OPS_TCP_CONNECT_CB, 0, NULL);
-+	bpf_tcp_ops_call(connect, sk);
+ 	remaining = bpf_skops_hdr_opt_len(sk, skb, NULL, NULL, 0, opts,
+ 					  remaining);
++	remaining = bpf_tcp_ops_hdr_opt_len(sk, skb, NULL, NULL, 0, opts,
++					    remaining);
  
- #if defined(CONFIG_TCP_MD5SIG) && defined(CONFIG_TCP_AO)
- 	/* Has to be checked late, after setting daddr/saddr/ops.
-diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
-index bf171b5e1eb3..4337627ee0ea 100644
---- a/net/ipv4/tcp_timer.c
-+++ b/net/ipv4/tcp_timer.c
-@@ -290,6 +290,7 @@ static int tcp_write_timeout(struct sock *sk)
- 		tcp_call_bpf_3arg(sk, BPF_SOCK_OPS_RTO_CB,
- 				  icsk->icsk_retransmits,
- 				  icsk->icsk_rto, (int)expired);
-+	bpf_tcp_ops_call(rto, sk);
+ 	return MAX_TCP_OPTION_SPACE - remaining;
+ }
+@@ -1141,6 +1176,8 @@ static unsigned int tcp_synack_options(const struct sock *sk,
  
- 	if (expired) {
- 		/* Has it gone just too far? */
+ 	remaining = bpf_skops_hdr_opt_len((struct sock *)sk, skb, req, syn_skb,
+ 					  synack_type, opts, remaining);
++	remaining = bpf_tcp_ops_hdr_opt_len((struct sock *)sk, skb, req, syn_skb,
++					    synack_type, opts, remaining);
+ 
+ 	return MAX_TCP_OPTION_SPACE - remaining;
+ }
+@@ -1244,6 +1281,15 @@ static unsigned int tcp_established_options(struct sock *sk, struct sk_buff *skb
+ 		size = MAX_TCP_OPTION_SPACE - remaining;
+ 	}
+ 
++	if (cgroup_bpf_enabled(CGROUP_TCP_SOCK_OPS)) {
++		unsigned int remaining = MAX_TCP_OPTION_SPACE - size;
++
++		remaining = bpf_tcp_ops_hdr_opt_len(sk, skb, NULL, NULL, 0, opts,
++						    remaining);
++
++		size = MAX_TCP_OPTION_SPACE - remaining;
++	}
++
+ 	return size;
+ }
+ 
+diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
+index c982801ec7db..fb1b2cb72fd2 100644
+--- a/tools/include/uapi/linux/bpf.h
++++ b/tools/include/uapi/linux/bpf.h
+@@ -4799,15 +4799,18 @@ union bpf_attr {
+  * 		The non-negative copied *buf* length equal to or less than
+  * 		*size* on success, or a negative error in case of failure.
+  *
+- * long bpf_load_hdr_opt(struct bpf_sock_ops *skops, void *searchby_res, u32 len, u64 flags)
++ * long bpf_load_hdr_opt(void *ctx, void *searchby_res, u32 len, u64 flags)
+  *	Description
+  *		Load header option.  Support reading a particular TCP header
+- *		option for bpf program (**BPF_PROG_TYPE_SOCK_OPS**).
++ *		option for bpf program (**BPF_PROG_TYPE_SOCK_OPS**).  For the
++ *		**bpf_tcp_ops** struct_ops, this helper can be called from the
++ *		**parse_hdr**\ () and **write_hdr_opt**\ () operators.
+  *
+- *		If *flags* is 0, it will search the option from the
+- *		*skops*\ **->skb_data**.  The comment in **struct bpf_sock_ops**
+- *		has details on what skb_data contains under different
+- *		*skops*\ **->op**.
++ *		If *flags* is 0, it will search the option from the packet
++ *		associated with the current operation.  For
++ *		**BPF_PROG_TYPE_SOCK_OPS**, the comment in
++ *		**struct bpf_sock_ops** has details on what skb_data
++ *		contains under different *op*.
+  *
+  *		The first byte of the *searchby_res* specifies the
+  *		kind that it wants to search.
+@@ -4840,6 +4843,8 @@ union bpf_attr {
+  *
+  *		* **BPF_LOAD_HDR_OPT_TCP_SYN** to search from the
+  *		  saved_syn packet or the just-received syn packet.
++ *		  Not supported by the **bpf_tcp_ops** struct_ops, which
++ *		  rejects all flags.
+  *
+  *	Return
+  *		> 0 when found, the header option is copied to *searchby_res*.
+@@ -4860,9 +4865,9 @@ union bpf_attr {
+  *		packet.
+  *
+  *		**-EPERM** if the helper cannot be used under the current
+- *		*skops*\ **->op**.
++ *		operation.
+  *
+- * long bpf_store_hdr_opt(struct bpf_sock_ops *skops, const void *from, u32 len, u64 flags)
++ * long bpf_store_hdr_opt(void *ctx, const void *from, u32 len, u64 flags)
+  *	Description
+  *		Store header option.  The data will be copied
+  *		from buffer *from* with length *len* to the TCP header.
+@@ -4878,7 +4883,9 @@ union bpf_attr {
+  *		by searching the same option in the outgoing skb.
+  *
+  *		This helper can only be called during
+- *		**BPF_SOCK_OPS_WRITE_HDR_OPT_CB**.
++ *		**BPF_SOCK_OPS_WRITE_HDR_OPT_CB**, or from the
++ *		**write_hdr_opt**\ () operator of the **bpf_tcp_ops**
++ *		struct_ops.
+  *
+  *	Return
+  *		0 on success, or negative error in case of failure:
+@@ -4893,9 +4900,9 @@ union bpf_attr {
+  *		**-EFAULT** on failure to parse the existing header options.
+  *
+  *		**-EPERM** if the helper cannot be used under the current
+- *		*skops*\ **->op**.
++ *		operation.
+  *
+- * long bpf_reserve_hdr_opt(struct bpf_sock_ops *skops, u32 len, u64 flags)
++ * long bpf_reserve_hdr_opt(void *ctx, u32 len, u64 flags)
+  *	Description
+  *		Reserve *len* bytes for the bpf header option.  The
+  *		space will be used by **bpf_store_hdr_opt**\ () later in
+@@ -4905,7 +4912,9 @@ union bpf_attr {
+  *		the total number of bytes will be reserved.
+  *
+  *		This helper can only be called during
+- *		**BPF_SOCK_OPS_HDR_OPT_LEN_CB**.
++ *		**BPF_SOCK_OPS_HDR_OPT_LEN_CB**, or from the
++ *		**hdr_opt_len**\ () operator of the **bpf_tcp_ops**
++ *		struct_ops.
+  *
+  *	Return
+  *		0 on success, or negative error in case of failure:
+@@ -4915,7 +4924,7 @@ union bpf_attr {
+  *		**-ENOSPC** if there is not enough space in the header.
+  *
+  *		**-EPERM** if the helper cannot be used under the current
+- *		*skops*\ **->op**.
++ *		operation.
+  *
+  * void *bpf_inode_storage_get(struct bpf_map *map, void *inode, void *value, u64 flags)
+  *	Description
 -- 
 2.52.0
 
