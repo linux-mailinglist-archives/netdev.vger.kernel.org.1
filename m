@@ -1,317 +1,194 @@
-Return-Path: <netdev+bounces-305090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305092-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 54JBCyHCS2oXZwEAu9opvQ
-	(envelope-from <netdev+bounces-305090-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 16:56:33 +0200
+	id 8nmELs3ZS2qvbQEAu9opvQ
+	(envelope-from <netdev+bounces-305092-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 18:37:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABCA2712407
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 16:56:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 019567135EE
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 18:37:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=garyguo.net header.s=selector1 header.b=EpcHIvhD;
-	dmarc=pass (policy=none) header.from=garyguo.net;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305090-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305090-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=ssi.bg header.s=ssi header.b=sdwh+UwC;
+	dmarc=pass (policy=reject) header.from=ssi.bg;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305092-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305092-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CEB90310D658
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 14:14:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6A8B738D5E58
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 14:20:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43E5827EFE9;
-	Mon,  6 Jul 2026 14:12:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BD223A75A3;
+	Mon,  6 Jul 2026 14:17:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from LO3P265CU004.outbound.protection.outlook.com (mail-uksouthazon11020136.outbound.protection.outlook.com [52.101.196.136])
+Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E4E3939A3;
-	Mon,  6 Jul 2026 14:12:10 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783347136; cv=fail; b=W7P+QNqUChjpZhCGzIUc5YCaG/H35j8tiXwqvGH0EN5BFxcQSEqPvW2uD3AnwogT2krlwHI42NZt++Smg+joTAF4YTcpmt4zewALk8cdCg8+Ca4OJY93CCBPCcuH92Y2JSNNix1atDoTNMUrYzOVIE0/JDcbg0D8oJz+7LX3p40=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783347136; c=relaxed/simple;
-	bh=TDdsV/I55ZZqAffWsj7qX9Ah2rjfQSGfyhKlJd6/clI=;
-	h=From:Date:Subject:Content-Type:Message-Id:References:In-Reply-To:
-	 To:Cc:MIME-Version; b=YnbrXWdolETJEqOGlCZM3itT3CDRr/XI6/6+Rg4hwtLtwlevR8QhxpXZCGaaqrpOBLvJECT1bJFnmx8d2slbmhll6PlS7gRCIZYlVpYeC+r0bvCuuSyyu5RJBHqges+PxmSZh/kPe2vdVcVNsQ+M97qxllJbtHN2r8NME2kKxtM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=EpcHIvhD; arc=fail smtp.client-ip=52.101.196.136
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yEKIQkITvFIDLwwa3rYWrZ7PVd+V9GRi4Pa1Qa5VxwNVJGA/ax3IWTD98aveMLC2sHVxZpTa20lflw0O1nN180kDd9DzYzxqOA4w+S9TB0RypwmDW+VKS4HGHPwAElAuQpS0dGi1XUuairbk9ulgFjMsStSm/SU4yezC/YRdho0MO2MWSvYDwOozaFmYDnB4DzbXo/em7RKQTbLbYdYvkcQfsqMJNwORbMhPFrZhtK0G/H4A3qFydRBNJ35vMkx2MNVHPIQ2f6DwqKuCVvrTyYhRV1Cmod+Fez/N93vb+e41/1WE2p04kX6MtYkiNpMXYq+VP6YLv9PG18BCNKAzgQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dn5GfkAHBwl6DlMqCNIir8ki6qq2M4UNsYDn2heV0L0=;
- b=GV+Zkh2ONYI+we43pKX7NX6JQPI0JdHtIULEU+FT8uLUTuqlnKaBfP1YLbzIif8bmgFQsYJh3ikFN95Mmn4IPEKN9J/hRfkGFXD5IImYkSwELzo+3WA4JT7UyVXA3IPczBnMMZxHdDZGw9SI/1DHjjDGZY5IgUkdkcGU5OcsEPHR4Q5c56iiBU/Rlu6ibWDpGhq8FLpTFyR3mY4QYDhRogc7lkJJ6ct339nSy3zth+4LHaaldDP+HDv3XXwVqYClx82bnVb4aQNSDnwSw81lY45PcxbJr9EYi1GeBitdsWGbScgCBp7exVK/Usv5nCBwYhihYNHqrZmA2j2Zf8ACrQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
- dkim=pass header.d=garyguo.net; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dn5GfkAHBwl6DlMqCNIir8ki6qq2M4UNsYDn2heV0L0=;
- b=EpcHIvhDgTEkKudXhFPU0BoxAFWGZS1cCVQWmfUFEMmtdFVvuvEwgIv+LQ1EZiUKztb/r+Me2XnM3D/FcMUl4vja+bIwmoJTKriP1+mOE8dO6pWl6spLAYSmOaB+Md5ukpnFYLH4Y9IwPWd8Dn+TmqDv7oyJVKWOrX9bvnEETiY=
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
- by CW1P265MB9444.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:28e::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.11; Mon, 6 Jul
- 2026 14:11:40 +0000
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986%4]) with mapi id 15.21.0181.008; Mon, 6 Jul 2026
- 14:11:40 +0000
-From: Gary Guo <gary@garyguo.net>
-Date: Mon, 06 Jul 2026 15:11:21 +0100
-Subject: [PATCH v3 9/9] pci: fix UAF when probe runs concurrent to dyn ID
- removal
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260706-pci_id_fix-v3-9-2d48fc025acc@garyguo.net>
-References: <20260706-pci_id_fix-v3-0-2d48fc025acc@garyguo.net>
-In-Reply-To: <20260706-pci_id_fix-v3-0-2d48fc025acc@garyguo.net>
-To: Bjorn Helgaas <bhelgaas@google.com>, 
- Zhenzhong Duan <zhenzhong.duan@gmail.com>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
- Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
- GOTO Masanori <gotom@debian.or.jp>, 
- YOKOTA Hiroshi <yokota@netlab.is.tsukuba.ac.jp>, 
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
- "Martin K. Petersen" <martin.petersen@oracle.com>, 
- Vaibhav Gupta <vaibhavgupta40@gmail.com>, 
- Jens Taprogge <jens.taprogge@taprogge.org>, 
- Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- David Airlie <airlied@redhat.com>
-Cc: linux-pci@vger.kernel.org, driver-core@lists.linux.dev, 
- linux-kernel@vger.kernel.org, linux-ide@vger.kernel.org, 
- linux-scsi@vger.kernel.org, industrypack-devel@lists.sourceforge.net, 
- netdev@vger.kernel.org, dri-devel@lists.freedesktop.org, 
- Sashiko <sashiko-bot@kernel.org>, Gary Guo <gary@garyguo.net>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1783347093; l=3982;
- i=gary@garyguo.net; s=20221204; h=from:subject:message-id;
- bh=TDdsV/I55ZZqAffWsj7qX9Ah2rjfQSGfyhKlJd6/clI=;
- b=+DMYV7M6raQTuaiuwv5aTzj5U3FZ856wubyHoyHmFByzWMezRBiRds1a95igsvRgRKo77IoaE
- BFeunoBkY8eCcJqZILBchy+BomLG/ZMbUhl+O17L5wbpIiQnvewtbCX
-X-Developer-Key: i=gary@garyguo.net; a=ed25519;
- pk=vB3uIX95SM4eVrIqo1DWNWKDKD2xzB+yLLLr0yOPYMo=
-X-ClientProxiedBy: LO4P123CA0509.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:272::13) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:488::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B49C3A963D;
+	Mon,  6 Jul 2026 14:17:53 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783347478; cv=none; b=BpQrRjwQw2pd5y4JHUE9KXpDucYcRwSNXpfOGLvaTcu4fAyXTU3PFAOF3N2nTO4FQF26EPkPQIb0pRl2odrgTJUboNM3JHdg2SaSAN2uRenQL/SpT5DXcacLshkCOTwndBsTHZp/xEDlNJUcFYbZI+dsvQS1RlymLIi5r5YQAX8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783347478; c=relaxed/simple;
+	bh=5rB+tcWjPVVWfW6ycYrFHi0qPClI3epYHo2xDUT70Ww=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=oiDPmRM/zz5xuAprp4S5ZAC4c9ReUhNRvNmNB+VLi02mwp3BiolsAHTzZq6V8eNLENBD+pTX/4N+bvsoqKW6T9H8jgp94vNnMF1r0gh7LNygd8ykYaxjAdMxC3YN+xWRczJFkF3UH3U58xsYfxhxJQFYWrohEwlJlOd+nqZvKPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=sdwh+UwC; arc=none smtp.client-ip=193.238.174.39
+Received: from mx.ssi.bg (localhost [127.0.0.1])
+	by mx.ssi.bg (Potsfix) with ESMTP id 365422121F;
+	Mon, 06 Jul 2026 17:17:50 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
+	:content-type:content-type:date:from:from:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
+	 bh=H2kYV2YNGwRbDpvUxivqC0uqB2DTUR1fxY9v63DflU8=; b=sdwh+UwCJLvB
+	Clp4C2RDPFw1foh+ob0EyuIg32UOTuyouSy5whBrJgCVAHX6VnvomZXf4QummmGz
+	UWrF26Kj1Hh/ZNuoJZELwCEEqL0s18YE9QClgJd5mRQ80PpObxFNH2nS1gXtlaew
+	ZnLh9B2pFPr9+mlM+SBPnDvxmJKxvsq3UbJ/9yNbrWJ+AeSMv/W2wRoZFzs5Nu1g
+	Ppzj/JnnZDv8Xusj5QrLn6pFQLwiOlZskXZ0ezsFrK3uZvDVjKks7t3Dq+E7xOhL
+	e8s6/Noij2vSsYTCQhaaP1XhJhtmyRG9e4smr48qz+OndzgtwU6bHH5eBMkLXCNp
+	phhgS7EOY9yokgW3jzsGgrDCTq2tR1orxRZkcQuEfZXa9ZUAlWu5kPn/aBpxDhVW
+	rQHm4IR+QKRM8NgARnBtz3RxL8awZtp3Aakd7tl9RK5Wz5sCcraHALMsOGDyg5tw
+	RKhSn6waYfgtOVE+UAfy0rbMj7eDHejkbSimebQYqRYud+b3LU0j+JCjcfQ5zZWP
+	UKDpD7HkCTHjkkbsXYNtPZSlmJGLXCpxsXachJshmki1vsAPErMMibziv7r1NF6n
+	BRN1WQ83SUMRAgfJ6/5WLplaLuCSCeVTAEutrf5m90DDaK4sDKUqq9ZjANSPChYK
+	7jy7WZiSm+j0rMrVawIGK4YSRAUGBz8=
+Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
+	by mx.ssi.bg (Potsfix) with ESMTPS;
+	Mon, 06 Jul 2026 17:17:50 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by box.ssi.bg (Potsfix) with ESMTPSA id 4597E60B74;
+	Mon,  6 Jul 2026 17:17:46 +0300 (EEST)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.2/8.18.2) with ESMTP id 666EHc2t054134;
+	Mon, 6 Jul 2026 17:17:39 +0300
+Date: Mon, 6 Jul 2026 17:17:38 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+cc: netdev@vger.kernel.org, Simon Horman <horms@verge.net.au>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, lvs-devel@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        linux-kernel@vger.kernel.org,
+        Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+        Ao Wang <wangao@seu.edu.cn>, Xuewei Feng <fengxw06@126.com>,
+        Qi Li <qli01@tsinghua.edu.cn>, Ke Xu <xuke@tsinghua.edu.cn>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH nf] ipvs: skip IPv6 extension headers in SCTP state
+ lookup
+In-Reply-To: <87E04893-B2B2-485F-B242-9CACF2F176D6@mails.tsinghua.edu.cn>
+Message-ID: <bcd7f0e6-b2fc-4e54-f9ac-e1c8b1b0c497@ssi.bg>
+References: <20260705123040.35755-1-zhaoyz24@mails.tsinghua.edu.cn> <92783c87-7e6a-e90a-b2fc-e5d1332139e0@ssi.bg> <87E04893-B2B2-485F-B242-9CACF2F176D6@mails.tsinghua.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|CW1P265MB9444:EE_
-X-MS-Office365-Filtering-Correlation-Id: b2588099-4b92-48e0-0689-08dedb687ec8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|10070799003|23010399003|376014|1800799024|366016|56012099006|18002099003|22082099003|921020;
-X-Microsoft-Antispam-Message-Info:
-	0QRcjdJtib4t6lRQHjPF24nB2zycJB6qSoVXN+3DVrkm5IYwBg3KUEXJCx+LpeLGlXtKTxNaX0xX3fgDobPVOBxITqMCuBDVn9/wJQHgWVwOd3Bi2FADxiGr8S7dVHQjzH7rHESAEAo+1OMblO+mGzwjTk2PYssM8+KpRrHdtYNkZCEbH9w/Ivu2ZWTpS49uVlKpzwTKVeMkIdfF0WcXdwtLRqPqL7GhdhRQl8WWDnLv0mM8KcEedlPi8X2l5vTHLLHS3HRSkILFZ8TqnslwL8+M22bfTLwfsgKIDOX/rX92HxedfowpqtQFU9QzIvbMDRc8C6NBBvxWa5UL9pN7v1/nH0QjAZrlmzeNcJbD2UiJ1Vj6lfsFtfes+98bFyHi5avNV9oSSYEHTP8+tgTlZXWijF3UkuIzWVfpnoaZHg2p4Wv1Rb8/PBpmbY1YeoLVblTKu/1HL7b26HJL0uUL5kA9Xa56ovnnq4s2l+ytbnqhj29mua6wa937ctJVTHyxqoYBboML2wvH/1P/rz9RLFb+YuuwvU3YDWmzoYrpEcR6ixXQsgEG2qubpnkNp0M9RuoC1oZhdMq3dA6UYo4kzqzvx2cnu97mlVNLB0zTIHMq8b7RdDyX256jX3gAlEt25/eYRF5p/7t2bRbdGdZPP8qgMRuM+ULRxydNK2YBCg8VVf+53BzDFOdGuuJlve5VwU2KM3RElUgTwdY3NW1XuQ==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(7416014)(10070799003)(23010399003)(376014)(1800799024)(366016)(56012099006)(18002099003)(22082099003)(921020);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MlExWEtlNGZjaE5hcU1iRUhicThGSi9WaWY2c3o1d0JHRzhnVE1GKzZMZ2Q0?=
- =?utf-8?B?WHV0WHFsQUhXQzdjcWczMUtSQ01JRDE0amxSMHUxOFhBSjN0VVZRdk8vOXBY?=
- =?utf-8?B?Z0p3dmwrY25ybTF0VUlLeXBQNGZUMG1LVzJlVngyZkFTRytCT0RXelMwbyt2?=
- =?utf-8?B?bEZXWXdVRkpBRytOWDE3RS9uUU4raXk2TFhYMGt5S281WnVrTVVsRFEzeUpr?=
- =?utf-8?B?WUVoK2l5U0ltUFgyOUVYT0oyU2dpSVNDZWVLMjJKclpJbzVSOUJnRVlMTFo0?=
- =?utf-8?B?NHFZY2UrUlU5YjdBZVY0ODZ1bWFzL1pEbkt6QlJ6UlJmWkloSzFOWGQwUlJt?=
- =?utf-8?B?ZnZTaWlFS2JFM3pDUTVGKzFQR05UNzcrdG1xSUU5K1o2WTdac0hKQnNMaGZT?=
- =?utf-8?B?MVBPdUh0T0hVWU5aVngvaGlEdUFuTHJFeDg1RW9kMFdhS21kbGNMejUzek1i?=
- =?utf-8?B?V2JENXh2MDRDWlFDeEFiWm9abkhBM0JjVVRVeEtiTGxvZFMxUnMrNXE2N3pp?=
- =?utf-8?B?dHorM3Y4ZDVwM3VMbjRUUmRLamxaYlpPQUZ0S2h3YnBDa0ZEMk5pTWVTVU1V?=
- =?utf-8?B?VnhJNVJCUHQvV0t4TkE3R0xSbkNNSThCTklYMGpyMFNiK05qSloxK0djZGE4?=
- =?utf-8?B?SENHd0R3MWlDbWJuYSs0dUh0SytWQ216Q0wzb3RJeVVrNFE4TlhYL2NrQ0pj?=
- =?utf-8?B?N3paY0x6ZzhYWGM0VkVpUFYyT1FGKzNrd3k3Y2EyUUl6UnNrQ2JRNE9ObEpL?=
- =?utf-8?B?M3B4NUhGYTJtNTN4cHQvU3dBYktqcW11YkFySnFPRk9NbCtuTXMvUUkxUllN?=
- =?utf-8?B?MlpPQzN5aTZkK0xDenZkYWo2dmRuQU5sZHRGWkhzbFdpYUhtY0hUdkwrWXJH?=
- =?utf-8?B?bjFzZFRGVDZYVXRMRjZtOXorcTdUa1ltSkVRbHZzSjFlK1lrRld4UTJzQlJR?=
- =?utf-8?B?azdITmtOajJVa0JZMm5uNzZ3TGNtUUJBZm5uZDVVUWtudldTd1kzZTR5ZEpq?=
- =?utf-8?B?b000VHUwdHh4Wi9NaTNROWhxMWcwcFU4ZHMyNnNsbGJCMmlETElOOUNXcEpV?=
- =?utf-8?B?bHYwQ2xjMnMwREFVTTlld3pxMXg3YlhmeTlENTRuSUFMdzdVcnp3R3RwZ1RP?=
- =?utf-8?B?QW9RaER5SlZyM3RyZ05KZ2kwZkFUN1MvUmtvT1IrN0FaQ0VZYTI5ZEdMbnNv?=
- =?utf-8?B?WDhmRnBHWGVRTmNuYnEwUUluVzBlcUR6cUN3cGdCNStqaWF6U0NmUWlIRDVR?=
- =?utf-8?B?SU9DVXJSWXNhMFdrTXo3Z0s5L2F2MlRNeHpLVkZLSlNOR1FJNktMY1drWXk1?=
- =?utf-8?B?RnVEbGxPeVZ3Q3NRRFdVcm14eHZIajE4QlZrMkQwbTlCZzE1M0NLVnZxK0Qy?=
- =?utf-8?B?NW5BWmVtbW5SeHQxbnJYOHF4Yk15MTZFb3BLdklmSmxpUkJldksyL3RhV0JC?=
- =?utf-8?B?UzluM05kTXpZWTREL09XWCtSM1hDdW1YblFyZlArRGNxaU1zbGRXOXhyNVVx?=
- =?utf-8?B?MTZDcjIvNHRGMjJGcE5hYUtJNnFiZ1pRS2lKUEJ2NXVDQ0IxVmVWSEhXNk10?=
- =?utf-8?B?UGJNWGhLeTFwK0RRL0pMbGZNUEJPL0tWekhxNWZxb1ZsYW9pZXFjdDIrQ1pH?=
- =?utf-8?B?Ry8xbW13MkhUNUkrMmhGZE05Zk8xemt6LzlSUDByTmN6VTNjUEl2OGYyRXBR?=
- =?utf-8?B?L0N2ZUpvTFBycGFzVlhURDJSUTNNU21QSXhDRFJXUTdESmVjbzVScXllamN1?=
- =?utf-8?B?TEQrM2VsOWdRSEJqQkw5c2loTXhkSjZ4UG5YS2hxa0hyemN1b2tadXFWajg4?=
- =?utf-8?B?bW9iK1ppNWYzKzRBdW5seG5tOGlxRjdsWkhGQUhEOHJGendZdGMyNnFNK1g2?=
- =?utf-8?B?V0hlM09qQWRYUFVzQ1VrdjJWTHF3TUkzNzR0b3VEQUFWdjNhcGpDNmJnMXBV?=
- =?utf-8?B?T1ByQkVQckluVHRmREZESThDZUEwaTRMY2pQSmR5WFNaZmJYNGlGdWxNZU5w?=
- =?utf-8?B?cmNMdWRmSGJYeit6N0Q0NnBzN091UitGYlUwTlc2YmNrck5iQ2xFZklvTEgz?=
- =?utf-8?B?SWltVDZTRUJhUUE3MzNPVzd4d3VTTnpYUEozYzJhWlBqZFBBRGpGU2JoZVBH?=
- =?utf-8?B?aWVlTlFUN2hMVUliWmxJeGNCRWV5bzBpSWh0cndMdWlNRVY1TzBneUdsdGxT?=
- =?utf-8?B?ekJRZVozQjA3cWxjampYN3A2QWl6WVM2N1NWSXp5WnkvRko3eWMvVHNNM1Ni?=
- =?utf-8?B?MTFWYlR4UHE2RDFwQlFxYktWeTlIMVgxSkpyaHIvMlJuK3N1NXlmUXRrSTNZ?=
- =?utf-8?B?cTl6aWR2ajVDTy96WEdGNDc0OEpWY2xIKzYwdkJBK3o0RDJ3cU91UT09?=
-X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: b2588099-4b92-48e0-0689-08dedb687ec8
-X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2026 14:11:38.4104
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YZUnxxOpG5p97CCr74kSLPcruxAX7U4o5SYk2LOnkQMSb0zCHDbYESyL5Yqn/4cEENGkGBB7Ljkt0DwTnPon+Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CW1P265MB9444
+Content-Type: text/plain; charset=US-ASCII
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[garyguo.net,none];
-	R_DKIM_ALLOW(-0.20)[garyguo.net:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
+	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[31];
+	TAGGED_FROM(0.00)[bounces-305092-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305090-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[google.com,gmail.com,linuxfoundation.org,kernel.org,debian.or.jp,netlab.is.tsukuba.ac.jp,HansenPartnership.com,oracle.com,taprogge.org,nvidia.com,lunn.ch,davemloft.net,redhat.com];
-	FORGED_RECIPIENTS(0.00)[m:bhelgaas@google.com,m:zhenzhong.duan@gmail.com,m:gregkh@linuxfoundation.org,m:rafael@kernel.org,m:dakr@kernel.org,m:dlemoal@kernel.org,m:cassel@kernel.org,m:gotom@debian.or.jp,m:yokota@netlab.is.tsukuba.ac.jp,m:James.Bottomley@HansenPartnership.com,m:martin.petersen@oracle.com,m:vaibhavgupta40@gmail.com,m:jens.taprogge@taprogge.org,m:idosch@nvidia.com,m:petrm@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:airlied@redhat.com,m:linux-pci@vger.kernel.org,m:driver-core@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:linux-ide@vger.kernel.org,m:linux-scsi@vger.kernel.org,m:industrypack-devel@lists.sourceforge.net,m:netdev@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:sashiko-bot@kernel.org,m:gary@garyguo.net,m:zhenzhongduan@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[gary@garyguo.net,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,verge.net.au,netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
+	FORGED_SENDER(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FORGED_RECIPIENTS(0.00)[m:zhaoyz24@mails.tsinghua.edu.cn,m:netdev@vger.kernel.org,m:horms@verge.net.au,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lvs-devel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[garyguo.net:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[ssi.bg:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gary@garyguo.net,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,garyguo.net:from_mime,garyguo.net:email,garyguo.net:mid,garyguo.net:dkim,vger.kernel.org:from_smtp]
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: ABCA2712407
+X-Rspamd-Queue-Id: 019567135EE
 
-Dynamic IDs are only guaranteed to be valid when dynids.lock is held,
-as remove_id_store can free the node. Thus, make a copy in
-pci_match_device. Also, clarify that the id parameter is only valid during
-probe.
 
-Reported-by: Sashiko <sashiko-bot@kernel.org>
-Link: https://lore.kernel.org/all/20260619170503.518F61F00A3A@smtp.kernel.org/
-Fixes: 0994375e9614 ("PCI: add remove_id sysfs entry")
-Signed-off-by: Gary Guo <gary@garyguo.net>
----
- drivers/pci/pci-driver.c | 28 +++++++++++++++-------------
- include/linux/pci.h      |  1 +
- 2 files changed, 16 insertions(+), 13 deletions(-)
+	Hello,
 
-diff --git a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
-index 2e80ae150ff4..4851061babcb 100644
---- a/drivers/pci/pci-driver.c
-+++ b/drivers/pci/pci-driver.c
-@@ -179,6 +179,7 @@ static const struct pci_device_id pci_device_id_any = {
-  * pci_match_device - See if a device matches a driver's list of IDs
-  * @drv: the PCI driver to match against
-  * @dev: the PCI device structure to match against
-+ * @id_copy: Place to store copy of pci_device_id for dynamic ID
-  *
-  * Used by a driver to check whether a PCI device is in its list of
-  * supported devices or in the dynids list, which may have been augmented
-@@ -186,9 +187,9 @@ static const struct pci_device_id pci_device_id_any = {
-  * structure or %NULL if there is no match.
-  */
- static const struct pci_device_id *pci_match_device(struct pci_driver *drv,
--						    struct pci_dev *dev)
-+						    struct pci_dev *dev,
-+						    struct pci_device_id *id_copy)
- {
--	struct pci_dynid *dynid;
- 	const struct pci_device_id *found_id = NULL;
- 	struct pci_device_id dev_id;
- 	int ret;
-@@ -200,17 +201,16 @@ static const struct pci_device_id *pci_match_device(struct pci_driver *drv,
- 
- 	dev_id = pci_id_from_device(dev);
- 	/* Look at the dynamic ids first, before the static ones */
--	spin_lock(&drv->dynids.lock);
--	list_for_each_entry(dynid, &drv->dynids.list, node) {
--		if (pci_match_one_id(&dynid->id, &dev_id)) {
--			found_id = &dynid->id;
--			break;
-+	scoped_guard(spinlock, &drv->dynids.lock) {
-+		struct pci_dynid *dynid;
-+
-+		list_for_each_entry(dynid, &drv->dynids.list, node) {
-+			if (pci_match_one_id(&dynid->id, &dev_id)) {
-+				*id_copy = dynid->id;
-+				return id_copy;
-+			}
- 		}
- 	}
--	spin_unlock(&drv->dynids.lock);
--
--	if (found_id)
--		return found_id;
- 
- 	found_id = do_pci_match_id(drv->id_table, &dev_id, ret > 0);
- 	if (found_id)
-@@ -466,12 +466,13 @@ void pci_probe_flush_workqueue(void)
- static int __pci_device_probe(struct pci_driver *drv, struct pci_dev *pci_dev)
- {
- 	const struct pci_device_id *id;
-+	struct pci_device_id id_copy;
- 	int error = 0;
- 
- 	if (drv->probe) {
- 		error = -ENODEV;
- 
--		id = pci_match_device(drv, pci_dev);
-+		id = pci_match_device(drv, pci_dev, &id_copy);
- 		if (id)
- 			error = pci_call_probe(drv, pci_dev, id);
- 	}
-@@ -1559,12 +1560,13 @@ static int pci_bus_match(struct device *dev, const struct device_driver *drv)
- 	struct pci_dev *pci_dev = to_pci_dev(dev);
- 	struct pci_driver *pci_drv;
- 	const struct pci_device_id *found_id;
-+	struct pci_device_id id_copy;
- 
- 	if (pci_dev_binding_disallowed(pci_dev))
- 		return 0;
- 
- 	pci_drv = (struct pci_driver *)to_pci_driver(drv);
--	found_id = pci_match_device(pci_drv, pci_dev);
-+	found_id = pci_match_device(pci_drv, pci_dev, &id_copy);
- 	if (found_id)
- 		return 1;
- 
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 64b308b6e61c..92c17c116de6 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -979,6 +979,7 @@ struct module;
-  *		function returns zero when the driver chooses to
-  *		take "ownership" of the device or an error code
-  *		(negative number) otherwise.
-+ *		The pci_device_id parameter is only valid during probe.
-  *		The probe function always gets called from process
-  *		context, so it can sleep.
-  * @remove:	The remove() function gets called whenever a device
+On Mon, 6 Jul 2026, Yizhou Zhao wrote:
 
--- 
-2.54.0
+> > On Jul 6, 2026, at 01:35, Julian Anastasov <ja@ssi.bg> wrote:
+> > 
+> > May be it is better starting from ip_vs_set_state()
+> > to provide new arg 'int iph_len/offset' (set to iph.len), down to
+> > state_transition(), sctp_state_transition() and set_sctp_state().
+> > Same for all protos. It should cost less stack and ipv6_find_hdr()
+> > calls and what matters most, correct iph context in case we
+> > have IP+ICMP+TCP (with just two ports or even with TCP flags)
+> > and are scheduling ICMP, i.e. not IP+TCP as usually.
+> 
+> I agree that the already parsed transport-header offset should be 
+> passed from ip_vs_set_state() down to the protocol state_transition() 
+> callbacks, instead of reparsing the skb in set_sctp_state(). We will 
+> send a v2 that does this for SCTP, TCP and the other IPVS protocols 
+> in one combined fix.
+> 
+> > But what I see is that ip_vs_in_icmp*() are missing
+> > the ip_vs_set_state(cp, IP_VS_DIR_INPUT, skb, pd) call just
+> > after ip_vs_in_stats() and before ip_vs_icmp_xmit() where
+> > we should provide ciph.len. That is why we don't reach the
+> > set_tcp_state() calls to set correct cp->state and timeout
+> > when scheduling related ICMP. So, this should be fixed too.
+> 
+> For the ICMP path, I agree that the missing ip_vs_set_state() call is
+> worth looking at, but using ICMP errors to drive the upper L4 state 
+> needs some care, because spoofed ICMP packets can match an 
+> existing embedded tuple before the endpoint TCP/SCTP stack 
+> performs its own validation. Maybe this change needs further
+> discussion?
+
+	May be only for the schedule_icmp case while the other
+ICMP replies should not change it:
+
+diff --git a/net/netfilter/ipvs/ip_vs_core.c b/net/netfilter/ipvs/ip_vs_core.c
+index 7f93239898ff..05fdcf4ce2c0 100644
+--- a/net/netfilter/ipvs/ip_vs_core.c
++++ b/net/netfilter/ipvs/ip_vs_core.c
+@@ -1971,6 +1971,8 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
+ 
+ 	/* do the statistics and put it back */
+ 	ip_vs_in_stats(cp, skb);
++	if (new_cp)
++		ip_vs_set_state(cp, IP_VS_DIR_INPUT, skb, pd, offset);
+ 	if (IPPROTO_TCP == cih->protocol || IPPROTO_UDP == cih->protocol ||
+ 	    IPPROTO_SCTP == cih->protocol)
+ 		offset += 2 * sizeof(__u16);
+
+	Here is why schedule_icmp was added:
+
+https://archive.linuxvirtualserver.org/html/lvs-devel/2015-08/msg00015.html
+
+	But the inner TCP header should be generated by the
+real server, not from the client, so things can go wrong. We can
+leave it as it is now - we will forward the ICMP to the right real 
+server by using short conn timeout...
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
 
 
