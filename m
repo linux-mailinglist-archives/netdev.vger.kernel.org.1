@@ -1,187 +1,201 @@
-Return-Path: <netdev+bounces-305134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305135-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3TNEIYzYS2pYbQEAu9opvQ
-	(envelope-from <netdev+bounces-305134-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 18:32:12 +0200
+	id +W2cC/DwS2qJdQEAu9opvQ
+	(envelope-from <netdev+bounces-305135-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 20:16:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5EE77134FD
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 18:32:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F61E7145FA
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 20:16:15 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=pKYVNxOv;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305134-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305134-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=intel.com header.s=Intel header.b=gp4sPCxu;
+	dmarc=pass (policy=none) header.from=intel.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305135-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305135-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5800031278F2
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 16:08:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4307730479EE
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 16:10:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43BC639EF20;
-	Mon,  6 Jul 2026 16:08:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67E843AE6E6;
+	Mon,  6 Jul 2026 16:10:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D34EE4014A5
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 16:08:26 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783354108; cv=pass; b=Qyt7dMUztA/6b+RwR5Y5ex5ElKcXwo+TQTvQRzFt//IfhdgFWCLTIcO44SWQiIVotMvZ+McPiqFwKJowgXt7LzMoHMvRsFYXSYXisxWY0XFYEQbgOOC7JuhT4ENKXaXbtLIVpCszxV0kvYQwmi9h61zdYMQWLM55zNC7oBDqbDM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783354108; c=relaxed/simple;
-	bh=/pcx26yWnumVx7kvmlQ1tjZLX4dp/hJE1UQTW/08s3I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n1j2jLlHlZEVbo4qcOlcbyF+dVuupTsBCVrs2Ds6vplZbAxl0917/ItZ0kY5V8kKELVA0sllS0zZ/hY53/iPqIhPtg6Qu/KYJpOW7hQPEBIO7Ou0HY2R9KQydNhb3uZfod3bGZbn0lWxQBZe0seV3OlGLuDMOhjke/vtXufcFw8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pKYVNxOv; arc=pass smtp.client-ip=209.85.216.41
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-380f3c1b087so236491a91.3
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 09:08:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783354106; cv=none;
-        d=google.com; s=arc-20260327;
-        b=bZOjz0d5lerRFkMj3o7w8GGEfYCrFsCwibHqoYHTVS+O5mSMMSIjy1gsXvOx16FwM/
-         LQ20p6epKQYoIYY1FAkjDGCnFI+/StrMzyRwQ1iCDS/pr+Br5Osbfe6ZYb1Swl/ke7or
-         OGlRLYY9Mn1MPIIIrdJaLQ0+hIh/1R2Y56Ny/5DtP1l7jbKBkJ7Mnf/bxpqpYNjDb+U7
-         zdLyhqZEqMfFJKydpLbk5qOowGgN9DwXFGxSQevVpC9iD/edRhfVJ3SOn8dQUL4X26F7
-         T6oJtQJDoqz7lSNYJvoMU5kZKm3SAwPM4lCXvKNJj6Itb6bru34lc1BgyfznhebfP5Y8
-         mHmQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=AoVUa+xESZdLy2HdVHs5BYMFE3jPA/o/dkMFEG3S7gE=;
-        fh=/jNq4QdmlUn/EdZCW1jynhF2aHgBlJz6Ocz++E50Nig=;
-        b=D4fgwcD3Iwd0IO7fjh88axKtdkq4LyQQvsXwnQWDwFo35QGZNjeRAMjREUapt09Y+Y
-         LWMpe6jGOIpaPTcWHb7qAQaTFBnnOnETcGKUofVat/g6ZgpQ8JMMXTr+pbfx8/ilAziP
-         7yLVH6lA5ir5eE9/G3bfLumqr3GwM/3e3FitFefS5TJwFNNboKWeVHjUSswb395tT9vr
-         GUlGDP0H7fzrv4phOGATAB1FseqlGCKEBC0sfd+U9pB2T/josjytw5Qop2a3WqkCjRpN
-         c9yoqkBBOyDtwybBK1aEYL/iCFWUnKBc44IFJcAoAXcREADlUPFN834lIiF12JoJMd6r
-         bg4A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783354106; x=1783958906; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=AoVUa+xESZdLy2HdVHs5BYMFE3jPA/o/dkMFEG3S7gE=;
-        b=pKYVNxOvc6quWOgMSwTscwMPsrz4xsQPSkK936SenxfKWROmEiJBacNZGNBiSg+NoH
-         AUwK/T7n0/HPI/3DVVIUfl92biUNT+GrTowCmVPDUaT9Ax2aiW3sEsOO5voQImNSUcsE
-         ZTobhKAhDhIy6ibKxPMiQPnxS9yWozCbdUO3l0Hp4muNbs8xiY73scCac8tGD+Mzwl1S
-         aN7Jp7xxHl+IZEMtu3OwnSmZoqfeHiG2pNf3daAaAeUJHO/ehDqKjjiJbDQP6KpZNtLH
-         VrkM9UO74p+E8KvV7QntukMbw7GBmc+WtlapnWgvTqoRg8Qxk9di2+wT36p/z9r00tlE
-         M4Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783354106; x=1783958906;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=AoVUa+xESZdLy2HdVHs5BYMFE3jPA/o/dkMFEG3S7gE=;
-        b=Xf8LGlOaprSctRpVWh/dgOzcSbC3P0gHWcIzsM4zfSx2WZNFd5j6wL84bareIlxvz2
-         VBhfDzeAPvhih6ft6KBIkfC+bRcb8qvq5bScEZvQjog7vYDh8nmhuyA847CRn85M3WNk
-         dJnzFGlZDnmCXtqHGrBYf57n/T+PXSZorHzbwrOHODU75FmvwxyhqyD4ZsaPCuik5wxS
-         DZcZdSox+Aj1cAUMQUTyi59v8/k3J8LQubXDGtZI7PuskhPsS51PDiojiC5wTINEdhk9
-         5DSWYWxqw0Ir0i/OpK/RoYTkQTIFwitGyw/2wonYzjpeLDTCYgGeBQ6QDZ9BYJUV2fZK
-         ct/A==
-X-Forwarded-Encrypted: i=1; AHgh+RpLI7DC/PrpQQuQWJzKECk9WA1qXURiIJmD70ZRtnqwKiEslJaLCStKks7Zq8C+tSZtRWUeFFU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydlHsEOyvU5TSq0m5Hei08RwoznF2rRd56YOSmZg9aNcYO/wbw
-	bng1YCF27j7jenCT2GJ65aqRJazqjcQn9/TpZhXist6tFEZcnvJ/KaHyOcNiFSGefSyANA8KlEK
-	iFoGYw6f8CqdoOEEHYZnliDTTVqiOrpw=
-X-Gm-Gg: AfdE7ckTsHSbMJ4lwwFJOEAnYTXbvN7b3CM16b6axFUK7k0V2Gb1LqhtG0mcfmAobrE
-	ZlBhpAGv974Wh6Hd4Atxwr+lSkNO6cwetXkPiy2JswNCqdA9zP66hBj3roJeoclP1l/XCUweWO9
-	rr1F3LMqcJPSHe/9s5JoQcGR1tdte8LoutFMJ7lpFvbIVt1MGUx4K+d/7kh0/c/9iCjkbkys8cQ
-	Bmcqo2ck5H+W2zU240lD2G5IwPLyDl8uj90AchuvKYpqQnCRQveQkHFj32ntiO3eJq1uLlSDK9W
-	5sq91juHtUSzL8+RjabrVo82khMWH9dJwoJmeoNkM3+SjU0qkgGV4wvCcCVtc/ns1lQfHPbv9YB
-	j2D6yYS/g6E7RI50ppmGXnp0=
-X-Received: by 2002:a17:90a:e703:b0:37f:fc3a:382d with SMTP id
- 98e67ed59e1d1-3829f4f05f3mr6252856a91.6.1783354106006; Mon, 06 Jul 2026
- 09:08:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F9C39F19E
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 16:10:19 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783354221; cv=none; b=LfzuJ3Ex+hJR4v/sb5a6eK6H1P/KcJ6xl09tW0ItVhQW1znZGCr4s9V3gVYWC6IkoixIYkJ7aymccJ5F7EwRlei2HREozSzTGyQZ8z00GFMOgkLDIXDgs6xHet+jKW9dOjZyJSw4PFyn+eFg+u3n+DCiP9ll2OdU96B8o+Fs1Xg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783354221; c=relaxed/simple;
+	bh=+MpXM3rms7tMeiOwh4i//Jc8YnWa+BFlnkeGhMYW3lw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kZYk2W+CZyTXLUsIxxrMHM7hIhgZqA08iDfUq2aK9UWwd9sjAYcRrzAXMsx1KXmiqFxLChtIFHHf5+Y+smGwLiUG35mIhlsrNvBa3ZdA/W3Tbum5Uq06UxIoCQZgaJ8EJTLwY3R8QF0Wr4HHLkO+e/ushLV6KDUqzJ9FqoZrwek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gp4sPCxu; arc=none smtp.client-ip=192.198.163.10
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1783354220; x=1814890220;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=+MpXM3rms7tMeiOwh4i//Jc8YnWa+BFlnkeGhMYW3lw=;
+  b=gp4sPCxuRYSbP7d2WAADViCRJt0UeWBCueI+7LutUeBoZDeNvFeIQkYR
+   JmzqNwwmmcgqrKS8TSI3hWtCyoiPVqsyNaWzPci86PHnHm28tQor+6oyD
+   i6BN17fZwb4+8vV3xTi6SoXm9r3J2hx45SyYkKYfhhA0gR54T6iD6yLgj
+   oTp263+VF4aOEJGZPWcyBMLPNdRoXN46gR2iP1ruduYabtyJ0tzk5YbPm
+   L3gZdPbpuR38qCnJrwjC8CzAXWQH+PIHqY1GkMnrn4EgNOFCQKa3RySRg
+   6EF5nQINLd92YhBc1RigiwKxGVDFQV/+SD1c5idr/mbNCHB7HI52iN7jg
+   w==;
+X-CSE-ConnectionGUID: uQ33TEdYQHqkRvDRkM0wUg==
+X-CSE-MsgGUID: Bb7LVZHwRACF52MBxhsQAg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11838"; a="95372048"
+X-IronPort-AV: E=Sophos;i="6.25,149,1779174000"; 
+   d="scan'208";a="95372048"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2026 09:10:19 -0700
+X-CSE-ConnectionGUID: v+mJnvRkRP+cPbTaEaVuPg==
+X-CSE-MsgGUID: 85eWajhgR/yxX4+BkyQtuw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,149,1779174000"; 
+   d="scan'208";a="257331802"
+Received: from lkp-server02.sh.intel.com (HELO ea128546eb3d) ([10.239.97.151])
+  by orviesa003.jf.intel.com with ESMTP; 06 Jul 2026 09:10:17 -0700
+Received: from kbuild by ea128546eb3d with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wgltf-00000000EX5-04qL;
+	Mon, 06 Jul 2026 16:10:15 +0000
+Date: Tue, 7 Jul 2026 00:09:43 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	intel-wired-lan@lists.osuosl.org
+Cc: oe-kbuild-all@lists.linux.dev, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] ixgbe: E610: force phy
+ link to get down when interface is down
+Message-ID: <202607070035.qAAqVjGH-lkp@intel.com>
+References: <20260706094330.186341-1-jedrzej.jagielski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260705-net-vert-imp-v1-0-95a35ddff411@gurudas.dev>
- <20260705-net-vert-imp-v1-2-95a35ddff411@gurudas.dev> <d2c1e11e-e616-4b2f-aa17-5eb96f045833@lunn.ch>
- <DJRKZD8LBXXH.MCISM5ZLNVMP@garyguo.net> <c1d24c8b-1c1d-4784-88a6-3cbb519d0406@lunn.ch>
-In-Reply-To: <c1d24c8b-1c1d-4784-88a6-3cbb519d0406@lunn.ch>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 6 Jul 2026 18:08:12 +0200
-X-Gm-Features: AVVi8CdBSCoos-8Xf_1FW4B4T0T9EY3XoD_ftwX1kAKbHtdENbzPvjUg2ExMSZo
-Message-ID: <CANiq72kHVkG3MbyUH82WwmhPXQrSe6ZJaqMrdOV-05Kg60NfgA@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] net: phy: qt2025: Use vertical import style
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Gary Guo <gary@garyguo.net>, Miguel Ojeda <ojeda@kernel.org>, 
-	Guru Das Srinagesh <linux@gurudas.dev>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
-	Trevor Gross <tmgross@umich.edu>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260706094330.186341-1-jedrzej.jagielski@intel.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-4.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-305135-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305134-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:gary@garyguo.net,m:ojeda@kernel.org,m:linux@gurudas.dev,m:fujita.tomonori@gmail.com,m:tmgross@umich.edu,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:rust-for-linux@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:fujitatomonori@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[miguelojedasandonis@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_SENDER(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:jedrzej.jagielski@intel.com,m:intel-wired-lan@lists.osuosl.org,m:oe-kbuild-all@lists.linux.dev,m:anthony.l.nguyen@intel.com,m:netdev@vger.kernel.org,m:aleksandr.loktionov@intel.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[miguelojedasandonis@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[garyguo.net,kernel.org,gurudas.dev,gmail.com,umich.edu,armlinux.org.uk,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,rust-lang.org:url]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:from_mime,intel.com:email,intel.com:mid,intel.com:dkim,vger.kernel.org:from_smtp,01.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E5EE77134FD
+X-Rspamd-Queue-Id: 7F61E7145FA
 
-On Mon, Jul 6, 2026 at 5:51=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> How often does the style edition change? Is there a 2026? How much
-> changes in each one?
+Hi Jedrzej,
 
-Every 3 years or so. For 2024, not much changes -- you can easily try
-yourself passing the `--style-edition` flag. From a quick look, it is
-almost all just the import sorting:
+kernel test robot noticed the following build errors:
 
-  https://doc.rust-lang.org/style-guide/editions.html
+[auto build test ERROR on tnguy-next-queue/dev-queue]
 
-> features. Style patches are mostly a waste of reviewer/maintainer
-> time, because some actually break stuff, so need to be reviewed just
+url:    https://github.com/intel-lab-lkp/linux/commits/Jedrzej-Jagielski/ixgbe-E610-force-phy-link-to-get-down-when-interface-is-down/20260706-180351
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git dev-queue
+patch link:    https://lore.kernel.org/r/20260706094330.186341-1-jedrzej.jagielski%40intel.com
+patch subject: [Intel-wired-lan] [PATCH iwl-next v2] ixgbe: E610: force phy link to get down when interface is down
+config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20260707/202607070035.qAAqVjGH-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 16.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260707/202607070035.qAAqVjGH-lkp@intel.com/reproduce)
 
-Yes, we don't particularly like those either, but this is not like
-those: it is not a manual process, and very, very unlikely to
-functionally break anything (and trivially reviewed, from my
-inspection above).
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202607070035.qAAqVjGH-lkp@intel.com/
 
-Just to clarify further: if we decided to do this, which is not a
-given, this would be a treewide change done at once (because
-formatting is enforced treewide), and nothing you would need to
-review.
+All errors (new ones prefixed by >>):
 
-Cheers,
-Miguel
+   drivers/net/ethernet/intel/ixgbe/ixgbe_main.c: In function 'ixgbe_close':
+>> drivers/net/ethernet/intel/ixgbe/ixgbe_main.c:7572:25: error: implicit declaration of function 'e_error'; did you mean 'e_err'? [-Wimplicit-function-declaration]
+    7572 |                         e_error(drv, "Cannot set PHY link down\n");
+         |                         ^~~~~~~
+         |                         e_err
+>> drivers/net/ethernet/intel/ixgbe/ixgbe_main.c:7572:33: error: 'drv' undeclared (first use in this function)
+    7572 |                         e_error(drv, "Cannot set PHY link down\n");
+         |                                 ^~~
+   drivers/net/ethernet/intel/ixgbe/ixgbe_main.c:7572:33: note: each undeclared identifier is reported only once for each function it appears in
+
+
+vim +7572 drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+
+  7544	
+  7545	/**
+  7546	 * ixgbe_close - Disables a network interface
+  7547	 * @netdev: network interface device structure
+  7548	 *
+  7549	 * Returns 0, this is not allowed to fail
+  7550	 *
+  7551	 * The close entry point is called when an interface is de-activated
+  7552	 * by the OS.  The hardware is still under the drivers control, but
+  7553	 * needs to be disabled.  A global MAC reset is issued to stop the
+  7554	 * hardware, and all transmit and receive resources are freed.
+  7555	 **/
+  7556	int ixgbe_close(struct net_device *netdev)
+  7557	{
+  7558		struct ixgbe_adapter *adapter = ixgbe_from_netdev(netdev);
+  7559	
+  7560		ixgbe_ptp_stop(adapter);
+  7561	
+  7562		if (netif_device_present(netdev))
+  7563			ixgbe_close_suspend(adapter);
+  7564	
+  7565		ixgbe_fdir_filter_exit(adapter);
+  7566	
+  7567		if (adapter->flags2 & IXGBE_FLAG2_LINK_DOWN_ON_CLOSE) {
+  7568			int err;
+  7569	
+  7570			err = ixgbe_disable_phy_link(&adapter->hw);
+  7571			if (err)
+> 7572				e_error(drv, "Cannot set PHY link down\n");
+  7573	
+  7574			ixgbe_handle_link_down(adapter);
+  7575		}
+  7576	
+  7577		ixgbe_release_hw_control(adapter);
+  7578	
+  7579		return 0;
+  7580	}
+  7581	
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
