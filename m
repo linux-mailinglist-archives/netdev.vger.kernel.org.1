@@ -1,187 +1,157 @@
-Return-Path: <netdev+bounces-304997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304998-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id CHXYD0OvS2r6YQEAu9opvQ
-	(envelope-from <netdev+bounces-304997-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 15:36:03 +0200
+	id Q7FFAKKxS2qLYgEAu9opvQ
+	(envelope-from <netdev+bounces-304998-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 15:46:10 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AC0671157C
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 15:36:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EABB7116FF
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 15:46:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b=FU526xmj;
-	dmarc=pass (policy=none) header.from=debian.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304997-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304997-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=a+0XmIjt;
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304998-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304998-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4570933558D8
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 11:56:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 421CE32747F2
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 12:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1603242254A;
-	Mon,  6 Jul 2026 11:55:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F6042376E;
+	Mon,  6 Jul 2026 12:00:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B55B41DEE2;
-	Mon,  6 Jul 2026 11:55:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D8132C21D8
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 12:00:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783338956; cv=none; b=er/pOzL87uW7VotAhYFDS2WG/KewpFSijEtVa2iF64ibL4qj9TBZx3NWKK4cS60zljPEujjdTBuLen1zAMSd2OvBoBJpFW+i17kgWzMyAG6DDh+WBvFJgwHmUIDI5VCiC1ptQ6TyWJ3Ql5vTPM0Sb2+x1BPoWaKfbHgOf00AqIU=
+	t=1783339212; cv=none; b=PslnDwgu2MO/ioMAgmb9utxcLmvLgTTAQJCW2Pyv0b9P8Hj9+WAd8cISMfHhGFnwJM7h4uIeAHPU1zhW0RpdM/Gokw1eLhNlkZQmFNkPgAnk2c8BZM+SvZMWgVfhq9nrpu84tMFEemR6jabr7pjRTt1NOlLzwgdnkM6U67FWi5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783338956; c=relaxed/simple;
-	bh=PTZG7m33xMH9SopMNkZXNBhboWoPLdaQI18YqDUA4dE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZmAiAgG1sdGiyS91M58RYED3KU25wipm2Z3CC73lybNppINn0fafWGTcg2Ri6IHLbzh5e+x4PrBjM71t3HH4QumhDsseJXWrdUSrJefaHgCXegoFsOsHgCd2bdqQvtmXns5ywkRAaGjCx3pEgAv5nEBT8iN/KjUvbZ4zzcUVQ74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=FU526xmj; arc=none smtp.client-ip=82.195.75.108
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=85baL4XzLdV4LjyrP8NBxWz1/vTMzqtO5DKNhG+R0N8=; b=FU526xmjgtWw5jczs74aRiAnqR
-	0fyhjwWFvAJr7M3i50dub4+s/M7pUhzBbJOdQor/hbuyMx6/0Xkki9o+WlPNbWE5cJ5fEm0qT3zcM
-	25+2qPH1ILNuwToXGzH5EENZF1kJDjWRKt6yJiBbDDk+W/SUar1084Cz5gPX//x+uQNNP7Gjl9jNB
-	xdkAwJ0SeAJy2d4MfdTq18D5cm1aaWazSeOlf56ixma4/4ycVFqwzxxZbItMUdiSJQ5I+WlMv87rJ
-	/nKecPObH/KvbSp7dA55TcS81fr9HF6SgKzE9QS9m4565Rhjrc+RESxhnArTjSdL8iHObStMpu4ww
-	s56JGEgQ==;
-Received: from authenticated-user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wghvL-001OeM-2u;
-	Mon, 06 Jul 2026 11:55:45 +0000
-Date: Mon, 6 Jul 2026 04:55:35 -0700
-From: Breno Leitao <leitao@debian.org>
-To: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: netdev@vger.kernel.org, asantostc@gmail.com, gustavold@gmail.com, 
-	linux-kernel@vger.kernel.org, kernel-team@meta.com
-Subject: Re: [PATCH net-next v2 0/8] netconsole: stop charging netpoll users
- for netconsole-only data
-Message-ID: <akuUkNgyjVOTHMuz@gmail.com>
-References: <20260702-netconsole_move_more-v2-0-1ebedd921dcb@debian.org>
+	s=arc-20240116; t=1783339212; c=relaxed/simple;
+	bh=dmuDp7Fv2tAk9iFKwhsczkmrqeRavBEb7VkFUV/pxoE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=HYNRlfslErGbYx4oXV7ALMdaO2+jiEl+HVvnXkYMlFgaNr7lp1/sd5QtDGIbUD79lgA1t6nDlwvN1T+9jhwXaWRj5OmEc7xv+4Z2zAnf8P2hI7OOSnOeXurQJwnQCha7ty5wbcNeBMlYe4PUWTSaQE93ALA57y6D8CPyBlh3eac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a+0XmIjt; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783339210;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dmuDp7Fv2tAk9iFKwhsczkmrqeRavBEb7VkFUV/pxoE=;
+	b=a+0XmIjtC3f6tOpvV5yFrzJ3pisMRV9g/CNOrwow1t57s6kIHJU8zeK0JxI9UEQNM/h/Lu
+	b6OM2UY/q3c3vJFClw8lR2n3QsWh5XOFGYGdIw/WP3/vh5zYWEXpUMdQ7GY7j7zr6miOzq
+	m7CNuo9WiChVBHrTxAvhUdarXXXuVn0=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-88-JpE8dzbuOCq9raDZS0k0Lg-1; Mon,
+ 06 Jul 2026 08:00:07 -0400
+X-MC-Unique: JpE8dzbuOCq9raDZS0k0Lg-1
+X-Mimecast-MFC-AGG-ID: JpE8dzbuOCq9raDZS0k0Lg_1783339205
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6A8D018052DB;
+	Mon,  6 Jul 2026 12:00:05 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.81.35])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A11CC1956088;
+	Mon,  6 Jul 2026 12:00:03 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Asim Viladi Oglu Manizada <manizada@pm.me>
+Cc: netdev@vger.kernel.org,  dev@openvswitch.org,  echaudro@redhat.com,
+  i.maximets@ovn.org,  davem@davemloft.net,  edumazet@google.com,
+  kuba@kernel.org,  pabeni@redhat.com,  horms@kernel.org,
+  stable@vger.kernel.org
+Subject: Re: [PATCH net] net: openvswitch: reject oversized nested action attrs
+In-Reply-To: <20260706094336.38639-1-manizada@pm.me> (Asim Viladi Oglu
+	Manizada's message of "Mon, 06 Jul 2026 09:44:10 +0000")
+References: <20260706094336.38639-1-manizada@pm.me>
+Date: Mon, 06 Jul 2026 08:00:02 -0400
+Message-ID: <f7ttsqc2urh.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260702-netconsole_move_more-v2-0-1ebedd921dcb@debian.org>
-X-Debian-User: leitao
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304998-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304997-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,meta.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:asantostc@gmail.com,m:gustavold@gmail.com,m:linux-kernel@vger.kernel.org,m:kernel-team@meta.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:manizada@pm.me,m:netdev@vger.kernel.org,m:dev@openvswitch.org,m:echaudro@redhat.com,m:i.maximets@ovn.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[aconole@redhat.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aconole@redhat.com,netdev@vger.kernel.org];
 	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[debian.org:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,pm.me:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8AC0671157C
+X-Rspamd-Queue-Id: 4EABB7116FF
 
-On Thu, Jul 02, 2026 at 05:19:44AM -0700, Breno Leitao wrote:
-> This work continue to untangle netconsole and netpoll, improving
-> memory usage for netpoll users that are not netconsole.
+Asim Viladi Oglu Manizada <manizada@pm.me> writes:
 
-Quick follow up on the sashiko findings. most of them are assuming that
-netconsole_write is called locklelly, which is not the case, except
-on panic (CON_NBCON_ATOMIC_UNSAFE). 
+> Open vSwitch stores generated flow actions as nlattrs, whose nla_len
+> field is u16. Commit a1e64addf3ff ("net: openvswitch: remove
+> misbehaving actions length check") allowed the total sw_flow_actions
+> stream to grow beyond 64 KiB, which is valid, but also removed the last
+> guard preventing a generated nested action attribute from exceeding
+> U16_MAX.
+>
+> An oversized generated container can thus be closed with a truncated
+> nla_len. A later dump or teardown then walks a structurally different
+> stream than the one that was validated. In particular, an oversized
+> nested CLONE/CT action may cause subsequent bytes in the generated
+> stream to be interpreted as independent actions.
+>
+> Keep the larger total-action-stream behavior, but make nested action
+> close reject generated containers that do not fit in nla_len, and return
+> the error through all callers. For recursive SAMPLE, CLONE, DEC_TTL, and
+> CHECK_PKT_LEN builders, trim resource-owning action-list tails in reverse
+> construction order before discarding failed wrappers, so resources copied
+> into the rejected tails are released before the wrappers are removed.
+>
+> Most failed outer wrappers are discarded by truncating actions_len after
+> child resources have been released. CHECK_PKT_LEN also trims its parent
+> after branch resources are gone. SET/TUNNEL close failures unwind their
+> known tun_dst ownership directly, and SET_TO_MASKED has no external
+> ownership and truncates on close failure.
+>
+> Fixes: a1e64addf3ff ("net: openvswitch: remove misbehaving actions
+> length check")
+> Cc: stable@vger.kernel.org
+> Assisted-by: avom-custom-harness:gpt-5.5-qwen3.6-mod-mix
+> Signed-off-by: Asim Viladi Oglu Manizada <manizada@pm.me>
+> ---
 
+Thanks for the fix!
 
-There are in order as they appear in
-https://sashiko.dev/#/patchset/20260702-netconsole_move_more-v2-0-1ebedd921dcb%40debian.org
-
-Tl;DR: There are two pre-existing issue that I will get fixed, but
-I don't think they are blockers for this series (IMO).
-
-Details of the findings and analyzes:
-
-1) This isn't a bug introduced by this patch, but is it safe to modify
-   target_list using standard list primitives while netconsole_write()
-   iterates over it locklessly?
-
-netconsole_write() is never called without the lock, unless on
-emergency, which is known to be unsafe (CON_NBCON_ATOMIC_UNSAFE).
-
-Sashiko doesn't undersatnd that nbcon .device_lock
-(netconsole_device_lock), is called before netconsole_write
-
-2) This is a pre-existing issue, but I noticed a potential race
-   condition between netdevice events and configfs rmdir that skips
-   cleanup. If netconsole_netdev_event() processes NETDEV_RELEASE or
-   NETDEV_JOIN, it sets nt->state = STATE_DISABLED and moves the target
-   to target_cleanup_list:
-
-This is a pre-existing issue, and I am happy to fix in here or as
-a follow-up
-
-
-3) This isn't a bug introduced by this patch, but I found a potential
-   lockless iteration race in netconsole_write() in this file.
-
-Again, netconsole_write() is not called locklelssly. 
-
-
-4) This is a pre-existing issue, but does lockless iteration of
-   target_list in netconsole_write() race with non-RCU list
-   modifications?
-
-Same as above.
-
-5) This is a pre-existing issue, but is there a race condition between
-   interface disablement and configfs removal that skips cleanup?
-
-This is a pre-existing issue, and I am happy to fix in here or as
-a follow-up.
-
-6) This is a pre-existing issue, but does skb_dequeue() acquire
-   a spinlock_t in NMI contexts?
-
-netconsole is not used on NMI contexts, unless on emergency
-(CON_NBCON_ATOMIC_UNSAFE).
-
-7) When netconsole_write() is called as an atomic console callback, it
-   iterates target_list locklessly. Concurrently, if a privileged user
-   removes the target via configfs:
-
-netconsole_write() is only called on atomic context on emergencies.
-There is no conflict with configfs.
-
-8) This isn't a bug introduced by this patch, but could the lockless
-   iteration of target_list in netconsole_write() race with list
-   removal? In drivers/net/netconsole.c:netconsole_write():
-
-Same as above, netconsole_write() are not called locklessly except on
-ops.
+Reviewed-by: Aaron Conole <aconole@redhat.com>
 
 
