@@ -1,328 +1,494 @@
-Return-Path: <netdev+bounces-304955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304948-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id G4TrM+KBS2pcSgEAu9opvQ
-	(envelope-from <netdev+bounces-304955-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 12:22:26 +0200
+	id a+KgEmJ9S2oQSQEAu9opvQ
+	(envelope-from <netdev+bounces-304948-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 12:03:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B01BE70F189
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 12:22:25 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4899A70EDDF
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 12:03:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=QepcjkmT;
-	dmarc=pass (policy=none) header.from=intel.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304955-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-304955-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=pm.me header.s=protonmail3 header.b=KhZ6SypG;
+	dmarc=pass (policy=quarantine) header.from=pm.me;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304948-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304948-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 93314301ACB8
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 10:10:22 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4ED75300E175
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 10:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2639401A2A;
-	Mon,  6 Jul 2026 10:02:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90A753AF64F;
+	Mon,  6 Jul 2026 09:44:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mail-24417.protonmail.ch (mail-24417.protonmail.ch [109.224.244.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79FDC36C9EC
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 10:02:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC65233F588
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 09:44:21 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783332170; cv=none; b=oVLa0kmlPUVJi4GPJw4uIEt4UPWxSl7W+niO1lQRTifZ7dOo5o5p4QNpgRD6DB1OifTHGoHvpKc90TQBx/o+Atd+s9MhLr4K2itsTjvcD73JR/83d2UNdzToyzYmzIMxyQ4vHZRY81xdqQPkAz7ebUnVoEkz0JUn5TSd5x9Czxc=
+	t=1783331066; cv=none; b=A5NioqQplnRc+ebo6WAd//6M0FJfnJPMw3hEOTTKBPJ5mmafAcTY5jCllKQ2efDfy/NXsOTGssoiA3fjsUxm/P9Vgq5gxkqCqvjMu7HmGE5WBKG3QZmJ9bZdFAPZi7ONBZ+dlXtuMPbpzFMOPYHiwGJxRHoVhXdCdKUWWdwbCTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783332170; c=relaxed/simple;
-	bh=2yPPPI4sVPsogh1N8K42E/+yAXC8cm8D6ZakBHj/BSM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lPfgyDRWAZfhaUYzxBWJvMMMWiExYcs8Ryl0wk6aoVbWR7GZStKtH8XpyItjTyqAuOHGTS2mYedEwi925GfrjKAF+etAsI0beZxtyQdIw5FSMD965orKYti0yNjRCInU84D+uqkW7IOpRRk8xDNjtwxitr7A5lXqBvAiKbf9Znc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QepcjkmT; arc=none smtp.client-ip=192.198.163.11
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1783332168; x=1814868168;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=2yPPPI4sVPsogh1N8K42E/+yAXC8cm8D6ZakBHj/BSM=;
-  b=QepcjkmT0abBR7HoP3p/mDCO5UcV7mKQNxcWlBiPZ/EMaJgTCvd5LTr9
-   J6t5XJvxVi/NHL3T5KEmoBwxm7Uh0Bi5NRntMZQEhY79nhJnTXTbpr34L
-   BCwECeWcAQgXaTM7+AiTBZqg15++4ClfXMchdoqIXLCeMnrI0eVyJbF9r
-   wH08ALvzKvX7kkfBMPOm8gNyf4pgANHkqIwIlEbwHEfKRLssrfVhafWyI
-   zVGDxgmctRI9tgNsYlu8G4MlPWwXiaHCwIkaXLKZjzSXVeDntx2lddMX4
-   iMfZbIjhNqJ4F5Xnn2ZZbjMF4Ygwis8RkPP+hJiZfbJcJ4+erFAUNgkOE
-   g==;
-X-CSE-ConnectionGUID: VmDYGjudQbykrhpgbJ/IMw==
-X-CSE-MsgGUID: I9Oa0PfXRa+GeYhviE3CQw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11838"; a="94566405"
-X-IronPort-AV: E=Sophos;i="6.25,149,1779174000"; 
-   d="scan'208";a="94566405"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2026 03:02:47 -0700
-X-CSE-ConnectionGUID: uUOeQ0LSSqCEQ38s38Xcmg==
-X-CSE-MsgGUID: ECgfHR/gQtupEWtSNd6oJA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,149,1779174000"; 
-   d="scan'208";a="251930799"
-Received: from os-delivery.igk.intel.com ([10.102.18.218])
-  by orviesa006.jf.intel.com with ESMTP; 06 Jul 2026 03:02:47 -0700
-From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH iwl-next v2] ixgbe: E610: force phy link to get down when interface is down
-Date: Mon,  6 Jul 2026 11:43:29 +0200
-Message-Id: <20260706094330.186341-1-jedrzej.jagielski@intel.com>
-X-Mailer: git-send-email 2.31.1
+	s=arc-20240116; t=1783331066; c=relaxed/simple;
+	bh=LyZ7USrGTzjrwZfR+WI6R8k9aQX/v7fy5DSBrfm3HSA=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=jJNpXEeL7M2pSHlBa5xAdLWKZLaNu6sHIU/1YNscjprG0iaYRk0zCJ1oULjYLNnmQ+HG36g/toZXvF+LVqVkuKLlq2C7icjDykpwOslWWs50+Wtej57SFwrz0q2zusSwq1RFcUOg2zpeWkF5bNDhztQw6KSj5L79lPknFLrQebQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=KhZ6SypG; arc=none smtp.client-ip=109.224.244.17
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
+	s=protonmail3; t=1783331058; x=1783590258;
+	bh=qOP5ugd7F6WEKBkmHSFpTwvR8Q3X0jNzSw53nWX6T5Q=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=KhZ6SypG4/5lRcmd2fS23xFMZ+Xvp6CF3ilY4rRMWNuS1xcqPIEuZiCZkaV4ExGL1
+	 AGm7NDi0ZWUytmkKHsgr/UHqAs5nL1RjnezY6EciOu/ePcghyhzqKeBd+YDGYVjxqK
+	 RyxAeawAwRsu0rsz6de9Fkwk6ENsrdBJUAPVsJo8yNkP14HseWILeaGoW9xP3Guy7I
+	 OEXuCyYrdk6hHHNhDFfCb0hf+6fKxPPIvhj3ASf40AubTXSOmPlxuwfTG2Md5v2160
+	 NCZHyazEMesixpDM691xr81rWAdS0zedaCVu26yUvnozE3/9OED6AoCV3OadM9Uwj9
+	 i8wM4aqc8LR2A==
+Date: Mon, 06 Jul 2026 09:44:10 +0000
+To: netdev@vger.kernel.org
+From: Asim Viladi Oglu Manizada <manizada@pm.me>
+Cc: dev@openvswitch.org, aconole@redhat.com, echaudro@redhat.com, i.maximets@ovn.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, Asim Viladi Oglu Manizada <manizada@pm.me>, stable@vger.kernel.org
+Subject: [PATCH net] net: openvswitch: reject oversized nested action attrs
+Message-ID: <20260706094336.38639-1-manizada@pm.me>
+Feedback-ID: 37265593:user:proton
+X-Pm-Message-ID: 1b1fac981c097f6e0f9116a6b84f87d28ca04ea0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[pm.me,quarantine];
+	R_DKIM_ALLOW(-0.20)[pm.me:s=protonmail3];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304955-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:dev@openvswitch.org,m:aconole@redhat.com,m:echaudro@redhat.com,m:i.maximets@ovn.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:manizada@pm.me,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304948-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:anthony.l.nguyen@intel.com,m:netdev@vger.kernel.org,m:jedrzej.jagielski@intel.com,m:aleksandr.loktionov@intel.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[manizada@pm.me,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[jedrzej.jagielski@intel.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jedrzej.jagielski@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[manizada@pm.me,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[pm.me:+];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:from_mime,intel.com:email,intel.com:mid,intel.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,pm.me:from_mime,pm.me:email,pm.me:mid,pm.me:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B01BE70F189
+X-Rspamd-Queue-Id: 4899A70EDDF
 
-For the E610 family, similarly to the E8xx adapters, the default behavior
-is for the PHY link to remain up even when the corresponding OS interface
-is down.
+Open vSwitch stores generated flow actions as nlattrs, whose nla_len
+field is u16. Commit a1e64addf3ff ("net: openvswitch: remove
+misbehaving actions length check") allowed the total sw_flow_actions
+stream to grow beyond 64 KiB, which is valid, but also removed the last
+guard preventing a generated nested action attribute from exceeding
+U16_MAX.
 
-Add function setting down the PHY config IXGBE_ACI_PHY_ENA_LINK bit
-what leads to disabling PHY link.
+An oversized generated container can thus be closed with a truncated
+nla_len. A later dump or teardown then walks a structurally different
+stream than the one that was validated. In particular, an oversized
+nested CLONE/CT action may cause subsequent bytes in the generated
+stream to be interpreted as independent actions.
 
-Now ixgbe_close() needs to share some of the ixgbe_watchdog_link_is_down
-code so move the common part into the separate function.
+Keep the larger total-action-stream behavior, but make nested action
+close reject generated containers that do not fit in nla_len, and return
+the error through all callers. For recursive SAMPLE, CLONE, DEC_TTL, and
+CHECK_PKT_LEN builders, trim resource-owning action-list tails in reverse
+construction order before discarding failed wrappers, so resources copied
+into the rejected tails are released before the wrappers are removed.
 
-Align functionality with the implementation of the ice driver.
+Most failed outer wrappers are discarded by truncating actions_len after
+child resources have been released. CHECK_PKT_LEN also trims its parent
+after branch resources are gone. SET/TUNNEL close failures unwind their
+known tun_dst ownership directly, and SET_TO_MASKED has no external
+ownership and truncates on close failure.
 
-Let user to configure link-down-on-close enablement through ethtool.
-
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Fixes: a1e64addf3ff ("net: openvswitch: remove misbehaving actions length c=
+heck")
+Cc: stable@vger.kernel.org
+Assisted-by: avom-custom-harness:gpt-5.5-qwen3.6-mod-mix
+Signed-off-by: Asim Viladi Oglu Manizada <manizada@pm.me>
 ---
-v2: apply Paul's notes
----
- drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  1 +
- drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 35 ++++++++++++++++++-
- drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |  1 +
- .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  | 15 ++++++++
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 27 +++++++++++---
- 5 files changed, 73 insertions(+), 6 deletions(-)
+ net/openvswitch/flow_netlink.c | 201 +++++++++++++++++++++++++--------
+ 1 file changed, 157 insertions(+), 44 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-index 30f62174acf2..7bbb82dd962c 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-@@ -685,6 +685,7 @@ struct ixgbe_adapter {
- #define IXGBE_FLAG2_MOD_POWER_UNSUPPORTED	BIT(22)
- #define IXGBE_FLAG2_API_MISMATCH		BIT(23)
- #define IXGBE_FLAG2_FW_ROLLBACK			BIT(24)
-+#define IXGBE_FLAG2_LINK_DOWN_ON_CLOSE		BIT(25)
- 
- 	/* Tx fast path data */
- 	int num_tx_queues;
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-index 831cfe9a4697..02bc0dac5123 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-@@ -1923,6 +1923,33 @@ void ixgbe_fc_autoneg_e610(struct ixgbe_hw *hw)
- 	hw->fc.current_mode = hw->fc.requested_mode;
+diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.=
+c
+index 13052408a132..d8079dee700e 100644
+--- a/net/openvswitch/flow_netlink.c
++++ b/net/openvswitch/flow_netlink.c
+@@ -2496,13 +2496,56 @@ static inline int add_nested_action_start(struct sw=
+_flow_actions **sfa,
+ =09return used;
  }
- 
-+/**
-+ * ixgbe_disable_phy_link - force phy link to get down
-+ * @hw: pointer to hardware structure
-+ *
-+ * Send 0x0601 with the IXGBE_ACI_PHY_ENA_LINK bit set down.
-+ *
-+ * Return: the exit code of the operation.
+=20
+-static inline void add_nested_action_end(struct sw_flow_actions *sfa,
+-=09=09=09=09=09 int st_offset)
++static inline int add_nested_action_end(struct sw_flow_actions *sfa,
++=09=09=09=09=09int st_offset)
+ {
+-=09struct nlattr *a =3D (struct nlattr *) ((unsigned char *)sfa->actions +
+-=09=09=09=09=09=09=09       st_offset);
++=09struct nlattr *a;
++=09u32 attr_len;
++
++=09if (WARN_ON_ONCE(st_offset < 0 ||
++=09=09=09 (u32)st_offset > sfa->actions_len))
++=09=09return -EINVAL;
++
++=09attr_len =3D sfa->actions_len - (u32)st_offset;
++=09if (WARN_ON_ONCE(attr_len < NLA_HDRLEN))
++=09=09return -EINVAL;
+=20
+-=09a->nla_len =3D sfa->actions_len - st_offset;
++=09if (attr_len > U16_MAX)
++=09=09return -EMSGSIZE;
++
++=09a =3D (struct nlattr *)((u8 *)sfa->actions + st_offset);
++=09a->nla_len =3D attr_len;
++=09return 0;
++}
++
++/* Free the generated action-list tail at @start and truncate it.
++ * If @nested, @start points to its containing nlattr header.
 + */
-+int ixgbe_disable_phy_link(struct ixgbe_hw *hw)
++static void ovs_nla_trim(struct sw_flow_actions *sfa, int start, bool nest=
+ed)
 +{
-+	struct ixgbe_aci_cmd_get_phy_caps_data pcaps = {};
-+	struct ixgbe_aci_cmd_set_phy_cfg_data pcfg = {};
-+	int err;
++=09const struct nlattr *actions;
++=09u32 len;
 +
-+	err = ixgbe_aci_get_phy_caps(hw, false, IXGBE_ACI_REPORT_ACTIVE_CFG,
-+				     &pcaps);
-+	if (err)
-+		return err;
++=09if (start < 0)
++=09=09return;
 +
-+	ixgbe_copy_phy_caps_to_cfg(&pcaps, &pcfg);
++=09if (WARN_ON_ONCE((u32)start > sfa->actions_len))
++=09=09return;
 +
-+	pcfg.caps &= ~IXGBE_ACI_PHY_ENA_LINK;
-+	pcfg.caps |= IXGBE_ACI_PHY_ENA_AUTO_LINK_UPDT;
++=09actions =3D (const struct nlattr *)((u8 *)sfa->actions + start);
++=09len =3D sfa->actions_len - (u32)start;
 +
-+	return ixgbe_aci_set_phy_cfg(hw, &pcfg);
-+}
++=09if (nested) {
++=09=09if (len < NLA_HDRLEN)
++=09=09=09goto out;
 +
- /**
-  * ixgbe_disable_rx_e610 - Disable RX unit
-  * @hw: pointer to hardware structure
-@@ -2207,6 +2234,7 @@ int ixgbe_setup_phy_link_e610(struct ixgbe_hw *hw)
- 	u8 rmode = IXGBE_ACI_REPORT_TOPO_CAP_MEDIA;
- 	u64 sup_phy_type_low, sup_phy_type_high;
- 	u64 phy_type_low = 0, phy_type_high = 0;
-+	bool force_on_required;
- 	int err;
- 
- 	err = ixgbe_aci_get_link_info(hw, false, NULL);
-@@ -2272,6 +2300,11 @@ int ixgbe_setup_phy_link_e610(struct ixgbe_hw *hw)
- 		phy_type_high |= IXGBE_PHY_TYPE_HIGH_10G_USXGMII;
- 	}
- 
-+	/* If IXGBE_ACI_PHY_ENA_LINK has been explicitly disabled that means
-+	 * we need to force PHY link UP state during PHY link setup
-+	 */
-+	force_on_required = !(pcfg.caps & IXGBE_ACI_PHY_ENA_LINK);
++=09=09actions =3D (const struct nlattr *)((u8 *)actions + NLA_HDRLEN);
++=09=09len -=3D NLA_HDRLEN;
++=09}
 +
- 	/* Mask the set values to avoid requesting unsupported link types. */
- 	phy_type_low &= sup_phy_type_low;
- 	pcfg.phy_type_low = cpu_to_le64(phy_type_low);
-@@ -2280,7 +2313,7 @@ int ixgbe_setup_phy_link_e610(struct ixgbe_hw *hw)
- 
- 	if (pcfg.phy_type_high != pcaps.phy_type_high ||
- 	    pcfg.phy_type_low != pcaps.phy_type_low ||
--	    pcfg.caps != pcaps.caps) {
-+	    pcfg.caps != pcaps.caps || force_on_required) {
- 		pcfg.caps |= IXGBE_ACI_PHY_ENA_LINK;
- 		pcfg.caps |= IXGBE_ACI_PHY_ENA_AUTO_LINK_UPDT;
- 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
-index 2cb76a3d30ae..59044d67ebeb 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
-@@ -50,6 +50,7 @@ int ixgbe_cfg_phy_fc(struct ixgbe_hw *hw,
- 		     enum ixgbe_fc_mode req_mode);
- int ixgbe_setup_fc_e610(struct ixgbe_hw *hw);
- void ixgbe_fc_autoneg_e610(struct ixgbe_hw *hw);
-+int ixgbe_disable_phy_link(struct ixgbe_hw *hw);
- void ixgbe_disable_rx_e610(struct ixgbe_hw *hw);
- int ixgbe_init_phy_ops_e610(struct ixgbe_hw *hw);
- int ixgbe_identify_phy_e610(struct ixgbe_hw *hw);
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-index b8e85bc91a27..16e26d54f3be 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-@@ -139,6 +139,8 @@ static const char ixgbe_priv_flags_strings[][ETH_GSTRING_LEN] = {
- 	"vf-ipsec",
- #define IXGBE_PRIV_FLAGS_AUTO_DISABLE_VF	BIT(2)
- 	"mdd-disable-vf",
-+#define IXGBE_PRIV_LINK_DOWN_ON_CLOSE	BIT(3)
-+	"link-down-on-close",
- };
- 
- #define IXGBE_PRIV_FLAGS_STR_LEN ARRAY_SIZE(ixgbe_priv_flags_strings)
-@@ -3822,6 +3824,9 @@ static u32 ixgbe_get_priv_flags(struct net_device *netdev)
- 	if (adapter->flags2 & IXGBE_FLAG2_AUTO_DISABLE_VF)
- 		priv_flags |= IXGBE_PRIV_FLAGS_AUTO_DISABLE_VF;
- 
-+	if (adapter->flags2 & IXGBE_FLAG2_LINK_DOWN_ON_CLOSE)
-+		priv_flags |= IXGBE_PRIV_LINK_DOWN_ON_CLOSE;
-+
- 	return priv_flags;
++=09ovs_nla_free_nested_actions(actions, len);
++out:
++=09sfa->actions_len =3D start;
  }
- 
-@@ -3859,6 +3864,16 @@ static int ixgbe_set_priv_flags(struct net_device *netdev, u32 priv_flags)
- 		}
- 	}
- 
-+	flags2 &= ~IXGBE_FLAG2_LINK_DOWN_ON_CLOSE;
-+	if (priv_flags & IXGBE_PRIV_LINK_DOWN_ON_CLOSE) {
-+		if (adapter->hw.mac.type == ixgbe_mac_e610) {
-+			flags2 |= IXGBE_FLAG2_LINK_DOWN_ON_CLOSE;
-+		} else {
-+			e_info(probe, "Cannot set private flags: Feature supported only for E610 devices\n");
-+			return -EOPNOTSUPP;
-+		}
-+	}
+=20
+ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *at=
+tr,
+@@ -2522,6 +2565,7 @@ static int validate_and_copy_sample(struct net *net, =
+const struct nlattr *attr,
+ =09const struct nlattr *attrs[OVS_SAMPLE_ATTR_MAX + 1];
+ =09const struct nlattr *probability, *actions;
+ =09const struct nlattr *a;
++=09int actions_start;
+ =09int rem, start, err;
+ =09struct sample_arg arg;
+=20
+@@ -2565,18 +2609,27 @@ static int validate_and_copy_sample(struct net *net=
+, const struct nlattr *attr,
+ =09err =3D ovs_nla_add_action(sfa, OVS_SAMPLE_ATTR_ARG, &arg, sizeof(arg),
+ =09=09=09=09 log);
+ =09if (err)
+-=09=09return err;
++=09=09goto err;
+=20
++=09actions_start =3D (*sfa)->actions_len;
+ =09err =3D __ovs_nla_copy_actions(net, actions, key, sfa,
+ =09=09=09=09     eth_type, vlan_tci, mpls_label_count, log,
+ =09=09=09=09     depth + 1);
+=20
+ =09if (err)
+-=09=09return err;
++=09=09goto err_free;
+=20
+-=09add_nested_action_end(*sfa, start);
++=09err =3D add_nested_action_end(*sfa, start);
++=09if (err)
++=09=09goto err_free;
+=20
+ =09return 0;
 +
- 	if (flags2 != adapter->flags2) {
- 		adapter->flags2 = flags2;
- 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 7a0783c1abc1..f650fa45b9ef 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -7551,6 +7551,17 @@ static void ixgbe_close_suspend(struct ixgbe_adapter *adapter)
- 	ixgbe_free_all_rx_resources(adapter);
++err_free:
++=09ovs_nla_trim(*sfa, actions_start, false);
++err:
++=09(*sfa)->actions_len =3D start;
++=09return err;
  }
- 
-+static void ixgbe_handle_link_down(struct ixgbe_adapter *adapter)
-+{
-+	struct net_device *netdev = adapter->netdev;
+=20
+ static int validate_and_copy_dec_ttl(struct net *net,
+@@ -2624,18 +2677,31 @@ static int validate_and_copy_dec_ttl(struct net *ne=
+t,
+ =09=09return start;
+=20
+ =09action_start =3D add_nested_action_start(sfa, OVS_DEC_TTL_ATTR_ACTION, =
+log);
+-=09if (action_start < 0)
+-=09=09return action_start;
++=09if (action_start < 0) {
++=09=09err =3D action_start;
++=09=09goto err;
++=09}
+=20
+ =09err =3D __ovs_nla_copy_actions(net, actions, key, sfa, eth_type,
+ =09=09=09=09     vlan_tci, mpls_label_count, log,
+ =09=09=09=09     depth + 1);
+ =09if (err)
+-=09=09return err;
++=09=09goto err_free;
 +
-+	if (test_bit(__IXGBE_PTP_RUNNING, &adapter->state))
-+		ixgbe_ptp_start_cyclecounter(adapter);
++=09err =3D add_nested_action_end(*sfa, action_start);
++=09if (err)
++=09=09goto err_free;
+=20
+-=09add_nested_action_end(*sfa, action_start);
+-=09add_nested_action_end(*sfa, start);
++=09err =3D add_nested_action_end(*sfa, start);
++=09if (err)
++=09=09goto err_free;
+ =09return 0;
 +
-+	e_info(drv, "NIC Link is Down\n");
-+	netif_carrier_off(netdev);
-+}
-+
- /**
-  * ixgbe_close - Disables a network interface
-  * @netdev: network interface device structure
-@@ -7573,6 +7584,16 @@ int ixgbe_close(struct net_device *netdev)
- 
- 	ixgbe_fdir_filter_exit(adapter);
- 
-+	if (adapter->flags2 & IXGBE_FLAG2_LINK_DOWN_ON_CLOSE) {
-+		int err;
-+
-+		err = ixgbe_disable_phy_link(&adapter->hw);
-+		if (err)
-+			e_error(drv, "Cannot set PHY link down\n");
-+
-+		ixgbe_handle_link_down(adapter);
-+	}
-+
- 	ixgbe_release_hw_control(adapter);
- 
- 	return 0;
-@@ -8251,11 +8272,7 @@ static void ixgbe_watchdog_link_is_down(struct ixgbe_adapter *adapter)
- 	if (ixgbe_is_sfp(hw) && hw->mac.type == ixgbe_mac_82598EB)
- 		adapter->flags2 |= IXGBE_FLAG2_SEARCH_FOR_SFP;
- 
--	if (test_bit(__IXGBE_PTP_RUNNING, &adapter->state))
--		ixgbe_ptp_start_cyclecounter(adapter);
--
--	e_info(drv, "NIC Link is Down\n");
--	netif_carrier_off(netdev);
-+	ixgbe_handle_link_down(adapter);
++err_free:
++=09ovs_nla_trim(*sfa, action_start, true);
++err:
++=09(*sfa)->actions_len =3D start;
++=09return err;
  }
- 
- static bool ixgbe_ring_tx_pending(struct ixgbe_adapter *adapter)
--- 
-2.31.1
+=20
+ static int validate_and_copy_clone(struct net *net,
+@@ -2646,6 +2712,7 @@ static int validate_and_copy_clone(struct net *net,
+ =09=09=09=09   u32 mpls_label_count, bool log, bool last,
+ =09=09=09=09   u32 depth)
+ {
++=09int actions_start;
+ =09int start, err;
+ =09u32 exec;
+=20
+@@ -2661,17 +2728,26 @@ static int validate_and_copy_clone(struct net *net,
+ =09err =3D ovs_nla_add_action(sfa, OVS_CLONE_ATTR_EXEC, &exec,
+ =09=09=09=09 sizeof(exec), log);
+ =09if (err)
+-=09=09return err;
++=09=09goto err;
+=20
++=09actions_start =3D (*sfa)->actions_len;
+ =09err =3D __ovs_nla_copy_actions(net, attr, key, sfa,
+ =09=09=09=09     eth_type, vlan_tci, mpls_label_count, log,
+ =09=09=09=09     depth + 1);
+ =09if (err)
+-=09=09return err;
++=09=09goto err_free;
+=20
+-=09add_nested_action_end(*sfa, start);
++=09err =3D add_nested_action_end(*sfa, start);
++=09if (err)
++=09=09goto err_free;
+=20
+ =09return 0;
++
++err_free:
++=09ovs_nla_trim(*sfa, actions_start, false);
++err:
++=09(*sfa)->actions_len =3D start;
++=09return err;
+ }
+=20
+ void ovs_match_init(struct sw_flow_match *match,
+@@ -2763,20 +2839,20 @@ static int validate_and_copy_set_tun(const struct n=
+lattr *attr,
+ =09tun_dst =3D metadata_dst_alloc(key.tun_opts_len, METADATA_IP_TUNNEL,
+ =09=09=09=09     GFP_KERNEL);
+=20
+-=09if (!tun_dst)
+-=09=09return -ENOMEM;
++=09if (!tun_dst) {
++=09=09err =3D -ENOMEM;
++=09=09goto err;
++=09}
+=20
+ =09err =3D dst_cache_init(&tun_dst->u.tun_info.dst_cache, GFP_KERNEL);
+-=09if (err) {
+-=09=09dst_release((struct dst_entry *)tun_dst);
+-=09=09return err;
+-=09}
++=09if (err)
++=09=09goto err_free_tun_dst;
+=20
+ =09a =3D __add_action(sfa, OVS_KEY_ATTR_TUNNEL_INFO, NULL,
+ =09=09=09 sizeof(*ovs_tun), log);
+ =09if (IS_ERR(a)) {
+-=09=09dst_release((struct dst_entry *)tun_dst);
+-=09=09return PTR_ERR(a);
++=09=09err =3D PTR_ERR(a);
++=09=09goto err_free_tun_dst;
+ =09}
+=20
+ =09ovs_tun =3D nla_data(a);
+@@ -2797,8 +2873,16 @@ static int validate_and_copy_set_tun(const struct nl=
+attr *attr,
+ =09ip_tunnel_info_opts_set(tun_info,
+ =09=09=09=09TUN_METADATA_OPTS(&key, key.tun_opts_len),
+ =09=09=09=09key.tun_opts_len, dst_opt_type);
+-=09add_nested_action_end(*sfa, start);
++=09err =3D add_nested_action_end(*sfa, start);
++=09if (WARN_ON_ONCE(err))
++=09=09goto err_free_tun_dst;
++
++=09return 0;
+=20
++err_free_tun_dst:
++=09dst_release((struct dst_entry *)tun_dst);
++err:
++=09(*sfa)->actions_len =3D start;
+ =09return err;
+ }
+=20
+@@ -2971,7 +3055,7 @@ static int validate_set(const struct nlattr *a,
+=20
+ =09/* Convert non-masked non-tunnel set actions to masked set actions. */
+ =09if (!masked && key_type !=3D OVS_KEY_ATTR_TUNNEL) {
+-=09=09int start, len =3D key_len * 2;
++=09=09int err, start, len =3D key_len * 2;
+ =09=09struct nlattr *at;
+=20
+ =09=09*skip_copy =3D true;
+@@ -2983,8 +3067,11 @@ static int validate_set(const struct nlattr *a,
+ =09=09=09return start;
+=20
+ =09=09at =3D __add_action(sfa, key_type, NULL, len, log);
+-=09=09if (IS_ERR(at))
+-=09=09=09return PTR_ERR(at);
++=09=09if (IS_ERR(at)) {
++=09=09=09err =3D PTR_ERR(at);
++=09=09=09(*sfa)->actions_len =3D start;
++=09=09=09return err;
++=09=09}
+=20
+ =09=09memcpy(nla_data(at), nla_data(ovs_key), key_len); /* Key. */
+ =09=09memset(nla_data(at) + key_len, 0xff, key_len);    /* Mask. */
+@@ -2994,7 +3081,11 @@ static int validate_set(const struct nlattr *a,
+=20
+ =09=09=09mask->ipv6_label &=3D htonl(0x000FFFFF);
+ =09=09}
+-=09=09add_nested_action_end(*sfa, start);
++=09=09err =3D add_nested_action_end(*sfa, start);
++=09=09if (WARN_ON_ONCE(err)) {
++=09=09=09(*sfa)->actions_len =3D start;
++=09=09=09return err;
++=09=09}
+ =09}
+=20
+ =09return 0;
+@@ -3040,7 +3131,8 @@ static int validate_and_copy_check_pkt_len(struct net=
+ *net,
+ =09const struct nlattr *acts_if_greater, *acts_if_lesser_eq;
+ =09struct nlattr *a[OVS_CHECK_PKT_LEN_ATTR_MAX + 1];
+ =09struct check_pkt_len_arg arg;
+-=09int nested_acts_start;
++=09int greater_acts_start =3D -1;
++=09int lesser_acts_start =3D -1;
+ =09int start, err;
+=20
+ =09err =3D nla_parse_deprecated_strict(a, OVS_CHECK_PKT_LEN_ATTR_MAX,
+@@ -3075,37 +3167,58 @@ static int validate_and_copy_check_pkt_len(struct n=
+et *net,
+ =09err =3D ovs_nla_add_action(sfa, OVS_CHECK_PKT_LEN_ATTR_ARG, &arg,
+ =09=09=09=09 sizeof(arg), log);
+ =09if (err)
+-=09=09return err;
++=09=09goto err_free;
+=20
+-=09nested_acts_start =3D add_nested_action_start(sfa,
+-=09=09OVS_CHECK_PKT_LEN_ATTR_ACTIONS_IF_LESS_EQUAL, log);
+-=09if (nested_acts_start < 0)
+-=09=09return nested_acts_start;
++=09lesser_acts_start =3D
++=09=09add_nested_action_start(sfa,
++=09=09=09=09=09OVS_CHECK_PKT_LEN_ATTR_ACTIONS_IF_LESS_EQUAL,
++=09=09=09=09=09log);
++=09if (lesser_acts_start < 0) {
++=09=09err =3D lesser_acts_start;
++=09=09goto err_free;
++=09}
+=20
+ =09err =3D __ovs_nla_copy_actions(net, acts_if_lesser_eq, key, sfa,
+ =09=09=09=09     eth_type, vlan_tci, mpls_label_count, log,
+ =09=09=09=09     depth + 1);
+=20
+ =09if (err)
+-=09=09return err;
++=09=09goto err_free;
+=20
+-=09add_nested_action_end(*sfa, nested_acts_start);
++=09err =3D add_nested_action_end(*sfa, lesser_acts_start);
++=09if (err)
++=09=09goto err_free;
+=20
+-=09nested_acts_start =3D add_nested_action_start(sfa,
+-=09=09OVS_CHECK_PKT_LEN_ATTR_ACTIONS_IF_GREATER, log);
+-=09if (nested_acts_start < 0)
+-=09=09return nested_acts_start;
++=09greater_acts_start =3D
++=09=09add_nested_action_start(sfa,
++=09=09=09=09=09OVS_CHECK_PKT_LEN_ATTR_ACTIONS_IF_GREATER,
++=09=09=09=09=09log);
++=09if (greater_acts_start < 0) {
++=09=09err =3D greater_acts_start;
++=09=09goto err_free;
++=09}
+=20
+ =09err =3D __ovs_nla_copy_actions(net, acts_if_greater, key, sfa,
+ =09=09=09=09     eth_type, vlan_tci, mpls_label_count, log,
+ =09=09=09=09     depth + 1);
+=20
+ =09if (err)
+-=09=09return err;
++=09=09goto err_free;
++
++=09err =3D add_nested_action_end(*sfa, greater_acts_start);
++=09if (err)
++=09=09goto err_free;
+=20
+-=09add_nested_action_end(*sfa, nested_acts_start);
+-=09add_nested_action_end(*sfa, start);
++=09err =3D add_nested_action_end(*sfa, start);
++=09if (err)
++=09=09goto err_free;
+ =09return 0;
++
++err_free:
++=09ovs_nla_trim(*sfa, greater_acts_start, true);
++=09ovs_nla_trim(*sfa, lesser_acts_start, true);
++=09ovs_nla_trim(*sfa, start, false);
++=09return err;
+ }
+=20
+ static int validate_psample(const struct nlattr *attr)
+--=20
+2.53.0
 
 
