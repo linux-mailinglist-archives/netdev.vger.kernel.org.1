@@ -1,167 +1,145 @@
-Return-Path: <netdev+bounces-305098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305099-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id D8nFG1bNS2oPagEAu9opvQ
-	(envelope-from <netdev+bounces-305098-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 17:44:22 +0200
+	id cNi0DuXJS2okaQEAu9opvQ
+	(envelope-from <netdev+bounces-305099-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 17:29:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id A701E712C19
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 17:44:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C341B7129BC
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 17:29:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=uADD0ghB;
-	dmarc=pass (policy=reject) header.from=mailbox.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305098-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305098-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=JPaxA1+j;
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305099-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305099-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7F80D3059DAE
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 14:49:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 116BC31863D9
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 14:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7150B41228F;
-	Mon,  6 Jul 2026 14:49:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B36F23F484B;
+	Mon,  6 Jul 2026 14:50:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3FD73DDDAA;
-	Mon,  6 Jul 2026 14:49:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E8B3E1CEF
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 14:50:04 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783349363; cv=none; b=HKomYi4AlsNFdqv8k0uOTJPnsume83m4ZBysgBhcpE+R005RzqwqPIl+IQasV3HWZ+5dNHeajNjaDCd8qcJXQy9lASJesF7OTkJkkbIQv/4kGKlhOU5xeEsLJzSED13gpuvzM54wqh2VARyeC8kyEqztBrz50QjJAOKSVIa8BRM=
+	t=1783349405; cv=none; b=Yd2ns51oHW9Omk2DXb0daW9Y1YYdjWZqgSci2F6Ysi5YmSZDiZnq+IR8ozDwWSpZUSGG1hbiCDE4L4ZfbjKLEw6Ar6aPHT2k4k5RSclvcJk6O1dn9E8+E7PnKKmtY44ncdZ4dZFBWLNCCnx6NuBAzN1rJ/nUm+O2+jd4eQt3WCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783349363; c=relaxed/simple;
-	bh=eulpyiUh0aznOlxmeBeXXDKWTgTsYGSGxJkchSqiGrM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=cjCk2sXxzSIwpuf+/GRmY+L/kRCvw2c7pIW/bO5ZRnM9+INlJyp4Dg4FISwIY6ciBtJZMEDKAkTcIvWDRNhBLcrVKZU2MasARBTqPfzAURnl8NLwMVpUo5nV8pZvwV5jqzgIYnTHiIvz3pgbIAD0N0Dik/SncwcAhY0l3DUrtz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=uADD0ghB; arc=none smtp.client-ip=80.241.56.151
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA512)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4gv6gr5jBTz8tvS;
-	Mon, 06 Jul 2026 16:49:12 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1783349352;
+	s=arc-20240116; t=1783349405; c=relaxed/simple;
+	bh=Rh1vgYbukgGycrzHGH8cwNVmcXUbb/k0vTFxH+uWsOA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=KI3tRf9jnnM7CO/14QWFYjGhv0YpRg0ARRrcRcGv58ESX0/2kIkyXco3Lf8xR21vu92vj94KYJHtDG6kQP2psSAn19DYxNW69HVaOpsqS3zp2U8GKnfTVSOUSaLLOcgAbc8mKZZhAvASwet7enuTDuvKiannr8mFRFa+8JyKJi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JPaxA1+j; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783349403;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=eulpyiUh0aznOlxmeBeXXDKWTgTsYGSGxJkchSqiGrM=;
-	b=uADD0ghBygQ7hl7LTqSuQzNrT4pfxd3Nkk3nWvmf6IB3D+bbZ8Po9+rlsavnkGLJ4uZdnA
-	E6oxE7wja5lrQWqtmpkzyprJHhQUbkUKADwiXdWDyRW509f88ZfjFbVdsc2ylpT40fOOU1
-	WzrrRp/KWvzTBBzYRWZJPYm3J3L0aVGbHLts233EFpwatX6mIqHFWSxS8OKrpUaHqJgDM6
-	8q8JwEt/ImdukYWwmuJxsFdKcpthuzyLtn4uBC7Nb6yxlqQ9FZ9gTB4t5yU9FTpas5wHRe
-	7YWXY3JENVL6v02qurgwVxEoXonNX6ionzTbrhMb+kZ8bmbK2CqpjuhuTskBOw==
-Message-ID: <88ee8e5f9b87c202a563accccc224280800a8a64.camel@mailbox.org>
-Subject: Re: [PATCH v3 02/20] driver core: platform: provide
- platform_device_set_of_node()
-From: Manuel Ebner <manuelebner@mailbox.org>
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, Lee Jones	
- <lee@kernel.org>, Thierry Reding <thierry.reding@avionic-design.de>, 
- Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller"	 <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski	 <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Srinivas Kandagatla	 <srini@kernel.org>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Vinod Koul	 <vkoul@kernel.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich	
- <dakr@kernel.org>, Rob Herring <robh@kernel.org>, Saravana Kannan	
- <saravanak@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, Michael
- Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- "Christophe Leroy (CS GROUP)"	 <chleroy@kernel.org>, Andi Shyti
- <andi.shyti@kernel.org>, Andy Shevchenko	
- <andriy.shevchenko@linux.intel.com>, Joerg Roedel <joro@8bytes.org>, Will
- Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, Doug Berger
- <opendmb@gmail.com>,  Florian Fainelli <florian.fainelli@broadcom.com>,
- Broadcom internal kernel review list	
- <bcm-kernel-feedback-list@broadcom.com>, Ulf Hansson <ulfh@kernel.org>, 
- Frank Li <Frank.Li@nxp.com>, Sascha Hauer <s.hauer@pengutronix.de>,
- Pengutronix Kernel Team	 <kernel@pengutronix.de>, Fabio Estevam
- <festevam@gmail.com>, Matthew Brost	 <matthew.brost@intel.com>, Thomas
- =?ISO-8859-1?Q?Hellstr=F6m?=	 <thomas.hellstrom@linux.intel.com>, Rodrigo
- Vivi <rodrigo.vivi@intel.com>,  David Airlie <airlied@gmail.com>, Simona
- Vetter <simona@ffwll.ch>, Peter Chen <peter.chen@kernel.org>,  Paul
- Cercueil <paul@crapouillou.net>, Bin Liu <b-liu@ti.com>, Philipp Zabel
- <p.zabel@pengutronix.de>,  Maximilian Luz <luzmaximilian@gmail.com>, Hans
- de Goede <hansg@kernel.org>, Ilpo =?ISO-8859-1?Q?J=E4rvinen?=	
- <ilpo.jarvinen@linux.intel.com>, Krzysztof Kozlowski <krzk@kernel.org>, 
- Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: brgl@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-sound@vger.kernel.org, 
-	driver-core@lists.linux.dev, devicetree@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-i2c@vger.kernel.org,
- iommu@lists.linux.dev, 	linux-pm@vger.kernel.org, imx@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, intel-xe@lists.freedesktop.org, 
-	dri-devel@lists.freedesktop.org, linux-usb@vger.kernel.org, 
-	linux-mips@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
-	mfd@lists.linux.dev
-Date: Mon, 06 Jul 2026 16:48:48 +0200
-In-Reply-To: <fbc50f89e0c3bb148656a3b8d96974f591576dec.camel@mailbox.org>
-References: <20260706-pdev-fwnode-ref-v3-0-1ff028e33779@oss.qualcomm.com>
-		 <20260706-pdev-fwnode-ref-v3-2-1ff028e33779@oss.qualcomm.com>
-	 <fbc50f89e0c3bb148656a3b8d96974f591576dec.camel@mailbox.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	bh=Iy7BN6o8CJa8VD49+oAWt1VcR6U5zC7d9Pjayl7vxeU=;
+	b=JPaxA1+j/VzfSrQP+7nnWR7k2aBvVKb1WZRPtSl0ptP/r8xgijFta/e8WXMPdgzp0H91l0
+	x4GRZwaoTxFIihHPk8aahHyVbCA4+XvsVGMPN8rolSlVHPikQRYfWBMBN24eFz+tyqwoli
+	GywOycb/3R7W/t2traMZFHzn3EcQsTA=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-517-zjKFGZzlO6-asScH71gwLA-1; Mon,
+ 06 Jul 2026 10:49:59 -0400
+X-MC-Unique: zjKFGZzlO6-asScH71gwLA-1
+X-Mimecast-MFC-AGG-ID: zjKFGZzlO6-asScH71gwLA_1783349397
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1E6591955D8F;
+	Mon,  6 Jul 2026 14:49:57 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.81.35])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 04A7D3000B52;
+	Mon,  6 Jul 2026 14:49:54 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Minxi Hou <houminxi@gmail.com>
+Cc: netdev@vger.kernel.org,  echaudro@redhat.com,  i.maximets@ovn.org,
+  davem@davemloft.net,  edumazet@google.com,  kuba@kernel.org,
+  pabeni@redhat.com,  horms@kernel.org,  shuah@kernel.org,
+  dev@openvswitch.org,  linux-kselftest@vger.kernel.org, kylebot@openai.com
+Subject: Re: [PATCH net-next v3] selftests/net/openvswitch: add output
+ truncation test
+In-Reply-To: <20260702074926.1174810-1-houminxi@gmail.com> (Minxi Hou's
+	message of "Thu, 2 Jul 2026 03:49:26 -0400")
+References: <20260702074926.1174810-1-houminxi@gmail.com>
+Date: Mon, 06 Jul 2026 10:49:53 -0400
+Message-ID: <f7t33xw2mwe.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MBO-RS-ID: e7506a7c665f87bbeac
-X-MBO-RS-META: yfo5gat8zopp9bgmyshyyaocgtadhjyy
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-305098-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305099-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:houminxi@gmail.com,m:netdev@vger.kernel.org,m:echaudro@redhat.com,m:i.maximets@ovn.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:dev@openvswitch.org,m:linux-kselftest@vger.kernel.org,m:kylebot@openai.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:bartosz.golaszewski@oss.qualcomm.com,m:lee@kernel.org,m:thierry.reding@avionic-design.de,m:sebastian.hesselbarth@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:srini@kernel.org,m:gregkh@linuxfoundation.org,m:vkoul@kernel.org,m:rafael@kernel.org,m:dakr@kernel.org,m:robh@kernel.org,m:saravanak@kernel.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:npiggin@gmail.com,m:chleroy@kernel.org,m:andi.shyti@kernel.org,m:andriy.shevchenko@linux.intel.com,m:joro@8bytes.org,m:will@kernel.org,m:robin.murphy@arm.com,m:opendmb@gmail.com,m:florian.fainelli@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:ulfh@kernel.org,m:Frank.Li@nxp.com,m:s.hauer@pengutronix.de,m:kernel@pengutronix.de,m:festevam@gmail.com,m:matthew.brost@intel.com,m:thomas.hellstrom@linux.intel.com,m:rodrigo.vivi@intel.com,m:airlied@gmail.com,m:simona@ffwll.ch,m:peter.chen@kernel.org,m:paul@crapouillou.net,m:b-liu@ti.com,m:p.zabe
- l@pengutronix.de,m:luzmaximilian@gmail.com,m:hansg@kernel.org,m:ilpo.jarvinen@linux.intel.com,m:krzk@kernel.org,m:benh@kernel.crashing.org,m:brgl@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-sound@vger.kernel.org,m:driver-core@lists.linux.dev,m:devicetree@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:linux-i2c@vger.kernel.org,m:iommu@lists.linux.dev,m:linux-pm@vger.kernel.org,m:imx@lists.linux.dev,m:linux-arm-kernel@lists.infradead.org,m:intel-xe@lists.freedesktop.org,m:dri-devel@lists.freedesktop.org,m:linux-usb@vger.kernel.org,m:linux-mips@vger.kernel.org,m:platform-driver-x86@vger.kernel.org,m:mfd@lists.linux.dev,m:sebastianhesselbarth@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[manuelebner@mailbox.org,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[oss.qualcomm.com,kernel.org,avionic-design.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,linuxfoundation.org,linux.ibm.com,ellerman.id.au,linux.intel.com,8bytes.org,arm.com,broadcom.com,nxp.com,pengutronix.de,intel.com,ffwll.ch,crapouillou.net,ti.com,kernel.crashing.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[66];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[manuelebner@mailbox.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mailbox.org:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER(0.00)[aconole@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aconole@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mailbox.org:from_mime,mailbox.org:dkim,mailbox.org:mid]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A701E712C19
+X-Rspamd-Queue-Id: C341B7129BC
 
-On Mon, 2026-07-06 at 16:39 +0200, Manuel Ebner wrote:
-> Hi Bartosz,
->=20
-> On Mon, 2026-07-06 at 14:44 +0200, Bartosz Golaszewski wrote:
-> >=20
-> > @@ -693,6 +693,24 @@ int platform_device_add_data(struct platform_devic=
-e *pdev, const
+Minxi Hou <houminxi@gmail.com> writes:
 
-Nevermind, I got confused because of @@ int platform_device_add_data() and
+> Add test_trunc exercising the OVS_ACTION_ATTR_TRUNC action. The test
+> verifies truncation limits in four steps: reject trunc(1) and
+> trunc(13) which are below ETH_HLEN, confirm normal forwarding works,
+> apply trunc(14) which truncates packets to the Ethernet header and
+> verify ping fails, then restore normal forwarding and verify recovery.
+>
+> The kernel requires max_len >= ETH_HLEN (14 bytes). trunc(14) sets
+> OVS_CB(skb)->cutlen so pskb_trim strips the IP payload at output
+> time; the receiver drops the runt frame and no echo reply is
+> generated.
+>
+> Signed-off-by: Minxi Hou <houminxi@gmail.com>
+> ---
 
-> @@ -619,6 +619,13 @@ static void platform_device_release_full(struct devi=
-ce *dev)
-in [PATCH v3 05/20] driver core: update kerneldoc for platform_device_alloc=
-()
+Reviewed-by: Aaron Conole <aconole@redhat.com>
 
-Sorry for the noise
- Manuel
+NB: There is a note from Sashiko on this about a pre-existing issue with
+trunc() action.  That issue was discussed a bit offline, and I think
+someone/someprocess is going to submit a patch upstream "soon."  That
+said, as with all actions related security issues in OVS, they require
+giving a process CAP_NET_ADMIN, which is quite a powerful capability and
+generally not advised for the average user.
+
 
