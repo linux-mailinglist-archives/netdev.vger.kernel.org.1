@@ -1,181 +1,267 @@
-Return-Path: <netdev+bounces-305157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305158-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VXcWK8v5S2rAdwEAu9opvQ
-	(envelope-from <netdev+bounces-305157-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 20:54:03 +0200
+	id zntjC6fmS2qwcQEAu9opvQ
+	(envelope-from <netdev+bounces-305158-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 19:32:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DDAB714B42
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 20:54:03 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27E95713E58
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 19:32:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=baylibre.com header.s=google header.b=N2AhnmO6;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305157-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305157-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=C3yJ6Xan;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305158-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305158-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2ABEF3056AA0
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 17:12:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1C6AB302E994
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 17:19:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEA6E343D64;
-	Mon,  6 Jul 2026 17:12:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E37BA3A641F;
+	Mon,  6 Jul 2026 17:19:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFF0338939
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 17:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D6F38C42E
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 17:19:23 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783357936; cv=none; b=Q6mVoqCkOigpcD4OYNy5lGxzoyYIipyNvFDPFg6dBBkZqeV2p3+8ZAZHYYNSXqOItL7WjqlVSgfPQKOUD3QeG7fYOrhl551LJMF5r+vIGRcyv/hW6UFriwaVnSD1JhvmYcFLi0gbF2ihKXStIfOx7cgmjBOUaiS/Q9+K8WGDNvU=
+	t=1783358364; cv=none; b=IrJSJoeXm4xwoTIpS3Bd9FoDa04wV8mFRWH5E1wNdKsRvNlnSMthrNDPDc5NoQrVvlOkozhU9BhOz69slvx1SrgxZaYrcWA2b0Jq7nLYevftbD35BQ5eacR/cBzjzqq83nY9IicGiudVcwn0F2AKutqNUeOCz/+UcTrdtEj4gNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783357936; c=relaxed/simple;
-	bh=9Qaxnft5QcjEe+8OGMPo6pcL4qMHnO2VQLIGwoXXX70=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lLFNurcpusrK+MTIroNNt5dBHuIENcWYIdXw8nNyxh3fofA+82ND1BsbHfX6IwrQjmw3kCopdioJhpmB/tMLKon4s8IfHk0hvIS4VvaxNCoHwYCj6b6frHVWA9dirJcYtVIdt1v0Ewr52WKI1+CtKfxiPC0mwVHBgu7mIwD89MM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=N2AhnmO6; arc=none smtp.client-ip=209.85.128.54
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-493d3135e9bso12576405e9.2
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 10:12:13 -0700 (PDT)
+	s=arc-20240116; t=1783358364; c=relaxed/simple;
+	bh=ehUPaU/1dF2KpG5kToZV7U5XhlQnUkBKHuGMy/qSzhs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FGquObv3MqAuBOSUQSn4VcSuoBnwVYS/rjN2OXPSylbBxBok+02XOXkYTGl0l5I+nvZhIU4zNt5eNFCoRSlFfkpMPCKbXfOneBq9LruZTDyMVIQf7UXK/w0/ITQi7F8sTPq9DOALdWeCSGqBaYwG5LvtSeOkITHQtnP5Nb1Otws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C3yJ6Xan; arc=none smtp.client-ip=209.85.210.41
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-7e9f5637634so1555683a34.3
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 10:19:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre.com; s=google; t=1783357931; x=1783962731; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=9Qaxnft5QcjEe+8OGMPo6pcL4qMHnO2VQLIGwoXXX70=;
-        b=N2AhnmO6qH2PcgazgauOqjcnYJCAfUD8BXzo0vfgNpSHNK3oQR7N/PcMILpCwT1KPq
-         KmX3pQt0GsXNx5PsnLQvt4SVQzIwOJjNeDvkObkrVGuEd3NhS4Xgp5PjqNH7j2S3Qi0d
-         CyVicMWbPZqZlTeB9nmghjLlRefD9oJocEeLVaODdqj7jul7BxX4A/6AqZLGqktOzXK1
-         YX9sijuJy4Ll8gjKnNHAF99+I34v3OP0yWko8elnXAP2KIPs3JETNtD2oskPeH17Erzw
-         DL8pVSar5jl7bHM+o8MKy0a/NWjL58cxnKQDAqImHhUIe/zen7npTRECQI7mo5pgOFmR
-         3EsQ==
+        d=gmail.com; s=20251104; t=1783358362; x=1783963162; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=CcnEKxuZvnrlq/X8pfnKmD+Iim0hx24bDmSujajdu2Y=;
+        b=C3yJ6Xanaw0+kWmedBpRUt76aNgktRzzTp8Df+YloZ3DIltOIyRAV1ucL9hjoK/V5T
+         zVJ8n5mqkPPp0O5tRbnxpP6lxm6E9STbO2CIADU7Iqnx/eO+PaK+0Q3+wmDyKy0hr2nV
+         fCAorBCKqpK5ZOxVKHxreVoDHRqPyaVqK5F8NLCCCghNhFpMkIsFWTYd2cnFOwtcHRur
+         v0k681+ldBt41nucDVaON0IBhkSVxUZag2SQQNF9H3mzCeeJpjz6AYyIO8nYkG0wNbsA
+         cgM27kAZDV5FoWkGsL1yoJmX5z4EFd9tOLnX/dJ92CStg6UT0iOCdGE520uWRQ252wrf
+         BzFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783357931; x=1783962731;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=9Qaxnft5QcjEe+8OGMPo6pcL4qMHnO2VQLIGwoXXX70=;
-        b=F+nTkLuuZofk6m237GQF1emGy6zko+OVLcxr4+3/GqaHJxjIMeyfwZ1ocprBzb6TQZ
-         ZbFd031ME8i5U/YDxokVL9T2od4srTl6RjxoQJ5hEwOKkvKJGnUqlEeKCTpC9+1qqnyB
-         I4l6k4YKZyWSKOJ+WXsAoY0mgsWNGmAor9s69DQuY/hYeQk0qckjS7nyL/3EhF3aB4wq
-         qUg5JMd54UFEwzI9fK8xmIDYpkAT86ucZNHALliYV0m24QjI6TDcsAzNOjoGE2LmaViA
-         GNwESP31GB3r08rwI/suKtMo0lyFo/z4KufvlK0vsO0+hFuh9AxhvWNnAFjQszssssPF
-         05Tw==
-X-Forwarded-Encrypted: i=1; AHgh+RqWmYCvJ1TvsZFLaUEFZoqoYS73XZr4MfpLWtyPZtYhA+5su+upYEqj9Lt7drI2cNifUJv4Dh8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywlp6ZFhAFZ8hT2uX/ljaxyqSkE/tEAAuYMwY7Y//NWiNHX3FAv
-	MdomT/GbRyKK9IZXN31gVIDQOZ5GiO8jsU7Fn/I1gIM+gOv/AeEGPkNEYnRjhyeUTbA=
-X-Gm-Gg: AfdE7clkuwXg1xjFeXWmSHAvxSJyeZAYETa/dUp42rV7r4a4+kURNPCdskK1F72+Xry
-	kImr5rGp+sl+i0ZWZvtXljW1+8oCW+spsv6C+vZyOoTshVdHEZ9g1STlb9B7u3OjwRYZ7WS1TJb
-	AO29WpgNmL17ULpUevmT6zh/thW71/EC4+KBkejv110Tt3f2ne1g09MiUiaGUPfgsQqEzJg6yKi
-	rKTALdNLRzaSz/BtgMeRwza0wusD7CfM+bZnnGVBJ6thynWQz8XbVaZJ8u3ABxoqQrJN9s+VAvj
-	njj3JL1JC3RkFXljfiEUVfGlQ/xTiSp0SJhB/AcnqwCZV9IUqbmlvD9wg8Q6Xj3LzN99lVvRGXB
-	9/q0FUVQUEHOFu49YUay/7dfcT0BzcQ9EG0VASgbzBkNdnkY6QAYF5+Ul8xA105iJiyKW1TbAVp
-	BZRyk2S3pD+f5YlqHweT9UgOZur55itSsRUUmodR4SQixiTu1FtPkyuaeu1dQd7xpytyKEOmDh0
-	y4=
-X-Received: by 2002:a05:600c:5395:b0:493:a5d0:d1a1 with SMTP id 5b1f17b1804b1-493df076a4bmr16790325e9.31.1783357931631;
-        Mon, 06 Jul 2026 10:12:11 -0700 (PDT)
-Received: from localhost (p200300f65f47db0404eb41111570ffdc.dip0.t-ipconnect.de. [2003:f6:5f47:db04:4eb:4111:1570:ffdc])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-493c6375764sm337785835e9.5.2026.07.06.10.12.10
+        d=1e100.net; s=20251104; t=1783358362; x=1783963162;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=CcnEKxuZvnrlq/X8pfnKmD+Iim0hx24bDmSujajdu2Y=;
+        b=UjIlkeXLCCdiPUlw6n4uVgAVZzAeWd5YsbPGvcZuon2PoYEvVcO5VbBTT1EwXt0sXX
+         ZfMFsZKOYshf169lXYFcNq9IuuTCVkp2RyGPw5jgjqmT/VopSwyYz8BdzhIMvLQRfbT4
+         i0+x+eVTVwZrq9ci5o8XQEWhFlc9wdscsXuk0yNekJ/B7aOyw2S3lB3FiNQdQt/OWph2
+         5PB0833avhbYXeo8d7uRt4/xoCVtl9Gwzk8bYMXjRr9Vm9z/vCYVewbWIfnH9aTz4KkW
+         adQCQpedOBRZQpHSame+drW0LVwKgbQDVQM2Nix8t1c8tEO8/RFwyc3+pd9twirybSlN
+         0DLg==
+X-Gm-Message-State: AOJu0YwmyHdBxHiWT5ptCnF8urtJ14tJaLCz0rGATGqCer50Hhuo7FtQ
+	akdhJGF/3pKJGfPFdD232muZmDHs8LET3NIDaEZA5r/0dk5vghEsZoKF
+X-Gm-Gg: AfdE7clzJmtn7Yg289FY1HLbbrpCFkoGrr21pMcrLMdm0dlvK89T2oUXgBvNRCkCsYD
+	D70yaVFjJXy7lAi2lF8CH9P6F2ihq1xo1U19/1XDIbik4Cyt7gKEy/dEbJeHCc23hRELBbW2itn
+	A4sVAY3G6UWIUXDSBuou+eUZzOhVPy+faxFSYEgMYwNxOB1D9Svr0wEr6r9DDQ9NuN8eu4lZWLU
+	1VyIBa3L/Hvh6jagy6CxjQkw4E2jRnhsOYaT6eKDxplAGRnHRrKCw2MJkMlWYx1aqdR7wz+ea0J
+	T1VDWk7IGeMo263nV79O+wcPvmsF9DcAoPHoUebUERosaa3Wn3AdCSpjGOVnMOPEi4Nu/ZQhb9i
+	gMBbDmr9RgzWo9r6zY4Uo9WzDLcOlfG8E9+kqoin6FZ6HoIrVr7eRxOtZ4lN3eUs582Op2msBFF
+	3keK5HiucscKLv9A==
+X-Received: by 2002:a05:6830:608d:b0:7e6:cee5:1bbf with SMTP id 46e09a7af769-7ebb2262664mr900845a34.12.1783358361740;
+        Mon, 06 Jul 2026 10:19:21 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:45::])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7eb54521db4sm11966334a34.25.2026.07.06.10.19.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jul 2026 10:12:10 -0700 (PDT)
-Date: Mon, 6 Jul 2026 19:12:09 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Jonas Jelonek <jelonek.jonas@gmail.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, 
-	Kory Maincent <kory.maincent@bootlin.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Daniel Golle <daniel@makrotopia.org>, =?utf-8?B?QmrDuHJu?= Mork <bjorn@mork.no>
-Subject: Re: [PATCH net-next v5 2/4] net: pse-pd: add Realtek/Broadcom PSE
- MCU core
-Message-ID: <akvhq1YcUFP6eizf@monoceros>
-References: <20260706112425.3149226-1-jelonek.jonas@gmail.com>
- <20260706112425.3149226-3-jelonek.jonas@gmail.com>
+        Mon, 06 Jul 2026 10:19:20 -0700 (PDT)
+From: Amery Hung <ameryhung@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	eddyz87@gmail.com,
+	memxor@gmail.com,
+	martin.lau@kernel.org,
+	shakeel.butt@linux.dev,
+	roman.gushchin@linux.dev,
+	kuniyu@google.com,
+	kerneljasonxing@gmail.com,
+	ameryhung@gmail.com,
+	kernel-team@meta.com
+Subject: [PATCH bpf-next v3 00/15] bpf: A common way to attach struct_ops to a cgroup
+Date: Mon,  6 Jul 2026 10:19:02 -0700
+Message-ID: <20260706171918.317102-1-ameryhung@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="apc7am3fmzbmx2nr"
-Content-Disposition: inline
-In-Reply-To: <20260706112425.3149226-3-jelonek.jonas@gmail.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[baylibre.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jelonek.jonas@gmail.com,m:o.rempel@pengutronix.de,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:bjorn@mork.no,m:jelonekjonas@gmail.com,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
-	DMARC_NA(0.00)[baylibre.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,linux.dev,google.com,meta.com];
+	TAGGED_FROM(0.00)[bounces-305158-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:alexei.starovoitov@gmail.com,m:andrii@kernel.org,m:daniel@iogearbox.net,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@kernel.org,m:shakeel.butt@linux.dev,m:roman.gushchin@linux.dev,m:kuniyu@google.com,m:kerneljasonxing@gmail.com,m:ameryhung@gmail.com,m:kernel-team@meta.com,m:alexeistarovoitov@gmail.com,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[baylibre.com:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-305157-lists,netdev=lfdr.de];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,monoceros:mid,baylibre.com:from_mime,baylibre.com:dkim,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3DDAB714B42
+X-Rspamd-Queue-Id: 27E95713E58
+
+Hi,
+
+I am continuing Martin's work to support attaching struct_ops to cgroup.
+
+At LSF/MM/BPF 2025, Martin presented [1] the need for a new interface
+to extend tcp_sock operations instead of adding more BPF_SOCK_OPS_*CB
+enum values. The need for predictable ordering when attaching struct_ops
+to a cgroup was also briefly discussed.
+
+At LSF/MM/BPF 2026, additional use cases were raised, in particular
+OOM and memcg use cases that also need to attach struct_ops to a
+cgroup.
+
+BPF already has a common bpf_link-based API for attaching different
+BPF program types to a cgroup. It provides common attach, detach,
+update, ordering, and query semantics across those program types.
+
+This series extends the same model to struct_ops. Conceptually,
+struct_ops is a group of BPF programs, so using similar
+attachment/detachment/update/query APIs and ordering semantics for
+cgroup attachment keeps the interface consistent with existing cgroup
+BPF links.
+
+This series uses a new struct bpf_tcp_ops as the first user. The
+struct_ops mirrors the TCP-related sockops hooks except
+BPF_SOCK_OPS_NEEDS_ECN and BPF_SOCK_OPS_BASE_RTT, which are
+intentionally left out.
+
+The selftests cover attach, query, update, ordering, before/after
+placement, retval chaining, the header option hooks, and inheritance
+across a multi-level cgroup hierarchy.
+
+The map_free_pre_rcu addition in patch 2 is not very ideal; it will
+need some thought too.
+
+[1] page 13: https://drive.google.com/file/d/1wjKZth6T0llLJ_ONPAL_6Q_jbxbAjByp/view?usp=sharing
 
 
---apc7am3fmzbmx2nr
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Subject: Re: [PATCH net-next v5 2/4] net: pse-pd: add Realtek/Broadcom PSE
- MCU core
-MIME-Version: 1.0
+Changelog
 
-Hello,
+v2 -> v3
+  - Patch 3: Remove redundant bpf_struct_ops_kdata_map_id (Sashiko)
+  - Patch 11: Reject sleepable programs (Sashiko)
+  - Patch 12: Silence warning when casting ctx to arg pointer
+  - Patch 13: Fix incorrect libbpf API addition (Andrii)
+  - Patch 14: Fix selftest cgroup cleanup (Sashiko)
+  - Patch 15: Use network_helpers.c
 
-On Mon, Jul 06, 2026 at 11:24:22AM +0000, Jonas Jelonek wrote:
-> +#include <linux/mod_devicetable.h>
+RFC v1 -> v2
+  - Fix UAF of cfi_stubs
+  - Fix retval: use bpf_tramp_run_ctx instead of bpf_cg_run_ctx and
+    expose bpf_get_retval() to bpf_tcp_ops
+  - Add selftests
+    - struct_ops cgroup attachment
+      - Test bpf_get_retval()
+      - Test before/after order
+      - Test cgroup hierarchy and inheritance
+    - Test TCP header option hooks and helpers
+  - Move bpf_tcp_ops out of legacy BPF_SOCK_OPS_TEST_FLAG guard
+  - Complete bpf_tcp_ops (make it comparable to legacy sockops tcp)
 
-Please only include those <linux/device-id/*.h> that you actively need.
-I'm working on getting rid of <linux/mod_devicetable.h>, so please don't
-introduce new users.
+---
 
-Best regards
-Uwe
+Amery Hung (4):
+  bpf: Allow all struct_ops to use bpf_dynptr_from_skb()
+  bpf: tcp: Support selected sock_ops callbacks as struct_ops
+  bpf: tcp: Support parse/len/write header option hooks in bpf_tcp_ops
+  selftests/bpf: Add test for bpf_tcp_ops header option hooks
 
---apc7am3fmzbmx2nr
-Content-Type: application/pgp-signature; name="signature.asc"
+Martin KaFai Lau (11):
+  bpf: Remove __rcu tagging in st_link->map
+  bpf: Make struct_ops tasks_rcu grace period optional
+  bpf: Add bpf_struct_ops accessor helpers
+  bpf: Remove unnecessary prog_list_prog() check
+  bpf: Replace prog_list_prog() check with direct pl->prog and pl->link
+    check
+  bpf: Add prog_list_init_item(), prog_list_replace_item(), and
+    prog_list_id()
+  bpf: Move LSM trampoline unlink into bpf_cgroup_link_auto_detach()
+  bpf: Add a few bpf_cgroup_array_* helper functions
+  bpf: Add infrastructure to support attaching struct_ops to cgroups
+  libbpf: Support attaching struct_ops to a cgroup
+  selftests/bpf: Test attaching struct_ops to a cgroup
 
------BEGIN PGP SIGNATURE-----
+ include/linux/bpf-cgroup-defs.h               |   1 +
+ include/linux/bpf-cgroup.h                    |  28 +
+ include/linux/bpf.h                           |  56 +-
+ include/linux/filter.h                        |   5 +
+ include/net/tcp.h                             | 153 ++++-
+ include/uapi/linux/bpf.h                      |  39 +-
+ kernel/bpf/bpf_struct_ops.c                   | 142 +++--
+ kernel/bpf/btf.c                              |  23 +-
+ kernel/bpf/cgroup.c                           | 472 ++++++++++++++-
+ kernel/bpf/core.c                             |   5 +
+ kernel/bpf/syscall.c                          |   4 +
+ net/core/filter.c                             |  33 +-
+ net/ipv4/Makefile                             |   1 +
+ net/ipv4/af_inet.c                            |   1 +
+ net/ipv4/bpf_tcp_ca.c                         |  16 +
+ net/ipv4/bpf_tcp_ops.c                        | 324 ++++++++++
+ net/ipv4/tcp.c                                |   1 +
+ net/ipv4/tcp_input.c                          |  17 +
+ net/ipv4/tcp_output.c                         |  48 ++
+ net/ipv4/tcp_timer.c                          |   1 +
+ net/sched/bpf_qdisc.c                         |   2 -
+ tools/include/uapi/linux/bpf.h                |  39 +-
+ tools/lib/bpf/bpf.c                           |   2 +
+ tools/lib/bpf/bpf.h                           |   3 +-
+ tools/lib/bpf/libbpf.c                        |  64 ++
+ tools/lib/bpf/libbpf.h                        |   3 +
+ tools/lib/bpf/libbpf.map                      |   1 +
+ .../selftests/bpf/prog_tests/bpf_tcp_ops.c    | 560 ++++++++++++++++++
+ .../bpf/prog_tests/bpf_tcp_ops_hdr.c          |  77 +++
+ .../testing/selftests/bpf/progs/bpf_tcp_ops.c | 141 +++++
+ .../selftests/bpf/progs/bpf_tcp_ops_hdr.c     |  83 +++
+ 31 files changed, 2224 insertions(+), 121 deletions(-)
+ create mode 100644 net/ipv4/bpf_tcp_ops.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/bpf_tcp_ops.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/bpf_tcp_ops_hdr.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_tcp_ops.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_tcp_ops_hdr.c
 
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmpL4eYACgkQj4D7WH0S
-/k6+5AgAm3qO0xKJJhBH9p6HlFmRDo8vQdEDyKRnzn8xXCoR1DY35sx0w/TXAGjb
-agwxL+lihe7DRNl9CoRJvSS7N0gUL1GYvceTOMqp+LY1hOkHJa8aVd6LxpGa3+E0
-YD38sCkSBzrHuX5m77awrFD3HfcqGfSxqEPsY8Ew18i9ja0LpBQ3XEx3MTeOZZS2
-1/IynC9RQj3xL5Q1QpTYsCSqAtCBu7zksVn+bCkTI/k77WEbX4RGs9uwMf7Futu8
-CuaTJc1Fqjx7mlZPuqF6uWCB7u12JdMi6QnRk337CFf+B7FzgreNTL5qx6RPFEw4
-it+yXyRgBxgFj/bfOuAqnHcEXp8iSw==
-=A8qs
------END PGP SIGNATURE-----
+-- 
+2.52.0
 
---apc7am3fmzbmx2nr--
 
