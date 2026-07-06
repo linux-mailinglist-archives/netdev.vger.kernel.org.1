@@ -1,99 +1,153 @@
-Return-Path: <netdev+bounces-304900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304901-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Tw4SIp5oS2q/QwEAu9opvQ
-	(envelope-from <netdev+bounces-304900-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 10:34:38 +0200
+	id NtesGotsS2qtRAEAu9opvQ
+	(envelope-from <netdev+bounces-304901-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 10:51:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55B4B70E27F
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 10:34:38 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6454770E4D6
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 10:51:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304900-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304900-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=sfPKwHmg;
+	dmarc=pass (policy=reject) header.from=bootlin.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304901-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304901-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B3A923093BCD
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 08:26:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CA22C30500F6
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 08:30:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCC033F6C50;
-	Mon,  6 Jul 2026 08:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CCE93E557C;
+	Mon,  6 Jul 2026 08:30:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0372F3DFC67;
-	Mon,  6 Jul 2026 08:26:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE283B8135
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 08:30:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783326385; cv=none; b=S4047LrDmXeqteUEFiAf/KK3+ZyyDrtvLzGFHfb7B6Q/1pA3o4grIsLZx6KtxPr4QpmhRboaI3aI4Yc2W602II0/6dHQgPBG+aNpSR7Qu4qO+6Nle8RteFZzuTsU11T4Xv5C4NSDJKYrK6qQ2BL0IuERagjAsOQ8fszy3LHnlAw=
+	t=1783326608; cv=none; b=UDBcCcDOZmn6jgt9K+CBeDxj8WaFk806gxJruIfy70kFNtRYTjpPDHxqKSvmrngnJ9rp5geWfKo0hIw3TgY6eEIk8RoiNAuRrqJaz7iCLg3L4gcazokdj7E/q/57uIx4RXPYIZGtMK2SrAfrhZSzbP/MZADXXPVzGACwpv0YA/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783326385; c=relaxed/simple;
-	bh=5XqDRuIe/B1ygd12dXDlZ/lOV6rSPqNPQ9E0MksFaQU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CBlu/MRqAAh/EiindKrtt5KMWlx6TBzDww/Nm+opfy7yL4w1jJjERYmpokGJURyOCg5jd/920scDE1L4f0OtpnIuNFhtKiOTlDGj9cG18RcygZ33rOXfWfUU6fYsOPz4JfZ0qgnXFzH9qEPD9tZe3Okqu+isGltkyuNdocclFHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id A831C60491; Mon, 06 Jul 2026 10:26:15 +0200 (CEST)
-Date: Mon, 6 Jul 2026 10:26:15 +0200
-From: Florian Westphal <fw@strlen.de>
-To: netdev@vger.kernel.org
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org,
-	pablo@netfilter.org
-Subject: Re: [PATCH net 0/9] netfilter: updates for net
-Message-ID: <aktmp2JwAoY-kBre@strlen.de>
-References: <20260703125709.16493-1-fw@strlen.de>
+	s=arc-20240116; t=1783326608; c=relaxed/simple;
+	bh=wZEYRdauGNyo+aR+aUOLLJQO4IJ+EyWBrO2qwu0+6jU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C9a+hePpOV9aoi3+I8I6lAVMDQkW8E1U+QBFBnVeBuRJZsd/NUX9DU1x87i8etnM+HgPjWDA1JPUxAmy3aZQVzInhkNUo5t/u0ks7ygnpD8TLWrjELG8ISancS36grYfkJoWPfdSXK1pdwSnvgIOzmGoc8uY+6qMjFxbTgj2+ZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=sfPKwHmg; arc=none smtp.client-ip=185.246.85.4
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id B04E54E40CA6;
+	Mon,  6 Jul 2026 08:29:56 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 83628601A2;
+	Mon,  6 Jul 2026 08:29:56 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D00C111BB9CCB;
+	Mon,  6 Jul 2026 10:29:50 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1783326595; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=PY9i1Sab1PSIG/yNf88fVZTp+uxV9ipVlzY648ikCP8=;
+	b=sfPKwHmg9IiZRmz4+LMlXqCSWYCt+zkzHpATUeuvy2InsXjF2sm7LWgIEm8PqU0prYabbh
+	V6vIt0HhLRNnjgcfa3PoswpRYzav0P4RzZEm+wOK1Ni2+Hgsl8NAmwQmgmItM7xsgp03y6
+	VIPFBQVTiAadRUvtrsVlASHObc4/DtAzbB2JJEiZJckVplwk9m/HsQVz4arSbKiF2+MlOQ
+	UDnn0eI7/C5dInjNXZQaX5ssP9amojJBNmsa69yOH+kfrcZupFf+IO+QCuFoq7jLoPzA76
+	v8Ak6uh6z61lFUWKikP+QDbX/7dR14P9Nxducgv+oKCWDXPdASxtgeTxme/rnA==
+Message-ID: <565c18f3-8b1b-4832-b060-617b7d683eb6@bootlin.com>
+Date: Mon, 6 Jul 2026 10:29:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260703125709.16493-1-fw@strlen.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: stmmac: intel: don't reconfigure SerDes on
+ unchanged mode
+To: Markus Breitenberger <bre@breiti.cc>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+ stable@vger.kernel.org, Markus Breitenberger <bre@keba.com>
+References: <20260706061954.94842-1-bre@breiti.cc>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <20260706061954.94842-1-bre@breiti.cc>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304900-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[strlen.de];
+	TAGGED_FROM(0.00)[bounces-304901-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:netfilter-devel@vger.kernel.org,m:pablo@netfilter.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:bre@breiti.cc,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:yong.liang.choong@linux.intel.com,m:stable@vger.kernel.org,m:bre@keba.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	R_DKIM_NA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:from_mime,bootlin.com:dkim,bootlin.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,keba.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 55B4B70E27F
+X-Rspamd-Queue-Id: 6454770E4D6
 
-Florian Westphal <fw@strlen.de> wrote:
-> The following patchset contains Netfilter fixes for *net*, all
-> for ancient problems.  Patch 7 raised drive-by sashiko findings,
-> but those are not related to the change itself.
+Hi Markus,
 
-There more unrelated findings, those will be addressed in a future PR.
+On 7/6/26 08:19, Markus Breitenberger wrote:
+> From: Markus Breitenberger <bre@keba.com>
+> 
+> intel_mac_finish() is registered as the phylink mac_finish() callback
+> for the Elkhart Lake SGMII ports. phylink calls mac_finish() at the end
+> of every major link reconfiguration, including the initial one during
+> probe, before any interface mode has actually changed.
+> 
+> The callback reprograms the shared ModPHY LCPLL through the PMC IPC and
+> then power-cycles the SerDes. On Elkhart Lake that ModPHY is also used
+> by the on-die AHCI SATA PHY. Running the reconfiguration during the
+> initial boot-time link-up disturbs the shared analog block while it is
+> still driving SATA, so the SATA link fails to train:
+> 
+>   ata1: SATA link down (SStatus 1 SControl 300)
+> 
+> The disk carrying the root filesystem is never detected and the system
+> hangs at rootwait. Ethernet itself comes up normally, which makes the
+> failure look unrelated to the network driver.
+> 
+> Firmware already programs the ModPHY for the configured interface, so
+> the reconfiguration is redundant unless the interface mode really
+> changes. Return early when the requested mode equals the current one.
+> This avoids touching the shared ModPHY (and the SATA PHY) during boot
+> while preserving runtime SGMII to 2500BASE-X switching, which still
+> sees a genuine mode change and reconfigures as before.
+
+One thing is that now we 'blindly' rely on the bootloader / fw having
+correctly configured the initial interface.
+
+From what I see the only configuration that's done is regarding the serdes
+rate. Maybe instead the serdes interaction logic can be reworked so that you
+query the serdes rate, see if you need to adjust it based on the selected
+interface, and if so you re-configure it ?
+
+Maxime
 
