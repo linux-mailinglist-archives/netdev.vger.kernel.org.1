@@ -1,197 +1,211 @@
-Return-Path: <netdev+bounces-305174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305175-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id NrFrM1b8S2qAeAEAu9opvQ
-	(envelope-from <netdev+bounces-305174-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 21:04:54 +0200
+	id K8szBx3nS2ricQEAu9opvQ
+	(envelope-from <netdev+bounces-305175-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 19:34:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36DAB714C77
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 21:04:54 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DFE4713EB6
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 19:34:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=nCLYqWUv;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305174-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305174-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=dINVRXiz;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305175-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305175-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 57B81319C3D0
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 17:26:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D3ED63045C8B
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 17:27:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB00E3B19C2;
-	Mon,  6 Jul 2026 17:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0E4C3B0AE9;
+	Mon,  6 Jul 2026 17:26:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 905F03AA4E7;
-	Mon,  6 Jul 2026 17:26:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D4A73AF656
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 17:26:52 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783358805; cv=none; b=Lkfg0e9cfwdYTczR+onuEotRl/oeq2oKiR/bzAIU2C3uEJfs19tCBBUVvZwJ/z6xHmOY4Z9b8vCtq79Y9Fng84yda0pcwOzD1qfD917/bY3a8RF3oMfp4jGQ19ILY7Ud9RZ3RYz8wSpZfmeJHxY7C/JVh4MeRIa7wC8RbYIBABY=
+	t=1783358814; cv=none; b=pdm9N5/CrC3dbAXhJ18DG4Me66xZSZscooP8tuiLVc3fYNGLLNALpBXEFXYSh8h4mLnFui9AyRm8gP2zD6WzXie1NU2sOF2TjVCyscf7Mhnn7UdC21pirTixvzsiBm1a84tfNQxdZla6sQoYhaFqZrRvirjkAcxdR+i0hYoX9S4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783358805; c=relaxed/simple;
-	bh=7IM4zAo6wp30fIKOD7ytq7OyqjlyWEMupcdMTPpFk2c=;
+	s=arc-20240116; t=1783358814; c=relaxed/simple;
+	bh=g7qWqVyY+iHjDRjtLMQRnNdNWq79ioRPbSLvXsnReaM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dgVPf43xcAN5wHmAYmQGcLYzttDmEYxOQwX55SFSZwIYNZaesgjZo8WJf/U4wKrPyQaFZeNRap/jzwDmAyy5UpSUhc1u9Cr9R5UYR6B7IwRklz2IOUhuW00j9swVhTlqSlL9daBjrlhJArvLxmC+0KMzoGLc0eJt1MTZNVB4RYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nCLYqWUv; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 160F11F000E9;
-	Mon,  6 Jul 2026 17:26:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783358804;
-	bh=6Q0tvr2GvB7IdKSisCRev74pEI09lUCKAJRHUpFa0u0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=nCLYqWUvGJM2k6XDnnND9naY7BS0FeW4Fu5CyITqesk4/FYtYFs2v+CdsAT/O073Y
-	 GtZ8t7rZu7alxOIECS486DbL4kafAvJYppDKfefXQcxPJWSm50Z5xEB87XflCdnqI0
-	 dI9I5Vp+VbNytWapWIsBYtTNmQpIQ3PSkrb5u0vxywEuxj1U2BwNjyu/B89xGJdNtD
-	 G/Odw4daeVaAAUZb5GsfrnhN7yZ/7dsR9qtpRXxY65g9kYlYkQBfw49iWquOtCkMjk
-	 tJfNZXyAVgeg0oDBCZxb/20tfctRWrUO672g92oAd9zuNBOetu0kFzrqAf+966bE2y
-	 VRCYCAEaqRrlQ==
-Date: Mon, 6 Jul 2026 18:26:30 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Manuel Ebner <manuelebner@mailbox.org>,
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
-	Lee Jones <lee@kernel.org>,
-	Thierry Reding <thierry.reding@avionic-design.de>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Srinivas Kandagatla <srini@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Vinod Koul <vkoul@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>, Rob Herring <robh@kernel.org>,
-	Saravana Kannan <saravanak@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Andi Shyti <andi.shyti@kernel.org>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Doug Berger <opendmb@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Ulf Hansson <ulfh@kernel.org>, Frank Li <Frank.Li@nxp.com>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Peter Chen <peter.chen@kernel.org>,
-	Paul Cercueil <paul@crapouillou.net>, Bin Liu <b-liu@ti.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Maximilian Luz <luzmaximilian@gmail.com>,
-	Hans de Goede <hansg@kernel.org>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>, brgl@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-sound@vger.kernel.org,
-	driver-core@lists.linux.dev, devicetree@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-i2c@vger.kernel.org,
-	iommu@lists.linux.dev, linux-pm@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	linux-usb@vger.kernel.org, linux-mips@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org, mfd@lists.linux.dev
-Subject: Re: [PATCH v3 02/20] driver core: platform: provide
- platform_device_set_of_node()
-Message-ID: <e40d0bd0-0e3d-4c01-bffc-8e0075213c45@sirena.org.uk>
-References: <20260706-pdev-fwnode-ref-v3-0-1ff028e33779@oss.qualcomm.com>
- <20260706-pdev-fwnode-ref-v3-2-1ff028e33779@oss.qualcomm.com>
- <fbc50f89e0c3bb148656a3b8d96974f591576dec.camel@mailbox.org>
- <akvOo2EeERLYPh72@ashevche-desk.local>
+	 Content-Type:Content-Disposition:In-Reply-To; b=XU/uxGVKs1Ctzn/wi5B+m1+zrReZs70PznZrk3wN95LoX4fRMaECnVpUaKB9RaqUVsUnwpH+HoLpHXlAFv22pYLZNqdWsHwawHER3yZpWUpJincbbYU3HtMdV3K6BHN7i+R2u6fXnJQpwylnmqKQIdiqlOr2zBmEQ0DIPoF1xhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dINVRXiz; arc=none smtp.client-ip=209.85.128.41
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-493d1e8aa46so17751335e9.0
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 10:26:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783358811; x=1783963611; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=+Qhyh669ZXxHpz8jMNLJsfrGWhAXNaBuHUx0OM+dLgc=;
+        b=dINVRXizQnhe364x1rtCV19YvTTCKr2/TwBqMmX01EmhNWnm4gd9sNOOF5urYcE2lJ
+         mq4D9eQ7VlErKs+TsUNtF8+9vHf3Vv6u/YzXHhYP3Jc8ZBEIn259fG+F1stp+zJPyi0W
+         mtzLtHj3kLQQAFKIz3QOmGGZ2ahRjO6+a9O1xJgS0qKk9xNU5roOFbn1cMAME8PgF2zo
+         gCmjKBWrBetud6Py8MghrqLd5vljdm9uVnOZcieV6ayc86GVW4mdVvj5xIw01hHbzt3/
+         Hb4cGljF0H/WJh4AMJtujeC/l3nsn5/a2k22Q/PP0giApoqhwqAouQ0f37sne81Uo2+W
+         YG+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783358811; x=1783963611;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=+Qhyh669ZXxHpz8jMNLJsfrGWhAXNaBuHUx0OM+dLgc=;
+        b=bt6I0gJliBHvdmGQyEtcG6EG/vog8jeAX1x/hn0uT0dCO4HZlX5qcSPkeaXfuEVT01
+         sQECmrcQ121t5dJ9nim3OBmg5RmrAkTCEQ/cdnTi9eqC9rcEiH5QzSZ+aqBCX/NVelXL
+         49lQiNb++XBN9tTmXcx4+GNwki0YGgQKT63c4CMMA+ORVJs2980uECcfmvIa2stHX+6p
+         U63hUf/evGymKXHw9VxnZPuK8ydy3HdaOVGaLqv55ivVsB+A956AFh1NG0DB1RlcY7OA
+         0Tiuzm/lENOXdSz/JUhOG/nQ5pnhv/8dKhK1SmUnng5xjzQ2vk8DzxiCpdyUx8oGSi0K
+         CRnA==
+X-Forwarded-Encrypted: i=1; AHgh+RoC1yj+zQSehLrMrKidNZAhyVZIYuXXy4S3oU6QJfEQz516e8zqAO9yNyQWNB3KLtqAv4WvETM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXIY2o2ETN61V3qGoh94YQY5gmDrvM3XMWmwOBS+zrnqzE2l+R
+	fNXTgCwA+VtsQA4hVT45kcIyexV6L1uCLQAdllKg6uOeMWlwRaM2JecT
+X-Gm-Gg: AfdE7cnFkDhGO2rQqxX/F60wA9+F4PUd2jsveMnxpmSzXMHhpiqRatJxEh63zif0Xbc
+	mHnz9fdxKPz4TXkh+h06ms+WN86ZX2h1qp05LC5lWK6aGKmrZsWCpXoYhP0y9kaxizitHj1KpUl
+	gz/KFIpYFNwk2hg5q4Nxag/7ibgy2giFAxe5jwuL7Vwo9FZTLvy3eO2mcycw8WUNyA29MG6/rif
+	0QludUXIf+sgx81nU7i5isOhs8oAgWCcyy6fenD//3n6zlYsN9ko9I0XVLvmqrRTKL3UllOsFUk
+	mInuYK3hZbdIAx68hm/1YypdQ9rWNa9ZU908BL6KkjUdEFzPw+1tT9NRg5VG8lkiDqk0dlkp6QG
+	+UbMTyCPrpc+Np3RYb8TVfBTxqjaGMP/k0HOPFghE/dXG6Bk8IsI4mD/ughi7IUflvhITLxvZsv
+	W988H5wW8FHad/PICGiYXgErOyAZ5MgllVPS2cO5JAhNzkKOd5LjFLqYc=
+X-Received: by 2002:a05:600c:8a1b:10b0:493:c1bc:79bd with SMTP id 5b1f17b1804b1-493df08c838mr14066975e9.20.1783358811347;
+        Mon, 06 Jul 2026 10:26:51 -0700 (PDT)
+Received: from gmail.com (deskosmtp.auranext.com. [195.134.167.217])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493df702209sm5264795e9.0.2026.07.06.10.26.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jul 2026 10:26:50 -0700 (PDT)
+Date: Mon, 6 Jul 2026 19:26:48 +0200
+From: Mahe Tardy <mahe.tardy@gmail.com>
+To: Stanislav Fomichev <sdf.kernel@gmail.com>
+Cc: bpf@vger.kernel.org, andrew+netdev@lunn.ch, andrii@kernel.org,
+	ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net,
+	eddyz87@gmail.com, edumazet@google.com, john.fastabend@gmail.com,
+	kuba@kernel.org, liamwisehart@meta.com, martin.lau@linux.dev,
+	pabeni@redhat.com, song@kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH bpf-next 2/6] bpf: Add ksock kfuncs
+Message-ID: <akvlWB6AkP6kQ7xO@gmail.com>
+References: <20260706093525.13030-1-mahe.tardy@gmail.com>
+ <20260706093525.13030-3-mahe.tardy@gmail.com>
+ <akvdsqFhq0x19cu2@devvm7509.cco0.facebook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="FWksib/oYWGW6VVm"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <akvOo2EeERLYPh72@ashevche-desk.local>
-X-Cookie: Did I do an INCORRECT THING??
+In-Reply-To: <akvdsqFhq0x19cu2@devvm7509.cco0.facebook.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.76 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[mailbox.org,oss.qualcomm.com,kernel.org,avionic-design.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,linuxfoundation.org,linux.ibm.com,ellerman.id.au,8bytes.org,arm.com,broadcom.com,nxp.com,pengutronix.de,intel.com,linux.intel.com,ffwll.ch,crapouillou.net,ti.com,kernel.crashing.org,vger.kernel.org,lists.linux.dev,lists.ozlabs.org,lists.infradead.org,lists.freedesktop.org];
+	TAGGED_FROM(0.00)[bounces-305175-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305174-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_SENDER(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:sdf.kernel@gmail.com,m:bpf@vger.kernel.org,m:andrew+netdev@lunn.ch,m:andrii@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:davem@davemloft.net,m:eddyz87@gmail.com,m:edumazet@google.com,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:liamwisehart@meta.com,m:martin.lau@linux.dev,m:pabeni@redhat.com,m:song@kernel.org,m:netdev@vger.kernel.org,m:sdfkernel@gmail.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[mahetardy@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,kernel.org,iogearbox.net,davemloft.net,gmail.com,google.com,meta.com,linux.dev,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andriy.shevchenko@linux.intel.com,m:manuelebner@mailbox.org,m:bartosz.golaszewski@oss.qualcomm.com,m:lee@kernel.org,m:thierry.reding@avionic-design.de,m:sebastian.hesselbarth@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:srini@kernel.org,m:gregkh@linuxfoundation.org,m:vkoul@kernel.org,m:rafael@kernel.org,m:dakr@kernel.org,m:robh@kernel.org,m:saravanak@kernel.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:npiggin@gmail.com,m:chleroy@kernel.org,m:andi.shyti@kernel.org,m:joro@8bytes.org,m:will@kernel.org,m:robin.murphy@arm.com,m:opendmb@gmail.com,m:florian.fainelli@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:ulfh@kernel.org,m:Frank.Li@nxp.com,m:s.hauer@pengutronix.de,m:kernel@pengutronix.de,m:festevam@gmail.com,m:matthew.brost@intel.com,m:thomas.hellstrom@linux.intel.com,m:rodrigo.vivi@intel.com,m:airlied@gmail.com,m:simona@ffwll.ch,m:peter.chen@kernel.org,m:paul@crapouillou.n
- et,m:b-liu@ti.com,m:p.zabel@pengutronix.de,m:luzmaximilian@gmail.com,m:hansg@kernel.org,m:ilpo.jarvinen@linux.intel.com,m:krzk@kernel.org,m:benh@kernel.crashing.org,m:brgl@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-sound@vger.kernel.org,m:driver-core@lists.linux.dev,m:devicetree@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:linux-i2c@vger.kernel.org,m:iommu@lists.linux.dev,m:linux-pm@vger.kernel.org,m:imx@lists.linux.dev,m:linux-arm-kernel@lists.infradead.org,m:intel-xe@lists.freedesktop.org,m:dri-devel@lists.freedesktop.org,m:linux-usb@vger.kernel.org,m:linux-mips@vger.kernel.org,m:platform-driver-x86@vger.kernel.org,m:mfd@lists.linux.dev,m:sebastianhesselbarth@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[67];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mahetardy@gmail.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sirena.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,wolfsonmicro.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 36DAB714C77
+X-Rspamd-Queue-Id: 7DFE4713EB6
 
+On Mon, Jul 06, 2026 at 09:58:09AM -0700, Stanislav Fomichev wrote:
+> On 07/06, Mahe Tardy wrote:
+> > Add BPF kfuncs that allow BPF LSM programs to create and use sockets for
+> > sending data. This provides a mechanism for BPF programs to emit
+> > telemetry. For this first patch set, it's restricted to SOCK_DGRAM
+> > socket types with IPPROTO_UDP protocol but could be easily extended to
+> > SOCK_STREAM and IPPROTO_TCP in the future.
+> > 
+> > The API consists of six kfuncs:
+> > 
+> >   bpf_ksock_create()   - Create a socket (sleepable)
+> 
+> [..]
+> 
+> >   bpf_ksock_bind()     - Bind socket to local address (sleepable)
+> >   bpf_ksock_connect()  - Connect socket to remote address (sleepable)
+> 
+> Since you're doing only UDP for now, maybe you don't need bind/connect? The
+> kernel should autobind (by default) when you sendmsg over UDP socket (IIRC).
 
---FWksib/oYWGW6VVm
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yep indeed, I kinda overlooked that as I started with UDP & TCP supports
+and mostly added the args checks. Another thing is that send is simpler
+since only used on connected sockets, so you just pass the struct
+bpf_ksock and data. So on one side it would simplify the current
+UDP-only API for now by removing the kfuncs but we might need a more
+complex send kfunc (something like sendto).
 
-On Mon, Jul 06, 2026 at 06:49:55PM +0300, Andy Shevchenko wrote:
-> On Mon, Jul 06, 2026 at 04:39:00PM +0200, Manuel Ebner wrote:
-> > On Mon, 2026-07-06 at 14:44 +0200, Bartosz Golaszewski wrote:
+> 
+> >   bpf_ksock_send()     - Send data through the socket (sleepable)
+> >   bpf_ksock_acquire()  - Acquire a reference to a socket context
+> >   bpf_ksock_release()  - Release a reference (cleanup via
+> >                          queue_rcu_work since sock_release sleeps)
+> > 
+> > The setup kfuncs bpf_ksock_create, bpf_ksock_bind, bpf_ksock_connect,
+> > can be called from SYSCALL programs only. While bpf_ksock_acquire,
+> > bpf_ksock_release and bpf_ksock_send can be called from SYSCALL and LSM
+> > programs.
+> > 
+> > The implementation follows the established kfunc lifecycle pattern
+> > (create/acquire/release with refcounting, kptr map storage, dtor
+> > registration). The kernel socket is wrapped in a refcounted bpf_ksock
+> > struct. Cleanup is deferred via queue_rcu_work() because sock_release()
+> > may sleep.
+> > 
+> > The kfuncs are only compiled when CONFIG_INET is enabled, as they
+> > specifically support AF_INET and AF_INET6 sockets.
+> > 
+> > The socket operations go through the expected LSM hooks instead of
+> > by-passing them like many kernel sockets since those are created by BPF
+> > programs and thus system users. Thus bpf_ksock_send() kfunc, which is
+> > exposed to LSM progs, has a re-entering protection to avoid recursion.
+> > Also, because of the LSM checks, we prevent the use of the kfuncs from
+> > asynchronous workqueue as the current value would then be invalid.
+> 
+> [..]
+> 
+> > A bpf_ksock_max sysctl is added to limit the maximum number of BPF
+> > kernel sockets that may exist in each network namespace. Out of
+> > simplicity for now, the settings is host wide but the counters are per
+> > network namespace.
+> 
+> What is this guarding against? Rogue bpf programs creating too many sockets?
 
-> > I removed Mark Brown <broonie@opensource.wolfsonmicro.com> from recipie=
-nts because:
-> > =E2=80=9CRCPT TO <broonie@opensource.wolfsonmicro.com> failed:
-> > <broonie@opensource.wolfsonmicro.com>: Recipient address rejected: Doma=
-in not found=E2=80=9D.
+Yes. AI review raised this because users are prevented from creating too
+many sockets by bumping against the max number of fd and this would
+allow them to create way more sockets. I kind of agreed that having "a
+limit" on resource creation would make sense but maybe it doesn't and we
+can simplify this!
 
-> Perhaps he needs to send a patch to update .mailmap?
-> Cc'ed to Mark.
-
-If it's for something that old I can't imagine I actually care.  If it's
-important enough I'm sure someone can work out how to get hold of me.
-
---FWksib/oYWGW6VVm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmpL5UUACgkQJNaLcl1U
-h9D67gf9GIugTh4PUXTgcv4IEO00hqfPt914zzGolWrW61nvCfBK/txok59PvoKw
-vaWiJIxtHNcqLXDHoH9/3oPWkqxrKq0RGWEX19nr124zN/T2SihiMa5RjzAr4UAG
-G9JAS2GOF29xF1Ml9KH8x5l5WduP6RUHVJqKK9vuJFpCloREcnnpMQVxJVgKEKpI
-TrKQpiKRZtTm5InBsTccxeXVDL2+bhnLHZaD4LbIziWok/tCyYnCw9VEJ/iUb7PJ
-bFLwu3JxUS7p7Kr/hStWapPyxi5fyw+V/ZQ8u+J5GE8g493f9A3rBarS4fJCZi8e
-cIRN6GhgNtdUL6L3p77EqAzlsDTheA==
-=WSwF
------END PGP SIGNATURE-----
-
---FWksib/oYWGW6VVm--
 
