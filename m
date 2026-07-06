@@ -1,280 +1,218 @@
-Return-Path: <netdev+bounces-305221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305222-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id BVt4JYkSTGrjfwEAu9opvQ
-	(envelope-from <netdev+bounces-305221-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 22:39:37 +0200
+	id 4JfxFqUUTGpHgAEAu9opvQ
+	(envelope-from <netdev+bounces-305222-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 22:48:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1AFD7157F8
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 22:39:36 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 013B471588B
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 22:48:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=eJGIyTzP;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305221-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305221-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=baylibre.com header.s=google header.b=mZ3QsY+A;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305222-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305222-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E51B93080BDA
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 20:30:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 71BB1301FFDB
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 20:48:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 975583E3C5F;
-	Mon,  6 Jul 2026 20:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97EBF3EFFBD;
+	Mon,  6 Jul 2026 20:48:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 877783E2AB9
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 20:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 442DC3ED11D
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 20:48:33 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783369806; cv=none; b=Six/X1toYFbBdSsg5arwDVhZnWDxqh/8ITH9n7eH7KXFKPcL6Ptmulc0vXWdz0s/eh45UYF3rRZ5P+B4NIhr3FkbC+A+lud2QEmN7LrgCDD3Qb6ew04h5qlGYIfI9IgrWU5pmK2gbU/VGGap/y0Ts/PKKpjQ78kT4+yhzSUP9es=
+	t=1783370915; cv=none; b=ecth0uc5ZSRF6EHAtbw3bWmv73BVCFfD+NV2yK+jyPdyVB5CrIWwHu9w12RZxfuzoIqeySjcqaQ8X2J1WKPm2LGrFQ00lsvCbGhZVIGHRCXexrCUVprgfhNWP4Gb/FULZNK92GRuaGFH0snrbUcd3pKJ0ehpyCvW+Tghuwv4OFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783369806; c=relaxed/simple;
-	bh=cuuGRQ9ikVr5K2JDWNiMw8FokA6lvFe5ZtfeL7kRoKQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LC3kmrT/hg8g3tpAFdosWaeVAgvMYOsIFFbp1LtPBG47BwvooR7bWi6qKdN5amnauWkJJ6ZLZY1IIV/RNhZXwinfJ6waWwmq26IXcFnnP+41a20RnjNzdE5uYanQkkJnnGGK16gV9nYbUoMramUXAax4gbQ3UV0NX+ZlXetL8gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eJGIyTzP; arc=none smtp.client-ip=209.85.128.44
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-493b7612475so32295575e9.3
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 13:30:03 -0700 (PDT)
+	s=arc-20240116; t=1783370915; c=relaxed/simple;
+	bh=sA3bUyxlyAgtfUkMb0H5qkmTnmpV+7g5kV7l0iLbrg8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DGOTPtq4sOk/HIR2K278RX4Zs2S5onEIi/jxWKJ9a2uQwn9d6Wj4ordKm8YWQp/r2yHkRjcUhDB0VYO+8zlCP3LnFVWRHAkqLUKaI0uMuCgx9bCOKSDCUfNqRr/jknlyCaSn496Ztl1FCAB3diPvXXLtn0S2D/KPmPvXYM9ZHaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=mZ3QsY+A; arc=none smtp.client-ip=209.85.221.46
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-470174001a0so1832095f8f.0
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 13:48:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783369802; x=1783974602; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6q/pZi6Akagjc5HROiArP01SOpU9gOVMCKwxAzqUAfM=;
-        b=eJGIyTzP+kAhRwtL2dHxTzMmBiNXlTHECGSUZmGjTm280+XxFxOA9JykXQ4o8xQs1L
-         TEGrgs5HBCCdEv1yRBF0RarZH8fsYGCtuozKKNDRRkvpkBsssbChORPHOpDnDFBr3wit
-         PMTKLTDkJwV8gFPjN7rBTiqCHHJuR7wWPi65tkD5VkussP6NjBGpuzOUhn6ws9XgCOP1
-         ceCT/WT0yRZAQxxuP1hdSTgriFQWfqqd8ISR5AAmw6tv6pVFIGzE0LjafrRdgM/2vSVo
-         5PL5rRW0pZHLT1A1iARx19k5IAjfuKWGczByQPYGT6QBTIvvPSYFY96Oenm1e3owWLX5
-         HAMw==
+        d=baylibre.com; s=google; t=1783370912; x=1783975712; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=0UHpBUD3cu/Rp4zLRsGuE1AtMqiOkk0aTyTzhiJ1BL8=;
+        b=mZ3QsY+AsrHxo3EAM2ic9C5MGyspmw2OwlRSqtOP1RX+npnC1yJlQfLVToZ6tp2L+D
+         1FDQ8vg8CtTeW1uLeyRJ4k5u8EpVauS3/891pOD7PU5dvtbD4pwaiEd2vCEIYfzvT0Kp
+         vHg2XXaJTbU8yjeHrYZszqaK8+068r7gx7WpPvrpLGuadZu9JauwioCLswVB+VZp7UYO
+         zXDG9BmwxAHmApF29H05BNPvzhqh1hMu2Zz+EsHYHTbxBFS+0cjczj4b4FeQi7bXl6zL
+         NZy79GxlTszrRqwt+jWi6VWTIYb4oEl8udgaIUV+wh2tURFq4JNT0BiobJVjoyhdRH7/
+         0dLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783369802; x=1783974602;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6q/pZi6Akagjc5HROiArP01SOpU9gOVMCKwxAzqUAfM=;
-        b=QZThkrY2CRWlq1mh2CclClcbx60UHTru2MSxZzUb5+XQKyesIpO5jrf3+Cfz9zfCs3
-         GhE9plvRkHkfu6/OU7O8YCjY6Y1IaWY6dLBpACYmF075NCkYVs/fOH9EfZ5tbzHgrND8
-         fzewQ9HNnmVweoBaqr5Q+j4lLmN4g0+NaxQ4BDik49n6/M21NNtQdUY3AV5WwV2+bqSh
-         x5iWAA+iwp0WbfOatUBr0/DBpoxJt7LF30Z0SgEKg/JpmaOpseGj0iDt8Sjy7Vp2sYZk
-         ypkPGjGq2BmdYrkZs4G7gVTHafsUwGfvLPk3tBa2gjKLWhoBEAuRv9SUL3UtspOhyMlw
-         9dAA==
-X-Forwarded-Encrypted: i=1; AHgh+RobiWCMOKsWz33Af6Xk2F3Pm2hrpZloVYGsjiXGtRMsF41hKriG+Cr5H5nObfhhCtXB+3rqum4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXcKdXOImNBR0lmd14pqPAP3zvVljR5fURx3D0Zobh2QkVII5S
-	PRMZWbfTLSsQOzfQ06zgUocC257oW4gDNd8fH3Ukp0B3rw2Fth40XEYA
-X-Gm-Gg: AfdE7cn4rmlWl9ui813FQiu/z9CQzWi3Fc4taX/jR4cjXOx0XFFb+BKNJNHABdg20m5
-	G2MuAlmxw2lafltDgpaOdAR5nBqtWQ0zEAgNDv2XIsWDrBY3tVfT5GR5vJO7g8uoHeSeCBxLSNl
-	gdtRgLnEOMEqlTcAtojUUiEL12Qv1boEKeB9eGVS1nyvME29wKoN5992BPRBNlSE5XPi1FQFxWh
-	VAUeZL81I2wzj6Lc3E0RS1/bJgNxVtcWCXMqD6KUuaVNDlDW3d8qo8tC0gJHiMfnSZj8T7aLg28
-	2eWX5YL3/mqVyV0pHYOwQHrgAdWnU4dWdRbLKl7sngEfU3Owqs4z21D7xgIyEnqy6OaM90kiDKM
-	35ty3vNX9tga4rrWKAFSbK1pKzUg9dHj3fnQy6E4Xim7A32cZHZivj78IX3h3ccCUpVniBjTnGP
-	xbVhHV4xWiN3Bw5beqgoi8KF3vAN11RMZunyy1H158O/t1OkRvU3uy4dSdNoJovM5uB4NYS4fX0
-	FlkC5Jog43YBCQ=
-X-Received: by 2002:a7b:c5cb:0:b0:493:c535:3934 with SMTP id 5b1f17b1804b1-493df09c294mr16563235e9.36.1783369801698;
-        Mon, 06 Jul 2026 13:30:01 -0700 (PDT)
-Received: from ?IPV6:2001:9e8:f13c:d501:a53d:1108:c6d3:af16? ([2001:9e8:f13c:d501:a53d:1108:c6d3:af16])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9de1e6ccsm27931062f8f.5.2026.07.06.13.30.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Jul 2026 13:30:01 -0700 (PDT)
-Message-ID: <c19e563a-8931-4f31-b05a-ff8def4a5161@gmail.com>
-Date: Mon, 6 Jul 2026 22:30:00 +0200
+        d=1e100.net; s=20251104; t=1783370912; x=1783975712;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=0UHpBUD3cu/Rp4zLRsGuE1AtMqiOkk0aTyTzhiJ1BL8=;
+        b=NmDPPOpXy7Y0xnhu//oQVvK6rNAj5Yi/pOyEBm/ESQaIblSDdWoYFW/zvU/GKGyXmk
+         tvBfpQAiSL0bS7+T07TyAKtV0fYVmtSwgPK2olSQZslV/7/8c301bb2qFiU0NNHuO+Sg
+         fuHgUdabWRDkMyzsZoaw1DrnDVdb5/eVojG94Xag9aU4fZK43uOiPMEjj5HvepdRpRk9
+         oR9I6S8hLGDLU7rZeAlOLs4q0Pd+82H86HnL7Gd2DFDJt9qgj1f11eAL3PKkhLB6mtPR
+         4q8l+6qeBUu0Lxf2zG+D7PvFl9ahpOM/VG8VT518R0MNsYqaMLWIOQz+qhO8fQn1c1fs
+         /yyw==
+X-Forwarded-Encrypted: i=1; AHgh+RpEXsdWhFe3LU7d1z3rmP9QUY286RBEkHk4wBH4PdShO34CkXSLMnggDvkdmiA+wPw1JfKfNcg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPXRdjWe9oLNhOcjJAfc2IZ1h8x3hl3csadNoqArGF05kY3wki
+	N84RE9TOCi6go9+Ny+P8HaYG6pPCFHJ+HfaIRMuHvWJEtJg+tvjsNvanxYVpkU6IC1M=
+X-Gm-Gg: AfdE7cn+QIKaUwbrkOl+PP0OCtMX1rtBcLd2LStfUyjEpi1RhfSguO5IepCc2pTDxWI
+	KSjrCXNqgeSF818Qhr/HXwCPw/N3pVLOw3WCw3o4uLZbtYPuS8UsuhBWnt5mDM8rl3z2xnbENlJ
+	Ubx5xRzwm8e0bA1SLvpaJEcocj1b6ZBnQmKSNCQcnhPUWfJUfx9IymU0Q7Xb4WdcTtDHCMocTy4
+	Cli/WpBfbdlOn/g3XmCYbWrX7Cn3wgs4GV/t02JpT/H0/8xjKRNUvLQOEg17u49SxjbWIFrSmch
+	eI1BZePIaGYZW9R32teBametuWaeXqIJLDECZvMD4myf2/6NBzRP5YZkmaS5OhDNrEuv53dGnoi
+	Oo3TVJJzQ4ZiVCojb39Nz9bECrnlQegP+AnfQJhV0OOnY8htxnVrHEUxukYxu/MA/jeKya7gO+W
+	eZQy5lZkb7SRP7JcbbOHW4lY/hoGsv
+X-Received: by 2002:a05:6000:2484:b0:476:6bd4:82b8 with SMTP id ffacd0b85a97d-47de66d0032mr2092771f8f.14.1783370911620;
+        Mon, 06 Jul 2026 13:48:31 -0700 (PDT)
+Received: from localhost ([2a02:8071:56d1:2de0:1d24:d58d:2b65:c291])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-47a9e4d7801sm28301287f8f.16.2026.07.06.13.48.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jul 2026 13:48:30 -0700 (PDT)
+Date: Mon, 6 Jul 2026 22:48:27 +0200
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 net-next] net: phy: Drop #inclusion of
+ <linux/mod_devicetable.h> from <linux/mdio.h>
+Message-ID: <akwToZyYvHZPtdjV@monoceros>
+References: <ca270a534d0f230a939a3fb4a661808b35d6436d.1783329817.git.u.kleine-koenig@baylibre.com>
+ <12ec5246-4124-4edb-a5f8-f10c73b1fcb7@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 1/4] dt-bindings: net: pse-pd: add bindings
- for Realtek/Broadcom PSE MCU
-Content-Language: en-US
-To: Conor Dooley <conor@kernel.org>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
- Kory Maincent <kory.maincent@bootlin.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- Daniel Golle <daniel@makrotopia.org>, =?UTF-8?Q?Bj=C3=B8rn_Mork?=
- <bjorn@mork.no>
-References: <20260706112425.3149226-1-jelonek.jonas@gmail.com>
- <20260706112425.3149226-2-jelonek.jonas@gmail.com>
- <20260706-player-handwash-0a3fe95cf5ec@spud>
-From: Jonas Jelonek <jelonek.jonas@gmail.com>
-In-Reply-To: <20260706-player-handwash-0a3fe95cf5ec@spud>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="yznje6wp3egk2oea"
+Content-Disposition: inline
+In-Reply-To: <12ec5246-4124-4edb-a5f8-f10c73b1fcb7@lunn.ch>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-3.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[baylibre.com:s=google];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-305221-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DMARC_NA(0.00)[baylibre.com];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:conor@kernel.org,m:o.rempel@pengutronix.de,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:bjorn@mork.no,m:andrew@lunn.ch,m:krzk@kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-305222-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[baylibre.com:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,vger.kernel.org];
 	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,zyxel.com:url,linksys.com:url,svanheule.net:url]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,monoceros:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E1AFD7157F8
+X-Rspamd-Queue-Id: 013B471588B
 
-Hi Conor,
 
-On 06.07.26 19:35, Conor Dooley wrote:
-> On Mon, Jul 06, 2026 at 11:24:21AM +0000, Jonas Jelonek wrote:
->> [...]
->> +
->> +description: |
->> +  Microcontroller (MCU) that fronts the PSE hardware on switches using
->> +  Realtek (RTL8238B, RTL8239, RTL8239C) or Broadcom (BCM59111, BCM59121)
->> +  PSE chips. The MCU exposes a small message-based protocol over either
->> +  I2C/SMBus or UART; the actual PSE silicon is not accessed directly. The
->> +  Realtek and Broadcom variants share this device tree contract but use
->> +  different protocol opcodes, selected by the compatible.
->> +
->> +  The compatible identifies the PSE-MCU protocol dialect, not a specific
->> +  part. The device here is the MCU: it presents a stable message protocol
->> +  documented by Realtek, with the PSE silicon behind it - Broadcom on
->> +  older boards, Realtek on newer - detected at runtime and not described
->> +  here. The MCU's own silicon is general-purpose and varies across
->> +  boards, so the 'realtek' vendor prefix names the protocol front-end
->> +  (following the google,cros-ec pattern); the '-rtk'/'-brcm' suffix
->> +  selects the Realtek or Broadcom dialect.
->> +
->> +  A single compatible per dialect covers both the I2C/SMBus and UART
->> +  attachments: the wire protocol is identical across them and the
->> +  transport is already expressed by the node's parent bus, so it is not
->> +  encoded in the compatible. Transport-specific properties differ
->> +  accordingly - the I2C attachment carries 'reg' (and, for Realtek,
->> +  'realtek,i2c-protocol'), while the UART attachment carries the serial
->> +  peripheral properties such as 'current-speed'.
-> I'm not really convinced by the arguments here.
->
-> If the switch vendors are running different software on their MCUs to
-> the point that they behave differently, then yes it makes sense to have
-> different compatibles.
->
-> The first thing I don't understand is why realtek is considered the
-> main vendor here? Is it their MCU that broadcom are re-using with some
-> protocol tweaks?
+--yznje6wp3egk2oea
+Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v1 net-next] net: phy: Drop #inclusion of
+ <linux/mod_devicetable.h> from <linux/mdio.h>
+MIME-Version: 1.0
 
-The protocol and firmware on the MCU, most likely the whole "solution",
-is from Realtek. The setup is always the same on most Realtek-based
-switches (saying most because a few counterexamples use completely
-different setups, not even Broadcom or Realtek PSE silicon). The host
-interface is always the same (except for I2C vs. SMBus vs. UART, which
-is likely just a config in the MCU firmware). Therefore "realtek," is the
-right prefix for all of these.
+Hello Andrew,
 
-Broadcom is not really involved here except for their PSE silicon being
-used. Maybe Realtek modeled their MCU host protocol after the one that
-Broadcom PSE silicon uses as host interface, but this is rather guessing.
+On Mon, Jul 06, 2026 at 04:17:47PM +0200, Andrew Lunn wrote:
+> On Mon, Jul 06, 2026 at 11:29:19AM +0200, Uwe Kleine-K=F6nig (The Capable=
+ Hub) wrote:
+> > <linux/mdio.h> itself doesn't use any of the device id structures. The
+> > files #including <linux/mdio.h> use a variety of them:
+> >=20
+> > 	$ git grep -l '<linux/mdio.h>' | xargs grep --color  -E '\<(acpi_devic=
+e_id|amba_id|ap_device_id|apr_device_id|auxiliary_device_id|bcma_device_id|=
+ccw_device_id|cdx_device_id|coreboot_device_id|css_device_id|dfl_device_id|=
+dmi_(device|system)_id|eisa_device_id|fsl_mc_device_id|hda_device_id|hid_de=
+vice_id|hv_vmbus_device_id|i2c_device_id|i3c_device_id|ieee1394_device_id|i=
+nput_device_id|ipack_device_id|isapnp_device_id|ishtp_device_id|mcb_device_=
+id|mdio_device_id|mei_cl_device_id|mhi_device_id|mips_cdmm_device_id|of_dev=
+ice_id|parisc_device_id|pci_device_id|pci_epf_device_id|pcmcia_device_id|pl=
+atform_device_id|pnp_(card_)?device_id|rio_device_id|rpmsg_device_id|sdio_d=
+evice_id|sdw_device_id|serio_device_id|slim_device_id|spi_device_id|spmi_de=
+vice_id|ssam_device_id|ssb_device_id|tb_service_id|tee_client_device_id|typ=
+ec_device_id|ulpi_device_id|usb_device_id|vchiq_device_id|virtio_device_id|=
+wmi_device_id|x86_(cpu|device)_id|zorro_device_id|cpu_feature)\>'
+> > 	...
+> >=20
+> > but none of them relies on <linux/mdio.h>'s #include.
+> >=20
+> > <linux/mod_devicetable.h> is a bad header mixing many different device
+> > id structures and thus is an unfortunate dependency because if e.g.
+> > struct wmi_device_id is modified all users of <linux/mdio.h> need to be
+> > recompiled despite none of them using struct wmi_device_id.
+> >=20
+> > So drop the unused header.
+>=20
+> While i agree that there are lots of unneeded dependencies here, does
+> this change actually solve anything? Pretty much every PHY driver
+> needs mdio_device_id, which is part of mod_devicetable.h. So it must
+> be getting included somehow.
+>=20
+> I assume the long term plan is to move all the structure definitions
+> out of mod_devicetable.h, so a driver can include just the ones it
+> needs?
 
-Maybe a historical view might help. Older RTL83xx-based switches with
-PoE shipped with this setup using Broadcom PSE silicon. From what I know,
-at this point Realtek didn't design their own PSE silicon. They used the
-Broadcom silicon, put a MCU as a manager in front of it with their firmware
-and a host protocol based on what Broadcom PSE itself uses. At some
-point Realtek started to design their own PSE silicon which then was
-used in newer switches instead of Broadcom PSE.
+Yes, however not long term, but I intend to get most of this done for
+7.3-rc1.
 
-> If it is, then having the vendor as a suffix like wheel reinvention to
-> me, and if the MCU and/or protocol aren't something that broadcom
-> borrowed from realtek then having a realtek vendor prefix is strange
-> altogether. The mention of old boards being broadcom while the protocol
-> is documented by realtek is confusing me.
->
-> Either way, encoding the vendor without using the vendor prefix seems
-> very odd me to.
+> Is this patch somehow a step along that path? Why not move
+> mdio_device_id into mod_devicetable_mdio.h and include that? It seems
+> like the more obvious fix.
 
-I'm open for suggestions here. This has been the hardest issue in this
-whole series, to be honest. It basically boils down to differentiating
-these two protocol generations. I cannot say why Realtek did that on
-the transition to their own PSE silicon but vendors doing weird stuff
-shouldn't be surprising and this is the reality now.
+That's exactly my thought, and there is commit ad428f5811bd
+("mod_devicetable.h: Split into per subsystem headers") that is part of
+v7.2-rc2 and that does exactly that (apart from the filename).
 
-Is something like "-gen1" and "-gen2" better, with a clear description
-somewhere in the bindings how that maps to actual device setups
-(gen1 = older/MCU fronts Broadcom PSE, gen2 = newer/MCU fronts
-Realtek PSE)? This would drop Broadcom and the confusion around it
-here. I admit, using a vendor suffix isn't great and still attributes
-Broadcom too much in this context here.
+Best regards
+Uwe
 
-> Secondly, the compatibles you do provide seem too generic. Is it really
-> possible for a given board to use smbus AND i2c, or do specific boards
-> only ever use i2c OR smbus (or uart for that matter).
-> I find it more believable that a board would support i2c and uart than
-> supporting both i2c and smbus fwiw.
+--yznje6wp3egk2oea
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Only one at a time is used, but not combined in any way. All switches
-I've seen so far always have a single management MCU for PoE, not
-multiple. Thus, only a single variant is used. Which variant is used
-likely depends on the board vendor which then tells Realtek "I want your
-PoE solution, I can attach it via (I2C/SMBus/UART)". At least for UART vs.
-I2C/SMBus there are sometimes valid reasons to use UART over the other.
+-----BEGIN PGP SIGNATURE-----
 
-There is only a single switch (from Linksys) where the MCU expects raw
-I2C messages. SMBus transaction fail actually. But I don't see the reason
-why Linksys did it that way. The reason can't be that the MCU is attached
-on a bit-banged I2C because another switch uses SMBus transaction on
-a bit-banged I2C.
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmpMFJgACgkQj4D7WH0S
+/k5dHQf/QoJwvEDslmRdlY/7+cdVFzKOjggf0jklvP1rIUOxJuc1G9pdBRKfCACH
+cSpHt0herH2EwKaXrpQPVdJgTNWwURKJ55j1fkP/YEPEGE7i3TM5JktQ/YAOPWj7
+MvfcQ5Ia8h40i/1g3X3gyKqaEGrB/eFDslsEGcMYiEUTLjtK8P/CqyubD+YXDJ7M
+mfLuW6fu6/U8gdw9fQay/J2UaM/zV1iNqAzgmD7eRAvje4WgrUnw6xm9RtaSimOq
+NUZtsQfvjxDJHWtJFNQODzR44GsLymwK6H+5bQLiVuBFtBR1LLlg28qipw3VRWtF
+2ncfNVS3on+zC95LHbfABSDLS7LqOw==
+=Y4bH
+-----END PGP SIGNATURE-----
 
-> Can you provide a link to the actual devices somewhere? It is
-> completely non-obvious to me what the binding actually represents.
-
-I hope I get your request correctly. Find some links to devices and/or
-to my commits wiring that up in actual DTS (WIP, hashes may change).
-
-Zyxel XMG1915-10EP (UART with Realtek PSE silicon):
-https://svanheule.net/switches/xmg1915-10ep
-https://github.com/jonasjelonek/openwrt/commit/d173e64730a511e04b68271289be23ae4e98a02f
-
-Zyxel XS1930-12HP (SMBus with Realtek PSE silicon):
-https://www.zyxel.com/de/de/products/switch/10-12-port-10g-multi-gigabit-lite-l3-smart-managed-switch-xs1930-series
-https://github.com/jonasjelonek/openwrt/commit/74339c9a002032fc204b6b1fe07af259d8f51787
-
-Zyxel GS1900-10HPv1 (UART with Broadcom PSE silicon):
-https://svanheule.net/switches/gs1900-10hp
-
-Linksys LGS328MPC (I2C raw, not SMBus, with Realtek PSE silicon):
-https://support.linksys.com/kb/article/5133-en/
-
-(mostly Zyxel devices but that's just the main devices I work with)
-
-> Cheers,
-> Conor.
->
->
->> [...]
->>
-
-Best regards,
-Jonas
+--yznje6wp3egk2oea--
 
