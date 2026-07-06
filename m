@@ -1,113 +1,113 @@
-Return-Path: <netdev+bounces-305150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305151-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id akRVNs3cS2p7bgEAu9opvQ
-	(envelope-from <netdev+bounces-305150-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 18:50:21 +0200
+	id js3xGsviS2pacAEAu9opvQ
+	(envelope-from <netdev+bounces-305151-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 19:15:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 755DC713823
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 18:50:21 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5103E713BEB
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 19:15:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b="DBm/mAnp";
+	dkim=pass header.d=google.com header.s=20251104 header.b="ZgA/mN2h";
 	dmarc=pass (policy=reject) header.from=google.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305150-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305150-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305151-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305151-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E86833004F39
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 16:50:20 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D82FD30172D0
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 16:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32C67417377;
-	Mon,  6 Jul 2026 16:50:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE99D3DDDAA;
+	Mon,  6 Jul 2026 16:54:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDE8640D571
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 16:50:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8690E37C926
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 16:54:41 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783356619; cv=pass; b=OglV4/ientK48c0r92NlL8Enly+2srgxHfGadSm9b1BNjny8k20mUzujeNjsy5WX+rUCUiy/nFzzmVZs2vRQ1MBnxnZq2mtxHotRNztVxBQm+iMaf+gfiCWdErnWPOAiQPUpDK9zo7mVr7c+eNvgXRZVDykVR46Pls+GRtPZxfE=
+	t=1783356882; cv=pass; b=YWEZPCKZs9mbUTguQ4l5GPaPjILwH7Nl1wloVm6f6CMlksVOCloeEEjoia1cMsI7QXzrx9h8/+OPEklbGyby6NrbYaI/5z9aFmu/3MmB0ZOdF+/kWfwSpjwVeazrTkGzY6Tupt3rdpcauRaAXGPlGNLqJ4jeRNvgDY05JDKl8ng=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783356619; c=relaxed/simple;
-	bh=h3i7O9G++g7CBLweFVs39stc/Qs7bD4BkEbgxYquuZY=;
+	s=arc-20240116; t=1783356882; c=relaxed/simple;
+	bh=0Y+jPbggfz0+aTRExiPF5rT44GzTy6yyUw8vlBFttSo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y17o+GXWoXeyzDohryFCrt/6d3fWGQNvSpFejWvZJdzlNlBr3sRpaAhlkbKlgEGl1RLcgL0QHrLKvmhSRsf4MwBTNXZJ/bdofXdnZtFl4DSKc1hQbvJ94q1zESOjt07GerbwIIcEXgUEwDYqfZJtqp2LEfByNV/70jyrm6YmM94=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DBm/mAnp; arc=pass smtp.client-ip=209.85.215.174
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-c8fee9f63d5so1788490a12.0
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 09:50:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783356617; cv=none;
+	 To:Cc:Content-Type; b=ljl3kfKkhvuykP47oU/gKqXRzsx6Efm2Kf+tdHN1CjYjwPLQqW8iBtUTS27STxN5RFaN4PX0pyH8Twy1vDes+VfaQWc5+g3XlL9kz13jHXzp407OBAnaVs4/JJ3SbZ7YzZSJP0vDdVU9eYl3raQrA4EApm8Ju7tkF5jOcXwrmD0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZgA/mN2h; arc=pass smtp.client-ip=209.85.216.46
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-3811e59df58so1978967a91.1
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 09:54:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783356881; cv=none;
         d=google.com; s=arc-20260327;
-        b=RN2nOtL+kSaPN27Td+7w4cNmUsplKWshWSpETeesJmB/agvw5Cl/hChnoX57vF7UtW
-         HWeAdLv1ilfogc7DST8vJQ28o5VlX3owJP7n8pNmcnu92VZqssz9/1JBjV8EPR9JCrZj
-         lck+ah/P/VzLpWjafEmKKxs6m3dJbfnOSYE5eNXlitc7YrQ3Sj1ob4FJjNwQz4S47Jbk
-         kbgppbxMxJvdcdQlU/wo1cDJ0sChnKae1VNTvRImAYbc2/J993DVg81TdevQ/X3jxit4
-         kXR2Cfj1+WByMYJtz5LpxVi/b15Yd58WeMCa1wgOXLcOS6PIzcyFS3E5IQ34RHeTKqU2
-         6wYQ==
+        b=R7raUQOzEe5ECpP1sL4H0up0LqNdv1RERBh9zPNH5HhOw7C1cQR1CFZbIVuQbn0l4h
+         nxxXosHFuLGB3t2MN2G2O7wWrePe8a1Yh2CH5llvFgjvyvFXcBNtyd9YwJLCvH3aC44L
+         d1wP+4xW5URquFyGb2dSjDWkn7DQwJfG/tA2ie8iDqzsMmhcRRUD0OJ60QA29cUd9OsQ
+         gN545RvidCwX8KTz5IHoHyOO4L4/WzS+ws2pI6cU77sMAitl0DWBpJJh/uA55Tcc1t+V
+         N/uk4U+SzRufKYwe7bvHE1qbX2cObc88BHZgd5J/d6xLydrEMayXLodVvA76StpKkmtM
+         flRQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=y2Jo1cTANhVWri7WEWVQ3/UfiG/vKV5dfVAPXk5QZDc=;
-        fh=0/3V+Bs8BenKT3mZ6+7qcC6tMGAxmIE5iPIuRa6FAnU=;
-        b=iINPSW7OZXhL0MAJ4D+74xgqHy1VcEUgNYKic8xNwXMakMNyYJCoHaYo325ikcKoRg
-         /PX0fBXMnRxxT1KtG83adtTJB18uDtzFG737qg6g43ofC3bVS1UpJ8Jl8VgOaLL5GCU2
-         4u7qwJaCobHV2OtpF8ny5CU4ERThm6SKkGyNneb6gjqEDzu4/HPXZiCEtdD/5Vbju8b2
-         6VqxhHPIn++Vr6iPAnzMHT5UhMYIleNYPApioVHFunDcm/WRV5B6sT+xIRN2YtL1B22S
-         WXyt5PxYjIBTmydENa31OO5/rt46wnqcYU3yNe9wuhrVIHve56LvR1zTU64VfEeQbK9H
-         ZOeA==;
+        bh=z4GcYX+9Z4gYXSYhgZvkx5Z4PEsTCSeVsgPumim+UhU=;
+        fh=RcOvXH/jbhzgrv0V9Ln7N7ZKulXgIvtjHSyCbdBvxgs=;
+        b=LinOG8EuA7Y7x3KOJTW8xz2UsqMcy/BCCtzTJxkICrXTKgsju1mVxemdYANtx3U47r
+         L+4k4I2DiiC7Ojx15cRpipihlbM7oWzvnsEZTAhYuE+YWUaQx+o7DtTyrvYm8z6/dA1M
+         e86kuYg3VS9MFaT1u6augaKxXg4N8u8OQ8VmRqyfjEjRJsCnSXnCRqdsvGrLMldocBen
+         37TyNolIDYFRBTbohwEhLyStxac+ZoaOOaES7WIAg/HUg5vzkvejGur8ke6ekzH8o9Bi
+         i/aMBayxc9X/S5FbDZQYSMd+AJjWmpLQt+aoKDziq9Lg54D5q2OS/iZM3jXoSW7iaCoz
+         e/uA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783356617; x=1783961417; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=y2Jo1cTANhVWri7WEWVQ3/UfiG/vKV5dfVAPXk5QZDc=;
-        b=DBm/mAnpp0Z+d7llVsIpQn0G0XjyfERW3LZQowX6ISYI/NWdU/XbojuKC8tb/Fb+2l
-         3P+q2x64WQWJQZeLSnBy2HMZFt/90ZxPVmjjXslzDYLKQ8h2OwtlOgPftQodX2mLhGt9
-         c39why2U8GOv3XrC7c7SzG6RurSgNF+uDbwJHx79CM8jEuWWJ+Twyx7F1h5TiAThHKtx
-         p4uWOZGVziiDJ6VEBCJ7ji8XfnSvQK/MRuwQJTXU54HwnkGTIGN5VqeiXGoY/hg8W7Z0
-         b+7r+E/MiKTIhzZZ/qc7jQCOCD9cMhqj2Rrl3oozDKfKQgCHGaNm6oV7Kb0+prDYjhgK
-         RkJQ==
+        d=google.com; s=20251104; t=1783356881; x=1783961681; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z4GcYX+9Z4gYXSYhgZvkx5Z4PEsTCSeVsgPumim+UhU=;
+        b=ZgA/mN2hg5paALkOG9IQ7ytWC7hXu++4hocQJB5dB1nXB7l+9K4K/7WkDSDo3V03c7
+         4rqSFGBPOGLzSbzGPqISAIfFBRm1NOHGuqQJN/x5xzTcpgpwqHM30HTObBiib7woovQ9
+         0BFp6h0DAgoUswVI1GQUfw59Yzw/9G3GYGIZpqfh9tnrh4+Pm31ASSRPj2z8u5BmB2R8
+         97hFwAZF1Sq+Ft7NaSdAoi2HaagsyO+4FgT29+dBCzuhhtJGhwNnZfSvSBHrw3THzJPc
+         fBVsAN4hRDA/g0/WOLwydQ1PB+8GC89BGvwC1OpEgZCFqU0FJTVXyzwp/tChmRCwPLbF
+         EV7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783356617; x=1783961417;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=y2Jo1cTANhVWri7WEWVQ3/UfiG/vKV5dfVAPXk5QZDc=;
-        b=PXU0WYlDauUICn8qRSfvW5SJA3KgS2Zg5m87ML79lqHBuFaHGoPrRJvh0AaH0hi7cq
-         nR/5Y2WtPxPOdzYwK4ywFenhxKbCwrHx9SWc3ShSVTIjcZeZdIh6ZvAV2fXFleLlGLGx
-         nv38lU/MZJ5woqTHEStaRu9QUy6hFyUNgFGRsZojKNZbI6KrlIFvRcwxL3QbBkLTda6V
-         4x2jrDbZPyrbaQER/VmQlTOILSQTeoHhRDTurXfK1xag+8ttGtPiYFsGy/SD2vvm6G3B
-         Tg4ggyC522utqY2NZiDT/L1C6wnOtKuxdKm6l7Mv06M41HO3aPl/lUv5Fe/T/Mby8jkH
-         r6ng==
-X-Forwarded-Encrypted: i=1; AHgh+RouGj4PX+08fZ/AvBrnYoSvrn04kIl2GudZ6V+O4OjI7nrpfNmPhtwMvyrDEvVpTsj0q258Rzs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwiFaX0+6lkAaQ6GotpG2AbxQFrPhKuQIzUn765mufwv3Yb4W8g
-	NOGp2uXy7163HzYnH2gY8h5G4rl1JfYf/2duBlUr8o0ZMq0lMZoGwWSMLDLxr5aIFFDncD/w0ay
-	r+q/PJRTObxjubuZfm8rD/QR0wZl11avqY35t0blw
-X-Gm-Gg: AfdE7claaCySWcpVkAW4twd0PflWtA32tpXDqEANExcIbOuejB0ucFYxH/8QkKZp04p
-	OoJcK1UWV4SxgJ8TYAyxPwpyTpjva5b27T/G8M0Iqxy9GTSjMlZB97pPZlLmrfeApTaSGxDAqwB
-	kfP6+Of57nIIFvBlqvC/FVxNrSU5OA15gArpL0deTOVZnBzHgK86M/Mm2TWuPipyOnV/HfJfEkJ
-	099hUEjRYSJA/vCYfTcFHdMOTvsW/hVb8fG+0y/JQsXmLeV4QAHbkQgLEOxP6qo+Cm0JaQf8zeU
-	MvKc+/78j/FdT5eQj9fFxFVPd/JsSN2miOhD9VwOP9O84VZrOLs7xlmktehwMGppPIUO8HX1OIF
-	wXfjxuQOq51tDSQsttf283i3lpREyHmme6Yy4SA8ySvsvsryjYA==
-X-Received: by 2002:a05:6a21:689:b0:39c:235:c5ec with SMTP id
- adf61e73a8af0-3c08ee78247mr1685112637.34.1783356616384; Mon, 06 Jul 2026
- 09:50:16 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1783356881; x=1783961681;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=z4GcYX+9Z4gYXSYhgZvkx5Z4PEsTCSeVsgPumim+UhU=;
+        b=LyJ9eQ0n/cT8kaS7wFYoHc5Tr5Sd47ucjxVaw9rPnKVivMwZIgf+ok+zOimfDp/rLK
+         b5Y3dN6f5bagXqPI0noub72d2CNFc3yUaenGfa5d/7AWiip39bGUrTjxFi4iWL78UPaj
+         PWhv+I+8+PC8lm28AKbkM8XcGndqk900+g6EgjxUqlEuOS8qB2wV50GCZEoOc0aoTWMr
+         b7bbwm8OvLniZZTG2QaWr5Tph8BIaqsX3nJWA/QtbJpNqqzDpYLxGrmNUcxMC9tdcJ0r
+         UeZprwjnrx140mH86hNcf5nrmwFbJ8KYFnm+beyRbH77zkw/xtUlbVR/2LVfyEWrTpu5
+         SWdQ==
+X-Forwarded-Encrypted: i=1; AHgh+RqMXHxwyCBG4qtSdszJ610oeaCLsRJVyffVO+G4+l/lVl3vCwuoU6bUBwaKyM0K3sFpF6gnU/o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuaVNuOHp3KD9vdH2uPo38SpobZFSqFgROs8aAC9BnGBZubOd4
+	cqPCbqdHSAuBt3pn88PJAGU++IMocbLShL6cMiVM0y3YENfDnaKvvgB+83TJkn7UAEsOxu165IC
+	7soy94/dmuKVRANhr0LfB/dbUcNp1anOsh4/+nwUe
+X-Gm-Gg: AfdE7clvr2Jb9RCFrEGdCRgSVntoEITanf5Wui6QRNAJQtGpPF9FwBt8GU4TRXTiIIo
+	7LcrRgmlR0nWphVY6jUcdGl1txgxBftXEUy+zf0ihKlzTwpDyiuq/KY48iEDH9xOrf8S5MArs+n
+	eXb+guj/Dl+xsCyEByO7F0nbJBRiicD79f/1evVyNKv6RExeRPwwqGRliFDuLTqjbamPCzxVm77
+	/0X78wcXWEl8C3wVqZITGyYCUPAWg8pz4Iznndr97ni0gcN9GM2vAUyxpkWftHgJSaxobvrTXa6
+	gpLTSo6xjXGjO377rCwxeXm1w+RRKV0x3cNMU3FM6N9YIW3OeLoMjqiXijoeVMmzNf8XEFSpu/u
+	vm5TfVVCioekyS7K6rmHea87M7/S1nbXnRje61jw=
+X-Received: by 2002:a05:6a20:9147:b0:3bf:6e72:68f9 with SMTP id
+ adf61e73a8af0-3c08ee6ddd9mr1642406637.38.1783356880303; Mon, 06 Jul 2026
+ 09:54:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260703001009.1572444-1-kuniyu@google.com> <20260703001009.1572444-12-kuniyu@google.com>
-In-Reply-To: <20260703001009.1572444-12-kuniyu@google.com>
+References: <20260703001009.1572444-1-kuniyu@google.com> <20260703001009.1572444-13-kuniyu@google.com>
+In-Reply-To: <20260703001009.1572444-13-kuniyu@google.com>
 From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 6 Jul 2026 09:50:05 -0700
-X-Gm-Features: AVVi8CfIYSIiUMIVlknORlbnjbAi834eFRLtfRJ60imfAhQPdQlp4iLZgV8K3do
-Message-ID: <CAAVpQUCgYwoEzsg5mWdRN=Pgp=h6YW3u2T0oAiGTLdM-VLmN+Q@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 11/14] ipvlan: Convert ipvl_port.count to refcount_t.
+Date: Mon, 6 Jul 2026 09:54:29 -0700
+X-Gm-Features: AVVi8CcCSyIS6Qr00fgmOoCc6bhSGQ00N_rvT3bGq30rFTutXOMPb6CdxIm8xrE
+Message-ID: <CAAVpQUC+2_GqR8KT+xW0tR9txY=sanQR3GyQN9eOsqFE1qLkZQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 12/14] ipvlan: Synchronise ipvlan_init() and
+ ipvlan_uninit() for the same lower dev.
 To: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>
 Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
@@ -118,12 +118,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305150-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305151-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org];
@@ -144,77 +144,80 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mail.gmail.com:mid]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 755DC713823
+X-Rspamd-Queue-Id: 5103E713BEB
 
 Replying to Sashiko review,
 
 On Thu, Jul 2, 2026 at 5:10=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.com=
 > wrote:
-[...]
-> -static void ipvlan_port_destroy(struct net_device *dev)
-> +static void ipvlan_port_destroy(struct ipvl_port *port)
->  {
-> -       struct ipvl_port *port =3D ipvlan_port_get_rtnl(dev);
-> +       struct net_device *dev =3D port->dev;
->         struct sk_buff *skb;
 >
-> -       netdev_put(dev, &port->dev_tracker);
->         if (port->mode =3D=3D IPVLAN_MODE_L3S)
->                 ipvlan_l3s_unregister(port);
-> +
->         netdev_rx_handler_unregister(dev);
-
----8<---
-Can this trigger a lockdep warning due to a missing global RTNL lock?
----8<--
-
-Once RTNL is removed, yes, but out-of-scope of this series as
-mentioned in the cover letter.
-
-
->         cancel_work_sync(&port->wq);
-> +       netdev_put(dev, &port->dev_tracker);
-> +
->         while ((skb =3D __skb_dequeue(&port->backlog)) !=3D NULL) {
->                 dev_put(skb->dev);
->                 kfree_skb(skb);
-> @@ -111,6 +114,27 @@ static void ipvlan_port_destroy(struct net_device *d=
-ev)
->         kfree(port);
->  }
+> ipvlan_uninit() for the last ipvlan device resets the lower device's
+> rx_handler_data to NULL.
 >
-> +static void ipvlan_port_put(struct ipvl_port *port)
-> +{
-> +       if (refcount_dec_and_test(&port->count))
-> +               ipvlan_port_destroy(port);
-> +}
+> Once RTNL is removed, ipvlan_init() would race with ipvlan_uninit(),
+> which could leak a newly allocated ipvl_port.
+>
+>   ipvlan_init()                   ipvlan_uninit()
+>   |                               |- if (refcount_dec_and_test(old_port))
+>   ...                                |- ipvlan_port_destroy(old_port)
+>   |                                     '
+>   |- refcount_inc_not_zero(old_port) <-- fails
+>   |- ipvlan_port_create(phy_dev)        .
+>      |- new_port =3D kzalloc()            |
+>      |- phy_dev->rx_handler_data =3D new_port
+>                                         |- phy_dev->rx_handler_data =3D N=
+ULL
+>                                         ...
+>                                         `- kfree(old_port);
+>
+> Let's synchronise the two by holding the lower device's netdev_lock().
+>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> ---
+>  drivers/net/ipvlan/ipvlan_main.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
+>
+> diff --git a/drivers/net/ipvlan/ipvlan_main.c b/drivers/net/ipvlan/ipvlan=
+_main.c
+> index b4906a8d24ef..7adad781e9b5 100644
+> --- a/drivers/net/ipvlan/ipvlan_main.c
+> +++ b/drivers/net/ipvlan/ipvlan_main.c
+> @@ -177,9 +177,12 @@ static int ipvlan_init(struct net_device *dev)
+>         if (!ipvlan->pcpu_stats)
+>                 return -ENOMEM;
+>
+> +       netdev_lock(phy_dev);
 > +
-> +static struct ipvl_port *ipvlan_port_get(struct net_device *dev)
-> +{
-> +       struct ipvl_port *port =3D NULL;
-> +
-> +       rcu_read_lock();
-> +       if (netif_is_ipvlan_port(dev)) {
-> +               port =3D ipvlan_port_get_rcu(dev);
-> +               if (!refcount_inc_not_zero(&port->count))
+>         if (!netif_is_ipvlan_port(phy_dev)) {
+>                 err =3D ipvlan_port_create(phy_dev);
+>                 if (err < 0) {
+> +                       netdev_unlock(phy_dev);
+>                         free_percpu(ipvlan->pcpu_stats);
+>                         return err;
+>                 }
+> @@ -190,6 +193,8 @@ static int ipvlan_init(struct net_device *dev)
+>                 refcount_inc(&port->count);
+>         }
 
 ---8<---
-Is there a potential NULL pointer dereference here due to CPU read-read
-reordering?
-In ipvlan_port_get(), netif_is_ipvlan_port(dev) checks dev->rx_handler,
-and then ipvlan_port_get_rcu(dev) fetches dev->rx_handler_data. Because
-there is only a control dependency and no data dependency or memory barrier
-between these reads, the CPU might speculatively reorder them.
-If this races with netdev_rx_handler_register() on another CPU during
-interface creation, could the reader fetch the old NULL rx_handler_data
-along with the new non-NULL rx_handler, resulting in a NULL port pointer
-being passed to refcount_inc_not_zero()?
+Does this fully resolve the race condition if ipvlan_device_event() drops
+the final reference?
 ---8<---
 
-No, ipvlan_port_get() is called from ipvlan_device_event(), and
-netdev_rx_handler_register() is called from ->newlink(), so they are
-under the same rtnl_net_lock().
+Yes.  netdev_lock() here is to prevent race between ->ndo_init() (newlink()=
+)
+and ->ndo_uninit() of an upper device, where the latter does not always
+hold the same rtnl_net_lock() with the former.
+
+---8<---
+Because ipvlan_device_event() temporarily acquires a port reference via
+ipvlan_port_get() and releases it via ipvlan_port_put() without holding
+netdev_lock(phy_dev), could the following sequence occur?
+---8<---
+
+ipvlan_device_event() for the lower dev and ipvlan_init() (->newlink()) for
+the upper dev are under the same rtnl_net_lock(), so no race occurs.
 
