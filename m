@@ -1,37 +1,38 @@
-Return-Path: <netdev+bounces-304878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304881-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id WianKK1eS2oPQQEAu9opvQ
-	(envelope-from <netdev+bounces-304878-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 09:52:13 +0200
+	id U/FEBmdRS2ojPQEAu9opvQ
+	(envelope-from <netdev+bounces-304881-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 08:55:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4316370DCA6
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 09:52:13 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7170770D364
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 08:55:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=sk.com (policy=none);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304878-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304878-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304881-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-304881-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D6FDE33F9388
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 06:44:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AD7F2311052E
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 06:47:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3C4E42B328;
-	Mon,  6 Jul 2026 06:22:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA26642640F;
+	Mon,  6 Jul 2026 06:22:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EB2A42640F;
-	Mon,  6 Jul 2026 06:21:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B5703C8C68;
+	Mon,  6 Jul 2026 06:22:07 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783318929; cv=none; b=mfTH8bs7WW0ZVQ8ZDCec/V04pPEk9yu0DP4GNYEKVmCaumAd20la56okF9ibsUeRFPRRSO3+/aFZ/nT5TMOFMzgD3e0gWsliV/m7JCIf09tU+IiX+glkzesLwiBTAG029Io5Exx3OVgoOoNO401cvvms+erDmM2WZxrY642mHsA=
+	t=1783318949; cv=none; b=p3nI9cCVTJDbGtw7OOMOm3zGXiuP9K1zvmIDOVl7eE5aRteGJspFpX/6q6V0EXhgqEHdk8QNIK5QyLshYHJOa1tzjw+dXGq29RMfKbtWwpE8n7uJZ/zDYweUsG1FmNOxQCKNgPgRsgVfa/t8gz8mZp5bSIngsuj11vDTHJI5+NY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783318929; c=relaxed/simple;
-	bh=6m46/bR7ahZ1eyue+jCsPNm2Mx2DXPiA4927jmqmv5Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=TzdA8LKYHLZj19MJxXoPWDXagSTQsW8zpXfAFbXqBlyqWQnVIv7ybVao8KhN9eu/lgSOtuPDy7efjTitRO3gCKJosM2tbTn+EoSfYeJ/V/zrYrm0F1Jhej1s8NqM/CRbTImLmk9D8xddCRj4Pjvm31NmDwvsILNX/LeDnBdXIAk=
+	s=arc-20240116; t=1783318949; c=relaxed/simple;
+	bh=yYQ/ICrr4Ybg4wzxLt2HdYTviFZ3VJcNVrq9rKQPtWM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KXOwkMkAXS4G9RuKqmlk0HNRoGL/TMz+JJzQU25lJsnFW2WigpGvnc82mUyOSOHjr0h183UGGq94iG2k/31f0LUzFM+ADkWrJriIkxSmF60szjMbYLIcqEVHCt8JNqoBAYfZ5SQ9xY9Glqzql0i8A2KJlsoBizlY/uLU7aTr5E8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-X-AuditID: a67dfc5b-c45ff70000001609-03-6a4b4983b95c
+X-AuditID: a67dfc5b-c2dff70000001609-20-6a4b4983b9ef
 From: Byungchul Park <byungchul@sk.com>
 To: linux-kernel@vger.kernel.org
 Cc: max.byungchul.park@gmail.com,
@@ -198,194 +199,150 @@ Cc: max.byungchul.park@gmail.com,
 	aliceryhl@google.com,
 	tmgross@umich.edu,
 	rust-for-linux@vger.kernel.org
-Subject: [PATCH v19 36/40] dept: track PG_writeback with dept
-Date: Mon,  6 Jul 2026 15:19:24 +0900
-Message-Id: <20260706061928.66713-37-byungchul@sk.com>
+Subject: [PATCH v19 37/40] SUNRPC: relocate struct rcu_head to the first field of struct rpc_xprt
+Date: Mon,  6 Jul 2026 15:19:25 +0900
+Message-Id: <20260706061928.66713-38-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20260706061928.66713-1-byungchul@sk.com>
 References: <20260706061928.66713-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSf1CTdRzH+z57nmdjuXpcnD3iJd38xWGSdlDv66Lor75l3Zn1j3ZeTXku
-	huNHAxHo6gbCBERZI9GDltPp4HApja70CG9C/uAA08Ixhp7oEbYGTOdGjSDb8PzvdZ/3vV/v
-	fz4Kmfo6l6TQ5RdLhnytXsMrWeXUomPr9ry9MXe9270BkXANi29OO3lcHq5kUX32IYtwdFSO
-	gxUEzh8qGAR6QwRBRz2B/8JbGJ6ZJJhv2olA0z0eIf8YwVAkyKPv4D4e0x08rg0ECKwtFoI9
-	9tM8mqwuFtcCcwxOut5Dv/kYg0N+HlFHuxwO4yo8tBUgMGHhceuSiYNr5AJBeOg2g27fWhw1
-	HWdRMx8muHjmDgNjy98crrr7OcwcWAav+Q+CxukJAkckKMdvbhuDivN2FhdtS2CZCMlhevAf
-	hxPhaRn2/tnFY2iki+BczRiDE21TsSmnh8fdZiuD3sgkA4/lCI/Z1th8yBqrVddH5WipOECw
-	r7qJRdWNDHw37yGYNoe5rCzq/NZJaO9kUEarOnfT2ch1nh6vnWXoV4Pr6Nnmm3Jadc4npzbX
-	LtrZlkrtP/sZejQU4agvkEld7bU8vXz4X5aODx1iNj23VflatqTXlUiGF1//RJkzWGuSFUaX
-	lwYiJmIk0aV1JEEhCulie7BR/pgjPvsC88Ia0euNyuKcKDwvdu6f4OqIUiETfk8W6x372Xjw
-	jJAptnabuTizwiqxbuqnBVYJL4tHxq6QR9Jk8WSHe0GUELufmrMycVYLGeJo8BIbl4qCPUEc
-	9zdyjwpLxfNtXtZMVDbyRDtR6/JL8rQ6fXpaTlm+rjRtR0Gei8SezfHF3EdnSOjqBz1EUBDN
-	IhWy3slVc9qSorK8HiIqZJpE1eqUjblqVba2rFwyFHxs2KWXinrIMgWreVb10szubLXwqbZY
-	2ilJhZLhccooEpKMJDN1s2/As6Xvx7KnbnRv/3Jx5YPBuuT7r95lb6Xea/h128Bnb+aY1s5X
-	VXaU973/tC4r7fPmry2FDYXJJa1ISbrTX/9kQ4b7wzeuJC5fqW/zhLv04RdKEfi+mCu/abOO
-	BveOdP7TQFfrNkVX3F+/xtv113jKKwOZ78K4YtjTvG1J+u1fNGxRjnZDqsxQpP0frpyfJmgD
-	AAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSe0hTcRTH+/3u3b3X1eqypF0LKhZZBPaAHodeGP3RLXv9E1EEOfKS87Fs
-	K8sgcq6Z2oM52qSWZZYr1HRtpi4bmaI9V5pZZpmTlmVqlrlkU7Ot6J/D53y/53w5fxyGkFaL
-	pjNK1SFBrVIkySkxKd66Shel2xiTsPjcZxlk6U/A+06vCF5ra0nwDWWRcKm8lIIxSxUNWfYL
-	Inj0JoOEprISBJ2+LATDIxYC9M5xEsaMjTQM+d/RYNIiGHc1IjA3Gwloa7pPQGmFFsNP228K
-	eusHEZi6vBTk9WhJGLCeQXCx20JDT8MG6O+sEcF4x2cMb371IbB6f2Pw1p5CMGZOhCuFjuC6
-	+TsFI+4XBOSZmhBc7eogYLDHg6Ci8QMC180MCj4Z7hDQ4p0Mr3wDFDw2naagv/kShm82Cgoy
-	XCJoftaLIN9iRNDd7sKgu1ZOgTnfToLTc5eG5t5RDO/NRgwl9i3Qae0m4amhEAfPDU7dloEl
-	T4eD5QsG060aDH5rMR1dhPhh/TmSL3ZUYl7/coziSy+XIn4kYET8UJGO4PWGYFvfN0DwJx1H
-	+KKnfRQf8LVSvOtXAck/KeT469kBzOe6o3jnxQ56+7rd4tVxQpIyVVAvWhsrjndnZxIp/plH
-	e32ZKB35I3JQGMOxSzlf+zU6xBQ7j2tr8xMhDmdnc46z3aIcJGYItmUWd8Z6lgwZU9k13A2X
-	QRRikp3L5fRX/WUJu5y74nmO/oXO4kpstX+DwoJ62Wg+DrGUXca9G3hIGpC4AE0oRuFKVWqy
-	Qpm0bKEmMT5NpTy6cN+BZDsK/pP1+GhuNRpq2VCHWAbJJ0kgelOCVKRI1aQl1yGOIeThksj5
-	MQlSSZwi7ZigPrBXfThJ0NShGQwpl0k27RRipex+xSEhURBSBPV/FzNh09MRjrj6zL1+5Y8d
-	JdOWb7N50iar7ztaTQerH6dksrYpw7YCO7+Cylhd4ZNFBNyt0Z6Jztzsr5Vz6HqTNEp1eIq/
-	xWlfpS107Gr8tujezqrUBTWayB+bB+Uzu9Lxp/lvA7ntcXNUchkzcVJt5ANZ4g22wRUOLxKs
-	5/eUn/jYcLwyRk5q4hVLFhBqjeIPAg6jj0sDAAA=
-X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0xTZxjH9547jV2OlYQz9wHTTEfchGG8PMkW4hKXHTFmRj+o24fZyNEW
+	CphykxkjV62kYOlCO1qsCOSsox1l7bZo0WzAQFFUCiglys24GgalBqlGA3SnkGV+efPL8/wv
+	b968DK6wU+sZTU6+oMtRaZWUjJCF1jRtqdizN/OTyedyiCzoCWhwuyjQe+pJuDVSRsBAmxPB
+	RESPwOw34RAY+AOHF+3LFMx0zyOwTJcSEBYNCKZ7voTQRAcJ0bFnGIy8nEUgPl3GYMmcBZeb
+	vJLe/JwCS90AgvnpSQS/9o4juOEoo2A4EqYg5G/AYK6dgsayGyT4+2cQXLKZEJQ3uym4Numj
+	wT+ziMFjswkDp2cfTIhBQmqnwGYpx+C12EqDWLIRbHeHSHjisNKwOJUK0cZc6HU+o6EtdJ+E
+	vvGHJMwETRR4RnsQLAxPYeAyBHHQ+yIE6JcWEAz5GigYd0VJKLG9khzWn6QHqK0mIWD8G8HP
+	c00UfD8XRDBqmZX6ImEaSjubiV0Z/KvKGoJv9f6O8ZWDSxTvsrsQX2mUju7ZMM5XeIv4200c
+	33LhDcbX3t3CX7OO0Xyjp4Cv+CtE8l7HZr75+jTGX5mPkPtTvpZ9liFoNYWCLiXtqEztcPSg
+	k7NrT3Wcs1MlqP7dKsQwHLuNWxg9XoXiVnDQdJWOMcV+yAUCr/EYx7MbOG91kKxCMgZnhxI5
+	g1hNxBbrWBUXnLqAxZhgN3L2kQgZYzm7g+v/xYhWQxM5Z/ufK0Fx0rxt8dKKXsFu5x6FbxKr
+	+rVcX/1TInYfXCp22xWxMS5Zy3+z4bFejh2P40Z7DNhq5ntcpyNAGBFrfctu/d9ufcveiPBW
+	pNDkFGarNNptyeriHM2p5GO52R4k/VrxzOI3V9H8wMEuxDJIuUYOu9IzFaSqMK84uwtxDK6M
+	l29K2pupkGeoir8TdLnf6gq0Ql4Xep8hlAnyrS+LMhTsCVW+kCUIJwXdf1uMiVtfgswfqBu0
+	CZi8d1NR+jBZmtr9VfxBeiwxX1x6cT5lMPrpxfqzpw8P8c5z7h8/fvDR5Q74wfSP7M1ggu9o
+	bV2otOaxta9A90V6Z11SF+tOE7PC6rZDvcfS/RsmW4rIO/2+A2f3t7yzZ9+R1u1p3UbLzjPH
+	lz+nk2suav33ru/WH7BGDUoiT61K3Yzr8lT/AoxJ5laxAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0wTWRSA986dTofGkrGQOEFd3GZ9xKi7m4g5icZHjHFWsmY3/jDxj050
+	lPKStIBgVgVqsSBuSpOW0EpFlIpQBYuoiF0JBlypRBBZiIKIW4uEIkZbTUsLTjUb/XPz3XO+
+	8/hxaKyYlSTQqsxsQZ3JpyspGSnbuV67WvtrcurPd6ZWgV53AoZHPRL4t7CdhIBfT8LZRgcF
+	EetNKeidlRL4Z7CIhN6rDQhGA3oEH2esGHStcyREjF1S8AefScFUiGDO1YXA3GfEMNR7F4Pj
+	eiEB75tmKZi89w6BacxDQcVEIQnT9jIEFq9VChOd22FqtE0CcyPjBAx+8CGwe2YJ8LSfQhAx
+	p8G5mmax3PyWgpmeRxgqTL0Izo+NYHg38QLB9a7nCFx1RRS8MrRg6PfEwpPANAUPTKcpmOo7
+	S8CbJgqqi1wS6Hs4iaDKakTgfeoiQHuhkQJzlZOE1he3pdA3GSZg2GwkoMH5G4zavSS4DTWE
+	uK5oXVsA1gotIT6vCTBdaSMgaK+Xbq5F3EfdXyRX33yD4HSPIxTnsDkQNxMyIs5fq8WcziB+
+	7/mmMXey+QhX6/ZRXCgwQHGuD9Uk113DchdLQgRX3rOaa7WMSH/fske24YCQrsoV1D9t3CdL
+	qavrRFm++XltxTaqAFXGlqIYmmXWso+Nt6RRppjl7NBQEEc5nlnCNp/xSkqRjMZMfyJbZj9D
+	RhNxDM96x0qIKJPMUtY2GJBEWc6sYx9eM6AvTRPZhqb2z41ixPjVcNVnX8Eksc+m75Nf/Pns
+	g0qPyLQ4YDnbaFNEw1gs1bZYsQHJLd9Ylq+W5RurGuF6FK/KzM3gVelJazRpKfmZqrw1+w9n
+	OJF4lfZj4fJbyN+/vQMxNFLOk8PmHakKCZ+ryc/oQCyNlfHyZSuSUxXyA3z+UUF9eK86J13Q
+	dKCFNKlcIN+xW9inYA7x2UKaIGQJ6v+zBB2TUIDc/SH3wN/2FcGw+whOlI//t3/D4q0q/6ns
+	E/rZsLaok36y9sdd53aef2+L7eiu7fTLy5OX3L/rjJMlWkqK12/JebrIl1vwZ0vCywGjMdU/
+	Hjn0aLCUPh7nefvHd3k/bJu7nJT1KlS2tFu1yTFsv33cqjp9MFzM56yq6Io/+X2wZ/ElJalJ
+	4X9ZidUa/hOqfMNukQMAAA==
+X-CFilter-Loop: Reflected
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.64 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[sk.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[sk.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_SENDER(0.00)[byungchul@sk.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,skhynix.com,linux-foundation.org,opensource.wdc.com,vger.kernel.org,dilger.ca,redhat.com,infradead.org,kernel.org,linutronix.de,goodmis.org,joelfernandes.org,ffwll.ch,intel.com,mit.edu,fromorbit.com,linuxfoundation.org,lge.com,kvack.org,cmpxchg.org,linux.com,google.com,suse.cz,vflare.org,toxicpanda.com,lists.freedesktop.org,oracle.com,ericsson.com,kzalloc.com,arm.com,lwn.net,alien8.de,zytor.com,linaro.org,padovan.org,amd.com,arndb.de,suse.com,nvidia.com,joshtriplett.org,efficios.com,linux.dev,suse.de,brown.name,talpey.com,huawei.com,amazon.co.uk,linux.alibaba.com,glider.be,linux.intel.com,treblig.org,star-ark.net,valla.it,vivo.com,baidu.com,lists.infradead.org,lists.linaro.org,lists.linux.dev,qq.com,ownmail.net,sang-engineering.com,linux-m68k.org,garyguo.net,protonmail.com,umich.edu];
+	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-304881-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:max.byungchul.park@gmail.com,m:kernel_team@skhynix.com,m:torvalds@linux-foundation.org,m:damien.lemoal@opensource.wdc.com,m:linux-ide@vger.kernel.org,m:adilger.kernel@dilger.ca,m:linux-ext4@vger.kernel.org,m:mingo@redhat.com,m:peterz@infradead.org,m:will@kernel.org,m:tglx@linutronix.de,m:rostedt@goodmis.org,m:joel@joelfernandes.org,m:sashal@kernel.org,m:daniel.vetter@ffwll.ch,m:duyuyang@gmail.com,m:johannes.berg@intel.com,m:tj@kernel.org,m:tytso@mit.edu,m:willy@infradead.org,m:david@fromorbit.com,m:amir73il@gmail.com,m:gregkh@linuxfoundation.org,m:kernel-team@lge.com,m:linux-mm@kvack.org,m:akpm@linux-foundation.org,m:mhocko@kernel.org,m:minchan@kernel.org,m:hannes@cmpxchg.org,m:vdavydov.dev@gmail.com,m:sj@kernel.org,m:jglisse@redhat.com,m:dennis@kernel.org,m:cl@linux.com,m:penberg@kernel.org,m:rientjes@google.com,m:vbabka@suse.cz,m:ngupta@vflare.org,m:linux-block@vger.kernel.org,m:josef@toxicpanda.com,m:linux-fsdevel@vger.kern
  el.org,m:jack@suse.cz,m:jlayton@kernel.org,m:dan.j.williams@intel.com,m:hch@infradead.org,m:djwong@kernel.org,m:dri-devel@lists.freedesktop.org,m:rodrigosiqueiramelo@gmail.com,m:melissa.srw@gmail.com,m:hamohammed.sa@gmail.com,m:harry.yoo@oracle.com,m:chris.p.wilson@intel.com,m:gwan-gyeong.mun@intel.com,m:boqun.feng@gmail.com,m:longman@redhat.com,m:yunseong.kim@ericsson.com,m:ysk@kzalloc.com,m:yeoreum.yun@arm.com,m:netdev@vger.kernel.org,m:matthew.brost@intel.com,m:her0gyugyu@gmail.com,m:corbet@lwn.net,m:catalin.marinas@arm.com,m:bp@alien8.de,m:x86@kernel.org,m:hpa@zytor.com,m:luto@kernel.org,m:sumit.semwal@linaro.org,m:gustavo@padovan.org,m:christian.koenig@amd.com,m:andi.shyti@kernel.org,m:arnd@arndb.de,m:lorenzo.stoakes@oracle.com,m:Liam.Howlett@oracle.com,m:rppt@kernel.org,m:surenb@google.com,m:mcgrof@kernel.org,m:petr.pavlu@suse.com,m:da.gomez@kernel.org,m:samitolvanen@google.com,m:paulmck@kernel.org,m:frederic@kernel.org,m:neeraj.upadhyay@kernel.org,m:joelagnelf@nvidia.com,m:jo
  sh@joshtriplett.org,m:urezki@gmail.com,m:mathieu.desnoyers@efficios.com,m:jiangshanlai@gmail.com,m:qiang.zhang@linux.dev,m:juri.lelli@redhat.com,m:vincent.guittot@linaro.org,m:dietmar.eggemann@arm.com,m:bsegall@google.com,m:mgorman@suse.de,m:vschneid@redhat.com,m:chuck.lever@oracle.com,m:neil@brown.name,m:okorniev@redhat.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[byungchul@sk.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-304878-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[byungchul@sk.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,skhynix.com,linux-foundation.org,opensource.wdc.com,vger.kernel.org,dilger.ca,redhat.com,infradead.org,kernel.org,linutronix.de,goodmis.org,joelfernandes.org,ffwll.ch,intel.com,mit.edu,fromorbit.com,linuxfoundation.org,lge.com,kvack.org,cmpxchg.org,linux.com,google.com,suse.cz,vflare.org,toxicpanda.com,lists.freedesktop.org,oracle.com,ericsson.com,kzalloc.com,arm.com,lwn.net,alien8.de,zytor.com,linaro.org,padovan.org,amd.com,arndb.de,suse.com,nvidia.com,joshtriplett.org,efficios.com,linux.dev,suse.de,brown.name,talpey.com,huawei.com,amazon.co.uk,linux.alibaba.com,glider.be,linux.intel.com,treblig.org,star-ark.net,valla.it,vivo.com,baidu.com,lists.infradead.org,lists.linaro.org,lists.linux.dev,qq.com,ownmail.net,sang-engineering.com,linux-m68k.org,garyguo.net,protonmail.com,umich.edu];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	TO_DN_NONE(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[byungchul@sk.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_GT_50(0.00)[165];
-	TAGGED_RCPT(0.00)[netdev,renesas];
 	R_DKIM_NA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,sk.com:from_mime,sk.com:email,sk.com:mid]
+	ALIAS_RESOLVED(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,kzalloc.com:email,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4316370DCA6
+X-Rspamd-Queue-Id: 7170770D364
 
-Makes dept able to track PG_writeback waits and events, which will be
-useful in practice.
+While compiling Linux kernel with DEPT on, the following error was
+observed:
 
+   ./include/linux/rcupdate.h:1084:17: note: in expansion of macro
+   ‘BUILD_BUG_ON’
+   1084 | BUILD_BUG_ON(offsetof(typeof(*(ptr)), rhf) >= 4096);	\
+        | ^~~~~~~~~~~~
+   ./include/linux/rcupdate.h:1047:29: note: in expansion of macro
+   'kvfree_rcu_arg_2'
+   1047 | #define kfree_rcu(ptr, rhf) kvfree_rcu_arg_2(ptr, rhf)
+        |                             ^~~~~~~~~~~~~~~~
+   net/sunrpc/xprt.c:1856:9: note: in expansion of macro 'kfree_rcu'
+   1856 | kfree_rcu(xprt, rcu);
+        | ^~~~~~~~~
+    CC net/kcm/kcmproc.o
+   make[4]: *** [scripts/Makefile.build:203: net/sunrpc/xprt.o] Error 1
+
+Since kfree_rcu() assumes 'offset of struct rcu_head in a rcu-managed
+struct < 4096', the offest of struct rcu_head in struct rpc_xprt should
+not exceed 4096 but does, due to the debug information added by DEPT.
+
+Relocate struct rcu_head to the first field of struct rpc_xprt from an
+arbitrary location to avoid the issue and meet the assumption.
+
+Reported-by: Yunseong Kim <ysk@kzalloc.com>
 Signed-off-by: Byungchul Park <byungchul@sk.com>
+Reviewed-by: Jeff Layton <jlayton@kernel.org>
 ---
- include/linux/mm_types.h   | 1 +
- include/linux/page-flags.h | 7 +++++++
- mm/filemap.c               | 6 +++++-
- mm/mm_init.c               | 1 +
- 4 files changed, 14 insertions(+), 1 deletion(-)
+ include/linux/sunrpc/xprt.h | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
-index e25d09f3dfa9..81dc9999090a 100644
---- a/include/linux/mm_types.h
-+++ b/include/linux/mm_types.h
-@@ -222,6 +222,7 @@ struct page {
- #endif
- 	struct dept_page_usage usage;
- 	struct dept_ext_wgen pg_locked_wgen;
-+	struct dept_ext_wgen pg_writeback_wgen;
- } _struct_page_alignment;
+diff --git a/include/linux/sunrpc/xprt.h b/include/linux/sunrpc/xprt.h
+index f46d1fb8f71a..666e42a17a31 100644
+--- a/include/linux/sunrpc/xprt.h
++++ b/include/linux/sunrpc/xprt.h
+@@ -211,6 +211,14 @@ enum xprt_transports {
  
- /*
-diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-index 0b0655354b08..ec736811a2c6 100644
---- a/include/linux/page-flags.h
-+++ b/include/linux/page-flags.h
-@@ -203,6 +203,7 @@ enum pageflags {
- #include <linux/dept.h>
- 
- extern struct dept_map pg_locked_map;
-+extern struct dept_map pg_writeback_map;
- 
- static inline void dept_set_page_usage(struct page *p,
- 		unsigned int new_type)
-@@ -292,6 +293,8 @@ static inline void dept_page_set_bit(struct page *p, int bit_nr)
- 
- 	if (bit_nr == PG_locked)
- 		dept_request_event(&pg_locked_map, &p->pg_locked_wgen);
-+	else if (bit_nr == PG_writeback)
-+		dept_request_event(&pg_writeback_map, &p->pg_writeback_wgen);
- }
- 
- static inline void dept_page_clear_bit(struct page *p, int bit_nr)
-@@ -300,6 +303,8 @@ static inline void dept_page_clear_bit(struct page *p, int bit_nr)
- 
- 	if (bit_nr == PG_locked)
- 		dept_event(&pg_locked_map, evt_f, _RET_IP_, __func__, &p->pg_locked_wgen);
-+	else if (bit_nr == PG_writeback)
-+		dept_event(&pg_writeback_map, evt_f, _RET_IP_, __func__, &p->pg_writeback_wgen);
- }
- 
- static inline void dept_page_wait_on_bit(struct page *p, int bit_nr)
-@@ -311,6 +316,8 @@ static inline void dept_page_wait_on_bit(struct page *p, int bit_nr)
- 
- 	if (bit_nr == PG_locked)
- 		dept_wait(&pg_locked_map, evt_f, _RET_IP_, __func__, 0, -1L);
-+	else if (bit_nr == PG_writeback)
-+		dept_wait(&pg_writeback_map, evt_f, _RET_IP_, __func__, 0, -1L);
- }
- 
- static inline void dept_folio_set_bit(struct folio *f, int bit_nr)
-diff --git a/mm/filemap.c b/mm/filemap.c
-index c0bff1e08a28..e3aa2754da3f 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -1197,7 +1197,7 @@ static void folio_wake_bit(struct folio *folio, int bit_nr)
- 	 * dept_page_clear_bit() being called multiple times is harmless.
- 	 * The worst case is to miss some dependencies but it's okay.
- 	 */
--	if (bit_nr == PG_locked)
-+	if (bit_nr == PG_locked || bit_nr == PG_writeback)
- 		dept_page_clear_bit(&folio->page, bit_nr);
- 
- 	spin_lock_irqsave(&q->lock, flags);
-@@ -1254,6 +1254,9 @@ static inline bool folio_trylock_flag(struct folio *folio, int bit_nr,
- struct dept_map __maybe_unused pg_locked_map = DEPT_MAP_INITIALIZER(pg_locked_map, NULL);
- EXPORT_SYMBOL(pg_locked_map);
- 
-+struct dept_map __maybe_unused pg_writeback_map = DEPT_MAP_INITIALIZER(pg_writeback_map, NULL);
-+EXPORT_SYMBOL(pg_writeback_map);
+ struct rpc_sysfs_xprt;
+ struct rpc_xprt {
++	/*
++	 * Place struct rcu_head within the first 4096 bytes of struct
++	 * rpc_xprt if sizeof(struct rpc_xprt) > 4096, so that
++	 * kfree_rcu() can simply work assuming that.  See the comment
++	 * in kfree_rcu().
++	 */
++	struct rcu_head		rcu;
 +
- static inline int folio_wait_bit_common(struct folio *folio, int bit_nr,
- 		int state, enum behavior behavior)
- {
-@@ -1697,6 +1700,7 @@ void folio_end_writeback_no_dropbehind(struct folio *folio)
- 		folio_rotate_reclaimable(folio);
- 	}
- 
-+	dept_page_clear_bit(&folio->page, PG_writeback);
- 	if (__folio_end_writeback(folio))
- 		folio_wake_bit(folio, PG_writeback);
- 
-diff --git a/mm/mm_init.c b/mm/mm_init.c
-index 66b68c02d8d4..2695d7b3b089 100644
---- a/mm/mm_init.c
-+++ b/mm/mm_init.c
-@@ -589,6 +589,7 @@ void __meminit __init_single_page(struct page *page, unsigned long pfn,
- 	page_cpupid_reset_last(page);
- 	page_kasan_tag_reset(page);
- 	dept_ext_wgen_init(&page->pg_locked_wgen);
-+	dept_ext_wgen_init(&page->pg_writeback_wgen);
- 
- 	INIT_LIST_HEAD(&page->lru);
- #ifdef WANT_PAGE_VIRTUAL
+ 	struct kref		kref;		/* Reference count */
+ 	const struct rpc_xprt_ops *ops;		/* transport methods */
+ 	unsigned int		id;		/* transport id */
+@@ -317,7 +325,6 @@ struct rpc_xprt {
+ #if IS_ENABLED(CONFIG_SUNRPC_DEBUG)
+ 	struct dentry		*debugfs;		/* debugfs directory */
+ #endif
+-	struct rcu_head		rcu;
+ 	const struct xprt_class	*xprt_class;
+ 	struct rpc_sysfs_xprt	*xprt_sysfs;
+ 	bool			main; /*mark if this is the 1st transport */
 -- 
 2.17.1
 
