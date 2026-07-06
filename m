@@ -1,194 +1,134 @@
-Return-Path: <netdev+bounces-305092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305091-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 8nmELs3ZS2qvbQEAu9opvQ
-	(envelope-from <netdev+bounces-305092-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 18:37:33 +0200
+	id ivdMM7bZS2qlbQEAu9opvQ
+	(envelope-from <netdev+bounces-305091-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 18:37:10 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 019567135EE
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 18:37:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 296E57135C9
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 18:37:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ssi.bg header.s=ssi header.b=sdwh+UwC;
-	dmarc=pass (policy=reject) header.from=ssi.bg;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305092-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305092-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b="NX ewQB/";
+	dmarc=pass (policy=none) header.from=lunn.ch;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305091-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305091-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6A8B738D5E58
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 14:20:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CD9A938C4F46
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 14:20:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BD223A75A3;
-	Mon,  6 Jul 2026 14:17:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BC19397694;
+	Mon,  6 Jul 2026 14:17:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B49C3A963D;
-	Mon,  6 Jul 2026 14:17:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD2437A836;
+	Mon,  6 Jul 2026 14:17:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783347478; cv=none; b=BpQrRjwQw2pd5y4JHUE9KXpDucYcRwSNXpfOGLvaTcu4fAyXTU3PFAOF3N2nTO4FQF26EPkPQIb0pRl2odrgTJUboNM3JHdg2SaSAN2uRenQL/SpT5DXcacLshkCOTwndBsTHZp/xEDlNJUcFYbZI+dsvQS1RlymLIi5r5YQAX8=
+	t=1783347472; cv=none; b=kGiNE5/WMmLbVHu+WyJRBzzUOTFnd8Wf/lAJ9GRUiyAsE5JOBWHf+hV1BM4b47SQ2TsRTr4AHwBEwK95rgYTPq91gvwl8Dxfk/cmvyF+0dSxkEHddku/mFxf75F/RYaF6pjEcgizuMOmNqP4Zm6jLQA32sKX6b7rVCrPTQO1Ni4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783347478; c=relaxed/simple;
-	bh=5rB+tcWjPVVWfW6ycYrFHi0qPClI3epYHo2xDUT70Ww=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=oiDPmRM/zz5xuAprp4S5ZAC4c9ReUhNRvNmNB+VLi02mwp3BiolsAHTzZq6V8eNLENBD+pTX/4N+bvsoqKW6T9H8jgp94vNnMF1r0gh7LNygd8ykYaxjAdMxC3YN+xWRczJFkF3UH3U58xsYfxhxJQFYWrohEwlJlOd+nqZvKPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=sdwh+UwC; arc=none smtp.client-ip=193.238.174.39
-Received: from mx.ssi.bg (localhost [127.0.0.1])
-	by mx.ssi.bg (Potsfix) with ESMTP id 365422121F;
-	Mon, 06 Jul 2026 17:17:50 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
-	:content-type:content-type:date:from:from:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
-	 bh=H2kYV2YNGwRbDpvUxivqC0uqB2DTUR1fxY9v63DflU8=; b=sdwh+UwCJLvB
-	Clp4C2RDPFw1foh+ob0EyuIg32UOTuyouSy5whBrJgCVAHX6VnvomZXf4QummmGz
-	UWrF26Kj1Hh/ZNuoJZELwCEEqL0s18YE9QClgJd5mRQ80PpObxFNH2nS1gXtlaew
-	ZnLh9B2pFPr9+mlM+SBPnDvxmJKxvsq3UbJ/9yNbrWJ+AeSMv/W2wRoZFzs5Nu1g
-	Ppzj/JnnZDv8Xusj5QrLn6pFQLwiOlZskXZ0ezsFrK3uZvDVjKks7t3Dq+E7xOhL
-	e8s6/Noij2vSsYTCQhaaP1XhJhtmyRG9e4smr48qz+OndzgtwU6bHH5eBMkLXCNp
-	phhgS7EOY9yokgW3jzsGgrDCTq2tR1orxRZkcQuEfZXa9ZUAlWu5kPn/aBpxDhVW
-	rQHm4IR+QKRM8NgARnBtz3RxL8awZtp3Aakd7tl9RK5Wz5sCcraHALMsOGDyg5tw
-	RKhSn6waYfgtOVE+UAfy0rbMj7eDHejkbSimebQYqRYud+b3LU0j+JCjcfQ5zZWP
-	UKDpD7HkCTHjkkbsXYNtPZSlmJGLXCpxsXachJshmki1vsAPErMMibziv7r1NF6n
-	BRN1WQ83SUMRAgfJ6/5WLplaLuCSCeVTAEutrf5m90DDaK4sDKUqq9ZjANSPChYK
-	7jy7WZiSm+j0rMrVawIGK4YSRAUGBz8=
-Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
-	by mx.ssi.bg (Potsfix) with ESMTPS;
-	Mon, 06 Jul 2026 17:17:50 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by box.ssi.bg (Potsfix) with ESMTPSA id 4597E60B74;
-	Mon,  6 Jul 2026 17:17:46 +0300 (EEST)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.2/8.18.2) with ESMTP id 666EHc2t054134;
-	Mon, 6 Jul 2026 17:17:39 +0300
-Date: Mon, 6 Jul 2026 17:17:38 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-cc: netdev@vger.kernel.org, Simon Horman <horms@verge.net.au>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, lvs-devel@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        linux-kernel@vger.kernel.org,
-        Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
-        Ao Wang <wangao@seu.edu.cn>, Xuewei Feng <fengxw06@126.com>,
-        Qi Li <qli01@tsinghua.edu.cn>, Ke Xu <xuke@tsinghua.edu.cn>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH nf] ipvs: skip IPv6 extension headers in SCTP state
- lookup
-In-Reply-To: <87E04893-B2B2-485F-B242-9CACF2F176D6@mails.tsinghua.edu.cn>
-Message-ID: <bcd7f0e6-b2fc-4e54-f9ac-e1c8b1b0c497@ssi.bg>
-References: <20260705123040.35755-1-zhaoyz24@mails.tsinghua.edu.cn> <92783c87-7e6a-e90a-b2fc-e5d1332139e0@ssi.bg> <87E04893-B2B2-485F-B242-9CACF2F176D6@mails.tsinghua.edu.cn>
+	s=arc-20240116; t=1783347472; c=relaxed/simple;
+	bh=gqEN4yEuJqeft4O65ZWqzzQPhS7Hu0z60urTWCiy4jI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ad3Web+TyO+yr8g2zqTLB+rcBD1KzGBnm/SMqTCiupZTHDT5rIQvpmv4dRjnTK4Fj3HduoHtFibd/gGB94rUky69K5qByPAX7tlCJclIaBRDdpQANSPXa+ITGbBT2JquGjAtYb3FFLDIlCCsovXqQPDpIq1mZ9Z439KXCLqnLoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NXewQB/V; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=t4Z7cgDJ+ry2IcOlaM3iFiga27Hfw0yB/aOf5j/AC4g=; b=NX
+	ewQB/Vv8AFQa10aeCRPRDbnFxBVli6C1SNio4DmFtJOgiwCr5RRiIe61CVHrjJZG3psEs4DNahD7G
+	dGlqWPwMmtNSdAQEGIewGcAB+uBBD/hFcRiT7jbJIaMJOEv1xzuxV2NhDPjfdJtqdHa3FfSQeaZ9Z
+	qp+g7Opf1ZQavg4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wgk8p-00B0D2-HJ; Mon, 06 Jul 2026 16:17:47 +0200
+Date: Mon, 6 Jul 2026 16:17:47 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 net-next] net: phy: Drop #inclusion of
+ <linux/mod_devicetable.h> from <linux/mdio.h>
+Message-ID: <12ec5246-4124-4edb-a5f8-f10c73b1fcb7@lunn.ch>
+References: <ca270a534d0f230a939a3fb4a661808b35d6436d.1783329817.git.u.kleine-koenig@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ca270a534d0f230a939a3fb4a661808b35d6436d.1783329817.git.u.kleine-koenig@baylibre.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
-	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305092-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305091-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,verge.net.au,netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
-	FORGED_SENDER(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FORGED_RECIPIENTS(0.00)[m:zhaoyz24@mails.tsinghua.edu.cn,m:netdev@vger.kernel.org,m:horms@verge.net.au,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lvs-devel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:u.kleine-koenig@baylibre.com,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[ssi.bg:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:from_mime,lunn.ch:dkim,lunn.ch:mid,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 019567135EE
+X-Rspamd-Queue-Id: 296E57135C9
 
-
-	Hello,
-
-On Mon, 6 Jul 2026, Yizhou Zhao wrote:
-
-> > On Jul 6, 2026, at 01:35, Julian Anastasov <ja@ssi.bg> wrote:
-> > 
-> > May be it is better starting from ip_vs_set_state()
-> > to provide new arg 'int iph_len/offset' (set to iph.len), down to
-> > state_transition(), sctp_state_transition() and set_sctp_state().
-> > Same for all protos. It should cost less stack and ipv6_find_hdr()
-> > calls and what matters most, correct iph context in case we
-> > have IP+ICMP+TCP (with just two ports or even with TCP flags)
-> > and are scheduling ICMP, i.e. not IP+TCP as usually.
+On Mon, Jul 06, 2026 at 11:29:19AM +0200, Uwe Kleine-König (The Capable Hub) wrote:
+> <linux/mdio.h> itself doesn't use any of the device id structures. The
+> files #including <linux/mdio.h> use a variety of them:
 > 
-> I agree that the already parsed transport-header offset should be 
-> passed from ip_vs_set_state() down to the protocol state_transition() 
-> callbacks, instead of reparsing the skb in set_sctp_state(). We will 
-> send a v2 that does this for SCTP, TCP and the other IPVS protocols 
-> in one combined fix.
+> 	$ git grep -l '<linux/mdio.h>' | xargs grep --color  -E '\<(acpi_device_id|amba_id|ap_device_id|apr_device_id|auxiliary_device_id|bcma_device_id|ccw_device_id|cdx_device_id|coreboot_device_id|css_device_id|dfl_device_id|dmi_(device|system)_id|eisa_device_id|fsl_mc_device_id|hda_device_id|hid_device_id|hv_vmbus_device_id|i2c_device_id|i3c_device_id|ieee1394_device_id|input_device_id|ipack_device_id|isapnp_device_id|ishtp_device_id|mcb_device_id|mdio_device_id|mei_cl_device_id|mhi_device_id|mips_cdmm_device_id|of_device_id|parisc_device_id|pci_device_id|pci_epf_device_id|pcmcia_device_id|platform_device_id|pnp_(card_)?device_id|rio_device_id|rpmsg_device_id|sdio_device_id|sdw_device_id|serio_device_id|slim_device_id|spi_device_id|spmi_device_id|ssam_device_id|ssb_device_id|tb_service_id|tee_client_device_id|typec_device_id|ulpi_device_id|usb_device_id|vchiq_device_id|virtio_device_id|wmi_device_id|x86_(cpu|device)_id|zorro_device_id|cpu_feature)\>'
+> 	...
 > 
-> > But what I see is that ip_vs_in_icmp*() are missing
-> > the ip_vs_set_state(cp, IP_VS_DIR_INPUT, skb, pd) call just
-> > after ip_vs_in_stats() and before ip_vs_icmp_xmit() where
-> > we should provide ciph.len. That is why we don't reach the
-> > set_tcp_state() calls to set correct cp->state and timeout
-> > when scheduling related ICMP. So, this should be fixed too.
+> but none of them relies on <linux/mdio.h>'s #include.
 > 
-> For the ICMP path, I agree that the missing ip_vs_set_state() call is
-> worth looking at, but using ICMP errors to drive the upper L4 state 
-> needs some care, because spoofed ICMP packets can match an 
-> existing embedded tuple before the endpoint TCP/SCTP stack 
-> performs its own validation. Maybe this change needs further
-> discussion?
+> <linux/mod_devicetable.h> is a bad header mixing many different device
+> id structures and thus is an unfortunate dependency because if e.g.
+> struct wmi_device_id is modified all users of <linux/mdio.h> need to be
+> recompiled despite none of them using struct wmi_device_id.
+> 
+> So drop the unused header.
 
-	May be only for the schedule_icmp case while the other
-ICMP replies should not change it:
+While i agree that there are lots of unneeded dependencies here, does
+this change actually solve anything? Pretty much every PHY driver
+needs mdio_device_id, which is part of mod_devicetable.h. So it must
+be getting included somehow.
 
-diff --git a/net/netfilter/ipvs/ip_vs_core.c b/net/netfilter/ipvs/ip_vs_core.c
-index 7f93239898ff..05fdcf4ce2c0 100644
---- a/net/netfilter/ipvs/ip_vs_core.c
-+++ b/net/netfilter/ipvs/ip_vs_core.c
-@@ -1971,6 +1971,8 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
- 
- 	/* do the statistics and put it back */
- 	ip_vs_in_stats(cp, skb);
-+	if (new_cp)
-+		ip_vs_set_state(cp, IP_VS_DIR_INPUT, skb, pd, offset);
- 	if (IPPROTO_TCP == cih->protocol || IPPROTO_UDP == cih->protocol ||
- 	    IPPROTO_SCTP == cih->protocol)
- 		offset += 2 * sizeof(__u16);
+I assume the long term plan is to move all the structure definitions
+out of mod_devicetable.h, so a driver can include just the ones it
+needs? Is this patch somehow a step along that path? Why not move
+mdio_device_id into mod_devicetable_mdio.h and include that? It seems
+like the more obvious fix.
 
-	Here is why schedule_icmp was added:
-
-https://archive.linuxvirtualserver.org/html/lvs-devel/2015-08/msg00015.html
-
-	But the inner TCP header should be generated by the
-real server, not from the client, so things can go wrong. We can
-leave it as it is now - we will forward the ICMP to the right real 
-server by using short conn timeout...
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
+	Andrew
 
 
