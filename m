@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-305088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305082-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id IxqQIqTGS2pJaAEAu9opvQ
-	(envelope-from <netdev+bounces-305088-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 17:15:48 +0200
+	id FVTKMhPXS2rhbAEAu9opvQ
+	(envelope-from <netdev+bounces-305082-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 18:25:55 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04970712733
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 17:15:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 714077133B0
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 18:25:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=garyguo.net header.s=selector1 header.b="NerLvY/P";
+	dkim=pass header.d=garyguo.net header.s=selector1 header.b=Qh1Vmqsn;
 	dmarc=pass (policy=none) header.from=garyguo.net;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305088-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305088-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305082-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305082-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1D13F34C7A74
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 14:13:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 288F73268B2F
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 14:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFD283D75C9;
-	Mon,  6 Jul 2026 14:12:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4D0E379C5C;
+	Mon,  6 Jul 2026 14:11:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CWXP265CU010.outbound.protection.outlook.com (mail-ukwestazon11022093.outbound.protection.outlook.com [52.101.101.93])
+Received: from LO3P265CU004.outbound.protection.outlook.com (mail-uksouthazon11020136.outbound.protection.outlook.com [52.101.196.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8697F37B40A;
-	Mon,  6 Jul 2026 14:12:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A552937883C;
+	Mon,  6 Jul 2026 14:11:43 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783347126; cv=fail; b=puJllpglcMjRWMFNUxHcap56d8QxUcEB4piKvj0yGXzT5ifWUprSX692SsPQ57PqMVaEDcrCMq06ETmcUzHdk89ptrr2pq8iIoKu88ud16KOjbHg8LRV0J7bUknFtTSaqvLTL1Z3XbbJSvTcs1Zp4rYMF7VLNzRuBh6jyze687U=
+	t=1783347109; cv=fail; b=dHq8XYINc3MlTvN0wgsnNOEOSRGnq49sAAxHr2SR4DyLg6Wl7W9C7iHkXzztCo2A4cwKvLy8pVSKIleeNP2QhVjZ8Ob/sjtrT9sCps2EkWLfGPpebJ0oqYadB/Yyo0aKofsGOBP0piW+qxWbo6b5dc+jmQQZJY3G7BfBQNOkFBo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783347126; c=relaxed/simple;
-	bh=Uq8OGAcHVw6a6nyxNc6mSwt8JEqAoheaziIIndM7prc=;
+	s=arc-20240116; t=1783347109; c=relaxed/simple;
+	bh=VUc8nQX6CjZ7+EWLu/ehxZTKqVLjapMAkfo1g01iaw4=;
 	h=From:Date:Subject:Content-Type:Message-Id:References:In-Reply-To:
-	 To:Cc:MIME-Version; b=V3xt91t7zAVGBUnzFnXQw1MgaljN8V6VXg1uNJ3Ue056H9RBaJHRLjiZyjHJeQOdLfXUQUp/yytpQwhGSgR7+bvKHFUIWMXnsDnouvi7L1PLT81psqduURovprgPhV1qg83mT6JKZtny4KY0IrFnyQ8p4ZlFL2LChhbzm/RgnLU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=NerLvY/P; arc=fail smtp.client-ip=52.101.101.93
+	 To:Cc:MIME-Version; b=sTOt0Dfyn9bZYIoLjMnDWeiywpvI1+vMxD58RGR2K/I5lm80Z2UqchFhNy52+Pie7Uuxc7Rlq7bhTVcy41hW5MT7Zpvm6uS39HX67/d+4JvmweY5FzUfynWYQGakyOJvIZIpySMUPVqOchQyUUMsT6GGGX+rVZwoXCL93PXp380=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=Qh1Vmqsn; arc=fail smtp.client-ip=52.101.196.136
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GesQYXXRRgAbtu4axPLFZxLDkh2yoXzYdWJ0ehr/e4tn2fDhw7N17f5q+XTeg5ScGZ3Sh8myOwD8jlHU/5alkjOR815WDCFkf2lyebGwY59PSpxqoSHv0tIeCTeWkL51NLmzoiqqNeeBxk8q6r5V0kpkJiFDGK5TjW0DIW6RUYH7uuQ3NGAAC7z12wPQcJJK7Y5bqlhT9l2+0jqXZDe+as6QuS9AQ9S8JogG16PBELlBYupjDFQFTWgzKi45KTkZ5lwGaaqGxSMq4fmD/vFDoPrPF2ts/C+gBCcQbyjufCtgzivwBpFgL0Qp2VKuYkUJ4um6xPWKIvgHJE1xtPHtVA==
+ b=RVzIAVSIPBSHFjiabz261JIVBxNdZy25MENzSdtadRvc+CW44OyLZVeCwcOfCS2dEUtsCUqYdTsa8MKqYuMZ1gXksnJjuEACKHD6o3arwig5NHDb49KWCujDpEsJtD/oPgRpIWpUgSTl23PGWavAvVzb8igE/gqHtt5zTVqz2+IbTkI3oVvIH9qpWzU/6CJY6PcPtNcG6GMSyhGdN8Jw5Z6DjMM5TpL/BOC3EiUvqUUf4F+5Nzg+Cw8ZoGeLAbeOqvJr1orPBMqLteCY+0LdaiuhpNMeI5vaPh1t5qjnVOXwJCJPc69IWXDRzDdG0+iP2rUDohshlld95ICjEX9Nhw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EqNSoU/Ele0jA7ni0VEhW0LfdshmnP/44N5SKfvrdQA=;
- b=fYzRWn2gyB4aQL+70JQ+Hw6r1W5tj9YwfFs1FQeoAr1uzJxcfMTPaSE0OKf1TFJPM6hsr0Kv078AkGmJMwRMLpfJWYXx3M+3gstrw40vBtNcSsDPOoKOGk3+WWtsutbs911eky85RGS3O3+Lujyj3cpAiGSImx/3bmR5Xc0+HB6Cylim71+OAitG0uNe3zSAVHl/TrONW9x3/mbBmC36c/O/OZmEE6FysB2Qbm+JF+3zoAKj3hY1YXYu2HfYoovESkpmyqy07PXZeo2NhRDIFyAfF4xwImM/6txq1bAAzZOhaRy2CThZhePgb8S7FOlBa31nKfY1pWSfGYPIn9vJOw==
+ bh=NdqIbNvxzqUYiNRvCdlxrbT5wN+ir6dmovcR66lSGlE=;
+ b=tnOcH4sjnpEczbiA9RtKJhHEp+xmAewJk+gIpcmwXjbNBl7RYS8ppvN+WpQlMeUr4FhXmpByFF8e44KqES248fdCZfyvR9tiGGLFrNwgNmXZiiZRRRSgVVY9bTWt2oVF+kUy36zyy0ZOmFo9FTjp1Gcjy/PocijUOMC6deTZ5mlYTd/QVmOVtHKsi1HGWmK1KJwNw9wWUfDZsQJayRgXCdN9Muw2YP163gHdkZLS/0mGCGE05iH38AmbhDJ0MyuJ0DM7QMZHP7x1WAJxXhji5yw+maT+U6DozRzr2r3PE6ShASqUQuRVS3llNlSA284i2gSiJe4QpRLv/vMncql5nQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
  dkim=pass header.d=garyguo.net; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EqNSoU/Ele0jA7ni0VEhW0LfdshmnP/44N5SKfvrdQA=;
- b=NerLvY/Pa5lbdWxUyMup0bquCo2OfKbhpeigxLNc8sMiuba858daigLJj55zCIdJCbiEzJEUM+UDzVm9TRk+4rYYj0LTspUpgsr4oVcsVJEzeXY85V3UgKk9DwC22hHsrIHaCqyPqZcEoir4wGGcam9OA+60Hu6Ga3U+fcOApmc=
+ bh=NdqIbNvxzqUYiNRvCdlxrbT5wN+ir6dmovcR66lSGlE=;
+ b=Qh1VmqsnSbXEBgI6tLgi0ximOAY5z8Wvs6fLA1Ng0wo1VOwjPtViQ0SmXWT6FCSxULd5n0l2yTp+C69cCOiPeaUu920Vd0YHxtcIICgVxuIuoK4wpV2x/6Dun0+aPBM/k5lG1TAAYLJmYc4ND5cx0qpRrOtYOzRk8Ph+ymJN3iY=
 Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
- by LO0P265MB7176.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:334::8) with
+ by CW1P265MB9444.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:28e::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.9; Mon, 6 Jul 2026
- 14:11:39 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.11; Mon, 6 Jul
+ 2026 14:11:39 +0000
 Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
  ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
  ([fe80::1c3:ceba:21b4:9986%4]) with mapi id 15.21.0181.008; Mon, 6 Jul 2026
  14:11:39 +0000
 From: Gary Guo <gary@garyguo.net>
-Date: Mon, 06 Jul 2026 15:11:16 +0100
-Subject: [PATCH v3 4/9] mlxsw: don't store pci_device_id
+Date: Mon, 06 Jul 2026 15:11:17 +0100
+Subject: [PATCH v3 5/9] agp/via: don't rely on address of pci_device_id
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260706-pci_id_fix-v3-4-2d48fc025acc@garyguo.net>
+Message-Id: <20260706-pci_id_fix-v3-5-2d48fc025acc@garyguo.net>
 References: <20260706-pci_id_fix-v3-0-2d48fc025acc@garyguo.net>
 In-Reply-To: <20260706-pci_id_fix-v3-0-2d48fc025acc@garyguo.net>
 To: Bjorn Helgaas <bhelgaas@google.com>, 
@@ -88,11 +88,11 @@ Cc: linux-pci@vger.kernel.org, driver-core@lists.linux.dev,
  netdev@vger.kernel.org, dri-devel@lists.freedesktop.org, 
  Gary Guo <gary@garyguo.net>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1783347093; l=2901;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1783347093; l=9887;
  i=gary@garyguo.net; s=20221204; h=from:subject:message-id;
- bh=Uq8OGAcHVw6a6nyxNc6mSwt8JEqAoheaziIIndM7prc=;
- b=nw7XATEUQSIcDCGNa111edihd5qn5Ot8tHlwsGG5rd4Ars8pNuxoLwrYfAC2WRLZigZM4iFRs
- ct1IgT2GWJQD2fMN8jcHUpxReD78e1eipWOBh7Ler07eP+JYqE+otJR
+ bh=VUc8nQX6CjZ7+EWLu/ehxZTKqVLjapMAkfo1g01iaw4=;
+ b=NkhLqBIwxB/vIu8dBA9K0tAs1kFuONEeI6/8Hlqd5uMxGl+LwMqxLz7sB6kew5Oc9T2q+5ixw
+ 1gMSHw1/cjKBSMKB6tOzqIiChfj1+t7TzhZRYerLJ+MBGDAJTXwi7As
 X-Developer-Key: i=gary@garyguo.net; a=ed25519;
  pk=vB3uIX95SM4eVrIqo1DWNWKDKD2xzB+yLLLr0yOPYMo=
 X-ClientProxiedBy: LO4P123CA0509.GBRP123.PROD.OUTLOOK.COM
@@ -105,68 +105,68 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|LO0P265MB7176:EE_
-X-MS-Office365-Filtering-Correlation-Id: accfc1ff-0aa5-4e56-9805-08dedb687d46
+X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|CW1P265MB9444:EE_
+X-MS-Office365-Filtering-Correlation-Id: 16b324df-c2f9-46b8-0e09-08dedb687d91
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|10070799003|366016|23010399003|7416014|1800799024|921020|18002099003|22082099003|56012099006|5023799004;
+	BCL:0;ARA:13230040|7416014|10070799003|23010399003|376014|1800799024|366016|56012099006|3023799007|18002099003|22082099003|921020;
 X-Microsoft-Antispam-Message-Info:
-	i87hpf+8vjoUBTc/+B75ewdm19XYTPsXO3Agrsaap+O64n+rLbmu4LoPOcfWgfpx60eGZXCYOhQsrne97USuhmkVWvea9+dZYgkF0l4F9nufEXaFOYwSLdchI6uZuOLYIgUeaDsZHYhivEwGYBtCOeQcKkJ6U0baLmlQ/sv/w37YODC9upMRKfmBBrSW0EtYwyZGgoZWzmlBugyjFkxVCoKR4C0tRCuQywtHIfvnvqajCicBUEHDEZWBDb5v56AGwznRrCgb7Po5h1mSBcBCKgnoHfGEBN7GG7XvR+H8Es/molAlPJbQN7PrlsYnpzxP2e2EtCLUkASnM3XcoxfJiqIaNBxOWHvolhXUz9fGfn8m0znC1L1G0YF/5gg9F2Qu6/h9VdkXwSzYpmHv86UqtpAtnuZAF0wgTNDeVcFmy881JlkCIf59XZo9QXSZ4X7m4tPrbi2XeAPc3kBRFMJvwKw6+vaS/bRNz/xzPH0Ip5FeTVWRNch1U0H/LUYedXagv5ItVI8VU3KHk+1WLfsTXKIoVbFzWzf/7xT/wiv/l/aebF9XINvDHx49sL9v9e8U5iSnEsv0Ue7ODtf1M9aG7dU4vpPr/XKwQFwOtMI0rELmbuZchQdH72/11ajkPP4JwuzaO8u7O5QCojKPJlqPiNcA6aL7NIRXJfGDioeN6lv6UvJverDLPjEYJrZ9HkYksstLYxHIhNMufB0ES9Jnzg==
+	CGgWFDv46c9SrgJ4C1Cdh6XmH90XWq6QAWFSoBCHn6RB2sFz+W4dTz0sPFp4Y9yPYJkA6Iqq32h0bXELSPsG7WvQF/JDSxiE0VB6gI5A+NADDRiQag4UBVe29Y5HewITmvsgXpLbHIU28VlXyw59QbZUJNAnnCEvIaL4Oy0rh6eTNAtPa8SJNyMuaylugGM6lxbRNhQR1NjMHdmNB0w9qsyKUEpfU4hhws3TRANR0VvpPgTmp1EJig4IfwYy8nAOM/X+Iu0sUHacsgaJuR6WnRVCHZta00V0BBOI72vmsxNn8chehwJiu3VjfFqbdM/Qbl708eu24KM1RabcjJgb2xaJ2ds3W3xYXYDifhHXJaE4CnhebjXUPknBOIuhjWbgkmuputRRa4bM3PZh9Uo8JMOYuvW0+jSphzhidxySamfUA/sXX9PEYFFi5/riJpM1YhzHIn1X72wfhQ56jln31kbXVYm2Bn9djUZklZG/k2nrbtLsctFuqk8CGNMLCLJzWV/3cCKzxo3cluNLqze8NfdLw8gj9UYKxL1ZhBStVeRyz5dejqmjNmxnWBUFnwpIJFBj8lQ4g7szEPt3Quy88xrACQUx7tmEzv8iJbhQAllKiWmJucDuANxf8PIBf5dUiOua2DMuKOvkbGb4bKAugU01yWkj8azbw7kLfxVAXJ5mX6rQkf8Vwvs3A3tUsHPatm573WyxZgvmatkOph52IQ==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(10070799003)(366016)(23010399003)(7416014)(1800799024)(921020)(18002099003)(22082099003)(56012099006)(5023799004);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(7416014)(10070799003)(23010399003)(376014)(1800799024)(366016)(56012099006)(3023799007)(18002099003)(22082099003)(921020);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?N0E1bnJFdndVdGwxbVk2OXVVMnRONWJjWFp6OFVvYW9PNDJ5VFRSOE9jS3lu?=
- =?utf-8?B?WmNacGszSXNGOENCWXdtOVYrQWhpeW1SaUtNV1ZBTlBDZHlvMEhscWdtVnRi?=
- =?utf-8?B?V0phcnBlcUZqcjRrS0l0RE56VkYrYnN4TFgzSHd6eVVoR3V0OWMvZDAxb25W?=
- =?utf-8?B?THVQbzlyb2xGL2I3enh4ekNZTVg0OVg2S3g5dWQvak5lS1k3T2x5NTM1WlM4?=
- =?utf-8?B?YzlNdVVtekRsdHdJaDVySlNmVHB1S2VyZFVoMjA1YktabFMrdk9jSTg3bTBr?=
- =?utf-8?B?QmtiRy9ZU3ltUzdkUDNUMmd1MnB6b0tIemFJRlBHOWR2akNYRnhJYVQ4OU5Q?=
- =?utf-8?B?NDczMlFWaWdleERteGpwNVBqbW5qbFJSdlhFM3B3NWsvRjM4TTBKMjExbFZw?=
- =?utf-8?B?cXNxMmtXZlEvTytYM2loYlZtOVpPYnpVU1hZWUhHdkFzN01vOWFvNlFoN1lI?=
- =?utf-8?B?ekNoYlNLbXVGODdEVjA4S2NORXROendQVGJiRnpMVXAraGxNbWxYSnZwOGZm?=
- =?utf-8?B?VXE0T0tkZTZuQmM1eVo1QmZMa2xnS3BtbVc3RlVIQUJFTjUwTlgzSDVuVnhK?=
- =?utf-8?B?eWFJZEQ0WnpaZnYzMWR6VG93SkY2U29MRmVzeHdHRm5YLzVGK0ZlQnBBTFRt?=
- =?utf-8?B?Tm1Da0RpZDFKZStRazluanZ5OHA0OEZ3MzY3R2doOWNGYW5rT2hHSTJTQm80?=
- =?utf-8?B?K2IxVjRyNmNjcXo0RnM1OFZXSnhaT2FZUUpYRWN2Vzg3bTJ0V2dIWG5KYkpX?=
- =?utf-8?B?S2lyZUJhZmtySHN5Z3ZZMTVJWTNZODJVQTQvU1U5b0ZHZmVkTWZHVlJyT3NM?=
- =?utf-8?B?SWJMYTJYY0Y0UkFEUHVVanEwZXNwMDFYb0tRdmFvWHo5UGkzZVFNb2Q2N3Q4?=
- =?utf-8?B?V21XcHpaN3ViQTJvcGdzYmYvN2xWS1FxdlNuOVY4MVNsRkludlp2dEhXaVhz?=
- =?utf-8?B?WGFsU1pOeWtGMmVnSVlJUlZXdXhzSnRmZTFyLzNIVVlLVzVCZ09lckYvSkMw?=
- =?utf-8?B?c05lRWZ5dllhWDJTbDZMNnRlVk8rc1pLVXdueWFHWXpSTVVwRGFvSnMzazdm?=
- =?utf-8?B?L1dYRXhzQ1JtVEh0enNoNXJUblJvNmFhMSt6WmZQakdPL1lSbEpoMVdHQ1A0?=
- =?utf-8?B?c1lBQW94cFJndGlJazd4VTIweEFQZ0xuWUJQM1FOR0dVdUl2TFppbDRPNjl4?=
- =?utf-8?B?Zmc3dE4rbTM4akx3ZzNlQlZQU1B2WVlwUkVMNDV6QlluQ24xOC95QVRwRklw?=
- =?utf-8?B?KzM0ZFovOHJ0UnFJSnRuR1M2RzRHT0J2SDVvMFZUNU5IcnI3bGs5QU1rMnJs?=
- =?utf-8?B?VWJ1cVVvcGQ0L1d1NWVqMzlaeTdJV1dSd1pvcWFFNHF4Z0ZkK2FwTnJ0RURq?=
- =?utf-8?B?dmlvRUtnQXF1MVROTWN3emh6ZU1pZ3JTQm1VL01MYmx0eFo0K0RHaEI1blNC?=
- =?utf-8?B?Mi9nQWE0c2h4N0czOEZGUnZGZmJjMitPeDlsVWNhek54LzV2V0ptL1Ewb1Z1?=
- =?utf-8?B?ZnhIWFFtV3VmSkVKaUw4NHZ3eTlFWTJsOEJmaFVnK0NJTk9PcE4xZWRUSFFE?=
- =?utf-8?B?U085aEkyRkNscTBhcVZEaGJhL3N2aGsyY0h2UGhUakZWVld6clVlY1RFVWF2?=
- =?utf-8?B?alJUaThFY2ZsUlZhL1RrT21BSERsTVFtMmpXVWdLd3l5bjEyMnVJRHdsMW5E?=
- =?utf-8?B?M0phY0xqNVdnQklHWnlOa2MyN1M3TDREY01WUXk3bHFVbE1jK1FUUXVkWk1Z?=
- =?utf-8?B?NkloZThsb0hld0JqQnRDY1AwRG9DZ0IwSmRCQ1RSVUQyR1dNa0w2VktGZGk5?=
- =?utf-8?B?dndaSHBBWmdUWTFjZ3hBclJXR2xRZ3hNSk01VHFpUFdaT0d3M2VtRXlTZ01G?=
- =?utf-8?B?SzBCQ3FqQUVSb1hTd2hPQWpNWGVnUVIzRCtoRkFwUFZEYVpGekFpQzA2ZUJq?=
- =?utf-8?B?WWNNVmlaTnU5eDcwa01OZ3AweFhqRXNYZ2k4UnhCai94UlFiUkc0SXBlTE5w?=
- =?utf-8?B?RHB2QUZ1Ly9rUFpSaGpxUGJrdFRRY1cxdVNZNis1Ny9aekRnbk1MRUJKY2hL?=
- =?utf-8?B?VU12UGNxcFcvWW9RWSsyUDUzc0dZY3lGWUlTcmVoUWRiN040b3VmUlk5UVUy?=
- =?utf-8?B?L2RyR3Z6dDlvR1duUWoyb0E1cjNjeWNLWDFKN3EvZVM5eHgwNHdueGR2Q1Zj?=
- =?utf-8?B?b3hlQ2Z3RU1lUDFDY3dRRSs0aUFYTFdBbkgrejVoVzBZWjhzZWNYREdBcVZ3?=
- =?utf-8?B?Z2hNYzh6d2toUHg3YS8rOWszZS92ZDRMTFZXNmI2QjVnTHU3VlBrQ0FxVGU5?=
- =?utf-8?B?RThDc2VkZDc0dXRITnJBZ3kwN001YkRFUkZSWUtzTFFCV3ZPYnhQZz09?=
+	=?utf-8?B?Q09LUmRvb3Bna2djTnRibllHNllnWlowVndtSU1pbHhiZENkTmsyL0R5ME1K?=
+ =?utf-8?B?N1Rrb2FIWnVNVlpjeUVIY1BHVkFsdnZMN3A0NFZqQjMxaC9FSnkvcGJRLzdT?=
+ =?utf-8?B?NTcxRTVJQk5MREJlRlRIZWU5QlJhaHlUZnV3Y1lET25nKy9sQWpHYmpCZlBw?=
+ =?utf-8?B?Y3BNMklYbUNidWUzNEVDWVQvaGR0KzhzRExRQUZMT1NsbmU3V1QxdEx5TStw?=
+ =?utf-8?B?NVdDUklCcEJJSXJkNVdHY2xMUFdzQVB4K1c3RnVHYWJwbUk2ejhZZ3p0N3JY?=
+ =?utf-8?B?L1Q1NGZ2OEdxVGt0VndMSzMwdG1XUXJ6cWRrdG1URDF3TWxpcVE5c0hNeWpz?=
+ =?utf-8?B?UEtEQ0FFVGVRT0ZydVFHQjlrN3RrRVBnR0dTQTdTelRqdnVnUGFiOXkrZTNt?=
+ =?utf-8?B?WW84TUpPb0gwYXlOUVJJdyt0dkIrWjAyNFlySGpZOXZMZUcxeFNJSUhtK1hh?=
+ =?utf-8?B?b2kvY2lpM1gxL3QrUVRLeEdNc0J2TVZibmFEa2lFSVZJY3pyaVhrY2FOK2di?=
+ =?utf-8?B?WDFLbTRZNlh4UXNiWmVNZklCdHdYUVJyMEtUeGQ1dGpNQ3hOV1hoQTdBeGYv?=
+ =?utf-8?B?cG5TWVk3WTBhRDRPQVJHRkRiSkpIODVESGw4OTA1TGR5dHN2ZDhibTBKVnJo?=
+ =?utf-8?B?M3A1LzE0b3I0Sk9mTzhaQ09FL1JOZHhFMFkydWZoYWZzQUVTY3RtUXRuMjJ1?=
+ =?utf-8?B?dm1sNWxpdnFEY1JyekFYdy9JZGlZckpwajlGTkgrS0dFVFNvSmtZV0lJTWIy?=
+ =?utf-8?B?SWh0M095VjJHZXhpRlFkcHlnaGJqTWUzNVhqSnNJVlVmVytOeS9KSzBKYlE5?=
+ =?utf-8?B?ODhYdUJyWnduSThyUUFXUG5yeHhha2JQcTFIWUwxNFFlUVpxOElJMk9ncEJi?=
+ =?utf-8?B?V3praHpJSFNObFZuOTZKODQ5V3JHQTdDcUtaYmxNekJpTUw3OU5UY0JkWjNZ?=
+ =?utf-8?B?RkJtZVZuK0NSbjN1bjFyMGdSdk5ZT3FmTFVhMjNkSVhjcSt5eFpxZzUwNjA5?=
+ =?utf-8?B?R0xZR3Fob0N4OUxpVFR6RTlJMHNOVU44aXp5UTdsSGp3SlNuTHlVL0hVRCtM?=
+ =?utf-8?B?cjNIbTlybjQrRUttSyt5RjhwTkJsWm5BVndkdCsrMjUveEZBUEZnd2thZllw?=
+ =?utf-8?B?b2JjN3lONi96bnhBN0VQc3dPcGV6ZjFMNUdHRlorcStkR01LeGdBMkJxSXFm?=
+ =?utf-8?B?Q1lheCtqZE8wMmRaMDVqdjZITFg2NytDL3ZQbUZJYWszQmZyUUQrUytCenRu?=
+ =?utf-8?B?bThObVo4RVNkQTNxWExpZ2U0THJ3K0ZDZGVveXVCdXRMb1RqTDg3WkdKNitp?=
+ =?utf-8?B?WWYzQmtBYUYxTFdJZzVKb05jck5scTR4YktlVGV5dVJ0U3NrM2RaRmM1VS95?=
+ =?utf-8?B?c3pFM3JkQ3oydElKWXFzdnN2K2hWcnBadzFRTVIvQTkzK2wzRVVvSDZRMFlp?=
+ =?utf-8?B?d0R3aVUrL1hJSm8vYVhqQW11WllPR2s1bFRMSFFtblBITE9QdENUVUtaOHMr?=
+ =?utf-8?B?Vi9rL1Z5V1M5UUtuaTJCTk5pY3Bsa25nL3IrcVFUcTJQOER1NHE5NEtXODZs?=
+ =?utf-8?B?QWplMXI1V0I1eWR4b05meGo3cHhORkJOTFc2R3N1emRmOUYvK2tGaFF0d21q?=
+ =?utf-8?B?OGlDZVgrMGZ1bk5qYXFCVm1vQ1N5ZXE3aC9mZkRQMmw1R2hNVEFSUGx1Wkdn?=
+ =?utf-8?B?Q0FDcE1CZE1iUDZFYTB0WUcxVHlDTVoyc3Rwd3hVVUFVc3dmTDY1di94QlFH?=
+ =?utf-8?B?YzRSUklyL2ZkTGUyc1BidFYwOHJrZ2R5c0JZNkZQRHRqNCt3NVIvNzNhQUpK?=
+ =?utf-8?B?MWVnemJWd01rMmVtUHM3NUpYd3VCR2xsOUJzVSs4NER6dUhhZXBwaXMvZ3Fk?=
+ =?utf-8?B?MFBYNW51LzFCVTlRdEJkUFBOMy9iRXhiN0txV2RXRXNkclZVTjNOVFhla3gv?=
+ =?utf-8?B?OGdhcFZFblJTeVc5eThhU3lFMnFSSThkaEc1bkpheWFZRWFxVGJDaUZyeWlP?=
+ =?utf-8?B?NC9Ya0dnTW5nMWVIbTV3UmFueU02dGlmc1dTQzhTWmRyRHlDbVYxdnIxcnQw?=
+ =?utf-8?B?eit5c1Q3MzlxUndCMXRYc0ZLYzI4ZEhMMGhwQWdVbngrbjA4VUR6SUlGRjB6?=
+ =?utf-8?B?Q3RhVVB3SURsVWpxWDNNcWlEc21zR21OZmdpakxyeEdKZ0RaY1pVTXVpNGFa?=
+ =?utf-8?B?WDU1WFdjMk5CUWg3M050ODZoeEEzY21Eb0dmOHZJbDRDVnVmVDJqeDk3MVc3?=
+ =?utf-8?B?dVNxTWIzUEtLU1IwQnpwQjhEcHM5aXhEYmp5clFXMWhPRTJCZTg4dzFuT2ox?=
+ =?utf-8?B?U09uVWFvZVNWODNPNEVjNnNDWlhuV2YwTFVzWWFIaVVTMXJDelpmdz09?=
 X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: accfc1ff-0aa5-4e56-9805-08dedb687d46
+X-MS-Exchange-CrossTenant-Network-Message-Id: 16b324df-c2f9-46b8-0e09-08dedb687d91
 X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2026 14:11:35.8836
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2026 14:11:36.3890
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6lDmt5l2x8QhPYCVQsB/Y9ZY3ytbVebvdDUmOefYj4p2Jydi6XlDm7TpFO/48dneqyAgrduh0bMpqmPVRdHAQQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO0P265MB7176
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3omqu6CLJIWjmxA/OBNcAbyCnV4JncqN2T8Gly44u93Xml8d4sWT+whCk0+CX4xtZw0hfiVQ5hB2xIF3VkSyQQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CW1P265MB9444
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -180,7 +180,7 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[30];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305088-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305082-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FREEMAIL_TO(0.00)[google.com,gmail.com,linuxfoundation.org,kernel.org,debian.or.jp,netlab.is.tsukuba.ac.jp,HansenPartnership.com,oracle.com,taprogge.org,nvidia.com,lunn.ch,davemloft.net,redhat.com];
 	FORGED_RECIPIENTS(0.00)[m:bhelgaas@google.com,m:zhenzhong.duan@gmail.com,m:gregkh@linuxfoundation.org,m:rafael@kernel.org,m:dakr@kernel.org,m:dlemoal@kernel.org,m:cassel@kernel.org,m:gotom@debian.or.jp,m:yokota@netlab.is.tsukuba.ac.jp,m:James.Bottomley@HansenPartnership.com,m:martin.petersen@oracle.com,m:vaibhavgupta40@gmail.com,m:jens.taprogge@taprogge.org,m:idosch@nvidia.com,m:petrm@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:airlied@redhat.com,m:linux-pci@vger.kernel.org,m:driver-core@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:linux-ide@vger.kernel.org,m:linux-scsi@vger.kernel.org,m:industrypack-devel@lists.sourceforge.net,m:netdev@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:gary@garyguo.net,m:zhenzhongduan@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
@@ -199,84 +199,367 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email,garyguo.net:from_mime,garyguo.net:email,garyguo.net:mid,garyguo.net:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,garyguo.net:from_mime,garyguo.net:email,garyguo.net:mid,garyguo.net:dkim,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 04970712733
+X-Rspamd-Queue-Id: 714077133B0
 
-pci_device_id is not guaranteed to live longer than probe due to presence
-of dynamic ID. This stored ID is unused so remove it.
+Address of pci_device_id cannot be relied on due to presence of dynamic ID
+and driver_override. Use driver_data instead.
 
-Reviewed-by: Danilo Krummrich <dakr@kernel.org>
-Reviewed-by: Petr Machata <petrm@nvidia.com>
 Signed-off-by: Gary Guo <gary@garyguo.net>
 ---
- drivers/net/ethernet/mellanox/mlxsw/pci.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+ drivers/char/agp/via-agp.c | 308 +++++++++++----------------------------------
+ 1 file changed, 72 insertions(+), 236 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/pci.c b/drivers/net/ethernet/mellanox/mlxsw/pci.c
-index 0da85d36647d..bfe3268dfdc1 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/pci.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/pci.c
-@@ -130,7 +130,6 @@ struct mlxsw_pci {
- 		} comp;
- 	} cmd;
- 	struct mlxsw_bus_info bus_info;
--	const struct pci_device_id *id;
- 	enum mlxsw_pci_cqe_v max_cqe_ver; /* Maximal supported CQE version */
- 	u8 num_cqs; /* Number of CQs */
- 	u8 num_sdqs; /* Number of SDQs */
-@@ -1768,7 +1767,6 @@ static void mlxsw_pci_mbox_free(struct mlxsw_pci *mlxsw_pci,
+diff --git a/drivers/char/agp/via-agp.c b/drivers/char/agp/via-agp.c
+index 8b19a5d1a09b..ab3b73dd080a 100644
+--- a/drivers/char/agp/via-agp.c
++++ b/drivers/char/agp/via-agp.c
+@@ -221,204 +221,6 @@ static const struct agp_bridge_driver via_driver = {
+ 	.agp_type_to_mask_type  = agp_generic_type_to_mask_type,
+ };
+ 
+-static struct agp_device_ids via_agp_device_ids[] =
+-{
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_82C597_0,
+-		.chipset_name	= "Apollo VP3",
+-	},
+-
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_82C598_0,
+-		.chipset_name	= "Apollo MVP3",
+-	},
+-
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_8501_0,
+-		.chipset_name	= "Apollo MVP4",
+-	},
+-
+-	/* VT8601 */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_8601_0,
+-		.chipset_name	= "Apollo ProMedia/PLE133Ta",
+-	},
+-
+-	/* VT82C693A / VT28C694T */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_82C691_0,
+-		.chipset_name	= "Apollo Pro 133",
+-	},
+-
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_8371_0,
+-		.chipset_name	= "KX133",
+-	},
+-
+-	/* VT8633 */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_8633_0,
+-		.chipset_name	= "Pro 266",
+-	},
+-
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_XN266,
+-		.chipset_name	= "Apollo Pro266",
+-	},
+-
+-	/* VT8361 */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_8361,
+-		.chipset_name	= "KLE133",
+-	},
+-
+-	/* VT8365 / VT8362 */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_8363_0,
+-		.chipset_name	= "Twister-K/KT133x/KM133",
+-	},
+-
+-	/* VT8753A */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_8753_0,
+-		.chipset_name	= "P4X266",
+-	},
+-
+-	/* VT8366 */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_8367_0,
+-		.chipset_name	= "KT266/KY266x/KT333",
+-	},
+-
+-	/* VT8633 (for CuMine/ Celeron) */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_8653_0,
+-		.chipset_name	= "Pro266T",
+-	},
+-
+-	/* KM266 / PM266 */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_XM266,
+-		.chipset_name	= "PM266/KM266",
+-	},
+-
+-	/* CLE266 */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_862X_0,
+-		.chipset_name	= "CLE266",
+-	},
+-
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_8377_0,
+-		.chipset_name	= "KT400/KT400A/KT600",
+-	},
+-
+-	/* VT8604 / VT8605 / VT8603
+-	 * (Apollo Pro133A chipset with S3 Savage4) */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_8605_0,
+-		.chipset_name	= "ProSavage PM133/PL133/PN133"
+-	},
+-
+-	/* P4M266x/P4N266 */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_8703_51_0,
+-		.chipset_name	= "P4M266x/P4N266",
+-	},
+-
+-	/* VT8754 */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_8754C_0,
+-		.chipset_name	= "PT800",
+-	},
+-
+-	/* P4X600 */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_8763_0,
+-		.chipset_name	= "P4X600"
+-	},
+-
+-	/* KM400 */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_8378_0,
+-		.chipset_name	= "KM400/KM400A",
+-	},
+-
+-	/* PT880 */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_PT880,
+-		.chipset_name	= "PT880",
+-	},
+-
+-	/* PT880 Ultra */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_PT880ULTRA,
+-		.chipset_name	= "PT880 Ultra",
+-	},
+-
+-	/* PT890 */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_8783_0,
+-		.chipset_name	= "PT890",
+-	},
+-
+-	/* PM800/PN800/PM880/PN880 */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_PX8X0_0,
+-		.chipset_name	= "PM800/PN800/PM880/PN880",
+-	},
+-	/* KT880 */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_3269_0,
+-		.chipset_name	= "KT880",
+-	},
+-	/* KTxxx/Px8xx */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_83_87XX_1,
+-		.chipset_name	= "VT83xx/VT87xx/KTxxx/Px8xx",
+-	},
+-	/* P4M800 */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_3296_0,
+-		.chipset_name	= "P4M800",
+-	},
+-	/* P4M800CE */
+-	{
+-		.device_id	= PCI_DEVICE_ID_VIA_P4M800CE,
+-		.chipset_name	= "VT3314",
+-	},
+-	/* VT3324 / CX700 */
+-	{
+-		.device_id  = PCI_DEVICE_ID_VIA_VT3324,
+-		.chipset_name   = "CX700",
+-	},
+-	/* VT3336 - this is a chipset for AMD Athlon/K8 CPU. Due to K8's unique
+-	 * architecture, the AGP resource and behavior are different from
+-	 * the traditional AGP which resides only in chipset. AGP is used
+-	 * by 3D driver which wasn't available for the VT3336 and VT3364
+-	 * generation until now.  Unfortunately, by testing, VT3364 works
+-	 * but VT3336 doesn't. - explanation from via, just leave this as
+-	 * as a placeholder to avoid future patches adding it back in.
+-	 */
+-#if 0
+-	{
+-		.device_id  = PCI_DEVICE_ID_VIA_VT3336,
+-		.chipset_name   = "VT3336",
+-	},
+-#endif
+-	/* P4M890 */
+-	{
+-		.device_id  = PCI_DEVICE_ID_VIA_P4M890,
+-		.chipset_name   = "P4M890",
+-	},
+-	/* P4M900 */
+-	{
+-		.device_id  = PCI_DEVICE_ID_VIA_VT3364,
+-		.chipset_name   = "P4M900",
+-	},
+-	{ }, /* dummy final entry, always present */
+-};
+-
+ 
+ /*
+  * VIA's AGP3 chipsets do magick to put the AGP bridge compliant
+@@ -437,17 +239,14 @@ static void check_via_agp3 (struct agp_bridge_data *bridge)
+ 
+ static int agp_via_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ {
+-	struct agp_device_ids *devs = via_agp_device_ids;
+ 	struct agp_bridge_data *bridge;
+-	int j = 0;
+ 	u8 cap_ptr;
+ 
+ 	cap_ptr = pci_find_capability(pdev, PCI_CAP_ID_AGP);
+ 	if (!cap_ptr)
+ 		return -ENODEV;
+ 
+-	j = ent - agp_via_pci_table;
+-	printk (KERN_INFO PFX "Detected VIA %s chipset\n", devs[j].chipset_name);
++	dev_info(&pdev->dev, "Detected VIA %s chipset\n", (const char *)ent->driver_data);
+ 
+ 	bridge = agp_alloc_bridge();
+ 	if (!bridge)
+@@ -501,9 +300,8 @@ static int agp_via_resume(struct device *dev)
+ 	return 0;
  }
  
- static int mlxsw_pci_sys_ready_wait(struct mlxsw_pci *mlxsw_pci,
--				    const struct pci_device_id *id,
- 				    u32 *p_sys_status)
- {
- 	unsigned long end;
-@@ -1839,7 +1837,7 @@ static int mlxsw_pci_reset_sw(struct mlxsw_pci *mlxsw_pci)
- }
+-/* must be the same order as name table above */
+ static const struct pci_device_id agp_via_pci_table[] = {
+-#define ID(x) \
++#define ID(x, name) \
+ 	{						\
+ 	.class		= (PCI_CLASS_BRIDGE_HOST << 8),	\
+ 	.class_mask	= ~0,				\
+@@ -511,39 +309,77 @@ static const struct pci_device_id agp_via_pci_table[] = {
+ 	.device		= x,				\
+ 	.subvendor	= PCI_ANY_ID,			\
+ 	.subdevice	= PCI_ANY_ID,			\
++	.driver_data	= (kernel_ulong_t)name,		\
+ 	}
+-	ID(PCI_DEVICE_ID_VIA_82C597_0),
+-	ID(PCI_DEVICE_ID_VIA_82C598_0),
+-	ID(PCI_DEVICE_ID_VIA_8501_0),
+-	ID(PCI_DEVICE_ID_VIA_8601_0),
+-	ID(PCI_DEVICE_ID_VIA_82C691_0),
+-	ID(PCI_DEVICE_ID_VIA_8371_0),
+-	ID(PCI_DEVICE_ID_VIA_8633_0),
+-	ID(PCI_DEVICE_ID_VIA_XN266),
+-	ID(PCI_DEVICE_ID_VIA_8361),
+-	ID(PCI_DEVICE_ID_VIA_8363_0),
+-	ID(PCI_DEVICE_ID_VIA_8753_0),
+-	ID(PCI_DEVICE_ID_VIA_8367_0),
+-	ID(PCI_DEVICE_ID_VIA_8653_0),
+-	ID(PCI_DEVICE_ID_VIA_XM266),
+-	ID(PCI_DEVICE_ID_VIA_862X_0),
+-	ID(PCI_DEVICE_ID_VIA_8377_0),
+-	ID(PCI_DEVICE_ID_VIA_8605_0),
+-	ID(PCI_DEVICE_ID_VIA_8703_51_0),
+-	ID(PCI_DEVICE_ID_VIA_8754C_0),
+-	ID(PCI_DEVICE_ID_VIA_8763_0),
+-	ID(PCI_DEVICE_ID_VIA_8378_0),
+-	ID(PCI_DEVICE_ID_VIA_PT880),
+-	ID(PCI_DEVICE_ID_VIA_PT880ULTRA),
+-	ID(PCI_DEVICE_ID_VIA_8783_0),
+-	ID(PCI_DEVICE_ID_VIA_PX8X0_0),
+-	ID(PCI_DEVICE_ID_VIA_3269_0),
+-	ID(PCI_DEVICE_ID_VIA_83_87XX_1),
+-	ID(PCI_DEVICE_ID_VIA_3296_0),
+-	ID(PCI_DEVICE_ID_VIA_P4M800CE),
+-	ID(PCI_DEVICE_ID_VIA_VT3324),
+-	ID(PCI_DEVICE_ID_VIA_P4M890),
+-	ID(PCI_DEVICE_ID_VIA_VT3364),
++	ID(PCI_DEVICE_ID_VIA_82C597_0, "Apollo VP3"),
++	ID(PCI_DEVICE_ID_VIA_82C598_0, "Apollo MVP3"),
++	ID(PCI_DEVICE_ID_VIA_8501_0, "Apollo MVP4"),
++	/* VT8601 */
++	ID(PCI_DEVICE_ID_VIA_8601_0, "Apollo ProMedia/PLE133Ta"),
++	/* VT82C693A / VT28C694T */
++	ID(PCI_DEVICE_ID_VIA_82C691_0, "Apollo Pro 133"),
++	ID(PCI_DEVICE_ID_VIA_8371_0, "KX133"),
++	/* VT8633 */
++	ID(PCI_DEVICE_ID_VIA_8633_0, "Pro 266"),
++	ID(PCI_DEVICE_ID_VIA_XN266, "Apollo Pro266"),
++	/* VT8361 */
++	ID(PCI_DEVICE_ID_VIA_8361, "KLE133"),
++	/* VT8365 / VT8362 */
++	ID(PCI_DEVICE_ID_VIA_8363_0, "Twister-K/KT133x/KM133"),
++	/* VT8753A */
++	ID(PCI_DEVICE_ID_VIA_8753_0, "P4X266"),
++	/* VT8366 */
++	ID(PCI_DEVICE_ID_VIA_8367_0, "KT266/KY266x/KT333"),
++	/* VT8633 (for CuMine/ Celeron) */
++	ID(PCI_DEVICE_ID_VIA_8653_0, "Pro266T"),
++	/* KM266 / PM266 */
++	ID(PCI_DEVICE_ID_VIA_XM266, "PM266/KM266"),
++	/* CLE266 */
++	ID(PCI_DEVICE_ID_VIA_862X_0, "CLE266"),
++	ID(PCI_DEVICE_ID_VIA_8377_0, "KT400/KT400A/KT600"),
++	/* VT8604 / VT8605 / VT8603 (Apollo Pro133A chipset with S3 Savage4) */
++	ID(PCI_DEVICE_ID_VIA_8605_0, "ProSavage PM133/PL133/PN133"),
++	/* P4M266x/P4N266 */
++	ID(PCI_DEVICE_ID_VIA_8703_51_0, "P4M266x/P4N266"),
++	/* VT8754 */
++	ID(PCI_DEVICE_ID_VIA_8754C_0, "PT800"),
++	/* P4X600 */
++	ID(PCI_DEVICE_ID_VIA_8763_0, "P4X600"),
++	/* KM400 */
++	ID(PCI_DEVICE_ID_VIA_8378_0, "KM400/KM400A"),
++	/* PT880 */
++	ID(PCI_DEVICE_ID_VIA_PT880, "PT880"),
++	/* PT880 Ultra */
++	ID(PCI_DEVICE_ID_VIA_PT880ULTRA, "PT880 Ultra"),
++	/* PT890 */
++	ID(PCI_DEVICE_ID_VIA_8783_0, "PT890"),
++	/* PM800/PN800/PM880/PN880 */
++	ID(PCI_DEVICE_ID_VIA_PX8X0_0, "PM800/PN800/PM880/PN880"),
++	/* KT880 */
++	ID(PCI_DEVICE_ID_VIA_3269_0, "KT880"),
++	/* KTxxx/Px8xx */
++	ID(PCI_DEVICE_ID_VIA_83_87XX_1, "VT83xx/VT87xx/KTxxx/Px8xx"),
++	/* P4M800 */
++	ID(PCI_DEVICE_ID_VIA_3296_0, "P4M800"),
++	/* P4M800CE */
++	ID(PCI_DEVICE_ID_VIA_P4M800CE, "VT3314"),
++	/* VT3324 / CX700 */
++	ID(PCI_DEVICE_ID_VIA_VT3324, "CX700"),
++	/* VT3336 - this is a chipset for AMD Athlon/K8 CPU. Due to K8's unique
++	 * architecture, the AGP resource and behavior are different from
++	 * the traditional AGP which resides only in chipset. AGP is used
++	 * by 3D driver which wasn't available for the VT3336 and VT3364
++	 * generation until now.  Unfortunately, by testing, VT3364 works
++	 * but VT3336 doesn't. - explanation from via, just leave this as
++	 * a placeholder to avoid future patches adding it back in.
++	 */
++#if 0
++	ID(PCI_DEVICE_ID_VIA_VT3336, "VT3336"),
++#endif
++	/* P4M890 */
++	ID(PCI_DEVICE_ID_VIA_P4M890, "P4M890"),
++	/* P4M900 */
++	ID(PCI_DEVICE_ID_VIA_VT3364, "P4M900"),
+ 	{ }
+ };
  
- static int
--mlxsw_pci_reset(struct mlxsw_pci *mlxsw_pci, const struct pci_device_id *id)
-+mlxsw_pci_reset(struct mlxsw_pci *mlxsw_pci)
- {
- 	struct pci_dev *pdev = mlxsw_pci->pdev;
- 	bool pci_reset_sbr_supported = false;
-@@ -1848,7 +1846,7 @@ mlxsw_pci_reset(struct mlxsw_pci *mlxsw_pci, const struct pci_device_id *id)
- 	u32 sys_status;
- 	int err;
- 
--	err = mlxsw_pci_sys_ready_wait(mlxsw_pci, id, &sys_status);
-+	err = mlxsw_pci_sys_ready_wait(mlxsw_pci, &sys_status);
- 	if (err) {
- 		dev_err(&pdev->dev, "Failed to reach system ready status before reset. Status is 0x%x\n",
- 			sys_status);
-@@ -1880,7 +1878,7 @@ mlxsw_pci_reset(struct mlxsw_pci *mlxsw_pci, const struct pci_device_id *id)
- 	if (err)
- 		return err;
- 
--	err = mlxsw_pci_sys_ready_wait(mlxsw_pci, id, &sys_status);
-+	err = mlxsw_pci_sys_ready_wait(mlxsw_pci, &sys_status);
- 	if (err) {
- 		dev_err(&pdev->dev, "Failed to reach system ready status after reset. Status is 0x%x\n",
- 			sys_status);
-@@ -1932,7 +1930,7 @@ static int mlxsw_pci_init(void *bus_priv, struct mlxsw_core *mlxsw_core,
- 	if (!mbox)
- 		return -ENOMEM;
- 
--	err = mlxsw_pci_reset(mlxsw_pci, mlxsw_pci->id);
-+	err = mlxsw_pci_reset(mlxsw_pci);
- 	if (err)
- 		goto err_reset;
- 
-@@ -2464,7 +2462,6 @@ static int mlxsw_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	mlxsw_pci->bus_info.device_name = pci_name(mlxsw_pci->pdev);
- 	mlxsw_pci->bus_info.dev = &pdev->dev;
- 	mlxsw_pci->bus_info.read_clock_capable = true;
--	mlxsw_pci->id = id;
- 
- 	err = mlxsw_core_bus_device_register(&mlxsw_pci->bus_info,
- 					     &mlxsw_pci_bus, mlxsw_pci, false,
 
 -- 
 2.54.0
