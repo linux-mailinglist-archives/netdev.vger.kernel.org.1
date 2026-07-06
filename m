@@ -1,137 +1,161 @@
-Return-Path: <netdev+bounces-305109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305110-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id iBb5Lv7IS2rlaAEAu9opvQ
-	(envelope-from <netdev+bounces-305109-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 17:25:50 +0200
+	id G3n2DuDgS2q3bwEAu9opvQ
+	(envelope-from <netdev+bounces-305110-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 19:07:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EBD37128DB
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 17:25:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E358713AD6
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 19:07:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linutronix.de header.s=2020 header.b=VTBiBrwE;
-	dkim=pass header.d=linutronix.de header.s=2020e header.b=P9d7GLAb;
-	dmarc=pass (policy=none) header.from=linutronix.de;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305109-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305109-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=iFSd+Lp8;
+	dmarc=pass (policy=none) header.from=lunn.ch;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305110-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305110-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8F7C731F0A2E
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 15:07:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7210936D5AF3
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 15:07:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C174381B10;
-	Mon,  6 Jul 2026 15:05:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A32C381AE9;
+	Mon,  6 Jul 2026 15:06:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161C5380FEB;
-	Mon,  6 Jul 2026 15:05:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA56637C0EC;
+	Mon,  6 Jul 2026 15:06:46 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783350356; cv=none; b=NNFcA2QgHQwEAV5PqbSlgoIlbbi/FNdPlg1QPpt0j7IDZZ65C2feFM6UaRnV5qi7MJXGUKVfPCA9jN1spofaN6ozFj1sRdRkmthR5UKo4atdWMeZgyzg5uuJ3ylZDO6Mym6x0H9ppQFsF+2PB9kPC1lLhFlAnZl31iAkadmSitI=
+	t=1783350408; cv=none; b=gt+xIJSdldHpFwyxbbkUcyLPzKntAB+fBenhD7v+fBCQo0Ily/76625y1rY8aFDCLR+cBBM3oWy+y6HWvjwn/8sv6dEFILDH6sB3MnSFXz2mtNWuxwC7Icc2BWPLaeT4/DLSK6ClDKcQof0o/Uh9YHAqmzC67+BVkw3teGOU4b0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783350356; c=relaxed/simple;
-	bh=3yi8neAEE9rEq0mxmjpaiKYd96ZV5xiHUgR7phnh+HY=;
+	s=arc-20240116; t=1783350408; c=relaxed/simple;
+	bh=gMB0gtTMqL2ZMVwjs5sXDPpPxgv1lBphzfkLjZBJRZ4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hYM/DW9RSycYeJlFYD8ppb84oLsdsuhw8D9niByrc7Owp90mLOfJM64am8Si85j2ICrdAlwgz0Dh+ggiNnE5c3EpGFnaqB9xx9TRMRQN7b0ZOyPMBZfatdGWzbyUv6QVTR1L/Ke6vcWsxR6AO4PK4zFTApUbW/a2Tp9m1xJSnYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=VTBiBrwE; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=P9d7GLAb; arc=none smtp.client-ip=193.142.43.55
-Date: Mon, 6 Jul 2026 17:05:52 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1783350353;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NB9C1tjmGRHLySf+l2Zt8ileBtf+TYUJy39INOr86Rg=;
-	b=VTBiBrwEo17Mp0HQTuYwb3bfzd/zrFr8t8ZTDKDypENitm0+Tnkk2+H68X4nS0AayUt6HM
-	zxCU0OHI8K1adKE2YYCFU5nJdq3/Sl1nH1nw9pd5xwiFndFn3hhg/AGZu/1ftTLRmTVfMK
-	bd46WKl2tO4PyLyDznw4dUxapNUGv9Y/1NHNDGcEgOSp8DcAvTHmXD3Qw0v+iD+Lfv5CuK
-	SE3yVClhbRdjccY12f5szI5t+OE8fEc/4fk7povRHWvuphZ7x35kgVb/R59ZmswD2eJgWP
-	yqJD4h9T1WdoNY26uR0LRwgmlzamqE5Gb3U7jPzq1hFTxVqX+gRDN+Nbk9QKfA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1783350353;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NB9C1tjmGRHLySf+l2Zt8ileBtf+TYUJy39INOr86Rg=;
-	b=P9d7GLAbFTnLUHFuMicc7kn2osB9FQ+NuT3a7SjkC6F/47wbb8306piJiBgy8MPLHY9rIJ
-	kk/YwkP3tYClXWDw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: christian.taedcke@weidmueller.com
-Cc: christian.taedcke-oss@weidmueller.com,
-	=?utf-8?B?VGjDqW8=?= Lebrun <theo.lebrun@bootlin.com>,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=iUuL8+npTD/oW3Ap0j6BoPJAJ53vmfNVdTMdNXvVcEo0yAZU6iisGjexRF8s/FdlQLiNmv5GQQZUUAaxvWYepemy8hP2ReTSQbajalTilNUaqcdyY6qGFJ2phfsnF8w3W/I+Bp0p4sY9dXzovyTSE6knxZ7rnQlyxoDEdfEmmq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=iFSd+Lp8; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=7T9lKLBCurJx7NULGnJPFkaWnZSHCHAuJLKjzAT+Hl0=; b=iFSd+Lp8lGBOZ23doP8kq/0DEl
+	x8P7JgYPLYwXYdN4e8q02nbnhWfvhQMt8Zk9h1/kwtFdY/+2/wYifu6J6lyX/XscKIV7YLhHvRlRY
+	2n0+Cs9vjNAWOt9wAMScq5Je1AzNYNV8NJ/PSe/7pWKmuZ8ofj04LPmEpi/Hqf7U4MAs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wgku3-00B0e7-BF; Mon, 06 Jul 2026 17:06:35 +0200
+Date: Mon, 6 Jul 2026 17:06:35 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Pengpeng Hou <pengpeng@iscas.ac.cn>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Kevin Hao <haokexin@gmail.com>, Simon Horman <horms@kernel.org>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Robert Hancock <robert.hancock@calian.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rt-devel@lists.linux.dev,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net 2/2] net: macb: mask TXUBR during TX NAPI poll to
- prevent IRQ storms
-Message-ID: <20260706150552.EomovsBn@linutronix.de>
-References: <20260706-upstreaming-macb-irq-storm-v1-0-ab3115b5a13a@weidmueller.com>
- <20260706-upstreaming-macb-irq-storm-v1-2-ab3115b5a13a@weidmueller.com>
+	Kees Cook <kees@kernel.org>, linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: usb: cx82310_eth: bound partial receive continuation
+Message-ID: <8ed2790f-05ab-4c6b-9982-e92a08c6c99d@lunn.ch>
+References: <20260705083609.23977-1-pengpeng@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260706-upstreaming-macb-irq-storm-v1-2-ab3115b5a13a@weidmueller.com>
+In-Reply-To: <20260705083609.23977-1-pengpeng@iscas.ac.cn>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305109-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305110-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_RECIPIENTS(0.00)[m:christian.taedcke@weidmueller.com,m:christian.taedcke-oss@weidmueller.com,m:theo.lebrun@bootlin.com,m:conor.dooley@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:haokexin@gmail.com,m:horms@kernel.org,m:clrkwllms@kernel.org,m:rostedt@goodmis.org,m:robert.hancock@calian.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rt-devel@lists.linux.dev,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:pengpeng@iscas.ac.cn,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kees@kernel.org,m:linux-usb@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[weidmueller.com,bootlin.com,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,goodmis.org,calian.com,vger.kernel.org,lists.linux.dev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,weidmueller.com:email,linutronix.de:from_mime,linutronix.de:dkim,linutronix.de:mid]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4EBD37128DB
+X-Rspamd-Queue-Id: 7E358713AD6
 
-On 2026-07-06 16:02:15 [+0200], Christian Taedcke via B4 Relay wrote:
-> From: Christian Taedcke <christian.taedcke@weidmueller.com>
+On Sun, Jul 05, 2026 at 04:36:09PM +0800, Pengpeng Hou wrote:
+> cx82310_rx_fixup() completes a packet that started in the previous URB
+> by copying dev->partial_rem bytes from the current skb. It then pulls
+> the same continuation extent, rounded up to an even byte count. The code
+> does not first prove that the current skb contains that continuation.
 > 
-> macb_interrupt() defers TX completion handling to NAPI, but when it
-> schedules the poll it only masks TCOMP, even though TXUBR is enabled
-> alongside it (both are part of MACB_TX_INT_FLAGS). macb_tx_poll() is
-> asymmetric in the same way and only re-enables TCOMP. TXUBR is thus
-> left unmasked while responsibility for handling it has been deferred
-> to NAPI.
+> Add a fail-closed bound check before the copy and pull. If the
+> continuation is shorter than the pending packet state expects, drop that
+> pending partial packet before returning so later URBs are not consumed as
+> stale continuation bytes. This keeps the existing cross-URB packet
+> model, but avoids consuming bytes that are not present in the current
+> skb.
 
-So this is not a race condition, this is always a failure?
+Please take a read of:
 
-Sebastian
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+The Subject: line is wrong.
+
+How has this been tested? 
+
+>  static int cx82310_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
+>  {
+> -	int len;
+> +	int len, pull_len;
+>  	struct sk_buff *skb2;
+>  	struct cx82310_priv *priv = dev->driver_priv;
+
+Although the reverse christmas tree is already broken here, you should
+try to keep with it, and put the new line at the end.
+
+>  
+> @@ -251,6 +251,13 @@
+>  	 * end of that packet at the beginning.
+>  	 */
+>  	if (dev->partial_rem) {
+> +		pull_len = (dev->partial_rem + 1) & ~1;
+> +		if (skb->len < pull_len) {
+> +			dev->partial_len = 0;
+> +			dev->partial_rem = 0;
+> +			return 0;
+> +		}
+> +
+>  		len = dev->partial_len + dev->partial_rem;
+>  		skb2 = alloc_skb(len, GFP_ATOMIC);
+>  		if (!skb2)
+> @@ -261,7 +265,7 @@
+>  		memcpy(skb2->data + dev->partial_len, skb->data,
+>  		       dev->partial_rem);
+>  		usbnet_skb_return(dev, skb2);
+> -		skb_pull(skb, (dev->partial_rem + 1) & ~1);
+> +		skb_pull(skb, pull_len);
+>  		dev->partial_rem = 0;
+>  		if (skb->len < 2)
+>  			return 1;
+> 
 
