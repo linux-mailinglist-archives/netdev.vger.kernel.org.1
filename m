@@ -1,264 +1,184 @@
-Return-Path: <netdev+bounces-305077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305079-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id s9dvNRq5S2rkZAEAu9opvQ
-	(envelope-from <netdev+bounces-305077-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 16:18:02 +0200
+	id oqjuCS/PS2q6agEAu9opvQ
+	(envelope-from <netdev+bounces-305079-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 17:52:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68829711D9C
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 16:18:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F77E712D69
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 17:52:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=A+v0gT8x;
-	dmarc=pass (policy=none) header.from=intel.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305077-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305077-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=qPbVPNsR;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305079-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305079-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4DA3A300C0D7
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 14:00:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 38DEE3461652
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 14:02:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FED936C0C8;
-	Mon,  6 Jul 2026 14:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E246D3783B5;
+	Mon,  6 Jul 2026 14:02:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED85831ED93;
-	Mon,  6 Jul 2026 14:00:29 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783346432; cv=fail; b=HsAYv0isc2Zm0wlNaNaMDSuitADzdyIQlFLeGiFtGpbfOw+C3Pe+qwt+2P2TcOshN006CKYaCoEFdaIpvNNBaawFkXczxDqhmZ0hpLqgOYmorj0iTsvtSWlbMZpjcsBJeNccFxPtAyRx6ysXgeE4evgI3Uns4VZuJlJy29V/uBA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783346432; c=relaxed/simple;
-	bh=Ic4saeICLvcaU/imsu+MUvdAsMi8UL16SITc9NT0WmQ=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=NWhLjYpZaPcMP2Q28BHLAhl3aYeBrzyV0JJAUng3LCa22yFFxFTv5dzo8OcF4KjlUVU0n3bZBeN8lbJSN12b2wKSi8TY9gCM8t+j375fmw2ItdlLCRTyqPKNnZV7/zliPFp2QJNYItaiaIdYB9MJKdIoo19yvEXtgeyrZNYVEfQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A+v0gT8x; arc=fail smtp.client-ip=198.175.65.14
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1783346430; x=1814882430;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Ic4saeICLvcaU/imsu+MUvdAsMi8UL16SITc9NT0WmQ=;
-  b=A+v0gT8xb6QfHujqNr1Hly/7Rr5G4y+TLkwtmewum5CTlpgW8DbQKON/
-   Wt5usT4G57nEQMH4VSzFlQwuUGFp87YIsuI/MM4bzRYyq09ay+uuBz63x
-   Ku+8I3rSi6AzLU8CPd+Mz/cNdCtV6vvTmZp9E+xI0sDE8IFyIB+o/Qti3
-   TGulSancP0Sdtba/pdyFmd4iHs5+zsYB5bBz5tDe7t+HCNl7QoUUy110r
-   AiWOQefrPU3dK9Da1F+oDx+FTucdG0rYlGueCZ3//6dIaHjmaVuVYaeoS
-   HLKFiU2autoJdRA2o66i6CD/UkB+NUNg08hS+euF8vkbrQ96EqtIRgAy2
-   w==;
-X-CSE-ConnectionGUID: HIeJhNL6Q9eMzpGLNL7ABg==
-X-CSE-MsgGUID: E0uPIBZuTGS84wEz90ULoQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11838"; a="87897331"
-X-IronPort-AV: E=Sophos;i="6.25,149,1779174000"; 
-   d="scan'208";a="87897331"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2026 07:00:30 -0700
-X-CSE-ConnectionGUID: IbPK4GqUTLe6KaclkG8pxQ==
-X-CSE-MsgGUID: OUtEBDgqRdmDHVU8xc+kWA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,149,1779174000"; 
-   d="scan'208";a="254362662"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2026 07:00:29 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Mon, 6 Jul 2026 07:00:29 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43 via Frontend Transport; Mon, 6 Jul 2026 07:00:29 -0700
-Received: from DM1PR04CU001.outbound.protection.outlook.com (52.101.61.36) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Mon, 6 Jul 2026 07:00:28 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YTD2TTk0wJVfPI3OqHTS85hZqKPxy/jnLiD5+yV3E2HZ4hlI9vFZN0p5rwPDimaCViEbIEppGpIloudi2iUVb2jucDFDLoi0O4ncF4KXzMfg4N02tdBpUHBiUOei9I30bTZkQW2MQv/6eh98Ocrtak/nQrG4nR4dXAErwu81+gHlJ+zq+jhjBN982JI7QLUY8puMnF+52CbJ6GfIi0txM5VUZOn+0xrdMulaK9EFP18HXMRC95D+jIR/bZJ6MnqlirVxMysYR/d/xfdw3dPv1JVx86fMNdqb4DWMuDVlpFt9+AKOBUwHWF8ykqJrLvl9fKFjOWp5G9yxnAt/NgV/Sg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kdABZS+Ohmi7CPkkCMxg9iYFru5T4t1h8nmYVHMvb/0=;
- b=Cl3qbCz4o7RnPE+6VUEMl+vv0JjXOlOsNNQwHI+ou51vQhFterpfAFqZUC2uzLmTORZc62dHDR4I8ciaOl89jW4OS9vG0vHLS00ElsdqOD4FG6D0CQgjFxTOMJjJX+yAKmuoWFWubpcH+xFHJdsOO1hBeixwS8xZo0MQ4GS1ppM8Gad+R5z8jmS6ry/t39ukiS3J7eHCnPDlyLZFTnVFTgyWUUusGLuITEUdZTbpi3zB6808J4DKnIySNrPdeHhPTaqjlNN30I+yBsEPUIsf7TpJMG1GAaMpY7l/FO0C7bKMajBnDmgKPdrVa4ACMGXRWI8zrLWX9Em6SUVkZszjAg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CH3PR11MB8496.namprd11.prod.outlook.com (2603:10b6:610:1ba::22)
- by DM4PR11MB6019.namprd11.prod.outlook.com (2603:10b6:8:60::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.181.8; Mon, 6 Jul 2026 14:00:23 +0000
-Received: from CH3PR11MB8496.namprd11.prod.outlook.com
- ([fe80::5627:e3a5:cb26:b555]) by CH3PR11MB8496.namprd11.prod.outlook.com
- ([fe80::5627:e3a5:cb26:b555%4]) with mapi id 15.21.0159.018; Mon, 6 Jul 2026
- 14:00:23 +0000
-Message-ID: <b25c04a9-becf-47f8-b231-c353efc55782@intel.com>
-Date: Mon, 6 Jul 2026 16:01:56 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] ixgbe: validate E610 PFA TLV bounds
-To: Pengpeng Hou <pengpeng@iscas.ac.cn>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20260706092500.79044-1-pengpeng@iscas.ac.cn>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <20260706092500.79044-1-pengpeng@iscas.ac.cn>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: WA1PEPF00005B82.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d8::60f) To CH3PR11MB8496.namprd11.prod.outlook.com
- (2603:10b6:610:1ba::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB878373BE8;
+	Mon,  6 Jul 2026 14:02:31 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783346551; cv=none; b=m4kto0PQEVCD5mH8SvPtyq4j8BpkRbfwNn4CFnrdUvcR9O8ntPkd7e9v/DWLK/6xnAd2oIJY6g/NaZ6D7h6pprFIvkNQrxH1p9pu4z+svRRM/t3VCTsNbbWOZavrf9ANZZXG/sOKHX/iay7abaNzFbq24F3TEpw21FsXnz7xrts=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783346551; c=relaxed/simple;
+	bh=LGjH+VaxkyRsmQ/os7WX5aNwBGmhH6HBNhqikwdceMM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CP+qiM3Z2qxb6Q9IXVRQ0gjIFI+fJI2i/PycxisCJ2XQgJ8A2N4USGofnFewVbfkNkBjx1+66Iosgz0xQqz7ONxcPDnI4h8hkvwi60csdG83CF/279xt/5jaQjT/OAgOipt2rhtr7u3LPv5L9QS/73edHtanEoUgc0iSoo1gEFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qPbVPNsR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 590A4C2BCB8;
+	Mon,  6 Jul 2026 14:02:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1783346551;
+	bh=LGjH+VaxkyRsmQ/os7WX5aNwBGmhH6HBNhqikwdceMM=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=qPbVPNsRQvg023DCq9xlCKDPO+uDYvxvsIuToYQiLpM87/h21+ei2r8ZdQwVSu2rj
+	 QUVCfQRbebCI8miHBj2SdJybXawrUGYVcOaXVIH7fSiBN++/oWZVEJHX/Mg9mtBY0o
+	 5UbSj5CpU3LgMqeytDkFslTIb1h0fVT2Oq+maujPKP8KyGOEjs0LcswD0flOahnv3v
+	 WBxGTzSmVWXMJ+5t/35x92GRPW+7nOwkaO53rB6BMDRvwKtVOfL7UV02iVfFX/LwtC
+	 1+oafBaZON8FkD+df4eO0r6jDw1q6nE0JV8cst/E5zo+BFJCF04NcFFaX6uwmk+zC7
+	 Pos+l0IA1O4PA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34EDFC43458;
+	Mon,  6 Jul 2026 14:02:31 +0000 (UTC)
+From: Christian Taedcke via B4 Relay <devnull+christian.taedcke.weidmueller.com@kernel.org>
+Subject: [PATCH net 0/2] net: macb: fix TXUBR interrupt storm on link
+ flapping
+Date: Mon, 06 Jul 2026 16:02:13 +0200
+Message-Id: <20260706-upstreaming-macb-irq-storm-v1-0-ab3115b5a13a@weidmueller.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8496:EE_|DM4PR11MB6019:EE_
-X-MS-Office365-Filtering-Correlation-Id: af38a7e1-80eb-497a-53f9-08dedb66ebdf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|23010399003|376014|22082099003|18002099003|6133799003|56012099006|11063799006;
-X-Microsoft-Antispam-Message-Info: BjUjWvHRKRK70/3IkuFxbGYyUhBTxfTWN28+XFrqEvD2VfOuG5HprZwDY8FTmvZL0nckey+bbjobalIR0829tVUe+VYz2rezg5Luuh8kodPhoVhCRrU6EeYb12VyTmAnBRn34McR4FOiXomeR9h6qPNEm141AMv4CxCfY1IfTDgkZ4uFULCoXuLUQjk9By/PK1Epd9Xu1PsGKzEuBNwiJmhC+3xYTlZE4g31xEr08dzmwG0IN8byuljtUMG8FK7NbOuq+igvvWYr9ItqZNadNy7k0x5Q78SBOIr/EdIRRVAC1rsJkQCRq0RRnDHFNYrLnJZXkWteyeNDd/quu+7ImYVQWrmrroyYRP/idcH2TsJ15d5vSGE1PSZuIEr6zN9btu+bxluRPSPuvafGpaW4dI1qcVc3PqSb1X6c+5QHvQlFW4tEw/VRCNgDmU97lALyRLnr4wva7512uw12B4NKWPyOsK4hTDCUrRvrHtodd4wDlnt0zStjrT6oaQ+IkDtFBMugWHiNp/CLwTtzy25JOpRgyXToUC6cYimul61HNVHcd6uWfN2MLi4OLGjdRnbSYUDYEKNYX8BlHdJPV0SO2WMJ/C4a2AaVNcxqdxbZmpps4wjCvE8NmeDizSEm0ErJUhASn8o1AG1Gwk7N63avVVJ2AJl4l3+tRJBuvL68K08=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8496.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(23010399003)(376014)(22082099003)(18002099003)(6133799003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OGtUUnZ0Qlg1VzdFSitWODlNZnJ3SWZvU0RFYVBSNDRoWXlzN0VoeHdXaFYx?=
- =?utf-8?B?WEhaWnJyOFJ3QnVHQ045WWkrS3p1TkRjbVNLTktWYldXS0hmRVJ1Z3BidGxx?=
- =?utf-8?B?RUFVdmE2V2NSdVVqRnM1OG0wbm9MRktVLzRWdERkNlVqZE9VbTRVa3R3Vjdt?=
- =?utf-8?B?dXkyVXFtaEgvQ3ZYbUg2N3dIYUM4SVRaYVNxMk40c0lDTDNwMzRIaGNhM0ZF?=
- =?utf-8?B?bit1djRoZXBteEVKN2RaSWN2Z1BYbWMwRzdVcnF2dXpadnkxWkp1bE1vRkZI?=
- =?utf-8?B?a1NPS2Y1dXI1UTZyU0FqRUZmaVh3NUtNVEk0NW1iWVVvZ1pOcVBuUmVRdU9X?=
- =?utf-8?B?dUZNTG55NTJlYml2NjFPUGxYWlFZaUNSVGNLeE1ad2dBeUpOSEJCTVQ5ZzZj?=
- =?utf-8?B?VkxydnMreVpwdFFHeWoxbUN3ZE1RdG9zck5UVTJGeEJOeDdGRFZrd3I2b25P?=
- =?utf-8?B?NjlyUzVYa0kxSi80QWwrdU84YmkxOGRZS3JwSDJuNzJ5OWlJeTcyN21Wdnh6?=
- =?utf-8?B?Q3lzNEcvVm53OXV5T3RrOXBDWGFObTl2TmZ2bXU0M1hlMlN2Y1dLR3U2Uko4?=
- =?utf-8?B?MWlGSmJjQ09XVmJWMkk4UXBlUkZhb040bGkxU3NsSmxyb1RzWExkZWh2eTJ4?=
- =?utf-8?B?ZE1EMjNKdjhMRHNBSk1WR0U2SVVJc0piK1hXM0RYcllURGpWRGFuN0tZMnBO?=
- =?utf-8?B?TWVkOEpaMjIxQW9jRkZKbU9LR2k1OHpZQWdzSC8wT00wVHd5cFR5b0E4ZWFH?=
- =?utf-8?B?NG5mMEc1ZWZYNFlLT1E3aWxBQVdaN2EvcmdEQ0QxMzBMMUt3K1RucFZQS2JE?=
- =?utf-8?B?bVZGdGwrTGJpY0ZrRVlvek14Q0dTZStUWHMzWUNYMDAzU2l3SFFhRkVFWGdS?=
- =?utf-8?B?NzhZWlA5bG8vNk1FaktJaEU4eXowKzIrS2ozcDhyUVh2aXRjR05wdkpKdzlY?=
- =?utf-8?B?Vm90cHRia3ZLZHZTcERSZHFaT0dpUDVyeVMrK3dBR3Vwd0Ywc0ZuZzlnYmNL?=
- =?utf-8?B?aVQ1K05iM1JzcGRrMnF4WTJ2UVlOVml0b1d2UjJpRFlrWFAwUlROUFVXbmNJ?=
- =?utf-8?B?dDM0dC9MenBhSVRCdFFsUzFxS29Hc25LTW9heHg1MWNOVC8vWjZUY3ZCU2sx?=
- =?utf-8?B?emxKcmRtdm5NMWVWTm1qYWJuREo5bUxlaURGcWd3Qml3Q0EyVUQ3R1AzRFEw?=
- =?utf-8?B?WE5icTZHLzlnUmtrR3h2Q0dETlllZy9MVXZoS2l2d2tPSjZ6dTQ5K1ArTm5j?=
- =?utf-8?B?allua0FQMlVxNm1qbmN4ajduNE9HNGhxZ05nRno4cmZNcm1xUGlYTGhqSFJH?=
- =?utf-8?B?SFRHUTBPbGY4TkxwQzlrTGE0RjFZSUVuMkZMOWtiYVdBcFNUeGRwRzNJTTVv?=
- =?utf-8?B?NEsvamJXdHlTcUYwSU4xQzZ0MlBwcmZYaTBSVWlMWllPVEVETTFqZzVFWFk0?=
- =?utf-8?B?K3MweE5kVEpUaGNHT3JMYUJydFprV3ZjN2trY21VRWx0RDdhQVcraUl4OUdn?=
- =?utf-8?B?T2ZSQ3pBWXhLMWlHSldSbUJyQmN0SXl6cXhlYjNyaDUzaG52SXZqaDJmU2l5?=
- =?utf-8?B?VnluK0RFM3VqYmRVSkpOK2c2bGx2VHlxOEVQQ09hTTIxTWM2Y0FCVE1nQ0k5?=
- =?utf-8?B?N3pKQ1hUWHB4K3JkaVlLWXJ5SjhrRGJWZGZqV2tRSElVWE56UVExVGFyTWJR?=
- =?utf-8?B?QkxMUFNZc0ZKMWNmVmllNFplWGtSaG8rOWJQU1U3UWVSZ2Z4aVR0TVNSeTR5?=
- =?utf-8?B?akZoSUV0dWNsbU1ZSmJmclUvYUxxUHY1NnZqWjJ3NzJWTXlpbGJPcjQ3d2FM?=
- =?utf-8?B?bjhIL1NxeXBYUUwxZzQ2TDg0Yk54R29FMkxCbkpySVNpOUdhbTB2VGg0WVp1?=
- =?utf-8?B?UEZldU9NSm1TbjdTS0MvbVd6UFpDQUhPdm05RUJDY2htOFBQZjNsZHZBM0Jp?=
- =?utf-8?B?VDd2ZEJjLzRIRDZYMFUzcnBxNjIwMFBYWVlLdExrNER1ellTRWMzNkZ1RkpD?=
- =?utf-8?B?cldPaFhmWDNMVEErT0lkVkw5UDZOSU1OcmpQcy9aU0k0QTNIV0IydW9DbkIw?=
- =?utf-8?B?Wi9rMXkreG1yUmtyTlJ0dzhmUG9ST0dhRVpUM0NnVWFZRkZzNWdlR0RPR2lL?=
- =?utf-8?B?Qjk5Sk5ibW53aDBMM3pXL21PSVBjZngyK2xaMGVhdnQ4dzNobUNmZ0JialJC?=
- =?utf-8?B?dUk1a0ZRMjVqU1FwTENPUE1najNIWmVEN05GZEZrNEJwaDhCcEI2QUhxZ1Yr?=
- =?utf-8?B?OThZMXVRcjRxNVllTTl0bmlzUjVLbUt3ellja3BkUldNOEJ4RHVOYS8vMUYw?=
- =?utf-8?B?aTJlMmc3L1RPeTdscVYvSzI0RFhtREhVaGlTdjA5OUVYc05paGh3bVRsWlFE?=
- =?utf-8?Q?zon6X6icISdIdwu8=3D?=
-X-Exchange-RoutingPolicyChecked: o0XKKEFso4zk6X8Hb7bFJwAus62Vx/12FS2UZbu2Suz5FBtGsdgpJennjRpuiJFgwDXdET1Du/yhEO2Ix/7b/CD4Ud7L6xCsPbdWrF/bOQ8gA40pVb/dEuSHROXd7R4KovjBqmHgwflN3Z0anvyDinWKsOIXo5QMU2DgfqgvspRqJuDqUlvc4FwhbjTyPKPpVqXCH4kUptm3kdc5NcYvg0uc9utUv+OMWxzLblzSQd0NKG5WNCXWb+rug79+Prcd5lFXQGFTTeE1UFAPt9au+3epVB5oB8OJp9G/B8xRrpm0j3akIbi1g2+6hqfPNElCEgDh2EPSC9hL+mtO2fkkaA==
-X-MS-Exchange-CrossTenant-Network-Message-Id: af38a7e1-80eb-497a-53f9-08dedb66ebdf
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8496.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2026 14:00:22.6677
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KzYhAdkbrxo7a3c7wToyxNiJRd7fPdNqZw1MRAxjeVwspluIM26r66YaYED6zbbzmbuq8hqOxFzcwMOh2ebzoNnomrHzWhSUu6iCQg9Jkwo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6019
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGW1S2oC/yXMywrCMBBG4Vcps3YgTcHbq4iLpP2tIyStM6kIp
+ e9u1OU5i28lgwqMzs1KipeYTLlGu2uov4c8gmWoTd75vTu4jpfZiiIkySOn0EcWfbKVSRMjDv7
+ kYotj56kCs+Im7x9+oYxC1/+0JT7Qly9L2/YBE/amu4MAAAA=
+X-Change-ID: 20260703-upstreaming-macb-irq-storm-ebd290b1e832
+To: christian.taedcke-oss@weidmueller.com, 
+ =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, 
+ Conor Dooley <conor.dooley@microchip.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Kevin Hao <haokexin@gmail.com>, Simon Horman <horms@kernel.org>, 
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+ Clark Williams <clrkwllms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
+ Robert Hancock <robert.hancock@calian.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-rt-devel@lists.linux.dev, 
+ Christian Taedcke <christian.taedcke@weidmueller.com>, 
+ stable@vger.kernel.org
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1783346550; l=2123;
+ i=christian.taedcke@weidmueller.com; s=20260702;
+ h=from:subject:message-id;
+ bh=LGjH+VaxkyRsmQ/os7WX5aNwBGmhH6HBNhqikwdceMM=;
+ b=33b8wgskQBt3ZzGbeRbzLxtKAax+bkWySLpAMG4R44eStuzkCjtdwcSi2Xwcf8nNYvGetIncg
+ 4bsnHablbDDC8NMTCRGmWQO8UcGU8BkoraAFd4qw9AiKf8T3H1Q7YuZ
+X-Developer-Key: i=christian.taedcke@weidmueller.com; a=ed25519;
+ pk=fVCoBhFV3uMogA2nxIOU/rynNY+O2TDJgWvWjR06TrQ=
+X-Endpoint-Received: by B4 Relay for
+ christian.taedcke@weidmueller.com/20260702 with auth_id=847
+X-Original-From: Christian Taedcke <christian.taedcke@weidmueller.com>
+Reply-To: christian.taedcke@weidmueller.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-2.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_MATCH_TO(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-305077-lists,netdev=lfdr.de];
+	REPLYTO_DOM_EQ_TO_DOM(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:christian.taedcke-oss@weidmueller.com,m:theo.lebrun@bootlin.com,m:conor.dooley@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:haokexin@gmail.com,m:horms@kernel.org,m:bigeasy@linutronix.de,m:clrkwllms@kernel.org,m:rostedt@goodmis.org,m:robert.hancock@calian.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rt-devel@lists.linux.dev,m:christian.taedcke@weidmueller.com,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:pengpeng@iscas.ac.cn,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:anthony.l.nguyen@intel.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:from_mime,intel.com:dkim,intel.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[weidmueller.com,bootlin.com,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,goodmis.org,calian.com];
+	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-305079-lists,netdev=lfdr.de,christian.taedcke.weidmueller.com];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	HAS_REPLYTO(0.00)[christian.taedcke@weidmueller.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[weidmueller.com:replyto,weidmueller.com:mid,weidmueller.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 68829711D9C
+X-Rspamd-Queue-Id: 6F77E712D69
 
-For the future please tag your intel ethernet submissions as
-iwl-net (fixes) or iwl-next (refactors/features).
-(Applies to v2 of this series).
+We observed a hard interrupt storm in the Cadence GEM (macb) driver on
+a Xilinx ZynqMP based platform running a PREEMPT_RT kernel (6.6.142).
 
-On 7/6/26 11:25, Pengpeng Hou wrote:
-> ixgbe_get_pfa_module_tlv() walks E610 PFA TLV records stored in
-> EEPROM.
-> 
-> Stop parsing malformed TLVs whose header or declared value length would
-> exceed the PFA boundary.
+After several Ethernet link up/down transitions, the CPU that the MAC
+IRQ is pinned to is pegged at 100% in the threaded MAC interrupt
+handler and the kernel reports "sched: RT throttling activated",
+killing the network interface. The MAC ISR keeps refiring with the
+level-triggered TXUBR (TX used bit read) set, because the transmitter
+is left pointing at a descriptor whose used bit is set. See the
+individual commit messages for the full analysis.
 
-this is a "beware of malicious NVM" type of change...
+Patch 1 fixes the root cause: gem_shuffle_tx_one_ring() resets tx_tail to
+the ring base on link-up but never reprograms the hardware TBQP pointer.
 
-> 
-> Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
-> ---
->   drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 6 ++++++
->   1 file changed, 6 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-> index 4d8ae5b56145..03e88bdf5a43 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-> @@ -3895,6 +3895,9 @@ static int ixgbe_get_pfa_module_tlv(struct ixgbe_hw *hw, u16 *module_tlv,
->   	while (next_tlv < pfa_end_ptr) {
->   		u16 tlv_sub_module_type, tlv_len;
->   
-> +		if (pfa_end_ptr - next_tlv < 2)
+Patch 2 fixes a second, independent bug: macb_interrupt() masks only
+TCOMP (not TXUBR) when scheduling the TX NAPI, and macb_tx_poll()
+re-enables only TCOMP. Because TXUBR is level-triggered, a persistent
+used-descriptor condition keeps it asserted and re-fires immediately,
+storming the MAC interrupt.
 
-instead of wrap-around arithmetics it would be better to use
-size_add/size_sub
+Both patches are required: on the affected platform the interrupt storm
+still reproduces with patch 1 applied alone, so patch 2 is needed as
+well to stop it.
 
-> +			break;
-> +
->   		/* Read TLV type */
->   		err = ixgbe_read_ee_aci_e610(hw, next_tlv,
->   					     &tlv_sub_module_type);
-> @@ -3917,6 +3920,9 @@ static int ixgbe_get_pfa_module_tlv(struct ixgbe_hw *hw, u16 *module_tlv,
->   		/* Check next TLV, i.e. current TLV pointer + length + 2 words
->   		 * (for current TLV's type and length).
->   		 */
-> +		if (tlv_len > pfa_end_ptr - next_tlv - 2)
-> +			break;
-> +
->   		next_tlv = next_tlv + tlv_len + 2;
->   	}
->   	/* Module does not exist */
+The relevant code is essentially identical in mainline, so the bug is not
+RT-specific. PREEMPT_RT merely turns the storm into a fatal failure via
+RT throttling.
+
+Tested on ZynqMP with PREEMPT_RT by repeatedly flapping the Ethernet
+link. The interrupt storm and RT throttling no longer occur.
+
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Christian Taedcke <christian.taedcke@weidmueller.com>
+---
+Christian Taedcke (2):
+      net: macb: reprogram TBQP after shuffling the TX ring on link-up
+      net: macb: mask TXUBR during TX NAPI poll to prevent IRQ storms
+
+ drivers/net/ethernet/cadence/macb_main.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+---
+base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
+change-id: 20260703-upstreaming-macb-irq-storm-ebd290b1e832
+
+Best regards,
+--  
+Christian Taedcke <christian.taedcke@weidmueller.com>
+
 
 
