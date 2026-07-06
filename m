@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-305164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305165-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id dXJoCt7mS2rHcQEAu9opvQ
-	(envelope-from <netdev+bounces-305164-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 19:33:18 +0200
+	id zwjdGNTlS2ppcQEAu9opvQ
+	(envelope-from <netdev+bounces-305165-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 19:28:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CBF0713E81
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 19:33:17 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF9BF713DD4
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 19:28:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=mP1C5z5M;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=PXUUMLOt;
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305164-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305164-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305165-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305165-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6B1BA3046355
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 17:20:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D61A330A83E8
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 17:20:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 691493B8127;
-	Mon,  6 Jul 2026 17:19:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86F1D3DF019;
+	Mon,  6 Jul 2026 17:19:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1DE23B83E1
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 17:19:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CDEF3BADA3
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 17:19:37 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783358377; cv=none; b=jkD9N+3M5WldTJPTHEmgOgSRBe21E/Qw1UsBgB7+avq/oRsmSRT3OJ6qS8jS2rC5FyNu/a5L8fPKZ/adqVaNQI4+m7RtUisvE4404ZehTEkT+wR9x1kqOmAyrpNnpyGHr/Fgokn7o7gll/b/RPRk0AFF5suKDI8lTeIwJYU4LHg=
+	t=1783358379; cv=none; b=KfYiHBcL+uhUYWHqfV9XsN9q/kuB0uMWzsObzpZTiGGEtZlvLp3g9AptUN5LLnS3hcwOq94k7FM8Itmh8KQmfe6opTBVi4ethjlheEizEqDp8EZiKQVZXjDXI6ARSxvr4D1v8IVhPwj74KQcyGShUYtHTLeFzxryq4Dm82+uZOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783358377; c=relaxed/simple;
-	bh=ABd/ww76+k3Cz3HVdTtdsTw2NNqLB395KUoMr1kUL9c=;
+	s=arc-20240116; t=1783358379; c=relaxed/simple;
+	bh=SO8Au3LdMj3YdJWgfQZnM3I9IcAVk/GaLFUx6z2zfYA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Oq74deXUVTZmnDZkkE1yFH8s5W4m7Fd3h6dIApGqu87r/IKrdAhUIClyDwLz+ej8V5igIT6buGHYz9vZnRdvZvCuKxYEsjIukguNoznECoJS7HhgW7LDYSqkYTxIHLBhfO3dhSXrPwzmCvUyt2U1XS0WeVeY/IijKMtejti8x2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mP1C5z5M; arc=none smtp.client-ip=209.85.161.42
-Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-6a30bcadd95so24428eaf.1
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 10:19:35 -0700 (PDT)
+	 MIME-Version; b=HPysPhFTezAehYebOVkIUP8IRa3XZ/Geh1ayn7g4dyf6qDwq/Yi7lytPxU1BrhATJlxaxFNCnKU6y7xJKpidT9EIKHkwGUdeXkLIsjZbM/qQE9U6qOUn42rvcX0+QsoEGU0sC9apF2nKcA1+4rHdMdhJecY0erBzpxgqXkDfPPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PXUUMLOt; arc=none smtp.client-ip=209.85.167.182
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-49c38a4f110so1226818b6e.1
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 10:19:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783358375; x=1783963175; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783358377; x=1783963177; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fwrNws75JbsyW/mUTo2aML94/IobRodHHQrNJC24UiE=;
-        b=mP1C5z5M7IjE5wXHUQk3jHzRvZm9jlSiFgPS1Ti4PYmQaKtsUaQ79U8/ERTOfH3EUv
-         CrnhtuOGJota5/pqufWw+EQ/BfNyaLyemarshvNw1ZEyH+i6lkX2iZJKETNe8sBqiHvy
-         ky+lP+Xs/kpLUSGGnLT2VzlPG1HtbChJuWgPM6nYo5vkDbqg17CYYDeLlYORyQVMrKbU
-         WwsRVOMMz2AYPRlCCRPYpXu5CCwp6V4lEN3b3Ea4lxJDpM+1XI/YzIufVyUVxZ7Yf/S1
-         DWAyYglinLKywSIyBsD83Qz62BGcAgRkTylvgbNGu1mUJd5AkwO9Cd7/m0J5Lk8314H3
-         R6cA==
+         :message-id:reply-to:content-type;
+        bh=QpRud8IfHMa48lHaLqrXsmv/FgGxX43vCtItcr3N5Ag=;
+        b=PXUUMLOt2X+r0RSzxwuST9KIMc5NevzpgvGolf7ERZJwFat9uAkhLjtHqN1HTadS45
+         +TXz/HZB4k5MDgJvuXkZILmoG9L9LftAsbstBLeca3kUNtpbiSt0NF/7zJ/xDywPIqnk
+         FzD1mr+oHW+KGh9/6Puxw7AI9YXsq4s7hVYNsD4XPEjxlJFQFLnOq7Dh7LPpDIVsbWCa
+         yt5NHYLpRukxUZD/R/cpsjZengkWPGjH5Yxgn+oWZHfgOmu8kjzMBER0Ivn9qdER2e66
+         qkmT5TFSs6BsBZ+WI/0RF92pqGQGETa+71prbw4KbPNKwWcN12/NQGW16gU2jXUs0mfe
+         TkWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783358375; x=1783963175;
+        d=1e100.net; s=20251104; t=1783358377; x=1783963177;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=fwrNws75JbsyW/mUTo2aML94/IobRodHHQrNJC24UiE=;
-        b=H9LDRss4U781PiFszEwCUceZjEEv1I1tOmPWBaBJGKSybO6tMdEonHl4YFML39ylEq
-         p1ZJiMlNjTNszU3KmQt9MysAFS1TelNGfi0dz/aMwsqcIASPsddv5P+B8EircqVsHpGN
-         ovHCH30pi8yq9RvvjpiFJyAov7xxO50f/iMOUmjRUNM9Aw0az1sKMBOXVcFDeENfdMi8
-         +FXxWHwDtFcLyUzr8WJP8cqL1E9iZS199e1ywj8KHLcIwii3sWrxUpKTOV+LfapsN/xm
-         6qXhfkiBkqvykxMq1LDa3Pfg6UVsOMjQkbutjmASrQcrwpI8jru8YL+5MsBFHRsjp4hC
-         flkw==
-X-Gm-Message-State: AOJu0YxDI5WR1FIR6g3+d/o2zwf6WX8sS3qMFeBwG/22nESGa6/ooYZr
-	HzsxlBsVzbMrtEKWoKizM9TeGmGHHLWwb4rhlv7Dpngv1XU4k60mdbvR
-X-Gm-Gg: AfdE7cny9HQrFIXcM1TvVMzo9vFqLT8GJLVsbiqS1ZpjKA6uuBbLnb4B0s4ya2cFP19
-	Fspz/oSsBHPXMQtWLiiFR22JNKdMOid8Ay9pApj12+W7ILHCv6H0muKyE9Ic3oFq3x82rpB0GN9
-	vgXE4hxljoi7hrWEJria+KceFv9fE4ew8P9ExfcNPd5D2XhsNSgsM1+gPe08KdWhq1L6m1IPKt/
-	PSeBw1++FX0r7iQAK8fw2ZkAfmBG5fnZPBmNhQ1HAUPAux1PdlEGuGe7jCsYIJFAQg2NgcnvCUE
-	KJ0iPJ02Cd50R4jcAtEsTC5p8t1iuJ15vsDDdvGxsP0W/j3JmYMNcpbRVEK9anW/R2pX6a9nC6a
-	KhrcB1HPFNGy/7Ef7ciqFKPqIig3LjZ2LlpU3F0UCP0PgcTHPMa4+73SU7E1470Y0EqPDFAIwRc
-	tQ/A==
-X-Received: by 2002:a05:6820:60a:b0:6a1:7c3e:f62a with SMTP id 006d021491bc7-6a354586d88mr785791eaf.12.1783358374491;
-        Mon, 06 Jul 2026 10:19:34 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:8::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7eb544f3d24sm12066292a34.21.2026.07.06.10.19.33
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=QpRud8IfHMa48lHaLqrXsmv/FgGxX43vCtItcr3N5Ag=;
+        b=f+0kPKwJmtO95OtXVnW9OY5kcxjUczIiPoDcoBAvc2m8PSqiPXZLBIRdmt7jYAO6aq
+         5B2ztwI9RqDgisyogu0zSUdfqyNBkrIRW1O8tuID62yQn/KH17mYwHqiT0nGWz5vm9uB
+         HdVfktyaW7cskdSB6ur/uIeX0odLC+Gpchp/H/HDASDY1Y1ENhbVjEUQQrw9VRXM0Pzh
+         WATgO8Wz3fRtfQkFNzzawta7EtGocd6zT3tNYbi6pMIgU43K7Si4ZG3MBtj8P0OLWVk9
+         wQvg8f/uOuYzfM10zHGqND2kHOvwCo4a88suDDkhC8nzUwqbjmNDPFuRoA3jUFoWAHKs
+         estQ==
+X-Gm-Message-State: AOJu0YwOUyUwiYX5vn9jh/p1YTaTIB7ShI6k7EufbtcNkwFpUs6u1OkQ
+	sh30zrk02O+avnVJ+BeY1cmsDBP60U47lk6Jlh0oVVMYJHeHd6jGhwyR
+X-Gm-Gg: AfdE7clH0AR+tfk2sux9h+m8AX077Woz5o3V/NrYhfYxcDJX3R8DLXYKjyy2/+FrUhM
+	3iMbZjelJCEPZhWGbQpuiJqAPjmInysOEB9u6deHrl8EV7MDK6BX45QADM5q0zLTylByz8taD3H
+	ZxibufatqlQ41+h+BkA9gNS4xfb5wCgO4kYzON/1CdR3vgoRz2W6GTQSxwE8O8oZeKrkC2U7MxB
+	nCxSwVlxk0R76CwtPQwQ9NVwJWC6KWlEW6MvPQMyn1LlZQ1GssuJ7FI62N0CymENzv5rsSytLSa
+	zn/HHwQL0OHeCVoflb82uz7LOS1isfQNg8SO84niQOX+Gqi5hlbtiw6OBlbJUXrXBhIqwU95/xF
+	YNhy06j2pKrmTugzI2lYPkctXctILucNT1YkzeJFGe7+sRgahylz5Y1I2n58AHQvmVqJx8lbj9U
+	2XwVc=
+X-Received: by 2002:a05:6808:178d:b0:495:dfbc:c1c6 with SMTP id 5614622812f47-49fdec03600mr1210273b6e.40.1783358376902;
+        Mon, 06 Jul 2026 10:19:36 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:50::])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-497d1853afbsm9451997b6e.8.2026.07.06.10.19.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jul 2026 10:19:33 -0700 (PDT)
+        Mon, 06 Jul 2026 10:19:36 -0700 (PDT)
 From: Amery Hung <ameryhung@gmail.com>
 To: bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org,
@@ -90,9 +90,9 @@ Cc: netdev@vger.kernel.org,
 	kerneljasonxing@gmail.com,
 	ameryhung@gmail.com,
 	kernel-team@meta.com
-Subject: [PATCH bpf-next v3 06/15] bpf: Add prog_list_init_item(), prog_list_replace_item(), and prog_list_id()
-Date: Mon,  6 Jul 2026 10:19:08 -0700
-Message-ID: <20260706171918.317102-7-ameryhung@gmail.com>
+Subject: [PATCH bpf-next v3 07/15] bpf: Move LSM trampoline unlink into bpf_cgroup_link_auto_detach()
+Date: Mon,  6 Jul 2026 10:19:09 -0700
+Message-ID: <20260706171918.317102-8-ameryhung@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260706171918.317102-1-ameryhung@gmail.com>
 References: <20260706171918.317102-1-ameryhung@gmail.com>
@@ -111,7 +111,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -119,7 +119,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[14];
 	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,linux.dev,google.com,meta.com];
-	TAGGED_FROM(0.00)[bounces-305164-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305165-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -135,103 +135,57 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3CBF0713E81
+X-Rspamd-Queue-Id: CF9BF713DD4
 
 From: Martin KaFai Lau <martin.lau@kernel.org>
 
-Add three helpers to abstract operations on a bpf_prog_list entry.
+Move the LSM trampoline unlink into bpf_cgroup_link_auto_detach().
+The purpose is to consolidate the auto_detach cleanup logic.
 
-Right now, bpf_prog_array_item is initialized from prog_list_prog(pl),
-which returns either pl->prog or pl->link->link.prog. This will not work
-when struct_ops is attached to a cgroup because the attachment is backed
-by a struct_ops map instead of a BPF prog.
-
-The same applies to __cgroup_bpf_query(). Instead of always copying a
-prog id to userspace, struct_ops cgroup attachment will need to copy the
-struct_ops map id.
-
-Refactor bpf_prog_array_item initialization into prog_list_init_item()
-and prog_list_replace_item(), and refactor id lookup into prog_list_id().
-These helpers will be extended to support pl->link->map in a later patch.
+It prepares for the upcoming struct_ops cgroup attachment patch where
+bpf_cgroup_link_auto_detach() will need to handle the struct_ops case
+(link->map != NULL).
 
 This is a no-op change.
 
 Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
 Signed-off-by: Amery Hung <ameryhung@gmail.com>
 ---
- kernel/bpf/cgroup.c | 26 +++++++++++++++++++-------
- 1 file changed, 19 insertions(+), 7 deletions(-)
+ kernel/bpf/cgroup.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/kernel/bpf/cgroup.c b/kernel/bpf/cgroup.c
-index b100c04cb9c8..b43f0bff184c 100644
+index b43f0bff184c..7abbe12e108f 100644
 --- a/kernel/bpf/cgroup.c
 +++ b/kernel/bpf/cgroup.c
-@@ -399,6 +399,22 @@ static struct bpf_prog *prog_list_prog(struct bpf_prog_list *pl)
- 	return NULL;
- }
- 
-+static void prog_list_init_item(struct bpf_prog_list *pl, struct bpf_prog_array_item *item)
-+{
-+	item->prog = prog_list_prog(pl);
-+	bpf_cgroup_storages_assign(item->cgroup_storage, pl->storage);
-+}
-+
-+static void prog_list_replace_item(struct bpf_prog_list *pl, struct bpf_prog_array_item *item)
-+{
-+	WRITE_ONCE(item->prog, pl->link->link.prog);
-+}
-+
-+static u32 prog_list_id(struct bpf_prog_list *pl)
-+{
-+	return prog_list_prog(pl)->aux->id;
-+}
-+
- /* count number of elements in the list.
-  * it's slow but the list cannot be long
+@@ -313,6 +313,8 @@ static void bpf_cgroup_storages_link(struct bpf_cgroup_storage *storages[],
   */
-@@ -492,9 +508,7 @@ static int compute_effective_progs(struct cgroup *cgrp,
- 				item = &progs->items[fstart];
- 				fstart++;
- 			}
--			item->prog = prog_list_prog(pl);
--			bpf_cgroup_storages_assign(item->cgroup_storage,
--						   pl->storage);
-+			prog_list_init_item(pl, item);
- 			cnt++;
- 		}
- 
-@@ -1015,7 +1029,7 @@ static void replace_effective_prog(struct cgroup *cgrp,
- 				desc->bpf.effective[atype],
- 				lockdep_is_held(&cgroup_mutex));
- 		item = &progs->items[pos];
--		WRITE_ONCE(item->prog, pl->link->link.prog);
-+		prog_list_replace_item(pl, item);
- 	}
+ static void bpf_cgroup_link_auto_detach(struct bpf_cgroup_link *link)
+ {
++	if (link->link.prog->expected_attach_type == BPF_LSM_CGROUP)
++		bpf_trampoline_unlink_cgroup_shim(link->link.prog);
+ 	cgroup_put(link->cgroup);
+ 	link->cgroup = NULL;
  }
- 
-@@ -1318,15 +1332,13 @@ static int __cgroup_bpf_query(struct cgroup *cgrp, const union bpf_attr *attr,
- 		} else {
- 			struct hlist_head *progs;
- 			struct bpf_prog_list *pl;
--			struct bpf_prog *prog;
- 			u32 id;
- 
- 			progs = &cgrp->bpf.progs[atype];
- 			cnt = min_t(int, prog_list_length(progs, NULL), total_cnt);
- 			i = 0;
- 			hlist_for_each_entry(pl, progs, node) {
--				prog = prog_list_prog(pl);
--				id = prog->aux->id;
-+				id = prog_list_id(pl);
- 				if (copy_to_user(prog_ids + i, &id, sizeof(id)))
- 					return -EFAULT;
- 				if (++i == cnt)
+@@ -346,11 +348,8 @@ static void cgroup_bpf_release(struct work_struct *work)
+ 					bpf_trampoline_unlink_cgroup_shim(pl->prog);
+ 				bpf_prog_put(pl->prog);
+ 			}
+-			if (pl->link) {
+-				if (pl->link->link.prog->expected_attach_type == BPF_LSM_CGROUP)
+-					bpf_trampoline_unlink_cgroup_shim(pl->link->link.prog);
++			if (pl->link)
+ 				bpf_cgroup_link_auto_detach(pl->link);
+-			}
+ 			kfree(pl);
+ 			static_branch_dec(&cgroup_bpf_enabled_key[atype]);
+ 		}
 -- 
 2.52.0
 
