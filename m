@@ -1,295 +1,196 @@
-Return-Path: <netdev+bounces-305068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305069-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id P1RmNky1S2rVYwEAu9opvQ
-	(envelope-from <netdev+bounces-305068-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 16:01:48 +0200
+	id rRbRG365S2r3ZAEAu9opvQ
+	(envelope-from <netdev+bounces-305069-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 16:19:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21BC8711A75
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 16:01:48 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0959711DE2
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 16:19:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b="K9MrIY9/";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305068-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305068-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=T5+BuZ2O;
+	dmarc=pass (policy=reject) header.from=google.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305069-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305069-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 67F6D3106397
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 13:45:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8978230D5A02
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 13:47:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C41231F988;
-	Mon,  6 Jul 2026 13:45:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D50E6348C70;
+	Mon,  6 Jul 2026 13:45:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0537325B0AC
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 13:45:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC8826B755
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 13:45:55 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783345524; cv=pass; b=X37ma0gJMP6PpUaYAizrKYL/UgJWf0r5YczLv1u33f7f9Z2TqfuoR31X6eOfkuIcs3U741JeoT84nd766Sope9bvFLLCl/2a5clUjNtzf+PZO5w8oLpZd9k7V1WqdaNBDP4t7zpJySifnwz+5/tAODGAcHkzvs64oXZZDEJ8SOI=
+	t=1783345556; cv=pass; b=u8KuMDmJx9Fks1hW9ooxUp1gfIzIT4p8+4qbJufErkoPgpDU3Rpt0T0dHTrUXhaYYDg9r13KVQ2qLlcZSL6SSBylH7EKn64wiUN08xWFb0qPUePGyUfvGnK3RguFcLOXaN25tqVrlqDQbw0xPOzEvIG8GhcoVFEPwLhmt7hedU8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783345524; c=relaxed/simple;
-	bh=k+LUwcYgwzSdPoecmMFD8iUrE3asaMgqhj52EUNSuNc=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=sF98pMzLeF88FYIalSxdb32NBY8UTY5HWncBkdLzzcOneBBrPXtrJmBie2ZWHNGe+y2Qu4cSwwQeEKJAkkfV1yp/vEZAhs5wsv3570OgZpeiY6C7Nn6Mv4DXgFTKGfcGXj985SooGOyZLM0qXISJEYItpJamosFbRnsYkXJd0gE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K9MrIY9/; arc=pass smtp.client-ip=209.85.218.41
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-c12620ed112so412383166b.3
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 06:45:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783345519; cv=none;
+	s=arc-20240116; t=1783345556; c=relaxed/simple;
+	bh=gnhdwSxs/2dEIXlbIYVInombO0ZsUEz3/h6snH5BdRU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cpykh1CmAnEv8lnXN3nYInp0F0DcpCKB//QeDeQSnau7gFYDVi/6f5LDN4ydudn5GPR8v0izTm48Uq90gI7xwLyfaLs50NMpYf36vkU1K6Y7b6NtEbI87RM4wI3f/h1sLeS48A7dm3a1jgwSMDWiS8jyz07ztfnL5Nym7klo4IY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T5+BuZ2O; arc=pass smtp.client-ip=209.85.221.46
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-47d6c634f45so1087008f8f.3
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 06:45:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783345553; cv=none;
         d=google.com; s=arc-20260327;
-        b=QKAzATyRz1jlVTIA3h6HGRE7jg29oUgp2vmNwRBjQDmLF+TCUVsrqn48WvouFINK+g
-         CJPyJFzp7F6Pp40f4UgnoV3N3c0BNnwyp1kFJJqltMf3dPIELPqR+qcQXSkO5JID15i+
-         3o/1/RHiR+fl7pu7MU1bVsKN15m7KkU2PuNeKUJ9IrF3sjZa0m7U+S3eYT/CPh6UTrdG
-         s1YkCr/uUOOajRPG5fv/mdqiuUJDkWGyhmqWte7PnS5/8YKWgwAQuqePrdl7Uj7s49Pp
-         ZrlJQUoNLwQCVL74x7eSRHq2YC+rTDBB3w7Gq/68Y63GVKcSGMIzePI4q2hojdx0SJ58
-         RcPw==
+        b=ku0M0FdYFWbAvNzE9IjjC5j03Ydt2Rl5zSnaWX+Rgj3Ylw3OfMUlyhwPi92I1ZCqKs
+         kY86im7LY82e36pYtTP2aremjkYWj3fPvkxZ0ji2B/MsaBWlG5Vq2EidgNDTLXykWRFp
+         2OPmckZEh1VRaeI8m2FZMkHebM2LQLk0Uzo1zRmO6rtFG0paKbrB9D+fTGHqTHdn1MCt
+         UOOuJ0d8m4WQuD26c49KqXP9RYnyg10fzkQ992mFe257aOn0bhbCWm3Wj9HwT9gQhJRU
+         kWSOu9t6qzP/As33tb+kF1YbGI5qZOs4lXfcDvXwZM4KucorUTyEYh96JNI/gnUjCjBS
+         sYFg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=JaMkP3/Yvn0tE4bv5skgBf8rRsLRrinEUX+P2tXawRA=;
-        fh=e7pmY3zjEa2I1zk8N8U5at4A2ZLvlhOpVGbtmkJloBc=;
-        b=mKoB/L1wuB7UxZM4LVVJRgpqbu7bp2KAkKUFaPnK3QIsTNK7+bmiUj2xXH7GW/Ia6f
-         nBAccne5Gy5FjW50xaDrIs4UgAv5ujX5H5sDhQkQPKKbeL7R7hJe/ebBIESLuY4k0F2j
-         aRut4JkdUXbynDE5R6QXInnD+qtKGEKi2jgtYfNni7x3/CLXF61SWkpbaCyBE3n8DdC5
-         1Ab+wZ3UFzhMlLDMExB/sm7VCS23JEafXW1pRigSMOJ2pTzma3KD+g2MjO2tz3KQtyVb
-         OnP1tYX1F0WuyAD2chKkaQ6imcj1nkFYw/0qwXe6hix/CBO+3z0AqyoyV0ByavKwi+Re
-         txjQ==;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=kcEQsIAK9WaEKSN1vaaZZgykO19KS7IvBARm/eZyWas=;
+        fh=xu71Rb8BRB1k4YSZC5gaO5XtNBrlAF0Ro2cobIdSTo0=;
+        b=pZ8w/qWoUhZNdPt3K4i9iBKyg9kxIO7JdKB60GyJHXIAg6goig/lg5Ka73A7FkVgd3
+         IhBUz14cYSu34cQZO2SdY6/V4WGBbzwIn6gT6N3N4p6ogMKxeFMhSfd6m3PD8yEigE6k
+         PVbYC1i8UQb/jVYuNn95OqtIaigwmXKd6qxI9ADHW8OyeZj8Ubamod/JSfvkgb15qWl/
+         mVXiyWKh7ZmOSNJmtseR/06aqehVkj67cf8MwxCvmv0UQYU+zzjQFQ/XtrFWG80Nqh4M
+         KlsC3Vtz0JEmh1mvsbanKD/gDjDWaxnBpXatRa3lLhXaarMc8JCrKYNmM8hkFHzjK30B
+         zS1Q==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783345519; x=1783950319; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=JaMkP3/Yvn0tE4bv5skgBf8rRsLRrinEUX+P2tXawRA=;
-        b=K9MrIY9/YfNIuAxIksPprbXShRqxHcz1mqaQOZOG+jKQMm1OUekkY4XrUBfK93uqcT
-         WC4Q/fOJWhA8nAFJ7VE1Ux2/0jSAnO5lyhQ43kf8zErto8CjjXoCRr32fvpsmNYpradn
-         rxz9jIBAKxS8MnuPNcFuEPt8doQ2kLL/XlRr/FTJcqqHYF79ZNN3c3zAmrSsKPOfr3Fo
-         KB6wA9IewbuaUm7M+LwczxAIIMroMhYqbsRC8K5//ovBhtgaveaupzIg8snlgO6Do0iO
-         NS3f4wu/PcKY4HfqNvCB02gfZQTv7pnr50B/n6L9PgBVG6DX4v8Rf8PpRrqZRDBID9OQ
-         HB+A==
+        d=google.com; s=20251104; t=1783345553; x=1783950353; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kcEQsIAK9WaEKSN1vaaZZgykO19KS7IvBARm/eZyWas=;
+        b=T5+BuZ2OUGykjQkrwU+MwdTf5WS65efsJVqdh4WEqcfBUEpFXR8HuHwZfBUpdwdIsc
+         An/QMkj2N0BGJQ8e0hqL57aRAi2jRDYao6+LCZqdl5o3NW0EE1T0x8+tdGRTR4nYvwWt
+         gfy+4V+tp57og7N/n2oDFCo4jEQhNR+y08brrsfCGFYwxnbO3nK8Sq/UZ23QZnxwcjY+
+         hsuX184I3UyiFUlmszho7Onkbex7ZO71gqOPbS/KbECsQ1nYggw72EvBj0NC36VCkJLA
+         h+AkaxQoFrtQ8+6u5pbgNgBNO/0p4LPe6W3OKz7L5Ez6T6VBcFq+90f7q/KtfHOtr6yc
+         4B6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783345519; x=1783950319;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JaMkP3/Yvn0tE4bv5skgBf8rRsLRrinEUX+P2tXawRA=;
-        b=mnxHOpDCHIcZaoLs1VF/dQIceUkC4N5sLkDWWU6hF/pm2+MDdKcQUibRyA0DvJXQql
-         YSRm8r+RYOkzjP+Qf5DX1pNbmbRL/01IvF1o7l5aI9gEiblo124J270TsJi6JhlqgW7V
-         JZ5GfqWJ78dld9bAqtNjxhgKKmnJVSR55zwtNWrPBnCbHBDAmc0lVkpyoGoITGgNQ+er
-         SIOZU/pa4sk4Vyz4AIJG9nOZBIICgCUCsqHDqJ4XwK+KHf0H+ZFtpP/Qla2yEOFnTgMS
-         Nk8spXUsnRbOC1S3VzyVGyZdX+tw5GznKe/7Py+kc15GJ4/j72qQY/0x/+1OB8fo07O/
-         s7JA==
-X-Gm-Message-State: AOJu0YyRjU9pLWvOGO1XBWGvbVaklygvrbrIpf39mJfPpayEgCetfWHZ
-	KYjpHkRln72gmKbTpoqp9xfPVDFyhIaaGICeLIbKugwNb+jqCMqNdmX9nmXMBofn69Yk62GpMpf
-	LxuLJErIH5CMq7b8r4DLJdY6T9J/wFkRaQUEd
-X-Gm-Gg: AfdE7cm1C3oV3kAcFppRwgbKKPK7NtrsfiKUhWeFlzNO3q83QVw8yQ6fY4KYkrxk8P2
-	wsqHqVPqImgMPSeR+2K5AhuRbPcOWzzf1m8HQ93ev8RoqsC+27m0xMvZAskzFMO1MVPOjjszAxW
-	c1ddVAf9fkv/1zjHhy3iIH4c7n3okJVq+1/3LmYAznNCw0kpC+R6xdzrMT0EBS6IhVzVN1ndbQG
-	QJm8kUE/9qWLCNXmHEB+10HQpPnedYQABZoaytLB/ZSqlhGJVQbeJzm7FoDpkgeYXi4lHxQFw==
-X-Received: by 2002:a17:906:a406:b0:c12:ac7b:97f6 with SMTP id
- a640c23a62f3a-c15a68c5a96mr23478566b.35.1783345518351; Mon, 06 Jul 2026
- 06:45:18 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1783345553; x=1783950353;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=kcEQsIAK9WaEKSN1vaaZZgykO19KS7IvBARm/eZyWas=;
+        b=ScFJaikX1/3a3p1Q3P0NUgiqYd2+OtxBixwsEq95BwoMiTmYoA627Kji1Jz3qhj4g/
+         A36yp8PmdtJn1YP0Elmlfn8/pynEEIQchCbosCZN76fVsBkkJXy4hGtCnwX9mgfZTU2e
+         KVkJB14BptiGONBQK4h0ksdZWGyzZTAvlTc3aHbFDqlBi7om2LPhvmmRNxdEfaWW4vE8
+         5+0jPYKknGUf4YGJSPEMTdfUXTkk7IeXitKMq+urboNnpNdfDrncBWmMq6T9fyemjs09
+         91eaxjWVnv9gA0vErNFmvvK1m4A1CUhzQFVF5D9R/HBc230AC5G2RcvVq207vbrdqIoD
+         brjQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rphv7E8qPH5WBZqIaEDycGFXKjyiEJblvMn23fM0r6I/BF+EOpkXuQ1c9avgeOFXlHpHgPIeac=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztrpS6lfu/28bklUhrmw6MGtqJ0ZMATh3QAUXZn0yOd8AM+IpZ
+	kgFXeciGFg23qc1maf42iM5ZQp0TBPXBy8tFy/V3OGlYbYmOLQmcA/i688IkKsHKemTbkWA8NfB
+	gOLW13ZO17PMtBK6G9F3svFa71YaptjDBCxmZVIth
+X-Gm-Gg: AfdE7ckIzkUpW9QTBvvqGPbrwIc2xgp3JtVt1q9d2Oz0GcN12BsCmhWLKWnyHfgbaY1
+	FAYUokR/jBkINUMs/8zvZYCDTXm/+nT5+fXK4LrBSw8XfBCKy3dELymbRkmE0uQRTWC0+9QyqSD
+	ql42qOPBoSxyuoKydJAi1jSBvBKajWvu+23ZEu27FJw6u2FmxzEZNWknnOBbXdW7SuLApFwxrkx
+	GxCyDX0gZFl6nJ4lTLjYH3MYHBhwkcl4Qc+IWyOS7UfmIPoMMMkosJ0izsqJkg6pAHgJykpsVm/
+	o2rJA8byQQBSg1/ZbvyMIcyJ9zS4TNMyPo8zpNcZlQmfQ4gCUyTI+X0gkCM=
+X-Received: by 2002:adf:f590:0:b0:477:6874:542c with SMTP id
+ ffacd0b85a97d-47de66a2fe0mr238935f8f.22.1783345552952; Mon, 06 Jul 2026
+ 06:45:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Daniel Pawlik <pawlik.dan@gmail.com>
-Date: Mon, 6 Jul 2026 15:45:06 +0200
-X-Gm-Features: AVVi8CfqSooGXdYAr4MfPpW4MuqJciGMKGy5DzlQCpBHXg70jR6jlEagZgEIImE
-Message-ID: <CALC2ApggM++j_U2HyuPqo3OArdQrqd+N0ftfUdVSaHhhRcB00A@mail.gmail.com>
-Subject: net: airoha: PPE SRAM stale L2 entries survive TC flower destroy on
- station roam
-To: netdev@vger.kernel.org
-Cc: lorenzo@kernel.org, upstream@airoha.com
+References: <20260705-net-vert-imp-v1-0-95a35ddff411@gurudas.dev>
+ <20260705-net-vert-imp-v1-1-95a35ddff411@gurudas.dev> <8376fc86-be9d-4e3a-a51e-4d9ecda1b648@lunn.ch>
+In-Reply-To: <8376fc86-be9d-4e3a-a51e-4d9ecda1b648@lunn.ch>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Mon, 6 Jul 2026 15:45:40 +0200
+X-Gm-Features: AVVi8CcfJ5T4Eksw8-ONpuN0gs2vDftnttVKE4h_kMWH2y7YBxV5vjR4JqCNsAk
+Message-ID: <CAH5fLggGdcMr-ARGpg150_ojhBUnNaV0weyfk_M0D3AP_Qhw1Q@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] net: phy: ax88796b: Use vertical import style
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Guru Das Srinagesh <linux@gurudas.dev>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+	Trevor Gross <tmgross@umich.edu>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:linux@gurudas.dev,m:fujita.tomonori@gmail.com,m:tmgross@umich.edu,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:rust-for-linux@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:fujitatomonori@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305069-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305068-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:lorenzo@kernel.org,m:upstream@airoha.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[pawlikdan@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pawlikdan@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[3];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gurudas.dev,gmail.com,umich.edu,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,vger.kernel.org:from_smtp,gurudas.dev:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 21BC8711A75
+X-Rspamd-Queue-Id: D0959711DE2
 
-Hi,
+On Mon, Jul 6, 2026 at 3:17=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Sun, Jul 05, 2026 at 10:38:40PM -0700, Guru Das Srinagesh wrote:
+> > Convert `use` imports to vertical layout for better readability and
+> > maintainability.
+> >
+> > Signed-off-by: Guru Das Srinagesh <linux@gurudas.dev>
+> > ---
+> >  drivers/net/phy/ax88796b_rust.rs | 7 ++++++-
+> >  1 file changed, 6 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/phy/ax88796b_rust.rs b/drivers/net/phy/ax88796=
+b_rust.rs
+> > index 2d24628a4e58..5a21fe09bd62 100644
+> > --- a/drivers/net/phy/ax88796b_rust.rs
+> > +++ b/drivers/net/phy/ax88796b_rust.rs
+> > @@ -5,7 +5,12 @@
+> >  //!
+> >  //! C version of this driver: [`drivers/net/phy/ax88796b.c`](./ax88796=
+b.c)
+> >  use kernel::{
+> > -    net::phy::{self, reg::C22, DeviceId, Driver},
+> > +    net::phy::{
+> > +        self,
+> > +        reg::C22,
+> > +        DeviceId,
+> > +        Driver, //
+> > +    },
+>
+> A question from somebody who does not know rust. Does the order of the
+> elements in the list matter?
+>
+> Linux has a pattern of sorting multi line lists, because it reduces
+> merge conflicts. Can this list be sorted?
 
-I spent the last few days debugging a WiFi throughput regression on an
-Airoha AN7581 router (Quantum Fiber W1700K, OpenWrt, acting as a dumb AP
-with bridger [1] doing TC flower-based L2 hardware offload). The symptom
-is that when a WiFi station switches from one radio to another, throughput
-drops to ~1 Mbit/s until something nudges the PPE out of its stale state.
-
-I want to share what I found in case it helps identify a driver or firmware
-issue, and ask a few questions for the Airoha folks.
-
-The setup: bridger installs skip_sw TC flower filters on bridge member
-interfaces to push L2 forwarding into the PPE.  For a station on phy0.2-ap0:
-
-    phy0.2-ap0 ingress: src=STATION dst=GW  ->  redirect lan2
-    lan2 ingress:       src=GW dst=STATION  ->  redirect phy0.2-ap0
-
-When the station moves to phy0.1-ap0, bridger tears down the old filters
-(RTM_DELTFILTER) and installs new ones (RTM_NEWTFILTER) for phy0.1-ap0.
-The kernel and driver both report success. But the PPE keeps sending
-downlink traffic to phy0.2-ap0, where the station is no longer associated,
-so every frame is dropped. iw dev phy0.1-ap0 station get a few minutes
-after the band switch:
-
-    tx retries: 3429
-    tx failed:  3435
-    rx bitrate: 6.0 MBit/s (link rate degraded by retransmission backoff)
-
-Meanwhile tc filter show lan2 ingress correctly shows redirect to phy0.1-ap0.
-The kernel's view of the world is right; the PPE's isn't.
-
-Bridger improvements along the way
-==================================
-
-During the investigation I made several improvements to bridger - better
-handling of port mismatches, FDB migration ordering, and the DELNEIGH/NEWNEIGH
-race during band switch - all in main-bridger-v4 [2]. These helped narrow
-down the problem but in the end were not enough to fully resolve the issue on
-their own, which is what led us to the PPE SRAM behaviour described below.
-
-Root issue - PPE SRAM consistency
-=================================
-
-Even after the bridger fixes, there's a residual window where the PPE SRAM
-has the old redirect in place. The sequence from the kernel's side looks
-correct:
-
-    RTM_DELTFILTER  ->  flow_offload_destroy()  ->  "flow_table entry
-removed OK"
-    RTM_NEWTFILTER  ->  flow_offload_add()      ->  success
-
-But the hardware continues forwarding on the old SRAM entry.
-
-While adding debug logging to bridger's nl.c to trace every RTM_DELTFILTER
-and its outcome (patch c1a5f49 in the same branch), I observed two things
-that suggest the SRAM management is not entirely consistent.
-
-First, RTM_DELTFILTER frequently returns ENOENT even for filters that were
-successfully installed earlier:
-
-    flow offload del on ifindex 8 handle 0xf521a056: FAILED kernel error -2
-
-The reason is that the PPE firmware proactively evicts idle flows from SRAM
-on its own schedule, notifying the driver via flow_offload_destroy(), which
-causes the kernel to remove the TC flower filter before bridger's idle timer
-fires. So bridger's delete arrives late, after the filter is already gone.
-In isolation this is harmless - ENOENT just means the hardware already did the
-cleanup - but it does mean there's a window between the PPE evicting the entry
-and bridger learning about it where the state is unclear.
-
-Second, dmesg occasionally shows the same cookie receiving multiple DESTROY
-notifications in rapid succession:
-
-    airoha_eth: PPE: TC DESTROY cookie ffffff8017ee1000: flow_table
-entry removed OK (TC filter will be deleted)
-    airoha_eth: PPE: TC DESTROY cookie ffffff8017ee1000 NOT in
-flow_table (already removed or never offloaded)
-    airoha_eth: PPE: TC DESTROY cookie ffffff8017ee1000 NOT in
-flow_table (already removed or never offloaded)
-
-Same cookie, three notifications within milliseconds. The first removes the
-entry cleanly; the next two find nothing. This looks like the NPU firmware
-can fire DESTROY more than once for the same SRAM slot, possibly because the
-invalidation commit to the hardware is not atomic from the firmware's
-perspective.
-
-The practical consequence: when bridger installs a new TC flower for the same
-MAC pair on a different port (RTM_NEWTFILTER for phy0.1-ap0 after
-RTM_DELTFILTER for phy0.2-ap0), there is apparently a window where the old
-SRAM entry is not yet fully invalidated. If the new flow_offload_add() runs
-into that window, the new SRAM entry either doesn't land or coexists with the
-old one in a way that lets the hardware continue using the old redirect.
-
-Workaround
-==========
-
-I tried a kernel-side workaround [3]: register a switchdev notifier for
-SWITCHDEV_FDB_ADD_TO_DEVICE / SWITCHDEV_FDB_DEL_TO_DEVICE and, on each
-event, walk the driver's flow_table and l2_flows and flush all PPE entries
-matching the affected MAC.
-
-Two things that flush handles:
-
-  - Removing the flow_table entry makes airoha_ppe_flow_offload_destroy()
-    return -ENOENT on RTM_DELTFILTER, which causes the TC layer to remove
-    the software filter state cleanly.
-
-  - Removing the l2_flows entry prevents airoha_ppe_foe_insert_entry() from
-    re-learning the stale redirect direction after the BIND entry ages out.
-    Without this, even after the SRAM entry expires, the old l2_flows parent
-    is still around and the PPE re-establishes hardware offload in the wrong
-    direction the next time traffic flows.
-
-This fixed the symptom completely. I held off upstreaming it because it
-felt like compensating for something the driver or firmware should handle
-correctly - if RTM_DELTFILTER reliably invalidated the SRAM entry and
-l2_flows were tied to the lifetime of the station's bridge port association,
-the switchdev flush wouldn't be needed.
-
-Questions for Airoha
-====================
-
-Is the NPU firmware's SRAM invalidation atomic? When flow_offload_destroy()
-returns, can the driver guarantee the hardware has stopped using that entry,
-or is there a commit pipeline that takes additional time?
-
-Is it expected that the firmware can send multiple DESTROY notifications for
-the same slot? The double-NOT-in-flow_table pattern in dmesg suggests so.
-
-When flow_offload_add() is called for a MAC pair that may still have a
-partially-invalidated SRAM entry from a previous flow, does the NPU guarantee
-the new entry takes precedence immediately? Or is there a recommended
-sequence (e.g. explicit invalidate, barrier, then add)?
-
-Is there a flush or barrier call in the NPU firmware interface that the driver
-could expose, so a switchdev handler or similar could ensure SRAM consistency
-without needing to walk the entire flow_table?
-
-Happy to run more tests, capture more dmesg, or share the full debug log
-from bridger if it would help.
-
-Regards,
-Dan
+No, the order does not matter. But rustfmt will complain if it's not
+sorted. Note that rustfmt prefers ordering lower-case before
+upper-case so it is currently sorted in the order preferred by the tool.
 
 
-Some info:
-Kernel: 6.18.37, arm64
-Platform: Airoha AN7581 (tested on Quantum Fiber W1700K)
-
-[1] https://github.com/nbd168/bridger
-[2] https://github.com/danpawlik/bridger/commits/main-bridger-v4
-[3] Local branch -
-https://github.com/danpawlik/openwrt/tree/airoha-npu-kernel-mailinglist
-    commit: https://github.com/openwrt/openwrt/commit/7373faf11f4ad14a3cb16f33e51fbc4dccc85ca4
+Alice
 
