@@ -1,132 +1,164 @@
-Return-Path: <netdev+bounces-304960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304962-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id hedDBoScS2q4WwEAu9opvQ
-	(envelope-from <netdev+bounces-304960-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 14:16:04 +0200
+	id 3sLENnSdS2oWXAEAu9opvQ
+	(envelope-from <netdev+bounces-304962-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 14:20:04 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3484B710618
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 14:16:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3555E7106E1
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 14:20:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304960-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304960-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=l+Q1gYUw;
+	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304962-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304962-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 092EA39735B2
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 10:14:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8091939BA079
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 10:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E153815CF;
-	Mon,  6 Jul 2026 10:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD7F944211D;
+	Mon,  6 Jul 2026 10:17:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bregans-1.gladserv.net (bregans-1.gladserv.net [185.128.211.58])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B7233F582;
-	Mon,  6 Jul 2026 10:11:41 +0000 (UTC)
+Received: from zg8tmja5ljk3lje4mi4ymjia.icoremail.net (zg8tmja5ljk3lje4mi4ymjia.icoremail.net [209.97.182.222])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F59827EFE9;
+	Mon,  6 Jul 2026 10:17:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783332704; cv=none; b=VDESHk7jpURQihjTvV8QpQftf0ntCETGvF3gwGHIXodg2cXNKxye2ipClbqfLK2IOsdXl4gDdDqkC9qkCowBDUCIUXzv2S7JmEj8E/5rj5IQY799x133d3c3rJfO4+yGzYyqsf6acWV75Ar14+eQuEuW4ov1F2L5bVyaDPOT8AU=
+	t=1783333032; cv=none; b=CLiLkZP44CBZSkKxd9/a293STFk1R6zqT5dG5F5qV32lL1VkLA52Hg+M9tQRBvMmRjWuL5MYrp/OWDu2MN5eZW6u775Rn8qtt6ksDfycalHitX/YwUG0PW429M47/xTWr1d3pGv4f1q1MG0zzzkqg46MuPGmxU7NrqQNdt3eVoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783332704; c=relaxed/simple;
-	bh=MBzYfn6wrT/moznkuon8LGgRLOwNEgezeJ/ZvYxKR6Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sv/Ya2K3VH/pYQnqAFe1gOES49fbCu9BaE15OCIxiS0oHMF5afoveFxdntk/XX9CGtuBlknUDJHBfQS2i/ncDnMfr+p5TEQYJPaB7N9wdsi/E6P/0Zsoq9dRGVJ+tEafPw4u2V8dMkFBGLGzZ13hO366BYxA4RWAU8EHikySyDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=librecast.net; spf=pass smtp.mailfrom=librecast.net; arc=none smtp.client-ip=185.128.211.58
-Date: Mon, 6 Jul 2026 12:11:15 +0200
-From: Brett A C Sheffield <bacs@librecast.net>
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowangio@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Tim Gebauer <tim.gebauer@tu-dortmund.de>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] tun/tap & vhost-net: make qdisc backpressure
- opt-in via IFF_BACKPRESSURE
-Message-ID: <akt_Q7kdR3Zb8_GZ@karahi.librecast.net>
-References: <20260706094242.115992-1-simon.schippers@tu-dortmund.de>
+	s=arc-20240116; t=1783333032; c=relaxed/simple;
+	bh=VCwZrRwTQmEgvu4RfMg740sUgjTmkta7dux4gUN6ax8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FEx8Wr6p/iavK1dabVN165t0d8ZQMYjQpWvy3B0skW6/PLXAvXrEgJia7AtSNYx6zFg7fCXb7saajNWpL1jchIUc41GWc38SIG9F5De9YjZl6PmfpFip7z/fd1BE7IfvtMjXm1ZmsoqM27Yd/LlvzX9lEGQ0KGCqfmlREjXS0aw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=l+Q1gYUw; arc=none smtp.client-ip=209.97.182.222
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
+	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=CGMXO
+	jZBJ7c5b38ucaL2dUKfGAjGD3ZKFalqvM5Qhx8=; b=l+Q1gYUw0PCMQdJxmKhpb
+	B5PFBSd0zMnfXpyCHPjiSODFQOF0PMPOq5qMd5x9Gv7CU28RsYXdlO34c6N/RZoM
+	SPeYmPVU5xEyFB9qdInJFX9LZPsNHz0AK91U4nQKr4oZdoMi9Suy87UblvyHR3Z3
+	ZYAVmhBiveLKc6HAYYHBX4=
+Received: from localhost.localdomain (unknown [101.5.13.242])
+	by web4 (Coremail) with SMTP id ywQGZQD3CJ6GgEtq_fjIAg--.37800S2;
+	Mon, 06 Jul 2026 18:16:39 +0800 (CST)
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+To: netdev@vger.kernel.org
+Cc: coreteam@netfilter.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	fengxw06@126.com,
+	fw@strlen.de,
+	horms@verge.net.au,
+	ja@ssi.bg,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvs-devel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	pabeni@redhat.com,
+	pablo@netfilter.org,
+	phil@nwl.cc,
+	qli01@tsinghua.edu.cn,
+	stable@vger.kernel.org,
+	wangao@seu.edu.cn,
+	xuke@tsinghua.edu.cn,
+	yangyx22@mails.tsinghua.edu.cn,
+	Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Subject: [PATCH nf v2 0/3] ipvs: use parsed transport offsets in state handlers
+Date: Mon,  6 Jul 2026 18:16:21 +0800
+Message-ID: <20260706101624.69471-1-zhaoyz24@mails.tsinghua.edu.cn>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260706094242.115992-1-simon.schippers@tu-dortmund.de>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ywQGZQD3CJ6GgEtq_fjIAg--.37800S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7urW7XFyUur43ur1rZw1fZwb_yoW8Jw13pa
+	sa93yagrZrKFyIvrsrArs7Ga4rCan8Gay7XayrK3s5tFy0vr45tF90k3yrKayUurZ7t347
+	Ar1Yvw43Zr4kJr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9m1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l8cAvFVAK
+	0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4
+	x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l
+	84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcx
+	kEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6x8ErcxFaVAv8VW8
+	Ww4UJr1UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6I
+	AqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_GFv_Wrylc2xS
+	Y4AK67AK6r4DMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY20_GrWkJr1UJwCFx2
+	IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v2
+	6r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67
+	AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IY
+	s7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr
+	0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUEkskUUUUU=
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQEAAWpLXR9AnAAAs+
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
+	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304960-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	DMARC_NA(0.00)[librecast.net];
+	TAGGED_FROM(0.00)[bounces-304962-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[bacs@librecast.net,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FORGED_RECIPIENTS(0.00)[m:simon.schippers@tu-dortmund.de,m:willemdebruijn.kernel@gmail.com,m:jasowangio@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mst@redhat.com,m:netdev@vger.kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:andrew+netdev@lunn.ch,m:tim.gebauer@tu-dortmund.de,m:linux-doc@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:coreteam@netfilter.org,m:davem@davemloft.net,m:edumazet@google.com,m:fengxw06@126.com,m:fw@strlen.de,m:horms@verge.net.au,m:ja@ssi.bg,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:lvs-devel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:pabeni@redhat.com,m:pablo@netfilter.org,m:phil@nwl.cc,m:qli01@tsinghua.edu.cn,m:stable@vger.kernel.org,m:wangao@seu.edu.cn,m:xuke@tsinghua.edu.cn,m:yangyx22@mails.tsinghua.edu.cn,m:zhaoyz24@mails.tsinghua.edu.cn,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,lwn.net,linuxfoundation.org,lunn.ch,tu-dortmund.de];
+	FREEMAIL_CC(0.00)[netfilter.org,davemloft.net,google.com,126.com,strlen.de,verge.net.au,ssi.bg,kernel.org,vger.kernel.org,redhat.com,nwl.cc,tsinghua.edu.cn,seu.edu.cn,mails.tsinghua.edu.cn];
+	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bacs@librecast.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	R_DKIM_NA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,librecast.net:from_mime,librecast.net:url,librecast.net:email,karahi.librecast.net:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mails.tsinghua.edu.cn:from_mime,mails.tsinghua.edu.cn:dkim,mails.tsinghua.edu.cn:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3484B710618
+X-Rspamd-Queue-Id: 3555E7106E1
 
-On 2026-07-06 11:42, Simon Schippers wrote:
-> Commit 1d6e569b7d0c ("tun/tap & vhost-net: avoid ptr_ring tail-drop
-> when a qdisc is present") did not show a relevant performance regression
-> in my testing but on Brett Sheffield's librecast testbed it shows a
-> significant performance drop in a IPv6 multicast testcase. The regression
-> can be pinpointed when multiple iperf3 UDP threads are sending. For 8
-> threads the performance dropped from 13.5 Gbit/s to 9.13 Gbit/s. This is
-> the reason why this patch makes the qdisc backpressure behavior opt-in.
+IPVS parses packets into struct ip_vs_iphdr before scheduling and state
+handling.  For IPv6, iph.len contains the real transport-header offset
+after ipv6_find_hdr() has skipped any extension headers.
 
-Your v1 commit message was correct.  The iperf3 tests were TCP, not UDP.
+TCP and SCTP state handlers still recompute their own transport offsets.
+They use sizeof(struct ipv6hdr) for IPv6, so packets with extension
+headers make the state machines read the wrong bytes.
 
-The original failing test that alerted me to the problem was IPv6 multicast
-(UDP), but the reproducer tests I provided stats for in the regression report
-were TCP "To eliminate my code and any multicast weirdness" and also to verify
-that this also affected TCP.
+Pass the parsed transport offset through the common IPVS state handling
+callback, then use it in the TCP and SCTP state lookups.
 
-Sorry for the confusion. The command lines used are in the regression report.
+Changes in v2:
+- Pass the parsed transport offset through ip_vs_set_state() and the
+  protocol callbacks.
+- Fix TCP state handling as well as SCTP.
+- Avoid reparsing the skb in SCTP state handling.
+- Split the common plumbing, TCP fix and SCTP fix into a 3-patch series.
 
-I've tested the v2 patch (with IPv6 multicast), and verified the
-previously failing test passes.
+Yizhou Zhao (3):
+  ipvs: pass parsed transport offset to state handlers
+  ipvs: use parsed transport offset in TCP state lookup
+  ipvs: use parsed transport offset in SCTP state lookup
 
-Tested-by: Brett A C Sheffield <bacs@librecast.net>
+ include/net/ip_vs.h                   |  3 ++-
+ net/netfilter/ipvs/ip_vs_core.c       | 10 +++++-----
+ net/netfilter/ipvs/ip_vs_proto_sctp.c | 18 +++++++-----------
+ net/netfilter/ipvs/ip_vs_proto_tcp.c  | 11 +++--------
+ net/netfilter/ipvs/ip_vs_proto_udp.c  |  3 ++-
+ 5 files changed, 19 insertions(+), 26 deletions(-)
 
-Cheers,
-
-
-Brett
 -- 
-Brett Sheffield (he/him)
-Librecast - Decentralising the Internet with Multicast
-https://librecast.net/
-https://blog.brettsheffield.com/
+2.34.1
+
 
