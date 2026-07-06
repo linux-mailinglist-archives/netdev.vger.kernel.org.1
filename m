@@ -1,329 +1,232 @@
-Return-Path: <netdev+bounces-305145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305146-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DoPwCAPeS2rQbgEAu9opvQ
-	(envelope-from <netdev+bounces-305145-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 18:55:31 +0200
+	id 7GXfGvfxS2rvdQEAu9opvQ
+	(envelope-from <netdev+bounces-305146-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 20:20:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D28C7138ED
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 18:55:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C06457146C7
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 20:20:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=meta.com header.s=s2048-2025-q2 header.b="UF1ei/d5";
-	dmarc=pass (policy=reject) header.from=meta.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305145-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305145-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=google.com header.s=20251104 header.b=vOPhojDr;
+	dmarc=pass (policy=reject) header.from=google.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305146-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305146-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1F5383091EAC
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 16:32:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3A05F30AA7E0
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 16:35:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 890CE3BE644;
-	Mon,  6 Jul 2026 16:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73FF3D16F9;
+	Mon,  6 Jul 2026 16:35:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A44073AE1A2
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 16:32:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CCD0220687
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 16:35:04 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783355560; cv=fail; b=nfvdQ/ZuYx5yYrfQT+N3KvGd/Fa1ZRLGqO773jwXj7UPFghLa3sKaJKuE128iaqvm3nkgOYLScKNHTxWCu8oysr+NkK3YTrYS51N+E2YtxpiN+4WOgaYljgKsIZX8p6DkDfdiPWYG+9G+rtXSU2h/yadMf3xEIbt95la6PTGNBM=
+	t=1783355705; cv=pass; b=eP0fWtBS/bfDj6HJ/JQyuQpVHCBUQzMb2qNBOmWAwGdt51fbDNEdmqHzKXAeNTQV35Z6wM7RnDV+NpsqhvyQCCDQnaevTgqywS9e4ZgyPG+J2bbSnKmCLsi2IOGsWO3UXJ6pJ1intqQ1ZONtVAgmZ9psxcKllh86gwGFqd+qThU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783355560; c=relaxed/simple;
-	bh=mx5uHltUsYhLsqOWutvshPPHLEmekZ74cMuJoihq6Vo=;
+	s=arc-20240116; t=1783355705; c=relaxed/simple;
+	bh=jp4o02YVqFXtkcO5evY3sYAyjmc2SIxBIBpizq3qZCE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W3wIJS2oBEynSE3yQSY3RKf2QU4LdpcowXmDSMzC6KxW8lfKS0fKMwQC0K9zXfiijshWglMaCOH3NJu2srRwZsh3PNvxNvz/a3cIjO/6hrHsoQG+6ZKNsyE0acalFsUHNCZw2MRNSK8ElR4j6jTYDIIR+0askq3Cxel0fAQYM+g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=UF1ei/d5; arc=fail smtp.client-ip=67.231.153.30
-Received: from pps.filterd (m0528004.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 666FIOs32267092
-	for <netdev@vger.kernel.org>; Mon, 6 Jul 2026 09:32:37 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=HrrgiS/Iwzmva1t6y7T/dPTBmDKM6tt/EjjvI+7SCB8=; b=UF1ei/d5zJrC
-	/my7dJTSu7IMTd5nLKpLDnKBkuq86wxUZl/Hs3z+hGeIOtrORNGLp9tlfz7lQ/mY
-	D7cmi2+uqvh1N6H/h1l5O9UB+FLTikvYOBgVJvp5eXj5Sdu9ZdBFgn+r8SdfFJGN
-	Uh5p6IoMCl24MMKyoP3il2xM1hQiESs/YCF+kwGKlWStO32+QJKqhLzo/Ls2IGTl
-	BT+cxdBKg0PwzO+BnV4IUIvPIhpLJ+0SPXZn3Xv46/1VsyGvH3Yl8J1z+MFwiWbF
-	zJikz67lfL7QwN3UWrARhE5D+twMv4Y8yPDy9vh6wCFkcyRjRPnnIsnOzSgFQPRe
-	gWmaxD5Hqw==
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com [209.85.218.72])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4f7ktef5w6-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 09:32:37 -0700 (PDT)
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-c12823d7822so284170166b.0
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 09:32:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783355556; cv=none;
+	 To:Cc:Content-Type; b=AI+7/Km9XN4YnyIfLLvstqmlw7uOvtJGkoDwLGsD/sswWPPPyRJf805QeyXd/TmCO37EFYYY1BCbcIWli8OX9GlIFgnGzGQDDh8qhEhMnnlRq5cVmenCWntHxiTe92JVe8YqU6kkh7g76l/mD9h8tk2VkXPrtZEOfC+jkwsYfzc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vOPhojDr; arc=pass smtp.client-ip=209.85.215.174
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-c9c80265bd7so1855469a12.1
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 09:35:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783355704; cv=none;
         d=google.com; s=arc-20260327;
-        b=N73zNuqBTlG93QzQsiKahgEADhD1H9LuFPWemN1SJWO2pAELbLZF7RDsqco7gBkPnb
-         jUejvIVM+oKRKF66OzirUEUwMsdLzfJA3LHIkLwBGoe1KBfd25MDOPXPOB7R/wzKM1Xu
-         NCGImUAPVOvAKqYaDDMMWdzGqVVhUjNL1qCG6YNYLTeN8LrmDGhx/KxFi4w7YirfhWFJ
-         rGRIoJcupfiesKBay9ec8TpWh/TZFm/BV/l4VO4L+saFC+EsxhRZC71ah+cL34cg+h0T
-         GoNb9lw3ppZPftspMQde3XM1zy+ZRaxmcU0g6bwaQDbSehF3ZFEAJTboz3xGe957EwLZ
-         cG/A==
+        b=PdEIrpu3r06FH43LtIfHoKMLg5sAU3dPQ2vbJKh8hTWAsimGK9gn/dK5/aEEReGqHf
+         3c8WbDF117HViZ+uS1Q27gnZbM7Hwr/Rzq7zprKpq+e8GJyH+Z2rgUzPFB+LqFVfYe5T
+         xeAVi13kTZet4FCmHT4YikpukvJiUpOo4tDGBAeXOBzvRfRMyjQtCF4vi1gdKqm+LeZx
+         USmANGEdNJJUaz6x7s2ZCk61lApFVWhfYF0CMfjYKBMPvD+ujfOA9aH36n9Hl4ZPKoE0
+         EUioQLdv0qXG/MduGbRVghE3wlRXsjvM+B44/7rGpAcWjhZ9eFav6TBonevsZ+G9MSq8
+         RdtA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version;
-        bh=bxaOyXTy6hvg43xYt7od4VQd2vhEtCKi28zKpX6o0fU=;
-        fh=7hCpBLDrNUMNAz7dOXxtr+VbJBHrmv6oJr4ewbPJGxU=;
-        b=Z2QiC7Eykjkd42UJFcjPLlPuLTqnTf6F9OQZfLJfNmPujF8PbT4GIsvaYvZRQkaDQk
-         5WBO1U2q+SrUTDmC+bocnvJ24HOTnmOFqz4+lFhh31FbJdmpCvpP01syWbnyXD4GddZS
-         WoM516SutS4tu5pmGo9Dkkj4FfH+XtMERDU/RioqJ0xHnjbdxC6iliCPNVn3INs737Fg
-         67OsQaIhwzmh6FQrv0XCX/KCSv67s3nvoreR4DCWdv2Xpwi1A1eDLo9Ps01DV2S0cvVK
-         n5Td60gauEIwpYJf6VAHUKDNdTcEyr07Y2tzigt6z5Vzm0TdbqtoWUh6yU88Rn78gZbA
-         s3jQ==;
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=l/qK1HC6z6FPRZZxYaSbBC0LTsTLNWfixN1WH2aw2eY=;
+        fh=ODpa+pky6NNW/T9O0LGWzl64o2roM0A5mSRkpqwKzfk=;
+        b=OEbDWHs8Yrqk/hkTdOMOz9TCKX+lVqo9RpahxY7WaJdIW+1QjfRqQLqOwQC81ugXT8
+         /5oonEPpvfPKjmZpbg4A5czBiqfZgcXVInaVB2/Hylw5IajWfMVMKigDbVDXfV9K4gG5
+         4uVTTzBJ1EJgBXu8Bjpl2fs5ZxnM0+93UFEn64GjGeP0YGeXm6e3Mgdoqs3Rl+D9+wem
+         sAIIKPn0eFa5dKRFeIlcK7iZKqrQ3Y+QpHFH7AxIKiqUUkH5x4TwZ85In6XtGeD/+VmM
+         qdoEA7UMmwrrjPIFkSAxZQoCarI60O5m+h5JDPmgLSAFP3OQZ+vhwIqGyBaftR84a29W
+         jMAw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1783355704; x=1783960504; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l/qK1HC6z6FPRZZxYaSbBC0LTsTLNWfixN1WH2aw2eY=;
+        b=vOPhojDr6/KQcYRagi3YDV0G0iS8CW7VRin3vCw1ywGlW91PNqetU11B8WTXGymx1Y
+         Jb3r3DPC1TfRD05iE2Q+B2Lrc48RKPLi1My5X+7IYNj7c42BLtE1uOFI1Swen65Shmos
+         AGGm3fga1Ewq0M48gP29VJELvjOZWL1U8rwvJjiZtDGk9rtQ56rB5Hc9OwcNFUnrRmHx
+         coZK1I0Dx6aj6WssTWFTyQjZurCYjHz/lo+mNephDm3Rs3z6TYNpO+iLFqL7C/hvojNh
+         QRBg0qNq8KCkUQXBfhwd3367HX2lBpxsaoxJeRkxSqFoeWS1GV4d82iXSbN3uRdMd+VT
+         BarA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783355556; x=1783960356;
+        d=1e100.net; s=20251104; t=1783355704; x=1783960504;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=bxaOyXTy6hvg43xYt7od4VQd2vhEtCKi28zKpX6o0fU=;
-        b=a8kadkXibT8m3v3HTmqBd9CMWXo5YTIIu7uDDDvw6cwyZiwfzKl/pmorqvbD4BK4BW
-         FfAFJvW9LboriKp04N1s3YzdLEHE4sv3eZG7DXg296y5ZcxbLXewqrPf/X5+69qkjGUx
-         gO99qJYnm8so6NRqg04MScezVUn8jarQaS71Cia0/KlndrZVMZ2pCvJqkJZTWBEji7Zk
-         ZU1IhST/GHg3NW83XYkNI9pXVNLsRjNNujQpnLUlr9Fnd/4V9aqSJ7tQCtPc8G4FEQ+C
-         g2yiT8fPnEifbdvNHgwIG0pZ8yfWmBHMkvHHztqI6xKVtqSTvkSP4XC+ZjgCllrP7EBW
-         5UiA==
-X-Forwarded-Encrypted: i=1; AHgh+RqdApvG3Pvbpo3ilaspXwSenWiRKExnSJWiIBJfjGqwWXyHpC0b976dEjVZoGsLML15MJu5z+Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDFWBa2xfJnhs2f4YYEydULxnhgwSvPbXUhwP3yb31jzkqw2Ly
-	8/2yUUQ+C2poSE8eVpPB5TT7Lbxy5FiyjZZqfMMOKmCjp5r8id0b3YDBuoRsx7Vrs9s7oGdB8GI
-	O5WZ4g5kzfyjII+BNpYEncBTOqqBKALVtdCecOpIhCt9T0k4MC9SarUsQk+gfXN7urYr2f9xXw4
-	NNqaVS5ZBlVtIlDNOD4UlsnoVT7u152A==
-X-Gm-Gg: AfdE7cl9EwtFqR6/b9IvbFpJqHw8rNTRLSPq1HVrKgO+57tQGbDwtomZXul3C7p6KnK
-	4JsDCCOZgbJkacwrQ3Lx/W9FkTrWYjUkqRaOgi2dAHWf+OCsZi5JDfGBSHGLCYRZeUYYGk+/gD4
-	l0c+AQTJnvgDWMpPLPu3J0KV5QODOJXdFLnHmtxGskMlPkJsOSwkqeAnVz0tDspvO4jIK6wbgs6
-	yWCChY=
-X-Received: by 2002:a17:906:9c90:b0:c12:5c08:279 with SMTP id a640c23a62f3a-c15a67dd064mr67175366b.1.1783355556231;
-        Mon, 06 Jul 2026 09:32:36 -0700 (PDT)
-X-Received: by 2002:a17:906:9c90:b0:c12:5c08:279 with SMTP id
- a640c23a62f3a-c15a67dd064mr67172466b.1.1783355555766; Mon, 06 Jul 2026
- 09:32:35 -0700 (PDT)
+        bh=l/qK1HC6z6FPRZZxYaSbBC0LTsTLNWfixN1WH2aw2eY=;
+        b=aWya4vzsAEcZyuY/z5s/95yM0bk5q2dkH2/dYcRKl0XCAzfm/3+BRSxH+KNfpFgfTc
+         qxolqfEi9Zt5vW7UY0k1mYqMx9LxEAWC5OHgIq33LjVmsSoKmKuCGzcOtv67trIkLanU
+         ACTLOH17b3ZMLbVo8qZhgTZg1OORvg8jaK7AbPNy6p7SLpZOd5KU9v/u2Mo7ULi2h41q
+         xiBlzHCMFHUMeftUi6VjiYBtm/oDV2uK78Qd4Z1PaPVf/uXvCPp0Xl0k7wwNRABTkhiG
+         qIGZH9OZzzsNfffTkdkr3kWQI4FQz73X3JMTepF68LdiqOKaoKG524jDnIkbp+HsP0mU
+         xAGQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rpt/MaC4dvZSt2446vuvSdS55nbbTo6fIHedffdO6YdMKHAbFD1y0Wjc5kdyKF/9ILi7rmCEN0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1mra1nf6/1ex8HjhefipK3mOVUYcKBmpWBLGLQp3kQW1mG0y7
+	CgH/sDBT1ENcNybvtnr5Ir3Qrs0b84TVhgCEZozohcaSS9ZyMGKVPyzwpkXSUGjnma2WVgWqkT2
+	/KIDXSDuJEn/LFMxJbAtSGXirZJdSLNDfyHYJEXBR
+X-Gm-Gg: AfdE7cnoKVzPbXsGlef8+Z7XMJoO7QI4IIwrs9zDgc/ObhA1yA6ZMgLhx6cR1sogwOf
+	CeZdQhhPySYSKi8z4K70U3hkjdi5ag1Sw7ZUappQKOgaWeKZGVxtxSU7JcS9oAY5GQZn9uBrwAp
+	uKrNzV5UWsIBusvacujAcvX3h7pSm7HBonPU4SmLR3t/Ahhjpqmz14NUj7R3puNXdqsvl0b3RRe
+	pb0dbK3tYrOsRWiV8FFi93K8Pg5iDqAyiWcdiZf9JZZyTdcMXEE/l27YUb5SwTsWwr4Ycs7NrCF
+	VGg4k7W2+ThaqbvV3d6nUNY7GoAMd1oMiIjBCAvuSdjCp6ycZF/w4znA3BGXplmaOMeQguVpAiE
+	m+RmK9FiZ0Sv5QEHvFoUVbCp6g9BZAxckOUcyiRk=
+X-Received: by 2002:a05:6a21:682:b0:3bf:9e25:1a0d with SMTP id
+ adf61e73a8af0-3c08ef84007mr1665765637.52.1783355701949; Mon, 06 Jul 2026
+ 09:35:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260703112431.2860506-1-kiran.kella@broadcom.com> <c2f1e433-99bf-4712-a31b-6b2360f8fb6e@gmail.com>
-In-Reply-To: <c2f1e433-99bf-4712-a31b-6b2360f8fb6e@gmail.com>
-From: Wei Wang <weibunny@meta.com>
-Date: Mon, 6 Jul 2026 09:32:24 -0700
-X-Gm-Features: AVVi8CctXqCTaMq07-RhsB0smUl7VLvs-J78KWdZTmzMN6obyG7Vm7tlo9JgPzM
-Message-ID: <CADe0Y=uumdvc_mq1JWfUK6yVc_WBQrRH_m33W7YuyBQws-QbKA@mail.gmail.com>
-Subject: Re: [PATCH net] psp: fix NULL genl_sock deref race with concurrent
- netns teardown
-To: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: Kiran Kella <kiran.kella@broadcom.com>, kuba@kernel.org,
-        willemdebruijn.kernel@gmail.com, davem@davemloft.net,
-        edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
-        weibunny@fb.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jayakrishnan.udayavarma@broadcom.com, ajit.khaparde@broadcom.com,
-        akhilesh.samineni@broadcom.com, Vikas Gupta <vikas.gupta@broadcom.com>,
-        Bhargava Marreddy <bhargava.marreddy@broadcom.com>
+References: <20260703001009.1572444-1-kuniyu@google.com> <20260703001009.1572444-7-kuniyu@google.com>
+In-Reply-To: <20260703001009.1572444-7-kuniyu@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Mon, 6 Jul 2026 09:34:50 -0700
+X-Gm-Features: AVVi8Cd1DScKSpt1fSOrucCK6h5te4ybwOSBDsA3Guj0c3vPkDpBnte_OvV2jP0
+Message-ID: <CAAVpQUDKoYU773xHEfVR4J1LLJyF+v66eAJupaM5XQqe2vE1vQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 06/14] net: Add per-netns netdev
+ unregistration infra.
+To: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Authority-Analysis: v=2.4 cv=UdJhjqSN c=1 sm=1 tr=0 ts=6a4bd8a5 cx=c_pps
- a=D+UBI74RbQA8i2EYnbuvxw==:117 a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22 a=GbPsI2Ihf5RTnMjR_gZv:22
- a=pGLkceISAAAA:8 a=Q-fNiiVtAAAA:8 a=FOH2dFAWAAAA:8 a=HMZOYdunbeZyl6sIA9IA:9
- a=QEXdDO2ut3YA:10 a=PsfoTyiJ_72bb7xyA04f:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA2MDE2OCBTYWx0ZWRfX4kpF68o/xsMn
- SNJX5C26EO+2SueVEWBjVK83zdYLYBDHuLwSZamfkw9VxdIYzXQvSg4+7HWPp0C8UALN0FWDjM7
- k8JMu15cQiaT82DMaI10hPFuQaAQCwhbwE5GdghgMArubnh/12Urw0PZBkXfcZ9i12xWfC4Y5LX
- PThCpdc7fj29jwW/F8aNBLikMJMUwicH0lT8/JmuSHBQ1bmWsNNyvKGDM/pENssKfIt+ODl7Jwm
- n98cIG2z0KwcmCuqmzMAGYzgsdTsGaPdstEb060g6ktVTS9Ta3fcxk+nJCp5z6dLirhtqq7Fs64
- YNf07MKevkSh1lscZ4FufL4lZ0tuVmOiY8rMfgE1+zrajmzCg4jF2JIF6WLYpBexyupgaBg5YKO
- WFWZw48+P4/4evdVuz0gh34gFPJ06+r2tAqHCXzXcZ2qBclQ19y/BDdplEDHrNXBlTN9mVHi79Q
- XThbi6cR3TTFcR0ydrA==
-X-Proofpoint-GUID: 4KzNcf5RPKrgYXePAo8ypUUYKcCyFzro
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzA2MDE2OCBTYWx0ZWRfX3Py+A4h1427Z
- yrD5hlSMem3I/beOZ+r64MWTATz4/116RT3ZaiIpbqnNukyrBup8UzzMOircMLtJe1nafSr+530
- E8eLT/Vz/GK5pdKT0hwX9GvcjYy2BPM=
-X-Proofpoint-ORIG-GUID: 4KzNcf5RPKrgYXePAo8ypUUYKcCyFzro
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-06_02,2026-07-06_02,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[meta.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:daniel.zahka@gmail.com,m:kiran.kella@broadcom.com,m:kuba@kernel.org,m:willemdebruijn.kernel@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:weibunny@fb.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jayakrishnan.udayavarma@broadcom.com,m:ajit.khaparde@broadcom.com,m:akhilesh.samineni@broadcom.com,m:vikas.gupta@broadcom.com,m:bhargava.marreddy@broadcom.com,m:danielzahka@gmail.com,m:willemdebruijnkernel@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305146-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305145-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[weibunny@meta.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:kuni1840@gmail.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[weibunny@meta.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[broadcom.com,kernel.org,gmail.com,davemloft.net,google.com,redhat.com,fb.com,vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DKIM_TRACE(0.00)[meta.com:+];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,vger.kernel.org:from_smtp,fb.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,broadcom.com:email]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5D28C7138ED
+X-Rspamd-Queue-Id: C06457146C7
 
-On Mon, Jul 6, 2026 at 6:46=E2=80=AFAM Daniel Zahka <daniel.zahka@gmail.com=
+Replying to Sashiko review,
+
+On Thu, Jul 2, 2026 at 5:10=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.com=
 > wrote:
+[...]
 >
-> >
->
-> On 7/3/26 7:24 AM, Kiran Kella wrote:
-> > The race occurs between network namespace removal and PSP device
-> > unregistration.  When a netns is deleted while a PSP device associated
-> > with that netns is concurrently being removed, psp_dev_unregister()
-> > triggers psp_nl_notify_dev() to send a device change notification.
-> > Concurrently, cleanup_net() running in the netns workqueue calls
-> > genl_pernet_exit(), which sets net->genl_sock to NULL. If
-> > genl_pernet_exit() wins the race, two sites in psp_nl_multicast_per_ns()
-> > then dereference the NULL socket and crash:
-> >
-> > CPU 0 (netns teardown)       CPU 1 (PSP device unregister)
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D     =
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
-> > cleanup_net [workqueue]
-> >    genl_pernet_exit()         psp_dev_unregister()
-> >      net->genl_sock =3D NULL      psp_nl_notify_dev()
-> >                                   psp_nl_multicast_per_ns()
-> >                                     build_ntf()
-> >                                       -> netlink_has_listeners(NULL)
-> >                                       /* crash */
-> >                                     genlmsg_multicast_netns()
-> >                                       -> nlmsg_multicast_filtered(NULL)
-> >                                       /* crash */
-> >
-> > Both the main_net path (derived from psd->main_netdev) and each
-> > assoc_net entry in psd->assoc_dev_list are affected.
-> >
-> > Fix by replacing the bare dev_net() calls with maybe_get_net().
-> > maybe_get_net() returns NULL if the namespace is already dying.
-> > Holding the reference ensures genl_sock remains valid across both the
-> > build_ntf() and genlmsg_multicast_netns() calls.
-> >
-> > Fixes: 00c94ca2b99e ("psp: base PSP device support")
-> > Fixes: 06c2dce2d0f6 ("psp: add new netlink cmd for dev-assoc and dev-di=
-sassoc")
-> > Signed-off-by: Kiran Kella <kiran.kella@broadcom.com>
-> > Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
-> > Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
-> > Reviewed-by: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
->
->
-> Thanks. I was able to repro myself by inserting a delay after the old:
->
-> main_net =3D dev_net(psd->main_netdev);
->
-> and then executing nsim_psp_rereg_write() in parallel with destroying
-> the netns that I placed a netdevsim dev into.
->
-> Tested-by: Daniel Zahka <daniel.zahka@gmail.com>
->
-> Reviewed-by: Daniel Zahka <daniel.zahka@gmail.com>
->
-Thanks for the fix!
+> Note that unregister_netdevice_move_net() does not need to call
+> rtnl_net_queue_work() because __dev_change_net_namespace() is
+> (supposed to be) called with rtnl_net_lock().  (Not all callers
+> hold it yet, but the race does not happen until all callers
+> are converted and RTNL is removed.)
+[...]
+> +static void unregister_netdevice_move_net(struct net *net_old,
+> +                                         struct net *net,
+> +                                         struct net_device *dev)
+> +{
+> +       if (net_old > net) {
+> +               spin_lock(&net->dev_unreg_lock);
+> +               spin_lock_nested(&net_old->dev_unreg_lock, SINGLE_DEPTH_N=
+ESTING);
+> +       } else {
+> +               spin_lock(&net_old->dev_unreg_lock);
+> +               spin_lock_nested(&net->dev_unreg_lock, SINGLE_DEPTH_NESTI=
+NG);
+> +       }
+> +
+> +       if (!list_empty(&dev->unreg_list_net)) {
+> +               list_del(&dev->unreg_list_net);
+> +               list_add_tail(&dev->unreg_list_net, &net->dev_unreg_head)=
+;
+> +       }
+> +
+> +       spin_unlock(&net_old->dev_unreg_lock);
+> +       spin_unlock(&net->dev_unreg_lock);
+> +}
+> +
+> +void unregister_netdevice_many_net(struct net *net)
+> +{
+> +       struct net_device *dev, *tmp;
+> +       LIST_HEAD(unreg_head_net);
+> +       LIST_HEAD(unreg_head);
+> +
+> +       spin_lock(&net->dev_unreg_lock);
+> +       list_splice_init(&net->dev_unreg_head, &unreg_head_net);
+> +       spin_unlock(&net->dev_unreg_lock);
+> +
+> +       list_for_each_entry_safe(dev, tmp, &unreg_head_net, unreg_list_ne=
+t) {
+> +               list_del_init(&dev->unreg_list_net);
+> +               list_add_tail(&dev->unreg_list, &unreg_head);
+> +       }
 
-Reviewed-by: Wei Wang <weibunny@fb.com>
-> > ---
-> >   net/psp/psp_nl.c | 33 +++++++++++++++++++++------------
-> >   1 file changed, 21 insertions(+), 12 deletions(-)
-> >
-> > diff --git a/net/psp/psp_nl.c b/net/psp/psp_nl.c
-> > index 9610d8c456ff..24ab626a9e8a 100644
-> > --- a/net/psp/psp_nl.c
-> > +++ b/net/psp/psp_nl.c
-> > @@ -62,36 +62,45 @@ psp_nl_multicast_per_ns(struct psp_dev *psd, unsign=
-ed int group,
-> >       struct net *main_net;
-> >       struct sk_buff *ntf;
-> >
-> > -     main_net =3D dev_net(psd->main_netdev);
-> > +     main_net =3D maybe_get_net(dev_net(psd->main_netdev));
-> > +     if (!main_net)
-> > +             return;
-> > +
-> >       xa_init(&sent_nets);
-> >
-> >       list_for_each_entry(entry, &psd->assoc_dev_list, dev_list) {
-> >               struct net *assoc_net =3D dev_net(entry->assoc_dev);
-> > +             struct net *net;
-> >               int ret;
-> >
-> >               if (net_eq(assoc_net, main_net))
-> >                       continue;
-> >
-> > -             ret =3D xa_insert(&sent_nets, (unsigned long)assoc_net, a=
-ssoc_net,
-> > -                             GFP_KERNEL);
-> > -             if (ret =3D=3D -EBUSY)
-> > +             net =3D maybe_get_net(assoc_net);
-> > +             if (!net)
-> >                       continue;
-> >
-> > -             ntf =3D build_ntf(psd, assoc_net, ctx);
-> > -             if (!ntf)
-> > +             ret =3D xa_insert(&sent_nets, (unsigned long)assoc_net, a=
-ssoc_net,
-> > +                             GFP_KERNEL);
-> > +             if (ret =3D=3D -EBUSY) {
-> > +                     put_net(net);
-> >                       continue;
-> > +             }
-> >
-> > -             genlmsg_multicast_netns(&psp_nl_family, assoc_net, ntf, 0,
-> > -                                     group, GFP_KERNEL);
-> > +             ntf =3D build_ntf(psd, net, ctx);
-> > +             if (ntf)
-> > +                     genlmsg_multicast_netns(&psp_nl_family, net, ntf,=
- 0,
-> > +                                             group, GFP_KERNEL);
-> > +             put_net(net);
-> >       }
->
-> some optional nits if you wanted to respin:
->
-> You could eliminate the extra struct net *net, by just doing something
-> like if (!maybe_get_net(assoc_net)) directly.
->
-> You could get away with a single put_net(net); call site, if you reorder
-> the ops that could fail so that maybe_get_net(assoc_net) happens last
-> before the build_ntf(psd, net, ctx)
->
-> >       xa_destroy(&sent_nets);
-> >
-> >       /* Send to main device netns */
-> >       ntf =3D build_ntf(psd, main_net, ctx);
-> > -     if (!ntf)
-> > -             return;
-> > -     genlmsg_multicast_netns(&psp_nl_family, main_net, ntf, 0, group,
-> > -                             GFP_KERNEL);
-> > +     if (ntf)
-> > +             genlmsg_multicast_netns(&psp_nl_family, main_net, ntf, 0,=
- group,
-> > +                                     GFP_KERNEL);
-> > +     put_net(main_net);
-> >   }
-> >
-> >   static struct sk_buff *psp_nl_clone_ntf(struct psp_dev *psd, struct n=
-et *net,
+---8<---
+Will this result in a stalled unregistration if a cross-netns device is del=
+eted
+and concurrently moved to a new namespace?
+
+If a user triggers deletion, unregister_netdevice_queue_net() queues the de=
+vice
+in dev_unreg_head and schedules the async workqueue. Because unregistration
+runs asynchronously, dev->reg_state remains NETREG_REGISTERED initially.
+If the pending device is concurrently moved to a new netns via
+
+dev_change_net_namespace(), unregister_netdevice_move_net() correctly trans=
+fers
+the device to the new netns's dev_unreg_head list.
+
+However, does this block miss a call to rtnl_net_queue_work(net) to schedul=
+e
+processing for the new netns?
+---8<---
+
+I didn't add rtnl_net_queue_work() intentionally as mentioned in the commit
+message.
+
+For now, such a race does not occur thanks to RTNL.
+
+Once RTNL is removed, all dev_change_net_namespace() callers must be
+called under per-netns RTNL, so even if the race occurred, the dev would be
+removed at __rtnl_net_unlock().
 
