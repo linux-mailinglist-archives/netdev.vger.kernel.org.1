@@ -1,312 +1,215 @@
-Return-Path: <netdev+bounces-305053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305054-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id nCnnHM2zS2ooYwEAu9opvQ
-	(envelope-from <netdev+bounces-305053-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 15:55:25 +0200
+	id SyxVGhHES2q1ZwEAu9opvQ
+	(envelope-from <netdev+bounces-305054-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 17:04:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55D287118DE
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 15:55:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D02647125A5
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 17:04:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=qIstvMD6;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305053-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305053-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=R+S3EXN9;
+	dkim=pass header.d=redhat.com header.s=google header.b=IjG0q4CK;
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305054-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305054-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D68F53109D37
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 13:35:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DD35D3270C09
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 13:36:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5956381AF9;
-	Mon,  6 Jul 2026 13:34:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C1692BEC52;
+	Mon,  6 Jul 2026 13:35:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9AC375F8E
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 13:34:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6EA28D8D0
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 13:35:48 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783344886; cv=none; b=KGnA8gyRqOyBPcbB0YWjtQLTCOnMjXXejfyrKtHjDa6xvAoO57Nf2gGSfOChfNXATWIXkdMfhOCA32TgblTsGUEWKv2ewjUfzRQpOiLGO+oD6UPJeQ7sOHDNCiieGzopiaZ6/Mvq3jkJhyxsuzldvD+BpJKq50ZtcHBR16xZIIQ=
+	t=1783344950; cv=none; b=YyezxPhqID3e15Uo6DiNI7a8wWYa64ERCc41qkVmpoaKngL+7uNvA/nGGgiaz1VWIVa21KJowdGD07OHPw4jofni0gp21nrpSzZmayi/H3ux8EYWfHz0RwV5dXVcIgulQ/9sJqIfAbENZKkOUlWRa3q11jDoASWSzDDp7tYVmH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783344886; c=relaxed/simple;
-	bh=dhEMbLhW8J+Vx9HRqU2Tme7Ie9fiKeWl3Cgzri1xzO8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=s0mWY34TBSbMFdISd0FNThPuE9Q8JviWOfKzT+fIW8eEBbGUefHF3OhPBgZQBl9X6QPFQgFLIM9MtJ0i12b0ylY50ZN4012/L+cteQlZtimN2u5p6bO6yBQ8oDVxx/mfjob3++EixLelDidLTKAIevIqu1TU4CksuFfIJ4pH6q4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qIstvMD6; arc=none smtp.client-ip=209.85.128.176
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-80e4455b9a3so43007857b3.1
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 06:34:45 -0700 (PDT)
+	s=arc-20240116; t=1783344950; c=relaxed/simple;
+	bh=eG2g92HpxADpaewQr6kuNzXlZQd2Ti0PWMpSl/JUR74=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kvt609xA6TolZI8GoQICHGFPjvW2l4xMqob9E+kjEWDkhmRLchRCul4e1UlBuKyMmtDFMjp/iUjKd8YeflHbnushJtTfCUW7BMbLqHbt6EYzXeRZaWHlki8fQ9o4TXM2VaoKxDeNzcfslSsBWMBfkZrpAVVM7wgDEwwPtv9DRUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R+S3EXN9; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=IjG0q4CK; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783344948;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N3Anvk5g2W6Ax5Xx12MjDPwqLCiF744jyWfZgTib1bI=;
+	b=R+S3EXN9qYrv10/oS9VWMY1WXF2H/ap2I22kceHus7NIKDfVCTIta1EKYXFLCwdqg4tODU
+	4DRC/QODf/zTPVYgDwd4QFw+VGLMDligj7behBb7z50nMDjPfY1nqAT/Ug/Cm8P6D0IcrE
+	k9ifCDWsRTcEN+j+UisoVi3WP0G0RV0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-611-yz55puyTPpeOPE2EVQ5gTw-1; Mon, 06 Jul 2026 09:35:44 -0400
+X-MC-Unique: yz55puyTPpeOPE2EVQ5gTw-1
+X-Mimecast-MFC-AGG-ID: yz55puyTPpeOPE2EVQ5gTw_1783344943
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-493b0fe95b6so17060075e9.1
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 06:35:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783344884; x=1783949684; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Z0doDpWzOG1dsMVuJr9ZQuuX6/xzczUHVpQyKjpbhko=;
-        b=qIstvMD65pzZya9+gW0uJGQ63ggh7bRNCeTNYt5PukvyfImAu6oWXrT9Y1mTyBMZDm
-         xB2mCROTOGwG0nr8mOcTsr6vcF4xYU63iVOoCsG3lQ+k5u2W/a9QusioCrsG8HNhHfEF
-         H9bcVzJwXAT1RwaHflg1FJprVYtA97LgDpqR/vYtt6JzewRjHBPe5N5h+4/AUTavlFlC
-         Podp3mWxLD9oySenLMHKg8jBcmjAkQl0ifmKsav3JFsIpY/nAKUuo/yfgwfVbhuznAzr
-         KK1VfnTX6IeW0S9ae+HEhHkjnTn6iatkel+pZzDECLuaPu03CIs/Sd4ekkh01oSc62ea
-         /SMw==
+        d=redhat.com; s=google; t=1783344943; x=1783949743; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=N3Anvk5g2W6Ax5Xx12MjDPwqLCiF744jyWfZgTib1bI=;
+        b=IjG0q4CKDj3qDuprZ0mYTPoN+ct+9sM3qKcK/J05gYszA82WP8wnfKchxl6dOoc6Ut
+         s3enpdOI2sUi1+OwLNfipcNqrQF/RslgK5Mz7vG6WZwWGp8bRScTUm59Z7pM6t/jBuq3
+         cvd4DfEcT4Tf3pXsUy8RBan81eNgH7EPiUpvP2iRlqi/zw7ZmSGTxLMFD0L/SqGMETZT
+         E+ZqCpDtPqY8V04BHoa0qXDC99p+AxerMVm7vo1l94cix85shuwmEBv2DVzUrwV45XZ6
+         ljIrYVYNor5Kh22JPY+NSBfp5JQ6n4e1mKndSHB/exCr6NnFJub6jU7qop9oHeW7cw+U
+         BFJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783344884; x=1783949684;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Z0doDpWzOG1dsMVuJr9ZQuuX6/xzczUHVpQyKjpbhko=;
-        b=aOPrJYsnbANyQ+PRHURsg3PvVFQ5lcMKYY8rVaJkK9L/GOB7rMVap0PTdrYESGYwOi
-         /MXhTWuINtuuNvz4bnxl/hdHVSB5YUxMUYQmx3hsPlINYV7hN5Z7m1eOJsMRAIMpeyqF
-         v9DaDBRJOTRDreXrsGhyfZw3hJ73rTgq7gF8GYnAF0Mro6TIWqW3d012q7DXiLETYd6M
-         2oQ8j3R5+Vm09LazJeXGBoLMVy0uIFbZbPXnIuJRb4QbAK5eK9IPbCeddo16wmHwhRKk
-         fTpK5WJBHBCfGB1lFI8a4J2xKV8LYPexBEAIqsP8e5N6StsyBL+jQtb0pm+BdkGe3OKi
-         Fv3w==
-X-Gm-Message-State: AOJu0YxO1LUFXiBktwDegj6jfmoraos90fzEnIid5QBcgRQyf5rjK8J7
-	nHWlzewfEwFvOdhj4aL/hNcjJkB6Fp7t5Az3w30qY67Z+acagJaW/8h8nNo05Q==
-X-Gm-Gg: AfdE7cnOUbsquJKbuOlvAkB8va3i4cx3jg+GGh0zuyPcN9nL4OhYKNHLUJ6676BEKHf
-	5UAOKg+vwhqW5NKkWh/4wyn6QcD5+wGvxjDwMNhya9OKGwhquOChhk4j+x7LVerMNtFlq6eP1Ow
-	nn6Aaf76YUv4NjpWxwG0JlNXieJO+Xw7ch9CKp3pdybZLiMQoZ2Y5bjanRnLY5Ua5/Ob3LW7yWQ
-	Y9EUY953NxW6OYD0PpRiuikDlqCuFr/fkP2pr3jANaAtK+fwBnxAkwdzRvuT7CdOKK10fLqjMM7
-	sV4JZab4G3pcxxXyZyeZaI3J+qCZKwjfAF8ncGIOIJdxvW6lslvYeuzGxtpnmwNNLhuqXdno5nM
-	OX5tQyM1m1QhB8rjDhkGjAezgd8Mhdl2PTqRjSv3Jur3MqsbEJQycakECAtHvlnjU7y+R2Rse90
-	UcD2zc6JoXVoEomgR89NkOLhP5C1dXwP7R3Y7wnTnuejFAxNs/fq/7Wevc7oYTAHqm8XpCKVeKy
-	bcB0bR6mIVfjyON
-X-Received: by 2002:a05:690c:6b05:b0:80f:34b4:8d with SMTP id 00721157ae682-81be1d38291mr2512947b3.27.1783344884120;
-        Mon, 06 Jul 2026 06:34:44 -0700 (PDT)
-Received: from willemb.c.googlers.com.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-8144b537e3asm57002827b3.34.2026.07.06.06.34.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jul 2026 06:34:43 -0700 (PDT)
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	andrew@lunn.ch,
-	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next 7/7] net: pktgen: add support for SO_TXTIME
-Date: Mon,  6 Jul 2026 09:34:09 -0400
-Message-ID: <20260706133433.3142805-8-willemdebruijn.kernel@gmail.com>
-X-Mailer: git-send-email 2.55.0.795.g602f6c329a-goog
-In-Reply-To: <20260706133433.3142805-1-willemdebruijn.kernel@gmail.com>
-References: <20260706133433.3142805-1-willemdebruijn.kernel@gmail.com>
+        d=1e100.net; s=20251104; t=1783344943; x=1783949743;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=N3Anvk5g2W6Ax5Xx12MjDPwqLCiF744jyWfZgTib1bI=;
+        b=C7TSDIEGiXzee5Nm7k+dU1ku7wqZpWuAAiBqH3rXr/s3aGjvMK15Z8osU2xWzRsJDA
+         WIAC5CjgH5kyk0ogexsJJxTT+YqXPBU1O4XQMkdTgkTa6lI/kCRLUFx+2EcUXuvpLZHo
+         n6+u3lNX/o2X4evrUfHuv06udeePEEe+BzG+kX8OYYeqcH4spF3hYWLeGzxW3Be2k1G7
+         yj0TPxABXPD+5mRVUhgB9hnx+dzk+nsGOuLxp1sjVGowejGFGeGUvvOCW9bbKgR3LT4e
+         qznZz3BryLnaCRwF75R0LMe/jsx+5n2bh+jRI67vp9hDseZ22E9EAe5Q5CJhJNllnVVk
+         riZA==
+X-Forwarded-Encrypted: i=1; AHgh+Rq9Qy6RTEoCf+ZE/oINxHV9fsgXynI6MAHgSaWYL3fITTgmbE65OdpawXFHtX+zhygowy3pbYk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNTNSRnmh7k7GOeaWs+g3PcGg8YRJ4+RLrM0N+KKRaYNsh/aq/
+	yoUFwS9k0TcZS4jmdGeK2QTlIshOgtqFhdGpFhft5rlPCRI1cmVPkATgHMft1sw5wWN4yaIcxDp
+	7CKknkRtAJcmUsxI8nfhsK1tiV/37g4cLMEbLaLQrlTPvvthCX4r8Fwn7lA==
+X-Gm-Gg: AfdE7cn7b0RxZ4SIo36k4B95lcsYFMlmb9x9NkqWivBeiidbPDs7bLe4CW6tbg3Y1cE
+	ynTooy0RCwSWKtuoKKNnQMfOV0G5QVLZUHYZFbMtefP+iuQKMBAuQHkBc/zwRuJI/bBCTNUtlAb
+	7kpX8z0o4Xw+hWNm+ev/UqHUF0hnYmhGkPM0ONAn+oeYm8PQ/JE6fLwrlwrp5zqBFDpFEW7FvNs
+	KT+1TQ8QQQVbzXJfA93iUairKQWNrbXLw2wzk+nAWXJyL/kiagzyFcVbF5/ULvYNEcXMY/NxUwd
+	QsXJi3H/YAlXLpxAXxefVvARaYxvq0dY/PSOcrEkpqJesrN7NfCM6oNC8X4LbeS7E+jT2dF1OBs
+	+Uvm/bcHVTXG9q/23sqDBx1VFKoHvi2lHKRCeQfcWlg0PuBc9Rc+6LeJQsbjlJ7xC9u/LDFUu8N
+	55b1zwiHafTK9a
+X-Received: by 2002:a05:600c:4f87:b0:490:be14:bfda with SMTP id 5b1f17b1804b1-493df17fcb9mr3435285e9.6.1783344943170;
+        Mon, 06 Jul 2026 06:35:43 -0700 (PDT)
+X-Received: by 2002:a05:600c:4f87:b0:490:be14:bfda with SMTP id 5b1f17b1804b1-493df17fcb9mr3434775e9.6.1783344942712;
+        Mon, 06 Jul 2026 06:35:42 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:5521:6b10:58fd:68f:7756:389d? ([2a0d:3344:5521:6b10:58fd:68f:7756:389d])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493cce11497sm308056635e9.12.2026.07.06.06.35.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Jul 2026 06:35:42 -0700 (PDT)
+Message-ID: <41d0e6d6-f1fc-425e-a122-b0433a925a3d@redhat.com>
+Date: Mon, 6 Jul 2026 15:35:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 6/6] riscv: dts: eswin:
+ eic7700-hifive-premier-p550: enable Ethernet controller
+To: =?UTF-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>,
+ Andrew Lunn <andrew@lunn.ch>
+Cc: sashiko-reviews@lists.linux.dev, conor+dt@kernel.org, robh@kernel.org,
+ devicetree@vger.kernel.org, Min Lin <linmin@eswincomputing.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <20260630063123.1118-1-lizhi2@eswincomputing.com>
+ <20260630063445.1226-1-lizhi2@eswincomputing.com>
+ <20260701063512.9ED051F000E9@smtp.kernel.org>
+ <5de09a24.a11e.19f2207d7d2.Coremail.lizhi2@eswincomputing.com>
+ <58532b95-bb74-4d87-acae-e67b41dd7d57@lunn.ch>
+ <f21ffca.a15e.19f25abaea6.Coremail.lizhi2@eswincomputing.com>
+From: Paolo Abeni <pabeni@redhat.com>
+Content-Language: en-US
+In-Reply-To: <f21ffca.a15e.19f25abaea6.Coremail.lizhi2@eswincomputing.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305053-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305054-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew@lunn.ch,m:willemb@google.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:lizhi2@eswincomputing.com,m:andrew@lunn.ch,m:sashiko-reviews@lists.linux.dev,m:conor+dt@kernel.org,m:robh@kernel.org,m:devicetree@vger.kernel.org,m:linmin@eswincomputing.com,m:netdev@vger.kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,vger.kernel.org:from_smtp,lunn.ch:email,eswincomputing.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 55D287118DE
+X-Rspamd-Queue-Id: D02647125A5
 
-From: Willem de Bruijn <willemb@google.com>
+On 7/3/26 3:50 AM, 李志 wrote:
+>> -----Original Messages-----
+>> From: "Andrew Lunn" <andrew@lunn.ch>
+>> Send time:Thursday, 02/07/2026 21:22:34
+>> To: 李志 <lizhi2@eswincomputing.com>
+>> Cc: sashiko-reviews@lists.linux.dev, conor+dt@kernel.org, robh@kernel.org, devicetree@vger.kernel.org, "Min Lin" <linmin@eswincomputing.com>
+>> Subject: Re: Re: [PATCH net-next v9 6/6] riscv: dts: eswin: eic7700-hifive-premier-p550: enable Ethernet controller
+>>
+>>> Hi Andrew,
+>>>
+>>> One question before I prepare the next revision.
+>>>
+>>> As discussed previously, the DTS patch was included only to provide the overall
+>>> Ethernet design context during the review of the binding and driver patches:
+>>>
+>>> https://lore.kernel.org/lkml/64bf6b40-b947-4ffa-8d48-4d6341931327@lunn.ch/
+>>>
+>>> For the next revision, would it be acceptable to drop the DTS patch from this
+>>> series and post only the binding and driver patches? The complete DTS
+>>> enablement is planned to be submitted later as a separate series after the
+>>> binding and driver have been merged.
+>>
+>> What normally happens is that I give an Acked-by: or a Reviewed-by:
+>> for the DT patch, and you submit it for merging via the DT Maintainer.
+>> Everything then meets up in linux-next.
+>>
+>> Why do you need to do this later? Why not now?
+>>
+> 
+> There is an another seperate DT patch series
+> [https://lore.kernel.org/all/20260615122016.1110206-1-pinkesh.vaghela@einfochips.com/]
+> which is under review.
+> It also introduces DT nodes for reset, clock, pinctrl, HSP power domain.
+> 
+> Therefore, our planned steps are as follows:
+> 1. In the next net-next v10​ patch series, drop the DTS patches, and submit only
+>    the bindings and driver.
+> 2. Wait for Pinkesh’s DT patch series​ to be merged.
+> 3. Once the HSPCRG patch series​
+>    [https://lore.kernel.org/all/20260605060730.1605-1-dongxuyang@eswincomputing.com/]
+>    is merged, submit a new DT patch series​ to extend ESWIN EIC7700 SoC support​
+>    for all HSP modules—including USB, eMMC, SD, and Ethernet, since they are all
+>    under the HSP bus node eventhough ethernet doese not depend on HSPCRG patch.
 
-Introduce support for setting the SO_TXTIME delivery txtime on
-generated packets. This allows testing pacing and scheduling features
-in the network stack (e.g., sch_fq, sch_taprio) and drivers.
+In v10 please include some actual description of the series, beyond the
+changelog.
 
-Add a new flag 'TXTIME' to enable this feature.
+Thanks,
 
-Add two new configuration parameters:
-
-- txtime_delay: offset from now in ns
-- txtime_clockid: clock to use (monotonic, realtime, tai)
-
-The queue_xmit mode can clear skb->tstamp in-flight, so this must be
-used without clone_skb.
-
-Signed-off-by: Willem de Bruijn <willemb@google.com>
-
----
-
-Sashiko: ignore data races in the control fields. Pktgen requires
-superuser privileges, has many such races already, which are benign.
----
- net/core/pktgen.c | 85 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 85 insertions(+)
-
-diff --git a/net/core/pktgen.c b/net/core/pktgen.c
-index 8e185b318288..be4fce895b2c 100644
---- a/net/core/pktgen.c
-+++ b/net/core/pktgen.c
-@@ -201,6 +201,7 @@
- 	pf(SVID_RND)		/* Random SVLAN ID */			\
- 	pf(NODE)		/* Node memory alloc*/			\
- 	pf(SHARED)		/* Shared SKB */			\
-+	pf(TXTIME)		/* SO_TXTIME support */			\
- 
- #define pf(flag)		flag##_SHIFT,
- enum pkt_flags {
-@@ -291,6 +292,10 @@ struct pktgen_dev {
- 	struct page *page;
- 	u64 delay;		/* nano-seconds */
- 
-+	/* TXTIME support */
-+	u64 txtime_delay;	/* transmit time delay in ns */
-+	clockid_t txtime_clockid; /* clockid for SO_TXTIME */
-+
- 	__u64 count;		/* Default No packets to send */
- 	__u64 sofar;		/* How many pkts we've sent so far */
- 	__u64 tx_bytes;		/* How many bytes we've transmitted */
-@@ -666,6 +671,17 @@ static int pktgen_if_show(struct seq_file *seq, void *v)
- 	if (pkt_dev->node >= 0)
- 		seq_printf(seq, "     node: %d\n", pkt_dev->node);
- 
-+	if (pkt_dev->flags & F_TXTIME) {
-+		clockid_t clockid = READ_ONCE(pkt_dev->txtime_clockid);
-+
-+		seq_printf(seq, "     txtime_delay: %llu\n",
-+			   (unsigned long long)pkt_dev->txtime_delay);
-+		seq_printf(seq, "     txtime_clockid: %s\n",
-+			   clockid == CLOCK_MONOTONIC ? "monotonic" :
-+			   clockid == CLOCK_REALTIME ? "realtime" :
-+			   clockid == CLOCK_TAI ? "tai" : "unknown");
-+	}
-+
- 	if (pkt_dev->xmit_mode == M_NETIF_RECEIVE)
- 		seq_puts(seq, "     xmit_mode: netif_receive\n");
- 	else if (pkt_dev->xmit_mode == M_QUEUE_XMIT)
-@@ -1141,6 +1157,49 @@ static ssize_t pktgen_if_write(struct file *file,
- 			(unsigned long long) pkt_dev->delay);
- 		return count;
- 	}
-+	if (!strcmp(name, "txtime_delay")) {
-+		max = min(10, count - i);
-+		len = num_arg(&user_buffer[i], max, &value);
-+		if (len < 0)
-+			return len;
-+
-+		/* in queue_xmit mode fq may clear tstamp, do not reuse skb */
-+		if (value > 0 && pkt_dev->clone_skb > 0)
-+			return -EINVAL;
-+
-+		pkt_dev->txtime_delay = (u64)value;
-+		sprintf(pg_result, "OK: txtime_delay=%llu",
-+			(unsigned long long)pkt_dev->txtime_delay);
-+		return count;
-+	}
-+	if (!strcmp(name, "txtime_clockid")) {
-+		char clockstr[32];
-+		clockid_t clk;
-+
-+		memset(clockstr, 0, sizeof(clockstr));
-+		max = min(sizeof(clockstr) - 1, count - i);
-+		len = strn_len(&user_buffer[i], max);
-+		if (len < 0)
-+			return len;
-+
-+		if (copy_from_user(clockstr, &user_buffer[i], len))
-+			return -EFAULT;
-+
-+		if (!strcmp(clockstr, "monotonic")) {
-+			clk = CLOCK_MONOTONIC;
-+		} else if (!strcmp(clockstr, "realtime")) {
-+			clk = CLOCK_REALTIME;
-+		} else if (!strcmp(clockstr, "tai")) {
-+			clk = CLOCK_TAI;
-+		} else {
-+			sprintf(pg_result, "ERROR: unknown clockid '%s'", clockstr);
-+			return -EINVAL;
-+		}
-+
-+		sprintf(pg_result, "OK: txtime_clockid=%s", clockstr);
-+		WRITE_ONCE(pkt_dev->txtime_clockid, clk);
-+		return count;
-+	}
- 	if (!strcmp(name, "rate")) {
- 		max = min(10, count - i);
- 		len = num_arg(&user_buffer[i], max, &value);
-@@ -1238,6 +1297,8 @@ static ssize_t pktgen_if_write(struct file *file,
- 		if (value > 0 && (pkt_dev->n_imix_entries > 0 ||
- 				  !(pkt_dev->flags & F_SHARED)))
- 			return -EINVAL;
-+		if (value > 0 && pkt_dev->txtime_delay)
-+			return -EINVAL;
- 
- 		pkt_dev->clone_skb = value;
- 
-@@ -2321,6 +2382,21 @@ static void pktgen_setup_inject(struct pktgen_dev *pkt_dev)
- }
- 
- 
-+static ktime_t ktime_get_clock(clockid_t clockid)
-+{
-+	switch (clockid) {
-+	case CLOCK_REALTIME:
-+		return ktime_get_real();
-+	case CLOCK_MONOTONIC:
-+		return ktime_get();
-+	case CLOCK_TAI:
-+		return ktime_get_clocktai();
-+	default:
-+		WARN_ON_ONCE(1);
-+		return ktime_get();
-+	}
-+}
-+
- static void spin(struct pktgen_dev *pkt_dev, ktime_t spin_until)
- {
- 	ktime_t start_time, end_time;
-@@ -3557,6 +3633,14 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
- 		}
- 		pkt_dev->last_pkt_size = pkt_dev->skb->len;
- 		pkt_dev->clone_count = 0;	/* reset counter */
-+
-+		if (pkt_dev->flags & F_TXTIME && pkt_dev->txtime_delay) {
-+			clockid_t clk = READ_ONCE(pkt_dev->txtime_clockid);
-+			ktime_t txtime = ktime_add_ns(ktime_get_clock(clk),
-+						      pkt_dev->txtime_delay);
-+
-+			skb_set_delivery_type_by_clockid(pkt_dev->skb, txtime, clk);
-+		}
- 	}
- 
- 	if (pkt_dev->delay && pkt_dev->last_ok)
-@@ -3869,6 +3953,7 @@ static int pktgen_add_device(struct pktgen_thread *t, const char *ifname)
- 	pkt_dev->burst = 1;
- 	pkt_dev->node = NUMA_NO_NODE;
- 	pkt_dev->flags = F_SHARED;	/* SKB shared by default */
-+	pkt_dev->txtime_clockid = CLOCK_MONOTONIC;
- 
- 	err = pktgen_setup_dev(t->net, pkt_dev, ifname);
- 	if (err)
--- 
-2.55.0.795.g602f6c329a-goog
+Paolo
 
 
