@@ -1,88 +1,91 @@
-Return-Path: <netdev+bounces-305185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305186-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5T85Fyr0S2qedgEAu9opvQ
-	(envelope-from <netdev+bounces-305185-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 20:30:02 +0200
+	id q8TeH0UFTGqlewEAu9opvQ
+	(envelope-from <netdev+bounces-305186-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 21:43:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E97E714871
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 20:30:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFD357151B1
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 21:43:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=fastmail.im header.s=fm2 header.b=CTLed4KJ;
-	dkim=pass header.d=messagingengine.com header.s=fm2 header.b="C9C4Z9c/";
+	dkim=pass header.d=fastmail.im header.s=fm2 header.b="O 697mkL";
+	dkim=pass header.d=messagingengine.com header.s=fm2 header.b="lYkDDo/V";
 	dmarc=pass (policy=none) header.from=fastmail.im;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305185-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305185-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305186-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305186-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3B21A302FDAB
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 18:20:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 35BBD31479D4
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 18:20:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F917436BF4;
-	Mon,  6 Jul 2026 18:20:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76725436BEF;
+	Mon,  6 Jul 2026 18:20:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E329436BCE
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 18:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019333F0774
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 18:20:42 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783362039; cv=none; b=Swwkh94IpN+kNnH7A9q9996MCEBlYlm+BnF1OUiKecPidWnQ4DGdWZsodbqb5CTTpjY3zXk5NK2X4asHjOlnsZ0+8YAkRreWjbROCoOSglNzm4USNCrOyQFDDXrtBDLWOFkIy2AWuVdejZbdxr9kmesIj/Xnj5xZq+15iBFV7TY=
+	t=1783362046; cv=none; b=QrqL9YGwr5Nh1Vu4hpqHTXVtwiFYPXhPtmJVWPv3VhtqyrtTrb9J7yNuiwCleYBUyypID+JpPL4HSKZnL82UU4DQ1UPMPUFwWTUR/I/9nbF0LXfIfsAwHqLVB/l5UJGIGTAYGQp5FxAUMlvu4nnKK/IpG43k8CaL4DOJJyBp6d0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783362039; c=relaxed/simple;
-	bh=H35183HW7vA7mQc3hmYy8ZNFfX5tNujI6rsWMv4Tj9g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Pn7kf6RU/mpdarXTwFl966fuYipaMQn9KajL5ZUi7UASNFhZ0/9iGEBedDzjL2wS1pHaZ9TZ0UdIe0L/NfbYPoKi3Yo4hPSDzI7RjcBUl/mRn52qHgZkBVUeU9GikpEzOLF1FmGkOiB+ZpexzlP1Huh8v8YAtXQUsC8XgwC/iZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=CTLed4KJ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=C9C4Z9c/; arc=none smtp.client-ip=103.168.172.144
-Received: from phl-compute-08.internal (phl-compute-08.internal [10.202.2.48])
-	by mailfout.phl.internal (Postfix) with ESMTP id D1757EC00C9;
-	Mon,  6 Jul 2026 14:20:35 -0400 (EDT)
+	s=arc-20240116; t=1783362046; c=relaxed/simple;
+	bh=VB9nnjB1u/fThjP1uKJ3INpsGETbHwS17fWd+vXC7rs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=h6w3UdP6ONXq/+qcdePv7t82pH1GdTeXhIpc3weHg7+dAFdT3w3L1lsoG8xSMssbMBDwezqqZB/v+3Tza/wvECm7yUOD8yc8xTTLX4GEN078Vv1tjMGD4mhGcq2cXggOqEALbNoJAbBhPg/WyBPCo3oqT3r4C6GYxAOSkH3S6/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=O697mkLz; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lYkDDo/V; arc=none smtp.client-ip=103.168.172.144
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.phl.internal (Postfix) with ESMTP id 17DFAEC0170;
+	Mon,  6 Jul 2026 14:20:42 -0400 (EDT)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-08.internal (MEProxy); Mon, 06 Jul 2026 14:20:35 -0400
+  by phl-compute-01.internal (MEProxy); Mon, 06 Jul 2026 14:20:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
 	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm2; t=1783362035; x=1783448435; bh=kPL1RA5c2oAG+pEjwbkyu
-	1r3npoxrJrYZitB34pmiP0=; b=CTLed4KJ7sduNM22VL0hYk/GxglJaSY4r50N8
-	nrF3dO2HAL7tu+4CvFKnw5PGWAT53aonTtnyBC643QBU3Wwny2ZnZ3fQQtjBZ0Ln
-	D8r4NXad5PLas+zuLZvzKQlJmSfxk71cy/GL/JJsEM1ToXcf8YHByk9rnelY+Ui6
-	HjlJw1SYpBc6bKa4/Wc/QqKdmwR8/zIX1nNGmmharRKcRzEJ1cU/8vm0mB0QHQiP
-	lWGxCtu1CL1kD5OfMjng+OvpHx2QUNr5zkkj6+qM2MXSBwa1KgWLS3fBc4hLzOY4
-	qQkEWka3v61oHp7LZBA7N8zTGnfZECAmwxzV6mmoVfNmOOfKw==
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1783362042; x=
+	1783448442; bh=sswoEQ3ATn5LViy/gjtVC5TptQBCE6i9rHy30vmge5c=; b=O
+	697mkLzhPX2M5V/1hKpB1curhyQmmhrXdAINHR3nRhGebTJMpZJcoh0HvZQ0l/g7
+	tiB8+deN5U5hkl4RQnSVtWFI1fniR32nzdDvNBnmsMdpBy1y0yG2WCB7rB3vtpd+
+	RxIlCqbqM6W8ywQPPW09QfX9FVNQIjv/kVoWcxYukGNtn0WsZGdQUnQS6/xPJFcc
+	oHpbf/Hmir9gx4AqAq3IkherV7FXd/HB1AJVaEAOYkvFskQ3hQLW5zrtmbaxnohP
+	34yrPYe9i3mbIfrhQ5Fx1yyN6kmuOGm+MZzZ2B3SJQoz7aRQEo0DKKufCTQwnDhl
+	IjQy/3oJTMVoGYs1eyWVQ==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1783362035; x=1783448435; bh=kPL1RA5c2oAG+pEjwbkyu1r3npoxrJrYZit
-	B34pmiP0=; b=C9C4Z9c/fxGzc+2hLP6OCrP2+N3W+U0D9o3C1jZQX3L45to+6ST
-	/liuRQdTdQUj+dIjFrEeJxhtTn4HTN+LZtZU/lFTb/seEHKbubebvdb6aIK0FML/
-	A7fvIyN+bfYVZiDsmuVLCopqwLG1yu45pOm+5Kzy9Rx48GbS36fM0Ouewukrc/Xo
-	ArwKsvwJwzSIlylE+oYbnH3c2A6AwIRnkGWMhDke6yHTg7rzbFJkcWL+ktl5ifTc
-	8clcp9tFusLX/4qfJE+zm8nZCRNDhnae4QNSJZYnLvMJzMX/6m19MzDJwB0LKQeM
-	Zuhrpjeqw1q9KLrmbAdkulN07IZK1Der58A==
-X-ME-Sender: <xms:8_FLakJrJOWd2z5Opt47pQ1Pe99qnZDM90w4kOOQxlttDIKzyUv44w>
-    <xme:8_FLaio1PUWlSop0wURIrhB9c4Z7u60yW0IuuKW5WV_zk10gTsx-Nbmie7i33LEsd
-    yI8PiWj-nTv783aK4640-S7L-7lkaEQGDCWdpllOx0n-X1ESYtTX_w>
-X-ME-Received: <xmr:8_FLarh6h13OjXatjhbJomqMlQ5k3oRYV2z64iFyaDogniARW3-kTFs5Mm8>
-X-ME-Proxy-Cause: dmFkZTFDNV4TCSYTGDDwqxrTt2wUmq5SXJTExHI+ftg3CIXmiEXT9Cdxpa8wnXYLgO9l8x
-    2f2KypsXYbqERuZ51r6jNsCS7okBAUnKVgTPWCcPCyeaHZ5FOgOXwsNX094GgSiX4vfCVp
-    jJixMaeEIbF5j/lrcWrO68n1pBQNkUBW0wu9lmHTwlClUJC4+FuH2lLzZkxuunM3OIOwCc
-    bmalj1eVV2we5H5lKzX3vZg2b6UQPHlguXkXAPT6FaoOGMam3z3czhPlRms4rdi+TyuzVx
-    7RR3fLzvPd0Ap0UtaCek9BHrAGedgaS2FgABCcK1ksw1tJwnoIFquEBh7dWaYSCHhymlPG
-    sC/1L/vCW7rVzWi7j8gr5yy/NeqkDV9jtFDvhONMamjR7BrmkNknabgjM+RsIdeOH8Chp+
-    aBCz3PkWOQQeBmW+olNZ/po1/HQ2bMaiV0sG45ScSzY/CKU+PqaYoYnNvW+dw4bvKek0YJ
-    jH8IRx9zxDtSy+xz84GQ31B7HD1BLK4Je0P1GMvhIKTLBxxC2OmIpN6dN/EiXCPaWSdRjP
-    0dbnvwSmVFHuEeFLJE4CFI9pgTAH9pqPOeJHjJaOobiFeLYxWDLgrYvGaCq2eVN5uIZ5ba
-    lO9SW+tdjg6sRWuQnKEWEPGkifPuoBnNgVyWyeXCwPI9K7GcH9eWCcKHd/hQ
-X-ME-Proxy: <xmx:8_FLahbc9g14sc34Ub2U-K06GHIFX3F7wxr8Z0bYo7RMDDtJxnL0gg>
-    <xmx:8_FLajm3HoSZhAldulm5Mxr6Ys-9It0O9-g-8TBu_8q-DLH1nqQRTw>
-    <xmx:8_FLany3dWy33Wx91Ldqrn9TKUjErBCJmeSTxpxo4mz7CLeaQZYkrg>
-    <xmx:8_FLap-N9X0KpbdZfWPGUETghRYYXn3jrYQrJ6yDfxATvKUIrVfVRw>
-    <xmx:8_FLaulf7JJN9PwLQE6MDJWAADCXCT-9o6cObAOI0O_es5JxEKtgF5r5>
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm2; t=1783362042; x=1783448442; bh=s
+	swoEQ3ATn5LViy/gjtVC5TptQBCE6i9rHy30vmge5c=; b=lYkDDo/VYZSsyYg8s
+	gmMKeZHXYWmmtnwcf5d+mZ3dqjmm+KvFZrf9OiPiBECwXUzCwpwWaeWPycnzyaDO
+	GsmB7GP83Y9wRzaD5ARK9wxv45uTv9Oz9ucj0/o9piH3VIAZZxJHtuVIXcrWG29m
+	e++PyJE/frCFVznvdSEgz2yaYelpoqsQl07+HpcGcQbmnflTvOAJzGbbl9lgg9FV
+	NQpCjBLF0KD3Z4gYFgEWhvAkZk2PYxyEWqfm6rIUYCmWAQp1/LgvCD8KKmn4Hno6
+	wN6AIgNcCJXmTeM26Lc21j4Yfmo94NNvsMDhreBENX9EThXM3Xtp5IOCw9b42Mqr
+	n/Pvg==
+X-ME-Sender: <xms:-fFLagpOb8OMNisX0NOCAjd_ltV-Rk-to1qylgKXf4sQ6mlF-d3e2w>
+    <xme:-fFLaqzYro1QzzYCt8y6eUTDy8lk82b7mqyoiOTADjQ-dOXI92wjtJLkOsjYqMzq0
+    HDy4wfpkUu9FX58QS_CgKbfZfpPBuH4TRrpgbtNChl1osylHrNfZsI>
+X-ME-Received: <xmr:-fFLaiOI8ZkatuMKu8HY0wF5QLVaMWpJoRUs-TaQIX8q8yIygq_ZArEMlHg>
+X-ME-Proxy-Cause: dmFkZTGUsUpJpDFa5ndE4N6eTKB/j2d4JsSbrhMs8kmEW2L9QK3N/6TXxA5y7ulUoXm7BP
+    89asODAMfT3OBvY/M09D0GqR/9f8fV5gBQIGHO+HJK2v+bCFZ6PfrlSqdRObcl1ifowHpG
+    tdD7vyUPEgwFuODXXuYyDriQ176ee08aLqbCrephkwOmUEbVwxNtxJmLaLFJpQP96s58mK
+    npPwdvdZvXzqtDhxT3KN6NVuVc++tCiI8YGn0XKi84DG+Ojy+uujNScslpd1sVLQiZ4Ias
+    tnSVjmdR3/qyqDiPkegvX2kZQRuflV0jlrEpRX03LLhuj7//XS63UPEDz3jVugM+iYgwQ1
+    GSLu2dC14iGVqiX4ApdSVTVXizVEehBI3t8MC1MeAfaKMpPvC30S+KvkF7hsc9M0vtvvZx
+    8VTkBfwC/SxAxhFUDjMsyAqTe/pH4Ac1rsActrvsv0Su+qMI5dMkmG0sbHkTgpu4zr3hkf
+    vNbbYcJUloZX+8/FUg9Qwbgz7yb3/XwGppSj779WaIjFl3lDYgxfQvvwcgM092C3jcIbbI
+    pi3ngNexQNswZg8B4D8cUn4pmSsqufg8HV3orpnL29DPfZHyxAsD0S0A0upFJP2+OCWFQU
+    C/sRCD62XenMQevQ+SbPEA79e+HumSKplXd9edYsYhjx+eOUD0rWGLcOH5fA
+X-ME-Proxy: <xmx:-fFLaicFTClSUDzUaPH7AoN11R_5622uzckIbXWQVyC32KVdE0oMGA>
+    <xmx:-fFLam4UmZZB4UenmEQN3Te1M4KrsF9hMqRSDPz0O3mFmBjOohFf0w>
+    <xmx:-fFLaqI5sO1wrrUMSTIfp2GQhDWYVaHYIK_YMx3kBbUUg1idm2uXyg>
+    <xmx:-fFLaq6xUMLyJWVNTY-A2QVGEZvsmaZv01Wz2lEslHUczw0JQPQXyQ>
+    <xmx:-vFLalaFPivKhu1BDusFn3Tqdb9eMsAPzVnK3YYcJ6Y7CLM5grzrARQH>
 Feedback-ID: i559e4809:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 6 Jul 2026 14:20:34 -0400 (EDT)
+ 6 Jul 2026 14:20:39 -0400 (EDT)
 From: Alice Mikityanska <alice.kernel@fastmail.im>
 To: Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -100,11 +103,14 @@ Cc: Shuah Khan <shuah@kernel.org>,
 	Simon Horman <horms@kernel.org>,
 	Florian Westphal <fw@strlen.de>,
 	netdev@vger.kernel.org,
-	Alice Mikityanska <alice@isovalent.com>
-Subject: [PATCH net-next v8 0/9] BIG TCP for UDP tunnels
-Date: Mon,  6 Jul 2026 21:19:32 +0300
-Message-ID: <20260706181941.385672-1-alice.kernel@fastmail.im>
+	Alice Mikityanska <alice@isovalent.com>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH net-next v8 1/9] net: Use helpers to get/set UDP len tree-wide
+Date: Mon,  6 Jul 2026 21:19:33 +0300
+Message-ID: <20260706181941.385672-2-alice.kernel@fastmail.im>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260706181941.385672-1-alice.kernel@fastmail.im>
+References: <20260706181941.385672-1-alice.kernel@fastmail.im>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -119,22 +125,22 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm2,messagingengine.com:s=fm2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305185-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305186-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[iogearbox.net,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,blackwall.org];
 	FORGED_SENDER(0.00)[alice.kernel@fastmail.im,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	FREEMAIL_FROM(0.00)[fastmail.im];
-	FORGED_RECIPIENTS(0.00)[m:daniel@iogearbox.net,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lucien.xin@gmail.com,m:willemdebruijn.kernel@gmail.com,m:willemb@google.com,m:dsahern@kernel.org,m:razor@blackwall.org,m:shuah@kernel.org,m:stfomichev@gmail.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:fw@strlen.de,m:netdev@vger.kernel.org,m:alice@isovalent.com,m:lucienxin@gmail.com,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:daniel@iogearbox.net,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lucien.xin@gmail.com,m:willemdebruijn.kernel@gmail.com,m:willemb@google.com,m:dsahern@kernel.org,m:razor@blackwall.org,m:shuah@kernel.org,m:stfomichev@gmail.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:fw@strlen.de,m:netdev@vger.kernel.org,m:alice@isovalent.com,m:Jason@zx2c4.com,m:lucienxin@gmail.com,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lunn.ch,strlen.de,vger.kernel.org,isovalent.com];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lunn.ch,strlen.de,vger.kernel.org,isovalent.com,zx2c4.com];
 	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -144,193 +150,1036 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,isovalent.com:email,vger.kernel.org:from_smtp,fastmail.im:from_mime,fastmail.im:dkim,fastmail.im:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,messagingengine.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,isovalent.com:email,messagingengine.com:dkim,vger.kernel.org:from_smtp,fastmail.im:from_mime,fastmail.im:dkim,fastmail.im:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4E97E714871
+X-Rspamd-Queue-Id: DFD357151B1
 
 From: Alice Mikityanska <alice@isovalent.com>
 
-This series is a follow-up to "BIG TCP without HBH in IPv6", and it adds
-support for BIG TCP IPv4/IPv6 workloads in vxlan and geneve. Now that
-IPv6 BIG TCP doesn't require stripping the HBH in all various
-combinations in tunneled traffic, adding BIG TCP becomes feasible.
+Since BIG TCP for UDP tunnels will start using len=0 in the UDP header
+as an indicator of a GSO packet bigger than 65535 bytes, this commit
+introduces the following getter and setters to use tree-wide, in order
+to explicitly mark places where len=0 may be expected, and handle them
+properly:
 
-Patch 01 adds accessors for the length field in the UDP header, as
-suggested by Paolo in review. The usage of udp_set_len is then added in
-the following patches that start using length=0 in BIG TCP UDP packets.
+1. udp_set_len() sets uh->len to its real value if it's not bigger than
+65535, and to 0 otherwise: to be used in GSO context with aggregated
+packets.
 
-Patches 02-04 close the gaps that prevent BIG TCP packets from going
-through UDP tunnel code.
+2. udp_set_len_short() is to be used when the length is known to fit 16
+bits. It WARNs when the caller tries to assign a bigger value if
+CONFIG_DEBUG_NET=y.
 
-Patch 05 validates packets in udp_gro_receive to exclude packets with
-length=0 from GRO aggregation.
+3. udp_get_len_short() returns len in host byte order: to be used on the
+RX side to deal with non-aggregated packets, or to access the raw value
+of the len field.
 
-Patch 06 is for proper formatting in tcpdump (set UDP len to 0 rather
-than a trimmed value on overflow).
+4. udp_get_len() decodes uh->len set by udp_set_len(). It checks whether
+the packet is GSO to guard from malformed packets.
 
-Patches 07-08 bump up tso_max_size for VXLAN and GENEVE.
+At the moment udp_set_len() is not used, a following commit will start
+using it after enabling len>65535 for GSO.
 
-Patch 09 adds selftests.
+Raw uh->len (in network byte order) is still accessed in a few places
+for checksum calculation purposes, and to decode len=0 in udpv6_rcv for
+jumbograms. udp_rcv and udpv6_rcv will be addressed by the commit that
+starts using udp_set_len() to set UDP len=0 for BIG TCP packets in UDP
+tunnels.
 
-Thanks all!
+Signed-off-by: Alice Mikityanska <alice@isovalent.com>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ drivers/infiniband/core/lag.c                 |  2 +-
+ drivers/infiniband/sw/rxe/rxe_net.c           |  4 +-
+ drivers/net/amt.c                             |  6 +--
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c   |  2 +-
+ drivers/net/ethernet/intel/iavf/iavf_txrx.c   |  2 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.c     |  2 +-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  2 +-
+ .../marvell/octeontx2/nic/otx2_txrx.c         |  2 +-
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  4 +-
+ .../ethernet/mellanox/mlx5/core/en_selftest.c |  2 +-
+ drivers/net/ethernet/sfc/falcon/selftest.c    |  4 +-
+ drivers/net/ethernet/sfc/selftest.c           |  4 +-
+ drivers/net/ethernet/sfc/siena/selftest.c     |  4 +-
+ drivers/net/ethernet/sfc/tc_encap_actions.c   |  2 +-
+ .../stmicro/stmmac/stmmac_selftests.c         |  4 +-
+ drivers/net/geneve.c                          |  2 +-
+ drivers/net/netconsole.c                      |  2 +-
+ drivers/net/netdevsim/dev.c                   |  2 +-
+ drivers/net/netdevsim/psample.c               |  2 +-
+ drivers/net/netdevsim/psp.c                   |  8 ++--
+ drivers/net/wireguard/receive.c               |  2 +-
+ include/linux/udp.h                           | 27 ++++++++++++++
+ include/trace/events/icmp.h                   |  2 +-
+ lib/tests/blackhole_dev_kunit.c               |  2 +-
+ net/6lowpan/nhc_udp.c                         | 10 ++---
+ net/core/pktgen.c                             |  4 +-
+ net/core/selftests.c                          |  4 +-
+ net/core/tso.c                                |  3 +-
+ net/ipv4/esp4.c                               |  2 +-
+ net/ipv4/fou_core.c                           |  2 +-
+ net/ipv4/ipconfig.c                           |  6 +--
+ net/ipv4/netfilter/nf_nat_snmp_basic_main.c   |  4 +-
+ net/ipv4/route.c                              |  2 +-
+ net/ipv4/udp.c                                |  3 +-
+ net/ipv4/udp_offload.c                        | 37 +++++++++----------
+ net/ipv4/udp_tunnel_core.c                    |  2 +-
+ net/ipv6/esp6.c                               |  5 ++-
+ net/ipv6/fou6.c                               |  2 +-
+ net/ipv6/ip6_udp_tunnel.c                     |  2 +-
+ net/ipv6/udp.c                                |  3 +-
+ net/ipv6/udp_offload.c                        |  2 +-
+ net/l2tp/l2tp_core.c                          |  2 +-
+ net/netfilter/ipvs/ip_vs_xmit.c               |  2 +-
+ net/netfilter/nf_conntrack_proto_udp.c        | 15 +++++++-
+ net/netfilter/nf_log_syslog.c                 |  2 +-
+ net/netfilter/nf_nat_helper.c                 |  2 +-
+ net/psp/psp_main.c                            |  2 +-
+ net/sched/act_csum.c                          |  4 +-
+ net/xfrm/xfrm_nat_keepalive.c                 |  2 +-
+ 49 files changed, 131 insertions(+), 88 deletions(-)
 
-v8 changes: Addressed Paolo's and Jason's review comments. Made the
-selftest more robust, added checks for SACK and mode with disabled tx
-checksum offload on lower veth netdevs. Added details to commit
-messages. Kept skb_segment logic unchanged, because the frags overflow
-issue is not specific to BIG TCP.
-
-v7: https://lore.kernel.org/netdev/20260611192955.604661-1-alice.kernel@fastmail.im/
-
-v7 changes: Addressed Paolo's comments to properly block malformed
-packets with UDP length=0 at udp_rcv level.
-
-v6: https://lore.kernel.org/netdev/20260602093931.516281-1-alice.kernel@fastmail.im/
-
-v6 changes: Lowered the packets threshold in the selftest to pass
-upstream CI on debug kernels, also made it configurable.
-
-v5: https://lore.kernel.org/netdev/20260526161200.1135899-1-alice.kernel@fastmail.im/
-
-v5 changes: Rebased, dropped one of the patches that came in via the net
-tree, addressed an overflow in nsim_do_psp found by Sashiko.
-
-v4: https://lore.kernel.org/netdev/20260512165648.386518-1-alice.kernel@fastmail.im/
-
-v4 changes: Rebased, addressed Sashiko AI review [1] and Willem's
-comment about netperf flags.
-
-My comments on Sashiko AI review per patch:
-
-01: I'd prefer to keep the cases that I haven't tested outside of the
-scope of this series, which is for VXLAN/GENEVE tunnels, not for ESP.
-
-02: The patch doesn't have behavioral changes other than fixing the
-checksum. The final uh->len assignment assigns the actual length, not
-64k.
-
-03: The check can't be loosened, because total_len is also assigned to
-UDP length. BIG TCP works in the mode without GRO hint option.
-
-04: Fixed the fallback value for udplen. BIG TCP is fine, it's the
-uh->len = 0 case, uh->len can't exceed 64k.
-
-05: In the BIG TCP case, partial GSO splits the SKB in two. If full
-segmentation is needed, the SKB is split in many MSS-sized SKBs without
-fragments.
-
-06: Invalid packets from the wire are addressed in 08.
-
-07: __udp_gso_segment only handles UDP GSO packets, which can't be
-bigger than 64k. Kept udp_set_len_short in nf_nat_mangle_udp_packet, as
-the function doesn't support BIG TCP packets anyway (see
-mangle_contents).
-
-08: udp_gro_receive handles packets before aggregation, there are no BIG
-TCP packets at this point. RFC 768 doesn't say that padded UDP packets
-are valid. Real jumbograms don't seem to be supported in this path
-anyway.
-
-09: The packet goes to skb_udp_tunnel_segment, not __udp_gso_segment.
-__skb_udp_tunnel_segment handles this case.
-
-12: Improved process cleanup by killing everything inside netns before
-deleting them, and by avoiding killing netserver outside of netns.
-netperf with -r in TCP_STREAM mode works, and the option has the
-intended effect, but I replaced it with -m. Added dependency check for
-tcpdump.
-
-[1]: https://sashiko.dev/#/patchset/20260410150943.993350-1-alice.kernel%40fastmail.im
-
-v3: https://lore.kernel.org/netdev/20260410150943.993350-1-alice.kernel@fastmail.im/
-
-v3 changes: Fixed the redirect in the selftest, rebased over my L2TP fix
-[2] for the syzbot report [3].
-
-[2]: https://lore.kernel.org/netdev/20260403174949.843941-1-alice.kernel@fastmail.im/
-[3]: https://lore.kernel.org/netdev/69a1dfba.050a0220.3a55be.0026.GAE@google.com/
-
-v2: https://lore.kernel.org/netdev/20260226201600.222044-1-alice.kernel@fastmail.im/
-
-v2 changes: Addressed the review comments: added UDP len helpers,
-consolidated UDP len sanity checks in patch 08 into one, added
-selftests. Added fixups to related code (patch 01-03).
-
-v1: https://lore.kernel.org/netdev/20250923134742.1399800-1-maxtram95@gmail.com/
-
-Alice Mikityanska (8):
-  net: Use helpers to get/set UDP len tree-wide
-  net: Enable BIG TCP with partial GSO
-  udp: Support BIG TCP GSO packets where they can occur
-  udp: Support gro_ipv4_max_size > 65536
-  udp: Validate UDP length in udp_gro_receive
-  udp: Set length in UDP header to 0 for big GSO packets
-  vxlan: Enable BIG TCP packets
-  selftests: net: Add a test for BIG TCP in UDP tunnels
-
-Daniel Borkmann (1):
-  geneve: Enable BIG TCP packets
-
- drivers/infiniband/core/lag.c                 |   2 +-
- drivers/infiniband/sw/rxe/rxe_net.c           |   4 +-
- drivers/net/amt.c                             |   6 +-
- drivers/net/ethernet/intel/i40e/i40e_txrx.c   |   2 +-
- drivers/net/ethernet/intel/iavf/iavf_txrx.c   |   2 +-
- drivers/net/ethernet/intel/ice/ice_txrx.c     |   2 +-
- drivers/net/ethernet/intel/idpf/idpf_txrx.c   |   2 +-
- .../marvell/octeontx2/nic/otx2_txrx.c         |   2 +-
- .../net/ethernet/mellanox/mlx5/core/en_rx.c   |   4 +-
- .../ethernet/mellanox/mlx5/core/en_selftest.c |   2 +-
- drivers/net/ethernet/sfc/falcon/selftest.c    |   4 +-
- drivers/net/ethernet/sfc/selftest.c           |   4 +-
- drivers/net/ethernet/sfc/siena/selftest.c     |   4 +-
- drivers/net/ethernet/sfc/tc_encap_actions.c   |   2 +-
- .../stmicro/stmmac/stmmac_selftests.c         |   4 +-
- drivers/net/geneve.c                          |   4 +-
- drivers/net/netconsole.c                      |   2 +-
- drivers/net/netdevsim/dev.c                   |   2 +-
- drivers/net/netdevsim/psample.c               |   2 +-
- drivers/net/netdevsim/psp.c                   |   8 +-
- drivers/net/vxlan/vxlan_core.c                |   2 +
- drivers/net/wireguard/receive.c               |   2 +-
- include/linux/udp.h                           |  27 +++
- include/trace/events/icmp.h                   |   2 +-
- lib/tests/blackhole_dev_kunit.c               |   2 +-
- net/6lowpan/nhc_udp.c                         |  10 +-
- net/core/pktgen.c                             |   4 +-
- net/core/selftests.c                          |   4 +-
- net/core/skbuff.c                             |  10 +-
- net/core/tso.c                                |   3 +-
- net/ipv4/esp4.c                               |   2 +-
- net/ipv4/fou_core.c                           |   2 +-
- net/ipv4/ipconfig.c                           |   6 +-
- net/ipv4/netfilter/nf_nat_snmp_basic_main.c   |   4 +-
- net/ipv4/route.c                              |   2 +-
- net/ipv4/udp.c                                |   7 +-
- net/ipv4/udp_offload.c                        |  49 ++---
- net/ipv4/udp_tunnel_core.c                    |   2 +-
- net/ipv6/esp6.c                               |   5 +-
- net/ipv6/fou6.c                               |   2 +-
- net/ipv6/ip6_udp_tunnel.c                     |   2 +-
- net/ipv6/udp.c                                |   7 +-
- net/ipv6/udp_offload.c                        |   2 +-
- net/l2tp/l2tp_core.c                          |   2 +-
- net/netfilter/ipvs/ip_vs_xmit.c               |   2 +-
- net/netfilter/nf_conntrack_proto_udp.c        |  15 +-
- net/netfilter/nf_log_syslog.c                 |   2 +-
- net/netfilter/nf_nat_helper.c                 |   2 +-
- net/psp/psp_main.c                            |   2 +-
- net/sched/act_csum.c                          |   4 +-
- net/xfrm/xfrm_nat_keepalive.c                 |   2 +-
- tools/testing/selftests/net/Makefile          |   1 +
- .../testing/selftests/net/big_tcp_tunnels.sh  | 183 ++++++++++++++++++
- 53 files changed, 335 insertions(+), 102 deletions(-)
- create mode 100755 tools/testing/selftests/net/big_tcp_tunnels.sh
-
+diff --git a/drivers/infiniband/core/lag.c b/drivers/infiniband/core/lag.c
+index 8fd80adfe833..00fe241737ff 100644
+--- a/drivers/infiniband/core/lag.c
++++ b/drivers/infiniband/core/lag.c
+@@ -36,7 +36,7 @@ static struct sk_buff *rdma_build_skb(struct net_device *netdev,
+ 	uh->source =
+ 		htons(rdma_flow_label_to_udp_sport(ah_attr->grh.flow_label));
+ 	uh->dest = htons(ROCE_V2_UDP_DPORT);
+-	uh->len = htons(sizeof(struct udphdr));
++	udp_set_len_short(uh, sizeof(struct udphdr));
+ 
+ 	if (is_ipv4) {
+ 		skb_push(skb, sizeof(struct iphdr));
+diff --git a/drivers/infiniband/sw/rxe/rxe_net.c b/drivers/infiniband/sw/rxe/rxe_net.c
+index 3741b2c4b0bb..53daaf4c1eb2 100644
+--- a/drivers/infiniband/sw/rxe/rxe_net.c
++++ b/drivers/infiniband/sw/rxe/rxe_net.c
+@@ -242,7 +242,7 @@ static int rxe_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
+ 	pkt->port_num = 1;
+ 	pkt->hdr = (u8 *)(udph + 1);
+ 	pkt->mask = RXE_GRH_MASK;
+-	pkt->paylen = be16_to_cpu(udph->len) - sizeof(*udph);
++	pkt->paylen = udp_get_len_short(udph) - sizeof(*udph);
+ 
+ 	/* remove udp header */
+ 	skb_pull(skb, sizeof(struct udphdr));
+@@ -305,7 +305,7 @@ static void prepare_udp_hdr(struct sk_buff *skb, __be16 src_port,
+ 
+ 	udph->dest = dst_port;
+ 	udph->source = src_port;
+-	udph->len = htons(skb->len);
++	udp_set_len_short(udph, skb->len);
+ 	udph->check = 0;
+ }
+ 
+diff --git a/drivers/net/amt.c b/drivers/net/amt.c
+index 5cf97c65576f..a44ffbb18165 100644
+--- a/drivers/net/amt.c
++++ b/drivers/net/amt.c
+@@ -667,7 +667,7 @@ static void amt_send_discovery(struct amt_dev *amt)
+ 	udph		= udp_hdr(skb);
+ 	udph->source	= amt->gw_port;
+ 	udph->dest	= amt->relay_port;
+-	udph->len	= htons(sizeof(*udph) + sizeof(*amtd));
++	udp_set_len_short(udph, sizeof(*udph) + sizeof(*amtd));
+ 	udph->check	= 0;
+ 	offset = skb_transport_offset(skb);
+ 	skb->csum = skb_checksum(skb, offset, skb->len - offset, 0);
+@@ -760,7 +760,7 @@ static void amt_send_request(struct amt_dev *amt, bool v6)
+ 	udph		= udp_hdr(skb);
+ 	udph->source	= amt->gw_port;
+ 	udph->dest	= amt->relay_port;
+-	udph->len	= htons(sizeof(*amtrh) + sizeof(*udph));
++	udp_set_len_short(udph, sizeof(*amtrh) + sizeof(*udph));
+ 	udph->check	= 0;
+ 	offset = skb_transport_offset(skb);
+ 	skb->csum = skb_checksum(skb, offset, skb->len - offset, 0);
+@@ -2611,7 +2611,7 @@ static void amt_send_advertisement(struct amt_dev *amt, __be32 nonce,
+ 	udph		= udp_hdr(skb);
+ 	udph->source	= amt->relay_port;
+ 	udph->dest	= dport;
+-	udph->len	= htons(sizeof(*amta) + sizeof(*udph));
++	udp_set_len_short(udph, sizeof(*amta) + sizeof(*udph));
+ 	udph->check	= 0;
+ 	offset = skb_transport_offset(skb);
+ 	skb->csum = skb_checksum(skb, offset, skb->len - offset, 0);
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+index 894f2d06d39d..ef5e657816f0 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+@@ -3129,7 +3129,7 @@ static int i40e_tso(struct i40e_tx_buffer *first, u8 *hdr_len,
+ 					 SKB_GSO_UDP_TUNNEL_CSUM)) {
+ 		if (!(skb_shinfo(skb)->gso_type & SKB_GSO_PARTIAL) &&
+ 		    (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_TUNNEL_CSUM)) {
+-			l4.udp->len = 0;
++			udp_set_len_short(l4.udp, 0);
+ 
+ 			/* determine offset of outer transport header */
+ 			l4_offset = l4.hdr - skb->data;
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.c b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
+index 363c42bf3dcf..c30abf17cf5d 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_txrx.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
+@@ -1774,7 +1774,7 @@ static int iavf_tso(struct iavf_tx_buffer *first, u8 *hdr_len,
+ 					 SKB_GSO_UDP_TUNNEL_CSUM)) {
+ 		if (!(skb_shinfo(skb)->gso_type & SKB_GSO_PARTIAL) &&
+ 		    (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_TUNNEL_CSUM)) {
+-			l4.udp->len = 0;
++			udp_set_len_short(l4.udp, 0);
+ 
+ 			/* determine offset of outer transport header */
+ 			l4_offset = l4.hdr - skb->data;
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+index 4ca1a0602307..fdea2758adf1 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.c
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+@@ -1893,7 +1893,7 @@ int ice_tso(struct ice_tx_buf *first, struct ice_tx_offload_params *off)
+ 					 SKB_GSO_UDP_TUNNEL_CSUM)) {
+ 		if (!(skb_shinfo(skb)->gso_type & SKB_GSO_PARTIAL) &&
+ 		    (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_TUNNEL_CSUM)) {
+-			l4.udp->len = 0;
++			udp_set_len_short(l4.udp, 0);
+ 
+ 			/* determine offset of outer transport header */
+ 			l4_start = (u8)(l4.hdr - skb->data);
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index 7f9056404f64..566b08ca3a6c 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -2871,7 +2871,7 @@ int idpf_tso(struct sk_buff *skb, struct idpf_tx_offload_params *off)
+ 				     (__force __wsum)htonl(paylen));
+ 		/* compute length of segmentation header */
+ 		off->tso_hdr_len = sizeof(struct udphdr) + l4_start;
+-		l4.udp->len = htons(shinfo->gso_size + sizeof(struct udphdr));
++		udp_set_len_short(l4.udp, shinfo->gso_size + sizeof(struct udphdr));
+ 		break;
+ 	default:
+ 		return -EINVAL;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+index 625bb5a05344..8d2d607bc92f 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+@@ -750,7 +750,7 @@ static void otx2_sqe_add_ext(struct otx2_nic *pfvf, struct otx2_snd_queue *sq,
+ 				ext->lso_format = pfvf->hw.lso_udpv6_idx;
+ 			}
+ 
+-			udph->len = htons(sizeof(struct udphdr));
++			udp_set_len_short(udph, sizeof(struct udphdr));
+ 		}
+ 	} else if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) {
+ 		ext->tstmp = 1;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+index 6fbc0441c4b8..04af54b704d8 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+@@ -1081,7 +1081,7 @@ static void mlx5e_shampo_update_ipv4_udp_hdr(struct mlx5e_rq *rq, struct iphdr *
+ 	struct udphdr *uh;
+ 
+ 	uh = (struct udphdr *)(skb->data + udp_off);
+-	uh->len = htons(skb->len - udp_off);
++	udp_set_len_short(uh, skb->len - udp_off);
+ 
+ 	if (uh->check)
+ 		uh->check = ~udp_v4_check(skb->len - udp_off, ipv4->saddr,
+@@ -1100,7 +1100,7 @@ static void mlx5e_shampo_update_ipv6_udp_hdr(struct mlx5e_rq *rq, struct ipv6hdr
+ 	struct udphdr *uh;
+ 
+ 	uh = (struct udphdr *)(skb->data + udp_off);
+-	uh->len = htons(skb->len - udp_off);
++	udp_set_len_short(uh, skb->len - udp_off);
+ 
+ 	if (uh->check)
+ 		uh->check = ~udp_v6_check(skb->len - udp_off, &ipv6->saddr,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_selftest.c b/drivers/net/ethernet/mellanox/mlx5/core/en_selftest.c
+index accc26d1a872..1dcdb86690bb 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_selftest.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_selftest.c
+@@ -113,7 +113,7 @@ static struct sk_buff *mlx5e_test_get_udp_skb(struct mlx5e_priv *priv)
+ 	/* Fill UDP header */
+ 	udph->source = htons(9);
+ 	udph->dest = htons(9); /* Discard Protocol */
+-	udph->len = htons(sizeof(struct mlx5ehdr) + sizeof(struct udphdr));
++	udp_set_len_short(udph, sizeof(struct mlx5ehdr) + sizeof(struct udphdr));
+ 	udph->check = 0;
+ 
+ 	/* Fill IP header */
+diff --git a/drivers/net/ethernet/sfc/falcon/selftest.c b/drivers/net/ethernet/sfc/falcon/selftest.c
+index db4dd7fb77f5..4d29e0baf2eb 100644
+--- a/drivers/net/ethernet/sfc/falcon/selftest.c
++++ b/drivers/net/ethernet/sfc/falcon/selftest.c
+@@ -401,8 +401,8 @@ static void ef4_iterate_state(struct ef4_nic *efx)
+ 
+ 	/* Initialise udp header */
+ 	payload->udp.source = 0;
+-	payload->udp.len = htons(sizeof(*payload) -
+-				 offsetof(struct ef4_loopback_payload, udp));
++	udp_set_len_short(&payload->udp, sizeof(*payload) -
++			  offsetof(struct ef4_loopback_payload, udp));
+ 	payload->udp.check = 0;	/* checksum ignored */
+ 
+ 	/* Fill out payload */
+diff --git a/drivers/net/ethernet/sfc/selftest.c b/drivers/net/ethernet/sfc/selftest.c
+index 8ec76329237a..dc716feb79cb 100644
+--- a/drivers/net/ethernet/sfc/selftest.c
++++ b/drivers/net/ethernet/sfc/selftest.c
+@@ -398,8 +398,8 @@ static void efx_iterate_state(struct efx_nic *efx)
+ 
+ 	/* Initialise udp header */
+ 	payload->udp.source = 0;
+-	payload->udp.len = htons(sizeof(*payload) -
+-				 offsetof(struct efx_loopback_payload, udp));
++	udp_set_len_short(&payload->udp, sizeof(*payload) -
++			  offsetof(struct efx_loopback_payload, udp));
+ 	payload->udp.check = 0;	/* checksum ignored */
+ 
+ 	/* Fill out payload */
+diff --git a/drivers/net/ethernet/sfc/siena/selftest.c b/drivers/net/ethernet/sfc/siena/selftest.c
+index 930643612df5..c74cf5131364 100644
+--- a/drivers/net/ethernet/sfc/siena/selftest.c
++++ b/drivers/net/ethernet/sfc/siena/selftest.c
+@@ -399,8 +399,8 @@ static void efx_iterate_state(struct efx_nic *efx)
+ 
+ 	/* Initialise udp header */
+ 	payload->udp.source = 0;
+-	payload->udp.len = htons(sizeof(*payload) -
+-				 offsetof(struct efx_loopback_payload, udp));
++	udp_set_len_short(&payload->udp, sizeof(*payload) -
++			  offsetof(struct efx_loopback_payload, udp));
+ 	payload->udp.check = 0;	/* checksum ignored */
+ 
+ 	/* Fill out payload */
+diff --git a/drivers/net/ethernet/sfc/tc_encap_actions.c b/drivers/net/ethernet/sfc/tc_encap_actions.c
+index db222abef53b..c2ad3a358d20 100644
+--- a/drivers/net/ethernet/sfc/tc_encap_actions.c
++++ b/drivers/net/ethernet/sfc/tc_encap_actions.c
+@@ -311,7 +311,7 @@ static void efx_gen_tun_header_udp(struct efx_tc_encap_action *encap, u8 len)
+ 	encap->encap_hdr_len += sizeof(*udp);
+ 
+ 	udp->dest = key->tp_dst;
+-	udp->len = cpu_to_be16(sizeof(*udp) + len);
++	udp_set_len_short(udp, sizeof(*udp) + len);
+ }
+ 
+ static void efx_gen_tun_header_vxlan(struct efx_tc_encap_action *encap)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_selftests.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_selftests.c
+index a0c75886587c..29e824bd90ca 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_selftests.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_selftests.c
+@@ -154,9 +154,9 @@ static struct sk_buff *stmmac_test_get_udp_skb(struct stmmac_priv *priv,
+ 	} else {
+ 		uhdr->source = htons(attr->sport);
+ 		uhdr->dest = htons(attr->dport);
+-		uhdr->len = htons(sizeof(*shdr) + sizeof(*uhdr) + attr->size);
++		udp_set_len_short(uhdr, sizeof(*shdr) + sizeof(*uhdr) + attr->size);
+ 		if (attr->max_size)
+-			uhdr->len = htons(attr->max_size -
++			udp_set_len_short(uhdr, attr->max_size -
+ 					  (sizeof(*ihdr) + sizeof(*ehdr)));
+ 		uhdr->check = 0;
+ 	}
+diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
+index 396e1a113cd4..011bf9d833ca 100644
+--- a/drivers/net/geneve.c
++++ b/drivers/net/geneve.c
+@@ -631,7 +631,7 @@ static int geneve_post_decap_hint(const struct sock *sk, struct sk_buff *skb,
+ 
+ 	/* Adjust the nested UDP header len and checksum. */
+ 	uh = udp_hdr(skb);
+-	uh->len = htons(skb->len - gro_hint->nested_tp_offset);
++	udp_set_len_short(uh, skb->len - gro_hint->nested_tp_offset);
+ 	if (uh->check) {
+ 		len = skb->len - gro_hint->nested_tp_offset;
+ 		skb_shinfo(skb)->gso_type |= SKB_GSO_UDP_TUNNEL_CSUM;
+diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+index c1812a98365b..a531548eb891 100644
+--- a/drivers/net/netconsole.c
++++ b/drivers/net/netconsole.c
+@@ -1792,7 +1792,7 @@ static void push_udp(struct netpoll *np, struct sk_buff *skb, int len)
+ 	udph = udp_hdr(skb);
+ 	udph->source = htons(np->local_port);
+ 	udph->dest = htons(np->remote_port);
+-	udph->len = htons(udp_len);
++	udp_set_len_short(udph, udp_len);
+ 
+ 	netpoll_udp_checksum(np, skb, len);
+ }
+diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
+index aed9ad5f1b43..f65b4cf4ea39 100644
+--- a/drivers/net/netdevsim/dev.c
++++ b/drivers/net/netdevsim/dev.c
+@@ -845,7 +845,7 @@ static struct sk_buff *nsim_dev_trap_skb_build(void)
+ 	udph = skb_put_zero(skb, sizeof(struct udphdr) + data_len);
+ 	get_random_bytes(&udph->source, sizeof(u16));
+ 	get_random_bytes(&udph->dest, sizeof(u16));
+-	udph->len = htons(sizeof(struct udphdr) + data_len);
++	udp_set_len_short(udph, sizeof(struct udphdr) + data_len);
+ 
+ 	return skb;
+ }
+diff --git a/drivers/net/netdevsim/psample.c b/drivers/net/netdevsim/psample.c
+index 717d157c3ae2..1e71c3da4def 100644
+--- a/drivers/net/netdevsim/psample.c
++++ b/drivers/net/netdevsim/psample.c
+@@ -73,7 +73,7 @@ static struct sk_buff *nsim_dev_psample_skb_build(void)
+ 	udph = skb_put_zero(skb, sizeof(struct udphdr) + data_len);
+ 	get_random_bytes(&udph->source, sizeof(u16));
+ 	get_random_bytes(&udph->dest, sizeof(u16));
+-	udph->len = htons(sizeof(struct udphdr) + data_len);
++	udp_set_len_short(udph, sizeof(struct udphdr) + data_len);
+ 
+ 	return skb;
+ }
+diff --git a/drivers/net/netdevsim/psp.c b/drivers/net/netdevsim/psp.c
+index 59c990fdc79e..6b3532b5e360 100644
+--- a/drivers/net/netdevsim/psp.c
++++ b/drivers/net/netdevsim/psp.c
+@@ -84,6 +84,7 @@ nsim_do_psp(struct sk_buff *skb, struct netdevsim *ns,
+ 		struct iphdr *iph;
+ 		struct udphdr *uh;
+ 		__wsum csum;
++		int udplen;
+ 
+ 		/* Do not decapsulate. Receive the skb with the udp and psp
+ 		 * headers still there as if this is a normal udp packet.
+@@ -91,19 +92,20 @@ nsim_do_psp(struct sk_buff *skb, struct netdevsim *ns,
+ 		 * provide a valid checksum here, so the skb isn't dropped.
+ 		 */
+ 		uh = udp_hdr(skb);
++		udplen = udp_get_len(skb, uh, skb_transport_offset(skb));
+ 		csum = skb_checksum(skb, skb_transport_offset(skb),
+-				    ntohs(uh->len), 0);
++				    udplen, 0);
+ 
+ 		switch (skb->protocol) {
+ 		case htons(ETH_P_IP):
+ 			iph = ip_hdr(skb);
+-			uh->check = udp_v4_check(ntohs(uh->len), iph->saddr,
++			uh->check = udp_v4_check(udplen, iph->saddr,
+ 						 iph->daddr, csum);
+ 			break;
+ #if IS_ENABLED(CONFIG_IPV6)
+ 		case htons(ETH_P_IPV6):
+ 			ip6h = ipv6_hdr(skb);
+-			uh->check = udp_v6_check(ntohs(uh->len), &ip6h->saddr,
++			uh->check = udp_v6_check(udplen, &ip6h->saddr,
+ 						 &ip6h->daddr, csum);
+ 			break;
+ #endif
+diff --git a/drivers/net/wireguard/receive.c b/drivers/net/wireguard/receive.c
+index eb8851113654..824bbefce61c 100644
+--- a/drivers/net/wireguard/receive.c
++++ b/drivers/net/wireguard/receive.c
+@@ -62,7 +62,7 @@ static int prepare_skb_header(struct sk_buff *skb, struct wg_device *wg)
+ 		 * to have UDP fields.
+ 		 */
+ 		return -EINVAL;
+-	data_len = ntohs(udp->len);
++	data_len = udp_get_len_short(udp);
+ 	if (unlikely(data_len < sizeof(struct udphdr) ||
+ 		     data_len > skb->len - data_offset))
+ 		/* UDP packet is reporting too small of a size or lying about
+diff --git a/include/linux/udp.h b/include/linux/udp.h
+index ce56ebcee5cb..998906ec3b32 100644
+--- a/include/linux/udp.h
++++ b/include/linux/udp.h
+@@ -23,6 +23,33 @@ static inline struct udphdr *udp_hdr(const struct sk_buff *skb)
+ 	return (struct udphdr *)skb_transport_header(skb);
+ }
+ 
++static inline unsigned int udp_get_len(const struct sk_buff *skb,
++				       const struct udphdr *uh,
++				       unsigned int dataoff)
++{
++	if (uh->len)
++		return ntohs(uh->len);
++	if (skb_is_gso(skb)) /* BIG TCP */
++		return skb->len - dataoff;
++	return 0;
++}
++
++static inline unsigned int udp_get_len_short(const struct udphdr *uh)
++{
++	return ntohs(uh->len);
++}
++
++static inline void udp_set_len(struct udphdr *uh, unsigned int len)
++{
++	uh->len = len < GRO_LEGACY_MAX_SIZE ? htons(len) : 0;
++}
++
++static inline void udp_set_len_short(struct udphdr *uh, unsigned int len)
++{
++	DEBUG_NET_WARN_ON_ONCE(len >= GRO_LEGACY_MAX_SIZE);
++	uh->len = htons(len);
++}
++
+ #define UDP_HTABLE_SIZE_MIN_PERNET	128
+ #define UDP_HTABLE_SIZE_MIN		(IS_ENABLED(CONFIG_BASE_SMALL) ? 128 : 256)
+ #define UDP_HTABLE_SIZE_MAX		65536
+diff --git a/include/trace/events/icmp.h b/include/trace/events/icmp.h
+index 31559796949a..09ae115099df 100644
+--- a/include/trace/events/icmp.h
++++ b/include/trace/events/icmp.h
+@@ -44,7 +44,7 @@ TRACE_EVENT(icmp_send,
+ 			} else {
+ 				__entry->sport = ntohs(uh->source);
+ 				__entry->dport = ntohs(uh->dest);
+-				__entry->ulen = ntohs(uh->len);
++				__entry->ulen = udp_get_len_short(uh);
+ 			}
+ 
+ 			p32 = (__be32 *) __entry->saddr;
+diff --git a/lib/tests/blackhole_dev_kunit.c b/lib/tests/blackhole_dev_kunit.c
+index 06834ab35f43..fa3e0533038d 100644
+--- a/lib/tests/blackhole_dev_kunit.c
++++ b/lib/tests/blackhole_dev_kunit.c
+@@ -46,7 +46,7 @@ static void test_blackholedev(struct kunit *test)
+ 	uh = (struct udphdr *)skb_push(skb, sizeof(struct udphdr));
+ 	skb_set_transport_header(skb, 0);
+ 	uh->source = uh->dest = htons(UDP_PORT);
+-	uh->len = htons(data_len);
++	udp_set_len_short(uh, data_len);
+ 	uh->check = 0;
+ 	/* (Network) IPv6 */
+ 	ip6h = (struct ipv6hdr *)skb_push(skb, sizeof(struct ipv6hdr));
+diff --git a/net/6lowpan/nhc_udp.c b/net/6lowpan/nhc_udp.c
+index 0a506c77283d..ed4227e6db74 100644
+--- a/net/6lowpan/nhc_udp.c
++++ b/net/6lowpan/nhc_udp.c
+@@ -88,16 +88,16 @@ static int udp_uncompress(struct sk_buff *skb, size_t needed)
+ 	switch (lowpan_dev(skb->dev)->lltype) {
+ 	case LOWPAN_LLTYPE_IEEE802154:
+ 		if (lowpan_802154_cb(skb)->d_size)
+-			uh.len = htons(lowpan_802154_cb(skb)->d_size -
+-				       sizeof(struct ipv6hdr));
++			udp_set_len_short(&uh, lowpan_802154_cb(skb)->d_size -
++					  sizeof(struct ipv6hdr));
+ 		else
+-			uh.len = htons(skb->len + sizeof(struct udphdr));
++			udp_set_len_short(&uh, skb->len + sizeof(struct udphdr));
+ 		break;
+ 	default:
+-		uh.len = htons(skb->len + sizeof(struct udphdr));
++		udp_set_len_short(&uh, skb->len + sizeof(struct udphdr));
+ 		break;
+ 	}
+-	pr_debug("uncompressed UDP length: src = %d", ntohs(uh.len));
++	pr_debug("uncompressed UDP length: src = %d", udp_get_len_short(&uh));
+ 
+ 	/* replace the compressed UDP head by the uncompressed UDP
+ 	 * header
+diff --git a/net/core/pktgen.c b/net/core/pktgen.c
+index 8e185b318288..5b4dd04d6124 100644
+--- a/net/core/pktgen.c
++++ b/net/core/pktgen.c
+@@ -3005,7 +3005,7 @@ static struct sk_buff *fill_packet_ipv4(struct net_device *odev,
+ 
+ 	udph->source = htons(pkt_dev->cur_udp_src);
+ 	udph->dest = htons(pkt_dev->cur_udp_dst);
+-	udph->len = htons(datalen + 8);	/* DATA + udphdr */
++	udp_set_len_short(udph, datalen + 8);	/* DATA + udphdr */
+ 	udph->check = 0;
+ 
+ 	iph->ihl = 5;
+@@ -3138,7 +3138,7 @@ static struct sk_buff *fill_packet_ipv6(struct net_device *odev,
+ 	udplen = datalen + sizeof(struct udphdr);
+ 	udph->source = htons(pkt_dev->cur_udp_src);
+ 	udph->dest = htons(pkt_dev->cur_udp_dst);
+-	udph->len = htons(udplen);
++	udp_set_len_short(udph, udplen);
+ 	udph->check = 0;
+ 
+ 	*(__be32 *) iph = htonl(0x60000000);	/* Version + flow */
+diff --git a/net/core/selftests.c b/net/core/selftests.c
+index 0a203d3fb9dc..36b949ae520b 100644
+--- a/net/core/selftests.c
++++ b/net/core/selftests.c
+@@ -72,9 +72,9 @@ struct sk_buff *net_test_get_skb(struct net_device *ndev, u8 id,
+ 	} else {
+ 		uhdr->source = htons(attr->sport);
+ 		uhdr->dest = htons(attr->dport);
+-		uhdr->len = htons(sizeof(*shdr) + sizeof(*uhdr) + attr->size);
++		udp_set_len_short(uhdr, sizeof(*shdr) + sizeof(*uhdr) + attr->size);
+ 		if (attr->max_size)
+-			uhdr->len = htons(attr->max_size -
++			udp_set_len_short(uhdr, attr->max_size -
+ 					  (sizeof(*ihdr) + sizeof(*ehdr)));
+ 		uhdr->check = 0;
+ 	}
+diff --git a/net/core/tso.c b/net/core/tso.c
+index 347b3856ddb9..d2934bcfa795 100644
+--- a/net/core/tso.c
++++ b/net/core/tso.c
+@@ -39,7 +39,8 @@ void tso_build_hdr(const struct sk_buff *skb, char *hdr, struct tso_t *tso,
+ 	} else {
+ 		struct udphdr *uh = (struct udphdr *)hdr;
+ 
+-		uh->len = htons(sizeof(*uh) + size);
++		/* size is after segmentation. */
++		udp_set_len_short(uh, sizeof(*uh) + size);
+ 	}
+ }
+ EXPORT_SYMBOL(tso_build_hdr);
+diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+index dfc81ee969ae..a6c18aea7498 100644
+--- a/net/ipv4/esp4.c
++++ b/net/ipv4/esp4.c
+@@ -323,7 +323,7 @@ static struct ip_esp_hdr *esp_output_udp_encap(struct sk_buff *skb,
+ 	uh = (struct udphdr *)esp->esph;
+ 	uh->source = sport;
+ 	uh->dest = dport;
+-	uh->len = htons(len);
++	udp_set_len_short(uh, len);
+ 	uh->check = 0;
+ 
+ 	/* For IPv4 ESP with UDP encapsulation, if xo is not null, the skb is in the crypto offload
+diff --git a/net/ipv4/fou_core.c b/net/ipv4/fou_core.c
+index 865bd7205122..a50740d0f288 100644
+--- a/net/ipv4/fou_core.c
++++ b/net/ipv4/fou_core.c
+@@ -1040,7 +1040,7 @@ static void fou_build_udp(struct sk_buff *skb, struct ip_tunnel_encap *e,
+ 
+ 	uh->dest = e->dport;
+ 	uh->source = sport;
+-	uh->len = htons(skb->len);
++	udp_set_len_short(uh, skb->len);
+ 	udp_set_csum(!(e->flags & TUNNEL_ENCAP_FLAG_CSUM), skb,
+ 		     fl4->saddr, fl4->daddr, skb->len);
+ 
+diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
+index a35ffedacc7c..155db067eaec 100644
+--- a/net/ipv4/ipconfig.c
++++ b/net/ipv4/ipconfig.c
+@@ -847,7 +847,7 @@ static void __init ic_bootp_send_if(struct ic_device *d, unsigned long jiffies_d
+ 	/* Construct UDP header */
+ 	b->udph.source = htons(68);
+ 	b->udph.dest = htons(67);
+-	b->udph.len = htons(sizeof(struct bootp_pkt) - sizeof(struct iphdr));
++	udp_set_len_short(&b->udph, sizeof(struct bootp_pkt) - sizeof(struct iphdr));
+ 	/* UDP checksum not calculated -- explicitly allowed in BOOTP RFC */
+ 
+ 	/* Construct DHCP/BOOTP header */
+@@ -1025,10 +1025,10 @@ static int __init ic_bootp_recv(struct sk_buff *skb, struct net_device *dev, str
+ 	if (b->udph.source != htons(67) || b->udph.dest != htons(68))
+ 		goto drop;
+ 
+-	if (ntohs(h->tot_len) < ntohs(b->udph.len) + sizeof(struct iphdr))
++	if (ntohs(h->tot_len) < udp_get_len_short(&b->udph) + sizeof(struct iphdr))
+ 		goto drop;
+ 
+-	len = ntohs(b->udph.len) - sizeof(struct udphdr);
++	len = udp_get_len_short(&b->udph) - sizeof(struct udphdr);
+ 	ext_len = len - (sizeof(*b) -
+ 			 sizeof(struct iphdr) -
+ 			 sizeof(struct udphdr) -
+diff --git a/net/ipv4/netfilter/nf_nat_snmp_basic_main.c b/net/ipv4/netfilter/nf_nat_snmp_basic_main.c
+index e540b86bd15b..4492bc548a66 100644
+--- a/net/ipv4/netfilter/nf_nat_snmp_basic_main.c
++++ b/net/ipv4/netfilter/nf_nat_snmp_basic_main.c
+@@ -127,7 +127,7 @@ static int snmp_translate(struct nf_conn *ct, int dir, struct sk_buff *skb)
+ {
+ 	struct iphdr *iph = ip_hdr(skb);
+ 	struct udphdr *udph = (struct udphdr *)((__be32 *)iph + iph->ihl);
+-	u16 datalen = ntohs(udph->len) - sizeof(struct udphdr);
++	u16 datalen = udp_get_len_short(udph) - sizeof(struct udphdr);
+ 	char *data = (unsigned char *)udph + sizeof(struct udphdr);
+ 	struct snmp_ctx ctx;
+ 	int ret;
+@@ -181,7 +181,7 @@ static int help(struct sk_buff *skb, unsigned int protoff,
+ 	 * enough room for a UDP header.  Just verify the UDP length field so we
+ 	 * can mess around with the payload.
+ 	 */
+-	if (ntohs(udph->len) != skb->len - (iph->ihl << 2)) {
++	if (udp_get_len_short(udph) != skb->len - (iph->ihl << 2)) {
+ 		nf_ct_helper_log(skb, ct, "dropping malformed packet\n");
+ 		return NF_DROP;
+ 	}
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index 3f3de5164d6e..0825ed983714 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -3187,7 +3187,7 @@ static struct sk_buff *inet_rtm_getroute_build_skb(__be32 src, __be32 dst,
+ 		udph = skb_put_zero(skb, sizeof(struct udphdr));
+ 		udph->source = sport;
+ 		udph->dest = dport;
+-		udph->len = htons(sizeof(struct udphdr));
++		udp_set_len_short(udph, sizeof(struct udphdr));
+ 		udph->check = 0;
+ 		break;
+ 	}
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 59248a59358c..cb86124fd963 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -1108,7 +1108,8 @@ static int udp_send_skb(struct sk_buff *skb, struct flowi4 *fl4,
+ 	uh = udp_hdr(skb);
+ 	uh->source = inet_sk(sk)->inet_sport;
+ 	uh->dest = fl4->fl4_dport;
+-	uh->len = htons(len);
++	/* Datagram length checked in udp_sendmsg. */
++	udp_set_len_short(uh, len);
+ 	uh->check = 0;
+ 
+ 	if (cork->gso_size) {
+diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+index 29651b1a0bc7..493e2b9e16fb 100644
+--- a/net/ipv4/udp_offload.c
++++ b/net/ipv4/udp_offload.c
+@@ -279,11 +279,11 @@ static struct sk_buff *__skb_udp_tunnel_segment(struct sk_buff *skb,
+ 		 * segment instead of the entire frame.
+ 		 */
+ 		if (gso_partial && skb_is_gso(skb)) {
+-			uh->len = htons(skb_shinfo(skb)->gso_size +
+-					SKB_GSO_CB(skb)->data_offset +
+-					skb->head - (unsigned char *)uh);
++			udp_set_len_short(uh, skb_shinfo(skb)->gso_size +
++					  SKB_GSO_CB(skb)->data_offset +
++					  skb->head - (unsigned char *)uh);
+ 		} else {
+-			uh->len = htons(len);
++			udp_set_len_short(uh, len);
+ 		}
+ 
+ 		if (!need_csum)
+@@ -468,7 +468,7 @@ static struct sk_buff *__udp_gso_segment_list(struct sk_buff *skb,
+ 	if (IS_ERR(skb))
+ 		return skb;
+ 
+-	udp_hdr(skb)->len = htons(sizeof(struct udphdr) + mss);
++	udp_set_len_short(udp_hdr(skb), sizeof(struct udphdr) + mss);
+ 
+ 	if (is_ipv6)
+ 		return __udpv6_gso_segment_list_csum(skb);
+@@ -486,8 +486,8 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+ 	unsigned int mss;
+ 	bool copy_dtor;
+ 	__sum16 check;
+-	__be16 newlen;
+ 	int ret = 0;
++	u16 newlen;
+ 
+ 	mss = skb_shinfo(gso_skb)->gso_size;
+ 	if (gso_skb->len <= sizeof(*uh) + mss)
+@@ -564,8 +564,8 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+ 			(skb_shinfo(gso_skb)->tx_flags & SKBTX_ANY_TSTAMP);
+ 
+ 	/* compute checksum adjustment based on old length versus new */
+-	newlen = htons(sizeof(*uh) + mss);
+-	check = csum16_add(csum16_sub(uh->check, uh->len), newlen);
++	newlen = sizeof(*uh) + mss;
++	check = csum16_add(csum16_sub(uh->check, uh->len), htons(newlen));
+ 
+ 	for (;;) {
+ 		if (copy_dtor) {
+@@ -577,7 +577,7 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+ 		if (!seg->next)
+ 			break;
+ 
+-		uh->len = newlen;
++		udp_set_len_short(uh, newlen);
+ 		uh->check = check;
+ 
+ 		if (seg->ip_summed == CHECKSUM_PARTIAL)
+@@ -594,11 +594,10 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+ 	 * segment may not be full MSS, account for that in the checksum
+ 	 */
+ 	if (!skb_is_gso(seg))
+-		newlen = htons(skb_tail_pointer(seg) -
+-			       skb_transport_header(seg) + seg->data_len);
+-	check = csum16_add(csum16_sub(uh->check, uh->len), newlen);
++		newlen = skb_tail_pointer(seg) - skb_transport_header(seg) + seg->data_len;
++	check = csum16_add(csum16_sub(uh->check, uh->len), htons(newlen));
+ 
+-	uh->len = newlen;
++	udp_set_len_short(uh, newlen);
+ 	uh->check = check;
+ 
+ 	if (seg->ip_summed == CHECKSUM_PARTIAL)
+@@ -709,7 +708,7 @@ static struct sk_buff *udp_gro_receive_segment(struct list_head *head,
+ 	}
+ 
+ 	/* Do not deal with padded or malicious packets, sorry ! */
+-	ulen = ntohs(uh->len);
++	ulen = udp_get_len_short(uh);
+ 	if (ulen <= sizeof(*uh) || ulen != skb_gro_len(skb)) {
+ 		NAPI_GRO_CB(skb)->flush = 1;
+ 		return NULL;
+@@ -742,7 +741,7 @@ static struct sk_buff *udp_gro_receive_segment(struct list_head *head,
+ 		 * On len mismatch merge the first packet shorter than gso_size,
+ 		 * otherwise complete the GRO packet.
+ 		 */
+-		if (ulen > ntohs(uh2->len) || flush) {
++		if (ulen > udp_get_len_short(uh2) || flush) {
+ 			pp = p;
+ 		} else {
+ 			if (NAPI_GRO_CB(skb)->is_flist) {
+@@ -765,7 +764,7 @@ static struct sk_buff *udp_gro_receive_segment(struct list_head *head,
+ 			}
+ 		}
+ 
+-		if (ret || ulen != ntohs(uh2->len) ||
++		if (ret || ulen != udp_get_len_short(uh2) ||
+ 		    NAPI_GRO_CB(p)->count >= UDP_GRO_CNT_MAX)
+ 			pp = p;
+ 
+@@ -915,12 +914,12 @@ static int udp_gro_complete_segment(struct sk_buff *skb)
+ int udp_gro_complete(struct sk_buff *skb, int nhoff,
+ 		     udp_lookup_t lookup)
+ {
+-	__be16 newlen = htons(skb->len - nhoff);
+ 	struct udphdr *uh = (struct udphdr *)(skb->data + nhoff);
++	unsigned int newlen = skb->len - nhoff;
+ 	struct sock *sk;
+ 	int err;
+ 
+-	uh->len = newlen;
++	udp_set_len_short(uh, newlen);
+ 
+ 	sk = INDIRECT_CALL_INET(lookup, udp6_lib_lookup_skb,
+ 				udp4_lib_lookup_skb, skb, uh->source, uh->dest);
+@@ -957,7 +956,7 @@ INDIRECT_CALLABLE_SCOPE int udp4_gro_complete(struct sk_buff *skb, int nhoff)
+ 
+ 	/* do fraglist only if there is no outer UDP encap (or we already processed it) */
+ 	if (NAPI_GRO_CB(skb)->is_flist && !NAPI_GRO_CB(skb)->encap_mark) {
+-		uh->len = htons(skb->len - nhoff);
++		udp_set_len_short(uh, skb->len - nhoff);
+ 
+ 		skb_shinfo(skb)->gso_type |= (SKB_GSO_FRAGLIST|SKB_GSO_UDP_L4);
+ 		skb_shinfo(skb)->gso_segs = NAPI_GRO_CB(skb)->count;
+diff --git a/net/ipv4/udp_tunnel_core.c b/net/ipv4/udp_tunnel_core.c
+index 9ab3728f9630..0fccb38f074d 100644
+--- a/net/ipv4/udp_tunnel_core.c
++++ b/net/ipv4/udp_tunnel_core.c
+@@ -178,7 +178,7 @@ void udp_tunnel_xmit_skb(struct rtable *rt, struct sock *sk, struct sk_buff *skb
+ 
+ 	uh->dest = dst_port;
+ 	uh->source = src_port;
+-	uh->len = htons(skb->len);
++	udp_set_len_short(uh, skb->len);
+ 
+ 	memset(&(IPCB(skb)->opt), 0, sizeof(IPCB(skb)->opt));
+ 
+diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
+index 296b57926abb..72ec0d7d1120 100644
+--- a/net/ipv6/esp6.c
++++ b/net/ipv6/esp6.c
+@@ -230,7 +230,8 @@ static void esp_output_encap_csum(struct sk_buff *skb)
+ 	if (*skb_mac_header(skb) == IPPROTO_UDP) {
+ 		struct udphdr *uh = udp_hdr(skb);
+ 		struct ipv6hdr *ip6h = ipv6_hdr(skb);
+-		int len = ntohs(uh->len);
++		/* esp6_output_udp_encap limits len to U16_MAX. */
++		int len = udp_get_len_short(uh);
+ 		unsigned int offset = skb_transport_offset(skb);
+ 		__wsum csum = skb_checksum(skb, offset, skb->len - offset, 0);
+ 
+@@ -358,7 +359,7 @@ static struct ip_esp_hdr *esp6_output_udp_encap(struct sk_buff *skb,
+ 	uh = (struct udphdr *)esp->esph;
+ 	uh->source = sport;
+ 	uh->dest = dport;
+-	uh->len = htons(len);
++	udp_set_len_short(uh, len);
+ 	uh->check = 0;
+ 
+ 	*skb_mac_header(skb) = IPPROTO_UDP;
+diff --git a/net/ipv6/fou6.c b/net/ipv6/fou6.c
+index 157765259e2f..588929409241 100644
+--- a/net/ipv6/fou6.c
++++ b/net/ipv6/fou6.c
+@@ -30,7 +30,7 @@ static void fou6_build_udp(struct sk_buff *skb, struct ip_tunnel_encap *e,
+ 
+ 	uh->dest = e->dport;
+ 	uh->source = sport;
+-	uh->len = htons(skb->len);
++	udp_set_len_short(uh, skb->len);
+ 	udp6_set_csum(!(e->flags & TUNNEL_ENCAP_FLAG_CSUM6), skb,
+ 		      &fl6->saddr, &fl6->daddr, skb->len);
+ 
+diff --git a/net/ipv6/ip6_udp_tunnel.c b/net/ipv6/ip6_udp_tunnel.c
+index 9adb5775487f..dcff7fb16ff6 100644
+--- a/net/ipv6/ip6_udp_tunnel.c
++++ b/net/ipv6/ip6_udp_tunnel.c
+@@ -93,7 +93,7 @@ void udp_tunnel6_xmit_skb(struct dst_entry *dst, struct sock *sk,
+ 	uh->dest = dst_port;
+ 	uh->source = src_port;
+ 
+-	uh->len = htons(skb->len);
++	udp_set_len_short(uh, skb->len);
+ 
+ 	skb_dst_set(skb, dst);
+ 
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index 392e18b97045..8bbd55546b6e 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -1369,7 +1369,8 @@ static int udp_v6_send_skb(struct sk_buff *skb, struct flowi6 *fl6,
+ 	uh = udp_hdr(skb);
+ 	uh->source = fl6->fl6_sport;
+ 	uh->dest = fl6->fl6_dport;
+-	uh->len = htons(len);
++	/* Datagram length checked in udpv6_sendmsg. */
++	udp_set_len_short(uh, len);
+ 	uh->check = 0;
+ 
+ 	if (cork->gso_size) {
+diff --git a/net/ipv6/udp_offload.c b/net/ipv6/udp_offload.c
+index 778afc7453ce..c92cf5ee3e6a 100644
+--- a/net/ipv6/udp_offload.c
++++ b/net/ipv6/udp_offload.c
+@@ -171,7 +171,7 @@ int udp6_gro_complete(struct sk_buff *skb, int nhoff)
+ 
+ 	/* do fraglist only if there is no outer UDP encap (or we already processed it) */
+ 	if (NAPI_GRO_CB(skb)->is_flist && !NAPI_GRO_CB(skb)->encap_mark) {
+-		uh->len = htons(skb->len - nhoff);
++		udp_set_len_short(uh, skb->len - nhoff);
+ 
+ 		skb_shinfo(skb)->gso_type |= (SKB_GSO_FRAGLIST|SKB_GSO_UDP_L4);
+ 		skb_shinfo(skb)->gso_segs = NAPI_GRO_CB(skb)->count;
+diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+index f940914959b1..4712cc41881a 100644
+--- a/net/l2tp/l2tp_core.c
++++ b/net/l2tp/l2tp_core.c
+@@ -1296,7 +1296,7 @@ static int l2tp_xmit_core(struct l2tp_session *session, struct sk_buff *skb, uns
+ 			ret = NET_XMIT_DROP;
+ 			goto out_unlock;
+ 		}
+-		uh->len = htons(udp_len);
++		udp_set_len_short(uh, udp_len);
+ 
+ 		/* Calculate UDP checksum if configured to do so */
+ #if IS_ENABLED(CONFIG_IPV6)
+diff --git a/net/netfilter/ipvs/ip_vs_xmit.c b/net/netfilter/ipvs/ip_vs_xmit.c
+index ce542ed4b013..ae3ed2c00ec3 100644
+--- a/net/netfilter/ipvs/ip_vs_xmit.c
++++ b/net/netfilter/ipvs/ip_vs_xmit.c
+@@ -1100,7 +1100,7 @@ ipvs_gue_encap(struct net *net, struct sk_buff *skb,
+ 	dport = cp->dest->tun_port;
+ 	udph->dest = dport;
+ 	udph->source = sport;
+-	udph->len = htons(skb->len);
++	udp_set_len_short(udph, skb->len);
+ 	udph->check = 0;
+ 
+ 	*next_protocol = IPPROTO_UDP;
+diff --git a/net/netfilter/nf_conntrack_proto_udp.c b/net/netfilter/nf_conntrack_proto_udp.c
+index cc9b7e5e1935..8a5675983e7c 100644
+--- a/net/netfilter/nf_conntrack_proto_udp.c
++++ b/net/netfilter/nf_conntrack_proto_udp.c
+@@ -41,11 +41,22 @@ static void udp_error_log(const struct sk_buff *skb,
+ 	nf_l4proto_log_invalid(skb, state, IPPROTO_UDP, "%s", msg);
+ }
+ 
++static bool udp_validate_len(struct sk_buff *skb,
++			     const struct udphdr *hdr,
++			     unsigned int dataoff)
++{
++	unsigned int udplen = udp_get_len_short(hdr);
++	unsigned int skblen = skb->len - dataoff;
++
++	if (udplen > skblen || udplen < sizeof(*hdr))
++		return false;
++	return true;
++}
++
+ static bool udp_error(struct sk_buff *skb,
+ 		      unsigned int dataoff,
+ 		      const struct nf_hook_state *state)
+ {
+-	unsigned int udplen = skb->len - dataoff;
+ 	const struct udphdr *hdr;
+ 	struct udphdr _hdr;
+ 
+@@ -57,7 +68,7 @@ static bool udp_error(struct sk_buff *skb,
+ 	}
+ 
+ 	/* Truncated/malformed packets */
+-	if (ntohs(hdr->len) > udplen || ntohs(hdr->len) < sizeof(*hdr)) {
++	if (!udp_validate_len(skb, hdr, dataoff)) {
+ 		udp_error_log(skb, state, "truncated/malformed packet");
+ 		return true;
+ 	}
+diff --git a/net/netfilter/nf_log_syslog.c b/net/netfilter/nf_log_syslog.c
+index e37b09b3203b..71dff0eb672c 100644
+--- a/net/netfilter/nf_log_syslog.c
++++ b/net/netfilter/nf_log_syslog.c
+@@ -301,7 +301,7 @@ nf_log_dump_udp_header(struct nf_log_buf *m,
+ 
+ 	/* Max length: 20 "SPT=65535 DPT=65535 " */
+ 	nf_log_buf_add(m, "SPT=%u DPT=%u LEN=%u ",
+-		       ntohs(uh->source), ntohs(uh->dest), ntohs(uh->len));
++		       ntohs(uh->source), ntohs(uh->dest), udp_get_len_short(uh));
+ 
+ out:
+ 	return 0;
+diff --git a/net/netfilter/nf_nat_helper.c b/net/netfilter/nf_nat_helper.c
+index bf591e6af005..3853f41db499 100644
+--- a/net/netfilter/nf_nat_helper.c
++++ b/net/netfilter/nf_nat_helper.c
+@@ -161,7 +161,7 @@ nf_nat_mangle_udp_packet(struct sk_buff *skb,
+ 
+ 	/* update the length of the UDP packet */
+ 	datalen = skb->len - protoff;
+-	udph->len = htons(datalen);
++	udp_set_len_short(udph, datalen);
+ 
+ 	/* fix udp checksum if udp checksum was previously calculated */
+ 	if (!udph->check && skb->ip_summed != CHECKSUM_PARTIAL)
+diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
+index 8b2f178e317c..90c7dc4e76a1 100644
+--- a/net/psp/psp_main.c
++++ b/net/psp/psp_main.c
+@@ -231,7 +231,7 @@ static void psp_write_headers(struct net *net, struct sk_buff *skb, __be32 spi,
+ 		uh->source = udp_flow_src_port(net, skb, 0, 0, false);
+ 	}
+ 	uh->check = 0;
+-	uh->len = htons(udp_len);
++	udp_set_len_short(uh, udp_len);
+ 
+ 	psph->nexthdr = IPPROTO_TCP;
+ 	psph->hdrlen = PSP_HDRLEN_NOOPT;
+diff --git a/net/sched/act_csum.c b/net/sched/act_csum.c
+index 078d3a27130b..5fff52a8ca90 100644
+--- a/net/sched/act_csum.c
++++ b/net/sched/act_csum.c
+@@ -276,7 +276,7 @@ static int tcf_csum_ipv4_udp(struct sk_buff *skb, unsigned int ihl,
+ 		return 0;
+ 
+ 	iph = ip_hdr(skb);
+-	ul = ntohs(udph->len);
++	ul = udp_get_len_short(udph);
+ 
+ 	if (udplite || udph->check) {
+ 
+@@ -334,7 +334,7 @@ static int tcf_csum_ipv6_udp(struct sk_buff *skb, unsigned int ihl,
+ 		return 0;
+ 
+ 	ip6h = ipv6_hdr(skb);
+-	ul = ntohs(udph->len);
++	ul = udp_get_len_short(udph);
+ 
+ 	udph->check = 0;
+ 
+diff --git a/net/xfrm/xfrm_nat_keepalive.c b/net/xfrm/xfrm_nat_keepalive.c
+index 458931062a04..906458f3d8c5 100644
+--- a/net/xfrm/xfrm_nat_keepalive.c
++++ b/net/xfrm/xfrm_nat_keepalive.c
+@@ -133,7 +133,7 @@ static void nat_keepalive_send(struct nat_keepalive *ka)
+ 	uh = skb_push(skb, sizeof(*uh));
+ 	uh->source = ka->encap_sport;
+ 	uh->dest = ka->encap_dport;
+-	uh->len = htons(skb->len);
++	udp_set_len_short(uh, skb->len);
+ 	uh->check = 0;
+ 
+ 	skb->mark = ka->smark;
 -- 
 2.54.0
 
