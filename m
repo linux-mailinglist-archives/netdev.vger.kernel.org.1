@@ -1,389 +1,191 @@
-Return-Path: <netdev+bounces-304993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304994-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 90MKA4mXS2qZWAEAu9opvQ
-	(envelope-from <netdev+bounces-304993-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 13:54:49 +0200
+	id +XzGOUqWS2ofWAEAu9opvQ
+	(envelope-from <netdev+bounces-304994-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 13:49:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0AD371020A
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 13:54:47 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77DBA710131
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 13:49:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=mh14CfjX;
-	dmarc=pass (policy=reject) header.from=nvidia.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304993-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304993-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=e4A6jFZ4;
+	dkim=pass header.d=redhat.com header.s=google header.b=jKu58+bi;
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304994-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304994-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0AB4B3036D75
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 11:49:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C60D1300EE96
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 11:49:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 016FB4219EB;
-	Mon,  6 Jul 2026 11:48:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EBED41F7D4;
+	Mon,  6 Jul 2026 11:49:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011009.outbound.protection.outlook.com [52.101.57.9])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B61E41DEE2;
-	Mon,  6 Jul 2026 11:48:49 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783338532; cv=fail; b=OaWfuB7W7cFtBG+kzSjkLBbxuvdZffTx5Cn5iTBivvpyEyvdf0PuDwPnawLsSlw27Jtu9UkokEGwfjzGZe4p4mxbw2omfKF8Ooqv5efjNwrom03t8XD3GbOLDh7Cxh+OAgvkUFjfk5lMZVAAYPbXilxQ/bYUcuh5eUY7TWM++1g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783338532; c=relaxed/simple;
-	bh=ABzRG8TUzuMkUH582GBV3VtSHRB/XpX3awmdPQAXydw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=rNy7032NmQ48V1/ohJ6emeDxinsvWu9zT2T9p2Qr9qk5Sr5mY+W22cQkyEOKia5uOd0LlSVlIkmefgrptigOmvxBrf2v33T8dgTu5nFMEutI+s/d00LnmEzf3e2FO1UpGeWXqeNqYxUckvEUTzEkto9cpTaLfzzpyq5+e3Fr5go=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mh14CfjX; arc=fail smtp.client-ip=52.101.57.9
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=m82OdOP6qgcOR6t6eC85ghfpE4KvY6bW6LU5VF8p293mbU+8ynctKc4uYQuh7x1NSgRuBqK7CKGBZnGFVcBGDtNktIDW1drMS4dCe53ZdI6Lkm5k+hUqRkhpeb2WjTnJKlhO8doCutjEqd7LEnh5wghrSni8iwawfBXmLKqv5AAn6m3z2x146QFvdsF5R5N7m1P+h8DVHH3/OLS6irMoyKX93jQeKFoDsIuhZqXFMliyt15kazu4ZzVIRyKUPwrfAcqV2hxe1aAuW7ILBMmTc19Mv/MbYch/RJpEwhZMMFCVL0owimec3ORYuT0vskBK+t664dAE7iQ/F5eYJhdM5A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kovUrn2/LwGyv2D7w+tzb3L2a4wEP+MG2Hn/jlksr0g=;
- b=wjIg46xw2OtL0jaeW0j40F+hzlgZPf6W1PDSlOyWlo5yzN1BgfEeuJqprmBofADeLpYLTlfHr3bjSZ7hCwRCICj3+ml36ThFE2E1TqU5hnUK+Ebc0O9JeUp1RZqJ7cMNz0BeqOjy3JG5O8t9I3Z4sj2pFcHPuOuOzEQa6x2dm7aK9ahn63WFIgA8PZEcrzKpxEcyQDbmWTjWB/zkqPuFR/Mo6HO4Q40iMmthEtbY8y1I7npoRKvopnuRDlSHizcQGfaFKXeZjNRFqW8J8iaS9qWo83fSSocKd2OplqbZX9xQyHM+kwmS/I1ou5YTKBpRW7M7UoC9btwzFPTCU/dt+Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kovUrn2/LwGyv2D7w+tzb3L2a4wEP+MG2Hn/jlksr0g=;
- b=mh14CfjXFUAO1BSIdmd2RUpK+99wif8e9N+yp3sGD/goUueXLaUgVGTfq5hsot/j6JdignjNRNEODNAojiVrw0VcHYF5rorTNly2Tqjp6SXLxHBTKCS54+2endG72rmih7eRS+heo3/VV5jplqnvvC1B4g5WrmGrFF5eqD/CQFiHwgIMhOPVtWCmcsFC4Hpaju3y9DDWULRSEqT3mAMiKUpLX8WO2bMC2xJ3BZ3B2y3FvLdebyk/uiosx3AcaUkcka1Zit3ndNjcXvSi98yGc/WuINKR0g5wN25wxICNYinDfmr9idpdsBP9F2dRYU+pIuJ2FaFbfR8xmZ1zD7KCig==
-Received: from CH3PR12MB8728.namprd12.prod.outlook.com (2603:10b6:610:171::12)
- by LV2PR12MB999073.namprd12.prod.outlook.com (2603:10b6:408:352::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.10; Mon, 6 Jul
- 2026 11:48:46 +0000
-Received: from CH3PR12MB8728.namprd12.prod.outlook.com
- ([fe80::2641:1046:bdf3:93d7]) by CH3PR12MB8728.namprd12.prod.outlook.com
- ([fe80::2641:1046:bdf3:93d7%6]) with mapi id 15.21.0181.009; Mon, 6 Jul 2026
- 11:48:46 +0000
-Message-ID: <5557a08f-6d53-4425-8004-b7f0bbcd8a50@nvidia.com>
-Date: Mon, 6 Jul 2026 13:48:41 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/mlx5e: bound TX CQ poll softirq residency
- with a time budget
-To: "Jose Fernandez (Anthropic)" <jose.fernandez@linux.dev>,
- Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, Ben Cressey <ben@cressey.dev>
-References: <20260703-mlx5e-tx-cq-time-budget-v1-1-6da2cfe9c7b1@linux.dev>
-Content-Language: en-US
-From: Dragos Tatulea <dtatulea@nvidia.com>
-In-Reply-To: <20260703-mlx5e-tx-cq-time-budget-v1-1-6da2cfe9c7b1@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0318.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:eb::18) To CH3PR12MB8728.namprd12.prod.outlook.com
- (2603:10b6:610:171::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0011B414A37
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 11:49:24 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783338566; cv=none; b=MP+pg2HU5Mh2TSPbFGMH1ky1BblaD7ABPAraJjk3HLDWtDntiX6wJvE2TJu+m0ABN1zW18AibI6TFG064XhE2WKFF1SaRjCNOHbyUOBsHiAtrwu/6uTuAwdu372TU4YpY/bDdSJazqXU+AsQfjW2cnX2Ywtt1iBLol4iur969wQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783338566; c=relaxed/simple;
+	bh=ej669tqdQRBrUGwoO+9YEmnfZjZOl4s5UHB7MEdZfF4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=M8YakVNAvDIKi40XyXGfVGBp0IH5Y9Ap24K2oGruozSzoNXqe/O68O4L95F0kr0Nj7hgjGFtSc/jDs3VX8nMSMCwgTJ8D5pWM82w5iOTBc3FJMGN4Z1MwkqUze84Scw0xql/eUrewr0aSOYyrkTnQwR6qvUC5jENJl+dfWkEyck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e4A6jFZ4; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=jKu58+bi; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783338564;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ej669tqdQRBrUGwoO+9YEmnfZjZOl4s5UHB7MEdZfF4=;
+	b=e4A6jFZ4iG1eZr5xBsRt2hLGTX120osrX88wetYam0Cg+XnzClLXfXTQ/Rkxv8g5F+q9sH
+	fpyQ39wKhHchmVX7pdzOKUcoakjZOBGlmLEgexYLwtK0FdVHaNkkasVMkIrUUO4h47aTEm
+	YcK7deUlzblpm0IiKivbYoqn9OvKS44=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-343-AEpNDNNKMieQuZWthZHNFg-1; Mon, 06 Jul 2026 07:49:22 -0400
+X-MC-Unique: AEpNDNNKMieQuZWthZHNFg-1
+X-Mimecast-MFC-AGG-ID: AEpNDNNKMieQuZWthZHNFg_1783338561
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-c12792a87d1so211932666b.1
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 04:49:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1783338561; x=1783943361; darn=vger.kernel.org;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ej669tqdQRBrUGwoO+9YEmnfZjZOl4s5UHB7MEdZfF4=;
+        b=jKu58+bi/uwSZJhHtAswirNFDHNTG28+UPWscDa00BiRC7d5scqZP1EtXla+kYGCWS
+         O4ZJQqATXO7pw7wpvntlsf/A4cLYt4gA+f1SSjPXKa1wm0Hpsd8fWfvEOmmjC9QTHVEl
+         fvRfQqGfgItMK7folGDSv0RKt2dGIj1g/9uB0HIcfDLKz7AG3G/KJdP41oPXfW0G1ZF0
+         EjTtc6yTVHIMIHvZxXLfepbsTwUMvQ5LDmEHAOuS7Q4PO8yKRNNJIA7yC8hQvprXUIyf
+         Nh21TjKiWzq/BGM5gQY/356lgURGZ7LnTvxc8c4ZK0TVQZsdAe7DARxjJJAtZu1jBsxZ
+         u5XA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783338561; x=1783943361;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ej669tqdQRBrUGwoO+9YEmnfZjZOl4s5UHB7MEdZfF4=;
+        b=lzer8kKWz5xjjxn+E9hugMTBJJL89YEitqCEq7wfmSIsU/8W09rVkTmEAqKles4GB2
+         Bsy4DOB60Ev1D0mN59PfdPzr17RKZeiSSPWOwo3dwyW6Rz0rl7vkcC0Cmd4SfsPfSlKS
+         30UC1akFvbhwjSD+2DVPKwd17L+kZknXRiPBitspVd1Tb+gwkcDy3lUai1vrOL9L+QsT
+         XVxTBzPPN95PfVGyqP8lj7yLFXxStYtYbp01pOSgah9TcJTbLM2YjPA2hEzKtNksHdkK
+         MM16jNXAQTjODXaO7+tO9dPGjJdD338qPNmP2b5gy1esBd8nLeqDE+WZQpGmeMfNfLU6
+         Kw6w==
+X-Gm-Message-State: AOJu0YzkUNyP1I6BYL2DGwna1VMIxm4f3oQcoKBpARVb9/vShdNjDnrk
+	11+vXHrz/KAjWDmPMw8UmfT/qju5ep2vmwcnSYLKbkPRDQFpaxTT2Vh9qCIjZ3ku5bA8jMPHX8h
+	ebR9RmesfFBvUbivkyNdn6Co9+9TkOoQcfqxB0KsUm3U+PSY3StvLbg1XMw==
+X-Gm-Gg: AfdE7ckvBTW/9vWBGcIM780ZZOIn2cr3BXKhiKfYl66Ko9KklxaRLYKppReDpZ/66z6
+	PlSVlvgaZG1/fzoLbjdLSW9HYF7XPmbprVZqKHlKpdRnEGjRWZXs6la4vdajsVLdg5BMDwvsb4g
+	w/xPNRdqi6FbDfPgKKqQAyIryoBSHpV+ezt4geTTZEb62GK6r7exmmcfE/jvtHVFXEFC+KHD3oV
+	1hPlEbbwVjIGvySNS45N8X79CL7TxSSfsrpZx0Q1nW3SeqMhw1wshd/yKqCZpGPHSnWdGWlZ6eh
+	Dm0MV0LVC4WN9RP6cmJLgtF579loxgIDm/itJvZviG9YNNlfRBwHXsl0edHN7IOL6EjAC2NaxJe
+	mbyKrf5sCYjQ8GAc4uaEsavDbExUE97ExOrxbcuzYG4PUB8CCaQ1FhSi70Fo=
+X-Received: by 2002:a17:907:399b:b0:c12:9b93:61fd with SMTP id a640c23a62f3a-c15a67dcb6amr12179566b.6.1783338561112;
+        Mon, 06 Jul 2026 04:49:21 -0700 (PDT)
+X-Received: by 2002:a17:907:399b:b0:c12:9b93:61fd with SMTP id a640c23a62f3a-c15a67dcb6amr12177866b.6.1783338560626;
+        Mon, 06 Jul 2026 04:49:20 -0700 (PDT)
+Received: from [10.44.49.24] (5920ab7b.static.cust.trined.nl. [89.32.171.123])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c12b628c16fsm752234066b.37.2026.07.06.04.49.19
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 06 Jul 2026 04:49:20 -0700 (PDT)
+From: Eelco Chaudron <echaudro@redhat.com>
+To: Asim Viladi Oglu Manizada <manizada@pm.me>
+Cc: netdev@vger.kernel.org, dev@openvswitch.org, aconole@redhat.com,
+ i.maximets@ovn.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net] net: openvswitch: reject oversized nested action
+ attrs
+Date: Mon, 06 Jul 2026 13:49:17 +0200
+X-Mailer: MailMate (2.0r6292)
+Message-ID: <EECA04B1-CDC4-4902-9DF3-4DE93515E6EF@redhat.com>
+In-Reply-To: <20260706094336.38639-1-manizada@pm.me>
+References: <20260706094336.38639-1-manizada@pm.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8728:EE_|LV2PR12MB999073:EE_
-X-MS-Office365-Filtering-Correlation-Id: dc119cf9-05e5-4fce-937a-08dedb548969
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|1800799024|23010399003|366016|921020|15056099003|6133799003|18002099003|22082099003|11063799006|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	p6ibow2XCXWjSMPRO975CMyxoO4Gd7zRJ2UAEoF/VgZOFekHQ0cNf2820wYHChFWeqrRpIRxRyCRQmGDKoxdURifqP3pmb4vyLbBl4ZqzYvY4BMWuzRnLHgpfcgDf+RkXV1XIJPgWDqfj+CIlr0olqMrgQbWzsjr9fm9G98f2/M7b2XOf8YeGpnYQoEb8NEQ8fp9fevbVrNbtp1FdSX+HViFMu2euSXsAyP1cFYFFxPIj/ujW8eCASgVFHOhn95K0QlLn5ly1nvwkO9Evs6pzjDf5YbvoV7Q204KrObYg2QTVIoKa5heOaVdgzx4b1egltnretkYZAmsr1Zmq1hPYZA4PzM2oZyqLv5fjGuf/Gh5goXZF23IWHWdACPKDfqH5vqvbHHlhkee0lWOOp6/F+H+Rt2C/+o9ZAbLRZE/yqPHcX4GFvzEjsaqStCZGWxgRUnl804opHK78XLjEd5Z5mCZBzk4dZfo7YYqJJd1d5JHMG5RHSsjbG/yoMg7hmhoCoCCIDtXPSe/nonw+RMvDx3PY2NrpDhRohmM4nYuGG1NNoadu8EIOEM+oKhXdNCU00HbZEZGaj0ZLLMG4iyUUnsLkpPmgnA1v72FQ3k5r5bwRwbVzWZlAXc0yMfum2F1Yf1GFdFVgy1hC04r06Y/L94a0HORCPkxf8VPaKQV6svtbt+PijqZQ6DP8fl4cItM2UmhX8G77u4B3SvGhmwpAQ==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8728.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(23010399003)(366016)(921020)(15056099003)(6133799003)(18002099003)(22082099003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?N1dYUi9YNjViNnkxUHVYWjJwWVBjd3pLb3R4S3VNbnd5RmRhUnBKdWNQLzlB?=
- =?utf-8?B?d21OQXl4dnNXSTlGUEV5L1JPdUtvOTlMbjdRay9RckxaSzZjRUpTOGNIRkJs?=
- =?utf-8?B?K3lVU3ZYSTY1bVpNWm41cENndGwwdzN6YUFYTGw0QjNzbW5XWEdGaWRiOWk1?=
- =?utf-8?B?Sys4TUpoV3RKTkJ0SVd6TUszTjlFNDl4S0NvK2dzSmdpcWhLY0dTRzBoZjFa?=
- =?utf-8?B?eXcyT1hDajhGalZ3aGdiNktSR1VpSEVjeG4rYVQveHhnRVVQRWZQay9BZjEr?=
- =?utf-8?B?UU5ja2F3QUhmMnJPNC85YmxaeE5tRkNoVlBaUXZ3VHV5d29Id1pmUkQxcWY5?=
- =?utf-8?B?VmVCVmNxTDBvbzBMczdlc01tcFZSbm9qd0JUcGh6K2ZsNjZWRWw0WnR2U2hN?=
- =?utf-8?B?YUlxRTh1MVdhQ25JRm9yaFU1WjhMMXJaZWhENDZQcFRidDd1YVRvVkJzSG1U?=
- =?utf-8?B?aVcvS1MyTFMvdWg2NWRxbTdTQUtwdmNOalhxZEkydFFzSi9Zd012N1hMM3NC?=
- =?utf-8?B?b0lSUVh4VFh3UkJCc3NMOWF1VlBLN3JPY3hjMUtTZFlxVXJUWFE3S2RxUnhV?=
- =?utf-8?B?eTNYNmpENThNMXUvUUJ0eWRrSGpVQVdiT3pZMEpleXVycktGRkZwOEg3OFFJ?=
- =?utf-8?B?VDB4MXdOMWJEU0ZMQjJJQzl3NWtPZG1vQk5GSlVqc2VZOW9LdDRpZmVkd0d6?=
- =?utf-8?B?SEtqTHQrcFkrUzJlODJIOURzcUEyWGIxaWIveUU5WmRrWjlUcmVESHRhVmxY?=
- =?utf-8?B?ZkM5T0RyUWVEV1NBQnYxdmRuR0VzbUdwNFo0MXBIeTcyN005RTYxcGI4cWhX?=
- =?utf-8?B?L2RkblpPZG5wZkNWdkNySk9KWWFTRGJVNHNOVTc3Y0IweG93TktUdi9lVHhD?=
- =?utf-8?B?dXhkN2RUemYwT2s0SUNNcEhQLzEwNXMvQUlIRFZRN05XVXlGM3ExOTJxOFVx?=
- =?utf-8?B?K3lPYktYdU1BK2lsdFVnTHZ0cVdZZ1RjdHRkVVFtSVN4N0ZGSldVOEdRUzBh?=
- =?utf-8?B?TURiOGYxTGNCZHhWdkw3QTFUbFVrZVlZVEx2M1oxVU1oQ2xzVUxiU0syenpW?=
- =?utf-8?B?Q1RiYURTNEtGYitCcHNOUTMvS0lOMU1FRDZXdHB2MTl2eERJMmJqaTQzb0VH?=
- =?utf-8?B?a2NlZ0ZCeXBST1oxMkRqaVFOdzFmaHMxL2dWTE1LWXhPNWxBRGlPS1M1SGx1?=
- =?utf-8?B?M1FXVWR0OElZajc3MkQ4VXJsWU5XeXVsWmN4ZTBoMHlpcmYzQlN5bUpvelp0?=
- =?utf-8?B?a21ZZU55K1pYcytveEhZYVY4MEFEZEo2M0VjYTNKQnJ1WUkvcExIUm5qNGd5?=
- =?utf-8?B?S3o4dlMrQ29aOURNL3pvQ1N1cng0eEdnRExFVmJQY2txeldIMDhzT04wNW9F?=
- =?utf-8?B?bTJQcDQ4YXBuYmlyYmovUjlYdXJ1dzk2TWpvdU9seWVGOW9ubFI5Rk0rcTNN?=
- =?utf-8?B?ZDlZREVoMUZaeE1HSVlVQ1FyeW1MTzZZMFFjZEo3bk9mdUFEWWNlQU4xZTZq?=
- =?utf-8?B?OTNqM0haenVOR2lUMHBlUU1MRFRUdUtRRFF0QnlCSWtMS1ZmdU9nM1FUZTBG?=
- =?utf-8?B?VUkxYTg3dllYeDJ4NHA3dGRReUY2QUd5ZzYxcUsrWUQ3eHBjTEpuYXloUWhy?=
- =?utf-8?B?eTRJMkpoQUJvTzhvcitDUXdkNmE1cXVlTk1jT25ZUE1ScktBSE1rV29Fcmp5?=
- =?utf-8?B?L05XLzFyK1VkcGNiOUJVcVlKRlp6MGFZdU83NWw1K1JLWVEzT29RRzNtTVZ1?=
- =?utf-8?B?eStHL3NlU3BhNnZYR1R4NFlidk5LSGJUTWVJMGZvaW8wZ1o1ZGhIV25BOEJw?=
- =?utf-8?B?aTIxZloyMklEVnBzWENoNi9ZczNwbkRsalFsaERqZUtCMHptdGpETkVWVkpI?=
- =?utf-8?B?Q3paZXF4cXMyUEdtVzZ2MlhhTi9waHVOZ1dwajFiMlgvMlloWHlrRCttOW1y?=
- =?utf-8?B?dTVGcnVuZTMxUG5xeDUzYVFJYlQ1Q01aL0d2eUxsbGdoNVVxUUFsalgvb2k3?=
- =?utf-8?B?cER5R0hZV01ySEo1bzFxM2luelFxbllJWVlSUzVzS2J3dWpGVk5pVUMxSjc1?=
- =?utf-8?B?WWl6UnVMb051WmFyZ2FLZTEzM3dyQlNqL3dEM1BrMW5VK2wxT0hqVmhkMkxH?=
- =?utf-8?B?cUIrZ0RYYW93d0Y2YnZlenRDTkZTU09URWZlL0I0b000Tlg4TWw0elJTMUs4?=
- =?utf-8?B?VDB3V3M5aTNLVXZrby9oa255NGVGeks2QU1sZ0JUNVkxTEUyazVKTlQ4cEJU?=
- =?utf-8?B?Um1DRGx0eUdwR28rRHhDMEJUTzNoUGFXUWNjMEk1L0hlek5TS1hvcGZCYzRR?=
- =?utf-8?B?azZLdUI3eTRKR0U4S085T0tKcCsrOEpMMlB4ZkFUSFFEVEp5QnI3Zz09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dc119cf9-05e5-4fce-937a-08dedb548969
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8728.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2026 11:48:46.4887
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OhljRQVUOn9yoCQdq6v1i6DIrJkYQ20HJbk1tuHQVOYGrTTeGbir7B2atha762+690im5NTxlA4xPmJTHAgfYQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB999073
+Content-Type: text/plain
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304993-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-304994-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER(0.00)[echaudro@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[dtatulea@nvidia.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:manizada@pm.me,m:netdev@vger.kernel.org,m:dev@openvswitch.org,m:aconole@redhat.com,m:i.maximets@ovn.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jose.fernandez@linux.dev,m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:leon@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ben@cressey.dev,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dtatulea@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[echaudro@redhat.com,netdev@vger.kernel.org];
 	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nvidia.com:mid,nvidia.com:from_mime,vger.kernel.org:from_smtp,cressey.dev:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,pm.me:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F0AD371020A
+X-Rspamd-Queue-Id: 77DBA710131
 
-Hi Jose,
 
-Thanks for your patch.
 
-On 03.07.26 03:36, Jose Fernandez (Anthropic) wrote:
-> Under strict IOMMU invalidation (iommu.strict=1), each per-fragment DMA
-> unmap in the TX completion path issues a synchronous TLB invalidate and
-> waits for CMD_SYNC, spinning IRQ-off in the SMMU command queue. Under
-> cross-CPU command-queue contention this per-unmap cost inflates from
-> microseconds to hundreds of microseconds. mlx5e_poll_tx_cq()'s per-CQE
-> budget (128) does not bound time in this regime: one CQE can cover a
-> multi-WQE batch with many fragments, so a single poll invocation can
-> accumulate seconds of softirq residency and trip the soft-lockup
-> watchdog on arm64/SMMU-v3 systems.
-> 
-This is interesting. I can think of 2 cases here which can overlap:
+On 6 Jul 2026, at 11:44, Asim Viladi Oglu Manizada wrote:
 
-1) Packets are sent with xmit_more which trigger this many WQEs per
-  CQE scenario.
+> Open vSwitch stores generated flow actions as nlattrs, whose nla_len
+> field is u16. Commit a1e64addf3ff ("net: openvswitch: remove
+> misbehaving actions length check") allowed the total sw_flow_actions
+> stream to grow beyond 64 KiB, which is valid, but also removed the last
+> guard preventing a generated nested action attribute from exceeding
+> U16_MAX.
+>
+> An oversized generated container can thus be closed with a truncated
+> nla_len. A later dump or teardown then walks a structurally different
+> stream than the one that was validated. In particular, an oversized
+> nested CLONE/CT action may cause subsequent bytes in the generated
+> stream to be interpreted as independent actions.
+>
+> Keep the larger total-action-stream behavior, but make nested action
+> close reject generated containers that do not fit in nla_len, and return
+> the error through all callers. For recursive SAMPLE, CLONE, DEC_TTL, and
+> CHECK_PKT_LEN builders, trim resource-owning action-list tails in reverse
+> construction order before discarding failed wrappers, so resources copied
+> into the rejected tails are released before the wrappers are removed.
+>
+> Most failed outer wrappers are discarded by truncating actions_len after
+> child resources have been released. CHECK_PKT_LEN also trims its parent
+> after branch resources are gone. SET/TUNNEL close failures unwind their
+> known tun_dst ownership directly, and SET_TO_MASKED has no external
+> ownership and truncates on close failure.
+>
+> Fixes: a1e64addf3ff ("net: openvswitch: remove misbehaving actions length check")
+> Cc: stable@vger.kernel.org
+> Assisted-by: avom-custom-harness:gpt-5.5-qwen3.6-mod-mix
+> Signed-off-by: Asim Viladi Oglu Manizada <manizada@pm.me>
 
-2) TSO packets can have many fragments so even a single WQE will have
-   more than one DMA unmap. For the default GSO size of 64K each TSO
-   skb will have 2 fragments on your platform. If the GSO is bumped to
-   256K then you usually get ~5 fragments.
+Thanks Asim for the patch, and Ilya for the offline review.
 
-Let's first understand if this is a case of 1) (small packets sent
-with xmit_more) or 2) (many TSO packets) or 1+2) (many TSO packets sent
-with xmit_more).
+The changes look good to me.
 
-If xmit_more is used then you can actually tune the BQL to avoid this
-behavior which seems to wreak havoc on your configuration.
+Reviewed-by: Eelco Chaudron <echaudro@redhat.com>
 
-> Bound the invocation by time: check local_clock() every 8 CQEs against
-> a budget (default 500us; module parameter tx_cq_time_budget_us,
-> runtime-writable, 0 disables) and break out of the CQE loop when
-> exceeded, reporting busy exactly like the existing CQE-budget
-> exhaustion path so NAPI keeps the poll scheduled. Remaining
-> completions are delayed by one reschedule, never stranded. The inner
-> WQE walk is never interrupted mid-CQE (sqcc/dma_fifo_cc accounting).
-> A new ethtool statistic (tx_time_budget_exit) counts early exits.
-> 
-> Also add cond_resched() in mlx5e_free_txqsq_descs(): the teardown path
-> walks the same per-fragment unmaps in process context.
-> 
-> Tested on arm64 with SMMU-v3 under strict mode: throughput cost is
-> within run-to-run variance at every measured load shape; under active
-> invalidation-storm contention, the bounded poll measures 35-50%
-> faster than unbounded (bounded polling yields cores back to the
-> transmit path).
-> 
-The bounded poll is faster because it is interrupted earlier or is
-it faster because it results in less contention on the IOMMU?
-
-> Assisted-by: Claude:unspecified
-> Signed-off-by: Jose Fernandez (Anthropic) <jose.fernandez@linux.dev>
-> Reviewed-by: Ben Cressey <ben@cressey.dev>
-> ---
->  drivers/net/ethernet/mellanox/mlx5/core/en_stats.c |  5 ++++
->  drivers/net/ethernet/mellanox/mlx5/core/en_stats.h |  2 ++
->  drivers/net/ethernet/mellanox/mlx5/core/en_tx.c    | 29 +++++++++++++++++++++-
->  3 files changed, 35 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
-> index 7f33261ba655..b940280af19d 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
-> @@ -171,6 +171,7 @@ static const struct counter_desc sw_stats_desc[] = {
->  	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, tx_cqes) },
->  	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, tx_queue_wake) },
->  	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, tx_cqe_err) },
-> +	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, tx_time_budget_exit) },
->  	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, tx_xdp_xmit) },
->  	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, tx_xdp_mpwqe) },
->  	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, tx_xdp_inlnw) },
-> @@ -426,6 +427,7 @@ static void mlx5e_stats_grp_sw_update_stats_sq(struct mlx5e_sw_stats *s,
->  	s->tx_queue_wake            += sq_stats->wake;
->  	s->tx_queue_dropped         += sq_stats->dropped;
->  	s->tx_cqe_err               += sq_stats->cqe_err;
-> +	s->tx_time_budget_exit      += sq_stats->time_budget_exit;
->  	s->tx_recover               += sq_stats->recover;
->  	s->tx_xmit_more             += sq_stats->xmit_more;
->  	s->tx_csum_partial_inner    += sq_stats->csum_partial_inner;
-> @@ -2323,6 +2325,7 @@ static const struct counter_desc sq_stats_desc[] = {
->  	{ MLX5E_DECLARE_TX_STAT(struct mlx5e_sq_stats, cqes) },
->  	{ MLX5E_DECLARE_TX_STAT(struct mlx5e_sq_stats, wake) },
->  	{ MLX5E_DECLARE_TX_STAT(struct mlx5e_sq_stats, cqe_err) },
-> +	{ MLX5E_DECLARE_TX_STAT(struct mlx5e_sq_stats, time_budget_exit) },
->  };
->  
->  static const struct counter_desc rq_xdpsq_stats_desc[] = {
-> @@ -2399,6 +2402,7 @@ static const struct counter_desc ptp_sq_stats_desc[] = {
->  	{ MLX5E_DECLARE_PTP_TX_STAT(struct mlx5e_sq_stats, cqes) },
->  	{ MLX5E_DECLARE_PTP_TX_STAT(struct mlx5e_sq_stats, wake) },
->  	{ MLX5E_DECLARE_PTP_TX_STAT(struct mlx5e_sq_stats, cqe_err) },
-> +	{ MLX5E_DECLARE_PTP_TX_STAT(struct mlx5e_sq_stats, time_budget_exit) },
->  };
->  
->  static const struct counter_desc ptp_ch_stats_desc[] = {
-> @@ -2476,6 +2480,7 @@ static const struct counter_desc qos_sq_stats_desc[] = {
->  	{ MLX5E_DECLARE_QOS_TX_STAT(struct mlx5e_sq_stats, cqes) },
->  	{ MLX5E_DECLARE_QOS_TX_STAT(struct mlx5e_sq_stats, wake) },
->  	{ MLX5E_DECLARE_QOS_TX_STAT(struct mlx5e_sq_stats, cqe_err) },
-> +	{ MLX5E_DECLARE_QOS_TX_STAT(struct mlx5e_sq_stats, time_budget_exit) },
->  };
->  
->  #define NUM_RQ_STATS			ARRAY_SIZE(rq_stats_desc)
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
-> index 09f155acb461..5ba954f42ccd 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
-> @@ -187,6 +187,7 @@ struct mlx5e_sw_stats {
->  	u64 tx_cqes;
->  	u64 tx_queue_wake;
->  	u64 tx_cqe_err;
-> +	u64 tx_time_budget_exit;
->  	u64 tx_xdp_xmit;
->  	u64 tx_xdp_mpwqe;
->  	u64 tx_xdp_inlnw;
-> @@ -445,6 +446,7 @@ struct mlx5e_sq_stats {
->  	u64 cqes ____cacheline_aligned_in_smp;
->  	u64 wake;
->  	u64 cqe_err;
-> +	u64 time_budget_exit;
->  };
->  
->  struct mlx5e_xdpsq_stats {
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
-> index 0b5e600e4a6a..994df912b765 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
-> @@ -43,6 +43,13 @@
->  #include "en_accel/macsec.h"
->  #include "en/ptp.h"
->  #include <net/ipv6.h>
-> +#include <linux/moduleparam.h>
-> +#include <linux/sched/clock.h>
-> +
-> +static unsigned int mlx5e_tx_cq_time_budget_us = 500;
-> +module_param_named(tx_cq_time_budget_us, mlx5e_tx_cq_time_budget_us, uint, 0644);
-> +MODULE_PARM_DESC(tx_cq_time_budget_us,
-> +		 "Max microseconds one TX CQ poll may spend before yielding (0 = unbounded)");
->  
->  static void mlx5e_dma_unmap_wqe_err(struct mlx5e_txqsq *sq, u8 num_dma)
->  {
-> @@ -760,9 +767,12 @@ void mlx5e_txqsq_wake(struct mlx5e_txqsq *sq)
->  bool mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget)
->  {
->  	struct mlx5e_sq_stats *stats;
-> +	bool time_exceeded = false;
-> +	u64 time_budget_end = 0;
->  	struct mlx5e_txqsq *sq;
->  	struct mlx5_cqe64 *cqe;
->  	u32 dma_fifo_cc;
-> +	u32 budget_us;
->  	u32 nbytes;
->  	u16 npkts;
->  	u16 sqcc;
-> @@ -790,6 +800,10 @@ bool mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget)
->  	/* avoid dirtying sq cache line every cqe */
->  	dma_fifo_cc = sq->dma_fifo_cc;
->  
-> +	budget_us = READ_ONCE(mlx5e_tx_cq_time_budget_us);
-> +	if (budget_us)
-> +		time_budget_end = local_clock() + (u64)budget_us * NSEC_PER_USEC;
-> +
->  	i = 0;
->  	do {
->  		struct mlx5e_tx_wqe_info *wi;
-> @@ -842,8 +856,19 @@ bool mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget)
->  			stats->cqe_err++;
->  		}
->  
-> +		/* Check between CQEs only (sqcc/dma_fifo_cc must advance together). */
-> +		if (unlikely(time_budget_end && (i & 7) == 7 &&
-> +			     local_clock() >= time_budget_end)) {
-> +			time_exceeded = true;
-> +			i++;
-> +			break;
-> +		}
-> +
->  	} while ((++i < MLX5E_TX_CQ_POLL_BUDGET) && (cqe = mlx5_cqwq_get_cqe(&cq->wq)));
->  
-> +	if (unlikely(time_exceeded))
-> +		stats->time_budget_exit++;
-> +
->  	stats->cqes += i;
->  
->  	mlx5_cqwq_update_db_record(&cq->wq);
-> @@ -858,7 +883,7 @@ bool mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget)
->  
->  	mlx5e_txqsq_wake(sq);
->  
-> -	return (i == MLX5E_TX_CQ_POLL_BUDGET);
-> +	return time_exceeded || (i == MLX5E_TX_CQ_POLL_BUDGET);
->  }
->  
-This change is too invasive in the driver for all the other cases. We have to figure
-another way to go about this issue.
-
-Thanks,
-Dragos
 
