@@ -1,45 +1,44 @@
-Return-Path: <netdev+bounces-304931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304933-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YcWUKR6DS2rASgEAu9opvQ
-	(envelope-from <netdev+bounces-304931-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 12:27:42 +0200
+	id izrABB6HS2rzUgEAu9opvQ
+	(envelope-from <netdev+bounces-304933-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 12:44:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0A6B70F287
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 12:27:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67E0F70F692
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 12:44:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304931-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304931-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304933-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-304933-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9FB863098114
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 09:48:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 12F6E3242C37
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 09:53:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1AE135898;
-	Mon,  6 Jul 2026 09:34:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9433436BD0;
+	Mon,  6 Jul 2026 09:35:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07543E5ED1;
-	Mon,  6 Jul 2026 09:34:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5F29434E41;
+	Mon,  6 Jul 2026 09:35:21 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783330459; cv=none; b=KhQL9JSQ0evbO8OY/qXgEG3SVwsZBxcxaWOzsH0vl+jtu8I7rTYXJaUwrhL3jKbr1pLf84DRF8Ao4OYPk56JTwDEuEdMj+Cko648LalJ/Bju/UCU+tYEksPoZ34E0Ggx8u/G/+10l+CVL1bquxtbIF3EpTwfdkOiLzESFQ+bF8I=
+	t=1783330527; cv=none; b=A1ZsrC9tauVBrZ7nPsWNj9ROzHszJXjLM3fXXlE8UphxE3irRPo/H+LxiX0z8M2Z1k9e+CGumJhX7dvJK+U7Pnya7Nu7+lP4Zjdq2PONK8C3RzUC5EV95xqY7JIkeZjYLQ5L2RYrZfeuCpSvU4ivCcoyOlO8fWiBHiEkaRP2Sdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783330459; c=relaxed/simple;
-	bh=jJM8EHcPKmodcduUHQf+XPYE8Gcu0XLeUc3KfcWOBOU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gpj3uXUmuEypWTvG7NTcPDpAEt9Co0wQBi4tzBTJA9ym2zyIRloMH5LsTTj4BDDCyPQsOdNPIukfyp+HtVz5BYHdGyocKZocLjEsfO9vKFKPRI5E4DI/hks2li79wX+EJ5zp09QJcso/WAZHRcPiWjzXZQyCMjmQvV3vQgGaOMo=
+	s=arc-20240116; t=1783330527; c=relaxed/simple;
+	bh=n0B3B0tyhdS5oTazdgAMUW+gNHDIKtv7VjTt/R0pbVI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qK1jZalg/91adK0YqOzHaiX7PclLxGK+kCsJ6RLNa8H8mFGI81rFL46pdfyjjYM6mmnBRM1H7HSwl9hk5DD+o+g7VvArWbKcNZUUvHMzqn2FmIAqPK6j0P0mZKbLCnkImeG7qydhBWqIRJhxePMGbhvzJwD3KhzKt9yU0zf3gbA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
 Received: from localhost.localdomain (unknown [111.196.245.140])
-	by APP-01 (Coremail) with SMTP id qwCowAD3mNGNdktqhIvxBA--.35187S2;
-	Mon, 06 Jul 2026 17:34:05 +0800 (CST)
+	by APP-01 (Coremail) with SMTP id qwCowAAnwMi_dktq+pDxBA--.1304S2;
+	Mon, 06 Jul 2026 17:34:55 +0800 (CST)
 From: Pengpeng Hou <pengpeng@iscas.ac.cn>
-To: Sudarsana Kalluru <skalluru@marvell.com>
+To: Cai Huoqing <cai.huoqing@linux.dev>
 Cc: Pengpeng Hou <pengpeng@iscas.ac.cn>,
-	Manish Chopra <manishc@marvell.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -47,9 +46,9 @@ Cc: Pengpeng Hou <pengpeng@iscas.ac.cn>,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: bnx2x: validate firmware section bounds without overflow
-Date: Mon,  6 Jul 2026 17:34:03 +0800
-Message-ID: <20260706093403.81017-1-pengpeng@iscas.ac.cn>
+Subject: [PATCH] net: hinic: validate firmware image section bounds
+Date: Mon,  6 Jul 2026 17:34:55 +0800
+Message-ID: <20260706093455.81168-1-pengpeng@iscas.ac.cn>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -58,23 +57,23 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowAD3mNGNdktqhIvxBA--.35187S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZF15Cr4fWr47JFy7tF17trb_yoW8ury3pa
-	1DGFW3Gr47GF13Cw40qa1DZF9Yk393J3yDGFyUCa95Z34Syw1kGas0kay2gr1UGrWkAw1a
-	gFn8AanxuFn0vw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9I14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID:qwCowAAnwMi_dktq+pDxBA--.1304S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxCr4xAr4fZw4UZrW8Jr4kCrg_yoW5KrW8pa
+	95CFW3Kr9rGr4UJwn3ta1UuF93WrWUGa4DJF9xG3WFy3W3XrWkt3ZYyryjvr45Gr95ZFZ7
+	Wa1jvr4kC3W5CF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
 	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
 	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
 	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
 	2Ix0cI8IcVAFwI0_Jw0_WrylYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
-	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
-	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Gr0_Xr
-	1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1lIxAIcVCF04k26cxKx2IYs7xG6r1j
-	6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJb
-	IYCTnIWIevJa73UjIFyTuYvjfU5byZUUUUU
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
+	Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r4UJVWxJr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j
+	6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjfU5b
+	yZUUUUU
 X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [1.54 / 15.00];
@@ -82,20 +81,20 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-304931-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304933-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
 	DMARC_NA(0.00)[iscas.ac.cn];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:skalluru@marvell.com,m:pengpeng@iscas.ac.cn,m:manishc@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS(0.00)[m:cai.huoqing@linux.dev,m:pengpeng@iscas.ac.cn,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -103,65 +102,112 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	R_DKIM_NA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iscas.ac.cn:from_mime,iscas.ac.cn:email,iscas.ac.cn:mid,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,iscas.ac.cn:from_mime,iscas.ac.cn:email,iscas.ac.cn:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E0A6B70F287
+X-Rspamd-Queue-Id: 67E0F70F692
 
-The firmware loader validates each section with offset + length before it
-uses section offsets to read data from the firmware image. Both fields are
-32-bit values from the firmware header, so the addition can wrap before it
-is compared with the firmware size.
+The firmware update path copies each section from the image with an offset
+and length supplied by the firmware header. The image validator only
+checked the sum of section lengths and used fw_len + header_size to check
+the file size, but it did not prove that each section offset and length
+fits in the firmware payload.
 
-Validate sections as offset <= size and length <= size - offset instead.
-Also require the firmware version section to contain the four bytes that
-bnx2x_check_firmware() reads later.
+Reject images with a truncated header, avoid the fw_len plus header-size
+addition, validate each section type before it is used as a bit index, and
+prove every section range with offset <= fw_len and len <= fw_len - offset.
 
 Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
 ---
- drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ .../net/ethernet/huawei/hinic/hinic_devlink.c | 57 ++++++++++++++++---
+ 1 file changed, 49 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-index 208a894d6190..c756a639e6ee 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-@@ -13258,6 +13258,11 @@ static int bnx2x_init_dev(struct bnx2x *bp, struct pci_dev *pdev,
- 	return rc;
- }
+diff --git a/drivers/net/ethernet/huawei/hinic/hinic_devlink.c b/drivers/net/ethernet/huawei/hinic/hinic_devlink.c
+index c977c43e5d5a..0c06fbdadad3 100644
+--- a/drivers/net/ethernet/huawei/hinic/hinic_devlink.c
++++ b/drivers/net/ethernet/huawei/hinic/hinic_devlink.c
+@@ -20,14 +20,25 @@
+ #include "hinic_devlink.h"
+ #include "hinic_hw_dev.h"
  
-+static bool bnx2x_fw_section_valid(size_t fw_size, u32 offset, u32 len)
++static bool hinic_fw_section_valid(u32 fw_len, u32 offset, u32 len)
 +{
-+	return offset <= fw_size && len <= fw_size - offset;
++	return offset <= fw_len && len <= fw_len - offset;
 +}
 +
- static int bnx2x_check_firmware(struct bnx2x *bp)
+ static bool check_image_valid(struct hinic_devlink_priv *priv, const u8 *buf,
+-			      u32 image_size, struct host_image_st *host_image)
++			      size_t image_size, struct host_image_st *host_image)
  {
- 	const struct firmware *firmware = bp->firmware;
-@@ -13281,7 +13286,7 @@ static int bnx2x_check_firmware(struct bnx2x *bp)
- 	for (i = 0; i < sizeof(*fw_hdr) / sizeof(*sections); i++) {
- 		offset = be32_to_cpu(sections[i].offset);
- 		len = be32_to_cpu(sections[i].len);
--		if (offset + len > firmware->size) {
-+		if (!bnx2x_fw_section_valid(firmware->size, offset, len)) {
- 			BNX2X_ERR("Section %d length is out of bounds\n", i);
- 			return -EINVAL;
- 		}
-@@ -13300,6 +13305,11 @@ static int bnx2x_check_firmware(struct bnx2x *bp)
- 	}
+-	struct fw_image_st *fw_image = NULL;
++	const struct fw_image_st *fw_image;
+ 	u32 len = 0;
+ 	u32 i;
  
- 	/* Check FW version */
-+	if (be32_to_cpu(fw_hdr->fw_version.len) < 4) {
-+		BNX2X_ERR("FW version section is too small\n");
-+		return -EINVAL;
+-	fw_image = (struct fw_image_st *)buf;
++	if (image_size < UPDATEFW_IMAGE_HEAD_SIZE) {
++		dev_err(&priv->hwdev->hwif->pdev->dev,
++			"Wrong image size read from file\n");
++		return false;
 +	}
 +
- 	offset = be32_to_cpu(fw_hdr->fw_version.offset);
- 	fw_ver = firmware->data + offset;
- 	if (fw_ver[0] != bp->fw_major || fw_ver[1] != bp->fw_minor ||
++	fw_image = (const struct fw_image_st *)buf;
+ 
+ 	if (fw_image->fw_magic != HINIC_MAGIC_NUM) {
+ 		dev_err(&priv->hwdev->hwif->pdev->dev, "Wrong fw_magic read from file, fw_magic: 0x%x\n",
+@@ -41,14 +52,44 @@ static bool check_image_valid(struct hinic_devlink_priv *priv, const u8 *buf,
+ 		return false;
+ 	}
+ 
++	if (fw_image->fw_len != image_size - UPDATEFW_IMAGE_HEAD_SIZE) {
++		dev_err(&priv->hwdev->hwif->pdev->dev,
++			"Wrong data size read from file\n");
++		return false;
++	}
++
+ 	for (i = 0; i < fw_image->fw_info.fw_section_cnt; i++) {
+-		len += fw_image->fw_section_info[i].fw_section_len;
+-		host_image->image_section_info[i] = fw_image->fw_section_info[i];
++		const struct fw_section_info_st *section =
++			&fw_image->fw_section_info[i];
++
++		if (section->fw_section_type >= FILE_TYPE_TOTAL_NUM) {
++			dev_err(&priv->hwdev->hwif->pdev->dev,
++				"Wrong section type read from file: %u\n",
++				section->fw_section_type);
++			return false;
++		}
++
++		if (!hinic_fw_section_valid(fw_image->fw_len,
++					    section->fw_section_offset,
++					    section->fw_section_len)) {
++			dev_err(&priv->hwdev->hwif->pdev->dev,
++				"Wrong section size read from file\n");
++			return false;
++		}
++
++		if (section->fw_section_len > fw_image->fw_len - len) {
++			dev_err(&priv->hwdev->hwif->pdev->dev,
++				"Wrong data size read from file\n");
++			return false;
++		}
++
++		len += section->fw_section_len;
++		host_image->image_section_info[i] = *section;
+ 	}
+ 
+-	if (len != fw_image->fw_len ||
+-	    (fw_image->fw_len + UPDATEFW_IMAGE_HEAD_SIZE) != image_size) {
+-		dev_err(&priv->hwdev->hwif->pdev->dev, "Wrong data size read from file\n");
++	if (len != fw_image->fw_len) {
++		dev_err(&priv->hwdev->hwif->pdev->dev,
++			"Wrong data size read from file\n");
+ 		return false;
+ 	}
+ 
 -- 
 2.43.0
 
