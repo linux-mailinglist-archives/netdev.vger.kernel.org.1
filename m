@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-305199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305200-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DtJJLiwLTGo9fQEAu9opvQ
-	(envelope-from <netdev+bounces-305199-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 22:08:12 +0200
+	id TxE0A4D7S2oseAEAu9opvQ
+	(envelope-from <netdev+bounces-305200-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 21:01:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A3877154E0
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 22:08:12 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7530D714C17
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 21:01:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=iogearbox.net header.s=default2302 header.b=rcToyTZI;
+	dkim=pass header.d=iogearbox.net header.s=default2302 header.b=ED24KCNO;
 	dmarc=pass (policy=reject) header.from=iogearbox.net;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305199-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305199-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305200-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305200-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E0A4731A75A5
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 18:56:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0F7C330433D7
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 18:56:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F2173CF05D;
-	Mon,  6 Jul 2026 18:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6E83D4121;
+	Mon,  6 Jul 2026 18:56:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F1BB3C37A5;
-	Mon,  6 Jul 2026 18:56:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752E1367B9E;
+	Mon,  6 Jul 2026 18:56:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783364175; cv=none; b=d/ZNf7bSZPpKxpva/Sl7QH5H+KwClXTLYZUpvceh4F+oOBw+K6rVGqA1DN7OX5ZUO4aHxCKSPg4h2AzHxYd4mHpjlriKYSyV2z5vxjMzMn8HMtpeLqx4oXqbOu18oNW15HM41gYsAxdbA8uzDb3npXN8C5aEbd2IdIU2SQYdqOM=
+	t=1783364176; cv=none; b=MC5julDKGaml5iaUXk0TaFF3HcNIWF/5t+dW9FuaSCQcNl8kBWoQwvACAdxKkAzxnZrmUzOqMYmkD3lc9BEfPiT0A6Ofd5a8OQSuzix92R9w2FWpZZdGNUVu4EcLCqazSa+yKkV70SikcRJTzlqxR/DUpgirFqrtU7QG7tRmUQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783364175; c=relaxed/simple;
-	bh=8Rbx5lIUWrrCq/GPq0PYmDPUoVSs33lySs+iGnimcZs=;
+	s=arc-20240116; t=1783364176; c=relaxed/simple;
+	bh=Zz8KjLmVV8oLZr319S5rBhLFi4n0ZT3Sim6NgMGYb5U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=l5smxZakRvxxOw6vam46iBZQFNHjn4XQtUg6G2V6e+UEOEl/eMk8RibghgF8QU2/OJLtLNQ13LfkdIsyzvFyPN/OMmLNXDGX7lNmDR3WjGKPjgJM4JV8WxzpEbtvJgQPNAwhSZOV9U3ePyt32bVtxgT9+gd4hD9tCfZlFBh8xyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=rcToyTZI; arc=none smtp.client-ip=213.133.104.62
+	 MIME-Version; b=o0pN/WzVD8uNQmRE2/sEmGfbzGnbgo77pUwoMaAmWxPS60BqMmGevIgmL2Dn/4SPOOrSTBqLWvgXl9beivKYsNUqX+hCyhXDTMAoTl1Ejh521mUZLW5YNa3emxxu3vPbKB3cWiBkWYbF1643q4j4CSkzFVPXuJEoc2uG3RiE7qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=ED24KCNO; arc=none smtp.client-ip=213.133.104.62
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
 	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
 	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=0eXt8S1pNr735xowN/wanEKMosGp3bRKBGMqRMlqcsY=; b=rcToyTZItC7/lCDk4F+viTPZB5
-	wqpnTA1jH0qPSgle3KqUmMfxiZAERjMy7gVqTOJgrfzjD2sC7CIDGW006GjBsgeZPH4xYLMmieuo+
-	7ADTylb1L2WEmHsmT7lrjomjO4wsfQn9JXxxDk+fbc0zEqNAG850LefYvafheamKBV2D3DbyVaW5O
-	RWVVmsybOY3XykpsMAxOR5oYiCWJPusk0JdacHC1os4CW/rnt2IPCCLhOVHLORlau7K8v3los2axK
-	IVLTs25zhUnsdFZ4fkLGiD+RzMg0irx3O5FNVrYxBEP7+3c3Uy3evJJnasiyxIOXhnx1tl9GGzmRX
-	tEyd/AZg==;
+	bh=nMK6PzCzA/c/AmwS75K8v3GQckv8SLFTcdl9hSYieEU=; b=ED24KCNOrONc+YkYHhmztFUMtq
+	68EztArqzovqHJQivNn9djZexYNFKDeI4yQxudIs2UyIWmp/7qB6tpa1+x7IQb68owar/9KiR+vXk
+	fV1vvNoiuHf7mcRLCos2I/6HdqhdF5oklIbrDoX6Mq6UO/TZ+GLvLow8xn8C0w/YCDHHzDZYtBa1t
+	PqEFD21XiGcvBofdayeaSiG2Z2WR4o7AEZL6znsZKg/Tpt1HbLsfhTKM79fGyooGHB1fbD4WOAo5d
+	QzTHNMSbldNiwoLMLBkmheN/iiZa04ZSA+G1LUPfqVEZowPJCCFFbasUmKV4GlVAwNy26PlxS2+A0
+	LqKL6yVA==;
 Received: from localhost ([127.0.0.1])
 	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96.2)
 	(envelope-from <daniel@iogearbox.net>)
-	id 1wgoUG-000Psq-07;
+	id 1wgoUG-000Psv-2X;
 	Mon, 06 Jul 2026 20:56:12 +0200
 From: Daniel Borkmann <daniel@iogearbox.net>
 To: kuba@kernel.org
@@ -59,11 +59,10 @@ Cc: pabeni@redhat.com,
 	andrii@kernel.org,
 	memxor@gmail.com,
 	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Victor Nogueira <victor@mojatatu.com>
-Subject: [PATCH net v2 2/3] net/sched: Handle TC_ACT_REDIRECT from qdisc filter chains
-Date: Mon,  6 Jul 2026 20:56:08 +0200
-Message-ID: <20260706185609.330006-3-daniel@iogearbox.net>
+	netdev@vger.kernel.org
+Subject: [PATCH net v2 3/3] selftests/bpf: Add test for redirect from qdisc qevent block
+Date: Mon,  6 Jul 2026 20:56:09 +0200
+Message-ID: <20260706185609.330006-4-daniel@iogearbox.net>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260706185609.330006-1-daniel@iogearbox.net>
 References: <20260706185609.330006-1-daniel@iogearbox.net>
@@ -77,312 +76,226 @@ Content-Transfer-Encoding: 8bit
 X-Virus-Scanned: Clear (ClamAV 1.4.3/28052/Mon Jul  6 08:24:35 2026)
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
 	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-305199-lists,netdev=lfdr.de];
 	FORGED_SENDER(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FREEMAIL_CC(0.00)[redhat.com,mojatatu.com,linutronix.de,kernel.org,gmail.com,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305200-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:pabeni@redhat.com,m:jhs@mojatatu.com,m:bigeasy@linutronix.de,m:andrii@kernel.org,m:memxor@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:pabeni@redhat.com,m:jhs@mojatatu.com,m:bigeasy@linutronix.de,m:andrii@kernel.org,m:memxor@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:victor@mojatatu.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iogearbox.net:from_mime,iogearbox.net:email,iogearbox.net:mid,iogearbox.net:dkim,linutronix.de:email]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,iogearbox.net:from_mime,iogearbox.net:email,iogearbox.net:mid,iogearbox.net:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1A3877154E0
+X-Rspamd-Queue-Id: 7530D714C17
 
-From: Jamal Hadi Salim <jhs@mojatatu.com>
+Add a regression test for the NULL current->bpf_net_context deref hit
+when a BPF classifier attached to a qdisc qevent block asks for a
+redirect. The classifier runs from tcf_qevent_handle() on the qdisc
+enqueue path, outside any bpf_net_context.
 
-When a TC filter attached to a qdisc filter chain returns
-TC_ACT_REDIRECT (ex: via an eBPF program calling bpf_redirect() or an
-act_bpf action), the redirect was silently lost i.e no qdisc classify
-function handled TC_ACT_REDIRECT, so the packet fell through the
-switch and was enqueued normally instead of being redirected.
+  # LDLIBS=-static PKG_CONFIG='pkg-config --static' ./vmtest.sh -- ./test_progs -t qevent
+  [...]
+  + /etc/rcS.d/S50-startup
+  ./test_progs -t qevent
+  #496/1   tc_qevent/redirect_verdict:OK
+  #496/2   tc_qevent/redirect_helper:OK
+  #496     tc_qevent:OK
+  Summary: 1/2 PASSED, 0 SKIPPED, 0 FAILED
 
-This has been broken since bpf_redirect() was introduced for TC in
-commit 27b29f63058d ("bpf: add bpf_redirect() helper"). We got lucky
-for a long time because bpf_net_context was a per-CPU variable that
-was always available.
-
-commit 401cb7dae813 ("net: Reference bpf_redirect_info via task_struct
-on PREEMPT_RT.") turned bpf_net_context into a task_struct member that
-is only set up by explicit callers. Without a caller setting it up,
-bpf_redirect() itself crashes with a NULL pointer dereference in
-bpf_net_ctx_get_ri(). However, even with bpf_net_context available,
-TC_ACT_REDIRECT from qdisc filter chains cannot be honored without
-adding skb_do_redirect() calls to every qdisc classify function, which
-would require changes across net/sched/. Isolate it to ebpf core where
-it belongs.
-
-Instead, add a tcf_classify_qdisc() inline helper in pkt_cls.h, as a
-wrapper around tcf_classify() for use by qdisc classify functions and
-tcf_qevent_handle(). When the classify verdict is TC_ACT_REDIRECT,
-the wrapper converts it to TC_ACT_SHOT, dropping the packet rather
-than letting it continue silently. Dropping is preferred over
-letting the packet through because the user immediately sees packet
-loss. Silently passing the packet through would hide the problem and
-leave the user wondering why their redirect is not working.
-
-The clsact fast path, tc_run() continues to call tcf_classify() directly
-and is unaffected: TC_ACT_REDIRECT is returned as-is and handled by
-sch_handle_egress/ingress() calling skb_do_redirect() as before.
-
-Fixes: 27b29f63058d ("bpf: add bpf_redirect() helper")
-Fixes: 401cb7dae813 ("net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.")
-Tested-by: Victor Nogueira <victor@mojatatu.com>
-Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
 Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 ---
- include/net/pkt_cls.h    | 14 +++++++++++++-
- net/sched/cls_api.c      |  4 +---
- net/sched/sch_cake.c     |  2 +-
- net/sched/sch_drr.c      |  2 +-
- net/sched/sch_dualpi2.c  |  2 +-
- net/sched/sch_ets.c      |  2 +-
- net/sched/sch_fq_codel.c |  2 +-
- net/sched/sch_fq_pie.c   |  2 +-
- net/sched/sch_hfsc.c     |  2 +-
- net/sched/sch_htb.c      |  2 +-
- net/sched/sch_multiq.c   |  2 +-
- net/sched/sch_prio.c     |  2 +-
- net/sched/sch_qfq.c      |  2 +-
- net/sched/sch_sfb.c      |  2 +-
- net/sched/sch_sfq.c      |  2 +-
- 15 files changed, 27 insertions(+), 17 deletions(-)
+ tools/testing/selftests/bpf/config            |   1 +
+ .../selftests/bpf/prog_tests/tc_qevent.c      | 113 ++++++++++++++++++
+ .../selftests/bpf/progs/test_tc_qevent.c      |  23 ++++
+ 3 files changed, 137 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/tc_qevent.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_tc_qevent.c
 
-diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
-index 3bd08d7f39c1..5f5cb36439fe 100644
---- a/include/net/pkt_cls.h
-+++ b/include/net/pkt_cls.h
-@@ -156,8 +156,20 @@ static inline int tcf_classify(struct sk_buff *skb,
- {
- 	return TC_ACT_UNSPEC;
- }
--
- #endif
-+static inline int tcf_classify_qdisc(struct sk_buff *skb,
-+				     const struct tcf_proto *tp,
-+				     struct tcf_result *res, bool compat_mode)
-+{
-+	int ret = tcf_classify(skb, NULL, tp, res, compat_mode);
+diff --git a/tools/testing/selftests/bpf/config b/tools/testing/selftests/bpf/config
+index adb25146e88c..ea7044f30adc 100644
+--- a/tools/testing/selftests/bpf/config
++++ b/tools/testing/selftests/bpf/config
+@@ -82,6 +82,7 @@ CONFIG_NET_SCH_BPF=y
+ CONFIG_NET_SCH_FQ=y
+ CONFIG_NET_SCH_INGRESS=y
+ CONFIG_NET_SCH_HTB=y
++CONFIG_NET_SCH_RED=y
+ CONFIG_NET_SCHED=y
+ CONFIG_NETDEVSIM=y
+ CONFIG_NETFILTER=y
+diff --git a/tools/testing/selftests/bpf/prog_tests/tc_qevent.c b/tools/testing/selftests/bpf/prog_tests/tc_qevent.c
+new file mode 100644
+index 000000000000..67e1d17567ab
+--- /dev/null
++++ b/tools/testing/selftests/bpf/prog_tests/tc_qevent.c
+@@ -0,0 +1,113 @@
++// SPDX-License-Identifier: GPL-2.0
 +
-+	/* TC_ACT_REDIRECT from qdisc filter chains is not supported.
-+	 * Use BPF via tcx or mirred redirect instead.
++#include <test_progs.h>
++#include <network_helpers.h>
++#include <sys/socket.h>
++#include <netinet/in.h>
++#include <arpa/inet.h>
++#include <unistd.h>
++#include <string.h>
++
++#include "test_tc_qevent.skel.h"
++
++#define NS_TX		"tc_qevent_tx"
++#define NS_RX		"tc_qevent_rx"
++#define IP_TX		"10.255.0.1"
++#define IP_RX		"10.255.0.2"
++#define PIN_PATH	"/sys/fs/bpf/tc_qevent_redirect"
++
++static void blast_udp(void)
++{
++	struct sockaddr_in dst = {};
++	char buf[1400] = {};
++	int fd, i;
++
++	fd = socket(AF_INET, SOCK_DGRAM, 0);
++	if (!ASSERT_GE(fd, 0, "udp socket"))
++		return;
++
++	dst.sin_family = AF_INET;
++	dst.sin_port = htons(12345);
++	inet_pton(AF_INET, IP_RX, &dst.sin_addr);
++
++	/*
++	 * Push far more than the RED queue can hold. Once qavg crosses qth_min
++	 * every further packet hits the congestion_drop / early_drop qevent.
 +	 */
-+	if (unlikely(ret == TC_ACT_REDIRECT))
-+		ret = TC_ACT_SHOT;
-+	return ret;
++	for (i = 0; i < 50000; i++)
++		sendto(fd, buf, sizeof(buf), MSG_DONTWAIT,
++		       (struct sockaddr *)&dst, sizeof(dst));
++
++	close(fd);
 +}
- 
- static inline unsigned long
- __cls_set_class(unsigned long *clp, unsigned long cl)
-diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
-index 523cf2a8bd1d..fee4524adc98 100644
---- a/net/sched/cls_api.c
-+++ b/net/sched/cls_api.c
-@@ -4045,9 +4045,7 @@ struct sk_buff *tcf_qevent_handle(struct tcf_qevent *qe, struct Qdisc *sch, stru
- 
- 	fl = rcu_dereference_bh(qe->filter_chain);
- 
--	switch (tcf_classify(skb, NULL, fl, &cl_res, false)) {
--	case TC_ACT_REDIRECT:
--		fallthrough;
-+	switch (tcf_classify_qdisc(skb, fl, &cl_res, false)) {
- 	case TC_ACT_SHOT:
- 		qdisc_qstats_drop(sch);
- 		__qdisc_drop(skb, to_free);
-diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
-index a3c185505afc..94eb47ac54ee 100644
---- a/net/sched/sch_cake.c
-+++ b/net/sched/sch_cake.c
-@@ -1730,7 +1730,7 @@ static u32 cake_classify(struct Qdisc *sch, struct cake_tin_data **t,
- 		goto hash;
- 
- 	*qerr = NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
--	result = tcf_classify(skb, NULL, filter, &res, false);
-+	result = tcf_classify_qdisc(skb, filter, &res, false);
- 
- 	if (result >= 0) {
- #ifdef CONFIG_NET_CLS_ACT
-diff --git a/net/sched/sch_drr.c b/net/sched/sch_drr.c
-index 020657f959b5..91b1ef824afa 100644
---- a/net/sched/sch_drr.c
-+++ b/net/sched/sch_drr.c
-@@ -312,7 +312,7 @@ static struct drr_class *drr_classify(struct sk_buff *skb, struct Qdisc *sch,
- 
- 	*qerr = NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
- 	fl = rcu_dereference_bh(q->filter_list);
--	result = tcf_classify(skb, NULL, fl, &res, false);
-+	result = tcf_classify_qdisc(skb, fl, &res, false);
- 	if (result >= 0) {
- #ifdef CONFIG_NET_CLS_ACT
- 		switch (result) {
-diff --git a/net/sched/sch_dualpi2.c b/net/sched/sch_dualpi2.c
-index 27088760eff4..4f678d4ff10e 100644
---- a/net/sched/sch_dualpi2.c
-+++ b/net/sched/sch_dualpi2.c
-@@ -364,7 +364,7 @@ static int dualpi2_skb_classify(struct dualpi2_sched_data *q,
- 	if (!fl)
- 		return NET_XMIT_SUCCESS;
- 
--	result = tcf_classify(skb, NULL, fl, &res, false);
-+	result = tcf_classify_qdisc(skb, fl, &res, false);
- 	if (result >= 0) {
- #ifdef CONFIG_NET_CLS_ACT
- 		switch (result) {
-diff --git a/net/sched/sch_ets.c b/net/sched/sch_ets.c
-index cb8cf437ce87..25fcf4079fec 100644
---- a/net/sched/sch_ets.c
-+++ b/net/sched/sch_ets.c
-@@ -391,7 +391,7 @@ static struct ets_class *ets_classify(struct sk_buff *skb, struct Qdisc *sch,
- 	*qerr = NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
- 	if (TC_H_MAJ(skb->priority) != sch->handle) {
- 		fl = rcu_dereference_bh(q->filter_list);
--		err = tcf_classify(skb, NULL, fl, &res, false);
-+		err = tcf_classify_qdisc(skb, fl, &res, false);
- #ifdef CONFIG_NET_CLS_ACT
- 		switch (err) {
- 		case TC_ACT_STOLEN:
-diff --git a/net/sched/sch_fq_codel.c b/net/sched/sch_fq_codel.c
-index cafd1f943d99..6cce86ba383c 100644
---- a/net/sched/sch_fq_codel.c
-+++ b/net/sched/sch_fq_codel.c
-@@ -91,7 +91,7 @@ static unsigned int fq_codel_classify(struct sk_buff *skb, struct Qdisc *sch,
- 		return fq_codel_hash(q, skb) + 1;
- 
- 	*qerr = NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
--	result = tcf_classify(skb, NULL, filter, &res, false);
-+	result = tcf_classify_qdisc(skb, filter, &res, false);
- 	if (result >= 0) {
- #ifdef CONFIG_NET_CLS_ACT
- 		switch (result) {
-diff --git a/net/sched/sch_fq_pie.c b/net/sched/sch_fq_pie.c
-index 72f48fa4010b..069e1facd413 100644
---- a/net/sched/sch_fq_pie.c
-+++ b/net/sched/sch_fq_pie.c
-@@ -96,7 +96,7 @@ static unsigned int fq_pie_classify(struct sk_buff *skb, struct Qdisc *sch,
- 		return fq_pie_hash(q, skb) + 1;
- 
- 	*qerr = NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
--	result = tcf_classify(skb, NULL, filter, &res, false);
-+	result = tcf_classify_qdisc(skb, filter, &res, false);
- 	if (result >= 0) {
- #ifdef CONFIG_NET_CLS_ACT
- 		switch (result) {
-diff --git a/net/sched/sch_hfsc.c b/net/sched/sch_hfsc.c
-index 7e537295b8b6..e87f5021a199 100644
---- a/net/sched/sch_hfsc.c
-+++ b/net/sched/sch_hfsc.c
-@@ -1143,7 +1143,7 @@ hfsc_classify(struct sk_buff *skb, struct Qdisc *sch, int *qerr)
- 	*qerr = NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
- 	head = &q->root;
- 	tcf = rcu_dereference_bh(q->root.filter_list);
--	while (tcf && (result = tcf_classify(skb, NULL, tcf, &res, false)) >= 0) {
-+	while (tcf && (result = tcf_classify_qdisc(skb, tcf, &res, false)) >= 0) {
- #ifdef CONFIG_NET_CLS_ACT
- 		switch (result) {
- 		case TC_ACT_QUEUED:
-diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
-index 908b9ba9ba2e..fdac0dc8f35a 100644
---- a/net/sched/sch_htb.c
-+++ b/net/sched/sch_htb.c
-@@ -243,7 +243,7 @@ static struct htb_class *htb_classify(struct sk_buff *skb, struct Qdisc *sch,
- 	}
- 
- 	*qerr = NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
--	while (tcf && (result = tcf_classify(skb, NULL, tcf, &res, false)) >= 0) {
-+	while (tcf && (result = tcf_classify_qdisc(skb, tcf, &res, false)) >= 0) {
- #ifdef CONFIG_NET_CLS_ACT
- 		switch (result) {
- 		case TC_ACT_QUEUED:
-diff --git a/net/sched/sch_multiq.c b/net/sched/sch_multiq.c
-index a467dd122369..66df30939aa5 100644
---- a/net/sched/sch_multiq.c
-+++ b/net/sched/sch_multiq.c
-@@ -36,7 +36,7 @@ multiq_classify(struct sk_buff *skb, struct Qdisc *sch, int *qerr)
- 	int err;
- 
- 	*qerr = NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
--	err = tcf_classify(skb, NULL, fl, &res, false);
-+	err = tcf_classify_qdisc(skb, fl, &res, false);
- #ifdef CONFIG_NET_CLS_ACT
- 	switch (err) {
- 	case TC_ACT_STOLEN:
-diff --git a/net/sched/sch_prio.c b/net/sched/sch_prio.c
-index e4dd56a89072..79437c587e7e 100644
---- a/net/sched/sch_prio.c
-+++ b/net/sched/sch_prio.c
-@@ -39,7 +39,7 @@ prio_classify(struct sk_buff *skb, struct Qdisc *sch, int *qerr)
- 	*qerr = NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
- 	if (TC_H_MAJ(skb->priority) != sch->handle) {
- 		fl = rcu_dereference_bh(q->filter_list);
--		err = tcf_classify(skb, NULL, fl, &res, false);
-+		err = tcf_classify_qdisc(skb, fl, &res, false);
- #ifdef CONFIG_NET_CLS_ACT
- 		switch (err) {
- 		case TC_ACT_STOLEN:
-diff --git a/net/sched/sch_qfq.c b/net/sched/sch_qfq.c
-index cb56787e1d25..6f3b7273cb16 100644
---- a/net/sched/sch_qfq.c
-+++ b/net/sched/sch_qfq.c
-@@ -709,7 +709,7 @@ static struct qfq_class *qfq_classify(struct sk_buff *skb, struct Qdisc *sch,
- 
- 	*qerr = NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
- 	fl = rcu_dereference_bh(q->filter_list);
--	result = tcf_classify(skb, NULL, fl, &res, false);
-+	result = tcf_classify_qdisc(skb, fl, &res, false);
- 	if (result >= 0) {
- #ifdef CONFIG_NET_CLS_ACT
- 		switch (result) {
-diff --git a/net/sched/sch_sfb.c b/net/sched/sch_sfb.c
-index b1d465094276..ed39869199c0 100644
---- a/net/sched/sch_sfb.c
-+++ b/net/sched/sch_sfb.c
-@@ -260,7 +260,7 @@ static bool sfb_classify(struct sk_buff *skb, struct tcf_proto *fl,
- 	struct tcf_result res;
- 	int result;
- 
--	result = tcf_classify(skb, NULL, fl, &res, false);
-+	result = tcf_classify_qdisc(skb, fl, &res, false);
- 	if (result >= 0) {
- #ifdef CONFIG_NET_CLS_ACT
- 		switch (result) {
-diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
-index 758b88f21865..77675f9a4c46 100644
---- a/net/sched/sch_sfq.c
-+++ b/net/sched/sch_sfq.c
-@@ -171,7 +171,7 @@ static unsigned int sfq_classify(struct sk_buff *skb, struct Qdisc *sch,
- 		return sfq_hash(q, skb) + 1;
- 
- 	*qerr = NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
--	result = tcf_classify(skb, NULL, fl, &res, false);
-+	result = tcf_classify_qdisc(skb, fl, &res, false);
- 	if (result >= 0) {
- #ifdef CONFIG_NET_CLS_ACT
- 		switch (result) {
++
++static void run_qevent_redirect(struct bpf_program *prog, __u64 *counter)
++{
++	struct nstoken *tok = NULL;
++	int err;
++
++	SYS_NOFAIL("ip netns del %s", NS_TX);
++	SYS_NOFAIL("ip netns del %s", NS_RX);
++	unlink(PIN_PATH);
++
++	err = bpf_program__pin(prog, PIN_PATH);
++	if (!ASSERT_OK(err, "pin prog"))
++		return;
++
++	SYS(unpin,  "ip netns add %s", NS_TX);
++	SYS(del_tx, "ip netns add %s", NS_RX);
++	SYS(del_rx, "ip -n %s link add veth0 type veth peer name veth1 netns %s", NS_TX, NS_RX);
++	SYS(del_rx, "ip -n %s addr add %s/24 dev veth0", NS_TX, IP_TX);
++	SYS(del_rx, "ip -n %s link set veth0 up", NS_TX);
++	SYS(del_rx, "ip -n %s addr add %s/24 dev veth1", NS_RX, IP_RX);
++	SYS(del_rx, "ip -n %s link set veth1 up", NS_RX);
++
++	tok = open_netns(NS_TX);
++	if (!ASSERT_OK_PTR(tok, "open_netns"))
++		goto del_rx;
++
++	SYS(close_ns, "tc qdisc add dev veth0 root handle 1: htb default 1");
++	SYS(close_ns, "tc class add dev veth0 parent 1: classid 1:1 htb rate 1mbit ceil 1mbit");
++
++	if (system("tc qdisc add dev veth0 parent 1:1 handle 11: red "
++		   "limit 500000 avpkt 1000 probability 1 min 5000 max 6000 "
++		   "burst 6 qevent early_drop block 10 2>/dev/null")) {
++		test__skip();
++		goto close_ns;
++	}
++
++	if (system("tc filter add block 10 bpf da object-pinned "
++		   PIN_PATH " 2>/dev/null")) {
++		test__skip();
++		goto close_ns;
++	}
++
++	blast_udp();
++	ASSERT_GT(*counter, 0, "qevent classifier ran");
++close_ns:
++	close_netns(tok);
++del_rx:
++	SYS_NOFAIL("ip netns del %s", NS_RX);
++del_tx:
++	SYS_NOFAIL("ip netns del %s", NS_TX);
++unpin:
++	bpf_program__unpin(prog, PIN_PATH);
++}
++
++void test_tc_qevent(void)
++{
++	struct test_tc_qevent *skel;
++
++	skel = test_tc_qevent__open_and_load();
++	if (!ASSERT_OK_PTR(skel, "open_and_load"))
++		return;
++
++	if (test__start_subtest("redirect_verdict"))
++		run_qevent_redirect(skel->progs.qevent_redirect_verdict,
++				    &skel->bss->verdict_calls);
++	if (test__start_subtest("redirect_helper"))
++		run_qevent_redirect(skel->progs.qevent_redirect_helper,
++				    &skel->bss->helper_calls);
++
++	test_tc_qevent__destroy(skel);
++}
+diff --git a/tools/testing/selftests/bpf/progs/test_tc_qevent.c b/tools/testing/selftests/bpf/progs/test_tc_qevent.c
+new file mode 100644
+index 000000000000..1529c111f4aa
+--- /dev/null
++++ b/tools/testing/selftests/bpf/progs/test_tc_qevent.c
+@@ -0,0 +1,23 @@
++// SPDX-License-Identifier: GPL-2.0
++#include "vmlinux.h"
++#include <bpf/bpf_helpers.h>
++
++int redirect_ifindex = 1;
++__u64 verdict_calls = 0;
++__u64 helper_calls = 0;
++
++SEC("tc")
++int qevent_redirect_verdict(struct __sk_buff *skb)
++{
++	__sync_fetch_and_add(&verdict_calls, 1);
++	return TCX_REDIRECT;
++}
++
++SEC("tc")
++int qevent_redirect_helper(struct __sk_buff *skb)
++{
++	__sync_fetch_and_add(&helper_calls, 1);
++	return bpf_redirect(redirect_ifindex, 0);
++}
++
++char _license[] SEC("license") = "GPL";
 -- 
 2.43.0
 
