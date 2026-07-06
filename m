@@ -1,139 +1,261 @@
-Return-Path: <netdev+bounces-305230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305232-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 1c4BC4AlTGqJgwEAu9opvQ
-	(envelope-from <netdev+bounces-305230-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 00:00:32 +0200
+	id 53lfBCApTGp3hAEAu9opvQ
+	(envelope-from <netdev+bounces-305232-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 00:16:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7245D715DC9
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 00:00:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FAC5715EB8
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 00:15:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=fail ("headers rsa verify failed") header.d=kernel.org header.s=k20260515 header.b=TuADPFGL;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305230-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305230-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}")
+	dkim=pass header.d=everpuredata.com header.s=google header.b="hJ2/TI3r";
+	dmarc=pass (policy=quarantine) header.from=everpuredata.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305232-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305232-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E75C63025097
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 22:00:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A0FFC3037E75
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 22:15:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D891230BD9;
-	Mon,  6 Jul 2026 22:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B4FB36EA98;
+	Mon,  6 Jul 2026 22:15:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF11B1A9FB0
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 22:00:26 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783375227; cv=none; b=kh+8V7RL8tWBqT21UPFEFHlK7Joq03GySL8nORWqXcVO4u0U0SRoNWdcozVNYQywEAdOLn6Bxw0hqluUF1+FJPHF8VTKkG5EaVwySfR6tpgq9SvsRZty9pZZyvjSf55vSADS7KLDOgoh6dQSxFKYEKj4UHEwXgXIAXjt2KitYik=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783375227; c=relaxed/simple;
-	bh=r0JK7xaiF19k/tDxV4+raUI0cKiYgeChTrYADNUxJ/8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ip6injDM2ujxqbbdRiXA5JlN5tT4nfmm63ZHr3gFfNB7gXKJ41ZGWWaLUC03jXGdbwaO5MWPbQMgUfy/bXiJHJiEbebAYg7kbvXB640po0fdg1cTltaZpE28Lixbsaw6yUzSK93+9eiuds9AB+nZZHmzPnFRFgmWrjnRpiAXUto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TuADPFGL; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AB051F000E9;
-	Mon,  6 Jul 2026 22:00:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783375226;
-	bh=DjMqWMd+5h6THtBBW/vMmvengJ17wWvk89tUuMxvISc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=TuADPFGLGncNshnOM1vsq6fZJzfeeXpuLaLoZ2DzndYPIhDfSIySZ4iEvv+V/BG/S
-	 PWb8MFzTlppV8jdnXNbVIk81l+fWaEnGUW0UizsfnJ7uM4wxQckUjnC0djfhLixMi8
-	 Z5NBiiTOKMSJ3orL5SXZAuMBv7PC5MqzQTILiiE/9Kitmq8F3C6dpkm4tPadPe78Xx
-	 itxnh6YirKqRnEHIshQsPEGxJ8KXvCQBJmSpStv4HzWg8eBrjZqEDi62FWSwK9H/Yj
-	 YXpTWyGoUWq1E2acHs1QfjyveR2J25TXOUV1pchkhJoGcHbkWFP/Gb6xZF+DsXdmkm
-	 XLWsLSEwxm+NA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0B273925F71;
-	Mon,  6 Jul 2026 22:00:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5AED3F888C
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 22:15:04 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783376109; cv=pass; b=szJmYJfO7kI0e4uBh1MF7Ezez013a/0IC9nUWownlqDmw27bevTIzTft49x3LIKFhnbLM+b8RemMuHBGgQo9mkBDMYwJCx1/pHw0aDl0hukPUf6EicFK8kKOCz4rF1gB3bA5zKv7sc55qf8nF8h9rMlRLFlkf9vZ3C/+n5jkxFY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783376109; c=relaxed/simple;
+	bh=ArrZuExoWTtFDpj0spA5EfcfXBIxqxWTPFerCos0KFU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KLViu9PD71CThKaQCKBbY/HM6kJAwOi2aqqX7ECYuZbzQDtLAsHPiUbVLbdXQahnfTANrQMfZeL3bKcPk43zwUnaGgkQKg7wtRYG6diYem09/NSqTdTKnRCs+mYkjS61RhxUCvT6Zrk095jaf//UVS7ZYlkv//w+cO39HY2VIaI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=everpuredata.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=everpuredata.com header.i=@everpuredata.com header.b=hJ2/TI3r; arc=pass smtp.client-ip=209.85.217.52
+Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-736eec08c43so28220137.1
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 15:15:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783376104; cv=none;
+        d=google.com; s=arc-20260327;
+        b=tDwYPVHfVOLwI1gqfXrsOhTNV2+1yesxmVO2hrwWsgTO9ZiMIyMaBv0QOU5DASFoUX
+         bbsr6yUISIAne/XN8VO2pLS9CM6VWXn23CJZ2kqbPbrrwUks0/5JNaqzxqdRIk0ZCizv
+         yfSwwubfTs/C9oT4o8ap4SchDqJ4jI3aVQGf6MpJa2VX65yNgDc7uS28kJLJJfpecSZM
+         c6xiBDNbvUdtUiVsfixdosUQJBANE9B3wxxXZp7oTHYumPoSVom9ngdQSMPHE96Sh7GR
+         yE/zSjhXvkVX1thLE1o9YcYBh7Y8BXtRUUFyrOEaAJZVZb4D1iZxewHmw+r8YDngDDP/
+         B+Rw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=30tQGHtDF9O2XTWbiEvjPHEb9UkwR8PjZGM3FgjJWJQ=;
+        fh=FUIhD4asJYerNBKkfkgbix6hL8USxyes+blvPCoeJnA=;
+        b=E9FxGvB2Oco5DgG7/SQ2WvDSMwpIXULiXfW7u5L/9y2uqMcwUQOZ35qqRvUERtj9Aa
+         XTmhlsLNXfNL9EBEBnZtNxWUygptGOT7m3hTv9GygkrfBZtwQ+A+QXvfG2FEcam5C3va
+         mffxBV06QH/Ro8qa8f2IEa7uWmBh/mcYiKsyaKyUcCf22MgsCgwwcy8h5R0I3QmjQR2m
+         7SbfzHmhbN5CHzOTZ3IvwGsaSFWcd0oT7MBIkg3cIReQnZskKMaZuEUcTOiiYZ/KZ8V2
+         pv9XxzcVNeKfvVYrU+vDnMoMO7HEgQQH9ENvkjC8Jqv/5PGdfm7MtnQRI3icfIIzWzis
+         F25g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=everpuredata.com; s=google; t=1783376104; x=1783980904; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=30tQGHtDF9O2XTWbiEvjPHEb9UkwR8PjZGM3FgjJWJQ=;
+        b=hJ2/TI3raZJ43BZ6ddweIcLzrW93JvTMXjqZIQdvnIvEdcOwjVuimgxspwFoO0pCMt
+         LYy4XJ+yiYL3JJudYbg4fiI4Q9uOL+2ELNpQ859QHAlUP/FZOfCVrl19wNpjtQgxD8vn
+         3k+/txcCBCgGLhI9aRvKp3kt9Ug0e8pyCnT0HW8LAGDKFrBfKr5/S6Jmcn1Bn89Cp1N7
+         OOxbnBLctQufn58EsN8hQfoUoHMLH/ip5yRl5ItfUki5RebkUOwYCMGGq+NGbpnDTT44
+         1qHsV3ZJ+PRT4NvebEo8a/Zj+igKehGZcdC2unVxYJ2FNs885BmPKfUbtujsD8DCMhCY
+         Cu+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783376104; x=1783980904;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=30tQGHtDF9O2XTWbiEvjPHEb9UkwR8PjZGM3FgjJWJQ=;
+        b=RIwtJlGTdrSTtZ/VOQGnj5bc5worHpdmjtRswY17qm0AMaH0FXoLhnU01ymWuRGXBh
+         esmToYJitgF/Ml9E+rAjNT/nxbZgyewBy7Ybk2N60eYxN0ThINIVobhHE2CBxMdNtjKU
+         9cwfgcgI1VQQDqD2xeKgl2eyAIKjxhvziTZfI/rEBVwNxpNoMqzh0YiF9uyS51dxOSSr
+         oj5dm4UlH9R2nNt+nEu16MTWIZoVBaNRfJ1aKWq2kLTlIWsEfltryGSoXbOzKKXIuSI5
+         9y7LTSqW0fOqS0ujisjbIHH44fAbFBDVTTAQkuZRYid5G4O/vC2Mi4fYyOxJWwZ+xEp1
+         lXwg==
+X-Forwarded-Encrypted: i=1; AHgh+Rqyydi2MTMJfsRGCYo2VKdROk2V6GJ22gncdShTSEMiSsw5WGVJt/gqvxj50uMnf2YZFbLlXsA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzl2kV3IBSQ1X3VraeLD5C1u6cd4I5o3dQdzq68H5Zrd5aeWBCO
+	J3EVoGZRoVhKEqigYbEFkHc+Vd4mG82OmrAHVKxEPYre+bxd58qvxolwlrgfQbkWIqRFoBn1OH2
+	mZQPIeASl4RJs24l32i+2dQSlZdLG9XjJFzesuKG2gw==
+X-Gm-Gg: AfdE7ckzs1Q7xM+pooHoqWvGwxraQm9JT2xrLLJgWKA38BBbbtQZNcf+SefLc+1UGvB
+	JXAxz7EQcMsSQEUjDjFaQ3Rbxko7o8ZfRzHSvJVY1/DVZ4X0UIMppc6tzoRG2XRyCYX3YSqf3gK
+	lUST9SgZhfLHJ90Py+Ho+XMbGORQdo7NAsfQIdqkzNY15CEml7c0Vd0UpI7Kf2ReG0DGcCEk09N
+	AwQZyWheG+06rrPBPmJ/PSeD3CKfdV9C3D2i4YPTlaGktVT9nsD+J2400+g3h6qNXoVMAmV4HaO
+	cfwdR8xJIROTlDxyraZtTN+9g6Zv1QhkD7wfOVRJBNsA6lm0hQ33Vm6Gb34e1mtIZ/tDLmM=
+X-Received: by 2002:a05:6102:3752:b0:740:2664:800b with SMTP id
+ ada2fe7eead31-744c230b74cmr102945137.10.1783376103518; Mon, 06 Jul 2026
+ 15:15:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 ethtool] man: ethtool: link 10000baseCR to SFF-8431,
- Appendix-E SFP+ DA
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178337520638.1223576.17680136243635201029.git-patchwork-notify@kernel.org>
-Date: Mon, 06 Jul 2026 22:00:06 +0000
-References: <20260703102004.1111597-1-siddaraju.dh@intel.com>
-In-Reply-To: <20260703102004.1111597-1-siddaraju.dh@intel.com>
-To: D@codeaurora.org, H@codeaurora.org,
-	Siddaraju <siddaraju.dh@intel.com>
-Cc: mkubecek@suse.cz, andrew@lunn.ch, maxime.chevallier@bootlin.com,
- netdev@vger.kernel.org, Shubham.Das@intel.com,
- balaji.chintalapalle@intel.com, vijay.srinivasan@intel.com,
- magnus.k.lindberg@ericsson.com, niklas.damberg@ericsson.com,
- jonas.wirandi@ericsson.com, siddarajudh@gmail.com
+References: <20260515212715.3151307-1-rjethwani@purestorage.com> <20260627210635.89769-1-nils.juenemann@gmail.com>
+In-Reply-To: <20260627210635.89769-1-nils.juenemann@gmail.com>
+From: Rishikesh Jethwani <rjethwani@everpuredata.com>
+Date: Mon, 6 Jul 2026 15:14:52 -0700
+X-Gm-Features: AVVi8CeN4t1HTguUIIhEzWA7k_mp1sVXyxDPY1mLFNJihpAK2hch87k1BF9EHHQ
+Message-ID: <CAKaoeS3Yg=kncNQRRcVh8JrQXy4Aah=3fuBwcitD6mjAEJOKOw@mail.gmail.com>
+Subject: Re: [PATCH net-next v14 0/9] tls: Add TLS 1.3 hardware offload support
+To: Nils Juenemann <nils.juenemann@gmail.com>
+Cc: borisp@nvidia.com, davem@davemloft.net, edumazet@google.com, 
+	john.fastabend@gmail.com, kuba@kernel.org, leon@kernel.org, mbloch@nvidia.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, saeedm@nvidia.com, 
+	sd@queasysnail.net, tariqt@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
-	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[everpuredata.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[everpuredata.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305230-lists,netdev=lfdr.de,netdevbpf];
-	R_DKIM_REJECT(0.00)[kernel.org:s=k20260515];
-	FREEMAIL_CC(0.00)[suse.cz,lunn.ch,bootlin.com,vger.kernel.org,intel.com,ericsson.com,gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:nils.juenemann@gmail.com,m:borisp@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:leon@kernel.org,m:mbloch@nvidia.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:saeedm@nvidia.com,m:sd@queasysnail.net,m:tariqt@nvidia.com,m:nilsjuenemann@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_RECIPIENTS(0.00)[m:D@codeaurora.org,m:H@codeaurora.org,m:siddaraju.dh@intel.com,m:mkubecek@suse.cz,m:andrew@lunn.ch,m:maxime.chevallier@bootlin.com,m:netdev@vger.kernel.org,m:Shubham.Das@intel.com,m:balaji.chintalapalle@intel.com,m:vijay.srinivasan@intel.com,m:magnus.k.lindberg@ericsson.com,m:niklas.damberg@ericsson.com,m:jonas.wirandi@ericsson.com,m:siddarajudh@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[rjethwani@everpuredata.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-305232-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:-];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[everpuredata.com:+];
 	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rjethwani@everpuredata.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[nvidia.com,davemloft.net,google.com,gmail.com,kernel.org,vger.kernel.org,redhat.com,queasysnail.net];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,suse.cz:email]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7245D715DC9
+X-Rspamd-Queue-Id: 2FAC5715EB8
 
-Hello:
+On Sat, Jun 27, 2026 at 2:06=E2=80=AFPM Nils Juenemann <nils.juenemann@gmai=
+l.com> wrote:
+>
+> Hi Rishikesh, all,
+>
+> thanks for picking up the sendfile/EOF fix in tls_device_splice_eof().
+>
+> Separate issue we hit while testing, looks pre-existing in mlx5e
+> rather than v14: a NULL deref on the RX offload path. Trigger is
+> ethtool -L <dev> combined 32 (down from 64) under HW-kTLS load,
+> then a TLS_RX offload setup:
+>
+> BUG: unable to handle page fault for address: 00000000000031c0
+> RIP: mlx5e_ktls_add_rx+0x268 [mlx5_core]
+> Call Trace:
+> mlx5e_ktls_add
+> tls_device_dev_add_rx
+> tls_set_device_offload_rx
+> tls_setsockopt
+>
+> sk_rx_queue_get(sk) returns a stale rxq (62 here) after the
+> reduction; mlx5e_ktls_sk_get_rxq() only guards rxq =3D=3D -1, so
+> mlx5e_ktls_add_rx() dereferences priv->channels.c[62], which
+> appears to be NULL. The resync paths index
+> priv->channels.c[priv_rx->rxq] the same way. This path is not
+> TLS 1.3 specific.
+>
+> I do not have a proposed fix yet. Happy to share the full
+> decoded oops / additional kdump details or test patches.
+>
+> Thanks again,
+> Nils Juenemann
 
-This patch was applied to ethtool/ethtool.git (master)
-by Michal Kubecek <mkubecek@suse.cz>:
+Following two patches should fix this issue:
 
-On Fri,  3 Jul 2026 15:50:04 +0530 you wrote:
-> Annotate the 10000baseCR entry in the advertise mask table so users
-> understand what physical media this mode it actually represents.
-> 
-> 10000baseCR does not correspond to any IEEE 802.3 *base-CR PMD.
-> It has no autonegotiation, no link training, and no mandatory FEC.
-> The industry standard for this media type is SFF-8431 Appendix-E
-> Direct Attach cable, also known as 10G_SFI_DA.
-> 
-> [...]
+Patch 1: net/mlx5e: kTLS, Reject stale RX queue mapping on offload setup
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
+b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
+index bca45679e201..232e998a8f24 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
+@@ -620,12 +620,15 @@ void mlx5e_ktls_handle_ctx_completion(struct
+mlx5e_icosq_wqe_info *wi)
+        queue_work(rule->priv->tls->rx_wq, &rule->work);
+ }
 
-Here is the summary with links:
-  - [v2,ethtool] man: ethtool: link 10000baseCR to SFF-8431, Appendix-E SFP+ DA
-    https://git.kernel.org/pub/scm/network/ethtool/ethtool.git/commit/?id=b0d4a0d60471
+-static int mlx5e_ktls_sk_get_rxq(struct sock *sk)
++static int mlx5e_ktls_sk_get_rxq(struct mlx5e_priv *priv, struct sock *sk)
+ {
+        int rxq =3D sk_rx_queue_get(sk);
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+        if (unlikely(rxq =3D=3D -1))
+-               rxq =3D 0;
++               return 0;
++
++       if (unlikely(rxq >=3D priv->channels.num))
++               return -EINVAL;
+
+        return rxq;
+ }
+@@ -673,7 +676,11 @@ int mlx5e_ktls_add_rx(struct net_device *netdev,
+struct sock *sk,
+        INIT_LIST_HEAD(&priv_rx->list);
+        spin_lock_init(&priv_rx->lock);
+
+-       rxq =3D mlx5e_ktls_sk_get_rxq(sk);
++       rxq =3D mlx5e_ktls_sk_get_rxq(priv, sk);
++       if (unlikely(rxq < 0)) {
++               err =3D rxq;
++               goto err_create_tir;
++       }
+        priv_rx->rxq =3D rxq;
+        priv_rx->sk =3D sk;
 
 
+Patch2: net/mlx5e: kTLS, Guard resync paths against stale channel index
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
+b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
+index 232e998a8f24..c0676148a36e 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
+@@ -343,6 +343,13 @@ static void resync_handle_work(struct work_struct *wor=
+k)
+                return;
+        }
+
++       if (unlikely(priv_rx->rxq >=3D resync->priv->channels.num)) {
++               priv_rx->rq_stats->tls_resync_req_skip++;
++               tls_offload_rx_resync_async_request_cancel(&resync->core);
++               mlx5e_ktls_priv_rx_put(priv_rx);
++               return;
++       }
++
+        c =3D resync->priv->channels.c[priv_rx->rxq];
+        sq =3D c->async_icosq;
+
+@@ -568,6 +575,10 @@ void mlx5e_ktls_rx_resync(struct net_device
+*netdev, struct sock *sk,
+        resync->seq =3D seq;
+
+        priv =3D netdev_priv(netdev);
++       if (unlikely(priv_rx->rxq >=3D priv->channels.num)) {
++               priv_rx->rq_stats->tls_resync_req_skip++;
++               return;
++       }
+        c =3D priv->channels.c[priv_rx->rxq];
+
+        resync_handle_seq_match(priv_rx, c);
 
