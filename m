@@ -1,223 +1,193 @@
-Return-Path: <netdev+bounces-305151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305152-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id js3xGsviS2pacAEAu9opvQ
-	(envelope-from <netdev+bounces-305151-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 19:15:55 +0200
+	id e7RlBnD3S2o2dwEAu9opvQ
+	(envelope-from <netdev+bounces-305152-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 20:44:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5103E713BEB
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 19:15:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D8467149F5
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 20:43:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b="ZgA/mN2h";
-	dmarc=pass (policy=reject) header.from=google.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305151-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305151-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=KYUkjdZS;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305152-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305152-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D82FD30172D0
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 16:54:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7DD4633DF63E
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 16:58:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE99D3DDDAA;
-	Mon,  6 Jul 2026 16:54:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAAFB434E25;
+	Mon,  6 Jul 2026 16:58:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-pj2-f4.google.com (mail-pj2-f4.google.com [74.125.227.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8690E37C926
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 16:54:41 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783356882; cv=pass; b=YWEZPCKZs9mbUTguQ4l5GPaPjILwH7Nl1wloVm6f6CMlksVOCloeEEjoia1cMsI7QXzrx9h8/+OPEklbGyby6NrbYaI/5z9aFmu/3MmB0ZOdF+/kWfwSpjwVeazrTkGzY6Tupt3rdpcauRaAXGPlGNLqJ4jeRNvgDY05JDKl8ng=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783356882; c=relaxed/simple;
-	bh=0Y+jPbggfz0+aTRExiPF5rT44GzTy6yyUw8vlBFttSo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ljl3kfKkhvuykP47oU/gKqXRzsx6Efm2Kf+tdHN1CjYjwPLQqW8iBtUTS27STxN5RFaN4PX0pyH8Twy1vDes+VfaQWc5+g3XlL9kz13jHXzp407OBAnaVs4/JJ3SbZ7YzZSJP0vDdVU9eYl3raQrA4EApm8Ju7tkF5jOcXwrmD0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZgA/mN2h; arc=pass smtp.client-ip=209.85.216.46
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-3811e59df58so1978967a91.1
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 09:54:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783356881; cv=none;
-        d=google.com; s=arc-20260327;
-        b=R7raUQOzEe5ECpP1sL4H0up0LqNdv1RERBh9zPNH5HhOw7C1cQR1CFZbIVuQbn0l4h
-         nxxXosHFuLGB3t2MN2G2O7wWrePe8a1Yh2CH5llvFgjvyvFXcBNtyd9YwJLCvH3aC44L
-         d1wP+4xW5URquFyGb2dSjDWkn7DQwJfG/tA2ie8iDqzsMmhcRRUD0OJ60QA29cUd9OsQ
-         gN545RvidCwX8KTz5IHoHyOO4L4/WzS+ws2pI6cU77sMAitl0DWBpJJh/uA55Tcc1t+V
-         N/uk4U+SzRufKYwe7bvHE1qbX2cObc88BHZgd5J/d6xLydrEMayXLodVvA76StpKkmtM
-         flRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=z4GcYX+9Z4gYXSYhgZvkx5Z4PEsTCSeVsgPumim+UhU=;
-        fh=RcOvXH/jbhzgrv0V9Ln7N7ZKulXgIvtjHSyCbdBvxgs=;
-        b=LinOG8EuA7Y7x3KOJTW8xz2UsqMcy/BCCtzTJxkICrXTKgsju1mVxemdYANtx3U47r
-         L+4k4I2DiiC7Ojx15cRpipihlbM7oWzvnsEZTAhYuE+YWUaQx+o7DtTyrvYm8z6/dA1M
-         e86kuYg3VS9MFaT1u6augaKxXg4N8u8OQ8VmRqyfjEjRJsCnSXnCRqdsvGrLMldocBen
-         37TyNolIDYFRBTbohwEhLyStxac+ZoaOOaES7WIAg/HUg5vzkvejGur8ke6ekzH8o9Bi
-         i/aMBayxc9X/S5FbDZQYSMd+AJjWmpLQt+aoKDziq9Lg54D5q2OS/iZM3jXoSW7iaCoz
-         e/uA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61BA5357D00
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 16:58:19 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783357100; cv=none; b=SfNyvP1BMOfTz9fEgUVRcAJBGkAGUvcijAtkE3FcywFZXGiyEjd4vliIBULxwBbVBP17dpkHEZx7OxmrsGQlI6Nu61AlDLV+SODxNEjHgWyCZndtIe2iGVUmSqaX9N6ivDSas8HtJD1tESYktT6ujIEChdjMaOvDJfqUAlkr8V4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783357100; c=relaxed/simple;
+	bh=ww7lCt6NpJeU6KKhYEyofAyOhJWk5zB8DqbthydSzU8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tUplq2LMPt29VHwDjeZTAl2pN4yhB+0NsirkthHVQUleiB8tBaLb8Cr+MTTLkvYzBX+5QwY/ojYX1zthIyB9FueXKxH8cUVzXpa2ToGz7xyEKiMpAdgJ8lVpLwmB3FLCW0JyQ5Bu4HZOzqeai3wJJZins+Z49y6T55K1FRIuEVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KYUkjdZS; arc=none smtp.client-ip=74.125.227.132
+Received: by mail-pj2-f4.google.com with SMTP id d9443c01a7336-2cc7ef596c6so2764415ad.1
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 09:58:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783356881; x=1783961681; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z4GcYX+9Z4gYXSYhgZvkx5Z4PEsTCSeVsgPumim+UhU=;
-        b=ZgA/mN2hg5paALkOG9IQ7ytWC7hXu++4hocQJB5dB1nXB7l+9K4K/7WkDSDo3V03c7
-         4rqSFGBPOGLzSbzGPqISAIfFBRm1NOHGuqQJN/x5xzTcpgpwqHM30HTObBiib7woovQ9
-         0BFp6h0DAgoUswVI1GQUfw59Yzw/9G3GYGIZpqfh9tnrh4+Pm31ASSRPj2z8u5BmB2R8
-         97hFwAZF1Sq+Ft7NaSdAoi2HaagsyO+4FgT29+dBCzuhhtJGhwNnZfSvSBHrw3THzJPc
-         fBVsAN4hRDA/g0/WOLwydQ1PB+8GC89BGvwC1OpEgZCFqU0FJTVXyzwp/tChmRCwPLbF
-         EV7g==
+        d=gmail.com; s=20251104; t=1783357099; x=1783961899; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=yCktVGKDr9d58r4vlA1PSQeqKAytnjdIS32qXzkgbaU=;
+        b=KYUkjdZSCIF4b0cm2KLL1+10MAj23ccTmUc7MQPUafwirB0sEGz14heT4laggVu9uZ
+         +tvO182u5QGm3t4ErE4v/NDt/k8jyal5qb8mt3sgv/AzSBtNzzS2A9KSgouMf6nf/Dxo
+         xoYCDjg00EwOK3ZUHJq8AhPVtotUS1K8K9Cr1mM+JydpE9v8A9dHcGosjGoTMWI+5+Su
+         9ootqqn1lGrbqHz8JJbgJg0kR/PSWTQleTA3kN29Gpku7Km35oVrhXAaqpdVQ3aRVIYl
+         hoG7QVfwArwykWmz0DgtCsuMZ3AFkMOqkPhhzuZIg2biEES3YCN0P9NoOltv9D8sHb5p
+         OG0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783356881; x=1783961681;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=z4GcYX+9Z4gYXSYhgZvkx5Z4PEsTCSeVsgPumim+UhU=;
-        b=LyJ9eQ0n/cT8kaS7wFYoHc5Tr5Sd47ucjxVaw9rPnKVivMwZIgf+ok+zOimfDp/rLK
-         b5Y3dN6f5bagXqPI0noub72d2CNFc3yUaenGfa5d/7AWiip39bGUrTjxFi4iWL78UPaj
-         PWhv+I+8+PC8lm28AKbkM8XcGndqk900+g6EgjxUqlEuOS8qB2wV50GCZEoOc0aoTWMr
-         b7bbwm8OvLniZZTG2QaWr5Tph8BIaqsX3nJWA/QtbJpNqqzDpYLxGrmNUcxMC9tdcJ0r
-         UeZprwjnrx140mH86hNcf5nrmwFbJ8KYFnm+beyRbH77zkw/xtUlbVR/2LVfyEWrTpu5
-         SWdQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqMXHxwyCBG4qtSdszJ610oeaCLsRJVyffVO+G4+l/lVl3vCwuoU6bUBwaKyM0K3sFpF6gnU/o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuaVNuOHp3KD9vdH2uPo38SpobZFSqFgROs8aAC9BnGBZubOd4
-	cqPCbqdHSAuBt3pn88PJAGU++IMocbLShL6cMiVM0y3YENfDnaKvvgB+83TJkn7UAEsOxu165IC
-	7soy94/dmuKVRANhr0LfB/dbUcNp1anOsh4/+nwUe
-X-Gm-Gg: AfdE7clvr2Jb9RCFrEGdCRgSVntoEITanf5Wui6QRNAJQtGpPF9FwBt8GU4TRXTiIIo
-	7LcrRgmlR0nWphVY6jUcdGl1txgxBftXEUy+zf0ihKlzTwpDyiuq/KY48iEDH9xOrf8S5MArs+n
-	eXb+guj/Dl+xsCyEByO7F0nbJBRiicD79f/1evVyNKv6RExeRPwwqGRliFDuLTqjbamPCzxVm77
-	/0X78wcXWEl8C3wVqZITGyYCUPAWg8pz4Iznndr97ni0gcN9GM2vAUyxpkWftHgJSaxobvrTXa6
-	gpLTSo6xjXGjO377rCwxeXm1w+RRKV0x3cNMU3FM6N9YIW3OeLoMjqiXijoeVMmzNf8XEFSpu/u
-	vm5TfVVCioekyS7K6rmHea87M7/S1nbXnRje61jw=
-X-Received: by 2002:a05:6a20:9147:b0:3bf:6e72:68f9 with SMTP id
- adf61e73a8af0-3c08ee6ddd9mr1642406637.38.1783356880303; Mon, 06 Jul 2026
- 09:54:40 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1783357099; x=1783961899;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=yCktVGKDr9d58r4vlA1PSQeqKAytnjdIS32qXzkgbaU=;
+        b=DaOzTOdRnD+ShhZF3vMiqENxhQB4PPkp4OnN3dWe4+VxACJhvv+CrcvoaLTlyrLjS0
+         EuDFDxdC0P3ZJ1MuSisqjYVUP3AKck4itNBIbHDrsoSjSq7a7w7CzkCcctBbB/q8gGO9
+         iGTVAnQENJChfBYpbvMwSCFsqTCXhaVhKqdvwx1xg8aRM9gKUU31Qn9mg+8D6f0s7HR0
+         qlj1ebIuQp0z7AKvsLZM6Y7twQ8xeVl0LX6t1Ym/xGSJ0FeJSKUlwEkQP96Pfh0mwIdJ
+         fobtM3WftW/kLeTaHEYuumgIOlKzYMMZhg4m1pzizguUvrp5i0jYNyr0qJRpZXuOJrII
+         RNyw==
+X-Forwarded-Encrypted: i=1; AHgh+Ro2yVwbhIp+3bxGMdojXBztDFV9kZZaylEkHmxXcyRrtp+dZzGL+LMXPKW4SkbifICyizTh++k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6+2gjijqTK8WlABSjuS759B8TQFu2/aFQj5BbyBK2iFI7TjaL
+	IGU8ZMslZqRId3hcVc00Lby4lH/gQg94/5zRTIH5Y2kQkMbKvF2x81Nc
+X-Gm-Gg: AfdE7cmWkeB9Ar+cO/x3nGZBlhhuo1Ik2arZWyWFNyzWehBzlV8l4XJJfQm2qQJ7LCk
+	e91dMJaFY/5T7mB/Qm899v4OGrCIA7tEuEJ+zOQ+D5Z7wmZhKujCY0xS0s07NZLXB3O8INyhfBZ
+	9tXylbDsHJjH8YUM2uBlEOiT7RPg+R6IMc+hw3AoNuEbxAq+F7tg+rs+yLzvqv5i7PFBoIC5PBf
+	tY0PpKdX277+walTvj9f8w8uiIYZNILEm1/ZFGa0sGsLfw+s4pZ9BJcbpvNsivtU307xQ0zPV2C
+	cqQR/k3d/i83QfR/ZScnC1b65wm8UqDxcPbtThHQ9A66xNs8IgV9IQYoyKrnWh4BKVsAY5cb7Br
+	fka93UYLKyvkNgy2wtxNGu/jO8irFCgLoa2ACEMhvk6o0Se8BYz8cTSvbBjPtGN7cL+cv7EfMoC
+	Lyroo5vbgQlYHvxLNJ
+X-Received: by 2002:a17:902:d4c7:b0:2ca:ce91:f027 with SMTP id d9443c01a7336-2ccbf08784fmr14779995ad.36.1783357098686;
+        Mon, 06 Jul 2026 09:58:18 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:58::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cad6f260acsm54342455ad.6.2026.07.06.09.58.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jul 2026 09:58:18 -0700 (PDT)
+Date: Mon, 6 Jul 2026 09:58:09 -0700
+From: Stanislav Fomichev <sdf.kernel@gmail.com>
+To: Mahe Tardy <mahe.tardy@gmail.com>
+Cc: bpf@vger.kernel.org, andrew+netdev@lunn.ch, andrii@kernel.org, 
+	ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
+	edumazet@google.com, john.fastabend@gmail.com, kuba@kernel.org, liamwisehart@meta.com, 
+	martin.lau@linux.dev, pabeni@redhat.com, song@kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH bpf-next 2/6] bpf: Add ksock kfuncs
+Message-ID: <akvdsqFhq0x19cu2@devvm7509.cco0.facebook.com>
+References: <20260706093525.13030-1-mahe.tardy@gmail.com>
+ <20260706093525.13030-3-mahe.tardy@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260703001009.1572444-1-kuniyu@google.com> <20260703001009.1572444-13-kuniyu@google.com>
-In-Reply-To: <20260703001009.1572444-13-kuniyu@google.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 6 Jul 2026 09:54:29 -0700
-X-Gm-Features: AVVi8CcCSyIS6Qr00fgmOoCc6bhSGQ00N_rvT3bGq30rFTutXOMPb6CdxIm8xrE
-Message-ID: <CAAVpQUC+2_GqR8KT+xW0tR9txY=sanQR3GyQN9eOsqFE1qLkZQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 12/14] ipvlan: Synchronise ipvlan_init() and
- ipvlan_uninit() for the same lower dev.
-To: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260706093525.13030-3-mahe.tardy@gmail.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305151-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:kuni1840@gmail.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-305152-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:mahe.tardy@gmail.com,m:bpf@vger.kernel.org,m:andrew+netdev@lunn.ch,m:andrii@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:davem@davemloft.net,m:eddyz87@gmail.com,m:edumazet@google.com,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:liamwisehart@meta.com,m:martin.lau@linux.dev,m:pabeni@redhat.com,m:song@kernel.org,m:netdev@vger.kernel.org,m:mahetardy@gmail.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,kernel.org,iogearbox.net,davemloft.net,gmail.com,google.com,meta.com,linux.dev,redhat.com];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,devvm7509.cco0.facebook.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5103E713BEB
+X-Rspamd-Queue-Id: 5D8467149F5
 
-Replying to Sashiko review,
+On 07/06, Mahe Tardy wrote:
+> Add BPF kfuncs that allow BPF LSM programs to create and use sockets for
+> sending data. This provides a mechanism for BPF programs to emit
+> telemetry. For this first patch set, it's restricted to SOCK_DGRAM
+> socket types with IPPROTO_UDP protocol but could be easily extended to
+> SOCK_STREAM and IPPROTO_TCP in the future.
+> 
+> The API consists of six kfuncs:
+> 
+>   bpf_ksock_create()   - Create a socket (sleepable)
 
-On Thu, Jul 2, 2026 at 5:10=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.com=
-> wrote:
->
-> ipvlan_uninit() for the last ipvlan device resets the lower device's
-> rx_handler_data to NULL.
->
-> Once RTNL is removed, ipvlan_init() would race with ipvlan_uninit(),
-> which could leak a newly allocated ipvl_port.
->
->   ipvlan_init()                   ipvlan_uninit()
->   |                               |- if (refcount_dec_and_test(old_port))
->   ...                                |- ipvlan_port_destroy(old_port)
->   |                                     '
->   |- refcount_inc_not_zero(old_port) <-- fails
->   |- ipvlan_port_create(phy_dev)        .
->      |- new_port =3D kzalloc()            |
->      |- phy_dev->rx_handler_data =3D new_port
->                                         |- phy_dev->rx_handler_data =3D N=
-ULL
->                                         ...
->                                         `- kfree(old_port);
->
-> Let's synchronise the two by holding the lower device's netdev_lock().
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> ---
->  drivers/net/ipvlan/ipvlan_main.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
->
-> diff --git a/drivers/net/ipvlan/ipvlan_main.c b/drivers/net/ipvlan/ipvlan=
-_main.c
-> index b4906a8d24ef..7adad781e9b5 100644
-> --- a/drivers/net/ipvlan/ipvlan_main.c
-> +++ b/drivers/net/ipvlan/ipvlan_main.c
-> @@ -177,9 +177,12 @@ static int ipvlan_init(struct net_device *dev)
->         if (!ipvlan->pcpu_stats)
->                 return -ENOMEM;
->
-> +       netdev_lock(phy_dev);
-> +
->         if (!netif_is_ipvlan_port(phy_dev)) {
->                 err =3D ipvlan_port_create(phy_dev);
->                 if (err < 0) {
-> +                       netdev_unlock(phy_dev);
->                         free_percpu(ipvlan->pcpu_stats);
->                         return err;
->                 }
-> @@ -190,6 +193,8 @@ static int ipvlan_init(struct net_device *dev)
->                 refcount_inc(&port->count);
->         }
+[..]
 
----8<---
-Does this fully resolve the race condition if ipvlan_device_event() drops
-the final reference?
----8<---
+>   bpf_ksock_bind()     - Bind socket to local address (sleepable)
+>   bpf_ksock_connect()  - Connect socket to remote address (sleepable)
 
-Yes.  netdev_lock() here is to prevent race between ->ndo_init() (newlink()=
-)
-and ->ndo_uninit() of an upper device, where the latter does not always
-hold the same rtnl_net_lock() with the former.
+Since you're doing only UDP for now, maybe you don't need bind/connect? The
+kernel should autobind (by default) when you sendmsg over UDP socket (IIRC).
 
----8<---
-Because ipvlan_device_event() temporarily acquires a port reference via
-ipvlan_port_get() and releases it via ipvlan_port_put() without holding
-netdev_lock(phy_dev), could the following sequence occur?
----8<---
+>   bpf_ksock_send()     - Send data through the socket (sleepable)
+>   bpf_ksock_acquire()  - Acquire a reference to a socket context
+>   bpf_ksock_release()  - Release a reference (cleanup via
+>                          queue_rcu_work since sock_release sleeps)
+> 
+> The setup kfuncs bpf_ksock_create, bpf_ksock_bind, bpf_ksock_connect,
+> can be called from SYSCALL programs only. While bpf_ksock_acquire,
+> bpf_ksock_release and bpf_ksock_send can be called from SYSCALL and LSM
+> programs.
+> 
+> The implementation follows the established kfunc lifecycle pattern
+> (create/acquire/release with refcounting, kptr map storage, dtor
+> registration). The kernel socket is wrapped in a refcounted bpf_ksock
+> struct. Cleanup is deferred via queue_rcu_work() because sock_release()
+> may sleep.
+> 
+> The kfuncs are only compiled when CONFIG_INET is enabled, as they
+> specifically support AF_INET and AF_INET6 sockets.
+> 
+> The socket operations go through the expected LSM hooks instead of
+> by-passing them like many kernel sockets since those are created by BPF
+> programs and thus system users. Thus bpf_ksock_send() kfunc, which is
+> exposed to LSM progs, has a re-entering protection to avoid recursion.
+> Also, because of the LSM checks, we prevent the use of the kfuncs from
+> asynchronous workqueue as the current value would then be invalid.
 
-ipvlan_device_event() for the lower dev and ipvlan_init() (->newlink()) for
-the upper dev are under the same rtnl_net_lock(), so no race occurs.
+[..]
+
+> A bpf_ksock_max sysctl is added to limit the maximum number of BPF
+> kernel sockets that may exist in each network namespace. Out of
+> simplicity for now, the settings is host wide but the counters are per
+> network namespace.
+
+What is this guarding against? Rogue bpf programs creating too many sockets?
 
