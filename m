@@ -1,240 +1,323 @@
-Return-Path: <netdev+bounces-304978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304979-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id pLSpGuqNS2rAVQEAu9opvQ
-	(envelope-from <netdev+bounces-304978-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 13:13:46 +0200
+	id XkXaL5OTS2pTVwEAu9opvQ
+	(envelope-from <netdev+bounces-304979-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 13:37:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4490070FB6D
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 13:13:45 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B88370FF2E
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 13:37:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=leemhuis.info header.s=key2 header.b=OGcdM4XX;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304978-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304978-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b=Z5dYJjyL;
+	dmarc=pass (policy=none) header.from=intel.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304979-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304979-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 58E63300D79F
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 11:04:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5B2E430285ED
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 11:05:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B8D339A812;
-	Mon,  6 Jul 2026 11:04:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A7223A6F1A;
+	Mon,  6 Jul 2026 11:05:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.102])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A9034BA33
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 11:04:32 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783335874; cv=none; b=ppQrxvU2kz3R6prFTmgY5D3KnqwLMiM/R+JAf4JzjEw3iTMDFTDuLT6r3Uusp0p2ASVKxXfYzf4JpGwxb5X9/CWzCcm3p/pXFo/bkbtMwZSkXh58jtQR203afspA8yX9ojJRyeCuaAz1GKd7ZVH+nbo0dTYIRDLLntu6Fq5htRg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783335874; c=relaxed/simple;
-	bh=ZhHjS76EDOyMCf5zoYs4QB/MG761m5MsVg+3Ds7w/qo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=peUPd2kPJYSyliJuzLpjx1gBinIzMp7rMUuW9spYPCcRdvcZBYM4Q1/3RwylXh8giljQcaEaNHEkWk6qLWkZb8JfQhDY36ZM7Uvj64WSlwy6+L0PeM8bpAN+KGgt7JnEVz4ZqCJNY6vTqKtj0DYi2ASzTlqnbmOgPNLKv7ZWvg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=OGcdM4XX; arc=none smtp.client-ip=188.68.63.102
-Received: from mors-relay-2502.netcup.net (localhost [127.0.0.1])
-	by mors-relay-2502.netcup.net (Postfix) with ESMTPS id 4gv1gj5MkXz60yB;
-	Mon,  6 Jul 2026 13:03:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
-	s=key2; t=1783335825;
-	bh=ZhHjS76EDOyMCf5zoYs4QB/MG761m5MsVg+3Ds7w/qo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=OGcdM4XXn3ezQZq6hccgb32L75EEkTpPiAM83GIoyGsCJj+179jNY+QiiZQOP6Hr0
-	 pXGu2ZTefK5v3xM9QOOe3i+u/wMX3CvdKvsB8yAXo7Gtq462WGCDO5P/7znbgR+WAu
-	 I+kHcJIknTsutWdqX5wNxq6lWUmND/KLL/HeYUEOXXVoGIoRcpktgTmyaTm5WhJHaz
-	 34iex8yG5eAMhsaagSv0sTOWjFCAhn2pT/G20BSW0THyMWd0DE5AT43jRjF2TT3UD3
-	 DW/45p8AstdKQSlfWStw/Nf0dKOel/kpi4BNIAPAvcWwtEYM4bD4SWwEMeXlnzKRBA
-	 1uk7PQgKRpYyQ==
-Received: from policy01-mors.netcup.net (unknown [46.38.225.35])
-	by mors-relay-2502.netcup.net (Postfix) with ESMTPS id 4gv1gj4fWbz4xc2;
-	Mon,  6 Jul 2026 13:03:45 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at policy01-mors.netcup.net
-X-Spam-Flag: NO
-X-Spam-Score: -2.898
-X-Spam-Level: 
-Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy01-mors.netcup.net (Postfix) with ESMTPS id 4gv1gf2fT5z8tXL;
-	Mon,  6 Jul 2026 13:03:42 +0200 (CEST)
-Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
-	by mxe9fb.netcup.net (Postfix) with ESMTPSA id BEEB7603ED;
-	Mon,  6 Jul 2026 13:03:41 +0200 (CEST)
-Received-SPF: pass (mxe9fb: connection is authenticated)
-Message-ID: <eb5bb7ba-d6f5-4989-8cdc-bd57059fda34@leemhuis.info>
-Date: Mon, 6 Jul 2026 13:03:41 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31B9C34BA33;
+	Mon,  6 Jul 2026 11:05:08 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783335911; cv=fail; b=JYg5Qx0rxR/JQQstgNPlsMLgPH2fcEgd8CkJn+uuqbaJhsO6veg+Jsf8vVWmXMu+F84oOdiyCjhAhBkSQSV1X2ovEqXeNnUBuDYxqWEYzpjHNBF66j/bs460npsnUwHjEXOao8fJKcasLePcSx8ThpJ/7wBEbgLfhKOTitrsoAc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783335911; c=relaxed/simple;
+	bh=Vea9aKfgtIdJDBHoVJ0/hbV60MhqfMyd5usDnLAHHIQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Hgj/fSMF3ptZq4tI1iU9VHyNQQwNPYZR+cueAIQR5fiP0l5+0JvB9QM8vRzgmkL5NFTmROx3zRFLPcBe6ZC6WsT7uY/LZyLw1IGiKte8HGIfw+iDJvb1zcIM2wB95gMtpHx4Y/3V4/qtTSqcTDxKd5424gUIONQtqycmC30ahjU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z5dYJjyL; arc=fail smtp.client-ip=198.175.65.20
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1783335909; x=1814871909;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=Vea9aKfgtIdJDBHoVJ0/hbV60MhqfMyd5usDnLAHHIQ=;
+  b=Z5dYJjyL5c8Ea41PAQwLysHh66D0NvZgJi9L1XKKBdseTpZl+6wTceEg
+   Bvzb3c0CNnf2G8gJ60ECsJW6UnKgstm7/kuDrdktbevShk54ERvUAX+N/
+   5uTaxz4VZugVky20lhaa7Ar+D73mr/VBbJ+ahV6tZ/wPoehJIEirJt3kE
+   OtY4bx8IjOAVNDawXuCdTpyf43OBhb6ShYi70PJ+bmy+d4/cOk9BUPOTT
+   i3SfkFyrmCXkzR/XVr/LDls73jCFoRfzL3jUnhASgLfuYB9Vdg/bCeRf5
+   KKr5nU/gFKgYHdckUNSccDtJ1ZZm0ooVAKZbY2qrfNjyvKuYqhtfT+UdU
+   g==;
+X-CSE-ConnectionGUID: KdmAb7FVScWc+Pz111eYLg==
+X-CSE-MsgGUID: AR9VCrAVTf+258IoA9dzhg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11838"; a="83739899"
+X-IronPort-AV: E=Sophos;i="6.25,149,1779174000"; 
+   d="scan'208";a="83739899"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2026 04:05:08 -0700
+X-CSE-ConnectionGUID: yOUggHXiSailNPkufWL9Sg==
+X-CSE-MsgGUID: jqLHyJ0iT7CMsdmgQ+XQUQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,149,1779174000"; 
+   d="scan'208";a="251940539"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2026 04:05:09 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Mon, 6 Jul 2026 04:05:08 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43 via Frontend Transport; Mon, 6 Jul 2026 04:05:08 -0700
+Received: from BL0PR03CU003.outbound.protection.outlook.com (52.101.53.4) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Mon, 6 Jul 2026 04:05:02 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kcJyGyaeioZvYCkdUTG+52X5sVbPbfeCp5ah0LQYcY6E7o2Q1RRCI1FXWCmtipH35dI1v5QjEahq641swhRNKjw9pNzti+To/2mvwhHv46Fwh7KwO/3nsPhK3Js86SY8Lqd2iIrxCELXbYosuqveiBcCwISeGJ2QGwc7Glq/uuItJmpa6jTVcFwG+1vkR3VHGuAdXXP3bsS9nEnw4CuFIsH2bqlgGucjWtqLEWGpIHGJQyaWsyg/ftwbfgdZWxwqq9ld9hGcnPm83cieSlta/9tMhsqj4ECWrrJDUmOc013wKu5wMRV+LMq46yFCnrJXr58Y4lc/MKMuhSX1MJlL7Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=epa0vJJidq0ww5QhtViOImDVlOSy+3BH6YJkYdTe8n4=;
+ b=jtvkO64wJbD7Cx4ujoojvuSQA01mmdKc7gETvxrIbXZv1YPbPWOFoiGvrI2cghV7YT5N2iTIGcHyTrlqkGjQd8IK5B5uC6wD5a+g8LmcOxmtK8t/hnpsaPRsSB3yoxju1QTqrrN/YiiHJu1cfDCNT/5qsjZG8Ufb1omDWOMSGritpOut0hWKBbbT/1Qpps4fMGieHlRHziu68GhjP5kb9TOkt+zEE8mrOzzcYJR4rXAxjldqMXQUSfwJmQNwq71ad7BF+aC4EqukZ+9NQJNwX7LqxN7QW0U8EZ39+/mMBT4sKKCZE11swSJ977iTs/ci5BuT9W32V1YrzhqR6XSwEg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM4SPRMB0045.namprd11.prod.outlook.com (2603:10b6:8:6e::21) by
+ SN7PR11MB6653.namprd11.prod.outlook.com (2603:10b6:806:26f::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.9; Mon, 6 Jul 2026
+ 11:04:57 +0000
+Received: from DM4SPRMB0045.namprd11.prod.outlook.com
+ ([fe80::b630:ca9c:20e1:f485]) by DM4SPRMB0045.namprd11.prod.outlook.com
+ ([fe80::b630:ca9c:20e1:f485%6]) with mapi id 15.21.0181.008; Mon, 6 Jul 2026
+ 11:04:57 +0000
+Date: Mon, 6 Jul 2026 13:04:44 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Johan Alvarado <contact@c127.dev>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <mcoquelin.stm32@gmail.com>,
+	<alexandre.torgue@foss.st.com>, <Jose.Abreu@synopsys.com>, <pavel@ucw.cz>,
+	<netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] net: stmmac: raise TX completion interrupt at the
+ end of an xmit burst
+Message-ID: <akuLzI9GVGn4eI1j@boxer>
+References: <0100019f35ea26e0-42ad009c-01ab-4a8f-b126-fa65fbacae5c-000000@email.amazonses.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <0100019f35ea26e0-42ad009c-01ab-4a8f-b126-fa65fbacae5c-000000@email.amazonses.com>
+X-ClientProxiedBy: WA2P291CA0004.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1e::8) To DM4SPRMB0045.namprd11.prod.outlook.com
+ (2603:10b6:8:6e::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Bug 221606] r8169: PCIe AER errors and recovery failure after
- recent driver changes
-To: Lasse Bjerre <lasse@lgb.dk>, Javen <javen_xu@realsil.com.cn>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Linux kernel regressions list <regressions@lists.linux.dev>
-References: <bug-221606-201211@https.bugzilla.kernel.org/>
- <bug-221606-201211-LMiiKJhHhg@https.bugzilla.kernel.org/>
- <b1bda1da-8231-4f05-94a7-7511041ae489@gmail.com>
- <9b206f58d93b48d194980374cf0da7b1@realsil.com.cn>
- <PA4PR02MB6991F71D748EE9A99191EEACDA1E2@PA4PR02MB6991.eurprd02.prod.outlook.com>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: de-DE, en-US
-X-Enigmail-Draft-Status: N11222
-Autocrypt: addr=linux@leemhuis.info; keydata=
- xsFNBFJ4AQ0BEADCz16x4kl/YGBegAsYXJMjFRi3QOr2YMmcNuu1fdsi3XnM+xMRaukWby47
- JcsZYLDKRHTQ/Lalw9L1HI3NRwK+9ayjg31wFdekgsuPbu4x5RGDIfyNpd378Upa8SUmvHik
- apCnzsxPTEE4Z2KUxBIwTvg+snEjgZ03EIQEi5cKmnlaUynNqv3xaGstx5jMCEnR2X54rH8j
- QPvo2l5/79Po58f6DhxV2RrOrOjQIQcPZ6kUqwLi6EQOi92NS9Uy6jbZcrMqPIRqJZ/tTKIR
- OLWsEjNrc3PMcve+NmORiEgLFclN8kHbPl1tLo4M5jN9xmsa0OZv3M0katqW8kC1hzR7mhz+
- Rv4MgnbkPDDO086HjQBlS6Zzo49fQB2JErs5nZ0mwkqlETu6emhxneAMcc67+ZtTeUj54K2y
- Iu8kk6ghaUAfgMqkdIzeSfhO8eURMhvwzSpsqhUs7pIj4u0TPN8OFAvxE/3adoUwMaB+/plk
- sNe9RsHHPV+7LGADZ6OzOWWftk34QLTVTcz02bGyxLNIkhY+vIJpZWX9UrfGdHSiyYThHCIy
- /dLz95b9EG+1tbCIyNynr9TjIOmtLOk7ssB3kL3XQGgmdQ+rJ3zckJUQapLKP2YfBi+8P1iP
- rKkYtbWk0u/FmCbxcBA31KqXQZoR4cd1PJ1PDCe7/DxeoYMVuwARAQABzSdUaG9yc3RlbiBM
- ZWVtaHVpcyA8bGludXhAbGVlbWh1aXMuaW5mbz7CwZQEEwEKAD4CGwMFCwkIBwMFFQoJCAsF
- FgIDAQACHgECF4AWIQSoq8a+lZZX4oPULXVytubvTFg9LQUCaOO74gUJHfEI0wAKCRBytubv
- TFg9Lc4iD/4omf2z88yGmior2f1BCQTAWxI2Em3S4EJY2+Drs8ZrJ1vNvdWgBrqbOtxN6xHF
- uvrpM6nbYIoNyZpsZrqS1mCA4L7FwceFBaT9CTlQsZLVV/vQvh2/3vbj6pQbCSi7iemXklF7
- y6qMfA7rirvojSJZ2mi6tKIQnD2ndVhSsxmo/mAAJc4tiEL+wkdaX1p7bh2Ainp6sfxTqL6h
- z1kYyjnijpnHaPgQ6GQeGG1y+TSQFKkb/FylDLj3b3efzyNkRjSohcauTuYIq7bniw7sI8qY
- KUuUkrw8Ogi4e6GfBDgsgHDngDn6jUR2wDAiT6iR7qsoxA+SrJDoeiWS/SK5KRgiKMt66rx1
- Jq6JowukzNxT3wtXKuChKP3EDzH9aD+U539szyKjfn5LyfHBmSfR42Iz0sofE4O89yvp0bYz
- GDmlgDpYWZN40IFERfCSxqhtHG1X6mQgxS0MknwoGkNRV43L3TTvuiNrsy6Mto7rrQh0epSn
- +hxwwS0bOTgJQgOO4fkTvto2sEBYXahWvmsEFdLMOcAj2t7gJ+XQLMsBypbo94yFYfCqCemJ
- +zU5X8yDUeYDNXdR2veePdS3Baz23/YEBCOtw+A9CP0U4ImXzp82U+SiwYEEQIGWx+aVjf4n
- RZ/LLSospzO944PPK+Na+30BERaEjx04MEB9ByDFdfkSbM7BTQRSeAENARAAzu/3satWzly6
- +Lqi5dTFS9+hKvFMtdRb/vW4o9CQsMqL2BJGoE4uXvy3cancvcyodzTXCUxbesNP779JqeHy
- s7WkF2mtLVX2lnyXSUBm/ONwasuK7KLz8qusseUssvjJPDdw8mRLAWvjcsYsZ0qgIU6kBbvY
- ckUWkbJj/0kuQCmmulRMcaQRrRYrk7ZdUOjaYmjKR+UJHljxLgeregyiXulRJxCphP5migoy
- ioa1eset8iF9fhb+YWY16X1I3TnucVCiXixzxwn3uwiVGg28n+vdfZ5lackCOj6iK4+lfzld
- z4NfIXK+8/R1wD9yOj1rr3OsjDqOaugoMxgEFOiwhQDiJlRKVaDbfmC1G5N1YfQIn90znEYc
- M7+Sp8Rc5RUgN5yfuwyicifIJQCtiWgjF8ttcIEuKg0TmGb6HQHAtGaBXKyXGQulD1CmBHIW
- zg7bGge5R66hdbq1BiMX5Qdk/o3Sr2OLCrxWhqMdreJFLzboEc0S13BCxVglnPqdv5sd7veb
- 0az5LGS6zyVTdTbuPUu4C1ZbstPbuCBwSwe3ERpvpmdIzHtIK4G9iGIR3Seo0oWOzQvkFn8m
- 2k6H2/Delz9IcHEefSe5u0GjIA18bZEt7R2k8CMZ84vpyWOchgwXK2DNXAOzq4zwV8W4TiYi
- FiIVXfSj185vCpuE7j0ugp0AEQEAAcLBfAQYAQoAJgIbDBYhBKirxr6Vllfig9QtdXK25u9M
- WD0tBQJo47viBQkd8QjTAAoJEHK25u9MWD0tCH8P/1b+AZ8K3D4TCBzXNS0muN6pLnISzFa0
- cWcylwxX2TrZeGpJkg14v2R0cDjLRre9toM44izLaz4SKyfgcBSj9XET0103cVXUKt6SgT1o
- tevoEqFMKKp3vjDpKEnrcOSOCnfH9W0mXx/jDWbjlKbBlN7UBVoZD/FMM5Ul0KSVFJ9Uij0Z
- S2WAg50NQi71NBDPcga21BMajHKLFzb4wlBWSmWyryXI6ouabvsbsLjkW3IYl2JupTbK3viH
- pMRIZVb/serLqhJgpaakqgV7/jDplNEr/fxkmhjBU7AlUYXe2BRkUCL5B8KeuGGvG0AEIQR0
- dP6QlNNBV7VmJnbU8V2X50ZNozdcvIB4J4ncK4OznKMpfbmSKm3t9Ui/cdEK+N096ch6dCAh
- AeZ9dnTC7ncr7vFHaGqvRC5xwpbJLg3xM/BvLUV6nNAejZeAXcTJtOM9XobCz/GeeT9prYhw
- 8zG721N4hWyyLALtGUKIVWZvBVKQIGQRPtNC7s9NVeLIMqoH7qeDfkf10XL9tvSSDY6KVl1n
- K0gzPCKcBaJ2pA1xd4pQTjf4jAHHM4diztaXqnh4OFsu3HOTAJh1ZtLvYVj5y9GFCq2azqTD
- pPI3FGMkRipwxdKGAO7tJVzM7u+/+83RyUjgAbkkkD1doWIl+iGZ4s/Jxejw1yRH0R5/uTaB MEK4
-In-Reply-To: 
- <PA4PR02MB6991F71D748EE9A99191EEACDA1E2@PA4PR02MB6991.eurprd02.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-PPP-Message-ID: <178333582208.734786.13573271730310934407@mxe9fb.netcup.net>
-X-NC-CID: Dz8q2ScuPMkR5wg978Cw6BuZlfVICEx7YH48LH/2tpGwle3ujdc=
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4SPRMB0045:EE_|SN7PR11MB6653:EE_
+X-MS-Office365-Filtering-Correlation-Id: 05151773-3593-44aa-d10c-08dedb4e6a58
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|23010399003|376014|7416014|1800799024|366016|18002099003|3023799007|56012099006|11063799006|22082099003;
+X-Microsoft-Antispam-Message-Info: Gn5XcbMshqc6wZ8EMZUrprV9f3baRWPjn3GRcutxjp3UJi2B3zdLdmWv/rihZSRsMJprIFZlsSisv5LoWYey8IoSrL6ZzKMADGgbyquE1Y1fYpXcRiwv2v64v+Xo3qgJIQw1ZWjwUC3EVlj37XbRXBDNQAmOecyuLgHhGkJV2P5x0sI/ugC2/4ENdoQsgJpRhR0Mw1MoyKYJ0hAzZzCFlCrEClOwEgdpoJXS+sL3kgcNXNH33DpADSZX+5MqUUPmoHfgQLrtwiGEdJJkF/+vIpPGWIh+UMF6wmC96gXf+jTVuBNUcKdHOzvoeeINs19U3agLZzlF5s28VK2kbszVpBUF3C/fs8fr6I1SXhra+lIXU+v2QY6bd5VoqLTDovRcFUZPWOec1wxUalFmSd6rSUG2P9TjKzKgoBZnvMzmjnlnUq9/T626knhWCWbTl1xlmGT5tmZ3SOXxReAk5jziO2D8btgdDJuYCQ+Idt3eWxPYMYyMkZ6EOtq2dqHDC0dJRbUZVcqQwi8QX/Elw8JTaowx+EWyIJevVSng/2lrI5dLgulG38RqaXP4COM1gR8Dvgu6Qci1CdrtJ2bF7o6Ef0SA7PO71bvjeFgBOgTpH+raXpfajE0RqnS6CmavRn3A+86wtqVTFBdfrEvteje5U6K/OaitDJWCTWhnKymH100=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4SPRMB0045.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(7416014)(1800799024)(366016)(18002099003)(3023799007)(56012099006)(11063799006)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?VMTzLuLLjH+q3I8JErtMAR3Hc5UibQmKj88aRXlrM9mgdm9CqTI0z/Mk91jK?=
+ =?us-ascii?Q?x4hIWKiHakid/vUf5w/tKgnVJxQ5NbSUO/GfvzHd494OcJMrLa+I+Wr1gb+3?=
+ =?us-ascii?Q?D+1DCxn1n3YWU18X3JXJLIVSgkDOLSwsnscDCOmvM3NFkj/HVBqM87JPAFo2?=
+ =?us-ascii?Q?krYUDWFrQhN6g0SQsfyNRYzjDvFn34vDgRYjIR1uZKN4p37Dc3KXsCFjw4y7?=
+ =?us-ascii?Q?/1E+lNt8bB60mfBhAQJjapFpxGQgcddBMMTZsbRymTRwNrOgpi6o8kAb9HTD?=
+ =?us-ascii?Q?qpd+/1et+4R7W+D8326heNH/8PjbDNBNXvQOrV9KBgbAzP4YNawTb2IxDR1v?=
+ =?us-ascii?Q?wHKHfnYxrhuqF2b34pPUhQuuE1WvPAKypYi329iWM+SnKYYBCLTuHcFwMveL?=
+ =?us-ascii?Q?by7uG+f+qVAFcoa1s8u7BqpvK+BNSOn1id2qzggWaJaAktoGt1FFRSXxobo3?=
+ =?us-ascii?Q?hEof/Vy1znV1egOVW0s/1eSlytdWzZ4Kch+weEAcHljVGm0+tAodJG/kS+w4?=
+ =?us-ascii?Q?fjhi0lrLTcXaChEpQb0lRDnOys5N9wWHqV5WlitP5GOC4Fth2u2cc0Quo+Gv?=
+ =?us-ascii?Q?Y2gIsfWlN3N9wlfwsTPYw4K8+t7sTYiZseiGd0jGhjD1xP4smNlr36qf6fah?=
+ =?us-ascii?Q?8mIIeyWjHzpX1MJWVvxluyrJrhuPkw5L6Ia1y7JqHHJU31Ht2DYsFLZVapS/?=
+ =?us-ascii?Q?z8aj9Mt4fpiU0qI/WUcluOBq3338GplTcTvIyFnJUIgrIn6CLwxPJzTmdhVL?=
+ =?us-ascii?Q?21OrLhVF+NJ824OcrsmejS8BIDubBCxT9jeOMZVboSEVF1sYdj81shRvzXVi?=
+ =?us-ascii?Q?8GhyP3cXF7GIjCmEqAGqJh/fYaIliRminNI7nN+PTXuIBuos8BBu49zib4XD?=
+ =?us-ascii?Q?8f/aqJY8FRTHZ4jse7zUM4rxiq2zqh3BynAcWM/znYSxK5yvrqKqVkgO0zIg?=
+ =?us-ascii?Q?toxWXGTAMRi0YccuemKndWFJYGeDfiprYf/9WJGwFgw2vZANL0lY9V64tXy3?=
+ =?us-ascii?Q?KSzy6Vh1/Vazk+H11AHYY/8yH/OVAYT0RLcb9gLUGf8tc7+m8RBv56HUKZOl?=
+ =?us-ascii?Q?T5tabak8UphtTJgTroO++WdpCC0vQW7H/JDa9kQNzyEAAnQqZNmxxms6cEgK?=
+ =?us-ascii?Q?A5UR9g+B8rdcHNTIzfu8HNph8HA9SDS5l+r2Ar8ZTDLBoNPKwVK4jZVRALA5?=
+ =?us-ascii?Q?UlQ4IN+IftNfjF/J39kuF8DAWfasGmHTHVvtsfN6gkwCA7EZ1OI+xKrM/glm?=
+ =?us-ascii?Q?k/8Q8oJlcHwpmCLmDVDNUogmYDeTzF+V+aJfptluZWBVeBSQqBa7FFB3ZRby?=
+ =?us-ascii?Q?Nr5kfpwuBAaKb03xOv8GT8lq7Kq+3eXvOLrPZ2mkW2w6RC0n0AKdYS7P6LB8?=
+ =?us-ascii?Q?ZSBTNdZTiSSResGWcMKxQC41jMLW7n5hy474XtV8tJgoa57uqYBNPJenP7v4?=
+ =?us-ascii?Q?jaofqKP5U/4pARAHskTwJV50TfD+t4058kqU4DmlawztWRXsmFjxVd8WnLm4?=
+ =?us-ascii?Q?rkE3hXxM9/hb/w9h3e1xkVtLIVg3VcRJj9jXxO59jYuTwCzXSrFzVtXVuzpr?=
+ =?us-ascii?Q?Az5OGsUNZ/ylymSClHhQHEPK/Jqdc5kLZlMAbCJdSGm22G62gTLEP4lfVpvv?=
+ =?us-ascii?Q?xE8M4KttJnpmH94ZaeYOon5q2UdXfvroEt1m5UsfmlTowII/jP1PmSPm1Nk+?=
+ =?us-ascii?Q?4i7yI+sOobXGXQ5ACbkTZpdXFRfgSONJvq4aWcVk9i6Bwi9OgXuLOcG6rbnQ?=
+ =?us-ascii?Q?TlYDkpMkAopE5IVfeUMr43boDjU/Apc=3D?=
+X-Exchange-RoutingPolicyChecked: BMcXMh3QixlNGzlUUga9MP3jlwunFjkOUDvb8pr3AB1/kxFqZOf1+G1dhkgFASjogK97GDng5xM6PMTdLLGpI760EKXnZLY+GCbDklsQOZe1OJzQKtk93XgCQ3EfftzwtUJ0uxa5xuY86Md0sz+wCR5Px6ZrzQ66jw7kT7XLGbR+mqDv/62dbnIwfG/iuqwASNgNpXphS2KmGAmRctkL3HxzYYDFHIkwlRIeFBCD8EzszK4rAbzs26fGj9quZCdh9RF82rtpYbWo8jaOBtSIc+AqrEBxudhA3ZpzN9fa5/qMUn2oi5kUTXkcLJhOwM47cc5YPcIlWzb3VwarDiPqJA==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 05151773-3593-44aa-d10c-08dedb4e6a58
+X-MS-Exchange-CrossTenant-AuthSource: DM4SPRMB0045.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2026 11:04:57.2088
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: C36HxHYe7dt9ct1kfSKzxjBF+bs4ILYd8wH7MI0paksppCmj9tjzP8J1fOUWHnJNaVyR+KDsRQr72EYEFT+pplXtA/gOTA0jEXOB6STujFs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6653
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[leemhuis.info:s=key2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:lasse@lgb.dk,m:javen_xu@realsil.com.cn,m:netdev@vger.kernel.org,m:hkallweit1@gmail.com,m:regressions@lists.linux.dev,s:lists@lfdr.de];
-	DMARC_NA(0.00)[leemhuis.info];
+	FORGED_RECIPIENTS(0.00)[m:contact@c127.dev,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:Jose.Abreu@synopsys.com,m:pavel@ucw.cz,m:netdev@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,leemhuis.info:from_mime,leemhuis.info:dkim,leemhuis.info:mid,lgb.dk:email];
-	FORGED_SENDER(0.00)[regressions@leemhuis.info,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304978-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304979-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,lists.linux.dev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[c127.dev:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,intel.com:from_mime,intel.com:dkim,boxer:mid];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[regressions@leemhuis.info,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[leemhuis.info:+];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,synopsys.com,ucw.cz,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DKIM_TRACE(0.00)[intel.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4490070FB6D
+X-Rspamd-Queue-Id: 4B88370FF2E
 
-On 6/10/26 19:58, Lasse Bjerre wrote:
+On Mon, Jul 06, 2026 at 05:32:45AM +0000, Johan Alvarado wrote:
+> The TX mitigation logic only sets the Interrupt on Completion bit once
+> every tx_coal_frames descriptors (STMMAC_TX_FRAMES = 25), with the
+> tx_coal_timer hrtimer (STMMAC_COAL_TX_TIMER = 5000 us) as the only
+> fallback. TX skbs are freed exclusively from the TX completion path,
+> so any flow that keeps fewer than 25 frames in flight has all of its
+> skbs held for up to 5 ms after transmission.
 > 
-> Absolutely, I have attached a full dmesg from a fresh boot as well as
-> the output of lspci.
-> Important to note (should have done so earlier) that I have manually
-> turned on l1_1_aspm using a udev rule. It is not on by default, but has
-> worked flawlessly until the issue in question.
+> Paced flows never queue enough frames to reach the frame threshold:
+> TCP Small Queues caps the amount of unfreed data at roughly two pacing
+> intervals worth, which at moderate pacing rates is only a couple of
+> packets. Every small burst then stalls until the coalesce timer fires,
+> and throughput collapses to approximately tsq_limit / tx_coal_timer
+> regardless of link capacity.
+> 
+> This is easily reproducible with BBR, which paces its output and thus
+> keeps only a few frames in flight at a time. On a YT6801
+> (dwmac-motorcomm) equipped Orange Pi 5 Pro, a BBR upload over a ~23 ms
+> RTT path is capped at 5.24 Mbit/s, while CUBIC reaches 207 Mbit/s on
+> the same path. BBR measures the stalled send rate as the path
+> bandwidth and locks its estimate near the floor, so the connection
+> never recovers. Lowering the coalesce settings with ethtool -C
+> (tx-usecs 100 tx-frames 1) lifts the same transfer to 447 Mbit/s,
+> confirming the mechanism.
+> 
+> Fix this by setting the IC bit on the last descriptor of every xmit
+> burst, i.e. whenever netdev_xmit_more() reports that no further frames
+> are pending in the current dequeue batch. Frame-based coalescing still
+> applies within a burst, bulk traffic keeps batching through qdisc bulk
+> dequeue and NAPI polling, and the coalesce timer becomes a pure
+> fallback instead of the primary completion mechanism for lightly
+> queued flows.
+> 
+> tx-frames 0 keeps its meaning of timer-based mitigation only.
+> 
+> Fixes: da2024510031 ("net: stmmac: Tune-up default coalesce settings")
+> Signed-off-by: Johan Alvarado <contact@c127.dev>
+> ---
+> Notes for reviewers (not for the changelog):
+> 
+> Tested on an Orange Pi 5 Pro (RK3588, Motorcomm YT6801 PCIe GbE via
+> dwmac-motorcomm), iperf3 upload to a public server over a ~23 ms RTT
+> path, coalesce settings left at their shipped values (tx-usecs 5000,
+> tx-frames 25):
+> 
+>   before, BBR:    5.24 Mbit/s (cwnd pinned, bw estimate ~6 Mbit/s)
+>   before, CUBIC:  207 Mbit/s
+>   after,  BBR:    447 Mbit/s
+> 
+> Interrupt overhead stays sane: ~3.3k NIC IRQs/s total at 447 Mbit/s
+> (~38 kpps), i.e. roughly 12 packets per interrupt, since qdisc bulk
+> dequeue plus NAPI polling still coalesce within bursts.
+> 
+> The 5000 us STMMAC_COAL_TX_TIMER value postdates the tagged commit
+> (it was 1000 us back then); the stall mechanism is the same, only the
+> throughput ceiling differs, hence the Fixes tag on the frame-count
+> change.
+> 
+> The XSK/XDP TX paths keep their frame-count-only IC logic: there is
+> no skb/TSQ backpressure on those paths, and netdev_xmit_more() is not
+> meaningful outside ndo_start_xmit.
+> 
+> The same completion starvation was reported by Pavel Machek in 2016
+> (UDP burst pauses, back then a 40 ms low-res timer):
+> https://lore.kernel.org/netdev/20161123105125.GA26394@amd/
+> His patch disabling TX coalescing entirely was rejected in favour of
+> "a real solution":
+> https://lore.kernel.org/netdev/20161205122711.GA30774@amd/
 
-Hmm, seems nothing happened since then -- or was there progress and I
-just missed it? If not: is this intentional (due to manually enabling
-l1_1_aspm maybe?), or did this regression fall through the cracks?
+Very messy thread. To reiterate - does tx coalescing do any good in this
+driver?
 
-Ciao, Thorsten
-> ------------------------------------------------------------------------
-> *From:* Javen <javen_xu@realsil.com.cn>
-> *Sent:* 04 June 2026 11:01
-> *To:* Heiner Kallweit <hkallweit1@gmail.com>
-> *Cc:* netdev@vger.kernel.org <netdev@vger.kernel.org>; Lasse Bjerre
-> <lasse@lgb.dk>
-> *Subject:* RE: [Bug 221606] r8169: PCIe AER errors and recovery failure
-> after recent driver changes
->  
->>On 03.06.2026 09:44, bugzilla-daemon@kernel.org wrote:
->>> https://bugzilla.kernel.org/show_bug.cgi?id=221606 <https://
-> bugzilla.kernel.org/show_bug.cgi?id=221606>
->>>
->>> --- Comment #2 from lasse@lgb.dk ---
->>> Commit 9ab94a32af704fa9c873094283ae8744a07baf25 (r8169: enable LTR
->>> support) seems to be the issue. Running the commit before this doesn't
->>> give me any AER errors and everything seems to behave normally.
->>>
->>Bisecting the reported issue points to one of your commits.
->>Could you please check with the user?
-> 
-> Hi, Heiner, Lasse
-> 
-> Thanks for reporting this issue.
-> 
-> Currently, we haven't received any similar reports from our customers,
-> and I am unable to reproduce this AER error on my local test platforms.
-> 
-> Could you please provide some more detailed information? The full dmesg
-> log will help me check the exact AER error messages and the boot
-> context. Also the output of sudo lspci -vvv. I need this to check the
-> exact platform information, PCIe topology, and the LTR/ASPM capabilities
-> of both your Root Port and the Realtek NIC.
-> 
-> While reviewing the initialization flow, I noticed a potential logic
-> contradiction. If rtl_aspm_is_safe(tp) returns false, the driver
-> disables L1 at the PCIe core level, but tp->aspm_manageable might still
-> be set to true. This could cause the driver to incorrectly enable ASPM/
-> LTR in the MAC registers later, creating a hardware state mismatch (PCIe
-> L1 disabled, but MAC LTR enabled) which usually leads to AER.
-> 
-> Could you please test if the following patch fixes the AER error on your
-> side?
-> 
-> -       if (enable && tp->aspm_manageable) {
-> +       if (enable && tp->aspm_manageable && rtl_aspm_is_safe(tp)) {
-> 
-> Thanks,
-> BRs,
-> Javen
+I did some digging and seems there was a rework of coalescing in 2018 and
+then some more polishing happened in 2023 (net: stmmac: improve TX timer
+arm logic).
 
+> The subsequent hrtimer conversion fixed the timer resolution but kept
+> the timer as the only completion mechanism for lightly queued flows;
+
+Wouldn't your change imply that tx coalescing could be dropped altogether?
+I do agree that each single batch of tx descs should be signalled with ic
+bit at the end.
+
+
+> this patch adds the missing burst-end interrupt.
+> 
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 2a0d7eff88d3..ddf4ac03538d 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -4626,6 +4626,8 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
+>  		set_ic = true;
+>  	else if (!priv->tx_coal_frames[queue])
+>  		set_ic = false;
+> +	else if (!netdev_xmit_more())
+> +		set_ic = true;
+>  	else if (tx_packets > priv->tx_coal_frames[queue])
+>  		set_ic = true;
+>  	else if ((tx_q->tx_count_frames %
+> @@ -4910,6 +4912,8 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+>  		set_ic = true;
+>  	else if (!priv->tx_coal_frames[queue])
+>  		set_ic = false;
+> +	else if (!netdev_xmit_more())
+> +		set_ic = true;
+>  	else if (tx_packets > priv->tx_coal_frames[queue])
+>  		set_ic = true;
+>  	else if ((tx_q->tx_count_frames %
+> -- 
+> 2.55.0
+> 
+> 
 
