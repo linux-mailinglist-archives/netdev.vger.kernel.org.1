@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-304912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304913-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id S64qEcR7S2q1SAEAu9opvQ
-	(envelope-from <netdev+bounces-304912-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 11:56:20 +0200
+	id yRAyN4+RS2qxVgEAu9opvQ
+	(envelope-from <netdev+bounces-304913-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 13:29:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F6E470ED2B
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 11:56:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A52170FD87
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 13:29:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b="e0bhBOq/";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b="jUE/xGOL";
 	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304912-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304912-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304913-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304913-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 733A9317BD2C
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 09:24:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 55440320FDE8
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 09:25:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78BED432BE7;
-	Mon,  6 Jul 2026 09:14:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E965432BED;
+	Mon,  6 Jul 2026 09:14:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AD8842640F
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 09:13:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3EF432BD8
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 09:14:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783329243; cv=none; b=EkYcf1ymJ8wOhzbsJrk6603f3COmd3svp5AG0xVA15b7IWO6+n1dXiBDPkJmu2uv7RXcT+LlbKCfF9qt+iZBJsiZ/2vfcskf3RXJQ6aLM5+g6MddoKgkl4+b8dCXL7BdQ8H90NLedqc5Kd1Prt6EEuda0vxa7xce1iuY/v8Qy8g=
+	t=1783329250; cv=none; b=HJYUM8Va1814jFgb/IhaqFhUvl0AzjiCRG3b6EWsxO1ycHAgZ21VIHLEM21rgASkSeK9ABsa8VeWY9WpBpqyvr/7GeoO+pxo9LrRwxCzePXCbrXhSF7jFibsPuH0B6vGmldT2nfob+EaauXeTj6IeBbYeWulOGfrhSo5FFqjq64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783329243; c=relaxed/simple;
-	bh=uqY9/ockpjF8+4Do6D/QxS1IP5urphdi71NM82HUtvI=;
+	s=arc-20240116; t=1783329250; c=relaxed/simple;
+	bh=xjbqe6Ea7FqsVWuk0HgiPhmVFC0rjaG4stXuA+LRMRM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uEiG6hAHMSGPKMZXDVd4vzNZo0Lvok/kbu9777T4xD6wxOO9+xauMZr0w1vaCh29z23jXBp+IDPXbyk00nB141Yjmrfgtpi1Lkun4KeILxj1WHq+dN9q1Nbtx/2iHmgk23ovlzT5AJA1HQxMmUv1FENC2OlO9sHlqqfzH8SYRVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e0bhBOq/; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=KoQyZ/OEiKI350YcGXxj67btZq9g4vmsAOVnkrAyD8zTCerMUqW6ghMECRvA/qNPW3BLgjkQppIDr6Yb5UGuco6y6w684mx8Qm/iY8rIAvdCO+FpxVhvvBoN8Kyk0oREJd1u52GFoQe3frkFVz/yeQ+2IUa2439vEhtQavBgbXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jUE/xGOL; arc=none smtp.client-ip=170.10.129.124
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783329225;
+	s=mimecast20190719; t=1783329235;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=v/vMmcC4kWrSghj9zOYbdr017eZqpNDv49JorGXwtkQ=;
-	b=e0bhBOq/NHM3GlJ9OyOfaMSsSbPXwnCwvEfRS4lpFbfAKDx86CTwJQ7saoRSs1ZTkXKgW6
-	FXUYP75GJ60lwbY4gLT4wydNMAdajysGOqh33tBPLy0NaCdYaWGFv1cW9MbF+pWPut1BLt
-	Zoq5r7oda7QNq3xu1POollCqYo3XumM=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=OZJn90Px9hZJUz6AB3nf2Qs9xkQXJCI5324Fe6y0Nzs=;
+	b=jUE/xGOLf/NgoUhxLrHJU++uFNekRSGPvv39ah8TvlGXN+qiStZRYf60KecX0UAEcPdXPO
+	VZZfL42QxmmiifCzqty0w8XoFX3WDSzVaWG3PhZunoQDSOas1cPA2F6p4pkraDN8W1Qhc1
+	SifwKH3WzQESvJXVgjWbLrvmojRxFQ8=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-414-7D3y0LjYNc-pGmC_Q9qfLw-1; Mon,
- 06 Jul 2026 05:13:41 -0400
-X-MC-Unique: 7D3y0LjYNc-pGmC_Q9qfLw-1
-X-Mimecast-MFC-AGG-ID: 7D3y0LjYNc-pGmC_Q9qfLw_1783329219
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-597-k0_NrMkTMqa0sm7gCWKE4w-1; Mon,
+ 06 Jul 2026 05:13:51 -0400
+X-MC-Unique: k0_NrMkTMqa0sm7gCWKE4w-1
+X-Mimecast-MFC-AGG-ID: k0_NrMkTMqa0sm7gCWKE4w_1783329228
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 536F31800846;
-	Mon,  6 Jul 2026 09:13:38 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D9A361955F05;
+	Mon,  6 Jul 2026 09:13:47 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.44.32.156])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 453EE300070A;
-	Mon,  6 Jul 2026 09:13:31 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EEED918005A2;
+	Mon,  6 Jul 2026 09:13:40 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: parvathi@couthit.com
 Cc: andrew+netdev@lunn.ch,
@@ -85,11 +85,11 @@ Cc: andrew+netdev@lunn.ch,
 	m-malladi@ti.com,
 	krishna@couthit.com,
 	mohan@couthit.com
-Subject: Re: [PATCH net-next v2 2/3] net: ti: icssm-prueth: Add priority based RX IRQ handlers
-Date: Mon,  6 Jul 2026 11:13:28 +0200
-Message-ID: <20260706091328.134740-1-pabeni@redhat.com>
-In-Reply-To: <20260630124958.894360-3-parvathi@couthit.com>
-References: <20260630124958.894360-3-parvathi@couthit.com>
+Subject: Re: [PATCH net-next v2 3/3] net: ti: icssm-prueth: Support duplicate HW offload feature for HSR and PRP
+Date: Mon,  6 Jul 2026 11:13:38 +0200
+Message-ID: <20260706091338.134754-1-pabeni@redhat.com>
+In-Reply-To: <20260630124958.894360-4-parvathi@couthit.com>
+References: <20260630124958.894360-4-parvathi@couthit.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,7 +97,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -105,7 +105,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -114,11 +114,11 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304912-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304913-lists,netdev=lfdr.de];
 	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS(0.00)[m:parvathi@couthit.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:danishanwar@ti.com,m:rogerq@kernel.org,m:pmohan@couthit.com,m:afd@ti.com,m:basharath@couthit.com,m:arnd@arndb.de,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:pratheesh@ti.com,m:j-rameshbabu@ti.com,m:vigneshr@ti.com,m:praneeth@ti.com,m:srk@ti.com,m:rogerq@ti.com,m:m-malladi@ti.com,m:krishna@couthit.com,m:mohan@couthit.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -131,9 +131,9 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9F6E470ED2B
+X-Rspamd-Queue-Id: 4A52170FD87
 
 From: AI Reviewer <ai@example.com>
 
@@ -141,184 +141,106 @@ This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 Full review at: https://sashiko.dev/
 ---
-net: ti: icssm-prueth: Add priority based RX IRQ handlers
+net: ti: icssm-prueth: Support duplicate HW offload feature for HSR and PRP
 
-This patch adds support for priority based interrupt handling for the STP/
-RSTP Switch, HSR and PRP protocols along with extra logic to address first
-come first served to avoid port dominance. The driver will read the RX HW
-timestamp from the frame to achieve wire-arrival ordering.
+This commit introduces hardware duplicate offload for HSR and PRP modes. It
+implements a common shared queue between the two ports, writing frames once
+to OCMC RAM and relying on the firmware to replicate the transmission.
 
 > diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.c b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
+> index 2ab78a98f8568..cbe666a212c3b 100644
 > --- a/drivers/net/ethernet/ti/icssm/icssm_prueth.c
 > +++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
-[ ... ]
-> @@ -1188,26 +1188,26 @@ static int icssm_emac_ndo_stop(struct net_device *ndev)
->  	/* disable the mac port */
->  	icssm_prueth_port_enable(emac, false);
+> @@ -97,6 +125,17 @@ static void icssm_prueth_write_reg(struct prueth *prueth,
+>  static enum pruss_mem pruss_mem_ids[] = { PRUSS_MEM_DRAM0, PRUSS_MEM_DRAM1,
+>  					  PRUSS_MEM_SHRD_RAM2 };
 >  
-> +	netif_stop_queue(ndev);
+> +struct prp_txopt_rct {
+> +	__be16 sequence_nr;
+> +	__be16 lan_id_and_lsdu_size;
+> +	__be16 prp_suffix;
+> +};
+
+[Severity: High]
+Does this structure definition need the __packed attribute?
+
+This struct consists of three 16-bit fields but lacks the __packed attribute,
+so it inherits a 2-byte alignment requirement.  Later in
+icssm_prueth_tx_enqueue, a pointer to this structure is derived directly
+from skb_tail_pointer.
+
+If an ethernet frame payload has an odd byte length, wouldn't casting and
+dereferencing this pointer cause an unaligned 16-bit memory access, resulting
+in hardware traps or panics on architectures that do not support it?
+
+[ ... ]
+> @@ -549,15 +588,24 @@ static int icssm_prueth_tx_enqueue(struct prueth_emac *emac,
+[ ... ]
+> +	other_emac = emac->prueth->emac[(emac->port_id == PRUETH_PORT_MII0) ?
+> +				PRUETH_PORT_MII1 - 1 : PRUETH_PORT_MII0 - 1];
 > +
->  	/* stop PHY */
->  	phy_stop(emac->phydev);
->  
-> -	napi_disable(&emac->napi);
->  	hrtimer_cancel(&emac->tx_hrtimer);
->  
-[ ... ]
->  	/* stop the PRU */
->  	if (!PRUETH_IS_EMAC(prueth))
->  		icssm_prueth_sw_shutdown_prus(emac, ndev);
->  
->  	if (prueth_is_lre(prueth))
->  		icssm_prueth_lre_cleanup(prueth);
+> +	if (prueth_is_lre(prueth) && (emac->link || other_emac->link))
+> +		link_up = true;
 
 [Severity: High]
-This is a pre-existing issue, but is the LRE duplicate detection timer
-prematurely canceled when a single port goes down?
+Could this logical OR cause the shared transmission queue to stall completely
+if only one of the slave links goes down?
 
-In icssm_emac_ndo_stop, icssm_prueth_lre_cleanup is called unconditionally
-when any interface is brought down.
+If one port loses its link, its emac->link is 0, but the other active port
+will still evaluate link_up as true. The active port would continue sending
+duplicate frames to the shared queue.
 
-If one port in the HSR/PRP bridge goes down while the other remains active,
-this cancels the shared tbl_check_timer, potentially causing duplicate
-frames to stop being detected and dropped by the hardware.
-
-> diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth_common.c b/drivers/net/ethernet/ti/icssm/icssm_prueth_common.c
-> new file mode 100644
-> --- /dev/null
-> +++ b/drivers/net/ethernet/ti/icssm/icssm_prueth_common.c
-> @@ -0,0 +1,286 @@
 [ ... ]
-> +static int icssm_prueth_common_emac_rx_packets(struct prueth_emac *emac,
-> +					       int quota, u8 qid1, u8 qid2)
-> +{
+> @@ -605,6 +659,29 @@ static int icssm_prueth_tx_enqueue(struct prueth_emac *emac,
 [ ... ]
-> +		if ((*pkt_info_p).length < EMAC_MIN_PKTLEN) {
-> +			/* Undersized frame: firmware should have filtered
-> +			 * these before they reach the host queue. Advance
-> +			 * the read pointer to skip it.
-> +			 */
-> +			update_rd_ptr = *bd_wr_ptr_p;
-> +			ndevstats_p->rx_length_errors++;
+> +		if (free_blocks_other_port < free_blocks)
+> +			free_blocks = free_blocks_other_port;
+> +	}
 
 [Severity: High]
-This is a pre-existing issue, but does this error path flush the entire
-pending RX queue?
+Following up on the link_up logic above, since the available queue space is
+bounded by the slowest reader here, wouldn't the inactive port's read pointer
+remain frozen?
 
-When the driver detects an undersized or oversized packet, it attempts to
-skip it by updating the read pointer. However, setting update_rd_ptr to
-*bd_wr_ptr_p appears to assign the hardware's write pointer (the very end of
-the queue), rather than advancing by one descriptor.
+This appears to exhaust the free_blocks pool, causing the active port to
+eventually spin and return -ENOBUFS permanently, defeating the redundancy.
 
-Could this discard all pending descriptors instead of just the malformed one?
-
-[Severity: High]
-Does this introduce a race condition on the network statistics?
-
-This patch introduces split NAPI polling with separate priority threads
-(napi_hpq and napi_lpq) that process the high and low priority queues across
-both physical ports. These NAPI instances can be scheduled on different CPUs
-concurrently.
-
-Both instances invoke icssm_prueth_common_emac_rx_packets, which updates raw
-unsigned long statistics like ndevstats_p->rx_length_errors (and 64-bit
-stats like emac->stats.rx_bytes in icssm_emac_rx_packet) using += without
-atomic instructions or locks.
-
-On 32-bit platforms, could this cause lost updates for concurrent writers, or
-torn reads when read by ndo_get_stats64?
-
-> +		} else if ((*pkt_info_p).length > EMAC_MAX_FRM_SUPPORT) {
-> +			/* Oversized frame: firmware should have filtered
-> +			 * these before they reach the host queue. Advance
-> +			 * the read pointer to skip it.
-> +			 */
-> +			update_rd_ptr = *bd_wr_ptr_p;
-> +			ndevstats_p->rx_length_errors++;
+[ ... ]
 > +		} else {
-> +			update_rd_ptr = *bd_rd_ptr_p;
-> +			ret = icssm_emac_rx_packet(emac_p, &update_rd_ptr,
-> +						   pkt_info_p, rxqueue_p);
-> +			if (ret)
-> +				return used;
+> +			/* Read PRP RCT to extract sequence number and LAN ID */
+> +			struct prp_txopt_rct *rct =
+> +				(struct prp_txopt_rct *)(skb_tail_pointer(skb) -
+> +							 ICSSM_LRE_TAG_SIZE);
+> +
+> +			if (rct->prp_suffix == htons(ETH_P_PRP)) {
 
 [Severity: High]
-This is a pre-existing issue, but does a memory allocation failure in this RX
-path cause a permanent RX queue stall?
+Is it safe to directly dereference rct->prp_suffix here?
 
-If icssm_emac_rx_packet fails to allocate an SKB, it returns -ENOMEM. The
-driver immediately aborts the NAPI polling loop without updating the hardware
-read pointer or consuming the packet.
+As mentioned above regarding the struct definition, this might lead to an
+unaligned memory access on certain architectures. Perhaps using the
+get_unaligned_be16 helper would be safer here, or adding the __packed
+attribute to the structure definition.
 
-Because it returns used (which is less than budget), it triggers
-napi_complete_done() which re-enables the RX interrupt. Since the packet is
-still pending in the hardware queue, the interrupt fires again immediately in
-an infinite loop.
-
-> diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth_lre.c b/drivers/net/ethernet/ti/icssm/icssm_prueth_lre.c
-> --- a/drivers/net/ethernet/ti/icssm/icssm_prueth_lre.c
-> +++ b/drivers/net/ethernet/ti/icssm/icssm_prueth_lre.c
-> @@ -152,6 +152,14 @@ static void icssm_prueth_lre_protocol_init(struct prueth *prueth)
->  	       dram1 + ICSS_LRE_SUP_ADDR_LOW);
->  }
->  
-> +static void icssm_prueth_lre_config_packet_timestamping(struct prueth *prueth)
-> +{
-> +	void __iomem *sram = prueth->mem[PRUETH_MEM_SHARED_RAM].va;
-> +
-> +	writeb(1, sram + ICSS_LRE_PRIORITY_INTRS_STATUS_OFFSET);
-> +	writeb(1, sram + ICSS_LRE_TIMESTAMP_PKTS_STATUS_OFFSET);
-> +}
-> +
 [ ... ]
-> @@ -202,6 +210,11 @@ void icssm_prueth_lre_config(struct prueth *prueth)
->  	icssm_prueth_lre_init(prueth);
->  	icssm_prueth_lre_dbg_init(prueth);
->  	icssm_prueth_lre_protocol_init(prueth);
-> +	/* Enable per-packet timestamping so the driver can order
-> +	 * received frames by arrival time across the two slave ports.
-> +	 */
-> +	icssm_prueth_lre_config_packet_timestamping(prueth);
-> +
->  }
+> @@ -1341,18 +1516,30 @@ static enum netdev_tx icssm_emac_ndo_start_xmit(struct sk_buff *skb,
+[ ... ]
+> +	raw_spin_lock(lock_queue);
+> +	ret = icssm_prueth_tx_enqueue(emac, skb, qid);
+> +	raw_spin_unlock(lock_queue);
 
 [Severity: High]
-Does this fail to enable hardware timestamping in Switch mode?
+Does this need to use the irqsave variant to protect against cross-device
+deadlocks with netpoll?
 
-The patch introduces timestamp-based packet ordering for Switch, HSR, and PRP
-modes, requiring configuration via ICSS_LRE_PRIORITY_INTRS_STATUS_OFFSET and
-ICSS_LRE_TIMESTAMP_PKTS_STATUS_OFFSET.
+The lre_host_queue_lock is shared between the two ports. If a hardirq
+preempts a CPU while it holds this lock during a transmission, and the
+interrupt handler invokes a printk that triggers netconsole over the second
+interface, netpoll might bypass the netif_tx_lock.
 
-However, icssm_prueth_lre_config_packet_timestamping is only called from
-icssm_prueth_lre_config, which is gated by prueth_is_lre() (only true for HSR
-and PRP).
-
-In Switch mode, these registers appear to never be written, potentially
-leaving timestamps disabled in firmware and breaking the wire-arrival
-ordering logic.
-
-[Severity: High]
-This is a pre-existing issue, but are the dynamically allocated FDB learning
-work items tracked for cleanup?
-
-When learning a new source MAC address in icssm_prueth_sw_learn_fdb()
-(drivers/net/ethernet/ti/icssm/icssm_prueth_switch.c), the driver dynamically
-allocates a struct icssm_prueth_sw_fdb_work and queues it.
-
-If these are not tracked in a list, unloading the module could leave pending
-work items that execute unmapped memory, potentially causing a kernel panic.
-
-[Severity: High]
-This is a pre-existing issue, but can the unbounded GFP_ATOMIC allocations
-for FDB learning lead to memory exhaustion?
-
-Every received frame with an unlearned source MAC address triggers
-icssm_prueth_sw_learn_fdb(), which uses kzalloc_obj(..., GFP_ATOMIC) without
-rate limiting.
-
-A continuous flood of frames with randomized source MAC addresses could
-trigger thousands of allocations per second, potentially exhausting the
-kernel's atomic memory pools.
+When the second interface calls into ndo_start_xmit, it would attempt to
+acquire the exact same lre_host_queue_lock, causing it to spin forever on
+the same CPU.
 -- 
 This is an AI-generated review.
 
