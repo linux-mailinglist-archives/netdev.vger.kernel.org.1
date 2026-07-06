@@ -1,304 +1,481 @@
-Return-Path: <netdev+bounces-304934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304940-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id aSC/E2yXS2qVWAEAu9opvQ
-	(envelope-from <netdev+bounces-304934-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 13:54:20 +0200
+	id MeFVC6uXS2qkWAEAu9opvQ
+	(envelope-from <netdev+bounces-304940-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 13:55:23 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 900837101FE
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 13:54:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 754D8710226
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 13:55:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=hkaf0IXL;
-	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=hLo5kcQU;
-	dmarc=pass (policy=reject) header.from=qualcomm.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304934-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304934-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=T4PnH5q+;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304940-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304940-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2DAD733ED1E4
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 09:54:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EB22337E5B9D
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 09:56:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FB4B438467;
-	Mon,  6 Jul 2026 09:35:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD9E43C7B7;
+	Mon,  6 Jul 2026 09:35:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D3843786E
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 09:35:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F5943B6E7
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 09:35:48 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783330537; cv=none; b=D8oN4mPTkNnda/GCcDo1UUfEVJEWxVP7AeBF1J4vK3PTRgaisBA5Ufryt3q/fyO8ANpdTS+q1mzNxcF/J494omZbhY4ShEWU1Uc3ZpbaySS48BB/UFvo/5EzFiJ0AuV2Y3SPN+PK6G9BK1mFbVBiF3fnDQd2NYMj2RgLP478/fY=
+	t=1783330553; cv=none; b=iyQohLk16Vn8RpxzEDfNs9onv8SFzxlQoDq1DZVS2sD/SYRgXeW+FRSeGhGeAg3ZyAEyV2va33IuU/KW2WLSueN5rBP12YSsfyAg2TuY6An1cvC2fotnTWeIzNz53hxrA2xeKZR9GPDKs9XIVqBMhtbXe6yTidvLP/m0DXvjlWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783330537; c=relaxed/simple;
-	bh=42Kj3VAyHdKAb4Mujj+SNBJjepZpYO0t8Hxlz5eSYok=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AVtLKWC6mW8UGOO5kdbllzln2QhnYGNcm2E+/iyTBAo5np5ox4BYEmWOicIXN0i5e9ZE1DRRNAc2AV+ZrNVHGYRVqqmA0ifZU4IukbJk2+CpmKhLctZGCzCZI22RtY/GpHeG3nY89T/fSnQFyuvT+6izNSmqk2mRdGGeqmWUZVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=hkaf0IXL; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=hLo5kcQU; arc=none smtp.client-ip=205.220.168.131
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66693xr4107755
-	for <netdev@vger.kernel.org>; Mon, 6 Jul 2026 09:35:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=x4hNt3rfNhUiPXOePYpG8Tjf20b4cSynXFo
-	kVgMJOC4=; b=hkaf0IXL4USdEe3sk0UKsslLAhxribsbMOq4P5NJ+pZlGwyjVlN
-	uNEa75X596G0RL4wNsJZGlRgf6SoaNrXLTNx6Q4uN5E6knM76KANsP2fviOsaVfI
-	i2yn79rpzofaLkK5jExvWEA1U5LHU00cHqgXz05asUzOuaIz5SET6w3IThDN9uPH
-	IkNCGnNbTj6HTzTBGI0e0pCJp3vP+HN5UGLrVz90lqJVN41bHds/+xijrmlctRkP
-	L6yEUdH/41PmtxQTWdVLRP9JDOGrgn8HDiknXlvHF3XbeHIPMExD57joolQWzUOJ
-	mEfcU6Vvkx32kVMsSLjQKKHeVMe/mww1Upg==
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4f891ur6x3-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 09:35:31 +0000 (GMT)
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-92e63df032bso313801885a.0
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 02:35:31 -0700 (PDT)
+	s=arc-20240116; t=1783330553; c=relaxed/simple;
+	bh=LkbDUITHcVIMSdNbfB4iuLmMd002FIwjIehN9J2b920=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=hsMcDtDwALQlSkEQzBmXAIXIMF0cFq1xPdD9CiUie4w/yVf7W3+0PD4ybhQ5acbDDfoyDIyt3qsNEBVzI2fm601GhZTZWjiwovhyfDMcc8zWRfNgiCcFkxx66bcK2Zs5SiI9WCMxEroDBylaeiZnhzHoSW2xS2chOz++5LNzso4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T4PnH5q+; arc=none smtp.client-ip=209.85.221.42
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-47c2b362ee2so1394816f8f.1
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 02:35:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1783330530; x=1783935330; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=x4hNt3rfNhUiPXOePYpG8Tjf20b4cSynXFokVgMJOC4=;
-        b=hLo5kcQUH/ZEoNTg9xQ55bRyXfHmQBLWEGRVS1P2KLG7HOOjBF69yzBI4IbfZOF9fF
-         VveAq0e9ryyR3/vfbMK53uRi18vlyWNvekEcj5645fWJRwZAXU75sZSQW8UlOL/hdzFx
-         SrkLAoNSeNGCA7/EPYHM/L4MVOoPAN2GoQu2+vaqhSFwTb+bputtY1SX+TS2AAheewYs
-         nLjjtSTV1NuARvyQ0sVdjoKlThCMg5NC14o9OhQ5muMIO/VPuL3DIcKsqJfUglsuTqr5
-         kDXJvhWqMg/YZkgzEKa//A2tP+qRahLvanlRi+nbQVstd4m0fzI6UyVtICyHD5grqO/G
-         Ej4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783330530; x=1783935330;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1783330546; x=1783935346; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=x4hNt3rfNhUiPXOePYpG8Tjf20b4cSynXFokVgMJOC4=;
-        b=MAcoyH+mQnyn+yOtO5O0oQzgir3ggq2PBgVFePrwpi/b2Z1e4keDOY+w/7SJvuX1H0
-         KIex6vKfyg75ktPZXN+7OKTdiCxe7RLpHawF4kyvADZn/voDi8VWCoiYB9ZcDfk6Nto+
-         4pYyU1ZVO+nWszsih1thp+Sim36B//9AwgMgZgAyp/3c1gT2WmDfySJjCD5U7uURkdfK
-         oJrU7A+xtgFeCYy0umMtq4/RCNcw5hiI4OrQix4v1+Itz2CLfFaxTmOA6qGM+9o29B6G
-         PhcWbv7mRox5FnRyIoRQ9Ios2OayYNwzXSwssdrstar6hlMZwEre3sbZeqWW58p9plRw
-         3SfQ==
-X-Forwarded-Encrypted: i=1; AHgh+RopAott5zh9WtDd9quXXYEzu0cZA0VrGOQRTonrg/pJK9v9JB7RBB0VSHX3tjlU60mgzBS7vkc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQC54K7C/stpJ1L72Q+K4W+px2bNxv6zBhhhToJLR5o7J0y6/M
-	5RJYvrDPiX4lOxU16u6uaFzZSc6199iC33Ttbw3kG/H/ppz9AWFCi2lBMoyrQzp8mRrl6hyE1Ud
-	oYP71eTrd0TlkUzDFU14+NCzaYGWeFLYlcaIBHruDCePCJKuneSLnvrW2DrM=
-X-Gm-Gg: AfdE7ckjFVhADp9Dr8Hg1mS83ABPAf7CnOxFnddWm7RmHggi8B+6PAB/8tYgrKEuoYb
-	HD0XUk686cKz3XYvGtVDB/daDLUaMhCqrfEl3sBA1qpQQCZq2bqEs0n2MupJxH9wwO50cC5QfVT
-	CfrdwSbw1nTOg0JNHwjhlUq1ZlianhjbB8iOu/UvIfbO0SzLIaOIfBHLRGy836UjzHahb7yLPaw
-	i0Xu3nfPm68kvWMaXa8KPhH5K1PT4lf22m0a8EkZCpgtrljd62QjT4DZ/Fm0Iqxixr46oL6Y9GP
-	XVqsZfJZ7WH22ZpUMlV6a1w7NilouNrj1XXQEf6+CRYeaoGAe6SZueTrQATBhDwkgyg3jIJHp1x
-	WoENUBbTDpjn+dAbgLj2Bd/AAtpw=
-X-Received: by 2002:a05:620a:6082:b0:92e:61f7:5687 with SMTP id af79cd13be357-92e8b539407mr1666942885a.29.1783330530185;
-        Mon, 06 Jul 2026 02:35:30 -0700 (PDT)
-X-Received: by 2002:a05:620a:6082:b0:92e:61f7:5687 with SMTP id af79cd13be357-92e8b539407mr1666940885a.29.1783330529728;
-        Mon, 06 Jul 2026 02:35:29 -0700 (PDT)
-Received: from quoll ([178.197.223.174])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493cce11497sm290925905e9.12.2026.07.06.02.35.27
+        bh=rOcr3Ek60ukkbbM/bpYf9F0+mvBBqkSW/FD62UP3Vks=;
+        b=T4PnH5q+/hh+oKAxPH1bJCwWkpaA5DZ5j33FrUoEREcrEWG5z3AwTATjljbN4eHnsS
+         y78rXklNtLQjSIYYh+HB+FC8XK/Y2h8/9jHZUUX1Hxwz7ZEZCqYdKOoqLKJ6iV0mmvQN
+         9OCscLQxelb+CB6u7dicJdM73MXDWvhAzqSFFN2r7wlcyVSiZiDuwfaA/3h2etsO8XB5
+         CCH4MyV756cmFeGimk6CDmtVFE2QcDzkdvgvkrx+FJL9gXJ9CDlVvWaGwKkaLrtBgy7H
+         5D4kM6NZS5p84SKenEwf5gwq9XmLe3p3v6Rf0kAZP2ebFvoBEbQusD29ROei+e1OYnA7
+         HHDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783330546; x=1783935346;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=rOcr3Ek60ukkbbM/bpYf9F0+mvBBqkSW/FD62UP3Vks=;
+        b=bM3pNgb9qEjiXMvz38GehzuhtqX5ODaALx+wkhhVXhkE99nFKxK4skoICl4toroirX
+         uBmENz79iw/ug/llVGlRunmcP+bWMaHzJhHyLBtLDqO4EeqVYfZIJQeFuTSJ3qby5BjH
+         yx/DBLJy7J/Gn2QJ5bw1gsWn+O7PBkOvpCi1Amy5PsebTfv5aPCp5ieR6SbyxKijoufX
+         IDnaJa9W+nB6iZ09Ybs9zU+3uqfg6/4eiV0hRJ5gxgchoCmtKX7OofXwWZjdHFLREM/o
+         lkzayIQsJ7YWQNhKgmlnuyeEvycHlFcf3Eg9AsM5Es4inXZC9qMeVBuYOfbiUUX0Uhql
+         fmVQ==
+X-Forwarded-Encrypted: i=1; AHgh+RrnypV3beT/7GtkbsTG50U6G8BBnSNJgmYMCugPBawRq8v95UaP26pr5v/9eBnXxpzu5583Ybo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsDGDqvWrmE97nMFqwrgYnO/vovGoZ/8q2ikkeQqF9UuxvBgFY
+	d1Pe3kkcO/SC0lGvq+nYvdKXantE+6yJEvVEKxSXMRRSxkX5iPWk6DRO
+X-Gm-Gg: AfdE7cmMAWXtNXaK2/SM4QA7Rmn76H+UM/nuliEj07cfIF+MEsjvch1mFXkIsSQPemb
+	Q1GV4cmGdrBRW9M87b+ZyUGFY1xw5LPU7tLeeBTR0gc4Cca44YyjslniVeWcuriToxxOCsh0/qA
+	To93HTWfkeK01O9PiVNie4WgU0k+jDgy2CTKYdS7IvANFHLoTiRwy9VzyzSo14mXCS1Qgt2bZ/f
+	KeCOf1eyaG6qZfpbRWoLsfc820xMsuBtqzUpAH+RmGKyoOiX7QcPWAvjEhy5QkjLjqlzWwfEuzM
+	pNQ1+AeOh6uNhDEXllFQ0TsjioHdorgRyvPQ7Rp9WH5GhA3X2hlRGWKdICUnuuK+UGTaCNOZwHL
+	z/o4r9t7Cv+jQYAtlpH64hPrG79tVfOQrwOEYaLwHygxiuaXx1j0m47yLj445pj+3iCCpjRaA31
+	fx3HHPHolm4o7p5ebz
+X-Received: by 2002:a5d:5e8d:0:b0:461:e27d:5690 with SMTP id ffacd0b85a97d-47aaaadf193mr10514727f8f.26.1783330545776;
+        Mon, 06 Jul 2026 02:35:45 -0700 (PDT)
+Received: from mtardy-friendly-lvh-runner.local ([2600:1900:4010:1a8::])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-47aa09608d4sm24282530f8f.25.2026.07.06.02.35.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jul 2026 02:35:28 -0700 (PDT)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
-To: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Raju Rangoju <Raju.Rangoju@amd.com>,
-        Prashanth Kumar K R <PrashanthKumar.K.R@amd.com>,
-        Richard Cochran <richardcochran@gmail.com>, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
-Subject: [PATCH 1/2] arm64: dts: amd: seattle: Remove useless clocks DTSI include
-Date: Mon,  6 Jul 2026 11:35:24 +0200
-Message-ID: <20260706093523.274093-3-krzysztof.kozlowski@oss.qualcomm.com>
-X-Mailer: git-send-email 2.53.0
+        Mon, 06 Jul 2026 02:35:45 -0700 (PDT)
+From: Mahe Tardy <mahe.tardy@gmail.com>
+To: bpf@vger.kernel.org
+Cc: andrew+netdev@lunn.ch,
+	andrii@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	davem@davemloft.net,
+	eddyz87@gmail.com,
+	edumazet@google.com,
+	john.fastabend@gmail.com,
+	kuba@kernel.org,
+	liamwisehart@meta.com,
+	martin.lau@linux.dev,
+	pabeni@redhat.com,
+	song@kernel.org,
+	netdev@vger.kernel.org,
+	Mahe Tardy <mahe.tardy@gmail.com>
+Subject: [PATCH bpf-next 5/6] selftests/bpf: Add ksock net ns quota tests
+Date: Mon,  6 Jul 2026 09:35:24 +0000
+Message-Id: <20260706093525.13030-6-mahe.tardy@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260706093525.13030-1-mahe.tardy@gmail.com>
+References: <20260706093525.13030-1-mahe.tardy@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3395; i=krzysztof.kozlowski@oss.qualcomm.com;
- h=from:subject; bh=42Kj3VAyHdKAb4Mujj+SNBJjepZpYO0t8Hxlz5eSYok=;
- b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBqS3bcQfZBrCmFoiQLVudR7CeFVhhcE1ScGZ28e
- W0f9Y+B2S6JAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCakt23AAKCRDBN2bmhouD
- 17p9D/0TBfp+/n2xq15jwV+novyrQONMFBQzxVcD3OoZwwPOU8qtkM9NzipW4MzH4KE3E+woz0X
- BU3efE1WpDvV4kqwdfL5mTgRlDfRZ0jNG1m/bz5ZqetiEUr51n0mungnDcyOSfNOb95R+grGE2f
- Tbx1WrcD4Hoy3y6lU9xmTFjTutHdyXUeb7u1J5dx+5IjpkoVAl0mFikumq79U2QnCo9dxNObBI6
- 7hVzSYtFoddGkC62brq4MvQXVKAokCabbsE8GIzZaSuGu/wRGNIjt3yLgZEFj9Jzm6KTqO3pQGh
- JVs9jJZ+Mnhs3+fTQzyrihS67Hhh6mCb9rv91uq4iqDhRw/k9RkjuBQUmy/rPD7aASx08TUy3DO
- N+KPQeIUtXJbf9lNoBQHLxJiAViV/kiG4kWPnpNZt5B0PYDOdNqoA+p+kr/jHMGEFRRTlFEbxFT
- eLjyb0YOwtrZpzTeNOFzvufkfSbHnKF2c4q48bBypqqu+jFpeP4xAz59ybY2MGHO5AtxuuTcG4F
- a7XA6BhG7383HWfezFLWMODQrIoSJpOKKnJmRNPKkzg1pniDbm+fkCEtafw/GlRgostlu4NZibQ
- y+BqC8WAblUCBOnSSHruMRldGpogIuQsdR5m5VoV54tTZBceYVURjWpV+CY3wfBE7me9Mise0Th Hd8KadIKhcCuXOQ==
-X-Developer-Key: i=krzysztof.kozlowski@oss.qualcomm.com; a=openpgp; fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: TGQ5BejTFjf0mC3_XrnLFDV4YrYvesGu
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzA2MDA5NiBTYWx0ZWRfXwWKBN9a0mxfE
- Kc4x8cMvJYuizYUOiWKbm4J/D2o7DrgykKqMqmqojLyjJtexykLnRHMsFvgjrhI5idv7iMpEQFK
- wbJslgbcHq3E+Rwvdv5oe3jJak5iYMg=
-X-Authority-Analysis: v=2.4 cv=Mo1iLWae c=1 sm=1 tr=0 ts=6a4b76e3 cx=c_pps
- a=HLyN3IcIa5EE8TELMZ618Q==:117 a=N6niishs+lR9UBL1FN3Qrw==:17
- a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=eoimf2acIAo5FJnRuUoq:22 a=EUspDBNiAAAA:8
- a=LplHZR8TypZ71DMuxxAA:9 a=bTQJ7kPSJx9SKPbeHEYW:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA2MDA5NiBTYWx0ZWRfX3rnXKEa2Y6bX
- 4Q5wSWoz0JtQFyiL74XJ1f2Z+qFgKCy7yDOhFvfJmYY8jqV/XzCHlFkQZs2ncZ5RtycNVLwVehj
- jLCo/+Lf5mU7lzf8X9LjpMoBzlF2gItLKGa8LCzUMhFnl1ZjsJMXW/BI2uSulZsJ8vrqhckCowr
- uschfOM/FI7HBozeuSFisGvWka9CvDyGz+Fb5wjrAGxnLPhep3D1320RPpp9zj8e+o8/oqa9Bgd
- 9bWXnHON6AbvYy+uiTc8igy0NoQNOI/vtIlqgfSmY/n+bPiBVuA5oOHz7zf5l3z5/+staED8qn8
- reQ3NxRu2NVgegfKn7pMXk4HMpxN26T37I2GCFCqeZpFuOKrWTJTqbyTI6Wd2yNubQYJnOc0wI7
- I2UTLonrLSRUQAvq85MoLTcWg/ITgZg6I1q5o5eMjGOjZtn665Aq/AnAgG7OcLi8KOBLBd6MCk4
- dWOMJwGxthdthviZBfA==
-X-Proofpoint-ORIG-GUID: TGQ5BejTFjf0mC3_XrnLFDV4YrYvesGu
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-07-06_01,2026-07-03_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 impostorscore=0 bulkscore=0 adultscore=0 priorityscore=1501
- suspectscore=0 spamscore=0 phishscore=0 lowpriorityscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607060096
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-304934-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_TO(0.00)[amd.com,kernel.org,gmail.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:suravee.suthikulpanit@amd.com,m:thomas.lendacky@amd.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:Raju.Rangoju@amd.com,m:PrashanthKumar.K.R@amd.com,m:richardcochran@gmail.com,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:krzysztof.kozlowski@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-304940-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:andrew+netdev@lunn.ch,m:andrii@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:davem@davemloft.net,m:eddyz87@gmail.com,m:edumazet@google.com,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:liamwisehart@meta.com,m:martin.lau@linux.dev,m:pabeni@redhat.com,m:song@kernel.org,m:netdev@vger.kernel.org,m:mahe.tardy@gmail.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,m:mahetardy@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[mahetardy@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,kernel.org,iogearbox.net,davemloft.net,gmail.com,google.com,meta.com,linux.dev,redhat.com,vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[krzysztof.kozlowski@oss.qualcomm.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzysztof.kozlowski@oss.qualcomm.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,oss.qualcomm.com:from_mime,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,qualcomm.com:email,qualcomm.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mahetardy@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[create_opts.family:url,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 900837101FE
+X-Rspamd-Queue-Id: 754D8710226
 
-The "amd-seattle-clks.dtsi" file is included exactly once, so paste the
-contents directly in proper DTSI.  No functional impact.
+The new bpf_ksock_create() kfunc is limited by quota enforced at the
+network namespace layer. This test verifies that the quota are enforced
+and the acquire/release patch increase/reduce the counters.
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+Signed-off-by: Mahe Tardy <mahe.tardy@gmail.com>
 ---
- arch/arm64/boot/dts/amd/amd-seattle-clks.dtsi | 43 -------------------
- arch/arm64/boot/dts/amd/amd-seattle-soc.dtsi  | 36 +++++++++++++++-
- 2 files changed, 35 insertions(+), 44 deletions(-)
- delete mode 100644 arch/arm64/boot/dts/amd/amd-seattle-clks.dtsi
+ .../selftests/bpf/prog_tests/ksock_quota.c    | 139 +++++++++++++++
+ .../testing/selftests/bpf/progs/ksock_quota.c | 167 ++++++++++++++++++
+ 2 files changed, 306 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/ksock_quota.c
+ create mode 100644 tools/testing/selftests/bpf/progs/ksock_quota.c
 
-diff --git a/arch/arm64/boot/dts/amd/amd-seattle-clks.dtsi b/arch/arm64/boot/dts/amd/amd-seattle-clks.dtsi
-deleted file mode 100644
-index 73f687773ce6..000000000000
---- a/arch/arm64/boot/dts/amd/amd-seattle-clks.dtsi
-+++ /dev/null
-@@ -1,43 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0
--/*
-- * DTS file for AMD Seattle Clocks
-- *
-- * Copyright (C) 2014 Advanced Micro Devices, Inc.
-- */
--
--	adl3clk_100mhz: uartspiclk_100mhz: clock-100000000 {
--		compatible = "fixed-clock";
--		#clock-cells = <0>;
--		clock-frequency = <100000000>;
--		clock-output-names = "adl3clk_100mhz";
--	};
--
--	ccpclk_375mhz: clock-375000000 {
--		compatible = "fixed-clock";
--		#clock-cells = <0>;
--		clock-frequency = <375000000>;
--		clock-output-names = "ccpclk_375mhz";
--	};
--
--	sataclk_333mhz: clock-333000000 {
--		compatible = "fixed-clock";
--		#clock-cells = <0>;
--		clock-frequency = <333000000>;
--		clock-output-names = "sataclk_333mhz";
--	};
--
--	dmaclk_500mhz: pcieclk_500mhz: clock-500000000 {
--		compatible = "fixed-clock";
--		#clock-cells = <0>;
--		clock-frequency = <500000000>;
--		clock-output-names = "pcieclk_500mhz";
--	};
--
--	xgmacclk0_dma_250mhz: xgmacclk0_ptp_250mhz: xgmacclk1_dma_250mhz: xgmacclk1_ptp_250mhz:
--	miscclk_250mhz: clock-250000000 {
--		compatible = "fixed-clock";
--		#clock-cells = <0>;
--		clock-frequency = <250000000>;
--		clock-output-names = "miscclk_250mhz";
--	};
--
-diff --git a/arch/arm64/boot/dts/amd/amd-seattle-soc.dtsi b/arch/arm64/boot/dts/amd/amd-seattle-soc.dtsi
-index a611f8288b3e..c5b9dbfdf014 100644
---- a/arch/arm64/boot/dts/amd/amd-seattle-soc.dtsi
-+++ b/arch/arm64/boot/dts/amd/amd-seattle-soc.dtsi
-@@ -11,7 +11,41 @@ / {
- 	#address-cells = <2>;
- 	#size-cells = <2>;
- 
--	/include/ "amd-seattle-clks.dtsi"
-+	adl3clk_100mhz: uartspiclk_100mhz: clock-100000000 {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <100000000>;
-+		clock-output-names = "adl3clk_100mhz";
-+	};
+diff --git a/tools/testing/selftests/bpf/prog_tests/ksock_quota.c b/tools/testing/selftests/bpf/prog_tests/ksock_quota.c
+new file mode 100644
+index 000000000000..c86d9b0a9513
+--- /dev/null
++++ b/tools/testing/selftests/bpf/prog_tests/ksock_quota.c
+@@ -0,0 +1,139 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) 2026 Isovalent */
 +
-+	ccpclk_375mhz: clock-375000000 {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <375000000>;
-+		clock-output-names = "ccpclk_375mhz";
-+	};
++#include <sys/stat.h>
 +
-+	sataclk_333mhz: clock-333000000 {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <333000000>;
-+		clock-output-names = "sataclk_333mhz";
-+	};
++#include "test_progs.h"
++#include "network_helpers.h"
++#include "sysctl_helpers.h"
++#include "ksock_quota.skel.h"
 +
-+	dmaclk_500mhz: pcieclk_500mhz: clock-500000000 {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <500000000>;
-+		clock-output-names = "pcieclk_500mhz";
-+	};
++#define NS_NET_QUOTA_TEST1 "ksock_net_quota_ns1"
++#define NS_NET_QUOTA_TEST2 "ksock_net_quota_ns2"
++#define KSOCK_MAX_SYSCTL "/proc/sys/net/core/bpf_ksock_max"
++#define KSOCK_QUOTA_NS_SLOTS 3
++#define KSOCK_QUOTA_NS1_OFFSET 0
++#define KSOCK_QUOTA_NS2_OFFSET KSOCK_QUOTA_NS_SLOTS
 +
-+	xgmacclk0_dma_250mhz: xgmacclk0_ptp_250mhz: xgmacclk1_dma_250mhz: xgmacclk1_ptp_250mhz:
-+	miscclk_250mhz: clock-250000000 {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <250000000>;
-+		clock-output-names = "miscclk_250mhz";
-+	};
- 
- 	gic0: interrupt-controller@e1101000 {
- 		compatible = "arm,gic-400", "arm,cortex-a15-gic";
--- 
-2.53.0
++static int ksock_run_prog(struct bpf_program *prog)
++{
++	LIBBPF_OPTS(bpf_test_run_opts, opts);
++	int err;
++
++	err = bpf_prog_test_run_opts(bpf_program__fd(prog), &opts);
++	if (err)
++		return err;
++	return opts.retval;
++}
++
++static __u64 ksock_quota_release_completed(struct ksock_quota *skel)
++{
++	return __atomic_load_n(&skel->bss->quota_release_completed,
++			       __ATOMIC_ACQUIRE);
++}
++
++static int ksock_release_quota_slots(struct ksock_quota *skel, int slot_offset)
++{
++	__u64 completed;
++	int err;
++
++	completed = ksock_quota_release_completed(skel);
++	skel->bss->quota_slot_offset = slot_offset;
++	err = ksock_run_prog(skel->progs.ksock_quota_release);
++	if (!ASSERT_OK(err, "ksock_quota_release"))
++		return -1;
++
++	while (ksock_quota_release_completed(skel) - completed <
++	       skel->bss->quota_released)
++		usleep(1000);
++
++	return skel->bss->quota_released;
++}
++
++static bool ksock_expect_quota(struct ksock_quota *skel, int slot_offset,
++			       const char *name)
++{
++	int err;
++
++	skel->bss->quota_slot_offset = slot_offset;
++	err = ksock_run_prog(skel->progs.ksock_quota_create);
++	if (!ASSERT_OK(err, name))
++		return false;
++	if (!ASSERT_EQ(skel->bss->quota_created, 2, name))
++		return false;
++	return ASSERT_EQ(skel->bss->quota_err, -ENOSPC, name);
++}
++
++static bool record_current_ns(struct ksock_quota *skel, int target)
++{
++	struct stat st;
++	int err;
++
++	err = stat("/proc/self/ns/net", &st);
++	if (!ASSERT_OK(err, "stat netns"))
++		return false;
++	skel->bss->target_netns_inum[target] = (__u32)st.st_ino;
++	return true;
++}
++
++void serial_test_ksock_net_quota(void)
++{
++	char old_max[16] = {};
++	struct netns_obj *netns1 = NULL, *netns2 = NULL;
++	struct ksock_quota *skel;
++	int released;
++
++	skel = ksock_quota__open_and_load();
++	if (!ASSERT_OK_PTR(skel, "ksock quota skeleton"))
++		return;
++	skel->links.ksock_release_work_enter =
++		bpf_program__attach_trace(skel->progs.ksock_release_work_enter);
++	if (!ASSERT_OK_PTR(skel->links.ksock_release_work_enter,
++			   "attach ksock release work entry"))
++		goto out;
++	skel->links.ksock_release_work_exit =
++		bpf_program__attach_trace(skel->progs.ksock_release_work_exit);
++	if (!ASSERT_OK_PTR(skel->links.ksock_release_work_exit,
++			   "attach ksock release work exit"))
++		goto out;
++
++	if (sysctl_set_or_fail(KSOCK_MAX_SYSCTL, old_max, "2"))
++		goto out;
++
++	netns1 = netns_new(NS_NET_QUOTA_TEST1, true);
++	if (!ASSERT_OK_PTR(netns1, "create first netns"))
++		goto out;
++	if (!record_current_ns(skel, 0))
++		goto out;
++
++	if (!ksock_expect_quota(skel, KSOCK_QUOTA_NS1_OFFSET,
++				"first netns quota"))
++		goto out;
++
++	/* The host-wide setting grants the full allowance to each netns. */
++	netns2 = netns_new(NS_NET_QUOTA_TEST2, true);
++	if (!ASSERT_OK_PTR(netns2, "create second netns"))
++		goto out;
++	if (!record_current_ns(skel, 1))
++		goto out;
++
++	if (!ksock_expect_quota(skel, KSOCK_QUOTA_NS2_OFFSET,
++				"second netns quota"))
++		goto out;
++
++	released = ksock_release_quota_slots(skel, KSOCK_QUOTA_NS2_OFFSET);
++	if (!ASSERT_EQ(released, 2, "second netns quota released"))
++		goto out;
++
++	/* Both released slots must become available again. */
++	ksock_expect_quota(skel, KSOCK_QUOTA_NS2_OFFSET, "recovered quota");
++
++out:
++	ksock_release_quota_slots(skel, KSOCK_QUOTA_NS2_OFFSET);
++	ksock_release_quota_slots(skel, KSOCK_QUOTA_NS1_OFFSET);
++	netns_free(netns2);
++	netns_free(netns1);
++	if (old_max[0])
++		sysctl_set_or_fail(KSOCK_MAX_SYSCTL, NULL, old_max);
++	ksock_quota__destroy(skel);
++}
+diff --git a/tools/testing/selftests/bpf/progs/ksock_quota.c b/tools/testing/selftests/bpf/progs/ksock_quota.c
+new file mode 100644
+index 000000000000..91854ea333c1
+--- /dev/null
++++ b/tools/testing/selftests/bpf/progs/ksock_quota.c
+@@ -0,0 +1,167 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) 2026 Isovalent */
++
++#include "vmlinux.h"
++#include <bpf/bpf_core_read.h>
++#include <bpf/bpf_helpers.h>
++#include <bpf/bpf_tracing.h>
++#include "bpf_tracing_net.h"
++#include "ksock_common.h"
++
++#define KSOCK_QUOTA_NS_SLOTS 3
++#define KSOCK_QUOTA_NETNS 2
++#define KSOCK_QUOTA_SLOTS (KSOCK_QUOTA_NS_SLOTS * KSOCK_QUOTA_NETNS)
++
++struct ksock_quota_value {
++	struct bpf_ksock __kptr * ctx;
++};
++
++struct {
++	__uint(type, BPF_MAP_TYPE_ARRAY);
++	__type(key, u32);
++	__type(value, struct ksock_quota_value);
++	__uint(max_entries, KSOCK_QUOTA_SLOTS);
++} quota_map SEC(".maps");
++
++struct {
++	__uint(type, BPF_MAP_TYPE_HASH);
++	__type(key, u64);
++	__type(value, u8);
++	__uint(max_entries, KSOCK_QUOTA_SLOTS);
++} release_workers SEC(".maps");
++
++u32 quota_created;
++u32 quota_released;
++u32 quota_slot_offset;
++u32 target_netns_inum[KSOCK_QUOTA_NETNS];
++u64 quota_release_completed;
++int quota_err;
++
++static __always_inline bool
++ksock_quota_create_one(u32 i,
++		       const struct bpf_ksock_create_opts *create_opts)
++{
++	struct ksock_quota_value *v;
++	struct bpf_ksock *ks, *old;
++	int err = 0;
++
++	i += quota_slot_offset;
++	if (i >= KSOCK_QUOTA_SLOTS) {
++		quota_err = -ERANGE;
++		return true;
++	}
++
++	barrier_var(err);
++	ks = bpf_ksock_create(create_opts, sizeof(*create_opts), &err);
++	if (!ks) {
++		quota_err = err;
++		return true;
++	}
++
++	v = bpf_map_lookup_elem(&quota_map, &i);
++	if (!v) {
++		bpf_ksock_release(ks);
++		quota_err = -ENOENT;
++		return true;
++	}
++
++	old = bpf_kptr_xchg(&v->ctx, ks);
++	if (old)
++		bpf_ksock_release(old);
++	quota_created++;
++	return false;
++}
++
++static __always_inline void ksock_quota_release_one(u32 i)
++{
++	struct ksock_quota_value *v;
++	struct bpf_ksock *ks;
++
++	i += quota_slot_offset;
++	if (i >= KSOCK_QUOTA_SLOTS)
++		return;
++
++	v = bpf_map_lookup_elem(&quota_map, &i);
++	if (!v)
++		return;
++
++	ks = bpf_kptr_xchg(&v->ctx, NULL);
++	if (ks) {
++		bpf_ksock_release(ks);
++		quota_released++;
++	}
++}
++
++SEC("syscall")
++int ksock_quota_create(void *ctx)
++{
++	struct bpf_ksock_create_opts create_opts = {};
++
++	create_opts.family = AF_INET;
++	create_opts.type = SOCK_DGRAM;
++	create_opts.protocol = IPPROTO_UDP;
++	quota_created = 0;
++	quota_err = 0;
++
++	if (ksock_quota_create_one(0, &create_opts))
++		return 0;
++	if (ksock_quota_create_one(1, &create_opts))
++		return 0;
++	ksock_quota_create_one(2, &create_opts);
++
++	return 0;
++}
++
++SEC("syscall")
++int ksock_quota_release(void *ctx)
++{
++	quota_released = 0;
++	ksock_quota_release_one(0);
++	ksock_quota_release_one(1);
++	ksock_quota_release_one(2);
++
++	return 0;
++}
++
++SEC("fentry/ksock_release_work_fn")
++int BPF_PROG(ksock_release_work_enter, struct work_struct *work)
++{
++	struct rcu_work *rwork = container_of(work, struct rcu_work, work);
++	struct bpf_ksock *ks = container_of(rwork, struct bpf_ksock, rwork);
++	u64 pid_tgid = bpf_get_current_pid_tgid();
++	struct net *net;
++	u32 inum;
++	u8 tracked = 1;
++
++	/* ksock_release_work_fn() frees ks before the fexit program runs. */
++	net = BPF_CORE_READ(ks, sock, sk, __sk_common.skc_net.net);
++	if (!net)
++		return 0;
++
++	inum = BPF_CORE_READ(net, ns.inum);
++	if (inum != target_netns_inum[0] &&
++	    inum != target_netns_inum[1])
++		return 0;
++
++	bpf_map_update_elem(&release_workers, &pid_tgid, &tracked, BPF_ANY);
++	return 0;
++}
++
++SEC("fexit/ksock_release_work_fn")
++int BPF_PROG(ksock_release_work_exit, struct work_struct *work)
++{
++	u64 pid_tgid = bpf_get_current_pid_tgid();
++	u8 *tracked;
++
++	tracked = bpf_map_lookup_elem(&release_workers, &pid_tgid);
++	if (!tracked)
++		return 0;
++	bpf_map_delete_elem(&release_workers, &pid_tgid);
++
++	/* The worker has released the socket and returned its quota charge. */
++	__sync_fetch_and_add(&quota_release_completed, 1);
++
++	return 0;
++}
++
++char __license[] SEC("license") = "GPL";
+--
+2.34.1
 
 
