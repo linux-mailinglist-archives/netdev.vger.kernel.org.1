@@ -1,91 +1,91 @@
-Return-Path: <netdev+bounces-305187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305188-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4dawBUHyS2oGdgEAu9opvQ
-	(envelope-from <netdev+bounces-305187-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 20:21:53 +0200
+	id uTRoLjQFTGqjewEAu9opvQ
+	(envelope-from <netdev+bounces-305188-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 21:42:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACC02714710
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 20:21:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1443A7151A9
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 21:42:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=fastmail.im header.s=fm2 header.b="C G5x/i5";
-	dkim=pass header.d=messagingengine.com header.s=fm2 header.b=m0x+pisD;
+	dkim=pass header.d=fastmail.im header.s=fm2 header.b="H MEMPuZ";
+	dkim=pass header.d=messagingengine.com header.s=fm2 header.b=VOi10Mt5;
 	dmarc=pass (policy=none) header.from=fastmail.im;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305187-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305187-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305188-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305188-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 185F43024B62
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 18:20:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7BE78315445B
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 18:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C719437863;
-	Mon,  6 Jul 2026 18:20:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E99437843;
+	Mon,  6 Jul 2026 18:20:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6FC8436BCE
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 18:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99C8436BDA
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 18:20:52 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783362049; cv=none; b=UfiVql9+wlB63yqBd/dbvUud0pSXxSlAVUAw4mtUZTvPE49654z7B+VYTlUNpZsdJ/o1kHp8dpcHYfwhLMLSZRo14wEJR8y13HsLS57yvipMM0Xg1XbfyNrv9wFt0A5I/GsAusaqeW6NDj8Du6AC6INIA3K2uhiNjUk8yMQLa/0=
+	t=1783362054; cv=none; b=deABTst701tZcca5wuQLlYTOKLnJw79YxeX2v57a4Opv7vLtvGjSInKS5xm19t3xnmp3XQSVBaRrWts0PiNdhSLQwmZd4CA5EcmM/CBpEo/LygVnLHi04v405nFvS43z3ME2hNL+4YYEMDwIYz7J8tuEfh8fGD2KQ0JPzoEb0p0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783362049; c=relaxed/simple;
-	bh=ZWXbgafIGTz8xu/L99Wf9gJbdEsf4Q7FwDvYQks5ALo=;
+	s=arc-20240116; t=1783362054; c=relaxed/simple;
+	bh=BpMU/KQZxIQhJJ019dQAS3ORZw04v9Z1KJIt1fkVI2U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZlY9a1OGbYS8IFkUAKhvDtLw62ENddWZ8bVQcIPcupDKHmumFDxfKgCG6dig49Spi2gQCinn4FsnMi9dLk4eQ9TJoqRvyOIWlhrQcI9GLnI1UGVNZE2dHjCbkYMFVSLu7CJMvjlY4yhD6nmUaAW/ldSH27F+LXTuB1q3nH3wi5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=CG5x/i5+; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=m0x+pisD; arc=none smtp.client-ip=103.168.172.152
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 28F8E140013D;
-	Mon,  6 Jul 2026 14:20:47 -0400 (EDT)
+	 MIME-Version; b=OWFe6wWvGFC+TUvDe+nBKs7BTkH85jvON/gZaRs+A1iSdeOtuXmBu4gAXWpa8ivIu2Sk8j0ah2vwMeH8UOTFz16MYkHzYcwovWrm6wE39uPJZxbAIdxIojx/T3UK5OWWltxgXuMF4qF5Vy2gOi+VZhzG9/dZFnle80Y/Z2zXQCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=HMEMPuZd; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=VOi10Mt5; arc=none smtp.client-ip=103.168.172.152
+Received: from phl-compute-08.internal (phl-compute-08.internal [10.202.2.48])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id EDA2F1400114;
+	Mon,  6 Jul 2026 14:20:51 -0400 (EDT)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Mon, 06 Jul 2026 14:20:47 -0400
+  by phl-compute-08.internal (MEProxy); Mon, 06 Jul 2026 14:20:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
 	cc:cc:content-transfer-encoding:content-type:date:date:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1783362047; x=
-	1783448447; bh=NBxc7NjrXRB/RPnGvxFt2oPvmnXmDKIQnsk0vpD0Uls=; b=C
-	G5x/i5+I84Wrc67RYMuoa8WK6OdWjuBr6rxvU0CP2BvcIVOYeP2r2Up9icTJMBqo
-	NIVvCcGHbtHKNu1eFTb89kFcNjJCzjhyFgBEWRP3dHJgi9wGx/4doNcIkWHEwJa9
-	0DKXTmH6aT3nqlwRoP4fmKq5pr23LH/saFe3IW4R1hulZ/SatQRzvmbbQ9pGp0FR
-	C1bmLYV03H64yfd4+o7H03ngocNel68bB0nZ4FT05ElMmP7j3oeJkmejg0KOFDNt
-	3gKHvtUXSfuaUeE0JJ3j4Tc03GsmJfMoHQh9fgHy61nPIPKFJMkbGocDtedHH2OX
-	3lKvHb5TzMKBET+UCdkwA==
+	:reply-to:subject:subject:to:to; s=fm2; t=1783362051; x=
+	1783448451; bh=iezIZhXVpeSc8eAq7auxerJW6WGW3QxsYHckVvIqEJ8=; b=H
+	MEMPuZdFgUFRN0TAlBs5TngMYyHlRTCzsCgxejzEeqGpwZcYCiBrEmLeLGBXS1K1
+	ImO4E1kvfQOJjRF+fDrY9yiXL817obo0boPtYqKfrQehjlA0oNwnDgNZ2ipVwMKv
+	j3STAUbY/CA932uEISsn2Jpcto5qv8pCKvJdJkIzOcfFDnxrBy93VvqCfRj+zHv0
+	7V/wMH2Ect4+1Nj/goTBfHqZc7yi7pKOALloy+EBj3IdYaCc9G9iSnP/t7SVrSJ8
+	b1DcBT2ErN7H1ZryMW7HqorDX11KsRMuDrFsYv96D27eqkfA5R2PQTqCYY4ZyuU5
+	PChL0P7X3TelH0wGtl8ew==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm2; t=1783362047; x=1783448447; bh=N
-	Bxc7NjrXRB/RPnGvxFt2oPvmnXmDKIQnsk0vpD0Uls=; b=m0x+pisDr9klWsBGq
-	544LKrFI0HhyIzWTHyvFCxeAfQo/5HrANBznm7PFgiw6JdGLTFq3Bia9C0QqyJZJ
-	hYYBTulKeObKukk+Fh/2UXpMedRfejh+DUA4VviacyuvSOpiE0Ffp2tiYBB0dx78
-	dqThO1ul+OV40DKZizV8ZPVG3OL1wI6RzTK4yW0LT2pXYUG8dEFVymlzq/Tm4LFo
-	r2T7Hg2eaCVKftUvg8Sry7vhX4Qe+JK7NWjxVLZ+53FTiaOFn0NitCkaIP6rEF76
-	v54vrd5OEzZsilOPcqME5j56RSRwOwaPPkp+/cu3GivAROFbmcsLwJ0I82Dme2Ja
-	D8TUQ==
-X-ME-Sender: <xms:_vFLatWXJ2CCj36k3YXVyogM34AC9RM7Egofpa9MjaoPw0PGmrgsGQ>
-    <xme:_vFLasFBJxHRqYUmyofZFU9FBnnvH_V4LAXFfizsCKOZJhf3g7YKynsaCzeDCSFtZ
-    _6v5ebkzd0hHFwtY_C5BbZV9Wght8dZ18xKuf6RWkwFKJom_XrhY7TX>
-X-ME-Received: <xmr:_vFLagOBsgROv5FsWX6zdsZ4PCHdbd0YQflsHgpEJcMY5KB3O6y-gH7hzk8>
-X-ME-Proxy-Cause: dmFkZTGUsUpJpDFa5ndE4N6eTKB/j2d4JsSbrhMs8kmEW2L9QK3N/6TXxA5y7ulUoXm7BP
-    89asODAMfT3OBvY/M09D0GqR/9f8fV5gBQIGHO+HJK2v+bCFZ6PfrlSqdRObcl1ifowHpG
-    tdD7vyUPEgwFuODXXuYyDriQ176ee08aLqbCrephkwOmUEbVwxNtxJmLaLFJpQP96s58mK
-    npPwdvdZvXzqtDhxT3KN6NVuVc++tCiI8YGn0XKi84DG+Ojy+uujNScslpd1sVLQiZ4Ias
-    tnSVjmdR3/qyqDiPkegvX2kZQRuflV0jlrEpRX03LLhuj7//XS63UPEDz3jVugM+iYgwJc
-    JoO+NkQUFdO9dq2Cc1BX/CpMY1M2f3anZlQSmXc1lDT7FTwDeBuiGCaTdleZrycrlh4IdA
-    xPNc+UMHU1jKylVeF0uFNThP3TVlmpOWtq09Xo2xh5CnEo5svQroiRzM6d7OQRr98fKRZT
-    cLzBEWRTahuJDjh99QJnorSDPYRSBbfp9LhoMNEUHH44TOAInBoJFAcwH3Y1Hrt3oVaKJE
-    MDUQS/a/561m6otvMYiw9PGlGqPkBFNj/Kdn7VbB7HMZrnQRjBaZl4AVupHvDLTSy9yccw
-    FkxYq3DPpQMxFBQsWzyJ+blC5faRt/cM7GYZ7K/ku5nk6i7BAvdZprP9oO3g
-X-ME-Proxy: <xmx:_vFLagXsE7rYRmJEfRZJp09koVTPsq1exjS9E4FLgq7uZ9ODo1rNaw>
-    <xmx:_vFLavw5I9sIcpfGWHrOWb8vI6n6io1AsDBBIesKQCOjXY7LCaVR-A>
-    <xmx:_vFLaoOWoCxASvhfZuHrX3tkWjtkguZX3F9ByIYDJWv_R-ch8OdtlQ>
-    <xmx:_vFLaprNCoEL7_dHnBs-IQx2ytDn6ErWZ8pvnfdKSsDvP0C8KQfArg>
-    <xmx:__FLavjxcrCaICMaMX6QUDjM3GfQpwfkyNNoii0i43UMq0IaYVjiTfgA>
+	:x-me-sender:x-sasl-enc; s=fm2; t=1783362051; x=1783448451; bh=i
+	ezIZhXVpeSc8eAq7auxerJW6WGW3QxsYHckVvIqEJ8=; b=VOi10Mt5RrmBPS6ox
+	2ePW1m20ZpZ6632DkEpGxo8sXiq6MNgzh7dlmGG+X7cFIZStP1Eq3d9fImGbQEtS
+	f02kp/ziAEKjBmFkdkW65KWnbFA5DCzAQih0ArPi5RsPnonSE5uMK0KTMQ2r/c7f
+	yDLccGzM27zbdK+B6mYon19BKn1RMXlUFjshr93In1JwXLlXLIg8XLZYI8NyckCI
+	pI6W7v/rq2NgFiJX3gaAouQX/XCvXud1lXOtX3Oul5ZrDuxzV8IT6JJNR3s0CZ3g
+	WlnNxo3PB+9C/mlVVsqnm10iVQ5XRw81ixWh44Okbmz4D5GZiJeRdz5V1bjYCq+U
+	w7d8Q==
+X-ME-Sender: <xms:A_JLagS-u9jnTVv4V0zpIQHKMUQBRql1D9nZ9membTGH2jSauIx9nQ>
+    <xme:A_JLasS93XeWSNjsUugDgr6hYJRWHVEBf_Yv-9OKFUo0XcaHQj5HB-zhTnqUABLZa
+    iToKrS6PfQ7YRzBCuIJKPHgWSSPshfs6smgZXsAssMdXZ7Xxfr36iI>
+X-ME-Received: <xmr:A_JLakoAlKCjxCBJpEWTuO28MCk0EigJsy03XAQ1ftthDc_q3SPijU8zWTE>
+X-ME-Proxy-Cause: dmFkZTEGTPv5OkKcjprW8/I9eo6u4pwgzYOjg6KFhqQqPhEcE15CLvyHfw+KtOGuruiqIO
+    RNBEfkqjE6n9+N680knhEUuD69YEJHEnuIz9rN1Z3nsMpcwWxLrhFq8Y3mO7NKw8IU0Xda
+    6lObyyPoWVV45JHUZI+DXDDPStMSyKm6G7gmBL/I49XwlNAfrDK9JFzvXaGy1kqeYjVqcI
+    7dmMZaut61MQOINjUZvHvPGjhzlZQt1yHbk9JExXHi4aAGmELWRRwleBjY7O4shNeF472R
+    iV0vQw/w1/u72oscJfGNj5WiGzXLuavT9H5l8k5y2FM5sILMEpSAYwjnjAGUg6Papuu7Qu
+    gVST0p/505JW3VYbFF8kgszCI7KPobOKXlZoZ5oEnAmQsScQF2EQcee/9RfAI+RovL5hAI
+    UsBv98sIUn638+ow8es2MSL02AbPCsMDL4FmtY05zIyLMYVz/bze3/8sb5br1E1VbGm4rU
+    QNlDirgNgDewi2dOsPI+nIOPIV1gE0VVOVwE0n+4z/rzGW3vOpRrhm7DJBbfITlC/9hspC
+    mX3fZtEsb78OWIfuYad79IQoYZ7qBosaGIOcEZwxDY/gkHlEQfRo9l19RCGlDbsWFURL1X
+    RwJXG5llta8aa47qMND0zIQx3jZclkt/WjCIHDqYusjOYMOGkG8rPMPBMyaA
+X-ME-Proxy: <xmx:A_JLakDn5Jhv2IFAbHya1xke-HEsofyfps8qDgjBodjdtgrK19Hv7w>
+    <xmx:A_JLahs0OUBiBrdTf3YBS1QlexekmA0_voIqwU1IS5h7brRWL_ozDw>
+    <xmx:A_JLarbvR2yxRzKp9lWpG42Mab0ENE4gZNnvLEqWwuIYsNMzKAlmyQ>
+    <xmx:A_JLalGac2p9VEOBlNfwONFxsVhzQsm0Gpjh9EX3nerRE5XbQtjadQ>
+    <xmx:A_JLatMF5tATv4TVljtXfxm48LMQwmmlOsUSoLuP5z2d68BO4mrN4ocs>
 Feedback-ID: i559e4809:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 6 Jul 2026 14:20:45 -0400 (EDT)
+ 6 Jul 2026 14:20:50 -0400 (EDT)
 From: Alice Mikityanska <alice.kernel@fastmail.im>
 To: Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -104,9 +104,9 @@ Cc: Shuah Khan <shuah@kernel.org>,
 	Florian Westphal <fw@strlen.de>,
 	netdev@vger.kernel.org,
 	Alice Mikityanska <alice@isovalent.com>
-Subject: [PATCH net-next v8 2/9] net: Enable BIG TCP with partial GSO
-Date: Mon,  6 Jul 2026 21:19:34 +0300
-Message-ID: <20260706181941.385672-3-alice.kernel@fastmail.im>
+Subject: [PATCH net-next v8 3/9] udp: Support BIG TCP GSO packets where they can occur
+Date: Mon,  6 Jul 2026 21:19:35 +0300
+Message-ID: <20260706181941.385672-4-alice.kernel@fastmail.im>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260706181941.385672-1-alice.kernel@fastmail.im>
 References: <20260706181941.385672-1-alice.kernel@fastmail.im>
@@ -124,12 +124,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm2,messagingengine.com:s=fm2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305187-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305188-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[iogearbox.net,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,blackwall.org];
 	FORGED_SENDER(0.00)[alice.kernel@fastmail.im,netdev@vger.kernel.org];
@@ -149,88 +149,98 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,fastmail.im:from_mime,fastmail.im:dkim,fastmail.im:mid,vger.kernel.org:from_smtp,isovalent.com:email,messagingengine.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[fastmail.im:from_mime,fastmail.im:dkim,fastmail.im:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,isovalent.com:email,messagingengine.com:dkim,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: ACC02714710
+X-Rspamd-Queue-Id: 1443A7151A9
 
 From: Alice Mikityanska <alice@isovalent.com>
 
-skb_segment is called for partial GSO, when netif_needs_gso returns true
-in validate_xmit_skb. Partial GSO is needed, for example, when
-segmentation of tunneled traffic is offloaded to a NIC that only
-supports inner checksum offload.
+Wherever a GSO packet can occur, and its length is used to fill the UDP
+header, use udp_set_len that assigns 0 if the length doesn't fit 16
+bits, so that the packet can be properly parsed and segmented later,
+instead of having truncated length.
 
-Currently, skb_segment clamps the segment length to 65534 bytes, because
-gso_size == 65535 is a special value GSO_BY_FRAGS, and we don't want
-to accidentally assign mss = 65535, as it would fall into the
-GSO_BY_FRAGS check further in the function.
-
-This implementation, however, artificially blocks len > 65534, which is
-possible since the introduction of BIG TCP. To allow bigger lengths and
-avoid resegmentation of BIG TCP packets, store the gso_by_frags flag in
-the beginning and don't use a special value of mss for this purpose
-after mss was modified.
+Use udp_get_len in udp_validate_len to treat BIG TCP packets as valid.
 
 Signed-off-by: Alice Mikityanska <alice@isovalent.com>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 ---
- net/core/skbuff.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ net/ipv4/fou_core.c                    | 2 +-
+ net/ipv6/fou6.c                        | 2 +-
+ net/netfilter/ipvs/ip_vs_xmit.c        | 2 +-
+ net/netfilter/nf_conntrack_proto_udp.c | 2 +-
+ net/psp/psp_main.c                     | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 18dabb4e9cfa..6ae4c2b205f2 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -4775,6 +4775,7 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
- 	struct sk_buff *tail = NULL;
- 	struct sk_buff *list_skb = skb_shinfo(head_skb)->frag_list;
- 	unsigned int mss = skb_shinfo(head_skb)->gso_size;
-+	bool gso_by_frags = mss == GSO_BY_FRAGS;
- 	unsigned int doffset = head_skb->data - skb_mac_header(head_skb);
- 	unsigned int offset = doffset;
- 	unsigned int tnl_hlen = skb_tnl_header_len(head_skb);
-@@ -4790,7 +4791,7 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
- 	int nfrags, pos;
+diff --git a/net/ipv4/fou_core.c b/net/ipv4/fou_core.c
+index a50740d0f288..aef3ce1dec7a 100644
+--- a/net/ipv4/fou_core.c
++++ b/net/ipv4/fou_core.c
+@@ -1040,7 +1040,7 @@ static void fou_build_udp(struct sk_buff *skb, struct ip_tunnel_encap *e,
  
- 	if ((skb_shinfo(head_skb)->gso_type & SKB_GSO_DODGY) &&
--	    mss != GSO_BY_FRAGS && mss != skb_headlen(head_skb)) {
-+	    !gso_by_frags && mss != skb_headlen(head_skb)) {
- 		struct sk_buff *check_skb;
+ 	uh->dest = e->dport;
+ 	uh->source = sport;
+-	udp_set_len_short(uh, skb->len);
++	udp_set_len(uh, skb->len);
+ 	udp_set_csum(!(e->flags & TUNNEL_ENCAP_FLAG_CSUM), skb,
+ 		     fl4->saddr, fl4->daddr, skb->len);
  
- 		for (check_skb = list_skb; check_skb; check_skb = check_skb->next) {
-@@ -4818,7 +4819,7 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
- 	sg = !!(features & NETIF_F_SG);
- 	csum = !!can_checksum_protocol(features, proto);
+diff --git a/net/ipv6/fou6.c b/net/ipv6/fou6.c
+index 588929409241..4b659ca60ba9 100644
+--- a/net/ipv6/fou6.c
++++ b/net/ipv6/fou6.c
+@@ -30,7 +30,7 @@ static void fou6_build_udp(struct sk_buff *skb, struct ip_tunnel_encap *e,
  
--	if (sg && csum && (mss != GSO_BY_FRAGS))  {
-+	if (sg && csum && !gso_by_frags)  {
- 		if (!(features & NETIF_F_GSO_PARTIAL)) {
- 			struct sk_buff *iter;
- 			unsigned int frag_len;
-@@ -4852,9 +4853,8 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
- 		/* GSO partial only requires that we trim off any excess that
- 		 * doesn't fit into an MSS sized block, so take care of that
- 		 * now.
--		 * Cap len to not accidentally hit GSO_BY_FRAGS.
- 		 */
--		partial_segs = min(len, GSO_BY_FRAGS - 1) / mss;
-+		partial_segs = len / mss;
- 		if (partial_segs > 1)
- 			mss *= partial_segs;
- 		else
-@@ -4878,7 +4878,7 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
- 		int hsize;
- 		int size;
+ 	uh->dest = e->dport;
+ 	uh->source = sport;
+-	udp_set_len_short(uh, skb->len);
++	udp_set_len(uh, skb->len);
+ 	udp6_set_csum(!(e->flags & TUNNEL_ENCAP_FLAG_CSUM6), skb,
+ 		      &fl6->saddr, &fl6->daddr, skb->len);
  
--		if (unlikely(mss == GSO_BY_FRAGS)) {
-+		if (unlikely(gso_by_frags)) {
- 			len = list_skb->len;
- 		} else {
- 			len = head_skb->len - offset;
+diff --git a/net/netfilter/ipvs/ip_vs_xmit.c b/net/netfilter/ipvs/ip_vs_xmit.c
+index ae3ed2c00ec3..c51ebd83a476 100644
+--- a/net/netfilter/ipvs/ip_vs_xmit.c
++++ b/net/netfilter/ipvs/ip_vs_xmit.c
+@@ -1100,7 +1100,7 @@ ipvs_gue_encap(struct net *net, struct sk_buff *skb,
+ 	dport = cp->dest->tun_port;
+ 	udph->dest = dport;
+ 	udph->source = sport;
+-	udp_set_len_short(udph, skb->len);
++	udp_set_len(udph, skb->len);
+ 	udph->check = 0;
+ 
+ 	*next_protocol = IPPROTO_UDP;
+diff --git a/net/netfilter/nf_conntrack_proto_udp.c b/net/netfilter/nf_conntrack_proto_udp.c
+index 8a5675983e7c..a7edfefd6fd1 100644
+--- a/net/netfilter/nf_conntrack_proto_udp.c
++++ b/net/netfilter/nf_conntrack_proto_udp.c
+@@ -45,7 +45,7 @@ static bool udp_validate_len(struct sk_buff *skb,
+ 			     const struct udphdr *hdr,
+ 			     unsigned int dataoff)
+ {
+-	unsigned int udplen = udp_get_len_short(hdr);
++	unsigned int udplen = udp_get_len(skb, hdr, dataoff);
+ 	unsigned int skblen = skb->len - dataoff;
+ 
+ 	if (udplen > skblen || udplen < sizeof(*hdr))
+diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
+index 90c7dc4e76a1..c9c1a8826b7f 100644
+--- a/net/psp/psp_main.c
++++ b/net/psp/psp_main.c
+@@ -231,7 +231,7 @@ static void psp_write_headers(struct net *net, struct sk_buff *skb, __be32 spi,
+ 		uh->source = udp_flow_src_port(net, skb, 0, 0, false);
+ 	}
+ 	uh->check = 0;
+-	udp_set_len_short(uh, udp_len);
++	udp_set_len(uh, udp_len);
+ 
+ 	psph->nexthdr = IPPROTO_TCP;
+ 	psph->hdrlen = PSP_HDRLEN_NOOPT;
 -- 
 2.54.0
 
