@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-305057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305058-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id HqZuH7PKS2pfaQEAu9opvQ
-	(envelope-from <netdev+bounces-305057-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 17:33:07 +0200
+	id fv43J0KyS2q5YgEAu9opvQ
+	(envelope-from <netdev+bounces-305058-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 15:48:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE759712A2C
-	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 17:33:06 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B8D0711787
+	for <lists+netdev@lfdr.de>; Mon, 06 Jul 2026 15:48:50 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=suse.com header.s=google header.b=H6ka8P+I;
+	dkim=pass header.d=suse.com header.s=google header.b=TKDanMyO;
 	dmarc=pass (policy=quarantine) header.from=suse.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305057-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305057-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305058-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305058-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ECF163162813
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 13:40:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 95C3C3044C21
+	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 13:41:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99E283750CF;
-	Mon,  6 Jul 2026 13:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDFC138B7D2;
+	Mon,  6 Jul 2026 13:40:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA71A36F912
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 13:40:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365CB3749F2
+	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 13:40:45 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783345245; cv=none; b=PgjOTC0cRZvDLtzczEIyAhXLCTrq4Nmyq3SvEqj9Qo1aFjvKWQQEPK8DC8Thrbm0V0+lVo1lP0EoYlsscPSie6Wz2MjTfmhVxETMcxQoCpS6lXFjTEfSoubTJ9izUOekuHbaWFmxJZBCZXMsiqyEDnWweU5x5759TB1ZUXwJlVg=
+	t=1783345246; cv=none; b=NX1k+xI4fQHM2Jd3lKjhW4gqmhBFFsgEfuPRX0xCGO0qU4TakuTlIHeJk1DR8y0q+JuAezvj7lb19travRG/WvWahwPTUpguEVh+tG8S4k4qJGuPU77OGcx7cng4qEfHQVH58x/0egrBmPx/FsO/EqNGkjH0IDTooiriG6GCSps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783345245; c=relaxed/simple;
-	bh=lsDFIcHAftlanfKCuHhcmiZBwiRMAZikzgChqPjJjHI=;
+	s=arc-20240116; t=1783345246; c=relaxed/simple;
+	bh=Rv9DeY3sVQADSDinNUAIAVGb1zyRUZLjDXTC9l8OOCo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WKchtAAsOpXWVHa5L5tXgcl+7eK0+AYxhc9koRHzr3Yj4NqF0LRx4Uu3ySgV/3suKZy1LmMJTdAvJ+z4HZoJYPuEwaT+9BvH9epqLtcG2iK0afTUVUQO9roQpmahkFhtriYNvdCJye19hFpWbhXWzNHmtDA8/SlOyuw+5AqKEOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=H6ka8P+I; arc=none smtp.client-ip=209.85.221.54
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-47c2b362ee2so1639325f8f.1
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 06:40:43 -0700 (PDT)
+	 MIME-Version:Content-Type; b=nqSdnniiZpCsUmJI++QT7B03LQ4HuZSkViIAmbnoUOE2fIocEaWdumtMY8wWcgmA5Bhu3p9CgfxS0EGHML1EgIgD6flbfPyuCeSdiwXaR5Wnw83tNJghTDZvupDGAnfEzxQrctwkkJe04YYa9cFg1mSkoYQuO+I83V32dorqP7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=TKDanMyO; arc=none smtp.client-ip=209.85.128.46
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-493c19bad03so28295785e9.2
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 06:40:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1783345242; x=1783950042; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1783345243; x=1783950043; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YNtvrx6JU0RSTB5C/gMvs38ikePYtzcXdrklgWjxoQE=;
-        b=H6ka8P+Iv8JbglyJ3MfUf1QG1iBNmZU6TBryESC3elIvf8iwSw8uPLCSnp91kFEtpy
-         AnO274KLUH5UkpHa6Gjlq+viJv30b43y0UZ4n6lcC97vTkxc+NjwjqxxXHjcAKVW766+
-         qDQ/eRAW5vyoG3lbHI+6QAynTEECKXhNvYR/X2PeStRxR7FojRGp4bSatSXE3BVOcYD6
-         Yo7IOLoeKrrbupHK3rFVWqFNEq2O63EkK785Zl7f25bxRYIrFeNFloV+QM5xT4ZryOt/
-         Y4iPbCk8+mPD/8Cu3vtInLmC2t4upaMGihe/kzKl9NihpvxSD3yFDEZpxFc85GM5AuFa
-         dihQ==
+        bh=m6RbzNK+eNCezcWvhoJEyPH0JtE0jxe26kaL9SwOJjI=;
+        b=TKDanMyONnjydayose6ATzVlsnWaCbW2zOk945/mK2qEzVYOGIl80RFZ44vc835i84
+         teCQc1zzmWWOoLhBAufnNHNsUMCSnPhWXc48uZHaF8lMfL2XX6YtUhF0ZEMBNQFCXa87
+         1OeaDQw2rvTZMcZBxX3o32Bo4vADF103lM6WOybexuWGZFfW/pPGcWBYiJeam98F42EF
+         Ekhs/L/Pqc9BYT2VJC5r0kv7QjWouoGcInUb2p/kqF4qSam+oilP0ZadZE+TkchP4ajh
+         4snKkcz/cbBOQgigWibbR4LdDj+wRbUA7TqXhF3tM/klI/BDtRMwCtIY1m2Tab0J1HhI
+         kStQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783345242; x=1783950042;
+        d=1e100.net; s=20251104; t=1783345243; x=1783950043;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=YNtvrx6JU0RSTB5C/gMvs38ikePYtzcXdrklgWjxoQE=;
-        b=OfL06o9gQdSNmjOGKY2TMTCzI2mFOXHYbaidJHVTzYKCUJKYcoK2VPY1OtrVEBwVbW
-         rYaeTzOXFX4lhQZ635X9BL90dgO5TSHLVc6OUiawEXide7F4jxzxv5R1MoDIrbTaImmX
-         qeuIX86UJxoPY9ud5eCPi0IBqQTErjUNzJT7HbSFiY5AYYDiN3KKsNWV0blTEhZZYA7a
-         rPHGOGu35QsfimK+wz5YFJtFK+hDpWtEPkovU2B8PK5zPPFhHVIpJLnQXKfx9+VtUx2e
-         AYjUbYlxU0ZTU5GPVJMHl2V4RRfCUJI5uDsvVSMov7shfd2PxXD2E5AgDdybnLlXx/R/
-         l0WA==
-X-Forwarded-Encrypted: i=1; AHgh+RrqVddlJEC3HbnFBoyrF8DUvlVNtImnR7NLlw78QS3ZgrxfUNFrqls2/89/Er9z/9vUuqznvAM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGyLvGx9sZcKbqKbro3msb1QyEffQ6I+xlM5SJqwV0Z3sskJmC
-	+zu89vDUo00hkvM4H9ZNvmJMGwe3bR2X1piyT/KA8x32OEtd72t2bBIbYsoOH+iedCc=
-X-Gm-Gg: AfdE7cn/8/PkB4AnW4BkodtQIFU3dDryXVOGVf4pCdhZmcmoPqQ6bSDLPI5fTvEg5CC
-	f+X2edCdOfUnwSRb/K7uG7z6Jhy37s+YblEKbknFggZXjoXR5M6/2jP0TSI9H8Jg2zb3fUEFEBg
-	J5efkEvLCIQkxZ+3SN7LjtD9DW0M8Aljey2shF0IWI4HtfkUPlRMkkm7/VtJ4XLjYbOqy2JutaG
-	d8kI7taXiMjRJ3eec4/WxSjqhb9VGoT7MmqxR+AeFvXRxvtMpo+LZxitsBQodVcV5xd5rE6hrzE
-	sx3HuALunAn1/7xNA3ZpsqdMPfHoU5i9YYlsB4YCH/pgyrM0CPop9RqWZrhThRDCJ1ydvUSvnil
-	1za7T+MBurrNJMuz9X0q5ZGqKWttJTtLlt/yM1gQX9GTmJBiVJvq87fT/dw1cWcYwJ/RB1fRXuA
-	hhYyAXZwEFCqto1mDoxjfyZ9zzLD/CytaiwrRqv2uggBoQKA==
-X-Received: by 2002:a5d:4101:0:b0:460:2eee:4e21 with SMTP id ffacd0b85a97d-47de66a4d3amr240493f8f.17.1783345242476;
-        Mon, 06 Jul 2026 06:40:42 -0700 (PDT)
+        bh=m6RbzNK+eNCezcWvhoJEyPH0JtE0jxe26kaL9SwOJjI=;
+        b=R9sNSLcupLf4cGh7q0JEd5Mb46Ej9AZt8i6LNZDnScKCEYXh4SRy3wDa88fmuR99e7
+         h1vWTYoxwryxCPN9spvmfPV5BLhPnxEjvreYX/YYuyzT7gkku8/PC0hUvzMKM2ioyCaa
+         JOHfXbsohhxT3xTkatX0w6GOns+NEEtTbyPpmS6IaOXvhsA3OI1ic4n5bp8+adeppf7N
+         FQBFyoAqT1Tx8O/FPGz98jC0WafwawfkbzBUwA4Q756M01MpLFx1JPd1Fhff3CIcATzQ
+         TTNM68FYIuk8rzB2I8ucWJjIOlKi+ITXs9tJk6AUzE4GOL6bzUS/+EZkvFr9X4jp8wdf
+         O+vw==
+X-Forwarded-Encrypted: i=1; AHgh+RqeDniKn4vsjsCI0SnuPweX01qxH2S+4Dzl7CvPiRBZeOh+PBCdP7WYVNzxNkmRt5h2BU1WKS4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yws7hKLJkGNWLe7nIW3bPEJHqcoxibgxWwBMuKyxTH6+QMGkJJA
+	GIkEjG7DUT379MtteqMz7wgJxxIn2hFGtGk6/FTxNF5sVVP81Xlp6T5vH0mxIY9GGgY=
+X-Gm-Gg: AfdE7ckzrvHN7Pwrb1wKSIjNNBwVaAXSHZztliRWckEdnthCPep97bTs1htbXi6NmUj
+	u31arAzQ+qtz8OoaBqH6oS/tcUg4ErV4ERwlZpHjOs0NoOeymcyxb18t7EujMbau+cZrBzKfbcv
+	ECA1S80Upnq32QMl5A1vDpUtQXBf29c5pyeweADasOyE3UluuMoKUL0xCL85JRw+kQDXQPBS1Zf
+	fdKTnf6dIQMMNoJ10D4ywMCoJQWgrhUUSuKhUNm5tlx056zYUZ4lAEiqR8Xz3dH/0qdQQ3dEAf/
+	aKE4JbOMsEJKohDuWq3ls2hAtmhqKdXQTVOBn4iG3ng7XvZTMHhHjEQcpKwcCgWhS8eCXqnyo1J
+	GPIN4Lm7BmLN6pQOYA3xxbb9GJHmFhSMrUXveR6NnZG31B6R+7dfe0n9oQ4FK2U2RkZtTZ8Fa3Z
+	KvbMGsjCD7CrOfkeFy9LV///qsU8I4A3BqEmM=
+X-Received: by 2002:a05:600c:8b70:b0:493:b6e4:fb2b with SMTP id 5b1f17b1804b1-493df06e943mr6108015e9.25.1783345243589;
+        Mon, 06 Jul 2026 06:40:43 -0700 (PDT)
 Received: from localhost.localdomain ([2a00:6d43:105:c401:e307:1a37:2e76:ce91])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa0f214d2sm24424868f8f.33.2026.07.06.06.40.41
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa0f214d2sm24424868f8f.33.2026.07.06.06.40.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jul 2026 06:40:42 -0700 (PDT)
+        Mon, 06 Jul 2026 06:40:43 -0700 (PDT)
 From: Marco Crivellari <marco.crivellari@suse.com>
 To: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
@@ -90,17 +90,13 @@ Cc: Tejun Heo <tj@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Haren Myneni <haren@linux.ibm.com>,
-	Rick Lindsley <ricklind@linux.ibm.com>,
-	Nick Child <nnac123@linux.ibm.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v2 1/5] ibmvnic: Move long delayed work on system_dfl_long_wq
-Date: Mon,  6 Jul 2026 15:40:24 +0200
-Message-ID: <20260706134033.244295-2-marco.crivellari@suse.com>
+	MD Danish Anwar <danishanwar@ti.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	Richard Cheng <icheng@nvidia.com>
+Subject: [PATCH net-next v2 2/5] net: ti: icssg-stats: Move long delayed work on system_dfl_long_wq
+Date: Mon,  6 Jul 2026 15:40:25 +0200
+Message-ID: <20260706134033.244295-3-marco.crivellari@suse.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260706134033.244295-1-marco.crivellari@suse.com>
 References: <20260706134033.244295-1-marco.crivellari@suse.com>
@@ -119,16 +115,16 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linutronix.de,suse.com,lunn.ch,davemloft.net,google.com,redhat.com,linux.ibm.com,ellerman.id.au,lists.ozlabs.org];
-	TAGGED_FROM(0.00)[bounces-305057-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:tj@kernel.org,m:jiangshanlai@gmail.com,m:frederic@kernel.org,m:bigeasy@linutronix.de,m:marco.crivellari@suse.com,m:mhocko@suse.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:haren@linux.ibm.com,m:ricklind@linux.ibm.com,m:nnac123@linux.ibm.com,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:npiggin@gmail.com,m:chleroy@kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linutronix.de,suse.com,lunn.ch,davemloft.net,google.com,redhat.com,ti.com,lists.infradead.org,nvidia.com];
+	TAGGED_FROM(0.00)[bounces-305058-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:tj@kernel.org,m:jiangshanlai@gmail.com,m:frederic@kernel.org,m:bigeasy@linutronix.de,m:marco.crivellari@suse.com,m:mhocko@suse.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:danishanwar@ti.com,m:rogerq@kernel.org,m:linux-arm-kernel@lists.infradead.org,m:icheng@nvidia.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FORGED_SENDER(0.00)[marco.crivellari@suse.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -143,11 +139,11 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:from_mime,suse.com:email,suse.com:mid,suse.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,ellerman.id.au:email,ozlabs.org:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:from_mime,suse.com:email,suse.com:mid,suse.com:dkim,vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nvidia.com:email,infradead.org:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CE759712A2C
+X-Rspamd-Queue-Id: 0B8D0711787
 
 Currently the code enqueue work items using {queue|mod}_delayed_work(),
 using system_long_wq. This workqueue should be used when long works are
@@ -170,41 +166,28 @@ obvious reason that justify the use of a per-cpu workqueue. So change
 system_long_wq with system_dfl_long_wq so that the work may benefit from
 scheduler task placement.
 
-Cc: Haren Myneni <haren@linux.ibm.com>
-Cc: Rick Lindsley <ricklind@linux.ibm.com>
-Cc: Nick Child <nnac123@linux.ibm.com>
-Cc: Madhavan Srinivasan <maddy@linux.ibm.com>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Nicholas Piggin <npiggin@gmail.com>
-Cc: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
-Cc: linuxppc-dev@lists.ozlabs.org
+Cc: MD Danish Anwar <danishanwar@ti.com>
+Cc: Roger Quadros <rogerq@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org
 Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
+Reviewed-by: Richard Cheng <icheng@nvidia.com>
 ---
- drivers/net/ethernet/ibm/ibmvnic.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/ti/icssg/icssg_stats.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
-index 5a510eed335e..a1c01c9820d2 100644
---- a/drivers/net/ethernet/ibm/ibmvnic.c
-+++ b/drivers/net/ethernet/ibm/ibmvnic.c
-@@ -3229,7 +3229,7 @@ static void __ibmvnic_reset(struct work_struct *work)
- 	if (adapter->state == VNIC_PROBING &&
- 	    !wait_for_completion_timeout(&adapter->probe_done, timeout)) {
- 		dev_err(dev, "Reset thread timed out on probe");
--		queue_delayed_work(system_long_wq,
-+		queue_delayed_work(system_dfl_long_wq,
- 				   &adapter->ibmvnic_delayed_reset,
- 				   IBMVNIC_RESET_DELAY);
- 		return;
-@@ -3267,7 +3267,7 @@ static void __ibmvnic_reset(struct work_struct *work)
- 	spin_lock(&adapter->rwi_lock);
- 	if (!list_empty(&adapter->rwi_list)) {
- 		if (test_and_set_bit_lock(0, &adapter->resetting)) {
--			queue_delayed_work(system_long_wq,
-+			queue_delayed_work(system_dfl_long_wq,
- 					   &adapter->ibmvnic_delayed_reset,
- 					   IBMVNIC_RESET_DELAY);
- 		} else {
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_stats.c b/drivers/net/ethernet/ti/icssg/icssg_stats.c
+index 7159baa0155c..7d6d6692d819 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_stats.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_stats.c
+@@ -69,7 +69,7 @@ void icssg_stats_work_handler(struct work_struct *work)
+ 						stats_work.work);
+ 	emac_update_hardware_stats(emac);
+ 
+-	queue_delayed_work(system_long_wq, &emac->stats_work,
++	queue_delayed_work(system_dfl_long_wq, &emac->stats_work,
+ 			   msecs_to_jiffies((STATS_TIME_LIMIT_1G_MS * 1000) / emac->speed));
+ }
+ EXPORT_SYMBOL_GPL(icssg_stats_work_handler);
 -- 
 2.54.0
 
