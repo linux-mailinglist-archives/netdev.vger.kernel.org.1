@@ -1,189 +1,199 @@
-Return-Path: <netdev+bounces-305619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305620-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id dAOlNQKJTWou1wEAu9opvQ
-	(envelope-from <netdev+bounces-305619-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 01:17:22 +0200
+	id Y/MpIXaKTWp51wEAu9opvQ
+	(envelope-from <netdev+bounces-305620-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 01:23:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A0917205C6
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 01:17:22 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D812C720618
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 01:23:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305619-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305619-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=BijXF1M3;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305620-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305620-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 317973028C8A
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 23:17:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DEAFF301C139
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 23:23:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E5942087C;
-	Tue,  7 Jul 2026 23:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C42F2351C0D;
+	Tue,  7 Jul 2026 23:23:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr2-f1.google.com (mail-wr2-f1.google.com [74.125.225.65])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B90A36EA98
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 23:16:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D17146D53
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 23:23:29 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783466218; cv=none; b=Db7Wh+i7Zgf/TpiExnewxmDBcZ+PsuJ45t3F1WTs02koYJjLttm5+H6QDrQ+QdELGdWLK2+LJk9cy1DjZRLWt5Y3YYCDqQgqs0O6sFtXoJEkXH1s8O3ksJSb0MJCn1K4skcArKnkEXIKg8op7XooYCrArn2GHpwVdvicnDB1tfI=
+	t=1783466610; cv=none; b=pALeH6Ns8A8JYOYlYZSgOXf9h1qyaRbdh7tBz+/uX8nqf9bv06ljhf5dyg4hyDMK/bnpEtzhW/nM4icEjvEsjEHsTaps3GkAav3bbrCBxHl+t47JgTfxMaa48li/e6GlqHJNe+KdZGcA9pzfK7MHBi19IKZoEA8JjS463i69NMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783466218; c=relaxed/simple;
-	bh=Pc/WLT8vyh7rH9PhvdoTJsW2NbouCdu7hSBg4pbUsDo=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=hfQubjIc5Xt80d/cDVN0etqECj+VDvnshxFWuyglSPHuLDXDQtlxIXZPfeQrisXabZ3lSAAHu5GIhGhvsuCVCnfArivhsay3HwvYxa21OsUyUijdEED4OSdE0GIqaehe35ueI9pdR5opcvgg65SldbG6tbyP4PVqDgU4Yuh2zPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=74.125.225.65
-Received: by mail-wr2-f1.google.com with SMTP id ffacd0b85a97d-46e747fbf36so29318f8f.0
-        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 16:16:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783466215; x=1784071015;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:cc:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1783466610; c=relaxed/simple;
+	bh=mQZ9V1GEmt+VqUk4kC7u7qbTeEFsn2SSRia8xIjBDUw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ssJXSG0PW38zFvV0seKS8PI+vbrVvVLDLd9vELmzZ91yd4QLy97X72vOQBhVdr2uHo3NrCuHADWokYlkJLjz1Pg3kAmkC+oaSqjEY4tcpx9sapCSz9yLuLX2E1ULBRzwYiwH5FYrngUdHoPYL6vk7siJuh549RDP2qkhjWdkeLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BijXF1M3; arc=none smtp.client-ip=209.85.221.45
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-47122683cf3so41886f8f.0
+        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 16:23:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783466608; x=1784071408; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UKwBKxnEgAfUGchM8aY1vGW2Ffzyqi1WFv0RQ03fjak=;
-        b=e/3+nyikNDHKqDEE60cQDX7tIQbgOHw+JRRZ9Zp9k25JPiWraEEOng4Y4SBvojz7hy
-         YUT8Tx9FJ4rlbjYd4NQVPwfJyPoOnxwRChqJziu45VftNd99gyLWn8SVT2Zhos6kLoQo
-         jjj3iyiB45pGxk3ZppNPJVBUiWVLQKtr0+dGHCa3q9i0aw4NNEozo769WK1siW2dJaXk
-         Ookkq2LATp0ozMVmisT9yLs7TVgM1wVUHcb5DRQ5R9RBoG2+9mi+3ubH3s/iK11s96sZ
-         0la9XAw0SV++BLyPN6O8BXymg9SqJwwBvxqZiQEpnCQ/Va1m0gp0Mvk4o5368dTxfL2I
-         3WSw==
-X-Forwarded-Encrypted: i=1; AHgh+RqJI99//93t7SaVKhMzdzG4XyhAUt/WGXl8pWsHAE46GmOyKBveLLz5Qn6E9fKNa9L4nLUUUi4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxaKj9yZLKyFj6BXUEpitrRT6NhE4KXweNT+ClfdixGsIlhVN7R
-	D64Nz4oJdivTbYCB+OKOI1YAyjRyn4uJ2gXHy//Cq8XexqgEn5Gc0JCR
-X-Gm-Gg: AfdE7ckmvMo0cQBJk6l1jkFzWPmk/QqoTP9DGT0otdjEXuY7bbjdRxigPDQc0Rd5uIO
-	yOY9uk5adWqIf46QPnAXZBGUonbMr4FBYHtseOmQT+0ZXcLBL2BkgWLl93lKXLzzcxQq/0bP5sa
-	GiZMBfcwKPFcsg9GRl7+Mn5KCO2qp84cvSI7rmcWPQjWSBY6keO3a+n9jSG0hpBtlNiX4rdA8CJ
-	M9d9Ly5M1pCtAqgsBTAVIdN4UFGWrzUUxqflq7cYms6ut7z2L8KtIxRNRnKjeKRc6OXZgOwEjjU
-	cgEh6GcYiluo5CZVRz7SxNwC6138bRZedhmj/NJ8eycI29oDeRhDegRTUkNBBmMcKQcslOuK+lQ
-	qPYovAXw59keYVYl3P8BQlQxWaRDz5v1o8Wjy3zb7q4CLRXdpCbUSPxs1jTn53HR9BMhFKPuTXw
-	8tFChHg//L8WBoCkBpU0JrLXjH3zLcaIUpXDtl99v+DX5CUThv4Q==
-X-Received: by 2002:a05:600c:4e93:b0:493:e508:1137 with SMTP id 5b1f17b1804b1-493e5081183mr18112435e9.39.1783466215520;
-        Tue, 07 Jul 2026 16:16:55 -0700 (PDT)
-Received: from [192.168.88.241] (78-80-108-129.customers.tmcz.cz. [78.80.108.129])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493e0f294a6sm178853125e9.1.2026.07.07.16.16.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jul 2026 16:16:55 -0700 (PDT)
-Message-ID: <7bc054f8-7afc-4fa5-b392-bcad1f9d70bd@ovn.org>
-Date: Wed, 8 Jul 2026 01:16:53 +0200
+        bh=q7U3MX6ghFE0ZIT9zyJDBq1y0YXrQGQB4NvY8Mq0tds=;
+        b=BijXF1M3LAKuAwpy2q3EAlkdQBSTdnE4yNLcieSfh3s1z6Qe22ZmM0TGkuGTZWFAEF
+         JHD7UMfTFOa4r/Narufp4TAuYQ712fv/DIMPlTymgo7/mN5AlWFxF8pl65vb9bety2go
+         wKT/P0ve0GrONe1W3Fl7y3wBcrimVbxusjtclNe+ng/vw0/wv+atFmDwpH3RB4Xo5EAC
+         SiIYtKF0TwCctgSJASjp1NR7he7jtjmRe/FVbQmUegCSZmJKWNhGN1PDut4xzVsQ0+J1
+         bsiUEzGbgBFCSoHMBXK0U/w/2PStJHIrBZZ1s8bEKHZMwDDhWRFpvRSu5NunE60ZWK2H
+         qAuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783466608; x=1784071408;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=q7U3MX6ghFE0ZIT9zyJDBq1y0YXrQGQB4NvY8Mq0tds=;
+        b=sIzh2HRkNZpXYUQRMJLQQDUu8HIao9AwHP2dWqf0lQCC/GkUE+2EokdyMy0copjC2l
+         y2esFG53IPYXw9xdxlASQNhn2X7X1VZuUtkiIjQH8MudUvEJSDrAmFy/3MQCYW8nroyW
+         CxwxRDCxW++GorxvSffKialfHJdIFu0GfSMaT6lZ9DsKO/eA7M0LrBZ2y20LwLdFxFwI
+         mQ6K1uuCFvdPHlXzpGkwld16frxnJB+at5G1Iqv1rGcdPuiUyaiwwEai9OHFkh4d1QaT
+         aVEXgjLPe263ttX+H6mzmqXC+x/b/Fvtygg69CoyHBkUDZzFSHpd1K+pOevyDGGDKR8J
+         Y9Pw==
+X-Forwarded-Encrypted: i=1; AHgh+RrgGW+K9CpN/yqLTW0nfB7RBT/we3V6bj7D07VNX0MP0WI7gD/SNUaUEUhU0VFz8OWqHrJq2v4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzeGxSadZh4/OO/DjsOikM9MqCgT1+gNmdSwXl7ffbeHzTeUi/O
+	Hrw8PAQ/3VnB3+6IBpuUHFV2dTuj+Mcj1ic9ZW/jf20USbtPCy9GAQMqmjrtp7Xm
+X-Gm-Gg: AfdE7ck9GDCHZWIm2Y2AxPX3veDSiIJC4tNnF+c/iR7clRQsUSmcPMMYv9uj8YT404M
+	dAAWTBNT/URYrB47jAqBgGeSzNZ2R62zFy++uzT8lnl53TTknO0HX52MwiusTyMMcGBtQk2MTM6
+	2H0gUmLB1UUWWPAv7CmWP7Q8BAsTKVwOTAlMuR6CVuUjv8ZMmK2vCW+niWY1RQVDF+REzYy2j1B
+	4R0Olg6pJON7vv0k42lthnxrXIaAxXME+1zoKe1KnENRnOV/vFVJrrYuWATvKCyS40SKQ4CHw8h
+	nTgnmUv+Yq5yuCXxuGOQC3XDLid/f+UXKOr7L/LYzLWMQ2OYhEDhglQB+cV/ck1s31snTfb64OC
+	XT8wy+Sx49MCRrrPGU5AKNYJ+RZfEXwH86xe5QFQyq87cQcpX64jVMG2bxHxv8ShcXHKTMGkGuC
+	DaOBjL2JWb4tKh7g86JyNTmq84GIDX6eGAn8XA4k88lvh5H4Ir
+X-Received: by 2002:adf:e549:0:b0:476:8a:5 with SMTP id ffacd0b85a97d-47de66a2fcamr6207251f8f.34.1783466607549;
+        Tue, 07 Jul 2026 16:23:27 -0700 (PDT)
+Received: from localhost.localdomain ([151.189.113.202])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa039afacsm35916922f8f.19.2026.07.07.16.23.26
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 07 Jul 2026 16:23:26 -0700 (PDT)
+From: Nils Juenemann <nils.juenemann@gmail.com>
+To: rjethwani@everpuredata.com
+Cc: borisp@nvidia.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	john.fastabend@gmail.com,
+	kuba@kernel.org,
+	leon@kernel.org,
+	mbloch@nvidia.com,
+	netdev@vger.kernel.org,
+	nils.juenemann@gmail.com,
+	pabeni@redhat.com,
+	saeedm@nvidia.com,
+	sd@queasysnail.net,
+	tariqt@nvidia.com
+Subject: Re: [PATCH net-next v14 0/9] tls: Add TLS 1.3 hardware offload support
+Date: Wed,  8 Jul 2026 01:23:25 +0200
+Message-ID: <20260707232325.61396-1-nils.juenemann@gmail.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <CAKaoeS3misLGVi4wEqQg3OwbisTBfB0zx-i3b81g2-vnOS_UYA@mail.gmail.com>
+References: <CAKaoeS3misLGVi4wEqQg3OwbisTBfB0zx-i3b81g2-vnOS_UYA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, Aaron Conole <aconole@redhat.com>,
- Eelco Chaudron <echaudro@redhat.com>, stable@vger.kernel.org,
- ovs dev <dev@openvswitch.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net] openvswitch: fix GSO userspace truncation underflow
-To: Kyle Zeng <kylebot@openai.com>, netdev@vger.kernel.org
-References: <20260707221635.27489-1-kylebot@openai.com>
-Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <20260707221635.27489-1-kylebot@openai.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305619-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[ovn.org];
-	FORGED_SENDER(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:i.maximets@ovn.org,m:aconole@redhat.com,m:echaudro@redhat.com,m:stable@vger.kernel.org,m:dev@openvswitch.org,m:pabeni@redhat.com,m:kylebot@openai.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305620-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:rjethwani@everpuredata.com,m:borisp@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:leon@kernel.org,m:mbloch@nvidia.com,m:netdev@vger.kernel.org,m:nils.juenemann@gmail.com,m:pabeni@redhat.com,m:saeedm@nvidia.com,m:sd@queasysnail.net,m:tariqt@nvidia.com,m:johnfastabend@gmail.com,m:nilsjuenemann@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[nilsjuenemann@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[nvidia.com,davemloft.net,google.com,gmail.com,kernel.org,vger.kernel.org,redhat.com,queasysnail.net];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[nilsjuenemann@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	R_DKIM_NA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,openai.com:email,ovn.org:from_mime,ovn.org:email,ovn.org:mid]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,everpuredata.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4A0917205C6
+X-Rspamd-Queue-Id: D812C720618
 
-On 7/8/26 12:16 AM, Kyle Zeng wrote:
-> OVS_ACTION_ATTR_TRUNC currently stores a delta from the original skb
-> length in OVS_CB(skb)->cutlen. When a later userspace action segments a
-> GSO skb, queue_gso_packets() reuses that delta for each smaller segment.
-> A segment can then reach queue_userspace_packet() with cutlen greater
-> than skb->len, underflowing the length passed to skb_zerocopy().
-> 
-> Store the maximum preserved length instead and bound each consumer
-> against the current skb length. Use U32_MAX as the no-truncation
-> sentinel so the value remains valid if skb geometry changes before a
-> consumer handles it.
-> 
-> Fixes: f2a4d086ed4c ("openvswitch: Add packet truncation support.")
-> Cc: stable@vger.kernel.org
-> Assisted-by: Codex:gpt-5.5
-> Signed-off-by: Kyle Zeng <kylebot@openai.com>
-> ---
+On Tue, Jul 7, 2026 at 3:38 PM Rishikesh Jethwani <rjethwani@everpuredata.com> wrote:
+>
+> Could you please send the following from the dump:
+[...]
 
-Thanks, Kyle!  For the future, please, don't skip the general networking
-maintainers and the ovs dev list while sending openvswitch -related patches.
+Hi,
 
-Otherwise, this patch looks good to me:
+The kdump for this event is incomplete -- makedumpfile ran out of disk
+space before finishing -- so I cannot run the crash> struct queries
+against it. I will capture a full dump if it recurs.
 
-Reviewed-by: Ilya Maximets <i.maximets@ovn.org>
+The oops still gives the relevant fault-site state:
+
+    BUG: kernel NULL pointer dereference, address: 0000000000000030
+    Oops: 0000 [#1] SMP NOPTI
+    CPU: 9 Comm: swapper/9  7.1.0-rc2+ #4  (mlx5 ConnectX-6 Dx)
+    RIP: 0010:mlx5e_ktls_handle_rx_skb+0x10a/0x2d0 [mlx5_core]
+    Code: 45 0f b7 c0 e8 17 dc 58 e0 49 89 c7 58 4d 85 ff 0f 84 4a ff ff ff 41 0f b6 47 12 3c 06 0f 84 cc 00 00 00 49 8b 87 f8 04 00 00 <48> 8b 40 30 4c 8b a8 08 01 00 00 4d 85 ed 0f 84 b1 00 00 00 49 8b
+    RSP: 0018:ffffd4504071cc38 EFLAGS: 00010293
+    RAX: 0000000000000000 RBX: ffff8dca063b5500 RCX: 0000000000000000
+    RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+    RBP: ffffd4504071cc68 R08: 0000000000000000 R09: 0000000000000000
+    R10: 0000000000000076 R11: 0000000000000000 R12: ffff8dcaaf984000
+    R13: 000000000000000e R14: ffff8dc8383605e2 R15: ffff8dc801b33200
+    CR2: 0000000000000030
+    Call Trace:
+     mlx5e_build_rx_skb+0x6fa/0xbf0 [mlx5_core]
+     mlx5e_handle_rx_cqe_mpwrq+0x120/0x2a0 [mlx5_core]
+     mlx5e_poll_rx_cq+0xa1/0x920 [mlx5_core]
+     mlx5e_napi_poll+0x118/0x7e0 [mlx5_core] (softirq)
+
+Decoded faulting instructions:
+
+    49 8b 87 f8 04 00 00   mov 0x4f8(%r15),%rax   ; icsk_ulp_data
+    48 8b 40 30            mov 0x30(%rax),%rax    ; priv_ctx_rx
+
+So R15 is sk:
+
+    sk = ffff8dc801b33200
+
+The fault site reloads icsk_ulp_data from sk+0x4f8, gets RAX=0, and then
+faults on the priv_ctx_rx load. CR2=0x30 matches that load.
+
+This is the direct tls_get_ctx(sk) use in resync_update_sn()
+(ktls_rx.c:553). It is a fresh icsk_ulp_data load at the fault site, not
+a value CSE'd from the earlier access via resync_queue_get_psv()
+(ktls_rx.c:486).
+
+So I still think this is consistent with icsk_ulp_data being cleared
+between the two reads, with the second dereference missing a NULL check.
+
+Thanks,
+Nils
 
