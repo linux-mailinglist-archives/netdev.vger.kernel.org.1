@@ -1,95 +1,64 @@
-Return-Path: <netdev+bounces-305248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305249-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id WD7WBAhQTGrXiwEAu9opvQ
-	(envelope-from <netdev+bounces-305248-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 03:02:00 +0200
+	id DC3TCklRTGohjAEAu9opvQ
+	(envelope-from <netdev+bounces-305249-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 03:07:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56D98716877
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 03:01:59 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96C5271688F
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 03:07:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=etsalapatis-com.20251104.gappssmtp.com header.s=20251104 header.b=HqKoV3ra;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305248-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305248-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=126.com header.s=s110527 header.b=cuRt6UfV;
+	dmarc=pass (policy=none) header.from=126.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305249-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305249-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EAA4430177AA
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 01:01:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C93D330095CB
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 01:07:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD6A7175A75;
-	Tue,  7 Jul 2026 01:01:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F2352EAD1C;
+	Tue,  7 Jul 2026 01:07:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.126.com (m16.mail.126.com [117.135.210.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA4442088E
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 01:01:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFF3C18FDDE;
+	Tue,  7 Jul 2026 01:07:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783386117; cv=none; b=E5wlY/9Uqmhjt9/G41JurEKGxSZeLaWta+aUyCJcmG1VMtX+zgHzmTkXtpGW05FXqfM9HP7qX3Jt0eG01nNXEzJ82WkUCvY9uKZGy1GrGiCZWJ+5pz1Gj+qelrBomaFAlSqERQL+oAFBedelgAR1lgrJSND8rQ6yU/eLXzLWUCw=
+	t=1783386434; cv=none; b=rKPn1iJddw0mydF2nCfAGDHJH/BAehtcgIEVJ0xFZOcSLvkCOvoyj+FRqYdw5BmfwOaA30gJT4KWbMyFkSXOgowD5P9LoukASZlreuHjmcRhuQuHJMzH1mRqyUBdZal37wliP/kDPgyzg02kgQIokVoAy7rY5K57jC/sSfYzC+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783386117; c=relaxed/simple;
-	bh=Cl4hxMwrRdfbEdaST7P89yCfniPHJVHCdUtxmwWGDBE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tdv86evSgjwePTiaiZEKHzdtS0zCY9RVrm/d2R20Hoq7vxxsgzkvOUMTjKUsYE8tRHKMbP9JxNF5Gg6zX4Qlpf1CDyOD54Bj6kNnPm3hCz0t66jpOgfqX4SPw1axy0LLu1TtGmoLRQKHHNHbjLq0d+8rNO9XKcZecltqj2s6haI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=HqKoV3ra; arc=none smtp.client-ip=209.85.216.54
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-3817f800c8bso2649135a91.1
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 18:01:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1783386114; x=1783990914; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mn7lUDGZ7NP4xadPAgx4FMS5SBwqLelhcDxZx9BPNhU=;
-        b=HqKoV3raJ7kpmysTanWbcn97V7rF8ucR/Y+BaLEIwYMqeozY6njDiwntwi0r4Pu+2F
-         d0yZ9PUgb71PIM89EuGcjIYkRkuLJGnw8qlKfBUZgId2EXo67viDkTxsG9GB93igBghg
-         JCBP8Ngzn+N5I4nDaKedz6s5B+GSN2CJOERMpFw/1wjBnNn6Q0cQ38TISjXQ2i+NsiQt
-         imTZGuQGmdMF9IeaQz87c6i61B1Gq1hOfUoDnL7/MLssV6Q1UXiM7RtT7la4D+7Q18oH
-         1UjtXoejd4PTwdKcMBtgBLYzGOcGDEu7ucVr3zvw/jY7r8UCCR2QnSM2WwnpHRErLzcG
-         UzuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783386114; x=1783990914;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Mn7lUDGZ7NP4xadPAgx4FMS5SBwqLelhcDxZx9BPNhU=;
-        b=mRywltBD6TaReJ8uK4ILVvdkJxRJUp1TYuf0TYAN8bmChBTe2gd0gyHLoCiuFLKUg7
-         U++ScRkbJcSkri044zJ/QjjeEUMF9M1lmJffUUZoLI35GcCnAysHUqUWeiTuuMUFZ9C8
-         wq2J5q8nHVR7IUJmFtjzTWP695qk4vW9H+snPV73yWWJwwWCbvlcva3l8GK/fJkoqYv4
-         iOhtcx0gv7sObQ/MGhLXG+i1mVSP/MJJInbPJSHK0fzCDm//0t+WktHjJbgXiiHRmkDx
-         g+2xJ4fS3aIlU4hmpUVleEWY5VaGmqUWmyY9pEsGWcEh4xJbXb5b08lmVv+TQtzPB6Qv
-         EUjA==
-X-Gm-Message-State: AOJu0Yz3OkM7QWJx30QN/ZHqPx1YTP0tPSpiLETGy8Obm8e+O06I5tPJ
-	ZulGWE4TilLiDXgpjYIibRnpAcn1iPxejJjYM5yLar682UFsUYbWvhLZBsY/8NkzcUWOiBZE5dQ
-	C1SvBXrU=
-X-Gm-Gg: AfdE7cnVrjyimRfLwit1ja90JMETOSf1d3BkFt+PYsZll4TGXnUF4erB85yFbXwBBGf
-	i61KqfW0NgBM9wiGfAz6FnJxAXbYOHTUnsJVnxGQxG5BhTsHqhAj/OrmLzPv4EiiKIeBsfw/tOa
-	Ajmxj1JMza9fIy9EJcZDL+TIKFr7ecwftMWyAFb9+U3FgPJUUzM557DfpINjJDNTKjDtY1uqsLY
-	ls2goKUI5YZhsmcUjQbOZ0SSqejcZaEzCSH99cB/xqh+KaGgAcZd1vjDD+PUDFGHUiagJCXZQ6M
-	Of6Fn35+0g4F9QP/Iau/8Kr9whJSljHji2WLUzYMvdRaSVHRdafckenWz9MtCF8jvck2FXVVZ3O
-	9koayAxW9aurSLVwvVGEBpwG3ZCCtxtDD/3OUY/AoTu8d+LswMbI0zz1nrDDn6WyN61NVmiE0yH
-	ZcLhf1YhbWoaP193OJ71GaX8rgcb9YDRhmpcxa+qBzVLVmnWCpjdkYQlUAWA==
-X-Received: by 2002:a17:90b:2801:b0:380:71eb:4014 with SMTP id 98e67ed59e1d1-3875621eb68mr3220612a91.15.1783386114234;
-        Mon, 06 Jul 2026 18:01:54 -0700 (PDT)
-Received: from krios.ht.home (107-190-31-17.cpe.teksavvy.com. [107.190.31.17])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9bdb56fsm2567785ad.15.2026.07.06.18.01.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jul 2026 18:01:53 -0700 (PDT)
-From: Emil Tsalapatis <emil@etsalapatis.com>
-To: netdev@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org
-Cc: edumazet@google.com,
-	ncardwell@google.com,
-	kuniyu@google.com,
-	rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Emil Tsalapatis <emil@etsalapatis.com>
-Subject: [PATCH net-next] net/tcp: Add explicit tracepoint for tcp_syn_ack_timeout()
-Date: Mon,  6 Jul 2026 21:01:51 -0400
-Message-ID: <20260707010151.43976-1-emil@etsalapatis.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1783386434; c=relaxed/simple;
+	bh=Aq7XpudnAcKaS81HjDJDNYPswQh+BUSNaYY8W66620A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aMTs5A2UfOJPoLhcLhDFxWbMgAtwOCPoyTHjqdJd4lmHpWCMXZd3tnGKz6wtajx61iiUsJZH/9xBJR8fo4K2MtU/YvUA46YCBa3vUE5Z7aJiPJ4qQKYwYf+gNemTgNVTRMuWUpbPmoxBkX/m2lUE224txmaFWAuz6mE+Flmc9hQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=cuRt6UfV; arc=none smtp.client-ip=117.135.210.8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=O/
+	yofhFvHkov23hY7UUkFz/6GuSRZ5PQqaEKBSq6uK8=; b=cuRt6UfVqt+OOV63XA
+	Qq7Yvn7fnto+BEbMIL+RZG0TK+eMzYryk/MAIzC1/3ps1j8+iWCSWFSpHqwLbJLp
+	NQmr2TF+dEhQBtpeTnDENIUCBc4iXquKw/yyGceQ/lcjz0Eh5wgoeaZqHYyiFfrd
+	T93a23CIVB7axoJYwE8lTuAL0=
+Received: from LAPTOP-M8806FGF.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wD3J84NUUxqULAkDA--.47340S2;
+	Tue, 07 Jul 2026 09:06:22 +0800 (CST)
+From: zhangzl2013@126.com
+To: Zhaolong Zhang <zhangzl2013@126.com>,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Qianheng Peng <pengqh1@chinatelecom.cn>,
+	Zhaolong Zhang <zhangzl68@chinatelecom.cn>
+Subject: [PATCH net] bonding: fix devconf_all NULL dereference when IPv6 is disabled
+Date: Tue,  7 Jul 2026 09:06:22 +0800
+Message-ID: <20260707010622.487333-1-zhangzl2013@126.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,157 +66,113 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3J84NUUxqULAkDA--.47340S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7Aw4xAF1DZw4ktry5tFyrWFg_yoW8tF15pr
+	Z3KrW5ur1ktr1UAF4UX3W093s5Za18XFZFkrWIkr95Zan5Ka1DAFy7Jr109F15trWrCFZI
+	va1Uta90gwn5Jw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pEfHUPUUUUU=
+X-CM-SenderInfo: x2kd0wt2osiiat6rjloofrz/xtbBog4F1GpMUQ7iOwAA3d
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[126.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	R_DKIM_ALLOW(-0.20)[126.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305248-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:zhangzl2013@126.com,m:jv@jvosburgh.net,m:andrew+netdev@lunn.ch,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:liuhangbin@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:pengqh1@chinatelecom.cn,m:zhangzl68@chinatelecom.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-trace-kernel@vger.kernel.org,m:edumazet@google.com,m:ncardwell@google.com,m:kuniyu@google.com,m:rostedt@goodmis.org,m:mhiramat@kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:emil@etsalapatis.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[etsalapatis.com];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_TO(0.00)[126.com,jvosburgh.net,lunn.ch,kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
-	ALIAS_RESOLVED(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_FROM(0.00)[126.com];
+	FORGED_SENDER(0.00)[zhangzl2013@126.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[etsalapatis.com:from_mime,etsalapatis.com:email,etsalapatis.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,etsalapatis-com.20251104.gappssmtp.com:dkim]
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-305249-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[zhangzl2013@126.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,gmail.com,vger.kernel.org,chinatelecom.cn];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[126.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[chinatelecom.cn:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 56D98716877
+X-Rspamd-Queue-Id: 96C5271688F
 
-Clang can inline the tcp_syn_ack_timeout() function during compilation,
-making it impossible to use kprobes for tracing without preventing
-inlining. Add an explicit tracepoint to it instead.
+From: Zhaolong Zhang <zhangzl68@chinatelecom.cn>
 
-Signed-off-by: Emil Tsalapatis <emil@etsalapatis.com>
+When booting with the 'ipv6.disable=1' parameter, the devconf_all is
+never initialized because inet6_init() exits before addrconf_init() is
+called which initializes it. bond_send_validate(), however, will still
+call bond_ns_send_all() even ipv6 is indeed disabled. It will lead to
+NULL derefence of net->ipv6.devconf_all in ip6_pol_route().
+
+ BUG: kernel NULL pointer dereference, address: 000000000000000c
+ [...]
+ Workqueue: bond0 bond_arp_monitor [bonding]
+ RIP: 0010:ip6_pol_route+0x69/0x480
+ [...]
+ Call Trace:
+  <TASK>
+  ? srso_return_thunk+0x5/0x5f
+  ? __pfx_ip6_pol_route_output+0x10/0x10
+  fib6_rule_lookup+0xfe/0x260
+  ? wakeup_preempt+0x8a/0x90
+  ? srso_return_thunk+0x5/0x5f
+  ? srso_return_thunk+0x5/0x5f
+  ? sched_balance_rq+0x369/0x810
+  ip6_route_output_flags+0xd7/0x170
+  bond_ns_send_all+0xde/0x280 [bonding]
+  bond_ab_arp_probe+0x296/0x320 [bonding]
+  ? srso_return_thunk+0x5/0x5f
+  bond_activebackup_arp_mon+0xb4/0x2c0 [bonding]
+  process_one_work+0x196/0x370
+  worker_thread+0x1af/0x320
+  ? srso_return_thunk+0x5/0x5f
+  ? __pfx_worker_thread+0x10/0x10
+  kthread+0xe3/0x120
+  ? __pfx_kthread+0x10/0x10
+  ret_from_fork+0x199/0x260
+  ? __pfx_kthread+0x10/0x10
+  ret_from_fork_asm+0x1a/0x30
+  </TASK>
+
+Fix this by adding ipv6_mod_enabled() condition check in the caller.
+
+Fixes: 4e24be018eb9 ("bonding: add new parameter ns_targets")
+Signed-off-by: Qianheng Peng <pengqh1@chinatelecom.cn>
+Signed-off-by: Zhaolong Zhang <zhangzl68@chinatelecom.cn>
 ---
- include/trace/events/tcp.h | 72 ++++++++++++++++++++++++++++++++++++++
- net/ipv4/tcp_timer.c       |  3 ++
- 2 files changed, 75 insertions(+)
+ drivers/net/bonding/bond_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-index f155f95cdb6e..37ffaa50faad 100644
---- a/include/trace/events/tcp.h
-+++ b/include/trace/events/tcp.h
-@@ -332,6 +332,78 @@ TRACE_EVENT(tcp_retransmit_synack,
- 		  __entry->saddr_v6, __entry->daddr_v6)
- );
- 
-+TRACE_EVENT(tcp_syn_ack_timeout,
-+
-+	TP_PROTO(const struct request_sock *req),
-+
-+	TP_ARGS(req),
-+
-+	TP_STRUCT__entry(
-+		__field(const void *, req)
-+		__field(__u16, sport)
-+		__field(__u16, dport)
-+		__field(__u16, family)
-+		__array(__u8, saddr, 4)
-+		__array(__u8, daddr, 4)
-+		__array(__u8, saddr_v6, 16)
-+		__array(__u8, daddr_v6, 16)
-+		__field(u8, state)
-+		__field(u8, num_timeout)
-+		__field(bool, acked)
-+	),
-+
-+
-+	TP_fast_assign(
-+		const struct inet_request_sock *ireq = inet_rsk(req);
-+		__be32 *p32;
-+
-+		__entry->req = req;
-+
-+		__entry->sport = ireq->ir_num;
-+		__entry->dport = ntohs(ireq->ir_rmt_port);
-+		__entry->family = req->__req_common.skc_family;
-+
-+		p32 = (__be32 *) __entry->saddr;
-+		*p32 = ireq->ir_loc_addr;
-+
-+		p32 = (__be32 *) __entry->daddr;
-+		*p32 = ireq->ir_rmt_addr;
-+
-+#if IS_ENABLED(CONFIG_IPV6)
-+		/*
-+		 * Cannot use TP_STORE_ADDRS directly because it assumes
-+		 * there is an sk available.
-+		 */
-+		if (__entry->family == AF_INET6) {
-+			struct in6_addr *pin6;
-+
-+			pin6 = (struct in6_addr *)__entry->saddr_v6;
-+			*pin6 = ireq->ir_v6_loc_addr;
-+			pin6 = (struct in6_addr *)__entry->daddr_v6;
-+			*pin6 = ireq->ir_v6_rmt_addr;
-+		} else {
-+			TP_STORE_V4MAPPED(__entry, ireq->ir_loc_addr, ireq->ir_rmt_addr);
-+		}
-+#else
-+		TP_STORE_V4MAPPED(__entry, ireq->ir_loc_addr, ireq->ir_rmt_addr);
-+#endif
-+
-+		__entry->state		= ireq->ireq_state;
-+		__entry->num_timeout	= req->num_timeout;
-+		__entry->acked		= ireq->acked;
-+	),
-+
-+	TP_printk("family=%s sport=%hu dport=%hu saddr=%pI4 "
-+		"daddr=%pI4 saddrv6=%pI6c daddrv6=%pI6c "
-+		"ireq_state=%s num_timeout=%u acked=%d",
-+		  show_family_name(__entry->family),
-+		  __entry->sport, __entry->dport,
-+		  __entry->saddr, __entry->daddr,
-+		  __entry->saddr_v6, __entry->daddr_v6,
-+		  show_tcp_state_name(__entry->state),
-+		  __entry->num_timeout, __entry->acked)
-+);
-+
- TRACE_EVENT(tcp_sendmsg_locked,
- 	TP_PROTO(const struct sock *sk, const struct msghdr *msg,
- 		 const struct sk_buff *skb, int size_goal),
-diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
-index bf171b5e1eb3..8f482a6b43e3 100644
---- a/net/ipv4/tcp_timer.c
-+++ b/net/ipv4/tcp_timer.c
-@@ -24,6 +24,7 @@
- #include <net/tcp.h>
- #include <net/tcp_ecn.h>
- #include <net/rstreason.h>
-+#include <trace/events/tcp.h>
- 
- static u32 tcp_clamp_rto_to_user_timeout(const struct sock *sk)
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index e044fc733b8c..522eab060f9e 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -3455,7 +3455,8 @@ static void bond_send_validate(struct bonding *bond, struct slave *slave)
  {
-@@ -753,6 +754,8 @@ void tcp_syn_ack_timeout(const struct request_sock *req)
- 	struct net *net = read_pnet(&inet_rsk(req)->ireq_net);
- 
- 	__NET_INC_STATS(net, LINUX_MIB_TCPTIMEOUTS);
-+
-+	trace_tcp_syn_ack_timeout(req);
+ 	bond_arp_send_all(bond, slave);
+ #if IS_ENABLED(CONFIG_IPV6)
+-	bond_ns_send_all(bond, slave);
++	if (likely(ipv6_mod_enabled()))
++		bond_ns_send_all(bond, slave);
+ #endif
  }
  
- void tcp_reset_keepalive_timer(struct sock *sk, unsigned long len)
 -- 
-2.54.0
+2.52.0
 
 
