@@ -1,241 +1,191 @@
-Return-Path: <netdev+bounces-305276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305277-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id z568Jb2STGqzmQEAu9opvQ
-	(envelope-from <netdev+bounces-305276-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 07:46:37 +0200
+	id aQt1BM+STGq3mQEAu9opvQ
+	(envelope-from <netdev+bounces-305277-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 07:46:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9DFC717904
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 07:46:36 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFE1F717907
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 07:46:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b="q/k/j+Vd";
-	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305276-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305276-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=cse-iitm-ac-in.20251104.gappssmtp.com header.s=20251104 header.b=bOYvrGyz;
+	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=iitm.ac.in (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305277-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305277-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 701463064D48
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 05:40:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3D6A730074A3
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 05:46:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C50E4386C15;
-	Tue,  7 Jul 2026 05:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A81EB3859DF;
+	Tue,  7 Jul 2026 05:46:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.78.106])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E331E386429;
-	Tue,  7 Jul 2026 05:39:10 +0000 (UTC)
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72113002DC
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 05:46:43 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783402758; cv=none; b=CZYGeEJgMOgUvbflfBPfjb5FRWzpvv5C5QQHfhFSs/VZUuZ5yLLDmizYHkvGFhllk0M1J2L9xRtNNqS9dslp4XP9CW9Xo5TNhgCZriH+HPATffZQfuPEcPhPfHRT8Xxnpxvw1CNF4NwlKp56ASrN18VY46zbBgTWoSXwqJGpObU=
+	t=1783403206; cv=none; b=WNI7dfbEtWUQZJoFbXW/aA3sJizXG+8Oh01ogKM3SGvZ7DF8+pSnaT+AD7t2zVJmd3+ZSe9SKETOBeh/eyRlccgkEV+f8jo8aRXwhn+hC/tN0DnO6I4q82adnVs05fE+QpCOELm4/mEQF+n17ej5j7VwzHMTnFP1QueIHlc0Y3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783402758; c=relaxed/simple;
-	bh=SY4IMC/Ddp2wMdcBI7IRusXV9eWYkEXvUrqXCdfG+fc=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=dwhGqTbEf4I6diQsQzaNu6PMZsP05Gsbp6iH+9L99GddSniaHsgziu9kgKYjW7f+HA26Zepca5xXGOS11uuH9o8hi25lCkHVZoMmna/HNlafb2FIC+Gx67de12ixzi5C15NVtJ9UFzhlb5BfnsjwnLgKfB3WuVaI7I/Af/BHKHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=q/k/j+Vd; arc=none smtp.client-ip=13.76.78.106
+	s=arc-20240116; t=1783403206; c=relaxed/simple;
+	bh=v1M232dO9X7uVE5dOP26dl0Q353P0zYi1E7BcK+8eiM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QoxRu+OVDRqQG0pVhyRmBORLateex8czjatqC/odrh3t4rk3kSssEpeIV5rX1U0ZTAlToi3x1Iuc1O1nrS2U/piF4gLI9zdXFy7gwZgJaqIKkov1UuKtwJjG4LmjZ3snxI3DiFsP3bj7WeQraqrN1iyDnrNq6XpYKQXsJw2jJEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.iitm.ac.in; spf=pass smtp.mailfrom=cse.iitm.ac.in; dkim=pass (2048-bit key) header.d=cse-iitm-ac-in.20251104.gappssmtp.com header.i=@cse-iitm-ac-in.20251104.gappssmtp.com header.b=bOYvrGyz; arc=none smtp.client-ip=209.85.214.172
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2cacb8416a1so31312695ad.1
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 22:46:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=mails.tsinghua.edu.cn; s=dkim; h=Received:Content-Type:
-	Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	Content-Transfer-Encoding:Message-Id:References:To; bh=HKp8jKsDh
-	acYe+U+r45zxu77QLGaXMYgMAaK8XzGGzQ=; b=q/k/j+VdJCH26dQXVLdbqVw2q
-	CRlvaLbEIVhEbjKcpgOUlKSuyWKIOqtMNIaNePn0b5jdb8hqSbKeKYQUw4Y59PrM
-	meEQm3Pq/mntTBo3pUJylvUbuBI6jNQOIwwGQQLURksDZK/m1EFhgucMCAkfDnlo
-	e6ckUPbatU0N2hFAxQ=
-Received: from smtpclient.apple (unknown [101.5.13.242])
-	by web2 (Coremail) with SMTP id yQQGZQDXsprTkExqpkjKAg--.28065S2;
-	Tue, 07 Jul 2026 13:38:28 +0800 (CST)
-Content-Type: text/plain;
-	charset=us-ascii
+        d=cse-iitm-ac-in.20251104.gappssmtp.com; s=20251104; t=1783403203; x=1784008003; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=W4L7gYHZDRtRjX7hFao4DIYHrV+U5n/xFwuS3PyRV14=;
+        b=bOYvrGyzZgle/Swf3SsVSLJnb5duYr8FYlYLt4ERI+3Ay0n7EhUTQerwbUZ+plrXql
+         iBKEeuPwK41yHiZDUlN9PPHUHXTu6t/tegrn2XMvXVijESIad6/1Ka7EMrhdn+e51O/D
+         b3kk4qMfpYkC0gVaBdNqohxvxFuI7Vp7gIjf+k0vB3eiclD5GGb1SnruNeU8QmjYt9Lt
+         B2c6u+wGuFik4h3ASvzNL7ZTm7v/aXRm8rcQjohQKUoNPcH3lzy0w6PNv/pcFQEfNt0V
+         wCFmQSopJzilB2O70VRyjUqJMFN3FNhHNjWrM0gSnoONlZaSBGCECnpPtGiqML1KYseh
+         75jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783403203; x=1784008003;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=W4L7gYHZDRtRjX7hFao4DIYHrV+U5n/xFwuS3PyRV14=;
+        b=CA2bO033nkm75fYpu6LAbQyCYt0O6kCKTa0F0Det5tDKt1WDx/QBqYeb2YcnexrWDN
+         tkUv2MKte3wiEnRw2Vi3D2OoIJT1GBN9XtgiYtVtkqhquZak/KNre65br7ejdF0P3Np6
+         dFjmCZS44CZE84HGUA4Vamuo7COkBUdmHx8M9RVnUaTgMLbqn8TcE4mHbTlLS3uG1Ykg
+         jzkK1BbFiLKUu40kyvGJw+CAL60zsCzR2Gu7+N26uAWviv/u54IHwuOrBGp1+9C7tvCj
+         iPan/3+QWVT3Bpxgimvcx5Q2nB/WDvjFi24UqLWz9TvV4aMFdtKtpP94vqRTx4n78GnP
+         bjpA==
+X-Forwarded-Encrypted: i=1; AHgh+Rpu3wHqD/M+6dVZBHrKmYpUk9XH+hySKLTHpIhwEpihNJMdjoQwO8Mkb6D5LR74tULLI6qFOlM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYh7rxQeX8veO+Ukz5+nzCpY6Smc0AvKUDx8wcPx86+G/YxSol
+	YVWxl3ZuS1ufO/A4MIsLkzSy2WO8ts3ls38ASyYPrAlFB7MXjipOD8Q3Q/uqY9JdkWU=
+X-Gm-Gg: AfdE7cmVqpYQtZFYXzfxe8v+Ah/HFn6jl5cmbXUuFlGYKjwQMGonzfY+XcEVUnWsYCz
+	Si6LnQhlrbtxDL5IO7rDnvhXWDQ2NKExMIgIdWAKNDGkPlf4/KVX3rMrf1mx/72M2EXG2Yksp1m
+	hUE6ImL+BTX9UkNqEdc23ke3xg7xybF4PMEm2Qhnz77DoDaiHvPrb+LbNdaWEikwqufjfzhd8QP
+	5ntGQpmfORgHCTRtGEzRd+ii7OOry73B9XXS2gPe5q66n1lyu68oa2jqhqSf64VLSn4KF48wxX9
+	4BKfMr2g0+a8AepCAm0INE2RpvU6MYtjw3pa3ZDAKmCN8x/IUNsY9g9QqQtIWizEpyfdwmJeHFy
+	24CuoR0Hh5VfX3GM5FxSXtL3kKQ3s3BX12EMzqjPP4GLJ0xzna5eOXFgcYlooqoh1WqI//UtR9S
+	aVNKwvZSxcNF1LlxBxh6DYoZ7lQxsDVinxQ9nE7BCAOyaH9bbRRT5PatAdBhHOIvKgL23hljVMy
+	JQihlx5DGU8K90/xMmXdkcBpWZD2JGcDZAzn5hjh2U=
+X-Received: by 2002:a17:903:288:b0:2c7:f12d:5d37 with SMTP id d9443c01a7336-2ccbeb17e6dmr35870015ad.17.1783403202764;
+        Mon, 06 Jul 2026 22:46:42 -0700 (PDT)
+Received: from Metius.iitm.ac.in ([103.158.43.43])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-2ccc9d3bc1fsm5320255ad.55.2026.07.06.22.46.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jul 2026 22:46:42 -0700 (PDT)
+From: Abdun Nihaal <nihaal@cse.iitm.ac.in>
+To: skalluru@marvell.com
+Cc: Abdun Nihaal <nihaal@cse.iitm.ac.in>,
+	manishc@marvell.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	horms@kernel.org,
+	maciej.fijalkowski@intel.com,
+	stable@vger.kernel.org,
+	Sashiko AI Review <sashiko-bot@kernel.org>
+Subject: [PATCH v2 net] bnx2x: fix null pointer dereference in bnx2x_free_mem_bp()
+Date: Tue,  7 Jul 2026 11:16:16 +0530
+Message-ID: <20260707054618.932108-1-nihaal@cse.iitm.ac.in>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.8\))
-Subject: Re: [PATCH nf] ipvs: skip IPv6 extension headers in SCTP state lookup
-From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-In-Reply-To: <bcd7f0e6-b2fc-4e54-f9ac-e1c8b1b0c497@ssi.bg>
-Date: Tue, 7 Jul 2026 13:38:18 +0800
-Cc: netdev@vger.kernel.org,
- Simon Horman <horms@verge.net.au>,
- Pablo Neira Ayuso <pablo@netfilter.org>,
- Florian Westphal <fw@strlen.de>,
- Phil Sutter <phil@nwl.cc>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- lvs-devel@vger.kernel.org,
- netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org,
- linux-kernel@vger.kernel.org,
- Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
- Ao Wang <wangao@seu.edu.cn>,
- Xuewei Feng <fengxw06@126.com>,
- Qi Li <qli01@tsinghua.edu.cn>,
- Ke Xu <xuke@tsinghua.edu.cn>,
- stable@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <52493DF7-5590-48A1-B76B-21BBC2401687@mails.tsinghua.edu.cn>
-References: <20260705123040.35755-1-zhaoyz24@mails.tsinghua.edu.cn>
- <92783c87-7e6a-e90a-b2fc-e5d1332139e0@ssi.bg>
- <87E04893-B2B2-485F-B242-9CACF2F176D6@mails.tsinghua.edu.cn>
- <bcd7f0e6-b2fc-4e54-f9ac-e1c8b1b0c497@ssi.bg>
-To: Julian Anastasov <ja@ssi.bg>
-X-Mailer: Apple Mail (2.3826.700.81.1.8)
-X-CM-TRANSID:yQQGZQDXsprTkExqpkjKAg--.28065S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxAryrZry8Kw48KF1UXFyfCrg_yoW5tFWUpa
-	ykKa4fXrZrJrWftwn7GryfXa48Gr1DGry7WrZ5KryfCFn8tr13KFnIk3yYkFZruryqkFy8
-	tFyYva4DZ3Wqy3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9v1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l8cAvFVAK
-	0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4
-	x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2
-	z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4
-	CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E74AGY7Cv6cx26r4r
-	Kr1UJr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc
-	8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVW8ZVWrXwCY02Av
-	z4vE14v_GrWl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8VW8Ww4UJr1UMxC20s
-	026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
-	JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
-	v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
-	j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
-	W8JrUvcSsGvfC2KfnxnUUI43ZEXa7VU1veHPUUUUU==
-X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQUBAWpMKrKTLgABsG
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [1.44 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[cse-iitm-ac-in.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[iitm.ac.in : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305276-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305277-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:horms@verge.net.au,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lvs-devel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,m:ja@ssi.bg,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_RECIPIENTS(0.00)[m:skalluru@marvell.com,m:nihaal@cse.iitm.ac.in,m:manishc@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:horms@kernel.org,m:maciej.fijalkowski@intel.com,m:stable@vger.kernel.org,m:sashiko-bot@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,verge.net.au,netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
+	FORGED_SENDER(0.00)[nihaal@cse.iitm.ac.in,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nihaal@cse.iitm.ac.in,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[cse-iitm-ac-in.20251104.gappssmtp.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mails.tsinghua.edu.cn:from_mime,mails.tsinghua.edu.cn:dkim,mails.tsinghua.edu.cn:mid,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E9DFC717904
+X-Rspamd-Queue-Id: BFE1F717907
 
-Hi Julian,
+In one of the error path in bnx2x_alloc_mem_bp(), bnx2x_free_mem_bp()
+may be called with bp->fp uninitialized. And so, there could be a null
+pointer dereference in bnx2x_free_mem_bp(). Fix that by initializing the
+fp_array_size after the bp->fp pointer is correctly initialized.
 
-> On Jul 6, 2026, at 22:17, Julian Anastasov <ja@ssi.bg> wrote:
->=20
->=20
-> Hello,
->=20
-> On Mon, 6 Jul 2026, Yizhou Zhao wrote:
->=20
->>> On Jul 6, 2026, at 01:35, Julian Anastasov <ja@ssi.bg> wrote:
->>>=20
->>> May be it is better starting from ip_vs_set_state()
->>> to provide new arg 'int iph_len/offset' (set to iph.len), down to
->>> state_transition(), sctp_state_transition() and set_sctp_state().
->>> Same for all protos. It should cost less stack and ipv6_find_hdr()
->>> calls and what matters most, correct iph context in case we
->>> have IP+ICMP+TCP (with just two ports or even with TCP flags)
->>> and are scheduling ICMP, i.e. not IP+TCP as usually.
->>=20
->> I agree that the already parsed transport-header offset should be=20
->> passed from ip_vs_set_state() down to the protocol state_transition()=20=
+Fixes: c3146eb676e7 ("bnx2x: Correct memory preparation and release")
+Cc: stable@vger.kernel.org
+Reported-by: Sashiko AI Review <sashiko-bot@kernel.org>
+Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Signed-off-by: Abdun Nihaal <nihaal@cse.iitm.ac.in>
+---
+Compile tested only.
+Thanks to Simon Horman for pointing out the Sashiko review.
 
->> callbacks, instead of reparsing the skb in set_sctp_state(). We will=20=
+v1->v2:
+- Add the correct Reported-by tag for Sashiko as suggested by Maciej
+  Fijalkowski. Also added Maciej's Reviewed-by tag.
+- Simplify the fix by initializing the fp_array_size later, as suggested
+  by Paolo Abeni.
 
->> send a v2 that does this for SCTP, TCP and the other IPVS protocols=20=
+Link to v1: https://patchwork.kernel.org/project/netdevbpf/patch/20260701065030.381836-1-nihaal@cse.iitm.ac.in/
 
->> in one combined fix.
->>=20
->>> But what I see is that ip_vs_in_icmp*() are missing
->>> the ip_vs_set_state(cp, IP_VS_DIR_INPUT, skb, pd) call just
->>> after ip_vs_in_stats() and before ip_vs_icmp_xmit() where
->>> we should provide ciph.len. That is why we don't reach the
->>> set_tcp_state() calls to set correct cp->state and timeout
->>> when scheduling related ICMP. So, this should be fixed too.
->>=20
->> For the ICMP path, I agree that the missing ip_vs_set_state() call is
->> worth looking at, but using ICMP errors to drive the upper L4 state=20=
+ drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
->> needs some care, because spoofed ICMP packets can match an=20
->> existing embedded tuple before the endpoint TCP/SCTP stack=20
->> performs its own validation. Maybe this change needs further
->> discussion?
->=20
-> May be only for the schedule_icmp case while the other
-> ICMP replies should not change it:
->=20
-> diff --git a/net/netfilter/ipvs/ip_vs_core.c =
-b/net/netfilter/ipvs/ip_vs_core.c
-> index 7f93239898ff..05fdcf4ce2c0 100644
-> --- a/net/netfilter/ipvs/ip_vs_core.c
-> +++ b/net/netfilter/ipvs/ip_vs_core.c
-> @@ -1971,6 +1971,8 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct =
-sk_buff *skb, int *related,
->=20
-> /* do the statistics and put it back */
-> ip_vs_in_stats(cp, skb);
-> + if (new_cp)
-> + ip_vs_set_state(cp, IP_VS_DIR_INPUT, skb, pd, offset);
-> if (IPPROTO_TCP =3D=3D cih->protocol || IPPROTO_UDP =3D=3D =
-cih->protocol ||
->    IPPROTO_SCTP =3D=3D cih->protocol)
-> offset +=3D 2 * sizeof(__u16);
->=20
-> Here is why schedule_icmp was added:
->=20
-> =
-https://archive.linuxvirtualserver.org/html/lvs-devel/2015-08/msg00015.htm=
-l
->=20
-> But the inner TCP header should be generated by the
-> real server, not from the client, so things can go wrong. We can
-> leave it as it is now - we will forward the ICMP to the right real=20
-> server by using short conn timeout...
-
-I agree. The embedded TCP/SCTP header in this path may not have the same
-meaning as a normal client packet reaching the virtual service, so I do =
-not
-see a good fix for the ICMP state update part at the moment.
-
-BTW, we have kept the ICMP handling unchanged and submitted a v2 series
-for the parsed transport-offset issue only, following your earlier =
-suggestion
-to pass the already parsed offset from ip_vs_set_state() down to the =
-protocol
-state handlers. The v2 also puts the TCP and SCTP fixes in the same =
-thread:
-
-=
-https://lore.kernel.org/netdev/20260706101624.69471-1-zhaoyz24@mails.tsing=
-hua.edu.cn/
-
-Thanks for the review.
-
->=20
-> Regards
->=20
-> --
-> Julian Anastasov <ja@ssi.bg>
-
-Thanks,
-Yizhou=
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
+index 5b2640bd31c3..5a9742fd3ddf 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
+@@ -4742,13 +4742,13 @@ int bnx2x_alloc_mem_bp(struct bnx2x *bp)
+ 
+ 	/* fp array: RSS plus CNIC related L2 queues */
+ 	fp_array_size = BNX2X_MAX_RSS_COUNT(bp) + CNIC_SUPPORT(bp);
+-	bp->fp_array_size = fp_array_size;
+-	BNX2X_DEV_INFO("fp_array_size %d\n", bp->fp_array_size);
+-
+-	fp = kzalloc_objs(*fp, bp->fp_array_size);
++	BNX2X_DEV_INFO("fp_array_size %d\n", fp_array_size);
++	fp = kzalloc_objs(*fp, fp_array_size);
+ 	if (!fp)
+ 		goto alloc_err;
+ 	bp->fp = fp;
++	bp->fp_array_size = fp_array_size;
++
+ 	for (i = 0; i < bp->fp_array_size; i++) {
+ 		fp[i].tpa_info =
+ 			kzalloc_objs(struct bnx2x_agg_info,
+-- 
+2.43.0
 
 
