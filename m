@@ -1,217 +1,306 @@
-Return-Path: <netdev+bounces-305266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305267-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id RvLuK21vTGr6kQEAu9opvQ
-	(envelope-from <netdev+bounces-305266-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 05:15:57 +0200
+	id yg2LGd92TGqykwEAu9opvQ
+	(envelope-from <netdev+bounces-305267-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 05:47:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FDFE716F9E
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 05:15:56 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17185717219
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 05:47:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=lDeGwA4M;
-	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=eMNuYgJX;
-	dmarc=pass (policy=reject) header.from=qualcomm.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305266-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305266-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=g5QYT0VT;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305267-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305267-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B67C2300B8D1
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 03:15:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A6B343023A68
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 03:47:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A0B92EDD78;
-	Tue,  7 Jul 2026 03:15:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C443191C8;
+	Tue,  7 Jul 2026 03:47:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26DEE420894
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 03:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F5FE42088B
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 03:47:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783394152; cv=none; b=O/xOmRGr17oT2ygb/wjUMt6a9FeyG+jyLNaGq7DCvxRHgq1T4E35+o0WAzEIRkY+ItzsAuEf5AHhWEDJfLAHTyYcexIChLtrIW2iyWQiStFTdvUikRzZWR7Acv0jBrWDs1FkZGa+iRl5Li0rgSmXOheZvd+x+Djsm5PRH9cX1xw=
+	t=1783396055; cv=none; b=eJ4FTcEM8K3HuIFT7woa8Q9FaknsMh/o7VTF6KDAgXmEMWY6vnXiTShNcC/Z9bJrizXhn9dRs7nQaC5PjJHjMRaHrfzsjKCOAm1SnkOUtj8IkMv0daSu6z0HxB+EQgVl9qlep0VO/Bf3UZl/38ZaxHQvZfaLzxcyaT1Lr5Hl9Vw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783394152; c=relaxed/simple;
-	bh=5lwDQMlulBC0yjUvbH8Nb43Xa9OwjLANFBcGuqy8cF4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TkMF6E1c8tbcACy5+JLOHXgBnY2PdQvez9lhVPmcWhYStXCiwhjcMxqfmRBje5cu1cZPB1OPXdVT3jZgwIckq+ZqRgzOGZkIcBPijJGTC02Mp628d4mxmAE5uSW7eu70E+R0bDameOjfHl9ed1iv2an1HxpMYoRa9yUM4VnOhes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=lDeGwA4M; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=eMNuYgJX; arc=none smtp.client-ip=205.220.180.131
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 666KEJw81639917
-	for <netdev@vger.kernel.org>; Tue, 7 Jul 2026 03:15:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	+2WHMx28uFft/DFZTLCY+m53g7WHXAUCDoM2ChDSZN8=; b=lDeGwA4M3fCTgMFw
-	InbTYoTYHt39CZMKtwgnvOoM75XW5RH/MH8++MmwULr+60qlE46bnTrOE/n/x8V6
-	y4Yu9dL2FfWk68ZalxmY+0mL4G8zSC/eDmfPbZE4DZTMpJz8KoOs9lhdG0tlRIhD
-	10r0Fi7NEBXEjJ09UWC3xwBmu2wy54IvxJQFKne0GLVT66OgUNFLO/thtQUf7AN9
-	iHEF3ftdFfNxGaV65zD/yceO46ruPdgCmeylWM56FT9u1s/shMXYZNWmQ0eDBgWz
-	ZmSJfDUfd4VpOm30+P/P3qqJKzeFKP2cY0dyZXY1kLR5msILJTEPkW5eowVjVv/r
-	/juG5w==
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com [209.85.210.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4f8a3r3u1j-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 03:15:50 +0000 (GMT)
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-8482b5cc6cfso749045b3a.1
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 20:15:49 -0700 (PDT)
+	s=arc-20240116; t=1783396055; c=relaxed/simple;
+	bh=bIpel2MisZarxPESn/8XO7PTy6ZrPetEUgx8Jkn5Qic=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hzYXVkVVJY041/CCu7jtXxRcEZvmqTYxdHJ1Kb7seFCok9j+aavhuJ9SVv3zcn2ZNAI0b7YoKRFWhu/TLyc0pLlq3oR2NDjMPczIWxUKLhBX3HSc/dwd0yECuP8LRB+cdbfkaghOHEK6FQ8PwzWBZXMh9F0e2hPOzMABdF0+gJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g5QYT0VT; arc=none smtp.client-ip=209.85.217.50
+Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-73a75f251a7so1142342137.2
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 20:47:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1783394149; x=1783998949; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+2WHMx28uFft/DFZTLCY+m53g7WHXAUCDoM2ChDSZN8=;
-        b=eMNuYgJXH6Qo5IrSPEG5zDxRy0nedTHZzNJP9ZJp8IMxYxUfyMHgJwEUY9Sugr/8c6
-         8NCgO39+gulc+4uz1qUy4zAL1tjumNcupmrmMUnhYYJkd9ZJNR69zZhoZpS3iL5+ioMA
-         Zy+10esedT1MEQhlLEOmeIvT4/feTuGk9L3MKcJ24GLElgilrnWspvOeQGLw7uo9fTJD
-         jMMKLO7gqUb2mdG+flS6ce4JPLcl1uox/ka1NyV1lQ++bbPhVkyYcaUz2uoMLSXpwJ4y
-         XEg67RXS3SDRdVbPKV1l/3v6FoC4Kz1f3TM4rWbjfxt1bCifLV6l44cxgQ+plQeX21Cs
-         yPqw==
+        d=gmail.com; s=20251104; t=1783396052; x=1784000852; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=7eoG/lm2vamJEnKh3aUV46HcL7smzTZx56E3ZGcUYAQ=;
+        b=g5QYT0VTkobFNkhLAvT+n3q8rKdazVZJ1hK14hvFaapSWuAeR7PrmyJVcYMpNEtKsG
+         BurxxjOAKFPMsBW8yi51nRsbKwP3jEFta1pJDghdQJCDzXX7k1aZGyMFcrtAIS5L+KsF
+         eDncPMPuDxk1tQEZ4hRP8tSG8fUwwvzIxwwks+LMduTg9Tdt1CE0bx+A3jSofGHIrXw8
+         pG+CHp6HC8r0Zdx4PWnjwkHT5IW1gcrHoglDfQ11wbjCiZUb+UJ4pC5Yd2v0H3BsAR+t
+         yom9ertYNW3iBjfRvnCCMVYZbIWXLn6Kl6pEJrAynnwyLOiBxH4G4GY3JgB6q4/07DEC
+         R67Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783394149; x=1783998949;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+2WHMx28uFft/DFZTLCY+m53g7WHXAUCDoM2ChDSZN8=;
-        b=ohbSwzZX/5aCRrg+XeSYwyeu+gwrol03sB0tDogYhGFHqhUfNXs4/n8S7b6KezsCy1
-         KmP74rv7QE9vmCOu6BUz9OcVo1Sxdx2zUEsNszsqKaCbJ+l50xFTAAgduKATHTSDdkl/
-         ne9aDRD837ercUwYSpdrzoTA7Ej5/6XS9KPqznEm35kZmXLizYH7Dkj0rlAT/gozSPDt
-         LQSZm2l735rw1oV/7v9iU9FN8c+K6POy1DaY5mnzLvNuNSmQmXCSYuE1+LM6pkLl9WJl
-         FEwfzPRW4TlFLNjNn1dxaXihDQAxx6516lDQtJl401V9AZKAk4AYmorYHejD1gGyRy6C
-         +T8w==
-X-Forwarded-Encrypted: i=1; AHgh+RoB0AqfbS6KHS71QyFgopZJZaM6bc7aPzJOGEiLd5V+ULfhONnlRrMo4Qy4tqI1eXvk6CifABw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2e6vMnbG27JjPywYnHENUoVx61xbgoaMUi4ib90MENi2qluRz
-	mf6YOcibPiNq3+NYzPGhw1Mhn+Suhc5vXnmBgSTyJvcaNBhdYgtW3XtEn4Q38wwYr8YoQOz8Qyo
-	2bDRfqhLRTxI5wJzMux0Ep+xiJr0rolmTNsVfUNtypOVovFLsasCZl93JCM4=
-X-Gm-Gg: AfdE7cmAno00GtujKyacTC3FpfvSKW7zboVOIy8QYoyi+5ELXfJjs5tY/jedtmjEEOc
-	uJvxyWjcJOL/FCdIAKOIWnnGiZioh/srmJXzBPAlfaZGwFqBjDdueDGqiG6RuB9WWBJDwsSIF/f
-	7x5/bHXJ7yzY0+I2jedUS2zQ+s7kDQ0VkP1dB1JmGtVgxGZqFbcvPsWhLhxmGuQUrDyHbHC6mfL
-	Whwxtn62AybAfLgfZoPYtRZSv3oSUPNIqnjG1hocDJyy7G16isU0ulqaej+UxcJa1rlgpljyS+s
-	UWaeoUqDEBbo36KsQgJLFvOOIt0j9iBgkUs2bJt+wkrXO4XXoGYu22GVeNAcIwc8GvRTrGRioFP
-	mVjDlnpCPtikMQjybghfxwGHL2ut1rRVpwNJ+8Bg9syCuWn2ody2aAJTUeFkNy55VeYVkbBWxAs
-	Up
-X-Received: by 2002:a05:6a00:3996:b0:842:3a98:b34d with SMTP id d2e1a72fcca58-84826d1a9camr3018064b3a.31.1783394149013;
-        Mon, 06 Jul 2026 20:15:49 -0700 (PDT)
-X-Received: by 2002:a05:6a00:3996:b0:842:3a98:b34d with SMTP id d2e1a72fcca58-84826d1a9camr3018039b3a.31.1783394148515;
-        Mon, 06 Jul 2026 20:15:48 -0700 (PDT)
-Received: from [10.133.33.152] (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-847f6d496besm4636406b3a.36.2026.07.06.20.15.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Jul 2026 20:15:48 -0700 (PDT)
-Message-ID: <4e08f53d-db08-43ed-9403-ad25e3c6156f@oss.qualcomm.com>
-Date: Tue, 7 Jul 2026 11:15:44 +0800
+        d=1e100.net; s=20251104; t=1783396052; x=1784000852;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=7eoG/lm2vamJEnKh3aUV46HcL7smzTZx56E3ZGcUYAQ=;
+        b=nW7Jer5gmiKHT5v+NTaI5YzjZpxbGoQK1wIRevuTQB4664f6h0jnIeIR7nhZWrjt9v
+         MQsXx6JHc8UOFC6bM0V60QY7IBJh5/Izjfi/rygNmL9Q9BikegQeEtanF5LFsYSrt4XD
+         4OQa8mJBaTK6wYpjE7PM0JRu7cZCMzhlBLLASDvK8CMQ9+OddsiCRQtN2F9UdKPjh4/9
+         wvYNfvhhByWOWAoDK/kf7h1ZeziTswYXZNQsjdQYnfbai+ZR6F9iUy34PHd9nY2vX5yW
+         +WRJfkE651KbQlPrGzARVj9/nBFwVITOLtkGoErCnQy//rdc5/29KFX6J1A7NmDVlOKg
+         6yKA==
+X-Gm-Message-State: AOJu0YxMGS6DS6iUCR8+Z0WHfViyNkmRLfEqh9mYPChIVMgabb1jy4Kk
+	azrCSVVtCQEtDDaNZ6ZZ3jVpvpqpyrbd7AvntPHr8rYBn1rSDLf5YHbBpBPEzhckG28=
+X-Gm-Gg: AfdE7ckFbuZwhQa67pgrMA0YvP3LtKPKg32XatROUt//p2DPTAmQ9udWaZY0QylNIFA
+	wKO+rtjE4NGt7Hca9WR7CLWYl6/TXF1R6aRSWdi5R6MiHV4QO5aJ3oXTqSniDNpChnfiwDdETIP
+	DVo8ZCCO7U7bISM45IkLfaG/qvM+L226CcdwJuG8bD8cjaL1uB1QVY6cbXMLQHZR51qXD0BkGpN
+	juQAxibRe8sNkqGHIEUK9WVhdmeg3hjSZD/MYc6yhCQb9JEgC1WPkG+D42vYnvQVTknwNFAFcy2
+	mR6NhqzJU7ANSX4ftfpYfKfdP7W37SMeulQunUMUOxmsBsEfy/W3SdxyoXgb3b5ZF1o7XP66Ltd
+	z7+USFiAMJyC/rIgo1SQh4HjETheihm3OjHxPJnx9q/XUPJXaNVafu7t+V0Z/QqCB0vV1QbsUC+
+	ulLHV6jvd7HxuLmw==
+X-Received: by 2002:a05:6102:6898:b0:631:2dc6:2f5c with SMTP id ada2fe7eead31-744b7853919mr1736452137.0.1783396051770;
+        Mon, 06 Jul 2026 20:47:31 -0700 (PDT)
+Received: from houminxi ([61.170.226.21])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-73e19f3f781sm6597392137.2.2026.07.06.20.47.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jul 2026 20:47:31 -0700 (PDT)
+From: Minxi Hou <houminxi@gmail.com>
+To: netdev@vger.kernel.org
+Cc: aconole@redhat.com,
+	echaudro@redhat.com,
+	i.maximets@ovn.org,
+	i.maximets@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org,
+	dev@openvswitch.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Minxi Hou <houminxi@gmail.com>
+Subject: [PATCH net-next v2] selftests/net/openvswitch: add SCTP flow key test
+Date: Mon,  6 Jul 2026 23:47:18 -0400
+Message-ID: <20260707034718.2717982-1-houminxi@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: ethernet: qualcomm: remove unneeded
- 'fast_io' parameter in regmap_config
-To: Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        linux-kernel@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
- <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-References: <20260705164208.2184-2-wsa+renesas@sang-engineering.com>
-Content-Language: en-US
-From: Jie Luo <jie.luo@oss.qualcomm.com>
-In-Reply-To: <20260705164208.2184-2-wsa+renesas@sang-engineering.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA3MDAyOCBTYWx0ZWRfX9TnKqr4PQTiq
- tWwNRo1EDBAjXtZ0DSKr9jnXy0KrE5vMOyFrNcEECofJ4ncId4LVdBuBvYfUOZzqYJ1PWY5w9Kt
- 2ii0qYY6Von4NMpqlHvTKCi+Q2qsEhsie9jo8GXoX8PlC0AwpmzxX2ZNIdMlZZEhkzyzE5WpxGE
- YupUZyeWhHiGYJlFOGW0YcgI8rEd8+LJHuXCfu8clJ+oTvYnadsGnmdqpf4+mybZGIxE+dVYSxF
- V0Nt3wPugOUFe8wgeocnnA5bDaVAvXv86ArifNXY/RPjvhmeqSRT3IjpFLvQ7B3/DHSLx8dTxJo
- ME+p0TFfTaPIeO1hemjlFs/34L5xTUvbBcwJ0vTYW1f8lmQvlbrYg3HTxBhBNDg/R3NLFq0sugv
- F3hbj+q4nTceKPlK6Z5fdhE/EZUG3/7Y+BTpg2wbHpQF/CO77A1uEJkMN5xBZKsskR5e41TDKbJ
- tLJZgOeyxE1MXXrXqSg==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzA3MDAyOCBTYWx0ZWRfX/PIYeaQhl9EL
- 0R8su2sUP0wFXjs/WvJxLLE/oJddoIGwFl4HyOAfZRYUnUyvp6SuquZRF9/TTsesqO+8vcvLB3Q
- roEaFCUySXK9wrO4pFZqSWScKpHY97k=
-X-Proofpoint-GUID: RMwEUpE-Tp8ElWTpYApB9uwNSnkPvSsZ
-X-Proofpoint-ORIG-GUID: RMwEUpE-Tp8ElWTpYApB9uwNSnkPvSsZ
-X-Authority-Analysis: v=2.4 cv=OKcXGyaB c=1 sm=1 tr=0 ts=6a4c6f66 cx=c_pps
- a=m5Vt/hrsBiPMCU0y4gIsQw==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22
- a=LDBv8-xUAAAA:8 a=EUspDBNiAAAA:8 a=wHv592AV-T507FYI2ZgA:9 a=QEXdDO2ut3YA:10
- a=IoOABgeZipijB_acs4fv:22 a=DZeXCJrVpAJBw65Qk4Ds:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-06_03,2026-07-06_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 adultscore=0 malwarescore=0 clxscore=1015 suspectscore=0
- spamscore=0 phishscore=0 priorityscore=1501 impostorscore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607070028
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305266-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,qualcomm.com:email,qualcomm.com:dkim,oss.qualcomm.com:from_mime,oss.qualcomm.com:dkim,oss.qualcomm.com:mid];
-	FORGED_RECIPIENTS(0.00)[m:wsa+renesas@sang-engineering.com,m:linux-kernel@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:wsa@sang-engineering.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[jie.luo@oss.qualcomm.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[redhat.com,ovn.org,davemloft.net,google.com,kernel.org,openvswitch.org,vger.kernel.org,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-305267-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:aconole@redhat.com,m:echaudro@redhat.com,m:i.maximets@ovn.org,m:i.maximets@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:dev@openvswitch.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:houminxi@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jie.luo@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9FDFE716F9E
+X-Rspamd-Queue-Id: 17185717219
 
+Register OVS_KEY_ATTR_SCTP in the flow key parser so that sctp()
+can be used in flow specifications. The ovs_key_sctp class already
+exists (with src/dst fields matching the TCP/UDP siblings) but was
+not wired into the parser, so the token was silently dropped and the
+kernel rejected the flow.
 
+Add test_sctp_connect_v4 exercising the SCTP flow key with
+port-specific matching: sctp(dst=4443) for client-to-server and
+sctp(src=4443) for server-to-client.
 
-On 7/6/2026 12:41 AM, Wolfram Sang wrote:
-> When using MMIO with regmap, fast_io is implied. No need to set it
-> again.
-> 
-> Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
-> ---
-> No dependencies, can be applied directly to the subsystem tree. Buildbot is
-> happy, too.
-> 
->  drivers/net/ethernet/qualcomm/ppe/ppe.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/qualcomm/ppe/ppe.c b/drivers/net/ethernet/qualcomm/ppe/ppe.c
-> index be747510d947..3c301e609d3e 100644
-> --- a/drivers/net/ethernet/qualcomm/ppe/ppe.c
-> +++ b/drivers/net/ethernet/qualcomm/ppe/ppe.c
-> @@ -106,7 +106,6 @@ static const struct regmap_config regmap_config_ipq9574 = {
->  	.rd_table = &ppe_reg_table,
->  	.wr_table = &ppe_reg_table,
->  	.max_register = 0xbef800,
-> -	.fast_io = true,
->  };
->  
->  static int ppe_clock_init_and_reset(struct ppe_device *ppe_dev)
+Wait for ncat readiness with ovs_wait instead of a fixed sleep so
+the test does not race against ncat startup. Use grep -c on the
+listening message to distinguish between successive ncat instances
+that share the same stderr log. Kill the previous server before
+respawning to avoid EADDRINUSE on the SCTP port.
 
-Reviewed-by: Luo Jie <jie.luo@oss.qualcomm.com>
+Signed-off-by: Minxi Hou <houminxi@gmail.com>
+---
+v1 -> v2: replace sleep with ovs_wait on ncat listening output,
+          kill previous ncat server before respawning to avoid
+          port conflict (Aaron review feedback)
+
+ .../selftests/net/openvswitch/openvswitch.sh  | 102 ++++++++++++++++++
+ .../selftests/net/openvswitch/ovs-dpctl.py    |   5 +
+ 2 files changed, 107 insertions(+)
+
+diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+index 2954245129a2..9c364eeb2ec2 100755
+--- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
++++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+@@ -32,6 +32,7 @@ tests="
+ 	dec_ttl					ttl: dec_ttl decrements IP TTL
+ 	flow_set				flow-set: Flow modify
+ 	action_set				set: SET action rewrites fields
++	sctp_connect_v4				sctp: SCTP flow key matching
+ 	psample					psample: Sampling packets with psample"
+ 
+ info() {
+@@ -443,6 +444,107 @@ test_action_set() {
+ 	return 0
+ }
+ 
++# sctp_connect_v4 test
++# - sctp(dst=4443) matches client-to-server INIT
++# - sctp(src=4443) matches server-to-client INIT-ACK
++# - remove flows and verify connection fails, reinstall and recover
++test_sctp_connect_v4() {
++	local t="test_sctp_connect_v4"
++
++	which ncat >/dev/null 2>&1 || return $ksft_skip
++	modprobe -q sctp 2>/dev/null || return $ksft_skip
++
++	sbx_add "$t" || return $?
++	ovs_add_dp "$t" sctp4 || return 1
++
++	info "create namespaces"
++	for ns in client server; do
++		ovs_add_netns_and_veths "$t" "sctp4" "$ns" \
++		    "${ns:0:1}0" "${ns:0:1}1" || return 1
++	done
++
++	ip netns exec client ip addr add 172.31.110.10/24 dev c1
++	ip netns exec client ip link set c1 up
++	ip netns exec server ip addr add 172.31.110.20/24 dev s1
++	ip netns exec server ip link set s1 up
++
++	# ARP forwarding
++	ovs_add_flow "$t" sctp4 \
++	    'in_port(1),eth(),eth_type(0x0806),arp()' \
++	    '2' || return 1
++	ovs_add_flow "$t" sctp4 \
++	    'in_port(2),eth(),eth_type(0x0806),arp()' \
++	    '1' || return 1
++
++	# SCTP port matching: dst for request, src for reply
++	ovs_add_flow "$t" sctp4 \
++	    'in_port(1),eth(),eth_type(0x0800),ipv4(proto=132),sctp(dst=4443)' \
++	    '2' || return 1
++	ovs_add_flow "$t" sctp4 \
++	    'in_port(2),eth(),eth_type(0x0800),ipv4(proto=132),sctp(src=4443)' \
++	    '1' || return 1
++
++	echo "server" | \
++		ovs_netns_spawn_daemon "$t" "server" \
++				ncat --sctp -l 172.31.110.20 -vn 4443
++	local server_pid=$pid
++	ovs_wait sh -c \
++	    "[ \$(grep -c 'Ncat: Listening' ${ovs_dir}/stderr) -ge 1 ]" \
++	    || return 1
++
++	info "verify SCTP association with port-keyed flows"
++	ovs_sbx "$t" ip netns exec client \
++	    ncat --sctp -i 1 -zv 172.31.110.20 4443 \
++	    || return 1
++
++	ovs_del_flows "$t" sctp4
++
++	info "verify connection fails without flows"
++	ovs_add_flow "$t" sctp4 \
++	    'in_port(1),eth(),eth_type(0x0806),arp()' \
++	    '2' || return 1
++	ovs_add_flow "$t" sctp4 \
++	    'in_port(2),eth(),eth_type(0x0806),arp()' \
++	    '1' || return 1
++
++	kill -TERM $server_pid 2>/dev/null
++	echo "server2" | \
++		ovs_netns_spawn_daemon "$t" "server" \
++				ncat --sctp -l 172.31.110.20 -vn 4443
++	server_pid=$pid
++	ovs_wait sh -c \
++	    "[ \$(grep -c 'Ncat: Listening' ${ovs_dir}/stderr) -ge 2 ]" \
++	    || return 1
++
++	ovs_sbx "$t" ip netns exec client \
++	    ncat --sctp -w 2 -zv 172.31.110.20 4443 \
++	    >/dev/null 2>&1 \
++	    && { info "FAIL: connection should fail without flows"
++	         return 1; }
++
++	info "reinstall flows and verify recovery"
++	ovs_add_flow "$t" sctp4 \
++	    'in_port(1),eth(),eth_type(0x0800),ipv4(proto=132),sctp(dst=4443)' \
++	    '2' || return 1
++	ovs_add_flow "$t" sctp4 \
++	    'in_port(2),eth(),eth_type(0x0800),ipv4(proto=132),sctp(src=4443)' \
++	    '1' || return 1
++
++	kill -TERM $server_pid 2>/dev/null
++	echo "server3" | \
++		ovs_netns_spawn_daemon "$t" "server" \
++				ncat --sctp -l 172.31.110.20 -vn 4443
++	ovs_wait sh -c \
++	    "[ \$(grep -c 'Ncat: Listening' ${ovs_dir}/stderr) -ge 3 ]" \
++	    || return 1
++
++	ovs_sbx "$t" ip netns exec client \
++	    ncat --sctp -i 1 -zv 172.31.110.20 4443 \
++	    || return 1
++
++	return 0
++}
++
+ # psample test
+ # - use psample to observe packets
+ test_psample() {
+diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+index e1ecfad2c03e..7cfc29ec7e59 100644
+--- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
++++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+@@ -1982,6 +1982,11 @@ class ovskey(nla):
+                 "icmp",
+                 ovskey.ovs_key_icmp,
+             ),
++            (
++                "OVS_KEY_ATTR_SCTP",
++                "sctp",
++                ovskey.ovs_key_sctp,
++            ),
+             (
+                 "OVS_KEY_ATTR_TCP_FLAGS",
+                 "tcp_flags",
+-- 
+2.55.0
 
 
