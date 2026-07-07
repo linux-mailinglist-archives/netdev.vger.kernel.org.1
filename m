@@ -1,171 +1,157 @@
-Return-Path: <netdev+bounces-305413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305414-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5ZKGJFbdTGqOrAEAu9opvQ
-	(envelope-from <netdev+bounces-305413-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 13:04:54 +0200
+	id WsdDAojcTGpYrAEAu9opvQ
+	(envelope-from <netdev+bounces-305414-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 13:01:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B43471AC2D
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 13:04:54 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9093271AB74
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 13:01:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=en4uQpc3;
-	dkim=pass header.d=redhat.com header.s=google header.b=d5rOWwEz;
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305413-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305413-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=fail ("headers rsa verify failed") header.d=kernel.org header.s=k20260515 header.b=IILQLy1y;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305414-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305414-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CD57C306CC44
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 10:59:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 33AA5303A8F7
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 11:00:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74C5C3F44F9;
-	Tue,  7 Jul 2026 10:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5473F7AB7;
+	Tue,  7 Jul 2026 11:00:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E8C63AE6F3
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 10:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4024E3DB65A
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 11:00:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783421994; cv=none; b=sRWu1FvuLoelcA4hRiKl8QvBAe+F4G+cocL2bJOQRaQ44EQ0hE1qAybHMybrsm6Fcyi8PLykHUwYVK3/52Vrh+MlU7ByYVNbdV8NPL3WhVPCUIzhkZaWIU/8QACR29g47C8ECmG7/7lT3eIGg0a5QfI+7FcxPtFv10g2ol9AeWk=
+	t=1783422035; cv=none; b=HJba8y2rVl6kfdrLzrQImoAwykLuCjGd06varEqrtJJzceZjSsnTB0KBbkuNOKlS9oHX3PDE3ALafZtrMnVGPByIMIXflWn+FgiPhUYMBBvCft5NzAVFxVC0mApFUpS7INg4Z0w9QEHghezGZP1IPZ5+z6fna5xFqTefhSOXgbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783421994; c=relaxed/simple;
-	bh=57nlmS3czWktRztgmPKDUccMTAH8kQqCnaRwmEcm/SM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HVs5P0ftBCYtOXh8UpCQR1f07PhsPA91di72Kz9YJ0dE+JfBSTVJlkqU045S43GAx/GFRU8AqaBUiwuGaJhc6miZza8k9+74xDE/46la2km5DI30sxuXQB2UfKURJC32Vph9FMAyUULp/HcsDd8PnblgaURFfWE018B3ubNcYv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=en4uQpc3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=d5rOWwEz; arc=none smtp.client-ip=170.10.129.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783421991;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KG6dF7uTNI7G+jE/O/3fAI9JePYHU7L+4iIKuiT9JOc=;
-	b=en4uQpc3kI997U6o5z40J/1IVitt6G/XJEWQY0dOKZxUPPvMqomjxfJhSTIlCYdDKXsRm0
-	iTdBeJPXCrVF0lcsQpbDDrmWJ05pdBP2/QXaUJg8XPdtRH8ZB9ipWUCFyJsWEpcKqZPBfq
-	PFcOmOg/xxZNqrhkiD02GDZgiB0Ogo0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-519-i0lwC9iFNQ6EIV1LPcyOLQ-1; Tue, 07 Jul 2026 06:59:50 -0400
-X-MC-Unique: i0lwC9iFNQ6EIV1LPcyOLQ-1
-X-Mimecast-MFC-AGG-ID: i0lwC9iFNQ6EIV1LPcyOLQ_1783421989
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-4784d0fb9cfso2136264f8f.2
-        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 03:59:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1783421989; x=1784026789; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=KG6dF7uTNI7G+jE/O/3fAI9JePYHU7L+4iIKuiT9JOc=;
-        b=d5rOWwEznejX4EV2pQqvJTqC16adqtiCxjjRjrRFg8s9jONDvzUjVvHc8HGOLkxb0o
-         d5i4j5kJeSL/nnN1w2brsWzK1LmSN7JxfhcgJRSQa0VgnbjiXCKf6Wel7ykL2lWZ/Czl
-         uKSBIyUhBIsAhFdqbAnh0qSaw3pUCHHRM+QUXso7oisw3G9iiy9fbHBMqPx0f4BGEwWH
-         Iy08UMuzi3Qq5qhlBFbGoml6zWHk61tUDbCay5ObsturwP1kM4VNgBRrnncO8dhdjGBd
-         DnRmSPRlUQjaTncInfCJ2BEwdEuskENIkW4279nGWmpzS/dWJRUBYv1kt53A+fUTjYNF
-         KdIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783421989; x=1784026789;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=KG6dF7uTNI7G+jE/O/3fAI9JePYHU7L+4iIKuiT9JOc=;
-        b=nKniLvvZIrpI07+xSaNJ/gAxTXqlnfm2hU+XF6IwtwwA7+wVhe/5ACRE3Y5GozlPWh
-         goQ2FyxplN79i5D9d52KevZc4a/s9vXI95i9kLVMQfxEvxktnqhbbPw5TJvgzcFqUumw
-         ejKjgqCVMqJP50hhTyrjt92zzf7lEbXAVCFquZP6kWF1J3DoiQWT2o9ajtpm8OLILyWb
-         ew8NrD8UlN28F6XxW8UNK9WxbE/MiAoltV+eNyRTACTK7ohMBmoHwbgiDLbF8BwfWATe
-         vbH+fwvOtEu9mfCrRnuDWyJgteCX9kaVqg+wkIZIM/5lq7yyd78JwcLemopQfVVc44sq
-         B96A==
-X-Forwarded-Encrypted: i=1; AHgh+RrRB09CY7fdOM7RJR7IE6p5/uPZZH1MBQ4BtXpScxooGno1lPqK3RoFSbEj5s2bw0jrEbpWlLE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyfk26nRqw0LSK13lqQzt3ixbGpeuMb+Jz3OaEkLPbqLn6Q8t4z
-	Tp3OIdfXI6uUes2wtvrBXh9lP/BpwVlYx70qWCzjPEJ0k6i/JKXeVgSiZs5loxg+GGVjohiMcQD
-	VqZ2lVKqal5kItBr05lgstDADrh2fBnFlFIoqOBH3s6jyCtduwi/dP5PHMw==
-X-Gm-Gg: AfdE7clUwZZDJhkdSCn40bsiTZbRxNzD0RQ/49B2mSXuYUY1hrlNiThWv4GO81eXcfp
-	GGla05DuNse3AIml9CsjyoPnkApq7u4JAtXd8XSydfmUgMeMs8v2DpkgaBexKvyUkgebdIGEYdI
-	CB/a8NcQMjKINRMSiAZM7zUmUyyUxeN58Lv2/cN4RsCBJgiBYSF1nt8NdEPhFdIJGrH0BezNTYi
-	GDUfUiusDrFR2wLlTofaBnqDBghDi9e7UiGopQQsAVRx6Ej6JP02oOjVZwku3j3vdmY4/lLSYMB
-	bbsERc/Tkq7V44mvELqi/v9GMHr4UjOb1SJ0nh4uH9zmKY3sCYlMJmXYqqyxSGzElqW+GUfk0HL
-	A+6mDlFQenaQCFpinK9D5XdM8RDEBV2ySXOnGo4bD9NZLarmkraIDr2td3s7ZZN/TvMGSxf0UjP
-	HzNaKmzezW44HN
-X-Received: by 2002:a5d:4384:0:b0:472:55a:ef8b with SMTP id ffacd0b85a97d-47de66d3b8bmr4233807f8f.16.1783421988906;
-        Tue, 07 Jul 2026 03:59:48 -0700 (PDT)
-X-Received: by 2002:a5d:4384:0:b0:472:55a:ef8b with SMTP id ffacd0b85a97d-47de66d3b8bmr4233771f8f.16.1783421988442;
-        Tue, 07 Jul 2026 03:59:48 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:5521:6b10:58fd:68f:7756:389d? ([2a0d:3344:5521:6b10:58fd:68f:7756:389d])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9e4d843csm32101388f8f.14.2026.07.07.03.59.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jul 2026 03:59:47 -0700 (PDT)
-Message-ID: <93f8ae24-f87d-49e9-b33d-decb18484e98@redhat.com>
-Date: Tue, 7 Jul 2026 12:59:46 +0200
+	s=arc-20240116; t=1783422035; c=relaxed/simple;
+	bh=Ry6VoGstTO4mM1xLDubI9yra5JGj+DzJHMW3aOeP7ME=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=LVQ4pTsB1uR8BAH+/ZeNPT1d7OCNIvkMXgK5LnGGrCcdfDuPjHc5NDzktE4krSHV+8InmTguqxm36dUVzuNLXKVpw74kttDbogpd8jhaD4QaUjeS56ftJ2VMqA2RUc+bA908EGS5J2/kDnMh+TUWvFakvqU624ZpjEWrJu6w6AI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IILQLy1y; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEC431F000E9;
+	Tue,  7 Jul 2026 11:00:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783422033;
+	bh=0+lW/HyoCQKv86mW2wwMMjW384TD69xk7+ot2UpKnlQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=IILQLy1yl3g5hwaO467sMXJ7x/ow/gtpvVci2uLzzZds7oK2Q2aC/VxLmsww0WSLv
+	 hlfZc8K/Wy7xrQuuaX1X6FzLMue86Wn4evU4vNS1kunU9z8RiWFwkWC9iuuatVtS+d
+	 pfAAF8QoQpgc7mmX5h7D+oRBPt08lT8iy3f5A5f318qnH9CyUiW3UeWCmD85mY5L1h
+	 b/GtMRpZwgEUrRBRTQyfLg53J08z98zYk9KawDu0aamq72+MquURwB2kg+yUW+p4kh
+	 lzPBXFb7LzPQ3fmgSAvr/9u7Tq4XSrOwuayMB2Q+xSatL+ZvtRuXr1Ya1AapFN8nl2
+	 Zs5f6ku/fkQpw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 19B383925479;
+	Tue,  7 Jul 2026 11:00:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 0/7] pull request: sfc 2026-07-01
-To: alejandro.lucero-palau@amd.com, netdev@vger.kernel.org, kuba@kernel.org,
- davem@davemloft.net, edumazet@google.com, horms@kernel.org,
- dave.jiang@intel.com
-Cc: Alejandro Lucero <alucerop@amd.com>
-References: <20260701113805.14072-1-alejandro.lucero-palau@amd.com>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260701113805.14072-1-alejandro.lucero-palau@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/7] cxl: Support Type2 cxl regs mapping
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178342201363.1497513.7679658303612517121.git-patchwork-notify@kernel.org>
+Date: Tue, 07 Jul 2026 11:00:13 +0000
+References: <20260701113805.14072-2-alejandro.lucero-palau@amd.com>
+In-Reply-To: <20260701113805.14072-2-alejandro.lucero-palau@amd.com>
+To: Lucero@codeaurora.org, Palau@codeaurora.org,
+	Alejandro <alejandro.lucero-palau@amd.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+ dave.jiang@intel.com, alucerop@amd.com, dan.j.williams@intel.com,
+ Jonathan.Cameron@huawei.com, benjamin.cheatham@amd.com,
+ ecree.xilinx@gmail.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-305413-lists,netdev=lfdr.de];
+	R_DKIM_REJECT(0.00)[kernel.org:s=k20260515];
+	TAGGED_FROM(0.00)[bounces-305414-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,davemloft.net,google.com,redhat.com,intel.com,amd.com,huawei.com,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:Lucero@codeaurora.org,m:Palau@codeaurora.org,m:alejandro.lucero-palau@amd.com,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:dave.jiang@intel.com,m:alucerop@amd.com,m:dan.j.williams@intel.com,m:Jonathan.Cameron@huawei.com,m:benjamin.cheatham@amd.com,m:ecree.xilinx@gmail.com,m:ecreexilinx@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:alejandro.lucero-palau@amd.com,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:dave.jiang@intel.com,m:alucerop@amd.com,s:lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:-];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amd.com:email]
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,huawei.com:email,intel.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0B43471AC2D
+X-Rspamd-Queue-Id: 9093271AB74
 
-On 7/1/26 1:37 PM, alejandro.lucero-palau@amd.com wrote:
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Dave Jiang <dave.jiang@intel.com>:
+
+On Wed, 1 Jul 2026 12:37:59 +0100 you wrote:
 > From: Alejandro Lucero <alucerop@amd.com>
 > 
-> Dear net maintainers,
+> Export cxl core functions for a Type2 driver being able to discover and
+> map the device registers.
 > 
-> here are the last CXL core changes for enabling CXL Type2 drivers to
-> initialize a CXL-capable device plus the netdev sfc driver changes using
-> this new CXL core Type2 support.
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
+> Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
+> Acked-by: Edward Cree <ecree.xilinx@gmail.com>
+> Link: https://patch.msgid.link/20260629183727.51502-2-alejandro.lucero-palau@amd.com
+> Signed-off-by: Dave Jiang <dave.jiang@intel.com>
 > 
-> Please pull or let me know of any problem!
+> [...]
 
-Process note: this is 'net-next' material (as opposed to 'net'); the
-target tree should be reported in each patch subj prefix.
+Here is the summary with links:
+  - [net,1/7] cxl: Support Type2 cxl regs mapping
+    https://git.kernel.org/netdev/net-next/c/2c599da8231f
+  - [net,2/7] cxl: Support dpa without a mailbox
+    https://git.kernel.org/netdev/net-next/c/96ddf1af34f5
+  - [net,3/7] sfc: add cxl support
+    https://git.kernel.org/netdev/net-next/c/a3fc56b12e3a
+  - [net,4/7] sfc: Map cxl regs
+    https://git.kernel.org/netdev/net-next/c/08699796dabf
+  - [net,5/7] sfc: Initialize cxl dpa
+    https://git.kernel.org/netdev/net-next/c/230284c1b165
+  - [net,6/7] sfc: obtain and map cxl range using devm_cxl_probe_mem
+    https://git.kernel.org/netdev/net-next/c/0418860ef2ca
+  - [net,7/7] sfc: support pio mapping based on cxl
+    https://git.kernel.org/netdev/net-next/c/bd6550bcdb0c
 
-/P
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
