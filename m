@@ -1,222 +1,202 @@
-Return-Path: <netdev+bounces-305402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305403-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Y02sOtTXTGrgqgEAu9opvQ
-	(envelope-from <netdev+bounces-305402-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 12:41:24 +0200
+	id 9ztRAcvVTGpOqgEAu9opvQ
+	(envelope-from <netdev+bounces-305403-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 12:32:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCAFB71A85A
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 12:41:23 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7979071A6CC
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 12:32:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=H8uhI0od;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305402-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305402-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=bjbhaiuH;
+	dkim=pass header.d=redhat.com header.s=google header.b=g7HwghTJ;
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305403-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305403-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E9D8430B2CE9
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 10:27:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A7A9F30B7D1C
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 10:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 422B03E00A9;
-	Tue,  7 Jul 2026 10:25:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83D0B3E44F0;
+	Tue,  7 Jul 2026 10:30:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1909B3DEAC0;
-	Tue,  7 Jul 2026 10:25:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077563E00B4
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 10:30:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783419958; cv=none; b=lmx2u1tXs9AWt36WgWdwDf34GRUhuMR9AbZaDH6j7YsM3mkuIp5mZknrRVJFfZp/HT/OHJMTvQlqSNVyB9Le25GeWGQtMej3Cv2OzrfgKsB/LZI0dYAmUBvbZir3zhEMDdIdUcZ9CFTiYlo/GJJZR8c0EzX1N6wklxOM4ouqR20=
+	t=1783420217; cv=none; b=oEiK4P+Yzu9A4p3WMRHapUXtCDjdvW+e++KPsmBgPWaDACZP0bJTb/1JmE2nHyZ96BblktwrSKKjnHezbhalXiW0CUVm4yhgyJfCToux6ElKqcSxFeyNZXQsdsVtlQHLMarVl5c0IoPVAwSzMUynS00tzoMvgUG8bU8fE3ZuI4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783419958; c=relaxed/simple;
-	bh=lavQzsFzLuud4owucqXOAe7/TStmFbzpIYigj/qMI58=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SrCnpOr92D1RRDDAgg0ss2Qa1XPhHp4hDpQS+/o/tEBDnMTqqrxqjuUjshA7JqAAd0OgAPQtthNjpAK0K6WddrsMdSYsTB1O/v+XAPPrAih0TQ6J5tZRFse/mM5vTF1MP9e4ZRDKgxLL97E3ClNBsIgZJiAbjGQKtWs3Tusz+Wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H8uhI0od; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8D7F1F00A3A;
-	Tue,  7 Jul 2026 10:25:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783419953;
-	bh=mnX0Xor/Tw8U/V1nZ7vUJbpJLhv1WXsPVIqYsN1S9JI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=H8uhI0odf1+Nyc1vY1CAo56e01lIQRebr/i+R9T6Kt2TRVpmlVOcGQ6Im6ER4Sy/t
-	 RRY9GlYhnqkRfIVTXtJSw3hSLRXgIF6Uq5Kz0sVb07aSArilOz021PEGns2rlw2r8v
-	 6Pdnt/z6u0ati+bODvS9XJzgNCsrvJxU7lKZxjig+ODoqnGicqXLwJ6sJU3oxAryqq
-	 32rIazm76gCZ+a4BPcXhpECSGZ2Amk22Yx57OiChxpZ73lHbx5VnjTF3K/Ulnxuhu+
-	 YaAbd3UpBZ4cjSCcbIUGXQiGel3HL8yFdfM+AH2G7pDPedlo3ahuUlYqhjjSiZ+SX7
-	 DO1SsLFw/wo0g==
-Date: Tue, 7 Jul 2026 13:25:46 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, mkalderon@marvell.com,
-	zyjzyj2000@gmail.com, sagi@grimberg.me, mgurtovoy@nvidia.com,
-	haris.iqbal@ionos.com, jinpu.wang@ionos.com, bvanassche@acm.org,
-	kbusch@kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, kch@nvidia.com, smfrench@gmail.com,
-	linkinjeon@kernel.org, metze@samba.org, tom@talpey.com,
-	cel@kernel.org, jlayton@kernel.org, neil@brown.name,
-	okorniev@redhat.com, Dai.Ngo@oracle.com, trondmy@kernel.org,
-	anna@kernel.org, achender@kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, kees@kernel.org,
-	andriy.shevchenko@linux.intel.com, clm@meta.com,
-	ebadger@purestorage.com, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, target-devel@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH rdma-next v9] RDMA: Change capability fields in
- ib_device_attr from int to u32
-Message-ID: <20260707102546.GM15188@unreal>
-References: <20260703060329.896125-1-ernis@linux.microsoft.com>
- <20260706084950.GK15188@unreal>
- <akzS9EdxScQsx9n8@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=arc-20240116; t=1783420217; c=relaxed/simple;
+	bh=6z6CU6EQ+brZROdDnjSW/AgL95ryAiJb7RKNl3DSgo8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Yg4ZJn7/RlBeBsNma2Qsh1ZbhbnuGqZnMnWGY93ySzImhqCCySHT2U1KsSKuxuvdwOS8HcM10ZxX07nPxdmqh+tuhMhIsCKapJ79UgxyOrx0gbLE8T4FbZLlLFojBuSuwBE6M1KzfVFCCHRE4RWABbmfqbKWMhHjpdoiaOZAhtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bjbhaiuH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=g7HwghTJ; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783420215;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zoSPVAeyfLAakHdkwoRkZKuwxGIMQEg6NmXCD0Y72LU=;
+	b=bjbhaiuHUp7lS5edjMbw0xDFz6MR85leQxmFE32mgnG1bG61EqiLJ0iv86+6MlP4OiKuCp
+	SpeJeKX8OiGzAiObXNWxp50qWJsDbziaILLLuPEoc21NklZDUw+3KiEuObVH8YZee8+an9
+	9NTs3dMsxuMvoaRTUMjSEvIYr6LqLkM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-517-K_imPixtOEyMd8ZGbWj5tg-1; Tue, 07 Jul 2026 06:30:13 -0400
+X-MC-Unique: K_imPixtOEyMd8ZGbWj5tg-1
+X-Mimecast-MFC-AGG-ID: K_imPixtOEyMd8ZGbWj5tg_1783420213
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-4744b72f90bso2467362f8f.0
+        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 03:30:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1783420213; x=1784025013; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zoSPVAeyfLAakHdkwoRkZKuwxGIMQEg6NmXCD0Y72LU=;
+        b=g7HwghTJAqV3bRAiaWm45BKCoDtr+T1xD7v0YqsMEHt3iUjF5gj/++kax/nQkJP/ZK
+         giY5U5vtQVRS2awio7qCi8DOs10d7EGO9+x1JoFVg5TPY/4Lc6WItl40qHjyqhhk8xJt
+         lmm5E2APg7ts5FMqiYuP5SjbpMPs+RtmTAqBdf1XMeyX6DRhyXC10b9CTKGNNO2nWhLa
+         63cEjqLCxL/2xnwCaBtBHjqV2vqFBN6Ugiqrm8Dt0hG1MUm+nJAG+b0XlgMGN9Y5lny6
+         jBYRJ1OwMEtUfUQDtDRm7SL5Zl+XQS0Zain3/MuCwyrBbhL+NekLHW9hqdkmdq+Ufkly
+         NjBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783420213; x=1784025013;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zoSPVAeyfLAakHdkwoRkZKuwxGIMQEg6NmXCD0Y72LU=;
+        b=b3Sc5/krBkENfYGQCq2g8EmVM9x2mcHjrHKFdtM2uTCSEl/bvz7w6wJqX09kU2Vwgz
+         SmiRomxKLK7aULAbUAfYLpp+8Kap3CDTDzNxVk46PPVjOBfRmdQMezWhQx7Cs1Uvl2Qn
+         oNLDUM0p1da/WKO6hTyi+n23SoLFgItJZaBTtjKAhshKwAvuEgKsqq4ZAZytSJw0mLMG
+         51HHIn64lShOmZV86PWUu3fPbCXUA0f9wSAf3la0T8Yem3etfUb9SCzXqcE8dGtPRWsM
+         zWw49mhMg6AcMytjrLAQr2Sar+sx/L4BuISrTBj1ZA4zgTuWGk6V4FNnSG42i5R8X8s3
+         Sr0Q==
+X-Forwarded-Encrypted: i=1; AHgh+RoRf/cbPla23AoQhm3cFlaC0R1HC87FfFLZB+fLIkH0ColuJ+Mt9vqB1AwZcR7Bt2gHIozfCeo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCn3BmPdsV9c9jPqlx+YOkGMLMqeqhjZU7YDB+MzeNodxjlQCs
+	BCLE9S7wPluqripISupUUtCK4MlWtpDr/e84sWa1Qz9oPka1uy3fVEsfFeYZZqKlVGJR6Rqjns2
+	4jeKFAPtkne6JxgHCgAndUDDaPgaTbtqwrCTfdQLT2OGuntTprgaR8V63ZQ==
+X-Gm-Gg: AfdE7cliZv9qXjDrTwwzFjPm9nBiLC7K3kyYKZ553lK37oLIIH8sAsgDMYWLooJgqsa
+	9/HyUCQqoN4gWYnY8cpYZN7I/xNyynT32EzF1jm0MK6h37Rko8luZoc2y72AX9qXC4NKg4yrGXh
+	tUeF3xsIiaWEwbwOcut3absT++9DEuviJW0w1DZKgj3z/y7GeW4WpBX/paozV0lpoXyo0kxnksy
+	bPPyKOiq+a/E201PQuysRt71xXOV7E7Vm5Wt+AYZEl3M4cYVFDzmLGPNCIETQObGwVq77On4/HZ
+	6NKpkI5yGVgPoK1GuHMvbxkKQ6XjkIYzZ/4k/ceOuVgXrhEJV30yWV9YdttBBqTQqQCjoAxyRyl
+	LuUmaM5ry4onbDs6teHC4PPTEJvi16MO9O2vzyDAp40jyJ0U+t+4oXMIXmp8M8eNVGu2gw1W+Lb
+	ISINb96NUYdt/j
+X-Received: by 2002:a05:6000:604:b0:462:6aa1:4393 with SMTP id ffacd0b85a97d-47de668ef06mr4430905f8f.4.1783420212385;
+        Tue, 07 Jul 2026 03:30:12 -0700 (PDT)
+X-Received: by 2002:a05:6000:604:b0:462:6aa1:4393 with SMTP id ffacd0b85a97d-47de668ef06mr4430875f8f.4.1783420211781;
+        Tue, 07 Jul 2026 03:30:11 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:5521:6b10:58fd:68f:7756:389d? ([2a0d:3344:5521:6b10:58fd:68f:7756:389d])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9de1e736sm35594909f8f.7.2026.07.07.03.30.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Jul 2026 03:30:11 -0700 (PDT)
+Message-ID: <71a1bacf-c54f-45b0-80df-7175261cf2ac@redhat.com>
+Date: Tue, 7 Jul 2026 12:30:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <akzS9EdxScQsx9n8@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: ti: icssg-prueth: Fix link-local addresses being
+ forwarded out of slave ports
+To: MD Danish Anwar <danishanwar@ti.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Meghana Malladi <m-malladi@ti.com>
+Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260701112535.4027920-1-danishanwar@ti.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260701112535.4027920-1-danishanwar@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:ernis@linux.microsoft.com,m:jgg@ziepe.ca,m:mkalderon@marvell.com,m:zyjzyj2000@gmail.com,m:sagi@grimberg.me,m:mgurtovoy@nvidia.com,m:haris.iqbal@ionos.com,m:jinpu.wang@ionos.com,m:bvanassche@acm.org,m:kbusch@kernel.org,m:axboe@kernel.dk,m:hch@lst.de,m:kch@nvidia.com,m:smfrench@gmail.com,m:linkinjeon@kernel.org,m:metze@samba.org,m:tom@talpey.com,m:cel@kernel.org,m:jlayton@kernel.org,m:neil@brown.name,m:okorniev@redhat.com,m:Dai.Ngo@oracle.com,m:trondmy@kernel.org,m:anna@kernel.org,m:achender@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kees@kernel.org,m:andriy.shevchenko@linux.intel.com,m:clm@meta.com,m:ebadger@purestorage.com,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:target-devel@vger.kernel.org,m:linux-nvme@lists.infradead.org,m:linux-cifs@vger.kernel.org,m:samba-technical@lists.samba.org,m:linux-nfs@vger.kernel.org,m:netdev@vger.kernel.org,m:rds-devel@oss.oracle.com,m:
- jgg@nvidia.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-305403-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[44];
-	FORGED_SENDER(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:danishanwar@ti.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:horms@kernel.org,m:m-malladi@ti.com,m:linux-arm-kernel@lists.infradead.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-305402-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[ziepe.ca,marvell.com,gmail.com,grimberg.me,nvidia.com,ionos.com,acm.org,kernel.org,kernel.dk,lst.de,samba.org,talpey.com,brown.name,redhat.com,oracle.com,davemloft.net,google.com,linux.intel.com,meta.com,purestorage.com,vger.kernel.org,lists.infradead.org,lists.samba.org,oss.oracle.com];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,unreal:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,sashiko.dev:url,ti.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DCAFB71A85A
+X-Rspamd-Queue-Id: 7979071A6CC
 
-On Tue, Jul 07, 2026 at 03:20:36AM -0700, Erni Sri Satya Vennela wrote:
-> On Mon, Jul 06, 2026 at 11:49:50AM +0300, Leon Romanovsky wrote:
-> > > ---
-> > >  drivers/infiniband/core/cq.c               |  3 +-
-> > >  drivers/infiniband/hw/qedr/verbs.c         |  2 +-
-> > >  drivers/infiniband/sw/rxe/rxe_qp.c         | 22 +++++-----
-> > >  drivers/infiniband/sw/rxe/rxe_srq.c        | 16 +++----
-> > >  drivers/infiniband/ulp/ipoib/ipoib_cm.c    | 10 ++---
-> > >  drivers/infiniband/ulp/ipoib/ipoib_verbs.c |  3 +-
-> > >  drivers/infiniband/ulp/iser/iser_verbs.c   |  5 +--
-> > >  drivers/infiniband/ulp/isert/ib_isert.c    |  7 ++-
-> > >  drivers/infiniband/ulp/rtrs/rtrs-clt.c     | 11 ++---
-> > >  drivers/infiniband/ulp/rtrs/rtrs-srv.c     | 11 ++---
-> > >  drivers/infiniband/ulp/srp/ib_srp.c        |  2 +-
-> > >  drivers/infiniband/ulp/srpt/ib_srpt.c      | 21 +++++----
-> > >  drivers/nvme/host/rdma.c                   |  8 ++--
-> > >  drivers/nvme/target/rdma.c                 | 22 ++++++----
-> > >  fs/smb/smbdirect/accept.c                  |  5 ++-
-> > >  fs/smb/smbdirect/connect.c                 |  5 ++-
-> > >  fs/smb/smbdirect/connection.c              |  8 ++--
-> > >  include/linux/sunrpc/svc_rdma.h            |  4 +-
-> > >  include/rdma/ib_verbs.h                    | 50 +++++++++++-----------
-> > >  net/rds/ib.c                               | 10 ++---
-> > >  net/rds/ib_cm.c                            | 10 ++---
-> > >  net/sunrpc/xprtrdma/frwr_ops.c             |  7 +--
-> > >  net/sunrpc/xprtrdma/svc_rdma_transport.c   |  5 +--
-> > >  net/sunrpc/xprtrdma/verbs.c                |  2 +-
-> > >  24 files changed, 122 insertions(+), 127 deletions(-)
-> > 
-> > The following code is still missing. 
+On 7/1/26 1:25 PM, MD Danish Anwar wrote:
+> Link-local multicast addresses (01:80:c2:00:00:0x) must only be
+> delivered to the host port (P0) and must not be forwarded out of
+> the physical slave ports. icssg_fdb_add_del() was programming these
+> addresses with P1/P2 membership bits set, causing the firmware to
+> forward them out of slave ports.
 > 
-> I'll make this change in the next version.
+> Clear P1/P2 membership and set only P0 membership when
+> is_link_local_ether_addr() returns true.
 > 
-> >Also, what about mxa_srq?
-> > Why wasn't it converted as well?
+> Fixes: 487f7323f39a ("net: ti: icssg-prueth: Add helper functions to configure FDB")
+> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+> ---
+>  drivers/net/ethernet/ti/icssg/icssg_config.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 > 
-> I originally left max_srq as int because its only consumer pairs it with
-> num_comp_vectors (a signed int) in nvmet_rdma, so keeping it int let
-> that site stay a plain min() instead of a min_t().
-> 
-> num_comp_vectors is the completion-vector count, legitimately int and
-> never anywhere near INT_MAX, so I'd prefer to leave it signed rather
-> than convert it everywhere. Does that work for you, or would you rather
-> num_comp_vectors be converted too?
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
+> index 3f8237c17d099..04a81402e3f3c 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_config.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
+> @@ -732,6 +732,16 @@ int icssg_fdb_add_del(struct prueth_emac *emac, const unsigned char *addr,
+>  	u8 fid = vid;
+>  	int ret;
+>  
+> +	/* Link-local addresses (01:80:c2:00:00:0x) must only be delivered to
+> +	 * the host port (P0). Clear P1/P2 membership to prevent the firmware
+> +	 * from forwarding them out of the physical slave ports.
+> +	 */
+> +	if (is_link_local_ether_addr(addr)) {
+> +		fid_c2 |= ICSSG_FDB_ENTRY_P0_MEMBERSHIP;
+> +		fid_c2 &= ~(ICSSG_FDB_ENTRY_P1_MEMBERSHIP |
+> +			    ICSSG_FDB_ENTRY_P2_MEMBERSHIP);
+> +	}
 
-In this patch no, but it is worth to write this in commit message.
+Sashiko gemeni mentioned it could be safer to reject entirely wrong masks:
 
-Thanks
+https://sashiko.dev/#/patchset/20260701112535.4027920-1-danishanwar%40ti.com
 
-> 
-> If it needs converting, I'll do it as a separate patch, since it lives
-> in a different struct (ib_device) and touches many call sites.
-> Otherwise, using min_t() for just this one call is fine too.
-> 
-> Thanks,
-> Vennela
-> 
-> > 
-> > diff --git a/drivers/infiniband/core/nldev.c b/drivers/infiniband/core/nldev.c
-> > index f599c24b34e8..aae4f3f6bcba 100644
-> > --- a/drivers/infiniband/core/nldev.c
-> > +++ b/drivers/infiniband/core/nldev.c
-> > @@ -454,7 +454,8 @@ static int fill_res_info(struct sk_buff *msg, struct ib_device *device,
-> >         };
-> > 
-> >         struct nlattr *table_attr;
-> > -       int ret, i, curr, max;
-> > +       u64 curr, max;
-> > +       int ret, i;
-> > 
-> >         if (fill_nldev_handle(msg, device))
-> >                 return -EMSGSIZE;
-> > diff --git a/drivers/infiniband/core/restrack.c b/drivers/infiniband/core/restrack.c
-> > index cfee2071586c..1b2f9df49e28 100644
-> > --- a/drivers/infiniband/core/restrack.c
-> > +++ b/drivers/infiniband/core/restrack.c
-> > @@ -61,7 +61,7 @@ void rdma_restrack_clean(struct ib_device *dev)
-> >   * @type: actual type of object to operate
-> >   * @show_details: count driver specific objects
-> >   */
-> > -int rdma_restrack_count(struct ib_device *dev, enum rdma_restrack_type type,
-> > +u32 rdma_restrack_count(struct ib_device *dev, enum rdma_restrack_type type,
-> >                         bool show_details)
-> >  {
-> >         struct rdma_restrack_root *rt = &dev->res[type];
-> > diff --git a/include/rdma/restrack.h b/include/rdma/restrack.h
-> > index 451f99e3717d..c081384740ce 100644
-> > --- a/include/rdma/restrack.h
-> > +++ b/include/rdma/restrack.h
-> > @@ -123,7 +123,7 @@ struct rdma_restrack_entry {
-> >         u32 id;
-> >  };
-> > 
-> > -int rdma_restrack_count(struct ib_device *dev, enum rdma_restrack_type type,
-> > +u32 rdma_restrack_count(struct ib_device *dev, enum rdma_restrack_type type,
-> >                         bool show_details);
-> >  /**
-> >   * rdma_is_kernel_res() - check the owner of resource
+It's not clear to me if the mentioned bad scenario is actually possibly,
+please have a look.
+
+/P
+
 
