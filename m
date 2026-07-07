@@ -1,190 +1,171 @@
-Return-Path: <netdev+bounces-305480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305481-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qlG3F+EHTWp0twEAu9opvQ
-	(envelope-from <netdev+bounces-305480-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 16:06:25 +0200
+	id B/yoDdYFTWq4tgEAu9opvQ
+	(envelope-from <netdev+bounces-305481-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 15:57:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A419571C52C
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 16:06:24 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A95F71C37C
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 15:57:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linutronix.de header.s=2020 header.b=EL18uPI5;
-	dkim=pass header.d=linutronix.de header.s=2020e header.b=p0Ldbksm;
-	dmarc=pass (policy=none) header.from=linutronix.de;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305480-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305480-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=ssi.bg header.s=ssi header.b=aRVnyjvY;
+	dmarc=pass (policy=reject) header.from=ssi.bg;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305481-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305481-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2C70830B840A
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 13:50:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A13FE30D18C0
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 13:52:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCAE9421A05;
-	Tue,  7 Jul 2026 13:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338D5408606;
+	Tue,  7 Jul 2026 13:51:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0103F4DDB;
-	Tue,  7 Jul 2026 13:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B41EA3F4DDB;
+	Tue,  7 Jul 2026 13:51:23 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783432208; cv=none; b=BEMnPWkLGMdw34l5Aof9ViDHJON0fnzJ+iPn8lErqcDyYlLPVASaqJpsG/gW5Uu7z631xv4CUQ/Ml5HERcY5dzm6gtjqRbDeP1ffzIR2YHcA7TFA0LtHLJ9MjsacSWag9Jh/udYjmaT8pG7B45x6Ee79zuSiAUW6ARrJmZJ9SII=
+	t=1783432288; cv=none; b=OiUpJUylyNescsB/hSEFycLseRte5esbQbqIm3VaxknLjjvVu9McJ2YGcyLaoJWHJ4cjMIz+ynnMUNcHWjBeisHj1XkhRXQ2ZB5CIP2jDtINWqRyV95eIZ5A9/byFIMRW27mIhzcK2kZjDzxal6DBuMWT1ShyPEUWVSAvuCDrIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783432208; c=relaxed/simple;
-	bh=q/1713FHlDloKU+P3UhkTohcYgghs28y3PCWNpu/DZ8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ksVo4BQ0pCJEabdrHGEPEGQhnQki2ZemlP7fGBECTR5nlQ+Rchwvn+vID6hfpLu4uVLwuRFRWa3VrAwUtG6EZoO3KgAuTGmI/8RCZjekj3v4ICROuFKkUE7u2385D7BeOgsudZBw0bgjmcpxfqa0SUdpsyAVMXWugDZyv62kZi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=EL18uPI5; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=p0Ldbksm; arc=none smtp.client-ip=193.142.43.55
-From: Nam Cao <namcao@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1783432201;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q/1713FHlDloKU+P3UhkTohcYgghs28y3PCWNpu/DZ8=;
-	b=EL18uPI5Xdsmw6WWUBiUP9SMKaw3dNPSANAqQTiM2m2QquzjrlmrNNsrtznI2b36E7yIzq
-	auXKFQy5pUCMgVSNo7J4x2wxXG7+k6SVwrGuWsJ5OkUu0aZRQSMGO5jPxiOqePm5tTBBlo
-	UPoCKeEeE/c5NQtb7DK9lRIj8kEx1vbBjgmIC3gtfbPUUYDU4uHqXKTSxYFdlSF/N3DKkE
-	BioWWGR1CfPi2ImST9Xk86ItFzQsw0A1OPbxy4+rIB2fguN3bpD+ekqKtN60by50Ne/mN1
-	uQYCaeRhaRNbm6Atzdauvjw4ZJXIVvKOq+fibGkMJv/TwT6PsMbpkzjglZ10Mg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1783432201;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q/1713FHlDloKU+P3UhkTohcYgghs28y3PCWNpu/DZ8=;
-	b=p0LdbksmmtnmoaDRv2u0EgJQwkIU5teucrUlqMuNF42/BhFfgkf4P8nZHKeW0l3g/uGvN1
-	fCSmsSRTInV3VEBQ==
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>, sashiko-reviews@lists.linux.dev,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH 1/2] af_unix: Do not wait for garbage collector in
- sendmsg()
-In-Reply-To: <20260707114225.4oj9SF_0@linutronix.de>
-References: <cover.1782922354.git.namcao@linutronix.de>
- <e663a83195f3d9f6d7ad4907c37ae3e45c151062.1782922354.git.namcao@linutronix.de>
- <20260702163608.0207A1F00A3A@smtp.kernel.org> <87mrw8sjo3.fsf@yellow.woof>
- <CAAVpQUB+LDxRrF66=NKwLAdLN8kt+Hssm_KBc2oc_q6FTJF0VA@mail.gmail.com>
- <87wlvbmgtv.fsf@yellow.woof> <20260707114225.4oj9SF_0@linutronix.de>
-Date: Tue, 07 Jul 2026 15:49:59 +0200
-Message-ID: <871pde3o54.fsf@yellow.woof>
+	s=arc-20240116; t=1783432288; c=relaxed/simple;
+	bh=vxInMY00Jzl3/lr3lH3zr+U2RqbRBBU8wA4aSfKJKHc=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=IlWXGN6bPQ4J5R/jw3IwBOLtJTV85HlLkrFOf30kX6wXhA+ju4ao0/Lnh4ZKldKsyCdEYXc0XSzyUccYgsXsRjBNTMLpjf/IaWASYTG+0IEMJcwHc1dIiNMIznR+2meDWWi+wqcuzKuIhw71OOFGvVt5DTnLCRr1C0/yd+2GRVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=aRVnyjvY; arc=none smtp.client-ip=193.238.174.39
+Received: from mx.ssi.bg (localhost [127.0.0.1])
+	by mx.ssi.bg (Potsfix) with ESMTP id 9030521302;
+	Tue, 07 Jul 2026 16:51:19 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
+	:content-type:content-type:date:from:from:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
+	 bh=VI3pBgOZzhP1av4QcJZuHCeEiA9AJwOZl1ZTj3J6s6I=; b=aRVnyjvYKndf
+	Wn5j9k9AMp/tVUoNhE0mjfPQdiw1gGY3BM1wK5BvC0yQmaBuE8idfDBR7bx/nZnr
+	2R9p8a+sl2oGo/mzHg0w98fb67ZPeDH5AfebmnFodr037ReG1kcxFg6hVz2cSkzk
+	chUbHWNl8k1pxOR/6WBw0fa6tQIy5y4sHkHPu9Mtz0S7V9oZrQlzhesv2JNKGGvq
+	iEysO2/mkZME2ba/E+NqhvV+bET8WgePSQ2vk2mC4PvHBcxTkFiVRa2THE/zeaUz
+	JdKQqdUenqpZuTQY9CKRgsNcyVbHzPpQqXHsXtGBls8xZazG76cfJ2iu8sWY+b7T
+	RRfM6rk+WJ2QRX3YNNMkHmB8TjSAgeDH9Vo8sQY4TRUqvuAhKg791D6aWtiiqabj
+	ITcE4O/4p81Weip24c7GHM2KVOrtLCi8tS1GkN45Ua88Zh9+UdMZ0mioiQNlwF73
+	2+1XTwFnCZaVAeSA1ZZjSP1062X7JpFzush0FlwZCKNf7kzjrkO0uzRKifQvBNZs
+	GtVHvfxVI9rcb3TnVzwa/nWrRmYtUnn13yRMZf7tUqUAAQbGbynK9G6gZzwErmSV
+	velTwRWw9LFDK67bi+epGLUQjeCH3lxFps01ttWT+d7qUpY3OCazjdh32Khfbo6j
+	xIR5kAFkzrqZRixWdkugfSEUKgIl4dI=
+Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
+	by mx.ssi.bg (Potsfix) with ESMTPS;
+	Tue, 07 Jul 2026 16:51:19 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by box.ssi.bg (Potsfix) with ESMTPSA id A9C4F60374;
+	Tue,  7 Jul 2026 16:51:15 +0300 (EEST)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.2/8.18.2) with ESMTP id 667Dp6Hk048186;
+	Tue, 7 Jul 2026 16:51:07 +0300
+Date: Tue, 7 Jul 2026 16:51:06 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+cc: netdev@vger.kernel.org, coreteam@netfilter.org, davem@davemloft.net,
+        edumazet@google.com, fengxw06@126.com, fw@strlen.de,
+        horms@verge.net.au, kuba@kernel.org, linux-kernel@vger.kernel.org,
+        lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        pabeni@redhat.com, pablo@netfilter.org, phil@nwl.cc,
+        qli01@tsinghua.edu.cn, stable@vger.kernel.org, wangao@seu.edu.cn,
+        xuke@tsinghua.edu.cn, yangyx22@mails.tsinghua.edu.cn
+Subject: Re: [PATCH nf v2 0/3] ipvs: use parsed transport offsets in state
+ handlers
+In-Reply-To: <20260706101624.69471-1-zhaoyz24@mails.tsinghua.edu.cn>
+Message-ID: <f1ca1fbd-b8db-a012-3db1-c5aa7d579408@ssi.bg>
+References: <20260706101624.69471-1-zhaoyz24@mails.tsinghua.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
+	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305480-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305481-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER(0.00)[namcao@linutronix.de,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,netfilter.org,davemloft.net,google.com,126.com,strlen.de,verge.net.au,kernel.org,redhat.com,nwl.cc,tsinghua.edu.cn,seu.edu.cn,mails.tsinghua.edu.cn];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,sashiko.dev:url,vger.kernel.org:from_smtp];
+	FORGED_SENDER(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FORGED_RECIPIENTS(0.00)[m:zhaoyz24@mails.tsinghua.edu.cn,m:netdev@vger.kernel.org,m:coreteam@netfilter.org,m:davem@davemloft.net,m:edumazet@google.com,m:fengxw06@126.com,m:fw@strlen.de,m:horms@verge.net.au,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:lvs-devel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:pabeni@redhat.com,m:pablo@netfilter.org,m:phil@nwl.cc,m:qli01@tsinghua.edu.cn,m:stable@vger.kernel.org,m:wangao@seu.edu.cn,m:xuke@tsinghua.edu.cn,m:yangyx22@mails.tsinghua.edu.cn,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:bigeasy@linutronix.de,m:kuniyu@google.com,m:sashiko-reviews@lists.linux.dev,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rt-devel@lists.linux.dev,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linutronix.de:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[ssi.bg:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[namcao@linutronix.de,netdev@vger.kernel.org];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,linutronix.de:from_mime,linutronix.de:email,linutronix.de:dkim,yellow.woof:mid]
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A419571C52C
+X-Rspamd-Queue-Id: 1A95F71C37C
 
-Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
-> On 2026-07-04 08:03:56 [+0200], Nam Cao wrote:
->> Kuniyuki Iwashima <kuniyu@google.com> writes:
->> > your patch makes it much easier to abuse.
->> > UNIX_INFLIGHT_SANE_USER is usually much smaller than
->> > RLIMIT_NOFILE.
->> >
->> > unix_schedule_gc() in sendmsg() is to self-regulate malicious users,
->> > otherwise GC relies on unrelated AF_UNIX socket's close() and could
->> > be triggered too late since GC is system-wide.
->>=20
->> About the abuse, the scenario where inflight sockets bypass
->> UNIX_INFLIGHT_SANE_USER and delay GC until an unrelated AF_UNIX socket
->> closes actually exists today.
->
-> We don't bypass the limit for an ordinary user. That one gets blocked in
-> too_many_unix_fds(). But for the CAP_SYS_RESOURCE + CAP_SYS_ADMIN it is
-> a different story.
-> In that case we cross the UNIX_INFLIGHT_SANE_USER and schedule the GC,
-> it is not delayed. The worker is triggered regularity and the thread
-> waits for its completion it is just the GC worker does not clean up
-> anything so it continues to increase. The only thing that actually
-> limits the sender is if it runs out of socket memory and needs to wait.
 
-That's also my understanding. But tasks that have
-CAP_SYS_RESOURCE|CAP_SYS_ADMIN should be trustworthy to not burn
-system's resources.
+	Hello,
 
-> So it kind of works for a single thread.
->
-> =E2=80=A6
->> To address this properly, we can schedule the GC at task exit. I can
->> include that patch in my series, if that sounds good to you.
->
-> task exit or closing the socket?
+On Mon, 6 Jul 2026, Yizhou Zhao wrote:
 
-I meant task exit, but closing the socket also makes sense because that
-is when dead cyclic reference can appear. However, unless the file
-descriptor's refcount reaches 0, the fs layer will not call us. We could
-change fs/, but I am not sure if we should invade into fs/ just for this
-one.
+> IPVS parses packets into struct ip_vs_iphdr before scheduling and state
+> handling.  For IPv6, iph.len contains the real transport-header offset
+> after ipv6_find_hdr() has skipped any extension headers.
+> 
+> TCP and SCTP state handlers still recompute their own transport offsets.
+> They use sizeof(struct ipv6hdr) for IPv6, so packets with extension
+> headers make the state machines read the wrong bytes.
+> 
+> Pass the parsed transport offset through the common IPVS state handling
+> callback, then use it in the TCP and SCTP state lookups.
+> 
+> Changes in v2:
+> - Pass the parsed transport offset through ip_vs_set_state() and the
+>   protocol callbacks.
+> - Fix TCP state handling as well as SCTP.
+> - Avoid reparsing the skb in SCTP state handling.
+> - Split the common plumbing, TCP fix and SCTP fix into a 3-patch series.
+> 
+> Yizhou Zhao (3):
+>   ipvs: pass parsed transport offset to state handlers
+>   ipvs: use parsed transport offset in TCP state lookup
+>   ipvs: use parsed transport offset in SCTP state lookup
+> 
+>  include/net/ip_vs.h                   |  3 ++-
+>  net/netfilter/ipvs/ip_vs_core.c       | 10 +++++-----
+>  net/netfilter/ipvs/ip_vs_proto_sctp.c | 18 +++++++-----------
+>  net/netfilter/ipvs/ip_vs_proto_tcp.c  | 11 +++--------
+>  net/netfilter/ipvs/ip_vs_proto_udp.c  |  3 ++-
+>  5 files changed, 19 insertions(+), 26 deletions(-)
 
-For the "resource is still consumed indefinitely after task exit" issue,
-then scheduling GC at task exit is good enough.
+	The patchset looks good to me, thanks!
 
-If the task does not exit, those dead cyclic references can sit there
-indefinitely. But this is not really critical as it is capped by
-RLIMIT_NOFILE. Additionally it is impossible to prevent a "malicious"
-task from creating RLIMIT_NOFILE inflight sockets and just leave them
-there.
+Acked-by: Julian Anastasov <ja@ssi.bg>
 
-> Either way, in your PoC it hardly makes any sense to schedule the worker
-> over and over and wait for it since it does not do anything. Sure it is
-> the system as a whole so triggering might make sense but I'm not sure
-> about waiting for its completion.
+	The Sashiko comments need additional fixes:
 
-Agree. For the GC triggering thingy, it is a trade-off between CPU
-consumption and how early garbage gets cleared, so that can arguably
-stay. But the waiting part has to go.
+https://sashiko.dev/#/patchset/20260706101624.69471-1-zhaoyz24%40mails.tsinghua.edu.cn
 
-> Side note: gc_in_progress is redundant since you can't schedule a worker
-> twice and work_pending(&unix_gc_work) would provide the same
-> information. The only difference is that you avoid scheduling the worker
-> while it is running but I don't think this is a problem.
+Regards
 
-Yep. Additionally gc_in_progress is not read/write under any lock, so
-it is possible to read a stale gc_in_progress and the GC gets delayed
-indefinitely. That is already on my todo list, among a few other
-things. But let's get this most important piece done first.
+--
+Julian Anastasov <ja@ssi.bg>
 
-Nam
 
