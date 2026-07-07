@@ -1,229 +1,241 @@
-Return-Path: <netdev+bounces-305275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305276-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id CsFnNceMTGprmAEAu9opvQ
-	(envelope-from <netdev+bounces-305275-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 07:21:11 +0200
+	id z568Jb2STGqzmQEAu9opvQ
+	(envelope-from <netdev+bounces-305276-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 07:46:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CEBD7176D6
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 07:21:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9DFC717904
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 07:46:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Rg7QkQtg;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305275-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305275-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b="q/k/j+Vd";
+	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305276-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305276-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DA6EB301AC11
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 05:21:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 701463064D48
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 05:40:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FEE6381AEF;
-	Tue,  7 Jul 2026 05:21:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C50E4386C15;
+	Tue,  7 Jul 2026 05:39:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB39C2EBB99
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 05:21:06 +0000 (UTC)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.78.106])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E331E386429;
+	Tue,  7 Jul 2026 05:39:10 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783401668; cv=none; b=I5Zin6uJ9rvt5wP272ezDrs2kYJBFI95yNEyy5G7hDIlOtGcjaXT2EKdjagfWhMkXrhJy/0+LnAaX+wlekSqlymr9HRGAbwDJbwqb0+jYwGMZONOduxPm57dqxcQYGBcdMmgLDbF6T8bvq8yvAEm+5zMpCXvkXT0jLAywuTweYU=
+	t=1783402758; cv=none; b=CZYGeEJgMOgUvbflfBPfjb5FRWzpvv5C5QQHfhFSs/VZUuZ5yLLDmizYHkvGFhllk0M1J2L9xRtNNqS9dslp4XP9CW9Xo5TNhgCZriH+HPATffZQfuPEcPhPfHRT8Xxnpxvw1CNF4NwlKp56ASrN18VY46zbBgTWoSXwqJGpObU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783401668; c=relaxed/simple;
-	bh=qXIWHSLyD+fTq5CYIL5RdrArR1kMbF2BZZFtbn1U3K0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WqkGm4XF7H6D4bkgEdKPcZoV2elnocPhbLC6JlraCIin4WE0vNXuhRE9KiLtRJUmjCIPRHcDAQfY0FEBb0j+FYkY6LBLAlYxAbQkmzJHMndmdmqPcT6qnWi2XQwZ73ChuRN+DIVHpX4jGH9doDHc2lKK+GUdloTl0GuIKHgDDHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rg7QkQtg; arc=none smtp.client-ip=209.85.216.42
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-381b831d535so4272289a91.0
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 22:21:06 -0700 (PDT)
+	s=arc-20240116; t=1783402758; c=relaxed/simple;
+	bh=SY4IMC/Ddp2wMdcBI7IRusXV9eWYkEXvUrqXCdfG+fc=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=dwhGqTbEf4I6diQsQzaNu6PMZsP05Gsbp6iH+9L99GddSniaHsgziu9kgKYjW7f+HA26Zepca5xXGOS11uuH9o8hi25lCkHVZoMmna/HNlafb2FIC+Gx67de12ixzi5C15NVtJ9UFzhlb5BfnsjwnLgKfB3WuVaI7I/Af/BHKHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=q/k/j+Vd; arc=none smtp.client-ip=13.76.78.106
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783401666; x=1784006466; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Blyrj+ntsWafQiuA8MTgFjvm/6Vjz++htzHBsCCdax8=;
-        b=Rg7QkQtgjI8Nm7+44hbGHGJGJulxcf6jPFHQ/1LJpWv+N67+zcoi1as/Z+cE8hy71D
-         BoLDbR1QV35x/a3Teznw8eXH9Yio/WEpMtZomgXOnrSZ6tDWl07uhRnMFqqHTFp896Dz
-         crWOVfzqcC27WosYJrRIBjU/3MpgNp0WPpKlvwjWqxkfBAPaGcirR73A4aIZMt6L1ky3
-         8AQFrbr9caACBtoG+PYjVBsg9pqzpjtVISGisaXTvTd8/mmQhno8dRCImmrCAFuWpBt4
-         YGMojhaeXJx5ZR4qcukfD3ApYPPPTxMFob6YU9xgfyfC2/q8dDNmiTQ1UsloixmnwpPn
-         gUtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783401666; x=1784006466;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Blyrj+ntsWafQiuA8MTgFjvm/6Vjz++htzHBsCCdax8=;
-        b=UjD406Z/snhbG16BPxQ0sGQscNd6OiwJ36oLQ/KTRQW+LzRMgukbEozfOvFOapIdmT
-         IeqZaVnE40rScqfa4KoaCqka1WjkHLs8RaY8EMzZV/kg9pdcw5oF/9RB/CAR9UsuER86
-         xG6JIvImIgwjwt/ucioZZBP+SKH+3ggs+ubVhyY1DAX/LXzU6QWc2+B8gS+RnqP7I0uM
-         oFrZJ0wwhvKzcgTCldKgZ6H/T7z/kGHn4bj3u3Fe3OmFXIIuXf3fqajeijoU2nFRzsjJ
-         iKHnJ5eiY+0ZIBNR35f+7r8+Kw7uZOCw7cge7KBGerFgL91DKjCI5KdzmWR7w38jQlAL
-         E9YQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqFavpucIc6DX5LhZwodEAO+0iyeAxUZ1tEnr+O129slePu/Qqhc6hSfqyTW9JYPIg6kN7q6Ec=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxloH1h+3xXlJ2sGHdDHorTazP/vM4K101WI7tiAZ4dGuz2ekxX
-	eWtysKoZgzeWNubGPC8KKVignZXsxZ/5I0s6kmWCVJq1Tir19juG16cX
-X-Gm-Gg: AfdE7cmmMrNEa6s7KCQXj2oEjesgd/l439yoFab1LBojR73lv0z2owFcCHJAWdB7GNU
-	8yC5NJvGYqwfBAjL3FhLdHLka1UJ8/VLhF5mXSPNLBR5L5qcEEwVIaiVc5fUYuHHoLqlNqnQUMK
-	1kiyl3BiCfdDz3UaS9R4RKHQOiL1mEEW1nZWAPC0gj51mhr3Lz7tnyaGRy3fzzP0WVOhJC97ttp
-	wRzg62APgtVDHr9d7cFGogYQvzGXYQ31e9V2GAfCTxOBxQ5x1zkYXFJtWh6+ho9UkZ+IMTXoLpr
-	aJQ7GTPUa5FHHQBxE8z2DZtO9h+IrGoCvuVtqHir14odv5Xwo7KxMEt3I936cEEW3nnSwZ4ReMh
-	ajevHQOHsrb86Xm7fYAqERC2DDREm715czjkS3dug7R72rsUxBW0HROQ+3i1pHtl1Bn+HoJRAx2
-	0bmYf63gnaQ7YfCAIjp8+dwFI91ptYuvQ=
-X-Received: by 2002:a17:90b:2688:b0:37f:caeb:69df with SMTP id 98e67ed59e1d1-38758164244mr3838662a91.22.1783401666109;
-        Mon, 06 Jul 2026 22:21:06 -0700 (PDT)
-Received: from enjou-Legion-Y7000P-2019 ([123.114.53.210])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-387d15f149bsm419814a91.5.2026.07.06.22.21.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jul 2026 22:21:05 -0700 (PDT)
-From: Ren Wei <enjou1224z@gmail.com>
-To: linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: cel@kernel.org,
-	jlayton@kernel.org,
-	neil@brown.name,
-	okorniev@redhat.com,
-	Dai.Ngo@oracle.com,
-	tom@talpey.com,
-	trondmy@kernel.org,
-	anna@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	fuzhen5@huawei.com,
-	yuantan098@gmail.com,
-	dstsmallbird@foxmail.com,
-	enjou1224z@gmail.com,
-	rakukuip@gmail.com
-Subject: [PATCH 1/1] sunrpc: fix use-after-free in __rpc_clnt_handle_event and __rpc_clnt_remove_pipedir
-Date: Tue,  7 Jul 2026 13:20:47 +0800
-Message-ID: <7cc1079bdd86c196d5c714c91df38dfc73aa40b6.1783393213.git.rakukuip@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1783393213.git.rakukuip@gmail.com>
-References: <cover.1783393213.git.rakukuip@gmail.com>
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:Content-Type:
+	Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	Content-Transfer-Encoding:Message-Id:References:To; bh=HKp8jKsDh
+	acYe+U+r45zxu77QLGaXMYgMAaK8XzGGzQ=; b=q/k/j+VdJCH26dQXVLdbqVw2q
+	CRlvaLbEIVhEbjKcpgOUlKSuyWKIOqtMNIaNePn0b5jdb8hqSbKeKYQUw4Y59PrM
+	meEQm3Pq/mntTBo3pUJylvUbuBI6jNQOIwwGQQLURksDZK/m1EFhgucMCAkfDnlo
+	e6ckUPbatU0N2hFAxQ=
+Received: from smtpclient.apple (unknown [101.5.13.242])
+	by web2 (Coremail) with SMTP id yQQGZQDXsprTkExqpkjKAg--.28065S2;
+	Tue, 07 Jul 2026 13:38:28 +0800 (CST)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.8\))
+Subject: Re: [PATCH nf] ipvs: skip IPv6 extension headers in SCTP state lookup
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+In-Reply-To: <bcd7f0e6-b2fc-4e54-f9ac-e1c8b1b0c497@ssi.bg>
+Date: Tue, 7 Jul 2026 13:38:18 +0800
+Cc: netdev@vger.kernel.org,
+ Simon Horman <horms@verge.net.au>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ Florian Westphal <fw@strlen.de>,
+ Phil Sutter <phil@nwl.cc>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ lvs-devel@vger.kernel.org,
+ netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org,
+ linux-kernel@vger.kernel.org,
+ Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+ Ao Wang <wangao@seu.edu.cn>,
+ Xuewei Feng <fengxw06@126.com>,
+ Qi Li <qli01@tsinghua.edu.cn>,
+ Ke Xu <xuke@tsinghua.edu.cn>,
+ stable@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <52493DF7-5590-48A1-B76B-21BBC2401687@mails.tsinghua.edu.cn>
+References: <20260705123040.35755-1-zhaoyz24@mails.tsinghua.edu.cn>
+ <92783c87-7e6a-e90a-b2fc-e5d1332139e0@ssi.bg>
+ <87E04893-B2B2-485F-B242-9CACF2F176D6@mails.tsinghua.edu.cn>
+ <bcd7f0e6-b2fc-4e54-f9ac-e1c8b1b0c497@ssi.bg>
+To: Julian Anastasov <ja@ssi.bg>
+X-Mailer: Apple Mail (2.3826.700.81.1.8)
+X-CM-TRANSID:yQQGZQDXsprTkExqpkjKAg--.28065S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxAryrZry8Kw48KF1UXFyfCrg_yoW5tFWUpa
+	ykKa4fXrZrJrWftwn7GryfXa48Gr1DGry7WrZ5KryfCFn8tr13KFnIk3yYkFZruryqkFy8
+	tFyYva4DZ3Wqy3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9v1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l8cAvFVAK
+	0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4
+	x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2
+	z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4
+	CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E74AGY7Cv6cx26r4r
+	Kr1UJr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc
+	8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVW8ZVWrXwCY02Av
+	z4vE14v_GrWl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8VW8Ww4UJr1UMxC20s
+	026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
+	JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
+	v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
+	j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
+	W8JrUvcSsGvfC2KfnxnUUI43ZEXa7VU1veHPUUUUU==
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQUBAWpMKrKTLgABsG
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305275-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,brown.name,redhat.com,oracle.com,talpey.com,davemloft.net,google.com,huawei.com,gmail.com,foxmail.com];
-	FORGED_RECIPIENTS(0.00)[m:linux-nfs@vger.kernel.org,m:netdev@vger.kernel.org,m:cel@kernel.org,m:jlayton@kernel.org,m:neil@brown.name,m:okorniev@redhat.com,m:Dai.Ngo@oracle.com,m:tom@talpey.com,m:trondmy@kernel.org,m:anna@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:fuzhen5@huawei.com,m:yuantan098@gmail.com,m:dstsmallbird@foxmail.com,m:enjou1224z@gmail.com,m:rakukuip@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[enjou1224z@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305276-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:horms@verge.net.au,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lvs-devel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,m:ja@ssi.bg,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[enjou1224z@gmail.com,netdev@vger.kernel.org];
-	TO_DN_NONE(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,verge.net.au,netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mails.tsinghua.edu.cn:from_mime,mails.tsinghua.edu.cn:dkim,mails.tsinghua.edu.cn:mid,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6CEBD7176D6
+X-Rspamd-Queue-Id: E9DFC717904
 
-From: Luxiao Xu <rakukuip@gmail.com>
+Hi Julian,
 
-Normal client creation goes through rpc_setup_pipedir(), which records
-clnt->pipefs_sb, but the mount-event path in __rpc_clnt_handle_event()
-calls rpc_setup_pipedir_sb() directly and never refreshes that field.
-The umount path also removes the directory without clearing
-clnt->pipefs_sb.
+> On Jul 6, 2026, at 22:17, Julian Anastasov <ja@ssi.bg> wrote:
+>=20
+>=20
+> Hello,
+>=20
+> On Mon, 6 Jul 2026, Yizhou Zhao wrote:
+>=20
+>>> On Jul 6, 2026, at 01:35, Julian Anastasov <ja@ssi.bg> wrote:
+>>>=20
+>>> May be it is better starting from ip_vs_set_state()
+>>> to provide new arg 'int iph_len/offset' (set to iph.len), down to
+>>> state_transition(), sctp_state_transition() and set_sctp_state().
+>>> Same for all protos. It should cost less stack and ipv6_find_hdr()
+>>> calls and what matters most, correct iph context in case we
+>>> have IP+ICMP+TCP (with just two ports or even with TCP flags)
+>>> and are scheduling ICMP, i.e. not IP+TCP as usually.
+>>=20
+>> I agree that the already parsed transport-header offset should be=20
+>> passed from ip_vs_set_state() down to the protocol state_transition()=20=
 
-After a late pipefs mount or any remount, rpc_clnt_remove_pipedir()
-compares the current superblock against a stale pipefs_sb pointer and
-skips cleanup, leaving pipefs dentries whose inode private data still
-points at a freed rpc_clnt, leading to a potential use-after-free during
-subsequent rpc_info_open() or rpc_show_info() calls.
+>> callbacks, instead of reparsing the skb in set_sctp_state(). We will=20=
 
-Fix this by properly updating clnt->pipefs_sb upon mount events and
-clearing it during unmount or failure paths.
+>> send a v2 that does this for SCTP, TCP and the other IPVS protocols=20=
 
-Fixes: bfca5fb4e97c ("SUNRPC: Fix RPC client cleaned up the freed pipefs dentries")
-Cc: stable@vger.kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Xin Liu <dstsmallbird@foxmail.com>
-Reviewed-by: Ren Wei <enjou1224z@gmail.com>
-Assisted-by: Codex:gpt-5.4
-Signed-off-by: Luxiao Xu <rakukuip@gmail.com>
----
- net/sunrpc/clnt.c | 22 +++++++++++++++++-----
- 1 file changed, 17 insertions(+), 5 deletions(-)
+>> in one combined fix.
+>>=20
+>>> But what I see is that ip_vs_in_icmp*() are missing
+>>> the ip_vs_set_state(cp, IP_VS_DIR_INPUT, skb, pd) call just
+>>> after ip_vs_in_stats() and before ip_vs_icmp_xmit() where
+>>> we should provide ciph.len. That is why we don't reach the
+>>> set_tcp_state() calls to set correct cp->state and timeout
+>>> when scheduling related ICMP. So, this should be fixed too.
+>>=20
+>> For the ICMP path, I agree that the missing ip_vs_set_state() call is
+>> worth looking at, but using ICMP errors to drive the upper L4 state=20=
 
-diff --git a/net/sunrpc/clnt.c b/net/sunrpc/clnt.c
-index bc8ca470718b..85fdd8ba94a4 100644
---- a/net/sunrpc/clnt.c
-+++ b/net/sunrpc/clnt.c
-@@ -96,7 +96,10 @@ static void rpc_unregister_client(struct rpc_clnt *clnt)
- 
- static void __rpc_clnt_remove_pipedir(struct rpc_clnt *clnt)
- {
--	rpc_remove_client_dir(clnt);
-+	if (clnt->pipefs_sb) {
-+		rpc_remove_client_dir(clnt);
-+		clnt->pipefs_sb = NULL;
-+	}
- }
- 
- static void rpc_clnt_remove_pipedir(struct rpc_clnt *clnt)
-@@ -177,19 +180,28 @@ static int rpc_clnt_skip_event(struct rpc_clnt *clnt, unsigned long event)
- }
- 
- static int __rpc_clnt_handle_event(struct rpc_clnt *clnt, unsigned long event,
--				   struct super_block *sb)
-+				    struct super_block *sb)
- {
-+	int err = 0;
-+
- 	switch (event) {
- 	case RPC_PIPEFS_MOUNT:
--		return rpc_setup_pipedir_sb(sb, clnt);
-+		clnt->pipefs_sb = sb;
-+		err = rpc_setup_pipedir_sb(sb, clnt);
-+		if (err)
-+			clnt->pipefs_sb = NULL;
-+		break;
- 	case RPC_PIPEFS_UMOUNT:
--		__rpc_clnt_remove_pipedir(clnt);
-+		if (clnt->pipefs_sb == sb) {
-+			__rpc_clnt_remove_pipedir(clnt);
-+			clnt->pipefs_sb = NULL;
-+		}
- 		break;
- 	default:
- 		printk(KERN_ERR "%s: unknown event: %ld\n", __func__, event);
- 		return -ENOTSUPP;
- 	}
--	return 0;
-+	return err;
- }
- 
- static int __rpc_pipefs_event(struct rpc_clnt *clnt, unsigned long event,
--- 
-2.43.0
+>> needs some care, because spoofed ICMP packets can match an=20
+>> existing embedded tuple before the endpoint TCP/SCTP stack=20
+>> performs its own validation. Maybe this change needs further
+>> discussion?
+>=20
+> May be only for the schedule_icmp case while the other
+> ICMP replies should not change it:
+>=20
+> diff --git a/net/netfilter/ipvs/ip_vs_core.c =
+b/net/netfilter/ipvs/ip_vs_core.c
+> index 7f93239898ff..05fdcf4ce2c0 100644
+> --- a/net/netfilter/ipvs/ip_vs_core.c
+> +++ b/net/netfilter/ipvs/ip_vs_core.c
+> @@ -1971,6 +1971,8 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct =
+sk_buff *skb, int *related,
+>=20
+> /* do the statistics and put it back */
+> ip_vs_in_stats(cp, skb);
+> + if (new_cp)
+> + ip_vs_set_state(cp, IP_VS_DIR_INPUT, skb, pd, offset);
+> if (IPPROTO_TCP =3D=3D cih->protocol || IPPROTO_UDP =3D=3D =
+cih->protocol ||
+>    IPPROTO_SCTP =3D=3D cih->protocol)
+> offset +=3D 2 * sizeof(__u16);
+>=20
+> Here is why schedule_icmp was added:
+>=20
+> =
+https://archive.linuxvirtualserver.org/html/lvs-devel/2015-08/msg00015.htm=
+l
+>=20
+> But the inner TCP header should be generated by the
+> real server, not from the client, so things can go wrong. We can
+> leave it as it is now - we will forward the ICMP to the right real=20
+> server by using short conn timeout...
+
+I agree. The embedded TCP/SCTP header in this path may not have the same
+meaning as a normal client packet reaching the virtual service, so I do =
+not
+see a good fix for the ICMP state update part at the moment.
+
+BTW, we have kept the ICMP handling unchanged and submitted a v2 series
+for the parsed transport-offset issue only, following your earlier =
+suggestion
+to pass the already parsed offset from ip_vs_set_state() down to the =
+protocol
+state handlers. The v2 also puts the TCP and SCTP fixes in the same =
+thread:
+
+=
+https://lore.kernel.org/netdev/20260706101624.69471-1-zhaoyz24@mails.tsing=
+hua.edu.cn/
+
+Thanks for the review.
+
+>=20
+> Regards
+>=20
+> --
+> Julian Anastasov <ja@ssi.bg>
+
+Thanks,
+Yizhou=
+
 
