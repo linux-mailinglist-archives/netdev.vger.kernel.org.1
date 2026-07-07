@@ -1,379 +1,312 @@
-Return-Path: <netdev+bounces-305537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305538-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id UNpOBxYzTWrwwQEAu9opvQ
-	(envelope-from <netdev+bounces-305537-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 19:10:46 +0200
+	id ZszvAH8zTWoRwgEAu9opvQ
+	(envelope-from <netdev+bounces-305538-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 19:12:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44BE271E248
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 19:10:45 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F344071E2A1
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 19:12:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=sartura.hr header.s=sartura header.b=Mv31kGbD;
-	dmarc=pass (policy=reject) header.from=sartura.hr;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305537-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305537-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b=FowGZEdZ;
+	dmarc=pass (policy=none) header.from=intel.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305538-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305538-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8D52330EBE28
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 17:05:47 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B740F302FE74
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 17:08:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A9973EB81E;
-	Tue,  7 Jul 2026 17:05:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11237480DDB;
+	Tue,  7 Jul 2026 17:06:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58E1D434E58
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 17:05:44 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783443947; cv=none; b=oySrq/pKV/w1tzT+gJv6rX5MZ/KV04fnn1c1KzwiFtk19mwBhuWJZFm3ZQYeaznlcofb+bs5SzLEu3qj6i2CM6ZAmWk+qjBRSm076JVx1XL1GG8sHf5mSe/w/Rq38BxPC3gllGH9Dk0Tcd/yRe5wkhAgsYg21iJ39JJIVVCKstw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783443947; c=relaxed/simple;
-	bh=oI9mo+kK/dY8LnNtPsTVPnaa5YkRrzSB+3UnGPD2bE4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tBCR6cj7OE7D6N2LnqS5osWexEJzv/Vscb1xxdHui1l8Q95tNJDS13CeTOxTSpsbtk9lOsCOkatdO4GpyPp9pWRXwpmgOTm4EbSTdBXWXoX+XC66FmOfFNAnBt0t/ErGZVUemZFOQZ2uUjUiRch7+HUvscFeA9E1OjoZrXTgJnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=Mv31kGbD; arc=none smtp.client-ip=209.85.221.46
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-471eeac43bfso4726899f8f.3
-        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 10:05:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1783443942; x=1784048742; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=L2AXykctnuSwIgdCxYi80gooQQMlU2MT4Krd1IoiYwg=;
-        b=Mv31kGbDyMZyQNfrhxORs9XGKKYmpNp0+Looj+QIXNLFy/jJVyhm+coCYMZ80ZAto6
-         tp97/hkRrQmqRlSQPOdCMhV3YmPApxzbUL6bJkTsLfPixxSh2lfj+ITs77yoci+AjqmT
-         PCwO00n6WAcoQ11atqv9gneqmQtF3S86m4ByuU1wYHGzp8IujSTBFzoiJeWbs71U49AM
-         4mtEBiEj+aC45W6BWvgE9NY7OLsJicLQZusi+dmBDF/4vW/54Qe2+vCqgygyDf6djF3K
-         zbZ9Gosc4hKRrIr/BOjnbLemmg599I7wc5mb4FRdkMyZk1VyKBOfsJgO0r9iveGKVvWu
-         uc6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783443942; x=1784048742;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L2AXykctnuSwIgdCxYi80gooQQMlU2MT4Krd1IoiYwg=;
-        b=acSYuWTY5QaKuC+QDO0x1LcrzpMoMQpNcVuLTbobEerORG97DytPCTPM+wEDXr5fKa
-         +xmb3WDxjcTc6ce0Er9VSXA3GdB6SAFTlyekffY3V+kqPMHW6Fhn54P97gf3W+S+qX/d
-         b7zrzsXR7xuWxz49OnJdgNWqlfY4HpgtFuYFtv1qFOAqa6QYee5pa73YIBSo2B+RFsyT
-         E0llcK4ORoogyZ01QFGvCEjb3+kbi6SnJ7ZoQmtUCF61xLW4/Gveo396gj1O/nPhzHgS
-         aGjJo7PoYH0I/WXSlgKNtixHwkJiuZwjjPNQsgmLXJzN8WBtSRVmbC/doXaoHXKSYIhC
-         PRaw==
-X-Forwarded-Encrypted: i=1; AHgh+RqNymQ7r3U8kFoB+S/C4PGMNc9DnQ3R1rYOS5u1JbidmiWCg3IGozC5d2qTCfAFGdIBzW6tzYU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxaMb7jG1ySmQZGkEMCxIk+CCdzWRAE5L4amT5XRhCJ/j5IME9w
-	HggBcj1s21QTJ3F73pOz6O7UbzkhqPZ8qf4JtaxefvT2SNndmchDAQcOb/ca1gj/jEk=
-X-Gm-Gg: AfdE7ckRN4zy7+R/yNF6AMQNAsbhWaEf/ByNCbB9XmU/+wWNMnWg15GJR4uBkVq7Vmk
-	QBycTSh7MiYsnigZqpTOmxO4pPUtZf0mGscWXK45/P/JAxAg/E4u6yw6lU6xNBLmC3EK8/Dig/r
-	6Ug+zR6TODA0tHIIDgR8IZrFB3+mIygxyDQPuONys28lbw9jpaiJHEsFgBhdNqgjWxWp+MZPAwz
-	hxO3C7cAW8xgw0vamNkJl5vwG2Gz7mRsWRMMH9cqwiMbKZHXs+RkI2j5lJg4F6jQG9E8gEu9N5/
-	3BsOX1E2sztv1E1Hpt0GWwdoLYdBc3VYrGsKNVD6Zv28p4SxVq0/1mt8AydcZWn6cVP87xNqddV
-	AoVtEqyBPmH1pMhAiWUuwp5dI6pplCaUaD7Cdd9/0MctdMMjPKQiAxi61tX4BpnTuxjCPCUpjrM
-	OAN3q4xVAAFBCysPHt1tyrDQ23McgiCKhKLVRye9wWIWN4BJaoPX1l3bxdgCVKi2tK3pTp/S/Ls
-	vs1y342jw1euoH/Det7a3GSY88DmJoKwRFRY0mMYig=
-X-Received: by 2002:a05:600c:1d1a:b0:493:d078:796 with SMTP id 5b1f17b1804b1-493df092921mr77545585e9.17.1783443942618;
-        Tue, 07 Jul 2026 10:05:42 -0700 (PDT)
-Received: from threadripper-fedora-workstation (dh207-15-57.xnet.hr. [88.207.15.57])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493e54a27cbsm1811395e9.1.2026.07.07.10.05.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jul 2026 10:05:41 -0700 (PDT)
-From: Robert Marko <robert.marko@sartura.hr>
-To: daniel.machon@microchip.com,
-	UNGLinuxDriver@microchip.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Steen.Hegelund@microchip.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: luka.perkov@sartura.hr,
-	Robert Marko <robert.marko@sartura.hr>
-Subject: [PATCH net-next] net: sparx5: configure TAS port link speed
-Date: Tue,  7 Jul 2026 19:04:48 +0200
-Message-ID: <20260707170531.1129866-1-robert.marko@sartura.hr>
-X-Mailer: git-send-email 2.55.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC97477998;
+	Tue,  7 Jul 2026 17:06:31 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783443995; cv=fail; b=WfWH/cRZIW6J8XT/ktRoKE6Zc5k0QL9ynpKxZ1ur9KMLzlBJU13ySUDriYiMX9DwY7jpT+X78epVHqKfUyPN54gJOGrtpCcJnfZ0RRbGfBNf5ECTbhhhLgdtxWRN5mjl/43uo2/OO6H9j1mmxAPuayjDapfrRT4aHHo7Zah1DgI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783443995; c=relaxed/simple;
+	bh=OY61pJto4BXNWnf2kLUj7VpTec8hpQ8XWbUptKS4Ypk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=XXAC+GuBTUvX5m+zQhfSbxFtpbb+KpnGFt0pFkLJZUnWFoWpEVlX+rDedSp25Tk1pI7r4GND6uBOcF0KaRrsxmol8tWJJbthzRPhPh2ThV0mxZE7IFG8C147AQIx5u99HWsu26GRVS3KhndBtHNwcDC5z0COvhi4XtVnS/ePBXI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FowGZEdZ; arc=fail smtp.client-ip=198.175.65.19
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1783443993; x=1814979993;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=OY61pJto4BXNWnf2kLUj7VpTec8hpQ8XWbUptKS4Ypk=;
+  b=FowGZEdZcBJ2CJr0eCARA0RnPUzgC0Msxf/KOdfJpKlnqmIfJzQOm5eM
+   FaiwCIV/oqy/zgnssHSnsv0Sqcvr1kHdAsgcJvTEu+p9bvzoURZ7WxZIo
+   EOUiqD0AQISFzAA4XC1YxTYfuUedl5bk1rn1xkMlsigCrMfatqlED2bR3
+   ARx/wGq/IeIUgaOj/9B2wlfsdcp/+7ytq1P5cKymvxABJ3k2+ebB3imtG
+   eRja5HudBK5fxgmtpjr3yLAuxlstZOD/Z660kAW/FZ3fQ0nVmDdd5YsKs
+   lW3HsIeGN6ZPFR2yS89fCb2DHjKIYxwwG0mQUmAFf+v8DP8UEk6A75a0R
+   A==;
+X-CSE-ConnectionGUID: 7a8godUrRy+IS0Gk+OHk+w==
+X-CSE-MsgGUID: x1PoxcISTimxo/Rro7nLTg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11840"; a="84071409"
+X-IronPort-AV: E=Sophos;i="6.25,153,1779174000"; 
+   d="scan'208";a="84071409"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2026 10:06:25 -0700
+X-CSE-ConnectionGUID: 6siBr/BSQAC8n9/gpphbtw==
+X-CSE-MsgGUID: MEWDUfEcTmydRJTcoQxDgA==
+X-ExtLoop1: 1
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2026 10:06:24 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Tue, 7 Jul 2026 10:06:24 -0700
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43 via Frontend Transport; Tue, 7 Jul 2026 10:06:24 -0700
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.1) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Tue, 7 Jul 2026 10:06:24 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=eRutM1iyGKz4nw66tuGDH9Lk+xcaqy7EepHe/BjH3xz98+urYpU0XzpaXntICSUN5t+bYR2UE8EquMQnS7MJk7wt9dOBGkjKZ5brZFy2TX2+duHl+7H4yt9qgr/c6AyN4giKk6EK/xbcLXXCTUHPWWjcpfXuRC429kUmm0b3kV8ElVd7Stl4cONhvK6YJr6SzuyC2CrWh2iCU5Bx4aGqVTRr6jLMtyCkjrObjvlsryAB3B9SqvqeVRkYIZBcj43a9vDXrAcnt+NdwaF6zGQnusVFb6qVhZWvtAcBzC8i2I445Or8n9vHGcdVroOVYUTdZtb0rm8CiCuPZZj7bPB65Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OY61pJto4BXNWnf2kLUj7VpTec8hpQ8XWbUptKS4Ypk=;
+ b=kPKHyE7N4ygrOkv353dNBP8USYYiIis1bSUKMh8ag6cX7lBWJ05X+fS3PoErdR4Gus323yZPUSBSSuhprSKwE+MsEEBdVbMiNKmTdPaw5bqTm/giBybfmMHq+idg9cX6u28MupAmTIo73VDIog9IHufiFTtPSKsiYAmepQpFXu2PHz6/jIUSmmemmSK40NMUECWlWbIH4S5oZmVu9fBpwee6/nC47QGDFwiPm31D/e/Mk44GrFdtWwQFAa5ignGBFv7FrYycF6CBQzDxlht+alPZMwY8EcFPP13kQC9YIhc1BpYOXTvctyEFWleOGYqnsHEQyfIjIeCfxWfV9fQbTQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SJ1PR11MB6297.namprd11.prod.outlook.com (2603:10b6:a03:458::8)
+ by CH3PR11MB8493.namprd11.prod.outlook.com (2603:10b6:610:1bc::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.9; Tue, 7 Jul 2026
+ 17:06:18 +0000
+Received: from SJ1PR11MB6297.namprd11.prod.outlook.com
+ ([fe80::6f05:5b37:2440:556e]) by SJ1PR11MB6297.namprd11.prod.outlook.com
+ ([fe80::6f05:5b37:2440:556e%3]) with mapi id 15.21.0181.008; Tue, 7 Jul 2026
+ 17:06:15 +0000
+From: "Salin, Samuel" <samuel.salin@intel.com>
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>, Li Li
+	<boolli@google.com>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "David S. Miller"
+	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
+	<edumazet@google.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "David
+ Decotigny" <decot@google.com>, "Singhai, Anjali" <anjali.singhai@intel.com>,
+	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Brian Vazquez
+	<brianvv@google.com>, "Tantilov, Emil S" <emil.s.tantilov@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v4] libie: log more info when
+ virtchnl fails
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v4] libie: log more info when
+ virtchnl fails
+Thread-Index: AQHc2Qlr0TsvaqWpKkKOMvXjj/Fh0rYEzJIAgAPeHACAWgjckA==
+Date: Tue, 7 Jul 2026 17:06:15 +0000
+Message-ID: <SJ1PR11MB6297DC182E3DC6F27136DDAF9BF02@SJ1PR11MB6297.namprd11.prod.outlook.com>
+References: <20260501012507.461044-1-boolli@google.com>
+ <CAODvEq7D75chNgD3h5w0rfa1ZFgca9VEd54sp4Ww999gCed=Aw@mail.gmail.com>
+ <IA3PR11MB8986AF8D9E84A7861B14B3F1E5382@IA3PR11MB8986.namprd11.prod.outlook.com>
+In-Reply-To: <IA3PR11MB8986AF8D9E84A7861B14B3F1E5382@IA3PR11MB8986.namprd11.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ1PR11MB6297:EE_|CH3PR11MB8493:EE_
+x-ms-office365-filtering-correlation-id: d520de60-f247-4e42-2696-08dedc4a0e2f
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|23010399003|1800799024|38070700021|921020|56012099006|4143699003|11063799006|22082099003|18002099003;
+x-microsoft-antispam-message-info: Br7Mm5QhKrhmBgQC3AfsIAqGlBgU1MnQ3SpcbXn4K4sqf1W6x1+BVnrreVOKNw3lInMKEu5uXOaRYrv3xM6HEeVJpSDVWi78HGd/JhQGjzj6gdHfMDzsqHU9asvAmovEhHyvcR7kV/OxQN88zgWkCLRX1sr0TiLtL2xWuJRp+YxQU4IPmtNUQV+wsUYNUQOaIS7al4jINiwcR/AQ1ZeEzJRUQmzMS1SzFMGgoxq/QfO4Dx7oUQkD74dctGT9nz70cE9i8OkyZOvNZjsEYDQ9Jetnc260IRm5iVpuHsL/gNP3VdhucIL488O7XFMrSPFYp/48fHfeFPsyu72MFIXrsLTBqurRMlbWdmYLSTb3c7UWH5rDIi+tasZ9eDs7nbAEj/7OgapELtbeTm63m2JT/xjzTVenHJO5iIW4LgA7BacUWOlowHmArsSG/tQCbUQ2c/cetM65rUYUqzYmrpVOJben+vm5RzPJQYrHClU7lY11nq75bADCfRJgh3cGunGPsyA8xQ3UcnFEbreBXY5e3yW5ed87pWj1dpQaSngTuG1bT9GAut7g3Y+2kFOqSCXeurSL1qaDezhmSIcT8yTBW+ODqx74zs6X2vH+5t8ksZAEClWmK84PYDXenuxPwp3+TGq43eCf7twCP1/aaef33NjhAou/YB1wQAbt4izfeUR3QIGQvehBMEG5qEOeh2WcQEFQqEwTFBrfgUAq6K60c3A0wrVY+vnVqJHlXV4Xq8ECYg9DDe8YTwyGMAGN0pEh
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR11MB6297.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(23010399003)(1800799024)(38070700021)(921020)(56012099006)(4143699003)(11063799006)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?cm9aOStZaFBCaHNCOVhpR2t6Zk5wTU5mVXJicElvWCtCdDhEYTVseFpMa1Ny?=
+ =?utf-8?B?RlEwbFJ0QXdsQStXdGowbjhzSUhNSVF4b21TTXNONEFMZFk1N3cwdVF0R2hO?=
+ =?utf-8?B?UU1qYlNoeis2WjUwajdJYW1hTTdVT3dpdDhQTXV1SVk1TzNoWThnTkRWWTZ1?=
+ =?utf-8?B?ZXdySjZuQytPZmZEYU1zcU1qK2lpK3FTYmdETEVKbDQzMUFBbS84TG84bEtk?=
+ =?utf-8?B?dDVNZGEvWWRiRlhqM1hOQk9IL0hjekMvU3krRVNUeFQ1RlhCc1NSa1FIYk1m?=
+ =?utf-8?B?V21KelpXUy9RT0xYblRDMTFQOThicW16ZndYQUkrQ2lWM0RZTVZ5ZzRUMjVK?=
+ =?utf-8?B?Vi9sNXFDeUFXOTdiNXYxWGN1SVZEMnBnYi9uRVVXNU9mNGtSaWZ6R2ZFNXpW?=
+ =?utf-8?B?TWw3ZFpYdzM2Y1pZTitqcXV0TkFoTTIwMzkvYTVwRTBwYWo5NUtPb2hjOWM4?=
+ =?utf-8?B?V29GcXl4OUdLaVFvZHJxL2w0aTVjSXA2K3drcE9vaXcxei9vTXFrc2pCbnBF?=
+ =?utf-8?B?ck1Sc3RXcDFrSnN0UnVMUi9DZ2tzTXRabENHSXRzVkVBQkVFQmZUWFRMM1E5?=
+ =?utf-8?B?Q3kvd1ZScTBjRXoxZ2V1ZHJiTll1eGo5VlpJdmRWalo1SHN5WVNjODZ0aEor?=
+ =?utf-8?B?Z2FFVzhpMVJsbit3V0JtWHpCWEk5N0E5ai82LytHaG5nMCtneEFYRG9RNUtv?=
+ =?utf-8?B?SzM4bmxMbkZvUTRGUlFrcG1pWVRWMklSWUcrdnpwRmpHTm9kaXR2QVNRamR2?=
+ =?utf-8?B?VGVQOGYxZkVYR1hmb1UybXRYRUkxaTMzWXhJKzg3TS9kYkI5WTNCTmxDVG16?=
+ =?utf-8?B?bHRDa3drSVpjMW9FR05tZlljN3F6RVhIOGZDTzFUN0l3OURmM0IzbFJGaTkr?=
+ =?utf-8?B?WDJyb0pFUGJibWhXa1h0UC9IZU9uUTlYUmJMNTJib3RwMHdXajB4amxzNkor?=
+ =?utf-8?B?Nmdta3B0dDZlMjlNUkYvaUpqc29WZXpwNnpoNytLeXhEbFRDYlh3MWlJMDJY?=
+ =?utf-8?B?MDhTcjU4eW5VUzhpRFhMaTNDNU0xN0FEazI0Q1VZWlFtWEZOVUFhZ090dmls?=
+ =?utf-8?B?dnp2L2NWcDRFUUpMV2p5LzcxbEh3RDZmMDZ0VDhjVmQ4ckpLVVl0dkZMK3V2?=
+ =?utf-8?B?MkNSWDRtK0g1QWdkNzZXekRRQzdMeDNBTzJWU3JOdDZrTnBEdFF3R2tPOFVI?=
+ =?utf-8?B?bVJ1NmduVmRRUXdBcklyUWV0NzlrbE5lSGU3YXVrVWM5MGJoeXhKMEFVZjJu?=
+ =?utf-8?B?MUl0NUQ2c2NBUERyN1BVak93aXRPanEwd3VTRE1TZ2dEeG12ZVhhL1REQ2VT?=
+ =?utf-8?B?S2tLMW1LckVsQTk0L1Brc0RHYndJby91ZUxYVGhGY2pCSmV5eU96ZEgxcEg1?=
+ =?utf-8?B?Z25leGRSVmdHay9RbFhMd3dNWVRwMmtLM2RYUHlNTWdSTlZ6SGdWVzdOL1Bq?=
+ =?utf-8?B?V1RWb1E0dEZUL1RadUZHSjVUVnI2SDUzSUJsbkJPNEV1TVRvS2pzSDV4L1lK?=
+ =?utf-8?B?VnJDWVNqbWJKZm1FbFNiYnRyVk0xUU1ZenhOUDdzQlRXME50OHgwQXJwdS9k?=
+ =?utf-8?B?TCsyYWxhSjlGVjNCWnRDYkJRZlg5ZThuWUMxOVkxL1dvSU9RRmdVN2E5MWRO?=
+ =?utf-8?B?SllNL0lRcHY5dG1nZDB2eGdYNWI1bzUxeVlBb3FUblFBTUdBbDdqRHltVyt0?=
+ =?utf-8?B?SCtqTnVhUk04S2R4NUNIckF5RjZjYjQ0REtQUFJRR1o3eS9wQml5T1l0M3lT?=
+ =?utf-8?B?SnlQRFFjN05qYzFwYk15dEliZmUyQmhWWVRTRThRRmZZVEVRUXNYTXc3Q0ta?=
+ =?utf-8?B?L0NVcmZoT1p3QkIzMjMzMXJ0cHZMaE1sQzR1QitTNXd1Y0drcnR1WktHZy9Q?=
+ =?utf-8?B?YlFKa0VEMHZmRUVxQUNwRnhKVmRvZjVGdjZSVE1JNllFL2VQdTJCK21FNEtX?=
+ =?utf-8?B?WEZIdjcveXlrVEUyYmtQWS9jUEY5MjlXdUxyVXgvcUQxam5WYXBTd0RySURt?=
+ =?utf-8?B?U1cwUGFDSHF4TWRHS084ckNZRC9ydlBYeWVvbllWbjA4NjljMUx5NUduZE41?=
+ =?utf-8?B?TUpXSll5U2VqMThYRk0wam9lZm1saDR1c2Yrd1lLOUw0cm5ySjVnN3dOdVRB?=
+ =?utf-8?B?QUV5dzMyQ3oyU3A3ZTJPVm5halNGRy9RMGU4QjBZcGNPbTB0eVFBNHE3ck9Q?=
+ =?utf-8?B?bEZpWm82R2w5cnRNY3Job0VybndRYzhjRGRMaEkvWGlsOS9SaUVJSm1uRHVM?=
+ =?utf-8?B?NzRjWVVZNGdHNGNHSUFaNGpoVmNHdkRMajh5QXFiMGoxUWd0UW5ycCtHL3da?=
+ =?utf-8?Q?h0+s6CSAv8ZgschtVI?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Exchange-RoutingPolicyChecked: KjI1Np/exOyyubzyi0ZBw9O46rtXiSuXcV/EoziKQc7bOfEUcHSkekniNZtMFHwK3YEj0CRr0iHUKUjCQSwLa51s5uopc6ioF7RhcTo1MOzCUmjY4DvFhgd0f2qilnJg7qv2EK37uTsynDdR50iOYovbRepw/AIEOvKsV4jtqxem3T/kpoRoMUZjJJfJ/e0G0tT5GuNYBtXbiTq1Wt1N8bI1m4JorFKxEmeHqam6BXbuaCk3AbN6lRt0GhE+hW3SndjGzADHPJC9m+8QjxLAU16Ncq1HfJx73NcATo5/H5oGbkCVuMQBdorNgU6hF5gyPZE6kZtBU1aAphb2B/cgFw==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ1PR11MB6297.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d520de60-f247-4e42-2696-08dedc4a0e2f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jul 2026 17:06:15.6286
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: kXqTT0vJKcSztdZ0k7AReljflEYM4jkQYyQ8ijJNUbUM6H+8NGC6bA6NybR2MrMdfHbKXipAhI2Lu/u+3jI5qg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8493
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[sartura.hr,reject];
-	R_DKIM_ALLOW(-0.20)[sartura.hr:s=sartura];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-3.06 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[robert.marko@sartura.hr,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-305537-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305538-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:aleksandr.loktionov@intel.com,m:boolli@google.com,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:decot@google.com,m:anjali.singhai@intel.com,m:sridhar.samudrala@intel.com,m:brianvv@google.com,m:emil.s.tantilov@intel.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:daniel.machon@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:Steen.Hegelund@microchip.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:luka.perkov@sartura.hr,m:robert.marko@sartura.hr,m:andrew@lunn.ch,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[samuel.salin@intel.com,netdev@vger.kernel.org];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[robert.marko@sartura.hr,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[samuel.salin@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[sartura.hr:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,microchip-ung.github.io:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 44BE271E248
+X-Rspamd-Queue-Id: F344071E2A1
 
-On the TSN and RED variants of LAN969x and SparX-5i TAS (Time-Aware Shaper)
-is present in the silicon.
-
-Currently, the driver does not use configure it at all, which means that
-the TAS_PROFILE_CONFIG.LINK_SPEED[1] value is left at the default of 3
-which means that its configured for 1 Gbps.
-
-So, running iperf between two 10G switch ports will result in only 940-ish
-Mbps while we should be getting around 9.3 Gbps.
-
-Correctly populating the TAS_PROFILE_CONFIG.LINK_SPEED[1] with the current
-port speed fixes this issue and we achieve around 9.4 Gbps between two 10G
-switch ports.
-
-So, port the TAS port link speed setting from the vendor BSP 6.18 kernel[2]
-
-[1] https://microchip-ung.github.io/lan969x-industrial_reginfo/reginfo_LAN969x-Industrial.html?select=hsch,tas_profile_cfg,tas_profile_config,link_speed
-[2] https://github.com/microchip-ung/linux/tree/bsp-6.18-2026
-
-Signed-off-by: Robert Marko <robert.marko@sartura.hr>
----
- .../microchip/sparx5/lan969x/lan969x_regs.c   |  3 ++
- .../microchip/sparx5/sparx5_main_regs.h       | 12 +++++
- .../ethernet/microchip/sparx5/sparx5_port.c   |  4 ++
- .../ethernet/microchip/sparx5/sparx5_qos.c    | 49 +++++++++++++++++++
- .../ethernet/microchip/sparx5/sparx5_qos.h    |  1 +
- .../ethernet/microchip/sparx5/sparx5_regs.c   |  3 ++
- .../ethernet/microchip/sparx5/sparx5_regs.h   |  3 ++
- 7 files changed, 75 insertions(+)
-
-diff --git a/drivers/net/ethernet/microchip/sparx5/lan969x/lan969x_regs.c b/drivers/net/ethernet/microchip/sparx5/lan969x/lan969x_regs.c
-index ace4ba21eec4..3fc2c006ba12 100644
---- a/drivers/net/ethernet/microchip/sparx5/lan969x/lan969x_regs.c
-+++ b/drivers/net/ethernet/microchip/sparx5/lan969x/lan969x_regs.c
-@@ -95,6 +95,7 @@ const unsigned int lan969x_gaddr[GADDR_LAST] = {
- 	[GA_HSCH_SYSTEM] = 37384,
- 	[GA_HSCH_MMGT] = 36260,
- 	[GA_HSCH_TAS_CONFIG] = 37696,
-+	[GA_HSCH_TAS_PROFILE_CFG] = 37712,
- 	[GA_PTP_PTP_CFG] = 512,
- 	[GA_PTP_PTP_TOD_DOMAINS] = 528,
- 	[GA_PTP_PHASE_DETECTOR_CTRL] = 628,
-@@ -129,6 +130,7 @@ const unsigned int lan969x_gcnt[GCNT_LAST] = {
- 	[GC_GCB_SIO_CTRL] = 1,
- 	[GC_HSCH_HSCH_CFG] = 1120,
- 	[GC_HSCH_HSCH_DWRR] = 32,
-+	[GC_HSCH_TAS_PROFILE_CFG] = 30,
- 	[GC_PTP_PTP_PINS] = 8,
- 	[GC_PTP_PHASE_DETECTOR_CTRL] = 8,
- 	[GC_REW_PORT] = 35,
-@@ -144,6 +146,7 @@ const unsigned int lan969x_gsize[GSIZE_LAST] = {
- 	[GW_FDMA_FDMA] = 448,
- 	[GW_GCB_CHIP_REGS] = 180,
- 	[GW_HSCH_TAS_CONFIG] = 16,
-+	[GW_HSCH_TAS_PROFILE_CFG] = 68,
- 	[GW_PTP_PHASE_DETECTOR_CTRL] = 12,
- 	[GW_QSYS_PAUSE_CFG] = 988,
- };
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main_regs.h b/drivers/net/ethernet/microchip/sparx5/sparx5_main_regs.h
-index 27d02eea7ce1..15fbfa68bc75 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_main_regs.h
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main_regs.h
-@@ -5369,6 +5369,18 @@ extern const struct sparx5_regs *regs;
- #define HSCH_TAS_STATEMACHINE_CFG_REVISIT_DLY_GET(x)\
- 	FIELD_GET(HSCH_TAS_STATEMACHINE_CFG_REVISIT_DLY, x)
- 
-+/* HSCH:TAS_PROFILE_CFG:TAS_PROFILE_CONFIG */
-+#define HSCH_TAS_PROFILE_CONFIG(g)                                             \
-+	__REG(TARGET_HSCH, 0, 1, regs->gaddr[GA_HSCH_TAS_PROFILE_CFG], g,       \
-+	      regs->gcnt[GC_HSCH_TAS_PROFILE_CFG],                              \
-+	      regs->gsize[GW_HSCH_TAS_PROFILE_CFG], 32, 0, 1, 4)
-+
-+#define HSCH_TAS_PROFILE_CONFIG_LINK_SPEED       GENMASK(10, 8)
-+#define HSCH_TAS_PROFILE_CONFIG_LINK_SPEED_SET(x)\
-+	FIELD_PREP(HSCH_TAS_PROFILE_CONFIG_LINK_SPEED, x)
-+#define HSCH_TAS_PROFILE_CONFIG_LINK_SPEED_GET(x)\
-+	FIELD_GET(HSCH_TAS_PROFILE_CONFIG_LINK_SPEED, x)
-+
- /* LAN969X ONLY */
- /* HSIOWRAP:XMII_CFG:XMII_CFG */
- #define HSIO_WRAP_XMII_CFG(g)                                                  \
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_port.c b/drivers/net/ethernet/microchip/sparx5/sparx5_port.c
-index 62c49893de3c..ef06bed3a9cc 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_port.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_port.c
-@@ -11,6 +11,7 @@
- #include "sparx5_main_regs.h"
- #include "sparx5_main.h"
- #include "sparx5_port.h"
-+#include "sparx5_qos.h"
- 
- #define SPX5_ETYPE_TAG_C     0x8100
- #define SPX5_ETYPE_TAG_S     0x88a8
-@@ -1050,6 +1051,9 @@ int sparx5_port_config(struct sparx5 *sparx5,
- 		 sparx5,
- 		 QFWD_SWITCH_PORT_MODE(port->portno));
- 
-+	/* Notify TAS about the speed. */
-+	sparx5_tas_speed(port, conf->speed);
-+
- 	/* Save the new values */
- 	port->conf = *conf;
- 
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_qos.c b/drivers/net/ethernet/microchip/sparx5/sparx5_qos.c
-index e580670f3992..972da8a71f5a 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_qos.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_qos.c
-@@ -9,6 +9,17 @@
- #include "sparx5_main.h"
- #include "sparx5_qos.h"
- 
-+enum sparx5_tas_link_speed {
-+	TAS_SPEED_NO_GB,
-+	TAS_SPEED_10,
-+	TAS_SPEED_100,
-+	TAS_SPEED_1000,
-+	TAS_SPEED_2500,
-+	TAS_SPEED_5000,
-+	TAS_SPEED_10000,
-+	TAS_SPEED_25000,
-+};
-+
- /* Calculate new base_time based on cycle_time.
-  *
-  * The hardware requires a base_time that is always in the future.
-@@ -581,3 +592,41 @@ int sparx5_tc_ets_del(struct sparx5_port *port)
- 
- 	return sparx5_dwrr_conf_set(port, &dwrr);
- }
-+
-+void sparx5_tas_speed(struct sparx5_port *port, int speed)
-+{
-+	struct sparx5 *sparx5 = port->sparx5;
-+	u8 spd;
-+
-+	switch (speed) {
-+	case SPEED_10:
-+		spd = TAS_SPEED_10;
-+		break;
-+	case SPEED_100:
-+		spd = TAS_SPEED_100;
-+		break;
-+	case SPEED_1000:
-+		spd = TAS_SPEED_1000;
-+		break;
-+	case SPEED_2500:
-+		spd = TAS_SPEED_2500;
-+		break;
-+	case SPEED_5000:
-+		spd = TAS_SPEED_5000;
-+		break;
-+	case SPEED_10000:
-+		spd = TAS_SPEED_10000;
-+		break;
-+	case SPEED_25000:
-+		spd = TAS_SPEED_25000;
-+		break;
-+	default:
-+		netdev_err(port->ndev, "TAS: Unsupported speed: %d\n", speed);
-+		return;
-+	}
-+
-+	spx5_rmw(HSCH_TAS_PROFILE_CONFIG_LINK_SPEED_SET(spd),
-+		 HSCH_TAS_PROFILE_CONFIG_LINK_SPEED,
-+		 sparx5,
-+		 HSCH_TAS_PROFILE_CONFIG(port->portno));
-+}
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_qos.h b/drivers/net/ethernet/microchip/sparx5/sparx5_qos.h
-index 04f76f1e23f6..a92a699c551f 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_qos.h
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_qos.h
-@@ -60,6 +60,7 @@ struct sparx5_dwrr {
- };
- 
- int sparx5_qos_init(struct sparx5 *sparx5);
-+void sparx5_tas_speed(struct sparx5_port *port, int speed);
- 
- /* Multi-Queue Priority */
- int sparx5_tc_mqprio_add(struct net_device *ndev, u8 num_tc);
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_regs.c b/drivers/net/ethernet/microchip/sparx5/sparx5_regs.c
-index 220e81b714d4..3863f954bd83 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_regs.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_regs.c
-@@ -95,6 +95,7 @@ const unsigned int sparx5_gaddr[GADDR_LAST] = {
- 	[GA_HSCH_SYSTEM] = 184000,
- 	[GA_HSCH_MMGT] = 162368,
- 	[GA_HSCH_TAS_CONFIG] = 162384,
-+	[GA_HSCH_TAS_PROFILE_CFG] = 188416,
- 	[GA_PTP_PTP_CFG] = 320,
- 	[GA_PTP_PTP_TOD_DOMAINS] = 336,
- 	[GA_PTP_PHASE_DETECTOR_CTRL] = 420,
-@@ -129,6 +130,7 @@ const unsigned int sparx5_gcnt[GCNT_LAST] = {
- 	[GC_GCB_SIO_CTRL] = 3,
- 	[GC_HSCH_HSCH_CFG] = 5040,
- 	[GC_HSCH_HSCH_DWRR] = 72,
-+	[GC_HSCH_TAS_PROFILE_CFG] = 100,
- 	[GC_PTP_PTP_PINS] = 5,
- 	[GC_PTP_PHASE_DETECTOR_CTRL] = 5,
- 	[GC_REW_PORT] = 70,
-@@ -144,6 +146,7 @@ const unsigned int sparx5_gsize[GSIZE_LAST] = {
- 	[GW_FDMA_FDMA] = 428,
- 	[GW_GCB_CHIP_REGS] = 424,
- 	[GW_HSCH_TAS_CONFIG] = 12,
-+	[GW_HSCH_TAS_PROFILE_CFG] = 64,
- 	[GW_PTP_PHASE_DETECTOR_CTRL] = 8,
- 	[GW_QSYS_PAUSE_CFG] = 1128,
- };
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_regs.h b/drivers/net/ethernet/microchip/sparx5/sparx5_regs.h
-index ea28130c2341..585589a31e90 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_regs.h
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_regs.h
-@@ -104,6 +104,7 @@ enum sparx5_gaddr_enum {
- 	GA_HSCH_SYSTEM,
- 	GA_HSCH_MMGT,
- 	GA_HSCH_TAS_CONFIG,
-+	GA_HSCH_TAS_PROFILE_CFG,
- 	GA_PTP_PTP_CFG,
- 	GA_PTP_PTP_TOD_DOMAINS,
- 	GA_PTP_PHASE_DETECTOR_CTRL,
-@@ -139,6 +140,7 @@ enum sparx5_gcnt_enum {
- 	GC_GCB_SIO_CTRL,
- 	GC_HSCH_HSCH_CFG,
- 	GC_HSCH_HSCH_DWRR,
-+	GC_HSCH_TAS_PROFILE_CFG,
- 	GC_PTP_PTP_PINS,
- 	GC_PTP_PHASE_DETECTOR_CTRL,
- 	GC_REW_PORT,
-@@ -155,6 +157,7 @@ enum sparx5_gsize_enum {
- 	GW_FDMA_FDMA,
- 	GW_GCB_CHIP_REGS,
- 	GW_HSCH_TAS_CONFIG,
-+	GW_HSCH_TAS_PROFILE_CFG,
- 	GW_PTP_PHASE_DETECTOR_CTRL,
- 	GW_QSYS_PAUSE_CFG,
- 	GSIZE_LAST,
--- 
-2.55.0
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSW50ZWwtd2lyZWQtbGFu
+IDxpbnRlbC13aXJlZC1sYW4tYm91bmNlc0Bvc3Vvc2wub3JnPiBPbiBCZWhhbGYgT2YNCj4gTG9r
+dGlvbm92LCBBbGVrc2FuZHINCj4gU2VudDogTW9uZGF5LCBNYXkgMTEsIDIwMjYgMzoxMCBBTQ0K
+PiBUbzogTGkgTGkgPGJvb2xsaUBnb29nbGUuY29tPjsgTmd1eWVuLCBBbnRob255IEwNCj4gPGFu
+dGhvbnkubC5uZ3V5ZW5AaW50ZWwuY29tPjsgS2l0c3plbCwgUHJ6ZW15c2xhdw0KPiA8cHJ6ZW15
+c2xhdy5raXRzemVsQGludGVsLmNvbT47IERhdmlkIFMuIE1pbGxlciA8ZGF2ZW1AZGF2ZW1sb2Z0
+Lm5ldD47DQo+IEpha3ViIEtpY2luc2tpIDxrdWJhQGtlcm5lbC5vcmc+OyBFcmljIER1bWF6ZXQg
+PGVkdW1hemV0QGdvb2dsZS5jb20+Ow0KPiBpbnRlbC13aXJlZC1sYW5AbGlzdHMub3N1b3NsLm9y
+Zw0KPiBDYzogbmV0ZGV2QHZnZXIua2VybmVsLm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVs
+Lm9yZzsgRGF2aWQgRGVjb3RpZ255DQo+IDxkZWNvdEBnb29nbGUuY29tPjsgU2luZ2hhaSwgQW5q
+YWxpIDxhbmphbGkuc2luZ2hhaUBpbnRlbC5jb20+OyBTYW11ZHJhbGEsDQo+IFNyaWRoYXIgPHNy
+aWRoYXIuc2FtdWRyYWxhQGludGVsLmNvbT47IEJyaWFuIFZhenF1ZXoNCj4gPGJyaWFudnZAZ29v
+Z2xlLmNvbT47IFRhbnRpbG92LCBFbWlsIFMgPGVtaWwucy50YW50aWxvdkBpbnRlbC5jb20+DQo+
+IFN1YmplY3Q6IFJlOiBbSW50ZWwtd2lyZWQtbGFuXSBbUEFUQ0ggaXdsLW5leHQgdjRdIGxpYmll
+OiBsb2cgbW9yZSBpbmZvIHdoZW4NCj4gdmlydGNobmwgZmFpbHMNCj4gDQo+IA0KPiANCj4gPiAt
+LS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+IEZyb206IEludGVsLXdpcmVkLWxhbiA8aW50
+ZWwtd2lyZWQtbGFuLWJvdW5jZXNAb3N1b3NsLm9yZz4gT24gQmVoYWxmDQo+ID4gT2YgTGkgTGkg
+dmlhIEludGVsLXdpcmVkLWxhbg0KPiA+IFNlbnQ6IFNhdHVyZGF5LCBNYXkgOSwgMjAyNiAxOjA3
+IEFNDQo+ID4gVG86IE5ndXllbiwgQW50aG9ueSBMIDxhbnRob255Lmwubmd1eWVuQGludGVsLmNv
+bT47IEtpdHN6ZWwsDQo+ID4gUHJ6ZW15c2xhdyA8cHJ6ZW15c2xhdy5raXRzemVsQGludGVsLmNv
+bT47IERhdmlkIFMuIE1pbGxlcg0KPiA+IDxkYXZlbUBkYXZlbWxvZnQubmV0PjsgSmFrdWIgS2lj
+aW5za2kgPGt1YmFAa2VybmVsLm9yZz47IEVyaWMgRHVtYXpldA0KPiA+IDxlZHVtYXpldEBnb29n
+bGUuY29tPjsgaW50ZWwtd2lyZWQtbGFuQGxpc3RzLm9zdW9zbC5vcmcNCj4gPiBDYzogbmV0ZGV2
+QHZnZXIua2VybmVsLm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsgRGF2aWQNCj4g
+PiBEZWNvdGlnbnkgPGRlY290QGdvb2dsZS5jb20+OyBTaW5naGFpLCBBbmphbGkNCj4gPiA8YW5q
+YWxpLnNpbmdoYWlAaW50ZWwuY29tPjsgU2FtdWRyYWxhLCBTcmlkaGFyDQo+ID4gPHNyaWRoYXIu
+c2FtdWRyYWxhQGludGVsLmNvbT47IEJyaWFuIFZhenF1ZXogPGJyaWFudnZAZ29vZ2xlLmNvbT47
+DQo+ID4gVGFudGlsb3YsIEVtaWwgUyA8ZW1pbC5zLnRhbnRpbG92QGludGVsLmNvbT4NCj4gPiBT
+dWJqZWN0OiBSZTogW0ludGVsLXdpcmVkLWxhbl0gW1BBVENIIGl3bC1uZXh0IHY0XSBsaWJpZTog
+bG9nIG1vcmUNCj4gPiBpbmZvIHdoZW4gdmlydGNobmwgZmFpbHMNCj4gPg0KPiA+IEZyaWVuZGx5
+IHBpbmcgb24gdGhpcyBwYXRjaC4NCj4gPg0KPiA+IFBsZWFzZSBsZXQgbWUga25vdyBpZiB5b3Ug
+aGF2ZSBhbnkgcXVlc3Rpb25zIHJlZ2FyZGluZyB0aGlzIHBhdGNoLA0KPiA+IHRoYW5rIHlvdSEN
+Cj4gPg0KPiA+IExpDQo+ID4NCj4gPiBPbiBUaHUsIEFwciAzMCwgMjAyNiBhdCA2OjI14oCvUE0g
+TGkgTGkgPGJvb2xsaUBnb29nbGUuY29tPiB3cm90ZToNCj4gPiA+DQo+ID4gPiBWaXJ0Y2hubCBm
+YWlsdXJlcyBjYW4gYmUgaGFyZCB0byBkZWJ1ZyB3aXRob3V0IGxvZ3MuIExvZ2dpbmcgdGhlDQo+
+ID4gPiBkZXRhaWxzIG9mIHZpcnRjaG5sIHRyYW5zYWN0aW9ucyBjYW4gYmUgdXNlZnVsIGZvciBk
+ZWJ1Z2dpbmcNCj4gPiA+IHZpcnRjaG5sLXJlbGF0ZWQgaXNzdWVzLg0KPiA+ID4NCj4gPiA+IFRl
+c3RlZDogQnVpbHQgJiBib290ZWQgb24gYSB0ZXN0IG1hY2hpbmUgYW5kIHN5bnRoZXRpY2FsbHkg
+cHJvZHVjZWQNCj4gPiBhDQo+ID4gPiB2aXJ0dWFsIGZhaWx1cmUgdG8gcHJvZHVjZSB0aGUgZm9s
+bG93aW5nIGxvZzoNCj4gPiA+DQo+ID4gPiBpZHBmIDAwMDA6MDE6MDAuMDogTm9uLXplcm8gdmly
+dGNobmwgcmV0IHZhbCA2IChtc2cgb3A6IDEsIGRhdGFfbGVuOg0KPiA+ID4gOCk7IHhuIGlkOiAw
+LCBjb29raWU6IDAgaWRwZiAwMDAwOjAxOjAwLjA6IFRyYW5zYWN0aW9uIGZhaWxlZCAob3AgMSwN
+Cj4gPiA+IHhuIHN0YXRlOg0KPiA+ID4gMywgaWQ6IDAsIGNvb2tpZTogMCwgc2l6ZTogOCkNCj4g
+PiA+DQo+ID4gPiBTaWduZWQtb2ZmLWJ5OiBMaSBMaSA8Ym9vbGxpQGdvb2dsZS5jb20+DQo+ID4g
+PiAtLS0NCj4gPiA+IHY0Og0KPiA+ID4gIC0gU2ltcGxpZnkgbG9nZ2luZyB0byByZWR1Y2UgcmVk
+dW5kYW50ICJyZXQgdmFsInMuDQo+ID4gPiAgLSBVc2UgJXUgZm9yIHhuLT5zdGF0ZS4NCj4gPiA+
+IHYzOg0KPiA+ID4gIC0gVXNlIGRldl9lcnJfcmF0ZWxpbWl0ZWQgaW4gYm90aCBsb2dzLg0KPiA+
+ID4gIC0gTW92ZSBsb2cgcGxhY2VtZW50IHRvIGFmdGVyIHZpcnRjaG5sIGZpZWxkIHZhbGlkYXRp
+b24uDQo+ID4gPiAgLSBSZW1vdmUgcmVkdW5kYW50IG9wL2Nvb2tpZSBmaWVsZHMgc2luY2UgdGhl
+eSB3ZXJlIHZhbGlkYXRlZC4NCj4gPiA+IHYyOg0KPiA+ID4gIC0gVXNlIGRldl93YXJuX3JhdGVs
+aW1pdGVkIGluc3RlYWQgb2YgZGV2X25vdGljZV9yYXRlbGltaXRlZCBiYXNlZA0KPiA+IG9uDQo+
+ID4gPiAgICByZXZpZXdlciBmZWVkYmFjay4NCj4gPiA+ICBkcml2ZXJzL25ldC9ldGhlcm5ldC9p
+bnRlbC9saWJpZS9jb250cm9scS5jIHwgMTMgKysrKysrKysrKysrKw0KPiA+ID4gIDEgZmlsZSBj
+aGFuZ2VkLCAxMyBpbnNlcnRpb25zKCspDQo+ID4gPg0KPiA+ID4gZGlmZiAtLWdpdCBhL2RyaXZl
+cnMvbmV0L2V0aGVybmV0L2ludGVsL2xpYmllL2NvbnRyb2xxLmMNCj4gPiA+IGIvZHJpdmVycy9u
+ZXQvZXRoZXJuZXQvaW50ZWwvbGliaWUvY29udHJvbHEuYw0KPiA+ID4gaW5kZXggZWJjMDUzNTVl
+MzlkLi5lMWJjMTlkNmNkYmYgMTAwNjQ0DQo+ID4gPiAtLS0gYS9kcml2ZXJzL25ldC9ldGhlcm5l
+dC9pbnRlbC9saWJpZS9jb250cm9scS5jDQo+ID4gPiArKysgYi9kcml2ZXJzL25ldC9ldGhlcm5l
+dC9pbnRlbC9saWJpZS9jb250cm9scS5jDQo+ID4gPiBAQCAtNzY2LDYgKzc2NiwxNCBAQCBsaWJp
+ZV9jdGxxX3huX3Byb2Nlc3NfcmVjdihzdHJ1Y3QNCj4gPiBsaWJpZV9jdGxxX3huX3JlY3ZfcGFy
+YW1zICpwYXJhbXMsDQo+ID4gPiAgICAgICAgICAgICBtc2dfY29va2llICE9IHhuLT5jb29raWUp
+DQo+ID4gPiAgICAgICAgICAgICAgICAgcmV0dXJuIGZhbHNlOw0KPiA+ID4NCj4gPiA+ICsgICAg
+ICAgaWYgKGN0bHFfbXNnLT5jaG5sX3JldHZhbCkgew0KPiA+ID4gKyAgICAgICAgICAgICAgIGRl
+dl9lcnJfcmF0ZWxpbWl0ZWQoDQo+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICBwYXJhbXMt
+PmN0bHEtPmRldiwNCj4gPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICJOb24temVybyB2aXJ0
+Y2hubCByZXQgdmFsICV1IChtc2cgb3A6ICV1LA0KPiA+IGRhdGFfbGVuOiAldSk7IHhuIGlkOiAl
+dSwgY29va2llOiAldVxuIiwNCj4gPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIGN0bHFfbXNn
+LT5jaG5sX3JldHZhbCwgY3RscV9tc2ctDQo+ID4gPmNobmxfb3Bjb2RlLA0KPiA+ID4gKyAgICAg
+ICAgICAgICAgICAgICAgICAgY3RscV9tc2ctPmRhdGFfbGVuLCB4bi0+aW5kZXgsIHhuLT5jb29r
+aWUpOw0KPiA+ID4gKyAgICAgICB9DQo+ID4gPiArDQo+ID4gPiAgICAgICAgIHNwaW5fbG9jaygm
+eG4tPnhuX2xvY2spOw0KPiA+ID4gICAgICAgICBpZiAoeG4tPnN0YXRlICE9IExJQklFX0NUTFFf
+WE5fQVNZTkMgJiYNCj4gPiA+ICAgICAgICAgICAgIHhuLT5zdGF0ZSAhPSBMSUJJRV9DVExRX1hO
+X1dBSVRJTkcpIHsgQEAgLTEwMTEsNg0KPiA+ICsxMDE5LDExDQo+ID4gPiBAQCBpbnQgbGliaWVf
+Y3RscV94bl9zZW5kKHN0cnVjdCBsaWJpZV9jdGxxX3huX3NlbmRfcGFyYW1zICpwYXJhbXMpDQo+
+ID4gPiAgICAgICAgICAgICAgICAgcGFyYW1zLT5yZWN2X21lbSA9IHhuLT5yZWN2X21lbTsNCj4g
+PiA+ICAgICAgICAgICAgICAgICBicmVhazsNCj4gPiA+ICAgICAgICAgZGVmYXVsdDoNCj4gPiA+
+ICsgICAgICAgICAgICAgICBkZXZfZXJyX3JhdGVsaW1pdGVkKA0KPiA+ID4gKyAgICAgICAgICAg
+ICAgICAgICAgICAgcGFyYW1zLT5jdGxxLT5kZXYsDQo+ID4gPiArICAgICAgICAgICAgICAgICAg
+ICAgICAiVHJhbnNhY3Rpb24gZmFpbGVkIChvcCAldSwgeG4gc3RhdGU6ICV1LA0KPiA+IGlkOiAl
+dSwgY29va2llOiAldSwgc2l6ZTogJXp1KVxuIiwNCj4gPiA+ICsgICAgICAgICAgICAgICAgICAg
+ICAgIHBhcmFtcy0+Y2hubF9vcGNvZGUsIHhuLT5zdGF0ZSwgeG4tPmluZGV4LA0KPiA+IHhuLT5j
+b29raWUsDQo+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICB4bi0+cmVjdl9tZW0uaW92X2xl
+bik7DQo+ID4gPiAgICAgICAgICAgICAgICAgcmV0ID0gLUVCQURNU0c7DQo+ID4gPiAgICAgICAg
+ICAgICAgICAgYnJlYWs7DQo+ID4gPiAgICAgICAgIH0NCj4gPiA+IC0tDQo+ID4gPiAyLjU0LjAu
+NTQ1Lmc2NTM5NTI0Y2EyLWdvb2cNCj4gPiA+DQo+IA0KPiBSZXZpZXdlZC1ieTogQWxla3NhbmRy
+IExva3Rpb25vdiA8YWxla3NhbmRyLmxva3Rpb25vdkBpbnRlbC5jb20+DQoNClRlc3RlZC1ieTog
+U2FtdWVsIFNhbGluIDxTYW11ZWwuc2FsaW5AaW50ZWwuY29tPg0K
 
