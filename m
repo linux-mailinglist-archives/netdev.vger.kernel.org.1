@@ -1,81 +1,124 @@
-Return-Path: <netdev+bounces-305291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305292-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id d6ggDWucTGoenAEAu9opvQ
-	(envelope-from <netdev+bounces-305291-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 08:27:55 +0200
+	id ggaIDYadTGp0nAEAu9opvQ
+	(envelope-from <netdev+bounces-305292-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 08:32:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16623717F14
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 08:27:54 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1B23717FF2
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 08:32:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=altera.com header.s=selector2 header.b=gCTtJ8kg;
-	dmarc=pass (policy=reject) header.from=altera.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305291-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305291-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=intel.com header.s=Intel header.b=MxOTZmCo;
+	dmarc=pass (policy=none) header.from=intel.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305292-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305292-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3B4723001CE8
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 06:27:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0B7AA3001859
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 06:32:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C597839E6F0;
-	Tue,  7 Jul 2026 06:27:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF65B3A6EEC;
+	Tue,  7 Jul 2026 06:32:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011010.outbound.protection.outlook.com [40.107.208.10])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B7BA13A86C;
-	Tue,  7 Jul 2026 06:27:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4606523183F
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 06:32:28 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783405668; cv=fail; b=FliiR8JFehxje/1kB4EcKwvr9by2+oPY8YvWgytLqunzfPQGpaWwyBOvMr7DfhnbPdnkKGOpaNViJTmJbPm1t+SS1OBsUVuA2zMxstwaFbtjytlpgPHTPs96WsxqkrMpLhZpEwOT0CtCHwuTBr1682ttS05BYc9Z/biMt5xvMys=
+	t=1783405951; cv=fail; b=nnEfxLJK/c1FOC4DZwshgYQU9k07GBOdiQuNDeS5RmPo8t6VahnlpepuZ7ZbkL3ucmxRpX5Pz1wxJiWblpciokmAd8dSuK/ISTt2hLrOvJnYr8XKs/1pe9TXx2tP3efDVqERhBV32z1PMhKRfKXzX6Nm/IZ8z6PNfR9GpCsaV9g=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783405668; c=relaxed/simple;
-	bh=cRg6YwgP0IBjafluwQefWP9gqiDfA57ZcytAt/7DpkI=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=QUxCLgPDEXHZ+W8pIPQDnX/EBcaWwffHU/spZco3547r69/3I9UKDZS18qEn+UsPg4OM+Jza2pdBpeSeSykykz74UNZ3WNPpOYdrnGqH3p/G9HjfKLqK21Egn2rxX1XsP3ImhYEHkbrZU/LZ7bFFc7j2qE5E4SDMkzldPkTT+qk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=gCTtJ8kg; arc=fail smtp.client-ip=40.107.208.10
+	s=arc-20240116; t=1783405951; c=relaxed/simple;
+	bh=YciNUKcYYle9WBH93Nuiy671a7wS0+3GYDwKEQw5uhw=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=BsLc8X5qlhE5leTEZfvJFBwOYwLQ95CgMGCj614xEO4GOM0mdZDp60VIOFt7Bprc7R7zvvvo3prjUvE0tn12cuF7xgzvoogZa6BMpcdIT9O6rAXLLGrZ/a/Qj5LHvF8tqpNlrVKPzm5gXXUmiZShR54ZOd7r3rdTVtiNRzbIxZY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MxOTZmCo; arc=fail smtp.client-ip=198.175.65.10
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1783405949; x=1814941949;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=YciNUKcYYle9WBH93Nuiy671a7wS0+3GYDwKEQw5uhw=;
+  b=MxOTZmCoWKaxIUhwEDh6kaSPk/TW5LlXzSV4GlmkcBV1kCo5JjJEaEMG
+   TaukrLF8MrsHB4ZOJgjrT8KMkI0RoibPAPX/TVHijgCGmDcRbO3m7iAyz
+   abqxJH9vhEY6T2AOc73MgUdMZ10wpaA93O1OnfWNu3wA1MNKbITQ4Ox08
+   Yl42iHNzq1506G1/W5MYQReBo+yf7F2JQPoZ7TpSXViVO4NemYhXUoSDO
+   rs9v2cS6GS5b71Dn0q2weMGDNrQUp6lRr1YJTz85vMob0tnxrxcRdD4Xm
+   DJ2Gd9+QcLnvfpBKtHFt+WCGYZ1OktJZaChJ2OmvYB144/mT34BZCXOax
+   A==;
+X-CSE-ConnectionGUID: LZEafVgxTBKwmBGhWie+iA==
+X-CSE-MsgGUID: +RZZXfiMSY2O/vLXa7Kw9w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11839"; a="101470042"
+X-IronPort-AV: E=Sophos;i="6.25,153,1779174000"; 
+   d="scan'208";a="101470042"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2026 23:32:28 -0700
+X-CSE-ConnectionGUID: lq6ET3t0SZewqF6dQLpc0g==
+X-CSE-MsgGUID: m5N7tmPLSOCFtqTZwQlFyw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,153,1779174000"; 
+   d="scan'208";a="257782456"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2026 23:32:28 -0700
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Mon, 6 Jul 2026 23:32:27 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43 via Frontend Transport; Mon, 6 Jul 2026 23:32:27 -0700
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.67)
+ by edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Mon, 6 Jul 2026 23:32:26 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DpMJ96VAH76/aVpo7EyA3r61KPQJB/OHDf3gBf4oe2mNhQatrw94357bY2HduUbCUMOMXzabZjwjrM0FR9eRkRqFQ7pRjkZ4t6e5fMoPQ0CJhqOVeJe2pEzJITDoL0SKiyk+IoTkl4/h3m6RJuyjPcqAU1cp3H0d7pm3GItyj27TMpnOEeZ+3XEU8JN963s2GGmueYSkoKhpWA750l1z66x2rJE+dh5hEA90/eamzz/HuWaB7lSHP9KJ//84jEePKGs6JuvNSag2A4qU9q65hFn41Caz9a95AL5xaEHhy3vL1/6zKb+KJVKr2ajH7PDyN20tqslspl8MbJ+kZvkQUA==
+ b=rE5Dqirvc7xRVtckEwauyrv43sEPpWBV3rS2tzXcVbZo8UwyTJCVVNNVBluTEWlXy16gBvp5ZQ5yCVtDHPURDCbL5K/3cSGBfVMPHg/Sr99Liw08CzCpWRHQRUrXQUAp+7OHqc2V451ramYrFhj9q5m0x+y9wS0SJ6tWvddzbmQ3BNFTtOMqUEc7w3D8wo2oKYdJoxTKqi5gkRkwPxIV1sXfRDsPU0BGSnMNhX4lilJOJJbFTFQB7ox9fddMCd18fOEvWL4o1HnW2VXMBbw17HURKuIwiJdDcNGEwO283jv7i3h4n5JsQCiqnU4L0NWsufp3967bBSnw8mLNfPGEGg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dNDd+3crtArV4qJ9hQ45PWQJWDET7BQkIelN49qwE8s=;
- b=NpZSPhICOq9f9fjXl/SYJ9JQnjXCpBxzwUpE/opHxfEAdpuKzeQ4Lf4hyHA9S/ORU4gOHwqJuJijoCdwXQERcMIyC9b2KmQwhua89XPX0otnVa8xOvLGEIWSwRvJCEZaKr3GhwClhTnD0PbFoDmelbRHNFEXNoBwNKFjmIPvouspnvya4dJ0Lyo/vH0y2KADr/4i5E2EPnKyWqUYFd8uvPl4n6lidMNPF6hjahnv4mhZhjm1jy0LEajfNHtESmwrGGraOWl85/PLQJLPVziwL8b94abhPDlGc0oerrDw6AJOBdMrjsxOw7oxToyS+vEGLi2aM51bcLKKIj1FIaggAg==
+ bh=BC3joOSm+wr9Q2dFhNZgmlIRSAGuGoOLFfMSnzCnG4E=;
+ b=oXpGdHYhyHHm69zj/zmBwF6WyeoeeXVw/EdQwgRnDTZ/gaU3jWRhPIOIq8Qso2+Z8B4hbuTqX0lEf3w/cM9CLI4/dS9npRpyDgEeeeha+xf++fIypdiiJbeRClj5Nz7sHIRRIJOwaF3y/I1C/rMZU1RknQQpuRCuo15Bz+qjecXY3mY1omCLZESNt318TpxgFr+zkGzM8Bu27YwvqaoS60jhmFX6MPlZcRbvIBWPcxcBbv9O3q5+x/hMmSXhgPHiYhAkdl/MGrOydWA8Qb5GYTdAQ2UornABzLR3nH26RmrThxNR+HfQG7ebAK2jMHQCiTFapNYc4MtA5QI9+V/OAw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
- dkim=pass header.d=altera.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dNDd+3crtArV4qJ9hQ45PWQJWDET7BQkIelN49qwE8s=;
- b=gCTtJ8kgtRzREIW6JROVhxP3bbgJJiRHC9VuJxAN+DS8FvXiClkrg7L0GBs4Z4C1YEOzIL20vTZh+PXJk3XM7baMhTKVTRg9P5zhMo4JoNQz3GEOnfMZ5Z7rd5hFIabBLyOYVRaB/ygK5XJ6VRKcntltmyVP/atV4XsqI8duZsgnMnwyNS7oV9Z7OgCkPjJqBiYPNMOhltFcSSFHD5IhTMdeD8+3jGk0FzEeSELbrlVrQaFkvpTDFypbF2Ng6md9N7kNHTHxX76QkiIZ31bJH9OFjOFOLahelEupoyJ3peaJVMgi69lNePaeo/nL2hTim5gCxVrr7vupKAOwj1Al+A==
-Received: from SJ0PR03MB6964.namprd03.prod.outlook.com (2603:10b6:a03:432::18)
- by MW4PR03MB6572.namprd03.prod.outlook.com (2603:10b6:303:12b::9) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB7958.namprd11.prod.outlook.com (2603:10b6:8:f9::19) by
+ SJ2PR11MB8539.namprd11.prod.outlook.com (2603:10b6:a03:56e::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.10; Tue, 7 Jul
- 2026 06:27:37 +0000
-Received: from SJ0PR03MB6964.namprd03.prod.outlook.com
- ([fe80::b965:bfa8:58fb:e775]) by SJ0PR03MB6964.namprd03.prod.outlook.com
- ([fe80::b965:bfa8:58fb:e775%4]) with mapi id 15.21.0181.009; Tue, 7 Jul 2026
- 06:27:37 +0000
-From: muhammad.nazim.amirul.nazle.asmade@altera.com
-To: linux@armlinux.org.uk,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: phylink: reject unsupported speed/duplex in ksettings_set() with PHY
-Date: Mon,  6 Jul 2026 23:27:35 -0700
-Message-ID: <20260707062735.17776-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
-X-Mailer: git-send-email 2.43.7
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR13CA0191.namprd13.prod.outlook.com
- (2603:10b6:a03:2c3::16) To SJ0PR03MB6964.namprd03.prod.outlook.com
- (2603:10b6:a03:432::18)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Tue, 7 Jul 2026
+ 06:32:24 +0000
+Received: from DS0PR11MB7958.namprd11.prod.outlook.com
+ ([fe80::8cb2:cffc:b684:9a99]) by DS0PR11MB7958.namprd11.prod.outlook.com
+ ([fe80::8cb2:cffc:b684:9a99%4]) with mapi id 15.21.0181.009; Tue, 7 Jul 2026
+ 06:32:24 +0000
+Message-ID: <202f6d3a-c29b-491b-979f-1d8223f59108@intel.com>
+Date: Tue, 7 Jul 2026 12:02:11 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/3] drm/drm_ras: Add drm_ras netlink error event
+To: <intel-xe@lists.freedesktop.org>, <aravind.iddamsetty@linux.intel.com>,
+	<kuba@kernel.org>, <rodrigo.vivi@intel.com>
+CC: <anshuman.gupta@intel.com>, <joonas.lahtinen@linux.intel.com>,
+	<simona.vetter@ffwll.ch>, <airlied@gmail.com>, <pratik.bari@intel.com>,
+	<joshua.santosh.ranjan@intel.com>, <ashwin.kumar.kulkarni@intel.com>,
+	<shubham.kumar@intel.com>, <ravi.kishore.koppuravuri@intel.com>,
+	<raag.jadav@intel.com>, <maarten.lankhorst@linux.intel.com>,
+	<mallesh.koujalagi@intel.com>, <soham.purkait@intel.com>, Zack McKevitt
+	<zachary.mckevitt@oss.qualcomm.com>, Lijo Lazar <lijo.lazar@amd.com>,
+	"Hawking Zhang" <Hawking.Zhang@amd.com>, "David S. Miller"
+	<davem@davemloft.net>, "Paolo Abeni" <pabeni@redhat.com>, Eric Dumazet
+	<edumazet@google.com>, <dri-devel@lists.freedesktop.org>,
+	<netdev@vger.kernel.org>
+References: <20260701094409.129131-5-riana.tauro@intel.com>
+ <20260701094409.129131-6-riana.tauro@intel.com>
+Content-Language: en-US
+From: "Tauro, Riana" <riana.tauro@intel.com>
+In-Reply-To: <20260701094409.129131-6-riana.tauro@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MA5PR01CA0134.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a01:1d5::11) To DS0PR11MB7958.namprd11.prod.outlook.com
+ (2603:10b6:8:f9::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,137 +126,447 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ0PR03MB6964:EE_|MW4PR03MB6572:EE_
-X-MS-Office365-Filtering-Correlation-Id: 809fe0a5-05ac-41be-9e54-08dedbf0d60f
-X-MS-Exchange-AtpMessageProperties: SA
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7958:EE_|SJ2PR11MB8539:EE_
+X-MS-Office365-Filtering-Correlation-Id: b74ed545-736a-417b-ae1b-08dedbf18192
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|23010399003|376014|11063799006|56012099006|6133799003|18002099003|55112099003;
-X-Microsoft-Antispam-Message-Info:
-	GMD1GVBxtGw7z7C6AYiWvBD5I61dLVTqU9FaovVNTPzHvQZ06Nwflrl4PKEXEqwwmAhZ9Id9+EXyJHPV1phsmNt2G1kUbBL7RfIh2D7t/UG0Eorq/48+1vKsA8D3jlZ9LpFTYAnVEnqDt8GpYV/O/WRVX8s+jyXzEt9Llkbwzj7Nb9MFvrzv4D6XUGinM8NrADMt98y8D4YYy4uihJECeKjKajK6smqYyM9XCV/lijnRPFZTfr7OSIkIFsURsZM3dwg52Di0EI/SxDfD4gaKYYDYFB+tO0LtIX6NHOL/UgrTxbCXJpJ5gmNJSuonXe6bwIemAEixj5UbMvNHvJe3CPFklmj+PWFOToy1BGMcTEV2ueWxIAOeBzwoMq/SB+ROl1HzitGGA2Gi6OYn/u7XMw39OxLrXZ3xzdPMxdsa48272DNw3iCgH1SCk4kfqTvYYYug6qIFr4NPBUU5MsGZaKa9c6ckUPGAa7ePmh+LeFD2a5n8+ce89Cvd+UctbM/sUJ94nN9RG7AcWJThaK7tmxg1J9JCvDkYZnsYutW3vHfuCK82shPqgeK0+6dA6ZXQjEdxbVm5U5dk+UhSgkUUaDszD3fR3ndz5PjAC2c4jwQ873Z4GcB3qMhicJSYwZYv3HNAlCyW32zBPLFXsGN/4ZjJ7KgFUufN+oH/T3wAyDM=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR03MB6964.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(23010399003)(376014)(11063799006)(56012099006)(6133799003)(18002099003)(55112099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?yh3fAF66zEj3PMLv7e7pddP2v/U9Q5OPHfo/7X0EpxgEc0CtFXD6IYTmJd4b?=
- =?us-ascii?Q?zzN6nGCSrF2aO40Zo6D5rSvyCTjJ4gdVCcu3+l9SMp4v7SginQTEiyrfxYNE?=
- =?us-ascii?Q?Tw7MSoyMiCL1gid9kOHCtOHTIqNkb1F48q18esIt73j1uR9bd1Tmxfd+4XNB?=
- =?us-ascii?Q?/XAU9kNLyevZrzkbTM5hBTcptS1ycEdKOQ/dwRJTBCSDtJUZ1DvCSxKB83Y/?=
- =?us-ascii?Q?yjlfHqXef3OiDOsFqr8YYpQB/mRU9r+2tiWCdf3vJ/EAXTFWqQVWyYIpaHHJ?=
- =?us-ascii?Q?ywFcmYt0weM210auS8kZRW8k9q7Zsxu0qlg8Ytk3fu9hCToihoSnbNxqAUhh?=
- =?us-ascii?Q?g+wZU8f20pzVjtK2AJak3kONFbWO0OjFiD7XSj468V54cWAHIAb9/TXbPRnu?=
- =?us-ascii?Q?eXEGzcOf0g7Aun6ZF1784a0AEmbUHDVT9+ILgDYdmSis6vz+RuxKOLTit3pD?=
- =?us-ascii?Q?G5uw7LlDY8ZBPLmDqYiSqr4do0OqtZIeY3qLAcVCUbRfznk2ikdSNNtw7Dx8?=
- =?us-ascii?Q?CpXca3LQhQQ5QfvhOaCUbVjqy4xJ/2/kYroMR+gK3IMNDKUpEaDpSVaZA7X6?=
- =?us-ascii?Q?D/VmSmM7s3lLX1qSMqVmIUGyLYzXetytg6lOenB4guyqk5+47UmRdJwj4LMx?=
- =?us-ascii?Q?LZJCWl+M/GA1QHEZg5PABr7/Eb66gtDVP2WG8T0itL1bSGNvqdGX1gh9Tept?=
- =?us-ascii?Q?ajRlulZ0LZP+8BFItePMMyjuP9I38h8wrZy4tHFlhqVZ+GOE7/hQRN3Psyij?=
- =?us-ascii?Q?qStskcauZGcJwA8HOSABPdkVQD+coijforjj9WU7iyUOouIk+Xqb5Vwkis17?=
- =?us-ascii?Q?bo2u7kLBAJwk9K93vXSTOA0benmJBupsLqvVY/zYbEH8qJzqG5HkWFtqgpMH?=
- =?us-ascii?Q?uHQtyDqQTwj/bBLi9fk/hA6XUG3jM2fP0sbv61jEjCvMZ5DVGCkf7MIivPXm?=
- =?us-ascii?Q?c+1cyvY9tbPOokunxbjiU7TD0wzw5BcjtU0bmx8aEkBydMzDUyAsSmDwg8Q4?=
- =?us-ascii?Q?bzPESBdqKGpVM9jeYavGRQFn+L96eUcrGZ4YjhJlgv3/u9gGD6+b8YuSeEqZ?=
- =?us-ascii?Q?HhPHR1VoNijSa5JadRDd6qgjDnKyFSiTS9S0s0HzeoEP3rjC+0hJv6EyKiV4?=
- =?us-ascii?Q?PivtOHDamQkSs+JSp4+2JgZwtRXHLMo0VEdvOY7DYxA+dCYsWr20JxYAWniJ?=
- =?us-ascii?Q?a5ETdokFzYZBqMfhaWrp1zak8OoKlpIUsCll1bBy21jFOwFLqK3GV9rgalZ+?=
- =?us-ascii?Q?BH9+YB2uGOdH8d6r4ha1+SAJtqwqh7VqlkLwEkS3yyh1In5SG/XcKScMfmbY?=
- =?us-ascii?Q?SQoDpAK8GTZNQ21+m/LhYVnkjM/NQZ2VKFAikcaWtK7mJMopxHaMyCuToP7p?=
- =?us-ascii?Q?z/x8b7mcczwZLNYznul7m/zsziJy7cPwJvde4Wcb2ZWweg1kzi/qKKYWBOWK?=
- =?us-ascii?Q?KcHwUEzKv414VDXm8ERQe6O+5Bqpd8hZaYAQ5eWehxHF3cns51wykgSTXN3D?=
- =?us-ascii?Q?vpU2PE5eG17CKMOjJN4EnKwVFuWZ2veoLYUcUEA7BZPvWLoZ+BWQMMgM2euH?=
- =?us-ascii?Q?g87UbqotX7k0GXs/cxm8RCq7/gokOKNm8bpXijmA9+iwyiH9yzp8fwnmwJBC?=
- =?us-ascii?Q?Tf5armh1geCsOXb2vbRuXPt/kSMpvPJIH9eMwGFV14DtxBRxh3ZZrz/wEj9A?=
- =?us-ascii?Q?y0UPnkiqq/yylDe/Bmir23jM3NuRA2m8eioiJpBv2KhguSnq/5oeHtqztvh+?=
- =?us-ascii?Q?YAmIbUGG/2yUXm0neW1OScHFiGnPqljyYLHZH3P/BU2EKjuLgpmoIxHAieJs?=
-X-MS-Exchange-AntiSpam-MessageData-1: V+d8hdmbr6RsGA==
-X-OriginatorOrg: altera.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 809fe0a5-05ac-41be-9e54-08dedbf0d60f
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR03MB6964.namprd03.prod.outlook.com
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|23010399003|1800799024|376014|7416014|3023799007|6133799003|11063799006|56012099006|4143699003|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info: TBFe7JGOBPtxyqC1ALqFXjR+rQuyesILMw8z4vnR9kck7j3tBN6ztT/liJws1ty+rdb7Utc2LMcCvPLIo70KwHuDIZqi3fU797Sr2zl+F6nTvg13cVKt+KyTJ2/cN84snsIYT6mSD3KoVUVi4Fi2vTjXYCojgKGZGB3kCFIG5TMxTcVo/jw65O7gxpNz0FPQHjkBBnRVvgi0RLGMg7sjuNgW3WrHn/BUqfbrFutEiZpOBYoHp+ljKhbaDg4CVHx5FrGJMI73LECv9HtjzlxNzdw3k1OZ4ozSY0bzb62I1jTC8rGDLtgkD2GGyEHw3/KhQHrliGzdEExLpC+RHcXxJ1E2ncjUSRvI8h1/EkK/NPlCLKVbZtVC//99pZ3iwvvY6fLt7inJ9z6NvXFeaUTmBn+ZRqFyJV/NU4JyFyk/M89x9vo514iM7GcG06ukK3a1Pz1NKZHDPRT7/Ki3A4e4I4svkKv6ZdUFVr6qfgc0NqOCKFSAiQX/2Q62/likW4aUm2tpMFC2G4arZSmqu/mXnaPOl1NrDw3O7fSPmA432fmjCwY+cx2mEURyUwt8wMhPr0hEIcSF083l94VVSBqMGQ5Jg0rrcFMSnq9gjPoP8LF8x9unKTk0Uep1pyoDHPS7zZ/taDnKr0EYpnrIruKCdwcvfSH+TGTEM06iboSj6mM=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7958.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(1800799024)(376014)(7416014)(3023799007)(6133799003)(11063799006)(56012099006)(4143699003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ajA2cklaWVZ6WXNaNWtiVFNnQlRtYzdsejdsRC8yNzJvdnFsWC90YXJ5VU9C?=
+ =?utf-8?B?cXVsSXVkZFNaY1JGdGR5Rm0yVVZvcUVSUFhkQnFFUDUwaWRqVkZCRTdnd2VR?=
+ =?utf-8?B?L3Btb3VHdXhkRjkvR1QvcE0wTWNMYTJCYlBMM3J2NnlncHZCdmRMektRRnNX?=
+ =?utf-8?B?ZzdlVzdmUkw2SmpkRU1jRnFLbE5ldXZHbkw4Z3RVNDZrVlNKdFNNTmV6dGIr?=
+ =?utf-8?B?TEhSWGJ2aTcyU05Nd2RvMXljQXhKZjdzcm82NFZvL21GdXVLTmRwTlhMQmxP?=
+ =?utf-8?B?NUUyazlZTmdUWUxhcXNhcDZTK0dBWnlYd0wwUXlDR3JlNmI2bm9ETS9mZjdH?=
+ =?utf-8?B?RFY4MGpvSEpHY2EvajZhVE5UU2pLUC9rdlFMenNwNzRkelNzc0xnRUF0MmU1?=
+ =?utf-8?B?K0JMSm1zRllKNnRRSUczT2J3eUJxSW96cWZpZ01tTlB1bEFpNExXdUptRjdi?=
+ =?utf-8?B?TG9OalNFMXlZaEJZckpCUjZMVXV5Q1dBV0RraHQ2a3Y1ZnBvV2NidXZQK1ZI?=
+ =?utf-8?B?b0F1aWtDNFpiYzFCNTdLWnVtbFRqaFpLcXpFYVQ0dVR4eXNqMWRrR1pkajFB?=
+ =?utf-8?B?a2JCU0dmemo4ak1mTDd6NWhHVXozVEMyNzF6c0tSRGpRSTBvY2ZEWi9LMTJ2?=
+ =?utf-8?B?M3dIUXF5RUZvZEZhVjJucGlET1RhdndNMlgzeWVvT1huRG9PVE5oUm9MT1Jz?=
+ =?utf-8?B?WlQ1aUJ2NkhKckZuL252UUVDMFlTblcvby84em5Fa0NUajY0dUxSVXBEdUhi?=
+ =?utf-8?B?QVhzenVjMHdMSnhhRFFlUkxTWnZkWmxHa1RSVVNPN1l1V01IT2FYcXNGb0lt?=
+ =?utf-8?B?Qm4ySnpUelZTVTJIdE9zUkk2eUNmWmJjQ1dHWjdpVHpTck1iNkZETFZOaEtp?=
+ =?utf-8?B?QmdmRm9IY0NhM1R0YmpZUiszVlZHK0NiTEpXeGZKdGR1K0MydFVFQ2gvV2pq?=
+ =?utf-8?B?RUY0OWtHQk1lK3JJbkJsTjNyVzgzUEI3bnZEdmE1QUhoQ0RzYTNmMGFFYWRP?=
+ =?utf-8?B?NHI2MnZENzBGdlhJWk9GMUdDTUdPQUxRNnRoYmVGUy9SbEFHb3pUbjdzd0M4?=
+ =?utf-8?B?TmtUa2o3a0JaK1JGTTZFMzJrcTNIMWNDa09PdExMZEdOdGlMR3R2N0Z6aG95?=
+ =?utf-8?B?S3A4Q05heENiMEdwYWRmSTgrQ2JQVm9aVWVzRC9XYVpabTNibVFYU0t6YUlG?=
+ =?utf-8?B?MEZuMUlJbkY4R1hrUXhoWkZCS0JmQjZBVHpyTnZHQ050aHpJSGkvdUVRbmlJ?=
+ =?utf-8?B?d0VtOSt6eW9lckd0VDM0d3hHVSttZmltNWhrR21DT0Fhd3RGMGZjNVkwdFYy?=
+ =?utf-8?B?Z2p2VXg0bDQwUmFsSk5tS0pvVUdMYldOa003YmF4SmwwVlQybW1Fa2dYRG9q?=
+ =?utf-8?B?Y25vZnI2NWNIWnVKanZWR0w3TGVpUlJhLzY3Rkdob1dKVlRBekF4RGx5bVEz?=
+ =?utf-8?B?MTR4bUFUZTlySnFTa2xDK0xOeFdKQkRTSEdGV1VocmFDYk40aXRkQzZpV3d6?=
+ =?utf-8?B?ZWpBV1RHdytHaitKQWJPdWcwakFzdFFsNXhsekR4MlNVc2xGeFF3L0dCTjEx?=
+ =?utf-8?B?OVBZSlBmNS9USWNhZ3lGK2NoK2RXaFVNRkU0MUQvRTc0WllDT2tjUittekFh?=
+ =?utf-8?B?Z290M1BrbkdBU1FldGFjMUFuVmZjSXlDdlNzbk1vN1R1RDlSUkpnU2c2RlQx?=
+ =?utf-8?B?aFZ6NU9hM2FKTWFSeGhpZEcvNkM2U2VWSnd6SlRHclRCckw5RFk2OEx1VzNR?=
+ =?utf-8?B?a2dQekphTE9HRjJGb0tmOXZNVWhha0RsQWRJaC9IbGhKc2lLZVZLdVFoZ1hy?=
+ =?utf-8?B?eG9Gb3A0RmY2OGFhVWlob0w1U3huYlRJa2JBdU1zY1Z5QjNmNUI0bkJ2QXlB?=
+ =?utf-8?B?VWZvd1M0cnFFQ2REa2t4Q3JHVCtUdG9kelFGV0hHV1MvZ0dGcVg3SkVCc0lN?=
+ =?utf-8?B?bk1VenMxS1lIQ3docEN0L21Qc2FqTFhaVThOY3V2REdzSU8xVVBpRE9OMUZN?=
+ =?utf-8?B?QTBGbUFhRFZuMGZ6Zkp4WCsrM2FQSkY3R2xwbzE3ZU8xTmd3UFBOWjh1bVhY?=
+ =?utf-8?B?ZE80eG9aTEZCYVllWGVpK0lrUWVNak5rS0VhUXY3K1Jlall4c3VKUThvZUxr?=
+ =?utf-8?B?bU9neUJhUHJxaDFIcEpITjg5L2JUbEFvU1FKYjc2ZURJcjNEUWN1TjUwS2dm?=
+ =?utf-8?B?SEU1c0FrK1JKQlNYM21IaURiSWtOQXZSandVMFJ5bS8wbG9aOVBsVlhoTmo0?=
+ =?utf-8?B?cW1uT1BCQ0Vob3F4RzZ0V1pvbmNDdWJsTmhKRVhZUVNuK0tLNHAvU2Y0RVhG?=
+ =?utf-8?B?cDNwZDNUZVVpbW00bTVhV1ZQUzZQZ3F6Ym1vOElMRFpXaE5BKzZIdz09?=
+X-Exchange-RoutingPolicyChecked: cmYwLVWSw8z3iRvBFz/hpZUI9PwxcfHU0TnMtkR0dzGyy/9TQcXEut3yk5BihF7LJDh23EWvOsPg0GmcYmf+IpVXwGydP00gKosHWyNpOot2pG8ox1LiE5roT60X2UhD1SbzsxJXuI1Kv/5EtRHNnQAe6oHnmeLX6+2rPXbuRgd5UmzQDsKNys95Nk9hQDvs5ZMcfuifpsQYMGJD1ObWE7w2aYsNMAC2VTWIAWdHl+Dkmx3xEmaKWDGFwWXErXnmHIMJtaQvvh0U0yqRmMaBvdObvFEQ05ZG5Cl2IZrv20ux64crw4TNruZXjDmlkmNOFOWdi0cK7CQ1ShWdyHNGPw==
+X-MS-Exchange-CrossTenant-Network-Message-Id: b74ed545-736a-417b-ae1b-08dedbf18192
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7958.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2026 06:27:37.2684
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2026 06:32:24.2140
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3+xE3io5O5c4xZTKYA5OrvVnY4xk9asIvihVg4wJcB1dYxm928n1VEA9mozhRMQQZjOVmlmTIiGdBKaOdnmBr+um7w8Vu4P97LubOBgu8LxGqvSkAOa+LuR1Ra4PxbszkLpCHL1HQSVTWWqEQCDYnQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR03MB6572
+X-MS-Exchange-CrossTenant-UserPrincipalName: HGRqfTJgQdlp+cZaJq98vaFr2i7jzdm9uRTs568NsrIkgjwdBQimlKt5z1YlYBzEcxAJOU/w9m4cKzeyrZqeBQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8539
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-3.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[altera.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[altera.com:s=selector2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:linux@armlinux.org.uk,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-305291-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[armlinux.org.uk,lunn.ch,gmail.com];
+	TAGGED_FROM(0.00)[bounces-305292-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[altera.com:+];
-	FROM_NO_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:intel-xe@lists.freedesktop.org,m:aravind.iddamsetty@linux.intel.com,m:kuba@kernel.org,m:rodrigo.vivi@intel.com,m:anshuman.gupta@intel.com,m:joonas.lahtinen@linux.intel.com,m:simona.vetter@ffwll.ch,m:airlied@gmail.com,m:pratik.bari@intel.com,m:joshua.santosh.ranjan@intel.com,m:ashwin.kumar.kulkarni@intel.com,m:shubham.kumar@intel.com,m:ravi.kishore.koppuravuri@intel.com,m:raag.jadav@intel.com,m:maarten.lankhorst@linux.intel.com,m:mallesh.koujalagi@intel.com,m:soham.purkait@intel.com,m:zachary.mckevitt@oss.qualcomm.com,m:lijo.lazar@amd.com,m:Hawking.Zhang@amd.com,m:davem@davemloft.net,m:pabeni@redhat.com,m:edumazet@google.com,m:dri-devel@lists.freedesktop.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	FORGED_SENDER(0.00)[riana.tauro@intel.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[intel.com,linux.intel.com,ffwll.ch,gmail.com,oss.qualcomm.com,amd.com,davemloft.net,redhat.com,google.com,lists.freedesktop.org,vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[riana.tauro@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,altera.com:from_mime,altera.com:email,altera.com:mid,altera.com:dkim]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 16623717F14
+X-Rspamd-Queue-Id: C1B23717FF2
 
-From: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
+Hi Rodrigo/Jakub/Aravind
 
-When using ethtool to change speed and duplex on a phylink-managed
-interface with a PHY attached, the requested speed/duplex combination
-is not validated against the MAC's supported capabilities before being
-passed down to the PHY layer.
+Please let me know if you have any feedback for this patch or can you please
+ack this if it looks good to you.
 
-commit df0acdc59b09 ("net: phylink: fix ksettings_set() ethtool call")
-and commit 03c44a21d033 ("net: phylink: actually fix ksettings_set()
-ethtool call") introduced masking of the PHY advertising modes against
-pl->supported, but did not add an explicit check that the requested
-speed/duplex itself is within the MAC's capability set.
+Thanks
+Riana
 
-The AUTONEG_DISABLE path in the non-PHY case already uses
-phy_caps_lookup() to validate speed/duplex against pl->supported.
-Extend the same validation to the pl->phydev path so that ethtool
-requests for unsupported speed/duplex combinations are rejected with
--EINVAL before reaching the PHY layer.
-
-Signed-off-by: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
----
- drivers/net/phy/phylink.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 087ac63f9193..22f9bbd381bd 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -2989,6 +2989,10 @@ int phylink_ethtool_ksettings_set(struct phylink *pl,
- 	if (pl->phydev) {
- 		struct ethtool_link_ksettings phy_kset = *kset;
- 
-+		if (!phy_caps_lookup(kset->base.speed, kset->base.duplex,
-+				     pl->supported, true))
-+			return -EINVAL;
-+
- 		linkmode_and(phy_kset.link_modes.advertising,
- 			     phy_kset.link_modes.advertising,
- 			     pl->supported);
--- 
-2.43.7
-
+On 01-07-2026 15:14, Riana Tauro wrote:
+> Define a new netlink event 'error-event' and a new multicast group
+> 'error-report' in drm_ras. Each event contains device name, node and
+> error information to identify the error triggering the event.
+>
+> Add drm_ras_nl_error_event() to trigger an event from the driver.
+> Userspace must subscribe to 'error-report' to receive 'error-event'
+> notifications.
+>
+> Usage:
+>
+> $ sudo ynl --family drm_ras --subscribe error-report
+>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Zack McKevitt <zachary.mckevitt@oss.qualcomm.com>
+> Cc: Lijo Lazar <lijo.lazar@amd.com>
+> Cc: Hawking Zhang <Hawking.Zhang@amd.com>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Riana Tauro <riana.tauro@intel.com>
+> Reviewed-by: Raag Jadav <raag.jadav@intel.com>
+> ---
+> v2: remove redundant initialization
+>      remove unnecessary space
+>      use ynl in commit message and doc (Raag)
+>      simplify doc for error-event attrs
+>
+> v3: rename error-notify to error-report
+>      Replace notify with report across the file (Raag)
+> ---
+>   Documentation/gpu/drm-ras.rst            | 21 ++++++
+>   Documentation/netlink/specs/drm_ras.yaml | 48 +++++++++++++
+>   drivers/gpu/drm/drm_ras.c                | 87 ++++++++++++++++++++++++
+>   drivers/gpu/drm/drm_ras_nl.c             |  6 ++
+>   drivers/gpu/drm/drm_ras_nl.h             |  4 ++
+>   include/drm/drm_ras.h                    |  5 ++
+>   include/uapi/drm/drm_ras.h               | 15 ++++
+>   7 files changed, 186 insertions(+)
+>
+> diff --git a/Documentation/gpu/drm-ras.rst b/Documentation/gpu/drm-ras.rst
+> index 83c21853b74b..406e4c49bac1 100644
+> --- a/Documentation/gpu/drm-ras.rst
+> +++ b/Documentation/gpu/drm-ras.rst
+> @@ -56,6 +56,7 @@ User space tools can:
+>     ``node-id`` and ``error-id`` as parameters.
+>   * Clear specific error counters with the ``clear-error-counter`` command, using both
+>     ``node-id`` and ``error-id`` as parameters.
+> +* Subscribe to the ``error-report`` multicast group to receive ``error-event``.
+>   
+>   YAML-based Interface
+>   --------------------
+> @@ -111,3 +112,23 @@ Example: Clear an error counter for a given node
+>   
+>       sudo ynl --family drm_ras --do clear-error-counter --json '{"node-id":0, "error-id":1}'
+>       None
+> +
+> +Example: Subscribe to ``error-report`` multicast group
+> +
+> +.. code-block:: bash
+> +
+> +    sudo ynl --family drm_ras --output-json --subscribe error-report
+> +
+> +.. code-block:: json
+> +
+> +    {
+> +        "name": "error-event",
+> +        "msg": {
+> +            "device-name": "0000:03:00.0",
+> +            "node-id": 1,
+> +            "node-name": "uncorrectable-errors",
+> +            "error-id": 1,
+> +            "error-name": "error_name1",
+> +            "error-value": 1
+> +        }
+> +    }
+> diff --git a/Documentation/netlink/specs/drm_ras.yaml b/Documentation/netlink/specs/drm_ras.yaml
+> index e113056f8c01..8aed3d4515e5 100644
+> --- a/Documentation/netlink/specs/drm_ras.yaml
+> +++ b/Documentation/netlink/specs/drm_ras.yaml
+> @@ -69,6 +69,33 @@ attribute-sets:
+>           name: error-value
+>           type: u32
+>           doc: Current value of the requested error counter.
+> +  -
+> +    name: error-event-attrs
+> +    attributes:
+> +      -
+> +        name: device-name
+> +        type: string
+> +        doc: Device (PCI BDF, UUID) that reported the error.
+> +      -
+> +        name: node-id
+> +        type: u32
+> +        doc: ID of the node that reported the error.
+> +      -
+> +        name: node-name
+> +        type: string
+> +        doc: Name of the node that reported the error.
+> +      -
+> +        name: error-id
+> +        type: u32
+> +        doc: ID of the error counter.
+> +      -
+> +        name: error-name
+> +        type: string
+> +        doc: Name of the error.
+> +      -
+> +        name: error-value
+> +        type: u32
+> +        doc: Current value of the error counter.
+>   
+>   operations:
+>     list:
+> @@ -124,3 +151,24 @@ operations:
+>         do:
+>           request:
+>             attributes: *id-attrs
+> +    -
+> +      name: error-event
+> +      doc: >-
+> +           Report an error event to userspace.
+> +           The event includes the device, node and error information
+> +           of the error that triggered the event.
+> +      attribute-set: error-event-attrs
+> +      mcgrp: error-report
+> +      event:
+> +        attributes:
+> +          - device-name
+> +          - node-id
+> +          - node-name
+> +          - error-id
+> +          - error-name
+> +          - error-value
+> +
+> +mcast-groups:
+> +  list:
+> +    -
+> +      name: error-report
+> diff --git a/drivers/gpu/drm/drm_ras.c b/drivers/gpu/drm/drm_ras.c
+> index d6eab29a1394..77f912a4d101 100644
+> --- a/drivers/gpu/drm/drm_ras.c
+> +++ b/drivers/gpu/drm/drm_ras.c
+> @@ -41,6 +41,11 @@
+>    *    Userspace must provide Node ID, Error ID.
+>    *    Clears specific error counter of a node if supported.
+>    *
+> + * 4. ERROR_REPORT: Subscribe to this multicast group to receive error events
+> + *
+> + * 5. ERROR_EVENT: Report an error event to userspace. The event contains device, node
+> + *    and error information that triggered the event.
+> + *
+>    * Node registration:
+>    *
+>    * - drm_ras_node_register(): Registers a new node and assigns
+> @@ -186,6 +191,34 @@ static int msg_reply_value(struct sk_buff *msg, u32 error_id,
+>   			   value);
+>   }
+>   
+> +static int msg_put_error_event_attrs(struct sk_buff *msg, struct drm_ras_node *node,
+> +				     u32 error_id, const char *error_name, u32 value)
+> +{
+> +	int ret;
+> +
+> +	ret = nla_put_string(msg, DRM_RAS_A_ERROR_EVENT_ATTRS_DEVICE_NAME, node->device_name);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = nla_put_u32(msg, DRM_RAS_A_ERROR_EVENT_ATTRS_NODE_ID, node->id);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = nla_put_string(msg, DRM_RAS_A_ERROR_EVENT_ATTRS_NODE_NAME, node->node_name);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = nla_put_u32(msg, DRM_RAS_A_ERROR_EVENT_ATTRS_ERROR_ID, error_id);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = nla_put_string(msg, DRM_RAS_A_ERROR_EVENT_ATTRS_ERROR_NAME, error_name);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return nla_put_u32(msg, DRM_RAS_A_ERROR_EVENT_ATTRS_ERROR_VALUE, value);
+> +}
+> +
+>   static int doit_reply_value(struct genl_info *info, u32 node_id,
+>   			    u32 error_id)
+>   {
+> @@ -222,6 +255,60 @@ static int doit_reply_value(struct genl_info *info, u32 node_id,
+>   	return genlmsg_reply(msg, info);
+>   }
+>   
+> +/**
+> + * drm_ras_nl_error_event() - Report an error event
+> + * @node: Node structure
+> + * @error_id: ID of the error
+> + * @error_name: Name of the error
+> + * @value: Value associated with the error
+> + * @flags: GFP flags for memory allocation
+> + *
+> + * Report an error-event to userspace using the error-report multicast group.
+> + *
+> + * Return: 0 on success, or negative errno on failure.
+> + */
+> +int drm_ras_nl_error_event(struct drm_ras_node *node, u32 error_id, const char *error_name,
+> +			   u32 value, gfp_t flags)
+> +{
+> +	struct genl_info info;
+> +	struct sk_buff *msg;
+> +	struct nlattr *hdr;
+> +	int ret;
+> +
+> +	if (!error_name)
+> +		return -EINVAL;
+> +
+> +	if (!genl_has_listeners(&drm_ras_nl_family, &init_net, DRM_RAS_NLGRP_ERROR_REPORT))
+> +		return 0;
+> +
+> +	genl_info_init_ntf(&info, &drm_ras_nl_family, DRM_RAS_CMD_ERROR_EVENT);
+> +
+> +	msg = genlmsg_new(NLMSG_GOODSIZE, flags);
+> +	if (!msg)
+> +		return -ENOMEM;
+> +
+> +	hdr = genlmsg_iput(msg, &info);
+> +	if (!hdr) {
+> +		ret = -EMSGSIZE;
+> +		goto free_msg;
+> +	}
+> +
+> +	ret = msg_put_error_event_attrs(msg, node, error_id, error_name, value);
+> +	if (ret)
+> +		goto cancel_msg;
+> +
+> +	genlmsg_end(msg, hdr);
+> +	genlmsg_multicast(&drm_ras_nl_family, msg, 0, DRM_RAS_NLGRP_ERROR_REPORT, flags);
+> +	return 0;
+> +
+> +cancel_msg:
+> +	genlmsg_cancel(msg, hdr);
+> +free_msg:
+> +	nlmsg_free(msg);
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL(drm_ras_nl_error_event);
+> +
+>   /**
+>    * drm_ras_nl_get_error_counter_dumpit() - Dump all Error Counters
+>    * @skb: Netlink message buffer
+> diff --git a/drivers/gpu/drm/drm_ras_nl.c b/drivers/gpu/drm/drm_ras_nl.c
+> index dea1c1b2494e..9d3123cc9f9c 100644
+> --- a/drivers/gpu/drm/drm_ras_nl.c
+> +++ b/drivers/gpu/drm/drm_ras_nl.c
+> @@ -58,6 +58,10 @@ static const struct genl_split_ops drm_ras_nl_ops[] = {
+>   	},
+>   };
+>   
+> +static const struct genl_multicast_group drm_ras_nl_mcgrps[] = {
+> +	[DRM_RAS_NLGRP_ERROR_REPORT] = { "error-report", },
+> +};
+> +
+>   struct genl_family drm_ras_nl_family __ro_after_init = {
+>   	.name		= DRM_RAS_FAMILY_NAME,
+>   	.version	= DRM_RAS_FAMILY_VERSION,
+> @@ -66,4 +70,6 @@ struct genl_family drm_ras_nl_family __ro_after_init = {
+>   	.module		= THIS_MODULE,
+>   	.split_ops	= drm_ras_nl_ops,
+>   	.n_split_ops	= ARRAY_SIZE(drm_ras_nl_ops),
+> +	.mcgrps		= drm_ras_nl_mcgrps,
+> +	.n_mcgrps	= ARRAY_SIZE(drm_ras_nl_mcgrps),
+>   };
+> diff --git a/drivers/gpu/drm/drm_ras_nl.h b/drivers/gpu/drm/drm_ras_nl.h
+> index a398643572a5..03ec275aca92 100644
+> --- a/drivers/gpu/drm/drm_ras_nl.h
+> +++ b/drivers/gpu/drm/drm_ras_nl.h
+> @@ -21,6 +21,10 @@ int drm_ras_nl_get_error_counter_dumpit(struct sk_buff *skb,
+>   int drm_ras_nl_clear_error_counter_doit(struct sk_buff *skb,
+>   					struct genl_info *info);
+>   
+> +enum {
+> +	DRM_RAS_NLGRP_ERROR_REPORT,
+> +};
+> +
+>   extern struct genl_family drm_ras_nl_family;
+>   
+>   #endif /* _LINUX_DRM_RAS_GEN_H */
+> diff --git a/include/drm/drm_ras.h b/include/drm/drm_ras.h
+> index 0beede3ddc4e..8abfb7d2077b 100644
+> --- a/include/drm/drm_ras.h
+> +++ b/include/drm/drm_ras.h
+> @@ -80,9 +80,14 @@ struct drm_device;
+>   #if IS_ENABLED(CONFIG_DRM_RAS)
+>   int drm_ras_node_register(struct drm_ras_node *node);
+>   void drm_ras_node_unregister(struct drm_ras_node *node);
+> +int drm_ras_nl_error_event(struct drm_ras_node *node, u32 error_id, const char *error_name,
+> +			   u32 value, gfp_t flags);
+>   #else
+>   static inline int drm_ras_node_register(struct drm_ras_node *node) { return 0; }
+>   static inline void drm_ras_node_unregister(struct drm_ras_node *node) { }
+> +static inline int drm_ras_nl_error_event(struct drm_ras_node *node, u32 error_id,
+> +					 const char *error_name, u32 value, gfp_t flags)
+> +{ return 0; }
+>   #endif
+>   
+>   #endif
+> diff --git a/include/uapi/drm/drm_ras.h b/include/uapi/drm/drm_ras.h
+> index 218a3ee86805..eab8231aa87c 100644
+> --- a/include/uapi/drm/drm_ras.h
+> +++ b/include/uapi/drm/drm_ras.h
+> @@ -38,13 +38,28 @@ enum {
+>   	DRM_RAS_A_ERROR_COUNTER_ATTRS_MAX = (__DRM_RAS_A_ERROR_COUNTER_ATTRS_MAX - 1)
+>   };
+>   
+> +enum {
+> +	DRM_RAS_A_ERROR_EVENT_ATTRS_DEVICE_NAME = 1,
+> +	DRM_RAS_A_ERROR_EVENT_ATTRS_NODE_ID,
+> +	DRM_RAS_A_ERROR_EVENT_ATTRS_NODE_NAME,
+> +	DRM_RAS_A_ERROR_EVENT_ATTRS_ERROR_ID,
+> +	DRM_RAS_A_ERROR_EVENT_ATTRS_ERROR_NAME,
+> +	DRM_RAS_A_ERROR_EVENT_ATTRS_ERROR_VALUE,
+> +
+> +	__DRM_RAS_A_ERROR_EVENT_ATTRS_MAX,
+> +	DRM_RAS_A_ERROR_EVENT_ATTRS_MAX = (__DRM_RAS_A_ERROR_EVENT_ATTRS_MAX - 1)
+> +};
+> +
+>   enum {
+>   	DRM_RAS_CMD_LIST_NODES = 1,
+>   	DRM_RAS_CMD_GET_ERROR_COUNTER,
+>   	DRM_RAS_CMD_CLEAR_ERROR_COUNTER,
+> +	DRM_RAS_CMD_ERROR_EVENT,
+>   
+>   	__DRM_RAS_CMD_MAX,
+>   	DRM_RAS_CMD_MAX = (__DRM_RAS_CMD_MAX - 1)
+>   };
+>   
+> +#define DRM_RAS_MCGRP_ERROR_REPORT	"error-report"
+> +
+>   #endif /* _UAPI_LINUX_DRM_RAS_H */
 
