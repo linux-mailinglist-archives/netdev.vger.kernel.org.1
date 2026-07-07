@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-305364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305365-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id EM2EOxnGTGonpgEAu9opvQ
-	(envelope-from <netdev+bounces-305364-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 11:25:46 +0200
+	id IyasI1TETGqXpQEAu9opvQ
+	(envelope-from <netdev+bounces-305365-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 11:18:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50447719BAF
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 11:25:45 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BEAE719A0C
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 11:18:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=XVx8VmDX;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="N/w1nAY2";
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305364-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305364-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305365-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305365-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C961A3129DC9
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 09:11:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 30B55306A53F
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 09:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF4B03955F4;
-	Tue,  7 Jul 2026 09:11:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C12AE39657B;
+	Tue,  7 Jul 2026 09:11:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B1C39524E
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 09:11:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000E7391512
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 09:11:22 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783415482; cv=none; b=AvW0czQn8LXTblnV7mVG7tsd5P+ptNlZQBFpfy4KCgTL77xATRmXjju2WzK3zjhLi9sncAslO6Blu57n61Nez/lbFDThvFwVlehWeB5e/NJgV4kXm5/l8VLKSvWhcmlMcVMJ12E8fMBQ8LYzFNYCMzzp5Mek8XxovVi7ZfNPhmY=
+	t=1783415485; cv=none; b=EVMVEye4176r20sDbarkLVqBcRraJt8oTu3QNpm+9N1Z+Pil/5bA6ktoc2bo03/tw+kFNBSxnKG28nv3Es8zRUpn2sTLf2UkKeaVEeLqWHoCME7gGIA/0QKiAnLXYnCAd+Q//jAtOaC24oiR1u7ciebLM29RERIG+k4Z350cH4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783415482; c=relaxed/simple;
-	bh=LwGdfVE6zCNMfNmWNHYheA/PzogaUt5+b/oAPBRLVHo=;
+	s=arc-20240116; t=1783415485; c=relaxed/simple;
+	bh=YBNEZ0JuBYpp39J19uIA6JD+g8DwilN2ygweuBY+Wvc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uzACKRRN5AGQJJW8h+uR1q+VuEvaVC/dtQV+YcdLL3MLnn8snQF+2fY1Q67dUGX5ikdGwumcSgs2G9PjnYwNeks8Zxm3DFBcwJYHUQ+uR8gcWHihi9iS19a90efeb7zM7uhVEMMovv7lC9O5QaNBYFYN/tID9Y+3CSTjSfpOAXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XVx8VmDX; arc=none smtp.client-ip=209.85.208.43
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-6974a6e54dbso6058369a12.2
-        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 02:11:21 -0700 (PDT)
+	 MIME-Version; b=I1R7FtWxri4SERyhNx8gAdZK36YqmOGxzZujqu07QrRZ7K+atlFp6Gu9RiSMcZh7e/VLSo3ZjgbaHWKyj5Z/wzug+Jqy1e1ICSTj5SQcmeEnfMeQWOPvFmA/rm1k25tIrJEfoN2cpBlDeI5udayxIGjzQgPxiX/bL+n1Nvp6vls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N/w1nAY2; arc=none smtp.client-ip=209.85.208.54
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-698aa7ba3e6so6812437a12.1
+        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 02:11:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783415479; x=1784020279; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783415481; x=1784020281; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=017gAsipokr31hcEOs9r+XS73NV9N5N3+SvjZqA1EbI=;
-        b=XVx8VmDXH0Hs7kW8toIo8uufVGYvgCrAZfFRzPimBYfUefqmKvGBL5/4APTSmFqd/l
-         hPBmgd+SO2J3Yv47ZVmOjlJfVOGC0TOiuPa8i5ZLfxCdvob5IsoWLPirsJzv0fE/OH2/
-         QyARwi68gRWoUcEfY9kB8Fj0pd07GY2uDB+bxV8ek5IbGMCvjpCRL6fXeb3QFinysdAl
-         wPCEXv0ey/sszQ+0U+RAbaHjK9dEDVHEqDi5kATDWUwoxr4zELcsQE1qpX/ejNZeW368
-         xkW4GNQV15UYP1DA8tWX0WQ29mO8dfDRuSH3A5AfvjOel1IdCuvoXxdBpEcatO4NWpJZ
-         HoXA==
+         :message-id:reply-to;
+        bh=1ab4D2p/3Z+QNLOMIvIrg+NC0XFgS2lOf5VtGliLMbQ=;
+        b=N/w1nAY2yQOsx7RdrILWrIFBBO3VoguSM2c3VRV2k9KxGeGPN26eyIC7RXxSokqwCK
+         SMI3ZGh7pFU2ducfiGxGNGjtcUAlMaNnO8Zx+ReOJTpeSAZKHiVqwpKOzdkOQ43+9lR2
+         P0rs2uqFhQikOJE3XMIo/YGe6CRb9iqBfAdtYILL1RNys8o4rbqMQG0x+Lyodf2FwJA+
+         7wejT7MfoLLTjQzN3nVYkWRP/ydur5+4pL/6MAcO0BhoGQ3cnpnandE+Fw9S1yilysEz
+         DDr2ruBn5W6j4i+vlcXa6i6FcYzsBhsVllRIK25YKdYomw+NakM53Gy/reZfLW6R6OZ/
+         hrCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783415479; x=1784020279;
+        d=1e100.net; s=20251104; t=1783415481; x=1784020281;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=017gAsipokr31hcEOs9r+XS73NV9N5N3+SvjZqA1EbI=;
-        b=n6Gpj+OVEFcZgHH5iehDqwwYQ3gg0O94Zc/LUhUicbOpdO/4CCvVpgDIzrCaq44dHQ
-         iWVEgtTywBfdI48ociq0dzHBqviTBCtJhvBM4j6B/qMTMgUjTGwFosEoT5MMKYcdmD79
-         /NaATZT68+Yr74RzypgPDAncaeRvpYPsruTd8NgUQ3vImGliUKoCNquOeshl4fut98Aq
-         Z9g2iA0dcpQUPlxxsKzdpqTewyPPwKJnW7yRTyXlvD1XylIyUd6qb+EtmZJqHNrrVc1L
-         tvbGnOXnlxLrKYKxIDO1IF1fGCTBdoTCZt/PuFLIsQP6Io52nFY3jXvzU7oKyEZ37ZFj
-         CN8g==
-X-Gm-Message-State: AOJu0YwKwvNHZ8fgUth9tt2RF3p3/ZSWhneLgl62pshEwzhetFZjov7g
-	NvAqmCoxy7NGxFX4ol9XMx6I+MuSW0biL9acZTTG6bSjrH30UWipnhag
-X-Gm-Gg: AfdE7ckBsvkqiZU2bvvJWUGFcOinp5xjKdZWjytp8a3cEUnRbpqDMGLmOCvj2CE+L55
-	oTq4zjMXNA4gvrRppHndszDqc3/gM5IPxnVNXXanjQ8AMU1mmkvfdGUNFlRRhqXXwGHGyRfBEC7
-	T2dNZadz4yzr/xsqZnpooqVoyERg+fHjbS6/v/NX+2u8ADAe3giky8oKBhJ1bBGpmr3nRTLwwjC
-	4ZCcLrC/Xq3eQm9gmkpRpNStwVIL+e8ggstO+E2jbi/Jmced6WA/RihrZd7sXMDeogEqcbmJQcx
-	b5wij4MlYAjEaFI/Yv82cbEnprwewEE184Tqjo7ZO92gMEIJJ2yMuDc25hjZKjBqfJ7D64iJoTe
-	LxJrG0W9FOEYcitP4CUhBI6jzOjA3Vq386fW5G8qdxQC4RYZ3iUzsIzIw27RAGLT5+aDX6sNX4L
-	T/nc/UKB4ip0+YRnOnTXfr9PmYHXkkN0rIn4bnwdVTcqAM609Rbd4MIAHKLSgsxv3DhdPqi+z/n
-	dxeZ/a79Fy0yx6nOshu4ZBvMQvShADZe0M4JY0YP21nMvbyeGihYXs=
-X-Received: by 2002:aa7:c588:0:b0:698:be56:d7cf with SMTP id 4fb4d7f45d1cf-69a85bb21cfmr1640778a12.16.1783415479480;
-        Tue, 07 Jul 2026 02:11:19 -0700 (PDT)
+         :to:cc:subject:date:message-id:reply-to;
+        bh=1ab4D2p/3Z+QNLOMIvIrg+NC0XFgS2lOf5VtGliLMbQ=;
+        b=MwYa4ySVUXYh2NjbfFRhU6wPn/M5ZHH/QbF7IhhUyGHs8Oas+8k5dwAbutrAirr5MF
+         FMNukDlVth2Ho44+sck4MikyMxkt+U09NrLBiTJKhOuU3o3N+vrOfznvN+g2SUoE1g2j
+         cqregZ7xEUh2Nm0m+hwmvxerroShkFy0ih1ulcMoXR8TYm+vSMEYHzMzHrUX4SiIQ3ag
+         Cz6ZuBNzToqif4x6Z9S4Fi0zwtm7jflb42AKDIdQK3eSqi18n/0ylSMap0IfREWZ4QsY
+         HhIGHNVaEtMOmZze2HR0tN0QLw4Ddx3QVp8DGLUOMLW/evhIXo88AtVPYWj6RDIsHMZj
+         K1FA==
+X-Gm-Message-State: AOJu0YxpW2T9UKbdFIwG4n1Jfce2lr7OXBAJ6Yael18sGHuy3it1eCXE
+	EKjrj5p7SOu0MfzS/rqHRnUnDZ7a+06LE5Ey5AdvGhxF1ke9U5KhTTfC
+X-Gm-Gg: AfdE7cmnf8Qjt55l+OsU8tqiDLhCc1CzC69hKatlmDZiKO1i0F4LCHaCVOXS1B/4KTp
+	KwZ/Cid+rR0ab/KlmzkidDltVeYvR+/tohx4wqYxjV16WWRndr+QYKtGvwfOvS5nYBvAgTbzutB
+	m5yP15Tx/ym84Yiaqjz7uWubMIGAjtjCeaLw8guiJ9ivaTn6uS6ICP0qM3upz0ZahSPHd5i0szD
+	blgTG4AJanJOb8lWGGEJW05K2wzM9CSu8c6JfJXyAlFpkpsS8FXN6d0YzPljxoCaiQfWQCXGXgu
+	cy5ZNJshWH8+lhefFCfvxyD2CuDfVPvlcvloZXyQkxDWjg8VhvZ4YLf6DkGXpYR5gBYp515VsRx
+	/oCon53bA7XcK0OORTLZ5JA0UMqCB+7vJF8tT4Oh3EHrrGULxURIqi9vk+vls0yhyFUjmvAW39m
+	SBSq5lt5A9NZD6zsIfVGPW9ErNrZSw0x/RdRxxgREmGBHhecigv5NRjCTU7ZJqo4lOGubv011BD
+	1mypUjbfmp6yLwEe3voy80FwbAoyNm7aGWJLmeZsRJX
+X-Received: by 2002:a05:6402:1d55:b0:698:e595:a5c with SMTP id 4fb4d7f45d1cf-69a85651f63mr2079368a12.6.1783415481357;
+        Tue, 07 Jul 2026 02:11:21 -0700 (PDT)
 Received: from eric (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-69a19cd87d6sm5297152a12.6.2026.07.07.02.11.18
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-69a19cd87d6sm5297152a12.6.2026.07.07.02.11.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jul 2026 02:11:19 -0700 (PDT)
+        Tue, 07 Jul 2026 02:11:20 -0700 (PDT)
 From: Eric Woudstra <ericwouds@gmail.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -98,9 +98,9 @@ Cc: netdev@vger.kernel.org,
 	netfilter-devel@vger.kernel.org,
 	bridge@lists.linux.dev,
 	Eric Woudstra <ericwouds@gmail.com>
-Subject: [PATCH v12 nf-next 4/7] netfilter: nf_flow_table_inet: Add nf_flowtable_type flowtable_bridge
-Date: Tue,  7 Jul 2026 11:10:42 +0200
-Message-ID: <20260707091045.967678-5-ericwouds@gmail.com>
+Subject: [PATCH v12 nf-next 5/7] netfilter: nft_flow_offload: nft_flow_offload_eval: check thoff==0
+Date: Tue,  7 Jul 2026 11:10:43 +0200
+Message-ID: <20260707091045.967678-6-ericwouds@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260707091045.967678-1-ericwouds@gmail.com>
 References: <20260707091045.967678-1-ericwouds@gmail.com>
@@ -118,12 +118,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305364-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305365-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,netfilter.org,strlen.de,nwl.cc,blackwall.org,nvidia.com,gmail.com,uwaterloo.ca];
 	FORGED_SENDER(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
@@ -143,66 +143,50 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,blackwall.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 50447719BAF
+X-Rspamd-Queue-Id: 0BEAE719A0C
 
-This will allow a flowtable to be added to the nft bridge family.
+In case of flow through bridge, when evaluating traffic with double vlan,
+pppoe and pppoe-in-q. In this case thoff will be valid only when meta has
+been processed. If meta was not processed in nftables, thoff is zero.
 
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
 ---
- net/netfilter/nf_flow_table_inet.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ net/netfilter/nft_flow_offload.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/net/netfilter/nf_flow_table_inet.c b/net/netfilter/nf_flow_table_inet.c
-index b0f1991719324..80b238196f29b 100644
---- a/net/netfilter/nf_flow_table_inet.c
-+++ b/net/netfilter/nf_flow_table_inet.c
-@@ -65,6 +65,16 @@ static int nf_flow_rule_route_inet(struct net *net,
- 	return err;
- }
+diff --git a/net/netfilter/nft_flow_offload.c b/net/netfilter/nft_flow_offload.c
+index f8c7f9f631e48..4f68fb64f1657 100644
+--- a/net/netfilter/nft_flow_offload.c
++++ b/net/netfilter/nft_flow_offload.c
+@@ -59,7 +59,7 @@ static void nft_flow_offload_eval(const struct nft_expr *expr,
+ 	struct flow_offload *flow;
+ 	enum ip_conntrack_dir dir;
+ 	struct nf_conn *ct;
+-	int ret;
++	int ret, thoff;
  
-+static struct nf_flowtable_type flowtable_bridge = {
-+	.family		= NFPROTO_BRIDGE,
-+	.init		= nf_flow_table_init,
-+	.setup		= nf_flow_table_offload_setup,
-+	.action		= nf_flow_rule_bridge,
-+	.free		= nf_flow_table_free,
-+	.hook		= nf_flow_offload_inet_hook,
-+	.owner		= THIS_MODULE,
-+};
-+
- static struct nf_flowtable_type flowtable_inet = {
- 	.family		= NFPROTO_INET,
- 	.init		= nf_flow_table_init,
-@@ -97,6 +107,7 @@ static struct nf_flowtable_type flowtable_ipv6 = {
+ 	if (nft_flow_offload_skip(pkt->skb, nft_pf(pkt)))
+ 		goto out;
+@@ -70,8 +70,11 @@ static void nft_flow_offload_eval(const struct nft_expr *expr,
  
- static int __init nf_flow_inet_module_init(void)
- {
-+	nft_register_flowtable_type(&flowtable_bridge);
- 	nft_register_flowtable_type(&flowtable_ipv4);
- 	nft_register_flowtable_type(&flowtable_ipv6);
- 	nft_register_flowtable_type(&flowtable_inet);
-@@ -109,6 +120,7 @@ static void __exit nf_flow_inet_module_exit(void)
- 	nft_unregister_flowtable_type(&flowtable_inet);
- 	nft_unregister_flowtable_type(&flowtable_ipv6);
- 	nft_unregister_flowtable_type(&flowtable_ipv4);
-+	nft_unregister_flowtable_type(&flowtable_bridge);
- }
- 
- module_init(nf_flow_inet_module_init);
-@@ -118,5 +130,6 @@ MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Pablo Neira Ayuso <pablo@netfilter.org>");
- MODULE_ALIAS_NF_FLOWTABLE(AF_INET);
- MODULE_ALIAS_NF_FLOWTABLE(AF_INET6);
-+MODULE_ALIAS_NF_FLOWTABLE(AF_BRIDGE);
- MODULE_ALIAS_NF_FLOWTABLE(1); /* NFPROTO_INET */
- MODULE_DESCRIPTION("Netfilter flow table mixed IPv4/IPv6 module");
+ 	switch (ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.dst.protonum) {
+ 	case IPPROTO_TCP:
+-		tcph = skb_header_pointer(pkt->skb, nft_thoff(pkt),
+-					  sizeof(_tcph), &_tcph);
++		thoff = nft_thoff(pkt);
++		if (thoff == 0)
++			goto out;
++		tcph = skb_header_pointer(pkt->skb, thoff, sizeof(_tcph),
++					  &_tcph);
+ 		if (unlikely(!tcph || tcph->fin || tcph->rst ||
+ 			     !nf_conntrack_tcp_established(ct)))
+ 			goto out;
 -- 
 2.53.0
 
