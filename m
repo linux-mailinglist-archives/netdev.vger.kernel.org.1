@@ -1,174 +1,369 @@
-Return-Path: <netdev+bounces-305528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305527-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id iBb0J24pTWoPwAEAu9opvQ
-	(envelope-from <netdev+bounces-305528-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:29:34 +0200
+	id ne0HO3EqTWoswAEAu9opvQ
+	(envelope-from <netdev+bounces-305527-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:33:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3396C71DDF6
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:29:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42A2571DE36
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:33:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=agner.ch header.s=dkim header.b=OExklQX0;
-	dmarc=pass (policy=none) header.from=agner.ch;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305528-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305528-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=CYyP7Mf4;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305527-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305527-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AB4A33009CF3
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 16:29:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 06C733034E18
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 16:26:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B47434E29;
-	Tue,  7 Jul 2026 16:29:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 363E542E8E7;
+	Tue,  7 Jul 2026 16:26:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.kmu-office.ch (mail.kmu-office.ch [178.209.48.109])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96EC137DAA9
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 16:29:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F41C30DD2F;
+	Tue,  7 Jul 2026 16:26:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783441771; cv=none; b=RxFVGYG6CMpEdlozf6qoja36X+T5oANWwt01PLoMEwPhtWCcoWlvHeJALNieVsqwtLSYNxiHFXNqt5m4jqdRz91hc4MqgS8IdrpX+uZvdk6wCIQhLVwTEubX3KiSEbNqqIf7+aSUdEoo9gnl3sKWk8gE6FNj35CiLy/p/xPnYtM=
+	t=1783441563; cv=none; b=iwHNYrUyB/MM3XT+hgeo5JVt/p4aF/wwK/fq0r0JnPjby7wZpcCVkOeo0ewEdstzD/GM/AmJCNMv2jrdIIoMSEkP4BDxvHtaMI24aHypZsnpBSdWl4o2N6C0dJ26V6m1Adgz7zlAmSIAT95s8blFB2yZHnhcuh/Bh0WB4mRFwGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783441771; c=relaxed/simple;
-	bh=iStYC0Iq8iFRqb83/hsfeJQsuMLUUC870SWEGOWoh+w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B2+ZZ1N21hzZHsa/a/t9GBueAkCvXHn8B3NrSLJN/rDz6MTnNG3Imjkl9kdKOVYrf6U0jblEsbJaeSdydRplFwdOSWPW8o3/ZWg7n/DI6yuTZ3vMHAPtbjoDo18gg49d45sJ/DHh+v5cW4WOmqpdwv99Tt3EDHqJJ2eTKVT4GPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=agner.ch; spf=pass smtp.mailfrom=agner.ch; dkim=pass (1024-bit key) header.d=agner.ch header.i=@agner.ch header.b=OExklQX0; arc=none smtp.client-ip=178.209.48.109
-Received: from allenwind.lan (unknown [IPv6:2a02:169:3c38:10::3a0])
-	by mail.kmu-office.ch (Postfix) with ESMTPSA id 5A49C5CA16B;
-	Tue,  7 Jul 2026 18:21:50 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=agner.ch; s=dkim;
-	t=1783441310;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:
-	 content-transfer-encoding:content-transfer-encoding:in-reply-to:
-	 references; bh=1lw1VBDE1/D2I6ja8qlx//S0jIyLgr96wpIl4MJHkxE=;
-	b=OExklQX0Z1RbE+wjJPmTMPSVhBQoTHdvN82uETaE1DHuFypcgBk2aUoB16NyUEuQN0lUe4
-	0X/5M9sDKZj7IoVSnybczAGLz9yKrX1VHWAUjX1+XzzOmz6OPBeG2pUd6bb87VxYv6/OwM
-	AlvuAaXr2C2jIkXgK31f8EO6df7/474=
-From: Stefan Agner <stefan@agner.ch>
-To: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1783441563; c=relaxed/simple;
+	bh=UgR4pX0fSVmJ0GeiLM53tyFkFkQLvkwfVqKtUzeFg68=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h8RjxoVhl+J7BoVgH6FwuUS7XVbj10NcQSVxUqPcKOhogMGXVC0CDT0se45EYp3+Cxeliovrf0q3GfD2KsSt8X506suUSajmW2Ev51kJpODm6vkV3TLtg0Q41FDncx5Q1y8QwpR+/AZp+08u1/iJBvHkryR8Spd0C4GWuE+PZXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CYyP7Mf4; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8B171F000E9;
+	Tue,  7 Jul 2026 16:26:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783441561;
+	bh=xaDuq1ZB1HflLrDzdt+OV6vrfoAZsFjA2zyfOAaYkgE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=CYyP7Mf4+GN9JppbBY9CLselE708FkBS7NaTpa1ICCH0kPty9sSTKl2ceN25EiSJB
+	 f+vwZpciH0whckwTcU4M8zGYtWzdOdGvzCBArGAagQ/3KeJmfZGopKUXTKUBF8e3OC
+	 srz0EXlTtlhOzcfztwb3jJ3XietlHsdhwt2UunmcVg+h7jdYqAzHu0JDcgj6Rk4aIL
+	 z7gMtD3mENFrZC7bTrMgsXJrbwZjJdTP3X+362B4RqKqXRhji9DdgZW2vmkKO0xp7J
+	 iAyQgBr9rX3CuDaVcNR5RqsYZZq6UVzRJtY5NXGrJKQg9YzfDPKaMuLIudP9umfRry
+	 KaRS7V12x2hrA==
+Date: Tue, 7 Jul 2026 18:25:58 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Ovidiu Panait <ovidiu.panait.rb@renesas.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	regressions@lists.linux.dev,
-	Stefan Agner <stefan@agner.ch>
-Subject: [PATCH net] net: stmmac: resume PHY before reopening the interface on MTU change
-Date: Tue,  7 Jul 2026 18:21:46 +0200
-Message-ID: <20260707162146.73823-1-stefan@agner.ch>
-X-Mailer: git-send-email 2.55.0
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Felix Fietkau <nbd@nbd.name>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	Shuah Khan <shuah@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH nf-next v4 3/6] net: netfilter: Add IPv4 over IPv6 tunnel
+ flowtable acceleration
+Message-ID: <ak0olot-8WTVrtGB@lore-desk>
+References: <20260703-b4-flowtable-sw-accel-ip6ip-v4-0-00398cd12382@kernel.org>
+ <20260703-b4-flowtable-sw-accel-ip6ip-v4-3-00398cd12382@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="KpcLrKuIJxPbhAqD"
+Content-Disposition: inline
+In-Reply-To: <20260703-b4-flowtable-sw-accel-ip6ip-v4-3-00398cd12382@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-5.26 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[agner.ch,none];
-	R_DKIM_ALLOW(-0.20)[agner.ch:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305528-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:nbd@nbd.name,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:horms@kernel.org,m:dsahern@kernel.org,m:idosch@nvidia.com,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:shuah@kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:linux-kselftest@vger.kernel.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[stefan@agner.ch,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:rmk+kernel@armlinux.org.uk,m:maxime.chevallier@bootlin.com,m:ovidiu.panait.rb@renesas.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:netdev@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:regressions@lists.linux.dev,m:stefan@agner.ch,m:andrew@lunn.ch,m:rmk@armlinux.org.uk,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,nbd.name,gmail.com,collabora.com,nvidia.com,netfilter.org,strlen.de,nwl.cc];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,bootlin.com,renesas.com,gmail.com,foss.st.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,lists.linux.dev,agner.ch];
-	DKIM_TRACE(0.00)[agner.ch:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stefan@agner.ch,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-305527-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,agner.ch:from_mime,agner.ch:email,agner.ch:mid,agner.ch:dkim]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,lore-desk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3396C71DDF6
+X-Rspamd-Queue-Id: 42A2571DE36
 
-Since the referenced commit, changing the MTU on a running interface no
-longer disconnects and reconnects the PHY; __stmmac_release() merely
-stops phylink, which also suspends the PHY (BMCR power-down) when WoL
-is not enabled. __stmmac_open() then performs the DMA software reset in
-stmmac_hw_setup() before phylink_start() resumes the PHY again.
 
-IEEE 802.3 22.2.4.1.5 allows a PHY to stop its receive clock while
-powered down, and stmmac requires a running receive clock for the DMA
-software reset to complete (the phylink config sets mac_requires_rxc).
-On such setups, e.g. the RK3566-based Home Assistant Green with an
-RTL8211F-VD PHY in RGMII mode, any runtime MTU change now times out and
-leaves the interface dead:
+--KpcLrKuIJxPbhAqD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  rk_gmac-dwmac fe010000.ethernet end0: Failed to reset the dma
-  rk_gmac-dwmac fe010000.ethernet end0: stmmac_hw_setup: DMA engine initialization failed
-  rk_gmac-dwmac fe010000.ethernet end0: __stmmac_open: Hw setup failed
-  rk_gmac-dwmac fe010000.ethernet end0: failed reopening the interface after MTU change
+commenting on shashiko's report:
+https://sashiko.dev/#/patchset/20260703-b4-flowtable-sw-accel-ip6ip-v4-0-00=
+398cd12382%40kernel.org
 
-In the field this is triggered by NetworkManager applying an MTU while
-activating the connection, breaking networking entirely.
+> Introduce sw flowtable acceleration for the TX/RX paths of
+> IPv4 over IPv6 tunnels, relying on the netfilter flowtable
+> infrastructure.
+> The feature can be tested with a forwarding scenario between two
+> NICs (eth0 and eth1), where an IPv4 over IPv6 tunnel is used to
+> reach a remote site via eth1 as the underlay device:
+>=20
+>     ETH0 -- TUN0 <=3D=3D> ETH1 -- [IP network] -- TUN1 (2001:db8:2::2)
+>=20
+> [IP configuration]
+>=20
+> 6: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state U=
+P group default qlen 1000
+>     link/ether 00:00:22:33:11:55 brd ff:ff:ff:ff:ff:ff
+>     inet 192.168.0.2/24 scope global eth0
+>        valid_lft forever preferred_lft forever
+> 7: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state U=
+P group default qlen 1000
+>     link/ether 00:11:22:33:11:55 brd ff:ff:ff:ff:ff:ff
+>     inet6 2001:db8:2::1/64 scope global nodad
+>        valid_lft forever preferred_lft forever
+> 8: tun0@NONE: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1480 qdisc noqueue stat=
+e UNKNOWN group default qlen 1000
+>     link/tunnel6 2001:db8:2::1 peer 2001:db8:2::2 permaddr ce9c:2940:7dcc=
+::
+>     inet 192.168.100.1/24 scope global tun0
+>        valid_lft forever preferred_lft forever
+>=20
+> $ ip route show
+> default via 192.168.100.2 dev tun0
+> 192.168.0.0/24 dev eth0 proto kernel scope link src 192.168.0.2
+> 192.168.100.0/24 dev tun0 proto kernel scope link src 192.168.100.1
+>=20
 
-Resume the PHY before reopening the interface, like stmmac_resume()
-does, to ensure the receive clock is running for the DMA software
-reset.
+[...]
 
-Fixes: db299a0c09e9 ("net: stmmac: move PHY handling out of __stmmac_open()/release()")
-Link: https://github.com/home-assistant/operating-system/issues/4858
-Assisted-by: Claude:claude-fable-5
-Tested-by: Stefan Agner <stefan@agner.ch>
-Signed-off-by: Stefan Agner <stefan@agner.ch>
----
-Note: phylink_prepare_resume()'s kernel-doc says it is to be called
-prior to phylink_resume(); here it is paired with phylink_start()
-(called from __stmmac_open()) instead, which phylink_resume() itself
-uses to restart the machinery. If preferred, I can extend the
-kernel-doc or introduce a more generically named helper.
+>  	struct nf_flow_xmit xmit =3D {};
+> +	struct in6_addr *ip6_daddr;
+>  	struct flow_offload *flow;
+>  	struct neighbour *neigh;
+>  	struct rtable *rt;
+> @@ -844,25 +872,41 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff =
+*skb,
+>  	other_tuple =3D &flow->tuplehash[!dir].tuple;
+>  	ip_daddr =3D other_tuple->src_v4.s_addr;
+> =20
+> -	if (nf_flow_tunnel_v4_push(state->net, skb, other_tuple, &ip_daddr) < 0)
+> +	if (nf_flow_tunnel_push(state->net, skb, other_tuple, &ip_daddr,
+> +				&ip6_daddr) < 0)
+>  		return NF_DROP;
+> =20
+>  	switch (tuplehash->tuple.xmit_type) {
+> -	case FLOW_OFFLOAD_XMIT_NEIGH:
+> -		rt =3D dst_rtable(tuplehash->tuple.dst_cache);
+> +	case FLOW_OFFLOAD_XMIT_NEIGH: {
+> +		struct dst_entry *dst;
+> +
+>  		xmit.outdev =3D dev_get_by_index_rcu(state->net, tuplehash->tuple.ifid=
+x);
+>  		if (!xmit.outdev) {
+>  			flow_offload_teardown(flow);
+>  			return NF_DROP;
+>  		}
+> -		neigh =3D ip_neigh_gw4(rt->dst.dev, rt_nexthop(rt, ip_daddr));
+> +		if (other_tuple->tun.encap_proto =3D=3D AF_INET6 ||
+> +		    ctx.tun.proto =3D=3D IPPROTO_IPV6) {
+> +			struct rt6_info *rt6;
+> +
+> +			rt6 =3D dst_rt6_info(tuplehash->tuple.dst_cache);
+> +			neigh =3D ip_neigh_gw6(rt6->dst.dev,
+> +					     rt6_nexthop(rt6, ip6_daddr));
+> +			dst =3D &rt6->dst;
+> +		} else {
+> +			rt =3D dst_rtable(tuplehash->tuple.dst_cache);
+> +			neigh =3D ip_neigh_gw4(rt->dst.dev,
+> +					     rt_nexthop(rt, ip_daddr));
+> +			dst =3D &rt->dst;
+> +		}
 
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+- Does this logic correctly handle cross-family tunneling like an IPv6-in-I=
+Pv4
+  packet (SIT) being forwarded out via another IPv4 tunnel?
+  - SIT support is added by a following patch in the series.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -5884,6 +5884,15 @@
- 
- 		__stmmac_release(dev);
- 
-+		/* phylink_stop() in __stmmac_release() suspends the PHY.
-+		 * IEEE 802.3 allows PHYs to stop their receive clock while
-+		 * powered down, but the DMA software reset performed by
-+		 * stmmac_hw_setup() requires a running receive clock.
-+		 * Resume the PHY, as on system resume, to ensure its clocks
-+		 * are running before reopening the interface.
-+		 */
-+		phylink_prepare_resume(priv->phylink);
-+
- 		ret = __stmmac_open(dev, dma_conf);
- 		if (ret) {
- 			free_dma_desc_resources(priv, dma_conf);
--- 
-2.49.0
+>  		if (IS_ERR(neigh)) {
+>  			flow_offload_teardown(flow);
+>  			return NF_DROP;
+>  		}
+>  		xmit.dest =3D neigh->ha;
+> -		skb_dst_set_noref(skb, &rt->dst);
+> +		skb_dst_set_noref(skb, dst);
+>  		break;
+> +	}
+>  	case FLOW_OFFLOAD_XMIT_DIRECT:
+>  		xmit.outdev =3D dev_get_by_index_rcu(state->net, tuplehash->tuple.out.=
+ifidx);
+>  		if (!xmit.outdev) {
+> @@ -1112,8 +1156,12 @@ nf_flow_offload_ipv6_lookup(struct nf_flowtable_ct=
+x *ctx,
+>  	if (!nf_flow_skb_encap_protocol(ctx, skb, htons(ETH_P_IPV6)))
+>  		return NULL;
+> =20
+> -	if (nf_flow_tuple_ipv6(ctx, skb, &tuple) < 0)
+> +	if (ctx->tun.proto =3D=3D IPPROTO_IPIP) {
+> +		if (nf_flow_tuple_ip(ctx, skb, &tuple) < 0)
+> +			return NULL;
+> +	} else if (nf_flow_tuple_ipv6(ctx, skb, &tuple) < 0) {
+>  		return NULL;
+> +	}
+> =20
+>  	return flow_offload_lookup(flow_table, &tuple);
+>  }
+> @@ -1140,7 +1188,11 @@ nf_flow_offload_ipv6_hook(void *priv, struct sk_bu=
+ff *skb,
+>  	if (tuplehash =3D=3D NULL)
+>  		return NF_ACCEPT;
+> =20
+> -	ret =3D nf_flow_offload_ipv6_forward(&ctx, flow_table, tuplehash, skb);
+> +	if (ctx.tun.proto =3D=3D IPPROTO_IPIP)
+> +		ret =3D nf_flow_offload_forward(&ctx, flow_table, tuplehash, skb);
+> +	else
+> +		ret =3D nf_flow_offload_ipv6_forward(&ctx, flow_table, tuplehash,
+> +						   skb);
+>  	if (ret < 0)
+>  		return NF_DROP;
+>  	else if (ret =3D=3D 0)
+> @@ -1164,21 +1216,38 @@ nf_flow_offload_ipv6_hook(void *priv, struct sk_b=
+uff *skb,
+>  		return NF_DROP;
+> =20
+>  	switch (tuplehash->tuple.xmit_type) {
+> -	case FLOW_OFFLOAD_XMIT_NEIGH:
+> -		rt =3D dst_rt6_info(tuplehash->tuple.dst_cache);
+> +	case FLOW_OFFLOAD_XMIT_NEIGH: {
+> +		struct dst_entry *dst;
+> +
+>  		xmit.outdev =3D dev_get_by_index_rcu(state->net, tuplehash->tuple.ifid=
+x);
+>  		if (!xmit.outdev) {
+>  			flow_offload_teardown(flow);
+>  			return NF_DROP;
+>  		}
+> -		neigh =3D ip_neigh_gw6(rt->dst.dev, rt6_nexthop(rt, ip6_daddr));
+> +		if (other_tuple->tun.encap_proto =3D=3D AF_INET ||
+> +		    ctx.tun.proto =3D=3D IPPROTO_IPIP) {
+> +			__be32 ip_daddr =3D other_tuple->src_v4.s_addr;
+> +			struct rtable *rt4;
+> +
+> +			skb->protocol =3D htons(ETH_P_IP);
+> +			rt4 =3D dst_rtable(tuplehash->tuple.dst_cache);
+> +			neigh =3D ip_neigh_gw4(rt4->dst.dev,
+> +					     rt_nexthop(rt4, ip_daddr));
+> +			dst =3D &rt4->dst;
+
+- Can this branch incorrectly cast a struct rt6_info to a struct rtable
+  if an IPv4-in-IPv6 packet is forwarded to another IPv6 tunnel?
+  - Double tunnel encapsulation is not currently supported.
+
+Regards,
+Lorenzo
+
+> +		} else {
+> +			rt =3D dst_rt6_info(tuplehash->tuple.dst_cache);
+> +			neigh =3D ip_neigh_gw6(rt->dst.dev,
+> +					     rt6_nexthop(rt, ip6_daddr));
+> +			dst =3D &rt->dst;
+> +		}
+>  		if (IS_ERR(neigh)) {
+>  			flow_offload_teardown(flow);
+>  			return NF_DROP;
+>  		}
+>  		xmit.dest =3D neigh->ha;
+> -		skb_dst_set_noref(skb, &rt->dst);
+> +		skb_dst_set_noref(skb, dst);
+>  		break;
+> +	}
+>  	case FLOW_OFFLOAD_XMIT_DIRECT:
+>  		xmit.outdev =3D dev_get_by_index_rcu(state->net, tuplehash->tuple.out.=
+ifidx);
+>  		if (!xmit.outdev) {
+> diff --git a/net/netfilter/nf_flow_table_path.c b/net/netfilter/nf_flow_t=
+able_path.c
+> index caaf48c5fd2a..5e84b7f18a26 100644
+> --- a/net/netfilter/nf_flow_table_path.c
+> +++ b/net/netfilter/nf_flow_table_path.c
+> @@ -216,12 +216,13 @@ static int nft_flow_tunnel_update_route(const struc=
+t nft_pktinfo *pkt,
+>  	struct dst_entry *tun_dst =3D NULL;
+>  	struct flowi fl =3D {};
+> =20
+> -	switch (nft_pf(pkt)) {
+> +	switch (tun->encap_proto) {
+>  	case NFPROTO_IPV4:
+>  		fl.u.ip4.daddr =3D tun->dst_v4.s_addr;
+>  		fl.u.ip4.saddr =3D tun->src_v4.s_addr;
+>  		fl.u.ip4.flowi4_iif =3D nft_in(pkt)->ifindex;
+> -		fl.u.ip4.flowi4_dscp =3D ip4h_dscp(ip_hdr(pkt->skb));
+> +		if (nft_pf(pkt) =3D=3D NFPROTO_IPV4)
+> +			fl.u.ip4.flowi4_dscp =3D ip4h_dscp(ip_hdr(pkt->skb));
+>  		fl.u.ip4.flowi4_mark =3D pkt->skb->mark;
+>  		fl.u.ip4.flowi4_flags =3D FLOWI_FLAG_ANYSRC;
+>  		break;
+> @@ -229,13 +230,14 @@ static int nft_flow_tunnel_update_route(const struc=
+t nft_pktinfo *pkt,
+>  		fl.u.ip6.daddr =3D tun->dst_v6;
+>  		fl.u.ip6.saddr =3D tun->src_v6;
+>  		fl.u.ip6.flowi6_iif =3D nft_in(pkt)->ifindex;
+> -		fl.u.ip6.flowlabel =3D ip6_flowinfo(ipv6_hdr(pkt->skb));
+> +		if (nft_pf(pkt) =3D=3D NFPROTO_IPV6)
+> +			fl.u.ip6.flowlabel =3D ip6_flowinfo(ipv6_hdr(pkt->skb));
+>  		fl.u.ip6.flowi6_mark =3D pkt->skb->mark;
+>  		fl.u.ip6.flowi6_flags =3D FLOWI_FLAG_ANYSRC;
+>  		break;
+>  	}
+> =20
+> -	nf_route(nft_net(pkt), &tun_dst, &fl, false, nft_pf(pkt));
+> +	nf_route(nft_net(pkt), &tun_dst, &fl, false, tun->encap_proto);
+>  	if (!tun_dst)
+>  		return -ENOENT;
+> =20
+>=20
+> --=20
+> 2.55.0
+>=20
+
+--KpcLrKuIJxPbhAqD
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCak0olgAKCRA6cBh0uS2t
+rI3NAQClQS3W+Ft7PA84x3n6YiTHeu7fpbuZ5bFy/w/e7uXuhgD/RyZixGGKm2Qr
+cNBbhlAS61B4HSxfpr27WoCCykRS+Ac=
+=gbZe
+-----END PGP SIGNATURE-----
+
+--KpcLrKuIJxPbhAqD--
 
