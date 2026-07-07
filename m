@@ -1,372 +1,222 @@
-Return-Path: <netdev+bounces-305318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305319-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id JogVN+a0TGrqoQEAu9opvQ
-	(envelope-from <netdev+bounces-305318-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:12:22 +0200
+	id PBicKgi3TGpcogEAu9opvQ
+	(envelope-from <netdev+bounces-305319-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:21:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48F3A718F37
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:12:22 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C7F9719046
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:21:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=YctvVaHA;
-	dkim=pass header.d=redhat.com header.s=google header.b=D+s4MvGU;
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305318-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305318-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=altera.com header.s=selector2 header.b=A08000so;
+	dmarc=pass (policy=reject) header.from=altera.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305319-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305319-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 13583307E6A3
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 08:06:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id ABA2C3040960
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 08:08:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 145472F7EF1;
-	Tue,  7 Jul 2026 08:06:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40F1029B78F;
+	Tue,  7 Jul 2026 08:08:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010041.outbound.protection.outlook.com [52.101.56.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E2BD2D6409
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 08:06:33 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783411595; cv=none; b=pF1hy3ClU3HTLRrDklB/0xm9fFY6mSm+HPWg2KAKSA0mxtQOsmR0xC6g85laDJVfI2CxuLqbdjUwHCP/U20MB0YBnQlvaNsckuLRVLzyz8jKYXLGfOsgDK+A4aJ6gGhLBu7JMZpaYT97U07G0JY4x8ZJkyYiV1fjR82caUPQ4Ys=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783411595; c=relaxed/simple;
-	bh=8ppzBJwjfdUXv0dRKpLgl5v1Ki2yjSGcqFRDrP++iBU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HqU2q76UR7PD9/5DOAlMdDINKM83V2gRjdCK14xZJulwUVPRKMYMAAUVO447ZAGvBf8pa+ruwA8PGXycesmQFscesoIl6uAhdNFwAB19ldxC1EgnlcbmXGTKjxMJFHtGPiXnQ5oGxXFieQp4vLqQ7wmV1wPZ9U2cXuhTa6KEIro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YctvVaHA; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=D+s4MvGU; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783411593;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PTPQmcJqIl+y+IOReiZffAKREQqqviuvmuYkaJIn+vI=;
-	b=YctvVaHAK8QBJwSL33mlfyCjqRbL7GGfixffsNvWpguuTNNdpeT9v4TRpmig0mQul/O7uk
-	A86eagCeY+hTE/irWtGrh9qRISxQkSkqwqFCTs6lMl5CIlx1GsGe1nvJI0L3Y149WPKkhz
-	K5g2KW0yg5ao82j7ztzkjtAegAnnTlg=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-600-dPM_7NJUMtueibubTiU3qg-1; Tue, 07 Jul 2026 04:06:31 -0400
-X-MC-Unique: dPM_7NJUMtueibubTiU3qg-1
-X-Mimecast-MFC-AGG-ID: dPM_7NJUMtueibubTiU3qg_1783411590
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-493ba771d1bso36145165e9.2
-        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 01:06:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1783411590; x=1784016390; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=PTPQmcJqIl+y+IOReiZffAKREQqqviuvmuYkaJIn+vI=;
-        b=D+s4MvGU3SzO4tIdTfBQvYqTdnT2fsic2ARQtlqAf0rLtuZqC4NBy1LfFsSRE4mkqo
-         R5sUScueakHhhC1dGtEFsG5Zs8ngMTF+k6tZsHaup0jOB4/VoaLinlKwQsBcWLhwJh9Z
-         Diq3Q35XSoiiq7YqldMGDstBz59bzsFwLsKj3/1OF0AvQti0bPyMK6mabOO2WhiCxMK3
-         3HJ6s88a9YhpT6WDNvEe4FSeHHB4Qi63WCakjFiXrdKDNuQNPZmB+x2LWvsf0b+juxw0
-         PpeHGm+i+XF5iZaQFEu3TxkPEaZzgT5OQP/jJHmvf7FQ04PCJqiGRKZxqveXW3nnbRSF
-         3thg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783411590; x=1784016390;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=PTPQmcJqIl+y+IOReiZffAKREQqqviuvmuYkaJIn+vI=;
-        b=OvU3QSePz4eohdJtmI4z5M28Y8EiqZWl+US6nM2FZXHx3zhcNhFg2f9JdX2yWQm4kz
-         Vfn2+Qlyrd0W8pGXBun2+UO9/G80QbizsXQXd+9Wz0/uCizS2FrBtmPpdnovd0l9pJap
-         wxcMnHCMny5Aq/iJ389X6lVyQ8/LzbBy8W/Nov7Mjsr9F6yL2vDPDg1+H0Byw8Vyn5hv
-         qJ4tU10VljEfiolSu3teQ+SPAKqqdUiOO23A5MrrwD9m/mTnMgtYk4DPoO2jj5x1VeIA
-         37CYXIwDRCP1m+4nyamOORZYzROJKQniCry9Z+xYKESTXlCLDOiCd/HGPVe6aaTL8ogT
-         hGtA==
-X-Forwarded-Encrypted: i=1; AHgh+RrNCK3nGap/TmoBcg1uVTvtZ3EM4yxAC75U2gilhocCRKPWqDHNFlyfF7LHJGVjIRUHpyyIp0E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDSOYNs3UuSENW1dwoemPTZbWNvrA3RO8MkC2hbXNd61HAqc1m
-	4BlKClKlSkFnRAnDPlXfJLYzQN/5A+jiAYKGhLu2vDtd028zr/5aijFyYy2DnLz4TyMfjd0IXfz
-	O0V8LOvTZeQn+/SFOYbXnqbdrLxwBJnW0rnHdAurJO4buuhhiIEJfVt3uUQ==
-X-Gm-Gg: AfdE7cnniMtI3ZaTPyNmvKh5oxTANNsbRa/6GscWUbGIX0rGuL7G62lU/Bb11yoFdw2
-	aUV2L6CH9TZeABVQoj3bLd+RY+Q4AE7IimNVFVjItP1/muyGTC6AHM8nYkU9MxE/v9RILRpzt7t
-	5P5p7z/BLgU2YaxWWJ4iRzGdyI7odtWiMvr4klctJesjfBqNGn3F1GfHiIiR2QqgI0oZhxLOSa0
-	T0ljEHEzAgZ2SQfT+m/O4VeSrZxbUP2MHgOBYHqFgdgc03LvCktSRypO9XRD+NVvlfr5e8Sx3xl
-	T+xqifNeFVtQ4lAA1R9X/rLwmJHAUHn82m/gZnf8870wD2l7BwxUi2ooQ5xgI3JQzh7kDXxzO2g
-	iA0AC6NxdI+6gHJHq0/z/6D+v/cw3AQY0OsFQyUWmxbP7YBYQq67cjpyOe7ZPpHQvdCLCpsW2BW
-	SJUjeaR/kFJpbf
-X-Received: by 2002:a05:600c:4e8b:b0:493:b877:fbc with SMTP id 5b1f17b1804b1-493df080c50mr42015305e9.21.1783411590344;
-        Tue, 07 Jul 2026 01:06:30 -0700 (PDT)
-X-Received: by 2002:a05:600c:4e8b:b0:493:b877:fbc with SMTP id 5b1f17b1804b1-493df080c50mr42014795e9.21.1783411589816;
-        Tue, 07 Jul 2026 01:06:29 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:5521:6b10:58fd:68f:7756:389d? ([2a0d:3344:5521:6b10:58fd:68f:7756:389d])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493e0f50418sm33378285e9.11.2026.07.07.01.06.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jul 2026 01:06:29 -0700 (PDT)
-Message-ID: <80222d3f-e6cf-408b-b42f-0a2a6afce297@redhat.com>
-Date: Tue, 7 Jul 2026 10:06:27 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2CE329D264;
+	Tue,  7 Jul 2026 08:08:40 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783411722; cv=fail; b=R5b/h+dVABRB1a+eOa7xowTqiUMFrYyD6mSU8KAPI/PDVXmuztBHr/D+cxkJ9YUgbsrj0zxsuBXSUB1mrLttHCprvfUmoPGGVumxovzj7YxLWAxHqOARwgBVlEdbFKm2uy5qtxMMO5L6JYbRCnzTY/nJlAWrq5z3N5pl5/lah8E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783411722; c=relaxed/simple;
+	bh=4oR0hu9iskowfYfYb9jZeUmxASNDppST3z0H103Mh1I=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=odLUk8FWmqL87ZOzB/7HGbOjEuP1uQuwPXMqkmIqWdTSA1uHXAFw5KC4g9OMMKr6Knrqq0fnx2n01//Ij3C8/e4xjJ6KeT12SjGBuvZxtfKlAZv/p3QhRmQ4i+WnamG4lgaOd0j7F7Tu4p3YTmd7RnrIdl5Igalr7OtH0hCVwU4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=A08000so; arc=fail smtp.client-ip=52.101.56.41
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fQnggwcgFpseyrlCbDrMG2UUlPC5Y+AHPtypBYUKUW8UB3l5IOlZbtphllZ7EiwFkGWcdQj961nFHla+QOC6cH3HNDpEZmg4+afoKQlKl8mSpR0FZ9/rGHeIwZE8vDLfPRtWXO++K1LSNp9Tz4nFyIVu5iZF+tEGLmXPYfeSnyyFoJpTr+CirBeXtrXbHtobbvzFsICRvqtYzaa2FA7NJyazfIoEuTC3oAnoZLUsMTH1XxkpyQgSfYK5n0V3q61kKQW64tFheA/eHc7nVwaGGiCXA8tbUYiXtjqF7U5W7WiHjForKrinOd5APzMNpOuOc0RX8ohTSQaOTRw7IOUyKw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4oR0hu9iskowfYfYb9jZeUmxASNDppST3z0H103Mh1I=;
+ b=Hx3CZEHA/4WStXwiEnr+wDwAvoyzMV4VNO+t/9EZ+7g0tzlFuwiTHfKIhn+dqO+7lsKySwUOlYxyDs+/bWW8LDc3gtqNUtilkEjNx8QtdUvxKoLspiD+UlqExqz2vihHzp6SqHuOsZETpd01RYRkguWYUvqfjB6matkIdCtyEK6sChJLiMC4aBzscw1Trq8vA2BNcNv+tb4h4fM8FfI6qwIJa8QqiYMeQ1tR+J+JjJbeKj/Nmw9UOl3LAzcqVGFKF0FNeE4JVuM3f9G8nehcXV276Z721e0xkzpbdm1HrTXFQNwbZ4cL+RCW/PUo+WiULEGirZfWH42BrvXGCMeaFw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
+ dkim=pass header.d=altera.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4oR0hu9iskowfYfYb9jZeUmxASNDppST3z0H103Mh1I=;
+ b=A08000sommOp+qi1tunsSSqyt4f+FZlpyS7wIC/NjYSprKoN503FDNlrv/9x7zPKxGygJXkoCycde5cMjE70gfnH32CpZoQgVCf/uUZz7KEIv+lZr157RZGfQuG1AtX6YKJp91okfR9fXI5KaXmMYCyJMvHqKAzrmm8+P9zOlzNUDzzxc7VSsj51CuEdk1qFFEZZyAyVaFMITaQcyUaUUtndvvq52JdG27wxmDIellms/CbcEI+vb7Uu9MHa7Xt2Pl7o1qb4yOpqbdnAIgDkYXxrQmkMtdvcq/BEXRalG7HuDfOxHo9+BkjP41s2VSrVieOTc1W1wbCRgr95Odo+Wg==
+Received: from SJ0PR03MB6964.namprd03.prod.outlook.com (2603:10b6:a03:432::18)
+ by DS3PR03MB989144.namprd03.prod.outlook.com (2603:10b6:8:39b::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.17; Tue, 7 Jul
+ 2026 08:08:38 +0000
+Received: from SJ0PR03MB6964.namprd03.prod.outlook.com
+ ([fe80::b965:bfa8:58fb:e775]) by SJ0PR03MB6964.namprd03.prod.outlook.com
+ ([fe80::b965:bfa8:58fb:e775%4]) with mapi id 15.21.0181.009; Tue, 7 Jul 2026
+ 08:08:38 +0000
+From: "Nazle Asmade, Muhammad Nazim Amirul"
+	<muhammad.nazim.amirul.nazle.asmade@altera.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>, "dinguyen@kernel.org"
+	<dinguyen@kernel.org>, "maxime.chevallier@bootlin.com"
+	<maxime.chevallier@bootlin.com>
+CC: "rmk+kernel@armlinux.org.uk" <rmk+kernel@armlinux.org.uk>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "conor+dt@kernel.org"
+	<conor+dt@kernel.org>, "robh@kernel.org" <robh@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "devicetree@vger.kernel.org"
+	<devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 1/4] dt-bindings: arm: altera: Add Agilex5 SoCDK TSN
+ Config2 board
+Thread-Topic: [PATCH v2 1/4] dt-bindings: arm: altera: Add Agilex5 SoCDK TSN
+ Config2 board
+Thread-Index: AQHdDdet/Hhk5cW5yEi55aAhwx3SLbZhm7EAgAAYPYA=
+Date: Tue, 7 Jul 2026 08:08:37 +0000
+Message-ID: <a93fc9d6-8e69-4625-884b-1b5c54748b6e@altera.com>
+References:
+ <20260707061305.27580-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
+ <20260707061305.27580-2-muhammad.nazim.amirul.nazle.asmade@altera.com>
+ <8e9a2c05-178b-4360-b814-660d049e50a3@kernel.org>
+In-Reply-To: <8e9a2c05-178b-4360-b814-660d049e50a3@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ0PR03MB6964:EE_|DS3PR03MB989144:EE_
+x-ms-office365-filtering-correlation-id: 525c865f-4b2d-4d4e-5ef8-08dedbfef312
+x-ms-exchange-atpmessageproperties: SA
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|376014|366016|7416014|23010399003|55112099003|4143699003|11063799006|38070700021|56012099006|18002099003|22082099003;
+x-microsoft-antispam-message-info:
+ C5kc5wc3Y08XyrRLH//bMvSMkM4z237XVW4Dsm9RciyRtzxOrOsrzx8KaXNhcRl5i9spqWUdJsBEGO8+YSDJCFhaxxfjqC4ZXhHnzQYXXwZo8XfJGxAfWsxq7DdFNLWT4xiO0cGdwhHuNa1iTIJGwhqu0RLGniykspdInWhtMgXENdWvaJhYVtsn1OYShEmhNQKZ1S4Uh3SRTOd3M5ERjnPFiRgFM7OnrGAtEyY5v6YszU9SroFE9n+IbIhhxrucg0nLhup2+Z1opl3c0SeeKbOdmgmUi42p11lY02b/45O0OA7nsrdu1UROIP3hMs7UWMvdiruTNlcHsRaK/OlzqWoFlAlBWRjGqckD1s+4WqAybSbb7ABjzRX+RlZaOJUFzH/Lz34Q2SmXalOAS/fSktS9rugCqKb1HBWhb/zF8C1P4tP1Yry+ve4+mAfTHQKoEleJdkPu19if2t/NOJ+MZR2dfB6hyKZhNpH0XA2IptaCFWVMWsHHbArq1LFDOWv69d9tpEfWzU2N1x5dkjmi2dsg3EgSIHzXwG3a6ZjZtyULqaD8MTghSyXaj9TdJzY1mcoP5IYJkP+usMy+Kru2Cvbpqc/e/g0DdTADaRZxKHyMS0F8Ro6R51CvjkcnJNttcCQSPwSWSehkthBvofcbo3+b7hEfBbrXRHiGJkuQskuIG03aPfKDAalMbSu6nUf/80JAHZbLQRtF/74rBpaIR0IjQAN0veSiVQhhmNGyYMo=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR03MB6964.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7416014)(23010399003)(55112099003)(4143699003)(11063799006)(38070700021)(56012099006)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 2
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?YXVKeGZkWURtcnZKWWk3UjV5Q3djNGs0SU9tOW5TNTRjc2JJT243NXVyL2NB?=
+ =?utf-8?B?T3I4NUUxSHZEZ094QnNTUTY0SXZBQjdLM0Q4UC82WEZUQmRRamQ4M2F0VU9P?=
+ =?utf-8?B?aXR1TTJheExndzAvYU8yR3VjYk0vTnp3djRNbGF2bUt0OU5xb3N1OWFzZE02?=
+ =?utf-8?B?M1dxWVVadmwrTis2eXhiTDdiaWdIbmVucTduV0xOL3BpVjFBazlSdmFqYWVW?=
+ =?utf-8?B?elIxSTFPY3VkMW85Z1lqVFBUSWozQThnWC9EZWFxRW1sK2RuOGROSzdvNkpl?=
+ =?utf-8?B?TnZuK0MvSlJ3YXBOYmtQTjZuVTF5V0JoZnF4aUp2V3c1MUpNbmFmVWFXMGpr?=
+ =?utf-8?B?TFNTSklCRFlGWjVnZnhaMmZDSDJLVkdvSnBkZTVZUzBkVFlmYTBqb0R5NGp0?=
+ =?utf-8?B?Wk1FWkVDOUNyRkZYV0dGaWVPU0RoditoV1JSd1kvTVFqb0hGZWJ2ZStsS2JI?=
+ =?utf-8?B?dDM2Rm5OcEhHN1NQN2JzSkpTSXN4dVdXdEkzc0l5STJwTlNPdmxTRno3Tm85?=
+ =?utf-8?B?SVZPckY0eEYvQ3FSNnhYZzE5d0ZXTmpZYmNtUnl0a0JTQmFSNUFpS05ZeHBE?=
+ =?utf-8?B?R1NFNHFKTXYzNkNpNG1MMWg2ekVYb05vZkVGZW9Sb1pnSXl0dDhjektWL3NG?=
+ =?utf-8?B?eVhnZmhhWXErRUlRbUZxRW96MEFNZ2l6ak5OSTlNSEVBYm9pMmZBeExidFRN?=
+ =?utf-8?B?U3ZESEJSWXhmS3grVWYwZnRqRkdycFhrQWlONlcwUDJDbGkwZ0Q3eS90TkV2?=
+ =?utf-8?B?NTJ1US9Md3RGTFBTMEx5R20wWmtTYVNYL1haOWNrMlNubS81SEVBM202RmRn?=
+ =?utf-8?B?YlBkSFpJK2FtZktWKzJLbG4yRkdxemNzMXBSdW9CNGUvOWNpdFlvOVJkNDBK?=
+ =?utf-8?B?WVNFbXlBdE9qbHRqREFJcVJSQ2tVS1RkUllEbE9Jb1hqS0R5aERKKzM0TjRF?=
+ =?utf-8?B?OGdWcUROZW5jUmVUeFFERHhWTGMzUkkzVW5FRExDRDcvQUVKYWJoV0t2c0RH?=
+ =?utf-8?B?UWMyN016N1JEaHZIeVlPelplQ0JkOS9GMzQ4dURsTlI5eHkxcWliRHU5Y3VG?=
+ =?utf-8?B?NUxkT3d5Z2hnTGpmc0IwZ0JjbE5BSVZ4eDBiNkVDUGZ0eEYyVFA4bzhEUkRm?=
+ =?utf-8?B?VURlc2JHZWhUWmlTT1JBRXdQL3JzVEVSVWhDalB5K2F3eDluaklRMkZMbjky?=
+ =?utf-8?B?R2R6UktmNWx4SHM0cmx1TFpyUTBJdzJ4azk4UXJTR1NRck1WM0lRSEpXU0Jt?=
+ =?utf-8?B?akRreG0wT2FieDFhSzQzSDNZSTFZMHFoV2xPUHZTMy9GcWdnQXVhcVNjdlFz?=
+ =?utf-8?B?V1hrbkw5SjJBMzlSbTRxK0QybXVOUmdmMy95em1Xb3JoY1B5QmZzeFlFNW9V?=
+ =?utf-8?B?ZVlrdDM2WU1tbEM4ZjJUc1c4dHBlRzhnYVVPK1o4MTFjSkFKcURqTW9QcGRj?=
+ =?utf-8?B?UG1kTUs5bVZsNHVCNmpuRmF1NndnSUQ3RFZFZ3Jram45WVhqYnplTFRjREFl?=
+ =?utf-8?B?RWh6d0VVaFZvYUVpZ1A0WmdHek9DZjB4dXk2UzdEcFBlWWtUSDFXOERhdjR1?=
+ =?utf-8?B?aHNha3EvYUttM3NScCt1cWpuaEZGTWNjYVByMHNUdXRFOE5EWDQ1MGN4UC9O?=
+ =?utf-8?B?MGJqMkhtY0hLVzNXRmc0K0NNQ3J5a1FNL09nTlBqVkNMQUMzUFIzbU1vaitN?=
+ =?utf-8?B?ZTFxakxNcm4rUzVidjY4RkhWaEdzd3hSRXgvaXBxNlZ4STRLVTBKRjdaV1ZV?=
+ =?utf-8?B?UkxwRDR3YVhoNWgwa2daT2MzL0JXRDZjekF0bEVkTkY5Z1liVElZWnhqWXcr?=
+ =?utf-8?B?YXNGclhDM0hSS2w3MitmR2lablpONTR0Ni83QVd4d1R6c2xseENCUVQrMVJp?=
+ =?utf-8?B?YytpeWdkamlteEZmZy9tV3R6cHZKcVhxNDhUc3Y5NzNWUVZIYmozVjVhNU8x?=
+ =?utf-8?B?OFdKK0Y1SUJhdm9GbTlRUWFWVWlzWnIxWVVEY05ITHQwRDkrVURTUzNKSVZv?=
+ =?utf-8?B?RGJ3cHp1ak9PSGlXMTJVUWQzbFBVRHFaSWNwNkROZVdNTmE1Y2diWkM1TWIy?=
+ =?utf-8?B?a3dOSnFqNXJDZEFjUGdwWGhrQzJuSFBWdlRjakd3VXQ0eEhKb3AwNEhNczNL?=
+ =?utf-8?B?MWtvS3NXV3h6eFBPSThVdDBTR3Zrck5IVEVSM2pSNjBUWXZ5a0ZnTFl2c2o5?=
+ =?utf-8?B?MytNMkhEc0ZYV0JWTkVLWloxdVRQRVJ3RGMrdFJnRmw4a3lmaWx1MnRRQmpB?=
+ =?utf-8?B?QS8rVGRHaUtzVk16SjkzdnhBVTNtalZoYkh4RmF3VTRTcmljY1pMa01KMHJm?=
+ =?utf-8?B?cWQzd1ZQU2E4UExwVjd0SXM0Nmcra21ndEpYbTVxNFUvalE2U3dYcURlN1li?=
+ =?utf-8?Q?5uq5hOwxf2Xny5K/ZMyuguVMVWJ0uKXwBNl0GRZgRSgNB?=
+x-ms-exchange-antispam-messagedata-1: cnhyLG0e4EWniQ==
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <94E97A14C6450C4A929232EE785AC613@namprd03.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 9/9] selftests: net: Add a test for BIG TCP in
- UDP tunnels
-To: Alice Mikityanska <alice.kernel@fastmail.im>,
- Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Xin Long <lucien.xin@gmail.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>,
- Nikolay Aleksandrov <razor@blackwall.org>
-Cc: Shuah Khan <shuah@kernel.org>, Stanislav Fomichev <stfomichev@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
- Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
- Alice Mikityanska <alice@isovalent.com>
-References: <20260706181941.385672-1-alice.kernel@fastmail.im>
- <20260706181941.385672-10-alice.kernel@fastmail.im>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260706181941.385672-10-alice.kernel@fastmail.im>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: altera.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR03MB6964.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 525c865f-4b2d-4d4e-5ef8-08dedbfef312
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jul 2026 08:08:37.9144
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: fbd72e03-d4a5-4110-adce-614d51f2077a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: eLupp7rqkSnC64Iel7fxCxo9gOqcuZ0AyMJ2M1K5nh/zgkkQpN/nb9S3Aq90z4IBVtxBhGA1yQFcXhyMmsQZjeYqW8yRuUn4RDDdqiwiy5Qjc6+EEBdgrymnGiEt79o6gcPCddu1c7MV0GhVzA/wUA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS3PR03MB989144
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [2.44 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[altera.com,reject];
+	R_DKIM_ALLOW(-0.20)[altera.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305318-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305319-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:alice.kernel@fastmail.im,m:daniel@iogearbox.net,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:lucien.xin@gmail.com,m:willemdebruijn.kernel@gmail.com,m:willemb@google.com,m:dsahern@kernel.org,m:razor@blackwall.org,m:shuah@kernel.org,m:stfomichev@gmail.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:fw@strlen.de,m:netdev@vger.kernel.org,m:alice@isovalent.com,m:lucienxin@gmail.com,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[fastmail.im,iogearbox.net,davemloft.net,google.com,kernel.org,gmail.com,blackwall.org];
-	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lunn.ch,strlen.de,vger.kernel.org,isovalent.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:krzk@kernel.org,m:dinguyen@kernel.org,m:maxime.chevallier@bootlin.com,m:rmk+kernel@armlinux.org.uk,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:robh@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:devicetree@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:rmk@armlinux.org.uk,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[altera.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,kernel,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,altera.com:from_mime,altera.com:email,altera.com:mid,altera.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 48F3A718F37
+X-Rspamd-Queue-Id: 9C7F9719046
 
-On 7/6/26 8:19 PM, Alice Mikityanska wrote:
-> From: Alice Mikityanska <alice@isovalent.com>
-> 
-> The test sets up VXLAN and GENEVE tunnels over IPv4 and IPv6 and runs
-> IPv4 and IPv6 traffic through them with BIG TCP enabled. It checks that
-> a non-negligible amount of big aggregated packets are seen in tcpdump.
-> 
-> Check the number of packets on both TX and RX sides to verify that GSO
-> packets are valid and not dropped. Capture on the lower netdev (veth),
-> when checksum offload is on, to verify that encapsulated BIG TCP packets
-> can get to their destination. In the test with TX checksum offload off,
-> software GSO splits aggregated VXLAN packets before passing them to
-> veth, so capture inside the tunnel instead to check that the big packets
-> are not dropped.
-> 
-> Check that the amount of SACKs is negligible. On unsupported kernels,
-> some amount of broken GSO packets bigger than 65536 bytes can be
-> produced in VXLAN tunnels, but they don't reach the destination. Seeing
-> TCP SACKs is a sign that such packets could have been dropped (in such
-> cases, the amount of SACKs is a few times bigger than the number of
-> attempts to send BIG TCP packets).
-> 
-> Signed-off-by: Alice Mikityanska <alice@isovalent.com>
-> ---
->  tools/testing/selftests/net/Makefile          |   1 +
->  .../testing/selftests/net/big_tcp_tunnels.sh  | 183 ++++++++++++++++++
->  2 files changed, 184 insertions(+)
->  create mode 100755 tools/testing/selftests/net/big_tcp_tunnels.sh
-> 
-> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-> index 708d960ae07d..4cb0a0bc1eea 100644
-> --- a/tools/testing/selftests/net/Makefile
-> +++ b/tools/testing/selftests/net/Makefile
-> @@ -13,6 +13,7 @@ TEST_PROGS := \
->  	arp_ndisc_untracked_subnets.sh \
->  	bareudp.sh \
->  	big_tcp.sh \
-> +	big_tcp_tunnels.sh \
->  	bind_bhash.sh \
->  	bpf_offload.py \
->  	bridge_stp_mode.sh \
-> diff --git a/tools/testing/selftests/net/big_tcp_tunnels.sh b/tools/testing/selftests/net/big_tcp_tunnels.sh
-> new file mode 100755
-> index 000000000000..128a710e74ad
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/big_tcp_tunnels.sh
-> @@ -0,0 +1,183 @@
-> +#!/usr/bin/env bash
-> +# SPDX-License-Identifier: GPL-2.0
-> +#
-> +# Testing for IPv4 and IPv6 BIG TCP over VXLAN and GENEVE tunnels.
-> +
-> +SERVER_NS=$(mktemp -u server-XXXXXXXX)
-> +SERVER_IP4="192.168.1.1"
-> +SERVER_IP6="2001:db8::1:1"
-> +SERVER_IP4_TUN="192.168.2.1"
-> +SERVER_IP6_TUN="2001:db8::2:1"
-> +
-> +CLIENT_NS=$(mktemp -u client-XXXXXXXX)
-> +CLIENT_IP4="192.168.1.2"
-> +CLIENT_IP6="2001:db8::1:2"
-> +CLIENT_IP4_TUN="192.168.2.2"
-> +CLIENT_IP6_TUN="2001:db8::2:2"
-> +
-> +: "${PACKETS_THRESHOLD:=1000}"
-> +
-> +# Kselftest framework requirement - SKIP code is 4.
-> +ksft_skip=4
-> +
-> +setup() {
-> +	ip netns add "$SERVER_NS"
-> +	ip netns add "$CLIENT_NS"
-> +	ip -netns "$SERVER_NS" link add link1 type veth peer name link0 netns "$CLIENT_NS"
-> +
-> +	ip -netns "$CLIENT_NS" link set link0 up
-> +	ip -netns "$CLIENT_NS" addr replace "$CLIENT_IP4/24" dev link0
-> +	ip -netns "$CLIENT_NS" addr replace "$CLIENT_IP6/112" dev link0 nodad
-> +	ip -netns "$CLIENT_NS" link set link0 \
-> +		gso_max_size 196608 gso_ipv4_max_size 196608 \
-> +		gro_max_size 196608 gro_ipv4_max_size 196608
-> +	ip -netns "$SERVER_NS" link set link1 up
-> +	ip -netns "$SERVER_NS" addr replace "$SERVER_IP4/24" dev link1
-> +	ip -netns "$SERVER_NS" addr replace "$SERVER_IP6/112" dev link1 nodad
-> +	ip -netns "$SERVER_NS" link set link1 \
-> +		gso_max_size 196608 gso_ipv4_max_size 196608 \
-> +		gro_max_size 196608 gro_ipv4_max_size 196608
-> +
-> +	ip netns exec "$SERVER_NS" netserver >/dev/null
-> +}
-> +
-> +setup_tunnel() {
-> +	if [ "$2" = 4 ]; then
-> +		SERVER_IP="$SERVER_IP4"
-> +		CLIENT_IP="$CLIENT_IP4"
-> +		echo "Setting up ${1^^} over IPv4, veth tx csum offload $3"
-> +	else
-> +		SERVER_IP="$SERVER_IP6"
-> +		CLIENT_IP="$CLIENT_IP6"
-> +		echo "Setting up ${1^^} over IPv6, veth tx csum offload $3"
-> +	fi
-> +
-> +	if [ "$1" = vxlan ]; then
-> +		ip -netns "$CLIENT_NS" link add tun0 type vxlan \
-> +			id 5001 remote "$SERVER_IP" local "$CLIENT_IP" dev link0 dstport 4789
-> +	else
-> +		ip -netns "$CLIENT_NS" link add tun0 type geneve \
-> +			id 5001 remote "$SERVER_IP"
-> +	fi
-> +	ip -netns "$CLIENT_NS" link set tun0 up
-> +	ip -netns "$CLIENT_NS" addr replace "$CLIENT_IP4_TUN/24" dev tun0
-> +	ip -netns "$CLIENT_NS" addr replace "$CLIENT_IP6_TUN/112" dev tun0 nodad
-> +	ip -netns "$CLIENT_NS" link set tun0 \
-> +		gso_max_size 196608 gso_ipv4_max_size 196608 \
-> +		gro_max_size 196608 gro_ipv4_max_size 196608
-> +	if [ "$1" = vxlan ]; then
-> +		ip -netns "$SERVER_NS" link add tun1 type vxlan \
-> +			id 5001 remote "$CLIENT_IP" local "$SERVER_IP" dev link1 dstport 4789
-> +	else
-> +		ip -netns "$SERVER_NS" link add tun1 type geneve \
-> +			id 5001 remote "$CLIENT_IP"
-> +	fi
-> +	ip -netns "$SERVER_NS" link set tun1 up
-> +	ip -netns "$SERVER_NS" addr replace "$SERVER_IP4_TUN/24" dev tun1
-> +	ip -netns "$SERVER_NS" addr replace "$SERVER_IP6_TUN/112" dev tun1 nodad
-> +	ip -netns "$SERVER_NS" link set tun1 \
-> +		gso_max_size 196608 gso_ipv4_max_size 196608 \
-> +		gro_max_size 196608 gro_ipv4_max_size 196608
-> +
-> +	ip netns exec "$CLIENT_NS" ethtool -K link0 tx-checksumming "$3" > /dev/null
-> +	ip netns exec "$SERVER_NS" ethtool -K link1 tx-checksumming "$3" > /dev/null
-> +}
-> +
-> +cleanup_tunnel() {
-> +	ip -netns "$CLIENT_NS" link del tun0
-> +	ip -netns "$SERVER_NS" link del tun1
-> +}
-> +
-> +cleanup() {
-> +	ip netns pids "$SERVER_NS" | xargs -r kill
-> +	ip netns pids "$CLIENT_NS" | xargs -r kill
-> +	ip netns del "$SERVER_NS"
-> +	ip netns del "$CLIENT_NS"
-> +	rm -rf "$WORKDIR"
-> +}
-> +
-> +do_test() {
-> +	# When tx csum offload is off, software GSO is performed before passing the
-> +	# packet to veth. Check BIG TCP packets inside the VXLAN tunnel to verify
-> +	# the software checksum path: if the checksum code is broken, these packets
-> +	# will be dropped.
-> +	if [ "$2" = on ]; then
-> +		CAPTURE_IFACE='link'
-> +	else
-> +		CAPTURE_IFACE='tun'
-> +	fi
-> +
-> +	ip netns exec "$SERVER_NS" tcpdump -nn -s 256 -i "${CAPTURE_IFACE}1" greater 65536 -w "$WORKDIR/server.pcap" 2> /dev/null &
-> +	TCPDUMP_SERVER_PID="$!"
-> +	ip netns exec "$CLIENT_NS" tcpdump -nn -s 256 -i "${CAPTURE_IFACE}0" greater 65536 -w "$WORKDIR/client.pcap" 2> /dev/null &
-> +	TCPDUMP_CLIENT_PID="$!"
-> +
-> +	# This filter doesn't capture all possible variants of SACK, but it's aimed
-> +	# at the typical one where SACK follows after [nop, nop, timestamp, nop,
-> +	# nop] (14 bytes after the 20-byte TCP header). IPv6 needs a separate match,
-> +	# because man tcpdump says:
-> +	# > Arithmetic expression against transport layer headers, like tcp[0], does
-> +	# > not work against IPv6 packets.  It only looks at IPv4 packets.
-> +	ip netns exec "$SERVER_NS" tcpdump -nn -s 256 -i "tun1" '(tcp[tcpflags] & (tcp-syn|tcp-ack) = tcp-ack and tcp[34:2] & 0xffc3 = 0x0502) or (ip6[6] = 0x06 and ip6[53] & 0x12 = 0x10 and ip6[74:2] & 0xffc3 = 0x0502)' -w "$WORKDIR/sack.pcap" 2> /dev/null &
-> +	TCPDUMP_SACK_PID="$!"
-> +
-> +	if [ "$1" = 4 ]; then
-> +		SERVER_IP="$SERVER_IP4_TUN"
-> +		echo "Running IPv4 traffic in the tunnel"
-> +	else
-> +		SERVER_IP="$SERVER_IP6_TUN"
-> +		echo "Running IPv6 traffic in the tunnel"
-> +	fi
-> +
-> +	sleep 1 # Give tcpdump a second to spin up.
-> +	ip netns exec "$CLIENT_NS" netperf -t TCP_STREAM -l 5 -H "$SERVER_IP" -- \
-> +		-m 80000 > /dev/null
-> +	sleep 1 # Give tcpdump a second to process buffered packets.
-> +	kill "$TCPDUMP_SERVER_PID" "$TCPDUMP_CLIENT_PID" "$TCPDUMP_SACK_PID"
-> +	wait "$TCPDUMP_SERVER_PID" "$TCPDUMP_CLIENT_PID" "$TCPDUMP_SACK_PID"
-> +	PACKETS_SERVER=$(tcpdump --count -r "$WORKDIR/server.pcap" 2> /dev/null | cut -d ' ' -f 1)
-> +	PACKETS_CLIENT=$(tcpdump --count -r "$WORKDIR/client.pcap" 2> /dev/null | cut -d ' ' -f 1)
-> +	PACKETS_SACK=$(tcpdump --count -r "$WORKDIR/sack.pcap" 2> /dev/null | cut -d ' ' -f 1)
-> +
-> +	echo "Captured BIG TCP RX packets: $PACKETS_SERVER"
-> +	echo "Captured BIG TCP TX packets: $PACKETS_CLIENT"
-> +	echo "Captured TCP SACK packets: $PACKETS_SACK"
-> +	[ "$PACKETS_SERVER" -gt "$PACKETS_THRESHOLD" ] || return 1
-> +	[ "$PACKETS_CLIENT" -gt "$PACKETS_THRESHOLD" ] || return 1
-> +	[ "$PACKETS_SACK" -lt "$(( PACKETS_CLIENT / 2 ))" ] || return 1
-
-KCI fails here, see:
-
-https://netdev-ctrl.bots.linux.dev/logs/vmksft/net/results/722863/156-big-tcp-tunnels-sh/stdout
-
-possibly the above parsing is a bit fragile/tcpdump version's dependent?!?
-
-Note that KCI automatically drops from PW series with failing test.
-
-/P
-
+T24gNy83LzIwMjYgMjo0MSBwbSwgS3J6eXN6dG9mIEtvemxvd3NraSB3cm90ZToNCj4+IEFkZCBj
+b21wYXRpYmxlIHN0cmluZyBmb3IgdGhlIEludGVsIFNvQ0ZQR0EgQWdpbGV4NSBTb0NESyBUU04g
+Q29uZmlnMg0KPj4gYm9hcmQgdmFyaWFudC4gVGhpcyBib2FyZCBlbmFibGVzIGdtYWMxIGFzIGEg
+VFNOIHBvcnQgd2l0aCBhbiBGUEdBDQo+PiBHTUlJLXRvLVJHTUlJIGNvbnZlcnRlciBwcm92aWRp
+bmcgdGhlIFJHTUlJIGNsb2NrIGRlbGF5cy4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBOYXppbSBB
+bWlydWw8bXVoYW1tYWQubmF6aW0uYW1pcnVsLm5hemxlLmFzbWFkZUBhbHRlcmEuY29tPg0KPiBT
+byB5b3UganVzdCBpZ25vcmVkIHRoZSB0YWc/IFN1cmUsIHdlIGNhbiBpZ25vcmUgcGF0Y2hlcyBh
+cyB3ZWxsLg0KPiBEcm9wcGluZyBmcm9tIHBhdGNod29yay4NCj4gDQo+IEJlc3QgcmVnYXJkcywN
+Cj4gS3J6eXN6dG9mDQpIaSBLcnp5c3p0b2YsDQoNCkFwb2xvZ2llcyBmb3IgdGhlIG92ZXJzaWdo
+dC4gSW4gdjIgd2UgcmVzdHJ1Y3R1cmVkIHRoZSBzZXJpZXMgYnkgYWRkaW5nIA0KYSBuZXcgcGF0
+Y2ggZm9yIHRoZSBuZXQgTUFDIGJpbmRpbmcgKGFsdHIsc29jZnBnYS1zdG1tYWMpLCBhbmQgZHVy
+aW5nIA0KdGhhdCByZW9yZ2FuaXphdGlvbiB3ZSBhY2NpZGVudGFsbHkgZHJvcHBlZCB5b3VyIEFj
+a2VkLWJ5IHRhZyBmcm9tIHBhdGNoIA0KMS80LiBUaGlzIHdhcyBvdXIgbWlzdGFrZSBhbmQgbm90
+IGludGVudGlvbmFsLg0KDQpXZSB3aWxsIGNhcnJ5IHlvdXIgQWNrZWQtYnkgaW4gdjMuDQoNCkJS
+LA0KTmF6aW0NCg==
 
