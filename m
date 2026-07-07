@@ -1,63 +1,64 @@
-Return-Path: <netdev+bounces-305273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305271-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FT3TBmqATGqVlQEAu9opvQ
-	(envelope-from <netdev+bounces-305273-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 06:28:26 +0200
+	id Mp1hGr1/TGprlQEAu9opvQ
+	(envelope-from <netdev+bounces-305271-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 06:25:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7963B7173D2
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 06:28:25 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EB0A71737E
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 06:25:32 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=rbox.co header.s=selector2 header.b=toXSCDNN;
+	dkim=pass header.d=rbox.co header.s=selector2 header.b=e78bz5uy;
 	dmarc=pass (policy=none) header.from=rbox.co;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305273-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305273-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305271-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305271-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 294D0303895E
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 04:25:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5C853300F79F
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 04:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74ED337BE9C;
-	Tue,  7 Jul 2026 04:25:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FB7735836B;
+	Tue,  7 Jul 2026 04:25:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB1A376A0B;
-	Tue,  7 Jul 2026 04:25:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49F293769EA;
+	Tue,  7 Jul 2026 04:25:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783398309; cv=none; b=BIdu7Wfo9QzDbE8WjLqB8ArB49MZY2qogpZD16IzOzzi2jRRFozpVomGd94UpztZgHreJkvaT9C9V0c47q7VgQ/g4yBpxFYLWhnlNExdXInYrUbBBSpaRdTqNVCiYTV6q11Dp//0/+Nj/NBvsX/OptknGC0L2KxB9KFPfB9qzUQ=
+	t=1783398308; cv=none; b=ChL7CHwn5w9B3wjasZxaZ1Py7z2v8g3gRclVvCqpIqsdn1EEoe49fVnpWJ1A5IlKeIwbFeiUJadKINIBIGIly7UX4G3cSHY/Pd05pM8pA2yohPnSB5BAW9MLvi/p/ZNJTxYTRizysoR1ZQAuDGO8Y74FOU7SJuWpN1ykPGPl1Gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783398309; c=relaxed/simple;
-	bh=opHTuuL9qw5T8tWLSEXG0Rt1luagGrS4UY1zmwZHa6k=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=NwHoRgNreO7OFmIs+TFlt9vi2ji15Bq5HNZhrX95astN+EHJHVQHi5ZcvbXUR3rBq3Q7Aae4+YmyssgeHJS95dKsK6lm4Qqb3LrD+8Oipb4QAFzNmMgRufQoE5oQu4GRwIbpisNziWpGb0ZuBRCqtDXlXMG+fwxXexhLExYZLow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=toXSCDNN; arc=none smtp.client-ip=185.226.149.37
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	s=arc-20240116; t=1783398308; c=relaxed/simple;
+	bh=85tq27hLD+jzwy3TCziJfyDxd7YsbuuJAEaNgXrCMDc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=cAmSIRd0vGui9WrTnMngRSHPsLvJRng44cK5yKbUESzorxe/EUSKu643S8LbSGP7WbJNSe4HzQ9N67cW1b4dj00D2lNMmL3ENh0TjHfO+VAUxTnyXsGJup1UFYYF0/xgFdu8dzByNUDAo6mwYIpnx7s87akmJJyvpIVTW7895XA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=e78bz5uy; arc=none smtp.client-ip=185.226.149.38
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1wgxMa-00DUhX-Q1; Tue, 07 Jul 2026 06:24:52 +0200
+	id 1wgxMa-00Dei1-F3; Tue, 07 Jul 2026 06:24:52 +0200
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
-	Message-Id:Date:Subject:From; bh=VEDYRANxd2n4E7p/Uqpqw4YEwTx+raQSJRg3dXH1x+U=
-	; b=toXSCDNNz9MfJeIbpiWA0UzebKuDxG6j9ppanpNhNsEqgCZ+XMZ3NFXtszEoNik73B3kv54DB
-	RN6tDStprnMIPPpYSBOWxB7EJCZp0DjXyMPOtn3a+gxb84ZGBYtSq3OoU95LWZb+b9MtQT3+3V8fE
-	y6u0DcRa0T2jA5wNsfRlAXi9HGXhH5/gg54hP5zqMGLbjlZDD6CGS6p3o4C0+L3fVqQc5Zy+nyNaf
-	lu3Tj6fsn/pXA7CwRv2YQh7+Wc5rwNSypTyziOvSQZh9ORTcYTPkq4mYR9Y9DUwdWi6kNu3n58/EM
-	D/WJ+XxuwHth2bVEY7jOOui4CpfSO0fjAg8A2Q==;
+	s=selector2; h=Cc:To:In-Reply-To:References:Message-Id:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
+	bh=tKhC+vAaiVHEXEq4FWXbZp0M6pkOOXe+U7ki5CbA0tc=; b=e78bz5uyJHHDEk1z7QSv5njRBF
+	tr3upiv/BLQ6TgGFTo4gPWNJHYfL9y/5QTtQ0KUmUuk6hYVeVpbpLzIkxAwDZzVFeJbMcYYcy/U0v
+	G5+f9JSAjQFfuid9jW2lhx2YdDokw/7qLzUG7E9qsZ5BdAobjPIxDrejLyq0U+ylhE1EKHTG9b2uW
+	H+xW443IRQFMP+c9zVhByeyKbyDOlbIeDNxQ/eQjodQRzSGMEBz/y489cIn3w9Cv1tOk+dNc98pzZ
+	YXBPcqzsgVpEAphS5RpmtvA2MTrDBgdsglYY3IcrGDFEmgMUpJuU8MBBJJHYQkmDYiBDfB3GH2igX
+	oZT5CC/A==;
 Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1wgxMZ-0004lH-Bi; Tue, 07 Jul 2026 06:24:51 +0200
+	id 1wgxMY-00076O-Qb; Tue, 07 Jul 2026 06:24:50 +0200
 Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.95)
-	id 1wgxMO-00Ctdi-HG;
-	Tue, 07 Jul 2026 06:24:40 +0200
+	id 1wgxMP-00Ctdi-O2;
+	Tue, 07 Jul 2026 06:24:41 +0200
 From: Michal Luczaj <mhal@rbox.co>
-Subject: [PATCH bpf v4 0/4] bpf, sockmap: Fix sockmap leaking UDP socks
-Date: Tue, 07 Jul 2026 06:23:55 +0200
-Message-Id: <20260707-sockmap-lookup-udp-leak-v4-0-f878346f27ab@rbox.co>
+Date: Tue, 07 Jul 2026 06:23:56 +0200
+Subject: [PATCH bpf v4 1/4] selftests/bpf: Ensure UDP sockets are bound
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,12 +67,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3XNQQ6DIBAF0KsY1qUBRMGueo+mC8WhUlsxoMbGe
- PeiLmwX7mYmf96fkAdnwKNLNCEHg/HGNmHhpwipKm8egE0ZdsQIS0lKBfZW1e+8xS9r677FfRl
- GyGtcKA6JSrikpUDhu3WgzbjKN1S0Gt23o++LJ6huMZdYZXxn3WftH+ga3qpYfFg1UEwwSSThO
- ouJBH51hR3Pyq4dA/tV0mOFBUWAAEaoyhKa/yvxrgjCjpU4KFrLEqSQjKdyV+Z5/gLSI6/LXwE
- AAA==
-X-Change-ID: 20260617-sockmap-lookup-udp-leak-bc4e5c5481d7
+Message-Id: <20260707-sockmap-lookup-udp-leak-v4-1-f878346f27ab@rbox.co>
+References: <20260707-sockmap-lookup-udp-leak-v4-0-f878346f27ab@rbox.co>
+In-Reply-To: <20260707-sockmap-lookup-udp-leak-v4-0-f878346f27ab@rbox.co>
 To: Alexei Starovoitov <ast@kernel.org>, 
  Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
  Eduard Zingerman <eddyz87@gmail.com>, 
@@ -96,12 +94,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[rbox.co,none];
 	R_DKIM_ALLOW(-0.20)[rbox.co:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-305273-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305271-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[27];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -110,7 +108,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_SENDER(0.00)[mhal@rbox.co,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
@@ -123,77 +121,53 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[cloudflare.com:email,rbox.co:from_mime,rbox.co:email,rbox.co:mid,rbox.co:dkim,vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7963B7173D2
+X-Rspamd-Queue-Id: 7EB0A71737E
 
-Fix for UDP sockets getting leaked during sockmap lookup/release.
-Accompanied by selftests updates.
+Update sockmap_basic tests to bind sockets before they are used. This
+accommodates the recent change in sockmap that rejects unbound UDP sockets.
 
-Two Sashiko's concerns to be addressed separately:
-https://lore.kernel.org/bpf/20260626205814.BAC3C1F000E9@smtp.kernel.org/
-
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Reviewed-by: Jakub Sitnicki <jakub@cloudflare.com>
 Signed-off-by: Michal Luczaj <mhal@rbox.co>
 ---
-Changes in v4:
-- selftest: drop redundant `if (err)` [Sashiko]
-- Link to v3: https://patch.msgid.link/20260702-sockmap-lookup-udp-leak-v3-0-ff8de8782468@rbox.co
+ tools/testing/selftests/bpf/prog_tests/sockmap_basic.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Changes in v3:
-- selftest: better error handling, ASSERT_*() macros [Sashiko]
-- selftest: fix grammar, reorder patches [Kuniyuki]
-- Link to v2: https://patch.msgid.link/20260626-sockmap-lookup-udp-leak-v2-0-7e7e201c951a@rbox.co
+diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
+index cb3229711f93..2d22a9058a8e 100644
+--- a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
++++ b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
+@@ -853,7 +853,7 @@ static void test_sockmap_many_socket(void)
+ 		return;
+ 	}
+ 
+-	udp = xsocket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, 0);
++	udp = socket_loopback(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK);
+ 	if (udp < 0) {
+ 		close(dgram);
+ 		close(tcp);
+@@ -922,7 +922,7 @@ static void test_sockmap_many_maps(void)
+ 		return;
+ 	}
+ 
+-	udp = xsocket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, 0);
++	udp = socket_loopback(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK);
+ 	if (udp < 0) {
+ 		close(dgram);
+ 		close(tcp);
+@@ -993,7 +993,7 @@ static void test_sockmap_same_sock(void)
+ 		return;
+ 	}
+ 
+-	udp = xsocket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, 0);
++	udp = socket_loopback(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK);
+ 	if (udp < 0) {
+ 		close(dgram);
+ 		close(tcp);
 
-Changes in v2:
-- selftest: drop the original, adapt old tests
-- fix: change approach to rejecting unbound UDP [Kuniyuki]
-- Link to v1: https://patch.msgid.link/20260623-sockmap-lookup-udp-leak-v1-0-05804f9308e4@rbox.co
-
-To: Alexei Starovoitov <ast@kernel.org>
-To: Daniel Borkmann <daniel@iogearbox.net>
-To: Andrii Nakryiko <andrii@kernel.org>
-To: Eduard Zingerman <eddyz87@gmail.com>
-To: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-To: Song Liu <song@kernel.org>
-To: Yonghong Song <yonghong.song@linux.dev>
-To: Jiri Olsa <jolsa@kernel.org>
-To: Emil Tsalapatis <emil@etsalapatis.com>
-To: Shuah Khan <shuah@kernel.org>
-To: John Fastabend <john.fastabend@gmail.com>
-To: Jakub Sitnicki <jakub@cloudflare.com>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: Eric Dumazet <edumazet@google.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-To: Paolo Abeni <pabeni@redhat.com>
-To: Willem de Bruijn <willemb@google.com>
-To: "David S. Miller" <davem@davemloft.net>
-To: Jakub Kicinski <kuba@kernel.org>
-To: Simon Horman <horms@kernel.org>
-To: Cong Wang <cong.wang@bytedance.com>
-Cc: bpf@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: netdev@vger.kernel.org
-
----
-Michal Luczaj (4):
-      selftests/bpf: Ensure UDP sockets are bound
-      bpf, sockmap: Reject unhashed UDP sockets on sockmap update
-      selftests/bpf: Adapt sockmap update error handling
-      selftests/bpf: Fail unbound UDP on sockmap update
-
- net/core/sock_map.c                                 |  2 ++
- .../selftests/bpf/prog_tests/sockmap_basic.c        |  6 +++---
- .../selftests/bpf/prog_tests/sockmap_listen.c       | 21 +++++++++++----------
- tools/testing/selftests/bpf/test_maps.c             | 13 ++++++-------
- 4 files changed, 22 insertions(+), 20 deletions(-)
----
-base-commit: 17566290dc802b03a8127729b19c5962d63a7947
-change-id: 20260617-sockmap-lookup-udp-leak-bc4e5c5481d7
-
-Best regards,
---  
-Michal Luczaj <mhal@rbox.co>
+-- 
+2.55.0
 
 
