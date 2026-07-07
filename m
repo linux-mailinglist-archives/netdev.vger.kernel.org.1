@@ -1,168 +1,165 @@
-Return-Path: <netdev+bounces-305487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305488-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id OpgCHFMLTWp8uAEAu9opvQ
-	(envelope-from <netdev+bounces-305487-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 16:21:07 +0200
+	id +mb5MSMKTWoZuAEAu9opvQ
+	(envelope-from <netdev+bounces-305488-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 16:16:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0DD671C853
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 16:21:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E9B171C714
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 16:16:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=IgLSxXyp;
-	dmarc=pass (policy=reject) header.from=bootlin.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305487-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305487-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=CM6PGvot;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305488-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305488-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 803BA301F1A2
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 14:01:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1CE783110658
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 14:08:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B86983168E1;
-	Tue,  7 Jul 2026 14:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 522783438BF;
+	Tue,  7 Jul 2026 14:07:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1B842B325;
-	Tue,  7 Jul 2026 14:00:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EBF73F39E9
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 14:07:20 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783432822; cv=none; b=pBkO8Cvi9qInmhwqndfjGbsXxRgV0iXDvkHg2t5j/AjoGT5JlUIa/0oSPLLGdv9QZhjVunQbA9DYoXGlRUCK6FZ6Dh151+wXKtNg64w2bCujxa9lzCAdI3aWBY2SGNqgh6Mu559Orkd/qmwR6lxb74J3+qRLJ5AIxbgoJGNiykU=
+	t=1783433241; cv=none; b=FXh9knnPQsldtlhCUrMViDY0fI6FJfd9/DJJKZlDmvwJ7XcYfIIE44RH6o8xeAAQ+ck2UyZVUcVb+OWHrmSMZH5JrpvHYLJ/0b2CK/KDQfvX/oyvWjRzv4NAw7EzYuUzrYGBTTmGDyuq8+TVaN3ZJLyn8q+HWquJhbOlmw7Zfbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783432822; c=relaxed/simple;
-	bh=hTF38CRsldNCAc84C+24BLtsxFbQnmuW4qGHVVfFL+o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P1OfuQORiCU4BEZFzbh9Hz8aJj2RllQjuZmiJ0jts4qJoOd5jDbdZryk2eU1FQ+hX4nW7VyrPYQrpFOIV03UG7vF3HcI4qbY1Hj4en4s0KGZnJHZmyUavAZfQpDLYX65JgU7vfnCqwGuEPe7KHR+vlEXl1gfWgS0gadLM712QH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IgLSxXyp; arc=none smtp.client-ip=185.246.84.56
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id C60C41A0EB2;
-	Tue,  7 Jul 2026 14:00:18 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 97FEE60333;
-	Tue,  7 Jul 2026 14:00:18 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D240A11BC2532;
-	Tue,  7 Jul 2026 16:00:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1783432817; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=3MYQXM7UkANi2WT6aY2MDPikz9inXNl8D1Bb0zGbg7o=;
-	b=IgLSxXypfN0MZ1rOo5iQyhIvtBVeXlLuS5UH4O3XEPh1p68PIZ04ZGCSy5QdcqZs6lKAXn
-	4VxKKSSOq6CwRimor6o1gmC9qjWDInEoTS7sZA7Q7CJgMdlChmeSFPiKfgu0s0l85B+nZG
-	q89IW3Ct+6MxcgFTFMwiOPRCfWhmIuHbEkA7tAFN+fkKkHOE6H0cfyvlqAhB3G5/AbITsZ
-	H+004Hnj5u3hmn5QQ5c5IdUiLVxVPoAALF10N2SEEJCk+y7xrKhrBHbcINJghsaUN9MCdJ
-	eLQy054PtyzjzNHVW9bbk8ZnsZtpQ8r4n791uk1h04CNSEPqyO2WPtLnDpi2Hg==
-Message-ID: <c1254d42-e617-4ebb-b65c-3c4079766489@bootlin.com>
-Date: Tue, 7 Jul 2026 16:00:07 +0200
+	s=arc-20240116; t=1783433241; c=relaxed/simple;
+	bh=VNOthrWDgMe51DaLNmRvGOgBRJChgBG+zoxmQTB7two=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QyovHuyTUkYE5lUcehSLlTWAQLCHqVF4Fbl9SKzFaE0uyAAWkOMeUzQ6mC1zc1pytoCh1ljiHKZQtRH8oJJWxn6RJuPRzUnq5phdsZ07eevEN7IVGQ0ueAjwxFs0U5T0bH9/LPobeLZ7m/GxqAX3njydb/pa7dpqgQ80uf///5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CM6PGvot; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C91D1F000E9;
+	Tue,  7 Jul 2026 14:07:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783433240;
+	bh=TbDjUFQ8y2cf3ZfvpIyeJwcBu1+jogsuvp+HURk7B1Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=CM6PGvotwp6h5fdyxBXyxflZVxqRIjdiRW2OXD33cNNVC0zMekKtrZxd+aaTv7QId
+	 xbWCGpMiIbAeXCmuCjzhTD9CHSjXRhIUJ+6cFbcXwWC5hHYRdM/F67ewYtDOkQtBCZ
+	 Fi0BBIS4wBxYrYtbowP0d8Em/2klHQOz+4sHlqU7GRBbmEDEySHfqfVp2cvR15/OM2
+	 3pMoF8UGBXlwy2rsSKDGYkU0fG91ecWQFAQ7DblX99E9OFVHBU1+oFpoZJrpsOG5K9
+	 QXoK5s2k5V07JapW6vJcvQFIp56Lqp+O+zSt3JkKjBUB+V1SzHvJyPkZJkunl7ULmT
+	 rUVGbkSw1T6FQ==
+Date: Tue, 7 Jul 2026 16:07:17 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Aniket Negi <aniket.negi03@gmail.com>
+Cc: netdev@vger.kernel.org, aniket.negi@airoha.com
+Subject: Re: [PATCH net v4] net: airoha: fix MIB stats collection to be
+ lossless
+Message-ID: <ak0IFdwz1rDEekOO@lore-desk>
+References: <akwczc23LOGbKfMl@lore-desk>
+ <20260707132117.94902-1-aniket.negi03@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v13 09/10] net: ethtool: Introduce ethtool
- command to list ports
-To: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net,
- Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Russell King <linux@armlinux.org.uk>,
- Heiner Kallweit <hkallweit1@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
- Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
- Romain Gantois <romain.gantois@bootlin.com>,
- Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
- Frank Wunderlich <frank.wunderlich@linux.dev>
-References: <20260701110427.143945-1-maxime.chevallier@bootlin.com>
- <20260701110427.143945-10-maxime.chevallier@bootlin.com>
- <aaef7304-573a-419e-b631-30b300373a08@redhat.com>
- <7f47104f-8333-4c10-aab6-90552daabefe@bootlin.com>
- <e1034a59-1ab0-4a41-b709-9da253d4901f@redhat.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <e1034a59-1ab0-4a41-b709-9da253d4901f@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="9OSNfM+DRPhE0WS3"
+Content-Disposition: inline
+In-Reply-To: <20260707132117.94902-1-aniket.negi03@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-6.76 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305487-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[redhat.com,davemloft.net,lunn.ch,kernel.org,google.com,armlinux.org.uk,gmail.com];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:davem@davemloft.net,m:andrew@lunn.ch,m:kuba@kernel.org,m:edumazet@google.com,m:linux@armlinux.org.uk,m:hkallweit1@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:thomas.petazzoni@bootlin.com,m:christophe.leroy@csgroup.eu,m:herve.codina@bootlin.com,m:f.fainelli@gmail.com,m:vladimir.oltean@nxp.com,m:kory.maincent@bootlin.com,m:kabel@kernel.org,m:o.rempel@pengutronix.de,m:nicveronese@gmail.com,m:horms@kernel.org,m:mwojtas@chromium.org,m:romain.gantois@bootlin.com,m:daniel@makrotopia.org,m:dimitri.fedrau@liebherr.com,m:frank.wunderlich@linux.dev,m:ffainelli@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:aniket.negi03@gmail.com,m:netdev@vger.kernel.org,m:aniket.negi@airoha.com,m:aniketnegi03@gmail.com,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,bootlin.com,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com,linux.dev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305488-lists,netdev=lfdr.de];
+	RCPT_COUNT_THREE(0.00)[3];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url,sashiko.dev:url,bootlin.com:from_mime,bootlin.com:dkim,bootlin.com:mid]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lore-desk:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B0DD671C853
+X-Rspamd-Queue-Id: 9E9B171C714
 
 
+--9OSNfM+DRPhE0WS3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 7/7/26 15:46, Paolo Abeni wrote:
-> On 7/7/26 12:47 PM, Maxime Chevallier wrote:
->> On 7/7/26 12:12, Paolo Abeni wrote:
->>>
->>> Both sashikos instances points to multiple races with dumps. I suspect
->>> some explicit locking is required.
->>>
->>> https://sashiko.dev/#/patchset/20260701110427.143945-1-maxime.chevallier%40bootlin.com
->>> https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260701110427.143945-1-maxime.chevallier%40bootlin.com
->>>
->>> I *think* this is hopefully the last pending issue.
->>
->> True indeed, the other issues are sashiko saying "what if we detach a PHY and attach it
->> to another netdev", which can't happen :) I agree with some of the locking points that
->> were found, I'll address that likely as a separate cleanup.
-> 
-> I'm sorry, but I think it's better to address the above problems with
-> the main series to avoid a window of opportunity that could cause a lot
-> of quite randomic/drop by submissions to try to addresses them with a
-> lot of noise on the ML.
+> Hi Lorenzo,
+> Thanks for the review.
+>=20
+> > > +	for (i =3D AIROHA_GDM1_IDX; i <=3D AIROHA_GDM4_IDX; i++)
+> > > +		airoha_fe_set(eth, REG_FE_GDM_MIB_CLEAR(i),
+> > > +			      FE_GDM_MIB_RX_CLEAR_MASK | FE_GDM_MIB_TX_CLEAR_MASK);
+> >
+> > This configuration is not needed since we reset FE at module load.
+>=20
+> Agreed. The SCU FE reset clears MIB counters, so the explicit loop
+> is redundant. Will drop it in v5.
+>=20
+> On Mon, 2 Jul 2026 22:59:32 +0000, Sashiko <sashiko@kernel.org> wrote:
+> > With this patch the driver no longer has any users of
+> > REG_FE_GDM_MIB_CLEAR, FE_GDM_MIB_RX_CLEAR_MASK or
+> > FE_GDM_MIB_TX_CLEAR_MASK; grep in drivers/net/ethernet/airoha/
+> > matches only the definitions in airoha_regs.h. Should these macros
+> > be removed in the same patch that eliminates their only caller?
+>=20
+> What is your suggestions here, I prefer that definitions should=20
+> be retained in airoha_regs.h as register documentation for future=20
+> reference. Only the loop will be dropped.
 
-I was thinking the opposite actually, send a cleanup series that gets the
-locking part correct before continuing with phy_port, as it seems for now
-the phy_port/topology code is avoiding races just because all the callpaths
-happen to be under rtnl(), but this isn't formalised properly with asserts
-and dedicated locks in the problematic parts of the code.
+correct.
 
-I otherwise agree, let's not send buggy code to be fixed later and I definitely
-see what you mean about the random submissions to fix these.
+Regards,
+Lorenzo
 
-Maxime
+>=20
+> > nit: tmp is not so meaningful, maybe better something like data?
+> > nit: I would prefer "+" instead of "|"
+> > nit: please drop prev and just do:
+> >       dev->stats.tx_ok_pkts =3D max(data, dev->stats.tx_ok_pkts);
+> > please redo it for all the occurrences.
+>=20
+> Understood. Will rename tmp to data, and use '+' instead of '|' in v5.
+>=20
+> Thanks,
+> Aniket
 
+--9OSNfM+DRPhE0WS3
+Content-Type: application/pgp-signature; name=signature.asc
 
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCak0IFQAKCRA6cBh0uS2t
+rPZ6AP9X0jB9HpK99S27kDxkKP1oUt6TrTSfLBDGruyoe2yvWgEApoZ/M6U5vY9k
+s1nkiMUPTYtBH0R5qY9C0At6wy1ubAE=
+=asqu
+-----END PGP SIGNATURE-----
+
+--9OSNfM+DRPhE0WS3--
 
