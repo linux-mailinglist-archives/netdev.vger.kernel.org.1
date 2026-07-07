@@ -1,290 +1,246 @@
-Return-Path: <netdev+bounces-305525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305526-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id X1bVM/0mTWqBvwEAu9opvQ
-	(envelope-from <netdev+bounces-305525-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:19:09 +0200
+	id qupDMkcmTWpbvwEAu9opvQ
+	(envelope-from <netdev+bounces-305526-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:16:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1223D71DC1B
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:19:09 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61BD171DBB0
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:16:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=KtYyrd0K;
-	dmarc=pass (policy=none) header.from=intel.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305525-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305525-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b="g33en/YF";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305526-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305526-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E43AE3017BFF
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 16:14:32 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 29A533007894
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 16:16:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA90D373BF3;
-	Tue,  7 Jul 2026 16:14:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 579E6434E33;
+	Tue,  7 Jul 2026 16:16:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E6432B10E
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 16:14:28 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783440870; cv=fail; b=lyha30pwkPeqphmMVJezv+1YXw27FmkQ4SO9PIIFB5wArE2AwFDNiQudzB76B98vvhV2RAPni6ZCGBcex8EcTo/yozmSwqyLDeFwYAJxPykGW6ZoybFsyFRBCVseslLUNjzINgFKzwlzWHnMIPT0ODOrAa3A7Ku3p1l8QVJM5A4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783440870; c=relaxed/simple;
-	bh=vkaLXs6RWpls23//qIfGnrzTccACHwibjJ/69HtS8L8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=drXlIBun8Kq6b6wtyspEClL8bUlSoQgoN18QKI0dbTpQboEoyio6PZ9e/mztZ4HSkfdGAdJCsGWxIkQ3wp3fgCnBXh6Ci35ohHu8rQgGKpzly2Ele7Z6xUNyeHme3CmlZeCzHuzpcK7+a7MlhyWGrAEk7pk265gnKMgaZznmjWU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KtYyrd0K; arc=fail smtp.client-ip=192.198.163.8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1783440868; x=1814976868;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=vkaLXs6RWpls23//qIfGnrzTccACHwibjJ/69HtS8L8=;
-  b=KtYyrd0KHZcC58CSwY0SDdFWgm+wUevB+cjqfn+mn+XIv7gqYaDxEe5o
-   zg68ydXklxXFbYargHM7gy+AxPxoZh+y66kZ1aas3SsDygSqNJw2z3qG2
-   1lN16cSxZNlI58sXGiGQ+PWW2z4iSdDIV54rGHUj8VMzg3nvcfoky7NjY
-   qLeMFh866I+F1/pUSX8eN417w1mvhpDpaRpDo/2qnSXxlCMGUmkNACgOr
-   KbxsQginpVS7Rd1cUYeLP8y2ASOhrUK0tkgTBjnkhXj7gTu3sONFF3KC6
-   ffDQP7ZbD5tX4R4dFV0EDEaIucbe/3dt+zEV4f54KkLJ22jc1QOzjeZgn
-   g==;
-X-CSE-ConnectionGUID: 2rq4l2fhS/uOOoknsanbcA==
-X-CSE-MsgGUID: 8Nh3D2ZySYecHEPW1mZ04w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11840"; a="101639302"
-X-IronPort-AV: E=Sophos;i="6.25,153,1779174000"; 
-   d="scan'208";a="101639302"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2026 09:14:27 -0700
-X-CSE-ConnectionGUID: zTCAllrhTLyuLdmZmhSM5Q==
-X-CSE-MsgGUID: FMACM8A4Qi+yYssycpF6hg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,153,1779174000"; 
-   d="scan'208";a="257614949"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2026 09:14:27 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Tue, 7 Jul 2026 09:14:26 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43 via Frontend Transport; Tue, 7 Jul 2026 09:14:26 -0700
-Received: from BL2PR02CU003.outbound.protection.outlook.com (52.101.52.48) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Tue, 7 Jul 2026 09:14:26 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=avBvbsFdn37Zs53AGTS4k5y8zh9AwUyCb+H3BU0ddoI5iJrS64kRGmaSlvh2gaatprwQj6zfgb19+SPct4H9ridYlcDNbJLfb6cjxFsX4FOuVON/IwruRcEElYAF91CnTwGazfTowEYit47W3P1TZoedPj+CaJznJmLtfShccmFGNqI6+mdhYz62umgaaQ1paAYVd0DlcG2adqzujTvN6LV26yQ3Eh4WUFPir4c+zUBSBjwyhl3FGyVoxFmMernRdIqXOn7A3k0geEWZnRp97r3zQFLMEuqnOhbptWxhpIRmyQ9uaSCFK7bd558is3z2vW3CJ8PM9KsW8IIbHJpOEw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kBFTMAyl2/aF5ijNjXWpDbQyh1y4TuNRSv82+2IYflY=;
- b=xW+upEGqJUehLnSmtnaYu4Q/hGhT+1DE5N9wOJFW/9bF6Xy/+k0jIGfX83VhNicYeHyPSyCTm8BrEXtxud1aRI3fBNqvUohMbIbiUpAjnJaoLtwL101VVTeDu+5E9KJvZxPBNC2NXTF2yTTIsfXtbZv1nWhjn+hWeEL1/yhwKFzPaZVTjf38XsnsJqcdwXhEXJQld/yXQ6q3HPE6tM0rpM/N7tBJ5yzt+/d96BR/DKioOx92/M39+0OWzoyhFtVcu69dI/DuyPa7tyb2+cc1ugI3+uiIJu6R5Vz2LfVG53AA9xYyk5VJ9LWnCJ//xOYOjBz1c+8DLuSg4VkbSZ072A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SJ1PR11MB6297.namprd11.prod.outlook.com (2603:10b6:a03:458::8)
- by IA0PR11MB7882.namprd11.prod.outlook.com (2603:10b6:208:40f::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.10; Tue, 7 Jul
- 2026 16:14:22 +0000
-Received: from SJ1PR11MB6297.namprd11.prod.outlook.com
- ([fe80::6f05:5b37:2440:556e]) by SJ1PR11MB6297.namprd11.prod.outlook.com
- ([fe80::6f05:5b37:2440:556e%3]) with mapi id 15.21.0181.008; Tue, 7 Jul 2026
- 16:14:21 +0000
-From: "Salin, Samuel" <samuel.salin@intel.com>
-To: Simon Horman <horms@kernel.org>, "Tantilov, Emil S"
-	<emil.s.tantilov@intel.com>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "Chittim, Madhu"
-	<madhu.chittim@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net] idpf: fix max_vport related
- crash on allocation error during init
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net] idpf: fix max_vport related
- crash on allocation error during init
-Thread-Index: AQHc/1f6nBfOykuzDEmsuiOwssf+vLZKM3IAgBglCKA=
-Date: Tue, 7 Jul 2026 16:14:21 +0000
-Message-ID: <SJ1PR11MB6297207C146736EAA932C4449BF02@SJ1PR11MB6297.namprd11.prod.outlook.com>
-References: <20260618192325.8694-1-emil.s.tantilov@intel.com>
- <20260622073058.GY827683@horms.kernel.org>
-In-Reply-To: <20260622073058.GY827683@horms.kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ1PR11MB6297:EE_|IA0PR11MB7882:EE_
-x-ms-office365-filtering-correlation-id: e2e88d8a-877e-4913-afb2-08dedc42ce36
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|23010399003|376014|38070700021|4143699003|5023799004|56012099006|11063799006|6133799003|18002099003|22082099003;
-x-microsoft-antispam-message-info: QGNB1PLTM5u281PF9MdtsnfwXfLwpHVUlbsEslJjBHiUqj02nKVj1D7OSY147H34VSjruCx26jsLqCCEbsu/sbSo5POzaf2TDnDFdbu4+q2QJfzrDdiFWSt761czjpuK25lglpYer+QgnwG+EEsYsNR9Kjg/tU4LKCy+SLAR2AYnd8HAozG4zf/5slwHU6Ov82ZgMV9J0oew0tpZq4ymOVVLTsURyxlTpipxGs8aCZjO6EG9Ou2qbJZrq63lejlCQolIak4RaAwUa97DgIYzjPM66Cxmd3oFY1ypat8N+Tn1L8OI0HscZTXvgSo4IRHodRH/WyjIgOr7bdWLt2sLHer+w/MrY70OPm1qrv362Sqqitz9YUpE0d/uaVODiipNWx8YlQgLWgT/jVp/QK+AKmwii9NK8zoIj58to5ylMqW+sLDlAhsMbZ5E8r9zDaE3iFvK3aaf8ZRqmSBsnaMO1Hd3syDGplKNPjzENJ955H331SLc5pAMD7zZVfKThDwKGh2IXBzUtu2p4FSn9LcPPXhRqtcyr9nFa921A9fHty26H+etsYCOEifXQjWBl2ICqeP53h+dwEY4vmQdLFrSb+cLC6BtCSP+v0uFgVo04ZuvuSAWaxcLzq+Oo5Nb+XDNpOgj8XYK8o3NLQSHDps1yPS1cGfGoxrvsfPlryg/qro/+HzZWzfMHjlIePbDHC0DMezdUgokhsZtCa0o9xin+T+eKMOsDmEss4wYvmGD9ao=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR11MB6297.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(23010399003)(376014)(38070700021)(4143699003)(5023799004)(56012099006)(11063799006)(6133799003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?DETMECavf7raY1g5v+C7zxNrxaN9qTD7lorWxg3gUZwbI9xyfkFQq14ZGvlW?=
- =?us-ascii?Q?FaTqeqEY5CLALdpVlpvxfIjNvSaUxZljZU6WuWcs9nM0W/JAzzbQNMz2g2qU?=
- =?us-ascii?Q?KxGfp8KQNXvWn+iYecg9n3FFu3RNIJZob9k8GjIKHpukeD1YjMGa5+05IzcW?=
- =?us-ascii?Q?m9xk9zTh3bUBV382t/dsg7jwD40JLDICxSUgX3UTqaewEYB9xpJS7UJxrhEL?=
- =?us-ascii?Q?MsEtshuy8PDo9sH3c4JbPcS9mmgZSlPSOwA/T/c7BnpYrHFesNNUhaGgRO2e?=
- =?us-ascii?Q?MewvlhB2jEZkaN2bATKZvr8qz78siC5aYBKoR4fGjyQh4fTe9TpTPslUf6lf?=
- =?us-ascii?Q?K4FspHqGysXZUZRAZE1eZIy4mpzZmGUrPnkxTSsdPH+6v8fx56/s7a1G7r/6?=
- =?us-ascii?Q?cM9Dp0fceSc5PDEFpourAipqoz87BFJxR2/fjcBGBpfstKkrKB0mJSTTxV9h?=
- =?us-ascii?Q?UCT5m5Hhn+jMTJtqUA+PAN3/4nFvKuIovJFyxGBlWXL40mBZMM0/LQNrj8B4?=
- =?us-ascii?Q?nl5ZkUV5JrlI0W9wcxewkXiTqZh+/pfyOgcKWkpHrhdRYZYZLPKRCWBHpamO?=
- =?us-ascii?Q?W+Xp6aS0RWUfF+jA3L7llMkRHjnOfQ4Ry+2Mz6vIaXfnlsIhlCyjPHnMVwvw?=
- =?us-ascii?Q?hfotoXZhY71KeDwpNdQnNbsyS8V9eLdiDgRWIuxHP4SlDKHJlqK4JjZxidZx?=
- =?us-ascii?Q?cWRwslqCUrmifFU9ERrINBRDVgkmp1lNnYn9N7p4dHufpVC6heR9Kqu1q6CU?=
- =?us-ascii?Q?jyADx2xtxAKA4TbOmjwsjm0EqSuFRXNxsXcHruB30a7NjAfRN++pRe8ueTFS?=
- =?us-ascii?Q?AmlisUlV0Vjti/d+/e0iyINjSv8nXy1z+1ViaBRtHULbHcyW5rt5y08YWaG9?=
- =?us-ascii?Q?JR+EBPA++nIUyDxr7NWwjKeLPWY6RfTdXWKQgi6YqrYfbbbWYSCJcVxh+K8I?=
- =?us-ascii?Q?lvwRTon/WQEaRvnKz2m8mgupz8dr/Ey05+K8RY4uCeGGwW/mpAyy5aBn6R0o?=
- =?us-ascii?Q?WEkpOOvHY27GRx6AGQ0CFQvTVPAnWstnAopXg8/NCUFc3pgVguR8PBTAlNOi?=
- =?us-ascii?Q?TFP1uXAH3+qImHkx25L6If8QAMdd4BsvVhZsTmA0fZ+Kg+CSb1fQ/cV6U2u4?=
- =?us-ascii?Q?+nYitiF/wqmXHw+plLYg2t9UzdrmrnEYD98ClFu4TbfxLBbRzZNTwIK+QB7D?=
- =?us-ascii?Q?h59lexFVlZCOxcyId97NnvBCTXsV+vqSvPAzx7SuiyIkzea31GXznaJ8hcLt?=
- =?us-ascii?Q?wnG09IaEhnqY+GSEBx3V1/9rpgfIEQIeVRzzQiKXAe4puHa+PuaL4D3v8oxz?=
- =?us-ascii?Q?SWRaxuCqIcTJxrFFTSs/3Q9+ROW+go09nPqIqoxlusebXpiDQxzEzCCjPKPO?=
- =?us-ascii?Q?GLxRKLsNzff+5kqNwoVDhZqFD/ubLjhoW5OahpW6lBnBp1lcgPcGsKmt3O84?=
- =?us-ascii?Q?tAQj0jYmIDc9CGKB2Q1Z1TfosL8MqSbTUJOaaEvk6VxCVcYsItLBiwOR+ULo?=
- =?us-ascii?Q?Db0OYMi66znIxQwRsKdN2/SxscGBX0ItHf2NTtTAZmY+pIgA5IDjBm9hsTWh?=
- =?us-ascii?Q?/fDwud8Es1Fp90xZeAwwf1r9JOP/u4RSYX3tMNZ0NgM7LeuB7UOInN6yk/TK?=
- =?us-ascii?Q?fwBr/6kWvVHUwFjky5ilLU8IGWjXSFEUIOGPAakr4fwXW75FrEdhTCaiRqL0?=
- =?us-ascii?Q?4s6lrQQ6n0vo0aLyJ4StGr6a0R95z2wYvakXvVabIkrC/KPk?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE65434E2D;
+	Tue,  7 Jul 2026 16:16:03 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783440963; cv=none; b=YBtGhQYNKIMtQDtnZ7yopyxsIBxgdjARoZIGhAILNwPCXy+uIkpvBYCssAQP8skciX6WR38nJ6mKYTr9s+/rGuWMbdti52VQf7kEKttcf0D+lrMLk8z4WGhHkjALNWM4JugTvW+4r/EhIrWZt18weKg6L2pVho9ryxldHeiJLmI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783440963; c=relaxed/simple;
+	bh=IQS+AU57I9FVF7loCFwQTNk/nzq7oElljhrawF91FRc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=lt0GXgXJ5PGKzIhMoPYmRVOqmjwdiYCmFLiaMNBaxxot1i9M17jq6huAFfgzD1Id7OaptBjR8meguSgwhD2uStJPKO7UEXA5IsxMMft5TXb3YjVA/mJHTQTMuT9n1BMeYG8iLuk8SXoukKf+lM5IVmRSobl0+xi9+CrdLgllscg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g33en/YF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DCC75C2BCB8;
+	Tue,  7 Jul 2026 16:16:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1783440962;
+	bh=IQS+AU57I9FVF7loCFwQTNk/nzq7oElljhrawF91FRc=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=g33en/YF4i563TwQMqga6FZDrtUa7/ZLLRmi/yp1+MRWgcVOaL9q+iIhtRzlW4LBo
+	 P1cVu4sLirK0O9GK7eSNoB+KNYPzGX9cUX2KDxGLO7kCZpeeo46udL7/ORGqVuVhNh
+	 Zsmf/XAfBoF8AyLIWX/qPIi8fLBr8mKx4iXV+9mGmOHCYmS6SRJ7H5QhzQfVU0r4Ty
+	 ff3eYKiykxF4Qi8VQ3iTlfalnYAUT6K7ZlCk32/9GMVsyo5qKTucL3dyh4IUYi89AY
+	 ja8i7g8LDhbKJJsldSivsY8OgLnKWBt0Xyqt0kFg7R3PXgN4pdgHS7FMk+0TlDAk1N
+	 Wt06Q2Rj58iYQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2014C43458;
+	Tue,  7 Jul 2026 16:16:02 +0000 (UTC)
+From: Mattia Meleleo via B4 Relay <devnull+mattia.meleleo.coralogix.com@kernel.org>
+Date: Tue, 07 Jul 2026 18:15:53 +0200
+Subject: [PATCH bpf] bpf, sockmap: Account for receive queue in FIONREAD
+ without a verdict program
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: o8nriK6LS+K+EM/u2jJxIDMouGMgNNw58fLMoByDUoxy0WLoo4p/1GopGG6LkFDNv8izY2q1f4BjcV1e76Z+Joi4uO7S1OvYlnDB/Tfb/IVST+gNfRaSMMrbSBZe2W/ZPBsjNpwAx3bkD3qEgKr5eE1wBN8b6Q8W8sGh8gYhoV204qvMfx440qCQkbdXvR/0EW+TNg9PGNd+01we5BVLcLfSgh6NCIe4alqtwYOrCWLCslBLmkfx0PHEJcAqNcDYjKFN7coc+4KafP4Uhz4us1Zj34vJTVJZcAsgx2Hq7t4kdhkjRp8Uvwmjqd5fgcFKfvrhSl4bcEMS0YyrCx9Jjw==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ1PR11MB6297.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e2e88d8a-877e-4913-afb2-08dedc42ce36
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jul 2026 16:14:21.8306
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Z2eBU7lVWfkAJqENePaVw7KJH/IVjABe0j7nnGlu0T2r4KsgTdmZBQCrM3z7Ge7XOrpbo4xDzS+1h8s/xjreeA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7882
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260707-fionread-no-verdict-v1-1-ce94a72357ec@coralogix.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWMQQrCMBBFr1L+2oFYpDFeRVykyYyOi7RMahFK7
+ 27U5fv89zZUNuWKS7fBeNWqU2lwPHRIj1juTJobo3f94LzzJO1gHDOViVa2rGmheJLzEHxMQQK
+ aORuLvn/VK8ZZcPuP9TU+OS3fHvb9A1FPRcB8AAAA
+X-Change-ID: 20260707-fionread-no-verdict-a4f8697ac9f9
+To: John Fastabend <john.fastabend@gmail.com>, 
+ Jakub Sitnicki <jakub@cloudflare.com>, 
+ Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
+ Mattia Meleleo <mattia.meleleo@coralogix.com>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1783440961; l=4235;
+ i=mattia.meleleo@coralogix.com; s=20260707; h=from:subject:message-id;
+ bh=aFZBdyJoJSWVLETQmNXpLi70lCPgP+Z+qtlX8undb2c=;
+ b=7VzhVRcI4/wPM/f39bOT4hg4dp0xF2Z8AKpWg83TJEmeLzjJFJza9F4yZ6pZbB3P+255nqEOT
+ GZkJLvRwBfPACWBpY6Y2OPq6iQK3ApXuROFw7E7Tyl6Sm9rg2mwEGfD
+X-Developer-Key: i=mattia.meleleo@coralogix.com; a=ed25519;
+ pk=cs1zLoe3YDm4bJ7bfbPaZH0lHnd871JyJLiSh2eEzLs=
+X-Endpoint-Received: by B4 Relay for mattia.meleleo@coralogix.com/20260707
+ with auth_id=857
+X-Original-From: Mattia Meleleo <mattia.meleleo@coralogix.com>
+Reply-To: mattia.meleleo@coralogix.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305525-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER(0.00)[samuel.salin@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:emil.s.tantilov@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:madhu.chittim@intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305526-lists,netdev=lfdr.de,mattia.meleleo.coralogix.com];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[samuel.salin@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,cloudflare.com,linux.dev];
+	FORGED_RECIPIENTS(0.00)[m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:mattia.meleleo@coralogix.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,coralogix.com:replyto,coralogix.com:mid,coralogix.com:email];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	HAS_REPLYTO(0.00)[mattia.meleleo@coralogix.com];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1223D71DC1B
+X-Rspamd-Queue-Id: 61BD171DBB0
+
+From: Mattia Meleleo <mattia.meleleo@coralogix.com>
+
+tcp_bpf_ioctl() answers SIOCINQ from psock->msg_tot_len, which only
+counts bytes in ingress_msg. Without a stream/skb verdict program
+nothing is diverted there: data stays in sk_receive_queue, so FIONREAD
+returns 0 even though read() returns data.
+
+Add tcp_inq() to the reported value when the psock has no verdict
+program. The two queues are disjoint, so bytes redirected into
+ingress_msg from other sockets stay correctly accounted through
+msg_tot_len.
+
+Add a selftest covering FIONREAD without a verdict program.
+
+Fixes: 929e30f93125 ("bpf, sockmap: Fix FIONREAD for sockmap")
+Signed-off-by: Mattia Meleleo <mattia.meleleo@coralogix.com>
+---
+ net/ipv4/tcp_bpf.c                                 | 16 ++++++++-
+ .../selftests/bpf/prog_tests/sockmap_basic.c       | 39 ++++++++++++++++++++++
+ 2 files changed, 54 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
+index cc0bd73f3..a001b1fff 100644
+--- a/net/ipv4/tcp_bpf.c
++++ b/net/ipv4/tcp_bpf.c
+@@ -334,6 +334,7 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
+ 
+ static int tcp_bpf_ioctl(struct sock *sk, int cmd, int *karg)
+ {
++	struct sk_psock *psock;
+ 	bool slow;
+ 
+ 	if (cmd != SIOCINQ)
+@@ -344,7 +345,20 @@ static int tcp_bpf_ioctl(struct sock *sk, int cmd, int *karg)
+ 		return -EINVAL;
+ 
+ 	slow = lock_sock_fast(sk);
+-	*karg = sk_psock_msg_inq(sk);
++	psock = sk_psock_get(sk);
++	if (unlikely(!psock)) {
++		unlock_sock_fast(sk, slow);
++		return tcp_ioctl(sk, cmd, karg);
++	}
++	*karg = sk_psock_get_msg_len_nolock(psock);
++	/* Without a verdict program, ingress data is never diverted to
++	 * ingress_msg: it stays in sk_receive_queue and is read through
++	 * the fallback to tcp_recvmsg(), so account for it like
++	 * tcp_ioctl() does.
++	 */
++	if (!psock->progs.stream_verdict && !psock->progs.skb_verdict)
++		*karg += tcp_inq(sk);
++	sk_psock_put(sk, psock);
+ 	unlock_sock_fast(sk, slow);
+ 
+ 	return 0;
+diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
+index cb3229711..f0f368201 100644
+--- a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
++++ b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
+@@ -1373,6 +1373,43 @@ static void test_sockmap_multi_channels(int sotype)
+ 	test_sockmap_pass_prog__destroy(skel);
+ }
+ 
++/* A socket in a sockmap without a verdict program keeps its ingress data
++ * in sk_receive_queue: FIONREAD must account for it.
++ */
++static void test_sockmap_no_verdict_fionread(void)
++{
++	int err, map, zero = 0, sent, avail;
++	int c0 = -1, c1 = -1, p0 = -1, p1 = -1;
++	struct test_sockmap_pass_prog *skel;
++	char buf[256] = "0123456789";
++
++	skel = test_sockmap_pass_prog__open_and_load();
++	if (!ASSERT_OK_PTR(skel, "open_and_load"))
++		return;
++	map = bpf_map__fd(skel->maps.sock_map_rx);
++
++	err = create_socket_pairs(AF_INET, SOCK_STREAM, &c0, &c1, &p0, &p1);
++	if (!ASSERT_OK(err, "create_socket_pairs()"))
++		goto out;
++
++	err = bpf_map_update_elem(map, &zero, &c1, BPF_NOEXIST);
++	if (!ASSERT_OK(err, "bpf_map_update_elem(c1)"))
++		goto out_close;
++
++	sent = xsend(p1, &buf, sizeof(buf), 0);
++	ASSERT_EQ(sent, sizeof(buf), "xsend(p1)");
++	avail = wait_for_fionread(c1, sizeof(buf), IO_TIMEOUT_SEC);
++	ASSERT_EQ(avail, sizeof(buf), "ioctl(FIONREAD)");
++
++out_close:
++	close(c0);
++	close(p0);
++	close(c1);
++	close(p1);
++out:
++	test_sockmap_pass_prog__destroy(skel);
++}
++
+ void test_sockmap_basic(void)
+ {
+ 	if (test__start_subtest("sockmap create_update_free"))
+@@ -1415,6 +1452,8 @@ void test_sockmap_basic(void)
+ 		test_sockmap_skb_verdict_shutdown();
+ 	if (test__start_subtest("sockmap skb_verdict fionread"))
+ 		test_sockmap_skb_verdict_fionread(true);
++	if (test__start_subtest("sockmap no_verdict fionread"))
++		test_sockmap_no_verdict_fionread();
+ 	if (test__start_subtest("sockmap skb_verdict fionread on drop"))
+ 		test_sockmap_skb_verdict_fionread(false);
+ 	if (test__start_subtest("sockmap skb_verdict change tail"))
+
+---
+base-commit: d2c9a99135da931377240942d44f3dea104cedb8
+change-id: 20260707-fionread-no-verdict-a4f8697ac9f9
+
+Best regards,
+--  
+Mattia Meleleo <mattia.meleleo@coralogix.com>
 
 
-
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Simon Horman
-> Sent: Monday, June 22, 2026 12:31 AM
-> To: Tantilov, Emil S <emil.s.tantilov@intel.com>
-> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Nguyen,
-> Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; andrew+netdev@lunn.ch;
-> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
-> pabeni@redhat.com; Chittim, Madhu <madhu.chittim@intel.com>
-> Subject: Re: [Intel-wired-lan] [PATCH iwl-net] idpf: fix max_vport relate=
-d crash
-> on allocation error during init
->=20
-> On Thu, Jun 18, 2026 at 12:23:25PM -0700, Emil Tantilov wrote:
-> > Set adapter->max_vports only after successful allocation of vports,
-> > netdevs and  vport_config buffers. This fixes possible crashes on
-> > reset or rmmod, following failed allocation on init
-> >
-> > [  305.981402] idpf 0000:83:00.0: enabling device (0100 -> 0102) [
-> > 305.994464] idpf 0000:83:00.0: Device HW Reset initiated [
-> > 320.416872] BUG: kernel NULL pointer dereference, address:
-> > 0000000000000000 [  320.416918] #PF: supervisor read access in kernel
-> > mode [  320.416942] #PF: error_code(0x0000) - not-present page [
-> > 320.416963] PGD 2099657067 P4D 0 [  320.416983] Oops: Oops: 0000
-> [#1]
-> > SMP NOPTI ...
-> > [  320.417093] RIP: 0010:idpf_remove+0x118/0x200 [idpf] [  320.417130]
-> > Code: 8b bb 98 09 00 00 e8 17 0f 5b e5 48 8b bb e8 08 00 00 e8 0b 0f
-> > 5b e5 66 83 bb 28 06 00 00 00 48 8b bb 20 06 00 00 74 49 31 ed <48> 8b
-> > 04 ef 48 85 c0 74 2f 48 8b 78 20 e8 66 58 91 e5 48 8b 83 20 [
-> > 320.417183] RSP: 0018:ff7322212903fdb8 EFLAGS: 00010246 [
-> 320.417205]
-> > RAX: 0000000000000000 RBX: ff4463de40300000 RCX:
-> ff7322212903fd4c [
-> > 320.417228] RDX: 0000000000000001 RSI: ffffffffa7f7d100 RDI:
-> > 0000000000000000 [  320.417250] RBP: 0000000000000000 R08:
-> > 0000000000000001 R09: 0000000000000000 [  320.417272] R10:
-> > 0000000000000001 R11: ff4463de3a638f58 R12: ff4463be89ac7000 [
-> > 320.417294] R13: ff4463be89ac7198 R14: ff4463be94fc7198 R15:
-> > ffffffffc0f10f20 [  320.417317] FS:  00007f963c0e6740(0000)
-> > GS:ff4463fdd65d8000(0000) knlGS:0000000000000000 [  320.417342]
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033 [  320.417362] CR2:
-> 0000000000000000 CR3: 00000020ba674002 CR4: 0000000000773ef0 [
-> 320.417385] PKRU: 55555554 [  320.417398] Call Trace:
-> > [  320.417412]  <TASK>
-> > [  320.417429]  pci_device_remove+0x42/0xb0 [  320.417459]
-> > device_release_driver_internal+0x1a9/0x210
-> > [  320.417492]  driver_detach+0x4b/0x90 [  320.417516]
-> > bus_remove_driver+0x70/0x100 [  320.417539]
-> > pci_unregister_driver+0x2e/0xb0 [  320.417564]
-> > __do_sys_delete_module.constprop.0+0x190/0x2f0
-> > [  320.417592]  ? kmem_cache_free+0x31e/0x550 [  320.417619]  ?
-> > lockdep_hardirqs_on_prepare+0xde/0x190
-> > [  320.417644]  ? do_syscall_64+0x38/0x6b0 [  320.417665]
-> > do_syscall_64+0xc8/0x6b0 [  320.417683]  ? clear_bhb_loop+0x30/0x80 [
-> > 320.417706]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> > [  320.417727] RIP: 0033:0x7f963bb30beb
-> >
-> > Fixes: 0fe45467a104 ("idpf: add create vport and netdev
-> > configuration")
-> > Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-> > Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
->=20
-> Reviewed-by: Simon Horman <horms@kernel.org>
->=20
-> FTR, an AI generated review of this patch is available on sashiko.dev.
-> I think that the issue raised there can be looked at in the context of po=
-ssible
-> follow-up.
-
-
-Tested-by: Samuel Salin <Samuel.salin@intel.com>
 
