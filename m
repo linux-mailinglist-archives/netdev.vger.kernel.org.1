@@ -1,200 +1,162 @@
-Return-Path: <netdev+bounces-305329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305330-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id eDmMGIK4TGq4ogEAu9opvQ
-	(envelope-from <netdev+bounces-305329-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:27:46 +0200
+	id mLtrIIq3TGpwogEAu9opvQ
+	(envelope-from <netdev+bounces-305330-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:23:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFA9671915C
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:27:45 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D389719090
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:23:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=collabora.com header.s=mail header.b=l8E70hUK;
-	dmarc=pass (policy=none) header.from=collabora.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305329-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305329-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=SsqbQ9eH;
+	dmarc=pass (policy=reject) header.from=google.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305330-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305330-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0AF9830D7993
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 08:22:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 49FA6301D743
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 08:23:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E1E2342C98;
-	Tue,  7 Jul 2026 08:21:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174853264FC;
+	Tue,  7 Jul 2026 08:23:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DFD413A86C;
-	Tue,  7 Jul 2026 08:21:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A066131D381
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 08:23:29 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783412508; cv=none; b=LpEwk2nRycyx/MvZHzu6VR02xdfkBwu8kyGQtD6ck+4DVT65Zi22lK083WIQQVZuaQTmaVq/V0n/tQhpxlibc0GGSeKcRebQ5pXDMxCNEMKBPeWZ/5+XcTJEl67aLYw/z0Ty1n/aZ8U3oxUGgHUcPW8nTeYdpJLcUoy3VQ3MkUI=
+	t=1783412612; cv=none; b=HkSBBJM7ng8bN1wf5BJXj+phFIpk0skUzmxFXLsUmuyobNNAuvswx5VjlaOecdZ3lvL1ed5YS30cAVuhMditgg+qOm/rOb9MmaOj3Aqs3OVNuEwlsMTvd8xwbM3TPSLVszo1qA7+CdBJmogZUo/VCLElbNLnFUmkQ9l0T2eaESo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783412508; c=relaxed/simple;
-	bh=yRFtRc/8CY6QhoblVADW6T5FZ96+tHK2oCTcPJgNl7s=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=u7EcFMWpncCL49xr5ziytKxcbLRX+zQVYsDWCTZ4WuTrGFiAYAWgWJH9RFtqmMWkPym5N/qZQqNNAMvRqYa0Nsw9lKD4Ope6ayyx2wSrucsMN4KJ5QVZMXPbdVUfOHqx/6xbJSXMfKVVAD5e9uLyPrz4dTWlXIdH7MM58hWLZeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=l8E70hUK; arc=none smtp.client-ip=148.251.105.195
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1783412502;
-	bh=yRFtRc/8CY6QhoblVADW6T5FZ96+tHK2oCTcPJgNl7s=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=l8E70hUK27HaAhWyDDUGq83eZrgrzShx19lG+2vENSxAYCqCzqalr5R50+rhvrUnT
-	 8sEOutSuePjJdK3n2QAgmawSYWY/kSrAt0gLBgMbwdZLs7jU+t3sWz6ol45KuC6mHr
-	 3YfFNO+mNUI95qPth6mISBRA8nt6spOOhqGp12ekoBFVHM2ii6At1qc02EmessXJxu
-	 lJKvVqcX9c0/oKSxsB9m1ZXww5cWQME8H8JISMNTpE4q85p04VT1uq6E9bUyFAo7c7
-	 XsAIqEYDRwI5ZmCSKShhAtF05HOLWCZ5ldHfKr2wJBiUhFYhLI6zseL4x09SIrmooS
-	 XXcsLgPdubBoQ==
-Received: from yukiji.home (unknown [100.64.0.131])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: laeyraud)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id AD8D217E1078;
-	Tue, 07 Jul 2026 10:21:41 +0200 (CEST)
-From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
-Date: Tue, 07 Jul 2026 10:21:24 +0200
-Subject: [PATCH net-next 6/6] net: stmmac: mediatek: add support for MT8189
- SoC
+	s=arc-20240116; t=1783412612; c=relaxed/simple;
+	bh=HQgdLCdm7zLQxOAeI2KzFpaJMzKhabZvUHvnPoqlDsQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=prm4k4gy8j8WuQ40ZXJskt9iRBKBKWzmCgEx9PN5hmUxfM1TPDUnBbnDR9O+Sz8vX61I77cxcqYr4WNFwLBtRNeIsNIjtUqWfi1SKo4PJPvWrBn41kwHSusXS5vFpLL93IHMgSWpec0zD2YeZkgLWdtyBXXhRrUJJH0d14Rgetw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SsqbQ9eH; arc=none smtp.client-ip=209.85.160.202
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-51c26012cd0so49568781cf.0
+        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 01:23:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1783412608; x=1784017408; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=edpuzPNlqLkIiVe8hDiwbrsEC4+WRFM9TrLPB0rzqfk=;
+        b=SsqbQ9eHwzvMYS2C+i9GPhTCrihTNCLR1sGL4pn+9VnwwaV/n3IFlJ827LABL5sA5J
+         uedUWi2isLJOBxeF4YCQNF9wyFDQWxIxn23TtZD3GtcVir6P0YlmjKvXDz1q3J5+FPmu
+         l7QCGC5ZTn1AaZfAVhoE7cQUYOIR2xHTnsQQG1RMi/NgvnPPvxOWnH9phfj2oRX8BzMa
+         ZD7yaC6We9Clt+rGbdgktAyyf+LEQ2JevUvkyBDIx5enRygmNDQYfcmPQbrH89PbTBp1
+         +ivOPAMio3u7aNezrC/t9lVaOPW2GwF3LqnQIrJkwdd0JoxUN6sBUTzeqW2i1qvNbNAC
+         rX8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783412608; x=1784017408;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=edpuzPNlqLkIiVe8hDiwbrsEC4+WRFM9TrLPB0rzqfk=;
+        b=ZA0bmTJhf763W2QnWWHA5LNeW0onqrPc7iI3pX7cqGz01svgU3W3emm/lKHb0wKcYH
+         gA0SO0wbXS73cSW4gaWtV4L/oBEKydzzrqQQTcr3x8FAbh0csSoQTCGvY2NShGskadyC
+         zTlOBaFsLrXpq0oDoWgmsdpxeRm57v+2hMJT1+idKrLqrKnCE/uJBt9jNutS4sLz6xi4
+         th7GhKfaMCenbf8XJ6QxcwnjvYmewatkTS8brDswysYRSdh6Dd49b/xe+NnNVIr+bcZV
+         TCK5yE+WnbJlPGzrZMSG5lgAOjdhcvGVNkJXWia973nQFN8FGmmAEtJqEoVmZKopc/RC
+         CclA==
+X-Forwarded-Encrypted: i=1; AHgh+Ro9N67wYtt0wv7FPEl0tYPGbkwpJ0HNkgjloKZlL4p38QOXzPBqR/dM7nM3A+xlsm2HZJ9yPsE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxwwPC8jRp7P+i6CmQjDFLcDJmpvzbTqcyuH8ch2ds6lLiH7Qnz
+	m+I4Ru6yd/QgMo4820sXzNh4Sn4+d0cTKxEZUhdSYIAuGo18U6rKlzuzCc2BUwMXcAv5ICh10Mw
+	w+wCmCNqhSFJOwQ==
+X-Received: from qtrr15-n2.prod.google.com ([2002:a05:622a:a98f:20b0:51c:f5f:5d2c])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:3cf:b0:50d:900e:c1c1 with SMTP id d75a77b69052e-51c747ca072mr45429201cf.7.1783412607802;
+ Tue, 07 Jul 2026 01:23:27 -0700 (PDT)
+Date: Tue,  7 Jul 2026 08:23:27 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260707-dwmac-mediatek-mt8189-v1-6-17f345eaaca3@collabora.com>
-References: <20260707-dwmac-mediatek-mt8189-v1-0-17f345eaaca3@collabora.com>
-In-Reply-To: <20260707-dwmac-mediatek-mt8189-v1-0-17f345eaaca3@collabora.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Biao Huang <biao.huang@mediatek.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>
-Cc: maxime.chevallier@bootlin.com, rmk+kernel@armlinux.org.uk, 
- kernel@collabora.com, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, 
- linux-stm32@st-md-mailman.stormreply.com, 
- Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1783412493; l=2415;
- i=louisalexis.eyraud@collabora.com; s=20250113; h=from:subject:message-id;
- bh=yRFtRc/8CY6QhoblVADW6T5FZ96+tHK2oCTcPJgNl7s=;
- b=rjmFjCSXIVFAAiwlRsbFDumpnHH5IheY8Gf75lMU0wWH1m9chQHK5CCQ/0CP5zbOLJj/U4I7k
- Vvhz8WTFGu+CtMHY+W5Pz6L89CX8GNvO/mhR0/hOwZiXpIg9gfTve7B
-X-Developer-Key: i=louisalexis.eyraud@collabora.com; a=ed25519;
- pk=CHFBDB2Kqh4EHc6JIqFn69GhxJJAzc0Zr4e8QxtumuM=
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.795.g602f6c329a-goog
+Message-ID: <20260707082327.3238690-1-edumazet@google.com>
+Subject: [PATCH net] net: hsr: fix memory leak on slave unregistration by
+ removing synced VLANs
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
+	syzbot+456957213f32970c0762@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[collabora.com,none];
-	R_DKIM_ALLOW(-0.20)[collabora.com:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305329-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:richardcochran@gmail.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:biao.huang@mediatek.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:maxime.chevallier@bootlin.com,m:rmk+kernel@armlinux.org.uk,m:kernel@collabora.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:linux-stm32@st-md-mailman.stormreply.com,m:louisalexis.eyraud@collabora.com,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:matthiasbgg@gmail.com,m:mcoquelinstm32@gmail.com,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,collabora.com,mediatek.com,foss.st.com];
-	FORGED_SENDER(0.00)[louisalexis.eyraud@collabora.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305330-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:syzbot+456957213f32970c0762@syzkaller.appspotmail.com,m:andrew@lunn.ch,m:ericdumazet@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,vger.kernel.org,gmail.com,google.com,syzkaller.appspotmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[louisalexis.eyraud@collabora.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[collabora.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,collabora.com:from_mime,collabora.com:email,collabora.com:mid,collabora.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,456957213f32970c0762];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,appspotmail.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AFA9671915C
+X-Rspamd-Queue-Id: 1D389719090
 
-Like MT8195 SoC, MT8189 SoC uses the Ethernet control registers from
-the peripheral configuration (pericfg) but at a different
-offset. It also needs additional features.
+When an HSR master device is brought UP, it auto-adds VLAN 0 via
+vlan_vid0_add(), which propagates VID 0 to its slave devices.
 
-Thus, add compatible, clock definitions and specific platform data to
-support the MT8189 SoC.
+If a slave device is later unregistered while HSR is active (e.g., during
+netns cleanup or interface destruction), hsr_del_port() is called to
+detach the slave port from the HSR master. However, hsr_del_port() currently
+does not delete the VLAN IDs that were synced to the slave device by HSR.
 
-Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+As a result, the slave device retains a refcount on VID 0 (and any other
+synced VLANs). When the slave device is destroyed, its vlan_info /
+vlan_vid_info structure remains allocated, leading to a memory leak.
+
+Fix this by calling vlan_vids_del_by_dev(port->dev, master->dev) in
+hsr_del_port() before unlinking the slave device, matching the cleanup
+behavior in bonding and team drivers.
+
+Fixes: 1a8a63a5305e ("net: hsr: Add VLAN CTAG filter support")
+Reported-by: syzbot+456957213f32970c0762@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/6a4cb6ca.57639fcc.86d58.000b.GAE@google.com/T/#u
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- .../net/ethernet/stmicro/stmmac/dwmac-mediatek.c    | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ net/hsr/hsr_slave.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
-index 6b0a42b5839f..e7e336b1f114 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
-@@ -37,6 +37,8 @@
- #define ETH_FINE_DLY_RXC	BIT(0)
- 
- /* Peri Configuration register for mt8189 */
-+#define MT8189_PERI_ETH_CTRL_BASE		0x270
-+
- #define MT8189_CTRL0_TXC_OUT_OP			BIT(20)
- #define MT8189_CTRL0_DLY_GTXC_STAGE_FINE	GENMASK(11, 6)
- 
-@@ -116,6 +118,10 @@ static const char * const mt8195_dwmac_clk_l[] = {
- 	"axi", "apb", "mac_cg", "mac_main", "ptp_ref"
- };
- 
-+static const char * const mt8189_dwmac_clk_l[] = {
-+	"mac_main", "ptp_ref"
-+};
-+
- static int set_phy_interface_v1(struct mediatek_dwmac_plat_data *plat,
- 				u8 phy_intf_sel)
- {
-@@ -444,6 +450,19 @@ static int set_delay_v2(struct mediatek_dwmac_plat_data *plat)
- 	return 0;
- }
- 
-+static const struct mediatek_dwmac_variant mt8189_gmac_variant = {
-+	.dwmac_set_phy_interface = set_phy_interface_v2,
-+	.dwmac_set_delay = set_delay_v2,
-+	.clk_list = mt8189_dwmac_clk_l,
-+	.num_clks = ARRAY_SIZE(mt8189_dwmac_clk_l),
-+	.dma_bit_mask = 35,
-+	.rx_delay_max = 9280,
-+	.tx_delay_max = 9280,
-+	.peri_eth_ctrl_offset = MT8189_PERI_ETH_CTRL_BASE,
-+	.use_out_op = true,
-+	.use_stage_fine = true,
-+};
-+
- static const struct mediatek_dwmac_variant mt8195_gmac_variant = {
- 	.dwmac_set_phy_interface = set_phy_interface_v2,
- 	.dwmac_set_delay = set_delay_v2,
-@@ -694,6 +713,8 @@ static void mediatek_dwmac_remove(struct platform_device *pdev)
- static const struct of_device_id mediatek_dwmac_match[] = {
- 	{ .compatible = "mediatek,mt2712-gmac",
- 	  .data = &mt2712_gmac_variant },
-+	{ .compatible = "mediatek,mt8189-gmac",
-+	  .data = &mt8189_gmac_variant },
- 	{ .compatible = "mediatek,mt8195-gmac",
- 	  .data = &mt8195_gmac_variant },
- 	{ }
-
+diff --git a/net/hsr/hsr_slave.c b/net/hsr/hsr_slave.c
+index d9af9e65f72f07b1997b80c85db16d812fbda488..2d1e3ea72088e35d5d870b4cc86dd2f789670394 100644
+--- a/net/hsr/hsr_slave.c
++++ b/net/hsr/hsr_slave.c
+@@ -242,6 +242,7 @@ void hsr_del_port(struct hsr_port *port)
+ 		netdev_rx_handler_unregister(port->dev);
+ 		if (!port->hsr->fwd_offloaded)
+ 			dev_set_promiscuity(port->dev, -1);
++		vlan_vids_del_by_dev(port->dev, master->dev);
+ 		netdev_upper_dev_unlink(port->dev, master->dev);
+ 		if (hsr->prot_version == PRP_V1 &&
+ 		    port->type == HSR_PT_SLAVE_B) {
 -- 
-2.55.0
+2.55.0.795.g602f6c329a-goog
 
 
