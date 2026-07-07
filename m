@@ -1,152 +1,130 @@
-Return-Path: <netdev+bounces-305500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305501-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id KXxSDpIVTWpAuwEAu9opvQ
-	(envelope-from <netdev+bounces-305500-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 17:04:50 +0200
+	id O93zJfwVTWpYuwEAu9opvQ
+	(envelope-from <netdev+bounces-305501-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 17:06:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A8DD71CFC2
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 17:04:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8C3E71D01E
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 17:06:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.alibaba.com header.s=default header.b=FmPPgbhe;
-	dmarc=pass (policy=none) header.from=linux.alibaba.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305500-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305500-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=netfilter.org header.s=2025 header.b=f1yfOviH;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305501-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305501-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6F1B531C847B
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 14:31:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E9C2C31AB740
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 14:32:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4319842641A;
-	Tue,  7 Jul 2026 14:31:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874D7429825;
+	Tue,  7 Jul 2026 14:32:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B64954252A2;
-	Tue,  7 Jul 2026 14:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5080425CC6
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 14:32:47 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783434675; cv=none; b=Ceza+/xZZ5tZlSmdNJE3fqrMTVM9BEESMAa+azHn3kkOOX7kdVW9qwz7l2pKM358BmdogygszkFoTGQKSzZY0WRHtJMsTNZyMWJSnyZ7SuCrP3t8oGdyuLEDgZvfi7aJH31/SCuJfmlVIRSPvA61uIhA0Fch5bNOvGx2em0OCYI=
+	t=1783434769; cv=none; b=tuY71WW8iJzNEBGEg+tFD8oE6G1RbEbZeB6N8BsxVtNWYX9js4Fq7MnUOkvwFPetxdhHGe8wzcHglHNDZ3rDWtDYVxVNbBl5qbwWm3GbxWik315QvbS7Ipy6R4AxNnBaSYn1QODU6/hANfS2F2fgEdVVqOKXQrlD2hyViA+N7WY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783434675; c=relaxed/simple;
-	bh=xLVQRIygJAF0+r/kQ4mO3IaymdnrpddqCGWjhZmBe2s=;
+	s=arc-20240116; t=1783434769; c=relaxed/simple;
+	bh=R+h+d1pBH7j+suspTHLN7nSmJ1rrO7a8PG4g0rBbZN8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uaW+i7K9w9165CElB6mOTX4gwlOMr1ufokyaQk7Z7kObCbuISZwve2NDiDn3kR0aQHaWWoqqLe/SA1Y36NaX4B4Vu3Q4Ht53Xwf9x4uOSM3/qfqeY63C49zBQj7Ua4+1mS8T4jsD8fXSLGMUbMUm0DRn7UNRT9IatwIvi6LeAhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=FmPPgbhe; arc=none smtp.client-ip=115.124.30.110
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1783434662; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=0pfHhjKxWnCHHqsUGc9OvKP9mug23MNVxOz2WJ7PpuE=;
-	b=FmPPgbhejgFFbNgTe+5KcQju0p7uwJUeSlRwZEIAVAnrrBUh/O96/BR28NBwJqUjY/T5G3JmoxGqQxQZBWL1xMN+MQO0C/JrBNbx+o1nU8e6YyXPHSd2u8edVegg22e3Dzly7SEC0nnuZ1muk6dh6GtHc4h+mWjmuURDdW+KDvM=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037009110;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0X6e2kUt_1783434660;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0X6e2kUt_1783434660 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 07 Jul 2026 22:31:01 +0800
-Date: Tue, 7 Jul 2026 22:31:00 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	"D . Wythe" <alibuda@linux.alibaba.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	Federico Kirschbaum <federico.kirschbaum@xbow.com>
-Subject: Re: [PATCH net] dibs: loopback: validate offset and size in
- move_data()
-Message-ID: <ak0NpKUDkvrkuSOm@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20260707074318.1448662-1-dust.li@linux.alibaba.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=C8ajO45/sSLfnQRoxz4KfqQs9KFnnfQrnksONah2C2m90uV3BIMVHEM1+YaNhWmnwtYFF3Br6mT4WRzxkYEq+LYM/lVOHYZvD7qP14nMVeIHoj2ORSFbw+LPBu5jG3Z7DFcjum46NbyaQUvInMChd+vZlN7XJv/TRS8cJ2p8p0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=f1yfOviH; arc=none smtp.client-ip=217.70.190.124
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 399A760194;
+	Tue,  7 Jul 2026 16:32:45 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1783434765;
+	bh=1jdaldTNEf92jtFvTk6vxq/9JGpSlITwrFemYyFuldE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=f1yfOviHmXbFuKPOQPXZaIzLWnHoZMDD9HJm0fDUSyvyZE4F9UxSgaPhD47dKXhah
+	 ws7auEx2rQau+ZJHDMYqdTyDnaG3X8KwvpJzmL23VLcmq5O2UAxlwV6tEcKGcPUdPJ
+	 3SdC+B4ZlHxmE4RUxTrwvzfJ1LwsjcErOQAS0bQ5T9R0dUCocvnuaRtLoHmuykMa1A
+	 KPBSmtfVWKFsKroPXUZsfuOmjB59S3zH1LM4CGZzA00/S2lrk2op0+7/2yczcXaDrK
+	 gfYw7M5JrZo+jHSVjjyGsWdutfXEeaVfpTAtoHlsRPafj1q+6KoMto6Jb+Hhjdl/g4
+	 H7WIOvXptrOHA==
+Date: Tue, 7 Jul 2026 16:32:42 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Zhixing Chen <running910@gmail.com>
+Cc: Harald Welte <laforge@gnumonks.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	osmocom-net-gprs@lists.osmocom.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net v2] gtp: parse extension headers before reading inner
+ protocol
+Message-ID: <ak0OCusCIcf0DH7y@chamomile>
+References: <20260703093708.18141-1-running910@gmail.com>
+ <akefPJ5cCrsZcpRw@chamomile>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260707074318.1448662-1-dust.li@linux.alibaba.com>
+In-Reply-To: <akefPJ5cCrsZcpRw@chamomile>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-12.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	WHITELIST_SPF_DKIM(-3.00)[alibaba.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305500-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[dust.li@linux.alibaba.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:wintera@linux.ibm.com,m:wenjia@linux.ibm.com,m:guwen@linux.alibaba.com,m:pabeni@redhat.com,m:mjambigi@linux.ibm.com,m:alibuda@linux.alibaba.com,m:sidraya@linux.ibm.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:federico.kirschbaum@xbow.com,s:lists@lfdr.de];
+	DMARC_NA(0.00)[netfilter.org];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:running910@gmail.com,m:laforge@gnumonks.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:osmocom-net-gprs@lists.osmocom.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305501-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dust.li@linux.alibaba.com,netdev@vger.kernel.org];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TAGGED_RCPT(0.00)[netdev];
-	HAS_REPLYTO(0.00)[dust.li@linux.alibaba.com];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[alibaba.com:email,vger.kernel.org:from_smtp,linux.alibaba.com:from_mime,linux.alibaba.com:replyto,linux.alibaba.com:mid,linux.alibaba.com:dkim]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:from_mime,netfilter.org:email,netfilter.org:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8A8DD71CFC2
+X-Rspamd-Queue-Id: E8C3E71D01E
 
-On 2026-07-07 15:43:18, Dust Li wrote:
->The loopback move_data() performs a memcpy into the registered DMB
->without checking whether offset + size exceeds the DMB length.  Unlike
->real ISM hardware, which enforces memory region bounds natively, the
->software loopback has no such protection.
->
->A peer-supplied out-of-bounds offset or oversized write would result in
->an OOB write past the allocated kernel buffer.  Add an explicit bounds
->check before the memcpy to reject such requests with -EINVAL.
->
->Fixes: f7a22071dbf3("net/smc: implement DMB-related operations of loopback-ism")
->Cc: stable@vger.kernel.org
->Reported-by: Federico Kirschbaum <federico.kirschbaum@xbow.com>
+On Fri, Jul 03, 2026 at 01:38:39PM +0200, Pablo Neira Ayuso wrote:
+> On Fri, Jul 03, 2026 at 05:37:08PM +0800, Zhixing Chen wrote:
+> > GTPv1-U packets may carry a chain of extension headers before the inner
+> > IP packet. The receive path already parses and skips these extension
+> > headers, but it currently reads the inner protocol before doing so.
+> > 
+> > As a result, the first extension header byte is interpreted as the inner
+> > IP version. Packets with extension headers are then dropped before PDP
+> > lookup.
+> > 
+> > Parse the extension header chain before calling gtp_inner_proto(), so the
+> > inner protocol is read from the actual inner IP header.
+> > 
+> > Fixes: c75fc0b9e5be ("gtp: identify tunnel via GTP device + GTP version + TEID + family")
+> > Signed-off-by: Zhixing Chen <running910@gmail.com>
+> 
+> Reviewed-by: Pablo Neira Ayuso <pablo@netfilter.org>
 
-Reported-by: Baul Lee <baul.lee@xbow.com>
-
-Best regards,
-Dust
-
->Signed-off-by: Dust Li <dust.li@linux.alibaba.com>
->---
-> drivers/dibs/dibs_loopback.c | 5 +++++
-> 1 file changed, 5 insertions(+)
->
->diff --git a/drivers/dibs/dibs_loopback.c b/drivers/dibs/dibs_loopback.c
->index ec3b48cb0e87..0f2e09311152 100644
->--- a/drivers/dibs/dibs_loopback.c
->+++ b/drivers/dibs/dibs_loopback.c
->@@ -254,6 +254,11 @@ static int dibs_lo_move_data(struct dibs_dev *dibs, u64 dmb_tok,
-> 		read_unlock_bh(&ldev->dmb_ht_lock);
-> 		return -EINVAL;
-> 	}
->+	if ((u64)offset + size > rmb_node->len) {
->+		read_unlock_bh(&ldev->dmb_ht_lock);
->+		return -EINVAL;
->+	}
->+
-> 	memcpy((char *)rmb_node->cpu_addr + offset, data, size);
-> 	sba_idx = rmb_node->sba_idx;
-> 	read_unlock_bh(&ldev->dmb_ht_lock);
->-- 
->2.43.7
+Patch is not good, it needs to refetch gtp header after
+pskb_may_pull().
 
