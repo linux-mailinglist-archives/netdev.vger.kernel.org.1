@@ -1,221 +1,253 @@
-Return-Path: <netdev+bounces-305247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305248-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id BI67MWtBTGqViQEAu9opvQ
-	(envelope-from <netdev+bounces-305247-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 01:59:39 +0200
+	id WD7WBAhQTGrXiwEAu9opvQ
+	(envelope-from <netdev+bounces-305248-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 03:02:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27BF9716648
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 01:59:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56D98716877
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 03:01:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=VMZdM+n1;
-	dmarc=pass (policy=none) header.from=asu.edu;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305247-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305247-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=etsalapatis-com.20251104.gappssmtp.com header.s=20251104 header.b=HqKoV3ra;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305248-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305248-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E3DC13027961
-	for <lists+netdev@lfdr.de>; Mon,  6 Jul 2026 23:59:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EAA4430177AA
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 01:01:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12FAC3EDE6E;
-	Mon,  6 Jul 2026 23:59:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD6A7175A75;
+	Tue,  7 Jul 2026 01:01:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A166D34A3A5
-	for <netdev@vger.kernel.org>; Mon,  6 Jul 2026 23:59:35 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783382377; cv=pass; b=g7cYxh2IQ5qUuFXvPlsYzuzt+fzm+Er2oul1uinsa+wsT0+2MgRRglxaDZ303wqqOzb2DrFRfoEq3JCwyD95hav1hstQYCK7WifJFzYuuPEQJSM3rFWwUtPa+F2FMLR3JPVhiAt7BL7rN1R3O7y5jmC1JgZYarknwTUjqBCRznQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783382377; c=relaxed/simple;
-	bh=oPhkeLKPQDLv/GGb3+U/t+kDfUwmkAfWwWU37v1UMG8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Szo8XjOI/pIf8pWOCWLxE3L4Cex1Yq+Gns9jqlCnqc3SfHEZE6CWtV4owP6JeGvrLd5NOTtBt7BD5HVSjNxY3/PqWFkZCd8t8157HivLFyYx+AUQdjQU9t/GCxT1t5Dqvgy1wXbw8S2Kv8i4PBeXXrmD3yQ9DVCJbA/xjRrZYPI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=VMZdM+n1; arc=pass smtp.client-ip=209.85.210.179
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-8471013fac2so3925632b3a.1
-        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 16:59:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783382375; cv=none;
-        d=google.com; s=arc-20260327;
-        b=oMBUXA4viTBbmuMC+GoLZO9coz4rj5xywaNmv/PD+vrauRA89StAHddxNCDDyHChGJ
-         IFUahd4f0zmbBZ+j982BahejjnVRrNzs5vZEkuszb85vD/Tf0WSBC0iG7F0CrNta40ef
-         bjcx14s7W76wTZTXOrzFRARXQp3QvmPb5cB8Yc8Cx/T58G07Y7Ima60BEKPzaz+w2vmP
-         C1NM5xtHqc9UJZdsuCwM1SSvMHiIop3UXECceLpcnUraxYzOMGTIRy02to505XwevOhi
-         FWEgAE4lzE36lYd3BJK1HuN61yZDGOezZSnilmCkB3yqy6AoomCMPAm6cY7x/iqDxTxk
-         SJLQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=NGnjV3nyHEtkwVotSk8EvCO/k6Ver5KbWx3DnxrgKbY=;
-        fh=6NyaKGwm1b0DTn9v/LFeWQo2uT5CvQ0hWeKUVfew86k=;
-        b=C6Db4Gi+yqo4Jjyi6UG+ifKWOcAWWiNiECNOoYtXsgdpHE2njCeTHAoupDoNLFg6Jv
-         llt6HxaNUTqKmmSgYUaJo+OYkw5jLCeEII2Q5JFzwVYiTdWUcHB1psD+H+N0ZqZkQ+x+
-         W9pACxFjxqqHk4/i+V0Yt6T64FiAmf27h3Ywh1PFa16TauKtu/ed3VsfOqTcsv46gajR
-         5lc8TCmlxOJ8hNTZ51O6nHNX3kcOScJGcLrtYpuUSRkYc4i3bVhKqcHAmGneIhg9io/y
-         ICiveN0ZiociF0wZ7kZaMTiTw6/qNRB6iYVC46NCIaWSiMu+xpNqa/99gOQs9+CPajzU
-         +HrQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA4442088E
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 01:01:54 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783386117; cv=none; b=E5wlY/9Uqmhjt9/G41JurEKGxSZeLaWta+aUyCJcmG1VMtX+zgHzmTkXtpGW05FXqfM9HP7qX3Jt0eG01nNXEzJ82WkUCvY9uKZGy1GrGiCZWJ+5pz1Gj+qelrBomaFAlSqERQL+oAFBedelgAR1lgrJSND8rQ6yU/eLXzLWUCw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783386117; c=relaxed/simple;
+	bh=Cl4hxMwrRdfbEdaST7P89yCfniPHJVHCdUtxmwWGDBE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tdv86evSgjwePTiaiZEKHzdtS0zCY9RVrm/d2R20Hoq7vxxsgzkvOUMTjKUsYE8tRHKMbP9JxNF5Gg6zX4Qlpf1CDyOD54Bj6kNnPm3hCz0t66jpOgfqX4SPw1axy0LLu1TtGmoLRQKHHNHbjLq0d+8rNO9XKcZecltqj2s6haI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=HqKoV3ra; arc=none smtp.client-ip=209.85.216.54
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-3817f800c8bso2649135a91.1
+        for <netdev@vger.kernel.org>; Mon, 06 Jul 2026 18:01:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1783382375; x=1783987175; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NGnjV3nyHEtkwVotSk8EvCO/k6Ver5KbWx3DnxrgKbY=;
-        b=VMZdM+n1c9vVmUYyWShBj+GI7g0TN3mSAaG8af6wP39qDcjwSIPMSefZfuS+vLUZwC
-         Y/+tIyaJ+RlFujud9lOA2NO234myLhFeXomObrXZTITIZx/rrxDgV7JeHMcMGskRBYaO
-         2+TW2EbQgM/pwpaesFikjOX1PWoVOoGjuL8iuGdt+5RjbQ7aQDFB4dx65Av0FvRf7WEt
-         p8Z4GpDc4e28e9T+3t0rHHGDhyL04+zNwErRRvvwGxBP8QnTclT9IbbN8KwFRb87MKna
-         Q4EQHyllFCgu9LmgU7FJ8P8wiDfC77bSOwK7ozZtSVrNucE04KyCIhXzM9C8jowxYbGk
-         xYjw==
+        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1783386114; x=1783990914; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mn7lUDGZ7NP4xadPAgx4FMS5SBwqLelhcDxZx9BPNhU=;
+        b=HqKoV3raJ7kpmysTanWbcn97V7rF8ucR/Y+BaLEIwYMqeozY6njDiwntwi0r4Pu+2F
+         d0yZ9PUgb71PIM89EuGcjIYkRkuLJGnw8qlKfBUZgId2EXo67viDkTxsG9GB93igBghg
+         JCBP8Ngzn+N5I4nDaKedz6s5B+GSN2CJOERMpFw/1wjBnNn6Q0cQ38TISjXQ2i+NsiQt
+         imTZGuQGmdMF9IeaQz87c6i61B1Gq1hOfUoDnL7/MLssV6Q1UXiM7RtT7la4D+7Q18oH
+         1UjtXoejd4PTwdKcMBtgBLYzGOcGDEu7ucVr3zvw/jY7r8UCCR2QnSM2WwnpHRErLzcG
+         UzuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783382375; x=1783987175;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=NGnjV3nyHEtkwVotSk8EvCO/k6Ver5KbWx3DnxrgKbY=;
-        b=KC9feGR7COPyCUVM2Ufc1VLI3UBLM4X5rtmWgL2qvDXKQPz9Fj/ilrfDwT1+AO/3dF
-         4sn2/jyk+p5tT37HffNbelYdAWruHNAaWggvStzD2ySOvisajloXv2/h4WqKeMz3lGRq
-         Vhg8HnnGEPvzdIhI3xM9C8225Rbj4wtKguWsP9llz15ksW9FlxmO8uXkpDjwLtfGDieZ
-         PRlmpaYdJ4wk+s6Qg6adhWZ23Qu0sD2VKO3FLUaoqLR7wbPuMuBw52irs2ETRpC95cFv
-         rGh2nJSuyz1XWtqGk+b5aGI+6j5VBKd7V1t2BSFdttfU/mQoCWuI1k8T4I4zIQlNg0CZ
-         73wg==
-X-Forwarded-Encrypted: i=1; AHgh+RpuOHvP9yps/hCX6lbBgwIZw3DX4ZsQr0hq/qfuQ84boeXOWPDET8Y+NFU2Mw3r73Sv0RE/eGM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxx05tYG2sucwAG0QMciozx1GppgGCGwezYVEynVKNcvK8z5Dvc
-	ed1rs6zKdThKPnsX+eVwM82dyPVSTRD6xDoEe5FQYNcZNg4bcztoSNUDQLGVg//vFBKLkuDyf3r
-	iWqzxIUTwUF/Cq4N4HgBaFbkrxflFK9+mvqSdu8n1
-X-Gm-Gg: AfdE7clcpT79/HE44Q86jKsmH0fotdvm57VjD85kveL1OAk+k2nHVMdVRZaUvmPhou6
-	R1fodAezACyOQxv/QVMIU0+189Xf989IeIyFolnCfbkjzziyizwgDrbpbagRjgtSkwUTUgH4YaQ
-	Y9XzS2F67vBXG7DiTAQ101TSBqJSvFiX37jij+wx7qEfKvRc8O04xMKjUaBeUjgdyoOFwJNZs+6
-	lO1SriOJlOpmrvx/WLr6ci3JP9R8t++ux0sKz+8reDPJWKryb5Vd+qdehuU6JbtwvQy1APmkbo4
-	V9DfQROvE4yMHy8e31NuAoKkGhReCg==
-X-Received: by 2002:a05:6a00:3a07:b0:847:8a1d:cf73 with SMTP id
- d2e1a72fcca58-84826d694f2mr2627513b3a.43.1783382375014; Mon, 06 Jul 2026
- 16:59:35 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1783386114; x=1783990914;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Mn7lUDGZ7NP4xadPAgx4FMS5SBwqLelhcDxZx9BPNhU=;
+        b=mRywltBD6TaReJ8uK4ILVvdkJxRJUp1TYuf0TYAN8bmChBTe2gd0gyHLoCiuFLKUg7
+         U++ScRkbJcSkri044zJ/QjjeEUMF9M1lmJffUUZoLI35GcCnAysHUqUWeiTuuMUFZ9C8
+         wq2J5q8nHVR7IUJmFtjzTWP695qk4vW9H+snPV73yWWJwwWCbvlcva3l8GK/fJkoqYv4
+         iOhtcx0gv7sObQ/MGhLXG+i1mVSP/MJJInbPJSHK0fzCDm//0t+WktHjJbgXiiHRmkDx
+         g+2xJ4fS3aIlU4hmpUVleEWY5VaGmqUWmyY9pEsGWcEh4xJbXb5b08lmVv+TQtzPB6Qv
+         EUjA==
+X-Gm-Message-State: AOJu0Yz3OkM7QWJx30QN/ZHqPx1YTP0tPSpiLETGy8Obm8e+O06I5tPJ
+	ZulGWE4TilLiDXgpjYIibRnpAcn1iPxejJjYM5yLar682UFsUYbWvhLZBsY/8NkzcUWOiBZE5dQ
+	C1SvBXrU=
+X-Gm-Gg: AfdE7cnVrjyimRfLwit1ja90JMETOSf1d3BkFt+PYsZll4TGXnUF4erB85yFbXwBBGf
+	i61KqfW0NgBM9wiGfAz6FnJxAXbYOHTUnsJVnxGQxG5BhTsHqhAj/OrmLzPv4EiiKIeBsfw/tOa
+	Ajmxj1JMza9fIy9EJcZDL+TIKFr7ecwftMWyAFb9+U3FgPJUUzM557DfpINjJDNTKjDtY1uqsLY
+	ls2goKUI5YZhsmcUjQbOZ0SSqejcZaEzCSH99cB/xqh+KaGgAcZd1vjDD+PUDFGHUiagJCXZQ6M
+	Of6Fn35+0g4F9QP/Iau/8Kr9whJSljHji2WLUzYMvdRaSVHRdafckenWz9MtCF8jvck2FXVVZ3O
+	9koayAxW9aurSLVwvVGEBpwG3ZCCtxtDD/3OUY/AoTu8d+LswMbI0zz1nrDDn6WyN61NVmiE0yH
+	ZcLhf1YhbWoaP193OJ71GaX8rgcb9YDRhmpcxa+qBzVLVmnWCpjdkYQlUAWA==
+X-Received: by 2002:a17:90b:2801:b0:380:71eb:4014 with SMTP id 98e67ed59e1d1-3875621eb68mr3220612a91.15.1783386114234;
+        Mon, 06 Jul 2026 18:01:54 -0700 (PDT)
+Received: from krios.ht.home (107-190-31-17.cpe.teksavvy.com. [107.190.31.17])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9bdb56fsm2567785ad.15.2026.07.06.18.01.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jul 2026 18:01:53 -0700 (PDT)
+From: Emil Tsalapatis <emil@etsalapatis.com>
+To: netdev@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org
+Cc: edumazet@google.com,
+	ncardwell@google.com,
+	kuniyu@google.com,
+	rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Emil Tsalapatis <emil@etsalapatis.com>
+Subject: [PATCH net-next] net/tcp: Add explicit tracepoint for tcp_syn_ack_timeout()
+Date: Mon,  6 Jul 2026 21:01:51 -0400
+Message-ID: <20260707010151.43976-1-emil@etsalapatis.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260706233344.3334648-1-xmei5@asu.edu> <20260706235614.1726605-1-kuniyu@google.com>
-In-Reply-To: <20260706235614.1726605-1-kuniyu@google.com>
-From: Xiang Mei <xmei5@asu.edu>
-Date: Mon, 6 Jul 2026 16:59:23 -0700
-X-Gm-Features: AVVi8CeBHj8uQXoFwVxAYV2b9PwIaAA9wAOd4bayVdnai42PxihieCsKdLPZ-l8
-Message-ID: <CAPpSM+Swu_7SdhVV-sDNAOsx21OSp1V9UFMcwvMEkVtVN7cPaA@mail.gmail.com>
-Subject: Re: [PATCH net] vxlan: add missing NULL check for vxlan_sock in GRO path
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: AutonomousCodeSecurity@microsoft.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, kys@microsoft.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	tgopinath@linux.microsoft.com, tom@herbertland.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-305247-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS(0.00)[m:kuniyu@google.com,m:AutonomousCodeSecurity@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:kys@microsoft.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:tgopinath@linux.microsoft.com,m:tom@herbertland.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[asu.edu:+];
+	TAGGED_FROM(0.00)[bounces-305248-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-trace-kernel@vger.kernel.org,m:edumazet@google.com,m:ncardwell@google.com,m:kuniyu@google.com,m:rostedt@goodmis.org,m:mhiramat@kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:emil@etsalapatis.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[etsalapatis.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
 	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:from_mime,asu.edu:email,asu.edu:dkim,vger.kernel.org:from_smtp,mail.gmail.com:mid]
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[etsalapatis.com:from_mime,etsalapatis.com:email,etsalapatis.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,etsalapatis-com.20251104.gappssmtp.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 27BF9716648
+X-Rspamd-Queue-Id: 56D98716877
 
-On Mon, Jul 6, 2026 at 4:56=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.com=
-> wrote:
->
-> From: "Xiang Mei (Microsoft)" <xmei5@asu.edu>
-> Date: Mon,  6 Jul 2026 23:33:44 +0000
-> > vxlan_gro_prepare_receive() reads vs->flags from the vxlan_sock returne=
-d
-> > by rcu_dereference_sk_user_data(sk) without a NULL check, unlike the re=
-st
-> > of the driver (e.g. vxlan_rcv() does "if (!vs) goto drop;").
-> >
-> > udp_tunnel_sock_release() clears sk_user_data to NULL and waits an RCU
-> > grace period before the socket leaves the hash, so any callback running=
- on
-> > the tunnel socket during teardown must tolerate a NULL sk_user_data. If=
- a
-> > VXLAN device is torn down while GRO runs on its UDP tunnel socket,
-> > sk_user_data can be NULL when a packet carrying VXLAN_HF_RCO arrives,
-> > faulting in NAPI/softirq context.
-> >
-> > The GRO path was the only sk_user_data reader on the socket missing thi=
-s
-> > guard (vxlan_rcv and vxlan_err_lookup already have it; the gro_complete
-> > callbacks do not touch sk_user_data). Add the same NULL check so GRO
-> > flushes instead of dereferencing a NULL socket pointer.
-> >
-> >   Oops: general protection fault ... SMP KASAN NOPTI
-> >   KASAN: probably user-memory-access in range [0x2018-0x201f]
-> >   RIP: 0010:vxlan_gro_prepare_receive (drivers/net/vxlan/vxlan_core.c:6=
-78)
-> >    vxlan_gro_receive (drivers/net/vxlan/vxlan_core.c:713)
-> >    udp_gro_receive (net/ipv4/udp_offload.c:841)
-> >    ...
-> >    dev_gro_receive (net/core/gro.c:522)
-> >    gro_receive_skb (net/core/gro.c:640)
-> >    tun_napi_poll (drivers/net/tun.c:259)
-> >    ...
-> >   Kernel panic - not syncing: Fatal exception in interrupt
-> >
-> > Fixes: 5602c48cf875 ("vxlan: change vxlan to use UDP socket GRO")
-> > Reported-by: AutonomousCodeSecurity@microsoft.com
-> > Signed-off-by: Xiang Mei (Microsoft) <xmei5@asu.edu>
-> > ---
-> >  drivers/net/vxlan/vxlan_core.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >
-> > diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_c=
-ore.c
-> > index b5b1253ac08b..f2235bae9bfe 100644
-> > --- a/drivers/net/vxlan/vxlan_core.c
-> > +++ b/drivers/net/vxlan/vxlan_core.c
-> > @@ -663,6 +663,9 @@ static struct vxlanhdr *vxlan_gro_prepare_receive(s=
-truct sock *sk,
-> >       struct vxlan_sock *vs =3D rcu_dereference_sk_user_data(sk);
-> >       __be32 flags;
-> >
-> > +     if (!vs)
-> > +             return NULL;
->
-> Please work on the latest tree, it's fixed 2 months ago.
->
-Thanks for the reminder. I apologize for my mistake.
+Clang can inline the tcp_syn_ack_timeout() function during compilation,
+making it impossible to use kprobes for tracing without preventing
+inlining. Add an explicit tracepoint to it instead.
 
-Xiang
+Signed-off-by: Emil Tsalapatis <emil@etsalapatis.com>
+---
+ include/trace/events/tcp.h | 72 ++++++++++++++++++++++++++++++++++++++
+ net/ipv4/tcp_timer.c       |  3 ++
+ 2 files changed, 75 insertions(+)
 
-> commit 30a45c0bffdd62350261e2f2689fdba426a33578
-> Author: Kuniyuki Iwashima <kuniyu@google.com>
-> Date:   Sat May 2 03:12:59 2026
->
->     vxlan: Fix potential null-ptr-deref in vxlan_gro_prepare_receive().
+diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
+index f155f95cdb6e..37ffaa50faad 100644
+--- a/include/trace/events/tcp.h
++++ b/include/trace/events/tcp.h
+@@ -332,6 +332,78 @@ TRACE_EVENT(tcp_retransmit_synack,
+ 		  __entry->saddr_v6, __entry->daddr_v6)
+ );
+ 
++TRACE_EVENT(tcp_syn_ack_timeout,
++
++	TP_PROTO(const struct request_sock *req),
++
++	TP_ARGS(req),
++
++	TP_STRUCT__entry(
++		__field(const void *, req)
++		__field(__u16, sport)
++		__field(__u16, dport)
++		__field(__u16, family)
++		__array(__u8, saddr, 4)
++		__array(__u8, daddr, 4)
++		__array(__u8, saddr_v6, 16)
++		__array(__u8, daddr_v6, 16)
++		__field(u8, state)
++		__field(u8, num_timeout)
++		__field(bool, acked)
++	),
++
++
++	TP_fast_assign(
++		const struct inet_request_sock *ireq = inet_rsk(req);
++		__be32 *p32;
++
++		__entry->req = req;
++
++		__entry->sport = ireq->ir_num;
++		__entry->dport = ntohs(ireq->ir_rmt_port);
++		__entry->family = req->__req_common.skc_family;
++
++		p32 = (__be32 *) __entry->saddr;
++		*p32 = ireq->ir_loc_addr;
++
++		p32 = (__be32 *) __entry->daddr;
++		*p32 = ireq->ir_rmt_addr;
++
++#if IS_ENABLED(CONFIG_IPV6)
++		/*
++		 * Cannot use TP_STORE_ADDRS directly because it assumes
++		 * there is an sk available.
++		 */
++		if (__entry->family == AF_INET6) {
++			struct in6_addr *pin6;
++
++			pin6 = (struct in6_addr *)__entry->saddr_v6;
++			*pin6 = ireq->ir_v6_loc_addr;
++			pin6 = (struct in6_addr *)__entry->daddr_v6;
++			*pin6 = ireq->ir_v6_rmt_addr;
++		} else {
++			TP_STORE_V4MAPPED(__entry, ireq->ir_loc_addr, ireq->ir_rmt_addr);
++		}
++#else
++		TP_STORE_V4MAPPED(__entry, ireq->ir_loc_addr, ireq->ir_rmt_addr);
++#endif
++
++		__entry->state		= ireq->ireq_state;
++		__entry->num_timeout	= req->num_timeout;
++		__entry->acked		= ireq->acked;
++	),
++
++	TP_printk("family=%s sport=%hu dport=%hu saddr=%pI4 "
++		"daddr=%pI4 saddrv6=%pI6c daddrv6=%pI6c "
++		"ireq_state=%s num_timeout=%u acked=%d",
++		  show_family_name(__entry->family),
++		  __entry->sport, __entry->dport,
++		  __entry->saddr, __entry->daddr,
++		  __entry->saddr_v6, __entry->daddr_v6,
++		  show_tcp_state_name(__entry->state),
++		  __entry->num_timeout, __entry->acked)
++);
++
+ TRACE_EVENT(tcp_sendmsg_locked,
+ 	TP_PROTO(const struct sock *sk, const struct msghdr *msg,
+ 		 const struct sk_buff *skb, int size_goal),
+diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+index bf171b5e1eb3..8f482a6b43e3 100644
+--- a/net/ipv4/tcp_timer.c
++++ b/net/ipv4/tcp_timer.c
+@@ -24,6 +24,7 @@
+ #include <net/tcp.h>
+ #include <net/tcp_ecn.h>
+ #include <net/rstreason.h>
++#include <trace/events/tcp.h>
+ 
+ static u32 tcp_clamp_rto_to_user_timeout(const struct sock *sk)
+ {
+@@ -753,6 +754,8 @@ void tcp_syn_ack_timeout(const struct request_sock *req)
+ 	struct net *net = read_pnet(&inet_rsk(req)->ireq_net);
+ 
+ 	__NET_INC_STATS(net, LINUX_MIB_TCPTIMEOUTS);
++
++	trace_tcp_syn_ack_timeout(req);
+ }
+ 
+ void tcp_reset_keepalive_timer(struct sock *sk, unsigned long len)
+-- 
+2.54.0
+
 
