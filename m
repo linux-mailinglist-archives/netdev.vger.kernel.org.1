@@ -1,182 +1,226 @@
-Return-Path: <netdev+bounces-305384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305385-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id aJgPAP/ITGr4pgEAu9opvQ
-	(envelope-from <netdev+bounces-305384-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 11:38:07 +0200
+	id rnZJGkbKTGpGpwEAu9opvQ
+	(envelope-from <netdev+bounces-305385-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 11:43:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E9E0719E12
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 11:38:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6D54719EB0
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 11:43:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.alibaba.com header.s=default header.b=pHBhzdAI;
-	dmarc=pass (policy=none) header.from=linux.alibaba.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305384-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305384-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=canonical.com header.s=20251003 header.b=S7JQDAE4;
+	dmarc=pass (policy=reject) header.from=canonical.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305385-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305385-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 64856306534A
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 09:29:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 50680306CF31
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 09:35:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70CE1382287;
-	Tue,  7 Jul 2026 09:29:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 442243ACEED;
+	Tue,  7 Jul 2026 09:35:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04FF33066D;
-	Tue,  7 Jul 2026 09:29:13 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783416557; cv=none; b=ANfwTCPXLR7ae+f9BPVMcvZ9Y7bpTTNwUbYrMcOvhigF/FadaJqG4on24G0hMIY/mgbktDlkQBgqrjKLHN2vIRS6GKdUU2iOdM4IpxIKs7eVJIvUGg2osGVQZGkgW1hNGl7AWaDzpG5+S+v/lJkwwMmGtqVoqm86v1GWbCoVtt8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783416557; c=relaxed/simple;
-	bh=hZkT2Dsk6x1Rc8lxbgya9SVeGD89lnwkYlre0tYxc2w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EaVvxV+8a4S0AsvCSDgff+Br7NDj2ibq+noCp08D1uYw4MrslasZBdeWyNyWbLUP8RjDwOdjiDLziKmQQlLhpJh/ajwYxsuIVDpB0rhTs6diKX1reZjO9F2MangL33mt27S+XwWUc0kVvix+xF0gZjqYidJqMR8wEmi3Nt0EDDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=pHBhzdAI; arc=none smtp.client-ip=115.124.30.118
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1783416546; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=x/JBmUH0AmD4h3bq2fvjuR02nLqqtA1dtweQcgT9r2k=;
-	b=pHBhzdAIaNpia0nJojGu+fKNii3HdKyNGNztCwxn8bFH7pDMawwPbLLOPG9JcPTWuQGz7YHS1VB/BGRNuEmhDfIEtoRuo+lS0/rKyM4FkwzudoUKAKVeRkLc+slZ/TSjhNizhZx5dxUdrZVPDGzPx1QYXNEVoax9hB07b6XcRx8=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045098064;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0X6cl3KV_1783416545;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0X6cl3KV_1783416545 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 07 Jul 2026 17:29:05 +0800
-Date: Tue, 7 Jul 2026 17:29:04 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: hexlabsecurity@proton.me, "David S. Miller" <davem@davemloft.net>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Stefan Raspl <raspl@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Ursula Braun <ubraun@linux.ibm.com>, linux-s390@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net v4 0/3] net/smc: bound wire-controlled CDC cursors
- against the local buffers
-Message-ID: <akzG4Hfeom6fNzFX@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20260705-b4-disp-28a1bbca-v4-0-be089b98acc6@proton.me>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E9839937C
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 09:35:43 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783416946; cv=pass; b=EE2/V3bgoYpmxSJdvWjWiz4Xg71ds7U5bzsCT7rEIem4ywhw6pWcf79uUPAhw+kp5QhhrhFZTt24cmm6veNHIXcq/OYl3r2XHmWXQa91GAI0wAHZSgdomNToYXfr7wU/C3wd3R8mOY21nfwzIvUfi8m7vbfxnSuJOCvgVxo5TkQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783416946; c=relaxed/simple;
+	bh=uLybiMWMjmE4TRojd9HQOPaGaWZeCtzCpL0SPNTzJx4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jwDOMJdRuKN5HVyjYBYiJ7qy77jb6icBZ4WVR6Wa22SxSQuJZvQLrlM1XPveTIKNeDNaBuJwb3bBG+XIJ+tlBqL1BC0gPLlNgdsy7XjnDDJVZq3lW1PrU2rsVesjjWsl9o6DgIB1V8JQ8m5AkVmLPMop+o8s/d8/V+5hrjqcpBo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=S7JQDAE4; arc=pass smtp.client-ip=185.125.188.122
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 80E723F527
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 09:35:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1783416936;
+	bh=bbT/31W+nDI+goBOogRFsrx2+HdUbut6Kmz6fgFzHhY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=S7JQDAE4E5CD/4AHpJ6qVSF1mqvol6EdkTCI/SUrz4xbNguPJFc0eOhr7wC1T4CgE
+	 p4w9azv+i5Y1JeX3UJReQ/tpOGdb1drIJu1Ca8095BN7EKshUskm9DgBq6GBfQZ6Es
+	 6XDPjt09NB10eWkOw3AU0ZjgMNE7luI7Yo0SggDj3Z+epxUMyoucCmFaztdfRqhWVr
+	 L72VJeAT0OnruEV4TY+r+rBYcFRKkRqlrXlVtUGMqIMUbq/tVcKadL1JVFkL2yruDz
+	 HXVGXzAQMm2IEAFnicg8eReQoWbpc06/B8dnSYA0NtOSuDzNAigKVTJdkpGU1FufXZ
+	 OhHN+L4sFtkJtBeDQqGgpaeiLMjbcTmqzi0PsU3Jrw4ABYSiqfDcQHmDpIrPj0Glvl
+	 km8BFcOoB82PLweejoRL8UqWwfCHYHsqUzr7tcyf3Bmwkh1/FV9+xicjeO1dVxNpo7
+	 MfTE/NnZ1PPfZQPBxWYeJCePIF+iRxuV1VxGbomaM3t1xe83sb05jubUQBHtOO7kmr
+	 Z9pV7k0w0AVnZ99M51QH0W2lRkGxNgaJFJzXZjlNBB6xwwqFRGD8EjirkoVLpBEDs/
+	 XQ3uHgDmgyA3jR+55RkJop4SnL+4wWbonjGFCO3OYjMM5HCQl/tqyML5sSDdURi1q6
+	 x/QMXU6Pj1NvQAv7qYmt+h2k=
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-847a225cd91so4164900b3a.2
+        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 02:35:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783416935; cv=none;
+        d=google.com; s=arc-20260327;
+        b=eHEpt/mKPx+TrmOSsBrfBb1hAaOtuKm1d25KHW4f4XwY9OdkBohKqeeBlxq1POGWUS
+         olm22u3XtmwK/fuzBpbwLQvCeKv7gQ2bJIzmgj9ZGwRlJoCWB6hdNA2iprTaILVmV2m/
+         yb5qg74RGposk1LSELfrCwM+drL4tkLYQwqm8nTuaOiDY/nE61Cv1VWHlAko3+C8M2/Z
+         olMEHm/bOddGvS1kKl9e9Dg28RCrhj4QIObyHA2V72YqgHb3+jwaZcteY3aPJKakEXOq
+         xwURJ32uXSinbbb1C3aBvI1TDz1GpUOrcKh1QGWPawNuXgcGoGmNDT0mYmWRXiFn201M
+         yMIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version;
+        bh=bbT/31W+nDI+goBOogRFsrx2+HdUbut6Kmz6fgFzHhY=;
+        fh=URfISgeGRy5DTcqeY8uNeSytDXK/HzwCuapdgvTVm0Q=;
+        b=INR8CYVi/owqLdQ1L3O2kIn+H6yll34eY0kpE0D5X+lHXzs+tQEBwyCV9aE5R5XqAU
+         WH6dcUm6s4yjR4wOiBAMuIrXn6vgNqI5jTEZ/5WYATw3QmxK16KLHQOPx0TtL4TMJBCR
+         itLY8lQ99XUOyQbWzL9fnFDdh+e7EOaXidJv0bp4SK99LZC+r7lnGSB/uKVKhHAznJBJ
+         ELVANLZ3fxWahFhzAxBjRoW/+6+EzKnvqbGx8JQowVLwd1nyer62hL0s4CmArbrEeQdd
+         NWjV6gdFWFEWRXKAZswOx9/MjgEROdTONE468tP7FXWTcTC8L3UNU4foewwtzvfma7BY
+         GfVg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783416935; x=1784021735;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=bbT/31W+nDI+goBOogRFsrx2+HdUbut6Kmz6fgFzHhY=;
+        b=kb/062lzXeCVLg1CauZzSFyKnoCIe5IGNnF/nm2cVWoDyCSCVMcBmXHgpJUrVAV/4j
+         WFJql0sbMmo/HjkfuY7xMaJpHDc4NtOz/7NbP8/K0cmVs2ByQs2hR1wE9twEkRpQthYV
+         y6nTVFj968LSdJAyLsda1w36uD6A2Eel25PvThnC/Nf8/ZotQZaFvHOkzXKtxJYJDYcd
+         hFnETigrFkweDIm6lOMDX+UeZc7YPg26DM8U6xivGBjxW3l3VaYT9+zTihWW9ZFVs1Y7
+         me0tpkrlPwrJHhMx9VsuznrvwW8B27Q46mpofbhJftEwnUMPyOVdJuyXBsloPnxsiTRW
+         os+A==
+X-Forwarded-Encrypted: i=1; AHgh+RopZB2nQcasVSFRoeavpjYWLzo44vE5cNlsUHwLz7BQmhYjf27dW3fVK+3PyqdhAHaR54D0g3A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmlcsZu0i7Zq+jp1MHiwYnsXqT0knzm4QQYTujAQO4nuPIUzfj
+	mu4rn9NEXlrlju2xPti4NvjEuNLcEXyUgxxzqmcDqz8nebl91SLYdUCbABpDpA7N+is/ztonDCm
+	S+P8FiPwAu1nd8uwoJEl7o4aaSu8Basf93MxUMniFNWBCnCB6AMS+CwHwAJscNmly06FxWZALnt
+	DuqLIjYZu1Ym4gVB76Njbnf9GLar1F4jz2FCiEl6ZhIYXBAJyP
+X-Gm-Gg: AfdE7cmQ3uPl8e9W0Uhx0+dbktuydUTQz2LiyKUYhU0VCrLzqu0ssgBwkSgaVAiXlpm
+	TtJRcUi5sBXuBVp12nISm+ghWgRt1xl3ErQzI65O05uFofTGhcKs677Ic7RbY7IKMvMvmxiozZs
+	a3G4QOaZWYznewaHV4s8StDtljtn9JGsDmeL9U2OgCLIMP7buWON9xGMHr0+TD+IgnfhfTt1PhL
+	Nn/S1IxGicp/ABDMeabZaH6lUN9AUiuPqEQk6+3dN6JPJbTJbUCmGODzv/KJonYjxrNt0+u4lR5
+	aMA9aGE=
+X-Received: by 2002:a05:6a20:c5aa:b0:3c0:9c1a:8948 with SMTP id adf61e73a8af0-3c09c1a9c1bmr2553458637.64.1783416934867;
+        Tue, 07 Jul 2026 02:35:34 -0700 (PDT)
+X-Received: by 2002:a05:6a20:c5aa:b0:3c0:9c1a:8948 with SMTP id
+ adf61e73a8af0-3c09c1a9c1bmr2553433637.64.1783416934523; Tue, 07 Jul 2026
+ 02:35:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260705-b4-disp-28a1bbca-v4-0-be089b98acc6@proton.me>
+References: <20260630214404.930923-1-anthony.l.nguyen@intel.com>
+ <20260630214404.930923-2-anthony.l.nguyen@intel.com> <0496c117-0731-4de4-9f5d-7fdacf34bd71@redhat.com>
+In-Reply-To: <0496c117-0731-4de4-9f5d-7fdacf34bd71@redhat.com>
+From: Aaron Ma <aaron.ma@canonical.com>
+Date: Tue, 7 Jul 2026 17:35:22 +0800
+X-Gm-Features: AVVi8CfFkGBoEQGbtTlj_qWkJDI5c9F_6NwSBaUWRPxR7DFsx1-u2mFLOdzGCoU
+Message-ID: <CAJ6xRxVwD9nLk96y6-HNSFt1AL8o=24UMUGxCYZdht2_+36Xhg@mail.gmail.com>
+Subject: Re: [PATCH net 1/4] ice: wait for reset completion in ice_resume()
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net, kuba@kernel.org, 
+	edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org, 
+	jbrandeb@kernel.org, stable@vger.kernel.org, Kohei Enju <kohei@enjuk.jp>, 
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+	Alexander Nowlin <alexander.nowlin@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-12.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	WHITELIST_SPF_DKIM(-3.00)[alibaba.com:d:+,kernel.org:s:+];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[canonical.com,reject];
+	R_DKIM_ALLOW(-0.20)[canonical.com:s=20251003];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-305385-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:hexlabsecurity@proton.me,m:davem@davemloft.net,m:sidraya@linux.ibm.com,m:edumazet@google.com,m:alibuda@linux.alibaba.com,m:kuba@kernel.org,m:horms@kernel.org,m:wenjia@linux.ibm.com,m:pabeni@redhat.com,m:raspl@linux.ibm.com,m:guwen@linux.alibaba.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:ubraun@linux.ibm.com,m:linux-s390@vger.kernel.org,m:linux-rdma@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[dust.li@linux.alibaba.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305384-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:anthony.l.nguyen@intel.com,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:jbrandeb@kernel.org,m:stable@vger.kernel.org,m:kohei@enjuk.jp,m:aleksandr.loktionov@intel.com,m:przemyslaw.kitszel@intel.com,m:alexander.nowlin@intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[aaron.ma@canonical.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	PRECEDENCE_BULK(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dust.li@linux.alibaba.com,netdev@vger.kernel.org];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	HAS_REPLYTO(0.00)[dust.li@linux.alibaba.com];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.alibaba.com:from_mime,linux.alibaba.com:replyto,linux.alibaba.com:mid,linux.alibaba.com:dkim,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aaron.ma@canonical.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[canonical.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mail.gmail.com:mid,canonical.com:from_mime,canonical.com:email,canonical.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1E9E0719E12
+X-Rspamd-Queue-Id: D6D54719EB0
 
-On 2026-07-05 02:54:04, Bryam Vargas via B4 Relay wrote:
->A peer's CDC producer/consumer cursors are copied from the wire and used,
->without an upper bound against the local buffers, as (a) a raw index into the
->RMB on the urgent path, (b) the receive length in smc_rx_recvmsg(), and (c) the
->send length in smc_tx_sendmsg() on the SMC-D DMB-merge path. A malicious or
->buggy peer can forge a cursor so each runs past the relevant buffer: an
->out-of-bounds read of adjacent kernel memory (disclosed to the peer) on the
->receive/urgent side, and, on the send side, an out-of-bounds write whose
->length the peer controls and whose overflowing bytes are the local sender's
->own outbound data.
+On Tue, Jul 7, 2026 at 4:28=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
 >
->This series bounds each length where it is consumed. The clamp is synchronous
->and race-free against the tasklet that advances the cursor, so it is the minimal
->fix for stable. A separate net-next series adds the wire-boundary validation and
->connection abort that Dust Li suggested; those do not replace these clamps.
+> On 6/30/26 11:43 PM, Tony Nguyen wrote:
+> > From: Aaron Ma <aaron.ma@canonical.com>
+> >
+> > ice_resume() schedules an asynchronous PF reset and returns
+> > immediately. The reset runs later in ice_service_task(). If
+> > userspace tries to bring up the net device before the reset
+> > finishes, ice_open() fails with -EBUSY:
+> >
+> >   ice_resume()
+> >     ice_schedule_reset()          # sets ICE_PFR_REQ, returns
+> >   ...
+> >   ice_open()
+> >     ice_is_reset_in_progress()    # ICE_PFR_REQ still set, -EBUSY
+> >   ...
+> >   ice_service_task()
+> >     ice_do_reset()
+> >       ice_rebuild()               # clears ICE_PFR_REQ, too late
+> >
+> > Reproduced on E800 series NICs during suspend/resume with irdma
+> > enabled, where the aux device probe widens the race window.
+> >
+> >   ice 0000:81:00.0: can't open net device while reset is in progress
+> >
+> > Add a best-effort wait (10s timeout, matching ice_devlink_info_get())
+> > for the reset to complete before returning from ice_resume(). In
+> > practice the reset completes in ~300ms.
 >
->The clamp is not subsumed by validating cursors at the input boundary. A peer
->that only increments prod.wrap with count == 0 hits the differing-wrap branch of
->smc_curs_diff(), which returns (len - 0) + 0 == len every CDC, so bytes_to_rcv
->(and sndbuf_space on the send side) accumulates past the buffer while every
->per-cursor bound sees count == 0 and accepts the message. The overflow lives in
->the accumulator, not the cursor; only the consumer-side clamp bounds it. And
->because a queued abort runs asynchronously (queue_work -> smc_conn_kill) while
->smc_rx_recvmsg() reads the accumulator under lock_sock, only the synchronous
->clamp closes that window. So the clamp goes to stable; the abort is net-next.
+> Would not be better to (eventually) wait in ice_open()? Why? AFAICS that
+> would be also more consistent with i.e. the current wait in
+> ice_devlink_info_get().
 >
->The nearby readable >= rmb_desc->len / len > sndbuf_desc->len tests only feed
->statistics counters (SMC_STAT_RMB_RX_FULL / SMC_STAT_RMB_TX_SIZE_SMALL) on an
->earlier, separate read; they do not bound the copy.
+> Otherwise why don't consolidate all the wait at resume time and remove
+> the other one in ice_devlink_info_get()?
 >
->A/B (in-kernel KASAN replaying the sink arithmetic over a real rmb_desc->len /
->sndbuf_desc->len slab; kasan.fault=report kasan_multi_shot, 2026-07-05):
->  - urgent index (1/3):  count = len+1        -> slab-out-of-bounds Read;  clamped -> clean
->  - recv length  (2/3):  bytes_to_rcv = 5*len via wrap++/count=0 -> OOB Read; clamped -> clean
->  - send length  (3/3):  sndbuf_space inflated -> slab-out-of-bounds Write; clamped -> clean
->  - signed overflow:     readable = -1 -> v1 ">len" misses -> OOB; "<0 || >len" -> clean
->  - concurrent TOCTOU race: a producer-side clamp is racy (OOB in a racing consumer
->    kthread on another CPU); the consumer-side clamp is race-free (0 hits / 5,000,000 reads).
->  - every in-bounds / honest-peer arm: clean.
+
+Hi Paolo,
+
+ice_open() is where the failure is observed, but it is not what creates
+this race. ice_resume() schedules a PFR and returns success before that
+reset/rebuild has completed, so userspace can call open immediately after
+resume and hit -EBUSY.
+
+Waiting in ice_resume() keeps the fix scoped to the PM path and to the
+reset initiated by resume. Moving the wait into ice_open() would change
+all opens during any reset from immediate -EBUSY to sleeping, and ndo_open
+runs under RTNL.
+
+The devlink wait should stay because ice_devlink_info_get() is reached by
+DEVLINK_CMD_INFO_GET userspace requests and reads device/FW state. That
+path still needs protection from resets unrelated to PM resume.
+
+Aaron
+
+> /P
 >
->Changes since v3:
->  - split into this stable-bound clamp series and a separate net-next
->    validate/abort series, per Dust Li's review;
->  - tightened the commit messages; noted that the nearby SMC_STAT_* tests are not
->    bounds; no functional change to the three clamps.
->  v3: https://lore.kernel.org/all/20260614-b4-disp-edd64be9-v3-0-551fa514257e@proton.me/
-
-Hi Bryam,
-
-Are you planning to land these clamps first, and then follow up with a
-separate validate/abort series?
-
-Looking at your earlier A/B test, it simulates this logic in userspace to
-demonstrate the bug, but it doesn't actually trigger the bug in our
-current kernel. If that's the case, the security risk here doesn't seem
-high to me, since SMC is only meant to be deployed in trusted environments.
-
-On the other hand, once this is actually triggered, it means the data
-we've been handing to userspace is already wrong, which is already a
-serious problem, and the connection should be terminated. So I don't
-really see much value in merging the bound-clamp patches first.
-
-So, I'd expected to see the real bug and validation/abort patch.
-
-Best regards,
-Dust
-
 
