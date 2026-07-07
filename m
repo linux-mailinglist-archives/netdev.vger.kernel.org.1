@@ -1,159 +1,199 @@
-Return-Path: <netdev+bounces-305268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305273-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id yKshJvZ4TGo7lAEAu9opvQ
-	(envelope-from <netdev+bounces-305268-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 05:56:38 +0200
+	id FT3TBmqATGqVlQEAu9opvQ
+	(envelope-from <netdev+bounces-305273-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 06:28:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F24C4717253
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 05:56:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7963B7173D2
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 06:28:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.alibaba.com header.s=default header.b=LlakIQbN;
-	dmarc=pass (policy=none) header.from=linux.alibaba.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305268-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305268-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=rbox.co header.s=selector2 header.b=toXSCDNN;
+	dmarc=pass (policy=none) header.from=rbox.co;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305273-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305273-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4AA6A301F889
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 03:56:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 294D0303895E
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 04:25:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 565F13191C8;
-	Tue,  7 Jul 2026 03:56:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74ED337BE9C;
+	Tue,  7 Jul 2026 04:25:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7F742086D;
-	Tue,  7 Jul 2026 03:56:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB1A376A0B;
+	Tue,  7 Jul 2026 04:25:04 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783396594; cv=none; b=dNNuNzVOzrCnvhAxlHfuSIeoKYKtE6VgLPs53ItU4gKzW4YLg6f/NfMciRlpRpkpfW2fYut2B6zH3JAiHX3TuI8sdqjaDuBmZSUMtw25LhkcDfW3Kg7eK4OLcBQmfofqDYIpG6j6t3k3zyTM0qzSzBFPT9HVhsVDSFEEBkmHyYY=
+	t=1783398309; cv=none; b=BIdu7Wfo9QzDbE8WjLqB8ArB49MZY2qogpZD16IzOzzi2jRRFozpVomGd94UpztZgHreJkvaT9C9V0c47q7VgQ/g4yBpxFYLWhnlNExdXInYrUbBBSpaRdTqNVCiYTV6q11Dp//0/+Nj/NBvsX/OptknGC0L2KxB9KFPfB9qzUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783396594; c=relaxed/simple;
-	bh=AH0x5XaXy0vIg0qhq+qAwESJKMn/Df6ORcuGRPEcxNo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JMjylz9Ovnk9Xpql1fhyuk9qpaeC8vAdJlk6vkk7BRrGC45rR7MbM6hycq6C3UdQl1bmdMnU/p66t4c83i4HJwnGnuflRFigvmsiw3k8k5GtdPHL6saa2CRs5/UyR3oEkwVUebUM2MjNxDIRxQ1jJdU8HsJjxD37NavhQkycFVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=LlakIQbN; arc=none smtp.client-ip=115.124.30.97
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1783396581; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=M4RVq49saWLjC2cfzHwMtl8WbBTa/nnpaGr8HOsnPv4=;
-	b=LlakIQbNJhf2JQWChhZ0wz876tCXtu0xCIvHcz8tG2i8d5USKunPD8FXAMy0LuW8opJJ3bPjDHsGRRiLqeByteLJY7bO4BKjhjFL+ovP8ug6UbojUMy83l/0tkkqeO4wPUcoqbZJYYDrPN1zamZm9HQIk622W5rxaq5wFdc30t4=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037009110;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0X6bdqfX_1783396580;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0X6bdqfX_1783396580 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 07 Jul 2026 11:56:21 +0800
-Date: Tue, 7 Jul 2026 11:56:20 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: "D. Wythe" <alibuda@linux.alibaba.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, Simon Horman <horms@kernel.org>,
-	Ursula Braun <ubraun@linux.vnet.ibm.com>,
-	Hans Wippel <hwippel@linux.ibm.com>, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net] net/smc: ignore peer-supplied rmbe_idx and dmbe_idx
-Message-ID: <akx45Ewt3iuhzCRI@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20260702171137.1099051-2-dust.li@linux.alibaba.com>
+	s=arc-20240116; t=1783398309; c=relaxed/simple;
+	bh=opHTuuL9qw5T8tWLSEXG0Rt1luagGrS4UY1zmwZHa6k=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=NwHoRgNreO7OFmIs+TFlt9vi2ji15Bq5HNZhrX95astN+EHJHVQHi5ZcvbXUR3rBq3Q7Aae4+YmyssgeHJS95dKsK6lm4Qqb3LrD+8Oipb4QAFzNmMgRufQoE5oQu4GRwIbpisNziWpGb0ZuBRCqtDXlXMG+fwxXexhLExYZLow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=toXSCDNN; arc=none smtp.client-ip=185.226.149.37
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1wgxMa-00DUhX-Q1; Tue, 07 Jul 2026 06:24:52 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From; bh=VEDYRANxd2n4E7p/Uqpqw4YEwTx+raQSJRg3dXH1x+U=
+	; b=toXSCDNNz9MfJeIbpiWA0UzebKuDxG6j9ppanpNhNsEqgCZ+XMZ3NFXtszEoNik73B3kv54DB
+	RN6tDStprnMIPPpYSBOWxB7EJCZp0DjXyMPOtn3a+gxb84ZGBYtSq3OoU95LWZb+b9MtQT3+3V8fE
+	y6u0DcRa0T2jA5wNsfRlAXi9HGXhH5/gg54hP5zqMGLbjlZDD6CGS6p3o4C0+L3fVqQc5Zy+nyNaf
+	lu3Tj6fsn/pXA7CwRv2YQh7+Wc5rwNSypTyziOvSQZh9ORTcYTPkq4mYR9Y9DUwdWi6kNu3n58/EM
+	D/WJ+XxuwHth2bVEY7jOOui4CpfSO0fjAg8A2Q==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1wgxMZ-0004lH-Bi; Tue, 07 Jul 2026 06:24:51 +0200
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.95)
+	id 1wgxMO-00Ctdi-HG;
+	Tue, 07 Jul 2026 06:24:40 +0200
+From: Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH bpf v4 0/4] bpf, sockmap: Fix sockmap leaking UDP socks
+Date: Tue, 07 Jul 2026 06:23:55 +0200
+Message-Id: <20260707-sockmap-lookup-udp-leak-v4-0-f878346f27ab@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260702171137.1099051-2-dust.li@linux.alibaba.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3XNQQ6DIBAF0KsY1qUBRMGueo+mC8WhUlsxoMbGe
+ PeiLmwX7mYmf96fkAdnwKNLNCEHg/HGNmHhpwipKm8egE0ZdsQIS0lKBfZW1e+8xS9r677FfRl
+ GyGtcKA6JSrikpUDhu3WgzbjKN1S0Gt23o++LJ6huMZdYZXxn3WftH+ga3qpYfFg1UEwwSSThO
+ ouJBH51hR3Pyq4dA/tV0mOFBUWAAEaoyhKa/yvxrgjCjpU4KFrLEqSQjKdyV+Z5/gLSI6/LXwE
+ AAA==
+X-Change-ID: 20260617-sockmap-lookup-udp-leak-bc4e5c5481d7
+To: Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+ Eduard Zingerman <eddyz87@gmail.com>, 
+ Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
+ Emil Tsalapatis <emil@etsalapatis.com>, Shuah Khan <shuah@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Jakub Sitnicki <jakub@cloudflare.com>, 
+ Jiayuan Chen <jiayuan.chen@linux.dev>, Eric Dumazet <edumazet@google.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+ Simon Horman <horms@kernel.org>, Cong Wang <cong.wang@bytedance.com>
+Cc: Michal Luczaj <mhal@rbox.co>, bpf@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org
+X-Mailer: b4 0.15.2
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-12.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	WHITELIST_SPF_DKIM(-3.00)[alibaba.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[rbox.co,none];
+	R_DKIM_ALLOW(-0.20)[rbox.co:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:alibuda@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:horms@kernel.org,m:ubraun@linux.vnet.ibm.com,m:hwippel@linux.ibm.com,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	REPLYTO_DOM_EQ_TO_DOM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER(0.00)[dust.li@linux.alibaba.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-305268-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305273-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_TO(0.00)[kernel.org,iogearbox.net,gmail.com,linux.dev,etsalapatis.com,cloudflare.com,google.com,redhat.com,davemloft.net,bytedance.com];
+	FORGED_RECIPIENTS(0.00)[m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:shuah@kernel.org,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:edumazet@google.com,m:kuniyu@google.com,m:pabeni@redhat.com,m:willemb@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:horms@kernel.org,m:cong.wang@bytedance.com,m:mhal@rbox.co,m:bpf@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[mhal@rbox.co,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	HAS_REPLYTO(0.00)[dust.li@linux.alibaba.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dust.li@linux.alibaba.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	FROM_NEQ_ENVFROM(0.00)[mhal@rbox.co,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[rbox.co:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,alibaba.com:email,linux.alibaba.com:from_mime,linux.alibaba.com:replyto,linux.alibaba.com:mid,linux.alibaba.com:dkim]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F24C4717253
+X-Rspamd-Queue-Id: 7963B7173D2
 
-On 2026-07-03 01:11:38, Dust Li wrote:
->Linux always uses exactly one RMBE per RMB (index 1 for SMC-R) and
->one DMBE per DMB (index 0 for SMC-D), so conn->tx_off is always zero.
->Hardcode these fixed values instead of deriving tx_off from the
->peer-supplied rmbe_idx / dmbe_idx in the CLC Accept/Confirm message.
->
->Fixes: e6727f39004b ("smc: send data (through RDMA)")
->Fixes: 413498440e30 ("net/smc: add SMC-D support in af_smc")
->Cc: stable@vger.kernel.org
->Reported-by: Federico Kirschbaum <federico.kirschbaum@xbow.com>
->Signed-off-by: Dust Li <dust.li@linux.alibaba.com>
->---
-> net/smc/af_smc.c | 16 ++++++++++++----
-> 1 file changed, 12 insertions(+), 4 deletions(-)
->
->diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->index b5db69073e20..3706e8ac49e0 100644
->--- a/net/smc/af_smc.c
->+++ b/net/smc/af_smc.c
->@@ -729,11 +729,15 @@ static void smcr_conn_save_peer_info(struct smc_sock *smc,
-> {
-> 	int bufsize = smc_uncompress_bufsize(clc->r0.rmbe_size);
-> 
->-	smc->conn.peer_rmbe_idx = clc->r0.rmbe_idx;
->+	/* Linux uses exactly one RMBE per RMB (always index 1); ignore the
->+	 * peer-supplied rmbe_idx to prevent a malicious peer from setting an
->+	 * out-of-bounds tx_off.
->+	 */
->+	smc->conn.peer_rmbe_idx = 1;
-> 	smc->conn.local_tx_ctrl.token = ntohl(clc->r0.rmbe_alert_token);
-> 	smc->conn.peer_rmbe_size = bufsize;
-> 	atomic_set(&smc->conn.peer_rmbe_space, smc->conn.peer_rmbe_size);
->-	smc->conn.tx_off = bufsize * (smc->conn.peer_rmbe_idx - 1);
->+	smc->conn.tx_off = 0;
+Fix for UDP sockets getting leaked during sockmap lookup/release.
+Accompanied by selftests updates.
 
-Althrough we only have 1 RMBE/DMBE per RMB/DMB, but this does break SMC
-protocol.
+Two Sashiko's concerns to be addressed separately:
+https://lore.kernel.org/bpf/20260626205814.BAC3C1F000E9@smtp.kernel.org/
 
-I will send another patch, checking the bound in dibs_loopback.c, please
-ignore this one.
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+Changes in v4:
+- selftest: drop redundant `if (err)` [Sashiko]
+- Link to v3: https://patch.msgid.link/20260702-sockmap-lookup-udp-leak-v3-0-ff8de8782468@rbox.co
 
-Thanks sashiko for pointing this out!
+Changes in v3:
+- selftest: better error handling, ASSERT_*() macros [Sashiko]
+- selftest: fix grammar, reorder patches [Kuniyuki]
+- Link to v2: https://patch.msgid.link/20260626-sockmap-lookup-udp-leak-v2-0-7e7e201c951a@rbox.co
+
+Changes in v2:
+- selftest: drop the original, adapt old tests
+- fix: change approach to rejecting unbound UDP [Kuniyuki]
+- Link to v1: https://patch.msgid.link/20260623-sockmap-lookup-udp-leak-v1-0-05804f9308e4@rbox.co
+
+To: Alexei Starovoitov <ast@kernel.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
+To: Andrii Nakryiko <andrii@kernel.org>
+To: Eduard Zingerman <eddyz87@gmail.com>
+To: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+To: Song Liu <song@kernel.org>
+To: Yonghong Song <yonghong.song@linux.dev>
+To: Jiri Olsa <jolsa@kernel.org>
+To: Emil Tsalapatis <emil@etsalapatis.com>
+To: Shuah Khan <shuah@kernel.org>
+To: John Fastabend <john.fastabend@gmail.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: Eric Dumazet <edumazet@google.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Willem de Bruijn <willemb@google.com>
+To: "David S. Miller" <davem@davemloft.net>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Simon Horman <horms@kernel.org>
+To: Cong Wang <cong.wang@bytedance.com>
+Cc: bpf@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org
+
+---
+Michal Luczaj (4):
+      selftests/bpf: Ensure UDP sockets are bound
+      bpf, sockmap: Reject unhashed UDP sockets on sockmap update
+      selftests/bpf: Adapt sockmap update error handling
+      selftests/bpf: Fail unbound UDP on sockmap update
+
+ net/core/sock_map.c                                 |  2 ++
+ .../selftests/bpf/prog_tests/sockmap_basic.c        |  6 +++---
+ .../selftests/bpf/prog_tests/sockmap_listen.c       | 21 +++++++++++----------
+ tools/testing/selftests/bpf/test_maps.c             | 13 ++++++-------
+ 4 files changed, 22 insertions(+), 20 deletions(-)
+---
+base-commit: 17566290dc802b03a8127729b19c5962d63a7947
+change-id: 20260617-sockmap-lookup-udp-leak-bc4e5c5481d7
 
 Best regards,
-Dust
+--  
+Michal Luczaj <mhal@rbox.co>
+
 
