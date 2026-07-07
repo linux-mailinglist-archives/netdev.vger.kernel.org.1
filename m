@@ -1,325 +1,270 @@
-Return-Path: <netdev+bounces-305602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305603-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id JZCiLc16TWp10wEAu9opvQ
-	(envelope-from <netdev+bounces-305602-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 00:16:45 +0200
+	id tofUCq98TWrf0wEAu9opvQ
+	(envelope-from <netdev+bounces-305603-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 00:24:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48D85720009
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 00:16:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77DF57200BD
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 00:24:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=openai.com header.s=google header.b=JvRA+p++;
-	dmarc=pass (policy=reject) header.from=openai.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305602-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305602-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=everpuredata.com header.s=google header.b=isrJligi;
+	dmarc=pass (policy=quarantine) header.from=everpuredata.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305603-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305603-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9C4A4301093D
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 22:16:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 40E8A3050D89
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 22:22:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20CAC2C15A0;
-	Tue,  7 Jul 2026 22:16:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31CBA3D955B;
+	Tue,  7 Jul 2026 22:22:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56DD93D45DF
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 22:16:41 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783462603; cv=none; b=OcK7MN/0PEP4XW1D/kZoonwEHfUK4pua3Y1AI2OYkjkcEaX6oCDBukQroskEopPhy7LedOZmo8KqgBPy29SMcsPIFI9xt3KFWi9M3446ErYtzXpGvUez7ZyZdrSG/RiR9MpL67TZ/KjGLapm35L1k5MvCxjuq+Ot3iBxEZCqFP8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783462603; c=relaxed/simple;
-	bh=fa7ot51AK4GvjXzjN2xatzNnAuOJJlWeGalMMZcyHX4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O61r6JP6u/ZqVVwp41iwnIBVkH3/cV5AwtPlZEGq2nB9hsiYNLirry4wMTTUYUnIIRH/959PuFk7tgGlbI6P9N5TTCNLU9l39Bl3B7ogxAWuPAeptiF4CWTxeqPD7FLnsN6DAVyHOZCVCkPzu+j80ySPfRKlNiN4mWx/qzfrFfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com; spf=pass smtp.mailfrom=openai.com; dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b=JvRA+p++; arc=none smtp.client-ip=209.85.215.177
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-c9c80265bd7so2671035a12.1
-        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 15:16:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58CF3D9678
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 22:22:08 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783462931; cv=pass; b=hoJkx8bVF8TGos3td1PotW3uX+Kaua690wNvp/GAjyZ9/plW03Bl8RVvIpTaN4ay4oSNVUAU8nbCdALRcz7Xol6QSfUpV3ZB9qS4/lGpidHw+5TLgB7MvSTEAK5cxzCfMwqUnVzMFBvGLk6jDy5zEfU1fN78i8wLtKWZibiybu4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783462931; c=relaxed/simple;
+	bh=u2+Erg3Mqm5BTt6EwJU3P+702TeVlQqR57tsm9yrByE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ggIBi1zHpJIDxS3C/uj5opgt8G3/b1MkEBOkm4GXYO8AiJdRag/pVs840QhrDa8/D3jxKEy7ZKzrPHTV8BcPNAVYFWV16cg8wEKiLbPEbOJ02lLMSQC1YiEbuJZlICm2TiVDH08vFWkptkV65k/aOKurzAHoOWvT5W3thvKRygQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=everpuredata.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=everpuredata.com header.i=@everpuredata.com header.b=isrJligi; arc=pass smtp.client-ip=209.85.217.49
+Received: by mail-vs1-f49.google.com with SMTP id ada2fe7eead31-735f73287e2so12479137.2
+        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 15:22:08 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783462927; cv=none;
+        d=google.com; s=arc-20260327;
+        b=LFx5XatFhHFZogyurYakAA1s2iaSGVOjQ+Uv6Ugf24S0ZRCNVNzkOTDU0i4bKDekL+
+         MtzvC/GXvFhSIgfBKR/ySWF3RVGI09XPPJnUsPlVjcIIxplm0Nqv4h9uHMW/nktW4VUS
+         pRBBg3uXx4xtSQM+VT7IxLXOIu72ggHC4jqcewkcpbkUKddUmZubHp78qxNdUdKLX51w
+         f9CT9Qf6OeDUIl1rdNFtgiMWCPovoEi7UdCeLa18Aec1b04mRnV197vpecwH4ijCUnbm
+         VtXrWS49pM6EMCvwRMTmso7BwQO4VeVHvSrv47QFf3Dujvqzyimmcci2pKnJrdYlEJcA
+         Mpxw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=s9FkF5g+SFR2M1lVFUmErdXZII4iyjWhaW0w30oVihg=;
+        fh=LU11JMcjY9vo5ppFJ6akUH2cvBnFemuXZu0FQ67UH9I=;
+        b=ax1IetKm0/rIYK5j7mqUkFP55r/aUbTS+nvRPHE51aBsQrjm+7fNKYs7F7Lxp4ZuVo
+         YcWmldpZQ/ya1TXt/NcLhQ1k9v4E2SmlKS7UwT2/kdfHWRdmd71HDmyUJAeAwvQe6TTp
+         rCuV5rhk+52iN1nPBxudu8JSv1KPUPkR0lFYmz1CJ/P22/w6AJaAWhabBis295dN43/W
+         0t3Rj0ad5yR7WORSPlL9pdlXaLwpuFDRMuPKnh6xVebClxRtFJBfw+6yIO4BCelJFuXR
+         OWC9B4jLHVfXBL11Y3AbUibs8Tx6xepuFYOmWI7Qg/aoaqqPpdmR5S9kIu5bMwR7Igmp
+         VmEA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openai.com; s=google; t=1783462600; x=1784067400; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=IdJZd9tQ2oh7Af4gmwWaKxs5ZeO+JiGwmEDefw5S65c=;
-        b=JvRA+p++8A69xx9Wd9u1dxTBDJ7ctqpE1queD9KcDmGF5W2nkWw671P3lafa2iIQ+a
-         /HPPfxSKxPPNQEP0tsXilyg6P+vDR/yWnsFyPwZCgsPEhFHgmW/7y6WEwws5bdeSnDfY
-         WZTGFdI/OyRfCwI472I2cv52MpuYWj81gAoM0=
+        d=everpuredata.com; s=google; t=1783462927; x=1784067727; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=s9FkF5g+SFR2M1lVFUmErdXZII4iyjWhaW0w30oVihg=;
+        b=isrJligisGYt8IgIw8mkeuljKVcmjGB5OEevHOiZs7WFh+wyOxq73AAXhmVqJ0Path
+         PE941pjESXc3ezdI+Obq7RS46V9wCdYH7cHQ3dkkcQ9Yc4zdo6l9VnsiBdyv4b3aA9kn
+         kURKnmaWqXw75z8+YpYMnH+QtX6VXQQ8gugnKqratP09V2RCT8xTbOII7yMjSokrgle1
+         5qAUbxxxQXG9CYIFBs+qvWkwBDmjQ0jBShrDhYCx7F3b7DCY8xHi7cEQUYiKk0DPwFoZ
+         Bk2o3fkQHFtwXgTHk2L3poqP80KG0poFmiSGetjLDoYLCAxZtlnl838eyaCTw3HUPKh8
+         oV5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783462600; x=1784067400;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=IdJZd9tQ2oh7Af4gmwWaKxs5ZeO+JiGwmEDefw5S65c=;
-        b=M+S3ILpT+WjtxAVXgfYgJgjKiShVIyU1WeHFKhdGlFuXmGdpLNJ3JmzqlQ+ICSuMeM
-         1bZc5kQ4TacYPsCWDthFG+Yt1xcj03HW0UopXjq3BOo1gEkEpPZhnxunRRSGGJ12MLam
-         wAyOlPGQgzx27sTmV1rfI0ZWqx3DLHaz0VdyoKg6A5lVnCcqHrY4cGNAVAWdjvHb0mkt
-         6ukNE8NIR6XSKaqqWpYZs31DV3T5iCPKzn+wCXCOw2VuS+QoSdflnmg3hFbETmxoCCUK
-         m4QTRDGdlt4tZE0n6CqkyluOfMJJjUEpqN5es21AB4o2XrZhr48O8ktwVtisF2hdEG/H
-         xHeg==
-X-Gm-Message-State: AOJu0YzlROZ5wdG6C90lY5UI/mR/bzUAGFhqcF8twouluh3oa7ZF+8AH
-	XHLnZ4ORyo2/a8S3mUEqiisPkKdSTlrGBB0hi6vshTt2+LsTWNHNoU9A108+2K+54zfkXPqLt6w
-	4lPgfCEI=
-X-Gm-Gg: AfdE7ckP7hAh5F0+dBwtkb4UQ4ZYEa2VAJVfHyvxBb6u/DaVKJEYcehrqAHrldcd3KC
-	EbZF2K1+u17W9AXJUtc0zeiCLaYd9M3jzsidHBEGmvNTjM/wK5rsQI3WquvBtVXAhEwsNQCZQ6Y
-	4qKdH/GnzcRX3UJj752e97oYqEguOw2BTx26e5bASdqyTMUGefBxo1F/vOt4lW9bMVtMUe040Qh
-	fQN0M8bI0ycIw7+H6K3NBc99HkckHEd0nHDWVbaSAj/1e2+grmtA3mvNv3QaMARluWLg8GewU/a
-	dfdGhM5JeHt7NnjyOGwCYuXpmQcWKdnIn7nASCrhwkhfJ4/Da4ErF8anfu2p/72VXGyDqxszhB2
-	el/eZGpmSSd68OtfUbWIY+sSvH3E6rbyq379NvUgpSNMzRIqg6+DhkVGU4j/F+24cgpIdRRW7ht
-	wRAJa6bz95aSDgTw371/mpYEf57XbpsGlcu9krA4Hj6+YJJEiWlh9SYnRsfOy9xLHqE8Szla1So
-	G1buXYctBaN21TB4W4=
-X-Received: by 2002:a05:6a21:b85:b0:3b4:7b2a:6a0a with SMTP id adf61e73a8af0-3c08ee94f8dmr9535215637.35.1783462600467;
-        Tue, 07 Jul 2026 15:16:40 -0700 (PDT)
-Received: from com-75606.corp.openai.org ([209.249.37.146])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13b659d8da9sm19103665c88.14.2026.07.07.15.16.39
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 07 Jul 2026 15:16:40 -0700 (PDT)
-From: Kyle Zeng <kylebot@openai.com>
-To: netdev@vger.kernel.org
-Cc: Aaron Conole <aconole@redhat.com>,
-	Eelco Chaudron <echaudro@redhat.com>,
-	Ilya Maximets <i.maximets@ovn.org>,
-	Kyle Zeng <kylebot@openai.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net] openvswitch: fix GSO userspace truncation underflow
-Date: Tue,  7 Jul 2026 15:16:35 -0700
-Message-ID: <20260707221635.27489-1-kylebot@openai.com>
-X-Mailer: git-send-email 2.54.0
+        d=1e100.net; s=20251104; t=1783462927; x=1784067727;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=s9FkF5g+SFR2M1lVFUmErdXZII4iyjWhaW0w30oVihg=;
+        b=pKXRDD57wxBrz4O0xUB5VEKAMmksQqZMC7Zx2flxnHSgRgwvVK0Ht7mJkPB4hDZG5S
+         wDyDadcA5Z4YVm3dObwXmKj/DQc2KRXBtFjUZ6Z1eINhH4jW2DeVsos+a/WcN9q43qPV
+         tZGLuC0jpZjPRqa1Au+BEtgQA+n911WsoaJJUvORfay8W9WdJf1EyJxY0+xoy8wBGQLk
+         o5n5SBrC+KSh/Ulii3kziphb/5XR5fosO0hXsr++YyNBNaQWQaG/KH35qSocRycfIHsh
+         dTT1elm+U3qFoJpmTG60EN4Xmuvih5/wvpwj8YcDyMVQ7DpXHnGGEUqRA92vXYDnTQiQ
+         X0eg==
+X-Gm-Message-State: AOJu0YwBzfommiETQE318atoAJt7OEiRB1ybBQCHiSXbEMDx6EjZbkUC
+	H89o774gbBFseeuF85KV6HqrEXfH1XmUuo1ue1MbQtqabPEyioAjckd0zALSMwu+4C0LJ9OGkTF
+	+D6n2xWzOd4EJq+qgGF8kew39r5p3YgUN6bkls7dw9g==
+X-Gm-Gg: AfdE7ckqV022aecvrKrDJDpspfjaSSQrpDC731PGN/c1cq5XCLCSQaIlhsqG2wGw3wf
+	Rz2aA7LYkifOMYwpXlEidd3JscaFeyl166TlbGWgfRjHSsWXpaNhmHpvY8PWGO8cS6QAJtPgHS3
+	sdGH/bQFsH3IGHtGaYWjEDMCDmzoaxehChUZAKGlCWGpxgyyLa6K2DU29iV35FoCFOWIY2s6zVP
+	HjQSJT5eDQZ5GYGqggjlMZyYLp7SdCveV9Dn1Hho5ugfnSegPrUAsB15E9Ez8SE3pwCsuH2lhzp
+	R0z/yJqxbJQhffgJPLwE0wOlWmkzHXj07JT3are+MBs3lLH54nBQ9pIBSHSnZGU/ewJXL/tYAXn
+	lTBsTK9UaLxApVYoPiPPf9jbMiHtK7Ruv4YvX1jx2Xmn0EzCDMtxPzW7c
+X-Received: by 2002:a67:ed96:0:b0:738:fa95:fb5f with SMTP id
+ ada2fe7eead31-744b7ea2640mr3107924137.17.1783462927474; Tue, 07 Jul 2026
+ 15:22:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAMPsyauZ+jzG9AysO0FWv6ZY0kvCUpjX_U7o=oOjCuOQ87BCgg@mail.gmail.com>
+ <CAKaoeS1dxK+SLrUPdE1J16TpL_M5mj8JTccL7C2OzfnNQEFNSQ@mail.gmail.com>
+In-Reply-To: <CAKaoeS1dxK+SLrUPdE1J16TpL_M5mj8JTccL7C2OzfnNQEFNSQ@mail.gmail.com>
+From: Rishikesh Jethwani <rjethwani@everpuredata.com>
+Date: Tue, 7 Jul 2026 15:21:55 -0700
+X-Gm-Features: AVVi8CfcuN37Qxxiooi6Ht7bwht6L475Iyd4df2OgeWam0KE7cpAYBR6lKRCYLU
+Message-ID: <CAKaoeS0HMeMtTdafvRVfp+gaqDjSPCMtf8pLNh_a+drHc0sKcQ@mail.gmail.com>
+Subject: Re: [PATCH v14 0/9] tls: Add TLS 1.3 hardware offload support
+To: Nils Juenemann <nils.juenemann@gmail.com>
+Cc: netdev@vger.kernel.org, borisp@nvidia.com, davem@davemloft.net, 
+	edumazet@google.com, john.fastabend@gmail.com, kuba@kernel.org, 
+	leon@kernel.org, mbloch@nvidia.com, saeedm@nvidia.com, sd@queasysnail.net, 
+	tariqt@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[openai.com:d:+,kernel.org:s:+];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[openai.com,reject];
-	R_DKIM_ALLOW(-0.20)[openai.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[everpuredata.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[everpuredata.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305602-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:nils.juenemann@gmail.com,m:netdev@vger.kernel.org,m:borisp@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:leon@kernel.org,m:mbloch@nvidia.com,m:saeedm@nvidia.com,m:sd@queasysnail.net,m:tariqt@nvidia.com,m:nilsjuenemann@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:aconole@redhat.com,m:echaudro@redhat.com,m:i.maximets@ovn.org,m:kylebot@openai.com,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[rjethwani@everpuredata.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-305603-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[kylebot@openai.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kylebot@openai.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[openai.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[everpuredata.com:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rjethwani@everpuredata.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,davemloft.net,google.com,gmail.com,kernel.org,queasysnail.net];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,openai.com:from_mime,openai.com:email,openai.com:mid,openai.com:dkim]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,everpuredata.com:from_mime,everpuredata.com:email,everpuredata.com:dkim,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 48D85720009
+X-Rspamd-Queue-Id: 77DF57200BD
 
-OVS_ACTION_ATTR_TRUNC currently stores a delta from the original skb
-length in OVS_CB(skb)->cutlen. When a later userspace action segments a
-GSO skb, queue_gso_packets() reuses that delta for each smaller segment.
-A segment can then reach queue_userspace_packet() with cutlen greater
-than skb->len, underflowing the length passed to skb_zerocopy().
+On Thu, Jun 25, 2026 at 3:57=E2=80=AFPM Rishikesh Jethwani
+<rjethwani@everpuredata.com> wrote:
+>
+> On Tue, Jun 23, 2026 at 10:53=E2=80=AFAM Nils Juenemann
+> <nils.juenemann@gmail.com> wrote:
+> >
+> > Hi Rishikesh, all,
+> >
+> > we have been testing the v14 TLS 1.3 HW offload series on a ConnectX-6
+> > DX and hit a sendfile() final-record loss on the device TX path. We
+> > reduced it to a self-contained C reproducer and characterized it;
+> > reporting it here with the analysis and a question on where a fix belon=
+gs.
+> >
+> > Setup:
+> >
+> > NIC: ConnectX-6 DX (crypto enabled), FW 22.47.1026, SR-IOV VF,
+> > TX offload only
+> >
+> > Kernel: net-next + this v14 series
+> >
+> > TLS 1.3, AES-128-GCM, kTLS installed via setsockopt(TLS_TX) on the
+> > sending side with fixed test crypto material and no handshake, like
+> > tools/testing/selftests/net/tls
+> >
+> > a server sends a file with the raw sendfile(2) syscall; a client on
+> > another host reads the decrypted stream and counts the bytes
+> >
+> > Trigger: sendfile(2) with a count larger than the bytes remaining in
+> > the file (count > EOF). This is what a generic copy loop / Go's
+> > net.TCPConn.ReadFrom passes for a file of unknown length (~2 GiB). The
+> > kernel sends up to EOF, but the connection's final TLS record then
+> > appears not to be put on the wire unless a subsequent write flushes it.
+> > An abrupt close() appears to drop it, and the peer receives the whole
+> > body except the last record's bytes.
+> >
+> > Reproducer results (two hosts over the ConnectX - a loopback/same-host
+> > connection stays on TLS_SW and does not show it). Same file, 226965
+> > bytes (=3D 13*16384 + 13973):
+> >
+> > TLS_HW count>EOF close() -> 212992 short
+> > TLS_HW count>EOF close(), no zerocopy -> 212992 same
+> > TLS_HW count=3D=3Dexact close() -> 226965 full
+> > TLS_HW count>EOF close_notify, then close() -> 226965 full
+> > TLS_SW count>EOF close(), hw-tx-offload off -> 226965 full
+> >
+> > So it is specific to the device-offload TX path: the final record of a
+> > count > EOF sendfile() appears not to be finalized/flushed at EOF, only
+> > by a following write. A bounded count, a trailing write (close_notify),
+> > or software kTLS all avoid it. TLS_TX_ZEROCOPY_RO makes no difference.
+> > We are currently using the exact-count workaround in a preview environm=
+ent.
+> >
+> > We may be misreading the code, so this is only a pointer: with
+> > count > EOF tls_push_data() fills the last record without reaching the
+> > size=3D=3D0 case; on the device path tls_device_record_close() for that
+> > pending record appears to run only on the next push, and an abrupt
+> > teardown appears to discard it. The software path seems to flush
+> > pending TX records on close (tls_sw_release_resources_tx), which would
+> > explain why it is unaffected.
+> >
+> > Reproducer:
+> > https://gist.github.com/totallyunknown/a8f0ad3c54e40befde2f5a8d360fa6be
+> >
+> > It installs kTLS with fixed test crypto material via
+> > setsockopt(TLS_TX/TLS_RX), sends a file using the raw sendfile(2)
+> > syscall, and compares count > EOF against exact-count and close_notify.
+> > The v14 selftest (patch 9/9) sends via send() only and ends cleanly, so
+> > it misses this; a sendfile() + count > EOF case reproduces it
+> > deterministically for us.
+> >
+> > Question: should the device offload finalize and flush the connection's
+> > final record at EOF / on close, the way software kTLS does, or is a
+> > trailing write required by contract? And should a fix live in net/tls
+> > (device record close on the final partial record / the close path) or
+> > on the mlx5 side?
+> >
+>
+> close() should be sufficient here.
+> I will fix this in net/tls/tls_device.c:tls_device_splice_eof().
+> tls_device_splice_eof() only checked tls_is_partially_sent_record(),
+> but it also needs to handle tls_is_pending_open_record()
+> (pending_open_record_frags). On the device TX path, that state occurs
+> when tls_push_data() exits with MSG_MORE set, which is what
+> splice/sendfile does while count > EOF still leaves requested bytes
+> outstanding.
+> So EOF can be reached with a final open record still pending. The fix
+> is to close and push that record from tls_device_splice_eof(), so
+> close() remains sufficient and no trailing write is required.
 
-Store the maximum preserved length instead and bound each consumer
-against the current skb length. Use U32_MAX as the no-truncation
-sentinel so the value remains valid if skb geometry changes before a
-consumer handles it.
+Patch:
+tls: device: push pending open record on splice EOF
 
-Fixes: f2a4d086ed4c ("openvswitch: Add packet truncation support.")
-Cc: stable@vger.kernel.org
-Assisted-by: Codex:gpt-5.5
-Signed-off-by: Kyle Zeng <kylebot@openai.com>
----
- net/openvswitch/actions.c  | 19 +++++++------------
- net/openvswitch/datapath.c | 25 ++++++++++++++-----------
- net/openvswitch/datapath.h |  2 +-
- net/openvswitch/vport.c    |  2 +-
- 4 files changed, 23 insertions(+), 25 deletions(-)
+diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
+index aa4ef04e9c43..0d43ebf67b8b 100644
+--- a/net/tls/tls_device.c
++++ b/net/tls/tls_device.c
+@@ -794,13 +794,15 @@ void tls_device_splice_eof(struct socket *sock)
+        struct tls_context *tls_ctx =3D tls_get_ctx(sk);
+        struct iov_iter iter =3D {};
 
-diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-index 140388a18ae0..513fca6a8e8a 100644
---- a/net/openvswitch/actions.c
-+++ b/net/openvswitch/actions.c
-@@ -837,12 +837,8 @@ static void do_output(struct datapath *dp, struct sk_buff *skb, int out_port,
- 		u16 mru = OVS_CB(skb)->mru;
- 		u32 cutlen = OVS_CB(skb)->cutlen;
- 
--		if (unlikely(cutlen > 0)) {
--			if (skb->len - cutlen > ovs_mac_header_len(key))
--				pskb_trim(skb, skb->len - cutlen);
--			else
--				pskb_trim(skb, ovs_mac_header_len(key));
--		}
-+		if (unlikely(cutlen < skb->len))
-+			pskb_trim(skb, max(cutlen, ovs_mac_header_len(key)));
- 
- 		if (likely(!mru ||
- 		           (skb->len <= mru + vport->dev->hard_header_len))) {
-@@ -1234,7 +1230,7 @@ static void execute_psample(struct datapath *dp, struct sk_buff *skb,
- 
- 	psample_group.net = ovs_dp_get_net(dp);
- 	md.in_ifindex = OVS_CB(skb)->input_vport->dev->ifindex;
--	md.trunc_size = skb->len - OVS_CB(skb)->cutlen;
-+	md.trunc_size = min(skb->len, OVS_CB(skb)->cutlen);
- 	md.rate_as_probability = 1;
- 
- 	rate = OVS_CB(skb)->probability ? OVS_CB(skb)->probability : U32_MAX;
-@@ -1284,22 +1280,21 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
- 			clone = skb_clone(skb, GFP_ATOMIC);
- 			if (clone)
- 				do_output(dp, clone, port, key);
--			OVS_CB(skb)->cutlen = 0;
-+			OVS_CB(skb)->cutlen = U32_MAX;
- 			break;
- 		}
- 
- 		case OVS_ACTION_ATTR_TRUNC: {
- 			struct ovs_action_trunc *trunc = nla_data(a);
- 
--			if (skb->len > trunc->max_len)
--				OVS_CB(skb)->cutlen = skb->len - trunc->max_len;
-+			OVS_CB(skb)->cutlen = trunc->max_len;
- 			break;
- 		}
- 
- 		case OVS_ACTION_ATTR_USERSPACE:
- 			output_userspace(dp, skb, key, a, attr,
- 						     len, OVS_CB(skb)->cutlen);
--			OVS_CB(skb)->cutlen = 0;
-+			OVS_CB(skb)->cutlen = U32_MAX;
- 			if (nla_is_last(a, rem)) {
- 				consume_skb(skb);
- 				return 0;
-@@ -1453,7 +1448,7 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
- 
- 		case OVS_ACTION_ATTR_PSAMPLE:
- 			execute_psample(dp, skb, a);
--			OVS_CB(skb)->cutlen = 0;
-+			OVS_CB(skb)->cutlen = U32_MAX;
- 			if (nla_is_last(a, rem)) {
- 				consume_skb(skb);
- 				return 0;
-diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
-index f0164817d9b7..eaf332b156d7 100644
---- a/net/openvswitch/datapath.c
-+++ b/net/openvswitch/datapath.c
-@@ -276,7 +276,7 @@ void ovs_dp_process_packet(struct sk_buff *skb, struct sw_flow_key *key)
- 			upcall.portid = ovs_vport_find_upcall_portid(p, skb);
- 
- 		upcall.mru = OVS_CB(skb)->mru;
--		error = ovs_dp_upcall(dp, skb, key, &upcall, 0);
-+		error = ovs_dp_upcall(dp, skb, key, &upcall, U32_MAX);
- 		switch (error) {
- 		case 0:
- 		case -EAGAIN:
-@@ -457,7 +457,8 @@ static int queue_userspace_packet(struct datapath *dp, struct sk_buff *skb,
- 	struct sk_buff *nskb = NULL;
- 	struct sk_buff *user_skb = NULL; /* to be queued to userspace */
- 	struct nlattr *nla;
--	size_t len;
-+	size_t msg_size;
-+	size_t skb_len;
- 	unsigned int hlen;
- 	int err, dp_ifindex;
- 	u64 hash;
-@@ -478,7 +479,8 @@ static int queue_userspace_packet(struct datapath *dp, struct sk_buff *skb,
- 		skb = nskb;
- 	}
- 
--	if (nla_attr_size(skb->len) > USHRT_MAX) {
-+	skb_len = min(skb->len, cutlen);
-+	if (nla_attr_size(skb_len) > USHRT_MAX) {
- 		err = -EFBIG;
- 		goto out;
- 	}
-@@ -493,13 +495,13 @@ static int queue_userspace_packet(struct datapath *dp, struct sk_buff *skb,
- 	 * padding logic. Only perform zerocopy if padding is not required.
- 	 */
- 	if (dp->user_features & OVS_DP_F_UNALIGNED)
--		hlen = skb_zerocopy_headlen(skb);
-+		hlen = min(skb_zerocopy_headlen(skb), cutlen);
- 	else
--		hlen = skb->len;
-+		hlen = skb_len;
- 
--	len = upcall_msg_size(upcall_info, hlen - cutlen,
--			      OVS_CB(skb)->acts_origlen);
--	user_skb = genlmsg_new(len, GFP_ATOMIC);
-+	msg_size = upcall_msg_size(upcall_info, hlen,
-+				   OVS_CB(skb)->acts_origlen);
-+	user_skb = genlmsg_new(msg_size, GFP_ATOMIC);
- 	if (!user_skb) {
- 		err = -ENOMEM;
- 		goto out;
-@@ -560,7 +562,7 @@ static int queue_userspace_packet(struct datapath *dp, struct sk_buff *skb,
- 	}
- 
- 	/* Add OVS_PACKET_ATTR_LEN when packet is truncated */
--	if (cutlen > 0 &&
-+	if (skb_len < skb->len &&
- 	    nla_put_u32(user_skb, OVS_PACKET_ATTR_LEN, skb->len)) {
- 		err = -ENOBUFS;
- 		goto out;
-@@ -585,9 +587,9 @@ static int queue_userspace_packet(struct datapath *dp, struct sk_buff *skb,
- 		err = -ENOBUFS;
- 		goto out;
- 	}
--	nla->nla_len = nla_attr_size(skb->len - cutlen);
-+	nla->nla_len = nla_attr_size(skb_len);
- 
--	err = skb_zerocopy(user_skb, skb, skb->len - cutlen, hlen);
-+	err = skb_zerocopy(user_skb, skb, skb_len, hlen);
- 	if (err)
- 		goto out;
- 
-@@ -644,6 +646,7 @@ static int ovs_packet_cmd_execute(struct sk_buff *skb, struct genl_info *info)
- 		packet->ignore_df = 1;
- 	}
- 	OVS_CB(packet)->mru = mru;
-+	OVS_CB(packet)->cutlen = U32_MAX;
- 
- 	if (a[OVS_PACKET_ATTR_HASH]) {
- 		hash = nla_get_u64(a[OVS_PACKET_ATTR_HASH]);
-diff --git a/net/openvswitch/datapath.h b/net/openvswitch/datapath.h
-index db0c3e69d66c..696640e88fa7 100644
---- a/net/openvswitch/datapath.h
-+++ b/net/openvswitch/datapath.h
-@@ -118,7 +118,7 @@ struct datapath {
-  * @mru: The maximum received fragement size; 0 if the packet is not
-  * fragmented.
-  * @acts_origlen: The netlink size of the flow actions applied to this skb.
-- * @cutlen: The number of bytes from the packet end to be removed.
-+ * @cutlen: The number of bytes in the packet to preserve on output.
-  * @probability: The sampling probability that was applied to this skb; 0 means
-  * no sampling has occurred; U32_MAX means 100% probability.
-  * @upcall_pid: Netlink socket PID to use for sending this packet to userspace;
-diff --git a/net/openvswitch/vport.c b/net/openvswitch/vport.c
-index 56b2e2d1a749..12741485c939 100644
---- a/net/openvswitch/vport.c
-+++ b/net/openvswitch/vport.c
-@@ -502,7 +502,7 @@ int ovs_vport_receive(struct vport *vport, struct sk_buff *skb,
- 
- 	OVS_CB(skb)->input_vport = vport;
- 	OVS_CB(skb)->mru = 0;
--	OVS_CB(skb)->cutlen = 0;
-+	OVS_CB(skb)->cutlen = U32_MAX;
- 	OVS_CB(skb)->probability = 0;
- 	OVS_CB(skb)->upcall_pid = 0;
- 	if (unlikely(dev_net(skb->dev) != ovs_dp_get_net(vport->dp))) {
--- 
-2.54.0
+-       if (!tls_is_partially_sent_record(tls_ctx))
++       if (!tls_is_partially_sent_record(tls_ctx) &&
++           !tls_is_pending_open_record(tls_ctx))
+                return;
 
+        mutex_lock(&tls_ctx->tx_lock);
+        lock_sock(sk);
+
+-       if (tls_is_partially_sent_record(tls_ctx)) {
++       if (tls_is_partially_sent_record(tls_ctx) ||
++           tls_is_pending_open_record(tls_ctx)) {
+                iov_iter_bvec(&iter, ITER_SOURCE, NULL, 0, 0);
+                tls_push_data(sk, &iter, 0, 0, TLS_RECORD_TYPE_DATA);
+        }
 
