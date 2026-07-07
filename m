@@ -1,246 +1,174 @@
-Return-Path: <netdev+bounces-305526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305528-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qupDMkcmTWpbvwEAu9opvQ
-	(envelope-from <netdev+bounces-305526-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:16:07 +0200
+	id iBb0J24pTWoPwAEAu9opvQ
+	(envelope-from <netdev+bounces-305528-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:29:34 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61BD171DBB0
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:16:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3396C71DDF6
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:29:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b="g33en/YF";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305526-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305526-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=agner.ch header.s=dkim header.b=OExklQX0;
+	dmarc=pass (policy=none) header.from=agner.ch;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305528-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305528-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 29A533007894
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 16:16:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AB4A33009CF3
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 16:29:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 579E6434E33;
-	Tue,  7 Jul 2026 16:16:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B47434E29;
+	Tue,  7 Jul 2026 16:29:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.kmu-office.ch (mail.kmu-office.ch [178.209.48.109])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE65434E2D;
-	Tue,  7 Jul 2026 16:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96EC137DAA9
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 16:29:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783440963; cv=none; b=YBtGhQYNKIMtQDtnZ7yopyxsIBxgdjARoZIGhAILNwPCXy+uIkpvBYCssAQP8skciX6WR38nJ6mKYTr9s+/rGuWMbdti52VQf7kEKttcf0D+lrMLk8z4WGhHkjALNWM4JugTvW+4r/EhIrWZt18weKg6L2pVho9ryxldHeiJLmI=
+	t=1783441771; cv=none; b=RxFVGYG6CMpEdlozf6qoja36X+T5oANWwt01PLoMEwPhtWCcoWlvHeJALNieVsqwtLSYNxiHFXNqt5m4jqdRz91hc4MqgS8IdrpX+uZvdk6wCIQhLVwTEubX3KiSEbNqqIf7+aSUdEoo9gnl3sKWk8gE6FNj35CiLy/p/xPnYtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783440963; c=relaxed/simple;
-	bh=IQS+AU57I9FVF7loCFwQTNk/nzq7oElljhrawF91FRc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=lt0GXgXJ5PGKzIhMoPYmRVOqmjwdiYCmFLiaMNBaxxot1i9M17jq6huAFfgzD1Id7OaptBjR8meguSgwhD2uStJPKO7UEXA5IsxMMft5TXb3YjVA/mJHTQTMuT9n1BMeYG8iLuk8SXoukKf+lM5IVmRSobl0+xi9+CrdLgllscg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g33en/YF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DCC75C2BCB8;
-	Tue,  7 Jul 2026 16:16:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1783440962;
-	bh=IQS+AU57I9FVF7loCFwQTNk/nzq7oElljhrawF91FRc=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=g33en/YF4i563TwQMqga6FZDrtUa7/ZLLRmi/yp1+MRWgcVOaL9q+iIhtRzlW4LBo
-	 P1cVu4sLirK0O9GK7eSNoB+KNYPzGX9cUX2KDxGLO7kCZpeeo46udL7/ORGqVuVhNh
-	 Zsmf/XAfBoF8AyLIWX/qPIi8fLBr8mKx4iXV+9mGmOHCYmS6SRJ7H5QhzQfVU0r4Ty
-	 ff3eYKiykxF4Qi8VQ3iTlfalnYAUT6K7ZlCk32/9GMVsyo5qKTucL3dyh4IUYi89AY
-	 ja8i7g8LDhbKJJsldSivsY8OgLnKWBt0Xyqt0kFg7R3PXgN4pdgHS7FMk+0TlDAk1N
-	 Wt06Q2Rj58iYQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2014C43458;
-	Tue,  7 Jul 2026 16:16:02 +0000 (UTC)
-From: Mattia Meleleo via B4 Relay <devnull+mattia.meleleo.coralogix.com@kernel.org>
-Date: Tue, 07 Jul 2026 18:15:53 +0200
-Subject: [PATCH bpf] bpf, sockmap: Account for receive queue in FIONREAD
- without a verdict program
+	s=arc-20240116; t=1783441771; c=relaxed/simple;
+	bh=iStYC0Iq8iFRqb83/hsfeJQsuMLUUC870SWEGOWoh+w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B2+ZZ1N21hzZHsa/a/t9GBueAkCvXHn8B3NrSLJN/rDz6MTnNG3Imjkl9kdKOVYrf6U0jblEsbJaeSdydRplFwdOSWPW8o3/ZWg7n/DI6yuTZ3vMHAPtbjoDo18gg49d45sJ/DHh+v5cW4WOmqpdwv99Tt3EDHqJJ2eTKVT4GPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=agner.ch; spf=pass smtp.mailfrom=agner.ch; dkim=pass (1024-bit key) header.d=agner.ch header.i=@agner.ch header.b=OExklQX0; arc=none smtp.client-ip=178.209.48.109
+Received: from allenwind.lan (unknown [IPv6:2a02:169:3c38:10::3a0])
+	by mail.kmu-office.ch (Postfix) with ESMTPSA id 5A49C5CA16B;
+	Tue,  7 Jul 2026 18:21:50 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=agner.ch; s=dkim;
+	t=1783441310;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:
+	 content-transfer-encoding:content-transfer-encoding:in-reply-to:
+	 references; bh=1lw1VBDE1/D2I6ja8qlx//S0jIyLgr96wpIl4MJHkxE=;
+	b=OExklQX0Z1RbE+wjJPmTMPSVhBQoTHdvN82uETaE1DHuFypcgBk2aUoB16NyUEuQN0lUe4
+	0X/5M9sDKZj7IoVSnybczAGLz9yKrX1VHWAUjX1+XzzOmz6OPBeG2pUd6bb87VxYv6/OwM
+	AlvuAaXr2C2jIkXgK31f8EO6df7/474=
+From: Stefan Agner <stefan@agner.ch>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Ovidiu Panait <ovidiu.panait.rb@renesas.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	regressions@lists.linux.dev,
+	Stefan Agner <stefan@agner.ch>
+Subject: [PATCH net] net: stmmac: resume PHY before reopening the interface on MTU change
+Date: Tue,  7 Jul 2026 18:21:46 +0200
+Message-ID: <20260707162146.73823-1-stefan@agner.ch>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260707-fionread-no-verdict-v1-1-ce94a72357ec@coralogix.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWMQQrCMBBFr1L+2oFYpDFeRVykyYyOi7RMahFK7
- 27U5fv89zZUNuWKS7fBeNWqU2lwPHRIj1juTJobo3f94LzzJO1gHDOViVa2rGmheJLzEHxMQQK
- aORuLvn/VK8ZZcPuP9TU+OS3fHvb9A1FPRcB8AAAA
-X-Change-ID: 20260707-fionread-no-verdict-a4f8697ac9f9
-To: John Fastabend <john.fastabend@gmail.com>, 
- Jakub Sitnicki <jakub@cloudflare.com>, 
- Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
- Mattia Meleleo <mattia.meleleo@coralogix.com>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1783440961; l=4235;
- i=mattia.meleleo@coralogix.com; s=20260707; h=from:subject:message-id;
- bh=aFZBdyJoJSWVLETQmNXpLi70lCPgP+Z+qtlX8undb2c=;
- b=7VzhVRcI4/wPM/f39bOT4hg4dp0xF2Z8AKpWg83TJEmeLzjJFJza9F4yZ6pZbB3P+255nqEOT
- GZkJLvRwBfPACWBpY6Y2OPq6iQK3ApXuROFw7E7Tyl6Sm9rg2mwEGfD
-X-Developer-Key: i=mattia.meleleo@coralogix.com; a=ed25519;
- pk=cs1zLoe3YDm4bJ7bfbPaZH0lHnd871JyJLiSh2eEzLs=
-X-Endpoint-Received: by B4 Relay for mattia.meleleo@coralogix.com/20260707
- with auth_id=857
-X-Original-From: Mattia Meleleo <mattia.meleleo@coralogix.com>
-Reply-To: mattia.meleleo@coralogix.com
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[agner.ch,none];
+	R_DKIM_ALLOW(-0.20)[agner.ch:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-305526-lists,netdev=lfdr.de,mattia.meleleo.coralogix.com];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305528-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,cloudflare.com,linux.dev];
-	FORGED_RECIPIENTS(0.00)[m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:mattia.meleleo@coralogix.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[stefan@agner.ch,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:rmk+kernel@armlinux.org.uk,m:maxime.chevallier@bootlin.com,m:ovidiu.panait.rb@renesas.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:netdev@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:regressions@lists.linux.dev,m:stefan@agner.ch,m:andrew@lunn.ch,m:rmk@armlinux.org.uk,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,coralogix.com:replyto,coralogix.com:mid,coralogix.com:email];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	HAS_REPLYTO(0.00)[mattia.meleleo@coralogix.com];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[armlinux.org.uk,bootlin.com,renesas.com,gmail.com,foss.st.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,lists.linux.dev,agner.ch];
+	DKIM_TRACE(0.00)[agner.ch:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stefan@agner.ch,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,agner.ch:from_mime,agner.ch:email,agner.ch:mid,agner.ch:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 61BD171DBB0
+X-Rspamd-Queue-Id: 3396C71DDF6
 
-From: Mattia Meleleo <mattia.meleleo@coralogix.com>
+Since the referenced commit, changing the MTU on a running interface no
+longer disconnects and reconnects the PHY; __stmmac_release() merely
+stops phylink, which also suspends the PHY (BMCR power-down) when WoL
+is not enabled. __stmmac_open() then performs the DMA software reset in
+stmmac_hw_setup() before phylink_start() resumes the PHY again.
 
-tcp_bpf_ioctl() answers SIOCINQ from psock->msg_tot_len, which only
-counts bytes in ingress_msg. Without a stream/skb verdict program
-nothing is diverted there: data stays in sk_receive_queue, so FIONREAD
-returns 0 even though read() returns data.
+IEEE 802.3 22.2.4.1.5 allows a PHY to stop its receive clock while
+powered down, and stmmac requires a running receive clock for the DMA
+software reset to complete (the phylink config sets mac_requires_rxc).
+On such setups, e.g. the RK3566-based Home Assistant Green with an
+RTL8211F-VD PHY in RGMII mode, any runtime MTU change now times out and
+leaves the interface dead:
 
-Add tcp_inq() to the reported value when the psock has no verdict
-program. The two queues are disjoint, so bytes redirected into
-ingress_msg from other sockets stay correctly accounted through
-msg_tot_len.
+  rk_gmac-dwmac fe010000.ethernet end0: Failed to reset the dma
+  rk_gmac-dwmac fe010000.ethernet end0: stmmac_hw_setup: DMA engine initialization failed
+  rk_gmac-dwmac fe010000.ethernet end0: __stmmac_open: Hw setup failed
+  rk_gmac-dwmac fe010000.ethernet end0: failed reopening the interface after MTU change
 
-Add a selftest covering FIONREAD without a verdict program.
+In the field this is triggered by NetworkManager applying an MTU while
+activating the connection, breaking networking entirely.
 
-Fixes: 929e30f93125 ("bpf, sockmap: Fix FIONREAD for sockmap")
-Signed-off-by: Mattia Meleleo <mattia.meleleo@coralogix.com>
+Resume the PHY before reopening the interface, like stmmac_resume()
+does, to ensure the receive clock is running for the DMA software
+reset.
+
+Fixes: db299a0c09e9 ("net: stmmac: move PHY handling out of __stmmac_open()/release()")
+Link: https://github.com/home-assistant/operating-system/issues/4858
+Assisted-by: Claude:claude-fable-5
+Tested-by: Stefan Agner <stefan@agner.ch>
+Signed-off-by: Stefan Agner <stefan@agner.ch>
 ---
- net/ipv4/tcp_bpf.c                                 | 16 ++++++++-
- .../selftests/bpf/prog_tests/sockmap_basic.c       | 39 ++++++++++++++++++++++
- 2 files changed, 54 insertions(+), 1 deletion(-)
+Note: phylink_prepare_resume()'s kernel-doc says it is to be called
+prior to phylink_resume(); here it is paired with phylink_start()
+(called from __stmmac_open()) instead, which phylink_resume() itself
+uses to restart the machinery. If preferred, I can extend the
+kernel-doc or introduce a more generically named helper.
 
-diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
-index cc0bd73f3..a001b1fff 100644
---- a/net/ipv4/tcp_bpf.c
-+++ b/net/ipv4/tcp_bpf.c
-@@ -334,6 +334,7 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
- 
- static int tcp_bpf_ioctl(struct sock *sk, int cmd, int *karg)
- {
-+	struct sk_psock *psock;
- 	bool slow;
- 
- 	if (cmd != SIOCINQ)
-@@ -344,7 +345,20 @@ static int tcp_bpf_ioctl(struct sock *sk, int cmd, int *karg)
- 		return -EINVAL;
- 
- 	slow = lock_sock_fast(sk);
--	*karg = sk_psock_msg_inq(sk);
-+	psock = sk_psock_get(sk);
-+	if (unlikely(!psock)) {
-+		unlock_sock_fast(sk, slow);
-+		return tcp_ioctl(sk, cmd, karg);
-+	}
-+	*karg = sk_psock_get_msg_len_nolock(psock);
-+	/* Without a verdict program, ingress data is never diverted to
-+	 * ingress_msg: it stays in sk_receive_queue and is read through
-+	 * the fallback to tcp_recvmsg(), so account for it like
-+	 * tcp_ioctl() does.
-+	 */
-+	if (!psock->progs.stream_verdict && !psock->progs.skb_verdict)
-+		*karg += tcp_inq(sk);
-+	sk_psock_put(sk, psock);
- 	unlock_sock_fast(sk, slow);
- 
- 	return 0;
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-index cb3229711..f0f368201 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-@@ -1373,6 +1373,43 @@ static void test_sockmap_multi_channels(int sotype)
- 	test_sockmap_pass_prog__destroy(skel);
- }
- 
-+/* A socket in a sockmap without a verdict program keeps its ingress data
-+ * in sk_receive_queue: FIONREAD must account for it.
-+ */
-+static void test_sockmap_no_verdict_fionread(void)
-+{
-+	int err, map, zero = 0, sent, avail;
-+	int c0 = -1, c1 = -1, p0 = -1, p1 = -1;
-+	struct test_sockmap_pass_prog *skel;
-+	char buf[256] = "0123456789";
-+
-+	skel = test_sockmap_pass_prog__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open_and_load"))
-+		return;
-+	map = bpf_map__fd(skel->maps.sock_map_rx);
-+
-+	err = create_socket_pairs(AF_INET, SOCK_STREAM, &c0, &c1, &p0, &p1);
-+	if (!ASSERT_OK(err, "create_socket_pairs()"))
-+		goto out;
-+
-+	err = bpf_map_update_elem(map, &zero, &c1, BPF_NOEXIST);
-+	if (!ASSERT_OK(err, "bpf_map_update_elem(c1)"))
-+		goto out_close;
-+
-+	sent = xsend(p1, &buf, sizeof(buf), 0);
-+	ASSERT_EQ(sent, sizeof(buf), "xsend(p1)");
-+	avail = wait_for_fionread(c1, sizeof(buf), IO_TIMEOUT_SEC);
-+	ASSERT_EQ(avail, sizeof(buf), "ioctl(FIONREAD)");
-+
-+out_close:
-+	close(c0);
-+	close(p0);
-+	close(c1);
-+	close(p1);
-+out:
-+	test_sockmap_pass_prog__destroy(skel);
-+}
-+
- void test_sockmap_basic(void)
- {
- 	if (test__start_subtest("sockmap create_update_free"))
-@@ -1415,6 +1452,8 @@ void test_sockmap_basic(void)
- 		test_sockmap_skb_verdict_shutdown();
- 	if (test__start_subtest("sockmap skb_verdict fionread"))
- 		test_sockmap_skb_verdict_fionread(true);
-+	if (test__start_subtest("sockmap no_verdict fionread"))
-+		test_sockmap_no_verdict_fionread();
- 	if (test__start_subtest("sockmap skb_verdict fionread on drop"))
- 		test_sockmap_skb_verdict_fionread(false);
- 	if (test__start_subtest("sockmap skb_verdict change tail"))
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
----
-base-commit: d2c9a99135da931377240942d44f3dea104cedb8
-change-id: 20260707-fionread-no-verdict-a4f8697ac9f9
-
-Best regards,
---  
-Mattia Meleleo <mattia.meleleo@coralogix.com>
-
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -5884,6 +5884,15 @@
+ 
+ 		__stmmac_release(dev);
+ 
++		/* phylink_stop() in __stmmac_release() suspends the PHY.
++		 * IEEE 802.3 allows PHYs to stop their receive clock while
++		 * powered down, but the DMA software reset performed by
++		 * stmmac_hw_setup() requires a running receive clock.
++		 * Resume the PHY, as on system resume, to ensure its clocks
++		 * are running before reopening the interface.
++		 */
++		phylink_prepare_resume(priv->phylink);
++
+ 		ret = __stmmac_open(dev, dma_conf);
+ 		if (ret) {
+ 			free_dma_desc_resources(priv, dma_conf);
+-- 
+2.49.0
 
