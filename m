@@ -1,249 +1,236 @@
-Return-Path: <netdev+bounces-305282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305285-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id h9lUACiZTGp3mwEAu9opvQ
-	(envelope-from <netdev+bounces-305282-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 08:14:00 +0200
+	id glpoL82ZTGqVmwEAu9opvQ
+	(envelope-from <netdev+bounces-305285-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 08:16:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79491717D5F
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 08:13:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DD9E717DCB
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 08:16:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=altera.com header.s=selector2 header.b=ciXDFwze;
-	dmarc=pass (policy=reject) header.from=altera.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305282-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305282-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305285-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305285-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 46C923034E76
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 06:13:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F16383008D27
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 06:16:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C870139989B;
-	Tue,  7 Jul 2026 06:13:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF038283FDC;
+	Tue,  7 Jul 2026 06:16:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011056.outbound.protection.outlook.com [52.101.62.56])
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B91DB3955ED;
-	Tue,  7 Jul 2026 06:13:16 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783404799; cv=fail; b=oyC4HBOuRK4WGtVCnrGGsK1Eno1zvyUL1ZRozHHYRC9DtLzBhtt6CgDlOZFmE+FkcRfLLeDwotYiTut6vfJK13NJgSW6eI1W9OqJx5z9vAdP8urAKVsJBe97Q15BWJmkPA7PFO+8CyBCQUTDqwcsA5CTlmHg0591Mc2Lvmr6KbA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783404799; c=relaxed/simple;
-	bh=aLUEqtV30DdjjunYoGhIf5N9C9FcP5HbUkO5fmpV+XA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=J+D299S0jNvGt8+oz9We5hDkenptsMM8C2+n6gq/PrgXSIifTeeKdTcSm98q5poHMfhsWouh4YaumNAfS/ks72U4mWdC+m5M0s6O8qrc8hHZBfxcRsI2vZDUbuptcuy+OC87xbmM1vClmEtPvP1dIFsqGyNpLUb89ObDP5LzqxM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=ciXDFwze; arc=fail smtp.client-ip=52.101.62.56
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WvNUvEWhTWCYtY62hcyQ+4CXkTpuq6jf2bN9cjRWJKls8Lu6PGwJn1Uk22bGwjFKcY4hFEJw9efRrcY9YTVbi3R5PwrvfPtWgWrEjQN9Jv0SKKyUzn6knDTioFEBJBq6RoUCk/dS5h2Qs0nfNHBKEDG0pO4MurwVyyvQou64Pf+m0iojGHFMPrk0Fpj1+iKI5GZ33BsKQmr/20GdXhiKmZirgd1YZJK7mw3JG+E1nEoPMNzetTyF2yR3ZIk4LCER/CRXfnufryg8yOiU7UNiNIJpbfS/8BZ7X+0OoK39LY+boiO9EKmGE8fdVf76OH5nQ22StAMZ3Dbx2tLexoTIUQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UR1wLZjrMZ++1kyBD4e57sSNMlAB4gbKtToiL3P7lOQ=;
- b=a4+Ix3FERPdijwYXrqVDKBoQ5yFyJh8+Nt+SywVnytuSsP96WscGhzh539zc1JHXOKAidUt88GKQ1Ew7aRxGoGubbz3f/O5uCzgrdrcSNPj/dizBj7/syhnRpAUxefGyTS8OI5fDyAoZ4+cxTIRIyHCn9GAPMWlfRAthtLE+ea3zeQ9+oNSimJizeHbSnGd4+9KvnjVdbNUmziXyolkZzwRPD7p4GnJRlEfBQVtI5gP+8pMJUdMOqvwLmsaIPRP8hlpRdppruS9pjLShhbZiRX1YpUPsT49JfRBTxGI8lglBbKBCSL5GYrO2i44cTNI2+1Ugz4LiKHGl8dOKE03cXg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
- dkim=pass header.d=altera.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UR1wLZjrMZ++1kyBD4e57sSNMlAB4gbKtToiL3P7lOQ=;
- b=ciXDFwzet6A1FO7ac1FLAZRR8lEhWlNsEpKB/RQlRPV60ncUCujhPxugnZA6UFSHXE67uuQ17OsF9JDXn1i8+fJ8AezQOUO6krx6or8SLJ+DOEhVvzkBRQ/y/JOcXfqlwg2jhIs8vBu4L1JiWPYaq4Pciep6Cax/lbuP3taXX8rOS7dqiMY53b+N44xA/uvpchb8WM2J1262p1vvm6iHwQ1g+2dVlnniIFbK12RtXIjOX9OTuSyugEprH0m5TeavxwEGCKd/W5Fi+9b3YbIgofLCA0f4y14odGJBka53sdSQ7eCL4oahudDqb5BvjlkM70Q1ZzmLIuoNRB+FBfBdkg==
-Received: from SJ0PR03MB6964.namprd03.prod.outlook.com (2603:10b6:a03:432::18)
- by SJ0PR03MB6598.namprd03.prod.outlook.com (2603:10b6:a03:38a::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.10; Tue, 7 Jul
- 2026 06:13:09 +0000
-Received: from SJ0PR03MB6964.namprd03.prod.outlook.com
- ([fe80::b965:bfa8:58fb:e775]) by SJ0PR03MB6964.namprd03.prod.outlook.com
- ([fe80::b965:bfa8:58fb:e775%4]) with mapi id 15.21.0181.009; Tue, 7 Jul 2026
- 06:13:09 +0000
-From: muhammad.nazim.amirul.nazle.asmade@altera.com
-To: dinguyen@kernel.org,
-	maxime.chevallier@bootlin.com
-Cc: rmk+kernel@armlinux.org.uk,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	robh@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 4/4] net: stmmac: dwmac-socfpga: Add support for Agilex5 TSN GMAC with FPGA converter
-Date: Mon,  6 Jul 2026 23:13:05 -0700
-Message-ID: <20260707061305.27580-5-muhammad.nazim.amirul.nazle.asmade@altera.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20260707061305.27580-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
-References: <20260707061305.27580-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR05CA0162.namprd05.prod.outlook.com
- (2603:10b6:a03:339::17) To SJ0PR03MB6964.namprd03.prod.outlook.com
- (2603:10b6:a03:432::18)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCE4E388363
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 06:15:58 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783404961; cv=none; b=TDJj0YZ/Xbq6AqDLTlB8OWiIo29z8JpW4y6cZcJQAHrlZ7Bf6pDBpofZ7Nx+azSo7+xi54hG2s2G+iDc34FC1PT4NRv+O9XjX+6CLX8KBPGn1ReYt/VpCdcnBXfgemeiuW4R/GOBthHxjtkUiJXCzKiPe4f9BhRXkAZ9MeVbSOg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783404961; c=relaxed/simple;
+	bh=BMR3JodvbgS0zHLmsFZBILZFcEt08mIJeXJ+RZRjRfo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=B/5FnEWTxO/DSJuYRKec5EKeZ6EsY76jPU9+x5RqmjGMwAWpxyaTnvvCNSDeYj3RtF4bZNw79W48uFdYUq2h94UolYuhVHIo58HFCSAJO7Fh+qlskQmphmh8SCu1IFso43MtYsjJ8Dm7UaPjZbblaWpzzo62q4Gw4fHqK0qzCQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.92.39.34
+X-QQ-mid: esmtpsz10t1783404900tea42a8be
+X-QQ-Originating-IP: eDdfl7p/6wtlmiqlDI3cCTT35hVnln5C9XOvsUQiMkE=
+Received: from lap-jiawenwu.trustnetic.com ( [60.188.196.189])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 07 Jul 2026 14:14:56 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 14897438653831546274
+EX-QQ-RecipientCnt: 22
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Simon Horman <horms@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	Joe Damato <joe@dama.to>,
+	Breno Leitao <leitao@debian.org>,
+	Jijie Shao <shaojijie@huawei.com>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>,
+	Rongguang Wei <weirongguang@kylinos.cn>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Fabio Baltieri <fabio.baltieri@gmail.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v10 0/5] net: wangxun: timeout and error
+Date: Tue,  7 Jul 2026 14:14:50 +0800
+Message-Id: <20260707061455.39564-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ0PR03MB6964:EE_|SJ0PR03MB6598:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5e30f1c2-4b45-4cc5-d5ff-08dedbeed13f
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|366016|7416014|1800799024|23010399003|56012099006|11063799006|3023799007|18002099003|22082099003|55112099003;
-X-Microsoft-Antispam-Message-Info:
-	3TqYb7ebRLHjJ9DMhjUrfeR0bWvqOmA7HTQq0aaYUqsc4TM9YBWPf+zJZmrosuxEa0lFN06RljuMh7wb0oEzSc4kcNUE+ToE48Euwx5lgvpcfNDZFRrKHH7SL9qm45xHR08a0lqZZdsbe/FE2djoicHLnqn36PfFWOOjeuXUvytovAWw+tfQous16mYUgG8Oive2gxvKG5UwaRiwUzP0abY7bLbNvYJPlPUWgiJNTzeDA7PSW38i86T6B6NNmZhHjorNmOtnIyDNT6H/4v6bA1FQTUEjW4OLTXgBriGFQSxp8zx/s+K5KxalzlTAG5jgAB9IW589eDLUwR4URacmZiBMq1T/Cx+9IhWja7RHS96jnCMmfmnrxL8ccCCIYFnWmhDh2DQeanNo1msmrKyQ3M+nwhFjPhdyxed3JfXAi/GEl1nyVVry1kDBLYR9dylxG2LFAEzCF92VaPz1EJnF/qHBcjhNZCLL6wCXPoS71V6qzTB3M3+PtNtRsH+rGrxq75Vx+oCo1Srm1rg1ttaXRsg34VjTY4ZvOg/Msw3lyQO94M6I6s5g6QVvXtfVedibYUTdFUXCyIMa+hh01MNYCwJ8SwRl9SlKxisUDI6wxSaLKhx+nqX6EJSyQtRPJB4dkhehamziFI15XgfZ1jvsb+R3SZwgYHSjUqXBZ4aQQZo=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR03MB6964.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024)(23010399003)(56012099006)(11063799006)(3023799007)(18002099003)(22082099003)(55112099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?4LuhgQtYBF4FZKjfb6j4ncJul26Jarj6cc3F0y+pHA12j/E2MxVJqM+6egDf?=
- =?us-ascii?Q?8HknJkM/NyYO5hCYO1TK9Gs9ydW4B6K2o22E1vCWq4JNpxrS2EoUqpELlCab?=
- =?us-ascii?Q?u+P4rvLEl3kxuAPIfdCdS3+8KpLILc7THmcOWjeDheaxBEreEX0B7h4n3Th6?=
- =?us-ascii?Q?PKZMbzv6HJhtYU/u6RyiXVopboRtYflFEYTTjy3unSlwlrLY2Ut0DUyR2SOU?=
- =?us-ascii?Q?Jly85E5RfXNjSPDiIn9cNpA4bwLC7fkfEVxYOfgRL06MdMHI5qrKH643Eiv6?=
- =?us-ascii?Q?MxmO4eKKYSDcUzOcASwYdgyrsa3rVhTP2vv9LUcARgEXw0SYRkHw4KLhQrd3?=
- =?us-ascii?Q?7pKPBYaF5lEqO47GmAMmVjLHLppS28jK3QirY1su+1ZKS/k1pVWnlG1a5Ls8?=
- =?us-ascii?Q?GSgR5S3/9c2NT10snBZJ7D8FkSba1+R2JcfJdtgiLqv2APbrifI7W5jWfith?=
- =?us-ascii?Q?/VYI5LanjF5Nr5ypqj4a5UoQBeh9pXZvLfndakxDTtxpJdetdhSS44L8GMEm?=
- =?us-ascii?Q?LFlYgMQBl8Eb8+BIKiJxifFh+Lu13oCYnQs2WZBBJZSeijz1IpEMdpMOeB7J?=
- =?us-ascii?Q?VQthetbbWrKUBAdux5DP+A8CpY53iawyI96NKuxqlxZofe4VNn/eTLYRhRvL?=
- =?us-ascii?Q?rxElfL8SazPqu3/fSuJ88NLgUJ61vHfQsplwLPhVKZV+X4aDnMIVXwGX6LJr?=
- =?us-ascii?Q?8cJuqk23zsyhhlLgHoJYkR2cjyqb+SAjMm3ftMxh47NONZrZ0ynrrvVINK4P?=
- =?us-ascii?Q?HDsO3QJ771Hv/eYlw934T1gaQ0t9+Giih0djeE8Lq4RZlIz+zoSXa5v+FIWJ?=
- =?us-ascii?Q?SK6aSCLc/spf1AQ9HakSVAvKzcAIOieARAQBBMiUPUaMkfa9tYetS++EkoQD?=
- =?us-ascii?Q?gSlEw9W5yHIt3M+zieTPu6l0YHt6k+zkHdKX1Psl+SrNxddD2rBPJTap/Wy2?=
- =?us-ascii?Q?RzHMO8xuPleymp7+Uvmjkfh0ZzqfJCe7677S7vfsUbikDqwjf+7yX0I7qa4Z?=
- =?us-ascii?Q?1/8+XiTf2SSs3+9URKuYzmIYyUef48URzNo534OmIFkMRRU0m+2cSxyzH2V7?=
- =?us-ascii?Q?MLjTrZ2edjUr25xoep0R9MmubQyttJg+XbhYYkjPq2F9O0T24knG7dLkoGaG?=
- =?us-ascii?Q?mkT5ZNBDkCk6ivVP77Nxwm6w4Fq0Q/Nu39YIdKZOUi2/J1ilr8eo70iBBmJI?=
- =?us-ascii?Q?8wHDIEogxwp1UfdWMzm9y7y6JAZcSJ4CFMNGSTIUmKGE+e7uWSMvXlkI4gIi?=
- =?us-ascii?Q?NsnwV9S4lyDNT/E4Lxt72V3xcBQ0WNnym2erTAwQMYoqhMyALYXqhkUDm47N?=
- =?us-ascii?Q?aH2TIPxasmUrtPtVOOdDZOLoLFF42+0EyaADrWZryFn43p+Fi146Pkb6pBUB?=
- =?us-ascii?Q?CvaksbGcYOpnJu09rO62hXo2CYAkosRqwtSsC86Wr4o9qJA+Qpd+wYiNg01n?=
- =?us-ascii?Q?GCjb56SX96UrDaU/prWyi0juwEPPwLPJUvA7Od6jWqN1lT6qLRuY7j1uNzho?=
- =?us-ascii?Q?AxpTlLQnBBn/wSD6ogwlHnIIBXjTjunKPOVHrd1YCKbRAsPMFR3TpT9pP+pZ?=
- =?us-ascii?Q?tXwFCs5JdFubKgsZWU4jACxdYERmZ3W25Gk15FyQPDsQelMs6UhSMXXEfLdQ?=
- =?us-ascii?Q?7RgI33xl07zhjIkhS1oQyL7EZejNq1vAgvGfg2zkGy5+ZtqGxtiIc3ToQgte?=
- =?us-ascii?Q?coaB/WeKhBvdt5K1ZwbewcJPpiDdKUU0QBT+zaI4gXRwOt5mJGR3OzetmGpi?=
- =?us-ascii?Q?Ypme9v1T9mk6tCHANR9rnn77W21dOh+beCZjfv3SudjemiKhqRNsegN3ShKH?=
-X-MS-Exchange-AntiSpam-MessageData-1: CN5WWT2xhxaQEA==
-X-OriginatorOrg: altera.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5e30f1c2-4b45-4cc5-d5ff-08dedbeed13f
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR03MB6964.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2026 06:13:09.4755
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: c8OFb8opH2A4Esx6uDes+5XQnJQntngCYaDK0UcU9gNA/CVeMi5HgiEvkrmKonNZywrAulP49EdLoVXTNOvx5YFlpJ6ArVpM4zxu7ZS/JIQ9aVgZo9y+pfUxk4zdj4LJWIEX9/i4bK3z7dJn3EyOqg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR03MB6598
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: OFWsfmE1GYcu5EzLQuHlksRtNezP2mj79iYjzwrcvqqmJJVPLp0SRA4j
+	gCoCEBhGXJz31DkYnCBN4nmMFcIvM03XLnZ+BVotMzD1MywNkagg6XMLFfPliTBqEntYACC
+	LF3l4Qxw/kY+Q/XqcwwjGaGnXNcx8BKfxgKK8LehylgCec9frFyuJshps+xMb4CZcjCTA1i
+	doCI3xKSjbPYfRpACd8l8AbAR2VjjYYYlBr5+wmoUPkHJPzZlX1PH0hoRtuN9gtVE9qEjZN
+	7tcuu2kLgYVk34wbZOJ5oRcc0+gPWso2A3EH2LOwNxqfwiQ13KKL1m3kT6cMYdpaOxkMcEE
+	92xyaDwDURmfyThLZJgD0Bf3dbcAcQMITyHfJq6nYqBRhgQH2sJRSelNc0+mSGtPw4mVXpP
+	XMwoksGcGTGv4Qc9bYQyFwK88potKGMWjqDO43gjohhGacsn1pmWg9MOYwHtTiCbnaQscsb
+	M2WPumQtJGqGWR1tEyS4jP1hViCEqL+aULxT2c4o1IEnGaxoxbC0E1bqDkWk/s0Ub+ctQDs
+	qQIRk/+SCbpwkrzLxsDZQ2FqSUjnn9PpiE2FHhQwSuL0Xku7Mwt4NCYviRAXV1rkliRd8lx
+	K33KsVVvjkUmQUHx6PV/IP8yZnkJvBEsdbVG92yZoexmc7u1Aqghs8p9c1MVHTZCYpKhLuV
+	0wLfgkatG0xc2uefrw7PWSjx6+fZggAL8PpYxwsU+I/lyX9LgszzwbJB0zL8s+6tSyPNe5j
+	4JzYFZThaORoxU7MORhs6h3+7D6kKiY5E6iDsrnoQqFg+KJUji86DnsX0gi2ccG0bMDDh/R
+	LFLkS7qWK0B5vhPCnFFhFDf1q8Wi9mcra6w4TkweQ53vhrOR/Re4XusftQ/DMnuG5bgvD99
+	aGpjNpUR5aMcvOzEZ0L9A+EF4kJuVh0dbIAkY2KsLWE1nN3fM2xQtW7z5xTyyfVKNtMMCgh
+	mWPcBfsFSVA6bm/k7dgj/UBbfuAi2g39cA9UJAarYrNMzGsfhbN9unA4mskW0DeN8mJ2gCq
+	iLtUYdpdYYm4VB3zwed/5ozVKm5b0MUl7sl5aUck+2BJ1azFNYaH6fUZn8kMI2fMJ3E0bRh
+	A==
+X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
+X-QQ-RECHKSPAM: 0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[altera.com,reject];
-	R_DKIM_ALLOW(-0.20)[altera.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-305282-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[trustnetic.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:dinguyen@kernel.org,m:maxime.chevallier@bootlin.com,m:rmk+kernel@armlinux.org.uk,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:robh@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:devicetree@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:rmk@armlinux.org.uk,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305285-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:mengyuanlou@net-swift.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:linux@armlinux.org.uk,m:aleksandr.loktionov@intel.com,m:jacob.e.keller@intel.com,m:michal.swiatkowski@linux.intel.com,m:horms@kernel.org,m:kees@kernel.org,m:joe@dama.to,m:leitao@debian.org,m:shaojijie@huawei.com,m:u.kleine-koenig@baylibre.com,m:weirongguang@kylinos.cn,m:larysa.zaremba@intel.com,m:fabio.baltieri@gmail.com,m:jiawenwu@trustnetic.com,m:andrew@lunn.ch,m:fabiobaltieri@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[altera.com:+];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NO_DN(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,intel.com,linux.intel.com,dama.to,debian.org,huawei.com,baylibre.com,kylinos.cn,trustnetic.com];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,kernel,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,altera.com:from_mime,altera.com:email,altera.com:mid,altera.com:dkim,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	R_DKIM_NA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,trustnetic.com:mid,trustnetic.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 79491717D5F
+X-Rspamd-Queue-Id: 1DD9E717DCB
 
-From: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
+It is about adding the Tx timeout process and pci_error_handlers.
+When a PCIe error occurs, the txgbe device is able to recover on platform
+that support AER interrupt. And for Tx timeout, the txgbe driver can
+recover the device by reset process.
 
-The Agilex5 SoCDK TSN Config2 board uses a GMII-to-RGMII converter
-implemented as FPGA soft IP between gmac1 and its PHY. This converter
-provides the RGMII TX/RX clock delays, so the MAC interface selector
-must be configured for GMII while the PHY is configured without delays.
+For ngbe devices, due to the absence of the current function, it cannot
+br fully recovered once there is a PCIe error or Tx timeout. Its
+function will be completed in the future.
 
-Add the "altr,socfpga-stmmac-agilex5-tsn" compatible to the match table
-and detect it in probe to force GMII for the MAC interface selector and
-strip the delay bits from phy_interface so the PHY is not configured to
-add delays already provided by the FPGA converter.
-
-Signed-off-by: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+Changes log:
+v10:
+- Remove pci_aer_clear_nonfatal_status().
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-index 1d7f0a57d288..bf591a68502f 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-@@ -69,12 +69,13 @@ struct socfpga_dwmac {
- 	void __iomem *tse_pcs_base;
- 	void __iomem *sgmii_adapter_base;
- 	bool f2h_ptp_ref_clk;
-+	phy_interface_t mac_interface;
- 	const struct socfpga_dwmac_ops *ops;
- };
+v9: https://lore.kernel.org/all/20260701072357.33984-1-jiawenwu@trustnetic.com
+- Add calling ptp_cancel_worker_sync() in wx_ptp_quiesce().
+- Fix the typo of 'out' for wx_control_hw().
+
+v8: https://lore.kernel.org/all/20260630031016.19820-1-jiawenwu@trustnetic.com
+- Not destroying PTP clock in wx_soft_quiesce(), and keeping the PTP worker
+  alive but idle during PCIe recovery.
+- Move wx_soft_quiesce() after wx_napi_disable_all().
+- Use PCI_COMMAND_MEMORY and U16_MAX instead of magic number.
+- Fix the leak of wx_control_hw() when WX_STATE_RES_FREED is set.
+
+v7: https://lore.kernel.org/all/20260615065016.21672-1-jiawenwu@trustnetic.com
+- Move ptp_clock_unregister() to be executed before free wx->ptp_tx_skb.
+
+v6: https://lore.kernel.org/all/20260610060917.23980-1-jiawenwu@trustnetic.com
+- Move the check of device status inside wx_soft_quiesce().
+- Reverse the error return of txgbe_disable_device().
+- Add PCIe error check in tx_timeout.
+- Add WX_STATE_RES_FREED flag to avoid double-free of resources.
+
+v5: https://lore.kernel.org/all/20260604085631.12720-1-jiawenwu@trustnetic.com
+- Avoid the same name on two functions.
+- Encode the device identity into the name of reset work queue.
+- Change pr_err() to wx_err().
+- Check WX_STATE_DOWN and WX_STATE_RESETTING at the entry of every work item.
+- Implement wx_ptp_quiesce().
+- Add netif_carrier_off() and netif_tx_disable() in soft_quiesce.
+- Move resource free operations after PCIe recovery.
+- Return error code in down path.
+
+v4: https://lore.kernel.org/all/20260601072221.2952-1-jiawenwu@trustnetic.com
+- Create a separate work queue for the reset task.
+- Gate wx_watchdog_flush_tx() on netif_running().
+- Add rtnl_lock() around wx->do_reset() in wx_io_slot_reset().
+- Change .close_suspend() to .soft_quiesce() to avoid MMIO when PCI
+  channel is frozen.
+
+v3: https://lore.kernel.org/all/20260509100540.32612-1-jiawenwu@trustnetic.com
+- Merge the multiple string line into one in wx_handle_tx_hang().
+- Remove the redundant warn messages.
+- Use test_and_clear_bit() instead of checking the flag bit then clear it.
+- Drop the Tx hang check in tx_timeout.
+- Call wx_update_stats() before wx_check_tx_hang().
+- Add Tx flush when link lost.
+- Move wx_ptp_stop() into wx->close_suspend().
+- Drop V2 patch 5/6 because WOL packets are handled before DMA ring.
+- Check wx NULL pointer in wx_io_error_detected().
+- Check perm failure before hardware teardown.
+
+v2: https://lore.kernel.org/all/20260430082517.19612-1-jiawenwu@trustnetic.com
+- Add the missing rtnl_unlock() at early return in wx_reset_subtask().
+- Replace ngbe_close() with ngbe_close_suspend() in ngbe_dev_shutdown().
+- Add a patch to clear stored DMA addresses.
  
- static phy_interface_t socfpga_get_plat_phymode(struct socfpga_dwmac *dwmac)
- {
--	return dwmac->plat_dat->phy_interface;
-+	return dwmac->mac_interface;
- }
- 
- static void socfpga_sgmii_config(struct socfpga_dwmac *dwmac, bool enable)
-@@ -650,6 +651,15 @@ static int socfpga_dwmac_probe(struct platform_device *pdev)
- 	plat_dat->pcs_exit = socfpga_dwmac_pcs_exit;
- 	plat_dat->select_pcs = socfpga_dwmac_select_pcs;
- 
-+	dwmac->mac_interface = plat_dat->phy_interface;
-+
-+	if (of_device_is_compatible(pdev->dev.of_node,
-+				    "altr,socfpga-stmmac-agilex5-tsn")) {
-+		dwmac->mac_interface = PHY_INTERFACE_MODE_GMII;
-+		if (phy_interface_mode_is_rgmii(plat_dat->phy_interface))
-+			plat_dat->phy_interface = PHY_INTERFACE_MODE_RGMII;
-+	}
-+
- 	ops->setup_plat_dat(dwmac);
- 
- 	return devm_stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
-@@ -674,6 +684,7 @@ static const struct of_device_id socfpga_dwmac_match[] = {
- 	{ .compatible = "altr,socfpga-stmmac", .data = &socfpga_gen5_ops },
- 	{ .compatible = "altr,socfpga-stmmac-a10-s10", .data = &socfpga_gen10_ops },
- 	{ .compatible = "altr,socfpga-stmmac-agilex5", .data = &socfpga_agilex5_ops },
-+	{ .compatible = "altr,socfpga-stmmac-agilex5-tsn", .data = &socfpga_agilex5_ops },
- 	{ }
- };
- MODULE_DEVICE_TABLE(of, socfpga_dwmac_match);
+v1: https://lore.kernel.org/r/20260428021156.13564-1-jiawenwu@trustnetic.com
+---
+
+Jiawen Wu (5):
+  net: ngbe: implement libwx reset ops
+  net: wangxun: add Tx timeout process
+  net: wangxun: add reinit parameter to wx->do_reset callback
+  net: wangxun: implement soft quiesce for PCIe error recovery
+  net: wangxun: add pcie error handler
+
+ drivers/net/ethernet/wangxun/libwx/Makefile   |   2 +-
+ drivers/net/ethernet/wangxun/libwx/wx_err.c   | 317 ++++++++++++++++++
+ drivers/net/ethernet/wangxun/libwx/wx_err.h   |  18 +
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   |   2 +-
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  17 +-
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  59 +++-
+ drivers/net/ethernet/wangxun/libwx/wx_lib.h   |   1 +
+ drivers/net/ethernet/wangxun/libwx/wx_ptp.c   |  21 ++
+ drivers/net/ethernet/wangxun/libwx/wx_ptp.h   |   1 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  25 +-
+ .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  |   1 -
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  83 ++++-
+ drivers/net/ethernet/wangxun/ngbe/ngbe_type.h |   1 +
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  57 +++-
+ .../net/ethernet/wangxun/txgbe/txgbe_type.h   |   2 +-
+ 15 files changed, 588 insertions(+), 19 deletions(-)
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_err.c
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_err.h
+
 -- 
-2.43.7
+2.51.0
 
 
