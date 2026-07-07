@@ -1,102 +1,86 @@
-Return-Path: <netdev+bounces-305620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305621-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Y/MpIXaKTWp51wEAu9opvQ
-	(envelope-from <netdev+bounces-305620-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 01:23:34 +0200
+	id 0fY7D+2MTWoA2AEAu9opvQ
+	(envelope-from <netdev+bounces-305621-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 01:34:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D812C720618
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 01:23:33 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D2767206B7
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 01:34:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=BijXF1M3;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305620-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305620-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=oracle.com header.s=corp-2025-04-25 header.b=TONy3GhC;
+	dmarc=pass (policy=reject) header.from=oracle.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305621-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305621-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DEAFF301C139
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 23:23:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3CFF0301CC5B
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 23:34:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C42F2351C0D;
-	Tue,  7 Jul 2026 23:23:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DE2636DA0D;
+	Tue,  7 Jul 2026 23:34:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D17146D53
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 23:23:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841C23093DF;
+	Tue,  7 Jul 2026 23:34:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783466610; cv=none; b=pALeH6Ns8A8JYOYlYZSgOXf9h1qyaRbdh7tBz+/uX8nqf9bv06ljhf5dyg4hyDMK/bnpEtzhW/nM4icEjvEsjEHsTaps3GkAav3bbrCBxHl+t47JgTfxMaa48li/e6GlqHJNe+KdZGcA9pzfK7MHBi19IKZoEA8JjS463i69NMc=
+	t=1783467242; cv=none; b=MzCJ/N/zyK8tlPVeY7NVreAbWnOP61udbp9heb4R43mwD6JEgwuYrD3qQ8Ph2Pf0o43cpvN1eYYGhUwCrNXUbtM+E12wqd9c3KdScNq6XM93UDccN0QQeFgmIQVw0jisTW3qwdgtp+gVTLnvJRSu/UCiMN9SF5FV41xWn/FGIYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783466610; c=relaxed/simple;
-	bh=mQZ9V1GEmt+VqUk4kC7u7qbTeEFsn2SSRia8xIjBDUw=;
+	s=arc-20240116; t=1783467242; c=relaxed/simple;
+	bh=4IKLks/ucOA2auXD2KLMR9GT/BPTMyC9nZ/pdpCputg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ssJXSG0PW38zFvV0seKS8PI+vbrVvVLDLd9vELmzZ91yd4QLy97X72vOQBhVdr2uHo3NrCuHADWokYlkJLjz1Pg3kAmkC+oaSqjEY4tcpx9sapCSz9yLuLX2E1ULBRzwYiwH5FYrngUdHoPYL6vk7siJuh549RDP2qkhjWdkeLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BijXF1M3; arc=none smtp.client-ip=209.85.221.45
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-47122683cf3so41886f8f.0
-        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 16:23:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783466608; x=1784071408; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q7U3MX6ghFE0ZIT9zyJDBq1y0YXrQGQB4NvY8Mq0tds=;
-        b=BijXF1M3LAKuAwpy2q3EAlkdQBSTdnE4yNLcieSfh3s1z6Qe22ZmM0TGkuGTZWFAEF
-         JHD7UMfTFOa4r/Narufp4TAuYQ712fv/DIMPlTymgo7/mN5AlWFxF8pl65vb9bety2go
-         wKT/P0ve0GrONe1W3Fl7y3wBcrimVbxusjtclNe+ng/vw0/wv+atFmDwpH3RB4Xo5EAC
-         SiIYtKF0TwCctgSJASjp1NR7he7jtjmRe/FVbQmUegCSZmJKWNhGN1PDut4xzVsQ0+J1
-         bsiUEzGbgBFCSoHMBXK0U/w/2PStJHIrBZZ1s8bEKHZMwDDhWRFpvRSu5NunE60ZWK2H
-         qAuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783466608; x=1784071408;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=q7U3MX6ghFE0ZIT9zyJDBq1y0YXrQGQB4NvY8Mq0tds=;
-        b=sIzh2HRkNZpXYUQRMJLQQDUu8HIao9AwHP2dWqf0lQCC/GkUE+2EokdyMy0copjC2l
-         y2esFG53IPYXw9xdxlASQNhn2X7X1VZuUtkiIjQH8MudUvEJSDrAmFy/3MQCYW8nroyW
-         CxwxRDCxW++GorxvSffKialfHJdIFu0GfSMaT6lZ9DsKO/eA7M0LrBZ2y20LwLdFxFwI
-         mQ6K1uuCFvdPHlXzpGkwld16frxnJB+at5G1Iqv1rGcdPuiUyaiwwEai9OHFkh4d1QaT
-         aVEXgjLPe263ttX+H6mzmqXC+x/b/Fvtygg69CoyHBkUDZzFSHpd1K+pOevyDGGDKR8J
-         Y9Pw==
-X-Forwarded-Encrypted: i=1; AHgh+RrgGW+K9CpN/yqLTW0nfB7RBT/we3V6bj7D07VNX0MP0WI7gD/SNUaUEUhU0VFz8OWqHrJq2v4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeGxSadZh4/OO/DjsOikM9MqCgT1+gNmdSwXl7ffbeHzTeUi/O
-	Hrw8PAQ/3VnB3+6IBpuUHFV2dTuj+Mcj1ic9ZW/jf20USbtPCy9GAQMqmjrtp7Xm
-X-Gm-Gg: AfdE7ck9GDCHZWIm2Y2AxPX3veDSiIJC4tNnF+c/iR7clRQsUSmcPMMYv9uj8YT404M
-	dAAWTBNT/URYrB47jAqBgGeSzNZ2R62zFy++uzT8lnl53TTknO0HX52MwiusTyMMcGBtQk2MTM6
-	2H0gUmLB1UUWWPAv7CmWP7Q8BAsTKVwOTAlMuR6CVuUjv8ZMmK2vCW+niWY1RQVDF+REzYy2j1B
-	4R0Olg6pJON7vv0k42lthnxrXIaAxXME+1zoKe1KnENRnOV/vFVJrrYuWATvKCyS40SKQ4CHw8h
-	nTgnmUv+Yq5yuCXxuGOQC3XDLid/f+UXKOr7L/LYzLWMQ2OYhEDhglQB+cV/ck1s31snTfb64OC
-	XT8wy+Sx49MCRrrPGU5AKNYJ+RZfEXwH86xe5QFQyq87cQcpX64jVMG2bxHxv8ShcXHKTMGkGuC
-	DaOBjL2JWb4tKh7g86JyNTmq84GIDX6eGAn8XA4k88lvh5H4Ir
-X-Received: by 2002:adf:e549:0:b0:476:8a:5 with SMTP id ffacd0b85a97d-47de66a2fcamr6207251f8f.34.1783466607549;
-        Tue, 07 Jul 2026 16:23:27 -0700 (PDT)
-Received: from localhost.localdomain ([151.189.113.202])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa039afacsm35916922f8f.19.2026.07.07.16.23.26
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 07 Jul 2026 16:23:26 -0700 (PDT)
-From: Nils Juenemann <nils.juenemann@gmail.com>
-To: rjethwani@everpuredata.com
-Cc: borisp@nvidia.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	john.fastabend@gmail.com,
-	kuba@kernel.org,
-	leon@kernel.org,
-	mbloch@nvidia.com,
-	netdev@vger.kernel.org,
-	nils.juenemann@gmail.com,
-	pabeni@redhat.com,
-	saeedm@nvidia.com,
-	sd@queasysnail.net,
-	tariqt@nvidia.com
-Subject: Re: [PATCH net-next v14 0/9] tls: Add TLS 1.3 hardware offload support
-Date: Wed,  8 Jul 2026 01:23:25 +0200
-Message-ID: <20260707232325.61396-1-nils.juenemann@gmail.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <CAKaoeS3misLGVi4wEqQg3OwbisTBfB0zx-i3b81g2-vnOS_UYA@mail.gmail.com>
-References: <CAKaoeS3misLGVi4wEqQg3OwbisTBfB0zx-i3b81g2-vnOS_UYA@mail.gmail.com>
+	 MIME-Version; b=NeBz8XiYNbTaakO04YqATu8FHC5ErAU5XLMeo/4TNXwM9wovOIA1PKcECT7WQLgjWPoGyPOg969WTGb31ZArujVdAIPAvVu57k53YHnVkn47nPWLDOS+iTYX/zBMRgMpb8rpnbPwyOHERdz+BxPDIHxM8wB1ElK8W03xZZ/0Q3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=TONy3GhC; arc=none smtp.client-ip=205.220.177.32
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 667JCPva1347545;
+	Tue, 7 Jul 2026 23:33:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=corp-2025-04-25; bh=igrpj
+	jJQUd+/3TCJOxayjEdZm97gP08Q/nEq7T9dCWs=; b=TONy3GhCIpCyKpqmFFVrA
+	1MG8TK+bHWVR1PhIZoYms0TERlkCwi87YnyNmaXZpPxQLn2WsFoBxBScQ7E35OvK
+	ZDzlw9Lzm19ioTmDFA6gNjMMjBNfiilNaWqtXWg8jxrZE9bCnaM4G5rU+ifvvia7
+	2Ya16Yrfe/5Eay06KExyESYMSq2GVatif7jRPTu0znrJFrL0dXWyDoUlYKCAvDxp
+	O2H87f7rgMJcEAQeH01DH6kTQwFnTC3tuEbPM89bBGg+HgR020+cEroOOiBfk5Ah
+	TwRptbdpW2BGo54j/3xBPOwc6SyWIFnEOUAVeXDCt18GHfjUHw/b+LyZIddJKP1l
+	w==
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4f6rkbeqvr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 07 Jul 2026 23:33:47 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.7/8.18.1.7) with ESMTP id 667NXblx027095;
+	Tue, 7 Jul 2026 23:33:46 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4f6rmr37j1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 07 Jul 2026 23:33:46 +0000 (GMT)
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.1.12) with ESMTP id 667NXjpv028202;
+	Tue, 7 Jul 2026 23:33:45 GMT
+Received: from mbpatil-ws.osdevelopmeniad.oraclevcn.com (mbpatil-ol10-ws.webad1iad.osdevelopmeniad.oraclevcn.com [100.100.228.95])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 4f6rmr37gg-1;
+	Tue, 07 Jul 2026 23:33:45 +0000 (GMT)
+From: Manjunath Patil <manjunath.b.patil@oracle.com>
+To: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+        Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+        netdev@vger.kernel.org
+Cc: Manjunath Patil <manjunath.b.patil@oracle.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Patrisious Haddad <phaddad@nvidia.com>, linux-rdma@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: [PATCH net v2] net/mlx5e: Use sender devcom for MPV master-up
+Date: Tue,  7 Jul 2026 16:33:37 -0700
+Message-ID: <20260707233337.3650025-1-manjunath.b.patil@oracle.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260610173915.4053423-1-manjunath.b.patil@oracle.com>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,96 +88,141 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-07_06,2026-07-06_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ mlxscore=0 spamscore=0 lowpriorityscore=0 suspectscore=0 malwarescore=0
+ adultscore=0 mlxlogscore=999 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2606160000 definitions=main-2607070231
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzA3MDIzMSBTYWx0ZWRfX4sekCjK1gNAZ
+ QfpXJvUjUW1ubt/5/K0wfgEXhPPfG9rltDFRFDlAacmWTW9jl2Mr+W0SMMKQomSG6vgYINh3x1t
+ 7jnmLt82MFWNyy3GY2cBNYY5zSGCp5B70ImiaELAxip7pLz5A1m6
+X-Authority-Analysis: v=2.4 cv=QP1YgALL c=1 sm=1 tr=0 ts=6a4d8cdb b=1 cx=c_pps
+ a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
+ a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jiCTI4zE5U7BLdzWsZGv:22
+ a=x4eqshVgHu-cdnggieHk:22 a=yPCof4ZbAAAA:8 a=VwQbUJbxAAAA:8
+ a=JXUkVfB3YJkj4ag9OGkA:9 a=5yU3S35YU4bGjq-dph-N:22 a=Bho9c0fBagfJEIQBS7DQ:22
+ cc=ntf awl=host:12222
+X-Proofpoint-GUID: 3Rm26ahq8YpeFLvGo3iYoOo9mZdWgpRx
+X-Proofpoint-ORIG-GUID: 3Rm26ahq8YpeFLvGo3iYoOo9mZdWgpRx
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA3MDIzMSBTYWx0ZWRfXwE0VWMd3mEQk
+ jZWl4eQToT5eO5BKmyFa7pPuo+GnZMf9MqGDBAPBrBkEKAq4kem8Bdyw7g16DqY2ShLrsEGhfxX
+ zhYDxBzxtGqDYVBSkU0KFnn/NdviWGMR1I2sHPwZuR6iF4pUV/DnxM4gAtbksf5KHcW6bUYU3eD
+ U0v7ueRi72G5lLgXnJT3vUU19wvMcaeGxMI0LnXAzX6YC2avaL/Y97TeExnFmDPYqRSh08eCM6d
+ +c5T0s0wVhTz45c6ka6GmtFYNpyaUaPvvGQMEhBCvChCOmmcSJLvOb3fKTebMODiXFDLVfUmmwv
+ iTI6W04a88x0Xi+WpRIR1Rr6+jAZA1dkk7/bzgD9bINHQvHNozxa6q+1jZtyrDN7s5BlosndQNr
+ U4/hKywlDkeRf+7aCNkc62KSYOcFyluAT7I4+BSuoLNMjNyKft96gJeXhhL/IHo+jONKkpyB3im
+ oVav9JIQpR8+VciMGlL8z3dS7b6Ncv7oYPjH9vTw=
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[oracle.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[oracle.com,reject];
+	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305620-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:rjethwani@everpuredata.com,m:borisp@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:leon@kernel.org,m:mbloch@nvidia.com,m:netdev@vger.kernel.org,m:nils.juenemann@gmail.com,m:pabeni@redhat.com,m:saeedm@nvidia.com,m:sd@queasysnail.net,m:tariqt@nvidia.com,m:johnfastabend@gmail.com,m:nilsjuenemann@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[nilsjuenemann@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-305621-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[nvidia.com,davemloft.net,google.com,gmail.com,kernel.org,vger.kernel.org,redhat.com,queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[manjunath.b.patil@oracle.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:leon@kernel.org,m:netdev@vger.kernel.org,m:manjunath.b.patil@oracle.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:phaddad@nvidia.com,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[nilsjuenemann@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[manjunath.b.patil@oracle.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[oracle.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,oracle.com:from_mime,oracle.com:email,oracle.com:mid,oracle.com:dkim];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,everpuredata.com:email]
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D812C720618
+X-Rspamd-Queue-Id: 7D2767206B7
 
-On Tue, Jul 7, 2026 at 3:38 PM Rishikesh Jethwani <rjethwani@everpuredata.com> wrote:
->
-> Could you please send the following from the dump:
-[...]
+After PCIe DPC recovery, mlx5 reloads the affected functions and
+replays multiport affiliation events. In the reported failure, the
+first relevant device error was:
 
-Hi,
+  pcieport 0000:10:01.1: DPC: containment event
+  pcieport 0000:10:01.1: PCIe Bus Error: severity=Uncorrected (Fatal)
+  pcieport 0000:10:01.1:    [ 5] SDES                   (First)
 
-The kdump for this event is incomplete -- makedumpfile ran out of disk
-space before finishing -- so I cannot run the crash> struct queries
-against it. I will capture a full dump if it recurs.
+mlx5 recovered the PCI functions and resumed 0000:11:00.1. During
+that resume, RDMA multiport binding replayed
+MLX5_DRIVER_EVENT_AFFILIATION_DONE and mlx5e sent
+MPV_DEVCOM_MASTER_UP. The host then panicked with:
 
-The oops still gives the relevant fault-site state:
+  BUG: kernel NULL pointer dereference, address: 0000000000000010
+  RIP: mlx5_devcom_comp_set_ready+0x5/0x40 [mlx5_core]
+  RDI: 0000000000000000
 
-    BUG: kernel NULL pointer dereference, address: 0000000000000030
-    Oops: 0000 [#1] SMP NOPTI
-    CPU: 9 Comm: swapper/9  7.1.0-rc2+ #4  (mlx5 ConnectX-6 Dx)
-    RIP: 0010:mlx5e_ktls_handle_rx_skb+0x10a/0x2d0 [mlx5_core]
-    Code: 45 0f b7 c0 e8 17 dc 58 e0 49 89 c7 58 4d 85 ff 0f 84 4a ff ff ff 41 0f b6 47 12 3c 06 0f 84 cc 00 00 00 49 8b 87 f8 04 00 00 <48> 8b 40 30 4c 8b a8 08 01 00 00 4d 85 ed 0f 84 b1 00 00 00 49 8b
-    RSP: 0018:ffffd4504071cc38 EFLAGS: 00010293
-    RAX: 0000000000000000 RBX: ffff8dca063b5500 RCX: 0000000000000000
-    RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-    RBP: ffffd4504071cc68 R08: 0000000000000000 R09: 0000000000000000
-    R10: 0000000000000076 R11: 0000000000000000 R12: ffff8dcaaf984000
-    R13: 000000000000000e R14: ffff8dc8383605e2 R15: ffff8dc801b33200
-    CR2: 0000000000000030
-    Call Trace:
-     mlx5e_build_rx_skb+0x6fa/0xbf0 [mlx5_core]
-     mlx5e_handle_rx_cqe_mpwrq+0x120/0x2a0 [mlx5_core]
-     mlx5e_poll_rx_cq+0xa1/0x920 [mlx5_core]
-     mlx5e_napi_poll+0x118/0x7e0 [mlx5_core] (softirq)
+Call trace included:
 
-Decoded faulting instructions:
+  mlx5_devcom_comp_set_ready
+  mlx5e_devcom_event_mpv
+  mlx5_devcom_send_event
+  mlx5_ib_bind_slave_port
+  mlx5r_mp_probe
+  mlx5_pci_resume
 
-    49 8b 87 f8 04 00 00   mov 0x4f8(%r15),%rax   ; icsk_ulp_data
-    48 8b 40 30            mov 0x30(%rax),%rax    ; priv_ctx_rx
+MPV devcom registration publishes mlx5e private data to the component
+peer list before mlx5e_devcom_init_mpv() stores the returned component
+device in priv->devcom. A concurrent master-up event can therefore
+reach a peer whose private data is visible but whose priv->devcom
+backpointer is still NULL.
 
-So R15 is sk:
+MPV_DEVCOM_MASTER_UP already carries the sender/master mlx5e private
+data as event_data. The ready bit is stored on the shared devcom
+component, not on an individual peer. Use the sender devcom when
+marking the MPV component ready.
 
-    sk = ffff8dc801b33200
+This preserves the readiness transition while avoiding a NULL
+dereference of the peer devcom pointer during affiliation replay after
+PCI error recovery.
 
-The fault site reloads icsk_ulp_data from sk+0x4f8, gets RAX=0, and then
-faults on the priv_ctx_rx load. CR2=0x30 matches that load.
+Fixes: bf11485f8419 ("net/mlx5: Register mlx5e priv to devcom in MPV mode")
+Assisted-by: Codex:gpt-5
+Signed-off-by: Manjunath Patil <manjunath.b.patil@oracle.com>
+Cc: stable@vger.kernel.org # 6.7+
+---
+v2:
+- Drop defensive master_priv/master_priv->devcom check as suggested by Tariq.
 
-This is the direct tls_get_ctx(sk) use in resync_update_sn()
-(ktls_rx.c:553). It is a fresh icsk_ulp_data load at the fault site, not
-a value CSE'd from the earlier access via resync_queue_get_psv()
-(ktls_rx.c:486).
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-So I still think this is consistent with icsk_ulp_data being cleared
-between the two reads, with the second dereference missing a NULL check.
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 8f2b3abe0092..9b27afeb9b12 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -211,11 +211,11 @@ static void mlx5e_disable_async_events(struct mlx5e_priv *priv)
+ 
+ static int mlx5e_devcom_event_mpv(int event, void *my_data, void *event_data)
+ {
+-	struct mlx5e_priv *slave_priv = my_data;
++	struct mlx5e_priv *master_priv = event_data;
+ 
+ 	switch (event) {
+ 	case MPV_DEVCOM_MASTER_UP:
+-		mlx5_devcom_comp_set_ready(slave_priv->devcom, true);
++		mlx5_devcom_comp_set_ready(master_priv->devcom, true);
+ 		break;
+ 	case MPV_DEVCOM_MASTER_DOWN:
+ 		/* no need for comp set ready false since we unregister after
 
-Thanks,
-Nils
+base-commit: e43ffb69e0438cddd72aaa30898b4dc446f664f8
+-- 
+2.47.3
 
