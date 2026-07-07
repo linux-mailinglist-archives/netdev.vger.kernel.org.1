@@ -1,317 +1,262 @@
-Return-Path: <netdev+bounces-305530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305531-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Wgl5HlosTWqLwAEAu9opvQ
-	(envelope-from <netdev+bounces-305530-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:42:02 +0200
+	id 4wB3ODAtTWq9wAEAu9opvQ
+	(envelope-from <netdev+bounces-305531-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:45:36 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFE1271DF37
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:42:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2302671DFB8
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:45:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=sa1JGVJV;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305530-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305530-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=mR7lrv4q;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305531-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305531-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C96DB30AA7F4
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 16:35:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DE163300C583
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 16:39:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CD67435A83;
-	Tue,  7 Jul 2026 16:35:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59817435A8C;
+	Tue,  7 Jul 2026 16:39:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76A55435A82
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 16:35:26 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783442128; cv=pass; b=ohyS7Q2lTSdIj56aFWVIW9awu7K6MA/4L2u3spFISFkmyewmOaWz78IomA3OjMYB0yy8dI7NtPa9Y2TTpK6IsztUARBDY/4VA+XncYx81KSXu9jZdvxfQujH92sKtEpfGF2Ynn0LgVDbmXqoc2KqNaTlk4xFn1ptmOv08vaQK1w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783442128; c=relaxed/simple;
-	bh=47FgWmL0/sJ3EBkjYH8n2XCB0eNqC8ghlh81msiLbSQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jYmFeYaLfvGerq13tCdJVCY26SSHVLnLiirV0O87AjDPhG0PcuZ3FLrLjV/O52W7b59trHpCUcjWs/QYI3DGLZevOdAW29VhCfn1u6g5OpumtFUaRKjnThbaVVi4yIjkY4yj5xaSJftWDlgXXBk1r+dG5Tqdz3wA7+7u8gYxrrs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sa1JGVJV; arc=pass smtp.client-ip=209.85.218.46
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-c15b9def622so64373766b.2
-        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 09:35:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783442125; cv=none;
-        d=google.com; s=arc-20260327;
-        b=hOkPArodNxXTneCRmHB53Gczl/KOFBPfFOJrTWCepN7KKiuK16qqVMJrz64CA+M9j6
-         n4bIQGn/O6QXxB0umKBPGH82ilzWoZ87A0OZvA1nLE3n8MW69EkC0E359xzip2sQRgA+
-         rUhSt/KBylp5XbLP+ENn7we1sMjcIycQQlBeIGs7a5NF2EPjzJ1JO4w3BZcjoY/WkE5I
-         0Hd20TIX6d7vPEJUOrs/3o5W3Ebzk67k/7564KQ/4kf9B5Mfnxg7qkiw1tmRYQGMHe8P
-         bdUyTl7uyWhErzdnA8RBvIbi8V3nI0IBsFapGlqMm8nAsh7/xi8sgFki3HGySlrsbNbu
-         9FtA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=eX0leblPThsG/mxI+RmYykiu1iq7KLEwPDU510RCSpY=;
-        fh=KHpAAkit/vOqWvh/AvhZGLFbe2WX6eQ0U/Q0ZBANmeQ=;
-        b=oWXBzG2UBm+1RzD3vUZ+C9fnGk1g2Pu1rrp5q2HZjq5mg47SfKUEmJD1EHJFQnlhxg
-         IcL7o0mEnbpqobUJpS4i2Zw+u5dkU27dLoH3LZkHpglb5UzIMY8Sg/EzKQdyr341AX2E
-         o2TmjnLcpcmtbb9O7BTwz32ojJEB8XM5hCyXKRXNQMDI68emv7qsd+OXzI4MzwmWyGbe
-         60L4cebZZLl0p0ZWnIDRUjVFjBM2kt0X2DYlexFXZbBOMTXTa625a161TREJHc486+Vl
-         84WLouTD33OcZtN9QZMf5NgL0seaMQdcXJsJtyVul6W3HsJjqam56lqQTBl6JS2VTDT0
-         wqig==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783442125; x=1784046925; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=eX0leblPThsG/mxI+RmYykiu1iq7KLEwPDU510RCSpY=;
-        b=sa1JGVJV2QP5QAOcJ3q63TXKUoiGsUUuiXy12zyBYOoQjH+XmIuTgdmpIuSBGMeg0I
-         ls/1/eULCoNkQjh8tplPsQRf1RVkc1HaC2ebgRAecxzxR6/fMnw3e/m19mmCUXLnOY6I
-         t37rIKzdoUifcElq8tYmZwwo7fstNCnvJnZYddqEKdeKl0MeUv0tkhWdlb/A55I+fgwk
-         gDOeE+XFVhxrfiBaKkdJ5pJs3s2MUNZa1qmn9S1nTFpQNs+5nTUwOSR58g7hX4YqycHu
-         B/Xb+GznJW7LmqlEDEdJnOkkX4X3mUjbFz10xhmVTmD3wp0ilAlwmY14uytibBb/uG6O
-         qQzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783442125; x=1784046925;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=eX0leblPThsG/mxI+RmYykiu1iq7KLEwPDU510RCSpY=;
-        b=i6e6THxLcOpJqe23wWjNWrlX/OgWXoh7Y68MVpauAwPsFycLmuZ7HjtbzT0dl+3GuD
-         ThKM6KUKeFPfW9yXBJoGk4L54rNmZaSL67KVTb6OCOJmJv0bjO+1WFKaBBrw4saiD/Ek
-         U4baJIQKXe+LZUuhNl/YvfOENs8l+09N9T+ALHqI/+C/VIsnoaGbTEQDsfc2E8GtvCkm
-         CseUx4DOxCGKS1gGnNy6rPHT96vr0cGwZR+WEOlh0zDxFXiQIH/1g8DUSnSxW6HGEZtp
-         9ofmzHjEYhBxHt2pDY9fFNIdaqCXs4YfZXQIzu5kbHoCR0UVKJ93R9Ngetwg31x/N7fB
-         ti2w==
-X-Forwarded-Encrypted: i=1; AHgh+RoVpsMrYBNCVLmgw1dKDQqWwo3hOvpAjYZ9tp7QsBaPNX3mFVizW/dVnP4OQnHuWMMzUzcehIs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyh0dcZv9sX6WU7/vzay+8hirfc0+MqajwFS+ZfT6eARNYiaREB
-	SGD4hs/TlFvRlPa2UPYDKmYDSEcqhwwq+L/xC/FMmTaZHD8SYrpz+ePod56oNsnwQQA6gQUunKo
-	rWOT8wZkoHZGf+HtrXfeiP7lo9k7GyWQ=
-X-Gm-Gg: AfdE7clqCXtUHNMbY4u+5S2DiUdOWj8B/vesHUvtnYfNqrb8eYfHGeu1opTmGXYcAXo
-	PofIc6zXBkbMgqaSnI2jHpbZVMcrXdMezsIKgeC+WZ0xfbBc4Ey0zWqBiia5WUW4Up6DCzVOZ7a
-	Qq+Zw5AO3ZCnTg4YqPXVRavqEQtOlMD4fqvW+dqdlOun1AvkJPXSAjd6lL/fvZshyohHvH5jidw
-	epweWYxpk4R5JEgUWrFDJ9O1VY8WQJsmHwBxCCLg9xQ7YtQ/qoho5GZaVBTliTQuuMwHoe4iwtR
-	lnvUHGG5ullLRvnIXhYmkF9yPO80
-X-Received: by 2002:a17:906:1754:b0:c12:9fb7:3e68 with SMTP id
- a640c23a62f3a-c15a67bd5ecmr244859066b.38.1783442124492; Tue, 07 Jul 2026
- 09:35:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011604314BD;
+	Tue,  7 Jul 2026 16:39:01 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783442343; cv=none; b=ldMsu+Y0oByvxCfXZ0jikUTkgEsWkjVgo0xPb5jlA/Oh+0Fjr375I98txEnLZgGv7O75zzm27fm/+/9B5xk0rql9tsosBux6AOryI1nkCoTvlhpyrIr6tWVjJtriy0wg0Iuq1MYXqPSJ4y/ONDHVhHHHEiOn79Rz2Zqz3/wD2+8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783442343; c=relaxed/simple;
+	bh=UsnAi76uOSA/XPHHYDSeZk1k/YxpguYAv8uXw+bn09k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M2Oj60CsVNpuNR9NEaebibRTU/COQBDr25uJGceymPhhAF0g4ZDFWonaAI9gN5YquhidXRka/H+P5xw3QwL5X7d9BxCltZP8kkxGWiuRyUipdbRYs9PkX38/jxDbzl7R1E+YsEOIy+O1gSGWLIiUTxgx40Rt9WEHziL02b5V89U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mR7lrv4q; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF16B1F00A3A;
+	Tue,  7 Jul 2026 16:39:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783442341;
+	bh=K+JEjuBM0OYzZSHnI6spcjojqKR6WTBMaW+xSWEmd5s=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To;
+	b=mR7lrv4qGTf6jmHqXm72+Kj48QsW7RImC8W8FkWZP7dj6uJwQ0NeNflCYzTab78Cu
+	 HNFz6KWxc3f/LJ+AEyCPmb+YB599UcadmZ7hMPT9EByIBqSQMSPZXa45p9ypHIGO3P
+	 iCpy/5bvaoZ0eIVVKGZT2m112eqoEsdLR3054RjVb2MMS5jtTcqFSyF0Zec3+iWjhQ
+	 OULDrDo0USxPj/0oh6E0lpAT3blLxHdnsvlrT25nGyAOt/XpR27waRfBa5HTpNfIMo
+	 LIZ5rjrPIgGUQcMyORsGikAjj2ifpBUEXFffI/MSYYgvtqmJufWzF6hn9W7DzTjNe4
+	 Hspf77jT/EjOQ==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 57847CE0AD3; Tue,  7 Jul 2026 09:39:01 -0700 (PDT)
+Date: Tue, 7 Jul 2026 09:39:01 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Petr Pavlu <petr.pavlu@suse.com>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Qingfang Deng <qingfang.deng@linux.dev>,
+	Breno Leitao <leitao@debian.org>,
+	Norbert Szetei <norbert@doyensec.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Taegu Ha <hataegu0826@gmail.com>, Kees Cook <kees@kernel.org>,
+	linux-ppp@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Guillaume Nault <gnault@redhat.com>, netdev@vger.kernel.org,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Daniel Gomez <da.gomez@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Aaron Tomlin <atomlin@atomlin.com>, linux-modules@vger.kernel.org
+Subject: Re: [PATCH net v2] ppp: defer channel free to an RCU grace period to
+ fix pppol2tp RX UAF
+Message-ID: <7ff3af97-1c10-4f46-84ae-ffbf757f7e9e@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <D9C0245B-608B-4884-8A09-F55BA4A9F948@doyensec.com>
+ <de2616b3-6edf-4255-ba77-0674e225ab27@linux.dev>
+ <akfjpBVML_1RFF91@gmail.com>
+ <87111f02-5b7a-4185-8364-2faba650578b@linux.dev>
+ <20260706092926.PIlrhRKz@linutronix.de>
+ <0dfe59c2-bf60-40fe-90e6-d6e1003709d0@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260706134716.3879-2-bestswngs@gmail.com> <GV1P189MB1988C48DB0AA286E9DF62789C6F02@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-In-Reply-To: <GV1P189MB1988C48DB0AA286E9DF62789C6F02@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-From: Weiming Shi <bestswngs@gmail.com>
-Date: Wed, 8 Jul 2026 00:34:47 +0800
-X-Gm-Features: AVVi8CdComON0MR6xWcmE3xdXWeZZPUdcAYQEQ0bPmJDHOFxhbmn34eaqbK-8ho
-Message-ID: <CANgPUi2Keetyi7Vs1+c4QBhLq33RG-=sZBJmJyJTeZDTbLdt-w@mail.gmail.com>
-Subject: Re: [PATCH net] tipc: serialize udp bearer replicast list updates
-To: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
-Cc: Jon Maloy <jmaloy@redhat.com>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	"tipc-discussion@lists.sourceforge.net" <tipc-discussion@lists.sourceforge.net>, Xiang Mei <xmei5@asu.edu>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0dfe59c2-bf60-40fe-90e6-d6e1003709d0@suse.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+X-Spamd-Result: default: False [-3.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-305531-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:tung.quang.nguyen@est.tech,m:jmaloy@redhat.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:tipc-discussion@lists.sourceforge.net,m:xmei5@asu.edu,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-305530-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER(0.00)[paulmck@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:petr.pavlu@suse.com,m:bigeasy@linutronix.de,m:qingfang.deng@linux.dev,m:leitao@debian.org,m:norbert@doyensec.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:hataegu0826@gmail.com,m:kees@kernel.org,m:linux-ppp@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:gnault@redhat.com,m:netdev@vger.kernel.org,m:mcgrof@kernel.org,m:da.gomez@kernel.org,m:samitolvanen@google.com,m:atomlin@atomlin.com,m:linux-modules@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[linutronix.de,linux.dev,debian.org,doyensec.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org,atomlin.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	HAS_REPLYTO(0.00)[paulmck@kernel.org];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[paulmck@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,paulmck-laptop:mid,sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CFE1271DF37
+X-Rspamd-Queue-Id: 2302671DFB8
 
-Tung Quang Nguyen <tung.quang.nguyen@est.tech> =E4=BA=8E2026=E5=B9=B47=E6=
-=9C=887=E6=97=A5=E5=91=A8=E4=BA=8C 21:21=E5=86=99=E9=81=93=EF=BC=9A
->
-> >Subject: [PATCH net] tipc: serialize udp bearer replicast list updates
-> >
-> >tipc_udp_rcast_add() and cleanup_bearer() both update ub->rcast.list wit=
-h
-> >list_add_rcu() / list_del_rcu(), but nothing serializes them. The add ru=
-ns from
-> >the encap receive softirq (via tipc_udp_rcast_disc()) without rtnl_lock(=
-), so it
-> >can race the cleanup delete and corrupt the
-> >list:
-> >
-> > list_del corruption. prev->next should be ffff8880298d7ab8,
-> >   but was ffff88802449ad38. (prev=3Dffff888027e3ec98)  kernel BUG at
-> >lib/list_debug.c:62!
-> > RIP: __list_del_entry_valid_or_report+0x17a/0x200
-> > Workqueue: events cleanup_bearer
-> > Call Trace:
-> >  cleanup_bearer (net/tipc/udp_media.c:811)
-> >  process_one_work (kernel/workqueue.c:3302)
-> >  worker_thread (kernel/workqueue.c:3466)
-> >
-> >The bearer can be enabled from an unprivileged user namespace, as the
-> >TIPCv2 generic-netlink ops carry no GENL_ADMIN_PERM.
-> >
-> >Add a spinlock and take it around both list updates. Re-check for the pe=
-er
-> >under the lock in the add path so the check-then-add in
-> >tipc_udp_rcast_disc() cannot insert a duplicate.
-> >
-> >Fixes: ef20cd4dd163 ("tipc: introduce UDP replicast")
-> >Reported-by: Xiang Mei <xmei5@asu.edu>
-> >Assisted-by: Claude:claude-opus-4-8
-> >Signed-off-by: Weiming Shi <bestswngs@gmail.com>
-> >---
-> > net/tipc/udp_media.c | 19 ++++++++++++++++++-
-> > 1 file changed, 18 insertions(+), 1 deletion(-)
-> >
-> >diff --git a/net/tipc/udp_media.c b/net/tipc/udp_media.c index
-> >62ae7f5b5840..601174297a16 100644
-> >--- a/net/tipc/udp_media.c
-> >+++ b/net/tipc/udp_media.c
-> >@@ -94,6 +94,7 @@ struct udp_replicast {
-> >  * @ifindex:  local address scope
-> >  * @work:     used to schedule deferred work on a bearer
-> >  * @rcast:    associated udp_replicast container
-> >+ * @rcast_lock:       serializes updates to @rcast.list
-> >  */
-> > struct udp_bearer {
-> >       struct tipc_bearer __rcu *bearer;
-> >@@ -101,6 +102,7 @@ struct udp_bearer {
-> >       u32 ifindex;
-> >       struct work_struct work;
-> >       struct udp_replicast rcast;
-> >+      spinlock_t rcast_lock; /* protects rcast.list */
-> > };
-> >
-> > static int tipc_udp_is_mcast_addr(struct udp_media_addr *addr) @@ -301,=
-7
-> >+303,7 @@ static bool tipc_udp_is_known_peer(struct tipc_bearer *b,  sta=
-tic
-> >int tipc_udp_rcast_add(struct tipc_bearer *b,
-> >                             struct udp_media_addr *addr)
-> > {
-> >-      struct udp_replicast *rcast;
-> >+      struct udp_replicast *rcast, *tmp;
-> >       struct udp_bearer *ub;
-> >
-> >       ub =3D rcu_dereference_rtnl(b->media_ptr);
-> >@@ -319,6 +321,17 @@ static int tipc_udp_rcast_add(struct tipc_bearer *b=
-,
-> >
-> >       memcpy(&rcast->addr, addr, sizeof(struct udp_media_addr));
-> >
-> >+      /* tipc_udp_rcast_disc() adds from softirq without rtnl_lock(). *=
-/
->
-> Remove above comment because it is vague. Caller of tipc_udp_rcv() alread=
-y holds rcu_read_lock().
->
-> >+      spin_lock_bh(&ub->rcast_lock);
->
-> Move 'spin_lock_bh(&ub->rcast_lock)' to above 'list_add_rcu(&rcast->list,=
- &ub->rcast.list);' because only 'ub->rcast.list' needs protection.
->
-> >+      list_for_each_entry(tmp, &ub->rcast.list, list) {
-> >+              if (!memcmp(&tmp->addr, addr, sizeof(struct
-> >udp_media_addr))) {
-> >+                      spin_unlock_bh(&ub->rcast_lock);
-> >+                      dst_cache_destroy(&rcast->dst_cache);
-> >+                      kfree(rcast);
-> >+                      return 0;
-> >+              }
-> >+      }
->
-> This is wrong because the code in the loop is never executed. tipc_udp_is=
-_known_peer() already verifies address duplication.
-> Please remove above code and fix tipc_udp_is_known_peer() as below:
->
-> static bool tipc_udp_is_known_peer(struct tipc_bearer *b,
->                                    struct udp_media_addr *addr)
->  {
-> -       struct udp_replicast *rcast, *tmp;
-> +       struct udp_replicast *rcast;
->         struct udp_bearer *ub;
->
->         ub =3D rcu_dereference_rtnl(b->media_ptr);
-> @@ -292,7 +292,7 @@ static bool tipc_udp_is_known_peer(struct tipc_bearer=
- *b,
->                 return false;
->         }
->
-> -       list_for_each_entry_safe(rcast, tmp, &ub->rcast.list, list) {
-> +       list_for_each_entry_rcu(rcast, &ub->rcast.list, list) {
->                 if (!memcmp(&rcast->addr, addr, sizeof(struct udp_media_a=
-ddr)))
->                         return true;
->         }
->
-> >+
-> >       if (ntohs(addr->proto) =3D=3D ETH_P_IP)
-> >               pr_info("New replicast peer: %pI4\n", &rcast->addr.ipv4);=
-  #if
-> >IS_ENABLED(CONFIG_IPV6) @@ -327,6 +340,7 @@ static int
-> >tipc_udp_rcast_add(struct tipc_bearer *b,  #endif
-> >       b->bcast_addr.broadcast =3D TIPC_REPLICAST_SUPPORT;
-> >       list_add_rcu(&rcast->list, &ub->rcast.list);
-> >+      spin_unlock_bh(&ub->rcast_lock);
-> >       return 0;
-> > }
-> >
-> >@@ -679,6 +693,7 @@ static int tipc_udp_enable(struct net *net, struct
-> >tipc_bearer *b,
-> >               return -ENOMEM;
-> >
-> >       INIT_LIST_HEAD(&ub->rcast.list);
-> >+      spin_lock_init(&ub->rcast_lock);
-> >
-> >       if (!attrs[TIPC_NLA_BEARER_UDP_OPTS])
-> >               goto err;
-> >@@ -819,10 +834,12 @@ static void cleanup_bearer(struct work_struct
-> >*work)
-> >       struct udp_replicast *rcast, *tmp;
-> >       struct tipc_net *tn;
-> >
-> >+      spin_lock_bh(&ub->rcast_lock);
-> >       list_for_each_entry_safe(rcast, tmp, &ub->rcast.list, list) {
-> >               list_del_rcu(&rcast->list);
-> >               call_rcu_hurry(&rcast->rcu, rcast_free_rcu);
-> >       }
-> >+      spin_unlock_bh(&ub->rcast_lock);
-> >
-> >       tn =3D tipc_net(sock_net(ub->sk));
-> >
-> >--
-> >2.43.0
-> >
->
+On Tue, Jul 07, 2026 at 05:32:10PM +0200, Petr Pavlu wrote:
+> On 7/6/26 11:29 AM, Sebastian Andrzej Siewior wrote:
+> > + MODULE maintainer
+> 
+> + Paul E. McKenney
+> 
+> > 
+> > On 2026-07-05 10:57:44 [+0800], Qingfang Deng wrote:
+> >> On 7/4/2026 at 12:32 AM, Breno Leitao wrote:
+> >>> On Fri, Jul 03, 2026 at 03:27:00PM +0800, Qingfang Deng wrote:
+> >>>> AI-review found an issue: https://sashiko.dev/#/patchset/D9C0245B-608B-4884-8A09-F55BA4A9F948%40doyensec.com
+> >>>>
+> >>>> An rcu_barrier() call is needed at the end of ppp_cleanup().
+> >>>
+> >>> I was initially unclear why rcu_barrier() would be necessary on a kfree path,
+> >>> but it appears to be required during module unload to ensure that
+> >>> ppp_release_channel_free() completes before the module's struct rcu_head is
+> >>> destroyed. Is that the correct understanding?
+> >>
+> >> It's required to ensure that all ppp_release_channel_free() callback
+> >> complete before the text segment of the module is unloaded.
+> > 
+> > So either a rcu_barrier() in ppp's module_exit() callback or a
+> > synchronize_rcu() instead of the call_rcu(). And all this because the
+> > module RCU callbacks pending which can be invoked after the module has
+> > been removed. There is a synchronize_rcu() during module exit but this
+> > is after the module code is gone.
+> > 
+> > I'm curious how many modules have a call_rcu() within their code but
+> > don't have anything to enforce its completion before module removal is
+> > complete? Wouldn't something like
+> > 
+> > 
+> > diff --git a/kernel/module/main.c b/kernel/module/main.c
+> > index 46dd8d25a6058..8eae1ea2d6eb4 100644
+> > --- a/kernel/module/main.c
+> > +++ b/kernel/module/main.c
+> > @@ -858,6 +858,9 @@ SYSCALL_DEFINE2(delete_module, const char __user *, name_user,
+> >  		goto out;
+> >  
+> >  	mutex_unlock(&module_mutex);
+> > +
+> > +	/* Ensure all rcu callbacks issued by the module have completed */
+> > +	rcu_barrier();
+> >  	/* Final destruction now no one is using it. */
+> >  	if (mod->exit != NULL)
+> >  		mod->exit();
+> > 
+> > make sense?
 
-Thank you for the review. I will look into your suggestions and send out v2=
-.
+There was some discussion of doing exactly this back in the day, but
+at that time there were many modules that didn't do call_rcu() at all,
+let alone call_rcu() with a function defined in that module.  And yes,
+there were performance concerns.
+
+Now rcu_barrier() has seen some performance work in the meantime, but
+careful benchmarking would be required to justify the above patch.
+
+That said, some automation would be very good, given that this sort of
+bug happens from time to time.
+
+> This is discussed in Documentation/RCU/rcubarrier.rst and
+> Documentation/RCU/Design/Requirements/Requirements.rst. The latter
+> contains:
+> 
+> | Loadable Modules
+> | ~~~~~~~~~~~~~~~~
+> | 
+> | The Linux kernel has loadable modules, and these modules can also be
+> | unloaded. After a given module has been unloaded, any attempt to call
+> | one of its functions results in a segmentation fault. The module-unload
+> | functions must therefore cancel any delayed calls to loadable-module
+> | functions, for example, any outstanding mod_timer() must be dealt
+> | with via timer_shutdown_sync() or similar.
+> | 
+> | Unfortunately, there is no way to cancel an RCU callback; once you
+> | invoke call_rcu(), the callback function is eventually going to be
+> | invoked, unless the system goes down first. Because it is normally
+> | considered socially irresponsible to crash the system in response to a
+> | module unload request, we need some other way to deal with in-flight RCU
+> | callbacks.
+> | 
+> | RCU therefore provides rcu_barrier(), which waits until all
+> | in-flight RCU callbacks have been invoked. If a module uses
+> | call_rcu(), its exit function should therefore prevent any future
+> | invocation of call_rcu(), then invoke rcu_barrier(). In theory,
+> | the underlying module-unload code could invoke rcu_barrier()
+> | unconditionally, but in practice this would incur unacceptable
+> | latencies.
+> 
+> I don't know if the last part about unacceptable latencies is still
+> relevant. I haven't done any measurements myself.
+
+Actual measurements would most definitely be needed!
+
+Alternatives include:
+
+o	Provide a patch like that above, but only execute the
+	rcu_barrier() in some debug mode.  If your code works when
+	that debug is enabled but does not otherwise, you add the
+	rcu_barrier().
+
+o	If debug is enabled, make rcu_do_batch() check the function
+	before invoking it.  If the function is not mapped, issue a
+	diagnostic, and don't try to invoke the function.  (But is
+	there a sufficiently cheap way to check for the function not
+	being mapped?)
+
+o	Make the page-fault code check this possibility.  (But it would
+	need to know that rcu_do_batch() was involved, which could no
+	doubt be arranged.)
+
+o	Make call_rcu() keep track of the fact that it was passed a
+	function defined in a module, and set a flag that caused the
+	module-exit code for that module to do rcu_barrier().  The
+	trick here would be doing this without unacceptable increases
+	to call_rcu() overheads.
+
+o	Some sort of static analysis that determines that call_rcu()
+	was passed a function defined in a module and either issues
+	needed diagnostics or (somehow) letting the module-unload
+	code know that rcu_barrier() is needed.
+
+o	One challenge for many of these alternatives is that the module is
+	already gone.  Maybe a KASAN-like trick that tracks the module's
+	old memory for some time afterwards?  Or maybe the user usually
+	knows which module was just now unloaded?  (Except for modules
+	being dependent on each other...)
+
+o	Your ideas here!!!
+
+							Thanx, Paul
 
