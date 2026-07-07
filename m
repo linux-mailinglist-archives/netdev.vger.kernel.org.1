@@ -1,174 +1,132 @@
-Return-Path: <netdev+bounces-305523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305524-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id AR6HLekmTWp8vwEAu9opvQ
-	(envelope-from <netdev+bounces-305523-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:18:49 +0200
+	id OLyoFhAlTWozvwEAu9opvQ
+	(envelope-from <netdev+bounces-305524-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:10:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4DDA71DC06
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:18:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD95571DB29
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 18:10:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=etsalapatis-com.20251104.gappssmtp.com header.s=20251104 header.b=NFwiFwUJ;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305523-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305523-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=jk9WV1lS;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305524-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305524-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 002023015170
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 16:08:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AFA8930146B2
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 16:08:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D45C4314BF;
-	Tue,  7 Jul 2026 16:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D957430CFC;
+	Tue,  7 Jul 2026 16:08:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF542367B85
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 16:08:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A983DC4A0;
+	Tue,  7 Jul 2026 16:08:53 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783440527; cv=none; b=RuzdOV2CY2hSroMSfk1GI0u/Xa1WFB344Kffk3lxCnoyxz3hatsGIrCzFel/CrEPrfRpMaax2lqJ/nap+WNXtdN4GwPHkgM79leAKcusLMJc+5wxjQ8QxZQyy36HvrzOFnAXgKvawUmXf8z1KF04+kQ1pcIvmFbridexgmUVjNs=
+	t=1783440534; cv=none; b=s62LW5rNo1hZDyNRrVIfLUwVvsSYMQ9bUkVt/JoF9CwvxpiUS3NB680EkByCUOU744R0hh9uDwsH4TTZrR3HzRdMsDH+tQ6KCyDXGVGzUUJkCx3GtlNhskiCns7XYWFf46b4dtbGKU/J34QFPU9lGn3aYVLn0uOxmY+inYprw6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783440527; c=relaxed/simple;
-	bh=gYxQlABoejgiGiTs0GRyEyflzw66+wYXuoHMbNI/GrM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=UcoFQh5cUJk2ilLJFPh7uN7PsbwTpMt+erAh2ifo/9oQwIbatKeCryzpcvBSKws9swx5/2vJjBfZZxPbme6BFxPFQ4eu3xnLenToVfPQYYcf35F+RTtZ552RG+nklODzY+OJhiSGkyUY0S6vFAfB2mtLLiDbMsfpkyfIXsuCcX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=NFwiFwUJ; arc=none smtp.client-ip=209.85.210.177
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-8482074a000so1707489b3a.0
-        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 09:08:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1783440522; x=1784045322; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-type:content-transfer-encoding:mime-version:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=cMBdmbNnt7rGb9jJRQ/x9X78dUBABwOU7eEiSX3Y2u0=;
-        b=NFwiFwUJDuLElpeLXlMcfWbWQwuWg7gzGSNfH+3OeeU1Lx0pzoXEsnBJcLN+yhU2CV
-         cFULfNpRHhD1MGGLnUJjPVUzNc/vuvaCLdDzJ6gdD0Mn5EMno9EfEV1e/IVSTKfVNlcM
-         78SQLM82LBHt3q0gEN18WScXXCT9dhovZ69VlTrzVVcDnon2AJKCffL9SkpbXtycgnyv
-         VpaT9z9F94qq9um/SbouFMQbAu7foU01PczPXbKdIS68CpyFlS20tReMeye8dYpOrbP4
-         ZLfMqSrEyvw1ui8MniJndKZoMZ+72SBxLx6r5BsQfMBPgBMxJ+4atZzbSDBblX6sWtY2
-         5kxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783440522; x=1784045322;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-type:content-transfer-encoding:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=cMBdmbNnt7rGb9jJRQ/x9X78dUBABwOU7eEiSX3Y2u0=;
-        b=r6xVA+D9HrtGZquLUoE4JZ9VNm0uGxIcVfm7jdoAuX1bxufgKVvFzI9pt53qaBYGXi
-         l/Chs4zadxp01g8JNKFSYEbDtRc3Rs6t4Q2YYHeJZN1t5vQgcyIPSb0LCENBK1rOHWB/
-         Mdmf89MlGp7iTp4TkAELvkHKMAuEdB2TKFNWOVaXl8LogSWVF4wB4CwL1RZUku20Hxq7
-         D4oPmCPMF0hyiE29CXirYabnOHp+k2zfXamhYMkrmVxn5Xah2FGf7CbnYI6u9mcy2LEV
-         RU9APYoIaY7eoYGTh0HRr+z1sHEZ/UIPyDXIsPoDohhwufCItY1J5ULDYpv4DsKJm6iG
-         pmFw==
-X-Gm-Message-State: AOJu0Yzwv7Ri+SMg4KUMWaMzpnYzhmOMs3s4XPBzoPtukb5N4h3G9gTC
-	d1qiSPcanZjgzgnZoRPK57RCaJeg6Qf4WVFWdK9ZSLuEpTIvz9hnPM3ks1HesjL239I=
-X-Gm-Gg: AfdE7ckD+u9AG6hLySMiJs6f7s9Q5qb9HcW6YcC5uugeJDLn0oozmhKSYFlAKEtIcwW
-	PaKwoao5SeHk6WGVwwdeMWjApUXiLdqBjxdd9ixSzolEfZ2Srp3DkBneQDq9+2FFV0csWw1jcU7
-	3d2v1dEhxsIzuw15S84TS6p+shg/NZA4c0Twb+uaYCPc0HtRwVucDjg8hSKJRxaougV+CnMSlL3
-	3G31uJzBpyawq2x3UwGomiRIHuCnlbKpyQLIaSygePDnto0ZPn5xB0FUs3FHOaDw4RdD0yf8COl
-	peuTlGC22q3jLpsy56pb27GEa6PRoQlI3mSBeSpyeaQ101G8B2CDkjUyJowW6R5C9V5b3vyscsM
-	jQk1ZoDf6xFr69jIThm7Q75WFoxJxAlo4dPZEGRZwU6aDCKEXCdFTAgghcCbFy6wn7hIxWrJYYx
-	vR/UDxDukwSyUeqhJLUbOAtHg72i61R3tpB7Vl/w+QfcxWrPjPZ1FY
-X-Received: by 2002:a05:6a00:987:b0:848:2f74:1d59 with SMTP id d2e1a72fcca58-8482f74207emr3285927b3a.63.1783440521110;
-        Tue, 07 Jul 2026 09:08:41 -0700 (PDT)
-Received: from localhost (107-190-31-17.cpe.teksavvy.com. [107.190.31.17])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-847f6bc9f5dsm5702549b3a.27.2026.07.07.09.08.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jul 2026 09:08:40 -0700 (PDT)
+	s=arc-20240116; t=1783440534; c=relaxed/simple;
+	bh=xtHMEG1TCejI8D4pEoh7MRQLg5UbMQHhYQUdiHQHI3I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rIGnKRVHI2kjIc/PjrUXlqUCCgC5RPaEDMJf6GwYxm7tfV6z2sfqE3GCwhWZmvYeWletH7ooCAoXEE1WuRsrqFDYkm1P5RWBy4xBfKVQUFoZKOJ6YKOrC3s8x8VAMFH9RsZ2oDS7TC6yw0VYZsViWSfxYfKWhIObkLDihhPejhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jk9WV1lS; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 640491F000E9;
+	Tue,  7 Jul 2026 16:08:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783440533;
+	bh=xtHMEG1TCejI8D4pEoh7MRQLg5UbMQHhYQUdiHQHI3I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=jk9WV1lS6vKOQaZZbkVIjbi/Ew2VREc4kAnJoUPb7NkCB85HnllzL5Ra0XyuRKQ1/
+	 CVg/6rPW0AAjyNUq17snGujS0X8Ot+xQWqhdM7f8e0AHWx/BberVp1t4ydXlXJYTCh
+	 CsBmaWELwJ18mqbcY6Wsvz7tfzhBRx3VCixAPWOANcUDJkh3n+6Kcm2Blvppq5njXR
+	 FzNoWstQnv44+lDVAUQx48fS4949T2qsc8605vQfMXTqsZscWL18Av++X1G7azR8Tv
+	 8Rc+CBVgv8I5Ra1HY5MD9fK+YtU3mKi//17qZkSXXoYzQXhPkVhtposnj8atD6lXjd
+	 eGP0NQvu7/MWA==
+Date: Tue, 7 Jul 2026 17:08:48 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Jorijn van der Graaf <jorijnvdgraaf@catcrafts.net>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, David Heidelberg <david@ixit.cz>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
+	oe-linux-nfc@lists.linux.dev, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: nfc: samsung,s3fwrn5:
+ add S3NRN4V and clk-req-gpios
+Message-ID: <20260707-purr-pucker-b9e8dd8dc9c0@spud>
+References: <20260705190621.128257-1-jorijnvdgraaf@catcrafts.net>
+ <20260705190621.128257-2-jorijnvdgraaf@catcrafts.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 07 Jul 2026 12:08:38 -0400
-Message-Id: <DJSGWFQ1Z86C.214O720ENTA1D@etsalapatis.com>
-Cc: <netdev@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>,
- <ncardwell@google.com>, <kuniyu@google.com>, <rostedt@goodmis.org>,
- <mhiramat@kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
- <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] net/tcp: Add explicit tracepoint for
- tcp_syn_ack_timeout()
-From: "Emil Tsalapatis" <emil@etsalapatis.com>
-To: "Eric Dumazet" <edumazet@google.com>, "Emil Tsalapatis"
- <emil@etsalapatis.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260707010151.43976-1-emil@etsalapatis.com>
- <CANn89iL23Rsu3iGXxhw4pAnCB-JgU7fnrryDLXKj4jHqSs=HOw@mail.gmail.com>
-In-Reply-To: <CANn89iL23Rsu3iGXxhw4pAnCB-JgU7fnrryDLXKj4jHqSs=HOw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="22Mwl49F0l+F6eKI"
+Content-Disposition: inline
+In-Reply-To: <20260705190621.128257-2-jorijnvdgraaf@catcrafts.net>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-5.26 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SIGNED_PGP(-2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-trace-kernel@vger.kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,m:rostedt@goodmis.org,m:mhiramat@kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:emil@etsalapatis.com,s:lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305523-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
-	DMARC_NA(0.00)[etsalapatis.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER(0.00)[conor@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_RECIPIENTS(0.00)[m:jorijnvdgraaf@catcrafts.net,m:krzk@kernel.org,m:david@ixit.cz,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:conor+dt@kernel.org,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:conor@kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305524-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,etsalapatis-com.20251104.gappssmtp.com:dkim]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,spud:mid,microchip.com:email,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A4DDA71DC06
+X-Rspamd-Queue-Id: CD95571DB29
 
-On Tue Jul 7, 2026 at 3:52 AM EDT, Eric Dumazet wrote:
-> On Mon, Jul 6, 2026 at 6:01=E2=80=AFPM Emil Tsalapatis <emil@etsalapatis.=
-com> wrote:
->>
->> Clang can inline the tcp_syn_ack_timeout() function during compilation,
->> making it impossible to use kprobes for tracing without preventing
->> inlining. Add an explicit tracepoint to it instead.
->
-> So much copy/pasting for a very small issue :/
->
->>
->> Signed-off-by: Emil Tsalapatis <emil@etsalapatis.com>
->> ---
->>  include/trace/events/tcp.h | 72 ++++++++++++++++++++++++++++++++++++++
->>  net/ipv4/tcp_timer.c       |  3 ++
->>  2 files changed, 75 insertions(+)
->>
->
-> tcp_syn_ack_timeout() is hardly a fast path, so you can instead:
->
-> diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
-> index 322db13333c7..ab2c3de19e46 100644
-> --- a/net/ipv4/tcp_timer.c
-> +++ b/net/ipv4/tcp_timer.c
-> @@ -748,7 +748,7 @@ static void tcp_write_timer(struct timer_list *t)
->         sock_put(sk);
->  }
->
-> -void tcp_syn_ack_timeout(const struct request_sock *req)
-> +noinline_for_tracing void tcp_syn_ack_timeout(const struct request_sock =
-*req)
->  {
->         struct net *net =3D read_pnet(&inet_rsk(req)->ireq_net);
+--22Mwl49F0l+F6eKI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Sounds good, I will respin and just mark it noinline.
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+
+--22Mwl49F0l+F6eKI
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCak0kkAAKCRB4tDGHoIJi
+0hLiAQCalXgHa4e8d6O5afFL59JI421HoDHDPn7f0Z/b2dxWGgD/XW0WuSId5uve
+i4mcqO4b3vUScmWctGMq9EeyXOODxwo=
+=gEEu
+-----END PGP SIGNATURE-----
+
+--22Mwl49F0l+F6eKI--
 
