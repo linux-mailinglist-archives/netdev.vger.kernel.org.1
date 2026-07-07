@@ -1,222 +1,256 @@
-Return-Path: <netdev+bounces-305320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305337-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zi1qC7W1TGoZogEAu9opvQ
-	(envelope-from <netdev+bounces-305320-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:15:49 +0200
+	id OrULFRm+TGozpAEAu9opvQ
+	(envelope-from <netdev+bounces-305337-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:51:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92544718FAC
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:15:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9DBE7195E8
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:51:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b="i0Q/ZS+p";
-	dkim=pass header.d=redhat.com header.s=google header.b=R4ZMIzYb;
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305320-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305320-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=NXP1.onmicrosoft.com header.s=selector1-NXP1-onmicrosoft-com header.b=gMSRLXcs;
+	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=nxp.com (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305337-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305337-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F01263003502
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 08:10:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B468A302835F
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 08:46:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D31FF2DF717;
-	Tue,  7 Jul 2026 08:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F73F3290A6;
+	Tue,  7 Jul 2026 08:46:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013007.outbound.protection.outlook.com [52.101.72.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE7E175A91
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 08:10:17 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783411818; cv=none; b=cRFNCY/79wEKXwMHp9g5neebUpaXuFC4LZWvKgH5dIkh6YUEifHNPEFnQbMs7J4fdGNt7pCyoq0LesEGKwb/13eG+u7RMqorF+8uaZfPXnycd+urWh4mhDiI7ivmWgd8H5I3cTZ3nV0udc8TGbe3Fydq8tETd/ss6ZAqQeH3nyQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783411818; c=relaxed/simple;
-	bh=TGcYGBPVrAQNAFzB06db+eO7Nd9fUC6S3B/Q6n9QSec=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hIhTBrKDeDCnlyb3kk1Zzz5BSoGRNSnbutvifjodO58hFXJqAksHmRTehMrJj+zoAR3xqxL+wX4kaX5nYN4S8m33MhK02u0KT8en1dgxqogE5eh9mteqQMikOcv7a0mib53RfImagwHNb1jMsH7HVRh5b0Khed3uOktPUFtXowg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i0Q/ZS+p; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=R4ZMIzYb; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783411816;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fwIuBnltJjcVH05UvK/HPdvAPa4OwSH5BV+mf/t4vPM=;
-	b=i0Q/ZS+pvlJ2dfBk3Q933l1PYMWqqfLZEZf8nSku2vZeQoemRee9gpgHQBvbRQiQWkzm0f
-	OQ5Qo5WStCdICiAtMbAnI4MwsnEKJ9SzieGuQo9cR2+j6v8140xzE4c/KO+mXNP9O83uTX
-	J7a9nCAWTHKlzcAW2JmzCcF020RPIR8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-522-LWOqDbwYP02qeWrXXf_fWA-1; Tue, 07 Jul 2026 04:10:15 -0400
-X-MC-Unique: LWOqDbwYP02qeWrXXf_fWA-1
-X-Mimecast-MFC-AGG-ID: LWOqDbwYP02qeWrXXf_fWA_1783411814
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-493e0042895so3096935e9.1
-        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 01:10:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1783411814; x=1784016614; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=fwIuBnltJjcVH05UvK/HPdvAPa4OwSH5BV+mf/t4vPM=;
-        b=R4ZMIzYbMfyE6BDOpvLXvVnhivKWK+aepEIY+9RHnAsl+7X1u30816f4QYRH0l34pg
-         WuEuFLfR9sk6sFnzUXBqSRb8ho6IfVCiWcZSBBvazhRdcwQuLtLWpn49JL8KG3ql+XB7
-         lvSoouTzIE5IHPuJT5YmfYVaEkGLizKbeZDaIOgioavRKKhrtCmevh6jjGr3ctJYSuAR
-         zYlp8x5jTsuzXX1dqrd7FY9kSDurtHoV4Y9uytxhAaoIUo/E2ly7a3keEbvHvXxqq6oo
-         ivb8t9fBdzGPHJ5NY+2RoeXyWRQpoaCGQXjePpW/m8HoEzg29nRN4MZdkfDmdD33MEOH
-         O5BQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783411814; x=1784016614;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=fwIuBnltJjcVH05UvK/HPdvAPa4OwSH5BV+mf/t4vPM=;
-        b=awMJIsLiMrt2w+TXiDXg+pjPIdLKtvn0+rOUAHA/jXCGTVsqEAu18f1ijSEP0fPMeY
-         nqwoKaZ1AqY6FMH44R0xAYUirMZzTUr2zC0HQyzJLwVMEEbq+fwHoFfm6NDJA6dbBRKm
-         wyfeYXBioD8hrHdKq1zM3mY+2/WAHrxk3M2AorMsslYpSLGrNK1HxSIujrDYr5qtMSlN
-         0BedkOhizjRJyP4/dYqj0CiCuWhaxJ2aPnz0LuxoLd+g+2ODu+J7ksidNRx5cpWM7j3Z
-         iChjCgxRJpJHjxvT0sboBJS8psZZL4P4sBm9vk9iVX9P2XP3sNRupf6XsCnobih6/way
-         VLEQ==
-X-Forwarded-Encrypted: i=1; AHgh+RrlkHMKU3fOyN+j5dPV1bsWOfvP0k0nORYorA0dv5d0PdnXNbCKB7gJQNQ7x6F6tBmTfJHrg/k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXgWVJ4+YnyBjn6ZcjFZ7+tpyRNy21d/hSvsOCl3IkZ4EexRdQ
-	bGutjKxu28NEuoAP6nITaaBK20zjO1WMSeIFN55ot6F9PK7pVae4e6D4Xryc4l0BfXXeA8AnnZi
-	GHkI9GFNN1F5bBFMc1ebtyD3TjuzJZpl0RDni/YUlDXXcPDlVrT0VZNulRg==
-X-Gm-Gg: AfdE7ckxp0u4Cqnx1oEHAFNKVKewcm8iN53rS9bxHz69sG3vaJnzLwJAO80KI4UJQt0
-	AhR/IZEfkKedp3wwN5xzmhP0NTjqpA/Gl+vOAioxPUwJXsJCj9UvpkFSidHHtX7U9RMljSB9+QL
-	fSy+lz1NAobk2tUe6AMspbd3jZeCJylee44GdzthYZI9h/9I0AeUmFzoAXyci0sSP2xVsmQvsWC
-	DH022HIDGQmaaIe/DE2R0m9Grp8E0liFUi6jS7Qim7kdqLr6xvlUKiNNW2ZKzJfIwHlTdpRi8KR
-	mDR3IAQ+8FmKk0OKyFIm4UQHkUtpkmkl80IJ7ZlYxAqVWKVMvgGBZufyVMs9slcgYYXXE9EK5Sa
-	gu5KDPvFz58UIpk94pyLWGKMLph9BkcSFS431OUhbVTdzEg2nShl3DlMCU8KuhsHoRJawn/0e6R
-	l8R2471F5yfYKM
-X-Received: by 2002:a05:600c:5395:b0:493:a5d0:d1a1 with SMTP id 5b1f17b1804b1-493df076a4bmr43339055e9.31.1783411813595;
-        Tue, 07 Jul 2026 01:10:13 -0700 (PDT)
-X-Received: by 2002:a05:600c:5395:b0:493:a5d0:d1a1 with SMTP id 5b1f17b1804b1-493df076a4bmr43338525e9.31.1783411813089;
-        Tue, 07 Jul 2026 01:10:13 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:5521:6b10:58fd:68f:7756:389d? ([2a0d:3344:5521:6b10:58fd:68f:7756:389d])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493e0ebf593sm39085795e9.0.2026.07.07.01.10.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jul 2026 01:10:12 -0700 (PDT)
-Message-ID: <1f4c7607-007d-49e8-b3bc-d1fd8034c570@redhat.com>
-Date: Tue, 7 Jul 2026 10:10:11 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1C4F328260;
+	Tue,  7 Jul 2026 08:46:49 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783414011; cv=fail; b=qyYHuFX0WgrzxjbHPyjw5vmWoNu/umZ1CI73QYk/j+iHNiIUqhDW/Ev5UFDJa+bY+n8lZfTGBa8qy38PLoFKKwrSIGdUs19h4emvDxiHAOcTVSCDgmZc6frHbkaTMhrl7YUaZVjgUBuU4TkAn/ciyqZAvinllu0RFJK4X+Xmvnc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783414011; c=relaxed/simple;
+	bh=gNVVafJDL4KbuE7WKS7zKOCtl3XyKLynmdckTHaqOUk=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=X4VXizWV540CYLD7aVFl5q7mboGEobgMQT3OYpxtNUKSjpz0cYim9jcn5jwrtGacGPUytp7ml8D9/KMzZCCJhoJ86sCHaP7nP2zlGoULTNOACK+3/XzDcuCRr2Eauj6ERa1a3arPjCA6raeOr/7Gz+ekx/JeL31g0OIycfIPPM8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=gMSRLXcs; arc=fail smtp.client-ip=52.101.72.7
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=tJac1pqNnqhJ34oyd7oX5H+x72P/d/65+D4PWv7DZe4W7d2xbMr1FEUqbg1clATxQnTchsDLwzkygzX/FMAhgaJqZPhAPdxuFof6Gp2I+I9GgFY9ZW5Qi5UQaIKN0r8kyasp+vq84TnuRQiJs/n+m6jLfCl/KGwqKFxh1ecouXOlTmntBcG1lC5i3tx49f/GgjUSEhPRqO0nDdZbIvEzIHqIQeXifXNR9WtzIqcNSe4vRX6sDlNUO570gDBGDu9OGpC/HiCMK/23Ws7eF/U+emijpe5aqRVmEFg19jShVvf/ffLT/kTijlo/lNfEKjEWHHQq37jVX9Zt3lVBnoR4+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VgPnzfXMfKg4CJENz6fu8LczSELELf1lTHmWEHwhssw=;
+ b=p5Ac9OBvMFcu66ObPykaYKatOObHakI7rWUdEwXVK1FO5ZMwodLxMcFVjzss85iyrcywn8jehaUaS/abX3K7H4L5HCuWcy5XP8sbSxdvPt5LHDwmYuW/5PNL6GwOJS2/A94daHJVRh+iQPBnCHDxpNDMX6DYI+kHJY+jXNjpBJF7p8/k/jiyFSirjgDqQGAD8St2j0QvVU1WptrZW1bjvNJWBOKyy8r7y96X4s7ZnqQsRpkZZ/DS9rZkuTw+oXAzkmqf/CbThubgMBM0S73lPJRb8SiAhpLbwEEea0tFRy9gwRwr9pnyUQjabgluTPEPSE1LzqOEXSbd8AWL2SXC7Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector1-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VgPnzfXMfKg4CJENz6fu8LczSELELf1lTHmWEHwhssw=;
+ b=gMSRLXcs6fbuEBDPTRr0EDubFqkV8S1UkJxjD2zqE74JD6aDHfybnxKXRNyMlmRFMLFxcVH2y1fg30xBjpZN0BgtMVaRRAN94QwoA3v1HqDIgtkUhcWWFXlCxMo/IyouERPd94gnJSdWyUeXZepL/eqLB9XlTBWWUZrN3En+3ovyYHKXjRBuF5m/WzcVm5bFKovDjTuGcvZARxZxkwgmw9xWUID0LEAGyySLf6mPhmGxD1OSqbSk5LLPM2RJFu5ptI68i6wOURsfmHBXmLyZKxI/4j/VQNUxyrAIxVzmQ8ZvgV9CB4K6os+bgyRCoZ0MBqDoz96F+m8uQHOvx0jBow==
+Received: from VE1PR04MB7216.eurprd04.prod.outlook.com (2603:10a6:800:1b0::22)
+ by VI1PR04MB7182.eurprd04.prod.outlook.com (2603:10a6:800:121::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.13; Tue, 7 Jul
+ 2026 08:46:45 +0000
+Received: from VE1PR04MB7216.eurprd04.prod.outlook.com
+ ([fe80::a9a5:cf83:dbe8:1f74]) by VE1PR04MB7216.eurprd04.prod.outlook.com
+ ([fe80::a9a5:cf83:dbe8:1f74%3]) with mapi id 15.21.0181.012; Tue, 7 Jul 2026
+ 08:46:45 +0000
+From: wei.fang@oss.nxp.com
+To: claudiu.manoil@nxp.com,
+	vladimir.oltean@nxp.com,
+	xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux@armlinux.org.uk,
+	wei.fang@nxp.com,
+	chleroy@kernel.org,
+	maxime.chevallier@bootlin.com
+Cc: imx@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH v4 net-next 00/14] net: enetc: cleanups and improvements
+Date: Tue,  7 Jul 2026 16:18:20 +0800
+Message-Id: <20260707081834.710730-1-wei.fang@oss.nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: MA5P287CA0204.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:a01:1aa::16) To VE1PR04MB7216.eurprd04.prod.outlook.com
+ (2603:10a6:800:1b0::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/tls: Consume empty data records in
- tls_sw_read_sock()
-To: Sabrina Dubroca <sd@queasysnail.net>, Chuck Lever <cel@kernel.org>
-Cc: john.fastabend@gmail.com, Jakub Kicinski <kuba@kernel.org>,
- davem@davemloft.net, edumazet@google.com, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org
-References: <20260630191551.875664-1-cel@kernel.org>
- <akaoXcfamBp8_mYe@krikkit>
- <0a03d16e-d4ce-422d-9492-3e31d910d8e5@app.fastmail.com>
- <akbdFcQP7oTp_n3s@krikkit>
- <d036b6fa-4f53-444c-b376-83e122982f1d@app.fastmail.com>
- <akyxoZTzhNl7XCEG@krikkit>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <akyxoZTzhNl7XCEG@krikkit>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VE1PR04MB7216:EE_|VI1PR04MB7182:EE_
+X-MS-Office365-Filtering-Correlation-Id: 45d2ded5-5cc5-4792-d6e7-08dedc044657
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|376014|23010399003|7416014|19092799006|56012099006|6133799003|11063799006|18002099003|921020;
+X-Microsoft-Antispam-Message-Info:
+	ezb7ZCQN8mm7gY54HrozLnnqpv7Rj/lraoBXjXh9owygq1P8Jl1B5kXqa8peaa8cXyWueSj4AyBEmlqPPcJL32IlHCqeyv2YWAemHruVu4/VA6rkRNEDP02ijdGxWDja2B7fDoDYAXBpvCYoKkleYTfjN66ROOqiT6V92i9Tq82Vt+jLMVpPzwMXZ+8WPubWj6yof9THue4VxLMFgSf/1FAsLX4zFY4QxSzeN8ob1xj5gB4gPaIGEYc6xVBAfkHf/PFeDokM1ZIC6tK2chy+WIg8dXMxNBoKx4oMUxbPXUUpi7JjkGF67tbAL36N+NEKKTltGTkCGqS8txqUqTIb8d088hTJml92k71bgx1s0LT0BJ8Ps+eHdHBQK2VuTOU7HZ0ZVJ6nUCfd2VLqcEl3lDABU2I2HlzC2/5I6XDQUjUgxrJdgfzBZGkSOe46iOJCQR8xv1Ung+/siBnWVVpkv5mPsQnRi5YUlxi03kP668iFpf827q/yfuzo6Qrvmw7bQtSd6QrkGD41tafXxTcnXc+HpQKpk4Krt5GgprGJ822SxxCVD385WJ7jF3zI1MHm88ASlHW4m8sbZ5IDA0VUTXN2ig/5D5edBQllQZaxsL4vOiMdQzPi0uSSQi+w+A79HHbEIA5mEdC6luRrPww3QA9hyvOECKnMAw4J6n1wzScrIO5metQaPL0sB1ozLW4v6K7vtIal5SnnK1czC09cTQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB7216.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(23010399003)(7416014)(19092799006)(56012099006)(6133799003)(11063799006)(18002099003)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?lJNOUuUAc2qg7gdolJJ+N08fxPlADZxnOgpdVr031f/pEe/8rO+5mxB7D48N?=
+ =?us-ascii?Q?FqqAVTrkvmDZOpln8aXiL2zaXXOhog2jYg7hcMHlU1qRf+ivceVAfJGsC3/I?=
+ =?us-ascii?Q?xKSXGmXIZDBH3f9RBmVFODVzi+YHFckAgl2YnV8bVEsZi4kofqvx1FFvVwl0?=
+ =?us-ascii?Q?kemDdx8s17qgBhQtdzVwlWdpb1wABw0mjeVmK6/C1z/eou4s2leSC/xfeJMp?=
+ =?us-ascii?Q?WZkaF10uE8vUOp0i09oCpBlqRXSmO3T1Y3BY1luJUZwLDWL7yokbiVgWz4nR?=
+ =?us-ascii?Q?z9Ocz9w/LSWiV9Rjb3hdfAIS5WLMlWz5rJ7UvlFPBIxXnU0FA0DStTsJRt0k?=
+ =?us-ascii?Q?DOMiIJsky6ygWuNyPsiR8lQBf0/gSoTh2oZfBjZsq+N2F9vwppVLwzjT/vRI?=
+ =?us-ascii?Q?wmT6RiM9Aq4BaeS8l+9nw4PNoyFVxXR5PBXHhtDbNLhiZvksta3UENpiItnG?=
+ =?us-ascii?Q?XUBCAG5H5DQjnKQI7mwfDF+o5iB70Gy1ob8W9HKrgtJD2tXN8KAaw/aUss2D?=
+ =?us-ascii?Q?HmCevKphScXANszESqLWxj2dDLTCOQOVRiDgV4gyqMTHjlOTlbEkbW4q9hDf?=
+ =?us-ascii?Q?G/EctVf0H/39EkflOgLv4EvYYV3v/jHhlCwN3LxBICIWmD66MgXQrWAAdVRD?=
+ =?us-ascii?Q?6iWTx3XK3iNKogpro8aQkQC230ZUT0+3rJg/TENf6Ays9PwBzUsuM3oKYrPu?=
+ =?us-ascii?Q?BLsEA+B3ZLzy8EG2ke5ek7v7/mslPGhV42zwfOihQsyKtMLfWeYDehEDByT2?=
+ =?us-ascii?Q?2Ugj5nHdTdfmipk2OkjP1ZSWAoFcxqRS5x2aiEa/Ln7xRcvq603pG9X/egPo?=
+ =?us-ascii?Q?UyRQR7ED+q1ee/VZjM5X5M2ZBCm5K4ZOkphlyMEfMx7eEy78pnZ7Vzh7DBvc?=
+ =?us-ascii?Q?59rPcjpeKJMKquJinp42h6da2qYWEW0e/7VfvCmY8YaPqdixewm6OAjkE1Qb?=
+ =?us-ascii?Q?qXikEA3c6ela0iRsWhYFvK8CQ6dO/OIHlAau80NTHw9uN+bSoCXjOy5vGt6O?=
+ =?us-ascii?Q?prSCf4rO4COh9bsRX9Sc9TxeO7sNn1yzAZmE+nobNthuQBgm2LcJQkc2Xh20?=
+ =?us-ascii?Q?7P+yqJHMbvlXHMuHKH7SmzdNyQqP2geN4JZnYGAUkku8QLl+nPB4aNEimKUr?=
+ =?us-ascii?Q?JNG3IG3DmviHbVlD0PD+xmRpEv23wVmyRxoEr9FL5xh+6pGX08lvHLFAhhKf?=
+ =?us-ascii?Q?9QoNQbleHzewh6IpnX+7mWGEMVMW/vtGqgDCrYU9si/1uqKoa8j/R85WapHJ?=
+ =?us-ascii?Q?Hz3gTkp/JgWsO14HAR9iwTBcbK8IMS4jc0HXPGVBYGU0IJnCbENbXgQay228?=
+ =?us-ascii?Q?JwVmxzyhmVkp4pGj4Y6Nq9kNzpdDKQaeZZq4xvIT7FkqpjpGbgJ7O+GHEtlH?=
+ =?us-ascii?Q?UHvmFeL8j11IHmoNXhQ5Vz16Za0U+F8iwd6jy/GMm6eJbLqHmPrmzco33MAh?=
+ =?us-ascii?Q?1KkNIyGhIuw23zMfzAopJ8GORNOfDlzHSbNe4qSCffvnMd2KTOch8WWdl4O/?=
+ =?us-ascii?Q?AaEeoM2RI36e+mg+zPSw4Pa9zyCQIzeRUJPHA+zTI2cckbh/8K8yLXZ4a6Ov?=
+ =?us-ascii?Q?kr98e9PLUGbzh0CYUV93EC7RxDbLSaHkYyGkYhWFlvNP3gLZZnAqTd8vvBqR?=
+ =?us-ascii?Q?s4vg4wrpz510YXZIZ2LbOaUzC/IBPjJkfT0nXUHr4a+KABoslMma4h/MP/3I?=
+ =?us-ascii?Q?DPPLPBzORcukLXZ/NJvuFDkSadBF3prtMeRUr9NGwYgZQ+LH281Wpw24+N5r?=
+ =?us-ascii?Q?Qaf3dcRcXvyCGgPoE9mHPqH2B9L1xGXiq4czTH4aYZv8MKUtstFt?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 45d2ded5-5cc5-4792-d6e7-08dedc044657
+X-MS-Exchange-CrossTenant-AuthSource: VE1PR04MB7216.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2026 08:46:45.4544
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: n2DuEGJf+liqkbcieDvqsn9vqQ3/+6MVuImymsG2sfepajDrTwjNxsq9JBRVtfTUtH+7/eVWsisDtJ3bQHlkUF9ANrftbrKqhQfpA30TU7pIl1Y9VEKtjT94wgvGsylE
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7182
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [3.44 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[NXP1.onmicrosoft.com:s=selector1-NXP1-onmicrosoft-com];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-305320-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-305337-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:sd@queasysnail.net,m:cel@kernel.org,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[wei.fang@oss.nxp.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:claudiu.manoil@nxp.com,m:vladimir.oltean@nxp.com,m:xiaoning.wang@nxp.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:wei.fang@nxp.com,m:chleroy@kernel.org,m:maxime.chevallier@bootlin.com,m:imx@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:linux-arm-kernel@lists.infradead.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@oss.nxp.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[NXP1.onmicrosoft.com:+];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NO_DN(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[queasysnail.net:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oss.nxp.com:mid,oss.nxp.com:from_mime,NXP1.onmicrosoft.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 92544718FAC
+X-Rspamd-Queue-Id: A9DBE7195E8
 
-On 7/7/26 9:58 AM, Sabrina Dubroca wrote:
-> 2026-07-06, 15:16:21 -0400, Chuck Lever wrote:
->> On Thu, Jul 2, 2026, at 5:50 PM, Sabrina Dubroca wrote:
->>> 2026-07-02, 15:52:49 -0400, Chuck Lever wrote:
->>>>
->>>>
->>>> On Thu, Jul 2, 2026, at 2:05 PM, Sabrina Dubroca wrote:
->>>>> 2026-06-30, 15:15:51 -0400, Chuck Lever wrote:
->>>>>> A peer may send a zero-length TLS application_data record; TLS 1.3
->>>>>> explicitly permits these as a traffic-analysis countermeasure (RFC
->>>>>> 8446, Section 5.1). After decryption such a record has full_len ==
->>>>>> 0. tls_sw_read_sock() hands it to the read_actor, which has no
->>>>>> payload to consume and returns zero. The loop treats a zero return
->>>>>> as backpressure (used <= 0), requeues the skb at the head of
->>>>>> rx_list, and stops. rx_list is serviced head-first on the next
->>>>>> call, so the empty record is dequeued, fails the same way, and is
->>>>>> requeued again; every later record on the connection is blocked
->>>>>> behind it.
->>>>>>
->>>>>> tls_sw_recvmsg() does not stall on this: a zero-length data record
->>>>>> copies nothing and falls through to consume_skb(). Mirror that in
->>>>>> the read_sock() path by recognizing an empty data record before
->>>>>> the actor runs, consuming it, and continuing.
->>>>>>
->>>>>> Fixes: 662fbcec32f4 ("net/tls: implement ->read_sock()")
->>>>>> Signed-off-by: Chuck Lever <cel@kernel.org>
->>>>>> ---
->>>>>>  net/tls/tls_sw.c | 11 +++++++++++
->>>>>>  1 file changed, 11 insertions(+)
->>>>>
->>>>> Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
->>>>>
->>>>> I think tls_sw_splice_read() suffers from a similar issue (returning 0
->>>>> even though more data may be available). Sashiko agrees, and also
->>>>> found a few more pre-existing issues.
->>>>
->>>> Do you want a v2 series with those issues addressed?
->>>
->>> I'd be ok with this patch going in on its own, and the other issues
->>> being addressed separately. If you have time to look into those,
->>> that'd be great.
->>
->> patchwork shows this patch continues to be marked as "New". Is there
->> something I need to do to help move it forward?
-> 
-> I don't think there's anything blocking it other than the length of
-> the maintainers' backlog.
+From: Wei Fang <wei.fang@nxp.com>
 
-As noted yday:
+The first group of patches (1, 2, 5-7) eliminates code duplication
+between the ENETC v1 and v4 drivers. Since both hardware generations
+share identical register layouts for MAC promiscuous mode, MAC hash
+filters, and VLAN promiscuous mode - differing only in register address
+offsets - common helper functions are extracted into enetc_pf_common.c
+and shared by both drivers.
 
-https://lore.kernel.org/netdev/c0cd72bd-6298-47a4-82a3-c43811c98063@redhat.com/
+Patch 3 converts ndo_set_rx_mode() to ndo_set_rx_mode_async(), removing
+the dedicated workqueue that was previously needed to defer MAC address
+list updates to a sleepable context.
 
-current patch processing capacity is limited.
+Patch 4 replaces counter-based MAFT entry tracking with a bitmap, which
+keeps hardware and software state in sync and avoids partial failures
+during entry allocation.
 
-I'm processing this one right now.
+Patches 8 and 9 fix phylink-related issues: removing invalid code from
+enetc4_pl_mac_link_up() and properly differentiating phylink capabilities
+between pseudo-MAC and standalone MAC.
 
-/P
+The remaining patches (10-14) are minor cleanups: removing a redundant
+VLAN promiscuous mode initialization in probe, using the PCI device name
+for the debugfs directory, simplifying port speed configuration, removing
+a redundant num_vsi field, using alloc_etherdev_mqs() for the VF driver,
+and using kzalloc_flex() for a flexible array allocation.
+
+---
+v4:
+1. Improve enetc4_set_si_msix_num()
+2. Update commit messages
+v3 link: https://lore.kernel.org/imx/20260703101328.550714-1-wei.fang@oss.nxp.com/
+v2 link: https://lore.kernel.org/imx/20260702025714.456233-1-wei.fang@oss.nxp.com/
+v1 link: https://lore.kernel.org/imx/20260630072036.382761-1-wei.fang@oss.nxp.com/
+---
+
+Claudiu Manoil (1):
+  net: enetc: differentiate phylink capabilities for pseudo-MAC and
+    standalone MAC
+
+Wei Fang (13):
+  net: enetc: extract common helpers for MAC promiscuous mode setting
+  net: enetc: extract common helpers for MAC hash filter configuration
+  net: enetc: convert ndo_set_rx_mode() to ndo_set_rx_mode_async()
+  net: enetc: improve MAFT entry management with bitmap tracking
+  net: enetc: use PCI device name for debugfs directory
+  net: enetc: simplify enetc4_set_port_speed()
+  net: enetc: remove invalid code from enetc4_pl_mac_link_up()
+  net: enetc: open-code enetc4_set_default_si_vlan_promisc()
+  net: enetc: refactor SI VLAN promiscuous mode configuration
+  net: enetc: move enetc_set_si_vlan_promisc() to enetc_pf_common.c
+  net: enetc: remove redundant num_vsi field from enetc_port_caps
+  net: enetc: use alloc_etherdev_mqs() to create netdev for VF driver
+  net: enetc: use kzalloc_flex() for enetc_psfp_gate allocation
+
+ drivers/net/ethernet/freescale/enetc/enetc.h  |   4 +-
+ .../ethernet/freescale/enetc/enetc4_debugfs.c |  42 +-
+ .../net/ethernet/freescale/enetc/enetc4_hw.h  |   6 +-
+ .../net/ethernet/freescale/enetc/enetc4_pf.c  | 471 ++++++++----------
+ .../ethernet/freescale/enetc/enetc_ethtool.c  |   2 +-
+ .../net/ethernet/freescale/enetc/enetc_hw.h   |  12 +-
+ .../net/ethernet/freescale/enetc/enetc_pf.c   |  94 +---
+ .../net/ethernet/freescale/enetc/enetc_pf.h   |   6 -
+ .../freescale/enetc/enetc_pf_common.c         | 150 +++++-
+ .../freescale/enetc/enetc_pf_common.h         |   5 +
+ .../net/ethernet/freescale/enetc/enetc_qos.c  |   4 +-
+ .../net/ethernet/freescale/enetc/enetc_vf.c   |   9 +-
+ include/linux/fsl/ntmp.h                      |   2 +
+ 13 files changed, 411 insertions(+), 396 deletions(-)
+
+-- 
+2.34.1
 
 
