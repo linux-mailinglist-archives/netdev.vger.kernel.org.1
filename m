@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-305325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305324-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id GrDWEGm3TGppogEAu9opvQ
-	(envelope-from <netdev+bounces-305325-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:23:05 +0200
+	id Sz/YKmi3TGpoogEAu9opvQ
+	(envelope-from <netdev+bounces-305324-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:23:04 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2F8371907A
+	by mail.lfdr.de (Postfix) with ESMTPS id 6925D719075
 	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:23:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=collabora.com header.s=mail header.b=FYuXXy8x;
+	dkim=pass header.d=collabora.com header.s=mail header.b=EbIy0yCM;
 	dmarc=pass (policy=none) header.from=collabora.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305325-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305325-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305324-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305324-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 42CD9303B589
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1EB3B303A674
 	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 08:21:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7BEB31A06C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3DFF319871;
 	Tue,  7 Jul 2026 08:21:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2965D3101B6;
-	Tue,  7 Jul 2026 08:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295D713A86C;
+	Tue,  7 Jul 2026 08:21:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783412500; cv=none; b=QxPb74K2x56VaQbYbMuIPBiwKCxnX6pF2qnQjAPj9s63rGB3v+oLGdqCysqr99MpWINbLogt452rz9XQbFFrDf927cLHT40rnjyzxlUAYQMQ8+RZzgIuEBN3/IDMlmxUpVLiGbSdJStRZx7e2PHgRUshkc8TMItuV8L6yP3oiag=
+	t=1783412500; cv=none; b=ju+NKgBT+1akZ/Qu1iyDsQExLLo3GC0uR5cspAjHzekMpSh5pIyNAk6r2jDDdaUrzWZo6qHdaGwnmAYHWXE24ZoHIpm0C+TGCP6IL+KiugVw0//eDtJkNPxR9kL84CDKyNp+vXn7bhCrt9i9b1RZMyILlRkxvUpatkf9pJnNJGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783412500; c=relaxed/simple;
-	bh=bH9Gs0qF0keeUPajExUcfUVpg+DQrsbg/viTr25L8LI=;
+	bh=rn+h6E9crTmTz6FeyLcR9ekRM3gKcnx7ZytFNlkAdFc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZmqsP3vJFW//2n29ugGL1zhrRAE1nu/6Zu6OyNsOsDQsyMn8DUMxh2Nd8/7x7025ZXONgFfJDoN3LJWou7zbxdLh6WTltVWG6S2Qog4hmECoSV933n2LtBunn2vuQ0RlSsvCaZigSY55tDySjdaOYJeUSfJ1hzogs83BnGMIy1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=FYuXXy8x; arc=none smtp.client-ip=148.251.105.195
+	 In-Reply-To:To:Cc; b=hiONaJJd1oK1fKBgQW1B4LgVW4F2dk2ly7nWPtY1XSB0MyEakwjWki7CqD1e4fBLSjTAPAql5MgYFnG4TkB2akm78mzrh9B5LuXnUUL77PSYLtBmtoOiCaF9yGbaJH703D5mQRLdBu+tpYCCmwXMVfmcN+XyEOzBD/AS27VurAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=EbIy0yCM; arc=none smtp.client-ip=148.251.105.195
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1783412496;
-	bh=bH9Gs0qF0keeUPajExUcfUVpg+DQrsbg/viTr25L8LI=;
+	s=mail; t=1783412497;
+	bh=rn+h6E9crTmTz6FeyLcR9ekRM3gKcnx7ZytFNlkAdFc=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=FYuXXy8xaODgicQa0bDQdSq4Vr4LREoEZC1shF5oKZQIwiXMUo2DnIVMgsMwwtuqY
-	 snJt/6M96H690QoAhDNNXvSPBpz2eN7Pxj8Mm+DRXEn3/nwhbf+LaKdWLXqaThWzuv
-	 jPhgoE5e+ngG4g+MZLLXBiibQlJM5AJqWbUg0RaV9l6OsWCFHLFHttsuJU3pN2iCUy
-	 SQ+aHmWmWFH3hrXRaFkWJJXLjgvQ8d5cHCRiCU/ETbZ82XbeFVV4eJ9acF5MLd1DSx
-	 H4kgctMUI+TYWrMLJXo0yM30hP2JImZ+A99CQgRaT9qMCpw6+x2dnVXqGY78OQoc7S
-	 Pn6f6ZfmwK8+g==
+	b=EbIy0yCM6Xjop0S4NBqYIiw0/0tuGqyG3AscIjPdYcY3CVVPRyAfRQelLfNHdMb3U
+	 PwHKglb7kKyTcuMnQ5n/QqUgmqnPXeDrdcWHxVaXbPRXu+fWGR6+Hq2pB92GjjFi2D
+	 yTpz7CBsz6rfAzWYBMUMroljwAqTrGqxHD4rcl10PH9kNqk+ZkjfCdk/b3biicR7lo
+	 oQHJ+8n7M9G2vnwGSZJluyXIBfQ2iHI2ZNq/jJWJ9mC0iSeLIua7ZReYQvRtqP3zPe
+	 aYKC5eSB+Gaaj73+w7OXL79EzfCVndW4tdTw5Dvj116uAWikmNVmjU1QfVCWjhzSIE
+	 ET2OkGpfciTRw==
 Received: from yukiji.home (unknown [100.64.0.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: laeyraud)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id EFF9C17E0795;
-	Tue, 07 Jul 2026 10:21:34 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 52BAA17E0CDE;
+	Tue, 07 Jul 2026 10:21:36 +0200 (CEST)
 From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
-Date: Tue, 07 Jul 2026 10:21:19 +0200
-Subject: [PATCH net-next 1/6] dt-bindings: net: mediatek-dwmac: add support
- for MT8189 SoC
+Date: Tue, 07 Jul 2026 10:21:20 +0200
+Subject: [PATCH net-next 2/6] net: stmmac: mediatek: add PERI_ETH_CTRLx
+ register offset in platform data
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,7 +63,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260707-dwmac-mediatek-mt8189-v1-1-17f345eaaca3@collabora.com>
+Message-Id: <20260707-dwmac-mediatek-mt8189-v1-2-17f345eaaca3@collabora.com>
 References: <20260707-dwmac-mediatek-mt8189-v1-0-17f345eaaca3@collabora.com>
 In-Reply-To: <20260707-dwmac-mediatek-mt8189-v1-0-17f345eaaca3@collabora.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -84,11 +84,11 @@ Cc: maxime.chevallier@bootlin.com, rmk+kernel@armlinux.org.uk,
  linux-stm32@st-md-mailman.stormreply.com, 
  Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1783412493; l=3289;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1783412493; l=4145;
  i=louisalexis.eyraud@collabora.com; s=20250113; h=from:subject:message-id;
- bh=bH9Gs0qF0keeUPajExUcfUVpg+DQrsbg/viTr25L8LI=;
- b=gCeukStCgJ3WFlJpW6pSIe620a8nm6VrzleEOcXfvUlIOJwl6YLnEWPDvr7+fO9EMzCYz/QF7
- STF4dpk3ltvBOAKfg+6sYokZWxenb11nexxLATn8UxgFzR+vNWEf9lQ
+ bh=rn+h6E9crTmTz6FeyLcR9ekRM3gKcnx7ZytFNlkAdFc=;
+ b=UAKb+wXQKcB5/p4YdbNOyXQMoqNpBez8ppGNqQFLQwt7dFu9sOpqg4ZbVLWJX8QB5LvXt8Ad8
+ ZzvlmwEgXqYBnqGtrwTQMw3CKw1C668o7ow0K71CtHub0CvBM6pbdm1
 X-Developer-Key: i=louisalexis.eyraud@collabora.com; a=ed25519;
  pk=CHFBDB2Kqh4EHc6JIqFn69GhxJJAzc0Zr4e8QxtumuM=
 X-Rspamd-Action: no action
@@ -101,7 +101,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305325-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305324-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,collabora.com,mediatek.com,foss.st.com];
@@ -126,129 +126,120 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,collabora.com:from_mime,collabora.com:email,collabora.com:mid,collabora.com:dkim,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E2F8371907A
+X-Rspamd-Queue-Id: 6925D719075
 
-Add new compatible string and clock definitions for the Ethernet MAC
-IP found in MT8189 SoC.
+In preparation of newer SoC support, that use like MT8195 the Ethernet
+control registers from the peripheral configuration syscon but at a
+different base offset, add a new base offset in the variant platform
+data to access the PERI_ETH_CTRLx registers and use it in implemented
+methods.
 
 Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
 ---
- .../devicetree/bindings/net/mediatek-dwmac.yaml    | 77 +++++++++++++++-------
- 1 file changed, 54 insertions(+), 23 deletions(-)
+ .../net/ethernet/stmicro/stmmac/dwmac-mediatek.c   | 28 +++++++++++++++-------
+ 1 file changed, 20 insertions(+), 8 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/mediatek-dwmac.yaml b/Documentation/devicetree/bindings/net/mediatek-dwmac.yaml
-index 3aab21b8e8de..000abec023b3 100644
---- a/Documentation/devicetree/bindings/net/mediatek-dwmac.yaml
-+++ b/Documentation/devicetree/bindings/net/mediatek-dwmac.yaml
-@@ -20,13 +20,11 @@ select:
-         enum:
-           - mediatek,mt2712-gmac
-           - mediatek,mt8188-gmac
-+          - mediatek,mt8189-gmac
-           - mediatek,mt8195-gmac
-   required:
-     - compatible
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
+index 30ae0dba7fff..0cabab4fd89a 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
+@@ -37,7 +37,9 @@
+ #define ETH_FINE_DLY_RXC	BIT(0)
  
--allOf:
--  - $ref: snps,dwmac.yaml#
--
- properties:
-   compatible:
-     oneOf:
-@@ -36,6 +34,7 @@ properties:
-           - const: snps,dwmac-4.20a
-       - items:
-           - enum:
-+              - mediatek,mt8189-gmac
-               - mediatek,mt8195-gmac
-           - const: snps,dwmac-5.10a
-       - items:
-@@ -44,26 +43,6 @@ properties:
-           - const: mediatek,mt8195-gmac
-           - const: snps,dwmac-5.10a
- 
--  clocks:
--    minItems: 5
--    items:
--      - description: AXI clock
--      - description: APB clock
--      - description: MAC Main clock
--      - description: PTP clock
--      - description: RMII reference clock provided by MAC
--      - description: MAC clock gate
--
--  clock-names:
--    minItems: 5
--    items:
--      - const: axi
--      - const: apb
--      - const: mac_main
--      - const: ptp_ref
--      - const: rmii_internal
--      - const: mac_cg
--
-   interrupts:
-     maxItems: 1
- 
-@@ -147,6 +126,58 @@ required:
-   - phy-mode
-   - mediatek,pericfg
- 
-+allOf:
-+  - $ref: snps,dwmac.yaml#
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            enum:
-+              - mediatek,mt2712-gmac
-+              - mediatek,mt8188-gmac
-+              - mediatek,mt8195-gmac
-+    then:
-+      properties:
-+        clocks:
-+          minItems: 5
-+          items:
-+            - description: AXI clock
-+            - description: APB clock
-+            - description: MAC Main clock
-+            - description: PTP clock
-+            - description: RMII reference clock provided by MAC
-+            - description: MAC clock gate
+ /* Peri Configuration register for mt8195 */
+-#define MT8195_PERI_ETH_CTRL0		0xFD0
++#define MT8195_PERI_ETH_CTRL_BASE	0xFD0
 +
-+        clock-names:
-+          minItems: 5
-+          items:
-+            - const: axi
-+            - const: apb
-+            - const: mac_main
-+            - const: ptp_ref
-+            - const: rmii_internal
-+            - const: mac_cg
-+
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            enum:
-+              - mediatek,mt8189-gmac
-+    then:
-+      properties:
-+        clocks:
-+          items:
-+            - description: MAC Main clock
-+            - description: PTP clock
-+            - description: RMII reference clock provided by MAC
-+
-+        clock-names:
-+          items:
-+            - const: mac_main
-+            - const: ptp_ref
-+            - const: rmii_internal
-+
- unevaluatedProperties: false
++#define MT8195_PERI_ETH_CTRL0		0x0
+ #define MT8195_RMII_CLK_SRC_INTERNAL	BIT(28)
+ #define MT8195_RMII_CLK_SRC_RXC		BIT(27)
+ #define MT8195_ETH_INTF_SEL		GENMASK(26, 24)
+@@ -47,7 +49,7 @@
+ #define MT8195_DLY_GTXC_ENABLE		BIT(5)
+ #define MT8195_DLY_GTXC_STAGES		GENMASK(4, 0)
  
- examples:
+-#define MT8195_PERI_ETH_CTRL1		0xFD4
++#define MT8195_PERI_ETH_CTRL1		0x4
+ #define MT8195_DLY_RXC_INV		BIT(25)
+ #define MT8195_DLY_RXC_ENABLE		BIT(18)
+ #define MT8195_DLY_RXC_STAGES		GENMASK(17, 13)
+@@ -55,7 +57,7 @@
+ #define MT8195_DLY_TXC_ENABLE		BIT(5)
+ #define MT8195_DLY_TXC_STAGES		GENMASK(4, 0)
+ 
+-#define MT8195_PERI_ETH_CTRL2		0xFD8
++#define MT8195_PERI_ETH_CTRL2		0x8
+ #define MT8195_DLY_RMII_RXC_INV		BIT(25)
+ #define MT8195_DLY_RMII_RXC_ENABLE	BIT(18)
+ #define MT8195_DLY_RMII_RXC_STAGES	GENMASK(17, 13)
+@@ -95,6 +97,7 @@ struct mediatek_dwmac_variant {
+ 
+ 	u32 rx_delay_max;
+ 	u32 tx_delay_max;
++	u32 peri_eth_ctrl_offset;
+ 	u8 dma_bit_mask;
+ };
+ 
+@@ -277,6 +280,7 @@ static int mt8195_set_interface(struct mediatek_dwmac_plat_data *plat,
+ 				u8 phy_intf_sel)
+ {
+ 	u32 intf_val = FIELD_PREP(MT8195_ETH_INTF_SEL, phy_intf_sel);
++	u32 reg_offset = plat->variant->peri_eth_ctrl_offset;
+ 
+ 	if (phy_intf_sel == PHY_INTF_SEL_RMII) {
+ 		if (plat->rmii_clk_from_mac)
+@@ -288,7 +292,9 @@ static int mt8195_set_interface(struct mediatek_dwmac_plat_data *plat,
+ 	/* MT8195 only support external PHY */
+ 	intf_val |= MT8195_EXT_PHY_MODE;
+ 
+-	regmap_write(plat->peri_regmap, MT8195_PERI_ETH_CTRL0, intf_val);
++	regmap_write(plat->peri_regmap,
++		     reg_offset + MT8195_PERI_ETH_CTRL0,
++		     intf_val);
+ 
+ 	return 0;
+ }
+@@ -313,8 +319,9 @@ static void mt8195_delay_stage2ps(struct mediatek_dwmac_plat_data *plat)
+ 
+ static int mt8195_set_delay(struct mediatek_dwmac_plat_data *plat)
+ {
+-	struct mac_delay_struct *mac_delay = &plat->mac_delay;
+ 	u32 gtxc_delay_val = 0, delay_val = 0, rmii_delay_val = 0;
++	struct mac_delay_struct *mac_delay = &plat->mac_delay;
++	u32 reg_offset = plat->variant->peri_eth_ctrl_offset;
+ 
+ 	mt8195_delay_ps2stage(plat);
+ 
+@@ -399,14 +406,18 @@ static int mt8195_set_delay(struct mediatek_dwmac_plat_data *plat)
+ 	}
+ 
+ 	regmap_update_bits(plat->peri_regmap,
+-			   MT8195_PERI_ETH_CTRL0,
++			   reg_offset + MT8195_PERI_ETH_CTRL0,
+ 			   MT8195_RGMII_TXC_PHASE_CTRL |
+ 			   MT8195_DLY_GTXC_INV |
+ 			   MT8195_DLY_GTXC_ENABLE |
+ 			   MT8195_DLY_GTXC_STAGES,
+ 			   gtxc_delay_val);
+-	regmap_write(plat->peri_regmap, MT8195_PERI_ETH_CTRL1, delay_val);
+-	regmap_write(plat->peri_regmap, MT8195_PERI_ETH_CTRL2, rmii_delay_val);
++	regmap_write(plat->peri_regmap,
++		     reg_offset + MT8195_PERI_ETH_CTRL1,
++		     delay_val);
++	regmap_write(plat->peri_regmap,
++		     reg_offset + MT8195_PERI_ETH_CTRL2,
++		     rmii_delay_val);
+ 
+ 	mt8195_delay_stage2ps(plat);
+ 
+@@ -421,6 +432,7 @@ static const struct mediatek_dwmac_variant mt8195_gmac_variant = {
+ 	.rx_delay_max = 9280,
+ 	.tx_delay_max = 9280,
+ 	.dma_bit_mask = 35,
++	.peri_eth_ctrl_offset = MT8195_PERI_ETH_CTRL_BASE,
+ };
+ 
+ static int mediatek_dwmac_config_dt(struct mediatek_dwmac_plat_data *plat)
 
 -- 
 2.55.0
