@@ -1,53 +1,103 @@
-Return-Path: <netdev+bounces-305478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305479-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id W30SEC8DTWrytQEAu9opvQ
-	(envelope-from <netdev+bounces-305478-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 15:46:23 +0200
+	id Ub1xC5IETWo7tgEAu9opvQ
+	(envelope-from <netdev+bounces-305479-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 15:52:18 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2EE471C17B
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 15:46:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 912AE71C235
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 15:52:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=L6RLv5oa;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305478-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305478-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=hz6mcsby;
+	dkim=pass header.d=redhat.com header.s=google header.b=M9jSULh0;
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305479-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305479-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D72063051799
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 13:41:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3C24B30B8A55
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 13:46:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ABC641DECD;
-	Tue,  7 Jul 2026 13:41:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87A9E41F7D6;
+	Tue,  7 Jul 2026 13:46:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F9B3F23C5;
-	Tue,  7 Jul 2026 13:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8143D47DD
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 13:46:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783431698; cv=none; b=VxEXUuxXPT8bwTIl+Ab1r8i/b83ZUqeB4G3hs79PhT5206029Zku23hcJFAvSgz66XcjOaWbkZ5edBwlBdKoqMwbGqFkRxAEPjfEqTCMwGhgPruqzCJyCR2qnA2/5Cnx7/jZAlfyWV6F1GVdkZiGTn6GzkJ9YLo5ahtBM2HKY4U=
+	t=1783431970; cv=none; b=F1gFyCPaf9+E6AjT67yI7RL/i6TB2iL5IisgY+6KPw9qdlzsyH4AhntpPX1IjJkWJpKLwa90301nW8kd5zDlGcOtAOA8YKEU69vq/+FttBA6WVnJmd5sRgQCW580XgNOFvAFQIcqkPEcPNDhV2tuuTCOHKz0JDF0yl6Rg42cPgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783431698; c=relaxed/simple;
-	bh=Q8bZHt7yJ+qnecwmMvVMWaD1rJjvWnisLULY4A4dVgo=;
+	s=arc-20240116; t=1783431970; c=relaxed/simple;
+	bh=4W1pgRGkuKaRZDd3G2M9VDfahtzQlthBqgxJx4Z3V1o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iBovhx/ZotK9uLegLGk/0sT/HdVNE56/1cFNpvCb4jZHfSoHYpHrB12wuORfyelS+rg37/rdypN0biPy8nQ/IY+83ypDURpxvRfuxeZAkRnyIWlwmI3W8rjj5/K+is0Ib8XenejJ2vE7oQY85lxyCoKFDuGTAB1N/qiW1qfAj5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L6RLv5oa; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE74E1F000E9;
-	Tue,  7 Jul 2026 13:41:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783431696;
-	bh=bBAfp/1WTjfXkIXmaMektccP3AUgen/qc3sIQcub5vg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=L6RLv5oae/GlbVM6EYEtzsV9gqOUqvIJWoGIE98a2DdQvknAOzsyPGZddYbOUK52i
-	 rBVz61LGnWjQWhah+Wtqx91WphWRQvAPOQkW/M9APuFZuZRhnv8vLK4WMWYowF1eKs
-	 g0sTD7nNUpPn5jBUh36uh5+UmrYcJvtoNroBp7g8IsY1Z7tUaoGExPcX4yKNiF5RfS
-	 Oxn2i/vEarvAHnn0Nme6i+cqPKmFcHVJADCmNUztm7Cdiq2T8nmj+NK04cLRSGEZdo
-	 6E7IZdnuPRvfVQovGpzi2WuwPwpSSlh3HxkqdwICYdefbhMQ1oofZNUGNcc2mwyaZL
-	 w6as4tFkpYf+Q==
-Message-ID: <25951ecd-53e1-439e-92a2-8de3ff471d8a@kernel.org>
-Date: Tue, 7 Jul 2026 15:41:31 +0200
+	 In-Reply-To:Content-Type; b=Ysr7brMR2xIKPP2SfQb0HyfTSdujn351RvQmce0qA/5AIzxaeWJu4UxrUpXmXF1SjHFAJbt4UbdHEBpM5D9KKD7RXs2ZNb610tPOiJXSyYycsIfCt7boJPkowL79Ju1g/dqGJwTSqpWxsMqt8dbw23B4HVCIEJP803Pwgq2sf00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hz6mcsby; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=M9jSULh0; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783431967;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JAzeUKz5/N2T/7rInHarhTmhaFb8U+NoRbSx7BOs71U=;
+	b=hz6mcsbycuZgBRAzLiPWhiJKF37tIBs8XUtlUg+gyxu6VFVIM2P2G+mq3VGelAfseePbG0
+	+ij7vfexYDnE/+T0rdK9TOoFPZRvPVQkKp6zooP/pkbr+TVUWG16NMGPfJx1so3Zz/aEwa
+	6JOmvJ548JVB30gomgYi3rA62gDVaZM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-613-ayJuM21WP0-lNXtr-aCLtQ-1; Tue, 07 Jul 2026 09:46:06 -0400
+X-MC-Unique: ayJuM21WP0-lNXtr-aCLtQ-1
+X-Mimecast-MFC-AGG-ID: ayJuM21WP0-lNXtr-aCLtQ_1783431965
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-4773d2405c5so3388285f8f.3
+        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 06:46:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1783431965; x=1784036765; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JAzeUKz5/N2T/7rInHarhTmhaFb8U+NoRbSx7BOs71U=;
+        b=M9jSULh0WqAD44nKGU8eoMmEyavMtw3MMiqvW1pkilJWvDDELZ5/vwN4ilSHYsoxNd
+         qP5+Pvb/W+uyDnZl3/6o64FGhWvmMby7Th4F5S0SBGzh3aPsceUfN1AiTBGhXAotpTjV
+         ir+7cM/inPHNnGsCPmqO6aZl5YmbfmRX/0unDZ9R+Ddni7+nMFTTGYkczNHt965fzgA7
+         AmsjhzCx6oMwq4ikueMu5q6SodAduA8eE3JBm0I43Ms8+VswgV0tQp0obNf106YbvjCc
+         IZBswXvjRBqSKFHVn8Xqi581Z1+xbDFeJS/DJ+debomOUVynyez7Pg1e7xmCzbv/hSjH
+         NKKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783431965; x=1784036765;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JAzeUKz5/N2T/7rInHarhTmhaFb8U+NoRbSx7BOs71U=;
+        b=nTURt3coNIngPuXQkPcR5IQutKQhtWi1Ee8dTXXrj6pT4YMIp98avxx2DBgZePPI2L
+         xvY6WdAJUnLFxRHfJ2x4RkIE6ODJbKeZsCXBMg89eNYrsYPRH9h0aCRdRzqsGj7kXUYg
+         dIbpjUvyEUKmTt6Let2+j/tLOlnni3KymQdAAZk7d287NuJCuU2oicm1wbiXoE4PHI9T
+         gXJftCrFIkxyC/YKPXqniILOaYzkmZ1D64epdn2hbuJxxpK2crrbzI/gFxsnZI4z4Iqo
+         2DQlMEHiosiW/kwnIn5uXrlQ501qs68dJur8vYZxoGK8tSfF1yKTbjDVuXuqKYcEoGEl
+         b8lA==
+X-Gm-Message-State: AOJu0Yx00RXlWCgltUwgFYBqjy8hntf4HG4HoXxMV/up2VyrNtS0wqA7
+	C8nt/c8eiOX+QQw+HUaBtQQaHPZAQwzqROh9LnCPI6mRNZjN0xDdCZy6WyFFRUnj4edQuVl6a96
+	BW6iT8bluZyxAXFswtBZe0PInudfZAwajIqdb6Y/I5I1O9uRnbNlIOTDfYg==
+X-Gm-Gg: AfdE7ckdFqH2NN+Yxk107WS8ApuipFPZl4aG3C46/8GlNYE/FRo410p9G3xHfGcUbm7
+	0wBhWNbRx08FAobdn2KNOn2A8MBDYCSM4E6YTcL6cN7Fs9RwQJ4nqVezSMQbdfibJ/4wClNNzrh
+	KhMh3a/sYROzozFXt2ujvPLlFAYILcVUpOqPw5ucY6koRYfCrfXU5YXP/ayJigHhFcaWN5N04Cc
+	3IFFFHxbleeWH04pJdF8mJk7fdQYfBtoI8CD2/QEGy6OlKJqlClhaZm86Dhe3nCHdAUPXvfbVvR
+	7zUn5ZQceNHCoegyN/X1SDK8QYe610r5qP09w3IrLRimI8ump9b9Mx5IkJ1aUdyp014G4EYOPBH
+	WGFoc7CHRs0se6ywrrFrcNf19sFsX7OffY+GuJyJWip56Dci+okWuwgND5VizRJBj4OEgOtvdvA
+	/JDfRHz/WESvlp
+X-Received: by 2002:a5d:6385:0:b0:474:7bf8:15d4 with SMTP id ffacd0b85a97d-47de6644b0dmr4377333f8f.36.1783431964826;
+        Tue, 07 Jul 2026 06:46:04 -0700 (PDT)
+X-Received: by 2002:a5d:6385:0:b0:474:7bf8:15d4 with SMTP id ffacd0b85a97d-47de6644b0dmr4377262f8f.36.1783431964162;
+        Tue, 07 Jul 2026 06:46:04 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:5521:6b10:58fd:68f:7756:389d? ([2a0d:3344:5521:6b10:58fd:68f:7756:389d])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa0f213e8sm31190523f8f.34.2026.07.07.06.46.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Jul 2026 06:46:03 -0700 (PDT)
+Message-ID: <e1034a59-1ab0-4a41-b709-9da253d4901f@redhat.com>
+Date: Tue, 7 Jul 2026 15:46:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,76 +105,95 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 7/7] usb: fix UAF when probe runs concurrent to dyn ID
- removal
-To: Gary Guo <gary@garyguo.net>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- Johan Hovold <johan@kernel.org>, Mauro Carvalho Chehab <mchehab@kernel.org>,
- Petko Manolov <petkan@nucleusys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Chas Williams <3chas3@gmail.com>, Alan Stern <stern@rowland.harvard.edu>,
- linux-usb@vger.kernel.org, driver-core@lists.linux.dev,
- linux-wireless@vger.kernel.org, linux-media@vger.kernel.org,
- linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
- usb-storage@lists.one-eyed-alien.net, linux-kernel@vger.kernel.org
-References: <20260707-usb_dyn_id_uaf-v2-0-632dcf3adfba@garyguo.net>
- <20260707-usb_dyn_id_uaf-v2-7-632dcf3adfba@garyguo.net>
-From: Danilo Krummrich <dakr@kernel.org>
+Subject: Re: [PATCH net-next v13 09/10] net: ethtool: Introduce ethtool
+ command to list ports
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
+ Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Russell King <linux@armlinux.org.uk>,
+ Heiner Kallweit <hkallweit1@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+ Frank Wunderlich <frank.wunderlich@linux.dev>
+References: <20260701110427.143945-1-maxime.chevallier@bootlin.com>
+ <20260701110427.143945-10-maxime.chevallier@bootlin.com>
+ <aaef7304-573a-419e-b631-30b300373a08@redhat.com>
+ <7f47104f-8333-4c10-aab6-90552daabefe@bootlin.com>
+From: Paolo Abeni <pabeni@redhat.com>
 Content-Language: en-US
-In-Reply-To: <20260707-usb_dyn_id_uaf-v2-7-632dcf3adfba@garyguo.net>
+In-Reply-To: <7f47104f-8333-4c10-aab6-90552daabefe@bootlin.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-305478-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305479-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:gary@garyguo.net,m:gregkh@linuxfoundation.org,m:rafael@kernel.org,m:toke@toke.dk,m:johan@kernel.org,m:mchehab@kernel.org,m:petkan@nucleusys.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:3chas3@gmail.com,m:stern@rowland.harvard.edu,m:linux-usb@vger.kernel.org,m:driver-core@lists.linux.dev,m:linux-wireless@vger.kernel.org,m:linux-media@vger.kernel.org,m:linux-atm-general@lists.sourceforge.net,m:netdev@vger.kernel.org,m:usb-storage@lists.one-eyed-alien.net,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[dakr@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:maxime.chevallier@bootlin.com,m:davem@davemloft.net,m:andrew@lunn.ch,m:kuba@kernel.org,m:edumazet@google.com,m:linux@armlinux.org.uk,m:hkallweit1@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:thomas.petazzoni@bootlin.com,m:christophe.leroy@csgroup.eu,m:herve.codina@bootlin.com,m:f.fainelli@gmail.com,m:vladimir.oltean@nxp.com,m:kory.maincent@bootlin.com,m:kabel@kernel.org,m:o.rempel@pengutronix.de,m:nicveronese@gmail.com,m:horms@kernel.org,m:mwojtas@chromium.org,m:romain.gantois@bootlin.com,m:daniel@makrotopia.org,m:dimitri.fedrau@liebherr.com,m:frank.wunderlich@linux.dev,m:ffainelli@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[bootlin.com,davemloft.net,lunn.ch,kernel.org,google.com,armlinux.org.uk,gmail.com];
+	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	FREEMAIL_CC(0.00)[vger.kernel.org,bootlin.com,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com,linux.dev];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dakr@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[linuxfoundation.org,kernel.org,toke.dk,nucleusys.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,rowland.harvard.edu,vger.kernel.org,lists.linux.dev,lists.sourceforge.net,lists.one-eyed-alien.net];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[garyguo.net:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sashiko.dev:url,vger.kernel.org:from_smtp,linux.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E2EE471C17B
+X-Rspamd-Queue-Id: 912AE71C235
 
-On 7/7/26 2:26 PM, Gary Guo wrote:
-> Dynamic IDs are only guaranteed to be valid when usb_dynids_lock is held,
-> as remove_id_store can free the node. Thus, make a copy in
-> usb_probe_interface. Clarify the documentation that the id parameter is
-> only valid during the probe.
+On 7/7/26 12:47 PM, Maxime Chevallier wrote:
+> On 7/7/26 12:12, Paolo Abeni wrote:
+>>
+>> Both sashikos instances points to multiple races with dumps. I suspect
+>> some explicit locking is required.
+>>
+>> https://sashiko.dev/#/patchset/20260701110427.143945-1-maxime.chevallier%40bootlin.com
+>> https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260701110427.143945-1-maxime.chevallier%40bootlin.com
+>>
+>> I *think* this is hopefully the last pending issue.
 > 
-> USB serial has the same pattern, but it does not need fixing as the IDs
-> cannot be removed via sysfs.
-> 
-> Fixes: 0c7a2b72746a ("USB: add remove_id sysfs attr for usb drivers")
-> Signed-off-by: Gary Guo <gary@garyguo.net>
-Reviewed-by: Danilo Krummrich <dakr@kernel.org>
+> True indeed, the other issues are sashiko saying "what if we detach a PHY and attach it
+> to another netdev", which can't happen :) I agree with some of the locking points that
+> were found, I'll address that likely as a separate cleanup.
+
+I'm sorry, but I think it's better to address the above problems with
+the main series to avoid a window of opportunity that could cause a lot
+of quite randomic/drop by submissions to try to addresses them with a
+lot of noise on the ML.
+
+I set the series to CR.
+
+/P
+
 
