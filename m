@@ -1,309 +1,243 @@
-Return-Path: <netdev+bounces-305593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305594-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id wzNXLQZkTWoYzQEAu9opvQ
-	(envelope-from <netdev+bounces-305593-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 22:39:34 +0200
+	id DhLBBbdmTWqjzQEAu9opvQ
+	(envelope-from <netdev+bounces-305594-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 22:51:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CA7F71F9B3
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 22:39:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71D4B71FA61
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 22:51:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=dNohO7ct;
-	dmarc=pass (policy=reject) header.from=google.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305593-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305593-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=I8FzOfOQ;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305594-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305594-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A4BF23014BE7
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 20:36:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 810A0300B067
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 20:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 229023EB0F0;
-	Tue,  7 Jul 2026 20:36:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E231C30C16B;
+	Tue,  7 Jul 2026 20:50:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8BDB10785
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 20:36:32 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783456594; cv=pass; b=WqhvXuq2hbcTxR+FGC3CgY8PX9LDG+PRUYyIHC2X16mjCOcLuC8424sTji1I4cEec9moGQaT/lYw/gO0BHDRr6W7U19N2jCmAN58GHM6Ux4KXBUK/BnGoF0r75295tYYJtL07uEBR0Rlc5uWpuvZrPz0CdWv+DuQ2RNevYhP/Tg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783456594; c=relaxed/simple;
-	bh=HJ8OXuS5hgTr2XHk/8DDuJJA0eA/2PHZVltL570lzqo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O4kFhx/erxVf1LVqST40tVrpU8tjFx/bRzRSUkZA9N5XSDRarXcJ+viNLU6cbahwrCYhTWLRpPwI9LDbVjYYlV8Dkbw/io2SOqgvGF1m1VifBxybonmjppB9slyYZKdTfS/kTgVVt+sMwY9Wy0k+g79DingHuiHFzhDNjucOpIA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dNohO7ct; arc=pass smtp.client-ip=209.85.214.182
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2cb59f6ba26so27905ad.0
-        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 13:36:32 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783456592; cv=none;
-        d=google.com; s=arc-20260327;
-        b=een3P+TsHdpsVekRYhY6drOz60nk/SBh5Uei/b9XKGCAkurGhkj84xFkTXGRUJYkTi
-         COfLWfJCtyaHuXO62p5IexV6QPVtfJvI2xcUTkxGGCDz1MKXBuChmQooF9kRy0e/7fM4
-         aYFiSxYMn129z/e+8zLICp8wxAXruCrTlIRqZavY+kMZLvp+zF3HBub0Osp0ryU8zQtg
-         RN9dfpUXKb9nzB3JPAo66w+3ZO76ehCXqrl6hL6psU425g0JMEDCUVJxx5QwMTUgnFYA
-         Lq26wGroqFetpU6FSdqlsmhM0wMjlVOKhVACu3UCWn0dSXBihrD3pcRY7Byfm/6AZjlV
-         PPXg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=jS1etq2XBh0Y21n7kpErG7DuCVj3yAQ6JGZ2x5w3TvE=;
-        fh=WFjSoLAwlHqJ7GfZlZEAXALZpuOmpG4WRxQxM8tADmg=;
-        b=kU+Kp0vHSNdfLfWBvI41+qpNRkFFMwSyX9mQuXpzY5Va4d8bCeGyA5WVpy94m1AzHr
-         TASbuaBdAppCUIOki/32zEZBzqA8qosrxAN5/POHUyvBz/gyObt/yRH0+xawO4JHm3b4
-         j7u0A0nVo6aOjUTr6Z4xwcfh9QwrZ0AIbbX+qrYt+nkyWtJL9Fhhd+nBbqQwyKyYmYHO
-         XTwFwlcIovNjwPKAyo9OqWaRlG6LvY33McE730VXQjwqbBZBgDGD4kM4F5Vf/U+szvsQ
-         ONbNBe8IeHDgtJpRNmOHp3XuPe/vaezasRNpAM52BHwFCZfdAP4AVca2W3oWgDudNV1s
-         xpkg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FF92DECD3
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 20:50:25 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783457426; cv=none; b=SKnSVQQyfaVBao0N1/q4uYA4BT4bSDGG1IWgZmyUPdHmp1T9C7WWQrmCWlb68vP6osO7owyGi9VH9iBiheP3zgf6opiqA6+FsLLV9+O/FK9Y7fWb4yf5BwPtDtgobNk7q6ZvnrVuyKe7d9KJ33NfS3g/Epbi/6wPFZ1XTTeVgL0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783457426; c=relaxed/simple;
+	bh=2+FrNKiZHlaOosauZT36r8EtxQenC5613cF0lHnS6Kw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ilhtt79fDVsfXk97SzbdGZz57W/j56HyFze19DZMdJhJnqIHSUiK2AR3qUPFOw47QsTAtbnUOve3VkmflKLpfaZZP20DQZCh641K8JE0ycW6Vu+muiv+6nqEMPNJG1NIF/1fWaQXSFYAveYtunw5YQ/TADSlc/m0K+99PVy3aUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I8FzOfOQ; arc=none smtp.client-ip=209.85.128.46
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-493b691cb44so33020695e9.0
+        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 13:50:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783456592; x=1784061392; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=jS1etq2XBh0Y21n7kpErG7DuCVj3yAQ6JGZ2x5w3TvE=;
-        b=dNohO7ctFiQDh8hfgA3fieXFh4ooHz/+zEOTDjPG+mn2hxzilaFHbdQ5O5eZkbRB6o
-         jddEOOY6vJ44jotyRwzmDY9mwHrqSUNVbHu4Yfb6Z5HWsZYNl9uVqol+THbVfPi5NAn7
-         HM3QvSs3klg9fknuqJRDnXM8sOGnCVY+rDNiO52AM/bv87W7aMBWKZY99Ovw+kpkS+nT
-         XIyakJYmO3i28r50cWFGfHDzAyoGbw7uTQh9Oyrbv04LRCu0RiC3qPqhm9m3F98RfK1c
-         RoBOSiiQdppsvIetJCIaCaznVFrIzuV6w5DRJ/+EGttI6Lb5t4+aFxOzgRHD3LRND1FO
-         XbRw==
+        d=gmail.com; s=20251104; t=1783457423; x=1784062223; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=zP44B3mdldx6dm5k0ofo9c87bKSYGg9SPFsLdDVShqc=;
+        b=I8FzOfOQTZex4RCLk2lWUweHHKqYVPqWpRRm89BavdVRGL9966L2jEnM2XOLp6xngk
+         YqP7Gq7zCtSIBm0SW2z+iT+Yor1tbMxuOBIugcqsix2P4+5DE7V/JEUfZ3ubyOAJlX+x
+         pYb3f5xjx+zr3SX8yznJW7zhokI0ED7o7hp7h2gzcCVqmmTy7EGOCiLQ94pMevJbG79T
+         Hsg08jlD2e5AsLiQsweXXwa5+rrkr32JWrET6SFgCgxSxdRgK7n9/wpUxQjuOUOzUJyj
+         ndao1qa0P5enRNr+TrsOI+49lE1OG9hqn1TiztZySqN2xwHyVWq+eWokJTg56NXA+90Y
+         5lyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783456592; x=1784061392;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=jS1etq2XBh0Y21n7kpErG7DuCVj3yAQ6JGZ2x5w3TvE=;
-        b=mq3elsRZKvNgxr85NKw3sEUcKQR7bduFkKy9w47fjSNNalnUv3qTyeizCA6jtDYsK8
-         6a5Ci4zGCTkN41790k11nXoxMnp+0bauajzNBPvR/4u2KFjZOzGkFr58nI9XDRolePXX
-         gar/TGzART0wghkklqS4kGYEpp9x4nHTcIqcNoph62HMOz7KKmI2MzV3pkSxVt1I5kKg
-         HGUmZLVdb7ue9JrXuekyE+kpIywBYqXR9CcKnpJMwnprqrxvSQh769IB4hBPMcX46tP0
-         EjqTFeP5OazZacux467rfirwEbmj6wBAYBWL669n+m+8fr7VeLwvOmkbFwUxnAYNlcPL
-         sujA==
-X-Forwarded-Encrypted: i=1; AHgh+RrN2Z9gdoeEZ+NRM1NRCxacuwFyQXukFKXIMCKxc8YL9waoRzXor5+9zADMGG3L26NMbDoGxS0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxT5NbanddnO3yWdBOY6vO8zGyL6AHkwEzYoPjISXgHzVCwq140
-	wt3y1d1YGV7XvFo8dcyO01V1Wpd113zsdYH05In/rei+CLL3UhhILkkZcgygftxFxC67O7FSBPb
-	HlDwAr/91oT/Lgq/0/hBwCQVwITFxuhQ/xProuhNV
-X-Gm-Gg: AfdE7clx0QoQVqyP2hxUYsU3lSYrtAjYbFNgdY4XV9O+hjYF9GMzcSujZZL+qAyeZqo
-	qiyKBGuFTcitW6UEN9SgK4FnO5EhDELMVSYPlgtzu8zUx1asPxl0sOPwDMUyvnBfgbT0BKnJfmk
-	6Diuuhe7sMsQlPZrTyC466u2VYkkPTKMysoX9cVBaE9VCLzHYirOTdIMnwg/D7RMz0SxM0c37wp
-	WQqQel+cMUOFO9CBSObM4kcmQGVUiQBrFFXaH208SqEo9TxosjIO8kxwjGxf+cB4Cq33j0KPcwO
-	xgptjftr+zRy601u+149PosRhyhaoNknl1Ts1Q==
-X-Received: by 2002:a17:903:1746:b0:2ca:e513:17a6 with SMTP id
- d9443c01a7336-2cce6070055mr514845ad.15.1783456591431; Tue, 07 Jul 2026
- 13:36:31 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1783457423; x=1784062223;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=zP44B3mdldx6dm5k0ofo9c87bKSYGg9SPFsLdDVShqc=;
+        b=G8yXrvSO6vuYan5pp0nYC2VliphrtxKZmLBNCqyVKWiaUlbcIE/UiJ0PZQCpzDjLO0
+         O0c9pbDpox0fq7slFnltkLr+pTqvxMMjdPTop2iZcgRmqnHGAPcBxFaFFQBa5N9voYMR
+         ZSnngWADwkLwoOUttO/v3454n5QishY0bkeWI2BHmx5tAUv6JH6+aryiypd7BQy8IN0R
+         Wfd2V12QISGWFGOIkzIQuumXr2Rwtdqv2VIoTrd6clN3GwNZF+ocLlt+FRL/ye3Ibyqi
+         INdGmbKj9GM+36pV2eCArCQsQnrrFUNdYm0RnV7i8UQQjVvqLig9wZwp4g4E0F3eYMbS
+         xvuA==
+X-Forwarded-Encrypted: i=1; AHgh+RoQFW9Pwy3W+E7IMe6mMcA4THMnjQuBCYhf4Annyk+QRdGv7g+93i4nl3z6oQ7YHc5xRFPkdJQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRM127W/1UVYCAnEKlBUdT5Za0B9UWeJuLnhJFSgoy8huj0WGy
+	rumUYfW/cWR0CUwUtnUjh2t7PwmXQKCrnFvYSUmT9iGwKJLGfj1eOAmnYdGp/A==
+X-Gm-Gg: AfdE7clK3/hktW/gNYZE+fbMuNA4NBPzjRisERpQPhUGAmIxl3HOHKyX+25vqC/RC6M
+	r3MNYF927gzbiByfQnQgZ/fxZLaqEU5T/QqvH+s4CHmml65aIzhswDrMCgueihnxXlDZMCecjMT
+	5JHsjCC3EGG2TPWwB2i+iTzVBFPKPMVf2dPAPChh1y2eJ5zwAIcyMBqF61WCaD+haoDmGCfkuX4
+	AwrBVqo8dfuLEuoAs+hTzYaJMh+5Qern7zOVd1duHZoETpY53RiQgQk/FiKf5rSQvB8AwE4Rlqc
+	LqbBqdiu6VwxYb7QjRRLCjxAwfJ8impoy6Cmti+pLvzNbBOYRyQbJXG8rJx5D7/Blw/88XZHXQp
+	oW1TiVtR6azduOXtffI0tAFt/yvFNqV1PSlImFDwFFthat6xgYqfXxfdBuz9orepZjq3+0caFCb
+	dLETYDwY/8T3vsM71Hhyxx+hO6Vl5EOc9SPi+yz7kJZRPhn2Lwplt2veW34vYBppuOROXk9YboT
+	6XAkQX9hI1HS+k=
+X-Received: by 2002:a05:600c:1908:b0:492:5855:1548 with SMTP id 5b1f17b1804b1-493df095562mr76302525e9.27.1783457423164;
+        Tue, 07 Jul 2026 13:50:23 -0700 (PDT)
+Received: from ?IPV6:2001:9e8:f102:9901:f85d:9fdd:690a:6e0f? ([2001:9e8:f102:9901:f85d:9fdd:690a:6e0f])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493e0f5ca1fsm89127555e9.15.2026.07.07.13.50.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Jul 2026 13:50:22 -0700 (PDT)
+Message-ID: <2afc9c9a-eacc-46ca-b965-4cabee8f7094@gmail.com>
+Date: Tue, 7 Jul 2026 22:50:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260701-tcpdm-large-niovs-v4-0-ca4654f37570@meta.com> <20260701-tcpdm-large-niovs-v4-1-ca4654f37570@meta.com>
-In-Reply-To: <20260701-tcpdm-large-niovs-v4-1-ca4654f37570@meta.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 7 Jul 2026 13:36:18 -0700
-X-Gm-Features: AVVi8Cft8xhwKuUJQBVnGzgYj4CRKQzZAZeZD_sYSlOKVL1n3UGciPvnN9lcbO0
-Message-ID: <CAHS8izNdJ1LTOr_pLjXef6Yv-=JOFPe1GcZtcbStD93Tkpy1XQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 1/3] net: devmem: allow rx-buf-size >
- PAGE_SIZE per dmabuf binding
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Gerd Hoffmann <kraxel@redhat.com>, 
-	Vivek Kasireddy <vivek.kasireddy@intel.com>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org, 
-	linaro-mm-sig@lists.linaro.org, linux-kselftest@vger.kernel.org, 
-	sdf@fomichev.me, razor@blackwall.org, daniel@iogearbox.net, 
-	matttbe@kernel.org, skhawaja@google.com, dw@davidwei.uk, 
-	Joe Damato <joe@dama.to>, Bobby Eshleman <bobbyeshleman@meta.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 1/4] dt-bindings: net: pse-pd: add bindings
+ for Realtek/Broadcom PSE MCU
+Content-Language: en-US
+To: Conor Dooley <conor@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+ Kory Maincent <kory.maincent@bootlin.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Daniel Golle <daniel@makrotopia.org>, =?UTF-8?Q?Bj=C3=B8rn_Mork?=
+ <bjorn@mork.no>
+References: <20260706112425.3149226-1-jelonek.jonas@gmail.com>
+ <20260706112425.3149226-2-jelonek.jonas@gmail.com>
+ <20260706-player-handwash-0a3fe95cf5ec@spud>
+ <c19e563a-8931-4f31-b05a-ff8def4a5161@gmail.com>
+ <20260707-dove-fretful-e3c8e237f1eb@spud>
+From: Jonas Jelonek <jelonek.jonas@gmail.com>
+In-Reply-To: <20260707-dove-fretful-e3c8e237f1eb@spud>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:bobbyeshleman@gmail.com,m:donald.hunter@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:kraxel@redhat.com,m:vivek.kasireddy@intel.com,m:sumit.semwal@linaro.org,m:christian.koenig@amd.com,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:linaro-mm-sig@lists.linaro.org,m:linux-kselftest@vger.kernel.org,m:sdf@fomichev.me,m:razor@blackwall.org,m:daniel@iogearbox.net,m:matttbe@kernel.org,m:skhawaja@google.com,m:dw@davidwei.uk,m:joe@dama.to,m:bobbyeshleman@meta.com,m:donaldhunter@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-305593-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-305594-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[almasrymina@google.com,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:conor@kernel.org,m:o.rempel@pengutronix.de,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:bjorn@mork.no,m:andrew@lunn.ch,m:krzk@kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[almasrymina@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,lunn.ch,intel.com,linaro.org,amd.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,fomichev.me,blackwall.org,iogearbox.net,davidwei.uk,dama.to,meta.com];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0CA7F71F9B3
+X-Rspamd-Queue-Id: 71D4B71FA61
 
-On Wed, Jul 1, 2026 at 12:22=E2=80=AFPM Bobby Eshleman <bobbyeshleman@gmail=
-.com> wrote:
->
-> From: Bobby Eshleman <bobbyeshleman@meta.com>
->
-> Every devmem dmabuf binding today hands the page_pool PAGE_SIZE niovs.
-> This caps a single RX descriptor at PAGE_SIZE, burning CPU on buffer
-> churn for large flows.
->
-> Add a bind-time netlink attribute, NETDEV_A_DMABUF_RX_BUF_SIZE, that
-> lets userspace request a larger niov size. The value must be a power of
-> two >=3D PAGE_SIZE.
->
-> Measurements
-> ------------
-> Setup: kperf in devmem RX/TX cuda mode, 4 flows, 64 MB messages, 60s,
-> dctcp, num-rx-queues=3D4, dmabuf-rx/tx-size-mb=3D2048, 10 runs per niov
-> size, mlx5.
->
-> CPU Util:
->
->    niov        net sirq %        net idle %         app sys %        app =
-idle %
->   -----  ----------------  ----------------  ----------------  ----------=
-------
->      4K   62.38 +/-  8.27   33.40 +/-  7.51   54.15 +/- 10.23   43.67 +/-=
- 10.53
->     16K   58.91 +/-  5.35   35.23 +/-  5.88   41.05 +/-  8.87   56.42 +/-=
-  9.24
->     32K   64.12 +/-  0.68   31.09 +/-  1.48   44.54 +/-  3.51   52.63 +/-=
-  3.65
->     64K   54.69 +/-  5.54   39.67 +/-  5.81   35.47 +/-  3.11   61.97 +/-=
-  3.27
->
-> RX app sys % drops ~19% from 4K to 64K.
->
-> Throughput:
->
->    niov       RX dev Gbps   RX flow avg Gbps
->   -----  ----------------  -----------------
->      4K  300.63 +/- 53.21    75.16 +/- 13.30
->     16K  321.35 +/- 28.20    80.34 +/-  7.05
->     32K  347.63 +/-  2.20    86.91 +/-  0.55
->     64K  332.11 +/- 14.26    83.03 +/-  3.56
->
-> Throughput seems to increase, but the stdev is pretty wide so could just
-> be noise.
->
-> kperf support (not yet merged):
-> https://github.com/facebookexperimental/kperf/commit/8837577f920876bce698=
-6ec18869ac04439ebcd2
->
-> Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
-> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Hi Conor,
 
-I'm pretty happy to see most of this patch being a spot-for-spot
-replacement of PAGE_SIZE with a variable. FWIW:
+On 07.07.26 19:25, Conor Dooley wrote:
+> On Mon, Jul 06, 2026 at 10:30:00PM +0200, Jonas Jelonek wrote:
+>> [...]
+>> The protocol and firmware on the MCU, most likely the whole "solution",
+>> is from Realtek. The setup is always the same on most Realtek-based
+>> switches (saying most because a few counterexamples use completely
+>> different setups, not even Broadcom or Realtek PSE silicon). The host
+>> interface is always the same (except for I2C vs. SMBus vs. UART, which
+>> is likely just a config in the MCU firmware). Therefore "realtek," is the
+>> right prefix for all of these.
+>>
+>> Broadcom is not really involved here except for their PSE silicon being
+>> used. Maybe Realtek modeled their MCU host protocol after the one that
+>> Broadcom PSE silicon uses as host interface, but this is rather guessing.
+>>
+>> Maybe a historical view might help. Older RTL83xx-based switches with
+>> PoE shipped with this setup using Broadcom PSE silicon. From what I know,
+>> at this point Realtek didn't design their own PSE silicon. They used the
+>> Broadcom silicon, put a MCU as a manager in front of it with their firmware
+>> and a host protocol based on what Broadcom PSE itself uses. At some
+>> point Realtek started to design their own PSE silicon which then was
+>> used in newer switches instead of Broadcom PSE.
+> Right, in that case it does make sense to use a realtek prefix, since
+> the software and mcu solution is all theirs.
+>
+>> [...]
+>> Only one at a time is used, but not combined in any way. All switches
+>> I've seen so far always have a single management MCU for PoE, not
+>> multiple. Thus, only a single variant is used. Which variant is used
+>> likely depends on the board vendor which then tells Realtek "I want your
+>> PoE solution, I can attach it via (I2C/SMBus/UART)". At least for UART vs.
+>> I2C/SMBus there are sometimes valid reasons to use UART over the other.
+>>
+>> There is only a single switch (from Linksys) where the MCU expects raw
+>> I2C messages. SMBus transaction fail actually. But I don't see the reason
+>> why Linksys did it that way. The reason can't be that the MCU is attached
+>> on a bit-banged I2C because another switch uses SMBus transaction on
+>> a bit-banged I2C.
+> Reading this, it feels like you "should" have compatibles that uniquely
+> identify the protocol used. 
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+Ok, I hope I put this together correctly. A concrete proposal:
 
-> ---
->  Documentation/netlink/specs/netdev.yaml |  8 +++++
->  include/uapi/linux/netdev.h             |  1 +
->  net/core/devmem.c                       | 55 +++++++++++++++++++--------=
-------
->  net/core/devmem.h                       | 13 +++++---
->  net/core/netdev-genl-gen.c              |  5 +--
->  net/core/netdev-genl.c                  | 19 ++++++++++--
->  tools/include/uapi/linux/netdev.h       |  1 +
->  7 files changed, 71 insertions(+), 31 deletions(-)
->
-> diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netl=
-ink/specs/netdev.yaml
-> index 5f143da7458c..70b902008bd3 100644
-> --- a/Documentation/netlink/specs/netdev.yaml
-> +++ b/Documentation/netlink/specs/netdev.yaml
-> @@ -598,6 +598,13 @@ attribute-sets:
->          type: u32
->          checks:
->            min: 1
-> +      -
-> +        name: rx-buf-size
-> +        doc: |
-> +          Size in bytes of each RX buffer the NIC writes into from the b=
-ound
-> +          dmabuf. Must be a power of two and >=3D PAGE_SIZE; defaults to
-> +          PAGE_SIZE.
-> +        type: u32
->
->  operations:
->    list:
-> @@ -812,6 +819,7 @@ operations:
->              - ifindex
->              - fd
->              - queues
-> +            - rx-buf-size
->          reply:
->            attributes:
->              - id
-> diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-> index 2f3ab75e8cc0..85e1d20c6268 100644
-> --- a/include/uapi/linux/netdev.h
-> +++ b/include/uapi/linux/netdev.h
-> @@ -219,6 +219,7 @@ enum {
->         NETDEV_A_DMABUF_QUEUES,
->         NETDEV_A_DMABUF_FD,
->         NETDEV_A_DMABUF_ID,
-> +       NETDEV_A_DMABUF_RX_BUF_SIZE,
->
->         __NETDEV_A_DMABUF_MAX,
->         NETDEV_A_DMABUF_MAX =3D (__NETDEV_A_DMABUF_MAX - 1)
-> diff --git a/net/core/devmem.c b/net/core/devmem.c
-> index 957d6b96216b..3d6cf35e50f3 100644
-> --- a/net/core/devmem.c
-> +++ b/net/core/devmem.c
-> @@ -46,7 +46,7 @@ static dma_addr_t net_devmem_get_dma_addr(const struct =
-net_iov *niov)
->
->         owner =3D net_devmem_iov_to_chunk_owner(niov);
->         return owner->base_dma_addr +
-> -              ((dma_addr_t)net_iov_idx(niov) << PAGE_SHIFT);
-> +              ((dma_addr_t)net_iov_idx(niov) << owner->binding->niov_shi=
-ft);
->  }
->
->  static void net_devmem_dmabuf_binding_release(struct percpu_ref *ref)
-> @@ -90,16 +90,17 @@ net_devmem_alloc_dmabuf(struct net_devmem_dmabuf_bind=
-ing *binding)
->         struct dmabuf_genpool_chunk_owner *owner;
->         unsigned long dma_addr;
->         struct net_iov *niov;
-> -       ssize_t offset;
-> -       ssize_t index;
-> +       size_t offset;
-> +       size_t index;
->
+"realtek,pse-mcu-gen1"                        (Protocol Gen 1, UART)
+"realtek,pse-mcu-gen1-smbus"            (Protocol Gen 1, SMBus)
+"realtek,pse-mcu-gen2"                        (Protocol Gen 2, UART)
+"realtek,pse-mcu-gen2-i2c"                  (Protocol Gen 2, raw I2C)
+"realtek,pse-mcu-gen2-smbus"            (Protocol Gen 2, SMBus)
 
-nit: I would keep this signed. Some of the most frustrating issues I
-ran into is some of the underflowing and then passing a > check or
-something. Although if the LLM is not complaining about this
-particular case, there is probably no issue with it. I also notice a
-lot of existing code that deals with indexes and offsets goes for
-signed.
+This uniquely identifies the protocol used: first generation and second
+generation. As Rob mentioned before [1], this also pulls in the raw I2C
+vs. SMBus framing in contrast to having it in a property. The framing
+suffix appears only on I2C attachments because it doesn't apply to
+UART transport, and this is given by the parent serial@ node.
 
---=20
-Thanks,
-Mina
+Though I'm still open for suggestions regarding the protocol
+identification if "-gen1"/"-gen2" is not acceptable.
+
+> Looking at the devices below, it seems like it
+> would be possible to use compatibles based on the switches themselves, e.g.
+> zyxel,xs1930-pse etc. If there are other devices that use the same
+> protocol, they could fall back to the ones below.
+>
+> It'd be good to have the net developers weigh in though, as to whether
+> using compatibles based on the switches is suitable.
+
+I'd lean against, but happy to defer to you and the net maintainers. The
+node describes the MCU with its Realtek firmware — the firmware/protocol
+defines the device. Everything that differs between instances on the
+controller level would be captured by the compatibles proposed above, so
+a board compatible would encode nothing there the gen+framing string
+doesn't.
+
+Observed variation lives on another level. For instance, some boards have
+heterogeneous per-port caps (e.g. 16 ports at 60W, 8 ports at 30W). This
+is clearly something that should be expressed per-pse-pi, not in a
+switch-specific compatible.
+
+It would also be an exception to the other PSE-PD bindings. They describe
+controllers used across many switches too, yet none encode the
+switch/enclosure. Board-specific compatibles might still be added later in
+case a device really has a variation or quirk that genuinely needs its own
+compatible.
+
+> [...]
+
+Best regards,
+Jonas
+
+
+[1] https://lore.kernel.org/netdev/20260615212959.GA1679454-robh@kernel.org/
 
