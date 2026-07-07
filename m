@@ -1,147 +1,213 @@
-Return-Path: <netdev+bounces-305476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305477-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id q9nrNiQFTWpmtgEAu9opvQ
-	(envelope-from <netdev+bounces-305476-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 15:54:44 +0200
+	id YnltI0IFTWputgEAu9opvQ
+	(envelope-from <netdev+bounces-305477-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 15:55:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8E7A71C2A8
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 15:54:43 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8055C71C2C2
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 15:55:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=W51SJiui;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305476-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305476-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=weidmueller.com header.s=selector2 header.b=xMclREJB;
+	dmarc=pass (policy=reject) header.from=weidmueller.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305477-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305477-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 014893027AC6
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 13:40:38 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9ACD430402A6
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 13:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8E8541D4EA;
-	Tue,  7 Jul 2026 13:40:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A7FF41D4FF;
+	Tue,  7 Jul 2026 13:41:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010001.outbound.protection.outlook.com [52.101.69.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C822B41A78B
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 13:40:35 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783431636; cv=none; b=bjkodZYbIzzCmi6xOoZZXCt2HwWPci5l/W93HhWCHfZSR3zkMnoj/eeLUD5ALl24GpJLEO5kFhP42ILkdkRBZ57t2xtEgUQALQcq5OcHNOmd7N9m14L2aom+HbMfst4DInfLmpUWNGYPub1n2no6lnTsy2enP7sFqB1+4sr06WE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783431636; c=relaxed/simple;
-	bh=TYCAB73nmJwMARlspU+aLKniDj9pF5JbYzHAo0LnN2c=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=XhrWEb28n2N1cEwdAR+k8SuFlclEsUx6V3qn+rX06Oxh+y0MtHhz55JDDsIdo+e0cV0qdDsVAXW7Kqi+yRkxeJg60uGhJVr1Q5t9lMdt4CEdBXxvWlL4erxUBcuXY2Ov+isOruhqNwzQA6F447jAHX2adfW5BG3CKq/zPcx/Nn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W51SJiui; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74BA01F00A3D;
-	Tue,  7 Jul 2026 13:40:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783431635;
-	bh=3MNJksVgEbRti8cuN4RXrW5FVxU2xglq3ohTnp0UYnQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=W51SJiuii6ZWV7fRWDB4aMkvVAqiV11wg2Q3YF1g0y3pAxeOsNb+QCIKvFY61FdJF
-	 0rCbAcKDK6trfFkuauKJuArpb4yfSQUD3HaVhejsC8fenfGichBerboKKva/MuAU9G
-	 XELyoVNt8xlK20eg3NB1k8W4jK6ggemTOjAZXZIaCsVadu3xlSx/5aoOREn7DJ4/0W
-	 eJI3d3aAP5RZcT8NFYgcD6hpH8OI/DxNqHMw2CHjv5WHrDJj20mP/E2a9l7xPaETM+
-	 yqkRgUiIPEQBcnTNCNS6UaE7TGNY8Iak1yxDh+HeaPai94ogdRklGvSeB2wFlYSonX
-	 nlhuc3m/dguhQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93B7E39253DA;
-	Tue,  7 Jul 2026 13:40:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B2333D891D;
+	Tue,  7 Jul 2026 13:41:04 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783431667; cv=fail; b=GAqR55FKbQU7diu31npFk2k3KFWgI/O6mD71FNhqj2LJChwuSbU3Gvd2o6iGadWKPklhgIoYH1DF3dBsGZAyp1/H/Th8yoJfV5hWPkQB3l2u60xOr8qzxMs38FRT5DPqiD0/jEIiqZxQTpXoESCeF/dMJ2Rqf+dfI6Vmve9O09Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783431667; c=relaxed/simple;
+	bh=zJaRecQvWCfyOb0u+CgzjGM8jpBNb1iGN5U7HLxKqFw=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=m2QoaBR2n2Z2/GnGpbXs42MZfJj9NAhUyg/XAimplpnT+scXNEM6rvpEPo0Tijidloi9eG5Ej/YtyVrLR/KTm4F++dYnpO8Ml7YJgQPgeBBW907nJyM+UaHgTWG+/dLLJ7wemcvMeLETTo2iXUmh+AF9DDpK/D6kIaXKZbIAumY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=weidmueller.com; spf=pass smtp.mailfrom=weidmueller.com; dkim=pass (2048-bit key) header.d=weidmueller.com header.i=@weidmueller.com header.b=xMclREJB; arc=fail smtp.client-ip=52.101.69.1
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QfMIXmFji4NvXABw0TQp9PqkC2iRNa+Ak1VQo6hSgB7BemY0QpHwt5rYxXrRRgmTlyx1rL/gzPHCPpFnpAXY/AnkteF/DsNNFcePcHRzhSgQSblRv/AFpXF4cB3tMKSgKW5mHcGVVcYH3n7mEhiAIC65n+m+Zok540KtldIxKa7va86VDPlWAe5bZlK+uw8wyXYwJMoRfKfWgBMsqpLFFWnKD8+RXhwyKJMGoTetxCMueZ3pO/52MgxgckijU26EOuuGwhw6E07JZMLpsuI4v8MW72C1A+B5S8ZkS+FmdRB2XE3pqmJeyylRSYjcWxRQcOQ+B2rgkH9b0PiJ7YBBAA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+j6MZLgnczjtpuyb49JFyeq78S/rDz/ucpBsZhnCN88=;
+ b=CKlghPH1MP8aajqiQ4tDst7mHHVAZIssWF842bcYSIXqwk19L9KzLsSlePgbnJQ3heimUhbWnCVg2ui2ZcyHY8CnChAY9zkbmFH0QuE9HCLQTY92S6r/XFxrZ4I08baH5ClJxbQcr41zZXlfwqbvn0/rXo/nx4hcw3BOJk3WkGCLvDNdUVx/x/CPDwQXk8VUTQ5Ic6rmchSDy8kd5a8SHg5eexGgA7xghzDJlW1+TGd6w77y/TUByy8t5OWu3wAZbdubbu/7J2cxjG+bIC17WGSibndU+MsLrP2qCu9BnH7iqzRtYOaZLmG/hcZ2SXHnmanT+/8birCXTkldogP9jQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=weidmueller.com; dmarc=pass action=none
+ header.from=weidmueller.com; dkim=pass header.d=weidmueller.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=weidmueller.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+j6MZLgnczjtpuyb49JFyeq78S/rDz/ucpBsZhnCN88=;
+ b=xMclREJBSF0Dvn6cFHvaj1dok5NcnuJpjseR/RlhTHJG2RkNY2Hy5ouBIYRD6OE012ffkTc1jCkTCQdA9O5GsBiYJxGM0tMKAs4/OlZsvKQd9ZBA1gSp45UC65tCDAxXhyq2oxdCtoUdLYvXbV8oJ5cruweeWqar9V4YQj4bEe5drZRRfS4ErzbeU2TYNdkrDO2HSZm1pVPhRHC/mVGPhL5p3G0XmMc/Yb5qDNzT9coirrRBJzcN2TAVyiaA9pvwcFbTED+2ZxysOLwcl645jU1IxZF/m+jINS+ZH39LCcww6aFc77GVjp+x9i+ocyP/DWNR29eYxKWlG+BhupATXA==
+Received: from AS2PR08MB9199.eurprd08.prod.outlook.com (2603:10a6:20b:578::22)
+ by MRWPR08MB11730.eurprd08.prod.outlook.com (2603:10a6:501:99::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Tue, 7 Jul 2026
+ 13:41:01 +0000
+Received: from AS2PR08MB9199.eurprd08.prod.outlook.com
+ ([fe80::5022:16e9:45e4:f778]) by AS2PR08MB9199.eurprd08.prod.outlook.com
+ ([fe80::5022:16e9:45e4:f778%2]) with mapi id 15.21.0181.010; Tue, 7 Jul 2026
+ 13:41:01 +0000
+Message-ID: <389f9c70-a2d1-4d6d-9c36-b875f896629e@weidmueller.com>
+Date: Tue, 7 Jul 2026 15:41:00 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/2] net: macb: mask TXUBR during TX NAPI poll to
+ prevent IRQ storms
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ christian.taedcke@weidmueller.com
+Cc: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>,
+ Conor Dooley <conor.dooley@microchip.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Kevin Hao <haokexin@gmail.com>, Simon Horman <horms@kernel.org>,
+ Clark Williams <clrkwllms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+ Robert Hancock <robert.hancock@calian.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rt-devel@lists.linux.dev,
+ stable@vger.kernel.org
+References: <20260706-upstreaming-macb-irq-storm-v1-0-ab3115b5a13a@weidmueller.com>
+ <20260706-upstreaming-macb-irq-storm-v1-2-ab3115b5a13a@weidmueller.com>
+ <20260706150552.EomovsBn@linutronix.de>
+From: "Taedcke, Christian" <christian.taedcke-oss@weidmueller.com>
+In-Reply-To: <20260706150552.EomovsBn@linutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR3P281CA0186.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a4::13) To AS2PR08MB9199.eurprd08.prod.outlook.com
+ (2603:10a6:20b:578::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/6] net: hold instance lock around
- NETDEV_DOWN
- and NETDEV_GOING_DOWN
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178343161539.1993077.11580513248901815053.git-patchwork-notify@kernel.org>
-Date: Tue, 07 Jul 2026 13:40:15 +0000
-References: <20260702224150.3730033-1-sdf@fomichev.me>
-In-Reply-To: <20260702224150.3730033-1-sdf@fomichev.me>
-To: Stanislav Fomichev <sdf.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS2PR08MB9199:EE_|MRWPR08MB11730:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4e951b40-3a45-4db2-fe4b-08dedc2d620c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|23010399003|7416014|366016|376014|1800799024|6133799003|4143699003|56012099006|11063799006|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	r2ivLaKhSVBeFkt6zTTkrrAygZTLulzeIwwVxEAfDAXJt16+3cWHZ8sKqNIhLYwMS47nrPIg1LYpOmdOX+bEe4JLlgJWKpBphIwAdL1RJz9L7qJlcMZ91LrgPh9LEA1lm59pGQha9PuFP7CgXKD8GP4+1bhtKcXwGFzUfBYUdBTpzm5W1FrXd3PaKsAcGnCqKZnYQK+BELVOt6AusvCMsXY4mm2GaMOLwwkksA5Bs1fVqsT3r0p2sUH7djCRwYfEq5W+eOv4fwcUboZl+gfFCPKAQX8XodlUWiyDjsVCMQqu5KDGPJktCVXyKssmLgTkzNkpFhOacR4B2mOBfPy+UgkQcm6mfABT5wi3nbOen2T7DVzkgxfHqAPgGTWrH/jiGpcgSi9vBY4f/08sh+Oo9FeEPcVhZd62YYHrn7DxHzI88DBRmucjKW3RxGvavKou1FmbJTWiWqbC59ii4AQEOGsYXm/HW3DOSKoH6HB/PJVkY5ebWem9PMWct/lcUh91uBZeP1fTd3eZGwBb5Wr4mGrjc5K1QeILVe2kwqn+c2vozSpgX09W4xsbnlCFSvw04SULugMl9n5oqgqctqBKFRMsaFUzSbFvzecC46Tug0483Z8UQ2sy1XyZWHV27YQzuiDBXxK7cU+j+YT8c+tyJuHEgNiWy4kD35jtLKsmTM8=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS2PR08MB9199.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(366016)(376014)(1800799024)(6133799003)(4143699003)(56012099006)(11063799006)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?R0Q2MC8xSjFTN081ZHZlbTYvQWo2cDViWnd6b0sxb1RwZlZQakhRNFVUQWhk?=
+ =?utf-8?B?SnJEbjlXRUNRT0Rnb0JvV1lYYVRzc2YzTVkwVEM5cFZkaEFVU0dyUEpRTTlx?=
+ =?utf-8?B?VzhpMnhZa01Oc1ZkRm5YU2dkT3A1ajJscnZGOXQyUTNlUC9PdG9iaklBVzJI?=
+ =?utf-8?B?N1RwaDhGUlI2ZmNXNmZtTFNkT0V0d2ordnhJcXlQbktYYWh6WGkyUytUbHly?=
+ =?utf-8?B?UXczT3RPY3U2TDc0d3BKZmcwWjFUdjREeUROQy9lT0NZUW5QajR2S1BJUTFG?=
+ =?utf-8?B?SHd5M3NHclZyWTBkYjBnQXdWRGdqZm1BbkZaQnJ3SjVFMElMZ3hkZktiQ0lK?=
+ =?utf-8?B?MjNqT3l6WnpWb1F5Vmx4Z2h2Mks1UnMyK0k2bGpjQTlla3RsdGJEajRUcy9i?=
+ =?utf-8?B?NlNsTVlFS1BUOFpiVTJ0Wm1yOTBDYkNyUnVOTjhUdWVCanozamJtWjFmSlJG?=
+ =?utf-8?B?WHRhVlVYc1BRZmxBRXRwcWoyRlhwUmdSUWQ2REIxVFJDYk1zMkRkYmhzWmZT?=
+ =?utf-8?B?ZDZON090VGRKMEpMR2x0ZVZuZnAweFJ0QVU0OEZnZkdSdSttYVRvd3JLdlhR?=
+ =?utf-8?B?MGl1ajJRME0zM0Z3RmRwNlZEa283VmQ4WE1WNFZoZG83NnFLUm4yM2gzRFNs?=
+ =?utf-8?B?Sk9xWUFIamNqV1pnejhNZnBCeDFnTDZHR0tXNm5Ic2lrNFovWVl6ck5OK0xQ?=
+ =?utf-8?B?eGpXUUc5REdPR1ZTM2V0aUNkeVQxOXhYZE5CV2tjUXRQSzkvTndncHpuNVdp?=
+ =?utf-8?B?OFdYUFJBRFhOUWNEZmJybDRTSTNoUkJPQW5BUnpRN3hLKzNFbk9ZUzdTT2Ni?=
+ =?utf-8?B?QitqQTFPQ2lVVnZHc0dmL0hLSDVBL29oM2diSE1QVFptd1BUZlRuVGUyYWo0?=
+ =?utf-8?B?akZ3eUJXQ0s3dmdaRDRocGFIWDhHK3I1MmplZVN5NktXZXFLRE1ScGNxLzN6?=
+ =?utf-8?B?WDEvbHFqQnJuL28rSU00VzdCR2FMU1d1dDRrbmRNU1hzZ2Y1cTcwZkhXSzY5?=
+ =?utf-8?B?MUwxWVZOQVBqd0phb3ZMaUlNT1BpRUx0RnNFZStXbGN2dWYxTUJ2MCtXKzNz?=
+ =?utf-8?B?T2prL08wcGJBWDBjODBpYk5MM0lDKzJQMHFXYmMvZlYxb3ZhSEZtc3Zmb0RQ?=
+ =?utf-8?B?NDQwazdhcVpRL3MvVzBUVTJuVGFIVXlGSzE0OExhQVBYWFJmaXZoMmMxSVlB?=
+ =?utf-8?B?Zk56UHdmYnluWFdrZGRWM2Y5M0hFZzRPNlFocUY5aFA1cnVlbDNrTnZWRkp0?=
+ =?utf-8?B?RGFod01pRTgzMlRKYXRaRTQ2eWNwb0dTMnA0SUNzQko2NWxkRXQzYVBObS9h?=
+ =?utf-8?B?WVY1c0hZSkJGTkkzd0tHVEhLdmJnbGQ0LzRFSENKbkxMcW5melh5aTBWbWZE?=
+ =?utf-8?B?S1htbXNIR3RWZFRKREJqd2l4QjFHYnI2V3JxbnBGUFVoY1RYa3YvVjE5Tk01?=
+ =?utf-8?B?RUdQUGxZenBrd1Azc3JpamU5ZXJuY2NqNUxWSUR3Z2xzWVlWYXNMY3FhbWVD?=
+ =?utf-8?B?bE4waFJKbGhYSTgwOWtzb1pXTXlvK3llVkJCMUN3VG95R09sNmhDaFMrWkph?=
+ =?utf-8?B?c2pMKzRZa2phN25vcG5Lem9UY0xwUkF2enk3V2FUQUl6dTlMOStxL2lncDVO?=
+ =?utf-8?B?aEFnU0NjMGVMS2R5T2MreHd0d0FpMWtwcWVFZHBYdndaRTdYVFVnT29Td2NG?=
+ =?utf-8?B?cUc2UFNuSllIWDA5T09xQ2M3SmRuM0hUUUdob2x2NE40bUdZbVF4eFpud3dG?=
+ =?utf-8?B?cWVETUJLWHhZRDlpcWc1Sk9zS0ZnTzJsYWtaNWV2dEh6K0VOV3FhUG9Gc3E5?=
+ =?utf-8?B?UjdRVFdkT1FBNTRuUkxMWlh6K1NkWE8rcHNmYXBNOWJoUjFaVVdwTjROMFVp?=
+ =?utf-8?B?ek9YSmdaaEs1OXBjOEpDOHVaQ2ZFcTl4ckhuOExCKzdtUEFoMThCeDZYSFRL?=
+ =?utf-8?B?Vkxya2FpeWFyRHVGUVA2NjJMbFh2RUNQZjlhUDJxTDBXZjFoUkZhdWhyZ0VK?=
+ =?utf-8?B?TmQyMUd2SzBQcFp5TUV4aDN6c3dCRktFNjBVM1pQMDd6Vi9hWVRNRTVtbUwy?=
+ =?utf-8?B?aHBrbDZkdDR0RmVJN1hXOWthS2EydG5hSFE4MzNKa080SENrUEZheVc1RFk2?=
+ =?utf-8?B?QkZUaGNRQ1V3Vk9JRmVuZEVJOXZBMktubzlnWVlHcnJMYWlsb1J4MlVRekpP?=
+ =?utf-8?B?RENEdFkxTDFNb2U3RXJTemVKSDNSTkZBT05SYTNxZjdPcldYQjZqbk4wQlJt?=
+ =?utf-8?B?ZlhUUUJjaXloNEZveEhFSnRsLythRjhBc0k4TjlJcDhpcVpnQXdNNTNKaVNB?=
+ =?utf-8?B?aHJBdmJWaVpLWlNFcmxEcXJJNGhVZDMrdnNQNzRlNGhWdkNHdm1SUnpxTy9P?=
+ =?utf-8?Q?KR/NDTKEvws7M/m5o1Ydb8vwomdrcYwnig4lt?=
+X-OriginatorOrg: weidmueller.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4e951b40-3a45-4db2-fe4b-08dedc2d620c
+X-MS-Exchange-CrossTenant-AuthSource: AS2PR08MB9199.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2026 13:41:01.1830
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: e4289438-1c5f-4c95-a51a-ee553b8b18ec
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dGu23iYBh0SnG2rgrfGZir5nXgVUsgPvuKiNpR04Scg3gTQOLZp6h6vazlJuJmpWDvRYTBczONVT6hzXyuxZWDspHG/K20LAmCe/TzEYM2qTAErHxLnGS/M/OU5vVJSG
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MRWPR08MB11730
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[weidmueller.com,reject];
+	R_DKIM_ALLOW(-0.20)[weidmueller.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-305477-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[christian.taedcke-oss@weidmueller.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_RECIPIENTS(0.00)[m:bigeasy@linutronix.de,m:christian.taedcke@weidmueller.com,m:theo.lebrun@bootlin.com,m:conor.dooley@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:haokexin@gmail.com,m:horms@kernel.org,m:clrkwllms@kernel.org,m:rostedt@goodmis.org,m:robert.hancock@calian.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rt-devel@lists.linux.dev,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305476-lists,netdev=lfdr.de,netdevbpf];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:sdf.kernel@gmail.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:sdfkernel@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[bootlin.com,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,goodmis.org,calian.com,vger.kernel.org,lists.linux.dev];
+	DKIM_TRACE(0.00)[weidmueller.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[christian.taedcke-oss@weidmueller.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[weidmueller.com:from_mime,weidmueller.com:email,weidmueller.com:mid,weidmueller.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B8E7A71C2A8
+X-Rspamd-Queue-Id: 8055C71C2C2
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Thu,  2 Jul 2026 15:41:44 -0700 you wrote:
-> NETDEV_UP and NETDEV_REGISTER already run under the per-device
-> instance lock. The teardown side does not. Make it symmetric so
-> ops-locked drivers can rely on the lock being held in both
-> directions.
+On 7/6/2026 5:05 PM, Sebastian Andrzej Siewior wrote:
+> On 2026-07-06 16:02:15 [+0200], Christian Taedcke via B4 Relay wrote:
+>> From: Christian Taedcke <christian.taedcke@weidmueller.com>
+>>
+>> macb_interrupt() defers TX completion handling to NAPI, but when it
+>> schedules the poll it only masks TCOMP, even though TXUBR is enabled
+>> alongside it (both are part of MACB_TX_INT_FLAGS). macb_tx_poll() is
+>> asymmetric in the same way and only re-enables TCOMP. TXUBR is thus
+>> left unmasked while responsibility for handling it has been deferred
+>> to NAPI.
 > 
-> v2:
-> - reword NETDEV_UNREGISTER unlocked rationale (Jakub)
+> So this is not a race condition, this is always a failure?
+
+As far as in understand it: yes
+
 > 
-> [...]
+> Sebastian
 
-Here is the summary with links:
-  - [net-next,v2,1/6] net: hold instance lock around NETDEV_DOWN/GOING_DOWN
-    https://git.kernel.org/netdev/net-next/c/5326fefb9fe8
-  - [net-next,v2,2/6] net: dsa: hold instance lock on close-on-shutdown paths
-    https://git.kernel.org/netdev/net-next/c/cefa18fab29c
-  - [net-next,v2,3/6] net: mtk_eth_soc: hold instance lock around DMA-device-swap close
-    https://git.kernel.org/netdev/net-next/c/6034bc4febc9
-  - [net-next,v2,4/6] net: rtnetlink: take instance lock inside rtnl_configure_link
-    https://git.kernel.org/netdev/net-next/c/b8d2262b966a
-  - [net-next,v2,5/6] net: require instance lock for NETDEV_DOWN/GOING_DOWN notifiers
-    https://git.kernel.org/netdev/net-next/c/f540caaaca8d
-  - [net-next,v2,6/6] net: document NETDEV_UNREGISTER unlocked rationale
-    https://git.kernel.org/netdev/net-next/c/538d89fd9146
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Christian
 
