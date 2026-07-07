@@ -1,143 +1,155 @@
-Return-Path: <netdev+bounces-305504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305505-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 6xtWBnUSTWp1ugEAu9opvQ
-	(envelope-from <netdev+bounces-305504-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 16:51:33 +0200
+	id UabwKIAWTWp0uwEAu9opvQ
+	(envelope-from <netdev+bounces-305505-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 17:08:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1B1871CDA6
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 16:51:32 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12F6071D065
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 17:08:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=netfilter.org header.s=2025 header.b=aR4VJX9a;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305504-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305504-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=MDhPEj9f;
+	dmarc=pass (policy=reject) header.from=google.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305505-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305505-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F2193300A495
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 14:51:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 48A8530A09FC
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 14:53:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2673A372049;
-	Tue,  7 Jul 2026 14:51:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26DBF348C70;
+	Tue,  7 Jul 2026 14:53:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295EF36F912;
-	Tue,  7 Jul 2026 14:51:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB064350A10
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 14:53:33 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783435880; cv=none; b=jgGfyUj1HRpAiXZMdcwDWGwhglFuH+r2gLXcE8HiBRhxPdGPuNaHnI4g6C7UvTgCBg9o+gqFCczK7tP83JQH/hIMxJK8Wz9Jm4wpqzCBpQ4V6kGv+xDlm/irfGlGe3bErSLj05NCGddVBtUcxOsr77/jU+5P1AO06rfQpqTkIy4=
+	t=1783436015; cv=none; b=JOTsyz2zeNP1Z3Sq2W4XNFnRg0q3bRMskXQHIEZr1ZfnF1OvdH3PlfFK+zkm+4eIw0gPRXqLxYzw9luFZwzXVFQXscnT+v3EvYLvQRuQC3gM6ZgHBiOShRXq2Wv/ZsK2DrPX6u60CKZiNCD4zo/Le6EOpLYZP4f1gwxuqKj5GV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783435880; c=relaxed/simple;
-	bh=L9pxNODWKGKAuUCsthtXuF8mIBH7L4Qzn2ryWaBeMOU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S1nq/Zw2T3iutwclBHnsEd0sv5f62gnsayjBAVojvkZiuRRyqPYYdO7B3kmyaY4XHNGmZ8PzsGiR58qoUCMGcVfns8qFjvJVa9ipJLNYt5Glp8D3OhWTj7J2AUBlkQLtHcmjQ6qgZA7NKPqc/z04kPM46lfamNSd3Y5S6cl4oic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=aR4VJX9a; arc=none smtp.client-ip=217.70.190.124
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 9F22560581;
-	Tue,  7 Jul 2026 16:51:15 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1783435875;
-	bh=gt9EUNIkxSF/HxvT4+/9rtfn5HBwdYBkGcy8bzzqMU8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aR4VJX9a0lT4k9RgfZhExBrDXRGUzS7AoA51CHfEL2KNL1oAInOVY65NfNkS4a194
-	 rxvdatytP7zN8L80/1RejAhfLRbXPpxDIFHiYXhM2p9ElKBlKezwe57ldSDeS5ITS5
-	 pplEuB28dm/CYaFJ+S0kyhbSpfgsH2ZYdYsE8kKllun3Q79DvRKeL/4uz4UXINnbvv
-	 cAZqvc59Utem2Chghcg+66CSJ2ITL3ZtMbSNOIkK2+iLh4uM6cjosMqV2g9cIXU8O7
-	 pEnP53NxY082Zr3DnPGYV7GtiEcuHtimKPoG9sml53gan3rkih6RXfWwpu0o+mtArX
-	 lhHIrCAybxR0w==
-Date: Tue, 7 Jul 2026 16:51:12 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Runyu Xiao <runyu.xiao@seu.edu.cn>, laforge@gnumonks.org,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com,
-	osmocom-net-gprs@lists.osmocom.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn
-Subject: Re: [PATCH net-next] gtp: annotate PDP lookups under RTNL
-Message-ID: <ak0SYEOvw6K_8C_w@chamomile>
-References: <20260701123925.3193089-1-runyu.xiao@seu.edu.cn>
- <20260707142820.GG1364329@horms.kernel.org>
+	s=arc-20240116; t=1783436015; c=relaxed/simple;
+	bh=h+ryLfDaDt5ItUxSxTJR9NANmDGckpwrZZlaxqmUmWI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=IUQHO5N8IytZTnCjz/RL8r/D7jZynpF215EzJ1qEDUSI4suSQYhB9/tzE7uBpOF74o0y5nFQYLidfvzXsGTGkjMwJNOnQggm5cwQSt71e7o9tlZUp4n5CiDKnHCMwkbdWVqnBcMC6rbzLad6iTYuXzfp/2YuoUFa2QnmtOJbQx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MDhPEj9f; arc=none smtp.client-ip=209.85.219.73
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-8f1d3eeab92so56496726d6.1
+        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 07:53:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1783436012; x=1784040812; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=dUheqUENlIK53LS2jT54JqHTs8OxEa884FQLcdwCn6k=;
+        b=MDhPEj9f8E9TPyAcuscyM+yvmxTuXkl4bTlY4QvudMqD2/zBpcmx3zKmf2zpcLHG0h
+         E2QA9JTdQe2jybvSlc6J19gVXs5ExCEedeapZCNUZ8gceqTdRTrivB2/U56X+BELQ1UE
+         1pYxdKkrtuHjxYXbmCAxLEQ2xEWgujEgtrdXQw99YUVE3fAsaFQ+oGLeCqmO0q6gLpCO
+         v6k9iWIvvc6ffudFTy/d7we7T2hyM4L4OmVeQ6bRQ95MC8FXFfOvnULXI2M7BHZL6mi+
+         lgihO0gR1iJxhtRVe/bY6EX5RchCY8rLwxBBbiHBn0Tm/Vyt03C20jsjzOVXzOsxPYgu
+         LK0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783436012; x=1784040812;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dUheqUENlIK53LS2jT54JqHTs8OxEa884FQLcdwCn6k=;
+        b=kBxYnGQQoHeEekj4/Az10JfyyiTXJPst66Ns1XgD9uFl4F5yX/jN/DZ954lN1uIfXt
+         Vja4upBE6NqFHWc5Z5A3F2YhXGYGVD27w1/79pdqbw3PoSJD2148LKO83RtB89miRR3B
+         KbwHk857zRK2EOUe0CZ45tByHGU9tOSzRlrWCaG+D0l0s+INgWaXG4+AoZMez+fj7UVR
+         n+3K8DK0r9gVg3TFPJ3bG+Le1iX/wllFGJE4trd1+z02tFfXOae6oXYRfchavAzDjMJZ
+         YpdGii04MUOTatrFfB7iOxjuFiyD8sZIV7bxag8AsT4AqZV2VY3PaL09oieaoK1vNe3r
+         RF4Q==
+X-Forwarded-Encrypted: i=1; AHgh+RoxTUlboMga2k6K3gc+REdx4ve0pE/cYNaAdCIz+uxu6OpfWEepdAlCfC25zrIXOt9WLdHwDuY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxpf9ep4wxO4vv1zbat8ECb/A4Javpy/rm5FYngruIaX6p3A0IA
+	pCCSDejdCb9d3iDeYeXUab9J3E95XWkWSyXp7Y6d0zYuaTIIyYxeXbDFO9rSv/tqKjmnN4EQFw3
+	gmhpWdojrnFpH5g==
+X-Received: from qvvv8.prod.google.com ([2002:a05:6214:8088:b0:8dc:3559:783e])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:2e49:b0:8dd:4979:4b19 with SMTP id 6a1803df08f44-8fcb289c3f5mr72517216d6.13.1783436012152;
+ Tue, 07 Jul 2026 07:53:32 -0700 (PDT)
+Date: Tue,  7 Jul 2026 14:53:27 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260707142820.GG1364329@horms.kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.795.g602f6c329a-goog
+Message-ID: <20260707145331.3717941-1-edumazet@google.com>
+Subject: [PATCH v2 net-next 0/3] geneve: make geneve_fill_info() RTNL-less
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:runyu.xiao@seu.edu.cn,m:laforge@gnumonks.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:osmocom-net-gprs@lists.osmocom.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DMARC_NA(0.00)[netfilter.org];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[netfilter.org:+];
+	TAGGED_FROM(0.00)[bounces-305505-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuniyu@google.com,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:andrew@lunn.ch,m:ericdumazet@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,lunn.ch,vger.kernel.org,gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-305504-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashko.dev:url,netfilter.org:from_mime,netfilter.org:dkim,seu.edu.cn:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A1B1871CDA6
+X-Rspamd-Queue-Id: 12F6071D065
 
-Hi Simon,
+This series makes geneve_fill_info() independent of the RTNL lock by
+converting the device configuration to an RCU-protected pointer.
 
-On Tue, Jul 07, 2026 at 03:28:20PM +0100, Simon Horman wrote:
-> On Wed, Jul 01, 2026 at 08:39:25PM +0800, Runyu Xiao wrote:
-> > The GTP PDP lookup helpers are shared by RCU-protected data and report
-> > paths and RTNL-protected control paths such as gtp_genl_new_pdp(). The
-> > helpers walk RCU hlists, but they do not currently pass the RTNL
-> > condition for the control-path lookups.
-> > 
-> > Pass lockdep_rtnl_is_held() to the PDP hlist iterators. Existing
-> > RCU-reader callers remain valid because the RCU-list macros also accept
-> > an active RCU read-side section; the added condition only documents the
-> > non-RCU protection already used by RTNL control paths.
-> > 
-> > This was found by our static analysis tool and then manually reviewed
-> > against the current tree. The dynamic triage evidence is a
-> > target-matched CONFIG_PROVE_RCU_LIST warning; the change is limited
-> > to documenting the existing protection contract.
-> > 
-> > This is a lockdep annotation cleanup. It does not change PDP lifetime or
-> > hash updates.
-> > 
-> > Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> 
-> There is an AI-generated review of this patch available on sashko.dev.
-> While I don't believe that the issues raised there should impede progress
-> of this patch you may want to look into them as possible follow-up.
+Historically, geneve_changelink() updated the device configuration by
+copying the new configuration over the old one using memcpy() under RTNL.
 
-This patch refers to the rtnl_lock, but it is the genetlink mutex that
-protects updates on the PDP context list.
+To prevent the transmit/receive data paths from reading torn values during
+the copy, geneve_quiesce() was used to pause the data path and wait for
+a synchronize_net(), causing packet loss and latency.
 
-Then, from packet path, rcu lookups are performed.
+By converting the configuration to an RCU-protected pointer, we can
+perform atomic updates via RCU swap. This allows data path readers to
+safely access the configuration locklessly under RCU read lock, and
+removes the need to stop the data path during changelink.
 
-I think this patch is not correct.
+With the RCU infrastructure in place, geneve_fill_info() is then updated
+to read the configuration under RCU read lock, removing its dependency
+on RTNL.
+
+v2: addressed Kuniyuki, Paolo and sashiko feedback
+v1: https://lore.kernel.org/netdev/20260701120454.3533252-1-edumazet@google.com/T/#m887804321856d9b5c7142107e81b52553e60e6ab
+
+Eric Dumazet (3):
+  geneve: pass geneve_config pointer to helper functions
+  geneve: convert config to RCU-protected pointer
+  geneve: make geneve_fill_info() RTNL independent
+
+ drivers/net/geneve.c | 370 ++++++++++++++++++++++++-------------------
+ 1 file changed, 209 insertions(+), 161 deletions(-)
+
+-- 
+2.55.0.795.g602f6c329a-goog
+
 
