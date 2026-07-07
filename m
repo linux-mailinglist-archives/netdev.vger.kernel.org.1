@@ -1,164 +1,168 @@
-Return-Path: <netdev+bounces-305420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305421-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5hUtIAjlTGq7rgEAu9opvQ
-	(envelope-from <netdev+bounces-305420-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 13:37:44 +0200
+	id 3oM8BJTmTGoarwEAu9opvQ
+	(envelope-from <netdev+bounces-305421-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 13:44:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAC3171B016
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 13:37:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6ECA471B10E
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 13:44:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=noIwUguk;
-	dmarc=pass (policy=reject) header.from=bootlin.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305420-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305420-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b="di78U/GW";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305421-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305421-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 016DB300A4E0
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 11:37:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5246F301919A
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 11:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E728C3F9289;
-	Tue,  7 Jul 2026 11:37:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2425E3F4DC1;
+	Tue,  7 Jul 2026 11:38:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7ED73F888C
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 11:37:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B83A03F7AA6
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 11:38:29 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783424256; cv=none; b=KWpqQFhF51RhBxSdeLJYn1zcOSrBm4LN+sWEqxhCaoL9xbJNyNgADzOsoZFrh2exgpe9nFSWcvMZTORFFyI9hkLOKv5QL0twuIh+8wObpQwWslze8hgeRkKWPslLLtuvmrwGFjcN9gEDOdZjTxyG2B2OzSd5aNZ/zQIQZaolwZo=
+	t=1783424311; cv=none; b=MFj8IP/MKPB14X8aKxn7gGs3130mUOVh5dMpnr4kvECFwOA6HyG47vaIHfCoxvETutsob6a/2o0aB1s3jGAbpPOmrpii23/fI/LE5fOYiKkNqMslLEf9nkApOk3BW6i04CMhCnj1qTECA7WdPwWgiFGtSDckKzvYs0PttVM8dJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783424256; c=relaxed/simple;
-	bh=pEC7ni5BvaU18nJiwHRqi9eXs+4Uf56v5D/Fk9lI1Z4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KSmPuRepG5wwdC/lL0g4P8yH5fUKy1qeKcFk58hW2vS3CGhxAIM3QDqOTKrJlTPgPFHNfTGfsipHZNY5fNIX768WGevX8LxNUQML7GjgMoqzKoxR7dFSab50MWw67RGOUCWeRNMWEghIGDGlA+0HQFg3k/8lPKazwWqjzEP9ZSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=noIwUguk; arc=none smtp.client-ip=185.171.202.116
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 7455BC8F1EA;
-	Tue,  7 Jul 2026 11:37:46 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id E0339601A3;
-	Tue,  7 Jul 2026 11:37:32 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D07F811BC15B3;
-	Tue,  7 Jul 2026 13:37:24 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1783424251; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=oe3bY6f5fTi80f3+Jhgg+BnDGy7fhtzVmRe3YS6HHNQ=;
-	b=noIwUguk9xY2PcJRl9sO+XvlR2RlhLvf0kfUpLAy2d1w7s8stfv7La0SZgFovtBHwF/h6j
-	w+uxreTyyh7Z1rspi8XWaQzs6aMysc7NZ+LEohM9VCiIAJY2sPG1S8T/JElnxO6l390svT
-	Ch5eVRqjuHNYrI9KhtpIKifwBEe0hEx77Y83ogtsEFSUsnb0X3SKK307C+S2pQHN0IqwMm
-	Pc4VfBCCQZVNPxc0pl5sad6Qeab+wobHfj2pUyfGubJGM7dzt6D2U4hiDInC29ClJztWCo
-	3UiIQNbC+Kj1rteVolSg3XR7zZukCcrHX97luVSkluRZNSPbTcznvcn7PV9eQQ==
-Message-ID: <96409687-5752-4ff9-b4ab-2c9ca54d6b15@bootlin.com>
-Date: Tue, 7 Jul 2026 13:37:23 +0200
+	s=arc-20240116; t=1783424311; c=relaxed/simple;
+	bh=hEzac39ba/5lX/9Eef9L5fGodksJwsGH6fZH1a9Oq/M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mLzjdCTJK5W6JKtDHw+/37bmD+iBbPB8vpkj4wrPsEAmkowjmAxcNYwKlRLbPQbjGd3rYmEymkZavpa1w/bpUc/GSS+qCNd8A5HYa3Q380nGVZo6HC2f8LlHTLmDeo0YrYBljo2SyJi73Oi2ggbADeGBPQqSd7GbsQMThA4QLT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=di78U/GW; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783424308;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gD1iFtbwfwxUxYa7Q7fmRHwP16XfGqMl+jwvGG5JkzY=;
+	b=di78U/GW1ndBolkO3OlQLjNS1hjPIiSD0Rr6Fsk+VRFJyLg+7CT2lMQWf40VX3NGo0GrDF
+	j/H0kqr0a18OXFgJAbtyzYNE5DK6vLuCPwAb4qQqyyySvqtAy8nN46PnBGi3fNRpa26lRB
+	mjCdSSJdL/lug34xl6dxfFadQuFZAdk=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-682-ypl6u5h8Nd2a3Wg0OVKRtA-1; Tue,
+ 07 Jul 2026 07:38:25 -0400
+X-MC-Unique: ypl6u5h8Nd2a3Wg0OVKRtA-1
+X-Mimecast-MFC-AGG-ID: ypl6u5h8Nd2a3Wg0OVKRtA_1783424304
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E92E71808964;
+	Tue,  7 Jul 2026 11:38:23 +0000 (UTC)
+Received: from thinkpad (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 883541956040;
+	Tue,  7 Jul 2026 11:38:21 +0000 (UTC)
+Date: Tue, 7 Jul 2026 13:38:18 +0200
+From: Felix Maurer <fmaurer@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com,
+	syzbot+456957213f32970c0762@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] net: hsr: fix memory leak on slave unregistration by
+ removing synced VLANs
+Message-ID: <akzlKrj0AtfImcJS@thinkpad>
+References: <20260707082327.3238690-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 3/8] r8169: add support for phylink
-To: javen <javen_xu@realsil.com.cn>, hkallweit1@gmail.com,
- nic_swsd@realtek.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- daniel@makrotopia.org, linux@armlinux.org.uk, enelsonmoore@gmail.com,
- daniel@thingy.jp
-References: <20260707091637.371-1-javen_xu@realsil.com.cn>
- <20260707091637.371-4-javen_xu@realsil.com.cn>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20260707091637.371-4-javen_xu@realsil.com.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260707082327.3238690-1-edumazet@google.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305420-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[realsil.com.cn,gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_RECIPIENTS(0.00)[m:javen_xu@realsil.com.cn,m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:linux@armlinux.org.uk,m:enelsonmoore@gmail.com,m:daniel@thingy.jp,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,makrotopia.org,armlinux.org.uk,gmail.com,thingy.jp];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-305421-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:syzbot+456957213f32970c0762@syzkaller.appspotmail.com,m:andrew@lunn.ch,m:ericdumazet@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,lunn.ch,vger.kernel.org,gmail.com,syzkaller.appspotmail.com];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,realsil.com.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,456957213f32970c0762];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email,thinkpad:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EAC3171B016
+X-Rspamd-Queue-Id: 6ECA471B10E
 
+On Tue, Jul 07, 2026 at 08:23:27AM +0000, Eric Dumazet wrote:
+> When an HSR master device is brought UP, it auto-adds VLAN 0 via
+> vlan_vid0_add(), which propagates VID 0 to its slave devices.
+>
+> If a slave device is later unregistered while HSR is active (e.g., during
+> netns cleanup or interface destruction), hsr_del_port() is called to
+> detach the slave port from the HSR master. However, hsr_del_port() currently
+> does not delete the VLAN IDs that were synced to the slave device by HSR.
+>
+> As a result, the slave device retains a refcount on VID 0 (and any other
+> synced VLANs). When the slave device is destroyed, its vlan_info /
+> vlan_vid_info structure remains allocated, leading to a memory leak.
+>
+> Fix this by calling vlan_vids_del_by_dev(port->dev, master->dev) in
+> hsr_del_port() before unlinking the slave device, matching the cleanup
+> behavior in bonding and team drivers.
+>
+> Fixes: 1a8a63a5305e ("net: hsr: Add VLAN CTAG filter support")
+> Reported-by: syzbot+456957213f32970c0762@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/6a4cb6ca.57639fcc.86d58.000b.GAE@google.com/T/#u
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
+Looks good to me, thank you!
 
-On 7/7/26 11:16, javen wrote:
-> From: Javen Xu <javen_xu@realsil.com.cn>
-> 
-> Transfer old framework to phylink. Phylink can support fiber mode card
-> which can not get link status or link speed from standard phy registers.
-> 
-> Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
+Reviewed-by: Felix Maurer <fmaurer@redhat.com>
+
 > ---
-> Changes in v2:
->  - merge patch v1 3/6 and v1 4/6.
->  - add helper rtl_mac_enable_tx_lpi(), rtl_mac_disable_tx_lpi()
->    and rtl8169_get_lpi_caps()
-> 
-> Changes in v3:
->  - use phylink_ethtool_set_pauseparam to set pause status when change
->    mtu
->  - replace phy_do_ioctl_running with rtl8169_ioctl
->  - recover phy_mode according to tp->supports_gmii for 1G nics
-> 
-> Changes in v4:
->  - set lpi_interface if support eee
->  - Only if jumbo changes, set pause
-> 
-> Changes in v5:
->  - no changes
-> ---
->  drivers/net/ethernet/realtek/Kconfig      |   1 +
->  drivers/net/ethernet/realtek/r8169_main.c | 279 ++++++++++++++++------
->  2 files changed, 206 insertions(+), 74 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/realtek/Kconfig b/drivers/net/ethernet/realtek/Kconfig
-> index 9b0f4f9631db..49ac72734225 100644
-> --- a/drivers/net/ethernet/realtek/Kconfig
-> +++ b/drivers/net/ethernet/realtek/Kconfig
-> @@ -88,6 +88,7 @@ config R8169
->  	select CRC32
->  	select PHYLIB
-
-PHYLINK selects PHYLIB, you can therefore drop this.
-
-Besides this and potential reworks for the pause, this patch looks
-pretty good :)
-
-Maxime
+>  net/hsr/hsr_slave.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/net/hsr/hsr_slave.c b/net/hsr/hsr_slave.c
+> index d9af9e65f72f07b1997b80c85db16d812fbda488..2d1e3ea72088e35d5d870b4cc86dd2f789670394 100644
+> --- a/net/hsr/hsr_slave.c
+> +++ b/net/hsr/hsr_slave.c
+> @@ -242,6 +242,7 @@ void hsr_del_port(struct hsr_port *port)
+>  		netdev_rx_handler_unregister(port->dev);
+>  		if (!port->hsr->fwd_offloaded)
+>  			dev_set_promiscuity(port->dev, -1);
+> +		vlan_vids_del_by_dev(port->dev, master->dev);
+>  		netdev_upper_dev_unlink(port->dev, master->dev);
+>  		if (hsr->prot_version == PRP_V1 &&
+>  		    port->type == HSR_PT_SLAVE_B) {
+> --
+> 2.55.0.795.g602f6c329a-goog
+>
 
 
