@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-305288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305286-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7IzeCCOaTGqtmwEAu9opvQ
-	(envelope-from <netdev+bounces-305288-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 08:18:11 +0200
+	id fJ2MOfSZTGqjmwEAu9opvQ
+	(envelope-from <netdev+bounces-305286-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 08:17:24 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70D63717E07
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 08:18:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A500717DF0
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 08:17:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305288-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305288-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305286-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305286-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 78939303583E
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 06:16:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E7826302979C
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 06:16:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E06F4376A09;
-	Tue,  7 Jul 2026 06:16:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99180388363;
+	Tue,  7 Jul 2026 06:16:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
+Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61EE7226CF6
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 06:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB3B226CF6
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 06:15:59 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783404966; cv=none; b=k8JyuoSRRMkst+lj6Hh5axnkq7KL+YD/ep6Fcs+vvMNEdBtmer6BGT04/mUdxBo4gKueT0ctpo2EOk3ES6q4Qo8a9NUGx8I4J4+AUvGTME0LD5i75jsC0ZMmBbPjiqKBM93br7mhg3w/cX6J1ZpeYWDCR9sXRfrll1YKURHYKLs=
+	t=1783404962; cv=none; b=ezgwl9TFtHf+OcFrn1pGiy03W//6TfXkoeBZ+oNANbhDD3fYaRaEvDGQc293ZNJ18tQmXY5yRZsqPJg7bRp/vx8X8Uz2C5Zu6qLwUls8XRi7j/BjgyI2Ud9wj+lIyl5TONaP/0S8oSNHDZglE8wTzOoSFrUH7dR0SzsVOuWEPuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783404966; c=relaxed/simple;
-	bh=fSkH3s+IoIx7W32YMC/h8FPXxFOZoCgqGIRbLsds3HM=;
+	s=arc-20240116; t=1783404962; c=relaxed/simple;
+	bh=BrARUmunaivAm6ZZlmtiJnjUjxqkkrByeFRiBW17H90=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=U6AXCnFDAKwKbRwlVhWzXtVNSVvoDQ+DfXmTiDgDl06dtFPTFB+2D2xlOK5yBKeyCTiz7RuvnL21XkoFcppm8FYeO7XTKMv7Edwgxj4F1bmnbvE45kZfxQqxS6YjA0J078o3kIJpmOsVg7zrrzGe683QxtfItyhCmrJ22cWlQEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.204.34.130
-X-QQ-mid: esmtpsz10t1783404917tc0e9bbf8
-X-QQ-Originating-IP: s+hn0JJIoMyHJwH7HDZuZ5ED3wxpBm9lA3ymTj0DnMc=
+	 MIME-Version; b=WDtb/TJYYcVB8rJ3U2toE+A4YnUEiZXwL4gvBKpU3lvOe6O0LHYwt6rwig+1I0EFekmg6IAWahCKuH2oMCQzGBxJ3XQ2IoTxOHxMxaKpuSVmShQGTzedo1Ve+9XNfID6RTaszucdhGPjE17SfHeixJOVmsG9Z+pZLi4kyFNRZu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.206.34.216
+X-QQ-mid: esmtpsz10t1783404920tdd122fec
+X-QQ-Originating-IP: nHCLoXmRGqNUExhtmCt6DeaeB1mKOQcc8GQHqd4dnbw=
 Received: from lap-jiawenwu.trustnetic.com ( [60.188.196.189])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 07 Jul 2026 14:15:14 +0800 (CST)
+	id ; Tue, 07 Jul 2026 14:15:18 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 14636461010994805736
+X-BIZMAIL-ID: 9719262162574171370
 EX-QQ-RecipientCnt: 22
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: netdev@vger.kernel.org
@@ -66,9 +66,9 @@ Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
 	Larysa Zaremba <larysa.zaremba@intel.com>,
 	Fabio Baltieri <fabio.baltieri@gmail.com>,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v10 4/5] net: wangxun: implement soft quiesce for PCIe error recovery
-Date: Tue,  7 Jul 2026 14:14:54 +0800
-Message-Id: <20260707061455.39564-5-jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v10 5/5] net: wangxun: add pcie error handler
+Date: Tue,  7 Jul 2026 14:14:55 +0800
+Message-Id: <20260707061455.39564-6-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.21.0.windows.1
 In-Reply-To: <20260707061455.39564-1-jiawenwu@trustnetic.com>
 References: <20260707061455.39564-1-jiawenwu@trustnetic.com>
@@ -81,24 +81,24 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: esmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: MkyMzdXM6uJmgB7UTm8oT6IphPDrpBXE2V3TfHXMw16iPkTQqoph/rNI
-	0XjWOrQK+yeNTvAZpfY/Ize0OLAxEBMnuCd6LGCBU7l2x0OST+OkDLoMWBrMjRIZQ/FDfYl
-	+Yg80dVujWr4Z1AgGjU3W4A5x8swHj2gtGiPOXng/lLOOGeePzFiH0OrAh9+jxh7kHkQp2O
-	til7enKcl/Qfgz436zOZkXEvzw3a0D0ZySTVMmRmQgdwb9za60NLi9eDjTApuus0KZcTlii
-	FqTehgggISrqNq4sl6wd3BEl6+ntsJ27R2olVdQmpfMcVL7RrkLi+N40NhvEDPpfFD7ovmI
-	+Dd6oD++8GzaSXgweNI7m+zCArtaZ5oVFiK1aVVoaQnlAaMbXNGFzL3HLVHbJdYU66dY4Wf
-	MkjN8eR4D72ecJ1uEMndITm+Hcggn/uQad+W5a92814Vl6TSsPVi7a5/jOjQtmveIx4zsUx
-	1IRB5bFQfyj8IfFI1HoengdQXTtMKx08R2j/amsgFdel6byATka/4XwNNshpBKWU++ewAQ5
-	2MtMxuAUaaje3iNaJvAnLUZbbtaGBVJcVdWhgGu8b1WtFh4L2ZzKCI5WRx6YpMafcbTlBii
-	2alJQJO6Q7bXIn86Vu0ZWxOv072HBw8PhZRsRJqhOwxIiOly8zwf8oyhgxn/xIHUV3Aer9b
-	WovMn7zvblIWIQXudds6mQaIZS0CZKYaCGFIBVaHXzkwSyFxDo4kw+yMNtPheq/zon+3yS5
-	z3G42c0KEDUAuE7lfx3aHyxorbvcITOBU7lYMaawl0jhePcFAIY0mRDTdO6WiQ8i0NOL5W+
-	ZAROslmG52C5zVjm7ailR3pApEX97HW7vp8wQxE8xL5r2WCr/861GrFOTLwHPciE1xCVAX9
-	Ur41z5bxN4lrrX4GUgDj0Oij27wGnVIJB3CWi6vYCt957Cy+z1DMfAtea0NPtsAt/uC44fC
-	470+WQwRVkahtpKT6FolfbGRDRVJpvTzMo7gJmJZhKv1/zQXiLl7JgUnMY3Xmvz6Ti4N/Fs
-	3H077ucu2TTb04RXXfoN2LuQA/Q5Z0xvS28BFYXjU/bgoORoOXRkXchn1KKcgL4iz3nMCBL
-	zSV06scpC7pmb/l9ATjzJ+FVzZ5Y3hfBg==
-X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
+X-QQ-XMAILINFO: OFfQQ3bkz2z44yHJhlg8v2M9Rsgj1kRfzAdLitmgbgdtWLJTIW5YlcUN
+	0pSTEoUuwQKxDUSQOEwC3QN8GhpaCjIq6GzqQcgAx7ihQ5yGY3TF/4x9N/p+IlRbCoKs6Dh
+	T78GmjbwlSqvVspPMjL7CWPGL0Jn9mOTngbXqxmxSxB6nhEzJG+TuxggRCBbCuaNQKwWauG
+	+BcH4R52gqEcGn/FSeKSsuuTORU04kal8m47iuYrfR9IRbLJesuwtlSoin5HhQPLDhfFArn
+	K2O93rJMVi+Vn4Eh22GrhAS06pofG6ejc4sYhJ538c5YDjIXXR7zdpsLN2vImYHV33vuN8q
+	+KZZ5H2YEdrgQ5eC0D7lSVBOuycMoGN+mLCl5BD0z9mEsafseimcQSCMl1XWXbKqYlmOnch
+	Um8iDX9eA5xSL8nw4oYK6f3KiCkRTgljFK5vns2xFP1n9XwRa3zLWIdqHx4CDGOP5ph//ec
+	5EWOcBNVWwDPOaTkuvA51qYPXprTVx8ICsZDy9ZuG+lG7kQyRlY66idQyuclW1357ktsQBx
+	OUPN6IgPQnZ9cCmtEQz1LzloaIw/g5SUdocqKPVlNwAcYOYGvDIJgDDmpCppULhXQ4vRpIg
+	6Toe74V+G8eA5boWR2TtZ0nBE9NbHDfVBoScF2a023+Bsb+FMG212mJzdlk2fLROmv+E0zl
+	rhYa7T73KPW8e2FzvEnrVl7cKhpeLmj9vMfMWTnOGRC/kz/+wU1Ld6+yG06E7MMvVMpqz3Z
+	3gx7/v/LERxqUOaUQJ1pb9yMy0NDKw8ML8dwYMdTkE+DbcwOFPejFFk6Uiv/YqVQlqYMMbp
+	LwtETZJvN9e9AfPGpzUXFkRtsEzZmhq8Edt/2Dufp1x0Ah5yI3Sb/QIGcxXc+k0dprlL/iE
+	hnxAVGdBrf+ONV9Kf0IB0yovULAVWsRLVTHHxko5p9YriSADgeA0SVtDMyp7fv3dOm4bk/8
+	fEtlvCm3Y8rOd2tYmPR6SgOaXDgJeA4AoCnvTs5LEIj5kdNhLUefz2jAF9c3vmJkAUHNqtx
+	jkTK+sPx42Kl3LHhXza54XZZ/IFBUF+4ShXKMkCbtc7zJKUVptRJoW+KntR9StRRCu0S459
+	w==
+X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
 X-QQ-RECHKSPAM: 0
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [1.54 / 15.00];
@@ -113,13 +113,13 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	DMARC_NA(0.00)[trustnetic.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305288-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305286-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[22];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:mengyuanlou@net-swift.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:linux@armlinux.org.uk,m:aleksandr.loktionov@intel.com,m:jacob.e.keller@intel.com,m:michal.swiatkowski@linux.intel.com,m:horms@kernel.org,m:kees@kernel.org,m:joe@dama.to,m:leitao@debian.org,m:shaojijie@huawei.com,m:u.kleine-koenig@baylibre.com,m:weirongguang@kylinos.cn,m:larysa.zaremba@intel.com,m:fabio.baltieri@gmail.com,m:jiawenwu@trustnetic.com,m:andrew@lunn.ch,m:fabiobaltieri@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:mengyuanlou@net-swift.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:linux@armlinux.org.uk,m:aleksandr.loktionov@intel.com,m:jacob.e.keller@intel.com,m:michal.swiatkowski@linux.intel.com,m:horms@kernel.org,m:kees@kernel.org,m:joe@dama.to,m:leitao@debian.org,m:shaojijie@huawei.com,m:u.kleine-koenig@baylibre.com,m:weirongguang@kylinos.cn,m:larysa.zaremba@intel.com,m:fabio.baltieri@gmail.com,m:jiawenwu@trustnetic.com,m:andrew@lunn.ch,m:fabiobaltieri@gmail.com,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -132,147 +132,465 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	R_DKIM_NA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,vger.kernel.org:from_smtp,trustnetic.com:from_mime,trustnetic.com:email,trustnetic.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,trustnetic.com:from_mime,trustnetic.com:email,trustnetic.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 70D63717E07
+X-Rspamd-Queue-Id: 2A500717DF0
 
-Function wx_soft_quiesce() provide a lightweight shutdown path during
-PCIe error recovery. It avoids MMIO-dependent operations in PCIe error
-status.
-
-Waiting for the service task to complete may unnecessarily delay PCIe
-error recovery, especially if the work item is already blocked by the
-hardware failure that triggered AER. So the service task is not
-explicitly cancelled in quiesce path. As a measure to block the service
-task, the checking of WX_STATE_DOWN and WX_STATE_RESETTING is added at
-the entry of relevant work item.
+Support AER driver to handle the PCIe errors. Sometimes netdev watchdog
+Tx timeout happens before the AER error report when a PCIe error occurs,
+CPU blocking would be caused by MMIO during the reset process. To
+prevent it, check PCIe error status in .ndo_tx_timeout. The current
+function of ngbe is not yet fully developed, it will be completed in the
+future.
 
 Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
- drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 18 ++++++++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_lib.h   |  1 +
- drivers/net/ethernet/wangxun/libwx/wx_ptp.c   | 21 +++++++++++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_ptp.h   |  1 +
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  8 +++++++
- 5 files changed, 49 insertions(+)
+ drivers/net/ethernet/wangxun/libwx/wx_err.c   | 144 +++++++++++++++++-
+ drivers/net/ethernet/wangxun/libwx/wx_err.h   |   2 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |   4 +
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  32 +++-
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  31 +++-
+ 5 files changed, 208 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-index c8a4822d3819..a65312c8078f 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -3383,5 +3383,23 @@ void wx_service_timer(struct timer_list *t)
- }
- EXPORT_SYMBOL(wx_service_timer);
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.c b/drivers/net/ethernet/wangxun/libwx/wx_err.c
+index ee27f96735dc..0cb99e456a1c 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_err.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_err.c
+@@ -4,11 +4,120 @@
  
-+void wx_soft_quiesce(struct wx *wx)
+ #include <linux/netdevice.h>
+ #include <linux/pci.h>
++#include <linux/aer.h>
+ 
+ #include "wx_type.h"
+ #include "wx_lib.h"
+ #include "wx_err.h"
+ 
++/**
++ * wx_io_error_detected - called when PCI error is detected
++ * @pdev: Pointer to PCI device
++ * @state: The current pci connection state
++ *
++ * Return: pci_ers_result_t.
++ *
++ * This function is called after a PCI bus error affecting
++ * this device has been detected.
++ */
++static pci_ers_result_t wx_io_error_detected(struct pci_dev *pdev,
++					     pci_channel_state_t state)
 +{
-+	if (!netif_running(wx->netdev) ||
-+	    test_and_set_bit(WX_STATE_DOWN, wx->state))
-+		return;
++	struct wx *wx = pci_get_drvdata(pdev);
++	struct net_device *netdev;
 +
-+	pci_clear_master(wx->pdev);
-+	netif_tx_stop_all_queues(wx->netdev);
-+	netif_carrier_off(wx->netdev);
-+	netif_tx_disable(wx->netdev);
-+	wx_napi_disable_all(wx);
-+	wx_ptp_quiesce(wx);
++	if (!wx)
++		return PCI_ERS_RESULT_DISCONNECT;
 +
-+	clear_bit(WX_FLAG_NEED_PF_RESET, wx->flags);
-+	timer_delete_sync(&wx->service_timer);
++	netdev = wx->netdev;
++	if (!netif_device_present(netdev))
++		return PCI_ERS_RESULT_DISCONNECT;
++
++	if (state == pci_channel_io_perm_failure)
++		return PCI_ERS_RESULT_DISCONNECT;
++
++	rtnl_lock();
++	netif_device_detach(netdev);
++	set_bit(WX_FLAG_NEED_PCIE_RECOVERY, wx->flags);
++	wx_soft_quiesce(wx);
++
++	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
++		pci_disable_device(pdev);
++	rtnl_unlock();
++
++	/* Request a slot reset. */
++	return PCI_ERS_RESULT_NEED_RESET;
 +}
-+EXPORT_SYMBOL(wx_soft_quiesce);
 +
- MODULE_DESCRIPTION("Common library for Wangxun(R) Ethernet drivers.");
- MODULE_LICENSE("GPL");
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.h b/drivers/net/ethernet/wangxun/libwx/wx_lib.h
-index aed6ea8cf0d6..11bd79985e17 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.h
-@@ -41,5 +41,6 @@ void wx_set_ring(struct wx *wx, u32 new_tx_count,
- void wx_service_event_schedule(struct wx *wx);
- void wx_service_event_complete(struct wx *wx);
- void wx_service_timer(struct timer_list *t);
-+void wx_soft_quiesce(struct wx *wx);
- 
- #endif /* _WX_LIB_H_ */
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ptp.c b/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
-index 44f3e6505246..a25eb6aed566 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
-@@ -321,6 +321,9 @@ static long wx_ptp_do_aux_work(struct ptp_clock_info *ptp)
- 	struct wx *wx = container_of(ptp, struct wx, ptp_caps);
- 	int ts_done;
- 
-+	if (!test_bit(WX_STATE_PTP_RUNNING, wx->state))
-+		return HZ;
-+
- 	ts_done = wx_ptp_tx_hwtstamp_work(wx);
- 
- 	wx_ptp_overflow_check(wx);
-@@ -842,6 +845,24 @@ void wx_ptp_stop(struct wx *wx)
- }
- EXPORT_SYMBOL(wx_ptp_stop);
- 
-+void wx_ptp_quiesce(struct wx *wx)
++/**
++ * wx_io_slot_reset - called after the pci bus has been reset.
++ * @pdev: Pointer to PCI device
++ *
++ * Return: pci_ers_result_t.
++ *
++ * Restart the card from scratch, as if from a cold-boot.
++ */
++static pci_ers_result_t wx_io_slot_reset(struct pci_dev *pdev)
 +{
-+	if (!test_and_clear_bit(WX_STATE_PTP_RUNNING, wx->state))
-+		return;
++	struct wx *wx = pci_get_drvdata(pdev);
 +
-+	clear_bit(WX_FLAG_PTP_PPS_ENABLED, wx->flags);
-+
-+	if (wx->ptp_clock)
-+		ptp_cancel_worker_sync(wx->ptp_clock);
-+
-+	if (wx->ptp_tx_skb) {
-+		dev_kfree_skb_any(wx->ptp_tx_skb);
-+		wx->ptp_tx_skb = NULL;
++	if (pci_enable_device_mem(pdev)) {
++		wx_err(wx, "Cannot re-enable PCI device after reset.\n");
++		return PCI_ERS_RESULT_DISCONNECT;
 +	}
-+	clear_bit_unlock(WX_STATE_PTP_TX_IN_PROGRESS, wx->state);
++
++	/* make all memory operations done before clearing the flag */
++	smp_mb__before_atomic();
++	clear_bit(WX_STATE_DISABLED, wx->state);
++	clear_bit(WX_FLAG_NEED_PCIE_RECOVERY, wx->flags);
++	pci_set_master(pdev);
++	pci_restore_state(pdev);
++	pci_wake_from_d3(pdev, false);
++
++	rtnl_lock();
++	if (netif_running(wx->netdev) && wx->down_suspend)
++		wx->down_suspend(wx);
++	if (wx->do_reset)
++		wx->do_reset(wx->netdev, false);
++	rtnl_unlock();
++
++	return PCI_ERS_RESULT_RECOVERED;
 +}
-+EXPORT_SYMBOL(wx_ptp_quiesce);
++
++/**
++ * wx_io_resume - called when traffic can start flowing again.
++ * @pdev: Pointer to PCI device
++ *
++ * This callback is called when the error recovery driver tells us that
++ * its OK to resume normal operation.
++ */
++static void wx_io_resume(struct pci_dev *pdev)
++{
++	struct wx *wx = pci_get_drvdata(pdev);
++	struct net_device *netdev;
++	int err;
++
++	netdev = wx->netdev;
++	rtnl_lock();
++	if (netif_running(netdev)) {
++		err = netdev->netdev_ops->ndo_open(netdev);
++		if (err) {
++			wx_err(wx, "Failed to open netdev after reset\n");
++			goto out;
++		}
++	}
++	netif_device_attach(netdev);
++out:
++	rtnl_unlock();
++}
++
++const struct pci_error_handlers wx_err_handler = {
++	.error_detected = wx_io_error_detected,
++	.slot_reset = wx_io_slot_reset,
++	.resume = wx_io_resume,
++};
++EXPORT_SYMBOL(wx_err_handler);
++
+ static void wx_pf_reset_subtask(struct wx *wx)
+ {
+ 	if (!test_and_clear_bit(WX_FLAG_NEED_PF_RESET, wx->flags))
+@@ -25,6 +134,9 @@ static void wx_reset_task(struct work_struct *work)
+ 
+ 	rtnl_lock();
+ 
++	if (test_bit(WX_FLAG_NEED_PCIE_RECOVERY, wx->flags))
++		wx_soft_quiesce(wx);
++
+ 	if (test_bit(WX_STATE_DOWN, wx->state) ||
+ 	    test_bit(WX_STATE_RESETTING, wx->state))
+ 		goto out;
+@@ -139,6 +251,33 @@ void wx_check_hang_subtask(struct wx *wx)
+ }
+ EXPORT_SYMBOL(wx_check_hang_subtask);
+ 
++static bool wx_check_pcie_error(struct wx *wx)
++{
++	u16 vid, pci_cmd;
++
++	pci_read_config_word(wx->pdev, PCI_VENDOR_ID, &vid);
++	pci_read_config_word(wx->pdev, PCI_COMMAND, &pci_cmd);
++
++	/* PCIe link loss or memory space can't access */
++	if (vid == U16_MAX || !(pci_cmd & PCI_COMMAND_MEMORY))
++		return true;
++
++	return false;
++}
++
++static void wx_tx_timeout_recovery(struct wx *wx)
++{
++	/*
++	 * When a PCIe hardware error occurs, the driver should initiate a PCIe
++	 * recovery mechanism. However, this recovery flow relies on the AER
++	 * driver for current kernel policy. Therefore, a self-contained
++	 * recovery mechanism is not implemented yet.
++	 */
++	set_bit(WX_FLAG_NEED_PCIE_RECOVERY, wx->flags);
++	wx_err(wx, "PCIe error detected during tx timeout\n");
++	queue_work(wx->reset_wq, &wx->reset_task);
++}
++
+ static void wx_tx_timeout_reset(struct wx *wx)
+ {
+ 	if (test_bit(WX_STATE_DOWN, wx->state))
+@@ -153,7 +292,10 @@ void wx_tx_timeout(struct net_device *netdev, unsigned int __always_unused txque
+ {
+ 	struct wx *wx = netdev_priv(netdev);
+ 
+-	wx_tx_timeout_reset(wx);
++	if (wx_check_pcie_error(wx))
++		wx_tx_timeout_recovery(wx);
++	else
++		wx_tx_timeout_reset(wx);
+ }
+ EXPORT_SYMBOL(wx_tx_timeout);
+ 
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.h b/drivers/net/ethernet/wangxun/libwx/wx_err.h
+index 1eed13e48095..a6a82a263528 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_err.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_err.h
+@@ -7,6 +7,8 @@
+ #ifndef _WX_ERR_H_
+ #define _WX_ERR_H_
+ 
++extern const struct pci_error_handlers wx_err_handler;
++
+ void wx_check_err_subtask(struct wx *wx);
+ int wx_init_err_task(struct wx *wx);
+ void wx_check_hang_subtask(struct wx *wx);
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+index edcb8d121b86..aa357e260c4c 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+@@ -1222,6 +1222,8 @@ enum wx_state {
+ 	WX_STATE_PTP_RUNNING,
+ 	WX_STATE_PTP_TX_IN_PROGRESS,
+ 	WX_STATE_SERVICE_SCHED,
++	WX_STATE_DISABLED,
++	WX_STATE_RES_FREED,
+ 	WX_STATE_NBITS		/* must be last */
+ };
+ 
+@@ -1289,6 +1291,7 @@ enum wx_pf_flags {
+ 	WX_FLAG_RX_MERGE_ENABLED,
+ 	WX_FLAG_TXHEAD_WB_ENABLED,
+ 	WX_FLAG_NEED_PF_RESET,
++	WX_FLAG_NEED_PCIE_RECOVERY,
+ 	WX_PF_FLAGS_NBITS               /* must be last */
+ };
+ 
+@@ -1410,6 +1413,7 @@ struct wx {
+ 	void (*configure_fdir)(struct wx *wx);
+ 	int (*setup_tc)(struct net_device *netdev, u8 tc);
+ 	void (*do_reset)(struct net_device *netdev, bool reinit);
++	void (*down_suspend)(struct wx *wx);
+ 	int (*ptp_setup_sdp)(struct wx *wx);
+ 	void (*set_num_queues)(struct wx *wx);
+ 
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+index 92895f503511..56d4b63387fd 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+@@ -47,6 +47,20 @@ static const struct pci_device_id ngbe_pci_tbl[] = {
+ 	{ }
+ };
+ 
++static void ngbe_down_suspend(struct wx *wx)
++{
++	if (test_and_set_bit(WX_STATE_RES_FREED, wx->state))
++		return;
++
++	phylink_stop(wx->phylink);
++	phylink_disconnect_phy(wx->phylink);
++	wx_clean_all_tx_rings(wx);
++	wx_clean_all_rx_rings(wx);
++	wx_free_irq(wx);
++	wx_free_isb_resources(wx);
++	wx_free_resources(wx);
++}
 +
  /**
-  * wx_ptp_rx_hwtstamp - utility function which checks for RX time stamp
-  * @wx: pointer to wx struct
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ptp.h b/drivers/net/ethernet/wangxun/libwx/wx_ptp.h
-index 50db90a6e3ee..ad2f824875d5 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ptp.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ptp.h
-@@ -10,6 +10,7 @@ void wx_ptp_reset(struct wx *wx);
- void wx_ptp_init(struct wx *wx);
- void wx_ptp_suspend(struct wx *wx);
- void wx_ptp_stop(struct wx *wx);
-+void wx_ptp_quiesce(struct wx *wx);
- void wx_ptp_rx_hwtstamp(struct wx *wx, struct sk_buff *skb);
- int wx_hwtstamp_get(struct net_device *dev,
- 		    struct kernel_hwtstamp_config *cfg);
+  *  ngbe_init_type_code - Initialize the shared code
+  *  @wx: pointer to hardware structure
+@@ -135,6 +149,7 @@ static int ngbe_sw_init(struct wx *wx)
+ 	wx->mbx.size = WX_VXMAILBOX_SIZE;
+ 	wx->setup_tc = ngbe_setup_tc;
+ 	wx->do_reset = ngbe_do_reset;
++	wx->down_suspend = ngbe_down_suspend;
+ 	set_bit(0, &wx->fwd_bitmask);
+ 
+ 	return 0;
+@@ -413,6 +428,9 @@ static void ngbe_disable_device(struct wx *wx)
+ 
+ static void ngbe_reset(struct wx *wx)
+ {
++	if (test_bit(WX_FLAG_NEED_PCIE_RECOVERY, wx->flags))
++		return;
++
+ 	wx_flush_sw_mac_table(wx);
+ 	wx_mac_set_default_filter(wx, wx->mac.addr);
+ 	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
+@@ -435,6 +453,7 @@ static void ngbe_up_complete(struct wx *wx)
+ 	/* make sure to complete pre-operations */
+ 	smp_mb__before_atomic();
+ 	clear_bit(WX_STATE_DOWN, wx->state);
++	clear_bit(WX_STATE_RES_FREED, wx->state);
+ 	wx_napi_enable_all(wx);
+ 	/* enable transmits */
+ 	netif_tx_start_all_queues(wx->netdev);
+@@ -529,12 +548,16 @@ static int ngbe_close(struct net_device *netdev)
+ {
+ 	struct wx *wx = netdev_priv(netdev);
+ 
++	if (test_bit(WX_STATE_RES_FREED, wx->state))
++		goto out;
++
+ 	wx_ptp_stop(wx);
+ 	ngbe_down(wx);
+ 	wx_free_irq(wx);
+ 	wx_free_isb_resources(wx);
+ 	wx_free_resources(wx);
+ 	phylink_disconnect_phy(wx->phylink);
++out:
+ 	wx_control_hw(wx, false);
+ 
+ 	return 0;
+@@ -566,7 +589,8 @@ static void ngbe_dev_shutdown(struct pci_dev *pdev, bool *enable_wake)
+ 	*enable_wake = !!wufc;
+ 	wx_control_hw(wx, false);
+ 
+-	pci_disable_device(pdev);
++	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
++		pci_disable_device(pdev);
+ }
+ 
+ static void ngbe_shutdown(struct pci_dev *pdev)
+@@ -855,6 +879,7 @@ static int ngbe_probe(struct pci_dev *pdev,
+ 		goto err_register;
+ 
+ 	pci_set_drvdata(pdev, wx);
++	pci_save_state(pdev);
+ 
+ 	return 0;
+ 
+@@ -910,7 +935,8 @@ static void ngbe_remove(struct pci_dev *pdev)
+ 	kfree(wx->mac_table);
+ 	wx_clear_interrupt_scheme(wx);
+ 
+-	pci_disable_device(pdev);
++	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
++		pci_disable_device(pdev);
+ }
+ 
+ static int ngbe_suspend(struct pci_dev *pdev, pm_message_t state)
+@@ -937,6 +963,7 @@ static int ngbe_resume(struct pci_dev *pdev)
+ 		wx_err(wx, "Cannot enable PCI device from suspend\n");
+ 		return err;
+ 	}
++	clear_bit(WX_STATE_DISABLED, wx->state);
+ 	pci_set_master(pdev);
+ 	device_wakeup_disable(&pdev->dev);
+ 
+@@ -961,6 +988,7 @@ static struct pci_driver ngbe_driver = {
+ 	.resume   = ngbe_resume,
+ 	.shutdown = ngbe_shutdown,
+ 	.sriov_configure = wx_pci_sriov_configure,
++	.err_handler = &wx_err_handler,
+ };
+ 
+ module_pci_driver(ngbe_driver);
 diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index a8773712cff8..a7bde03a98fe 100644
+index a7bde03a98fe..d85ee83192e4 100644
 --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
 +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -94,6 +94,10 @@ static void txgbe_module_detection_subtask(struct wx *wx)
- {
+@@ -155,6 +155,7 @@ static void txgbe_up_complete(struct wx *wx)
+ 	/* make sure to complete pre-operations */
+ 	smp_mb__before_atomic();
+ 	clear_bit(WX_STATE_DOWN, wx->state);
++	clear_bit(WX_STATE_RES_FREED, wx->state);
+ 	wx_napi_enable_all(wx);
+ 
+ 	switch (wx->mac.type) {
+@@ -198,6 +199,9 @@ static void txgbe_reset(struct wx *wx)
+ 	u8 old_addr[ETH_ALEN];
  	int err;
  
-+	if (test_bit(WX_STATE_DOWN, wx->state) ||
-+	    test_bit(WX_STATE_RESETTING, wx->state))
++	if (test_bit(WX_FLAG_NEED_PCIE_RECOVERY, wx->flags))
 +		return;
 +
- 	if (!test_and_clear_bit(WX_FLAG_NEED_MODULE_RESET, wx->flags))
- 		return;
+ 	err = txgbe_reset_hw(wx);
+ 	if (err != 0)
+ 		wx_err(wx, "Hardware Error: %d\n", err);
+@@ -304,6 +308,20 @@ void txgbe_up(struct wx *wx)
+ 	txgbe_up_complete(wx);
+ }
  
-@@ -107,6 +111,10 @@ static void txgbe_module_detection_subtask(struct wx *wx)
++static void txgbe_down_suspend(struct wx *wx)
++{
++	if (test_and_set_bit(WX_STATE_RES_FREED, wx->state))
++		return;
++
++	phylink_stop(wx->phylink);
++	wx_clean_all_tx_rings(wx);
++	wx_clean_all_rx_rings(wx);
++	wx_free_irq(wx);
++	txgbe_free_misc_irq(wx->priv);
++	wx_free_resources(wx);
++	txgbe_fdir_filter_exit(wx);
++}
++
+ /**
+  *  txgbe_init_type_code - Initialize the shared code
+  *  @wx: pointer to hardware structure
+@@ -420,6 +438,7 @@ static int txgbe_sw_init(struct wx *wx)
  
- static void txgbe_link_config_subtask(struct wx *wx)
+ 	wx->setup_tc = txgbe_setup_tc;
+ 	wx->do_reset = txgbe_do_reset;
++	wx->down_suspend = txgbe_down_suspend;
+ 	set_bit(0, &wx->fwd_bitmask);
+ 
+ 	switch (wx->mac.type) {
+@@ -530,12 +549,16 @@ static int txgbe_close(struct net_device *netdev)
  {
-+	if (test_bit(WX_STATE_DOWN, wx->state) ||
-+	    test_bit(WX_STATE_RESETTING, wx->state))
-+		return;
-+
- 	if (!test_and_clear_bit(WX_FLAG_NEED_LINK_CONFIG, wx->flags))
- 		return;
+ 	struct wx *wx = netdev_priv(netdev);
  
++	if (test_bit(WX_STATE_RES_FREED, wx->state))
++		goto out;
++
+ 	wx_ptp_stop(wx);
+ 	txgbe_down(wx);
+ 	wx_free_irq(wx);
+ 	txgbe_free_misc_irq(wx->priv);
+ 	wx_free_resources(wx);
+ 	txgbe_fdir_filter_exit(wx);
++out:
+ 	wx_control_hw(wx, false);
+ 
+ 	return 0;
+@@ -556,7 +579,8 @@ static void txgbe_dev_shutdown(struct pci_dev *pdev)
+ 
+ 	wx_control_hw(wx, false);
+ 
+-	pci_disable_device(pdev);
++	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
++		pci_disable_device(pdev);
+ }
+ 
+ static void txgbe_shutdown(struct pci_dev *pdev)
+@@ -907,6 +931,7 @@ static int txgbe_probe(struct pci_dev *pdev,
+ 		goto err_remove_phy;
+ 
+ 	pci_set_drvdata(pdev, wx);
++	pci_save_state(pdev);
+ 
+ 	netif_tx_stop_all_queues(netdev);
+ 
+@@ -981,7 +1006,8 @@ static void txgbe_remove(struct pci_dev *pdev)
+ 	kfree(wx->mac_table);
+ 	wx_clear_interrupt_scheme(wx);
+ 
+-	pci_disable_device(pdev);
++	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
++		pci_disable_device(pdev);
+ }
+ 
+ static struct pci_driver txgbe_driver = {
+@@ -991,6 +1017,7 @@ static struct pci_driver txgbe_driver = {
+ 	.remove   = txgbe_remove,
+ 	.shutdown = txgbe_shutdown,
+ 	.sriov_configure = wx_pci_sriov_configure,
++	.err_handler = &wx_err_handler,
+ };
+ 
+ module_pci_driver(txgbe_driver);
 -- 
 2.51.0
 
