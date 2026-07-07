@@ -1,162 +1,197 @@
-Return-Path: <netdev+bounces-305330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305331-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mLtrIIq3TGpwogEAu9opvQ
-	(envelope-from <netdev+bounces-305330-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:23:38 +0200
+	id naHVBSe6TGoeowEAu9opvQ
+	(envelope-from <netdev+bounces-305331-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:34:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D389719090
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:23:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A01C7719287
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:34:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=SsqbQ9eH;
-	dmarc=pass (policy=reject) header.from=google.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305330-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305330-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=Ku+NGm43;
+	dkim=pass header.d=redhat.com header.s=google header.b=Bvs5RL7g;
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305331-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305331-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 49FA6301D743
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 08:23:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9AF203026C12
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 08:28:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174853264FC;
-	Tue,  7 Jul 2026 08:23:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44FE830BF6D;
+	Tue,  7 Jul 2026 08:28:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A066131D381
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 08:23:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7A564CB5B
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 08:28:20 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783412612; cv=none; b=HkSBBJM7ng8bN1wf5BJXj+phFIpk0skUzmxFXLsUmuyobNNAuvswx5VjlaOecdZ3lvL1ed5YS30cAVuhMditgg+qOm/rOb9MmaOj3Aqs3OVNuEwlsMTvd8xwbM3TPSLVszo1qA7+CdBJmogZUo/VCLElbNLnFUmkQ9l0T2eaESo=
+	t=1783412902; cv=none; b=AhXGdX0D/84GlAD5G3JzGtRApHhFSE6qWtkX3YniPvYtOoFKGX08r34nOaexwT+qYZ2PGvcBvBUGOzAkWa3Uk74T6FCDdFOZ3t393hqtXLO+n9ZEbfMEHb0eYXLm3wQo88L27jSaCymTcnZyxl66d4vYgRE1qiNNYiC7N+Fn1vk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783412612; c=relaxed/simple;
-	bh=HQgdLCdm7zLQxOAeI2KzFpaJMzKhabZvUHvnPoqlDsQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=prm4k4gy8j8WuQ40ZXJskt9iRBKBKWzmCgEx9PN5hmUxfM1TPDUnBbnDR9O+Sz8vX61I77cxcqYr4WNFwLBtRNeIsNIjtUqWfi1SKo4PJPvWrBn41kwHSusXS5vFpLL93IHMgSWpec0zD2YeZkgLWdtyBXXhRrUJJH0d14Rgetw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SsqbQ9eH; arc=none smtp.client-ip=209.85.160.202
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-51c26012cd0so49568781cf.0
-        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 01:23:29 -0700 (PDT)
+	s=arc-20240116; t=1783412902; c=relaxed/simple;
+	bh=WQKIs64871yUyTjfsDUxssJgvhRqui78lP2WGCaXxAA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JtMh7nnzRkrkK+FIKibDhG4PSlEHZX9oqpgsAISh0PJiT95OI9Yi49moY3gJRj1TRPiJTGMfELtg4EuY4zpqvlA+iHN8xFwyAgYo17BD+m5bHLqlzlfbGoBryjPlv+uRH3so4OWDiRoe2F9hKtvMVql9vwhJWqvKvv1ZsladMCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ku+NGm43; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bvs5RL7g; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783412900;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cJTOrChuile1dpJZ5oPmUIH4vsB4RlLW31n2flQo1JE=;
+	b=Ku+NGm43PGAKX2SlUAQ6tdu6zfNky9OJ75+Ogt9UsbsOiR8EzuWGdOJ4AyKZsr6wEbVoih
+	9EUL852rrBVCZvxJm7FOoslqWgksCjNj0knKq9mc8ouh/HHvO/nEcns0Fli++GbQ3WLde1
+	E/RX3T+ya1OtT1rbxcWQW56uLrJfGg4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-424-dPojVbbRMh2O7jI49XgV6w-1; Tue, 07 Jul 2026 04:28:18 -0400
+X-MC-Unique: dPojVbbRMh2O7jI49XgV6w-1
+X-Mimecast-MFC-AGG-ID: dPojVbbRMh2O7jI49XgV6w_1783412897
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-493b0a5e636so37604085e9.3
+        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 01:28:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783412608; x=1784017408; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=edpuzPNlqLkIiVe8hDiwbrsEC4+WRFM9TrLPB0rzqfk=;
-        b=SsqbQ9eHwzvMYS2C+i9GPhTCrihTNCLR1sGL4pn+9VnwwaV/n3IFlJ827LABL5sA5J
-         uedUWi2isLJOBxeF4YCQNF9wyFDQWxIxn23TtZD3GtcVir6P0YlmjKvXDz1q3J5+FPmu
-         l7QCGC5ZTn1AaZfAVhoE7cQUYOIR2xHTnsQQG1RMi/NgvnPPvxOWnH9phfj2oRX8BzMa
-         ZD7yaC6We9Clt+rGbdgktAyyf+LEQ2JevUvkyBDIx5enRygmNDQYfcmPQbrH89PbTBp1
-         +ivOPAMio3u7aNezrC/t9lVaOPW2GwF3LqnQIrJkwdd0JoxUN6sBUTzeqW2i1qvNbNAC
-         rX8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783412608; x=1784017408;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=redhat.com; s=google; t=1783412897; x=1784017697; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=edpuzPNlqLkIiVe8hDiwbrsEC4+WRFM9TrLPB0rzqfk=;
-        b=ZA0bmTJhf763W2QnWWHA5LNeW0onqrPc7iI3pX7cqGz01svgU3W3emm/lKHb0wKcYH
-         gA0SO0wbXS73cSW4gaWtV4L/oBEKydzzrqQQTcr3x8FAbh0csSoQTCGvY2NShGskadyC
-         zTlOBaFsLrXpq0oDoWgmsdpxeRm57v+2hMJT1+idKrLqrKnCE/uJBt9jNutS4sLz6xi4
-         th7GhKfaMCenbf8XJ6QxcwnjvYmewatkTS8brDswysYRSdh6Dd49b/xe+NnNVIr+bcZV
-         TCK5yE+WnbJlPGzrZMSG5lgAOjdhcvGVNkJXWia973nQFN8FGmmAEtJqEoVmZKopc/RC
-         CclA==
-X-Forwarded-Encrypted: i=1; AHgh+Ro9N67wYtt0wv7FPEl0tYPGbkwpJ0HNkgjloKZlL4p38QOXzPBqR/dM7nM3A+xlsm2HZJ9yPsE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwwPC8jRp7P+i6CmQjDFLcDJmpvzbTqcyuH8ch2ds6lLiH7Qnz
-	m+I4Ru6yd/QgMo4820sXzNh4Sn4+d0cTKxEZUhdSYIAuGo18U6rKlzuzCc2BUwMXcAv5ICh10Mw
-	w+wCmCNqhSFJOwQ==
-X-Received: from qtrr15-n2.prod.google.com ([2002:a05:622a:a98f:20b0:51c:f5f:5d2c])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:3cf:b0:50d:900e:c1c1 with SMTP id d75a77b69052e-51c747ca072mr45429201cf.7.1783412607802;
- Tue, 07 Jul 2026 01:23:27 -0700 (PDT)
-Date: Tue,  7 Jul 2026 08:23:27 +0000
+        bh=cJTOrChuile1dpJZ5oPmUIH4vsB4RlLW31n2flQo1JE=;
+        b=Bvs5RL7gT/JU5uAsKOiCs0zFhzQFpT2S6y60ZDXKL2mAIodGdpjFMa+nPJhHSGkFiV
+         /bbc/TybGGdPXYOqjmXxTVsYTckXiFuKBWjhInmTdIYXvA3UPdMuNhQN70WDwFtZa0Db
+         elLIeWw9ZdBAOvFpR5PLFtLX6FayYwrvvlVQS58Kz/j+I2HNDEHlQg29mfojPDlTSgbl
+         5dvDND9uAHVFza2ohxz+NGT2UM8U2egdSDuBzAKO008iGx6dH7GkNNlRvMxywgFViDSN
+         zI7NLqbMxQ9PwwCuZvvkSD0ji3IRlE+UHQjGcHoXpT217PBRYGVvB/at6n36M448im3d
+         HcQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783412897; x=1784017697;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cJTOrChuile1dpJZ5oPmUIH4vsB4RlLW31n2flQo1JE=;
+        b=bw1+LWe4oXrlTVlqLH2IaGk0q5ErOpTOMo4hTfBzMMtltbLPoqT9OV3V8IsnvX4Knk
+         s8+KvNGPk/R6wlUfC1wur7B+HlwBjVHJG4BvEqGMLA2vnqynCYVc/W5ToeRAYQg0MPdF
+         kclD4VNTlasit5R6LeXJ4PekX+8NydIrOuNrYx7GyJhIimg5BwMdlLww8YficXi97t9z
+         5txq/6KTGeow3HxrLlCAXub8g/5s2S5nP/DhFG7WbYtrMcU9tioa98c6f96GzncnxHHx
+         7gfGXdGbFmFQpFjLYO8lSvjj6Cr9TfGxYBtJFPa76Js1hwbDBLT2sdPjEhoEfmMT4Fzo
+         nX1Q==
+X-Forwarded-Encrypted: i=1; AHgh+Rrx/+Es7OI+ZcUQUUHxETSgMqh2qrH9dKbK8f06zmvLvlMy1vkjSsoO5q7fbzZNDoFNUBQBfBc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzsg9BemL9CEBfSsoQAMF5+Xfp/MmAO2oY7Hzrsq/wJ7emsLUat
+	qtq1jD5mbsDbA7NsqGMky9GFCZBKtB4OXFeVcixtsvYq31H6dGECWz+UCPUD2qn9Aen0JIjAd5t
+	ngQl0IproD70BLcxVmhuxTZOKJZd2L4/BeuxRBWY0v6pptj7hZ+AuucKTeg==
+X-Gm-Gg: AfdE7clSuxyYiXZh5Yv/nW72SbXR+uGvZbY9fEd2E2MmLdAvL16+/YoPryZHT0HCV5J
+	5Q5a9KzT3AtNfkh7eCUR82CwGD84m633OwWbRkUfBmMnczKnRw8W/VSSf5GFE/5KdlOLAjWZ6fi
+	8JtZfpjjozdd8WoA4Qt7pB/8KM6NZ7Z5tXS7oOQgXZ0+sbmuon392fxh7zHD5cawAIGDORdgWVv
+	2vM45WdRcMRQCuz5t3HkH71QDWDvK3EJ9tR72IhOD0v9RSiv6HerbEETLR5Shm4T93OP2tEhyno
+	5KM/j17sCPfd1roW6llXKfTSjBaMXEfhfYKnfApTQqPMeyXfIVXPKIyCUXUSlRfn1A1FXqEcCmR
+	ZdL2f31fryKSIjGm6Fsmfae0B8EQDReLtAfTtGbB4XWo9fk35PDNRV+2rLvMr01xltniaUTmWEH
+	ZkbBMh7ZzBmST2
+X-Received: by 2002:a05:600c:3f0a:b0:493:c182:6b08 with SMTP id 5b1f17b1804b1-493df0a07e3mr41019355e9.36.1783412895115;
+        Tue, 07 Jul 2026 01:28:15 -0700 (PDT)
+X-Received: by 2002:a05:600c:3f0a:b0:493:c182:6b08 with SMTP id 5b1f17b1804b1-493df0a07e3mr41019005e9.36.1783412894747;
+        Tue, 07 Jul 2026 01:28:14 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:5521:6b10:58fd:68f:7756:389d? ([2a0d:3344:5521:6b10:58fd:68f:7756:389d])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493e0f4e3afsm44221735e9.7.2026.07.07.01.28.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Jul 2026 01:28:14 -0700 (PDT)
+Message-ID: <0496c117-0731-4de4-9f5d-7fdacf34bd71@redhat.com>
+Date: Tue, 7 Jul 2026 10:28:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.55.0.795.g602f6c329a-goog
-Message-ID: <20260707082327.3238690-1-edumazet@google.com>
-Subject: [PATCH net] net: hsr: fix memory leak on slave unregistration by
- removing synced VLANs
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
-	syzbot+456957213f32970c0762@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/4] ice: wait for reset completion in ice_resume()
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
+ kuba@kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
+ netdev@vger.kernel.org
+Cc: Aaron Ma <aaron.ma@canonical.com>, jbrandeb@kernel.org,
+ stable@vger.kernel.org, Kohei Enju <kohei@enjuk.jp>,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Alexander Nowlin <alexander.nowlin@intel.com>
+References: <20260630214404.930923-1-anthony.l.nguyen@intel.com>
+ <20260630214404.930923-2-anthony.l.nguyen@intel.com>
+From: Paolo Abeni <pabeni@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20260630214404.930923-2-anthony.l.nguyen@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-305331-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305330-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:syzbot+456957213f32970c0762@syzkaller.appspotmail.com,m:andrew@lunn.ch,m:ericdumazet@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_RECIPIENTS(0.00)[m:anthony.l.nguyen@intel.com,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:aaron.ma@canonical.com,m:jbrandeb@kernel.org,m:stable@vger.kernel.org,m:kohei@enjuk.jp,m:aleksandr.loktionov@intel.com,m:przemyslaw.kitszel@intel.com,m:alexander.nowlin@intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,vger.kernel.org,gmail.com,google.com,syzkaller.appspotmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,456957213f32970c0762];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,appspotmail.com:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[canonical.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1D389719090
+X-Rspamd-Queue-Id: A01C7719287
 
-When an HSR master device is brought UP, it auto-adds VLAN 0 via
-vlan_vid0_add(), which propagates VID 0 to its slave devices.
+On 6/30/26 11:43 PM, Tony Nguyen wrote:
+> From: Aaron Ma <aaron.ma@canonical.com>
+> 
+> ice_resume() schedules an asynchronous PF reset and returns
+> immediately. The reset runs later in ice_service_task(). If
+> userspace tries to bring up the net device before the reset
+> finishes, ice_open() fails with -EBUSY:
+> 
+>   ice_resume()
+>     ice_schedule_reset()          # sets ICE_PFR_REQ, returns
+>   ...
+>   ice_open()
+>     ice_is_reset_in_progress()    # ICE_PFR_REQ still set, -EBUSY
+>   ...
+>   ice_service_task()
+>     ice_do_reset()
+>       ice_rebuild()               # clears ICE_PFR_REQ, too late
+> 
+> Reproduced on E800 series NICs during suspend/resume with irdma
+> enabled, where the aux device probe widens the race window.
+> 
+>   ice 0000:81:00.0: can't open net device while reset is in progress
+> 
+> Add a best-effort wait (10s timeout, matching ice_devlink_info_get())
+> for the reset to complete before returning from ice_resume(). In
+> practice the reset completes in ~300ms.
 
-If a slave device is later unregistered while HSR is active (e.g., during
-netns cleanup or interface destruction), hsr_del_port() is called to
-detach the slave port from the HSR master. However, hsr_del_port() currently
-does not delete the VLAN IDs that were synced to the slave device by HSR.
+Would not be better to (eventually) wait in ice_open()? Why? AFAICS that
+would be also more consistent with i.e. the current wait in
+ice_devlink_info_get().
 
-As a result, the slave device retains a refcount on VID 0 (and any other
-synced VLANs). When the slave device is destroyed, its vlan_info /
-vlan_vid_info structure remains allocated, leading to a memory leak.
+Otherwise why don't consolidate all the wait at resume time and remove
+the other one in ice_devlink_info_get()?
 
-Fix this by calling vlan_vids_del_by_dev(port->dev, master->dev) in
-hsr_del_port() before unlinking the slave device, matching the cleanup
-behavior in bonding and team drivers.
-
-Fixes: 1a8a63a5305e ("net: hsr: Add VLAN CTAG filter support")
-Reported-by: syzbot+456957213f32970c0762@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/6a4cb6ca.57639fcc.86d58.000b.GAE@google.com/T/#u
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/hsr/hsr_slave.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/net/hsr/hsr_slave.c b/net/hsr/hsr_slave.c
-index d9af9e65f72f07b1997b80c85db16d812fbda488..2d1e3ea72088e35d5d870b4cc86dd2f789670394 100644
---- a/net/hsr/hsr_slave.c
-+++ b/net/hsr/hsr_slave.c
-@@ -242,6 +242,7 @@ void hsr_del_port(struct hsr_port *port)
- 		netdev_rx_handler_unregister(port->dev);
- 		if (!port->hsr->fwd_offloaded)
- 			dev_set_promiscuity(port->dev, -1);
-+		vlan_vids_del_by_dev(port->dev, master->dev);
- 		netdev_upper_dev_unlink(port->dev, master->dev);
- 		if (hsr->prot_version == PRP_V1 &&
- 		    port->type == HSR_PT_SLAVE_B) {
--- 
-2.55.0.795.g602f6c329a-goog
+/P
 
 
