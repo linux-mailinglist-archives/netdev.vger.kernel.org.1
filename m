@@ -1,201 +1,298 @@
-Return-Path: <netdev+bounces-305316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305317-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5RLGMJq0TGrboQEAu9opvQ
-	(envelope-from <netdev+bounces-305316-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:11:06 +0200
+	id qLLEMdOzTGquoQEAu9opvQ
+	(envelope-from <netdev+bounces-305317-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:07:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DFC0718EFE
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:11:05 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A975718E73
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:07:47 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=queasysnail.net header.s=fm3 header.b="L d0wWe9";
-	dkim=pass header.d=messagingengine.com header.s=fm2 header.b=QJREVmts;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305316-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305316-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=iKxXnh7n;
+	dmarc=pass (policy=reject) header.from=nvidia.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305317-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305317-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 63D7030184D0
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 07:58:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 87BC23018C24
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 08:03:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FC11386543;
-	Tue,  7 Jul 2026 07:58:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B54829E117;
+	Tue,  7 Jul 2026 08:03:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012062.outbound.protection.outlook.com [52.101.48.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68176175A91
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 07:58:29 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783411112; cv=none; b=bw0YIkFwCIhLttkx7k4KmpcwYNnYQGJGZoVxWKqC2DzYP1zym9jfcM3GhSk/9laoyRujAKp6MqPJMTm83fXwetJiHY/JN3mrN2wLLyKV9j7ZjcZxPZK0sRLzL/B8ZJDmBBQWyJEEgKmZBHt1s1SMN8gfaZCcHohhEkmAkiqcMCc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783411112; c=relaxed/simple;
-	bh=iU/qiWmVqc8mJ4kMWloLnEMZPtFCZP6TrUTpLpQ815k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BNnezHOgn34GaA5m8YuVlZAOvUYHriS6P0K7Uwss1bSaCrqhvIt1JwHPOqaeWIbHMAwaWKkp+v3HVCU2yO/Hqjml/huTN5GOj8RdOykpfQa8Fg4WATUQMV8dVnaYNlw7qKil821nfsths6+EfUpXukM4odGVYzqPgDSQYqExa1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Ld0wWe9D; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=QJREVmts; arc=none smtp.client-ip=103.168.172.150
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfout.phl.internal (Postfix) with ESMTP id 6F5B9EC00C0;
-	Tue,  7 Jul 2026 03:58:28 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Tue, 07 Jul 2026 03:58:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1783411108; x=
-	1783497508; bh=eJwZUoiS1FO5f6Y8aS9IeirTJ0PEY9A1ZMp5FQTjB7E=; b=L
-	d0wWe9DZOKTzYGTsH7Z7X7NrIO1r4mvYnw5vIr+Gs7Boqd8veAT0RKquQGzf2HwX
-	kEvTL4llAAw62meDbTHV08TnS2jM2PiUrN5v22dw+MPL6bwj2hOlYYa2ARJFuob5
-	beUPcYfaQGFLhSobLtSbY7LEuuAau+bvzhToMgWSfVVDxKUlZw/VaQ3odEiv7hid
-	avilACRtmuolo1kD6nqkUlP5RAHpaZ5A7p7kJadZ7USUtsh2Hp3nHrTN4pb8HU9L
-	+albiQ5vtJotR9BOZKoVF6cQ3peXm0HiuxKd6w5yOzx31Q89HWEE3j7ApNuuBL3u
-	QjQYHuNvXCl/x9fpRxGXA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1783411108; x=1783497508; bh=eJwZUoiS1FO5f6Y8aS9IeirTJ0PEY9A1ZMp
-	5FQTjB7E=; b=QJREVmtso+boEN6IzeOrR000lYyE9NURF8PIuwit1xpBltxcp7a
-	bEzbo9gSbStRC6wFC9oIHq2sjsWWIw4RtRzhDdVjWxe6qT5ZJqMk8mp4fgvIc2i6
-	Yafq8AHcNuuBR4/ivgVVXKhfUkg0Nj4Ul3GxFVj+I3wAr0f9T0nNpiGgs2td5yZM
-	ndRR4YZTU7WSzErKnnTtEKTb8M6tNswXKkQaJOLLwfVIxLRyuKVHbTrU1GL9Gi5e
-	R33s/5NAe7pDF8fTNHzZqRC1+2HU4BN5MOOyrhXAJQnCMmZcbqMR+f3957YeUgul
-	sd5hcBXt2Pjc1Oek4V5BcjTUSDvbku84DZg==
-X-ME-Sender: <xms:pLFMagMtilv31kzD1RMgeR3tC4lKZKdjaiTR9u9aDNT0uolNDI8MJg>
-    <xme:pLFMamDXcsW_UESAfenir2kcQPdNW_CmNiDNGAp02CmbXl_QanneqhwCpO15tr_yt
-    rmrHLYdJ0pGha9a4Z89bt-n2Y7Schkh7YwDt7PecWP--iKj5l4s3Q>
-X-ME-Received: <xmr:pLFMatexcp8xaLix6OJxVes6bkOkx5nw2oEq_AqIfwDiNldwq_TIRMwOqsU>
-X-ME-Proxy-Cause: dmFkZTERHFx1yKfx12fcH1oZ/ZaGDI7QF68G+4py/16YMDHSaIO4gl37BLVla8k1DERMXL
-    XRspa9RtuFiZbel8idESlESFqtB9hUEbFBJCvt2O47hMVfEitJOKyNHEnLMp0z5h+CLkKq
-    fWnUPXeKDTjfeyKCnjWZdb5S0vA/mWcD0Ikwv2Hi58LFZbUIFeJiEvJexdoNzWPHQuUwmg
-    ZklndqFGfB+6njln5WMq+hqiu0V7h1n6v1xE/pgPtMoN38JDfIZl1L2q77ZB5Z4rHN3YOL
-    3UTj+sr1DiQFd/vhfODKISEe6Hc4IEctNMEeCKHli2rsIBQwsBn64nMFC8PY0zjUOqkOte
-    R8OV79x5fOpjIqgAbCTG0xDDcX/GWtaR4BvkqoGLlnWQobkwp8CC+HOzrsWthOWix4614w
-    HVQ5XZ86wAE4YAENX2om19V3i3YUjnZ8jbVvTCW1eJommZmq6I+bHln0hKfy3gTJ7PRlWN
-    dkJvQ6TjY19KdKoeYFZMLEy+u7BTMwX/nc1NsNInsF+K71ebJvC0dD5pLiQL02XvKhQ1e4
-    k8mPSjs6Pt1I7/6eoHJ873jrRGoae0jUHHhdc5FbwFCYJsU76z6aE68XNfzcnm/NUX6yl3
-    LFDoB67TD33uyRofO43i32Pf7SzoU3aCyRdWj8WFxNIniazHSw6WizxhxtTQ
-X-ME-Proxy: <xmx:pLFMalMAusi8HYH7fsXCi1LHQov6wYbXFIYQVj9GaRiqFV_aWd2zQA>
-    <xmx:pLFMatJDPwJfmaImh4C5a8WBPHbbalpEPMcqdRgWBDMovizxFPJd3A>
-    <xmx:pLFMalKKLk4jO2zQ57O6j5q08FOh8JgArcKdhs6_ZI0ichfu0cct-w>
-    <xmx:pLFMan7hcTxlMVIJb9CVWoPU6cjXcGbJOrFRKZoIWlgDtvaMEg8lmQ>
-    <xmx:pLFMarI6ABlxOtIgnszDJD2MtEXKP9IZ2WNKHVWcUOzo9ox7Ggl-0G7K>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 7 Jul 2026 03:58:27 -0400 (EDT)
-Date: Tue, 7 Jul 2026 09:58:25 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Chuck Lever <cel@kernel.org>
-Cc: john.fastabend@gmail.com, Jakub Kicinski <kuba@kernel.org>,
-	davem@davemloft.net, edumazet@google.com,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] net/tls: Consume empty data records in
- tls_sw_read_sock()
-Message-ID: <akyxoZTzhNl7XCEG@krikkit>
-References: <20260630191551.875664-1-cel@kernel.org>
- <akaoXcfamBp8_mYe@krikkit>
- <0a03d16e-d4ce-422d-9492-3e31d910d8e5@app.fastmail.com>
- <akbdFcQP7oTp_n3s@krikkit>
- <d036b6fa-4f53-444c-b376-83e122982f1d@app.fastmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D2E279907;
+	Tue,  7 Jul 2026 08:03:51 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783411433; cv=fail; b=o0iPjJg/8Jkr4qEzh5Ogd5i1wokmGPRXRc6tB16t+LeitpyhChy3nLAgrRXLBjT1Ol+t4wZas1ahrRSFDU2Sp7wf3AzLLIFFWBAuJ3p4CWwotVOx7/swzJL/lLw7V8zlgvvrgE/mwOLPTP7tB4Zfc9fGotJABeRcJUZQeNc4fs0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783411433; c=relaxed/simple;
+	bh=2ddChfKdSEwghfio/4sqgHyj/FZGz2LRYtLfb6/fqhw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=s8ul/awIXoTg56XFpFzB7vJLmGfJ3ow6ZH3x9P3qBRXXt45V5qDgqF9a3woyH1t+3rsh1X+j73CjavSLm8P06VBirjYN4VvNWRDcOoWOEvghc314urktAX5IoB2BbnW342L8twlAfTugEN4+jP5adxMmevMW47izI0UVUyznobg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=iKxXnh7n; arc=fail smtp.client-ip=52.101.48.62
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=busck44Cx++mbTQxrQYqVEikpQHauQnvxlwPBiRRP8d7SA9GWGs46LrWEKB5ZsKkENK7wrcM/tP7GVV8DGPvRk2TKecSMszfwIjRk/4ALYEsDIo6RoCv0v4ungMOfeLa9iiKZ71JAoLs72w54L3rzAargmTYKyZ6x4ddGPi0nrEmrVTp1VkIgMFT+rqU8afv77jYiTQ0fqkSrmXesKD0jSBqQqu4jo8oRKJKfHzgCXtc+QFISQ/5NZPxGRvAXf/v2y1oGPNUiFdpFhW8VX4QRPLxVJa6Dt4QvZTBzziFhT7zqTClWbjaEgHycFiJJuOFvYf3cfQXyRjyblUxZEnuTQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IyhYqp8cpRlPqbZcoDOa7ghHFwxJjJ5yMHrwriIvpX4=;
+ b=Ku4XIQcQEU00Fg5DQBdt1h/glGWNncPLFMMrTLA/5RS8gkLssdU/TFr0OPWSQqtoHHGn6/A0yStZFpEHeTD/yAUL1i5qlRJ7RnRVHgpEbtDeRWt20a/yzfYVoAKJvr+OlcLmlCB7/7GKZsr+3OS6fBFeKMo+w1OBb2vMaUgazLOzl/Uaa7KRa2pXsmnR0QnRa/Bhy12bx+Byxx0cabeYYJPGyx5Swwed9n4ci/kL3PYMs2amJ49+U+kWUbmXwDo5Yrs3UxYEmgBTSZ2AAiw1k3Kd7upfGQyuTJ4zdeBADXE+HqKgmbhjbz8TcnBb5WsSIblGFhfu3sH4JLE3dorfyQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IyhYqp8cpRlPqbZcoDOa7ghHFwxJjJ5yMHrwriIvpX4=;
+ b=iKxXnh7nDhwRJg318xQGjhQiewwP56XZpfxIXjXl2UreC9HEa37xVhps7pC0pnYuh+ApFR8932fEWhW/a2cz4MJvMsy+wZENZwfSvfPGvHM0V/wFjT3csF+zszs8qlHZt7c///B/1AMjLNQyYswNGrpxom32Uiz6nW5I4Kh2OJXZ3Ndr6bwH+qh/QKmTGAmI3Tn6anAdWTVUMdtyvUQ77e1qQZiJ+mOr0mztGsFn+KUviBNUUg3HNpb5pcUDhNkvEx+wF//TXgaun0N0CBiTWqZGnBiWzVWBpM+QIOvOuNyFzb9pM2wLqXyq+2Wzs41HvrtcIdAXx1UPaJZsH0znMA==
+Received: from SN7PR04CA0033.namprd04.prod.outlook.com (2603:10b6:806:120::8)
+ by DS0PR12MB8200.namprd12.prod.outlook.com (2603:10b6:8:f5::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.10; Tue, 7 Jul
+ 2026 08:03:45 +0000
+Received: from SA2PEPF00003F63.namprd04.prod.outlook.com
+ (2603:10b6:806:120:cafe::59) by SN7PR04CA0033.outlook.office365.com
+ (2603:10b6:806:120::8) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.181.13 via Frontend Transport; Tue, 7
+ Jul 2026 08:03:45 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SA2PEPF00003F63.mail.protection.outlook.com (10.167.248.38) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.181.6 via Frontend Transport; Tue, 7 Jul 2026 08:03:45 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 7 Jul
+ 2026 01:03:23 -0700
+Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.231.37) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Tue, 7 Jul 2026 01:03:19 -0700
+From: Danielle Ratson <danieller@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <donald.hunter@gmail.com>, <kuba@kernel.org>, <davem@davemloft.net>,
+	<edumazet@google.com>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<razor@blackwall.org>, <petrm@nvidia.com>, <nikolay@nvidia.com>,
+	<idosch@nvidia.com>, <bridge@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, Danielle Ratson <danieller@nvidia.com>
+Subject: [PATCH net] netlink: specs: rt-link: convert bridge port flag attributes to u8
+Date: Tue, 7 Jul 2026 11:03:04 +0300
+Message-ID: <a57cdfcfc4a6dcb92106c25b4dde5059fde2bd44.1783236731.git.danieller@nvidia.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <d036b6fa-4f53-444c-b376-83e122982f1d@app.fastmail.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF00003F63:EE_|DS0PR12MB8200:EE_
+X-MS-Office365-Filtering-Correlation-Id: c4c2b442-e6db-445d-fb60-08dedbfe449e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700016|23010399003|376014|7416014|18002099003|6133799003|56012099006|11063799006;
+X-Microsoft-Antispam-Message-Info:
+	7u590OuwMV4Q2r+6cBNGbhfNPXSSUu+Z40iQAPNWCQwUkMQSEa72VvDZ9j/ggIH6rnsTte/XZ8cVJBuljEnoxTmsp/2vp+zx1IdJDsChLIGenZFM9jOEnjORqMCXgPyZcTWeE9BGKnz6Ydno0LMGkjUFARTyM0EcLxtYjP1QgsbyWMhK70mikoduf2QS2FOgI+3Lthy44u4CucoTPFFYb+L6UldumNGKzaLXmhIL3RFTxcNq+Ewj+WFMRnd4za/bd7RW2qi103R90ZK3O+X2u+VDXIf9jEOuM962nAXqvp03qecxF4QtVJx+LKq9vot3BH8+8UVTgFCLSI+0F/BIWyUfGii9mtwaOGV1P+oZ+O5yw0fMm9w2Ta3BQt18PFalKVQ96k+Z4nyRv4PI0iRVPbISmjPQ7s9+JDAbuB1S3U2h2750VsnWkkQkfET0duiLOyABdxJcRVMYoBYe01oOvBdOzwRce6VezeM5kpQKgKk+YueE/vCWaMC5peKoWvBvnTevQoH5C7hEIsHylgN2DRf9DFsAmBh9wkErCN7MQ/6k/AyO/Wp9PzX0XUmZo3irbkAJ7Dge4LQhapTFl6LbTNXmAIivlMPp+BGBbQnJqKGiX7cIW9JkGbJ8UDX4G/Rv0hgQtGoCXSWkeS4dWZTZOQuJvHKQy03hJFqXstMw1SOvoq6XO4jpATBcD7i2o1mO9wg/UMQ4A5yEjikt4AGGrg==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700016)(23010399003)(376014)(7416014)(18002099003)(6133799003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	9+vPXqIJPjMbKpcHcmJEysOz/uk5CISJqtVxqHypbIC2BeWkjZdrsz2qtABnXyX+6VGN6+EsmbWL/rgIwJSzK+IrQaeakxLXHUFHvH6ZpgubwtPBjTUi+o7Y8ljY+HpnKE96MwTiXclVwM3lVx6rcit4/wvcjUG0SwSITNe6l40SYqBpOaAJv+1MDDPFQvSLt/hQOKjJ3HGXg2SRns+l0a3pxcU/Lw237rYWGe3O+OyoN/FqZ6YyAre81iPFgbjGyvfXwVhRJXExrI36D/BRGL9MRyq7Haj2bSN6bAvzb86Qq6ueKsvDc1CXaM31IC64sOQbKhA6T/8APeVXP2c1VBKLsrHLg2uaVzJHsGb94qZJ8DiKKnCzZYLxR+axPws0+o9pl+JUj2RNs88kh5OgAgF03CPmjcVfulN6jSV+iR5nF4kU5s7zk202rorY/x+V
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2026 08:03:45.1075
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c4c2b442-e6db-445d-fb60-08dedbfe449e
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF00003F63.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8200
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-4.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305316-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:cel@kernel.org,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	DMARC_NA(0.00)[queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:donald.hunter@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:razor@blackwall.org,m:petrm@nvidia.com,m:nikolay@nvidia.com,m:idosch@nvidia.com,m:bridge@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:danieller@nvidia.com,m:donaldhunter@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305317-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[danieller@nvidia.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,blackwall.org,nvidia.com,lists.linux.dev,vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[danieller@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,messagingengine.com:dkim,queasysnail.net:from_mime,queasysnail.net:email,queasysnail.net:dkim]
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4DFC0718EFE
+X-Rspamd-Queue-Id: 3A975718E73
 
-2026-07-06, 15:16:21 -0400, Chuck Lever wrote:
-> 
-> 
-> On Thu, Jul 2, 2026, at 5:50 PM, Sabrina Dubroca wrote:
-> > 2026-07-02, 15:52:49 -0400, Chuck Lever wrote:
-> >> 
-> >> 
-> >> On Thu, Jul 2, 2026, at 2:05 PM, Sabrina Dubroca wrote:
-> >> > 2026-06-30, 15:15:51 -0400, Chuck Lever wrote:
-> >> >> A peer may send a zero-length TLS application_data record; TLS 1.3
-> >> >> explicitly permits these as a traffic-analysis countermeasure (RFC
-> >> >> 8446, Section 5.1). After decryption such a record has full_len ==
-> >> >> 0. tls_sw_read_sock() hands it to the read_actor, which has no
-> >> >> payload to consume and returns zero. The loop treats a zero return
-> >> >> as backpressure (used <= 0), requeues the skb at the head of
-> >> >> rx_list, and stops. rx_list is serviced head-first on the next
-> >> >> call, so the empty record is dequeued, fails the same way, and is
-> >> >> requeued again; every later record on the connection is blocked
-> >> >> behind it.
-> >> >> 
-> >> >> tls_sw_recvmsg() does not stall on this: a zero-length data record
-> >> >> copies nothing and falls through to consume_skb(). Mirror that in
-> >> >> the read_sock() path by recognizing an empty data record before
-> >> >> the actor runs, consuming it, and continuing.
-> >> >> 
-> >> >> Fixes: 662fbcec32f4 ("net/tls: implement ->read_sock()")
-> >> >> Signed-off-by: Chuck Lever <cel@kernel.org>
-> >> >> ---
-> >> >>  net/tls/tls_sw.c | 11 +++++++++++
-> >> >>  1 file changed, 11 insertions(+)
-> >> >
-> >> > Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
-> >> >
-> >> > I think tls_sw_splice_read() suffers from a similar issue (returning 0
-> >> > even though more data may be available). Sashiko agrees, and also
-> >> > found a few more pre-existing issues.
-> >> 
-> >> Do you want a v2 series with those issues addressed?
-> >
-> > I'd be ok with this patch going in on its own, and the other issues
-> > being addressed separately. If you have time to look into those,
-> > that'd be great.
-> 
-> patchwork shows this patch continues to be marked as "New". Is there
-> something I need to do to help move it forward?
+A number of IFLA_BRPORT_* attributes are documented in the rt-link spec
+as having the "flag" type, i.e. a payload-less NLA_FLAG attribute whose
+meaning is presence-only. This does not match the kernel, which emits
+these attributes with nla_put_u8() and validates them as NLA_U8 in
+br_port_policy[]. The values are not mere presence flags but carry a u8
+payload (0/1).
 
-I don't think there's anything blocking it other than the length of
-the maintainers' backlog.
+Convert these bridge port attributes from "flag" to "u8" so the spec
+reflects the actual wire format.
 
+Fixes: 077b6022d24b ("doc/netlink/specs: Add sub-message type to rt_link family")
+Assisted-by: Claude:claude-opus-4-8
+Reviewed-by: Petr Machata <petrm@nvidia.com>
+Acked-by: Nikolay Aleksandrov <nikolay@nvidia.com>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Signed-off-by: Danielle Ratson <danieller@nvidia.com>
+---
+ Documentation/netlink/specs/rt-link.yaml | 40 ++++++++++++------------
+ 1 file changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/Documentation/netlink/specs/rt-link.yaml b/Documentation/netlink/specs/rt-link.yaml
+index 892979da098e..68c26a70bb64 100644
+--- a/Documentation/netlink/specs/rt-link.yaml
++++ b/Documentation/netlink/specs/rt-link.yaml
+@@ -1585,31 +1585,31 @@ attribute-sets:
+         type: u32
+       -
+         name: mode
+-        type: flag
++        type: u8
+       -
+         name: guard
+-        type: flag
++        type: u8
+       -
+         name: protect
+-        type: flag
++        type: u8
+       -
+         name: fast-leave
+-        type: flag
++        type: u8
+       -
+         name: learning
+-        type: flag
++        type: u8
+       -
+         name: unicast-flood
+-        type: flag
++        type: u8
+       -
+         name: proxyarp
+-        type: flag
++        type: u8
+       -
+         name: learning-sync
+-        type: flag
++        type: u8
+       -
+         name: proxyarp-wifi
+-        type: flag
++        type: u8
+       -
+         name: root-id
+         type: binary
+@@ -1656,34 +1656,34 @@ attribute-sets:
+         type: pad
+       -
+         name: mcast-flood
+-        type: flag
++        type: u8
+       -
+         name: mcast-to-ucast
+-        type: flag
++        type: u8
+       -
+         name: vlan-tunnel
+-        type: flag
++        type: u8
+       -
+         name: bcast-flood
+-        type: flag
++        type: u8
+       -
+         name: group-fwd-mask
+         type: u16
+       -
+         name: neigh-suppress
+-        type: flag
++        type: u8
+       -
+         name: isolated
+-        type: flag
++        type: u8
+       -
+         name: backup-port
+         type: u32
+       -
+         name: mrp-ring-open
+-        type: flag
++        type: u8
+       -
+         name: mrp-in-open
+-        type: flag
++        type: u8
+       -
+         name: mcast-eht-hosts-limit
+         type: u32
+@@ -1692,10 +1692,10 @@ attribute-sets:
+         type: u32
+       -
+         name: locked
+-        type: flag
++        type: u8
+       -
+         name: mab
+-        type: flag
++        type: u8
+       -
+         name: mcast-n-groups
+         type: u32
+@@ -1704,7 +1704,7 @@ attribute-sets:
+         type: u32
+       -
+         name: neigh-vlan-suppress
+-        type: flag
++        type: u8
+       -
+         name: backup-nhid
+         type: u32
 -- 
-Sabrina
+2.54.0
+
 
