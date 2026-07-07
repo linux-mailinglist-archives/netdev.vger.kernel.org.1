@@ -1,55 +1,70 @@
-Return-Path: <netdev+bounces-305414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305415-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id WsdDAojcTGpYrAEAu9opvQ
-	(envelope-from <netdev+bounces-305414-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 13:01:28 +0200
+	id qC0pBlreTGrcrAEAu9opvQ
+	(envelope-from <netdev+bounces-305415-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 13:09:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9093271AB74
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 13:01:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6438871ACEC
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 13:09:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=fail ("headers rsa verify failed") header.d=kernel.org header.s=k20260515 header.b=IILQLy1y;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305414-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305414-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}")
+	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=E1jvZzaW;
+	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305415-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305415-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 33AA5303A8F7
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 11:00:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6E48730E1105
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 11:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5473F7AB7;
-	Tue,  7 Jul 2026 11:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0E8B3F6600;
+	Tue,  7 Jul 2026 11:00:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4024E3DB65A
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 11:00:34 +0000 (UTC)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.175.55.52])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07F3D3F870C;
+	Tue,  7 Jul 2026 11:00:38 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783422035; cv=none; b=HJba8y2rVl6kfdrLzrQImoAwykLuCjGd06varEqrtJJzceZjSsnTB0KBbkuNOKlS9oHX3PDE3ALafZtrMnVGPByIMIXflWn+FgiPhUYMBBvCft5NzAVFxVC0mApFUpS7INg4Z0w9QEHghezGZP1IPZ5+z6fna5xFqTefhSOXgbI=
+	t=1783422045; cv=none; b=sR2+x8F1IGTAGO8LlQNemf0nOc49s+7ctEtPbTr3nTeAcqBX3spUo12cJ0L8+yHpUi1Az2DJmMY3vlo+P98bWyxZxRHLbjU5YKS58HDhWkH7ebJ0A/tOu5Wt8GdEAti/W/YIJ4XuhGOgRm2uKe3GcNFnz03P3p7Gcfrt9Dx/0X8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783422035; c=relaxed/simple;
-	bh=Ry6VoGstTO4mM1xLDubI9yra5JGj+DzJHMW3aOeP7ME=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LVQ4pTsB1uR8BAH+/ZeNPT1d7OCNIvkMXgK5LnGGrCcdfDuPjHc5NDzktE4krSHV+8InmTguqxm36dUVzuNLXKVpw74kttDbogpd8jhaD4QaUjeS56ftJ2VMqA2RUc+bA908EGS5J2/kDnMh+TUWvFakvqU624ZpjEWrJu6w6AI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IILQLy1y; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEC431F000E9;
-	Tue,  7 Jul 2026 11:00:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783422033;
-	bh=0+lW/HyoCQKv86mW2wwMMjW384TD69xk7+ot2UpKnlQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=IILQLy1yl3g5hwaO467sMXJ7x/ow/gtpvVci2uLzzZds7oK2Q2aC/VxLmsww0WSLv
-	 hlfZc8K/Wy7xrQuuaX1X6FzLMue86Wn4evU4vNS1kunU9z8RiWFwkWC9iuuatVtS+d
-	 pfAAF8QoQpgc7mmX5h7D+oRBPt08lT8iy3f5A5f318qnH9CyUiW3UeWCmD85mY5L1h
-	 b/GtMRpZwgEUrRBRTQyfLg53J08z98zYk9KawDu0aamq72+MquURwB2kg+yUW+p4kh
-	 lzPBXFb7LzPQ3fmgSAvr/9u7Tq4XSrOwuayMB2Q+xSatL+ZvtRuXr1Ya1AapFN8nl2
-	 Zs5f6ku/fkQpw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 19B383925479;
-	Tue,  7 Jul 2026 11:00:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1783422045; c=relaxed/simple;
+	bh=xfAix1SI/5H4odFpah60tVEkhbcttrfLxGmJA+3KN7A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l31HJlprJpBxUNIZyWDgtADhumrunhpvCQw4iFyS4sC97gOQRAy02gAp1cHJSgL+Y2fcCTCccO9T7Xm6e98O5F1h2q10GcdLxGMR+Tc8iq3FFuXZqpKXdYNQ5W/bM68FxkvyBXfvBHH22a649w0mP1o63AbrNQYSiMP745zaukk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=E1jvZzaW; arc=none smtp.client-ip=52.175.55.52
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
+	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=Wb1ul
+	XqaN6LhsrQOCbA/VuSQqCeRVoSv6NswqkkKJ8w=; b=E1jvZzaWo3hUgMdd0OHlg
+	CsCEz2tugJDvIaW4EiZ/SUgjsLh75MKd9wBJy4POqO+9HqAexd/KRipE4B8PKftL
+	qwRWKBksOdraVTP9oT0OxpaWeqBkjD1rYD/oYGvJeCPjW16zVbMf3w0rEhhh1h7E
+	eMRZc36m2Go404eE7lbP90=
+Received: from localhost.localdomain (unknown [101.5.13.242])
+	by web2 (Coremail) with SMTP id yQQGZQAXw5VB3ExqboPLAg--.29993S2;
+	Tue, 07 Jul 2026 19:00:17 +0800 (CST)
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org
+Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+	Ao Wang <wangao@seu.edu.cn>,
+	Xuewei Feng <fengxw06@126.com>,
+	Qi Li <qli01@tsinghua.edu.cn>,
+	Ke Xu <xuke@tsinghua.edu.cn>
+Subject: [PATCH nf] netfilter: ecache: fix inverted time_after() check
+Date: Tue,  7 Jul 2026 19:00:14 +0800
+Message-ID: <20260707110015.99988-1-zhaoyz24@mails.tsinghua.edu.cn>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,101 +72,121 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/7] cxl: Support Type2 cxl regs mapping
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178342201363.1497513.7679658303612517121.git-patchwork-notify@kernel.org>
-Date: Tue, 07 Jul 2026 11:00:13 +0000
-References: <20260701113805.14072-2-alejandro.lucero-palau@amd.com>
-In-Reply-To: <20260701113805.14072-2-alejandro.lucero-palau@amd.com>
-To: Lucero@codeaurora.org, Palau@codeaurora.org,
-	Alejandro <alejandro.lucero-palau@amd.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- dave.jiang@intel.com, alucerop@amd.com, dan.j.williams@intel.com,
- Jonathan.Cameron@huawei.com, benjamin.cheatham@amd.com,
- ecree.xilinx@gmail.com
+X-CM-TRANSID:yQQGZQAXw5VB3ExqboPLAg--.29993S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxZry3tFWkur18uF15XFWkZwb_yoW5Wr17pF
+	Z5Zr93tFWxCrWYkanYvw1UAFn8ua93u34xua45GF95CanxGrs8JFs5KrW2qF98ZrWvkF4I
+	yF4jyr1jkFs8XF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9v1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l8cAvFVAK
+	0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4
+	x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2
+	z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4
+	CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E74AGY7Cv6cx26r4r
+	Kr1UJr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc
+	8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVW8ZVWrXwCY02Av
+	z4vE14v_Gw4l42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8VW8Ww4UJr1UMxC20s
+	026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
+	JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
+	v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
+	j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
+	W8JrUvcSsGvfC2KfnxnUUI43ZEXa7VU1rb15UUUUU==
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAgABAWpMxHwgogAAse
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
+	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	R_DKIM_REJECT(0.00)[kernel.org:s=k20260515];
-	TAGGED_FROM(0.00)[bounces-305414-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,davemloft.net,google.com,redhat.com,intel.com,amd.com,huawei.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-305415-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:Lucero@codeaurora.org,m:Palau@codeaurora.org,m:alejandro.lucero-palau@amd.com,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:dave.jiang@intel.com,m:alucerop@amd.com,m:dan.j.williams@intel.com,m:Jonathan.Cameron@huawei.com,m:benjamin.cheatham@amd.com,m:ecree.xilinx@gmail.com,m:ecreexilinx@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:zhaoyz24@mails.tsinghua.edu.cn,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:-];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
+	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,huawei.com:email,intel.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mails.tsinghua.edu.cn:from_mime,mails.tsinghua.edu.cn:dkim,mails.tsinghua.edu.cn:mid,seu.edu.cn:email,tsinghua.edu.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9093271AB74
+X-Rspamd-Queue-Id: 6438871ACEC
 
-Hello:
+ecache_work_evict_list() redelivers DESTROY events for conntracks that
+were moved to the per-netns dying_list after event delivery failed.  It
+sets a 10ms deadline:
 
-This series was applied to netdev/net-next.git (main)
-by Dave Jiang <dave.jiang@intel.com>:
+    stop = jiffies + ECACHE_MAX_JIFFIES
 
-On Wed, 1 Jul 2026 12:37:59 +0100 you wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> Export cxl core functions for a Type2 driver being able to discover and
-> map the device registers.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
-> Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
-> Acked-by: Edward Cree <ecree.xilinx@gmail.com>
-> Link: https://patch.msgid.link/20260629183727.51502-2-alejandro.lucero-palau@amd.com
-> Signed-off-by: Dave Jiang <dave.jiang@intel.com>
-> 
-> [...]
+but then tests:
 
-Here is the summary with links:
-  - [net,1/7] cxl: Support Type2 cxl regs mapping
-    https://git.kernel.org/netdev/net-next/c/2c599da8231f
-  - [net,2/7] cxl: Support dpa without a mailbox
-    https://git.kernel.org/netdev/net-next/c/96ddf1af34f5
-  - [net,3/7] sfc: add cxl support
-    https://git.kernel.org/netdev/net-next/c/a3fc56b12e3a
-  - [net,4/7] sfc: Map cxl regs
-    https://git.kernel.org/netdev/net-next/c/08699796dabf
-  - [net,5/7] sfc: Initialize cxl dpa
-    https://git.kernel.org/netdev/net-next/c/230284c1b165
-  - [net,6/7] sfc: obtain and map cxl range using devm_cxl_probe_mem
-    https://git.kernel.org/netdev/net-next/c/0418860ef2ca
-  - [net,7/7] sfc: support pio mapping based on cxl
-    https://git.kernel.org/netdev/net-next/c/bd6550bcdb0c
+    time_after(stop, jiffies)
 
-You are awesome, thank you!
+This condition is true while the deadline is still in the future, so the
+worker returns STATE_RESTART after the first successful redelivery in the
+usual case.  ecache_work() maps STATE_RESTART to delay 0, which turns the
+redelivery path into one dying conntrack per workqueue dispatch and makes
+the sent > 16 batching/cond_resched() path effectively unreachable.
+
+A conntrack netlink listener whose receive queue is congested can make
+DESTROY event delivery fail with -ENOBUFS.  With sustained conntrack
+churn, entries then accumulate on the dying_list and are only drained at
+the degraded one-entry-per-dispatch rate once delivery succeeds again,
+wasting CPU on back-to-back workqueue reschedules and prolonging
+conntrack memory/resource pressure.
+
+In a KASAN QEMU test with CONFIG_NF_CONNTRACK_EVENTS=y and
+nf_conntrack.enable_hooks=1, a congested DESTROY listener caused 8192
+nf_ct_delete() calls to return false and move entries to the dying_list.
+After closing the listener, the unfixed kernel needed 7670 ecache_work()
+entries to destroy 7669 conntracks.  With this change, the same 8192
+entries were destroyed by 2 ecache_work() entries.
+
+Swap the comparison so the worker restarts only after the deadline has
+expired.
+
+Fixes: 2ed3bf188b33 ("netfilter: ecache: use dedicated list for event redelivery")
+Cc: stable@vger.kernel.org
+Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
+Reported-by: Ao Wang <wangao@seu.edu.cn>
+Reported-by: Xuewei Feng <fengxw06@126.com>
+Reported-by: Qi Li <qli01@tsinghua.edu.cn>
+Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
+Assisted-by: Claude-Code:GLM-5.2
+Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+---
+ net/netfilter/nf_conntrack_ecache.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/netfilter/nf_conntrack_ecache.c b/net/netfilter/nf_conntrack_ecache.c
+index 9df159448b89..cc8d8e85169f 100644
+--- a/net/netfilter/nf_conntrack_ecache.c
++++ b/net/netfilter/nf_conntrack_ecache.c
+@@ -77,7 +77,7 @@ static enum retry_state ecache_work_evict_list(struct nf_conntrack_net *cnet)
+ 		hlist_nulls_del_rcu(&ct->tuplehash[IP_CT_DIR_ORIGINAL].hnnode);
+ 		hlist_nulls_add_head(&ct->tuplehash[IP_CT_DIR_REPLY].hnnode, &evicted_list);
+ 
+-		if (time_after(stop, jiffies)) {
++		if (time_after(jiffies, stop)) {
+ 			ret = STATE_RESTART;
+ 			break;
+ 		}
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.47.3
 
 
