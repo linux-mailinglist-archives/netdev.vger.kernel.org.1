@@ -1,295 +1,312 @@
-Return-Path: <netdev+bounces-305470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305471-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /DxNKM0CTWrZtQEAu9opvQ
-	(envelope-from <netdev+bounces-305470-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 15:44:45 +0200
+	id wIHjAXADTWoDtgEAu9opvQ
+	(envelope-from <netdev+bounces-305471-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 15:47:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB55871C124
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 15:44:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52BDC71C194
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 15:47:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=bQI4XZrG;
-	dmarc=pass (policy=none) header.from=intel.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305470-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305470-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=weidmueller.com header.s=selector2 header.b=PdQ9EAbV;
+	dmarc=pass (policy=reject) header.from=weidmueller.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305471-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305471-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4BC303016C88
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 13:36:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0F6DB31BC68F
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 13:37:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCFAB41C303;
-	Tue,  7 Jul 2026 13:36:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6112541DEE8;
+	Tue,  7 Jul 2026 13:36:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013018.outbound.protection.outlook.com [40.107.159.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A46175A77
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 13:36:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E865A422526;
+	Tue,  7 Jul 2026 13:36:29 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783431362; cv=fail; b=nc8VILQdYfwx59Sh8dxHFH6fEeaXnmgn/nl1opVoMMDhpZIXvaBRZJfiRauz3lcni+ufg2hd1m47BK/vuxYbB21uU4sGdJ3xGfUNwkAXBAv1J0fFQ6JD9EaSYgb4TBXcJBb0TAg4Em6KoYtJxbNyXDcE7MO5cxhciA7VA9vj6Y4=
+	t=1783431394; cv=fail; b=atqseEKCDFhJ3212iCNi2rEsA1HbBO6YrBy4UaQ889m/K/ZWutkFAXLz/IpyS3Kg5IjBb/ItaUECHIXKYiFMZct9IZaAiTtEzJEp/5rkURDtbYphJXfrZE16XDk8KXmT7zjqjWpQNyoxHgfiWcBjD7yz5VDUqT7mPqWOAeKjeLo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783431362; c=relaxed/simple;
-	bh=8+8pKRvgB2BkrX1Rju0K1m9TUyEjFLAbHdYxP3QB1mA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=YZWuQaXhqkTReYvj3m+ZRNz3AZjc66ozb+KWhskmIPv4A8NIgDxrAuIBR0pconCi4FHemNwrbi4bVxqG3MIJgkZ7UAe7MJBtZ6TpOGPtt11rcIuWfrB/PccK2eeOecumpiSnIfZeeUBvGTbCEzUBP0EWGwjxuxn6MJb5CWp2XV8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bQI4XZrG; arc=fail smtp.client-ip=198.175.65.16
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1783431361; x=1814967361;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=8+8pKRvgB2BkrX1Rju0K1m9TUyEjFLAbHdYxP3QB1mA=;
-  b=bQI4XZrG7e52/7rvNGJGGShUZlbPl21rnqOPx34wQu2BwQmMBoLtH/c1
-   O7oFYGYRiOUJnm9dTbmqydQjY0YKQZekeiBCtGzbcmRGc1OnRQrJPOuXG
-   rfkMMVBm++OqTqWwNjvl4iHYd7xveLky0JvpKZ+FMQNxM6kINIHuqpv3E
-   yuoFtK7EtgjrIL+tGgwCwrVf+E4xusgl4QlHzA/MP08OgCTR9c8ybJZhG
-   frcs971xT601f9c/aIxWlseWA58nzd4hGqktw9N4XMdWgRztltEuWW0GR
-   OLGX6fspA4xD1EfgGabP3u9IJTB0339W9CTGB1rmNBdO1Gzgyu5uJCE/a
-   A==;
-X-CSE-ConnectionGUID: xcXaZaTdQ7+63VjBtYF5yg==
-X-CSE-MsgGUID: 54Dt1q7hQkG3xLIvXW7Qiw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11840"; a="84267531"
-X-IronPort-AV: E=Sophos;i="6.25,153,1779174000"; 
-   d="scan'208";a="84267531"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2026 06:36:01 -0700
-X-CSE-ConnectionGUID: TvYy+Rq8RZel+ceRiUqi2g==
-X-CSE-MsgGUID: srJOBAY7TIeUy3TLg/A/iQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,153,1779174000"; 
-   d="scan'208";a="277221057"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2026 06:36:00 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Tue, 7 Jul 2026 06:35:59 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43 via Frontend Transport; Tue, 7 Jul 2026 06:35:59 -0700
-Received: from BYAPR05CU005.outbound.protection.outlook.com (52.101.85.23) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Tue, 7 Jul 2026 06:35:59 -0700
+	s=arc-20240116; t=1783431394; c=relaxed/simple;
+	bh=gnjG+1TFfauaWf7YGFOCUnj+bnz/T8JID7dOt4UBboQ=;
+	h=Message-ID:Date:From:Subject:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ZsHXkWL5AQkB18PnpwvwYfmiQ2bNhWVS3W+i04RX1mxKCZlaSshZAtNj/6TEVrOj4RKxxjHQOzITz410kCd80V2uYxGZLnW3Qf9FsYWTWakSrHWSFbq4UdD4dVtWDvDliQuQFEhzA9ICfpzDmSDc0kaaOaPt/ZouyFsUQi0gu5Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=weidmueller.com; spf=pass smtp.mailfrom=weidmueller.com; dkim=pass (2048-bit key) header.d=weidmueller.com header.i=@weidmueller.com header.b=PdQ9EAbV; arc=fail smtp.client-ip=40.107.159.18
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hRaFFhmazB04WgHCaslVAtVGvFLLqw1RypNFPT+hrdCbe55u8QTt2MFPLXr12Non/FjwbpdJ1obyZaeqfzFm9JUj3F4U5tz9CZlHyJ80fsE7Xe3yDpigWC9Dgfyp93xiR9xAViDfskWmV71soh7H3L0zrNTYVZsQYYiv1w55FG+i0BcK8L1wa2CTvAxq7pq1qGMUfKs9GyiDNPHzJh6b7F5I9RyTp199HOvft4Qg+vho0NBM6+xCKBCTJt6TOZmBdSuEOX8EeFmn4jvYshaseUnaVyRPSZk9BeL0jopMB90co/a3lhhkBNn5uK0n9Rlc7rV9K1vo+e1pmbCWLdzg1Q==
+ b=ABXcpKNho7NfLzaHNavFEcEPFd5eeIuvoG/dhFA/4nzqZKmz9j63CvdDJBtoVjgvL5BjYjV0Va0MUyrwQF+0eaH8kbXgPXrsDybF2dQ1SJ1F5D4mm/+4na0CbBOnWoCLWK2OJkZ1GkSk8QXfPB7RmnLD8E3JLdBHs43bfl7BtS8zVid5fkLQkjdZx8k3nFqaucu8RTbbD4vWYOEFxkVB/gqwTN5jj62aos1rUyqs5rL2EtJ4pPHIG4A9eA6OY/0Uzlkes3Rt3fOeMcTX5L2Wjj7S8sfeYSRuq60BVqSy+I08yUU/HTO9VZUxNKHsB3s6OAKbwshwP8TSHXYy6ORioQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=F5+sDelNGqHrF9/kIC/kbwMGxj0GgB4pQzATeNOMG+I=;
- b=QRAwAW0OEQvDnse5+1DAz/V2zK9SYhgAAyTEW03pD4oM/VL2XlxSDa9+ilIW7vflmxW1yYD1R0REnI6DDZne/rXOjevbbo9+kFcHAAWeUSXV6s4uZhwCmFo2gbpz7ogGpaZx2RXn6X020jkrCJEbR3SjVd3R9rTohTl2Y+BYclH/7SUPeljzeY/3+yqyvwvxD9oPCZwB2Wm62/izZqQ0gJPHNQrU+GGiw5JCfw8cCa8uRojuUFwalOwDqWYRKN4UH3os+lnTndRWRQj3/J5zoVJ3+FMLYifMM+a3OcFYtv5CDkumtD8yJDeXRnBPG02pPXgNt84dDtJMWcDtP3EPLQ==
+ bh=T3ToJlNE3dZAixWVES/tKqm3RYXBmuktaaFlBl1X3po=;
+ b=LEsfZGyea1hlpCtPBQMect5X+bs1b3PpYlZFKAsDmT4ktjwzRF9DQBs67yjZ/fPMAk03Skvohj515TpIPntyiSTS6vC0NkAw5mRmtuyVuEzSSK456PNqrloUeW9IKQ7beLNDHc4QdHy4UronJfIzYJQnbdKkw60lKxCetyGIDirI/Auu6U0YeFMG7l6HdLPC8wdeg5QyDkeQRqdBakIJm6KFmoTkR2K5C0OszNCfC6Nut3PG1zFYT4S7vSs390AmuzfilKZeg8ITz386rc7sfR40xW7kTO3p9AB9i1l5hlVvYgeZT6LlHO9SKc+KEUzJKoxQlSVqbCjweuL2aGLdIw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by SA1PR11MB9873.namprd11.prod.outlook.com (2603:10b6:806:4d9::22) with
+ smtp.mailfrom=weidmueller.com; dmarc=pass action=none
+ header.from=weidmueller.com; dkim=pass header.d=weidmueller.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=weidmueller.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=T3ToJlNE3dZAixWVES/tKqm3RYXBmuktaaFlBl1X3po=;
+ b=PdQ9EAbV9VxAxFBvBhOlIvqfd2KjHwrG3vZXRW4Wl2BFXGhseGb/kMpmO3BJurPXbZFHgLg4VF3KokpJOw/N76EsH21BKyQ9YKeh5oCYsMKL3m7xvKTifQ+H2CGnfYBqJNiyY8a84ueJmQGRikjL6NEkjiGZaX6BKVph515SFMDnLXVKjhMoXZZIVCGldDYT5CdYWduFQvtuRjRnAB+G5cdhY3vK+ybys5HGpzeUxdA+giURFHQ3zL0ej6DN6FRT7uAE3Cv7qem2qzxFUV1SUucCznCJ+KqGXUzxjRyCOtLTHAytGS7YkoWriz6rnEs24JhQP2D210iVSDCFE8J/LA==
+Received: from AS2PR08MB9199.eurprd08.prod.outlook.com (2603:10a6:20b:578::22)
+ by MRWPR08MB11730.eurprd08.prod.outlook.com (2603:10a6:501:99::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.11; Tue, 7 Jul
- 2026 13:35:49 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c%6]) with mapi id 15.21.0181.008; Tue, 7 Jul 2026
- 13:35:49 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Karlsson, Magnus"
-	<magnus.karlsson@intel.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "horms@kernel.org"
-	<horms@kernel.org>, "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-	"Keller, Jacob E" <jacob.e.keller@intel.com>, "Fijalkowski, Maciej"
-	<maciej.fijalkowski@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH v5 net 1/7] i40e: unregister netdev
- before clearing VSI on reinit failure
-Thread-Topic: [Intel-wired-lan] [PATCH v5 net 1/7] i40e: unregister netdev
- before clearing VSI on reinit failure
-Thread-Index: AQHdCVeTUgFfdFVjWk27U2expifMGrZiGEpA
-Date: Tue, 7 Jul 2026 13:35:49 +0000
-Message-ID: <IA3PR11MB89864B550FEE23C7CFCFA528E5F02@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20260701124524.13644-1-maciej.fijalkowski@intel.com>
- <20260701124524.13644-2-maciej.fijalkowski@intel.com>
-In-Reply-To: <20260701124524.13644-2-maciej.fijalkowski@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|SA1PR11MB9873:EE_
-x-ms-office365-filtering-correlation-id: 5dcf5499-ca0b-459e-f395-08dedc2ca833
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|23010399003|376014|18002099003|22082099003|38070700021|56012099006|4143699003|11063799006;
-x-microsoft-antispam-message-info: j8+lSQ6OdTzVaLBN3Q6euXw5GJT3UzMvzjQaIBUdfaI3qDFwhM0tzmIvobVl/XRXdjT1jlJYc5BNRfIs/BcyLw3x3RNanwiMcff0+FUddKsKplqYImwDd2RWr6u0cLM9rm9WEcyVAv4kvLuV8LQ64D2XMXLe++eLzWlOx1Gx4zwin1ggGMagnXaeubM9BVkb7Oc1ekCM9CtMW0k9TrJEXl9gP9lXj4wHJR37e6mWMe/Run08O+cx16zVG42ayzwZMLHR1Q7aV+ZSf7Kghdnpmcedbbz0aOm/tXCaLo7VInHULjFHRSTKfNyUcwsGa1yG7msGdl/HuEj2Beol5/CncQXkmYf10liH2eYkUg7TQFA6qx7dYb5BwYFdNsXVFSangfdD2oxDCP2RjYtZJAcK8xAYNT44+CrH/fUMT/Jw86+ft8eQGK1JnKoi/fd/mtxEDrlzPowMsZkjGW6W3eodQgO/igEUQmFwD5bhVLho1LZZcow75u1Sm6UGazRzl+syXapqYhc1qm5T+tgdUv7OtSod5MNvP0/Rbj8qm+FCSz/uDFRl+FAJ6iEGi9zjUlWkoJ14MHgKvW0/d600lNKocyVYJ0QSUCqY1mXeSAO0ar74/VoTLYo8aS4e50Gb0PchdEERz/gvlut3NnxfVFXO03/EmspD9Z5O6bfz+i5BrqdTLufpusTEII+3wDdlMImhhu/f+WdYUoiJ4NRWKS+RZkKnyDN4+DwrM+XRUhC94ZU=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(23010399003)(376014)(18002099003)(22082099003)(38070700021)(56012099006)(4143699003)(11063799006);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?JlZ7jIGIReOwaBe9eD3Po7I1GMnWAPZkswiprAbJRDK/l9leoqm1WegjP3yi?=
- =?us-ascii?Q?mHsFePzzz/XqRCG0fQ6xyQuuEayDagTXrbfz+4wTG0s8g83Umzlx2kUm9jOv?=
- =?us-ascii?Q?0wMcq9fCPMOgpL+eJZy3ef8vJLjKT38tpiRBak4TaFaxs028V3wlkMHZmGJF?=
- =?us-ascii?Q?uA+KylfIOCc1/7luH1C5cBDLDWjGJdNMSjJVWCP0LMPBUZOGUmlATpu82WMI?=
- =?us-ascii?Q?2emIvJ+75EROe/VqX4tPT4qhLZeNcvu+P1VPqRUue8X4CHYFOdHxMx+lLqUA?=
- =?us-ascii?Q?HP7dhDtDWNPgOR7vZTS77PlGr08zGZX2UHIkSJYlZvpZoNQcl7A+yvJEnG0V?=
- =?us-ascii?Q?/fcCnYbk2rivLvf8gOTK7U36rkDbvzVgft+0m+NLQOlCZZ8LhFHh15yHN7kj?=
- =?us-ascii?Q?glcIOs8QHFj3Obbv6UvadvDehASW2B4kY8GEFZ3ECpe92iVLQh1eit8DGqN5?=
- =?us-ascii?Q?l3Atp40sVMY82x3UzCwQBhcYW8BEFbm2bO31SARDBcFaqxG5dc1oVLxEMcEh?=
- =?us-ascii?Q?2rPonwZ7APTvx2SpVdT1lNZXy25dnzpEYZH/9vybzfAHpUr47vGnwNHMNSpv?=
- =?us-ascii?Q?QBM64qSLZziHpKPC9973bAL02M+kOi9in3sOwkLimxFulorqIwJMk3t+rdVp?=
- =?us-ascii?Q?2ZosQDyx0m2YDCU4h9sWuscZMekhhzVMgFfkuf+HYGAT/AIkgvcyPUCWeBOn?=
- =?us-ascii?Q?dqNXOJY5ixhI8nt2CILZoZvLU+GwMLxzJqdZMMBhVQKkWve1idCkO62/gPu8?=
- =?us-ascii?Q?TPojNrMaG5yfnr+pujGaZxAKDD64wkV++5YIF26qVKBHlHvjEUxVLsmGUXUy?=
- =?us-ascii?Q?BWNyT7Js/rJIYXTXW9Wb0MsYSr9XxsF2tJvsaSoVIJSBDY9rcTpSYsm9YoAe?=
- =?us-ascii?Q?LQfgxCKxTazJddcqLnpq9ds5NqmM45bxzQc2cBYvDQ9He2V0YDfAuCCrAUpP?=
- =?us-ascii?Q?nD204HOC0A+9fVXN9HPlBkSUQUoXBoVpUZgth8WpM68rKiDitpyJkUhmHmOW?=
- =?us-ascii?Q?wdCE5o0G50jKPKealmGU1phHfwF4x+lavDB85Egv+A+nDTyaqhQgcT1N71Fq?=
- =?us-ascii?Q?oUjqT9IDC1f4MKFvef+Oi1kKjPDME3lGZKvcAsSId7vOgEHb0pdF8Mu5kPlt?=
- =?us-ascii?Q?i6NBgTUA+Br2tLB4IvPSyiW+4K+jy0T4sz1SJFSy6CFCO048atR5+Fi/AB4W?=
- =?us-ascii?Q?aedepit+L/P6vf9dhXjJR+VUDZG9TRwVpLfm1wzDB/7UAWTOrS3uP8zuKEpQ?=
- =?us-ascii?Q?sEVkqpAo0SVUXWoNt825rIozIziFGq+UM5iI3CKAdSKdwgGn+H/lmxahL8V+?=
- =?us-ascii?Q?rDJsvVoGqZ8VKeMVFUPU7O453qt4CWGdqUTa05qdo2GZG8G/675GjAS2JmWM?=
- =?us-ascii?Q?bC0vSp/bpfYtZQVka5FIe8QWMRtwwEkSSbyBUp0DY0RElxjfXsRZyaM4iHjl?=
- =?us-ascii?Q?RlMro4nynUN4+gASBIrtIHk5UpHylDcNdt8Zwz69AxeyCvWJiNaH5ju5Vfmy?=
- =?us-ascii?Q?MlSH+O5fseqTuTP9KT6emDBpze1rHvWBH0mBRNUFfLKDVZYUH2Nj574JONzX?=
- =?us-ascii?Q?qScuVlROojmeqZ4utPqUIeUDFoDMftUDvAMDsa+Ho4Hhdf3tis4DEixn2k4Z?=
- =?us-ascii?Q?hDjQDDl0AefePnC/Kd1a9Qmo/wZ6UcCLqmvRxebJUnjQPEKjspy7sPGAxRIy?=
- =?us-ascii?Q?W1VRuaJU1Lg+WyBkb6IPbza+W6xyl+0lJ+YVHN9lLPwu7iSSxfDsnRWx3Tun?=
- =?us-ascii?Q?kmgkVR00LruCrdaQisgzlAk3qDuFCFw=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Tue, 7 Jul 2026
+ 13:36:25 +0000
+Received: from AS2PR08MB9199.eurprd08.prod.outlook.com
+ ([fe80::5022:16e9:45e4:f778]) by AS2PR08MB9199.eurprd08.prod.outlook.com
+ ([fe80::5022:16e9:45e4:f778%2]) with mapi id 15.21.0181.010; Tue, 7 Jul 2026
+ 13:36:25 +0000
+Message-ID: <4c0570d2-5018-4389-ab63-5f829cc41f32@weidmueller.com>
+Date: Tue, 7 Jul 2026 15:36:24 +0200
+User-Agent: Mozilla Thunderbird
+From: "Taedcke, Christian" <christian.taedcke-oss@weidmueller.com>
+Subject: Re: [PATCH net 1/2] net: macb: reprogram TBQP after shuffling the TX
+ ring on link-up
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ christian.taedcke@weidmueller.com
+Cc: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>,
+ Conor Dooley <conor.dooley@microchip.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Kevin Hao <haokexin@gmail.com>, Simon Horman <horms@kernel.org>,
+ Clark Williams <clrkwllms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+ Robert Hancock <robert.hancock@calian.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rt-devel@lists.linux.dev,
+ stable@vger.kernel.org
+References: <20260706-upstreaming-macb-irq-storm-v1-0-ab3115b5a13a@weidmueller.com>
+ <20260706-upstreaming-macb-irq-storm-v1-1-ab3115b5a13a@weidmueller.com>
+ <20260706150422.-wYiCBuE@linutronix.de>
+In-Reply-To: <20260706150422.-wYiCBuE@linutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR3P281CA0049.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:4a::22) To AS2PR08MB9199.eurprd08.prod.outlook.com
+ (2603:10a6:20b:578::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: DbXSsq9E0K3YnCldv40HUXFtgZd7atprLZaStVB5orpKxuzNdVQ/A0VPDh4cCDQEHda6phxCstlpHnhM+MD0JsK+MRdSTwy+LmykuOXfbfcGYd60cic/95/GGdR0sckYP1Mr51m4zR5o+2C9VZ7I8oE5ASO/qu5w4xwx3fV52DDnLSht1RyRNAqGujVsCMUUqEYrso6qv4rvwPNkOMT85oOryXu2bO5eAYeZbmjikSBuKq9lAvuLR0TsMjVgeK5GpTYFI46lxlDeiT+gWE5RPfI7S2fFuFUPZxb2IsJR6dhj/oIH20zu8nTlfNMTppHEhQiK81c5kQEavT/NCveLgQ==
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS2PR08MB9199:EE_|MRWPR08MB11730:EE_
+X-MS-Office365-Filtering-Correlation-Id: 24471a51-19d9-440e-c76f-08dedc2cbda4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|23010399003|7416014|366016|376014|1800799024|6133799003|4143699003|56012099006|11063799006|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	2i00xY/V3h/++wEbsO7dGw6ld3L76LpaNEYo9sMSRi9Z+eGkmbd5Aj2twVPlC6ijNG5EEa6oqGfLzT1Dl6f2d8FKdWzD7WAOLvw8lb1mAconNtWwzy7TmrnQqZoGCpXkDRn0Eb5cai4thNwlQWQV866Kd4loQgKsYqkLxXhgTleKnJ0D92u9YMdD7jBtzc3msxoURVJYDijBdnnEi921FWUk0VGYNOoS7RLyhs8AgA7YjA5eRWuOVdXb8mcSJd67fTVEusowYa68gy+h6n8+De4D+5gukm6sQCt0X5N2uOzSzjflHIfLS8LDSBJ4R1J0DV53nOZxjo80bzRutXSMfD+diMgzMAmLqsyOxxipxJT1neZpgo+gsg7mlUuczagHItGbUbMibQj0vurqE9/12/Dz1vJ1HSbyeCqkkRH48E4y9G3mhHdFZeY6WZpWmBt2TP77D4NFA0fUr2Z994gI5PNTf/NsYnS7mctgZot5bUkyineZGIC6AXm6UkwfSf2jm9uPL1jIpV5UD2XQGhLq0R1BRDcmcTt3ZuLsJNgakGyKjEqaY/QUj42dKrtSOXWEyu7Yak8b8Ucp1ewWqHaPrz275ovtFWlTXGr+0EYTvCt9acHbbPedG0OomNc1qdYm
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS2PR08MB9199.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(366016)(376014)(1800799024)(6133799003)(4143699003)(56012099006)(11063799006)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?SnlQOHl0TTNrUUIyUUVMMThVbURUM0xINVhreGcvUFJmQnZ1cjA5YTJwRmV6?=
+ =?utf-8?B?T2d4OGp6QTFOeHVHbDBPb1pkeTd3RzZkMlRNU2lRTWdUZUIxSjNoYUc5d2VE?=
+ =?utf-8?B?T05nWWY1ZzRYNzBCWWd4TjMrN1dUNFZMb0lpejZNRmRTT3dqUTI3V3dhNE9w?=
+ =?utf-8?B?Qi9yT0ZUb3k3RGI0K05KVDhnTXBNcGdHMjJCblhXT3RWUmlsT3J3ZXNadDFw?=
+ =?utf-8?B?SnlZSHl0SjNxZ0QxMHJIbjA1S0pnbkw0d0oybGxTNFRnTCtRS0hjWDRpc29N?=
+ =?utf-8?B?alI2Y3NoYUkyYm16VXAzTUxvMzZCOG1oM1doMEhwTTVhWUFnSEFiQlV4cS9S?=
+ =?utf-8?B?M1dyb016ZnhZYnQxUmhDWWZKVmRScWJ4UWhuYWFjMERyNXI1dXBBMkZldTZq?=
+ =?utf-8?B?dFR1UnJ4T2VkNGNxalBGRGwwUFBTc25SWm5kb3lUbHpHYWhuMU42R2N0TU1r?=
+ =?utf-8?B?YVZPZWdhOXVFb29hTlNnWkVJUm90RWt4WEUxYm91ZVJXNEZ1dGk3dHBVRnVC?=
+ =?utf-8?B?dmR1dCt5ajJqVG40NDByeEg0ZFVEeHlIMS9DY2JUZDNseERoYlU2dlVITUtl?=
+ =?utf-8?B?RFFMekdtMmJMbFJFVWI3NEdlbU5YTnFaaFRJYnY4QzN1Q3M3Q0g5MjR6eDNU?=
+ =?utf-8?B?UW9pT29lVi95Z1RsTWxmcXlYQlN0R1VoSDMwNU9vTzhTOGZ3dFFoSmx1Vysz?=
+ =?utf-8?B?QnM4SWVPY2pRQ0Z6TWFJQVF2MTYxYnIwQ3F6WVorb0tkdk5OelNHVk9HczJN?=
+ =?utf-8?B?REd6bDU0alBKdEhQV1NMeWxmTWphaUE1c0M2MGtLSmx4b2ZBMzVoU3k1TzVj?=
+ =?utf-8?B?VUUrc29sb1dzcThxeGNZSncwL3ZpbG1DT2g0R2lGcWVoUHFBczkzOVYybmNl?=
+ =?utf-8?B?cHFMZE41SnVYRHV4djRMYnZRZVVoS3IzWEpmRWNuSzV1a3l0ZS8xMjdySEJs?=
+ =?utf-8?B?bjNNUFVSeTJxWEtnWi91QTlCVWNuK3E1b0NwSTByNUJBMWQ3VjB6YnR2VXY4?=
+ =?utf-8?B?d2pmRFJ3a0s4aDc5K1BsN09DQk1zK0ZoeW0xcW5pYzd4eHRnOGpwZXRpMHhD?=
+ =?utf-8?B?NzJINWR2dCtlSitlWGtWTDBTTWVxTTYzRk1aTGRNSzg5dXA1OWt2OUtaZVBa?=
+ =?utf-8?B?aTVnNDY2OXJaQUpBRVNjdC9kc09YUm9UMzZ3b3E4WGZhcmNwMzJRcCtYYkx4?=
+ =?utf-8?B?dkM2SEtvcTdrSDJXSlNDb1dpaE1COGtzNmN2cmZVZkc2eE5PcE1hUjdNcEZT?=
+ =?utf-8?B?a0RLZ2xYa1AxTHhIQjdKajJLeFI5Z1BXWk1kV1hWbW8wd2Y1UnN0bll4eGt5?=
+ =?utf-8?B?UjUrZWN3N1gvaVdIdmVHUVhMT2hNYUlMd3oyV0h2aEpqbTFDcEdVVU4vdXZN?=
+ =?utf-8?B?c250cnBWdUxQMC9kMlRFdTBjYnNLWUtsTENHbHhUaW0zRzM0NExDZVFCSVFR?=
+ =?utf-8?B?UkM1NUhWMGkrK3k0UVdtdXp2WVNsL2RIZWFUeGp3c3BNckxIa1Z1V0dyR2Mw?=
+ =?utf-8?B?cnBrWFNQZ3YxdHNTdVBsWXNITXJlOG1od2RXOEJRUEVFNGZuTmNzZTk2Y0lS?=
+ =?utf-8?B?QmVodjRjL0t2ZENhYXc2a3hWeUwwcEZ4aWFkckxEL1BEZDg3ajVXcWRjQ0NY?=
+ =?utf-8?B?MnRFRkZsUzJHMjVQK3FPWnBRbVNDUDFlbDlyamw1d0NacERDQmFpdGpOY3cz?=
+ =?utf-8?B?b0hlVjZIS2hoakp6SlplN1BBNkk1OEt5d28wNHA1Z1NIOTJuV2NlQ2FnaEd5?=
+ =?utf-8?B?OXBjTnhKTnM3akpSYXJpY0M1UDJ5NUlFTlZhSGN3U2ExaXZWRkhpenpTbHNZ?=
+ =?utf-8?B?MFpZR1ZNd3E5L3J1dUhWZFZ2Y0FsY0R2WFlFNmI0VkpGSEJVVWFVa3VaTWcz?=
+ =?utf-8?B?V0dhS09oWlNabFliNUNMa2dyNlpZUDdCUjExMnlhekdkd05DT1FVQkY1SzRq?=
+ =?utf-8?B?Lzczd2g3OU95V3NSSDVMdVhsS0dhMDZtUFFaTlVPV0lJQUpHSGhNT1B1VCtv?=
+ =?utf-8?B?ZjBTRlhNNnJ5aHZBS25BeDl3UThDdmlHczFoUzFrWEsxNXZ5MnJWZm9QaXF4?=
+ =?utf-8?B?U1BCWTdiTlhTNXJNbmRiOXlZNkVHSjJZeEd5dTNieEE2MmkydmVwNERsby9k?=
+ =?utf-8?B?T0tubFVWSXluL0NaTTdNYTFuWHh5d3JDdVI4eWdaZ2Z1OCtLUHBrUmh6RHE2?=
+ =?utf-8?B?RGxHNU1QeHVOYkRsM2VKYk50SFNMK1BRWjB4ZHoxVlprRHVlS1Q0eXQ3eElJ?=
+ =?utf-8?B?QWNFbERqUzc5TXRQY09YOXBYR0JTb0RZYkJGKzIxUmFpMGNXcVY0K2pyckRm?=
+ =?utf-8?B?bGc2Z2NkV2MrRHVNanlLSGJ0b2dHaEtOSFRSRUZNdEM0RWp4cVgySTlkK3dr?=
+ =?utf-8?Q?JTvTaiVFs2R6ZdVAh2wF2T3kHIgw8xhjpg9ui?=
+X-OriginatorOrg: weidmueller.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 24471a51-19d9-440e-c76f-08dedc2cbda4
+X-MS-Exchange-CrossTenant-AuthSource: AS2PR08MB9199.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5dcf5499-ca0b-459e-f395-08dedc2ca833
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jul 2026 13:35:49.1738
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2026 13:36:25.2895
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: CeawC5+9HvU9/pT7C2IHVSouh3glZKUVU34YQJYsvibPY+i2o/c2onKwyf4O5frg0ieYY7Mygz36iUj6L2AsbJaFo9b2RWTn6nO66Xucu8o=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB9873
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: e4289438-1c5f-4c95-a51a-ee553b8b18ec
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3de8XCESlUDpYTztwvI5hO9mUeP/kVdRmeQQbHCMW9sMVxfM9NkUvPPccnFOo/psrqXB6nsSW5BLIpq4p1erngwY4XQK9By3HDIwZIFDnQWso3jGPSBAI6x7V89K5sCC
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MRWPR08MB11730
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[weidmueller.com,reject];
+	R_DKIM_ALLOW(-0.20)[weidmueller.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305470-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305471-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:maciej.fijalkowski@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:magnus.karlsson@intel.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:przemyslaw.kitszel@intel.com,m:jacob.e.keller@intel.com,s:lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:from_mime,intel.com:email,intel.com:dkim,osuosl.org:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,IA3PR11MB8986.namprd11.prod.outlook.com:mid];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER(0.00)[christian.taedcke-oss@weidmueller.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_RECIPIENTS(0.00)[m:bigeasy@linutronix.de,m:christian.taedcke@weidmueller.com,m:theo.lebrun@bootlin.com,m:conor.dooley@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:haokexin@gmail.com,m:horms@kernel.org,m:clrkwllms@kernel.org,m:rostedt@goodmis.org,m:robert.hancock@calian.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rt-devel@lists.linux.dev,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[bootlin.com,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,goodmis.org,calian.com,vger.kernel.org,lists.linux.dev];
+	DKIM_TRACE(0.00)[weidmueller.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[christian.taedcke-oss@weidmueller.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[yoctoproject.org:url,vger.kernel.org:from_smtp,amd.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,weidmueller.com:from_mime,weidmueller.com:email,weidmueller.com:mid,weidmueller.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CB55871C124
+X-Rspamd-Queue-Id: 52BDC71C194
 
+Thank you for the quick review! This is my first Linux kernel
+contribution, so I appreciate your feedback here.
 
+On 7/6/2026 5:04 PM, Sebastian Andrzej Siewior wrote:
+> On 2026-07-06 16:02:14 [+0200], Christian Taedcke via B4 Relay wrote:
+>> From: Christian Taedcke <christian.taedcke@weidmueller.com>
+>>
+>> gem_shuffle_tx_one_ring() rotates the software TX ring so that the
+>> tail sits at index 0 and resets queue->tx_tail to 0, but it never
+>> reprograms the hardware transmit buffer queue pointer (TBQP). Other
+>> paths that reset tx_tail to the ring base (macb_init_buffers() and
+>> macb_tx_error_task()) also reprogram TBQP to queue->tx_ring_dma; this
+>> path does not, leaving TBQP pointing at a stale descriptor.
+>>
+>> gem_shuffle_tx_rings() runs on every link-up from
+>> macb_mac_link_up(). After a few link up/down flaps that leave
+>> un-completed descriptors in the ring, the stale TBQP keeps pointing at
+>> a descriptor whose used bit is set. When TX is re-enabled on link-up,
+>> the GEM reads that used descriptor and raises TXUBR. macb_interrupt()
+>> schedules the TX NAPI, macb_tx_poll() makes no progress (work_done ==
+>> 0) and macb_tx_restart() re-issues TSTART, which makes the controller
+>> read the same used descriptor again and re-assert TXUBR. As the MAC
+>> interrupt is level-triggered, it never deasserts and one CPU is pegged
+>> at 100% in the threaded handler, eventually triggering "sched: RT
+>> throttling activated" and a dead network interface.
+> 
+> But this should also happen with !RT at which point the interrupt runs
+> at 100% CPU and the softirq has hardly an chance to make progress, no?
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> Of Maciej Fijalkowski
-> Sent: Wednesday, July 1, 2026 2:45 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; Karlsson, Magnus
-> <magnus.karlsson@intel.com>; kuba@kernel.org; pabeni@redhat.com;
-> horms@kernel.org; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>;
-> Keller, Jacob E <jacob.e.keller@intel.com>; Fijalkowski, Maciej
-> <maciej.fijalkowski@intel.com>
-> Subject: [Intel-wired-lan] [PATCH v5 net 1/7] i40e: unregister netdev
-> before clearing VSI on reinit failure
->=20
-> i40e_vsi_reinit_setup() tears down the existing VSI queue/ring backing
-> state before allocating replacement arrays and queue tracking. If one
-> of these early allocations fails, the function jumps directly to
-> err_vsi and calls i40e_vsi_clear().
->=20
-> For a registered netdev, this frees the VSI while netdev_priv(netdev)-
-> >vsi can still point at it, leaving the registered netdev with
-> dangling private driver state.
->=20
-> Split the error path so failures after destructive reinit teardown
-> first unregister and free the netdev before clearing the VSI.
->=20
-> Fixes: d2a69fefd756 ("i40e: Fix changing previously set
-> num_queue_pairs for PFs")
-> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> ---
->  drivers/net/ethernet/intel/i40e/i40e_main.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c
-> b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> index a04683004a56..471fa7f7b643 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> @@ -14274,7 +14274,7 @@ static struct i40e_vsi
-> *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
->  	i40e_set_num_rings_in_vsi(vsi);
->  	ret =3D i40e_vsi_alloc_arrays(vsi, false);
->  	if (ret)
-> -		goto err_vsi;
-> +		goto err_netdev;
->=20
->  	alloc_queue_pairs =3D vsi->alloc_queue_pairs *
->  			    (i40e_enabled_xdp_vsi(vsi) ? 2 : 1); @@ -
-> 14284,7 +14284,7 @@ static struct i40e_vsi
-> *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
->  		dev_info(&pf->pdev->dev,
->  			 "failed to get tracking for %d queues for VSI %d
-> err %d\n",
->  			 alloc_queue_pairs, vsi->seid, ret);
-> -		goto err_vsi;
-> +		goto err_netdev;
->  	}
->  	vsi->base_queue =3D ret;
->=20
-> @@ -14309,6 +14309,7 @@ static struct i40e_vsi
-> *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
->=20
->  err_rings:
->  	i40e_vsi_free_q_vectors(vsi);
-> +err_netdev:
->  	if (vsi->netdev_registered) {
->  		vsi->netdev_registered =3D false;
->  		unregister_netdev(vsi->netdev);
-> @@ -14318,7 +14319,6 @@ static struct i40e_vsi
-> *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
->  	if (vsi->type =3D=3D I40E_VSI_MAIN)
->  		i40e_devlink_destroy_port(pf);
->  	i40e_aq_delete_element(&pf->hw, vsi->seid, NULL);
-> -err_vsi:
->  	i40e_vsi_clear(vsi);
->  	return NULL;
->  }
-> --
-> 2.43.0
+Problably yes. I had issues reproducing the issue since it appeared only
+on specific test setups when a lot packets where sent to another network
+device and this device's power was cut. And even then on some test runs
+the issue was not visible after a few hundred iterations. But after a
+restart of the whole test setup (including cold reboot of all devices)
+the issue sometimes appeared after 5 iterations.
+I only metion RT here because it was the only thing i tested. I only ran
+the RT kernel.
+Should I change the description?
 
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> 
+>> Fix it by reprogramming TBQP to the ring base on every path of
+>> gem_shuffle_tx_one_ring() that resets tx_tail to 0, mirroring
+>> macb_tx_error_task(). The early return for an already-aligned tail is
+>> left untouched as TBQP is already consistent there. This is safe
+>> because the shuffle runs from macb_mac_link_up() while TE is still
+>> disabled, so the transmitter is halted.
+>>
+>> Fixes: 881a0263d502 ("net: macb: Shuffle the tx ring before enabling tx")
+> 
+> This is v7.0-rc4. So that RT tree of yours has some backports or did you
+> run into this while trying to reproduce it upstream?
+
+There were some backports. I ran this on the linux-yocto kernel
+https://git.yoctoproject.org/linux-yocto branch
+v6.6/standard/preempt-rt/base.
+The "Fixes:" commit was backported as 0a47c3889fcd before their version
+of 6.6.130.
+
+The kernel i reproduced the issue on was linux-yocto branch
+v6.6/standard/preempt-rt/base after 6.6.142 was merged into it.
+
+> 
+>> Cc: stable@vger.kernel.org
+>> Assisted-by: Claude:claude-opus-4-8
+>> Signed-off-by: Christian Taedcke <christian.taedcke@weidmueller.com>
+>> ---
+>>  drivers/net/ethernet/cadence/macb_main.c | 9 ++++++++-
+>>  1 file changed, 8 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+>> index fd282a1700fb..b11cb8f068b7 100644
+>> --- a/drivers/net/ethernet/cadence/macb_main.c
+>> +++ b/drivers/net/ethernet/cadence/macb_main.c
+>> @@ -820,7 +820,7 @@ static void gem_shuffle_tx_one_ring(struct macb_queue *queue)
+>>  	if (!count) {
+>>  		queue->tx_head = 0;
+>>  		queue->tx_tail = 0;
+>> -		goto unlock;
+>> +		goto reset_hw_ptr;
+> 
+> This update is even needed for count == 0 case? I kind of do understand
+> that you need to updated if you shuffled the descriptors around.
+
+This was my understanding before researching more because of the email
+from Kevin in this thread: count == 0 may happen anywhere within the ring
+(e.g. when both the tail and the head point to the middle).
+Resetting queue->tx_tail to 0 but not resetting TBQP results in them
+being out-of-sync.
+But as Kevin mentioned in his email TBQP is reset to the original
+value when transmit is disabled (by setting bit 3 in NCR register).
+
+I will investigate this further why my code change fixed the issue for
+me, but according to the documentation in [1] it should be a no-op.
+
+[1] https://docs.amd.com/v/u/en-US/ug1085-zynq-ultrascale-trm pg. 1040
+> 
+>>  	}
+>>  
+>>  	shift = tail % ring_size;
+>> @@ -869,6 +869,13 @@ static void gem_shuffle_tx_one_ring(struct macb_queue *queue)
+>>  	/* Make descriptor updates visible to hardware */
+>>  	wmb();
+>>  
+>> +reset_hw_ptr:
+>> +	/* tx_tail was reset to the ring base, so TBQP must be reprogrammed
+>> +	 * to match; otherwise it keeps pointing at a stale descriptor. Safe
+>> +	 * to write directly here as TX is still disabled (called from
+>> +	 * macb_mac_link_up() before TE is set).
+>> +	 */
+>> +	queue_writel(queue, TBQP, lower_32_bits(queue->tx_ring_dma));
+>>  unlock:
+>>  	spin_unlock_irqrestore(&queue->tx_ptr_lock, flags);
+>>  }
+>>
+> 
+> Sebastian
+
+Christian
 
