@@ -1,176 +1,220 @@
-Return-Path: <netdev+bounces-305386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305387-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id jEklNATKTGo+pwEAu9opvQ
-	(envelope-from <netdev+bounces-305386-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 11:42:28 +0200
+	id KntKAsTJTGoupwEAu9opvQ
+	(envelope-from <netdev+bounces-305387-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 11:41:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40103719E90
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 11:42:28 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFAA1719E7C
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 11:41:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=maIQV6fr;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305386-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305386-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=kjExUrcD;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305387-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305387-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8EEFF303D349
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 09:40:50 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0007E3002500
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 09:41:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF3EC3B5306;
-	Tue,  7 Jul 2026 09:40:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9863F3B1017;
+	Tue,  7 Jul 2026 09:41:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6FDC23BD1D;
-	Tue,  7 Jul 2026 09:40:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D12072C0299
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 09:41:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783417248; cv=none; b=SsFPUhuyIhXXXRMjR+Qtq0m4lItGvs9j9go376fcorEPD4dj1zccHdgA8X3UhSOOOyVqAcHprZLuxQ1BNbKbHgGintgvyEuzcpe2ELeXY0cjuezgwFUKmcZEiaAktNg0a959R1pxSUXPhQWeNFT3/HGpt2mH5Hoqs0Fq4pxvXzU=
+	t=1783417278; cv=none; b=oLcgvno0o8BQS1qM56k+WkrPxrFqLoQ0R+83v1gYpRwgkVax1Pgx+xR1UOMIYYHurXNOiEJe/a7qzzrJ9OovF3wABSjDTwVjFvPxS+7DcHdRIogk2gVVMBZFGfth30ryBiC9tDyIWw7OBOIU8P2ZLdmmcsU4xrkRH01ijAzEBcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783417248; c=relaxed/simple;
-	bh=2SvJG9DL3UqCvuRg7Vo6qhQ4H7IzR1naPKn5y4+0hpI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UZg3avxRiUeNs4QYADgLutU0pUM6Z3xULRodJ6oHA+ds7L6M6Ne5QN89ut8aT6WVDfnkmuLVafVkBcpfOwRjXwMwmO6DAdR93+IH8Akdigt/4RkPGM8VC9CD9Qjf+G4mmgPMNwbUFGQGfuY86KaN/uzpEoLRloLQXSMRhlzE1qY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=maIQV6fr; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C8761F000E9;
-	Tue,  7 Jul 2026 09:40:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783417247;
-	bh=6uJPozj/uhbrq91wleQ/hPHYt4I/QFVwHZxnDm65VnU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=maIQV6frxWzq57q2+mzWiIBsx546dKVfAEfuRxFY3qTAYTBdavS1NcqcIlgKNF7fl
-	 DPhrbrl6/3XvFUDXQ+qQd9yDqZYra3fHxiIVJdd6jKJl5J8E8YPSsypeZitq0lu+Ni
-	 jEDtfFnua+72m+Pena7SLoubtroRQFPrX/4UQsyaOEPjopE7RcVi8BbfTqN0SBmApH
-	 hqog+vLCxpLf1DsQA2lAvAolJtd7L2WHCEh64aV75WgOzVb0p0AQ33FO0W4qE9PBYm
-	 fvf8K9SFL9LpHZ6AEpaQfqIzpIv6ccJHLEyfux4ZJ3DXSDuSSGcbKccvtZJnFI6Ykd
-	 8yB3eclpGVDZQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0CB03925473;
-	Tue,  7 Jul 2026 09:40:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1783417278; c=relaxed/simple;
+	bh=GPdHdqWRNzRZZchJQ9wPXni8dJdU+/hQXmvi8Itk7Q8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i4znpBhpFjOkpF5TofGGTRZW0PH7ubtnfuw2NKhuc5gTpbnUnWxTmNjVKBZDq7YZJmUZs6ao1OyCIsVVfIEUXDMLnNVpVqITNvZOekpsxFOklsoL8EiCbcgXuwL6DcAZLKjQ9JpzK0VM0VaDY1Gr+m9Qt1Rl6bHb6e8B8USR+cw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kjExUrcD; arc=none smtp.client-ip=209.85.128.53
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-490cf322ed0so25661005e9.1
+        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 02:41:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783417275; x=1784022075; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=YZUJruZyrJKIs3f2D7Ek0uWfUfy3QKwkxgMqXzof9SI=;
+        b=kjExUrcDAU5ADPZsKh7NEJYJULtzAEkgablAbNoWYvKBMeRW4x0BXt4AppaLnTtVFT
+         vYSGrinF2AbF1w2ppuMdQuMvEMgSd5ha9D53CBOAwpo3iAOE0bJ1iMNlXNE6IG/tafmj
+         vRdvwdL0m/iR8a2ssEne4b5/7pWSrYhlKgopkIHrawI6Lk9l/V2trA03GNmsAHMWKrkT
+         uK37MIYq2mWDYRA6Mvej71W5IrgEb9Sv/Zj/UIItah2HP4GZ2WpIfMCflUCY5WrX4mVJ
+         Q61UIvdV3fedtsMOhVK2+4BbRdJHOw5Z4eO+S6g2RXydNn9dyxjXlVvoYeLVVlOzgiK9
+         gAzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783417275; x=1784022075;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=YZUJruZyrJKIs3f2D7Ek0uWfUfy3QKwkxgMqXzof9SI=;
+        b=dHXfxT8MnvrZ3kbuNP8+Xo5MCD4sMseVP3js2AP0+QurC/JimA/9BZJ8hFXMyQGrC9
+         9AM8LRAOyZ9ohizOXbDWxFy+tphuy+Y008b8a/oboG3fmwWcf7aozIKhDY8pQlLOFtBb
+         5JWwJSs4N4hBiwxbqnZZ2YpuO4pYMgzwxUEtbRZaBs6tVA4fLaj+E7EO6xrwEEr2XY88
+         eGaNuE+CNlLbwBhqfbaljTsbfNsRX3suoXPY0zRNOj56zxyxHTNCLklfCoZDnYOcjn6h
+         pANzZtpQFghNlVoKSJMsfypDyTpcFohWw3QBe5EQkbQKlMEOekT7KZ36TcbMWEJtgOft
+         TOSw==
+X-Forwarded-Encrypted: i=1; AHgh+Rqdu87UvMmKChw0fHCcRPvGBD5p0k/CgK8midjKXXrwTFHIfUWSVB8s0aF8JciiJYqlyZNBe3A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFT8hhVeBoOT0f0gPSKBxvl9YWz/LlGpa4Erg5uaz+QziI4O7a
+	+ijvPeAbbEjjrAyXzL/V2nRP6ILAjLCizZSjEPjsSAn2fh8rbs0scbc8
+X-Gm-Gg: AfdE7ck+IVus1VWg2vnX1i14uZp2NAYLcSOoP5DlssNQfxt2C/QDrijzvrxwsZd17Fp
+	QWKXrDd7BQxaj8Pc00a3vOezgrt+kxk3IDx9Pufz6PVSFeo7LzvbV3wlvYmtcTwmb3pjz7hCpb1
+	5I6EMfx+IzQonKUKBBdE/SSFaIWCZNbLLAw3myrHlJYBvTJ2uBlifNyZtuU2dxUXqNOVjr2msR/
+	CfbVA4joUevsVoO+HZ3Rf9xINO4KC6e04vzHuqBvzUfEdwFfrvfBWA98RQSpPPiDSOlUrvqEmsZ
+	G6y0BHQLUhUNRoUbgWM+XjsRqyklUT3WTNLj11yswHhvJBolnKJZ5vEr3AlN5oGvYIoZRLJpzg3
+	On6b9G6ZlbvhcQ4J8nBZaweD7XarMYHyARZbIFkpwqoUBRrlQ7D3CoJU6fHX2PqYsAoHEOf8TQZ
+	jTkjTg+nq7vOCxY/7gAtDNYYs4/FHShTT7yqVjSx9cUzxX
+X-Received: by 2002:a05:600c:4585:b0:493:bc4a:fb55 with SMTP id 5b1f17b1804b1-493df09e3cbmr47373745e9.38.1783417274421;
+        Tue, 07 Jul 2026 02:41:14 -0700 (PDT)
+Received: from gmail.com (deskosmtp.auranext.com. [195.134.167.217])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493e0f4e3afsm49184435e9.7.2026.07.07.02.41.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Jul 2026 02:41:13 -0700 (PDT)
+Date: Tue, 7 Jul 2026 11:41:12 +0200
+From: Mahe Tardy <mahe.tardy@gmail.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: sdf.kernel@gmail.com, andrew+netdev@lunn.ch, andrii@kernel.org,
+	ast@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
+	davem@davemloft.net, eddyz87@gmail.com, edumazet@google.com,
+	john.fastabend@gmail.com, kuba@kernel.org, liamwisehart@meta.com,
+	martin.lau@linux.dev, netdev@vger.kernel.org, pabeni@redhat.com,
+	song@kernel.org
+Subject: Re: [PATCH bpf-next 2/6] bpf: Add ksock kfuncs
+Message-ID: <akzJt4jua55mpUgA@gmail.com>
+References: <akwTnnSGJpki9hAn@devvm7509.cco0.facebook.com>
+ <20260706225047.1684039-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V10 00/14] devlink and mlx5: Support
- cross-function
- rate scheduling
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178341722764.1458887.13873598911208666533.git-patchwork-notify@kernel.org>
-Date: Tue, 07 Jul 2026 09:40:27 +0000
-References: <20260701073254.754518-1-tariqt@nvidia.com>
-In-Reply-To: <20260701073254.754518-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- ajayachandra@nvidia.com, bobbyeshleman@meta.com, cjubran@nvidia.com,
- cratiu@nvidia.com, daniel@iogearbox.net, danielj@nvidia.com,
- daniel.zahka@gmail.com, dw@davidwei.uk, donald.hunter@gmail.com,
- dtatulea@nvidia.com, jiri@nvidia.com, jiri@resnulli.us, joe@dama.to,
- corbet@lwn.net, kees@kernel.org, leon@kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-rdma@vger.kernel.org, mbloch@nvidia.com, moshe@nvidia.com,
- ohartoov@nvidia.com, parav@nvidia.com, petrm@nvidia.com,
- rkannoth@marvell.com, saeedm@nvidia.com, shshitrit@nvidia.com,
- shayd@nvidia.com, shuah@kernel.org, skhan@linuxfoundation.org,
- horms@kernel.org, sdf@fomichev.me, willemb@google.com, gal@nvidia.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260706225047.1684039-1-kuniyu@google.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,vger.kernel.org,redhat.com,nvidia.com,meta.com,iogearbox.net,gmail.com,davidwei.uk,resnulli.us,dama.to,lwn.net,marvell.com,linuxfoundation.org,fomichev.me];
+	TAGGED_FROM(0.00)[bounces-305387-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305386-lists,netdev=lfdr.de,netdevbpf];
-	RCPT_COUNT_TWELVE(0.00)[42];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:kuniyu@google.com,m:sdf.kernel@gmail.com,m:andrew+netdev@lunn.ch,m:andrii@kernel.org,m:ast@kernel.org,m:bpf@vger.kernel.org,m:daniel@iogearbox.net,m:davem@davemloft.net,m:eddyz87@gmail.com,m:edumazet@google.com,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:liamwisehart@meta.com,m:martin.lau@linux.dev,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:song@kernel.org,m:sdfkernel@gmail.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[mahetardy@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:tariqt@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:ajayachandra@nvidia.com,m:bobbyeshleman@meta.com,m:cjubran@nvidia.com,m:cratiu@nvidia.com,m:daniel@iogearbox.net,m:danielj@nvidia.com,m:daniel.zahka@gmail.com,m:dw@davidwei.uk,m:donald.hunter@gmail.com,m:dtatulea@nvidia.com,m:jiri@nvidia.com,m:jiri@resnulli.us,m:joe@dama.to,m:corbet@lwn.net,m:kees@kernel.org,m:leon@kernel.org,m:linux-doc@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:mbloch@nvidia.com,m:moshe@nvidia.com,m:ohartoov@nvidia.com,m:parav@nvidia.com,m:petrm@nvidia.com,m:rkannoth@marvell.com,m:saeedm@nvidia.com,m:shshitrit@nvidia.com,m:shayd@nvidia.com,m:shuah@kernel.org,m:skhan@linuxfoundation.org,m:horms@kernel.org,m:sdf@fomichev.me,m:willemb@google.com,m:gal@nvidia.com,m:andrew@lunn.ch,m:danielzahka@gmail.com,m:donaldhunter@gmail.co
- m,s:lists@lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,kernel.org,vger.kernel.org,iogearbox.net,davemloft.net,google.com,meta.com,linux.dev,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mahetardy@gmail.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 40103719E90
+X-Rspamd-Queue-Id: EFAA1719E7C
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed, 1 Jul 2026 10:32:40 +0300 you wrote:
-> Hi,
+On Mon, Jul 06, 2026 at 10:50:33PM +0000, Kuniyuki Iwashima wrote:
+> From: Stanislav Fomichev <sdf.kernel@gmail.com>
+> Date: Mon, 6 Jul 2026 14:02:39 -0700
+> > On 07/06, Mahe Tardy wrote:
+> > > On Mon, Jul 06, 2026 at 09:58:09AM -0700, Stanislav Fomichev wrote:
+> > > > On 07/06, Mahe Tardy wrote:
+> > > > > Add BPF kfuncs that allow BPF LSM programs to create and use sockets for
+> > > > > sending data. This provides a mechanism for BPF programs to emit
+> > > > > telemetry. For this first patch set, it's restricted to SOCK_DGRAM
+> > > > > socket types with IPPROTO_UDP protocol but could be easily extended to
+> > > > > SOCK_STREAM and IPPROTO_TCP in the future.
+> > > > > 
+> > > > > The API consists of six kfuncs:
+> > > > > 
+> > > > >   bpf_ksock_create()   - Create a socket (sleepable)
+> > > > 
+> > > > [..]
+> > > > 
+> > > > >   bpf_ksock_bind()     - Bind socket to local address (sleepable)
+> > > > >   bpf_ksock_connect()  - Connect socket to remote address (sleepable)
+> > > > 
+> > > > Since you're doing only UDP for now, maybe you don't need bind/connect? The
+> > > > kernel should autobind (by default) when you sendmsg over UDP socket (IIRC).
+> > > 
+> > > Yep indeed, I kinda overlooked that as I started with UDP & TCP supports
+> > > and mostly added the args checks. Another thing is that send is simpler
+> > > since only used on connected sockets, so you just pass the struct
+> > > bpf_ksock and data. So on one side it would simplify the current
+> > > UDP-only API for now by removing the kfuncs but we might need a more
+> > > complex send kfunc (something like sendto).
+> > 
+> > Since you were targeting bpf_netpoll_send_udp originally, maybe sendto
+> > is a better fit? You get the payload and the destination and you
+> > bpf_sendto() it? We can later move to stateful bind/connect if needed.
+> > 
+> > (mostly coming from the pow of minimizing api exposure initially, but
+> > not a strong preference)
 > 
-> This series by Cosmin adds support for cross-function rate scheduling in
-> devlink and mlx5.
-> See detailed explanation by Cosmin below [0].
+> +1, small start would be better.
+
+Okay I feel at least we can confidently remove bind for now. Indeed for
+netpoll it was kinda obvious that it was going to be sendto-style but
+now with the sockets I'm unsure what's best:
+
+As Amery Hung wrote in a parallel thread:
+
+> [...] but connect() + send() make sense to me. In the stated use case,
+> the dst addr probably doesn't change often and I think avoiding route
+> lookup everytime should be a good thing.
+
+Looks like there's benefit to both approaches, I'll experiment.
+
+> > > > >   bpf_ksock_send()     - Send data through the socket (sleepable)
+> > > > >   bpf_ksock_acquire()  - Acquire a reference to a socket context
+> > > > >   bpf_ksock_release()  - Release a reference (cleanup via
+> > > > >                          queue_rcu_work since sock_release sleeps)
+> > > > > 
+> > > > [..]
+> > > > 
+> > > > > A bpf_ksock_max sysctl is added to limit the maximum number of BPF
+> > > > > kernel sockets that may exist in each network namespace. Out of
+> > > > > simplicity for now, the settings is host wide but the counters are per
+> > > > > network namespace.
+> > > > 
+> > > > What is this guarding against? Rogue bpf programs creating too many sockets?
+> > > 
+> > > Yes. AI review raised this because users are prevented from creating too
+> > > many sockets by bumping against the max number of fd and this would
+> > > allow them to create way more sockets. I kind of agreed that having "a
+> > > limit" on resource creation would make sense but maybe it doesn't and we
+> > > can simplify this!
+> > 
+> > I believe even the kernel sockets go via lsm layer, so this enforcement
+> > can be done in an lsm bpf program. Seems like that should be enough?
 > 
-> Regards,
-> Tariq
-> 
-> [...]
+> Right, I don't think the per-netns limit is useful for CAP_BPF users.
 
-Here is the summary with links:
-  - [net-next,V10,01/14] devlink: Update nested instance locking comment
-    https://git.kernel.org/netdev/net-next/c/3bf4c5970ca8
-  - [net-next,V10,02/14] devlink: Add a helper for getting a nested-in instance
-    https://git.kernel.org/netdev/net-next/c/9f2d908cc34e
-  - [net-next,V10,03/14] devlink: Migrate from info->user_ptr to info->ctx
-    https://git.kernel.org/netdev/net-next/c/e48abacd6e83
-  - [net-next,V10,04/14] devlink: Decouple rate storage from associated devlink object
-    https://git.kernel.org/netdev/net-next/c/db078bc2b031
-  - [net-next,V10,05/14] devlink: Add parent dev to devlink API
-    https://git.kernel.org/netdev/net-next/c/b5f90fd4580c
-  - [net-next,V10,06/14] devlink: Allow parent dev for rate-set and rate-new
-    https://git.kernel.org/netdev/net-next/c/58132b6fc4a5
-  - [net-next,V10,07/14] devlink: Allow rate node parents from other devlinks
-    https://git.kernel.org/netdev/net-next/c/6bbd1bce3099
-  - [net-next,V10,08/14] net/mlx5: qos: Use mlx5_lag_query_bond_speed to query LAG speed
-    https://git.kernel.org/netdev/net-next/c/f8128b13df66
-  - [net-next,V10,09/14] net/mlx5: qos: Refactor vport QoS cleanup
-    https://git.kernel.org/netdev/net-next/c/89a0881183d1
-  - [net-next,V10,10/14] net/mlx5: qos: Model the root node in the scheduling hierarchy
-    https://git.kernel.org/netdev/net-next/c/22d32def3ced
-  - [net-next,V10,11/14] net/mlx5: qos: Remove qos domains and use shd
-    https://git.kernel.org/netdev/net-next/c/450ed6b182de
-  - [net-next,V10,12/14] net/mlx5: qos: Support cross-device tx scheduling
-    https://git.kernel.org/netdev/net-next/c/2bc38232047c
-  - [net-next,V10,13/14] selftests: drv-net: Add test for cross-esw rate scheduling
-    https://git.kernel.org/netdev/net-next/c/b2aa7390967e
-  - [net-next,V10,14/14] net/mlx5: Document devlink rates
-    https://git.kernel.org/netdev/net-next/c/403ac520e893
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Ok, agree, let's remove all this then for the next version.
 
 
