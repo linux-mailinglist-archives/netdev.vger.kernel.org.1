@@ -1,172 +1,454 @@
-Return-Path: <netdev+bounces-305296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305297-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id L+79JHqeTGqinAEAu9opvQ
-	(envelope-from <netdev+bounces-305296-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 08:36:42 +0200
+	id k0yuGrafTGrinAEAu9opvQ
+	(envelope-from <netdev+bounces-305297-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 08:41:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE206718050
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 08:36:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C74097180E3
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 08:41:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=secunet.com header.s=202301 header.b=OQD9Ll8E;
-	dmarc=pass (policy=none) header.from=secunet.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305296-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305296-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305297-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305297-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6D3983033505
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 06:35:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1740E3010BB8
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 06:41:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 214BE3A7F4C;
-	Tue,  7 Jul 2026 06:35:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E17F33A9D8B;
+	Tue,  7 Jul 2026 06:41:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 525BF221546
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 06:35:18 +0000 (UTC)
+Received: from zg8tmtyylji0my4xnjeumjiw.icoremail.net (zg8tmtyylji0my4xnjeumjiw.icoremail.net [162.243.161.220])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA8F73A9615;
+	Tue,  7 Jul 2026 06:41:19 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783406121; cv=none; b=bUkjW09X+55Z98MqCOzY8oOcntFP1W5GHNB+QPEh4WMNML0YWJJ0znGlA2Zs26B8QecVtuObiBuDItyyQI1qGUOcSo2S+pBV3ljsUYTq0kl3nSwGkl35WETFrRGZvyNEOYq7d8xvcUG+CKuYDfWo4ZWNJGUzlKwjB4dadyo2YjE=
+	t=1783406483; cv=none; b=nJwhT4K57FJpHIzwATB91V/kh0K+A/xIVbS5yyZgz4qf4oLVwfo6N2ImCPuXQw5kzR+Q0y12GK2hrFe8s+mKFi4jGhoALKDcdG74dfm0tITh46xPQWK15PkUdC1vGjHsav4CeyZYCOMMf9Nx7QN4dkRynn2ycN/KSkcXvcVbfJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783406121; c=relaxed/simple;
-	bh=VDrBstBOFICQAgg+jbFgeBja/S2bIuBwqO6VoAQaGl0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bKYvEUWSHdQgJCMcaajRn9Go1wb/P8cmBy734/iNREF1YVCDF8YI64RalF39z/co0hJOMqAEOVc1RkHD8p8fhimimHG9Cjm2P7/VaWB+gwhjMQfveFxMa+fuZ/iSAfCKn25NFUVS1Vut3qpbwbjDaXJZA77UkP+turiZ/CVumvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=OQD9Ll8E; arc=none smtp.client-ip=62.96.220.36
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 59F9220684;
-	Tue,  7 Jul 2026 08:35:17 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2dZA85wDudYW; Tue,  7 Jul 2026 08:35:16 +0200 (CEST)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id AA900201A7;
-	Tue,  7 Jul 2026 08:35:16 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com AA900201A7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1783406116;
-	bh=kzrzumhwSvWjHox7RF0py7oBmUZ7+wYva9qQEZ8GZBU=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=OQD9Ll8EEoMW5MdmqVSDGAkSyIzktp33+YK4OOoCxhcf5Ce4MyHkduD2QWABFDpAM
-	 F5dLUyGerxiZbMUXG77MRl21AaAdk5f2Pkcp4Q+iES9cja8ZjfYEHHaAOl6fq1e3GA
-	 Ixw5GPTQsAiifa6UGCfHf9LmbE3RZzmXjZRIFR8KpTCKrHffunCZ1ccH6hiibQWHqh
-	 8ueel/f1qJ/fOISEFgAFxRgBC/fGoxubsATMwxAUAMG5p3bftRekaqOkY5f5xcjbLa
-	 y+FpxTbJmGWmz0PbsIPWufqSvFVkUD2IgT2MPMXNrCHZaGyUSYPp/NElIzmWBc6JNd
-	 kevODSIjpN0QA==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Tue, 7 Jul
- 2026 08:35:15 +0200
-Received: (nullmailer pid 205581 invoked by uid 1000);
-	Tue, 07 Jul 2026 06:35:14 -0000
-Date: Tue, 7 Jul 2026 08:35:14 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Florian Westphal <fw@strlen.de>
-CC: "Xiang Mei (Microsoft)" <xmei5@asu.edu>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <netdev@vger.kernel.org>, <horms@kernel.org>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<AutonomousCodeSecurity@microsoft.com>, <tgopinath@linux.microsoft.com>,
-	<kys@microsoft.com>
-Subject: Re: [PATCH ipsec v2] xfrm: policy: preallocate inexact bins before
- xfrm_hash_rebuild reinsert
-Message-ID: <akyeIoKtMaRiQUI7@secunet.com>
-References: <20260703051932.966884-1-xmei5@asu.edu>
- <akdM501yK5_mk1th@strlen.de>
+	s=arc-20240116; t=1783406483; c=relaxed/simple;
+	bh=rQi3+ECihJ0aHJVpmhEJgssG8t9I+u7Nf94GYKMaJWM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gM26LjjDyyG1Ccz2GiVYW3WZm4HjKUnG5BAmhUBAGKtyuSMreSUHl/pUZ19uSRaySS70YzERMOCvqbTrae6wEtuxz03S6hXaXeK1wRHWocf6Q8zVXUjJpFHSGHJ2A4UTkjeGcNCqx8rGK8sAjWMjistSlUdNWsKfEpmch4IjSVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=162.243.161.220
+Received: from E0004057DT.eswin.cn (unknown [10.11.96.26])
+	by app1 (Coremail) with SMTP id TAJkCgB3DHFln0xqXQ0yAA--.28072S2;
+	Tue, 07 Jul 2026 14:40:40 +0800 (CST)
+From: lizhi2@eswincomputing.com
+To: devicetree@vger.kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	rmk+kernel@armlinux.org.uk,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	maxime.chevallier@bootlin.com
+Cc: ningyu@eswincomputing.com,
+	linmin@eswincomputing.com,
+	pinkesh.vaghela@einfochips.com,
+	pritesh.patel@einfochips.com,
+	weishangjuan@eswincomputing.com,
+	horms@kernel.org,
+	Zhi Li <lizhi2@eswincomputing.com>
+Subject: [PATCH net-next v10 0/4] net: stmmac: eic7700: add eth1 variant support and update delay bindings
+Date: Tue,  7 Jul 2026 14:40:33 +0800
+Message-ID: <20260707064033.1265-1-lizhi2@eswincomputing.com>
+X-Mailer: git-send-email 2.52.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <akdM501yK5_mk1th@strlen.de>
-X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-01.secunet.de
- (10.32.0.171)
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:TAJkCgB3DHFln0xqXQ0yAA--.28072S2
+X-Coremail-Antispam: 1UD129KBjvAXoW3uF4fJr1DKw13Xr47CFW3ZFb_yoW8Gr43Go
+	WSqrWrXr40vr13CFn2krnrGa9xW3s29r13JayUWr1qyryvqa17t34ruayxXFy3tFWFkFW5
+	Xa4xXw1ftanxJayfn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
+	AaLaJ3UjIYCTnIWjp_UUUYK7AC8VAFwI0_Xr0_Wr1l1xkIjI8I6I8E6xAIw20EY4v20xva
+	j40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2
+	x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8
+	Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26r
+	xl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
+	6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
+	0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E
+	8cxan2IY04v7M4kE6xkIj40Ew7xC0wCY1x0262kKe7AKxVW8ZVWrXwCY02Avz4vE-syl42
+	xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWU
+	GwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI4
+	8JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4U
+	MIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I
+	8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRK1vVDUUUU
+X-CM-SenderInfo: xol2xx2s6h245lqf0zpsxwx03jof0z/
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:devicetree@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:rmk+kernel@armlinux.org.uk,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:maxime.chevallier@bootlin.com,m:ningyu@eswincomputing.com,m:linmin@eswincomputing.com,m:pinkesh.vaghela@einfochips.com,m:pritesh.patel@einfochips.com,m:weishangjuan@eswincomputing.com,m:horms@kernel.org,m:lizhi2@eswincomputing.com,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:mcoquelinstm32@gmail.com,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
+	DMARC_NA(0.00)[eswincomputing.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305296-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,asu.edu:email,secunet.com:from_mime,secunet.com:dkim,secunet.com:mid];
-	FORGED_SENDER(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS(0.00)[m:fw@strlen.de,m:xmei5@asu.edu,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:horms@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,st-md-mailman.stormreply.com,lists.infradead.org,bootlin.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	FORGED_SENDER(0.00)[lizhi2@eswincomputing.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305297-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lizhi2@eswincomputing.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	R_DKIM_NA(0.00)[];
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[eswincomputing.com:from_mime,eswincomputing.com:email,eswincomputing.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DE206718050
+X-Rspamd-Queue-Id: C74097180E3
 
-On Fri, Jul 03, 2026 at 07:47:19AM +0200, Florian Westphal wrote:
-> Xiang Mei (Microsoft) <xmei5@asu.edu> wrote:
-> > xfrm_hash_rebuild()'s first loop preallocates the bins/chains the reinsert
-> > loop needs, so the reinsert (after hlist_del_rcu()) cannot allocate or
-> > fail. But its guard is inverted: it skips policies with prefixlen <
-> > threshold and preallocates for the rest.
-> > 
-> > prefixlen < threshold is exactly when policy_hash_bysel() returns NULL and
-> > the reinsert takes the allocating xfrm_policy_inexact_insert() path. So the
-> > loop preallocates for the exact policies (which never allocate) and skips
-> > the inexact ones, whose bin/node is then allocated GFP_ATOMIC during
-> > reinsert. On failure the error path only WARN_ONCE()s and continues,
-> > leaving a poisoned bydst node; the next rebuild's hlist_del_rcu()
-> > dereferences LIST_POISON2 and takes a GPF. Reachable under memory pressure,
-> > deterministic via failslab.
-> > 
-> > Invert the guard so preallocation covers exactly the reinserted policies;
-> > the reinsert then allocates nothing and cannot fail.
-> > 
-> > Crash:
-> >   Oops: general protection fault, probably for non-canonical address
-> >   0xfbd59c0000000024: 0000 [#1] SMP KASAN NOPTI
-> >   KASAN: maybe wild-memory-access in range [0xdead...]
-> >   ...
-> >   Workqueue: events xfrm_hash_rebuild
-> >   RIP: 0010:xfrm_hash_rebuild+0x5b3/0x1190
-> >   RAX: dead000000000122   (LIST_POISON2 + offset)
-> >   ...
-> >   Call Trace:
-> >    hlist_del_rcu (include/linux/rculist.h:599)
-> >    xfrm_hash_rebuild (net/xfrm/xfrm_policy.c:1365)
-> >    process_one_work (kernel/workqueue.c:3322)
-> >    worker_thread (kernel/workqueue.c:3486)
-> >    kthread (kernel/kthread.c:436)
-> >    ret_from_fork (arch/x86/kernel/process.c:158)
-> >    ret_from_fork_asm (arch/x86/entry/entry_64.S:245)
-> >    ...
-> >   Kernel panic - not syncing: Fatal exception in interrupt
-> > 
-> > Fixes: 24969facd704 ("xfrm: policy: store inexact policies in an rhashtable")
-> > Reported-by: AutonomousCodeSecurity@microsoft.com
-> > Signed-off-by: Xiang Mei (Microsoft) <xmei5@asu.edu>
-> 
-> Reviewed-by: Florian Westphal <fw@strlen.de>
+From: Zhi Li <lizhi2@eswincomputing.com>
 
-Applied, thanks everyone!
+This series updates Ethernet support for the ESWIN EIC7700 SoC,
+including support for the eth1 MAC variant.
+
+The series includes DT binding updates and stmmac glue driver updates
+for the EIC7700 Ethernet controller.
+
+The changes include:
+  - Update the tx-internal-delay-ps binding property from a fixed enum
+    list to a range-based definition, and make it optional with the
+    corresponding driver update.
+
+  - Add support for the EIC7700 eth1 MAC variant, which has
+    silicon-specific RX sampling behavior and TX timing characteristics.
+    A dedicated compatible string is introduced for this hardware variant,
+    and the driver applies the required RX clock inversion handling and
+    timing adjustments.
+
+Due to silicon characteristics, the eth1 interface has a fixed TX
+internal delay of approximately 2 ns and an RX sampling skew of 4-5 ns
+that cannot be compensated solely by standard RGMII delay settings.
+The binding models the effective TX delay range of this variant, while
+the driver handles the required hardware-specific timing configuration.
+
+Only the DT bindings and driver patches are included in this series. The
+DTS changes are intentionally omitted for the following reasons:
+  - The HSP bus infrastructure is being introduced by Pinkesh Vaghela's
+    DT series [0], currently under review.
+  - The HSPCRG clock/reset series [1] provides additional infrastructure
+    for the HSP subsystem.
+
+Once these dependencies are merged, a follow-up DT series will enable
+Ethernet, USB, eMMC, and SD across the HSP bus.
+
+Reference:
+  [0] https://lore.kernel.org/lkml/20260706081055.1126275-1-pinkesh.vaghela@einfochips.com/
+  [1] https://lore.kernel.org/all/20260605060730.1605-1-dongxuyang@eswincomputing.com/
+
+v9 -> v10:
+  - Drop the DTS patches (patches 5 and 6 in v9) from this series.
+  - Update the cover letter to include a description of the series.
+  - Add Conor Dooley's Acked-by tag.
+
+  - Link to v9:
+    https://lore.kernel.org/lkml/20260630063123.1118-1-lizhi2@eswincomputing.com/
+
+v8 -> v9:
+  - patch2:
+      - Update DT binding schema for tx-internal-delay-ps:
+        - Replace the previous oneOf schema with a base range plus
+          allOf/if-then conditional constraints.
+        - Define a common range of 0-4540 ps and apply compatible-specific
+          constraints using conditional schema rules:
+            - eswin,eic7700-qos-eth:
+              maximum 2540 ps
+            - eswin,eic7700-qos-eth-clk-inversion:
+              minimum 2000 ps
+  - patch6:
+      - Refine DTS implementation to address Sashiko review comments:
+        - Address DTC and dtbs_check warnings.
+        - Improve node naming and HSP bus organization.
+  - patch5 and patch6:
+      - Update commit messages for the DTS patches:
+        - Clarify that the DTS patches are included only to provide an
+          overview of the complete Ethernet integration for review.
+        - The upstream DTS enablement will be submitted as a separate series
+          after the DT bindings and driver changes have been applied.
+
+  - Link to v8:
+    https://lore.kernel.org/lkml/20260610012727.848-1-lizhi2@eswincomputing.com/
+
+v7 -> v8:
+  - eth0-related fixes were moved into separate series [1], [2]:
+    - All eth0-related fixes have been removed from this series to avoid mixing
+      MAC variants and RX timing logic in a single review context.
+    - Reference:
+      [1]https://lore.kernel.org/lkml/20260602014528.2076-1-lizhi2@eswincomputing.com/
+      [2]https://lore.kernel.org/lkml/20260518021919.404-1-lizhi2@eswincomputing.com/
+
+  - Update cover letter and overall series scope description:
+    - Replace previous wording "EIC7700 eth1 RX sampling timing fix"
+      with a more accurate description:
+        - Add eth1 MAC variant support.
+        - Update RGMII delay binding model.
+    - This reflects the structural nature of the series rather than a pure
+      bug fix.
+
+  -  Split DT bindings changes into two patches:
+    - patch1:
+        - Relax RGMII internal delay constraints.
+        - Change rx/tx internal delay from enum-based model to range-based
+          model.
+        - Mark delay properties as optional.
+    - patch2:
+        - Introduce EIC7700 eth1 MAC variant compatible string
+          "eswin,eic7700-qos-eth-clk-inversion".
+        - Model silicon-specific RX clock inversion requirement via SoC
+          variant instead of board-level properties.
+
+    - Due to this restructuring:
+        - Patch structure and commit messages have changed significantly
+          compared to v7.
+        - The previously received Acked-by from Conor Dooley is not
+          carried forward because the binding patches were substantially
+          reworked and split.
+
+  - Split driver changes into two patches. No functional changes to eth1
+    compared to v7:
+    - patch 3:
+        - Make rx-internal-delay-ps and tx-internal-delay-ps optional.
+        - Remove mandatory DT property requirement in probe path.
+        - Allow zero-delay default when properties are absent.
+    - patch 4:
+        - Add support for eth1 MAC variant using compatible-specific
+          match data.
+        - Introduce RX clock inversion handling for eth1 at runtime.
+        - Apply speed-dependent configuration via fix_mac_speed()
+          callback.
+
+  - Note:
+    - These patches (5/6 and 6/6) are included only to facilitate review
+      of the overall Ethernet integration across bindings, driver, and
+      device tree.
+      A cleaned-up, upstream-ready DTS series will be submitted separately
+      once all dependencies and final hardware integration are completed.
+
+  - Link to v7:
+    https://lore.kernel.org/lkml/20260427072353.1114-1-lizhi2@eswincomputing.com/
+
+v6 -> v7:
+  - Address checkpatch.pl --strict warnings for DTS changes:
+    - Split DT binding documentation and DTS board description into separate patches
+    - Fix DTS style issues reported by checkpatch:
+      - Reduce line length where applicable
+      - Add required description for rgmii-rxid
+
+  - DTS changes in this series are split into:
+    - Patch 3/4: syscon binding update (documentation / reference only)
+    - Patch 4/4: board DTS changes (architecture overview only)
+
+    These patches (3/4 and 4/4) are provided to facilitate review of the overall
+    Ethernet integration across binding, driver, and device tree, and are not
+    intended as final upstream submission in their current form.
+
+    A cleaned-up, upstream-ready DTS series will be submitted separately once
+    all dependencies and final hardware integration are completed.
+
+  - Note:
+    - Clock-related bindings referenced in earlier revisions are now already merged
+      into net-next, so dtbs_check warnings related to clock are no longer present
+      and are not relevant to this revision.
+
+  - No functional changes in the stmmac driver or binding semantics in this revision.
+
+  - Link to v6:
+    https://lore.kernel.org/lkml/20260423085501.760-1-lizhi2@eswincomputing.com/
+
+v5 -> v6:
+  - Update DTS/DTSI descriptions to fix invalid phandle references reported by DTC:
+    - Add missing GMAC provider nodes required for proper hardware description:
+      - HSP power domain: GMAC nodes moved under this domain to reflect
+        hardware power hierarchy.
+      - Clock nodes: added to provide clk phandles referenced by GMAC.
+      - Reset nodes: added to provide reset phandles referenced by GMAC.
+      - Pinctrl nodes: defines pinctrl settings for GMAC signals
+        (pinctrl_gpio106, pinctrl_gpio111).
+    - Move GMAC nodes under the correct HSP power domain.
+    - Ensure DTS builds without dtc errors and all phandle references
+      (clk/reset/pinctrl/power-domain) are valid.
+    - This update does not change runtime behavior; it only improves DTS
+      consistency and resolves issues reported by dtc.
+
+  - Note:
+    - The patch 3/3 for DTS changes in this series provide an overview of the GMAC
+      integration and its dependencies, as discussed previously:
+      https://lore.kernel.org/lkml/64bf6b40-b947-4ffa-8d48-4d6341931327@lunn.ch/
+
+    - It is **not intended for upstream inclusion** in its current form,
+      and is provided solely for architecture overview and integration
+      context.
+
+    - A fully cleaned and upstream-ready DTS series will be submitted
+      separately once all related components (pinctrl, clock, power-domain,
+      etc.) are finalized.
+
+  - dtbs_check has been run on top of net-next for reference purposes.
+    Remaining warnings are expected due to missing EIC7700 clock bindings[1]
+    in net-next and do not reflect issues in the DTS design itself.
+
+  - One remaining warning:
+    - eswin,eic7700-clock
+
+  - The clock binding has already been applied to upstream and is present
+    in mainline, but not yet available in net-next.
+
+  - The syscon binding is extended in this series to include the
+    eswin,eic7700-syscfg compatible.
+
+  - Any further refinement of the syscfg binding will be handled in
+    separate patches if needed.
+
+  - Dependencies:
+    - [1]EIC7700 clock binding:
+      https://lore.kernel.org/lkml/20260303080637.2100-1-dongxuyang@eswincomputing.com/
+      (already applied to upstream)
+
+  - Link to v5:
+    https://lore.kernel.org/lkml/20260324073017.376-1-lizhi2@eswincomputing.com/
+
+v4 -> v5:
+  - eswin,eic7700-eth.yaml:
+    - Add Acked-by from Conor Dooley
+    - No functional changes
+
+  - Update dwmac-eic7700.c:
+    - Disable clocks on the error path to fix a clock leak in
+      eic7700_dwmac_init() when regmap_set_bits() fails
+      (reported by Simon Horman <horms@kernel.org>)
+
+  - Link to v4:
+    https://lore.kernel.org/lkml/20260313075234.1567-1-lizhi2@eswincomputing.com/
+
+v3 -> v4:
+  - Update eswin,eic7700-eth.yaml:
+    - Improve commit message in dt-bindings patch to clarify the
+      hardware difference of the eth1 MAC and why a new compatible
+      string is required.
+    - Move the newly added eswin,hsp-sp-csr item to the end of the list
+      to avoid inserting entries in the middle of the binding schema.
+    - Simplify the compatible schema by replacing the previous oneOf
+      construct with an enum.
+
+  - Update dwmac-eic7700.c:
+    - Fix build issues.
+    - Adjust code to match the updated binding definition.
+
+  - Update DTS/DTSI descriptions:
+    - Move SoC-level descriptions to the .dtsi file.
+    - Keep board-specific configuration in the .dts file.
+
+  - Link to v3:
+    https://lore.kernel.org/lkml/20260303061525.846-1-lizhi2@eswincomputing.com/
+
+v2 -> v3:
+  - Update eswin,eic7700-eth.yaml:
+    - Extend rx-internal-delay-ps and tx-internal-delay-ps range
+      from 0-2400 to 0-2540 to match the full 7-bit hardware delay
+      field (127 * 20 ps).
+    - Add "multipleOf: 20" constraint to reflect the 20 ps hardware
+      step size.
+    - Make rx-internal-delay-ps and tx-internal-delay-ps optional.
+      A well-designed board should not require internal delay tuning.
+    - Remove rx-internal-delay-ps and tx-internal-delay-ps from the
+      example to avoid encouraging blind copy into board DTs.
+
+  - Update dwmac-eic7700.c:
+    - Treat rx-internal-delay-ps and tx-internal-delay-ps as optional
+      DT properties.
+    - Apply delay configuration only when properties are present.
+    - Keep TX/RX delay registers cleared by default to ensure a
+      deterministic state when no delay is specified.
+
+  - Describe Ethernet configuration for the HiFive Premier P550 board:
+    - Add GMAC controller nodes for the HiFive Premier P550 board
+      to describe the on-board Ethernet configuration.
+
+      The Ethernet controller depends on clock, reset, pinctrl
+      and HSP subsystem providers which are currently under
+      upstream review. These dependent nodes will be submitted
+      separately once the corresponding drivers are merged.
+
+      Due to these missing dependencies, dt-binding-check may
+      report warnings or failures for this series.
+
+  - No functional changes to RX clock inversion logic.
+
+  - Link to v2:
+    https://lore.kernel.org/lkml/20260209094628.886-1-lizhi2@eswincomputing.com/
+
+  - This series is based on the EIC7700 clock support series:
+    https://lore.kernel.org/all/20260210095008.726-1-dongxuyang@eswincomputing.com/
+    The clock series is currently under review.
+
+v1 -> v2:
+  - Update eswin,eic7700-eth.yaml:
+    - Drop the vendor-specific properties eswin,rx-clk-invert and
+      eswin,tx-clk-invert.
+    - Introduce a distinct compatible string
+      "eswin,eic7700-qos-eth-clk-inversion" to describe MAC instances that
+      require internal RGMII clock inversion.
+      This models the SoC-specific hardware difference directly via the
+      compatible string and avoids per-board configuration properties.
+    - Change rx-internal-delay-ps and tx-internal-delay-ps from enum to
+      minimum/maximum to reflect the actual delay range (0-2400 ps)
+    - Add reference to High-Speed Subsystem documentation in eswin,hsp-sp-csr
+      description. The HSP CSR block is described in Chapter 10
+      ("High-Speed Interface") of the EIC7700X SoC Technical Reference Manual,
+      Part 4 (EIC7700X_SoC_Technical_Reference_Manual_Part4.pdf):
+      https://github.com/eswincomputing/EIC7700X-SoC-Technical-Reference-Manual/releases
+
+  - Update dwmac-eic7700.c:
+    - Remove handling of eswin,rx-clk-invert and eswin,tx-clk-invert
+      properties.
+    - Select RX clock inversion based on the new
+      "eswin,eic7700-qos-eth-clk-inversion" compatible string, using
+      match data to apply the required configuration for affected MAC
+      instances (eth1).
+
+  - Link to v1:
+    https://lore.kernel.org/lkml/20260109080601.1262-1-lizhi2@eswincomputing.com/
+
+Zhi Li (4):
+  dt-bindings: ethernet: eswin: relax internal delay model to
+    range-based constraints
+  dt-bindings: ethernet: eswin: add EIC7700 eth1 RX clock inversion
+    variant
+  net: stmmac: eic7700: make RGMII delay properties optional
+  net: stmmac: eic7700: add support for eth1 clock inversion variant
+
+ .../bindings/net/eswin,eic7700-eth.yaml       |  74 +++++++++--
+ .../ethernet/stmicro/stmmac/dwmac-eic7700.c   | 117 +++++++++++++++---
+ 2 files changed, 164 insertions(+), 27 deletions(-)
+
+-- 
+2.25.1
+
 
