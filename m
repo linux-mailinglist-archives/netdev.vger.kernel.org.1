@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-305375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305374-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id eC1vDIrGTGpFpgEAu9opvQ
-	(envelope-from <netdev+bounces-305375-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 11:27:38 +0200
+	id N5FAE7DITGropgEAu9opvQ
+	(envelope-from <netdev+bounces-305374-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 11:36:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EF35719C14
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 11:27:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D900719DE8
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 11:36:47 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=d1zIkA4m;
+	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=BOuJ6arj;
 	dmarc=pass (policy=none) header.from=realsil.com.cn;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305375-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305375-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305374-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305374-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 67E7730BFAF1
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 09:23:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 153B630EC5FB
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 09:23:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1D523AE706;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDF8639734A;
 	Tue,  7 Jul 2026 09:22:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D26583955EC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2703396B8C;
 	Tue,  7 Jul 2026 09:22:42 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783416164; cv=none; b=sOcU8GH3l8VB8LPCG/pRJOZLus7m0Js05fX6eDA5k9CwT0+oCOV7TvBbXoVl24wLiH3crWcQc0klKoc4n4u78rLgUaTjUYMSivRnGXE4HPQ723+BoJ0e2p+VFcqoh6sZayST7gqWKs3pOyYfaKunGZCln/35nBuI+iwql8eSDec=
+	t=1783416164; cv=none; b=kunemKKQjFoB0kdBHvQ0rWsWJsZRwLVPUDMN9XbG05xhOOt9yGM7UHVVeIHq1O310zB6n4PFwL+9tZ8BHQkaPRkNO0AyqCBWpztEdwh+AUKFafrohUgzA9GDZMOVnuLtVIwwJvIBkyXmUQFT8mUPxDAR9VfGaodu0PGQTk2SUhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783416164; c=relaxed/simple;
-	bh=gugcGH0SBODI15Dfgkz7FXEejOvFCteyIXzl21Cmdu8=;
+	bh=zEW02xdNxdxtVLbHHrXCgDgvPJRsJc476xqLIoKrsU0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Jb8Ys8UZi+ngePcHugpGAYSH9dGoXQlPQkZZoQlcTzSzV2a1clj16VDZ5ncKHe9kF4MjEfYYlNZNiciPHnq9+QENEi5huVpOBBffonUDtIhPqREjo5LZ9iIin+IXMVFjyW1FIuoR7PoKMoAMOKKJB8s+4q90IsRFy6wQq3g8wso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=d1zIkA4m; arc=none smtp.client-ip=211.75.126.72
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6679GdovE1361138, This message is accepted by code: ctloc85258
+	 MIME-Version:Content-Type; b=atnUNTeFEBQjaLHTh3sG/pYMKoVAssXvJC8oyPU6qROfVSTgSFWeJAz+fK0nUIEnVo334fSkQt0WoVAiHzTM98aaOGyw8pICYA/Bmkk7isWrZYDNTNk5URbUy2+MDLDM8/azhF+cX07jDwLDOYGGuXE8sXzvmPnULYOgk+FHML8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=BOuJ6arj; arc=none smtp.client-ip=211.75.126.72
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6679GdowE1361138, This message is accepted by code: ctloc85258
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1783415799;
-	bh=NOY3RLKFgFQk0tAf1u1rAJdcRTApwY41pVMUH6mrfGM=;
+	s=dkim; t=1783415800;
+	bh=0/u5yFqgeBiCDpXpLLiaSBsrFkSiy48Oz+dvZzdt/JE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=d1zIkA4mYRrWMnqgkVDxNkWRz0hlOyFNURx93OgwjjgOhiE6rD7RjXx6I7AfTK9Yx
-	 OQXCxahvv8Mbwhnqbmg9Xtw2QO1AmZPY3UfI2kQP/4VNwYHSdLl4ow1qhniMA3cpcR
-	 6EEpDujlTsZ0OrbMGNum4j0X2ui5rLCELvBOgOWQQwzAx4a1CxNDvCZrl5oS2OLW4T
-	 ljYT/QQclPy4JlMiLt/Nkc8+diafjdOZTmWPocM7E7p63m/eye2RtQGa6rpv2CLw16
-	 yA8dn/Riex2MEgw5vrub5mrp+sIuYYoztEA3IS1NJe7vO6L166egvAal19tDqJlu9p
-	 KHe4Q2nJSlI3g==
+	b=BOuJ6arjyg69wMdxMLtoeab7IBCca9VU/LksXB9cv4scxZS4kmv+K8Bw7+/P/Nygb
+	 TiVXuG4CCTLSiL8zj4ZxboxK/QXMk7ZJ8v8w0JmWq2zNHayshEcKV2pkVAAVzRYhGt
+	 WiMHv+ZRFKfjM6qkFtLgFaqFUKkchVzi8hx6FXN0dD7houdEZsdbtS6ZR/2ccmYiow
+	 MTA/QQ0Tbi89IbXv7MW4DQ8pDwPlywUkveAmkI1YL2mPIRSQQ6l/JvbNRyvH97shwy
+	 6Zgs/kHcu5liCDuL4JOXlAGiuysc7h+lY9zl3KlES9rT4oOo0jx7WrtIOcVyzJkrd/
+	 oYzmXIl2hjWIQ==
 Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
-	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 6679GdovE1361138
+	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 6679GdowE1361138
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
 	Tue, 7 Jul 2026 17:16:39 +0800
 Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
@@ -63,11 +63,10 @@ To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
 	<pabeni@redhat.com>, <maxime.chevallier@bootlin.com>, <horms@kernel.org>
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<daniel@makrotopia.org>, <linux@armlinux.org.uk>, <enelsonmoore@gmail.com>,
-	<daniel@thingy.jp>, Javen Xu <javen_xu@realsil.com.cn>, Andrew Lunn
-	<andrew@lunn.ch>
-Subject: [PATCH net-next v5 1/8] r8169: add speed in private struct
-Date: Tue, 7 Jul 2026 17:16:29 +0800
-Message-ID: <20260707091637.371-2-javen_xu@realsil.com.cn>
+	<daniel@thingy.jp>, Javen Xu <javen_xu@realsil.com.cn>
+Subject: [PATCH net-next v5 2/8] net: phy: phylink: add helper to modify pause
+Date: Tue, 7 Jul 2026 17:16:30 +0800
+Message-ID: <20260707091637.371-3-javen_xu@realsil.com.cn>
 X-Mailer: git-send-email 2.50.1.windows.1
 In-Reply-To: <20260707091637.371-1-javen_xu@realsil.com.cn>
 References: <20260707091637.371-1-javen_xu@realsil.com.cn>
@@ -86,21 +85,21 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305375-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305374-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:maxime.chevallier@bootlin.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:linux@armlinux.org.uk,m:enelsonmoore@gmail.com,m:daniel@thingy.jp,m:javen_xu@realsil.com.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,makrotopia.org,armlinux.org.uk,gmail.com,thingy.jp,realsil.com.cn,lunn.ch];
+	FREEMAIL_CC(0.00)[vger.kernel.org,makrotopia.org,armlinux.org.uk,gmail.com,thingy.jp,realsil.com.cn];
 	DKIM_TRACE(0.00)[realsil.com.cn:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -111,127 +110,114 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,realsil.com.cn:from_mime,realsil.com.cn:email,realsil.com.cn:mid,realsil.com.cn:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8EF35719C14
+X-Rspamd-Queue-Id: 9D900719DE8
 
 From: Javen Xu <javen_xu@realsil.com.cn>
 
-This patch adds speed in private struct in order to decouple
-from phydev in the following patch supporting for phylink.
+For Realtek nics, when we enable jumbo, pause are not supported. So we
+must check the pause capabilities from ourself and lp.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
 ---
-Changes in v2:
- - repalce current_speed with speed
-
-Changes in v3:
- - update tp->speed in rtl8169_set_link_ksettings()
-
-Changes in v4:
- - no changes
-
 Changes in v5:
- - no changes
+ - no changes, new file
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+ drivers/net/phy/phylink.c | 66 +++++++++++++++++++++++++++++++++++++++
+ include/linux/phylink.h   |  2 ++
+ 2 files changed, 68 insertions(+)
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index ec4fc21fa21f..c60710f9bd21 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -750,6 +750,7 @@ struct rtl8169_private {
- 	u32 irq_mask;
- 	int irq;
- 	struct clk *clk;
-+	int speed;
- 
- 	struct {
- 		DECLARE_BITMAP(flags, RTL_FLAG_MAX);
-@@ -1673,16 +1674,14 @@ static void rtl8169_irq_mask_and_ack(struct rtl8169_private *tp)
- 	rtl_pci_commit(tp);
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 59dfe35afa54..c450ee33b75c 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -1828,6 +1828,72 @@ int phylink_set_fixed_link(struct phylink *pl,
  }
+ EXPORT_SYMBOL_GPL(phylink_set_fixed_link);
  
--static void rtl_link_chg_patch(struct rtl8169_private *tp)
-+static void rtl_link_chg_patch(struct rtl8169_private *tp, int speed)
- {
--	struct phy_device *phydev = tp->phydev;
--
- 	if (tp->mac_version == RTL_GIGA_MAC_VER_34 ||
- 	    tp->mac_version == RTL_GIGA_MAC_VER_38) {
--		if (phydev->speed == SPEED_1000) {
-+		if (speed == SPEED_1000) {
- 			rtl_eri_write(tp, 0x1bc, ERIAR_MASK_1111, 0x00000011);
- 			rtl_eri_write(tp, 0x1dc, ERIAR_MASK_1111, 0x00000005);
--		} else if (phydev->speed == SPEED_100) {
-+		} else if (speed == SPEED_100) {
- 			rtl_eri_write(tp, 0x1bc, ERIAR_MASK_1111, 0x0000001f);
- 			rtl_eri_write(tp, 0x1dc, ERIAR_MASK_1111, 0x00000005);
- 		} else {
-@@ -1692,7 +1691,7 @@ static void rtl_link_chg_patch(struct rtl8169_private *tp)
- 		rtl_reset_packet_filter(tp);
- 	} else if (tp->mac_version == RTL_GIGA_MAC_VER_35 ||
- 		   tp->mac_version == RTL_GIGA_MAC_VER_36) {
--		if (phydev->speed == SPEED_1000) {
-+		if (speed == SPEED_1000) {
- 			rtl_eri_write(tp, 0x1bc, ERIAR_MASK_1111, 0x00000011);
- 			rtl_eri_write(tp, 0x1dc, ERIAR_MASK_1111, 0x00000005);
- 		} else {
-@@ -1700,7 +1699,7 @@ static void rtl_link_chg_patch(struct rtl8169_private *tp)
- 			rtl_eri_write(tp, 0x1dc, ERIAR_MASK_1111, 0x0000003f);
- 		}
- 	} else if (tp->mac_version == RTL_GIGA_MAC_VER_37) {
--		if (phydev->speed == SPEED_10) {
-+		if (speed == SPEED_10) {
- 			rtl_eri_write(tp, 0x1d0, ERIAR_MASK_0011, 0x4d02);
- 			rtl_eri_write(tp, 0x1dc, ERIAR_MASK_0011, 0x0060a);
- 		} else {
-@@ -2074,11 +2073,11 @@ rtl_coalesce_info(struct rtl8169_private *tp)
- 		ci = rtl_coalesce_info_8168_8136;
++/**
++ * phylink_set_mac_capabilities() - Dynamically update MAC capabilities
++ * @pl: a pointer to a &struct phylink returned from phylink_create()
++ * @mac_capabilities: the new MAC capabilities mask
++ *
++ * This function allows a MAC driver to dynamically change its capabilities,
++ * such as losing/gaining Pause frame support based on MTU size.
++ * It recalculates supported link modes and triggers renegotiation if needed.
++ */
++void phylink_set_mac_capabilities(struct phylink *pl, unsigned long mac_capabilities)
++{
++	struct phylink_link_state *config = &pl->link_config;
++	unsigned long caps_added, caps_removed;
++
++	ASSERT_RTNL();
++
++	caps_added = mac_capabilities & ~pl->config->mac_capabilities;
++	caps_removed = pl->config->mac_capabilities & ~mac_capabilities;
++
++	if (!caps_added && !caps_removed)
++		return;
++
++	mutex_lock(&pl->state_mutex);
++
++	pl->config->mac_capabilities = mac_capabilities;
++
++	if (caps_removed & MAC_SYM_PAUSE)
++		linkmode_clear_bit(ETHTOOL_LINK_MODE_Pause_BIT, pl->supported);
++	if (caps_removed & MAC_ASYM_PAUSE)
++		linkmode_clear_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, pl->supported);
++
++	linkmode_and(config->advertising, config->advertising, pl->supported);
++
++	if (caps_added & MAC_SYM_PAUSE) {
++		linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT, pl->supported);
++		if (pl->phydev && !phylink_test(pl->phydev->supported, Pause))
++			linkmode_clear_bit(ETHTOOL_LINK_MODE_Pause_BIT, pl->supported);
++	}
++	if (caps_added & MAC_ASYM_PAUSE) {
++		linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, pl->supported);
++		if (pl->phydev && !phylink_test(pl->phydev->supported, Asym_Pause))
++			linkmode_clear_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, pl->supported);
++	}
++
++	linkmode_and(config->advertising, config->advertising, pl->supported);
++
++	if (config->pause & MLO_PAUSE_AN) {
++		if (phylink_test(pl->supported, Pause))
++			linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT, config->advertising);
++
++		if (phylink_test(pl->supported, Asym_Pause))
++			linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, config->advertising);
++	}
++
++	if (!pl->phydev)
++		phylink_change_inband_advert(pl);
++
++	mutex_unlock(&pl->state_mutex);
++
++	if (pl->phydev) {
++		linkmode_copy(pl->phydev->advertising, config->advertising);
++		phy_start_aneg(pl->phydev);
++	}
++}
++EXPORT_SYMBOL_GPL(phylink_set_mac_capabilities);
++
+ /**
+  * phylink_create() - create a phylink instance
+  * @config: a pointer to the target &struct phylink_config
+diff --git a/include/linux/phylink.h b/include/linux/phylink.h
+index 2bc0db3d52ac..56642ab961a7 100644
+--- a/include/linux/phylink.h
++++ b/include/linux/phylink.h
+@@ -842,4 +842,6 @@ void phylink_replay_link_begin(struct phylink *pl);
  
- 	/* if speed is unknown assume highest one */
--	if (tp->phydev->speed == SPEED_UNKNOWN)
-+	if (tp->speed == SPEED_UNKNOWN)
- 		return ci;
+ void phylink_replay_link_end(struct phylink *pl);
  
- 	for (; ci->speed; ci++) {
--		if (tp->phydev->speed == ci->speed)
-+		if (tp->speed == ci->speed)
- 			return ci;
- 	}
- 
-@@ -2236,7 +2235,7 @@ static void rtl_set_eee_txidle_timer(struct rtl8169_private *tp)
- 
- static unsigned int r8169_get_tx_lpi_timer_us(struct rtl8169_private *tp)
- {
--	unsigned int speed = tp->phydev->speed;
-+	unsigned int speed = tp->speed;
- 	unsigned int timer = tp->tx_lpi_timer;
- 
- 	if (!timer || speed == SPEED_UNKNOWN)
-@@ -4968,8 +4967,9 @@ static void r8169_phylink_handler(struct net_device *ndev)
- 	struct rtl8169_private *tp = netdev_priv(ndev);
- 	struct device *d = tp_to_dev(tp);
- 
-+	tp->speed = tp->phydev->speed;
- 	if (netif_carrier_ok(ndev)) {
--		rtl_link_chg_patch(tp);
-+		rtl_link_chg_patch(tp, tp->speed);
- 		rtl_enable_tx_lpi(tp, tp->phydev->enable_tx_lpi);
- 		pm_request_resume(d);
- 	} else {
-@@ -5667,6 +5667,7 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 				     ext_xid_str, xid);
- 	tp->mac_version = chip->mac_version;
- 	tp->fw_name = chip->fw_name;
-+	tp->speed = SPEED_UNKNOWN;
- 
- 	/* Disable ASPM L1 as that cause random device stop working
- 	 * problems as well as full system hangs for some PCIe devices users.
++void phylink_set_mac_capabilities(struct phylink *pl, unsigned long mac_capabilities);
++
+ #endif
 -- 
 2.43.0
 
