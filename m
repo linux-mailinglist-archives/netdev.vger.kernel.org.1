@@ -1,140 +1,239 @@
-Return-Path: <netdev+bounces-305321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305322-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id a4AvIuO4TGrRogEAu9opvQ
-	(envelope-from <netdev+bounces-305321-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:29:23 +0200
+	id G4BQFji3TGphogEAu9opvQ
+	(envelope-from <netdev+bounces-305322-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:22:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 758467191BB
-	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:29:22 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3DFD71905A
+	for <lists+netdev@lfdr.de>; Tue, 07 Jul 2026 10:22:15 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=mtmp+VVK;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305321-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305321-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305322-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305322-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3BA0A301DB19
-	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 08:20:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E17523046C50
+	for <lists+netdev@lfdr.de>; Tue,  7 Jul 2026 08:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EF7530E828;
-	Tue,  7 Jul 2026 08:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6D4C31355C;
+	Tue,  7 Jul 2026 08:20:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f205.google.com (mail-oi1-f205.google.com [209.85.167.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769B32EC09B
-	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 08:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E3C30E0CC
+	for <netdev@vger.kernel.org>; Tue,  7 Jul 2026 08:20:27 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783412427; cv=none; b=qLNGboRykji+KWYYEzYcMERhP4Dz/1asQZSHVfLoWVhG5snHYE21No+Wrk7n/SvbeMhgqd5Ko6xrcjZW1UXg56KQKkGKJs48BAGGMU4tDe8ogNId3goKAJhmCeILPZP/cnCIQN3AD6Fvkz2gmK4SyzQ6wUjNBxSybA2Px+97DIU=
+	t=1783412428; cv=none; b=Zq37x80AnDaS+MBrKed94oFftCEPlPjKS/VOWi3XXJcdkNKZeNvSLf+G5HuB+ki6uRr95Wwk3MhEEHfh09surXFWH+3GWci/Isn1Gu90BalJ9n2I3dGGdpUHuE5OQQHZ+OOvlMYsehHwfNFWsvivk7ly5dBfnDmDROPrdm469P0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783412427; c=relaxed/simple;
-	bh=Mv7hIGu0qh0YiqTgC7s7RNgpqHPK+a9PpbFXMHXX1qQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=G3+T6pbSIuiGtoIghb0ffrMi+ToXlFLthUPJm4LmCByi8Zr3WuTaU2nK2Hy5ltoLQcCXkADpG2pPJTHU48wUtXev5cvk5aKdLEkwUaIo799yod6mRuxq6w2w+hK7ipGxQTXMLbepJ7a5ZNEM66meScFWIbjFavjqHL30Z2KYvFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mtmp+VVK; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 185BF1F000E9;
-	Tue,  7 Jul 2026 08:20:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783412426;
-	bh=xXOAg0FpVCCICt02wq+bSUxL2DGd/Xe7kyDrvZ0/i2o=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=mtmp+VVKGlG+tQCQ7GEhlx7heYpkwEdcwHY+76SRs1y1DhIwtxJgI1bgFiHqjL6vM
-	 GqDUJGoaPKe6i+uvH5V7OZMv7gRTQ3j3f9uKA30nUvNpeZ0n02+WreoNeonKfsOdaI
-	 yLC5bpqHIUzs76Hlrr4+jM/8wYNSdw5jwZAtY69caNXol+gPZYeaf4ftEg6EOA4av3
-	 BMPWQ4mOpMdIY3rBZ4HspAB453vq6u4iDYKZi8NU9AFHrY211pkpFMYMebeRfwMqv8
-	 ArNrdtCvTkk5zvNDbBaM5cAaldu1aTwt/UoKdLiw1PWwfCdrfWOmwWh9Eacg+QtA3q
-	 8tARtq6PNiDOg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 56A81392545F;
-	Tue,  7 Jul 2026 08:20:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1783412428; c=relaxed/simple;
+	bh=Hjiyxg2eUNmBvt4aUNqjtkRdpxTKWi4LfPWtvi9ZFOo=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=hFDcJYIBZzqcYiuowUiKsEGRJTrmiiJm6qC3tl49Lrscg2n7MWyyP5Zf2l1sT0y78BVeizXcp2/Ljd+WeyOxXldfwoOfsfYWPgWahS8Zzib96LFHTA+OMLaJ7z46pyZauhTqYHKj6rm7j/OwaraIPHILV+/CmnpCwW7SLtfY5S4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.205
+Received: by mail-oi1-f205.google.com with SMTP id 5614622812f47-495e6bbed50so460123b6e.1
+        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 01:20:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783412426; x=1784017226;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OY3pUOoki3lJk4N4z7FkJAxOZfZdPekPl+bIFkFpNbA=;
+        b=K8K1IA8AwLQvLY54+9xHeUTf93xbFzmp0Nvir0hRPmFjRclzrNKBSdtgA4HEoY3p80
+         p4tcVSGTwEVKdyHz8Smj/JBX+iXMFUIvdq16U9cjmJCNii4YVbGn3kHUc9tNuPvvPDM7
+         zTim0Hg8C6pvT41mo+YxNKeGiGbHLXLM854Dc2g3kbkJUpqdHbtcgJNx8KuapCO0WsRX
+         UyIURMvMeaXr+fBaFABA002HhNUklyLqX17SuqQUumsyDVLafMPuyNg9oFyXzPwJioVV
+         1t2j0S9mmQ24DT4yUKTERTi1No+JVkOTnJfL1P7Dh4NuAWDBXiSxDzx5dzqBySdZU0gj
+         J8wA==
+X-Forwarded-Encrypted: i=1; AFNElJ924lVP3s6GlKw0eIYplIi1OEqGYvTREgn4hWcOW+QTOZmVdB9ttY0o6G1tUr/AzmePG7pvQfQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGpekhlSNleoXyYWfVz+NI66KzPW3YdK64v6LDEesKhb82Q6mr
+	KrvqVIByEWQboVeyD6RrDSz9vGPw8psm6O/M3BR7L1qZiXWMhHU0sgad0mZKTxpx64Kstuuau+O
+	CQgvIBN0UqzTgpdb2F6er84rr4JJdbMCJGSVsFFHGmuyUzkP/ByJOpzIMUCk=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net/tls: Consume empty data records in
- tls_sw_read_sock()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178341240614.1419868.13885768597307476374.git-patchwork-notify@kernel.org>
-Date: Tue, 07 Jul 2026 08:20:06 +0000
-References: <20260630191551.875664-1-cel@kernel.org>
-In-Reply-To: <20260630191551.875664-1-cel@kernel.org>
-To: Chuck Lever <cel@kernel.org>
-Cc: john.fastabend@gmail.com, kuba@kernel.org, sd@queasysnail.net,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, netdev@vger.kernel.org
+X-Received: by 2002:a05:6808:309b:b0:495:f8a5:8797 with SMTP id
+ 5614622812f47-4a073dc4eb4mr1753390b6e.0.1783412426131; Tue, 07 Jul 2026
+ 01:20:26 -0700 (PDT)
+Date: Tue, 07 Jul 2026 01:20:26 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a4cb6ca.57639fcc.86d58.000b.GAE@google.com>
+Subject: [syzbot] [net?] memory leak in vlan_vid_add
+From: syzbot <syzbot+456957213f32970c0762@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=b80376788da8bcda];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,queasysnail.net,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-305321-lists,netdev=lfdr.de,netdevbpf];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:cel@kernel.org,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:sd@queasysnail.net,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:syzkaller-bugs@googlegroups.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305322-lists,netdev=lfdr.de,456957213f32970c0762];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	SUBJECT_HAS_QUESTION(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 758467191BB
+X-Rspamd-Queue-Id: B3DFD71905A
 
-Hello:
+Hello,
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+syzbot found the following issue on:
 
-On Tue, 30 Jun 2026 15:15:51 -0400 you wrote:
-> A peer may send a zero-length TLS application_data record; TLS 1.3
-> explicitly permits these as a traffic-analysis countermeasure (RFC
-> 8446, Section 5.1). After decryption such a record has full_len ==
-> 0. tls_sw_read_sock() hands it to the read_actor, which has no
-> payload to consume and returns zero. The loop treats a zero return
-> as backpressure (used <= 0), requeues the skb at the head of
-> rx_list, and stops. rx_list is serviced head-first on the next
-> call, so the empty record is dequeued, fails the same way, and is
-> requeued again; every later record on the connection is blocked
-> behind it.
-> 
-> [...]
+HEAD commit:    71dfdfb0209b Merge tag 'vfs-7.2-rc2.fixes' of git://git.ke..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=13bbf1b1580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b80376788da8bcda
+dashboard link: https://syzkaller.appspot.com/bug?extid=456957213f32970c0762
+compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10166ffe580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16218b1c580000
 
-Here is the summary with links:
-  - [net] net/tls: Consume empty data records in tls_sw_read_sock()
-    https://git.kernel.org/netdev/net/c/3be28e2c9cd0
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/d3c154e8d39b/disk-71dfdfb0.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/9f35a0982146/vmlinux-71dfdfb0.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/fc56d29c15a3/bzImage-71dfdfb0.xz
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+456957213f32970c0762@syzkaller.appspotmail.com
+
+BUG: memory leak
+unreferenced object 0xffff8881147f3c00 (size 256):
+  comm "syz-executor", pid 5805, jiffies 4294943736
+  hex dump (first 32 bytes):
+    00 40 02 0b 81 88 ff ff 00 00 00 00 00 00 00 00  .@..............
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc a66a6b91):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4625 [inline]
+    slab_alloc_node mm/slub.c:4945 [inline]
+    __kmalloc_cache_noprof+0x356/0x440 mm/slub.c:5511
+    _kmalloc_noprof include/linux/slab.h:969 [inline]
+    _kzalloc_noprof include/linux/slab.h:1290 [inline]
+    vlan_info_alloc net/8021q/vlan_core.c:153 [inline]
+    vlan_vid_add+0x1ff/0x2b0 net/8021q/vlan_core.c:329
+    vlan_vid0_add net/8021q/vlan.c:349 [inline]
+    vlan_device_event.cold+0x27/0x65 net/8021q/vlan.c:388
+    notifier_call_chain+0x59/0x160 kernel/notifier.c:85
+    call_netdevice_notifiers_info+0x7d/0xb0 net/core/dev.c:2250
+    call_netdevice_notifiers_extack net/core/dev.c:2288 [inline]
+    call_netdevice_notifiers net/core/dev.c:2302 [inline]
+    __dev_notify_flags+0xb1/0x1b0 net/core/dev.c:9793
+    netif_change_flags+0x71/0x90 net/core/dev.c:9822
+    do_setlink.isra.0+0x50e/0x1ce0 net/core/rtnetlink.c:3215
+    rtnl_changelink net/core/rtnetlink.c:3849 [inline]
+    __rtnl_newlink net/core/rtnetlink.c:4022 [inline]
+    rtnl_newlink+0xb23/0x1310 net/core/rtnetlink.c:4159
+    rtnetlink_rcv_msg+0x52b/0x600 net/core/rtnetlink.c:7076
+    netlink_rcv_skb+0x89/0x1c0 net/netlink/af_netlink.c:2556
+    netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+    netlink_unicast+0x38f/0x4e0 net/netlink/af_netlink.c:1345
+    netlink_sendmsg+0x335/0x690 net/netlink/af_netlink.c:1900
+    sock_sendmsg_nosec net/socket.c:775 [inline]
+    __sock_sendmsg net/socket.c:790 [inline]
+    __sys_sendto+0x2ca/0x2e0 net/socket.c:2252
+    __do_sys_sendto net/socket.c:2259 [inline]
+    __se_sys_sendto net/socket.c:2255 [inline]
+    __x64_sys_sendto+0x28/0x30 net/socket.c:2255
+    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+    do_syscall_64+0xf8/0x610 arch/x86/entry/syscall_64.c:94
+
+BUG: memory leak
+unreferenced object 0xffff8881127a3660 (size 32):
+  comm "syz-executor", pid 5805, jiffies 4294943736
+  hex dump (first 32 bytes):
+    a0 3c 7f 14 81 88 ff ff a0 3c 7f 14 81 88 ff ff  .<.......<......
+    81 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc a6a88710):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4625 [inline]
+    slab_alloc_node mm/slub.c:4945 [inline]
+    __kmalloc_cache_noprof+0x356/0x440 mm/slub.c:5511
+    _kmalloc_noprof include/linux/slab.h:969 [inline]
+    _kzalloc_noprof include/linux/slab.h:1290 [inline]
+    vlan_vid_info_alloc net/8021q/vlan_core.c:196 [inline]
+    __vlan_vid_add net/8021q/vlan_core.c:302 [inline]
+    vlan_vid_add+0x14f/0x2b0 net/8021q/vlan_core.c:336
+    vlan_vid0_add net/8021q/vlan.c:349 [inline]
+    vlan_device_event.cold+0x27/0x65 net/8021q/vlan.c:388
+    notifier_call_chain+0x59/0x160 kernel/notifier.c:85
+    call_netdevice_notifiers_info+0x7d/0xb0 net/core/dev.c:2250
+    call_netdevice_notifiers_extack net/core/dev.c:2288 [inline]
+    call_netdevice_notifiers net/core/dev.c:2302 [inline]
+    __dev_notify_flags+0xb1/0x1b0 net/core/dev.c:9793
+    netif_change_flags+0x71/0x90 net/core/dev.c:9822
+    do_setlink.isra.0+0x50e/0x1ce0 net/core/rtnetlink.c:3215
+    rtnl_changelink net/core/rtnetlink.c:3849 [inline]
+    __rtnl_newlink net/core/rtnetlink.c:4022 [inline]
+    rtnl_newlink+0xb23/0x1310 net/core/rtnetlink.c:4159
+    rtnetlink_rcv_msg+0x52b/0x600 net/core/rtnetlink.c:7076
+    netlink_rcv_skb+0x89/0x1c0 net/netlink/af_netlink.c:2556
+    netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+    netlink_unicast+0x38f/0x4e0 net/netlink/af_netlink.c:1345
+    netlink_sendmsg+0x335/0x690 net/netlink/af_netlink.c:1900
+    sock_sendmsg_nosec net/socket.c:775 [inline]
+    __sock_sendmsg net/socket.c:790 [inline]
+    __sys_sendto+0x2ca/0x2e0 net/socket.c:2252
+    __do_sys_sendto net/socket.c:2259 [inline]
+    __se_sys_sendto net/socket.c:2255 [inline]
+    __x64_sys_sendto+0x28/0x30 net/socket.c:2255
+    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+    do_syscall_64+0xf8/0x610 arch/x86/entry/syscall_64.c:94
+
+connection error: failed to recv *flatrpc.ExecutorMessageRawT: EOF
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
