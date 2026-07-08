@@ -1,149 +1,154 @@
-Return-Path: <netdev+bounces-305781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305782-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Y/xGEKQ4Tmr0JAIAu9opvQ
-	(envelope-from <netdev+bounces-305781-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:46:44 +0200
+	id 56aNH1w5TmogJQIAu9opvQ
+	(envelope-from <netdev+bounces-305782-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:49:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D571725FE3
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:46:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F0A1726034
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:49:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=collabora.com header.s=zohomail header.b=hHGodoC5;
-	dmarc=pass (policy=none) header.from=collabora.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305781-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305781-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305782-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305782-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id AB5EC3004431
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 11:45:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B2EB03010C39
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 11:46:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF9DC433BD0;
-	Wed,  8 Jul 2026 11:45:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B84434E33;
+	Wed,  8 Jul 2026 11:46:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852943749F5;
-	Wed,  8 Jul 2026 11:45:20 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783511121; cv=pass; b=eB4F+K9sfn5zmOTEzFN4iByKFIe8xuDzb0yJj+5a45MG+txy79SspVBS2HWCj1r+mxzE1swQoshBpsLDfpYyojIeZFMn3KXWM2DkYaMBHEPQS/t1L1KRDrf9en9fo9lsagLqupq/N84iIurQOYk6BHh84K8sZrjvgDTk8xqnegg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783511121; c=relaxed/simple;
-	bh=vG674cmrQhJjZlTsH72CkjCa0sAbuJq5pd0lZ9+z5lQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=pqJp5S7QQb1a/n0p48L14nrFMVkkfdzlAxSEPNyf0EXwwTQyOAGQthAl8ydmy0cTycDzBuYP1edt0q9gqMGCpAX9vCELHswjK5sStMENaF7W0iEGAknlN5FCoFcNOjrf0sn0pLDhiitjBH9jtKouUYSstTo1LPXM2ZzgYIZ8Z10=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=louisalexis.eyraud@collabora.com header.b=hHGodoC5; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal: i=1; a=rsa-sha256; t=1783511084; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=BbzfzKxqbvPnrvyVyHOhzb8iD20zR3d66/NJqDevEdeclatBqZjVOp40FJJBVUGAkZDBYHC3ODWdArm/rrjpPI/IYXPshf4P9TSy6xjx5FerLYq09rVpkQAzZ0wtIsSdxbEgl7L1HfDSB20xpPNMSd/B5CoQVlqmup2BYQWPqWA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1783511084; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=10jNbGRvZsPmWMGouxLK8UHxoLr85rz2aRkumx5Y9/A=; 
-	b=LLI7sW882jTnhgaNd1popR55mSPsaxMbsW7mOffkw42FDSe0VycSQiGZ6O64cH0tHIQxND9to8OpnJaDzWBoOpCCdbMpAlocI3IZmYvw7TkOJqvBGqRvPyB3UW/jSL7WMfvBv+qkEAA9ROigdTLXPBOSp/QugRRqThk+tJqbR9E=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=louisalexis.eyraud@collabora.com;
-	dmarc=pass header.from=<louisalexis.eyraud@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1783511084;
-	s=zohomail; d=collabora.com; i=louisalexis.eyraud@collabora.com;
-	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
-	bh=10jNbGRvZsPmWMGouxLK8UHxoLr85rz2aRkumx5Y9/A=;
-	b=hHGodoC5rNtt9ao4ZOa0g7TQj9LXm/mPnD0kmSkHKFrfpnRPy4Mnq1S3IQjvaToI
-	LBIjBPD3bgr6htQpPURhrwg7UUMeCeGicaNuGHnfvGhRuM4zF2kDIcjqD0IrVq3NnNs
-	mazulxdQPHJYyp46a0hAfQktOenapwaW2mdU/4ms=
-Received: by mx.zohomail.com with SMTPS id 1783511083198326.6815554898435;
-	Wed, 8 Jul 2026 04:44:43 -0700 (PDT)
-Message-ID: <3c22fe68c08c414b789c79144ae569840e1ba6a9.camel@collabora.com>
-Subject: Re: [PATCH net-next 2/6] net: stmmac: mediatek: add PERI_ETH_CTRLx
- register offset in platform data
-From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley	
- <conor+dt@kernel.org>, Richard Cochran <richardcochran@gmail.com>, Matthias
- Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno	
- <angelogioacchino.delregno@collabora.com>, Biao Huang
- <biao.huang@mediatek.com>,  Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	maxime.chevallier@bootlin.com, rmk+kernel@armlinux.org.uk,
- kernel@collabora.com, 	netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, 	linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, 
-	linux-stm32@st-md-mailman.stormreply.com
-Date: Wed, 08 Jul 2026 13:44:36 +0200
-In-Reply-To: <3e135fe0-4ef9-45be-a962-d131c8a2e9e0@lunn.ch>
-References: <20260707-dwmac-mediatek-mt8189-v1-0-17f345eaaca3@collabora.com>
-	 <20260707-dwmac-mediatek-mt8189-v1-2-17f345eaaca3@collabora.com>
-	 <3e135fe0-4ef9-45be-a962-d131c8a2e9e0@lunn.ch>
-Organization: Collabora Ltd
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D93742B30F;
+	Wed,  8 Jul 2026 11:45:59 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783511161; cv=none; b=HnBCsmb8wWQLS6quWJQq0WXVfcB2anDb6ljctDM4VWfdqAiajZ9c7G8xaLJ/dEeDL2Z3SoIWtVCo0//ziaPgvCZEjmf8GDb0niSlpgcRla5IKRXgkOi+G+CPxdVdURxyh1upPaDnSBfY0/OAXd0E1xzhVrObUcj0zYWhEp0d/0M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783511161; c=relaxed/simple;
+	bh=mea4e5gKCQknIDxQ3PIurGaHdYWY5ez4ydVOLNKJiv4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CMWkbc4JpUet7lUsQVWq55cHZk/1c1osOVsBAdrpcKlppVcAl4WwtLMIkrC+4ni5+RMSnApxAruX4PRUvXzPudZ9xWEl+RmcUohgPDhlKc7xRPgQBPRykHH4cjTb83PJYwShWPJVoGk9aJCPJ52Ja4n/DJQxB3ex/Mr+WkCjaKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 8CD7C6059E; Wed, 08 Jul 2026 13:45:50 +0200 (CEST)
+Date: Wed, 8 Jul 2026 13:45:44 +0200
+From: Florian Westphal <fw@strlen.de>
+To: "Xiang Mei (Microsoft)" <xmei5@asu.edu>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, AutonomousCodeSecurity@microsoft.com,
+	tgopinath@linux.microsoft.com, kys@microsoft.com
+Subject: Re: [PATCH net] netfilter: bridge: fix stale prevhdr pointer in
+ br_ip6_fragment()
+Message-ID: <ak44aLdDrMZXb6fC@strlen.de>
+References: <20260706232850.3333016-1-xmei5@asu.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260706232850.3333016-1-xmei5@asu.edu>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[collabora.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[collabora.com:s=zohomail];
+X-Spamd-Result: default: False [-1.46 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	HAS_ORG_HEADER(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-305781-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[strlen.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:richardcochran@gmail.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:biao.huang@mediatek.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:maxime.chevallier@bootlin.com,m:rmk+kernel@armlinux.org.uk,m:kernel@collabora.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:linux-stm32@st-md-mailman.stormreply.com,m:krzk@kernel.org,m:conor@kernel.org,m:matthiasbgg@gmail.com,m:mcoquelinstm32@gmail.com,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[louisalexis.eyraud@collabora.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:xmei5@asu.edu,m:pablo@netfilter.org,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,collabora.com,mediatek.com,foss.st.com,bootlin.com,armlinux.org.uk,vger.kernel.org,lists.infradead.org,st-md-mailman.stormreply.com];
+	FORGED_SENDER(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-305782-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[louisalexis.eyraud@collabora.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[collabora.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3D571725FE3
+X-Rspamd-Queue-Id: 0F0A1726034
 
-Hi Andrew
+Xiang Mei (Microsoft) <xmei5@asu.edu> wrote:
+> br_ip6_fragment() gets prevhdr, a pointer into the skb head, from
+> ip6_find_1stfragopt(), then calls skb_checksum_help().  For a cloned skb
+> skb_checksum_help() reallocates the head via pskb_expand_head(), leaving
+> prevhdr dangling.  It is later dereferenced in ip6_frag_next(), causing a
+> use-after-free write.
+> 
+> Re-find prevhdr after skb_checksum_help() so it points into the current
+> head.
+> 
+>   BUG: KASAN: slab-use-after-free in ip6_frag_next (net/ipv6/ip6_output.c:857)
+>   Write of size 1 at addr ffff888013ff5016 by task exploit/141
+>   Call Trace:
+>    ...
+>    kasan_report (mm/kasan/report.c:595)
+>    ip6_frag_next (net/ipv6/ip6_output.c:857)
+>    br_ip6_fragment (net/ipv6/netfilter.c:212)
+>    nf_ct_bridge_post (net/bridge/netfilter/nf_conntrack_bridge.c:407)
+>    nf_hook_slow (net/netfilter/core.c:619)
+>    br_forward_finish (net/bridge/br_forward.c:66)
+>    __br_forward (net/bridge/br_forward.c:115)
+>    maybe_deliver (net/bridge/br_forward.c:191)
+>    br_flood (net/bridge/br_forward.c:245)
+>    br_handle_frame_finish (net/bridge/br_input.c:229)
+>    br_handle_frame (net/bridge/br_input.c:442)
+>    ...
+>    packet_sendmsg (net/packet/af_packet.c:3114)
+>    ...
+>    do_syscall_64 (arch/x86/entry/syscall_64.c:94)
+>    entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
+>   Kernel panic - not syncing: Fatal exception in interrupt
+> 
+> Fixes: 764dd163ac92 ("netfilter: nf_conntrack_bridge: add support for IPv6")
+> Reported-by: AutonomousCodeSecurity@microsoft.com
+> Signed-off-by: Xiang Mei (Microsoft) <xmei5@asu.edu>
+> ---
+>  net/ipv6/netfilter.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/net/ipv6/netfilter.c b/net/ipv6/netfilter.c
+> index 6d80f85e55fa..547879da9532 100644
+> --- a/net/ipv6/netfilter.c
+> +++ b/net/ipv6/netfilter.c
+> @@ -147,6 +147,10 @@ int br_ip6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
+>  	    (err = skb_checksum_help(skb)))
+>  		goto blackhole;
+>  
+> +	err = ip6_find_1stfragopt(skb, &prevhdr);
+> +	if (err < 0)
+> +		goto blackhole;
 
-On Tue, 2026-07-07 at 14:45 +0200, Andrew Lunn wrote:
-> > +	.peri_eth_ctrl_offset =3D MT8195_PERI_ETH_CTRL_BASE,
->=20
-> nitpick:
->=20
-> Could the naming be more consistent? offset vs base?
->=20
-> 	Andrew
+Would you mind sending a v2 that solves this the same way that it was
+fixed in ipv6 output engine?
 
-Ack.=C2=A0
+See
+ef0efcd3bd3f ("ipv6: Fix dangling pointer when ipv6 fragment")
 
-The commit description and subject also use offset terminology and not
-base so better keep the consistency.
-
-I'll rename this define to MT8195_PERI_ETH_CTRL_OFFSET in the v2
-version and do the same for the MT8189 one in patch 6.
-
-Regards,
-Louis-Alexis
+Thanks!
 
