@@ -1,423 +1,212 @@
-Return-Path: <netdev+bounces-305767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305768-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id OWyCBAMuTmrqEgIAu9opvQ
-	(envelope-from <netdev+bounces-305767-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:01:23 +0200
+	id 3e+6FWIuTmoNEwIAu9opvQ
+	(envelope-from <netdev+bounces-305768-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:02:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 540B57249B1
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:01:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A05A07249E8
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:02:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=d2+beyWg;
-	dkim=pass header.d=redhat.com header.s=google header.b=WNsKgdKI;
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305767-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305767-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=baylibre.com header.s=google header.b=TVCoBivw;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305768-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305768-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6557F300B0BE
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 11:00:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 68D573003E99
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 11:02:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0863742CB12;
-	Wed,  8 Jul 2026 11:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 809E64314A3;
+	Wed,  8 Jul 2026 11:02:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21BCA3CAE99
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 11:00:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F60430CF0
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 11:02:43 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783508416; cv=none; b=dwoA9dwJ+Z4oVWnT4KXI3KTq50JFcf09GzrKNY2dgjupBU0wuQxvplJG1YnfujJG3AxjH5j/F+DOeY2v3hjj4RzvBWLLHaY+hE4zqvEio8ME7OwZwgsAi/5aWk1n0JduD+qDpz0RcJyQPasJksKuk/rRcwnF2ttMbRiLMfkovBQ=
+	t=1783508570; cv=none; b=EfuiKZf5NS0L+qPAeNZgB+TK64A1SFSMvTEtXguYqJNfRF6n971zWns4S+42iXwRUCRjhxA6/WFie43YuUet4jVnpyZEtIFDcpJ0KpiY9mGwVhv3e8GAIrC/D658Ot+ZekahEAjNp8mOePPpb5O58NpqSz5Y+zpb5ChEm9DDWDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783508416; c=relaxed/simple;
-	bh=/z59NgigRUT1t7wKHaZdXuB2mvaJJ3J4A7h7gfTV4bg=;
+	s=arc-20240116; t=1783508570; c=relaxed/simple;
+	bh=oPZaKv1OXlABgq9QPAtMKfhvRK+tiC3E15Kuw9g/LH0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SfwEdrwlFhO4kCd7ibUakrBEFueAIDTwXsfAfRwoA4wbK6ZHEs2s8EaA3v2YOJEEVLGZFNNvE2y+m630KOEs7VvY4C7w18MgD6IQRly19k08G+Gf964j8KF0H/8Z8xlPKnUUAwM9y5UpKIV++AbtR+qP+uL+PsGKfKR+JRg35q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d2+beyWg; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=WNsKgdKI; arc=none smtp.client-ip=170.10.129.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783508411;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3XaPC9zE2h9RHiRdcpGWZIRteZhCC8n0qMjJjG4dNfo=;
-	b=d2+beyWgceZ1oxbwx5Ng9OJrjsjzUigF0i7ncHJKlqucT+W0afB/lR29LBn6TQx55SSHzH
-	9296Ky6eKQEOyBI4Og6UCOHkXGkrqdS8QP3w1qpTfURqKpOgIhB9pIXa9yOQZeVgTmCvQD
-	lLomh4S6AK3lOrpOKD0jhMYlLzafDBQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-643-9IhUv_ahNXm9aep0H-SIzw-1; Wed, 08 Jul 2026 07:00:08 -0400
-X-MC-Unique: 9IhUv_ahNXm9aep0H-SIzw-1
-X-Mimecast-MFC-AGG-ID: 9IhUv_ahNXm9aep0H-SIzw_1783508407
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-474170b59dfso422388f8f.3
-        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 04:00:08 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=dNs4XSuxjR0D4yKbCtOr22sn1kAA+8mVLv6iitGTBK+D+FFGMUz+iwQYzZXHjndV74kvY8rZ9DwizNkmAUztx1wvinDVvf6wLeCKMuEHC/3YeIzso9SF4Z1/AF0EWOsZ3JCMi/29hpzzRUkxh9qa5UPa8JoJxVUGg5JzDyd+6F4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=TVCoBivw; arc=none smtp.client-ip=209.85.128.46
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-493b27c7451so18913595e9.0
+        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 04:02:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1783508407; x=1784113207; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3XaPC9zE2h9RHiRdcpGWZIRteZhCC8n0qMjJjG4dNfo=;
-        b=WNsKgdKIJGCdhGqI40Us/JbWjvT7N8hwb4M9H6IW2WTAHUPvjH63GMjUt+BLI7rOGA
-         bC5mygR+2Eniqff+YKh/qlW0xbcU7trUZ7JdjGYORdpq6anrax0+Zu/YknBRJt/Poq1a
-         YiShKsD7HdNoPPN/LPD0snCyFpf8m/hsOQAyJECzOBJgJh3Fa9XGG/JZIiBtOIYemday
-         0tCf65DDFjoG06QVBmRiphbx6jTaJicQM9ifw6qXgRf1V6G/RpU1C0b+jm24rE5SIH6p
-         vRcD4O+0u90j6tVRRijE6wwzBPaVKI3HzXTLDlMPi3qJr+LJtM/oRbXIJvLseqibfpG9
-         ZOiQ==
+        d=baylibre.com; s=google; t=1783508557; x=1784113357; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=oPZaKv1OXlABgq9QPAtMKfhvRK+tiC3E15Kuw9g/LH0=;
+        b=TVCoBivwZB2Iu+tXZ3PZJl6FTVvr7/zv/pmro4MivlSx8HxlzupIfthsZ8Jim8mcQN
+         Ag2xQD1zlSNB9iI/B816fkbjAjAvNmspd4RfFBRANlt03eGinG4oeeNYVFkZSx6rkpLT
+         qG5bHwkZyvigBoT6egeQcBw0Wgu6XK/y/nU7ui0lkmSg6lwhjZI/qfMt7mEfCxRptRbh
+         iVXPhcg/iWozh82DGlFpg0+caPRIMs/IBAkwHkEiOlb22hdpVFYsy3a/LmdxDXTB3JP4
+         aOua/pWfGBrSsBV7C2QTnR8PelDfMvOLDFzIDzu+CeAy0oVyQpsUWykyUPeRUEeF7kEl
+         EKOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783508407; x=1784113207;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3XaPC9zE2h9RHiRdcpGWZIRteZhCC8n0qMjJjG4dNfo=;
-        b=BFuBxsKWbg/x02lsl3Qp65rJVNN6dyEF604v310egHwnkF1fzfOvPOrsu7gQi3ed9m
-         tahrEiTfzv9lU8A5d3cygJ+qDCndHxTy16GlTaSQV2rr1Z0hIlFALyql4w2JTULrwnu/
-         wjiex1cOGrOK/HLqZYp7yrgSknCFnxSBlj+besgP/OLM+emBT/NgIMnlFINhrw/z/ZiX
-         y68GhPH1D0PwaTuBgG0a3qAcogpWei6DWcpzYV3svf4m+hm7K/ZviZfyf/2w4mHtyAve
-         M2I3qubjUDnXd/NR7UUJEqnL0Qjqb1iD7eHgJiatB/rYTBotK48ggr6eo7cwqFCP90zq
-         DHHQ==
-X-Gm-Message-State: AOJu0Yz/eAxCFuP6omw8AVwhbXXn29VWb5lOoeG07ALoY0/9aNnFXbKF
-	+DXE0Tl6lU+jzugDoIzXjnBFPWleWYUQHi6jiJbcyShuo8sOlxxHjpjY++VGpO+HF74L2M6eOg7
-	gywUPshcoM5KpF+BwH6NDOcQKvUqa+0ILg993E2lq4MiOcqqLukgm6t1ZHA==
-X-Gm-Gg: AfdE7cnbCV8/3A/hRTCuW4JhcGKpqqxMbyFV3WaxOR7o7lvDrwKPv8oQDMB0613obDQ
-	VOuDxb/Fv9MHkm2ORvCdYveb/7ckYbECW4TTL/9gIHimm++eEDBazHs3OK16i+ENy9fkwsKOqYJ
-	6vwrF8hQm1s0ZxkO2kvIgCWMA7pOFE6/WUgtuwhhsDPWrydcniO05b3f8r04D0cPUw2/p/6wh7D
-	shcJdPW6dwWd4uTZJNY6bbFiQuLiX71XUFGaZYXm/z/L6+bMij3EeqZWZxHcf2pWw2/jNRCUem2
-	2LggPiOnufOxv6q6kYGVZnavrS3+YzWMMk+659ODFArzxReWvEoxPSuS7pM6Wt2awoSagBe/waa
-	ZXiv0e2TAtFJp04yRFBWUGiRrJ1YlUR3l
-X-Received: by 2002:a05:6000:2909:b0:475:3a97:8e3c with SMTP id ffacd0b85a97d-47df0738de7mr2106804f8f.18.1783508407018;
-        Wed, 08 Jul 2026 04:00:07 -0700 (PDT)
-X-Received: by 2002:a05:6000:2909:b0:475:3a97:8e3c with SMTP id ffacd0b85a97d-47df0738de7mr2106594f8f.18.1783508404895;
-        Wed, 08 Jul 2026 04:00:04 -0700 (PDT)
-Received: from redhat.com (IGLD-80-230-68-31.inter.net.il. [80.230.68.31])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa039afacsm39865443f8f.19.2026.07.08.04.00.02
+        d=1e100.net; s=20251104; t=1783508557; x=1784113357;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=oPZaKv1OXlABgq9QPAtMKfhvRK+tiC3E15Kuw9g/LH0=;
+        b=edAybCyIGUxSm7MqBP3GaG50TtPG5uBf8vbEK9vZl+g7230kvF4Aso/DrCZ9lcE1qn
+         o4o1MQ39EH4NyvrAByra/aNaJmyvmJDo5KJX0lN5HkJMRQQqWqcb3TKSOab93b1omwlS
+         4acVDfRuee8eEz8BkEmMR8EXgaH7VTkk9m/wTK3EPjlcSHr5H2c/9Zif+V62O4xIX6Hz
+         PbamwHG98Q/qEwjkWElc6xfEOAMpNs431BQheHFEShyR4WuAL6jNwA0xGD9Q92lfLXFy
+         dA6pZ/0qOjrX3dd+H/5rTQW7fMioAbMoDBSBTM1Tc9k2ytexK1Kmy9gRZv7syz0yAB8B
+         78Tw==
+X-Forwarded-Encrypted: i=1; AHgh+RpJLAQUZWTiNSjm32XfOkhsoglA6Pxe9CQbIafhth0zDiOJCburfpEllb6LWsy/qnZaP/+oZPA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiflVu/8ryDxuYJpE/JVJtfR9dOegA3IWTtiEOIr3z3qt2ag4x
+	4B1gPVi8rMkzXPXBawB1Viv4Y6xTfBvEsgnJYTViN965RyUMuJ/J6pfBFFK0m+mVdSqWYjoyV4t
+	3jdoy
+X-Gm-Gg: AfdE7clibZc8oxYq3h0H80BCw12wdVeEBONZkAQdOfA94GjHPYJOngTRVWdWUFftCDm
+	bbjF4+oB8pt8F5DpcXANVVrlt0kkYvoPuVaT0nDiKs0cML0x/VuadVdSsa57L+EV2LFpx74YqNJ
+	Dj/nQS3m8TEMI8Myno+fERhHYKbCp/QdpuKCSvogv4Vms/Y9aCCm0WlvQG0vFTR+gGl/EIwN+v8
+	aImWZOAcZAc9EVYNoqh+7joEDMqWyIDYtrni7z7IC7bb+0N1H4pkpUbwOmR/Gqz2MZ2hsf/P8xc
+	/DrXuUGEOcGi4fwobvV4l9Zz2tp8bBri6KTecYF10y5Je81WiotipddbN6KiREKAx8WRfh9/Ldo
+	fJiL2qTot5nexjCWDaf8L0/ySeMfuZhz8uhPP318PvBtZrqQ75CmuFNT6nBToFZnYIohdRupdmc
+	hFOoLw+29IF1M1x8v+MrcN9iNaW6g+9pdDClfuyHFvJWcFS3t5XkSR0voKO25qZ0tk9t2gi7hBx
+	QWA
+X-Received: by 2002:a05:600c:1d04:b0:493:bc4a:a14d with SMTP id 5b1f17b1804b1-493e63a9f76mr20030585e9.19.1783508557034;
+        Wed, 08 Jul 2026 04:02:37 -0700 (PDT)
+Received: from localhost (p200300f65f47db04930dc5bd4534e1e5.dip0.t-ipconnect.de. [2003:f6:5f47:db04:930d:c5bd:4534:e1e5])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-493e0f40d50sm151903545e9.5.2026.07.08.04.02.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2026 04:00:04 -0700 (PDT)
-Date: Wed, 8 Jul 2026 07:00:00 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org, Jason Wang <jasowangio@gmail.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, virtualization@lists.linux.dev,
-	Jakub Kicinski <kuba@kernel.org>, Jason Wang <jasowang@redhat.com>,
-	stable@vger.kernel.org, Brien Oberstein <brienpub@gmail.com>
-Subject: Re: [PATCH net v2 1/2] vsock/virtio: collapse receive queue under
- memory pressure
-Message-ID: <20260708065947-mutt-send-email-mst@kernel.org>
-References: <20260708102904.50732-1-sgarzare@redhat.com>
- <20260708102904.50732-2-sgarzare@redhat.com>
+        Wed, 08 Jul 2026 04:02:36 -0700 (PDT)
+Date: Wed, 8 Jul 2026 13:02:34 +0200
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 net-next] net: phy: Drop #inclusion of
+ <linux/mod_devicetable.h> from <linux/mdio.h>
+Message-ID: <ak4tWWl2Mt3BkTXy@monoceros>
+References: <ca270a534d0f230a939a3fb4a661808b35d6436d.1783329817.git.u.kleine-koenig@baylibre.com>
+ <12ec5246-4124-4edb-a5f8-f10c73b1fcb7@lunn.ch>
+ <akwToZyYvHZPtdjV@monoceros>
+ <96a77bc9-9804-43fb-acf0-b93574cd60f3@lunn.ch>
+ <akynGw4TQimFiQST@monoceros>
+ <2f07f731-0b97-4a23-8ccd-f01638fc1c7e@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ncfrdjtwdwvsqxls"
 Content-Disposition: inline
-In-Reply-To: <20260708102904.50732-2-sgarzare@redhat.com>
+In-Reply-To: <2f07f731-0b97-4a23-8ccd-f01638fc1c7e@lunn.ch>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-3.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[baylibre.com:s=google];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	ASN_FAIL(0.00)[4.211.64.104.asn.rspamd.com:query timed out];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305767-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[mst@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:sgarzare@redhat.com,m:netdev@vger.kernel.org,m:jasowangio@gmail.com,m:xuanzhuo@linux.alibaba.com,m:edumazet@google.com,m:eperezma@redhat.com,m:horms@kernel.org,m:stefanha@redhat.com,m:davem@davemloft.net,m:linux-kernel@vger.kernel.org,m:kvm@vger.kernel.org,m:pabeni@redhat.com,m:virtualization@lists.linux.dev,m:kuba@kernel.org,m:jasowang@redhat.com,m:stable@vger.kernel.org,m:brienpub@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,linux.alibaba.com,google.com,redhat.com,kernel.org,davemloft.net,lists.linux.dev];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DMARC_NA(0.00)[baylibre.com];
 	FROM_HAS_DN(0.00)[];
-	RSPAMD_EMAILBL_FAIL(0.00)[mst.redhat.com:query timed out];
+	FORGED_SENDER(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305768-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[baylibre.com:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_NEQ_ENVFROM(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,vger.kernel.org];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,baylibre.com:from_mime,baylibre.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 540B57249B1
-
-On Wed, Jul 08, 2026 at 12:29:03PM +0200, Stefano Garzarella wrote:
-> From: Stefano Garzarella <sgarzare@redhat.com>
-> 
-> When many small packets accumulate in the receive queue, the skb overhead
-> can exceed buf_alloc even while the payload is within bounds. This causes
-> virtio_transport_inc_rx_pkt() to reject packets, leading to connection
-> resets during large transfers under backpressure.
-> 
-> The issue was reported by Brien, who has a reproducer, but it is also
-> easily reproducible with iperf-vsock [1] using a small packet size:
-> 
->   iperf3 --vsock -c $CID -l 129
-> 
-> which fails immediately without this patch but with commit 059b7dbd20a6
-> ("vsock/virtio: fix potential unbounded skb queue").
-> 
-> Inspired by TCP's tcp_collapse() which solves a similar problem, add
-> virtio_transport_collapse_rx_queue() that walks the receive queue and
-> re-copies data into compact linear skbs to reduce the overhead.
-> 
-> The collapse is triggered proactively from when the number of skb queued
-> is close to exceeding the overhead budget.
-> 
-> A pre-scan counts the eligible bytes to size each allocation precisely,
-> avoiding waste for isolated small packets. Partially consumed skbs are
-> kept as-is to preserve buf_used/fwd_cnt accounting, EOM-marked skbs to
-> maintain SEQPACKET message boundaries, and skbs already larger than the
-> collapse target because they already have a good data-to-overhead ratio.
-> 
-> Walking a large queue may take a significant amount of time and cache
-> misses, causing traffic burstiness. To limit this, the collapse stops
-> once enough room is freed for this packet and the next one, but may
-> opportunistically free more to fill each collapsed skb to capacity.
-> 
-> [1] https://github.com/stefano-garzarella/iperf-vsock
-> 
-> Fixes: 059b7dbd20a6 ("vsock/virtio: fix potential unbounded skb queue")
-> Cc: stable@vger.kernel.org
-> Reported-by: Brien Oberstein <brienpub@gmail.com>
-> Closes: https://lore.kernel.org/netdev/618701dd023e$063de350$12b9a9f0$@gmail.com/
-> Tested-by: Brien Oberstein <brienpub@gmail.com>
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+X-Rspamd-Queue-Id: A05A07249E8
 
 
-this is the right approach
+--ncfrdjtwdwvsqxls
+Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v1 net-next] net: phy: Drop #inclusion of
+ <linux/mod_devicetable.h> from <linux/mdio.h>
+MIME-Version: 1.0
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+On Tue, Jul 07, 2026 at 02:10:56PM +0200, Andrew Lunn wrote:
+> On Tue, Jul 07, 2026 at 09:15:35AM +0200, Uwe Kleine-K=F6nig (The Capable=
+ Hub) wrote:
+> > Hello Andrew,
+> >=20
+> > On Mon, Jul 06, 2026 at 11:28:33PM +0200, Andrew Lunn wrote:
+> > > > That's exactly my thought, and there is commit ad428f5811bd
+> > > > ("mod_devicetable.h: Split into per subsystem headers") that is par=
+t of
+> > > > v7.2-rc2 and that does exactly that (apart from the filename).
+> > >=20
+> > > Ah, O.K. net-next tends to great dragged along the -rcX versions. So
+> > > you can probably submit the networking changes in a weeks time. Just
+> > > make sure they apply to
+> > >=20
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git
+> >=20
+> > Note that while I created the patch under discussion on top of -rc2, the
+> > justification is also valid on -rc1 and the patch doesn't use the new
+> > headers, so it can be applied to the above repo already now.
+>=20
+> Yes, our patchwork instance and its CI agree:
+>=20
+> https://patchwork.kernel.org/project/netdevbpf/patch/ca270a534d0f230a939a=
+3fb4a661808b35d6436d.1783329817.git.u.kleine-koenig@baylibre.com/
 
-> ---
-> v2:
-> - defined MAX_COLLAPSE_LEN macro instead of using a variable [Paolo]
-> - added a threshold to avoid walking all the queue while collapsing
->   [Paolo]
-> - collapsed the queue before calling virtio_transport_inc_rx_pkt().
->   While working on the threshold, I figured out that the check I was
->   introducing can also be used to proactively trigger the collapse, so I
->   moved the call to virtio_transport_collapse_rx_queue() before acquiring
->   the rx_lock to have also a better diff to simplify backports
-> - improved code readability (removed `out` label, `keep` initialization,
->   etc.) [Paolo + other small stuff]
-> - Brien kindly retested this version as well (thank you so much)
-> ---
->  net/vmw_vsock/virtio_transport_common.c | 165 +++++++++++++++++++++++-
->  1 file changed, 164 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> index 09475007165b..8becad81279c 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -26,6 +26,13 @@
->  /* Threshold for detecting small packets to copy */
->  #define GOOD_COPY_LEN  128
->  
-> +/* Max payload that can be collapsed into a single linear skb, using the same
-> + * allocation threshold as virtio_vsock_alloc_skb() to avoid adding pressure
-> + * on the page allocator.
-> + */
-> +#define MAX_COLLAPSE_LEN \
-> +	SKB_MAX_ORDER(VIRTIO_VSOCK_SKB_HEADROOM, PAGE_ALLOC_COSTLY_ORDER)
-> +
->  static void virtio_transport_cancel_close_work(struct vsock_sock *vsk,
->  					       bool cancel_timeout);
->  static s64 virtio_transport_has_space(struct virtio_vsock_sock *vvs);
-> @@ -420,6 +427,145 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->  	return ret;
->  }
->  
-> +static bool virtio_transport_can_collapse(struct sk_buff *skb)
-> +{
-> +	/* skbs that are partially consumed, mark a SEQPACKET message boundary,
-> +	 * or are already large enough should not be collapsed: they either
-> +	 * need special accounting, carry protocol state, or already have a
-> +	 * good data-to-overhead ratio.
-> +	 */
-> +	if (VIRTIO_VSOCK_SKB_CB(skb)->offset)
-> +		return false;
-> +	if (le32_to_cpu(virtio_vsock_hdr(skb)->flags) & VIRTIO_VSOCK_SEQ_EOM)
-> +		return false;
-> +	if (skb->len >= MAX_COLLAPSE_LEN)
-> +		return false;
-> +	return true;
-> +}
-> +
-> +/* Iterate through the packets in the queue starting from the current skb to
-> + * count the number of bytes we can collapse.
-> + */
-> +static unsigned int
-> +virtio_transport_collapse_size(struct sk_buff *skb, struct sk_buff_head *queue)
-> +{
-> +	unsigned int target = skb->len - VIRTIO_VSOCK_SKB_CB(skb)->offset;
-> +
-> +	while ((skb = skb_peek_next(skb, queue)) &&
-> +	       virtio_transport_can_collapse(skb)) {
-> +		unsigned int len = skb->len - VIRTIO_VSOCK_SKB_CB(skb)->offset;
-> +
-> +		if (len > MAX_COLLAPSE_LEN - target)
-> +			return target;
-> +
-> +		target += len;
-> +	}
-> +
-> +	return target;
-> +}
-> +
-> +/* Called under lock_sock to compact the receive queue by merging small skbs.
-> + * @min_to_free: minimum number of skbs to eliminate from the queue. May free
-> + *               more to fill each collapsed skb to capacity.
-> + */
-> +static void
-> +virtio_transport_collapse_rx_queue(struct virtio_vsock_sock *vvs,
-> +				   u32 min_to_free)
-> +{
-> +	struct sk_buff *skb, *next_skb, *new_skb = NULL;
-> +	struct sk_buff_head new_queue;
-> +	u32 saved = 0;
-> +
-> +	__skb_queue_head_init(&new_queue);
-> +
-> +	skb_queue_walk_safe(&vvs->rx_queue, skb, next_skb) {
-> +		struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
-> +		u32 src_off = VIRTIO_VSOCK_SKB_CB(skb)->offset;
-> +		u32 src_len = skb->len - src_off;
-> +		bool keep;
-> +
-> +		keep = !virtio_transport_can_collapse(skb);
-> +		if (keep) {
-> +			/* Finalize pending collapsed skb to preserve packet
-> +			 * ordering.
-> +			 */
-> +			if (new_skb) {
-> +				__skb_queue_tail(&new_queue, new_skb);
-> +				new_skb = NULL;
-> +				saved--;
-> +			}
-> +			goto next;
-> +		}
-> +
-> +		/* Finalize if this packet won't fit in the remaining tailroom,
-> +		 * so we can allocate a right-sized new_skb.
-> +		 */
-> +		if (new_skb && src_len > skb_tailroom(new_skb)) {
-> +			__skb_queue_tail(&new_queue, new_skb);
-> +			new_skb = NULL;
-> +			saved--;
-> +		}
-> +
-> +		if (!new_skb) {
-> +			unsigned int alloc_size;
-> +
-> +			/* Check after finalizing to opportunistically fill
-> +			 * each collapsed skb to capacity, merging more skbs
-> +			 * than strictly required.
-> +			 */
-> +			if (saved >= min_to_free)
-> +				break;
-> +
-> +			alloc_size = virtio_transport_collapse_size(skb, &vvs->rx_queue);
-> +
-> +			/* Only this skb's data is eligible, nothing to merge
-> +			 * with. Keep as-is.
-> +			 */
-> +			if (alloc_size <= src_len) {
-> +				keep = true;
-> +				goto next;
-> +			}
-> +
-> +			new_skb = virtio_vsock_alloc_linear_skb(alloc_size +
-> +					VIRTIO_VSOCK_SKB_HEADROOM, GFP_KERNEL);
-> +			if (!new_skb)
-> +				break;
-> +
-> +			memcpy(virtio_vsock_hdr(new_skb), hdr,
-> +			       sizeof(struct virtio_vsock_hdr));
-> +			virtio_vsock_hdr(new_skb)->len = 0;
-> +		}
-> +
-> +		/* Cannot fail since src_off/src_len are within bounds, but if
-> +		 * it does, discard new_skb to avoid queuing corrupted data.
-> +		 */
-> +		if (WARN_ON_ONCE(skb_copy_bits(skb, src_off,
-> +					       skb_put(new_skb, src_len),
-> +					       src_len))) {
-> +			kfree_skb(new_skb);
-> +			new_skb = NULL;
-> +			break;
-> +		}
-> +
-> +		le32_add_cpu(&virtio_vsock_hdr(new_skb)->len, src_len);
-> +		virtio_vsock_hdr(new_skb)->flags |= hdr->flags;
-> +
-> +next:
-> +		__skb_unlink(skb, &vvs->rx_queue);
-> +		if (keep) {
-> +			__skb_queue_tail(&new_queue, skb);
-> +		} else {
-> +			consume_skb(skb);
-> +			saved++;
-> +		}
-> +	}
-> +
-> +	if (new_skb)
-> +		__skb_queue_tail(&new_queue, new_skb);
-> +
-> +	skb_queue_splice(&new_queue, &vvs->rx_queue);
-> +}
-> +
->  static bool virtio_transport_inc_rx_pkt(struct virtio_vsock_sock *vvs,
->  					u32 len)
->  {
-> @@ -1354,12 +1500,29 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
->  {
->  	struct virtio_vsock_sock *vvs = vsk->trans;
->  	bool can_enqueue, free_pkt = false;
-> +	u32 len, queue_max, queue_len;
->  	struct virtio_vsock_hdr *hdr;
-> -	u32 len;
->  
->  	hdr = virtio_vsock_hdr(skb);
->  	len = le32_to_cpu(hdr->len);
->  
-> +	/* virtio_transport_inc_rx_pkt() rejects packets when the per-skb
-> +	 * overhead (skb_queue_len * SKB_TRUESIZE(0)) exceeds buf_alloc.
-> +	 * Proactively collapse the queue before that happens.
-> +	 * No rx_lock needed: lock_sock is held by caller, preventing
-> +	 * concurrent enqueue or dequeue.
-> +	 */
-> +	queue_max = vvs->buf_alloc / SKB_TRUESIZE(0);
-> +	queue_len = skb_queue_len(&vvs->rx_queue);
-> +	if (queue_len >= queue_max) {
-> +		/* Walking a large queue may take a significant amount of time
-> +		 * and cache misses, causing traffic burstiness. Limit the
-> +		 * collapse to freeing room for this packet and the next one.
-> +		 * It may free more to fill each collapsed skb to capacity.
-> +		 */
-> +		virtio_transport_collapse_rx_queue(vvs, queue_len + 2 - queue_max);
-> +	}
-> +
->  	spin_lock_bh(&vvs->rx_lock);
->  
->  	can_enqueue = virtio_transport_inc_rx_pkt(vvs, len);
-> -- 
-> 2.55.0
+That's great.
 
+> but i was actually meaning the patches which swaps to the broken out
+> header with only struct mdio_device_id. I assume that patch is the one
+> which really reduces the number of files which get recompiled on
+> unrelated changes. That patch can be submitted to netdev probably next
+> week.
+
+Ah, indeed. After 995832b2cebe6969d1b42635db698803ee31294d and its
+parent there are not many left affecting netdev. But ack, I will wait a
+bit before tackling drivers/net/wireless/intel/iwlwifi/iwl-config.h
+(which is the only remaining user of <linux/mod_devicetable.h> in
+drivers/net).
+
+Best regards
+Uwe
+
+--ncfrdjtwdwvsqxls
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmpOLkcACgkQj4D7WH0S
+/k6E0wgApW4YEibqxo7s6E2O2Qy4D5Tx3XurOUW4nbjnKTfepxZwf8B5r5Hn6fr/
+QhUtm5a9JNOxWPsmJM79yjdBDGmGls18G+CTQxwOxRj1IfW+RAD0kGQBXYJpq4uN
+dQq21Wq7sO6jOxuBlYuu9oZFDA6ZkqnU/0VnH6Jp1D/vCOsfAcxPttTO3D61MGiO
+eQuh2zR7SPDiF+Lzm7IWi6NEZAKbXg/+jbkioFJU2vE09GkH9lJvVtS5SQwVX25p
+HhoQCYm1wTyEPP8gTl9lf3hSQ/Epr7DFMtxmrTQ4GMgTplSOQln8zMJwK37v+bBi
+F3CvCSUqlUJWY0AEQxg1ehLQbzbj0g==
+=v4gp
+-----END PGP SIGNATURE-----
+
+--ncfrdjtwdwvsqxls--
 
