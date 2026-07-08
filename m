@@ -1,176 +1,171 @@
-Return-Path: <netdev+bounces-305966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305967-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id x8LwJECeTmoyQwIAu9opvQ
-	(envelope-from <netdev+bounces-305966-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:00:16 +0200
+	id eV6qGeKeTmprQwIAu9opvQ
+	(envelope-from <netdev+bounces-305967-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:02:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0FAF729C14
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:00:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF3BB729C4E
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:02:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=pB7UcjMW;
-	dmarc=pass (policy=none) header.from=linux.dev;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305966-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305966-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=nYTnqZkV;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305967-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305967-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6F07830568B2
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 19:00:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D5208306AEA4
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 19:02:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DFE63CA4A0;
-	Wed,  8 Jul 2026 19:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189D031987D;
+	Wed,  8 Jul 2026 19:02:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C58A3C0A05
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 19:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F19A3270540
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 19:02:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783537214; cv=none; b=rsem7A9rDRxZ9VhF6pk1LOZhy+n/aFOFCSGk8AZKQDT6YOqUK5wRzaXYaaGOJNvDem3P93zLHn0hzIGPdLBnAJKAr3HgEiMqPfwJy8GxVrXegNCczEyrVVf8vXRpGnLaUHricpdhg/UKlGnS+v8UZWgoZxwTBsSqZJ76501TcE4=
+	t=1783537337; cv=none; b=iVshYoPXG1FbhilHv/HbJP5k+mfwrRJNcUhlAb6bfCw/qM9RlNPUqpU7KlQce+4daurwN/qgMUuvRY8J9f+xnBtGq8Xy6CLwt/J3H8QHR8E9d8HIrMYoiIDYWCmVaf+jue9vjSFVMvV5zmIPiFvQUbJAMp1OkeqWYi66dcX6I4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783537214; c=relaxed/simple;
-	bh=/i4q3PciWLr5dRKe8HwkUbjEdZBsKalnv/hNk0whSdY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cSP9Bi56wjtpP1Ej5k46jhvbgGTQcCRilzeG5JPZ6QFMW61JyreBtWt1rp/O5z87PfzPn17aeDUzdgFgxBKlzNZLgB86LpSrHPUrfzKmwiIc0/wzTY2OJ8piN1PhaeL8qtg1G+X7JChxV4bGT9BAVmVa4wZE6AOYaIrvRcoNsh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pB7UcjMW; arc=none smtp.client-ip=91.218.175.170
-Message-ID: <7a6d7de8-7c33-42fd-a0f3-68bc1911b0e5@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783537210;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dW2Pe/NnDxzT3LmCghEoob5D1+lVvIxfWr0Cp5jm/kU=;
-	b=pB7UcjMWL8pHSHChuspgfgOi2EgLbGP5vu+IzQ/ytPRmG7t1prIyXPRVawHGrF4qsiz8Ti
-	6wpDfilioOfgqcZpxVjw5Hm7v0l5wQBfwMvfWINrL7bNnfEm7dCVJqyWIEOHBE8yI2SHvl
-	2/g7ZbgGh1qLyWT6PrbQC39Bp3wOQs4=
-Date: Wed, 8 Jul 2026 20:00:00 +0100
+	s=arc-20240116; t=1783537337; c=relaxed/simple;
+	bh=Vif2MjHiTHDnsG7KTlzPaYWpFdvuZkkTzLfu8U72/eo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=QL4idUpoHoi8PLVHfPMZzxU/GKE3HuvdWrf30gtEJO3U78HlqZIXoLXpbXU0HcFs8VAbDjKHLfZu/UA/zPP3OVaXzYc/nfo58X/sydMt+HnymdGInTZNAkwbKswQfEMC7k5mVH73+yJ0Elfr5M+Pt/nILvqG090xZbDZAs4YHu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nYTnqZkV; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA87A1F00AC4;
+	Wed,  8 Jul 2026 19:02:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783537335;
+	bh=HpVymHzVcb0QxYp1ZYts3vB/+YwjzHrrzmF1p+frD+o=;
+	h=From:Date:Subject:To:Cc;
+	b=nYTnqZkVRvkS2pnSXQePYnRHIqVOBaY4m1CxiwAyJzi8lWPF5KuEmar0cEpvSEU98
+	 Y1RuDPG5L+4q/CJE+8DmVW4GCSbRjw25KJqKYHYx+e+rOKIK5IcQnhDn7EpgAqneTa
+	 qvft1/SpYTWSi1dohyi+ENMSg+ayUquwc9UZaQPpw/WNkx5uKvu5JlFHQQzRf+1ZHb
+	 2+OLTcpEEF4L1w0l0h0zyJ/vxWm67LnRIGSk4hqWNHXeIM4jycP6oeX876tS7h5Uz8
+	 zKpcb2YWjbUxBq39mlg5K7JcmgHsBYzbXjzKpEFew5QoYQ3Y91RtiKxJLtCgTWA6lP
+	 6JqOMLG+PGY5A==
+From: Simon Horman <horms@kernel.org>
+Date: Wed, 08 Jul 2026 20:02:05 +0100
+Subject: [PATCH net-next] Revert "gtp: annotate PDP lookups under RTNL"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v3] tipc: fix u16 MTU truncation in media and bearer
- MTU validation
-To: "Cen Zhang (Microsoft)" <blbllhy@gmail.com>, jmaloy@redhat.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org
-Cc: netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
- linux-kernel@vger.kernel.org, tung.quang.nguyen@est.tech,
- AutonomousCodeSecurity@microsoft.com, tgopinath@linux.microsoft.com,
- kys@microsoft.com
-References: <20260708180212.2898-1-blbllhy@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260708180212.2898-1-blbllhy@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Message-Id: <20260708-gtp-rtnl-v1-1-218091f171bc@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAKyeTmoC/x3MQQqAMAwAwa9IzgaiSKt+RTyIxhqQKG2RQvHvF
+ o8Dy2YI7IUDjFUGz48EubSgqStYj0Udo2zF0FJryFKPLt7oo55I1mw0GNvx3kDJb8+7pH81gXJ
+ E5RRhft8PecCyXGQAAAA=
+X-Change-ID: 20260708-gtp-rtnl-076d09674ef1
+To: Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Harald Welte <laforge@gnumonks.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: osmocom-net-gprs@lists.osmocom.org, netdev@vger.kernel.org, 
+ Simon Horman <horms@kernel.org>
+X-Mailer: b4 0.14.2
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-305967-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:blbllhy@gmail.com,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:tung.quang.nguyen@est.tech,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_TO(0.00)[gmail.com,redhat.com,davemloft.net,google.com,kernel.org];
-	FORGED_SENDER(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-305966-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:laforge@gnumonks.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:osmocom-net-gprs@lists.osmocom.org,m:netdev@vger.kernel.org,m:horms@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A0FAF729C14
+X-Rspamd-Queue-Id: EF3BB729C4E
 
-On 08/07/2026 19:02, Cen Zhang (Microsoft) wrote:
-> Both TIPC_NL_MEDIA_SET and TIPC_NL_BEARER_SET accept user-supplied
-> MTU values but only enforce a minimum bound, not a maximum. When a user
-> sets the MTU to a value exceeding U16_MAX (65535), it passes validation
-> but is silently truncated when assigned to u16 fields l->mtu and
-> l->advertised_mtu in tipc_link_create(). Values like 65536 (0x10000)
-> truncate to 0, causing a division by zero in tipc_link_set_queue_limits()
-> which computes TIPC_MAX_PUBL / (l->mtu / ITEM_SIZE). Other overflowing
-> values (e.g. 65537-131071) produce small incorrect MTU values, resulting
-> in link malfunction behaviors.
-> 
-> Crash stack (triggered as unprivileged user via user namespace):
-> 
->    tipc_link_set_queue_limits  net/tipc/link.c:2531
->    tipc_link_create            net/tipc/link.c:520
->    tipc_node_check_dest        net/tipc/node.c:1279
->    tipc_disc_rcv               net/tipc/discover.c:252
->    tipc_rcv                    net/tipc/node.c:2129
->    tipc_udp_recv               net/tipc/udp_media.c:392
-> 
-> Two independent paths lack the upper bound check:
-> 1. tipc_udp_mtu_bad() -- called from __tipc_nl_media_set() (MEDIA_SET)
-> 2. inline check in __tipc_nl_bearer_set() at bearer.c:1160 (BEARER_SET)
-> 
-> Fix both by rejecting MTU values above U16_MAX.
-> 
-> Fixes: 901271e0403a ("tipc: implement configuration of UDP media MTU")
-> Reported-by: AutonomousCodeSecurity@microsoft.com
-> Closes: https://lore.kernel.org/all/CAB8m9WgETt0AjmFwE=F-CKjGXsK6_WDv0=kbYRcC8-noo+amnA@mail.gmail.com
-> Signed-off-by: Cen Zhang (Microsoft) <blbllhy@gmail.com>
-> ---
-> v3: Use nla_policy check to limit MTU max value as suggested by Vadim
-> v2: Solved format issue
-> Link: https://lore.kernel.org/all/CAB8m9WgETt0AjmFwE=F-CKjGXsK6_WDv0=kbYRcC8-noo+amnA@mail.gmail.com
-> 
->   net/tipc/netlink.c | 6 +++++-
->   1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/tipc/netlink.c b/net/tipc/netlink.c
-> index 8336a9664703..1307dd1a9613 100644
-> --- a/net/tipc/netlink.c
-> +++ b/net/tipc/netlink.c
-> @@ -113,12 +113,16 @@ const struct nla_policy tipc_nl_node_policy[TIPC_NLA_NODE_MAX + 1] = {
->   };
->   
->   /* Properties valid for media, bearer and link */
-> +static const struct netlink_range_validation tipc_nl_mtu_range = {
-> +	.max = U16_MAX,
-> +};
-> +
->   const struct nla_policy tipc_nl_prop_policy[TIPC_NLA_PROP_MAX + 1] = {
->   	[TIPC_NLA_PROP_UNSPEC]		= { .type = NLA_UNSPEC },
->   	[TIPC_NLA_PROP_PRIO]		= { .type = NLA_U32 },
->   	[TIPC_NLA_PROP_TOL]		= { .type = NLA_U32 },
->   	[TIPC_NLA_PROP_WIN]		= { .type = NLA_U32 },
-> -	[TIPC_NLA_PROP_MTU]		= { .type = NLA_U32 },
-> +	[TIPC_NLA_PROP_MTU]		= NLA_POLICY_FULL_RANGE(NLA_U32, &tipc_nl_mtu_range),
+This reverts commit 0be5c3f0fbef3679f50f345b9237b8f9ea5de4e9.
 
-netlink_range_validation with only .max range doesn't look great, there
-is simply NLA_POLICY_MAX() macro.
+Commit 0be5c3f0fbef ("gtp: annotate PDP lookups under RTNL") added a
+lockdep_rtnl_is_held condition to hlist_for_each_rcu() loops to help
+insure that RTNL is held.
 
-if you really want to use range check you can technically set .min to
-TIPC_MIN_BEARER_MTU, but you still have to have both checks for min mtu
-as there is unavoidable encap overhead...
+Unfortunately, as pointed out by Pablo Neira Ayuso, the PDP context list
+is actually protected by the genetlink mutex. And so the condition
+is incorrect.
 
->   	[TIPC_NLA_PROP_BROADCAST]	= { .type = NLA_U32 },
->   	[TIPC_NLA_PROP_BROADCAST_RATIO]	= { .type = NLA_U32 }
->   };
+Compile tested only.
+
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+ drivers/net/gtp.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
+index 4ad9528322c45c4511a2cde02d3ca7c8faea3758..a60ef32b35b8255a17bed3fbc6ce19f26b3ba3a8 100644
+--- a/drivers/net/gtp.c
++++ b/drivers/net/gtp.c
+@@ -151,8 +151,7 @@ static struct pdp_ctx *gtp0_pdp_find(struct gtp_dev *gtp, u64 tid, u16 family)
+ 
+ 	head = &gtp->tid_hash[gtp0_hashfn(tid) % gtp->hash_size];
+ 
+-	hlist_for_each_entry_rcu(pdp, head, hlist_tid,
+-				 lockdep_rtnl_is_held()) {
++	hlist_for_each_entry_rcu(pdp, head, hlist_tid) {
+ 		if (pdp->af == family &&
+ 		    pdp->gtp_version == GTP_V0 &&
+ 		    pdp->u.v0.tid == tid)
+@@ -169,8 +168,7 @@ static struct pdp_ctx *gtp1_pdp_find(struct gtp_dev *gtp, u32 tid, u16 family)
+ 
+ 	head = &gtp->tid_hash[gtp1u_hashfn(tid) % gtp->hash_size];
+ 
+-	hlist_for_each_entry_rcu(pdp, head, hlist_tid,
+-				 lockdep_rtnl_is_held()) {
++	hlist_for_each_entry_rcu(pdp, head, hlist_tid) {
+ 		if (pdp->af == family &&
+ 		    pdp->gtp_version == GTP_V1 &&
+ 		    pdp->u.v1.i_tei == tid)
+@@ -187,8 +185,7 @@ static struct pdp_ctx *ipv4_pdp_find(struct gtp_dev *gtp, __be32 ms_addr)
+ 
+ 	head = &gtp->addr_hash[ipv4_hashfn(ms_addr) % gtp->hash_size];
+ 
+-	hlist_for_each_entry_rcu(pdp, head, hlist_addr,
+-				 lockdep_rtnl_is_held()) {
++	hlist_for_each_entry_rcu(pdp, head, hlist_addr) {
+ 		if (pdp->af == AF_INET &&
+ 		    pdp->ms.addr.s_addr == ms_addr)
+ 			return pdp;
+@@ -223,8 +220,7 @@ static struct pdp_ctx *ipv6_pdp_find(struct gtp_dev *gtp,
+ 
+ 	head = &gtp->addr_hash[ipv6_hashfn(ms_addr) % gtp->hash_size];
+ 
+-	hlist_for_each_entry_rcu(pdp, head, hlist_addr,
+-				 lockdep_rtnl_is_held()) {
++	hlist_for_each_entry_rcu(pdp, head, hlist_addr) {
+ 		if (pdp->af == AF_INET6 &&
+ 		    ipv6_pdp_addr_equal(&pdp->ms.addr6, ms_addr))
+ 			return pdp;
+
+
 
 
