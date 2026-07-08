@@ -1,195 +1,155 @@
-Return-Path: <netdev+bounces-305815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305816-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Es6gInlQTmp5KgIAu9opvQ
-	(envelope-from <netdev+bounces-305815-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:28:25 +0200
+	id MpD6J1VRTmqhKgIAu9opvQ
+	(envelope-from <netdev+bounces-305816-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:32:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 880F3726CAB
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:28:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF046726D27
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:32:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=GZ8n7awj;
-	dmarc=pass (policy=reject) header.from=google.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305815-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305815-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="gq/dzTHH";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305816-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305816-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D123F3006027
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 13:25:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BBB7C302D95C
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 13:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3DB733ADB9;
-	Wed,  8 Jul 2026 13:25:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 468D4340418;
+	Wed,  8 Jul 2026 13:28:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32EC62868AB
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 13:25:01 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783517102; cv=pass; b=fpMjMajnSIUndP95M6Nmx+YGRxrBUy0IwHaMPiUyTcNqtfU8VYvPqzFDkF5mMAv44J2qj0iHHWGbMp6J5yVcdHRTcRnb/Kf37DcpCpk7nYZ3osoPTG44AgPMs84parQ7wjkaqhJQSYAJNaVMNuqi5XnHP4wvSlDPBflmt+5CIkk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783517102; c=relaxed/simple;
-	bh=CW2i7fo0pWIUPuJSiYHXQ2V4W+okSr4LfTOZ+koLDdY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lZZCkFZAHvOSPT5151obUEhUQ149VLGspFgB5XYG3wZ4aIEZDlGea8vkUuvAXreZGIan3Qks8VdMHppzoTcYQj/CIWVZ3NPWBPS4jsQuyIL7okyAI/QBJ90FymGgWQS48ktikHLYZPiv7jr7LtPFtpRY0PtXLglr+ASHS75vaOg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GZ8n7awj; arc=pass smtp.client-ip=209.85.160.175
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-51c167c58f2so3822561cf.0
-        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 06:25:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783517100; cv=none;
-        d=google.com; s=arc-20260327;
-        b=GU+k3D3QNDy0NjHrZ2pSUVjjtYKP2e6dNati70mvgayYfY3tAJ7sHPqFOmMNSSEffn
-         WkGTe6h/SA1vqwnZ4wXH74E3Lk2BnKLTIRRO81Kpza8p6+28iTkogbGxybFGHS9l5UKH
-         C24aV2FTDOtyRzp5jzsRaF8MJbK2CL9UH/sPo+ALqxlQ9Z+0ooDsrUzqE10+d1Qy8qK1
-         xiZ8hK2bNzAiWAazARUM6a8ekwOZSeZ+zPigY6q8bVCnhZvFL2ZRjknLuZHwZp4wLycd
-         NoeeqmpWFtBgxaIVaW5iAhtCG8RACsA+TTYlwX8jpax4Cp1BtAbWSBE/J9nYYH8nTK0y
-         GmKw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ch/nUQqu3dJxazOvqEujUD4Z4+uKmVKQLrbRPqE0hIs=;
-        fh=KlCWNeHHciiIOIPDvc2pL5b8Zbp+7TkW6+2+7qELYP4=;
-        b=Op2R3UxzX8ar0MoL9UXCWnzPFYsqnfRqJr2ckUkZelK+uxOYtGJ6GE7NhOLSVhCJwV
-         eRM3clHXY9lCupucUXbFVTCZTWjWlWS28GRk6Np/VHymEQ6yHgN6sqoT45n2EIYEs8va
-         wAPbIRasVtpYBnd2UI8Qauv6b+7/D90l8hwfLAEYRnsTMElZNRnaScgZTjUc3K3XT3PO
-         hau9e+hg5EdgRPvf4SbvBo45u7e4Bin+xXcQpI8Pi59eZQH3G+uSTyiaFbbjnfHcwho/
-         k00RK3jMeq6vSM6jdFBIgW0fjVA4KD2jgW6WXVRsjfWjbmvm6J5CLNONkv3iiRXybno7
-         P1QA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783517100; x=1784121900; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=ch/nUQqu3dJxazOvqEujUD4Z4+uKmVKQLrbRPqE0hIs=;
-        b=GZ8n7awjMzB04UoG09oQMNyWWIz4nWXHJ9Hej6cp/C6P7sD7isP05neQtdp57GiBQZ
-         S0xYz9k7XCp2GRghCuTbrZhChLY3SKNEentjLb4Fnm7Gj3YSIuMRs4G7PZiOJp4RdMt8
-         cLM+E5VqXe88jc9q+ZHZ144qFJSQWlIcrMzGIOOe7hjaUlgaz7Xk2wxVgLaglsUwjCfJ
-         mEDPfLN9EbD8IobQUeO9cumYK209ookg+8PQnV7Qdd4VFp3mNkCnuyj+HWj5Wf7LpkAY
-         3svQv6mlZIctHpRe2szfzMxYsn8H6YnVkfu+L0g37WCwfN1F73CLfbQTSjrLQcaiyoLw
-         w8ZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783517100; x=1784121900;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ch/nUQqu3dJxazOvqEujUD4Z4+uKmVKQLrbRPqE0hIs=;
-        b=CiG9IvK3245SQLmjQ1CdubgP2TaI7J3/9dO/HGKVl4R3a6YIzeygFxKueBH1+L0fHA
-         DaHh3VYHI3jSIY8Gy5o3L9MdNVbtE++PLdvjiZqjEYqv5cM0EqsdivyoP5J7niOMs1pq
-         3lj4H7GcImxpZDcO7ylR32TxyF8DanYRRsWGDOWGGHKCi4nwmP/dnzj49HTzF/XSk0Rw
-         q6Sem0bKSQyhONuMRqBUZQC7wM3ySpL19iX2xX7osKhOWRkGZ2SAo+oUlsWJncAWVl8P
-         Au7OobLIkrxNqt69/jkXXzRXp4q9xAJ17llc1p4Qmm3EyfwEq3O2QmGdb5i4sPMXa9Aj
-         YsAw==
-X-Gm-Message-State: AOJu0YxGSnpymD+h16HTsbK17Sc0+z4nGCCmWzpDXOpGNWvToydJLO6D
-	dxvJo8lsXQ323Ym2XZKRT/OCpAlsZn1KmZrZtllR6jWCtmZFvbnM+OG705Q6Jw6PoGJ3WWP1oG0
-	tlIJrbbJgY8Y+io5OPJ2BfH/N8bCDZIsbMxneeKjO/4LL+OZfPgvbjYAgfeE=
-X-Gm-Gg: AfdE7ckmMiWvG/AMWo88GGQQkjKxgE/WmeboWGkqhN4sTMjIweBjjX+qMRNm+pSYfJV
-	PZS/nCZFOLylD3fjABPvEHGgpBAI6kuynNuIqQRIwQIkAS11JncqOHZhYSoDYewYwE2js/13HAw
-	UW7cM81tN5PJ7YVE7DSa33u7OYUo7IBp3T6b1mKNhe2Muq8FRyzh0qlgbOBkC8WYdqSR3CjnFZT
-	2wxQ8WszY6Wnq1DnZUVasUhRl7BLk0FySRYbobXboz/17uR/7/voIdZRBZRQ4ReSdepxTM+bLnL
-	aAEZbOylRqrAfoCW0caoKT6ekUAHQkp0kt05+R5SMRBGb1SU3fueZgGV4MnEka3yg2UY/9xR9NA
-	oLXhNUqg=
-X-Received: by 2002:a05:622a:28b:b0:517:9003:e1a with SMTP id
- d75a77b69052e-51c8b2dcc60mr26600651cf.21.1783517099505; Wed, 08 Jul 2026
- 06:24:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B676F33F591;
+	Wed,  8 Jul 2026 13:28:00 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783517283; cv=none; b=NmslI3uw5VItdsyn8mb1DfSM4g7zilOu9V85zlCpz6I7LzxBxqKDayBCWalEv4/P3AhV6GXFWiTONB9IdEznUzZcf//oMXgfnvD7uN6dyhNVHjvsTuRsZjdg7oh0uXZTwN8O2DVssRpWsLXyK/xb1hqi7ng8lYO+pW1IszE9dXM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783517283; c=relaxed/simple;
+	bh=QJ95qpiXZBu+4cDMaEogfSFwkcealgcdhFrXZnWHJGw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DqXWxefu+jzSrf+i+BrtAirD3yJl1sayXS47Xd3BB7Wii++RMn2SXl45BEmDXButrODF3B0KwF1OLv7Ak7L3/bVKkqE5zDILTz2wljNXYPUkvEgWPAe04tapXM1HxDgf0EwEqsYSzery3YHNYDFIeMSb8r6amhuGo3lLfhDZHkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gq/dzTHH; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CD841F000E9;
+	Wed,  8 Jul 2026 13:27:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783517279;
+	bh=JZznSW1QxIA8YchHXYmBD7rqYjeBEHt8iCwtpCrWKE8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=gq/dzTHHIPOEXl71Cphk3JscbEHk9Wo5plPjKBq+bmWbIWK56ZMHaxIrTY3KFY+HQ
+	 A1X6ZaAvKvBP98O74jcXyYY1Jt17sg8z4ahhyBZ4hBhGUvrx3QnsUatXAl0GvrY2mA
+	 BQf1+UYkt3LNEoOJEM5TKj9Yytsovd6h5eND+lOXK70SSQp/hlpBIIeP8jBz0DTn/K
+	 bLJ5UDpxgmx4+LBs1R25AYDzr28o8DwJAlBFiH4+Tpe6HcMfRVhys5r4+jkmqXQj+d
+	 jlcBzXBiitML/4/D1WNM/YlayTkznXQR0XwkZw4evyIWfphPLUZmYlJF0mYzNB5+Cx
+	 JW+BxXzgtWlzQ==
+Message-ID: <529e3997-d26f-4d8e-ad90-3329fe90e555@kernel.org>
+Date: Wed, 8 Jul 2026 22:27:54 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260708123933.1303291-1-idosch@nvidia.com>
-In-Reply-To: <20260708123933.1303291-1-idosch@nvidia.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 8 Jul 2026 15:24:48 +0200
-X-Gm-Features: AVVi8Ce34S2-Vb-buoutlV6ioNGoI5aiFjFLLp7OHBokposEbGcnDFi3bVn_x-I
-Message-ID: <CANn89i+VjCxn=ymHOps34LZwg0wpn-Xd-=C5pLxuv9_O9uvJUw@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/3] mlxsw: Make the driver ops-locked
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, petrm@nvidia.com, andrew+netdev@lunn.ch
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3] net: skb: isolate skb data area allocations
+ into a separate bucket
+To: Pedro Falcato <pfalcato@suse.de>, Paolo Abeni <pabeni@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Jason Xing <kerneljasonxing@gmail.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+ Kees Cook <kees@kernel.org>, linux-mm@kvack.org,
+ Vlastimil Babka <vbabka@kernel.org>
+References: <20260702170728.168755-1-pfalcato@suse.de>
+ <04debe19-bbe8-4b5f-9668-753d1f97832d@redhat.com>
+ <ak4w2k4Woj55E0On@pedro-suse>
+Content-Language: en-US
+From: Harry Yoo <harry@kernel.org>
+In-Reply-To: <ak4w2k4Woj55E0On@pedro-suse>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305815-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305816-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:idosch@nvidia.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:petrm@nvidia.com,m:andrew+netdev@lunn.ch,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:pfalcato@suse.de,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:horms@kernel.org,m:kerneljasonxing@gmail.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-hardening@vger.kernel.org,m:kees@kernel.org,m:linux-mm@kvack.org,m:vbabka@kernel.org,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[harry@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,gmail.com,vger.kernel.org,kvack.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[harry@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 880F3726CAB
+X-Rspamd-Queue-Id: DF046726D27
 
-On Wed, Jul 8, 2026 at 2:41=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> wro=
-te:
->
-> Make the driver ops-locked in order to allow ethtool operations to be
-> invoked without RTNL being held.
->
-> An ops-locked driver has most of its NDOs, all of its ethtool operations
-> and some net device notifications run with the netdev instance lock
-> held.
->
-> In the specific case of mlxsw, the driver is not using any functions
-> that acquire this lock nor functions that expect the lock to be held for
-> an ops-locked driver. Therefore, converting its NDOs to run with the
-> lock being held is trivial except for a small quirk which is handled in
-> patch #1.
->
-> The driver does not generate any net device notifications, so there is
-> no risk of nested notifications of the ops-locked types. For the
-> notifications that run under the instance lock, RTNL is also held, and
-> the driver does not acquire the instance lock itself, so no changes are
-> required in its notifier handling.
->
-> Ethtool operations can be invoked without RTNL except for two operations
-> that are annotated in patch #2.
->
-> Lastly, patch #3 converts the driver to be ops-locked.
->
-> A probe on rtnl_lock() shows it is no longer taken when dumping
-> statistics:
->
->  # perf probe --add rtnl_lock
->
-> Before:
->
->  # perf stat -e probe:rtnl_lock -- ethtool -S swp1 --all-groups
->  [...]
->                   1      probe:rtnl_lock
->
-> After:
->
->  # perf stat -e probe:rtnl_lock -- ethtool -S swp1 --all-groups
->  [...]
->                   0      probe:rtnl_lock
->
 
-We probably want to add noinline_for_tracing to rtnl_lock() and friends...
+
+On 7/8/26 8:16 PM, Pedro Falcato wrote:
+> On Wed, Jul 08, 2026 at 10:30:50AM +0200, Paolo Abeni wrote:
+>> On 7/2/26 7:07 PM, Pedro Falcato wrote:> @@ -586,6 +586,8 @@ struct
+>> sk_buff *napi_build_skb(void *data, unsigned int frag_size)
+>>>  }
+>>>  EXPORT_SYMBOL(napi_build_skb);
+>>>  
+>>> +static kmem_buckets *skb_data_buckets __ro_after_init;
+>>> +
+>>>  static void *kmalloc_pfmemalloc(size_t obj_size, gfp_t flags, int node)
+>>>  {
+>>>  	if (!gfp_pfmemalloc_allowed(flags))
+>>> @@ -593,7 +595,8 @@ static void *kmalloc_pfmemalloc(size_t obj_size, gfp_t flags, int node)
+>>>  	if (!obj_size)
+>>>  		return kmem_cache_alloc_node(net_hotdata.skb_small_head_cache,
+>>>  					     flags, node);
+>>> -	return kmalloc_node_track_caller(obj_size, flags, node);
+>>> +	return kmem_buckets_alloc_node_track_caller(skb_data_buckets, obj_size,
+>>> +						    flags, node);
+>>
+>> Sashiko noted that some drivers may require GFP_DMA buckets, and the
+>> above may break them:
+>>
+>> https://sashiko.dev/#/patchset/20260702170728.168755-1-pfalcato%40suse.de
+> 
+> Oh, this is really awkward. Adding linux-mm and slab maintainers for input here.
+> 
+> Considering the current slab bucketing does not seem to duplicate DMA or
+> CGROUP caches, could it make sense to duplicate those as well?
+
+Could we specify what kmalloc types the user needs when creating
+kmem_buckets and duplicate caches for the requested kmalloc types only?
+
+> Otherwise we could add a branch like:
+>
+> if (gfp_flags & __GFP_DMA)
+> 	/* use the global dma kmalloc caches */
+
+-- 
+Cheers,
+Harry / Hyeonggon
 
