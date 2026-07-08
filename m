@@ -1,267 +1,231 @@
-Return-Path: <netdev+bounces-305979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305980-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id n/haJ2iyTmpYSgIAu9opvQ
-	(envelope-from <netdev+bounces-305979-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 22:26:16 +0200
+	id XRBbMXW0TmrlSgIAu9opvQ
+	(envelope-from <netdev+bounces-305980-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 22:35:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7FC572A310
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 22:26:15 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14A5072A3B4
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 22:35:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b="Nx8Dr/ya";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305979-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305979-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=verdict.gg header.s=sig1 header.b="BA/ERtkc";
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305980-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305980-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D63B4300DF4A
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 20:24:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2D176301519F
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 20:34:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AF903876B8;
-	Wed,  8 Jul 2026 20:24:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C0AB3E0C4D;
+	Wed,  8 Jul 2026 20:34:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outbound.qs.icloud.com (qs-2004a-snip4-11.eps.apple.com [57.103.84.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C07FC439320
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 20:24:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD5F03E00BD
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 20:34:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783542266; cv=none; b=s7thu65s+Atwjd/JaO7i6HevsINc0GpFRJxwoNtVuFcobkCn3WbW4J76V5Mnyz/Dyk1TE9Iry94pgigLRKAxE64NMmIgG3sQk1JhPGvvsukYMYQUWmAdIfel5r7DEVduVj7rev3E68IIdXySt8FNatOwMbir7iGHyB2l3oO2Bis=
+	t=1783542895; cv=none; b=pUW2z+4xs1FoENsFkh5NcnDvYz4a0NTE4sAUcUZb//B9EQaVxYuUYiTjB2i+pG9HS3W8kBVW9X28vnoGTNrLtqizinbMImhBuwaPI5Sq7j+h0op0eBjv9njuKSwKcm5Jjl9UOLXHkQCRFDOjxrcnNnULQEI6g7WdUusdKVEqu1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783542266; c=relaxed/simple;
-	bh=TXXbCYEXpC+9kfz5SYw/H/+O5UyHxNvVsZaiufM/gfc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=saVPgHy4+cxPUqrbTomWIhOsVtvzr4uZJ5srEoutz6V2jtDSFuU0g45vQuNWtTxE4jRyBIDg+LHKD9zJs8xxj+meu5URt2hW++Ml774CeiRMeTIlL7Jn3TRnGHjdH1FvZSMz4R7flaiZ1mSEG6KMATsHFHJB/i+HRf03FuwwnS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nx8Dr/ya; arc=none smtp.client-ip=209.85.128.43
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-493c52cde9eso1478685e9.3
-        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 13:24:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783542263; x=1784147063; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=7Hqm+SrTRL+/Dklgpg/R/6ZCv3REs66MksaYhdwdmzU=;
-        b=Nx8Dr/yaRyePKQXOircY3Q9LMIG9zAKBVGsn6XvlqPf12gzwh26mQ57kMmx69AQ3R9
-         d2qDjMPa7kMTeNz28ZPQec2WUhIVUR74fI3+watgu+xB+oog1H+347Ld4jyQqx7fkY4n
-         LNgSCpX3GeqQ1Xj/IIqGBYbBw9Dvnvxv/0VRlVuAV+WjZNpgEHU83dq0NAXE77Wsa20A
-         5lwiltGCMZmgiOw2GjACWq9TW7AOLoGngQ8wWGxoyvPNzXl3TLxaLzF65xRScEmrH/85
-         kstVBblOVXOm3SlBPgFJvnCFMMsanxVYg/WUXbfE1pbq7SHewKFMcT8y216R01jt6LeR
-         9wkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783542263; x=1784147063;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=7Hqm+SrTRL+/Dklgpg/R/6ZCv3REs66MksaYhdwdmzU=;
-        b=gH0W0ruFimWZZBhUGcz7meCm3mrHZZzDQk+fcYkG1szhPppOUC/GWR5ItqM787Rri/
-         bt/1XkfCDEd+At21It/OAp+aHk/50RKT1iRCKUWPC4vg0/UsesOoUTginut+2tm235DQ
-         N6wAoCG/9rYg5V63X2ML1D5oSgSs/hCizKJjXFYcNZOBOEsVrlQ5OdD14nzQLzqnE5bG
-         ln7oZK4ODeeFIdm9fVzToYbpfX4YemXKJpn6/G296f+r+PN67Js4IajHHyCGm/1omDcu
-         ED4DTs+yX4gRt6fXWbhY/ZMC4+wv0zNMaKwR15gpMnh+Id4vAuJ8YRplSk6m+DxuvEbJ
-         EpSQ==
-X-Forwarded-Encrypted: i=1; AHgh+RrGhmNHR90ldJ4SXIiLe+pJtAHBoz7jqsESb4+S3f2gqzAuTaa5ogJDDloFG5667UUAarsO4+4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxduSsl5dRn39MiEpCtTFcigE9Vrd4gmD6UDD6DLzq4EFNNgEgI
-	IRRnhhMeNp9iOisAMLk08qHOmH7s6e0UfIN3zZkxMp13yhDuH/FmRgJz
-X-Gm-Gg: AfdE7ckltdWNfIorHMJxk+ovt75J0KaeqoUs+UFz9lxTItpKTUVbLU2R0xta15+9OlI
-	zh0RR+fK38QVzFOvt4/B5Q/H0Q1shJfxAo+VZpBLQ3BFcZmes4G8Vr42tu6CvmsWMf9gIM0nw3P
-	I5C+B3INuE7oqX3VcF64vKVR6XSAz9n1rIZ4dSOucHopgfTrVGiZUyDnPpv9WsUHX1ZTjUG8pU6
-	NUmM/6kP0N5XGTojVj6rQ7hoAsvLorLgqepyVUqG7jtbhAzlFf8ofSKC026x+Gz5nHVMZcpewq1
-	9E153Fs/DQt4Gci/DHJwE15gOsYcceAVE4Y13USjA4pJe6jnHoKXKP/qNITAmZidPtF5VeyBezw
-	IRnbiE8LaDZJg+1exWKAxpUk1qc0443RuumLyG4hCSyrqww2DghWmoB0Z0R9j2kq8zq1ATwVLMZ
-	+p8IoGLvz9YMA580BYDztypdn402k7c3r0zPy6u3lo
-X-Received: by 2002:a05:600d:8445:20b0:493:cd3f:d097 with SMTP id 5b1f17b1804b1-493e68a0f7bmr32761835e9.12.1783542262863;
-        Wed, 08 Jul 2026 13:24:22 -0700 (PDT)
-Received: from archlinux ([143.58.204.65])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493eb6df417sm4407995e9.8.2026.07.08.13.24.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2026 13:24:22 -0700 (PDT)
-Date: Wed, 8 Jul 2026 21:24:20 +0100
-From: Andre Carvalho <asantostc@gmail.com>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Breno Leitao <leitao@debian.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v11 7/7] selftests: netconsole: validate target
- resume
-Message-ID: <ak6jtwbct3C5lZPA@archlinux>
-References: <20260118-netcons-retrigger-v11-0-4de36aebcf48@gmail.com>
- <20260118-netcons-retrigger-v11-7-4de36aebcf48@gmail.com>
- <f398373e-2cb4-4649-a491-9763df94d98b@kernel.org>
+	s=arc-20240116; t=1783542895; c=relaxed/simple;
+	bh=cKTqWKNeQpYFZKRzLGP3mK0x+DHNGDCBTEI86dwWR+8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AZixV/0yG5/ND6mSyd7HRzFJHrY3huwNuopZ0B8gQB2lqLubTcRzazCrGhgNp5TSMKZvk/TMfPtyETAcT2lrNTmXq39P7RdEb1DkzJiDGjaPWFYp6eat+SyIHnzpgdaeRbfwpJcfNzsQIVkDkwhhsGp3j/v4+DCLWXpmGVGdtVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg; spf=pass smtp.mailfrom=verdict.gg; dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b=BA/ERtkc; arc=none smtp.client-ip=57.103.84.13
+Received: from outbound.qs.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-east-2d-10-percent-0 (Postfix) with ESMTPS id AAF11300009E;
+	Wed, 08 Jul 2026 20:34:44 +0000 (UTC)
+X-ICL-RepId: 019f4370-a882-708d-a5d5-81ada2bf8718
+X-ICL-Out-Info: HUtFAUMHWwJACUgBTUQeDx5WFlZNRAJCTQhICkMGWQJeCEABQwVdEhVdRVcIWwJAEVc4RQhFD1sTTVZUChcNVk1PHUEJXghGXl4fEx9UVgFDGRBWAVhWXQVNGlwYWQ8cAUpWWg5bBEcUFxtcABcbRgIEIwJfAEUCXglWATAXD1ZNTx1BCV4IRl5eHxMAXg8PTAtIAVsHXAJIC0gAWQZbHEQMSQFcGlofFFwUWh9WBXIGXApXBFQfHBdeRhMZThtXTVoNQBlYBm0UVhVSBFk=
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verdict.gg; s=sig1; t=1783542889; x=1786134889; bh=vYoBJPpO2uL4VVlcC7jV1/CXwJbaRqJ4IBmz5iXbOPY=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=BA/ERtkciXMZdtqVL0IC3V5YrhWuOAuBDAEJHzjaZDvZchl4xVw1RkKMK8PIc5xKpuGqd/uKKmNcJzjSOrmZUYE8twb473mfaINObZcVWk84hoDdpTaIhF4l71NUUbZ7KNWecgQkcO7lIQhRHN/8bTmYb9ZJFXQkA4rrGZWwtyKct/wqO3luq8el0QS5TOnlW8A+HuK/xVHuiWzHDdIOobE0HiDdC4lBynQpnqpixjnU6/zK483FvoBnE7QIhhi2H313U+AMUXzbrVdj7kc3ojx3jKkaeeC+dZ4qMM0hvRh/y0cbZwwGW2LVpMdd0xYz/6cuWz/a1SGQldHC1LPfUg==
+mail-alias-created-date: 1621344842221
+Received: from DelNac.mail.msk (unknown [17.57.155.37])
+	by p00-icloudmta-asmtp-us-east-2d-10-percent-0 (Postfix) with ESMTPSA id 59B9B300110C;
+	Wed, 08 Jul 2026 20:34:37 +0000 (UTC)
+From: Vladimir Vdovin <deliran@verdict.gg>
+To: Lorenzo Bianconi <lorenzo@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: Jakub Sitnicki <jakub@cloudflare.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kselftest@vger.kernel.org,
+	Vladimir Vdovin <deliran@verdict.gg>
+Subject: [PATCH bpf-next v4 0/6] Add the capability to load HW RX checksum in eBPF programs
+Date: Wed,  8 Jul 2026 23:34:04 +0300
+Message-ID: <20260708203410.45121-1-deliran@verdict.gg>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f398373e-2cb4-4649-a491-9763df94d98b@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-ORIG-GUID: zQNJaRqpKCjpeW_8rRYGsYSRCFrT5GZ0
+X-Proofpoint-GUID: zQNJaRqpKCjpeW_8rRYGsYSRCFrT5GZ0
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA4MDIwMiBTYWx0ZWRfX9zezX2Lhrufp
+ JjcrUWu/fiGOYri9228fif3ZL5UFWsHAyW2yPCtM5nktzM0kbacRld5p7G55OUi02SwgJvZxjaV
+ MHbc3uZad2dJ/4Kc78WXPZFfv4dUqA/wGw0kQtX3OoKX1UJnoW8ovhy3NLFMItV5jrxLk6h8lBw
+ w6GBtsUDJepJ3NmXWb1z8GtG+cdc9eLol5GqEsidmhlYpG/keEdOq5RvsDTfCJ8p/EHa+GFzzvT
+ 9E3UdJAkriVJ4HNebPWvQ8d0hlOP2+IyLt0YwD10zi2/3K5CzJqInJfLHI2/v+T4FJ9r7gto5KM
+ Mc3j51gPg8/YGpavaEh
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[verdict.gg:s=sig1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305979-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[33];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[asantostc@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:matttbe@kernel.org,m:leitao@debian.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:shuah@kernel.org,m:horms@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-305980-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:donald.hunter@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:andrew+netdev@lunn.ch,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:aleksander.lobakin@intel.com,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:kpsingh@kernel.org,m:haoluo@google.com,m:jolsa@kernel.org,m:shuah@kernel.org,m:maciej.fijalkowski@intel.com,m:jakub@cloudflare.com,m:aleksandr.loktionov@intel.com,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:linux-kselftest@vger.kernel.org,m:deliran@verdict.gg,m:donaldhunter@gmail.com,m:johnfastabend@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DMARC_NA(0.00)[verdict.gg];
+	FORGED_SENDER(0.00)[deliran@verdict.gg,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_TO(0.00)[kernel.org,gmail.com,davemloft.net,google.com,redhat.com,iogearbox.net,fomichev.me,lunn.ch,intel.com,linux.dev];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[asantostc@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[deliran@verdict.gg,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[verdict.gg:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,archlinux:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,cloudflare.com:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E7FC572A310
+X-Rspamd-Queue-Id: 14A5072A3B4
 
-Hello Matthieu,
+Introduce bpf_xdp_metadata_rx_checksum() kfunc in order to load the HW
+RX checksum results in the eBPF program bound to the NIC.
+Implement xmo_rx_checksum callback for veth and ice drivers.
 
-On Wed, Jul 08, 2026 at 05:50:53PM +0200, Matthieu Baerts wrote:
-> 
-> > +function trigger_reactivation() {
-> > +	# Add back low level module
-> > +	modprobe netdevsim
-> > +	# Recreate namespace and two interfaces
-> > +	set_network
-> > +	# Restore MACs
-> > +	ip netns exec "${NAMESPACE}" ip link set "${DSTIF}" \
-> > +		address "${SAVED_DSTMAC}"
-> > +	if [ "${BINDMODE}" == "mac" ]; then
-> > +		ip link set dev "${SRCIF}" down
-> > +		ip link set dev "${SRCIF}" address "${SAVED_SRCMAC}"
-> > +		# Rename device in order to trigger target resume, as initial
-> > +		# when device was recreated it didn't have correct mac address.
-> > +		ip link set dev "${SRCIF}" name "${TARGET}"
-> 
-> When I execute the test, the "ifname" bind mode works without issues,
-> but the "mac" one not. From what I see, the socat process doesn't get
-> any UDP packet when expected. I wonder if the problem might not come
-> from here: the interface is disabled before changing the MAC address and
-> renaming the interface, but not re-enabled at the end. Is it normal?
+If the hardware detects a wrong/failed checksum, it will report
+CHECKSUM_NONE in the packet metadata. Moreover, CHECKSUM_NONE will be
+returned even if the NIC can't parse the packet (e.g. if it does not
+support a specific protocol). A possible use case for
+bpf_xdp_metadata_rx_checksum() would be to implement a XDP DDoS
+application [1] combining the info from bpf_xdp_metadata_rx_checksum()
+and bpf_xdp_metadata_rx_hash() kfuncs in order to filter packets with a
+wrong/failed checksum.
 
-Yes, the expectation is that the target would be automatically re-enabled by
-netconsole. That is why we don't 'up' the interface here explicitly.
+This is a repost of Lorenzo's series, rebased on top of net-next, with
+a new drv-net selftest for the RX checksum metadata added on top of it,
+as Lorenzo suggested [2].
 
-The problem is that the test has an implict dependency on interface mac address
-changing when we recreate them, which is why we have to do this whole down/update/rename
-flow to trigger the reactivation in this case.
+A note on the new selftest semantics: for traffic with a correct
+checksum the test requires a usable verdict (CHECKSUM_UNNECESSARY
+and/or CHECKSUM_COMPLETE) but reports SKIP on CHECKSUM_NONE, since the
+API allows devices that do not verify the packets (e.g. veth reports
+NONE for locally generated CHECKSUM_PARTIAL traffic). For corrupted
+packets it only asserts that CHECKSUM_UNNECESSARY is not set, as
+CHECKSUM_COMPLETE legitimately carries the raw checksum of bad packets
+too.
 
-> If I add 'up' at the end of this last line here, or if I remove the
-> whole if-statement block, the test passes.
+[1] https://blog.cloudflare.com/unimog-cloudflares-edge-load-balancer/
+[2] https://lore.kernel.org/r/ak5ox296M46FAcWX@lore-desk
 
-For cases where the mac is persistent (e.g with systemd MACAddressPolicy=persistent),
-the actual re-enablement should "just work", which I suspect is why it works when
-you remove the whole if-statement block.
+---
+Changes in v4:
+- Report ip_summed as a bitmask of XDP_CHECKSUM_* values and return the
+  hw checksum and the checksum level via dedicated
+  bpf_xdp_metadata_rx_checksum() arguments
+- Rebase on top of net-next
+- Add a drv-net selftest for the XDP RX checksum metadata
+- Link to v3: https://lore.kernel.org/r/20260217-bpf-xdp-meta-rxcksum-v3-0-30024c50ba71@kernel.org
 
-I think to make the test more robust to such scenarios, we should skip the
-if-statement block when we detect that the interface came back with the same mac
-as previously. Something like this:
+Changes in v3:
+- Remove leftover assignment from v2 in veth_xdp_rx_checksum()
+- Fix typos
+- Fix commit logs
+- Link to v2: https://lore.kernel.org/r/20260213-bpf-xdp-meta-rxcksum-v2-0-a82c4802afbe@kernel.org
 
-if [ "${BINDMODE}" == "mac" ]; then
-	CURR_SRCMAC=$(mac_get "${SRCIF}")
-	if [ "${CURR_SRCMAC}" == "${SAVED_SRCMAC}" ]; then
-		# Interface came back with same mac, no need to restore
-		return
-	fi
-	ip link set dev "${SRCIF}" down
-	ip link set dev "${SRCIF}" address "${SAVED_SRCMAC}"
-	# Rename device in order to trigger target resume, as initial
-	# when device was recreated it didn't have correct mac address.
-	ip link set dev "${SRCIF}" name "${TARGET}"
-fi
+Changes in v2:
+- Remove XDP_CHECKSUM_PARTIAL definition
+- Improve veth_xdp_rx_checksum() callback
+- Fix uninitialized case for cksum_meta in ice_get_rx_csum()
+- Fix sparse warnings in ice driver
+- Fix typos
+- Link to v1: https://lore.kernel.org/r/20260210-bpf-xdp-meta-rxcksum-v1-0-e5d55caa0541@kernel.org
 
-Could you confirm if this fixes the selftest in your environment?
+Changes in v1:
+- Rebase on top of bpf-next
+- Test ice driver using xdp_hw_metadata tool available in the bpf
+  kernel selftest
+- Improve cover letter with an use-case for
+  bpf_xdp_metadata_rx_checksum()
+- Link to RFC v2: https://lore.kernel.org/r/20250925-bpf-xdp-meta-rxcksum-v2-0-6b3fe987ce91@kernel.org
 
-> The "network logging resumed on interface" seems to suggest that the
-> previous patch of this series here, commit 220dbe3c76ed ("netconsole:
-> resume previously deactivated target"), managed to resume the previously
-> activated target, but not in my case.
+change-id: 20250925-bpf-xdp-meta-rxcksum-900685e2909d
 
-Thanks for including the logs, this helps quite a bit and I think confirms that
-the interface comes back with the same mac address as previously, and is indeed
-resumed, I believe the down/update/rename portion of the test then drops the target
-and causes the failure.
+Lorenzo Bianconi (5):
+  netlink: specs: Add XDP RX checksum capability to XDP metadata specs
+  net: veth: Add xmo_rx_checksum callback to veth driver
+  net: ice: Add xmo_rx_checksum callback
+  selftests/bpf: Add selftest support for bpf_xdp_metadata_rx_checksum
+  selftests/bpf: Add bpf_xdp_metadata_rx_checksum support to
+    xdp_hw_metadat prog
 
-> What I don't understand is why is it working on the Netdev CI, and not
-> on my side. The main difference is that I might be missing some
-> userspace packages -- but I don't see what can be missing here, all
-> other netconsole tests pass -- a specific kernel config, or not applied
-> patch. Or something different on the host -- in a container on my side
-> -- but there shouldn't be any interactions with the host here,
-> everything is happening in the VM. Any ideas? :)
+Vladimir Vdovin (1):
+  selftests: drv-net: add XDP RX checksum metadata tests
 
-Netdev CI executes with MACAddressPolicy=none (which is why I added the if-statement
-block [1]) and I think it might explain the behaviour difference.
+ Documentation/netlink/specs/netdev.yaml       |   5 +
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 123 ++++++++++++------
+ drivers/net/veth.c                            |  32 +++++
+ include/net/xdp.h                             |  18 +++
+ include/uapi/linux/netdev.h                   |   3 +
+ net/core/xdp.c                                |  32 +++++
+ tools/include/uapi/linux/netdev.h             |   3 +
+ .../selftests/bpf/prog_tests/xdp_metadata.c   |   9 ++
+ .../selftests/bpf/progs/xdp_hw_metadata.c     |   7 +
+ .../selftests/bpf/progs/xdp_metadata.c        |   2 +
+ tools/testing/selftests/bpf/xdp_hw_metadata.c |  31 +++++
+ tools/testing/selftests/bpf/xdp_metadata.h    |  13 ++
+ .../selftests/drivers/net/hw/xdp_metadata.py  | 110 ++++++++++++++++
+ .../selftests/net/lib/xdp_metadata.bpf.c      | 112 ++++++++++++++--
+ 14 files changed, 445 insertions(+), 55 deletions(-)
 
-> 
-> > +	echo "Running with bind mode: ${BINDMODE}" >&2
-> > +	# Set current loglevel to KERN_INFO(6), and default to KERN_NOTICE(5)
-> > +	echo "6 5" > /proc/sys/kernel/printk
-> 
-> Can we remove this? Without that, it is hard to understand what went
-> wrong in case of issues.
 
-Can you elaborate? This is typical for netconsole tests and I think required to
-ensure the write will show up on netconsole. I'm not opposed to changing it if
-there is a reason, but we probably want to make it consistent with other tests too.
-
-> > +	# Send the message
-> > +	echo "${MSG}: ${TARGET}" > /dev/kmsg
-> > +	# Wait until socat saves the file to disk
-> > +	busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
-> 
-> In my case, the script was stopping here, without any message. I can
-> send a patch adding "|| true" to go to the next instruction, and display
-> "FAIL: File was not generated.".
-> 
-
-This seems reasonable to me.
-
-> > +	# Make sure the message was received in the dst part
-> > +	# and exit
-> > +	validate_msg "${OUTPUT_FILE}"
-> > +
-> > +	# kill socat in case it is still running
-> > +	pkill_socat
-> > +	# Cleanup & unload the module
-> > +	cleanup
-> > +
-> > +	echo "${BINDMODE} : Test passed" >&2
-> > +done
-> > +
-> > +trap - EXIT
-> > +exit "${EXIT_STATUS}"
-> > 
-> 
-> Cheers,
-> Matt
-
-[1] https://lore.kernel.org/all/20260117092227.741cba3b@kernel.org/
-
+base-commit: 08030ddb87b4c6c6a2c03c82731b5e188f02f5b9
 -- 
-Andre Carvalho
+2.47.0
+
 
