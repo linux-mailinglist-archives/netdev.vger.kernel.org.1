@@ -1,195 +1,158 @@
-Return-Path: <netdev+bounces-305805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305806-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id AT9vBWxKTmoiKQIAu9opvQ
-	(envelope-from <netdev+bounces-305805-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:02:36 +0200
+	id Dm0JLIxKTmouKQIAu9opvQ
+	(envelope-from <netdev+bounces-305806-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:03:08 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A77372691E
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:02:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C029572694A
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:03:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=TgoZy0kS;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305805-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305805-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=suse.com header.s=google header.b=Xb3DIokC;
+	dmarc=pass (policy=quarantine) header.from=suse.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305806-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305806-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DAA4F30478ED
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 12:57:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6B9353049964
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 12:57:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C98F4657D6;
-	Wed,  8 Jul 2026 12:57:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F07A14611FC;
+	Wed,  8 Jul 2026 12:57:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA8B426ECA
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 12:57:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2D444A730
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 12:57:45 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783515461; cv=none; b=hlOjyqY25W1JDp7CN5M1V/28Nk/qbiM6h6eepnPHMYDmLJM8PuW7/DfbnyLU5+/3EwUjqMa54sIgX/sGNiGvLQ9eWGF7WJSASMv8rBdxfrN82lfNcsfmuMhZBX1OI2fTXxCEtDLT66I1anlMduFACjHtVKVOkG9Ep2Fm37NT9zI=
+	t=1783515466; cv=none; b=Adz8xSV+JaMVA1/VJhMMG/YYME6llK6L+fl8/N6tCehaUkej95U3a52WMoM+i/8+lCR+OFeEk3BFifF11U0whBcLlaFIusU9cZ8wMCStHVJJIqnzpQ5+HtGFFGx/z3rl6G/yzA8HRbl30as5GTZ5Ia2ML1HkOYT4NvVEarccoMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783515461; c=relaxed/simple;
-	bh=15UnY4fxkitLRe+qzCjT/HKM8t0y+iriTCIS1A+AqSw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ff23fmu7aj/KUb2J2cCImxgH9oitlK9z9tefdAIbpgbegpbGQhWEM8HA7z8LOz/jZAk1nFmUsXi2DcyXAjDodheWw5qgaX/RKFnAnNzeNh5Ad4EXJvQ3CegH32gCVX1Pq41uD97hxGGfJaW2+I+7pTyArsDPamSpvXHxMZ+RmrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TgoZy0kS; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45F481F000E9;
-	Wed,  8 Jul 2026 12:57:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783515459;
-	bh=qRWldEfKotFz0RFdvk3K7yQLwFVfCSqWSdZVW6pQ84g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=TgoZy0kS3bz79fZjR9pb0xVWBZcQ38mOq5nUZTlP1W5U7hHHvwuUMWxW/RteOsLR6
-	 vheU6GNS9szCoKdTolmTKXZy4MZr3JRDAt4bbyWMdIPFdR7Iq1/ubyLY6z6mymZ8cb
-	 4sZelPFPMfAwghJQ1QNXlLKwPgKs3Q+Z8HFdXo1CkTrrtbCp5ieCmiPIieyQNTk9AQ
-	 FCD2REueExEfHu0hgQ4uXjNRnKdYKJ6E8uY0pdxPkCRP+8K1M4DEVEIwGupeJEKf2y
-	 OqzaHPxKmpCOi+hje6tEswt6x9HOHJCG+KJBPN1EzmotWRjqA4f6yasvNAUZxNFoSa
-	 nJzuJJGTVhj9g==
-Date: Wed, 8 Jul 2026 14:57:37 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Wayen Yan <win847@gmail.com>
-Cc: netdev@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
-	kuba@kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
-	angelogioacchino.delregno@collabora.com, matthias.bgg@gmail.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net] net: airoha: Fix DMA direction for NPU mailbox buffer
-Message-ID: <ak5JQZwD2D4ogWw3@lore-desk>
-References: <178351055214.98729.11403147818632027428@gmail.com>
+	s=arc-20240116; t=1783515466; c=relaxed/simple;
+	bh=p2sBG0EfGLaH6Y35Jnfm7LcczjHmXVGXkFdF7AVbxLU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oMSEec8yorUPNx0dNgNtKcXEe/rtiMeyZc96SZ45pxpOi8QtA6ysrNnrMQx+J/z/0iqJMoXzbgQmonwpfS80UcsNnwbSEPzQTU1snBOQIBWpxtlVZKZ+ufQKaw+hPtLCFQUjki8vit5HOecZSfXhTj5K1VmpWH/GAN9Nld4Supc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Xb3DIokC; arc=none smtp.client-ip=209.85.128.45
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-493e4ccccc2so4735485e9.2
+        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 05:57:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1783515464; x=1784120264; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=kbuub7RzesYOSTnZvhaXlscpLtvQ6nHc+kPlYrOavVg=;
+        b=Xb3DIokCVEoZjy106BwrJ3Z5yfUa2cIug9ZiCqG94L3m8f7q2TrHicUCO7NDxs9aCq
+         mvxewvrBWJ4jMBELHJ7HIURK+jUnLsq9W/TN/Auat3HiII7R117KprUi5MUOJQeJEJEh
+         LPeHTfjOeYljyZ70NMHAsyN7o8GQiAjVysZn1YgjoWkm7cdXkBwQuKAo7pXC609etF3a
+         iqprVQzj/rPZXGLoaFzvTRPttUWEvl0sSsEaQVEFt4U+63hkeaADz01w7OidQqk0fUOF
+         Z3GYO2kPeP41kdo4OgM03+Wkid20p1ERnc+URU3bDy1OBAPHI/jh/+jBGCTA9P2lBfnB
+         QfdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783515464; x=1784120264;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=kbuub7RzesYOSTnZvhaXlscpLtvQ6nHc+kPlYrOavVg=;
+        b=Qy0K3BT4X2L9cDFMsnA1KAyHZgeAR/TAwp/nXCpu7cFpu9zEev2i9GT8vPSUdcHOEL
+         K/KeQwluXzpr3EOMaIHyOrXVoGmz9gWjoYo8FEO68TtvrhXaqUuK7n8mYex/eR/VdFEb
+         ctA6IM017zuNkIal0U414aJJqls5d6sKSBDmAkylbUlfHgfXVK730DlZGBb6cbxsHQUA
+         0TznXeqR+83vYn5qveu7u/ctyiW9f/QJUF+86FNeSNRFYU19YIfmE+Uj6Zw/ENpvX5cW
+         tJF+EzLn0Dim7ABL8NiC2dlRAedV22BlTn+ZvNRgzvJL6GcpNPuRXzNnCeVRXuLYvpke
+         NNhg==
+X-Gm-Message-State: AOJu0YwvJVScyXGvF9G1blx2ZnICBPgwNtwnSLo5lAd4FYjernQRhBPA
+	0fJcbJgfUtmV/zILQCIeSXjUgtw8Wok1MNsZS2Q2QF/UG5mVEqz6eY6J89KylQ5CTAw=
+X-Gm-Gg: AfdE7cm0nqrxO3UmLcrIBUHidUz7mxDN1OAv6Wd43jQjuX36ZIytYtgh2CF22FSxGu8
+	I3Z0PoATNGBxtDO24HUZNhLw1QFNWTy9VpKyi6w7p277LyacvPMVJtWII/+CbwF7+v6HorHuJdX
+	GNm0ilCnhgkC/2ZE6oDtA0loKJeLp06BD6ylHqqWrVZPwkkdcXOcazXP+yFHJf8yOtr5/Ts01g+
+	B7DpyxTj3gwA7mwmG1ie7yWw4MDiwDYu4wJ6pwhFpljgqP29QPhBEMP50xS0sJYtJS6cULECELW
+	lOjxgxJP2m2kOmcv39eKrgYBY1b9wFDC6X7t0CyCl/ELeQAJNdBCNjIBezsn9nEzYwEQRY1Cdes
+	Lr5ROhZPD/jhrVf7Za2Kx7XYyGP73Bnq16j60Ois2KyIRMVWv1lCE/i4itYu114hx8JhP8TmswH
+	U2qDeoPIsz6EHkd55XtwzbN+aeE0+//65Ph8ceUPrafUKVB82XoNDC8MuW
+X-Received: by 2002:a05:600c:34ce:b0:492:4911:8a with SMTP id 5b1f17b1804b1-493e68bfa4emr25852455e9.12.1783515463922;
+        Wed, 08 Jul 2026 05:57:43 -0700 (PDT)
+Received: from ?IPV6:2001:a61:1384:9d01:1a30:62e0:878c:ea70? ([2001:a61:1384:9d01:1a30:62e0:878c:ea70])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493e544837dsm51934925e9.0.2026.07.08.05.57.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Jul 2026 05:57:43 -0700 (PDT)
+Message-ID: <2a0bacab-951a-48b2-8263-bad3088a29b7@suse.com>
+Date: Wed, 8 Jul 2026 14:57:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="fqtiECgthKw6C3p6"
-Content-Disposition: inline
-In-Reply-To: <178351055214.98729.11403147818632027428@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 04/12] net: mctp: usb: Improve IN endpoint
+ status handling
+To: Jeremy Kerr <jk@codeconstruct.com.au>,
+ Matt Johnston <matt@codeconstruct.com.au>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org
+References: <20260708-dev-mctp-usb-1-1-v3-0-9e710155cdbf@codeconstruct.com.au>
+ <20260708-dev-mctp-usb-1-1-v3-4-9e710155cdbf@codeconstruct.com.au>
+Content-Language: en-US
+From: Oliver Neukum <oneukum@suse.com>
+In-Reply-To: <20260708-dev-mctp-usb-1-1-v3-4-9e710155cdbf@codeconstruct.com.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.26 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305805-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:win847@gmail.com,m:netdev@vger.kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:angelogioacchino.delregno@collabora.com,m:matthias.bgg@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,google.com,lunn.ch,collabora.com,gmail.com,lists.infradead.org];
+	DKIM_TRACE(0.00)[suse.com:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[oneukum@suse.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305806-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:jk@codeconstruct.com.au,m:matt@codeconstruct.com.au,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:gregkh@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-usb@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[oneukum@suse.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7A77372691E
+X-Rspamd-Queue-Id: C029572694A
 
+On 08.07.26 11:58, Jeremy Kerr wrote:
 
---fqtiECgthKw6C3p6
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-> airoha_npu_send_msg() always maps the mailbox buffer with DMA_TO_DEVICE,
-> but some callers expect the NPU to write response data back into the
-> same buffer:
->=20
-> - airoha_npu_wlan_msg_get() (NPU_OP_GET): NPU writes response into
->   the buffer, then the caller reads it via memcpy()
-> - airoha_npu_ppe_stats_setup() (NPU_OP_SET): NPU writes back
->   npu_stats_addr field in the response
->=20
-> On non-cache-coherent architectures like EN7581 (Cortex-A53 without
-> hardware cache coherency for NPU DMA), DMA_TO_DEVICE unmap is a no-op
-> =E2=80=94 it does not invalidate the CPU cache. If the NPU-written cache =
-line
-> is still present in the CPU cache when the caller reads the buffer,
-> the CPU observes stale data instead of the NPU response.
->=20
-> This is a timing-sensitive bug: small mailbox buffers (~24 bytes)
-> typically fit in a single cache line and may survive in the cache
-> until the caller reads them, producing silent data corruption rather
-> than a crash. The bug is more likely to trigger when the caller reads
-> the response immediately after dma_unmap_single() without intervening
-> cache-evicting operations.
->=20
-> Fix by using DMA_BIDIRECTIONAL for both map and unmap, which ensures
-> dma_unmap_single() invalidates the CPU cache on non-coherent systems.
-> The mailbox buffers are small so there is no performance concern.
+> @@ -198,6 +254,8 @@ static int mctp_usb_open(struct net_device *dev)
+>   	struct mctp_usb *mctp_usb = netdev_priv(dev);
+>   
+>   	WRITE_ONCE(mctp_usb->rx_stopped, false);
+> +	mctp_usb->clear_halt = false;
+> +	mctp_usb->in_err_count = 0;
 
-Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
+What allows the assumption that mctp_usb_open() does not race
+with error handling? What happens if the device is still stalled?
+It seems to me that you need to wait for the halt to be cleared.
 
->=20
-> Fixes: c52918744ee1e49cea86622a2633b9782446428f ("net: airoha: npu: Move =
-memory allocation in airoha_npu_send_msg() caller")
-> Signed-off-by: Wayen Yan <win847@gmail.com>
-> ---
->  drivers/net/ethernet/airoha/airoha_npu.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/ether=
-net/airoha/airoha_npu.c
-> index 870d61fdd9c6..b679bed952de 100644
-> --- a/drivers/net/ethernet/airoha/airoha_npu.c
-> +++ b/drivers/net/ethernet/airoha/airoha_npu.c
-> @@ -168,7 +168,7 @@ static int airoha_npu_send_msg(struct airoha_npu *npu=
-, int func_id,
->  	dma_addr_t dma_addr;
->  	int ret;
-> =20
-> -	dma_addr =3D dma_map_single(npu->dev, p, size, DMA_TO_DEVICE);
-> +	dma_addr =3D dma_map_single(npu->dev, p, size, DMA_BIDIRECTIONAL);
->  	ret =3D dma_mapping_error(npu->dev, dma_addr);
->  	if (ret)
->  		return ret;
-> @@ -191,7 +191,7 @@ static int airoha_npu_send_msg(struct airoha_npu *npu=
-, int func_id,
-> =20
->  	spin_unlock_bh(&npu->cores[core].lock);
-> =20
-> -	dma_unmap_single(npu->dev, dma_addr, size, DMA_TO_DEVICE);
-> +	dma_unmap_single(npu->dev, dma_addr, size, DMA_BIDIRECTIONAL);
-> =20
->  	return ret;
->  }
-> --=20
-> 2.51.0
->=20
->=20
+	Regards
+		Oliver
 
---fqtiECgthKw6C3p6
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCak5JQQAKCRA6cBh0uS2t
-rEkuAQDBR2AU7po/548CG9jgOQ4FrFUOWREXpwLycau0KwabmgEAoT0GbuBjIF0v
-B0mV4hsyWdRr1ux3Q6bkcxszl+YIfwg=
-=TO0g
------END PGP SIGNATURE-----
-
---fqtiECgthKw6C3p6--
 
