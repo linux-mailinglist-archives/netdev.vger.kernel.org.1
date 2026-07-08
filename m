@@ -1,187 +1,289 @@
-Return-Path: <netdev+bounces-305894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305895-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mYXtGOp8TmoFNwIAu9opvQ
-	(envelope-from <netdev+bounces-305894-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:38:02 +0200
+	id EPPRIpCATmr6NwIAu9opvQ
+	(envelope-from <netdev+bounces-305895-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:53:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 016E3728CBD
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:38:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2969D728EB4
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:53:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amd.com header.s=selector1 header.b=ge0H6sGt;
+	dkim=pass header.d=amd.com header.s=selector1 header.b=MPj0Biya;
 	dmarc=pass (policy=quarantine) header.from=amd.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305894-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305894-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305895-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305895-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2F4C3300AB22
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 16:37:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2E54A302658B
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 16:41:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C38C7401A3A;
-	Wed,  8 Jul 2026 16:37:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 985AC437115;
+	Wed,  8 Jul 2026 16:41:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010001.outbound.protection.outlook.com [52.101.56.1])
+Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011065.outbound.protection.outlook.com [40.107.208.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6166B37206E
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 16:37:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9F434B1A6;
+	Wed,  8 Jul 2026 16:41:53 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783528678; cv=fail; b=ejGwzDSHkr8+1KskFurnAaOsh4/xN9mvjez2u6AL75MPgumM0imXHbUtXKZW9s6B7HtBgKpkxzF3pkm0K2/2ghQxeuiY87WFM3vbl4+AahCBE6/9j/yB+L2KnAF+ec9Ln1sXFTsqyd+hmsmNFkSFCAQy3KxmXZ95sY+jHDK4xhY=
+	t=1783528916; cv=fail; b=GDC60lXdMK264Zr94wSXF/KUzQXvIUdgxdB50j0jYiLzvWR77pvLO3rHq0dFN5Nv7COHqgPWVC/w6BrINk1KeN7f1AN2KJOZFqPkvS20uXk8VOF7Iz8xXdneBN5cSmHOn/aEUYVyvMxqSmTjHheq64sa3feV7G47zrlslHHl3Fw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783528678; c=relaxed/simple;
-	bh=zKON425vDYh/9cGLAlzgSuAPIXtvAYCkCwfqVvl2VYc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B3TzHib14o1f5wUVohGxNkw2v9D2MVg2Y8/24MjxRNzfwj7sxd1lX2MyIOhKuvNGB0y1H772Vfbqmy5umJ2Z4r24r4/QAXlB14KLL6GIxmOVfDo5+SdmyBvWaTuTKUPCz8QAZPUDRiho+ru0NlDLj8pv41P3zOWUM6AFjGIOczE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ge0H6sGt; arc=fail smtp.client-ip=52.101.56.1
+	s=arc-20240116; t=1783528916; c=relaxed/simple;
+	bh=j6lMCv+KCoVTU6cydrq88aWju8CMqgqFc5HQfAaHlwE=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=jA+XxuFwcmV0M7NpYjmyBxnm+HaEyE3R25RJwoe9vZk5TrxzHAaeUqz2j9PetfupTzad7fwe3odvtgtdIYFtiVXb84UPjt+H1XNoPHdT1/UQb5G4bAmSczfXVwt4vRjZDllfyphaWcduBwctXvTgPINTtDEiJZgSxxUt3ts15fA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=MPj0Biya; arc=fail smtp.client-ip=40.107.208.65
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Zv0ksu1nYd6VSk7EHdKHC3YZf3HAVcW3Qdq7nTLp3dyyjh2cCPayDu6sN0wY6PbXN9EiC2BOFjAOjed1UrQ7cd8Btu+IwfcxjXwP05M0Nco/ViyVlw/5ydoMKQMZikCd8MaMX591unWUU2jEexP8//BkgJ85CcXN3QIFZhc3L6eTWlKoFPXlmxfdr65R4vPUj5bVUGpCSpL9GuTnbhGIHxFE/K8wjCJ3iPG4/9cgDjtxMlg7IsGp9UInxoNpXJNPC14ai7WI7DOWsCiuWaEVvhIXfsdRAGAO3zokZH+wtm1gSV4YtDKzLLNHK0xYomO7RsDZzOz3cBmdFu3+MD8vdw==
+ b=iEfaPllRile8kwtY1FcJ2YnS0f6VpS4eSJhBU9Mm+eS3UsY1ahwGsMBlbHwPUHGuHZjEQ+VjOlRrW+U0I9UtX+kNuVor5vJ4usrwMK8YvUWPqgZyc2Z8pZyAXoiZz5c8V9n6zC5LcbqBZ9IqLfYBKeUjy7kf3lAtGHZ0xYIWVYO2627sCIe0z91zOcpCm2ekjtmpBYGh1fhAcgprLc1xiRI8DqIfFYptCdih+b9vpaEOLgLUHT9s1jF8ySrJTAVuYi2ALC594OM/5UIWUBkxqghFA57DPSmOw0p48BYPknrh7p0f3uBJYGXNigAuMNQK7/ATb3gIwOw6lOSna58MDQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KFKPPOAIrAhPdtAFW9q5Twaj5hLTqgv/4uybEJonud4=;
- b=IwebSOmJzjTJ3pOiCRHUdk/U+KwK1vgqw8Q1dvYjvdV5/zFXQStwikfnAjYP27cZ6g/QDB4yHP8zVQFTyFs1lCu056yjogypb2hDo1ZS0wanw0NOK8mre0kqxo8BykNaueMlaD9XVFnNEHtCgZQ1VEEjZlgsrXN2HJYgoNQAT/RlO2SaC6ZdRgyvAjAPUEGI1uhWDsMEt/xCKN5vtD14vSq4cRcR8ocq0GhYiwZKslZDu2maZeoxnDxC6A7fzglsrtgbNRkszH8eTx5LVKM1oJJegz7I8rtZt2hts1GGCkWbewPJf2+v4NpHfQpJ3KUfbWD/SfQG1+vuuEMM6y9WYw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
+ bh=UrRcme4Xu7HcdW1rgtXQTdpDClxqOklL7lNizxZWOD0=;
+ b=ezf/Hzyc1UBm/6/cR0DDWYJNIywp+x4vERlcXWorfbOVtRdOIGMMldLDNdLYp8b8SAvAJOBR4X6T5+9XHWFOvEbaYGYgsnF2E/QC5FqsYf0ZBNdFxzZvl8MH8bNNbNAIe2GTnGl9XppK0JHJdvoVXiiCSQ6GqEEBXCR5npmA88Fh1L2pxiUA9y95CQ/+tajRqH5ELrvR7SayMpBf5BA/4Au47KWm96ayAE5xqdnyWHtNXytUsNrtmMMCdfMEg/krH0B9dMQdXXj1BKIu02lTFj/4r80V+sOK+5+ap1dFonKNixmfkJZEFWBgsCTy4j+K7YKXkgHjzZVdvUS+5Lt6PA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KFKPPOAIrAhPdtAFW9q5Twaj5hLTqgv/4uybEJonud4=;
- b=ge0H6sGtOgSACxiuFTZ+vH0Fu4eZHeI0n1Z+rOjjgmRZAZm6a5PhVzun9oAxMC/SyH9XPMESGfoxdrL7F72yghbQWa5Yoc1e0OfTqYQYZt7N584tXMtn/5G1uhZzZ7O4UTMnzZA/41WZRfgKeoZ45Z6OKEgOftRQPoPwOoD1jbE=
-Received: from SJ0PR03CA0276.namprd03.prod.outlook.com (2603:10b6:a03:39e::11)
- by PH0PR12MB8097.namprd12.prod.outlook.com (2603:10b6:510:295::18) with
+ bh=UrRcme4Xu7HcdW1rgtXQTdpDClxqOklL7lNizxZWOD0=;
+ b=MPj0BiyaLsjH8G5mW+FCVOFrNMScggl++BK2et68gP2NBTx8QaFUZnYnmNKCNt9gEe7U1/Pja005jCgazWcN8/j3qXfMiDmCmUZmO5suyuD9OHz1TWH+KszIXBv/BOeODFjWPUREo53Z4Z2Z9DH4FpVTBmGPu7a8f3SOT/uEHpU=
+Received: from CY1PR12MB9697.namprd12.prod.outlook.com (2603:10b6:930:107::6)
+ by PH8PR12MB6868.namprd12.prod.outlook.com (2603:10b6:510:1cb::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.10; Wed, 8 Jul
- 2026 16:37:49 +0000
-Received: from SJ1PEPF00001CE1.namprd05.prod.outlook.com
- (2603:10b6:a03:39e:cafe::12) by SJ0PR03CA0276.outlook.office365.com
- (2603:10b6:a03:39e::11) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.181.11 via Frontend Transport; Wed, 8
- Jul 2026 16:37:49 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- SJ1PEPF00001CE1.mail.protection.outlook.com (10.167.242.9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.181.6 via Frontend Transport; Wed, 8 Jul 2026 16:37:49 +0000
-Received: from amd.rund-run.pensando.io (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Wed, 8 Jul
- 2026 11:37:48 -0500
-From: "Nikhil P. Rao" <nikhil.rao@amd.com>
-To: <netdev@vger.kernel.org>
-CC: <kuba@kernel.org>, <brett.creeley@amd.com>, <eric.joyner@amd.com>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, "Nikhil P. Rao" <nikhil.rao@amd.com>
-Subject: [PATCH net] pds_core: reject component parameter in legacy firmware update
-Date: Wed, 8 Jul 2026 16:36:49 +0000
-Message-ID: <20260708163649.128620-1-nikhil.rao@amd.com>
-X-Mailer: git-send-email 2.43.0
+ 2026 16:41:39 +0000
+Received: from CY1PR12MB9697.namprd12.prod.outlook.com
+ ([fe80::3a41:55a0:8203:596d]) by CY1PR12MB9697.namprd12.prod.outlook.com
+ ([fe80::3a41:55a0:8203:596d%5]) with mapi id 15.21.0181.010; Wed, 8 Jul 2026
+ 16:41:39 +0000
+Message-ID: <9983ea6e-105b-4c3e-86f0-5667159d89dd@amd.com>
+Date: Wed, 8 Jul 2026 22:11:28 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V3 3/4] net: xilinx: axienet: Derive RX frame length from
+ DMA residue
+To: Srinivas Neeli <srinivas.neeli@amd.com>, Vinod Koul <vkoul@kernel.org>,
+ Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
+Cc: Frank Li <Frank.Li@kernel.org>, Michal Simek <michal.simek@amd.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Suraj Gupta <suraj.gupta2@amd.com>, Marek Vasut <marex@nabladev.com>,
+ Tomi Valkeinen <tomi.valkeinen@ideasonboard.com>,
+ Alex Bereza <alex@bereza.email>,
+ Folker Schwesinger <dev@folker-schwesinger.de>, dmaengine@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, git@amd.com
+References: <20260708100652.603074-1-srinivas.neeli@amd.com>
+ <20260708100652.603074-4-srinivas.neeli@amd.com>
+Content-Language: en-US
+From: "Pandey, Radhey Shyam" <radheys@amd.com>
+In-Reply-To: <20260708100652.603074-4-srinivas.neeli@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MA0PR01CA0018.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a01:80::18) To CY1PR12MB9697.namprd12.prod.outlook.com
+ (2603:10b6:930:107::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE1:EE_|PH0PR12MB8097:EE_
-X-MS-Office365-Filtering-Correlation-Id: d9b69403-2d63-4937-3113-08dedd0f3f8e
+X-MS-TrafficTypeDiagnostic: CY1PR12MB9697:EE_|PH8PR12MB6868:EE_
+X-MS-Office365-Filtering-Correlation-Id: 05806e3e-fc93-4ac9-6fe0-08dedd0fc88c
+X-LD-Processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700016|1800799024|23010399003|376014|18002099003|56012099006|11063799006;
+	BCL:0;ARA:13230040|23010399003|1800799024|366016|376014|7416014|18002099003|22082099003|4143699003|56012099006|11063799006|6133799003|3023799007;
 X-Microsoft-Antispam-Message-Info:
-	1mwvw10em9qxIdVbr7Ngp+L2148SstplJx9sdvAkFkv2CoScs006AF6Zz86aH5X/LPoUIk529B1QZtd4l6YF5cyjgzo3qOwjMytq+sfMvAZdBTs42HR36mDSImtVv3ItTZEZCUFCtBzsabNkpspMVaho9whms46KJIMsvSZEogAG56lMgHEGmKegxfaxb3mExg+YOFt1FB3VWwONnGc9iRcE36TwdB10ToNYWufdWJT6xYcd6OcDkF6P8yFqTHlP87tmrUqAIzuAtX3fHzx6DYZv9FPv+0FaYkeocJfHeF9kSqCV3nY5oKYpi2bXdkfAMBHuttEplRix+p96jL7EqElCS4z7NnN190SYCe1wePQ925WB/8fxou2LLAxdIG5AmJKSg0tiClzPEYiOBz66eW7iKILORvEL3j2o5p/iy5vTPDiuLMkYxFlYYj8imJmReXFGL/FFjr/IJObpYF5fiPEMv1oV3mPzkO+pE+Na/IpQLjeWLDrPEVV98o/zI9MMISwpA/vxYMpGH1PGC3wolFfj6RhE7it4cUGbYJzdipRSfe5fXMrbli2seQkMkxq+lZhL1/YMweB98pv8+3k4AUhDrQPDGtfE7/nj/e+wFrjHUlgeqkcOGZHwftvtw5jqAhaaVXzGdyCtiBU2/fEXxtRovnywRU5/NQMCdOG+A7G1Lm/j6yISniCFinGiXLEoEA+AtLZe9yk6G/fDw+KgtA==
+	lTxLks72hIfw7rFteYUxHGRj1Wow+qkWnJeMyClqUuOw63DpivYUEfRM1bCmN2oPNf7u6fVWCs6EYFakGsCS0hhGQyhfhwQBIww2ud886iNmkmWxQhh74VFXd3XmEhi8jN9ygivbTw7/lhUqb4wC7yShkMVIX1njxb9ao5AsFeAEpL5s9Ic3nkoXERWv11KMpsi4LvLtkwf1VL5aqOiyKP92utrneh0AS0bvYlN35X8JZyLAdxvAIYqy7ZStOgZFo2VzHt2TXAWiTEUuAwotchti5QCTDrGXuSqfTvwyKEE4Iri7NvdFZYw4yLuBcToArG6Srj41ZOokG5Mkn7Xu+rIavGUW5dm3KGAOtpijFoBrk/6VxV+/PIIQQgYVX5eYRS65Cd4dpQfL05E5E4kOyRWwcSx9gRglXl8+QV5IYRn24LMn9/9LPRjmJkOwP5WY/rmwg5AhdpqMRXEv7nZL8OkKRE/pmBZdOSWDJazprgxer++Urw7uRDErfpUZACwm0wvFSCMaJ6Apb8CH545vDPWy9TiSseDlHQfKWLwxpcYonxD2aEuZKkj6SaQb9VKSBFtr3Y9ffwMABLXuDBiWgsccA2nyqZ1gvuCpV2PXXTEaEZ+/Rjmil9IFBBb1K+kKP2fj63++8rVHnqc70FNznk14XM4D7fARlBp4njlQYkw=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(1800799024)(23010399003)(376014)(18002099003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY1PR12MB9697.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(366016)(376014)(7416014)(18002099003)(22082099003)(4143699003)(56012099006)(11063799006)(6133799003)(3023799007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	MvwdtC2j8i6VLM2SYP0Gc7og0hrKQVWw1lj9SVAISsP98jPsW3wIFQX/EOmdfc/Saw1DhvjZOJWjfiTXagIofaN/Neze5QxI6+zZeGjy+KtvEeHvlwmsIVc1LX1Vw6GsW8N1WjtUO/b8lsEt2K8sM8oRl0h37E4XmozB8XTbS8RO5GcrG5uTp17oZmQ0e3ySe4231y5uPRxTjpprYwnDOVxOHknuXJhXHVPUxlCpZpbTk6PnVesZGbkwbyDZXlIb1z11QovPMHswe+zaMuViboZGzjwS25T19on9V4bzz0HWDknC0Aspqb5A1t3snnFL4cVKyaVcOp3OFMpf+szmqQoHGpQjGZLCQURXn8Ld1YMw2qqOIVE1UnYfy6B0NyjctFXyQ6gzcFihw5BrhBKYgjC83IEfzVAv+d17TpeozAp3sKsxL7c8vAFtaRdL/AzC
+	=?utf-8?B?elpxNDRaWWZYQ0pYcGZRNVA2aDFNSWlNbE04TFRDZFpob3duRmtpcVhid2E0?=
+ =?utf-8?B?dUF1Vnl4MUxOeHQ2ckM0UFFab2pnTVhndVkySnBUOXl5ZDZ3eC9HZHBmMGFa?=
+ =?utf-8?B?eHJTbS9pVDFrTG00a2ZaUXVnUTZjbDQvanhBMW5RUHFCeTBycGZtdTRYSHVn?=
+ =?utf-8?B?Q1hVZ3BhdkM1Yzl2NGpWNVV4d3BVS2JzNmQyVG11Z0kvaEhNbys4OG9nWUNQ?=
+ =?utf-8?B?VUlYSDAvbmUzVGp0UUxETnpmeW5LMzJmckpMN0FnaDJwTVVmTE5XNnBZZ1JT?=
+ =?utf-8?B?dm1ZNFZ2WEZKeVJKeDRWcjhIKytVODQ5V0gvajJVM2JhWFp0MWxaa0NaU0cw?=
+ =?utf-8?B?Y2RzU1lna2hnejJRVGpGUTlpbWdoVDRDWEV4ZytEdmdaU3Q0ZlQ1UTRoQlcw?=
+ =?utf-8?B?MlVwdjdERzYxdWZKSTFVM2U1dXRVOEExcEMyeHNpblRrNUZDaTFzemRHKzVY?=
+ =?utf-8?B?ZHZsY0IwdE9HS1VQYlBpWGdwUXdtL0NTOGlTWDJ0MG9hUzNOR2RzUzZoMk5m?=
+ =?utf-8?B?cFVoek5INmpRUjdwWXNDNVZVVFdpNTExODdxNjBYZWFlUDhsdVcySGVLS1pR?=
+ =?utf-8?B?bHpaajYyUVNmMmM2clBMdW83UWJDZmh4REUxR3oyZUJOU0M5UUdLV0FPeVJk?=
+ =?utf-8?B?VDdva2dQeHJXSDFkVG5qcFRjSFdjN1V2M29SUmRLOXVMNTZjRVRMcEYxaHl5?=
+ =?utf-8?B?YjdOSDJ1QzZHVVdUcytDNnVMdWFOM05yTTNFVjFkZUpSKzh1UGxuZ2dzMXhr?=
+ =?utf-8?B?Nk40dmpPb3FZY09ZMXZwTUY0NnVkZnVYSTlnWDRxV3lIQlRsWnFseFgyWmov?=
+ =?utf-8?B?MXJDS3dXSml3Q3MwNUVJQ3gwVEkwTndiUTErdDc5dlQvSDNsejlSWFQ4QVhV?=
+ =?utf-8?B?cUFjZGpEQ0hyenVXVlMzZERXbGhlS1V5TDJvWTFON3UzSW5IS20zRUI2S1pL?=
+ =?utf-8?B?TFo4M0dqK3FKL1ZRZkZQekQ0L2dQeEVXM1M2anorSUJmRzB3WDN0NTlWaHJm?=
+ =?utf-8?B?Z3RzV0crM3RWQU0zSkJIQ2cwelpxcGYvSjlhTDl5Wlhkcm1rbnYxb1Z3ZnlZ?=
+ =?utf-8?B?MkplczJ0d29HcmNZOFpGN2J1QkR0ek5QYTRyQ1grejZFNUVFUXI4SVNzV21J?=
+ =?utf-8?B?RGZuWkJnZnZoQktSck84OXhTLzExR1Q3VWFOaXpyL1N5elAzcDdjVHQ1ZkUr?=
+ =?utf-8?B?eCtjTW5VUFVMSDFQNXBDZ05PNE9WOCtDZFl5RTU5dVVoK1FIdWVmSEh6Undv?=
+ =?utf-8?B?Y3BzWWt4RTVpeUIwaXE4VFpQUGpLRW4rZ0grQ0R3RkpqNUNxbFJocDlmQm9I?=
+ =?utf-8?B?a2N1ZFhCam5YbzZFRjRPY3NyZnFubCtXZllybE4zMHNTOSsxUmZEMUQ0YWxJ?=
+ =?utf-8?B?eE1KRnB0S1ZKelJkMFplVXpISEJJMVNOZFl1SElpYVhPVXhDc3I0Qm9GeXA5?=
+ =?utf-8?B?Ym1rbHVvVlJLRy93RkZBV01DQUUxZkduVU8welIyWlFPVmp0TFR5NnRzTDAy?=
+ =?utf-8?B?aVQySk4vWnA1MmR5Vk5udEFtTzBROWE3LzdlZ3dHM1JzcGp4aStwa21IcVIx?=
+ =?utf-8?B?YW5XdkZXK3JwOTA1QUp3bFB0d0czSHN1akl3SjNsRTFLRWVPVkRCVWJPdndF?=
+ =?utf-8?B?ejlVMnh6ZUhScUQzOW5jUVVPNmNTamJod0lpc01TRlJBbDhEUW1EdlhoblJR?=
+ =?utf-8?B?RS9WdDdTTklVSzJYRUpPMng0UHFlU3NvY2tVaEdvYitHK3Q2UXJuKzRudGJr?=
+ =?utf-8?B?T1g0YitXK2lWc0lBK0lqR0RqZWpFMndBRHZyQUtkVWpESXI2VTlQeHBJdEtr?=
+ =?utf-8?B?OTROTTVZei96QnExTlFrUkhyRzhYVTV3bDJmamZRQ0ZmWGwyTTBGTlVuSm9L?=
+ =?utf-8?B?V1NOT3pPUFI5K2oxYXJsY2g2cTNlWThuUjFFaDljM1Z5ODFJZjBJdWJxY2Fi?=
+ =?utf-8?B?eGtLY09lL29QK1JMZ05JOSs5Y21jcnFyUXRMRTYraldFN1ovOUVscE54azlk?=
+ =?utf-8?B?ZHptYjU4VnAxb2d0bkxqV0tBUVUraGE3dnBvMGxIdlRrMkpXYXRUTTNFeE1U?=
+ =?utf-8?B?ZFZsL2laLzhGdUFDbWpwZy9vTXQ0YmNXWUk4ZFBjWlZVd2g4ZkdKVXZkQTZE?=
+ =?utf-8?B?Z2QwVC8zY28zVTB0Z1BsQndhU0dVcXQ5cGpUMEhHUmxoU1h6clVncHVQNndh?=
+ =?utf-8?B?N3k4Yld2dSs2Q292YWZ6Z1FDSytLK3BtQUE4bkk1VWZhdmZ5RUZIcVhFelJI?=
+ =?utf-8?B?dTZVN2U1V3dkWHg5bkNtckN4ZUhDdytvWXlVTnVuUk03Szk0emtoOE5wWnlR?=
+ =?utf-8?B?dUE2M3B0TUl3d09KMXJoR01NaGhJbWZ6eTdlWEZrTkJuS1I5ZWdRUT09?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2026 16:37:49.2701
+X-MS-Exchange-CrossTenant-Network-Message-Id: 05806e3e-fc93-4ac9-6fe0-08dedd0fc88c
+X-MS-Exchange-CrossTenant-AuthSource: CY1PR12MB9697.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2026 16:41:39.3515
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d9b69403-2d63-4937-3113-08dedd0f3f8e
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CE1.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8097
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dw2U0ya9ySfisbJ/UtE/fSBliYUuvOD2EjlucOUyiRhrnAMoVRZHdvWaHAxlawLr
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6868
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	TAGGED_FROM(0.00)[bounces-305895-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-305894-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:srinivas.neeli@amd.com,m:vkoul@kernel.org,m:radhey.shyam.pandey@amd.com,m:Frank.Li@kernel.org,m:michal.simek@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:suraj.gupta2@amd.com,m:marex@nabladev.com,m:tomi.valkeinen@ideasonboard.com,m:alex@bereza.email,m:dev@folker-schwesinger.de,m:dmaengine@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:git@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[radheys@amd.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:kuba@kernel.org,m:brett.creeley@amd.com,m:eric.joyner@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:nikhil.rao@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[radheys@amd.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[amd.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:from_mime,amd.com:email,amd.com:mid,amd.com:dkim,vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,amd.com:from_mime,amd.com:email,amd.com:mid,amd.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 016E3728CBD
+X-Rspamd-Queue-Id: 2969D728EB4
 
-The legacy firmware update path does not support per-component updates.
-If a user specifies a component parameter with devlink flash, reject
-the request with -EOPNOTSUPP rather than silently ignoring the component
-parameter and flashing the entire firmware image.
+rephrase to - derive RX frame length from residue in dmaengine path
 
-Fixes: 49ce92fbee0b ("pds_core: add FW update feature to devlink")
-Signed-off-by: Nikhil P. Rao <nikhil.rao@amd.com>
----
- drivers/net/ethernet/amd/pds_core/devlink.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+> The dmaengine RX path determined the received frame length by reading APP
+> word 4 of the DMA descriptor metadata, masking the lower 16 bits of
+> app_metadata[LEN_APP].
 
-diff --git a/drivers/net/ethernet/amd/pds_core/devlink.c b/drivers/net/ethernet/amd/pds_core/devlink.c
-index 2ea97e1c5939..8adae7b18898 100644
---- a/drivers/net/ethernet/amd/pds_core/devlink.c
-+++ b/drivers/net/ethernet/amd/pds_core/devlink.c
-@@ -90,6 +90,12 @@ int pdsc_dl_flash_update(struct devlink *dl,
- {
- 	struct pdsc *pdsc = devlink_priv(dl);
- 
-+	if (params->component) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Component update not supported by this device");
-+		return -EOPNOTSUPP;
-+	}
-+
- 	return pdsc_firmware_update(pdsc, params->fw, extack);
- }
- 
--- 
-2.43.0
+Avoid above explanation and make commit description concise.>
+> This relies on the optional AXI4-Stream status/control interface being
+> present in the design. The descriptor APP fields are only populated by the
+> hardware when that interface is enabled. On designs without it the APP
+> fields are not updated, so the length read back is invalid.
+> 
+> The AXI DMA engine already reports how many bytes it wrote into the buffer
+> through the standard dmaengine residue mechanism
+> (dmaengine_result.residue). The received frame length is therefore the
+> posted buffer length minus the residue, which is independent of the
+> status/control interface and correct across all designs, including
+> multi-descriptor frames where the residue is summed over the chain.
+> 
+> Use result->residue to compute the RX frame length and drop the descriptor
+> metadata lookup, which was only used for this purpose. The error path now
+> uses the standard dmaengine_result.result status instead of the metadata
+> pointer return value, and the now-unused LEN_APP macro is removed.
+
+now unused>
+> The transmit path is unaffected. It still passes APP metadata for checksum
+> offload and derives its length from the skb.
+> 
+
+Switching to dmaengine residue is better alternative but consider it as 
+an enhancement. Drop the fixes tag. The non-dmaengine axienet RX path 
+still derives frame length from APP field and it's a design assumption.
+
+> Fixes: 6a91b846af85 ("net: axienet: Introduce dmaengine support")
+> Signed-off-by: Srinivas Neeli <srinivas.neeli@amd.com>
+> ---
+> Changes in V3:
+>   - New patch in this series.
+>   - This patch enables axienet to work on designs where the AXI4-Stream
+>     status/control interface is not present. By using the standard
+>     dmaengine residue mechanism, the driver no longer depends on APP
+>     fields being populated by hardware.
+>   - This approach replaces the V2 xferred_bytes mechanism (V2 patch 5/5),
+>     making the dt-bindings patch (V2 patch 4/5) for xlnx,include-stscntrl-strm
+>     also unnecessary. Both V2 patches are dropped in this series.
+> ---
+>   drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 14 +++++---------
+>   1 file changed, 5 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> index fcf517069d16..67d1b8e91d68 100644
+> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> @@ -53,7 +53,6 @@
+>   #define TX_BD_NUM_MAX			4096
+>   #define RX_BD_NUM_MAX			4096
+>   #define DMA_NUM_APP_WORDS		5
+> -#define LEN_APP				4
+>   #define RX_BUF_NUM_DEFAULT		128
+>   
+>   /* Must be shorter than length of ethtool_drvinfo.driver field to fit */
+> @@ -1159,29 +1158,26 @@ axienet_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+>   static void axienet_dma_rx_cb(void *data, const struct dmaengine_result *result)
+>   {
+>   	struct skbuf_dma_descriptor *skbuf_dma;
+> -	size_t meta_len, meta_max_len, rx_len;
+>   	struct axienet_local *lp = data;
+>   	struct sk_buff *skb;
+> -	u32 *app_metadata;
+> +	size_t rx_len;
+>   	int i;
+>   
+>   	skbuf_dma = axienet_get_rx_desc(lp, lp->rx_ring_tail++);
+>   	skb = skbuf_dma->skb;
+> -	app_metadata = dmaengine_desc_get_metadata_ptr(skbuf_dma->desc, &meta_len,
+> -						       &meta_max_len);
+>   	dma_unmap_single(lp->dev, skbuf_dma->dma_address, lp->max_frm_size,
+>   			 DMA_FROM_DEVICE);
+>   
+> -	if (IS_ERR(app_metadata)) {
+> +	if (result->result != DMA_TRANS_NOERROR) {
+>   		if (net_ratelimit())
+> -			netdev_err(lp->ndev, "Failed to get RX metadata pointer\n");
+> +			netdev_err(lp->ndev, "RX DMA transfer failed\n");
+>   		dev_kfree_skb_any(skb);
+>   		lp->ndev->stats.rx_dropped++;
+>   		goto rx_submit;
+>   	}
+>   
+> -	/* TODO: Derive app word index programmatically */
+> -	rx_len = (app_metadata[LEN_APP] & 0xFFFF);
+> +	/* Actual length = posted buffer length - residue. */
+> +	rx_len = lp->max_frm_size - result->residue;
+>   	skb_put(skb, rx_len);
+>   	skb->protocol = eth_type_trans(skb, lp->ndev);
+>   	skb->ip_summed = CHECKSUM_NONE;
 
 
