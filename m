@@ -1,437 +1,326 @@
-Return-Path: <netdev+bounces-305751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305753-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id xg6sNbMlTmprEAIAu9opvQ
-	(envelope-from <netdev+bounces-305751-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 12:25:55 +0200
+	id YBAyKnEmTmqiEAIAu9opvQ
+	(envelope-from <netdev+bounces-305753-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 12:29:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D844872447B
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 12:25:54 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B41F72453E
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 12:29:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=cFeQIGmD;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305751-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305751-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305753-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305753-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7B67D301F758
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 10:24:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6EB42303C5FB
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 10:25:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1145A3F8EAF;
-	Wed,  8 Jul 2026 10:24:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F403393DF1;
+	Wed,  8 Jul 2026 10:24:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D673439B4A2
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 10:23:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4DA53AB262
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 10:24:35 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783506242; cv=none; b=RiOtFtcR3RqxIsYBemMouEDMmFQMkjApM/rxVniC6gepBnBvYmPubOdXTp9efbK7vOpaPBIDYP/FYWtLI27MjTIrddHPwiQEv7Xx2o7zNoN4HvyonQXormmfKx/8MdKbHmAL2T9h3zrRVARSt6bs2AMnejxC0T3cTHl64WItwqA=
+	t=1783506283; cv=none; b=uCkyAjVSwJrQUtzjU9LIywK/2vYe+ddWqXpINgMMeM2hvFZOIJCJN5o8xpl43KmOF3ZyW4eCCKsbSOWcXXmGWrxzTJXyBc5B9BIXntg6lt4MsL0xV47nxCwzvRm2ezvY1xIPwddxRUVxhI9VMAZuIU/GlElNgeLSa/QNlFmuE2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783506242; c=relaxed/simple;
-	bh=+h32aoU2ErUCEc3ENAJ3GJ6wUlXX5HC8rIWpziFqvNk=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dE75gtvF0zY1LKhxqul0w4/nwPe8YETcOCCmhU0w7dSybGIhF3iGTLb2BprSQHfVHhxjlY7I36c4HIMiPspMClg7xKUpaEMX0C1boIAYo26M4ZBiGMQC3Cpr3BRmw0xGpvOoUoAQXovEZ1pS9XRAOvgjwvHgNpNC/jR1Rg/+UHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cFeQIGmD; arc=none smtp.client-ip=209.85.221.47
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-47d70879764so360843f8f.2
-        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 03:23:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783506238; x=1784111038; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=MyuwS38PfYwJJi1QJOBh4vgrGD72hR8pS22EH++wjHw=;
-        b=cFeQIGmDzsmtMZ012OX3xnh6Y6HdHKOgdCq1dro2my0lAz9j1rcmbU5GZuWxOgqgg4
-         RKu58jXjY4QyhBSC8jA+6dFCIS1Th+He0BZwaX2Kn94VEs6DgHE/OKmHfVWoUl41e4IU
-         cB4gBLql56Ma5Eqotr7jd4bS4VfvxtBHDLw/z2ba0MLOp4iNsOt9GzQGVAOLaVYvCBMC
-         klGPNr6JuMnl5l+JeXocJBSL993UW7+VnyGntBdesgPNVDdxpHM36Xmcztl3gKj/rGnY
-         jOEwYwe0hA/mT9t3KCahfqh4hVJGTVZ8tVXUvlOLQ8YU9lBk9XyUzEMAsn9NoFkpqOIR
-         +S/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783506238; x=1784111038;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=MyuwS38PfYwJJi1QJOBh4vgrGD72hR8pS22EH++wjHw=;
-        b=IbB5PjyugR+mMX4z+jlcjKXwwEfi0VN1WM3mD8Dr5xRolU0+aFZWIbFs+bbUqByo7K
-         bhGK6Df0ZUQqv6ckhjDHetQ/rIYwmdWGI6UoU/hyXOdGv2JltRD3lzL5p4HLfpbvttBJ
-         VGcYIZso+g0nQDj27Aoh3dzYZNz3X37eaRqd+1CSUiY0fxL0KJHJpKLPPXyvWj+nQk6c
-         qDaaT52UsbyjDiDuKkonxvUjBIOUe6wbs/MlA4XqTxYnYxqaoGXroEyPAvMIec7ipilL
-         zowdeUsh3ZwPejTWle7QKQAhosjhcEo4ZwEKe4OcnrRcs4w03IZzfeJqXGMDG3dg5/CI
-         hxfQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rr1S4K341CxC6FYb20/Ctch2nRKqxqlUHSdW43FHuSzHSugQRPCb5hTFePSlpdLdesPRjG4NKA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFQJk10fjMizlyRMVmg5cHKCOQ34YEE07wHVCKJdASITGQHX3V
-	0m2NxVvsY/1VIEV0+ZwdEF5W9Za3+x3KYaZoGX6eVMmpLXKv8ivd+INt
-X-Gm-Gg: AfdE7cl/NNo6DFA3Q10NPH5P4K4V4xC6KAPqczp7gTMTsQKd0TiQpx6FE4l/qNFd5yR
-	hDGtXYWE0I2zE8N6ycH32dRDZG4MyO1Cx7OUSp2BO2rah062HOavYX7kSunELRWa3rtmb5jVgLS
-	/DqJ2iC5DdH+k9w9XnssOPvzV59H38tsB/Rso3OrIkrXC0OEwVnlz3fgZMEkI7BuD88nmbT4QkW
-	8hRmLVTajYMW37keGpdqyfQuA+ieF58ZUc0iHz0S3tyoL4h6NC8/klGlLWduXv4Hq3JX/QvBJj0
-	0EpE/z4kcE6yhhm4t5rvNcI66e/lA28ig+mlWoVQDJvkK4JXIdnfp3AjyZ8Qk6HHSVLJEyXYe+r
-	CW0TymBmNzZNJo0MQCWwnLDnOO0cxlg3RYCoH8lAhj6Sc+Pm0N+UwEuZJAeQIKLLOeP6sZ/hQZU
-	B+Y/B8hLgI5bmWaa9oUXChIygcOVaD20nIA9e9ZW62Wpw8fDuav1nq3X1+9xpSPvlaIhJICo4H9
-	JPT/5af
-X-Received: by 2002:a05:6000:200b:b0:474:cd60:115a with SMTP id ffacd0b85a97d-47df07b5bedmr1889851f8f.18.1783506237895;
-        Wed, 08 Jul 2026 03:23:57 -0700 (PDT)
-Received: from Ansuel-XPS24.localdomain (host-95-248-227-210.retail.telecomitalia.it. [95.248.227.210])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-47aa0f2186bsm40660248f8f.36.2026.07.08.03.23.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2026 03:23:57 -0700 (PDT)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH net-next 5/5] net: phy: mediatek: add calibration logic for AN7583
-Date: Wed,  8 Jul 2026 12:23:31 +0200
-Message-ID: <20260708102341.53919-6-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260708102341.53919-1-ansuelsmth@gmail.com>
-References: <20260708102341.53919-1-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1783506283; c=relaxed/simple;
+	bh=H2shEOmNejMQSYdatJnwXRcHlaK5PfqWoplcteZBtvk=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=UPxVJ3qpR1NCi991u+suGxgPT8Zmay1Ze1tKIiBk8PcF3GuNPENe+ykxoB5A/D3CcT2zyJHyEtmKsSWq6KuAtP7qZgc4PHNRICQk5t2KE81uJy1FggStdPlQMwtOQPS2jZbUrgDgfH0H9B9EUWUt5Mn6c3l7XDdh7ZKpBoC6/n0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.207.22.56
+X-QQ-mid: esmtpgz12t1783506234te4e7f166
+X-QQ-Originating-IP: 0O58FwahYTO6u4S7lcAVRSo8k9RjSzH5DW7xKk2VDQY=
+Received: from smtpclient.apple ( [60.188.196.189])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 08 Jul 2026 18:23:52 +0800 (CST)
+X-QQ-SSF: 0001000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 81809779861008349
+EX-QQ-RecipientCnt: 6
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.600.51.1.1\))
+Subject: Re: [PATCH net-next v6 3/3] net: libwx: support vf per-queue
+ statistics via ethtool -S
+From: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
+In-Reply-To: <20260707095046.104606-1-pabeni@redhat.com>
+Date: Wed, 8 Jul 2026 18:23:42 +0800
+Cc: netdev@vger.kernel.org,
+ jiawenwu@trustnetic.com,
+ duanqiangwen@net-swift.com,
+ horms@kernel.org,
+ kuba@kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <C73D2F94-B574-47ED-9744-7B3C3DA9BB39@net-swift.com>
+References: <20260701100145.23738-4-mengyuanlou@net-swift.com>
+ <20260707095046.104606-1-pabeni@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+X-Mailer: Apple Mail (2.3864.600.51.1.1)
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:net-swift.com:qybglogicsvrgz:qybglogicsvrgz5b-1
+X-QQ-XMAILINFO: N4l297NxaS4d/0DAGa1I6fOMJypBS6l1As2m29UbKrUEk4ZcPpBCvwdl
+	oEds33LVv+AUJ0gZ4qJU226TiImx+OhvqcNlKIDioP5OKG4RKt7prUlIhsoKK1AITAwY+v2
+	uji0X7q+X9uxod0WppG/EoodXH7Ip5Wis7gNetj0jWvIWVyPrMoAkH6TjolTMdDuHN5rxMC
+	Y4Cv3oICljhnZ4zZ5hZGJFr7kAf3DcOPjRKkrOMUxz1q6eu/AyHrrzPeGLgq/hGvtJKT/aU
+	dlZkKqWEY9+s/sM4+0RO1XAX43sUEbwpXyJMLDhpP03K3D3GRtWSpREGJdv+5Tz7bUpYf+2
+	NjCnITndqi4kTCG0uS6ksytutIf1HQXEIF6nv8M1TRtU+jc0aCWuSjEChAr6Lny/GH2gMEj
+	rxmLmqYNQ+HXb9S/FTSXl7two4fdTvl+4lPBWyVAnpf4xPG8QTLvLFwhx4FEBfmpUoRY1oO
+	kWcP7Cd7hDMon4Fnd9rszA7F1PI3el+uSWIhkjL+wTIVv42OYN4uWXjAlK5dEljfA5RbYZp
+	oodF5M+SSzjMfiNKe7wKk+383xPA2cp13ihOEs+GlxvcIZ6znzrULsmPfjhazp8Fwzu/fFX
+	LzTeYJIRUnoyjgNyvhCJQpBEOaVUf8/BIMRBtTlDqCtqpkjLtBGT8f1dJW5Z6POAUynNiUf
+	mcq31qTUMQXvwBXarwmlD2vxYzSeWbQTq85bi5l522uIsJfJ1rOwastpsCnCRs1Tb2IUkLE
+	Xp6faMT1bp/+fLEP4u3dQoV5+z1/rdDjgdgtL3L+yED/+upOXVsBVyUK/ZKvQ+U+Op9bt1A
+	IaZVypuKvmQU+Oug5tewq+liyepsvlsUiDIx+apz/+wVjmBb6YYQAVwZjJJ7NEibqsL0NhC
+	UJnYS9U0Yb3oSbcBuc142qLCMkvFlBHHNeV1DCfkN3IXMnwhBtFehO9vYNA96nrH301cdAX
+	/MhPazPvTmIfRMpPxmlif4VbiLLxIv+ebm+3Sc0vtFrMfizn3DUC5XLZCrkfTzBP3d9Vh0T
+	+MBlQQoknwbmYa6pzfpqK13myb5dEDFi/6MRKKeZcDdhhnfRkops2ipfqovgXaCyZtliOEe
+	dla3/DbWJu4cf4N0rwXZLHfYBoAtpizwA==
+X-QQ-XMRINFO: MPJ6Tf5t3I/yesON6mHkT11hJVx/QaGLwA==
+X-QQ-RECHKSPAM: 0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	FROM_DN_EQ_ADDR(1.00)[];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305751-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[ansuelsmth@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ansuelsmth@gmail.com,m:daniel@makrotopia.org,m:dqfext@gmail.com,m:SkyLake.Huang@mediatek.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,makrotopia.org,mediatek.com,collabora.com,vger.kernel.org,lists.infradead.org];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:jiawenwu@trustnetic.com,m:duanqiangwen@net-swift.com,m:horms@kernel.org,m:kuba@kernel.org,m:pabeni@redhat.com,s:lists@lfdr.de];
+	DMARC_NA(0.00)[net-swift.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_NEQ_ENVFROM(0.00)[mengyuanlou@net-swift.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ansuelsmth@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER(0.00)[mengyuanlou@net-swift.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305753-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,linux.dev:url,net-swift.com:from_mime,net-swift.com:email,net-swift.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D844872447B
+X-Rspamd-Queue-Id: 7B41F72453E
 
-Similar to Airoha AN7581 Switch PHY also the Airoha AN7583 SoC
-requires dedicated calibration and tuneup to make EEE correctly work.
 
-Airoha AN7583 differ from AN7581 by having a dedicated table for
-calibration and additional EEE logic tuneup.
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- drivers/net/phy/mediatek/airoha-ge-soc.c | 227 ++++++++++++++++++++++-
- drivers/net/phy/mediatek/mtk.h           |   1 +
- 2 files changed, 225 insertions(+), 3 deletions(-)
+> 2026=E5=B9=B47=E6=9C=887=E6=97=A5 17:50=EF=BC=8CPaolo Abeni =
+<pabeni@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> From: AI Reviewer <ai@example.com>
+>=20
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+> ---
+> Now I have enough information to produce the report.
+>=20
+> commit e59c58bb080afb34cac34c91b8c320a1f05134e6
+> Author: Mengyuan Lou <mengyuanlou@net-swift.com>
+>=20
+> net: libwx: support vf per-queue statistics via ethtool -S
+>=20
+> The patch wires wx_get_sset_count, wx_get_strings, and =
+wx_get_ethtool_stats
+> into wx_ethtool_ops_vf, adds a small vf-only global stats table, and =
+starts
+> calling wx_update_stats() from wxvf_service_task. It also adds NULL =
+checks
+> for wx->rx_ring[i] / wx->tx_ring[i] inside wx_update_stats.
+>=20
+>> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c =
+b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+>> index 22037f015ded..f72908630ea4 100644
+>> --- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+>> +++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+>=20
+> [ ... ]
+>=20
+>> @@ -114,7 +133,7 @@ void wx_get_strings(struct net_device *netdev, =
+u32 stringset, u8 *data)
+>> ethtool_sprintf(&p, "tx_queue_%u_packets", i);
+>> ethtool_sprintf(&p, "tx_queue_%u_bytes", i);
+>> }
+>> - for (i =3D 0; i < WX_NUM_RX_QUEUES; i++) {
+>> + for (i =3D 0; i < WX_NUM_RX_QUEUES(netdev); i++) {
+>> ethtool_sprintf(&p, "rx_queue_%u_packets", i);
+>> ethtool_sprintf(&p, "rx_queue_%u_bytes", i);
+>> }
+>=20
+> [ ... ]
+>=20
+>> @@ -852,6 +878,9 @@ static const struct ethtool_ops wx_ethtool_ops_vf =
+=3D {
+>> .set_coalesce =3D wx_set_coalesce,
+>> .get_ts_info =3D ethtool_op_get_ts_info,
+>> .get_link_ksettings =3D wx_get_link_ksettings_vf,
+>> + .get_sset_count =3D wx_get_sset_count,
+>> + .get_strings =3D wx_get_strings,
+>> + .get_ethtool_stats =3D wx_get_ethtool_stats,
+>> };
+>=20
+> [Medium]
+> Before this change wx_ethtool_ops_vf had no get_sset_count / =
+get_strings /
+> get_ethtool_stats callbacks, so the VF exposed no ethtool -S output at =
+all.
+> Wiring these in also picks up the shared per-queue string loop that =
+emits
+> tx_queue_%u_packets / tx_queue_%u_bytes and rx_queue_%u_packets /
+> rx_queue_%u_bytes.
+>=20
+> Per-queue TX/RX packet and byte counters are a category that already =
+has a
+> standard uAPI (netdev_stat_ops with queue_stats_rx / queue_stats_tx,
+> surfaced by netlink and ynl). Documentation/networking/statistics.rst =
+and
+> the ethtool -S guidance state that new counters covering values that =
+have a
+> standard uAPI should not be added to ethtool -S even when the driver =
+does
+> not yet implement the standard interface.
+>=20
+> The wangxun tree does not implement netdev_stat_ops (no
+> get_base_stats / get_queue_stats_rx / get_queue_stats_tx callbacks are
+> present under drivers/net/ethernet/wangxun/).
 
-diff --git a/drivers/net/phy/mediatek/airoha-ge-soc.c b/drivers/net/phy/mediatek/airoha-ge-soc.c
-index bc487b093cfa..601a64d83365 100644
---- a/drivers/net/phy/mediatek/airoha-ge-soc.c
-+++ b/drivers/net/phy/mediatek/airoha-ge-soc.c
-@@ -159,6 +159,106 @@ static u8 an7581_zcal_to_r45ohm[64] = {
- 	 52,  50,  48,  46,  44,  42,  40,  39,  36,  35,  32,  32,  30,  28,  27,  25
- };
- 
-+/*
-+ * 2 chip revision
-+ * TXMR or discrete
-+ * 2 MDI type
-+ * TX AMP test/TX AMP 1G/TX AMP 100M/TX AMP 10M/R50
-+ * 4 PHY
-+ */
-+static int an7583_tx_amp_compensation_tbl[TRANSFORMER_TYPE_MAX][MDI_TYPE_MAX][CALIB_CONST_TYPE_MAX][4] = {
-+	[TXMR] = {
-+		[MDI_0R] = {
-+			[TX_AMP_TEST_A] = { -3, -3, -3, -3 },
-+			[TX_AMP_TEST_B] = { -3, -3, -3, -3 },
-+			[TX_AMP_TEST_C] = { -3, -3, -3, -3 },
-+			[TX_AMP_TEST_D] = { -3, -3, -3, -3 },
-+			[TX_AMP_1G_A] = { 0, 0, 0, 0 },
-+			[TX_AMP_1G_B] = { 0, 0, 0, 0 },
-+			[TX_AMP_1G_C] = { 0, 0, 0, 0 },
-+			[TX_AMP_1G_D] = { 0, 0, 0, 0 },
-+			[TX_AMP_100M_A] = { 4, 4, 4, 4 },
-+			[TX_AMP_100M_B] = { 4, 4, 4, 4 },
-+			[TX_AMP_10M_A] = { 0, 0, 0, 0 },
-+			[TX_AMP_10M_B] = { 0, 0, 0, 0 },
-+			[R50_A] = { 4, 4, 0, 0 },
-+			[R50_B] = { 4, 4, 0, 0 },
-+			[R50_C] = { 5, 5, 3, 4 },
-+			[R50_D] = { 4, 4, 4, 0 },
-+		},
-+		[MDI_5R] = {
-+			[TX_AMP_TEST_A] = { -3, -3, -3, -3 },
-+			[TX_AMP_TEST_B] = { -3, -3, -3, -3 },
-+			[TX_AMP_TEST_C] = { -3, -3, -3, -3 },
-+			[TX_AMP_TEST_D] = { -3, -3, -3, -3 },
-+			[TX_AMP_1G_A] = { 0, 0, 0, 0 },
-+			[TX_AMP_1G_B] = { 0, 0, 0, 0 },
-+			[TX_AMP_1G_C] = { 0, 0, 0, 0 },
-+			[TX_AMP_1G_D] = { 0, 0, 0, 0 },
-+			[TX_AMP_100M_A] = { 4, 4, 4, 4 },
-+			[TX_AMP_100M_B] = { 4, 4, 4, 4 },
-+			[TX_AMP_10M_A] = { 0, 0, 0, 0 },
-+			[TX_AMP_10M_B] = { 0, 0, 0, 0 },
-+			[R50_A] = { -4, -4, -4, -4 },
-+			[R50_B] = { -4, -4, -4, -4 },
-+			[R50_C] = { -2, -2, -2, -2 },
-+			[R50_D] = { -3, -3, -2, -2 },
-+		},
-+	},
-+	[DISCRETE] = {
-+		[MDI_0R] = {
-+			[TX_AMP_TEST_A] = { -3, -3, -3, -3 },
-+			[TX_AMP_TEST_B] = { -3, -3, -3, -3 },
-+			[TX_AMP_TEST_C] = { -3, -3, -3, -3 },
-+			[TX_AMP_TEST_D] = { -3, -3, -3, -3 },
-+			[TX_AMP_1G_A] = { 0, 0, 0, 0 },
-+			[TX_AMP_1G_B] = { 0, 0, 0, 0 },
-+			[TX_AMP_1G_C] = { 0, 0, 0, 0 },
-+			[TX_AMP_1G_D] = { 0, 0, 0, 0 },
-+			[TX_AMP_100M_A] = { 4, 4, 4, 4 },
-+			[TX_AMP_100M_B] = { 4, 4, 4, 4 },
-+			[TX_AMP_10M_A] = { 0, 0, 0, 0 },
-+			[TX_AMP_10M_B] = { 0, 0, 0, 0 },
-+			[R50_A] = { 4, 4, 4, 4 },
-+			[R50_B] = { 4, 4, 4, 4 },
-+			[R50_C] = { 6, 6, 6, 6 },
-+			[R50_D] = { 4, 4, 4, 4 },
-+		},
-+		[MDI_5R] = {
-+			[TX_AMP_TEST_A] = { -3, -3, -3, -3 },
-+			[TX_AMP_TEST_B] = { -3, -3, -3, -3 },
-+			[TX_AMP_TEST_C] = { -3, -3, -3, -3 },
-+			[TX_AMP_TEST_D] = { -3, -3, -3, -3 },
-+			[TX_AMP_1G_A] = { 0, 0, 0, 0 },
-+			[TX_AMP_1G_B] = { 0, 0, 0, 0 },
-+			[TX_AMP_1G_C] = { 0, 0, 0, 0 },
-+			[TX_AMP_1G_D] = { 0, 0, 0, 0 },
-+			[TX_AMP_100M_A] = { 4, 4, 4, 4 },
-+			[TX_AMP_100M_B] = { 4, 4, 4, 4 },
-+			[TX_AMP_10M_A] = { 0, 0, 0, 0 },
-+			[TX_AMP_10M_B] = { 0, 0, 0, 0 },
-+			[R50_A] = { 0, 0, 0, 0 },
-+			[R50_B] = { 0, 0, 0, 0 },
-+			[R50_C] = { 0, 0, 0, 0 },
-+			[R50_D] = { 0, 0, 0, 0 },
-+		},
-+	},
-+};
-+
-+static u8 an7583_zcal_to_r50ohm_0R[64] = {
-+	127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127,
-+	127, 127, 127, 122, 118, 114, 110, 106, 102,  98,  96,  92,  88,  85,  82,  80,
-+	 76,  72,  70,  68,  64,  62,  60,  57,  55,  52,  50,  48,  46,  44,  41,  40,
-+	 38,  36,  33,  32,  30,  28,  26,  24,  24,  22,  20,  18,  16,  16,  14,  12,
-+};
-+
-+static u8 an7583_zcal_to_r50ohm_5R[64] = {
-+	127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127,
-+	127, 127, 127, 127, 127, 127, 127, 127, 127, 124, 120, 116, 112, 110, 106, 102,
-+	 99,  96,  93,  90,  88,  84,  81,  79,  76,  73,  71,  68,  66,  64,  61,  59,
-+	 56,  54,  52,  50,  48,  46,  44,  42,  40,  39,  37,  36,  33,  32,  31,  29,
-+};
-+
- static int airoha_cal_cycle(struct phy_device *phydev, int devad,
- 			    u32 regnum, u16 mask, u16 cal_val)
- {
-@@ -766,8 +866,9 @@ static int airoha_rx_offset_cal_sw(struct phy_device *phydev)
- 	phy_clear_bits_mmd(phydev, MDIO_MMD_VEND1, 0x171,
- 			   BIT(8) | BIT(7));
- 
--	phy_write_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_RG_ANA_CAL_RG6,
--		      0x1);
-+	if (phydev->drv->phy_id == AIROHA_GPHY_ID_AN7581)
-+		phy_write_mmd(phydev, MDIO_MMD_VEND1,
-+			      MTK_PHY_RG_ANA_CAL_RG6, 0x1);
- 
- 	return 0;
- }
-@@ -1540,8 +1641,126 @@ static int an7581_phy_led_polarity_set(struct phy_device *phydev, int index,
- 
- static int an7583_phy_config_init(struct phy_device *phydev)
- {
-+	struct airoha_socphy_shared *shared = phy_package_get_priv(phydev);
-+	struct phy_device *phydev_p0;
-+	u8 phy_offset;
-+	int ret;
-+
- 	/* BMCR_PDOWN is enabled by default */
--	return phy_clear_bits(phydev, MII_BMCR, BMCR_PDOWN);
-+	phy_clear_bits(phydev, MII_BMCR, BMCR_PDOWN);
-+
-+	phydev_p0 = shared->phydev_p0;
-+	phy_offset = phydev->mdio.addr - phydev_p0->mdio.addr;
-+
-+	/* FIXME: Read SoC MDI Resister Type if available or default to 5R */
-+	shared->mdi_resister_type = MDI_5R;
-+
-+	shared->mdi_resister_type = MDI_5R;
-+	if (shared->mdi_resister_type == MDI_0R)
-+		shared->r50_cal_tbl = an7583_zcal_to_r50ohm_0R;
-+	if (shared->mdi_resister_type == MDI_5R)
-+		shared->r50_cal_tbl = an7583_zcal_to_r50ohm_5R;
-+	shared->tx_amp_compensation_tbl = &an7583_tx_amp_compensation_tbl;
-+
-+	ret = airoha_phy_calib(phydev);
-+	if (ret)
-+		return ret;
-+
-+	ret = airoha_phy_auto_select_transformer(phydev);
-+	if (ret)
-+		return ret;
-+
-+	ret = airoha_phy_tx_amp_compensation(phydev);
-+	if (ret)
-+		return ret;
-+
-+	/* Enable Idle Mode Power Setting */
-+	if (phy_offset == 0) {
-+		phy_write_mmd(phydev, MDIO_MMD_VEND2, 0x268, 0x07F1);
-+		phy_write_mmd(phydev, MDIO_MMD_VEND2, 0x703, 0x3111);
-+		phy_write_mmd(phydev, MDIO_MMD_VEND2, 0x271, 0x3C24);
-+		phy_write_mmd(phydev, MDIO_MMD_VEND2, 0x701, 0x1023);
-+	}
-+
-+	if (shared->transformer_type[phy_offset] == TXMR) {
-+		phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x23, 0x0881);
-+		phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x24, 0x0881);
-+		phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x25, 0x0881);
-+		phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x26, 0x0881);
-+
-+		if (shared->mdi_resister_type == MDI_0R)
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x05, 0x0205);
-+		else
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x05, 0x0200);
-+	} else {
-+		if (shared->mdi_resister_type == MDI_0R) {
-+			/* RX setting for 5R_TXMR before AN setting */
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0xe7, 0x6666);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0xe9, 0x0003);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0xfe, 0x0006);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0xe6, 0x1111);
-+			/* 100M sharp */
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x23, 0x0c86);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x24, 0x0c86);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x25, 0x0c86);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x26, 0x0c86);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x01, 0x01cb);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x02, 0x01c2);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x03, 0x0108);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x04, 0x0211);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x05, 0x0205);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x06, 0x0387);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x07, 0x03ce);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x08, 0x03c8);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x0b, 0x0005);
-+		} else {
-+			/* 100M sharp */
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x23, 0x0886);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x24, 0x0886);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x25, 0x0886);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x26, 0x0886);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x00, 0x0195);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x01, 0x01cb);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x02, 0x01c2);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x03, 0x0108);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x04, 0x0211);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x05, 0x0205);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x06, 0x0387);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x07, 0x03ce);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x08, 0x03c3);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x0a, 0x0010);
-+			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x0b, 0x0005);
-+		}
-+	}
-+
-+	/* RX Setting */
-+	phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x3c, 0xc000);
-+	phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x3d, 0x0000);
-+	phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x3e, 0xc000);
-+
-+	/* EEE setting */
-+	phy_write_mmd(phydev, MDIO_MMD_AN, 0x3c, 0x0000);
-+
-+	/* 10M settings */
-+	phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x1a3, 0x00d2);
-+	phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x1a4, 0x010e);
-+	phy_write_mmd(phydev, MDIO_MMD_VEND2, 0x27b, 0x1177);
-+	phy_write_mmd(phydev, MDIO_MMD_VEND2, 0x27c, 0x0808);
-+
-+	phy_select_page(phydev, MTK_PHY_PAGE_EXTENDED_3);
-+	__phy_write(phydev, 0x14, 0x190);
-+	phy_restore_page(phydev, MTK_PHY_PAGE_STANDARD, 0);
-+
-+	phy_select_page(phydev, MTK_PHY_PAGE_EXTENDED_1);
-+	__phy_write(phydev, 0x14, 0x3a18);
-+	phy_restore_page(phydev, MTK_PHY_PAGE_STANDARD, 0);
-+
-+	phy_write(phydev, 0x9, 0x0600);
-+
-+	/* EEE keep only Pair A ON */
-+	phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x630, 0x006E);
-+
-+	return 0;
- }
- 
- static struct phy_driver mtk_socphy_driver[] = {
-@@ -1572,6 +1791,8 @@ static struct phy_driver mtk_socphy_driver[] = {
- 		.led_hw_control_set = mt798x_phy_led_hw_control_set,
- 		.led_hw_control_get = mt798x_phy_led_hw_control_get,
- 		.led_polarity_set = an7581_phy_led_polarity_set,
-+		.read_page	= mtk_phy_read_page,
-+		.write_page	= mtk_phy_write_page,
- 	},
- };
- 
-diff --git a/drivers/net/phy/mediatek/mtk.h b/drivers/net/phy/mediatek/mtk.h
-index c690aaf38124..cd9d4c5550c3 100644
---- a/drivers/net/phy/mediatek/mtk.h
-+++ b/drivers/net/phy/mediatek/mtk.h
-@@ -13,6 +13,7 @@
- 
- #define MTK_EXT_PAGE_ACCESS			0x1f
- #define MTK_PHY_PAGE_EXTENDED_1			0x0001
-+#define MTK_PHY_PAGE_EXTENDED_3			0x0003
- #define MTK_PHY_PAGE_STANDARD			0x0000
- #define MTK_PHY_PAGE_EXTENDED_52B5		0x52b5
- 
--- 
-2.53.0
+Ok=EF=BC=8CI will remove patch3=EF=BC=88support vf per-queue statistics =
+via ethtool -S).
+>=20
+> Would it be preferable to expose the per-queue counters on the VF via
+> netdev_stat_ops instead of adding them to ethtool -S here?
+
+netdev_stat_ops support is deferred to a follow-up patch; this one only =
+extends ethtool ops.
+>=20
+>> void wx_set_ethtool_ops_vf(struct net_device *netdev)
+>> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c =
+b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+>> index 260e14d5d541..349afbe60132 100644
+>> --- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+>> +++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+>> @@ -2886,6 +2886,8 @@ void wx_update_stats(struct wx *wx)
+>> for (i =3D 0; i < wx->num_rx_queues; i++) {
+>> struct wx_ring *rx_ring =3D wx->rx_ring[i];
+>>=20
+>> + if (!rx_ring)
+>> + continue;
+>> non_eop_descs +=3D rx_ring->rx_stats.non_eop_descs;
+>=20
+> [ ... ]
+>=20
+>> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c =
+b/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c
+>> index 26de78e9a69e..1d84fe35d7d9 100644
+>> --- a/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c
+>> +++ b/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c
+>> @@ -409,6 +410,7 @@ static void wxvf_service_task(struct work_struct =
+*work)
+>>=20
+>> wxvf_link_config_subtask(wx);
+>> wxvf_reset_subtask(wx);
+>> + wx_update_stats(wx);
+>> wx_service_event_complete(wx);
+>> }
+>=20
+> [High]
+> Can this call race with VF PCI suspend and shutdown to produce a
+> use-after-free on wx->rx_ring[i] / wx->tx_ring[i]?
+>=20
+> Both ngbevf and txgbevf use wxvf_suspend as their PM suspend callback =
+and
+> wxvf_shutdown (which calls wxvf_suspend) as their pci_driver =
+->shutdown
+> callback:
+>=20
+>    static DEFINE_SIMPLE_DEV_PM_OPS(ngbevf_pm_ops, wxvf_suspend, =
+wxvf_resume);
+>    ...
+>    .shutdown =3D wxvf_shutdown,
+>=20
+> wxvf_suspend() in wx_vf_common.c does:
+>=20
+>    int wxvf_suspend(struct device *dev_d)
+>    {
+>        struct pci_dev *pdev =3D to_pci_dev(dev_d);
+>        struct wx *wx =3D pci_get_drvdata(pdev);
+>=20
+>        netif_device_detach(wx->netdev);
+>        wx_clear_interrupt_scheme(wx);
+>        pci_disable_device(pdev);
+>=20
+>        return 0;
+>    }
+>=20
+> wx_clear_interrupt_scheme() ends up freeing the q_vectors (via
+> kfree_rcu), and the ring allocations are embedded in the q_vector, so
+> wx->rx_ring[i] / wx->tx_ring[i] end up pointing at memory that will be
+> freed after an RCU grace period.
+>=20
+> wxvf_suspend / wxvf_shutdown do not call timer_shutdown_sync on
+> wx->service_timer or cancel_work_sync on wx->service_task, and they do
+> not set WX_STATE_DOWN.
+>=20
+> With this hunk in place, the service_task now walks wx->rx_ring[] and
+> wx->tx_ring[]:
+>=20
+>    void wx_update_stats(struct wx *wx)
+>    {
+>        ...
+>        for (i =3D 0; i < wx->num_rx_queues; i++) {
+>            struct wx_ring *rx_ring =3D wx->rx_ring[i];
+>=20
+>            if (!rx_ring)
+>                continue;
+>            non_eop_descs +=3D rx_ring->rx_stats.non_eop_descs;
+>            ...
+>        }
+>        ...
+>        for (i =3D 0; i < wx->num_tx_queues; i++) {
+>            struct wx_ring *tx_ring =3D wx->tx_ring[i];
+>=20
+>            if (!tx_ring)
+>                continue;
+>            restart_queue +=3D tx_ring->tx_stats.restart_queue;
+>            ...
+>        }
+>=20
+> If the service_task latches a non-NULL rx_ring / tx_ring pointer just
+> before wx_clear_interrupt_scheme runs, the added NULL check does not
+> help, and the subsequent ->rx_stats / ->tx_stats reads touch memory
+> that has been kfree_rcu'd. wxvf_remove() covers this by calling
+> timer_shutdown_sync + cancel_work_sync before =
+wx_clear_interrupt_scheme,
+> but wxvf_suspend / wxvf_shutdown do not.
+>=20
+> Should wxvf_suspend (and hence wxvf_shutdown) quiesce the =
+service_timer
+> and service_task, or set WX_STATE_DOWN, before =
+wx_clear_interrupt_scheme
+> now that wx_update_stats is on the service_task's call path?
+> --=20
+> This is an AI-generated review.
+>=20
+>=20
 
 
