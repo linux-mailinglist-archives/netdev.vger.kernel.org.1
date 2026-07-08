@@ -1,267 +1,368 @@
-Return-Path: <netdev+bounces-305881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305882-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Z55SMWN5Tmr4NQIAu9opvQ
-	(envelope-from <netdev+bounces-305881-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:22:59 +0200
+	id gb/fCvtzTmo8NAIAu9opvQ
+	(envelope-from <netdev+bounces-305882-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 17:59:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6069D728A55
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:22:59 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9D1B7285D9
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 17:59:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amd.com header.s=selector1 header.b=IUZHpYmd;
-	dmarc=pass (policy=quarantine) header.from=amd.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305881-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305881-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=F5Wu84Vj;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305882-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305882-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7E3BC30B1B22
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 15:57:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E0579302CDAA
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 15:59:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EF7D409285;
-	Wed,  8 Jul 2026 15:57:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF3441CB29;
+	Wed,  8 Jul 2026 15:59:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012033.outbound.protection.outlook.com [52.101.43.33])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F358B439337;
-	Wed,  8 Jul 2026 15:57:17 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783526239; cv=fail; b=mEW+TyvLMltcCzreWFqHo2p6jJ23eqh95MCy6cv9tiB/d5Cpa17YihpJvGh0h3JjhmZmRXDbFei1RLFXGdQqO8i5Xbnso++gZbwum/jKjJfhxasWdQsvUKp2Nbyhl6y6QWXeNjy4GdvdPGYW7loT7QZLOgCUKWPSPrsXBxchJgs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783526239; c=relaxed/simple;
-	bh=1ozWx6msHaAZS4jEoJZrEuIFkg7xrRZTmMuCC/5yk7g=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=m5gw69IlRqu7uXz+eRexELr9HJhAiXeISWrKOJFrIj5MWw2uUGCl9X3NwdpLoek1g/BWvUHE4KTaemoJc4pylV6arHG4Z8IkC0moyP72aTl0TgbtBn6F1FDr/WGIUp+hNiRY/KtUejRzBjaoGN/BMV9HNTyN5DHAjPTwxWacuxQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=IUZHpYmd; arc=fail smtp.client-ip=52.101.43.33
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fYDpvmHgEoOgZ00gXu+uh4NJoybSs5JYGg8fjJ2Gi1dcLFthTHZivzFnVJfiEoaysYeRE8GVXLuNQ2UNiGQ6vNKjsG09ON3HrJTwE3ebybBzCAGkKC4DLzDpAqVdrRwTBViExRqyM8R8R0QR7VkMy7aeTKvIQymClvP0BMiirecXMvmhQ5Wcx4weVNfrFehBEucG1CVUjlUo2z9/7HX7RhFer4ZtXAcgo/AEXYUNNkN4iwLxQprXOHJg7JaFPqSUOfYX6T7WxeARfEn1OHPuc3a/toSNgCzJLe5P1f3txFJB2sfC60qpBwgjKeX59m0/CZyc0ucype167wqrAMyMxQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wiVXL4I5vnajX3RW2E00xVb4sve/CQZy+lpyfm/0CTk=;
- b=pr+cXSG5QrWIdj83C6+scHAs5jurZb3OtBCNHIWqq4dtcKd3sg9CABdKRxHmEr4SImhlNFLfVRNzecfaO0anPOatZikT8efONF7kN1+PeXahjMiEQLBWEwvn3gAodiFvFdc5JXTQDRh6sTPhY8aGVy0HTnPt0JNJUDoAIUc9Whb0xjPVyFvuNE24VrYSSN01WKUFKtq4Cz7rghKo2fA6CZ7DT186Ty2toWRTgvh3xwBiRqHNmcuhwowV23tcQi6maO3r8M30qdaUiYgxC0whDW8S8n7SHMkIY6/JolgGAb0biF8g6KPxj2iZu+wFfCh8+7L2oPUE2BfmvwqbtJMXiA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wiVXL4I5vnajX3RW2E00xVb4sve/CQZy+lpyfm/0CTk=;
- b=IUZHpYmdHRngZ0Xnqofwn6PM+Br0tTmHVnwHTfkZb7XuyFjvAOKR2BpoiNCSkydSugKIs/zIBinBaPyQgrkmRsd7ltM+RhGIsuzmVbFqqRoCnxc1LaMCH4ri5Dz+/mMQg6cQhceRh9dAOWJ2ctzPfev49KYjXH3j6H0un/CCUTU=
-Received: from CY1PR12MB9697.namprd12.prod.outlook.com (2603:10b6:930:107::6)
- by IA1PR12MB8493.namprd12.prod.outlook.com (2603:10b6:208:447::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.10; Wed, 8 Jul
- 2026 15:57:12 +0000
-Received: from CY1PR12MB9697.namprd12.prod.outlook.com
- ([fe80::3a41:55a0:8203:596d]) by CY1PR12MB9697.namprd12.prod.outlook.com
- ([fe80::3a41:55a0:8203:596d%5]) with mapi id 15.21.0181.010; Wed, 8 Jul 2026
- 15:57:11 +0000
-Message-ID: <c5c9473f-2a60-4385-9c5c-0d0fabe6c8e1@amd.com>
-Date: Wed, 8 Jul 2026 21:26:59 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V3 2/4] dmaengine: xilinx_dma: Move descriptors to done
- list based on completion bit
-To: Srinivas Neeli <srinivas.neeli@amd.com>, Vinod Koul <vkoul@kernel.org>,
- Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
-Cc: Frank Li <Frank.Li@kernel.org>, Michal Simek <michal.simek@amd.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Suraj Gupta <suraj.gupta2@amd.com>, Marek Vasut <marex@nabladev.com>,
- Tomi Valkeinen <tomi.valkeinen@ideasonboard.com>,
- Alex Bereza <alex@bereza.email>,
- Folker Schwesinger <dev@folker-schwesinger.de>, dmaengine@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, git@amd.com
-References: <20260708100652.603074-1-srinivas.neeli@amd.com>
- <20260708100652.603074-3-srinivas.neeli@amd.com>
-Content-Language: en-US
-From: "Pandey, Radhey Shyam" <radheys@amd.com>
-In-Reply-To: <20260708100652.603074-3-srinivas.neeli@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0124.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:96::12) To CY1PR12MB9697.namprd12.prod.outlook.com
- (2603:10b6:930:107::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD41E377003;
+	Wed,  8 Jul 2026 15:59:36 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783526378; cv=none; b=MqT7u/hjuwpBEAk1JkTgaqUYSC2ESb9clo3FexhLHd2LGUW81ref4mfi2A72nekL9SshnxYuUvCJSpVEKYAqG1WE2WQlvEFCGSPqC6G8XKeY8N1SNV/wsMPtN9FssQQ6sVMkIRGGviA9+NtT+nJmD146rmlvWqhX7bIhDzNyrrY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783526378; c=relaxed/simple;
+	bh=egFSGt8kcBq7+3KTBcUr6rEZnhx2TON5wudYFkUgVRY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=eaC5HssKQa3kBn1DNC9GlFYMJk4oW3Tsrda363/OkpvngeGapVzmdOyMc4N6pBtWNZnG81ZpS1UVFCIYr+4hWJRMazlIFkVVoiodZYdnxRp+Jjl4A9P9My2kYiGQFkksM4hqw2zRRmehfIPwwAhvvpAEzU6Vc1WHJ0lS3Z3XvBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F5Wu84Vj; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 236761F00A3D;
+	Wed,  8 Jul 2026 15:59:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783526376;
+	bh=bgHMjrz0F2NAw+WlnQWaUmYDJnFaPfiIHTo3qBDjSJY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=F5Wu84Vj55NlW+FO4CJe3VrjQ/dlbsOXnA6UuuZEYS/0GobWaudc4wJv7O0ESBN+p
+	 oXAl89FDn+G1JdiKRN8YMsY1+PvNd/vEKtclVXXzsOXbTsUbkrL+yg9E35muXyJ8m9
+	 3f57sVzFqlbr6y8M4GfR13FuhXFvwCev0bcRVZAulCZNl/S3siAbWlH5AvDPld9xl1
+	 bZRdR5acXvg8lRNMe0yqaoCbu19CQJ7gKAcSzIyKAg6esgbP6YQ+c1swqZqQFy2k4o
+	 5m5O445imASy8joEwTnsqqKMsS5x9115GCVYiIkabHX7I2wXJQcm6Z5uJ+Pvclmlcw
+	 YppmNw5DaJuuA==
+From: Simon Horman <horms@kernel.org>
+To: dipayanroy@linux.microsoft.com
+Cc: Simon Horman <horms@kernel.org>,
+	kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	leon@kernel.org,
+	longli@microsoft.com,
+	kotaranov@microsoft.com,
+	shradhagupta@linux.microsoft.com,
+	ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com,
+	shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	stephen@networkplumber.org,
+	jacob.e.keller@intel.com,
+	dipayanroy@microsoft.com,
+	leitao@debian.org,
+	kees@kernel.org,
+	john.fastabend@gmail.com,
+	hawk@kernel.org,
+	bpf@vger.kernel.org,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	sdf@fomichev.me,
+	yury.norov@gmail.com,
+	pavan.chebbi@broadcom.com
+Subject: Re: [PATCH net-next v11 2/2] net: mana: force full-page RX buffers via ethtool private flag
+Date: Wed,  8 Jul 2026 16:57:42 +0100
+Message-ID: <20260708155741.1509815-2-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260701141808.461554-3-dipayanroy@linux.microsoft.com>
+References: <20260701141808.461554-3-dipayanroy@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY1PR12MB9697:EE_|IA1PR12MB8493:EE_
-X-MS-Office365-Filtering-Correlation-Id: 97e0044c-e72f-4319-b0c2-08dedd09924d
-X-LD-Processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|1800799024|23010399003|366016|376014|4143699003|5023799004|11063799006|56012099006|6133799003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	cmP1jVVzDwJNItLHrsTVljswJ0Dvo8GiAk65uOCpa75AEvO8xJj34g4rKSsc7cgdQETMhAIVM7S3bzOriwPICVDiMGzmOCpiVGxkhMwOs+rnWblAD+gHzirlZZbxoUfTR6+ZD+t8kMfcu5DW5aU53tWzIVJns/HQ3utCtr8vK9IgVwZDmX0GLE1a987rKlMrgqnVMnn40L3evSJRnj17UXyyjxN9is7uId2C3MkKW+s7nXqpyw1jULIxgsEhyPve6RMqIOSss1PmGHsPGffJo3aVgbfwY1xS+6ib/CmYD7TRDT6Av++fj6bUJQ09BMw4u2Voj1ZFSTdYISAzbI5gc8tx+IZ9WnrG+x2OGXWnZKPi5ltp9pp5+574dkfzvF124fZy2tNLBecOitllWd87zU9LW1GQ389q8NkVGgNEZpODpUTwQ5s52CHhywMmxk1GtI8WwP/zDTSFOPh4n19/Z8tfnUbaHCjk6b4hCFIdrAMiLoMbdhE0MyDTAUt+ldk5mzMx6eVUo2tW/HFaQQ3jB0fghdY3fhHCcp0ZTE/BRXvtsianoDu5BW/FCZz6/UlYlko7frHyVXmc2knVLH1sXM/By7IePvI6kC25ffjVy2Z9BEKgs79YgZtBw/S9fUI9K4AFjVtBGjS3bNXZ9z/RsgxT0C1WvfXp4kgPxig1fQ8=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY1PR12MB9697.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(23010399003)(366016)(376014)(4143699003)(5023799004)(11063799006)(56012099006)(6133799003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VGttSE11STJnRmpSdGpydlVKNjA1Z3lzdTlSVmd6QzN5TnJ0SDF2YlZQeWx0?=
- =?utf-8?B?a0g5dVBURzB5UVovdmx5SzJvUkRIenozR0lhT1cvYm1CNkMvODg2RXNTOTBo?=
- =?utf-8?B?ZmVlTktEQnYzRjJpT2VBRU9Cb3lDTkNHY09wOXhBYjdBcVJlR2lRaXllNnJW?=
- =?utf-8?B?cENSTkxkREswaWl4bE0xRmlCS2hSRmt6cm5DUFpoR0d1bXdZUW9nWVBXUkxZ?=
- =?utf-8?B?aFBKOTZ0RUhFeDJ4eWdkMkQvQVVnUDlDNGhkMnlMOTRMZlF5YXpmY2s2cVJP?=
- =?utf-8?B?cmQxRXIzRGtsMWE3c0tDZ242UGhYdkF6aFVIY2NjRlJRN2sxZFF5QnN5Rklo?=
- =?utf-8?B?UkRmcUNjNTVnRDZRNUlBZEdIZ2Q1YWpXdjlxK2M3aFFvS1pObDdrM1VxV0pZ?=
- =?utf-8?B?dENqRTJuWVZnRGhNcWc1VmRkemVVNzkxcnhkR1lZMCtUQ2Z0T04wbEFQTi83?=
- =?utf-8?B?RExqWGlRakx3OHhQQ1RTVloxN2M0TVJFakMvQUpabjhYdFRNMmV3a1lTenFp?=
- =?utf-8?B?MDJaejdjeXF1bVlZejNTaC9IcXh1RS9xYXFGOWRmSEZ3VkNwVTh3clVyQnZN?=
- =?utf-8?B?V052Q3REZkdYS0lHR1JOb2ZCSERWRVZMM2hFTWxoWTc2RExIdWlxUko1Rkt4?=
- =?utf-8?B?c1lXeTJ6andCeGxwMmZNUFNqMG1Lajl1V1I2N1VqdGNWRDhsQ2xtdjlTQ3Ev?=
- =?utf-8?B?Zlpva1FkOG1WOTRXa3dxSElRQ016dkxKZHM2Nkowb0FNTGlVeXhJdGJjL0p5?=
- =?utf-8?B?RDdtU3dvZko0YUgrQUpFM1lHVUhhS0RzYi9OdkJFRnpWbnorZEw2dTh1UVBl?=
- =?utf-8?B?SGRScXFVczBOc3hRS0x5TC8zRUViNkNyMm5xczVjN0thcUwraEdRbkNIUnh1?=
- =?utf-8?B?NUU3cWVlVGoyNlNjeitZb3Y2eGdqcWx1QTYwbS9lWGk2KzBSZkNwMzFnbTRv?=
- =?utf-8?B?T3FsTVg1VWZoNDFUN04ya3FxYkV5WXd4QjBxZmsyaGM2aTladWZ6Tk1LbENw?=
- =?utf-8?B?TkJ2MFZYbmt3MW5sZjhHWHc3UGpUWG43VHhKbkxpVnd0ODY4Z29OQVdZMFVS?=
- =?utf-8?B?dG9yejd2VlBLVXQ5VTd2UGpsS1poVFBmNXJJRitPRTI0dDJyaEw3Lys4S1BF?=
- =?utf-8?B?c0xCNVU2K0p4UHlScWMzZTF4cWZQOGtocTFBK0UxbWp0cVRXOTV0Yk12RTcv?=
- =?utf-8?B?Z3dwTTZuQVh0N3dQZ2pqT3JjeTREbGtxcm9TRUtHRDR2ODhwZCtteFY2Tnoy?=
- =?utf-8?B?eE9YU1dnZ1pKNmdnMCt6N2xhUDl2RjZjTkFrWVZjYzJBZnZaZUpObmJmQzhk?=
- =?utf-8?B?TUxQa3Q5S1VVdklHekQyMFFXSEJtYUNrZk4wTE9rQmFaTlJzU0NtN2k5UFpo?=
- =?utf-8?B?QW5XVDB1L2V5dmpubGpEOENmc2Q1eVBGblYrT1AxNEFuOXU4dy9DYUxoSmdX?=
- =?utf-8?B?ajFhNmhFUFVRSWxadlg2ZVU3RTNKZE9DaWpyOTlBOG9Eck03R3ZDaXRvUUZU?=
- =?utf-8?B?QUZjN0ptOFNzTTQwV1dUdGFCc052Y0VCdE1ub2VGUE5sSWN1SFVKd3hIZ1BB?=
- =?utf-8?B?YkhLU2NqcW9wN1FpalJkZU5ZdWNNckZKVG1lMFJYQlhvUVBHSlk0ZVlpSHVw?=
- =?utf-8?B?Z1RnaXRCM3BDd2xRNmV5TTQwb2xXdlVzZ05lY0RwbUZ6aThhejR5MWRHamNk?=
- =?utf-8?B?b1N2SmZ4aEF4Y05kNmZEWjRqQlVVU3hzaU9aemZHNERaL2REekszVmxma3ZD?=
- =?utf-8?B?anlEb2hjSUE3QjNsMDBiaERCRUhFK0oycDRQbzQzalV0VE5wQlA5QW91SHQx?=
- =?utf-8?B?YzBJSndtYTVMQ091bTJMQlJFMUM3NzdscSt6VHg1Wlc3eEN2TmFoUDNSUnFo?=
- =?utf-8?B?ZWdveVhIdWN0bWVlb1NoUUJXZUNCUWxEUmRNQmRYUmVkbmxvblAva3BYNW1h?=
- =?utf-8?B?MnVYd25vRGNnaHo3QVJMNG8wZTJQS2p3aTVlaXQ3L1hIaU56QXlhbWV0eHRW?=
- =?utf-8?B?cEY1cjBXalZvYlkwSjlsL2xzOW8weXZ1YWxBYm5YL3hCZS9yNjRFSUFXaVp0?=
- =?utf-8?B?TGkwcjhQeTBLZ3d4UzhjL0xyMm5VbS9LVllSNks1UmdBcDQyRHB2UW5LRTdL?=
- =?utf-8?B?Y1dzL1ZSb3pxWjRaeFFxY0ZiS0FVby90SXFCaXRTcE9xZUNGN1JINnBvV0h5?=
- =?utf-8?B?b1dHSWRKMEFCN2hjRHhmOUM0K1luK0pnSkg4UGpzbkpHNXpTeTVhMUhHZFow?=
- =?utf-8?B?NDBrRCtKTTVoV2NHTUlxNXpRM0hCZnVhbjZobHVaRWRtSkJhN3Q0a3NvN3Ra?=
- =?utf-8?B?RFVCWTZHdVczZ2ZTdDVpbDVmekx5elhyZmVhOUtJUisxNS9qcTFOQT09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 97e0044c-e72f-4319-b0c2-08dedd09924d
-X-MS-Exchange-CrossTenant-AuthSource: CY1PR12MB9697.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2026 15:57:11.5849
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: aXp1zDYZW26gHnW5Z9CaaLVbgaVIkS3gWD0U7/ThkROkXMHOYnbxtbjZiw3ao5Jz
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8493
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	TAGGED_FROM(0.00)[bounces-305881-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305882-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:srinivas.neeli@amd.com,m:vkoul@kernel.org,m:radhey.shyam.pandey@amd.com,m:Frank.Li@kernel.org,m:michal.simek@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:suraj.gupta2@amd.com,m:marex@nabladev.com,m:tomi.valkeinen@ideasonboard.com,m:alex@bereza.email,m:dev@folker-schwesinger.de,m:dmaengine@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:git@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:dipayanroy@linux.microsoft.com,m:horms@kernel.org,m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:leon@kernel.org,m:longli@microsoft.com,m:kotaranov@microsoft.com,m:shradhagupta@linux.microsoft.com,m:ssengar@linux.microsoft.com,m:ernis@linux.microsoft.com,m:shirazsaleem@microsoft.com,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:stephen@networkplumber.org,m:jacob.e.keller@intel.com,m:dipayanroy@microsoft.com,m:leitao@debian.org,m:kees@kernel.org,m:john.fastabend@gmail.com,m:hawk@kernel.org,m:bpf@vger.kernel.org,m:daniel@iogearbox.net,m:ast@kernel.org,m:sdf@fomichev.me,m:yury.norov@gmail.com,m:pavan.chebbi@broadcom.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,m:yurynorov@gmail.com,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[35];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[radheys@amd.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[radheys@amd.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[amd.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,microsoft.com,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me,broadcom.com];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,amd.com:from_mime,amd.com:email,amd.com:mid,amd.com:dkim]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,linux.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6069D728A55
+X-Rspamd-Queue-Id: B9D1B7285D9
 
-> In AXI MCDMA scatter-gather mode, xilinx_dma_complete_descriptor() walks
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+---
+net: mana: force full-page RX buffers via ethtool private flag
 
-avoid "scatter-gather" mode.
+This adds an ethtool private flag "full-page-rx" that forces one RX buffer
+per page to avoid a page_pool fragment path throughput regression on some
+4K PAGE_SIZE ARM64 platforms. Toggling the flag while the port is up
+triggers a mana_detach() + mana_attach() reconfiguration to apply the new
+buffer layout.
 
-> the channel's active_list and unconditionally moves every entry to the
-> done_list. The MCDMA IOC interrupt handler invokes this function on
-> every interrupt-on-completion, but with interrupt coalescing
-> (IRQThreshold > 1) an IOC interrupt may fire after only a subset of the
-> queued descriptors have actually been processed by the hardware. As a
-> result, descriptors whose completion bit is not yet set in the BD status
-> were being reported as completed to client drivers.
-> 
-> Add a check for the descriptor completion bit before moving entries from
-> the active list to the done list, using the appropriate direction-
-> specific status field (s2mm_status for DMA_DEV_TO_MEM, mm2s_status for
-> DMA_MEM_TO_DEV).
-> 
-> The MCDMA completion check is intentionally not guarded by chan->has_sg,
-> unlike the AXIDMA branch above. AXI MCDMA only operates in scatter-gather
-> mode (has_sg is always true), so the guard would always pass and is
-> omitted. The completion bit is therefore checked unconditionally.
+A few questions inline.
 
-Not need to talk about has_sg check and compare it with AXIDMA but if 
-you still prefer make it precise.
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> index 7438ea6b3f26..38f50b4eef87 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
 
-Once addressed , feel free to add.
+[ ... mana_use_single_rxbuf_per_page() and mana_get_rxbuf_cfg() hunks
+      unrelated to the comments below ... ]
 
-Reviewed-by: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
-Thanks!
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> index 3531abfdaf43..24f6ce63b031 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
 
-Just a note that this change aligns with changes that were done in past 
-for AXIDMA in commit 7bcdaa658102 dmaengine: xilinx_dma: Freeup active 
-list based on descriptor completion bit
+[ ... ]
 
-> 
-> Fixes: 6ccd692bfb7f ("dmaengine: xilinx_dma: Add Xilinx AXI MCDMA Engine driver support")
-> Signed-off-by: Srinivas Neeli <srinivas.neeli@amd.com>
-> ---
-> Changes in V3:
->   - Added Fixes tag.
->   - Expanded commit message to explain the interrupt coalescing scenario
->     and why the has_sg guard is omitted for MCDMA.
->   - Changed local variable from 'bool completed' to 'u32 status' for
->     cleaner status field access.
->   - Simplified completion check logic.
-> 
-> Changes in V2:
->   - No change.
-> ---
->   drivers/dma/xilinx/xilinx_dma.c | 11 +++++++++++
->   1 file changed, 11 insertions(+)
-> 
-> diff --git a/drivers/dma/xilinx/xilinx_dma.c b/drivers/dma/xilinx/xilinx_dma.c
-> index ff5b29a808e9..1b5b00f08c5f 100644
-> --- a/drivers/dma/xilinx/xilinx_dma.c
-> +++ b/drivers/dma/xilinx/xilinx_dma.c
-> @@ -1784,6 +1784,17 @@ static void xilinx_dma_complete_descriptor(struct xilinx_dma_chan *chan)
->   					      struct xilinx_axidma_tx_segment, node);
->   			if (!(seg->hw.status & XILINX_DMA_BD_COMP_MASK) && chan->has_sg)
->   				break;
-> +		} else if (chan->xdev->dma_config->dmatype == XDMA_TYPE_AXIMCDMA) {
-> +			struct xilinx_aximcdma_tx_segment *seg;
-> +			u32 status;
+> @@ -611,6 +630,88 @@ static int mana_get_link_ksettings(struct net_device *ndev,
+>  	return 0;
+>  }
+>  
+> +static u32 mana_get_priv_flags(struct net_device *ndev)
+> +{
+> +	struct mana_port_context *apc = netdev_priv(ndev);
 > +
-> +			seg = list_last_entry(&desc->segments,
-> +					      struct xilinx_aximcdma_tx_segment,
-> +					      node);
-> +			status = (chan->direction == DMA_DEV_TO_MEM) ?
-> +				seg->hw.s2mm_status : seg->hw.mm2s_status;
-> +			if (!(status & XILINX_DMA_BD_COMP_MASK))
-> +				break;
->   		}
->   		if (chan->has_sg && chan->xdev->dma_config->dmatype !=
->   		    XDMA_TYPE_VDMA)
+> +	return apc->priv_flags;
+> +}
+> +
+> +static int mana_set_priv_flags(struct net_device *ndev, u32 priv_flags)
+> +{
+> +	struct mana_port_context *apc = netdev_priv(ndev);
+> +	u32 changed = apc->priv_flags ^ priv_flags;
+> +	u32 old_priv_flags = apc->priv_flags;
+> +	bool schedule_port_reset = false;
+> +	int err = 0;
+> +
+> +	if (!changed)
+> +		return 0;
+> +
+> +	/* Reject unknown bits */
+> +	if (priv_flags & ~GENMASK(MANA_PRIV_FLAG_MAX - 1, 0))
+> +		return -EINVAL;
+> +
+> +	if (changed & BIT(MANA_PRIV_FLAG_USE_FULL_PAGE_RXBUF)) {
+> +		apc->priv_flags = priv_flags;
 
+[Low]
+Is the storage of priv_flags intentionally nested inside the per-flag
+branch?  With only one flag today this is fine, but when a second bit is
+added to enum mana_priv_flag_bits, a user toggling only the new bit
+passes the !changed and unknown-bits checks, the outer if is skipped,
+apc->priv_flags is never updated, and mana_set_priv_flags() returns 0
+while mana_get_priv_flags() keeps reporting the old state.
+
+Would it be cleaner to store priv_flags unconditionally after validation
+and use per-flag if (changed & BIT(...)) blocks only for the
+flag-specific reconfiguration?
+
+> +
+> +		if (!apc->port_is_up) {
+> +			/* Port is down, flag updated to apply on next up
+> +			 * so just return.
+> +			 */
+> +			return 0;
+> +		}
+> +
+> +		/* Pre-allocate buffers to prevent failure in mana_attach
+> +		 * later
+> +		 */
+> +		err = mana_pre_alloc_rxbufs(apc, ndev->mtu, apc->num_queues);
+
+[Low]
+When the MTU is already jumbo (mtu + MANA_RXBUF_PAD > PAGE_SIZE / 2) or
+XDP is attached, mana_use_single_rxbuf_per_page() already returns true
+regardless of the new priv flag:
+
+	if (apc->priv_flags & BIT(MANA_PRIV_FLAG_USE_FULL_PAGE_RXBUF))
+		return true;
+
+	/* For xdp and jumbo frames make sure only one packet fits per page. */
+	if (mtu + MANA_RXBUF_PAD > PAGE_SIZE / 2 || mana_xdp_get(apc))
+		return true;
+
+In that case mana_get_rxbuf_cfg() produces identical output whether the
+new flag is on or off, yet toggling the flag here always performs a full
+mana_pre_alloc_rxbufs() + mana_detach() + mana_attach() cycle and flaps
+the link.
+
+Would a pre/post comparison of mana_get_rxbuf_cfg() output be worth
+adding to skip the reconfiguration when nothing actually changes?
+
+[High]
+mana_set_priv_flags() drives the same detach/attach sequence used by
+mana_set_channels() and mana_per_port_queue_reset_work_handler(), but
+does not take apc->vport_mutex and set apc->channel_changing = true
+across the window.
+
+The struct comment on channel_changing spells out the invariant:
+
+	/* Set by mana_set_channels() under vport_mutex to block RDMA
+	 * from grabbing the vport during the detach/attach window.
+	 * Checked by mana_cfg_vport() when called from the RDMA path.
+	 */
+	bool channel_changing;
+
+Without it, after mana_detach() uncfg's the vport an RDMA client can
+call mana_cfg_vport() and bump vport_use_count, and then mana_attach()
+will fail with -EBUSY when it re-cfg's the vport.
+
+There is also no equivalent of the '!port_is_up && vport_use_count'
+early -EBUSY check that mana_set_channels() performs, so is the flag
+allowed to be changed silently while an RDMA client is using the vport?
+
+> +		if (err) {
+> +			netdev_err(ndev,
+> +				   "Insufficient memory for new allocations\n");
+> +			apc->priv_flags = old_priv_flags;
+> +			return err;
+> +		}
+> +
+> +		err = mana_detach(ndev, false);
+
+[High]
+mana_detach() begins with ASSERT_RTNL(), and so does mana_attach()
+called below.  Is RTNL guaranteed to be held on the SET priv-flags path?
+
+mana registers net_shaper_ops in mana_devops, which makes it an
+ops-locked driver, so netdev_need_ops_lock() is true and the ethtool
+core acquires rtnl only when the driver opts in via
+ETHTOOL_OP_NEEDS_RTNL_* for that specific command.
+
+Looking at mana_ethtool_ops.op_needs_rtnl:
+
+	.op_needs_rtnl		= ETHTOOL_OP_NEEDS_RTNL_SCHANNELS |
+				  ETHTOOL_OP_NEEDS_RTNL_SRINGPARAM |
+				  ETHTOOL_OP_NEEDS_RTNL_GLINK,
+
+ETHTOOL_OP_NEEDS_RTNL_SPFLAGS is not listed, so ASSERT_RTNL() in the
+detach/attach helpers below will WARN, and the code races with
+RTNL-serialized mutators (mana_open, mana_close, mana_change_mtu,
+mana_tx_timeout) that read and write apc->port_is_up, apc->rxqs,
+apc->tx_qp and apc->port_st_save.
+
+Should ETHTOOL_OP_NEEDS_RTNL_SPFLAGS be added to op_needs_rtnl, matching
+what is already done for SET channels?
+
+> +		if (err) {
+> +			netdev_err(ndev, "mana_detach failed: %d\n", err);
+> +			apc->priv_flags = old_priv_flags;
+> +
+> +			/* Port is in an inconsistent state. Restore
+> +			 * 'port_is_up' so that queue reset work handler
+> +			 * can properly detach and re-attach.
+> +			 */
+> +			apc->port_is_up = true;
+> +			schedule_port_reset = true;
+> +			goto out;
+> +		}
+> +
+> +		err = mana_attach(ndev);
+> +		if (err) {
+> +			netdev_err(ndev, "mana_attach failed: %d\n", err);
+> +			apc->priv_flags = old_priv_flags;
+> +
+> +			/* Restore 'port_is_up' so the reset work handler
+> +			 * can properly detach/attach. Without this,
+> +			 * the handler sees port_is_up=false and skips
+> +			 * queue allocation, leaving the port dead.
+> +			 */
+> +			apc->port_is_up = true;
+> +			schedule_port_reset = true;
+
+[High]
+On this branch, mana_detach() has already succeeded and run
+mana_cleanup_port_context(), so apc->rxqs is NULL and queues are torn
+down.  Setting apc->port_is_up = true here between now and when
+queue_reset_work runs opens a window where callers gate on port_is_up
+as their "safe to access rxqs/tx_qp" predicate.
+
+For example, mana_get_ethtool_stats() does:
+
+	if (!apc->port_is_up)
+		return;
+	...
+	rxq = apc->rxqs[q];
+	...
+
+A concurrent ethtool -S invocation during that window will pass the
+port_is_up gate and dereference apc->rxqs[q]->stats on a NULL rxqs.
+
+Is the port_is_up restore actually needed for the reset work handler's
+mana_detach() call?  On the reset path, mana_detach() takes its early
+return when !netif_device_present(ndev):
+
+	if (!from_close && !netif_device_present(ndev))
+		return 0;
+
+That early return does not touch apc->port_st_save, so the saved state
+from the earlier successful mana_detach() should already be intact for
+the follow-up mana_attach().
+
+There is also no smp_wmb() paired with this write, unlike the pattern
+used inside mana_detach()/mana_attach() proper.
+
+> +		}
+> +	}
+> +
+> +out:
+> +	mana_pre_dealloc_rxbufs(apc);
+> +
+> +	if (schedule_port_reset)
+> +		queue_work(apc->ac->per_port_queue_reset_wq,
+> +			   &apc->queue_reset_work);
+> +
+> +	return err;
+> +}
+> +
+
+[ ... remaining hunks unrelated to the comments above ... ]
 
