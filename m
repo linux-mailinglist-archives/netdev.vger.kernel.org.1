@@ -1,274 +1,184 @@
-Return-Path: <netdev+bounces-305945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305946-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zxEQN+6WTmo2QAIAu9opvQ
-	(envelope-from <netdev+bounces-305945-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 20:29:02 +0200
+	id 6c9ELhqXTmpGQAIAu9opvQ
+	(envelope-from <netdev+bounces-305946-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 20:29:46 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40FE972981A
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 20:29:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C4B4729822
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 20:29:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=dXTzUtiy;
-	dmarc=pass (policy=reject) header.from=mailbox.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305945-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305945-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=birger-koblitz.de header.s=default header.b=NQ8w0Ns0;
+	dkim=pass header.d=birger-koblitz.de header.s=default header.b=VrQiw1AX;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305946-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305946-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E8EF1303F674
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 18:26:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2E6D63019BA6
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 18:27:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56C4D3B42EC;
-	Wed,  8 Jul 2026 18:26:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5778C48A2B5;
+	Wed,  8 Jul 2026 18:27:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9ECA21CC58;
-	Wed,  8 Jul 2026 18:25:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEDB243800D;
+	Wed,  8 Jul 2026 18:27:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783535162; cv=none; b=fVokFSK8GHeoFUWVMQSpRbSasTAPHwFn30z7fBHAcwkXCvaxxKMJP945J8Y9qmRosbl5odXD6ozdoojcfQkZcGtEdkpTPnciHf9Os6QWUy+HtDJrKDc9y7rqIgwh3w/ETr9H2rtSHakUMl98CagVx5lDMMrxTDc1W6ukELdfJi4=
+	t=1783535261; cv=none; b=PIBTtkR67XtWZAFFjO9oICSCrKc6N/CWO8AlUGc0wcLCI4fg5EH35zWE2mBcJ1pSmXdUH3EMIP0Hg/NOqq1cyQEJpuE4Qbt6VI8Z4UG/x/STSyQ8EGuReI5bgB3o6ACL+YwfXbGHi4tREo6KMPK/QTP0CX5ed1N7IqPc13jL+yA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783535162; c=relaxed/simple;
-	bh=7ygv9zNUSd2ulxVRE0lEpnSk+Rc+r1kyJIfvOrIRmAA=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Pm66zX9JDwdgwAYtZVMy0XfRGNwy8oFEWcnOm+SNFH9783PKSZiGPo+2YP+pPI0HTZ1Lpe7U6k4sUnOKQMlUBR6JC0IKb3yGI+9tzqpjIAhXepxrztgOxN8eO7WFWf5/Ru+/VDQWAELXxVCbpMQp6PM+aTDgXP6/f6TNmRW8ajM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=dXTzUtiy; arc=none smtp.client-ip=80.241.56.151
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA512)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4gwRNz0jctz8v4r;
-	Wed, 08 Jul 2026 20:25:55 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1783535155;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z4iuFEB0S+wIFIF/+96tCQE1MxQdc4F6EeshLLWPU+0=;
-	b=dXTzUtiyaHAbBOInci3ON7YWIZmzU0azhpPDSn9jy3h2WWaRDv1IXtic0AgX7IPulaR/Of
-	B7OXD6hxDr8qX6WvlyE8ruVYehHlwnz39z3ZYVdO5yFIrzVyXabzCnGc4l1isahR4qqOUV
-	OcLabbB+kYlM20upQm1Ia0QRBNEQYJjqkm5n5sntXEKybUQOeg7W5kpgJm1ju7BvLNyUaf
-	y1QX3F+YAXfRQbLPC3nB9p2lrIHkngziZ+DApyyj5iRKv6/PllKx5oUMDky67QC0Cs+8Cb
-	sRz2HRuIXUCq1uMeqYB5iNM14HEA5gwhy/GDa0AZBQF0MvjlT1ZD1hUznGKX7A==
-Message-ID: <c6a291e752b889689c0776e59024e752e4306868.camel@mailbox.org>
-Subject: Re: [PATCH RFC net-next 3/3] net: dsa: mxl862xx: add devlink
- flash_update and info_get
-From: Manuel Ebner <manuelebner@mailbox.org>
-To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>, 
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,  Jakub Kicinski	
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman	
- <horms@kernel.org>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Date: Wed, 08 Jul 2026 20:25:49 +0200
-In-Reply-To: <ak0KOrM5E2_sPIHf@makrotopia.org>
-References: <ak0KOrM5E2_sPIHf@makrotopia.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1783535261; c=relaxed/simple;
+	bh=/Clcg5W49fBSfL0SR2mQDWbxpt8lcd/KGT45zBqE2OY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KBg3lXPTt6KR+kWxWCU0dW4R52wk6CgSNulS/Yivwmx6+n54h0aj4V+6I6BNSW7DFkhActdbOU/7a83oNTHiM4vCrCvFN7kJsIliNzQu6RfrwDHRXsWup8JG9TRH8FCpOAMLL4/HvDjIHWKKp8E02cT4cTrGro0pYvvh2BNIIcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=NQ8w0Ns0; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=VrQiw1AX; arc=none smtp.client-ip=23.88.97.239
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1783535258;
+	bh=/Clcg5W49fBSfL0SR2mQDWbxpt8lcd/KGT45zBqE2OY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=NQ8w0Ns0sMDpcxo56FYrlRW/4dVTE2c5t+BOp7S+vYSyEcrkJamMg6RKHdRs+Ufc9
+	 stm0g4g2q21AL/gxFpafIMpNbdX1Wd6AtCFN/ifbhrn213vefmRP+Vf+v9cmdnyQCQ
+	 qairUvNPdr4Skvvhm8AEAlU/hTxcNOz7D1VVw2YbChKUDsFFGJPYk7j4vMgS+P0oWH
+	 RxfTZ3pNVOzTf7ZJgyxcODSn8yjeMvCcb/g9YSo4cAl7N45fe7FXJeOYV456f68HmZ
+	 wseWEtVrlQB6RH6Mh2KLPa4E+9DyjbX4O1kWoUWnT+sW214P89iqG6RaWqX7yZwGkT
+	 vgp28RlXM/VVQ==
+Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
+	id 49E3A493F1; Wed,  8 Jul 2026 18:27:38 +0000 (UTC)
+X-Spam-Level: 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1783535256;
+	bh=/Clcg5W49fBSfL0SR2mQDWbxpt8lcd/KGT45zBqE2OY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=VrQiw1AXARNU6X4FGPQhC5hJnwn5L8jbeJ/P6hBM7Ao69CA9z240azFFJd6G3IPvO
+	 jDi78qFXX/62lAU9C2ynYqW4/Kt7iTovv85mz3oKWstUY/YoKgIj4Dek0bxPLs/Evz
+	 ivVDOwKflIMrXpFKbZ/KeqFckCbnyIW+zAaHQKzJW5NgUtE03OXGhFsdQclOMp3HQ5
+	 GECHH6pcSOQrJGygGxbIrysDeEErJAr1H5QMQOm6WNCle6F0WI5mPuAAOOUQ38rRu9
+	 dtKxHQhLwAAhOOG/0gQPCVp5nC/eo/nyFbtG16WEuNpEqmpeKdmbd/ZUEEVUCeEjB9
+	 Z3ehZdubkpSAQ==
+Received: from [IPV6:2003:c6:9f1c:3c00:b761:2fd3:8ae8:9dbd] (p200300c69f1c3c00b7612fd38ae89dbd.dip0.t-ipconnect.de [IPv6:2003:c6:9f1c:3c00:b761:2fd3:8ae8:9dbd])
+	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 01F1C493D0;
+	Wed,  8 Jul 2026 18:27:35 +0000 (UTC)
+Message-ID: <dadd3b8d-fab8-4ad0-9167-e46132a1db1f@birger-koblitz.de>
+Date: Wed, 8 Jul 2026 20:27:35 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MBO-RS-ID: 791c0825b960b52aa7c
-X-MBO-RS-META: 8yycxhk77caia6ri7r6i4yem5mdpo94g
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/9] ax88179_178a: Add HW support for AX179A-based chips
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260701-ax88179a-v1-0-13685df67515@birger-koblitz.de>
+ <20260701-ax88179a-v1-2-13685df67515@birger-koblitz.de>
+ <6b368510-05d4-4d73-b588-8002d0d59915@lunn.ch>
+From: Birger Koblitz <mail@birger-koblitz.de>
+Content-Language: en-US
+In-Reply-To: <6b368510-05d4-4d73-b588-8002d0d59915@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305945-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305946-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:daniel@makrotopia.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	FORGED_SENDER(0.00)[manuelebner@mailbox.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-usb@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[birger-koblitz.de];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[birger-koblitz.de:+];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mailbox.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[manuelebner@mailbox.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mailbox.org:from_mime,mailbox.org:dkim,mailbox.org:mid,makrotopia.org:email]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,birger-koblitz.de:from_mime,birger-koblitz.de:dkim,birger-koblitz.de:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 40FE972981A
-
-Hi Daniel,
-
-On Tue, 2026-07-07 at 16:16 +0200, Daniel Golle wrote:
-> Implement runtime firmware upgrade via "devlink dev flash" and version
-> reporting via "devlink dev info":
->=20
-> =C2=A0 devlink dev info mdio_bus/<bus>/<addr>
-> =C2=A0 devlink dev flash mdio_bus/<bus>/<addr> file <firmware.bin>
->=20
-> The driver sends SYS_MISC_FW_UPDATE to enter MCUboot rescue mode,
-> transfers the signed image over the SB PDI bulk-transfer protocol
-> (clause-22 SMDIO), waits for the switch to reboot, then schedules
-> device_reprobe() for a clean remove()+probe() cycle.
-
-This could be split up into two sentences.
+X-Rspamd-Queue-Id: 1C4B4729822
 
 
-> Before the transfer begins the driver closes all conduit interfaces
-> and marks every netdev (user and conduit) not-present via
-> netif_device_detach() so that userspace cannot bring ports back up
-> during the ~15 minute flash process. Progress is reported through
-> devlink status notifications. Once the FW_UPDATE command has been
-> sent the switch is in MCUboot mode and normal operation can only be
-> restored by a reprobe, so the driver always schedules one regardless
-> of transfer outcome.
->=20
-> The reprobe work item is dynamically allocated (following the iwlwifi
-> pattern)
 
-I'm not familiar with the net subsystem, if the iwlwifi pattern is not
-trivial consider adding a link or a explanation.
+On 7/1/26 17:05, Andrew Lunn wrote:
+>>   #include <linux/usb/usbnet.h>
+>>   #include <uapi/linux/mdio.h>
+>>   #include <linux/mdio.h>
+>> +#include <linux/if_vlan.h>
+> 
+> Does this patch require this header?
+Yes, because of the use of __vlan_hwaccel_put_tag later in the patch.
 
->  because device_reprobe() triggers remove() which frees the
-> devm-managed priv while the work is still executing.
->=20
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
-> =C2=A0drivers/net/dsa/mxl862xx/Makefile=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 |=C2=A0=C2=A0 2 +-
-> =C2=A0drivers/net/dsa/mxl862xx/mxl862xx-cmd.h=C2=A0 |=C2=A0=C2=A0 1 +
-> =C2=A0drivers/net/dsa/mxl862xx/mxl862xx-fw.c=C2=A0=C2=A0 | 434 ++++++++++=
-+++++++++++++
-> =C2=A0drivers/net/dsa/mxl862xx/mxl862xx-fw.h=C2=A0=C2=A0 |=C2=A0 15 +
-> =C2=A0drivers/net/dsa/mxl862xx/mxl862xx-host.c |=C2=A0=C2=A0 7 +
-> =C2=A0drivers/net/dsa/mxl862xx/mxl862xx.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
-=C2=A0=C2=A0 3 +
-> =C2=A0drivers/net/dsa/mxl862xx/mxl862xx.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
-=C2=A0=C2=A0 2 +
-> =C2=A07 files changed, 463 insertions(+), 1 deletion(-)
-> =C2=A0create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-fw.c
-> =C2=A0create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-fw.h
->=20
-> diff --git a/drivers/net/dsa/mxl862xx/Makefile b/drivers/net/dsa/mxl862xx=
-/Makefile
-> index a7be0e6669df..bccac0d0f703 100644
-> --- a/drivers/net/dsa/mxl862xx/Makefile
-> +++ b/drivers/net/dsa/mxl862xx/Makefile
-> @@ -1,3 +1,3 @@
-> =C2=A0# SPDX-License-Identifier: GPL-2.0
-> =C2=A0obj-$(CONFIG_NET_DSA_MXL862) +=3D mxl862xx_dsa.o
-> -mxl862xx_dsa-y :=3D mxl862xx.o mxl862xx-host.o mxl862xx-phylink.o
-> +mxl862xx_dsa-y :=3D mxl862xx.o mxl862xx-host.o mxl862xx-phylink.o mxl862=
-xx-fw.o
-> diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-cmd.h
-> b/drivers/net/dsa/mxl862xx/mxl862xx-cmd.h
-> index c87a955c13c4..e2aa2934e9e1 100644
-> --- a/drivers/net/dsa/mxl862xx/mxl862xx-cmd.h
-> +++ b/drivers/net/dsa/mxl862xx/mxl862xx-cmd.h
-> @@ -70,6 +70,7 @@
-> =C2=A0#define INT_GPHY_READ			(GPY_GPY2XX_MAGIC + 0x1)
-> =C2=A0#define INT_GPHY_WRITE			(GPY_GPY2XX_MAGIC + 0x2)
-> =C2=A0
-> +#define SYS_MISC_FW_UPDATE		(SYS_MISC_MAGIC + 0x1)
-> =C2=A0#define SYS_MISC_FW_VERSION		(SYS_MISC_MAGIC + 0x2)
-> =C2=A0
-> =C2=A0#define MXL862XX_XPCS_PCS_CONFIG	(MXL862XX_XPCS_MAGIC + 0x1)
-> diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-fw.c b/drivers/net/dsa/mxl=
-862xx/mxl862xx-
-> fw.c
-> new file mode 100644
-> index 000000000000..7cd4a462667b
-> --- /dev/null
-> +++ b/drivers/net/dsa/mxl862xx/mxl862xx-fw.c
-> @@ -0,0 +1,434 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * Firmware flash and devlink support for MaxLinear MxL862xx
+> 
+>> @@ -414,7 +570,6 @@ static int ax88179_suspend(struct usb_interface *intf, pm_message_t message)
+>>   
+>>   	usbnet_suspend(intf, message);
+>>   
+>> -	/* Enable WoL */
+>>   	if (priv->wolopts) {
+> 
+> Please try to avoid changes like this.
+Fixed in v2.
 
-If you have a data sheet for the device please add a link.
+> 
+>>   	/* Force bulk-in zero length */
+>>   	ax88179_read_cmd(dev, AX_ACCESS_MAC, AX_PHYPWR_RSTCTL,
+>> -			 2, 2, &tmp16);
+>> +			2, 2, &tmp16);
+>>   
+>>   	tmp16 |= AX_PHYPWR_RSTCTL_BZ | AX_PHYPWR_RSTCTL_IPRL;
+>>   	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_PHYPWR_RSTCTL,
+>> -			  2, 2, &tmp16);
+>> +			2, 2, &tmp16);
+> 
+> Please put white space changes in another patch.
+Will be removed from v2.
 
-> + *
-> + * Copyright (C) 2025 Daniel Golle <daniel@makrotopia.org>
-> + *
-> + * Usage:
-> + *=C2=A0=C2=A0 # Query running firmware version:
-> + *=C2=A0=C2=A0 devlink dev info mdio_bus/<bus>/<addr>
-> + *
-> + *=C2=A0=C2=A0 # Flash new firmware (all ports are taken down automatica=
-lly):
-> + *=C2=A0=C2=A0 devlink dev flash mdio_bus/<bus>/<addr> file <firmware.bi=
-n>
-> + *
-> + * The flash process takes approximately 15 minutes.=C2=A0
+> 
+>> +	/* Initialize MII structure */
+>> +	dev->mii.dev = dev->net;
+>> +	dev->mii.mdio_read = ax88179_mdio_read;
+>> +	dev->mii.mdio_write = ax88179_mdio_write;
+>> +	dev->mii.phy_id_mask = 0xff;
+>> +	dev->mii.reg_num_mask = 0xff;
+>> +	dev->mii.phy_id = 0x03;
+> 
+> If this device is going to have a long term future, it really should
+> move to phylink.
 
-Does the user get informed about the wait?
+As discussed previously, I started converting the code to phylink,
+but for the PHYs implemented as IP-cores in the the AX88179A-based chips,
+the behaviour of the PHYs is so different from their discrete counterparts
+because of other firmware used, that even if they have the same PHY-ID as
+their discrete counterparts, they behave entirely differently and in a
+way that is adapted to being used via USB as part of a USB-Ethernet
+adapter.
 
+Only few of the USB-Ethernet drivers presently use phylink (asix,
+lan78xx), btw.
 
-> Progress is
-> + * reported via devlink status notifications. After a successful (or
-> + * failed) flash the driver reprobes the device automatically.
-> + */
->=20
-> [...]
-> +
-> +/* Timeouts */
-> +#define MXL862XX_FW_READY_TIMEOUT_MS	30000
-> +#define MXL862XX_FW_ACK_TIMEOUT_MS	5000
-> +#define MXL862XX_FW_ERASE_TIMEOUT_MS	300000	/* flash erase is very slow =
-*/
-
-Slow is relative.
-Can you give an erase speed in MB/s or time for the whole memory?
-
-> [...]
-> +
-> +	dev_info(ds->dev, "flash: running firmware %u.%u.%u\n",
-> +		 priv->fw_version.major, priv->fw_version.minor,
-> +		 priv->fw_version.revision);
-> +
-> +	/* Close all user and CPU ports while the firmware is still
-> +	 * alive. dev_close() on user ports triggers multicast group
-> +	 * leave and host MDB/FDB removal on the CPU port through the
-> +	 * normal DSA callbacks so the core's tracking lists are
-> +	 * drained before we enter MCUboot. Then mark user ports
-> +	 * not-present so userspace cannot bring them back up during
-> +	 * the (slow) flash process. The conduit is only closed, not
-
-(slow) -> up to 20 minutes long flash process.
-    or -> circa 15 minutes long flash process.
-
-> +	 * detached -- it is owned by the Ethernet MAC driver and
-> +	 * dev_open() during reprobe must be able to bring it back.
-> +	 */
-> +[...]
-> +	/* Silently discard all API commands during the teardown that
-> +	 * reprobe triggers -- the switch firmware has been reset and
-> +	 * has no knowledge of the old configuration.
-> +	 */
-> +	priv->skip_teardown =3D true;
-> +
-> +	reprobe =3D kzalloc(sizeof(*reprobe), GFP_KERNEL);
-
--> kzalloc_obj(*reprobe); - GFP_KERNEL is the default, therefore omitted.
-as suggested in 2932ba8d9c99 ("slab: Introduce kmalloc_obj() and family")
-
-Did you skip checkpatch or is it out of date?
-
-Anyway thanks
- Manuel
-
-> [...]
+Birger
 
