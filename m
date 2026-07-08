@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-305668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305669-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id TRzUEvr5TWo7BAIAu9opvQ
-	(envelope-from <netdev+bounces-305668-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 09:19:22 +0200
+	id QrpUHRX+TWpbBQIAu9opvQ
+	(envelope-from <netdev+bounces-305669-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 09:36:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46C4B7228FD
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 09:19:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43DCF722B2A
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 09:36:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=samsung.com header.s=mail20170921 header.b=dqgy0tx6;
+	dkim=pass header.d=samsung.com header.s=mail20170921 header.b="C8KSUpY/";
 	dmarc=pass (policy=none) header.from=samsung.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305668-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305668-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305669-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305669-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B9F67301277B
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 07:18:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2CDC430D24A5
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 07:27:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C8393F20ED;
-	Wed,  8 Jul 2026 07:18:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B6AA3EFFC4;
+	Wed,  8 Jul 2026 07:27:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C41E3ACF1D
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 07:18:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0533E7BBB
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 07:27:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783495114; cv=none; b=YIiqLiA3iN5jPGwNnrdX32r1eos5MjbeXksd7MsuLlF2lb0x+srFTS1kBoN5EaQTf8EExN9etj8kk2UDR4U0RdjKL7yzBoKWqNa4+yoNKWON2Uh5PzccnZodQruRPYaroKVVsiYPAMcEa3JSqlWlcOyzqAv4AZEWeiK5bB3C+90=
+	t=1783495645; cv=none; b=Omi3c9GXveRHJLpzSBUkQP0OQxA3sa80H/7DwCMB1VU4LvT69bhh/d2hJfNY3/5pPRWDGHv6mV4mlO1/2uVc3LdUQrLRVXU4d0s+R6s4PN8dLYz5MNLCcbYkqfdR7/5Rg8bU+N30IDQDwOexehZIGdlUhG/UZhdUxh8mtOjnC7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783495114; c=relaxed/simple;
-	bh=tc5P6XvtSNcAFKVcTcvXExZuQxIKi/5PDLgdqL28+9A=;
+	s=arc-20240116; t=1783495645; c=relaxed/simple;
+	bh=8TwkcMAicouAmlLicdqCdPqx48WWKC4JL5vHmeBaaEQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=gE+KjyFeP3fa/XN8WH9BV6ay/VtmqbdCusW6e2Dubn2FPBIV2HPRoQTvi9MofBBbq9PikMwl8cfKvssTuAANDEZmpn3sOhR3KTJGIGQaeJi/qrDnJoGXTD97OHw9X3E5oxGPdZa/6CPSDTBNSP30pHZFmIVM6B/P232u7J3HTv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=dqgy0tx6; arc=none smtp.client-ip=210.118.77.12
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20260708071821euoutp02b786dda0d5ccfdc629ed862bb7b32d6b~AP1h0-xhp0587605876euoutp029
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 07:18:21 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20260708071821euoutp02b786dda0d5ccfdc629ed862bb7b32d6b~AP1h0-xhp0587605876euoutp029
+	 Content-Type:References; b=gV7ffOeZPeglZrlKG9tGGLWupaB649rBqpmmLTBgE6rCtwnxNuD1W+EECTeqQCdr+qaQN0WPZljBmZqmm84TyQyhCdI6XcA6ExyTgdR3/3nqaUL3TgaCcJFQ2h6uX+YLvUnu3BJoENBfO35JU4z16BEi8eHxY97pCnBCICEy1uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=C8KSUpY/; arc=none smtp.client-ip=210.118.77.12
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20260708072708euoutp020ddce7b5481265a080b4b868f3931eff~AP9MdpT7m1814218142euoutp02o
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 07:27:08 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20260708072708euoutp020ddce7b5481265a080b4b868f3931eff~AP9MdpT7m1814218142euoutp02o
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1783495101;
-	bh=NtEIand9GnbkU6Gmk6cHJc/OJJrgfSZv10wVu3h9OTs=;
+	s=mail20170921; t=1783495628;
+	bh=AAT0vxHvZGnQFghigS3BsjoKQVyxGb6u1tpbTaYnWoA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dqgy0tx6XfSS9ZQOmJv6oBqEiBm18HkmXtHwlF7mqVY+2G9fPOU4A7YwzY/BuPI+g
-	 R2WivM4MbVng3qen7ibHCFcwIDme3asMvIy6ZRahvtdLWQdQiAzRV3Yw0KMzd8X8Sr
-	 plnn1GtrAunRxeJ1NVIECjQgsaLmaU30x+99Ef3c=
-Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20260708071821eucas1p1781d839e4c171db030e3cc100140a18b~AP1hX0Igg1688916889eucas1p1b;
-	Wed,  8 Jul 2026 07:18:21 +0000 (GMT)
+	b=C8KSUpY/JfVGmDRu7STwuADaSziCHaNIIg1/sjBVa/o2LhIGB2vi/x8rLiSD37/+P
+	 AsJTC2cxhc9t7lo1v9hzAt5Wbf5vAiBxaBUMYDdJYBxwHVSlg8iYZiuKIVnnITnGV5
+	 uWFPg3H7vc9UzQq6aaST3GlttX+WpMuJlX4wjFVc=
+Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20260708072707eucas1p2dce9de593df0be3855839c4f41f61f2c~AP9Lj3STQ0421304213eucas1p2m;
+	Wed,  8 Jul 2026 07:27:07 +0000 (GMT)
 Received: from AMDC4622.eu.corp.samsungelectronics.net (unknown
-	[106.120.77.34]) by eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20260708071820eusmtip236a9c2dfa6bc4bffa3c1d0aa81ba9c6d~AP1gt38kQ3160531605eusmtip2G;
-	Wed,  8 Jul 2026 07:18:20 +0000 (GMT)
-Date: Wed, 8 Jul 2026 09:18:17 +0200
+	[106.120.77.34]) by eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260708072706eusmtip1a9d4958030b6902d17d42dbb46221419~AP9KjxNiX1151911519eusmtip1i;
+	Wed,  8 Jul 2026 07:27:06 +0000 (GMT)
+Date: Wed, 8 Jul 2026 09:27:06 +0200
 From: Jakub Raczynski <j.raczynski@samsung.com>
 To: Andrew Lunn <andrew@lunn.ch>
 Cc: netdev@vger.kernel.org, k.tegowski@samsung.com,
@@ -62,27 +62,26 @@ Cc: netdev@vger.kernel.org, k.tegowski@samsung.com,
 	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 1/2] net/stmmac: Protect against zero queue DTS
- config
-Message-ID: <ak35uSDb8YGJDixt@AMDC4622.eu.corp.samsungelectronics.net>
+Subject: Re: [PATCH net 2/2] net/stmmac: Verify provided DTS AXI setup
+Message-ID: <ak37yhQjA32gI0kr@AMDC4622.eu.corp.samsungelectronics.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <d4fb7a9f-c0bb-4ced-8428-14bd2aa66d85@lunn.ch>
-X-CMS-MailID: 20260708071821eucas1p1781d839e4c171db030e3cc100140a18b
+In-Reply-To: <ee504cab-b1da-4584-8693-70ed5cd943c7@lunn.ch>
+X-CMS-MailID: 20260708072707eucas1p2dce9de593df0be3855839c4f41f61f2c
 X-Msg-Generator: CA
 Content-Type: multipart/mixed;
-	boundary="----eLQjSWLrXY9-oLo2Anxe58pGrKtOPid212nTY8jU3vRtfcwP=_131043_"
-X-RootMTR: 20260707174438eucas1p132b5c02ceed2493cc7de98ab28c390ee
+	boundary="----FoLMw5K6Fe9t5vMBf.HRV6LBdzA_42JMttv_zc4dtfIAKr8-=_130f8b_"
+X-RootMTR: 20260707174439eucas1p153ea592df5c1c7a50e947022a80a1056
 X-EPHeader: CA
-X-CMS-RootMailID: 20260707174438eucas1p132b5c02ceed2493cc7de98ab28c390ee
+X-CMS-RootMailID: 20260707174439eucas1p153ea592df5c1c7a50e947022a80a1056
 References: <20260707174431.1264520-1-j.raczynski@samsung.com>
-	<CGME20260707174438eucas1p132b5c02ceed2493cc7de98ab28c390ee@eucas1p1.samsung.com>
-	<20260707174431.1264520-2-j.raczynski@samsung.com>
-	<d4fb7a9f-c0bb-4ced-8428-14bd2aa66d85@lunn.ch>
+	<CGME20260707174439eucas1p153ea592df5c1c7a50e947022a80a1056@eucas1p1.samsung.com>
+	<20260707174431.1264520-3-j.raczynski@samsung.com>
+	<ee504cab-b1da-4584-8693-70ed5cd943c7@lunn.ch>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[samsung.com:d:+,kernel.org:s:+];
@@ -91,12 +90,12 @@ X-Spamd-Result: default: False [-2.66 / 15.00];
 	CTYPE_MIXED_BOGUS(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
 	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305668-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305669-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+,1:+,2:+];
 	FORGED_SENDER(0.00)[j.raczynski@samsung.com,netdev@vger.kernel.org];
@@ -117,69 +116,73 @@ X-Spamd-Result: default: False [-2.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[samsung.com:from_mime,samsung.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,AMDC4622.eu.corp.samsungelectronics.net:mid]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[samsung.com:from_mime,samsung.com:dkim,AMDC4622.eu.corp.samsungelectronics.net:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 46C4B7228FD
+X-Rspamd-Queue-Id: 43DCF722B2A
 
-------eLQjSWLrXY9-oLo2Anxe58pGrKtOPid212nTY8jU3vRtfcwP=_131043_
+------FoLMw5K6Fe9t5vMBf.HRV6LBdzA_42JMttv_zc4dtfIAKr8-=_130f8b_
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
 
-On Tue, Jul 07, 2026 at 08:57:28PM +0200, Andrew Lunn wrote:
-> On Tue, Jul 07, 2026 at 07:44:30PM +0200, Jakub Raczynski wrote:
-> > Commit 8a7bca6de6de protected against inputing number of tx/rx_queues_to_use
-> > over kernel supported limit in DTS config. AI review mentioned that we also
-> > should protect against zero queue input, because this would cause issues
-> > down the line. Missing config is not an issue as stmmac_plat_dat_alloc()
-> > does apply '1' by default.
-> > 
-> > Fix this by adding check for zero queues input during DTS parsing
-> > 
-> > Fixes: 8a7bca6de6de ("net/stmmac: Apply MTL_MAX queue limit if config missing")
+On Tue, Jul 07, 2026 at 09:04:00PM +0200, Andrew Lunn wrote:
+> On Tue, Jul 07, 2026 at 07:44:31PM +0200, Jakub Raczynski wrote:
+> > During parsing of AXI setup, there are few issues:
+> > - 'axi_blen' array is uninitialized value on stack without zero-init stack
+> >   configured. This can result in random AXI burst length config if
+> >   DTS config provides shorter array than AXI_BLEN.
 > 
-> I'm not sure a Fixes: is justified here. Does this bother somebody? As
-> far as i understand, for this to actually do something the system is
-> broken anyway?
+> What does the DT blinding say about the length? Is it allowed to be
+> short?
+> 
+> Are we talking about:
+> 
+>       snps,blen:
+>         $ref: /schemas/types.yaml#/definitions/uint32-array
+>         description:
+>           this is a vector of supported burst length.
+>         minItems: 7
+>         maxItems: 7
+> 
+> So it should be 7. Are there any in kernel DT blobs which don't pass
+> 7? Can we just error out when it is not 7?
 
-Yes, more below
+Erroring would be fine, as wrong amount will pass.
+Same as previous answer, I start to agree more and more that code should give
+more errors rather silent fix stuff.
+This is mostly Sashiko complaining but I have seen this being incorrect in
+some internal forks.
+But, as a code is currently written, this does not have to be 7 and
+documentation is merely a suggestions. I doubt wrong DTS would pass to
+mainline linux so it is merely 'internal' fix.
 
 > 
-> >  	if (!of_property_read_u32(rx_node, "snps,rx-queues-to-use", &value)) {
-> >  		if (value > MTL_MAX_RX_QUEUES)
-> >  			value = MTL_MAX_RX_QUEUES;
-> > +		else if (value == 0)
-> > +			value = 1;
+> > - In case of failed memory allocation for AXI and error, there is no handling
+> >   of that. Fix it by checking if AXI config is error and return if so,
+> >   as this can only lack of memory. No AXI config, although is probably
+> >   wrong in most cases, is not treated as error, as generic config is mostly
+> >   provided in drivers.
 > 
-> If the DT is broken, don't we want it to be fixed? -EINVAL would make
-> it obvious.
+> This seems like a different fix. Maybe put it into a patch of its own.
 > 
->     Andrew
->
 
-EINVAL would be better, I agree.
+Got that.
 
-Mentioned patch changed U8_MAX -> MTL_MAX_RX_QUEUES (and TX), because
-inputing more just panicked kernel and there was already verification for
-that, so it was fixed by silent fix of incorrect value.
-We triggered this while were testing XGMAC hardware that supports 16 queues
-(current driver limit is 8). Original fix having EINVAL would also be good.
+> > Fixes: afea03656add ("stmmac: rework DMA bus setting and introduce new platform AXI structure")
+> 
+> Again, does this bother anybody? At least axi_blen issue seems to be
+> that the DT blob is broken, so i doubt it actually does. Are there
+> reports of memory allocation error and resulting Opps.
+> 
 
-Inputing 0 is much less honest mistake but rather some testing how kernel
-handles other/incorrect values. So at the very least, this should not be able
-to panic kernel. But as above, I agree EINVAL actually would fit better here,
-that will be for V2, and so it would for original 8a7bca6de6de.
-
-Whether it justifies Fixes or not, I am not sure, it is real possibility to
-trigger panic if system has dynamic DTS loading (CONFIG_OF_OVERLAY) on
-system with wrong permissions.
+Only internal and quickly fixed. No public reports.
 
 BR
 Jakub Raczynski
 
-------eLQjSWLrXY9-oLo2Anxe58pGrKtOPid212nTY8jU3vRtfcwP=_131043_
+------FoLMw5K6Fe9t5vMBf.HRV6LBdzA_42JMttv_zc4dtfIAKr8-=_130f8b_
 Content-Type: text/plain; charset="utf-8"
 
 
-------eLQjSWLrXY9-oLo2Anxe58pGrKtOPid212nTY8jU3vRtfcwP=_131043_--
+------FoLMw5K6Fe9t5vMBf.HRV6LBdzA_42JMttv_zc4dtfIAKr8-=_130f8b_--
 
