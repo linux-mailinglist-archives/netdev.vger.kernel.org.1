@@ -1,73 +1,77 @@
-Return-Path: <netdev+bounces-305967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305968-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id eV6qGeKeTmprQwIAu9opvQ
-	(envelope-from <netdev+bounces-305967-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:02:58 +0200
+	id NyQXKVyfTmqtQwIAu9opvQ
+	(envelope-from <netdev+bounces-305968-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:05:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF3BB729C4E
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:02:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D504D729C5A
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:04:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=nYTnqZkV;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Y9lREdGE;
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305967-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305967-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305968-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305968-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D5208306AEA4
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 19:02:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 86ABF302FA96
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 19:04:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189D031987D;
-	Wed,  8 Jul 2026 19:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87770370AD0;
+	Wed,  8 Jul 2026 19:04:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F19A3270540
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 19:02:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8107043933E;
+	Wed,  8 Jul 2026 19:04:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783537337; cv=none; b=iVshYoPXG1FbhilHv/HbJP5k+mfwrRJNcUhlAb6bfCw/qM9RlNPUqpU7KlQce+4daurwN/qgMUuvRY8J9f+xnBtGq8Xy6CLwt/J3H8QHR8E9d8HIrMYoiIDYWCmVaf+jue9vjSFVMvV5zmIPiFvQUbJAMp1OkeqWYi66dcX6I4c=
+	t=1783537497; cv=none; b=lRE4oWbUHSj4W9J7lk1mBCIPYxyt1EK4zV5TfhIXeP/xAFxjGvO/t50h2CcwEJ7Ge0Q5xoDfrUOotbUOirSxG2TyAcmVdlYZ2PdR6+ZAHjwcbvwxaeaCSz3Uuk2V6AyxavL0zusg+dgAINpGb5mbEItElmG+XKDybx73pPAqDT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783537337; c=relaxed/simple;
-	bh=Vif2MjHiTHDnsG7KTlzPaYWpFdvuZkkTzLfu8U72/eo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=QL4idUpoHoi8PLVHfPMZzxU/GKE3HuvdWrf30gtEJO3U78HlqZIXoLXpbXU0HcFs8VAbDjKHLfZu/UA/zPP3OVaXzYc/nfo58X/sydMt+HnymdGInTZNAkwbKswQfEMC7k5mVH73+yJ0Elfr5M+Pt/nILvqG090xZbDZAs4YHu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nYTnqZkV; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA87A1F00AC4;
-	Wed,  8 Jul 2026 19:02:13 +0000 (UTC)
+	s=arc-20240116; t=1783537497; c=relaxed/simple;
+	bh=tPH9DICekdlZbynKMclkIKeubaFZz/dgqiOwKq97EIM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ujDvVKAQPFToNHlz8NF/WddiDCKoFWaGiLZnm0nTpA82+ZEDUe7cWFVNWy3IFZ+g92qETsud5AAOPXuThI4tdxCorAdGMKvjQwomQ9ZznbPI4yJ/NaxFkMhWpTl40fm+U6nFRBrP3Jpx3li4jwPrm8w8SBA6DkQNFDHf/Rr7oQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y9lREdGE; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD2491F000E9;
+	Wed,  8 Jul 2026 19:04:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783537335;
-	bh=HpVymHzVcb0QxYp1ZYts3vB/+YwjzHrrzmF1p+frD+o=;
-	h=From:Date:Subject:To:Cc;
-	b=nYTnqZkVRvkS2pnSXQePYnRHIqVOBaY4m1CxiwAyJzi8lWPF5KuEmar0cEpvSEU98
-	 Y1RuDPG5L+4q/CJE+8DmVW4GCSbRjw25KJqKYHYx+e+rOKIK5IcQnhDn7EpgAqneTa
-	 qvft1/SpYTWSi1dohyi+ENMSg+ayUquwc9UZaQPpw/WNkx5uKvu5JlFHQQzRf+1ZHb
-	 2+OLTcpEEF4L1w0l0h0zyJ/vxWm67LnRIGSk4hqWNHXeIM4jycP6oeX876tS7h5Uz8
-	 zKpcb2YWjbUxBq39mlg5K7JcmgHsBYzbXjzKpEFew5QoYQ3Y91RtiKxJLtCgTWA6lP
-	 6JqOMLG+PGY5A==
+	s=k20260515; t=1783537496;
+	bh=P77UWkg5VroY5vpeRPWTAH/eSCjDlL6nr9xgv0/Fd6I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Y9lREdGE2X8+jzoVKSg32WHZlgvfm9WUnyhAs7lCBVlPjSEGUlqc/9BP+Khb87TWw
+	 PcMlY0SMlJfW7z5yAXD6XGxU1f6aI/OMTQSmS7d13+3zao6azE0jjjNtfxNi+lnlOM
+	 sWWXqZjKVt65mmWHcRaexgAleBoEjR2/r6chFprmV0rV5/Fc8hfKGMVt8YRmhWiZjF
+	 Shr/s9UsWMHEg5uMVvvZOfDGhEU7pSazhugTTPIYeBAbr99/0zSWXWRo1OqeDTT1l2
+	 pNgcyFJl4jk3K9Fegi7OPac0d4gLGiWjIsAk8J9vfckBKJ/e3+3j4Ziuu0ScLX865Z
+	 /hEAc3FieTDEA==
+Date: Wed, 8 Jul 2026 20:04:51 +0100
 From: Simon Horman <horms@kernel.org>
-Date: Wed, 08 Jul 2026 20:02:05 +0100
-Subject: [PATCH net-next] Revert "gtp: annotate PDP lookups under RTNL"
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Runyu Xiao <runyu.xiao@seu.edu.cn>, laforge@gnumonks.org,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, osmocom-net-gprs@lists.osmocom.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	jianhao.xu@seu.edu.cn
+Subject: Re: [PATCH net-next] gtp: annotate PDP lookups under RTNL
+Message-ID: <20260708190451.GM1364329@horms.kernel.org>
+References: <20260701123925.3193089-1-runyu.xiao@seu.edu.cn>
+ <20260707142820.GG1364329@horms.kernel.org>
+ <ak0SYEOvw6K_8C_w@chamomile>
+ <20260708103525.GJ1364329@horms.kernel.org>
+ <8d5fe948-6979-46be-866a-69a98ee391d8@redhat.com>
+ <20260708183252.GL1364329@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260708-gtp-rtnl-v1-1-218091f171bc@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAKyeTmoC/x3MQQqAMAwAwa9IzgaiSKt+RTyIxhqQKG2RQvHvF
- o8Dy2YI7IUDjFUGz48EubSgqStYj0Udo2zF0FJryFKPLt7oo55I1mw0GNvx3kDJb8+7pH81gXJ
- E5RRhft8PecCyXGQAAAA=
-X-Change-ID: 20260708-gtp-rtnl-076d09674ef1
-To: Pablo Neira Ayuso <pablo@netfilter.org>, 
- Harald Welte <laforge@gnumonks.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: osmocom-net-gprs@lists.osmocom.org, netdev@vger.kernel.org, 
- Simon Horman <horms@kernel.org>
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260708183252.GL1364329@horms.kernel.org>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
@@ -75,97 +79,55 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305967-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-305968-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:laforge@gnumonks.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:osmocom-net-gprs@lists.osmocom.org,m:netdev@vger.kernel.org,m:horms@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:pablo@netfilter.org,m:runyu.xiao@seu.edu.cn,m:laforge@gnumonks.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:osmocom-net-gprs@lists.osmocom.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EF3BB729C4E
+X-Rspamd-Queue-Id: D504D729C5A
 
-This reverts commit 0be5c3f0fbef3679f50f345b9237b8f9ea5de4e9.
+On Wed, Jul 08, 2026 at 07:32:52PM +0100, Simon Horman wrote:
+> On Wed, Jul 08, 2026 at 01:10:58PM +0200, Paolo Abeni wrote:
+> > On 7/8/26 12:35 PM, Simon Horman wrote:
+> > > On Tue, Jul 07, 2026 at 04:51:12PM +0200, Pablo Neira Ayuso wrote:
 
-Commit 0be5c3f0fbef ("gtp: annotate PDP lookups under RTNL") added a
-lockdep_rtnl_is_held condition to hlist_for_each_rcu() loops to help
-insure that RTNL is held.
+...
 
-Unfortunately, as pointed out by Pablo Neira Ayuso, the PDP context list
-is actually protected by the genetlink mutex. And so the condition
-is incorrect.
+> > >> I think this patch is not correct.
+> > > 
+> > > Hi Pablo,
+> > > 
+> > > Of course you are correct.
+> > > Sorry for not realising this earlier.
+> > 
+> > Human slop here made me wrongly apply this patch. Could either of you
+> > please share a formal revert?
+> 
+> Sure, will do.
 
-Compile tested only.
-
-Signed-off-by: Simon Horman <horms@kernel.org>
----
- drivers/net/gtp.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-index 4ad9528322c45c4511a2cde02d3ca7c8faea3758..a60ef32b35b8255a17bed3fbc6ce19f26b3ba3a8 100644
---- a/drivers/net/gtp.c
-+++ b/drivers/net/gtp.c
-@@ -151,8 +151,7 @@ static struct pdp_ctx *gtp0_pdp_find(struct gtp_dev *gtp, u64 tid, u16 family)
- 
- 	head = &gtp->tid_hash[gtp0_hashfn(tid) % gtp->hash_size];
- 
--	hlist_for_each_entry_rcu(pdp, head, hlist_tid,
--				 lockdep_rtnl_is_held()) {
-+	hlist_for_each_entry_rcu(pdp, head, hlist_tid) {
- 		if (pdp->af == family &&
- 		    pdp->gtp_version == GTP_V0 &&
- 		    pdp->u.v0.tid == tid)
-@@ -169,8 +168,7 @@ static struct pdp_ctx *gtp1_pdp_find(struct gtp_dev *gtp, u32 tid, u16 family)
- 
- 	head = &gtp->tid_hash[gtp1u_hashfn(tid) % gtp->hash_size];
- 
--	hlist_for_each_entry_rcu(pdp, head, hlist_tid,
--				 lockdep_rtnl_is_held()) {
-+	hlist_for_each_entry_rcu(pdp, head, hlist_tid) {
- 		if (pdp->af == family &&
- 		    pdp->gtp_version == GTP_V1 &&
- 		    pdp->u.v1.i_tei == tid)
-@@ -187,8 +185,7 @@ static struct pdp_ctx *ipv4_pdp_find(struct gtp_dev *gtp, __be32 ms_addr)
- 
- 	head = &gtp->addr_hash[ipv4_hashfn(ms_addr) % gtp->hash_size];
- 
--	hlist_for_each_entry_rcu(pdp, head, hlist_addr,
--				 lockdep_rtnl_is_held()) {
-+	hlist_for_each_entry_rcu(pdp, head, hlist_addr) {
- 		if (pdp->af == AF_INET &&
- 		    pdp->ms.addr.s_addr == ms_addr)
- 			return pdp;
-@@ -223,8 +220,7 @@ static struct pdp_ctx *ipv6_pdp_find(struct gtp_dev *gtp,
- 
- 	head = &gtp->addr_hash[ipv6_hashfn(ms_addr) % gtp->hash_size];
- 
--	hlist_for_each_entry_rcu(pdp, head, hlist_addr,
--				 lockdep_rtnl_is_held()) {
-+	hlist_for_each_entry_rcu(pdp, head, hlist_addr) {
- 		if (pdp->af == AF_INET6 &&
- 		    ipv6_pdp_addr_equal(&pdp->ms.addr6, ms_addr))
- 			return pdp;
-
-
-
+- [PATCH net-next] Revert "gtp: annotate PDP lookups under RTNL"
+  https://lore.kernel.org/netdev/20260708-gtp-rtnl-v1-1-218091f171bc@kernel.org/T/
 
