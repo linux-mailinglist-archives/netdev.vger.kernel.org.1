@@ -1,98 +1,98 @@
-Return-Path: <netdev+bounces-305766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305767-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5OP5G04wTmrIEwIAu9opvQ
-	(envelope-from <netdev+bounces-305766-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:11:10 +0200
+	id OWyCBAMuTmrqEgIAu9opvQ
+	(envelope-from <netdev+bounces-305767-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:01:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEF09724B06
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:11:09 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 540B57249B1
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:01:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=fSIgkP4a;
-	dkim=pass header.d=redhat.com header.s=google header.b=U43iV86f;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=d2+beyWg;
+	dkim=pass header.d=redhat.com header.s=google header.b=WNsKgdKI;
 	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305766-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305766-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305767-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305767-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BDFFC308BD21
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 11:00:02 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6557F300B0BE
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 11:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA33842E8EC;
-	Wed,  8 Jul 2026 10:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0863742CB12;
+	Wed,  8 Jul 2026 11:00:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F244242E8C1
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 10:59:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21BCA3CAE99
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 11:00:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783508397; cv=none; b=EQOUU2cd5SM0c2/xiS+UGvcZgqizs+uEyUOBfWJQXeEjODrIdO59H6ljURFe3jrsa3DTsJC3xhRFxEl5qMxz5f77rDKC3v/tC14NKr2xMmsdQtD+jFV7HoMHCDF+jXeyzpX7EMU5C3pua/hMO2c6AMOw3/7w8Zbhtk+bqCuA/cs=
+	t=1783508416; cv=none; b=dwoA9dwJ+Z4oVWnT4KXI3KTq50JFcf09GzrKNY2dgjupBU0wuQxvplJG1YnfujJG3AxjH5j/F+DOeY2v3hjj4RzvBWLLHaY+hE4zqvEio8ME7OwZwgsAi/5aWk1n0JduD+qDpz0RcJyQPasJksKuk/rRcwnF2ttMbRiLMfkovBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783508397; c=relaxed/simple;
-	bh=Wxh1h5TWAdT1dv/JQYXllO6752pAMRojLLF30bzxwcE=;
+	s=arc-20240116; t=1783508416; c=relaxed/simple;
+	bh=/z59NgigRUT1t7wKHaZdXuB2mvaJJ3J4A7h7gfTV4bg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q4tKPkzHPxQ1J1ZSsLi4ISDQkR+hl4VpLrnTEBUiiYjy+mtfOfA4dEicFt62xb9H72JPpDmjQG5Qb4Sx0rQ/9dmVP826Et3bHlTxX6L9P5ujOmEWPMF6dJNXJST2If9atu/LQ76//tddapYp7Ay/CVB5BKvkrVvDFDnI1Rabzpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fSIgkP4a; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=U43iV86f; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=SfwEdrwlFhO4kCd7ibUakrBEFueAIDTwXsfAfRwoA4wbK6ZHEs2s8EaA3v2YOJEEVLGZFNNvE2y+m630KOEs7VvY4C7w18MgD6IQRly19k08G+Gf964j8KF0H/8Z8xlPKnUUAwM9y5UpKIV++AbtR+qP+uL+PsGKfKR+JRg35q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d2+beyWg; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=WNsKgdKI; arc=none smtp.client-ip=170.10.129.124
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783508388;
+	s=mimecast20190719; t=1783508411;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6E0ixpEMrHT9a5crJiV6RHWP5trgVnT1h9yDneEUY78=;
-	b=fSIgkP4aB8vRI30T8/D1IVgLDQMg6UJqNGmESanK4fH0qws8UEKVIfwGBMmTBnmHqstjvg
-	GJz/YUzukx5WzVeKEEVnQxjmjelT5/6q38jJ3UB91pbDQ0jdT0GuIvTBQJKj02Em0H+e/I
-	4XpsKnuzjanPWBwPABMAXzyQZmtZfUA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=3XaPC9zE2h9RHiRdcpGWZIRteZhCC8n0qMjJjG4dNfo=;
+	b=d2+beyWgceZ1oxbwx5Ng9OJrjsjzUigF0i7ncHJKlqucT+W0afB/lR29LBn6TQx55SSHzH
+	9296Ky6eKQEOyBI4Og6UCOHkXGkrqdS8QP3w1qpTfURqKpOgIhB9pIXa9yOQZeVgTmCvQD
+	lLomh4S6AK3lOrpOKD0jhMYlLzafDBQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-153-e-FZ04W2O1K4TVrlcgujeA-1; Wed, 08 Jul 2026 06:59:46 -0400
-X-MC-Unique: e-FZ04W2O1K4TVrlcgujeA-1
-X-Mimecast-MFC-AGG-ID: e-FZ04W2O1K4TVrlcgujeA_1783508385
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-4773d2405c5so761585f8f.3
-        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 03:59:46 -0700 (PDT)
+ us-mta-643-9IhUv_ahNXm9aep0H-SIzw-1; Wed, 08 Jul 2026 07:00:08 -0400
+X-MC-Unique: 9IhUv_ahNXm9aep0H-SIzw-1
+X-Mimecast-MFC-AGG-ID: 9IhUv_ahNXm9aep0H-SIzw_1783508407
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-474170b59dfso422388f8f.3
+        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 04:00:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1783508385; x=1784113185; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1783508407; x=1784113207; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6E0ixpEMrHT9a5crJiV6RHWP5trgVnT1h9yDneEUY78=;
-        b=U43iV86fQCWGaoUI/WbpgRWUHK8p0DDASayl+U6HMl3tGqxvancJNoM0c599lEZw9L
-         20rXFVd7Le8jtiCtOTnNoF2ec0xRqSep8iJM5MBAfHPsSVuD/vxEY291bip7esSQ80U3
-         MRO/J9rVE8PwfMgvW1wvC0GIQ1Eucn+57cmgJ9wxkTO5aJ6eUcRm0TBZVNaaBtZi+hP2
-         f50H7ZEqCXlnufZgQUeK67RWMPp1f8Q8zFJjdRu4Fumh88QjBpFzlWeLzbU16TL2r31N
-         1VhKcCdBca0ciN0ndeoB+BoJTR1er/q7Oo3VPGfPOxEdDg7eiMZz7dqFU8YXlilHRLbQ
-         HYlg==
+        bh=3XaPC9zE2h9RHiRdcpGWZIRteZhCC8n0qMjJjG4dNfo=;
+        b=WNsKgdKIJGCdhGqI40Us/JbWjvT7N8hwb4M9H6IW2WTAHUPvjH63GMjUt+BLI7rOGA
+         bC5mygR+2Eniqff+YKh/qlW0xbcU7trUZ7JdjGYORdpq6anrax0+Zu/YknBRJt/Poq1a
+         YiShKsD7HdNoPPN/LPD0snCyFpf8m/hsOQAyJECzOBJgJh3Fa9XGG/JZIiBtOIYemday
+         0tCf65DDFjoG06QVBmRiphbx6jTaJicQM9ifw6qXgRf1V6G/RpU1C0b+jm24rE5SIH6p
+         vRcD4O+0u90j6tVRRijE6wwzBPaVKI3HzXTLDlMPi3qJr+LJtM/oRbXIJvLseqibfpG9
+         ZOiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783508385; x=1784113185;
+        d=1e100.net; s=20251104; t=1783508407; x=1784113207;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6E0ixpEMrHT9a5crJiV6RHWP5trgVnT1h9yDneEUY78=;
-        b=H0NkuzARQZ8nzVFnKzSKfCr6XzoaHzS1oxs/164InL3v8w4RgxIy56gZxmZBYnGq9t
-         N0T0aiy+vXRT4l8icVu6W3zOQZOmjiK9vACi07SZdTvDLa+c9ernhfnczstFicdJATz/
-         7XL3hpILuogS3AF6f1mNMyAfAvQdZCbCaPhn5kABoQs7Kl8On4fZRPBUK54DTXlqGKzK
-         ClffNsZexIXR2cUfx2kAyLprCjKC7v07cimHadt9F/yQhjtk1b3UgZP2RSMhwmHxDL69
-         1BL+17+o6yBEg64C3NhAtIOi+ObTtWoYLBe34VX7NZ9J8kbCtaoBAeIsGMvwnhiVVME2
-         rnBg==
-X-Gm-Message-State: AOJu0Yx64QmmK5pgL05PxHIrZfNnBH0s7smIQebE05o1xBR6NdcWTIQ8
-	Ek6EBFKFReag0Y8Hvulgy1JFB3S4t6crZdpR7L7+TMOec3R8e5SXtZ2qD+d7ENBJBsObLPM5h/D
-	J5uu1Rvzcp2ZxMGwykQogIuMS5/W4FKdUZ6Q2gdw77M0S2nfEmVPie0rS0Q==
-X-Gm-Gg: AfdE7ckTcG1ovbapTiSqRRD1unkJ0aZq7PF0jctmmCJH5jZpneCJjMfmYX/eP6oLve8
-	Bg5FAbIJg8JnrEKlUqFyD1/g7+4Yzh4HkWSVDcgd5WN4YlOda1xsgfwewR3g7ePWVDsSLfBbQZB
-	HKLk/Uxeh3/XKzcTXQPApOn52jkIsnjfoM73+JbGWMe9ifTGfr6BvJ7l4h9JwR77fiHJDSt/rhZ
-	LhXSc7q+PnIwVEPOvslYxrv2vFuM+oW7mrWI20C5J+nl0pG1T0SgKiwqE7V7Es8um0VbQ2pEq1E
-	eo5N96tAuDBQnPQ3OH70qnDG+exBAa4uHGNRw6J2C4ANlpz6Kcrvztqs7Vdazf5QkfrQ639I/qB
-	0eP5zoJ1TjeWU6HORPhiQIvpsy1MeTqUw
-X-Received: by 2002:a5d:5f42:0:b0:475:5e4b:588f with SMTP id ffacd0b85a97d-47df075a119mr2128504f8f.16.1783508385269;
-        Wed, 08 Jul 2026 03:59:45 -0700 (PDT)
-X-Received: by 2002:a5d:5f42:0:b0:475:5e4b:588f with SMTP id ffacd0b85a97d-47df075a119mr2128475f8f.16.1783508384801;
-        Wed, 08 Jul 2026 03:59:44 -0700 (PDT)
+        bh=3XaPC9zE2h9RHiRdcpGWZIRteZhCC8n0qMjJjG4dNfo=;
+        b=BFuBxsKWbg/x02lsl3Qp65rJVNN6dyEF604v310egHwnkF1fzfOvPOrsu7gQi3ed9m
+         tahrEiTfzv9lU8A5d3cygJ+qDCndHxTy16GlTaSQV2rr1Z0hIlFALyql4w2JTULrwnu/
+         wjiex1cOGrOK/HLqZYp7yrgSknCFnxSBlj+besgP/OLM+emBT/NgIMnlFINhrw/z/ZiX
+         y68GhPH1D0PwaTuBgG0a3qAcogpWei6DWcpzYV3svf4m+hm7K/ZviZfyf/2w4mHtyAve
+         M2I3qubjUDnXd/NR7UUJEqnL0Qjqb1iD7eHgJiatB/rYTBotK48ggr6eo7cwqFCP90zq
+         DHHQ==
+X-Gm-Message-State: AOJu0Yz/eAxCFuP6omw8AVwhbXXn29VWb5lOoeG07ALoY0/9aNnFXbKF
+	+DXE0Tl6lU+jzugDoIzXjnBFPWleWYUQHi6jiJbcyShuo8sOlxxHjpjY++VGpO+HF74L2M6eOg7
+	gywUPshcoM5KpF+BwH6NDOcQKvUqa+0ILg993E2lq4MiOcqqLukgm6t1ZHA==
+X-Gm-Gg: AfdE7cnbCV8/3A/hRTCuW4JhcGKpqqxMbyFV3WaxOR7o7lvDrwKPv8oQDMB0613obDQ
+	VOuDxb/Fv9MHkm2ORvCdYveb/7ckYbECW4TTL/9gIHimm++eEDBazHs3OK16i+ENy9fkwsKOqYJ
+	6vwrF8hQm1s0ZxkO2kvIgCWMA7pOFE6/WUgtuwhhsDPWrydcniO05b3f8r04D0cPUw2/p/6wh7D
+	shcJdPW6dwWd4uTZJNY6bbFiQuLiX71XUFGaZYXm/z/L6+bMij3EeqZWZxHcf2pWw2/jNRCUem2
+	2LggPiOnufOxv6q6kYGVZnavrS3+YzWMMk+659ODFArzxReWvEoxPSuS7pM6Wt2awoSagBe/waa
+	ZXiv0e2TAtFJp04yRFBWUGiRrJ1YlUR3l
+X-Received: by 2002:a05:6000:2909:b0:475:3a97:8e3c with SMTP id ffacd0b85a97d-47df0738de7mr2106804f8f.18.1783508407018;
+        Wed, 08 Jul 2026 04:00:07 -0700 (PDT)
+X-Received: by 2002:a05:6000:2909:b0:475:3a97:8e3c with SMTP id ffacd0b85a97d-47df0738de7mr2106594f8f.18.1783508404895;
+        Wed, 08 Jul 2026 04:00:04 -0700 (PDT)
 Received: from redhat.com (IGLD-80-230-68-31.inter.net.il. [80.230.68.31])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9de1d905sm43295235f8f.2.2026.07.08.03.59.42
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa039afacsm39865443f8f.19.2026.07.08.04.00.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2026 03:59:44 -0700 (PDT)
-Date: Wed, 8 Jul 2026 06:59:41 -0400
+        Wed, 08 Jul 2026 04:00:04 -0700 (PDT)
+Date: Wed, 8 Jul 2026 07:00:00 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Stefano Garzarella <sgarzare@redhat.com>
 Cc: netdev@vger.kernel.org, Jason Wang <jasowangio@gmail.com>,
@@ -104,12 +104,13 @@ Cc: netdev@vger.kernel.org, Jason Wang <jasowangio@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>, virtualization@lists.linux.dev,
-	Jakub Kicinski <kuba@kernel.org>, Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH net v2 2/2] vsock/test: add test for small packets under
- pressure
-Message-ID: <20260708065853-mutt-send-email-mst@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>, Jason Wang <jasowang@redhat.com>,
+	stable@vger.kernel.org, Brien Oberstein <brienpub@gmail.com>
+Subject: Re: [PATCH net v2 1/2] vsock/virtio: collapse receive queue under
+ memory pressure
+Message-ID: <20260708065947-mutt-send-email-mst@kernel.org>
 References: <20260708102904.50732-1-sgarzare@redhat.com>
- <20260708102904.50732-3-sgarzare@redhat.com>
+ <20260708102904.50732-2-sgarzare@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -118,173 +119,304 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260708102904.50732-3-sgarzare@redhat.com>
+In-Reply-To: <20260708102904.50732-2-sgarzare@redhat.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305766-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,linux.alibaba.com,google.com,redhat.com,kernel.org,davemloft.net,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	ASN_FAIL(0.00)[4.211.64.104.asn.rspamd.com:query timed out];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[mst@redhat.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_RECIPIENTS(0.00)[m:sgarzare@redhat.com,m:netdev@vger.kernel.org,m:jasowangio@gmail.com,m:xuanzhuo@linux.alibaba.com,m:edumazet@google.com,m:eperezma@redhat.com,m:horms@kernel.org,m:stefanha@redhat.com,m:davem@davemloft.net,m:linux-kernel@vger.kernel.org,m:kvm@vger.kernel.org,m:pabeni@redhat.com,m:virtualization@lists.linux.dev,m:kuba@kernel.org,m:jasowang@redhat.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305767-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:sgarzare@redhat.com,m:netdev@vger.kernel.org,m:jasowangio@gmail.com,m:xuanzhuo@linux.alibaba.com,m:edumazet@google.com,m:eperezma@redhat.com,m:horms@kernel.org,m:stefanha@redhat.com,m:davem@davemloft.net,m:linux-kernel@vger.kernel.org,m:kvm@vger.kernel.org,m:pabeni@redhat.com,m:virtualization@lists.linux.dev,m:kuba@kernel.org,m:jasowang@redhat.com,m:stable@vger.kernel.org,m:brienpub@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,linux.alibaba.com,google.com,redhat.com,kernel.org,davemloft.net,lists.linux.dev];
+	FROM_HAS_DN(0.00)[];
+	RSPAMD_EMAILBL_FAIL(0.00)[mst.redhat.com:query timed out];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CEF09724B06
+X-Rspamd-Queue-Id: 540B57249B1
 
-On Wed, Jul 08, 2026 at 12:29:04PM +0200, Stefano Garzarella wrote:
+On Wed, Jul 08, 2026 at 12:29:03PM +0200, Stefano Garzarella wrote:
 > From: Stefano Garzarella <sgarzare@redhat.com>
 > 
-> Add a test that sends 2 MB of data using randomly sized small packets
-> (129-512 bytes) over a SOCK_STREAM connection. Packets above
-> GOOD_COPY_LEN (128) bypass the in-place coalescing in recv_enqueue(),
-> forcing each one into its own skb.
+> When many small packets accumulate in the receive queue, the skb overhead
+> can exceed buf_alloc even while the payload is within bounds. This causes
+> virtio_transport_inc_rx_pkt() to reject packets, leading to connection
+> resets during large transfers under backpressure.
 > 
-> Without receive queue collapsing, the per-skb overhead eventually
-> exceeds buf_alloc and the connection is reset. The test verifies
-> that all data arrives and that content integrity is preserved.
+> The issue was reported by Brien, who has a reproducer, but it is also
+> easily reproducible with iperf-vsock [1] using a small packet size:
 > 
+>   iperf3 --vsock -c $CID -l 129
+> 
+> which fails immediately without this patch but with commit 059b7dbd20a6
+> ("vsock/virtio: fix potential unbounded skb queue").
+> 
+> Inspired by TCP's tcp_collapse() which solves a similar problem, add
+> virtio_transport_collapse_rx_queue() that walks the receive queue and
+> re-copies data into compact linear skbs to reduce the overhead.
+> 
+> The collapse is triggered proactively from when the number of skb queued
+> is close to exceeding the overhead budget.
+> 
+> A pre-scan counts the eligible bytes to size each allocation precisely,
+> avoiding waste for isolated small packets. Partially consumed skbs are
+> kept as-is to preserve buf_used/fwd_cnt accounting, EOM-marked skbs to
+> maintain SEQPACKET message boundaries, and skbs already larger than the
+> collapse target because they already have a good data-to-overhead ratio.
+> 
+> Walking a large queue may take a significant amount of time and cache
+> misses, causing traffic burstiness. To limit this, the collapse stops
+> once enough room is freed for this packet and the next one, but may
+> opportunistically free more to fill each collapsed skb to capacity.
+> 
+> [1] https://github.com/stefano-garzarella/iperf-vsock
+> 
+> Fixes: 059b7dbd20a6 ("vsock/virtio: fix potential unbounded skb queue")
+> Cc: stable@vger.kernel.org
+> Reported-by: Brien Oberstein <brienpub@gmail.com>
+> Closes: https://lore.kernel.org/netdev/618701dd023e$063de350$12b9a9f0$@gmail.com/
+> Tested-by: Brien Oberstein <brienpub@gmail.com>
 > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 
-maybe cut down SO_VM_SOCKETS_BUFFER_SIZE? will make it easier to
-trigger?
 
-anyway
+this is the right approach
 
 Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
 > ---
->  tools/testing/vsock/vsock_test.c | 87 ++++++++++++++++++++++++++++++++
->  1 file changed, 87 insertions(+)
+> v2:
+> - defined MAX_COLLAPSE_LEN macro instead of using a variable [Paolo]
+> - added a threshold to avoid walking all the queue while collapsing
+>   [Paolo]
+> - collapsed the queue before calling virtio_transport_inc_rx_pkt().
+>   While working on the threshold, I figured out that the check I was
+>   introducing can also be used to proactively trigger the collapse, so I
+>   moved the call to virtio_transport_collapse_rx_queue() before acquiring
+>   the rx_lock to have also a better diff to simplify backports
+> - improved code readability (removed `out` label, `keep` initialization,
+>   etc.) [Paolo + other small stuff]
+> - Brien kindly retested this version as well (thank you so much)
+> ---
+>  net/vmw_vsock/virtio_transport_common.c | 165 +++++++++++++++++++++++-
+>  1 file changed, 164 insertions(+), 1 deletion(-)
 > 
-> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-> index 76be0e4a7f0e..b4ff9f946565 100644
-> --- a/tools/testing/vsock/vsock_test.c
-> +++ b/tools/testing/vsock/vsock_test.c
-> @@ -2347,6 +2347,88 @@ static void test_stream_tx_credit_bounds_server(const struct test_opts *opts)
->  	close(fd);
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index 09475007165b..8becad81279c 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -26,6 +26,13 @@
+>  /* Threshold for detecting small packets to copy */
+>  #define GOOD_COPY_LEN  128
+>  
+> +/* Max payload that can be collapsed into a single linear skb, using the same
+> + * allocation threshold as virtio_vsock_alloc_skb() to avoid adding pressure
+> + * on the page allocator.
+> + */
+> +#define MAX_COLLAPSE_LEN \
+> +	SKB_MAX_ORDER(VIRTIO_VSOCK_SKB_HEADROOM, PAGE_ALLOC_COSTLY_ORDER)
+> +
+>  static void virtio_transport_cancel_close_work(struct vsock_sock *vsk,
+>  					       bool cancel_timeout);
+>  static s64 virtio_transport_has_space(struct virtio_vsock_sock *vvs);
+> @@ -420,6 +427,145 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>  	return ret;
 >  }
 >  
-> +/* Test that many small packets don't cause a connection reset under pressure
-> + * and that data integrity is preserved.  Packet sizes vary randomly between
-> + * 129 and 512 bytes, above GOOD_COPY_LEN (128) to bypass in-place coalescing
-> + * in recv_enqueue, forcing each one into its own skb.  Without receive queue
-> + * collapsing, the per-skb overhead eventually exceeds buf_alloc and the
-> + * connection is reset.
+> +static bool virtio_transport_can_collapse(struct sk_buff *skb)
+> +{
+> +	/* skbs that are partially consumed, mark a SEQPACKET message boundary,
+> +	 * or are already large enough should not be collapsed: they either
+> +	 * need special accounting, carry protocol state, or already have a
+> +	 * good data-to-overhead ratio.
+> +	 */
+> +	if (VIRTIO_VSOCK_SKB_CB(skb)->offset)
+> +		return false;
+> +	if (le32_to_cpu(virtio_vsock_hdr(skb)->flags) & VIRTIO_VSOCK_SEQ_EOM)
+> +		return false;
+> +	if (skb->len >= MAX_COLLAPSE_LEN)
+> +		return false;
+> +	return true;
+> +}
+> +
+> +/* Iterate through the packets in the queue starting from the current skb to
+> + * count the number of bytes we can collapse.
 > + */
-> +#define COLLAPSE_PKT_MIN 129
-> +#define COLLAPSE_PKT_MAX 512
-> +#define COLLAPSE_TOTAL (2 * 1024 * 1024)
-> +
-> +static void test_stream_collapse_client(const struct test_opts *opts)
+> +static unsigned int
+> +virtio_transport_collapse_size(struct sk_buff *skb, struct sk_buff_head *queue)
 > +{
-> +	unsigned char *data;
-> +	unsigned long hash;
-> +	size_t offset = 0;
-> +	int i, fd;
+> +	unsigned int target = skb->len - VIRTIO_VSOCK_SKB_CB(skb)->offset;
 > +
-> +	data = malloc(COLLAPSE_TOTAL);
-> +	if (!data) {
-> +		perror("malloc");
-> +		exit(EXIT_FAILURE);
+> +	while ((skb = skb_peek_next(skb, queue)) &&
+> +	       virtio_transport_can_collapse(skb)) {
+> +		unsigned int len = skb->len - VIRTIO_VSOCK_SKB_CB(skb)->offset;
+> +
+> +		if (len > MAX_COLLAPSE_LEN - target)
+> +			return target;
+> +
+> +		target += len;
 > +	}
 > +
-> +	for (i = 0; i < COLLAPSE_TOTAL; i++)
-> +		data[i] = rand() & 0xff;
-> +
-> +	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
-> +	if (fd < 0) {
-> +		perror("connect");
-> +		exit(EXIT_FAILURE);
-> +	}
-> +
-> +	while (offset < COLLAPSE_TOTAL) {
-> +		size_t pkt_size = COLLAPSE_PKT_MIN +
-> +			rand() % (COLLAPSE_PKT_MAX - COLLAPSE_PKT_MIN + 1);
-> +
-> +		pkt_size = min(pkt_size, COLLAPSE_TOTAL - offset);
-> +
-> +		send_buf(fd, data + offset, pkt_size, 0, pkt_size);
-> +		offset += pkt_size;
-> +	}
-> +
-> +	hash = hash_djb2(data, COLLAPSE_TOTAL);
-> +	control_writeulong(hash);
-> +
-> +	free(data);
-> +	close(fd);
+> +	return target;
 > +}
 > +
-> +static void test_stream_collapse_server(const struct test_opts *opts)
+> +/* Called under lock_sock to compact the receive queue by merging small skbs.
+> + * @min_to_free: minimum number of skbs to eliminate from the queue. May free
+> + *               more to fill each collapsed skb to capacity.
+> + */
+> +static void
+> +virtio_transport_collapse_rx_queue(struct virtio_vsock_sock *vvs,
+> +				   u32 min_to_free)
 > +{
-> +	unsigned long hash, remote_hash;
-> +	unsigned char *data;
-> +	int fd;
+> +	struct sk_buff *skb, *next_skb, *new_skb = NULL;
+> +	struct sk_buff_head new_queue;
+> +	u32 saved = 0;
 > +
-> +	data = malloc(COLLAPSE_TOTAL);
-> +	if (!data) {
-> +		perror("malloc");
-> +		exit(EXIT_FAILURE);
+> +	__skb_queue_head_init(&new_queue);
+> +
+> +	skb_queue_walk_safe(&vvs->rx_queue, skb, next_skb) {
+> +		struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
+> +		u32 src_off = VIRTIO_VSOCK_SKB_CB(skb)->offset;
+> +		u32 src_len = skb->len - src_off;
+> +		bool keep;
+> +
+> +		keep = !virtio_transport_can_collapse(skb);
+> +		if (keep) {
+> +			/* Finalize pending collapsed skb to preserve packet
+> +			 * ordering.
+> +			 */
+> +			if (new_skb) {
+> +				__skb_queue_tail(&new_queue, new_skb);
+> +				new_skb = NULL;
+> +				saved--;
+> +			}
+> +			goto next;
+> +		}
+> +
+> +		/* Finalize if this packet won't fit in the remaining tailroom,
+> +		 * so we can allocate a right-sized new_skb.
+> +		 */
+> +		if (new_skb && src_len > skb_tailroom(new_skb)) {
+> +			__skb_queue_tail(&new_queue, new_skb);
+> +			new_skb = NULL;
+> +			saved--;
+> +		}
+> +
+> +		if (!new_skb) {
+> +			unsigned int alloc_size;
+> +
+> +			/* Check after finalizing to opportunistically fill
+> +			 * each collapsed skb to capacity, merging more skbs
+> +			 * than strictly required.
+> +			 */
+> +			if (saved >= min_to_free)
+> +				break;
+> +
+> +			alloc_size = virtio_transport_collapse_size(skb, &vvs->rx_queue);
+> +
+> +			/* Only this skb's data is eligible, nothing to merge
+> +			 * with. Keep as-is.
+> +			 */
+> +			if (alloc_size <= src_len) {
+> +				keep = true;
+> +				goto next;
+> +			}
+> +
+> +			new_skb = virtio_vsock_alloc_linear_skb(alloc_size +
+> +					VIRTIO_VSOCK_SKB_HEADROOM, GFP_KERNEL);
+> +			if (!new_skb)
+> +				break;
+> +
+> +			memcpy(virtio_vsock_hdr(new_skb), hdr,
+> +			       sizeof(struct virtio_vsock_hdr));
+> +			virtio_vsock_hdr(new_skb)->len = 0;
+> +		}
+> +
+> +		/* Cannot fail since src_off/src_len are within bounds, but if
+> +		 * it does, discard new_skb to avoid queuing corrupted data.
+> +		 */
+> +		if (WARN_ON_ONCE(skb_copy_bits(skb, src_off,
+> +					       skb_put(new_skb, src_len),
+> +					       src_len))) {
+> +			kfree_skb(new_skb);
+> +			new_skb = NULL;
+> +			break;
+> +		}
+> +
+> +		le32_add_cpu(&virtio_vsock_hdr(new_skb)->len, src_len);
+> +		virtio_vsock_hdr(new_skb)->flags |= hdr->flags;
+> +
+> +next:
+> +		__skb_unlink(skb, &vvs->rx_queue);
+> +		if (keep) {
+> +			__skb_queue_tail(&new_queue, skb);
+> +		} else {
+> +			consume_skb(skb);
+> +			saved++;
+> +		}
 > +	}
 > +
-> +	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
-> +	if (fd < 0) {
-> +		perror("accept");
-> +		exit(EXIT_FAILURE);
-> +	}
+> +	if (new_skb)
+> +		__skb_queue_tail(&new_queue, new_skb);
 > +
-> +	recv_buf(fd, data, COLLAPSE_TOTAL, 0, COLLAPSE_TOTAL);
-> +
-> +	hash = hash_djb2(data, COLLAPSE_TOTAL);
-> +	remote_hash = control_readulong();
-> +	if (hash != remote_hash) {
-> +		fprintf(stderr, "hash mismatch: local %lu remote %lu\n",
-> +			hash, remote_hash);
-> +		exit(EXIT_FAILURE);
-> +	}
-> +
-> +	free(data);
-> +	close(fd);
+> +	skb_queue_splice(&new_queue, &vvs->rx_queue);
 > +}
 > +
->  static struct test_case test_cases[] = {
->  	{
->  		.name = "SOCK_STREAM connection reset",
-> @@ -2546,6 +2628,11 @@ static struct test_case test_cases[] = {
->  		.run_client = test_stream_msg_peek_client,
->  		.run_server = test_stream_peek_after_recv_server,
->  	},
-> +	{
-> +		.name = "SOCK_STREAM small packets backpressure",
-> +		.run_client = test_stream_collapse_client,
-> +		.run_server = test_stream_collapse_server,
-> +	},
->  	{},
->  };
+>  static bool virtio_transport_inc_rx_pkt(struct virtio_vsock_sock *vvs,
+>  					u32 len)
+>  {
+> @@ -1354,12 +1500,29 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
+>  {
+>  	struct virtio_vsock_sock *vvs = vsk->trans;
+>  	bool can_enqueue, free_pkt = false;
+> +	u32 len, queue_max, queue_len;
+>  	struct virtio_vsock_hdr *hdr;
+> -	u32 len;
 >  
+>  	hdr = virtio_vsock_hdr(skb);
+>  	len = le32_to_cpu(hdr->len);
+>  
+> +	/* virtio_transport_inc_rx_pkt() rejects packets when the per-skb
+> +	 * overhead (skb_queue_len * SKB_TRUESIZE(0)) exceeds buf_alloc.
+> +	 * Proactively collapse the queue before that happens.
+> +	 * No rx_lock needed: lock_sock is held by caller, preventing
+> +	 * concurrent enqueue or dequeue.
+> +	 */
+> +	queue_max = vvs->buf_alloc / SKB_TRUESIZE(0);
+> +	queue_len = skb_queue_len(&vvs->rx_queue);
+> +	if (queue_len >= queue_max) {
+> +		/* Walking a large queue may take a significant amount of time
+> +		 * and cache misses, causing traffic burstiness. Limit the
+> +		 * collapse to freeing room for this packet and the next one.
+> +		 * It may free more to fill each collapsed skb to capacity.
+> +		 */
+> +		virtio_transport_collapse_rx_queue(vvs, queue_len + 2 - queue_max);
+> +	}
+> +
+>  	spin_lock_bh(&vvs->rx_lock);
+>  
+>  	can_enqueue = virtio_transport_inc_rx_pkt(vvs, len);
 > -- 
 > 2.55.0
 
