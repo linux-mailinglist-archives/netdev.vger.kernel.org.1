@@ -1,144 +1,295 @@
-Return-Path: <netdev+bounces-305693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305699-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 8Mx4OPMWTmq8CwIAu9opvQ
-	(envelope-from <netdev+bounces-305693-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:22:59 +0200
+	id BR1hB1sXTmrwCwIAu9opvQ
+	(envelope-from <netdev+bounces-305699-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:24:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 717D5723A28
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:22:59 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFA5F723ABC
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:24:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=simonwunderlich.de header.s=09092022 header.b=nqnZQX4z;
-	dmarc=pass (policy=none) header.from=simonwunderlich.de;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305693-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305693-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=microchip.com header.s=mchp header.b=Fq7U9H9y;
+	dmarc=pass (policy=reject) header.from=microchip.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305699-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305699-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6396530526A5
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 09:18:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 155EB30AD8D5
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 09:19:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7758840A93D;
-	Wed,  8 Jul 2026 09:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 667A3411691;
+	Wed,  8 Jul 2026 09:18:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B2440960A;
-	Wed,  8 Jul 2026 09:18:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88957409632;
+	Wed,  8 Jul 2026 09:18:49 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783502328; cv=none; b=KS7xfoDu7NR43u5qhVRyRlINmZcmX77nhbpM4JNMOweoTif9h6iGbV5RGSnRy8tRI6l2G07OwlSlF2hdJIG4mJ7NpEohCfj+kk+HR9laNG4ocPOq7tXpRzrAD/BU2loheBkWLyrdtKfLmSh5c8mqElwsiWIQm5L/mqq1b7jZVsY=
+	t=1783502331; cv=none; b=g7zYNbrRGmYFn5lX7NIWw4OcIRgERiJWcCs4CiaILE0lEhLRScyn1BV5sq1Do92+2Ai4dVibLRW26WLrZWoWIS+FzIShPzHIEk/CNg2Rn439/lK3NGmnHB1bk16YZCXEWx/1ICUHF1xxcxgJSm/DjG32xXopA0EDEgKbUek092U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783502328; c=relaxed/simple;
-	bh=MUiT6sSKkPf6yigCLCZNekpAZH4pZEOgUWrAgBdFUtE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uJfov1RJruJMn9HEQpN82ZpYX9HWvJ1YN9i1/SHiBtXcJeRJVJ0HDz1yPMiazb10l1+pYDGcaSLnOKCc6RANJk0EPhFAe1cm6k3Y96E8NEDQ3BbxutbTmzKblBu3qUWL3KnuQpt88jBn5MO9TK18iAy38IBDWtBh1dv/WFxcCSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=nqnZQX4z; arc=none smtp.client-ip=23.88.38.48
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
-	s=09092022; t=1783502321;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZFpl7pK3uTWz21nbIM7Bm6WBFUQXvhGQVbOYY5GDip8=;
-	b=nqnZQX4z5ROHJ+k22LirLdDuCstF4g31h8fMI0/Nbgter3bg7D6mJ3zwo92wWyivEtJfWP
-	FiA8o8zt5b/A5SRdTOCKDPiTa3k+h5vGMtb9X31J9a2PnY+/fEUmYnfGGIvnYN5JuDyfuz
-	SiwcZLdw39gKp3Kxzed/isMmWEnCiig0a78U6GKeNk+tzVjTBOUb1d7H03laG2ZESaudNp
-	4PEjOv/ubsMckI5Me+UMvU6NTSVRQ0kNhxEcW117t/cKlGy2ASCBuF5xloEI6NFbR+JZ+F
-	M4O/zWLem6VFyk7YV+wZYdDtvGItGSSiFzKU6U3KRMJrczVs/UXfd8g3xUzr3g==
-From: Simon Wunderlich <sw@simonwunderlich.de>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	b.a.t.m.a.n@lists.open-mesh.org,
-	Sven Eckelmann <sven@narfation.org>,
-	stable@vger.kernel.org,
-	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH net 5/9] batman-adv: tt: prevent TVLV OOB check overflow
-Date: Wed,  8 Jul 2026 11:18:17 +0200
-Message-ID: <20260708091821.314516-6-sw@simonwunderlich.de>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260708091821.314516-1-sw@simonwunderlich.de>
-References: <20260708091821.314516-1-sw@simonwunderlich.de>
+	s=arc-20240116; t=1783502331; c=relaxed/simple;
+	bh=ufp1lS6pxtZ9XdxO7KaFz0KpYqv1ad4/N2+2EvTjmE8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
+	 In-Reply-To:To:CC; b=JRltdUKfBAPg6C8WOat1taIolBpfEweUreaEc7zEagAjOAIJwm/eXzkyfJBUFflBizDT5SpW+maqbN01Kv66y3SpA0f7N3qxwHW5n6lUA0lUmJQiAhzFG2GIjh5ryeRANhO45COQZQbB9jSvb4E21Iu4lUKAQEarou7HkxDJnpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Fq7U9H9y; arc=none smtp.client-ip=68.232.153.233
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1783502331; x=1815038331;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:references:in-reply-to:to:cc;
+  bh=ufp1lS6pxtZ9XdxO7KaFz0KpYqv1ad4/N2+2EvTjmE8=;
+  b=Fq7U9H9y2KhN045vPRhE+bnMAm490Y10h1YkRArmoaopsyRPD6EDmUm3
+   Jo/P9mFQktCbZYhGvUWXHIIdzMOxy/W5mxcNb6N2gDkDPwBDfJDLrAXrH
+   EfbXs8du30VUwARf1Y66cJtF7SGe3hICAR65h0Fkh+QlPo3zsP+BeKMZd
+   wAoCaTCr0GJRCKAv1jq9zbLr9+Oh+AOiK5eKcOLkMtvaToPVi0KSEkNBU
+   m8TVxQ78pdmS7Ppq25soawSmjmN1Tp4GXzQZ/+brG5hAdbgunaCj6s+fw
+   n2g4l6Vjq3Bh6j93Xjhy5BZlcV45ZWuKHqOKdHpWU/OhVKTedpYwjydP8
+   g==;
+X-CSE-ConnectionGUID: M45luJsEQUWg9gPNmvoV5A==
+X-CSE-MsgGUID: 3GRDzvBrSqGA/wLPugqoew==
+X-IronPort-AV: E=Sophos;i="6.25,153,1779174000"; 
+   d="scan'208";a="69588816"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2026 02:18:50 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.87.151) by
+ chn-vm-ex2.mchp-main.com (10.10.87.31) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.43; Wed, 8 Jul 2026 02:18:48 -0700
+Received: from [127.0.0.1] (10.10.85.11) by chn-vm-ex04.mchp-main.com
+ (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Wed, 8 Jul 2026 02:18:44 -0700
+From: =?utf-8?q?Jens_Emil_Schulz_=C3=98stergaard?=
+	<jensemil.schulzostergaard@microchip.com>
+Date: Wed, 8 Jul 2026 11:18:17 +0200
+Subject: [PATCH net-next v9 2/9] dt-bindings: net: lan9645x: add LAN9645X
+ switch bindings
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+Message-ID: <20260708-dsa_lan9645x_switch_driver_base-v9-2-0d1512a326d7@microchip.com>
+References: <20260708-dsa_lan9645x_switch_driver_base-v9-0-0d1512a326d7@microchip.com>
+In-Reply-To: <20260708-dsa_lan9645x_switch_driver_base-v9-0-0d1512a326d7@microchip.com>
+To: <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew@lunn.ch>, "Vladimir
+ Oltean" <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>, Russell King
+	<linux@armlinux.org.uk>, Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, =?utf-8?q?Jens_Emil_Schulz_=C3=98stergaard?=
+	<jensemil.schulzostergaard@microchip.com>
+X-Mailer: b4 0.15-dev
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[simonwunderlich.de,none];
-	R_DKIM_ALLOW(-0.20)[simonwunderlich.de:s=09092022];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-305693-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-305699-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:b.a.t.m.a.n@lists.open-mesh.org,m:sven@narfation.org,m:stable@vger.kernel.org,m:sw@simonwunderlich.de,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
+	FORGED_SENDER(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_RECIPIENTS(0.00)[m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:woojung.huh@microchip.com,m:linux@armlinux.org.uk,m:Steen.Hegelund@microchip.com,m:daniel.machon@microchip.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:jensemil.schulzostergaard@microchip.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[simonwunderlich.de:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[microchip.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,narfation.org:email,simonwunderlich.de:from_mime,simonwunderlich.de:email,simonwunderlich.de:mid,simonwunderlich.de:dkim]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[devicetree.org:url,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,microchip.com:from_mime,microchip.com:email,microchip.com:mid,microchip.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 717D5723A28
+X-Rspamd-Queue-Id: BFA5F723ABC
 
-From: Sven Eckelmann <sven@narfation.org>
+Add bindings for LAN9645X switch. We use a fallback compatible for the
+smallest SKU microchip,lan96455s-switch.
 
-A TT unicast TVLV contains the number of VLANs stored in it. This number is
-an u16 and gets multiplied by the size of the struct
-batadv_tvlv_tt_vlan_data (8 bytes). The size can therefore overflow the u16
-used to store the tt_vlan_len. All additional safety checks to prevent
-out-of-bounds access of the TVLV buffer are invalid due to this overflow.
-
-Using size_t prevents this overflow and ensures that the safety checks
-compare against the actual buffer requirements.
-
-Cc: stable@vger.kernel.org
-Fixes: 7ea7b4a14275 ("batman-adv: make the TT CRC logic VLAN specific")
-Signed-off-by: Sven Eckelmann <sven@narfation.org>
-Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
+Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
+Signed-off-by: Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 ---
- net/batman-adv/translation-table.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Changes in v5:
+- No changes.
 
-diff --git a/net/batman-adv/translation-table.c b/net/batman-adv/translation-table.c
-index aae72015645a4..dae5e1d8c0385 100644
---- a/net/batman-adv/translation-table.c
-+++ b/net/batman-adv/translation-table.c
-@@ -4033,7 +4033,8 @@ static int batadv_tt_tvlv_unicast_handler_v1(struct batadv_priv *bat_priv,
- 					     u16 tvlv_value_len)
- {
- 	struct batadv_tvlv_tt_data *tt_data;
--	u16 tt_vlan_len, tt_num_entries;
-+	u16 tt_num_entries;
-+	size_t tt_vlan_len;
- 	char tt_flag;
- 	bool ret;
+Changes in v4:
+- No changes.
+
+Changes in v3:
+- remove additionalProperties: true
+- remove unnecessary | from description
+- change top level $ref to dsa.yaml#/$defs/ethernet-ports
+- use ethernet-ports and ethernet-port
+- move ethernet-ports under properties instead of patternProperties
+- move unevaluatedProperties: false after $ref
+- update example to use ethernet-ports and ethernet-port
+
+Changes in v2:
+- rename file to microchip,lan96455s-switch.yaml
+- remove led vendor property
+- add {rx,tx}-internal-delay-ps for rgmii delay
+- remove labels from example
+- remove container node from example
+---
+ .../net/dsa/microchip,lan96455s-switch.yaml        | 111 +++++++++++++++++++++
+ MAINTAINERS                                        |   1 +
+ 2 files changed, 112 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,lan96455s-switch.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,lan96455s-switch.yaml
+new file mode 100644
+index 000000000000..043fb48922b4
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/dsa/microchip,lan96455s-switch.yaml
+@@ -0,0 +1,111 @@
++# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/dsa/microchip,lan96455s-switch.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Microchip LAN9645x Ethernet switch
++
++maintainers:
++  - Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
++
++description:
++  The LAN9645x switch is a multi-port Gigabit AVB/TSN Ethernet switch with
++  five integrated 10/100/1000Base-T PHYs. In addition to the integrated PHYs,
++  it supports up to 2 RGMII/RMII, up to 2 BASE-X/SERDES/2.5GBASE-X and one
++  Quad-SGMII interfaces.
++
++properties:
++  compatible:
++    oneOf:
++      - enum:
++          - microchip,lan96455s-switch
++      - items:
++          - enum:
++              - microchip,lan96455f-switch
++              - microchip,lan96457f-switch
++              - microchip,lan96459f-switch
++              - microchip,lan96457s-switch
++              - microchip,lan96459s-switch
++          - const: microchip,lan96455s-switch
++
++  reg:
++    maxItems: 1
++
++  ethernet-ports:
++    type: object
++    patternProperties:
++      "^ethernet-port@[0-8]$":
++        type: object
++        description: Ethernet switch ports
++
++        $ref: dsa-port.yaml#
++        unevaluatedProperties: false
++
++        properties:
++          rx-internal-delay-ps:
++            const: 2000
++
++          tx-internal-delay-ps:
++            const: 2000
++
++$ref: dsa.yaml#/$defs/ethernet-ports
++
++required:
++  - compatible
++  - reg
++  - ethernet-ports
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    ethernet-switch@4000 {
++        compatible = "microchip,lan96459f-switch", "microchip,lan96455s-switch";
++        reg = <0x4000 0x244>;
++
++        ethernet-ports {
++            #address-cells = <1>;
++            #size-cells = <0>;
++
++            ethernet-port@0 {
++                reg = <0>;
++                phy-mode = "gmii";
++                phy-handle = <&cuphy0>;
++            };
++
++            ethernet-port@1 {
++                reg = <1>;
++                phy-mode = "gmii";
++                phy-handle = <&cuphy1>;
++            };
++
++            ethernet-port@2 {
++                reg = <2>;
++                phy-mode = "gmii";
++                phy-handle = <&cuphy2>;
++            };
++
++            ethernet-port@3 {
++                reg = <3>;
++                phy-mode = "gmii";
++                phy-handle = <&cuphy3>;
++            };
++
++            ethernet-port@7 {
++                reg = <7>;
++                phy-mode = "rgmii";
++                ethernet = <&cpu_host_port>;
++                rx-internal-delay-ps = <2000>;
++                tx-internal-delay-ps = <2000>;
++
++                fixed-link {
++                    speed = <1000>;
++                    full-duplex;
++                    pause;
++                };
++            };
++        };
++    };
++...
++
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f261c378eff3..8e507eaf7393 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -17626,6 +17626,7 @@ M:	Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
+ M:	UNGLinuxDriver@microchip.com
+ L:	netdev@vger.kernel.org
+ S:	Maintained
++F:	Documentation/devicetree/bindings/net/dsa/microchip,lan96455s-switch.yaml
+ F:	include/linux/dsa/lan9645x.h
+ F:	net/dsa/tag_lan9645x.c
  
+
 -- 
-2.47.3
+2.52.0
 
 
