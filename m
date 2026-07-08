@@ -1,198 +1,202 @@
-Return-Path: <netdev+bounces-305822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305824-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vbANLfVTTmohKwIAu9opvQ
-	(envelope-from <netdev+bounces-305822-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:43:17 +0200
+	id 4HWJEAZWTmqUKwIAu9opvQ
+	(envelope-from <netdev+bounces-305824-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:52:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 498B3726E89
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:43:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7995726F86
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:52:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=K7d7PHI1;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305822-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305822-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=collabora.com header.s=zohomail header.b=PB5MOWP6;
+	dmarc=pass (policy=none) header.from=collabora.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305824-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305824-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DBF7C30518DE
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 13:42:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4A30030A07F9
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 13:45:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58616380FCD;
-	Wed,  8 Jul 2026 13:42:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF25C3803DE;
+	Wed,  8 Jul 2026 13:45:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3263F3803F4;
-	Wed,  8 Jul 2026 13:42:01 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783518121; cv=none; b=R67Ht7+wL1QZLY192nN4g086qx8IXcs0dwr4r2wZ1ax+OP/FGKUX0q3zkMgXraaj+X7lw2X6/Q9lTMOBjJQaRVgIlXxJZrrc3nIE2C7aAaRRM+DQBnvfvHfttLEoYo/h1cX79/4Kv4CkSScj+fjpCykhurF08aN02Lpx1enig8E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783518121; c=relaxed/simple;
-	bh=aWYlSl1iKd+S/LFdxx9EKTZByuDcw7WfLy/kJpP40Lg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Ii6RyxTi+GVM/IOAWHrX+TVWUbF1RtN83LJRP19l5Vk8DD5XmtQFaAf28YeVgFvA0f5AgZzegcn0rBQUX07GXd6yLWAQ+0KyyQ2E6LPfut/1ngUGF4vt5CHJPVf8D4vpg87zhNUVKGVKy/u2hmr++rHvdVpAHyA9N9ilHF5Yd0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K7d7PHI1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EE048C2BCF4;
-	Wed,  8 Jul 2026 13:42:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1783518121;
-	bh=aWYlSl1iKd+S/LFdxx9EKTZByuDcw7WfLy/kJpP40Lg=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=K7d7PHI1R2B+ae/wDg5xwBOnZk6DbWkMaY1YKH4Lk30yBUr115+7i24rCn7gTI0rw
-	 h+gpCG7Ols1PmlbmSWoonsL4Mof4TdHTmw0FRSgewbPLnXRufqHjls+hRUCIMWUDFW
-	 B6YiJHR01g3C0epZ98GkhFNCOrVCQ61wGA9IfNpeLFAzOGEwUCTtI0NNVLfCNfZUnn
-	 2F9FI0caCqCE0Wowz+a+9PD7Xc8uU55XRVDfuPOnN9XBHb+wQV0xQ+lbETuPBNbcUf
-	 ReZTsIvtAGX3SUmbOauSmeV04v/MlTTiCHeUtfi/R9RrnSDcFCfsQMvaQVEVMGkhU+
-	 /SGR9IVrDIExQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D09D8C44501;
-	Wed,  8 Jul 2026 13:42:00 +0000 (UTC)
-From: Mattia Meleleo via B4 Relay <devnull+mattia.meleleo.coralogix.com@kernel.org>
-Date: Wed, 08 Jul 2026 15:40:57 +0200
-Subject: [PATCH bpf v2 2/2] selftests/bpf: Test FIONREAD on a sockmap
- socket without a verdict program
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319CB3803C5;
+	Wed,  8 Jul 2026 13:45:12 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783518314; cv=pass; b=oYY/oVNaCP7uLoe0PTVCicIFO3l5YgUrh1OhbEUzepc+W2ItmirxN7v4j9ipJm12AzJeQbr71g/VckDTbRRBORujhDVi5XqKZSBuwt7wnqY2U7EsvjUD4VIhRb+ZN0/FJhoAOiHL7xyMMzNVkxrQIt0JMhpv/l+L+VE+l1TeZCk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783518314; c=relaxed/simple;
+	bh=qWprFcj4shuGHq5yxrj4ujGarnc9yIZ52TmhC/6XIwk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=IeqW/652y/JdA/mEbObu9LYYVzPNHHeJvYPDKIrpc6OZ4txuMJb1Hk+Eu0viFrDBRO/kTQcEUPl0UfyguQIL4lYP2BwyCsNxLfwDabbDfPEFH9uBIhKsbcrT8kB7zJydi0ChUEOoI2xM9dRvgfZcpB6Is/TmMZcEPlkTKosRpUQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=louisalexis.eyraud@collabora.com header.b=PB5MOWP6; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal: i=1; a=rsa-sha256; t=1783518290; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=HBq9iS9jB6ewfkBvD6l/hbdZk9lWKDtHUbN71aNOZzsPLaY3iejK0SyY1j/4NBwcd9eUXrS+SniQU/2qJDseInB9kzWsSB1x5o6XcRGzRTkW3fzh9mXmRrTEM38b/bPRWHnLqzQmtdZzhYRN5kTvn5g1GWHdz5W38zNcUGDPR1w=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1783518290; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=qWprFcj4shuGHq5yxrj4ujGarnc9yIZ52TmhC/6XIwk=; 
+	b=m6cuxMrOVq4L8VkW/d073JvTz5zzxha3+ZKqTNROYRjUXXEbtxF1PaXWsflkd0SVK0gOre6P4sulmjdLtx0F7J7LCaaYCla+xr1elj1AHOb6EwnWOZdvoZfLQkQ5KHmdyjACCyE8UQsMr+OELEjcVBo68P3XkKdoxRn2PSiEQ64=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=louisalexis.eyraud@collabora.com;
+	dmarc=pass header.from=<louisalexis.eyraud@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1783518290;
+	s=zohomail; d=collabora.com; i=louisalexis.eyraud@collabora.com;
+	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
+	bh=qWprFcj4shuGHq5yxrj4ujGarnc9yIZ52TmhC/6XIwk=;
+	b=PB5MOWP6bfWP1uYvdd2mougUVnAF9pEe1jEhriEp822oJuoalAbrJcw9fBaiUssu
+	cjDdpxFnM0U3H7mB8Krxm0/TwkhW5jVwv7DdRs4J8Eur4cNdBl08RvlqbcuxgegdjJS
+	wDFfIWKK2x+8boHirToKdrVaKDl1pBin8nwP48/w=
+Received: by mx.zohomail.com with SMTPS id 178351828794519.896016735108105;
+	Wed, 8 Jul 2026 06:44:47 -0700 (PDT)
+Message-ID: <d1e37bd4f2a05fed6c7bfdc5d9a0fa90c892d608.camel@collabora.com>
+Subject: Re: [PATCH 02/15] dt-bindings: clock: mediatek: regroup MT8188
+ dt-bindings into MT8186
+From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+To: Rob Herring <robh@kernel.org>
+Cc: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>,  Brian Masney <bmasney@redhat.com>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley	 <conor+dt@kernel.org>, Matthias Brugger
+ <matthias.bgg@gmail.com>,  AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, Chun-Jie Chen
+ <chun-jie.chen@mediatek.com>, Philipp Zabel	 <p.zabel@pengutronix.de>,
+ Edward-JW Yang <edward-jw.yang@mediatek.com>,  Richard Cochran
+ <richardcochran@gmail.com>, kernel@collabora.com,
+ linux-clk@vger.kernel.org, 	devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, 	linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, 	netdev@vger.kernel.org
+Date: Wed, 08 Jul 2026 15:44:42 +0200
+In-Reply-To: <20260701193311.GA1402559-robh@kernel.org>
+References: 
+	<20260701-mt8189-clocks-system-base-v1-0-2b048feea50a@collabora.com>
+	 <20260701-mt8189-clocks-system-base-v1-2-2b048feea50a@collabora.com>
+	 <20260701193311.GA1402559-robh@kernel.org>
+Organization: Collabora Ltd
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260708-fionread-no-verdict-v2-2-29dd293621c7@coralogix.com>
-References: <20260708-fionread-no-verdict-v2-0-29dd293621c7@coralogix.com>
-In-Reply-To: <20260708-fionread-no-verdict-v2-0-29dd293621c7@coralogix.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org, John Fastabend <john.fastabend@gmail.com>, 
- Jakub Sitnicki <jakub@cloudflare.com>, 
- Jiayuan Chen <jiayuan.chen@linux.dev>, 
- Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
- Emil Tsalapatis <emil@etsalapatis.com>, 
- Mattia Meleleo <mattia.meleleo@coralogix.com>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1783518119; l=2540;
- i=mattia.meleleo@coralogix.com; s=20260707; h=from:subject:message-id;
- bh=p7lS9BLCvIzk4qRf5KI1vjYiReTBJhPhNVqmY8gvgxU=;
- b=zidsfoXQVVjr8qXp8v/wgttXzZ9KXCEg/FS17WN9aNkwrJnTH+cmUDhGghDWN0U9pwtueba5j
- Yde+vEcC9KCBvy4GdbjXKLNw3rzF7bN5uRarJc6s8QXpJ3lt5CY0xDJ
-X-Developer-Key: i=mattia.meleleo@coralogix.com; a=ed25519;
- pk=cs1zLoe3YDm4bJ7bfbPaZH0lHnd871JyJLiSh2eEzLs=
-X-Endpoint-Received: by B4 Relay for mattia.meleleo@coralogix.com/20260707
- with auth_id=857
-X-Original-From: Mattia Meleleo <mattia.meleleo@coralogix.com>
-Reply-To: mattia.meleleo@coralogix.com
+X-ZohoMailClient: External
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[collabora.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[collabora.com:s=zohomail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305822-lists,netdev=lfdr.de,mattia.meleleo.coralogix.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:memxor@gmail.com,m:emil@etsalapatis.com,m:mattia.meleleo@coralogix.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	HAS_ORG_HEADER(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,cloudflare.com,linux.dev,etsalapatis.com,coralogix.com];
 	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305824-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:robh@kernel.org,m:mturquette@baylibre.com,m:sboyd@kernel.org,m:bmasney@redhat.com,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:chun-jie.chen@mediatek.com,m:p.zabel@pengutronix.de,m:edward-jw.yang@mediatek.com,m:richardcochran@gmail.com,m:kernel@collabora.com,m:linux-clk@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[louisalexis.eyraud@collabora.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[baylibre.com,kernel.org,redhat.com,gmail.com,collabora.com,mediatek.com,pengutronix.de,vger.kernel.org,lists.infradead.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[louisalexis.eyraud@collabora.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[collabora.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	HAS_REPLYTO(0.00)[mattia.meleleo@coralogix.com]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 498B3726E89
+X-Rspamd-Queue-Id: D7995726F86
 
-From: Mattia Meleleo <mattia.meleleo@coralogix.com>
+Hello Rob,
 
-Add a test validating that FIONREAD on a TCP socket in a sockmap
-without a verdict program reports data pending in sk_receive_queue.
+On Wed, 2026-07-01 at 14:33 -0500, Rob Herring wrote:
+> On Wed, Jul 01, 2026 at 03:11:07PM +0200, Louis-Alexis Eyraud wrote:
+> > Regroup the MT8188 clock and system clock dt-bindings into MT8186
+> > ones
+> > to ease maintainability and have common files for several currently
+> > supported SoC or new future ones, that have the same kind of clock
+> > controller design.
+> >=20
+> > Note:
+> > The `#clock-cells` property is a required property for all
+> > compatibles
+> > declared in MT8188 clock and system clock dt-bindings but not in
+> > MT8186
+> > ones.
+> > To avoid ABI breakage, conditional blocks to check this requirement
+> > for MT8188 compatibles are added, rather than enforcing it for
+> > MT8186
+> > compatibles.
+>=20
+> If the existing DTs are just wrong, then I would just make #clock-
+> cells=20
+> required. But please update the .dts files so the warnings don't
+> grow.
+>=20
+I've tested to make the #clock-cells required for the MT8186, MT8192
+and MT8195 system and functional clock controllers.
+I did not see new warnings, so no extra dts patches would be needed.
 
-Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
-Signed-off-by: Mattia Meleleo <mattia.meleleo@coralogix.com>
----
- .../selftests/bpf/prog_tests/sockmap_basic.c       | 39 ++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+I'll add new patches (one per SoC) in the next revision of the series
+for this, as it simplifies the grouping patches (no more if/then to
+require #clock-cells for the MT8188/MT8189 clock controllers) and the
+note in commit message could be removed.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-index cb3229711..f0f368201 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-@@ -1373,6 +1373,43 @@ static void test_sockmap_multi_channels(int sotype)
- 	test_sockmap_pass_prog__destroy(skel);
- }
- 
-+/* A socket in a sockmap without a verdict program keeps its ingress data
-+ * in sk_receive_queue: FIONREAD must account for it.
-+ */
-+static void test_sockmap_no_verdict_fionread(void)
-+{
-+	int err, map, zero = 0, sent, avail;
-+	int c0 = -1, c1 = -1, p0 = -1, p1 = -1;
-+	struct test_sockmap_pass_prog *skel;
-+	char buf[256] = "0123456789";
-+
-+	skel = test_sockmap_pass_prog__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open_and_load"))
-+		return;
-+	map = bpf_map__fd(skel->maps.sock_map_rx);
-+
-+	err = create_socket_pairs(AF_INET, SOCK_STREAM, &c0, &c1, &p0, &p1);
-+	if (!ASSERT_OK(err, "create_socket_pairs()"))
-+		goto out;
-+
-+	err = bpf_map_update_elem(map, &zero, &c1, BPF_NOEXIST);
-+	if (!ASSERT_OK(err, "bpf_map_update_elem(c1)"))
-+		goto out_close;
-+
-+	sent = xsend(p1, &buf, sizeof(buf), 0);
-+	ASSERT_EQ(sent, sizeof(buf), "xsend(p1)");
-+	avail = wait_for_fionread(c1, sizeof(buf), IO_TIMEOUT_SEC);
-+	ASSERT_EQ(avail, sizeof(buf), "ioctl(FIONREAD)");
-+
-+out_close:
-+	close(c0);
-+	close(p0);
-+	close(c1);
-+	close(p1);
-+out:
-+	test_sockmap_pass_prog__destroy(skel);
-+}
-+
- void test_sockmap_basic(void)
- {
- 	if (test__start_subtest("sockmap create_update_free"))
-@@ -1415,6 +1452,8 @@ void test_sockmap_basic(void)
- 		test_sockmap_skb_verdict_shutdown();
- 	if (test__start_subtest("sockmap skb_verdict fionread"))
- 		test_sockmap_skb_verdict_fionread(true);
-+	if (test__start_subtest("sockmap no_verdict fionread"))
-+		test_sockmap_no_verdict_fionread();
- 	if (test__start_subtest("sockmap skb_verdict fionread on drop"))
- 		test_sockmap_skb_verdict_fionread(false);
- 	if (test__start_subtest("sockmap skb_verdict change tail"))
+> The grouping I would do here is:
+>=20
+> - clock controller only
+> - reset controller only
+> - both clock and reset controller
+>=20
+> That should avoid any if/then schemas.
+>=20
 
--- 
-Git-155)
+By this grouping, I understand you suggest having separate dt-bindings
+files, that could look like:
+- mediatek,mt8186-clock.yaml: clock controllers
+- <name to be found>: reset controllers
+- <name to be found>: clock controllers with reset controller
+- mediatek,mt8186-sys-clock.yaml: system clock controllers.
+- <name to be found>: system clock controllers with reset controller
 
+Is that what you meant?
 
+There is no pure reset controllers for those SoC so no dedicated file
+would needed at the moment.
+The system clock controllers all have reset-controllers, even they may
+currently be not all implemented, so no separate files for system clock
+controllers would needed as well.
+
+Also, from what I see the current dt-bindings, the system clocks
+controllers for the MT8186/MT8188/MT8192/MT8195 SoC have the #reset-
+cells property but it is not required for them (examples:
+mediatek,mt8188-infracfg-ao or mediatek,mt8195-infracfg_ao).
+
+With the patches to make the #clock-cells property required, I already
+removed the biggest if/else block in mediatek,mt8186-clock.yaml, so
+only the one regarding #reset-cells property remains.
+
+So, should I create separate files, following the grouping suggestion,
+for the v2 of this patch?
+
+Regards,
+Louis-Alexis
+
+> Rob
 
