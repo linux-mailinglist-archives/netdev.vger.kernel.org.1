@@ -1,197 +1,345 @@
-Return-Path: <netdev+bounces-305652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305653-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id fh/SBIrvTWpEAQIAu9opvQ
-	(envelope-from <netdev+bounces-305652-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 08:34:50 +0200
+	id nNrpMMLyTWrxAQIAu9opvQ
+	(envelope-from <netdev+bounces-305653-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 08:48:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12CBC722364
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 08:34:49 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA8A6722508
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 08:48:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b="mGYs/BRd";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305652-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305652-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305653-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305653-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 86DC23007A55
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 06:34:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B9FC530074D8
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 06:48:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5E603CC7F3;
-	Wed,  8 Jul 2026 06:34:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10B213E5A04;
+	Wed,  8 Jul 2026 06:48:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from out28-2.mail.aliyun.com (out28-2.mail.aliyun.com [115.124.28.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62393D668E
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 06:34:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD550238C0A;
+	Wed,  8 Jul 2026 06:47:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783492452; cv=none; b=illnqE+l3KZFm+lT0LCLDfchjeboxREsb9HlYg+SFM1Q6A5TonrWMXQAG4WHYOwxqbmiA6YBdM2IIUOkxOPm41ECA8Yvs13zqICMVzbUDU8zSFUT/CSCklP9Ng0D4xuEiijPYA8Z/37C3VbomGvk+/x7M60cbHmU0hF/rxU5egQ=
+	t=1783493279; cv=none; b=lrvRxTQK1lq5ZbUTrH8YP4Z4gclgfsa4w17dSaWBaMTuH5oV0sS4SZWNMNgRqmYEX6Yeh2fB8XvF12k1jDJmSc9QPAoVIRxC4BhNbKoumIXDYbwsrDrvDlehI1TkTe88UuF4ijyC+h638UlAJQ4I7IvbPn3/MYBYZyKbUzVPOq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783492452; c=relaxed/simple;
-	bh=WUDb/PbkOBm48utwLBlifBSQYCzJbZQ2IPogvWOWeAY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ELwMeJh+FVkAetqE72qil70L17XW+gjb52P7NuDAsJo8AnqOcOMO/H/cmq83CesiLcyf66d5O1S0C6LwWeoB9x93FIB+5q2KkkwtQUMg7C/DyriwAX2/z7PtlwjFyWS4K7VWmkPhXZWcFxJ+UVWl4lGuSboyBNvjCRvi7QQEtyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mGYs/BRd; arc=none smtp.client-ip=185.246.85.4
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 9A2FB4E40CF0;
-	Wed,  8 Jul 2026 06:34:02 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 567E960337;
-	Wed,  8 Jul 2026 06:34:02 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 26D1411BC25AD;
-	Wed,  8 Jul 2026 08:33:54 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1783492441; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=2u9XNj54KnCKdzGWeON2Ik6EnoCNeLw8ko4IIpofdm0=;
-	b=mGYs/BRdE2fIPEx8g1+Wf+oxYtf/ZzpxuhKuxAdrGKpGHPY/BamADVua1W4wlmVGbMPRsN
-	gzMIt3Ici9zsHvtJZDTO4fjn0Xp3N1C9qzPFy2xO/hLt0msmSJiATxP3oCyC/tAR4JepTL
-	FxfWJ6GEnTQnKT4YCHSzkRsM2IUnRpgSGDqTmihzaUi9hiBJrCnNb1idCjC52QdcN+dokF
-	sU/zXT5/aM0u3sKOA8wutVcw+8xKiZigAm9dBoJYTeB5Vwh7ax/10pdw3FXvFbdTRB1wnT
-	WgjgUcQ7L1B8tkifCKGpLxbV9CvqHOkqPxd/e/ED9OxaS+sTCBapXiPnhh650Q==
-Message-ID: <dcb8f2ad-e09e-4f86-be06-7da39710e304@bootlin.com>
-Date: Wed, 8 Jul 2026 08:33:53 +0200
+	s=arc-20240116; t=1783493279; c=relaxed/simple;
+	bh=wIX1BvCIs1OXFmwJwQEczccJqPrxCV4oqY17ez/4b3s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SUk6G1MsQkwKJ6Sp+nhldqArDrayOqUNqszTOoyuA507/uQm6WywfeunUMLq5yyb1NvxRWLKcKavdW1mlpHRJb0YHeSaZW85wrpmtezUL6QX3x7NIZjZdTA9EaKXO+DR7f6nCDyAz867xBctY7W6lrNbUs79RfpuGt6C4Q2FJN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com; spf=pass smtp.mailfrom=nebula-matrix.com; arc=none smtp.client-ip=115.124.28.2
+X-Alimail-AntiSpam:AC=CONTINUE;BC=0.07329495|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_alarm|0.104959-0.00966442-0.885376;FP=2626160830735468050|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam033032062159;MF=illusion.wang@nebula-matrix.com;NM=1;PH=DS;RN=18;RT=18;SR=0;TI=SMTPD_---.iG5uJ.5_1783493265;
+Received: from localhost.localdomain(mailfrom:illusion.wang@nebula-matrix.com fp:SMTPD_---.iG5uJ.5_1783493265 cluster:ay29)
+          by smtp.aliyun-inc.com;
+          Wed, 08 Jul 2026 14:47:46 +0800
+From: "illusion.wang" <illusion.wang@nebula-matrix.com>
+To: dimon.zhao@nebula-matrix.com,
+	illusion.wang@nebula-matrix.com,
+	alvin.wang@nebula-matrix.com,
+	sam.chen@nebula-matrix.com,
+	netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch,
+	corbet@lwn.net,
+	kuba@kernel.org,
+	horms@kernel.org,
+	linux-doc@vger.kernel.org,
+	pabeni@redhat.com,
+	vadim.fedorenko@linux.dev,
+	lukas.bulwahn@redhat.com,
+	edumazet@google.com,
+	enelsonmoore@gmail.com,
+	skhan@linuxfoundation.org,
+	hkallweit1@gmail.com,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH v21 net-next 00/12] nbl driver for Nebulamatrix NICs
+Date: Wed,  8 Jul 2026 14:47:26 +0800
+Message-ID: <20260708064742.35391-1-illusion.wang@nebula-matrix.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 1/2] net: dsa: realtek: rtl8365mb: add SGMII
- support for RTL8367S
-To: Johan Alvarado <contact@c127.dev>
-Cc: linusw@kernel.org, alsi@bang-olufsen.dk, andrew@lunn.ch,
- olteanv@gmail.com, kuba@kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, linux@armlinux.org.uk,
- luizluca@gmail.com, namiltd@yahoo.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <0100019f3f45ab47-bab143e1-1dee-49f0-9b38-16fd0d84175e-000000@email.amazonses.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <0100019f3f45ab47-bab143e1-1dee-49f0-9b38-16fd0d84175e-000000@email.amazonses.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [1.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-305652-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:contact@c127.dev,m:linusw@kernel.org,m:alsi@bang-olufsen.dk,m:andrew@lunn.ch,m:olteanv@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:luizluca@gmail.com,m:namiltd@yahoo.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,bang-olufsen.dk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk,yahoo.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305653-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[nebula-matrix.com];
+	FORGED_RECIPIENTS(0.00)[m:dimon.zhao@nebula-matrix.com,m:illusion.wang@nebula-matrix.com,m:alvin.wang@nebula-matrix.com,m:sam.chen@nebula-matrix.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:corbet@lwn.net,m:kuba@kernel.org,m:horms@kernel.org,m:linux-doc@vger.kernel.org,m:pabeni@redhat.com,m:vadim.fedorenko@linux.dev,m:lukas.bulwahn@redhat.com,m:edumazet@google.com,m:enelsonmoore@gmail.com,m:skhan@linuxfoundation.org,m:hkallweit1@gmail.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[illusion.wang@nebula-matrix.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,lwn.net,kernel.org,vger.kernel.org,redhat.com,linux.dev,google.com,gmail.com,linuxfoundation.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[illusion.wang@nebula-matrix.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,2.ai:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 12CBC722364
+X-Rspamd-Queue-Id: BA8A6722508
 
-Hi,
+From: illusion wang <illusion.wang@nebula-matrix.com>
 
-On 7/8/26 03:09, Johan Alvarado wrote:
+This patch series represents the first phase. We plan to integrate it in
+two phases: the first phase covers mailbox and chip configuration,
+while the second phase involves net dev configuration.
+Together, they will provide basic PF-based Ethernet port transmission and
+reception capabilities.
 
-> 
-> [...]
-> 
->>> +		/* The SerDes has its own pause controls; program them from
->>> +		 * the resolved pause modes, as the vendor driver does when
->>> +		 * forcing the link on a SerDes external interface. This is
->>> +		 * done here rather than in rtl8365mb_pcs_link_up() because
->>> +		 * pcs_link_up() carries no pause information.
->>> +		 */
->>> +		if (rtl8365mb_interface_is_serdes(interface)) {
->>> +			u32 val = 0;
->>> +
->>> +			if (tx_pause)
->>> +				val |= RTL8365MB_SDS_MISC_SGMII_TXFC_MASK;
->>> +			if (rx_pause)
->>> +				val |= RTL8365MB_SDS_MISC_SGMII_RXFC_MASK;
->>
->> Do you know what this does in HW ? Is this so that the PCS lets the Pause frames through
->> in either directions ?
->>
->> I suspect this is something that would be only used for inband advertising
->> of pause settings (in such case, you don't even need that), but ofc I'm not sure :)
->>
->> You already configure the MAC pause settings, can you test that these bits actually do
->> anything by exercising a bit flow control and checking if these registers are used ?
-> 
-> I tested it on the hardware, and it turns out these bits are the
-> operative pause controls for the SerDes port: pause frames are only
-> ever emitted when SDS_MISC_SGMII_TXFC is set, and the MAC force-mode
-> pause bits alone have no observable effect on this port. They are not
-> tied to in-band advertisement either - they act with the link fully
-> forced.
-> 
-> For context, there is no public documentation for these bits, but in
-> the vendor GPL code every write to them lives in
-> rtl8367c_setAsicPortForceLinkExt(), the forced-link path, where they
-> are programmed from the resolved tx/rx pause settings right alongside
-> the MAC force-mode pause bits - never from the nway/in-band paths.
-> 
-> Test setup: RTL8367S (Mercusys MR80X), CPU port 6 on HSGMII,
-> 2500base-x fixed link to an IPQ5018. I enabled regmap debugfs writes
-> so I could flip the bits live, and forced congestion by L2-forwarding
-> ~350 Mbit/s of SoC-generated UDP in through the CPU port and out of a
-> 100M user port (~3.5x oversubscription, ~135 MB per run), watching the
-> CPU port's dot3OutPauseFrames MIB counter:
-> 
->   everything cleared (baseline):                 0 pause frames
->   MAC force pause only (DIGITAL_INTERFACE_FORCE
->       TXPAUSE|RXPAUSE, reg 0x1311):              0 pause frames
->   MAC force pause + SDS TXFC|RXFC:            2396 pause frames
->   SDS TXFC|RXFC only (MAC pause cleared):     2362 pause frames
->   SDS TXFC only:                              2934 pause frames
->   SDS RXFC only:                                 0 pause frames
-> 
-> RXFC did not influence pause emission, so by symmetry it presumably
-> gates honouring received pause frames; I could not exercise that
-> direction because the SoC MAC on this board never transmits pause.
-> 
-> So the write has to stay - without it flow control simply does not
-> work on SGMII/HSGMII. I will expand the comment in v5 to say that
-> these are the functional pause enables for the SerDes, rather than
-> describing it as mirroring the vendor forced-link sequence.
-> 
+After that, we will consider other features, such as ethtool support,
+flow management, adminq messaging, VF support, debugfs support, etc.
 
-Thanks a lot for the investigation ! Ok so you do need to configure that
-in the PCS. Maybe at some point we'll have to pass tx/rx negotiated pause
-settings to the PCS, just like we to for the MAC, but it's strange as the
-PCS isn't supposed to be the block handling pause :/
+To ensure compatibility, our architecture is divided into the following
+layers:
 
-I'm ok leaving this as-is right now, you've added a nice comment on why
-PCS regs are accessed in the MAC's link_up(). If we find other devices
-that behave the same w.r.t. pause, we may have to pass these to the pcs_link_up,
-but it's rather unusual I think.
+1. Dev Layer (Device Layer)
+The top-level business logic layer where all operations are
+device-centric. Every operation is performed relative to the device
+context. The intergration of base functions encompasses:
+management(ctrl only for leonis pf0), network(net_dev,this time not
+contained),common.
 
-Thanks :)
+2. Dispatch Layer
+The distribution from services to specific data operations is mainly
+divided into two types: direct pass-through and handling by the
+management PF. It shields the upper layer from the differences in
+specific underlying locations.
+It describes the processing locations and paths of the services.
 
-Maxime 
+3. Resource Layer
+Handles tasks dispatched from Dispatch Layer. These tasks fall into two
+categories:
+3.1 Hardware control
+The Resource Layer further invokes the HW Layer when hardware access is
+needed, as only the HW Layer has OS-level privileges.
+3.2 Software resource management
+Operations like packet statistics collection that don't require hardware
+access.
+
+4. HW Layer (Hardware Layer)
+Serves the Resource Layer by interacting with different hardware
+chipsets.Writes to hardware registers to drive the hardware based on
+Resource Layer directives.
+
+5. Channel Layer
+
+Handle communication between PF0(has ctrl func) and other PF,and provide
+basic interaction channels.
+
+6. Common Layer
+Provides fundamental services
+
+changes v20->v21
+Link to v20:https://lore.kernel.org/netdev/20260630010718.4346-1-illusion.wang@nebula-matrix.com/
+I have dropped the old Patch 2 titled "add our driver architecture"
+Add new Patch 2 "add core driver architecture and HW layer initialization".
+Split original patch8 into three separate patches as suggested
+
+changes v19->v20
+Link to v19:https://lore.kernel.org/netdev/20260617044702.2439-1-illusion.wang@nebula-matrix.com/
+Starting from V20, I have dropped the old Patch 3 titled "P4
+configuration invoked during chip initialization". This functionality
+will be reimplemented in next phase using the request_firmware() API
+with an external firmware blob.
+changes v18->v19
+Link to v18:https://lore.kernel.org/netdev/20260611044916.2383-1-illusion.wang@nebula-matrix.com/
+changes v17->v18
+Link to v17:https://lore.kernel.org/netdev/20260601093149.25905-1-illusion.wang@nebula-matrix.com/
+changes v16->v17
+Link to v16:https://lore.kernel.org/netdev/20260526035453.2359-1-illusion.wang@nebula-matrix.com/
+AI review issues
+changes v15->v16
+Link to v15:https://lore.kernel.org/netdev/20260520032950.4874-1-illusion.wang@nebula-matrix.com/
+AI review issues
+changes v14->v15
+Link to v14:https://lore.kernel.org/netdev/20260513011649.4404-1-illusion.wang@nebula-matrix.com/
+AI review issues
+changes v13->v14
+Link to v13:https://lore.kernel.org/netdev/20260428114910.2616-1-illusion.wang@nebula-matrix.com/
+AI review issues
+changes v12->v13
+Link to v12:https://lore.kernel.org/netdev/20260415033608.2438-1-illusion.wang@nebula-matrix.com/
+AI review issues
+changes v11->v12
+Link to v11:https://lore.kernel.org/netdev/20260408093739.56001-1-illusion.wang@nebula-matrix.com/
+AI review issues
+changes v10->v11
+Link to v10:https://lore.kernel.org/netdev/20260401022318.28550-1-illusion.wang@nebula-matrix.com/
+1.Issues found by Mohsin
+2.AI review issues
+changes v9->v10
+Link to v9:https://lore.kernel.org/netdev/20260325040048.2313-1-illusion.wang@nebula-matrix.com/
+1.Issues found by Jakub
+2.AI review issue
+changes v8->v9
+Link to v8:https://lore.kernel.org/netdev/20260317034533.5600-1-illusion.wang@nebula-matrix.com/
+1.Issues found by Jakub
+2.AI review issue
+Changes v7→v8
+Link to v7:https://lore.kernel.org/netdev/20260310120959.22015-1-illusion.wang@nebula-matrix.com/
+1.Issues found by Paolo
+Changes v6->v7
+Link to v6:https://lore.kernel.org/netdev/20260306033451.5196-1-illusion.wang@nebula-matrix.com/
+1.Issue found by Jakub
+2.AI review issue
+Changes v5->v6
+Link to V5:https://lore.kernel.org/netdev/20260226073840.3222-1-illusion.wang@nebula-matrix.com/
+1.put all standard linux includes files the .c file which needs it & others
+--Andrew
+2.AI review issue
+Changes v4->v5
+Link to V4:https://lore.kernel.org/netdev/20260206021608.85381-1-illusion.wang@nebula-matrix.com/
+1.change nbl_core to nbl & change ** pointers to *pointers & others
+--Andrew
+2.AI review issue
+Changes v3->v4
+Link to v3: https://lore.kernel.org/netdev/20260123011804.31263-1-illusion.wang@nebula-matrix.com
+1.cut down to part of a mini driver(mailbox and chip init)
+--Jakub Kicinski Simon Horman(some sort of staged approached)
+2.modify issues found by ai.
+3. Reverse Christmas tree/nbl_err/devm_kfree/remove some macros/
+void type to real type/others
+--Andrew Lunn
+4.change deprecated pci_enable_msix_range to pci_alloc_irq_vectors
+5.delete service layer
+6.the style of kconfig---Randy Dunlap
+7.add to Documentation/networking/device_drivers/ethernet/index.rst
+--Simon Horman
+Changes v2 →v3
+Link to v2: https://lore.kernel.org/netdev/20260109100146.63569-1-illusion.wang@nebula-matrix.com/
+1.cut down to a mini driver:
+    delete vf support
+    use promisc mode to cut down flow management
+    drop patch15 in v2
+    delete adminq msg
+    delete abnormal handling
+    delete some unimportant interfaces
+2.modify issues found by ai review
+Changes v1->v2
+Link to v1: https://lore.kernel.org/netdev/20251223035113.31122-1-illusion.wang@nebula-matrix.com/
+1.Format Issues and Compilation Issues
+- Paolo Abeni
+2.add sysfs patch and drop coexisting patch
+- Andrew Lunn
+3.delete some unimportant ndo operations
+4.add machine generated headers patch
+5.Modify the issues found in patch1-2 and apply the same fixes to other
+patches
+6.modify issues found by nipa
+
+illusion wang (12):
+  net/nebula-matrix: add minimum nbl build framework
+  net/nebula-matrix: add core driver architecture and HW layer
+    initialization
+  net/nebula-matrix: add channel wire opcode enum definitions
+  net/nebula-matrix: add channel layer
+  net/nebula-matrix: add common resource implementation
+  net/nebula-matrix: add intr resource implementation
+  net/nebula-matrix: add vsi resource implementation
+  net/nebula-matrix: dispatch: add control-level routing core
+    infrastructure
+  net/nebula-matrix: dispatch: add cross-version channel message
+    framework
+  net/nebula-matrix: dispatch: add resource ops lock protection
+  net/nebula-matrix: add common/ctrl dev init/remove operation
+  net/nebula-matrix: add common dev start/stop operation
+
+ .../device_drivers/ethernet/index.rst         |    1 +
+ .../ethernet/nebula-matrix/nbl.rst            |   28 +
+ MAINTAINERS                                   |   10 +
+ drivers/net/ethernet/Kconfig                  |    1 +
+ drivers/net/ethernet/Makefile                 |    1 +
+ drivers/net/ethernet/nebula-matrix/Kconfig    |   34 +
+ drivers/net/ethernet/nebula-matrix/Makefile   |    6 +
+ .../net/ethernet/nebula-matrix/nbl/Makefile   |   15 +
+ .../nbl/nbl_channel/nbl_channel.c             | 1098 +++++++++++++++++
+ .../nbl/nbl_channel/nbl_channel.h             |  168 +++
+ .../nebula-matrix/nbl/nbl_common/nbl_common.c |  183 +++
+ .../nebula-matrix/nbl/nbl_common/nbl_common.h |   33 +
+ .../net/ethernet/nebula-matrix/nbl/nbl_core.h |   56 +
+ .../nebula-matrix/nbl/nbl_core/nbl_dev.c      |  464 +++++++
+ .../nebula-matrix/nbl/nbl_core/nbl_dev.h      |   55 +
+ .../nebula-matrix/nbl/nbl_core/nbl_dispatch.c |  540 ++++++++
+ .../nebula-matrix/nbl/nbl_core/nbl_dispatch.h |   42 +
+ .../nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.c  |  982 +++++++++++++++
+ .../nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.h  |  368 ++++++
+ .../nbl_hw_leonis/nbl_resource_leonis.c       |  295 +++++
+ .../nbl_hw_leonis/nbl_resource_leonis.h       |   12 +
+ .../nebula-matrix/nbl/nbl_hw/nbl_hw_reg.h     |   73 ++
+ .../nebula-matrix/nbl/nbl_hw/nbl_interrupt.c  |  288 +++++
+ .../nebula-matrix/nbl/nbl_hw/nbl_interrupt.h  |   21 +
+ .../nebula-matrix/nbl/nbl_hw/nbl_resource.c   |  148 +++
+ .../nebula-matrix/nbl/nbl_hw/nbl_resource.h   |  108 ++
+ .../nebula-matrix/nbl/nbl_hw/nbl_vsi.c        |   26 +
+ .../nebula-matrix/nbl/nbl_hw/nbl_vsi.h        |   12 +
+ .../nbl/nbl_include/nbl_def_channel.h         |  371 ++++++
+ .../nbl/nbl_include/nbl_def_common.h          |   68 +
+ .../nbl/nbl_include/nbl_def_dev.h             |   16 +
+ .../nbl/nbl_include/nbl_def_dispatch.h        |   42 +
+ .../nbl/nbl_include/nbl_def_hw.h              |   53 +
+ .../nbl/nbl_include/nbl_def_resource.h        |   38 +
+ .../nbl/nbl_include/nbl_include.h             |   66 +
+ .../net/ethernet/nebula-matrix/nbl/nbl_main.c |  253 ++++
+ 36 files changed, 5975 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/nebula-matrix/nbl.rst
+ create mode 100644 drivers/net/ethernet/nebula-matrix/Kconfig
+ create mode 100644 drivers/net/ethernet/nebula-matrix/Makefile
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/Makefile
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_channel/nbl_channel.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_channel/nbl_channel.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_common/nbl_common.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_common/nbl_common.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dispatch.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dispatch.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_resource_leonis.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_resource_leonis.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_reg.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_interrupt.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_interrupt.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_resource.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_resource.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_vsi.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_vsi.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_channel.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_common.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_dev.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_dispatch.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_hw.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_resource.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_include.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_main.c
+
+-- 
+2.47.3
 
 
