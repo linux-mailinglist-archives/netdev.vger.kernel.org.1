@@ -1,187 +1,173 @@
-Return-Path: <netdev+bounces-305779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305780-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id pNViAlw3TmqsJAIAu9opvQ
-	(envelope-from <netdev+bounces-305779-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:41:16 +0200
+	id wvy1CkY4TmrgJAIAu9opvQ
+	(envelope-from <netdev+bounces-305780-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:45:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0288E725F60
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:41:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C669725FB0
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:45:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=OT7D5EhI;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305779-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305779-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=collabora.com header.s=zohomail header.b=SgpZaz1L;
+	dmarc=pass (policy=none) header.from=collabora.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305780-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305780-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1650430135CF
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 11:36:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 02BDD30E549D
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 11:37:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D38C33D349C;
-	Wed,  8 Jul 2026 11:35:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E6A3433BCA;
+	Wed,  8 Jul 2026 11:37:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B3B637A486
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 11:35:57 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783510558; cv=none; b=tcaq8TXqKyzg3Uc7E+FQrqifUNgfVXy4AKNDzxcSM/vuM0oEEEdu3HKkIh8amWiYdfw4Ef/B0byWtigv3mxmFnrZIHVyEoaTroQ8XyDD5Ef/djXEuE+D/PB5vZmub2yNDZqREivPKxolfAxUfxp8GrWMELv/S4S59ZOVwPTpHLs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783510558; c=relaxed/simple;
-	bh=Ah83tdi6uMZ65rIqw/348ZXK0jFCKAqKHBYKp7CVmzM=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=O/TEy4ZlQu5rFZ3hDp6+Kmcx0M3J39+usjXNU3eVFq5N2WE49vbl4Io92FIV1Fc8bVPMmmVCJ+tlesFKNk/f9ZSa75GOTBKglyBXSfzg7IXMnpu569K0g+bYUOX4dCuRxHEBjMiVOlo1JEaNAry2f4FaQDhiVBTNFY+5RzMxCEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OT7D5EhI; arc=none smtp.client-ip=209.85.214.174
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2caea3f742bso9945725ad.0
-        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 04:35:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783510557; x=1784115357; darn=vger.kernel.org;
-        h=mime-version:content-type:message-id:date:subject:cc:to:from:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Brmbfs6RPXs03BhYiS0ot6De5Oja1VZ3H8esF8uHn1Q=;
-        b=OT7D5EhITy+wHvzmvqZxMxMmB+iPT+0bGOrGyZCAYNIgkVfNBfaysgP3e6XzjmMtnh
-         +fQVg6ZFLm/RdNfmnxQ7gjNo73ZzuEevSGydRs1aZW/nEapAHDoC3aliZOme2Mh7AOO/
-         L8GPYjHm+LdDMzwPiyXu6AnkPNubcMgFUE6L7Jlg64nOrqEaR04pN+f8sEFYQTWqq2hq
-         jmDq6AnQ/pBUYqZ2DVttG4BHRomNoi6/7MA21MTYLietew3gD6BUmshfVnyjAxG9qJq3
-         r1PX2F9ghsNbpbz0Z1/lZdCzoBuzidbRIwKIctCbmi2sA+Gbalqx3tQpailQ6NdVVQnd
-         GF5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783510557; x=1784115357;
-        h=mime-version:content-type:message-id:date:subject:cc:to:from
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=Brmbfs6RPXs03BhYiS0ot6De5Oja1VZ3H8esF8uHn1Q=;
-        b=GxKHyD5jL/LMtW0DseQ3pQA4wDF/7q5CLH/3nzT/Zw2d0RpSKUbn18q59jVxgRubyd
-         gk27eIwpwUSABOSlMAjgIcAOouyW7St39iswmeitzsrgmMlvTJwMCp5VwyX7kmSD9xo2
-         7EqTeizuzTxIXOpUH5zTJ8Soyaz5ce7XCP9FTK79utVyCrNQQlFJ70maHLodx6e+cwKV
-         9Do4BHNiVjsmK0Zi+lrdPb1CfU2ItlshlzVLPQ13XPNZWqpP1OZQyu6ZDRXXsIy4G3Eg
-         8rfRfasZfV0fZmqHwrGhyIBdwwzdLPAmtQtuq9zWYsPaEXBBPlgbVSdi6pqnNesp3N+7
-         ePag==
-X-Gm-Message-State: AOJu0YycalsLmbQ+rKXsqjnX7c629PAi7bVQNUR866FZyUm2uK1BCwkH
-	u4tMmY72ZgKVkcMJcCiuBBaZWcBLGQROqLyMtX81x1kHgAs7spDMFAXJqX8bOXwfgGE=
-X-Gm-Gg: AfdE7ckKsvjDV/2vZnhRFLHPxbQeIT66hDHETKcJWVLMMfDGSlPdb0OSTUQpn+IfUf9
-	wbBPF5b2j/dvNYHr7GhUIT2LEf45PlYjL4CCSZjt6dtARRv/e+8TLZDXAhIiRw8TBzDS6TNRqRj
-	4Qt/qAKHJqz61ErEiEANVnFEVswQjgdUuztkc+rrgXQ7+DTu1wEGxCPrG7kZqwZEe7wSgpaFjAA
-	WmukNGEKNhInEBecn6qyJZDIcM8G2JLWC9japMfdYSmcJIFM6+Wbz5dtokABQnbiAhTj6MpIZv1
-	BQvMpdp66lhJ8RmBnjDgb/KrDij00abPfrRXAsjRc6zxWhuDmXfZ0wExyl5f9xDZU5vWoccBSI5
-	DprtK7ZA+4cHdWMbepanxe0DTLXE1MMo/RkFYQujKOHuc4gx7YEkjdtRfEJavtIWqWqPW3D9LGU
-	yVLE1OxQ==
-X-Received: by 2002:a17:903:2411:b0:2c9:b396:1a55 with SMTP id d9443c01a7336-2ccea394d5dmr21404765ad.12.1783510556811;
-        Wed, 08 Jul 2026 04:35:56 -0700 (PDT)
-Received: from [127.0.1.1] ([47.253.114.73])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9d59e51sm26989615ad.76.2026.07.08.04.35.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2026 04:35:56 -0700 (PDT)
-From: Wayen Yan <win847@gmail.com>
-To: netdev@vger.kernel.org
-Cc: lorenzo@kernel.org, horms@kernel.org, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, andrew+netdev@lunn.ch, angelogioacchino.delregno@collabora.com, matthias.bgg@gmail.com, linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-Subject: [PATCH net] net: airoha: Fix DMA direction for NPU mailbox buffer
-Date: Wed, 8 Jul 2026 19:35:29 +0800
-Message-ID: <178351055214.98729.11403147818632027428@gmail.com>
-Content-Type: text/plain; charset=utf-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FCDB42EED7;
+	Wed,  8 Jul 2026 11:37:20 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783510642; cv=pass; b=cnWnq/3caKbfFkfixJbGgnycoqMnteUHKAtDgtMcE8crb2zoFptnvEGSvT0cUjEN5N3S3kuitrNNJOHcYuYpFyR1PHHV/KwCV5s6m/a2AhWijGYwsl3WfZFVl7mQ/BpiHq1cEM+osHS2VIMyYsgHsDpxXAVIWsk0iSU3tQlOSoQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783510642; c=relaxed/simple;
+	bh=MQjOHxd6PAl5dz6llEhjB7twiwDcwseiliYt9HRWP9c=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=f8QhISYF2X5aqCHmwwptDH7JDoI8E6dSWbCFtcrKvCKmgXivqMhhdbcqv49GwAAQ8pcsooeBZ5NYynpZGebs9IV6L+M+UqBQZcaeGDgdMIJNRLHRLcA2zjTUExfzAZhfK11To6GWGdcGsc9dUpQQAyEuCdal3G8yyNUYNf61gbU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=louisalexis.eyraud@collabora.com header.b=SgpZaz1L; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal: i=1; a=rsa-sha256; t=1783510592; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=fiM838OSJXxgoJdBoSWbg9eOpW3CqgvOWxKDidB7HrEtGzON8fr84bpH54/eWTMokKJGeHDcDC3nnYVk4PXKtWKRZ8YuoHs69TJbi8n1og/TFEs+dgzdDAJ2+0DE/KcqDXEHYoeEU9AYTGFqDed3+FOib+ScgGx/A8oJGBRFiak=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1783510592; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=gcY7T0lP5le5CCNf+zhfFY+iI1N5QvSyJZnptU0Oys8=; 
+	b=Gb1vx0D3oEAGSswxky62uf/lSq8w8KZrVtlO0xcj6NALwgSI8elGNHJix84Q3+ITAfHFzoZc9fEBQyukiWVOJkdmrVr0HuZauE7AYvG2itYZUaKYdFplRrq4EReb8NcMpzEkeZeiDqIab3npvRk3Fr2+SKleQLi0R6yMI711yaI=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=louisalexis.eyraud@collabora.com;
+	dmarc=pass header.from=<louisalexis.eyraud@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1783510592;
+	s=zohomail; d=collabora.com; i=louisalexis.eyraud@collabora.com;
+	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
+	bh=gcY7T0lP5le5CCNf+zhfFY+iI1N5QvSyJZnptU0Oys8=;
+	b=SgpZaz1LyvYikKA5/5BCe443LYNenKVSqHw4XguZa+HpuQiaQYXH8hvKhF1ve3KN
+	ZZoSo3RXdwCGd6wE8gqO29opjDcsyyTT+lqZyJ5l1iegYaA+7VTNePrzVIX43pIzAZs
+	LmElpjbQ+VBGQ+Mc7vZhhZGbSXxNb2Y7Y6gzMLQI=
+Received: by mx.zohomail.com with SMTPS id 1783510588746822.2863328296761;
+	Wed, 8 Jul 2026 04:36:28 -0700 (PDT)
+Message-ID: <8304b0a704c8db697767584b8c34388f07ba401d.camel@collabora.com>
+Subject: Re: [PATCH net-next 1/6] dt-bindings: net: mediatek-dwmac: add
+ support for MT8189 SoC
+From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley	
+ <conor+dt@kernel.org>, Richard Cochran <richardcochran@gmail.com>, Matthias
+ Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno	
+ <angelogioacchino.delregno@collabora.com>, Biao Huang
+ <biao.huang@mediatek.com>,  Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	maxime.chevallier@bootlin.com, rmk+kernel@armlinux.org.uk,
+ kernel@collabora.com, 	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, 	linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, 
+	linux-stm32@st-md-mailman.stormreply.com
+Date: Wed, 08 Jul 2026 13:36:21 +0200
+In-Reply-To: <b810b9cd-8f5e-4c9d-8496-908aae55dac1@lunn.ch>
+References: <20260707-dwmac-mediatek-mt8189-v1-0-17f345eaaca3@collabora.com>
+	 <20260707-dwmac-mediatek-mt8189-v1-1-17f345eaaca3@collabora.com>
+	 <b810b9cd-8f5e-4c9d-8496-908aae55dac1@lunn.ch>
+Organization: Collabora Ltd
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-ZohoMailClient: External
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.39 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_BAD_CTE_7BIT(1.05)[unknown,utf8];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[collabora.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[collabora.com:s=zohomail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,redhat.com,google.com,lunn.ch,collabora.com,gmail.com,lists.infradead.org];
-	TAGGED_FROM(0.00)[bounces-305779-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[win847@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:lorenzo@kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:angelogioacchino.delregno@collabora.com,m:matthias.bgg@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
+	HAS_ORG_HEADER(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TO_DN_NONE(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[win847@gmail.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305780-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:richardcochran@gmail.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:biao.huang@mediatek.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:maxime.chevallier@bootlin.com,m:rmk+kernel@armlinux.org.uk,m:kernel@collabora.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:linux-stm32@st-md-mailman.stormreply.com,m:krzk@kernel.org,m:conor@kernel.org,m:matthiasbgg@gmail.com,m:mcoquelinstm32@gmail.com,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[louisalexis.eyraud@collabora.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,collabora.com,mediatek.com,foss.st.com,bootlin.com,armlinux.org.uk,vger.kernel.org,lists.infradead.org,st-md-mailman.stormreply.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[louisalexis.eyraud@collabora.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[collabora.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0288E725F60
+X-Rspamd-Queue-Id: 6C669725FB0
 
-airoha_npu_send_msg() always maps the mailbox buffer with DMA_TO_DEVICE,
-but some callers expect the NPU to write response data back into the
-same buffer:
+Hi Andrew,
 
-- airoha_npu_wlan_msg_get() (NPU_OP_GET): NPU writes response into
-  the buffer, then the caller reads it via memcpy()
-- airoha_npu_ppe_stats_setup() (NPU_OP_SET): NPU writes back
-  npu_stats_addr field in the response
+On Tue, 2026-07-07 at 14:42 +0200, Andrew Lunn wrote:
+> > +=C2=A0 - if:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 properties:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 compatible:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 contains:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 enu=
+m:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 - mediatek,mt8189-gmac
+> > +=C2=A0=C2=A0=C2=A0 then:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 properties:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 clocks:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 items:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - d=
+escription: MAC Main clock
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - d=
+escription: PTP clock
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - d=
+escription: RMII reference clock provided by MAC
+>=20
+> Since this is a MAC, it sounds like it is consuming its own clock?
 
-On non-cache-coherent architectures like EN7581 (Cortex-A53 without
-hardware cache coherency for NPU DMA), DMA_TO_DEVICE unmap is a no-op
-— it does not invalidate the CPU cache. If the NPU-written cache line
-is still present in the CPU cache when the caller reads the buffer,
-the CPU observes stale data instead of the NPU response.
+In the driver ([1]), this clock is described as being only used and
+needed in RMII when MAC provides the reference clock, and useless
+otherwise (RGMII/MII or RMII when PHY provides the reference clock).
 
-This is a timing-sensitive bug: small mailbox buffers (~24 bytes)
-typically fit in a single cache line and may survive in the cache
-until the caller reads them, producing silent data corruption rather
-than a crash. The bug is more likely to trigger when the caller reads
-the response immediately after dma_unmap_single() without intervening
-cache-evicting operations.
+Its use and configuration also depends on the "mediatek,rmii-clk-from-
+mac" vendor property ([2]) presence in devicetree.
 
-Fix by using DMA_BIDIRECTIONAL for both map and unmap, which ensures
-dma_unmap_single() invalidates the CPU cache on non-coherent systems.
-The mailbox buffers are small so there is no performance concern.
+Do you wish this clock description be reworded in the dt-bindings for
+both occurrences?
 
-Fixes: c52918744ee1e49cea86622a2633b9782446428f ("net: airoha: npu: Move memory allocation in airoha_npu_send_msg() caller")
-Signed-off-by: Wayen Yan <win847@gmail.com>
----
- drivers/net/ethernet/airoha/airoha_npu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+[1]:
+https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/dr=
+ivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c#n480
+[2]:
+https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/Do=
+cumentation/devicetree/bindings/net/mediatek-dwmac.yaml#n108
 
-diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/ethernet/airoha/airoha_npu.c
-index 870d61fdd9c6..b679bed952de 100644
---- a/drivers/net/ethernet/airoha/airoha_npu.c
-+++ b/drivers/net/ethernet/airoha/airoha_npu.c
-@@ -168,7 +168,7 @@ static int airoha_npu_send_msg(struct airoha_npu *npu, int func_id,
- 	dma_addr_t dma_addr;
- 	int ret;
- 
--	dma_addr = dma_map_single(npu->dev, p, size, DMA_TO_DEVICE);
-+	dma_addr = dma_map_single(npu->dev, p, size, DMA_BIDIRECTIONAL);
- 	ret = dma_mapping_error(npu->dev, dma_addr);
- 	if (ret)
- 		return ret;
-@@ -191,7 +191,7 @@ static int airoha_npu_send_msg(struct airoha_npu *npu, int func_id,
- 
- 	spin_unlock_bh(&npu->cores[core].lock);
- 
--	dma_unmap_single(npu->dev, dma_addr, size, DMA_TO_DEVICE);
-+	dma_unmap_single(npu->dev, dma_addr, size, DMA_BIDIRECTIONAL);
- 
- 	return ret;
- }
--- 
-2.51.0
-
-
+Regards,
+Louis-Alexis
+>=20
+> 	Andrew
 
