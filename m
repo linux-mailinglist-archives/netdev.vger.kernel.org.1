@@ -1,138 +1,143 @@
-Return-Path: <netdev+bounces-305776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305777-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id O3eXBoMzTmrfGwIAu9opvQ
-	(envelope-from <netdev+bounces-305776-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:24:51 +0200
+	id FSPxLcs0Tmq2HgIAu9opvQ
+	(envelope-from <netdev+bounces-305777-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:30:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 568BE724F01
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:24:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09F4E72547A
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:30:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=g1x4puQ4;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=JhBTlTRA;
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305776-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305776-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305777-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305777-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9F6343019517
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 11:24:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ECCE430427DB
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 11:25:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1B154779A9;
-	Wed,  8 Jul 2026 11:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 623D33C3437;
+	Wed,  8 Jul 2026 11:25:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C75E2437864;
-	Wed,  8 Jul 2026 11:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C4FB3A8741;
+	Wed,  8 Jul 2026 11:25:37 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783509627; cv=none; b=iNLok5+HIZ8wmv/zKuMl/YnOvb/p/VNdrWVpnyPqDmZsyaU1lnzN+0nDroKHPxHDADrcAZlQHeErAk3MLiPySMdwrD1Wlpu4xjgPGUMCur2IpbeDk9oeNL0KRatoyqkv+E6omA5BfiUHX3IaXXaUlCvGbGhVElIbZoPvpmpV5t8=
+	t=1783509938; cv=none; b=kEuSdZT9GCUe8IaySkK81ee0koyzWJBUE+2A/tPteQbmDXT8ndD9N8EK7fUDT2OaSI44fdngK4kMaR0Ffdl6EN/Zo7UQGKS4OzTkvxakMH3JZaoP+Bb1vVcH9VgLG3nFchfAH2nNyl7wWt3zoGBa9qkeU2AVq8/XsIUWo0jyqo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783509627; c=relaxed/simple;
-	bh=naTLxVv/Y3+9ERX1j0xr+5nj/poeZC/gIQxlXs0FlG4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tV4Y3Vtb4OkGeFYihFNBBBRwwYpR4ZeHs9zsVFaVXJdhd3YeID3z6OeyJ2xc1jQYs3tvxJ4GT2GHh1iYWwIjY/iiO0V40ueegO596A9NbyYY3dqasJu9ZvJ6MvqA/kbvWd4JblzA8RcDK4FHiewAlR7koJONmksM2YshAKmcOEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g1x4puQ4; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 532061F000E9;
-	Wed,  8 Jul 2026 11:20:26 +0000 (UTC)
+	s=arc-20240116; t=1783509938; c=relaxed/simple;
+	bh=84PMDdJTdc/8LkogfzioAu97kqRYNS20rB39544MOHQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=T+MWKZUFzZhp/W5hVDnctJzO8J0RFP3qkzBSeqrPeu/Vt6GrkGfvvJofRatPysrQDSXnQBPQN9C5Cj+qxKSMPVHRqnTF6OXc5ZZxLqyTwDVygMm2lSvdU2D6CBGZw82xNIogkNDaJW8cld1aRGs95vkSXaIUbPI5M/wTyCEa78c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JhBTlTRA; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68E151F000E9;
+	Wed,  8 Jul 2026 11:25:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783509626;
-	bh=AlmlQCmyiMaFrtx4Cjr1TuapotDHv/aiEeNOwcW3/n8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=g1x4puQ4PP8btquU8CG5zu4KwIMmALu+i8Evwq2BgnwCfTye0eRBvTLaJsD8Oqi/+
-	 dGJaIT4xBfqF+LlpXMSGa4MVt1TyecGfyp3KQun2nAFmyg2ILL2MqDFzS+ke11h/rQ
-	 t6gA+OVsiJmfvo7hqqCH+i9HomM8l4gsPuG7MJa68FSqmshVpem6Rqdd9F0anB6qdD
-	 oVvra+0/KpOToqp+H9Lj7HEu76RcdVCa6PXloOSQE0RJ9GM/h6nYvwscHPODuBo01r
-	 pr7nvxgKwHOhELk67ruWhCd/N5b04wY8DMyzz83G9s6PBUzH2YRJj8xB3Op2S87N0O
-	 axmHah6Tq/fxA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0C44392666F;
-	Wed,  8 Jul 2026 11:20:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20260515; t=1783509936;
+	bh=pUsFCtblw0cweRpabo6PXQ27P9GWRIBHnxgFsdpDEDI=;
+	h=From:Date:Subject:To:Cc;
+	b=JhBTlTRAhjMj6IVDdcT5EXTHk++LNouH6kSZVOh9nR0IWGaEOc27fU4CMV/HenJH3
+	 ztMJlQQLmhsCcSZvdduRYWePMQ3Ue1skeaDNkuGs2BdAn1Fr0kcKkDDvII8n/CLiEM
+	 qChYpekqniRd9z5COrVyV2Zsgy8KD0Zs0l/DKQtFtO5KuR/AyzXT122sbIh64hJjRy
+	 LvmCew4rAAK+1HKqnm+jYuwm8bJLjBfuNBuF/BiOHENg8hA8jndyncpb82BADESFMt
+	 VZOlQJfjeAzCQ3ogIsfpN4lQLvCyzrxce/OYMUUe2RvGpivWtFJEnRBeQM5LPinQ/M
+	 6LNtpxUzYDuzA==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Wed, 08 Jul 2026 13:25:18 +0200
+Subject: [PATCH net-next] net: ipip: use tunnel parameters for
+ fill_forward_path route lookup
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] ppp/ppp_{async,synctty}: drop unused
- {a,}syncppp::bytes_{sent,rcvd}
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178350960564.2449791.1582849842162293264.git-patchwork-notify@kernel.org>
-Date: Wed, 08 Jul 2026 11:20:05 +0000
-References: <20260702060420.95023-1-jirislaby@kernel.org>
-In-Reply-To: <20260702060420.95023-1-jirislaby@kernel.org>
-To: Jiri Slaby <jirislaby@kernel.org>
-Cc: kuba@kernel.org, linux-kernel@vger.kernel.org, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- linux-ppp@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260708-ipip-route-lookup-fill_forward_path-v1-1-b77df74822ed@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3NQQqDMBBA0avIrDsQRW3oVUqRQSd1aEjCJLaCe
+ HdDl2/z/wGZVTjDozlA+StZYqhobw3MK4U3oyzV0JluNHdjUZIk1LgVRh/jZ0voxPvJRf2RLlO
+ isuJIllrXD8b2M9RSUnay/y9PCFww8F7gdZ4Xu69mrX8AAAA=
+X-Change-ID: 20260708-ipip-route-lookup-fill_forward_path-6a8a1f45084c
+To: David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
+X-Spamd-Result: default: False [-5.16 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305776-lists,netdev=lfdr.de,netdevbpf];
+	FORGED_RECIPIENTS(0.00)[m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:pablo@netfilter.org,m:fw@strlen.de,m:netdev@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:lorenzo@kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:jirislaby@kernel.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux-ppp@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-305777-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 568BE724F01
+X-Rspamd-Queue-Id: 09F4E72547A
 
-Hello:
+Pass source address, DSCP and output interface from the tunnel
+configuration to ip_route_output() in ipip_fill_forward_path(), aligning
+the route lookup with the slow path in ipip_tunnel_xmit().
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ net/ipv4/ipip.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-On Thu,  2 Jul 2026 08:04:20 +0200 you wrote:
-> The bytes_sent and bytes_rcvd members of structs asyncppp and syncppp
-> are not used. Drop them.
-> 
-> Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
-> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> 
-> [...]
+diff --git a/net/ipv4/ipip.c b/net/ipv4/ipip.c
+index b643194f57d2..d1aa048a6099 100644
+--- a/net/ipv4/ipip.c
++++ b/net/ipv4/ipip.c
+@@ -360,8 +360,9 @@ static int ipip_fill_forward_path(struct net_device_path_ctx *ctx,
+ 	const struct iphdr *tiph = &tunnel->parms.iph;
+ 	struct rtable *rt;
+ 
+-	rt = ip_route_output(dev_net(ctx->dev), tiph->daddr, 0, 0, 0,
+-			     RT_SCOPE_UNIVERSE);
++	rt = ip_route_output(dev_net(ctx->dev), tiph->daddr, tiph->saddr,
++			     inet_dsfield_to_dscp(tiph->tos),
++			     tunnel->parms.link, RT_SCOPE_UNIVERSE);
+ 	if (IS_ERR(rt))
+ 		return PTR_ERR(rt);
+ 
 
-Here is the summary with links:
-  - ppp/ppp_{async,synctty}: drop unused {a,}syncppp::bytes_{sent,rcvd}
-    https://git.kernel.org/netdev/net-next/c/155c68aef239
+---
+base-commit: 155c68aef2397f8c5d72ef10acf48ae159bf1869
+change-id: 20260708-ipip-route-lookup-fill_forward_path-6a8a1f45084c
 
-You are awesome, thank you!
+Best regards,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Lorenzo Bianconi <lorenzo@kernel.org>
 
 
