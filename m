@@ -1,55 +1,66 @@
-Return-Path: <netdev+bounces-305845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305846-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 95l5JE5bTmriLAIAu9opvQ
-	(envelope-from <netdev+bounces-305845-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 16:14:38 +0200
+	id qDdaNaZaTmq0LAIAu9opvQ
+	(envelope-from <netdev+bounces-305846-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 16:11:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC58A727315
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 16:14:37 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2871727261
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 16:11:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305845-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305845-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=huawei.com header.s=dkim header.b=YQk+Tt4C;
+	dmarc=pass (policy=quarantine) header.from=huawei.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305846-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305846-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 678803028819
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 14:04:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4F8ED3023ADB
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 14:05:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2054843B6E0;
-	Wed,  8 Jul 2026 14:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B38444212A;
+	Wed,  8 Jul 2026 14:05:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA92541B358;
-	Wed,  8 Jul 2026 14:04:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B9943E487;
+	Wed,  8 Jul 2026 14:05:49 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783519475; cv=none; b=jdXH/USVaJ3EafuzVOxskoqz76EvzFKYCY6+khXFQECrzE79BVWfouGKkjqloaQTcs95erBDvSOZoHIh3Xsug/oePd4KuQb7HmolflHyDXDBrQS2rQ13d9RQOF50RRbMJBtgAUux0YTtstvX5EbdOdRtdt4P8bwe+P1AwdcDMjA=
+	t=1783519553; cv=none; b=XOV2wi1nTpu1QZIT0pontmsVh6Pxdm9CNwlWLZQZ3f8f9BC0rTSs6q3LnKCbA6hdXSlTW0xfdNkazFVpuHdxb4NmQTK+rHi00NzYk18DfPF+7+jnQpBfirEqNFUEKM8qvz9cCf6q7VfmzpoXnyXrWNo/C8NIqmqZ2fxxxhH2BSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783519475; c=relaxed/simple;
-	bh=eVmxKpZrC6/ZlDdOPr7SDiXu+UtUj4kSoCey6f1A7QA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tpIlMZoxFCLi52PtudTiO/7AegeObr2VOVguiQStJRPXwUW7vbSk4NY6YIAt1AWNgr00vq4bh7yj3OHk7Ux1ufkU0GP9jhZAtVA93IAF85z2mOoDdxCmTDMmDxYJ7n9cNPJfL1H9ZuP63gZ9jxJRIkNS1FOxUBNv6tkiCrN7h0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id EFB7860F04; Wed, 08 Jul 2026 16:04:31 +0200 (CEST)
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	pablo@netfilter.org
-Subject: [PATCH net 17/17] ipvs: ensure inner headers in ICMP errors are in headroom
-Date: Wed,  8 Jul 2026 16:03:09 +0200
-Message-ID: <20260708140309.19633-18-fw@strlen.de>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260708140309.19633-1-fw@strlen.de>
-References: <20260708140309.19633-1-fw@strlen.de>
+	s=arc-20240116; t=1783519553; c=relaxed/simple;
+	bh=YNOD2IdyP1DUNm2lZt2xJ9bA+ruZls8qgMHq7VFP47U=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gFeDN6YIzxfdIqevADKFy36FvC/cZO/zENNPZ0QoRJDKgovEoGRR7ou/tL71cMhfef1DDAI2CnFGCO84kXHgyuSOfJLVVDpR8pl6Umh0HZx7tAWvQ/J2SGqHKMcecCdq9Gwhm1gpgGyRlGr1mkM1TB3UmuQ9XmunZNbNZelz3RA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=YQk+Tt4C; arc=none smtp.client-ip=113.46.200.227
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=iWMQSMJvHG1NNWpmlkeunWRo28qp2f38429zWZh7/II=;
+	b=YQk+Tt4CvuXjgJJSk+92kgv3nABn+Xeg89hGEqdm6vy1L6i4UZ9IvS8Hg8gPDv9nmpUJu06yl
+	DS/tW50Bmp4GKaNCAooseOhgRG2fJtYOE+SoxulKRdQ+qzlL/tqDncIM2dVv+/7SMVSFi/CIFQw
+	C91rX2vtM2i3Yzo86ktZJWg=
+Received: from mail.maildlp.com (unknown [172.19.162.92])
+	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gwKQt4LS1znTWQ;
+	Wed,  8 Jul 2026 21:57:10 +0800 (CST)
+Received: from kwepemo500018.china.huawei.com (unknown [7.202.195.199])
+	by mail.maildlp.com (Postfix) with ESMTPS id 81E7C40565;
+	Wed,  8 Jul 2026 22:05:46 +0800 (CST)
+Received: from localhost.huawei.com (10.90.31.46) by
+ kwepemo500018.china.huawei.com (7.202.195.199) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Wed, 8 Jul 2026 22:05:45 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
+CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
+	<chenhao418@huawei.com>, <yangshuaisong@h-partners.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<shaojijie@huawei.com>
+Subject: [PATCH V2 net] net: hns3: fix speed configuration residue after driver reload
+Date: Wed, 8 Jul 2026 22:05:32 +0800
+Message-ID: <20260708140532.1691493-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,142 +68,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemo500018.china.huawei.com (7.202.195.199)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[huawei.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:shenjian15@huawei.com,m:liuyonglong@huawei.com,m:chenhao418@huawei.com,m:yangshuaisong@h-partners.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:shaojijie@huawei.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[strlen.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:netfilter-devel@vger.kernel.org,m:pablo@netfilter.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[fw@strlen.de,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-305845-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-305846-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	R_DKIM_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DC58A727315
+X-Rspamd-Queue-Id: C2871727261
 
-From: Julian Anastasov <ja@ssi.bg>
+After setting a 100G optical port to 40G via ethtool and reloading
+the driver, the port remains at 40G instead of reverting to the
+firmware default speed of 100G.
 
-Sashiko points out that after stripping the outer headers
-with pskb_pull() we should ensure the inner IP headers
-in ICMP errors from tunnels are present in the skb headroom
-for functions like ipv4_update_pmtu(), icmp_send() and
-IP_VS_DBG().
+In hclge_init_ae_dev(), hclge_update_port_info() reads mac.speed
+from hardware, which reflects the last user configuration (e.g.
+ethtool changes), not the firmware default. When req_speed is
+overwritten with this value, hclge_set_autoneg_speed_dup() re-applies
+the stale speed instead of the firmware default on non-copper media.
 
-Also, add more checks for the length of the inner headers.
+Fix by removing the req_speed overwrite in hclge_init_ae_dev(),
+keeping only the req_autoneg synchronization. This ensures req_speed
+retains the firmware default value set during hclge_configure().
 
-Fixes: f2edb9f7706d ("ipvs: implement passive PMTUD for IPIP packets")
-Link: https://sashiko.dev/#/patchset/20260702073430.67680-1-zhaoyz24%40mails.tsinghua.edu.cn
-Signed-off-by: Julian Anastasov <ja@ssi.bg>
-Signed-off-by: Florian Westphal <fw@strlen.de>
+Fixes: d9d349c4e8a0 ("net: hns3: differentiate autoneg default values between copper and fiber")
+Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
- net/netfilter/ipvs/ip_vs_core.c | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
+v2:
+ - Discard v1 and resend with the correct "net" prefix in the subject. 
+   Apologies for the noise. No code changes.
+---
+ drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/net/netfilter/ipvs/ip_vs_core.c b/net/netfilter/ipvs/ip_vs_core.c
-index f79c09869636..35cbe821c259 100644
---- a/net/netfilter/ipvs/ip_vs_core.c
-+++ b/net/netfilter/ipvs/ip_vs_core.c
-@@ -1767,6 +1767,7 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
- 	bool tunnel, new_cp = false;
- 	union nf_inet_addr *raddr;
- 	char *outer_proto = "IPIP";
-+	unsigned int hlen_ipip;
- 	int ulen = 0;
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+index fc8587c80813..164c3ecf195c 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+@@ -9498,12 +9498,8 @@ static int hclge_init_ae_dev(struct hnae3_ae_dev *ae_dev)
+ 	if (ret)
+ 		goto err_ptp_uninit;
  
- 	*related = 1;
-@@ -1804,9 +1805,10 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
- 	/* Now find the contained IP header */
- 	offset += sizeof(_icmph);
- 	cih = skb_header_pointer(skb, offset, sizeof(_ciph), &_ciph);
--	if (cih == NULL)
-+	if (!(cih && cih->version == 4 && cih->ihl >= 5))
- 		return NF_ACCEPT; /* The packet looks wrong, ignore */
- 	raddr = (union nf_inet_addr *)&cih->daddr;
-+	hlen_ipip = cih->ihl * 4;
+-	if (hdev->hw.mac.media_type != HNAE3_MEDIA_TYPE_COPPER) {
++	if (hdev->hw.mac.media_type != HNAE3_MEDIA_TYPE_COPPER)
+ 		hdev->hw.mac.req_autoneg = hdev->hw.mac.autoneg;
+-		if (hdev->hw.mac.autoneg == AUTONEG_DISABLE &&
+-		    hdev->hw.mac.speed != SPEED_UNKNOWN)
+-			hdev->hw.mac.req_speed = hdev->hw.mac.speed;
+-	}
  
- 	/* Special case for errors for IPIP/UDP/GRE tunnel packets */
- 	tunnel = false;
-@@ -1822,9 +1824,9 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
- 		/* Only for known tunnel */
- 		if (!dest || dest->tun_type != IP_VS_CONN_F_TUNNEL_TYPE_IPIP)
- 			return NF_ACCEPT;
--		offset += cih->ihl * 4;
-+		offset += hlen_ipip;
- 		cih = skb_header_pointer(skb, offset, sizeof(_ciph), &_ciph);
--		if (cih == NULL)
-+		if (!(cih && cih->version == 4 && cih->ihl >= 5))
- 			return NF_ACCEPT; /* The packet looks wrong, ignore */
- 		tunnel = true;
- 	} else if ((cih->protocol == IPPROTO_UDP ||	/* Can be UDP encap */
-@@ -1836,7 +1838,7 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
- 		/* Non-first fragment has no UDP/GRE header */
- 		if (unlikely(cih->frag_off & htons(IP_OFFSET)))
- 			return NF_ACCEPT;
--		offset2 = offset + cih->ihl * 4;
-+		offset2 = offset + hlen_ipip;
- 		if (cih->protocol == IPPROTO_UDP) {
- 			ulen = ipvs_udp_decap(ipvs, skb, offset2, AF_INET,
- 					      raddr, &iproto);
-@@ -1905,6 +1907,7 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
- 	}
- 
- 	if (tunnel) {
-+		unsigned int hlen_orig = cih->ihl * 4;
- 		__be32 info = ic->un.gateway;
- 		__u8 type = ic->type;
- 		__u8 code = ic->code;
-@@ -1921,6 +1924,9 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
- 				goto ignore_tunnel;
- 			offset2 -= ihl + sizeof(_icmph);
- 			skb_reset_network_header(skb);
-+			/* Ensure the IP header is present in headroom */
-+			if (!pskb_may_pull(skb, hlen_ipip))
-+				goto ignore_tunnel;
- 			IP_VS_DBG(12, "ICMP for %s %pI4->%pI4: mtu=%u\n",
- 				  outer_proto, &ip_hdr(skb)->saddr,
- 				  &ip_hdr(skb)->daddr, mtu);
-@@ -1936,8 +1942,8 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
- 				if (dest_dst)
- 					mtu = dst_mtu(dest_dst->dst_cache);
- 			}
--			if (mtu > 68 + sizeof(struct iphdr) + ulen)
--				mtu -= sizeof(struct iphdr) + ulen;
-+			if (mtu > 68 + hlen_ipip + ulen)
-+				mtu -= hlen_ipip + ulen;
- 			info = htonl(mtu);
- 		}
- 		/* Strip outer IP, ICMP and IPIP/UDP/GRE, go to IP header of
-@@ -1946,6 +1952,9 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
- 		if (pskb_pull(skb, offset2) == NULL)
- 			goto ignore_tunnel;
- 		skb_reset_network_header(skb);
-+		/* Ensure the IP header is present in headroom */
-+		if (!pskb_may_pull(skb, hlen_orig))
-+			goto ignore_tunnel;
- 		IP_VS_DBG(12, "Sending ICMP for %pI4->%pI4: t=%u, c=%u, i=%u\n",
- 			&ip_hdr(skb)->saddr, &ip_hdr(skb)->daddr,
- 			type, code, ntohl(info));
+ 	ret = hclge_set_autoneg_speed_dup(hdev);
+ 	if (ret) {
+
+base-commit: 235acadd310533ba386ae61ad155b72bee381559
 -- 
-2.54.0
+2.33.0
 
 
