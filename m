@@ -1,139 +1,137 @@
-Return-Path: <netdev+bounces-305683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305684-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id POgKJucOTmqICQIAu9opvQ
-	(envelope-from <netdev+bounces-305683-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 10:48:39 +0200
+	id tASiNKoPTmqwCQIAu9opvQ
+	(envelope-from <netdev+bounces-305684-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 10:51:54 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E91FA723540
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 10:48:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2467C723593
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 10:51:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=bH3pODnE;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305683-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305683-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=netfilter.org header.s=2025 header.b=VQFPRF75;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305684-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305684-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D78073045682
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 08:40:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 328E930CB841
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 08:42:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 920CB403B05;
-	Wed,  8 Jul 2026 08:40:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 448AB402B99;
+	Wed,  8 Jul 2026 08:42:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9453FF1D0;
-	Wed,  8 Jul 2026 08:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C908403AE5;
+	Wed,  8 Jul 2026 08:42:46 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783500035; cv=none; b=CNH4e4H5FfwA6ZWShHqvjm1gzYCjgfeAXn5CzkWYA3h5BiftGBSt9PXJOACwT94Oye2s7Zp/GTRDSncY7ivsvrMxLwDvsPR/bb/m83BJRNskirwI3dB2Lp38bGBcJISaIMf9wcoMEoDtq3m3S7lky0KF8qA/MrXxIuphVFHwkS0=
+	t=1783500169; cv=none; b=uScEPpzI46r++uCet7W6gD9/O8xEWrvHv4ChgDMQfjXCErWP4XLbTkU8KEtql6nSt6KJKnLhMXHhUdeRexxn4QFr8e5gJgM0NbadW1r1xcxsppX9YDHGdmL2zhWn6W/5q0cvI3ksM+RmkzVb72K5+O6Gkb4VBdGQAtZFCaUKigc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783500035; c=relaxed/simple;
-	bh=9VQdfdtHghpxl/1NVOnJ3+eiZORLyI8T/JPV1T58o84=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MjxcgZ0En9Y0k8VUvivcGe6akhB8BuA9d0/zvXE/for2Bkhj4OIWejfJZDrWO+QFsy9nFrUONt06EcSfPr2XRvahAfI5Eelp3BfibJaawsC8SKZ7JpJygURwiVSmcW0wgIZ9YfCHh/d7wp49H7RKcp8Ha9zdBsTcIo2YkVRWivg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bH3pODnE; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4158D1F000E9;
-	Wed,  8 Jul 2026 08:40:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783500026;
-	bh=yf87XJNoQkN3VLsWjUPSkPSyKWdRSfNMzT1yWJe7RAo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=bH3pODnEhU6/NnKRldMGQRFLL/PfqjreZcW7rVbXuIfdPyfXPGw78enPHSscQF7+F
-	 F/w3u9u1SoD8NtdMYuHbUnWZ1NJ1I3t62gdzL62o7WpfV1BY1NzHFPZT+yfETFuRhZ
-	 nIs6wK6H9teztsjTEnh1oLu6QF55/k8+w2OTW1j7nefzvta2XRt+hwuyynWp8yB9Ps
-	 73ysJDoabiZoeZmu3TCjeni7OBWn3gNSOzo8amQBCiCYUn5fJ5L13XbSLDRUxf157G
-	 ncMuAd8zH7tzIHPKiaItLh7bCQQYes888D6dMxoFQ2m7sqG8WBHIjO1dBtbsxRPRkC
-	 wSNZFvB1yGSow==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D08E43926384;
-	Wed,  8 Jul 2026 08:40:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1783500169; c=relaxed/simple;
+	bh=Q4AzakSreRmBqZMHj7yI29C3WUnQuxxYE3n9JDNM+lw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MX/SN0YmyGZBY0WGNicUbORx4rhkXRM2tOMgFqG8YtYp5PFXxjsaU7FeuK9trNFQ+M/mq4rnmCmTFtAk5wvl5eXmgntOQA9gWGGykmpl7UHwVyR/IYu7LxOTFQiXYlNw6XAfpFrRNOmLJCfwBkZG99vV6HweEshq12WGc/kFt+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=VQFPRF75; arc=none smtp.client-ip=217.70.190.124
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 2155960195;
+	Wed,  8 Jul 2026 10:42:43 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1783500163;
+	bh=WyZC4VZNLAyINCvHiu8v7Zo1G7GXtuJPqXKag7xhzsI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VQFPRF75I4pcJJK5OHe5FnZJOKfeDIW7PQrOoPPGRm0eMNdDhpXyA/QQcU8LsNPxh
+	 jDApmBd3Pu18OiEo0TKTAn4ZgquZf3tFwuZpvJjfbZ9w1fURXGafVKwuUkaR1tTTZH
+	 Fy2ikQKypjm6pUvJlmBjNyALBbUQSFyGZaI0ae53ZfnI0sNd2N/5PPCQZGC++PNxEF
+	 chJozOJ7YeauBcnU6F56y9LzqoJQ0naQlIVuPvzo4bOFJzC4/6IUq6zh0RceUqEFy9
+	 RaG7oXiQ5nlY9k/3VbmhJ3AlP6P+KUxRZqIsF+s3M0mq3nRF/l6vOsAe2Yk+L2q30m
+	 I2cuWPFPKbeSw==
+Date: Wed, 8 Jul 2026 10:42:40 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: patchwork-bot+netdevbpf@kernel.org
+Cc: Runyu Xiao <runyu.xiao@seu.edu.cn>, laforge@gnumonks.org,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com,
+	osmocom-net-gprs@lists.osmocom.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn
+Subject: Re: [PATCH net-next] gtp: annotate PDP lookups under RTNL
+Message-ID: <ak4NgOrro-4OZjz3@chamomile>
+References: <20260701123925.3193089-1-runyu.xiao@seu.edu.cn>
+ <178349880988.2367097.8758757633307166154.git-patchwork-notify@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: rmnet: annotate endpoint lookup under RTNL
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178350000539.2376807.15934938683516609692.git-patchwork-notify@kernel.org>
-Date: Wed, 08 Jul 2026 08:40:05 +0000
-References: <20260701124017.3205729-1-runyu.xiao@seu.edu.cn>
-In-Reply-To: <20260701124017.3205729-1-runyu.xiao@seu.edu.cn>
-To: Runyu Xiao <runyu.xiao@seu.edu.cn>
-Cc: subash.a.kasiviswanathan@oss.qualcomm.com,
- sean.tranchetti@oss.qualcomm.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <178349880988.2367097.8758757633307166154.git-patchwork-notify@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305683-lists,netdev=lfdr.de,netdevbpf];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:runyu.xiao@seu.edu.cn,m:subash.a.kasiviswanathan@oss.qualcomm.com,m:sean.tranchetti@oss.qualcomm.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:patchwork-bot+netdevbpf@kernel.org,m:runyu.xiao@seu.edu.cn,m:laforge@gnumonks.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:osmocom-net-gprs@lists.osmocom.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,m:patchwork-bot@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DMARC_NA(0.00)[netfilter.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[netfilter.org:+];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-305684-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev,netdevbpf];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,netfilter.org:from_mime,netfilter.org:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E91FA723540
+X-Rspamd-Queue-Id: 2467C723593
 
-Hello:
+Hi,
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed,  1 Jul 2026 20:40:17 +0800 you wrote:
-> rmnet_get_endpoint() is shared by packet receive paths and
-> RTNL-protected control paths. The receive paths already run under RCU/BH
-> context through the RX handler, while the control paths reach
-> rmnet_get_endpoint() after obtaining the rmnet port with
-> rmnet_get_port_rtnl().
+On Wed, Jul 08, 2026 at 08:20:09AM +0000, patchwork-bot+netdevbpf@kernel.org wrote:
+> Hello:
 > 
-> The helper walks port->muxed_ep[] with hlist_for_each_entry_rcu(). Pass
-> lockdep_rtnl_is_held() as the non-RCU protection condition so
-> CONFIG_PROVE_RCU_LIST can see the RTNL-protected control-path calls
-> while preserving the existing RCU-reader behavior for data paths.
+> This patch was applied to netdev/net-next.git (main)
+> by Paolo Abeni <pabeni@redhat.com>:
 > 
-> [...]
+> On Wed,  1 Jul 2026 20:39:25 +0800 you wrote:
+> > The GTP PDP lookup helpers are shared by RCU-protected data and report
+> > paths and RTNL-protected control paths such as gtp_genl_new_pdp(). The
+> > helpers walk RCU hlists, but they do not currently pass the RTNL
+> > condition for the control-path lookups.
+> > 
+> > Pass lockdep_rtnl_is_held() to the PDP hlist iterators. Existing
+> > RCU-reader callers remain valid because the RCU-list macros also accept
+> > an active RCU read-side section; the added condition only documents the
+> > non-RCU protection already used by RTNL control paths.
+> > 
+> > [...]
+> 
+> Here is the summary with links:
+>   - [net-next] gtp: annotate PDP lookups under RTNL
+>     https://git.kernel.org/netdev/net-next/c/0be5c3f0fbef
 
-Here is the summary with links:
-  - [net-next] net: rmnet: annotate endpoint lookup under RTNL
-    https://git.kernel.org/netdev/net-next/c/4fa0619d039f
+For the record, I think this patch was not OK.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+PDP context hashtable is protected by the genl_mutex, not rtnl.
 
-
+If I'm mistaken, please let know, thanks!
 
