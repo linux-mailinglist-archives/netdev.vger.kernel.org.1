@@ -1,143 +1,133 @@
-Return-Path: <netdev+bounces-305718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305720-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qhkVA1AaTmo7DQIAu9opvQ
-	(envelope-from <netdev+bounces-305718-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:37:20 +0200
+	id YRdOCsYcTmreDQIAu9opvQ
+	(envelope-from <netdev+bounces-305720-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:47:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 892EB723CE0
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:37:19 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B379723DCE
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:47:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=GQFatmxv;
-	dmarc=pass (policy=none) header.from=linux.dev;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305718-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305718-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=netfilter.org header.s=2025 header.b=q8b2I+IS;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305720-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305720-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E753A301649E
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 09:37:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4D4F030074F1
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 09:47:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4109241B347;
-	Wed,  8 Jul 2026 09:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EAC9420883;
+	Wed,  8 Jul 2026 09:47:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9164F41C2E8
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 09:37:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1749A202963;
+	Wed,  8 Jul 2026 09:47:43 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783503427; cv=none; b=WVch6w7cH9YgESfGu/KMPFr+Lt5Z9SdIcaQwUzQcJWBqop/siOc/FmPwIV/2e466sEvxN5hGRysgv0kTsp+16S2GiJgOY0ruMefhXZ9MYlVkLm6jejurHRf6I26bHGVmDMAKsnDWkGhS/CLgiBW5EaSUb134wOXXfiP2iLq5MGw=
+	t=1783504064; cv=none; b=F3ZtpQ1GZpf0X+nUZhxWKeVXJ6cVtidLBH1CskL6eoSpg+scFI4k1IO3mk/m7KbzYx9Ndh7nV5PZDMNUs8LI0+qoIDSCck0TNOMNJf7fcPg8IXWGk3EJvdx22cqSdWj5eErbkdp4p5iX78sIeghsJiwV15DaEONh76GZXOTeNuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783503427; c=relaxed/simple;
-	bh=DzsX1puom5eEftUovrdNZ95H6ISbQl90ZBBHvuTcBdk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NwUzMRpjEjm0OWWtLh8mb9RaJy2WJaduzzH9XpY5w0ePweolKeJsWMd8PlIV/G0sxedH+Or6EtOQdd44n9jgf2v0B73XPF1pYgaiQaVT6+b7IZWAi5+tWAusiBQK/0cHIxbFrsx1QfDruXSy9QEGv3aCePXF6sKavc3y0x1jHKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GQFatmxv; arc=none smtp.client-ip=91.218.175.178
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783503411;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ydX26kqe1zakyWKUhYdu+Skm/dFs17mN2Looq9WX1As=;
-	b=GQFatmxvNfZvuFNZUMKCO+9nP07ZBojZc2FU7TCp9ctSRUsBVvXcykzBE2YV99igOX+J+d
-	XeChxXLvgy1lLNxEx8FzxYbXVMxO3uM1jNZCNwDh9tEoDPcmWEqOLPgi9R2WFm5Wjx96K7
-	p2dNeN5biWPm6HltpKDaG+vIGGacans=
-From: xuanqiang.luo@linux.dev
-To: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	netdev@vger.kernel.org,
-	linux-afs@lists.infradead.org
-Cc: "David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1783504064; c=relaxed/simple;
+	bh=2UgdhvCGhKgRQkmJRc96GJIV6llQ7T3t1zDzDxlGnZg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u1aj0g4EBI1Sxlqc1pILG8xJvBboX8ceQB9nKyiibTQc4ytIHEAlEEtgIYWH8NxCJEp9veHxsmYEW4+fssCIeAg2/Kb+p7qMPCNmoBoOx33qk7tq9Dpt2zGgJvi1MSoITz+CB3STz3VzZ4wWNMd0g2bDta1e+Q+3ZCrpJVPYRMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=q8b2I+IS; arc=none smtp.client-ip=217.70.190.124
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 2976560193;
+	Wed,  8 Jul 2026 11:47:41 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1783504061;
+	bh=2UgdhvCGhKgRQkmJRc96GJIV6llQ7T3t1zDzDxlGnZg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=q8b2I+IS6HDoQPBSTyVBsFQKp5IoijQCkAoyHVuUPhJN5svd8ODqibHf/SJsjJo+N
+	 iHlgcBdTWp0pBBy2kjA7lTZG10La17/cvipw1Y/1tRXTVsXAynfmsX/Zo1YvyujVqr
+	 fkOfrO4mRzdxVZN+AI1H7D8Pa9BDqQpYBkDUQJVh/4fdcH+EwVeT5neTr/UqpkTrRN
+	 llplN2oyn+NkdNmzLH/IRaCDo3X0M//FWM7LcvMxfVbt+0sb7UDk57LfK7WPhU7f3n
+	 nnsKBCpLli81YGBeMGTTeEn/DJl+zETx/GjiImTx3xDG5gv+MBUgn02JWPTvVBpqs4
+	 2E4hpf6MRQ2Mg==
+Date: Wed, 8 Jul 2026 11:47:38 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-Subject: [PATCH net v1] rxrpc: fix io_thread race in rxrpc_wake_up_io_thread()
-Date: Wed,  8 Jul 2026 17:35:34 +0800
-Message-ID: <20260708093534.53486-1-xuanqiang.luo@linux.dev>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Stanislav Fomichev <sdf.kernel@gmail.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Krishna Kumar <krikku@gmail.com>,
+	Martin Karsten <mkarsten@uwaterloo.ca>, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, bridge@lists.linux.dev
+Subject: Re: [PATCH v12 nf-next 0/7] netfilter: Add bridge-fastpath
+Message-ID: <ak4culZgTe8CNSva@chamomile>
+References: <20260707091045.967678-1-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260707091045.967678-1-ericwouds@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305718-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER(0.00)[xuanqiang.luo@linux.dev,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:dhowells@redhat.com,m:marc.dionne@auristor.com,m:netdev@vger.kernel.org,m:linux-afs@lists.infradead.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:luoxuanqiang@kylinos.cn,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:ericwouds@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:fw@strlen.de,m:phil@nwl.cc,m:razor@blackwall.org,m:idosch@nvidia.com,m:kuniyu@google.com,m:sdf.kernel@gmail.com,m:skhawaja@google.com,m:liuhangbin@gmail.com,m:krikku@gmail.com,m:mkarsten@uwaterloo.ca,m:netdev@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:bridge@lists.linux.dev,m:andrew@lunn.ch,m:sdfkernel@gmail.com,s:lists@lfdr.de];
+	DMARC_NA(0.00)[netfilter.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FORGED_SENDER(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,strlen.de,nwl.cc,blackwall.org,nvidia.com,gmail.com,uwaterloo.ca,vger.kernel.org,lists.linux.dev];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xuanqiang.luo@linux.dev,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-305720-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[kylinos.cn:email,linux.dev:from_mime,linux.dev:dkim,linux.dev:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[chamomile:mid,vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,netfilter.org:from_mime,netfilter.org:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 892EB723CE0
+X-Rspamd-Queue-Id: 1B379723DCE
 
-From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+Hi Eric,
 
-rxrpc_wake_up_io_thread() checks local->io_thread before waking it, but
-then reloads the pointer for wake_up_process().
+On Tue, Jul 07, 2026 at 11:10:38AM +0200, Eric Woudstra wrote:
+> This patchset makes it possible to set up a software fastpath between
+> bridged interfaces. One patch adds the flow rule for the hardware
+> fastpath. This creates the possibility to have a hardware offloaded
+> fastpath between bridged interfaces. More patches are added to solve
+> issues found with the existing code.
 
-local->io_thread is cleared with WRITE_ONCE() when the I/O thread exits, so
-the second load can see NULL even if the first load did not.
+Thanks for your series.
 
-Take a READ_ONCE() snapshot and use it for both the NULL check and the
-wake_up_process() call, as rxrpc_encap_rcv() already does.
+I posted an alternative series, including one of your patches for the
+bridge vlan filtering support (which is still untested on my side):
 
-Fixes: 5800b1cf3fd8 ("rxrpc: Allow CHALLENGEs to the passed to the app for a RESPONSE")
-Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
----
- net/rxrpc/ar-internal.h | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
-index ce946b0a03e2b..865f05fe37ab9 100644
---- a/net/rxrpc/ar-internal.h
-+++ b/net/rxrpc/ar-internal.h
-@@ -1285,9 +1285,11 @@ int rxrpc_io_thread(void *data);
- void rxrpc_post_response(struct rxrpc_connection *conn, struct sk_buff *skb);
- static inline void rxrpc_wake_up_io_thread(struct rxrpc_local *local)
- {
--	if (!local->io_thread)
-+	struct task_struct *io_thread = READ_ONCE(local->io_thread);
-+
-+	if (!io_thread)
- 		return;
--	wake_up_process(READ_ONCE(local->io_thread));
-+	wake_up_process(io_thread);
- }
- 
- static inline bool rxrpc_protocol_error(struct sk_buff *skb, enum rxrpc_abort_reason why)
--- 
-2.43.0
-
+https://lore.kernel.org/netfilter-devel/20260708093250.1187068-1-pablo@netfilter.org/T/#m270aedab59bf39f1bc4452d1d8d739a2b1b0bc45
 
