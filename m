@@ -1,219 +1,262 @@
-Return-Path: <netdev+bounces-305763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305764-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id m/w3KUksTmo7EgIAu9opvQ
-	(envelope-from <netdev+bounces-305763-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 12:54:01 +0200
+	id MtJSGRouTmr/EgIAu9opvQ
+	(envelope-from <netdev+bounces-305764-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:01:46 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41D0F7248D1
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 12:54:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 860657249C7
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:01:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=QqthG9ND;
-	dkim=pass header.d=redhat.com header.s=google header.b=QyXGLIXe;
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305763-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305763-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=jXP0cTh7;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305764-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305764-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7AB71307A2C4
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 10:51:53 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A742E30D84AD
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 10:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B80D5414DD3;
-	Wed,  8 Jul 2026 10:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D406B400DE1;
+	Wed,  8 Jul 2026 10:56:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1ED38E8AB
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 10:50:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC2E425CCB;
+	Wed,  8 Jul 2026 10:56:07 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783507820; cv=none; b=W7IINY1YhYy96B1jVsqf6y+fl1ysXIkHrpxQqZndXoxDjf2QOVpjUC1XZgcBPY7QjU2jidmVQD5UYK6Larr4IdNple0yCfpyu2SqczhGamX8GD6dAPbF78cdATZJKEZQLAa/z/kBtc44oqT5eu/OuQw1Fl9v8tcwSRO+vABdkSU=
+	t=1783508173; cv=none; b=bKVNWpZlQqNXX8cQJLgG0llXaaACeq5KLZVQfE68If2ei3QknvX7Z83LojMQvVDhIcE4AaxWnBdRhvfOp1+vFpLt5FCi3TdNyLc+8ZTeCI1PxubipzBRdcAOWxnNCS7AOKqoi5Egv5BP9KmlKNkk+Z3tsoJprS3PQuvKhO6ZYm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783507820; c=relaxed/simple;
-	bh=XbtrJUUeM3xNHOoBDhocSvoqSRxhQJf5NIcQJ2vvppI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M2JoaUuAeRyldaNLy1cPcuZIW/YUkYFwkrI4++b2ifgtwsryGWflLkQ7u2jw74McIKJqVgqXw0uNudH1fqrsilGphklvuvylCTv+zGd/e+kSk77PjToPEygAUSU/s6f1aZLEPHubt2gR2wVxkeEPzWchji20trivNm1wuPp+R9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QqthG9ND; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=QyXGLIXe; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783507813;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7RthwfiaiuQwFULsU9rLR+4p2hP6BkmVyKgFOz4tjmA=;
-	b=QqthG9ND+/rwaf1cjppmLex2EYwg0ZZka8lr1sZ9MZqqF25l9xr+4Ryglr4dBUU2r57hr0
-	CmKgfd2dnH0y2ssVGOdJWjxHtQg/CeMw6aQ6G/huf2dadQRsxGmXsSfytd+a3pcSs/h3Z2
-	F0o6MxX0ZGQEF1vNxbXDCka4d9a2uMM=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-522-Lc29S4g6POaz7kRHQI4x_Q-1; Wed, 08 Jul 2026 06:50:12 -0400
-X-MC-Unique: Lc29S4g6POaz7kRHQI4x_Q-1
-X-Mimecast-MFC-AGG-ID: Lc29S4g6POaz7kRHQI4x_Q_1783507811
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-493c20d0468so7259885e9.1
-        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 03:50:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1783507811; x=1784112611; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=7RthwfiaiuQwFULsU9rLR+4p2hP6BkmVyKgFOz4tjmA=;
-        b=QyXGLIXegC9GU8f+7pf9mscNhjhpghkLNmZwWQ8FttE9MXp9UZfvHghK3670O3CIEu
-         KzUnbutFlOEcFKIGWpz+apyBYVZhDx8/SF5LqhmyOomOTjIkerJQmlBdJ6DNh5hvjWfg
-         F9mK9gOYZwv5xqLSo1hIb7UG4W+j2Y9QfKpvglZdzziSjPVy1hLsZkivX5o0/ZZ0TLmd
-         bD9HGpBnubzcwDZ54p/kMfzXV9VU1EaX9lDX3IlrkF1fiE7PMfR9lQbEhzZ905iIB5U8
-         7H3U2u4Gw74t1vyCgFWa9PEGnvLiV2mkCvSKK/gH+dvF3mJNM0J03Ojp9BEkVaBGRmVJ
-         Qb5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783507811; x=1784112611;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=7RthwfiaiuQwFULsU9rLR+4p2hP6BkmVyKgFOz4tjmA=;
-        b=fExcERpvHxPJTVivH4XcKjcucDyhaIfj1ZKSYwW4CBlc/UPqf5Fj/NZSwJNSPCzkvO
-         jY1SsgjNzoDzjmtfD0TKiY9lDTsSJ8KeIYl3SpRVB2GWF5HODUvxCsdjKvF5CV+hR61n
-         7f0XAypQtEMFNxdVuwdc1Ew85yZbtmgYnKHvJGvlsauqDKbp5S/zrPkrQ/IVE2MSsL6l
-         lRKL4sAgbZSOXhHlIHlxWPK4IPaVQtWCB59/UiB5s1MJXyHpV/YRj6ROuFNV7HtZyCmB
-         nJM5Tflil+2I5p7ICiGvyMle1NPtMx+cltPFAhZC13ty5nKXerRMpyKAkPDQE5X/Fngi
-         Zjfg==
-X-Forwarded-Encrypted: i=1; AHgh+Ro+35zKLCzCby+7nInbIoI9lClxUd3oJNub0xoheswyyVcarQe/4wMIslrmUG/vWqAi0o+gi7k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZcAcn45qtD7X9HSqdjPwJEU72GdALcIM2jH+qC8Axk/P9aTlo
-	q4Z4PM+rk6hkBc/wpIpRiv/bLRJad2n+k7POMpJICq0yCzUbC17OV6k7GatqxboCri8Z7jb+K/H
-	HJve0AqLBQrVikXMSzmZ/+fBf0pyxBpKqQWp7U+JhyZ5GlCxKxIPNo/lWIg==
-X-Gm-Gg: AfdE7ckholCsnXx13Gj4paiqNWsSCNGsci4+UXQMdIpVg3lk93P0J9lHX4rWvPuADqY
-	0NmDTOuNZ3r8+vM8dukuTbdNmsxkDm4JhbytdfWBjJOzq6ci2XHPxWeI0Ye9mfqFF1HMAHfStuM
-	dmKZsrMzbjw1SCKfMADouE2DHHzQaBEq273wjd7T/pTZuBdv9a/Q+q2hEysTgjIDF5f4M8ihalX
-	D2xYYjMuy4+OStDbdEKspWNlE2QVL8HcUdjCHVoVJ7x6WJnZ/ya+eajRr00K4OLx/4cL6v6HKZJ
-	ynfUqVGomavOGLoCjlD/oUDmTg/h8VWRx/Xta+CVjJj4N643PCKpgoSbB3Zo+8isRjaH3l6O5iI
-	TZYjER0V81DAc8oIflUjQl90uQ41RSqT6VzexEnq7OwjOM4J4jDp/6HiXQHol1Ro9/UIczJLSt1
-	b7bosMvnVdApc4
-X-Received: by 2002:a05:600c:3b92:b0:493:e892:f03c with SMTP id 5b1f17b1804b1-493e892f05amr3891795e9.10.1783507811133;
-        Wed, 08 Jul 2026 03:50:11 -0700 (PDT)
-X-Received: by 2002:a05:600c:3b92:b0:493:e892:f03c with SMTP id 5b1f17b1804b1-493e892f05amr3891245e9.10.1783507810639;
-        Wed, 08 Jul 2026 03:50:10 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:5521:6b10:58fd:68f:7756:389d? ([2a0d:3344:5521:6b10:58fd:68f:7756:389d])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493e0f40912sm123922735e9.4.2026.07.08.03.50.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jul 2026 03:50:10 -0700 (PDT)
-Message-ID: <15e72c82-ca99-481b-bd53-744fabd503b0@redhat.com>
-Date: Wed, 8 Jul 2026 12:50:07 +0200
+	s=arc-20240116; t=1783508173; c=relaxed/simple;
+	bh=aOVJdv1u/8St0FjT9BGxdCg4gHdYSbuUsEmv+23i/7k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qWn+8OMtaOlpOLlo3Noy1MLJCGf5+cHdlDeWv8uM0hf/ToJw7IgaSSCrdrHxjKzEMMxdcISqmLNNUCNdBI8zyfXZ4TL07yi1+QfsKNATz0FPE8YTb1+lkvYihnyNAOqfNCGloIz+MQEYBWpawKB0KBBn+zZTc3tiTOMPeg4+lKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jXP0cTh7; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD88B1F000E9;
+	Wed,  8 Jul 2026 10:56:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783508166;
+	bh=qfv7NHEZROLc4ny4kch2W339mc8lcjfZtZAX5Iqn7VM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=jXP0cTh7ufw0koNao5auuHSOFneiEm+vZjfQQ8k9mJxGp8ye17YT8Mal47a5UgXPL
+	 MUuKS5XiMdIxAk87ExUMJsTTQIos5sOrWzP6/khedZbFYW3ZYNjTx+VXYuf8Fo1ARs
+	 NDfiMBDZ7Q+PXRhO/OgE7bf8WTeVwlJTwTTFYxlmRd4ZgZARoOh8OyBKoE0O8M1MtX
+	 TT/63MVqwAacs8k7th8hAJy6dgeJqzUmbf3/HZ2ItaYwjitLlCZtXrg+SOHo7OBToZ
+	 zNrh8sS0GsR4prkSnhU+MpANu+pyMN+dJuUlLaBspk1MaTpQKUopZIXI13WBWJVHu5
+	 Q7HSAi/+D4P7Q==
+Date: Wed, 8 Jul 2026 12:56:01 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Mikhail Lukianchikov <avermoal@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Rengarajan Sundararajan <Rengarajan.S@microchip.com>, UNGLinuxDriver <UNGLinuxDriver@microchip.com>, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] dt-bindings: net: convert microchip,lan78xx.txt to YAML
+ schema
+Message-ID: <20260708-tireless-pillbug-from-eldorado-5c17f9@quoll>
+References: <20260707165840.107409-1-avermoal@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 1/3] net: devmem: allow rx-buf-size >
- PAGE_SIZE per dmabuf binding
-To: Mina Almasry <almasrymina@google.com>,
- Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Gerd Hoffmann <kraxel@redhat.com>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>,
- Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
- linux-kselftest@vger.kernel.org, sdf@fomichev.me, razor@blackwall.org,
- daniel@iogearbox.net, matttbe@kernel.org, skhawaja@google.com,
- dw@davidwei.uk, Joe Damato <joe@dama.to>,
- Bobby Eshleman <bobbyeshleman@meta.com>
-References: <20260701-tcpdm-large-niovs-v4-0-ca4654f37570@meta.com>
- <20260701-tcpdm-large-niovs-v4-1-ca4654f37570@meta.com>
- <CAHS8izNdJ1LTOr_pLjXef6Yv-=JOFPe1GcZtcbStD93Tkpy1XQ@mail.gmail.com>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <CAHS8izNdJ1LTOr_pLjXef6Yv-=JOFPe1GcZtcbStD93Tkpy1XQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260707165840.107409-1-avermoal@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-3.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305763-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:almasrymina@google.com,m:bobbyeshleman@gmail.com,m:donald.hunter@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:kraxel@redhat.com,m:vivek.kasireddy@intel.com,m:sumit.semwal@linaro.org,m:christian.koenig@amd.com,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:linaro-mm-sig@lists.linaro.org,m:linux-kselftest@vger.kernel.org,m:sdf@fomichev.me,m:razor@blackwall.org,m:daniel@iogearbox.net,m:matttbe@kernel.org,m:skhawaja@google.com,m:dw@davidwei.uk,m:joe@dama.to,m:bobbyeshleman@meta.com,m:donaldhunter@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[google.com,gmail.com];
-	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,lunn.ch,redhat.com,intel.com,linaro.org,amd.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,fomichev.me,blackwall.org,iogearbox.net,davidwei.uk,dama.to,meta.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:avermoal@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:Rengarajan.S@microchip.com,m:UNGLinuxDriver@microchip.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-305764-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,meta.com:email]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,quoll:mid,bootlin.com:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 41D0F7248D1
+X-Rspamd-Queue-Id: 860657249C7
 
-On 7/7/26 10:36 PM, Mina Almasry wrote:
-> On Wed, Jul 1, 2026 at 12:22 PM Bobby Eshleman <bobbyeshleman@gmail.com> wrote:
->>
->> From: Bobby Eshleman <bobbyeshleman@meta.com>
->>
->> Every devmem dmabuf binding today hands the page_pool PAGE_SIZE niovs.
->> This caps a single RX descriptor at PAGE_SIZE, burning CPU on buffer
->> churn for large flows.
->>
->> Add a bind-time netlink attribute, NETDEV_A_DMABUF_RX_BUF_SIZE, that
->> lets userspace request a larger niov size. The value must be a power of
->> two >= PAGE_SIZE.
->>
->> Measurements
->> ------------
+On Tue, Jul 07, 2026 at 10:58:40PM +0600, Mikhail Lukianchikov wrote:
+> Convert the Microchip LAN78xx family (LAN7800, LAN7801, LAN7850) binding
+> documentation from plain text to DT schema format using YAML.
 
-Checkpatch complains about this separator usage:
+Subject: there is no YAML schema
 
-ERROR: Invalid commit separator - some tools may have problems applying this
-#15:
-------------
+https://elixir.bootlin.com/linux/v7.1-rc7/source/Documentation/devicetree/bindings/submitting-patches.rst#L23
 
-Please replace or remove it in the next revision
-
->> @@ -90,16 +90,17 @@ net_devmem_alloc_dmabuf(struct net_devmem_dmabuf_binding *binding)
->>         struct dmabuf_genpool_chunk_owner *owner;
->>         unsigned long dma_addr;
->>         struct net_iov *niov;
->> -       ssize_t offset;
->> -       ssize_t index;
->> +       size_t offset;
->> +       size_t index;
->>
 > 
-> nit: I would keep this signed. Some of the most frustrating issues I
-> ran into is some of the underflowing and then passing a > check or
-> something. Although if the LLM is not complaining about this
-> particular case, there is probably no issue with it. I also notice a
-> lot of existing code that deals with indexes and offsets goes for
-> signed.
+> The conversion was validated with 'make dt_binding_check'
 
-At very least the above change should go in a separate patch, as is
-quite unrelated from the rest.
+Drop, irrelevant and not even true. There is no point in writing in
+commit msg that you performed the absolute minimal expected build
+testing. It is expected.
 
-/P
+
+> 
+> Signed-off-by: Mikhail Lukianchikov <avermoal@gmail.com>
+
+...
+
+You left stale maintainer entry. Checkpatch told you that, no? Did you
+run checkpatch?
+
+If this is your first contribution then you need to read carefully
+guidelines how to contribute and then actually follow these guidelines.
+What does evry guideline speak about? Checkpatch.
+
+> diff --git a/Documentation/devicetree/bindings/net/microchip,lan78xx.yaml b/Documentation/devicetree/bindings/net/microchip,lan78xx.yaml
+> new file mode 100644
+> index 000000000000..743667c1e761
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/microchip,lan78xx.yaml
+
+
+microchip,lan7800.yaml
+
+> @@ -0,0 +1,113 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/microchip,lan78xx.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Microchip LAN78xx Gigabit Ethernet controller
+> +
+> +maintainers:
+> +  - Rengarajan Sundararajan <Rengarajan.S@microchip.com>
+> +  - UNGLinuxDriver <UNGLinuxDriver@microchip.com>
+
+Drop last email.
+
+> +
+> +description:
+> +  The LAN78XX devices are usually configured by programming their OTP or with
+> +  an external EEPROM, but some platforms (e.g. Raspberry Pi 3 B+) have neither.
+> +  The Device Tree properties, if present, override the OTP and EEPROM.
+> +
+> +allOf:
+> +  - $ref: /schemas/usb/usb-device.yaml#
+> +  - $ref: /schemas/net/ethernet-controller.yaml#
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - usb424,7800
+> +      - usb424,7801
+> +      - usb424,7850
+
+Odd format. Missing blank lines. Look at existing code to understand how
+this is supposed to look like.
+
+> +  reg:
+> +    maxItems: 1
+> +    description: USB port number
+> +  local-mac-address:
+> +    $ref: /schemas/types.yaml#/definitions/uint8-array
+> +    minItems: 6
+> +    maxItems: 6
+> +    description:
+> +      MAC address to use if not stored in OTP or EEPROM. If present,
+> +      overrides OTP/EEPROM.
+> +  mdio:
+> +    $ref: /schemas/net/mdio.yaml#
+> +    unevaluatedProperties: false
+> +
+> +patternProperties:
+> +  "^ethernet-phy(@[0-9a-f]+)?$":
+> +    type: object
+> +    description: |
+> +      PHY node for the embedded or external PHY. The PHY address is
+> +      given by the 'reg' property.
+> +    properties:
+> +      reg:
+> +        maxItems: 1
+> +        description: PHY address.
+> +      microchip,led-modes:
+> +        $ref: /schemas/types.yaml#/definitions/uint32-array
+> +        minItems: 1
+> +        maxItems: 4
+> +        description:
+> +          Array of LED mode values for each of up to 4 LEDs.
+> +          Omitted LEDs are turned off. Allowed values are defined
+> +          in include/dt-bindings/net/microchip-lan78xx.h.
+> +    required:
+> +      - reg
+> +    additionalProperties: false
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/net/microchip-lan78xx.h>
+> +    / {
+> +        usb: usb {
+> +            compatible = "usb-host";
+> +            #address-cells = <1>;
+> +            #size-cells = <0>;
+> +        };
+> +    };
+> +    &usb {
+
+Drop all this, irrelevant and not even close to expected style.
+
+> +        usb-port@1 {
+> +            compatible = "usb424,2514";
+
+Drop node
+
+> +            reg = <1>;
+> +            #address-cells = <1>;
+> +            #size-cells = <0>;
+> +
+> +            usb-port@1 {
+> +                compatible = "usb424,2514";
+
+Drop node, not relevant to this binding.
+
+Again, look at other bindings to understand what to write. Or read
+DTS101 slides.
+
+> +                reg = <1>;
+> +                #address-cells = <1>;
+> +                #size-cells = <0>;
+
+Best regards,
+Krzysztof
 
 
