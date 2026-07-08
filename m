@@ -1,176 +1,140 @@
-Return-Path: <netdev+bounces-305857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305858-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id XlRDIExoTmptMAIAu9opvQ
-	(envelope-from <netdev+bounces-305857-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 17:10:04 +0200
+	id qoSYOt9sTmr4MQIAu9opvQ
+	(envelope-from <netdev+bounces-305858-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 17:29:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4DB7727C82
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 17:10:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3954872808E
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 17:29:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linuxfoundation.org header.s=korg header.b=xW4i8IH0;
-	dmarc=pass (policy=none) header.from=linuxfoundation.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305857-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305857-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=A3jCUi92;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305858-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305858-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BBE123102E4D
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 14:55:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 265AE303B4E1
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 15:00:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C5413B71C7;
-	Wed,  8 Jul 2026 14:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E980D4D90C0;
+	Wed,  8 Jul 2026 14:57:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CD73390228;
-	Wed,  8 Jul 2026 14:55:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0C064D8DBE;
+	Wed,  8 Jul 2026 14:57:23 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783522525; cv=none; b=lECXL9R5ViXOWkYZtHH/c6Yqy7yV4VozRShKqNm5hBhBNGk/mIethq+zhmN8ktuOwjPf1UAm98tQgwuRgzUGAbHf/6zQcV6HZgxIId8gvt3JGPtW0PK9xnGNC0+Aj1/CTqYD44cxBzjcNKRx8aDV4oh3+d2CVti0iJ8aWQH/OH4=
+	t=1783522644; cv=none; b=DjItv51ssveiltbN3VjXEfrxxP+dwfaLI8ioKRMwYUlaBux/6D/crnRptu1UX/M4rgxzCpg/JWhnIlFC2mdgMOkAbONYo6IvGAAsHbSo02gh3lJ95EzCxdnKfLEUpW5Xp+gZB7xmqifhfJQ66C4P7yVLJtGKrLXK0VSQEXwHM7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783522525; c=relaxed/simple;
-	bh=8FhydZ5T6HRYZO1CUeYB4dyiCSrzViAcpUgRLUr8FGE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lDqECGGqAv/K8iNiHQgOYUbpAzz6KaspXfStnSid8Nsf05jpJ7X0LhAPlfWcG/6wZC3Wk5A6tgzq5mp5wceh+fMJGL7nNW9bs2yukhARnpVquKjwvMqKeBSlHPVaX21hUp0GjQA25VGEO0noaX1JgDcOnzHxdhDoRblOzJ/62Lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=xW4i8IH0; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AE281F000E9;
-	Wed,  8 Jul 2026 14:55:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1783522523;
-	bh=N4tk33+gGzEvWhx3TAYATpFb6wxOHUQmG8/nMmeWOk0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=xW4i8IH00Xp6ZAjNrt4/A3qUb/gBuHTe/GlvTkuACu4a9Pz0zHAJa6o5Zjifg3gJ7
-	 RZjLOgySpbzaGfHe1VBkUx6uoZ7r9my1/m1uZVWhbuNgeO+eZ7cckcAXUw1lPNde4o
-	 QVN2IHGaRvCryL30/1DVjQWiXXoyUMZ7O05dyy0E=
-Date: Wed, 8 Jul 2026 16:55:20 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Yuan Tan <yuantan098@gmail.com>
-Cc: linux-kernel@vger.kernel.org, workflows@vger.kernel.org,
-	jhs@mojatatu.com, sven@narfation.org, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [RFC] VEGA: a syzbot-like workflow for LLM-found kernel bugs
-Message-ID: <2026070828-carried-extortion-789e@gregkh>
-References: <20260708092247.4188498-1-yuantan098@gmail.com>
+	s=arc-20240116; t=1783522644; c=relaxed/simple;
+	bh=JYzf/onF9NFirTAfSc9PDQP9wK5ZKsBVM9F2HTMBsA4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uM41JZ1XucddLavXBBA3yHggQkdlwDzClF943XODaAROkPhtkgSGCmRP0RzsCD/kBtfFjZeYo7qTPWi9g6pChss2LHgkmfl16qtJnR1gtzPm60gY5sI8LjwcIX90plxUnGplDi+Gp1osZU0Sji7kuimc4IFb+CZ3YJZsyfLCF9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A3jCUi92; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 504D21F00A3F;
+	Wed,  8 Jul 2026 14:57:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783522643;
+	bh=aOSlRVOOsp/b8/M0wS8/T7JwtXcb0jgJm7bcNhotsfk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=A3jCUi92le+Rm3J0/Xv2R3TQTMFaC1ybqJgwkDl0oMns6/31SZHyiD4k1nsIKb/X4
+	 HqFlCa6jS3smLI89QvFeAYIYiBeYF5m4I3iNzciYajFVcq8F7N3g2qhHKKb1+Xbi6/
+	 p+cRzVcpAsw9JijkQIMKHQNQ4ZkgEmuSFsPqcEovqQVuNTq6FRdd+xEEWqLE2c5GVB
+	 JPv1qB2AYP1526neWBmBIa0lCXYYKOr7Ftxc1pInZivoHXwCEer3QrbWEPVxkKqb2/
+	 SVE2FuLIGYw9fHA7YiHQVK9j6NB1vYaOyJ//CbJPpWXhaFvlITNWFsClbqG/s4bhe0
+	 skhkCUkYMENGg==
+From: Bjorn Andersson <andersson@kernel.org>
+To: Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Brian Masney <bmasney@redhat.com>,
+	Imran Shaik <imran.shaik@oss.qualcomm.com>
+Cc: Ajit Pandey <ajit.pandey@oss.qualcomm.com>,
+	Taniya Das <taniya.das@oss.qualcomm.com>,
+	Jagadeesh Kona <jagadeesh.kona@oss.qualcomm.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	linux-arm-msm@vger.kernel.org,
+	linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Subject: Re: (subset) [PATCH v5 0/4] clk: qcom: Add RPMCC and GCC support for the Qualcomm Shikra SoC
+Date: Wed,  8 Jul 2026 09:56:24 -0500
+Message-ID: <178352261615.2235436.7887300430709425990.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260608-shikra-gcc-rpmcc-clks-v5-0-94cefe092ee3@oss.qualcomm.com>
+References: <20260608-shikra-gcc-rpmcc-clks-v5-0-94cefe092ee3@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260708092247.4188498-1-yuantan098@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.34 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
-	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:mturquette@baylibre.com,m:sboyd@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:richardcochran@gmail.com,m:bmasney@redhat.com,m:imran.shaik@oss.qualcomm.com,m:ajit.pandey@oss.qualcomm.com,m:taniya.das@oss.qualcomm.com,m:jagadeesh.kona@oss.qualcomm.com,m:krzk@kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-clk@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:krzysztof.kozlowski@oss.qualcomm.com,m:dmitry.baryshkov@oss.qualcomm.com,m:conor@kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:yuantan098@gmail.com,m:linux-kernel@vger.kernel.org,m:workflows@vger.kernel.org,m:jhs@mojatatu.com,m:sven@narfation.org,m:netdev@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:linux-crypto@vger.kernel.org,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-305857-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER(0.00)[andersson@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_TO(0.00)[baylibre.com,kernel.org,gmail.com,redhat.com,oss.qualcomm.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305858-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linuxfoundation.org:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[andersson@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,gregkh:mid,linuxfoundation.org:from_mime,linuxfoundation.org:dkim,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E4DB7727C82
+X-Rspamd-Queue-Id: 3954872808E
 
-On Wed, Jul 08, 2026 at 02:22:47AM -0700, Yuan Tan wrote:
-> Hi all,
+
+On Mon, 08 Jun 2026 17:51:48 +0530, Imran Shaik wrote:
+> This series adds support for the Global Clock Controller (GCC) and
+> RPM-managed clocks on Qualcomm Shikra SoC.
 > 
-> We would like to ask for feedback on a proposed workflow for reporting Linux
-> kernel bugs found by an LLM-assisted code auditing tool that we have
-> been developing since earlier this year.
+> Qualcomm Shikra SoC details:
+>  - https://lore.kernel.org/all/20260428-shikra-socid-v1-0-6ff16bad5ea2@oss.qualcomm.com/
 > 
-> Since February, we have been developing an LLM-driven kernel code auditing
-> tool called VEGA. It started as a side project, but the results became much
-> substantial than we expected: VEGA has found hundreds of valid bugs in Linux
-> kernel.
 > 
-> That immediately created a practical problem: we do not want to dump a large
-> pile of bug reports onto mail lists and annoy the maintainers.
+> [...]
 
-True, which is why we all end up with long lists of issues/patches at
-the moment.  The initial reaction is "we need a dashboard for everyone
-to collab around!" like you did here, but I'd like to say this is not
-the best thing to do at all.
+Applied, thanks!
 
-syzbot can get away with a dashboard because someone is tending to it,
-triaging the "serious" bugs before they become public, and only letting
-the "would be nice to fix one day" type issues remain.  That's a huge
-resource commitment that Google has made here, and that's great, but I
-doubt that anyone else will have those resources to do this type of
-thing.
+[4/4] clk: qcom: Add Global clock controller support on Qualcomm Shikra SoC
+      commit: 01cf3e27824d1cf2dcb815e59087c6556819b039
 
-Instead, let's just work to get these things fixed.  We all have
-hundreds of patches/reports in our internal systems right now,
-attempting to triage/rank/coordinate would just waste time.  In other
-words, just grind through them, send patches out, and get these fixed.
-
-I'm doing this now, and I know many others are as well.  We are all
-running "different" tools, and so we find different issues, so we can
-all just keep sending patches as we get them done.  It's going to take a
-lot of effort (I've somehow convinced 8 interns to help me out with this
-this summer), but once we get it done, we'll be much better off.
-
-> The first thing we tried was to fix as many as we could ourselves. We
-> started working with a group of student volunteers. Most of them are
-> college students, so we have been training them, reviewing their patches,
-> and trying to build an internal review process before anything is sent to
-> the mailing list. The goal is to turn these findings into useful fixes, and
-> also to help new contributors grow into people who can reduce maintainer
-> workload instead of adding to it.
-> 
-> The process was not perfect. Some patches were not good enough, and we also
-> made some mistakes early on when deciding what should be called a security
-> issue.  Our internal review process has been improving with the help of the
-> community.
-
-That's great, keep it up!
-
-> But the remaining queue is still too large for us to handle.
-> 
-> Recently Jamal pointed out problems around our tags. That made me realize
-> that we should probably stop treating this as an ad-hoc patch effort and
-> build something closer to syzbot: public, reproducible, trackable,
-> deduplicated, and useful to maintainers.
-
-Again, I think that effort is going to be larger than just getting the
-patches fixed and pushed out.  It also turns into a central
-point-of-failure, which is what we do not want to have at all for the
-kernel.
-
-But hey, I could be totally wrong.  Maybe some generous company that is
-involved in unleashing this hell on us would be so kind as to pony up to
-do the work to create this and help fix the issues that their tools are
-finding.  Just like Google did in the past, there is precedent, but for
-some reason people don't like learning from history...
-
-It's going to be a long 18 months...
-
-greg k-h
+Best regards,
+-- 
+Bjorn Andersson <andersson@kernel.org>
 
