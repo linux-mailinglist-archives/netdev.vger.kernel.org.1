@@ -1,260 +1,209 @@
-Return-Path: <netdev+bounces-305996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306000-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vDXpI9W/TmrATQIAu9opvQ
-	(envelope-from <netdev+bounces-305996-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 23:23:33 +0200
+	id UTVnFzzDTmp5TgIAu9opvQ
+	(envelope-from <netdev+bounces-306000-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 23:38:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8A5E72A80D
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 23:23:32 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA50A72A921
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 23:38:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amd.com header.s=selector1 header.b=UeAQHCc8;
-	dmarc=pass (policy=quarantine) header.from=amd.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305996-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305996-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=oLWiMIEJ;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306000-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306000-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 001F0300F15E
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 21:23:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 486B1301BA72
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 21:34:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 450043F1AC8;
-	Wed,  8 Jul 2026 21:23:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A36443F6C26;
+	Wed,  8 Jul 2026 21:34:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011010.outbound.protection.outlook.com [52.101.57.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3993CF047
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 21:23:29 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783545811; cv=fail; b=kmTcC0mpNf5bmBuaasjXj4U7oAuKM1abybiH7r5Gy1mrXVrSwiqSfiqeF16RgjuDfpvE3JeQRjua2VqgrVEio/gAL4CUVvuzapMGDFb6LOduibvgr0I6wYgDGoywsTXOzzyFvyv5guADkxrnFo/1GmzD46JBNcldNnbmS4+jCx4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783545811; c=relaxed/simple;
-	bh=sypCW1enPSKw4hXYleE24Hm5uDen/SQ66oGTi1l+2i8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=khNbpFf03BhGdQCYsftKsm+NGz5A2JBJJNcyUdqiIAK5Omn1//uZrUyZ8C3y4kDfclfn8jDdBKn3N9Flyu5aKk6X8GOPl3wW6mWs6DDcGk11j/Q3Nq/M/n/O97ORrOkInrYZr9h/ErmNyqRiQT80mPFTD8gk6SuTKAFIEh0Qw+0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=UeAQHCc8; arc=fail smtp.client-ip=52.101.57.10
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QU5HmtPuvsimeaOw8O/IfG1tjhHny66hEzmzjpkjJ0X7iJ2mNQ3dTn8bm6yks+8y85GTFt5Yh7JzIoFIzSknE1/hMG7eE+Q9zXUsr9JieZZ2111XufV8cxIC4IBlhZEdlT1s18fqpH35t5BuqAJDbsTq1OuiZAlXLYjcbm+fUCObamBGllzyuIdYY6F848zKw53cUiojeMZeapcYFYQNjFjhaVGXmhUEX8h4uNqqCVivREPUV0QYsJ2YKEF8BTDqSDC2z/OOvEr8D6jNeQPLjeZYoW0uKh6OAo853bAleOCC/tWCF1N97dKttleogVcU/CJA4z+n+YhZcVWKqMIN8A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EC/YOvm5+54jIbSVBX1GTTYulo5sXGOI+WtB6jnq73E=;
- b=A3x3PZI8f4U/rjvmJkeGRmaZBhjf8Zv7W7TLBUjZmJEEMmqkNdA1POpKkTxKz5qV3OWRZIdX/8sqd5+55iUugwU1uPxxiQKlNoK1R2/lvmbBTiNaVHxnHYXsqcHiX8Yuy48/WzjGailU/WJfiHM5e0MrWh1r/7Id0W8LpQJKRL6rg3jkSWUsW8j0AH2p5uw0UTSARG4RNR9EpTc1sdI2KbxNctbeMHLt0vLeAfMjDlF1SZmjPra/Iwx5P4CBaarZfpZWznVmfdp4/o+PM0JccUYXpPMongWZi+VQz9zJ5BDDonm0uUDAZXcagwdJXfwCjdKWMZx063CVUKAMngY4XQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EC/YOvm5+54jIbSVBX1GTTYulo5sXGOI+WtB6jnq73E=;
- b=UeAQHCc84Tr/+lDs/ceVU52tl2i3pYbkjjpZy8nkIbVZDAG+sypj1cAH1PirxcD/slWzqtCrEmcdYRHxoMJPzeh7ielG/JJwnsJ8lt4xflew8wPsDK6OHF+p8dd17V/Sxdyq+pl7rSH8dLwQlgFDxJWx8bk8pTenw6OteXaJdP4=
-Received: from CH0PR04CA0083.namprd04.prod.outlook.com (2603:10b6:610:74::28)
- by DS3PR12MB999241.namprd12.prod.outlook.com (2603:10b6:8:38e::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Wed, 8 Jul 2026
- 21:23:26 +0000
-Received: from CH2PEPF0000013F.namprd02.prod.outlook.com
- (2603:10b6:610:74:cafe::73) by CH0PR04CA0083.outlook.office365.com
- (2603:10b6:610:74::28) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.202.10 via Frontend Transport; Wed, 8
- Jul 2026 21:23:25 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- CH2PEPF0000013F.mail.protection.outlook.com (10.167.244.71) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.181.6 via Frontend Transport; Wed, 8 Jul 2026 21:23:25 +0000
-Received: from amd.rund-run.pensando.io (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Wed, 8 Jul
- 2026 16:23:24 -0500
-From: "Nikhil P. Rao" <nikhil.rao@amd.com>
-To: <netdev@vger.kernel.org>
-CC: <kuba@kernel.org>, <brett.creeley@amd.com>, <eric.joyner@amd.com>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <jacob.e.keller@intel.com>, "Nikhil P. Rao"
-	<nikhil.rao@amd.com>, Vamsi Atluri <Vamsi.Atluri@amd.com>
-Subject: [PATCH 6/6] pds_core: add debugfs support for host backed memory
-Date: Wed, 8 Jul 2026 21:22:22 +0000
-Message-ID: <20260708212222.296202-7-nikhil.rao@amd.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260708212222.296202-1-nikhil.rao@amd.com>
-References: <20260708212222.296202-1-nikhil.rao@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC623AB29E
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 21:34:48 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783546489; cv=none; b=UkR7ZsHvGA13ktRY/B4ZnMJsoHDI86K5nycpWo6AQbaiMnlZAP0P1PFfyax60/CAccqNEDf+9iJ0LeEcj60ZNmEczuNglSmIA7t96eDKuLSSVNStnmQDKMMNzTGPuf/Mh6qNQ66KdjPoDFPjgtjBIbc161bQTf2A2N3vYO/eS54=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783546489; c=relaxed/simple;
+	bh=QOSXPs572gwC1zNEaba3iUlnyvy4QAECU2owztJON50=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GLHImM4uDqvUgENWsUW5VQgOAPu4JCT3ilUMQJQuxllvDBLGb1gevqbY6BYegHdospL5yvXl9+5ebPgK4LtmE/sVhS5iNOBqfuaDkfvhTk/I3awVfI8Jq+xLog6/nL5o+23dYXnJ+bIX+JoBSpnF7w99wO4+pQawBFE6X7tfR5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oLWiMIEJ; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BDF51F01559
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 21:34:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783546488;
+	bh=QOSXPs572gwC1zNEaba3iUlnyvy4QAECU2owztJON50=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=oLWiMIEJ0W+2X8o0NSe2rZ6aZ3sA6U0G3Dq+g9ru8SeVgFY7ajC/IFv/EZWpsR5Xk
+	 geK/gPYk+UMZRfpa7k1QenCnUGWTbPm3ZsHpkyFzbIAayQBkS6sjilk9ExJRQu8Fs8
+	 7EUnOZAdU1U0xEUWoDATI9FLYwtAhcc2Ly8+nhDxtj4JA8NlBLjGZxSP1Y6GZSOwvI
+	 c+vM8ee3gvlIvJVR8u83IXaNI3/rRtMq7NuqbKXPpIyvrNqSEkSKhU01Jg0EunLJhk
+	 uLfFyYjwY7928goknVNQYJCKy4nlHiR+Dd4FM77K/mm76Z7uNJh7YJTm+FHDnLrUBz
+	 pC+WHzxSmARzw==
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-c029505b389so44354866b.1
+        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 14:34:48 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RoEFfmhTSfm6ZGD3HjtWxi7qMLo1G9SrNDxVEE3Sc7r7wl0njCCXY8N1TwAj/m6Z1vUxXAi0hM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkSyGQyOgowV+K8mCamuT8TN2ocXQAeBZcgsLft54HhEiaAsu4
+	+bLoeOCleDkTCiDSHdmy+zG4ERU0mDWMb4bVTTh3wDAG5zo27zwjhR79lniwDtgXNn0+bilSYV6
+	2zsmGmF2k2otACLYwPlTaEfiTKUkSlQ==
+X-Received: by 2002:a17:906:2099:b0:c15:c323:36e5 with SMTP id
+ a640c23a62f3a-c15e744ffafmr1138866b.10.1783546486746; Wed, 08 Jul 2026
+ 14:34:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF0000013F:EE_|DS3PR12MB999241:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3f2595a4-bfc2-4fe7-7da0-08dedd372571
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|376014|23010399003|36860700016|22082099003|56012099006|6133799003|11063799006|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	CE4DM3C6eq3vnGS1bEP90PWkL1zh4GHFUzm/QtsZ2Jeq5/bT2bquZULasZFKDb7CxwLBIncAQJBesewH0Jszwh5OcGRwCvohOLTusjK6bPqWErgkl1MWOv3wheP7kEevprUJJVf9j7gLnTR7X8gcQmQhy6Ehi1YtVH1k5gTpknxbHppOM9ngRUeXd4mrZAedpkqTeBXCm865AiujHzrjeA0AiR0/S1v0a7bAh/1oOfSKO29nVjudcRKM34iQIVFv2lVu9qgD+OdiFFpU6+7Wnya5UhL1oDOjFKVND7HLsrTpqTev9iQVOeCn1oeqemCqohPHAUOTMwdEpcS0TZlo2hFPu8CVwZfJFXJkIsstVFgMEg8+HulaYTB5xrgQVVogttG4X9YM6qe6JqZXx8JVjtM93N/6AtpepDhTi0HQaPObNQp01PZK1LIyUI5zHYftt8MkXxfVpbAAcXMYA1xV3v+hDISuZbEQvozXLwcFSUP3OP95c39y/bdneJclJPwVirz9N1Ow76T5AZUM7S6G08gNctOGZCZpA1+kFBH9xgeZ2UwBkljs3gVcmKLA4QBQ293H2wxwVc7t9PEuFuz0UJH3BeBcAaJdZ5tA5gqPWcMZOOEb0ybf7xEBkwxxdZ2Hsmx8+d0C7k2uM9GlsW0YVJVnr+1gNOOOHj22Laru3LIrMUaBMO57Ed47xC1moHgJwTuyQ4HK6i0A89z++Ckt4A==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(23010399003)(36860700016)(22082099003)(56012099006)(6133799003)(11063799006)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	r8oSWhwFNIqcIAbty4rG9RB4X8ZSnLzf1O/pcDF9hMbiYKaATVcdpS3N2mdANDPLnEMRWBegr43Cjs5VxNSnt50lJ5Pc5jMludsC/cnxtEQow8Cn4UfRmrWe7X9TMsTS3IN5Fc9zAQqamj+2vrXiFstNAojEveYENXyqeIblQVWLfagvaF65xPFJCt1bAl7ovC6aTl/qUkZALozTtawtvBwBJZKXq5gLtwO+V8viQxIoQFbh6nGVdyVkL4iULe4xMYlrFhPzWwJbo+qvLUgc/F1g+TxNo/gzYBSXziZ1ABjRvRy5Evxb2DHRrPnrRN6AGw3W5AKpePJF2zHlSkLzsnI7NB8kOT8i1ZBT3U7Vi9OsMSg1XiQDrt9a6VJTY2myCvTYzpxcfxKVGhZt5NIte86s71JPYXhfpiUybVmQ2arkVxNkTLYwGGWZ7dKYXrK8
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2026 21:23:25.3776
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3f2595a4-bfc2-4fe7-7da0-08dedd372571
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF0000013F.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS3PR12MB999241
+References: <20260701-mt8189-clocks-system-base-v1-0-2b048feea50a@collabora.com>
+ <20260701-mt8189-clocks-system-base-v1-2-2b048feea50a@collabora.com>
+ <20260701193311.GA1402559-robh@kernel.org> <d1e37bd4f2a05fed6c7bfdc5d9a0fa90c892d608.camel@collabora.com>
+In-Reply-To: <d1e37bd4f2a05fed6c7bfdc5d9a0fa90c892d608.camel@collabora.com>
+From: Rob Herring <robh@kernel.org>
+Date: Wed, 8 Jul 2026 16:34:35 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqK8mmkhp8rM1QVB8cqLmTVqy5toFdt3Y1AFLJ5-wOdhgQ@mail.gmail.com>
+X-Gm-Features: AUfX_mw1Ig80oWjopfC3vG9UTQnueKyNCwAlWOrtHD_SpQ7K2JXbmkzTxRjcs9w
+Message-ID: <CAL_JsqK8mmkhp8rM1QVB8cqLmTVqy5toFdt3Y1AFLJ5-wOdhgQ@mail.gmail.com>
+Subject: Re: [PATCH 02/15] dt-bindings: clock: mediatek: regroup MT8188
+ dt-bindings into MT8186
+To: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Cc: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Brian Masney <bmasney@redhat.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Chun-Jie Chen <chun-jie.chen@mediatek.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	Edward-JW Yang <edward-jw.yang@mediatek.com>, Richard Cochran <richardcochran@gmail.com>, 
+	kernel@collabora.com, linux-clk@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-305996-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306000-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:kuba@kernel.org,m:brett.creeley@amd.com,m:eric.joyner@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:jacob.e.keller@intel.com,m:nikhil.rao@amd.com,m:Vamsi.Atluri@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:louisalexis.eyraud@collabora.com,m:mturquette@baylibre.com,m:sboyd@kernel.org,m:bmasney@redhat.com,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:chun-jie.chen@mediatek.com,m:p.zabel@pengutronix.de,m:edward-jw.yang@mediatek.com,m:richardcochran@gmail.com,m:kernel@collabora.com,m:linux-clk@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[baylibre.com,kernel.org,redhat.com,gmail.com,collabora.com,mediatek.com,pengutronix.de,vger.kernel.org,lists.infradead.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,amd.com:from_mime,amd.com:email,amd.com:mid,amd.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E8A5E72A80D
+X-Rspamd-Queue-Id: CA50A72A921
 
-Add debugfs entry to dump host backed memory allocations for debug
-purposes.
+On Wed, Jul 8, 2026 at 8:45=E2=80=AFAM Louis-Alexis Eyraud
+<louisalexis.eyraud@collabora.com> wrote:
+>
+> Hello Rob,
+>
+> On Wed, 2026-07-01 at 14:33 -0500, Rob Herring wrote:
+> > On Wed, Jul 01, 2026 at 03:11:07PM +0200, Louis-Alexis Eyraud wrote:
+> > > Regroup the MT8188 clock and system clock dt-bindings into MT8186
+> > > ones
+> > > to ease maintainability and have common files for several currently
+> > > supported SoC or new future ones, that have the same kind of clock
+> > > controller design.
+> > >
+> > > Note:
+> > > The `#clock-cells` property is a required property for all
+> > > compatibles
+> > > declared in MT8188 clock and system clock dt-bindings but not in
+> > > MT8186
+> > > ones.
+> > > To avoid ABI breakage, conditional blocks to check this requirement
+> > > for MT8188 compatibles are added, rather than enforcing it for
+> > > MT8186
+> > > compatibles.
+> >
+> > If the existing DTs are just wrong, then I would just make #clock-
+> > cells
+> > required. But please update the .dts files so the warnings don't
+> > grow.
+> >
+> I've tested to make the #clock-cells required for the MT8186, MT8192
+> and MT8195 system and functional clock controllers.
+> I did not see new warnings, so no extra dts patches would be needed.
+>
+> I'll add new patches (one per SoC) in the next revision of the series
+> for this, as it simplifies the grouping patches (no more if/then to
+> require #clock-cells for the MT8188/MT8189 clock controllers) and the
+> note in commit message could be removed.
+>
+> > The grouping I would do here is:
+> >
+> > - clock controller only
+> > - reset controller only
+> > - both clock and reset controller
+> >
+> > That should avoid any if/then schemas.
+> >
+>
+> By this grouping, I understand you suggest having separate dt-bindings
+> files, that could look like:
+> - mediatek,mt8186-clock.yaml: clock controllers
+> - <name to be found>: reset controllers
+> - <name to be found>: clock controllers with reset controller
+> - mediatek,mt8186-sys-clock.yaml: system clock controllers.
+> - <name to be found>: system clock controllers with reset controller
+>
+> Is that what you meant?
 
-Assisted-by: Claude:claude-opus-4.6
-Signed-off-by: Vamsi Atluri <Vamsi.Atluri@amd.com>
-Signed-off-by: Nikhil P. Rao <nikhil.rao@amd.com>
----
- drivers/net/ethernet/amd/pds_core/core.c    |  2 +
- drivers/net/ethernet/amd/pds_core/core.h    |  1 +
- drivers/net/ethernet/amd/pds_core/debugfs.c | 45 +++++++++++++++++++++
- 3 files changed, 48 insertions(+)
+I think so, but not sure I understand the distinction with clock
+controllers and system clock controllers.
 
-diff --git a/drivers/net/ethernet/amd/pds_core/core.c b/drivers/net/ethernet/amd/pds_core/core.c
-index 356a69c895b6..d4857bf4860d 100644
---- a/drivers/net/ethernet/amd/pds_core/core.c
-+++ b/drivers/net/ethernet/amd/pds_core/core.c
-@@ -500,6 +500,7 @@ void pdsc_teardown(struct pdsc *pdsc, bool removing)
- 		pdsc->viftype_status = NULL;
- 	}
- 
-+	pdsc_debugfs_del_host_mem(pdsc);
- 	pdsc_host_mem_free(pdsc);
- 	pdsc_dev_uninit(pdsc);
- 
-@@ -511,6 +512,7 @@ int pdsc_start(struct pdsc *pdsc)
- 	pds_core_intr_mask(&pdsc->intr_ctrl[pdsc->adminqcq.intx],
- 			   PDS_CORE_INTR_MASK_CLEAR);
- 	pdsc_host_mem_add(pdsc);
-+	pdsc_debugfs_add_host_mem(pdsc);
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/amd/pds_core/core.h b/drivers/net/ethernet/amd/pds_core/core.h
-index 085f2e988aa0..791756a50870 100644
---- a/drivers/net/ethernet/amd/pds_core/core.h
-+++ b/drivers/net/ethernet/amd/pds_core/core.h
-@@ -306,6 +306,7 @@ void pdsc_debugfs_add_irqs(struct pdsc *pdsc);
- void pdsc_debugfs_add_qcq(struct pdsc *pdsc, struct pdsc_qcq *qcq);
- void pdsc_debugfs_del_qcq(struct pdsc_qcq *qcq);
- void pdsc_debugfs_add_host_mem(struct pdsc *pdsc);
-+void pdsc_debugfs_del_host_mem(struct pdsc *pdsc);
- 
- int pdsc_err_to_errno(enum pds_core_status_code code);
- bool pdsc_is_fw_running(struct pdsc *pdsc);
-diff --git a/drivers/net/ethernet/amd/pds_core/debugfs.c b/drivers/net/ethernet/amd/pds_core/debugfs.c
-index 810a0cd9bcac..ef0a1b7d159b 100644
---- a/drivers/net/ethernet/amd/pds_core/debugfs.c
-+++ b/drivers/net/ethernet/amd/pds_core/debugfs.c
-@@ -178,3 +178,48 @@ void pdsc_debugfs_del_qcq(struct pdsc_qcq *qcq)
- 	debugfs_remove_recursive(qcq->dentry);
- 	qcq->dentry = NULL;
- }
-+
-+static int host_mem_show(struct seq_file *seq, void *v)
-+{
-+	struct pdsc *pdsc = seq->private;
-+	struct pdsc_host_mem *hm;
-+	int i;
-+
-+	if (!pdsc->host_mem_reqs || pdsc->num_host_mem_reqs == 0) {
-+		seq_puts(seq, "No host memory allocated\n");
-+		return 0;
-+	}
-+
-+	seq_printf(seq, "Host memory requests: %u\n\n",
-+		   pdsc->num_host_mem_reqs);
-+	seq_puts(seq, "Tag    Size         Order  PA\n");
-+	seq_puts(seq, "---    ----         -----  --\n");
-+
-+	for (i = 0; i < pdsc->num_host_mem_reqs; i++) {
-+		hm = &pdsc->host_mem_reqs[i];
-+
-+		if (!hm->pg)
-+			continue;
-+
-+		seq_printf(seq, "%-6u %-12u %-6u %pad\n",
-+			   hm->tag, hm->size, hm->order, &hm->pa);
-+	}
-+
-+	return 0;
-+}
-+DEFINE_SHOW_ATTRIBUTE(host_mem);
-+
-+void pdsc_debugfs_add_host_mem(struct pdsc *pdsc)
-+{
-+	if (!(pdsc->dev_ident.capabilities &
-+	     cpu_to_le64(PDS_CORE_DEV_CAP_HOST_MEM)))
-+		return;
-+
-+	debugfs_create_file("host_mem", 0400, pdsc->dentry,
-+			    pdsc, &host_mem_fops);
-+}
-+
-+void pdsc_debugfs_del_host_mem(struct pdsc *pdsc)
-+{
-+	debugfs_lookup_and_remove("host_mem", pdsc->dentry);
-+}
--- 
-2.43.0
+> There is no pure reset controllers for those SoC so no dedicated file
+> would needed at the moment.
+> The system clock controllers all have reset-controllers, even they may
+> currently be not all implemented, so no separate files for system clock
+> controllers would needed as well.
+>
+> Also, from what I see the current dt-bindings, the system clocks
+> controllers for the MT8186/MT8188/MT8192/MT8195 SoC have the #reset-
+> cells property but it is not required for them (examples:
+> mediatek,mt8188-infracfg-ao or mediatek,mt8195-infracfg_ao).
+>
+> With the patches to make the #clock-cells property required, I already
+> removed the biggest if/else block in mediatek,mt8186-clock.yaml, so
+> only the one regarding #reset-cells property remains.
+>
+> So, should I create separate files, following the grouping suggestion,
+> for the v2 of this patch?
 
+Shrug. There's no hard rule here, it's a judgment call. With one
+if/then block dropped, it's a bit more tolerable to keep it as-is. If
+the if/then schemas are as long as the rest of the schema (minus any
+example), then I would say to split the schemas.
+
+Rob
 
