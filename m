@@ -1,198 +1,134 @@
-Return-Path: <netdev+bounces-305812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305813-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DS3hColMTmqQKQIAu9opvQ
-	(envelope-from <netdev+bounces-305812-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:11:37 +0200
+	id HFITOS9NTmrCKQIAu9opvQ
+	(envelope-from <netdev+bounces-305813-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:14:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5F11726A5B
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:11:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36DDD726AF9
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:14:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=suse.com header.s=google header.b=YI5qyFe7;
-	dmarc=pass (policy=quarantine) header.from=suse.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305812-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305812-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=b2jit3P9;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305813-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305813-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 47E323066B7D
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 13:04:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 775DD3009507
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 13:07:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2701246770;
-	Wed,  8 Jul 2026 13:04:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21E72571C0;
+	Wed,  8 Jul 2026 13:07:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A883231A41
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 13:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB739213254;
+	Wed,  8 Jul 2026 13:07:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783515876; cv=none; b=ctWX6GkUam65O6oBEpKCZZx+C0vWVRBqH7zUmjxxs2GhEj633+4SmX5lS1a5AdUpe/95oyHpd7iBtqI2StmnkT4WAKBsjOUntzj8U8em3nYrhzPNxdzPg76BBRcfk0Rb3lE6t0B1Sq/d6kUZfqyBzCxU8Es/2rYYuXSrNNIc0KQ=
+	t=1783516077; cv=none; b=SEK42fLxPpF4bnLVL98JQKdIplX6Gz3bMe/kzNLuRrHDScJDIyTcCc1oudOONziWauSeZT5ohBQ40egysteOkBWrQddSNT7TBPNBGGg8jqO9GrazJUi3XuGpOpd7cAkYgSvrgzXe1xnoXB2v+OlHxsQFB5CjiPeag53WeZL98ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783515876; c=relaxed/simple;
-	bh=TPmuL1ero5zv+WHjvwHCf1loe950mWpRMqA8MpPKYCA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=U/4pFbBKuHtjzhXPpMVECsn/bI5sg0hEPSAEdSAuJVwe9564rpJDfjnctUqA2wh611+Uzz+Bbav08L1OToiVPcFpzx+0X7bwZ4I2vPkbyWz0qr0BIdtgey7n7C4aCJwg2vDfWtEwbsPRdwMZmeuDYWWTP8IAFgwGO62n4/w/FSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=YI5qyFe7; arc=none smtp.client-ip=209.85.128.50
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-493ce08a75bso2596775e9.1
-        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 06:04:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1783515874; x=1784120674; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=/x6FSTkcJjBlea16+XEShOIorxoX9U0UFrtSrJcffgE=;
-        b=YI5qyFe7tEZCsTz+ih+tFtd+C3xTfwWeqycM/atEgEyS4s3WQrW1tcxy2wWjQiAnyC
-         DVAmhSUTaATJhG3Xamh6PbUYXiNIfpiJSLubeZgNA6DL6pRWX50q2PH6N30QWYwK+6ck
-         YdKmwW7rlplvz4gDEaNdNQkJMA5RZ96NttJcgrvjGAkS1TUsVsis9HNQBu0hTHYR4Bqw
-         pxWoLy1ymZsRqVNq90byKnqIHs7P81KZsdbX23mcR74L7nOhnf1ZPqiPnTK+vYe4yixN
-         Fo3QuZyYWpq/Hry7rA/ahUiL7o6p9CY3LR1tfPDdx9ZJO/szkd0SLw7zYmNPBFpzfiZ9
-         isNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783515874; x=1784120674;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=/x6FSTkcJjBlea16+XEShOIorxoX9U0UFrtSrJcffgE=;
-        b=DiFv3eDZwdLv9ReR/I60w/yWdsi4cz1Vl1s6tA2Y7oyVrQPNDW14w/YPEyYpFb+5gu
-         PsC2EWs2Ck7gkGsfJQM2jSInlsyTt5zfWAtdcza5PajTxNgojhiJH2bSloaxDZmyzd4Q
-         E0Y0jf5MSbl6NtuoMVXVItA7D2gOIprnUeA0SNIbIS5+g7rU9P/bGMPSqbrCGUxg8NRW
-         xzK9I7GxTMMHm+znU7juDARw0zF/eJ15vtXNmdWFZ22LkQZfl+tgUHFuNc/smHqXVtJN
-         4A7eIWu0tZdu8cc/AHjjfwNicnJmEe0A2BVW2Uze7ZY1XraprSYNv4KgyGdeaoxSO0Wa
-         J9gQ==
-X-Forwarded-Encrypted: i=1; AHgh+RomelHmZuZ1TiCWFgEExrzVjbs89fCsVJ9I5bWeynFg3d/LGi0JxELlKht2eH/Tg7VgZYJTxts=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8LsnaP7D4wKXYFrNbxMPLuOjDrSTR0uThyytDoQNEgp20KjWS
-	cPorlHJOXo6ZKmQcxu0za6/Tp6JU1bkKfWy2F1XFfZJHqD05kbRhCDbl0dv2LrHftRE=
-X-Gm-Gg: AfdE7ck6nOh+X65e/OsvAhf9p5WZE5K9ZEfengw8S63/fDaVzVomcI6UDVkNbCLq9cU
-	DT08yHcquHUfwX98j7eeP/RuOH/llzvy7kZ6ZzViWEPUVAz9Vpn7OpXV5gI427yMI9ZfvzAV38X
-	coeDb/6253bylNLwqJqSTaWWwL4t4ZnmKtm92NTLUqOIMKeTsQvn4rrFkc/qfK2drFPbBlngZeh
-	V0+yk2REvulAL+FfrmeOEVzEbgbgEYD9twDPWkP1eFxqcm7K6I6gMMpGOSm5q0wKx9ItiabViOO
-	9RSIRbv+NftXwR3LTtjltxFZvWrLJIttzxoeCNHJHb8rfSlz/LvkGWoujuJqF0vZ8T5wBhE+kLs
-	YwSejvzRkOy8LrgcsM2tXAejzZoBwLSKq4PXufp4k8vsa4tIxn2Ssy4uLM2xrbBacekuPmrezFb
-	MtcI4OEVLJGUQzdQFsg77qrMFVYXqvCJw+yswQH0Ckt0W6
-X-Received: by 2002:a05:600c:1da8:b0:492:63c3:8eeb with SMTP id 5b1f17b1804b1-493e687cb4amr21521735e9.35.1783515873732;
-        Wed, 08 Jul 2026 06:04:33 -0700 (PDT)
-Received: from [192.168.42.79] (nat2.prg.suse.com. [195.250.132.146])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493e0f4e3afsm158975915e9.7.2026.07.08.06.04.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jul 2026 06:04:33 -0700 (PDT)
-Message-ID: <bef05178-4856-4b62-9c3b-62bf636c239d@suse.com>
-Date: Wed, 8 Jul 2026 15:04:32 +0200
+	s=arc-20240116; t=1783516077; c=relaxed/simple;
+	bh=68S989PONmhv7+eqxY9lQaNx5Y4o6WwzG4wnhKkqZlY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LnTu7aFd2j54Z0BLF+Q1iyanJlD17gy74tyl/QMHPxuUEIAxJmT6nk8kHHeK2vCQ6+8ZcAzhLAxfajmb0KLgCKXaEorA5IVzqMFQw1md3bDEo6zU/6ABKHG30hCQFqdcT2Zuz8Dby+2SDW5uKGxiejdNcmca2VYBpuTDZVqbgvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b2jit3P9; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A56C11F000E9;
+	Wed,  8 Jul 2026 13:07:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783516076;
+	bh=Hd9z8VELC8Q9jRxuWHqe0GJM5+T9P0twkrs5m0ntfM4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=b2jit3P9I90j0FZjTmExlp1xbmH1GSvS4sU8IR3MyVc5sSpljbnNNdxGqkxsK2C3L
+	 mmYeQcbz4811i4MpBns2qIcDzmt9GY+4F/qGKEsnth8bJVmZmIv5WEKSMvsQUm/pQM
+	 NO2tCBRiZn0uM881e2uvqCJHEWrnO5D/LI6E1LdqS/AooESId9VYxZ8wbpk9zUpMWU
+	 lm0hR7ekV4iUpI/DpMsN629BQUCuTyQfrFxrOzIlGoL4QPaVjaoUXam5hAkIom7RVK
+	 QhaS3ubPY4NCh+harlsLa6KhQELB2Bb3QucvWb+CkBPivRb0Z/fnrNq2Y3kwH5rt0E
+	 RsIdGMCRFtPAQ==
+Date: Wed, 8 Jul 2026 14:07:20 +0100
+From: Simon Horman <horms@kernel.org>
+To: Muhammad Bilal <meatuni001@gmail.com>
+Cc: David Heidelberg <david@ixit.cz>, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	oe-linux-nfc@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] nfc: nci: fix out-of-bounds read in activation
+ parameter parsing
+Message-ID: <20260708130534.GA1481798@horms.kernel.org>
+References: <20260628210026.129941-1-meatuni001@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] ppp: defer channel free to an RCU grace period to
- fix pppol2tp RX UAF
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Qingfang Deng <qingfang.deng@linux.dev>, Breno Leitao
- <leitao@debian.org>, Norbert Szetei <norbert@doyensec.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Taegu Ha <hataegu0826@gmail.com>, Kees Cook <kees@kernel.org>,
- linux-ppp@vger.kernel.org, linux-kernel@vger.kernel.org,
- Guillaume Nault <gnault@redhat.com>, netdev@vger.kernel.org,
- Luis Chamberlain <mcgrof@kernel.org>, Daniel Gomez <da.gomez@kernel.org>,
- Sami Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>,
- linux-modules@vger.kernel.org, "Paul E. McKenney" <paulmck@kernel.org>
-References: <D9C0245B-608B-4884-8A09-F55BA4A9F948@doyensec.com>
- <de2616b3-6edf-4255-ba77-0674e225ab27@linux.dev> <akfjpBVML_1RFF91@gmail.com>
- <87111f02-5b7a-4185-8364-2faba650578b@linux.dev>
- <20260706092926.PIlrhRKz@linutronix.de>
- <0dfe59c2-bf60-40fe-90e6-d6e1003709d0@suse.com>
- <20260708074904.xnpi0mlh@linutronix.de>
-Content-Language: en-US
-From: Petr Pavlu <petr.pavlu@suse.com>
-In-Reply-To: <20260708074904.xnpi0mlh@linutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260628210026.129941-1-meatuni001@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.dev,debian.org,doyensec.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org,atomlin.com];
-	TAGGED_FROM(0.00)[bounces-305812-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305813-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[petr.pavlu@suse.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:bigeasy@linutronix.de,m:qingfang.deng@linux.dev,m:leitao@debian.org,m:norbert@doyensec.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:hataegu0826@gmail.com,m:kees@kernel.org,m:linux-ppp@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:gnault@redhat.com,m:netdev@vger.kernel.org,m:mcgrof@kernel.org,m:da.gomez@kernel.org,m:samitolvanen@google.com,m:atomlin@atomlin.com,m:linux-modules@vger.kernel.org,m:paulmck@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:meatuni001@gmail.com,m:david@ixit.cz,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:oe-linux-nfc@lists.linux.dev,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[petr.pavlu@suse.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B5F11726A5B
+X-Rspamd-Queue-Id: 36DDD726AF9
 
-On 7/8/26 9:49 AM, Sebastian Andrzej Siewior wrote:
-> On 2026-07-07 17:32:10 [+0200], Petr Pavlu wrote:
->>> --- a/kernel/module/main.c
->>> +++ b/kernel/module/main.c
->>> @@ -858,6 +858,9 @@ SYSCALL_DEFINE2(delete_module, const char __user *, name_user,
->>>  		goto out;
->>>  
->>>  	mutex_unlock(&module_mutex);
->>> +
->>> +	/* Ensure all rcu callbacks issued by the module have completed */
->>> +	rcu_barrier();
->>>  	/* Final destruction now no one is using it. */
->>>  	if (mod->exit != NULL)
->>>  		mod->exit();
->>>
->>> make sense?
->>
->> This is discussed in Documentation/RCU/rcubarrier.rst and
->> Documentation/RCU/Design/Requirements/Requirements.rst. The latter
->> contains:
+On Mon, Jun 29, 2026 at 02:00:26AM +0500, Muhammad Bilal wrote:
+> nci_extract_activation_params_iso_dep() and
+> nci_extract_activation_params_nfc_dep() receive a pointer into the
+> RF_INTF_ACTIVATED_NTF notification but are not told how many bytes
+> remain.  Each reads a one-byte length field (rats_res_len,
+> attrib_res_len, atr_res_len or atr_req_len) and then memcpy()s that many
+> bytes from the packet.  The length is clamped to the destination size,
+> but it is never checked against the remaining activation-parameter data,
+> so a notification whose length field is larger than the data present
+> reads past the end of the buffer.
 > 
-> I am aware of this. It is just not the first time I stumble about this.
-> But maybe with the AI review these days there won't be a miss.
+> The sibling nci_extract_rf_params_*() helpers were recently given a
+> data_len argument and matching remaining-length checks, but the
+> activation-parameter helpers were not updated.
 > 
->> I don't know if the last part about unacceptable latencies is still
->> relevant. I haven't done any measurements myself.
+> Pass the remaining length down and validate each field against it before
+> copying, as the rf_params helpers do.
 > 
-> There is a synchronize_rcu() later on. I think I could replace it with a
-> call_rcu() so we might end up even. I was thinking about about it last
-> time I was touching modules but somehow I stopped where I stopped.
-> The question is just, is it worth doing it or is it reasonable to expect
-> that it is done correctly.
+> Fixes: ac2068384034 ("NFC: Parse NCI NFC-DEP activation params")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Muhammad Bilal <meatuni001@gmail.com>
 
-As RCU usage in modules is now more common, I see an argument for the
-module loader to invoke rcu_barrier() during module unload to make RCU
-usage easier. In general, module unloading is a rare operation, so even
-if it becomes somewhat slower, I don't expect it to be a significant
-issue.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-One problem is that I'm not sure where the new rcu_barrier() call should
-be placed. The prototype adds it before calling the module's exit
-function. Would this actually fit all modules? From a quick look, I can
-see that various modules call it at different points during their exit.
-
--- 
-Thanks,
-Petr
+FTR, there is an AI-=generated review of this patch on sashiko.dev.
+However, I think that the issues raised there can be treated
+as possible follow-up rather than impeding the progress of this patch.
 
