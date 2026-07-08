@@ -1,156 +1,228 @@
-Return-Path: <netdev+bounces-305827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305828-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +IZTL4BaTmqpLAIAu9opvQ
-	(envelope-from <netdev+bounces-305827-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 16:11:12 +0200
+	id SUFsAPhZTmqHLAIAu9opvQ
+	(envelope-from <netdev+bounces-305828-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 16:08:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8A5672723F
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 16:11:11 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A893D7271DC
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 16:08:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="Apu/OFOx";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305827-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305827-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305828-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305828-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0E97C30500F8
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 14:02:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0D7813019FDC
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 14:03:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E3F03A5E64;
-	Wed,  8 Jul 2026 14:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7A4A380FF4;
+	Wed,  8 Jul 2026 14:03:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A0E02222C5;
-	Wed,  8 Jul 2026 14:01:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02F972222C5;
+	Wed,  8 Jul 2026 14:03:21 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783519305; cv=none; b=tpUcAawF2rWJ6mGA4sjLXx3J0lfGNi3pumY8AjMYqMucl3WLqm851inoYcZXVH2vL/+BwP/44w8gCHUsMf7MiqyTPQhEGra/P6MH9haOSNZag0RmOfNR7MhiePRV1p+jbzvIMwwMLPWRS+9SBTFjz0kc1o3fsiFM5VirmVzd8K4=
+	t=1783519403; cv=none; b=G+/ikZnndWAwGjM/t4tL6OugVSFW5fYXwHe0Jf9ePp7K+dexsuecFwM7agtv2Yr+7+K/sWiF3KVSe84HbtgNbrNUlHdMIYnO01pub/db/2eUobOg4OBOH40leOEPpq0I5GRwJ8IxBA9JqzHZoBlD0zVgWf/sG/8OQdnnaVljaNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783519305; c=relaxed/simple;
-	bh=YC/qCa48WRz1F+/u1eBG35P/dZUcvcWdqRTkbNtiX2E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IH7VMKqYhQPdFx772Q8zrLf3SRyI87+ZJQkYjPdNy7ATtj2KafbFSAIewUjI8F5MT5DiKnYkFtkQdmINZsEHTHyCqjI9h9Gr0He1y56CZDK+AO3Io1z6JLTAvcnzNEDN6YXVjdZ38QnPRiL6WwywAv2OIokre11B0xOFl9sQ16A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Apu/OFOx; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA26F1F000E9;
-	Wed,  8 Jul 2026 14:01:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783519303;
-	bh=9iuqA1JnRaIWvxE2q0j98cwoSE0yjUDKHKevIN01wxQ=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To;
-	b=Apu/OFOx4X6HeghfBzTIPllEGxDwqvapdQz8PF7LNNg9dqdzhoK8mu9wyjGR+7hKs
-	 V2MLFHaxAhv9b5v1fi+L8g/ZYWNT8+5SJiSPR2EIVgSc8ewS1nUU2M+FNihm8mQomc
-	 lQj6IoGpYmhyzplQY+9ghnXi8NmBfU6WueIKfv9wjz2Jw2Z046dFOD5lEuEs7iFF1k
-	 dTUAqQ5Yl7xd6L28zrKOCEShE5YjRSzhVPcudjlo+IzHPqvLo38V4OcZRW4oT9CGC8
-	 zb4ABjulHNgaDxMR3qIrvejR4OHvojRlHzp8vK6QgoR6YH/4rMFvPm5t1qdndGpDl1
-	 PGv9OPJBWnRtw==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id A57B0CE04B1; Wed,  8 Jul 2026 07:01:43 -0700 (PDT)
-Date: Wed, 8 Jul 2026 07:01:43 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Petr Pavlu <petr.pavlu@suse.com>,
-	Qingfang Deng <qingfang.deng@linux.dev>,
-	Breno Leitao <leitao@debian.org>,
-	Norbert Szetei <norbert@doyensec.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1783519403; c=relaxed/simple;
+	bh=5cxBzQsfLJdRoWvA5ssYYkPx4c8bS6l4OBynz9QZfLw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g8EschLoIUsCn9DF5OzJ5WSIIcKMcQbXu4DpVmnhFeYNgaLoimt+xXJO4GMtOEttuItaj4oczs8Aa+20nG9FuJGkV6lR7ZEtgoPfCXwHsxDdv56w/kZ2Bw13O9hxkdSfhToRyQaXMLm2WAyYMiqCOeTOto8fuqgBoj6fvuZ7zo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 44B196059E; Wed, 08 Jul 2026 16:03:19 +0200 (CEST)
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Taegu Ha <hataegu0826@gmail.com>, Kees Cook <kees@kernel.org>,
-	linux-ppp@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Guillaume Nault <gnault@redhat.com>, netdev@vger.kernel.org,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Aaron Tomlin <atomlin@atomlin.com>, linux-modules@vger.kernel.org
-Subject: Re: [PATCH net v2] ppp: defer channel free to an RCU grace period to
- fix pppol2tp RX UAF
-Message-ID: <b78eb36d-3d3e-4a08-ba8e-a1cdb084c41b@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <D9C0245B-608B-4884-8A09-F55BA4A9F948@doyensec.com>
- <de2616b3-6edf-4255-ba77-0674e225ab27@linux.dev>
- <akfjpBVML_1RFF91@gmail.com>
- <87111f02-5b7a-4185-8364-2faba650578b@linux.dev>
- <20260706092926.PIlrhRKz@linutronix.de>
- <0dfe59c2-bf60-40fe-90e6-d6e1003709d0@suse.com>
- <7ff3af97-1c10-4f46-84ae-ffbf757f7e9e@paulmck-laptop>
- <20260708091147.O1d41Vi0@linutronix.de>
+	Jakub Kicinski <kuba@kernel.org>,
+	<netfilter-devel@vger.kernel.org>,
+	pablo@netfilter.org
+Subject: [PATCH net 00/17] netfilter: updates for net
+Date: Wed,  8 Jul 2026 16:02:52 +0200
+Message-ID: <20260708140309.19633-1-fw@strlen.de>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260708091147.O1d41Vi0@linutronix.de>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305827-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[paulmck@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FORGED_RECIPIENTS(0.00)[m:bigeasy@linutronix.de,m:petr.pavlu@suse.com,m:qingfang.deng@linux.dev,m:leitao@debian.org,m:norbert@doyensec.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:hataegu0826@gmail.com,m:kees@kernel.org,m:linux-ppp@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:gnault@redhat.com,m:netdev@vger.kernel.org,m:mcgrof@kernel.org,m:da.gomez@kernel.org,m:samitolvanen@google.com,m:atomlin@atomlin.com,m:linux-modules@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[strlen.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:netfilter-devel@vger.kernel.org,m:pablo@netfilter.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[suse.com,linux.dev,debian.org,doyensec.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org,atomlin.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[paulmck@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-305828-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	HAS_REPLYTO(0.00)[paulmck@kernel.org]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	R_DKIM_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B8A5672723F
+X-Rspamd-Queue-Id: A893D7271DC
 
-On Wed, Jul 08, 2026 at 11:11:47AM +0200, Sebastian Andrzej Siewior wrote:
-> On 2026-07-07 09:39:01 [-0700], Paul E. McKenney wrote:
-> > Alternatives include:
-> > 
-> > o	Provide a patch like that above, but only execute the
-> > 	rcu_barrier() in some debug mode.  If your code works when
-> > 	that debug is enabled but does not otherwise, you add the
-> > 	rcu_barrier().
-> > 
-> > o	If debug is enabled, make rcu_do_batch() check the function
-> > 	before invoking it.  If the function is not mapped, issue a
-> > 	diagnostic, and don't try to invoke the function.  (But is
-> > 	there a sufficiently cheap way to check for the function not
-> > 	being mapped?)
-> 
-> In both cases you would see a backtrace and the name of the last
-> unloaded module. And since we don't see a lot of these reports, people
-> either don't run into this because it does not exist or RCU is quick
-> enough.
+Hi,
 
-Good point, the splat from calling the no-longer-mapped function should
-call out the offending module.  So maybe our debug code is good enough
-already.
+The following patchset contains Netfilter fixes for *net*.
 
-							Thanx, Paul
+Most of these are LLM fixes for old issues flagged by sashiko/LLMs.
+
+Many of these trigger drive-by-findings in sashiko. In particular:
+
+- many load/store tearing and missing memory barriers, races
+  etc. in ipset, esp. with GC and resizing.
+  Keeping the proposed patches spinning for yet-another-iteration
+  keeps legit fixes back, so I prefer to add these now and follow
+  up with other reports later.
+- flowtable work queue still has possible races with teardown,
+  but same rationale as with ipset: drive-by findings, not
+  problems coming with the flowtable IPIP changeset in this PR.
+- ever since unreadable frag skb support was added in 6.12, we can no
+  longer do: BUG_ON(skb_copy_bits( ...): it will fire with such skbs.
+  Mina Almasry is looking at similar patterns elsewhere in the stack.
+
+1) Guard skb->mac_header adjustment after IPv6 defragmentation in
+nf_conntrack_reasm.  From Xiang Mei.
+
+2) NUL-terminate ebtables table names before calling find_table_lock() to
+prevent stack-out-of-bounds reads.  Also from Xiang Mei.
+
+3) Zero the ebtables chainstack array, else error unwind may free bogus
+pointer when CPU mask is sparse.  All three issues date from 2.6 days.
+
+4) Ensure ebtables module names are c-strings, same bug pattern as 2).
+Bug added in 4.6.
+
+5) Fix catchall element handling for inverted lookups in nft_lookup. Fold the
+catchall lookup into ext before computing the match status.  Was like
+this ever since catchall elements got introduced in 5.13.
+From Tamaki Yanagawa.
+
+6-9) ipset updates from Jozsef Kadlecsik:
+- mark rcu protected areas correctly
+- address gc and resize clash in the comment extension
+- add/del backlog cleanup in the error path
+- allocate right size for the generic hash structure
+
+10-12): IPIP flowtable updates from Pablo Neira Ayuso:
+ - Use the current direction's route when pushing IPIP headers
+   Fix incorrect headroom and fragmentation offset calculations.
+ - Avoid hardware offload for IPIP tunnels due to lack of driver support.
+ - Support IPIP tunnels with direct xmit in netfilter flowtable.
+   dst_cache and dst_cookie are moved outside the union to share route
+   state across flows.  This is a followup to work done in 6.19 cycle.
+
+13) Don't BUG() on skb_copy_bits error. Handle unreadable fragments by
+either returning an error or restricting the copy operations to linear area,
+This became an issue when unreable frag support was merged in 6.12.
+
+14-16): IPVS updates from Yizhou Zhao:
+ - Pass parsed transport offset to IPVS state handlers.
+   update callback signatures.
+ - use correct transport header offset on state lookp in TCP.
+   As-is it was possible for ipv6 extension header data to be
+   treated as L4 header.
+ - same for SCTP.  This was also broken since 2.6 days.
+
+17) Ensure inner IP headers in ICMP errors are in the skb headroom after
+stripping outer headers. Add more checks for the length of inner headers.
+This was broken since 3.7 days.
+From Julian Anastasov.
+
+Please, pull these changes from:
+The following changes since commit 6d27e29a90bc6a717b97c6ddcd866db7bd8e4adc:
+
+  Merge branch 'ipv4-ipv6-fix-uaf-and-memory-leak-in-igmp-mld' (2026-07-08 14:41:04 +0200)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-26-07-08
+
+for you to fetch changes up to 3f7a535ff0fa627a0132803e4c2f903ceffcbc1c:
+
+  ipvs: ensure inner headers in ICMP errors are in headroom (2026-07-08 15:33:44 +0200)
+
+----------------------------------------------------------------
+netfilter pull request nf-26-07-08
+
+----------------------------------------------------------------
+
+Florian Westphal (3):
+  netfilter: ebtables: zero chainstack array
+  netfilter: ebtables: module names must be null-terminated
+  netfilter: handle unreadable frags
+
+Jozsef Kadlecsik (4):
+  netfilter: ipset: mark the rcu locked areas properly
+  netfilter: ipset: exclude gc when resize is in progress
+  netfilter: ipset: cleanup the add/del backlog when resize failed
+  netfilter: ipset: allocate the proper memory for the generic hash structure
+
+Julian Anastasov (1):
+  ipvs: ensure inner headers in ICMP errors are in headroom
+
+Pablo Neira Ayuso (3):
+  netfilter: flowtable: use dst in this direction when pushing IPIP header
+  netfilter: flowtable: IPIP tunnel hardware offload is not yet support
+  netfilter: flowtable: support IPIP tunnel with direct xmit
+
+Tamaki Yanagawa (1):
+  netfilter: nft_lookup: fix catchall element handling with inverted lookups
+
+Xiang Mei (2):
+  netfilter: nf_conntrack_reasm: guard mac_header adjustment after IPv6 defrag
+  netfilter: ebtables: terminate table name before find_table_lock()
+
+Yizhou Zhao (3):
+  ipvs: pass parsed transport offset to state handlers
+  ipvs: use parsed transport offset in TCP state lookup
+  ipvs: use parsed transport offset in SCTP state lookup
+
+ include/net/ip_vs.h                     |  3 +-
+ include/net/netfilter/nf_flow_table.h   |  7 +-
+ net/bridge/netfilter/ebtables.c         | 12 +++-
+ net/ipv6/netfilter/nf_conntrack_reasm.c |  5 +-
+ net/netfilter/ipset/ip_set_hash_gen.h   | 85 ++++++++++++++++---------
+ net/netfilter/ipvs/ip_vs_core.c         | 31 +++++----
+ net/netfilter/ipvs/ip_vs_proto_sctp.c   | 18 ++----
+ net/netfilter/ipvs/ip_vs_proto_tcp.c    | 11 +---
+ net/netfilter/ipvs/ip_vs_proto_udp.c    |  3 +-
+ net/netfilter/nf_flow_table_core.c      | 19 +++---
+ net/netfilter/nf_flow_table_ip.c        | 21 +++---
+ net/netfilter/nf_flow_table_offload.c   | 22 ++++++-
+ net/netfilter/nfnetlink_log.c           | 26 +++++---
+ net/netfilter/nfnetlink_queue.c         | 16 +++--
+ net/netfilter/nft_lookup.c              | 10 +--
+ net/netfilter/xt_u32.c                  | 16 +++--
+ 16 files changed, 196 insertions(+), 109 deletions(-)
+
+-- 
+2.54.0
+
 
