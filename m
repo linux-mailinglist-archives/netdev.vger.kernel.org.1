@@ -1,204 +1,241 @@
-Return-Path: <netdev+bounces-305650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305651-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 9gW+JLTpTWoLAAIAu9opvQ
-	(envelope-from <netdev+bounces-305650-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 08:09:56 +0200
+	id eXnKB7TqTWo7AAIAu9opvQ
+	(envelope-from <netdev+bounces-305651-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 08:14:12 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E957722124
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 08:09:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B34FA722183
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 08:14:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=jojbmrBi;
-	dmarc=pass (policy=none) header.from=linux.dev;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305650-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305650-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b="lG/5n0MP";
+	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305651-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305651-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B83C2304D748
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 06:06:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 87C2A30036EA
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 06:11:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 932C13839BC;
-	Wed,  8 Jul 2026 06:06:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 135823932DB;
+	Wed,  8 Jul 2026 06:11:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1632437D11F
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 06:06:44 +0000 (UTC)
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C1C7346E70;
+	Wed,  8 Jul 2026 06:11:47 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783490806; cv=none; b=WLZmWF5SEmw1jst6db6OqSs18xJwVF2NJE8W5TUElrfUtcQb/quzvYkRP2AnWXeRjA6R3qjJ2dWzA8q5DI6ZDlaCFHFkZ9vuKmp3WyxO7YmJSTW5v4SdEvSWMVZIcia7jSN23iwNuAcYQpRhcvqAtCoMyQyDn19JqHYlCLFf9m8=
+	t=1783491112; cv=none; b=lc6WRIYua8GSWvLFo3BUhswEtLLsSm1rBcsg4PhQQ1EthsnIsJ9nD3Hge8avdlOwHZGLORHHexXLLBAGYy2knCWUaW5hjdIDYWbZP+nPD2wGIfV/jfJ66rtW7QcqRhS6KJmlMiaRfTthNIYLUaLMd5U6p0s06pez3BpzR+oRJQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783490806; c=relaxed/simple;
-	bh=cJAKCsATZu1hv6z4ZbiF7Btxv6VeiniLdNRhSY8UXCQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ndoxlwKV9ukp/2QSxMd526/JXqyKUYWXGwVREmLadYDqLqBAFOfdU9Ghcn29EzbNBE8I28NkTqQNuykvNWDLNRKsuD9KCg73W+ScY5dk+ZVf7IKTy9JNYz7/hwmjafhN5qmIEB3zSuhkHFWeuWu7XtvI7AU6WEcyntIhIK9amJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jojbmrBi; arc=none smtp.client-ip=91.218.175.189
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783490802;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wCj9Nnj2Mldbj02SmTcTXwvZVO75xuL0hZ3WqcMIS0M=;
-	b=jojbmrBiVYDRlWy6EYAO/pY6uH0o0estbGyedKzSDvIJi3UvWSoYrheT/ogzoKWWbrXvPy
-	qhw8VFN4QsCMIDh9vv9UomROQjh6iJxBcI40J/yVgmu9KmjQG2R9Ku2EFaSY9CPFyuzGZ1
-	TKroHwwYeD7+CKgyPi9ePMq3lKLSJDI=
-From: xuanqiang.luo@linux.dev
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Ido Schimmel <idosch@nvidia.com>
-Cc: Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-Subject: [PATCH net-next v3 2/2] ipv4: snapshot dst.dev in ip_rt_send_redirect() and ip_rt_get_source()
-Date: Wed,  8 Jul 2026 14:05:37 +0800
-Message-ID: <20260708060537.17188-3-xuanqiang.luo@linux.dev>
-In-Reply-To: <20260708060537.17188-1-xuanqiang.luo@linux.dev>
-References: <20260708060537.17188-1-xuanqiang.luo@linux.dev>
+	s=arc-20240116; t=1783491112; c=relaxed/simple;
+	bh=NCDSq0bVfwbwV1n+rWGUYBeBmBz37eP6OqsknRr0HPo=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=mjBDd3uW/ND5ULtA/nAbDrul4SuAMWh/cLgo2A2PHUp0i7FSNKdTL0hz9X1PBiXjTCYugCCikBkdUrfbBA6cZbcoI3O78f4mijEAQwxA4/RDDzi6iZFa9jziQCcyokBcj+5XiaL/xbp9IWzo+HpyE0UzJ1HNKDl8EqHMrgvOJJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=lG/5n0MP; arc=none smtp.client-ip=206.189.21.223
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:Content-Type:
+	Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	Content-Transfer-Encoding:Message-Id:References:To; bh=xY7vm8/nb
+	YuNfFUTtT+pfhWgkWxH7nBjPPBDaOT7fcE=; b=lG/5n0MPPBzKoEiu8BMWR5Z5z
+	qkVLYzxcafDUoTdqexCS3EKJ5//4GaAslhjFpeQU3a25V7sJvI2DrHZfVo42VtLR
+	tmhccIbAT+55MEFq3bt8M2B9rFZmN3a0rZqGLzQDfl0+CK5uBNf5wZhe3ZBYfYuj
+	PXMC6eJiY0NYPzOqIA=
+Received: from smtpclient.apple (unknown [211.102.241.101])
+	by web3 (Coremail) with SMTP id ygQGZQAndZIC6k1q6sUIAw--.47788S2;
+	Wed, 08 Jul 2026 14:11:14 +0800 (CST)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.8\))
+Subject: Re: [PATCH nf] ipvs: make destination flags atomic
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+In-Reply-To: <41c3d792-af7d-5582-5057-ac3df5f7bfd6@ssi.bg>
+Date: Wed, 8 Jul 2026 14:11:04 +0800
+Cc: Simon Horman <horms@verge.net.au>,
+ David Ahern <dsahern@kernel.org>,
+ Ido Schimmel <idosch@nvidia.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ Florian Westphal <fw@strlen.de>,
+ Phil Sutter <phil@nwl.cc>,
+ Alexander Frolkin <avf@eldamar.org.uk>,
+ netdev@vger.kernel.org,
+ lvs-devel@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org,
+ stable@vger.kernel.org,
+ Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+ Ao Wang <wangao@seu.edu.cn>,
+ Xuewei Feng <fengxw06@126.com>,
+ Qi Li <qli01@tsinghua.edu.cn>,
+ Ke Xu <xuke@tsinghua.edu.cn>,
+ zhaoyz24@mails.tsinghua.edu.cn
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <91509A0C-9E4A-4F0E-A45C-ABD29396067E@mails.tsinghua.edu.cn>
+References: <20260707085706.96322-1-zhaoyz24@mails.tsinghua.edu.cn>
+ <41c3d792-af7d-5582-5057-ac3df5f7bfd6@ssi.bg>
+To: Julian Anastasov <ja@ssi.bg>
+X-Mailer: Apple Mail (2.3826.700.81.1.8)
+X-CM-TRANSID:ygQGZQAndZIC6k1q6sUIAw--.47788S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxCw45KFykZF18uFyUtry8uFg_yoW5Ww1Up3
+	y7KFZ5KayDKr9a9r12yw4aqFW8C3WkGa4jyr1Dtw17Z3s0vr1Yqr93tFW5CFy7ZFZ3Z3WI
+	vFWjq3srAasFyFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUP014x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
+	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_GFv_Wrylc2xSY4AK67
+	AK6r47MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
+	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc4
+	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
+	xVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
+	1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRETKZJUU
+	UUU==
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAgACAWpNfR6iqQAAsO
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
+	MV_CASE(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305650-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305651-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER(0.00)[xuanqiang.luo@linux.dev,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:dsahern@kernel.org,m:idosch@nvidia.com,m:horms@kernel.org,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:luoxuanqiang@kylinos.cn,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:horms@verge.net.au,m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:avf@eldamar.org.uk,m:netdev@vger.kernel.org,m:lvs-devel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:stable@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:zhaoyz24@mails.tsinghua.edu.cn,m:ja@ssi.bg,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[verge.net.au,kernel.org,nvidia.com,davemloft.net,google.com,redhat.com,netfilter.org,strlen.de,nwl.cc,eldamar.org.uk,vger.kernel.org,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xuanqiang.luo@linux.dev,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,kylinos.cn:email,linux.dev:from_mime,linux.dev:dkim,linux.dev:mid,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ssi.bg:email,mails.tsinghua.edu.cn:from_mime,mails.tsinghua.edu.cn:dkim,mails.tsinghua.edu.cn:mid,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2E957722124
+X-Rspamd-Queue-Id: B34FA722183
 
-From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+Hi Julian,
 
-rt_flush_dev() can replace rt->dst.dev with blackhole_netdev while RCU
-readers are running.  ip_rt_send_redirect() and ip_rt_get_source() both
-read rt->dst.dev more than once and use the results in one operation.
 
-If rt->dst.dev changes between those reads, the operation can use values
-from two devices.  For example, ip_rt_send_redirect() can use in_dev from
-the old device and the L3 master ifindex from blackhole_netdev.
+> On Jul 8, 2026, at 03:18, Julian Anastasov <ja@ssi.bg> wrote:
+>=20
+>=20
+> Hello,
+>=20
+> On Tue, 7 Jul 2026, Yizhou Zhao wrote:
+>=20
+>> is_unavailable() in the SH scheduler reads dest->flags from the =
+packet
+>> scheduling path while holding only the RCU read lock.  The same word =
+is
+>> updated by read-modify-write operations from connection accounting =
+and
+>> destination update paths, for example ip_vs_bind_dest(),
+>> ip_vs_unbind_dest(), and __ip_vs_update_dest().
+>>=20
+>> The RCU read lock only protects the destination lifetime; it does not
+>> serialize accesses to dest->flags.  A racing plain load or RMW update =
+can
+>> therefore observe stale state or lose an AVAILABLE/OVERLOAD bit =
+update,
+>> which can make the scheduler choose an overloaded destination or =
+report no
+>> available destination even though one should be usable.
+>=20
+> While the patch correctly serializes the concurrent
+> modifications for the flags, we can not claim that the scheduler
+> will not choose an overloaded or unavailable destination.
+> The patch does not change the fact that we can work with
+> stale data.
+>=20
+> We can compare 3 solutions, from fast to slow:
+>=20
+> 1. atomic_read or test_bit
+> - no memory barriers for the readers
+> - no memory ordering (=3D> stale data)
+>=20
+> PRO:
+> - serializes RMW operations
+>=20
+> CON:
+> - readers can use old values
+> - writers may need to synchronize while changing
+> the flags, eg. to check the thresholds and update the
+> flags in atomic way. We do not do this.
+>=20
+> 2. Use refcount_inc_not_zero(&dest->available) from readers
+>=20
+> - and put the ref immediately or later:
+>=20
+> smp_mb__before_atomic();
+> refcount_dec(&dest->available);
+>=20
+> - alternative: RMW such as atomic_fetch_add
+>=20
+> - writers can synchronize by using the IP_VS_DEST_F_AVAILABLE
+> flag and then to inc/dec &dest->available when the
+> flag changes
+> - the same can be done for &dest->not_overloaded and
+> IP_VS_DEST_F_OVERLOAD
+> - PRO: readers are serialized perfectly with the
+> changed value, new packets will detect the changes
+> immediately
+> - CON:
+> - 2 full memory barriers for the readers
+> - writers may need to synchronize while changing
+> the flags
+>=20
+> 3. read_lock/write_lock
+> - PRO: can modify more things under write lock
+> - CON: full memory barriers
+>=20
+> With this patch you choose solution 1.
+> The other solutions can be expensive for the fast path.
+> Lets fix the commit message. Also, it is better to fix the
+> scripts/checkpatch.pl warnings about the 'if' conditions,
+> even if they are not introduced now.
+>=20
+> Regards
+>=20
+> --
+> Julian Anastasov <ja@ssi.bg>
 
-Read rt->dst.dev once in these two functions and use the snapshot for the
-later device accesses.
+Thank you for your suggestions.
 
-Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
----
- net/ipv4/route.c | 31 ++++++++++++++++++-------------
- 1 file changed, 18 insertions(+), 13 deletions(-)
+We have posted a v2 patch at:
+=
+https://lore.kernel.org/netfilter-devel/20260708060454.20534-1-zhaoyz24@ma=
+ils.tsinghua.edu.cn/
 
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index b668375df71e2..4fed07cae7da2 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -874,21 +874,23 @@ void ip_rt_send_redirect(struct sk_buff *skb)
- {
- 	struct rtable *rt = skb_rtable(skb);
- 	struct in_device *in_dev;
-+	struct net_device *dev;
- 	struct inet_peer *peer;
--	struct net *net;
- 	int log_martians;
-+	struct net *net;
- 	int vif;
- 
- 	rcu_read_lock();
--	in_dev = __in_dev_get_rcu(rt->dst.dev);
-+	dev = dst_dev_rcu(&rt->dst);
-+	in_dev = __in_dev_get_rcu(dev);
- 	if (!in_dev || !IN_DEV_TX_REDIRECTS(in_dev)) {
- 		rcu_read_unlock();
- 		return;
- 	}
- 	log_martians = IN_DEV_LOG_MARTIANS(in_dev);
--	vif = l3mdev_master_ifindex_rcu(rt->dst.dev);
-+	vif = l3mdev_master_ifindex_rcu(dev);
- 
--	net = dev_net(rt->dst.dev);
-+	net = dev_net_rcu(dev);
- 	peer = inet_getpeer_v4(net->ipv4.peers, ip_hdr(skb)->saddr, vif);
- 	if (!peer) {
- 		rcu_read_unlock();
-@@ -1287,29 +1289,32 @@ void ip_rt_get_source(u8 *addr, struct sk_buff *skb, struct rtable *rt)
- {
- 	__be32 src;
- 
--	if (rt_is_output_route(rt))
-+	rcu_read_lock();
-+	if (rt_is_output_route(rt)) {
- 		src = ip_hdr(skb)->saddr;
--	else {
--		struct fib_result res;
-+	} else {
-+		struct net_device *dev = dst_dev_rcu(&rt->dst);
-+		struct net *net = dev_net_rcu(dev);
- 		struct iphdr *iph = ip_hdr(skb);
-+		struct fib_result res;
- 		struct flowi4 fl4 = {
- 			.daddr = iph->daddr,
- 			.saddr = iph->saddr,
- 			.flowi4_dscp = ip4h_dscp(iph),
--			.flowi4_oif = rt->dst.dev->ifindex,
-+			.flowi4_oif = dev->ifindex,
- 			.flowi4_iif = skb->dev->ifindex,
- 			.flowi4_mark = skb->mark,
- 		};
- 
--		rcu_read_lock();
--		if (fib_lookup(dev_net(rt->dst.dev), &fl4, &res, 0) == 0)
--			src = fib_result_prefsrc(dev_net(rt->dst.dev), &res);
-+		if (fib_lookup(net, &fl4, &res, 0) == 0)
-+			src = fib_result_prefsrc(net, &res);
- 		else
--			src = inet_select_addr(rt->dst.dev,
-+			src = inet_select_addr(dev,
- 					       rt_nexthop(rt, iph->daddr),
- 					       RT_SCOPE_UNIVERSE);
--		rcu_read_unlock();
- 	}
-+	rcu_read_unlock();
-+
- 	memcpy(addr, &src, 4);
- }
- 
--- 
-2.43.0
+The v2 patch updates the commit message with more conservative
+wording, and fixes the checkpatch logical-continuation warnings.
+
+Regards,
+Yizhou=
 
 
