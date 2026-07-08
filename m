@@ -1,162 +1,185 @@
-Return-Path: <netdev+bounces-305854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305855-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id TlnfGQBmTmrNLwIAu9opvQ
-	(envelope-from <netdev+bounces-305854-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 17:00:16 +0200
+	id ccPKFCNmTmrZLwIAu9opvQ
+	(envelope-from <netdev+bounces-305855-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 17:00:51 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55662727B36
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 17:00:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 078B3727B53
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 17:00:50 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b="Yb OHKqa";
-	dmarc=pass (policy=none) header.from=lunn.ch;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305854-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305854-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=YBNNycRn;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305855-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305855-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 39BE03090D5B
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 14:36:27 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7AB4F3114FFE
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 14:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14E4D44B662;
-	Wed,  8 Jul 2026 14:35:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D990F299937;
+	Wed,  8 Jul 2026 14:36:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38A43AC0F4;
-	Wed,  8 Jul 2026 14:35:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC26115FA81
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 14:36:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783521357; cv=none; b=dCrP9hBL6UPtc4eS2L7AIqHdPASrzU1JU+jkapiB/ARN51XPq1Ngg+6jtFvQWwqHio5h1PIci8DNINo7L5jnuZlT8AJa1hhKSjtMQCs2Fxrs74DDYaFrY6MyLtj1kvqAcA/kD6TuVXTBayP18VEiYp96rzxgt4gYpsLEcFHGmL8=
+	t=1783521400; cv=none; b=khqRiPaiR/FU8NY6Y+goNhTKn3Of1D7ZT6k+bA4m5mWpGBdLDQf5n/hKwo5ILEfETbmc95KOfpxKOTMnCJ0GVwdaLiZcON0xtzbEGn+tLd+aJpPKBQLq6pInnbpGt8TVsSsGFTx3rV06c2zEPkmwC3fD/bXQVQLsh1D8TDEHY1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783521357; c=relaxed/simple;
-	bh=y3rT/mjcH4xI9BKcUNq8uwljgKi3IFXGXPepiCwt2w4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lgXzmFaCWYuybWARiMj29hTzm8trfwRTHoesRW1vFg3rMMxdizndU2uwWV7pn0E3ylGekPQXN9mBcez0OXGINFPdhECJ3mfPIW51/N+h7AT8aodqQU8S/1mBdSrMe9UTDhhcIcl3e28hi08bNllXHqNIu+2H9t/DQVSilXGaWwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=YbOHKqa1; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=3RsIPvZTD5nyIx31RnZBoJDbs5La8Zh1JeU+CoAk0mc=; b=Yb
-	OHKqa1T/B64IUbHGnRIp5MUkE/sqUTcfU+fOTp4OdCC8IXPMUblg7xAEbtfI6mPatQsy5wLoEIfw5
-	k9FEupjoPV+I/yDDkkQBFzXdcyd2+uZmyhbI8FrJpRIj2U70jU17dy+IY9pmVK3R++4cIYekuR7l7
-	ftGjZ2nL0usWUlI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1whTNB-00BKwC-V6; Wed, 08 Jul 2026 16:35:37 +0200
-Date: Wed, 8 Jul 2026 16:35:37 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Biao Huang <biao.huang@mediatek.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	maxime.chevallier@bootlin.com, rmk+kernel@armlinux.org.uk,
-	kernel@collabora.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH net-next 1/6] dt-bindings: net: mediatek-dwmac: add
- support for MT8189 SoC
-Message-ID: <6ea11726-8d50-411e-afab-da346e09ab9b@lunn.ch>
-References: <20260707-dwmac-mediatek-mt8189-v1-0-17f345eaaca3@collabora.com>
- <20260707-dwmac-mediatek-mt8189-v1-1-17f345eaaca3@collabora.com>
- <b810b9cd-8f5e-4c9d-8496-908aae55dac1@lunn.ch>
- <8304b0a704c8db697767584b8c34388f07ba401d.camel@collabora.com>
+	s=arc-20240116; t=1783521400; c=relaxed/simple;
+	bh=e7CsZdXBNm4jSvihEswzJs+yRhoQ2Lnrx69XW2/Igd0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Ci51/sillfF2FpfhURmb9/wgWU/Yzf2V6KMsovjKlhC4OBX2Dyg3bWjg6sAfnWXUuYsGg+ImZsaBCROfQl4JfemQ1DrNS2ky4eNahAFkoLMovpmG3iXuYTLgSikgs7ER7rh4sPc0wPELhdY0KBQMBezgqux31HoVEc+oqgv2i6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YBNNycRn; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E16F1F00A3A;
+	Wed,  8 Jul 2026 14:36:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783521399;
+	bh=+sg0cd/dOtDSeooJg4oAtROLzWI4irmZPtRfZt3Xg10=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=YBNNycRn/HVArimdqvQVG4cesmyWfHBX8eimHeL+dpAPEbq1wd0Etn0ggTXixdepX
+	 LakOxAH1a/MpcAynAKGAKGL7wofGaH5cyk/+RQ1BW7YRYZIIOCpRaE5rpzZBozdD9J
+	 4WYfeWT3JIY00jASrSQLGOuk7ce3jcyYi++hT3tuHpOeQgffT8mixCleLJWzqtxK4x
+	 iQD33PxJtLJRCBcigs/Fvd+FonAACgGKhQgSvHAswQrz7Bpa3g02MQb/jNTqkQ1Izi
+	 6DGRyEZqZzW87Q6t2A2XzB0ugroPFEMl/fLT7n1JddWKhSrYDLtohNbJKl19h8AXQj
+	 Qz0ELMY7WW3eg==
+From: Simon Horman <horms@kernel.org>
+To: mheib@redhat.com
+Cc: Simon Horman <horms@kernel.org>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	corbet@lwn.net,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch
+Subject: Re: [PATCH iwl-next v2 1/2] i40e: move ATR sample rate from ring to PF level
+Date: Wed,  8 Jul 2026 15:36:01 +0100
+Message-ID: <20260708143601.1491656-1-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260701093830.948756-1-mheib@redhat.com>
+References: <20260701093830.948756-1-mheib@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <8304b0a704c8db697767584b8c34388f07ba401d.camel@collabora.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-305855-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305854-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	FORGED_RECIPIENTS(0.00)[m:louisalexis.eyraud@collabora.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:richardcochran@gmail.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:biao.huang@mediatek.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:maxime.chevallier@bootlin.com,m:rmk+kernel@armlinux.org.uk,m:kernel@collabora.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:linux-stm32@st-md-mailman.stormreply.com,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:matthiasbgg@gmail.com,m:mcoquelinstm32@gmail.com,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:mheib@redhat.com,m:horms@kernel.org,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:corbet@lwn.net,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,collabora.com,mediatek.com,foss.st.com,bootlin.com,armlinux.org.uk,vger.kernel.org,lists.infradead.org,st-md-mailman.stormreply.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,lunn.ch:from_mime,lunn.ch:dkim,lunn.ch:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 55662727B36
+X-Rspamd-Queue-Id: 078B3727B53
 
-> On Tue, 2026-07-07 at 14:42 +0200, Andrew Lunn wrote:
-> > > +  - if:
-> > > +      properties:
-> > > +        compatible:
-> > > +          contains:
-> > > +            enum:
-> > > +              - mediatek,mt8189-gmac
-> > > +    then:
-> > > +      properties:
-> > > +        clocks:
-> > > +          items:
-> > > +            - description: MAC Main clock
-> > > +            - description: PTP clock
-> > > +            - description: RMII reference clock provided by MAC
-> > 
-> > Since this is a MAC, it sounds like it is consuming its own clock?
-> 
-> In the driver ([1]), this clock is described as being only used and
-> needed in RMII when MAC provides the reference clock, and useless
-> otherwise (RGMII/MII or RMII when PHY provides the reference clock).
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+i40e: move ATR sample rate from ring to PF level
 
-So it sounds like this is a clock output, going to the PHY, as its
-reference clock input. So ideally, the PHY should consume this clock,
-not the MAC.
+This commit moves the ATR sample rate configuration from the per-ring level
+to the PF level. It initializes the sample rate globally during software init
+and updates the fast path to reference the PF structure.
 
-> Its use and configuration also depends on the "mediatek,rmii-clk-from-
-> mac" vendor property ([2]) presence in devicetree.
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> index a04683004a567..4d4d4b07a0f3a 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+[ ... ]
+> @@ -3454,12 +3454,7 @@ static int i40e_configure_tx_ring(struct i40e_ring *ring)
+>  		ring->xsk_pool = i40e_xsk_pool(ring);
+>  
+>  	/* some ATR related tx ring init */
+> -	if (test_bit(I40E_FLAG_FD_ATR_ENA, vsi->back->flags)) {
+> -		ring->atr_sample_rate = I40E_DEFAULT_ATR_SAMPLE_RATE;
+> -		ring->atr_count = 0;
+> -	} else {
+> -		ring->atr_sample_rate = 0;
+> -	}
+> +	ring->atr_count = 0;
 
-This makes it sounds like it is historically wrong, and the patch is
-just extending this to the new device.
+[Severity: High]
+Does removing this per-ring initialization remove the protection against
+dynamic ethtool flag toggles?
 
-Do you have a board using RMII? Can you list the clock in the PHY
-node, not the MAC, and see if it still works?
+Previously, if the ring was configured while Flow Director ATR was disabled,
+the ring's sample rate was cached to 0 in i40e_configure_tx_ring(). This
+prevented descriptor injection even if the PF flag was later toggled on
+without a ring reset.
 
-Ideally, for a new device, we should not repeat past errors.
+[ ... ]
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+> index 894f2d06d39d0..b36e0fc9b31d2 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+[ ... ]
+> @@ -2879,7 +2879,7 @@ static void i40e_atr(struct i40e_ring *tx_ring, struct sk_buff *skb,
+>  		return;
+>  
+>  	/* if sampling is disabled do nothing */
+> -	if (!tx_ring->atr_sample_rate)
+> +	if (!pf->atr_sample_rate)
+>  		return;
 
-	 Andrew
+[Severity: High]
+Can this global check lead to a hardware Malicious Driver Detection (MDD)
+event if ethtool flags are modified dynamically?
+
+If an administrator performs the following sequence:
+
+1. Disables flow-director-atr via ethtool.
+2. Disables ntuple (which resets the ring and sets tx_ctx.fd_ena = 0).
+3. Re-enables flow-director-atr.
+
+The final step does not trigger a ring reset, so fd_ena remains 0 in the
+hardware queue context.
+
+However, I40E_FLAG_FD_ATR_ENA is now true, and pf->atr_sample_rate is
+globally set to a non-zero value.
+
+Will i40e_atr() now proceed and inject FDIR descriptors into a TX queue
+that is not configured for FDIR?
+
+If so, does this cause the hardware to trigger an MDD event and hang the
+TX queue?
 
