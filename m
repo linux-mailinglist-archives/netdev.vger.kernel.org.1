@@ -1,133 +1,416 @@
-Return-Path: <netdev+bounces-305968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305969-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id NyQXKVyfTmqtQwIAu9opvQ
-	(envelope-from <netdev+bounces-305968-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:05:00 +0200
+	id bUE6AxWiTmp6RAIAu9opvQ
+	(envelope-from <netdev+bounces-305969-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:16:37 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D504D729C5A
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:04:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 82925729D39
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:16:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Y9lREdGE;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305968-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305968-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="XprCJY1/";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305969-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305969-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 86ABF302FA96
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 19:04:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3C4F6308E56A
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 19:14:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87770370AD0;
-	Wed,  8 Jul 2026 19:04:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0901D3CF047;
+	Wed,  8 Jul 2026 19:14:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8107043933E;
-	Wed,  8 Jul 2026 19:04:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB1CC3C5DA1
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 19:14:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783537497; cv=none; b=lRE4oWbUHSj4W9J7lk1mBCIPYxyt1EK4zV5TfhIXeP/xAFxjGvO/t50h2CcwEJ7Ge0Q5xoDfrUOotbUOirSxG2TyAcmVdlYZ2PdR6+ZAHjwcbvwxaeaCSz3Uuk2V6AyxavL0zusg+dgAINpGb5mbEItElmG+XKDybx73pPAqDT8=
+	t=1783538058; cv=none; b=XF0M2/TuY34dK9dfrOOOL+8BK8bjrMGrkCbzxbes12nwjuAAbhd3TrZfq0sCwlINHyaFSpSmiF9lm6zMn8i7gEZJK4G4GbUetHwDDkBnOumS6/mSrTXQVtj85sdNJP9FSDKSqXmYvnKKJudnkoLmPQefYsXOQcNjJZyW4573m9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783537497; c=relaxed/simple;
-	bh=tPH9DICekdlZbynKMclkIKeubaFZz/dgqiOwKq97EIM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ujDvVKAQPFToNHlz8NF/WddiDCKoFWaGiLZnm0nTpA82+ZEDUe7cWFVNWy3IFZ+g92qETsud5AAOPXuThI4tdxCorAdGMKvjQwomQ9ZznbPI4yJ/NaxFkMhWpTl40fm+U6nFRBrP3Jpx3li4jwPrm8w8SBA6DkQNFDHf/Rr7oQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y9lREdGE; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD2491F000E9;
-	Wed,  8 Jul 2026 19:04:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783537496;
-	bh=P77UWkg5VroY5vpeRPWTAH/eSCjDlL6nr9xgv0/Fd6I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Y9lREdGE2X8+jzoVKSg32WHZlgvfm9WUnyhAs7lCBVlPjSEGUlqc/9BP+Khb87TWw
-	 PcMlY0SMlJfW7z5yAXD6XGxU1f6aI/OMTQSmS7d13+3zao6azE0jjjNtfxNi+lnlOM
-	 sWWXqZjKVt65mmWHcRaexgAleBoEjR2/r6chFprmV0rV5/Fc8hfKGMVt8YRmhWiZjF
-	 Shr/s9UsWMHEg5uMVvvZOfDGhEU7pSazhugTTPIYeBAbr99/0zSWXWRo1OqeDTT1l2
-	 pNgcyFJl4jk3K9Fegi7OPac0d4gLGiWjIsAk8J9vfckBKJ/e3+3j4Ziuu0ScLX865Z
-	 /hEAc3FieTDEA==
-Date: Wed, 8 Jul 2026 20:04:51 +0100
-From: Simon Horman <horms@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Runyu Xiao <runyu.xiao@seu.edu.cn>, laforge@gnumonks.org,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, osmocom-net-gprs@lists.osmocom.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	jianhao.xu@seu.edu.cn
-Subject: Re: [PATCH net-next] gtp: annotate PDP lookups under RTNL
-Message-ID: <20260708190451.GM1364329@horms.kernel.org>
-References: <20260701123925.3193089-1-runyu.xiao@seu.edu.cn>
- <20260707142820.GG1364329@horms.kernel.org>
- <ak0SYEOvw6K_8C_w@chamomile>
- <20260708103525.GJ1364329@horms.kernel.org>
- <8d5fe948-6979-46be-866a-69a98ee391d8@redhat.com>
- <20260708183252.GL1364329@horms.kernel.org>
+	s=arc-20240116; t=1783538058; c=relaxed/simple;
+	bh=ZlefMp0qwwBvdrQmCZdmTlurpVHr17eYlPh5Ql4Sbys=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kqyjFPO3IO9ow8z6XeLfL0OPbCnhBT+7VJYJNFjGC83s5OE5a0Dduo+cYaEuGV/DE1uKo/RwMP2jSSwZVGNtnYr82vKm6U/xSVU2JnQoabPynQ8fLTV/IsZmuNKrvOiNLjzSHCbGQQTO8qfsSfi2UAon53RbgcCzHTlSNtZxzF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XprCJY1/; arc=none smtp.client-ip=209.85.208.45
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-698aa8d4dafso1066999a12.0
+        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 12:14:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783538054; x=1784142854; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=BKdeyh5qDiS0BQge1087oDJUBrqtE39YPXs8iI8Zre0=;
+        b=XprCJY1/6JRjFlTMaAKscLYOMXrh3fRGQnciWhToff+AQaeqea4fdarITbf6NG0l1T
+         EDe5ma4POsAMHRcXm50CHl/sY30d4Gfofc4bypGQQFka3qNrTVrbVkK3hRE/qqNprlDp
+         gV/DCDna1VNr699vXgZZmRquELrsGqIvJMVauxieKMF1T0LajSuGTbCU/Z6OOmXFWyw5
+         0ctUR+WjkU5PfncR81Ljz3cLZwObvjkMjAhgfjyCYkglKI8inepVw0JeaXMoa4xH5p7y
+         3l+eMmyEAw6dxN8TBG+elmkzjFg04ss0LCfZBTXbR63nND/8v1EzFYuJWYAegZDP6s/j
+         k2lQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783538054; x=1784142854;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=BKdeyh5qDiS0BQge1087oDJUBrqtE39YPXs8iI8Zre0=;
+        b=i8KqgSlJhYMUIrvoRwl6PCXQ00x7MdVbOYHkv8yP8JijcMzZo/id8Dqtd9Un5WbDPJ
+         faf2l8jrf3B6fmzg6PoOEK2EULvZPMZeQ8ZdjmfjgfWftss5pCFo1pJXL9WoGn94frpi
+         402Zq2g1sHd6zTvPGW/OFybucvM0mHfddmaUP8AI+f6ZrFkjwJmnndFW3xXs2v2vQ7Ld
+         lHAMwsuyV5UfGvOuh5zWfPoaElGIHLBO7dhGt9mp9unneImBKI2CKeSDYQdCGwexDdMz
+         FtJumYGw1ntpvXaNSHrNqR655kcXbI9FFaVDLePy7qMVga003xvlOj4yD2uG9gxP46PX
+         jX7A==
+X-Forwarded-Encrypted: i=1; AHgh+Rr6m5w3duyw8MIzvQfb2MmTnSimqh/rNMfzXPqJuQJ3YhYSYIi5vMESsJGdpNzfGmlVvtKsM6A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLh/EbZXoKLJhYZUOgXG25JzOMgCsX+phddSHo95GgyxnxZI18
+	XA7VjUAGb1WgeSItPmZM7CI4dsAM3MiXOCe1+pFTi9pFlkP+QkRHzQGo
+X-Gm-Gg: AfdE7ckpalqek7I7Gsp0qroHdrYk5owa1CrQuXrO9LZm11QG8r/GL/ikNvx0MeeoT6P
+	mgqkWx/EgRRmv/77fsbgtO/3cTash641Rc4a1VcT27hzAmdnApftHFUFJbpQuTzczU1Jm3aMu5R
+	OE/YHP2J46h/VoeFcB5w7tO2xj03rQDmOO9gRlr0zF3UibEA8xJ4kIV/Y2MN8BDWsbHOdM2+BBN
+	Ad87wb+XwUDAkUx8gLpcR7epL3yMUcpo8hqb9X/cHdzFhjxC5axIfXUpyI+elTTJpE2IYvHibY3
+	jriCg7Mmii5s3ecEIGJCWWtQZbHURLZrEDgES57dH2ZFZOH2Mg5WgxFmNw8Ghst9w7k54svZl22
+	t7SJbFt2MYmXYLsHg66Wd9RxD4d0garOC522EcIPuzvIucg4zvAsNs9/xcEtu11I+/nV/50Nc02
+	nEvigz0fr7knnGibwkOANKaw2EKYk3iANEI+yBPuEHkaB59bedr1OQU7SRqjQ1HL7TEQG3PjUNZ
+	XuSozFl+lvbh509P5+iruo4+XCnWFo12KgzFk4LfrdjSQj+tYb1/MTsY3EnDBk8l97VrKhHLpfo
+	k2WM/wIF65eyxCowbyUiNvA=
+X-Received: by 2002:a05:6402:3207:b0:698:76b8:e552 with SMTP id 4fb4d7f45d1cf-69ab446345cmr1638678a12.2.1783538054086;
+        Wed, 08 Jul 2026 12:14:14 -0700 (PDT)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-69aa6dba523sm2645976a12.0.2026.07.08.12.14.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Jul 2026 12:14:13 -0700 (PDT)
+Message-ID: <edfca509-860d-4f10-b84d-3f7249bc1488@gmail.com>
+Date: Wed, 8 Jul 2026 21:14:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260708183252.GL1364329@horms.kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 nf-next 7/7] netfilter: nft_flow_offload: Add
+ bridgeflow to nft_flow_offload_eval()
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>,
+ Phil Sutter <phil@nwl.cc>, Nikolay Aleksandrov <razor@blackwall.org>,
+ Ido Schimmel <idosch@nvidia.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Stanislav Fomichev <sdf.kernel@gmail.com>,
+ Samiullah Khawaja <skhawaja@google.com>, Hangbin Liu <liuhangbin@gmail.com>,
+ Krishna Kumar <krikku@gmail.com>, Martin Karsten <mkarsten@uwaterloo.ca>,
+ netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ bridge@lists.linux.dev
+References: <20260707091045.967678-1-ericwouds@gmail.com>
+ <20260707091045.967678-8-ericwouds@gmail.com> <ak4d89hkh0Jvcp2W@chamomile>
+From: Eric Woudstra <ericwouds@gmail.com>
+Content-Language: en-US
+In-Reply-To: <ak4d89hkh0Jvcp2W@chamomile>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305968-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	TAGGED_FROM(0.00)[bounces-305969-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:fw@strlen.de,m:phil@nwl.cc,m:razor@blackwall.org,m:idosch@nvidia.com,m:kuniyu@google.com,m:sdf.kernel@gmail.com,m:skhawaja@google.com,m:liuhangbin@gmail.com,m:krikku@gmail.com,m:mkarsten@uwaterloo.ca,m:netdev@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:bridge@lists.linux.dev,m:andrew@lunn.ch,m:sdfkernel@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:pablo@netfilter.org,m:runyu.xiao@seu.edu.cn,m:laforge@gnumonks.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:osmocom-net-gprs@lists.osmocom.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,strlen.de,nwl.cc,blackwall.org,nvidia.com,gmail.com,uwaterloo.ca,vger.kernel.org,lists.linux.dev];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D504D729C5A
+X-Rspamd-Queue-Id: 82925729D39
 
-On Wed, Jul 08, 2026 at 07:32:52PM +0100, Simon Horman wrote:
-> On Wed, Jul 08, 2026 at 01:10:58PM +0200, Paolo Abeni wrote:
-> > On 7/8/26 12:35 PM, Simon Horman wrote:
-> > > On Tue, Jul 07, 2026 at 04:51:12PM +0200, Pablo Neira Ayuso wrote:
 
-...
 
-> > >> I think this patch is not correct.
-> > > 
-> > > Hi Pablo,
-> > > 
-> > > Of course you are correct.
-> > > Sorry for not realising this earlier.
-> > 
-> > Human slop here made me wrongly apply this patch. Could either of you
-> > please share a formal revert?
+On 7/8/26 11:52 AM, Pablo Neira Ayuso wrote:
+> Hi,
 > 
-> Sure, will do.
+> On Tue, Jul 07, 2026 at 11:10:45AM +0200, Eric Woudstra wrote:
+>> Edit nft_flow_offload_eval() to make it possible to handle a flowtable of
+>> the nft bridge family.
+>>
+>> Use nft_flow_offload_bridge_init() to fill the flow tuples. It uses
+>> nft_dev_fill_bridge_path() in each direction.
+> 
+> I decided to add a bit more boiler plate in my proposal to detach the
+> inet and bridge flowtable dataplanes.
+> 
+> More comments below.
+> 
+>> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+>> ---
+>>  include/net/netfilter/nf_flow_table.h |   5 +
+>>  net/netfilter/nf_flow_table_path.c    | 126 ++++++++++++++++++++++++++
+>>  net/netfilter/nft_flow_offload.c      |  20 +++-
+>>  3 files changed, 146 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/include/net/netfilter/nf_flow_table.h b/include/net/netfilter/nf_flow_table.h
+>> index 5c6e3b65ae85b..a109eda5250c7 100644
+>> --- a/include/net/netfilter/nf_flow_table.h
+>> +++ b/include/net/netfilter/nf_flow_table.h
+>> @@ -305,6 +305,11 @@ nf_flow_table_offload_del_cb(struct nf_flowtable *flow_table,
+>>  void flow_offload_route_init(struct flow_offload *flow,
+>>  			     struct nf_flow_route *route);
+>>  
+>> +int flow_offload_bridge_init(struct flow_offload *flow,
+>> +			     const struct nft_pktinfo *pkt,
+>> +			     enum ip_conntrack_dir dir,
+>> +			     struct nft_flowtable *ft);
+>> +
+>>  int flow_offload_add(struct nf_flowtable *flow_table, struct flow_offload *flow);
+>>  void flow_offload_refresh(struct nf_flowtable *flow_table,
+>>  			  struct flow_offload *flow, bool force);
+>> diff --git a/net/netfilter/nf_flow_table_path.c b/net/netfilter/nf_flow_table_path.c
+>> index 2b6ebb594a9ee..cdd6a822cb811 100644
+>> --- a/net/netfilter/nf_flow_table_path.c
+>> +++ b/net/netfilter/nf_flow_table_path.c
+>> @@ -1,6 +1,7 @@
+>>  // SPDX-License-Identifier: GPL-2.0-only
+>>  #include <linux/kernel.h>
+>>  #include <linux/module.h>
+>> +#include <linux/if_vlan.h>
+>>  #include <linux/init.h>
+>>  #include <linux/etherdevice.h>
+>>  #include <linux/netlink.h>
+>> @@ -365,3 +366,128 @@ int nft_flow_route(const struct nft_pktinfo *pkt, const struct nf_conn *ct,
+>>  	return -ENOENT;
+>>  }
+>>  EXPORT_SYMBOL_GPL(nft_flow_route);
+>> +
+>> +static int nft_dev_fill_bridge_path(struct flow_offload *flow,
+>> +				    struct nft_flowtable *ft,
+>> +				    enum ip_conntrack_dir dir,
+>> +				    const struct net_device *src_dev,
+>> +				    const struct net_device *dst_dev,
+>> +				    unsigned char *src_ha,
+>> +				    unsigned char *dst_ha)
+>> +{
+>> +	struct flow_offload_tuple_rhash *th = flow->tuplehash;
+>> +	struct net_device_path_ctx ctx = {};
+>> +	struct net_device_path_stack stack;
+>> +	struct nft_forward_info info = {};
+>> +	int i, j = 0;
+>> +
+>> +	for (i = th[dir].tuple.encap_num - 1; i >= 0 ; i--) {
+>> +		if (info.num_encaps >= NF_FLOW_TABLE_ENCAP_MAX)
+>> +			return -1;
+>> +
+>> +		if (th[dir].tuple.in_vlan_ingress & BIT(i))
+>> +			continue;
+>> +
+>> +		info.encap[info.num_encaps].id = th[dir].tuple.encap[i].id;
+>> +		info.encap[info.num_encaps].proto = th[dir].tuple.encap[i].proto;
+>> +		info.num_encaps++;
+>> +
+>> +		if (th[dir].tuple.encap[i].proto == htons(ETH_P_PPP_SES))
+>> +			continue;
+>> +
+>> +		if (ctx.num_vlans >= NET_DEVICE_PATH_VLAN_MAX)
+>> +			return -1;
+>> +		ctx.vlan[ctx.num_vlans].id = th[dir].tuple.encap[i].id;
+>> +		ctx.vlan[ctx.num_vlans].proto = th[dir].tuple.encap[i].proto;
+>> +		ctx.num_vlans++;
+>> +	}
+> 
+> I am not sure why this is needed, in my approach I simplified this,
+> but maybe I broke bridge vlan filtering. I am not sure what test
+> coverage you made.
+> 
 
-- [PATCH net-next] Revert "gtp: annotate PDP lookups under RTNL"
-  https://lore.kernel.org/netdev/20260708-gtp-rtnl-v1-1-218091f171bc@kernel.org/T/
+This part is used for handling packets that are incoming with encaps.
+Previously I got the encaps from the skb and stored them in
+th[dir].tuple.encap. I understand you want to do this differently.
+It is also why I'm starting in the opposite direction as in you patch-set.
+
+The code above then reads th[dir].tuple.encap and starts filling info
+and ctx with encaps. It also handles encaps marked with a
+in_vlan_ingress bit. Once info and ctx are filled with the encaps from
+the skb, it can continue with dev_fill_bridge_path().
+
+My selftest script bridge_fastpath.sh tests this code thoroughly in many
+different scenarios. Incoming vlan, q-in-q, ad, pppoe, pppoe-in-q. Also
+on a dsa-port with the in_vlan_ingress bit set.
+
+>> +	ctx.dev = src_dev;
+>> +	ether_addr_copy(ctx.daddr, dst_ha);
+>> +
+>> +	if (dev_fill_bridge_path(&ctx, &stack) < 0)
+>> +		return -1;
+>> +
+>> +	nft_dev_path_info(&stack, &info, dst_ha, &ft->data);
+>> +
+>> +	if (!info.indev || info.indev != dst_dev)
+>> +		return -1;
+>> +
+>> +	th[!dir].tuple.iifidx = info.indev->ifindex;
+>> +	for (i = info.num_encaps - 1; i >= 0; i--) {
+>> +		th[!dir].tuple.encap[j].id = info.encap[i].id;
+>> +		th[!dir].tuple.encap[j].proto = info.encap[i].proto;
+>> +		if (info.ingress_vlans & BIT(i))
+>> +			th[!dir].tuple.in_vlan_ingress |= BIT(j);
+>> +		j++;
+>> +	}
+>> +	th[!dir].tuple.encap_num = info.num_encaps;
+>> +
+>> +	th[dir].tuple.mtu = dst_dev->mtu;
+>> +	ether_addr_copy(th[dir].tuple.out.h_source, src_ha);
+>> +	ether_addr_copy(th[dir].tuple.out.h_dest, dst_ha);
+>> +	th[dir].tuple.out.ifidx = info.outdev->ifindex;
+>> +	th[dir].tuple.xmit_type = FLOW_OFFLOAD_XMIT_DIRECT;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +int flow_offload_bridge_init(struct flow_offload *flow,
+>> +			     const struct nft_pktinfo *pkt,
+>> +			     enum ip_conntrack_dir dir,
+>> +			     struct nft_flowtable *ft)
+>> +{
+>> +	const struct net_device *in_dev, *out_dev;
+>> +	struct ethhdr *eth = eth_hdr(pkt->skb);
+>> +	struct flow_offload_tuple *tuple;
+>> +	int err, i = 0;
+>> +
+>> +	in_dev = nft_in(pkt);
+>> +	if (!in_dev || !nft_flowtable_find_dev(in_dev, ft))
+>> +		return -1;
+>> +
+>> +	out_dev = nft_out(pkt);
+>> +	if (!out_dev || !nft_flowtable_find_dev(out_dev, ft))
+>> +		return -1;
+>> +
+>> +	tuple =  &flow->tuplehash[!dir].tuple;
+>> +
+>> +	if (skb_vlan_tag_present(pkt->skb)) {
+>> +		tuple->encap[i].id = skb_vlan_tag_get(pkt->skb);
+>> +		tuple->encap[i].proto = pkt->skb->vlan_proto;
+>> +		i++;
+>> +	}
+>> +
+>> +	switch (eth_hdr(pkt->skb)->h_proto) {
+>> +	case htons(ETH_P_8021Q): {
+>> +		struct vlan_hdr *vhdr = (struct vlan_hdr *)(skb_mac_header(pkt->skb)
+>> +					 + sizeof(struct ethhdr));
+>> +		tuple->encap[i].id = ntohs(vhdr->h_vlan_TCI);
+>> +		tuple->encap[i].proto = htons(ETH_P_8021Q);
+>> +		i++;
+>> +		break;
+>> +	}
+>> +	case htons(ETH_P_PPP_SES): {
+>> +		struct pppoe_hdr *phdr = (struct pppoe_hdr *)(skb_mac_header(pkt->skb)
+>> +					  + sizeof(struct ethhdr));
+>> +
+>> +		tuple->encap[i].id = ntohs(phdr->sid);
+>> +		tuple->encap[i].proto = htons(ETH_P_PPP_SES);
+>> +		i++;
+>> +		break;
+>> +	}
+>> +	}
+>> +	tuple->encap_num = i;
+> 
+> I am not sure these lines above can work. The VLAN tag might be
+> already gone by when the packet is observed from the bridge/forward
+> hook. I think populating the encap fields of the tuple by using the
+> observed packet is not good to go.
+> 
+
+I have not experienced this, but I understand that this is no guarantee
+that it does not happen at all.
+
+>> +	err = nft_dev_fill_bridge_path(flow, ft, !dir, out_dev, in_dev,
+>> +				       eth->h_dest, eth->h_source);
+>> +	if (err < 0)
+>> +		return err;
+>> +
+>> +	err = nft_dev_fill_bridge_path(flow, ft, dir, in_dev, out_dev,
+>> +				       eth->h_source, eth->h_dest);
+>> +	if (err < 0)
+>> +		return err;
+>> +
+>> +	return 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(flow_offload_bridge_init);
+>> diff --git a/net/netfilter/nft_flow_offload.c b/net/netfilter/nft_flow_offload.c
+>> index 0be62841155b6..d0d63ef7cecd5 100644
+>> --- a/net/netfilter/nft_flow_offload.c
+>> +++ b/net/netfilter/nft_flow_offload.c
+>> @@ -53,6 +53,7 @@ static void nft_flow_offload_eval(const struct nft_expr *expr,
+>>  {
+>>  	struct nft_flow_offload *priv = nft_expr_priv(expr);
+>>  	struct nf_flowtable *flowtable = &priv->flowtable->data;
+>> +	bool routing = flowtable->type->family != NFPROTO_BRIDGE;
+>>  	struct tcphdr _tcph, *tcph = NULL;
+>>  	struct nf_flow_route route = {};
+>>  	enum ip_conntrack_info ctinfo;
+>> @@ -109,14 +110,21 @@ static void nft_flow_offload_eval(const struct nft_expr *expr,
+>>  		goto out;
+>>  
+>>  	dir = CTINFO2DIR(ctinfo);
+>> -	if (nft_flow_route(pkt, ct, &route, dir, priv->flowtable) < 0)
+>> -		goto err_flow_route;
+>> +	if (routing) {
+>> +		if (nft_flow_route(pkt, ct, &route, dir, priv->flowtable) < 0)
+>> +			goto err_flow_route;
+>> +	}
+> 
+> As said, I am leaning towards adding a bit more boilerplate code to
+> separate the bridge and inet flowtable datapaths.
+> 
+>>  	flow = flow_offload_alloc(ct);
+>>  	if (!flow)
+>>  		goto err_flow_alloc;
+>>  
+>> -	flow_offload_route_init(flow, &route);
+>> +	if (routing)
+>> +		flow_offload_route_init(flow, &route);
+>> +	else
+>> +		if (flow_offload_bridge_init(flow, pkt, dir, priv->flowtable) < 0)
+>> +			goto err_flow_add;
+>> +
+>>  	if (tcph)
+>>  		flow_offload_ct_tcp(ct);
+>>  
+>> @@ -164,8 +172,10 @@ static void nft_flow_offload_eval(const struct nft_expr *expr,
+>>  err_flow_add:
+>>  	flow_offload_free(flow);
+>>  err_flow_alloc:
+>> -	dst_release(route.tuple[dir].dst);
+>> -	dst_release(route.tuple[!dir].dst);
+>> +	if (routing) {
+>> +		dst_release(route.tuple[dir].dst);
+>> +		dst_release(route.tuple[!dir].dst);
+>> +	}
+>>  err_flow_route:
+>>  	clear_bit(IPS_OFFLOAD_BIT, &ct->status);
+>>  out:
+>> -- 
+>> 2.53.0
+>>
+
 
