@@ -1,168 +1,210 @@
-Return-Path: <netdev+bounces-305970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305971-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +zoONhimTmqjRQIAu9opvQ
-	(envelope-from <netdev+bounces-305970-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:33:44 +0200
+	id t4FJGY+oTmo+RgIAu9opvQ
+	(envelope-from <netdev+bounces-305971-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:44:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7579A729E1E
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:33:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5955729EB7
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:44:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=eMpN2EiY;
-	dmarc=pass (policy=none) header.from=linux.dev;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305970-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305970-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Z9wamYBJ;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305971-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305971-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C428E303981A
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 19:33:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 168A1300579E
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 19:44:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 482653CAE73;
-	Wed,  8 Jul 2026 19:33:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AAA93DCDB5;
+	Wed,  8 Jul 2026 19:44:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D8FD3B8405
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 19:33:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 152F43D25A3
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 19:44:05 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783539191; cv=none; b=ZD7zOSEX0o9XW+1uaUmipd0gfpgBUS2OuEH4Om4M43Q28Y2xfJWJm3fcd4HZwx5KRKm3WXA+G0UWG5frpbP5QdyPXmHmObmVRNLjgHZHJ/xr/fj1RgsLjLADpYwn51ZT6xQo05A3axNxQ0vFAuN/gOtUWRWm1zxL6Z8LZ2PleC8=
+	t=1783539847; cv=none; b=SewPJwv4zceU9hqOMFELvZQ62SHWpPd2AqI5INcoZmDb9ji3ZL2lJhS2o4Z4EQxd73xI80zGAJ94cXh3P4cgZX13HuKfO1fh2G5YBAOEeONKK9NGtth/X6Alfh6fG+L4bj2ltD0bY5VthPMXSFvDYrE+y+mHNdurh4cdX2Jto+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783539191; c=relaxed/simple;
-	bh=IOS5GN2pONlWzmwhsKZA8OXhk6yaaGtWlzaGSCHwBxk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PwvG605o+2+38hv/a5XWAfQM546X094kn55CFigKCtkN9Ku6DMo1y0m9nUZ1YvfiPnXROrPiefEs3UM2M0timAUCscRlOF0njgl17RaeJ9JELSqlBJxBU6PKy52EWmrs6yiMbG2D9dnH980JzUDqz7KB8/tVihs5iLJKGsF1Po4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eMpN2EiY; arc=none smtp.client-ip=95.215.58.179
-Date: Wed, 8 Jul 2026 19:32:16 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783539177;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ALUaD454sMRQMP0Da2KjIGTgJMad7ivkipowHf/Yitk=;
-	b=eMpN2EiYDIOFvvgoXG+7C/O0zYni/j0H+Qt6Qu9dHkFNb0sWGh+6wiBgBeb4mP1Fsk1x0i
-	CSLdG9ZWkRhTa4vtz8Pn3TSUEiBRXZRn54KRAgwZ+3ZKYe+g5vlcPu3VanyfwyGz0kLqOJ
-	YW6PoKpkeQNGRX+jUWJEs8BA5h2UHxY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jose Fernandez (Anthropic)" <jose.fernandez@linux.dev>
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, 
-	Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Ben Cressey <ben@cressey.dev>
-Subject: Re: [PATCH net-next] net/mlx5e: bound TX CQ poll softirq residency
- with a time budget
-Message-ID: <ak6efg89Cb1s_TEd@linux.dev>
-References: <20260703-mlx5e-tx-cq-time-budget-v1-1-6da2cfe9c7b1@linux.dev>
- <5557a08f-6d53-4425-8004-b7f0bbcd8a50@nvidia.com>
+	s=arc-20240116; t=1783539847; c=relaxed/simple;
+	bh=sCBV4R2IskE+Qnt8X1ddpdk4fJf5MMWKVa9tRTgLXvA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Fb5z9OK7X/MFaNVyrNcAljZ+hRrg/4JKiih/AoZvOoLEzJZdVNkKRHN9kRVB260sO7RWGhCH4iICbgbXnafccTpRBGZddZb44lizHdC8zGoH5aezRm/kFGMPeAtM4gu/NhHpJGB4IgTXFJXPTwsE19ODA/luTGgXF/su1UzAUWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z9wamYBJ; arc=none smtp.client-ip=209.85.128.54
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-493d92b7db3so11439875e9.2
+        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 12:44:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783539844; x=1784144644; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=sCBV4R2IskE+Qnt8X1ddpdk4fJf5MMWKVa9tRTgLXvA=;
+        b=Z9wamYBJkxQNjZkhmBdNJWvecPMkya3cozZAsa/1bbhEEbfEV+4QvdJj0A+4VqfDOE
+         icvHtxykM+DmHp8EZjo5waUgBHoFU0L6fgUrq4tv3YEIx4rSIXe2PT3xRRhbTs7OjG0Z
+         03Va/KtNSAOPYTP6gi8YI4g30nerFCmnv8loOh8sIgXNYTmO30Tjw5sJBbJmfuHZEYuq
+         9qI2tNFmUyBKph+PsKxOplrqbyqhtI/i7WtWQLAlz9qm14MPuDoVHVmZ3aLUc1BCVhZD
+         IvO5KXy9zP7WjvGrw6ZdLevwvr6W+68LFaXW0LZZ/CP/jCUbERmJC/p4K24qfzFk55mq
+         NqpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783539844; x=1784144644;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=sCBV4R2IskE+Qnt8X1ddpdk4fJf5MMWKVa9tRTgLXvA=;
+        b=ZzLdAttkad/pvrolCqPkX/h++HS7NiW9hHuk+7iXb37nN0zG/wmdFES7Lgbfi8jYWU
+         nXspkyVsPC0d5Poe2k6o9y+oi+fG7fk/uAzYHG3cXbcHxEphFyCXZl6TNbaPoHMp2DFv
+         j9WPcqykC2M1GergMU0emSWz2JZVUCe9dKdzr/2HCwL6OZvroXuUaNqdSFnPg9QCZQC8
+         MNM75QHwnQMxfoz+AzxIvUWVFbJx4zU42m1RLMev8aUQI9CnVakbLNLP2yOyXYTyaIDZ
+         sE2fTPbN2phlITnMfj1iRFSLMapHa9auZnwFtmYa1GsxucRSes6AL4AoasZU2RjKefTG
+         s/YA==
+X-Forwarded-Encrypted: i=1; AHgh+RpCtznirVE9Q9tVGJwzrEXmgX6mGmUbFfzAN0gFniosudiddHTRjB1blJ0sp5KO121q9xwkoho=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwE2m5MWxWr2uDQgZXrqzbQmlXv1SZ15kSvQZiiMtn+2SnyLeOL
+	K+KU+WzIauM2i9SsK3gFFaON1nKpjAcc2ktQ+h10d/bd2oqjyHu2my4S
+X-Gm-Gg: AfdE7cmmbfb969LkjKCPUODeYr3WzYFD7Kuu1edZuwV0QmuokVLhIUhLjVcKEmAPCw4
+	G9Dh884GG5Q+i+59sh4tspN7WPk4j6NTS1lviv8CoEZJglF31U8HC+T31G9G4/iou3dtHdMw4rO
+	58zNFR+YA3hBjS2gt2o2sR+60ZXRsuBMTVj97UMKd5s2LOrJbCIUqsSZ/e63dKT3YBzVEnlIwJA
+	h6SQMJ/fuCDb+KROcftQO8rChUaBsY1O2aTu46R3DW8cm0GrLckIIoVVKfj1VhXh6aNMCduwQdF
+	Fvr+OO06qmVJj6Qap+UNHrkDnnkJyRCxzLkrnZwl6LLnYgDejcD3Xs5nRBc+q6RozJ1Ib+83mBO
+	f3E0MFoLHdfiQlW4OOY5M70gLZHJn/srj5+pmNQyWq6JXlWmjg4OFO2nrtJVUctSmMmckxKX3n1
+	B7Lz1e9+7mQoJzL2GNm2ywjgI6jaQiCMPbMrYr5iAbe2oRTDXXeN5U/G7VTPKkaLZJw6lUMjaNr
+	EO2cVlNaXE0
+X-Received: by 2002:a05:600c:1d0f:b0:493:cfd2:cd06 with SMTP id 5b1f17b1804b1-493e68b8007mr39812645e9.6.1783539844178;
+        Wed, 08 Jul 2026 12:44:04 -0700 (PDT)
+Received: from ?IPV6:2001:9e8:f108:7101:a0d0:f2a:50b6:7266? ([2001:9e8:f108:7101:a0d0:f2a:50b6:7266])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9e3e2702sm47175156f8f.9.2026.07.08.12.44.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Jul 2026 12:44:03 -0700 (PDT)
+Message-ID: <df0aaf90-2baa-424c-8c83-aed52a4b4321@gmail.com>
+Date: Wed, 8 Jul 2026 21:44:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5557a08f-6d53-4425-8004-b7f0bbcd8a50@nvidia.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 1/4] dt-bindings: net: pse-pd: add bindings
+ for Realtek/Broadcom PSE MCU
+Content-Language: en-US
+To: Conor Dooley <conor@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+ Kory Maincent <kory.maincent@bootlin.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Daniel Golle <daniel@makrotopia.org>, =?UTF-8?Q?Bj=C3=B8rn_Mork?=
+ <bjorn@mork.no>
+References: <20260706112425.3149226-1-jelonek.jonas@gmail.com>
+ <20260706112425.3149226-2-jelonek.jonas@gmail.com>
+ <20260706-player-handwash-0a3fe95cf5ec@spud>
+ <c19e563a-8931-4f31-b05a-ff8def4a5161@gmail.com>
+ <20260707-dove-fretful-e3c8e237f1eb@spud>
+ <2afc9c9a-eacc-46ca-b965-4cabee8f7094@gmail.com>
+ <20260708-lyrically-footrest-10963a12145f@spud>
+From: Jonas Jelonek <jelonek.jonas@gmail.com>
+In-Reply-To: <20260708-lyrically-footrest-10963a12145f@spud>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-305971-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305970-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:dtatulea@nvidia.com,m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:leon@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ben@cressey.dev,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[jose.fernandez@linux.dev,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:conor@kernel.org,m:o.rempel@pengutronix.de,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:bjorn@mork.no,m:andrew@lunn.ch,m:krzk@kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jose.fernandez@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,linux.dev:from_mime,linux.dev:dkim,linux.dev:mid]
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7579A729E1E
+X-Rspamd-Queue-Id: B5955729EB7
 
-Hi Dragos,
+Hi Conor,
 
-Thanks for the review.
-
-On Mon, Jul 06, 2026 at 01:48:41PM +0200, Dragos Tatulea wrote:
-> This is interesting. I can think of 2 cases here which can overlap:
+On 08.07.26 18:56, Conor Dooley wrote:
+> On Tue, Jul 07, 2026 at 10:50:21PM +0200, Jonas Jelonek wrote:
+>> [...]
+>> Ok, I hope I put this together correctly. A concrete proposal:
+>>
+>> "realtek,pse-mcu-gen1"                        (Protocol Gen 1, UART)
+>> "realtek,pse-mcu-gen1-smbus"            (Protocol Gen 1, SMBus)
+>> "realtek,pse-mcu-gen2"                        (Protocol Gen 2, UART)
+>> "realtek,pse-mcu-gen2-i2c"                  (Protocol Gen 2, raw I2C)
+>> "realtek,pse-mcu-gen2-smbus"            (Protocol Gen 2, SMBus)
+>>
+>> This uniquely identifies the protocol used: first generation and second
+>> generation. As Rob mentioned before [1], this also pulls in the raw I2C
+>> vs. SMBus framing in contrast to having it in a property. The framing
+>> suffix appears only on I2C attachments because it doesn't apply to
+>> UART transport, and this is given by the parent serial@ node.
+>>
+>> Though I'm still open for suggestions regarding the protocol
+>> identification if "-gen1"/"-gen2" is not acceptable.
+> This seems reasonable enough.
 >
-> 1) Packets are sent with xmit_more which trigger this many WQEs per
->   CQE scenario.
+>> [...]
+>>
+>> It would also be an exception to the other PSE-PD bindings. They describe
+>> controllers used across many switches too, yet none encode the
+> The difference is those cases (for what few pse-psd bindings there are)
+> the compatibles correspond to individual devices. Here you have
+> compatibles you're going to use to cover multiple devices (with device
+> corresponding to a combination of mcu/firmware/hardware behind the mcu).
+> That lack of a 1:1 mapping is why I'm asking for something different from
+> you than you see with the existing pse-pd devices. The switch the device
+> is integrated on seems to be the only thing that reasonably makes sense
+> to use.
 >
-> 2) TSO packets can have many fragments so even a single WQE will have
->    more than one DMA unmap. For the default GSO size of 64K each TSO
->    skb will have 2 fragments on your platform. If the GSO is bumped to
->    256K then you usually get ~5 fragments.
 >
-> Let's first understand if this is a case of 1) (small packets sent
-> with xmit_more) or 2) (many TSO packets) or 1+2) (many TSO packets sent
-> with xmit_more).
+>> switch/enclosure. Board-specific compatibles might still be added later in
+>> case a device really has a variation or quirk that genuinely needs its own
+>> compatible.
+> And in doing so, have to retrofit that compatible to all devicetrees
+> that use it. This is one of the reasons that we generally demand
+> device-specific compatibles.
+>
+> You could add switch-specific compatibles that fall back to the ones you
+> provide above, with the driver only using the ones above unless
+> something crops up in the future?
 
-Likely both, mostly 1). The workload is bursty bulk transfers, and
-the stalls hit while processing a burst's completions: one CQE covers
-a whole xmit_more batch, each TSO skb adds its 2 frag unmaps, so the
-CQE budget bounds entries but not the unmap work behind them.
+Thank you for the thorough explanation. I think I got your point now and
+understand why it's required that way.
 
-I don't have the tx_xmit_more / tx_tso_packets ratios handy. I'll
-collect them across a burst window and report back.
+I'll rework this for the next version.
 
-> If xmit_more is used then you can actually tune the BQL to avoid this
-> behavior which seems to wreak havoc on your configuration.
+> Cheers,
+> Conor.
 
-We considered that. BQL bounds bytes in flight, but bytes only
-translate into poll time at some assumed per-unmap cost, and that
-cost is the unstable part here: a few us normally, ~100x worse when
-many CPUs contend on the shared SMMU command queue. A BQL setting
-small enough for the worst case would hurt throughput the rest of
-the time.
-
-> The bounded poll is faster because it is interrupted earlier or is
-> it faster because it results in less contention on the IOMMU?
-
-Both, and we tried to separate them. Sweeping the yield cadence
-barely moves the numbers, so it is not just doing less per poll. And
-in A/B runs with the budget armed, the competing side's per-unmap
-cost drops 15-20%, so there is a real contention reduction on top of
-the transmit path getting the core back sooner.
-
-> This change is too invasive in the driver for all the other cases. We have to figure
-> another way to go about this issue.
-
-Fair enough, and the module parameter should not have been there anyway.
-The direction I would rather take: fix the cost instead of capping it,
-by converting the mlx5e TX path to the tso_dma_map helpers (as bnxt
-did), so a TSO skb maps as one IOVA range where the DMA IOVA API is
-available, completing with one sync instead of one per frag.
-
-Once the counters confirm the frag-unmap volume I will prototype that,
-unless you or Tariq/Saeed see a problem with the direction. Happy to
-test on the affected boxes. We have a repro harness.
-
-Thanks,
-Jose
+Best regards,
+Jonas
 
