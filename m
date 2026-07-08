@@ -1,156 +1,176 @@
-Return-Path: <netdev+bounces-305964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305966-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DPhWG+OaTmrrQQIAu9opvQ
-	(envelope-from <netdev+bounces-305964-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 20:45:55 +0200
+	id x8LwJECeTmoyQwIAu9opvQ
+	(envelope-from <netdev+bounces-305966-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:00:16 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 149CD729AAF
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 20:45:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A0FAF729C14
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:00:15 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=birger-koblitz.de header.s=default header.b=U6g+sPXx;
-	dkim=pass header.d=birger-koblitz.de header.s=default header.b=RvPrx3M6;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305964-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305964-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=key1 header.b=pB7UcjMW;
+	dmarc=pass (policy=none) header.from=linux.dev;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305966-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305966-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B4E2C3129248
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 18:40:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6F07830568B2
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 19:00:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE0534D90DF;
-	Wed,  8 Jul 2026 18:40:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DFE63CA4A0;
+	Wed,  8 Jul 2026 19:00:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A33A74D8D91;
-	Wed,  8 Jul 2026 18:40:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C58A3C0A05
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 19:00:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783536022; cv=none; b=CVnY5Tk2r7dHadwFrYyAYBhaZxcanjcR+JyvMgBzOtj58vFu1zNHvV6yNdcxxNQGzlKhb07aYXVrqQQTPnIVMUkDcD3t5RtUQY8vK2paJEWZ79sZcaD+f+NVtxhAarYav2tvJyrHRC9SEARkJLpvPfUT6wOccLCzJHlOoOzplFc=
+	t=1783537214; cv=none; b=rsem7A9rDRxZ9VhF6pk1LOZhy+n/aFOFCSGk8AZKQDT6YOqUK5wRzaXYaaGOJNvDem3P93zLHn0hzIGPdLBnAJKAr3HgEiMqPfwJy8GxVrXegNCczEyrVVf8vXRpGnLaUHricpdhg/UKlGnS+v8UZWgoZxwTBsSqZJ76501TcE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783536022; c=relaxed/simple;
-	bh=VFZFa+sqUfWBHYurcLEvhRD//b3NDb9yrlEBlFIELNk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=X7vkZUOfWiH5MxzztBbeaBPMs+vyNuUpO/hOBE4x5+M2btKGIglVNklGUsybNSsIUhZF3V4lMSdf5lDymBHhF11zQYRNNx0RgqTmOjjGBcIBH2SSr/MreEdQVOqZn5ZunKAW/sFmc70Iwq4YIqul5uS8r9T5WrIIw5O0NSjujvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=U6g+sPXx; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=RvPrx3M6; arc=none smtp.client-ip=23.88.97.239
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1783536015;
-	bh=VFZFa+sqUfWBHYurcLEvhRD//b3NDb9yrlEBlFIELNk=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=U6g+sPXxvU/ARC+eAbMqMlVuOsXKzJW/IZj0Ngjh/oXlHwcG4zCmA/07eN+pz9Vdu
-	 TG02zvXt4i83Gh/RKavjNFr96TqbYS7OSw+shAf8n6OIOPYY0Th1l4z/EAfmU5Sv6x
-	 c2yh/RN+bYgx5MEavXIxGbUj5krYQ9nqgEPeRhqnSGnsOzUottVi+0cRarGxuQzPis
-	 lLCgBmpNQ4wK+8KU1in8BWNXLcNYD+Xz8DbOYYxigYTEfS3dq+HT0DtXyQboO03lFE
-	 4eDvzECP6tHHl/+x+8KnMfH6ybpI5E8T3kJyErvNrASuUoVAsfhP0LKt6J0p4lu487
-	 PuNZFrSVWj3yQ==
-Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
-	id 02F5049444; Wed,  8 Jul 2026 18:40:15 +0000 (UTC)
-X-Spam-Level: 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1783536007;
-	bh=VFZFa+sqUfWBHYurcLEvhRD//b3NDb9yrlEBlFIELNk=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=RvPrx3M6GgcsUPQRH9X25Mp2FaHEXnBvDjtMXb/fQ9H6CJiVYY3+RLNPIMJUz5GIF
-	 JdAjnBqL/iz6ALVs1mCYy38h+kqhy+GdamJVKv0FH4Ucv4+GskRssQKNuDdWkOhaRK
-	 C68cnnIzjjZ0wN8M/caAokRrWfSIu7UO52mxgPzRC7hx+nEsmLIcT9R/XH+HPP+4RW
-	 2SEkfTc/JUnlkW7Anj/eTw9SD34R8qII4y2eQnL+R96qsYSbzvhzgsaHglf7qJ9Iqi
-	 cyt4XnZISY8WKDQNNsEVU5R/mWiddbxcj2Rx9SU/64bl72v5acNGnyrm0thhdllA8j
-	 Tuyc+kH2IRswA==
-Received: from DebianDesktop.lan (p200300c69f1c3c00b7612fd38ae89dbd.dip0.t-ipconnect.de [IPv6:2003:c6:9f1c:3c00:b761:2fd3:8ae8:9dbd])
-	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 44C9B493F1;
-	Wed,  8 Jul 2026 18:40:07 +0000 (UTC)
-From: Birger Koblitz <mail@birger-koblitz.de>
-Date: Wed, 08 Jul 2026 20:39:18 +0200
-Subject: [PATCH net-next v2 12/12] ax88179_178a: Add AX179A/AX279 multicast
- configuration
+	s=arc-20240116; t=1783537214; c=relaxed/simple;
+	bh=/i4q3PciWLr5dRKe8HwkUbjEdZBsKalnv/hNk0whSdY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cSP9Bi56wjtpP1Ej5k46jhvbgGTQcCRilzeG5JPZ6QFMW61JyreBtWt1rp/O5z87PfzPn17aeDUzdgFgxBKlzNZLgB86LpSrHPUrfzKmwiIc0/wzTY2OJ8piN1PhaeL8qtg1G+X7JChxV4bGT9BAVmVa4wZE6AOYaIrvRcoNsh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pB7UcjMW; arc=none smtp.client-ip=91.218.175.170
+Message-ID: <7a6d7de8-7c33-42fd-a0f3-68bc1911b0e5@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783537210;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dW2Pe/NnDxzT3LmCghEoob5D1+lVvIxfWr0Cp5jm/kU=;
+	b=pB7UcjMWL8pHSHChuspgfgOi2EgLbGP5vu+IzQ/ytPRmG7t1prIyXPRVawHGrF4qsiz8Ti
+	6wpDfilioOfgqcZpxVjw5Hm7v0l5wQBfwMvfWINrL7bNnfEm7dCVJqyWIEOHBE8yI2SHvl
+	2/g7ZbgGh1qLyWT6PrbQC39Bp3wOQs4=
+Date: Wed, 8 Jul 2026 20:00:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Subject: Re: [PATCH net v3] tipc: fix u16 MTU truncation in media and bearer
+ MTU validation
+To: "Cen Zhang (Microsoft)" <blbllhy@gmail.com>, jmaloy@redhat.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org
+Cc: netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+ linux-kernel@vger.kernel.org, tung.quang.nguyen@est.tech,
+ AutonomousCodeSecurity@microsoft.com, tgopinath@linux.microsoft.com,
+ kys@microsoft.com
+References: <20260708180212.2898-1-blbllhy@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20260708180212.2898-1-blbllhy@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260708-ax88179a-v2-12-0800fedb2e16@birger-koblitz.de>
-References: <20260708-ax88179a-v2-0-0800fedb2e16@birger-koblitz.de>
-In-Reply-To: <20260708-ax88179a-v2-0-0800fedb2e16@birger-koblitz.de>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Birger Koblitz <mail@birger-koblitz.de>
-X-Mailer: b4 0.14.2
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305964-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-usb@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:mail@birger-koblitz.de,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[birger-koblitz.de];
+	FORGED_RECIPIENTS(0.00)[m:blbllhy@gmail.com,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:tung.quang.nguyen@est.tech,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_TO(0.00)[gmail.com,redhat.com,davemloft.net,google.com,kernel.org];
+	FORGED_SENDER(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[birger-koblitz.de:+];
+	TAGGED_FROM(0.00)[bounces-305966-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[birger-koblitz.de:from_mime,birger-koblitz.de:email,birger-koblitz.de:mid,birger-koblitz.de:dkim,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 149CD729AAF
+X-Rspamd-Queue-Id: A0FAF729C14
 
-Add support for conditionally setting the ip_alignement flag
-AX_RX_CTL_IPE in AX_RX_CTL and make sure that AX_RX_CTL_DROPCRCERR
-is also set to be consistent with the initial configuration in
-ax88179_reset()
+On 08/07/2026 19:02, Cen Zhang (Microsoft) wrote:
+> Both TIPC_NL_MEDIA_SET and TIPC_NL_BEARER_SET accept user-supplied
+> MTU values but only enforce a minimum bound, not a maximum. When a user
+> sets the MTU to a value exceeding U16_MAX (65535), it passes validation
+> but is silently truncated when assigned to u16 fields l->mtu and
+> l->advertised_mtu in tipc_link_create(). Values like 65536 (0x10000)
+> truncate to 0, causing a division by zero in tipc_link_set_queue_limits()
+> which computes TIPC_MAX_PUBL / (l->mtu / ITEM_SIZE). Other overflowing
+> values (e.g. 65537-131071) produce small incorrect MTU values, resulting
+> in link malfunction behaviors.
+> 
+> Crash stack (triggered as unprivileged user via user namespace):
+> 
+>    tipc_link_set_queue_limits  net/tipc/link.c:2531
+>    tipc_link_create            net/tipc/link.c:520
+>    tipc_node_check_dest        net/tipc/node.c:1279
+>    tipc_disc_rcv               net/tipc/discover.c:252
+>    tipc_rcv                    net/tipc/node.c:2129
+>    tipc_udp_recv               net/tipc/udp_media.c:392
+> 
+> Two independent paths lack the upper bound check:
+> 1. tipc_udp_mtu_bad() -- called from __tipc_nl_media_set() (MEDIA_SET)
+> 2. inline check in __tipc_nl_bearer_set() at bearer.c:1160 (BEARER_SET)
+> 
+> Fix both by rejecting MTU values above U16_MAX.
+> 
+> Fixes: 901271e0403a ("tipc: implement configuration of UDP media MTU")
+> Reported-by: AutonomousCodeSecurity@microsoft.com
+> Closes: https://lore.kernel.org/all/CAB8m9WgETt0AjmFwE=F-CKjGXsK6_WDv0=kbYRcC8-noo+amnA@mail.gmail.com
+> Signed-off-by: Cen Zhang (Microsoft) <blbllhy@gmail.com>
+> ---
+> v3: Use nla_policy check to limit MTU max value as suggested by Vadim
+> v2: Solved format issue
+> Link: https://lore.kernel.org/all/CAB8m9WgETt0AjmFwE=F-CKjGXsK6_WDv0=kbYRcC8-noo+amnA@mail.gmail.com
+> 
+>   net/tipc/netlink.c | 6 +++++-
+>   1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/tipc/netlink.c b/net/tipc/netlink.c
+> index 8336a9664703..1307dd1a9613 100644
+> --- a/net/tipc/netlink.c
+> +++ b/net/tipc/netlink.c
+> @@ -113,12 +113,16 @@ const struct nla_policy tipc_nl_node_policy[TIPC_NLA_NODE_MAX + 1] = {
+>   };
+>   
+>   /* Properties valid for media, bearer and link */
+> +static const struct netlink_range_validation tipc_nl_mtu_range = {
+> +	.max = U16_MAX,
+> +};
+> +
+>   const struct nla_policy tipc_nl_prop_policy[TIPC_NLA_PROP_MAX + 1] = {
+>   	[TIPC_NLA_PROP_UNSPEC]		= { .type = NLA_UNSPEC },
+>   	[TIPC_NLA_PROP_PRIO]		= { .type = NLA_U32 },
+>   	[TIPC_NLA_PROP_TOL]		= { .type = NLA_U32 },
+>   	[TIPC_NLA_PROP_WIN]		= { .type = NLA_U32 },
+> -	[TIPC_NLA_PROP_MTU]		= { .type = NLA_U32 },
+> +	[TIPC_NLA_PROP_MTU]		= NLA_POLICY_FULL_RANGE(NLA_U32, &tipc_nl_mtu_range),
 
-Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
----
- drivers/net/usb/ax88179_178a.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+netlink_range_validation with only .max range doesn't look great, there
+is simply NLA_POLICY_MAX() macro.
 
-diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
-index 3972eff910ca766cd6e2cca0431ca50a2b02dd2b..d7c021388979595b9c0773eea2126080ca7d2d86 100644
---- a/drivers/net/usb/ax88179_178a.c
-+++ b/drivers/net/usb/ax88179_178a.c
-@@ -1313,10 +1313,14 @@ static int ax179a_vlan_rx_add_vid(struct net_device *net, __be16 proto, u16 vid)
- static void ax88179_set_multicast(struct net_device *net)
- {
- 	struct usbnet *dev = netdev_priv(net);
--	struct ax88179_data *data = dev->driver_priv;
- 	u8 *m_filter = ((u8 *)dev->data);
-+	struct ax88179_data *data;
-+
-+	data = dev->driver_priv;
- 
--	data->rxctl = (AX_RX_CTL_START | AX_RX_CTL_AB | AX_RX_CTL_IPE);
-+	data->rxctl = (AX_RX_CTL_START | AX_RX_CTL_AB | AX_RX_CTL_DROPCRCERR);
-+	if (data->ip_align)
-+		data->rxctl |= AX_RX_CTL_IPE;
- 
- 	if (net->flags & IFF_PROMISC) {
- 		data->rxctl |= AX_RX_CTL_PRO;
+if you really want to use range check you can technically set .min to
+TIPC_MIN_BEARER_MTU, but you still have to have both checks for min mtu
+as there is unavoidable encap overhead...
 
--- 
-2.47.3
+>   	[TIPC_NLA_PROP_BROADCAST]	= { .type = NLA_U32 },
+>   	[TIPC_NLA_PROP_BROADCAST_RATIO]	= { .type = NLA_U32 }
+>   };
 
 
