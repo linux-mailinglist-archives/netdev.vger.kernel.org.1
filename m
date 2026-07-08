@@ -1,326 +1,306 @@
-Return-Path: <netdev+bounces-305879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305880-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 9WWfIDt3Tmo7NQIAu9opvQ
-	(envelope-from <netdev+bounces-305879-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:13:47 +0200
+	id ARkDGWp4TmqsNQIAu9opvQ
+	(envelope-from <netdev+bounces-305880-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:18:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C45D972885F
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:13:46 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 198AF7289A8
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:18:50 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="jO/J01/h";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305879-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305879-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=ssi.bg header.s=ssi header.b="rGhaM8I/";
+	dmarc=pass (policy=reject) header.from=ssi.bg;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305880-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305880-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7B0423026F3B
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 15:51:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7F0E8303B19E
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 15:53:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 608A93F12C8;
-	Wed,  8 Jul 2026 15:51:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CBB409272;
+	Wed,  8 Jul 2026 15:53:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 062B93AA4F9;
-	Wed,  8 Jul 2026 15:50:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BF802EF64F;
+	Wed,  8 Jul 2026 15:53:35 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783525861; cv=none; b=PHIH2X8Oz3+NNnnYevf7BjiTkCpXzJX2JNAeaBnMLiwlCvfHBonIswmmZ3khNw1ayTJHh0QOeQTCJ0vMbie0V3bROmMmCFueq9j7l6JpZKDGwzcV8TKB5mX3rTGXDsJa+4ch+XwV3KH568Nxtdj313BXwi0er6fZzl2VXcDwGjg=
+	t=1783526018; cv=none; b=pbZ4bRdG/v28OFSp3j3Ij3QI9Zp47TxmDL1BpF2ulQz2mSN+qvCSrMAFGrdxoS0d0euG7msGMXsDTr7zv9v8wmiAm2ug8aJEmXY3T5iMYGskxe/3LbxS5PTrHj+ru+aK2Meywb1Cyc/BO/zzKR2v/QBQnkNw7XJE7k8aW7a/XEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783525861; c=relaxed/simple;
-	bh=0Ht6C/KQ2or/qv8egh8SNjkXW35Xwst2cMLczdpAYRY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tLGf5hNSj3UP6V10DhGEHvUpRSKk5stXiXSyL/TJV9NOtchriD23hXSLjjQGAU3tg3R7KEkxFZD6mJgxG00PO9i7Jwn7j9Xd4nDx237tLKt089/N/wdDsmNg/zGCYWs3iTQ9GgQXyLe71N7iDXCsXoW55P0HUmXnR5DrRgO/OJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jO/J01/h; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 233CB1F000E9;
-	Wed,  8 Jul 2026 15:50:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783525859;
-	bh=wuE75PEjauhhf61SUJFf1x8vbYIkv9QeYpA6RcVrlJ0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=jO/J01/hzPgDT+IIB/ZBrBSWfAZUBVVJ2Xu808zgNS7EvizWJ14TTM1ia5h3h9mNi
-	 Uy2SIdVH3/7cm59qm3nctebNdOYpO7zo2Xa1hTAQKYpdiLtO9dZfHdGUO4mXhbV7YA
-	 FhcCeij3xyLs2HYULlUPEHJCUXRmU0NmXu1Exe5lkclxtQMdGZ3H0AVf2uFMS1k5Ct
-	 bkFu+211+TSp3ZW+A3pqJcB9wErXZlCjqrVlb1xrvSoKJ/+tP+Hu67egavZjR4zNXg
-	 6pOfX9cdZ1Y/+6eRAvIwHJHMMnN4YWPJYvYPiJ8LcPiIGq+LhmzLNIveEcwGos30Oy
-	 yPtdC9VYsVs3g==
-Message-ID: <f398373e-2cb4-4649-a491-9763df94d98b@kernel.org>
-Date: Wed, 8 Jul 2026 17:50:53 +0200
+	s=arc-20240116; t=1783526018; c=relaxed/simple;
+	bh=0Mge3JAgIP+E0X+MesrXp8TixEJc4l6be13natFqp4w=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=Vz2cXP7C18vlqqBWxHH8mlE9JQuD1yv1UeLXYZXt0g90wwcAOi1936iVEEpWcgc6FlUlqZlbJ3D2/+iFNRewsgnXJDvfEdPGQPFDE5pnfd/4l21PcqFhq/j208XTpmIH4rdO2IbGcn/9gwNCMwzYJEhdwKlnhSR9CYQ0kBpaJbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=rGhaM8I/; arc=none smtp.client-ip=193.238.174.39
+Received: from mx.ssi.bg (localhost [127.0.0.1])
+	by mx.ssi.bg (Potsfix) with ESMTP id C88EE20252;
+	Wed, 08 Jul 2026 18:53:32 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
+	:content-type:content-type:date:from:from:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
+	 bh=IrBFyo4X9p4vQcBuAXEscbyeWrGozHn+zcsBI+OqvLA=; b=rGhaM8I/EwgW
+	HvSp6hduo21Rar8HkjRO+WuJ2VuHDC7d9dlomU8UF5YtzUV0ZLUBZ4BDZ08MF/w0
+	QJ7eBHhkZ2e1NoYOCraLJ3pYyMxAKJ5BcMYPOQg806+fBw5l5XpfcrW5dwNDch6u
+	1VC8zjSgewpLyAqLebPHaAlK+2c69PL+0FXofnBLcK5lSGeQl8I+47LGd2CywkeP
+	rDOM3CO93CCJk8z73uWAATYexH7/Um7MV5KmHhEEk8buXJ5MwjYPByGVNGabhuVn
+	bgs30xxlohn3+P/jo2HLU6Dvbk1OwD3Eqa8gfi4/UnCcY+EzsI5dsOfxXq3sa/B2
+	5r2jTdci421Kgtas6DtmX3bXaiF2DHQ6HU4a26NBvB14ub+IFWzaNMweT0OBw2vs
+	I4sQZRbDVyCcwa9HeDjmRxRxzn3b3ma31pVETQ2eSgL06lotDaEBUgVNwZGIlYNm
+	M9qrrq1JHtZKbAUczLfVwQLqq2JvtYF8+pycZ82cZ50lHdYG0tyLJ2SP3c6+nN6B
+	N0kVBOAgkgF4GL6Um+5+uQfBzTigZuKuiruGLTwj6BPVFoTAlxc3GVmjz1aEQD7N
+	HzEXw0pyQQseqVouHpUp4bs4FYPm9GAlUxk/iF8BCDzA91VlGRBDOQYIDzOAVH6J
+	uxDfS/k6eoCCalWOWvg+8UwnkSsj4Go=
+Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
+	by mx.ssi.bg (Potsfix) with ESMTPS;
+	Wed, 08 Jul 2026 18:53:32 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by box.ssi.bg (Potsfix) with ESMTPSA id 5F34C6029E;
+	Wed,  8 Jul 2026 18:53:25 +0300 (EEST)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.2/8.18.2) with ESMTP id 668FrEwS064811;
+	Wed, 8 Jul 2026 18:53:16 +0300
+Date: Wed, 8 Jul 2026 18:53:14 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+cc: Simon Horman <horms@verge.net.au>, David Ahern <dsahern@kernel.org>,
+        Ido Schimmel <idosch@nvidia.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+        Alexander Frolkin <avf@eldamar.org.uk>, netdev@vger.kernel.org,
+        lvs-devel@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        stable@vger.kernel.org, Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+        Ao Wang <wangao@seu.edu.cn>, Xuewei Feng <fengxw06@126.com>,
+        Qi Li <qli01@tsinghua.edu.cn>, Ke Xu <xuke@tsinghua.edu.cn>
+Subject: Re: [PATCH nf] ipvs: make destination flags atomic
+In-Reply-To: <91509A0C-9E4A-4F0E-A45C-ABD29396067E@mails.tsinghua.edu.cn>
+Message-ID: <afcdb34c-ec10-de8e-083c-624bcedca90e@ssi.bg>
+References: <20260707085706.96322-1-zhaoyz24@mails.tsinghua.edu.cn> <41c3d792-af7d-5582-5057-ac3df5f7bfd6@ssi.bg> <91509A0C-9E4A-4F0E-A45C-ABD29396067E@mails.tsinghua.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next v11 7/7] selftests: netconsole: validate target
- resume
-Content-Language: fr
-To: Andre Carvalho <asantostc@gmail.com>, Breno Leitao <leitao@debian.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>
-References: <20260118-netcons-retrigger-v11-0-4de36aebcf48@gmail.com>
- <20260118-netcons-retrigger-v11-7-4de36aebcf48@gmail.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20260118-netcons-retrigger-v11-7-4de36aebcf48@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
+	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305879-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305880-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[verge.net.au,kernel.org,nvidia.com,davemloft.net,google.com,redhat.com,netfilter.org,strlen.de,nwl.cc,eldamar.org.uk,vger.kernel.org,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ssi.bg:from_mime,ssi.bg:email,ssi.bg:mid,ssi.bg:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
+	FORGED_SENDER(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FORGED_RECIPIENTS(0.00)[m:zhaoyz24@mails.tsinghua.edu.cn,m:horms@verge.net.au,m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:avf@eldamar.org.uk,m:netdev@vger.kernel.org,m:lvs-devel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:stable@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com,debian.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:asantostc@gmail.com,m:leitao@debian.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:shuah@kernel.org,m:horms@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	HAS_ORG_HEADER(0.00)[];
-	FORGED_SENDER(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[ssi.bg:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,netcons_resume.sh:url]
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C45D972885F
+X-Rspamd-Queue-Id: 198AF7289A8
 
-Hi Andre, Breno,
 
-On 18/01/2026 12:00, Andre Carvalho wrote:
-> Introduce a new netconsole selftest to validate that netconsole is able
-> to resume a deactivated target when the low level interface comes back.
+	Hello,
+
+On Wed, 8 Jul 2026, Yizhou Zhao wrote:
+
+> > On Jul 8, 2026, at 03:18, Julian Anastasov <ja@ssi.bg> wrote:
+> > 
+> > On Tue, 7 Jul 2026, Yizhou Zhao wrote:
+> > 
 > 
-> The test setups the network using netdevsim, creates a netconsole target
-> and then remove/add netdevsim in order to bring the same interfaces
-> back. Afterwards, the test validates that the target works as expected.
+> We have posted a v2 patch at:
+> https://lore.kernel.org/netfilter-devel/20260708060454.20534-1-zhaoyz24@mails.tsinghua.edu.cn/
 > 
-> Targets are created via cmdline parameters to the module to ensure that
-> we are able to resume targets that were bound by mac and interface name.
+> The v2 patch updates the commit message with more conservative
+> wording, and fixes the checkpatch logical-continuation warnings.
 
-I'm sorry to react on this "old" patch, but I have some troubles running
-this netcons_resume.sh test in a new environment with containers.
+	After looking again at the code, I think we can
+do it in different way:
 
-> diff --git a/tools/testing/selftests/drivers/net/netcons_resume.sh b/tools/testing/selftests/drivers/net/netcons_resume.sh
-> new file mode 100755
-> index 000000000000..fc5e5e3ad3d4
-> --- /dev/null
-> +++ b/tools/testing/selftests/drivers/net/netcons_resume.sh
+- IP_VS_DEST_F_AVAILABLE and IP_VS_DEST_F_OVERLOAD are defined
+in include/uapi/linux/ip_vs.h but we never export them to user
+space. So, we are free to change them. We can move them to 
+include/net/ip_vs.h, see below...
 
-(...)
+- IP_VS_DEST_F_AVAILABLE is changed only under service_mutex,
+so we can keep its usage
 
-> +function trigger_reactivation() {
-> +	# Add back low level module
-> +	modprobe netdevsim
-> +	# Recreate namespace and two interfaces
-> +	set_network
-> +	# Restore MACs
-> +	ip netns exec "${NAMESPACE}" ip link set "${DSTIF}" \
-> +		address "${SAVED_DSTMAC}"
-> +	if [ "${BINDMODE}" == "mac" ]; then
-> +		ip link set dev "${SRCIF}" down
-> +		ip link set dev "${SRCIF}" address "${SAVED_SRCMAC}"
-> +		# Rename device in order to trigger target resume, as initial
-> +		# when device was recreated it didn't have correct mac address.
-> +		ip link set dev "${SRCIF}" name "${TARGET}"
+- IP_VS_DEST_F_OVERLOAD needs different access methods.
+We can add 'unsigned long flags2;', may be after l_threshold.
+And to switch to such usage (F_OVERLOAD -> FL_OVERLOAD):
 
-When I execute the test, the "ifname" bind mode works without issues,
-but the "mac" one not. From what I see, the socat process doesn't get
-any UDP packet when expected. I wonder if the problem might not come
-from here: the interface is disabled before changing the MAC address and
-renaming the interface, but not re-enabled at the end. Is it normal?
+	- test_bit(IP_VS_DEST_FL_OVERLOAD, &dest->flags2)
+	- set_bit(IP_VS_DEST_FL_OVERLOAD, &dest->flags2)
 
-If I add 'up' at the end of this last line here, or if I remove the
-whole if-statement block, the test passes.
+		Sometimes if (test_bit()) clear_bit() can avoid
+		full memory barrier in ip_vs_dest_update_overload()
 
-In the console, I can see these messages, with or without re-enabling
-the interface:
+	- clear_bit(IP_VS_DEST_FL_OVERLOAD, &dest->flags2)
+		test_bit() guard can help here too
 
-  netdevsim netdevsim642 eni642np1: renamed from eth0
-  netdevsim netdevsim387 eni387np1: renamed from eth1
-  netconsole: netconsole: local port 1514
-  netconsole: netconsole: local IPv4 address 192.0.2.1
-  netconsole: netconsole: interface name ''
-  netconsole: netconsole: local ethernet address '1e:95:b7:ae:ab:dc'
-  netconsole: netconsole: remote port 6666
-  netconsole: netconsole: remote IPv4 address 192.0.2.2
-  netconsole: netconsole: remote ethernet address e6:12:42:f8:4c:b2
-  printk: console [netcon_ext0] enabled
-  netconsole: network logging started
-  netconsole: network logging stopped on interface eni387np1 as it
-unregistered
-  netdevsim netdevsim642 eni642np1: renamed from eth0
-  netdevsim netdevsim387 eni387np1: renamed from eth1
-  netconsole: Process resuming  (mac: 1e:95:b7:ae:ab:dc), s:2, r:-1
-  netpoll: netconsole: device 1e:95:b7:ae:ab:dc not up yet, forcing it
-  netconsole: network logging resumed on interface eni387np1
-  netdevsim netdevsim387 netcons_LFLQP: renamed from eni387np1
-  netconsole selftest: netcons_LFLQP
+	As there are other races involved, something like
+this can be a starting point for such change. It tries harder
+to update the overload flag on dest edit/add but it does not
+include the proposed bitops:
 
-The "network logging resumed on interface" seems to suggest that the
-previous patch of this series here, commit 220dbe3c76ed ("netconsole:
-resume previously deactivated target"), managed to resume the previously
-activated target, but not in my case.
+diff --git a/include/net/ip_vs.h b/include/net/ip_vs.h
+index 49297fec448a..b34631270e24 100644
+--- a/include/net/ip_vs.h
++++ b/include/net/ip_vs.h
+@@ -1906,6 +1906,8 @@ static inline void ip_vs_dest_put_and_free(struct ip_vs_dest *dest)
+ 		kfree(dest);
+ }
+ 
++void ip_vs_dest_update_overload(struct ip_vs_dest *dest);
++
+ /* IPVS sync daemon data and function prototypes
+  * (from ip_vs_sync.c)
+  */
+diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_conn.c
+index d19caf66afeb..3fd221996e6e 100644
+--- a/net/netfilter/ipvs/ip_vs_conn.c
++++ b/net/netfilter/ipvs/ip_vs_conn.c
+@@ -1087,6 +1087,26 @@ static inline int ip_vs_dest_totalconns(struct ip_vs_dest *dest)
+ 		+ atomic_read(&dest->inactconns);
+ }
+ 
++__always_inline void ip_vs_dest_update_overload(struct ip_vs_dest *dest)
++{
++	int conns, l, u;
++
++	u = READ_ONCE(dest->u_threshold);
++	if (!u)
++		goto unset;
++	conns = ip_vs_dest_totalconns(dest);
++	if (conns >= u) {
++		dest->flags |= IP_VS_DEST_F_OVERLOAD;
++		return;
++	}
++	l = READ_ONCE(dest->l_threshold) ? : (u * 3 / 4);
++	if (conns >= l && l)
++		return;
++
++unset:
++	dest->flags &= ~IP_VS_DEST_F_OVERLOAD;
++}
++
+ /*
+  *	Bind a connection entry with a virtual service destination
+  *	Called just after a new connection entry is created.
+@@ -1161,9 +1181,7 @@ ip_vs_bind_dest(struct ip_vs_conn *cp, struct ip_vs_dest *dest)
+ 		atomic_inc(&dest->persistconns);
+ 	}
+ 
+-	if (dest->u_threshold != 0 &&
+-	    ip_vs_dest_totalconns(dest) >= dest->u_threshold)
+-		dest->flags |= IP_VS_DEST_F_OVERLOAD;
++	ip_vs_dest_update_overload(dest);
+ }
+ 
+ 
+@@ -1257,16 +1275,8 @@ static inline void ip_vs_unbind_dest(struct ip_vs_conn *cp)
+ 		atomic_dec(&dest->persistconns);
+ 	}
+ 
+-	if (dest->l_threshold != 0) {
+-		if (ip_vs_dest_totalconns(dest) < dest->l_threshold)
+-			dest->flags &= ~IP_VS_DEST_F_OVERLOAD;
+-	} else if (dest->u_threshold != 0) {
+-		if (ip_vs_dest_totalconns(dest) * 4 < dest->u_threshold * 3)
+-			dest->flags &= ~IP_VS_DEST_F_OVERLOAD;
+-	} else {
+-		if (dest->flags & IP_VS_DEST_F_OVERLOAD)
+-			dest->flags &= ~IP_VS_DEST_F_OVERLOAD;
+-	}
++	if (dest->flags & IP_VS_DEST_F_OVERLOAD)
++		ip_vs_dest_update_overload(dest);
+ 
+ 	ip_vs_dest_put(dest);
+ }
+diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
+index bcf40b8c41cf..2871116e46ec 100644
+--- a/net/netfilter/ipvs/ip_vs_ctl.c
++++ b/net/netfilter/ipvs/ip_vs_ctl.c
+@@ -1315,6 +1315,7 @@ __ip_vs_update_dest(struct ip_vs_service *svc, struct ip_vs_dest *dest,
+ 	struct ip_vs_service *old_svc;
+ 	struct ip_vs_scheduler *sched;
+ 	int conn_flags;
++	bool upd_thresh;
+ 
+ 	/* We cannot modify an address and change the address family */
+ 	BUG_ON(!add && udest->af != dest->af);
+@@ -1370,10 +1371,12 @@ __ip_vs_update_dest(struct ip_vs_service *svc, struct ip_vs_dest *dest,
+ 	/* set the dest status flags */
+ 	dest->flags |= IP_VS_DEST_F_AVAILABLE;
+ 
+-	if (udest->u_threshold == 0 || udest->u_threshold > dest->u_threshold)
+-		dest->flags &= ~IP_VS_DEST_F_OVERLOAD;
+-	dest->u_threshold = udest->u_threshold;
+-	dest->l_threshold = udest->l_threshold;
++	upd_thresh = READ_ONCE(dest->u_threshold) != udest->u_threshold ||
++		     READ_ONCE(dest->l_threshold) != udest->l_threshold;
++	WRITE_ONCE(dest->u_threshold, udest->u_threshold);
++	WRITE_ONCE(dest->l_threshold, udest->l_threshold);
++	if (upd_thresh)
++		ip_vs_dest_update_overload(dest);
+ 
+ 	dest->af = udest->af;
+ 
+@@ -3667,8 +3670,8 @@ __ip_vs_get_dest_entries(struct netns_ipvs *ipvs, const struct ip_vs_get_dests *
+ 			entry.port = dest->port;
+ 			entry.conn_flags = atomic_read(&dest->conn_flags);
+ 			entry.weight = atomic_read(&dest->weight);
+-			entry.u_threshold = dest->u_threshold;
+-			entry.l_threshold = dest->l_threshold;
++			entry.u_threshold = READ_ONCE(dest->u_threshold);
++			entry.l_threshold = READ_ONCE(dest->l_threshold);
+ 			entry.activeconns = atomic_read(&dest->activeconns);
+ 			entry.inactconns = atomic_read(&dest->inactconns);
+ 			entry.persistconns = atomic_read(&dest->persistconns);
+@@ -4277,8 +4280,10 @@ static int ip_vs_genl_fill_dest(struct sk_buff *skb, struct ip_vs_dest *dest)
+ 			 dest->tun_port) ||
+ 	    nla_put_u16(skb, IPVS_DEST_ATTR_TUN_FLAGS,
+ 			dest->tun_flags) ||
+-	    nla_put_u32(skb, IPVS_DEST_ATTR_U_THRESH, dest->u_threshold) ||
+-	    nla_put_u32(skb, IPVS_DEST_ATTR_L_THRESH, dest->l_threshold) ||
++	    nla_put_u32(skb, IPVS_DEST_ATTR_U_THRESH,
++			READ_ONCE(dest->u_threshold)) ||
++	    nla_put_u32(skb, IPVS_DEST_ATTR_L_THRESH,
++			READ_ONCE(dest->l_threshold)) ||
+ 	    nla_put_u32(skb, IPVS_DEST_ATTR_ACTIVE_CONNS,
+ 			atomic_read(&dest->activeconns)) ||
+ 	    nla_put_u32(skb, IPVS_DEST_ATTR_INACT_CONNS,
 
-What I don't understand is why is it working on the Netdev CI, and not
-on my side. The main difference is that I might be missing some
-userspace packages -- but I don't see what can be missing here, all
-other netconsole tests pass -- a specific kernel config, or not applied
-patch. Or something different on the host -- in a container on my side
--- but there shouldn't be any interactions with the host here,
-everything is happening in the VM. Any ideas? :)
+Regards
 
-> +	fi
-> +}
-> +
-> +function trigger_deactivation() {
-> +	# Start by storing mac addresses so we can be restored in reactivate
-> +	SAVED_DSTMAC=$(ip netns exec "${NAMESPACE}" \
-> +		cat /sys/class/net/"$DSTIF"/address)
-> +	SAVED_SRCMAC=$(mac_get "${SRCIF}")
-> +	# Remove low level module
-> +	rmmod netdevsim
-> +}
-> +
-> +trap cleanup EXIT
-> +
-> +# Run the test twice, with different cmdline parameters
-> +for BINDMODE in "ifname" "mac"
-> +do
-> +	echo "Running with bind mode: ${BINDMODE}" >&2
-> +	# Set current loglevel to KERN_INFO(6), and default to KERN_NOTICE(5)
-> +	echo "6 5" > /proc/sys/kernel/printk
+--
+Julian Anastasov <ja@ssi.bg>
 
-Can we remove this? Without that, it is hard to understand what went
-wrong in case of issues.
-
-> +
-> +	# Create one namespace and two interfaces
-> +	set_network
-> +
-> +	# Create the command line for netconsole, with the configuration from
-> +	# the function above
-> +	CMDLINE=$(create_cmdline_str "${BINDMODE}")
-> +
-> +	# The content of kmsg will be save to the following file
-> +	OUTPUT_FILE="/tmp/${TARGET}-${BINDMODE}"
-> +
-> +	# Load the module, with the cmdline set
-> +	modprobe netconsole "${CMDLINE}"
-> +	# Expose cmdline target in configfs
-> +	mkdir "${NETCONS_CONFIGFS}/cmdline0"
-> +
-> +	# Target should be enabled
-> +	wait_target_state "cmdline0" "enabled"
-> +
-> +	# Trigger deactivation by unloading netdevsim module. Target should be
-> +	# disabled.
-> +	trigger_deactivation
-> +	wait_target_state "cmdline0" "disabled"
-> +
-> +	# Trigger reactivation by loading netdevsim, recreating the network and
-> +	# restoring mac addresses. Target should be re-enabled.
-> +	trigger_reactivation
-> +	wait_target_state "cmdline0" "enabled"
-> +
-> +	# Listen for netconsole port inside the namespace and destination
-> +	# interface
-> +	listen_port_and_save_to "${OUTPUT_FILE}" &
-> +	# Wait for socat to start and listen to the port.
-> +	wait_local_port_listen "${NAMESPACE}" "${PORT}" udp
-> +	# Send the message
-> +	echo "${MSG}: ${TARGET}" > /dev/kmsg
-> +	# Wait until socat saves the file to disk
-> +	busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
-
-In my case, the script was stopping here, without any message. I can
-send a patch adding "|| true" to go to the next instruction, and display
-"FAIL: File was not generated.".
-
-> +	# Make sure the message was received in the dst part
-> +	# and exit
-> +	validate_msg "${OUTPUT_FILE}"
-> +
-> +	# kill socat in case it is still running
-> +	pkill_socat
-> +	# Cleanup & unload the module
-> +	cleanup
-> +
-> +	echo "${BINDMODE} : Test passed" >&2
-> +done
-> +
-> +trap - EXIT
-> +exit "${EXIT_STATUS}"
-> 
-
-Cheers,
-Matt
 
