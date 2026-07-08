@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-305712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305714-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 2zJLNL8YTmqWDAIAu9opvQ
-	(envelope-from <netdev+bounces-305712-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:30:39 +0200
+	id /wblCQAZTmqwDAIAu9opvQ
+	(envelope-from <netdev+bounces-305714-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:31:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D49C4723BFC
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:30:38 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39F9D723C25
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:31:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=simonwunderlich.de header.s=09092022 header.b=vtg7s09u;
+	dkim=pass header.d=simonwunderlich.de header.s=09092022 header.b=mN+nJC0h;
 	dmarc=pass (policy=none) header.from=simonwunderlich.de;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305712-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305712-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305714-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305714-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DB203303C5C8
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 09:25:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0EF39304318C
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 09:26:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1111E40D57E;
-	Wed,  8 Jul 2026 09:25:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 237BC413D63;
+	Wed,  8 Jul 2026 09:25:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00291409127;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0046C40960A;
 	Wed,  8 Jul 2026 09:25:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783502738; cv=none; b=EsrkkBVMxYWKjTISTS4X0oRzzotYHznxAd2cepV9Rqakr+FX10hFL6vFbqMPbLG8qridxh1bB4Y2/e9UjSMJZo1LCWvuMz/IFW31CVq3oibc6g/SvTUgFi6Zv3iD5ZGlo4cttt4MyWgGPWpf6I8uECCdlloIpIozRlXEivyqScE=
+	t=1783502740; cv=none; b=AIcbbu3frsInox+hHnTdHYbewWo1QbLr3ZvBrHM/FHvt0UYTTGYyQjKUUux9RKDllE9mGEa5uOxdXJz+XxAQdDyPO1BS+fzeyM35PEJicyout0+BJdcMZuUMqTNJCtZ6JXjim9IHWHaLleGMjcczXDYECRUwTiV0hd7SiDadmcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783502738; c=relaxed/simple;
-	bh=I6JG3l5yadE4ni050YRFuLiJpYeSBeDZaMZ6ox/5iIg=;
+	s=arc-20240116; t=1783502740; c=relaxed/simple;
+	bh=z2y2eFK/vgKRHQoO8Ch0RMv5BVHK+J78ZvQ7iUZ5lU4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tG3VCGV7S9Gl2bL6IXVxNC3JXDtOGTF6+yIrR+5ciPa6ztr4g5O6r/oWrQufMar1dJ3lzoqaWch8ZfWgAM8LSbwl6gRCOWdt4XRFWlq6rwQaR1hLXu2zzeEVjeWdyMitI0ZQJLXx1UK7ZasawAiAyKPX/AN0wMfvOlE4XyJ01Oc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=vtg7s09u; arc=none smtp.client-ip=23.88.38.48
+	 MIME-Version; b=YBtAYVFGZRmUN0PFrwC3h9OMxooGz7njqyMF8HTtEycrON43IsB89YdVyLCdxGlDklIH6g+W6IU4FvHWFgTgUUk0wR1nvTfWghiJJcvyIGJ1IhM9PylhNXHKrU+AcFBoCnIZcdHnJV3hxpSW3wJY9abiFUr6miy0x240QTZWzEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=mN+nJC0h; arc=none smtp.client-ip=23.88.38.48
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
-	s=09092022; t=1783502319;
+	s=09092022; t=1783502320;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5AMdxW44N2haoNqT9owFcCG9SY8E2sZKqXc4kIUckTo=;
-	b=vtg7s09uKKic1UBT1uzejFiC7QPuFsBbHLSeebTB7+kWaNdQkoqkyLoly26gW2WAGPftda
-	+Rai9PCNdEylgOR2YYaQ66PGuhpKj4yYyrV2U4jCKoui1TJSF8T9bwfEFpjvDeVB5tkv0h
-	YCcrtw5wSu01TGhXeQxjriKm2rNZJ0JmblcLqKV3pEzPzRZD0760wYtmR+mqt+YPcMoz4H
-	S9+CMxSzDi7q/nRhhGkCtA5/9QR8o3e7zy7CCqIFEHs8JlIZM2k2561wuFHgPa3GTVMnER
-	ZYvvXdVty836cjlWd8o7LspXRqXVhDmMDxWmtPcGqsVijltodXx02QSre/4QoA==
+	bh=Mhon6sTuY4kUTXwjWv/Mi9kGv+9UzLfGRQ7dJRuPoZ4=;
+	b=mN+nJC0hwMwr8tRccPs1GyDN2Pi/CAxBAEBxe1wnx42SIMgXXRUhZfXYc3m2lQtAb70G8B
+	WQL3CHenvd+3zxuodQAj9RkV+njCVLgnF9g24+NXwXj58VUOvWjKbufU5jRjEkkPmj0p/r
+	pgN6c1s+xqScl/WK7sVOl/8PErDZwMCDfGYKfvyaU1Fj/HSkJUoyHBo+t/+rMgb7nSuCIC
+	mHh38te0f84yXeM7fHJB39Geu5J+oKOPXqOZXhTJEjS3tqdnH1Pc61u8v3izyNkz/RiUdk
+	ZI7OZXEg4n8km/8MSMNIzf0emYMiGAKM1fAly6PgXddjr3sNMHb/c13tGvYTjQ==
 From: Simon Wunderlich <sw@simonwunderlich.de>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -57,9 +57,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Sven Eckelmann <sven@narfation.org>,
 	stable@vger.kernel.org,
 	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH net 3/9] batman-adv: clean untagged VLAN on netdev registration failure
-Date: Wed,  8 Jul 2026 11:18:15 +0200
-Message-ID: <20260708091821.314516-4-sw@simonwunderlich.de>
+Subject: [PATCH net 4/9] batman-adv: tt: avoid request storms during pending request
+Date: Wed,  8 Jul 2026 11:18:16 +0200
+Message-ID: <20260708091821.314516-5-sw@simonwunderlich.de>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260708091821.314516-1-sw@simonwunderlich.de>
 References: <20260708091821.314516-1-sw@simonwunderlich.de>
@@ -77,19 +77,19 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[simonwunderlich.de,none];
 	R_DKIM_ALLOW(-0.20)[simonwunderlich.de:s=09092022];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-305712-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305714-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:b.a.t.m.a.n@lists.open-mesh.org,m:sven@narfation.org,m:stable@vger.kernel.org,m:sw@simonwunderlich.de,s:lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -103,109 +103,43 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,simonwunderlich.de:from_mime,simonwunderlich.de:email,simonwunderlich.de:mid,simonwunderlich.de:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,narfation.org:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D49C4723BFC
+X-Rspamd-Queue-Id: 39F9D723C25
 
 From: Sven Eckelmann <sven@narfation.org>
 
-When an mesh interface is registered, it creates an untagged struct
-batadv_meshif_vlan on top of it via the NETDEV_REGISTER notifier. But in
-this process, another receiver of this notification can veto the
-registration. The netdev registration will be aborted because of this veto.
+batadv_send_tt_request() allocates a tt_req_node when none exists for the
+destination originator node. This should prevent that a multiple TT
+requests are send at the same time to an originator.
 
-The register_netdevice() call will try to clean up the net_device using
-unregister_netdevice_queue() - which only uses the .priv_destructor to
-free private resources. In this situation, .dellink will not be called.
+But if allocation of the send buffer failed, this request must be cleaned
+up again. But indicator for such a failure is "ret == false". But the
+actual implementation is checking for "ret == true".
 
-The cleanup of the untagged batadv_meshif_vlan must thefore be done in the
-destructor to avoid a leak of this object.
+The check must be inverted to not loose the information about the TT
+request directly after it was attempted to be sent out. This should avoid
+potential request storms.
 
 Cc: stable@vger.kernel.org
-Fixes: 5d2c05b21337 ("batman-adv: add per VLAN interface attribute framework")
+Fixes: 335fbe0f5d25 ("batman-adv: tvlv - convert tt query packet to use tvlv unicast packets")
 Signed-off-by: Sven Eckelmann <sven@narfation.org>
 Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
 ---
- net/batman-adv/main.c           |  8 ++++++++
- net/batman-adv/mesh-interface.c | 13 ++-----------
- net/batman-adv/mesh-interface.h |  2 ++
- 3 files changed, 12 insertions(+), 11 deletions(-)
+ net/batman-adv/translation-table.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/batman-adv/main.c b/net/batman-adv/main.c
-index 8844e40e6a803..67bed3ee77e7e 100644
---- a/net/batman-adv/main.c
-+++ b/net/batman-adv/main.c
-@@ -259,6 +259,7 @@ int batadv_mesh_init(struct net_device *mesh_iface)
- void batadv_mesh_free(struct net_device *mesh_iface)
- {
- 	struct batadv_priv *bat_priv = netdev_priv(mesh_iface);
-+	struct batadv_meshif_vlan *vlan;
+diff --git a/net/batman-adv/translation-table.c b/net/batman-adv/translation-table.c
+index 4bfad36a4b704..aae72015645a4 100644
+--- a/net/batman-adv/translation-table.c
++++ b/net/batman-adv/translation-table.c
+@@ -2971,7 +2971,7 @@ static bool batadv_send_tt_request(struct batadv_priv *bat_priv,
+ out:
+ 	batadv_hardif_put(primary_if);
  
- 	WRITE_ONCE(bat_priv->mesh_state, BATADV_MESH_DEACTIVATING);
- 
-@@ -273,6 +274,13 @@ void batadv_mesh_free(struct net_device *mesh_iface)
- 
- 	batadv_mcast_free(bat_priv);
- 
-+	/* destroy the "untagged" VLAN */
-+	vlan = batadv_meshif_vlan_get(bat_priv, BATADV_NO_FLAGS);
-+	if (vlan) {
-+		batadv_meshif_destroy_vlan(bat_priv, vlan);
-+		batadv_meshif_vlan_put(vlan);
-+	}
-+
- 	/* Free the TT and the originator tables only after having terminated
- 	 * all the other depending components which may use these structures for
- 	 * their purposes.
-diff --git a/net/batman-adv/mesh-interface.c b/net/batman-adv/mesh-interface.c
-index 0b75234521b63..fbfd99268de47 100644
---- a/net/batman-adv/mesh-interface.c
-+++ b/net/batman-adv/mesh-interface.c
-@@ -595,8 +595,8 @@ int batadv_meshif_create_vlan(struct batadv_priv *bat_priv, unsigned short vid)
-  * @bat_priv: the bat priv with all the mesh interface information
-  * @vlan: the object to remove
-  */
--static void batadv_meshif_destroy_vlan(struct batadv_priv *bat_priv,
--				       struct batadv_meshif_vlan *vlan)
-+void batadv_meshif_destroy_vlan(struct batadv_priv *bat_priv,
-+				struct batadv_meshif_vlan *vlan)
- {
- 	/* explicitly remove the associated TT local entry because it is marked
- 	 * with the NOPURGE flag
-@@ -1091,22 +1091,13 @@ static int batadv_meshif_newlink(struct net_device *dev,
- static void batadv_meshif_destroy_netlink(struct net_device *mesh_iface,
- 					  struct list_head *head)
- {
--	struct batadv_priv *bat_priv = netdev_priv(mesh_iface);
- 	struct batadv_hard_iface *hard_iface;
--	struct batadv_meshif_vlan *vlan;
- 
- 	while (!list_empty(&mesh_iface->adj_list.lower)) {
- 		hard_iface = netdev_adjacent_get_private(mesh_iface->adj_list.lower.next);
- 		batadv_hardif_disable_interface(hard_iface);
- 	}
- 
--	/* destroy the "untagged" VLAN */
--	vlan = batadv_meshif_vlan_get(bat_priv, BATADV_NO_FLAGS);
--	if (vlan) {
--		batadv_meshif_destroy_vlan(bat_priv, vlan);
--		batadv_meshif_vlan_put(vlan);
--	}
--
- 	unregister_netdevice_queue(mesh_iface, head);
- }
- 
-diff --git a/net/batman-adv/mesh-interface.h b/net/batman-adv/mesh-interface.h
-index 53756c5a45e04..5e1e83e04ffbc 100644
---- a/net/batman-adv/mesh-interface.h
-+++ b/net/batman-adv/mesh-interface.h
-@@ -21,6 +21,8 @@ void batadv_interface_rx(struct net_device *mesh_iface,
- bool batadv_meshif_is_valid(const struct net_device *net_dev);
- extern struct rtnl_link_ops batadv_link_ops;
- int batadv_meshif_create_vlan(struct batadv_priv *bat_priv, unsigned short vid);
-+void batadv_meshif_destroy_vlan(struct batadv_priv *bat_priv,
-+				struct batadv_meshif_vlan *vlan);
- void batadv_meshif_vlan_release(struct kref *ref);
- struct batadv_meshif_vlan *batadv_meshif_vlan_get(struct batadv_priv *bat_priv,
- 						  unsigned short vid);
+-	if (ret && tt_req_node) {
++	if (!ret && tt_req_node) {
+ 		spin_lock_bh(&bat_priv->tt.req_list_lock);
+ 		if (!hlist_unhashed(&tt_req_node->list)) {
+ 			hlist_del_init(&tt_req_node->list);
 -- 
 2.47.3
 
