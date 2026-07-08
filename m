@@ -1,180 +1,139 @@
-Return-Path: <netdev+bounces-305721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305722-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id OTXWBBYdTmrqDQIAu9opvQ
-	(envelope-from <netdev+bounces-305721-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:49:10 +0200
+	id OyRAMLEdTmorDgIAu9opvQ
+	(envelope-from <netdev+bounces-305722-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:51:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 655FF723DF4
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:49:09 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51139723E92
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:51:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=netfilter.org header.s=2025 header.b="qRIpuNf/";
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305721-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305721-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=V9SrlQfH;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305722-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305722-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D8E8F301DC3E
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 09:48:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2D44D301F152
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 09:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66E1833FE2F;
-	Wed,  8 Jul 2026 09:48:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5BE32ED58;
+	Wed,  8 Jul 2026 09:50:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65B732860B;
-	Wed,  8 Jul 2026 09:48:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC7EC322768;
+	Wed,  8 Jul 2026 09:50:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783504135; cv=none; b=FSjxB7TZvV/NgLVSegBshFufXTxt3HO83uFzz+AvjhFnZ1/9CChmOP5S1SVAKOMXw0FxsNUCME/ErOh9LLCHW9SbOY7AXRuf5n4oVbdvGBTgjMmSdAjN3rCZdohN2dkyKnmp++OiVlXG69uM5PEeaPMCHsvA1Z3vwpqtcFadOdc=
+	t=1783504228; cv=none; b=NNEuOZVaEWKS0Cj6jby1ClwB9KAeQP9qOivkNNhxMRimM/OmaeREEq7MFnvjVA6jvub4iVjdC9bDzjY2bZRwXg0G7HXsF0bAZJiCP4/oRwQgqzm4K2FrbuY0BQYFgpf2l+Px5uOegnGsXV8YERBB04YcbmsUsAs8/vbNm7cLg/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783504135; c=relaxed/simple;
-	bh=X5xuPPkM4pw2HH1LwZVPuqZvsbhgyekRtZKLwkDx22Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sCzmHCQTPlJTeee1C1SBc8LUF6xT1x0/Z/d4kccA/6Qct/2K4f++WAZBqfN/mALoXiJWLZ/cVyHHoD8HADhk9M2jE60yhsS2BfgHkYC6d/MkRvQuFEl9TQESVpZZh+nvCXDfL78sq1ZYxpplDQx8gud1Oo71ilpbTMZLvzuGsz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=qRIpuNf/; arc=none smtp.client-ip=217.70.190.124
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 1053960193;
-	Wed,  8 Jul 2026 11:48:52 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1783504132;
-	bh=UpErLOvc7LypcUmI0780VM1aFUUZM+RYAVzEWgLm5xA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qRIpuNf/dF83w9J6TtQmzlvSWfQ3G1P3DskDtizIcaXbreOgXiEsNEERvHoA3y4yY
-	 lCCwMyRak/zSK9ebaUTPCuBUESS+cAu9GYN8Vy180Eji5gif9ygiLE7PQfkoTdO/Jx
-	 oVaD9+/jbsZWMgYIB7Pm3XCCIYZACUDggdh+iEm8asksjmav7y1d3RQBoTA8l02fDD
-	 z8ESgkeQD3T/G9QKHGk+d5bY+XScnZcQ9JdfYnjVYw9brH10Ts0cFj1eAxc+BXkE2i
-	 S/hcLlKpT8Ue2FZukY/NegtndsnB/iIO/e6s+QE/cd7u8mrMhfjcSpXfQzfHArD2E+
-	 oGXjPtu3OxM8g==
-Date: Wed, 8 Jul 2026 11:48:49 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Stanislav Fomichev <sdf.kernel@gmail.com>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Krishna Kumar <krikku@gmail.com>,
-	Martin Karsten <mkarsten@uwaterloo.ca>, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, bridge@lists.linux.dev
-Subject: Re: [PATCH v12 nf-next 3/7] netfilter: nf_flow_table_offload: Add
- nf_flow_rule_bridge()
-Message-ID: <ak4dAXHDmTDRr7-b@chamomile>
-References: <20260707091045.967678-1-ericwouds@gmail.com>
- <20260707091045.967678-4-ericwouds@gmail.com>
+	s=arc-20240116; t=1783504228; c=relaxed/simple;
+	bh=iy35GBWFC/MrIA3370XuDu2OpM58GQ4Uc3qsS8cBalY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=FrvGUmat2ENoVgdjxFKsVszA+BXL/b488B2P7kSy5AqAejdH4Ldi6PPRFBGy6xL1rXs/55wrI3mlBDKvqjPblAErx7yJyGJOfrStpEV2TfWKyYvjyqft3ATy3TSky8xYExRqliWqtIWftwtfdZ7XhZr19jN3LJZVgincrdlTkBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V9SrlQfH; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C19091F00A3A;
+	Wed,  8 Jul 2026 09:50:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783504226;
+	bh=/BuyvH1dcxTv4VZSu0HO7PZC50NBeOGm81a2slkrjoY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=V9SrlQfHOhqF0FHD6ZdW4xNfsEvuwrbzo3VE0itsZ+4Tj1SCQlDaIvBFpxOK/zynQ
+	 gXlyMen2zUGcod3/+EuS6zN1jOoRjOJ6NlY1HGzsINLhsa3w0lIvOZRdlAwcmGFwiy
+	 HC9Kxke2uvJWFAWH2AcZ0fP+y4MAmy4TWTJiLleGoWMxfCDFIwDvuw7PD1Q+6GONhG
+	 39aIhHPZVQn7F9UPbKFdUme8LMHI9CDErI7pA3BT7oH50yHQkH0p2CYv/KrBP1hkkP
+	 gGKlEiJ42XcTyRREbpP3t98C43zCXqomyhR3l2CI634awpJkB/HDTfgSZA8ZqBIl3y
+	 vhxbNNPiecaOw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 5697339263BF;
+	Wed,  8 Jul 2026 09:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260707091045.967678-4-ericwouds@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3] net/sched: cake: reject overhead values that underflow
+ length
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178350420589.2406324.14854685159827268973.git-patchwork-notify@kernel.org>
+Date: Wed, 08 Jul 2026 09:50:05 +0000
+References: 
+ <20260702000758.297407.e5c888d9d99d.cake-overhead-underflow@trailofbits.com>
+In-Reply-To: 
+ <20260702000758.297407.e5c888d9d99d.cake-overhead-underflow@trailofbits.com>
+To: Samuel Moelius <sam.moelius@trailofbits.com>
+Cc: toke@toke.dk, jhs@mojatatu.com, jiri@resnulli.us, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ cake@lists.bufferbloat.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:ericwouds@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:fw@strlen.de,m:phil@nwl.cc,m:razor@blackwall.org,m:idosch@nvidia.com,m:kuniyu@google.com,m:sdf.kernel@gmail.com,m:skhawaja@google.com,m:liuhangbin@gmail.com,m:krikku@gmail.com,m:mkarsten@uwaterloo.ca,m:netdev@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:bridge@lists.linux.dev,m:andrew@lunn.ch,m:sdfkernel@gmail.com,s:lists@lfdr.de];
-	DMARC_NA(0.00)[netfilter.org];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305722-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FORGED_SENDER(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS(0.00)[m:sam.moelius@trailofbits.com,m:toke@toke.dk,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:cake@lists.bufferbloat.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,strlen.de,nwl.cc,blackwall.org,nvidia.com,gmail.com,uwaterloo.ca,vger.kernel.org,lists.linux.dev];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-305721-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,chamomile:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,netfilter.org:from_mime,netfilter.org:dkim,blackwall.org:email]
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 655FF723DF4
+X-Rspamd-Queue-Id: 51139723E92
 
-Hi,
+Hello:
 
-On Tue, Jul 07, 2026 at 11:10:41AM +0200, Eric Woudstra wrote:
-> Add nf_flow_rule_bridge().
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Thu,  2 Jul 2026 00:07:59 +0000 you wrote:
+> CAKE accepts signed overhead values and stores them in an s16, but the
+> adjusted packet length calculation uses unsigned arithmetic.  A negative
+> effective length can therefore wrap to a large value.
 > 
-> It only calls the common rule and adds the redirect.
-
-I decided to use the new _unsupp() function, so we don't pretend
-bridge hw offload is already supported. We will need a driver before
-we can add this, this stub does not provide much. I guess your goal
-was just to avoid a crash here.
-
-> Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
-> ---
->  include/net/netfilter/nf_flow_table.h |  3 +++
->  net/netfilter/nf_flow_table_offload.c | 13 +++++++++++++
->  2 files changed, 16 insertions(+)
+> Such configurations make rate accounting depend on integer wraparound
+> rather than on the packet size userspace intended to model.  A static
+> netlink lower bound is not enough because packets reaching CAKE can be
+> smaller than any reasonable manual-overhead allowance.
 > 
-> diff --git a/include/net/netfilter/nf_flow_table.h b/include/net/netfilter/nf_flow_table.h
-> index 7b23b245a5a86..5c6e3b65ae85b 100644
-> --- a/include/net/netfilter/nf_flow_table.h
-> +++ b/include/net/netfilter/nf_flow_table.h
-> @@ -368,6 +368,9 @@ void nf_flow_table_offload_flush_cleanup(struct nf_flowtable *flowtable);
->  int nf_flow_table_offload_setup(struct nf_flowtable *flowtable,
->  				struct net_device *dev,
->  				enum flow_block_command cmd);
-> +int nf_flow_rule_bridge(struct net *net, struct flow_offload *flow,
-> +			enum flow_offload_tuple_dir dir,
-> +			struct nf_flow_rule *flow_rule);
->  int nf_flow_rule_route_ipv4(struct net *net, struct flow_offload *flow,
->  			    enum flow_offload_tuple_dir dir,
->  			    struct nf_flow_rule *flow_rule);
-> diff --git a/net/netfilter/nf_flow_table_offload.c b/net/netfilter/nf_flow_table_offload.c
-> index 002ec15d988bd..5566ebda7b7d3 100644
-> --- a/net/netfilter/nf_flow_table_offload.c
-> +++ b/net/netfilter/nf_flow_table_offload.c
-> @@ -740,6 +740,19 @@ nf_flow_rule_route_common(struct net *net, const struct flow_offload *flow,
->  	return 0;
->  }
->  
-> +int nf_flow_rule_bridge(struct net *net, struct flow_offload *flow,
-> +			enum flow_offload_tuple_dir dir,
-> +			struct nf_flow_rule *flow_rule)
-> +{
-> +	if (nf_flow_rule_route_common(net, flow, dir, flow_rule) < 0)
-> +		return -1;
-> +
-> +	flow_offload_redirect(net, flow, dir, flow_rule);
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(nf_flow_rule_bridge);
-> +
->  int nf_flow_rule_route_ipv4(struct net *net, struct flow_offload *flow,
->  			    enum flow_offload_tuple_dir dir,
->  			    struct nf_flow_rule *flow_rule)
-> -- 
-> 2.53.0
-> 
+> [...]
+
+Here is the summary with links:
+  - [v3] net/sched: cake: reject overhead values that underflow length
+    https://git.kernel.org/netdev/net/c/b7f97cae7ec1
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
