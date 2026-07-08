@@ -1,190 +1,233 @@
-Return-Path: <netdev+bounces-306004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306005-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 9GsQJeXSTmpGUwIAu9opvQ
-	(envelope-from <netdev+bounces-306004-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 00:44:53 +0200
+	id ZTKWEKDTTmqLUwIAu9opvQ
+	(envelope-from <netdev+bounces-306005-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 00:48:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1925972AECF
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 00:44:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 938E572AF1E
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 00:47:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=UVKTyyLA;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306004-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306004-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=auditcode.ai header.s=zmail header.b=hapswX3h;
+	dmarc=pass (policy=none) header.from=auditcode.ai;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306005-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306005-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BEAC23042810
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 22:44:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 827D1304C11C
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 22:47:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7FFF400E0C;
-	Wed,  8 Jul 2026 22:44:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FC79315793;
+	Wed,  8 Jul 2026 22:46:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv2-f1.google.com (mail-qv2-f1.google.com [74.125.230.129])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender-op-o17.zoho.eu (sender-op-o17.zoho.eu [136.143.169.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C733F7AB9
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 22:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 580112DF719;
+	Wed,  8 Jul 2026 22:46:56 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783550676; cv=pass; b=ZxDgotiIISqVebWvpaFQCApEzziPpyzImD44iYqGCbqqgbipuplewtlMahhO5U2zkY4QCO/0/2Zqqe5QGJiwa4T5jLr2xFeds0MZK6nFL1LzGhCLujJhD5WsywPVLzsvKdhIMmQu/dB7NFgbTQuCObXT+KL1u48UqRzQ8r5IGVA=
+	t=1783550819; cv=pass; b=QYjAYM+ZPAhUyYHUfPajG5D+Mx6WVeu2g+oy9sW6GjrKF5IRFMGsfCKDfzT873Wupv2ops8hLatGZ+2A47YCyGaqBE12QBijCUKC7SKwf3ePXu7Bw5QqGt18j+j2qD39WmJpoCtyPtBpyv7Mmw8ZaBTGwQxH6wpiQrU/w4e674s=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783550676; c=relaxed/simple;
-	bh=LLNhkfWdeUPVzDAF5zUPQg/J3NffcXVnybN7CMTspwM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SmS0+kQeKRlOZf13yMutsaW9UFTTLEl6IlhKH7shpVP5zTOPLCJstqW/Pqu/XuAor+U6DXnM1L5bqCS4o4CQEyMuBvTegPeanwKjsd6pW7g/4l38SpOWumLhkoI9lbEy2x61b82qMvGnmY+QlVCjRef2PwKI92vIGKRShmKwonM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UVKTyyLA; arc=pass smtp.client-ip=74.125.230.129
-Received: by mail-qv2-f1.google.com with SMTP id 6a1803df08f44-8de1d032d56so4138976d6.0
-        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 15:44:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783550674; cv=none;
-        d=google.com; s=arc-20260327;
-        b=dQGg9XTekrExzK+dK5lTEf43X47jQdOC1uzKjxLa48ssiLuHhFv14hqxowibE4TGD0
-         FbfOCmgwnQijCPNf6R7GiYOwjJiImDsSOiziC8ShPz5jvcJjSUDKjw27YEGtwSO3pp1y
-         ZKHU4KPQX9VRPNMIJcZ2RdFldTtyihr5BAuC+vRJffO9tOGxHdTnG3s1FECFiTdSvDEn
-         c19d2EvEfJwr8eZm4aSkm+MX2RTHUXR9qs7CMQ8SEBsN0aBfvrh+8BoKs1kuJqgaujd2
-         C97iLKFt31c29aO/kLCZQJelYxZMFo/jpyK33QeTd2NdRsNnX+DVKpcV2rvefTly9VgP
-         Btqw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=bLPKDOeCD+1o9/Dzr4Ln1MhIdulj5ZDzLX8a0QaxQYQ=;
-        fh=jsOTozTIHSP6Cza/PvpDKoCAbEZMM534UViWoD4Q83g=;
-        b=NiYtPbPURoYs6pTMPxUfIAfLYctwaavGJ6089fuo8W6Xzwyq3+l0HQtBpYWjqfCb/b
-         dJlZNNG8xXenP2YY1cv80lOElxSaXpBvPHAN+gF8/i4HcWvs7clqcaYe0xQxLHIxdsbS
-         TDUO3YCi08cp3T6SMymy5nTqgjGeFpdERKQaG37QPJqayt7c0BqMyi2Xt98VAimu3Fss
-         yx07Bhz2Gk5+ZpmbOculwzE80gdtkwxCRnO3DJFr5sodWAKT9m+IeJ8HWESMWy0Wz8eE
-         2dZS2Q4jOakvME/TrMkTi9jxkSjsLaxfPBr8NNmLOk3F5i3B0EOceFzPyrYTsABv82hg
-         Glvg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783550674; x=1784155474; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=bLPKDOeCD+1o9/Dzr4Ln1MhIdulj5ZDzLX8a0QaxQYQ=;
-        b=UVKTyyLAf5TiBvUWbqBDF3eV6RI96UTyaqH6aVQ7kFB30qB+G10rL+5LwNv8Dg11Ox
-         ohBwxVj1bZkVucfZwyle0A4ydDciJ9V4DxXFe7TqczNnQpWX1VKwwsuKEyMJnpiNMYWp
-         EUxd6932wiN3EqpvqnXd0i6o4W1XXHuIqxn7VpLSZzUoUaVfkMW9R8V0w90quCeK3XP6
-         OZfWlGu//mcBguDPyxbUjro7l3ecB4dJOnjhW4Veg8RQGIZoDBKJVCA18N9xkLlE9S8D
-         XWuyQ48uJ0vdKLacVyNoQ4vgo1HSQBWSFKZHBG6a8D6CLsEi2qqh4gTA5wumM0Xjdt2/
-         J4MQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783550674; x=1784155474;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=bLPKDOeCD+1o9/Dzr4Ln1MhIdulj5ZDzLX8a0QaxQYQ=;
-        b=ble67gRqCU1xg7ABhdodUocln+wi0wV72HGHJ3Jr4NTULKh8D0uKzZPh69yi5d/MLK
-         +rLY2fofcVEPcae9Ng0dO4EOqyJs8NWTNmDRAQavj43+MPXmJxBMnOaI52MQWkLCrebp
-         EIJlwM/toE1DaZAmz+3p9hZxqb8nB2ksRKEM9ouUZxWG8VvN586HgaecsTCNvnYSxpnx
-         RFFL5o5RMy5Ro+5uiYMrk6pl7tlzLTRs8/lx9dRNSNqdMAL+Jtq2bdcYLjMAy7FflosB
-         vDPvEIgHBaovfQf/KTh50jySr+ToJLV0LZXt8+5YGKXv1UOjoNxsIWRv3gs+IWE+vYsx
-         z2gg==
-X-Forwarded-Encrypted: i=1; AHgh+RpmfTYFR5ij/vQ4WfCrfThSynILujtaHzN/hHFGuAM5CWYWiaf/mrOqOOXFyLM7vTw4PMGQ/tM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YznJwfoUxhIkg+sv15cJDPziTx5Q+F58FWGpJNXq5HUsDYGujYq
-	NRM9bMUP+AKBKJmcTIoISkbn8meOcaItz+fBU9NICnu7PV+DCR6/HHF9J5yGTRLe45CuPRE5AYM
-	63DJm9Uw4WzaEmcdUJnwuP9wrdccHxzI=
-X-Gm-Gg: AfdE7clsYTdA+U0aFNSsCyG/4tVTixSu+iXkOEjsl4W2L4kMCyR0qsSoHJ5KE6BX8e7
-	IaQZmUW+72Aw36+7VpN0ksL4foa9xR+8+PMyctdxc18KImFm+puDR9Peo6ZZ12qiR6KuowwgeSh
-	pUJkJMv+uSA5Q+yGBTkh67FSoh8kSmJuTHfsY1vsoWNkrPo8yFTc6V67v5cHGa/gTBvRc1O8SYe
-	5LYLK7P3J9/LXKc1bQ4uVd2VdYQl7JJ5KFMi1Hg7iUon2rImjbGjlKMtHbe/+vwh4BM41o76R2i
-	P0IXSNdlS5LysBuCk0xsd2nSVe4c0n7cixtVfNivH6aZ7O6ZOUw0pXEU8g==
-X-Received: by 2002:ad4:5ca6:0:b0:8ef:a4d5:1523 with SMTP id
- 6a1803df08f44-8fec2d4614cmr50151326d6.42.1783550674017; Wed, 08 Jul 2026
- 15:44:34 -0700 (PDT)
+	s=arc-20240116; t=1783550819; c=relaxed/simple;
+	bh=jILP5Z6OPK8gxpQC2+iS4tCb6I25ZrP2gErb2RMG+f8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O+MZbOIMDVmrPi1OaWLcHoso7SL/PGjcfxaTTH5soUuJF+yqVnq0wAnyJVwVokPvmfMsbt46k6uO/z3O7idXCzsFDz+85oaeL05wNeVmYX6Z3xymm7n9ESqjrl4XMrl8/dcT/ADpZ23SPhfd3RQUV6Ds56HSNgwvPIKKiFq4Gt8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=auditcode.ai; spf=pass smtp.mailfrom=auditcode.ai; dkim=pass (1024-bit key) header.d=auditcode.ai header.i=security@auditcode.ai header.b=hapswX3h; arc=pass smtp.client-ip=136.143.169.17
+ARC-Seal: i=1; a=rsa-sha256; t=1783550795; cv=none; 
+	d=zohomail.eu; s=zohoarc; 
+	b=I69ImU8dBtqEfzcFa7JxisF1ng3nCovGaDDcVl7ESwqq1aOCdrTodJ3X6LjsA8mWj7mUpzUVqVVeiV/Xq1RXUBgmDOdcxFerpC3DP46zyoZv8swwUbpgJ2ydblc7dIi1rapBsy9oPpaqlDl7h32hooIZjjaV5XYSHbrIUrdQLfQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
+	t=1783550795; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=YHo7QS+KZ7ArRwLLv3UorwxU8L3SjC/F1OjeKqTwFiw=; 
+	b=MWmeEH5AzwfUxjrq9/Ujfegy82OUZ2OwrebaIep0mYaJYFfuR0DDs3NNVo8cSt38+7gnzpXSHXNsOStmWRDbyPaULI7RNpek+3HAd8AWqKkNyjLzrwfUq7hZ6YBAmld+wEEYt18C+hTffmf0f2iUihY1L72ZVlabAFiNac74M1U=
+ARC-Authentication-Results: i=1; mx.zohomail.eu;
+	dkim=pass  header.i=auditcode.ai;
+	spf=pass  smtp.mailfrom=security@auditcode.ai;
+	dmarc=pass header.from=<security@auditcode.ai>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1783550795;
+	s=zmail; d=auditcode.ai; i=security@auditcode.ai;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=YHo7QS+KZ7ArRwLLv3UorwxU8L3SjC/F1OjeKqTwFiw=;
+	b=hapswX3hoKdCdOpiapMAVs26P/SrH9CKwTX92Yl0waCvf4StFVpqTPKPql78j/th
+	jhxA2IJzzaJBTe7MCLSooI0HMXMaVU88eNm4XWoMogu9ihmTA3Q3jG93wczieI58lz/
+	gUHtl6QnDPWooIuCH/+unf6RZgtWwQ4jpRx34eHc=
+Received: by mx.zoho.eu with SMTPS id 1783550793953780.7520409843604;
+	Thu, 9 Jul 2026 00:46:33 +0200 (CEST)
+From: Ibrahim Hashimov <security@auditcode.ai>
+To: Antonio Quartulli <antonio@openvpn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Sabrina Dubroca <sd@queasysnail.net>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH] ovpn: prevent UAF re-add to by_transp_addr on float-vs-delete race
+Date: Thu,  9 Jul 2026 00:46:31 +0200
+Message-ID: <20260708224631.1365-1-security@auditcode.ai>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260705083724.24494-1-pengpeng@iscas.ac.cn>
-In-Reply-To: <20260705083724.24494-1-pengpeng@iscas.ac.cn>
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Date: Wed, 8 Jul 2026 15:44:23 -0700
-X-Gm-Features: AUfX_mxJL2tTqyB3fiMZ9o8Nt9yyvNlGf1QmdljUFtCVK4O4T07jrTSLQnm3nZU
-Message-ID: <CADkSEUigsJmMgMPGFX1TdhgC0+NVEyR2ijK8rk0yTz-UGHFmSQ@mail.gmail.com>
-Subject: Re: [PATCH] net: usb: sr9700: validate receive packet extent
-To: Pengpeng Hou <pengpeng@iscas.ac.cn>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Peter Korsgaard <peter@korsgaard.com>, Simon Horman <horms@kernel.org>, linux-usb@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[auditcode.ai,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[auditcode.ai:s=zmail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306004-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:pengpeng@iscas.ac.cn,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:peter@korsgaard.com,m:horms@kernel.org,m:linux-usb@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-306005-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[security@auditcode.ai,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:antonio@openvpn.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:sd@queasysnail.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[security@auditcode.ai,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[auditcode.ai:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com]
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1925972AECF
+X-Rspamd-Queue-Id: 938E572AF1E
 
-On Sun, Jul 5, 2026 at 1:37=E2=80=AFAM Pengpeng Hou <pengpeng@iscas.ac.cn> =
-wrote:
->
-> sr9700_rx_fixup() copies len bytes from skb->data + SR_RX_OVERHEAD when
-> a URB contains multiple packets. The old check compared len against
-> skb->len, but the source pointer has already skipped SR_RX_OVERHEAD
-> bytes.
->
-> Validate len against the remaining bytes after SR_RX_OVERHEAD before the
-> copy and cursor advance.
->
-> Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
-> ---
-> diff --git a/drivers/net/usb/sr9700.c b/drivers/net/usb/sr9700.c
-> --- a/drivers/net/usb/sr9700.c
-> +++ b/drivers/net/usb/sr9700.c
-> @@ -355,7 +355,8 @@
->                 /* ignore the CRC length */
->                 len =3D (skb->data[1] | (skb->data[2] << 8)) - 4;
->
-> -               if (len > ETH_FRAME_LEN || len > skb->len || len < 0)
-> +               if (len > ETH_FRAME_LEN || len < 0 ||
-> +                   len > skb->len - SR_RX_OVERHEAD)
->                         return 0;
->
->                 /* the last packet of current skb */
->
+ovpn_peer_endpoints_update() reacts to a data-channel "float" (a
+peer's packets arriving from a new source transport address) by
+first committing the new endpoint under peer->lock, then dropping
+peer->lock, and only afterwards re-acquiring peer->ovpn->lock and
+peer->lock to rehash the peer into peers->by_transp_addr:
 
-Hi, Pengpeng,
+	spin_unlock_bh(&peer->lock);
+	ovpn_nl_peer_float_notify(peer, &ss);
+	if (peer->ovpn->mode == OVPN_MODE_MP) {
+		spin_lock_bh(&peer->ovpn->lock);
+		spin_lock_bh(&peer->lock);
+		bind = rcu_dereference_protected(peer->bind, ...);
+		if (unlikely(!bind)) {
+			... return;
+		}
+		...
+		hlist_nulls_del_init_rcu(&peer->hash_entry_transp_addr);
+		nhead = ovpn_get_hash_head(peer->ovpn->peers->by_transp_addr, ...);
+		hlist_nulls_add_head_rcu(&peer->hash_entry_transp_addr, nhead);
+		...
+	}
 
-Other than the subject needing to be clarified, as Andrew mentioned,
-the patch looks good to me. Thank you for noticing this issue.
+Between the spin_unlock_bh(&peer->lock) and the re-acquire of
+peer->ovpn->lock, this thread holds *no* lock on the peer at all. If
+an OVPN_CMD_PEER_DEL arrives in that window, ovpn_peer_remove()
+(which only requires peer->ovpn->lock) runs to completion: it
+unhashes the peer from every table, including by_transp_addr, and
+queues it on the release list. peer->bind is only cleared much
+later, when the peer is actually released, so the
+"if (unlikely(!bind))" check performed after re-acquiring the locks
+does *not* observe that the peer has already been removed.
+ovpn_peer_endpoints_update() then proceeds to unconditionally re-add
+hash_entry_transp_addr, resurrecting the already-removed peer in the
+by_transp_addr hash table. Because ovpn_peer_remove() itself guards
+against a double remove with
+"if (hlist_unhashed(&peer->hash_entry_id)) return;", nothing ever
+unhashes the peer a second time. Once the in-flight RX packet that
+triggered the float drops its reference and the refcount reaches
+zero, the peer is kfree()'d via RCU while still linked in
+by_transp_addr. The next matching lookup in
+ovpn_peer_get_by_transp_addr() walks that bucket and calls
+ovpn_peer_transp_match(), dereferencing the freed peer's ->bind
+*before* ovpn_peer_hold() is attempted -- a slab-use-after-free read
+on the RX softirq path, runtime-confirmed under KASAN (715
+independent "slab-use-after-free in ovpn_peer_get_by_transp_addr"
+reports, kmalloc-1k / struct ovpn_peer, freed by the RCU callback,
+read from udp_queue_rcv_one_skb -> ovpn_udp_encap_recv ->
+ovpn_peer_get_by_transp_addr).
 
-Reviewed-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Tested-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Fix it the same way ovpn_peer_remove() protects itself against a
+racing double-remove: after re-acquiring peer->ovpn->lock, check
+hlist_unhashed(&peer->hash_entry_id) before touching
+hash_entry_transp_addr. ovpn_peer_remove() only mutates the peer's
+hashtable membership while holding peer->ovpn->lock, and this check
+is performed while we hold that same lock, so the observation is
+race-free: either the remove has already happened and hash_entry_id
+is unhashed (in which case we must not resurrect the peer and simply
+return), or it has not happened yet and cannot happen until we
+release peer->ovpn->lock (by which point the rehash under this lock
+has already completed). This mirrors the existing double-remove
+idiom in ovpn_peer_remove() (drivers/net/ovpn/peer.c) rather than
+introducing a new locking primitive.
 
-Ethan
+This is a minimal, targeted fix for the float-vs-delete race; it
+does not attempt to shrink the lock-free window itself (peer->lock
+is still dropped around ovpn_nl_peer_float_notify()), only to stop
+the rehash path from acting on a peer it can no longer safely assume
+is still part of the peer tables.
+
+Runtime-verified on a v6.19 KASAN-instrumented kernel: a reproducer
+that races authenticated-peer float traffic against a concurrent
+OVPN_CMD_PEER_DEL reliably trips a KASAN slab-use-after-free read in
+ovpn_peer_get_by_transp_addr() before this fix, and the same
+reproducer no longer triggers it once this fix is applied.
+
+Fixes: f0281c1d3732 ("ovpn: add support for updating local or remote UDP endpoint")
+Cc: stable@vger.kernel.org
+Signed-off-by: Ibrahim Hashimov <security@auditcode.ai>
+Assisted-by: AuditCode-AI:2026.07
+---
+ drivers/net/ovpn/peer.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/drivers/net/ovpn/peer.c b/drivers/net/ovpn/peer.c
+index a09d61296425..aeb69f0b06fa 100644
+--- a/drivers/net/ovpn/peer.c
++++ b/drivers/net/ovpn/peer.c
+@@ -307,6 +307,28 @@ void ovpn_peer_endpoints_update(struct ovpn_peer *peer, struct sk_buff *skb)
+ 			return;
+ 		}
+ 
++		/* Guard against a peer that was concurrently removed (e.g.
++		 * OVPN_CMD_PEER_DEL -> ovpn_peer_remove()) while we held neither
++		 * peer->lock nor ovpn->lock, i.e. in the window opened by the
++		 * spin_unlock_bh(&peer->lock) above. ovpn_peer_remove() only
++		 * unhashes the peer and queues it for release: peer->bind is
++		 * not cleared until the peer is actually released, so the
++		 * !bind check we just did above does not catch this case.
++		 * Blindly re-adding hash_entry_transp_addr below would
++		 * resurrect an already-removed (and soon to be freed) peer in
++		 * the by_transp_addr table, causing a use-after-free the next
++		 * time that table is walked. Reuse the same
++		 * hlist_unhashed(&peer->hash_entry_id) test ovpn_peer_remove()
++		 * itself uses to detect a duplicate removal: ovpn->lock is
++		 * held here too, so this observation is race-free with any
++		 * in-flight or future removal.
++		 */
++		if (unlikely(hlist_unhashed(&peer->hash_entry_id))) {
++			spin_unlock_bh(&peer->lock);
++			spin_unlock_bh(&peer->ovpn->lock);
++			return;
++		}
++
+ 		/* This function may be invoked concurrently, therefore another
+ 		 * float may have happened in parallel: perform rehashing
+ 		 * using the peer->bind->remote directly as key
+-- 
+2.50.1 (Apple Git-155)
+
 
