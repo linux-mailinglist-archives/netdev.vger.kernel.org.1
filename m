@@ -1,187 +1,386 @@
-Return-Path: <netdev+bounces-305716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305717-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id UBffIiwZTmrADAIAu9opvQ
-	(envelope-from <netdev+bounces-305716-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:32:28 +0200
+	id 26+cMCwaTmolDQIAu9opvQ
+	(envelope-from <netdev+bounces-305717-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:36:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0B5E723C3D
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:32:27 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55D68723CC5
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:36:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=compal.com (policy=reject);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305716-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305716-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=fXYDQMR0;
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305717-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305717-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7A16C302813E
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 09:30:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 89F3B3011A51
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 09:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C366B411665;
-	Wed,  8 Jul 2026 09:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C881641B358;
+	Wed,  8 Jul 2026 09:35:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from tpecef21.compal.com (exmail3.compal.com [59.120.207.196])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FDF340BCC1;
-	Wed,  8 Jul 2026 09:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D834541A76A
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 09:35:48 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783503036; cv=none; b=ceBTo8N7yb5XSUOnx3nRWeww8p2Bl3SQ1XlVQ3vjHgTxrxMgeTvVebcxVZNeToN5M++R8t4e8tRflnGFLGUemGH7u+hPvwaucPS8g/EMMds802tPn3C5JqNnfFBQrR6zT1KaDWWo5Xo+KcsETyvqGbc+9sGE38G155Qha22Y5Js=
+	t=1783503352; cv=none; b=G/ld6v4djzFtmYMv/7YF67NrIicx9RSxYrTF6MwSpG0pG2EKGzIW5xodGnIoFKh4IoINalDE4u1PFrM4Pq0lNf6sWtCA3y7IxMwYL4HaagCwzjIL9M//IYnFyInOZ8QGB13FVm6Zv8ra/g8KGFNd9YD4DdyKaMxeIhSEFVD7hVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783503036; c=relaxed/simple;
-	bh=fdXCHFlSHY6Pi75XVezjTuGAQRUzEJGxffv1ff2kPdo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=je4wM1L8bj+uoDJbaFBkEy6LRtG/jBG2MYovLdf1McACdrm9wlgv6ghqjnen4kKUr/R7pQvkM3Z12vO9zcf+MOLr5mMIQ2/AUBxdJK1gBje/h/TRGSR2gR+Eo26U3zGAia4gqU2U/bTJ1yefYRqfsnxxFE5jQ4TE/jO6129nMe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=compal.com; spf=pass smtp.mailfrom=compal.com; arc=none smtp.client-ip=59.120.207.196
-X-UUID: a318ae327aaf11f1b2470fb4f881575f-20260708
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.17,REQID:ace3b483-2243-4700-bb3f-c990361bb1fa,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:d497b38,CLOUDID:922b396e-22d0-4ede-bde2-6d8eba2d8269,B
-	ulkID:nil,BulkQuantity:0,SF:80|81|82|83|102|110|111|836|865|888|898,TC:-5,
-	Content:-10|0|15|50|99,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,B
-	EC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: a318ae327aaf11f1b2470fb4f881575f-20260708
-Received: from sdmg11.sdbg.compal.com [(10.113.168.9)] by tpecef21.compal.com
-	(envelope-from <jackbb_wu@compal.com>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 430219693; Wed, 08 Jul 2026 17:30:19 +0800
-X-UUID: a0d994747aaf11f1b328fd8a884f4420-20260708
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.15,REQID:67e242bb-a205-4bc1-8542-34d19cf307b3,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:e276073,CLOUDID:b579e314-ea64-44d4-98db-4e1fb89955a3,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102|110|111|836|865|888|
-	898,TC:-5,Content:-10|0|15|50|99,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:ni
-	l,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE
-	:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: a0d994747aaf11f1b328fd8a884f4420-20260708
-Received: from sdbmbx13.tpe.compalcomm.com [(10.113.2.137)] by sdmg11.sdbg.compal.com
-	(envelope-from <jackbb_wu@compal.com>)
-	(Compal Mail Service with TLSv1.2 ECDHE-RSA-AES128-SHA 128/128)
-	with ESMTP id 2050100014; Wed, 08 Jul 2026 17:30:16 +0800
-Received: from SDBMBX13.tpe.compalcomm.com (10.113.2.137) by
- SDBMBX13.tpe.compalcomm.com (10.113.2.137) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Wed, 8 Jul 2026 17:30:12 +0800
-Received: from SDBMBX13.tpe.compalcomm.com ([fe80::2b98:6c2c:37df:2a86]) by
- SDBMBX13.tpe.compalcomm.com ([fe80::2b98:6c2c:37df:2a86%11]) with mapi id
- 15.02.2562.043; Wed, 8 Jul 2026 17:30:12 +0800
-From: "Wu. JackBB (GSM)" <JackBB_Wu@compal.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Loic Poulain <loic.poulain@oss.qualcomm.com>, Sergey Ryazanov
-	<ryazanov.s.a@gmail.com>, Johannes Berg <johannes@sipsolutions.net>, "Andrew
- Lunn" <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Wen-Zhi Huang <wen-zhi.huang@mediatek.com>, Shi-Wei Yeh
-	<shi-wei.yeh@mediatek.com>, Minano Tseng <Minano.tseng@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
-	<angelogioacchino.delregno@collabora.com>, Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-mediatek@lists.infradead.org"
-	<linux-mediatek@lists.infradead.org>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>
-Subject: RE: [External Mail] Re: [PATCH v3 2/7] net: wwan: t9xx: Add control
- plane transaction layer
-Thread-Topic: [External Mail] Re: [PATCH v3 2/7] net: wwan: t9xx: Add control
- plane transaction layer
-Thread-Index: AQHdA/KoG0AzoVDQmky5mWyAxH40ubZVI4cU///wpwCABNxa7P//y6CAgAm0KDo=
-Date: Wed, 8 Jul 2026 09:30:12 +0000
-Message-ID: <e85332119e154021b062b5fc55c0e7b8@compal.com>
-References: <20260624-t9xx_driver_v1-v3-0-73ff03f60c48@compal.com>
- <20260624-t9xx_driver_v1-v3-2-73ff03f60c48@compal.com>
- <2a90ae6b-2b6d-4340-b557-915252cc3488@lunn.ch>
- <49939d4d682f4c1fb359973ea2cdbd00@compal.com>
- <92b1e341-31a1-4f60-80d5-ccf8f742a38a@lunn.ch>
- <4ec081f8df234cc584702abc67213965@compal.com>,<1e75c090-f4aa-4a02-82f5-fd4f3854acbe@lunn.ch>
-In-Reply-To: <1e75c090-f4aa-4a02-82f5-fd4f3854acbe@lunn.ch>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-tm-as-product-ver: SMEX-14.0.0.3239-9.1.2019-30054.005
-x-tm-as-result: No-10--3.904000-8.000000
-x-tmase-matchedrid: CEwNJ/T/RZQuv++HU7VXryRFbfQbCufdN0X64jGy2db7+pncqRJfyx3E
-	y8bUOyJjLw+bI5poIljs40ztshOst3xCS+CiD3FqO9AbTF0WkMJ2Tr80kEaYUBxnMY5CbhsDBK5
-	jsahkTKnXaWrmEWCMgtXNOAQ2MSi2E+WLy1iJCWo58Sarp97J8xfqd/DJ3Zya7rEbQf2fdE7Y1X
-	9Lfi2tyajbSjLATgmfsOVWI173K16vZxwuuLqHzTAkd+hz53cJ9DE2tWwfka1IaQZV+iBbeJT/N
-	1bEGeXqAyJyOEvE0jHbYRPoS4v8I1dlNryGcEYBugRp53kzD5HdjOqvc66oIgeBiFV2jjCF
-x-tm-as-user-approved-sender: No
-x-tm-as-user-blocked-sender: No
-x-tmase-result: 10--3.904000-8.000000
-x-tmase-version: SMEX-14.0.0.3239-9.1.2019-30054.005
-x-tm-snts-smtp: 67EF2485A09C352298FE9A9653BA47C3F06CDA692DB1F078D6CA9BF212C9D1CA2000:8
-Content-Type: text/plain; charset="big5"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1783503352; c=relaxed/simple;
+	bh=StteSp9fRcSPzilMyJoQaXo0nUGQEkeryVKN26Ddpbk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=dZO7DzXyaVg/d/WB8dNOfKmBi6ngaASqkZ074+rtyGg0icVY9+EOVcHWlzQm+QvyV4PemIXuR9euxDgWFXDbHO972EYhZdvcWFoF/K+H0U5E24mzcHH9o3rl/rKApWxz6IEmwQ1F1FE5jAt9UQGrldTjK/58FLjodL64Au0cDdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fXYDQMR0; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783503347;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WANXkYn/R4DaHane7E5z4t8hUV+EyVL6+p1Ml7qoTi0=;
+	b=fXYDQMR0EHZECzsQyB5C/oJKVXrvQ0xeFLD2+MmLvu9tGQT8s/uTp69pe7zVReftFiSJwX
+	o6Ha7Oh4k20q138WmU6IdHcmvhVzbZKAGsx0Pfs/+o5Q45YBbALYop42dvcbNWQ8GQXsg5
+	Qr5f35YX0HMKnY84WGeGHuhNsEMFcSY=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-488-6PA1K0UrPjKq-PzooXSccA-1; Wed,
+ 08 Jul 2026 05:35:43 -0400
+X-MC-Unique: 6PA1K0UrPjKq-PzooXSccA-1
+X-Mimecast-MFC-AGG-ID: 6PA1K0UrPjKq-PzooXSccA_1783503340
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 675121956051;
+	Wed,  8 Jul 2026 09:35:39 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.49.133])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B7B321800480;
+	Wed,  8 Jul 2026 09:35:29 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: dipayanroy@linux.microsoft.com
+Cc: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	leon@kernel.org,
+	longli@microsoft.com,
+	kotaranov@microsoft.com,
+	horms@kernel.org,
+	shradhagupta@linux.microsoft.com,
+	ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com,
+	shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	stephen@networkplumber.org,
+	jacob.e.keller@intel.com,
+	dipayanroy@microsoft.com,
+	leitao@debian.org,
+	kees@kernel.org,
+	john.fastabend@gmail.com,
+	hawk@kernel.org,
+	bpf@vger.kernel.org,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	sdf@fomichev.me,
+	yury.norov@gmail.com,
+	pavan.chebbi@broadcom.com
+Subject: Re: [PATCH net-next v11 2/2] net: mana: force full-page RX buffers via ethtool private flag
+Date: Wed,  8 Jul 2026 11:35:24 +0200
+Message-ID: <20260708093524.130524-1-pabeni@redhat.com>
+In-Reply-To: <20260701141808.461554-3-dipayanroy@linux.microsoft.com>
+References: <20260701141808.461554-3-dipayanroy@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [3.14 / 15.00];
-	DMARC_POLICY_REJECT(2.00)[compal.com : SPF not aligned (relaxed), No valid DKIM,reject];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305716-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me,broadcom.com];
+	TAGGED_FROM(0.00)[bounces-305717-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[compal.com:mid,compal.com:from_mime,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
-	FREEMAIL_CC(0.00)[oss.qualcomm.com,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,mediatek.com,collabora.com,lwn.net,linuxfoundation.org,vger.kernel.org,lists.infradead.org];
+	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:loic.poulain@oss.qualcomm.com,m:ryazanov.s.a@gmail.com,m:johannes@sipsolutions.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:wen-zhi.huang@mediatek.com,m:shi-wei.yeh@mediatek.com,m:Minano.tseng@mediatek.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:linux-doc@vger.kernel.org,m:ryazanovsa@gmail.com,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:dipayanroy@linux.microsoft.com,m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:leon@kernel.org,m:longli@microsoft.com,m:kotaranov@microsoft.com,m:horms@kernel.org,m:shradhagupta@linux.microsoft.com,m:ssengar@linux.microsoft.com,m:ernis@linux.microsoft.com,m:shirazsaleem@microsoft.com,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:stephen@networkplumber.org,m:jacob.e.keller@intel.com,m:dipayanroy@microsoft.com,m:leitao@debian.org,m:kees@kernel.org,m:john.fastabend@gmail.com,m:hawk@kernel.org,m:bpf@vger.kernel.org,m:daniel@iogearbox.net,m:ast@kernel.org,m:sdf@fomichev.me,m:yury.norov@gmail.com,m:pavan.chebbi@broadcom.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,m:yurynorov@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER(0.00)[JackBB_Wu@compal.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[35];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[JackBB_Wu@compal.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	R_DKIM_NA(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,linux.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B0B5E723C3D
+X-Rspamd-Queue-Id: 55D68723CC5
 
-SGkgQW5kcmV3LA0KDQo+ID4gV2Ugd2lsbCBhbHNvIHJlbW92ZSBhbGwgdW5uZWNlc3NhcnkgZGV2
-bV9rZnJlZSgpIGNhbGxzIGZyb20gcHJvYmUNCj4gPiBlcnJvciBwYXRocyBhbmQgcmVtb3ZlIHBh
-dGhzLCBrZWVwaW5nIHRoZW0gb25seSB3aGVyZSByZXNvdXJjZXMNCj4gPiBhcmUgZnJlZWQgYW5k
-IHJlLWFsbG9jYXRlZCBhdCBydW50aW1lIChlLmcuLCBDTERNQSBxdWV1ZSBsaWZlY3ljbGUNCj4g
-PiBkdXJpbmcgbW9kZW0gcmVzZXQgY3ljbGVzKS4NCj4NCj4gVGhlcmUgaXMgbm8gcG9pbnQgdXNp
-bmcgZGV2bV8gaWYgeW91IGFyZSBnb2luZyB0byBtYW51YWxseSBtYW5hZ2UNCj4gdGhlaXIgcmVs
-ZWFzZS4gQW55dGhpbmcgd2hpY2ggaGFzIGEgc2hvcnRlciBsaWZldGltZSB0aGFuIHRoZSBkZXZp
-Y2UNCj4gc2hvdWxkIHVzZSBremFsbG9jKCkva2ZyZWUoKS4NCg0KV2Ugd2lsbCBjb252ZXJ0IGFs
-bCBydW50aW1lLW1hbmFnZWQgcmVzb3VyY2VzIGZyb20NCmRldm1fa3phbGxvYy9kZXZtX2tmcmVl
-IHRvIHBsYWluIGt6YWxsb2Mva2ZyZWUsIHNpbmNlIHRoZXkgaGF2ZQ0Kc2hvcnRlciBsaWZldGlt
-ZXMgdGhhbiB0aGUgZGV2aWNlLiBPbmx5IGRldmljZS1saWZldGltZSByZXNvdXJjZXMNCndpbGwg
-cmVtYWluIGFzIGRldm1fa3phbGxvYy4NCg0KVGhhbmtzLg0KICAgIEphY2sgV3U=
+From: AI Reviewer <ai@example.com>
+
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+---
+net: mana: force full-page RX buffers via ethtool private flag
+
+This adds an ethtool private flag "full-page-rx" that forces one RX buffer
+per page to avoid a page_pool fragment path throughput regression on some
+4K PAGE_SIZE ARM64 platforms. Toggling the flag while the port is up
+triggers a mana_detach() + mana_attach() reconfiguration to apply the new
+buffer layout.
+
+A few questions inline.
+
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> index 7438ea6b3f26..38f50b4eef87 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+
+[ ... mana_use_single_rxbuf_per_page() and mana_get_rxbuf_cfg() hunks
+      unrelated to the comments below ... ]
+
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> index 3531abfdaf43..24f6ce63b031 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+
+[ ... ]
+
+> @@ -611,6 +630,88 @@ static int mana_get_link_ksettings(struct net_device *ndev,
+>  	return 0;
+>  }
+>  
+> +static u32 mana_get_priv_flags(struct net_device *ndev)
+> +{
+> +	struct mana_port_context *apc = netdev_priv(ndev);
+> +
+> +	return apc->priv_flags;
+> +}
+> +
+> +static int mana_set_priv_flags(struct net_device *ndev, u32 priv_flags)
+> +{
+> +	struct mana_port_context *apc = netdev_priv(ndev);
+> +	u32 changed = apc->priv_flags ^ priv_flags;
+> +	u32 old_priv_flags = apc->priv_flags;
+> +	bool schedule_port_reset = false;
+> +	int err = 0;
+> +
+> +	if (!changed)
+> +		return 0;
+> +
+> +	/* Reject unknown bits */
+> +	if (priv_flags & ~GENMASK(MANA_PRIV_FLAG_MAX - 1, 0))
+> +		return -EINVAL;
+> +
+> +	if (changed & BIT(MANA_PRIV_FLAG_USE_FULL_PAGE_RXBUF)) {
+> +		apc->priv_flags = priv_flags;
+
+[Low]
+Is the storage of priv_flags intentionally nested inside the per-flag
+branch?  With only one flag today this is fine, but when a second bit is
+added to enum mana_priv_flag_bits, a user toggling only the new bit
+passes the !changed and unknown-bits checks, the outer if is skipped,
+apc->priv_flags is never updated, and mana_set_priv_flags() returns 0
+while mana_get_priv_flags() keeps reporting the old state.
+
+Would it be cleaner to store priv_flags unconditionally after validation
+and use per-flag if (changed & BIT(...)) blocks only for the
+flag-specific reconfiguration?
+
+> +
+> +		if (!apc->port_is_up) {
+> +			/* Port is down, flag updated to apply on next up
+> +			 * so just return.
+> +			 */
+> +			return 0;
+> +		}
+> +
+> +		/* Pre-allocate buffers to prevent failure in mana_attach
+> +		 * later
+> +		 */
+> +		err = mana_pre_alloc_rxbufs(apc, ndev->mtu, apc->num_queues);
+
+[Low]
+When the MTU is already jumbo (mtu + MANA_RXBUF_PAD > PAGE_SIZE / 2) or
+XDP is attached, mana_use_single_rxbuf_per_page() already returns true
+regardless of the new priv flag:
+
+	if (apc->priv_flags & BIT(MANA_PRIV_FLAG_USE_FULL_PAGE_RXBUF))
+		return true;
+
+	/* For xdp and jumbo frames make sure only one packet fits per page. */
+	if (mtu + MANA_RXBUF_PAD > PAGE_SIZE / 2 || mana_xdp_get(apc))
+		return true;
+
+In that case mana_get_rxbuf_cfg() produces identical output whether the
+new flag is on or off, yet toggling the flag here always performs a full
+mana_pre_alloc_rxbufs() + mana_detach() + mana_attach() cycle and flaps
+the link.
+
+Would a pre/post comparison of mana_get_rxbuf_cfg() output be worth
+adding to skip the reconfiguration when nothing actually changes?
+
+[High]
+mana_set_priv_flags() drives the same detach/attach sequence used by
+mana_set_channels() and mana_per_port_queue_reset_work_handler(), but
+does not take apc->vport_mutex and set apc->channel_changing = true
+across the window.
+
+The struct comment on channel_changing spells out the invariant:
+
+	/* Set by mana_set_channels() under vport_mutex to block RDMA
+	 * from grabbing the vport during the detach/attach window.
+	 * Checked by mana_cfg_vport() when called from the RDMA path.
+	 */
+	bool channel_changing;
+
+Without it, after mana_detach() uncfg's the vport an RDMA client can
+call mana_cfg_vport() and bump vport_use_count, and then mana_attach()
+will fail with -EBUSY when it re-cfg's the vport.
+
+There is also no equivalent of the '!port_is_up && vport_use_count'
+early -EBUSY check that mana_set_channels() performs, so is the flag
+allowed to be changed silently while an RDMA client is using the vport?
+
+> +		if (err) {
+> +			netdev_err(ndev,
+> +				   "Insufficient memory for new allocations\n");
+> +			apc->priv_flags = old_priv_flags;
+> +			return err;
+> +		}
+> +
+> +		err = mana_detach(ndev, false);
+
+[High]
+mana_detach() begins with ASSERT_RTNL(), and so does mana_attach()
+called below.  Is RTNL guaranteed to be held on the SET priv-flags path?
+
+mana registers net_shaper_ops in mana_devops, which makes it an
+ops-locked driver, so netdev_need_ops_lock() is true and the ethtool
+core acquires rtnl only when the driver opts in via
+ETHTOOL_OP_NEEDS_RTNL_* for that specific command.
+
+Looking at mana_ethtool_ops.op_needs_rtnl:
+
+	.op_needs_rtnl		= ETHTOOL_OP_NEEDS_RTNL_SCHANNELS |
+				  ETHTOOL_OP_NEEDS_RTNL_SRINGPARAM |
+				  ETHTOOL_OP_NEEDS_RTNL_GLINK,
+
+ETHTOOL_OP_NEEDS_RTNL_SPFLAGS is not listed, so ASSERT_RTNL() in the
+detach/attach helpers below will WARN, and the code races with
+RTNL-serialized mutators (mana_open, mana_close, mana_change_mtu,
+mana_tx_timeout) that read and write apc->port_is_up, apc->rxqs,
+apc->tx_qp and apc->port_st_save.
+
+Should ETHTOOL_OP_NEEDS_RTNL_SPFLAGS be added to op_needs_rtnl, matching
+what is already done for SET channels?
+
+> +		if (err) {
+> +			netdev_err(ndev, "mana_detach failed: %d\n", err);
+> +			apc->priv_flags = old_priv_flags;
+> +
+> +			/* Port is in an inconsistent state. Restore
+> +			 * 'port_is_up' so that queue reset work handler
+> +			 * can properly detach and re-attach.
+> +			 */
+> +			apc->port_is_up = true;
+> +			schedule_port_reset = true;
+> +			goto out;
+> +		}
+> +
+> +		err = mana_attach(ndev);
+> +		if (err) {
+> +			netdev_err(ndev, "mana_attach failed: %d\n", err);
+> +			apc->priv_flags = old_priv_flags;
+> +
+> +			/* Restore 'port_is_up' so the reset work handler
+> +			 * can properly detach/attach. Without this,
+> +			 * the handler sees port_is_up=false and skips
+> +			 * queue allocation, leaving the port dead.
+> +			 */
+> +			apc->port_is_up = true;
+> +			schedule_port_reset = true;
+
+[High]
+On this branch, mana_detach() has already succeeded and run
+mana_cleanup_port_context(), so apc->rxqs is NULL and queues are torn
+down.  Setting apc->port_is_up = true here between now and when
+queue_reset_work runs opens a window where callers gate on port_is_up
+as their "safe to access rxqs/tx_qp" predicate.
+
+For example, mana_get_ethtool_stats() does:
+
+	if (!apc->port_is_up)
+		return;
+	...
+	rxq = apc->rxqs[q];
+	...
+
+A concurrent ethtool -S invocation during that window will pass the
+port_is_up gate and dereference apc->rxqs[q]->stats on a NULL rxqs.
+
+Is the port_is_up restore actually needed for the reset work handler's
+mana_detach() call?  On the reset path, mana_detach() takes its early
+return when !netif_device_present(ndev):
+
+	if (!from_close && !netif_device_present(ndev))
+		return 0;
+
+That early return does not touch apc->port_st_save, so the saved state
+from the earlier successful mana_detach() should already be intact for
+the follow-up mana_attach().
+
+There is also no smp_wmb() paired with this write, unlike the pattern
+used inside mana_detach()/mana_attach() proper.
+
+> +		}
+> +	}
+> +
+> +out:
+> +	mana_pre_dealloc_rxbufs(apc);
+> +
+> +	if (schedule_port_reset)
+> +		queue_work(apc->ac->per_port_queue_reset_wq,
+> +			   &apc->queue_reset_work);
+> +
+> +	return err;
+> +}
+> +
+
+[ ... remaining hunks unrelated to the comments above ... ]
+-- 
+This is an AI-generated review.
+
 
