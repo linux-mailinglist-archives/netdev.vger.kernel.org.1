@@ -1,202 +1,144 @@
-Return-Path: <netdev+bounces-305824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305825-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4HWJEAZWTmqUKwIAu9opvQ
-	(envelope-from <netdev+bounces-305824-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:52:06 +0200
+	id KWxHBLJXTmrQKwIAu9opvQ
+	(envelope-from <netdev+bounces-305825-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:59:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7995726F86
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:52:05 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D323727031
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:59:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=collabora.com header.s=zohomail header.b=PB5MOWP6;
-	dmarc=pass (policy=none) header.from=collabora.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305824-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305824-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=v06q6lq3;
+	dmarc=pass (policy=none) header.from=lunn.ch;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305825-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305825-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4A30030A07F9
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 13:45:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A260E3025C1B
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 13:56:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF25C3803DE;
-	Wed,  8 Jul 2026 13:45:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D44422537;
+	Wed,  8 Jul 2026 13:55:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319CB3803C5;
-	Wed,  8 Jul 2026 13:45:12 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783518314; cv=pass; b=oYY/oVNaCP7uLoe0PTVCicIFO3l5YgUrh1OhbEUzepc+W2ItmirxN7v4j9ipJm12AzJeQbr71g/VckDTbRRBORujhDVi5XqKZSBuwt7wnqY2U7EsvjUD4VIhRb+ZN0/FJhoAOiHL7xyMMzNVkxrQIt0JMhpv/l+L+VE+l1TeZCk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783518314; c=relaxed/simple;
-	bh=qWprFcj4shuGHq5yxrj4ujGarnc9yIZ52TmhC/6XIwk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IeqW/652y/JdA/mEbObu9LYYVzPNHHeJvYPDKIrpc6OZ4txuMJb1Hk+Eu0viFrDBRO/kTQcEUPl0UfyguQIL4lYP2BwyCsNxLfwDabbDfPEFH9uBIhKsbcrT8kB7zJydi0ChUEOoI2xM9dRvgfZcpB6Is/TmMZcEPlkTKosRpUQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=louisalexis.eyraud@collabora.com header.b=PB5MOWP6; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal: i=1; a=rsa-sha256; t=1783518290; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=HBq9iS9jB6ewfkBvD6l/hbdZk9lWKDtHUbN71aNOZzsPLaY3iejK0SyY1j/4NBwcd9eUXrS+SniQU/2qJDseInB9kzWsSB1x5o6XcRGzRTkW3fzh9mXmRrTEM38b/bPRWHnLqzQmtdZzhYRN5kTvn5g1GWHdz5W38zNcUGDPR1w=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1783518290; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=qWprFcj4shuGHq5yxrj4ujGarnc9yIZ52TmhC/6XIwk=; 
-	b=m6cuxMrOVq4L8VkW/d073JvTz5zzxha3+ZKqTNROYRjUXXEbtxF1PaXWsflkd0SVK0gOre6P4sulmjdLtx0F7J7LCaaYCla+xr1elj1AHOb6EwnWOZdvoZfLQkQ5KHmdyjACCyE8UQsMr+OELEjcVBo68P3XkKdoxRn2PSiEQ64=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=louisalexis.eyraud@collabora.com;
-	dmarc=pass header.from=<louisalexis.eyraud@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1783518290;
-	s=zohomail; d=collabora.com; i=louisalexis.eyraud@collabora.com;
-	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
-	bh=qWprFcj4shuGHq5yxrj4ujGarnc9yIZ52TmhC/6XIwk=;
-	b=PB5MOWP6bfWP1uYvdd2mougUVnAF9pEe1jEhriEp822oJuoalAbrJcw9fBaiUssu
-	cjDdpxFnM0U3H7mB8Krxm0/TwkhW5jVwv7DdRs4J8Eur4cNdBl08RvlqbcuxgegdjJS
-	wDFfIWKK2x+8boHirToKdrVaKDl1pBin8nwP48/w=
-Received: by mx.zohomail.com with SMTPS id 178351828794519.896016735108105;
-	Wed, 8 Jul 2026 06:44:47 -0700 (PDT)
-Message-ID: <d1e37bd4f2a05fed6c7bfdc5d9a0fa90c892d608.camel@collabora.com>
-Subject: Re: [PATCH 02/15] dt-bindings: clock: mediatek: regroup MT8188
- dt-bindings into MT8186
-From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
-To: Rob Herring <robh@kernel.org>
-Cc: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>,  Brian Masney <bmasney@redhat.com>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley	 <conor+dt@kernel.org>, Matthias Brugger
- <matthias.bgg@gmail.com>,  AngeloGioacchino Del Regno
- <angelogioacchino.delregno@collabora.com>, Chun-Jie Chen
- <chun-jie.chen@mediatek.com>, Philipp Zabel	 <p.zabel@pengutronix.de>,
- Edward-JW Yang <edward-jw.yang@mediatek.com>,  Richard Cochran
- <richardcochran@gmail.com>, kernel@collabora.com,
- linux-clk@vger.kernel.org, 	devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, 	linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, 	netdev@vger.kernel.org
-Date: Wed, 08 Jul 2026 15:44:42 +0200
-In-Reply-To: <20260701193311.GA1402559-robh@kernel.org>
-References: 
-	<20260701-mt8189-clocks-system-base-v1-0-2b048feea50a@collabora.com>
-	 <20260701-mt8189-clocks-system-base-v1-2-2b048feea50a@collabora.com>
-	 <20260701193311.GA1402559-robh@kernel.org>
-Organization: Collabora Ltd
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0208A41169C;
+	Wed,  8 Jul 2026 13:55:28 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783518940; cv=none; b=Z5N8ehrNOCCcLI8KbVAml/+Q6Fnqt2eAGV+GBFvyEOwJ9hht6B7QsuU6UdTyBKnuiqn3SiPKKHCxuVC3X3HhmKS8t+EIIXpi96/ScBc01Y5ksQ5gDie+YzceKTcWraV3h8M/6KqHJECIIzpjSlgRp+WPQaewD7x7xCj3fE9Dpvc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783518940; c=relaxed/simple;
+	bh=y71ANcgxK4k7zYOyU6FPjouwov/Lhp1d/qAMm3ED5C4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q+lTFVQhIQ8ld65TITGRVv1auXKHQcYmH27qONP0h1cMjcNB9uWwSk/sz88W2+UrkpIdyWGDqdv17RcGuI2NupJl4KHWLhP4JogvlKKdBF5YXAcFav6LbbhukvgF9ms/YZ19u6nSsbTRAEJDGVDs/jBvFTsUFM2VUhNocpXKAuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=v06q6lq3; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=KgSsb7UuDIy1B6AUzPi0R2vyt+fJ3IagJlno1nuwFLk=; b=v06q6lq3/kSHtnrAEMiI/9cvla
+	Mu7/mNO+HUhrksELxTxHKQSy4DgKgvk58b0Qwwv1/75Tp1UMEToQ5tgW460QqDfYfIri5tmRg+MUs
+	Ee4RA+YhQzLjHgmZ2x7XAsKChrds/vs1JlDHl0IrCmIjTNAq97NyR2qHn324lguX+ImA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1whSk4-00BKIb-FK; Wed, 08 Jul 2026 15:55:12 +0200
+Date: Wed, 8 Jul 2026 15:55:12 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Markus Breitenberger <bre@breiti.cc>
+Cc: andrew+netdev@lunn.ch, bre@keba.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, stable@vger.kernel.org,
+	yong.liang.choong@linux.intel.com
+Subject: Re: [PATCH net] net: stmmac: intel: don't reconfigure SerDes on
+ unchanged mode
+Message-ID: <2e3c213c-e49a-4bcc-8cb9-e43403a2ea37@lunn.ch>
+References: <abd431d1-2819-4dc9-97f5-8e2b2ceb2658@lunn.ch>
+ <20260707220814.109028-1-bre@breiti.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260707220814.109028-1-bre@breiti.cc>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[collabora.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[collabora.com:s=zohomail];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	HAS_ORG_HEADER(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-305824-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:robh@kernel.org,m:mturquette@baylibre.com,m:sboyd@kernel.org,m:bmasney@redhat.com,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:chun-jie.chen@mediatek.com,m:p.zabel@pengutronix.de,m:edward-jw.yang@mediatek.com,m:richardcochran@gmail.com,m:kernel@collabora.com,m:linux-clk@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[louisalexis.eyraud@collabora.com,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[baylibre.com,kernel.org,redhat.com,gmail.com,collabora.com,mediatek.com,pengutronix.de,vger.kernel.org,lists.infradead.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[louisalexis.eyraud@collabora.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[collabora.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305825-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:bre@breiti.cc,m:andrew+netdev@lunn.ch,m:bre@keba.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:stable@vger.kernel.org,m:yong.liang.choong@linux.intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D7995726F86
+X-Rspamd-Queue-Id: 5D323727031
 
-Hello Rob,
+On Wed, Jul 08, 2026 at 12:08:14AM +0200, Markus Breitenberger wrote:
+> Hi Andrew,
+> 
+> Thanks for looking at this, and you're right - the runtime case is the
+> more dangerous one. If a genuine interface change (SGMII <-> 2500BASE-X)
+> happened at runtime while the disk was live, reprogramming the shared
+> ModPHY LCPLL would disturb the SATA PHY under an active filesystem, and
+> a failed boot would be preferable to that.
+> 
+> Two points of clarification:
+> 
+> - A plain switch change does not reprogram the ModPHY on my fixed-PHY
+>   setup. mac_finish() only runs a real reconfiguration when the
+>   MAC-side interface mode changes (e.g. a multi-rate SFP moving between
+>   SGMII and 2500BASE-X).
 
-On Wed, 2026-07-01 at 14:33 -0500, Rob Herring wrote:
-> On Wed, Jul 01, 2026 at 03:11:07PM +0200, Louis-Alexis Eyraud wrote:
-> > Regroup the MT8188 clock and system clock dt-bindings into MT8186
-> > ones
-> > to ease maintainability and have common files for several currently
-> > supported SoC or new future ones, that have the same kind of clock
-> > controller design.
-> >=20
-> > Note:
-> > The `#clock-cells` property is a required property for all
-> > compatibles
-> > declared in MT8188 clock and system clock dt-bindings but not in
-> > MT8186
-> > ones.
-> > To avoid ABI breakage, conditional blocks to check this requirement
-> > for MT8188 compatibles are added, rather than enforcing it for
-> > MT8186
-> > compatibles.
->=20
-> If the existing DTs are just wrong, then I would just make #clock-
-> cells=20
-> required. But please update the .dts files so the warnings don't
-> grow.
->=20
-I've tested to make the #clock-cells required for the MT8186, MT8192
-and MT8195 system and functional clock controllers.
-I did not see new warnings, so no extra dts patches would be needed.
+A fibre SFP is unlikely to use SGMII. It will swap between 2500BaseX
+and 1000BaseX, if the SFP module is ejected and a different one
+plugged in.
 
-I'll add new patches (one per SoC) in the next revision of the series
-for this, as it simplifies the grouping patches (no more if/then to
-require #clock-cells for the MT8188/MT8189 clock controllers) and the
-note in commit message could be removed.
+> On a fixed copper PHY the interface mode does
+>   not change, so changing the link partner / switch does not trigger
+>   the reconfiguration.
 
-> The grouping I would do here is:
->=20
-> - clock controller only
-> - reset controller only
-> - both clock and reset controller
->=20
-> That should avoid any if/then schemas.
->=20
+That depends on the PHY. Some change there host side interface to
+match the line side. So they use 25000BaseX for 2.5G, but SGMII for
+10/100/1G. Other use 'rate-adaptation'. They run the host side at the
+fastest speed, 25000BaseX, and then insert pause frames to slow down
+the MAC when the line side is running at 10/100/1G.
 
-By this grouping, I understand you suggest having separate dt-bindings
-files, that could look like:
-- mediatek,mt8186-clock.yaml: clock controllers
-- <name to be found>: reset controllers
-- <name to be found>: clock controllers with reset controller
-- mediatek,mt8186-sys-clock.yaml: system clock controllers.
-- <name to be found>: system clock controllers with reset controller
+> Given that, I'd like to keep this patch scoped to the boot regression
+> and leave the pre-existing shared-ModPHY-with-live-SATA question to the
+> maintainers, who have the hardware knowledge to decide whether a
+> stronger guard is warranted.
 
-Is that what you meant?
+a42f6b3f1cc1 is from Intel, so i assume they thought about what
+happens to the SATA controller, and are happy to take the risk of
+destroying filesystems. So, yes, lets leave it as is for the moment.
 
-There is no pure reset controllers for those SoC so no dedicated file
-would needed at the moment.
-The system clock controllers all have reset-controllers, even they may
-currently be not all implemented, so no separate files for system clock
-controllers would needed as well.
-
-Also, from what I see the current dt-bindings, the system clocks
-controllers for the MT8186/MT8188/MT8192/MT8195 SoC have the #reset-
-cells property but it is not required for them (examples:
-mediatek,mt8188-infracfg-ao or mediatek,mt8195-infracfg_ao).
-
-With the patches to make the #clock-cells property required, I already
-removed the biggest if/else block in mediatek,mt8186-clock.yaml, so
-only the one regarding #reset-cells property remains.
-
-So, should I create separate files, following the grouping suggestion,
-for the v2 of this patch?
-
-Regards,
-Louis-Alexis
-
-> Rob
+	   Andrew
 
