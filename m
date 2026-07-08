@@ -1,210 +1,187 @@
-Return-Path: <netdev+bounces-305893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305894-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id j8XDNQ1/TmqQNwIAu9opvQ
-	(envelope-from <netdev+bounces-305893-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:47:09 +0200
+	id mYXtGOp8TmoFNwIAu9opvQ
+	(envelope-from <netdev+bounces-305894-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:38:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3053C728DB2
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:47:09 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 016E3728CBD
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:38:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=YdllqHIt;
-	dmarc=pass (policy=reject) header.from=google.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305893-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305893-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=amd.com header.s=selector1 header.b=ge0H6sGt;
+	dmarc=pass (policy=quarantine) header.from=amd.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305894-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305894-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9B0F930EDAC5
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 16:32:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2F4C3300AB22
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 16:37:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEFCC435EE4;
-	Wed,  8 Jul 2026 16:32:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C38C7401A3A;
+	Wed,  8 Jul 2026 16:37:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010001.outbound.protection.outlook.com [52.101.56.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0288F39D6D9
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 16:32:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6166B37206E
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 16:37:57 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783528337; cv=pass; b=DGwnTm+f5LRqUQmVhbp1CHXgYc9UeGqAv5KK2hU3uDTjUM3l9yg8wRG7cKe0gEVGSfXXkoh5w77u+cvg2OIVWoHnKrF7WERkQR/aqUOUNaEuk0CNFTksccu8wecR58K3/85hPZaLuarBtM6RYlqI5MQdb+v2xk6DWzk8ihrwVSo=
+	t=1783528678; cv=fail; b=ejGwzDSHkr8+1KskFurnAaOsh4/xN9mvjez2u6AL75MPgumM0imXHbUtXKZW9s6B7HtBgKpkxzF3pkm0K2/2ghQxeuiY87WFM3vbl4+AahCBE6/9j/yB+L2KnAF+ec9Ln1sXFTsqyd+hmsmNFkSFCAQy3KxmXZ95sY+jHDK4xhY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783528337; c=relaxed/simple;
-	bh=j3aEajN0/29oaUsTwZfKj6TerZXjtMIoVrKFtWWD32I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NNxz2R0GnHjGdhO555LAkyVDcqeSmFIJEV4VxgCWm+b39ghqk4jbbSpaFH/NMBGi7eSycC+giq1BO03DTiUDtqvy8WiCMNwaqKPkdpCv8TjYirV0zN+FIec0yA56KhRmyCU/Tm02cZtHJrWEU550VH4Dyo0NURu5wM7mDHzDxXA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YdllqHIt; arc=pass smtp.client-ip=209.85.160.170
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-51c8e2e39easo4849971cf.0
-        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 09:32:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783528335; cv=none;
-        d=google.com; s=arc-20260327;
-        b=fXwPmiPZy3LsITLfULi72rq6VWLY8qli+gzzgJCF7TSPTIJUUSun2pr3UxFSaXjkcB
-         2raUgUdqwYBB8aYHZroObO9codtwKWe/G0wcZ5uUj3SQyme+2PDTzujtchKY3Sul6x/z
-         oRcIL8p7LQPplxiYYAR5111YkJlnR15cGkOuyioR1zGWjcunZ7MZLf/n4ncn+CmLPTPT
-         bulc1P0FIhvMzcDRF100ERc6sRoQ2iYnB2SLcVj5DQ8D/TylMbHaxXc2UgX3MLVMnXj9
-         X7nle4RZonQedmeg/Jq1njDYpzHby3G3MkAleLSWrKIWcoFPIWfKBhvNXWzzML2JAX6H
-         cZBw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=WUrebOkpLmw90DxZoL4UHWmGrurEOst5/kgqp4Dvt8U=;
-        fh=VUCgSZne+KKHfsXyil0pDgah4Ky+0U3b06dsBhN+8/0=;
-        b=oDlc+Wn94uMeWuZgJI3waBwLGulfKKf15ZcvyT4Jx8Bok2Y+Rkb4azUWy06OHxy87G
-         g9JoQV7Bsyz4wUxz1mTTrvCpM8G/CUsDPkoANJXVSbodxKl5jnvv1NaI8cBLYqS8py4V
-         u3PeYINKqlY4UBo3ESKl7sFJCRIPa1SuSksTMgVLGFFxTDuHRrj8tej1WffPV2Po83Ev
-         0ctTJYck0jOq/N/IaaRwDfruNzo5RGTs6fFp16vTsCdlWMHx5S1cIxDzjMG8SpWoTpH3
-         zWLNwtx/DjDZuUBIKKrTFhEtm3BOU20KMsPWyu5wQesT69b5xHz1ETE28ItmK1tZkFU1
-         hICw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783528335; x=1784133135; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=WUrebOkpLmw90DxZoL4UHWmGrurEOst5/kgqp4Dvt8U=;
-        b=YdllqHItVoRmv+GRUrbSUyQjsN7FpiEFsPz4HbXioUCFfCy03IihrltpGwAuuJ7uYl
-         RcmlR1OHAh1a3b4Z5s8RnPa201IlEuQwbxzGVy+qvI7u4SO1yhqAc1vt8P+6PAwdwBLO
-         OLee2ASnR0GS+2j4ljMNecWarp3ULx7TP0dJTQfeAwD+zLOAVrYtYMjFru3LHYu/8w/r
-         ORA9XXS6v0BrwJJ/+qh3SVfodnJt3FDJTQ64d28fuRR3tiJlwCQiCeR8HLy4C3zCQn2k
-         2M5z7/Zx5NM4iPLA1e4ei8o7lh7cznUgzEhVEO5xdE9xPSkXFd8uONuooQKnFd8xQsr/
-         Pnnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783528335; x=1784133135;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=WUrebOkpLmw90DxZoL4UHWmGrurEOst5/kgqp4Dvt8U=;
-        b=R4pEW3QzcTOe+EDhgkEBB/cD7ridcDWfM8xR/gDQwcUZE0Vulndav8tOjU2/x+mcSv
-         79nIj5WYiuC3CXwVSHA3qnVIVhPfdBUV/pgUB28zb2rzM+GTTFAM8CMM2zqKeGAPE9Oq
-         abzUsBXnAxBVyOZ9YXiXEMUduFNbMRFmfJqMEiFG+cr/9eLsV54ZFTAv7RiHbHTxDR/x
-         wNittmn/+UkjKdqp4MrKGE96lFywuEdZJvljvquVQ9NbJ7sCsssUbiExWkbk6mpp+cuE
-         UTF5lDOxIeODvae9OszMO00y21VMoInomDQt2ctX1a1l0Ar9m5Ls/DxSxDrPl/pFndx2
-         4yXA==
-X-Forwarded-Encrypted: i=1; AHgh+RrtdeUXVWM7qN9n0IBrwwc/lXMMB+FJb/43NRGYV5CmVcPy257aWmfyihOKtYg1PrEWYd/gka8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywju76lDITKJ5TZSSqU4uqrZQizIszFE3W9LC5LmeWkGjTZ+Bi0
-	KS41MFKVKcFyT1HCxkG3YgyQDnyApaJ5kXUvOypgyO3AQAFiKC5rk6lRhAukDUM5PNUnXIbUf28
-	VsTkDsLV6FAZfN/6trzeX5OAjr0GcmBXBKRfuGxn7
-X-Gm-Gg: AfdE7cnUpbzPEo1DGQUNfVZcJvaN43D3I96GHn+0FA3hLXz0kqeuYc23G3eEycwWo16
-	NGn2m7HhXCPMEOHPuAIAIg8gs/vSOngkRmkZZTHYz7aKYkMGMoUqaoieyBvMAtz7O0XDZBAbh5x
-	u1mFMgdMP7RYJGoKJxt/6Gb1kqW1rLRzvjSo2JbqdtZJJBIbQaa1/0o5/HrQvtNQrADIAuI9KbT
-	nnUpTBgPX9aUTtF10o2Si7q/b5ogzsLQlyn8lyxUc9EiCiHca1CXGMEFWwp7bMaANsEAgGr4YV7
-	nlOeuEDcBrYGEZ13yXedNknsbG3DzIK+8lHbvEqPpRohyyVfmIPePcuRRCswaj9KmWshBS5Y0Ww
-	LIFQy+L8=
-X-Received: by 2002:a05:622a:610:b0:517:7e6e:708f with SMTP id
- d75a77b69052e-51c8b49bea1mr32469801cf.52.1783528333984; Wed, 08 Jul 2026
- 09:32:13 -0700 (PDT)
+	s=arc-20240116; t=1783528678; c=relaxed/simple;
+	bh=zKON425vDYh/9cGLAlzgSuAPIXtvAYCkCwfqVvl2VYc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B3TzHib14o1f5wUVohGxNkw2v9D2MVg2Y8/24MjxRNzfwj7sxd1lX2MyIOhKuvNGB0y1H772Vfbqmy5umJ2Z4r24r4/QAXlB14KLL6GIxmOVfDo5+SdmyBvWaTuTKUPCz8QAZPUDRiho+ru0NlDLj8pv41P3zOWUM6AFjGIOczE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ge0H6sGt; arc=fail smtp.client-ip=52.101.56.1
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Zv0ksu1nYd6VSk7EHdKHC3YZf3HAVcW3Qdq7nTLp3dyyjh2cCPayDu6sN0wY6PbXN9EiC2BOFjAOjed1UrQ7cd8Btu+IwfcxjXwP05M0Nco/ViyVlw/5ydoMKQMZikCd8MaMX591unWUU2jEexP8//BkgJ85CcXN3QIFZhc3L6eTWlKoFPXlmxfdr65R4vPUj5bVUGpCSpL9GuTnbhGIHxFE/K8wjCJ3iPG4/9cgDjtxMlg7IsGp9UInxoNpXJNPC14ai7WI7DOWsCiuWaEVvhIXfsdRAGAO3zokZH+wtm1gSV4YtDKzLLNHK0xYomO7RsDZzOz3cBmdFu3+MD8vdw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KFKPPOAIrAhPdtAFW9q5Twaj5hLTqgv/4uybEJonud4=;
+ b=IwebSOmJzjTJ3pOiCRHUdk/U+KwK1vgqw8Q1dvYjvdV5/zFXQStwikfnAjYP27cZ6g/QDB4yHP8zVQFTyFs1lCu056yjogypb2hDo1ZS0wanw0NOK8mre0kqxo8BykNaueMlaD9XVFnNEHtCgZQ1VEEjZlgsrXN2HJYgoNQAT/RlO2SaC6ZdRgyvAjAPUEGI1uhWDsMEt/xCKN5vtD14vSq4cRcR8ocq0GhYiwZKslZDu2maZeoxnDxC6A7fzglsrtgbNRkszH8eTx5LVKM1oJJegz7I8rtZt2hts1GGCkWbewPJf2+v4NpHfQpJ3KUfbWD/SfQG1+vuuEMM6y9WYw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KFKPPOAIrAhPdtAFW9q5Twaj5hLTqgv/4uybEJonud4=;
+ b=ge0H6sGtOgSACxiuFTZ+vH0Fu4eZHeI0n1Z+rOjjgmRZAZm6a5PhVzun9oAxMC/SyH9XPMESGfoxdrL7F72yghbQWa5Yoc1e0OfTqYQYZt7N584tXMtn/5G1uhZzZ7O4UTMnzZA/41WZRfgKeoZ45Z6OKEgOftRQPoPwOoD1jbE=
+Received: from SJ0PR03CA0276.namprd03.prod.outlook.com (2603:10b6:a03:39e::11)
+ by PH0PR12MB8097.namprd12.prod.outlook.com (2603:10b6:510:295::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.10; Wed, 8 Jul
+ 2026 16:37:49 +0000
+Received: from SJ1PEPF00001CE1.namprd05.prod.outlook.com
+ (2603:10b6:a03:39e:cafe::12) by SJ0PR03CA0276.outlook.office365.com
+ (2603:10b6:a03:39e::11) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.181.11 via Frontend Transport; Wed, 8
+ Jul 2026 16:37:49 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ SJ1PEPF00001CE1.mail.protection.outlook.com (10.167.242.9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.181.6 via Frontend Transport; Wed, 8 Jul 2026 16:37:49 +0000
+Received: from amd.rund-run.pensando.io (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Wed, 8 Jul
+ 2026 11:37:48 -0500
+From: "Nikhil P. Rao" <nikhil.rao@amd.com>
+To: <netdev@vger.kernel.org>
+CC: <kuba@kernel.org>, <brett.creeley@amd.com>, <eric.joyner@amd.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<pabeni@redhat.com>, "Nikhil P. Rao" <nikhil.rao@amd.com>
+Subject: [PATCH net] pds_core: reject component parameter in legacy firmware update
+Date: Wed, 8 Jul 2026 16:36:49 +0000
+Message-ID: <20260708163649.128620-1-nikhil.rao@amd.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260708133815.3419465-1-usama.arif@linux.dev>
- <ak5rH-SWjiqR6MVe@gmail.com> <bc16e45e-32ef-45d8-99af-14f088733ab3@linux.dev>
-In-Reply-To: <bc16e45e-32ef-45d8-99af-14f088733ab3@linux.dev>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 8 Jul 2026 18:32:02 +0200
-X-Gm-Features: AVVi8CfVmy7GjTbj7GHzvYXfQ9HcYkZLmXQ50o7RhyVEJb452ShBm1kuME1IQ6c
-Message-ID: <CANn89iLc1Bv_wmKvr_9mtGRM3gL7kgoy2Prr2SgtHY4C=ZgfBg@mail.gmail.com>
-Subject: Re: [PATCH] net: use sync wakeups for socket error reports
-To: Usama Arif <usama.arif@linux.dev>
-Cc: Breno Leitao <leitao@debian.org>, davem@davemloft.net, horms@kernel.org, 
-	kuba@kernel.org, kuniyu@google.com, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, willemb@google.com, 
-	shakeel.butt@linux.dev, hannes@cmpxchg.org, riel@surriel.com, 
-	kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE1:EE_|PH0PR12MB8097:EE_
+X-MS-Office365-Filtering-Correlation-Id: d9b69403-2d63-4937-3113-08dedd0f3f8e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700016|1800799024|23010399003|376014|18002099003|56012099006|11063799006;
+X-Microsoft-Antispam-Message-Info:
+	1mwvw10em9qxIdVbr7Ngp+L2148SstplJx9sdvAkFkv2CoScs006AF6Zz86aH5X/LPoUIk529B1QZtd4l6YF5cyjgzo3qOwjMytq+sfMvAZdBTs42HR36mDSImtVv3ItTZEZCUFCtBzsabNkpspMVaho9whms46KJIMsvSZEogAG56lMgHEGmKegxfaxb3mExg+YOFt1FB3VWwONnGc9iRcE36TwdB10ToNYWufdWJT6xYcd6OcDkF6P8yFqTHlP87tmrUqAIzuAtX3fHzx6DYZv9FPv+0FaYkeocJfHeF9kSqCV3nY5oKYpi2bXdkfAMBHuttEplRix+p96jL7EqElCS4z7NnN190SYCe1wePQ925WB/8fxou2LLAxdIG5AmJKSg0tiClzPEYiOBz66eW7iKILORvEL3j2o5p/iy5vTPDiuLMkYxFlYYj8imJmReXFGL/FFjr/IJObpYF5fiPEMv1oV3mPzkO+pE+Na/IpQLjeWLDrPEVV98o/zI9MMISwpA/vxYMpGH1PGC3wolFfj6RhE7it4cUGbYJzdipRSfe5fXMrbli2seQkMkxq+lZhL1/YMweB98pv8+3k4AUhDrQPDGtfE7/nj/e+wFrjHUlgeqkcOGZHwftvtw5jqAhaaVXzGdyCtiBU2/fEXxtRovnywRU5/NQMCdOG+A7G1Lm/j6yISniCFinGiXLEoEA+AtLZe9yk6G/fDw+KgtA==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(1800799024)(23010399003)(376014)(18002099003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	MvwdtC2j8i6VLM2SYP0Gc7og0hrKQVWw1lj9SVAISsP98jPsW3wIFQX/EOmdfc/Saw1DhvjZOJWjfiTXagIofaN/Neze5QxI6+zZeGjy+KtvEeHvlwmsIVc1LX1Vw6GsW8N1WjtUO/b8lsEt2K8sM8oRl0h37E4XmozB8XTbS8RO5GcrG5uTp17oZmQ0e3ySe4231y5uPRxTjpprYwnDOVxOHknuXJhXHVPUxlCpZpbTk6PnVesZGbkwbyDZXlIb1z11QovPMHswe+zaMuViboZGzjwS25T19on9V4bzz0HWDknC0Aspqb5A1t3snnFL4cVKyaVcOp3OFMpf+szmqQoHGpQjGZLCQURXn8Ld1YMw2qqOIVE1UnYfy6B0NyjctFXyQ6gzcFihw5BrhBKYgjC83IEfzVAv+d17TpeozAp3sKsxL7c8vAFtaRdL/AzC
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2026 16:37:49.2701
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d9b69403-2d63-4937-3113-08dedd0f3f8e
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00001CE1.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8097
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+X-Spamd-Result: default: False [2.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:usama.arif@linux.dev,m:leitao@debian.org,m:davem@davemloft.net,m:horms@kernel.org,m:kuba@kernel.org,m:kuniyu@google.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:willemb@google.com,m:shakeel.butt@linux.dev,m:hannes@cmpxchg.org,m:riel@surriel.com,m:kernel-team@meta.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-305893-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-305894-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:kuba@kernel.org,m:brett.creeley@amd.com,m:eric.joyner@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:nikhil.rao@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:from_mime,amd.com:email,amd.com:mid,amd.com:dkim,vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email,mail.gmail.com:mid]
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3053C728DB2
+X-Rspamd-Queue-Id: 016E3728CBD
 
-On Wed, Jul 8, 2026 at 6:09=E2=80=AFPM Usama Arif <usama.arif@linux.dev> wr=
-ote:
->
->
->
-> On 08/07/2026 16:25, Breno Leitao wrote:
-> > On Wed, Jul 08, 2026 at 06:38:15AM -0700, Usama Arif wrote:
-> >> Measured on a 176-core EPYC 9D64 host running a Meta production
-> >> workload, bpftrace on tracepoint:ipi:ipi_send_cpu with a kstack filter
-> >> attributed the sock_def_error_report -> ep_poll_callback ->
-> >> try_to_wake_up -> ttwu_queue_wakelist -> __smp_call_single_queue
-> >> chain to 16,326 IPIs/min.
-> >
-> > I am interested in why so many sock_def_error_report().
-> >
-> > That's seems a lot for genuine socket errors (RST/ICMP) on a healthy
-> > host, so I suspect these aren't errors at all?
-> >
-> > Can you share the full stack above sock_def_error_report()?
->
->
-> I ran this bpftrace script the host now (results added at the end):
->
-> sudo bpftrace -e '
->   kprobe:sock_def_error_report
->   {
->     @wake_src[kstack()] =3D count();
->   }
->   interval:s:60
->   {
->     print(@wake_src, 5);
->     exit();
->   }'
->
->
-> The biggest source is tcp_sendmsg -> __skb_tstamp_tx, which as you said
-> is not an actual error. __skb_tstamp_tx clones the outgoing skb, tags it
-> with ee_origin =3D SO_EE_ORIGIN_TIMESTAMPING and ee_errno =3D ENOMSG, enq=
-ueues
-> it on sk->sk_error_queue via sock_queue_err_skb, and calls sk_error_repor=
-t
-> so epoll raises EPOLLERR. Userspace then reads it with recvmsg(MSG_ERRQUE=
-UE)
-> to get the SND/ACK timestamp.
->
-> So the workload has SO_TIMESTAMPING enabled on its TCP sockets, and every
-> packet completion and every ACK triggers a timestamp delivery through the
-> error-queue path, which is why sock_def_error_report fires.
->
+The legacy firmware update path does not support per-component updates.
+If a user specifies a component parameter with devlink flash, reject
+the request with -EOPNOTSUPP rather than silently ignoring the component
+parameter and flashing the entire firmware image.
 
-It seems we can not please everyone.
+Fixes: 49ce92fbee0b ("pds_core: add FW update feature to devlink")
+Signed-off-by: Nikhil P. Rao <nikhil.rao@amd.com>
+---
+ drivers/net/ethernet/amd/pds_core/devlink.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-https://lore.kernel.org/netdev/20260526063650.952-1-xuewen.yan@unisoc.com/
+diff --git a/drivers/net/ethernet/amd/pds_core/devlink.c b/drivers/net/ethernet/amd/pds_core/devlink.c
+index 2ea97e1c5939..8adae7b18898 100644
+--- a/drivers/net/ethernet/amd/pds_core/devlink.c
++++ b/drivers/net/ethernet/amd/pds_core/devlink.c
+@@ -90,6 +90,12 @@ int pdsc_dl_flash_update(struct devlink *dl,
+ {
+ 	struct pdsc *pdsc = devlink_priv(dl);
+ 
++	if (params->component) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Component update not supported by this device");
++		return -EOPNOTSUPP;
++	}
++
+ 	return pdsc_firmware_update(pdsc, params->fw, extack);
+ }
+ 
+-- 
+2.43.0
 
-Perhaps this SYNC heuristic should be a per-socket choice so that
-applications can decide what is best for them.
 
