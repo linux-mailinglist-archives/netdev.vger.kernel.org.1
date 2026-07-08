@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-305635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305636-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id GemACKnCTWql9wEAu9opvQ
-	(envelope-from <netdev+bounces-305635-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 05:23:21 +0200
+	id QMXGDljETWrp9wEAu9opvQ
+	(envelope-from <netdev+bounces-305636-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 05:30:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6914A7215C9
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 05:23:20 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F3DB72162D
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 05:30:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=lOC67acm;
+	dkim=pass header.d=linux.dev header.s=key1 header.b=KeC+qsRv;
 	dmarc=pass (policy=none) header.from=linux.dev;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305635-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305635-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305636-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305636-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1A57330214DB
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 03:23:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 89015301E7F9
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 03:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97CE536B076;
-	Wed,  8 Jul 2026 03:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C95E373BE9;
+	Wed,  8 Jul 2026 03:30:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F9363271FD
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 03:23:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C4742087F;
+	Wed,  8 Jul 2026 03:30:24 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783480990; cv=none; b=TIHjnApKpb5O0vst5k5gNlE9hml/aJP3ZYnTmHg6t4sgvoO2JExS1aEzAJbiDWL6m9HwUn+/7jJFhse0KSaPqAxVvHRDfmNAltOsfMY0zD8NjE6w8xlZbB1mtQBDOsf/39QSre75kFwDsOC5VlllB+xTQsfDX+2fzPmHNfdW5mk=
+	t=1783481426; cv=none; b=BqkIZC11YJn/p5TX8O4nwQFUbiaSxA9wnUymxfAcZTJSoH+OglFLX+C7/l1Qe6wuDU2HZUtiKjYqQ/At2qroB2Nz+Tgy7oihSAl79dGXvzIo1eSBgc5aoEy1lzb724Ldj8d3L1oAf+uK1T2B+m6eUtu1dNWx9l80VeCppDHr9ww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783480990; c=relaxed/simple;
-	bh=LR8ZkF3VK3DQ+1b3NahwIArIM/D2QpLWCJHiyLBsbcA=;
+	s=arc-20240116; t=1783481426; c=relaxed/simple;
+	bh=4SeRtoGkiJ0YU+DChKH2d4yuDJUGWWHBlkzM6OpeQFU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HfjDoQccUY8Lc+NI4QwyTzDOQMpUsG6LZeaY0d3MsVR5ECo2IUUayeXUXBe2bBJYJKd7YFXiuMPfYZ+roTEcPLh2bkvER4fGAeWN8iwH3d6MmN6T5/v7Sn3WfSbPckO9w4cA/KkO0h1qBLXQLEbeW/dYixM6kA72O0euGgIHhw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lOC67acm; arc=none smtp.client-ip=91.218.175.170
-Message-ID: <2ea29553-b0bd-4d12-9ff9-9b6f99267fc0@linux.dev>
+	 In-Reply-To:Content-Type; b=CmN1QQvjNwzWs9fQNh6kCxqjbEImgGxQegzcScXhCpAU/kyMvMeEHMHg1oI3dpmtuDJRejkyEnYQS7ispM654wDkT1qZzFT3+avhUTcfKr/Jw0+iJYvVzVC4ouuvzjsaegEY9qxT/s+uFwH+Ewy9mb62hoLz/tIPzYEUs2yFy20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KeC+qsRv; arc=none smtp.client-ip=91.218.175.178
+Message-ID: <6702d2f1-dcd4-4b68-b1ac-daa8661235a0@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783480976;
+	t=1783481422;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=y1a2UG4qiDNeOYHH404Fpdk2UN9XF1jE5+XaJZ48Ojg=;
-	b=lOC67acmeaf3tcUhfAAiGGXM1A7NuahPyQs2Iqpm2I9o709r5Bl+5AZJILRy7VASo9jNQy
-	nyBP76d6/n3pXWbVAXKatcYwgjSGewR+JmrUKwd0R7iKokj12CJUrnQHJht7Ijm98t6fTi
-	TWpMHY8r43iaQweeu8Ho5Gb8XNUDr5Q=
-Date: Wed, 8 Jul 2026 11:22:44 +0800
+	bh=hAfIYp1qkUw5nv6HMpuzXiAFinGF8d61HsxbLIT9CoI=;
+	b=KeC+qsRvkercaCeJMK0baG7g9L7IgTKrKgPQLRzPzmRJhODWz3t6hFjU3qk3vjnirrr/PY
+	LEAGp/rwAN1aiEXn0JNmpcePjQBzkbz42gsEWfYnJ5dCk0RlqCHZAPCVHFv3oTVnUGadbf
+	4XsOUfePghJg0y58QGJAtrnwoi4vNvk=
+Date: Wed, 8 Jul 2026 11:30:06 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf 2/2] selftests/bpf: Add XDP dispatcher FineIBT
- regression test
+Subject: Re: [PATCH bpf 1/2] bpf, x86: Fix FineIBT #CP in BPF dispatcher's
+ indirect-jump fallback
 Content-Language: en-US
 To: David Windsor <dwindsor@gmail.com>, bpf@vger.kernel.org
 Cc: Alexei Starovoitov <ast@kernel.org>,
@@ -72,10 +72,9 @@ Cc: Alexei Starovoitov <ast@kernel.org>,
  Peter Zijlstra <peterz@infradead.org>, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
 References: <c5a6bff16c0885d3ec756a1cdfb623636d0bdb4a.1783479101.git.dwindsor@gmail.com>
- <f6df1bf381517f7ff6927d82de7680e7826adf94.1783479101.git.dwindsor@gmail.com>
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Leon Hwang <leon.hwang@linux.dev>
-In-Reply-To: <f6df1bf381517f7ff6927d82de7680e7826adf94.1783479101.git.dwindsor@gmail.com>
+In-Reply-To: <c5a6bff16c0885d3ec756a1cdfb623636d0bdb4a.1783479101.git.dwindsor@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
@@ -85,12 +84,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_RECIPIENTS(0.00)[m:dwindsor@gmail.com,m:bpf@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:tglx@kernel.org,m:mingo@redhat.com,m:bp@alien8.de,m:dave.hansen@linux.intel.com,m:x86@kernel.org,m:hpa@zytor.com,m:davem@davemloft.net,m:kuba@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:shuah@kernel.org,m:peterz@infradead.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-305635-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305636-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	FORGED_SENDER(0.00)[leon.hwang@linux.dev,netdev@vger.kernel.org];
@@ -112,113 +111,81 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linux.dev:from_mime,linux.dev:dkim,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:from_mime,linux.dev:dkim,linux.dev:mid,qemu.org:url,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6914A7215C9
+X-Rspamd-Queue-Id: 9F3DB72162D
 
 On 8/7/26 10:57, David Windsor wrote:
-> Add a regression test for the x86 BPF dispatcher's indirect-jump fallback
-> under FineIBT.
+> commit 4f9087f16651 ("x86/cfi,bpf: Fix BPF JIT call") updated
+> emit_cfi() to emit FineIBT preambles for JIT-compiled BPF programs, but
+> did not update emit_bpf_dispatcher(). When prog->bpf_func is not in the
+> dispatcher table (e.g. an XDP_REDIRECT target program in a CPUMAP or
+> DEVMAP, or BPF_PROG_TEST_RUN of an unattached prog), the dispatcher
+> still jumps directly to prog->bpf_func. Without a FineIBT caller
+> sequence, under FineIBT this raises #CP:
 > 
-> This test can crash the kernel on an unfixed FineIBT build and so should
-> be run in a VM.
+>   Missing ENDBR: __cfi_bpf_prog_..._xdp_dispatcher_unattached+0x10/0x10
+>   ------------[ cut here ]------------
+>   kernel BUG at arch/x86/kernel/cet.c:133!
+>   Oops: invalid opcode: 0000 [#1] SMP NOPTI
+>   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org 04/01/2014
+>   RIP: 0010:do_kernel_cp_fault+0x126/0x130
+>   Call Trace:
+>    <TASK>
+>    exc_control_protection+0x46/0x80
+>    asm_exc_control_protection+0x2b/0x30
+>   RIP: 0010:__cfi_bpf_prog_..._xdp_dispatcher_unattached+0x10/0x10
+>    bpf_prog_test_run+0xda/0x1b0
+>    __sys_bpf+0x70b/0x990
+>    __x64_sys_bpf+0x2d/0x50
+>    x64_sys_call+0x1079/0x2d40
+>    do_syscall_64+0x12a/0x3c0
+>    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>    </TASK>
 > 
+> To fix this, we precede the indirect jump in emit_bpf_dispatcher() with
+> the FineIBT caller sequence: load cfi_bpf_hash into %eax and subtract
+> cfi_get_offset() from the target so it enters the preamble's real ENDBR.
+> Only needed for CFI_FINEIBT.
+> 
+> Fixes: 4f9087f16651 ("x86/cfi,bpf: Fix BPF JIT call")
+> Cc: stable@vger.kernel.org
 > Signed-off-by: David Windsor <dwindsor@gmail.com>
 > ---
->  .../bpf/prog_tests/xdp_dispatcher_fineibt.c   | 47 +++++++++++++++++++
->  .../bpf/progs/xdp_dispatcher_fineibt.c        | 18 +++++++
->  2 files changed, 65 insertions(+)
->  create mode 100644 tools/testing/selftests/bpf/prog_tests/xdp_dispatcher_fineibt.c
->  create mode 100644 tools/testing/selftests/bpf/progs/xdp_dispatcher_fineibt.c
+>  arch/x86/net/bpf_jit_comp.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 > 
-> diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_dispatcher_fineibt.c b/tools/testing/selftests/bpf/prog_tests/xdp_dispatcher_fineibt.c
-> new file mode 100644
-> index 000000000000..2d3fc4034eb9
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/prog_tests/xdp_dispatcher_fineibt.c
-> @@ -0,0 +1,47 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright (c) 2026 David Windsor */
-> +
-> +/*
-> + * Regression test for the x86 BPF dispatcher's indirect-jump fallback
-> + * under FineIBT.
-> + *
-> + * WARNING
-> + * -------
-> + *  This test can crash the kernel, thus should be run in a VM.
-> + */
-> +#include <uapi/linux/if_link.h>
-> +#include <test_progs.h>
-> +#include <network_helpers.h>
-> +#include "xdp_dispatcher_fineibt.skel.h"
-> +
-> +#define IFINDEX_LO		1
-> +
-> +void test_xdp_dispatcher_fineibt(void)
-> +{
-> +	struct xdp_dispatcher_fineibt *skel;
-> +	int err, attached_fd, unattached_fd;
-> +
-> +	LIBBPF_OPTS(bpf_test_run_opts, topts,
-> +		.data_in = &pkt_v4,
-> +		.data_size_in = sizeof(pkt_v4),
-> +	);
-> +
-> +	skel = xdp_dispatcher_fineibt__open_and_load();
-> +	if (!ASSERT_OK_PTR(skel, "skel_open_and_load"))
-> +		return;
-> +
-> +	attached_fd = bpf_program__fd(skel->progs.xdp_dispatcher_attached);
-> +	unattached_fd = bpf_program__fd(skel->progs.xdp_dispatcher_unattached);
-> +
-> +	err = bpf_xdp_attach(IFINDEX_LO, attached_fd, XDP_FLAGS_SKB_MODE, NULL);
-> +	if (!ASSERT_OK(err, "attach_prog"))
-> +		goto out;
-> +
-> +	err = bpf_prog_test_run_opts(unattached_fd, &topts);
-> +	ASSERT_OK(err, "unattached_test_run");
-> +	ASSERT_EQ(topts.retval, XDP_PASS, "unattached_retval");
-> +
-> +	bpf_xdp_detach(IFINDEX_LO, XDP_FLAGS_SKB_MODE, NULL);
-> +out:
-> +	xdp_dispatcher_fineibt__destroy(skel);
-> +}
-> diff --git a/tools/testing/selftests/bpf/progs/xdp_dispatcher_fineibt.c b/tools/testing/selftests/bpf/progs/xdp_dispatcher_fineibt.c
-> new file mode 100644
-> index 000000000000..b49b84f01c8e
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/progs/xdp_dispatcher_fineibt.c
-> @@ -0,0 +1,18 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright (c) 2026 David Windsor */
-> +#include <linux/bpf.h>
-> +#include <bpf/bpf_helpers.h>
-> +
-> +SEC("xdp")
-> +int xdp_dispatcher_attached(struct xdp_md *ctx)
-> +{
-> +	return XDP_PASS;
-> +}
-> +
-> +SEC("xdp")
-> +int xdp_dispatcher_unattached(struct xdp_md *ctx)
-> +{
-> +	return XDP_PASS;
-> +}
-> +
-> +char _license[] SEC("license") = "GPL";
+> diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+> index de7515ea1bea..1c8249d8ca3b 100644
+> --- a/arch/x86/net/bpf_jit_comp.c
+> +++ b/arch/x86/net/bpf_jit_comp.c
+> @@ -3740,6 +3740,15 @@ static int emit_bpf_dispatcher(u8 **pprog, int a, int b, s64 *progs, u8 *image,
+>  		if (err)
+>  			return err;
+>  
+> +		/* If running under FineIBT, enter the preamble so the following
+> +		 * indirect jump lands on a real ENDBR instead of the poison.
+> +		 */
 
 
-Instead of creating xdp_dispatcher_fineibt.c, better to reuse
-xdp_dummy.c. Then, in xdp_dispatcher_fineibt.c, you can create two
-xdp_dummy skels, one for attaching, one for running.
+Comment style: /* should stay at its own line.
 
-And, add the test to xdp_attach.c instead of new file
-prog_tests/xdp_dispatcher_fineibt.c?
+> +		if (cfi_mode == CFI_FINEIBT) {
+> +			EMIT1_off32(0xb8, cfi_bpf_hash);	/* mov $cfi_bpf_hash, %eax */
+> +			EMIT1(add_1mod(0x48, BPF_REG_3));	/* sub rdx, cfi_get_offset() */
+> +			EMIT2_off32(0x81, add_1reg(0xE8, BPF_REG_3), cfi_get_offset());
+> +		}
+
+
+Better to emit_cfi()?
 
 Thanks,
 Leon
+
+> +
+>  		emit_indirect_jump(&prog, BPF_REG_3 /* R3 -> rdx */, image + (prog - buf));
+>  
+>  		*pprog = prog;
 
 
