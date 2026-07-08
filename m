@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-305985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305986-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id F0bhAy+1TmofSwIAu9opvQ
-	(envelope-from <netdev+bounces-305985-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 22:38:07 +0200
+	id phGlBWK1TmoxSwIAu9opvQ
+	(envelope-from <netdev+bounces-305986-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 22:38:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5E4A72A443
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 22:38:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60EE572A451
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 22:38:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=verdict.gg header.s=sig1 header.b=hHBJMgu1;
+	dkim=pass header.d=verdict.gg header.s=sig1 header.b=il+Cobxd;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305985-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305985-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305986-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305986-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 37B2830BBD5E
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 20:35:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 210B33052068
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 20:35:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1EC03E5ED6;
-	Wed,  8 Jul 2026 20:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBC173E63B1;
+	Wed,  8 Jul 2026 20:35:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.qs.icloud.com (qs-2005i-snip4-11.eps.apple.com [57.103.86.221])
+Received: from outbound.qs.icloud.com (qs-2005g-snip4-1.eps.apple.com [57.103.86.192])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C33735E1B6
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 20:35:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EDA32E7378
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 20:35:20 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783542916; cv=none; b=dFOqUHcm6o8w5WcnRO9QRZCwDDt5RARCjRNRrvH5KypTvUJ1JjrhWXpcrqlTUmRBY7feGqRVqnj8vseL9Kkcvz5eBF9HaAbQo7+7wYoZ+MrGv2ONFpeyuJiBLR2o/60WTmxHNFLfHazMXKZ/wgv8ZIbAhdG4jHzB9ZPsI8ekpuc=
+	t=1783542922; cv=none; b=i8VdLUxpj7QvPPieNlQXeJnS5GQY+AjTZVK1MYftk4RP3obBudiJBbNBThyKGAJVEIizHNhgrBTxmiIZBuMGWkSnhthT/bH5GQK7QLtn+8FCcvGHes0AIoEDhZsVV7njJPAv+U6f8JLiQ0fkwwHcOcauQ4BKplqFuRrCLMM2CnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783542916; c=relaxed/simple;
-	bh=Q+/any6DcHinqwZLRkuj5dOQIBbBwaCx9zs4CHO5bu4=;
+	s=arc-20240116; t=1783542922; c=relaxed/simple;
+	bh=z/CgzwcPBbOSyjW2/ggTUepc5FVeM1tCtziqOzNK7gI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cwbrrAcEwtulICMWgyg+n5CO5+drt1RKH8AlCvDKv9R0kt0ZwWI/queZFBU4wOX40skkAVUOe4WS7JRW6xb3KeLadZYVrmmIJwpCP1JGUX18K673T5fZNYyszgn8mYZAsnJD1AJyjTv/vZ4RToMfFDaBiKIw0L3xh45fC01RKi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg; spf=pass smtp.mailfrom=verdict.gg; dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b=hHBJMgu1; arc=none smtp.client-ip=57.103.86.221
+	 MIME-Version; b=LFV3WshDrDRagSRtrpmsUM2/ntgZ5i/b92T3ZUIafElAl/PhSshD8abITjx1oKuHQWnvB+3EEPZJ735iN9yI2aZT4Rh+lPniEVVIJtcKtP0cz1rTbi0GoTxsV7EcSwF9YSyfj6iFQaR4o+TM4OUNoeKLkiQG0oOPhQ1N6l1jDT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg; spf=pass smtp.mailfrom=verdict.gg; dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b=il+Cobxd; arc=none smtp.client-ip=57.103.86.192
 Received: from outbound.qs.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-east-2d-10-percent-0 (Postfix) with ESMTPS id 45D8130000A7;
-	Wed, 08 Jul 2026 20:35:10 +0000 (UTC)
-X-ICL-RepId: 019f4371-0cf5-78ee-8741-84716a342eec
-X-ICL-Out-Info: HUtFAUMHWwJACUgBTUQeDx5WFlZNRAJCTQhICkMGWQJeCEABQwVdEhVdRVcIWwJAEVc4RQhFD1sTTVZUChcNVk1PHUEJXghGXl4fEx9UVgFDGRBWAVhWXQVNGlwYWQ8cAUpWWg5bBEcUFxtcABcbRgIEIwJfAEUCXglWATAXD1ZNTx1BCV4IRl5eHxMAXg8PTAtIAVsHXAJIC0gAWQZbHEQMSQFcGl0fFFwUWh9WBXIGXApXBFQfHBdeRhMZThtXTVoNQBlYBm0UVhVSBFk=
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verdict.gg; s=sig1; t=1783542914; x=1786134914; bh=P9yZ3D+W7OaCzN5HlpP15te0niQUHg9N2Yn3fSLJwKQ=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=hHBJMgu1UR7ZtQu0GfIWLTdpVm2+dzVDzTl/t6MkzU9GA3r6DYqXxrxQzuFQwJ39U3ccofZXAtg11ktElYbW1ov5btl/kyWawZxHu05tV3lkD7n2vBpwHYR8j0mYQ96tWilKgUi2Anth2GkgEh9/+ShVlTGG5Cz7+plQo9dPYhQs10LTxB8aGf0NYpcHkxkMhgxcy2ige5NfvZ52XSMz7+J+EtyBkQjbPfkRiJGG5KCkqa4olTSL4/+n1ZBARbA+998L5sb7ZWsbMJjhWNcExFWnCWB19N0tTOvnO0vRHMPdsFSF685WtXLpsYkk+hpOAjx7NYWeDXJhETZFrBnT1w==
+	by p00-icloudmta-asmtp-us-east-2d-10-percent-0 (Postfix) with ESMTPS id BC03030000A3;
+	Wed, 08 Jul 2026 20:35:15 +0000 (UTC)
+X-ICL-RepId: 019f4371-226b-7a27-8744-4bf09211985f
+X-ICL-Out-Info: HUtFAUMHWwJACUgBTUQeDx5WFlZNRAJCTQhICkMGWQJeCEABQwVdEhVdRVcIWwJAEVc4RQhFD1sTTVZUChcNVk1PHUEJXghGXl4fEx9UVgFDGRBWAVhWXQVNGlwYWQ8cAUpWWg5bBEcUFxtcABcbRgIEIwJfAEUCXglWATAXD1ZNTx1BCV4IRl5eHxMAXg8PTAtIAVsHXAJIC0gAWQZbHEQMSQFcGlwfFFwUWh9WBXIGXApXBFQfHBdeRhMZThtXTVoNQBlYBm0UVhVSBFk=
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verdict.gg; s=sig1; t=1783542919; x=1786134919; bh=au4REDALGPbRd4qyDPkjSmLLWroBmZZ1WT6/m3cMYNs=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=il+CobxdjWqcBnKnWfjzAcHqy9/yEj6NeMoRZgrHoJ/veiQ/h8QeFIp7WCfOmkFwscUacm01Vux0cOJWlb/sMieaGfBvJtG5cgZnIChsfykUeBg4RoGWHfeCX3VBH1zqkx43FzGGcbNtVetC9jgo6Mz9iSTr4oaP6ZEj5xT528N9MvVd4pUVXbI463VVPi1g/a7TRzURTt4z/pSc7/YncTOKeYtaxTRc/tw0hwdNFf1BrgFDBrFBJiAKKoq8RunUxDP28OCGmkqF96QWF6/irHcbPONAOUj3/kKy+gbvtUlKfBmaVE+AL+TjeU1dXABaY2KjItrIqoOageghFEfL1w==
 mail-alias-created-date: 1621344842221
 Received: from DelNac.mail.msk (unknown [17.57.155.37])
-	by p00-icloudmta-asmtp-us-east-2d-10-percent-0 (Postfix) with ESMTPSA id 8DEF93001131;
-	Wed, 08 Jul 2026 20:35:04 +0000 (UTC)
+	by p00-icloudmta-asmtp-us-east-2d-10-percent-0 (Postfix) with ESMTPSA id D6FB33001133;
+	Wed, 08 Jul 2026 20:35:09 +0000 (UTC)
 From: Vladimir Vdovin <deliran@verdict.gg>
 To: Lorenzo Bianconi <lorenzo@kernel.org>,
 	Donald Hunter <donald.hunter@gmail.com>,
@@ -78,9 +78,9 @@ Cc: Jakub Sitnicki <jakub@cloudflare.com>,
 	intel-wired-lan@lists.osuosl.org,
 	linux-kselftest@vger.kernel.org,
 	Vladimir Vdovin <deliran@verdict.gg>
-Subject: [PATCH bpf-next v4 5/6] selftests/bpf: Add bpf_xdp_metadata_rx_checksum support to xdp_hw_metadat prog
-Date: Wed,  8 Jul 2026 23:34:09 +0300
-Message-ID: <20260708203410.45121-6-deliran@verdict.gg>
+Subject: [PATCH bpf-next v4 6/6] selftests: drv-net: add XDP RX checksum metadata tests
+Date: Wed,  8 Jul 2026 23:34:10 +0300
+Message-ID: <20260708203410.45121-7-deliran@verdict.gg>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20260708203410.45121-1-deliran@verdict.gg>
 References: <20260708203410.45121-1-deliran@verdict.gg>
@@ -91,28 +91,28 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: KC7sGlHzL50hsQ8zFZqYikrF1tSlvV3G
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA4MDIwMiBTYWx0ZWRfX/6Cgds3nmqO8
- FB6Wpi6p9x20KF9UFCxwVZax5liF9ajdkn7i+4tU/5aN/n62zmZpfRd6WFt5iUAKt46H1j7q35w
- SHo9AMH3gENRRM+salepGNeCbjH8dOzJjul5JalHT/uQ4QnZ8WN9AS+FMOtNa2CDCGUVouCppus
- O9bCuViIfCs+mHi1rqzjIZvzMwha+X7bq224VUwAREPulqIa2Iox47Vshv8p5MJD0klwpsFjbUp
- LhD1X/P634jxGMaeOQg0zHqLtf2KRgYB5ESc2Oe4TdpQfFVFfBc55vYXr/g2ezMHPiu9JT8KN0K
- R0/EC5A97Cx8JJ0lnd0
-X-Proofpoint-ORIG-GUID: KC7sGlHzL50hsQ8zFZqYikrF1tSlvV3G
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA4MDIwMiBTYWx0ZWRfX5DLLJJfIo833
+ mlI4XeWHxNp1CUh17CwXchncUfu5QCYc24ImhIyw8NZgQJ7219CRguKNXVbpQHPL3+OrL/K6O2+
+ BhPfQtQR8MGoInIIqXlJ4Gpa0qEWkiRZ1dD2dm6hd/dsURY6ZLW4n4vRTf0OP8poMPaI9lY/iiV
+ 0PJ+fDvGc4ukudW8zYTRSh14tS0wbikbpA6ROmD3k5gA7gugxI2HCT5yqL1Tv7GpNcaY/3gEQYO
+ QM0uZtRk4poDbhETTcIg0qoMoHN3Ij4/tuGxcPbsWwrEZTc4oqyNDux6VOgoirUa8m0JDAM5mmZ
+ Mg435n5jSuNgyoMXPdw
+X-Proofpoint-ORIG-GUID: sLYEc1WpMdFxjTRWa13G-6KjpVxsQjjP
+X-Proofpoint-GUID: sLYEc1WpMdFxjTRWa13G-6KjpVxsQjjP
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[verdict.gg:s=sig1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[33];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305985-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305986-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:donald.hunter@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:andrew+netdev@lunn.ch,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:aleksander.lobakin@intel.com,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:kpsingh@kernel.org,m:haoluo@google.com,m:jolsa@kernel.org,m:shuah@kernel.org,m:maciej.fijalkowski@intel.com,m:jakub@cloudflare.com,m:aleksandr.loktionov@intel.com,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:linux-kselftest@vger.kernel.org,m:deliran@verdict.gg,m:donaldhunter@gmail.com,m:johnfastabend@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	DMARC_NA(0.00)[verdict.gg];
 	FORGED_SENDER(0.00)[deliran@verdict.gg,netdev@vger.kernel.org];
@@ -129,131 +129,381 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	DKIM_TRACE(0.00)[verdict.gg:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,verdict.gg:from_mime,verdict.gg:email,verdict.gg:mid,verdict.gg:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,verdict.gg:from_mime,verdict.gg:email,verdict.gg:mid,verdict.gg:dkim,vger.kernel.org:from_smtp,lib.py:url,xdp_metadata.py:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A5E4A72A443
+X-Rspamd-Queue-Id: 60EE572A451
 
-From: Lorenzo Bianconi <lorenzo@kernel.org>
+Extend the xdp_metadata.py driver test with coverage for
+bpf_xdp_metadata_rx_checksum().
 
-Introduce the capability to dump HW rx checksum in xdp_hw_metadata
-program via bpf_xdp_metadata_rx_checksum() kfunc.
+Add an xdp_rx_csum program to xdp_metadata.bpf.o that reads the RX
+checksum verdict and stores the ip_summed bitmask, the hw checksum
+value and the checksum level into a map.  The L4 port/protocol filter
+is the same as in the existing xdp_rss_hash program, so move it into a
+common helper.
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+The new cases only run on devices whose driver implements the
+xmo_rx_checksum callback, detected through the "checksum" bit of the
+xdp-rx-metadata-features netlink attribute; on other devices they
+report SKIP:
+
+ - xdp_rx_csum_valid (tcp/udp variants): traffic with a correct
+   checksum sent from the remote endpoint must be reported with a
+   usable verdict, i.e. CHECKSUM_UNNECESSARY and/or CHECKSUM_COMPLETE.
+   CHECKSUM_NONE is a legitimate verdict for a device that does not
+   verify the packets (e.g. veth reports it for locally generated
+   CHECKSUM_PARTIAL traffic), so it results in SKIP rather than in a
+   failure;
+
+ - xdp_rx_csum_invalid: UDP packets with a corrupted L4 checksum
+   (sent with the net/lib csum tool) must not be reported as
+   CHECKSUM_UNNECESSARY.
+
 Signed-off-by: Vladimir Vdovin <deliran@verdict.gg>
 ---
- .../selftests/bpf/progs/xdp_hw_metadata.c     |  7 +++++
- tools/testing/selftests/bpf/xdp_hw_metadata.c | 31 +++++++++++++++++++
- tools/testing/selftests/bpf/xdp_metadata.h    | 12 ++++---
- 3 files changed, 46 insertions(+), 4 deletions(-)
+ .../selftests/drivers/net/hw/xdp_metadata.py  | 110 +++++++++++++++++
+ .../selftests/net/lib/xdp_metadata.bpf.c      | 112 ++++++++++++++++--
+ 2 files changed, 209 insertions(+), 13 deletions(-)
 
-diff --git a/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c b/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-index 330ece2eabdb..5eeadb7e27cf 100644
---- a/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-+++ b/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-@@ -110,6 +110,13 @@ int rx(struct xdp_md *ctx)
- 	else
- 		meta->hint_valid |= XDP_META_FIELD_VLAN_TAG;
+diff --git a/tools/testing/selftests/drivers/net/hw/xdp_metadata.py b/tools/testing/selftests/drivers/net/hw/xdp_metadata.py
+index 33a1985356d9..1a623771477b 100644
+--- a/tools/testing/selftests/drivers/net/hw/xdp_metadata.py
++++ b/tools/testing/selftests/drivers/net/hw/xdp_metadata.py
+@@ -8,6 +8,8 @@ These tests load device-bound XDP programs from xdp_metadata.bpf.o
+ that call metadata kfuncs, send traffic, and verify the extracted
+ metadata via BPF maps.
+ """
++import time
++
+ from lib.py import ksft_run, ksft_eq, ksft_exit, ksft_ge, ksft_ne, ksft_pr
+ from lib.py import KsftNamedVariant, ksft_variants
+ from lib.py import CmdExitFailure, KsftSkipEx, NetDrvEpEnv
+@@ -81,8 +83,22 @@ _RSS_KEY_TYPE = 1
+ _RSS_KEY_PKT_CNT = 2
+ _RSS_KEY_ERR_CNT = 3
  
-+	err = bpf_xdp_metadata_rx_checksum(ctx, &meta->ip_summed,
-+					   &meta->cksum, &meta->cksum_level);
-+	if (err)
-+		meta->rx_cksum_err = err;
-+	else
-+		meta->hint_valid |= XDP_META_FIELD_CHECKSUM;
++_CSUM_KEY_IP_SUMMED = 0
++_CSUM_KEY_CKSUM = 1
++_CSUM_KEY_LEVEL = 2
++_CSUM_KEY_PKT_CNT = 3
++_CSUM_KEY_ERR_CNT = 4
 +
- 	__sync_add_and_fetch(&pkts_redir, 1);
- 	return bpf_redirect_map(&xsk, ctx->rx_queue_index, XDP_PASS);
- }
-diff --git a/tools/testing/selftests/bpf/xdp_hw_metadata.c b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-index 6db3b5555a22..c63a70a54075 100644
---- a/tools/testing/selftests/bpf/xdp_hw_metadata.c
-+++ b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-@@ -8,6 +8,7 @@
-  * - Metadata verified:
-  *   - rx_timestamp
-  *   - rx_hash
-+ *   - rx_checksum
-  *
-  * TX:
-  * - UDP 9091 packets trigger TX reply
-@@ -219,6 +220,30 @@ static void print_vlan_tci(__u16 tag)
- 	printf("PCP=%u, DEI=%d, VID=0x%X\n", pcp, dei, vlan_id);
+ XDP_RSS_L4 = 0x8  # BIT(3) from enum xdp_rss_hash_type
+ 
++# Mirror of enum xdp_checksum from include/net/xdp.h
++XDP_CHECKSUM_NONE = 0x1
++XDP_CHECKSUM_UNNECESSARY = 0x2
++XDP_CHECKSUM_COMPLETE = 0x4
++
++# Fixed destination port of the net/lib csum tool
++_CSUM_TOOL_PORT = 34000
++
+ 
+ @ksft_variants([
+     KsftNamedVariant("tcp", "tcp"),
+@@ -130,6 +146,98 @@ def test_xdp_rss_hash(cfg, proto):
+             f"RSS hash type should include L4 for {proto.upper()} traffic")
+ 
+ 
++def _require_rx_csum_meta(cfg):
++    """Skip unless the device exposes XDP RX checksum metadata."""
++    dev_info = cfg.netnl.dev_get({"ifindex": cfg.ifindex})
++    rx_meta = dev_info.get("xdp-rx-metadata-features", [])
++    if "checksum" not in rx_meta:
++        raise KsftSkipEx("device does not support XDP rx checksum metadata")
++
++
++@ksft_variants([
++    KsftNamedVariant("tcp", "tcp"),
++    KsftNamedVariant("udp", "udp"),
++])
++def test_xdp_rx_csum_valid(cfg, proto):
++    """Test RX checksum metadata for packets with a correct checksum.
++
++    Loads the xdp_rx_csum program, sends traffic with a valid L4 checksum
++    from the remote endpoint, and verifies that the checksum verdict
++    reported via bpf_xdp_metadata_rx_checksum() is usable
++    (CHECKSUM_UNNECESSARY and/or a CHECKSUM_COMPLETE value).
++
++    CHECKSUM_NONE is a valid verdict for a device that did not verify
++    the packets (e.g. veth reports it for locally generated traffic,
++    which is CHECKSUM_PARTIAL on the skb), so it results in SKIP, not
++    in a failure.
++    """
++    _require_rx_csum_meta(cfg)
++
++    prog_info = _load_xdp_metadata_prog(cfg, "xdp_rx_csum")
++
++    port = rand_port()
++    bpf_map_set("map_xdp_setup", _SETUP_KEY_PORT, port)
++
++    csum_map_id = prog_info["maps"]["map_csum"]
++
++    _send_probe(cfg, port, proto=proto)
++
++    csum = bpf_map_dump(csum_map_id)
++
++    pkt_cnt = csum.get(_CSUM_KEY_PKT_CNT, 0)
++    err_cnt = csum.get(_CSUM_KEY_ERR_CNT, 0)
++    ip_summed = csum.get(_CSUM_KEY_IP_SUMMED, 0)
++
++    ksft_ge(pkt_cnt, 1, comment="should have received at least one packet")
++    ksft_eq(err_cnt, 0, comment=f"RX checksum error count: {err_cnt}")
++
++    ksft_pr(f"  ip_summed: {ip_summed:#x} cksum: "
++            f"{csum.get(_CSUM_KEY_CKSUM, 0):#010x} "
++            f"level: {csum.get(_CSUM_KEY_LEVEL, 0)}")
++    ksft_ne(ip_summed, 0, "the program should have stored a checksum verdict")
++    if not ip_summed & (XDP_CHECKSUM_UNNECESSARY | XDP_CHECKSUM_COMPLETE):
++        raise KsftSkipEx("device did not verify the packet checksum "
++                         "(CHECKSUM_NONE)")
++
++
++def test_xdp_rx_csum_invalid(cfg):
++    """Test RX checksum metadata for packets with a corrupted checksum.
++
++    Sends UDP packets with an intentionally bad L4 checksum using the
++    net/lib csum tool and verifies the device does not claim it validated
++    them: the CHECKSUM_UNNECESSARY bit must not be set.
++    """
++    _require_rx_csum_meta(cfg)
++
++    ipver = cfg.addr_ipver
++    bin_remote = cfg.remote.deploy(cfg.net_lib_dir / "csum")
++
++    prog_info = _load_xdp_metadata_prog(cfg, "xdp_rx_csum")
++
++    bpf_map_set("map_xdp_setup", _SETUP_KEY_PORT, _CSUM_TOOL_PORT)
++
++    csum_map_id = prog_info["maps"]["map_csum"]
++
++    cmd(f"{bin_remote} -i {cfg.remote_ifname} -n 20 -{ipver} "
++        f"-S {cfg.remote_addr} -D {cfg.addr} -r 1 -T -E",
++        host=cfg.remote)
++
++    # no receiver to synchronize against; let NAPI drain the last packets
++    time.sleep(1)
++
++    csum = bpf_map_dump(csum_map_id)
++
++    pkt_cnt = csum.get(_CSUM_KEY_PKT_CNT, 0)
++    ip_summed = csum.get(_CSUM_KEY_IP_SUMMED, 0)
++
++    ksft_ge(pkt_cnt, 1, comment="should have received at least one packet")
++
++    ksft_pr(f"  ip_summed: {ip_summed:#x}")
++    ksft_eq(ip_summed & XDP_CHECKSUM_UNNECESSARY, 0,
++            "device must not report CHECKSUM_UNNECESSARY for a corrupted "
++            "checksum")
++
++
+ def main():
+     """Run XDP metadata kfunc tests against a real device."""
+     with NetDrvEpEnv(__file__) as cfg:
+@@ -137,6 +245,8 @@ def main():
+         ksft_run(
+             [
+                 test_xdp_rss_hash,
++                test_xdp_rx_csum_valid,
++                test_xdp_rx_csum_invalid,
+             ],
+             args=(cfg,))
+     ksft_exit()
+diff --git a/tools/testing/selftests/net/lib/xdp_metadata.bpf.c b/tools/testing/selftests/net/lib/xdp_metadata.bpf.c
+index f71f59215239..70decae0a663 100644
+--- a/tools/testing/selftests/net/lib/xdp_metadata.bpf.c
++++ b/tools/testing/selftests/net/lib/xdp_metadata.bpf.c
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0
+ 
+ #include <stddef.h>
++#include <stdbool.h>
+ #include <linux/bpf.h>
+ #include <linux/in.h>
+ #include <linux/if_ether.h>
+@@ -40,6 +41,24 @@ struct {
+ 	__uint(max_entries, 4);
+ } map_rss SEC(".maps");
+ 
++/* RX checksum results: key 0 = ip_summed bitmask, key 1 = hw cksum value,
++ * key 2 = cksum level, key 3 = packet count, key 4 = error count.
++ */
++enum {
++	CSUM_KEY_IP_SUMMED = 0,
++	CSUM_KEY_CKSUM = 1,
++	CSUM_KEY_LEVEL = 2,
++	CSUM_KEY_PKT_CNT = 3,
++	CSUM_KEY_ERR_CNT = 4,
++};
++
++struct {
++	__uint(type, BPF_MAP_TYPE_ARRAY);
++	__type(key, __u32);
++	__type(value, __u32);
++	__uint(max_entries, 5);
++} map_csum SEC(".maps");
++
+ /* Mirror of enum xdp_rss_hash_type from include/net/xdp.h.
+  * Needed because the enum is not part of UAPI headers.
+  */
+@@ -55,8 +74,20 @@ enum xdp_rss_hash_type {
+ 	XDP_RSS_L4_ICMP = 1U << 8,
+ };
+ 
++/* Mirror of enum xdp_checksum from include/net/xdp.h.
++ * Needed because the enum is not part of UAPI headers.
++ */
++enum xdp_checksum {
++	XDP_CHECKSUM_NONE = 1U << 0,
++	XDP_CHECKSUM_UNNECESSARY = 1U << 1,
++	XDP_CHECKSUM_COMPLETE = 1U << 2,
++};
++
+ extern int bpf_xdp_metadata_rx_hash(const struct xdp_md *ctx, __u32 *hash,
+ 				    enum xdp_rss_hash_type *rss_type) __ksym;
++extern int bpf_xdp_metadata_rx_checksum(const struct xdp_md *ctx,
++					enum xdp_checksum *ip_summed,
++					__u32 *cksum, __u8 *cksum_level) __ksym;
+ 
+ static __always_inline __u16 get_dest_port(void *l4, void *data_end,
+ 					   __u8 protocol)
+@@ -78,41 +109,39 @@ static __always_inline __u16 get_dest_port(void *l4, void *data_end,
+ 	return 0;
  }
  
-+static void print_rx_cksum(__u8 ip_summed, __u32 cksum, __u8 cksum_level)
-+{
-+	const char *cksum_str;
-+
-+	switch (ip_summed) {
-+	case XDP_CHECKSUM_COMPLETE | XDP_CHECKSUM_UNNECESSARY:
-+		cksum_str = "CHECKSUM_COMPLETE,CHECKSUM_UNNECESSARY";
-+		break;
-+	case XDP_CHECKSUM_UNNECESSARY:
-+		cksum_str = "CHECKSUM_UNNECESSARY";
-+		break;
-+	case XDP_CHECKSUM_COMPLETE:
-+		cksum_str = "CHECKSUM_COMPLETE";
-+		break;
-+	case XDP_CHECKSUM_NONE:
-+	default:
-+		cksum_str = "CHECKSUM_NONE";
-+		break;
-+	}
-+
-+	printf("rx-cksum: %s, csum=0x%x, cksum_level=0x%x\n",
-+	       cksum_str, cksum, cksum_level);
+-SEC("xdp")
+-int xdp_rss_hash(struct xdp_md *ctx)
++/* Return true when the packet matches the L4 protocol and destination
++ * port configured in map_xdp_setup (zero/unset filters match anything).
++ */
++static __always_inline bool xdp_match_setup(struct xdp_md *ctx)
+ {
+ 	void *data_end = (void *)(long)ctx->data_end;
+ 	void *data = (void *)(long)ctx->data;
+-	enum xdp_rss_hash_type rss_type = 0;
+ 	struct ethhdr *eth = data;
+ 	__u8 l4_proto = 0;
+-	__u32 hash = 0;
+-	__u32 key, val;
+ 	void *l4 = NULL;
+-	__u32 *cnt;
+-	int ret;
++	__u32 key;
+ 
+ 	if ((void *)(eth + 1) > data_end)
+-		return XDP_PASS;
++		return false;
+ 
+ 	if (eth->h_proto == bpf_htons(ETH_P_IP)) {
+ 		struct iphdr *iph = (void *)(eth + 1);
+ 
+ 		if ((void *)(iph + 1) > data_end)
+-			return XDP_PASS;
++			return false;
+ 		l4_proto = iph->protocol;
+ 		l4 = (void *)(iph + 1);
+ 	} else if (eth->h_proto == bpf_htons(ETH_P_IPV6)) {
+ 		struct ipv6hdr *ip6h = (void *)(eth + 1);
+ 
+ 		if ((void *)(ip6h + 1) > data_end)
+-			return XDP_PASS;
++			return false;
+ 		l4_proto = ip6h->nexthdr;
+ 		l4 = (void *)(ip6h + 1);
+ 	}
+ 
+ 	if (!l4)
+-		return XDP_PASS;
++		return false;
+ 
+ 	/* Filter on the configured protocol (map_xdp_setup key XDP_PROTO).
+ 	 * When set, only process packets matching the requested L4 protocol.
+@@ -121,7 +150,7 @@ int xdp_rss_hash(struct xdp_md *ctx)
+ 	__s32 *proto_cfg = bpf_map_lookup_elem(&map_xdp_setup, &key);
+ 
+ 	if (proto_cfg && *proto_cfg != 0 && l4_proto != (__u8)*proto_cfg)
+-		return XDP_PASS;
++		return false;
+ 
+ 	/* Filter on the configured port (map_xdp_setup key XDP_PORT).
+ 	 * Only applies to protocols with ports (UDP, TCP).
+@@ -133,9 +162,24 @@ int xdp_rss_hash(struct xdp_md *ctx)
+ 		__u16 dest = get_dest_port(l4, data_end, l4_proto);
+ 
+ 		if (!dest || bpf_ntohs(dest) != (__u16)*port_cfg)
+-			return XDP_PASS;
++			return false;
+ 	}
+ 
++	return true;
 +}
 +
- static void verify_xdp_metadata(void *data, clockid_t clock_id)
- {
- 	struct xdp_meta *meta;
-@@ -254,6 +279,12 @@ static void verify_xdp_metadata(void *data, clockid_t clock_id)
- 		printf("No rx_vlan_tci or rx_vlan_proto, err=%d\n",
- 		       meta->rx_vlan_tag_err);
- 	}
++SEC("xdp")
++int xdp_rss_hash(struct xdp_md *ctx)
++{
++	enum xdp_rss_hash_type rss_type = 0;
++	__u32 hash = 0;
++	__u32 key, val;
++	__u32 *cnt;
++	int ret;
 +
-+	if (meta->hint_valid & XDP_META_FIELD_CHECKSUM)
-+		print_rx_cksum(meta->ip_summed, meta->cksum,
-+			       meta->cksum_level);
-+	else
-+		printf("No rx_cksum, err=%d\n", meta->rx_cksum_err);
++	if (!xdp_match_setup(ctx))
++		return XDP_PASS;
++
+ 	ret = bpf_xdp_metadata_rx_hash(ctx, &hash, &rss_type);
+ 	if (ret < 0) {
+ 		key = RSS_KEY_ERR_CNT;
+@@ -160,4 +204,46 @@ int xdp_rss_hash(struct xdp_md *ctx)
+ 	return XDP_PASS;
  }
  
- static void verify_skb_metadata(int fd)
-diff --git a/tools/testing/selftests/bpf/xdp_metadata.h b/tools/testing/selftests/bpf/xdp_metadata.h
-index bca09b94af26..f864d4a8bd8c 100644
---- a/tools/testing/selftests/bpf/xdp_metadata.h
-+++ b/tools/testing/selftests/bpf/xdp_metadata.h
-@@ -28,6 +28,7 @@ enum xdp_meta_field {
- 	XDP_META_FIELD_TS	= BIT(0),
- 	XDP_META_FIELD_RSS	= BIT(1),
- 	XDP_META_FIELD_VLAN_TAG	= BIT(2),
-+	XDP_META_FIELD_CHECKSUM = BIT(3),
- };
- 
- #define XDP_CHECKSUM_NONE		BIT(0)
-@@ -52,10 +53,13 @@ struct xdp_meta {
- 		};
- 		__s32 rx_vlan_tag_err;
- 	};
--	struct {
--		__u32 ip_summed;
--		__u32 cksum;
--		__u8 cksum_level;
-+	union {
-+		struct {
-+			__u32 ip_summed;
-+			__u32 cksum;
-+			__u8 cksum_level;
-+		};
-+		__s32 rx_cksum_err;
- 	};
- 	enum xdp_meta_field hint_valid;
- };
++SEC("xdp")
++int xdp_rx_csum(struct xdp_md *ctx)
++{
++	enum xdp_checksum ip_summed = 0;
++	__u8 cksum_level = 0;
++	__u32 cksum = 0;
++	__u32 key, val;
++	__u32 *cnt;
++	int ret;
++
++	if (!xdp_match_setup(ctx))
++		return XDP_PASS;
++
++	ret = bpf_xdp_metadata_rx_checksum(ctx, &ip_summed, &cksum,
++					   &cksum_level);
++	if (ret < 0) {
++		key = CSUM_KEY_ERR_CNT;
++		cnt = bpf_map_lookup_elem(&map_csum, &key);
++		if (cnt)
++			__sync_fetch_and_add(cnt, 1);
++		return XDP_PASS;
++	}
++
++	key = CSUM_KEY_IP_SUMMED;
++	val = (__u32)ip_summed;
++	bpf_map_update_elem(&map_csum, &key, &val, BPF_ANY);
++
++	key = CSUM_KEY_CKSUM;
++	bpf_map_update_elem(&map_csum, &key, &cksum, BPF_ANY);
++
++	key = CSUM_KEY_LEVEL;
++	val = cksum_level;
++	bpf_map_update_elem(&map_csum, &key, &val, BPF_ANY);
++
++	key = CSUM_KEY_PKT_CNT;
++	cnt = bpf_map_lookup_elem(&map_csum, &key);
++	if (cnt)
++		__sync_fetch_and_add(cnt, 1);
++
++	return XDP_PASS;
++}
++
+ char _license[] SEC("license") = "GPL";
 -- 
 2.47.0
 
