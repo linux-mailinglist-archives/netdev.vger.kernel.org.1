@@ -1,306 +1,267 @@
-Return-Path: <netdev+bounces-305880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305881-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ARkDGWp4TmqsNQIAu9opvQ
-	(envelope-from <netdev+bounces-305880-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:18:50 +0200
+	id Z55SMWN5Tmr4NQIAu9opvQ
+	(envelope-from <netdev+bounces-305881-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:22:59 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 198AF7289A8
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:18:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6069D728A55
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:22:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ssi.bg header.s=ssi header.b="rGhaM8I/";
-	dmarc=pass (policy=reject) header.from=ssi.bg;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305880-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305880-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=amd.com header.s=selector1 header.b=IUZHpYmd;
+	dmarc=pass (policy=quarantine) header.from=amd.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305881-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305881-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7F0E8303B19E
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 15:53:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7E3BC30B1B22
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 15:57:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CBB409272;
-	Wed,  8 Jul 2026 15:53:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EF7D409285;
+	Wed,  8 Jul 2026 15:57:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012033.outbound.protection.outlook.com [52.101.43.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BF802EF64F;
-	Wed,  8 Jul 2026 15:53:35 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783526018; cv=none; b=pbZ4bRdG/v28OFSp3j3Ij3QI9Zp47TxmDL1BpF2ulQz2mSN+qvCSrMAFGrdxoS0d0euG7msGMXsDTr7zv9v8wmiAm2ug8aJEmXY3T5iMYGskxe/3LbxS5PTrHj+ru+aK2Meywb1Cyc/BO/zzKR2v/QBQnkNw7XJE7k8aW7a/XEU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783526018; c=relaxed/simple;
-	bh=0Mge3JAgIP+E0X+MesrXp8TixEJc4l6be13natFqp4w=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=Vz2cXP7C18vlqqBWxHH8mlE9JQuD1yv1UeLXYZXt0g90wwcAOi1936iVEEpWcgc6FlUlqZlbJ3D2/+iFNRewsgnXJDvfEdPGQPFDE5pnfd/4l21PcqFhq/j208XTpmIH4rdO2IbGcn/9gwNCMwzYJEhdwKlnhSR9CYQ0kBpaJbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=rGhaM8I/; arc=none smtp.client-ip=193.238.174.39
-Received: from mx.ssi.bg (localhost [127.0.0.1])
-	by mx.ssi.bg (Potsfix) with ESMTP id C88EE20252;
-	Wed, 08 Jul 2026 18:53:32 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
-	:content-type:content-type:date:from:from:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
-	 bh=IrBFyo4X9p4vQcBuAXEscbyeWrGozHn+zcsBI+OqvLA=; b=rGhaM8I/EwgW
-	HvSp6hduo21Rar8HkjRO+WuJ2VuHDC7d9dlomU8UF5YtzUV0ZLUBZ4BDZ08MF/w0
-	QJ7eBHhkZ2e1NoYOCraLJ3pYyMxAKJ5BcMYPOQg806+fBw5l5XpfcrW5dwNDch6u
-	1VC8zjSgewpLyAqLebPHaAlK+2c69PL+0FXofnBLcK5lSGeQl8I+47LGd2CywkeP
-	rDOM3CO93CCJk8z73uWAATYexH7/Um7MV5KmHhEEk8buXJ5MwjYPByGVNGabhuVn
-	bgs30xxlohn3+P/jo2HLU6Dvbk1OwD3Eqa8gfi4/UnCcY+EzsI5dsOfxXq3sa/B2
-	5r2jTdci421Kgtas6DtmX3bXaiF2DHQ6HU4a26NBvB14ub+IFWzaNMweT0OBw2vs
-	I4sQZRbDVyCcwa9HeDjmRxRxzn3b3ma31pVETQ2eSgL06lotDaEBUgVNwZGIlYNm
-	M9qrrq1JHtZKbAUczLfVwQLqq2JvtYF8+pycZ82cZ50lHdYG0tyLJ2SP3c6+nN6B
-	N0kVBOAgkgF4GL6Um+5+uQfBzTigZuKuiruGLTwj6BPVFoTAlxc3GVmjz1aEQD7N
-	HzEXw0pyQQseqVouHpUp4bs4FYPm9GAlUxk/iF8BCDzA91VlGRBDOQYIDzOAVH6J
-	uxDfS/k6eoCCalWOWvg+8UwnkSsj4Go=
-Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
-	by mx.ssi.bg (Potsfix) with ESMTPS;
-	Wed, 08 Jul 2026 18:53:32 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by box.ssi.bg (Potsfix) with ESMTPSA id 5F34C6029E;
-	Wed,  8 Jul 2026 18:53:25 +0300 (EEST)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.2/8.18.2) with ESMTP id 668FrEwS064811;
-	Wed, 8 Jul 2026 18:53:16 +0300
-Date: Wed, 8 Jul 2026 18:53:14 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-cc: Simon Horman <horms@verge.net.au>, David Ahern <dsahern@kernel.org>,
-        Ido Schimmel <idosch@nvidia.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
-        Alexander Frolkin <avf@eldamar.org.uk>, netdev@vger.kernel.org,
-        lvs-devel@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        stable@vger.kernel.org, Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
-        Ao Wang <wangao@seu.edu.cn>, Xuewei Feng <fengxw06@126.com>,
-        Qi Li <qli01@tsinghua.edu.cn>, Ke Xu <xuke@tsinghua.edu.cn>
-Subject: Re: [PATCH nf] ipvs: make destination flags atomic
-In-Reply-To: <91509A0C-9E4A-4F0E-A45C-ABD29396067E@mails.tsinghua.edu.cn>
-Message-ID: <afcdb34c-ec10-de8e-083c-624bcedca90e@ssi.bg>
-References: <20260707085706.96322-1-zhaoyz24@mails.tsinghua.edu.cn> <41c3d792-af7d-5582-5057-ac3df5f7bfd6@ssi.bg> <91509A0C-9E4A-4F0E-A45C-ABD29396067E@mails.tsinghua.edu.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F358B439337;
+	Wed,  8 Jul 2026 15:57:17 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783526239; cv=fail; b=mEW+TyvLMltcCzreWFqHo2p6jJ23eqh95MCy6cv9tiB/d5Cpa17YihpJvGh0h3JjhmZmRXDbFei1RLFXGdQqO8i5Xbnso++gZbwum/jKjJfhxasWdQsvUKp2Nbyhl6y6QWXeNjy4GdvdPGYW7loT7QZLOgCUKWPSPrsXBxchJgs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783526239; c=relaxed/simple;
+	bh=1ozWx6msHaAZS4jEoJZrEuIFkg7xrRZTmMuCC/5yk7g=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=m5gw69IlRqu7uXz+eRexELr9HJhAiXeISWrKOJFrIj5MWw2uUGCl9X3NwdpLoek1g/BWvUHE4KTaemoJc4pylV6arHG4Z8IkC0moyP72aTl0TgbtBn6F1FDr/WGIUp+hNiRY/KtUejRzBjaoGN/BMV9HNTyN5DHAjPTwxWacuxQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=IUZHpYmd; arc=fail smtp.client-ip=52.101.43.33
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fYDpvmHgEoOgZ00gXu+uh4NJoybSs5JYGg8fjJ2Gi1dcLFthTHZivzFnVJfiEoaysYeRE8GVXLuNQ2UNiGQ6vNKjsG09ON3HrJTwE3ebybBzCAGkKC4DLzDpAqVdrRwTBViExRqyM8R8R0QR7VkMy7aeTKvIQymClvP0BMiirecXMvmhQ5Wcx4weVNfrFehBEucG1CVUjlUo2z9/7HX7RhFer4ZtXAcgo/AEXYUNNkN4iwLxQprXOHJg7JaFPqSUOfYX6T7WxeARfEn1OHPuc3a/toSNgCzJLe5P1f3txFJB2sfC60qpBwgjKeX59m0/CZyc0ucype167wqrAMyMxQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wiVXL4I5vnajX3RW2E00xVb4sve/CQZy+lpyfm/0CTk=;
+ b=pr+cXSG5QrWIdj83C6+scHAs5jurZb3OtBCNHIWqq4dtcKd3sg9CABdKRxHmEr4SImhlNFLfVRNzecfaO0anPOatZikT8efONF7kN1+PeXahjMiEQLBWEwvn3gAodiFvFdc5JXTQDRh6sTPhY8aGVy0HTnPt0JNJUDoAIUc9Whb0xjPVyFvuNE24VrYSSN01WKUFKtq4Cz7rghKo2fA6CZ7DT186Ty2toWRTgvh3xwBiRqHNmcuhwowV23tcQi6maO3r8M30qdaUiYgxC0whDW8S8n7SHMkIY6/JolgGAb0biF8g6KPxj2iZu+wFfCh8+7L2oPUE2BfmvwqbtJMXiA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wiVXL4I5vnajX3RW2E00xVb4sve/CQZy+lpyfm/0CTk=;
+ b=IUZHpYmdHRngZ0Xnqofwn6PM+Br0tTmHVnwHTfkZb7XuyFjvAOKR2BpoiNCSkydSugKIs/zIBinBaPyQgrkmRsd7ltM+RhGIsuzmVbFqqRoCnxc1LaMCH4ri5Dz+/mMQg6cQhceRh9dAOWJ2ctzPfev49KYjXH3j6H0un/CCUTU=
+Received: from CY1PR12MB9697.namprd12.prod.outlook.com (2603:10b6:930:107::6)
+ by IA1PR12MB8493.namprd12.prod.outlook.com (2603:10b6:208:447::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.10; Wed, 8 Jul
+ 2026 15:57:12 +0000
+Received: from CY1PR12MB9697.namprd12.prod.outlook.com
+ ([fe80::3a41:55a0:8203:596d]) by CY1PR12MB9697.namprd12.prod.outlook.com
+ ([fe80::3a41:55a0:8203:596d%5]) with mapi id 15.21.0181.010; Wed, 8 Jul 2026
+ 15:57:11 +0000
+Message-ID: <c5c9473f-2a60-4385-9c5c-0d0fabe6c8e1@amd.com>
+Date: Wed, 8 Jul 2026 21:26:59 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V3 2/4] dmaengine: xilinx_dma: Move descriptors to done
+ list based on completion bit
+To: Srinivas Neeli <srinivas.neeli@amd.com>, Vinod Koul <vkoul@kernel.org>,
+ Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
+Cc: Frank Li <Frank.Li@kernel.org>, Michal Simek <michal.simek@amd.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Suraj Gupta <suraj.gupta2@amd.com>, Marek Vasut <marex@nabladev.com>,
+ Tomi Valkeinen <tomi.valkeinen@ideasonboard.com>,
+ Alex Bereza <alex@bereza.email>,
+ Folker Schwesinger <dev@folker-schwesinger.de>, dmaengine@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, git@amd.com
+References: <20260708100652.603074-1-srinivas.neeli@amd.com>
+ <20260708100652.603074-3-srinivas.neeli@amd.com>
+Content-Language: en-US
+From: "Pandey, Radhey Shyam" <radheys@amd.com>
+In-Reply-To: <20260708100652.603074-3-srinivas.neeli@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN3PR01CA0124.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:96::12) To CY1PR12MB9697.namprd12.prod.outlook.com
+ (2603:10b6:930:107::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY1PR12MB9697:EE_|IA1PR12MB8493:EE_
+X-MS-Office365-Filtering-Correlation-Id: 97e0044c-e72f-4319-b0c2-08dedd09924d
+X-LD-Processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|1800799024|23010399003|366016|376014|4143699003|5023799004|11063799006|56012099006|6133799003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	cmP1jVVzDwJNItLHrsTVljswJ0Dvo8GiAk65uOCpa75AEvO8xJj34g4rKSsc7cgdQETMhAIVM7S3bzOriwPICVDiMGzmOCpiVGxkhMwOs+rnWblAD+gHzirlZZbxoUfTR6+ZD+t8kMfcu5DW5aU53tWzIVJns/HQ3utCtr8vK9IgVwZDmX0GLE1a987rKlMrgqnVMnn40L3evSJRnj17UXyyjxN9is7uId2C3MkKW+s7nXqpyw1jULIxgsEhyPve6RMqIOSss1PmGHsPGffJo3aVgbfwY1xS+6ib/CmYD7TRDT6Av++fj6bUJQ09BMw4u2Voj1ZFSTdYISAzbI5gc8tx+IZ9WnrG+x2OGXWnZKPi5ltp9pp5+574dkfzvF124fZy2tNLBecOitllWd87zU9LW1GQ389q8NkVGgNEZpODpUTwQ5s52CHhywMmxk1GtI8WwP/zDTSFOPh4n19/Z8tfnUbaHCjk6b4hCFIdrAMiLoMbdhE0MyDTAUt+ldk5mzMx6eVUo2tW/HFaQQ3jB0fghdY3fhHCcp0ZTE/BRXvtsianoDu5BW/FCZz6/UlYlko7frHyVXmc2knVLH1sXM/By7IePvI6kC25ffjVy2Z9BEKgs79YgZtBw/S9fUI9K4AFjVtBGjS3bNXZ9z/RsgxT0C1WvfXp4kgPxig1fQ8=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY1PR12MB9697.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(23010399003)(366016)(376014)(4143699003)(5023799004)(11063799006)(56012099006)(6133799003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VGttSE11STJnRmpSdGpydlVKNjA1Z3lzdTlSVmd6QzN5TnJ0SDF2YlZQeWx0?=
+ =?utf-8?B?a0g5dVBURzB5UVovdmx5SzJvUkRIenozR0lhT1cvYm1CNkMvODg2RXNTOTBo?=
+ =?utf-8?B?ZmVlTktEQnYzRjJpT2VBRU9Cb3lDTkNHY09wOXhBYjdBcVJlR2lRaXllNnJW?=
+ =?utf-8?B?cENSTkxkREswaWl4bE0xRmlCS2hSRmt6cm5DUFpoR0d1bXdZUW9nWVBXUkxZ?=
+ =?utf-8?B?aFBKOTZ0RUhFeDJ4eWdkMkQvQVVnUDlDNGhkMnlMOTRMZlF5YXpmY2s2cVJP?=
+ =?utf-8?B?cmQxRXIzRGtsMWE3c0tDZ242UGhYdkF6aFVIY2NjRlJRN2sxZFF5QnN5Rklo?=
+ =?utf-8?B?UkRmcUNjNTVnRDZRNUlBZEdIZ2Q1YWpXdjlxK2M3aFFvS1pObDdrM1VxV0pZ?=
+ =?utf-8?B?dENqRTJuWVZnRGhNcWc1VmRkemVVNzkxcnhkR1lZMCtUQ2Z0T04wbEFQTi83?=
+ =?utf-8?B?RExqWGlRakx3OHhQQ1RTVloxN2M0TVJFakMvQUpabjhYdFRNMmV3a1lTenFp?=
+ =?utf-8?B?MDJaejdjeXF1bVlZejNTaC9IcXh1RS9xYXFGOWRmSEZ3VkNwVTh3clVyQnZN?=
+ =?utf-8?B?V052Q3REZkdYS0lHR1JOb2ZCSERWRVZMM2hFTWxoWTc2RExIdWlxUko1Rkt4?=
+ =?utf-8?B?c1lXeTJ6andCeGxwMmZNUFNqMG1Lajl1V1I2N1VqdGNWRDhsQ2xtdjlTQ3Ev?=
+ =?utf-8?B?Zlpva1FkOG1WOTRXa3dxSElRQ016dkxKZHM2Nkowb0FNTGlVeXhJdGJjL0p5?=
+ =?utf-8?B?RDdtU3dvZko0YUgrQUpFM1lHVUhhS0RzYi9OdkJFRnpWbnorZEw2dTh1UVBl?=
+ =?utf-8?B?SGRScXFVczBOc3hRS0x5TC8zRUViNkNyMm5xczVjN0thcUwraEdRbkNIUnh1?=
+ =?utf-8?B?NUU3cWVlVGoyNlNjeitZb3Y2eGdqcWx1QTYwbS9lWGk2KzBSZkNwMzFnbTRv?=
+ =?utf-8?B?T3FsTVg1VWZoNDFUN04ya3FxYkV5WXd4QjBxZmsyaGM2aTladWZ6Tk1LbENw?=
+ =?utf-8?B?TkJ2MFZYbmt3MW5sZjhHWHc3UGpUWG43VHhKbkxpVnd0ODY4Z29OQVdZMFVS?=
+ =?utf-8?B?dG9yejd2VlBLVXQ5VTd2UGpsS1poVFBmNXJJRitPRTI0dDJyaEw3Lys4S1BF?=
+ =?utf-8?B?c0xCNVU2K0p4UHlScWMzZTF4cWZQOGtocTFBK0UxbWp0cVRXOTV0Yk12RTcv?=
+ =?utf-8?B?Z3dwTTZuQVh0N3dQZ2pqT3JjeTREbGtxcm9TRUtHRDR2ODhwZCtteFY2Tnoy?=
+ =?utf-8?B?eE9YU1dnZ1pKNmdnMCt6N2xhUDl2RjZjTkFrWVZjYzJBZnZaZUpObmJmQzhk?=
+ =?utf-8?B?TUxQa3Q5S1VVdklHekQyMFFXSEJtYUNrZk4wTE9rQmFaTlJzU0NtN2k5UFpo?=
+ =?utf-8?B?QW5XVDB1L2V5dmpubGpEOENmc2Q1eVBGblYrT1AxNEFuOXU4dy9DYUxoSmdX?=
+ =?utf-8?B?ajFhNmhFUFVRSWxadlg2ZVU3RTNKZE9DaWpyOTlBOG9Eck03R3ZDaXRvUUZU?=
+ =?utf-8?B?QUZjN0ptOFNzTTQwV1dUdGFCc052Y0VCdE1ub2VGUE5sSWN1SFVKd3hIZ1BB?=
+ =?utf-8?B?YkhLU2NqcW9wN1FpalJkZU5ZdWNNckZKVG1lMFJYQlhvUVBHSlk0ZVlpSHVw?=
+ =?utf-8?B?Z1RnaXRCM3BDd2xRNmV5TTQwb2xXdlVzZ05lY0RwbUZ6aThhejR5MWRHamNk?=
+ =?utf-8?B?b1N2SmZ4aEF4Y05kNmZEWjRqQlVVU3hzaU9aemZHNERaL2REekszVmxma3ZD?=
+ =?utf-8?B?anlEb2hjSUE3QjNsMDBiaERCRUhFK0oycDRQbzQzalV0VE5wQlA5QW91SHQx?=
+ =?utf-8?B?YzBJSndtYTVMQ091bTJMQlJFMUM3NzdscSt6VHg1Wlc3eEN2TmFoUDNSUnFo?=
+ =?utf-8?B?ZWdveVhIdWN0bWVlb1NoUUJXZUNCUWxEUmRNQmRYUmVkbmxvblAva3BYNW1h?=
+ =?utf-8?B?MnVYd25vRGNnaHo3QVJMNG8wZTJQS2p3aTVlaXQ3L1hIaU56QXlhbWV0eHRW?=
+ =?utf-8?B?cEY1cjBXalZvYlkwSjlsL2xzOW8weXZ1YWxBYm5YL3hCZS9yNjRFSUFXaVp0?=
+ =?utf-8?B?TGkwcjhQeTBLZ3d4UzhjL0xyMm5VbS9LVllSNks1UmdBcDQyRHB2UW5LRTdL?=
+ =?utf-8?B?Y1dzL1ZSb3pxWjRaeFFxY0ZiS0FVby90SXFCaXRTcE9xZUNGN1JINnBvV0h5?=
+ =?utf-8?B?b1dHSWRKMEFCN2hjRHhmOUM0K1luK0pnSkg4UGpzbkpHNXpTeTVhMUhHZFow?=
+ =?utf-8?B?NDBrRCtKTTVoV2NHTUlxNXpRM0hCZnVhbjZobHVaRWRtSkJhN3Q0a3NvN3Ra?=
+ =?utf-8?B?RFVCWTZHdVczZ2ZTdDVpbDVmekx5elhyZmVhOUtJUisxNS9qcTFOQT09?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 97e0044c-e72f-4319-b0c2-08dedd09924d
+X-MS-Exchange-CrossTenant-AuthSource: CY1PR12MB9697.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2026 15:57:11.5849
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: aXp1zDYZW26gHnW5Z9CaaLVbgaVIkS3gWD0U7/ThkROkXMHOYnbxtbjZiw3ao5Jz
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8493
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
-	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305880-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[verge.net.au,kernel.org,nvidia.com,davemloft.net,google.com,redhat.com,netfilter.org,strlen.de,nwl.cc,eldamar.org.uk,vger.kernel.org,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ssi.bg:from_mime,ssi.bg:email,ssi.bg:mid,ssi.bg:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
-	FORGED_SENDER(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FORGED_RECIPIENTS(0.00)[m:zhaoyz24@mails.tsinghua.edu.cn,m:horms@verge.net.au,m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:avf@eldamar.org.uk,m:netdev@vger.kernel.org,m:lvs-devel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:stable@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	TAGGED_FROM(0.00)[bounces-305881-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:srinivas.neeli@amd.com,m:vkoul@kernel.org,m:radhey.shyam.pandey@amd.com,m:Frank.Li@kernel.org,m:michal.simek@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:suraj.gupta2@amd.com,m:marex@nabladev.com,m:tomi.valkeinen@ideasonboard.com,m:alex@bereza.email,m:dev@folker-schwesinger.de,m:dmaengine@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:git@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[ssi.bg:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[radheys@amd.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[radheys@amd.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[amd.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,amd.com:from_mime,amd.com:email,amd.com:mid,amd.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 198AF7289A8
+X-Rspamd-Queue-Id: 6069D728A55
 
+> In AXI MCDMA scatter-gather mode, xilinx_dma_complete_descriptor() walks
 
-	Hello,
+avoid "scatter-gather" mode.
 
-On Wed, 8 Jul 2026, Yizhou Zhao wrote:
-
-> > On Jul 8, 2026, at 03:18, Julian Anastasov <ja@ssi.bg> wrote:
-> > 
-> > On Tue, 7 Jul 2026, Yizhou Zhao wrote:
-> > 
+> the channel's active_list and unconditionally moves every entry to the
+> done_list. The MCDMA IOC interrupt handler invokes this function on
+> every interrupt-on-completion, but with interrupt coalescing
+> (IRQThreshold > 1) an IOC interrupt may fire after only a subset of the
+> queued descriptors have actually been processed by the hardware. As a
+> result, descriptors whose completion bit is not yet set in the BD status
+> were being reported as completed to client drivers.
 > 
-> We have posted a v2 patch at:
-> https://lore.kernel.org/netfilter-devel/20260708060454.20534-1-zhaoyz24@mails.tsinghua.edu.cn/
+> Add a check for the descriptor completion bit before moving entries from
+> the active list to the done list, using the appropriate direction-
+> specific status field (s2mm_status for DMA_DEV_TO_MEM, mm2s_status for
+> DMA_MEM_TO_DEV).
 > 
-> The v2 patch updates the commit message with more conservative
-> wording, and fixes the checkpatch logical-continuation warnings.
+> The MCDMA completion check is intentionally not guarded by chan->has_sg,
+> unlike the AXIDMA branch above. AXI MCDMA only operates in scatter-gather
+> mode (has_sg is always true), so the guard would always pass and is
+> omitted. The completion bit is therefore checked unconditionally.
 
-	After looking again at the code, I think we can
-do it in different way:
+Not need to talk about has_sg check and compare it with AXIDMA but if 
+you still prefer make it precise.
 
-- IP_VS_DEST_F_AVAILABLE and IP_VS_DEST_F_OVERLOAD are defined
-in include/uapi/linux/ip_vs.h but we never export them to user
-space. So, we are free to change them. We can move them to 
-include/net/ip_vs.h, see below...
+Once addressed , feel free to add.
 
-- IP_VS_DEST_F_AVAILABLE is changed only under service_mutex,
-so we can keep its usage
+Reviewed-by: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
+Thanks!
 
-- IP_VS_DEST_F_OVERLOAD needs different access methods.
-We can add 'unsigned long flags2;', may be after l_threshold.
-And to switch to such usage (F_OVERLOAD -> FL_OVERLOAD):
+Just a note that this change aligns with changes that were done in past 
+for AXIDMA in commit 7bcdaa658102 dmaengine: xilinx_dma: Freeup active 
+list based on descriptor completion bit
 
-	- test_bit(IP_VS_DEST_FL_OVERLOAD, &dest->flags2)
-	- set_bit(IP_VS_DEST_FL_OVERLOAD, &dest->flags2)
-
-		Sometimes if (test_bit()) clear_bit() can avoid
-		full memory barrier in ip_vs_dest_update_overload()
-
-	- clear_bit(IP_VS_DEST_FL_OVERLOAD, &dest->flags2)
-		test_bit() guard can help here too
-
-	As there are other races involved, something like
-this can be a starting point for such change. It tries harder
-to update the overload flag on dest edit/add but it does not
-include the proposed bitops:
-
-diff --git a/include/net/ip_vs.h b/include/net/ip_vs.h
-index 49297fec448a..b34631270e24 100644
---- a/include/net/ip_vs.h
-+++ b/include/net/ip_vs.h
-@@ -1906,6 +1906,8 @@ static inline void ip_vs_dest_put_and_free(struct ip_vs_dest *dest)
- 		kfree(dest);
- }
- 
-+void ip_vs_dest_update_overload(struct ip_vs_dest *dest);
-+
- /* IPVS sync daemon data and function prototypes
-  * (from ip_vs_sync.c)
-  */
-diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_conn.c
-index d19caf66afeb..3fd221996e6e 100644
---- a/net/netfilter/ipvs/ip_vs_conn.c
-+++ b/net/netfilter/ipvs/ip_vs_conn.c
-@@ -1087,6 +1087,26 @@ static inline int ip_vs_dest_totalconns(struct ip_vs_dest *dest)
- 		+ atomic_read(&dest->inactconns);
- }
- 
-+__always_inline void ip_vs_dest_update_overload(struct ip_vs_dest *dest)
-+{
-+	int conns, l, u;
-+
-+	u = READ_ONCE(dest->u_threshold);
-+	if (!u)
-+		goto unset;
-+	conns = ip_vs_dest_totalconns(dest);
-+	if (conns >= u) {
-+		dest->flags |= IP_VS_DEST_F_OVERLOAD;
-+		return;
-+	}
-+	l = READ_ONCE(dest->l_threshold) ? : (u * 3 / 4);
-+	if (conns >= l && l)
-+		return;
-+
-+unset:
-+	dest->flags &= ~IP_VS_DEST_F_OVERLOAD;
-+}
-+
- /*
-  *	Bind a connection entry with a virtual service destination
-  *	Called just after a new connection entry is created.
-@@ -1161,9 +1181,7 @@ ip_vs_bind_dest(struct ip_vs_conn *cp, struct ip_vs_dest *dest)
- 		atomic_inc(&dest->persistconns);
- 	}
- 
--	if (dest->u_threshold != 0 &&
--	    ip_vs_dest_totalconns(dest) >= dest->u_threshold)
--		dest->flags |= IP_VS_DEST_F_OVERLOAD;
-+	ip_vs_dest_update_overload(dest);
- }
- 
- 
-@@ -1257,16 +1275,8 @@ static inline void ip_vs_unbind_dest(struct ip_vs_conn *cp)
- 		atomic_dec(&dest->persistconns);
- 	}
- 
--	if (dest->l_threshold != 0) {
--		if (ip_vs_dest_totalconns(dest) < dest->l_threshold)
--			dest->flags &= ~IP_VS_DEST_F_OVERLOAD;
--	} else if (dest->u_threshold != 0) {
--		if (ip_vs_dest_totalconns(dest) * 4 < dest->u_threshold * 3)
--			dest->flags &= ~IP_VS_DEST_F_OVERLOAD;
--	} else {
--		if (dest->flags & IP_VS_DEST_F_OVERLOAD)
--			dest->flags &= ~IP_VS_DEST_F_OVERLOAD;
--	}
-+	if (dest->flags & IP_VS_DEST_F_OVERLOAD)
-+		ip_vs_dest_update_overload(dest);
- 
- 	ip_vs_dest_put(dest);
- }
-diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
-index bcf40b8c41cf..2871116e46ec 100644
---- a/net/netfilter/ipvs/ip_vs_ctl.c
-+++ b/net/netfilter/ipvs/ip_vs_ctl.c
-@@ -1315,6 +1315,7 @@ __ip_vs_update_dest(struct ip_vs_service *svc, struct ip_vs_dest *dest,
- 	struct ip_vs_service *old_svc;
- 	struct ip_vs_scheduler *sched;
- 	int conn_flags;
-+	bool upd_thresh;
- 
- 	/* We cannot modify an address and change the address family */
- 	BUG_ON(!add && udest->af != dest->af);
-@@ -1370,10 +1371,12 @@ __ip_vs_update_dest(struct ip_vs_service *svc, struct ip_vs_dest *dest,
- 	/* set the dest status flags */
- 	dest->flags |= IP_VS_DEST_F_AVAILABLE;
- 
--	if (udest->u_threshold == 0 || udest->u_threshold > dest->u_threshold)
--		dest->flags &= ~IP_VS_DEST_F_OVERLOAD;
--	dest->u_threshold = udest->u_threshold;
--	dest->l_threshold = udest->l_threshold;
-+	upd_thresh = READ_ONCE(dest->u_threshold) != udest->u_threshold ||
-+		     READ_ONCE(dest->l_threshold) != udest->l_threshold;
-+	WRITE_ONCE(dest->u_threshold, udest->u_threshold);
-+	WRITE_ONCE(dest->l_threshold, udest->l_threshold);
-+	if (upd_thresh)
-+		ip_vs_dest_update_overload(dest);
- 
- 	dest->af = udest->af;
- 
-@@ -3667,8 +3670,8 @@ __ip_vs_get_dest_entries(struct netns_ipvs *ipvs, const struct ip_vs_get_dests *
- 			entry.port = dest->port;
- 			entry.conn_flags = atomic_read(&dest->conn_flags);
- 			entry.weight = atomic_read(&dest->weight);
--			entry.u_threshold = dest->u_threshold;
--			entry.l_threshold = dest->l_threshold;
-+			entry.u_threshold = READ_ONCE(dest->u_threshold);
-+			entry.l_threshold = READ_ONCE(dest->l_threshold);
- 			entry.activeconns = atomic_read(&dest->activeconns);
- 			entry.inactconns = atomic_read(&dest->inactconns);
- 			entry.persistconns = atomic_read(&dest->persistconns);
-@@ -4277,8 +4280,10 @@ static int ip_vs_genl_fill_dest(struct sk_buff *skb, struct ip_vs_dest *dest)
- 			 dest->tun_port) ||
- 	    nla_put_u16(skb, IPVS_DEST_ATTR_TUN_FLAGS,
- 			dest->tun_flags) ||
--	    nla_put_u32(skb, IPVS_DEST_ATTR_U_THRESH, dest->u_threshold) ||
--	    nla_put_u32(skb, IPVS_DEST_ATTR_L_THRESH, dest->l_threshold) ||
-+	    nla_put_u32(skb, IPVS_DEST_ATTR_U_THRESH,
-+			READ_ONCE(dest->u_threshold)) ||
-+	    nla_put_u32(skb, IPVS_DEST_ATTR_L_THRESH,
-+			READ_ONCE(dest->l_threshold)) ||
- 	    nla_put_u32(skb, IPVS_DEST_ATTR_ACTIVE_CONNS,
- 			atomic_read(&dest->activeconns)) ||
- 	    nla_put_u32(skb, IPVS_DEST_ATTR_INACT_CONNS,
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
+> 
+> Fixes: 6ccd692bfb7f ("dmaengine: xilinx_dma: Add Xilinx AXI MCDMA Engine driver support")
+> Signed-off-by: Srinivas Neeli <srinivas.neeli@amd.com>
+> ---
+> Changes in V3:
+>   - Added Fixes tag.
+>   - Expanded commit message to explain the interrupt coalescing scenario
+>     and why the has_sg guard is omitted for MCDMA.
+>   - Changed local variable from 'bool completed' to 'u32 status' for
+>     cleaner status field access.
+>   - Simplified completion check logic.
+> 
+> Changes in V2:
+>   - No change.
+> ---
+>   drivers/dma/xilinx/xilinx_dma.c | 11 +++++++++++
+>   1 file changed, 11 insertions(+)
+> 
+> diff --git a/drivers/dma/xilinx/xilinx_dma.c b/drivers/dma/xilinx/xilinx_dma.c
+> index ff5b29a808e9..1b5b00f08c5f 100644
+> --- a/drivers/dma/xilinx/xilinx_dma.c
+> +++ b/drivers/dma/xilinx/xilinx_dma.c
+> @@ -1784,6 +1784,17 @@ static void xilinx_dma_complete_descriptor(struct xilinx_dma_chan *chan)
+>   					      struct xilinx_axidma_tx_segment, node);
+>   			if (!(seg->hw.status & XILINX_DMA_BD_COMP_MASK) && chan->has_sg)
+>   				break;
+> +		} else if (chan->xdev->dma_config->dmatype == XDMA_TYPE_AXIMCDMA) {
+> +			struct xilinx_aximcdma_tx_segment *seg;
+> +			u32 status;
+> +
+> +			seg = list_last_entry(&desc->segments,
+> +					      struct xilinx_aximcdma_tx_segment,
+> +					      node);
+> +			status = (chan->direction == DMA_DEV_TO_MEM) ?
+> +				seg->hw.s2mm_status : seg->hw.mm2s_status;
+> +			if (!(status & XILINX_DMA_BD_COMP_MASK))
+> +				break;
+>   		}
+>   		if (chan->has_sg && chan->xdev->dma_config->dmatype !=
+>   		    XDMA_TYPE_VDMA)
 
 
