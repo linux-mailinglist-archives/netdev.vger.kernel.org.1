@@ -1,48 +1,50 @@
-Return-Path: <netdev+bounces-305648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305649-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id h20iMELpTWrq/wEAu9opvQ
-	(envelope-from <netdev+bounces-305648-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 08:08:02 +0200
+	id Sw8FFnvpTWoAAAIAu9opvQ
+	(envelope-from <netdev+bounces-305649-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 08:08:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12A897220F8
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 08:08:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C6F172210C
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 08:08:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=p59YpYxF;
+	dkim=pass header.d=linux.dev header.s=key1 header.b="arP/d2S5";
 	dmarc=pass (policy=none) header.from=linux.dev;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305648-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305648-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305649-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305649-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 19BCF300F113
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 06:06:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 95A523041A08
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 06:06:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F8F380FD4;
-	Wed,  8 Jul 2026 06:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F305937D11F;
+	Wed,  8 Jul 2026 06:06:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5BFE356765;
-	Wed,  8 Jul 2026 06:06:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BBFD383313
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 06:06:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783490798; cv=none; b=nMA9js67wwVSTvZelGdh2cf6tMvZf7qQiBRi3L6ET5Rijys2zFADhNXW104/87KRCH0GZH9EEsMRFzJqG5dNlxVzaE3yGkscm669YvpZIPXp60LUExzzt0+GE748i/8srrE1KmuH4qa7NOf8OSse9C+Gl8KopjAVHHpcCe42Trc=
+	t=1783490801; cv=none; b=TgJzW3zeq7AxHL0su+AKrd6wJUmNsHTy4OLAK920J5I850FULQtJLi8qZzJQvqkoZTXKD2iyHVpmq8cWiz1EernH4EzKgwqiaCwkWle+TSjtpwSBx3W78r5Nyu4eeRYjEszwY+xFspE2jZ/nwBmUQCtp37fMIOynBFO8NXbZYoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783490798; c=relaxed/simple;
-	bh=+DR0Vd/N1HbPH+tl653IE8znn3Np9S8ELM3IGKflUjg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YF/WL1uMsnjoZXSrrCiqtgUieeKGH8lRgV4ZL1HcEWuvWe6GefuLEPC3mqciePF2xrqCBUL+OLLENlzlqODsAf9zVUNCf+pYYr7iOeyS4SzwdFpvSVL8azGiBAUKePAYz4nDYx6z6K4LS4dUHX6i8nqMZux5CUcd8OwvJTqkJrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=p59YpYxF; arc=none smtp.client-ip=91.218.175.185
+	s=arc-20240116; t=1783490801; c=relaxed/simple;
+	bh=DrODIwvyYn9L/GKPzhvUTnULjebDwilC94nEuArScPk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=RU1pQ8i4Ass2OSNleTpY77zPepvqBhMK4IFyBUFt+818nmeVekBl6yH7E3UiFxkEFUc6JNpuJQmwiWIix695FM2pg2D1naj7HrlC5AbM3nqNcVdnyUxUMUCdoGRqvg5/5TvPim1/pMETq7dYxzKi9HH9RMhpnxoVWowU2zz8xs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=arP/d2S5; arc=none smtp.client-ip=91.218.175.178
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783490794;
+	t=1783490798;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=oBH/iYWDgg2fjHB0n8MaHNuUv23VWE33006Snrd0C+c=;
-	b=p59YpYxFB5zx88zzCxE7YayMoP3jQriQpAbYYh86Ajt8TKtBfSqGHWYmy4rj4a7x/OiFdu
-	NCaVQRp7KfCfdT4dLXyqEHO5tNmF63A2y0yH8mzhcqiyJq1x2Fhzh7n9LSRV5uObGjENla
-	+qFbqCdEhAzgg/3/zKl5DYfmNcLAmpo=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8fVpIZ6ugNKREnQtdLTXjerq4ghmARfupm+QFoiSfkU=;
+	b=arP/d2S5lNGCB+VL2UegdIkjEQhuQ7TbQ31FjeBxKjhRIMBFvjS8nY4MDNLQpXssJmzMou
+	sGFuys1Ux0NF+1PIhnvzRbw2sCUFfOTK56qqUC4nkYAIMRT0JN8FIOzz7CGI1ResH8Xcwy
+	NcmhXqLiSq67ELxRiy/In49ZQruBR9Q=
 From: xuanqiang.luo@linux.dev
 To: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -54,10 +56,12 @@ Cc: Simon Horman <horms@kernel.org>,
 	Kuniyuki Iwashima <kuniyu@google.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Xuanqiang Luo <xuanqiang.luo@linux.dev>
-Subject: [PATCH net-next v3 0/2] ipv4: update rt_flush_dev() and two dst.dev readers
-Date: Wed,  8 Jul 2026 14:05:35 +0800
-Message-ID: <20260708060537.17188-1-xuanqiang.luo@linux.dev>
+	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+Subject: [PATCH net-next v3 1/2] ipv4: use rcu_assign_pointer() in rt_flush_dev()
+Date: Wed,  8 Jul 2026 14:05:36 +0800
+Message-ID: <20260708060537.17188-2-xuanqiang.luo@linux.dev>
+In-Reply-To: <20260708060537.17188-1-xuanqiang.luo@linux.dev>
+References: <20260708060537.17188-1-xuanqiang.luo@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,17 +76,17 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305648-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305649-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER(0.00)[xuanqiang.luo@linux.dev,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:dsahern@kernel.org,m:idosch@nvidia.com,m:horms@kernel.org,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:xuanqiang.luo@linux.dev,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:dsahern@kernel.org,m:idosch@nvidia.com,m:horms@kernel.org,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:luoxuanqiang@kylinos.cn,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[linux.dev:+];
@@ -97,45 +101,39 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,linux.dev:from_mime,linux.dev:email,linux.dev:mid,linux.dev:dkim,dst.dev:url]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:from_mime,linux.dev:dkim,linux.dev:mid,vger.kernel.org:from_smtp,kylinos.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 12A897220F8
+X-Rspamd-Queue-Id: 9C6F172210C
 
-From: Xuanqiang Luo <xuanqiang.luo@linux.dev>
+From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 
-Patch 1 makes the rt_flush_dev() write to rt->dst.dev use
-rcu_assign_pointer(), matching the existing dst_dev_rcu() readers.
+rt_flush_dev() replaces rt->dst.dev with blackhole_netdev on uncached
+routes.  The field is also exposed as dst.dev_rcu, and existing readers
+use dst_dev_rcu().
 
-Patch 2 makes ip_rt_send_redirect() and ip_rt_get_source() use one
-dst.dev snapshot throughout each operation, so a concurrent rt_flush_dev()
-update cannot make them use values from two devices.
+Use rcu_assign_pointer() for the replacement, as dst_dev_put() already
+does for the same field.
 
-v3:
-- Split the rt_flush_dev() change into a separate patch.
-- Update PATCH 2 subject and commit message to describe the actual scope
-  more clearly.
-- Drop the Fixes tag.
-- Fix local variable ordering for netdev reverse xmas tree style.
+Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+---
+ net/ipv4/route.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks to Ido Schimmel for the feedback.
-
-v2: https://lore.kernel.org/lkml/20260701032434.17500-1-xuanqiang.luo@linux.dev/
-- Use dst_dev_rcu() and dev_net_rcu() for the RCU readers.
-- Use rcu_assign_pointer() when publishing the uncached route device
-  replacement.
-- Slightly adjust the commit message wording because this issue was found
-  by inspection, not from an observed user-visible failure.
-
-v1: https://lore.kernel.org/all/20260630094250.29386-1-xuanqiang.luo@linux.dev/
-
-Xuanqiang Luo (2):
-  ipv4: use rcu_assign_pointer() in rt_flush_dev()
-  ipv4: snapshot dst.dev in ip_rt_send_redirect() and ip_rt_get_source()
-
- net/ipv4/route.c | 33 +++++++++++++++++++--------------
- 1 file changed, 19 insertions(+), 14 deletions(-)
-
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index 3f3de5164d6e5..b668375df71e2 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -1565,7 +1565,7 @@ void rt_flush_dev(struct net_device *dev)
+ 		list_for_each_entry_safe(rt, safe, &ul->head, dst.rt_uncached) {
+ 			if (rt->dst.dev != dev)
+ 				continue;
+-			rt->dst.dev = blackhole_netdev;
++			rcu_assign_pointer(rt->dst.dev_rcu, blackhole_netdev);
+ 			netdev_ref_replace(dev, blackhole_netdev,
+ 					   &rt->dst.dev_tracker, GFP_ATOMIC);
+ 			list_del_init(&rt->dst.rt_uncached);
 -- 
 2.43.0
+
 
