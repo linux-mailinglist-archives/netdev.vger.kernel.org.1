@@ -1,166 +1,209 @@
-Return-Path: <netdev+bounces-305642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305643-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id BUQhJXLVTWpf+wEAu9opvQ
-	(envelope-from <netdev+bounces-305642-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 06:43:30 +0200
+	id 0zA3HTHgTWrQ/QEAu9opvQ
+	(envelope-from <netdev+bounces-305643-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 07:29:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE99F721A14
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 06:43:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17175721CC4
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 07:29:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=LBniLzzD;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305642-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305642-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=l6ln1pnu;
+	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305643-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305643-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1FC633019045
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 04:43:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C4B153009CEB
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 05:28:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A086F3AE19B;
-	Wed,  8 Jul 2026 04:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45EB33B9D9D;
+	Wed,  8 Jul 2026 05:28:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm2-f2.google.com (mail-wm2-f2.google.com [74.125.225.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16A60360EE4
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 04:43:17 +0000 (UTC)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.78.106])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A133B9D9B;
+	Wed,  8 Jul 2026 05:28:02 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783485799; cv=none; b=nIn/HlIUi6RbdErzfZRjW4qHIz4PejR+rNKcCUYMJBafF3QQXoWHlbxsV8Xr+w/v1tJ+djkiX5DK09Q/+cm7DCqb741v0MbPsX+1/KXnGlcRb5rio3ByuK6EiBM04ZCBUh7A2OiQjK6bMgwFe0XSgbuAmUFHrynu9MY9ME9GnHI=
+	t=1783488488; cv=none; b=HUNaQHXCtaIpusJ8727RfKy2Bp36nCOLC04lrxN2osaz9GX0VS2HVSYLBcrpltjGNGS03sOCTasP3oRqw4rr+ZNbtb9PRGBhJn24JAM38hPpvMwYXaQ3ocCQv1CnA3iYSfCgDWBHXyP/Tp37zIa5f1GmoeJUYpZ5fycjhVH/wx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783485799; c=relaxed/simple;
-	bh=FAoptCMB2sR5zqcHYSt82rCp/yEQWpVdGexkr86eBYQ=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=Eua+AGT0yvM9vzBSBQ5lCJ0OTPF0jeeCC3O3eRZOfoJuZtlckLiULbK5JNPfqMhGGcTp/pwWfoayGKHpj8MfNAt/zQmpdOYjlTNSTHnrKkWzlZGDErwP+zYmf1ewYpNuZ2UirDUuqwMiQR3RyeOZkZYf+fFKUybYv6h/5cauwCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LBniLzzD; arc=none smtp.client-ip=74.125.225.130
-Received: by mail-wm2-f2.google.com with SMTP id 5b1f17b1804b1-493b567a019so1523125e9.1
-        for <netdev@vger.kernel.org>; Tue, 07 Jul 2026 21:43:17 -0700 (PDT)
+	s=arc-20240116; t=1783488488; c=relaxed/simple;
+	bh=Tk/SIKN81NVDuX2stQgrEZFJK2nWKRLk8SvQKPTSZ3E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OsRnCH24sC2VSyYdNt79a7+C1QlOeFyeGI/PtaCz7wmKT6i6Uc+KgRhC8wGLVoXWp7oZtflHoNji7m5rhsdQbB4znSIfJzaZZyuC/ZAcj5C4OlUtQ23A4EgyuUJ9sNs5CJgSCvMFsy8wNNeKPdVoa0So0zYRn+KNN8FHeDTvwj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=l6ln1pnu; arc=none smtp.client-ip=13.76.78.106
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783485796; x=1784090596; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-type:content-transfer-encoding:mime-version:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=FAoptCMB2sR5zqcHYSt82rCp/yEQWpVdGexkr86eBYQ=;
-        b=LBniLzzDF8R1Mu7A5VE9jTEzkiRIhCUyrX3TbdeWmA2VwinaInalmdB0sTsR+2XZP0
-         5Ac2twMDJhT7Gi1YZ9wzM1oGl+jbbbx3vMsn64/xwx/nC7bjZZ6KKBxhNUGDxs3VcVze
-         AuY9HJfA/FnuG7ZDsaY+XAlJUdC7bhcxUc/Lqztbb/bc6jbArOOeGEWxczsuN4P7xskP
-         wPovmAzyP2MHOMVZ6pNOY5fh62GVLCR+44/VrihAgrkrDbNEP2Us8cdcSwH8O6ItHC8O
-         p6lKMQqD02LGAJs6C5/sfhHvQoZ8kf0RgxOtLvDxXtIRG+CkedCj20zTWXP94eYAYjI8
-         YalQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783485796; x=1784090596;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-type:content-transfer-encoding:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=FAoptCMB2sR5zqcHYSt82rCp/yEQWpVdGexkr86eBYQ=;
-        b=cC7kmjyJ4UHhDgnEeMoI5AJGQhLk0l1tXyz9JtFVTiM7+Q+VgfT5LOrr475akpKSXy
-         y6oQEnXU8wfb/DoxSN9WAOzZ9VT1fmkNaNgG/UMalkEAgbP7UZgfzD+2/owr5VN6lZRy
-         lOyH4X/Sdz2RvQIr1t8RPVgy+QswOUJ/NH/ICWGds5E2mc4OW7NYDyjcv28YzOb2fbWN
-         drPda7XljUpCIsMIxu00VrCIQWDhmWlfBp6G/kSYirrJVYOjnCF2Se651rw1wd2Ysf5s
-         BBfR4APiSPL0+8AYHFFAbM3/QxnhwtBCXngiHBuxCRGryyPOrJEhBwnPnDMrT2+qB2g/
-         ELdQ==
-X-Gm-Message-State: AOJu0YxiL/5voPjBN/mbR/+joeuPOqtd+RXrc7ImkJkLoUNm2dKLQw4E
-	u11VqQvK84mhzBtNkO3ssllKrMF+tCcMmhKImRttWwg10OSEb60OkdFR
-X-Gm-Gg: AfdE7cmYcXfF1O2O2XCd3HZc0S1mWb8TcdqGXWXciSqKTPUzdUDZ/t5DonOB23acwDI
-	8Dikdoy6noxfLv1KRuvvqwvvek69oDQ9MeEFxz/HOWyUIbfXTeWXw13EeWuax7NMVj8ymhwRP0r
-	5hOFG+P1y1IiUI4FXOutFgp5luBtpqcALbZY3C4bVClYWw78dDuGvjC6Xx/sscwL8A9xWbF+NVq
-	Ci/RGC9c7eOercWxjnLAEz63JMtKg+Qz8DGy92nEgo0PZxNU+hBn7Ds1JLTHw3CDOl1T+ZQq0Ko
-	tBMdK34uemrXun7T+b2m+za8DD8Zm6KNU6+XJQHrVM+F9iqafuQnTkBazuYlIn9lnDps+ttSJ15
-	1QFlbD5E9U995yCLTechf/AvbmPbYKEnanh8R9TDq0jdToVlI5HO/IIiyggQ3bHk/QidOuXUti+
-	IcsO4N71T5sWKcr2lwIyCaTThodJZZYh+ITvs4Epv63OLs3dxdgUE+5o0iJQxXU9PdjpQ+PZd8w
-	hhPZLUvEgvOuWKRqkYOl4bvOWIkTkiulc2Fd8NJt5esGJ5osWXxNvpK7FaECsJ2dg==
-X-Received: by 2002:a05:600c:4fd4:b0:493:c0c1:3930 with SMTP id 5b1f17b1804b1-493e6898af0mr6142695e9.1.1783485796334;
-        Tue, 07 Jul 2026 21:43:16 -0700 (PDT)
-Received: from localhost (nat-icclus-192-26-29-3.epfl.ch. [192.26.29.3])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493e0f5ca1fsm116627765e9.15.2026.07.07.21.43.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jul 2026 21:43:16 -0700 (PDT)
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
+	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=U0Et5
+	gxWdJSPtba9Rc9sxcUYbgY5trVM/vydxYE7rrU=; b=l6ln1pnu/vRxkC5K83wYe
+	du07UKyn0SenuEp3eHTCumEep/rSCnCsdOf7p2kvHEV8peZVlm+ZTFkIq3jTjQy2
+	zXHTHuEgA6q5Ah+UJeU4USC6zUoaTHf+i3O+PjuOwZOSmtfYfL0kMNvDz0XbvQGT
+	6NtgJRkJ3STAyuJ2u+UdZU=
+Received: from localhost.localdomain (unknown [211.102.241.101])
+	by web2 (Coremail) with SMTP id yQQGZQAnAprF301qtzPPAg--.34710S2;
+	Wed, 08 Jul 2026 13:27:34 +0800 (CST)
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+To: netfilter-devel@vger.kernel.org
+Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+	Ao Wang <wangao@seu.edu.cn>,
+	Xuewei Feng <fengxw06@126.com>,
+	Qi Li <qli01@tsinghua.edu.cn>,
+	Ke Xu <xuke@tsinghua.edu.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH nf v2] netfilter: nf_conncount: fix zone comparison in tuple dedup
+Date: Wed,  8 Jul 2026 13:27:28 +0800
+Message-ID: <20260708052730.18354-1-zhaoyz24@mails.tsinghua.edu.cn>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 08 Jul 2026 06:43:15 +0200
-Message-Id: <DJSWY7PQZK30.UZVS6AUU453U@gmail.com>
-Cc: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>
-Subject: Re: [PATCH bpf] bpf, sockmap: Account for receive queue in FIONREAD
- without a verdict program
-From: "Kumar Kartikeya Dwivedi" <memxor@gmail.com>
-To: <mattia.meleleo@coralogix.com>, "John Fastabend"
- <john.fastabend@gmail.com>, "Jakub Sitnicki" <jakub@cloudflare.com>,
- "Jiayuan Chen" <jiayuan.chen@linux.dev>
-X-Mailer: aerc 0.21.0
-References: <20260707-fionread-no-verdict-v1-1-ce94a72357ec@coralogix.com>
-In-Reply-To: <20260707-fionread-no-verdict-v1-1-ce94a72357ec@coralogix.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:yQQGZQAnAprF301qtzPPAg--.34710S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxCw1rXr4UWF4fZryktF17Awb_yoWrXFWfpr
+	WYkrZayFZ7XrZFk3s7Zw17AF13Jws8AFy3JFn5A3yqvws0gas0yayxt343A3WDuF4DXF17
+	ZF45Wr1jyan8ArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUP014x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
+	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_GFv_Wrylc2xSY4AK67
+	AK6r4rMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
+	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc4
+	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
+	xVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
+	1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sREK0PPUU
+	UUU==
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQECAWpNfDKVPAAAsD
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
+	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305642-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305643-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:mattia.meleleo@coralogix.com,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[memxor@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_TO(0.00)[coralogix.com,gmail.com,cloudflare.com,linux.dev];
-	TO_DN_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_RECIPIENTS(0.00)[m:netfilter-devel@vger.kernel.org,m:zhaoyz24@mails.tsinghua.edu.cn,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
+	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[memxor@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,coralogix.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tsinghua.edu.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,seu.edu.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DE99F721A14
+X-Rspamd-Queue-Id: 17175721CC4
 
-On Tue Jul 7, 2026 at 6:15 PM CEST, Mattia Meleleo via B4 Relay wrote:
-> From: Mattia Meleleo <mattia.meleleo@coralogix.com>
->
-> tcp_bpf_ioctl() answers SIOCINQ from psock->msg_tot_len, which only
-> counts bytes in ingress_msg. Without a stream/skb verdict program
-> nothing is diverted there: data stays in sk_receive_queue, so FIONREAD
-> returns 0 even though read() returns data.
->
-> Add tcp_inq() to the reported value when the psock has no verdict
-> program. The two queues are disjoint, so bytes redirected into
-> ingress_msg from other sockets stay correctly accounted through
-> msg_tot_len.
->
-> Add a selftest covering FIONREAD without a verdict program.
->
-> Fixes: 929e30f93125 ("bpf, sockmap: Fix FIONREAD for sockmap")
-> Signed-off-by: Mattia Meleleo <mattia.meleleo@coralogix.com>
-> ---
+The "already exists" dedup logic in __nf_conncount_add() decides
+whether a connection has already been counted and can be skipped instead
+of incrementing the connlimit count.  It compares the conntrack zone of a
+list entry with the zone of the connection being added using
+nf_ct_zone_id() and nf_ct_zone_equal(), passing conn->zone.dir or
+zone->dir as the direction argument.
 
-Please respin with the fix and selftest as separate patches, but still targ=
-eting
-bpf tree. You can add the Reviewed-by: tags to both.
+Those helpers take enum ip_conntrack_dir values: IP_CT_DIR_ORIGINAL is 0
+and IP_CT_DIR_REPLY is 1.  However, zone->dir is a u8 bitmask:
+NF_CT_ZONE_DIR_ORIG is 1, NF_CT_ZONE_DIR_REPL is 2 and
+NF_CT_DEFAULT_ZONE_DIR is 3.  Passing that bitmask as the enum direction
+shifts the meaning of every non-zero value.  An ORIG-only zone passes 1
+and is tested as REPLY, while REPL-only and default zones pass 2 or 3 and
+test bits beyond the valid direction range.  In those cases
+nf_ct_zone_id() can fall back to NF_CT_DEFAULT_ZONE_ID instead of using
+the real zone id, so different zones can be treated as equal and dedup
+collapses to tuple equality alone.
 
-pw-bot: cr
+nf_conncount stores and compares the original-direction tuple for a
+connection.  If an skb already has an attached conntrack entry,
+get_ct_or_tuple_from_skb() explicitly copies
+ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple, regardless of the packet's
+ctinfo.  Therefore the zone comparison in the tuple dedup path must use
+IP_CT_DIR_ORIGINAL as well; the zone direction bitmask describes where a
+zone id applies, not which direction this conncount tuple represents.
 
-> [...]
+Fix the two dedup comparisons by passing IP_CT_DIR_ORIGINAL directly.
+Do not special-case NF_CT_DEFAULT_ZONE_DIR and do not compare raw zone
+ids: using the existing helpers with IP_CT_DIR_ORIGINAL preserves the
+direction-aware NF_CT_DEFAULT_ZONE_ID fallback.  A default bidirectional
+zone contains the ORIG bit, so it naturally returns the real zone id;
+reply-only zones continue to fall back for original-direction tuple
+comparisons.
+
+Fixes: 21ba8847f857 ("netfilter: nf_conncount: Fix garbage collection with zones")
+Fixes: b36e4523d4d5 ("netfilter: nf_conncount: fix garbage collection confirm race")
+Cc: stable@vger.kernel.org
+Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
+Reported-by: Ao Wang <wangao@seu.edu.cn>
+Reported-by: Xuewei Feng <fengxw06@126.com>
+Reported-by: Qi Li <qli01@tsinghua.edu.cn>
+Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
+Assisted-by: Claude-Code:GLM-5.2
+Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+---
+Changes in v2:
+- Use IP_CT_DIR_ORIGINAL directly instead of adding a helper to map
+  zone->dir to an enum direction, suggested by Florian Westphal.
+- Link to v1: https://lore.kernel.org/netfilter-devel/20260706114820.74006-1-zhaoyz24@mails.tsinghua.edu.cn/
+---
+diff --git a/net/netfilter/nf_conncount.c b/net/netfilter/nf_conncount.c
+index 91582069f6d2..e9ea6d9466e7 100644
+--- a/net/netfilter/nf_conncount.c
++++ b/net/netfilter/nf_conncount.c
+@@ -211,8 +211,8 @@ static int __nf_conncount_add(struct net *net,
+ 			/* Not found, but might be about to be confirmed */
+ 			if (PTR_ERR(found) == -EAGAIN) {
+ 				if (nf_ct_tuple_equal(&conn->tuple, &tuple) &&
+-				    nf_ct_zone_id(&conn->zone, conn->zone.dir) ==
+-				    nf_ct_zone_id(zone, zone->dir))
++				    nf_ct_zone_id(&conn->zone, IP_CT_DIR_ORIGINAL) ==
++				    nf_ct_zone_id(zone, IP_CT_DIR_ORIGINAL))
+ 					goto out_put; /* already exists */
+ 			} else {
+ 				collect++;
+@@ -223,7 +223,7 @@ static int __nf_conncount_add(struct net *net,
+ 		found_ct = nf_ct_tuplehash_to_ctrack(found);
+ 
+ 		if (nf_ct_tuple_equal(&conn->tuple, &tuple) &&
+-		    nf_ct_zone_equal(found_ct, zone, zone->dir)) {
++		    nf_ct_zone_equal(found_ct, zone, IP_CT_DIR_ORIGINAL)) {
+ 			/*
+ 			 * We should not see tuples twice unless someone hooks
+ 			 * this into a table without "-p tcp --syn".
+
+--
+2.47.3
+
 
