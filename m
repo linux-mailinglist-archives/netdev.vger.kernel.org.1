@@ -1,61 +1,103 @@
-Return-Path: <netdev+bounces-306001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306002-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id O/u+MabDTmqVTgIAu9opvQ
-	(envelope-from <netdev+bounces-306001-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 23:39:50 +0200
+	id AZtfOnjFTmoVTwIAu9opvQ
+	(envelope-from <netdev+bounces-306002-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 23:47:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F68672A96D
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 23:39:50 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40E9572AA2B
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 23:47:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=proton.me header.s=protonmail header.b=JBsx2lPo;
-	dmarc=pass (policy=quarantine) header.from=proton.me;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306001-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306001-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=queasysnail.net header.s=fm3 header.b="K 1LJCbE";
+	dkim=pass header.d=messagingengine.com header.s=fm2 header.b="Dr/bbDL+";
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306002-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306002-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5251330048C8
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 21:36:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9873C301CD25
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 21:47:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 325C13F6C5E;
-	Wed,  8 Jul 2026 21:36:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 295663F7AA2;
+	Wed,  8 Jul 2026 21:47:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-43100.protonmail.ch (mail-43100.protonmail.ch [185.70.43.100])
+Received: from fout-b5-smtp.messagingengine.com (fout-b5-smtp.messagingengine.com [202.12.124.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E5B3AB29E;
-	Wed,  8 Jul 2026 21:35:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93533E4506;
+	Wed,  8 Jul 2026 21:47:30 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783546562; cv=none; b=M/TXcV+wiobSm4ZjkLNfLu/mSU7XgTpLnY4+VTi4W+xqRhUNUn6TEH0icJNAYLxWoaxjPqtZRmiGx8Nqr/dj5OTLbT7g316Gb402K8VC5K9c7H3y1ydmTtfkL41CWtU5gmn//9MMlWo7ZsCqem4+Eh65mFY0do+sTgV5/PMCRtw=
+	t=1783547254; cv=none; b=SvhtRJMgRQ6u9Wo8m1GTQEpWL7kcWCawy154TYsLSw9WUXDdUnQqz2WcQzuXyL9UDvtPR2L/q1ifeZFXyHRFJNpqpnAlRkE1knY9Ln5E9pfOtL1he9mkRS9wgYKAvWGE4QfDYdl1lZNkpmuuIeksUTPVQT4nCgDRsFrE2SytYpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783546562; c=relaxed/simple;
-	bh=uW3KpuuRhONSI4WnwH7ciiMe9KKhWTDUZaNxZJWu9ts=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sahbDzFs2ltRZ0UX1ZRsMgOzfi5jZKYfpszlYdcOgRQSmVn26XemfUalXCCoITp4CGSwvZj2AvtkGH9FKqZzhkFlqCa3hsauGIkUI1wD1/7eCysqQPAEYTSV+FiVGqrEd4xLI3i7m3Qy7Xbmmdo4EOYp5PKYYAtAecMTKpLHwPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=JBsx2lPo; arc=none smtp.client-ip=185.70.43.100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1783546555; x=1783805755;
-	bh=OaFK8xchxZpdcSqUAlwbyjWiLLlhU4uj9zauzAG6mTM=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=JBsx2lPoXe0XnnsfV7iz1fLtcAxOvIzUT5rz3EklYgZFTRxMnULH/axoylwiMmuzg
-	 XtnV7eewtqFFQHPhsmaNTZlvXu9NQWs7abX7HNm27R7HTphTiq/Rvi71d2F3wtQUpV
-	 d8/CIBPtzp42Ec9ZswoC0mLOKZ98GLY6Tong1397mTKCNqqUJxUCQROqG2K/bvZ1jo
-	 EJWqCTpvW1fdx43LrFuGkN9gyNKukcIgeo5BZR0nGYygvqyisQySJZdz/8q5+/UbmV
-	 Vo5riulTp/uK8YF2/lWlnJSJPlgUQK6t3ni1HldwTZ7TNTmG4Q44EKKI1rH3ZvvSyQ
-	 X7gEegdqacWfg==
-Date: Wed, 08 Jul 2026 21:35:51 +0000
-To: Alex Elder <elder@ieee.org>, Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alex Elder <elder@kernel.org>
-From: Esteban Urrutia <esteuwu@proton.me>
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 3/3] net: ipa: Add IPA v5.1 data
-Message-ID: <e89985ff-adf2-4014-95c1-27fc32f774dc@proton.me>
-In-Reply-To: <b810c574-0f60-4d3d-ad5a-4205a119fe00@ieee.org>
-References: <20260622-sm8450-ipa-v1-0-532f0299f96e@proton.me> <20260622-sm8450-ipa-v1-3-532f0299f96e@proton.me> <b810c574-0f60-4d3d-ad5a-4205a119fe00@ieee.org>
-Feedback-ID: 147889766:user:proton
-X-Pm-Message-ID: 7c235c73f6aaaa99f540929f35efc5c8c9a7c78d
+	s=arc-20240116; t=1783547254; c=relaxed/simple;
+	bh=cLbYfj0ix0uweAgXGMGt8iFFBLz5yorNVz94Azlcj2c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bQ6s6EvLiBHZmSbk87pdH7YR0oyu5ajZUnrttf2KFc4JFH3WJfFpuBpHXoE0hePFTGuDTyjovxGvKTSPrloGNKKoFjSzzWIbLPcgQH61sJxfG/cHGEKXzCR+nWFR5gTbiULxRgfqEzgsqB2DRg3E4fcEJpW/uYN2EJX2p8/10aI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=K1LJCbEG; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Dr/bbDL+; arc=none smtp.client-ip=202.12.124.148
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.stl.internal (Postfix) with ESMTP id B7E431D000F9;
+	Wed,  8 Jul 2026 17:47:29 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Wed, 08 Jul 2026 17:47:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1783547249; x=
+	1783633649; bh=SkhMzosNQBmymgj3p2xy58uHyxhr2icAp5O0RittQsM=; b=K
+	1LJCbEG1PWvnlad0u6OH2lgDk3yullbaD90XoQNGzNXFKuHumqCs0p4SStp2ZbU1
+	5IfaiOLrNHuxQjWuYw/uYx8TU1VfUbck9B3aqjNPgof4VlBz71RSUDPatFvJCEGE
+	ZiLlfD19rZSMHMw7ZJF27N20uSu6wU9UpNTdPM9o6POy6ovNuOYBcwmeVlQn3Not
+	LSy1BPV+L9KrSzeFV7QC65A1wrD+ANAGXHIboi4T17ihg9hvBUmahLWoI1LsH2Zu
+	VOYnx/W71yT4CoAXL8PSRIFiDe3FVJeC4dGYmk6NLLLo3cF5hj/rVINZvfkdTF5+
+	oRJ2sdEo9IxBg9CuCQxsA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1783547249; x=1783633649; bh=SkhMzosNQBmymgj3p2xy58uHyxhr2icAp5O
+	0RittQsM=; b=Dr/bbDL+Nfj24xMuamJn3n5991rsaof8f5Okxgwm5a1z8USunaE
+	PYxgDAlF/VoehPlipTgjEHwPWTiyL3OMlrzViy8PteArxpDDVAcidaAefy40F78+
+	L/LYuUKq0GGSVVogKwGjByp1IIbclBvBA4GUTdL6AGKBipOCAtx+gpDONIPpBtTE
+	4NTwopLbmCJxfTSVnBNpwy4ox/YjPB9NlUVjNaVHR0NhzvcLe5fH955hQSQjRWTR
+	LLFkAk1olQGdg81Eq2hfJn81XyAY00+BTPzGH+uUMagvPXvWFrGu25+RXh5H+Ygu
+	dJKw6kaCeyt/akaC88ICPrhnrFjJ8gKlgWA==
+X-ME-Sender: <xms:cMVOaj6wnGviWtpneh4TyA3-RsuMSiXfYDXkyoLjo2Hnx75Pmt9o-Q>
+    <xme:cMVOau41Oa6Y46-tyuXsYRHpZQrIsJvT0pNWDqtu1ItRjWcd9DNKsCqcfzkBSFii7
+    MC3dpaPbLrqe3l9i8bkjF6KdYNokxUYbFaNDfPEzbNiAuZG7M-aB9c>
+X-ME-Received: <xmr:cMVOalQz-ENSktFUZSIKYA-Sv4BXNLZraxiKaWXKjpdTirNxYabj5ZGTuvY>
+X-ME-Proxy-Cause: dmFkZTEonscYrV8b2DWfVXUlBrm8n8hor4M9W55tDzUSmnxl25KP1CDRJTK8KTUJgx0v8Y
+    gx9DrSnOE1G5w2YDc92fzt/3txvP0t10I/emDODh1kwAOEc/4ftn0/IZmO9iIxfsJMn3VK
+    nESCEsib6vJR/x7xMXWiWu+E+h8zCso7JZy7DXlfQaEnQNC1/7whC7ynogs4MH7KtQkFEz
+    PD21nDRC7d0oKKHiOoXAg4z8HLsu/KZQGV0kXec00bBGJ1Xgo4Pe0vmufmgX3hO/JptI/Y
+    yX/oUFENX2HOeSzvRCO4ZZWqHdzbXqAEs8zJiizPgc7ra5P6LD6FuHiQtOXM2wUlDdnIP4
+    92DAvQWPAVArDoZu5DDIg4XcvX43AYnNI5uISxV7xrZO68/fnk7NL5xA1cZNToAsiUVhre
+    VWWw9lmSlnz9SV7sXBNt70L9TpFT0UfECute6TcbTFlUzZ2Wslbz5E44yL0zUvBHUVV9xU
+    Lw8vw/66ub9cSuJck0L3ntiOQyoePK5gJwFJ+5r3FARajElxlTRBAxpu3zdGBk7rCoYrNM
+    FTiVtPVXyWw3ztPZKUZMP01KleNtxHbbLq9ZrG49zm0XhhB2/+RG9z3hv9IAjBNPeGKExD
+    ZfIdm3cq0f0RaiiitqobDCJActJCIxUv6/bjUJrkz7CB31vwlzMoJoWmeCwQ
+X-ME-Proxy: <xmx:cMVOam9jrdq3MkSHaaFvjqv2zsH_4YZO332ctRHBePbb_k9HdYo2Gg>
+    <xmx:ccVOambS91hN9Q_eoThVoHfeEh6pLS0q_mTcyR5Z3dMRlQl4Qi_V2A>
+    <xmx:ccVOanq_DFVRO71aiEPeO1OD0oDwd4HW4sSI5-N-pdmRYXIvs9IzWg>
+    <xmx:ccVOaqRmO_LXfL4aGODNXAy7zr3shu6kXmFCKm1ObDPRLJYJ03BEWg>
+    <xmx:ccVOavSNQ7VVDKEgK15wj9ua9xPvHF6PkWSJ2gYTE0cnijdK1MxZWm1f>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 8 Jul 2026 17:47:28 -0400 (EDT)
+Date: Wed, 8 Jul 2026 23:47:26 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: James Raphael Tiovalen <jamestiotio@gmail.com>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Antoine Tenart <atenart@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] macsec: fix promiscuity refcount leak in
+ macsec_dev_open()
+Message-ID: <ak7FbqzijszPeyni@krikkit>
+References: <20260705113629.187490-1-jamestiotio@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,301 +105,70 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+In-Reply-To: <20260705113629.187490-1-jamestiotio@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[proton.me,quarantine];
-	R_DKIM_ALLOW(-0.20)[proton.me:s=protonmail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-306002-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306001-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:elder@ieee.org,m:andersson@kernel.org,m:konradybcio@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:elder@kernel.org,m:linux-arm-msm@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[esteuwu@proton.me,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:jamestiotio@gmail.com,m:netdev@vger.kernel.org,m:stable@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:atenart@kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[esteuwu@proton.me,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[proton.me:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,codelinaro.org:url]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,messagingengine.com:dkim,krikkit:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1F68672A96D
+X-Rspamd-Queue-Id: 40E9572AA2B
 
-On 7/8/26 4:06 PM, Alex Elder wrote:
-> I think the DDR values might be wrong, but it's difficult to be
-> sure.  In some cases, in arrays like this in the downstream code,
-> if there is no entry found in an array, the *earlier* version
-> values should be used.  (Unless someone better informed states
-> that this is wrong, I think it's fine as-is.)
->=20
-> This information is found in the ipa3_qmb_outstanding[IPA_5_1][]
-> array in the downstream code.  However there is no entry for that
-> version.  Given that, all zeroes (as you have it) makes sense.
-> But it's possible this applies instead:
->=20
->          [IPA_5_0][IPA_QMB_INSTANCE_DDR]         =3D {12, 12, 0},
->          [IPA_5_0][IPA_QMB_INSTANCE_PCIE]        =3D {0, 0, 0},
->=20
-> I have no way of knowing; perhaps someone from Qualcomm can
-> get confirmation that all zeroes is correct.
->=20
-> (Note the order of values presented in the downstream code
-> differs from upstream.)
+2026-07-05, 19:36:29 +0800, James Raphael Tiovalen wrote:
+> When a MACsec interface with IFF_PROMISC set is brought up on top of a
+> device that has hardware offload enabled, macsec_dev_open() first calls
+> dev_set_promiscuity(real_dev, 1) and then propagates the open to the
+> offload device. If that propagation fails, the error path jumps to the
+> clear_allmulti label, which only reverts allmulti and the unicast
+> address. The promiscuity taken on the lower device is never dropped, so
+> real_dev is left permanently stuck in promiscuous mode. Its promiscuity
+> count can no longer be balanced from software.
+> 
+> Add a clear_promisc label that drops the promiscuity reference and
+> route the two offload failure paths to it. The dev_set_promiscuity()
+> failure itself still jumps to clear_allmulti, since on that failure the
+> count was not incremented.
+> 
+> Fixes: 3cf3227a21d1 ("net: macsec: hardware offloading infrastructure")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: James Raphael Tiovalen <jamestiotio@gmail.com>
+> ---
+>  drivers/net/macsec.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
 
-In downstream ipa_utils.c there's a function called ipa3_cfg_qsb() which
-is in charge of reading these values from ipa3_qmb_outstanding.
-Since these values are not present for IPA v5.1, one would assume
-they're not set and that, since this is the first time such behavior is
-found, additional changes would need to be made to the IPA driver.
-However, looking at this function, which I'll leave as a snippet below
-given its shortness:
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
-static void ipa3_cfg_qsb(void)
-{
-=09u8 hw_type_idx;
-=09const struct ipa_qmb_outstanding *qmb_ot;
-=09struct ipahal_reg_qsb_max_reads max_reads =3D { 0 };
-=09struct ipahal_reg_qsb_max_writes max_writes =3D { 0 };
-
-=09hw_type_idx =3D ipa3_ctx->hw_type_index;
-
-=09/*
-=09 * Read the register values before writing to them to ensure
-=09 * other values are not overwritten
-=09 */
-=09ipahal_read_reg_fields(IPA_QSB_MAX_WRITES, &max_writes);
-=09ipahal_read_reg_fields(IPA_QSB_MAX_READS, &max_reads);
-
-=09qmb_ot =3D &(ipa3_qmb_outstanding[hw_type_idx][IPA_QMB_INSTANCE_DDR]);
-=09max_reads.qmb_0_max_reads =3D qmb_ot->ot_reads;
-=09max_writes.qmb_0_max_writes =3D qmb_ot->ot_writes;
-=09max_reads.qmb_0_max_read_beats =3D qmb_ot->ot_read_beats;
-
-=09qmb_ot =3D &(ipa3_qmb_outstanding[hw_type_idx][IPA_QMB_INSTANCE_PCIE]);
-=09max_reads.qmb_1_max_reads =3D qmb_ot->ot_reads;
-=09max_writes.qmb_1_max_writes =3D qmb_ot->ot_writes;
-
-=09ipahal_write_reg_fields(IPA_QSB_MAX_WRITES, &max_writes);
-=09ipahal_write_reg_fields(IPA_QSB_MAX_READS, &max_reads);
-}
-
-There are no conditions for writing ot_reads, ot_writes and
-ot_read_beats, which would correspond to max_reads, max_writes and
-max_reads_beats in upstream.
-Since hw_type_idx is set to IPA_5_1, this should give a null pointer.
-With this info, there are two possibilities:
-
-1. Null pointer dereference, resulting in a kernel oops downstream.
-2. qmb_ot is set with all values to 0.
-
-I have never seen a null pointer dereference downstream, so I'm more
-inclined to believe option 2 is what's actually happening.
-IPA v5.0 also zeroes these values, but I wasn't able to actually confirm
-this.
-This because in downstream, IPA versions are split into subversions,
-which are:
-
-1. Normal IPA (IPA_X_Y)
-2. MHI IPA (IPA_X_Y_MHI)
-3. APQ IPA (IPA_X_Y_APQ)
-
-Data for IPA v5.0 seems to be of the MHI type, since it's only used in
-the SDX65 SoC, which I believe is mostly used in 5G modems.
-I realized this while cross-checking since some values didn't really
-match, so I had to cross-check with different ipa_data-vX.Y.c files
-because of this.
-
-> And although ipa_gsi_ep_config is not defined in this code
-> base, here is what it looks like:
->=20
-> struct ipa_gsi_ep_config {
->          int ipa_ep_num;
->          int ipa_gsi_chan_num;
->          int ipa_if_tlv;
->          int ipa_if_aos;
->          int ee;
->          enum gsi_prefetch_mode prefetch_mode;
->          uint8_t prefetch_threshold;
-> };
->=20
-> This might not be current; I'm using code found here:
->    https://git.codelinaro.org/clo/la/kernel/msm-5.15.git
-
-Many thanks for providing the declaration for this struct.
-
-> In the downstream code--confusingly--ipa_gsi_setup_channel()
-> doubles the desc_fifo_sz value (for GSI, versus the older BAM
-> interface).  So the ring size becomes 4096 bytes, and that
-> works out to 256 16-byte GSI TRE entries.  I'm not sure why
-> 512 is used for IPA v3.5.1, but it probably just means it's
-> bigger than it needs to be.
->=20
-> The event_count should be the same as the tre_count.  Again
-> I no longer know why that's not the case for IPA v3.5.1.
-
-For the record (since this is off-topic). I tried to get the modem up in
-a device whose SoC was using IPA v3.5.1 and I was experimenting weird
-behavior, such as IPA crashing the SoC when removing the module or when
-it automatically loaded at boot.
-The reason I mention this is because a warning similar to "channel 4
-limited to 256 TREs" appeared whenever IPA was loaded. That may be the
-reason I was experimenting those issues.
-
->> +static const struct ipa_mem ipa_mem_local_data[] =3D {
->=20
-> IPA has local memory that is partitioned as defined by this
-> array.  The regions are used by IPA/GSI firmware and/or
-> hardware.  The configuration defined here is sent to
-> the modem in an ipa_init_modem_driver_req QMI message
-> so both the modem and AP have a consistent view of
-> how the memory is used.
->=20
-> Many memory regions are preceded by 0-2 "canaries", which
-> are 32-byte values initialized to IPA_MEM_CANARY_VAL.
->=20
-> In the downstream code there is structure ipa3_mem_partition
-> that defines these things, and structures of this type are
-> defined in "ipa_utils.c".  For IPA v5.1, ipa_5_1_mem_part
-> defines them all.  The mapping between downstream and
-> upstream is not trivial and direct, but it should be
-> obvious how they get translated.
->=20
->=20
-> With two exceptions, what I see here looks like you
-> correctly transferred everything.  (The two exceptions
-> are entries that from what I can tell, should not be
-> present.)
-
-[...]
-
-> The next two entries look wrong to me.  Can you explain where
-> you got these offsets and sizes?  Is it from "ipa_data-v5.0.c"?
->=20
-> Here are the relevant entries I see in ipa_5_1_mem_part
-> in the downstream code:
->          .stats_flt_v4_ofst =3D 0,
->          .stats_flt_v4_size =3D 0,
->          .stats_flt_v6_ofst =3D 0,
->          .stats_flt_v6_size =3D 0,
->          .stats_rt_v4_ofst =3D 0,
->          .stats_rt_v4_size =3D 0,
->          .stats_rt_v6_ofst =3D 0,
->          .stats_rt_v6_size =3D 0,
-> (Since their size is zero, their entries can be omitted.)
->=20
->> +=09{
->> +=09=09.id=09=09=3D IPA_MEM_AP_V4_FILTER,
->> +=09=09.offset=09=09=3D 0x29b8,
->> +=09=09.size=09=09=3D 0x0188,
->> +=09=09.canary_count=09=3D 2,
->> +=09},
->> +=09{
->> +=09=09.id=09=09=3D IPA_MEM_AP_V6_FILTER,
->> +=09=09.offset=09=09=3D 0x2b40,
->> +=09=09.size=09=09=3D 0x0228,
->> +=09=09.canary_count=09=3D 0,
->> +=09},
->=20
-> The remaining entries (below) look good.
-
-While cross-referencing IPA data files upstream, I found these two
-regions to be present in data for IPA v5.5, even though they aren't
-defined in ipa_5_5_mem_part. At the start I assumed these were correct
-since they were present upstream, but I took a closer look at that file
-and I believe data for this version was directly added without going
-through a proper review process.
-
-The reason why I used IPA v5.5 memory regions in IPA v5.1 is because
-their memory partitions are identical.
-
-Now, with this information, I would like to ask whether both of these
-memory regions are correct for both IPA v5.1 and v5.5 data files.
-
->> +/* Memory configuration data for an SoC having IPA v5.1 */
->> +static const struct ipa_mem_data ipa_mem_data =3D {
->> +=09.local_count=09=3D ARRAY_SIZE(ipa_mem_local_data),
->> +=09.local=09=09=3D ipa_mem_local_data,
->> +=09.imem_addr=09=3D 0x146a8000,
->=20
-> I think I needed to look up the imem offset value
-> in Qualcomm documentation I no longer have access
-> to.  Perhaps someone from there could confirm you
-> are using the right values here.
-
-After cross-checking I believe this may be the qcom,additional-mapping
-property downstream, which specifies the IMEM starting address and size.
-I'll leave (2) and (3) for reference.
-(2) corresponds to SM8450, while (3) corresponds to SM8475.
-
->=20
->> +=09.imem_size=09=3D 0x00002000,
->> +=09/*
->> +=09 * While this value is 0xb000 on SM8450 and 0x9000 on SM8475,
->> +=09 * it has been left set to 0x9000 for compatibility with SM8475
->> +=09 */
->=20
-> As I said earlier, I'm not completely sure this will still
-> work on the SM8450.  Someone should confirm this, and it
-> really ought to be tested somehow.
-
-I have clarified this in my previous email (4), so I'll skip this part.
-
->=20
->> +=09.smem_size=09=3D 0x00009000,
->> +};
->> +
->> +/* Interconnect rates are in 1000 byte/second units */
->> +static const struct ipa_interconnect_data ipa_interconnect_data[] =3D {
->> +=09{
->> +=09=09.name=09=09=09=3D "memory",
->> +=09=09.peak_bandwidth=09=09=3D 1900000,=09/* 1.9 GBps */
->> +=09=09.average_bandwidth=09=3D 590000,=09/* 590 MBps */
->=20
-> I no longer recall where to get these bandwidth values
-> for the interconnects.  Perhaps someone from Qualcomm
-> can find this out/confirm what you have.
-
-This was a tricky part. These seem to come from the qcom,svs2 property
-which seems to be mapped to the interconnects specified downstream.
-Since the IPA interconnects declared in device trees are different in
-both downstream and upstream I had to make some adjustments, such as
-using the minimum value between both ipa_to_llcc and llcc_to_ebi1
-interconnects.
-An example of this can be seen in (5), which corresponds to the SM8350
-SoC using IPA v4.9.
-
-Again, thanks for taking the time to properly explain things.
-
-(1) https://github.com/LineageOS/android_kernel_qcom_sm8450-modules/blob/li=
-neage-20/qcom/opensource/dataipa/drivers/platform/msm/ipa/ipa_v3/ipa_utils.=
-c#L7881
-https://github.com/LineageOS/android_kernel_qcom_sm8450-devicetrees/blob/li=
-neage-20/qcom/waipio.dtsi#L3404
-https://github.com/LineageOS/android_kernel_qcom_sm8450-devicetrees/blob/li=
-neage-20/qcom/cape.dtsi#L2723
-(4) https://lore.kernel.org/all/3e70d77e-6bec-4e16-ae88-a4f5161f182e@proton=
-.me/
-(5) https://github.com/LineageOS/android_kernel_motorola_sm7325/blob/lineag=
-e-23.2/arch/arm64/boot/dts/vendor/qcom/lahaina.dtsi#L4683
-
-Regards,
-Esteban
-
+-- 
+Sabrina
 
