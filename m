@@ -1,91 +1,55 @@
-Return-Path: <netdev+bounces-305676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305677-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MNd/HNgGTmp8BwIAu9opvQ
-	(envelope-from <netdev+bounces-305676-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 10:14:16 +0200
+	id gNfvL68HTmrMBwIAu9opvQ
+	(envelope-from <netdev+bounces-305677-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 10:17:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D2B0723061
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 10:14:15 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5265C72310D
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 10:17:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=GTth6Ip2;
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305676-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305676-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=hTQuXiYY;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305677-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305677-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E91533026A40
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 08:09:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 090E03039897
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 08:10:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18AAF3D6662;
-	Wed,  8 Jul 2026 08:09:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 533193D6662;
+	Wed,  8 Jul 2026 08:10:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F25D3FC5BE
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 08:09:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387953E1718;
+	Wed,  8 Jul 2026 08:10:25 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783498156; cv=none; b=MjptiF1bpGuRzMRa8pUvI/Xdc/bjDiuCCqpUzZbpV0vdrVpF3qfIu0UaRaQH1FPBIM1BNrWX3Rc0dJKLUTQd9K+xUS7E0AUPR/Pl5ZayCpmN4nbvxSRXprbieBr18kfnQDTKBI25kTCdLF6LvuRG+i1nHFcY0d2vcYPp79tsSDw=
+	t=1783498227; cv=none; b=hUfjcTx4CLk8XgSzmT7ODJ9iNG+dBak+ymJ6cry69wc5p4Ky2a4VPUgU8C8k583HgOC1BzNLBeRECAbzlsxffapMfHFn6rPHdqRsgG5Tham51nT73TjqcSlVdIFbke8SWC0giXnJEA78RzkScXmTYEUh5lWukbi9qwezOwgiL8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783498156; c=relaxed/simple;
-	bh=702mdA8LTCW0LMJY/Wr0rF7VyxkqhvUcebXQgKhzJ40=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EeerHBJhn9cRh2jBvVbkZ92pRboIHSxjKE1gjVZoNfQLkZpsw45LruBlCgagjsESoNAqnNVC6zgrfInspgliXEEEIRq/Cbj4yZIHHu8miD/jdh9aSxtVWWOMGHZa5pLDYp/Qgkcmz6CLAuPm5Ci2g/lIwwNNFPDbpUMvYCHbnjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GTth6Ip2; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783498152;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z0t8XVivFCWpKwmYWDQSAZHlhT75KpK6j/oL38Ul+ck=;
-	b=GTth6Ip2wQkSqfrSvcpn+br7yNI0Ks0COZF/h2XA9WtJ4ej21HNZiE1FdGDDARMCI9g0g7
-	dEpYc0YCGyCs7I26x0ry5kcm+4YXsEFhZ5f7zOe/4aoFurck7kLNOpCCF3Ta3pxNkr2pZz
-	vJlkA22J+ywUyvgaJ1lnt8trGBMmhhc=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-308-Z38E3Gx0Oo2V3QOF5_1f0Q-1; Wed,
- 08 Jul 2026 04:09:09 -0400
-X-MC-Unique: Z38E3Gx0Oo2V3QOF5_1f0Q-1
-X-Mimecast-MFC-AGG-ID: Z38E3Gx0Oo2V3QOF5_1f0Q_1783498145
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3F8BA1955D5B;
-	Wed,  8 Jul 2026 08:09:05 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.49.133])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DB87D1956056;
-	Wed,  8 Jul 2026 08:08:58 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: haiyangz@linux.microsoft.com
-Cc: linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	longli@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	ernis@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com,
-	gargaditya@linux.microsoft.com,
-	shradhagupta@linux.microsoft.com,
-	linux-kernel@vger.kernel.org,
-	paulros@microsoft.com
-Subject: Re: [PATCH net-next v2] net: mana: Add handler for sriov configure
-Date: Wed,  8 Jul 2026 10:08:54 +0200
-Message-ID: <20260708080854.64655-1-pabeni@redhat.com>
-In-Reply-To: <20260701180116.507690-1-haiyangz@linux.microsoft.com>
-References: <20260701180116.507690-1-haiyangz@linux.microsoft.com>
+	s=arc-20240116; t=1783498227; c=relaxed/simple;
+	bh=yCqSS875QpHsbFoa2bk23+nvYovKpFiry8Jjh/B8F7Y=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Z4jxvHR7dH+Q47g5N0Ub+pJATZSiQ23pkB6skyOCi908O2/rWQ4zQqj2eEUo7UUyJ9j1EQScZPXxLBU4C1bDisT+9BLNAu3aSaZvVLMRTxIiBjo7h5MQaEdX05dGxN7k94Cre2tCjp5IDZ2hAnUviiOufotviL9xeYPU9A3KojA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hTQuXiYY; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B65441F000E9;
+	Wed,  8 Jul 2026 08:10:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783498225;
+	bh=GgV78O363yhQjW/mjMg5O2ccLPnLEWk0RTgUkDs69oA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=hTQuXiYYVkRMp7d1/Pa2YQwcmHonvxgag+V7+chaFddpQzq9hUYEb/dW/y1abE+uL
+	 WGe7au04gJKnfuln1bNIqXW40DJCOksR9GULiJDaqu0c0X14thRYC/deWzY5tcjYpT
+	 +vBPY46uymIVMNW5haPIGGdaa9nHjMN5u2GgN8KAY2EYrOhs8M7WA/shwv32Ju+nlP
+	 ZT+ykpTQj9gtU9FylhaM8sZhIkBf/aA5SpDpnA4J8ny0Xdwm+oENAdAAmyRWpSQIYF
+	 D5SDMZ/Xi8VcIYWDBlZ6EVQI8zHVsKtUfcnq8lzh0ATO0b6N1MmHM2hBbuHhL9DFZ9
+	 3okoGfSrNwiWQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 569443926383;
+	Wed,  8 Jul 2026 08:10:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,102 +57,83 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Subject: Re: [PATCH net] net: mdio: select REGMAP_MMIO instead of depending on
+ it
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178349820489.2361978.9830216385714459265.git-patchwork-notify@kernel.org>
+Date: Wed, 08 Jul 2026 08:10:04 +0000
+References: <20260702032653.1580616-1-rosenp@gmail.com>
+In-Reply-To: <20260702032653.1580616-1-rosenp@gmail.com>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, dtcccc@linux.alibaba.com,
+ linux-kernel@vger.kernel.org
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com];
+	TAGGED_FROM(0.00)[bounces-305677-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:rosenp@gmail.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:dtcccc@linux.alibaba.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305676-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:haiyangz@linux.microsoft.com,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ernis@linux.microsoft.com,m:dipayanroy@linux.microsoft.com,m:gargaditya@linux.microsoft.com,m:shradhagupta@linux.microsoft.com,m:linux-kernel@vger.kernel.org,m:paulros@microsoft.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6D2B0723061
+X-Rspamd-Queue-Id: 5265C72310D
 
-From: AI Reviewer <ai@example.com>
+Hello:
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev/
----
-net: mana: Add handler for sriov configure
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Add callback function for the pci_driver / sriov_configure.
+On Wed,  1 Jul 2026 20:26:52 -0700 you wrote:
+> REGMAP_MMIO is a hidden (non-user-visible) tristate symbol. Using
+> depends on it is incorrect because there is no way for the user to
+> enable it directly. Change to select, which is the convention used
+> by every other driver in the tree that needs REGMAP_MMIO.
+> 
+> Fixes: 8057cbb8335c ("net: mdio: mscc-miim: Add depend of REGMAP_MMIO on MDIO_MSCC_MIIM")
+> Assisted-by: opencode:big-pickle
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> 
+> [...]
 
-It asks the NIC to provide certain number of VFs, or disable
-VFs if the request is zero.
+Here is the summary with links:
+  - [net] net: mdio: select REGMAP_MMIO instead of depending on it
+    https://git.kernel.org/netdev/net/c/1a3267a8c9ec
 
-> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> index e8b7ffb47eb98..f7a79874fd0eb 100644
-> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> @@ -2496,6 +2496,20 @@ static void mana_gd_shutdown(struct pci_dev *pdev)
->  	pci_disable_device(pdev);
->  }
-
-[Severity: High]
-With the addition of SR-IOV support in this patch, do mana_gd_shutdown() and
-mana_gd_remove() need to call pci_disable_sriov()?
-
-If a user enables VFs via sysfs and then unbinds the driver or shuts down the
-system, could this omission introduce a regression where orphaned, dead VF PCI
-devices are left in the kernel?
-
-Accessing these orphaned VFs might trigger use-after-free crashes or hardware
-faults, as the underlying PF hardware and driver context have been destroyed.
-
-> +static int mana_sriov_configure(struct pci_dev *pdev, int numvfs)
-> +{
-> +	int err = 0;
-> +
-> +	dev_info(&pdev->dev, "Requested num VFs: %d\n", numvfs);
-> +
-> +	if (numvfs > 0)
-> +		err = pci_enable_sriov(pdev, numvfs);
-> +	else
-> +		pci_disable_sriov(pdev);
-
-[Severity: High]
-Should this path check if the VFs are currently assigned to a guest VM before
-disabling SR-IOV?
-
-If a privileged user writes 0 to sriov_numvfs while VFs are actively assigned
-to a VM (e.g., via vfio-pci), could forcefully removing the PCI devices cause
-a regression resulting in host IOMMU faults and guest kernel panics?
-
-Would it be better to check pci_vfs_assigned(pdev) here, or use the
-pci_sriov_configure_simple() helper to safely enforce this?
-
-> +
-> +	return err ? err : numvfs;
-> +}
+You are awesome, thank you!
 -- 
-This is an AI-generated review.
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
