@@ -1,205 +1,338 @@
-Return-Path: <netdev+bounces-305928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305929-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id XD7aDL+FTmoAOgIAu9opvQ
-	(envelope-from <netdev+bounces-305928-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 19:15:43 +0200
+	id zXQnMEeHTmqqOgIAu9opvQ
+	(envelope-from <netdev+bounces-305929-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 19:22:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFBDC729144
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 19:15:42 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1307B729232
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 19:22:15 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=IYPtHZOU;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305928-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305928-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b="CBSVmN/X";
+	dmarc=pass (policy=none) header.from=intel.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305929-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305929-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 67876305732F
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 17:14:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C9307300C02B
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 17:22:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 489954DA53C;
-	Wed,  8 Jul 2026 17:12:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 595AF3F12C8;
+	Wed,  8 Jul 2026 17:22:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A0B4C955C;
-	Wed,  8 Jul 2026 17:12:37 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783530757; cv=none; b=cLSeQWE4hwzNlyOU54Q/pHglhKmt7POFhwGrdrE9rhVexYrPX8Ea7T0wTXG/nT8w0Ei9gSKebPYjees87LwtTogSJKfvlOl+O+hzdDTk35286W6mpnzsSX9hryfvSq95OOqqoJcCodCXIrlECrdcRniO5ShkJTOxnUWt580YN90=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783530757; c=relaxed/simple;
-	bh=tO65MYkXi3aUKw0XR3bn0/mIiIMrnwfj1GuESNTstxw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=hGXc4AtJKpeHUd5Rzf0Ca1Edxb+HaoszZyN9KtEZe74B62xJ+XdR45NEpStezTI1CMMG1OVevWkgkMw4G6Vgg+jx/YJx2MUYiCsfkp5AzcmehDGV5yx3FfXjCyYgsgaLiGwiPiHBCet7x6qML8x1yjAOQgH6m5ISKk65hg+Sark=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IYPtHZOU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6A453C2BCFB;
-	Wed,  8 Jul 2026 17:12:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1783530757;
-	bh=tO65MYkXi3aUKw0XR3bn0/mIiIMrnwfj1GuESNTstxw=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=IYPtHZOUIn9NsZ8kB9eWUu4fjXeGRcJBpNS9RNz35q3dB/B0+hgCKFzgHlkhORo8Z
-	 6x+2MG7iLkBlPSzgZrsLO6aHe0JLbg8BOcBUXp+SllHnigGtJEc5YdgO0X1tMzda3K
-	 Ti9q4WFkYcZsMPIZQ56lWbShAf7e5L8CL8PMt/mcw+x7z9nk1Qb2OeGFCHCrKfVpNc
-	 E9ejq+trpEqy4qQflnPnCNnz8sehOGwpnM2ceB+b657x67nXMXFiOMsdZw9YgTNf4Y
-	 LPl0oBmBF4yxmslUw+y5ysH/ZVa3/9F62qk+OYiCkvks5SydVaSiutp//QWncptIiQ
-	 zQmz5C+MVARTg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50A3CC44507;
-	Wed,  8 Jul 2026 17:12:37 +0000 (UTC)
-From: Selvamani Rajagopal via B4 Relay <devnull+Selvamani.Rajagopal.onsemi.com@kernel.org>
-Date: Wed, 08 Jul 2026 10:12:45 -0700
-Subject: [PATCH net-next v7 15/15] onsemi: s2500: Added selftest support to
- onsemi's S2500 driver
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B992C383C95
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 17:22:11 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783531333; cv=fail; b=jvgV5hRj9WmVzJ3PNhwuDOa7ZIAM5/acuwbtOZePY6NtbNcYQ0QareuixmnH7HDRkcqktnwC3i9mXmFMg5AiHsW5HfxNUpJ8nKOKWbr7RCoZK3irfmg8j5t6rcnjCMy1fu9RHST8OvLDIjlK3t8WCCQXsA9zFuko3l3kh5crnnU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783531333; c=relaxed/simple;
+	bh=jfjx59+UbOiO7W/ePN2Ds9XAmUX/4Je++PwNW6tkSTk=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=V4ZXogpiRrzU7Nq7d74BpBcrd/2vnq2j4xK5wBWwq357wTDDuaaUvc4wUqd0BGHlZBHB/NsmIVeqwFvwNS5SGHY3klpXdBm93YTw2LOyDiX+JMNSx1p8XqeUq8ARQmoSE2xOHgMUg/mekklnVXbnBTUCqtt38x46uWefITmx0kY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CBSVmN/X; arc=fail smtp.client-ip=192.198.163.16
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1783531331; x=1815067331;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=jfjx59+UbOiO7W/ePN2Ds9XAmUX/4Je++PwNW6tkSTk=;
+  b=CBSVmN/X6oZtssSU5cjgEoQVMHEJKlszBXXmxHdDvRY3KT3ZzlIgOsiA
+   A5yUaDIDw1TARoHe/QpkS+gk915zSaEOXJYQuynmfdc4sn4pqgGbQhHLx
+   /Y7yuxb6rAJIVyN1eqQfHEaYDhUSDJKsb2Nso0GkXQ87fRvcf7nb3D/63
+   Yg9vCOnVgOfPaNAKS8/SSlrnsiVXhBusCzZ64qUv4JCKGOyEQG/UHD5sr
+   v8VX2W3oEyk0lvQ8GLxLUJc9ubD7dBNpEoYaoCpZHf8vBaXuAiAoBlxr/
+   CDy/Hk1Ir6cUtHGjtm03Gmz/zuXMymUpW1JXbu7va0bWqV3n1rKqaqTi4
+   A==;
+X-CSE-ConnectionGUID: nlttyBIRS76vD30JnqEuPw==
+X-CSE-MsgGUID: ZCx6IktrS2Wv3O3TJAUHTw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="71723361"
+X-IronPort-AV: E=Sophos;i="6.25,153,1779174000"; 
+   d="scan'208";a="71723361"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2026 10:22:11 -0700
+X-CSE-ConnectionGUID: e8wAEY8pRKGZwAsFyOftPw==
+X-CSE-MsgGUID: xl2rVXqnRRWIm/Dzfrraag==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,153,1779174000"; 
+   d="scan'208";a="259249030"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2026 10:22:11 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Wed, 8 Jul 2026 10:22:10 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43 via Frontend Transport; Wed, 8 Jul 2026 10:22:10 -0700
+Received: from BL2PR02CU003.outbound.protection.outlook.com (52.101.52.11) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Wed, 8 Jul 2026 10:22:10 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gAKdEMGnYxs0JbV8gjmpzO0v/9aXCNt3lqEvUdusSgoasEjfwszXChCZmmbjjAV/GsOc1GCEEz2QbIXhRIr3QYTgEqkjiHmhqBzqXFsatQSW+WTjY0CooI1Rr+EH055KEHHy3cIpMudNITgr6Eji8gB1EiW/WzgoxFlnOWAuibQREnl7psiTRPN56y0LYVkeWGiiPuRp3+f4Al60sEyb+PYBRBQIJFwA8y/kY4dT8YeVAhLkm+VD1DHUPKVVjV3cU+3kxHwMF0AYCv/9VW1POU2QPPK10oUB7JJ1nptcqxUC/lEbStwESWyu8IePWi0VGUH/sXUWR8R8TTK6at5rEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZFkGnyVnN5TTqK/K7OLSHDpZxjbaTCmZvM8wjoJDeTo=;
+ b=XWuRS5zNPTzsLN2ijtO/W8mcDY2YreL8rM2uFlsXy4Xq3Pu5kIylvRRJBkaYSaOj9rAmH9EjL4Axe8ySQn+X5Mb1hBUGAMzrZXZzm+k3hx84iOLBA9ewauPpV56+1uYKPHhRI0f2/9jLJ5PyIpNgbmLFSuiTPh9yukkuKM1QiV6mcrEBPTwBxtLNi7vVG5Cro6oWAisYUEpGTRq+g/aEEn2Qgp5YZcrD5ouO0ozoC9w0tqAREcBcMg/oIdr36PIS06Vlw3qbyGYJ20glfGX4IIm7n08nwBU3iieJg8PIPWuW0WEe9HF56LRUyuT+WDDDEXRsvrYNDDKppeLpMhwGxA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM4SPRMB0045.namprd11.prod.outlook.com (2603:10b6:8:6e::21) by
+ LVTPR11MB9912.namprd11.prod.outlook.com (2603:10b6:408:3c6::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.10; Wed, 8 Jul
+ 2026 17:22:08 +0000
+Received: from DM4SPRMB0045.namprd11.prod.outlook.com
+ ([fe80::b630:ca9c:20e1:f485]) by DM4SPRMB0045.namprd11.prod.outlook.com
+ ([fe80::b630:ca9c:20e1:f485%6]) with mapi id 15.21.0181.008; Wed, 8 Jul 2026
+ 17:22:07 +0000
+Date: Wed, 8 Jul 2026 19:22:02 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Simon Horman <horms@kernel.org>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<magnus.karlsson@intel.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<przemyslaw.kitszel@intel.com>, <jacob.e.keller@intel.com>
+Subject: Re: [PATCH v5 net 2/7] i40e: avoid null ptr dereference in
+ i40e_ptp_stop()
+Message-ID: <ak6HOhJh/pxdloEs@boxer>
+References: <20260701124524.13644-3-maciej.fijalkowski@intel.com>
+ <20260708150455.1498611-2-horms@kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260708150455.1498611-2-horms@kernel.org>
+X-ClientProxiedBy: VIVP296CA0120.AUTP296.PROD.OUTLOOK.COM
+ (2603:10a6:800:358::8) To DM4SPRMB0045.namprd11.prod.outlook.com
+ (2603:10b6:8:6e::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260708-s2500-mac-phy-support-v7-15-478c877aa1a9@onsemi.com>
-References: <20260708-s2500-mac-phy-support-v7-0-478c877aa1a9@onsemi.com>
-In-Reply-To: <20260708-s2500-mac-phy-support-v7-0-478c877aa1a9@onsemi.com>
-To: Andrew Lunn <andrew@lunn.ch>, 
- Piergiorgio Beruto <pier.beruto@onsemi.com>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, 
- Selva Rajagopal <selvamani.rajagopal@onsemi.com>, 
- Richard Cochran <richardcochran@gmail.com>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>, 
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-doc@vger.kernel.org, 
- Jerry Ray <jerry.ray@microchip.com>, 
- Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1783530757; l=1904;
- i=Selvamani.Rajagopal@onsemi.com; s=20260531; h=from:subject:message-id;
- bh=2F0qNA75xdPACjyZAhDG2bEj0CghDHnrBQqxbAXox/w=;
- b=34FcZ5aLfX7qa4rp2Rj7EI5IE2MOkVn3CLe9AGFEiu0AdYthBE2JsX0rGbVm51XqFZj7DjrRM
- HSlw9tT8Q9uDmIA0gwJ7qEceF6yA9l8DUtGztD3Fb8uqChXPSjcwlcq
-X-Developer-Key: i=Selvamani.Rajagopal@onsemi.com; a=ed25519;
- pk=5QRdM0HS/LGWWcUZZ9hVfZ+qbPQGZCumcTXOiN7Fyug=
-X-Endpoint-Received: by B4 Relay for
- Selvamani.Rajagopal@onsemi.com/20260531 with auth_id=803
-X-Original-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-Reply-To: Selvamani.Rajagopal@onsemi.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4SPRMB0045:EE_|LVTPR11MB9912:EE_
+X-MS-Office365-Filtering-Correlation-Id: bc8a21b3-9447-4d22-7ea9-08dedd157000
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|23010399003|376014|1800799024|366016|6133799003|22082099003|11063799006|18002099003|4143699003|56012099006|5023799004|3023799007;
+X-Microsoft-Antispam-Message-Info: EcJq2NOJH44CUSAb0UEGkiI4wrGfUjsE/h61SAth3vXxuZz7Z5aYsaJz03okVRuXdZbMD59X//jAVbmxfBH/vTqFIfEMcV7Tn4GH3WvKRuZu6el/y+xbnLZx2rOiPuLVwXFNnSXMORCbo4M9wRrKbfQezeifzCk6V1MT4CtxA7Q3wG2jaimQM/YmCMepyOVJC/D+V8hN50Ejq2dR8V/YV9XpDfUAo7zuMg9+2nxpSANn4ckpPvYziWyMagXW1V6lx3sOoSZ7lrfsJrDlJTUKVeckdC4sHIpiNYdroxNS6YQ1JgJuMmr+qE0369pBLhhuj8LwD41CxVKuORPOgUvYQuwEfNLWNnrbPG3EE833F/UyJ9zWcI/4c5ChploUNZ0ZJU77fKX4khghXdWaTNcaH7hZSKzPJwD3Aii5STHrYQNq5Ipim0QBcyX1T3h36eYA/r0T6SUqz8Dk1WNTjtt2OXolphWgmUMk8GLIuWW7SQXo8ydUe/e1vocEqba4NzdqhcrL5yb6dtGcpceMpcS4wJtMX69Y+R9SaJnvfAaSTx/OvXH+1jkZMA6q3s5GDyRzsBn1fzDm2viG2HIfQeDyNEZpK9trxCDYtaNbvCnhn/8=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4SPRMB0045.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(1800799024)(366016)(6133799003)(22082099003)(11063799006)(18002099003)(4143699003)(56012099006)(5023799004)(3023799007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?QZ4tNZddYhX6mBrogW6Kf/tH9Z7bKgLxc5RhBc6zc2yzLP0b1AWWgb0p2Sij?=
+ =?us-ascii?Q?pUg8OkpwNVNVvOiy12K1XuJsFB5DNCeu9E9bVoDDpS9DFy9x5lG35tqnE2x0?=
+ =?us-ascii?Q?fBginWsmOJbFtTFjSlNHld5MzJMLZIv61B2jC/DGEz/MCZ49QORzuMnVytws?=
+ =?us-ascii?Q?5lDquduFrI4iT6gkmnQLWG5nrJUQ+ARJcKEUCSwtm7rGUJSzNXnrysxj7hZE?=
+ =?us-ascii?Q?fQPRal2srkfFQyBErknWiWbUg42NSXZNzUSZ1v/1pggktxVBXHilnLwirENn?=
+ =?us-ascii?Q?w6BJk4tqjemoYkSSzGOWh3r/I9aoLBiAKCrIeRm9GmccHoQnsywnOzoRSG3I?=
+ =?us-ascii?Q?B/lm4EQjddReqsbfRoYPuglNpUk7Io85mo4BTq5ZpWAZaoIYMNwUOwT6U8wI?=
+ =?us-ascii?Q?V1K8+eP7Sv4UkE8JH6vTQlSw1GUQGLYYxGlcy1K6uT21KQPTnwwDAu/ai3v6?=
+ =?us-ascii?Q?psBpu52jN9bAxG1irOhhvJ5kM2+u2wik3RXttlDiDpupNMyKwnrAYPQSX2kp?=
+ =?us-ascii?Q?MOYFdXovcSkOy33UiIbydi4/DxS114MiVuDficyvEJTsTb8Gyq7x2f/rq4Jq?=
+ =?us-ascii?Q?RzgyLoxhAXoqj3f/xJ3XPDN8AIZAF0fOXTL96n3b9IdFwUSSBfvdhXbeCKSo?=
+ =?us-ascii?Q?iGBcEttI0HbKeQNnDwMPhppUgnGB3pJI5VBGH5JZjBSlVqTjNPT1qSUZ3gNI?=
+ =?us-ascii?Q?dxjCs1yRHkYKOUSgji9saToKAg3GAhvrhQluHupgC8+wVgbuiSt3MuyuZyjd?=
+ =?us-ascii?Q?EyYBSjIwbuQeMYznkUdf5IWewuXDmwc0VMBNmNl3LB8AcJI2FVTN33isWGTe?=
+ =?us-ascii?Q?Np0z3tq4dSLW3gXaV6WMYwonpiIF9UOcXFEG+q9d3A+FCGtjpOHPOVIMqCWf?=
+ =?us-ascii?Q?afUA4k3QgxXwo8tL8HAqSql1nkOOjKuMmbdq/F0JAHQzmcujAGYwV3Qx8+IM?=
+ =?us-ascii?Q?RHkI4iUTsnoGwPNmLY5iQFAgHpQxYdDYF/4ydeVSObBOR83KEj3FIe/Wub87?=
+ =?us-ascii?Q?tZhb92yH3uJ0qInTsLN9YSHe+Tjjqrv7s++C+6dQ+SZw6j1jVpczRAnztM/+?=
+ =?us-ascii?Q?nk8u15FUNMNz4dKnCec3U2kNuCPqgasuc5kXih4oE1MGA3IVZCHlnjFAsZvV?=
+ =?us-ascii?Q?NUXGZAx2xoHZMwyhkGtCxhaTC0z5ZffXHDB/r29GQ05b0sezbv87bjn3vnjz?=
+ =?us-ascii?Q?/zbqafhnwydO1pDa77Zs/mgH5cla6zVZQokfnH/2mHMkGBLfi+hxB1vergaf?=
+ =?us-ascii?Q?YQ7Tw/dDhl7fPHLphd9ei2QIufbZ99RUiwlMaEoYVva9fIFg1UBWoPbrsjv8?=
+ =?us-ascii?Q?iSD+A8ojC3fsseJzG1uMKXAmpXOySa0vup9kZwJCIFEALxd12E/1Si+Owinq?=
+ =?us-ascii?Q?iWO5euNuywGWb1GPFQNteV4iKnTEa1qJUFJ7ULNhvkFV5AKYWdUljX4nvHmY?=
+ =?us-ascii?Q?pcNYj9QfH51trWo/BqE9LRsEdh2JXHcqYP93VdEjih9N0CFiJBSUVMyz36cL?=
+ =?us-ascii?Q?/F7m12PgeIAioj2vDwMvqfPD9CKxw8jTKQMgbk7UOSf26XIGPUkRuDC1n66p?=
+ =?us-ascii?Q?qtaRyeaiXg9NvLtXw0yUVk9aOqBEY0GASECgMCOqY0+zmQA+q0VZrmzMJwBb?=
+ =?us-ascii?Q?gyNT1A0Dc5T11soa13Ky8DmadsMIMf+V+Z2wtx8IrnTE8AHFT9dochSvB55R?=
+ =?us-ascii?Q?VzHgs7CX6zpq+riR2huabV+Gf1D9MVnGAonP+2wbZ0LdGp6/HNuTCmu/C7wL?=
+ =?us-ascii?Q?0hKMaiU4Xi/4y4Y7vboQtHW2s5m9rfI=3D?=
+X-Exchange-RoutingPolicyChecked: BwLwInI69IDM88ocGzaycvdW9LrubVoU2A/9fgm2Tz7x2vG3kxZlr0fwkVdtYOzSwRyr47FhJu/+YwbKo+hUCBaJd7VzWKt4K9rJBNfaJ2e+vKzxSPYNyTkU/WUIrd1sC50beMjsE88RLd/YAgF0mdydjjlwiKEK1+xESGlkGZQR41Ov6wsCY6CzLsm73Ax6Z9Mjc9TSIK54kxweyvvpdcK+RqOnqShDCI7AcJGKMqk3Yt+NmaQ3oClEhRYxwl3rDR2mUVFeL7ii3mxI/s5zBKaNC9agEL+NtL93Q7JaFzniqYEwj/G1opEwX77qsyqjC7E0OkJe70WyYAFPToV0Xw==
+X-MS-Exchange-CrossTenant-Network-Message-Id: bc8a21b3-9447-4d22-7ea9-08dedd157000
+X-MS-Exchange-CrossTenant-AuthSource: DM4SPRMB0045.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2026 17:22:07.7296
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: yyf/lkk9wYvJ8ltu8xqcWut3Um+p8wwLJCcrNyVQ4sjO6J49fbqilSj242LmdyrQk1/rkJ67F1hnVPNm2CeQ91KVx4cxTrOkZzUG3B/ZfGs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LVTPR11MB9912
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-Spamd-Result: default: False [-2.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305928-lists,netdev=lfdr.de,Selvamani.Rajagopal.onsemi.com];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:pier.beruto@onsemi.com,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:parthiban.veerasooran@microchip.com,m:selvamani.rajagopal@onsemi.com,m:richardcochran@gmail.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-doc@vger.kernel.org,m:jerry.ray@microchip.com,m:Selvamani.Rajagopal@onsemi.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[lunn.ch,onsemi.com,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,lwn.net,linuxfoundation.org];
-	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	HAS_REPLYTO(0.00)[Selvamani.Rajagopal@onsemi.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305929-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:magnus.karlsson@intel.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:przemyslaw.kitszel@intel.com,m:jacob.e.keller@intel.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:from_mime,intel.com:dkim,vger.kernel.org:from_smtp,sashiko.dev:url];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,onsemi.com:replyto,onsemi.com:mid,onsemi.com:email]
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AFBDC729144
+X-Rspamd-Queue-Id: 1307B729232
 
-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+On Wed, Jul 08, 2026 at 04:04:56PM +0100, Simon Horman wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://sashiko.dev
+> ---
+> i40e: avoid null ptr dereference in i40e_ptp_stop()
+>     
+> Check if main_vsi is not null before calling dev_info() to avoid a null
+> pointer dereference when i40e_vsi_clear() frees the main VSI during rebuild.
+> 
+> > diff --git a/drivers/net/ethernet/intel/i40e/i40e_ptp.c b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+> > index ff62b5f2c8150..ca93df4d67859 100644
+> > --- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+> > +++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+> > @@ -1556,8 +1556,9 @@ void i40e_ptp_stop(struct i40e_pf *pf)
+> >  	if (pf->ptp_clock) {
+> >  		ptp_clock_unregister(pf->ptp_clock);
+> >  		pf->ptp_clock = NULL;
+> > -		dev_info(&pf->pdev->dev, "%s: removed PHC on %s\n", __func__,
+> > -			 main_vsi->netdev->name);
+> > +		if (main_vsi)
+> > +			dev_info(&pf->pdev->dev, "%s: removed PHC on %s\n", __func__,
+> > +				 main_vsi->netdev->name);
+> 
+> [Severity: High]
+> This isn't a bug introduced by this patch, but this lockless check appears
+> to introduce a time-of-check to time-of-use race condition.
 
-Adds selftest support for onsemi S2500 MAC-PHY. Added as a separate
-patch for the ease of review.
+Thanks Simon I saw these, however since all of the issues are classified
+as pre-existing issues IMHO these changes are okay to be taken and then
+we could go with another round of fixes.
 
-Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-
----
-changes in v7
-  - No change
-changes in v6
-  - Moved the signed off information to the correct place.
-changes in v5
-  - No change
-changes in v4:
-  - Added a selftest as a separate patch
-  - First patch
----
- drivers/net/ethernet/onsemi/s2500/Kconfig         | 1 +
- drivers/net/ethernet/onsemi/s2500/s2500_ethtool.c | 6 ++++++
- 2 files changed, 7 insertions(+)
-
-diff --git a/drivers/net/ethernet/onsemi/s2500/Kconfig b/drivers/net/ethernet/onsemi/s2500/Kconfig
-index 7786f702d6ec..141fbaf1b641 100644
---- a/drivers/net/ethernet/onsemi/s2500/Kconfig
-+++ b/drivers/net/ethernet/onsemi/s2500/Kconfig
-@@ -6,6 +6,7 @@
- config S2500_MACPHY
- 	tristate "S2500 support"
- 	depends on SPI
-+	imply NET_SELFTESTS
- 	select NCN26000_PHY
- 	select OA_TC6
- 	help
-diff --git a/drivers/net/ethernet/onsemi/s2500/s2500_ethtool.c b/drivers/net/ethernet/onsemi/s2500/s2500_ethtool.c
-index 7e96d9ad563f..0b7ef490d7ca 100644
---- a/drivers/net/ethernet/onsemi/s2500/s2500_ethtool.c
-+++ b/drivers/net/ethernet/onsemi/s2500/s2500_ethtool.c
-@@ -5,6 +5,7 @@
-  */
- 
- #include <linux/ethtool.h>
-+#include <net/selftests.h>
- #include <linux/phy.h>
- 
- #include "s2500_hw_def.h"
-@@ -229,6 +230,8 @@ static int s2500_get_sset_count(struct net_device *ndev, int sset)
- 	switch (sset) {
- 	case ETH_SS_STATS:
- 		return S2500_MAC_STATS_LEN;
-+	case ETH_SS_TEST:
-+		return net_selftest_get_count();
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-@@ -242,6 +245,9 @@ static void s2500_get_strings(struct net_device *ndev, u32 stringset,
- 		memcpy(buf, s2500_mac_stat_strings,
- 		       S2500_MAC_STATS_LEN * ETH_GSTRING_LEN);
- 		break;
-+	case ETH_SS_TEST:
-+		net_selftest_get_strings(buf);
-+		break;
- 	}
- }
- 
-
--- 
-2.43.0
-
-
+> 
+> When i40e_remove() calls i40e_ptp_stop(pf), it does so unsynchronized from
+> the background i40e_rebuild() task. If i40e_rebuild() fails during setup, it
+> calls i40e_vsi_clear(main_vsi), which frees the VSI and its netdev.
+> 
+> If i40e_ptp_stop() caches main_vsi right before it is cleared, couldn't the
+> if (main_vsi) check pass, but the subsequent main_vsi->netdev->name access
+> dereference freed memory, causing a use-after-free?
+> 
+> [Severity: High]
+> This is another pre-existing issue, but I noticed that i40e_ptp_stop() doesn't
+> seem to cancel the background workqueue task ptp_extts0_work.
+> 
+> During device removal, i40e_remove() calls i40e_ptp_stop() and then
+> subsequently frees the i40e_pf structure. If the work executes after the PF
+> is freed, will it access the deallocated i40e_pf structure and trigger a
+> use-after-free?
+> 
+> [Severity: High]
+> This is also a pre-existing issue, but I am looking at how pf->ptp_tx_skb is
+> cleared earlier in i40e_ptp_stop(). The teardown uses I40E_FLAG_PTP_ENA as a 
+> gate guard:
+> 
+> i40e_ptp_stop() clears I40E_FLAG_PTP_ENA, then locklessly checks and frees
+> pf->ptp_tx_skb using dev_kfree_skb_any().
+> 
+> The interrupt handler i40e_ptp_tx_hwtstamp() uses the same bit as a guard:
+> 
+>     if (!test_bit(I40E_FLAG_PTP_ENA, pf->flags))
+>             return;
+> 
+> If the interrupt handler passes the test_bit check just before i40e_ptp_stop()
+> executes clear_bit(), both contexts could concurrently read the same
+> pf->ptp_tx_skb pointer into local variables before it is NULLed out. Could
+> this result in a double free of the SKB?
+> 
+> [Severity: High]
+> There is a similar pre-existing issue related to the teardown of the
+> timestamping state in i40e_ptp_stop() racing with the TX datapath.
+> 
+> The TX datapath i40e_tstamp() protects the state using a bit lock:
+> 
+>     if (pf->ptp_tx &&
+>         !test_and_set_bit_lock(__I40E_PTP_TX_IN_PROGRESS, pf->state)) {
+>             ...
+>             pf->ptp_tx_skb = skb_get(skb);
+>     }
+> 
+> However, i40e_ptp_stop() checks pf->ptp_tx_skb locklessly and only clears
+> the bit lock if the SKB was present. If the TX datapath acquires the lock
+> and is preempted right before assigning pf->ptp_tx_skb, i40e_ptp_stop()
+> might execute, see a NULL ptp_tx_skb, and skip the cleanup block.
+> 
+> When the TX datapath resumes, it assigns the SKB pointer. Since the device
+> is subsequently destroyed, does this cause the SKB to be permanently leaked?
+> 
+> >  	}
+> >  
+> >  	if (i40e_is_ptp_pin_dev(&pf->hw)) {
+> 
+> [Severity: High]
+> This isn't a bug introduced by this patch, but while reviewing the driver's
+> cleanup paths, I noticed a potential leak in the i40e_probe() error handling:
+> 
+> drivers/net/ethernet/intel/i40e/i40e_main.c:i40e_probe() {
+> ...
+> err_vsis:
+>         set_bit(__I40E_DOWN, pf->state);
+>         i40e_ptp_stop(pf);
+>         i40e_clear_interrupt_scheme(pf);
+>         kfree(pf->vsi);
+> ...
+> }
+> 
+> If initialization fails after VSIs are successfully created, this cleanup
+> path calls kfree(pf->vsi) which frees the pointer array, but does not appear
+> to unregister the netdev or free the actual VSI structs and hardware rings.
+> 
+> Could this leave an active, registered netdev with dangling pointers to the
+> subsequently freed PF, potentially triggering a use-after-free upon network
+> traffic or userspace access?
+> 
+> [Severity: High]
+> This is a pre-existing issue, but I noticed an ad-hoc locking pattern in
+> i40e_remove():
+> 
+> drivers/net/ethernet/intel/i40e/i40e_main.c:i40e_remove() {
+> ...
+>         while (test_and_set_bit(__I40E_RESET_RECOVERY_PENDING, pf->state))
+>                 usleep_range(1000, 2000);
+> ...
+> }
+> 
+> This attempts to synchronize with the background reset path by spinning on
+> a bit flag, which acts as a sleepable lock without the standard fairness or
+> deadlock detection guarantees. 
+> 
+> Since this ad-hoc locking scheme fails to provide proper mutual exclusion
+> earlier in the function, could this be the direct cause of why i40e_ptp_stop()
+> executes unsynchronized from i40e_rebuild()? Should a proper mutex be used
+> here instead?
 
