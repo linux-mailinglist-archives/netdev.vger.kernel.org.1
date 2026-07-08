@@ -1,234 +1,210 @@
-Return-Path: <netdev+bounces-305897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305898-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 2Z8AME6ATmrjNwIAu9opvQ
-	(envelope-from <netdev+bounces-305897-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:52:30 +0200
+	id QnGnJZeBTmpVOAIAu9opvQ
+	(envelope-from <netdev+bounces-305898-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:57:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01611728E73
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:52:29 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9A57728F51
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:57:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ibm.com header.s=pp1 header.b=HLkAVqCV;
-	dmarc=pass (policy=none) header.from=ibm.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305897-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305897-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=CR4kgh28;
+	dkim=pass header.d=redhat.com header.s=google header.b=S2ZogioL;
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305898-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305898-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5A8A6302DFA4
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 16:46:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E897430A8E89
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 16:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8A3843803B;
-	Wed,  8 Jul 2026 16:46:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C5A244213B;
+	Wed,  8 Jul 2026 16:50:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6516C439336;
-	Wed,  8 Jul 2026 16:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27E1A43E9C4
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 16:50:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783529183; cv=none; b=f2iMDQbFyUyz7nr/Ck/A1SDiUPFBYAzvURUQvgz5IyftDM0OsEFJ62ASEy36WYISgmynp9PNy/vFudebWDhQYYmz47jXDGMg86d1zto2v/gzwxKWzhKFihx0mKcx78msjRUIRKJtY5mdUOqGrG9aqkHzUGrKURwLvfCiwQCqIIQ=
+	t=1783529420; cv=none; b=CD88171qtL9lYsX5T9hNTZzZAqrI0/yUFfxvaTiJtvqyJybFl5shq07e7yHImD5J9eWxSObayaKZ81AyROrYeDe/cynXZ3gfDwz1rHjHmELmSMS+8TrAYVzChJy4u2ndrxBYfyTvWK/If98We92VmPmQG5p5SdeRrg7igyz1rUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783529183; c=relaxed/simple;
-	bh=al/zUXiLhesNUN9/kTzomyBJl8WeG/FOE9t6Sg/cieA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ujD+keasn56s1oITXfio9teR2FzwfVMEayvsHMp8MWNag4pYC5DEuQXHnE4ZsR2n0lLlWtVGY8ShnaStfwq7GmhGMy5iVn5aye1RoYo13/zMc3111M2eCj7leE13sWeJdoaXm3QxWAQMxc+dtYfa+JsWAHCX6purb+W1JI4YvBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HLkAVqCV; arc=none smtp.client-ip=148.163.158.5
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 668GJHBY3971438;
-	Wed, 8 Jul 2026 16:46:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=OorGcR
-	ptNTrRV2iIx8/DyhI9nn6DgM9umuYga92efm4=; b=HLkAVqCV/B9IY4ZYWjzzCz
-	zlQ/RjNjSA6wZjbPYlOVskfn6d130eyi5gLvR2OBY7yjhM9xcc/X5kXuWhxqPRUP
-	Fu16NyNwSkaG+e8o3hEwZmF8k04e7ZL5XZ339OHfo3dgLeIZayNRUytg34P7E0cY
-	ddbToHzKr7o5giy1fjh9WosyQ5cI7RNgo3T1KLw5eC6LwdXYRXrG/assPmLB+luL
-	m+ABXRNPs+xWux0YXnYfY0xU6WFOlemtCEmhm63seoWYoVHKFyDHIPG4ggQEt39+
-	xb/NT10tPKGLnNHLur7Zpm9JctMHOg3CVMf82VQ8MmFrihbQY/bpEecOdk40Im0w
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f6qknmxy4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Jul 2026 16:46:05 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 668GYbIm001432;
-	Wed, 8 Jul 2026 16:46:04 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4f7cgq95f2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Jul 2026 16:46:04 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 668Gk3aa25428664
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 8 Jul 2026 16:46:03 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3D8395803F;
-	Wed,  8 Jul 2026 16:46:03 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6F83E58056;
-	Wed,  8 Jul 2026 16:45:57 +0000 (GMT)
-Received: from [9.39.27.42] (unknown [9.39.27.42])
-	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  8 Jul 2026 16:45:57 +0000 (GMT)
-Message-ID: <7e5a9ff5-a584-422b-a8d8-67ade59fa4fb@linux.ibm.com>
-Date: Wed, 8 Jul 2026 22:15:54 +0530
+	s=arc-20240116; t=1783529420; c=relaxed/simple;
+	bh=HEXCS7+2myohc1YZaELPgANH9OaRCUzaJ5f7a6XuwhQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=POslLU3XJtpQestvJlkbGyPLspo4M17FnDDTIQFSc26IDEVmeJGbeLV2OrSZeEYEh4MG51gu9o+ioTDe0P8R3+9QRlyZzt3ZAIzhkmeSSlOnU5QaXzHswNMfNnf67at0P25qsyvXBgCWbaieDpAOjEgMu1dDWISVN/f+ObEKkCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CR4kgh28; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=S2ZogioL; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783529413;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iOZxF9JBJJ0HTV1hxdJ54Cs/JFpZYK6OhfeE5DF280s=;
+	b=CR4kgh28GW2JJuQiQCOVOVDhBPPPsmGORpuY/MW4mG3wuiv0heukWHxKbFlw/xkVJDtt/T
+	bKGnoa385Lg3sZvqbdRCx1HcmMSoZk08nIhLhBns/2aGWhjzszl4dNOuJtzVFHrd6h3jFc
+	cHnaDydv4JPObgpL4tlCbJZmCHtI9as=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-564-n3j9NmLvMcm6CbgZOvWXTg-1; Wed, 08 Jul 2026 12:50:11 -0400
+X-MC-Unique: n3j9NmLvMcm6CbgZOvWXTg-1
+X-Mimecast-MFC-AGG-ID: n3j9NmLvMcm6CbgZOvWXTg_1783529410
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-49244130073so55665e9.1
+        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 09:50:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1783529410; x=1784134210; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=iOZxF9JBJJ0HTV1hxdJ54Cs/JFpZYK6OhfeE5DF280s=;
+        b=S2ZogioLkYQS9nC40/heiOWtv2tt+PBKqW9cyk5srBHMFR10DN1Wy7LiBG7QzZbs8r
+         gRu6UiipzrgCGYvAjKgjTYNUTCZ3aZ0xPI8Dy7IRG6Wk/BprPcppjt5gGOHNkkcR/jLa
+         gn3mCTT1OVtzNhfCyCQfRZvL5kl7BSl2qynNuD6lQ5Nn5PGiswMJsuDQcISTk1Q7B7MT
+         nBCWwMo7VbhNVa7LyHJRsTd+G5Zp3MvEwMNttoJ36SHF0X9yXla9dcGYMPhXn37DHKzr
+         qhL29zi80lzWVygg6Y9voFBqPAJ5Fa+pAZYVbAxa9WFJOfybPji9fqXEFQYThMihVoS7
+         8pxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783529410; x=1784134210;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=iOZxF9JBJJ0HTV1hxdJ54Cs/JFpZYK6OhfeE5DF280s=;
+        b=L3Co716/zEHjbDM8zmgtfXPMNaxsa/gfy+r0/he4CXQGGZBwGUakd/w1r0kceGOOIV
+         E+bts4fuOmH9XK54eUSFg4D7VyWaGBGYchU1/txWThPMDTWhmCz4gQZTSyGB3lSTfiNb
+         WpdBtkMbn8l4RH3AG/47Qkwi6166C7h77O97LgfqClhZnVrfLbD4UwtNxAsYI2Tt1Z8c
+         3Jw/cKvvlGOe5Lq70KLEvgRAVwvk+lB/dnoqNsdyFJUS35Wy2ij7T/rksoh7EuHgaXsD
+         QJVsHXyuwVtfFp0CTit3unp+Jk7Ph0PZkurE/hPt4XUXwo1UGJIYXxAtryeo1dv8yv/G
+         MeRw==
+X-Forwarded-Encrypted: i=1; AHgh+RqM7TWWs7ieDPRGqIyCCYWSNNcYyjH4mtpPM8V2GJmnOT+FIQotRwg1TwhNsUidkVilC4qwfSM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxl7xHXX+T32EoihXQWJAmkJmBAhsdHBNcfMkyMBfqYT+y0qUL+
+	j1+UYbvv98rCfgdOM8dTLou6XBhP92UQHQSAafD1HN01OM82YMNevaCRWZAJhD8xy2cYnjCJc+7
+	3n9q0MbIr4ikl4Ogrdz9dQyA9oSbtHOpUoT61SfK/xaQGbAcnU+XTgXRKRQ==
+X-Gm-Gg: AfdE7cnX3tPOoaCvxtDtvsroPGrn5VmtB91afOKtlrC0b86r09MiAn1NS3b0tGwPxp6
+	H66CRTflTp9PSCS8nYH4n34dBFmBZOp4WmDlApZOOQ8KE3RZpk8Lh7iArbi+3puK/eQslnHDa4y
+	pCBasZ2ULqGJaHfYy4l9RFzQJBozlzpw1krmojzjIyhVYYx1GLnaV9KoSrw3wHdnAx9IQ+pfC33
+	hhbDljo8/n14ShMGUa/eism9Rnda1FJZuZF+7UMHjowiX1H6/gc3tvuekZ6MTtjMiKegt0xRtDo
+	g9x0wYSoOL6DR4Vc7kR3AT6RXH0E7hq5IndJMdjpyN1IQJxPaWRbuGaRO5LOaSM1EqGTDFCQXoV
+	hfhQ0OQCEbopBG/Kpk38nUDaxcLSTjpML
+X-Received: by 2002:a05:600c:19d0:b0:493:cce0:3724 with SMTP id 5b1f17b1804b1-493e68aed4dmr30880575e9.4.1783529410059;
+        Wed, 08 Jul 2026 09:50:10 -0700 (PDT)
+X-Received: by 2002:a05:600c:19d0:b0:493:cce0:3724 with SMTP id 5b1f17b1804b1-493e68aed4dmr30880225e9.4.1783529409552;
+        Wed, 08 Jul 2026 09:50:09 -0700 (PDT)
+Received: from redhat.com (IGLD-80-230-68-31.inter.net.il. [80.230.68.31])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa039b0cesm44408115f8f.22.2026.07.08.09.50.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jul 2026 09:50:08 -0700 (PDT)
+Date: Wed, 8 Jul 2026 12:50:06 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: enrico.zanda@arm.com
+Cc: jasowangio@gmail.com, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, kuba@kernel.org, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, eperezma@redhat.com, nd@arm.com
+Subject: Re: [PATCH net] vhost-net: fix TX stall when vhost owns virtio-net
+ header
+Message-ID: <20260708124901-mutt-send-email-mst@kernel.org>
+References: <20260708152242.2268848-1-enrico.zanda@arm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/iucv: take a reference on the socket found in
- afiucv_hs_rcv()
-To: hexlabsecurity@proton.me, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Alexandra Winter <wintera@linux.ibm.com>, pasic@linux.ibm.com
-Cc: Nagamani PV <nagamani@linux.ibm.com>, Simon Horman <horms@kernel.org>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, aswin@linux.ibm.com
-References: <20260705-b4-disp-fc79c0dc-v1-1-d2cdcb57afa9@proton.me>
-Content-Language: en-GB
-From: Hidayathulla Khan I <hidayath@linux.ibm.com>
-In-Reply-To: <20260705-b4-disp-fc79c0dc-v1-1-d2cdcb57afa9@proton.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=Q/XiJY2a c=1 sm=1 tr=0 ts=6a4e7ecd cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=mpG3tCo3JFPGy_rZ:21 a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22
- a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=RTV58wmTnq1ZVL7yGYkA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: UqWjOzrUF2xZ0mE36cwJQcvu04vg1Fa6
-X-Proofpoint-ORIG-GUID: LXU27-XIuX01X7blPqu1A_VmCxXoIAk4
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzA4MDE2MCBTYWx0ZWRfX3JopxISW0yET
- pJVORX6hrWUa+FgHkbTE3pF8T7Dfujf0gNefRuIVJ9wItKHU+7+NkgCM/vuBnpmMSdXqYPy31m+
- B14S0n21YlUY0D81F0Ds1nNLuz9gShI=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA4MDE2MCBTYWx0ZWRfX4r+BNaHI2HKt
- W1t9f+TgPhEPzJ0+34XjWKYecMlPxZXSqXJeoT/Vluc3e/bZxxYNwvOxDzd83eAs+h6dQlrRSoR
- bqVXwHyaTItXeYbJ8N+3LIEXTQ55LtiGuh5xMrHo42nFwomShzeztd/ETQy2hnLj6zWLiRb9YWo
- Cwix+dueQ4n4mRMjcbFII2YUMxvlZoBR+opvPVcCFbvv1To4X3pto7EoxGjbI72wvF6Xk1wUnod
- W66b4lkKh+PHzRm98sO7EIoWPU29/FQZjz5K18bBUuSFD6H6T+aTdBwoNecKX4mHW72wFKKgjxd
- lF97tBXZB+FTBNSpyIJPGWLTw/HOaMbPzRDqH68z5JBjXiwxNiDJHx0M/5Y+Rn/a3Bi5YeWdodE
- WYdTY7y2mJSzOCHib8MlPJVxnfMwkgxE4lLwji3nAx9508Fx0xh9VgBu1YJgl61sp7XMXpe2HU0
- 0WXWiYhvddMcq2v1lYg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-08_03,2026-07-08_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 impostorscore=0 spamscore=0 phishscore=0 priorityscore=1501
- bulkscore=0 clxscore=1015 lowpriorityscore=0 suspectscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607080160
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260708152242.2268848-1-enrico.zanda@arm.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-305898-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FREEMAIL_CC(0.00)[gmail.com,lists.linux.dev,vger.kernel.org,kernel.org,redhat.com,arm.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305897-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:hexlabsecurity@proton.me,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:twinkler@linux.ibm.com,m:wintera@linux.ibm.com,m:pasic@linux.ibm.com,m:nagamani@linux.ibm.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-s390@vger.kernel.org,m:aswin@linux.ibm.com,s:lists@lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[proton.me:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,linux.ibm.com:mid,linux.ibm.com:from_mime];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_SENDER(0.00)[hidayath@linux.ibm.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:enrico.zanda@arm.com,m:jasowangio@gmail.com,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:kvm@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:eperezma@redhat.com,m:nd@arm.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hidayath@linux.ibm.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[11]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,arm.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 01611728E73
+X-Rspamd-Queue-Id: E9A57728F51
 
-Hi Bryam,
+On Wed, Jul 08, 2026 at 04:22:42PM +0100, enrico.zanda@arm.com wrote:
+> From: Enrico Zanda <enrico.zanda@arm.com>
+> 
+> When vhost owns the virtio-net header, i.e. when
+> VHOST_NET_F_VIRTIO_NET_HDR is negotiated, sock_hlen is 0,
+> meaning that no header will be forwarded to the TAP device.
+> 
+> In the current vhost_net_build_xdp() implementation,
+> when sock_hlen == 0, the gso pointer can point at the start of the
+> Ethernet frame instead of a virtio-net header.
+> This results in a wrong interpretation of the destination MAC address
+> bytes as struct virtio_net_hdr fields.
+> 
+> This can, for some MAC addresses, trigger -EINVAL and return early
+> before the TX descriptor is completed, which can stall vhost-net TX.
+> 
+> Before 97b2409f28e0, the gso pointer was set to the zeroed padding area,
+> using it as a synthetic virtio-net header. Restore that behavior.
+> 
+> Fixes: 97b2409f28e0 ("vhost-net: reduce one userspace copy when building XDP buff")
+> Signed-off-by: Enrico Zanda <enrico.zanda@arm.com>
 
-Patch looks correct. The fix properly pins the socket found in 
-afiucv_hs_rcv()
-before dropping iucv_sk_list.lock, preventing a concurrent close from 
-freeing
-it before the handlers run.
 
-The sock_hold() and sock_put() placement and guards are correct.
+The fix looks good:
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-Reviewed-by: Hidayath Khan <hidayath@linux.ibm.com>
+Sashiko thinks there's something something security here, but I think
+it is misguided. It's just guest hurting itself. driver breaks the
+device it gets to keep both pieces.
 
-On 06/07/26 8:54 am, Bryam Vargas via B4 Relay wrote:
-> From: Bryam Vargas <hexlabsecurity@proton.me>
->
-> afiucv_hs_rcv() looks up the destination socket under iucv_sk_list.lock,
-> drops the lock, and then passes the socket to the afiucv_hs_callback_*()
-> handlers without holding a reference. AF_IUCV sockets are not
-> RCU-protected and are freed synchronously by iucv_sock_kill() ->
-> sock_put(), so a concurrent close can free the socket in the window
-> between read_unlock() and the handler, which then dereferences freed
-> memory (for example sk->sk_data_ready() in afiucv_hs_callback_syn()).
->
-> Take a reference with sock_hold() while the socket is still on the list
-> and release it with sock_put() once the handler has run.
->
-> Fixes: 3881ac441f64 ("af_iucv: add HiperSockets transport")
-> Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
 > ---
-> afiucv_netdev_event() has the same iucv_sk_list use-after-free and is
-> being fixed separately by Nagamani PV:
->    https://lore.kernel.org/all/20260508170534.2208812-1-nagamani@linux.ibm.com/
-> This patch covers the receive path, afiucv_hs_rcv(), which that fix does
-> not touch.
->
-> Verified with an LKMM/herd7 litmus (the missing sock_hold() is the only
-> delta between a flagged data race and none) and with an in-kernel KASAN
-> model that reproduces the afiucv_hs_rcv() lookup-without-hold path (the
-> freed socket's sk_data_ready pointer is read after the callback runs);
-> adding the reference clears it. af_iucv is s390-only, so this is the
-> model rather than the driver. Reproducer available on request.
-> ---
->   net/iucv/af_iucv.c | 4 ++++
->   1 file changed, 4 insertions(+)
->
-> diff --git a/net/iucv/af_iucv.c b/net/iucv/af_iucv.c
-> index fed240b453bd..b85fb9767dec 100644
-> --- a/net/iucv/af_iucv.c
-> +++ b/net/iucv/af_iucv.c
-> @@ -2089,6 +2089,8 @@ static int afiucv_hs_rcv(struct sk_buff *skb, struct net_device *dev,
->   			}
->   		}
->   	}
-> +	if (sk)
-> +		sock_hold(sk);
->   	read_unlock(&iucv_sk_list.lock);
->   	if (!iucv)
->   		sk = NULL;
-> @@ -2138,6 +2140,8 @@ static int afiucv_hs_rcv(struct sk_buff *skb, struct net_device *dev,
->   		kfree_skb(skb);
->   	}
->   
-> +	if (sk)
-> +		sock_put(sk);
->   	return err;
->   }
->   
->
-> ---
-> base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
-> change-id: 20260705-b4-disp-fc79c0dc-019670262472
->
-> Best regards,
+>  drivers/vhost/net.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index 77b59f49bddb..3e72b9c6af0c 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -731,10 +731,12 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+>  		goto err;
+>  	}
+>  
+> -	gso = buf + pad - sock_hlen;
+> -
+> -	if (!sock_hlen)
+> +	if (!sock_hlen) {
+>  		memset(buf, 0, pad);
+> +		gso = buf;
+> +	} else {
+> +		gso = buf + pad - sock_hlen;
+> +	}
+>  
+>  	if ((gso->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) &&
+>  	    vhost16_to_cpu(vq, gso->csum_start) +
+> -- 
+> 2.43.0
+
 
