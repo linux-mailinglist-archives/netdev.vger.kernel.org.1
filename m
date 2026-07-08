@@ -1,205 +1,196 @@
-Return-Path: <netdev+bounces-305725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305726-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id aBeeMIAfTmqcDgIAu9opvQ
-	(envelope-from <netdev+bounces-305725-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:59:28 +0200
+	id hG8mOv4fTmrDDgIAu9opvQ
+	(envelope-from <netdev+bounces-305726-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 12:01:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1708B723F3B
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:59:28 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68903723FA5
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 12:01:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=HptC63VL;
-	dkim=pass header.d=redhat.com header.s=google header.b=LAhN7SFy;
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305725-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305725-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=codeconstruct.com.au header.s=2022a header.b=ah9iWdcU;
+	dmarc=pass (policy=none) header.from=codeconstruct.com.au;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305726-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305726-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 43BCA30265BF
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 09:58:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BBD0E301BF76
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 09:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90E3B371885;
-	Wed,  8 Jul 2026 09:58:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 360D73749FB;
+	Wed,  8 Jul 2026 09:58:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248AB341AC7
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 09:58:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57EAB367F31;
+	Wed,  8 Jul 2026 09:58:52 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783504694; cv=none; b=Fds6pFrDwtbDtJ0x5dQNNGvXa+w7Kl3yjOMeDuGdAc4gpAYLnO/X1I6ZNLqWc848AH+fIqf/fhiiI0/3Gd+fqV1hsyoorizjEAQnVne+3BgwAA40PL9m+hIs+EJ0/Hdv6wOJiN3fn1UQ4ggpsn/2/mDmyZyYpW17ACkijSWI9Tg=
+	t=1783504734; cv=none; b=QxV65LIINM5TdofTCsIvQL2+GDzWhkOUT9XNl78rT2YMAmpVFln4Waj5DgpIiq6cVTAFkrB5ViPFiIBlUOALuilNpWL/ksQ6222zgEmpj5FHIAovaywdgTwVZZ/VUWRbZo7nHLDLqIhb8ne6KUcb3TmKuL747B94jpI6dUydIAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783504694; c=relaxed/simple;
-	bh=ZPZ8Ghpofvj3SxI2tuKyXiYtS79lSc4K8bhJ3ppreTk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ufDSlVbIsvuVWwpEmrT2TXz5a+LcKUMOHC06Nd/sVNRcDKuoJYYlUaCCWUoW0NsJMtMABTGna04Dw6n8BW3xcpYoD2TUS5pxk7vwLqkWvuXZYIy+9RZM3FHVgdmkMdbz/7FqEI6qbnLXVzaZy3wUBVEt/WapKL3fqGC+8aW6DBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HptC63VL; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=LAhN7SFy; arc=none smtp.client-ip=170.10.129.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783504692;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vZPaMybjeMNKNpD8AtX/8HSMSCIwjQpAmfLjC6sDrjw=;
-	b=HptC63VLBmON6gB8DF7tfthve4rMu6392jSxWg4VPEkAsNgiTj8floUCCtqgw/f48J5MUK
-	73ZxaxDzTw7Q5FA+KlEIse8Uq92ByGnNJzTzO0vEBOVvMIX03NhwrsQL/QncvrCouJXeaN
-	8Tc+0ExB6e7iHu+CLex1hyfgrWZz8NY=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-671-OPDPZFCxML2alUfR7nbb1Q-1; Wed, 08 Jul 2026 05:58:11 -0400
-X-MC-Unique: OPDPZFCxML2alUfR7nbb1Q-1
-X-Mimecast-MFC-AGG-ID: OPDPZFCxML2alUfR7nbb1Q_1783504690
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-493bdaf8549so4781445e9.2
-        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 02:58:10 -0700 (PDT)
+	s=arc-20240116; t=1783504734; c=relaxed/simple;
+	bh=51W4xMdGTfZYWKyMifoJl4D3DqRiZkIHs+NR3TyhtOQ=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=GMjSrpt372hQSHY+IHycFDL3ywENoBNCqINAsWUEoXjB4LLuFihMQ64qhfMuhC5j2pTiTmr9RmAub6YXu+IZpedpSNl2Nhemx3+DnE/WvM1529Iwk4r/ICNNzSF9BdU9jPI+0eXmeHU/6aX5L49NGQbYQmzL/vraBbmMOEL4duo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=ah9iWdcU; arc=none smtp.client-ip=203.29.241.158
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1783504690; x=1784109490; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=vZPaMybjeMNKNpD8AtX/8HSMSCIwjQpAmfLjC6sDrjw=;
-        b=LAhN7SFyMNxgdC3eCNsZJ7NpwILQH0VQ7ps9BlsMbNl6xyYsdYyzFSy0Ks02AH0GHM
-         p3yJ0yAhwKENfKrljwmppPUb6so8K3v28GXtIN40ZPu0Ng7QosIqkN5dkKWI9y+xrsNt
-         u3KB0K1GTQVyjIFt7J8neEdh8hPWENDJQ/s74WI+cF6DIY37X61Tv/n1KV9OxnewjYr4
-         u8v63Lcbo6etOIpsWymXhhYfEvh+LKYp7qzghPkxXcVeb56l40bPXPpmkwwZun/8SPcV
-         qcQ3q4cMglE+rytPdjxAjOi0/a9ytzB22pddRqiMeRqnhrPO1lzufCm7F9Twf1BQLd0X
-         q59w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783504690; x=1784109490;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=vZPaMybjeMNKNpD8AtX/8HSMSCIwjQpAmfLjC6sDrjw=;
-        b=tJtFZYA0QAcPz0O9V6CcUTCj6FMGXqNNmyyXLAZwQxtarHg6oHvtP9GQS/IuNNiVQY
-         /1h54ppdJu/9+YIXpyoY8SOU8IOxBobO+xaXPWscFdRHQcO59fBEQkK+NUeE4m6Gjnpg
-         Gk6keNBCpdrdAwddIrFzfk42Zm+gQMtP+QFtKZkpF3NM/iRm2bfIU+jnplZyOJaNSdGp
-         9tXaHG+cSUOQlA9v/Z/Qc/2L/mPCg12nD1HBrL77kswoGvRqHv67YAi7WZt0bH7tMRM8
-         u69f3aA5HkBlwO2BKohDl+K3TrQ0EK7e47kep6qIV5GXe1ynvQzP9neDuKv9/z3p9gGC
-         bm3w==
-X-Forwarded-Encrypted: i=1; AHgh+Ro0vQewKJiPCsxnap6t/xiGlzEtOi8KOan91SgGuYXEEHPEjcqNqAWkwLx/I3a1ooNxLYuHbc4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxedA1w+HNA0W9SxYe2hP1oEnzU9lmY6Tb7ZzJ2SHWLRspzdaUy
-	hs/ZjBRTjbYzs8esjSUvRRbAvdbpjxGoUsrhTbgI2FWQ5r1L5T3ULRZTpwD4RSPjdR1/UDEUAfK
-	/z9H9m9GoWqONKT9B4jUFqej0Z1jc2AwRdgqaVzUAwtgp6entpbvo+NfvmQ==
-X-Gm-Gg: AfdE7clZUONvrH5Ttv/1EgPsZxuQTQXlaaqj5c2Xh/Ol0fexAACLpJ/oTnFLsp/Z5lg
-	VgoXhFtukwKb6gh6T/924/5bdizYBNF0oQrZ3d4OA+XG7CuxUxzm4534AmMLRSSWnANpCpXwqDX
-	FlTlGxh78gBtlnvhjKTzQmq+WQaXtI6wXFF0QH+mnRnR07sEd4xZ1PeJh6OnZBEXkt1q5WlmLlY
-	gn8mlb5g/EV+8eBqQMDRD0M7tpMajgalF5HAJ7CLD3LlhiTY8mwadSQOxGmSJrL5eBvEvnEGv/D
-	gkefVf2EqgB42ZEPHR+D3dfSig6RmCW91u4oUMqqjq0w7fxK3BhL1F779KhbP3CGxufw5rRDbMV
-	x5ll54WjyuSlks4+uen/k1EBv4ShGgPavlaWBZ/40c+Lvh9YSGquvey4dLCRXb4+oggxEm1BcXR
-	Xuj4UslTwA6fSe
-X-Received: by 2002:a05:600c:3e11:b0:493:df1d:7488 with SMTP id 5b1f17b1804b1-493e6904b5dmr20334495e9.16.1783504689796;
-        Wed, 08 Jul 2026 02:58:09 -0700 (PDT)
-X-Received: by 2002:a05:600c:3e11:b0:493:df1d:7488 with SMTP id 5b1f17b1804b1-493e6904b5dmr20334145e9.16.1783504689342;
-        Wed, 08 Jul 2026 02:58:09 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:5521:6b10:58fd:68f:7756:389d? ([2a0d:3344:5521:6b10:58fd:68f:7756:389d])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493e0fccf2dsm135091445e9.15.2026.07.08.02.58.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jul 2026 02:58:08 -0700 (PDT)
-Message-ID: <e981a64f-ec3f-45d6-b20f-e03b61a91f2b@redhat.com>
-Date: Wed, 8 Jul 2026 11:58:06 +0200
+	d=codeconstruct.com.au; s=2022a; t=1783504724;
+	bh=BT/RZYYVoc0gCsHBOMp+tg5rBdH6JU85lu53knTMkyA=;
+	h=From:Subject:Date:To:Cc;
+	b=ah9iWdcU3o3UPWSOVby5Jp3y/pDo1jmSmMgy9x6ezXMdYXfVANYTStNEJs/+ivFQ/
+	 gqijkUSQ0pbCYKryvi7j2ZqhohwRuV/Z8Gt4qc3Xj9/Cie5TwrZemwkcOBDS1zhNe+
+	 qJthO5MQykWScyFkr6Ve7AAiBTEOR2hmEygd+gywkT0TwK2EheO9BNF0mcODtr290q
+	 aH45cYVTAOBFvZRZv921j4QrLwWzQAXpaz6iuslCq8rdRh/Xl9RJf4Smo0JGT0DUlU
+	 QIN1Ex7ksjBeajvRRb0jrooc9qStapZe3d6mGvXbYp9qL/Il4PLiT1yD/K0u0+ffBA
+	 HZheIwpHhkQzw==
+Received: by codeconstruct.com.au (Postfix, from userid 10000)
+	id 71CE266526; Wed,  8 Jul 2026 17:58:44 +0800 (AWST)
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+Subject: [PATCH net-next v3 00/12] net: mctp: usb: Add support for
+ MCTP-over-USB v1.1
+Date: Wed, 08 Jul 2026 17:58:31 +0800
+Message-Id: <20260708-dev-mctp-usb-1-1-v3-0-9e710155cdbf@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] VEGA: a syzbot-like workflow for LLM-found kernel bugs
-To: Yuan Tan <yuantan098@gmail.com>, linux-kernel@vger.kernel.org,
- workflows@vger.kernel.org
-Cc: jhs@mojatatu.com, gregkh@linuxfoundation.org, sven@narfation.org,
- netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
- linux-crypto@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>
-References: <20260708092247.4188498-1-yuantan098@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260708092247.4188498-1-yuantan098@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAEcfTmoC/3WOyw6CMBBFf4V0bUlLsRBX/odxAe0gNaHFvoIh/
+ LsFTFyomdXNzD1nZuTAKnDolM3IQlROGZ0CO2RI9I2+AVYyZVSQghNOSiwh4kH4EQfXYpqGd7I
+ +lo2kDGqUaqOFTk0b8oI0eKxh8ui6b1xo7yD8SnzfWniEZPV7YT3rlfPGPreXIt0wu52Rb3ukm
+ OCaN4zSTvCqrc7CSBBGO2+D8LkwQ96ETR+LD6si7AerSCxOWMLUnLaM/WEty/ICmhiO2zgBAAA
+ =
+X-Change-ID: 20260604-dev-mctp-usb-1-1-6fd854ad13e8
+To: Matt Johnston <matt@codeconstruct.com.au>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org
+X-Mailer: b4 0.16-dev
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305725-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305726-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:yuantan098@gmail.com,m:linux-kernel@vger.kernel.org,m:workflows@vger.kernel.org,m:jhs@mojatatu.com,m:gregkh@linuxfoundation.org,m:sven@narfation.org,m:netdev@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:linux-crypto@vger.kernel.org,m:edumazet@google.com,m:kuba@kernel.org,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FORGED_RECIPIENTS(0.00)[m:matt@codeconstruct.com.au,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:gregkh@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-usb@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1708B723F3B
+X-Rspamd-Queue-Id: 68903723FA5
 
-Hi,
+Version 1.1.0 of DSP0283 (MCTP over USB transport binding) has been
+released, this patch series updates our current v1.0.1 support for the
+changes in v1.1.x.
 
-On 7/8/26 11:22 AM, Yuan Tan wrote:
-> The rough idea
-> ==============
-> 
-> VEGA would have a public dashboard, similar to syzbot, and would
-> send selected bug reports to the relevant kernel mailing lists.
-> 
-> The goal is to send reports that contain enough information for maintainers
-> or other developers to pick up, understand, reproduce and fix the issue.
-> 
-> For each public report, we expect to include:
-> 
->   - a description of the bug
->   - the tested kernel tree and commit
->   - the kernel config and environment
->   - the crash log
->   - a minimized user-space reproducer
->   - the suspected introducing commit
->   - a suggested fix patch
-> 
-> The suggested fix patch is meant to reduce maintainer burden. It still need
-> human review, but hopefully it can save a lot time from building a patch
-> from scratch.
+The major change in v1.1 is the introduction of "packet spanning" mode,
+where a single MCTP packet may be split over multiple USB packets
+(themselves forming a single USB bulk transfer). This relaxes the
+requirement for USB high-speed mode, as we can now send MCTP packets
+contained over multiple 64-byte full-speed USB bulk transfers, and gives
+us an increase in the maximum MCTP packet size - we now have 13 bits of
+packet length (previously 8) in the transport header.
 
-Thanks for sharing. This sounds very interesting to me, modulo final
-impact on the ML - overall load is severely increased since the LLM era,
-while the maintainers pool not so much.
+Handling packet spanning introduces some complexity in the transmit and
+receive paths, as we lose some constraints on where packet boundaries
+may correspond to USB transfer boundaries, and may need to retain state
+across separate transfers. To contain this complexity, we introduce a
+new library for the transfer packing- and unpacking implementations,
+"mctp-usblib". The host driver is a consumer of this library, and a
+future gadget driver can use the same implementations. We can now also
+implement tests on the API boundary of the library.
 
-A few notes on top of my head:
-- the amount/rate of reports is critical. The higher the rate, the
-better need to be the reproducer and the suggested patch.
-- the crash log should include the decoded stack trace.
-- IIRC syzbot reports sharing is [always] human
-moderated/limited/controlled. I think that is the correct default and I
-hope it should be possible for you, too.
-- it's not entirely clear to me who exactly is 'you' and would
-appreciate more info about that.
-- it would be great to discuss this topic in person, i.e. in the
-upcoming NetDev.
+The series implements an incremental shift to mctp-usblib, then
+implements packet spanning mode in the new library. We have a few
+changes to prepare for this, in altering a few constants and
+behaviours as v1.0-specific. Once packet spanning is implemented in
+mctp-usblib, we enable it in the host-side driver.
 
-Thanks,
+To: Matt Johnston <matt@codeconstruct.com.au>
+To: Andrew Lunn <andrew+netdev@lunn.ch>
+To: "David S. Miller" <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: netdev@vger.kernel.org
+Cc: linux-usb@vger.kernel.org
+Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
 
-Paolo
+Changes in v3:
+- split rx urb status handling to a separate change, handle stalls
+- merge tx anchor usage into initial usblib implementation
+- add skb drop reasons
+- prevent unnecessary skb reallocation
+- Link to v2: https://patch.msgid.link/20260703-dev-mctp-usb-1-1-v2-0-60367b861b33@codeconstruct.com.au
+
+Changes in v2:
+- address sashiko reviews:
+  - rx mac_header correction
+  - rx/tx stats fixes
+  - limit non-spanned packets (where we have no ZLP) to max size
+  - handle transient rx urb error status
+  - set skb_drop_reasons
+  - kunit early-exit cleanups, take rntl lock where needed
+- rework tx_qmem locking and anchor handling (we don't need to unanchor
+  on completion)
+- Link to v1: https://patch.msgid.link/20260630-dev-mctp-usb-1-1-v1-0-86a311fc67b7@codeconstruct.com.au
+
+---
+Jeremy Kerr (12):
+      net: mctp: usb: Include version indicator in max packet size defines
+      net: mctp: usb: Use packet-length max for maximum packet-size check
+      net: mctp: usblib: Move RX transfer processing to a new mctp-usblib
+      net: mctp: usb: Improve IN endpoint status handling
+      net: mctp: usblib: Move TX transfer processing to mctp-usblib
+      net: mctp: usblib: Add support for multi-packet transmit
+      net: mctp: usb: Accommodate DSP0283 v1.1 header format
+      net: mctp: usblib: Implement receive-side packet spanning
+      net: mctp: usblib: Implement transmit-side packet spanning
+      net: mctp: usblib: Add initial kunit tests
+      net: mctp: usb: enable v1.1 packet spanning
+      net: mctp: usb: Allow multiple urbs in flight
+
+ drivers/net/mctp/Kconfig            |  16 +
+ drivers/net/mctp/Makefile           |   1 +
+ drivers/net/mctp/mctp-usb.c         | 315 +++++++++---------
+ drivers/net/mctp/mctp-usblib-test.c | 410 ++++++++++++++++++++++++
+ drivers/net/mctp/mctp-usblib.c      | 616 ++++++++++++++++++++++++++++++++++++
+ include/linux/usb/mctp-usb.h        |  88 +++++-
+ 6 files changed, 1297 insertions(+), 149 deletions(-)
+---
+base-commit: b85966adbf5de0668a815c6e3527f87e0c387fb4
+change-id: 20260604-dev-mctp-usb-1-1-6fd854ad13e8
+
+Best regards,
+--  
+Jeremy Kerr <jk@codeconstruct.com.au>
 
 
