@@ -1,93 +1,70 @@
-Return-Path: <netdev+bounces-305990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305991-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 2XdpAA+6TmozTAIAu9opvQ
-	(envelope-from <netdev+bounces-305990-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 22:58:55 +0200
+	id vJ+SOIe6TmpnTAIAu9opvQ
+	(envelope-from <netdev+bounces-305991-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 23:00:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 467EF72A5BB
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 22:58:54 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5296272A5FC
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 23:00:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b="iG/mbXZn";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305990-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305990-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.microsoft.com header.s=default header.b="SSLrwj/F";
+	dmarc=pass (policy=none) header.from=linux.microsoft.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305991-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305991-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BD71D30D6E61
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 20:54:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2A8E330143C1
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 21:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5F43EB113;
-	Wed,  8 Jul 2026 20:54:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F15F63BC69C;
+	Wed,  8 Jul 2026 21:00:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F1383ED11A
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 20:54:35 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A842FF164;
+	Wed,  8 Jul 2026 21:00:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783544078; cv=none; b=uLQjjasBpgMVhlh2l215CuzvKpSQGQeWhcgFCPCaD23et2HHigfwaMzwQmAmmLZoSYNvejYwJfj4KUZT2/zOXTXPiW8/rq15GGZcTZ3g2dAtRBLrTzroovgAeYqVjNqDNfPdimb3uSwi/0i/yOOtExfqnJXDI+kg9QDdF+cWJ4Y=
+	t=1783544429; cv=none; b=S6XNoTx7QlSTDzOn0FeGroZuD7xIKLxnZL2GjwTwSeM7bF/qMWWet61WbkzsjsANF+IK4z5t2g/EHgrardJkaKvNCwlBf0p2INQxdk8DHfAOT4AT9WijRLz0gbQdS4y+SN7O5MKwOD/0gGjB2D6ajphL9+oOHlrFENiEh+XVEK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783544078; c=relaxed/simple;
-	bh=K41E6g0m+fII6bVTpp2miUntJRjDf5KNhqEOniqvHzI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S4plDLsnUH/4KEK5U/Gt5UbkcKijjh70EkcKryhbXHFMbAaJ/jMSNWo2QY2HPVXFJOEdKfsrNLlYbwaEMniMwbbvVOyPAUnibcZAhuG5IH3iPb9Qx86AWUKaitEZokaSKSU227gXWe9zMY6SfWxqK8RQKWRjJDfeOKs3+HCkybo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iG/mbXZn; arc=none smtp.client-ip=209.85.218.41
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-c1274802697so22278166b.3
-        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 13:54:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783544074; x=1784148874; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=4wpLh1Wx2k4+jwvP651bLUL6cNpgNwa+ZpxJAG9vl8E=;
-        b=iG/mbXZncPQWBTYka8wjeeyR5a7mBr8RhdghSztVZISEkaEmZTR1GRTZhzYBqIDKWU
-         kq27k2f52ZhAHoE2PE4fjzIJZZ9XZSpry/E/RSahAbx/6RS1KDgF2Psw5w3ztjO2ToDv
-         enxv8VvRiTcndg7p3PD8LtalPH0MlKF0dZSGNXO4Hi6sjaxKeecpqhpTGyZLajXgXbs1
-         uOCljjlRrcxnn6zq6NyYo5X1Alzw29BGVuIu4U8hHj+Xz3S9n4/1Ofma5gTu+/VH6VNN
-         CeCer9J8LYvA8+G0mG3AxYvU4/ztMTWHtyWetH0hPGpFLJLq7pPQmCeGEawYKROQlSsP
-         Yr3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783544074; x=1784148874;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=4wpLh1Wx2k4+jwvP651bLUL6cNpgNwa+ZpxJAG9vl8E=;
-        b=Iq0WknsEW0qjxnRtBcuaQuFWltUQ4u9XAB2zYEoKgoqMxjOxfAjuYrW6r0yDteWYeZ
-         1qaGl6kx1S8/CeOUk2euR/pmucGJ2DGwkLbME8H1+xzUC8/lEfKoxlA8B+mh7pVnx01T
-         +TZs2aBH6cvSVxZPzykZRKwoz7ijtOMPBAyOLQGzucWNaIOcQEY8kcWDEUWHxpOU5bkL
-         S8hNKjuPK4iKDPVSwvOblacwBx/1hPmCuKHHj8rFFfDPWWmtbuF2VYZ6gD7GYOGVHvji
-         pQwlIa0AfjHHof/YxcFQcWOO7rY9P5bz944W09ASawJMU5Y47RYHIK0RNpdsLUUrMOQt
-         uomQ==
-X-Forwarded-Encrypted: i=1; AHgh+RpDEq01jBiU9gR5xR6n44xoutRJKrg4c07ZlqrdKY10LNU42Ai2e7UsJBZ7dAsvaEUi9+ETC2I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy41eMECpCoPFQ5OVf/nfBX6+4SNyPcMYe/bcT080rjsWpDQk5A
-	s7NtzHU3HNKC0EfKie8dLq9wKdnhwGZtXuER06/6V3j5nRdoX61zCX6Z
-X-Gm-Gg: AfdE7cn0hem/pa2dotoTRILOyHvFI3CqgaL1dCtin6Mlgfsej/BFT8AVqMGRpltJ1Bj
-	C+1dwuDIC1ZCx1Hvht6EDh6atNHk9cICNR0DGvFol5kBNezJyhc6Z5NtUnHYVJoBJ1FQxSE57Gh
-	zIMrbpOhRLtaPu/ltItOEly2i38NW6+c4NH0J9O2FMu9WBzZAzXMeDKLH6L2dBNPKCAGTEiEXau
-	VRM6fWX38H+v95ymMtbq8lYH2uNUzl5zHvE9zqz31RX3/LF5FNawNnWZiRy5qjr9jhzRKrd3i56
-	g/RPUmURObt8lJVoM6m8r03eqIrDG+7z3DUE67DysQ5rnSDsxjX91Cm2wEJ/bpJBIcYCGXK5dLe
-	zRIMM5sSpAJh20Ik+W6hzJ+W8Ns4uZqhdOpAVvZ5GRTermwx5qLcxAodkSfWQg0iv+9ivRYS/pm
-	2WoRjA7b2fiA==
-X-Received: by 2002:a17:907:5c3:b0:c15:db89:f0a0 with SMTP id a640c23a62f3a-c15db89f6dcmr93362966b.50.1783544073568;
-        Wed, 08 Jul 2026 13:54:33 -0700 (PDT)
-Received: from azaki-desk1.. ([156.216.98.197])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c15de6c565fsm63355066b.2.2026.07.08.13.54.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2026 13:54:33 -0700 (PDT)
-From: Ahmed Zaki <anzaki@gmail.com>
-To: netfilter-devel@vger.kernel.org
-Cc: pablo@netfilter.org,
-	fw@strlen.de,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH nf] netfilter: flowtable: tear down HW offloaded flows on FIB route changes
-Date: Wed,  8 Jul 2026 14:54:04 -0600
-Message-ID: <20260708205404.911832-1-anzaki@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1783544429; c=relaxed/simple;
+	bh=CGmhYeHo9ruvnlF2f/eZBt95w03O2Ro9NBdOGYXrf5c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NNJ7GTOh0JWmKNgpglNuejXOprdPIx5oj//JrQ3HjOAVKwSFL8LkD3IyGf3kftqOX8+yCaWsCvdOf5+fQ0eTJHD1HTl4ibkVkgH7PD33UK74Ti1cQQeg+TAEgQ+lchxJ3u8r0jeKfUA3YUj7RG+LH0gfj+pbwgSMnxrDLKPts68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=SSLrwj/F; arc=none smtp.client-ip=13.77.154.182
+Received: by linux.microsoft.com (Postfix, from userid 1006)
+	id 5E46820B716B; Wed,  8 Jul 2026 14:00:23 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5E46820B716B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1783544423;
+	bh=bdzu0Oi5yl8bAykCWi1Ow9jtLjVoEU97W+c58vtKvew=;
+	h=From:To:Cc:Subject:Date:From;
+	b=SSLrwj/Fzva25T3RpqLW0D+fHQS9I5Ur4PE6XYJbjOm4pJJka6feHB6AFoHBB9RVj
+	 uDsW9+gD4QnA7zDtAASQdlbXIsqUM+MHgYkdkeMhjRueE118et/Qj09sO1gH29wKKU
+	 WFW4hrLLYHkF3hiZwtBuxPBxYXUS8IQgDkIAGfls=
+From: Haiyang Zhang <haiyangz@linux.microsoft.com>
+To: linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+	Dipayaan Roy <dipayanroy@linux.microsoft.com>,
+	Aditya Garg <gargaditya@linux.microsoft.com>,
+	Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	linux-kernel@vger.kernel.org
+Cc: paulros@microsoft.com
+Subject: [PATCH net-next v3] net: mana: Add handler for sriov configure
+Date: Wed,  8 Jul 2026 13:59:18 -0700
+Message-ID: <20260708205924.2408673-1-haiyangz@linux.microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,327 +73,119 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[microsoft.com:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305990-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netfilter-devel@vger.kernel.org,m:pablo@netfilter.org,m:fw@strlen.de,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[anzaki@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[anzaki@gmail.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ernis@linux.microsoft.com,m:dipayanroy@linux.microsoft.com,m:gargaditya@linux.microsoft.com,m:shradhagupta@linux.microsoft.com,m:linux-kernel@vger.kernel.org,m:paulros@microsoft.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_NEQ_ENVFROM(0.00)[haiyangz@linux.microsoft.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[haiyangz@linux.microsoft.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	ALIAS_RESOLVED(0.00)[];
-	TO_DN_NONE(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305991-lists,netdev=lfdr.de];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 467EF72A5BB
+X-Rspamd-Queue-Id: 5296272A5FC
 
-Hardware-offloaded flows bypass the CPU and, unlike the software
-datapath, dst_check() does not invalidate them when a route changes.
-For ephemeral flows, this is usually not a problem as the flow expire on
-its own and the driver clears the entry in the HW. However, for persistent
-flows forwarded through the device, the HW is never informed that the
-route has expired.
+From: Haiyang Zhang <haiyangz@microsoft.com>
 
-For tables marked with NF_FLOWTABLE_HW_OFFLOAD, listen to the per-net FIB
-notifier chain and tear down the affected flows so they are re-evaluated by
-the SW forwarding path.
+Add callback function for the pci_driver / sriov_configure.
 
-A lockless list is used to reduce the work items overhead in case of a
-route change storm allowing many FIB events to be processed by one work
-item.
+It asks the NIC to provide certain number of VFs, or disable
+VFs if the request is zero.
 
-Fixes: c29f74e0df7a ("netfilter: nf_flow_table: hardware offload support")
-Assisted-by: Claude:claude-opus-4.8
-Signed-off-by: Ahmed Zaki <anzaki@gmail.com>
+Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
 ---
- include/net/netfilter/nf_flow_table.h |   3 +
- net/netfilter/nf_flow_table_core.c    | 202 ++++++++++++++++++++++++++
- 2 files changed, 205 insertions(+)
+v3:
+  Updated sriov disabling paths suggested by Paolo Abeni
 
-diff --git a/include/net/netfilter/nf_flow_table.h b/include/net/netfilter/nf_flow_table.h
-index 7b23b245a5a8..7c36255f5a4f 100644
---- a/include/net/netfilter/nf_flow_table.h
-+++ b/include/net/netfilter/nf_flow_table.h
-@@ -84,6 +84,9 @@ struct nf_flowtable {
- 	struct flow_block		flow_block;
- 	struct rw_semaphore		flow_block_lock; /* Guards flow_block */
- 	possible_net_t			net;
-+	struct notifier_block		fib_nb;
-+	struct work_struct		fib_work;
-+	struct llist_head		fib_events;
+v2:
+  No longer change VF autoprobe as discussed with Leon Romanovsky and Bjorn Helgaas.
+
+---
+ .../net/ethernet/microsoft/mana/gdma_main.c   | 26 +++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index aef3b77229c1..80a9118a90bc 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -2456,6 +2456,8 @@ static void mana_gd_remove(struct pci_dev *pdev)
+ {
+ 	struct gdma_context *gc = pci_get_drvdata(pdev);
+ 
++	pci_disable_sriov(pdev);
++
+ 	mana_rdma_remove(&gc->mana_ib);
+ 	mana_remove(&gc->mana, false);
+ 
+@@ -2517,6 +2519,8 @@ static void mana_gd_shutdown(struct pci_dev *pdev)
+ 
+ 	dev_info(&pdev->dev, "Shutdown was called\n");
+ 
++	pci_disable_sriov(pdev);
++
+ 	mana_rdma_remove(&gc->mana_ib);
+ 	mana_remove(&gc->mana, true);
+ 
+@@ -2525,6 +2529,27 @@ static void mana_gd_shutdown(struct pci_dev *pdev)
+ 	pci_disable_device(pdev);
+ }
+ 
++static int mana_sriov_configure(struct pci_dev *pdev, int numvfs)
++{
++	int err = 0;
++
++	dev_info(&pdev->dev, "Requested num VFs: %d\n", numvfs);
++
++	if (numvfs > 0) {
++		err = pci_enable_sriov(pdev, numvfs);
++	} else {
++		if (pci_vfs_assigned(pdev)) {
++			dev_warn(&pdev->dev,
++				 "Cannot disable SR-IOV while VFs are assigned\n");
++			return -EPERM;
++		}
++
++		pci_disable_sriov(pdev);
++	}
++
++	return err ? err : numvfs;
++}
++
+ static const struct pci_device_id mana_id_table[] = {
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_MICROSOFT, MANA_PF_DEVICE_ID) },
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_MICROSOFT, MANA_PF2_DEVICE_ID) },
+@@ -2540,6 +2565,7 @@ static struct pci_driver mana_driver = {
+ 	.suspend	= mana_gd_suspend,
+ 	.resume		= mana_gd_resume,
+ 	.shutdown	= mana_gd_shutdown,
++	.sriov_configure = mana_sriov_configure,
  };
  
- static inline bool nf_flowtable_hw_offload(struct nf_flowtable *flowtable)
-diff --git a/net/netfilter/nf_flow_table_core.c b/net/netfilter/nf_flow_table_core.c
-index 99c5b9d671a0..2c912056921a 100644
---- a/net/netfilter/nf_flow_table_core.c
-+++ b/net/netfilter/nf_flow_table_core.c
-@@ -5,8 +5,12 @@
- #include <linux/netfilter.h>
- #include <linux/rhashtable.h>
- #include <linux/netdevice.h>
-+#include <linux/llist.h>
- #include <net/ip.h>
- #include <net/ip6_route.h>
-+#include <net/fib_notifier.h>
-+#include <net/ip_fib.h>
-+#include <net/ip6_fib.h>
- #include <net/netfilter/nf_tables.h>
- #include <net/netfilter/nf_flow_table.h>
- #include <net/netfilter/nf_conntrack.h>
-@@ -695,11 +699,179 @@ void nf_flow_dnat_port(const struct flow_offload *flow, struct sk_buff *skb,
- }
- EXPORT_SYMBOL_GPL(nf_flow_dnat_port);
- 
-+struct nf_flow_fib_match {
-+	struct llist_node	*events;
-+};
-+
-+struct nf_flow_fib_event {
-+	struct llist_node	node;
-+	u8			family;
-+	u8			prefix_len;
-+	union {
-+		__be32		ip4;
-+		struct in6_addr	ip6;
-+	} addr;
-+};
-+
-+static bool nf_flow_fib_tuple_match(const struct flow_offload_tuple *tuple,
-+				    const struct nf_flow_fib_event *ev)
-+{
-+	if (tuple->l3proto != ev->family)
-+		return false;
-+
-+	switch (ev->family) {
-+	case NFPROTO_IPV4: {
-+		__be32 mask = ev->prefix_len ?
-+			htonl(~0u << (32 - ev->prefix_len)) : 0;
-+		return (tuple->dst_v4.s_addr & mask) == (ev->addr.ip4 & mask);
-+	}
-+#if IS_ENABLED(CONFIG_IPV6)
-+	case NFPROTO_IPV6:
-+		return ipv6_prefix_equal(&tuple->dst_v6, &ev->addr.ip6,
-+					 ev->prefix_len);
-+#endif
-+	default:
-+		return false;
-+	}
-+}
-+
-+static bool nf_flow_fib_flow_match(const struct flow_offload *flow,
-+				   const struct nf_flow_fib_match *m)
-+{
-+	const struct flow_offload_tuple *orig, *reply;
-+	const struct nf_flow_fib_event *ev;
-+	struct llist_node *node;
-+
-+	orig  = &flow->tuplehash[FLOW_OFFLOAD_DIR_ORIGINAL].tuple;
-+	reply = &flow->tuplehash[FLOW_OFFLOAD_DIR_REPLY].tuple;
-+
-+	for (node = m->events; node; node = node->next) {
-+		ev = llist_entry(node, struct nf_flow_fib_event, node);
-+		if (nf_flow_fib_tuple_match(orig, ev) ||
-+		    nf_flow_fib_tuple_match(reply, ev))
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
-+static void nf_flow_offload_fib_cb(struct nf_flowtable *flow_table,
-+				   struct flow_offload *flow, void *data)
-+{
-+	const struct nf_flow_fib_match *m = data;
-+
-+	if (test_bit(NF_FLOW_TEARDOWN, &flow->flags))
-+		return;
-+
-+	if (nf_flow_fib_flow_match(flow, m))
-+		flow_offload_teardown(flow);
-+}
-+
-+static void nf_flow_table_fib_work(struct work_struct *work)
-+{
-+	struct nf_flowtable *flow_table =
-+		container_of(work, struct nf_flowtable, fib_work);
-+	struct nf_flow_fib_event *ev, *next;
-+	struct nf_flow_fib_match m = {};
-+	struct llist_node *events;
-+
-+	events = llist_del_all(&flow_table->fib_events);
-+	if (!events)
-+		return;
-+
-+	m.events = events;
-+	nf_flow_table_iterate(flow_table, nf_flow_offload_fib_cb, &m);
-+
-+	llist_for_each_entry_safe(ev, next, events, node)
-+		kfree(ev);
-+}
-+
-+static bool nf_flowtable_fib_family_match(const struct nf_flowtable *flowtable,
-+					  u8 event_family)
-+{
-+	switch (flowtable->type->family) {
-+	case NFPROTO_IPV4:
-+		return event_family == NFPROTO_IPV4;
-+	case NFPROTO_IPV6:
-+		return event_family == NFPROTO_IPV6;
-+	case NFPROTO_INET:
-+		return event_family == NFPROTO_IPV4 ||
-+		       event_family == NFPROTO_IPV6;
-+	default:
-+		return false;
-+	}
-+}
-+
-+/* Called with rcu_read_lock() */
-+static int nf_flow_table_fib_event(struct notifier_block *nb,
-+				   unsigned long event, void *ptr)
-+{
-+	struct nf_flowtable *flow_table =
-+		container_of(nb, struct nf_flowtable, fib_nb);
-+	struct fib_notifier_info *info = ptr;
-+	struct nf_flow_fib_event *ev;
-+
-+	switch (event) {
-+	case FIB_EVENT_ENTRY_REPLACE:
-+	case FIB_EVENT_ENTRY_APPEND:
-+	case FIB_EVENT_ENTRY_DEL:
-+		break;
-+	default:
-+		return NOTIFY_DONE;
-+	}
-+
-+	/* Skip events for an address family this table cannot hold. */
-+	if (!nf_flowtable_fib_family_match(flow_table, info->family))
-+		return NOTIFY_DONE;
-+
-+	ev = kzalloc(sizeof(*ev), GFP_ATOMIC);
-+	if (!ev)
-+		return NOTIFY_DONE;
-+
-+	switch (info->family) {
-+	case NFPROTO_IPV4:
-+		struct fib_entry_notifier_info *fen;
-+
-+		fen = container_of(info, struct fib_entry_notifier_info, info);
-+		ev->family     = NFPROTO_IPV4;
-+		ev->addr.ip4   = htonl(fen->dst);
-+		ev->prefix_len = fen->dst_len;
-+		break;
-+
-+#if IS_ENABLED(CONFIG_IPV6)
-+	case NFPROTO_IPV6:
-+		struct fib6_entry_notifier_info *fen6;
-+
-+		fen6 = container_of(info, struct fib6_entry_notifier_info, info);
-+		if (!fen6->rt)
-+			goto err;
-+
-+		ev->family     = NFPROTO_IPV6;
-+		ev->addr.ip6   = fen6->rt->fib6_dst.addr;
-+		ev->prefix_len = fen6->rt->fib6_dst.plen;
-+		break;
-+#endif
-+	default:
-+		goto err;
-+	}
-+
-+	llist_add(&ev->node, &flow_table->fib_events);
-+	queue_work(system_power_efficient_wq, &flow_table->fib_work);
-+	return NOTIFY_DONE;
-+
-+err:
-+	kfree(ev);
-+	return NOTIFY_DONE;
-+}
-+
- int nf_flow_table_init(struct nf_flowtable *flowtable)
- {
-+	struct net *net = read_pnet(&flowtable->net);
- 	int err;
- 
- 	INIT_DELAYED_WORK(&flowtable->gc_work, nf_flow_offload_work_gc);
-+	INIT_WORK(&flowtable->fib_work, nf_flow_table_fib_work);
-+	init_llist_head(&flowtable->fib_events);
- 	flow_block_init(&flowtable->flow_block);
- 	init_rwsem(&flowtable->flow_block_lock);
- 
-@@ -711,11 +883,24 @@ int nf_flow_table_init(struct nf_flowtable *flowtable)
- 	queue_delayed_work(system_power_efficient_wq,
- 			   &flowtable->gc_work, HZ);
- 
-+	if (nf_flowtable_hw_offload(flowtable)) {
-+		flowtable->fib_nb.notifier_call = nf_flow_table_fib_event;
-+		err = register_fib_notifier(net, &flowtable->fib_nb,
-+					    NULL, NULL);
-+		if (err < 0)
-+			goto err_fib;
-+	}
-+
- 	mutex_lock(&flowtable_lock);
- 	list_add(&flowtable->list, &flowtables);
- 	mutex_unlock(&flowtable_lock);
- 
- 	return 0;
-+
-+err_fib:
-+	cancel_delayed_work_sync(&flowtable->gc_work);
-+	rhashtable_destroy(&flowtable->rhashtable);
-+	return err;
- }
- EXPORT_SYMBOL_GPL(nf_flow_table_init);
- 
-@@ -754,8 +939,25 @@ void nf_flow_table_cleanup(struct net_device *dev)
- }
- EXPORT_SYMBOL_GPL(nf_flow_table_cleanup);
- 
-+static void nf_flow_table_fib_drain(struct nf_flowtable *flow_table)
-+{
-+	struct nf_flow_fib_event *ev, *next;
-+	struct llist_node *events;
-+
-+	events = llist_del_all(&flow_table->fib_events);
-+	llist_for_each_entry_safe(ev, next, events, node)
-+		kfree(ev);
-+}
-+
- void nf_flow_table_free(struct nf_flowtable *flow_table)
- {
-+	if (nf_flowtable_hw_offload(flow_table)) {
-+		unregister_fib_notifier(read_pnet(&flow_table->net),
-+					&flow_table->fib_nb);
-+		cancel_work_sync(&flow_table->fib_work);
-+		nf_flow_table_fib_drain(flow_table);
-+	}
-+
- 	mutex_lock(&flowtable_lock);
- 	list_del(&flow_table->list);
- 	mutex_unlock(&flowtable_lock);
+ static int __init mana_driver_init(void)
 -- 
-2.43.0
+2.34.1
 
 
