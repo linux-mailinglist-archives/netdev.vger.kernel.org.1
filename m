@@ -1,236 +1,223 @@
-Return-Path: <netdev+bounces-305784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305788-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DJhvEUE6TmpzJQIAu9opvQ
-	(envelope-from <netdev+bounces-305784-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:53:37 +0200
+	id /SqBFLg9TmomJgIAu9opvQ
+	(envelope-from <netdev+bounces-305788-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 14:08:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB6587260B4
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:53:36 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D958572624C
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 14:08:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b=lVglUYCY;
-	dmarc=pass (policy=none) header.from=debian.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305784-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305784-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=infotecs.ru header.s=mx header.b=FCtd1fus;
+	dmarc=pass (policy=reject) header.from=infotecs.ru;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305788-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305788-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 69C8A302E7FE
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 11:52:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1F551300847C
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 12:08:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E85D8437873;
-	Wed,  8 Jul 2026 11:52:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97ACF43B6C7;
+	Wed,  8 Jul 2026 12:08:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7521425CCB;
-	Wed,  8 Jul 2026 11:52:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A44043B6CD;
+	Wed,  8 Jul 2026 12:08:13 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783511550; cv=none; b=jv9t84SUM5Kko9OZ7pazWCqYmdtTEzSNKXDzxqs9SeNstk22MQmMHdwhp5gEG9+D0LjvUI8MET5aZtWIhLT+5K8MuAfSVft0KW/PRl/mVtu9ZRPj0EbxovmtRuKwRM43xJUr4GSnSG66zRByDx2fC9Fp6SUveGWrKRwHFOmPjoU=
+	t=1783512498; cv=none; b=GF5jKrmnlF5Du2FQry3XeEmEpTnsezG6RHUlGgkch7iKjYGEkjhcOdKo8TVynIfmJH4E/wKQc2XueIInbUqFjVDHVuhNJ7PCEbw94UvMddIn36Oqrf2EONP4L1B30V1eIVjBHFM6fcnjVZgkh3Szpf9O8QkdK17jny1tTfXzPjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783511550; c=relaxed/simple;
-	bh=kJ+Kh3oaC1Ua5xY6TwLFvAdMgWjJTsHzrAQ6sjb1nSo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Jkh6omlLYmPYwYCBYR87pXHlyVR39tVdSaZlIPBgSSuBOoZUe07iqNpj7IELuaKusnZotbejzI0k6WyMo+a3GR3gcL9zloeW2mMkx2zW2ZsJ8kQiHaDuIShLvamMpDgDcy+iDtR0Hw4gexn0xKcgqpWJ0+tn7+YxX+26efd9uBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=lVglUYCY; arc=none smtp.client-ip=82.195.75.108
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:In-Reply-To:References:
-	Message-Id:Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:
-	From:Reply-To:Content-ID:Content-Description;
-	bh=i75F3RttXhulJNWIw2ZX+9qrsSgvWqNEAljgohIXHqo=; b=lVglUYCYMQJITRssT8MSLzeG8l
-	zAOPREnVlAgeRaLbYcQiEeoT5FxxROdOewF77AU9enatoHYCss2lQY7IYF511WVmsf3VJs6VBdb+1
-	4raK2h1si/v6AJeraq2zT593SIKpa3ZRDrEOJpW/3SwKEqjxhMlNUA3oedncbxoEzhXxqLgKVbT1P
-	t0/VHbpN7WjDNzq9ujzVvEBk4FMn3QaDz2p+6SYU0j6twldEtsc2jESgmqRMSHq9znD+HlHrIYkeq
-	YJrYR3d5qDuAIofUyS9R4cw40zQ9Pm34BoHotyummN6P/bsvGO/zNBxL6D0jH5UUPSlRk4fQCZsUV
-	YXwxUZaw==;
-Received: from authenticated-user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1whQpF-002veG-22;
-	Wed, 08 Jul 2026 11:52:25 +0000
-From: Breno Leitao <leitao@debian.org>
-Date: Wed, 08 Jul 2026 04:51:59 -0700
-Subject: [PATCH net-next 2/2] nfc: llcp: convert to getsockopt_iter
+	s=arc-20240116; t=1783512498; c=relaxed/simple;
+	bh=rrk2/4gr0Hs3V/kHNY2cTJ3pwwp60vgSfiKMxRSnW8c=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=b/tU4GoyLIDLtBJ6kOvjHLCykxbvApkz3aQD16AnBDW+TPZ+XDRI81czWsRRy97Ut33oDlKzbFGj+yiaL1lRmnysv0I7khzcT63x58yz7Gr4Z+MQ8qhbXyilIg5xncfuwQxeJJdl+uIfMaAMUJspaHlHdZ2L2S1XxVHvMso2hc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru; spf=pass smtp.mailfrom=infotecs.ru; dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b=FCtd1fus; arc=none smtp.client-ip=91.244.183.115
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru F19EF2C0BA9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
+	t=1783511994; bh=z8pwacSiX1yXmFvoYo25v1yODLzYm33N/ufx+ubMVkE=;
+	h=From:To:CC:Subject:Date:From;
+	b=FCtd1fusTaUXUHma1IR3xAUIRuyiSABv4IDd1+uCdQihws4SeNTaP+PgT5fdgRoLq
+	 d3u7s174iexiDwyXt02wUNoAxrsntIiiGAet+e++D5OS6RBBYUFdqqCpBJd8eiJPFS
+	 B2A/5xdN7+Et4XuJYWbHm0CZ+EuvqFGiKgvfGVwE=
+Received: from mx0.infotecs-nt (localhost [127.0.0.1])
+	by mx0.infotecs.ru (Postfix) with ESMTP id F19EF2C0BA9;
+	Wed,  8 Jul 2026 14:59:53 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs-nt A75882C0BA2
+Received: from msk-exch-01.infotecs-nt (msk-exch-01.infotecs-nt [10.0.7.191])
+	by mx0.infotecs-nt (Postfix) with ESMTP id A75882C0BA2;
+	Wed,  8 Jul 2026 14:59:53 +0300 (MSK)
+From: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
+To: Allison Henderson <achender@kernel.org>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ka-Cheong Poon
+	<ka-cheong.poon@oracle.com>, Santosh Shilimkar
+	<santosh.shilimkar@oracle.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "rds-devel@oss.oracle.com"
+	<rds-devel@oss.oracle.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "lvc-project@linuxtesting.org"
+	<lvc-project@linuxtesting.org>
+Subject: [PATCH net] rds: Fix inet6_addr_lst NULL dereference when IPv6 is
+ disabled
+Thread-Topic: [PATCH net] rds: Fix inet6_addr_lst NULL dereference when IPv6
+ is disabled
+Thread-Index: AQHdDtFJkzJE74BSrkynIWuhoK5tUg==
+Date: Wed, 8 Jul 2026 11:59:53 +0000
+Message-ID: <20260708115922.2226279-1-Ilia.Gavrilov@infotecs.ru>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260708-getsockopt_phase3-v1-2-d8394f2fc554@debian.org>
-References: <20260708-getsockopt_phase3-v1-0-d8394f2fc554@debian.org>
-In-Reply-To: <20260708-getsockopt_phase3-v1-0-d8394f2fc554@debian.org>
-To: David Heidelberg <david@ixit.cz>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: oe-linux-nfc@lists.linux.dev, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, sdf.kernel@gmail.com, 
- Breno Leitao <leitao@debian.org>, kernel-team@meta.com
-X-Mailer: b4 0.16-dev-d5d98
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3487; i=leitao@debian.org;
- h=from:subject:message-id; bh=kJ+Kh3oaC1Ua5xY6TwLFvAdMgWjJTsHzrAQ6sjb1nSo=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqTjnt8a/t0gbzvG9IACJApyw75iyKrVVohGGta
- HnOIUb8cVmJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCak457QAKCRA1o5Of/Hh3
- bfmyEACtoUebDNDwdaYYXV8ChpKTNxvPDiz43uWn2kW3qfM7z3V/fBvt4jJ71h83RURQJf8NUzH
- uvmzsJ72rw4dzTzl+pq6qUz1n+MMFgosWQVrU9v49JtUlErn35H9rRLDt8K8mU5lIssB5ONBNJ8
- 0koPrq9x2ccf7iUlj5qwyCQ0ye4EkIwa77xuTu7liTIxpb7bgSZjzXXJ/X/FTirSqIufRNhvASN
- Zqtap5YvUmkVOFvkhbx4ocd0YiiXxsX4GVGB/x4ddtQjQmEwnLq+OIOkAtwthtEF4gsUQA1naJo
- OBAN8EudBrdrbjCeRan4O9597j4mvwIaJijACAcVXUnYIKtF8s2BNAz67WhGdjbxF6PI2sgRqsO
- Jyq/Wr7iYsqhvX4AC6qDBfULJj38Nqhjjy+iNqNczVkhVBkm9FZtaUriFz1FR/15zbgdy8VdbVC
- Vghvu6RiXUeJn4NzZEyz5so9VwBoy+5vilV7d8d2cqEhrZuQ9ecu+ywHlejL14Gn139KK1lbnpw
- 8YHnfsvP8m6f4qtm9eJcwdWR+XFbYh6prAfbreQ1SmFpYwgrudGWYQHJtQIuDkfe/yI/xVJ7/xm
- hcZtXwv4Jb7Dm9/u+6dTAilSlfDR+HF/ivqyCK+m8Kai2NdXVFEkxiE5nh+zDXu0l/4Phra+GUx
- 07ij+1DoXM5arxg==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
-X-Debian-User: leitao
+X-KSMG-AntiPhishing: NotDetected
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Envelope-From: Ilia.Gavrilov@infotecs.ru
+X-KSMG-AntiSpam-Info: LuaCore: 112 0.3.112 7c8d497b0e572fbfa504a2ee62037c045a8cb4ec, {Tracking_from_domain_doesnt_match_to}, infotecs.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiSpam-Lua-Profiles: 204322 [Jul 08 2026]
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Version: 6.1.1.22
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 3.0.0.9059, bases: 2026/07/08 08:32:00 #28418202
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-LinksScanning: NotDetected
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 8
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[infotecs.ru,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[infotecs.ru:s=mx];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305784-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS(0.00)[m:david@ixit.cz,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:sdf.kernel@gmail.com,m:leitao@debian.org,m:kernel-team@meta.com,m:sdfkernel@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-305788-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:achender@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ka-cheong.poon@oracle.com,m:santosh.shilimkar@oracle.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:rds-devel@oss.oracle.com,m:linux-kernel@vger.kernel.org,m:lvc-project@linuxtesting.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[Ilia.Gavrilov@infotecs.ru,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,gmail.com,debian.org,meta.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[infotecs.ru:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[debian.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Ilia.Gavrilov@infotecs.ru,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AB6587260B4
+X-Rspamd-Queue-Id: D958572624C
 
-Convert nfc_llcp_getsockopt() to the getsockopt_iter proto_ops callback.
-It takes a sockopt_t and writes each value with copy_to_iter() instead of
-a put_user() into optval; the socket layer builds the sockopt_t and copies
-the length back. The socket lock and optlen validation are unchanged.
+When booting with the 'ipv6.disable=3D1' parameter, inet6_addr_lst
+is never initialized because inet6_init() exits before addrconf_init()
+is called to initialize it. An attempt to bind an RDS socket to
+an ipv6 address results in a crash in __ipv6_chk_addr_and_flags()
 
-No functional change.
+KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
+RIP: 0010:__ipv6_chk_addr_and_flags+0x1df/0x7e0
+Call Trace:
+ <TASK>
+ ipv6_chk_addr+0x3b/0x50
+ rds_tcp_laddr_check+0x155/0x3b0 [rds_tcp]
+ rds_trans_get_preferred+0x15d/0x2d0 [rds]
+ ? trace_hardirqs_on+0x2d/0x110
+ rds_bind+0x1433/0x1d60 [rds]
+ ? rds_remove_bound+0xd50/0xd50 [rds]
+ ? aa_af_perm+0x250/0x250
+ ? __might_fault+0xde/0x190
+ ? __sys_bind+0x1dc/0x210
+ __sys_bind+0x1dc/0x210
+ ? __ia32_sys_socketpair+0x100/0x100
+ ? restore_fpregs_from_fpstate+0x53/0x100
+ __x64_sys_bind+0x73/0xb0
+ ? syscall_enter_from_user_mode+0x1c/0x50
+ do_syscall_64+0x34/0x80
+ entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+RIP: 0033:0x7f47f8269ea9
+ </TASK>
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
+The following code reproduces the issue:
+
+struct sockaddr_in6 addr;
+s =3D socket(PF_RDS, SOCK_SEQPACKET, 0);
+
+memset(&addr, 0, sizeof(addr));
+inet_pton(AF_INET6, ADDRESS, &addr.sin6_addr);
+addr.sin6_family =3D AF_INET6;
+addr.sin6_port =3D htons(PORT);
+
+bind(s, &addr, sizeof(addr);
+
+Found by InfoTeCS on behalf of Linux Verification Center
+(linuxtesting.org) with Syzkaller.
+
+Fixes: eee2fa6ab322 ("rds: Changing IP address internal representation to s=
+truct in6_addr")
+Fixes: 1e2b44e78eea ("rds: Enable RDS IPv6 support")
+Signed-off-by: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
 ---
- net/nfc/llcp_sock.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+ net/rds/ib.c  | 4 ++++
+ net/rds/tcp.c | 8 +++++---
+ 2 files changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/net/nfc/llcp_sock.c b/net/nfc/llcp_sock.c
-index 94850fbe3620d..0f9cd03294074 100644
---- a/net/nfc/llcp_sock.c
-+++ b/net/nfc/llcp_sock.c
-@@ -302,21 +302,20 @@ static int nfc_llcp_setsockopt(struct socket *sock, int level, int optname,
+diff --git a/net/rds/ib.c b/net/rds/ib.c
+index 39f87272e071..8f9cf491984f 100644
+--- a/net/rds/ib.c
++++ b/net/rds/ib.c
+@@ -429,6 +429,10 @@ static int rds_ib_laddr_check_cm(struct net *net, cons=
+t struct in6_addr *addr,
+ 		sa =3D (struct sockaddr *)&sin;
+ 	} else {
+ #if IS_ENABLED(CONFIG_IPV6)
++		if (!ipv6_mod_enabled()) {
++			ret =3D -EADDRNOTAVAIL;
++			goto out;
++		}
+ 		memset(&sin6, 0, sizeof(sin6));
+ 		sin6.sin6_family =3D AF_INET6;
+ 		sin6.sin6_addr =3D *addr;
+diff --git a/net/rds/tcp.c b/net/rds/tcp.c
+index a1de114d5e2e..955d92277d5a 100644
+--- a/net/rds/tcp.c
++++ b/net/rds/tcp.c
+@@ -366,9 +366,11 @@ int rds_tcp_laddr_check(struct net *net, const struct =
+in6_addr *addr,
+ 		rcu_read_unlock();
+ 	}
+ #if IS_ENABLED(CONFIG_IPV6)
+-	ret =3D ipv6_chk_addr(net, addr, dev, 0);
+-	if (ret)
+-		return 0;
++	if (ipv6_mod_enabled()) {
++		ret =3D ipv6_chk_addr(net, addr, dev, 0);
++		if (ret)
++			return 0;
++	}
+ #endif
+ 	return -EADDRNOTAVAIL;
  }
- 
- static int nfc_llcp_getsockopt(struct socket *sock, int level, int optname,
--			       char __user *optval, int __user *optlen)
-+			       sockopt_t *opt)
- {
- 	struct nfc_llcp_local *local;
- 	struct sock *sk = sock->sk;
- 	struct nfc_llcp_sock *llcp_sock = nfc_llcp_sock(sk);
-+	u32 miux, remote_miu, remote_lto, remote_rw, rw;
- 	int len, err = 0;
--	u32 miux, remote_miu, rw;
- 
- 	pr_debug("%p optname %d\n", sk, optname);
- 
- 	if (level != SOL_NFC)
- 		return -ENOPROTOOPT;
- 
--	if (get_user(len, optlen))
--		return -EFAULT;
-+	len = opt->optlen;
- 
- 	if (len < 0)
- 		return -EINVAL;
-@@ -337,7 +336,7 @@ static int nfc_llcp_getsockopt(struct socket *sock, int level, int optname,
- 	switch (optname) {
- 	case NFC_LLCP_RW:
- 		rw = llcp_sock->rw > LLCP_MAX_RW ? local->rw : llcp_sock->rw;
--		if (put_user(rw, (u32 __user *) optval))
-+		if (copy_to_iter(&rw, len, &opt->iter_out) != len)
- 			err = -EFAULT;
- 
- 		break;
-@@ -346,7 +345,7 @@ static int nfc_llcp_getsockopt(struct socket *sock, int level, int optname,
- 		miux = be16_to_cpu(llcp_sock->miux) > LLCP_MAX_MIUX ?
- 			be16_to_cpu(local->miux) : be16_to_cpu(llcp_sock->miux);
- 
--		if (put_user(miux, (u32 __user *) optval))
-+		if (copy_to_iter(&miux, len, &opt->iter_out) != len)
- 			err = -EFAULT;
- 
- 		break;
-@@ -355,19 +354,21 @@ static int nfc_llcp_getsockopt(struct socket *sock, int level, int optname,
- 		remote_miu = llcp_sock->remote_miu > LLCP_MAX_MIU ?
- 				local->remote_miu : llcp_sock->remote_miu;
- 
--		if (put_user(remote_miu, (u32 __user *) optval))
-+		if (copy_to_iter(&remote_miu, len, &opt->iter_out) != len)
- 			err = -EFAULT;
- 
- 		break;
- 
- 	case NFC_LLCP_REMOTE_LTO:
--		if (put_user(local->remote_lto / 10, (u32 __user *) optval))
-+		remote_lto = local->remote_lto / 10;
-+		if (copy_to_iter(&remote_lto, len, &opt->iter_out) != len)
- 			err = -EFAULT;
- 
- 		break;
- 
- 	case NFC_LLCP_REMOTE_RW:
--		if (put_user(llcp_sock->remote_rw, (u32 __user *) optval))
-+		remote_rw = llcp_sock->remote_rw;
-+		if (copy_to_iter(&remote_rw, len, &opt->iter_out) != len)
- 			err = -EFAULT;
- 
- 		break;
-@@ -379,8 +380,7 @@ static int nfc_llcp_getsockopt(struct socket *sock, int level, int optname,
- 
- 	release_sock(sk);
- 
--	if (put_user(len, optlen))
--		return -EFAULT;
-+	opt->optlen = len;
- 
- 	return err;
- }
-@@ -937,7 +937,7 @@ static const struct proto_ops llcp_sock_ops = {
- 	.listen         = llcp_sock_listen,
- 	.shutdown       = sock_no_shutdown,
- 	.setsockopt     = nfc_llcp_setsockopt,
--	.getsockopt     = nfc_llcp_getsockopt,
-+	.getsockopt_iter = nfc_llcp_getsockopt,
- 	.sendmsg        = llcp_sock_sendmsg,
- 	.recvmsg        = llcp_sock_recvmsg,
- 	.mmap           = sock_no_mmap,
-
--- 
-2.53.0-Meta
-
+--=20
+2.47.3
 
