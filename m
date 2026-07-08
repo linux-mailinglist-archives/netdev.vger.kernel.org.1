@@ -1,210 +1,123 @@
-Return-Path: <netdev+bounces-305971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305972-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id t4FJGY+oTmo+RgIAu9opvQ
-	(envelope-from <netdev+bounces-305971-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:44:15 +0200
+	id 95WQOw+pTmqHRgIAu9opvQ
+	(envelope-from <netdev+bounces-305972-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:46:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5955729EB7
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:44:14 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8271B729F85
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 21:46:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Z9wamYBJ;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305971-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305971-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305972-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305972-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 168A1300579E
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 19:44:10 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 005B7301ABB4
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 19:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AAA93DCDB5;
-	Wed,  8 Jul 2026 19:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D50C3A1A5D;
+	Wed,  8 Jul 2026 19:46:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 152F43D25A3
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 19:44:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7ECDF4F1;
+	Wed,  8 Jul 2026 19:46:18 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783539847; cv=none; b=SewPJwv4zceU9hqOMFELvZQ62SHWpPd2AqI5INcoZmDb9ji3ZL2lJhS2o4Z4EQxd73xI80zGAJ94cXh3P4cgZX13HuKfO1fh2G5YBAOEeONKK9NGtth/X6Alfh6fG+L4bj2ltD0bY5VthPMXSFvDYrE+y+mHNdurh4cdX2Jto+k=
+	t=1783539980; cv=none; b=CUCQh9V4ewNP+sLTFUo00HGnhO8fcH7BWDEFWs1KkdudghWvLqaCeli2IhsE3tae6UubzbWjnc17Cu95oCpiNJkypZe71H/ZCwkhF07IRaoDc2U64IYPj99/FNo4AstT3WyKzCEr2Bc0DGLjHSXLp9C90G2eHUgWtl3PEnrSbsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783539847; c=relaxed/simple;
-	bh=sCBV4R2IskE+Qnt8X1ddpdk4fJf5MMWKVa9tRTgLXvA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fb5z9OK7X/MFaNVyrNcAljZ+hRrg/4JKiih/AoZvOoLEzJZdVNkKRHN9kRVB260sO7RWGhCH4iICbgbXnafccTpRBGZddZb44lizHdC8zGoH5aezRm/kFGMPeAtM4gu/NhHpJGB4IgTXFJXPTwsE19ODA/luTGgXF/su1UzAUWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z9wamYBJ; arc=none smtp.client-ip=209.85.128.54
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-493d92b7db3so11439875e9.2
-        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 12:44:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783539844; x=1784144644; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=sCBV4R2IskE+Qnt8X1ddpdk4fJf5MMWKVa9tRTgLXvA=;
-        b=Z9wamYBJkxQNjZkhmBdNJWvecPMkya3cozZAsa/1bbhEEbfEV+4QvdJj0A+4VqfDOE
-         icvHtxykM+DmHp8EZjo5waUgBHoFU0L6fgUrq4tv3YEIx4rSIXe2PT3xRRhbTs7OjG0Z
-         03Va/KtNSAOPYTP6gi8YI4g30nerFCmnv8loOh8sIgXNYTmO30Tjw5sJBbJmfuHZEYuq
-         9qI2tNFmUyBKph+PsKxOplrqbyqhtI/i7WtWQLAlz9qm14MPuDoVHVmZ3aLUc1BCVhZD
-         IvO5KXy9zP7WjvGrw6ZdLevwvr6W+68LFaXW0LZZ/CP/jCUbERmJC/p4K24qfzFk55mq
-         NqpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783539844; x=1784144644;
-        h=content-transfer-encoding:content-type:in-reply-to:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=sCBV4R2IskE+Qnt8X1ddpdk4fJf5MMWKVa9tRTgLXvA=;
-        b=ZzLdAttkad/pvrolCqPkX/h++HS7NiW9hHuk+7iXb37nN0zG/wmdFES7Lgbfi8jYWU
-         nXspkyVsPC0d5Poe2k6o9y+oi+fG7fk/uAzYHG3cXbcHxEphFyCXZl6TNbaPoHMp2DFv
-         j9WPcqykC2M1GergMU0emSWz2JZVUCe9dKdzr/2HCwL6OZvroXuUaNqdSFnPg9QCZQC8
-         MNM75QHwnQMxfoz+AzxIvUWVFbJx4zU42m1RLMev8aUQI9CnVakbLNLP2yOyXYTyaIDZ
-         sE2fTPbN2phlITnMfj1iRFSLMapHa9auZnwFtmYa1GsxucRSes6AL4AoasZU2RjKefTG
-         s/YA==
-X-Forwarded-Encrypted: i=1; AHgh+RpCtznirVE9Q9tVGJwzrEXmgX6mGmUbFfzAN0gFniosudiddHTRjB1blJ0sp5KO121q9xwkoho=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwE2m5MWxWr2uDQgZXrqzbQmlXv1SZ15kSvQZiiMtn+2SnyLeOL
-	K+KU+WzIauM2i9SsK3gFFaON1nKpjAcc2ktQ+h10d/bd2oqjyHu2my4S
-X-Gm-Gg: AfdE7cmmbfb969LkjKCPUODeYr3WzYFD7Kuu1edZuwV0QmuokVLhIUhLjVcKEmAPCw4
-	G9Dh884GG5Q+i+59sh4tspN7WPk4j6NTS1lviv8CoEZJglF31U8HC+T31G9G4/iou3dtHdMw4rO
-	58zNFR+YA3hBjS2gt2o2sR+60ZXRsuBMTVj97UMKd5s2LOrJbCIUqsSZ/e63dKT3YBzVEnlIwJA
-	h6SQMJ/fuCDb+KROcftQO8rChUaBsY1O2aTu46R3DW8cm0GrLckIIoVVKfj1VhXh6aNMCduwQdF
-	Fvr+OO06qmVJj6Qap+UNHrkDnnkJyRCxzLkrnZwl6LLnYgDejcD3Xs5nRBc+q6RozJ1Ib+83mBO
-	f3E0MFoLHdfiQlW4OOY5M70gLZHJn/srj5+pmNQyWq6JXlWmjg4OFO2nrtJVUctSmMmckxKX3n1
-	B7Lz1e9+7mQoJzL2GNm2ywjgI6jaQiCMPbMrYr5iAbe2oRTDXXeN5U/G7VTPKkaLZJw6lUMjaNr
-	EO2cVlNaXE0
-X-Received: by 2002:a05:600c:1d0f:b0:493:cfd2:cd06 with SMTP id 5b1f17b1804b1-493e68b8007mr39812645e9.6.1783539844178;
-        Wed, 08 Jul 2026 12:44:04 -0700 (PDT)
-Received: from ?IPV6:2001:9e8:f108:7101:a0d0:f2a:50b6:7266? ([2001:9e8:f108:7101:a0d0:f2a:50b6:7266])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9e3e2702sm47175156f8f.9.2026.07.08.12.44.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jul 2026 12:44:03 -0700 (PDT)
-Message-ID: <df0aaf90-2baa-424c-8c83-aed52a4b4321@gmail.com>
-Date: Wed, 8 Jul 2026 21:44:02 +0200
+	s=arc-20240116; t=1783539980; c=relaxed/simple;
+	bh=KXzvMMXAalFxrhgHFbpXE+QWseDaqEypD1jOwd1J6/U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vxn7aUO1MG6oiKx7RhnPXoJUBRgltIbzlaS82RFoskcbeh1RmZmXVB3cajkzcF3xdE6X2mYW4J3AZdggeHZYd3yjHWkEIL8qxqCFWa5p03p+SWQM7ChVk4K3EPq/5uTCzQWFZ8G6jPhFPIK5FHWnOis6voQyAGb2fNwYi0aSquM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1whYDe-000000000js-2aC0;
+	Wed, 08 Jul 2026 19:46:07 +0000
+Date: Wed, 8 Jul 2026 21:45:48 +0200
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 2/3] net: dsa: mxl862xx: add SMDIO clause-22
+ register access
+Message-ID: <ak6o7Ovekjb_evPs@makrotopia.org>
+References: <ak0KJ6gUk2l_IwoI@makrotopia.org>
+ <96c362d3-59d2-43c4-b2aa-c12dfeb6fcca@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 1/4] dt-bindings: net: pse-pd: add bindings
- for Realtek/Broadcom PSE MCU
-Content-Language: en-US
-To: Conor Dooley <conor@kernel.org>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
- Kory Maincent <kory.maincent@bootlin.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- Daniel Golle <daniel@makrotopia.org>, =?UTF-8?Q?Bj=C3=B8rn_Mork?=
- <bjorn@mork.no>
-References: <20260706112425.3149226-1-jelonek.jonas@gmail.com>
- <20260706112425.3149226-2-jelonek.jonas@gmail.com>
- <20260706-player-handwash-0a3fe95cf5ec@spud>
- <c19e563a-8931-4f31-b05a-ff8def4a5161@gmail.com>
- <20260707-dove-fretful-e3c8e237f1eb@spud>
- <2afc9c9a-eacc-46ca-b965-4cabee8f7094@gmail.com>
- <20260708-lyrically-footrest-10963a12145f@spud>
-From: Jonas Jelonek <jelonek.jonas@gmail.com>
-In-Reply-To: <20260708-lyrically-footrest-10963a12145f@spud>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <96c362d3-59d2-43c4-b2aa-c12dfeb6fcca@lunn.ch>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-305971-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305972-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[makrotopia.org];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:conor@kernel.org,m:o.rempel@pengutronix.de,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:bjorn@mork.no,m:andrew@lunn.ch,m:krzk@kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,makrotopia.org:mid,makrotopia.org:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B5955729EB7
+X-Rspamd-Queue-Id: 8271B729F85
 
-Hi Conor,
+On Wed, Jul 08, 2026 at 07:22:49PM +0200, Andrew Lunn wrote:
+> On Tue, Jul 07, 2026 at 04:16:07PM +0200, Daniel Golle wrote:
+> > Add mxl862xx_smdio_read() and mxl862xx_smdio_write() for clause-22
+> > SMDIO register access. MCUboot rescue mode only exposes clause-22
+> > registers; the existing clause-45 MMD interface is unavailable during
+> > firmware transfer. The MDIO bus lock is held per-transaction (not
+> > across polls) so that SB PDI polling during flash erase does not
+> > starve other MDIO users.
+> 
+> What other MDIO users are there? It sounds like once the switch is in
+> rescue mode, switch management is dead. So how can there be users?
 
-On 08.07.26 18:56, Conor Dooley wrote:
-> On Tue, Jul 07, 2026 at 10:50:21PM +0200, Jonas Jelonek wrote:
->> [...]
->> Ok, I hope I put this together correctly. A concrete proposal:
->>
->> "realtek,pse-mcu-gen1"                        (Protocol Gen 1, UART)
->> "realtek,pse-mcu-gen1-smbus"            (Protocol Gen 1, SMBus)
->> "realtek,pse-mcu-gen2"                        (Protocol Gen 2, UART)
->> "realtek,pse-mcu-gen2-i2c"                  (Protocol Gen 2, raw I2C)
->> "realtek,pse-mcu-gen2-smbus"            (Protocol Gen 2, SMBus)
->>
->> This uniquely identifies the protocol used: first generation and second
->> generation. As Rob mentioned before [1], this also pulls in the raw I2C
->> vs. SMBus framing in contrast to having it in a property. The framing
->> suffix appears only on I2C attachments because it doesn't apply to
->> UART transport, and this is given by the parent serial@ node.
->>
->> Though I'm still open for suggestions regarding the protocol
->> identification if "-gen1"/"-gen2" is not acceptable.
-> This seems reasonable enough.
->
->> [...]
->>
->> It would also be an exception to the other PSE-PD bindings. They describe
->> controllers used across many switches too, yet none encode the
-> The difference is those cases (for what few pse-psd bindings there are)
-> the compatibles correspond to individual devices. Here you have
-> compatibles you're going to use to cover multiple devices (with device
-> corresponding to a combination of mcu/firmware/hardware behind the mcu).
-> That lack of a 1:1 mapping is why I'm asking for something different from
-> you than you see with the existing pse-pd devices. The switch the device
-> is integrated on seems to be the only thing that reasonably makes sense
-> to use.
->
->
->> switch/enclosure. Board-specific compatibles might still be added later in
->> case a device really has a variation or quirk that genuinely needs its own
->> compatible.
-> And in doing so, have to retrofit that compatible to all devicetrees
-> that use it. This is one of the reasons that we generally demand
-> device-specific compatibles.
->
-> You could add switch-specific compatibles that fall back to the ones you
-> provide above, with the driver only using the ones above unless
-> something crops up in the future?
-
-Thank you for the thorough explanation. I think I got your point now and
-understand why it's required that way.
-
-I'll rework this for the next version.
-
-> Cheers,
-> Conor.
-
-Best regards,
-Jonas
+The MDIO bus lock refers to the host bus which is used to connect
+the switch management interface. The same bus can also be used to
+connect other unrelated PHYs (eg. to provide a WAN or management
+interface independent of the switch).
+Especially because this "other" interface can be used to connect
+to the host via SSH and perform the firmware update on the switch
+holding the MDIO bus lock may impact PHY polling and impair the
+link used to conduct the update.
+At least that was my thought when implementing this.
 
