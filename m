@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-305654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305665-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id i0O5FNvyTWr4AQIAu9opvQ
-	(envelope-from <netdev+bounces-305654-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 08:48:59 +0200
+	id 5yyrLpX1TWrwAgIAu9opvQ
+	(envelope-from <netdev+bounces-305665-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 09:00:37 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 817FB722511
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 08:48:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B20AA7226ED
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 09:00:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305654-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305654-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305665-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305665-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2C60A300E31F
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 06:48:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D913F3045198
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 06:53:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F135F3E5EC6;
-	Wed,  8 Jul 2026 06:48:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F3C3E7BBB;
+	Wed,  8 Jul 2026 06:53:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out28-74.mail.aliyun.com (out28-74.mail.aliyun.com [115.124.28.74])
+Received: from out28-101.mail.aliyun.com (out28-101.mail.aliyun.com [115.124.28.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC153E51CC;
-	Wed,  8 Jul 2026 06:47:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387DA3DAC02;
+	Wed,  8 Jul 2026 06:53:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783493280; cv=none; b=BuFhptP2q+2q8Gs3z6epv//bNg0ocemVHR6ve+Xw7S42Je+WW0S6SuemT1AVRxXSlbIkTzLZwA54yJ02fOg9JQf8FuEEBTG4LOD5fTJxLTdu+Yd0N4uSy3nLQspNlojfADP7dnc3E05wcviI/juq4rSmcTqFwb8fV5c+ckpW55s=
+	t=1783493614; cv=none; b=Kbg5QSlobUnFYXgaUa3sOYQcL9GI/LKfHeXa5GQzLnTkmtbdb7m0RcAuGFxb0P0S/vMXvj6gAX7LqHgzR5Dew0CkoqXgVB5nkW7qXs0Pb3xcT28NP7vklV/ogqYCfR1oK++mY+1YyIi1VuJF2ACYDpdQ5mmaweSRg3R8uBzFC3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783493280; c=relaxed/simple;
-	bh=lQegSffsautsFqzjkhE9sTg1I216O9gFaVIdctB8uck=;
+	s=arc-20240116; t=1783493614; c=relaxed/simple;
+	bh=QOgrKln7DdIX6s37nEymUPbbwLmDFdSXjWiabZyYgoE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MYYVSZCyDOnnlfaELPNXdZoWEJo/qPID8QxFuoBGQQhxuEdI4tkgc0924iYGphqP91qJX/BEP7UHvsiVJ00oF45GJC/l3tHVxFgHfZb9TX+fHFu8lp79dGuorANzRpy7/8BUW6SUHJTfCETJ0x5efJUCGCBqSnR5vgPoti5AOTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com; spf=pass smtp.mailfrom=nebula-matrix.com; arc=none smtp.client-ip=115.124.28.74
-X-Alimail-AntiSpam:AC=CONTINUE;BC=0.06712908|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_alarm|0.00394422-0.00315705-0.992899;FP=13141337120659097266|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam033045213054;MF=illusion.wang@nebula-matrix.com;NM=1;PH=DS;RN=18;RT=18;SR=0;TI=SMTPD_---.iG5uJ1a_1783493267;
-Received: from localhost.localdomain(mailfrom:illusion.wang@nebula-matrix.com fp:SMTPD_---.iG5uJ1a_1783493267 cluster:ay29)
+	 MIME-Version; b=jIOH9xxMDvurQdONxkQs4uwH9b6TuODJbZyw/VZ3OJYt1vAj2TUepzi6pd3JTGFc2kgOykN2T6ruwpnMdx2lK4sfevIurD0Toc/8Gr+klSpOIf+z2jD9aDyUF6NUIsswBiwpzgkcxp4XMCuKGq6n+MIg4s8pDspGw4GSooyeNgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com; spf=pass smtp.mailfrom=nebula-matrix.com; arc=none smtp.client-ip=115.124.28.101
+X-Alimail-AntiSpam:AC=CONTINUE;BC=0.06712908|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_regular_dialog|0.0839016-0.0168439-0.899254;FP=17469866563720446116|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam033040074035;MF=illusion.wang@nebula-matrix.com;NM=1;PH=DS;RN=18;RT=18;SR=0;TI=SMTPD_---.iG5uJ2n_1783493269;
+Received: from localhost.localdomain(mailfrom:illusion.wang@nebula-matrix.com fp:SMTPD_---.iG5uJ2n_1783493269 cluster:ay29)
           by smtp.aliyun-inc.com;
-          Wed, 08 Jul 2026 14:47:48 +0800
+          Wed, 08 Jul 2026 14:47:49 +0800
 From: "illusion.wang" <illusion.wang@nebula-matrix.com>
 To: dimon.zhao@nebula-matrix.com,
 	illusion.wang@nebula-matrix.com,
@@ -57,9 +57,9 @@ Cc: andrew+netdev@lunn.ch,
 	skhan@linuxfoundation.org,
 	hkallweit1@gmail.com,
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH v21 net-next 02/12] net/nebula-matrix: add core driver architecture and HW layer initialization
-Date: Wed,  8 Jul 2026 14:47:28 +0800
-Message-ID: <20260708064742.35391-3-illusion.wang@nebula-matrix.com>
+Subject: [PATCH v21 net-next 03/12] net/nebula-matrix: add channel wire opcode enum definitions
+Date: Wed,  8 Jul 2026 14:47:29 +0800
+Message-ID: <20260708064742.35391-4-illusion.wang@nebula-matrix.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260708064742.35391-1-illusion.wang@nebula-matrix.com>
 References: <20260708064742.35391-1-illusion.wang@nebula-matrix.com>
@@ -82,7 +82,7 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-305654-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305665-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER(0.00)[illusion.wang@nebula-matrix.com,netdev@vger.kernel.org];
 	DMARC_NA(0.00)[nebula-matrix.com];
@@ -102,496 +102,270 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,nebula-matrix.com:from_mime,nebula-matrix.com:email,nebula-matrix.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,nebula-matrix.com:from_mime,nebula-matrix.com:email,nebula-matrix.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 817FB722511
+X-Rspamd-Queue-Id: B20AA7226ED
 
 From: illusion wang <illusion.wang@nebula-matrix.com>
 
-Add the fundamental driver architecture framework and Leonis hardware
-layer initialization for NBL NIC family.
+Add enum nbl_chan_msg_type to nbl_def_channel.h, which defines all
+PF/VF/firmware channel wire opcodes used for inter-component mailbox
+communication.
 
-- nbl_adapter/nbl_core/nbl_common_info core device context
-- PCI probe/remove entry and basic device capability parsing
-- 64/32-bit DMA mask fallback and PCI master setup
-- Leonis hardware BAR resource request and ioremap logic
+Each enumerator ordinal acts as the wire-format message ID. These opcodes
+are stable across firmware and driver versions; reordering or inserting
+new entries before NBL_CHAN_MSG_MAILBOX_MAX will break cross-version
+interoperability.
 
-This patch establishes the lowest HW layer and core infrastructure,
-preparing for subsequent device implementations.
+This commit only introduces the opcode ID enumeration. Message data
+structures and full channel layer logic are added in subsequent separate
+patches. Explicit fixed numeric values for each opcode will be assigned
+in a follow-up patch to avoid accidental opcode renumbering.
 
 Signed-off-by: illusion wang <illusion.wang@nebula-matrix.com>
 ---
- .../net/ethernet/nebula-matrix/nbl/Makefile   |   3 +-
- .../net/ethernet/nebula-matrix/nbl/nbl_core.h |  19 +++
- .../nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.c  | 141 ++++++++++++++++++
- .../nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.h  |  14 ++
- .../nebula-matrix/nbl/nbl_hw/nbl_hw_reg.h     |  28 ++++
- .../nbl/nbl_include/nbl_def_common.h          |  33 ++++
- .../nbl/nbl_include/nbl_def_hw.h              |  21 +++
- .../nbl/nbl_include/nbl_include.h             |   9 ++
- .../net/ethernet/nebula-matrix/nbl/nbl_main.c | 105 ++++++++++++-
- 9 files changed, 371 insertions(+), 2 deletions(-)
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.c
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_reg.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_common.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_hw.h
+ .../nbl/nbl_include/nbl_def_channel.h         | 232 ++++++++++++++++++
+ 1 file changed, 232 insertions(+)
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_channel.h
 
-diff --git a/drivers/net/ethernet/nebula-matrix/nbl/Makefile b/drivers/net/ethernet/nebula-matrix/nbl/Makefile
-index b90fba239401..caa863d3a582 100644
---- a/drivers/net/ethernet/nebula-matrix/nbl/Makefile
-+++ b/drivers/net/ethernet/nebula-matrix/nbl/Makefile
-@@ -3,4 +3,5 @@
- 
- obj-$(CONFIG_NBL) := nbl.o
- 
--nbl-objs +=      nbl_main.o
-+nbl-objs +=       nbl_hw/nbl_hw_leonis/nbl_hw_leonis.o \
-+				nbl_main.o
-diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_core.h b/drivers/net/ethernet/nebula-matrix/nbl/nbl_core.h
-index ef083956c695..7ae331959ca1 100644
---- a/drivers/net/ethernet/nebula-matrix/nbl/nbl_core.h
-+++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_core.h
-@@ -6,9 +6,28 @@
- #ifndef _NBL_CORE_H_
- #define _NBL_CORE_H_
- 
-+#include <linux/pci.h>
-+#include "nbl_include/nbl_include.h"
-+#include "nbl_include/nbl_def_common.h"
-+
-+struct nbl_hw_mgt;
-+
- enum {
- 	NBL_CAP_HAS_CTRL_BIT,
- 	NBL_CAP_HAS_NET_BIT,
- };
- 
-+struct nbl_core {
-+	struct nbl_hw_mgt *hw_mgt;
-+};
-+
-+struct nbl_adapter {
-+	struct pci_dev *pdev;
-+	struct nbl_core core;
-+	struct nbl_common_info common;
-+};
-+
-+struct nbl_adapter *nbl_core_init(struct pci_dev *pdev,
-+				  struct nbl_init_param *param);
-+void nbl_core_remove(struct nbl_adapter *adapter);
- #endif
-diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.c b/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.c
+diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_channel.h b/drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_channel.h
 new file mode 100644
-index 000000000000..b823c2114a0a
+index 000000000000..f8bffb925ade
 --- /dev/null
-+++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.c
-@@ -0,0 +1,141 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2025 Nebula Matrix Limited.
-+ */
-+#include <linux/device.h>
-+#include <linux/pci.h>
-+#include <linux/bits.h>
-+#include <linux/io.h>
-+#include <linux/spinlock.h>
-+#include <linux/bitfield.h>
-+#include "nbl_hw_leonis.h"
-+
-+/* Structure starts here, adding an op should not modify anything below */
-+static struct nbl_hw_mgt *nbl_hw_setup_hw_mgt(struct nbl_common_info *common)
-+{
-+	struct device *dev = common->dev;
-+	struct nbl_hw_mgt *hw_mgt;
-+
-+	hw_mgt = devm_kzalloc(dev, sizeof(*hw_mgt), GFP_KERNEL);
-+	if (!hw_mgt)
-+		return ERR_PTR(-ENOMEM);
-+
-+	hw_mgt->common = common;
-+
-+	return hw_mgt;
-+}
-+
-+static int nbl_pcim_request_selected_bars(struct pci_dev *pdev, u32 mask,
-+					  const char *name)
-+{
-+	int bar;
-+	int ret;
-+
-+	for (bar = 0; bar < PCI_STD_NUM_BARS; bar++) {
-+		if (!(mask & BIT(bar)))
-+			continue;
-+		ret = pcim_request_region(pdev, bar, name);
-+		if (ret)
-+			return ret;
-+	}
-+	return 0;
-+}
-+
-+int nbl_hw_init_leonis(struct nbl_adapter *adapter)
-+{
-+	struct nbl_common_info *common = &adapter->common;
-+	struct pci_dev *pdev = common->pdev;
-+	struct nbl_hw_mgt *hw_mgt = NULL;
-+	resource_size_t bar_len;
-+	u32 bar_mask;
-+	int ret;
-+
-+	hw_mgt = nbl_hw_setup_hw_mgt(common);
-+	if (IS_ERR(hw_mgt)) {
-+		ret = PTR_ERR(hw_mgt);
-+		goto setup_mgt_fail;
-+	}
-+	bar_mask = BIT(NBL_MEMORY_BAR) | BIT(NBL_MAILBOX_BAR);
-+	ret = nbl_pcim_request_selected_bars(pdev, bar_mask, NBL_DRIVER_NAME);
-+	if (ret) {
-+		dev_err(&pdev->dev,
-+			"Request memory bar failed, err = %d\n",
-+			ret);
-+		goto setup_mgt_fail;
-+	}
-+
-+	bar_len = pci_resource_len(pdev, NBL_MEMORY_BAR);
-+	if (!(pci_resource_flags(pdev, NBL_MEMORY_BAR) & IORESOURCE_MEM)) {
-+		dev_err(&pdev->dev, "MEMORY BAR is not memory resource\n");
-+		ret = -EINVAL;
-+		goto setup_mgt_fail;
-+	}
-+	if (common->has_ctrl) {
-+		if (bar_len < NBL_HW_REG_SPACE_SIZE) {
-+			dev_err(&pdev->dev,
-+				"MEMORY BAR len %pa too small for ctrl reg space\n",
-+				&bar_len);
-+			ret = -EINVAL;
-+			goto setup_mgt_fail;
-+		}
-+		if (bar_len < NBL_RDMA_NOTIFY_LEN) {
-+			dev_err(&pdev->dev,
-+				"MEMORY BAR len %pa too small to reserve notify region\n",
-+				&bar_len);
-+			ret = -EINVAL;
-+			goto setup_mgt_fail;
-+		}
-+		hw_mgt->hw_size = bar_len - NBL_RDMA_NOTIFY_LEN;
-+		hw_mgt->hw_addr =
-+			pcim_iomap(pdev, NBL_MEMORY_BAR,
-+				   hw_mgt->hw_size);
-+	} else {
-+		if (bar_len < NBL_REG_NET_ONLY_LEN) {
-+			dev_err(&pdev->dev,
-+				"MEMORY BAR insufficient for regs\n");
-+			ret = -EINVAL;
-+			goto setup_mgt_fail;
-+		}
-+		hw_mgt->hw_size = NBL_REG_NET_ONLY_LEN;
-+		hw_mgt->hw_addr = pcim_iomap(pdev, NBL_MEMORY_BAR,
-+					     hw_mgt->hw_size);
-+	}
-+	if (!hw_mgt->hw_addr) {
-+		dev_err(&pdev->dev, "MEMORY BAR pcim_iomap failed\n");
-+		ret = -EIO;
-+		goto setup_mgt_fail;
-+	}
-+
-+	bar_len = pci_resource_len(pdev, NBL_MAILBOX_BAR);
-+	if (!(pci_resource_flags(pdev, NBL_MAILBOX_BAR) & IORESOURCE_MEM)) {
-+		dev_err(&pdev->dev, "MAILBOX BAR is not memory resource\n");
-+		ret = -EINVAL;
-+		goto setup_mgt_fail;
-+	}
-+	if (bar_len == 0) {
-+		dev_err(&pdev->dev, "MAILBOX BAR length is zero\n");
-+		ret = -EINVAL;
-+		goto setup_mgt_fail;
-+	}
-+	hw_mgt->mailbox_bar_hw_addr = pcim_iomap(pdev, NBL_MAILBOX_BAR,
-+						 bar_len);
-+	if (!hw_mgt->mailbox_bar_hw_addr) {
-+		dev_err(&pdev->dev, "MAILBOX BAR pcim_iomap failed\n");
-+		ret = -EIO;
-+		goto setup_mgt_fail;
-+	}
-+
-+	adapter->core.hw_mgt = hw_mgt;
-+
-+	return 0;
-+
-+setup_mgt_fail:
-+	return ret;
-+}
-+
-+void nbl_hw_remove_leonis(struct nbl_adapter *adapter)
-+{
-+	/* All BAR mappings & PCI regions are managed by pcim/devres,
-+	 * no manual iounmap / release required
-+	 */
-+}
-diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.h b/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.h
-new file mode 100644
-index 000000000000..77c67b67ba31
---- /dev/null
-+++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.h
-@@ -0,0 +1,14 @@
++++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_channel.h
+@@ -0,0 +1,232 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/*
 + * Copyright (c) 2025 Nebula Matrix Limited.
 + */
 +
-+#ifndef _NBL_HW_LEONIS_H_
-+#define _NBL_HW_LEONIS_H_
++#ifndef _NBL_DEF_CHANNEL_H_
++#define _NBL_DEF_CHANNEL_H_
 +
-+#include <linux/types.h>
-+
-+#include "../../nbl_include/nbl_include.h"
-+#include "../nbl_hw_reg.h"
-+
-+#endif
-diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_reg.h b/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_reg.h
-new file mode 100644
-index 000000000000..96453d5d09da
---- /dev/null
-+++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_reg.h
-@@ -0,0 +1,28 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (c) 2025 Nebula Matrix Limited.
-+ */
-+
-+#ifndef _NBL_HW_REG_H_
-+#define _NBL_HW_REG_H_
-+
-+#include <linux/types.h>
-+
-+#include "../nbl_include/nbl_def_hw.h"
-+#include "../nbl_include/nbl_def_common.h"
-+#include "../nbl_core.h"
-+
-+#define NBL_MEMORY_BAR				0
-+#define NBL_MAILBOX_BAR				2
-+#define NBL_RDMA_NOTIFY_LEN			8192
-+#define NBL_REG_NET_ONLY_LEN			8192
-+#define NBL_HW_REG_SPACE_SIZE (32 * 1024 * 1024)
-+
-+struct nbl_hw_mgt {
-+	struct nbl_common_info *common;
-+	u8 __iomem *hw_addr;
-+	u8 __iomem *mailbox_bar_hw_addr;
-+	resource_size_t hw_size;
++enum nbl_chan_msg_type {
++	NBL_CHAN_MSG_ACK,
++	NBL_CHAN_MSG_ADD_MACVLAN,
++	NBL_CHAN_MSG_DEL_MACVLAN,
++	NBL_CHAN_MSG_ADD_MULTI_RULE,
++	NBL_CHAN_MSG_DEL_MULTI_RULE,
++	NBL_CHAN_MSG_SETUP_MULTI_GROUP,
++	NBL_CHAN_MSG_REMOVE_MULTI_GROUP,
++	NBL_CHAN_MSG_REGISTER_NET,
++	NBL_CHAN_MSG_UNREGISTER_NET,
++	NBL_CHAN_MSG_ALLOC_TXRX_QUEUES,
++	NBL_CHAN_MSG_FREE_TXRX_QUEUES,
++	NBL_CHAN_MSG_SETUP_QUEUE,
++	NBL_CHAN_MSG_REMOVE_ALL_QUEUES,
++	NBL_CHAN_MSG_CFG_DSCH,
++	NBL_CHAN_MSG_SETUP_CQS,
++	NBL_CHAN_MSG_REMOVE_CQS,
++	NBL_CHAN_MSG_CFG_QDISC_MQPRIO,
++	NBL_CHAN_MSG_CONFIGURE_MSIX_MAP,
++	NBL_CHAN_MSG_DESTROY_MSIX_MAP,
++	NBL_CHAN_MSG_MAILBOX_SET_IRQ,
++	NBL_CHAN_MSG_GET_GLOBAL_VECTOR,
++	NBL_CHAN_MSG_GET_VSI_ID,
++	NBL_CHAN_MSG_SET_PROMISC_MODE,
++	NBL_CHAN_MSG_GET_FIRMWARE_VERSION,
++	NBL_CHAN_MSG_GET_QUEUE_ERR_STATS,
++	NBL_CHAN_MSG_GET_COALESCE,
++	NBL_CHAN_MSG_SET_COALESCE,
++	NBL_CHAN_MSG_SET_SPOOF_CHECK_ADDR,
++	NBL_CHAN_MSG_SET_VF_SPOOF_CHECK,
++	NBL_CHAN_MSG_GET_RXFH_INDIR_SIZE,
++	NBL_CHAN_MSG_GET_RXFH_INDIR,
++	NBL_CHAN_MSG_GET_RXFH_RSS_KEY,
++	NBL_CHAN_MSG_GET_RXFH_RSS_ALG_SEL,
++	NBL_CHAN_MSG_GET_HW_CAPS,
++	NBL_CHAN_MSG_GET_HW_STATE,
++	NBL_CHAN_MSG_REGISTER_RDMA,
++	NBL_CHAN_MSG_UNREGISTER_RDMA,
++	NBL_CHAN_MSG_GET_REAL_HW_ADDR,
++	NBL_CHAN_MSG_GET_REAL_BDF,
++	NBL_CHAN_MSG_GRC_PROCESS,
++	NBL_CHAN_MSG_SET_SFP_STATE,
++	NBL_CHAN_MSG_SET_ETH_LOOPBACK,
++	NBL_CHAN_MSG_CHECK_ACTIVE_VF,
++	NBL_CHAN_MSG_GET_PRODUCT_FLEX_CAP,
++	NBL_CHAN_MSG_ALLOC_KTLS_TX_INDEX,
++	NBL_CHAN_MSG_FREE_KTLS_TX_INDEX,
++	NBL_CHAN_MSG_CFG_KTLS_TX_KEYMAT,
++	NBL_CHAN_MSG_ALLOC_KTLS_RX_INDEX,
++	NBL_CHAN_MSG_FREE_KTLS_RX_INDEX,
++	NBL_CHAN_MSG_CFG_KTLS_RX_KEYMAT,
++	NBL_CHAN_MSG_CFG_KTLS_RX_RECORD,
++	NBL_CHAN_MSG_ADD_KTLS_RX_FLOW,
++	NBL_CHAN_MSG_DEL_KTLS_RX_FLOW,
++	NBL_CHAN_MSG_ALLOC_IPSEC_TX_INDEX,
++	NBL_CHAN_MSG_FREE_IPSEC_TX_INDEX,
++	NBL_CHAN_MSG_ALLOC_IPSEC_RX_INDEX,
++	NBL_CHAN_MSG_FREE_IPSEC_RX_INDEX,
++	NBL_CHAN_MSG_CFG_IPSEC_TX_SAD,
++	NBL_CHAN_MSG_CFG_IPSEC_RX_SAD,
++	NBL_CHAN_MSG_ADD_IPSEC_TX_FLOW,
++	NBL_CHAN_MSG_DEL_IPSEC_TX_FLOW,
++	NBL_CHAN_MSG_ADD_IPSEC_RX_FLOW,
++	NBL_CHAN_MSG_DEL_IPSEC_RX_FLOW,
++	NBL_CHAN_MSG_NOTIFY_IPSEC_HARD_EXPIRE,
++	NBL_CHAN_MSG_GET_MBX_IRQ_NUM,
++	NBL_CHAN_MSG_CLEAR_FLOW,
++	NBL_CHAN_MSG_CLEAR_QUEUE,
++	NBL_CHAN_MSG_GET_ETH_ID,
++	NBL_CHAN_MSG_SET_OFFLOAD_STATUS,
++	NBL_CHAN_MSG_INIT_OFLD,
++	NBL_CHAN_MSG_INIT_CMDQ,
++	NBL_CHAN_MSG_DESTROY_CMDQ,
++	NBL_CHAN_MSG_RESET_CMDQ,
++	NBL_CHAN_MSG_INIT_FLOW,
++	NBL_CHAN_MSG_DEINIT_FLOW,
++	NBL_CHAN_MSG_OFFLOAD_FLOW_RULE,
++	NBL_CHAN_MSG_GET_ACL_SWITCH,
++	NBL_CHAN_MSG_GET_VSI_GLOBAL_QUEUE_ID,
++	NBL_CHAN_MSG_INIT_REP,
++	NBL_CHAN_MSG_GET_LINE_RATE_INFO,
++	NBL_CHAN_MSG_REGISTER_NET_REP,
++	NBL_CHAN_MSG_UNREGISTER_NET_REP,
++	NBL_CHAN_MSG_REGISTER_ETH_REP,
++	NBL_CHAN_MSG_UNREGISTER_ETH_REP,
++	NBL_CHAN_MSG_REGISTER_UPCALL_PORT,
++	NBL_CHAN_MSG_UNREGISTER_UPCALL_PORT,
++	NBL_CHAN_MSG_GET_PORT_STATE,
++	NBL_CHAN_MSG_SET_PORT_ADVERTISING,
++	NBL_CHAN_MSG_GET_MODULE_INFO,
++	NBL_CHAN_MSG_GET_MODULE_EEPROM,
++	NBL_CHAN_MSG_GET_LINK_STATE,
++	NBL_CHAN_MSG_NOTIFY_LINK_STATE,
++	NBL_CHAN_MSG_GET_QUEUE_CXT,
++	NBL_CHAN_MSG_CFG_LOG,
++	NBL_CHAN_MSG_INIT_VDPAQ,
++	NBL_CHAN_MSG_DESTROY_VDPAQ,
++	NBL_CHAN_MSG_GET_UPCALL_PORT,
++	NBL_CHAN_MSG_NOTIFY_ETH_REP_LINK_STATE,
++	NBL_CHAN_MSG_SET_ETH_MAC_ADDR,
++	NBL_CHAN_MSG_GET_FUNCTION_ID,
++	NBL_CHAN_MSG_GET_CHIP_TEMPERATURE,
++	NBL_CHAN_MSG_DISABLE_HW_FLOW,
++	NBL_CHAN_MSG_ENABLE_HW_FLOW,
++	NBL_CHAN_MSG_SET_UPCALL_RULE,
++	NBL_CHAN_MSG_UNSET_UPCALL_RULE,
++	NBL_CHAN_MSG_GET_REG_DUMP,
++	NBL_CHAN_MSG_GET_REG_DUMP_LEN,
++	NBL_CHAN_MSG_CFG_LAG_HASH_ALGORITHM,
++	NBL_CHAN_MSG_CFG_LAG_MEMBER_FWD,
++	NBL_CHAN_MSG_CFG_LAG_MEMBER_LIST,
++	NBL_CHAN_MSG_CFG_LAG_MEMBER_UP_ATTR,
++	NBL_CHAN_MSG_ADD_LAG_FLOW,
++	NBL_CHAN_MSG_DEL_LAG_FLOW,
++	NBL_CHAN_MSG_SWITCHDEV_INIT_CMDQ,
++	NBL_CHAN_MSG_SWITCHDEV_DEINIT_CMDQ,
++	NBL_CHAN_MSG_SET_TC_FLOW_INFO,
++	NBL_CHAN_MSG_UNSET_TC_FLOW_INFO,
++	NBL_CHAN_MSG_INIT_ACL,
++	NBL_CHAN_MSG_UNINIT_ACL,
++	NBL_CHAN_MSG_CFG_LAG_MCC,
++	NBL_CHAN_MSG_REGISTER_VSI2Q,
++	NBL_CHAN_MSG_SETUP_Q2VSI,
++	NBL_CHAN_MSG_REMOVE_Q2VSI,
++	NBL_CHAN_MSG_SETUP_RSS,
++	NBL_CHAN_MSG_REMOVE_RSS,
++	NBL_CHAN_MSG_GET_REP_QUEUE_INFO,
++	NBL_CHAN_MSG_CTRL_PORT_LED,
++	NBL_CHAN_MSG_NWAY_RESET,
++	NBL_CHAN_MSG_SET_INTL_SUPPRESS_LEVEL,
++	NBL_CHAN_MSG_GET_ETH_STATS,
++	NBL_CHAN_MSG_GET_MODULE_TEMPERATURE,
++	NBL_CHAN_MSG_GET_BOARD_INFO,
++	NBL_CHAN_MSG_GET_P4_USED,
++	NBL_CHAN_MSG_GET_VF_BASE_VSI_ID,
++	NBL_CHAN_MSG_ADD_LLDP_FLOW,
++	NBL_CHAN_MSG_DEL_LLDP_FLOW,
++	NBL_CHAN_MSG_CFG_ETH_BOND_INFO,
++	NBL_CHAN_MSG_CFG_DUPPKT_MCC,
++	NBL_CHAN_MSG_ADD_ND_UPCALL_FLOW,
++	NBL_CHAN_MSG_DEL_ND_UPCALL_FLOW,
++	NBL_CHAN_MSG_GET_BOARD_ID,
++	NBL_CHAN_MSG_SET_SHAPING_DPORT_VLD,
++	NBL_CHAN_MSG_SET_DPORT_FC_TH_VLD,
++	NBL_CHAN_MSG_REGISTER_RDMA_BOND,
++	NBL_CHAN_MSG_UNREGISTER_RDMA_BOND,
++	NBL_CHAN_MSG_RESTORE_NETDEV_QUEUE,
++	NBL_CHAN_MSG_RESTART_NETDEV_QUEUE,
++	NBL_CHAN_MSG_RESTORE_HW_QUEUE,
++	NBL_CHAN_MSG_KEEP_ALIVE,
++	NBL_CHAN_MSG_GET_BASE_MAC_ADDR,
++	NBL_CHAN_MSG_CFG_BOND_SHAPING,
++	NBL_CHAN_MSG_CFG_BGID_BACK_PRESSURE,
++	NBL_CHAN_MSG_ALLOC_KT_BLOCK,
++	NBL_CHAN_MSG_FREE_KT_BLOCK,
++	NBL_CHAN_MSG_GET_USER_QUEUE_INFO,
++	NBL_CHAN_MSG_GET_ETH_BOND_INFO,
++	NBL_CHAN_MSG_CLEAR_ACCEL_FLOW,
++	NBL_CHAN_MSG_SET_BRIDGE_MODE,
++	NBL_CHAN_MSG_GET_VF_FUNCTION_ID,
++	NBL_CHAN_MSG_NOTIFY_LINK_FORCED,
++	NBL_CHAN_MSG_SET_PMD_DEBUG,
++	NBL_CHAN_MSG_REGISTER_FUNC_MAC,
++	NBL_CHAN_MSG_SET_TX_RATE,
++	NBL_CHAN_MSG_REGISTER_FUNC_LINK_FORCED,
++	NBL_CHAN_MSG_GET_LINK_FORCED,
++	NBL_CHAN_MSG_REGISTER_FUNC_VLAN,
++	NBL_CHAN_MSG_GET_FD_FLOW,
++	NBL_CHAN_MSG_GET_FD_FLOW_CNT,
++	NBL_CHAN_MSG_GET_FD_FLOW_ALL,
++	NBL_CHAN_MSG_GET_FD_FLOW_MAX,
++	NBL_CHAN_MSG_REPLACE_FD_FLOW,
++	NBL_CHAN_MSG_REMOVE_FD_FLOW,
++	NBL_CHAN_MSG_CFG_FD_FLOW_STATE,
++	NBL_CHAN_MSG_REGISTER_FUNC_RATE,
++	NBL_CHAN_MSG_NOTIFY_VLAN,
++	NBL_CHAN_MSG_GET_XDP_QUEUE_INFO,
++	NBL_CHAN_MSG_STOP_ABNORMAL_SW_QUEUE,
++	NBL_CHAN_MSG_STOP_ABNORMAL_HW_QUEUE,
++	NBL_CHAN_MSG_NOTIFY_RESET_EVENT,
++	NBL_CHAN_MSG_ACK_RESET_EVENT,
++	NBL_CHAN_MSG_GET_VF_VSI_ID,
++	NBL_CHAN_MSG_CONFIGURE_QOS,
++	NBL_CHAN_MSG_GET_PFC_BUFFER_SIZE,
++	NBL_CHAN_MSG_SET_PFC_BUFFER_SIZE,
++	NBL_CHAN_MSG_GET_VF_STATS,
++	NBL_CHAN_MSG_REGISTER_FUNC_TRUST,
++	NBL_CHAN_MSG_NOTIFY_TRUST,
++	NBL_CHAN_MSG_CHECK_VF_IS_ACTIVE,
++	NBL_CHAN_MSG_GET_ETH_ABNORMAL_STATS,
++	NBL_CHAN_MSG_GET_ETH_CTRL_STATS,
++	NBL_CHAN_MSG_GET_PAUSE_STATS,
++	NBL_CHAN_MSG_GET_ETH_MAC_STATS,
++	NBL_CHAN_MSG_GET_FEC_STATS,
++	NBL_CHAN_MSG_CFG_MULTI_MCAST_RULE,
++	NBL_CHAN_MSG_GET_LINK_DOWN_COUNT,
++	NBL_CHAN_MSG_GET_LINK_STATUS_OPCODE,
++	NBL_CHAN_MSG_GET_RMON_STATS,
++	NBL_CHAN_MSG_REGISTER_PF_NAME,
++	NBL_CHAN_MSG_GET_PF_NAME,
++	NBL_CHAN_MSG_CONFIGURE_RDMA_BW,
++	NBL_CHAN_MSG_SET_RATE_LIMIT,
++	NBL_CHAN_MSG_SET_TC_WGT,
++	NBL_CHAN_MSG_REMOVE_QUEUE,
++	NBL_CHAN_MSG_GET_MIRROR_TABLE_ID,
++	NBL_CHAN_MSG_CONFIGURE_MIRROR,
++	NBL_CHAN_MSG_CONFIGURE_MIRROR_TABLE,
++	NBL_CHAN_MSG_CLEAR_MIRROR_CFG,
++	NBL_CHAN_MSG_MIRROR_OUTPUTPORT_NOTIFY,
++	NBL_CHAN_MSG_CHECK_FLOWTABLE_SPEC,
++	NBL_CHAN_MSG_CHECK_VF_IS_VDPA,
++	NBL_CHAN_MSG_GET_VDPA_VF_STATS,
++	NBL_CHAN_MSG_SET_RX_RATE,
++	NBL_CHAN_MSG_GET_UVN_PKT_DROP_STATS,
++	NBL_CHAN_MSG_GET_USTORE_PKT_DROP_STATS,
++	NBL_CHAN_MSG_GET_USTORE_TOTAL_PKT_DROP_STATS,
++	NBL_CHAN_MSG_SET_WOL,
++	NBL_CHAN_MSG_INIT_VF_MSIX_MAP,
++	NBL_CHAN_MSG_GET_ST_NAME,
++	/* mailbox msg end */
++	NBL_CHAN_MSG_MAILBOX_MAX,
 +};
 +
 +#endif
-diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_common.h b/drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_common.h
-new file mode 100644
-index 000000000000..95997c567a6a
---- /dev/null
-+++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_common.h
-@@ -0,0 +1,33 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (c) 2025 Nebula Matrix Limited.
-+ */
-+
-+#ifndef _NBL_DEF_COMMON_H_
-+#define _NBL_DEF_COMMON_H_
-+
-+#include <linux/types.h>
-+#include <linux/pci.h>
-+#include <linux/device.h>
-+#include "nbl_include.h"
-+
-+struct nbl_common_info {
-+	struct pci_dev *pdev;
-+	struct device *dev;
-+	u32 msg_enable;
-+	u16 vsi_id;
-+	u8 eth_id;
-+	u8 logic_eth_id;
-+	u8 eth_num;
-+
-+	u8 function;
-+	u8 devid;
-+	u8 bus;
-+	u8 hw_bus;
-+	u16 mgt_pf;
-+
-+	u8 has_ctrl;
-+	u8 has_net;
-+};
-+
-+#endif
-diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_hw.h b/drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_hw.h
-new file mode 100644
-index 000000000000..ab97956582b4
---- /dev/null
-+++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_hw.h
-@@ -0,0 +1,21 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (c) 2025 Nebula Matrix Limited.
-+ */
-+
-+#ifndef _NBL_DEF_HW_H_
-+#define _NBL_DEF_HW_H_
-+
-+#include <linux/types.h>
-+
-+struct nbl_hw_mgt;
-+struct nbl_adapter;
-+
-+struct nbl_hw_ops_tbl {
-+	struct nbl_hw_mgt *priv;
-+};
-+
-+int nbl_hw_init_leonis(struct nbl_adapter *adapter);
-+void nbl_hw_remove_leonis(struct nbl_adapter *adapter);
-+
-+#endif
-diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_include.h b/drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_include.h
-index cd99f96e1568..70f4f4b4c49c 100644
---- a/drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_include.h
-+++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_include.h
-@@ -10,5 +10,14 @@
- 
- /*  ------  Basic definitions  -------  */
- #define NBL_DRIVER_NAME					"nbl"
-+struct nbl_func_caps {
-+	u32 has_ctrl:1;
-+	u32 has_net:1;
-+	u32 rsv:30;
-+};
-+
-+struct nbl_init_param {
-+	struct nbl_func_caps caps;
-+};
- 
- #endif
-diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_main.c b/drivers/net/ethernet/nebula-matrix/nbl/nbl_main.c
-index 7c969c854bdc..2a0c0395a72f 100644
---- a/drivers/net/ethernet/nebula-matrix/nbl/nbl_main.c
-+++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_main.c
-@@ -8,16 +8,119 @@
- #include <linux/module.h>
- #include <linux/bits.h>
- #include "nbl_include/nbl_include.h"
-+#include "nbl_include/nbl_def_hw.h"
-+#include "nbl_include/nbl_def_common.h"
- #include "nbl_core.h"
- 
-+struct nbl_adapter *nbl_core_init(struct pci_dev *pdev,
-+				  struct nbl_init_param *param)
-+{
-+	struct nbl_common_info *common;
-+	struct nbl_adapter *adapter;
-+	int ret;
-+
-+	adapter = devm_kzalloc(&pdev->dev, sizeof(*adapter), GFP_KERNEL);
-+	if (!adapter)
-+		return ERR_PTR(-ENOMEM);
-+
-+	adapter->pdev = pdev;
-+	common = &adapter->common;
-+
-+	common->pdev = pdev;
-+	common->dev = &pdev->dev;
-+	common->has_ctrl = param->caps.has_ctrl;
-+	common->has_net = param->caps.has_net;
-+	common->function = PCI_FUNC(pdev->devfn);
-+	common->devid = PCI_SLOT(pdev->devfn);
-+	common->bus = pdev->bus->number;
-+
-+	ret = nbl_hw_init_leonis(adapter);
-+	if (ret)
-+		goto hw_init_fail;
-+
-+	return adapter;
-+hw_init_fail:
-+	return ERR_PTR(ret);
-+}
-+
-+void nbl_core_remove(struct nbl_adapter *adapter)
-+{
-+	nbl_hw_remove_leonis(adapter);
-+}
-+
-+static void nbl_get_func_param(struct pci_dev *pdev, kernel_ulong_t driver_data,
-+			       struct nbl_init_param *param)
-+{
-+	param->caps.has_net = !!(driver_data & BIT(NBL_CAP_HAS_NET_BIT));
-+
-+	/*
-+	 * Only PF0 possesses ctrl capability; all PFs share identical PCI
-+	 * device ID, so we handle this via special function ID judgement.
-+	 */
-+	if ((PCI_FUNC(pdev->devfn) == 0) && !pdev->is_virtfn)
-+		param->caps.has_ctrl = 1;
-+}
-+
- static int nbl_probe(struct pci_dev *pdev,
- 		     const struct pci_device_id *id)
- {
--	return -ENODEV;
-+	struct nbl_init_param param = { { 0 } };
-+	struct device *dev = &pdev->dev;
-+	struct nbl_adapter *adapter;
-+	int dma_32_err;
-+	int err;
-+
-+	err = pci_enable_device(pdev);
-+	if (err) {
-+		dev_err(&pdev->dev, "Failed to enable PCI dev, err=%d\n", err);
-+		return err;
-+	}
-+	err = pci_save_state(pdev);
-+	if (err) {
-+		dev_err(dev, "Save pci state failed %d\n", err);
-+		goto configure_dma_err;
-+	}
-+	nbl_get_func_param(pdev, id->driver_data, &param);
-+
-+	err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
-+	if (err) {
-+		dev_dbg(dev, "Configure DMA 64 bit mask failed, err = %d\n",
-+			err);
-+		dma_32_err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32));
-+		if (dma_32_err) {
-+			dev_err(dev,
-+				"Configure DMA 32 bit mask failed, err = %d\n",
-+				err);
-+			goto configure_dma_err;
-+		}
-+	}
-+	pci_set_master(pdev);
-+
-+	adapter = nbl_core_init(pdev, &param);
-+	if (IS_ERR(adapter)) {
-+		dev_err(dev, "Nbl adapter init fail: %pe\n", adapter);
-+		err = PTR_ERR(adapter);
-+		goto adapter_init_err;
-+	}
-+	pci_set_drvdata(pdev, adapter);
-+	return 0;
-+adapter_init_err:
-+	pci_clear_master(pdev);
-+configure_dma_err:
-+	pci_disable_device(pdev);
-+	return err;
- }
- 
- static void nbl_remove(struct pci_dev *pdev)
- {
-+	struct nbl_adapter *adapter = pci_get_drvdata(pdev);
-+
-+	if (adapter)
-+		nbl_core_remove(adapter);
-+
-+	pci_restore_state(pdev);
-+	pci_clear_master(pdev);
-+	pci_disable_device(pdev);
- }
- 
- /*
 -- 
 2.47.3
 
