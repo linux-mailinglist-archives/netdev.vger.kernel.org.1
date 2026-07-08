@@ -1,203 +1,170 @@
-Return-Path: <netdev+bounces-305774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305775-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id bPFRNXAzTmqHGwIAu9opvQ
-	(envelope-from <netdev+bounces-305774-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:24:32 +0200
+	id y0eoElE2TmplJAIAu9opvQ
+	(envelope-from <netdev+bounces-305775-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:36:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CB04724EF6
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:24:32 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 798FD725EA0
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:36:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Za4DuOW8;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=6r1x0ynR;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=i0hMqNmj;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Aj3XLAhY;
-	dmarc=pass (policy=none) header.from=suse.de;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305774-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305774-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=ijaMb2bP;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305775-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-305775-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 359D430C1A61
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 11:18:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AA63C304AA39
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 11:22:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E7F643F4AD;
-	Wed,  8 Jul 2026 11:16:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C07C743F4CA;
+	Wed,  8 Jul 2026 11:19:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D36D43E4A2
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 11:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69DD343E9CD
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 11:19:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783509414; cv=none; b=tOCSex+/RgD1BE1152XNtYe+l0Olt/Vb0wXxYrPmiCQ8+JaPSWcKNrI9zSRDL/FgWAW72ynpotZGFIg8VYUo99quxA9V6/Ft+qz8D0us2s3s0PMe9VWGc0vX8wCOKymXmrzlw80lLuAitlSi/mPXHIdnEKytpaTQ4xtjcyf2WaE=
+	t=1783509542; cv=none; b=fTN1sin9uMITt6ccs/wU/04F7olOEg4AlHEEGnzqjVuK30ymhKQDNG3uGJuSb6zP+ncvVlnzb05Nm1xySoCL7xe37wNdu3reFKLMsYVEynIuUs3d+JfRFVGN0t0nEncT6IhLgNHWfwpi1hE//apWCvd/JQotC2TifWz8mG+CT68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783509414; c=relaxed/simple;
-	bh=3PInDbf4JbfgTmFx+PN8mNEA88VRjgw5io2se7ift1c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ic5lzGTfvZiwT7VGYkaYO0H3ZTle1CaY+vROqimLzSrcEz20889C8BbKlLkpd3S1PW6EqljJyxcf6xtxg9C+pdq8FEjzKRSyZ57lNkJFqvZr8kSMPX+ctLglJxD3oIg8Pa/6zYgupZclL9AjdhHDS0xNkEtkBhmyKgib0j1fhzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Za4DuOW8; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=6r1x0ynR; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=i0hMqNmj; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Aj3XLAhY; arc=none smtp.client-ip=195.135.223.131
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id D033D759DC;
-	Wed,  8 Jul 2026 11:16:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1783509408; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zf0N7hyL9ieefPaK1hQyYaoHoBFLf71w/CV6PNdQScA=;
-	b=Za4DuOW8aViDWdGKSRqUx+4l0Wiat9bfqmZmUpcJU4asPLP2SHTX5SRpROgsQ08eJN1xBi
-	qY3On68ubhYOTy4etsXYgv/c32bIZQGW+2iDNmvI4CtOn5ojw4nE2pMXfUJTy8nRjeiYcm
-	lD4lqTtj3TUUTUSMzpPF5psGnesq2AU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1783509408;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zf0N7hyL9ieefPaK1hQyYaoHoBFLf71w/CV6PNdQScA=;
-	b=6r1x0ynRj86u7sQ1VQIc9IRfOk/cBqFF9KRYm+28V22F8wBxU+EUCOncVAtBQ1OtmqH5eI
-	EI4VRIkQK9uUlGCg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1783509407; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zf0N7hyL9ieefPaK1hQyYaoHoBFLf71w/CV6PNdQScA=;
-	b=i0hMqNmjGuh18zyd9w7EBeCsH3kQW85vULtgyHNjuKGx+sz2m8SL74PJLqYEReu9RZbtv+
-	OMnuopjq1kf3VMNu1oF9xcqtPGRKZ6u6Sp041aF9TbrJvcx0CeAUP5g95t2Rpu+TewoSVm
-	38IEf9OIvW51n7bf1Nz5bDcochaADvs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1783509407;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zf0N7hyL9ieefPaK1hQyYaoHoBFLf71w/CV6PNdQScA=;
-	b=Aj3XLAhYXjGFu1orWSrMrTIBuRA+FR70+NILNlEteFudv028P9a5xA0UZdzNJLRM8qzlKX
-	KwpBM+z5LjKsQABA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E0590779AE;
-	Wed,  8 Jul 2026 11:16:46 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id GMK9Mp4xTmriQQAAD6G6ig
-	(envelope-from <pfalcato@suse.de>); Wed, 08 Jul 2026 11:16:46 +0000
-Date: Wed, 8 Jul 2026 12:16:44 +0100
-From: Pedro Falcato <pfalcato@suse.de>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Jason Xing <kerneljasonxing@gmail.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, Kees Cook <kees@kernel.org>, linux-mm@kvack.org, 
-	Vlastimil Babka <vbabka@kernel.org>, Harry Yoo <harry@kernel.org>
-Subject: Re: [PATCH net-next v3] net: skb: isolate skb data area allocations
- into a separate bucket
-Message-ID: <ak4w2k4Woj55E0On@pedro-suse>
-References: <20260702170728.168755-1-pfalcato@suse.de>
- <04debe19-bbe8-4b5f-9668-753d1f97832d@redhat.com>
+	s=arc-20240116; t=1783509542; c=relaxed/simple;
+	bh=Fh52x4Vt0BpyOjAih35iTF09I10Gnxn7njczCHjHsis=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XXMkGa39/ujw4G63i7bi6RAzgPlrMWiYEfHbuWL+1NdzbICmNg6XBfYEfGnxPuwlibgR7ryWM2Ackn3k1SDtKWpTiKu5YsXBmaN7j1I5eXwCFLObK63oj/b2J/sCCkGluSlU/AFOc+o7/Ux58NTraKRF1K41ykhhFmFtQVb4DY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ijaMb2bP; arc=none smtp.client-ip=209.85.214.175
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2caea3f742bso9738435ad.0
+        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 04:19:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783509541; x=1784114341; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=dtrnVdmp8xU1FJJT2ghOauXbPCWLYJ7jSo2ML1ydzG0=;
+        b=ijaMb2bP+G8IIYtBQype3Fe+aurN7UpK3wHD9cHr+erL3A4qFPgUHKmzoCaY33QpqQ
+         L6I+JdgYgPxkPt4Xk67wG0TLkq8t7PXSpeF2JIlAOW295HiKVFmUVjoqtYDgh0yFlWc6
+         vNAu7O0Uw4q26QaDTO/+shdA8lGLtx/eaCe1qwCJ6E7X3LryhdsmbZMYVQX1QMnt+Z11
+         Q2iSOe6bLsCV2OLEn08RXdMY5qo1eEylQHQelw1Muc80/jbPAwqOb86iO+keGgaLWW6Q
+         m0LGX/KRESOf7RUuEd/oRsP8xmJMvjJZtevMSo9eqy5oGGccGsADxhsOpfJH2WFSNetl
+         vYdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783509541; x=1784114341;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=dtrnVdmp8xU1FJJT2ghOauXbPCWLYJ7jSo2ML1ydzG0=;
+        b=bwfNzo+pQSrtQfxs2geWnvapX6NxZGGk7Mt7GSaxYFUIUFaqylsaCzgN8RnOAhAD8z
+         jyDzSffn8oIEauHBl7SnixU6kyDTKg5azI4mnS09MMRnjPxRxPYSk5nrBVS9rY/aZGMI
+         Th9i7rOd8mPgaN2fvgQnDx3JnlkiY37DaxLUk2J0W462Mv+RNECHrhxFBW3LuPajnwSB
+         pVcp8k2IuKbgNrbchAhfhCKR3QFBQeklCsMV4RKOdnSIxFkCd8G5jJEOEasAr8xVGLUv
+         FCzSzU7Ag3yrNSgIVV5RG2tUKuvtK03Nz7IAWkJ/qrUivMUmHQRDPLLtmp3hs1HM9lKq
+         Eigw==
+X-Forwarded-Encrypted: i=1; AHgh+RqopDwAE4wGYj3Ce/k8f657V805q09CmGHxymfbDNKg60i/fn/6Yq8mK3hUVjRM8WtpSWivwbA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbJgGxup+p0NCkQuk4R7lUa/KLBra1/L7+VgVaMkwUQMamn64u
+	fQDYKdereXzgaMFugLiT4+Iln7K1pFc8PYFcYozr2p7Yeye/89I4I1Hi
+X-Gm-Gg: AfdE7cm6PPTKVeRHGEbuHg+Tm93+D4pacbS7y62hmiMBrSoaSX+8EWTXW3KK+r5ZnZU
+	xj4T+EBZrpeuwBDU0TMDu1A0HIbXFV4/Kf2ApRWt7vudsv0DV7iysVWhyZ9fyalOTRjK4mwni0O
+	QpiVNPrjQjYzOBZBZl0Cmua1cT5P4wz11dXhK3rk74N5hTqLPr9mGiykLUiEAeDbbxpxC2/aO6y
+	vLgAnQrF7WcKq98bBiiVIeBzpX7pWHiV9KyKcZg2qxSmb3DLhPGE7eXo1yN9PAHkYwHbs2HVDBh
+	bO0xce4hO2AJBt/JYdIjYHmILpk9NWbrkhlsGTAq9uDnvcIwH4VnLvDdJgxYYcC8vItpJc/jnw6
+	eu0eSdkT5Z24bfyLTCMXr1AcX5TRG7xLpJWFuZafi4fZeL9O+7crLIwhzZxsj/JmRaYgCxb/hcw
+	bOqNawZfvxGRS/PX9yc8lW
+X-Received: by 2002:a17:902:f547:b0:2c9:cf41:adf9 with SMTP id d9443c01a7336-2ccea5aecd4mr24313285ad.47.1783509540668;
+        Wed, 08 Jul 2026 04:19:00 -0700 (PDT)
+Received: from lgs.. ([101.76.249.46])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9d3d968sm26108005ad.60.2026.07.08.04.18.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jul 2026 04:19:00 -0700 (PDT)
+From: Guangshuo Li <lgs201920130244@gmail.com>
+To: Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Guangshuo Li <lgs201920130244@gmail.com>
+Subject: [PATCH] dpaa2-eth: put MAC endpoint device on disconnect
+Date: Wed,  8 Jul 2026 19:17:37 +0800
+Message-ID: <20260708111738.750391-1-lgs201920130244@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <04debe19-bbe8-4b5f-9668-753d1f97832d@redhat.com>
-X-Spam-Flag: NO
-X-Spam-Score: -4.01
-X-Spam-Level: 
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-305774-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-305775-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:horms@kernel.org,m:kerneljasonxing@gmail.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-hardening@vger.kernel.org,m:kees@kernel.org,m:linux-mm@kvack.org,m:vbabka@kernel.org,m:harry@kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[pfalcato@suse.de,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,gmail.com,vger.kernel.org,kvack.org];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER(0.00)[lgs201920130244@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:ioana.ciornei@nxp.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:lgs201920130244@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pfalcato@suse.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[suse.de:+];
+	FROM_NEQ_ENVFROM(0.00)[lgs201920130244@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,suse.de:from_mime,suse.de:dkim,pedro-suse:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4CB04724EF6
+X-Rspamd-Queue-Id: 798FD725EA0
 
-On Wed, Jul 08, 2026 at 10:30:50AM +0200, Paolo Abeni wrote:
-> On 7/2/26 7:07 PM, Pedro Falcato wrote:> @@ -586,6 +586,8 @@ struct
-> sk_buff *napi_build_skb(void *data, unsigned int frag_size)
-> >  }
-> >  EXPORT_SYMBOL(napi_build_skb);
-> >  
-> > +static kmem_buckets *skb_data_buckets __ro_after_init;
-> > +
-> >  static void *kmalloc_pfmemalloc(size_t obj_size, gfp_t flags, int node)
-> >  {
-> >  	if (!gfp_pfmemalloc_allowed(flags))
-> > @@ -593,7 +595,8 @@ static void *kmalloc_pfmemalloc(size_t obj_size, gfp_t flags, int node)
-> >  	if (!obj_size)
-> >  		return kmem_cache_alloc_node(net_hotdata.skb_small_head_cache,
-> >  					     flags, node);
-> > -	return kmalloc_node_track_caller(obj_size, flags, node);
-> > +	return kmem_buckets_alloc_node_track_caller(skb_data_buckets, obj_size,
-> > +						    flags, node);
-> 
-> Sashiko noted that some drivers may require GFP_DMA buckets, and the
-> above may break them:
-> 
-> https://sashiko.dev/#/patchset/20260702170728.168755-1-pfalcato%40suse.de
+fsl_mc_get_endpoint() returns the MAC endpoint device with a reference
+taken through device_find_child(). The Ethernet connect path stores that
+device in mac->mc_dev and keeps it for the lifetime of the connected MAC
+object.
 
-Oh, this is really awkward. Adding linux-mm and slab maintainers for input here.
+However, the disconnect path only disconnects and closes the MAC before
+freeing the dpaa2_mac object. It does not drop the endpoint device
+reference stored in mac->mc_dev, so every successful connect leaks that
+device reference when the MAC is later disconnected.
 
-Considering the current slab bucketing does not seem to duplicate DMA or
-CGROUP caches, could it make sense to duplicate those as well? Otherwise we
-could add a branch like:
+Drop the endpoint device reference after closing the MAC and before
+freeing the dpaa2_mac object.
 
-if (gfp_flags & __GFP_DMA)
-	/* use the global dma kmalloc caches */
+Fixes: 719479230893 ("dpaa2-eth: add MAC/PHY support through phylink")
+Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
+---
+ drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> 
-> >  }
-> >  
-> >  /*
-> > @@ -634,7 +637,7 @@ static void *kmalloc_reserve(unsigned int *size, gfp_t flags, int node,
-> >  	 * Try a regular allocation, when that fails and we're not entitled
-> >  	 * to the reserves, fail.
-> >  	 */
-> > -	obj = kmalloc_node_track_caller(obj_size,
-> > +	obj = kmem_buckets_alloc_node_track_caller(skb_data_buckets, obj_size,
-> >  					flags | __GFP_NOMEMALLOC | __GFP_NOWARN,
-> >  					node);
-> 
-> Minor nit: checkpatch laments WRT brackets alignment.
-
-Will fix, thanks.
-
+diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
+index 9335703768a9..764d2a09668f 100644
+--- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
++++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
+@@ -4732,6 +4732,7 @@ static void dpaa2_eth_disconnect_mac(struct dpaa2_eth_priv *priv)
+ 		dpaa2_mac_disconnect(mac);
+ 
+ 	dpaa2_mac_close(mac);
++	put_device(&mac->mc_dev->dev);
+ 	kfree(mac);
+ }
+ 
 -- 
-Pedro
+2.43.0
+
 
