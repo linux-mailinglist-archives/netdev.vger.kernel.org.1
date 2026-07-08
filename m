@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-305823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305821-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id O47AIIBUTmpQKwIAu9opvQ
-	(envelope-from <netdev+bounces-305823-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:45:36 +0200
+	id vU+ICBtVTmpqKwIAu9opvQ
+	(envelope-from <netdev+bounces-305821-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:48:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79EFE726ED7
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:45:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50A8D726F1F
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:48:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=kRrlWPPc;
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=Z4nAj4EH;
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305823-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305823-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305821-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305821-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DD12B3032806
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 13:42:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 279D531269B8
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 13:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59265380FEA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57A94380FC9;
 	Wed,  8 Jul 2026 13:42:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326D63806AB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325B43803C6;
 	Wed,  8 Jul 2026 13:42:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783518121; cv=none; b=WfLCJ2yvUyhDOatukeO0UvWZQ9knw4OR1dXwZqjK7JDXfX7yoMKLUaHWDVvgRabf2qCq/8jTBxwuN8Hzs+2si8GKHD4f/JdKosqBOr9byy7wiTqompbi8Ualf3K1txqMQBkjKPAusUVV06hTShTGkJKqa/lQ1o9jFARY9rhdjt4=
+	t=1783518121; cv=none; b=e+uKz7K1kL4jhzTc885l9ELHO62MpHBuUMzUjUhgVRWXQzUCS/uGa4fdHypW3pARu87tJY9NGEuQpHMWG10Ymb9fioCAAAQrNxR7ATURZ9SN6wNeMMxnMo8Udcnc28DL8NIc2SIJyz4/3z00bs/dbgDBjBT/zsps9p2QPffhXk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783518121; c=relaxed/simple;
-	bh=766ztwFBIetWgxKoZZgeUKJCGrbo58G2Y/FPIvlaf+s=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ZPTZpGu1SWn9JURJYrQQNs2pbHVQbrtDgUzsi1D4uoRkpsjAOy7wIlfc7k7xopht3O4v4CSvoDiFzDYNaciFtYD6IuuM0YX7wnNCpgCOmg4oZxMbb5rmoQ8fDYv7bcXOZQNAiMC7INwD4qngyKHwoTpspWK2P03Gihjx0HeoEus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kRrlWPPc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D7C48C2BCB9;
+	bh=Bm7RObp9s++cBMV9gkbZTmjkcWOyReBVOW6pz3ieI9I=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=GX9PyY7rYOIFKboFBrdrU0qj1EbyChYDmD3lm5eEfJKDpSuwmfToMRYgFtq31iX6XEdEwnr0c/vsVYtS+vriLqPzHhsa9TeHMaAIk2gAB6VxFqmLhQMuxLm/UP3C9RMgRe1UI4vIvsrcOvgl3BWXdVlE2pv3jP8MPcQY4n4nMoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z4nAj4EH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E2C48C2BCF5;
 	Wed,  8 Jul 2026 13:42:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1783518120;
-	bh=766ztwFBIetWgxKoZZgeUKJCGrbo58G2Y/FPIvlaf+s=;
-	h=From:Subject:Date:To:Cc:Reply-To:From;
-	b=kRrlWPPcZZtpyUjdL3CySjh8lCjWXipygSEsZ9LjMlShETC4Khky5kOLtbk3ZBUUb
-	 E6bHxtaTPQHt9X/Opec1ok2Haq7vavnY1vm7h6keBJsz7C0gtBLyS3/Oaq7YLATggr
-	 72zXWC0mgfJnBXrntyd9APG6vYWi17So9ArM49oFpMkCmIFLV6ApbDparBCGS5j5LV
-	 eke4Q48cgM6zOM1BJo+h0mdwiPX85VwA5B09p+4ahR/cPGwTsvfN0l7+s8rD42qEvV
-	 tTtHoxzJX4zJmb0MtxqIKobA/dNNf5py8mpGkc1B4hwIo8/MwvdCj/EtJ1mU/xuLWF
-	 gqVobP1xK9uvw==
+	bh=Bm7RObp9s++cBMV9gkbZTmjkcWOyReBVOW6pz3ieI9I=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=Z4nAj4EHwFWipzPWBGfUODXCzMvclcqA5zEg4UL6KMhyPiCq177S8frkzkTGtj+/0
+	 eVxRgPovQ6F6URO87oF5K5fnoxzG4HqFeBj1lk9yTukurj3fyeNrKYruF0hPxQTXB2
+	 MoKsBrOoCmy1/jRU8mpew5f+fuYWkj5dlw4AR0Xwv0qcnIrrRqY7h6lfUF9bpRtBaT
+	 VSSRvrcxlDg/KvVl4tttRC/Aw8wN6XoRmnt8aeJ64KyeLrPaqyqRIzAUF675vYJkVT
+	 nZ4CkpAiuDQVIc0BN7B8L+c8arOFu7pmCz5dEuUbTSMYa3OQ8cCoMZewB6XwMoFEsa
+	 JA1JhofaMfC1Q==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B49D4C43458;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C445FC43602;
 	Wed,  8 Jul 2026 13:42:00 +0000 (UTC)
 From: Mattia Meleleo via B4 Relay <devnull+mattia.meleleo.coralogix.com@kernel.org>
-Subject: [PATCH bpf v2 0/2] bpf, sockmap: Fix FIONREAD for sockets without
- a verdict program
-Date: Wed, 08 Jul 2026 15:40:55 +0200
-Message-Id: <20260708-fionread-no-verdict-v2-0-29dd293621c7@coralogix.com>
+Date: Wed, 08 Jul 2026 15:40:56 +0200
+Subject: [PATCH bpf v2 1/2] bpf, sockmap: Account for receive queue in
+ FIONREAD without a verdict program
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,11 +61,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/32NwQ6CMBBEf4Xs2RqoSK0n/8NwKMsW1iglLTYYw
- r9b8O7xTd7MLBDIMwW4Zgt4ihzYDQnkIQPszdCR4DYxyFxWucqVsEnwZFoxOBHJt4yTMKW9VFo
- Z1FZDao6eLM/76h2a0UL9C8O7eRBO296m9Rwm5z/7dyx2+e9NLEQhkHRplDydFeENnTdP1/F8R
- PeCel3XL83dMgDRAAAA
-X-Change-ID: 20260707-fionread-no-verdict-a4f8697ac9f9
+Message-Id: <20260708-fionread-no-verdict-v2-1-29dd293621c7@coralogix.com>
+References: <20260708-fionread-no-verdict-v2-0-29dd293621c7@coralogix.com>
+In-Reply-To: <20260708-fionread-no-verdict-v2-0-29dd293621c7@coralogix.com>
 To: bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org, John Fastabend <john.fastabend@gmail.com>, 
  Jakub Sitnicki <jakub@cloudflare.com>, 
@@ -74,11 +72,11 @@ Cc: netdev@vger.kernel.org, John Fastabend <john.fastabend@gmail.com>,
  Emil Tsalapatis <emil@etsalapatis.com>, 
  Mattia Meleleo <mattia.meleleo@coralogix.com>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1783518119; l=1123;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1783518119; l=1935;
  i=mattia.meleleo@coralogix.com; s=20260707; h=from:subject:message-id;
- bh=766ztwFBIetWgxKoZZgeUKJCGrbo58G2Y/FPIvlaf+s=;
- b=c3Ik8Gu7yKFePrD+Vyi7Z+EJBxqPu6omkq95Cp/7RvNogFSQ5dAN95OUuetKY0TVtRVbewzYh
- qcaj/FQApKVBQBD31jI0Ze8WXaG8ER1TBCDAuXmN/Ivqg1GD5E8WSHf
+ bh=+7W+UywcmQEf+EMNYloJybeZfGEOpWtaZ50KeeVhEPM=;
+ b=rJB40xzHsfzfq0DEE+iaFOQymdme8+o6xox98Q11IEKechOz/K1/KHm8zeoZ2APnI/TVR2O9w
+ fsSRAZyQig+DF1kGPzTppidER3cP+Y58qa1D5Tb5IDxoN47xojab04N
 X-Developer-Key: i=mattia.meleleo@coralogix.com; a=ed25519;
  pk=cs1zLoe3YDm4bJ7bfbPaZH0lHnd871JyJLiSh2eEzLs=
 X-Endpoint-Received: by B4 Relay for mattia.meleleo@coralogix.com/20260707
@@ -91,13 +89,13 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305823-lists,netdev=lfdr.de,mattia.meleleo.coralogix.com];
+	TAGGED_FROM(0.00)[bounces-305821-lists,netdev=lfdr.de,mattia.meleleo.coralogix.com];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:memxor@gmail.com,m:emil@etsalapatis.com,m:mattia.meleleo@coralogix.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
@@ -117,38 +115,70 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	HAS_REPLYTO(0.00)[mattia.meleleo@coralogix.com]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 79EFE726ED7
+X-Rspamd-Queue-Id: 50A8D726F1F
 
-Sockets added to a sockmap/sockhash with no stream/skb verdict program
-attached answer FIONREAD with 0 even when unread data is pending in
-sk_receive_queue. Fix tcp_bpf_ioctl() to account for the receive queue
-in that case, and add a selftest.
+From: Mattia Meleleo <mattia.meleleo@coralogix.com>
 
-Changes in v2:
-- Split the fix and the selftest into separate patches
-- Use READ_ONCE() to read the verdict program pointers
-- Link to v1: https://patch.msgid.link/20260707-fionread-no-verdict-v1-1-ce94a72357ec@coralogix.com
+tcp_bpf_ioctl() answers SIOCINQ from psock->msg_tot_len, which only
+counts bytes in ingress_msg. Without a stream/skb verdict program
+nothing is diverted there: data stays in sk_receive_queue, so FIONREAD
+returns 0 even though read() returns data.
 
+Add tcp_inq() to the reported value when the psock has no verdict
+program. The two queues are disjoint, so bytes redirected into
+ingress_msg from other sockets stay correctly accounted through
+msg_tot_len.
+
+Fixes: 929e30f93125 ("bpf, sockmap: Fix FIONREAD for sockmap")
+Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
 Signed-off-by: Mattia Meleleo <mattia.meleleo@coralogix.com>
 ---
-Mattia Meleleo (2):
-      bpf, sockmap: Account for receive queue in FIONREAD without a verdict program
-      selftests/bpf: Test FIONREAD on a sockmap socket without a verdict program
+ net/ipv4/tcp_bpf.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
- net/ipv4/tcp_bpf.c                                 | 17 +++++++++-
- .../selftests/bpf/prog_tests/sockmap_basic.c       | 39 ++++++++++++++++++++++
- 2 files changed, 55 insertions(+), 1 deletion(-)
----
-base-commit: d2c9a99135da931377240942d44f3dea104cedb8
-change-id: 20260707-fionread-no-verdict-a4f8697ac9f9
+diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
+index cc0bd73f3..8e905b50d 100644
+--- a/net/ipv4/tcp_bpf.c
++++ b/net/ipv4/tcp_bpf.c
+@@ -334,6 +334,7 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
+ 
+ static int tcp_bpf_ioctl(struct sock *sk, int cmd, int *karg)
+ {
++	struct sk_psock *psock;
+ 	bool slow;
+ 
+ 	if (cmd != SIOCINQ)
+@@ -344,7 +345,21 @@ static int tcp_bpf_ioctl(struct sock *sk, int cmd, int *karg)
+ 		return -EINVAL;
+ 
+ 	slow = lock_sock_fast(sk);
+-	*karg = sk_psock_msg_inq(sk);
++	psock = sk_psock_get(sk);
++	if (unlikely(!psock)) {
++		unlock_sock_fast(sk, slow);
++		return tcp_ioctl(sk, cmd, karg);
++	}
++	*karg = sk_psock_get_msg_len_nolock(psock);
++	/* Without a verdict program, ingress data is never diverted to
++	 * ingress_msg: it stays in sk_receive_queue and is read through
++	 * the fallback to tcp_recvmsg(), so account for it like
++	 * tcp_ioctl() does.
++	 */
++	if (!READ_ONCE(psock->progs.stream_verdict) &&
++	    !READ_ONCE(psock->progs.skb_verdict))
++		*karg += tcp_inq(sk);
++	sk_psock_put(sk, psock);
+ 	unlock_sock_fast(sk, slow);
+ 
+ 	return 0;
 
-Best regards,
---  
-Mattia Meleleo <mattia.meleleo@coralogix.com>
+-- 
+Git-155)
 
 
 
