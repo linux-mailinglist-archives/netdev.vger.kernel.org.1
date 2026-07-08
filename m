@@ -1,212 +1,169 @@
-Return-Path: <netdev+bounces-305768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305772-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3e+6FWIuTmoNEwIAu9opvQ
-	(envelope-from <netdev+bounces-305768-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:02:58 +0200
+	id 3G3OGtQxTmqeFwIAu9opvQ
+	(envelope-from <netdev+bounces-305772-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:17:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A05A07249E8
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:02:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8581724CC7
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 13:17:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=baylibre.com header.s=google header.b=TVCoBivw;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305768-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305768-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=qeYd3w2+;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305772-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305772-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 68D573003E99
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 11:02:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 270403017C11
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 11:12:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 809E64314A3;
-	Wed,  8 Jul 2026 11:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC47403150;
+	Wed,  8 Jul 2026 11:12:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F60430CF0
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 11:02:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931E730C163
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 11:12:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783508570; cv=none; b=EfuiKZf5NS0L+qPAeNZgB+TK64A1SFSMvTEtXguYqJNfRF6n971zWns4S+42iXwRUCRjhxA6/WFie43YuUet4jVnpyZEtIFDcpJ0KpiY9mGwVhv3e8GAIrC/D658Ot+ZekahEAjNp8mOePPpb5O58NpqSz5Y+zpb5ChEm9DDWDg=
+	t=1783509176; cv=none; b=m+RsUQfKuA6x93dLK81qrGSCS6EVGBZQlVYt5qvRZ6Nn4k5EkXPUHVyF+AQz2oKHTQdlDNOeiJ41Yj7DdDVMObJuumH8pNMOOEvZ5kRBfzbHCj4WUb6OpYLIRVHRfZvb37m3HVLFDCmhMOJK2rKPoVifnv9kaPFE+bFdRAYv5gA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783508570; c=relaxed/simple;
-	bh=oPZaKv1OXlABgq9QPAtMKfhvRK+tiC3E15Kuw9g/LH0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dNs4XSuxjR0D4yKbCtOr22sn1kAA+8mVLv6iitGTBK+D+FFGMUz+iwQYzZXHjndV74kvY8rZ9DwizNkmAUztx1wvinDVvf6wLeCKMuEHC/3YeIzso9SF4Z1/AF0EWOsZ3JCMi/29hpzzRUkxh9qa5UPa8JoJxVUGg5JzDyd+6F4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=TVCoBivw; arc=none smtp.client-ip=209.85.128.46
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-493b27c7451so18913595e9.0
-        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 04:02:43 -0700 (PDT)
+	s=arc-20240116; t=1783509176; c=relaxed/simple;
+	bh=vAYuSKepYX2R6SHPiXef5gcb+t+WIrxDadX/4+/aE/4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lYp2lCEh8LHfoE0R4GBISQHZRAslOE0PnYWjAbwNCqu3Sxi5tuZepc6KerfhjyxXG7ZTuZaDShr/N/sZ296vPnPZlQwqmc16Gvn2hYgcnoDn/v3ad+dRxdQy5J5RZgogz8FpEnH/RJUTuTaM+FwwOH3R2GrAJw9t9uVofgizoZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qeYd3w2+; arc=none smtp.client-ip=209.85.214.170
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2cacd69a9c0so6576695ad.1
+        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 04:12:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre.com; s=google; t=1783508557; x=1784113357; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=oPZaKv1OXlABgq9QPAtMKfhvRK+tiC3E15Kuw9g/LH0=;
-        b=TVCoBivwZB2Iu+tXZ3PZJl6FTVvr7/zv/pmro4MivlSx8HxlzupIfthsZ8Jim8mcQN
-         Ag2xQD1zlSNB9iI/B816fkbjAjAvNmspd4RfFBRANlt03eGinG4oeeNYVFkZSx6rkpLT
-         qG5bHwkZyvigBoT6egeQcBw0Wgu6XK/y/nU7ui0lkmSg6lwhjZI/qfMt7mEfCxRptRbh
-         iVXPhcg/iWozh82DGlFpg0+caPRIMs/IBAkwHkEiOlb22hdpVFYsy3a/LmdxDXTB3JP4
-         aOua/pWfGBrSsBV7C2QTnR8PelDfMvOLDFzIDzu+CeAy0oVyQpsUWykyUPeRUEeF7kEl
-         EKOg==
+        d=gmail.com; s=20251104; t=1783509175; x=1784113975; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=s31bR1iKC+e6h6RE4wZIClsqmUypkmINB4OCzr0ClWk=;
+        b=qeYd3w2+Mi4x8EL2Uj+6GSkm91Y5b/0Vir3TnPgMfsv6L3ALF1Etk8FU7POfNsuNzX
+         FHDGAJo9CgkxzZCyLgn7mbX+YENou+i3COnArVb3TRUiNawE2lVM8WucYQg7IvI9Fahs
+         xJE+5CYMuDUSqW3t32UArpJkoG93wDUNFA6lihQWrDjc+KErVCSKOtNYo8kbdJkv/v0V
+         oT1CLBPNKIL+1qJr+gvj9QD7ZTP5RGiIhij4hATc3/Uuxdd5j+/W7nkKMQC0zOKsb52v
+         UMgn6jI9nzI3RWZxn6hTxbD614jiIo/4uuxgSPE+rw5zL0XD7jFBI1kmO8TdOg+5Gkox
+         Brtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783508557; x=1784113357;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=oPZaKv1OXlABgq9QPAtMKfhvRK+tiC3E15Kuw9g/LH0=;
-        b=edAybCyIGUxSm7MqBP3GaG50TtPG5uBf8vbEK9vZl+g7230kvF4Aso/DrCZ9lcE1qn
-         o4o1MQ39EH4NyvrAByra/aNaJmyvmJDo5KJX0lN5HkJMRQQqWqcb3TKSOab93b1omwlS
-         4acVDfRuee8eEz8BkEmMR8EXgaH7VTkk9m/wTK3EPjlcSHr5H2c/9Zif+V62O4xIX6Hz
-         PbamwHG98Q/qEwjkWElc6xfEOAMpNs431BQheHFEShyR4WuAL6jNwA0xGD9Q92lfLXFy
-         dA6pZ/0qOjrX3dd+H/5rTQW7fMioAbMoDBSBTM1Tc9k2ytexK1Kmy9gRZv7syz0yAB8B
-         78Tw==
-X-Forwarded-Encrypted: i=1; AHgh+RpJLAQUZWTiNSjm32XfOkhsoglA6Pxe9CQbIafhth0zDiOJCburfpEllb6LWsy/qnZaP/+oZPA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiflVu/8ryDxuYJpE/JVJtfR9dOegA3IWTtiEOIr3z3qt2ag4x
-	4B1gPVi8rMkzXPXBawB1Viv4Y6xTfBvEsgnJYTViN965RyUMuJ/J6pfBFFK0m+mVdSqWYjoyV4t
-	3jdoy
-X-Gm-Gg: AfdE7clibZc8oxYq3h0H80BCw12wdVeEBONZkAQdOfA94GjHPYJOngTRVWdWUFftCDm
-	bbjF4+oB8pt8F5DpcXANVVrlt0kkYvoPuVaT0nDiKs0cML0x/VuadVdSsa57L+EV2LFpx74YqNJ
-	Dj/nQS3m8TEMI8Myno+fERhHYKbCp/QdpuKCSvogv4Vms/Y9aCCm0WlvQG0vFTR+gGl/EIwN+v8
-	aImWZOAcZAc9EVYNoqh+7joEDMqWyIDYtrni7z7IC7bb+0N1H4pkpUbwOmR/Gqz2MZ2hsf/P8xc
-	/DrXuUGEOcGi4fwobvV4l9Zz2tp8bBri6KTecYF10y5Je81WiotipddbN6KiREKAx8WRfh9/Ldo
-	fJiL2qTot5nexjCWDaf8L0/ySeMfuZhz8uhPP318PvBtZrqQ75CmuFNT6nBToFZnYIohdRupdmc
-	hFOoLw+29IF1M1x8v+MrcN9iNaW6g+9pdDClfuyHFvJWcFS3t5XkSR0voKO25qZ0tk9t2gi7hBx
-	QWA
-X-Received: by 2002:a05:600c:1d04:b0:493:bc4a:a14d with SMTP id 5b1f17b1804b1-493e63a9f76mr20030585e9.19.1783508557034;
-        Wed, 08 Jul 2026 04:02:37 -0700 (PDT)
-Received: from localhost (p200300f65f47db04930dc5bd4534e1e5.dip0.t-ipconnect.de. [2003:f6:5f47:db04:930d:c5bd:4534:e1e5])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-493e0f40d50sm151903545e9.5.2026.07.08.04.02.35
+        d=1e100.net; s=20251104; t=1783509175; x=1784113975;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=s31bR1iKC+e6h6RE4wZIClsqmUypkmINB4OCzr0ClWk=;
+        b=pf7i+tGuB/1Vz5vY5OBtZM2zM/5e3LEW83NncoCSnROnlCas7KW5ZF/B0OrSpTxVCf
+         iFgrilOLvKSaEwX9RrWY/Fz4upM2rlAceKYaYPw0B09WSg/cE/tzNl+H8OQuRFaxzUzW
+         Pc1Hph6L2U+JYIcUwhGWBYp+iTy6UA7HWD7KR45sg6uHBFdpCaeOmUEWJTckr5d6rlX5
+         QLwhF1FV6LdWJQSFu/yYTcAPxJ13xVRL2sB6Tz7SDMomARSUE/KiXGIekn9Rc3xvhYky
+         zuzCki6t4uSnf/3rDRalYXJLNsca4ue1xEJS+Z9lD7wJeE3ip64+IRtLSWrmo4on/Jrl
+         c9sA==
+X-Forwarded-Encrypted: i=1; AHgh+RpVoVgNguwSpJW1JkQfU6TQWq8WGXlQ+6ZQch5IjFMCVT+Rj3HAxgPwO/tMVTKa57MLtEzy3Do=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBJexXcrQU+Z76Yh9YhGnkNVW/WPMB+FZ7V1a9EiLfc9TvAl/w
+	yYmf367DHhzvK5+jhTDMCf4Ts90jZCkNyY+ZDXFudwYDzxDbb9qr7hqT
+X-Gm-Gg: AfdE7cl7fCtkltr/7fdCU/F52g1UHElaC4kGTnjvXlYgshaF/wYu4yqtW56V/FXobmj
+	lAgpebeot/4pC4O0K5cAFAOeLkAF5LC4oNKOdJYZ2gCWxikCTqA782ta+PJuui3mWLqVspIH2ta
+	vobsPsh+bbHYMn9G5XBzWHgNw6f2H7zT/FLYGPovGFodq5Igc0Z9Y4FcflajQFbpSsAaN3yoXvp
+	1aj4VV5eal8hDJKcnbvzPSwkfGbltrwNI3KihaXH3AFhvq+nxzhPod3EAXoSYXmuHyfgduS9T6C
+	6LkS8etdk0oJswkkY+TFNO7IYPNabc5oQ9E/KRhleSIPJnLO85rGn3OMjcTIcHogKd2a3jlQFcf
+	vpa6hObRGG6UpQC78nxLGxyBcs0wyt9xZ5oiohB9VDDE9kRlf2aLpGRQm3G5CBIbnGOQ3+Ig=
+X-Received: by 2002:a17:903:4b30:b0:2c6:a012:6241 with SMTP id d9443c01a7336-2ccea348876mr23010425ad.6.1783509174902;
+        Wed, 08 Jul 2026 04:12:54 -0700 (PDT)
+Received: from lgs.. ([2001:250:5800:1000::f280])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9bf8d80sm26679355ad.25.2026.07.08.04.12.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2026 04:02:36 -0700 (PDT)
-Date: Wed, 8 Jul 2026 13:02:34 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 net-next] net: phy: Drop #inclusion of
- <linux/mod_devicetable.h> from <linux/mdio.h>
-Message-ID: <ak4tWWl2Mt3BkTXy@monoceros>
-References: <ca270a534d0f230a939a3fb4a661808b35d6436d.1783329817.git.u.kleine-koenig@baylibre.com>
- <12ec5246-4124-4edb-a5f8-f10c73b1fcb7@lunn.ch>
- <akwToZyYvHZPtdjV@monoceros>
- <96a77bc9-9804-43fb-acf0-b93574cd60f3@lunn.ch>
- <akynGw4TQimFiQST@monoceros>
- <2f07f731-0b97-4a23-8ccd-f01638fc1c7e@lunn.ch>
+        Wed, 08 Jul 2026 04:12:54 -0700 (PDT)
+From: Guangshuo Li <lgs201920130244@gmail.com>
+To: Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Guangshuo Li <lgs201920130244@gmail.com>
+Subject: [PATCH] dpaa2-switch: put MAC endpoint device on disconnect
+Date: Wed,  8 Jul 2026 19:10:25 +0800
+Message-ID: <20260708111025.749311-1-lgs201920130244@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ncfrdjtwdwvsqxls"
-Content-Disposition: inline
-In-Reply-To: <2f07f731-0b97-4a23-8ccd-f01638fc1c7e@lunn.ch>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[baylibre.com:s=google];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[baylibre.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305772-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:ioana.ciornei@nxp.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:lgs201920130244@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-305768-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[lgs201920130244@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[baylibre.com:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lgs201920130244@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,baylibre.com:from_mime,baylibre.com:dkim]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A05A07249E8
+X-Rspamd-Queue-Id: B8581724CC7
 
+fsl_mc_get_endpoint() returns the MAC endpoint device with a reference
+taken through device_find_child(). The switch port connect path stores
+that device in mac->mc_dev and keeps it for the lifetime of the connected
+MAC object.
 
---ncfrdjtwdwvsqxls
-Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v1 net-next] net: phy: Drop #inclusion of
- <linux/mod_devicetable.h> from <linux/mdio.h>
-MIME-Version: 1.0
+However, the disconnect path only closes the MAC and frees the dpaa2_mac
+object. It does not drop the endpoint device reference stored in
+mac->mc_dev, so every successful connect leaks that device reference when
+the MAC is later disconnected.
 
-On Tue, Jul 07, 2026 at 02:10:56PM +0200, Andrew Lunn wrote:
-> On Tue, Jul 07, 2026 at 09:15:35AM +0200, Uwe Kleine-K=F6nig (The Capable=
- Hub) wrote:
-> > Hello Andrew,
-> >=20
-> > On Mon, Jul 06, 2026 at 11:28:33PM +0200, Andrew Lunn wrote:
-> > > > That's exactly my thought, and there is commit ad428f5811bd
-> > > > ("mod_devicetable.h: Split into per subsystem headers") that is par=
-t of
-> > > > v7.2-rc2 and that does exactly that (apart from the filename).
-> > >=20
-> > > Ah, O.K. net-next tends to great dragged along the -rcX versions. So
-> > > you can probably submit the networking changes in a weeks time. Just
-> > > make sure they apply to
-> > >=20
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git
-> >=20
-> > Note that while I created the patch under discussion on top of -rc2, the
-> > justification is also valid on -rc1 and the patch doesn't use the new
-> > headers, so it can be applied to the above repo already now.
->=20
-> Yes, our patchwork instance and its CI agree:
->=20
-> https://patchwork.kernel.org/project/netdevbpf/patch/ca270a534d0f230a939a=
-3fb4a661808b35d6436d.1783329817.git.u.kleine-koenig@baylibre.com/
+Drop the endpoint device reference before freeing the dpaa2_mac object.
 
-That's great.
+Fixes: 84cba72956fd ("dpaa2-switch: integrate the MAC endpoint support")
+Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
+---
+ drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> but i was actually meaning the patches which swaps to the broken out
-> header with only struct mdio_device_id. I assume that patch is the one
-> which really reduces the number of files which get recompiled on
-> unrelated changes. That patch can be submitted to netdev probably next
-> week.
+diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+index 858ba844ac51..dd4f60031d0c 100644
+--- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
++++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+@@ -1560,6 +1560,7 @@ static void dpaa2_switch_port_disconnect_mac(struct ethsw_port_priv *port_priv)
+ 		dpaa2_mac_disconnect(mac);
+ 
+ 	dpaa2_mac_close(mac);
++	put_device(&mac->mc_dev->dev);
+ 	kfree(mac);
+ }
+ 
+-- 
+2.43.0
 
-Ah, indeed. After 995832b2cebe6969d1b42635db698803ee31294d and its
-parent there are not many left affecting netdev. But ack, I will wait a
-bit before tackling drivers/net/wireless/intel/iwlwifi/iwl-config.h
-(which is the only remaining user of <linux/mod_devicetable.h> in
-drivers/net).
-
-Best regards
-Uwe
-
---ncfrdjtwdwvsqxls
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmpOLkcACgkQj4D7WH0S
-/k6E0wgApW4YEibqxo7s6E2O2Qy4D5Tx3XurOUW4nbjnKTfepxZwf8B5r5Hn6fr/
-QhUtm5a9JNOxWPsmJM79yjdBDGmGls18G+CTQxwOxRj1IfW+RAD0kGQBXYJpq4uN
-dQq21Wq7sO6jOxuBlYuu9oZFDA6ZkqnU/0VnH6Jp1D/vCOsfAcxPttTO3D61MGiO
-eQuh2zR7SPDiF+Lzm7IWi6NEZAKbXg/+jbkioFJU2vE09GkH9lJvVtS5SQwVX25p
-HhoQCYm1wTyEPP8gTl9lf3hSQ/Epr7DFMtxmrTQ4GMgTplSOQln8zMJwK37v+bBi
-F3CvCSUqlUJWY0AEQxg1ehLQbzbj0g==
-=v4gp
------END PGP SIGNATURE-----
-
---ncfrdjtwdwvsqxls--
 
