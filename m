@@ -1,253 +1,559 @@
-Return-Path: <netdev+bounces-305863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305862-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id H8ReFdBuTmqFMgIAu9opvQ
-	(envelope-from <netdev+bounces-305863-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 17:37:52 +0200
+	id /K2BCBRvTmqWMgIAu9opvQ
+	(envelope-from <netdev+bounces-305862-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 17:39:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3F7B7281E5
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 17:37:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70957728207
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 17:38:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tu-dortmund.de header.s=unimail header.b=eqdssayO;
-	dmarc=pass (policy=none) header.from=tu-dortmund.de;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305863-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-305863-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=intel.com header.s=Intel header.b=YKB9yPs+;
+	dmarc=pass (policy=none) header.from=intel.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305862-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305862-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 234D730EE8F6
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 15:15:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9311E303F674
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 15:14:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DEA43A6B81;
-	Wed,  8 Jul 2026 15:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F297439331;
+	Wed,  8 Jul 2026 15:14:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B5E35E92F;
-	Wed,  8 Jul 2026 15:15:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3891C439332;
+	Wed,  8 Jul 2026 15:14:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783523750; cv=none; b=ssv8MFkeZZs6mgZ9bUPTUhwLw7/bFbuRGkxj3XmbR7qCaPxdM7Q/WaTsYqThMuvJhW+iOmnc35TTLs1XA8ABt96sw2MfJkni76PLN08zMwWPgi9g0IDiHPJ4JfwTZewxnjkGyKkQu0c9XV0ESRrxo6mhXM9cVFYTJBIZTMPdTr8=
+	t=1783523674; cv=none; b=bA9V2QgZIiTpm4vxXrsRSv+cslQXMUieRfV4Dm0WS2gSHm8kZ+2Kl/wtDjXcjjgbN73KrkvYoksh9eVYFt74ghMWb8YOXxmJni5yft2HKVjdrwWogbhBHIfn5G30+r2THeeGeNio9ux+7/ugPKTKK2yREE8pxxueHaa3lk/AKHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783523750; c=relaxed/simple;
-	bh=Z/M4qo4aKet++ZcdMmdrhg8tuZe93BjhicMEfgYQ8Tk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AFT0k7tFrv53WZff5ZDo6W+YUE2fmspQ1KfEChtZP2uE1mIGEHqZZBNFdKn6zaNjvi/o629ClhdhjXwF7NLBXPBWcHd+kG7P2vdfA7GzVoF6WjR52nrerPq4/hlWlPoOSbly/u+7zay6nvtt/l9ctqjmnqNDnYJw1QMlC6SA4Q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=eqdssayO; arc=none smtp.client-ip=129.217.128.51
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tu-dortmund.de;
-	s=unimail; t=1783523541;
-	bh=JUDy9KU7vJOTJs+mWZpY03LuKhL3NZcOljSDWdfTCWA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=eqdssayOH+/cStC+U/0yFHImlwHFTayvhMtscaSSyYc/avX8xY2PRMifV/gj/+FWF
-	 9+HjBhXrw8IHgPVt+ms0Eza6uSxiyjVRcQvexIdn/2cjCv4zxsUQfV9hYPf8jJROwr
-	 S07ZOTA1Nug4/AHiMhghK71Y2nyvh0cLHrZV+WUw=
-Received: from [129.217.186.105] ([129.217.186.105])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.19.0.2/8.19.0.2) with ESMTPSA id 668FCKJF013807
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 8 Jul 2026 17:12:20 +0200 (CEST)
-Message-ID: <c743935b-7b6f-49f4-b1dd-3fe1cc528464@tu-dortmund.de>
-Date: Wed, 8 Jul 2026 17:12:19 +0200
+	s=arc-20240116; t=1783523674; c=relaxed/simple;
+	bh=8fnpr6z9AuZi5VnTtsQcikSj+36E2NPhArizOu9ntgY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KLSMGcrWJTarjoiKFdwCNTwNgMWzXBFIHPLirhfrSLsIKSWwcgkKLGr75I9AfgAWL+Xqy1glbiHM2PExaJC5OdQTWbKjavYdB6R8G35RJO2wekXVKx1fvYe8lVKG+EGcl+ke4ucRyHv//nZZ48HC0JZwx0QN0vu8WRtF8AzADJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YKB9yPs+; arc=none smtp.client-ip=192.198.163.8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1783523672; x=1815059672;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8fnpr6z9AuZi5VnTtsQcikSj+36E2NPhArizOu9ntgY=;
+  b=YKB9yPs+uGh44Eazz54KT+Hj32iZVfroVCF4vlRicakDEMCx2JBpslCQ
+   2woERvo1QkI8bwWKDPFNfQLW02NY8Iz37vEmf8+29zgmqprvNCaL7T1S9
+   KvIvlEqFeI7FkOtg6qwJ8mDF50ddaeGdWDARAhTkEbTIWiueRx5o3ukwx
+   tdcRELvL+92QqWyyMr0W8ZJsnE1TY1R2btIRYTYjzNAhReAThRgOMYW0Y
+   3v/1h6YprL3QhvQWXuGu4WqRRGHxifQ4rT/06ZmNJvV17arB24Fx2FKxH
+   /xPhJloc3+8jlDby+2493DCgGBWfIOojMyTS8ID62R38f8lUccFqxIN0f
+   g==;
+X-CSE-ConnectionGUID: gvli7RUnTHqQelMI2QLgcQ==
+X-CSE-MsgGUID: ETrnvFCGSzCwb4aUM0tzoA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="101735213"
+X-IronPort-AV: E=Sophos;i="6.25,153,1779174000"; 
+   d="scan'208,223";a="101735213"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2026 08:14:31 -0700
+X-CSE-ConnectionGUID: sHCD79rBRiO4zu96wCMiEQ==
+X-CSE-MsgGUID: qpY9mRSsSlGbgPWXsoQtgg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,153,1779174000"; 
+   d="scan'208,223";a="257904707"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orviesa003.jf.intel.com with ESMTP; 08 Jul 2026 08:14:28 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	nxne.cnse.osdt.itp.upstreaming@intel.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH iwl-next] idpf: add flow-based XDP fallback for FWs without Tx FIFO support
+Date: Wed,  8 Jul 2026 17:13:27 +0200
+Message-ID: <20260708151327.1091570-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] tun/tap & vhost-net: make qdisc backpressure
- opt-in via IFF_BACKPRESSURE
-To: Brett A C Sheffield <bacs@librecast.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        Jason Wang <jasowangio@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Tim Gebauer <tim.gebauer@tu-dortmund.de>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20260706094242.115992-1-simon.schippers@tu-dortmund.de>
- <akt_Q7kdR3Zb8_GZ@karahi.librecast.net>
- <20260706091706-mutt-send-email-mst@kernel.org>
- <2728c540-2e76-4e06-9064-ed1dff071cbe@tu-dortmund.de>
- <akvhhy_JpH64KrcL@karahi.librecast.net>
- <0d28fdc4-3c03-48d6-bd59-e59f7a01f4b6@tu-dortmund.de>
- <ak1cIAwQzKS35x0m@karahi.librecast.net>
-Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <ak1cIAwQzKS35x0m@karahi.librecast.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
-	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-305862-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-305863-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FORGED_RECIPIENTS(0.00)[m:bacs@librecast.net,m:mst@redhat.com,m:willemdebruijn.kernel@gmail.com,m:jasowangio@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:andrew+netdev@lunn.ch,m:tim.gebauer@tu-dortmund.de,m:linux-doc@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[aleksander.lobakin@intel.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:aleksander.lobakin@intel.com,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:nxne.cnse.osdt.itp.upstreaming@intel.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,lwn.net,linuxfoundation.org,lunn.ch,tu-dortmund.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tu-dortmund.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksander.lobakin@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,tu-dortmund.de:from_mime,tu-dortmund.de:dkim,tu-dortmund.de:mid]
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,intel.com:from_mime,intel.com:email,intel.com:mid,intel.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D3F7B7281E5
+X-Rspamd-Queue-Id: 70957728207
 
-On 7/7/26 22:05, Brett A C Sheffield wrote:
-> On 2026-07-07 08:52, Simon Schippers wrote:
->> Brett, can you try the two attached patches here with iperf3?
->> I think testing with 8 and 16 threads is enough, so where there is a
->> regression.
->>
->> The two patches are about time when to wake:
->> Currently we wake after consuming half the internal ring buffer.
->> One of the attached patches wakes after 2 cachelines (128 of 1000
->> packets) and the other one just wakes once the ring buffer is empty.
->>
->> This would really help :)
-> 
-> Sure...
-> 
-> 
+From the first days of XDP implementation in idpf, it relied and
+worked solely on top of the queue-based scheduling Tx mode, which
+basically means simple FIFO. However, turned out not every firmware
+supports this mode and XDP doesn't work there at all.
 
-The reverted results for reference:
-7.2.0-rc1 reverted:
+Since the flow-based scheduling Tx mode is mandatory and supported
+by every FW, introduce a simple fallback guarded by a static key
+to not hurt the more performant mode. The FB mode generates a
+completion for each Tx descriptor and never guarantees that there
+won't be any out-of-order completions. Serialize that using a
+bitmap of completed descriptors and report contiguous blocks of
+free bits to match XDP and XSk expectations and avoid further
+code complication.
 
-threads 1
-[  5]   0.00-10.00  sec  15.3 GBytes  13.1 Gbits/sec  368            sender
-[  5]   0.00-10.00  sec  2.00 GBytes  1.72 Gbits/sec                  receiver
+The usage of a bitmap on hotpath might sound scary, but this
+fallback is able to reach around 70% of the QB mode's performance,
+which is comparable to what ice gives us. The main bottlenecks are
+unlikely()s and one completion per each descriptor, while in the QB
+mode we have one completion per batch (which might contain 64 or
+even 128 frames), plus the size of the completion descriptor is
+8 bytes in this mode (4 bytes in the QB mode), which means a lot
+of additional PCI traffic.
 
-threads 2
-[SUM]   0.00-10.00  sec  15.9 GBytes  13.7 Gbits/sec  1567             sender
-[SUM]   0.00-10.00  sec  4.00 GBytes  3.43 Gbits/sec                  receiver
+bloat-o-meter shows .text increase in about 2 Kb without adding new
+functions or uninlining any of the existing ones. I played a bunch
+with inlining and uninlining certain pieces or the whole fallback,
+but the compiler collapses and optimizes libeth templates so hardly
+so that each additional external call only makes things worse.
 
-threads 4
-[SUM]   0.00-10.00  sec  16.5 GBytes  14.1 Gbits/sec  6701             sender
-[SUM]   0.00-10.00  sec  8.00 GBytes  6.87 Gbits/sec                  receiver
+Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+---
+ drivers/net/ethernet/intel/idpf/idpf.h      |   1 +
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h |  11 +-
+ drivers/net/ethernet/intel/idpf/xdp.h       |  60 +++++++++-
+ include/net/libeth/xdp.h                    |  13 +++
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c |  10 +-
+ drivers/net/ethernet/intel/idpf/xdp.c       | 115 +++++++++++++++++++-
+ 6 files changed, 201 insertions(+), 9 deletions(-)
 
-threads 8
-[SUM]   0.00-10.00  sec  16.2 GBytes  14.0 Gbits/sec  19319             sender
-[SUM]   0.00-10.00  sec  15.7 GBytes  13.5 Gbits/sec                  receiver
-
-threads 16
-[SUM]   0.00-10.00  sec  14.4 GBytes  12.4 Gbits/sec  43593             sender
-[SUM]   0.00-10.00  sec  14.4 GBytes  12.4 Gbits/sec                  receiver
-
-
-> 7.2.0-rc2 (unpatched)
-> 
-> threads 1
-> [  5]   0.00-10.00  sec  20.4 GBytes  17.5 Gbits/sec    0            sender
-> [  5]   0.00-10.00  sec  2.00 GBytes  1.72 Gbits/sec                  receiver
-> 
-> threads 2
-> [SUM]   0.00-10.00  sec  12.7 GBytes  10.9 Gbits/sec    0             sender
-> [SUM]   0.00-10.00  sec  4.00 GBytes  3.43 Gbits/sec                  receiver
-> 
-> threads 8
-> [SUM]   0.00-10.00  sec  11.5 GBytes  9.85 Gbits/sec    0             sender
-> [SUM]   0.00-10.01  sec  11.4 GBytes  9.83 Gbits/sec                  receiver
-> 
-> threads 16
-> [SUM]   0.00-10.00  sec  11.6 GBytes  9.95 Gbits/sec    0             sender
-> [SUM]   0.00-10.01  sec  11.5 GBytes  9.91 Gbits/sec                  receiver
-> 
-> 
-> 7.2.0-rc2 with 0001-tun-set-waking-threshold-to-ptr_ring_empty.patch
-> 
-> threads 1
-> [  5]   0.00-10.00  sec  19.6 GBytes  16.8 Gbits/sec    0            sender
-> [  5]   0.00-10.00  sec  2.00 GBytes  1.72 Gbits/sec                  receiver
-> 
-> threads 2
-> [SUM]   0.00-10.00  sec  11.1 GBytes  9.50 Gbits/sec    0             sender
-> [SUM]   0.00-10.00  sec  4.00 GBytes  3.43 Gbits/sec                  receiver
-> 
-> threads 8
-> [SUM]   0.00-10.00  sec  10.8 GBytes  9.25 Gbits/sec    0             sender
-> [SUM]   0.00-10.01  sec  10.7 GBytes  9.23 Gbits/sec                  receiver
-> 
-> threads 16
-> [SUM]   0.00-10.00  sec  10.9 GBytes  9.34 Gbits/sec    0             sender
-> [SUM]   0.00-10.01  sec  10.8 GBytes  9.30 Gbits/sec                  receiver
-> 
-> 
-> 7.2.0-rc2 with 0001-tun-set-waking-threshold-to-tx_ring.batch.patch
-> 
-> threads 1
-> [  5]   0.00-10.00  sec  19.6 GBytes  16.9 Gbits/sec    2            sender
-> [  5]   0.00-10.00  sec  2.00 GBytes  1.72 Gbits/sec                  receiver
-> 
-> threads 2
-> [SUM]   0.00-10.00  sec  13.9 GBytes  11.9 Gbits/sec    0             sender
-> [SUM]   0.00-10.00  sec  4.00 GBytes  3.43 Gbits/sec                  receiver
-> 
-> threads 8
-> [SUM]   0.00-10.00  sec  12.7 GBytes  10.9 Gbits/sec    0             sender
-> [SUM]   0.00-10.01  sec  12.3 GBytes  10.6 Gbits/sec                  receiver
-> 
-> threads 16
-> [SUM]   0.00-10.00  sec  12.5 GBytes  10.7 Gbits/sec    0             sender
-> [SUM]   0.00-10.00  sec  12.4 GBytes  10.7 Gbits/sec                  receiver
-> 
-> 
-> 
-> HTH,
-> 
-> 
-> Brett
-
-Thank you again!
-
-These results show that waking earlier performs better in this case:
-For 8 threads we get 10.6 Gbit/s instead of 9.83 Gbit/s when waking early
-but we are still *far* from the 13.5 Gbit/s when we revert everything
-(see above I pasted the reverted results there).
-
-So I come to the conclusion:
-
-1. Waking earlier/later will not fix the performance issues. It may
-   improve the performance slightly.
-   Apart from that we introduce smp_mb__after_atomic() for the re-check
-   on producer side (noop on x86) and a full smp_mb() for the re-check on
-   consumer side.
-   Nothing else stands out to me apart from the overheads of
-   netif_tx_stop_queue() and netif_tx_wake_queue(). But we must use
-   those 2 functions one way or another.
-
-2. Users may depend on the dropping. Without backpressure tun/tap acts
-   like a pfifo qdisc which tail-drops. Some users may require this.
-
---> I would merge this opt-in patchset, it should be fine (it is not
-    flagged by Sashiko anymore btw). I would not be mad if it would not
-    get merged but I am out of ideas on how to improve.
-
-Thanks,
-Simon
+diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
+index ec1b75f039bb..5414bbbee07a 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf.h
++++ b/drivers/net/ethernet/intel/idpf/idpf.h
+@@ -384,6 +384,7 @@ struct idpf_vport {
+ 	struct idpf_tx_queue **txqs;
+ 	u16 num_txq;
+ 	u16 num_xdp_txq;
++	bool xdpsq_fb;
+ 	bool xdpsq_share;
+ 	struct bpf_prog *xdp_prog;
+ 
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
+index a0d92adf11c4..ba6193f01552 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
+@@ -625,11 +625,12 @@ libeth_cacheline_set_assert(struct idpf_rx_queue,
+  * @clean_budget: singleq only, queue cleaning budget
+  * @cleaned_pkts: Number of packets cleaned for the above said case
+  * @refillq: Pointer to refill queue
++ * @cached_tstamp_caps: Tx timestamp capabilities negotiated with the CP
+  * @pending: number of pending descriptors to send in QB
+  * @xdp_tx: number of pending &xdp_buff or &xdp_frame buffers
+  * @timer: timer for XDP Tx queue cleanup
+  * @xdp_lock: lock for XDP Tx queues sharing
+- * @cached_tstamp_caps: Tx timestamp capabilities negotiated with the CP
++ * @pending_mask: mask of buffers waiting for completion in the FB XDP mode
+  * @tstamp_task: Work that handles Tx timestamp read
+  * @stats_sync: See struct u64_stats_sync
+  * @q_stats: See union idpf_tx_queue_stats
+@@ -689,6 +690,8 @@ struct idpf_tx_queue {
+ 			u16 cleaned_pkts;
+ 
+ 			struct idpf_sw_queue *refillq;
++
++			struct idpf_ptp_vport_tx_tstamp_caps *cached_tstamp_caps;
+ 		};
+ 		struct {
+ 			u32 pending;
+@@ -696,10 +699,11 @@ struct idpf_tx_queue {
+ 
+ 			struct libeth_xdpsq_timer *timer;
+ 			struct libeth_xdpsq_lock xdp_lock;
++
++			unsigned long *pending_mask;
+ 		};
+ 	};
+ 
+-	struct idpf_ptp_vport_tx_tstamp_caps *cached_tstamp_caps;
+ 	struct work_struct *tstamp_task;
+ 
+ 	struct u64_stats_sync stats_sync;
+@@ -718,8 +722,7 @@ struct idpf_tx_queue {
+ 	__cacheline_group_end_aligned(cold);
+ };
+ libeth_cacheline_set_assert(struct idpf_tx_queue, 64,
+-			    104 +
+-			    offsetof(struct idpf_tx_queue, cached_tstamp_caps) -
++			    96 + offsetof(struct idpf_tx_queue, tstamp_task) -
+ 			    offsetofend(struct idpf_tx_queue, timer) +
+ 			    offsetof(struct idpf_tx_queue, q_stats) -
+ 			    offsetofend(struct idpf_tx_queue, tstamp_task),
+diff --git a/drivers/net/ethernet/intel/idpf/xdp.h b/drivers/net/ethernet/intel/idpf/xdp.h
+index 63e56f7d43e0..3d01c535bd4c 100644
+--- a/drivers/net/ethernet/intel/idpf/xdp.h
++++ b/drivers/net/ethernet/intel/idpf/xdp.h
+@@ -8,6 +8,10 @@
+ 
+ #include "idpf_txrx.h"
+ 
++struct idpf_q_vec_rsrc;
++
++DECLARE_STATIC_KEY_FALSE(idpf_xdp_fb);
++
+ int idpf_xdp_rxq_info_init(struct idpf_rx_queue *rxq);
+ int idpf_xdp_rxq_info_init_all(const struct idpf_q_vec_rsrc *rsrc);
+ void idpf_xdp_rxq_info_deinit(struct idpf_rx_queue *rxq, u32 model);
+@@ -21,6 +25,34 @@ void idpf_xdpsqs_put(const struct idpf_vport *vport);
+ u32 idpf_xdpsq_poll(struct idpf_tx_queue *xdpsq, u32 budget);
+ bool idpf_xdp_tx_flush_bulk(struct libeth_xdp_tx_bulk *bq, u32 flags);
+ 
++static inline void idpf_xdp_tx_xmit_fb(struct libeth_xdp_tx_desc desc, u32 i,
++				       const struct libeth_xdpsq *sq, u64 priv)
++{
++	struct idpf_flex_tx_sched_desc *tx_desc = sq->descs;
++	u32 cmd;
++
++	cmd = FIELD_PREP(IDPF_TXD_FLEX_FLOW_DTYPE_M,
++			 IDPF_TX_DESC_DTYPE_FLEX_FLOW_SCHE);
++	if (desc.flags & LIBETH_XDP_TX_LAST)
++		cmd |= IDPF_TXD_FLEX_FLOW_CMD_EOP;
++	if (priv && (desc.flags & LIBETH_XDP_TX_CSUM))
++		cmd |= IDPF_TXD_FLEX_FLOW_CMD_CS_EN;
++
++	tx_desc = &tx_desc[i];
++	tx_desc->buf_addr = cpu_to_le64(desc.addr);
++
++#ifdef __LIBETH_WORD_ACCESS
++	*(u64 *)&tx_desc->qw1 = ((u64)desc.len << 48) | ((u64)i << 32) | cmd;
++#else
++	tx_desc->qw1.rxr_bufsize = cpu_to_le16(desc.len);
++	tx_desc->qw1.compl_tag = cpu_to_le16(i);
++	tx_desc->qw1.ts[0] = 0;
++	tx_desc->qw1.ts[1] = 0;
++	tx_desc->qw1.ts[2] = 0;
++	tx_desc->qw1.cmd_dtype = cmd;
++#endif
++}
++
+ /**
+  * idpf_xdp_tx_xmit - produce a single HW Tx descriptor out of XDP desc
+  * @desc: XDP descriptor to pull the DMA address and length from
+@@ -34,6 +66,14 @@ static inline void idpf_xdp_tx_xmit(struct libeth_xdp_tx_desc desc, u32 i,
+ 	struct idpf_flex_tx_desc *tx_desc = sq->descs;
+ 	u32 cmd;
+ 
++	if (static_branch_unlikely(&idpf_xdp_fb) &&
++	    idpf_queue_has(FLOW_SCH_EN,
++			   libeth_xdpsq_to_sq(sq, struct idpf_tx_queue,
++					      next_to_use))) {
++		idpf_xdp_tx_xmit_fb(desc, i, sq, priv);
++		return;
++	}
++
+ 	cmd = FIELD_PREP(IDPF_FLEX_TXD_QW1_DTYPE_M,
+ 			 IDPF_TX_DESC_DTYPE_FLEX_L2TAG1_L2TAG2);
+ 	if (desc.flags & LIBETH_XDP_TX_LAST)
+@@ -53,10 +93,27 @@ static inline void idpf_xdp_tx_xmit(struct libeth_xdp_tx_desc desc, u32 i,
+ #endif
+ }
+ 
++static inline void idpf_xdpsq_set_rs_fb(const struct idpf_tx_queue *xdpsq)
++{
++	u32 n = min(xdpsq->pending, xdpsq->desc_count - xdpsq->next_to_clean);
++
++	bitmap_set(xdpsq->pending_mask, xdpsq->next_to_clean, n);
++
++	n = xdpsq->pending - n;
++	if (n)
++		bitmap_set(xdpsq->pending_mask, 0, n);
++}
++
+ static inline void idpf_xdpsq_set_rs(const struct idpf_tx_queue *xdpsq)
+ {
+ 	u32 ntu, cmd;
+ 
++	if (static_branch_unlikely(&idpf_xdp_fb) &&
++	    idpf_queue_has(FLOW_SCH_EN, xdpsq)) {
++		idpf_xdpsq_set_rs_fb(xdpsq);
++		return;
++	}
++
+ 	ntu = xdpsq->next_to_use;
+ 	if (unlikely(!ntu))
+ 		ntu = xdpsq->desc_count;
+@@ -84,7 +141,8 @@ static inline void idpf_xdpsq_update_tail(const struct idpf_tx_queue *xdpsq)
+  * Set the RS bit ("end of batch"), bump the tail, and queue the cleanup timer.
+  * To be called after a NAPI polling loop, at the end of .ndo_xdp_xmit() etc.
+  */
+-static inline void idpf_xdp_tx_finalize(void *_xdpsq, bool sent, bool flush)
++static __always_inline void idpf_xdp_tx_finalize(void *_xdpsq, bool sent,
++						 bool flush)
+ {
+ 	struct idpf_tx_queue *xdpsq = _xdpsq;
+ 
+diff --git a/include/net/libeth/xdp.h b/include/net/libeth/xdp.h
+index 898723ab62e8..ed61d83bda2d 100644
+--- a/include/net/libeth/xdp.h
++++ b/include/net/libeth/xdp.h
+@@ -430,6 +430,19 @@ struct libeth_xdpsq {
+ 	struct libeth_xdpsq_lock	*lock;
+ };
+ 
++/**
++ * libeth_xdpsq_to_sq - get SQ pointer from an XDPSQ pointer
++ * @xdpsq: &libeth_xdpsq corresponding to the queue
++ * @type: typeof() of the driver Tx queue structure
++ * @member: name of the NTU field inside @type
++ *
++ * Some of the sending callbacks take only &libeth_xdpsq pointer and no pointer
++ * to the actual driver Tx queue structure. Use this helper to quickly jump to
++ * the latter when needed.
++ */
++#define libeth_xdpsq_to_sq(xdpsq, type, member)				      \
++	container_of_const((xdpsq)->ntu, type, member)
++
+ /**
+  * struct libeth_xdp_tx_desc - abstraction for an XDP Tx descriptor
+  * @addr: DMA address of the frame
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index 4b94e554d7fa..81e21a564da6 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -227,7 +227,7 @@ static int idpf_tx_desc_alloc(const struct idpf_vport *vport,
+ 
+ 	idpf_xsk_setup_queue(vport, tx_q, VIRTCHNL2_QUEUE_TYPE_TX);
+ 
+-	if (!idpf_queue_has(FLOW_SCH_EN, tx_q))
++	if (!idpf_queue_has(FLOW_SCH_EN, tx_q) || idpf_queue_has(XDP, tx_q))
+ 		return 0;
+ 
+ 	refillq = tx_q->refillq;
+@@ -1058,6 +1058,11 @@ static void idpf_clean_queue_set(const struct idpf_queue_set *qs)
+ 			if (idpf_queue_has(XDP, q->txq)) {
+ 				q->txq->pending = 0;
+ 				q->txq->xdp_tx = 0;
++
++				if (static_branch_unlikely(&idpf_xdp_fb) &&
++				    idpf_queue_has(FLOW_SCH_EN, q->txq))
++					bitmap_zero(q->txq->pending_mask,
++						    q->txq->desc_count);
+ 			} else {
+ 				q->txq->txq_grp->num_completions_pending = 0;
+ 			}
+@@ -1320,7 +1325,8 @@ static void idpf_txq_group_rel(struct idpf_q_vec_rsrc *rsrc)
+ 			if (!txq_grp->txqs[j])
+ 				continue;
+ 
+-			if (idpf_queue_has(FLOW_SCH_EN, txq_grp->txqs[j])) {
++			if (idpf_queue_has(FLOW_SCH_EN, txq_grp->txqs[j]) &&
++			    !idpf_queue_has(XDP, txq_grp->txqs[j])) {
+ 				kfree(txq_grp->txqs[j]->refillq);
+ 				txq_grp->txqs[j]->refillq = NULL;
+ 			}
+diff --git a/drivers/net/ethernet/intel/idpf/xdp.c b/drivers/net/ethernet/intel/idpf/xdp.c
+index cbccd4546768..8a4e0a13364d 100644
+--- a/drivers/net/ethernet/intel/idpf/xdp.c
++++ b/drivers/net/ethernet/intel/idpf/xdp.c
+@@ -7,6 +7,8 @@
+ #include "xdp.h"
+ #include "xsk.h"
+ 
++DEFINE_STATIC_KEY_FALSE(idpf_xdp_fb);
++
+ static int idpf_rxq_for_each(const struct idpf_q_vec_rsrc *rsrc,
+ 			     int (*fn)(struct idpf_rx_queue *rxq, void *arg),
+ 			     void *arg)
+@@ -183,8 +185,8 @@ int idpf_xdpsqs_get(const struct idpf_vport *vport)
+ 		kfree(xdpsq->refillq);
+ 		xdpsq->refillq = NULL;
+ 
+-		idpf_queue_clear(FLOW_SCH_EN, xdpsq);
+-		idpf_queue_clear(FLOW_SCH_EN, xdpsq->complq);
++		idpf_queue_assign(FLOW_SCH_EN, xdpsq, vport->xdpsq_fb);
++		idpf_queue_assign(FLOW_SCH_EN, xdpsq->complq, vport->xdpsq_fb);
+ 		idpf_queue_set(NOIRQ, xdpsq);
+ 		idpf_queue_set(XDP, xdpsq);
+ 		idpf_queue_set(XDP, xdpsq->complq);
+@@ -197,6 +199,28 @@ int idpf_xdpsqs_get(const struct idpf_vport *vport)
+ 		xdpsq->pending = 0;
+ 		xdpsq->xdp_tx = 0;
+ 		xdpsq->thresh = libeth_xdp_queue_threshold(xdpsq->desc_count);
++
++		if (static_branch_unlikely(&idpf_xdp_fb) &&
++		    idpf_queue_has(FLOW_SCH_EN, xdpsq)) {
++			xdpsq->pending_mask =
++				bitmap_zalloc_node(xdpsq->desc_count,
++						   GFP_KERNEL,
++						   cpu_to_mem(i - sqs));
++			if (xdpsq->pending_mask)
++				continue;
++
++			for (int j = i - 1; j >= sqs; j--) {
++				xdpsq = vport->txqs[j];
++
++				if (idpf_queue_has(FLOW_SCH_EN, xdpsq))
++					bitmap_free(xdpsq->pending_mask);
++			}
++
++			for (u32 j = 0; j < vport->num_xdp_txq; j++)
++				kfree(timers[j]);
++
++			return -ENOMEM;
++		}
+ 	}
+ 
+ 	return 0;
+@@ -222,6 +246,12 @@ void idpf_xdpsqs_put(const struct idpf_vport *vport)
+ 		libeth_xdpsq_deinit_timer(xdpsq->timer);
+ 		libeth_xdpsq_put(&xdpsq->xdp_lock, dev);
+ 
++		if (static_branch_unlikely(&idpf_xdp_fb) &&
++		    idpf_queue_has(FLOW_SCH_EN, xdpsq)) {
++			bitmap_free(xdpsq->pending_mask);
++			xdpsq->pending_mask = NULL;
++		}
++
+ 		kfree(xdpsq->timer);
+ 		xdpsq->refillq = NULL;
+ 		idpf_queue_clear(NOIRQ, xdpsq);
+@@ -250,6 +280,65 @@ static int idpf_xdp_parse_cqe(const struct idpf_splitq_4b_tx_compl_desc *desc,
+ 	return upper_16_bits(val);
+ }
+ 
++static u32 idpf_xdpsq_poll_fb(struct idpf_tx_queue *xdpsq, u32 budget)
++{
++	struct idpf_compl_queue *cq = xdpsq->complq;
++	unsigned long *mask = xdpsq->pending_mask;
++	u32 done_frames, tx_cnt, new_ntc;
++	u32 ntc = cq->next_to_clean;
++	u32 cnt = cq->desc_count;
++	bool gen;
++
++	gen = idpf_queue_has(GEN_CHK, cq);
++
++	for (done_frames = 0; done_frames < budget; ) {
++		int ret;
++
++		ret = idpf_xdp_parse_cqe(&cq->comp[ntc].common, gen);
++		if (ret >= 0) {
++			__clear_bit(ret, mask);
++			done_frames++;
++
++			goto next;
++		}
++
++		switch (ret) {
++		case -ENODATA:
++			goto out;
++		case -EINVAL:
++			break;
++		}
++
++next:
++		if (unlikely(++ntc == cnt)) {
++			ntc = 0;
++			gen = !gen;
++			idpf_queue_change(GEN_CHK, cq);
++		}
++	}
++
++out:
++	cq->next_to_clean = ntc;
++
++	if (unlikely(!done_frames))
++		return 0;
++
++	tx_cnt = xdpsq->desc_count;
++
++	/* Don't go past next_to_use */
++	__set_bit(xdpsq->next_to_use, mask);
++
++	new_ntc = find_next_bit(mask, tx_cnt, xdpsq->next_to_clean);
++	done_frames = new_ntc - xdpsq->next_to_clean;
++
++	if (new_ntc == tx_cnt)
++		done_frames += find_first_bit(mask, tx_cnt);
++
++	__clear_bit(xdpsq->next_to_use, mask);
++
++	return done_frames;
++}
++
+ u32 idpf_xdpsq_poll(struct idpf_tx_queue *xdpsq, u32 budget)
+ {
+ 	struct idpf_compl_queue *cq = xdpsq->complq;
+@@ -260,6 +349,10 @@ u32 idpf_xdpsq_poll(struct idpf_tx_queue *xdpsq, u32 budget)
+ 	u32 done_frames;
+ 	bool gen;
+ 
++	if (static_branch_unlikely(&idpf_xdp_fb) &&
++	    idpf_queue_has(FLOW_SCH_EN, xdpsq))
++		return idpf_xdpsq_poll_fb(xdpsq, budget);
++
+ 	gen = idpf_queue_has(GEN_CHK, cq);
+ 
+ 	for (done_frames = 0; done_frames < budget; ) {
+@@ -479,6 +572,24 @@ static int idpf_xdp_setup_prog(struct idpf_vport *vport,
+ 		return -ENOSPC;
+ 	}
+ 
++	vport->xdpsq_fb = !idpf_is_cap_ena(vport->adapter, IDPF_OTHER_CAPS,
++					   VIRTCHNL2_CAP_SPLITQ_QSCHED);
++	if (!vport->xdpsq_fb)
++		goto reset;
++
++	if (prog) {
++		bool warn = !static_key_enabled(&idpf_xdp_fb);
++
++		static_branch_inc(&idpf_xdp_fb);
++
++		if (warn && net_ratelimit())
++			netdev_warn(vport->netdev,
++				    "The FW doesn't support Tx in FIFO mode, XDP Tx performance might be suboptimal\n");
++	} else {
++		static_branch_dec(&idpf_xdp_fb);
++	}
++
++reset:
+ 	old = cfg->user_config.xdp_prog;
+ 	cfg->user_config.xdp_prog = prog;
+ 
+-- 
+2.55.0
 
 
