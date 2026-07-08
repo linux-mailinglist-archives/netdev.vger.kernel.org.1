@@ -1,294 +1,422 @@
-Return-Path: <netdev+bounces-305989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305990-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id H3irAIa5TmoXTAIAu9opvQ
-	(envelope-from <netdev+bounces-305989-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 22:56:38 +0200
+	id 2XdpAA+6TmozTAIAu9opvQ
+	(envelope-from <netdev+bounces-305990-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 22:58:55 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40F5272A588
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 22:56:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 467EF72A5BB
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 22:58:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=microsoft.com header.s=selector2 header.b=NZeUKFtS;
-	dmarc=pass (policy=reject) header.from=microsoft.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305989-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305989-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="iG/mbXZn";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305990-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305990-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A47393012C72
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 20:52:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BD71D30D6E61
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 20:54:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F32F3E7BAF;
-	Wed,  8 Jul 2026 20:52:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5F43EB113;
+	Wed,  8 Jul 2026 20:54:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11020115.outbound.protection.outlook.com [52.101.56.115])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C73F3E6DC8;
-	Wed,  8 Jul 2026 20:52:30 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783543952; cv=fail; b=JUlB4MWK/LQgqQmDDLHIRLUOQxVEV9phztd8FOlyg9sOmOGK8Z9tHdw3xYUSIyIlWxDpvuTCmZ4EVVumv5L0dubVClo8K0FQmLNcoGh6EUAGouEeGxma9X4FOn6xBZQ7BCNRKLhfSIrsREq3GUKhvcR446hRt9MkP61wR3DO7S4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783543952; c=relaxed/simple;
-	bh=V3tcwAmamNP3U0FtU0nbdXsN3gs+QB18HRAa01DsH/8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Ian2BzuX622z7BkT/M54uOe42vmCVGS57HJoDreticznZZYNUzWeNAx/dlcuV6e5rsfYEXs4yi6jeVX2v6gUadhTdsbx1nqywKPkqNrMggPeQMQHJim83jQ1Qwo0Ccm2btXyeqGfoV2ptaMuoN6pZx9jJ+uuqW2FZ83wJ6C47SM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=NZeUKFtS; arc=fail smtp.client-ip=52.101.56.115
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=v09Cnlp0HkS3SOVQmZNWZN7FiV17xnAaRgFfgMjNO9VIm+aajZHNWzJagcCTgZvPTAF8yfp00oYJpy+zUt7sF5rSFpJ6nY/aEkop05s6/PEDQ/n6tEKYrF5sf/PzsnH7XW93EKVj0rBeBteWdvCz2+mxS+BosrKJolHYKPTO9w1/ZVhtsbMDpxExlKQA+cYhGy6yZ4s384IxVC/AXk56q2fgVBBGYgmUWkJpzeaaCaUUZe+v4AkAh9I3NeAfF7u0h1p2M0tR4MCp27NZD75+KdJYCWX2KFOJa//HQkCuhZvtlhsBWqaoqxhIZ5LuTQywka/HfnUN4jjkG1vefX/PJQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JievpMki2BNvz2AZE4jC/0HDkNvVUBBeFEiVXSB2deQ=;
- b=hYIjJ1RhN6Xk1nBlB+Ls6DNjWxtKBPmSIs7cymckRL+IKcR/dBWqaZ6n/1iynJZv5nGEtBbRJDGkOJ3zrx3Sb16LDGjBTYcMPsB6oE+L35KczjMbx8lhUJkty5SfAmSR5Ka9OatKTCtCvgElLJVKm4wPtlcCTGUsGI6MoaxoT4Gae4/KBaqFmEKlFnn7KzkmySOku/6xLoLTvc33Hhy3YGQdBjnCn0WYmQGtsxde97gstW/uEqBhQWDz1K8T7xsq1HSLtmkaWJ9BZhpNdt/Jd07Yi9v2JldGVM+VQ3RFYMZV0tUw1O4qGKGbgcS2wou5shWbIGhjIxv+P/hekj4azw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JievpMki2BNvz2AZE4jC/0HDkNvVUBBeFEiVXSB2deQ=;
- b=NZeUKFtSeKu6oegLySW3F93FgksgvKTqw57ax2p4PPi49qt5BhUgL15EGWAku1QAysRYPx6LlJcEujuS8fVrWEkfV8iFJuq7GgxJvcD9BkOSf6/Iy3P3h0kaWOfs/lxa1R9+Xbh+tYZJjp/CULSpMwk1d25B9OKmyWvLkplON2M=
-Received: from LV5PR21MB4704.namprd21.prod.outlook.com (2603:10b6:408:307::7)
- by LV5PR21MB5137.namprd21.prod.outlook.com (2603:10b6:408:307::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.223.3; Wed, 8 Jul 2026
- 20:52:27 +0000
-Received: from LV5PR21MB4704.namprd21.prod.outlook.com
- ([fe80::144b:98da:1262:2ebb]) by LV5PR21MB4704.namprd21.prod.outlook.com
- ([fe80::144b:98da:1262:2ebb%6]) with mapi id 15.21.0223.002; Wed, 8 Jul 2026
- 20:52:27 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: Paolo Abeni <pabeni@redhat.com>, "haiyangz@linux.microsoft.com"
-	<haiyangz@linux.microsoft.com>
-CC: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, KY Srinivasan
-	<kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui
-	<DECUI@microsoft.com>, Long Li <longli@microsoft.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "horms@kernel.org" <horms@kernel.org>,
-	"ernis@linux.microsoft.com" <ernis@linux.microsoft.com>,
-	"dipayanroy@linux.microsoft.com" <dipayanroy@linux.microsoft.com>,
-	"gargaditya@linux.microsoft.com" <gargaditya@linux.microsoft.com>,
-	"shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Paul Rosswurm
-	<paulros@microsoft.com>
-Subject: RE: [EXTERNAL] Re: [PATCH net-next v2] net: mana: Add handler for
- sriov configure
-Thread-Topic: [EXTERNAL] Re: [PATCH net-next v2] net: mana: Add handler for
- sriov configure
-Thread-Index: AQHdCYO4UEKqbe3S7Um7CSrPXTXPZbZjTwEAgADUuCA=
-Date: Wed, 8 Jul 2026 20:52:27 +0000
-Message-ID:
- <LV5PR21MB4704E2BAE81785FF87887F77CAFF2@LV5PR21MB4704.namprd21.prod.outlook.com>
-References: <20260701180116.507690-1-haiyangz@linux.microsoft.com>
- <20260708080854.64655-1-pabeni@redhat.com>
-In-Reply-To: <20260708080854.64655-1-pabeni@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=9838eb2b-3496-4941-9584-0e7991e8a061;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-07-08T20:50:14Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV5PR21MB4704:EE_|LV5PR21MB5137:EE_
-x-ms-office365-filtering-correlation-id: a6bc621f-41bc-4d7a-0823-08dedd32d1e4
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|23010399003|7416014|376014|38070700021|18002099003|4143699003|5023799004|4133799003|11063799006|6133799003|22082099003|7053199004|56012099006;
-x-microsoft-antispam-message-info:
- vsEB3IVSLqIrWccc4zg4XYVzGAyYlKh/z7amnriw0ipyxgWl2ETS+EXq2lPCq1IMvsuLPuRR5dqooYaa4lrq8LC2mvmxMGtKM7pjKNqgIAXUAVMYqfLMFbQO60sxsk+RIuGoWa4w9NJPGI3rW8Z6nJnAwuwmw7sU8POdaBnkSknbcObzU/dSQTlz2TjhfHytdjM8ekSN4ZbjWN9bb44QiMB9X3I7nqmwf65KQQmOttb/6d6k0cae8Nv6iJXJeLolHMwoX+fwv9jgbEbvMqgAa1u8kjI90Ug/aQYal6ws09yWvdTNbflnRLbUwFUnvb/iLMDeE3bYnZmhUyRfT+98qam0AaiGB55dGFjkp1B5y48zxlbxXVImPxsfYorvvXJm/1PKXB1WokKkBYtLaSr+iIYInIwLSu6iNOedWHGMMdOkjpPoyvOecWrDgNH3iYoxfe8gwWeczCjwqCne+Q52kDjGDbeQRjhiByQOBAXKwuWwqLQDWvHTL39rWOVUBlvpFIfauEFlpxOuN+hiLX4V4MiijMfKjhUjxfZY6HdeD1y8/zEU1OCcCQX8bwv+lfTWw1zyfLJW12Ks0emgKQI18PxIJE9o0UHU2OO4iIJxliLqOoLf/4gqvRYzXKTJeKHGNtAUksNjPWzE1DArtjbQrKYroUhV0Ogg7rdaYuoqoILV53PV2ReZ7HgUuhHMTkpG7xvvkf+CcZVvC+IvRwQvZ7rCCAKMb6eph/iEpr5qwJ8=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV5PR21MB4704.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(23010399003)(7416014)(376014)(38070700021)(18002099003)(4143699003)(5023799004)(4133799003)(11063799006)(6133799003)(22082099003)(7053199004)(56012099006);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?TDk0AMop/KKjYKIqbXjunN5s12MyqHqiNCb2QqSO1cB61uOdD3KndyHlVplt?=
- =?us-ascii?Q?SkQvhzZj7Afet0/KrvGtlYiXnIFDgo8OMhjzeerfhBisixGam2Do6EJG3+4i?=
- =?us-ascii?Q?6QNeUxOfZR3R7t9VpTFazw3u6vyL4DbuDm8OXLqvUz3LvutqSqOdVvZhe51L?=
- =?us-ascii?Q?E+7oeM97qROJ9cqXe2ieJLwAkjImbkd2aEQkqTT2xHAdnXCdZvIB7+diCfQ9?=
- =?us-ascii?Q?7iiRCT6biQBG8kC1Oac1rD6BXs2R7IGimjkGeSAurA9LWtZjsHbUNSTfFmhS?=
- =?us-ascii?Q?JTzxZHGE+4UBRi9nDndN8djmNRfZV1ba1FlpJPp8Akp3gqR9aAJbfBwc2jjk?=
- =?us-ascii?Q?MTeRROVssWo6W3em1TLYU8GFjZ4CUM7cVlo82qne445Mg5I3qmi77dLrbcN/?=
- =?us-ascii?Q?ONT2WsUhqHP/E80FzhKlZ2zO418H1jf840pA5K1cntZsPsa8DXw1R9yz0MF8?=
- =?us-ascii?Q?h1CBHWVKe8l8aCtVBd9XohLNm+Uw6OmvCMNut8h5N4wxorqdOYFME6ybUSQO?=
- =?us-ascii?Q?vUnjwhNwbL3rkZPfRO6K4w5vjbLJu2aAZPrDqMytq+wnpHRQIrq2C011EB/j?=
- =?us-ascii?Q?JKITI2zm8T5K74DQxKT1Gn6RwC73NpCyZMS99bGkh2M3D0OuyaurXrb8TF+h?=
- =?us-ascii?Q?1iBCzOzyWwpckc+f/zNKyl6wyz/XOAGKK37nKnDgYxvLPyz3/T9ddu2FP4I/?=
- =?us-ascii?Q?wtDE26rRHH6DFAV8JtgfXl+qqY3yiOuK0cJtpAl9KC8dznykK0SSeFLoY+0j?=
- =?us-ascii?Q?JOLTmFSXXXOaUOdfb2MlswA7m1MRPq7LzQaxIwSfu0Znl81wBBzOzIn/o1ur?=
- =?us-ascii?Q?x5YJ4lhxhstxPggx+nlDFIWEILy5z6m8fbQpu4GkjJLTViBE4GxfzoXORVuP?=
- =?us-ascii?Q?biZKy7svqVm57jO2JSRRhqkdinXUgHXoGxfVTplkQPncOLoV8pQFgAcIeJ03?=
- =?us-ascii?Q?BUpfniTHlHk4Ry8t8C1FNCWIc5hyI7aiiAE/054Qr9aH7m83GDyTYARnpjx+?=
- =?us-ascii?Q?unu21+iIfMJPUKuINf6/zTnSlod++WyzCWnc1Bgr0MOB1WYwucATkfZvUg8b?=
- =?us-ascii?Q?iKLIHqVYwgDCHF9N6hZUdCTXX8q5yR1df9UImkGRsJOOPHz9MKN5M+i/C2J5?=
- =?us-ascii?Q?kDmBuDQMipsTjvjkZbkbkEbd6GyIzGg4eJvZCdRdxs7cxQR1k3+XjskamtA5?=
- =?us-ascii?Q?n8TFjmdPru/SWIEi45YGtP+SImML+eRqBTM2YrYLLubY2mSsjtE30ZKCljh5?=
- =?us-ascii?Q?/1J8HkanqVSe7jXr/7Ex+4EdRPq95DaqklQtEBlrDiAI+fyscIJslEOvvJC1?=
- =?us-ascii?Q?2lY06ksYEm5oH3zw8kLw6/aMj2vsaINBSX7UszuNRd9+TQNEcMASOnlVjeXa?=
- =?us-ascii?Q?Ss7WqxyDrsTxIRjHbfuv8qkE/rM+78KaDf4gqu8+hezJR8UnIsojBUZ8cqY/?=
- =?us-ascii?Q?SYIWIQzETrodHEddJyvvv3+eLQSYPCaIu8sklPN1fsgytsA46YEnnmfB6p1P?=
- =?us-ascii?Q?v3YUYWOxLwJmzuNvAJIxN8ZivSDQq+w2rTqZdglKF76OObSexDGH+7c9VNvZ?=
- =?us-ascii?Q?cJnZe4qudhadHxn2DBIKh/84Dv5Xt3GxWEBz3b7JvZVQU73BUe+0CvpGDcXT?=
- =?us-ascii?Q?k7BmXIx6EmekB2qWditHTS4BSxkoWnt2C3feRpWTV2F/Y8JMFLt2ycLMd9F+?=
- =?us-ascii?Q?5Vy1AZmysYv8eT4/JxWpT72wO5+B8wyg4bHFGt5Sc0ExxSN0zOaIVonRRQ6t?=
- =?us-ascii?Q?EvJosCOl2A=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F1383ED11A
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 20:54:35 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783544078; cv=none; b=uLQjjasBpgMVhlh2l215CuzvKpSQGQeWhcgFCPCaD23et2HHigfwaMzwQmAmmLZoSYNvejYwJfj4KUZT2/zOXTXPiW8/rq15GGZcTZ3g2dAtRBLrTzroovgAeYqVjNqDNfPdimb3uSwi/0i/yOOtExfqnJXDI+kg9QDdF+cWJ4Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783544078; c=relaxed/simple;
+	bh=K41E6g0m+fII6bVTpp2miUntJRjDf5KNhqEOniqvHzI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S4plDLsnUH/4KEK5U/Gt5UbkcKijjh70EkcKryhbXHFMbAaJ/jMSNWo2QY2HPVXFJOEdKfsrNLlYbwaEMniMwbbvVOyPAUnibcZAhuG5IH3iPb9Qx86AWUKaitEZokaSKSU227gXWe9zMY6SfWxqK8RQKWRjJDfeOKs3+HCkybo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iG/mbXZn; arc=none smtp.client-ip=209.85.218.41
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-c1274802697so22278166b.3
+        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 13:54:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783544074; x=1784148874; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=4wpLh1Wx2k4+jwvP651bLUL6cNpgNwa+ZpxJAG9vl8E=;
+        b=iG/mbXZncPQWBTYka8wjeeyR5a7mBr8RhdghSztVZISEkaEmZTR1GRTZhzYBqIDKWU
+         kq27k2f52ZhAHoE2PE4fjzIJZZ9XZSpry/E/RSahAbx/6RS1KDgF2Psw5w3ztjO2ToDv
+         enxv8VvRiTcndg7p3PD8LtalPH0MlKF0dZSGNXO4Hi6sjaxKeecpqhpTGyZLajXgXbs1
+         uOCljjlRrcxnn6zq6NyYo5X1Alzw29BGVuIu4U8hHj+Xz3S9n4/1Ofma5gTu+/VH6VNN
+         CeCer9J8LYvA8+G0mG3AxYvU4/ztMTWHtyWetH0hPGpFLJLq7pPQmCeGEawYKROQlSsP
+         Yr3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783544074; x=1784148874;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=4wpLh1Wx2k4+jwvP651bLUL6cNpgNwa+ZpxJAG9vl8E=;
+        b=Iq0WknsEW0qjxnRtBcuaQuFWltUQ4u9XAB2zYEoKgoqMxjOxfAjuYrW6r0yDteWYeZ
+         1qaGl6kx1S8/CeOUk2euR/pmucGJ2DGwkLbME8H1+xzUC8/lEfKoxlA8B+mh7pVnx01T
+         +TZs2aBH6cvSVxZPzykZRKwoz7ijtOMPBAyOLQGzucWNaIOcQEY8kcWDEUWHxpOU5bkL
+         S8hNKjuPK4iKDPVSwvOblacwBx/1hPmCuKHHj8rFFfDPWWmtbuF2VYZ6gD7GYOGVHvji
+         pQwlIa0AfjHHof/YxcFQcWOO7rY9P5bz944W09ASawJMU5Y47RYHIK0RNpdsLUUrMOQt
+         uomQ==
+X-Forwarded-Encrypted: i=1; AHgh+RpDEq01jBiU9gR5xR6n44xoutRJKrg4c07ZlqrdKY10LNU42Ai2e7UsJBZ7dAsvaEUi9+ETC2I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy41eMECpCoPFQ5OVf/nfBX6+4SNyPcMYe/bcT080rjsWpDQk5A
+	s7NtzHU3HNKC0EfKie8dLq9wKdnhwGZtXuER06/6V3j5nRdoX61zCX6Z
+X-Gm-Gg: AfdE7cn0hem/pa2dotoTRILOyHvFI3CqgaL1dCtin6Mlgfsej/BFT8AVqMGRpltJ1Bj
+	C+1dwuDIC1ZCx1Hvht6EDh6atNHk9cICNR0DGvFol5kBNezJyhc6Z5NtUnHYVJoBJ1FQxSE57Gh
+	zIMrbpOhRLtaPu/ltItOEly2i38NW6+c4NH0J9O2FMu9WBzZAzXMeDKLH6L2dBNPKCAGTEiEXau
+	VRM6fWX38H+v95ymMtbq8lYH2uNUzl5zHvE9zqz31RX3/LF5FNawNnWZiRy5qjr9jhzRKrd3i56
+	g/RPUmURObt8lJVoM6m8r03eqIrDG+7z3DUE67DysQ5rnSDsxjX91Cm2wEJ/bpJBIcYCGXK5dLe
+	zRIMM5sSpAJh20Ik+W6hzJ+W8Ns4uZqhdOpAVvZ5GRTermwx5qLcxAodkSfWQg0iv+9ivRYS/pm
+	2WoRjA7b2fiA==
+X-Received: by 2002:a17:907:5c3:b0:c15:db89:f0a0 with SMTP id a640c23a62f3a-c15db89f6dcmr93362966b.50.1783544073568;
+        Wed, 08 Jul 2026 13:54:33 -0700 (PDT)
+Received: from azaki-desk1.. ([156.216.98.197])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c15de6c565fsm63355066b.2.2026.07.08.13.54.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jul 2026 13:54:33 -0700 (PDT)
+From: Ahmed Zaki <anzaki@gmail.com>
+To: netfilter-devel@vger.kernel.org
+Cc: pablo@netfilter.org,
+	fw@strlen.de,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH nf] netfilter: flowtable: tear down HW offloaded flows on FIB route changes
+Date: Wed,  8 Jul 2026 14:54:04 -0600
+Message-ID: <20260708205404.911832-1-anzaki@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV5PR21MB4704.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a6bc621f-41bc-4d7a-0823-08dedd32d1e4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jul 2026 20:52:27.2336
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Anh9AJmpmHwnR9QajDhBny+OG8nnAp6ZFTmWQFwJgd7iq9bNNr3oFZfjROnWMpJyp1/YBMEZkbf1PdjgM+vUYA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV5PR21MB5137
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[microsoft.com:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[microsoft.com,reject];
-	R_DKIM_ALLOW(-0.20)[microsoft.com:s=selector2];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305989-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:haiyangz@linux.microsoft.com,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:kys@microsoft.com,m:wei.liu@kernel.org,m:DECUI@microsoft.com,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:horms@kernel.org,m:ernis@linux.microsoft.com,m:dipayanroy@linux.microsoft.com,m:gargaditya@linux.microsoft.com,m:shradhagupta@linux.microsoft.com,m:linux-kernel@vger.kernel.org,m:paulros@microsoft.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER(0.00)[haiyangz@microsoft.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-305990-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netfilter-devel@vger.kernel.org,m:pablo@netfilter.org,m:fw@strlen.de,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[anzaki@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[anzaki@gmail.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
 	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[haiyangz@microsoft.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[microsoft.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 40F5272A588
+X-Rspamd-Queue-Id: 467EF72A5BB
 
+Hardware-offloaded flows bypass the CPU and, unlike the software
+datapath, dst_check() does not invalidate them when a route changes.
+For ephemeral flows, this is usually not a problem as the flow expire on
+its own and the driver clears the entry in the HW. However, for persistent
+flows forwarded through the device, the HW is never informed that the
+route has expired.
 
+For tables marked with NF_FLOWTABLE_HW_OFFLOAD, listen to the per-net FIB
+notifier chain and tear down the affected flows so they are re-evaluated by
+the SW forwarding path.
 
-> -----Original Message-----
-> From: Paolo Abeni <pabeni@redhat.com>
-> Sent: Wednesday, July 8, 2026 4:09 AM
-> To: haiyangz@linux.microsoft.com
-> Cc: linux-hyperv@vger.kernel.org; netdev@vger.kernel.org; KY Srinivasan
-> <kys@microsoft.com>; Haiyang Zhang <haiyangz@microsoft.com>;
-> wei.liu@kernel.org; Dexuan Cui <DECUI@microsoft.com>; Long Li
-> <longli@microsoft.com>; andrew+netdev@lunn.ch; davem@davemloft.net;
-> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com; horms@kernel.org=
-;
-> ernis@linux.microsoft.com; dipayanroy@linux.microsoft.com;
-> gargaditya@linux.microsoft.com; shradhagupta@linux.microsoft.com; linux-
-> kernel@vger.kernel.org; Paul Rosswurm <paulros@microsoft.com>
-> Subject: [EXTERNAL] Re: [PATCH net-next v2] net: mana: Add handler for
-> sriov configure
->=20
-> From: AI Reviewer <ai@example.com>
->=20
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> Full review at:
-> https://nam06.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fsashi=
-ko.
-> dev%2F&data=3D05%7C02%7Chaiyangz%40microsoft.com%7C27add93a1c4b4c0c7b4808=
-ded
-> cc833d4%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C639190949593984694%7=
-C
-> Unknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJ=
-X
-> aW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=3DqLm%2BrL1nE=
-F6%
-> 2FlF2%2Fmed2mnc%2BVR4Vp9P6G6i5Im1PquU%3D&reserved=3D0
-> ---
-> net: mana: Add handler for sriov configure
->=20
-> Add callback function for the pci_driver / sriov_configure.
->=20
-> It asks the NIC to provide certain number of VFs, or disable
-> VFs if the request is zero.
->=20
-> > diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > index e8b7ffb47eb98..f7a79874fd0eb 100644
-> > --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > @@ -2496,6 +2496,20 @@ static void mana_gd_shutdown(struct pci_dev
-> *pdev)
-> >  	pci_disable_device(pdev);
-> >  }
->=20
-> [Severity: High]
-> With the addition of SR-IOV support in this patch, do mana_gd_shutdown()
-> and
-> mana_gd_remove() need to call pci_disable_sriov()?
->=20
-> If a user enables VFs via sysfs and then unbinds the driver or shuts down
-> the
-> system, could this omission introduce a regression where orphaned, dead V=
-F
-> PCI
-> devices are left in the kernel?
->=20
-> Accessing these orphaned VFs might trigger use-after-free crashes or
-> hardware
-> faults, as the underlying PF hardware and driver context have been
-> destroyed.
-Will fix.
+A lockless list is used to reduce the work items overhead in case of a
+route change storm allowing many FIB events to be processed by one work
+item.
 
->=20
-> > +static int mana_sriov_configure(struct pci_dev *pdev, int numvfs)
-> > +{
-> > +	int err =3D 0;
-> > +
-> > +	dev_info(&pdev->dev, "Requested num VFs: %d\n", numvfs);
-> > +
-> > +	if (numvfs > 0)
-> > +		err =3D pci_enable_sriov(pdev, numvfs);
-> > +	else
-> > +		pci_disable_sriov(pdev);
->=20
-> [Severity: High]
-> Should this path check if the VFs are currently assigned to a guest VM
-> before
-> disabling SR-IOV?
->=20
-> If a privileged user writes 0 to sriov_numvfs while VFs are actively
-> assigned
-> to a VM (e.g., via vfio-pci), could forcefully removing the PCI devices
-> cause
-> a regression resulting in host IOMMU faults and guest kernel panics?
->=20
-> Would it be better to check pci_vfs_assigned(pdev) here, or use the
-> pci_sriov_configure_simple() helper to safely enforce this?
+Fixes: c29f74e0df7a ("netfilter: nf_flow_table: hardware offload support")
+Assisted-by: Claude:claude-opus-4.8
+Signed-off-by: Ahmed Zaki <anzaki@gmail.com>
+---
+ include/net/netfilter/nf_flow_table.h |   3 +
+ net/netfilter/nf_flow_table_core.c    | 202 ++++++++++++++++++++++++++
+ 2 files changed, 205 insertions(+)
 
-Will update.
-I will send out an updated patch soon.
+diff --git a/include/net/netfilter/nf_flow_table.h b/include/net/netfilter/nf_flow_table.h
+index 7b23b245a5a8..7c36255f5a4f 100644
+--- a/include/net/netfilter/nf_flow_table.h
++++ b/include/net/netfilter/nf_flow_table.h
+@@ -84,6 +84,9 @@ struct nf_flowtable {
+ 	struct flow_block		flow_block;
+ 	struct rw_semaphore		flow_block_lock; /* Guards flow_block */
+ 	possible_net_t			net;
++	struct notifier_block		fib_nb;
++	struct work_struct		fib_work;
++	struct llist_head		fib_events;
+ };
+ 
+ static inline bool nf_flowtable_hw_offload(struct nf_flowtable *flowtable)
+diff --git a/net/netfilter/nf_flow_table_core.c b/net/netfilter/nf_flow_table_core.c
+index 99c5b9d671a0..2c912056921a 100644
+--- a/net/netfilter/nf_flow_table_core.c
++++ b/net/netfilter/nf_flow_table_core.c
+@@ -5,8 +5,12 @@
+ #include <linux/netfilter.h>
+ #include <linux/rhashtable.h>
+ #include <linux/netdevice.h>
++#include <linux/llist.h>
+ #include <net/ip.h>
+ #include <net/ip6_route.h>
++#include <net/fib_notifier.h>
++#include <net/ip_fib.h>
++#include <net/ip6_fib.h>
+ #include <net/netfilter/nf_tables.h>
+ #include <net/netfilter/nf_flow_table.h>
+ #include <net/netfilter/nf_conntrack.h>
+@@ -695,11 +699,179 @@ void nf_flow_dnat_port(const struct flow_offload *flow, struct sk_buff *skb,
+ }
+ EXPORT_SYMBOL_GPL(nf_flow_dnat_port);
+ 
++struct nf_flow_fib_match {
++	struct llist_node	*events;
++};
++
++struct nf_flow_fib_event {
++	struct llist_node	node;
++	u8			family;
++	u8			prefix_len;
++	union {
++		__be32		ip4;
++		struct in6_addr	ip6;
++	} addr;
++};
++
++static bool nf_flow_fib_tuple_match(const struct flow_offload_tuple *tuple,
++				    const struct nf_flow_fib_event *ev)
++{
++	if (tuple->l3proto != ev->family)
++		return false;
++
++	switch (ev->family) {
++	case NFPROTO_IPV4: {
++		__be32 mask = ev->prefix_len ?
++			htonl(~0u << (32 - ev->prefix_len)) : 0;
++		return (tuple->dst_v4.s_addr & mask) == (ev->addr.ip4 & mask);
++	}
++#if IS_ENABLED(CONFIG_IPV6)
++	case NFPROTO_IPV6:
++		return ipv6_prefix_equal(&tuple->dst_v6, &ev->addr.ip6,
++					 ev->prefix_len);
++#endif
++	default:
++		return false;
++	}
++}
++
++static bool nf_flow_fib_flow_match(const struct flow_offload *flow,
++				   const struct nf_flow_fib_match *m)
++{
++	const struct flow_offload_tuple *orig, *reply;
++	const struct nf_flow_fib_event *ev;
++	struct llist_node *node;
++
++	orig  = &flow->tuplehash[FLOW_OFFLOAD_DIR_ORIGINAL].tuple;
++	reply = &flow->tuplehash[FLOW_OFFLOAD_DIR_REPLY].tuple;
++
++	for (node = m->events; node; node = node->next) {
++		ev = llist_entry(node, struct nf_flow_fib_event, node);
++		if (nf_flow_fib_tuple_match(orig, ev) ||
++		    nf_flow_fib_tuple_match(reply, ev))
++			return true;
++	}
++
++	return false;
++}
++
++static void nf_flow_offload_fib_cb(struct nf_flowtable *flow_table,
++				   struct flow_offload *flow, void *data)
++{
++	const struct nf_flow_fib_match *m = data;
++
++	if (test_bit(NF_FLOW_TEARDOWN, &flow->flags))
++		return;
++
++	if (nf_flow_fib_flow_match(flow, m))
++		flow_offload_teardown(flow);
++}
++
++static void nf_flow_table_fib_work(struct work_struct *work)
++{
++	struct nf_flowtable *flow_table =
++		container_of(work, struct nf_flowtable, fib_work);
++	struct nf_flow_fib_event *ev, *next;
++	struct nf_flow_fib_match m = {};
++	struct llist_node *events;
++
++	events = llist_del_all(&flow_table->fib_events);
++	if (!events)
++		return;
++
++	m.events = events;
++	nf_flow_table_iterate(flow_table, nf_flow_offload_fib_cb, &m);
++
++	llist_for_each_entry_safe(ev, next, events, node)
++		kfree(ev);
++}
++
++static bool nf_flowtable_fib_family_match(const struct nf_flowtable *flowtable,
++					  u8 event_family)
++{
++	switch (flowtable->type->family) {
++	case NFPROTO_IPV4:
++		return event_family == NFPROTO_IPV4;
++	case NFPROTO_IPV6:
++		return event_family == NFPROTO_IPV6;
++	case NFPROTO_INET:
++		return event_family == NFPROTO_IPV4 ||
++		       event_family == NFPROTO_IPV6;
++	default:
++		return false;
++	}
++}
++
++/* Called with rcu_read_lock() */
++static int nf_flow_table_fib_event(struct notifier_block *nb,
++				   unsigned long event, void *ptr)
++{
++	struct nf_flowtable *flow_table =
++		container_of(nb, struct nf_flowtable, fib_nb);
++	struct fib_notifier_info *info = ptr;
++	struct nf_flow_fib_event *ev;
++
++	switch (event) {
++	case FIB_EVENT_ENTRY_REPLACE:
++	case FIB_EVENT_ENTRY_APPEND:
++	case FIB_EVENT_ENTRY_DEL:
++		break;
++	default:
++		return NOTIFY_DONE;
++	}
++
++	/* Skip events for an address family this table cannot hold. */
++	if (!nf_flowtable_fib_family_match(flow_table, info->family))
++		return NOTIFY_DONE;
++
++	ev = kzalloc(sizeof(*ev), GFP_ATOMIC);
++	if (!ev)
++		return NOTIFY_DONE;
++
++	switch (info->family) {
++	case NFPROTO_IPV4:
++		struct fib_entry_notifier_info *fen;
++
++		fen = container_of(info, struct fib_entry_notifier_info, info);
++		ev->family     = NFPROTO_IPV4;
++		ev->addr.ip4   = htonl(fen->dst);
++		ev->prefix_len = fen->dst_len;
++		break;
++
++#if IS_ENABLED(CONFIG_IPV6)
++	case NFPROTO_IPV6:
++		struct fib6_entry_notifier_info *fen6;
++
++		fen6 = container_of(info, struct fib6_entry_notifier_info, info);
++		if (!fen6->rt)
++			goto err;
++
++		ev->family     = NFPROTO_IPV6;
++		ev->addr.ip6   = fen6->rt->fib6_dst.addr;
++		ev->prefix_len = fen6->rt->fib6_dst.plen;
++		break;
++#endif
++	default:
++		goto err;
++	}
++
++	llist_add(&ev->node, &flow_table->fib_events);
++	queue_work(system_power_efficient_wq, &flow_table->fib_work);
++	return NOTIFY_DONE;
++
++err:
++	kfree(ev);
++	return NOTIFY_DONE;
++}
++
+ int nf_flow_table_init(struct nf_flowtable *flowtable)
+ {
++	struct net *net = read_pnet(&flowtable->net);
+ 	int err;
+ 
+ 	INIT_DELAYED_WORK(&flowtable->gc_work, nf_flow_offload_work_gc);
++	INIT_WORK(&flowtable->fib_work, nf_flow_table_fib_work);
++	init_llist_head(&flowtable->fib_events);
+ 	flow_block_init(&flowtable->flow_block);
+ 	init_rwsem(&flowtable->flow_block_lock);
+ 
+@@ -711,11 +883,24 @@ int nf_flow_table_init(struct nf_flowtable *flowtable)
+ 	queue_delayed_work(system_power_efficient_wq,
+ 			   &flowtable->gc_work, HZ);
+ 
++	if (nf_flowtable_hw_offload(flowtable)) {
++		flowtable->fib_nb.notifier_call = nf_flow_table_fib_event;
++		err = register_fib_notifier(net, &flowtable->fib_nb,
++					    NULL, NULL);
++		if (err < 0)
++			goto err_fib;
++	}
++
+ 	mutex_lock(&flowtable_lock);
+ 	list_add(&flowtable->list, &flowtables);
+ 	mutex_unlock(&flowtable_lock);
+ 
+ 	return 0;
++
++err_fib:
++	cancel_delayed_work_sync(&flowtable->gc_work);
++	rhashtable_destroy(&flowtable->rhashtable);
++	return err;
+ }
+ EXPORT_SYMBOL_GPL(nf_flow_table_init);
+ 
+@@ -754,8 +939,25 @@ void nf_flow_table_cleanup(struct net_device *dev)
+ }
+ EXPORT_SYMBOL_GPL(nf_flow_table_cleanup);
+ 
++static void nf_flow_table_fib_drain(struct nf_flowtable *flow_table)
++{
++	struct nf_flow_fib_event *ev, *next;
++	struct llist_node *events;
++
++	events = llist_del_all(&flow_table->fib_events);
++	llist_for_each_entry_safe(ev, next, events, node)
++		kfree(ev);
++}
++
+ void nf_flow_table_free(struct nf_flowtable *flow_table)
+ {
++	if (nf_flowtable_hw_offload(flow_table)) {
++		unregister_fib_notifier(read_pnet(&flow_table->net),
++					&flow_table->fib_nb);
++		cancel_work_sync(&flow_table->fib_work);
++		nf_flow_table_fib_drain(flow_table);
++	}
++
+ 	mutex_lock(&flowtable_lock);
+ 	list_del(&flow_table->list);
+ 	mutex_unlock(&flowtable_lock);
+-- 
+2.43.0
 
-Thanks,
-- Haiyang
 
