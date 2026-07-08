@@ -1,185 +1,154 @@
-Return-Path: <netdev+bounces-305820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305823-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id L0TYIXdTTmoMKwIAu9opvQ
-	(envelope-from <netdev+bounces-305820-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:41:11 +0200
+	id O47AIIBUTmpQKwIAu9opvQ
+	(envelope-from <netdev+bounces-305823-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:45:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25A25726E3F
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:41:11 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79EFE726ED7
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 15:45:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=IyRbqlxO;
-	dmarc=pass (policy=none) header.from=linux.dev;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305820-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-305820-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=kRrlWPPc;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305823-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305823-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 938A0300BB8A
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 13:41:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DD12B3032806
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 13:42:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C745337DEB9;
-	Wed,  8 Jul 2026 13:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59265380FEA;
+	Wed,  8 Jul 2026 13:42:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3283B1F5437
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 13:41:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326D63806AB;
+	Wed,  8 Jul 2026 13:42:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783518068; cv=none; b=TFCEx8v2FMFk7OXpXy0gllmJlLTDNe5yEHKLv91N76SNA2Gpk1iTh3XN9gG8TEXc6L22k4nRkTh52aRGiXXVjQf4IL40FxWtYuQM+luP8Gg1dSfN6ydOdC+bWCg7XWEQMrHWEdbUWYU840ApVWP3tE8kGa8jBeqp/h/x99+oick=
+	t=1783518121; cv=none; b=WfLCJ2yvUyhDOatukeO0UvWZQ9knw4OR1dXwZqjK7JDXfX7yoMKLUaHWDVvgRabf2qCq/8jTBxwuN8Hzs+2si8GKHD4f/JdKosqBOr9byy7wiTqompbi8Ualf3K1txqMQBkjKPAusUVV06hTShTGkJKqa/lQ1o9jFARY9rhdjt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783518068; c=relaxed/simple;
-	bh=yahR6VV4oId4ke2EcTPSLUBVRa8Wq4PuIKySjS6Aa6U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WRVdNiYnLu4q1Hfx/rDF8m0g+CLAS2eJh9Fhsl9hi7uNQnx8Nv19TpN5leOQvJs5phRc2Xe6ra1AtfoPlz3bFHInsNMAoI7Uhky8pCm6C3ovbwTbxHGOZvdd5tsTbGU9oeTzoGSlMrD+Mh3VFbxEoTZLYBEioWCwoTBo9dfLNCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IyRbqlxO; arc=none smtp.client-ip=91.218.175.180
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783518065;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=JIjKdwSo1SvNGAxUxkPye4smNHCYoCTZEiX1YoURXjw=;
-	b=IyRbqlxOYa1pYEWPtoUM+QP3xxmtOIfHAB2guWgAqjCxjDOpmKok+2sNtNtWv9vr2p1ZCP
-	r6Rlpz7EaxDyis5GD+KjvHlCfSF+3eHm3V9d1Uc52EYfkr1YcfpOtpTb2sJc4rLhxXiJ6w
-	rtsSdh0r4aqIPO46mEDWvQGtRIXgVbM=
-From: Tao Cui <cui.tao@linux.dev>
-To: dsahern@kernel.org,
-	leonro@nvidia.com
-Cc: linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	cui.tao@linux.dev,
-	cuitao@kylinos.cn
-Subject: [PATCH iproute2-next v4] rdma: display resource limits in curr/max format
-Date: Wed,  8 Jul 2026 21:40:03 +0800
-Message-ID: <20260708134003.85505-1-cui.tao@linux.dev>
+	s=arc-20240116; t=1783518121; c=relaxed/simple;
+	bh=766ztwFBIetWgxKoZZgeUKJCGrbo58G2Y/FPIvlaf+s=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ZPTZpGu1SWn9JURJYrQQNs2pbHVQbrtDgUzsi1D4uoRkpsjAOy7wIlfc7k7xopht3O4v4CSvoDiFzDYNaciFtYD6IuuM0YX7wnNCpgCOmg4oZxMbb5rmoQ8fDYv7bcXOZQNAiMC7INwD4qngyKHwoTpspWK2P03Gihjx0HeoEus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kRrlWPPc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D7C48C2BCB9;
+	Wed,  8 Jul 2026 13:42:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1783518120;
+	bh=766ztwFBIetWgxKoZZgeUKJCGrbo58G2Y/FPIvlaf+s=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=kRrlWPPcZZtpyUjdL3CySjh8lCjWXipygSEsZ9LjMlShETC4Khky5kOLtbk3ZBUUb
+	 E6bHxtaTPQHt9X/Opec1ok2Haq7vavnY1vm7h6keBJsz7C0gtBLyS3/Oaq7YLATggr
+	 72zXWC0mgfJnBXrntyd9APG6vYWi17So9ArM49oFpMkCmIFLV6ApbDparBCGS5j5LV
+	 eke4Q48cgM6zOM1BJo+h0mdwiPX85VwA5B09p+4ahR/cPGwTsvfN0l7+s8rD42qEvV
+	 tTtHoxzJX4zJmb0MtxqIKobA/dNNf5py8mpGkc1B4hwIo8/MwvdCj/EtJ1mU/xuLWF
+	 gqVobP1xK9uvw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B49D4C43458;
+	Wed,  8 Jul 2026 13:42:00 +0000 (UTC)
+From: Mattia Meleleo via B4 Relay <devnull+mattia.meleleo.coralogix.com@kernel.org>
+Subject: [PATCH bpf v2 0/2] bpf, sockmap: Fix FIONREAD for sockets without
+ a verdict program
+Date: Wed, 08 Jul 2026 15:40:55 +0200
+Message-Id: <20260708-fionread-no-verdict-v2-0-29dd293621c7@coralogix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/32NwQ6CMBBEf4Xs2RqoSK0n/8NwKMsW1iglLTYYw
+ r9b8O7xTd7MLBDIMwW4Zgt4ihzYDQnkIQPszdCR4DYxyFxWucqVsEnwZFoxOBHJt4yTMKW9VFo
+ Z1FZDao6eLM/76h2a0UL9C8O7eRBO296m9Rwm5z/7dyx2+e9NLEQhkHRplDydFeENnTdP1/F8R
+ PeCel3XL83dMgDRAAAA
+X-Change-ID: 20260707-fionread-no-verdict-a4f8697ac9f9
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org, John Fastabend <john.fastabend@gmail.com>, 
+ Jakub Sitnicki <jakub@cloudflare.com>, 
+ Jiayuan Chen <jiayuan.chen@linux.dev>, 
+ Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
+ Emil Tsalapatis <emil@etsalapatis.com>, 
+ Mattia Meleleo <mattia.meleleo@coralogix.com>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1783518119; l=1123;
+ i=mattia.meleleo@coralogix.com; s=20260707; h=from:subject:message-id;
+ bh=766ztwFBIetWgxKoZZgeUKJCGrbo58G2Y/FPIvlaf+s=;
+ b=c3Ik8Gu7yKFePrD+Vyi7Z+EJBxqPu6omkq95Cp/7RvNogFSQ5dAN95OUuetKY0TVtRVbewzYh
+ qcaj/FQApKVBQBD31jI0Ze8WXaG8ER1TBCDAuXmN/Ivqg1GD5E8WSHf
+X-Developer-Key: i=mattia.meleleo@coralogix.com; a=ed25519;
+ pk=cs1zLoe3YDm4bJ7bfbPaZH0lHnd871JyJLiSh2eEzLs=
+X-Endpoint-Received: by B4 Relay for mattia.meleleo@coralogix.com/20260707
+ with auth_id=857
+X-Original-From: Mattia Meleleo <mattia.meleleo@coralogix.com>
+Reply-To: mattia.meleleo@coralogix.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-305820-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305823-lists,netdev=lfdr.de,mattia.meleleo.coralogix.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS(0.00)[m:dsahern@kernel.org,m:leonro@nvidia.com,m:linux-rdma@vger.kernel.org,m:netdev@vger.kernel.org,m:cui.tao@linux.dev,m:cuitao@kylinos.cn,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:memxor@gmail.com,m:emil@etsalapatis.com,m:mattia.meleleo@coralogix.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,cloudflare.com,linux.dev,etsalapatis.com,coralogix.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[cui.tao@linux.dev,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cui.tao@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FROM_HAS_DN(0.00)[]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	HAS_REPLYTO(0.00)[mattia.meleleo@coralogix.com]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 25A25726E3F
+X-Rspamd-Queue-Id: 79EFE726ED7
 
-From: Tao Cui <cuitao@kylinos.cn>
+Sockets added to a sockmap/sockhash with no stream/skb verdict program
+attached answer FIONREAD with 0 even when unread data is pending in
+sk_receive_queue. Fix tcp_bpf_ioctl() to account for the receive queue
+in that case, and add a selftest.
 
-Parse the new RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX netlink attribute
-to show resource limits alongside current counts in curr/max format:
+Changes in v2:
+- Split the fix and the selftest into separate patches
+- Use READ_ONCE() to read the verdict program pointers
+- Link to v1: https://patch.msgid.link/20260707-fionread-no-verdict-v1-1-ce94a72357ec@coralogix.com
 
-  Before: 0: mlx5_0: qp 123  cq 45  mr 200  pd 10
-  After:  0: mlx5_0: qp 123/131072  cq 45/65536  mr 200/1000000  pd 10/32768
-
-JSON output provides both current and max fields per resource type
-(e.g. "qp": 123, "qp-max": 131072). Backward compatible: no output
-change when kernel lacks the new attribute.
-
-Signed-off-by: Tao Cui <cuitao@kylinos.cn>
-Link: https://lore.kernel.org/all/20260615003646.168704-1-cui.tao@linux.dev/
+Signed-off-by: Mattia Meleleo <mattia.meleleo@coralogix.com>
 ---
-Changes in v4:
-- Add Link to the kernel patch that introduces the new uapi attribute.
----
- rdma/include/uapi/rdma/rdma_netlink.h |  5 +++++
- rdma/res.c                            | 21 ++++++++++++++++++++-
- rdma/utils.c                          |  1 +
- 3 files changed, 26 insertions(+), 1 deletion(-)
+Mattia Meleleo (2):
+      bpf, sockmap: Account for receive queue in FIONREAD without a verdict program
+      selftests/bpf: Test FIONREAD on a sockmap socket without a verdict program
 
-diff --git a/rdma/include/uapi/rdma/rdma_netlink.h b/rdma/include/uapi/rdma/rdma_netlink.h
-index 4356ec4a..e5b8b065 100644
---- a/rdma/include/uapi/rdma/rdma_netlink.h
-+++ b/rdma/include/uapi/rdma/rdma_netlink.h
-@@ -604,6 +604,11 @@ enum rdma_nldev_attr {
- 	RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES,	/* u32 */
- 	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_KERNEL_VENDOR_KEY,	/* u64 */
- 
-+	/*
-+	 * Resource summary entry maximum value.
-+	 */
-+	RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX,		/* u64 */
-+
- 	/*
- 	 * Always the end
- 	 */
-diff --git a/rdma/res.c b/rdma/res.c
-index 062f0007..046935e2 100644
---- a/rdma/res.c
-+++ b/rdma/res.c
-@@ -55,7 +55,26 @@ static int res_print_summary(struct nlattr **tb)
- 
- 		name = mnl_attr_get_str(nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_NAME]);
- 		curr = mnl_attr_get_u64(nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_CURR]);
--		res_print_u64(name, curr, nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_CURR]);
-+		if (nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX]) {
-+			uint64_t max;
-+			char max_name[64];
-+
-+			max = mnl_attr_get_u64(
-+				nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX]);
-+			snprintf(max_name, sizeof(max_name), "%s-max", name);
-+			print_u64(PRINT_JSON, name, NULL, curr);
-+			print_u64(PRINT_JSON, max_name, NULL, max);
-+			if (!is_json_context()) {
-+				char buf[64];
-+
-+				snprintf(buf, sizeof(buf), "%s %" PRIu64 "/%" PRIu64 " ",
-+					 name, curr, max);
-+				pr_out("%s", buf);
-+			}
-+		} else {
-+			res_print_u64(name, curr,
-+				      nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_CURR]);
-+		}
- 	}
- 	return 0;
- }
-diff --git a/rdma/utils.c b/rdma/utils.c
-index 87003b2c..90ea1c55 100644
---- a/rdma/utils.c
-+++ b/rdma/utils.c
-@@ -480,6 +480,7 @@ static const enum mnl_attr_data_type nldev_policy[RDMA_NLDEV_ATTR_MAX] = {
- 	[RDMA_NLDEV_ATTR_EVENT_TYPE] = MNL_TYPE_U8,
- 	[RDMA_NLDEV_SYS_ATTR_MONITOR_MODE] = MNL_TYPE_U8,
- 	[RDMA_NLDEV_ATTR_STAT_OPCOUNTER_ENABLED] = MNL_TYPE_U8,
-+	[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX] = MNL_TYPE_U64,
- };
- 
- static int rd_attr_check(const struct nlattr *attr, int *typep)
--- 
-2.43.0
+ net/ipv4/tcp_bpf.c                                 | 17 +++++++++-
+ .../selftests/bpf/prog_tests/sockmap_basic.c       | 39 ++++++++++++++++++++++
+ 2 files changed, 55 insertions(+), 1 deletion(-)
+---
+base-commit: d2c9a99135da931377240942d44f3dea104cedb8
+change-id: 20260707-fionread-no-verdict-a4f8697ac9f9
+
+Best regards,
+--  
+Mattia Meleleo <mattia.meleleo@coralogix.com>
+
 
 
