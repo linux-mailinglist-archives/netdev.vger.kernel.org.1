@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-305706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305707-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id hdf5MWkYTmptDAIAu9opvQ
-	(envelope-from <netdev+bounces-305706-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:29:13 +0200
+	id NErzEn8YTmp3DAIAu9opvQ
+	(envelope-from <netdev+bounces-305707-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:29:35 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C2DE723BA0
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:29:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CD02723BAD
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 11:29:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=microchip.com header.s=mchp header.b=w34baQf6;
+	dkim=pass header.d=microchip.com header.s=mchp header.b=Ssxp1DnR;
 	dmarc=pass (policy=reject) header.from=microchip.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305706-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305706-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305707-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305707-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D8545307FC38
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 09:20:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3EA23309EB7D
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 09:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62C014219EB;
-	Wed,  8 Jul 2026 09:19:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3BF741C2E8;
+	Wed,  8 Jul 2026 09:19:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 254D342188B;
-	Wed,  8 Jul 2026 09:19:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F2DD414DFE;
+	Wed,  8 Jul 2026 09:19:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783502353; cv=none; b=Azr/mFjXTDdRbRFh1gnDVVr4npmaybxuA1gC0/Axl/YYAy25H2J8CnzSU0y4ztx6hmeceQ+LT4hvV1yTWnDYW6VeFXgB/8yAgiUtuwZ6lKj4HSFCKhK8VdL4hIHqNQwWo1RmiAG42+zRVO+pFGa9xIusyl1gac/05rsVJUN8vPw=
+	t=1783502358; cv=none; b=IyugewhpM9i1dcDE/aByHNtMKoRQ6G/nRo/YHz6CPRK0flFGqfNAITtwrL9Zn/W6PSdWGSa9ioscW31pPY6zez6DBpJxdQHUj1w3OyVvR2hXG9oAOkyz4tIp0tLHDbXnB04eNN9o/zP0h6cb5p3nfOYwwZZqtZtkYf+KTeWLWQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783502353; c=relaxed/simple;
-	bh=60e7pWI0BLbQll05iraz8polM1jXtM/jLpJJc8u2bqs=;
+	s=arc-20240116; t=1783502358; c=relaxed/simple;
+	bh=C77rvRoOXnddhSwT4JjKck0GcTogcMhOUPbIkubNp0s=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=aRhfaaUxe6xKWx77ZmxnkryrZEkksTZ+IdK2iSonaCVViNLpUT2xnjkD2CXHrsBZwpchrMYBhXpJ6BXr1YyprFphIuWdY30SJNEO4ImL8qSmgs9ojl6eUWUYDMNpL8a3GAd39FSG/1+jAwxyRdpaJjHwymDeW6l3R/btaQYLRS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=w34baQf6; arc=none smtp.client-ip=68.232.153.233
+	 In-Reply-To:To:CC; b=c8Pz9Lg01EHRZLk4aJaoZcRnT7LHKIfzoLuFhWWeVqd0PNC/Z7DobgS75RcjTvT4Awi/z3ECZw9Nu/4umQ0pVNuVXbjKWA7TjH3iACcpeXfBdYfS0sMG/pkUzZknAlvkPNyRPB4fg50dyB3NRf+1/dFSWVip3qeZHrhpSfVD4n8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Ssxp1DnR; arc=none smtp.client-ip=68.232.154.123
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1783502353; x=1815038353;
+  t=1783502355; x=1815038355;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=60e7pWI0BLbQll05iraz8polM1jXtM/jLpJJc8u2bqs=;
-  b=w34baQf6bY6z0zIgo/ktJLBqIK788zcN93EeohiruYL5u6NCLhec0a8t
-   l+snLfaEimR+uf6OBt0cu8IyG1LaGZq/12De5oUjeERUKqpl+2H+dx5SY
-   KNiPAng64Hv9j4yvYWzxvLl0u73HZQRH189+V2qmEyzGVFnN7K1a7Ba0p
-   EnvlpttsKjZH5LXBcayG3lMm63NIjc3dFOAD62E3ihddXSrstLEBJMNne
-   8iD9dhmnfX+BejhTuXsQ+56g+QqNmztUMSWBQ9tKqVAIYWYhZw8u2qXX0
-   t8G6mEEvzUKyxIGb/6hWPBoTVar7VEQiEblGI5Tia0dXhdIQqEFKAI+fQ
-   g==;
-X-CSE-ConnectionGUID: w8MycfiqTUeraPD2Z4y+aw==
-X-CSE-MsgGUID: ScoNInimQluydmB7xdnROA==
+  bh=C77rvRoOXnddhSwT4JjKck0GcTogcMhOUPbIkubNp0s=;
+  b=Ssxp1DnRCku+rPfxy2SN9Ic1B/n3zHFkvd04IOoyb8FUad48Vf6q3+H0
+   jHRyJ3YpcZM1MdoAuaqQIzY1fo9ibWzChq1yl+cHUZh0Ix6jUpmHekIYT
+   upk/ldKfhee/mZ7chmCrfeWgGddyv1UeaSqpgKuH3hJseMrRUOvmxKKiE
+   KoT0V8LVa4HRhqBzX7RafZ2Spr1jM0yDiMjC7N/lzgDjZDzNRG9rSpNEC
+   xROI4nL/zWkciW/YMrUHeFZhrbAw2I0B96kfUloX22U+HoEsXIJFWeFqO
+   UWEUkhM2hY9Sd9EIs6jIi43FwuM79JHxYhpQVBbBOBytv6l0Ij8fAPPmG
+   A==;
+X-CSE-ConnectionGUID: fAipHbxuQQ24Vza3NX7+YQ==
+X-CSE-MsgGUID: RUgnHHxhRvWor5QX1uL1pg==
 X-IronPort-AV: E=Sophos;i="6.25,153,1779174000"; 
-   d="scan'208";a="60261520"
+   d="scan'208";a="60616777"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2026 02:19:13 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.87.151) by
- chn-vm-ex2.mchp-main.com (10.10.87.31) with Microsoft SMTP Server
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Jul 2026 02:19:14 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.43; Wed, 8 Jul 2026 02:19:09 -0700
+ 15.1.2507.58; Wed, 8 Jul 2026 02:19:14 -0700
 Received: from [127.0.0.1] (10.10.85.11) by chn-vm-ex04.mchp-main.com
  (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Wed, 8 Jul 2026 02:19:06 -0700
+ Transport; Wed, 8 Jul 2026 02:19:10 -0700
 From: =?utf-8?q?Jens_Emil_Schulz_=C3=98stergaard?=
 	<jensemil.schulzostergaard@microchip.com>
-Date: Wed, 8 Jul 2026 11:18:23 +0200
-Subject: [PATCH net-next v9 8/9] net: dsa: lan9645x: add mdb management
+Date: Wed, 8 Jul 2026 11:18:24 +0200
+Subject: [PATCH net-next v9 9/9] net: dsa: lan9645x: add port statistics
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,7 +73,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-ID: <20260708-dsa_lan9645x_switch_driver_base-v9-8-0d1512a326d7@microchip.com>
+Message-ID: <20260708-dsa_lan9645x_switch_driver_base-v9-9-0d1512a326d7@microchip.com>
 References: <20260708-dsa_lan9645x_switch_driver_base-v9-0-0d1512a326d7@microchip.com>
 In-Reply-To: <20260708-dsa_lan9645x_switch_driver_base-v9-0-0d1512a326d7@microchip.com>
 To: <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew@lunn.ch>, "Vladimir
@@ -98,7 +98,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-305706-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-305707-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
@@ -121,652 +121,1442 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,microchip.com:from_mime,microchip.com:email,microchip.com:mid,microchip.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:from_mime,microchip.com:email,microchip.com:mid,microchip.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6C2DE723BA0
+X-Rspamd-Queue-Id: 7CD02723BAD
 
-Add support for dsa mdb callbacks. L2 multicast and IP multicast is
-handled differently. IP multicast stores the port group mask inline in
-the mac table. L2 multicast points to a PGID index, which encodes the
-port group mask.
+Add statistics support for the port counters. Chip registers are 32 bit,
+so this unit is responsible maintaining a 64bit software cache, and
+updating it frequently to handle overflows in hardware.
 
 Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
 Signed-off-by: Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
 ---
-Changes in v8:
-- Use lan9645x->num_phys_ports instead of CPU_PORT for the CPU port
-  module, and reword the related comments.
-
-Changes in v7:
-- refactor IGMP/MLD/IPMC_CTRL to use new LAN9645X_CPUQ_DEF,
-  LAN9645X_CPUQ_TRAP and LAN9645X_CPUQ_COPY queues
-- add __aligned(2) to mac variable in lan9645x_mdb_update_dest
-
 Changes in v5:
-- skip igmp/mld redir for npi port
+- make lan9645x_stats_init void
+- add SCNT_TX_BUFDROP to tx_dropped
+- change rmon range {0,64} -> {64, 64}. Runt frames counted elsewhere.
+- remove rx_crc, rx_symbol_err from rx_packets, as they are already
+  counted in SZ_* buckets.
+- add defensive cancel_delayed_work_sync in stats_free
 
 Changes in v4:
-- clean up fresh mdb when hw mac table write fails.
-- avoid void return in lan9645x_offload_fwd_mark
+- remove rx_uc and tx_uc from ethtool stats list, as they are derivable
+  from the eth-mac group
+- split stats_init into stats_alloc and stats_init, use alloc in probe
+  and init in dsa_setup
 
 Changes in v3:
-- avoid mdb add/del dealloc when mac table writes fail
-- dealloc mdb entries on deinit
+- No changes
 
 Changes in v2:
-- New file: selftests required implementation of the mdb callbacks.
+- introduce spinlock sw_lock protecting software counters and region
+  buffer.
+- ran Ioana's selftest for standard counters
+        drivers/net/hw/ethtool_std_stats.sh
+  along with
+        selftests/drivers/net/hw/ethtool_rmon.sh
+  they pass except for software injected pause frames.
+- remove strings/counters covered by standard counters from
+  get_strings/get_ethtool_stats.
+- fix proper use of 'src' in standard counters
+- remove static region table, and use stats_prepare_regions for dynamic
+  region calculation inspired by ocelot.
+- fix queue leak in error path.
 ---
  drivers/net/dsa/microchip/lan9645x/Makefile        |   1 +
- drivers/net/dsa/microchip/lan9645x/lan9645x_mac.c  |  14 +
- drivers/net/dsa/microchip/lan9645x/lan9645x_main.c |  62 ++++
- drivers/net/dsa/microchip/lan9645x/lan9645x_main.h |  21 ++
- drivers/net/dsa/microchip/lan9645x/lan9645x_mdb.c  | 398 +++++++++++++++++++++
- drivers/net/dsa/microchip/lan9645x/lan9645x_port.c |  11 +-
- 6 files changed, 506 insertions(+), 1 deletion(-)
+ drivers/net/dsa/microchip/lan9645x/lan9645x_main.c |  87 +-
+ drivers/net/dsa/microchip/lan9645x/lan9645x_main.h |   3 +
+ .../net/dsa/microchip/lan9645x/lan9645x_stats.c    | 929 +++++++++++++++++++++
+ .../net/dsa/microchip/lan9645x/lan9645x_stats.h    | 279 +++++++
+ 5 files changed, 1298 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/dsa/microchip/lan9645x/Makefile b/drivers/net/dsa/microchip/lan9645x/Makefile
-index 70815edca5b9..2413d11fe849 100644
+index 2413d11fe849..cd994943c1c0 100644
 --- a/drivers/net/dsa/microchip/lan9645x/Makefile
 +++ b/drivers/net/dsa/microchip/lan9645x/Makefile
-@@ -4,6 +4,7 @@ obj-$(CONFIG_NET_DSA_MICROCHIP_LAN9645X) += mchp-lan9645x.o
- mchp-lan9645x-objs := \
- 	lan9645x_mac.o \
- 	lan9645x_main.o \
-+	lan9645x_mdb.o \
+@@ -8,4 +8,5 @@ mchp-lan9645x-objs := \
  	lan9645x_npi.o \
  	lan9645x_phylink.o \
  	lan9645x_port.o \
-diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_mac.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_mac.c
-index 9d5282754b7a..aefb3c58370a 100644
---- a/drivers/net/dsa/microchip/lan9645x/lan9645x_mac.c
-+++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_mac.c
-@@ -143,6 +143,20 @@ int lan9645x_mact_learn(struct lan9645x *lan9645x, int port,
++	lan9645x_stats.o \
+ 	lan9645x_vlan.o \
+diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
+index fc604edb309b..6a14ba366162 100644
+--- a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
++++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
+@@ -5,6 +5,7 @@
+ #include <linux/platform_device.h>
+ 
+ #include "lan9645x_main.h"
++#include "lan9645x_stats.h"
+ 
+ static const char *lan9645x_resource_names[NUM_TARGETS + 1] = {
+ 	[TARGET_GCB]          = "gcb",
+@@ -71,6 +72,7 @@ static void lan9645x_teardown(struct dsa_switch *ds)
+ 	lan9645x_npi_port_deinit(lan9645x, lan9645x->npi);
+ 	lan9645x_mac_deinit(lan9645x);
+ 	lan9645x_mdb_deinit(lan9645x);
++	lan9645x_stats_deinit(lan9645x);
+ 	mutex_destroy(&lan9645x->fwd_domain_lock);
+ }
+ 
+@@ -285,6 +287,8 @@ static int lan9645x_setup(struct dsa_switch *ds)
+ 		goto err_mac;
+ 	}
+ 
++	lan9645x_stats_init(lan9645x);
++
+ 	ds->mtu_enforcement_ingress = true;
+ 	ds->assisted_learning_on_cpu_port = true;
+ 	ds->fdb_isolation = true;
+@@ -763,6 +767,68 @@ static int lan9645x_mdb_del(struct dsa_switch *ds, int port,
  	return err;
  }
  
-+int lan9645x_mact_learn_cpu_copy(struct lan9645x *lan9645x, int port,
-+				 const unsigned char *addr, u16 vid,
-+				 enum macaccess_entry_type type, bool cpu_copy)
++static void lan9645x_get_strings(struct dsa_switch *ds, int port, u32 stringset,
++				 uint8_t *data)
 +{
-+	int err;
-+
-+	mutex_lock(&lan9645x->mact_lock);
-+	err = __lan9645x_mact_learn_cpu_copy(lan9645x, port, addr, vid, type,
-+					     cpu_copy);
-+	mutex_unlock(&lan9645x->mact_lock);
-+
-+	return err;
++	lan9645x_stats_get_strings(ds->priv, port, stringset, data);
 +}
 +
- int lan9645x_mact_flush(struct lan9645x *lan9645x, int port)
- {
- 	int err;
-diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-index af158d4461ae..fc604edb309b 100644
---- a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-+++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-@@ -70,6 +70,7 @@ static void lan9645x_teardown(struct dsa_switch *ds)
- 	destroy_workqueue(lan9645x->owq);
- 	lan9645x_npi_port_deinit(lan9645x, lan9645x->npi);
- 	lan9645x_mac_deinit(lan9645x);
-+	lan9645x_mdb_deinit(lan9645x);
- 	mutex_destroy(&lan9645x->fwd_domain_lock);
- }
- 
-@@ -156,6 +157,7 @@ static int lan9645x_setup(struct dsa_switch *ds)
- 	err = lan9645x_mac_init(lan9645x);
- 	if (err)
- 		goto err_mutex;
-+	lan9645x_mdb_init(lan9645x);
- 
- 	/* Link Aggregation Mode: NETDEV_LAG_HASH_L2 */
- 	lan_wr(ANA_AGGR_CFG_AC_SMAC_ENA |
-@@ -302,6 +304,7 @@ static int lan9645x_setup(struct dsa_switch *ds)
- 
- err_mac:
- 	lan9645x_mac_deinit(lan9645x);
-+	lan9645x_mdb_deinit(lan9645x);
- err_mutex:
- 	mutex_destroy(&lan9645x->fwd_domain_lock);
- 	lan9645x_npi_port_deinit(lan9645x, lan9645x->npi);
-@@ -705,6 +708,61 @@ static int lan9645x_fdb_del(struct dsa_switch *ds, int port,
- 	return lan9645x_mact_forget(lan9645x, addr, vid, ENTRYTYPE_LOCKED);
- }
- 
-+static int lan9645x_mdb_add(struct dsa_switch *ds, int port,
-+			    const struct switchdev_obj_port_mdb *mdb,
-+			    struct dsa_db db)
++static void lan9645x_get_ethtool_stats(struct dsa_switch *ds, int port,
++				       uint64_t *data)
 +{
-+	struct net_device *bridge_dev = lan9645x_db2bridge(db);
-+	struct lan9645x *lan9645x = ds->priv;
-+
-+	dev_dbg(lan9645x->dev, "port=%d addr=%pM vid=%u\n", port, mdb->addr,
-+		mdb->vid);
-+
-+	if (IS_ERR(bridge_dev))
-+		return PTR_ERR(bridge_dev);
-+
-+	if (dsa_is_cpu_port(ds, port) && !bridge_dev &&
-+	    dsa_mdb_present_in_other_db(ds, port, mdb, db))
-+		return 0;
-+
-+	if (port == lan9645x->npi)
-+		port = lan9645x->num_phys_ports;
-+
-+	return lan9645x_mdb_port_add(lan9645x, port, mdb, bridge_dev);
++	lan9645x_stats_get_ethtool_stats(ds->priv, port, data);
 +}
 +
-+static int lan9645x_mdb_del(struct dsa_switch *ds, int port,
-+			    const struct switchdev_obj_port_mdb *mdb,
-+			    struct dsa_db db)
++static int lan9645x_get_sset_count(struct dsa_switch *ds, int port, int sset)
 +{
-+	struct net_device *bridge_dev = lan9645x_db2bridge(db);
-+	struct lan9645x *lan9645x = ds->priv;
-+	int err;
++	return lan9645x_stats_get_sset_count(ds->priv, port, sset);
++}
 +
-+	dev_dbg(lan9645x->dev, "port=%d addr=%pM vid=%u\n", port, mdb->addr,
-+		mdb->vid);
++static void lan9645x_get_eth_mac_stats(struct dsa_switch *ds, int port,
++				       struct ethtool_eth_mac_stats *mac_stats)
++{
++	lan9645x_stats_get_eth_mac_stats(ds->priv, port, mac_stats);
++}
 +
-+	if (IS_ERR(bridge_dev))
-+		return PTR_ERR(bridge_dev);
++static void
++lan9645x_get_rmon_stats(struct dsa_switch *ds, int port,
++			struct ethtool_rmon_stats *rmon_stats,
++			const struct ethtool_rmon_hist_range **ranges)
++{
++	lan9645x_stats_get_rmon_stats(ds->priv, port, rmon_stats, ranges);
++}
 +
-+	if (dsa_is_cpu_port(ds, port) && !bridge_dev &&
-+	    dsa_mdb_present_in_other_db(ds, port, mdb, db))
-+		return 0;
++static void lan9645x_get_stats64(struct dsa_switch *ds, int port,
++				 struct rtnl_link_stats64 *s)
++{
++	lan9645x_stats_get_stats64(ds->priv, port, s);
++}
 +
-+	if (port == lan9645x->npi)
-+		port = lan9645x->num_phys_ports;
++static void lan9645x_get_pause_stats(struct dsa_switch *ds, int port,
++				     struct ethtool_pause_stats *pause_stats)
++{
++	lan9645x_stats_get_pause_stats(ds->priv, port, pause_stats);
++}
 +
-+	err = lan9645x_mdb_port_del(lan9645x, port, mdb, bridge_dev);
-+	if (err == -ENOENT) {
-+		dev_dbg(lan9645x->dev,
-+			"mdb not found port=%d addr=%pM vid=%u\n", port,
-+			mdb->addr, mdb->vid);
-+		return 0;
-+	}
++static void lan9645x_get_mm_stats(struct dsa_switch *ds, int port,
++				  struct ethtool_mm_stats *stats)
++{
++	lan9645x_stats_get_mm_stats(ds->priv, port, stats);
++}
 +
-+	return err;
++static void lan9645x_get_eth_phy_stats(struct dsa_switch *ds, int port,
++				       struct ethtool_eth_phy_stats *phy_stats)
++{
++	lan9645x_stats_get_eth_phy_stats(ds->priv, port, phy_stats);
++}
++
++static void
++lan9645x_get_eth_ctrl_stats(struct dsa_switch *ds, int port,
++			    struct ethtool_eth_ctrl_stats *ctrl_stats)
++{
++	lan9645x_stats_get_eth_ctrl_stats(ds->priv, port, ctrl_stats);
 +}
 +
  static const struct dsa_switch_ops lan9645x_switch_ops = {
  	.get_tag_protocol		= lan9645x_get_tag_protocol,
  
-@@ -738,6 +796,10 @@ static const struct dsa_switch_ops lan9645x_switch_ops = {
- 	.port_fdb_dump			= lan9645x_fdb_dump,
- 	.port_fdb_add			= lan9645x_fdb_add,
- 	.port_fdb_del			= lan9645x_fdb_del,
+@@ -800,6 +866,18 @@ static const struct dsa_switch_ops lan9645x_switch_ops = {
+ 	/* Multicast database */
+ 	.port_mdb_add			= lan9645x_mdb_add,
+ 	.port_mdb_del			= lan9645x_mdb_del,
 +
-+	/* Multicast database */
-+	.port_mdb_add			= lan9645x_mdb_add,
-+	.port_mdb_del			= lan9645x_mdb_del,
++	/* Port statistics counters. */
++	.get_strings			= lan9645x_get_strings,
++	.get_ethtool_stats		= lan9645x_get_ethtool_stats,
++	.get_sset_count			= lan9645x_get_sset_count,
++	.get_eth_mac_stats		= lan9645x_get_eth_mac_stats,
++	.get_rmon_stats			= lan9645x_get_rmon_stats,
++	.get_stats64			= lan9645x_get_stats64,
++	.get_pause_stats		= lan9645x_get_pause_stats,
++	.get_mm_stats			= lan9645x_get_mm_stats,
++	.get_eth_phy_stats		= lan9645x_get_eth_phy_stats,
++	.get_eth_ctrl_stats		= lan9645x_get_eth_ctrl_stats,
  };
  
  static int lan9645x_request_target_regmaps(struct lan9645x *lan9645x)
+@@ -900,9 +978,15 @@ static int lan9645x_probe(struct platform_device *pdev)
+ 
+ 	lan9645x_set_feat_dis(lan9645x);
+ 
+-	err = dsa_register_switch(ds);
++	err = lan9645x_stats_alloc(lan9645x);
+ 	if (err)
++		return dev_err_probe(dev, err, "Failed to allocate stats");
++
++	err = dsa_register_switch(ds);
++	if (err) {
++		lan9645x_stats_free(lan9645x);
+ 		return dev_err_probe(dev, err, "Failed to register DSA switch");
++	}
+ 
+ 	return 0;
+ }
+@@ -916,6 +1000,7 @@ static void lan9645x_remove(struct platform_device *pdev)
+ 
+ 	/* Calls lan9645x DSA .teardown */
+ 	dsa_unregister_switch(lan9645x->ds);
++	lan9645x_stats_free(lan9645x);
+ 	dev_set_drvdata(&pdev->dev, NULL);
+ }
+ 
 diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.h b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.h
-index 318082d6df35..0e523b975619 100644
+index 0e523b975619..6423fa415330 100644
 --- a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.h
 +++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.h
-@@ -209,6 +209,14 @@ struct lan9645x {
- 	/* VLAN entries */
- 	struct lan9645x_vlan vlans[VLAN_N_VID];
+@@ -217,6 +217,9 @@ struct lan9645x {
+ 	 */
+ 	struct mutex mdb_lock;
  
-+	/* Multicast Forwarding Database */
-+	struct list_head mdb_entries;
-+	struct list_head pgid_entries;
-+	/* lock for mdb_entries and pgid_entries. Must be taken before mact_lock
-+	 * if both are taken.
-+	 */
-+	struct mutex mdb_lock;
++	/* Statistics  */
++	struct lan9645x_stats *stats;
 +
  	int num_port_dis;
  };
  
-@@ -411,5 +419,18 @@ int lan9645x_mac_init(struct lan9645x *lan9645x);
- void lan9645x_mac_deinit(struct lan9645x *lan9645x);
- int lan9645x_mact_dsa_dump(struct lan9645x *lan9645x, int port,
- 			   dsa_fdb_dump_cb_t *cb, void *data);
-+int lan9645x_mact_learn_cpu_copy(struct lan9645x *lan9645x, int port,
-+				 const unsigned char *addr, u16 vid,
-+				 enum macaccess_entry_type type, bool cpu_copy);
-+
-+/* Multicast Database lan9645x_mdb.c */
-+int lan9645x_mdb_port_add(struct lan9645x *lan9645x, int port,
-+			  const struct switchdev_obj_port_mdb *mdb,
-+			  struct net_device *bridge);
-+int lan9645x_mdb_port_del(struct lan9645x *lan9645x, int port,
-+			  const struct switchdev_obj_port_mdb *mdb,
-+			  struct net_device *bridge);
-+void lan9645x_mdb_init(struct lan9645x *lan9645x);
-+void lan9645x_mdb_deinit(struct lan9645x *lan9645x);
- 
- #endif /* __LAN9645X_MAIN_H__ */
-diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_mdb.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_mdb.c
+diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_stats.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_stats.c
 new file mode 100644
-index 000000000000..ea37bb660273
+index 000000000000..e38f510eb8f6
 --- /dev/null
-+++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_mdb.c
-@@ -0,0 +1,398 @@
-+// SPDX-License-Identifier: GPL-2.0
++++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_stats.c
+@@ -0,0 +1,929 @@
++// SPDX-License-Identifier: GPL-2.0+
 +/* Copyright (C) 2026 Microchip Technology Inc.
 + */
 +
++#include <linux/spinlock.h>
++#include <linux/workqueue.h>
++
 +#include "lan9645x_main.h"
++#include "lan9645x_stats.h"
 +
-+/* HW ignores dest_idx for IPv4/IPv6 types, so we use this dummy index */
-+#define IP_ENTRY_PGID		0
-+#define PGID_INDEX(pgid)	((pgid) ? (pgid)->index : IP_ENTRY_PGID)
++#define LAN9645X_STATS_CHECK_DELAY	(3 * HZ)
 +
-+struct lan9645x_pgid_entry {
-+	struct list_head list;
-+	int index;
-+	refcount_t refcount;
-+	u16 ports;
++static const u32 lan9645x_port_stats_layout[] = {
++	[SCNT_RX_OCT]              = 0x0,
++	[SCNT_RX_UC]               = 0x1,
++	[SCNT_RX_MC]               = 0x2,
++	[SCNT_RX_BC]               = 0x3,
++	[SCNT_RX_SHORT]            = 0x4,
++	[SCNT_RX_FRAG]             = 0x5,
++	[SCNT_RX_JABBER]           = 0x6,
++	[SCNT_RX_CRC]              = 0x7,
++	[SCNT_RX_SYMBOL_ERR]       = 0x8,
++	[SCNT_RX_SZ_64]            = 0x9,
++	[SCNT_RX_SZ_65_127]        = 0xa,
++	[SCNT_RX_SZ_128_255]       = 0xb,
++	[SCNT_RX_SZ_256_511]       = 0xc,
++	[SCNT_RX_SZ_512_1023]      = 0xd,
++	[SCNT_RX_SZ_1024_1526]     = 0xe,
++	[SCNT_RX_SZ_JUMBO]         = 0xf,
++	[SCNT_RX_PAUSE]            = 0x10,
++	[SCNT_RX_CONTROL]          = 0x11,
++	[SCNT_RX_LONG]             = 0x12,
++	[SCNT_RX_CAT_DROP]         = 0x13,
++	[SCNT_RX_RED_PRIO_0]       = 0x14,
++	[SCNT_RX_RED_PRIO_1]       = 0x15,
++	[SCNT_RX_RED_PRIO_2]       = 0x16,
++	[SCNT_RX_RED_PRIO_3]       = 0x17,
++	[SCNT_RX_RED_PRIO_4]       = 0x18,
++	[SCNT_RX_RED_PRIO_5]       = 0x19,
++	[SCNT_RX_RED_PRIO_6]       = 0x1a,
++	[SCNT_RX_RED_PRIO_7]       = 0x1b,
++	[SCNT_RX_YELLOW_PRIO_0]    = 0x1c,
++	[SCNT_RX_YELLOW_PRIO_1]    = 0x1d,
++	[SCNT_RX_YELLOW_PRIO_2]    = 0x1e,
++	[SCNT_RX_YELLOW_PRIO_3]    = 0x1f,
++	[SCNT_RX_YELLOW_PRIO_4]    = 0x20,
++	[SCNT_RX_YELLOW_PRIO_5]    = 0x21,
++	[SCNT_RX_YELLOW_PRIO_6]    = 0x22,
++	[SCNT_RX_YELLOW_PRIO_7]    = 0x23,
++	[SCNT_RX_GREEN_PRIO_0]     = 0x24,
++	[SCNT_RX_GREEN_PRIO_1]     = 0x25,
++	[SCNT_RX_GREEN_PRIO_2]     = 0x26,
++	[SCNT_RX_GREEN_PRIO_3]     = 0x27,
++	[SCNT_RX_GREEN_PRIO_4]     = 0x28,
++	[SCNT_RX_GREEN_PRIO_5]     = 0x29,
++	[SCNT_RX_GREEN_PRIO_6]     = 0x2a,
++	[SCNT_RX_GREEN_PRIO_7]     = 0x2b,
++	[SCNT_RX_ASSEMBLY_ERR]     = 0x2c,
++	[SCNT_RX_SMD_ERR]          = 0x2d,
++	[SCNT_RX_ASSEMBLY_OK]      = 0x2e,
++	[SCNT_RX_MERGE_FRAG]       = 0x2f,
++	[SCNT_RX_PMAC_OCT]         = 0x30,
++	[SCNT_RX_PMAC_UC]          = 0x31,
++	[SCNT_RX_PMAC_MC]          = 0x32,
++	[SCNT_RX_PMAC_BC]          = 0x33,
++	[SCNT_RX_PMAC_SHORT]       = 0x34,
++	[SCNT_RX_PMAC_FRAG]        = 0x35,
++	[SCNT_RX_PMAC_JABBER]      = 0x36,
++	[SCNT_RX_PMAC_CRC]         = 0x37,
++	[SCNT_RX_PMAC_SYMBOL_ERR]  = 0x38,
++	[SCNT_RX_PMAC_SZ_64]       = 0x39,
++	[SCNT_RX_PMAC_SZ_65_127]   = 0x3a,
++	[SCNT_RX_PMAC_SZ_128_255]  = 0x3b,
++	[SCNT_RX_PMAC_SZ_256_511]  = 0x3c,
++	[SCNT_RX_PMAC_SZ_512_1023] = 0x3d,
++	[SCNT_RX_PMAC_SZ_1024_1526] = 0x3e,
++	[SCNT_RX_PMAC_SZ_JUMBO]    = 0x3f,
++	[SCNT_RX_PMAC_PAUSE]       = 0x40,
++	[SCNT_RX_PMAC_CONTROL]     = 0x41,
++	[SCNT_RX_PMAC_LONG]        = 0x42,
++	[SCNT_TX_OCT]              = 0x80,
++	[SCNT_TX_UC]               = 0x81,
++	[SCNT_TX_MC]               = 0x82,
++	[SCNT_TX_BC]               = 0x83,
++	[SCNT_TX_COL]              = 0x84,
++	[SCNT_TX_DROP]             = 0x85,
++	[SCNT_TX_PAUSE]            = 0x86,
++	[SCNT_TX_SZ_64]            = 0x87,
++	[SCNT_TX_SZ_65_127]        = 0x88,
++	[SCNT_TX_SZ_128_255]       = 0x89,
++	[SCNT_TX_SZ_256_511]       = 0x8a,
++	[SCNT_TX_SZ_512_1023]      = 0x8b,
++	[SCNT_TX_SZ_1024_1526]     = 0x8c,
++	[SCNT_TX_SZ_JUMBO]         = 0x8d,
++	[SCNT_TX_YELLOW_PRIO_0]    = 0x8e,
++	[SCNT_TX_YELLOW_PRIO_1]    = 0x8f,
++	[SCNT_TX_YELLOW_PRIO_2]    = 0x90,
++	[SCNT_TX_YELLOW_PRIO_3]    = 0x91,
++	[SCNT_TX_YELLOW_PRIO_4]    = 0x92,
++	[SCNT_TX_YELLOW_PRIO_5]    = 0x93,
++	[SCNT_TX_YELLOW_PRIO_6]    = 0x94,
++	[SCNT_TX_YELLOW_PRIO_7]    = 0x95,
++	[SCNT_TX_GREEN_PRIO_0]     = 0x96,
++	[SCNT_TX_GREEN_PRIO_1]     = 0x97,
++	[SCNT_TX_GREEN_PRIO_2]     = 0x98,
++	[SCNT_TX_GREEN_PRIO_3]     = 0x99,
++	[SCNT_TX_GREEN_PRIO_4]     = 0x9a,
++	[SCNT_TX_GREEN_PRIO_5]     = 0x9b,
++	[SCNT_TX_GREEN_PRIO_6]     = 0x9c,
++	[SCNT_TX_GREEN_PRIO_7]     = 0x9d,
++	[SCNT_TX_AGED]             = 0x9e,
++	[SCNT_TX_LLCT]             = 0x9f,
++	[SCNT_TX_CT]               = 0xa0,
++	[SCNT_TX_BUFDROP]          = 0xa1,
++	[SCNT_TX_MM_HOLD]          = 0xa2,
++	[SCNT_TX_MERGE_FRAG]       = 0xa3,
++	[SCNT_TX_PMAC_OCT]         = 0xa4,
++	[SCNT_TX_PMAC_UC]          = 0xa5,
++	[SCNT_TX_PMAC_MC]          = 0xa6,
++	[SCNT_TX_PMAC_BC]          = 0xa7,
++	[SCNT_TX_PMAC_PAUSE]       = 0xa8,
++	[SCNT_TX_PMAC_SZ_64]       = 0xa9,
++	[SCNT_TX_PMAC_SZ_65_127]   = 0xaa,
++	[SCNT_TX_PMAC_SZ_128_255]  = 0xab,
++	[SCNT_TX_PMAC_SZ_256_511]  = 0xac,
++	[SCNT_TX_PMAC_SZ_512_1023] = 0xad,
++	[SCNT_TX_PMAC_SZ_1024_1526] = 0xae,
++	[SCNT_TX_PMAC_SZ_JUMBO]    = 0xaf,
++	[SCNT_DR_LOCAL]            = 0x100,
++	[SCNT_DR_TAIL]             = 0x101,
++	[SCNT_DR_YELLOW_PRIO_0]    = 0x102,
++	[SCNT_DR_YELLOW_PRIO_1]    = 0x103,
++	[SCNT_DR_YELLOW_PRIO_2]    = 0x104,
++	[SCNT_DR_YELLOW_PRIO_3]    = 0x105,
++	[SCNT_DR_YELLOW_PRIO_4]    = 0x106,
++	[SCNT_DR_YELLOW_PRIO_5]    = 0x107,
++	[SCNT_DR_YELLOW_PRIO_6]    = 0x108,
++	[SCNT_DR_YELLOW_PRIO_7]    = 0x109,
++	[SCNT_DR_GREEN_PRIO_0]     = 0x10a,
++	[SCNT_DR_GREEN_PRIO_1]     = 0x10b,
++	[SCNT_DR_GREEN_PRIO_2]     = 0x10c,
++	[SCNT_DR_GREEN_PRIO_3]     = 0x10d,
++	[SCNT_DR_GREEN_PRIO_4]     = 0x10e,
++	[SCNT_DR_GREEN_PRIO_5]     = 0x10f,
++	[SCNT_DR_GREEN_PRIO_6]     = 0x110,
++	[SCNT_DR_GREEN_PRIO_7]     = 0x111,
 +};
 +
-+struct lan9645x_mdb_entry {
-+	struct list_head list;
-+	unsigned char mac[ETH_ALEN];
-+	u16 vid;
-+	u16 ports;
-+	struct lan9645x_pgid_entry *pgid;
++struct lan9645x_ethtool_stat {
++	char name[ETH_GSTRING_LEN];
++	u16 idx;
 +};
 +
-+void lan9645x_mdb_init(struct lan9645x *lan9645x)
++static const struct lan9645x_ethtool_stat lan9645x_port_ethtool_stats[] = {
++	{ "rx_cat_drop",        SCNT_RX_CAT_DROP },
++	{ "rx_red_prio_0",      SCNT_RX_RED_PRIO_0 },
++	{ "rx_red_prio_1",      SCNT_RX_RED_PRIO_1 },
++	{ "rx_red_prio_2",      SCNT_RX_RED_PRIO_2 },
++	{ "rx_red_prio_3",      SCNT_RX_RED_PRIO_3 },
++	{ "rx_red_prio_4",      SCNT_RX_RED_PRIO_4 },
++	{ "rx_red_prio_5",      SCNT_RX_RED_PRIO_5 },
++	{ "rx_red_prio_6",      SCNT_RX_RED_PRIO_6 },
++	{ "rx_red_prio_7",      SCNT_RX_RED_PRIO_7 },
++	{ "rx_yellow_prio_0",   SCNT_RX_YELLOW_PRIO_0 },
++	{ "rx_yellow_prio_1",   SCNT_RX_YELLOW_PRIO_1 },
++	{ "rx_yellow_prio_2",   SCNT_RX_YELLOW_PRIO_2 },
++	{ "rx_yellow_prio_3",   SCNT_RX_YELLOW_PRIO_3 },
++	{ "rx_yellow_prio_4",   SCNT_RX_YELLOW_PRIO_4 },
++	{ "rx_yellow_prio_5",   SCNT_RX_YELLOW_PRIO_5 },
++	{ "rx_yellow_prio_6",   SCNT_RX_YELLOW_PRIO_6 },
++	{ "rx_yellow_prio_7",   SCNT_RX_YELLOW_PRIO_7 },
++	{ "rx_green_prio_0",    SCNT_RX_GREEN_PRIO_0 },
++	{ "rx_green_prio_1",    SCNT_RX_GREEN_PRIO_1 },
++	{ "rx_green_prio_2",    SCNT_RX_GREEN_PRIO_2 },
++	{ "rx_green_prio_3",    SCNT_RX_GREEN_PRIO_3 },
++	{ "rx_green_prio_4",    SCNT_RX_GREEN_PRIO_4 },
++	{ "rx_green_prio_5",    SCNT_RX_GREEN_PRIO_5 },
++	{ "rx_green_prio_6",    SCNT_RX_GREEN_PRIO_6 },
++	{ "rx_green_prio_7",    SCNT_RX_GREEN_PRIO_7 },
++	{ "tx_drop",            SCNT_TX_DROP },
++	{ "tx_yellow_prio_0",   SCNT_TX_YELLOW_PRIO_0 },
++	{ "tx_yellow_prio_1",   SCNT_TX_YELLOW_PRIO_1 },
++	{ "tx_yellow_prio_2",   SCNT_TX_YELLOW_PRIO_2 },
++	{ "tx_yellow_prio_3",   SCNT_TX_YELLOW_PRIO_3 },
++	{ "tx_yellow_prio_4",   SCNT_TX_YELLOW_PRIO_4 },
++	{ "tx_yellow_prio_5",   SCNT_TX_YELLOW_PRIO_5 },
++	{ "tx_yellow_prio_6",   SCNT_TX_YELLOW_PRIO_6 },
++	{ "tx_yellow_prio_7",   SCNT_TX_YELLOW_PRIO_7 },
++	{ "tx_green_prio_0",    SCNT_TX_GREEN_PRIO_0 },
++	{ "tx_green_prio_1",    SCNT_TX_GREEN_PRIO_1 },
++	{ "tx_green_prio_2",    SCNT_TX_GREEN_PRIO_2 },
++	{ "tx_green_prio_3",    SCNT_TX_GREEN_PRIO_3 },
++	{ "tx_green_prio_4",    SCNT_TX_GREEN_PRIO_4 },
++	{ "tx_green_prio_5",    SCNT_TX_GREEN_PRIO_5 },
++	{ "tx_green_prio_6",    SCNT_TX_GREEN_PRIO_6 },
++	{ "tx_green_prio_7",    SCNT_TX_GREEN_PRIO_7 },
++	{ "tx_aged",            SCNT_TX_AGED },
++	{ "tx_bufdrop",         SCNT_TX_BUFDROP },
++	{ "dr_local",           SCNT_DR_LOCAL },
++	{ "dr_tail",            SCNT_DR_TAIL },
++	{ "dr_yellow_prio_0",   SCNT_DR_YELLOW_PRIO_0 },
++	{ "dr_yellow_prio_1",   SCNT_DR_YELLOW_PRIO_1 },
++	{ "dr_yellow_prio_2",   SCNT_DR_YELLOW_PRIO_2 },
++	{ "dr_yellow_prio_3",   SCNT_DR_YELLOW_PRIO_3 },
++	{ "dr_yellow_prio_4",   SCNT_DR_YELLOW_PRIO_4 },
++	{ "dr_yellow_prio_5",   SCNT_DR_YELLOW_PRIO_5 },
++	{ "dr_yellow_prio_6",   SCNT_DR_YELLOW_PRIO_6 },
++	{ "dr_yellow_prio_7",   SCNT_DR_YELLOW_PRIO_7 },
++	{ "dr_green_prio_0",    SCNT_DR_GREEN_PRIO_0 },
++	{ "dr_green_prio_1",    SCNT_DR_GREEN_PRIO_1 },
++	{ "dr_green_prio_2",    SCNT_DR_GREEN_PRIO_2 },
++	{ "dr_green_prio_3",    SCNT_DR_GREEN_PRIO_3 },
++	{ "dr_green_prio_4",    SCNT_DR_GREEN_PRIO_4 },
++	{ "dr_green_prio_5",    SCNT_DR_GREEN_PRIO_5 },
++	{ "dr_green_prio_6",    SCNT_DR_GREEN_PRIO_6 },
++	{ "dr_green_prio_7",    SCNT_DR_GREEN_PRIO_7 },
++};
++
++static const struct lan9645x_view_stats lan9645x_view_stat_cfgs[] = {
++	[LAN9645X_STAT_PORTS] = {
++		.name = "ports",
++		.type = LAN9645X_STAT_PORTS,
++		.layout = lan9645x_port_stats_layout,
++		.num_cnts = ARRAY_SIZE(lan9645x_port_stats_layout),
++		.num_indexes = NUM_PHYS_PORTS,
++	},
++};
++
++static int __lan9645x_stats_view_idx_hw_read(struct lan9645x *lan9645x,
++					     enum lan9645x_view_stat_type vtype,
++					     int idx)
 +{
-+	INIT_LIST_HEAD(&lan9645x->mdb_entries);
-+	INIT_LIST_HEAD(&lan9645x->pgid_entries);
-+	mutex_init(&lan9645x->mdb_lock);
++	struct lan9645x_stat_region region;
++	struct lan9645x_view_stats *vstats;
++	u32 *region_buf;
++	int err;
 +
-+	/* Use CPU queues to communicate frame classification to the CPU */
-+	lan_rmw(ANA_CPUQ_CFG_CPUQ_IGMP_SET(LAN9645X_CPUQ_TRAP) |
-+		ANA_CPUQ_CFG_CPUQ_MLD_SET(LAN9645X_CPUQ_TRAP) |
-+		ANA_CPUQ_CFG_CPUQ_IPMC_CTRL_SET(LAN9645X_CPUQ_COPY),
-+		ANA_CPUQ_CFG_CPUQ_IGMP |
-+		ANA_CPUQ_CFG_CPUQ_MLD |
-+		ANA_CPUQ_CFG_CPUQ_IPMC_CTRL,
-+		lan9645x, ANA_CPUQ_CFG);
-+}
++	lockdep_assert_held(&lan9645x->stats->hw_lock);
 +
-+static enum macaccess_entry_type lan9645x_mdb_classify(const unsigned char *mac)
-+{
-+	if (ether_addr_is_ipv4_mcast(mac))
-+		return ENTRYTYPE_MACV4;
-+	if (ether_addr_is_ipv6_mcast(mac))
-+		return ENTRYTYPE_MACV6;
-+	return ENTRYTYPE_LOCKED;
-+}
++	vstats = lan9645x_get_vstats(lan9645x, vtype);
++	if (!vstats || idx < 0 || idx >= vstats->num_indexes)
++		return -EINVAL;
 +
-+static struct lan9645x_mdb_entry *
-+lan9645x_mdb_entry_lookup(struct lan9645x *lan9645x, const unsigned char *mac,
-+			  u16 vid)
-+{
-+	struct lan9645x_mdb_entry *mdb;
++	lan_wr(SYS_STAT_CFG_STAT_VIEW_SET(idx), lan9645x, SYS_STAT_CFG);
 +
-+	list_for_each_entry(mdb, &lan9645x->mdb_entries, list) {
-+		if (ether_addr_equal(mdb->mac, mac) && mdb->vid == vid)
-+			return mdb;
-+	}
++	region_buf = &vstats->buf[vstats->num_cnts * idx];
 +
-+	return NULL;
-+}
-+
-+static struct lan9645x_mdb_entry *
-+lan9645x_mdb_entry_alloc(struct lan9645x *lan9645x,
-+			 const unsigned char addr[ETH_ALEN], u16 vid)
-+{
-+	struct lan9645x_mdb_entry *mdb_entry;
-+
-+	mdb_entry = kzalloc_obj(*mdb_entry);
-+	if (!mdb_entry)
-+		return ERR_PTR(-ENOMEM);
-+
-+	ether_addr_copy(mdb_entry->mac, addr);
-+	mdb_entry->vid = vid;
-+
-+	list_add_tail(&mdb_entry->list, &lan9645x->mdb_entries);
-+
-+	dev_dbg(lan9645x->dev, "vid=%u addr=%pM\n", mdb_entry->vid,
-+		mdb_entry->mac);
-+
-+	return mdb_entry;
-+}
-+
-+static void lan9645x_mdb_encode_mac(unsigned char *dst, unsigned char *mac,
-+				    u16 ports, enum macaccess_entry_type type)
-+{
-+	ether_addr_copy(dst, mac);
-+
-+	/* The HW encodes the portmask in the high bits of the mac for ip
-+	 * multicast entries, to save on the limited PGID resources.
-+	 *
-+	 * IPv4 Multicast DMAC: 0x01005Exxxxxx
-+	 * IPv6 Multicast DMAC: 0x3333xxxxxxxx
-+	 *
-+	 * which gives us 24 or 16 bits to encode the portmask.
++	/* Each region for this index contains counters which are at sequential
++	 * addresses, so we can use bulk reads to ease lock pressure a bit.
 +	 */
-+	if (type == ENTRYTYPE_MACV4) {
-+		dst[0] = 0;
-+		dst[1] = ports >> 8;
-+		dst[2] = ports & 0xff;
-+	} else if (type == ENTRYTYPE_MACV6) {
-+		dst[0] = ports >> 8;
-+		dst[1] = ports & 0xff;
-+	}
-+}
-+
-+static void lan9645x_pgid_entry_put(struct lan9645x *lan9645x,
-+				    struct lan9645x_pgid_entry *pgid_entry)
-+{
-+	if (!pgid_entry)
-+		return;
-+
-+	if (!refcount_dec_and_test(&pgid_entry->refcount))
-+		return;
-+
-+	dev_dbg(lan9645x->dev, "pgid=%d ports=0x%x", pgid_entry->index,
-+		pgid_entry->ports);
-+	/* We leave the PGID written in HW, as no entry is pointing to it. */
-+	list_del(&pgid_entry->list);
-+	kfree(pgid_entry);
-+}
-+
-+static void lan9645x_mdb_entry_dealloc(struct lan9645x *lan9645x,
-+				       struct lan9645x_mdb_entry *mdb_entry)
-+{
-+	dev_dbg(lan9645x->dev, "vid=%u addr=%pM\n", mdb_entry->vid,
-+		mdb_entry->mac);
-+	list_del(&mdb_entry->list);
-+	lan9645x_pgid_entry_put(lan9645x, mdb_entry->pgid);
-+	kfree(mdb_entry);
-+}
-+
-+static struct lan9645x_pgid_entry *
-+lan9645x_mdb_pgid_entry_lookup(struct lan9645x *lan9645x, u16 ports)
-+{
-+	struct lan9645x_pgid_entry *pgid_entry;
-+
-+	list_for_each_entry(pgid_entry, &lan9645x->pgid_entries, list) {
-+		if (pgid_entry->ports == ports &&
-+		    refcount_inc_not_zero(&pgid_entry->refcount))
-+			return pgid_entry;
-+	}
-+
-+	return NULL;
-+}
-+
-+static struct lan9645x_pgid_entry *
-+lan9645x_pgid_entry_alloc(struct lan9645x *lan9645x, int index, u16 ports)
-+{
-+	struct lan9645x_pgid_entry *pgid_entry;
-+
-+	pgid_entry = kzalloc_obj(*pgid_entry);
-+	if (!pgid_entry)
-+		return ERR_PTR(-ENOMEM);
-+
-+	pgid_entry->ports = ports;
-+	pgid_entry->index = index;
-+	refcount_set(&pgid_entry->refcount, 1);
-+
-+	list_add_tail(&pgid_entry->list, &lan9645x->pgid_entries);
-+
-+	dev_dbg(lan9645x->dev, "index=%d ports=0x%x", pgid_entry->index,
-+		pgid_entry->ports);
-+
-+	lan_rmw(ANA_PGID_PGID_SET(pgid_entry->ports),
-+		ANA_PGID_PGID, lan9645x,
-+		ANA_PGID(pgid_entry->index));
-+
-+	return pgid_entry;
-+}
-+
-+static struct lan9645x_pgid_entry *
-+lan9645x_mdb_pgid_entry_create(struct lan9645x *lan9645x, u16 ports)
-+{
-+	struct lan9645x_pgid_entry *pgid_entry = NULL;
-+	int index;
-+
-+	for (index = PGID_GP_START; index < PGID_GP_END; index++) {
-+		bool used = false;
-+
-+		list_for_each_entry(pgid_entry, &lan9645x->pgid_entries, list) {
-+			if (pgid_entry->index == index) {
-+				used = true;
-+				break;
-+			}
++	for (int r = 0; r < vstats->num_regions; r++) {
++		region = vstats->regions[r];
++		err = lan_bulk_rd(&region_buf[region.cnts_base_idx], region.cnt,
++				  lan9645x, SYS_CNT(region.base_offset));
++		if (err) {
++			dev_err(lan9645x->dev,
++				"stats bulk read err vtype=%d idx=%d err=%d\n",
++				vtype, idx, err);
++			return err;
 +		}
-+
-+		if (!used)
-+			return lan9645x_pgid_entry_alloc(lan9645x, index,
-+							 ports);
 +	}
 +
-+	return ERR_PTR(-ENOSPC);
-+}
-+
-+static struct lan9645x_pgid_entry *
-+lan9645x_mdb_pgid_entry_get(struct lan9645x *lan9645x, u16 ports,
-+			    enum macaccess_entry_type type)
-+{
-+	struct lan9645x_pgid_entry *pgid_entry;
-+	u16 pgid_ports;
-+
-+	if (type == ENTRYTYPE_MACV4 || type == ENTRYTYPE_MACV6 || !ports)
-+		return NULL;
-+
-+	/* CPU port module forwarding is handled by cpu_copy flag on mac table
-+	 * entry. So we can strip the CPU port module here to allow better PGID
-+	 * sharing.
-+	 */
-+	pgid_ports = ports & ~BIT(lan9645x->num_phys_ports);
-+
-+	pgid_entry = lan9645x_mdb_pgid_entry_lookup(lan9645x, pgid_ports);
-+	if (!pgid_entry)
-+		return lan9645x_mdb_pgid_entry_create(lan9645x, pgid_ports);
-+
-+	return pgid_entry;
-+}
-+
-+static int lan9645x_mdb_update_dest(struct lan9645x *lan9645x,
-+				    struct lan9645x_mdb_entry *mdb_entry,
-+				    enum macaccess_entry_type type,
-+				    struct lan9645x_pgid_entry *new_pgid,
-+				    u16 new_ports)
-+{
-+	unsigned char mac[ETH_ALEN] __aligned(2);
-+	struct lan9645x_pgid_entry *old_pgid;
-+	int err, pgid_index;
-+	bool cpu_copy;
-+
-+	old_pgid = mdb_entry->pgid;
-+	lan9645x_mdb_encode_mac(mac, mdb_entry->mac, new_ports, type);
-+	cpu_copy = !!(new_ports & BIT(lan9645x->num_phys_ports));
-+	pgid_index = PGID_INDEX(new_pgid);
-+
-+	/* For IP multicast, the hardware lookup uses the DMAC
-+	 * (01:00:5E:.. / 33:33:..) as the (mac, vid) key, not the encoded mac.
-+	 * Therefore, this CMD_LEARN will atomically rewrite the existing
-+	 * hardware entry. We intentionally do not do a forget before learn
-+	 * sequence, as that would not be atomic, and leave a forwarding gap.
-+	 */
-+	err = lan9645x_mact_learn_cpu_copy(lan9645x, pgid_index, mac,
-+					   mdb_entry->vid, type, cpu_copy);
-+	if (err) {
-+		lan9645x_pgid_entry_put(lan9645x, new_pgid);
-+		return err;
-+	}
-+	mdb_entry->pgid = new_pgid;
-+	mdb_entry->ports = new_ports;
-+	lan9645x_pgid_entry_put(lan9645x, old_pgid);
 +	return 0;
 +}
 +
-+static int __lan9645x_mdb_add(struct lan9645x *lan9645x, int chip_port,
-+			      const unsigned char addr[ETH_ALEN], u16 vid,
-+			      enum macaccess_entry_type type)
++static void
++__lan9645x_stats_view_idx_transfer(struct lan9645x *lan9645x,
++				   enum lan9645x_view_stat_type vtype, int idx)
 +{
-+	struct lan9645x_pgid_entry *new_pgid;
-+	struct lan9645x_mdb_entry *mdb_entry;
-+	u16 new_ports;
-+	int err;
++	struct lan9645x_view_stats *vstats;
++	u64 *idx_counters;
++	u32 *region_buf;
++	int cntr;
 +
-+	mdb_entry = lan9645x_mdb_entry_lookup(lan9645x, addr, vid);
-+	if (!mdb_entry) {
-+		mdb_entry = lan9645x_mdb_entry_alloc(lan9645x, addr, vid);
-+		if (IS_ERR(mdb_entry))
-+			return PTR_ERR(mdb_entry);
-+	}
++	lockdep_assert_held(&lan9645x->stats->sw_lock);
 +
-+	if (mdb_entry->ports & BIT(chip_port))
-+		return 0;
++	vstats = lan9645x_get_vstats(lan9645x, vtype);
++	if (!vstats || idx < 0 || idx >= vstats->num_indexes)
++		return;
 +
-+	new_ports = mdb_entry->ports | BIT(chip_port);
++	idx_counters = STATS_INDEX(vstats, idx);
++	region_buf = &vstats->buf[vstats->num_cnts * idx];
 +
-+	/* Update PGID ptr for non-IP entries (L2 multicast) */
-+	new_pgid = lan9645x_mdb_pgid_entry_get(lan9645x, new_ports, type);
-+	if (IS_ERR(new_pgid)) {
-+		/* Out of PGIDs or mem. Continue forwarding to old port
-+		 * group, or remove if fresh mdb_entry.
-+		 */
-+		if (!mdb_entry->ports)
-+			lan9645x_mdb_entry_dealloc(lan9645x, mdb_entry);
-+
-+		return PTR_ERR(new_pgid);
-+	}
-+
-+	err = lan9645x_mdb_update_dest(lan9645x, mdb_entry, type, new_pgid,
-+				       new_ports);
-+	if (err && !mdb_entry->ports)
-+		lan9645x_mdb_entry_dealloc(lan9645x, mdb_entry);
-+
-+	return err;
++	for (cntr = 0; cntr < vstats->num_cnts; cntr++)
++		lan9645x_stats_add_cnt(&idx_counters[cntr], region_buf[cntr]);
 +}
 +
-+static int __lan9645x_mdb_del(struct lan9645x *lan9645x, int chip_port,
-+			      const unsigned char addr[ETH_ALEN], u16 vid,
-+			      enum macaccess_entry_type type)
++static void __lan9645x_stats_view_idx_update(struct lan9645x *lan9645x,
++					     enum lan9645x_view_stat_type vtype,
++					     int idx)
 +{
-+	struct lan9645x_pgid_entry *new_pgid;
-+	struct lan9645x_mdb_entry *mdb_entry;
-+	u16 new_ports;
++	struct lan9645x_stats *s = lan9645x->stats;
++
++	lockdep_assert_held(&s->hw_lock);
++
++	if (!__lan9645x_stats_view_idx_hw_read(lan9645x, vtype, idx)) {
++		spin_lock(&s->sw_lock);
++		__lan9645x_stats_view_idx_transfer(lan9645x, vtype, idx);
++		spin_unlock(&s->sw_lock);
++	}
++}
++
++static u64 *lan9645x_stats_view_idx_update(struct lan9645x *lan9645x,
++					   enum lan9645x_view_stat_type vtype,
++					   int idx)
++{
++	struct lan9645x_stats *s = lan9645x->stats;
++
++	mutex_lock(&s->hw_lock);
++	__lan9645x_stats_view_idx_update(lan9645x, vtype, idx);
++	mutex_unlock(&s->hw_lock);
++
++	return STAT_COUNTERS(lan9645x, vtype, idx);
++}
++
++static void lan9645x_stats_view_update(struct lan9645x *lan9645x,
++				       enum lan9645x_view_stat_type vtype)
++{
++	struct lan9645x_stats *s = lan9645x->stats;
++	struct lan9645x_view_stats *vstats;
++	int idx;
++
++	vstats = lan9645x_get_vstats(lan9645x, vtype);
++	if (!vstats)
++		return;
++
++	switch (vtype) {
++	case LAN9645X_STAT_PORTS:
++		mutex_lock(&s->hw_lock);
++		for (idx = 0; idx < vstats->num_indexes; idx++) {
++			if (dsa_is_unused_port(lan9645x->ds, idx))
++				continue;
++			__lan9645x_stats_view_idx_update(lan9645x, vtype, idx);
++		}
++		mutex_unlock(&s->hw_lock);
++		return;
++	default:
++		return;
++	}
++}
++
++static void lan9645x_stats_update(struct lan9645x *lan9645x)
++{
++	for (int vtype = 0; vtype < LAN9645X_STAT_NUM; vtype++)
++		lan9645x_stats_view_update(lan9645x, vtype);
++}
++
++void lan9645x_stats_get_strings(struct lan9645x *lan9645x, int port,
++				u32 stringset, u8 *data)
++{
++	int i;
++
++	if (stringset != ETH_SS_STATS)
++		return;
++
++	for (i = 0; i < ARRAY_SIZE(lan9645x_port_ethtool_stats); i++)
++		memcpy(data + i * ETH_GSTRING_LEN,
++		       lan9645x_port_ethtool_stats[i].name, ETH_GSTRING_LEN);
++}
++
++int lan9645x_stats_get_sset_count(struct lan9645x *lan9645x, int port, int sset)
++{
++	if (sset != ETH_SS_STATS)
++		return -EOPNOTSUPP;
++
++	return ARRAY_SIZE(lan9645x_port_ethtool_stats);
++}
++
++void lan9645x_stats_get_ethtool_stats(struct lan9645x *lan9645x, int port,
++				      u64 *data)
++{
++	struct lan9645x_stats *stats = lan9645x->stats;
++	u64 *c;
++	int i;
++
++	c = lan9645x_stats_view_idx_update(lan9645x, LAN9645X_STAT_PORTS, port);
++
++	spin_lock(&stats->sw_lock);
++	for (i = 0; i < ARRAY_SIZE(lan9645x_port_ethtool_stats); i++)
++		*data++ = c[lan9645x_port_ethtool_stats[i].idx];
++	spin_unlock(&stats->sw_lock);
++}
++
++static u64 *lan9645x_stats_port_update(struct lan9645x *lan9645x, int port)
++{
++	return lan9645x_stats_view_idx_update(lan9645x, LAN9645X_STAT_PORTS,
++					      port);
++}
++
++void lan9645x_stats_get_eth_mac_stats(struct lan9645x *lan9645x, int port,
++				      struct ethtool_eth_mac_stats *m)
++{
++	struct lan9645x_stats *s = lan9645x->stats;
++	u64 *c;
++
++	c = lan9645x_stats_port_update(lan9645x, port);
++
++	spin_lock(&s->sw_lock);
++
++	switch (m->src) {
++	case ETHTOOL_MAC_STATS_SRC_EMAC:
++		m->FramesTransmittedOK = c[SCNT_TX_UC] +
++					 c[SCNT_TX_MC] +
++					 c[SCNT_TX_BC];
++		m->SingleCollisionFrames = c[SCNT_TX_COL];
++		m->FramesReceivedOK = c[SCNT_RX_UC] +
++				      c[SCNT_RX_MC] +
++				      c[SCNT_RX_BC];
++		m->FrameCheckSequenceErrors = c[SCNT_RX_CRC];
++		m->OctetsTransmittedOK = c[SCNT_TX_OCT];
++		m->OctetsReceivedOK = c[SCNT_RX_OCT];
++		m->MulticastFramesXmittedOK = c[SCNT_TX_MC];
++		m->BroadcastFramesXmittedOK = c[SCNT_TX_BC];
++		m->MulticastFramesReceivedOK = c[SCNT_RX_MC];
++		m->BroadcastFramesReceivedOK = c[SCNT_RX_BC];
++		m->InRangeLengthErrors = c[SCNT_RX_FRAG] +
++					 c[SCNT_RX_JABBER] +
++					 c[SCNT_RX_CRC];
++		m->OutOfRangeLengthField = c[SCNT_RX_SHORT] +
++					   c[SCNT_RX_LONG];
++		m->FrameTooLongErrors = c[SCNT_RX_LONG];
++		break;
++	case ETHTOOL_MAC_STATS_SRC_PMAC:
++		m->FramesTransmittedOK = c[SCNT_TX_PMAC_UC] +
++					 c[SCNT_TX_PMAC_MC] +
++					 c[SCNT_TX_PMAC_BC];
++		m->FramesReceivedOK = c[SCNT_RX_PMAC_UC] +
++				      c[SCNT_RX_PMAC_MC] +
++				      c[SCNT_RX_PMAC_BC];
++		m->FrameCheckSequenceErrors = c[SCNT_RX_PMAC_CRC];
++		m->OctetsTransmittedOK = c[SCNT_TX_PMAC_OCT];
++		m->OctetsReceivedOK = c[SCNT_RX_PMAC_OCT];
++		m->MulticastFramesXmittedOK = c[SCNT_TX_PMAC_MC];
++		m->BroadcastFramesXmittedOK = c[SCNT_TX_PMAC_BC];
++		m->MulticastFramesReceivedOK = c[SCNT_RX_PMAC_MC];
++		m->BroadcastFramesReceivedOK = c[SCNT_RX_PMAC_BC];
++		m->InRangeLengthErrors = c[SCNT_RX_PMAC_FRAG] +
++					 c[SCNT_RX_PMAC_JABBER] +
++					 c[SCNT_RX_PMAC_CRC];
++		m->OutOfRangeLengthField = c[SCNT_RX_PMAC_SHORT] +
++					   c[SCNT_RX_PMAC_LONG];
++		m->FrameTooLongErrors = c[SCNT_RX_PMAC_LONG];
++		break;
++	default:
++		m->FramesTransmittedOK = c[SCNT_TX_UC] +
++					 c[SCNT_TX_MC] +
++					 c[SCNT_TX_BC] +
++					 c[SCNT_TX_PMAC_UC] +
++					 c[SCNT_TX_PMAC_MC] +
++					 c[SCNT_TX_PMAC_BC];
++		m->SingleCollisionFrames = c[SCNT_TX_COL];
++		m->FramesReceivedOK = c[SCNT_RX_UC] +
++				      c[SCNT_RX_MC] +
++				      c[SCNT_RX_BC] +
++				      c[SCNT_RX_PMAC_UC] +
++				      c[SCNT_RX_PMAC_MC] +
++				      c[SCNT_RX_PMAC_BC];
++		m->FrameCheckSequenceErrors = c[SCNT_RX_CRC] +
++					      c[SCNT_RX_PMAC_CRC];
++		m->OctetsTransmittedOK = c[SCNT_TX_OCT] +
++					 c[SCNT_TX_PMAC_OCT];
++		m->OctetsReceivedOK = c[SCNT_RX_OCT] +
++				      c[SCNT_RX_PMAC_OCT];
++		m->MulticastFramesXmittedOK = c[SCNT_TX_MC] +
++					      c[SCNT_TX_PMAC_MC];
++		m->BroadcastFramesXmittedOK = c[SCNT_TX_BC] +
++					      c[SCNT_TX_PMAC_BC];
++		m->MulticastFramesReceivedOK = c[SCNT_RX_MC] +
++					       c[SCNT_RX_PMAC_MC];
++		m->BroadcastFramesReceivedOK = c[SCNT_RX_BC] +
++					       c[SCNT_RX_PMAC_BC];
++		m->InRangeLengthErrors = c[SCNT_RX_FRAG] +
++					 c[SCNT_RX_JABBER] +
++					 c[SCNT_RX_CRC] +
++					 c[SCNT_RX_PMAC_FRAG] +
++					 c[SCNT_RX_PMAC_JABBER] +
++					 c[SCNT_RX_PMAC_CRC];
++		m->OutOfRangeLengthField = c[SCNT_RX_SHORT] +
++					   c[SCNT_RX_LONG] +
++					   c[SCNT_RX_PMAC_SHORT] +
++					   c[SCNT_RX_PMAC_LONG];
++		m->FrameTooLongErrors = c[SCNT_RX_LONG] +
++					c[SCNT_RX_PMAC_LONG];
++		break;
++	}
++
++	spin_unlock(&s->sw_lock);
++}
++
++static const struct ethtool_rmon_hist_range lan9645x_rmon_ranges[] = {
++	{    64,     64 },
++	{   65,    127 },
++	{  128,    255 },
++	{  256,    511 },
++	{  512,   1023 },
++	{ 1024,   1526 },
++	{ 1527, 0xffff },
++	{}
++};
++
++void
++lan9645x_stats_get_rmon_stats(struct lan9645x *lan9645x, int port,
++			      struct ethtool_rmon_stats *r,
++			      const struct ethtool_rmon_hist_range **ranges)
++{
++	struct lan9645x_stats *s = lan9645x->stats;
++	u64 *c;
++
++	c = lan9645x_stats_port_update(lan9645x, port);
++
++	spin_lock(&s->sw_lock);
++
++	switch (r->src) {
++	case ETHTOOL_MAC_STATS_SRC_EMAC:
++		r->undersize_pkts = c[SCNT_RX_SHORT];
++		r->oversize_pkts = c[SCNT_RX_LONG];
++		r->fragments = c[SCNT_RX_FRAG];
++		r->jabbers = c[SCNT_RX_JABBER];
++		r->hist[0] = c[SCNT_RX_SZ_64];
++		r->hist[1] = c[SCNT_RX_SZ_65_127];
++		r->hist[2] = c[SCNT_RX_SZ_128_255];
++		r->hist[3] = c[SCNT_RX_SZ_256_511];
++		r->hist[4] = c[SCNT_RX_SZ_512_1023];
++		r->hist[5] = c[SCNT_RX_SZ_1024_1526];
++		r->hist[6] = c[SCNT_RX_SZ_JUMBO];
++		r->hist_tx[0] = c[SCNT_TX_SZ_64];
++		r->hist_tx[1] = c[SCNT_TX_SZ_65_127];
++		r->hist_tx[2] = c[SCNT_TX_SZ_128_255];
++		r->hist_tx[3] = c[SCNT_TX_SZ_256_511];
++		r->hist_tx[4] = c[SCNT_TX_SZ_512_1023];
++		r->hist_tx[5] = c[SCNT_TX_SZ_1024_1526];
++		r->hist_tx[6] = c[SCNT_TX_SZ_JUMBO];
++		break;
++	case ETHTOOL_MAC_STATS_SRC_PMAC:
++		r->undersize_pkts = c[SCNT_RX_PMAC_SHORT];
++		r->oversize_pkts = c[SCNT_RX_PMAC_LONG];
++		r->fragments = c[SCNT_RX_PMAC_FRAG];
++		r->jabbers = c[SCNT_RX_PMAC_JABBER];
++		r->hist[0] = c[SCNT_RX_PMAC_SZ_64];
++		r->hist[1] = c[SCNT_RX_PMAC_SZ_65_127];
++		r->hist[2] = c[SCNT_RX_PMAC_SZ_128_255];
++		r->hist[3] = c[SCNT_RX_PMAC_SZ_256_511];
++		r->hist[4] = c[SCNT_RX_PMAC_SZ_512_1023];
++		r->hist[5] = c[SCNT_RX_PMAC_SZ_1024_1526];
++		r->hist[6] = c[SCNT_RX_PMAC_SZ_JUMBO];
++		r->hist_tx[0] = c[SCNT_TX_PMAC_SZ_64];
++		r->hist_tx[1] = c[SCNT_TX_PMAC_SZ_65_127];
++		r->hist_tx[2] = c[SCNT_TX_PMAC_SZ_128_255];
++		r->hist_tx[3] = c[SCNT_TX_PMAC_SZ_256_511];
++		r->hist_tx[4] = c[SCNT_TX_PMAC_SZ_512_1023];
++		r->hist_tx[5] = c[SCNT_TX_PMAC_SZ_1024_1526];
++		r->hist_tx[6] = c[SCNT_TX_PMAC_SZ_JUMBO];
++		break;
++	default:
++		r->undersize_pkts = c[SCNT_RX_SHORT] +
++				    c[SCNT_RX_PMAC_SHORT];
++		r->oversize_pkts = c[SCNT_RX_LONG] +
++				   c[SCNT_RX_PMAC_LONG];
++		r->fragments = c[SCNT_RX_FRAG] +
++			       c[SCNT_RX_PMAC_FRAG];
++		r->jabbers = c[SCNT_RX_JABBER] +
++			     c[SCNT_RX_PMAC_JABBER];
++		r->hist[0] = c[SCNT_RX_SZ_64] +
++			     c[SCNT_RX_PMAC_SZ_64];
++		r->hist[1] = c[SCNT_RX_SZ_65_127] +
++			     c[SCNT_RX_PMAC_SZ_65_127];
++		r->hist[2] = c[SCNT_RX_SZ_128_255] +
++			     c[SCNT_RX_PMAC_SZ_128_255];
++		r->hist[3] = c[SCNT_RX_SZ_256_511] +
++			     c[SCNT_RX_PMAC_SZ_256_511];
++		r->hist[4] = c[SCNT_RX_SZ_512_1023] +
++			     c[SCNT_RX_PMAC_SZ_512_1023];
++		r->hist[5] = c[SCNT_RX_SZ_1024_1526] +
++			     c[SCNT_RX_PMAC_SZ_1024_1526];
++		r->hist[6] = c[SCNT_RX_SZ_JUMBO] +
++			     c[SCNT_RX_PMAC_SZ_JUMBO];
++		r->hist_tx[0] = c[SCNT_TX_SZ_64] +
++				c[SCNT_TX_PMAC_SZ_64];
++		r->hist_tx[1] = c[SCNT_TX_SZ_65_127] +
++				c[SCNT_TX_PMAC_SZ_65_127];
++		r->hist_tx[2] = c[SCNT_TX_SZ_128_255] +
++				c[SCNT_TX_PMAC_SZ_128_255];
++		r->hist_tx[3] = c[SCNT_TX_SZ_256_511] +
++				c[SCNT_TX_PMAC_SZ_256_511];
++		r->hist_tx[4] = c[SCNT_TX_SZ_512_1023] +
++				c[SCNT_TX_PMAC_SZ_512_1023];
++		r->hist_tx[5] = c[SCNT_TX_SZ_1024_1526] +
++				c[SCNT_TX_PMAC_SZ_1024_1526];
++		r->hist_tx[6] = c[SCNT_TX_SZ_JUMBO] +
++				c[SCNT_TX_PMAC_SZ_JUMBO];
++		break;
++	}
++
++	spin_unlock(&s->sw_lock);
++
++	*ranges = lan9645x_rmon_ranges;
++}
++
++/* Called in atomic context */
++void lan9645x_stats_get_stats64(struct lan9645x *lan9645x, int port,
++				struct rtnl_link_stats64 *stats)
++{
++	struct lan9645x_stats *s = lan9645x->stats;
++	u64 *c;
++
++	c = STAT_COUNTERS(lan9645x, LAN9645X_STAT_PORTS, port);
++
++	spin_lock(&s->sw_lock);
++
++	stats->rx_bytes = c[SCNT_RX_OCT] + c[SCNT_RX_PMAC_OCT];
++
++	stats->rx_packets = c[SCNT_RX_SHORT] +
++			    c[SCNT_RX_FRAG] +
++			    c[SCNT_RX_JABBER] +
++			    c[SCNT_RX_SZ_64] +
++			    c[SCNT_RX_SZ_65_127] +
++			    c[SCNT_RX_SZ_128_255] +
++			    c[SCNT_RX_SZ_256_511] +
++			    c[SCNT_RX_SZ_512_1023] +
++			    c[SCNT_RX_SZ_1024_1526] +
++			    c[SCNT_RX_SZ_JUMBO] +
++			    c[SCNT_RX_LONG] +
++			    c[SCNT_RX_PMAC_SHORT] +
++			    c[SCNT_RX_PMAC_FRAG] +
++			    c[SCNT_RX_PMAC_JABBER] +
++			    c[SCNT_RX_PMAC_SZ_64] +
++			    c[SCNT_RX_PMAC_SZ_65_127] +
++			    c[SCNT_RX_PMAC_SZ_128_255] +
++			    c[SCNT_RX_PMAC_SZ_256_511] +
++			    c[SCNT_RX_PMAC_SZ_512_1023] +
++			    c[SCNT_RX_PMAC_SZ_1024_1526] +
++			    c[SCNT_RX_PMAC_SZ_JUMBO];
++
++	stats->multicast = c[SCNT_RX_MC] + c[SCNT_RX_PMAC_MC];
++
++	stats->rx_errors = c[SCNT_RX_SHORT] +
++			   c[SCNT_RX_FRAG] +
++			   c[SCNT_RX_JABBER] +
++			   c[SCNT_RX_CRC] +
++			   c[SCNT_RX_SYMBOL_ERR] +
++			   c[SCNT_RX_LONG] +
++			   c[SCNT_RX_PMAC_SHORT] +
++			   c[SCNT_RX_PMAC_FRAG] +
++			   c[SCNT_RX_PMAC_JABBER] +
++			   c[SCNT_RX_PMAC_CRC] +
++			   c[SCNT_RX_PMAC_SYMBOL_ERR] +
++			   c[SCNT_RX_PMAC_LONG];
++
++	stats->rx_dropped = c[SCNT_RX_LONG] +
++			    c[SCNT_DR_LOCAL] +
++			    c[SCNT_DR_TAIL] +
++			    c[SCNT_RX_CAT_DROP] +
++			    c[SCNT_RX_RED_PRIO_0] +
++			    c[SCNT_RX_RED_PRIO_1] +
++			    c[SCNT_RX_RED_PRIO_2] +
++			    c[SCNT_RX_RED_PRIO_3] +
++			    c[SCNT_RX_RED_PRIO_4] +
++			    c[SCNT_RX_RED_PRIO_5] +
++			    c[SCNT_RX_RED_PRIO_6] +
++			    c[SCNT_RX_RED_PRIO_7];
++
++	for (int i = 0; i < LAN9645X_NUM_TC; i++) {
++		stats->rx_dropped += c[SCNT_DR_YELLOW_PRIO_0 + i] +
++				     c[SCNT_DR_GREEN_PRIO_0 + i];
++	}
++
++	stats->tx_bytes = c[SCNT_TX_OCT] + c[SCNT_TX_PMAC_OCT];
++
++	stats->tx_packets = c[SCNT_TX_SZ_64] +
++			    c[SCNT_TX_SZ_65_127] +
++			    c[SCNT_TX_SZ_128_255] +
++			    c[SCNT_TX_SZ_256_511] +
++			    c[SCNT_TX_SZ_512_1023] +
++			    c[SCNT_TX_SZ_1024_1526] +
++			    c[SCNT_TX_SZ_JUMBO] +
++			    c[SCNT_TX_PMAC_SZ_64] +
++			    c[SCNT_TX_PMAC_SZ_65_127] +
++			    c[SCNT_TX_PMAC_SZ_128_255] +
++			    c[SCNT_TX_PMAC_SZ_256_511] +
++			    c[SCNT_TX_PMAC_SZ_512_1023] +
++			    c[SCNT_TX_PMAC_SZ_1024_1526] +
++			    c[SCNT_TX_PMAC_SZ_JUMBO];
++
++	stats->tx_dropped = c[SCNT_TX_DROP] +
++			    c[SCNT_TX_AGED] +
++			    c[SCNT_TX_BUFDROP];
++
++	stats->collisions = c[SCNT_TX_COL];
++
++	spin_unlock(&s->sw_lock);
++}
++
++void lan9645x_stats_get_eth_phy_stats(struct lan9645x *lan9645x, int port,
++				      struct ethtool_eth_phy_stats *p)
++{
++	struct lan9645x_stats *s = lan9645x->stats;
++	u64 *c;
++
++	c = lan9645x_stats_port_update(lan9645x, port);
++
++	spin_lock(&s->sw_lock);
++
++	switch (p->src) {
++	case ETHTOOL_MAC_STATS_SRC_EMAC:
++		p->SymbolErrorDuringCarrier = c[SCNT_RX_SYMBOL_ERR];
++		break;
++	case ETHTOOL_MAC_STATS_SRC_PMAC:
++		p->SymbolErrorDuringCarrier = c[SCNT_RX_PMAC_SYMBOL_ERR];
++		break;
++	default:
++		p->SymbolErrorDuringCarrier = c[SCNT_RX_SYMBOL_ERR] +
++					      c[SCNT_RX_PMAC_SYMBOL_ERR];
++		break;
++	}
++
++	spin_unlock(&s->sw_lock);
++}
++
++void
++lan9645x_stats_get_eth_ctrl_stats(struct lan9645x *lan9645x, int port,
++				  struct ethtool_eth_ctrl_stats *ctrl)
++{
++	struct lan9645x_stats *s = lan9645x->stats;
++	u64 *c;
++
++	c = lan9645x_stats_port_update(lan9645x, port);
++
++	spin_lock(&s->sw_lock);
++
++	switch (ctrl->src) {
++	case ETHTOOL_MAC_STATS_SRC_EMAC:
++		ctrl->MACControlFramesReceived = c[SCNT_RX_CONTROL];
++		break;
++	case ETHTOOL_MAC_STATS_SRC_PMAC:
++		ctrl->MACControlFramesReceived = c[SCNT_RX_PMAC_CONTROL];
++		break;
++	default:
++		ctrl->MACControlFramesReceived = c[SCNT_RX_CONTROL] +
++						 c[SCNT_RX_PMAC_CONTROL];
++		break;
++	}
++
++	spin_unlock(&s->sw_lock);
++}
++
++void lan9645x_stats_get_pause_stats(struct lan9645x *lan9645x, int port,
++				    struct ethtool_pause_stats *ps)
++{
++	struct lan9645x_stats *s = lan9645x->stats;
++	u64 *c;
++
++	c = lan9645x_stats_port_update(lan9645x, port);
++
++	spin_lock(&s->sw_lock);
++
++	switch (ps->src) {
++	case ETHTOOL_MAC_STATS_SRC_EMAC:
++		ps->tx_pause_frames = c[SCNT_TX_PAUSE];
++		ps->rx_pause_frames = c[SCNT_RX_PAUSE];
++		break;
++	case ETHTOOL_MAC_STATS_SRC_PMAC:
++		ps->tx_pause_frames = c[SCNT_TX_PMAC_PAUSE];
++		ps->rx_pause_frames = c[SCNT_RX_PMAC_PAUSE];
++		break;
++	default:
++		ps->tx_pause_frames = c[SCNT_TX_PAUSE] + c[SCNT_TX_PMAC_PAUSE];
++		ps->rx_pause_frames = c[SCNT_RX_PAUSE] + c[SCNT_RX_PMAC_PAUSE];
++		break;
++	}
++
++	spin_unlock(&s->sw_lock);
++}
++
++void lan9645x_stats_get_mm_stats(struct lan9645x *lan9645x, int port,
++				 struct ethtool_mm_stats *stats)
++{
++	struct lan9645x_stats *s = lan9645x->stats;
++	u64 *c;
++
++	c = lan9645x_stats_port_update(lan9645x, port);
++
++	spin_lock(&s->sw_lock);
++
++	stats->MACMergeFrameAssErrorCount = c[SCNT_RX_ASSEMBLY_ERR];
++	stats->MACMergeFrameSmdErrorCount = c[SCNT_RX_SMD_ERR];
++	stats->MACMergeFrameAssOkCount = c[SCNT_RX_ASSEMBLY_OK];
++	stats->MACMergeFragCountRx = c[SCNT_RX_MERGE_FRAG];
++	stats->MACMergeFragCountTx = c[SCNT_TX_MERGE_FRAG];
++	stats->MACMergeHoldCount = c[SCNT_TX_MM_HOLD];
++
++	spin_unlock(&s->sw_lock);
++}
++
++static void lan9645x_check_stats_work(struct work_struct *work)
++{
++	struct delayed_work *del_work = to_delayed_work(work);
++	struct lan9645x_stats *stats;
++
++	stats = container_of(del_work, struct lan9645x_stats, work);
++
++	lan9645x_stats_update(stats->lan9645x);
++
++	queue_delayed_work(stats->queue, &stats->work,
++			   LAN9645X_STATS_CHECK_DELAY);
++}
++
++static int lan9645x_stats_prepare_regions(struct lan9645x *lan9645x,
++					  struct lan9645x_view_stats *vstat)
++{
++	struct lan9645x_stat_region *regions;
++	const u32 *layout = vstat->layout;
++	size_t num_regions = 1;
++	int i;
++
++	for (i = 1; i < vstat->num_cnts; i++)
++		if (layout[i] != layout[i - 1] + 1)
++			num_regions++;
++
++	regions = devm_kcalloc(lan9645x->dev, num_regions, sizeof(*regions),
++			       GFP_KERNEL);
++	if (!regions)
++		return -ENOMEM;
++
++	vstat->num_regions = num_regions;
++	vstat->regions = regions;
++
++	regions[0].base_offset = layout[0];
++	regions[0].cnts_base_idx = 0;
++	regions[0].cnt = 1;
++
++	for (i = 1, num_regions = 0; i < vstat->num_cnts; i++) {
++		if (layout[i] != layout[i - 1] + 1) {
++			num_regions++;
++			regions[num_regions].base_offset = layout[i];
++			regions[num_regions].cnts_base_idx = i;
++			regions[num_regions].cnt = 1;
++		} else {
++			regions[num_regions].cnt++;
++		}
++	}
++
++	return 0;
++}
++
++static int lan9645x_view_stat_init(struct lan9645x *lan9645x,
++				   struct lan9645x_view_stats *vstat,
++				   const struct lan9645x_view_stats *cfg)
++{
++	size_t total = cfg->num_cnts * cfg->num_indexes;
 +	int err;
 +
-+	mdb_entry = lan9645x_mdb_entry_lookup(lan9645x, addr, vid);
-+	if (!mdb_entry)
-+		return -ENOENT;
++	memcpy(vstat, cfg, sizeof(*cfg));
 +
-+	if (!(mdb_entry->ports & BIT(chip_port)))
-+		return 0;
++	vstat->cnts = devm_kcalloc(lan9645x->dev, total, sizeof(u64),
++				   GFP_KERNEL);
++	if (!vstat->cnts)
++		return -ENOMEM;
 +
-+	new_ports = mdb_entry->ports & ~BIT(chip_port);
++	vstat->buf = devm_kcalloc(lan9645x->dev, total, sizeof(u32),
++				  GFP_KERNEL);
++	if (!vstat->buf)
++		return -ENOMEM;
 +
-+	if (!new_ports) {
-+		/* For IP multicast hardware uses DMAC as key (mac,vid) not
-+		 * encoded mac.
-+		 */
-+		err = lan9645x_mact_forget(lan9645x, mdb_entry->mac,
-+					   mdb_entry->vid, type);
++	err = lan9645x_stats_prepare_regions(lan9645x, vstat);
++	if (err)
++		return err;
++
++	vstat->stats = lan9645x->stats;
++
++	return 0;
++}
++
++int lan9645x_stats_alloc(struct lan9645x *lan9645x)
++{
++	const struct lan9645x_view_stats *vs;
++	struct lan9645x_stats *stats;
++	int err, i;
++
++	lan9645x->stats = devm_kzalloc(lan9645x->dev, sizeof(*stats),
++				       GFP_KERNEL);
++	if (!lan9645x->stats)
++		return -ENOMEM;
++
++	stats = lan9645x->stats;
++	stats->lan9645x = lan9645x;
++
++	for (i = 0; i < ARRAY_SIZE(lan9645x_view_stat_cfgs); i++) {
++		vs = &lan9645x_view_stat_cfgs[i];
++
++		if (!vs->num_cnts)
++			continue;
++
++		err = lan9645x_view_stat_init(lan9645x, &stats->view[vs->type],
++					      vs);
 +		if (err)
 +			return err;
-+		lan9645x_mdb_entry_dealloc(lan9645x, mdb_entry);
-+		return 0;
 +	}
 +
-+	/* Update PGID ptr for non-IP entries (L2 multicast) */
-+	new_pgid = lan9645x_mdb_pgid_entry_get(lan9645x, new_ports, type);
-+	if (IS_ERR(new_pgid))
-+		/* Continue forwarding to old port group. */
-+		return PTR_ERR(new_pgid);
++	stats->queue = alloc_ordered_workqueue("%s-stats", 0,
++					       dev_name(lan9645x->dev));
++	if (!stats->queue)
++		return -ENOMEM;
 +
-+	return lan9645x_mdb_update_dest(lan9645x, mdb_entry, type, new_pgid,
-+					new_ports);
++	mutex_init(&stats->hw_lock);
++	spin_lock_init(&stats->sw_lock);
++	INIT_DELAYED_WORK(&stats->work, lan9645x_check_stats_work);
++
++	return 0;
 +}
 +
-+static int lan9645x_mdb_add(struct lan9645x *lan9645x, int chip_port,
-+			    const unsigned char addr[ETH_ALEN], u16 vid,
-+			    enum macaccess_entry_type type)
++void lan9645x_stats_free(struct lan9645x *lan9645x)
 +{
-+	int err;
-+
-+	mutex_lock(&lan9645x->mdb_lock);
-+	err = __lan9645x_mdb_add(lan9645x, chip_port, addr, vid, type);
-+	mutex_unlock(&lan9645x->mdb_lock);
-+	return err;
++	cancel_delayed_work_sync(&lan9645x->stats->work);
++	destroy_workqueue(lan9645x->stats->queue);
++	mutex_destroy(&lan9645x->stats->hw_lock);
 +}
 +
-+static int lan9645x_mdb_del(struct lan9645x *lan9645x, int chip_port,
-+			    const unsigned char addr[ETH_ALEN], u16 vid,
-+			    enum macaccess_entry_type type)
++void lan9645x_stats_init(struct lan9645x *lan9645x)
 +{
-+	int err;
++	struct lan9645x_stats *stats = lan9645x->stats;
 +
-+	mutex_lock(&lan9645x->mdb_lock);
-+	err = __lan9645x_mdb_del(lan9645x, chip_port, addr, vid, type);
-+	mutex_unlock(&lan9645x->mdb_lock);
-+	return err;
++	queue_delayed_work(stats->queue, &stats->work,
++			   LAN9645X_STATS_CHECK_DELAY);
 +}
 +
-+int lan9645x_mdb_port_add(struct lan9645x *lan9645x, int port,
-+			  const struct switchdev_obj_port_mdb *mdb,
-+			  struct net_device *bridge)
++void lan9645x_stats_deinit(struct lan9645x *lan9645x)
 +{
-+	enum macaccess_entry_type type;
-+	u16 vid = mdb->vid;
-+
-+	type = lan9645x_mdb_classify(mdb->addr);
-+
-+	if (!vid)
-+		vid = lan9645x_vlan_unaware_pvid(!!bridge);
-+
-+	return lan9645x_mdb_add(lan9645x, port, mdb->addr, vid, type);
++	cancel_delayed_work_sync(&lan9645x->stats->work);
 +}
+diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_stats.h b/drivers/net/dsa/microchip/lan9645x/lan9645x_stats.h
+new file mode 100644
+index 000000000000..cd5db16258a0
+--- /dev/null
++++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_stats.h
+@@ -0,0 +1,279 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/* Copyright (C) 2026 Microchip Technology Inc.
++ */
 +
-+int lan9645x_mdb_port_del(struct lan9645x *lan9645x, int port,
-+			  const struct switchdev_obj_port_mdb *mdb,
-+			  struct net_device *bridge)
++#ifndef _LAN9645X_STATS_H_
++#define _LAN9645X_STATS_H_
++
++#include "lan9645x_main.h"
++
++#define STATS_INDEX(vstats, idx) (&(vstats)->cnts[(vstats)->num_cnts * (idx)])
++
++#define STAT_COUNTERS(lan9645x, type, idx) \
++	STATS_INDEX(lan9645x_get_vstats(lan9645x, type), idx)
++
++/* Counter indices into stat layout structs */
++#define SCNT_FRER_SID_IN_PKT             0
++#define SCNT_ISDX_GREEN_OCT              1
++#define SCNT_ISDX_GREEN_PKT              2
++#define SCNT_ISDX_YELLOW_OCT             3
++#define SCNT_ISDX_YELLOW_PKT             4
++#define SCNT_ISDX_RED_OCT                5
++#define SCNT_ISDX_RED_PKT                6
++#define SCNT_ISDX_DROP_GREEN_OCT         7
++#define SCNT_ISDX_DROP_GREEN_PKT         8
++#define SCNT_ISDX_DROP_YELLOW_OCT        9
++#define SCNT_ISDX_DROP_YELLOW_PKT        10
++
++#define SCNT_SF_MATCHING_FRAMES_COUNT    0
++#define SCNT_SF_NOT_PASSING_FRAMES_COUNT 1
++#define SCNT_SF_NOT_PASSING_SDU_COUNT    2
++#define SCNT_SF_RED_FRAMES_COUNT         3
++#define SCNT_SF_STREAM_BLOCK_COUNT       4
++
++#define SCNT_ESDX_GREEN_OCT              0
++#define SCNT_ESDX_GREEN_PKT              1
++#define SCNT_ESDX_YELLOW_OCT             2
++#define SCNT_ESDX_YELLOW_PKT             3
++
++#define SCNT_RX_OCT                      0
++#define SCNT_RX_UC                       1
++#define SCNT_RX_MC                       2
++#define SCNT_RX_BC                       3
++#define SCNT_RX_SHORT                    4
++#define SCNT_RX_FRAG                     5
++#define SCNT_RX_JABBER                   6
++#define SCNT_RX_CRC                      7
++#define SCNT_RX_SYMBOL_ERR               8
++#define SCNT_RX_SZ_64                    9
++#define SCNT_RX_SZ_65_127                10
++#define SCNT_RX_SZ_128_255               11
++#define SCNT_RX_SZ_256_511               12
++#define SCNT_RX_SZ_512_1023              13
++#define SCNT_RX_SZ_1024_1526             14
++#define SCNT_RX_SZ_JUMBO                 15
++#define SCNT_RX_PAUSE                    16
++#define SCNT_RX_CONTROL                  17
++#define SCNT_RX_LONG                     18
++#define SCNT_RX_CAT_DROP                 19
++#define SCNT_RX_RED_PRIO_0               20
++#define SCNT_RX_RED_PRIO_1               21
++#define SCNT_RX_RED_PRIO_2               22
++#define SCNT_RX_RED_PRIO_3               23
++#define SCNT_RX_RED_PRIO_4               24
++#define SCNT_RX_RED_PRIO_5               25
++#define SCNT_RX_RED_PRIO_6               26
++#define SCNT_RX_RED_PRIO_7               27
++#define SCNT_RX_YELLOW_PRIO_0            28
++#define SCNT_RX_YELLOW_PRIO_1            29
++#define SCNT_RX_YELLOW_PRIO_2            30
++#define SCNT_RX_YELLOW_PRIO_3            31
++#define SCNT_RX_YELLOW_PRIO_4            32
++#define SCNT_RX_YELLOW_PRIO_5            33
++#define SCNT_RX_YELLOW_PRIO_6            34
++#define SCNT_RX_YELLOW_PRIO_7            35
++#define SCNT_RX_GREEN_PRIO_0             36
++#define SCNT_RX_GREEN_PRIO_1             37
++#define SCNT_RX_GREEN_PRIO_2             38
++#define SCNT_RX_GREEN_PRIO_3             39
++#define SCNT_RX_GREEN_PRIO_4             40
++#define SCNT_RX_GREEN_PRIO_5             41
++#define SCNT_RX_GREEN_PRIO_6             42
++#define SCNT_RX_GREEN_PRIO_7             43
++#define SCNT_RX_ASSEMBLY_ERR             44
++#define SCNT_RX_SMD_ERR                  45
++#define SCNT_RX_ASSEMBLY_OK              46
++#define SCNT_RX_MERGE_FRAG               47
++#define SCNT_RX_PMAC_OCT                 48
++#define SCNT_RX_PMAC_UC                  49
++#define SCNT_RX_PMAC_MC                  50
++#define SCNT_RX_PMAC_BC                  51
++#define SCNT_RX_PMAC_SHORT               52
++#define SCNT_RX_PMAC_FRAG                53
++#define SCNT_RX_PMAC_JABBER              54
++#define SCNT_RX_PMAC_CRC                 55
++#define SCNT_RX_PMAC_SYMBOL_ERR          56
++#define SCNT_RX_PMAC_SZ_64               57
++#define SCNT_RX_PMAC_SZ_65_127           58
++#define SCNT_RX_PMAC_SZ_128_255          59
++#define SCNT_RX_PMAC_SZ_256_511          60
++#define SCNT_RX_PMAC_SZ_512_1023         61
++#define SCNT_RX_PMAC_SZ_1024_1526        62
++#define SCNT_RX_PMAC_SZ_JUMBO            63
++#define SCNT_RX_PMAC_PAUSE               64
++#define SCNT_RX_PMAC_CONTROL             65
++#define SCNT_RX_PMAC_LONG                66
++#define SCNT_TX_OCT                      67
++#define SCNT_TX_UC                       68
++#define SCNT_TX_MC                       69
++#define SCNT_TX_BC                       70
++#define SCNT_TX_COL                      71
++#define SCNT_TX_DROP                     72
++#define SCNT_TX_PAUSE                    73
++#define SCNT_TX_SZ_64                    74
++#define SCNT_TX_SZ_65_127                75
++#define SCNT_TX_SZ_128_255               76
++#define SCNT_TX_SZ_256_511               77
++#define SCNT_TX_SZ_512_1023              78
++#define SCNT_TX_SZ_1024_1526             79
++#define SCNT_TX_SZ_JUMBO                 80
++#define SCNT_TX_YELLOW_PRIO_0            81
++#define SCNT_TX_YELLOW_PRIO_1            82
++#define SCNT_TX_YELLOW_PRIO_2            83
++#define SCNT_TX_YELLOW_PRIO_3            84
++#define SCNT_TX_YELLOW_PRIO_4            85
++#define SCNT_TX_YELLOW_PRIO_5            86
++#define SCNT_TX_YELLOW_PRIO_6            87
++#define SCNT_TX_YELLOW_PRIO_7            88
++#define SCNT_TX_GREEN_PRIO_0             89
++#define SCNT_TX_GREEN_PRIO_1             90
++#define SCNT_TX_GREEN_PRIO_2             91
++#define SCNT_TX_GREEN_PRIO_3             92
++#define SCNT_TX_GREEN_PRIO_4             93
++#define SCNT_TX_GREEN_PRIO_5             94
++#define SCNT_TX_GREEN_PRIO_6             95
++#define SCNT_TX_GREEN_PRIO_7             96
++#define SCNT_TX_AGED                     97
++#define SCNT_TX_LLCT                     98
++#define SCNT_TX_CT                       99
++#define SCNT_TX_BUFDROP                  100
++#define SCNT_TX_MM_HOLD                  101
++#define SCNT_TX_MERGE_FRAG               102
++#define SCNT_TX_PMAC_OCT                 103
++#define SCNT_TX_PMAC_UC                  104
++#define SCNT_TX_PMAC_MC                  105
++#define SCNT_TX_PMAC_BC                  106
++#define SCNT_TX_PMAC_PAUSE               107
++#define SCNT_TX_PMAC_SZ_64               108
++#define SCNT_TX_PMAC_SZ_65_127           109
++#define SCNT_TX_PMAC_SZ_128_255          110
++#define SCNT_TX_PMAC_SZ_256_511          111
++#define SCNT_TX_PMAC_SZ_512_1023         112
++#define SCNT_TX_PMAC_SZ_1024_1526        113
++#define SCNT_TX_PMAC_SZ_JUMBO            114
++#define SCNT_DR_LOCAL                    115
++#define SCNT_DR_TAIL                     116
++#define SCNT_DR_YELLOW_PRIO_0            117
++#define SCNT_DR_YELLOW_PRIO_1            118
++#define SCNT_DR_YELLOW_PRIO_2            119
++#define SCNT_DR_YELLOW_PRIO_3            120
++#define SCNT_DR_YELLOW_PRIO_4            121
++#define SCNT_DR_YELLOW_PRIO_5            122
++#define SCNT_DR_YELLOW_PRIO_6            123
++#define SCNT_DR_YELLOW_PRIO_7            124
++#define SCNT_DR_GREEN_PRIO_0             125
++#define SCNT_DR_GREEN_PRIO_1             126
++#define SCNT_DR_GREEN_PRIO_2             127
++#define SCNT_DR_GREEN_PRIO_3             128
++#define SCNT_DR_GREEN_PRIO_4             129
++#define SCNT_DR_GREEN_PRIO_5             130
++#define SCNT_DR_GREEN_PRIO_6             131
++#define SCNT_DR_GREEN_PRIO_7             132
++
++enum lan9645x_view_stat_type {
++	LAN9645X_STAT_PORTS = 0,
++	LAN9645X_STAT_ISDX,
++	LAN9645X_STAT_ESDX,
++	LAN9645X_STAT_SFID,
++
++	LAN9645X_STAT_NUM,
++};
++
++struct lan9645x_stat_region {
++	u32 base_offset;
++	u32 cnt;
++	u32 cnts_base_idx;
++};
++
++/* Counters are organized by indices/views such as
++ *
++ * - physical ports
++ * - isdx
++ * - esdx
++ * - frer
++ * - sfid
++ *
++ * Each view contains regions, which is a linear address range of related
++ * stats. I.e. the ports index has RX, TX and Drop regions.
++ *
++ *
++ * and you have a given counter replicated per index.
++ */
++struct lan9645x_view_stats {
++	/* HW register offsets indexed by SCNT_*, used for bulk reading */
++	const u32 *layout;
++	/* Region description for this view, used for bulk reading */
++	struct lan9645x_stat_region *regions;
++	struct lan9645x_stats *stats;
++	char name[16];
++	/* 64bit software counters with the same addr layout hw */
++	u64 *cnts;
++	/* Buffer for bulk reading counter regions from hw */
++	u32 *buf;
++	/* Number of counters per index in view */
++	u32 num_cnts;
++	/* Number of indexes in view */
++	u32 num_indexes;
++	/* Number of counter regions with counters at sequential addresses */
++	size_t num_regions;
++	enum lan9645x_view_stat_type type;
++};
++
++struct lan9645x_stats {
++	struct lan9645x *lan9645x;
++	struct mutex hw_lock; /* lock r/w to stat registers and u32 buf */
++	spinlock_t sw_lock; /* lock access to u64 software counters */
++	struct delayed_work work;
++	struct workqueue_struct *queue;
++
++	struct lan9645x_view_stats view[LAN9645X_STAT_NUM];
++};
++
++static inline struct lan9645x_view_stats *
++lan9645x_get_vstats(struct lan9645x *lan9645x,
++		    enum lan9645x_view_stat_type type)
 +{
-+	enum macaccess_entry_type type;
-+	u16 vid = mdb->vid;
++	if (WARN_ON(!(type < LAN9645X_STAT_NUM)))
++		return NULL;
 +
-+	type = lan9645x_mdb_classify(mdb->addr);
-+
-+	if (!vid)
-+		vid = lan9645x_vlan_unaware_pvid(!!bridge);
-+
-+	return lan9645x_mdb_del(lan9645x, port, mdb->addr, vid, type);
++	return &lan9645x->stats->view[type];
 +}
 +
-+void lan9645x_mdb_deinit(struct lan9645x *lan9645x)
++/* Add a possibly wrapping 32 bit value to a 64 bit counter */
++static inline void lan9645x_stats_add_cnt(u64 *cnt, u32 val)
 +{
-+	struct lan9645x_mdb_entry *mdb, *tmp;
++	if (val < (*cnt & U32_MAX))
++		*cnt += (u64)1 << 32; /* value has wrapped */
 +
-+	list_for_each_entry_safe(mdb, tmp, &lan9645x->mdb_entries, list)
-+		lan9645x_mdb_entry_dealloc(lan9645x, mdb);
-+
-+	mutex_destroy(&lan9645x->mdb_lock);
++	*cnt = (*cnt & ~(u64)U32_MAX) + val;
 +}
-diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c
-index 0548904dc4bd..407d7eb1d064 100644
---- a/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c
-+++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c
-@@ -210,8 +210,17 @@ int lan9645x_port_setup(struct dsa_switch *ds, int port)
- 		ANA_PORT_CFG_PORTID_VAL,
- 		lan9645x, ANA_PORT_CFG(p->chip_port));
- 
--	if (p->chip_port != lan9645x->npi)
-+	if (p->chip_port != lan9645x->npi) {
- 		lan9645x_vlan_set_hostmode(p);
- 
-+		lan_rmw(ANA_CPU_FWD_CFG_IGMP_REDIR_ENA_SET(true) |
-+			ANA_CPU_FWD_CFG_MLD_REDIR_ENA_SET(true) |
-+			ANA_CPU_FWD_CFG_IPMC_CTRL_COPY_ENA_SET(true),
-+			ANA_CPU_FWD_CFG_IGMP_REDIR_ENA |
-+			ANA_CPU_FWD_CFG_MLD_REDIR_ENA |
-+			ANA_CPU_FWD_CFG_IPMC_CTRL_COPY_ENA,
-+			lan9645x, ANA_CPU_FWD_CFG(p->chip_port));
-+	}
 +
- 	return 0;
- }
++int lan9645x_stats_alloc(struct lan9645x *lan9645x);
++void lan9645x_stats_free(struct lan9645x *lan9645x);
++void lan9645x_stats_init(struct lan9645x *lan9645x);
++void lan9645x_stats_deinit(struct lan9645x *lan9645x);
++void lan9645x_stats_get_strings(struct lan9645x *lan9645x, int port,
++				u32 stringset, u8 *data);
++int lan9645x_stats_get_sset_count(struct lan9645x *lan9645x, int port,
++				  int sset);
++void lan9645x_stats_get_ethtool_stats(struct lan9645x *lan9645x, int port,
++				      uint64_t *data);
++void lan9645x_stats_get_eth_mac_stats(struct lan9645x *lan9645x, int port,
++				      struct ethtool_eth_mac_stats *mac_stats);
++void
++lan9645x_stats_get_rmon_stats(struct lan9645x *lan9645x, int port,
++			      struct ethtool_rmon_stats *rmon_stats,
++			      const struct ethtool_rmon_hist_range **ranges);
++void lan9645x_stats_get_stats64(struct lan9645x *lan9645x, int port,
++				struct rtnl_link_stats64 *s);
++void lan9645x_stats_get_mm_stats(struct lan9645x *lan9645x, int port,
++				 struct ethtool_mm_stats *stats);
++void lan9645x_stats_get_pause_stats(struct lan9645x *lan9645x, int port,
++				    struct ethtool_pause_stats *ps);
++void
++lan9645x_stats_get_eth_ctrl_stats(struct lan9645x *lan9645x, int port,
++				  struct ethtool_eth_ctrl_stats *ctrl_stats);
++void lan9645x_stats_get_eth_phy_stats(struct lan9645x *lan9645x, int port,
++				      struct ethtool_eth_phy_stats *phy_stats);
++
++#endif
 
 -- 
 2.52.0
