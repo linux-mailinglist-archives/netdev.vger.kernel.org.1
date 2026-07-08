@@ -1,192 +1,291 @@
-Return-Path: <netdev+bounces-305891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-305892-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ENY/Gpp6TmpiNgIAu9opvQ
-	(envelope-from <netdev+bounces-305891-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:28:10 +0200
+	id M1B/L1V9TmoeNwIAu9opvQ
+	(envelope-from <netdev+bounces-305892-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:39:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E901728B41
-	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:28:09 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30958728CF6
+	for <lists+netdev@lfdr.de>; Wed, 08 Jul 2026 18:39:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=MbtZEVtM;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305891-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-305891-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=etsalapatis-com.20251104.gappssmtp.com header.s=20251104 header.b=X7RuaNBc;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-305892-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-305892-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C975D302BD96
-	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 16:14:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2B2D4305EA6E
+	for <lists+netdev@lfdr.de>; Wed,  8 Jul 2026 16:19:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 038B340928D;
-	Wed,  8 Jul 2026 16:14:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB2942DA43;
+	Wed,  8 Jul 2026 16:19:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E7BB37B415
-	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 16:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 237F53F12F9
+	for <netdev@vger.kernel.org>; Wed,  8 Jul 2026 16:19:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783527247; cv=none; b=uKoMTE81s8g4uxiHSEkp5IeKKUJOXHT73p9OcQKPHWhfGaT9XW5eppK/KnZC5AvzLCH/E702gcaIytFT+gEBxnsU1p71cH6xDi2KENlIfIAP1uIbiMQipd0LaClQfNtoRqcfyYYhazfEjFjiSKWabWUKjRjeSYOi103RQkwjmDs=
+	t=1783527597; cv=none; b=aqBQfeEj59pyUHyrZdm0MG56i3dM3k5U6/NNeXU6XY23dcF8ZEaFAU7hHUHui72Oed7EVe3NDw+5vAi1pLpzUoRdcTCIeI0kz7xF/YBJ+YeAMhlB4ME0jvSkNuqM4fQKNRIoyCX5LFQ7StOw++wpHx0cmt7AzZkr2xg5vtpzyqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783527247; c=relaxed/simple;
-	bh=GcUlruM+NGqEx7z3ydLkr+i+uXVPzazlpG6H7pNviRg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DxCdDKV+yhHab9L1MHvrLbIwWJzZaoYZCFgJT9yBDjYCUe6bBNdqfJM3MLE+bbg0xEIbuN47V8DSADSHVR1/TLgJKPQXWCK8yKBz+OZXaFF6Nj73ySX3pIfh5tbWpyH+e1K9NDL3iTQpI/hladHxELwgCX9xiCnocADrEpmyJJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MbtZEVtM; arc=none smtp.client-ip=209.85.216.44
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-381018b9375so986492a91.0
-        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 09:14:06 -0700 (PDT)
+	s=arc-20240116; t=1783527597; c=relaxed/simple;
+	bh=LqRAHZpn9XsmnomtiA/+PnRH4DsQWzTchYzEcXUBzzw=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=JfaxHaJ/zfNLW6vGUcYEEnBaUyAeZYXrEUQs/Xe8sOiIjcOd7e5MirAVw8muHLJ7iN5T3p2/m2trj070I7HX8V2ogKia3psRip65dP1rrnFbcdPklKK9F3mu6g9Fgi7XgqbDQOBgCdwum7i1VEuQBvFvgRr4HkhvQslA/gCN43k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=X7RuaNBc; arc=none smtp.client-ip=209.85.214.172
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2cad225673bso7954235ad.3
+        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 09:19:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783527246; x=1784132046; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=+myLTsla0EBewCTP4a0cFztuzTTZxCB2bGQ0rDnbLXs=;
-        b=MbtZEVtM3z8t/DBANpCtfJ/3cev2hldfimO+M4zOvlT/5ZLHVaXXZ4dOIrXl0JAAX1
-         pt/Gq8fSphVU75zQudSgFGC8o1bNkpnUezUaAM5F8L2tUoRwfEcWnUqsimz1JlvYqYIE
-         7Kycimi2ezAttQl4cmPDsALTNTUgEpfYCwEbxPGsEF+sIfJxz2YWfYv575e7iT2H6zCi
-         zi+PyRahZ3JR4YfJBFazOSgaLo/g3+IyI+5DXMLjg4BqVu8CIBxxwfRD7RR0rnkrd+V/
-         z36lowvxUPc2kB5mgVJOtyM/TUMFSaOemNgkgMqwhYzB2PcLvqjb7Pt3JInEtERKx6Ws
-         jrjw==
+        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1783527595; x=1784132395; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-type:content-transfer-encoding:mime-version:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=KoeQIzrdmjIACDxHWQZkS7jhZWHaXngGQAZTPpEL6vk=;
+        b=X7RuaNBctzYyEIibVicUKWtIPdBaXKUeTXIHLe58U7zhA/wCRzfaU1MrTjT8fC4RJy
+         TcchrOPiH7wN8BRkW2WB+iH6sc2g3pnvHoft7L8C0Fx/9pz5i6YyNo1j6j7arUzXks1d
+         y2xkQBdyzNaLQ5I810+/Gv5BeEHnR0AZ+rZ1eArJwGd80Rnv1ihyICtyr+GxZSb9hb28
+         KevviloO+GYQtdnv6Xa6OUvVVK5sO/OXsgzzgZaj8hh+MBAJrg1As7LcMB2XkkyHpD29
+         fGH3MoXRyIc2krjsbtBlivBLkgLNokzKt1sGRgdPDkr51jDQ6RCL44Bmo5Xk1HGMekvf
+         27DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783527246; x=1784132046;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=+myLTsla0EBewCTP4a0cFztuzTTZxCB2bGQ0rDnbLXs=;
-        b=nC43oQsr8iVcU4v+bVubBwC6axkPtNfoy8OFrFCb+XJ5j7FjRNecPCYmSQ9K8+SxEE
-         r+07MbkR54MOtNSiS5Camr3+AW2CUqUIB9qknVcWVFwgkA+fAPCDM+NHtdTzvGwd9N7I
-         /PQzjA4HnHzgvoLp0Rij34N/oAyVKqjIu68qlIwD24sAw2jCrTFH6bx6Mh24fD5DE+uH
-         rAhTjZD8Onyi/dfKq+Ai+38GxtPLd1JQDKh405F2kvvaBDrU54OAMnUeG6Wf0+0QmlsI
-         ExMqBZrIKXe4THeeE8pFoedEmGpd/ogjT7FeXHZ3AvtoSSvicgmTiFnGEZjtlapxEBYZ
-         nCEQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rqv0yGQAacO47asm4ka0mE+q3n0JKaSlVZT+pfcy3xoknipdNuRYs5FS1VskvmGqvppm+8Pcc0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiqAwGbknhfk8td6QtXWIcSeofxt2/72XE7QdXAo2EOJPWn8dr
-	HFeK4GLcHUEproa8s1ofW84eAq1wzdGR9eCcJ+NXr8pW8fKHU4HYdWEy
-X-Gm-Gg: AfdE7cmG7khhprv1qZEnYES56nqPVZa3+EPWs/jH609+MtC1vkIho/UGIMI5TORLlrj
-	czqFoCWIvGQYgVBhqPlq4giA0f1N/56Z5AZy9Bzi3SsEcKdGHKt8FMyy1cHIpdUFUWFT1oaNj/Y
-	G1c6J7SPhuT/Fhl9R7KaRB/4iGXRMVa14/6Nnfo1QzXZa6MiOETmqRB3p+7I9wJeasLyZGfXSLB
-	VM2leyt9IMlzt3JcZlYxp7aix3mVZV/GBGQuw+q/sEyWd+mcClOy4UkNVijU5EAkbSyr4c3At+W
-	yub048cI6BqfgdsNsPrlA38DU2bY1Nr1GVhsd9vFtCakTbvVQRTvfOLwuqeR0JWPOiVB186UC8J
-	qlMb5XsQRk1s4Pa8QSNVdQZtyDy6o1o5LPgQbsWtQ2G018sSSIrS+xzVf+SRcUkAf9TND0pX0xX
-	fXxLlBMcIHk8+LKC9ZgMnw+Er5OFqdGYSYD/69Dy9+TyPE/z2qDTvURZvSNQ==
-X-Received: by 2002:a17:90b:5384:b0:381:c500:b0d1 with SMTP id 98e67ed59e1d1-389421ae13emr3606078a91.20.1783527245930;
-        Wed, 08 Jul 2026 09:14:05 -0700 (PDT)
-Received: from fx.tailc0aff1.ts.net ([206.206.192.132])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31174a8f521sm21215064eec.22.2026.07.08.09.14.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2026 09:14:05 -0700 (PDT)
-From: Weiming Shi <bestswngs@gmail.com>
-To: Jon Maloy <jmaloy@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>
-Cc: Xiang Mei <xmei5@asu.edu>,
-	netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
-	Weiming Shi <bestswngs@gmail.com>
-Subject: [PATCH net] tipc: guard against empty buffer list in tipc_node_xmit()
-Date: Wed,  8 Jul 2026 09:13:25 -0700
-Message-ID: <20260708161324.2954113-2-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20251104; t=1783527595; x=1784132395;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-type:content-transfer-encoding:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=KoeQIzrdmjIACDxHWQZkS7jhZWHaXngGQAZTPpEL6vk=;
+        b=hVl0WojrPtbnukF2hILwxMTvdDU4jwoLj9lcP9gg99fAEv79Rir7GmO7ePgfkqrtO6
+         hHppTwAsvNj4NqD2QPOkGaTAUa4mG3NpVVINgspV0QVV3EMr6SWvo3NQZOcECyNJrijZ
+         E9UfPYXL1gmYA/bRAkAqPSDRQim+qxEtx7COUc/UmMypG6KCQfmIHkDSLHLCYcShqyrK
+         4ew49F4shjUHpUbYrlpx3VigfDDyxql36ijent2Sszx5M6Iq/XvUSW4JJthBY+01YgSo
+         QrsjFmEYNCr2zBqAJXeVU3Y8BSlwWzrs/oKQk/wfIZb9sfLXZnX9ebXw1A5p1RWGG4ze
+         zfXg==
+X-Gm-Message-State: AOJu0YwOu9IGt7yrTZcSoabmpzK0K3URlFxM0bJEsyXxfAdNosi40hc4
+	eGoHQCiCiWfqos2o3WOcrBMM9DsFc82knIhCIGaUA2Hs9UQVm5JzO/f2abjvoFshEns=
+X-Gm-Gg: AfdE7cl49dR1pN7DB0sNIMQF6zKO0cmABANanMIhe+qzwP3iH0WFeHjKPFztE+mRRLs
+	bXJQf8EVK/OvfHjjG8eyxXQuw6/qMwFh5UpalcXw0xgwoZ0xcSJUFyAqQeS07EzV1FqIwskhwJe
+	AOAEn/2TuV08xJ3wmlGM6ZPyTwU44wJ1EQKDWGPrtsgERcJ1nmOxzuRNipEKxikgBC4NHLI8CE7
+	2rZwc/aqnWS7MuVC8Rar7LpcDUYGur2XkxoxaDp3M72r1qmOFkO0l7AKknozf9K3p85nAxkxusE
+	xrrERTpzA8EELfwt3TO926fdQFqQ/6yjgNC6XaQy6uxaH5gO05U0jRN+uJ75I+Eb6G/eYe+btzr
+	0nhHepW87CwNfH3bbmir1iljoAZTx3tV7Wck6GxtWc5YTRU/wcGcV7weHaQ7vEvY8SDu6pg++15
+	Venr9w9sNdikFDUjWE4MR2nRevy2FSipZWxgYGxaGY0w==
+X-Received: by 2002:a17:902:e5c5:b0:2cc:aa36:c046 with SMTP id d9443c01a7336-2ccea2cbd6amr32640175ad.14.1783527595214;
+        Wed, 08 Jul 2026 09:19:55 -0700 (PDT)
+Received: from localhost (107-190-31-17.cpe.teksavvy.com. [107.190.31.17])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9d3d2efsm30247775ad.64.2026.07.08.09.19.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Jul 2026 09:19:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 08 Jul 2026 12:19:54 -0400
+Message-Id: <DJTBRLLCR138.YFMNJ4MITDR7@etsalapatis.com>
+Cc: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>
+Subject: Re: [PATCH bpf] bpf, sockmap: Account for receive queue in FIONREAD
+ without a verdict program
+From: "Emil Tsalapatis" <emil@etsalapatis.com>
+To: "Kumar Kartikeya Dwivedi" <memxor@gmail.com>, "Emil Tsalapatis"
+ <emil@etsalapatis.com>, <mattia.meleleo@coralogix.com>, "John Fastabend"
+ <john.fastabend@gmail.com>, "Jakub Sitnicki" <jakub@cloudflare.com>,
+ "Jiayuan Chen" <jiayuan.chen@linux.dev>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260707-fionread-no-verdict-v1-1-ce94a72357ec@coralogix.com>
+ <DJSIEQSX3AFI.341HNU79LHFEF@etsalapatis.com>
+ <DJSWX1VY6XXI.1XRGI8HMHT6JT@gmail.com>
+In-Reply-To: <DJSWX1VY6XXI.1XRGI8HMHT6JT@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[asu.edu,vger.kernel.org,lists.sourceforge.net,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-305891-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:horms@kernel.org,m:xmei5@asu.edu,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:bestswngs@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-305892-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:memxor@gmail.com,m:emil@etsalapatis.com,m:mattia.meleleo@coralogix.com,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_TO(0.00)[gmail.com,etsalapatis.com,coralogix.com,cloudflare.com,linux.dev];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[etsalapatis.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,asu.edu:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[etsalapatis-com.20251104.gappssmtp.com:dkim,etsalapatis.com:from_mime,etsalapatis.com:email,etsalapatis.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,coralogix.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5E901728B41
+X-Rspamd-Queue-Id: 30958728CF6
 
-tipc_node_xmit() dispatches a buffer list either to the bearer path via
-tipc_link_xmit() or, when the destination node lives in a sibling network
-namespace on the same host (n->peer_net set), to tipc_lxc_xmit(). The
-bearer path returns early on an empty list, but tipc_node_xmit() does not,
-and tipc_lxc_xmit() dereferences the first buffer without checking:
+On Wed Jul 8, 2026 at 12:41 AM EDT, Kumar Kartikeya Dwivedi wrote:
+> On Tue Jul 7, 2026 at 7:19 PM CEST, Emil Tsalapatis wrote:
+>> On Tue Jul 7, 2026 at 12:15 PM EDT, Mattia Meleleo via B4 Relay wrote:
+>>> From: Mattia Meleleo <mattia.meleleo@coralogix.com>
+>>>
+>>> tcp_bpf_ioctl() answers SIOCINQ from psock->msg_tot_len, which only
+>>> counts bytes in ingress_msg. Without a stream/skb verdict program
+>>> nothing is diverted there: data stays in sk_receive_queue, so FIONREAD
+>>> returns 0 even though read() returns data.
+>>>
+>>> Add tcp_inq() to the reported value when the psock has no verdict
+>>> program. The two queues are disjoint, so bytes redirected into
+>>> ingress_msg from other sockets stay correctly accounted through
+>>> msg_tot_len.
+>>>
+>>> Add a selftest covering FIONREAD without a verdict program.
+>>>
+>>> Fixes: 929e30f93125 ("bpf, sockmap: Fix FIONREAD for sockmap")
+>>> Signed-off-by: Mattia Meleleo <mattia.meleleo@coralogix.com>
+>>
+>> Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
+>>
+>> I don't think the Sashiko READ_ONCE() recommendation is that important,
+>> we're just checking for the pointers' existence and I don't see how the
+>> reads can be moved/optimized out/merged in a way that breaks this code.
+>>
+>
+> It would be necessary if the xchg() can happen even when the lock is held=
+, at
+> the very least, to suppress potential KCSAN warnings, I think. Even for t=
+he
+> theoretical load tearing that causes false positive, it would be benign d=
+ue to
+> wrong accounting.
+>
 
-	struct tipc_msg *hdr = buf_msg(skb_peek(list));
+Fair enough, nothing wrong with adding the READ_ONCE since the set already
+needed respinning.
 
-named_distribute() can hand tipc_node_xmit() an empty list. It bails out
-early when named_prepare_buf() fails its GFP_ATOMIC allocation, leaving
-the queue empty, and tipc_named_node_up() then calls tipc_node_xmit() on
-it unconditionally. On the intra-host container path skb_peek() returns
-NULL and msg_user() reads through it.
-
-The TIPC configuration ops are flagged GENL_UNS_ADMIN_PERM, so an
-unprivileged user can reach this via unshare(CLONE_NEWUSER|CLONE_NEWNET).
-
-  Oops: general protection fault, probably for non-canonical address 0xdffffc000000001b
-  KASAN: null-ptr-deref in range [0x00000000000000d8-0x00000000000000df]
-  CPU: 0 Comm: ksoftirqd/0
-  RIP: 0010:tipc_lxc_xmit (net/tipc/msg.h:202 net/tipc/node.c:1629)
-  Call Trace:
-   tipc_node_xmit (net/tipc/node.c:1721)
-   tipc_named_node_up (net/tipc/name_distr.c:223)
-   tipc_node_write_unlock (net/tipc/node.c:428)
-   tipc_rcv (net/tipc/node.c:2189)
-   tipc_l2_rcv_msg (net/tipc/bearer.c:670)
-
-Return early from tipc_node_xmit() when the list is empty.
-
-Fixes: f73b12812a3d ("tipc: improve throughput between nodes in netns")
-Reported-by: Xiang Mei <xmei5@asu.edu>
-Assisted-by: Claude:claude-opus-4-8
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
----
- net/tipc/node.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/tipc/node.c b/net/tipc/node.c
-index 8e4ef2630ae4..cd05269e5335 100644
---- a/net/tipc/node.c
-+++ b/net/tipc/node.c
-@@ -1695,6 +1695,9 @@ int tipc_node_xmit(struct net *net, struct sk_buff_head *list,
- 	int bearer_id;
- 	int rc;
- 
-+	if (skb_queue_empty(list))
-+		return 0;
-+
- 	if (in_own_node(net, dnode)) {
- 		tipc_loopback_trace(net, list);
- 		spin_lock_init(&list->lock);
--- 
-2.43.0
+>>> ---
+>>>  net/ipv4/tcp_bpf.c                                 | 16 ++++++++-
+>>>  .../selftests/bpf/prog_tests/sockmap_basic.c       | 39 ++++++++++++++=
+++++++++
+>>>  2 files changed, 54 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
+>>> index cc0bd73f3..a001b1fff 100644
+>>> --- a/net/ipv4/tcp_bpf.c
+>>> +++ b/net/ipv4/tcp_bpf.c
+>>> @@ -334,6 +334,7 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
+>>>
+>>>  static int tcp_bpf_ioctl(struct sock *sk, int cmd, int *karg)
+>>>  {
+>>> +	struct sk_psock *psock;
+>>>  	bool slow;
+>>>
+>>>  	if (cmd !=3D SIOCINQ)
+>>> @@ -344,7 +345,20 @@ static int tcp_bpf_ioctl(struct sock *sk, int cmd,=
+ int *karg)
+>>>  		return -EINVAL;
+>>>
+>>>  	slow =3D lock_sock_fast(sk);
+>>> -	*karg =3D sk_psock_msg_inq(sk);
+>>> +	psock =3D sk_psock_get(sk);
+>>> +	if (unlikely(!psock)) {
+>>> +		unlock_sock_fast(sk, slow);
+>>> +		return tcp_ioctl(sk, cmd, karg);
+>>> +	}
+>>> +	*karg =3D sk_psock_get_msg_len_nolock(psock);
+>>> +	/* Without a verdict program, ingress data is never diverted to
+>>> +	 * ingress_msg: it stays in sk_receive_queue and is read through
+>>> +	 * the fallback to tcp_recvmsg(), so account for it like
+>>> +	 * tcp_ioctl() does.
+>>> +	 */
+>>> +	if (!psock->progs.stream_verdict && !psock->progs.skb_verdict)
+>>> +		*karg +=3D tcp_inq(sk);
+>>> +	sk_psock_put(sk, psock);
+>>>  	unlock_sock_fast(sk, slow);
+>>>
+>>>  	return 0;
+>>> diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c b/t=
+ools/testing/selftests/bpf/prog_tests/sockmap_basic.c
+>>> index cb3229711..f0f368201 100644
+>>> --- a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
+>>> +++ b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
+>>> @@ -1373,6 +1373,43 @@ static void test_sockmap_multi_channels(int soty=
+pe)
+>>>  	test_sockmap_pass_prog__destroy(skel);
+>>>  }
+>>>
+>>> +/* A socket in a sockmap without a verdict program keeps its ingress d=
+ata
+>>> + * in sk_receive_queue: FIONREAD must account for it.
+>>> + */
+>>> +static void test_sockmap_no_verdict_fionread(void)
+>>> +{
+>>> +	int err, map, zero =3D 0, sent, avail;
+>>> +	int c0 =3D -1, c1 =3D -1, p0 =3D -1, p1 =3D -1;
+>>> +	struct test_sockmap_pass_prog *skel;
+>>> +	char buf[256] =3D "0123456789";
+>>> +
+>>> +	skel =3D test_sockmap_pass_prog__open_and_load();
+>>> +	if (!ASSERT_OK_PTR(skel, "open_and_load"))
+>>> +		return;
+>>> +	map =3D bpf_map__fd(skel->maps.sock_map_rx);
+>>> +
+>>> +	err =3D create_socket_pairs(AF_INET, SOCK_STREAM, &c0, &c1, &p0, &p1)=
+;
+>>> +	if (!ASSERT_OK(err, "create_socket_pairs()"))
+>>> +		goto out;
+>>> +
+>>> +	err =3D bpf_map_update_elem(map, &zero, &c1, BPF_NOEXIST);
+>>> +	if (!ASSERT_OK(err, "bpf_map_update_elem(c1)"))
+>>> +		goto out_close;
+>>> +
+>>> +	sent =3D xsend(p1, &buf, sizeof(buf), 0);
+>>> +	ASSERT_EQ(sent, sizeof(buf), "xsend(p1)");
+>>> +	avail =3D wait_for_fionread(c1, sizeof(buf), IO_TIMEOUT_SEC);
+>>> +	ASSERT_EQ(avail, sizeof(buf), "ioctl(FIONREAD)");
+>>> +
+>>> +out_close:
+>>> +	close(c0);
+>>> +	close(p0);
+>>> +	close(c1);
+>>> +	close(p1);
+>>> +out:
+>>> +	test_sockmap_pass_prog__destroy(skel);
+>>> +}
+>>> +
+>>>  void test_sockmap_basic(void)
+>>>  {
+>>>  	if (test__start_subtest("sockmap create_update_free"))
+>>> @@ -1415,6 +1452,8 @@ void test_sockmap_basic(void)
+>>>  		test_sockmap_skb_verdict_shutdown();
+>>>  	if (test__start_subtest("sockmap skb_verdict fionread"))
+>>>  		test_sockmap_skb_verdict_fionread(true);
+>>> +	if (test__start_subtest("sockmap no_verdict fionread"))
+>>> +		test_sockmap_no_verdict_fionread();
+>>>  	if (test__start_subtest("sockmap skb_verdict fionread on drop"))
+>>>  		test_sockmap_skb_verdict_fionread(false);
+>>>  	if (test__start_subtest("sockmap skb_verdict change tail"))
+>>>
+>>> ---
+>>> base-commit: d2c9a99135da931377240942d44f3dea104cedb8
+>>> change-id: 20260707-fionread-no-verdict-a4f8697ac9f9
+>>>
+>>> Best regards,
+>>> --
+>>> Mattia Meleleo <mattia.meleleo@coralogix.com>
 
 
