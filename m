@@ -1,274 +1,220 @@
-Return-Path: <netdev+bounces-306295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306294-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ve5IOsq/T2osnwIAu9opvQ
-	(envelope-from <netdev+bounces-306295-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 17:35:38 +0200
+	id u5qxLQW8T2runQIAu9opvQ
+	(envelope-from <netdev+bounces-306294-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 17:19:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D96F9732F93
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 17:35:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0233A732C0B
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 17:19:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=yahoo.com header.s=s2048 header.b=ujvpBcz6;
-	dmarc=pass (policy=reject) header.from=yahoo.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306295-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306295-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=onsemi.com header.s=mimecast20250127 header.b="id6qN/ys";
+	dmarc=pass (policy=reject) header.from=onsemi.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306294-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306294-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 133B6300442F
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 15:13:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 20B413129C33
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 15:03:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62F87342501;
-	Thu,  9 Jul 2026 15:13:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 368FB357A3E;
+	Thu,  9 Jul 2026 15:03:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic305-21.consmr.mail.ne1.yahoo.com (sonic305-21.consmr.mail.ne1.yahoo.com [66.163.185.147])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from usb-smtp-delivery-120.mimecast.com (usb-smtp-delivery-120.mimecast.com [170.10.153.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B70A136BCC4
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 15:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 899AE23D7FB
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 15:03:04 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783609982; cv=none; b=c63PLILy+TuwUcolNpFOpp08wldYTf/W/F8BNtkZ4Zxoylt7ijydiQgzyUedNEH98KdZQsJaMPK7yv8a7V/7l3eP78NN0Lt9o6WpEiZCJS3jbEFwL9sNVKIs8D3cp1yTWSwcDkfBOGE/rPIEoTOckCHFGkCaZUeXQd5oNErQ/to=
+	t=1783609386; cv=none; b=O8KsiYp7Dm4ExXeCvpeYkfkXbKmLCMyFdWWk7dWaeSQiTd721GVLMzuX8rGLve0vHAxLaMnLOYjwEDxu0fI+Ltu+RlEwlyaChKPYWMAsnNO7EIXUjCDcT50o6tTumUmcP1/lBEqtwQLZKMhHH35tXZjcXu/0OQYgVMpBiP5kvsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783609982; c=relaxed/simple;
-	bh=Ncsb8W3MPkLyXDKm+Y8UivlCJmy1txyn92Y12PYUKg0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HR/AKJFFbnbn+8sJFQJkQGmMqA3E8jCubHh5F6q5jl1rr7nPyLIoPwcR7rAh7HjRpqAH9lvhlRGB07RdYDpoA133TQhw4o4QTsQzMik3ZaujFAju6nDTJRatPGczuk6LiQfMHkYdkOUdqsMhgClYUPa9sNjyaII/1yyaPvQy+oU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=ujvpBcz6; arc=none smtp.client-ip=66.163.185.147
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1783609980; bh=xbLKV+fyL/sTfAdSz0wMm/SRXvoeeDb8C93qT5s1TUg=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=ujvpBcz6EGizFjhm90K5VoZehOhXimSKxmcjRFqudnEhm2wxzKDEYI4/w/Dys2ppr5pa82A/FFXENA6XW45H1DIQWBslkRKbAxrHlZ7MJ8dYqgpxO1vO3wnwsbSVFQiSNRYbvhQinE/117OSj7C6wbCwoIZ4fOigwxHpk/nXDSC4x1ggg1NQPzOSWD5pOYohqFAAEAcfsv8LAdlL076moEM9jO5Pes9pYAv0VcZBj7RGBfZZuEG1bA4qtQKEbctqHXa2VfXmhBQC3A4+CYnskuIS4+s1Mv/9wCBksU3pNxC0SL4/dLglUyOO3dSX5aWe1gokdMSwptP6X7acY/uYbQ==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1783609980; bh=3jbR8+4hvuFH8nyEbtr3RKejiomjccs2/+MAYkBDTKV=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=rRdoRQDBOM1Bn7ZGLW/BbHgbnDPU0PGPGcuEdubr2Bwk1IQFkGBeVP/8/dcxzAqaCcWx0tzOKob71nI0QdpMHaarFTnNXZYQAsCNyNZoaTF+tRTdOAHPLlH/NhMzcC3kJGIlxE0tfXgdZz0b2x0f4j9KvM6d7/nhy8aqXF4AzCsJ1GIda3xOD1KiRBUg9V5lSb4Ii7x+UyK/ydngQGlqGjJPhwaX9i/qwLq74xDOpkEkJW5V4u7fHgOiv86/9R00WI0QnCuSunnDmx5paMPP71VvyqWMx/RgltBoMvV3TmjmciMj9yP3JM5iMpyHXqUGfVE1tJLu0fwwC0Pb3h0FCA==
-X-YMail-OSG: WaGoWxkVM1lAKZnwCA9sep4_X9xkcRp5Vc0Ym9UhzpQEAyYma9_hiogfBXtcO6r
- BSbeH.tFoyg_esPPgrG5rEpV10kHttFjGEwj1cFO.3NBIaiZyCPLDsGsCiXW_RHA9jkwAB6V0atL
- iCKfrfPLhxlsjILmqjrSL1HWrQB53Cn1wOiPP.heyCGyPImjB3fo5G_t4K8Z.3CJU2koaKMb0YwD
- 6RxxLBPVR0SGO9GzX._lkN.M1WFu6qntr27OCzwk9bBtTxHwpAx1fII7n2ACRLXhYctdggd_HQi6
- 4qhqLkHJfFm2ZMrFyCJAJ7Y1.do_GJUHdFNu.wh8cZcmJrQENKlbc_.Coe_WNGRhxw_0je0k5MLP
- g4RyGn603MysLFlPJPesrh5VkdHvtDolth4NEzPFGPR29Vu_.V2X22W2x0OHbWeimKISZAI50Db3
- QTd.HjtkxVptBZadmB7Bo4U3pJIL3uYFjyg49JaG5Lh4y_D0WSOImXTHo_nCqb1_H_LWeVDvstIs
- TLoQFUIrjUBzpaj95OOx11r1E51qjTCEPyG4jm9XLG81ovFgvzeYaEqdQahXaiiULXlhsWNmIYoS
- _31jdQISu96PduZhUqRH5DNtj2kVIjBt1PxsH9T2Qd2VwTC_GWNrIzCzEQlmIg35ew7mT5v44MCD
- 0Lj0Ft1m.dqfgIzTwEH7adWaHmM8atrHAAa8yfgpzxNGEUr4Zdcgb_Ts.OMze32GhQq19yQREQSJ
- PmAPs3fAsBi96pDzJRmg8lgsaCPlI0wPOoyztfCL0Y7p7c.e.A46s1x7Ar_MRb40WgENW1ORnIey
- jLaXpUYeH9cJGwqtoeHjYL0.TVw9lruwPWIZQTRb9vtGB4pvg4FtPeVRiBny9jVAghzTG4t6Hg80
- P6H49XZYtFmgTbyuxV_GgNYWqMgKveJoDmiYvFiK7JoN3X4www8FMx5NWbcc4jlLiDodOCv0VaCy
- 3.JAzjMOf8UrcemPDnGCAI9iek0U3WhHk5NZVS0xL2W4ip7BcFuMdl1ilH3yePEmCQ1nhlv1r.oX
- 8w484MYT9SK3C5ZGxpo5rtL0Kwiw5bsAzSnkPT1qWmDGtmTAU8cRq2DG0oqeKgUtpiLW.QwHhOLu
- CExO74cfAwNfyM5cY84gIrEMBtsIOOTAAQKv20natR8FbOOYaN6c6PkvgUHQlZJWoY87y8AXlX4T
- u1QxD27WsMlmnjG52kA6gLpyoEbnM2L6Oz27A3easn9oYJ3fLtURnhDHttfeLC8mZrSHyLVH3EI5
- WPhOYbuY90j0DNVw_V7AvhX3rUeohmlGvpaFa7Zc7nN4zyfmeYoLQuvrKfrIM2pzRBiAgPFD9BT.
- ZuWbldObzu3IJYpVdPB6IRlP59k3MFBaT9Bjb3tfXgh99I__th7tPxK5iuCb65FoKY9SW4ZVbsS0
- xFX4qc6I8xc_KScuXGh_sH2TRrrDskByaCvi5pXqji0nLpowdAjY_gcesAcpa4FPLkh8s7husQAe
- N4WI9g5Yx1.q_27w4oHeJUBCbEFrzPNohvO_oOXjB3VUqg51cJOQchgLkJcn8Nvhrr7EuUFZo7zR
- .xSKiR8abPujrso0ofvXf1kKwXJ3MviDgpBIfQjgODEE0x2NBwUhxb32KK2prBk3zE_kh4kwBK6H
- 4x0KMn8Wz_d48o8azxFV8FCSqNXiT3ZMKVN_Q3dMISa0O4GBEXufWnMnCFJtMsXmMmiyNo1ByJTf
- yx3mKnBCSIAyc1nbE5Zc0z8JhDw7sJ0bFQE48.v.q6O3ZAWDhOOcgOVDX4W.zAtVwCmmeYrMG92_
- NpF8jbQUaSYmQD3DK5UsZRTRh3cWbqVkGnUx4KexVNtaEd0OX3GuaNaM1xT_EvwuS10pKDPICFSq
- ZOCW6uRLRaHWrrMig6CZW8h6mRiD6NC_Ye97cCpWDfE6iHpUHLsIS7JKXcllr6g3ea7etBbtdN5g
- KBhycZZun7mRJoxy8DoE2PORmPilx2AHdoGOSW2nwRF9HZRc5a2IpzKdUIW42z2TCfSnzkqaANVO
- S5E62Iopn2oeBBM1kFfEm7WEdnBUbVCgs8la4ZZOX783O.kq042k9Vqqi3Km3Fl5OFeXUe_YG0IF
- vixJuoJ8yr6.BBAlmO22GOSaTIhTW6RTvjBGY_wERWkhI6hSeEqt1H65B3VX04ROjznSqutst6Xh
- LG35ttxUG4mak3InyRI5W9tOaVINCb6lAqsGs7aP6x04oTxVTAQRRFuU96LJ_TYgXwhmOLBuIEfJ
- 5s9mErvz6uBHJqFCPAr6tP7ysfrBgIziiS2ZMmXCTy8hlkW22XgDSPHdeQKQLjB9NCfSj1Ys-
-X-Sonic-MF: <namiltd@yahoo.com>
-X-Sonic-ID: 0f3b3ae9-870c-4d16-900f-ff8a23c57d9e
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic305.consmr.mail.ne1.yahoo.com with HTTP; Thu, 9 Jul 2026 15:13:00 +0000
-Received: by hermes--production-ir2-7b48fcd765-2bc6j (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 3fa513dfaadcb2c8a76ae27bd4128239;
-          Thu, 09 Jul 2026 15:02:40 +0000 (UTC)
-Message-ID: <276c436f-696c-4301-831e-6a79e4756905@yahoo.com>
-Date: Thu, 9 Jul 2026 17:02:36 +0200
+	s=arc-20240116; t=1783609386; c=relaxed/simple;
+	bh=b+7gt16ss+1aXCdimO3zYtlkRqfM3eem9aodXMTqg5A=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=YSr0c13SquHtyvZzE+108dhthIZsrB8wwq29QzeLz+QIXjKn3gbzdOQVATllJTcVzO7ZhEDOouhVycg5Iq5b/99uyIF0uJyl6jPU0bhOJQV93pP2ATHnMLQGDSuCHeWZqgWRO1i23N3jDL1quIo+3Yx3Vg4A83nVKGeGme4zzAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com; spf=pass smtp.mailfrom=onsemi.com; dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b=id6qN/ys; arc=none smtp.client-ip=170.10.153.120
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onsemi.com;
+	s=mimecast20250127; t=1783609384;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b+7gt16ss+1aXCdimO3zYtlkRqfM3eem9aodXMTqg5A=;
+	b=id6qN/ysBShcPAW9AOY+f3SjIk1WtOK05kADTNDfvOZDl0hMFhaiKvamuJC1XyBHhggUpA
+	7hd9it9xeqyOj8Kcfdfji3ODf9pUA/x6keNS/0symrXfpAxsTLPZudyus1M6oQL83Vcsf9
+	/0BHp0MGE4LOy7t/J9M9usETr7knDX8gTtKIn6TRdO0HD90EXPeKg9Sf+lh2ecVMIF3COD
+	5bRo+hvEUoQOtQbEBfAKyhsQOQpCnWtkLuXAlxOCKi3D5ywK4Jbb5TDbZcpiuPhD9e/krj
+	6YlsQxk9NavnrxkuepoVmwvS1hf5cE0QKRgnIDpRyJExhQAYwrQffl+euDnUQA==
+Received: from CY7PR03CU001.outbound.protection.outlook.com
+ (mail-westcentralusazon11010050.outbound.protection.outlook.com
+ [40.93.198.50]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ usb-mta-32-Wm7kqzisP0WutrOUEJrjjg-1; Thu, 09 Jul 2026 08:02:56 -0700
+X-MC-Unique: Wm7kqzisP0WutrOUEJrjjg-1
+X-Mimecast-MFC-AGG-ID: Wm7kqzisP0WutrOUEJrjjg_1783609368
+Received: from CYYPR02MB9828.namprd02.prod.outlook.com (2603:10b6:930:b8::20)
+ by PH0PR02MB7176.namprd02.prod.outlook.com (2603:10b6:510:1d::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.14; Thu, 9 Jul
+ 2026 15:02:45 +0000
+Received: from CYYPR02MB9828.namprd02.prod.outlook.com
+ ([fe80::2767:f7d2:778c:8dca]) by CYYPR02MB9828.namprd02.prod.outlook.com
+ ([fe80::2767:f7d2:778c:8dca%4]) with mapi id 15.21.0181.009; Thu, 9 Jul 2026
+ 15:02:44 +0000
+From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Andrew Lunn <andrew@lunn.ch>,
+	Piergiorgio Beruto <Pier.Beruto@onsemi.com>, Heiner Kallweit
+	<hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, Parthiban Veerasooran
+	<parthiban.veerasooran@microchip.com>, Richard Cochran
+	<richardcochran@gmail.com>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Simon
+ Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
+	<skhan@linuxfoundation.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, Jerry Ray
+	<jerry.ray@microchip.com>
+Subject: RE: [PATCH net-next v7 08/15] net: ethernet: oa_tc6: Support for
+ hardware timestamp
+Thread-Topic: [PATCH net-next v7 08/15] net: ethernet: oa_tc6: Support for
+ hardware timestamp
+Thread-Index: AQHdD5DdBz2+4L1RLE6n9UH5TdAjtLZlSDqw
+Date: Thu, 9 Jul 2026 15:02:44 +0000
+Message-ID: <CYYPR02MB982841173093F85A04D3DF4B83FE2@CYYPR02MB9828.namprd02.prod.outlook.com>
+References: <20260708-s2500-mac-phy-support-v7-0-478c877aa1a9@onsemi.com>
+ <20260708-s2500-mac-phy-support-v7-8-478c877aa1a9@onsemi.com>
+ <4a847a6b-7837-4044-8a87-0ddac47725f8@linux.dev>
+In-Reply-To: <4a847a6b-7837-4044-8a87-0ddac47725f8@linux.dev>
+Accept-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CYYPR02MB9828:EE_|PH0PR02MB7176:EE_
+x-ms-office365-filtering-correlation-id: effb33f1-8911-4fdb-5969-08deddcb21ca
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|23010399003|366016|376014|7416014|56012099006|3023799007|11063799006|4143699003|22082099003|18002099003|6133799003|38070700021|921020
+x-microsoft-antispam-message-info: 2FYgo1LzSRfjkkI9fySRtfD8barDQZjqpQJmcRyL3REhrzWvRBmcm++cf6hmdaKgMhExtIEHe5TrQgVvSpMrHMHEPgnmkyZs5kRWajMA7dqDClfyS5bloTSJSeIkwkYk48UbanB5vicL60pUrgFWcNC4ElF2+6k45OAEG3ry5PYpXLKI6JaxEMC6ZESwAeqn9+93INBkaBsMSVtk5/825A//Olp9fHWXNhA2Y3ZQwG5wJ/vzDnoVWsJS2jvFyqw2sh6RlLAwzRkyPBiQe3om4LJdvY/wA+S4HCMqyuthRRWp+O/SCpl7qyC0tlGMJj4n9SaLvS0GCR+nUIZup8Do6InIqsMN985lpBS2Byp2QcEa2MOMXw3KDyjJitOG0SGaPgdLRQlqswbZd0MWdvm6z0qQ+VKuuIgJ1mM7/mLb1v9GhVCegFuRCHTUGpaaCQPjeYnpPnJixTTvftvCBp2nkWCHq8sACkEN5oA0Y2kIbH9lFM62x3S2+uG+pZEeFAmb23p0z1yxCaeTxfwF/TwgAgO/LoDm5ip6DcUbOrQVd49tr0yvDM+shB9Pz5mmEfnz9XRAOPV2K/8gujxMDCKMli2TBp+9Q4Ht45KM4U6CF9XinPJHGAN7X98XkXr8KIWNr67EXideuNyLSOYzExoxYDrjoZZaumdF54Nq7z8u+2K801KRXKzhFzhsoK4DLvLNqD8VxP6JunHlX2sX9QEv2QO9guNMshnqI/qAjhzFez49yDjN2zYIgKCagY/dDUQb
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR02MB9828.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(23010399003)(366016)(376014)(7416014)(56012099006)(3023799007)(11063799006)(4143699003)(22082099003)(18002099003)(6133799003)(38070700021)(921020);DIR:OUT;SFP:1101
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?b0JkaFZKM2pmMHMyM0ZiM2NoT2E5dmdqWHZmeUhrRXFFWVJhVGhNdWZpamcz?=
+ =?utf-8?B?Y3A2enFmaE5HNnJiUkJSOGlEa2dabDRkWnRRL3NNQ3BLZ2hvWU1zU2FjL3Js?=
+ =?utf-8?B?djV5ZWxHM0xwRjA4Wmc1T1kyQ2hNaUlQQWlEV0R1NDd5clc4QmFlR1hNWGJG?=
+ =?utf-8?B?bnBxVWZsd2pnWHNHY0FJRHBRN3V4YlZDcVQ3VDZuVW9wQ2EvbUs0T0tVYmZ4?=
+ =?utf-8?B?bHZLSVJSeTByMUliZGtpejFEOC83VmhIQjNRN2t5QllvWjhpdEUrUmRtcmJp?=
+ =?utf-8?B?VHNkVGhUL1hYUWpJQTVzS0luaE9CRXFkME5LMUU0d2d1RHpOV3BLTWxXM3lH?=
+ =?utf-8?B?MFRqSEJqbTJaTFFpQnZhOElLMlNJWE95aDV5VUtWejFTa1BtMDJUUXVxWDZS?=
+ =?utf-8?B?d0hhOTdmdThVYmxxVTE1eVlxUlRCMDVQT0Q2OEI4TGIza04vZFJNVWU1QnJB?=
+ =?utf-8?B?SlhOeDhCc000VkFWdllWL3ZLMGliMloyVE5sTWdrcmlqL0VCWTFxRzBoN2V6?=
+ =?utf-8?B?ejl0c1UxV2VqWFd6dzNBNFBjbVhwclZRRWxVUDV2OUcwQ2RRUnVWZnFqczhF?=
+ =?utf-8?B?eFFFb2VmU2syOGZLZUFELzRrM0N1NzdyY2FiWHAycXNPMWRvMlN1REUvRzZF?=
+ =?utf-8?B?UiszbjgzT0pxaDBQaEd6MGRYRVB5c1BmOE1sdmxHOGdRd0swbVJRNm1Ld3hI?=
+ =?utf-8?B?YWl6SVgrZytrZ1RXeHB5U2NMbjlaZ2pmY2trdXRUTGdPeWZ2YWdFdk90bU9X?=
+ =?utf-8?B?YmxLTEtEVHdIRXRGbCtaRjkydXNoK3FxRDI5ODFrQU82czY4R3hzZVhUTldE?=
+ =?utf-8?B?bEc3RXQ2Ukc0NERJdDhtTGhyMi9EWFp5VWlSNyt6YUU0N2xnV0I4a1M1TmxG?=
+ =?utf-8?B?K2Y4SmluR2ZndEhMTiswTWR1YzlibURYYm00ZWJxVkFhbDA0NTNxMStlYjhI?=
+ =?utf-8?B?N1VXTVFvcnhxa1BoR2g1NEkrQkZML3lhc1BNNFJsZGFML01UamlBbnJmMlAx?=
+ =?utf-8?B?eE5oS2tZUWxQMXdQK29VWG9MdVVndVJxNUVSTTJPZ1dOWC9OVXdGSjVYalQw?=
+ =?utf-8?B?N2k1WFNYSzZwS3IxSWR4Qm9sa2lLeFRFYU8wc3RCZmR1QzlldElQMzRBK3NL?=
+ =?utf-8?B?Tm4wR1VXeTUydEl5TFBLb01uMlYzQjhtZFFWa3Uxc01vRlk3Y2tBcGs0RzJ4?=
+ =?utf-8?B?dnRRQ2ZGNUJjTXNHYWVTaHFyMnIrV3A5VnhrenpsWC9mMlFUZTZOQW83S09j?=
+ =?utf-8?B?blhlSEYxd0xYdS8rc2FOMGZsT0FLSzVCb21jZlJOS2FyR05PamhzeHVReDA5?=
+ =?utf-8?B?RFBUUzMwQjZ4VmhISWtUVVM1UzY4RzNjRUxMblBKZ2Z2cHUrd2hYVDExemZ0?=
+ =?utf-8?B?Y0tRMXNHK21CUERSbkpzMHBwZGdnbmtkWGxjVloyRjhvQXErdzJSa2JQcHFB?=
+ =?utf-8?B?dGszLzRYWEQwU2QvTTRZbS9rYmlGZmhZMGJJTVNaTlBFeGdSSnFCWlQ3OEFK?=
+ =?utf-8?B?WXhBUFVGaWM0a25XQ1pKR0lKQktPb2gvbUhaV1NLcHA5SGVvL1N2clBPQ0pO?=
+ =?utf-8?B?KzJLYXFvczRFVUREL2xrMTNKRGhobGVDOTVva25VMXFoMjFydFlwL3Q2S2FL?=
+ =?utf-8?B?dytFVHozRUc3RncwVVkyZ1BvRjV0OHBPV2dsT1ZseG1STnJ0a1I3QjdEWm5D?=
+ =?utf-8?B?b0c5MmlwUW5KKzZ4cVBZYm5qMW9pNkRLZTZXak1QMGt4Q1A1NmxQYnpzTG1U?=
+ =?utf-8?B?bGJqeU1JcEpGTktCT0gramp4U3FSeXUxRVhOV3NlRHJXL2VnZjh1VmJ5RDdG?=
+ =?utf-8?B?cXZxbkZGSmx5Q3BHZWtUaEhuRnhJYk04NDg2VklJdUZObGNZSytGNjc1eS9w?=
+ =?utf-8?B?am1ROGZIWVBxT1lQMGh6Q2tkMDZVeTdUNXovR3FHUzVWRGV1T0RVRHE4S1ZU?=
+ =?utf-8?B?QjBraFNGaEtEeUZsNXRUc1B0cnhVQk9BcnBPU0VldHhVei85R1c3SnZoRFRV?=
+ =?utf-8?B?Smx6eFJiQzJLZlUxN0dDNVBYS21Yai90R29QQ0lDN2hGcTlvUWcrWEM4MXU2?=
+ =?utf-8?B?Mk1pd21CUERxb3VVbURza04zUGt6algrYXZ0VVFRQ1IrY3dlOXo3dmU5U0JE?=
+ =?utf-8?B?VEJRT2lPdWd0VkE4aDBOZDJvZldiSGFoMEFPQVpoRGJLSlFkZDQ0MWU4V25o?=
+ =?utf-8?B?ZUU5YUNxNmVxekxoM1ZxcFNUN0h6QzYydzFGZjlia05zc1pCRm1lVFlicHlo?=
+ =?utf-8?B?ZkZEWTlHYjVReHNuanRndFdLWW1DTVlQUjFzdWdzZW0waGM3WlpsSERLZTg2?=
+ =?utf-8?B?UU1kOHJYQ3F3RTlZZ3hwbWszcHVRK3djS1M3OC9DdU5rWlZPQWladz09?=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 2/2] net: dsa: realtek: rtl8365mb: add HSGMII
- support for RTL8367S
-To: Johan Alvarado <contact@c127.dev>
-Cc: linusw@kernel.org, alsi@bang-olufsen.dk, andrew@lunn.ch,
- olteanv@gmail.com, kuba@kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, linux@armlinux.org.uk,
- luizluca@gmail.com, maxime.chevallier@bootlin.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <0100019f45cc4fe2-2464b68a-dfcf-4e93-9bfc-8445370d8e3e-000000@email.amazonses.com>
-Content-Language: pl
-From: Mieczyslaw Nalewaj <namiltd@yahoo.com>
-In-Reply-To: <0100019f45cc4fe2-2464b68a-dfcf-4e93-9bfc-8445370d8e3e-000000@email.amazonses.com>
+X-Exchange-RoutingPolicyChecked: TGD1p0HMxRuilVzhnP9nHonfkafy76n/9fhnwwo7lmu2gNwHfFM17UivhgUfNMeRB7R4yDcCtOqZ7940DZgJeFzROR0mjRu6TbmOEg+uTsEsBlbQZ140ScePd09q5/vLOS5Rk8rP+uVQeUj6F0OaJe5gbUgaLS+DjZ/yNwXwbAMB7DZSlwDh7oWx7tyRsDAHbn4fPM93eL+7IddMrHS9W6annesVWY9R1lVpVhkzUic5DfYUxAL9pIZqQDDZLeUzQabu9zWdxUhn/dVLPQvQwX86AxBP3Xspoby55+iNVKDYE2N5kC91u+AVtU3VtuaJg1ZyUZiNF/D2uvqvpY55Jw==
+X-OriginatorOrg: onsemi.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CYYPR02MB9828.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: effb33f1-8911-4fdb-5969-08deddcb21ca
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jul 2026 15:02:44.7884
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 04e1674b-7af5-4d13-a082-64fc6e42384c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2GznbPpSVo5W+2TN5wP1SpAKNuXhMOAXwNL2zAJAJ3+zTmHDRketZAoZ6wrumtbY0KH/4LwqNurBwMy519KKEstOgyvJIzLVelE6/cfTiYs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR02MB7176
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: GYSI5Tcw1_4-i6voP9GE9gVsfZmwzYzX2ZlcQc5NuMI_1783609368
+X-Mimecast-Originator: onsemi.com
+Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: WebService/1.1.26086 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+Content-Transfer-Encoding: base64
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.44 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[yahoo.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[yahoo.com:s=s2048];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[onsemi.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[onsemi.com:s=mimecast20250127];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_FROM(0.00)[yahoo.com];
-	TAGGED_FROM(0.00)[bounces-306295-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[namiltd@yahoo.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:contact@c127.dev,m:linusw@kernel.org,m:alsi@bang-olufsen.dk,m:andrew@lunn.ch,m:olteanv@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:luizluca@gmail.com,m:maxime.chevallier@bootlin.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306294-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:vadim.fedorenko@linux.dev,m:andrew@lunn.ch,m:Pier.Beruto@onsemi.com,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:parthiban.veerasooran@microchip.com,m:richardcochran@gmail.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-doc@vger.kernel.org,m:jerry.ray@microchip.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[linux.dev,lunn.ch,onsemi.com,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,lwn.net,linuxfoundation.org];
+	FORGED_SENDER(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,bang-olufsen.dk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk,bootlin.com,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[namiltd@yahoo.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[yahoo.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[onsemi.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[onsemi.com:from_mime,onsemi.com:dkim,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email,CYYPR02MB9828.namprd02.prod.outlook.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D96F9732F93
+X-Rspamd-Queue-Id: 0233A732C0B
 
-Hi Johan
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBWYWRpbSBGZWRvcmVua28gPHZh
+ZGltLmZlZG9yZW5rb0BsaW51eC5kZXY+DQo+IFNlbnQ6IFRodXJzZGF5LCBKdWx5IDksIDIwMjYg
+Mzo0NSBBTQ0KPiBTdWJqZWN0OiBSZTogW1BBVENIIG5ldC1uZXh0IHY3IDA4LzE1XSBuZXQ6IGV0
+aGVybmV0OiBvYV90YzY6IFN1cHBvcnQgZm9yIGhhcmR3YXJlDQo+IHRpbWVzdGFtcA0KPiANCj4g
+DQo+ID4gKw0KPiA+ICsgaWYgKGNtZCA9PSBTSU9DU0hXVFNUQU1QIHx8IGNtZCA9PSBTSU9DR0hX
+VFNUQU1QKQ0KPiA+ICsgcmV0dXJuIG9hX3RjNl90c3RhbXBfaW9jdGwodGM2LCBycSwgY21kKTsN
+Cj4gDQo+IGlvY3RsIGludGVyZmFjZSBmb3IgSFcgdGltZXN0YW1wIGNvbmZpZ3VyYXRpb24gaXMg
+ZGVwcmVjYXRlZCwga2VybmVsDQo+IGNvZGUgd2FzIHJlY2VudGx5IGNsZWFuZWQgdXAgdG8gYXZp
+b2QgdGhlc2UgaW9jdGwgY29tbWFuZHMgaW4gZmF2b3Igb2YNCj4gbmRvX2h3dHN0YW1wX2dldC9u
+ZG9faHd0c3RhbXBfc2V0IGNhbGxiYWNrcy4gTmV3IGRyaXZlcnMgbXVzdCBub3QgdXNlDQo+IGRl
+cHJlY2F0ZWQgaW9jdGwgY29tbWFuZHMuDQo+IA0KDQpJIHNlZS4gU3VyZS4gV2lsbCByZW1vdmUg
+aXQuIA0K
 
-On 7/9/2026 9:34 AM, Johan Alvarado wrote:
-> Hi Mieczyslaw,
-> 
-> On 7/3/2026 5:12 PM, Mieczyslaw Nalewaj wrote:
->> Johan, looks like you forgot to include the scheduler bandwidth bits
->> for the CPU port. Without this, HSGMII will still be capped at the
->> old SGMII rate limits. Something like:
-> 
-> Good catch. I had dropped these on the assumption that the vendor
-> driver never touches them, but your mail made me look again: the
-> "Max rate" block in dal_rtl8367c_switch_init() programs exactly these
-> registers for EXT_PORT0 - the port 6 ingress and egress rate limiters
-> are raised to 0x7FFFF via rtl8367c_setAsicPortIngressBandwidth() and
-> rtl8367c_setAsicPortEgressRate(), followed by a raw write of 0x0007
-> to 0x03fa (LINE_RATE_HSG_H). I had missed it because those writes go
-> through the indexed register macros and a raw address rather than the
-> PORT6_* register names.
-> 
-> On my board this was masked by the bootloader: U-Boot runs the vendor
-> switch init (rtk_switch_init() from the ipq5018 gmac driver) and
-> leaves the limits raised, but the kernel driver then issues a full
-> chip reset in rtl8365mb_setup(), which puts these registers back to
-> their reset defaults. With the ingress/egress limiters back at their
-> defaults that would indeed cap HSGMII at roughly 1 Gbps, and I could
-> not have seen it in testing because my downstream ports are 1G only
-> (as noted in the cover letter, 2.5G line rate is unverified on my
-> hardware).
-> 
-> One caveat I want to be transparent about: for the same reason I
-> cannot verify the cap itself, and the vendor documentation leaves
-> some room for doubt. The rtl8367c_setAsicPortIngressBandwidth()
-> comment describes the bandwidth value 0x1FFFF as "disable", and
-> that is exactly the reset default - I read back both limiters as
-> 0x1FFFF (LSBs at 0xFFFF, MSBs at 1) on my RTL8367S after the
-> driver's chip reset - so the limiter may in fact be disabled out
-> of reset (though that note looks like stale text from earlier
-> 17-bit-granularity chips, given this family's maximum is 0x7FFFF).
-> 
-> Raising the limiters is safe under either reading: if the default
-> really is a ~1 Gbps limit, the write removes it, and if it means
-> "disabled", the new value (0x7FFFF * 8 Kbps, about 4.19 Gbps, well
-> above the 2.5G line rate) never engages.
-> 
-> While I cannot push more than 1 Gbps, I did verify that these
-> registers really are the live rate limiters for the SerDes CPU
-> port, by going the other way: on a build with the setup-time
-> writes described below already in place, I lowered the limiters at
-> runtime (via regmap debugfs) to 12500 * 8 Kbps = 100 Mbps
-> and ran iperf3 across the CPU port. Throughput clamps from ~460 to
-> ~95 Mbps with the ingress limiter lowered (CPU-originated traffic)
-> and from ~600 to ~96 Mbps with the egress limiter lowered
-> (CPU-bound traffic); restoring the maximum returns both directions
-> to baseline. The ~95/100 ratio is the expected TCP goodput for a
-> 100 Mbps wire-rate limit, so both limiters demonstrably meter this
-> port at the documented 8 Kbps granularity. The only thing this
-> cannot settle is the meaning of the 0x1FFFF default itself
-> (~1.048 Gbps cap vs. disabled), since any value at or above the
-> traffic I can generate behaves identically. If you have an
-> RTL8367S setup that can push more than 1 Gbps across the HSGMII
-> CPU port, a before/after measurement would be a very welcome
-> confirmation of the cap.
-> 
-> So I'll add the writes in v5, following the vendor init: raise the
-> port 6 ingress/egress limiters to their maximum once at setup time,
-> rather than per interface mode. Two differences from your snippet:
-> the vendor init writes the full 19-bit rate value, i.e. the LSB
-> halves too (0x00cf and 0x0398 set to 0xFFFF), so I'll program both
-> halves rather than only the *_CTRL1 registers, to avoid depending on
-> the reset defaults of the LSB registers. And LINE_RATE_HSG_H needs no
-> new write at all: the driver's common init jam table has always
-> written 0x03fa = 0x0007 in rtl8365mb_switch_init(), so that one is
-> already at its maximum on every probe (which also matches the 7 you
-> read back for it). I have this running on my board already: with the
-> setup-time writes in place both limiters read back 0x7FFFF after
-> probe, and the HSGMII link comes up and forwards as before.
-> 
-> As an aside, a per-interface-mode variant of these writes does exist
-> in the vendor code, but only for other chip families: in
-> rtl8367c_setAsicPortExtMode(), the chip id 0x0652/0x6368 branch
-> programs its rate registers (0x0130/0x039f/0x03fa) on every mode
-> change, with 7s for EXT_HSGMII and lower values otherwise, and the
-> 0x0801/0x6511 branch writes 0x00d0/0x0399/0x03fa = 7 only for
-> EXT_HSGMII (which is where the pattern in your snippet comes from).
-> For the 0x6367 family the ext-mode path never touches them, and the
-> vendor only programs them once, unconditionally, in switch_init -
-> which is another reason I prefer the one-time setup write over doing
-> it from the PCS path.
-> 
-> For completeness, the same vendor block also touches three related
-> bits: rtl8367c_setAsicPortIngressBandwidth() additionally clears the
-> port 6 ingress metering pre-IFG bit and sets the "flow control when
-> ingress rate exceeded" bit (PORT6_MISC_CFG, 0x00ce bits 10/11), and
-> switch_init follows the egress rate write with
-> rtl8367c_setAsicPortEgressRateIfg(ENABLED), which sets the global
-> "egress rate accounting includes IFG" bit (SCHEDULE_WFQ_CTRL 0x0300
-> bit 0). With the limiters raised to maximum the meter never engages,
-> so neither the exceed action nor the IFG accounting has any
-> observable effect. I plan to leave those three bits at their reset
-> defaults and program only the rate values and LINE_RATE_HSG_H, to
-> keep the driver's footprint on the QoS block minimal - but I'm happy
-> to mirror the vendor init exactly if you'd rather not deviate from
-> it.
-> 
->> One more thing while we're on this: I checked the equivalent
->> registers for RGMII on the RTL8367S, and they come out to 1, 1, 7
->> respectively (INGRESSBW_PORT6_RATE_CTRL1, PORT6_EGRESSBW_CTRL1,
->> LINE_RATE_HSG_H). For correctness these should be set to those
->> values in the RGMII path as well, rather than left at whatever
->> reset/default state they're currently in.
-> 
-> The 1/1 you read back for the rate limiter MSBs match the reset
-> defaults I see on my RTL8367S as well, and the 7 for LINE_RATE_HSG_H
-> is the value the common init jam table writes on every probe, as
-> above. Since the driver hard-resets the chip and then replays the
-> init jam on every probe, those values are already guaranteed in
-> the RGMII case, so writing them again from the RGMII path would be
-> a no-op. These fields are also the MSBs of the per-port QoS rate
-> limiters rather than link-mode configuration, so I would prefer to
-> touch them as little as possible from the link paths. My plan for
-> v5 is therefore the single write at setup time described above,
-> which covers both SGMII and HSGMII and has no functional effect on
-> RGMII either way: both the default value (~1.048 Gbps, if it acts
-> as a limit at all) and the raised maximum sit above the 1G RGMII
-> line rate, so the meter never engages there. Let me know if you
-> see a problem with that.
-> 
-> Best regards,
-> Johan
-
-Performance degradation without setting these registers can only be
-observed in HSGMII mode with simultaneous load on multiple LAN ports.
-
-This was noticed during work on adding support for the Mercusys MR85X
-router with DSA to OpenWrt: https://github.com/openwrt/openwrt/pull/19445#issuecomment-4505613294
-
-Regards
 
