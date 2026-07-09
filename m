@@ -1,76 +1,72 @@
-Return-Path: <netdev+bounces-306175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306176-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id uo4oMr1/T2r+iAIAu9opvQ
-	(envelope-from <netdev+bounces-306175-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:02:21 +0200
+	id fCvIHT2AT2omiQIAu9opvQ
+	(envelope-from <netdev+bounces-306176-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:04:29 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEE54730005
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:02:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C5AC730070
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:04:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=realtek.com header.s=dkim header.b=IlaLYaM4;
-	dmarc=pass (policy=none) header.from=realtek.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306175-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306175-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=BnCOQY7x;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306176-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306176-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4DE8A319D1DA
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 10:36:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B171B302C5E3
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 10:38:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81CB840759F;
-	Thu,  9 Jul 2026 10:35:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321333FADE8;
+	Thu,  9 Jul 2026 10:38:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8841E407CFC;
-	Thu,  9 Jul 2026 10:35:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F543ED101;
+	Thu,  9 Jul 2026 10:38:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783593326; cv=none; b=VKedQa0GsjAPOJKqPhv1jzjYws3ZVgIq9p1HcASNsDCw0CRKl8zsK0cZjszfKwGyM1TPd6SsHMKE1GzTrP+0UQEKVlEo1sZZqp8zJDJC3v9KDxwL/fa/qRYuHa7BpeWFHXs5WrZJka6eieMIacdJWTfCRrEH0/Hr9HN9mhbfSOY=
+	t=1783593492; cv=none; b=q8P22JWcKhJ9uVTOpHgph0k7IAYp5185N3Nmdyw4jSWNwdgPQx8NLnya5d9Rc91WijuIZtecb8gHdMRvNl/dGWPBjDrKvY9diBmN7zM4sYUoTC378R0GzYvahqVI80o3EnZ9tI8jlPyOhPS5WCVRvl74fvpSUVIxjKPPUvFrnQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783593326; c=relaxed/simple;
-	bh=T1Y62vu2ZHhJDKqhNGFRRkiCxMTg26VdyIso6kwxcUI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MmmGBwW7KtHbKxxoSu/zrn61vBxmVSbUWugBJmKg6QqV3aZ7q5ljXskFRs+PgVPjbnc5faAxLDJholse2y4dZC/H2n9sa+8siJIi5cvnuoE8o4UNX2xxy+pAYn9KzRrL174Q3dLH28TIiWRzlOawODdqZ2kBQwa9IDNgPwPI+Yw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=IlaLYaM4; arc=none smtp.client-ip=211.75.126.72
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 669AYxIqA2991601, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1783593299; bh=VoxrNT8BayOuGdFA09LCSb7weOY+l4w15zoWU0H1cZA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=IlaLYaM4dONGqiQ/DkFd4JlN9qb5g5w5qDfr8TsEM0IkBSWFL+4ZNEw1FmCBfZunO
-	 GOxEiVEpXvs8jquJNvKf3IyB6v9gT627uIGbcnESdlMdx+sQhQNPl5pqrbINFx/NM6
-	 wWA0LvXU3AADmRcxOvnT9BLlLb9+giBz+uVqOrKTiVmO1/X7qDt4o5Ez/2fM2JH1J6
-	 Bs4/XjLMoVJgn94nl/sO7w5ns72Rvg6YziTr3DV6Ws1E2E605WIAAcVxy87WwdVgrc
-	 ThHXxTu/cF1gJ49Yur7NNzzi0agvc0UQau3t+4d6Np4wauGf5D8VuZDrMGqz0Yy4nY
-	 ggSchzGeyV8AA==
-Received: from mail.realtek.com (rtkexhmbs04.realtek.com.tw[10.21.1.54])
-	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 669AYxIqA2991601
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 9 Jul 2026 18:34:59 +0800
-Received: from RTKEXHMBS05.realtek.com.tw (10.21.1.55) by
- RTKEXHMBS04.realtek.com.tw (10.21.1.54) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 9 Jul 2026 18:34:59 +0800
-Received: from RTKEXHMBS03.realtek.com.tw (10.21.1.53) by
- RTKEXHMBS05.realtek.com.tw (10.21.1.55) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 9 Jul 2026 18:34:58 +0800
-Received: from RTDOMAIN (172.21.42.225) by RTKEXHMBS03.realtek.com.tw
- (10.21.1.53) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Thu, 9 Jul 2026 18:34:58 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <stable@vger.kernel.org>, <horms@kernel.org>,
-	<richardcochran@gmail.com>, <david.laight.linux@gmail.com>,
-	<aleksander.lobakin@intel.com>, <pkshih@realtek.com>,
-	<larry.chiu@realtek.com>, Justin Lai <justinlai0215@realtek.com>
-Subject: [PATCH net v5] rtase: Workaround for TX hang caused by hardware packet parsing
-Date: Thu, 9 Jul 2026 18:34:56 +0800
-Message-ID: <20260709103456.83789-1-justinlai0215@realtek.com>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1783593492; c=relaxed/simple;
+	bh=uN27BS4ewStwCklQr2DuM5gP4rGJ1wPSO/4y1Hf/bo8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=rqG23F2NPRWkodzOybf5cp1qwPjyFw9IkPt4FhvkZDMJzpE65aJiKpE0NXm+xjyzjU56j6PC61vASjiV2lu6Ja0E7Hfv97THu1xt6qNX4AmPypMJuaUNAzp9bJ4wIggm8JNtCOPn6q9/FUdIJfkT7IEB25/0lE1TN9zp3WXvZz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BnCOQY7x; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C9CD1F000E9;
+	Thu,  9 Jul 2026 10:38:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783593491;
+	bh=Y6VGOlkpgo4arCW+nyarOcCI4IwHdmRhLsRejOptB8w=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=BnCOQY7xP6QHREHgMjc6e7PDRpKXWvc2mHPQ5W1aMPsERACfOO5K6l32UUrp0e2K/
+	 r34STa9E8zqjpZjU1xYa7Dr0Uu/wa3HiWVfq/pTUWrk81hSMW4+gkSLmV0AlEFKy0b
+	 bJ+TJ0qX1EbVkvCOFYhP1l+9RHBH3yr7MJhQEtr4YrapD0LpAnMrlnx6Ae/gDm3WYI
+	 W1vIRRoE2JRxeepbcUE1pr7jFfVoanpUKBOMOF4oYRd3DkCCvBlc9Rywa2fkrOhnj4
+	 6sAa4Jb7ZpFmOBIZSdHshNzt4WlkB+F6LEChx61GNDnIiUAhPStCUbIIqKMYLsuUs3
+	 WnuMwHhSm50TQ==
+From: Simon Horman <horms@kernel.org>
+To: dhowells@redhat.com
+Cc: Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	marc.dionne@auristor.com,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	linux-afs@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	jaltman@auristor.com,
+	jarkko@kernel.org,
+	keyrings@vger.kernel.org,
+	stable@kernel.org
+Subject: Re: [PATCH net 4/4] rxrpc: Fix CHALLENGE packet overqueuing and simplify RESPONSE generation
+Date: Thu,  9 Jul 2026 11:37:53 +0100
+Message-ID: <20260709103753.1543915-1-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260702144919.172295-5-dhowells@redhat.com>
+References: <20260702144919.172295-5-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,362 +74,199 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306175-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7];
-	FORGED_SENDER(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:stable@vger.kernel.org,m:horms@kernel.org,m:richardcochran@gmail.com,m:david.laight.linux@gmail.com,m:aleksander.lobakin@intel.com,m:pkshih@realtek.com,m:larry.chiu@realtek.com,m:justinlai0215@realtek.com,m:andrew@lunn.ch,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306176-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:dhowells@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:marc.dionne@auristor.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux-afs@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:jaltman@auristor.com,m:jarkko@kernel.org,m:keyrings@vger.kernel.org,m:stable@kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,lunn.ch,vger.kernel.org,kernel.org,gmail.com,intel.com,realtek.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[realtek.com:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,realtek.com:from_mime,realtek.com:email,realtek.com:mid,realtek.com:dkim]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CEE54730005
+X-Rspamd-Queue-Id: 0C5AC730070
 
-The hardware performs packet parsing before packet transmission.
-Parsing incomplete IPv4, IPv6, TCP, or UDP headers may trigger a TX
-hang because the hardware parser expects additional protocol header
-data that is not present in the packet.
-
-The hardware performs additional PTP parsing on UDP packets identified
-by destination ports 319/320 at the expected UDP destination port
-offset.
-
-If such a packet has transport data smaller than RTASE_MIN_PAD_LEN,
-the hardware parser expects additional packet data and may trigger a
-TX hang.
-
-To avoid these hardware issues, the driver applies the following
-workarounds.
-
-Drop malformed packets that may trigger this hardware issue before
-transmission.
-
-For IPv4 non-initial fragments, the hardware does not check the
-fragment offset before parsing the expected transport header location.
-As a result, these packets are still subject to transport header
-parsing even though they do not contain a transport header. If the
-transport data is shorter than the minimum transport header required
-by the hardware parser, pad the transport data to the minimum
-transport header length required by the hardware parser. Packets that
-also match the hardware PTP parsing conditions continue to follow the
-corresponding workaround.
-
-For IPv6 fragmented packets, neither of the above hardware issues
-occurs because the hardware only continues packet parsing when the
-IPv6 Base Header Next Header field directly indicates UDP. Packets
-carrying a Fragment Header do not continue through the subsequent
-packet parsing stages.
-
-For packets identified for hardware PTP parsing, pad the transport
-data so it reaches RTASE_MIN_PAD_LEN before transmission.
-
-Fixes: d6e882b89fdf ("rtase: Implement .ndo_start_xmit function")
-Cc: stable@vger.kernel.org
-Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
 ---
-v4 -> v5:
-- Drop packets that may trigger a TX hang during hardware packet
-  parsing.
-- Pad IPv4 non-initial fragments when the transport data is shorter
-  than the minimum transport header required by the hardware parser.
+Subject: rxrpc: Fix CHALLENGE packet overqueuing and simplify RESPONSE generation
 
-v3 -> v4:
-- Derive the L3 protocol and network offset from Ethernet/VLAN
-headers instead of relying on vlan_get_protocol().
-- Reject malformed packets when the computed UDP offset exceeds
-skb->len.
+This commit removes the out-of-band queueing mechanism for CHALLENGE
+packets. It transitions the connection event processor to handle
+CHALLENGE parsing and RESPONSE generation directly, while allowing
+application data to be passed via a user-type key.
 
-v2 -> v3:
-- Remove dependency on skb_transport_header_was_set().
-- Determine UDP header offset from IPv4/IPv6 headers.
-- Use skb_header_pointer() for UDP header access.
-- Add non-linear skb handling.
+Link: https://sashiko.dev/#/patchset/20260624163819.3017002-1-dhowells%40redhat.com
 
-v1 -> v2:
-- Remove RTASE_SHORT_PKT_THRESH and the packet length check.
-- Check transport data length before parsing the UDP header.
-- Add Fixes tag.
-- Add Cc: stable@vger.kernel.org.
-- Target net tree.
----
- drivers/net/ethernet/realtek/rtase/rtase.h    |   8 +
- .../net/ethernet/realtek/rtase/rtase_main.c   | 197 ++++++++++++++++++
- 2 files changed, 205 insertions(+)
+> diff --git a/fs/afs/cm_security.c b/fs/afs/cm_security.c
+> index 103168c70dd4d..db2a3b30f0209 100644
+> --- a/fs/afs/cm_security.c
+> +++ b/fs/afs/cm_security.c
+> @@ -295,13 +295,22 @@ static int afs_create_yfs_cm_token(struct sk_buff *challenge,
+>  	if (ret < 0)
+>  		goto out_aead;
+>  
+> -	server->cm_rxgk_appdata.len  = adatasize;
+> -	server->cm_rxgk_appdata.data = appdata;
+> -	appdata = NULL;
+> +	appdata_key = key_alloc(&key_type_user, "rxrpc: afs rxgk appdata",
+> +				GLOBAL_ROOT_UID, GLOBAL_ROOT_GID, current_cred(),
+> +				KEY_POS_VIEW | KEY_POS_SEARCH | KEY_USR_VIEW,
+> +				KEY_ALLOC_NOT_IN_QUOTA, NULL);
+> +	if (IS_ERR(appdata_key)) {
+> +		ret = PTR_ERR(appdata_key);
+> +		goto out_aead;
+> +	}
+> +
+> +	ret = key_instantiate_and_link(appdata_key, appdata, adatasize, NULL, NULL);
+> +	if (ret < 0) {
+> +		key_put(appdata_key);
+> +		goto out_aead;
+> +	}
+> +
+> +	server->cm_rxgk_appdata = appdata_key;
 
-diff --git a/drivers/net/ethernet/realtek/rtase/rtase.h b/drivers/net/ethernet/realtek/rtase/rtase.h
-index 9bd6872474c1..03b12d83f6e9 100644
---- a/drivers/net/ethernet/realtek/rtase/rtase.h
-+++ b/drivers/net/ethernet/realtek/rtase/rtase.h
-@@ -192,6 +192,12 @@ enum rtase_sw_flag_content {
- 	RTASE_SWF_MSIX_ENABLED = BIT(2),
- };
- 
-+enum rtase_parse_result {
-+	RTASE_PARSE_OK,
-+	RTASE_PARSE_SKIP,
-+	RTASE_PARSE_DROP,
-+};
-+
- #define RSVD_MASK 0x3FFFC000
- 
- struct rtase_tx_desc {
-@@ -363,4 +369,6 @@ struct rtase_private {
- 
- #define RTASE_MSS_MASK GENMASK(28, 18)
- 
-+#define RTASE_MIN_PAD_LEN 47
-+
- #endif /* RTASE_H */
-diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-index 255667775f0e..4168ad9e48ea 100644
---- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-+++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-@@ -61,6 +61,7 @@
- #include <linux/pci.h>
- #include <linux/pm_runtime.h>
- #include <linux/prefetch.h>
-+#include <linux/ptp_classify.h>
- #include <linux/rtnetlink.h>
- #include <linux/tcp.h>
- #include <asm/irq.h>
-@@ -1252,6 +1253,199 @@ static u32 rtase_tx_csum(struct sk_buff *skb, const struct net_device *dev)
- 	return csum_cmd;
- }
- 
-+static enum rtase_parse_result rtase_get_l3_proto(struct sk_buff *skb,
-+						  __be16 *proto,
-+						  u32 *network_offset)
-+{
-+	struct vlan_hdr *vh, _vh;
-+	struct ethhdr *eh, _eh;
-+	u32 offset = ETH_HLEN;
-+
-+	eh = skb_header_pointer(skb, 0, sizeof(_eh), &_eh);
-+	if (!eh)
-+		return RTASE_PARSE_DROP;
-+
-+	*proto = eh->h_proto;
-+
-+	while (eth_type_vlan(*proto)) {
-+		vh = skb_header_pointer(skb, offset, sizeof(_vh), &_vh);
-+		if (!vh)
-+			return RTASE_PARSE_DROP;
-+
-+		*proto = vh->h_vlan_encapsulated_proto;
-+		offset += VLAN_HLEN;
-+	}
-+
-+	*network_offset = offset;
-+
-+	return RTASE_PARSE_OK;
-+}
-+
-+static bool rtase_pad_to_transport_len(struct sk_buff *skb,
-+				       u32 transport_offset,
-+				       u32 pad_to_len)
-+{
-+	u32 trans_data_len;
-+	u32 pad_len;
-+
-+	trans_data_len = skb->len - transport_offset;
-+	if (trans_data_len >= pad_to_len)
-+		return true;
-+
-+	if (skb_is_nonlinear(skb)) {
-+		if (skb_linearize(skb))
-+			return false;
-+	}
-+
-+	pad_len = pad_to_len - trans_data_len;
-+	if (__skb_put_padto(skb, skb->len + pad_len, false))
-+		return false;
-+
-+	return true;
-+}
-+
-+static enum rtase_parse_result rtase_get_transport_offset(struct sk_buff *skb,
-+							  u32 *transport_offset,
-+							  u8 *transport_proto,
-+							  u32 *pad_to_len)
-+{
-+	enum rtase_parse_result ret;
-+	struct ipv6hdr *i6h, _i6h;
-+	struct iphdr *ih, _ih;
-+	bool non_first_frag;
-+	__be16 proto;
-+	u32 offset;
-+	u32 no;
-+
-+	ret = rtase_get_l3_proto(skb, &proto, &no);
-+	if (ret != RTASE_PARSE_OK)
-+		return ret;
-+
-+	switch (proto) {
-+	case htons(ETH_P_IP):
-+		ih = skb_header_pointer(skb, no, sizeof(_ih), &_ih);
-+		if (!ih)
-+			return RTASE_PARSE_DROP;
-+
-+		if (ih->ihl < 5)
-+			return RTASE_PARSE_DROP;
-+
-+		offset = no + ih->ihl * 4;
-+		if (offset > skb->len)
-+			return RTASE_PARSE_DROP;
-+
-+		non_first_frag = ntohs(ih->frag_off) & IP_OFFSET;
-+
-+		if (ih->protocol == IPPROTO_TCP) {
-+			if (skb->len - offset < sizeof(struct tcphdr)) {
-+				if (non_first_frag) {
-+					*transport_offset = offset;
-+					*transport_proto = IPPROTO_TCP;
-+					*pad_to_len = sizeof(struct tcphdr);
-+
-+					return RTASE_PARSE_OK;
-+				}
-+
-+				return RTASE_PARSE_DROP;
-+			}
-+
-+			return RTASE_PARSE_SKIP;
-+		}
-+
-+		if (ih->protocol != IPPROTO_UDP)
-+			return RTASE_PARSE_SKIP;
-+
-+		*transport_offset = offset;
-+		*transport_proto = IPPROTO_UDP;
-+
-+		if (skb->len - offset < sizeof(struct udphdr)) {
-+			if (non_first_frag) {
-+				*pad_to_len = sizeof(struct udphdr);
-+
-+				return RTASE_PARSE_OK;
-+			}
-+
-+			return RTASE_PARSE_DROP;
-+		}
-+
-+		return RTASE_PARSE_OK;
-+
-+	case htons(ETH_P_IPV6):
-+		i6h = skb_header_pointer(skb, no, sizeof(_i6h), &_i6h);
-+		if (!i6h)
-+			return RTASE_PARSE_DROP;
-+
-+		offset = no + sizeof(*i6h);
-+
-+		if (i6h->nexthdr == IPPROTO_TCP) {
-+			if (skb->len - offset < sizeof(struct tcphdr))
-+				return RTASE_PARSE_DROP;
-+
-+			return RTASE_PARSE_SKIP;
-+		}
-+
-+		if (i6h->nexthdr != IPPROTO_UDP)
-+			return RTASE_PARSE_SKIP;
-+
-+		if (skb->len - offset < sizeof(struct udphdr))
-+			return RTASE_PARSE_DROP;
-+
-+		*transport_offset = offset;
-+		*transport_proto = IPPROTO_UDP;
-+
-+		return RTASE_PARSE_OK;
-+
-+	default:
-+		return RTASE_PARSE_SKIP;
-+	}
-+}
-+
-+static bool rtase_skb_pad(struct sk_buff *skb)
-+{
-+	enum rtase_parse_result ret;
-+	u32 transport_offset;
-+	__be16 *dest, _dest;
-+	u32 trans_data_len;
-+	u32 pad_to_len = 0;
-+	u8 transport_proto;
-+	u16 dest_port;
-+
-+	ret = rtase_get_transport_offset(skb, &transport_offset,
-+					 &transport_proto, &pad_to_len);
-+	if (ret == RTASE_PARSE_SKIP) {
-+		return true;
-+	} else if (ret == RTASE_PARSE_DROP) {
-+		netdev_dbg(skb->dev, "drop malformed packet\n");
-+		return false;
-+	}
-+
-+	if (pad_to_len &&
-+	    !rtase_pad_to_transport_len(skb, transport_offset, pad_to_len))
-+		return false;
-+
-+	if (transport_proto != IPPROTO_UDP)
-+		return true;
-+
-+	trans_data_len = skb->len - transport_offset;
-+	if (trans_data_len < offsetof(struct udphdr, len) ||
-+	    trans_data_len >= RTASE_MIN_PAD_LEN)
-+		return true;
-+
-+	dest = skb_header_pointer(skb,
-+				  transport_offset +
-+				  offsetof(struct udphdr, dest),
-+				  sizeof(_dest), &_dest);
-+	if (!dest)
-+		return true;
-+
-+	dest_port = ntohs(*dest);
-+	if (dest_port != PTP_EV_PORT && dest_port != PTP_GEN_PORT)
-+		return true;
-+
-+	return rtase_pad_to_transport_len(skb, transport_offset,
-+					  RTASE_MIN_PAD_LEN);
-+}
-+
- static int rtase_xmit_frags(struct rtase_ring *ring, struct sk_buff *skb,
- 			    u32 opts1, u32 opts2)
- {
-@@ -1365,6 +1559,9 @@ static netdev_tx_t rtase_start_xmit(struct sk_buff *skb,
- 		opts2 |= rtase_tx_csum(skb, dev);
- 	}
- 
-+	if (!rtase_skb_pad(skb))
-+		goto err_dma_0;
-+
- 	frags = rtase_xmit_frags(ring, skb, opts1, opts2);
- 	if (unlikely(frags < 0))
- 		goto err_dma_0;
--- 
-2.40.1
+[Severity: Medium]
+Does this plain store require memory barriers? afs_make_call() appears to
+read call->server->cm_rxgk_appdata concurrently without holding the
+cm_token_lock. Without smp_store_release() here and a corresponding
+smp_load_acquire() or READ_ONCE() on the read side, could the reader
+observe the pointer before the key object's initialization is completely
+visible to other CPUs?
 
+> diff --git a/fs/afs/rxrpc.c b/fs/afs/rxrpc.c
+> index 05fcb9b6adde7..ae48c15b3db94 100644
+> --- a/fs/afs/rxrpc.c
+> +++ b/fs/afs/rxrpc.c
+> @@ -373,8 +373,25 @@ void afs_make_call(struct afs_call *call, gfp_t gfp)
+>  		call->drop_ref = true;
+>  	}
+>  
+> +	if (call->key && call->server) {
+> +		u32 krb5_enctype = 0;
+> +		u8 security_index = 0;
+> +
+> +		rxrpc_kernel_query_key(call->key, &security_index, &krb5_enctype);
+> +		switch (security_index) {
+> +#ifdef CONFIG_RXGK
+> +		case RXRPC_SECURITY_YFS_RXGK:
+> +			app_data = call->server->cm_rxgk_appdata;
+> +			break;
+
+[Severity: Medium]
+Following up on the previous observation, is it safe to perform a plain
+read of the cm_rxgk_appdata pointer here in afs_make_call() without
+READ_ONCE() or a lock?
+
+> diff --git a/net/rxrpc/rxgk.c b/net/rxrpc/rxgk.c
+> index 77a67ace1d248..9ab766d5f0b6c 100644
+> --- a/net/rxrpc/rxgk.c
+> +++ b/net/rxrpc/rxgk.c
+> @@ -981,36 +981,36 @@ static int rxgk_construct_response(struct rxrpc_connection *conn,
+> [ ... ]
+> +	if (conn->bundle->app_data) {
+> +		rcu_read_lock();
+> +		appdata = (struct user_key_payload *)
+> +			user_key_payload_rcu(conn->bundle->app_data);
+
+[Severity: High]
+If an attacker passes the ID of a non-user key (like an asymmetric key
+or keyring) during sendmsg(), could casting that key's payload to struct
+user_key_payload and modifying its refcount cause memory corruption?
+
+> +		if (!refcount_inc_not_zero(&appdata->ref))
+
+[Severity: High]
+Can user_key_payload_rcu() return NULL here if the user key has been
+revoked by userspace via keyctl(KEYCTL_REVOKE)? If appdata evaluates to
+NULL, would calling refcount_inc_not_zero(&appdata->ref) attempt to
+dereference a low offset address and trigger a kernel panic?
+
+> diff --git a/net/rxrpc/sendmsg.c b/net/rxrpc/sendmsg.c
+> index 4c754f78ece9a..225eec410bedc 100644
+> --- a/net/rxrpc/sendmsg.c
+> +++ b/net/rxrpc/sendmsg.c
+> @@ -590,6 +592,18 @@ static int rxrpc_sendmsg_cmsg(struct msghdr *msg, struct rxrpc_send_params *p)
+> [ ... ]
+> +		case RXRPC_RESPONSE_APPDATA:
+> +			if (len != sizeof(key_serial_t))
+> +				return -EINVAL;
+> +			if (p->call.app_data)
+> +				return -EINVAL;
+> +			key_id = *(key_serial_t *)CMSG_DATA(cmsg);
+> +			key = lookup_user_key(key_id, 0, KEY_NEED_SEARCH);
+> +			if (IS_ERR(key))
+> +				return PTR_ERR(key);
+> +			p->call.app_data = key_ref_to_ptr(key);
+> +			break;
+
+[Severity: High]
+Should there be a check here in rxrpc_sendmsg_cmsg() to verify that the
+fetched key is actually a user-type key (e.g., key->type == &key_type_user)?
+Without validation, any key type could be assigned to p->call.app_data,
+leading to the invalid cast mentioned previously in
+rxgk_respond_to_challenge().
+
+> @@ -677 +716 @@ int rxrpc_do_sendmsg(struct rxrpc_sock *rx, struct msghdr *msg, size_t len)
+> [ ... ]
+>  	call = rxrpc_find_call_by_user_ID(rx, p.call.user_call_ID);
+>  	if (!call) {
+> [ ... ]
+> +		call = rxrpc_new_client_call_for_sendmsg(rx, msg, &p);
+> +		/* The socket is now unlocked... */
+> +		if (IS_ERR(call))
+> +			return PTR_ERR(call);
+
+[Severity: High]
+Does this direct return leak the key reference acquired by lookup_user_key()
+and stored in p.call.app_data when rxrpc_new_client_call_for_sendmsg()
+fails?
+
+> @@ -803,6 +803,7 @@ int rxrpc_do_sendmsg(struct rxrpc_sock *rx, struct msghdr *msg, size_t len)
+>  out_put_unlock:
+>  	if (!dropped_lock)
+>  		mutex_unlock(&call->user_mutex);
+>  error_put:
+>  	rxrpc_put_call(call, rxrpc_call_put_sendmsg);
+>  	_leave(" = %d", ret);
+>  	return ret;
+>  
+>  error_release_sock:
+>  	release_sock(&rx->sk);
+> +	key_put(p.call.app_data);
+>  	return ret;
+>  }
+
+[Severity: High]
+Do the out_put_unlock and error_put paths in rxrpc_do_sendmsg() also need
+to call key_put(p.call.app_data)? It appears rxrpc_alloc_client_call()
+takes its own reference on the key via key_get(), which means the original
+reference acquired during rxrpc_sendmsg_cmsg() will be leaked on successful
+operations or when failing after the socket lock is released.
 
