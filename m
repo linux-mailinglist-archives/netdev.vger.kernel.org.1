@@ -1,166 +1,271 @@
-Return-Path: <netdev+bounces-306129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306130-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +1TWDWtwT2rzggIAu9opvQ
-	(envelope-from <netdev+bounces-306129-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:56:59 +0200
+	id H4XCLmVvT2qcggIAu9opvQ
+	(envelope-from <netdev+bounces-306130-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:52:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C231C72F32E
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:56:58 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50B5A72F25C
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:52:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="Czt/6Vo+";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306129-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306129-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=resnulli-us.20251104.gappssmtp.com header.s=20251104 header.b=bMxSyS0j;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306130-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306130-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2C361304E6DD
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:51:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C010D3011355
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:52:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D72402453;
-	Thu,  9 Jul 2026 09:50:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C03B9400E18;
+	Thu,  9 Jul 2026 09:52:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB1883FBB69;
-	Thu,  9 Jul 2026 09:50:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021FF3EA94B
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 09:52:33 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783590654; cv=none; b=UvcEwgjsA5Mc18CumPnKPP39KSgVujylrfyNbhAfsIbTHPxY+Kw4wJ90+SUdAuFwVrJRrh1f6aY5CyL4lyg6pwf4j3StK/ljcEuPIhv/OyZykERLYhoALK435Ad8OgS6VnLZhyo26X9TVb5uekYlHeeTM/yAvpBqEYDcKl637sk=
+	t=1783590755; cv=none; b=qMja+T5DOFfG1DEtfMsX0IToMiBPm8iInd3jxG0txDETRxjc07fEYGlGJ6VQXSuWF4vDErcyRTlYTjqiFqWLdO49jYl1RFeRiCxvwAeIHVW12XGOL++1miVqnywbboAN5FmOvnOh3CW+dMwpeUfSOWyGxCk0TsvHzAIhTcd9j+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783590654; c=relaxed/simple;
-	bh=muvquHUNF18hxMTX8gmYRYIf1eQSvehLDezpGhHBvBA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pSFrBnzFVXncTHxXlp7bPPkcKHN+GlBJTcVo2kgn/4vVIKX9ebqe34WHSs6ri8wBcgK/BUHYIhzPXxgiYBxwLdu4Ricao23dSw5afL4IUazTI/c9MNalOLKqqbXH4+x99reHYoOGIevAtiN2TqsgZhn0orFBJzCQ1fqaAv8RevQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Czt/6Vo+; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B043F1F000E9;
-	Thu,  9 Jul 2026 09:50:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783590652;
-	bh=OYI04CWeUX0RrY0bbXHHMJDfAnVT6RP1adWSYVMh5jY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=Czt/6Vo+iT30JUB+Jk8UDTkjC0CaqXgublJJCoepgFiUzUgHSmJsRusYEnOjiQwaC
-	 8tan+H8djVoHbG1kW1MqFD+M/9VnVNEhwFwH4O/Smwd5kFwzJZfXy/1QjrvVVPsi7a
-	 Lo+noxDZIUT+9YoXaqll+c8/Xw2gD4FW9pfJIeQXynhzf3JF9iCYneqQAAjWAk/mNn
-	 xGOEbEuRWdOk4obaCZpGFtam86Q4iao3lTCJchVhPLvsYOiAM2sWlKgUMEoPsiJZ/V
-	 zynVUbhrpmx/xGEXKeWZSJPjtmxUuSOSIl025Rel7oOfzj8vaj1GtHvYpoUw5LCSdp
-	 57MiB5NbiZq1Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9394C393A57D;
-	Thu,  9 Jul 2026 09:50:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1783590755; c=relaxed/simple;
+	bh=iQNrGVvv3ujLtkwmKctK+PWCeJB+Z38/i3Nxrwmlsrs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sKDFfhPN8mz+NTIv0adJ2xVJIB0O/PwioaX9mcrJ07fo8KI5Gd6itjksCs1XST1CCIxDx4q3swuYDlpXp+KLUrwpyqGHVV0yZP7b/4ROp78oKC4BhmMGSPMDtOorv5c7nLLbmwZwzOdKClkaQVGNkku7DjZq7qbiGa1CG0JPc88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=bMxSyS0j; arc=none smtp.client-ip=209.85.128.54
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-493b61b52b6so15674125e9.1
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 02:52:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1783590752; x=1784195552; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=cmUvpg/LGglbFmX5TbG8S8cuP4tLEOPmrTkk7nQFQLo=;
+        b=bMxSyS0jwGsmJ9MuQogJyBz3F63LUvsACq+qyW5SuL5TGiMrFn6oWnP1raMt0zSqOs
+         KPCHAvEOkvHnkgapRFG3coOIo2t7LdYiwODMKtMHP6dhftejtSoBSnC6yt57SoDVYGyS
+         SkhTVmOi6VM6+P3CGSP2ryQE6Iv+vEm5x5RL8J8gMojBQuvog5v3dyC+em/tw/nGQ1rx
+         ewWmylZPOhEYFoL16n5oSCbtFWL0GWF8MDYlBlw3QRnx75eWGNeE4EdAJcgZMd+U8wGb
+         f1z2SUs+qsLUakRRl5k/M/CdjDwr5+6vDIdpXVIdWMeXsbGrfpJmIkoxrfLaCzmfpliB
+         iErw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783590752; x=1784195552;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=cmUvpg/LGglbFmX5TbG8S8cuP4tLEOPmrTkk7nQFQLo=;
+        b=avbsjdElyaxVU8hLLRrpn0ghQ3lQyUIOxoXRNqbFyeSfOh/iFsUuj0mteWbWMit0Ps
+         /1H9WJB+TVPRbP0cs3yn8Vkty/go6eXivYIFIbybjJ1dLKj9oVJ7fYus0DVuv9kdGyYv
+         7kotqnUJBzUtiEFL2EPMBSGIlR1fekS/9K7po5t3g2CCHAbgUr8gH9n36uq6/lpQcTYW
+         /Xa0MVZFV4Sl+hUr36byNccBPhPqwEQnUtkQ5AtNj3KVY/P+RU/Os4LB8Yd904fZHQZm
+         EE7KavGh2c0B7WLOXRnGHYYyqq7QitVcLdq+nxEBtUuTsMJQnQMmTq26xFqrkKsHwz3l
+         66TA==
+X-Forwarded-Encrypted: i=1; AHgh+RqXmrDghjYvQRfLUklKNiE6eJyAGNb6QJ3icdZRV2WvcJZiNENMJpfCR0L7ob8ffz0OIIl8gS0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yysrwl6ZUjkKaStroBIF7IZRXY2UgAGgeumJVJTfnUgkfEOP8Nn
+	4CfjAwlDjFK8Nd1NZVOF857Z73xENaL6Pj69GCctBATqAzDT+MzTFxMEca5qd7UISvk=
+X-Gm-Gg: AfdE7cluFwo7FYym8LHCnQCIP/99wwhP4AJ1Z7QITju4gwnm/TG11KuaHh7rEqgF6/o
+	iXpdVTxBphEBlPybEBs4J0mayKGdTCF6ZfhG2q2reLM4MNOEhQi22RX0W3WZR6pRCfXm5S3j+Yb
+	o3XvEN9J5e3R/yJT5N6DokKgMn3/90z8QIZursKyAFSth7Uf+ckD4ynWKol+de8r7MSC3P7ZFwJ
+	xvtt6aEH9LzUj/YV/+DW7c/fM5d75beHBB6GIy6K4pngckHTW3namqFOHAbf1g1kFznx4VavyoQ
+	SbfpCm+1xT4pcbAf1fcsGSRZTEKHVdx998jDVNpCqzzbtqbZ+Yal57/KMdmK+JEQTBZiJs9hkFz
+	W8qh8IjcIzIYq/US4lzW1no65mtaYMDlg0ct9Z/yNXevxIKtH+cTJmbtEcCB+y436tVrCJqmh/f
+	cc1Jz8rX6TT8evXcnM4QsNeYs4pGFCP2Pb
+X-Received: by 2002:a05:600c:3111:b0:493:aab3:c09c with SMTP id 5b1f17b1804b1-493e6a4a8b1mr61043955e9.28.1783590752378;
+        Thu, 09 Jul 2026 02:52:32 -0700 (PDT)
+Received: from localhost ([140.209.217.211])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9de1d8cdsm53652344f8f.1.2026.07.09.02.52.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jul 2026 02:52:31 -0700 (PDT)
+Date: Thu, 9 Jul 2026 11:52:28 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Mark Bloch <mbloch@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+	Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next V5 6/6] net/mlx5: Apply devlink eswitch mode
+ boot default on probe
+Message-ID: <ak9un-lCDmhGI9tL@FV6GYCPJ69>
+References: <20260707174527.425134-1-mbloch@nvidia.com>
+ <20260707174527.425134-7-mbloch@nvidia.com>
+ <ak4LVcyKofmtrWcU@FV6GYCPJ69>
+ <7309e57a-89bc-4e4a-97e9-d843b02efa42@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 01/17] netfilter: nf_conntrack_reasm: guard mac_header
- adjustment after IPv6 defrag
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178359063113.3372474.9367073912354621322.git-patchwork-notify@kernel.org>
-Date: Thu, 09 Jul 2026 09:50:31 +0000
-References: <20260708140309.19633-2-fw@strlen.de>
-In-Reply-To: <20260708140309.19633-2-fw@strlen.de>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
- pablo@netfilter.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7309e57a-89bc-4e4a-97e9-d843b02efa42@nvidia.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306129-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:mbloch@nvidia.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:andrew+netdev@lunn.ch,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-doc@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DMARC_NA(0.00)[resnulli.us];
+	FORGED_SENDER(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-306130-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:fw@strlen.de,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:netfilter-devel@vger.kernel.org,m:pablo@netfilter.org,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[strlen.de:email,vger.kernel.org:from_smtp,asu.edu:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[FV6GYCPJ69:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nvidia.com:email,vger.kernel.org:from_smtp,resnulli-us.20251104.gappssmtp.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C231C72F32E
+X-Rspamd-Queue-Id: 50B5A72F25C
 
-Hello:
+Thu, Jul 09, 2026 at 08:00:19AM +0200, mbloch@nvidia.com wrote:
+>
+>
+>On 08/07/2026 11:34, Jiri Pirko wrote:
+>> Tue, Jul 07, 2026 at 07:45:27PM +0200, mbloch@nvidia.com wrote:
+>>> Apply devlink_eswitch_mode= boot defaults for mlx5 after the initial
+>>> probe finishes device initialization while holding the devlink instance
+>>> lock.
+>>>
+>>> At this point the devlink instance is registered and mlx5 can perform an
+>>> eswitch mode change. Calling devl_apply_default_esw_mode() also clears
+>>> any pending default apply work queued by devl_register(), so the queued
+>>> work will not apply the same default again.
+>>>
+>>> Keep this call in mlx5_init_one() rather than the lower-level
+>>> devl-locked init helper. That helper is also used by devlink reload, and
+>>> devlink core already applies the boot default after a successful
+>>> DRIVER_REINIT reload.
+>>>
+>>> Signed-off-by: Mark Bloch <mbloch@nvidia.com>
+>>> ---
+>>> drivers/net/ethernet/mellanox/mlx5/core/main.c | 13 +++++++++++++
+>>> 1 file changed, 13 insertions(+)
+>>>
+>>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
+>>> index 643b4aac2033..0712efea74cc 100644
+>>> --- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
+>>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
+>>> @@ -1392,6 +1392,17 @@ static void mlx5_unload(struct mlx5_core_dev *dev)
+>>> 	mlx5_free_bfreg(dev, &dev->priv.bfreg);
+>>> }
+>>>
+>>> +static void mlx5_devl_apply_default_esw_mode(struct mlx5_core_dev *dev)
+>>> +{
+>>> +	struct devlink *devlink = priv_to_devlink(dev);
+>>> +
+>>> +	if (!MLX5_ESWITCH_MANAGER(dev))
+>>> +		return;
+>>> +
+>>> +	devl_assert_locked(devlink);
+>>> +	devl_apply_default_esw_mode(devlink);
+>>> +}
+>>> +
+>>> int mlx5_init_one_devl_locked(struct mlx5_core_dev *dev)
+>>> {
+>>> 	bool light_probe = mlx5_dev_is_lightweight(dev);
+>>> @@ -1471,6 +1482,8 @@ int mlx5_init_one(struct mlx5_core_dev *dev)
+>>> 	err = mlx5_init_one_devl_locked(dev);
+>>> 	if (err)
+>>> 		devl_unregister(devlink);
+>>> +	else
+>>> +		mlx5_devl_apply_default_esw_mode(dev);
+>> 
+>> I don't understand why this patch is needed at all. Just leave the job
+>> to the devlink core, no? That was the point to not pollute drivers with
+>> code like this. Is it some kind of leftover?
+>
+>It was discussed with Jakub here:
+>https://lore.kernel.org/all/20260611085440.4fe36bf2@kernel.org/
+>
+>The main reason is timing. If the default is applied only by devlink
+>core, it has to wait until the driver drops the devlink lock.
 
-This series was applied to netdev/net.git (main)
-by Florian Westphal <fw@strlen.de>:
+I don't follow.
 
-On Wed,  8 Jul 2026 16:02:53 +0200 you wrote:
-> From: Xiang Mei <xmei5@asu.edu>
-> 
-> nf_ct_frag6_reasm() slides the packet head forward to drop the IPv6
-> fragment header and then unconditionally advances skb->mac_header:
-> 
-> 	skb->mac_header += sizeof(struct frag_hdr);
-> 
-> [...]
+<quote>
+	devl_lock(devlink);
+	if (dev->shd) {
+		err = devl_nested_devlink_set(dev->shd, devlink);
+		if (err)
+			goto unlock;
+	}
+	devl_register(devlink);
+	err = mlx5_init_one_devl_locked(dev);
+	if (err)
+		devl_unregister(devlink);
+unlock:
+	devl_unlock(devlink);
+</quote>
 
-Here is the summary with links:
-  - [net,01/17] netfilter: nf_conntrack_reasm: guard mac_header adjustment after IPv6 defrag
-    https://git.kernel.org/netdev/net/c/3b08fed5b7e0
-  - [net,02/17] netfilter: ebtables: terminate table name before find_table_lock()
-    https://git.kernel.org/netdev/net/c/a622d2e9608c
-  - [net,03/17] netfilter: ebtables: zero chainstack array
-    https://git.kernel.org/netdev/net/c/cbfe53599eeb
-  - [net,04/17] netfilter: ebtables: module names must be null-terminated
-    https://git.kernel.org/netdev/net/c/084d23f81832
-  - [net,05/17] netfilter: nft_lookup: fix catchall element handling with inverted lookups
-    https://git.kernel.org/netdev/net/c/e6107a4c74b5
-  - [net,06/17] netfilter: ipset: mark the rcu locked areas properly
-    https://git.kernel.org/netdev/net/c/5d0c22e73656
-  - [net,07/17] netfilter: ipset: exclude gc when resize is in progress
-    https://git.kernel.org/netdev/net/c/cffcf57bf03c
-  - [net,08/17] netfilter: ipset: cleanup the add/del backlog when resize failed
-    https://git.kernel.org/netdev/net/c/672321302ed6
-  - [net,09/17] netfilter: ipset: allocate the proper memory for the generic hash structure
-    https://git.kernel.org/netdev/net/c/724f32699aea
-  - [net,10/17] netfilter: flowtable: use dst in this direction when pushing IPIP header
-    https://git.kernel.org/netdev/net/c/c328b90c17fc
-  - [net,11/17] netfilter: flowtable: IPIP tunnel hardware offload is not yet support
-    https://git.kernel.org/netdev/net/c/6c5dcab95f4c
-  - [net,12/17] netfilter: flowtable: support IPIP tunnel with direct xmit
-    https://git.kernel.org/netdev/net/c/fa7395c02d95
-  - [net,13/17] netfilter: handle unreadable frags
-    https://git.kernel.org/netdev/net/c/da5b58478a9c
-  - [net,14/17] ipvs: pass parsed transport offset to state handlers
-    https://git.kernel.org/netdev/net/c/bae7ce7bafb5
-  - [net,15/17] ipvs: use parsed transport offset in TCP state lookup
-    https://git.kernel.org/netdev/net/c/2500fa3958b1
-  - [net,16/17] ipvs: use parsed transport offset in SCTP state lookup
-    https://git.kernel.org/netdev/net/c/2f75c0faa336
-  - [net,17/17] ipvs: ensure inner headers in ICMP errors are in headroom
-    https://git.kernel.org/netdev/net/c/3f7a535ff0fa
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+devlink lock is droped right after.
 
 
+
+>For mlx5, that usually happens very late in the init sequence. I
+>wanted drivers to be able to apply the default as soon as the driver
+>is ready for it, because on NICs with a DPU the host PF can remain
+>stuck until the ECPF moves to switchdev.
+>
+>This API is also useful beyond the initial devlink registration path.
+>Follow-up patches will use it for driver controlled paths that are
+>not covered by the devlink core, such as recovery and FW reset.
+>
+>There is also a race window where userspace may take the devlink lock
+>before the core gets a chance to apply the default. Letting the driver
+>explicitly apply the default at the right point avoids that scenario.
+>
+>Thinking about this again, maybe the simpler approach is to apply the
+>default from devl_unlock(). That would avoid the whole workqueue
+>infra.
+>
+>I avoided doing that earlier because applying a default mode as a
+>side effect of devl_unlock() feels a bit odd. But compared to adding
+>dedicated workqueue handling maybe it is the lesser evil here.
+>
+>What do you think?
+
+I was under impression that you need the work to resolve nested locking.
+If not, drop it, sure.
+
+
+>
+>About the extra API, I still think it's useful and would like to keep
+>it if possible.
+>
+>Mark
+>
+>
+>> 
+>> 
+>> 
+>>> unlock:
+>>> 	devl_unlock(devlink);
+>>> 	return err;
+>>> -- 
+>>> 2.43.0
+>>>
+>
 
