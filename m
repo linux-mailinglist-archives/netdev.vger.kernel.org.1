@@ -1,458 +1,338 @@
-Return-Path: <netdev+bounces-306074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306070-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kL6/GZtDT2qDdAIAu9opvQ
-	(envelope-from <netdev+bounces-306074-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 08:45:47 +0200
+	id vVoHEHpET2q3dAIAu9opvQ
+	(envelope-from <netdev+bounces-306070-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 08:49:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F25AE72D506
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 08:45:46 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B62572D56C
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 08:49:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b="PYJjQm/F";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306074-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306074-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=est.tech header.s=selector1 header.b=XMBF6ESc;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306070-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306070-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AF279302819A
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 06:45:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DDA7C300B849
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 06:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 515143E0C42;
-	Thu,  9 Jul 2026 06:43:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDA4E3D9688;
+	Thu,  9 Jul 2026 06:42:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012070.outbound.protection.outlook.com [52.101.66.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BADCB3DE445;
-	Thu,  9 Jul 2026 06:42:58 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783579386; cv=none; b=bHA1g+8DtneebSQZ+BWnz6jkIGodx+aaUWUoKwmplawQGQP+P7Mcex8YIJqt+mNYzIbduXcG/3eYhVhmiuA3aArCrDoedI8XED89orQh2SG8CIWdC54spl89NIcuZDFOPPbW4jIupVjAmSPXNAV13JBIcv70BVO3AZR3hOzbEbU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783579386; c=relaxed/simple;
-	bh=zeQbK24H5wDz8lEmLc4ot4f43usN7aP3TJ+RpJukAV8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Xvr1b9pGUXdjHaHQ9WP89pIiWcKhQz8yMXzc6J47w975zgz29wN9g5GoYXBUrT8j1adU2Q+q1KJ0hBp8cTWiV6xEA/5wn3nEUnbPmV+pxgIv8UMxjXGEKUwhFt0jYjAlEdti5ZJoPV/0/ipOQ3I8QTL3yFAx1bGQ+qjDt/VaX/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PYJjQm/F; arc=none smtp.client-ip=185.246.84.56
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 4DEA91A0F00;
-	Thu,  9 Jul 2026 06:42:56 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 218905FF03;
-	Thu,  9 Jul 2026 06:42:56 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 59EF011BC207F;
-	Thu,  9 Jul 2026 08:42:53 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1783579375; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=wh79rBXHGjoF4j9LDwbXGQfgxDfkRfX5JND3HvCdjhE=;
-	b=PYJjQm/FiYUpHZOQhu2U5Vwzmi26QtKz+VXeOdIC0W1ZwWgIX5W9L3WAt259EYnyo0JWZZ
-	YtTUanX7lorbBhWzKkik1C5/NkgLxOxc41GoaQSxq8e6yEg8BhgJfbKfnAZJbtYFSh+eHX
-	1foncC9RmNt32fxdRZzDi5/UvL7UF2vrTQ8V84bcrVo9yYrMzl1tm/ggGeAvefhYQtFlFg
-	oTbgX1kVQTQ1/uOgdyT2rmlwIMiJIGDcZ8IJeAWcxgkI8YpAQbESCpFfppEGLhjLak8T3/
-	g47qttqddfTP60CkG+1l21c8DODWpwolZYnVyI3ZVMR8YQU13HkjtazfH2+PhQ==
-From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Date: Thu, 09 Jul 2026 08:42:36 +0200
-Subject: [PATCH net-next 10/10] net: dsa: microchip: add two-steps PTP
- support for KSZ8463
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AABDF3DD526;
+	Thu,  9 Jul 2026 06:42:53 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783579377; cv=fail; b=Y/tG6Hfi/MiXA2g3q5CHF+qkBzct6++2Yg4290nbzNxncBdRncXdA82HO572mX+E2cugTApMyvD1FrpRn/evhCrMKZQ9sQQ1wVK2qyBOsxuHZk8kc9MB7ngz9LFFoZ22F/9r/dh6SJtxV+DukwsoBhcofvg8h8264l2fOlYzmEU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783579377; c=relaxed/simple;
+	bh=DKh1nzaTpNt/dd9Xbv6fVBX1Sb0BlJpxRCn4/x3vDH4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Pn/4T36Uu9UW+VsrJ9aGzLvwGwbVaxH5CgXUVanyZcnsIp/P8+qBQm75nWkAabBKQm6zdHPw8++F29VkmQEMsU8nxZeE8WYuuRW1XVLIj0WlnKEjoggrKAZuhnXQY4xJnQGEPTkjbjTRdilq6dF0nX38xzmVVSGynfGTlkJ4z3U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=XMBF6ESc; arc=fail smtp.client-ip=52.101.66.70
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QDGZj50h420GbZAgXDpQoG2a/GkKBEjo9E3FayyQpcDaGLkIcIa35ey3RxhjygENLGpFkgTND1d9xpEApzA5roFVOkYx/OPc+j1W28Kynpc9whEExG1FIvT78SSoCyqQxeOxLJzzVmeqJbbrAA8xAMlomiS6KmYaXL3A4IUDDczrtnAIbW/c1reD+XHnJX9B2rR6sujGFabqm2uGCERdfwxl0ZIK3gGb5L3zr5y/Z2BQ8XU5Ts1UVD48abfw87YGLvYEkJb6jmX8CtMCky3ao+67wc4gZDT80UydLi2ajVQ69PtvCVxtabRD94uTdx5ddaLFmwT2UaY0LCMDHie13Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=a91IXcHHIZ+2YJLH7csU0+/5i9PSVJBcuyTO9fT+IfI=;
+ b=iv/TB/2in60fJonDb14vRm53n9a+KcAnOINvLN3OBCv3Yt0RcHqEOQlinzZ4M71m+r2mJOtCxe+3nbyZwemCCpIcaGrNqTT1YY61HU7MaPSo3Aq4GPgyDg1mMyZUx2wYIT5pUcKWAAJZXNhA0tbq2vXiLHwWhkzhwHdC2OoGGJMNenpEqWklbiuqAf8Tf4caRoA98l7lXpmO9ruaGmblE1rLApMaMDO6JjAHPSAFOKJrSSIsTrYM2SFLbB8odrDhyk0Rfu/cKwjTsaIMZnyCbEbngsUcLxYbrSsPm/S0YWHrUEAL2Qqafrytz4fbvLKzcTHC6ggfJkHFxb9qz4W6SA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
+ dkim=pass header.d=est.tech; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=a91IXcHHIZ+2YJLH7csU0+/5i9PSVJBcuyTO9fT+IfI=;
+ b=XMBF6EScYqBExUTvoVhfsuVE7bU4WznxddXGWZrLE8m7Jy8cA+nLwJECZEBv3ZG8KIaRhmEzhx+IxDvh8q/i0N6JnQGU6HPCO9LiWvNQxekQQqGT120lDzV1tBy9ZYXAHGhuBJmqudWB73ML7OPCsyueIy2/cDLQPxRFnF77PMVRzfmIZKBdBjJ8iZWoZHXc11FsClbrL55FSamix/Xkw4X6OIbvrPGKvf3vMDJSXt5HTPYVsi4sipdCHeNbog1dvTb8nc1neemVFvRa2WPGfjm9ghT1AuRhGOmRtMUv2tc4XgDhdAeUL3+pTpVZJAiAnvv/FDPbPFKB51NguKaqqg==
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
+ DU4P189MB2755.EURP189.PROD.OUTLOOK.COM (2603:10a6:10:570::15) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.181.11; Thu, 9 Jul 2026 06:42:46 +0000
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7%6]) with mapi id 15.21.0181.010; Thu, 9 Jul 2026
+ 06:42:46 +0000
+From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
+To: Weiming Shi <bestswngs@gmail.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"tipc-discussion@lists.sourceforge.net"
+	<tipc-discussion@lists.sourceforge.net>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Xiang Mei <xmei5@asu.edu>, Jon Maloy
+	<jmaloy@redhat.com>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Subject: RE: [PATCH net v2] tipc: serialize udp bearer replicast list updates
+Thread-Topic: [PATCH net v2] tipc: serialize udp bearer replicast list updates
+Thread-Index: AQHdDi/D4YmkcIZsF02+N8D+qqpgrLZkvlsw
+Date: Thu, 9 Jul 2026 06:42:46 +0000
+Message-ID:
+ <GV1P189MB1988185B47AFAA9202408186C6FE2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+References: <20260707164248.821265-2-bestswngs@gmail.com>
+In-Reply-To: <20260707164248.821265-2-bestswngs@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: GV1P189MB1988:EE_|DU4P189MB2755:EE_
+x-ms-office365-filtering-correlation-id: f7fe4857-a610-4f62-9a83-08dedd85497a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|23010399003|1800799024|7416014|376014|366016|38070700021|22082099003|18002099003|5023799004|56012099006|11063799006|6133799003;
+x-microsoft-antispam-message-info:
+ Z5Z6pTl3yyC2JsmmcmOGG75RtW/UBiPqZrjwIPiHjxzsRFKCLf5DqZ5ucTkG+TR8vmhlVuyZ/Z0sgmz1qxdEC24VSG4uwsUlcc/Y0Hp3Pjc+uSpe1PASnpcusSRTNHd15frKQu5jWSU/W41PNGr7VTmbs3vnS/9BlD3Pb2Bl8e1n/ad5uhDgHCXqUgMgCi7oIP3RQWfwkwHZhHG/B42EJaEXn7e8w4qJZeiHMTt4S4yzjbD7A9Z+QahEucXd5kh2gLEdP1ZjnoJMfHlSpbvUsTXU7gw6vS0KGsyrEVml6TvGyM/Xh5GNshOhrTY0Rh2GzG0fyZEIplUWKynGHg9othU54enor1MS4IcPBwapAmE/YaQPDP52hK65QBjqfs938Af42HPtf3Zr/oeSJERdaay/QtM8Xkl8cOHswOieXIiagbkcdnXy1Hgxi/gKGqVTm00+55lI+Wt6nB+QmsKy9lg/Qd83+CA4GUKPpJHao4TH/CZYJg3X7eo7CZntpD8NP+H6VXvJ+eOAa7rYmm083P0+QYm9pCB1xud0eNZnUzXE3UOMiwu0AZ21TImWO57lYydiQ1KQdwhFxJ6wEH2oMsK+TLV+JjYGsnyzGKxOJ0Zsjg7FSK2mPqa/wQd8Dfeys9nOGLC6CqCqaQCd2tmjNc4E61r5z4a2ZtcXmX353OaGgX83+j9sgHHAjCw1ieFWGOJ0awxTLArSmqNx0MvPhUKKsw5CCOmWaRdGn+IgGd0=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(7416014)(376014)(366016)(38070700021)(22082099003)(18002099003)(5023799004)(56012099006)(11063799006)(6133799003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?n9V3LsD8wEHUuSN5H5fo+vQS191a5yXJjpKfWMupjwVaQnI11T3iOHY1F6Ab?=
+ =?us-ascii?Q?77ErwCWlJf5dVCyBH+KuyzdM03chHgT5YO3CZXeQjiFSjZCQP+wJSjfvUV53?=
+ =?us-ascii?Q?Rg7VVLqLjau9MgfuhjjvlGWIeWeGPj++gbBP2XB4Lu5qzNNuKOrOYNRpFrKx?=
+ =?us-ascii?Q?0XIJcZQu+wS4Vjx9XpiT4rik5pCd99UVHruTz6LdIoYusHKAk6qM9UqQWimR?=
+ =?us-ascii?Q?Wp5q/dtK2RqO1/9CWxA8YmPCKnRLDuCx28ABto0JYisumOgAVmYYpSIqSaOl?=
+ =?us-ascii?Q?l3rIXrRgxH3FpA7WCPonGCHeW2Wj9dCRga+PtVg/SnDHZVsgXnIGgDF8WLim?=
+ =?us-ascii?Q?qPvucTncy9wjDCT7zgr5st5aJxQDhJu8nh+9N8jGDznY9uwhu0i2Ob8FlDhZ?=
+ =?us-ascii?Q?inM/GG3tOJ2rNKbqlpH39SfSXgReMAdOkvMnzU6BzE/NEqQ2oDEdk6SZLqxI?=
+ =?us-ascii?Q?35jqVHS1nv7ajlHgBV9Gnaqf44fnwGcb+zQUrsrOv/rdlLzaVFzrLiMM44gb?=
+ =?us-ascii?Q?4FzQ6T2qo0Nhe1uKX3pkBAV/LIQeqDrrcAZAVXAxAY+AhcWFCs6axCpDffTG?=
+ =?us-ascii?Q?z0FYXXqscqWI8OxLMmi0LI1XkS9rTEkRF+hczIce9ssTbzF/Yla8J92G8Lon?=
+ =?us-ascii?Q?M1RcUER2UvohjnfyALYhXwy0RjHRtHRcOm2/ndR4c9tUyEgVio9RXLMGo/5t?=
+ =?us-ascii?Q?DkKlk5biQoJURErY9ecpA0hV7wSDInx1pdUqIKkh6gcgBi7pMyIpl+xcxajF?=
+ =?us-ascii?Q?H3BxdM9hXLisp1xse41n5lC8bhpGk5YJhr1/G9SC4/WLdN3mmdXeMxeMrEx0?=
+ =?us-ascii?Q?mHPXpVEL21aHc/5BDeAvyfO489XxoslQceiYCFJjUl60jbChj2+TsvGDRNpb?=
+ =?us-ascii?Q?bLbbzzrbtsIiyy0lMpHezBsmasyx488I0e5zsKlnNB4p5fgwB9K3jkgzSTtr?=
+ =?us-ascii?Q?yiOqdtR6+xeuPiVAo7gXvpygfrgUJMJ834aC7d1HaFYeOznk0SdFHMVIfXsZ?=
+ =?us-ascii?Q?FRi12y4nKoLOMvwVxPsXD8m1SM10Xo6DtlmQRsQ3Q6+cL08xB559k8hR8AEa?=
+ =?us-ascii?Q?+6K3abeTG6Ekbu/FKdu7aH9CZWZEGru5kjgfb1xtectEeKQLPxvAcsO7QFeN?=
+ =?us-ascii?Q?u56cnLvnyVmdUF3UQDM9RXNWHiz9bumsbYemiUv4Lg4khn3sww8xE/A3mz7T?=
+ =?us-ascii?Q?H/JG0F8iS6bIrjF1EJz31S7mikTIxPuNDXed/Qtwjw8+r2vvXqnPRxEc8yOQ?=
+ =?us-ascii?Q?VapZ6Q6WsjFCvAM2sXucxKi3/fgbkxyEStraH148mh4xVBdXKG4Gzzt3Isaj?=
+ =?us-ascii?Q?yAIsCXJtal4MtFm1/pGU+h+asFCy/6jKM0zWd8JP2E191y8L8zmrUcsUIue2?=
+ =?us-ascii?Q?5qtuipEjCkAMrc02QKXi+Jn8RVVNKf0rzsXWgRHy+Q7vdRua9lN2icg3B4Wb?=
+ =?us-ascii?Q?ckJ0tfbtDmTOJO+eGGYWNiFxPW9v9S2tTyZQl47TEfi0hiNN142pD0InNShX?=
+ =?us-ascii?Q?bKYyu2gc+5tXMorjJ+cd9hlP/yc5KCgX4XRhEOHQWVfqZLpMHZWOiomczYEs?=
+ =?us-ascii?Q?CprRZ/26Wbv60jwP9RYC8IMyYARAoWRuwUfqfs7eIhVNo8twg00z5Jp8HR/Y?=
+ =?us-ascii?Q?JQJTOaBDWHjW3vZMSLvNcYlX6QLf8a24OCB50PQ4DQoOC3gAEHCmeMb/sr1G?=
+ =?us-ascii?Q?OndrCMBSYQrNq/Fw5Wy9bDR2iTIXW5zSHh02K3KQWeUPUV8zXE2kLSTbGHWh?=
+ =?us-ascii?Q?b7Nf3ydxMg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260709-ksz-new-ptp-v1-10-344f02fe739e@bootlin.com>
-References: <20260709-ksz-new-ptp-v1-0-344f02fe739e@bootlin.com>
-In-Reply-To: <20260709-ksz-new-ptp-v1-0-344f02fe739e@bootlin.com>
-To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, Simon Horman <horms@kernel.org>, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Pascal Eberhard <pascal.eberhard@se.com>, 
- =?utf-8?q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-X-Mailer: b4 0.14.3
-X-Last-TLS-Session-Version: TLSv1.3
+X-OriginatorOrg: est.tech
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: f7fe4857-a610-4f62-9a83-08dedd85497a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jul 2026 06:42:46.6040
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 7kuZ52ppDFVD/0XtU9RCO7kebgPLn6qE8B80+sTHUVJjWw1+wN2RFw1Dv4W8siYysXn8vI1N0R4vbmTNb/xj40D00ePSihs9pIy+1cbh8Lg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4P189MB2755
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_SENDER(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,bootlin.com];
-	FORGED_RECIPIENTS(0.00)[m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:linux@armlinux.org.uk,m:horms@kernel.org,m:maxime.chevallier@bootlin.com,m:pascal.eberhard@se.com,m:miquel.raynal@bootlin.com,m:thomas.petazzoni@bootlin.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bastien.curutchet@bootlin.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-306074-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:bestswngs@gmail.com,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:xmei5@asu.edu,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,s:lists@lfdr.de];
+	DMARC_NA(0.00)[est.tech];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306070-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[est.tech:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:from_mime,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim,vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,GV1P189MB1988.EURP189.PROD.OUTLOOK.COM:mid,est.tech:from_mime,est.tech:email,est.tech:dkim,asu.edu:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F25AE72D506
+X-Rspamd-Queue-Id: 9B62572D56C
 
-The KSZ8463 switch supports PTP but it's not supported by the driver.
+>Subject: [PATCH net v2] tipc: serialize udp bearer replicast list updates
+>
+>tipc_udp_rcast_add() and cleanup_bearer() both update ub->rcast.list with
+>list_add_rcu() / list_del_rcu(), but nothing serializes them. The add runs=
+ from
+>the encap receive softirq (via tipc_udp_rcast_disc()) without rtnl_lock(),=
+ so it
+>can race the cleanup delete and corrupt the
+>list:
+>
+> list_del corruption. prev->next should be ffff8880298d7ab8,
+>   but was ffff88802449ad38. (prev=3Dffff888027e3ec98)  kernel BUG at
+>lib/list_debug.c:62!
+> RIP: __list_del_entry_valid_or_report+0x17a/0x200
+> Workqueue: events cleanup_bearer
+> Call Trace:
+>  cleanup_bearer (net/tipc/udp_media.c:811)
+>  process_one_work (kernel/workqueue.c:3302)
+>  worker_thread (kernel/workqueue.c:3466)
+>
+>The bearer can be enabled from an unprivileged user namespace, as the
+>TIPCv2 generic-netlink ops carry no GENL_ADMIN_PERM.
+>
+>Add a spinlock to struct udp_bearer and take it around the
+>list_add_rcu() in tipc_udp_rcast_add() and the list_del_rcu() loop in
+>cleanup_bearer() so the two writers can no longer corrupt the list.
+>
+>While here, switch the read-only walk in tipc_udp_is_known_peer() to
+>list_for_each_entry_rcu(); it never deletes, so list_for_each_entry_safe()=
+ was
+>misleading.
+>
+>Fixes: ef20cd4dd163 ("tipc: introduce UDP replicast")
+>Reported-by: Xiang Mei <xmei5@asu.edu>
+>Suggested-by: Tung Nguyen <tung.quang.nguyen@est.tech>
+>Assisted-by: Claude:claude-opus-4-8
+>Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+>---
+>v2: (per Tung's review)
+> - Narrow the lock to just list_add_rcu().
+> - Drop the under-lock dup re-check; serializing the writers is enough.
+> - Use list_for_each_entry_rcu() in tipc_udp_is_known_peer().
+>
+> net/tipc/udp_media.c | 11 +++++++++--
+> 1 file changed, 9 insertions(+), 2 deletions(-)
+>
+>diff --git a/net/tipc/udp_media.c b/net/tipc/udp_media.c index
+>62ae7f5b5840..c6aa8c3c54ce 100644
+>--- a/net/tipc/udp_media.c
+>+++ b/net/tipc/udp_media.c
+>@@ -94,6 +94,7 @@ struct udp_replicast {
+>  * @ifindex:	local address scope
+>  * @work:	used to schedule deferred work on a bearer
+>  * @rcast:	associated udp_replicast container
+>+ * @rcast_lock:	serializes updates to @rcast.list
+>  */
+> struct udp_bearer {
+> 	struct tipc_bearer __rcu *bearer;
+>@@ -101,6 +102,7 @@ struct udp_bearer {
+> 	u32 ifindex;
+> 	struct work_struct work;
+> 	struct udp_replicast rcast;
+>+	spinlock_t rcast_lock; /* protects rcast.list */
+> };
+>
+> static int tipc_udp_is_mcast_addr(struct udp_media_addr *addr) @@ -281,7
+>+283,7 @@ static int tipc_udp_send_msg(struct net *net, struct sk_buff *sk=
+b,
+>static bool tipc_udp_is_known_peer(struct tipc_bearer *b,
+> 				   struct udp_media_addr *addr)
+> {
+>-	struct udp_replicast *rcast, *tmp;
+>+	struct udp_replicast *rcast;
+> 	struct udp_bearer *ub;
+>
+> 	ub =3D rcu_dereference_rtnl(b->media_ptr);
+>@@ -290,7 +292,7 @@ static bool tipc_udp_is_known_peer(struct tipc_bearer
+>*b,
+> 		return false;
+> 	}
+>
+>-	list_for_each_entry_safe(rcast, tmp, &ub->rcast.list, list) {
+>+	list_for_each_entry_rcu(rcast, &ub->rcast.list, list) {
+> 		if (!memcmp(&rcast->addr, addr, sizeof(struct
+>udp_media_addr)))
+> 			return true;
+> 	}
 
-Add L2 two-step PTP support for the KSZ8463. IPv4 and IPv6 layers aren't
-supported. Neither is one-step PTP. Use KSZ8463-specific implementations
-of the .get_ts_info and .port_hwtstamp_set callbacks.
+sashiko reports:
 
-The pdelay_req and pdelay_resp timestamps share one interrupt bit status
-while they're located in two different registers. So introduce
-last_tx_is_pdelayresp to keep track of the last sent event type. This
-flag is set by the xmit worker right before sending the packet and then
-used in the interrupt handler to retrieve the timestamp location.
+...
+Is there a possibility of triggering a lockdep warning here?
+Since this function is called from tipc_udp_nl_bearer_add() during Netlink
+configuration, rtnl_lock() is held but rcu_read_lock() is not.
+Without an explicit lockdep condition like lockdep_rtnl_is_held() passed to
+the list traversal macro, lockdep will complain about the RCU list being
+traversed outside a reader section.
+>                 if (!memcmp(&rcast->addr, addr, sizeof(struct udp_media_a=
+ddr)))
+>                         return true;
+>         }
+> @@ -326,7 +328,9 @@ static int tipc_udp_rcast_add(struct tipc_bearer *b,
+>                 pr_info("New replicast peer: %pI6\n", &rcast->addr.ipv6);
+>  #endif
+>         b->bcast_addr.broadcast =3D TIPC_REPLICAST_SUPPORT;
+> +       spin_lock_bh(&ub->rcast_lock);
+>         list_add_rcu(&rcast->list, &ub->rcast.list);
+> +       spin_unlock_bh(&ub->rcast_lock);
+>         return 0;
+>  }
+Could this allow duplicate peers to be added to the list?
+The under-lock duplicate check was removed in this patch iteration. Since
+tipc_udp_is_known_peer() is checked locklessly earlier in
+tipc_udp_rcast_disc(), two concurrent packets from the same unknown peer
+could both see the peer as missing.
+They would then both acquire rcast_lock sequentially and add duplicate
+entries, leading to memory leaks and traffic amplification when broadcastin=
+g.
+[ ... ]
+...
 
-Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
----
- drivers/net/dsa/microchip/ksz8.c        |  26 +++++--
- drivers/net/dsa/microchip/ksz8_reg.h    |   1 +
- drivers/net/dsa/microchip/ksz_common.h  |   1 +
- drivers/net/dsa/microchip/ksz_ptp.c     | 127 +++++++++++++++++++++++++++++++-
- drivers/net/dsa/microchip/ksz_ptp.h     |   7 ++
- drivers/net/dsa/microchip/ksz_ptp_reg.h |   4 +
- 6 files changed, 159 insertions(+), 7 deletions(-)
+I think we have to check duplicate address in tipc_udp_rcast_add() before a=
+dding and remove tipc_udp_is_known_peer().
 
-diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
-index ac9e8ef5774a..941ae9f66f70 100644
---- a/drivers/net/dsa/microchip/ksz8.c
-+++ b/drivers/net/dsa/microchip/ksz8.c
-@@ -242,8 +242,11 @@ static int ksz8463_girq_setup(struct ksz_device *dev)
- 
- static int ksz8463_reset_switch(struct ksz_device *dev)
- {
--	ksz_cfg(dev, KSZ8463_REG_SW_RESET, KSZ8463_GLOBAL_SOFTWARE_RESET, true);
--	ksz_cfg(dev, KSZ8463_REG_SW_RESET, KSZ8463_GLOBAL_SOFTWARE_RESET,
-+	ksz_cfg(dev, KSZ8463_REG_SW_RESET,
-+		KSZ8463_GLOBAL_SOFTWARE_RESET | KSZ8463_PTP_SOFTWARE_RESET,
-+		true);
-+	ksz_cfg(dev, KSZ8463_REG_SW_RESET,
-+		KSZ8463_GLOBAL_SOFTWARE_RESET | KSZ8463_PTP_SOFTWARE_RESET,
- 		false);
- 	return 0;
- }
-@@ -2474,17 +2477,24 @@ static int ksz8463_setup(struct dsa_switch *ds)
- 		ret = ksz8463_ptp_irq_setup(ds);
- 		if (ret)
- 			goto free_girq;
-+
-+		ret = ksz_ptp_clock_register(ds);
-+		if (ret) {
-+			dev_err(dev->dev, "Failed to register PTP clock: %d\n",
-+				ret);
-+			goto free_ptp_irq;
-+		}
- 	}
- 
- 	ret = ksz_mdio_register(dev);
- 	if (ret < 0) {
- 		dev_err(dev->dev, "failed to register the mdio");
--		goto free_ptp_irq;
-+		goto ptp_clock_unregister;
- 	}
- 
- 	ret = ksz_dcb_init(dev);
- 	if (ret)
--		goto free_ptp_irq;
-+		goto ptp_clock_unregister;
- 
- 	/* start switch */
- 	regmap_update_bits(ksz_regmap_8(dev), regs[S_START_CTRL],
-@@ -2492,6 +2502,9 @@ static int ksz8463_setup(struct dsa_switch *ds)
- 
- 	return 0;
- 
-+ptp_clock_unregister:
-+	if (dev->irq > 0)
-+		ksz_ptp_clock_unregister(ds);
- free_ptp_irq:
- 	if (dev->irq > 0)
- 		ksz8463_ptp_irq_free(ds);
-@@ -2507,6 +2520,7 @@ static void ksz8463_teardown(struct dsa_switch *ds)
- 	struct ksz_device *dev = ds->priv;
- 
- 	if (dev->irq > 0) {
-+		ksz_ptp_clock_unregister(ds);
- 		ksz8463_ptp_irq_free(ds);
- 		ksz_irq_free(&dev->girq);
- 	}
-@@ -3129,9 +3143,9 @@ const struct dsa_switch_ops ksz8463_switch_ops = {
- 	.port_max_mtu		= ksz88xx_max_mtu,
- 	.suspend		= ksz_suspend,
- 	.resume			= ksz_resume,
--	.get_ts_info		= ksz_get_ts_info,
-+	.get_ts_info		= ksz8463_get_ts_info,
- 	.port_hwtstamp_get	= ksz_hwtstamp_get,
--	.port_hwtstamp_set	= ksz_hwtstamp_set,
-+	.port_hwtstamp_set	= ksz8463_hwtstamp_set,
- 	.port_txtstamp		= ksz_port_txtstamp,
- 	.port_rxtstamp		= ksz_port_rxtstamp,
- 	.port_setup_tc		= ksz8_setup_tc,
-diff --git a/drivers/net/dsa/microchip/ksz8_reg.h b/drivers/net/dsa/microchip/ksz8_reg.h
-index 981ab441d9b7..6bc511da1f7d 100644
---- a/drivers/net/dsa/microchip/ksz8_reg.h
-+++ b/drivers/net/dsa/microchip/ksz8_reg.h
-@@ -786,6 +786,7 @@
- #define KSZ8463_REG_SW_RESET		0x126
- 
- #define KSZ8463_GLOBAL_SOFTWARE_RESET	BIT(0)
-+#define KSZ8463_PTP_SOFTWARE_RESET	BIT(2)
- 
- #define KSZ8463_PTP_CLK_CTRL		0x600
- 
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index 0f2abb22ca91..cbe98494578c 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -194,6 +194,7 @@ struct ksz_port {
- 	struct kernel_hwtstamp_config tstamp_config;
- 	bool hwts_tx_en;
- 	bool hwts_rx_en;
-+	bool last_tx_is_pdelayresp;
- 	struct ksz_irq ptpirq;
- 	struct ksz_ptp_irq ptpmsg_irq[3];
- 	ktime_t tstamp_msg;
-diff --git a/drivers/net/dsa/microchip/ksz_ptp.c b/drivers/net/dsa/microchip/ksz_ptp.c
-index 5323fdc8862e..a3cc7b97caaf 100644
---- a/drivers/net/dsa/microchip/ksz_ptp.c
-+++ b/drivers/net/dsa/microchip/ksz_ptp.c
-@@ -297,6 +297,31 @@ static int ksz_ptp_enable_mode(struct ksz_device *dev)
- 			 tag_en ? PTP_ENABLE : 0);
- }
- 
-+int ksz8463_get_ts_info(struct dsa_switch *ds, int port,
-+			struct kernel_ethtool_ts_info *ts)
-+{
-+	struct ksz_device *dev = ds->priv;
-+	struct ksz_ptp_data *ptp_data;
-+
-+	ptp_data = &dev->ptp_data;
-+
-+	if (!ptp_data->clock)
-+		return -ENODEV;
-+
-+	ts->so_timestamping = SOF_TIMESTAMPING_TX_HARDWARE |
-+			      SOF_TIMESTAMPING_RX_HARDWARE |
-+			      SOF_TIMESTAMPING_RAW_HARDWARE;
-+
-+	ts->tx_types = BIT(HWTSTAMP_TX_OFF) | BIT(HWTSTAMP_TX_ON);
-+
-+	ts->rx_filters = BIT(HWTSTAMP_FILTER_NONE) |
-+			 BIT(HWTSTAMP_FILTER_PTP_V2_L2_EVENT);
-+
-+	ts->phc_index = ptp_clock_index(ptp_data->clock);
-+
-+	return 0;
-+}
-+
- /* The function is return back the capability of timestamping feature when
-  * requested through ethtool -T <interface> utility
-  */
-@@ -341,6 +366,72 @@ int ksz_hwtstamp_get(struct dsa_switch *ds, int port,
- 	return 0;
- }
- 
-+static int ksz8463_set_hwtstamp_config(struct ksz_device *dev,
-+				       struct ksz_port *prt,
-+				       struct kernel_hwtstamp_config *config)
-+{
-+	const u16 *regs = dev->info->regs;
-+	int ret;
-+
-+	if (config->flags)
-+		return -EINVAL;
-+
-+	switch (config->tx_type) {
-+	case HWTSTAMP_TX_OFF:
-+		prt->ptpmsg_irq[KSZ8463_SYNC_MSG].ts_en  = false;
-+		prt->ptpmsg_irq[KSZ8463_XDREQ_PDRES_MSG].ts_en = false;
-+		prt->hwts_tx_en = false;
-+		break;
-+	case HWTSTAMP_TX_ON:
-+		prt->ptpmsg_irq[KSZ8463_SYNC_MSG].ts_en  = true;
-+		prt->ptpmsg_irq[KSZ8463_XDREQ_PDRES_MSG].ts_en = true;
-+		prt->hwts_tx_en = true;
-+
-+		ret = ksz_rmw16(dev, regs[PTP_MSG_CONF1], PTP_1STEP, 0);
-+		if (ret)
-+			return ret;
-+
-+		break;
-+	default:
-+		return -ERANGE;
-+	}
-+
-+	switch (config->rx_filter) {
-+	case HWTSTAMP_FILTER_NONE:
-+		prt->hwts_rx_en = false;
-+		break;
-+	case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
-+	case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
-+		config->rx_filter = HWTSTAMP_FILTER_PTP_V2_L2_EVENT;
-+		prt->hwts_rx_en = true;
-+		break;
-+	default:
-+		config->rx_filter = HWTSTAMP_FILTER_NONE;
-+		return -ERANGE;
-+	}
-+
-+	return ksz_ptp_enable_mode(dev);
-+}
-+
-+int ksz8463_hwtstamp_set(struct dsa_switch *ds, int port,
-+			 struct kernel_hwtstamp_config *config,
-+			 struct netlink_ext_ack *extack)
-+{
-+	struct ksz_device *dev = ds->priv;
-+	struct ksz_port *prt;
-+	int ret;
-+
-+	prt = &dev->ports[port];
-+
-+	ret = ksz8463_set_hwtstamp_config(dev, prt, config);
-+	if (ret)
-+		return ret;
-+
-+	prt->tstamp_config = *config;
-+
-+	return 0;
-+}
-+
- static int ksz_set_hwtstamp_config(struct ksz_device *dev,
- 				   struct ksz_port *prt,
- 				   struct kernel_hwtstamp_config *config)
-@@ -571,6 +662,28 @@ static void ksz_ptp_txtstamp_skb(struct ksz_device *dev,
- 	skb_complete_tx_timestamp(skb, &hwtstamps);
- }
- 
-+static void ksz8463_set_pdelayresp_flag(struct ksz_port *prt,
-+					struct sk_buff *skb)
-+{
-+	struct ptp_header *hdr;
-+	unsigned int type;
-+	u8 ptp_msg_type;
-+
-+	if (!ksz_is_ksz8463(prt->ksz_dev))
-+		return;
-+
-+	type = ptp_classify_raw(skb);
-+	if (type == PTP_CLASS_NONE)
-+		return;
-+
-+	hdr = ptp_parse_header(skb, type);
-+	if (!hdr)
-+		return;
-+
-+	ptp_msg_type = ptp_get_msgtype(hdr, type);
-+	prt->last_tx_is_pdelayresp = (ptp_msg_type == PTP_MSGTYPE_PDELAY_RESP);
-+}
-+
- void ksz_port_deferred_xmit(struct kthread_work *work)
- {
- 	struct ksz_deferred_xmit_work *xmit_work = work_to_xmit_work(work);
-@@ -587,6 +700,8 @@ void ksz_port_deferred_xmit(struct kthread_work *work)
- 
- 	reinit_completion(&prt->tstamp_msg_comp);
- 
-+	ksz8463_set_pdelayresp_flag(prt, skb);
-+
- 	dsa_enqueue_skb(skb, skb->dev);
- 
- 	ksz_ptp_txtstamp_skb(dev, prt, clone);
-@@ -979,7 +1094,17 @@ void ksz_ptp_clock_unregister(struct dsa_switch *ds)
- 
- static int ksz_read_ts(struct ksz_port *port, u16 reg, u32 *ts)
- {
--	return ksz_read32(port->ksz_dev, reg, ts);
-+	u16 ts_reg = reg;
-+
-+	/**
-+	 * On KSZ8463 DREQ and DRESP timestamps share one interrupt line
-+	 * so we have to check the nature of the latest event sent to know
-+	 * where the timestamp is located
-+	 */
-+	if (ksz_is_ksz8463(port->ksz_dev) && port->last_tx_is_pdelayresp)
-+		ts_reg += KSZ8463_DRESP_TS_OFFSET;
-+
-+	return ksz_read32(port->ksz_dev, ts_reg, ts);
- }
- 
- static irqreturn_t ksz_ptp_msg_thread_fn(int irq, void *dev_id)
-diff --git a/drivers/net/dsa/microchip/ksz_ptp.h b/drivers/net/dsa/microchip/ksz_ptp.h
-index 11408580031d..7067ec9bd1e6 100644
---- a/drivers/net/dsa/microchip/ksz_ptp.h
-+++ b/drivers/net/dsa/microchip/ksz_ptp.h
-@@ -39,11 +39,16 @@ void ksz_ptp_clock_unregister(struct dsa_switch *ds);
- 
- int ksz_get_ts_info(struct dsa_switch *ds, int port,
- 		    struct kernel_ethtool_ts_info *ts);
-+int ksz8463_get_ts_info(struct dsa_switch *ds, int port,
-+			struct kernel_ethtool_ts_info *ts);
- int ksz_hwtstamp_get(struct dsa_switch *ds, int port,
- 		     struct kernel_hwtstamp_config *config);
- int ksz_hwtstamp_set(struct dsa_switch *ds, int port,
- 		     struct kernel_hwtstamp_config *config,
- 		     struct netlink_ext_ack *extack);
-+int ksz8463_hwtstamp_set(struct dsa_switch *ds, int port,
-+			 struct kernel_hwtstamp_config *config,
-+			 struct netlink_ext_ack *extack);
- void ksz_port_txtstamp(struct dsa_switch *ds, int port, struct sk_buff *skb);
- void ksz_port_deferred_xmit(struct kthread_work *work);
- bool ksz_port_rxtstamp(struct dsa_switch *ds, int port, struct sk_buff *skb,
-@@ -82,10 +87,12 @@ static inline int ksz8463_ptp_irq_setup(struct dsa_switch *ds)
- static inline void ksz8463_ptp_irq_free(struct dsa_switch *ds) {}
- 
- #define ksz_get_ts_info NULL
-+#define ksz8463_get_ts_info NULL
- 
- #define ksz_hwtstamp_get NULL
- 
- #define ksz_hwtstamp_set NULL
-+#define ksz8463_hwtstamp_set NULL
- 
- #define ksz_port_rxtstamp NULL
- 
-diff --git a/drivers/net/dsa/microchip/ksz_ptp_reg.h b/drivers/net/dsa/microchip/ksz_ptp_reg.h
-index 1a669d6ee889..65ea8577af75 100644
---- a/drivers/net/dsa/microchip/ksz_ptp_reg.h
-+++ b/drivers/net/dsa/microchip/ksz_ptp_reg.h
-@@ -137,4 +137,8 @@
- #define KSZ_XDREQ_MSG			1
- #define KSZ_PDRES_MSG			0
- 
-+#define KSZ8463_DRESP_TS_OFFSET		(KSZ8463_REG_PORT_DRESP_TS - KSZ8463_REG_PORT_DREQ_TS)
-+#define KSZ8463_SYNC_MSG		0
-+#define KSZ8463_XDREQ_PDRES_MSG		1
-+
- #endif
-
--- 
-2.54.0
+>@@ -326,7 +328,9 @@ static int tipc_udp_rcast_add(struct tipc_bearer *b,
+> 		pr_info("New replicast peer: %pI6\n", &rcast->addr.ipv6);
+>#endif
+> 	b->bcast_addr.broadcast =3D TIPC_REPLICAST_SUPPORT;
+>+	spin_lock_bh(&ub->rcast_lock);
+> 	list_add_rcu(&rcast->list, &ub->rcast.list);
+>+	spin_unlock_bh(&ub->rcast_lock);
+> 	return 0;
+> }
+>
+>@@ -679,6 +683,7 @@ static int tipc_udp_enable(struct net *net, struct
+>tipc_bearer *b,
+> 		return -ENOMEM;
+>
+> 	INIT_LIST_HEAD(&ub->rcast.list);
+>+	spin_lock_init(&ub->rcast_lock);
+>
+> 	if (!attrs[TIPC_NLA_BEARER_UDP_OPTS])
+> 		goto err;
+>@@ -819,10 +824,12 @@ static void cleanup_bearer(struct work_struct
+>*work)
+> 	struct udp_replicast *rcast, *tmp;
+> 	struct tipc_net *tn;
+>
+>+	spin_lock_bh(&ub->rcast_lock);
+> 	list_for_each_entry_safe(rcast, tmp, &ub->rcast.list, list) {
+> 		list_del_rcu(&rcast->list);
+> 		call_rcu_hurry(&rcast->rcu, rcast_free_rcu);
+> 	}
+>+	spin_unlock_bh(&ub->rcast_lock);
+>
+> 	tn =3D tipc_net(sock_net(ub->sk));
+>
+>--
+>2.43.0
 
 
