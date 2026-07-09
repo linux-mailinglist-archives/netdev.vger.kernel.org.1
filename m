@@ -1,70 +1,78 @@
-Return-Path: <netdev+bounces-306293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306305-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id P7DCMZm6T2qSnQIAu9opvQ
-	(envelope-from <netdev+bounces-306293-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 17:13:29 +0200
+	id HgxjGaHHT2odoQIAu9opvQ
+	(envelope-from <netdev+bounces-306305-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 18:09:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 146A9732AF1
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 17:13:29 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A37DA7334E5
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 18:09:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=fiMk1Kv2;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306293-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306293-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=intel.com header.s=Intel header.b=l3MnGtDS;
+	dmarc=pass (policy=none) header.from=intel.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306305-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306305-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8D8EF30A2FAC
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 14:58:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CA23430CDBA6
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 15:59:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE98A382F28;
-	Thu,  9 Jul 2026 14:58:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4FD24192F4;
+	Thu,  9 Jul 2026 15:59:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2442386C0A;
-	Thu,  9 Jul 2026 14:58:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79C636A375
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 15:59:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783609104; cv=none; b=AFH+u4oVM58FBn2UXsVTmNKJNjhCEvIQPm2P63RyebEoJVa3ldpl6H4ByLTUbkk1xxJwAOgLwdXdVpFRiswmgdr+pl9gf7WR4FJN1Ss4d2fmG0Qazktv4eho4zSU7fvKo/J2ymJvjITm23Syd5xmZVbpvzFqtbv2xG8eSX5nFlQ=
+	t=1783612781; cv=none; b=g9/tl0gcSlGnWKTCdaLXspVWkYDXwTcxlayx4P7d2PHmDCusjifX3YlY5lZGYKi9fILQC9w57ICpc9s/SR9kC12TQ5UMNCj7S92D/OIbhgK9aEJB3Upi27/cu9AG6tHllvosOiCo33izIzhtTq7zh/2VLztgIywCQYeENxK65HI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783609104; c=relaxed/simple;
-	bh=M2o5JBhcjSo6kFgzOaEEFUvnEMWhmrc8EJQoSa/YG7g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dxEKggz/l9xpViHYDuSHMqZCknElMFSSyoSfSOwV+9gPC0MYuRitv+mYvVBWPL9ZzP7cYt2yKSj88ubNSh5Vcll28S93gQUqfyM3iMiZ7nuuvmmJCQ2TgV4SdIU2WTuJTwLefvqYLFIVmPdkOMUESzg07XPuFtEmau0gVzfWIZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fiMk1Kv2; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B7B31F000E9;
-	Thu,  9 Jul 2026 14:58:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783609103;
-	bh=i8AtWB/O+soBGuSWP3QFa65Z4LA4DVivyGGeko0k400=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=fiMk1Kv25zzEEjKvgoVw7WxR0leENu/UuhCZnVxUjJE8AbQ6myW4veAKuhpxHPoJH
-	 iw1SBNrp7FUwXSM9PW6aF65eXgaoS86mL7DqCYoUALG5ooKQpBa7unkJK2nSzpi/h5
-	 vzU92eeCc1UJ/1OMKywfi6pBAeI5CZRZJVxA7MOgXw+qfD1Xmf18ZBp0shh6b944hM
-	 wTURj5MhFuAOBSobRNpgFvP5fB3vNEBa2nkfb3iQ1auvsqOs69RPFkZ7N5s4RJH56R
-	 SPdL81RwZHl+2FbKogN0ETbcMfblfjaypmvHqtHfBiuKvU6Bqawa0VRvoZyZ4uNggO
-	 kj54PsfgPPbtQ==
-From: Simon Horman <horms@kernel.org>
-To: zhaojinming@uniontech.com
-Cc: Simon Horman <horms@kernel.org>,
-	madalin.bucur@nxp.com,
-	sean.anderson@linux.dev,
-	netdev@vger.kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	igal.liberman@freescale.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 2/2] net: fman: add error cleanup path in fman_probe
-Date: Thu,  9 Jul 2026 15:56:48 +0100
-Message-ID: <20260709145647.1567539-2-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260703074324.907294-2-zhaojinming@uniontech.com>
-References: <20260703074324.907294-2-zhaojinming@uniontech.com>
+	s=arc-20240116; t=1783612781; c=relaxed/simple;
+	bh=bnDDy05kYz3XkFFSJ+rs21I3F6XQAlDJfnl4nBcLMQE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XI/qhjIZ5x1+3pAyTwRLDTtgFuR9SiG0TxQqQM7PI+lIh4jnfFDthfGrwdD7wnTaq+asKQnvdUi603IL97nSiR94x9MpwLfn9MfGyZ9EjrsB9LIs6/+g4n/hQKLNUtTxyCspmSIRoSVR0VqIC6u1sgmZ12RI83+TosrfSaF1XTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l3MnGtDS; arc=none smtp.client-ip=192.198.163.10
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1783612779; x=1815148779;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=bnDDy05kYz3XkFFSJ+rs21I3F6XQAlDJfnl4nBcLMQE=;
+  b=l3MnGtDSIslkggtJhoYbNbamPeMYuPIncq8eStZSKshCCeEIT6vAT39i
+   Yz40LNBb78SIt8lI0FWpVCPl4Lz8wqc+F/INI+8EjzJL6mWyNOXcoqbK0
+   bht75rbvTFr5AYLh+JUg0pWC8x2blOk9wYzZrdFrZ0Z70aaH4pthp3+N4
+   BRG1f8HwmozMH5qxYYPCY8ekTKLzi0W0I4RHWhhD4RJ7OJMbbe8SlVQbR
+   oZtiLWRD2iImRL0Ee+mrqbFogP9fePRTlIp9vFW4UwunkTpACvYrofuvM
+   5FWf/JVUJfdzSYg02nl2qJHfAUwCDipM0QSVZC7JUzXyBXgYVQDRT2bTT
+   g==;
+X-CSE-ConnectionGUID: kKR10I1YTce273I0Z7EPBw==
+X-CSE-MsgGUID: Yz9jp4yrTaSJD6/qtGwybg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="95671657"
+X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
+   d="scan'208";a="95671657"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2026 08:59:39 -0700
+X-CSE-ConnectionGUID: aJOjZyFIRIS4eZj9684RzA==
+X-CSE-MsgGUID: l/gfQvLHSou4XVQm3Ltjeg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
+   d="scan'208";a="279019819"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa001.fm.intel.com with ESMTP; 09 Jul 2026 08:59:37 -0700
+Received: from gond.igk.intel.com (gond.igk.intel.com [10.123.220.52])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 801AF312C4;
+	Thu,  9 Jul 2026 16:59:36 +0100 (IST)
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH iwl-next] ice: fix uninitialized response buffer in ice_acl_create_tbl()
+Date: Thu,  9 Jul 2026 16:59:04 +0200
+Message-ID: <20260709145904.164375-1-marcin.szycik@linux.intel.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,123 +81,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306293-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306305-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:zhaojinming@uniontech.com,m:horms@kernel.org,m:madalin.bucur@nxp.com,m:sean.anderson@linux.dev,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:igal.liberman@freescale.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:anthony.l.nguyen@intel.com,m:marcin.szycik@linux.intel.com,m:lkp@intel.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[marcin.szycik@linux.intel.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[marcin.szycik@linux.intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,sashiko.dev:url]
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,linux.intel.com:mid,linux.intel.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 146A9732AF1
+X-Rspamd-Queue-Id: A37DA7334E5
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
+Buffer is uninitialized in error path. Move assignment before goto. This
+buffer is only used for response, so its content doesn't matter.
+
+Fixes: d80ee68614c3 ("ice: initialize ACL table")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202607022231.FWjSU75X-lkp@intel.com
+Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
 ---
-net: fman: add error cleanup path in fman_probe
+Tony, please squash this with the offending commit. It's not applied
+yet, so hash is invalid, but I don't want to resend a ~5000 line
+patchset just to move one line.
+---
+ drivers/net/ethernet/intel/ice/ice_acl_ctrl.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-This commit introduces a new error cleanup path in fman_probe() to prevent
-memory leaks when fman_init() or devm_request_irq() fail. It adds
-fman_muram_finish() and fman_free_resources() to properly tear down
-allocations and states.
+diff --git a/drivers/net/ethernet/intel/ice/ice_acl_ctrl.c b/drivers/net/ethernet/intel/ice/ice_acl_ctrl.c
+index a76762e3aa46..4ea08bd9784c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_acl_ctrl.c
++++ b/drivers/net/ethernet/intel/ice/ice_acl_ctrl.c
+@@ -354,14 +354,14 @@ int ice_acl_create_tbl(struct ice_hw *hw, struct ice_acl_tbl_params *params)
+ 		return -ENOMEM;
+ 	}
+ 
++	resp_buf = &tbl_alloc.buf.resp_buf;
++
+ 	tbl = kzalloc_obj(*tbl);
+ 	if (!tbl) {
+ 		err = -ENOMEM;
+ 		goto err_dealloc_tbl;
+ 	}
+ 
+-	resp_buf = &tbl_alloc.buf.resp_buf;
+-
+ 	/* Retrieve information of the allocated table */
+ 	tbl->id = alloc_id;
+ 	tbl->first_tcam = resp_buf->ops.table.first_tcam;
+-- 
+2.49.0
 
-> diff --git a/drivers/net/ethernet/freescale/fman/fman.c b/drivers/net/ethernet/freescale/fman/fman.c
-> index 6947f3bc7c87e..752c0df0e17c5 100644
-> --- a/drivers/net/ethernet/freescale/fman/fman.c
-> +++ b/drivers/net/ethernet/freescale/fman/fman.c
-
-[ ... ]
-
-> +static void fman_free_resources(struct fman *fman, struct device *dev,
-> +				bool irq_registered)
-> +{
-> +	/* Free IRQs first while fman is still valid */
-> +	if (irq_registered) {
-> +		if (fman->dts_params.err_irq != 0)
-> +			devm_free_irq(dev, fman->dts_params.err_irq, fman);
-> +		devm_free_irq(dev, fman->dts_params.irq, fman);
-> +	}
-> +
-> +	kfree(fman->keygen);
-> +	free_init_resources(fman);
-
-[Severity: High]
-If fman_init() fails internally (for example, in dma_init() or
-keygen_init()), it calls free_init_resources(fman) on its own failure path.
-However, it does not clear fman->fifo_offset or fman->cam_offset.
-
-When fman_probe() catches this error, it jumps to err_no_irq and calls
-fman_free_resources(), which will invoke free_init_resources(fman) a second
-time.
-
-Does this cause a double-free of the MURAM resources?
-
-[Severity: High]
-This is a pre-existing issue, but if fman_muram_alloc() fails during
-fman_init(), it returns an error code (such as -ENOMEM) which is stored
-directly in fman->fifo_offset.
-
-Since the error code is non-zero, free_init_resources() will evaluate
-if (fman->fifo_offset) as true and pass the error pointer to
-fman_muram_free_mem().
-
-Does attempting to free this pseudo-random error code cause corruption in
-the gen_pool allocator?
-
-> +	kfree(fman->cfg);
-> +	fman_muram_finish(fman->muram);
-> +	kfree(fman->state);
-> +	kfree(fman);
-> +}
-
-[ ... ]
-
-> @@ -2844,7 +2863,7 @@ static int fman_probe(struct platform_device *of_dev)
->  	if (err < 0) {
->  		dev_err(dev, "%s: irq %d allocation failed (error = %d)\n",
->  			__func__, fman->dts_params.irq, err);
-> -		return err;
-> +		goto err_no_irq;
->  	}
->  
->  	if (fman->dts_params.err_irq != 0) {
-
-[Severity: High]
-If devm_request_irq() fails here, fman_init() has already succeeded. At the
-end of fman_init(), the FMan hardware is fully enabled via enable(fman, cfg).
-
-Jumping to err_no_irq calls fman_free_resources(), which destroys the
-structures and unmaps the MURAM memory. However, there doesn't appear to be
-any call to stop or disable the active hardware.
-
-Will the hardware continue to operate and perform DMA to the freed MURAM
-addresses, potentially causing memory corruption?
 
