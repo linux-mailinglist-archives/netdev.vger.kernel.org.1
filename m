@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-306236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306237-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id hJPDOUeoT2p/lwIAu9opvQ
-	(envelope-from <netdev+bounces-306236-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 15:55:19 +0200
+	id zLKqEfepT2pgmQIAu9opvQ
+	(envelope-from <netdev+bounces-306237-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 16:02:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57CD2731D39
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 15:55:19 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41A78731EC6
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 16:02:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=collabora.com header.s=mail header.b="CJ2SRWT/";
+	dkim=pass header.d=collabora.com header.s=mail header.b=pWUYlofp;
 	dmarc=pass (policy=none) header.from=collabora.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306236-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306236-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306237-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306237-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CEBF33146BA5
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 13:47:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 405AB30B167A
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 13:47:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA57C3890EA;
-	Thu,  9 Jul 2026 13:43:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E67233BE154;
+	Thu,  9 Jul 2026 13:43:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485233839B6;
-	Thu,  9 Jul 2026 13:43:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50799382373;
+	Thu,  9 Jul 2026 13:43:02 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783604582; cv=none; b=J4ZU+J3kH+7pRLiF4Jt0mGk9e+n2hFX2/+/jMrQe12Jl3c4EJdl4twHvjbF88Z54hE/COHzqN49szdjzpFQaLKcVhhzVmgdrMN450hphlPo+9z9PDMfcXeJXGh+M9sVqWmlCcOcatWGfrDzAHbUN8YhJiASQbxzfBnX5q22jfJ4=
+	t=1783604583; cv=none; b=BNDNE+OvoxBvvUJi/SbsuYIzi3d5glryaoucszGyTJ2RSFw1nP2IXRiDvoHrYEJrsvUUP63tG910nWw83pTCeb4fso+3/2gzxzRc59poLMzT5tp4XCGUztR5GjWa6f7MbpJuE7thWNkXkn2n+MhtYaykzSm4MNwzrEEAZhckvBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783604582; c=relaxed/simple;
-	bh=2D9r64PmMn/aUcy8ufcjTpqOB+Pkyk4OdcYuFZ5sKms=;
+	s=arc-20240116; t=1783604583; c=relaxed/simple;
+	bh=Vzul1Dau7HnyUjS7eHhVbzTIRBW+63VNmie+QWlSG1I=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=r0De/gs4JCzCFMBW44DybbJVSmgQnOsIzUznp3orkR1aKoq9pHKt4UYQsFRVVlZFU951Vr4Jqn4/DJslN1uDHEigP0Ld0+kPHgla99a6adgxQebNzndCs/Yr1RPtClPxSw4Cp1+kq3WzvSDMUZZEk3YsYIRNDQiboWrvBX6W324=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=CJ2SRWT/; arc=none smtp.client-ip=148.251.105.195
+	 In-Reply-To:To:Cc; b=aaKTrWmTaEXgnvrz5stcMX8eqq7L/Z5b4DtHVfBRZmUch1ZNkDdcl2FNi/aLDD6omik/CZQJxWXkYsudyqFQ6iBzYpgXa9ppDOSM2VEjRCB0EG42MujfrDBgJEaBXfARvMG4ZV0PFvdmH5KBlbIiMTpisTKK8K6lDffsOr67oJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=pWUYlofp; arc=none smtp.client-ip=148.251.105.195
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1783604579;
-	bh=2D9r64PmMn/aUcy8ufcjTpqOB+Pkyk4OdcYuFZ5sKms=;
+	s=mail; t=1783604580;
+	bh=Vzul1Dau7HnyUjS7eHhVbzTIRBW+63VNmie+QWlSG1I=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=CJ2SRWT/USyWyh+UbnSGT7T6C2nsOMONmtA/MaNqjZA8A35TtAl2yWEAcZ3t5fjkb
-	 MMjcW1nLOOn88iw0WHzMqLBsQa9e8GISZACX/aqBzAM1FCM9v4XX2e3w7ki3xWI4Tu
-	 OjPjBJUs8uzJ73RPP+fPNt+CpkYf0BSP5i0IVvlDWUWjr4ux3QK6DctQWoHl546eEK
-	 e5EtFVOC2IJ5BR0k8v1bb4/sp5HWEnQJNy6WDBqi0LejlBzHhUcgXqW0hzIW8ajhiW
-	 pvscMl5TNUp5iStTy2Rn9UBOdOQhixQwnurjCKX4ZKyR9W5X4nT606x82ZhfF3fz+W
-	 B+AXPGbXJJUIw==
+	b=pWUYlofpjuLfgAvasn42m3FDmVl+KtQl5w5aqq/t6N69hmsn+6DoNjnr5JtF41Gln
+	 K1Df/QCoOu8//eN5h2AsN45s1hCFfu8roXfMhFU10wTxaBOKXWOc30FpID8XzIFEDQ
+	 R3pWjnswWmcRXGH4xZTYSLXUnwyxkXrFpyg+dO7hSSdPoQK8GmUbbzrVl1Aym3QHvP
+	 9wRfbpKZGoseL3R65RNOa0LIe7B2feTo56Aw2pDYsp4LoiMGUq86vdm0FyC2XLer2B
+	 Qx2hm6qWpz/+m1G3yK9ehqGgSKVV01/O53g1DRkGIrSdqfGviPyRE4N3eWUTkzNiL6
+	 SKFNy2BJWosTA==
 Received: from yukiji.home (unknown [100.64.0.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: laeyraud)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id B03A617E0DFB;
-	Thu, 09 Jul 2026 15:42:58 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id D6FCF17E0E04;
+	Thu, 09 Jul 2026 15:42:59 +0200 (CEST)
 From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
-Date: Thu, 09 Jul 2026 15:42:43 +0200
-Subject: [PATCH v2 03/18] dt-bindings: clock: mediatek: Make '#clock-cells'
- required for MT8195
+Date: Thu, 09 Jul 2026 15:42:44 +0200
+Subject: [PATCH v2 04/18] dt-bindings: clock: mediatek: reorder MT8186
+ compatibles
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,7 +63,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260709-mt8189-clocks-system-base-v2-3-2926da3db6cf@collabora.com>
+Message-Id: <20260709-mt8189-clocks-system-base-v2-4-2926da3db6cf@collabora.com>
 References: <20260709-mt8189-clocks-system-base-v2-0-2926da3db6cf@collabora.com>
 In-Reply-To: <20260709-mt8189-clocks-system-base-v2-0-2926da3db6cf@collabora.com>
 To: Michael Turquette <mturquette@baylibre.com>, 
@@ -82,11 +82,11 @@ Cc: kernel@collabora.com, linux-clk@vger.kernel.org,
  netdev@vger.kernel.org, 
  Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1783604575; l=1522;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1783604575; l=2425;
  i=louisalexis.eyraud@collabora.com; s=20250113; h=from:subject:message-id;
- bh=2D9r64PmMn/aUcy8ufcjTpqOB+Pkyk4OdcYuFZ5sKms=;
- b=sHVam2U9wFo8NSOS/GFeW6poHyIWSEJaRsEvD5tmjNjVhDBZVxFa/E2KbKLfEUC91onO3SN06
- C+NMShbuGS6CSm2DevNok6tlfg/d6hXOupoxQkVeZGkXxG6dGh9Z63K
+ bh=Vzul1Dau7HnyUjS7eHhVbzTIRBW+63VNmie+QWlSG1I=;
+ b=7d6Rd1fCrtfU8WLljqhSj9/wOSKJmYYEKFhK9NcUuSxN9uPtJ76dc/HuVNOQniABwVCUP3QCj
+ 6ItDzNW5nNQAlSZ7vIuxThCM4yAj0aJ+pQzvrFi4w+k/J1Fr/l8pHs4
 X-Developer-Key: i=louisalexis.eyraud@collabora.com; a=ed25519;
  pk=CHFBDB2Kqh4EHc6JIqFn69GhxJJAzc0Zr4e8QxtumuM=
 X-Rspamd-Action: no action
@@ -95,11 +95,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[collabora.com,none];
 	R_DKIM_ALLOW(-0.20)[collabora.com:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306236-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306237-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:mturquette@baylibre.com,m:sboyd@kernel.org,m:bmasney@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:chun-jie.chen@mediatek.com,m:p.zabel@pengutronix.de,m:edward-jw.yang@mediatek.com,m:richardcochran@gmail.com,m:kernel@collabora.com,m:linux-clk@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:louisalexis.eyraud@collabora.com,m:krzk@kernel.org,m:conor@kernel.org,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[baylibre.com,kernel.org,redhat.com,gmail.com,collabora.com,mediatek.com,pengutronix.de];
@@ -120,48 +120,71 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,collabora.com:from_mime,collabora.com:email,collabora.com:mid,collabora.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,collabora.com:from_mime,collabora.com:email,collabora.com:mid,collabora.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 57CD2731D39
+X-Rspamd-Queue-Id: 41A78731EC6
 
-Both MT8195 clock controllers dt-bindings (clock and sys-clock)
-document the '#clock-cells' property but do not enforce it as required
-property.
-As clock provider nodes should define this property in devicetrees, add
-it to the required property list in both its dt-bindings files.
+In order to prepare regrouping several Mediatek SoC clock controller
+dt-bindings files into the MT8186 ones, reorder the MT8186 clock
+controller compatibles so they are sorted alphanumerically.
 
 Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
 ---
- Documentation/devicetree/bindings/clock/mediatek,mt8195-clock.yaml     | 1 +
- Documentation/devicetree/bindings/clock/mediatek,mt8195-sys-clock.yaml | 1 +
- 2 files changed, 2 insertions(+)
+ .../bindings/clock/mediatek,mt8186-clock.yaml           | 17 +++++++++--------
+ .../bindings/clock/mediatek,mt8186-sys-clock.yaml       |  4 ++--
+ 2 files changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/clock/mediatek,mt8195-clock.yaml b/Documentation/devicetree/bindings/clock/mediatek,mt8195-clock.yaml
-index fcc963aff087..94dd29c2396c 100644
---- a/Documentation/devicetree/bindings/clock/mediatek,mt8195-clock.yaml
-+++ b/Documentation/devicetree/bindings/clock/mediatek,mt8195-clock.yaml
-@@ -58,6 +58,7 @@ properties:
- required:
-   - compatible
-   - reg
-+  - '#clock-cells'
+diff --git a/Documentation/devicetree/bindings/clock/mediatek,mt8186-clock.yaml b/Documentation/devicetree/bindings/clock/mediatek,mt8186-clock.yaml
+index 539149c945d0..756b937bb7c4 100644
+--- a/Documentation/devicetree/bindings/clock/mediatek,mt8186-clock.yaml
++++ b/Documentation/devicetree/bindings/clock/mediatek,mt8186-clock.yaml
+@@ -23,18 +23,19 @@ properties:
+   compatible:
+     items:
+       - enum:
+-          - mediatek,mt8186-imp_iic_wrap
+-          - mediatek,mt8186-mfgsys
+-          - mediatek,mt8186-wpesys
+-          - mediatek,mt8186-imgsys1
+-          - mediatek,mt8186-imgsys2
+-          - mediatek,mt8186-vdecsys
+-          - mediatek,mt8186-vencsys
+           - mediatek,mt8186-camsys
+           - mediatek,mt8186-camsys_rawa
+           - mediatek,mt8186-camsys_rawb
+-          - mediatek,mt8186-mdpsys
++          - mediatek,mt8186-imgsys1
++          - mediatek,mt8186-imgsys2
++          - mediatek,mt8186-imp_iic_wrap
+           - mediatek,mt8186-ipesys
++          - mediatek,mt8186-mdpsys
++          - mediatek,mt8186-mfgsys
++          - mediatek,mt8186-vdecsys
++          - mediatek,mt8186-vencsys
++          - mediatek,mt8186-wpesys
++
+   reg:
+     maxItems: 1
  
- additionalProperties: false
+diff --git a/Documentation/devicetree/bindings/clock/mediatek,mt8186-sys-clock.yaml b/Documentation/devicetree/bindings/clock/mediatek,mt8186-sys-clock.yaml
+index f8acc02cafee..6733dafbde16 100644
+--- a/Documentation/devicetree/bindings/clock/mediatek,mt8186-sys-clock.yaml
++++ b/Documentation/devicetree/bindings/clock/mediatek,mt8186-sys-clock.yaml
+@@ -27,10 +27,10 @@ properties:
+   compatible:
+     items:
+       - enum:
++          - mediatek,mt8186-apmixedsys
++          - mediatek,mt8186-infracfg_ao
+           - mediatek,mt8186-mcusys
+           - mediatek,mt8186-topckgen
+-          - mediatek,mt8186-infracfg_ao
+-          - mediatek,mt8186-apmixedsys
+       - const: syscon
  
-diff --git a/Documentation/devicetree/bindings/clock/mediatek,mt8195-sys-clock.yaml b/Documentation/devicetree/bindings/clock/mediatek,mt8195-sys-clock.yaml
-index 69f096eb168d..ba1b36fa0169 100644
---- a/Documentation/devicetree/bindings/clock/mediatek,mt8195-sys-clock.yaml
-+++ b/Documentation/devicetree/bindings/clock/mediatek,mt8195-sys-clock.yaml
-@@ -43,6 +43,7 @@ properties:
- required:
-   - compatible
-   - reg
-+  - '#clock-cells'
- 
- additionalProperties: false
- 
+   reg:
 
 -- 
 2.55.0
