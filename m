@@ -1,68 +1,93 @@
-Return-Path: <netdev+bounces-306222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306226-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id i+FJLcacT2o9lAIAu9opvQ
-	(envelope-from <netdev+bounces-306222-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 15:06:14 +0200
+	id rr7pEBKfT2rXlAIAu9opvQ
+	(envelope-from <netdev+bounces-306226-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 15:16:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10D39731627
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 15:06:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F7E773179E
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 15:16:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=h-partners.com header.s=dkim header.b=AT+cCbE9;
-	dmarc=pass (policy=quarantine) header.from=h-partners.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306222-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306222-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=0sec.ai header.s=google header.b=0HUpb3ZZ;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306226-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306226-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D3F02302BE2A
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 13:01:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ACF66304BBC0
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 13:12:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99EF32512C8;
-	Thu,  9 Jul 2026 13:01:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 333F72727E2;
+	Thu,  9 Jul 2026 13:12:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B871022097;
-	Thu,  9 Jul 2026 13:01:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E8F1AA780
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 13:12:33 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783602103; cv=none; b=C1Pizf5sxsWa8cQ9pzTY5WMDYGZpU6WuUyV45Nue2xqTKaSCmbviloUn7XM1TB0t4ACQWsJh7jg6+pBT16bBNEHo/emyl/fhd5lr9B1Nh2oDiWKe4QMH9GWym2J1xvbLsu2rn3+n/isxj3zigPVcfkNgGn9e0tgI8r+OrCyicf4=
+	t=1783602755; cv=none; b=IudUYEWLcUBvEjvWZ8a88ttR3gQwePDHyyNGnpn7OlW6ff3LmMRHFrSKtOThVN3wgYDFQ0PqJgBsIenDXNO+5unRig4mIDDqBVYs3PihZVD4Eip0ugBU/RXrCk0Q+o1ACvYR7piiOSGPhXlDB9vOau3cvXSX/UMkGVbTdLiNSDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783602103; c=relaxed/simple;
-	bh=JKZDS8WZ+t/gQ1mOl8AQFVGRJyZE3RE44N79+4rT7L4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cCkhQbFrTMAZRJdR6hXQbgyA1RR7fDwdIfEIYmKfu+m8g3hhzSQl88unFFpwYIxnvWDYSIwq9+EnncPUbqoRoGTEprHUWrvVog2Nc0H9cmf146KlT4/n0xo/J5WXJpRpSVmMwNpcbhQvaKz53zcg+hT4Yu2vFXpMQhuRCQxlk6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=h-partners.com; spf=pass smtp.mailfrom=h-partners.com; dkim=pass (1024-bit key) header.d=h-partners.com header.i=@h-partners.com header.b=AT+cCbE9; arc=none smtp.client-ip=113.46.200.222
-dkim-signature: v=1; a=rsa-sha256; d=h-partners.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=WopBaQaQuiL/DU1vAnYKzMrkSjej1oGbeLKGRLVVDVE=;
-	b=AT+cCbE9PfJtQFumjJbUDTMuS/6pugaV7RgVoHFEO33Eu4o+ZG8aure4z3z0G8kMMJ88NVS2m
-	VjejYENaYpsTtwhXnJ1aUWFLxGLJxJTi0hoQb3iWl4au8Pdk4K+EMlFo3CKTUdP5YZbbpZxPVK0
-	usf14K7UHmb7PfkECWXr54o=
-Received: from mail.maildlp.com (unknown [172.19.163.200])
-	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4gwvxf0bdNzLlXD;
-	Thu,  9 Jul 2026 20:52:22 +0800 (CST)
-Received: from kwepemr100001.china.huawei.com (unknown [7.202.195.168])
-	by mail.maildlp.com (Postfix) with ESMTPS id C740D4055B;
-	Thu,  9 Jul 2026 21:01:36 +0800 (CST)
-Received: from huawei.com (10.50.159.234) by kwepemr100001.china.huawei.com
- (7.202.195.168) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Thu, 9 Jul
- 2026 21:01:35 +0800
-From: xietangxin <xietangxin@h-partners.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>,
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: Phil Sutter <phil@nwl.cc>, Simon Horman <horms@kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Victor Nogueira
-	<victor@mojatatu.com>, gaoxingwang <gaoxingwang1@huawei.com>, huyizhen
-	<huyizhen2@huawei.com>, xietangxin <xietangxin@h-partners.com>
-Subject: [PATCH net v2] netfilter: nf_nat: recalculate TCP TS offset when snat change sport
-Date: Thu, 9 Jul 2026 21:12:16 +0800
-Message-ID: <20260709131216.2189210-1-xietangxin@h-partners.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1783602755; c=relaxed/simple;
+	bh=iAyyFv/AQxA40DSCOj6cGXn3go3IfDOrY7GY4Sy9UyA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XPUpT8+2qgOq3dQ/LzGuc0daD9kijNOnXy4uXiTwZWZQ8YFsQp8bnIPcsYqpYOEXKBKYxYZJpT5ZHqOxtG6CB6piYLIRup57oFHkIhD2+HiOxdzSRQifQqNNJ5R9DAp5iHkVZUX6Qtn6dcdphIUbEVvyTCldKw/Ba+1QaYjOLbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=0HUpb3ZZ; arc=none smtp.client-ip=209.85.221.43
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-4720d22c94aso1714620f8f.1
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 06:12:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=0sec.ai; s=google; t=1783602752; x=1784207552; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=H9Bxn/o6bHrATO0mn2uaPiWaqZWNuvOxb6ptBdz4eyg=;
+        b=0HUpb3ZZrqe6jNid3T41CKaPgavGJH2XFVDZpU4OlrkemmGqXwgJg3skM+++7PbJoz
+         lM/OTM5QiCBi7AkhWrErNjiarEbpLIoOl2TPEoy+r24R7peg4IVt39gNKvrY1i/fUO2s
+         zHYhmDod8lllMEPZp7x+E9/yUUr7CqutmJtEW7PzEQejJcDiSDtm/cvnwv2I4B7hSiHw
+         Dj1uGvCdOEqlEdcJnMDrHkyPUE1QXT24Ep8GvRUkfBlhVqoqH3EjJYF/b/ZDGK1FBv2U
+         WQnUgusisLYMbaAqYvcFqtjMnZNp8v0G8nSsm2p8ZkIApxVhGnDmNg6/ytZN1XQeXVNn
+         oUPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783602752; x=1784207552;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=H9Bxn/o6bHrATO0mn2uaPiWaqZWNuvOxb6ptBdz4eyg=;
+        b=MGqSgYfON5+gcuyi3VlQogRVYd2+OcAtewzPr6JnK539sH9RkD6VMJID8HCR9PxqPw
+         MBVZGTJLrLfdILuh4WULFn9lgESsO5u4BBNwa6emQvYie0QoafexJGcozfcZYLtfkQW8
+         +eU68WbkioTqmzm0FKciAW5VEQm4fRUKvzuhlzoUCjbW1DpFDdeqx5KLMQjGoVzK2u+e
+         Bvq9jpIkctnKLB1pBA+KRvYTnW2daiqC1U+7pdH7j4BJ6fTFi8PivwPlX6fx4f6VCX3T
+         M52Ia9XuF3OTaeJ1qDYnz9uqST3J01VlZb0Bte2I7GKjVtOxcTjleAmyRZTHStuWFBXX
+         ROww==
+X-Forwarded-Encrypted: i=1; AHgh+RqSoVaXI1fgD/YVlAPjpP0Csxn83rkQa8ScBZYrhtbIdTTrVNph6DJ7fHSlzQpfPEPsxq50Ew0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyl3b9RxBdvPo453x8Xuf2L5N/LibEoSzcm7/MRJFvy24quSO+t
+	VDO0KjWqpQL5filvNHPycjODZ6WMUltNUhZ70VYGfI5DewH1Idhz8a5ATq6ZwIo2iaQc
+X-Gm-Gg: AfdE7cmJNAze6BP3pIST5jBLKTtSHbJnaYnfG3d0KdSyFH6yFZgth6yxFQCTM+MxLrD
+	ZY+1/3pccMChrIQwHzxZibBxDmN0d3xnei1jpKi+JAob0xgEH4zAFAe85qDf03L93GSk05qgqoR
+	/UycgPClG+VuwJBoeqfs1fZyRy/qjY17OM3GSTXiEkrWU/XtbrsVFx69BNvKhVnwdkt/PUScORe
+	FP529//M4zjI7uVYWgI3Gt32dh+sm+bBJRLyPWL3knorIXY0VU406lS00cH/ICRHZMf+/5uij+J
+	eFn3+jc5QYkbWT7pMoYxKwviEz+H88NkM880YB+C8Ok1PY5qy5I8jJCJckqk+SwRqORBGMTM8EG
+	7Rddu7AZejOTKSU4fcjqT1vBlTpVnRYayv3amlVJwhA6+1PKDrVIuQzy90GwzLLhUM3B2GdYOAp
+	qpS6M8jZ160+72xZKr5HzjhUeBO1PdJ8z2TYuB57O4p2sb7EkUbMDpYS5YFvoQD4dvBhdG7BAmy
+	cJuNrJQ6GlO5O7o7PUxa3o856s43+9yw2w=
+X-Received: by 2002:a05:6000:290b:b0:476:e67a:dfa7 with SMTP id ffacd0b85a97d-47df073b100mr7611503f8f.7.1783602751497;
+        Thu, 09 Jul 2026 06:12:31 -0700 (PDT)
+Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.218.188])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9e4d6da9sm50439168f8f.12.2026.07.09.06.12.30
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 09 Jul 2026 06:12:31 -0700 (PDT)
+From: Doruk Tan Ozturk <doruk@0sec.ai>
+To: david@ixit.cz,
+	oe-linux-nfc@lists.linux.dev
+Cc: horms@kernel.org,
+	david.laight.linux@gmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Doruk Tan Ozturk <doruk@0sec.ai>
+Subject: [PATCH net v2] nfc: llcp: bound the connect_sn TLV walk to the skb
+Date: Thu,  9 Jul 2026 15:12:29 +0200
+Message-ID: <20260709131229.44477-1-doruk@0sec.ai>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,214 +95,118 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemr100001.china.huawei.com (7.202.195.168)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[h-partners.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[h-partners.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[0sec.ai:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-306222-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,0sec.ai];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[xietangxin@h-partners.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:fw@strlen.de,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:phil@nwl.cc,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:victor@mojatatu.com,m:gaoxingwang1@huawei.com,m:huyizhen2@huawei.com,m:xietangxin@h-partners.com,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-306226-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:david@ixit.cz,m:oe-linux-nfc@lists.linux.dev,m:horms@kernel.org,m:david.laight.linux@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:doruk@0sec.ai,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
+	DMARC_NA(0.00)[0sec.ai];
+	DKIM_TRACE(0.00)[0sec.ai:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xietangxin@h-partners.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[h-partners.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,h-partners.com:from_mime,h-partners.com:email,h-partners.com:mid,h-partners.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,0sec.ai:dkim,0sec.ai:mid,0sec.ai:from_mime,0sec.ai:url,0sec.ai:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 10D39731627
+X-Rspamd-Queue-Id: 8F7E773179E
 
-Problem observed in Kubernetes environments where MASQUERADE target with
---random-fully is configured by default. after commit
-165573e41f2f ("tcp: secure_seq: add back ports to TS offset") TCP short
-connection QPS dropped from ~20000 to ~10000. This added source and
-destination ports into TS offset calculation.
+Commit 27256cdb290e ("nfc: llcp: bound SNL TLV parsing to the skb and
+add length checks") fixed the unbounded TLV walk in nfc_llcp_recv_snl(),
+and commit d8bd2dedbde5 ("nfc: llcp: fix OOB read and u8 offset wrap in
+TLV parsers") subsequently bounded nfc_llcp_parse_gb_tlv() and
+nfc_llcp_parse_connection_tlv(). One sibling parser sharing the same
+pattern remains unbounded: nfc_llcp_connect_sn().
 
-However, with MASQUERADE --random-fully, when multiple internal connections
-(e.g sport 10000,20000) are mapped to the same external port (e.g 30000),
-their TS offsets are calculated as ts_offset(10000) and ts_offset(20000).
-If the server reuses the TIME_WAIT slot from the first connection, there is
-a chance that ts_offset(20000) < ts_offset(10000), breaking TSval
-monotonicity for the same 4-tuple and causing RST packets:
-  Client -> Server 24870 -> 80 [SYN] TSval=2294041168
-  Server -> Client 80 -> 24870 [ACK] TSecr=2846236456
-  Client -> Server 24870 -> 80 [RST] Seq=855605690
+nfc_llcp_connect_sn() walks a TLV list, reading a two-byte header
+(type, length) followed by length bytes of value, without checking that
+the two header bytes or the declared length stay within the buffer. It
+returns a pointer to a service name of up to 255 bytes that may point
+past the end of the skb; it is subsequently consumed by memcmp() in
+nfc_llcp_sock_from_sn(). In addition tlv_array_len was computed as
+"skb->len - LLCP_HEADER_SIZE" in size_t, so a CONNECT/CC frame shorter
+than the LLCP header underflows to a huge length and the walk runs far
+past the buffer.
 
-After nf_nat_inet_fn() successfully assigns a new randomized
-source port, recalculate the TS offset using the new port and
-update the SYN packet's TSval accordingly.
+nfc_llcp_connect_sn() is reachable from nfc_llcp_recv_connect() and
+nfc_llcp_recv_cc(), i.e. from received CONNECT and CC PDUs. A nearby
+NFC device can reach this without authentication; LLCP link activation
+happens automatically after NFC-DEP, and the nfc_llcp_rx_skb()
+dispatcher applies no minimum-length guard.
 
-Test results on 4U4G VM with
-`./wrk -t8 -c200 -H "Connection: close" -d10s --latency http://5.5.5.5:80`
-Before:
-  random:10712 req/s, random-fully:10986 req/s
-After:
-  random:20530 req/s, random-fully:19511 req/s
+Walk the TLV list by pointer, bounded by skb_tail_pointer(skb), and
+validate each declared length before use, matching the approach already
+used for nfc_llcp_recv_snl(). Starting the walk at
+&skb->data[LLCP_HEADER_SIZE] against the tail pointer also removes the
+size_t underflow for short frames.
 
-Fixes: 165573e41f2f ("tcp: secure_seq: add back ports to TS offset")
+Found by 0sec automated security-research tooling (https://0sec.ai).
+
+Fixes: d646960f7986 ("NFC: Initial LLCP support")
 Cc: stable@vger.kernel.org
-Closes:https://lore.kernel.org/all/92935c00-e0be-4591-ac44-5978c7804d57@yeah.net/
-Signed-off-by: xietangxin <xietangxin@h-partners.com>
+Assisted-by: 0sec:claude-opus-4-8
+Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
 ---
-v2:
-  - Move the new helper in the IP_CT_NEW case of nf_nat_inet_fn().
-  - Fix a compilation failure when CONFIG_IPV6 is disabled.
+v2: drop the nfc_llcp_parse_gb_tlv() and nfc_llcp_parse_connection_tlv()
+    hunks - fixed independently by d8bd2dedbde5. This resend covers only
+    the still-unbounded nfc_llcp_connect_sn().
+v1: https://lore.kernel.org/netdev/20260705113505 net/nfc/llcp_core.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-v1: https://lore.kernel.org/all/20260629093408.3927103-1-xietangxin@h-partners.com/
----
- net/netfilter/nf_nat_core.c | 103 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 102 insertions(+), 1 deletion(-)
-
-diff --git a/net/netfilter/nf_nat_core.c b/net/netfilter/nf_nat_core.c
-index 63ff6b4d5d21..9d0b316fa3c7 100644
---- a/net/netfilter/nf_nat_core.c
-+++ b/net/netfilter/nf_nat_core.c
-@@ -16,6 +16,8 @@
- #include <linux/siphash.h>
- #include <linux/rtnetlink.h>
+diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+index aed5fe1afef0..0de20279e046 100644
+--- a/net/nfc/llcp_core.c
++++ b/net/nfc/llcp_core.c
+@@ -849,13 +849,16 @@ static struct nfc_llcp_sock *nfc_llcp_sock_get_sn(struct nfc_llcp_local *local,
+ static const u8 *nfc_llcp_connect_sn(const struct sk_buff *skb, size_t *sn_len)
+ {
+ 	u8 type, length;
+-	const u8 *tlv = &skb->data[2];
+-	size_t tlv_array_len = skb->len - LLCP_HEADER_SIZE, offset = 0;
++	const u8 *tlv = &skb->data[LLCP_HEADER_SIZE];
++	const u8 *tlv_end = skb_tail_pointer(skb);
  
-+#include <net/tcp.h>
-+#include <net/secure_seq.h>
- #include <net/netfilter/nf_conntrack_bpf.h>
- #include <net/netfilter/nf_conntrack_core.h>
- #include <net/netfilter/nf_conntrack_helper.h>
-@@ -894,6 +896,99 @@ static bool in_vrf_postrouting(const struct nf_hook_state *state)
- 	return false;
- }
+-	while (offset < tlv_array_len) {
++	while (tlv + 2 < tlv_end) {
+ 		type = tlv[0];
+ 		length = tlv[1];
  
-+static __be32 *nf_nat_tcp_ts_option_ptr(const struct sk_buff *skb)
-+{
-+	struct tcphdr *th;
-+	unsigned char *ptr;
-+	unsigned char opcode;
-+	unsigned char opsize;
-+	unsigned int optlen, offset;
-+
-+	offset = 0;
-+	th = tcp_hdr(skb);
-+	optlen = (th->doff - 5) * 4;
-+	ptr = (unsigned char *)(th + 1);
-+
-+	while (offset < optlen) {
-+		opcode = ptr[offset];
-+		if (opcode == TCPOPT_EOL)
++		if (tlv + 2 + length > tlv_end)
 +			break;
 +
-+		if (opcode == TCPOPT_NOP) {
-+			offset++;
-+			continue;
-+		}
-+
-+		if (offset + 1 >= optlen)
-+			break;
-+
-+		opsize = ptr[offset + 1];
-+		if (opsize < 2 || offset + opsize > optlen)
-+			break;
-+
-+		if (opcode == TCPOPT_TIMESTAMP && opsize == TCPOLEN_TIMESTAMP)
-+			return (__be32 *)(ptr + offset + 2);
-+
-+		offset += opsize;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void nf_nat_update_tcp_ts_offset(struct nf_conn *ct, struct sk_buff *skb)
-+{
-+	__be32 *tsptr;
-+	struct net *net;
-+	struct tcphdr *th;
-+	struct tcp_sock *tp;
-+	union tcp_seq_and_ts_off st;
-+	struct nf_conntrack_tuple *orig_tuple;
-+	struct nf_conntrack_tuple *reply_tuple;
-+
-+	orig_tuple = &ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple;
-+	reply_tuple = &ct->tuplehash[IP_CT_DIR_REPLY].tuple;
-+	if (orig_tuple->src.u.tcp.port == reply_tuple->dst.u.tcp.port)
-+		return;
-+
-+	th = tcp_hdr(skb);
-+	if (!th || !th->syn || th->ack)
-+		return;
-+
-+	net = nf_ct_net(ct);
-+	if (READ_ONCE(net->ipv4.sysctl_tcp_timestamps) != 1)
-+		return;
-+
-+	if (!skb->sk)
-+		return;
-+
-+	tsptr = nf_nat_tcp_ts_option_ptr(skb);
-+	if (!tsptr)
-+		return;
-+
-+	switch (nf_ct_l3num(ct)) {
-+	case NFPROTO_IPV4:
-+		st = secure_tcp_seq_and_ts_off(net, reply_tuple->dst.u3.ip,
-+					       reply_tuple->src.u3.ip,
-+					       reply_tuple->dst.u.tcp.port,
-+					       reply_tuple->src.u.tcp.port);
-+		break;
-+#if IS_ENABLED(CONFIG_IPV6)
-+	case NFPROTO_IPV6:
-+		st = secure_tcpv6_seq_and_ts_off(net, reply_tuple->dst.u3.ip6,
-+						 reply_tuple->src.u3.ip6,
-+						 reply_tuple->dst.u.tcp.port,
-+						 reply_tuple->src.u.tcp.port);
-+		break;
-+#endif
-+	default:
-+		return;
-+	}
-+
-+	tp = tcp_sk(skb->sk);
-+	*tsptr = htonl(tcp_skb_timestamp_ts(tp->tcp_usec_ts, skb) + st.ts_off);
-+	WRITE_ONCE(tp->tsoffset, st.ts_off);
-+}
-+
- unsigned int
- nf_nat_inet_fn(void *priv, struct sk_buff *skb,
- 	       const struct nf_hook_state *state)
-@@ -937,8 +1032,14 @@ nf_nat_inet_fn(void *priv, struct sk_buff *skb,
- 						       state);
- 				if (ret != NF_ACCEPT)
- 					return ret;
--				if (nf_nat_initialized(ct, maniptype))
-+				if (nf_nat_initialized(ct, maniptype)) {
-+					if (state->hook == NF_INET_POST_ROUTING &&
-+					    nf_ct_protonum(ct) == IPPROTO_TCP &&
-+					    (ct->status & IPS_SRC_NAT)) {
-+						nf_nat_update_tcp_ts_offset(ct, skb);
-+					}
- 					goto do_nat;
-+				}
- 			}
- null_bind:
- 			ret = nf_nat_alloc_null_binding(ct, state->hook);
+ 		pr_debug("type 0x%x length %d\n", type, length);
+ 
+ 		if (type == LLCP_TLV_SN) {
+@@ -863,7 +866,6 @@ static const u8 *nfc_llcp_connect_sn(const struct sk_buff *skb, size_t *sn_len)
+ 			return &tlv[2];
+ 		}
+ 
+-		offset += length + 2;
+ 		tlv += length + 2;
+ 	}
+ 
 -- 
 2.43.0
 
