@@ -1,141 +1,179 @@
-Return-Path: <netdev+bounces-306094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306095-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FIxGHINiT2qnfgIAu9opvQ
-	(envelope-from <netdev+bounces-306094-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 10:57:39 +0200
+	id CpHDM1ZlT2qvfwIAu9opvQ
+	(envelope-from <netdev+bounces-306095-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:09:42 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B60B972E917
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 10:57:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3977E72EB7D
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:09:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=fail ("headers rsa verify failed") header.d=kernel.org header.s=k20260515 header.b=KZFeq5Ih;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=lOIJkr5F;
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306094-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306094-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}")
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306095-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306095-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 156A03014663
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 08:50:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CB82B315A9DA
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 08:53:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 632793CE4B1;
-	Thu,  9 Jul 2026 08:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFBF2403AEA;
+	Thu,  9 Jul 2026 08:52:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E002853E9;
-	Thu,  9 Jul 2026 08:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 879A2402BB6;
+	Thu,  9 Jul 2026 08:52:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783587028; cv=none; b=Q1RjIOBxOhPsHJq7Uog4Q2rwsoLsfvxu4GLBmEeMoMJ9h5d5gQ+bOoaNdCH7wfTPBMoZG1QPN+3qnD4C6vxn/JUTqwVsLxVxvPbyNY6BONIuy26xq0TAsgOGk+TbZrSl9HFp7AglAkKd+2jKvNB7bgd3aHb/HsXCUXbjLTISIxQ=
+	t=1783587152; cv=none; b=KJW18qDtCbJJ5W0NliZOWq14guoBJ1AhmAMevo5obJzkTBwBDKrVu/2vS1EetZABegT/mHTVGR5BhQjxVkEWeH/PhO/PafEAAlXjV0jSZQfz3RPhVoYKMAjv0qsmth8edprNMaZ5nqR6G+Iry5uquJ0N9gKgZ/l21/oH8qpIkdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783587028; c=relaxed/simple;
-	bh=L8LJua1DxqqFV9UY+8irAffMMey+0OoAu9uwDEy2f2k=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cn11meTVVIX9h0bv3yxgT7WpuyvVsOW+0unrT0p6Husf9yzDbXwzfwruFY7DlaRmNyebKRjIpr9bCJ7ut29q09rpEYbps90AE4tPe35HQ+75FA9+N1N8L7/6sNzNA+X6UmyPwvBUGxuhOjm1dyB+A7WSjxNNKueN2HAMAbuvPos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KZFeq5Ih; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9E9B1F00A3F;
-	Thu,  9 Jul 2026 08:50:26 +0000 (UTC)
+	s=arc-20240116; t=1783587152; c=relaxed/simple;
+	bh=4eWCm4rv9inxcBfTt7pd6XJfTFRtelNohzhM2cb65zY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=J82ciWk1MYekf21yg6sLkrODrf9M5srS/zEMct8qhJtYP9oVV/2GRWl9L/oWNCIEhU7uLVKzF4o6ZmSvBt4RGQ1HZmIWWl5jiLpOaQnHziLWNIS/WUYU1RikT2baql9X/4ITfB8nu9j5UPJA+6DqZoCYfiAJhcXwprrAo32/dVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lOIJkr5F; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E80BE1F00A3E;
+	Thu,  9 Jul 2026 08:52:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783587027;
-	bh=+ZKhXsAhdtilMoK2puuWkLVqsDWjK3+/5l6BtNqzwb0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=KZFeq5Ihsw0R5Rcn7scrOK1rfBrl2JX86ReGBjqJH2ssop+zzyw1A3pTwCKQ3tYmY
-	 R5XlvblzMscpz/Tj0Aonemmt7kwNg21qsK+iTMCJhgqIzkA6L3QqWwFZDs3zJZxUTp
-	 WhEGawuTehSQBXuPhG35VtXwg6jP5A9EujBFjrd2eBt2KfJzpCNc9t/f55kr/8X/qb
-	 og4VJSxc4Oy589p7YyrDc5cCiuIpFQV4cJA8ws6CNLL/x3j0DuVu+5dzS/XmULTfnf
-	 cFwtX4hSCZpJ+gRc/r7pX4vwrWgcT/YpgIXYJeD1fy2o3CUHPF17ecFkpKBhcLATJT
-	 mvfcqM6xCFmTQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D09893939F14;
-	Thu,  9 Jul 2026 08:50:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20260515; t=1783587151;
+	bh=8psXzlPUn1qaPIoR8K5/IlKByb97VV49Dd43WJ9R3cY=;
+	h=From:Subject:Date:To:Cc;
+	b=lOIJkr5F6wf2m2HlMDzWb9WTkTrWiKGJb+f+ZevlnbU0PUurj5sZSCvQLqmkglkhD
+	 kuumua3+lnvwfHhm4D+NYXWhBUSGfeB2yAPc64aIHoHR6H9co2UtY3h31/FsRnnDwe
+	 yqbWO5KNt1j0LFLsN7f3sEClEdxVguVkbsZfA2TUrfs/0lnEf6gnyh55TC9mmq/T+B
+	 LGWzgEvErhdbrNyqiWELAE4/R+jVxO0T6pb84BVMlOoUps8/p2KA8J21mXSMSn7S+A
+	 ST8inBqcJISCDEFcmO/GiSQBbBijFCqCWRAGDe3hEG4jykt6rByhj2DNW51eAi2t8N
+	 JeLidx9474e7Q==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: [PATCH nf-next v5 0/6] Add IPv4 over IPv6 and SIT flowtable SW
+ acceleration
+Date: Thu, 09 Jul 2026 10:52:07 +0200
+Message-Id: <20260709-b4-flowtable-sw-accel-ip6ip-v5-0-828ceaf85bab@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v4] net: macb: drop in-flight Tx SKBs on close
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178358700564.3339064.13535033370383188443.git-patchwork-notify@kernel.org>
-Date: Thu, 09 Jul 2026 08:50:05 +0000
-References: <20260702-macb-drop-tx-v4-1-1c833eebdbc8@bootlin.com>
-In-Reply-To: <20260702-macb-drop-tx-v4-1-1c833eebdbc8@bootlin.com>
-To: =?utf-8?q?Th=C3=A9o_Lebrun_=3Ctheo=2Elebrun=40bootlin=2Ecom=3E?=@codeaurora.org
-Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, jeff@garzik.org,
- conor.dooley@microchip.com, pvalerio@redhat.com, nb@tipi-net.de,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- vladimir.kondratiev@mobileye.com, gregory.clement@bootlin.com,
- benoit.monin@bootlin.com, tawfik.bayouk@mobileye.com,
- thomas.petazzoni@bootlin.com, maxime.chevallier@bootlin.com,
- stable@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/43QQWrDMBAF0KsErTtFmpElq6veo3ShyKNE1NhGM
+ k5C8N0jvGlKwHT5+fD+MHdROCcu4uNwF5mXVNI41NC8HUQ4++HEkLqaBUo0spENHDXEfrzM/tg
+ zlAv4ELiHNJk0gVVSSdKhU9qKKkyZY7pu+pcYIgx8ncV3Lc6pzGO+bauL2up/DSwKJDgfyIUQH
+ Hv3+cN54P59zKcNXvAZM/sYVkyTi51Ga9HwC0ZPGKl9jCrWGI8tmkhoXy/Tv5iVtI/piklJrq2
+ vRGrxD7au6wM4OfNgtwEAAA==
+X-Change-ID: 20260505-b4-flowtable-sw-accel-ip6ip-7101034cd147
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Felix Fietkau <nbd@nbd.name>, Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
+ Ido Schimmel <idosch@nvidia.com>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, 
+ Shuah Khan <shuah@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+ linux-kselftest@vger.kernel.org
+X-Mailer: b4 0.14.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.54 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	R_DKIM_REJECT(0.00)[kernel.org:s=k20260515];
-	DKIM_TRACE(0.00)[kernel.org:-];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:=?utf-8?q?Th=C3=A9o_Lebrun_=3Ctheo=2Elebrun=40bootlin=2Ecom=3E?=@codeaurora.org,m:nicolas.ferre@microchip.com,m:claudiu.beznea@tuxon.dev,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jeff@garzik.org,m:conor.dooley@microchip.com,m:pvalerio@redhat.com,m:nb@tipi-net.de,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vladimir.kondratiev@mobileye.com,m:gregory.clement@bootlin.com,m:benoit.monin@bootlin.com,m:tawfik.bayouk@mobileye.com,m:thomas.petazzoni@bootlin.com,m:maxime.chevallier@bootlin.com,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:nbd@nbd.name,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:horms@kernel.org,m:dsahern@kernel.org,m:idosch@nvidia.com,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:shuah@kernel.org,m:lorenzo@kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:linux-kselftest@vger.kernel.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,nbd.name,gmail.com,collabora.com,nvidia.com,netfilter.org,strlen.de,nwl.cc];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-306094-lists,netdev=lfdr.de,netdevbpf];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306095-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_NO_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B60B972E917
+X-Rspamd-Queue-Id: 3977E72EB7D
 
-Hello:
+Similar to IPIP and IP6I6 tunnels, introduce sw acceleration for IPv4 over
+IPv6 and SIT tunnels in the netfilter flowtable infrastructure.
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+---
+Changes in v5:
+- Fix ipip6_tunnel_fill_forward_path() to take into account not only
+  IPv6 packet since SIT tunnels can encapsulate even IPv4/MPLS traffic.
+- Return an error in ipip6_tunnel_fill_forward_path() if tunnel daddr is
+  not set since NBMA tunnels are not supported yet.
+- Return an error in ipip6_tunnel_fill_forward_path() if encap.type is
+  not TUNNEL_ENCAP_NONE
+- cosmetics
+- Link to v4: https://lore.kernel.org/r/20260703-b4-flowtable-sw-accel-ip6ip-v4-0-00398cd12382@kernel.org
 
-On Thu, 02 Jul 2026 17:37:02 +0200 you wrote:
-> The MACB driver has since forever leaked the outgoing SKBs that
-> have not yet been marked as completed. They live in queue->tx_skb
-> which gets freed without remorse nor checking.
-> 
-> macb_free_consistent() gets called in a few codepaths, but only close will
-> trigger the added expressions. In macb_open() and macb_alloc_consistent()
-> failure cases, queues' tx_skb just got allocated and are empty.
-> 
-> [...]
+Changes in v4:
+- Rebase on top of nf-next and fixed conflicts.
+- Link to v3: https://lore.kernel.org/r/20260531-b4-flowtable-sw-accel-ip6ip-v3-0-56a2826f3279@kernel.org
 
-Here is the summary with links:
-  - [net,v4] net: macb: drop in-flight Tx SKBs on close
-    https://git.kernel.org/netdev/net/c/27f575836cfe
+Changes in v3:
+- Drop nf_flow_tunnel_v4_push and nf_flow_tunnel_v6_push routines
+- Rebase on top of net-next tree.
+- Link to v2: https://lore.kernel.org/r/20260506-b4-flowtable-sw-accel-ip6ip-v2-0-439fd427726e@kernel.org
 
-You are awesome, thank you!
+Changes in v2:
+- Fix MTU check in nf_flow_offload_forward() and in
+  nf_flow_offload_ipv6_forward()
+- Add SIT sw acceleration support
+- Link to v1: https://lore.kernel.org/r/20260505-b4-flowtable-sw-accel-ip6ip-v1-0-9ac39ccc9ea9@kernel.org
+
+---
+Lorenzo Bianconi (6):
+      net: netfilter: add ether_type to net_device_path_ctx
+      net: netfilter: add encap_proto to flow_offload_tunnel
+      net: netfilter: add IPv4 over IPv6 tunnel flowtable acceleration
+      selftests: netfilter: nft_flowtable.sh: add IPv4 over IPv6 flowtable selftest
+      net: netfilter: add SIT tunnel flowtable acceleration
+      selftests: netfilter: nft_flowtable.sh: add SIT flowtable selftest
+
+ drivers/net/ethernet/airoha/airoha_ppe.c           |  13 +-
+ drivers/net/ethernet/mediatek/mtk_ppe_offload.c    |  13 +-
+ include/linux/netdevice.h                          |   5 +-
+ include/net/netfilter/nf_flow_table.h              |   1 +
+ net/core/dev.c                                     |   6 +-
+ net/ipv4/ipip.c                                    |   1 +
+ net/ipv6/ip6_tunnel.c                              |   6 +-
+ net/ipv6/sit.c                                     |  51 +++
+ net/netfilter/nf_flow_table_core.c                 |  16 +-
+ net/netfilter/nf_flow_table_ip.c                   | 411 +++++++++++++--------
+ net/netfilter/nf_flow_table_path.c                 |  20 +-
+ tools/testing/selftests/net/netfilter/config       |   1 +
+ .../selftests/net/netfilter/nft_flowtable.sh       |  78 +++-
+ 13 files changed, 434 insertions(+), 188 deletions(-)
+---
+base-commit: a88e11651a59b616a8e614e178f68cd730eed0fe
+change-id: 20260505-b4-flowtable-sw-accel-ip6ip-7101034cd147
+
+Best regards,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Lorenzo Bianconi <lorenzo@kernel.org>
 
 
