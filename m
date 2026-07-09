@@ -1,162 +1,201 @@
-Return-Path: <netdev+bounces-306213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306214-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id CA+zFYiYT2o6kgIAu9opvQ
-	(envelope-from <netdev+bounces-306213-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 14:48:08 +0200
+	id ioLuFnqZT2rIkgIAu9opvQ
+	(envelope-from <netdev+bounces-306214-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 14:52:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A13EC731325
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 14:48:07 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53A0E7313E0
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 14:52:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b="U/DlZ5eu";
-	dmarc=pass (policy=reject) header.from=mailbox.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306213-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306213-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=oSTzm5VZ;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306214-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306214-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AD37F30FC04F
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 12:39:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D180530AC10E
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 12:39:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9A2642B303;
-	Thu,  9 Jul 2026 12:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00765431496;
+	Thu,  9 Jul 2026 12:37:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C0F42314E;
-	Thu,  9 Jul 2026 12:37:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6CF42CAE2
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 12:37:43 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783600662; cv=none; b=UUQDIqqjOdP/nzvnWWBpo6AXNb2b1rPS5jv84M0Pq3Tq1vm39F5WH9CAQ2CUbOjcTwTyoX2/YMFZxiNlMPfgVT6Y6FYQDCtF1wPfI7QsyoKRS9lBTO0GAbzCu8bc1aHneGTgzx8E2owVyISVP9Kj7+8fnj1EASPTVJY8Rs55sck=
+	t=1783600664; cv=none; b=GO/ijMA35j4T2sWeu3amjXWK7fR8L88gQSbLgCB4UXjymjxHO+FFNP4UdOXezcrpL9CUZwRFQoKq4zAM0xsJ1G46fgHl+jvK+qCRyGndKrxIszWlziKiDvORxQoDAOlDY7GjHBh0b5nOVIvanxfOERTfJR3oOcZglW6IAKI1iP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783600662; c=relaxed/simple;
-	bh=9mUEh7JJ5Hj7d4HF8ZuDZfLWSNamwgKa9yDJtW4exD4=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IVHCwOeF3SwvReUjJZhk9u4kPiF7NKUrDYu9nWYRGPQLKRhNPm4ippKFWBirDki20KSSFxm968hBsgQ5j+wSxBSODTHLH2oDTcPaBtQ3ZmksVx0Q7AqzxJoPzdQvZDXAK+GOiIKXxF5S9Q7T9P6jPicFzZ4py6vyH95ccQx0mpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=U/DlZ5eu; arc=none smtp.client-ip=80.241.56.172
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA512)
-	(No client certificate requested)
-	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4gwvcd4bk6zMlHs;
-	Thu, 09 Jul 2026 14:37:37 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1783600657;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9w3MuQ9hO1ow5wjopkcgpcnT5W91hwq/FqCJiEnl/U8=;
-	b=U/DlZ5euG11Bh810Iznq69BjcVMDkoFkm+C96W3oeQBilkHk8oNAFTBo6S0w3hXt1L1W1J
-	Qha2BmaIkGP+3knXFrk0+Qd7XUY+SdYpHHIOW5vEZXL66FeVNQPybYn8X5wmKy2gTIv7F4
-	nFe/mIiRWExsZLzW1hdtHp8t4IKbpFZpD9DfVsCYLb92IdyOwjIgxOsxm2LJU09sB5nsmC
-	53FPIW1gvDPniB+ElxG2hxKDRaRSHvsSLKcAz5nVEtFRfADKrSRxdyYkFdyAIjNQ59ZSCa
-	ngRXngGHcExvfhPcM/XusDRpW2kUKAfPm6fjd8eScRxwOyVXsQPW81HxAwewtA==
-Message-ID: <0a0721d511c10414cb6a6e53f1bb33698ada963e.camel@mailbox.org>
-Subject: Re: [PATCHv2 net-next 1/7] net: usb: centralize
- usbnet_cdc_zte_rx_fixup in usbnet
-From: Manuel Ebner <manuelebner@mailbox.org>
-To: Oliver Neukum <oneukum@suse.com>, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, 	netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Date: Thu, 09 Jul 2026 14:37:32 +0200
-In-Reply-To: <20260709120116.1423033-1-oneukum@suse.com>
-References: <20260709120116.1423033-1-oneukum@suse.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1783600664; c=relaxed/simple;
+	bh=N7u+K2H8AMSpKxT22XYhaTAOeJR5UWYAcY50gHQtV+s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OVs7VXjUvuzy8NjMX03RhlkA4CX4WjllRqaKfX/WDZ/AbyAJM25VxCQ5QDC40/6kdQvIOQ5KsyNL5mLLIEpvDNDKQdSTbkVPTm7inqZgAadrOLhd6H6FjFI/9fOHA/3Qo+sviEhVPpqFEJlTMmnNWhUe/peGq5X+rubAJCKxdxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oSTzm5VZ; arc=none smtp.client-ip=209.85.160.173
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-51c4436d02cso8140831cf.1
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 05:37:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783600662; x=1784205462; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=eZsM6QHqor3CIMylXI/PYzeAjQqxKR3ZG+lD/y/C554=;
+        b=oSTzm5VZ7AfjqOHJkzYkX+wFI4gGi93a2qGibtMzjADMd0+KQ15XUmLpKBT+9QUEhz
+         pZ0iU0UQbXCTHq/lik610Ak7La5pZDSlCYj0TB5ws6Po5gVYxNQKxiYyY8tluNujTuJU
+         6GNV6NlRaiRw/+Zs+kLGOmdaeMyeVONB4UXX8QbZ0FpbyNkOj1Y9av572FJDxpVGp7+0
+         CXj7wmqKhVaTr30U2+PPioWJ64IDEkmGB5XfdYlYgroWD6KcFsn/QShQ+OG4l9NbcQvO
+         YLztGYAWcX7EELU5M/WW3X71uqUMV8M7bSpTvp7bYLAES6TMuLJ9CEdMz3qcNdCI8bTn
+         Bi5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783600662; x=1784205462;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=eZsM6QHqor3CIMylXI/PYzeAjQqxKR3ZG+lD/y/C554=;
+        b=buGAcVskr5Sgmpp2BQ6vMqnEJV4yelos8qNmVjXVmowjnSM2IGyM62DALcGxeMqyXf
+         w8VBRlJ+dZkKaI+gvn4iVxzOaYSUABLWHCJ9Pwxbq4N9X0aaRg6GtVhRSp77hsWW9GFu
+         2JRRCjDsfk+oVzuWznk6CN0teUOuVWe/FiRqb70+dWX0qAHsG7AyJFPnYORUXiq5hmqX
+         ZTmem/GZZ/dzQTuKs4aj0Q3cdUWfKvznoSqKdmdE45rNAe1Dor2CRb2DoZ/1f8h+yNNx
+         45p6gupXz+laDntq64DhwaKiYeuolMeq9pYu/EuemIkfTFI85g12haLg0MPi508N3+kB
+         Ac5A==
+X-Forwarded-Encrypted: i=1; AHgh+Rq9BXOLWTaOvgo6p4qFW/R2gA0QgH2g/X8dRv3RNAxBTRCn1qn4UvkaVFIX9kq+YI5gfKvvtQs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNhTw67jZcon3WWwZn4O0aBxTPPoT9PkdVcfj5eOc/ydhp3NG+
+	EV52cD0zu9JuNNp88d69uW3nYVXtNDx4fmeiBbBjhY380e6ZAMVPVD0R
+X-Gm-Gg: AfdE7cmElnZWMDewgdajJbdYK4NS5O7AFl7/Cxkip4qPahx/m3qDHBE8ULLPz6Oorwe
+	1aOGWMH5le1FxH3q8268XhDMP1qdB8nduSKHjeehCfYE5jZ98p4rEvI538rzQUzHwIY24xTdes7
+	0IYwisl8Ah+ZJVjq3lX5wzss2isxz4E9gIeKEZFDGq2BgjFQRkQf+tNQB0W/0CsJ/vU7FroiThb
+	Qr7Bf35P7IfQ0ibPOBldRMdtWkMMa+/21q7DtOq7FI3ZJbVEud1o7Fdqi4P4g0plKeZ2Gw66vKR
+	g7r/6RGYSa370VW+ebJnDRkq+1h6lA9nNKupbQTPWTfb/2/FTe5/NbeI9GI1zrszutkSR+eYwLL
+	e23Saa4GfEuzoYm0d7jONpK+FwElbJ7sNU6Mq+bO6ctGSzXb7EPOFjYidi6PJY6IT7Edq8ttk1L
+	vI66SxtJTlFh6xpBWusj8h2S7UxFUilDEQ+3UV/d2YXBqH
+X-Received: by 2002:a05:622a:606:b0:51c:844f:28df with SMTP id d75a77b69052e-51c8b420e56mr74133901cf.75.1783600662266;
+        Thu, 09 Jul 2026 05:37:42 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1145:4:69c1:4b24:4324:2373? ([2620:10d:c091:500::1:7f14])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51c41abe756sm172240671cf.6.2026.07.09.05.37.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jul 2026 05:37:41 -0700 (PDT)
+Message-ID: <dab3ce06-b2a7-4495-8fb3-a867e33806a6@gmail.com>
+Date: Thu, 9 Jul 2026 08:37:40 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MBO-RS-ID: 1bc4835a57a33a462e4
-X-MBO-RS-META: 5zy76esrfprzhha86d1riy6nno75xab5
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 00/15] net/mlx5e: PSP cleanups and improvements
+To: Cosmin Ratiu <cratiu@nvidia.com>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "davem@davemloft.net" <davem@davemloft.net>, Tariq Toukan
+ <tariqt@nvidia.com>, "kuba@kernel.org" <kuba@kernel.org>,
+ "pabeni@redhat.com" <pabeni@redhat.com>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: Boris Pismenny <borisp@nvidia.com>,
+ "willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>,
+ Jianbo Liu <jianbol@nvidia.com>, "leon@kernel.org" <leon@kernel.org>,
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ Raed Salem <raeds@nvidia.com>, Chris Mi <cmi@nvidia.com>,
+ Dragos Tatulea <dtatulea@nvidia.com>,
+ "sdf.kernel@gmail.com" <sdf.kernel@gmail.com>, Mark Bloch
+ <mbloch@nvidia.com>, "sdf@fomichev.me" <sdf@fomichev.me>,
+ Saeed Mahameed <saeedm@nvidia.com>,
+ "aleksandr.loktionov@intel.com" <aleksandr.loktionov@intel.com>,
+ Gal Pressman <gal@nvidia.com>, Lama Kayal <lkayal@nvidia.com>,
+ "jacob.e.keller@intel.com" <jacob.e.keller@intel.com>
+References: <20260707130858.969928-1-tariqt@nvidia.com>
+ <0dfe5f6b-dbc8-4104-8883-e88e8e59ab58@gmail.com>
+ <9c6a65b7e54a31dea87e7ea1c5b1b3931240f3ac.camel@nvidia.com>
+ <3a8a33b0822e82d8a37aeb7e9c326889074e458a.camel@nvidia.com>
+Content-Language: en-US
+From: Daniel Zahka <daniel.zahka@gmail.com>
+In-Reply-To: <3a8a33b0822e82d8a37aeb7e9c326889074e458a.camel@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306213-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[manuelebner@mailbox.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306214-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:oneukum@suse.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-usb@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[danielzahka@gmail.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:cratiu@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:tariqt@nvidia.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:netdev@vger.kernel.org,m:borisp@nvidia.com,m:willemdebruijn.kernel@gmail.com,m:jianbol@nvidia.com,m:leon@kernel.org,m:rrameshbabu@nvidia.com,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:raeds@nvidia.com,m:cmi@nvidia.com,m:dtatulea@nvidia.com,m:sdf.kernel@gmail.com,m:mbloch@nvidia.com,m:sdf@fomichev.me,m:saeedm@nvidia.com,m:aleksandr.loktionov@intel.com,m:gal@nvidia.com,m:lkayal@nvidia.com,m:jacob.e.keller@intel.com,m:andrew@lunn.ch,m:willemdebruijnkernel@gmail.com,m:sdfkernel@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[nvidia.com,gmail.com,kernel.org,vger.kernel.org,fomichev.me,intel.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mailbox.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[danielzahka@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[manuelebner@mailbox.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mailbox.org:from_mime,mailbox.org:dkim,mailbox.org:mid,vger.kernel.org:from_smtp]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A13EC731325
+X-Rspamd-Queue-Id: 53A0E7313E0
 
-On Thu, 2026-07-09 at 14:01 +0200, Oliver Neukum wrote:
 
-I guess a couple suggestions got lost, that's ok.
+On 7/9/26 6:51 AM, Cosmin Ratiu wrote:
+> So the test relies on TCP retransmissions to catch the encrypted echo
+> from the responder on the UDP socket. The timeline seems to be:
+> 1. data_send_off disables PSP on its end.
+> 2. data_send_off opens a UDP socket and binds it to port 1000.
+> 3. data_send_off sends "data echo" to psp_responder on the control
+> connection.
+> 4. psp_responder send "echo" on the now sabotaged PSP connection.
+> 5. psp_responder acks the "echo request" on the control connection.
+> 6. data_send_off receives the ack.
+> 7. data_send_off tries to receive "echo" on the PSP connection but
+> expect_fail==True so stops after 100 ms.
+> 8. data_send_off reenables PSP on its end.
+> 9. data_send_off waits for "echo" to be received now that connectivity
+> is back for up to 350 ms.
+> 10. data_send_off asserts that something is in the UDP socket queue.
+>
+> So UDP packets could be enqueued if PSP packets are received between
+> steps 4-8.
+>
+> It seems disabling PSP steering rules isn't as atomic as we thought,
+> and sometimes the first echo is discarded by steering. The default TCP
+> retransmission timeout is 200 ms so there are no retransmissions in the
+> ~150-170 ms between steps 4-8.
+>
+> With a slightly modified test that directly requests data echoes, the
+> test becomes more reliable. Additionally, you need the UDP_NO_CHECK6_RX
+> (102) socket options for the ipv6 version, otherwise zero-checksum UDP
+> packets are discarded by the stack. I vaguely remember doing this
+> change for this test in Jakub's repo a few years ago.
+>
+> Anyway, here's the diff that makes both tests reliably pass:
 
-> This helper is used by multiple drivers using usbnet.
-> It is better to be provided by usbnet than one of them.
->=20
-> Signed-off-by: Oliver Neukum <oneukum@suse.com>
-> ---
->=20
-> v2:
-> - spelling issues
-> - issue with lost synchronization with SPLIT packets
->=20
-> =C2=A0drivers/net/usb/cdc_ether.c | 19 -------------------
-> =C2=A0drivers/net/usb/usbnet.c=C2=A0=C2=A0=C2=A0 | 19 +++++++++++++++++++
-> =C2=A02 files changed, 19 insertions(+), 19 deletions(-)
->=20
-> diff --git a/drivers/net/usb/cdc_ether.c b/drivers/net/usb/cdc_ether.c
-> index b4df32e18461..e688fb99c61d 100644
-> --- a/drivers/net/usb/cdc_ether.c
-> +++ b/drivers/net/usb/cdc_ether.c
-> @@ -404,25 +404,6 @@ static int usbnet_cdc_zte_bind(struct usbnet *dev, s=
-truct
-> usb_interface *intf)
-> =C2=A0	return status;
-> =C2=A0}
-> =C2=A0
-> -/* Make sure packets have correct destination MAC address
+Thanks for taking a look. I suppose the timing and 0 udp checksum 
+explain why I wasn't seeing any packets. I was concerned that we may 
+have entered a state where we were losing some udp packets permanently, 
+as opposed to just some transient drops at the time the device is 
+reconfigured, but it sounds like that isn't the case. So, I think this 
+works ok then.
 
-Make sure packets have the correct destination MAC address
-
-> - *
-> - * A firmware bug observed on some devices (ZTE MF823/831/910) is that t=
-he
-> - * device sends packets with a static, bogus, random MAC address (event =
-if
-
- (even if the device ...
-
-> - * device MAC address has been updated). Always set MAC address to that =
-of the
-> - * device.
-
-Always set the MAC address to the one of your device.
-
-Thanks
- Manuel
-
-> [...]
 
