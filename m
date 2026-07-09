@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-306371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306372-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cipoCdEMUGphsgIAu9opvQ
-	(envelope-from <netdev+bounces-306371-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 23:04:17 +0200
+	id kKMYBNYMUGpisgIAu9opvQ
+	(envelope-from <netdev+bounces-306372-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 23:04:22 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57BF1735B83
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 23:04:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 61EDE735B87
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 23:04:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=purestorage.com header.s=google2022 header.b="TwPD3/7n";
+	dkim=pass header.d=purestorage.com header.s=google2022 header.b=O76Lo1Ae;
 	dmarc=pass (policy=quarantine) header.from=purestorage.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306371-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306371-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306372-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306372-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C8FDE304971D
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 20:54:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 953A930667EF
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 20:54:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64DC33D3337;
-	Thu,  9 Jul 2026 20:54:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72DE23E0098;
+	Thu,  9 Jul 2026 20:54:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89F9F3B6C11
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 20:54:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4D33E0C4A
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 20:54:30 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783630469; cv=none; b=EIf6+2YpXkvSZHPycD4BnUqM8F0eeF6n5RYLBmkCRVfJh2bjQLN003iYIEayl5g8gUwCJdwILkyi5V0+qUsonoQwgUlWhrgYe3gynhsp0cMpcxy3fGV7uBbpm8zb3JKzV4Pumai5NCH4V917zizW09370/KnVbtcQZgDj/YzucE=
+	t=1783630472; cv=none; b=dBzFsxUPVctIi8COCzK2inxpi1l7RQrSnzSG/038ZeB0Hv+qLl6DfjetpZN/WimbB3V8aUmsoE7mGUMjcbhMhYF1+6wKPhahG9dbZrzFgadCBRyIAS/SOODdhZRh98oMKC3LQDlzneWcBpPrDw3q2RwK0P4Qf0e0+FCxZgyFiNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783630469; c=relaxed/simple;
-	bh=maW/AdYWuK8BsDS8KSzSgHXYaUMsPA074OQ12rZ89jQ=;
+	s=arc-20240116; t=1783630472; c=relaxed/simple;
+	bh=yAjBdtzSxZzqazK4I4MclvRDi3Z09oilBmO66u8JyE0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aijQvGyqHQ2K2/yfHsOj11463iLlsNxOAvL3kT8ldhrL85P3CksTQRDFgpR50RPV5mDCUH8pNdf/LwhWRhQ6W9twDhGQzvDLqu7wk1iap0E2GhzH1eCUlS5Pm8x6RYo1eOBZLVxV2YJAGzAicuQi1VX8vox2hu2CA7QCcmHZ9Yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=TwPD3/7n; arc=none smtp.client-ip=209.85.160.44
-Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-44ae14b4fd6so90087fac.2
-        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 13:54:27 -0700 (PDT)
+	 MIME-Version; b=rUCnptHfZQ9rF/ZxXQOjRWVI0d7femesNf4cVyAyw/7BTNwJPfE+TumV2S4jMjzSImRxsk1g/du1/hT5TzXuRi+M0IWSeEyttjQSJyXjDtRkSuB9bkELORfHZ7iNf73oFrFs2KWmlMCZQ9w+LweNUR/ad7rMqTdVmIgUPaKgZHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=O76Lo1Ae; arc=none smtp.client-ip=209.85.160.47
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-44cf70de986so91246fac.0
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 13:54:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1783630466; x=1784235266; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1783630469; x=1784235269; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=qtDiVIInccujlIt2Sqa5fOCnM6byWdzYUVqLrms+bSo=;
-        b=TwPD3/7nfhZ/nQClOdqR6SW6C0cE4uSXc4tUsT5BktKU4ajqLEL/g33cyBee8W/PtJ
-         Ze23dseWRexxcKqLa5zq1vPo383bSiLuTvQ+z+gs98Z0WP6Xh8UeSsri1plP+Q8I6INg
-         NbHFYHm3h85SwigWpg456U9cV8sLEAr1I9mN/fHaDz+2c6fpeytYSUA95JukwahhdPvU
-         VJEvI8zsvHpixhCHArdpcqWG3Is6W/rtECcDxDzLsnX90k782EV2mjnVUc4DVo8/WyYz
-         SQslsdux6QRFaTg9hSmXdtgSpyhJM5RnLGOGbpC40bpzNO2R1uSgqQ7umJgwYRMzZcbY
-         HN0g==
+        bh=L4EweZDFw2PX/IG413UeHfw+AVFQCjkdSWjHShCzuwY=;
+        b=O76Lo1AejIzn1ssAcDcbzn6z77wtby6AoQp92hhC/MlQ35QTNZ6/kQZJfj+SgEi3JB
+         Oeu3rEMVhmYeZYrfdgzhp4naRyxF/zDyVqEjURbSfea1/POORsPt7teozGlCYvicqq8h
+         92i6I+SH2+0fbCS83eA1TxS7jrA52sCLN5cNK4BwCMzKnxQHHF8bW8S4d9Xk7GBDWAYQ
+         f23wpW6C+7CZ/2UkGwSiwewl/B1UO9U4wzP4tGd8EOa6VDJ42YOCeS+9POyOG+ljn5vm
+         rubiWVOmQhMgX7RXa0VLwA/cyo1GdojWf0vZIoE0grGiMmmGYfRfaovcqDuNSRAo0eO9
+         bHSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783630466; x=1784235266;
+        d=1e100.net; s=20251104; t=1783630469; x=1784235269;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=qtDiVIInccujlIt2Sqa5fOCnM6byWdzYUVqLrms+bSo=;
-        b=g76wJ6a3JL/Ow5UCNlC59YBCfU2nwUy7MmrR+rhyAeqFEoaiwO4+xWZmVJ0/lYV2tQ
-         7IQlIAIGvPDqWN8vSX4HAskq4zNbP/OWOhbwXL5Avp5j4an+j6qtfI1nXr0yWQ0GbiUa
-         uHGmtxdB2QGlGufwv6Ywg5ww4sG+xwQgjqlrjDx2ULRljq4HxvpAvkHfL202DLkPIR3h
-         m++ClMhAhA0Kia7Jo/vF5f1HXHz48BxCkp3663aXVlqjxLVG5CLB8WhJyQkt8r4ywyIu
-         1T6ZJh0DC3tM8oT/rQZOM+EmSRiTnKE7bKJCHllePYZU9kHrhjcwNor4wcSEXuXTPcyO
-         Fhcg==
-X-Gm-Message-State: AOJu0Yz8O5KlvdOU+Z/MwPAUBjNkBFLD03whbJOp53wOVS94FahDVjvw
-	FgonCd2yPkZKh6ZhWogFuMVLl7VSWcOgNV6bLaoeWqLqvRKn6YkZC2MXfHImCj8GF4TdWV3cKAr
-	WBc9o4rTsthgEcs71RC2uheU/l0DCZ+FyHkyja04JTL1vwRQ5/Jkx69KwmhRac+P7lBA21sit+q
-	+lKXaIvzjD1qzZlyUQLajImtFi6UWoVb8y4s30BqiHDnpl2vE=
-X-Gm-Gg: AfdE7cmYrTldIjugHlF1Uxn4goLKD4bItfzsI4xNDmQXAEU8QUi0Uk9JKcWxJq6mfM/
-	DYjlRGsUZV/t+5vLfAw9f3t21NcnwDlD7v2vVx3f8LS6EXcbPm8c1527KiRQOBaDWL4fYzSuVIi
-	gX+pToy0jMMuiR4NKReammTxg3IbAyOEiu2uGnnA8AdxQ/y+ezeonHwO6HLe//i+cCz2XBQ2ibM
-	m174PPysSkaNVHGScYG+Bn7T4lZQ9GU1WufDKboexpgx/mBSvusCFrELmA/VBPc00x0CDqw7uuz
-	BQtwcVeI+kIL4wfPUWKJvr+H/imI9M95j/rG6xGVYwTbrxYb+sROgv357qw18ppPghSzVmYznRd
-	4hsqVn36ZNqtTIoaLnoHxqu34RwoInYRrmhdSKBh8tzaKePIKVxFLrqApfs9ldhH4yGUswKLVDA
-	8I+hRxsSQKciwEy8hqVArNyngv3NfSc7BckZPI0v3bVjAQxKGjtKhAmVezEGLNU3Gaz6K67x7bo
-	wxr0RXDg7e100mU7mQ5brUGMxD4p0Q1GSG68jBR7f6Zh1DV7utw9NDwqNN051t6qpvArFXPgdjL
-	dOiQNgiTbjowva87GPsTMiT3826Hew9iRiU=
-X-Received: by 2002:a05:6871:7414:b0:447:48b6:83c6 with SMTP id 586e51a60fabf-45163a9a71dmr6465057fac.24.1783630466241;
-        Thu, 09 Jul 2026 13:54:26 -0700 (PDT)
+        bh=L4EweZDFw2PX/IG413UeHfw+AVFQCjkdSWjHShCzuwY=;
+        b=tSRTbJeuCKu0aoRp2TuLRywkZw1RNPiij3AMuzRwHtn5SMrOc66IEa6f0ymZzdO0KY
+         cHsutXhWPqHO/3ATcvG5+ZwgiA3mhLjU95w7Eg69EbCAVDQ0dPory7jsp+vX8FqOsmAU
+         lJJp8TPLPLo8BzcpVZOuo/T3uq2tyliEm2RUXEkBoM+4IHchEY/lX4EJ3lEW1n7ZLcv4
+         XP2Bz8u7rYIGiZvusydZHj8txGWrh4OAPCaFBJ8DTL9AGJzpeEyFNOiW+84l9dNlkc7h
+         WlVG/Pro28SRo8ysQHhIVmJdffjqMVchB2hu4nGMAbZl+sJ7mc2pHBZ+pRQ4NrJlFYWd
+         Zf0Q==
+X-Gm-Message-State: AOJu0YyujQYPWoaSCg9TRqpms0QpihLQ6YFwMI9gLXpeenz9+aP1xj94
+	8YD56FwIdQZe+VT4Ivlt42CsZXe6lhOhbaOSl1gdi9fT6IUuL1w52QOUQcHVENqUUvdK2OvAm13
+	sTJmkahwv72OOob5G3ozvMAxL4lRg1dBdt54hvl/eEG2HortI6bcT1h8r+7H2QReohoGafiine7
+	JpfYUcVdYRuqBhtpATPZXAvV54/MUbjhc4rNr0eLG5toMaodM=
+X-Gm-Gg: AfdE7cnKjiVqFTXvUfkMyMqCrTh5nhcyKth3/dmzd8kTG1uXP7IHGZ3lJT+aEVJQL3d
+	UKrR1SizoMrQ6pHus8s5TExHNSZVWkKx8E3wMIBzcf42xmL0WzT6Q7klJ7SvM5xtmoB54fWD+lj
+	q7HSICsvYjzniflJbIRenduSLS3SkT3+csfCjDLRMiEW4lMpehay4dQC7PkzMdpjk7zk0Lj1jIr
+	CwAbdqO7A3W4AOOs6uSqeYxkHx8XPbA2cpN4g4KxU8BFDy30LTFm1yrM8F3bJHosRx50huGdpI5
+	hjDTlcmRSh/mYHKLsG3/RXQfalBAOubPM4QEqNsleeHSqFqIPpSduwN2RJVcv6BcTBZQuHClmDb
+	ExxJCBJtStckgFDS4nj1lxayuJawM6Kuq1V1k/QDyoHX/GrX7G/0Ojte9J8ETFYSp/t9NFbrcyQ
+	9PZiCQhLmpqYvo0IQjaBMhXLt4L9Nr3h4y13ngE/uqm72SSPfR12xBYFE28N0h6skRCm+Vo3PbY
+	n4D7Olln8m767EricKWWbuiive0jLFnuUebNVrMFqE2fb/sh7TQBcBxoLp9b1fMn97ahnF71fnD
+	n1E8D0XeKgTyF+UrhfTeC+H/2OFRJYvGeF8=
+X-Received: by 2002:a05:6870:8088:b0:447:9474:df1c with SMTP id 586e51a60fabf-4516387437bmr6281498fac.14.1783630469194;
+        Thu, 09 Jul 2026 13:54:29 -0700 (PDT)
 Received: from dev-rjethwani.dev.purestorage.com ([208.88.159.129])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-451916d5cebsm3059283fac.15.2026.07.09.13.54.25
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-451916d5cebsm3059283fac.15.2026.07.09.13.54.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2026 13:54:25 -0700 (PDT)
+        Thu, 09 Jul 2026 13:54:28 -0700 (PDT)
 From: Rishikesh Jethwani <rjethwani@purestorage.com>
 To: netdev@vger.kernel.org
 Cc: saeedm@nvidia.com,
@@ -94,9 +94,9 @@ Cc: saeedm@nvidia.com,
 	leon@kernel.org,
 	andrew.gospodarek@broadcom.com,
 	Rishikesh Jethwani <rjethwani@purestorage.com>
-Subject: [PATCH v15 1/9] net: tls: reject TLS 1.3 offload in chcr_ktls and nfp drivers
-Date: Thu,  9 Jul 2026 14:53:17 -0600
-Message-Id: <20260709205325.1591196-2-rjethwani@purestorage.com>
+Subject: [PATCH v15 2/9] net/mlx5e: add TLS 1.3 hardware offload support
+Date: Thu,  9 Jul 2026 14:53:18 -0600
+Message-Id: <20260709205325.1591196-3-rjethwani@purestorage.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260709205325.1591196-1-rjethwani@purestorage.com>
 References: <20260709205325.1591196-1-rjethwani@purestorage.com>
@@ -122,7 +122,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[14];
 	FREEMAIL_CC(0.00)[nvidia.com,gmail.com,kernel.org,queasysnail.net,davemloft.net,redhat.com,google.com,broadcom.com,purestorage.com];
-	TAGGED_FROM(0.00)[bounces-306371-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306372-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -141,47 +141,107 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,purestorage.com:from_mime,purestorage.com:email,purestorage.com:mid,purestorage.com:dkim,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,purestorage.com:from_mime,purestorage.com:email,purestorage.com:mid,purestorage.com:dkim,vger.kernel.org:from_smtp,nvidia.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 57BF1735B83
+X-Rspamd-Queue-Id: 61EDE735B87
 
-These drivers only support TLS 1.2. Return early when TLS 1.3
-is requested to prevent unsupported hardware offload attempts.
+Enable TLS 1.3 TX/RX hardware offload on ConnectX-6 Dx and newer
+crypto-enabled adapters.
+Key changes:
+- Add TLS 1.3 capability checking and version validation
+- Use MLX5E_STATIC_PARAMS_CONTEXT_TLS_1_3 (0x3) for crypto context
+- Handle TLS 1.3 IV format: full 12-byte IV copied to gcm_iv +
+  implicit_iv (vs TLS 1.2's 4-byte salt only)
+
+Tested with TLS 1.3 AES-GCM-128 and AES-GCM-256 cipher suites.
 
 Signed-off-by: Rishikesh Jethwani <rjethwani@purestorage.com>
+Tested-by: Tariq Toukan <tariqt@nvidia.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 ---
- drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c | 3 +++
- drivers/net/ethernet/netronome/nfp/crypto/tls.c                | 3 +++
- 2 files changed, 6 insertions(+)
+ .../ethernet/mellanox/mlx5/core/en_accel/ktls.h    |  8 +++++++-
+ .../mellanox/mlx5/core/en_accel/ktls_txrx.c        | 14 +++++++++++---
+ 2 files changed, 18 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c b/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c
-index f5acd4be1e69..29e108ce6764 100644
---- a/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c
-+++ b/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c
-@@ -431,6 +431,9 @@ static int chcr_ktls_dev_add(struct net_device *netdev, struct sock *sk,
- 	atomic64_inc(&port_stats->ktls_tx_connection_open);
- 	u_ctx = adap->uld[CXGB4_ULD_KTLS].handle;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls.h b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls.h
+index 07a04a142a2e..0469ca6a0762 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls.h
+@@ -30,7 +30,9 @@ static inline bool mlx5e_is_ktls_device(struct mlx5_core_dev *mdev)
+ 		return false;
  
-+	if (crypto_info->version != TLS_1_2_VERSION)
-+		goto out;
-+
- 	if (direction == TLS_OFFLOAD_CTX_DIR_RX) {
- 		pr_err("not expecting for RX direction\n");
- 		goto out;
-diff --git a/drivers/net/ethernet/netronome/nfp/crypto/tls.c b/drivers/net/ethernet/netronome/nfp/crypto/tls.c
-index 9983d7aa2b9c..13864c6a55dc 100644
---- a/drivers/net/ethernet/netronome/nfp/crypto/tls.c
-+++ b/drivers/net/ethernet/netronome/nfp/crypto/tls.c
-@@ -287,6 +287,9 @@ nfp_net_tls_add(struct net_device *netdev, struct sock *sk,
- 	BUILD_BUG_ON(offsetof(struct nfp_net_tls_offload_ctx, rx_end) >
- 		     TLS_DRIVER_STATE_SIZE_RX);
+ 	return (MLX5_CAP_TLS(mdev, tls_1_2_aes_gcm_128) ||
+-		MLX5_CAP_TLS(mdev, tls_1_2_aes_gcm_256));
++		MLX5_CAP_TLS(mdev, tls_1_2_aes_gcm_256) ||
++		MLX5_CAP_TLS(mdev, tls_1_3_aes_gcm_128) ||
++		MLX5_CAP_TLS(mdev, tls_1_3_aes_gcm_256));
+ }
  
-+	if (crypto_info->version != TLS_1_2_VERSION)
-+		return -EOPNOTSUPP;
-+
- 	if (!nfp_net_cipher_supported(nn, crypto_info->cipher_type, direction))
- 		return -EOPNOTSUPP;
+ static inline bool mlx5e_ktls_type_check(struct mlx5_core_dev *mdev,
+@@ -40,10 +42,14 @@ static inline bool mlx5e_ktls_type_check(struct mlx5_core_dev *mdev,
+ 	case TLS_CIPHER_AES_GCM_128:
+ 		if (crypto_info->version == TLS_1_2_VERSION)
+ 			return MLX5_CAP_TLS(mdev,  tls_1_2_aes_gcm_128);
++		else if (crypto_info->version == TLS_1_3_VERSION)
++			return MLX5_CAP_TLS(mdev,  tls_1_3_aes_gcm_128);
+ 		break;
+ 	case TLS_CIPHER_AES_GCM_256:
+ 		if (crypto_info->version == TLS_1_2_VERSION)
+ 			return MLX5_CAP_TLS(mdev,  tls_1_2_aes_gcm_256);
++		else if (crypto_info->version == TLS_1_3_VERSION)
++			return MLX5_CAP_TLS(mdev,  tls_1_3_aes_gcm_256);
+ 		break;
+ 	}
  
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_txrx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_txrx.c
+index 570a912dd6fa..f3f1be1d4034 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_txrx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_txrx.c
+@@ -6,6 +6,7 @@
+ 
+ enum {
+ 	MLX5E_STATIC_PARAMS_CONTEXT_TLS_1_2 = 0x2,
++	MLX5E_STATIC_PARAMS_CONTEXT_TLS_1_3 = 0x3,
+ };
+ 
+ enum {
+@@ -15,8 +16,10 @@ enum {
+ #define EXTRACT_INFO_FIELDS do { \
+ 	salt    = info->salt;    \
+ 	rec_seq = info->rec_seq; \
++	iv      = info->iv;      \
+ 	salt_sz    = sizeof(info->salt);    \
+ 	rec_seq_sz = sizeof(info->rec_seq); \
++	iv_sz      = sizeof(info->iv);      \
+ } while (0)
+ 
+ static void
+@@ -24,9 +27,9 @@ fill_static_params(struct mlx5_wqe_tls_static_params_seg *params,
+ 		   union mlx5e_crypto_info *crypto_info,
+ 		   u32 key_id, u32 resync_tcp_sn)
+ {
++	u16 salt_sz, rec_seq_sz, iv_sz;
++	char *salt, *rec_seq, *iv;
+ 	char *initial_rn, *gcm_iv;
+-	u16 salt_sz, rec_seq_sz;
+-	char *salt, *rec_seq;
+ 	u8 tls_version;
+ 	u8 *ctx;
+ 
+@@ -59,7 +62,12 @@ fill_static_params(struct mlx5_wqe_tls_static_params_seg *params,
+ 	memcpy(gcm_iv,      salt,    salt_sz);
+ 	memcpy(initial_rn,  rec_seq, rec_seq_sz);
+ 
+-	tls_version = MLX5E_STATIC_PARAMS_CONTEXT_TLS_1_2;
++	if (crypto_info->crypto_info.version == TLS_1_3_VERSION) {
++		memcpy(gcm_iv + salt_sz, iv, iv_sz);
++		tls_version = MLX5E_STATIC_PARAMS_CONTEXT_TLS_1_3;
++	} else {
++		tls_version = MLX5E_STATIC_PARAMS_CONTEXT_TLS_1_2;
++	}
+ 
+ 	MLX5_SET(tls_static_params, ctx, tls_version, tls_version);
+ 	MLX5_SET(tls_static_params, ctx, const_1, 1);
 -- 
 2.25.1
 
