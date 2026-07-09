@@ -1,196 +1,192 @@
-Return-Path: <netdev+bounces-306277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306278-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 0zPYBXWzT2r4mwIAu9opvQ
-	(envelope-from <netdev+bounces-306277-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 16:43:01 +0200
+	id HFECHcWyT2rRmwIAu9opvQ
+	(envelope-from <netdev+bounces-306278-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 16:40:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DD29732680
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 16:43:00 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E233A7325FA
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 16:40:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linuxfoundation.org header.s=korg header.b=pFzKKCK5;
-	dmarc=pass (policy=none) header.from=linuxfoundation.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306277-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306277-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="S1e/y/aP";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306278-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306278-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5C8EE317AA1F
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 14:22:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AA121310850F
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 14:32:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3BB3331221;
-	Thu,  9 Jul 2026 14:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31B713368BB;
+	Thu,  9 Jul 2026 14:31:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9372221E098;
-	Thu,  9 Jul 2026 14:22:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90A931715B;
+	Thu,  9 Jul 2026 14:31:53 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783606947; cv=none; b=G3TcFU1Osv+KJs6twasILJhXc10im7p99+1DPaaSj1VqIScpKEzOrdbLFXHsxi3TFs0Ebxo2O7KAYFBLnnYxTafi/QrZSVMl7WvHxLnCV/GrLi2RhdaDi7SlHeiFJ6bCWNmSS+pAfY+9i2I4GV/BXDY3yEgVaBBx0dz9/fihTGM=
+	t=1783607515; cv=none; b=b2ZcKVFimXvOiWSnjLnJIXTXrFuYAPocZiP19FENsgBcNaZv/HcZBnWL2ntUOkiJR3nyI4wm3b2d37c/zIEdA9feFSxgGVoM8lsQr9KtK6VL24YpIZRFfVMtfxerm0ahgvl7O8O0GUs1DdvYpOmIPPuW4kUSEkkZF5AU9bKCtdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783606947; c=relaxed/simple;
-	bh=s5381n1trsYscNMAirkC5WSZZqb4jbYbyDzi7jZd+i0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JK9eRW9u8fGNwJNenAALNVwYXaIQhy7cgBI8IDNhC04SqXerNsUnMWpJrkDpmjnNyQtJ72uer9PvbBBPnJcpV+Sz0yjHN9CzzCAK6lK1Z/TxARj37S2lTcT0nbC/tIiu5yer/7fyiLK4EK4pm+rGfxHk3N77E7QYxgOkYPu976I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=pFzKKCK5; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BD191F000E9;
-	Thu,  9 Jul 2026 14:22:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1783606946;
-	bh=sgXrUQkmCDVtsWqbs4V36y920B23PeNjLAPQUUnUwSo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=pFzKKCK50fniSEB/52TnzsE7Y/2SpWWP6em9d3vP2BEHEmEj3+MV3JwnxQf/HEW7+
-	 U/WJYzKqpGVDIM/X54k4uzuKgKhdOM4e9u7NyRsQZenH99C8Ubob7KbEubRB6VBuEQ
-	 3jHXrHn5955OALFjxDieS0cZ/g+fednSXu/4O/J0=
-Date: Thu, 9 Jul 2026 16:22:22 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Ujjal Roy <royujjal@gmail.com>
-Cc: Linux Stable <stable@vger.kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>, David Ahern <dsahern@kernel.org>,
-	Shuah Khan <shuah@kernel.org>, Andy Roulin <aroulin@nvidia.com>,
-	Yong Wang <yongwang@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	Ujjal Roy <ujjal@alumnux.com>, bridge@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: Please backport bridge multicast exponential field encoding fix
- series to 6.1.y/6.6.y/6.12.y/6.18.y/7.0.y
-Message-ID: <2026070948-lively-exchange-a458@gregkh>
-References: <20260709101327.9508-1-royujjal@gmail.com>
- <2026070925-delay-gauntlet-bc7c@gregkh>
- <CAE2MWk=mm8_bkd54Gv1mdox6rfvx85Dd3AjOCxPz0fPAfyuWYA@mail.gmail.com>
- <2026070954-activist-left-8303@gregkh>
- <CAE2MWkmcQdhGp3LTMtpgAse3AFcfKcAcpQe89+iijfP5e0w_QQ@mail.gmail.com>
+	s=arc-20240116; t=1783607515; c=relaxed/simple;
+	bh=NZchBU/L/UegMUXOn4df6n6k6TAIyFg7AKgfkKoHFwg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SN2cTstengX9qC7hrokKqQsdESZefol/5ge9bii6do2+M+E9YC34wrSg3LOjrKkbJNl/3UbaJ4PmgzD7zXzhWsuyQd+ztP6nk870WOQnJ1PcyGifslMq7zbj56Zm0FCqtTIfW8Jr8HjwYeSyaaTZiRrSTgiFu7T4VMXyOlySKYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S1e/y/aP; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D4AD1F000E9;
+	Thu,  9 Jul 2026 14:31:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783607513;
+	bh=EZNESH4mpdK+p58mn0i8O9PeF/FEh34whTG4x2sm6pE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=S1e/y/aPU/kaPabbq9XlW+E4FjDdOlDasKACV2CyAv8SxST0Rqgb4R3z/SQr3hLCe
+	 Ukn1Rde2U/Le5V6G52GxkPj9tlcr6pxVC1FD7iXj9f3Ys7SzlqKaU4Rndg7uuumBO8
+	 lLA1J2eSdPc0o917C07JzZ8HtWdF/w3X1ehU3dP4do0kQUQl+R1gpnBB1fcAz1T6m7
+	 EHEqYtsNc/FF81eZ3vHJEVmFs71XjdlvXi9MpqF6aefqAmEUmOIttLGqhJ5xI+VQQ8
+	 0NsVUjCI2z5FX15sSdirsinecWgljiSNPVkGJEuIEt3bkzOW2XAUT6ivpv5mCG4gcW
+	 /SQzYLYRksX4Q==
+Message-ID: <dd96a6a0-625b-43a2-9cae-3c159a847c74@kernel.org>
+Date: Thu, 9 Jul 2026 16:31:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH v2] mptcp: only set DATA_FIN when a mapping is present
+Content-Language: fr
+To: Michael Bommarito <michael.bommarito@gmail.com>
+Cc: gang.yan@linux.dev, Geliang Tang <geliang@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, mptcp@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Mat Martineau <martineau@kernel.org>
+References: <2edcb1cd-f2db-4d0c-a0e3-fd2b4dd820fe@redhat.com>
+ <20260707171730.2679013-1-michael.bommarito@gmail.com>
+ <8155514655323d8c4a07da86d2b2ccdd7244c125@linux.dev>
+ <8d735844-dccb-4a65-b7fc-468d144ebc02@kernel.org>
+ <CAJJ9bXy29+cwu+Me8WNrf=f4qc=uoXSMCrUG3NJbR-xANJxseA@mail.gmail.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <CAJJ9bXy29+cwu+Me8WNrf=f4qc=uoXSMCrUG3NJbR-xANJxseA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAE2MWkmcQdhGp3LTMtpgAse3AFcfKcAcpQe89+iijfP5e0w_QQ@mail.gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.34 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:royujjal@gmail.com,m:stable@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:razor@blackwall.org,m:idosch@nvidia.com,m:dsahern@kernel.org,m:shuah@kernel.org,m:aroulin@nvidia.com,m:yongwang@nvidia.com,m:petrm@nvidia.com,m:ujjal@alumnux.com,m:bridge@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-306278-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-306277-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:michael.bommarito@gmail.com,m:gang.yan@linux.dev,m:geliang@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:kuba@kernel.org,m:mptcp@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:martineau@kernel.org,m:michaelbommarito@gmail.com,s:lists@lfdr.de];
+	HAS_ORG_HEADER(0.00)[];
+	FORGED_SENDER(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linuxfoundation.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,gregkh:mid,linuxfoundation.org:from_mime,linuxfoundation.org:email,linuxfoundation.org:dkim]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3DD29732680
+X-Rspamd-Queue-Id: E233A7325FA
 
-On Thu, Jul 09, 2026 at 06:35:04PM +0530, Ujjal Roy wrote:
-> On Thu, Jul 9, 2026 at 6:23 PM Greg KH <gregkh@linuxfoundation.org> wrote:
-> >
-> > On Thu, Jul 09, 2026 at 06:12:40PM +0530, Ujjal Roy wrote:
-> > > On Thu, Jul 9, 2026 at 4:34 PM Greg KH <gregkh@linuxfoundation.org> wrote:
-> > > >
-> > > > On Thu, Jul 09, 2026 at 10:13:27AM +0000, Ujjal Roy wrote:
-> > > > > Hi Greg,
-> > > > >
-> > > > > Please consider backporting the following bridge multicast fix series to 6.1.y, 6.6.y, 6.12.y, 6.18.y and 7.0.y.
-> > > > >
-> > > > > 726fa7da2d8c ("ipv4: igmp: get rid of IGMPV3_{QQIC,MRC} and simplify calculation")
-> > > > > 12cfb4ecc471 ("ipv6: mld: rename mldv2_mrc() and add mldv2_qqi()")
-> > > > > 95bfd196f0dc ("ipv4: igmp: encode multicast exponential fields")
-> > > > > e51560f4220a ("ipv6: mld: encode multicast exponential fields")
-> > > > > 529dbe762de0 ("selftests: net: bridge: add MRC and QQIC field encoding tests")
-> > > >
-> > > > Why is any of this needed in older kernels?
-> > > >
-> > > > And 7.0.y is long end-of-life.
-> > > >
-> > > > And why, if this does fix issues, was it not tagged for stable to start
-> > > > with?
-> > > >
-> > > > thanks,
-> > > >
-> > > > greg k-h
-> > >
-> > > I already explained this in the email thread, "Please backport bridge
-> > > multicast exponential field encoding fix series to stable kernels".
-> >
-> > Sorry, but that's not here (remember, some of us get 1000+ emails a
-> > day.)
-> >
-> > Please explain why patches need to be backported when asking for them to
-> > be backported.
-> >
-> > thanks,
-> >
-> > greg k-h
+On 09/07/2026 15:12, Michael Bommarito wrote:
+> On Thu, Jul 9, 2026 at 8:27 AM Matthieu Baerts <matttbe@kernel.org> wrote:
 > 
-> Sorry for breaking the thread. I understand your point, I will
-> maintain this in the future.
-> How should I send the patchset that addresses the conflicts on 5.10.y
-> and 7.1.y? Shall I send the conflicts patchset as a series via a
-> different thread or how? I've never done this before, so I'm asking.
+>> By chance, do you have a reproducer? Maybe using Packetdrill with MPTCP
+>> support? [1]
+>> If not, how did you discover this issue?
 > 
-> Here is the explanation for why the patches need to be backported:
-> 
-> History: The multicast stack currently supports decoding of IGMPv3 and
-> MLDv2 exponential timer field encodings, but lacks the corresponding
-> encoding logic when generating multicast query packets. As a result,
-> query intervals and response codes exceeding the linear encoding range
-> can be transmitted incorrectly. This can cause multicast queriers and
-> listeners to interpret different timing values, resulting in protocol
-> interoperability issues, membership timeouts, and premature multicast
-> group expiration.
-> 
-> Testing: The series adds the missing encoding support for both IGMPv3
-> and MLDv2 and includes selftests that validate the behavior.
-> I backported the series to v6.6.123.2 and verified the accompanying
-> selftests. The selftests fail on the unpatched kernel and pass after
-> applying the series, demonstrating both the bug and the effectiveness
-> of the fix.
-> 
-> Given that this is a protocol correctness issue affecting multicast
-> query generation, please consider backporting the complete series to
-> all applicable stable kernels.
-> 
+> Yup, I'll send to you offlist.  It's a custom Python/TUN/qemu setup,
+> not Packetdrill, but I'm guessing it could be ported or extended for
+> testing/fuzzing.
 
-But this really seems like a new feature being added, it's not fixing a
-regression of something that previously worked, right?
+Interesting. Yes, it could be useful for various protocols.
 
-WHy can't people just update to the latest kernel release to get this if
-they need it for their environments?
+> I discovered it with my homegrown agentic stack, which is a Rube
+> Goldberg machine full of various tools (like cocci, semgrep) and
+> knowledge graphs (built with libclang).  The agent logs suggest that
+> it came from a family of rules that surfaces suspicious struct init
+> candidates, which I can share too.
 
-thanks,
+Is it also based on crafted traffic? It could also be useful!
 
-greg k-h
+>> If I may add, please also send new version in a separate thread, not as
+>> a reply, not to confuse various tools, as mentioned in the same doc.
+> 
+> Sure, thanks to both you and Gang for the feedback.  I'll send a v3
+> based on your suggestions later today.
+
+Thanks!
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
