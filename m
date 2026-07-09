@@ -1,277 +1,249 @@
-Return-Path: <netdev+bounces-306382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306383-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cs1VBlEQUGorswIAu9opvQ
-	(envelope-from <netdev+bounces-306382-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 23:19:13 +0200
+	id vWkNF4wSUGqYswIAu9opvQ
+	(envelope-from <netdev+bounces-306383-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 23:28:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C3A3735CAE
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 23:19:12 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F335735D03
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 23:28:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=ODdPRmOo;
-	dmarc=pass (policy=reject) header.from=google.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306382-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306382-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=JOB9dDaC;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306383-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-306383-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8E3BB3017BF3
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 21:19:11 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3DAF5300B8C4
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 21:28:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1EFE3AC0D0;
-	Thu,  9 Jul 2026 21:19:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BF723BB13B;
+	Thu,  9 Jul 2026 21:28:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420AC3AE6E9
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 21:19:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9D03BB106
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 21:28:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783631950; cv=none; b=JrQOhROJ8ICnF1XFtluYUV/MO8+8siaWq60YCAnYz0hYOF0HgDUUfVlAmlYVxcFfH9Euedx4bBWP6Bd4VUrEWl4wR6bZYuVIn03qkJoCJLoLS0Hueom6TaOoT7WbZUb4p7EW36kZ9necjLySXOnB3+pnfQl95qPUiYVPFJiPBjU=
+	t=1783632518; cv=none; b=L0wWtPHxaLL4aPXUOIgTaafULBFzxsWeRK+xYY1U9FKbyAMk7Fj++MuEld9FOSpYmj0yOldJ/9G078llXF8MzGaPJCpIzbq/5xFIV5Icr24cH3MvZaj34Cw91L+rw6X/4s9bA8gPM5uEojCBOPrDp27JI8kOE1/7Z1+45ogn5a4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783631950; c=relaxed/simple;
-	bh=0g/6zbiEcbIQq0OxAyV2Q08ui9MvxNfKFpl/ZYmlVHA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Hjp3KAzz6obsRBU2IUqKnnousa2tVAZ11r8Vn1EnO/WnC5picpAGILYajyBqFO0zmFR/ZuXMeCy7qQV8Tqpqfffb1Tj3dXjejaChVi67IlsV2vWDDbHDwX++4TzYjg9BNWfsQfPPfASY3wbWAPLL1G8tbH0keLMqVzThes/6RxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ODdPRmOo; arc=none smtp.client-ip=209.85.215.201
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c9fe4c5eb39so172128a12.1
-        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 14:19:09 -0700 (PDT)
+	s=arc-20240116; t=1783632518; c=relaxed/simple;
+	bh=RfK4Rc+82FAtWUKvR0czhUym4lsT1kXkCb6HVu1HCxI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lhhyw70oWKqOOzGrOpKvQuNUK4hA3Fgy1NrWSos+gtmmbqAgOPYg4guftqAfLOspzcKzPyuo79buAzVs3nRNSDJKpe8m/26DJdXNNy+UU+/9kH1wkvL+I2Su5Vu6hNjlGitf4CuSqqVYIW3rQdO41fzFejllXvSlbMIf8rueUCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JOB9dDaC; arc=none smtp.client-ip=209.85.160.178
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-51a868b6962so2159291cf.2
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 14:28:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783631949; x=1784236749; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=+T7RxQXDP6VavQCmW76B4jR7UdEawZb+uP1OIxEgxgI=;
-        b=ODdPRmOoRHCUiHwdDtWxbYWnZUMqWLK5coW6GCfL0yIdF67yqIvMC7G9tSzqLUTGdn
-         eW57+JoOBnMcj13mM0D1AaZL/Z4wskrVCvv2XMy38tpsoS7ryyG0Qi03h0PBHxCDqYYL
-         16cWwY8cQSza0sYmNNDQou39Xr56dlKUaN+yW2MjyZ4R2umlrW67ltkFzv8ONQJQkmKQ
-         RuYfv0mDFxbIsx8KQnzRaef0e1KcrlqRG7Qf4ohdIES33jJFc9ssREA0MZ54hYATdBhl
-         ZOzm1fBvVdLU/JiGrRO0X3LQr7ohgaZW//UwZnTBAl2YbU/FkJ+qFtxPc6E7KMKClzgX
-         1UPQ==
+        d=gmail.com; s=20251104; t=1783632515; x=1784237315; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=UGPBGDpmMCJG1jdmjxc2zGCbnDM99IZvLsk38bHA9OQ=;
+        b=JOB9dDaCekjMUQcPq9Nzb26Xu6j+ZCsuJVfhuuSUF6Yc6UcmtQfw3gB9iXwFc+9DVE
+         YkpwNlZy6B5BevvyGGyO8sCnE9C0yEVcBfpOAwegeAnOlUXW7e71EhE2vX8taReWdMWH
+         dmDxe/XMQRNtme0hH7WU2/CVid7eI8r7gny7cWx2WGUVLlNx0P+lpS6tb4Mmy2TyOMJ/
+         ghy8QvaxCq5xWAamj9H3jrkaSj86Ya2tV1vKe1z8c6XjXcArFv0CWv5e7OFiflhVWvgB
+         8Zfbl4VefWCARFzkJQQPhTvcJJgMd01whC82f6NGK0zuH/28RTymvLHbtgsZu/xp60sd
+         M/cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783631949; x=1784236749;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=+T7RxQXDP6VavQCmW76B4jR7UdEawZb+uP1OIxEgxgI=;
-        b=I/AC7n9NZwIrshq1X2oq6rJw23aRzt+gRNs+3I1wxApNoS5dfdOuP2WFz17StwZ+G9
-         u2IgjdFv3hpjXvylcoHw5zdE9YkGQk/at64KtkNSNsZh+jPK9q7M1uDA6y1cWoqo44PC
-         Q2uX3llAmutUfZKoU7BjU4zg669l+QZ3ArwBMxY5RELghz6BaHxaxys6kzzJ37kqlkhK
-         D1w4GEZiYiBeudhDprl5+xbar1Tl6Dvh4vWhGXLJRNT+PBcqNQfITIznT6ghAewWsx+X
-         tzOZhoyUI2w4q+iofzCoo6l3OvHqpYfYUtvFe8N740DnMbsWUnNChN4DI6TA2MokLAB4
-         Xk+w==
-X-Gm-Message-State: AOJu0YyCo37QdF/2dMXxfdRCKu6450k6iStKTPpZsSeU8vNxVv2gyASW
-	FU4oG0TvU7U9ZmjkT80hzLAmqZOnUtk7PWwNJ6X+oH1g9/uJUEDnxGr1hppgyrJt+BY2oKdhg33
-	docazm+3B7cRWK1/i8aZevbEIMBoNPEVSyF1UQoccaGMTTrrqFVIY4EdaFTZDLRvfOq7YxWkm0o
-	k3Nhcg48okY7KhS7s8Edo2Wstytu60CQwwzQV40hg4s0S8G6JDqza0Xgmi4EYx76Q=
-X-Received: from pgmj15.prod.google.com ([2002:a63:594f:0:b0:c96:9e6a:6261])
- (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a20:918c:b0:3bf:63af:859 with SMTP id adf61e73a8af0-3c0bd0f8fd3mr10854302637.45.1783631948380;
- Thu, 09 Jul 2026 14:19:08 -0700 (PDT)
-Date: Thu,  9 Jul 2026 21:19:06 +0000
+        d=1e100.net; s=20251104; t=1783632515; x=1784237315;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=UGPBGDpmMCJG1jdmjxc2zGCbnDM99IZvLsk38bHA9OQ=;
+        b=l5npvqGd0qgSEgyWdYfNJAU6S65iDRlHKggH8QMdZSZ2vCGWUFK3SzP1TRh3mcdPab
+         RD/WdDx79FUcGq751dPOfQm/ZWq2GC4gBnpujM7affnOK5s0r72StcrNDX70BzTZa7tS
+         aq9WXU9ji54PD+bWyFI3O/ICsMHsGPzjtP73RiUXxXxiF1PAPDgcmUtUjMvVIFC6QzDr
+         wEMmrXsGBbXk4+bmHhgmZB2mhH9fAe/ow1iGQ30rzsJy1Ynn6wdHhn39vsnZG7oOE19l
+         /gpOUGJOUS5kaW/PB4KPljcqWy/XVj9XPcXcHYUSk49MX6MzDqQDxDRFKKFG4vfvuQ0M
+         c3Wg==
+X-Gm-Message-State: AOJu0YyUK3EGzUeCg5viXILMYgD4UYHObY/mnMt7Lw7MQYJ6hW5nlua6
+	8ST9O5xupFCc9a+G2wE8V3XhQZjahE68XnQPQTnqHWERso1Kp88QaiGADgK1mw==
+X-Gm-Gg: AfdE7cmsjPTzAk1eZELMrnHqrbQkMPvyB265YX/MKf0tLI5hQIPuuOhMWhBy4QTVybd
+	MeXAThE4MqzOyM/+zXhsS2szrQ3FZNRyYFwzHvCe6BGLBtNpVSbLRgCxnbZOPCg879HTx5/Ff7D
+	UYdhklz1i7SgJB0N771+QGOjEmJB8tP8Wa0YqRJw2Hc+lZdWU4ULEk8eYTeOA6WMWyNHkZsTGnu
+	0uJY7GuKLIIfKl4j75yRLz2tUqTs9r/QLX+Iva8Hg/gLem/ODzlLDNp1rGLEuM/TX/q6t7E2AB4
+	Bk+OTrIBKrPYs8cPlTRRkx0hWcMM3nnncv3FFwRM0PDruI189Cn4WOAZZ+NRg5Pk9kpOKha6Ncx
+	hYkhjsGDxO9OhJweqwBm1yFKlF2eLyuWSCteAoLI6m0rrSUEKNYZ0pWNH+oVwgBSuFXx86Cm33I
+	cROgwCSSpshu2ZwPxUwfmksLo7lZqkTTWcwNuZWTL7MVaJ1T1qVTxkZ8hiYcXuRdhXy4OZT9OJr
+	vFAgIcQGFNuaS1WsdUDX0L72+tQpopPqqwyIC+osJvIwrGe4oF+v38Wujqkh5dQRw==
+X-Received: by 2002:ac8:5e51:0:b0:516:e10f:7140 with SMTP id d75a77b69052e-51c8b3f9775mr89854991cf.35.1783632515371;
+        Thu, 09 Jul 2026 14:28:35 -0700 (PDT)
+Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51caae206b6sm3237861cf.14.2026.07.09.14.28.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jul 2026 14:28:34 -0700 (PDT)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	linux-sctp@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Subject: [PATCH net-next] sctp: replace cb->args[4] with a local variable in sctp_diag_dump()
+Date: Thu,  9 Jul 2026 17:28:33 -0400
+Message-ID: <e0076ec046fbd8a70d4f3facfb701473d08c3ebb.1783632513.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.55.0.795.g602f6c329a-goog
-Message-ID: <20260709211906.3322883-1-hramamurthy@google.com>
-Subject: [PATCH net v2] gve: fix Rx queue stall on alloc failure
-From: Harshitha Ramamurthy <hramamurthy@google.com>
-To: netdev@vger.kernel.org
-Cc: joshwash@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	willemb@google.com, jordanrhee@google.com, nktgrg@google.com, 
-	maolson@google.com, thostet@google.com, csully@google.com, bcf@google.com, 
-	maciej.fijalkowski@intel.com, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org, Eddie Phillips <eddiephillips@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:joshwash@google.com,m:hramamurthy@google.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:willemb@google.com,m:jordanrhee@google.com,m:nktgrg@google.com,m:maolson@google.com,m:thostet@google.com,m:csully@google.com,m:bcf@google.com,m:maciej.fijalkowski@intel.com,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:eddiephillips@google.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-306382-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[google.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-306383-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:marcelo.leitner@gmail.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7C3A3735CAE
+X-Rspamd-Queue-Id: 3F335735D03
 
-From: Eddie Phillips <eddiephillips@google.com>
+cb->args[4] is currently used as a temporary counter to track the assoc
+index while traversing ep->asocs in sctp_sock_dump(). However, this
+state is only needed locally within a single dump iteration and does not
+need to be preserved across callbacks.
 
-When the system is under extreme memory pressure, page allocations can
-fail during the Rx buffer refill loop. If the number of buffers posted
-to hardware falls below a critical low threshold and the refill loop
-exits due to allocation failures, the queue can stall:
+Replace cb->args[4] with a local idx variable in sctp_sock_dump(), and
+update cb->args[1] directly when the dump is interrupted due to skb
+space exhaustion.
 
-1. The device drops incoming packets because there are no descriptors.
-2. Since no packets are processed, no Rx completions are generated.
-3. Because no completions occur, NAPI is never scheduled, preventing
-   the refill loop from running again even after memory is freed.
+This simplifies the dump state handling and removes the dependency on an
+extra cb->args[] slot, making the traversal logic easier to follow.
 
-This results in a permanent queue stall.
-
-Resolve this by introducing a starvation recovery timer for each Rx queue.
-If the number of buffers posted to hardware falls below a critical low
-threshold, start a timer to periodically reschedule NAPI. Once NAPI runs
-and successfully refills the queue above the threshold, the timer is
-not rescheduled.
-
-The threshold is set to 32 because a single maximum-sized Receive Segment
-Coalescing (RSC) packet can consume up to 19 descriptors in the Rx path.
-Lower thresholds (such as 8 or 16) would be insufficient to process a
-complete maximum-sized RSC packet, risking packet drops or unexpected
-hardware behavior under memory pressure. Setting the threshold to 32
-guarantees a safe margin to handle at least one full RSC packet.
-
-Cc: stable@vger.kernel.org
-Fixes: 9b8dd5e5ea48 ("gve: DQO: Add RX path")
-Reviewed-by: Jordan Rhee <jordanrhee@google.com>
-Signed-off-by: Eddie Phillips <eddiephillips@google.com>
-Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
 ---
-Changes in v2:
-- Link to v1: https://lore.kernel.org/netdev/20260701005341.3699161-1-hramamurthy@google.com/
-- Relocated the starvation timer to the end of gve_rx_ring to avoid polluting
-hotpath cachelines
-- Decoupled timer lifecycle from allocation cycles by moving initialization
-and shutdown to start/stop pathways instead of setup/remove pathways.
-- Added explicit rationale for the 32-descriptor threshold
-(GVE_RX_BUF_THRESH_DQO) ensuring it is safe for maximum-sized RSC packets.
-- Removed addition of a stat tracking critical low buffer events
+ net/sctp/diag.c | 45 ++++++++++++++++++++++-----------------------
+ 1 file changed, 22 insertions(+), 23 deletions(-)
 
- drivers/net/ethernet/google/gve/gve.h        |  3 +++
- drivers/net/ethernet/google/gve/gve_rx_dqo.c | 34 ++++++++++++++++++++++++++++++++++
- 2 files changed, 37 insertions(+)
-
-diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-index 2f7bd330..bdd53d08 100644
---- a/drivers/net/ethernet/google/gve/gve.h
-+++ b/drivers/net/ethernet/google/gve/gve.h
-@@ -13,6 +13,7 @@
- #include <linux/netdevice.h>
- #include <linux/net_tstamp.h>
- #include <linux/pci.h>
-+#include <linux/timer.h>
- #include <linux/ptp_clock_kernel.h>
- #include <linux/u64_stats_sync.h>
- #include <net/page_pool/helpers.h>
-@@ -41,6 +42,7 @@
- 
- /* Interval to schedule a stats report update, 20000ms. */
- #define GVE_STATS_REPORT_TIMER_PERIOD	20000
-+#define GVE_RX_NAPI_RESCHED_MS 20 /* msecs */
- 
- /* Numbers of NIC tx/rx stats in stats report. */
- #define NIC_TX_STATS_REPORT_NUM	0
-@@ -341,6 +343,7 @@ struct gve_rx_ring {
- 	struct xdp_rxq_info xdp_rxq;
- 	struct xsk_buff_pool *xsk_pool;
- 	struct page_frag_cache page_cache; /* Page cache to allocate XDP frames */
-+	struct timer_list starvation_timer; /* for queue starvation recovery */
- };
- 
- /* A TX desc ring entry */
-diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-index 02cba280..8271f731 100644
---- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-+++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-@@ -18,6 +18,16 @@
- #include <net/tcp.h>
- #include <net/xdp_sock_drv.h>
- 
-+static void gve_rx_starvation_timer(struct timer_list *t)
-+{
-+	struct gve_rx_ring *rx = timer_container_of(rx, t, starvation_timer);
-+	struct gve_priv *priv = rx->gve;
-+	struct gve_notify_block *block;
-+
-+	block = &priv->ntfy_blocks[rx->ntfy_id];
-+	napi_schedule(&block->napi);
-+}
-+
- static void gve_rx_free_hdr_bufs(struct gve_priv *priv, struct gve_rx_ring *rx)
+diff --git a/net/sctp/diag.c b/net/sctp/diag.c
+index c2a0de2adf6f..a9bb31303613 100644
+--- a/net/sctp/diag.c
++++ b/net/sctp/diag.c
+@@ -299,18 +299,21 @@ static int sctp_sock_dump_one(struct sctp_endpoint *ep, struct sctp_transport *t
+ static int sctp_sock_dump(struct sctp_endpoint *ep, struct sctp_transport *tsp, void *p)
  {
- 	struct device *hdev = &priv->pdev->dev;
-@@ -120,6 +130,7 @@ void gve_rx_stop_ring_dqo(struct gve_priv *priv, int idx)
+ 	struct sctp_comm_param *commp = p;
+-	struct sock *sk = ep->base.sk;
++	struct sock *sk = ep->base.sk, *nsk;
+ 	struct sk_buff *skb = commp->skb;
+ 	struct netlink_callback *cb = commp->cb;
+ 	const struct inet_diag_req_v2 *r = commp->r;
++	u32 portid = NETLINK_CB(cb->skb).portid;
+ 	struct sctp_association *assoc;
+-	int err = 0;
++	int err = 0, idx = 0;
++
++	nsk = NETLINK_CB(cb->skb).sk;
  
- 	if (rx->dqo.page_pool)
- 		page_pool_disable_direct_recycling(rx->dqo.page_pool);
-+	timer_shutdown_sync(&rx->starvation_timer);
- 	gve_remove_napi(priv, ntfy_idx);
- 	gve_rx_remove_from_block(priv, idx);
- 	gve_rx_reset_ring_dqo(priv, idx);
-@@ -208,8 +219,10 @@ static int gve_rx_alloc_hdr_bufs(struct gve_priv *priv, struct gve_rx_ring *rx,
- void gve_rx_start_ring_dqo(struct gve_priv *priv, int idx)
- {
- 	int ntfy_idx = gve_rx_idx_to_ntfy(priv, idx);
-+	struct gve_rx_ring *rx = &priv->rx[idx];
+ 	lock_sock(sk);
+ 	if (ep != tsp->asoc->ep)
+ 		goto release;
+ 	list_for_each_entry(assoc, &ep->asocs, asocs) {
+-		if (cb->args[4] < cb->args[1])
++		if (idx < cb->args[1])
+ 			goto next;
  
- 	gve_rx_add_to_block(priv, idx);
-+	timer_setup(&rx->starvation_timer, gve_rx_starvation_timer, 0);
- 	gve_add_napi(priv, ntfy_idx, gve_napi_poll_dqo);
- }
+ 		if (r->id.idiag_sport != htons(assoc->base.bind_addr.port) &&
+@@ -320,32 +323,31 @@ static int sctp_sock_dump(struct sctp_endpoint *ep, struct sctp_transport *tsp,
+ 		    r->id.idiag_dport)
+ 			goto next;
  
-@@ -365,6 +378,7 @@ void gve_rx_post_buffers_dqo(struct gve_rx_ring *rx)
- 	struct gve_rx_compl_queue_dqo *complq = &rx->dqo.complq;
- 	struct gve_rx_buf_queue_dqo *bufq = &rx->dqo.bufq;
- 	struct gve_priv *priv = rx->gve;
-+	u32 num_bufs_avail_to_hw;
- 	u32 num_avail_slots;
- 	u32 num_full_slots;
- 	u32 num_posted = 0;
-@@ -400,6 +414,26 @@ void gve_rx_post_buffers_dqo(struct gve_rx_ring *rx)
+-		if (!cb->args[3] &&
+-		    inet_sctp_diag_fill(sk, NULL, skb, r,
+-					sk_user_ns(NETLINK_CB(cb->skb).sk),
+-					NETLINK_CB(cb->skb).portid,
+-					cb->nlh->nlmsg_seq,
+-					NLM_F_MULTI, cb->nlh,
+-					commp->net_admin) < 0) {
+-			err = 1;
+-			goto release;
++		if (!cb->args[3]) {
++			err = inet_sctp_diag_fill(sk, NULL, skb, r,
++						  sk_user_ns(nsk), portid,
++						  cb->nlh->nlmsg_seq,
++						  NLM_F_MULTI, cb->nlh,
++						  commp->net_admin);
++			if (err < 0) {
++				cb->args[1] = idx;
++				goto release;
++			}
+ 		}
+ 		cb->args[3] = 1;
+ 
+-		if (inet_sctp_diag_fill(sk, assoc, skb, r,
+-					sk_user_ns(NETLINK_CB(cb->skb).sk),
+-					NETLINK_CB(cb->skb).portid,
+-					cb->nlh->nlmsg_seq, 0, cb->nlh,
+-					commp->net_admin) < 0) {
+-			err = 1;
++		err = inet_sctp_diag_fill(sk, assoc, skb, r, sk_user_ns(nsk),
++					  portid, cb->nlh->nlmsg_seq, 0,
++					  cb->nlh, commp->net_admin);
++		if (err < 0) {
++			cb->args[1] = idx;
+ 			goto release;
+ 		}
+ next:
+-		cb->args[4]++;
++		idx++;
  	}
- 
- 	rx->fill_cnt += num_posted;
-+
-+	/* If the queue has fewer than GVE_RX_BUF_THRESH_DQO descriptors
-+	 * visible to the hardware, the hardware is in danger of starving
-+	 * and cannot trigger interrupts.
-+	 *
-+	 * We use a threshold of 32 because a single maximum-sized RSC
-+	 * packet can consume up to 19 descriptors in the Rx path. Lower
-+	 * thresholds (e.g., 8 or 16) would be unsafe as they could cause
-+	 * the device to drop/stall on a maximum-sized RSC packet.
-+	 *
-+	 * Start the timer to periodically reschedule NAPI and recover.
-+	 */
-+	num_bufs_avail_to_hw =
-+		((bufq->tail & ~(GVE_RX_BUF_THRESH_DQO - 1)) -
-+		 bufq->head) & bufq->mask;
-+
-+	if (num_bufs_avail_to_hw < GVE_RX_BUF_THRESH_DQO) {
-+		mod_timer(&rx->starvation_timer,
-+			  jiffies + msecs_to_jiffies(GVE_RX_NAPI_RESCHED_MS));
-+	}
+ 	cb->args[1] = 0;
+ 	cb->args[3] = 0;
+-	cb->args[4] = 0;
+ release:
+ 	release_sock(sk);
+ 	return err;
+@@ -505,14 +507,11 @@ static void sctp_diag_dump(struct sk_buff *skb, struct netlink_callback *cb,
+ 	 * 1 : to record the assoc pos of this time's traversal
+ 	 * 2 : to record the transport pos of this time's traversal
+ 	 * 3 : to mark if we have dumped the ep info of the current asoc
+-	 * 4 : to track position within ep->asocs list in sctp_sock_dump()
+ 	 */
+ 	pos = cb->args[2];
+ 	sctp_transport_traverse_process(sctp_sock_filter, sctp_sock_dump,
+ 					net, &pos, &commp);
+ 	cb->args[2] = pos;
+-	cb->args[1] = cb->args[4];
+-	cb->args[4] = 0;
  }
  
- static void gve_rx_skb_csum(struct sk_buff *skb,
+ static const struct inet_diag_handler sctp_diag_handler = {
 -- 
-2.55.0.795.g602f6c329a-goog
+2.47.1
 
 
