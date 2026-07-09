@@ -1,183 +1,277 @@
-Return-Path: <netdev+bounces-306381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306382-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id uvUqFVAQUGoqswIAu9opvQ
-	(envelope-from <netdev+bounces-306381-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 23:19:12 +0200
+	id cs1VBlEQUGorswIAu9opvQ
+	(envelope-from <netdev+bounces-306382-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 23:19:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E95E5735CA9
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 23:19:11 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C3A3735CAE
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 23:19:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=C17PSIue;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306381-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306381-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=ODdPRmOo;
+	dmarc=pass (policy=reject) header.from=google.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306382-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306382-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DD615301DAC5
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 21:18:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8E3BB3017BF3
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 21:19:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D0F824BD03;
-	Thu,  9 Jul 2026 21:18:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1EFE3AC0D0;
+	Thu,  9 Jul 2026 21:19:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D061B3AC0D0
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 21:18:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420AC3AE6E9
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 21:19:09 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783631914; cv=none; b=FfAwpCu1SyNSLTWLvGse900rVo6VXMLNT3eiUOitfJDd+GSNFakUoW2MI2VIsWlO+MiGVe/EI+cIUSNpVqQIXqL8SS7i0K0lQzifZXOpo8wYBXGwyKUzCiqFJw+tvnk2YfPitaBR8pR7UwHWFJbqG3LfJmMOz2UXOZS1b/5yXRc=
+	t=1783631950; cv=none; b=JrQOhROJ8ICnF1XFtluYUV/MO8+8siaWq60YCAnYz0hYOF0HgDUUfVlAmlYVxcFfH9Euedx4bBWP6Bd4VUrEWl4wR6bZYuVIn03qkJoCJLoLS0Hueom6TaOoT7WbZUb4p7EW36kZ9necjLySXOnB3+pnfQl95qPUiYVPFJiPBjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783631914; c=relaxed/simple;
-	bh=jX3YXc/Uj8Q32KvLYO8PF7pOiLM6wUtucx5wZAGFeoM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=iQmezcOhjHsBhutvPdQJDJ3auHnonhoG2L3SMv1KbJIevnpjsV9mgKGr3j0ix0ErtmDOTuBpqv/DvoxR9SAa791TQovuhudgaDIITBbB2WIeZ6sfVoFTZgQ0zUHL64SibhyYKceZrxEZAfWw6X2uu1ZdqDeXWMIgnyPd3AxSBTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C17PSIue; arc=none smtp.client-ip=209.85.128.181
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-80cbb0688c8so4327387b3.1
-        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 14:18:32 -0700 (PDT)
+	s=arc-20240116; t=1783631950; c=relaxed/simple;
+	bh=0g/6zbiEcbIQq0OxAyV2Q08ui9MvxNfKFpl/ZYmlVHA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Hjp3KAzz6obsRBU2IUqKnnousa2tVAZ11r8Vn1EnO/WnC5picpAGILYajyBqFO0zmFR/ZuXMeCy7qQV8Tqpqfffb1Tj3dXjejaChVi67IlsV2vWDDbHDwX++4TzYjg9BNWfsQfPPfASY3wbWAPLL1G8tbH0keLMqVzThes/6RxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ODdPRmOo; arc=none smtp.client-ip=209.85.215.201
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c9fe4c5eb39so172128a12.1
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 14:19:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783631912; x=1784236712; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:subject
-         :references:in-reply-to:message-id:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=G00RWwYZC2HViOKTjnb8tJyzSdAlUEMFUeiIIZqhKvE=;
-        b=C17PSIueFezg7Sepxpi2zgf0IXoVvHSp1JUg5acNQaA3InHbRhR2N9HVnjjp8/8lAx
-         NdKySf6YZm/3Y7WvlhFQBRwVlxOV3mOULA9EyZwy6oOb1/KSZezfbf2UbDBeBrkWvcT0
-         zIbVvVYpQU1aK3b+bTkc8GTYLJsyxQi/5wfUllySgE1UYDy1lNtThreSrqIij+Cd+z+Q
-         bKzy+vR6BjP5LO4ypZrzA2DZpwggmbb3CeZki0eyXq0Gld7o3ql+Z4wqqQkzEYoB0Vvu
-         tDC/epnPeMrCrZ+yRrebWy0VARhNf2Uf7C/zlls0LUmcH41xeG3HzEUGSgbUIxvU1jpX
-         apwQ==
+        d=google.com; s=20251104; t=1783631949; x=1784236749; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=+T7RxQXDP6VavQCmW76B4jR7UdEawZb+uP1OIxEgxgI=;
+        b=ODdPRmOoRHCUiHwdDtWxbYWnZUMqWLK5coW6GCfL0yIdF67yqIvMC7G9tSzqLUTGdn
+         eW57+JoOBnMcj13mM0D1AaZL/Z4wskrVCvv2XMy38tpsoS7ryyG0Qi03h0PBHxCDqYYL
+         16cWwY8cQSza0sYmNNDQou39Xr56dlKUaN+yW2MjyZ4R2umlrW67ltkFzv8ONQJQkmKQ
+         RuYfv0mDFxbIsx8KQnzRaef0e1KcrlqRG7Qf4ohdIES33jJFc9ssREA0MZ54hYATdBhl
+         ZOzm1fBvVdLU/JiGrRO0X3LQr7ohgaZW//UwZnTBAl2YbU/FkJ+qFtxPc6E7KMKClzgX
+         1UPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783631912; x=1784236712;
-        h=content-transfer-encoding:content-type:mime-version:subject
-         :references:in-reply-to:message-id:cc:to:from:date:x-gm-gg
+        d=1e100.net; s=20251104; t=1783631949; x=1784236749;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=G00RWwYZC2HViOKTjnb8tJyzSdAlUEMFUeiIIZqhKvE=;
-        b=jKw5973lrsJTr6Gt1mO59+YvJFaOHVEC3iAnWHLoEUyKjn4WIm0AUeNPWSamhgNGQx
-         NEhiEWOOKJLZQ3v9c0evAE0sIymguSl93Zb52RXvsHuXgk0NSU0aeHzfq5siRG9aHKM+
-         4l26Oa1SSMLp8iZqqtqDs/9tRB/nlV5aM0M0cHnWJfXpd0Pv9pD/4H/CKBGVG5j9cJdz
-         U/Dwo6snlw6KN1iIjj4YmMvZP2/QKcZ81uyXKJaXsjlD4VHnN+LqoxmYbKRNm8lyNG8S
-         HkcPMOY7P6CiVPh/AMlf9jXIrOo71F0TKIph0k0DRIaXgbEOBAKFj4T4BdPeGMcgujd8
-         WBbA==
-X-Gm-Message-State: AOJu0YzjQYdz9Wz+oMRPEGvgRfdvzuhKoQTnl33/+bVFQQ1ANoID8UcP
-	tqpm3Q9kMASy+zyreJUHXuPqfQuRKkyiJVLkw3Fveh147WnVN+Tl7pDf
-X-Gm-Gg: AfdE7cnJllhnM6+1mCbzbTQ2LrJK8LjM4Gukp4C2NsRNAPzQylBmtHP9HzIpxpSpPSM
-	bFKmaiLqOuL7SUcLXG+VQ5oh7XfLI6FpM9+JauDqp1H7d8pw+kPY2iLxnODHN5tky7CowB4RhvW
-	c8JUNhxcvMFOAwpyYwdBmp24Hmx8qC6qvvBxT37OyoUKsqSPuSuAxFyA6umssrHzfaHxDztRCH8
-	vtS9sl0tog3Yl+edDccWqe5K2zyuRONEK0nCMEJNyOXq2Z5gy3zIZNlx9DUqBQ8Wwn+ltEqa5hX
-	TrgXp2RnIN1N/CsDbuXAYfajyNtPgjWnUMOuH2e6+PAzlwpDK/T9iEdv1B1RUPthIJZ1jvTjkhs
-	1nL+1RdBhZpChRqHzWwSQFnD4IPeRpFrN0PgZRDkHJVYLr3jJpTUXWJwFHqdVLyOOF2scPiJoIp
-	FuwqFWwoGNHbRNTn7IZHGqT150IBRCmyP/Co4Ej+oqjd6bOpSyweh2wM7vOuYNXH6Yog==
-X-Received: by 2002:a05:690c:9989:b0:80e:3d45:5206 with SMTP id 00721157ae682-81dbe755af8mr77147287b3.18.1783631911671;
-        Thu, 09 Jul 2026 14:18:31 -0700 (PDT)
-Received: from gmail.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-81e6be904a4sm29435337b3.7.2026.07.09.14.18.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2026 14:18:30 -0700 (PDT)
-Date: Thu, 09 Jul 2026 17:18:30 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Anton Danilov <littlesmilingcloud@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, 
- Willem de Bruijn <willemb@google.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
- Kuniyuki Iwashima <kuniyu@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- linux-kselftest@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.159e777649f4a@gmail.com>
-In-Reply-To: <alAAXv60KUZ9KYx1@dau-home-pc>
-References: <cover.1783372173.git.littlesmilingcloud@gmail.com>
- <5372ccac062193147e02b991d5328a5c3fa3a85a.1783372173.git.littlesmilingcloud@gmail.com>
- <willemdebruijn.kernel.2a3e532d3c28f@gmail.com>
- <alAAXv60KUZ9KYx1@dau-home-pc>
-Subject: Re: [PATCH net-next v6 1/2] udp: fix encapsulation packet resubmit in
- multicast deliver
+        bh=+T7RxQXDP6VavQCmW76B4jR7UdEawZb+uP1OIxEgxgI=;
+        b=I/AC7n9NZwIrshq1X2oq6rJw23aRzt+gRNs+3I1wxApNoS5dfdOuP2WFz17StwZ+G9
+         u2IgjdFv3hpjXvylcoHw5zdE9YkGQk/at64KtkNSNsZh+jPK9q7M1uDA6y1cWoqo44PC
+         Q2uX3llAmutUfZKoU7BjU4zg669l+QZ3ArwBMxY5RELghz6BaHxaxys6kzzJ37kqlkhK
+         D1w4GEZiYiBeudhDprl5+xbar1Tl6Dvh4vWhGXLJRNT+PBcqNQfITIznT6ghAewWsx+X
+         tzOZhoyUI2w4q+iofzCoo6l3OvHqpYfYUtvFe8N740DnMbsWUnNChN4DI6TA2MokLAB4
+         Xk+w==
+X-Gm-Message-State: AOJu0YyCo37QdF/2dMXxfdRCKu6450k6iStKTPpZsSeU8vNxVv2gyASW
+	FU4oG0TvU7U9ZmjkT80hzLAmqZOnUtk7PWwNJ6X+oH1g9/uJUEDnxGr1hppgyrJt+BY2oKdhg33
+	docazm+3B7cRWK1/i8aZevbEIMBoNPEVSyF1UQoccaGMTTrrqFVIY4EdaFTZDLRvfOq7YxWkm0o
+	k3Nhcg48okY7KhS7s8Edo2Wstytu60CQwwzQV40hg4s0S8G6JDqza0Xgmi4EYx76Q=
+X-Received: from pgmj15.prod.google.com ([2002:a63:594f:0:b0:c96:9e6a:6261])
+ (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a20:918c:b0:3bf:63af:859 with SMTP id adf61e73a8af0-3c0bd0f8fd3mr10854302637.45.1783631948380;
+ Thu, 09 Jul 2026 14:19:08 -0700 (PDT)
+Date: Thu,  9 Jul 2026 21:19:06 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+X-Mailer: git-send-email 2.55.0.795.g602f6c329a-goog
+Message-ID: <20260709211906.3322883-1-hramamurthy@google.com>
+Subject: [PATCH net v2] gve: fix Rx queue stall on alloc failure
+From: Harshitha Ramamurthy <hramamurthy@google.com>
+To: netdev@vger.kernel.org
+Cc: joshwash@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	willemb@google.com, jordanrhee@google.com, nktgrg@google.com, 
+	maolson@google.com, thostet@google.com, csully@google.com, bcf@google.com, 
+	maciej.fijalkowski@intel.com, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org, Eddie Phillips <eddiephillips@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306381-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:littlesmilingcloud@gmail.com,m:willemdebruijn.kernel@gmail.com,m:netdev@vger.kernel.org,m:willemb@google.com,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:kuniyu@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:linux-kselftest@vger.kernel.org,m:willemdebruijnkernel@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:joshwash@google.com,m:hramamurthy@google.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:willemb@google.com,m:jordanrhee@google.com,m:nktgrg@google.com,m:maolson@google.com,m:thostet@google.com,m:csully@google.com,m:bcf@google.com,m:maciej.fijalkowski@intel.com,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:eddiephillips@google.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306382-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[google.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E95E5735CA9
+X-Rspamd-Queue-Id: 7C3A3735CAE
 
-Anton Danilov wrote:
-> On Wed, Jul 08, 2026 at 09:24:10PM -0400, Willem de Bruijn wrote:
-> > This helps the case of one encap_rcv socket in the multicast receiver
-> > group, so is a useful fix on its own.
-> > 
-> > But is Sashiko correct that this would still leave the same issue for
-> > other sockets in the group? If so, something to address in this series
-> > or leave for later?
-> > 
-> > Might be worthwhile to extend the test to capture that case too.
-> 
-> The clone loop is not reachable for encapsulation sockets, so there is
-> no remaining gap.
-> 
-> FOU/GUE tunnel sockets are created via udp_sock_create() /
-> setup_udp_tunnel_sock() and do not set SO_REUSEADDR or SO_REUSEPORT.
-> Without either, a UDP socket cannot share its port, so an encap socket
-> is always the only socket bound to its port. In
-> __udp[46]_lib_mcast_deliver() it is therefore always delivered as
-> 'first', and the clone loop -- which handles the second and subsequent
-> sockets in the group -- never runs for it. The positive (resubmit)
-> return from udp_queue_rcv_skb() only happens for encap sockets; plain
-> UDP sockets return 0 or a negative value there. So the resubmit case
-> in the clone loop cannot occur.
-> 
-> For the same reason a selftest cannot exercise it: a second socket
-> cannot bind to the FOU port.
-> 
-> If useful, I can add a brief comment above the clone loop documenting
-> why no resubmit is needed there.
+From: Eddie Phillips <eddiephillips@google.com>
 
-Thanks for that context. No need to respin for that.
+When the system is under extreme memory pressure, page allocations can
+fail during the Rx buffer refill loop. If the number of buffers posted
+to hardware falls below a critical low threshold and the refill loop
+exits due to allocation failures, the queue can stall:
+
+1. The device drops incoming packets because there are no descriptors.
+2. Since no packets are processed, no Rx completions are generated.
+3. Because no completions occur, NAPI is never scheduled, preventing
+   the refill loop from running again even after memory is freed.
+
+This results in a permanent queue stall.
+
+Resolve this by introducing a starvation recovery timer for each Rx queue.
+If the number of buffers posted to hardware falls below a critical low
+threshold, start a timer to periodically reschedule NAPI. Once NAPI runs
+and successfully refills the queue above the threshold, the timer is
+not rescheduled.
+
+The threshold is set to 32 because a single maximum-sized Receive Segment
+Coalescing (RSC) packet can consume up to 19 descriptors in the Rx path.
+Lower thresholds (such as 8 or 16) would be insufficient to process a
+complete maximum-sized RSC packet, risking packet drops or unexpected
+hardware behavior under memory pressure. Setting the threshold to 32
+guarantees a safe margin to handle at least one full RSC packet.
+
+Cc: stable@vger.kernel.org
+Fixes: 9b8dd5e5ea48 ("gve: DQO: Add RX path")
+Reviewed-by: Jordan Rhee <jordanrhee@google.com>
+Signed-off-by: Eddie Phillips <eddiephillips@google.com>
+Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+---
+Changes in v2:
+- Link to v1: https://lore.kernel.org/netdev/20260701005341.3699161-1-hramamurthy@google.com/
+- Relocated the starvation timer to the end of gve_rx_ring to avoid polluting
+hotpath cachelines
+- Decoupled timer lifecycle from allocation cycles by moving initialization
+and shutdown to start/stop pathways instead of setup/remove pathways.
+- Added explicit rationale for the 32-descriptor threshold
+(GVE_RX_BUF_THRESH_DQO) ensuring it is safe for maximum-sized RSC packets.
+- Removed addition of a stat tracking critical low buffer events
+
+ drivers/net/ethernet/google/gve/gve.h        |  3 +++
+ drivers/net/ethernet/google/gve/gve_rx_dqo.c | 34 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 37 insertions(+)
+
+diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
+index 2f7bd330..bdd53d08 100644
+--- a/drivers/net/ethernet/google/gve/gve.h
++++ b/drivers/net/ethernet/google/gve/gve.h
+@@ -13,6 +13,7 @@
+ #include <linux/netdevice.h>
+ #include <linux/net_tstamp.h>
+ #include <linux/pci.h>
++#include <linux/timer.h>
+ #include <linux/ptp_clock_kernel.h>
+ #include <linux/u64_stats_sync.h>
+ #include <net/page_pool/helpers.h>
+@@ -41,6 +42,7 @@
+ 
+ /* Interval to schedule a stats report update, 20000ms. */
+ #define GVE_STATS_REPORT_TIMER_PERIOD	20000
++#define GVE_RX_NAPI_RESCHED_MS 20 /* msecs */
+ 
+ /* Numbers of NIC tx/rx stats in stats report. */
+ #define NIC_TX_STATS_REPORT_NUM	0
+@@ -341,6 +343,7 @@ struct gve_rx_ring {
+ 	struct xdp_rxq_info xdp_rxq;
+ 	struct xsk_buff_pool *xsk_pool;
+ 	struct page_frag_cache page_cache; /* Page cache to allocate XDP frames */
++	struct timer_list starvation_timer; /* for queue starvation recovery */
+ };
+ 
+ /* A TX desc ring entry */
+diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+index 02cba280..8271f731 100644
+--- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
++++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+@@ -18,6 +18,16 @@
+ #include <net/tcp.h>
+ #include <net/xdp_sock_drv.h>
+ 
++static void gve_rx_starvation_timer(struct timer_list *t)
++{
++	struct gve_rx_ring *rx = timer_container_of(rx, t, starvation_timer);
++	struct gve_priv *priv = rx->gve;
++	struct gve_notify_block *block;
++
++	block = &priv->ntfy_blocks[rx->ntfy_id];
++	napi_schedule(&block->napi);
++}
++
+ static void gve_rx_free_hdr_bufs(struct gve_priv *priv, struct gve_rx_ring *rx)
+ {
+ 	struct device *hdev = &priv->pdev->dev;
+@@ -120,6 +130,7 @@ void gve_rx_stop_ring_dqo(struct gve_priv *priv, int idx)
+ 
+ 	if (rx->dqo.page_pool)
+ 		page_pool_disable_direct_recycling(rx->dqo.page_pool);
++	timer_shutdown_sync(&rx->starvation_timer);
+ 	gve_remove_napi(priv, ntfy_idx);
+ 	gve_rx_remove_from_block(priv, idx);
+ 	gve_rx_reset_ring_dqo(priv, idx);
+@@ -208,8 +219,10 @@ static int gve_rx_alloc_hdr_bufs(struct gve_priv *priv, struct gve_rx_ring *rx,
+ void gve_rx_start_ring_dqo(struct gve_priv *priv, int idx)
+ {
+ 	int ntfy_idx = gve_rx_idx_to_ntfy(priv, idx);
++	struct gve_rx_ring *rx = &priv->rx[idx];
+ 
+ 	gve_rx_add_to_block(priv, idx);
++	timer_setup(&rx->starvation_timer, gve_rx_starvation_timer, 0);
+ 	gve_add_napi(priv, ntfy_idx, gve_napi_poll_dqo);
+ }
+ 
+@@ -365,6 +378,7 @@ void gve_rx_post_buffers_dqo(struct gve_rx_ring *rx)
+ 	struct gve_rx_compl_queue_dqo *complq = &rx->dqo.complq;
+ 	struct gve_rx_buf_queue_dqo *bufq = &rx->dqo.bufq;
+ 	struct gve_priv *priv = rx->gve;
++	u32 num_bufs_avail_to_hw;
+ 	u32 num_avail_slots;
+ 	u32 num_full_slots;
+ 	u32 num_posted = 0;
+@@ -400,6 +414,26 @@ void gve_rx_post_buffers_dqo(struct gve_rx_ring *rx)
+ 	}
+ 
+ 	rx->fill_cnt += num_posted;
++
++	/* If the queue has fewer than GVE_RX_BUF_THRESH_DQO descriptors
++	 * visible to the hardware, the hardware is in danger of starving
++	 * and cannot trigger interrupts.
++	 *
++	 * We use a threshold of 32 because a single maximum-sized RSC
++	 * packet can consume up to 19 descriptors in the Rx path. Lower
++	 * thresholds (e.g., 8 or 16) would be unsafe as they could cause
++	 * the device to drop/stall on a maximum-sized RSC packet.
++	 *
++	 * Start the timer to periodically reschedule NAPI and recover.
++	 */
++	num_bufs_avail_to_hw =
++		((bufq->tail & ~(GVE_RX_BUF_THRESH_DQO - 1)) -
++		 bufq->head) & bufq->mask;
++
++	if (num_bufs_avail_to_hw < GVE_RX_BUF_THRESH_DQO) {
++		mod_timer(&rx->starvation_timer,
++			  jiffies + msecs_to_jiffies(GVE_RX_NAPI_RESCHED_MS));
++	}
+ }
+ 
+ static void gve_rx_skb_csum(struct sk_buff *skb,
+-- 
+2.55.0.795.g602f6c329a-goog
+
 
