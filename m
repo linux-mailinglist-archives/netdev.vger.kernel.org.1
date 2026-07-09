@@ -1,64 +1,76 @@
-Return-Path: <netdev+bounces-306174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306175-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id fHDfHjh6T2oMhwIAu9opvQ
-	(envelope-from <netdev+bounces-306174-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:38:48 +0200
+	id uo4oMr1/T2r+iAIAu9opvQ
+	(envelope-from <netdev+bounces-306175-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:02:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 105C172FB57
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:38:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEE54730005
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:02:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mandelbit.com header.s=MBO0001 header.b=z74GkJIz;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306174-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306174-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=realtek.com header.s=dkim header.b=IlaLYaM4;
+	dmarc=pass (policy=none) header.from=realtek.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306175-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306175-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 53417302F3BC
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 10:36:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4DE8A319D1DA
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 10:36:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0B01406281;
-	Thu,  9 Jul 2026 10:35:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81CB840759F;
+	Thu,  9 Jul 2026 10:35:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-b-112.mailbox.org (mout-b-112.mailbox.org [195.10.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36DC03FAE10
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 10:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8841E407CFC;
+	Thu,  9 Jul 2026 10:35:24 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783593321; cv=none; b=dCGSVctSsa/z/HU0Nm05BW1vNryU8Om4V1QjNaBqjntQanSGFnozM6FMeZgWZxC/dcVBMIEzVkkCWwF2zQiqFT+eykguGTptFK62b3S1TjV2K03l/BVh3HLsa936mGSHYfOW+DA81mb+4z6XoYRvhR5utaSG4bhwuE/2nAAOn/4=
+	t=1783593326; cv=none; b=VKedQa0GsjAPOJKqPhv1jzjYws3ZVgIq9p1HcASNsDCw0CRKl8zsK0cZjszfKwGyM1TPd6SsHMKE1GzTrP+0UQEKVlEo1sZZqp8zJDJC3v9KDxwL/fa/qRYuHa7BpeWFHXs5WrZJka6eieMIacdJWTfCRrEH0/Hr9HN9mhbfSOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783593321; c=relaxed/simple;
-	bh=p1kjbhdT6N3Q9NUC7Rx1mS/UfL+53xtmvDuoLjwn3DU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fYgpiA4z2st+Z5wpEpvZGx9k6uWQnMBcnVAHni9kRcAL9sEDcjDu1lXD2gz7L2LvXhlTreJ91cz+HNzOccP1jkZbmJWx9yeh1WdJAXum5S2VdKJTM0B7tjCcxXv56WdsL2QAgNoqGIhZ5LnRs0bQaJDwRcwfOTG5VKT949QWk9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com; spf=pass smtp.mailfrom=mandelbit.com; dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b=z74GkJIz; arc=none smtp.client-ip=195.10.208.42
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA512)
-	(No client certificate requested)
-	by mout-b-112.mailbox.org (Postfix) with ESMTPS id 4gwrmB00Vvz5wk3;
-	Thu, 09 Jul 2026 12:28:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandelbit.com;
-	s=MBO0001; t=1783592938;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=jmFWoFrPowpEJzbuNxET6ZuMs1aM0FuNyRi2737QkK0=;
-	b=z74GkJIzy+oQd0qtm2tC5U8txbvp9aZ0XYISTnEplxlxyoTe45Zs3Umy/yhtaz0M14G2XD
-	jZh6UBQtOu7JYY8wqkZ8TvxMZcFz6pEUgPyKNZf7bX4fhJrBSwSg47jHoOAgKi5NfzsDYX
-	nbMM7jUqwAfwlMRhb1mXq2xwaXGbBvKNNspZbaBbY/3UPceN30f8bT53o4ZpIGRD1eW3B8
-	y1bV48wyU/ZjKsWYF4EQ23djoxnPZ9dAdHk4cbphHLS3EYqxGYTFvTwczM4HMskVw/Wz8O
-	H71A0SW9fGaN3TePGc219GtPZyt5VDUHrA0OoHFIAejxfqOO1Vvqo/S8T3Nggg==
-From: Marco Baffo <marco@mandelbit.com>
-To: netdev@vger.kernel.org
-Cc: David Ahern <dsahern@kernel.org>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Antonio Quartulli <antonio@openvpn.net>,
-	Marco Baffo <marco@mandelbit.com>
-Subject: [PATCH iproute2-next v2] ip: add OVPN device mode support
-Date: Thu,  9 Jul 2026 12:28:19 +0200
-Message-ID: <20260709102819.48809-1-marco@mandelbit.com>
+	s=arc-20240116; t=1783593326; c=relaxed/simple;
+	bh=T1Y62vu2ZHhJDKqhNGFRRkiCxMTg26VdyIso6kwxcUI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MmmGBwW7KtHbKxxoSu/zrn61vBxmVSbUWugBJmKg6QqV3aZ7q5ljXskFRs+PgVPjbnc5faAxLDJholse2y4dZC/H2n9sa+8siJIi5cvnuoE8o4UNX2xxy+pAYn9KzRrL174Q3dLH28TIiWRzlOawODdqZ2kBQwa9IDNgPwPI+Yw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=IlaLYaM4; arc=none smtp.client-ip=211.75.126.72
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 669AYxIqA2991601, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
+	t=1783593299; bh=VoxrNT8BayOuGdFA09LCSb7weOY+l4w15zoWU0H1cZA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=IlaLYaM4dONGqiQ/DkFd4JlN9qb5g5w5qDfr8TsEM0IkBSWFL+4ZNEw1FmCBfZunO
+	 GOxEiVEpXvs8jquJNvKf3IyB6v9gT627uIGbcnESdlMdx+sQhQNPl5pqrbINFx/NM6
+	 wWA0LvXU3AADmRcxOvnT9BLlLb9+giBz+uVqOrKTiVmO1/X7qDt4o5Ez/2fM2JH1J6
+	 Bs4/XjLMoVJgn94nl/sO7w5ns72Rvg6YziTr3DV6Ws1E2E605WIAAcVxy87WwdVgrc
+	 ThHXxTu/cF1gJ49Yur7NNzzi0agvc0UQau3t+4d6Np4wauGf5D8VuZDrMGqz0Yy4nY
+	 ggSchzGeyV8AA==
+Received: from mail.realtek.com (rtkexhmbs04.realtek.com.tw[10.21.1.54])
+	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 669AYxIqA2991601
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 9 Jul 2026 18:34:59 +0800
+Received: from RTKEXHMBS05.realtek.com.tw (10.21.1.55) by
+ RTKEXHMBS04.realtek.com.tw (10.21.1.54) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Thu, 9 Jul 2026 18:34:59 +0800
+Received: from RTKEXHMBS03.realtek.com.tw (10.21.1.53) by
+ RTKEXHMBS05.realtek.com.tw (10.21.1.55) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Thu, 9 Jul 2026 18:34:58 +0800
+Received: from RTDOMAIN (172.21.42.225) by RTKEXHMBS03.realtek.com.tw
+ (10.21.1.53) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
+ Transport; Thu, 9 Jul 2026 18:34:58 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <stable@vger.kernel.org>, <horms@kernel.org>,
+	<richardcochran@gmail.com>, <david.laight.linux@gmail.com>,
+	<aleksander.lobakin@intel.com>, <pkshih@realtek.com>,
+	<larry.chiu@realtek.com>, Justin Lai <justinlai0215@realtek.com>
+Subject: [PATCH net v5] rtase: Workaround for TX hang caused by hardware packet parsing
+Date: Thu, 9 Jul 2026 18:34:56 +0800
+Message-ID: <20260709103456.83789-1-justinlai0215@realtek.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,242 +78,362 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[mandelbit.com:s=MBO0001];
+	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:dsahern@kernel.org,m:stephen@networkplumber.org,m:antonio@openvpn.net,m:marco@mandelbit.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306175-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[mandelbit.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7];
+	FORGED_SENDER(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:stable@vger.kernel.org,m:horms@kernel.org,m:richardcochran@gmail.com,m:david.laight.linux@gmail.com,m:aleksander.lobakin@intel.com,m:pkshih@realtek.com,m:larry.chiu@realtek.com,m:justinlai0215@realtek.com,m:andrew@lunn.ch,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[marco@mandelbit.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-306174-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,lunn.ch,vger.kernel.org,kernel.org,gmail.com,intel.com,realtek.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marco@mandelbit.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[mandelbit.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[realtek.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mandelbit.com:from_mime,mandelbit.com:email,mandelbit.com:mid,mandelbit.com:dkim]
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,realtek.com:from_mime,realtek.com:email,realtek.com:mid,realtek.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 105C172FB57
+X-Rspamd-Queue-Id: CEE54730005
 
-ovpn devices (OpenVPN data channel offload, kernel v6.16) can already
-be created with "ip link add ovpn0 type ovpn", but the mode is always
-left to the kernel default (p2p mode).
+The hardware performs packet parsing before packet transmission.
+Parsing incomplete IPv4, IPv6, TCP, or UDP headers may trigger a TX
+hang because the hardware parser expects additional protocol header
+data that is not present in the packet.
 
-Add ovpn link type support so that point-to-point (p2p) or multi-peer
-(mp) mode can be selected at creation time and shown by
-"ip -d link show".
+The hardware performs additional PTP parsing on UDP packets identified
+by destination ports 319/320 at the expected UDP destination port
+offset.
 
-Example:
+If such a packet has transport data smaller than RTASE_MIN_PAD_LEN,
+the hardware parser expects additional packet data and may trigger a
+TX hang.
 
-  $ ip link add ovpn0 type ovpn mode mp
+To avoid these hardware issues, the driver applies the following
+workarounds.
 
-Signed-off-by: Marco Baffo <marco@mandelbit.com>
+Drop malformed packets that may trigger this hardware issue before
+transmission.
+
+For IPv4 non-initial fragments, the hardware does not check the
+fragment offset before parsing the expected transport header location.
+As a result, these packets are still subject to transport header
+parsing even though they do not contain a transport header. If the
+transport data is shorter than the minimum transport header required
+by the hardware parser, pad the transport data to the minimum
+transport header length required by the hardware parser. Packets that
+also match the hardware PTP parsing conditions continue to follow the
+corresponding workaround.
+
+For IPv6 fragmented packets, neither of the above hardware issues
+occurs because the hardware only continues packet parsing when the
+IPv6 Base Header Next Header field directly indicates UDP. Packets
+carrying a Fragment Header do not continue through the subsequent
+packet parsing stages.
+
+For packets identified for hardware PTP parsing, pad the transport
+data so it reaches RTASE_MIN_PAD_LEN before transmission.
+
+Fixes: d6e882b89fdf ("rtase: Implement .ndo_start_xmit function")
+Cc: stable@vger.kernel.org
+Signed-off-by: Justin Lai <justinlai0215@realtek.com>
 ---
+v4 -> v5:
+- Drop packets that may trigger a TX hang during hardware packet
+  parsing.
+- Pad IPv4 non-initial fragments when the transport data is shorter
+  than the minimum transport header required by the hardware parser.
 
-Changes in v2:
-- Created a mode table to use for both parsing and printing.
-- Used strcmp() instead of matches().
+v3 -> v4:
+- Derive the L3 protocol and network offset from Ethernet/VLAN
+headers instead of relying on vlan_get_protocol().
+- Reject malformed packets when the computed UDP offset exceeds
+skb->len.
 
- ip/Makefile           |  2 +-
- ip/iplink.c           |  2 +-
- ip/iplink_ovpn.c      | 92 +++++++++++++++++++++++++++++++++++++++++++
- man/man8/ip-link.8.in | 24 +++++++++++
- 4 files changed, 118 insertions(+), 2 deletions(-)
- create mode 100644 ip/iplink_ovpn.c
+v2 -> v3:
+- Remove dependency on skb_transport_header_was_set().
+- Determine UDP header offset from IPv4/IPv6 headers.
+- Use skb_header_pointer() for UDP header access.
+- Add non-linear skb handling.
 
-diff --git a/ip/Makefile b/ip/Makefile
-index 3535ba78..978f6841 100644
---- a/ip/Makefile
-+++ b/ip/Makefile
-@@ -13,7 +13,7 @@ IPOBJ=ip.o ipaddress.o ipaddrlabel.o iproute.o iprule.o ipnetns.o \
-     ipvrf.o iplink_xstats.o ipseg6.o iplink_netdevsim.o iplink_rmnet.o \
-     ipnexthop.o ipmptcp.o iplink_bareudp.o iplink_wwan.o ipioam6.o \
-     iplink_amt.o iplink_batadv.o iplink_gtp.o iplink_virt_wifi.o \
--    iplink_netkit.o ipstats.o
-+    iplink_netkit.o ipstats.o iplink_ovpn.o
+v1 -> v2:
+- Remove RTASE_SHORT_PKT_THRESH and the packet length check.
+- Check transport data length before parsing the UDP header.
+- Add Fixes tag.
+- Add Cc: stable@vger.kernel.org.
+- Target net tree.
+---
+ drivers/net/ethernet/realtek/rtase/rtase.h    |   8 +
+ .../net/ethernet/realtek/rtase/rtase_main.c   | 197 ++++++++++++++++++
+ 2 files changed, 205 insertions(+)
+
+diff --git a/drivers/net/ethernet/realtek/rtase/rtase.h b/drivers/net/ethernet/realtek/rtase/rtase.h
+index 9bd6872474c1..03b12d83f6e9 100644
+--- a/drivers/net/ethernet/realtek/rtase/rtase.h
++++ b/drivers/net/ethernet/realtek/rtase/rtase.h
+@@ -192,6 +192,12 @@ enum rtase_sw_flag_content {
+ 	RTASE_SWF_MSIX_ENABLED = BIT(2),
+ };
  
- RTMONOBJ=rtmon.o
- 
-diff --git a/ip/iplink.c b/ip/iplink.c
-index 3f0b46c9..c6aee8b6 100644
---- a/ip/iplink.c
-+++ b/ip/iplink.c
-@@ -42,7 +42,7 @@ void iplink_types_usage(void)
- 		"          ifb | ip6erspan | ip6gre | ip6gretap | ip6tnl |\n"
- 		"          ipip | ipoib | ipvlan | ipvtap |\n"
- 		"          macsec | macvlan | macvtap | netdevsim |\n"
--		"          netkit | nlmon | pfcp | rmnet | sit | team | team_slave |\n"
-+		"          netkit | nlmon | ovpn | pfcp | rmnet | sit | team | team_slave |\n"
- 		"          vcan | veth | vlan | vrf | vti | vxcan | vxlan | wwan |\n"
- 		"          xfrm | virt_wifi }\n");
- }
-diff --git a/ip/iplink_ovpn.c b/ip/iplink_ovpn.c
-new file mode 100644
-index 00000000..d3dff295
---- /dev/null
-+++ b/ip/iplink_ovpn.c
-@@ -0,0 +1,92 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * iplink_ovpn.c	OpenVPN DCO device support
-+ *
-+ * Author: Marco Baffo <marco@mandelbit.com>
-+ *
-+ */
-+
-+#include <stdio.h>
-+#include <string.h>
-+#include <linux/if_link.h>
-+
-+#include "utils.h"
-+#include "ip_common.h"
-+
-+static const char * const ovpn_mode_strings[] = {
-+	[OVPN_MODE_P2P] = "p2p",
-+	[OVPN_MODE_MP] = "mp",
++enum rtase_parse_result {
++	RTASE_PARSE_OK,
++	RTASE_PARSE_SKIP,
++	RTASE_PARSE_DROP,
 +};
 +
-+static const char *ovpn_mode_to_str(__u8 mode)
+ #define RSVD_MASK 0x3FFFC000
+ 
+ struct rtase_tx_desc {
+@@ -363,4 +369,6 @@ struct rtase_private {
+ 
+ #define RTASE_MSS_MASK GENMASK(28, 18)
+ 
++#define RTASE_MIN_PAD_LEN 47
++
+ #endif /* RTASE_H */
+diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+index 255667775f0e..4168ad9e48ea 100644
+--- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
++++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+@@ -61,6 +61,7 @@
+ #include <linux/pci.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/prefetch.h>
++#include <linux/ptp_classify.h>
+ #include <linux/rtnetlink.h>
+ #include <linux/tcp.h>
+ #include <asm/irq.h>
+@@ -1252,6 +1253,199 @@ static u32 rtase_tx_csum(struct sk_buff *skb, const struct net_device *dev)
+ 	return csum_cmd;
+ }
+ 
++static enum rtase_parse_result rtase_get_l3_proto(struct sk_buff *skb,
++						  __be16 *proto,
++						  u32 *network_offset)
 +{
-+	if (mode >= ARRAY_SIZE(ovpn_mode_strings) || !ovpn_mode_strings[mode])
-+		return "(unknown)";
++	struct vlan_hdr *vh, _vh;
++	struct ethhdr *eh, _eh;
++	u32 offset = ETH_HLEN;
 +
-+	return ovpn_mode_strings[mode];
-+}
++	eh = skb_header_pointer(skb, 0, sizeof(_eh), &_eh);
++	if (!eh)
++		return RTASE_PARSE_DROP;
 +
-+static void print_explain(FILE *f)
-+{
-+	fprintf(f,
-+		"Usage: ... ovpn [ mode { p2p | mp } ]\n"
-+		"\n"
-+		"MODE := p2p | mp\n"
-+		"(p2p is the default if mode is not specified)\n");
-+}
++	*proto = eh->h_proto;
 +
-+static int ovpn_parse_opt(struct link_util *lu, int argc, char **argv,
-+			  struct nlmsghdr *n)
-+{
-+	while (argc > 0) {
-+		if (strcmp(*argv, "mode") == 0) {
-+			int mode, err;
++	while (eth_type_vlan(*proto)) {
++		vh = skb_header_pointer(skb, offset, sizeof(_vh), &_vh);
++		if (!vh)
++			return RTASE_PARSE_DROP;
 +
-+			NEXT_ARG();
-+			mode = parse_one_of("mode", *argv, ovpn_mode_strings,
-+					    ARRAY_SIZE(ovpn_mode_strings),
-+					    &err);
-+			if (err)
-+				return err;
-+			addattr8(n, 1024, IFLA_OVPN_MODE, mode);
-+		} else if (strcmp(*argv, "help") == 0) {
-+			print_explain(stderr);
-+			return -1;
-+		} else {
-+			fprintf(stderr, "ovpn: unknown option \"%s\"?\n", *argv);
-+			print_explain(stderr);
-+			return -1;
-+		}
-+		argc--;
-+		argv++;
++		*proto = vh->h_vlan_encapsulated_proto;
++		offset += VLAN_HLEN;
 +	}
 +
-+	return 0;
++	*network_offset = offset;
++
++	return RTASE_PARSE_OK;
 +}
 +
-+static void ovpn_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
++static bool rtase_pad_to_transport_len(struct sk_buff *skb,
++				       u32 transport_offset,
++				       u32 pad_to_len)
 +{
-+	__u8 mode;
++	u32 trans_data_len;
++	u32 pad_len;
 +
-+	if (!tb || !tb[IFLA_OVPN_MODE] ||
-+	    RTA_PAYLOAD(tb[IFLA_OVPN_MODE]) < sizeof(mode))
-+		return;
++	trans_data_len = skb->len - transport_offset;
++	if (trans_data_len >= pad_to_len)
++		return true;
 +
-+	mode = rta_getattr_u8(tb[IFLA_OVPN_MODE]);
++	if (skb_is_nonlinear(skb)) {
++		if (skb_linearize(skb))
++			return false;
++	}
 +
-+	print_string(PRINT_ANY, "mode", "mode %s ", ovpn_mode_to_str(mode));
++	pad_len = pad_to_len - trans_data_len;
++	if (__skb_put_padto(skb, skb->len + pad_len, false))
++		return false;
++
++	return true;
 +}
 +
-+static void ovpn_print_help(struct link_util *lu, int argc, char **argv,
-+			    FILE *f)
++static enum rtase_parse_result rtase_get_transport_offset(struct sk_buff *skb,
++							  u32 *transport_offset,
++							  u8 *transport_proto,
++							  u32 *pad_to_len)
 +{
-+	print_explain(f);
++	enum rtase_parse_result ret;
++	struct ipv6hdr *i6h, _i6h;
++	struct iphdr *ih, _ih;
++	bool non_first_frag;
++	__be16 proto;
++	u32 offset;
++	u32 no;
++
++	ret = rtase_get_l3_proto(skb, &proto, &no);
++	if (ret != RTASE_PARSE_OK)
++		return ret;
++
++	switch (proto) {
++	case htons(ETH_P_IP):
++		ih = skb_header_pointer(skb, no, sizeof(_ih), &_ih);
++		if (!ih)
++			return RTASE_PARSE_DROP;
++
++		if (ih->ihl < 5)
++			return RTASE_PARSE_DROP;
++
++		offset = no + ih->ihl * 4;
++		if (offset > skb->len)
++			return RTASE_PARSE_DROP;
++
++		non_first_frag = ntohs(ih->frag_off) & IP_OFFSET;
++
++		if (ih->protocol == IPPROTO_TCP) {
++			if (skb->len - offset < sizeof(struct tcphdr)) {
++				if (non_first_frag) {
++					*transport_offset = offset;
++					*transport_proto = IPPROTO_TCP;
++					*pad_to_len = sizeof(struct tcphdr);
++
++					return RTASE_PARSE_OK;
++				}
++
++				return RTASE_PARSE_DROP;
++			}
++
++			return RTASE_PARSE_SKIP;
++		}
++
++		if (ih->protocol != IPPROTO_UDP)
++			return RTASE_PARSE_SKIP;
++
++		*transport_offset = offset;
++		*transport_proto = IPPROTO_UDP;
++
++		if (skb->len - offset < sizeof(struct udphdr)) {
++			if (non_first_frag) {
++				*pad_to_len = sizeof(struct udphdr);
++
++				return RTASE_PARSE_OK;
++			}
++
++			return RTASE_PARSE_DROP;
++		}
++
++		return RTASE_PARSE_OK;
++
++	case htons(ETH_P_IPV6):
++		i6h = skb_header_pointer(skb, no, sizeof(_i6h), &_i6h);
++		if (!i6h)
++			return RTASE_PARSE_DROP;
++
++		offset = no + sizeof(*i6h);
++
++		if (i6h->nexthdr == IPPROTO_TCP) {
++			if (skb->len - offset < sizeof(struct tcphdr))
++				return RTASE_PARSE_DROP;
++
++			return RTASE_PARSE_SKIP;
++		}
++
++		if (i6h->nexthdr != IPPROTO_UDP)
++			return RTASE_PARSE_SKIP;
++
++		if (skb->len - offset < sizeof(struct udphdr))
++			return RTASE_PARSE_DROP;
++
++		*transport_offset = offset;
++		*transport_proto = IPPROTO_UDP;
++
++		return RTASE_PARSE_OK;
++
++	default:
++		return RTASE_PARSE_SKIP;
++	}
 +}
 +
-+struct link_util ovpn_link_util = {
-+	.id		= "ovpn",
-+	.maxattr	= IFLA_OVPN_MAX,
-+	.parse_opt	= ovpn_parse_opt,
-+	.print_opt	= ovpn_print_opt,
-+	.print_help	= ovpn_print_help,
-+};
-diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
-index fc7f0248..d54d2fbc 100644
---- a/man/man8/ip-link.8.in
-+++ b/man/man8/ip-link.8.in
-@@ -287,6 +287,7 @@ ip-link \- network device configuration
- .BR netdevsim " |"
- .BR netkit " |"
- .BR nlmon " |"
-+.BR ovpn " |"
- .BR pfcp " |"
- .BR rmnet " |"
- .BR sit " |"
-@@ -430,6 +431,9 @@ Link types:
- .BR nlmon
- - Netlink monitoring device
- .sp
-+.BR ovpn
-+- OpenVPN Data Channel Offload device
-+.sp
- .BR pfcp
- - Packet Forwarding Control Protocol device
- .sp
-@@ -1349,6 +1353,26 @@ the following additional arguments are supported:
- .BI  mode " MODE "
- - specifies the mode (datagram or connected) to use.
++static bool rtase_skb_pad(struct sk_buff *skb)
++{
++	enum rtase_parse_result ret;
++	u32 transport_offset;
++	__be16 *dest, _dest;
++	u32 trans_data_len;
++	u32 pad_to_len = 0;
++	u8 transport_proto;
++	u16 dest_port;
++
++	ret = rtase_get_transport_offset(skb, &transport_offset,
++					 &transport_proto, &pad_to_len);
++	if (ret == RTASE_PARSE_SKIP) {
++		return true;
++	} else if (ret == RTASE_PARSE_DROP) {
++		netdev_dbg(skb->dev, "drop malformed packet\n");
++		return false;
++	}
++
++	if (pad_to_len &&
++	    !rtase_pad_to_transport_len(skb, transport_offset, pad_to_len))
++		return false;
++
++	if (transport_proto != IPPROTO_UDP)
++		return true;
++
++	trans_data_len = skb->len - transport_offset;
++	if (trans_data_len < offsetof(struct udphdr, len) ||
++	    trans_data_len >= RTASE_MIN_PAD_LEN)
++		return true;
++
++	dest = skb_header_pointer(skb,
++				  transport_offset +
++				  offsetof(struct udphdr, dest),
++				  sizeof(_dest), &_dest);
++	if (!dest)
++		return true;
++
++	dest_port = ntohs(*dest);
++	if (dest_port != PTP_EV_PORT && dest_port != PTP_GEN_PORT)
++		return true;
++
++	return rtase_pad_to_transport_len(skb, transport_offset,
++					  RTASE_MIN_PAD_LEN);
++}
++
+ static int rtase_xmit_frags(struct rtase_ring *ring, struct sk_buff *skb,
+ 			    u32 opts1, u32 opts2)
+ {
+@@ -1365,6 +1559,9 @@ static netdev_tx_t rtase_start_xmit(struct sk_buff *skb,
+ 		opts2 |= rtase_tx_csum(skb, dev);
+ 	}
  
-+.TP
-+OVPN Type Support
-+For a link of type
-+.I OVPN
-+the following additional arguments are supported:
++	if (!rtase_skb_pad(skb))
++		goto err_dma_0;
 +
-+.BI "ip link add " DEVICE
-+.BR "type ovpn " [ " mode " "{ " p2p " | " mp " }" " ]"
-+
-+.in +8
-+.sp
-+.BR mode " { " p2p " | " mp " }"
-+- selects the OpenVPN device mode. The default,
-+.BR p2p ,
-+creates a point-to-point device for a single peer. The
-+.B mp
-+mode creates a multi-peer device.
-+
-+.in -8
-+
- .TP
- ERSPAN Type Support
- For a link of type
+ 	frags = rtase_xmit_frags(ring, skb, opts1, opts2);
+ 	if (unlikely(frags < 0))
+ 		goto err_dma_0;
 -- 
-2.43.0
+2.40.1
 
 
