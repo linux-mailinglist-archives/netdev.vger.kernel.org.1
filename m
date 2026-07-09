@@ -1,219 +1,260 @@
-Return-Path: <netdev+bounces-306028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306029-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id iKirNLoHT2pzZQIAu9opvQ
-	(envelope-from <netdev+bounces-306028-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 04:30:18 +0200
+	id dqAlFREMT2rkZgIAu9opvQ
+	(envelope-from <netdev+bounces-306029-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 04:48:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FB0172BF1A
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 04:30:18 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FB7F72C256
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 04:48:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=onsemi.com header.s=mimecast20250127 header.b=Duipelcg;
-	dmarc=pass (policy=reject) header.from=onsemi.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306028-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306028-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Eq1nmR65;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306029-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306029-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B865330478E0
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 02:29:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 644413004D9B
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 02:48:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90BF7330337;
-	Thu,  9 Jul 2026 02:29:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEFBA36680C;
+	Thu,  9 Jul 2026 02:48:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from usb-smtp-delivery-120.mimecast.com (usb-smtp-delivery-120.mimecast.com [170.10.153.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED6C2E06E4
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 02:29:40 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783564182; cv=none; b=PKFRTj94u6U/O4aCd6Ffg3swTqRoTqfat7XeYvHrvQmLxLFMQd0Bum309lKzWzHj3P05YxRCgh3sl4Xg0rM79MutXjV0bXMPRrCHZ/L4FeELZStXmRWKanEf7cYSfbA5U0bbuKfch23yBFYsJLzsjxVqAOlwSoVldmWe+LExhtk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783564182; c=relaxed/simple;
-	bh=h7ixAFmKcgZptEaFgwYIMwhx22MwAhDKeNBxTwFO+gk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=FhHPKDFgAeYGpICqiIE6gpoAoBRn9ZsE8im4Wc8zx9OItZlUEAMBX9vVo1MhhazkE9qacc0AED9G2Xl7F6Vp6oH/urwd2gtXf/mBZKss8GxYVmmLYTVS0S0f/EmAwXF1jLxJm8bOcTyDU3xju2GnlsF9uq0pFgY1yyemUn6Acd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com; spf=pass smtp.mailfrom=onsemi.com; dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b=Duipelcg; arc=none smtp.client-ip=170.10.153.120
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onsemi.com;
-	s=mimecast20250127; t=1783564180;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h7ixAFmKcgZptEaFgwYIMwhx22MwAhDKeNBxTwFO+gk=;
-	b=DuipelcgW0J7slaGL0HMXjByWyBK7qGVRFrnXjhxKLolub/8zO+ibffoYssiQ/pqRY2UaE
-	UNBfbVaJ4cJCFOS8zNZvsCiH1w4+e/fuPiwT6+smI9QfCgNg0HLnjyJgFPIhRgNit/lACF
-	1mixe+A3ECByXI9DSMFx4c9SqIc3ZkMq7Zadcp1HSb58KYU+Bve+KAvR0zeJyQiDbLKEOz
-	KvLVW1NhGyeuoQgkF4zVHYzlCHx8nesOQ6YWWjt4lCiR2JMDIDTgvEUSeIr6wBDpzRzhgO
-	31WLwUG6Z0iH6x4nbwYv7yJpzmGOAQN2eJKyGgKTcFqbftP6Aj/b99kT79E8Mw==
-Received: from DM5PR21CU001.outbound.protection.outlook.com
- (mail-centralusazon11011044.outbound.protection.outlook.com [52.101.62.44])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id usb-mta-10-v36LDFo5NyKphKHIYueCfQ-1; Wed,
- 08 Jul 2026 19:29:34 -0700
-X-MC-Unique: v36LDFo5NyKphKHIYueCfQ-1
-X-Mimecast-MFC-AGG-ID: v36LDFo5NyKphKHIYueCfQ_1783564168
-Received: from CYYPR02MB9828.namprd02.prod.outlook.com (2603:10b6:930:b8::20)
- by BN0PR02MB7917.namprd02.prod.outlook.com (2603:10b6:408:160::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.15; Thu, 9 Jul
- 2026 02:29:27 +0000
-Received: from CYYPR02MB9828.namprd02.prod.outlook.com
- ([fe80::2767:f7d2:778c:8dca]) by CYYPR02MB9828.namprd02.prod.outlook.com
- ([fe80::2767:f7d2:778c:8dca%4]) with mapi id 15.21.0181.009; Thu, 9 Jul 2026
- 02:29:27 +0000
-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-To: "ciprian.regus@analog.com" <ciprian.regus@analog.com>, Parthiban
- Veerasooran <parthiban.veerasooran@microchip.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
-	<corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, Andrew Lunn
-	<andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
-	<linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
-	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
-Subject: RE: [PATCH net-next v5 10/13] net: phy: add generic helpers for
- direct C45 MMD access
-Thread-Topic: [PATCH net-next v5 10/13] net: phy: add generic helpers for
- direct C45 MMD access
-Thread-Index: AQHdDmHokZwNZhTmyEi12dE3JLi4pLZkd5Zw
-Date: Thu, 9 Jul 2026 02:29:26 +0000
-Message-ID: <CYYPR02MB9828A0F83559EF025D01A14C83FE2@CYYPR02MB9828.namprd02.prod.outlook.com>
-References: <20260708-adin1140-driver-v5-0-4aca7b51a58b@analog.com>
- <20260708-adin1140-driver-v5-10-4aca7b51a58b@analog.com>
-In-Reply-To: <20260708-adin1140-driver-v5-10-4aca7b51a58b@analog.com>
-Accept-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CYYPR02MB9828:EE_|BN0PR02MB7917:EE_
-x-ms-office365-filtering-correlation-id: ea9e8d8c-2f13-49cc-b343-08dedd61e5cb
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|7416014|376014|23010399003|1800799024|921020|38070700021|18002099003|22082099003|6133799003|56012099006|4143699003|11063799006
-x-microsoft-antispam-message-info: OAZxQLv4TukccaRUtc9+mcsyCHTvPE0dfQYRmkiRyZrXNSJYQFt/9zrvVu2W8IPJfxbuP0BNwmeqyYVlUWz2Ek/kLJUSJciNNyTHcVDJj1eihlkgK4xcdwJ8/qd5EKEP3YTBrNCRW2g5SCfBhF9a4TRdwddgYe2AfVJl5SsbAmRoVM1KKTekfxJZh6vHpGedBWmOhRGc50sUfBqVHtLuI1JV1HoBgNFBVo4TA+WxbWReP5VXkAVuseIhavrA+V009+pcEkav0GlsWxblZrnReLr9NVhvtcORHbsIxjx1GNiOX4HcMgqY41M0WgQ6RgY8ttv9P4YySjr4qr7Km7DMTAU7OGzYFRlsGHYd5lauAPMw49t5VuKLz2pjmylyAiV/1UqwdhcBk1ehIER/Y0cgPldAO5R+35mWHox8w+JQV/5u7zZayPYzADIGoCAFit2kxBd4OE97XEvb+cA/IV3dBBMwUhSKAUvAIdOgTm0QRHPRgrwPDtnTSKAKfhDCsPCnlUX2zYNExbNEWnfOCL14Q3qinUZeM6KioDMlQ3HZ2+0V9zBhXU7V49k1lycloe0bt3S1i9nuzvql/K3F9tioZsZUDlnS0nMZ78KCQMa3ABmei1iMkznp424nhfQeTAz7wLbODBmj0EJTemeql9coaaUIspQXVDxfbtf7igUSmSIlel/W6vEcv/MAvMUmcWxKF/suRZXqqsp0G0/HT6Xm7zvRD1P4/IiuskjXFc/JemJEGZl1fbUW3gENF+t2SHnc
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR02MB9828.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(23010399003)(1800799024)(921020)(38070700021)(18002099003)(22082099003)(6133799003)(56012099006)(4143699003)(11063799006);DIR:OUT;SFP:1101
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?T3Y5dTlKeE1GZTZiYXo4OFI2V09rdmhuSzNlRnJ3RVQycGNNc3RGK3BBUCtV?=
- =?utf-8?B?bHVPeE1aZEpFR3lWb0ppcjlGejNVSEkrUVEwWkcrTDF6cXhHSG1jTHJMZVZa?=
- =?utf-8?B?RFRDNTBhTUVoSTFEcmdoc1pjMnlYbnlDWllvMWREK3FaY1pGSzdJbWlYbS9H?=
- =?utf-8?B?WVN5Q1pVNU5jWGVzR0srczR2eTR0Yi83bnRTd2F6UXdZZE9qNG1aWlFPbUcz?=
- =?utf-8?B?WVU3bzNOS3ZPU3RsZzZNck1QcmcweFVac1RtbHd5NnYwcFlmeEpzanpCSXZy?=
- =?utf-8?B?TGtZUkptV0x3Y205cVdTTjBjTW5Oa0puaGZGU1U1NzRkcGZFSjJ1K2NvRzc4?=
- =?utf-8?B?a2hCUzhWSGZJUk55eWl6SElibm1oRkVKUDdDYnBURTRmRXp1S1ZZUXJWSzI4?=
- =?utf-8?B?bTFvcHJhR3c2Zi9XRmhMUGthZk1xWUM4b0svQUVBYW9WQklNMCs0cTlabHZH?=
- =?utf-8?B?c2wvVVJSNm1QUGtySGowWE5qZ0gzZUpndEpCU0crWnhQVy9hZkwrczcvOC8x?=
- =?utf-8?B?Tkd2QWhVZU1NZ21pajdEelJ6b2dtdWtSRUlqQXhiaXYyVFZ6VmhBYnZBSzhS?=
- =?utf-8?B?Z0lvTHlhR1ZaTnJZaGRpTEJHaFZzUnp0eEdkeUZ2T1VCNGtSVm83c3BSU3dZ?=
- =?utf-8?B?TVcrRm95cVBaeTV2SGRacktTd2V1bC9ObjFrSk1McGZsMllxdVFMNUFXeHdz?=
- =?utf-8?B?TStuTDljeFFUanN6QlhhZDY3cjI3aTRua3JmMFpKcDlmVDhUTFQ4N1Z0VW9k?=
- =?utf-8?B?YVVydUZiblJwQjlZNVRmOVBmL0MyaDRKeWVBckFwdlpYZjNKVU5yNVFCYmg3?=
- =?utf-8?B?bXNPd1FpNVphT2FSOUsxUkV0M1RDS1NtMnJlTGFVWW1ab0xQampKT1pmTCtF?=
- =?utf-8?B?aEU1OWxzU0QzNkFWbzhGWkNTZVA0ZFFldWJ2UjFwMjUyanVhQmNkQ2VMMk5H?=
- =?utf-8?B?TjNicHNqNGhqdTBpQ0lEM3VMQWdEdlltK0VpMUdnYWQrU3paSVJtWlFpMHhp?=
- =?utf-8?B?SjJsekF2MTBoNCs5cG1FVjNGYnFBYzVmZjZJVkZKV0l0TjJJZytBYUZqb1gw?=
- =?utf-8?B?TUhUaTdBbjg5anZxeEluYzgvZnZHb1JjTnVWUlRtMkZ2b2xxSnAxWnpFQ1c5?=
- =?utf-8?B?SkF0QU15MW1zcW5IakZyNU82d1ZHVzlaV051R3djczZCWlVRWE5rT3RMcG1G?=
- =?utf-8?B?UjlCQVBjaFZCZmdQYVVKZXkxUjd6MW5PcWJ6WTVOVU5EUFBpRERDSmQzKzNn?=
- =?utf-8?B?REpqYXhZcnRjTUxrbGYwTEd0ZmppRzRkRzBVTTdvcmNxL3p3dmpWQVdmOEts?=
- =?utf-8?B?TW53amsyOVI5MXZ5MzAxVWw4YU4xY1J2Tkoza1dsTm5WcU41NW9oL0Jybmgr?=
- =?utf-8?B?YWl5RWR6cTJkcENqSkEwS29lTldpb3B5bGVDYWFDK1BKR0dnaG04R1cwRUJC?=
- =?utf-8?B?bTRxbzAxeU5NZVQyRUZsZWhCYzJXYi8va3pXbEI3YVEydngzOHg1L0d0cFo3?=
- =?utf-8?B?aFRZc1BlRVdONjNndTFjSWNNSW9uNmRnMjFnTlFpbDQxcm44dzJxc3RqUmVw?=
- =?utf-8?B?T3RiQXowMHlCdEVQOEVRQVFlSVJtb09nckxsSjFqUzBvZnhPY1p3bHFNdFVl?=
- =?utf-8?B?dVRMbVhhYXBOUExzNXVrKzJYSEdQQVFET2IwV0JOdUhPaE05MW82aURtU3Ix?=
- =?utf-8?B?Vzg2dEJGdkdQd2pmQXhDTlM1YjBVbWt4eHVyL2RuMldIbVFYREtjR3ZyS2Rh?=
- =?utf-8?B?Zm5oNFBaN0hpeklaRGt3ams4UFZlVHRjaGp0eFZaOTlUTi9KUWUySGlEVEh3?=
- =?utf-8?B?NHgwb1BxaHBqVm1uMlVjVkVsMkRtV1JzSG80YTQrRUJFdmVXaFhpYVZUVm5Q?=
- =?utf-8?B?ZFpmckJPbVVLWVY0S3VWZzdNcW9mSFhMQ1hIUFJsbEdlL05zUks0b1RndENG?=
- =?utf-8?B?ay8xNndJRnlSV1p6NnFkTW4wTDZlSXY1ZDBDNUxLUUZIUnR4a3h5bm9qY0lP?=
- =?utf-8?B?QjJicWU3eExRSXhtTUhTUVRsbjMvRXdEUGtGSTQ2cXlJcnBZSG96N01LOHVj?=
- =?utf-8?B?OWg1UWtpU3ZUbHhrTmEyeXZHOFdNMUVIM211WWZWLzVyZFp1c1haNy9DVDhu?=
- =?utf-8?B?TGd0a2IxRmtGZHczNHNZam9HUTZpU09RaXJFQkwzTFJ0N094a2J6VFdJN1d5?=
- =?utf-8?B?MjluWDB2ai81VkY0MFdJSTZBOVpQRDB5L1pPbUdSWllVR1lhM3VJelRuZmla?=
- =?utf-8?B?TDJab0JlY0haVkZuT2kxbUJpU0xiTCtNVkxGNi9td0VHOG5waHRzWmNCdzFz?=
- =?utf-8?B?NHB6cXdKNG1MeUJRU2ZIREI1Q2lza3hFbVRWUGNNRmMxOWFBRTRUSm15eE9u?=
- =?utf-8?Q?meVj+lKBpoKlT39g=3D?=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2CB53655F1
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 02:48:15 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783565298; cv=pass; b=dDC7xS0qdBHTSYea4kJ+JCtwjSNv/Zmp1zrZDgB8euJ+wLO8tWhPuimXmPO1uATXEHiPEJCS2FI7jWIDyCa+g/7g7NWwLR/4coHWZUSkxObxCHj/N37YnXijteHXxr8mHKm5EoEebS9bi5Mj4lSkIoFCnFBPQu41Ba06bsk9vpM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783565298; c=relaxed/simple;
+	bh=97Y5G3bemZJPx1xBDJhKVeFxaQdRimz6xlQijZv/PXc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ad8Pk7KVLRmGD+QTE5JjWy6JtYPNr/oBk9ETeuanx4n+vy/NYSzMayjhlXnQ/ETQNYA76t1hikXkqn79e8bCOProB6VXnFSg6ST/iFTUFa/mKp5KHUz2hw6krMW/MXMroBpdg6QLXq9iFOXOfgmwQlb0MQz+fakWuC8xNmOpzKQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Eq1nmR65; arc=pass smtp.client-ip=209.85.208.54
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-693c51a8a19so597332a12.3
+        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 19:48:15 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783565293; cv=none;
+        d=google.com; s=arc-20260327;
+        b=c/+J8eSiMQ/FYtNjciMmlW+XZ+U8w19RihUa3KL5jn8O81sVhFTBe7JelMriPioiwM
+         yg30tib274uasx70r1vBFwlZESE0qx8giVzBATHGRQSqMfX9cgmaHVM2lIFwG60JzPkq
+         YfH59zV6kEsJ9BXo4ZWIG9VA8gxFJaY2L097NVtJLd8GZlCqXoYboF4vWfACvsAG0Ula
+         EeaqEWYGbs8LlfANdIiJwPloxZANzrzsMSTV5G3NWunqja+MBfHaewgEQGBgcetpfX4R
+         dKVuiaMR8CTlOY79onn0vXohENSYlQZ/fb23EOh+tbB20rqXKLEJzGP6jeWVn7m+JKss
+         FjpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=+RzIbPzyaxROQi2DmI6cNz6eEd7xiOCPNeCs2VmCd4w=;
+        fh=Qqv0gPKQjBFV7ofgmr/Jm6XxUVyxyR+zTsF4evqJH94=;
+        b=AhUjskfEYxgEFwM7Kv6F0iD0yU+k/IZVySqpgVeOxIWbYENuQGAauWBdkl8h+08zUf
+         p/171cd9JVVYMhtaKZjwxEBJVRslkIoFJgtGVy51tkCQWu1LNHD4BwcfKZB0Ap0fPUrr
+         DvBjZgxcawrlVVA9GTeYS/wJ2d5EyFot38FsL7UFvdZlOz7YDbSsIQNL7rNZHiPs99Qo
+         rTF/kJRnhbfGsZpZL0xNRAEq5yiLeUhkYJVe0coW20wUBk0VOEn1XnzJPQL+O3Rdg5Co
+         V+yWn7bYwV5hSs/Wq5mt1quseBDFTHEf5cFe1YEbwYI/HJMfJtA6XSlzUYQzF3yPGjXr
+         JTgg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783565293; x=1784170093; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=+RzIbPzyaxROQi2DmI6cNz6eEd7xiOCPNeCs2VmCd4w=;
+        b=Eq1nmR65vlHGjzMaKUdvS28YsYaLyVos236+YUTI7beBnE74WptKRuZZTxEB/RUM4W
+         Q2JdwI16sPVRLuiu7zsKFrypnQS/6jgfIIklpQOegwB7Erb4Zad3oCCwsYECHazO7qWh
+         fLtwYcntdq4S4iAGNI8ObAIr/IvTXSv1vBBlcJZ0xy7DcLAim6g6BuZuYu8D6o++CLlB
+         w0cyzLMRxBPqh3lqmbIPFiKwOn1YMlROyDIAJVS3OLPKR4QcReUrjX2VxAqQqQCrxBtb
+         nzNywYHo2Kh/emCZo4qcmnlO26hN4QYjCK2T0jsqfxZ12zHBQx5IAb6Ge3hkBHWYTn03
+         U1kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783565293; x=1784170093;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=+RzIbPzyaxROQi2DmI6cNz6eEd7xiOCPNeCs2VmCd4w=;
+        b=kGCqh+jwLscWtbYkyK8z106ARxmyv4ZPdFSRe14blVaK3zT6BVolr2dBXeeFkH1Jz1
+         hEYAy/nSRL88sZE3mj+gG0nXZKK9vOGFx8xAIzvJHUfOW4A0ZpobYuZkOII2DjLnHnmP
+         rZ5osHDl60isoH6e5cJJwKxS7e6yMYmlaceYBkVdmD8EREyLGykliA3TiT56Yx6Rkznb
+         S7pZsjaMZn5Wi4uzIrrl0SqPHJB4aCeqb+u7RSQMt3YuxDN6FZch+5/L9vWUiVrOJjBd
+         HxQ7V3t7mRyuV4mSy07mvRA8RKOliFRz+4mLCZ+hSdtZEO8A4gmNTyMjpCWvPs5d9deC
+         G/9Q==
+X-Forwarded-Encrypted: i=1; AHgh+RpgFV4p7GgfeTBNUDhFEnUtbi8LfgNQZUEdEmn6OVXguZaaFCL8QKu/v9WNZQL33ploIbXKt2s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtDrTJlqeyCrg60XIKDAHAHWnmSD3s4zLAVdsjPswYmegzSKVU
+	qBPoFpcGL2tmLdAI153ys4WRvuJy+e1yT9+huGZbh7WbNeRL+REUt1EPnxXUWwX6Y+ig/5TNbuq
+	Vm3QtJB4zPbUYPtBsfqvPe94PsJoqhQM=
+X-Gm-Gg: AfdE7cnGZMDjKdYR160Hkd3h4RxQXTsvsppNxRJGWDiXGA3ElmmwrjSVNIUjc556tes
+	7+OYvHy51ac2F02pc0/fkHnRt5LjSjgUpSLCE0vm5Y8IOPJ+pNswDuupTVEYAVE/srJ1WXcmDd5
+	UGENv8EwVxIc+Zvi27p73YBRJhczRb8JP4CladM4YDbPVjqUVc8IYIUuqGSekDpam4pNVa2hTcK
+	s1WBOmmUCgo3w7+BO3ppYdjRm4ngh+q1xtic14vBLddo2MvxfkobGgys2WQ6UjZge0cDRFEquTF
+	yMz6OoiV
+X-Received: by 2002:a05:6402:2b90:b0:698:3b7c:7e50 with SMTP id
+ 4fb4d7f45d1cf-69ab44aa1a2mr1864953a12.38.1783565292883; Wed, 08 Jul 2026
+ 19:48:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: ezuC4Yp30IrfcPbyz+qykLsl4WV28+xQI4zcaxJ31V0KWLG6w/22KqYkizVRuxBkxzPqX6I5mxcpMkFA5pIgn///RZFC+8QX7efuFqQZnla0o4xpkO3YfC19ubOzzAnWDvBErAL8i/253KePzQyjG/yG4QTyD8ghn1GUHkAne3DtnCKrwdlpNCmYYwI7wTHoNvF3d4wUZnHGoo+vOV7faRiqi2caPeZzN8bPqCx5/r1JilCrgPB70OHNRXNpT/FBmX22cIIicbkTFA9fqCHBFuGcM89Be1EKAVNPy3XQXDmOilxIS81zOfJdncjRMoUPwZ62JfQs6U4mnvvncp8oRQ==
-X-OriginatorOrg: onsemi.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CYYPR02MB9828.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ea9e8d8c-2f13-49cc-b343-08dedd61e5cb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jul 2026 02:29:26.9607
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 04e1674b-7af5-4d13-a082-64fc6e42384c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dAC6CMVxNRglRSLs9Bu4f6KbdAKHjCg7w3XLLvpasRKYW+lNFfYWeopcx/Xi9U+zurSRCA2DECHEvjr3BYUWCwgNBk8xacQzxbAvjxOgEh4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR02MB7917
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: YrcEm1MrEAoWw-3UsaXCy3HKb6yFBklKzMPI_NSkkJw_1783564168
-X-Mimecast-Originator: onsemi.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+References: <20260630144831.1109-1-hujy652@gmail.com> <20260706101044.161059-1-pabeni@redhat.com>
+In-Reply-To: <20260706101044.161059-1-pabeni@redhat.com>
+From: Zhi-Jun You <hujy652@gmail.com>
+Date: Thu, 9 Jul 2026 10:48:01 +0800
+X-Gm-Features: AUfX_mwdocD4sBig_WoK4SaEZrNCS0Q_Edgdfsxn5LciBLfJp0MkFDpcIGf2CVc
+Message-ID: <CAHGaMk-=0FfVq_73mr6wcn+3XaGXRJZVTbBVEQ3uTcYrBhdNtQ@mail.gmail.com>
+Subject: Re: [PATCH net] net:ethernet: mtk_wed: setup WDMA_RING_TX(0) for
+ non-DBDC MT7986
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: lorenzo@kernel.org, nbd@nbd.name, netdev@vger.kernel.org, 
+	linux-mediatek@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.44 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[onsemi.com,reject];
-	R_DKIM_ALLOW(-0.20)[onsemi.com:s=mimecast20250127];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:ciprian.regus@analog.com,m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:devicetree@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:lorenzo@kernel.org,m:nbd@nbd.name,m:netdev@vger.kernel.org,m:linux-mediatek@lists.infradead.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306028-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[analog.com,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk];
-	FORGED_SENDER(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306029-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[hujy652@gmail.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[onsemi.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hujy652@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,CYYPR02MB9828.namprd02.prod.outlook.com:mid,onsemi.com:from_mime,onsemi.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2FB0172BF1A
+X-Rspamd-Queue-Id: 3FB7F72C256
 
-DQo+ICtpbnQgZ2VucGh5X3JlYWRfbW1kX2M0NShzdHJ1Y3QgcGh5X2RldmljZSAqcGh5ZGV2LCBp
-bnQgZGV2bnVtLCB1MTYgcmVnbnVtKQ0KPiArew0KPiArIHN0cnVjdCBtaWlfYnVzICpidXMgPSBw
-aHlkZXYtPm1kaW8uYnVzOw0KPiArIGludCBhZGRyID0gcGh5ZGV2LT5tZGlvLmFkZHI7DQoNCllv
-dSBtYXkgd2FudCB0byBpbnNlcnQgdGhlIGxvY2tkZXBfYXNzZXJ0IGhlcmUuIFRoYXQnbGwgZW5z
-dXJlIHRoYXQgcmVhZC93cml0ZSBBUElzIGFyZSBjYWxsZWQNCmFmdGVyIHRoZSBtZGlvLWxvY2sg
-aXMgdGFrZW4uIEFuZHJldydzIHN1Z2dlc3Rpb24uDQoNCiAgIGxvY2tkZXBfYXNzZXJ0X2hlbGQo
-JmJ1cy0+bWRpb19sb2NrKQ0KDQoNCj4gKyByZXR1cm4gX19tZGlvYnVzX2M0NV9yZWFkKGJ1cywg
-YWRkciwgZGV2bnVtLCByZWdudW0pOw0KPiArfQ0KDQoNCj4gK2ludCBnZW5waHlfd3JpdGVfbW1k
-X2M0NShzdHJ1Y3QgcGh5X2RldmljZSAqcGh5ZGV2LCBpbnQgZGV2bnVtLCB1MTYgcmVnbnVtLA0K
-PiArIHUxNiB2YWwpDQo+ICt7DQo+ICsgc3RydWN0IG1paV9idXMgKmJ1cyA9IHBoeWRldi0+bWRp
-by5idXM7DQo+ICsgaW50IGFkZHIgPSBwaHlkZXYtPm1kaW8uYWRkcjsNCg0KDQpBbmQgaGVyZSB0
-b28uDQoNCg0KPiArIHJldHVybiBfX21kaW9idXNfYzQ1X3dyaXRlKGJ1cywgYWRkciwgZGV2bnVt
-LCByZWdudW0sIHZhbCk7DQo+ICt9DQo+ICtFWFBPUlRfU1lNQk9MKGdlbnBoeV93cml0ZV9tbWRf
-YzQ1KTsNCj4gKw0KDQo=
+On Mon, Jul 6, 2026 at 6:10=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> From: AI Reviewer <ai@example.com>
+>
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://sashiko.dev/
+> ---
+> net:ethernet: mtk_wed: setup WDMA_RING_TX(0) for non-DBDC MT7986
+>
+> This commit updates mtk_wed_start() to configure WDMA_RING_TX(0) on
+> non-DBDC MT7986 devices. It adds a call to mtk_wed_wdma_tx_ring_setup()
+> for v2 hardware if the descriptor is not yet set up.
+>
+> > diff --git a/drivers/net/ethernet/mediatek/mtk_wed.c b/drivers/net/ethe=
+rnet/mediatek/mtk_wed.c
+> > index 10d9beaae3721..2420557f6c966 100644
+> > --- a/drivers/net/ethernet/mediatek/mtk_wed.c
+> > +++ b/drivers/net/ethernet/mediatek/mtk_wed.c
+> > @@ -2334,6 +2334,10 @@ mtk_wed_start(struct mtk_wed_device *dev, u32 ir=
+q_mask)
+> >               if (!dev->rx_wdma[i].desc)
+> >                       mtk_wed_wdma_rx_ring_setup(dev, i, 16, false);
+>
+> [Severity: High]
+> This isn't a bug introduced by this patch, but does this loop need to che=
+ck
+> the return value of mtk_wed_wdma_rx_ring_setup()?
+>
+> If mtk_wed_wdma_rx_ring_setup() returns -ENOMEM, the hardware registers a=
+re
+> not programmed, but mtk_wed_start() continues execution and enables DMA.
+>
+> Could this lead to hardware DMA using an uninitialized ring base address?
+Hi,
 
+I am not sure how to proceed with this one.
+mtk_wed_start is a void function and both mt7915 and mt7996's dma
+function that calls it don't have return value handling either.
+
+>
+> >
+> > +     if (mtk_wed_is_v2(dev->hw))
+> > +             if (!dev->tx_wdma[0].desc)
+> > +                     mtk_wed_wdma_tx_ring_setup(dev, 0, MTK_WED_WDMA_R=
+ING_SIZE, false);
+>
+> [Severity: High]
+> Are there similar error handling concerns with this new call to
+> mtk_wed_wdma_tx_ring_setup()?
+>
+> Like the RX path, if dma_alloc_coherent() fails inside this setup functio=
+n,
+> it returns -ENOMEM without programming the hardware registers.
+>
+> Since mtk_wed_start() doesn't check this return value, it will proceed to
+> enable hardware DMA, which might attempt to use an uninitialized DMA addr=
+ess.
+>
+> [Severity: High]
+> Does the check for !dev->tx_wdma[0].desc prevent necessary hardware
+> initialization after a warm reset?
+>
+> When the WLAN driver triggers a hardware reset, the WED hardware register=
+s
+> are cleared, and mtk_wed_start() is called again.
+>
+> Because dev->tx_wdma[0].desc was allocated during the initial start, the
+> guard will evaluate to false, skipping the hardware register reprogrammin=
+g
+> for tx_wdma[0].
+>
+> Will the hardware DMA end up using a zeroed ring base address after a res=
+et?
+
+During warm reset, MTK_WDMA_RING_TX(i) + MTK_WED_RING_OFS_CPU_IDX is set to=
+ 0.
+Other parts are left untouched.
+After the warm reset, mtk_wed_rx_ring_setup will be called with
+reset=3Dtrue, which also calls
+mtk_wed_wdma_tx_ring_setup with reset=3Dtrue.
+
+reset=3Dtrue will skip ring allocation and call an extra mtk_wed_ring_reset
+but for non-DBDC mt7986, this path won't happen for the tx_wdma[0].
+
+Usually rx_ring and tx_wdma are paired together but this is a special
+case that rx_ring[1] and
+tx_wdma[1] are allocated but tx_wdma[0] is still required.
+Maybe something like this would work?
+Runs only if wed is v2 and rx ring 0 is not allocated, reset only when
+tx_wdma[0] was already allocated.
+
+if (mtk_wed_is_v2 && !dev->rx_ring[0].desc)
+        mtk_wed_wdma_tx_ring_setup(dev, 0, MTK_WED_WDMA_RING_SIZE,
+!!dev->tx_wdma[0].desc);
+
+Best regards,
+Zhi-Jun
+
+>
+> > +
+> >       if (dev->wlan.hw_rro) {
+> >               for (i =3D 0; i < MTK_WED_RX_PAGE_QUEUES; i++) {
+> >                       u32 addr =3D MTK_WED_RRO_MSDU_PG_CTRL0(i) +
+> --
+> This is an AI-generated review.
+>
 
