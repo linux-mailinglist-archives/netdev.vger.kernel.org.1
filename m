@@ -1,366 +1,207 @@
-Return-Path: <netdev+bounces-306125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306126-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id sqwnDn1vT2qiggIAu9opvQ
-	(envelope-from <netdev+bounces-306125-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:53:01 +0200
+	id BAziJdtuT2qDggIAu9opvQ
+	(envelope-from <netdev+bounces-306126-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:50:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EF6872F274
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:53:00 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11E7872F215
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:50:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=eKFL2k+h;
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306125-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306125-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=suse.com header.s=google header.b=PovcRIVX;
+	dmarc=pass (policy=quarantine) header.from=suse.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306126-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306126-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7560B30166EF
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:48:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 113FD302DF90
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:50:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A03BC3F4128;
-	Thu,  9 Jul 2026 09:48:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98BFD402453;
+	Thu,  9 Jul 2026 09:50:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58E5E3976BC
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 09:48:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CBD401A08
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 09:49:52 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783590516; cv=none; b=ldXhWW1+BOvA+CtPuvh4UseSXNOjEKfUXSz10LqQ0CgaVssYqCFFj9NZc4vT7t0MGX7GWn6SlHUngtIB/4hCSS1a8rOegv4xXAYANNdJdOhyRT3BFevJb7QPurh/0OeFOIuFYXtpUPSXJy9j4wqFtTIa0KfsX8aZa9H4cq5qX1g=
+	t=1783590601; cv=none; b=JfimyBE+Y2tfsjNH27ADN00sk6n9qD+s0mRqNVxnDf9mgAInPyVXAHL89GY74oqbnXZHFAvcaQV6km1fcwFlA1RrsgeggnlG/mv/rZUzhXiL8gL0yZl0JhigrYte1lK34Hdm6wJf3xidN+dIiAMIR8yvte0T0AbAOp31ypVKGWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783590516; c=relaxed/simple;
-	bh=5MpdNiL8YTnIQQPsb7sDhdwNS/SACRbuL/oohVg8JfA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R3sSbwKb3hTYi8mdGecP1tqzUyght2haJnmF11f2MvXRW+IMahnfWiQL7ZRUgy/Yi+W44AyXOkcOphpdb8yGfdxxtPQrkL+gv0WDjwCe8fC17uEyh6PWPjxN3Tx2bq25g61oi4P0PAwIZZd7VFZlWddoj+jKeBaKjPPbxDUr3ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eKFL2k+h; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783590511;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jbR0KSGSt7XmeW9/13gnUCr56j3CEYZ22cwlAYHBK3o=;
-	b=eKFL2k+h9vnJa049ji/zFPUfAcG9+h+bFDRi/JXSt7oEzGUZf/ENaXBtLWMmKNRaon/FKN
-	CsEW38N6RnpG6THR9Ec95yqE04ASXAgqXuImHOMkspEHC3dwuifnVvZlkVqC56rPamuVaP
-	sKpWTmkOZyGydve+NDmJX+08YWyklpw=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-284-on8Ck46VNqavqFVfqGVD-A-1; Thu,
- 09 Jul 2026 05:48:26 -0400
-X-MC-Unique: on8Ck46VNqavqFVfqGVD-A-1
-X-Mimecast-MFC-AGG-ID: on8Ck46VNqavqFVfqGVD-A_1783590505
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 992F519560B7;
-	Thu,  9 Jul 2026 09:48:24 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.33.79])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B9A443000C31;
-	Thu,  9 Jul 2026 09:48:21 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: h.mahadeva@chelsio.com
-Cc: netdev@vger.kernel.org,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	bharat@chelsio.com
-Subject: Re: [PATCH net v2] cxgb4: flower: fix 802.1ad VLAN TPID matching in tc flower filters
-Date: Thu,  9 Jul 2026 11:48:16 +0200
-Message-ID: <20260709094816.114720-1-pabeni@redhat.com>
-In-Reply-To: <20260702044955.20119-1-h.mahadeva@chelsio.com>
-References: <20260702044955.20119-1-h.mahadeva@chelsio.com>
+	s=arc-20240116; t=1783590601; c=relaxed/simple;
+	bh=jTFvyUggpn9b7ir5dJXF/0vV6aESSqllkJsE1EJX8x0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MG9WhPecYj/Ib64Etd7ZJ5LM9PdzKAXH50XDRLRImxxOb5+ubf+ONE4f2u7XIZwQoeKuF3640oPdZS22mxjvtX5T+Au1wNP92cSK7HiAbgLFFRCX3TA+4SfKTKpit9U46MUWytARLd/bc3SkRbUtLirqeAvw5vNLV8XNIuOkjMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=PovcRIVX; arc=none smtp.client-ip=209.85.128.46
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-493b77b150aso13078395e9.2
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 02:49:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1783590589; x=1784195389; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=MXemn+RWgfgniHXL+Z+iccp115cwF5wMpUS4nNjdkFs=;
+        b=PovcRIVXEPSF/FJeQlxhlzoXjqZOrbs3CiE5bUYuum/kokSouOcrfuWzkJz+QZ+EEU
+         bXZutBCPHghMPuDpORpgqEkhwf9ItYai/C2Wls7hXpV8JBACI0ISAzSZohMkmVLXApNn
+         fZlxwp5LQbRlt1W9WkBqq04596J259cyQGkTEsx5D5ai1Vpe/8NCZrLqgzS5soekf8Zd
+         N1CUWCeoaHYptaJl5ecJ1ZzDp9e7jZkz7Z27dZDIG4LQ8N1cI1J5HRitdDR0mFAuAiJK
+         tCK2hnhPLuoPo29pU3Y3TxhIiW33KldSOjrnaQ78LbO8JgLXI4Yv8EB+9OvmBldN7dCE
+         StRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783590589; x=1784195389;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=MXemn+RWgfgniHXL+Z+iccp115cwF5wMpUS4nNjdkFs=;
+        b=Y27ZQPuXLdD451rGJVTvsaDYg8uvcMCKNALpIoRfrYUmde4WBT4izHOUlT8RbACur6
+         Gx5o4q357isRbm+Pw4fgiD/ITHB+x2INlPG4Z/Lpa8xHrN658zLSEnlzkhjpwCQa1Nkr
+         KmqaG93k+2XdbjU814Di9Rd5re1dPeApFAq/MIdylkSXHQFfttmNUCLVz02QRmG2XwG7
+         6IySsQ26cp4mBAI8Cg7zoQdNVcYx1apwKd53x6eUnLR+t0YTwjBfFylsURktQ1V6Vapt
+         ojy+YmWM0ErOkdpxbYyIacIN9Tj7QVaBayH9kuutP3b4vfyrWcXcQvYE0Q99ifu1Mcb2
+         G30w==
+X-Forwarded-Encrypted: i=1; AHgh+RptCeQf+hE3D1+aSvQODcP6VsNi0G7eNwbX4s8KbfyJa+efluZw+EDo8hFmQmHJ5nC3HXUlqHQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0fTem/pmb7EKHvSMxFyQAM97juBux5gXKLFXy5kq7dX4qj9bN
+	MludX9aNZHSN54WhN31Z5NBnt5PjFdP+NVr5sY1xTOF/v4Aw5drUCO8M45bzv1ibpUQ=
+X-Gm-Gg: AfdE7ck/BUHfDwvefw69SQnLc29tG1rLxdu9K96+YkTCg7CwNaR6FnIf6j72IEQ0+qz
+	/LktL7G6JX6m3XJ6G11gEYb3G/o+xxTgGUArxpPU2b3cL+z7zzg1VfoTioG2uqe6s+qkDOySkFX
+	TF4PFxCWholV8ZWvclFnxkHATxzk5wSvxgQYPxOqxlUV7qinJDYtEt7/wZ7XTF2tIpMIokwZkkK
+	s6fHjV3hNpqtQAwhBjb1hj95l4ONokfFe5fsMf3kjKQHZPCvxnoxxZ6kTNPlrgfJis84QutMOH3
+	9t03a7DViATH0GvVKkiOd27wqIXTpV4KFTfydegrXLUlYNUZJg2L1xejb3I5tBJbQ/1EWFsh9oV
+	JT51c2idSkSNFDlr4Jzng4ftxbK49F3cnOie43fa61Aka9ez4V+FY53S/dGmzTBV1Dp/F4LFyVn
+	SbjLp8zTINYNlZULawus0O5g9HZ6ycbmiuaA==
+X-Received: by 2002:a05:600c:c1d7:20b0:490:9782:3eb8 with SMTP id 5b1f17b1804b1-493e68c3535mr47652155e9.25.1783590588957;
+        Thu, 09 Jul 2026 02:49:48 -0700 (PDT)
+Received: from [192.168.42.79] (nat2.prg.suse.com. [195.250.132.146])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493eb6d53absm47837275e9.6.2026.07.09.02.49.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jul 2026 02:49:48 -0700 (PDT)
+Message-ID: <3e2ae6e8-41ad-45f0-a885-131a5711c276@suse.com>
+Date: Thu, 9 Jul 2026 11:49:45 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] umh, treewide: Explicitly include linux/umh.h where
+ needed
+To: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>
+Cc: Tony Luck <tony.luck@intel.com>, Borislav Petkov <bp@alien8.de>,
+ Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>,
+ Philipp Reisner <philipp.reisner@linbit.com>,
+ Lars Ellenberg <lars.ellenberg@linbit.com>,
+ =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
+ Jens Axboe <axboe@kernel.dk>, Johan Hovold <johan@kernel.org>,
+ Alex Elder <elder@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Michal Januszewski <spock@gentoo.org>, Helge Deller <deller@gmx.de>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
+ Chuck Lever <cel@kernel.org>, Jeff Layton <jlayton@kernel.org>,
+ NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>,
+ Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
+ Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
+ Joseph Qi <joseph.qi@linux.alibaba.com>, Tejun Heo <tj@kernel.org>,
+ Johannes Weiner <hannes@cmpxchg.org>, Luis Chamberlain <mcgrof@kernel.org>,
+ Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>,
+ Aaron Tomlin <atomlin@atomlin.com>, Pavel Machek <pavel@kernel.org>,
+ Len Brown <lenb@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
+ Danilo Krummrich <dakr@kernel.org>, Nikolay Aleksandrov
+ <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, David Howells <dhowells@redhat.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>, Paul Moore <paul@paul-moore.com>,
+ James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
+ Kentaro Takeda <takedakn@nttdata.co.jp>,
+ Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+ linux-edac@vger.kernel.org, linux-kernel@vger.kernel.org,
+ drbd-dev@lists.linux.dev, linux-block@vger.kernel.org,
+ greybus-dev@lists.linaro.org, linuxppc-dev@lists.ozlabs.org,
+ linux-acpi@vger.kernel.org, linux-fbdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org,
+ linux-nfs@vger.kernel.org, ocfs2-devel@lists.linux.dev,
+ cgroups@vger.kernel.org, linux-modules@vger.kernel.org,
+ linux-pm@vger.kernel.org, driver-core@lists.linux.dev,
+ bridge@lists.linux.dev, netdev@vger.kernel.org, keyrings@vger.kernel.org,
+ linux-security-module@vger.kernel.org
+References: <20260708154510.6794-1-petr.pavlu@suse.com>
+ <20260708154510.6794-2-petr.pavlu@suse.com>
+ <ak6STbqZd-Q-c56v@localhost.localdomain>
+Content-Language: en-US
+From: Petr Pavlu <petr.pavlu@suse.com>
+In-Reply-To: <ak6STbqZd-Q-c56v@localhost.localdomain>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306125-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_RECIPIENTS(0.00)[m:h.mahadeva@chelsio.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:bharat@chelsio.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ALIAS_RESOLVED(0.00)[];
-	TO_DN_NONE(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER(0.00)[petr.pavlu@suse.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[intel.com,alien8.de,kernel.org,redhat.com,linux.intel.com,zytor.com,linbit.com,kernel.dk,linuxfoundation.org,gentoo.org,gmx.de,zeniv.linux.org.uk,suse.cz,brown.name,oracle.com,talpey.com,fasheh.com,evilplan.org,linux.alibaba.com,cmpxchg.org,google.com,atomlin.com,linux-foundation.org,blackwall.org,nvidia.com,davemloft.net,paul-moore.com,namei.org,hallyn.com,nttdata.co.jp,i-love.sakura.ne.jp,vger.kernel.org,lists.linux.dev,lists.linaro.org,lists.ozlabs.org,lists.freedesktop.org];
+	TAGGED_FROM(0.00)[bounces-306126-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[suse.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:mkoutny@suse.com,m:tony.luck@intel.com,m:bp@alien8.de,m:tglx@kernel.org,m:mingo@redhat.com,m:dave.hansen@linux.intel.com,m:x86@kernel.org,m:hpa@zytor.com,m:philipp.reisner@linbit.com,m:lars.ellenberg@linbit.com,m:christoph.boehmwalder@linbit.com,m:axboe@kernel.dk,m:johan@kernel.org,m:elder@kernel.org,m:gregkh@linuxfoundation.org,m:rafael@kernel.org,m:spock@gentoo.org,m:deller@gmx.de,m:viro@zeniv.linux.org.uk,m:brauner@kernel.org,m:jack@suse.cz,m:trondmy@kernel.org,m:anna@kernel.org,m:cel@kernel.org,m:jlayton@kernel.org,m:neil@brown.name,m:okorniev@redhat.com,m:Dai.Ngo@oracle.com,m:tom@talpey.com,m:mark@fasheh.com,m:jlbec@evilplan.org,m:joseph.qi@linux.alibaba.com,m:tj@kernel.org,m:hannes@cmpxchg.org,m:mcgrof@kernel.org,m:da.gomez@kernel.org,m:samitolvanen@google.com,m:atomlin@atomlin.com,m:pavel@kernel.org,m:lenb@kernel.org,m:akpm@linux-foundation.org,m:dakr@kernel.org,m:razor@blackwall.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:k
+ uba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:dhowells@redhat.com,m:jarkko@kernel.org,m:paul@paul-moore.com,m:jmorris@namei.org,m:serge@hallyn.com,m:takedakn@nttdata.co.jp,m:penguin-kernel@i-love.sakura.ne.jp,m:linux-edac@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:drbd-dev@lists.linux.dev,m:linux-block@vger.kernel.org,m:greybus-dev@lists.linaro.org,m:linuxppc-dev@lists.ozlabs.org,m:linux-acpi@vger.kernel.org,m:linux-fbdev@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-fsdevel@vger.kernel.org,m:linux-nfs@vger.kernel.org,m:ocfs2-devel@lists.linux.dev,m:cgroups@vger.kernel.org,m:linux-modules@vger.kernel.org,m:linux-pm@vger.kernel.org,m:driver-core@lists.linux.dev,m:bridge@lists.linux.dev,m:netdev@vger.kernel.org,m:keyrings@vger.kernel.org,m:linux-security-module@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[petr.pavlu@suse.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_GT_50(0.00)[76];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:from_mime,suse.com:email,suse.com:mid,suse.com:dkim,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7EF6872F274
+X-Rspamd-Queue-Id: 11E7872F215
 
-From: AI Reviewer <ai@example.com>
+On 7/8/26 8:13 PM, Michal Koutný wrote:
+> Hi Petr.
+> 
+> On Wed, Jul 08, 2026 at 05:44:29PM +0200, Petr Pavlu <petr.pavlu@suse.com> wrote:
+>> diff --git a/kernel/cgroup/cgroup-v1.c b/kernel/cgroup/cgroup-v1.c
+>> index a4337c9b5287..60eb994c32ae 100644
+>> --- a/kernel/cgroup/cgroup-v1.c
+>> +++ b/kernel/cgroup/cgroup-v1.c
+>> @@ -16,6 +16,7 @@
+>>  #include <linux/pid_namespace.h>
+>>  #include <linux/cgroupstats.h>
+>>  #include <linux/fs_parser.h>
+>> +#include <linux/umh.h>
+>>  
+>>  #include <trace/events/cgroup.h>
+> 
+> There is kmod.h in here too but it's unnecessary, no module lazy loading
+> in this code.
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://netdev-ai.bots.linux.dev/sashiko/
----
-cxgb4: flower: fix 802.1ad VLAN TPID matching in tc flower filters
+You're right. I'll remove the kmod.h include from
+kernel/cgroup/cgroup-v1.c. I went through all the files again and it
+seems this was the only place I missed.
 
-This patch adds an 802.1ad branch to cxgb4_process_flow_match() that
-programs a port-specific OVLAN register with ETH_P_8021AD, sets bit 0
-of the RX control register, clears bit 9 of TP_INGRESS_CONFIG, and
-populates the filter's outer-VLAN match fields.
-
-A few questions about the new code follow inline.
-
-> diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c
-> index 3307e5042681..8c5cfa6982e7 100644
-> --- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c
-> +++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c
-> @@ -266,24 +267,48 @@ static void cxgb4_process_flow_match(struct net_device *dev,
->  					       VLAN_PRIO_SHIFT);
->  		vlan_tci_mask = match.mask->vlan_id | (match.mask->vlan_priority <<
->  						     VLAN_PRIO_SHIFT);
-> -		fs->val.ivlan = vlan_tci;
-> -		fs->mask.ivlan = vlan_tci_mask;
-> -
-> -		fs->val.ivlan_vld = 1;
-> -		fs->mask.ivlan_vld = 1;
-> -
-> -		/* Chelsio adapters use ivlan_vld bit to match vlan packets
-> [ ... ]
-> -		if (fs->val.ethtype == ETH_P_8021Q) {
-> -			fs->val.ethtype = 0;
-> -			fs->mask.ethtype = 0;
-> +
-> +		if (match.key->vlan_tpid == cpu_to_be16(ETH_P_8021AD)) {
-
-[Medium]
-The gating condition consults only match.key->vlan_tpid and does not
-look at match.mask->vlan_tpid.  In tc-flower semantics a key value is
-only significant to the extent the mask covers it.
-
-If a rule sets key=0x88a8 with mask=0 (don't care about TPID), this
-branch is still entered and the adapter registers are still
-reprogrammed.  Should this test be gated on the mask as well, similar
-to how mlx5 and nfp consult the mask before honoring the key?
-
-> +			struct adapter *adap = netdev2adap(dev);
-> +			u32 ovlan_reg, ctl_reg, val, port_id;
-> +
-> +			if (!adap) {
-> +				netdev_err(dev, "%s: adap not found\n", __func__);
-> +				return;
-> +			}
-
-[Low]
-netdev2adap() expands to netdev2pinfo(dev)->adapter and is not expected
-to return NULL for a netdev that tc-flower can bind to.  If the check
-ever did fire, cxgb4_process_flow_match() is void, so this early return
-also skips the trailing:
-
-    fs->val.iport = netdev2pinfo(dev)->port_id;
-    fs->mask.iport = ~0;
-
-and cxgb4_flow_rule_replace() would proceed to install a filter with
-iport=0 / iport_mask=0.  Should the check either be removed, or the
-function refactored to propagate an error?
-
-> +
-> +			val = (0xffff << 16) | ETH_P_8021AD;
-
-[Low]
-The literal 0xffff has type int (signed), so 0xffff << 16 evaluates to
-a value that is not representable in a signed int.  Per C11 6.5.7 this
-is undefined behavior and UBSAN's shift sanitizer flags it.  Would
-0xffffU << 16 (or a symbolic _V()/_M() macro) be preferable?
-
-The layout of MPS_PORT_RX_OVLAN0_A ([31:16]=mask, [15:0]=value) is also
-not expressed through the driver's usual _S/_V/_F/_M helpers used by
-neighboring registers.  Could symbolic field macros be added?
-
-> +			port_id = netdev2pinfo(dev)->port_id;
-> +			fs->val.ovlan = vlan_tci;
-> +			fs->mask.ovlan = vlan_tci_mask;
-> +			fs->val.ovlan_vld = 1;
-> +			fs->mask.ovlan_vld = 1;
-
-[High]
-Does this ovlan programming survive on adapters that have VNIC_F set in
-the cached ingress_config?  In cxgb4_filter.c, both __cxgb4_set_filter()
-and cxgb4_set_hash_filter() unconditionally do:
-
-    if (adap->params.tp.ingress_config & VNIC_F) {
-        fs->val.ovlan = (fs->val.pf << 13) | fs->val.vf;
-        fs->val.ovlan_vld = fs->val.pfvf_vld;
-        ...
-    }
-
-which overwrites the fs->val.ovlan / fs->val.ovlan_vld set here.
-validate_filter() also rejects with -EOPNOTSUPP when ovlan_vld is set
-together with VNIC_F, or when the filter mode does not include
-VNIC_ID_F.
-
-On adapters where VNIC_F is enabled, does this branch actually restore
-matching, or does it silently lose the VID (and, per the next comment,
-still mutate hardware before failing validation)?
-
-> +			ovlan_reg = PORT_REG(port_id, MPS_PORT_RX_OVLAN0_A);
-> +			ctl_reg = PORT_REG(port_id, MPS_PORT_RX_CTL_A);
-> +			t4_write_reg(adap, ovlan_reg, val);
-
-[High]
-cxgb4_process_flow_match() is called from cxgb4_flow_rule_replace()
-before __cxgb4_set_filter() runs validate_filter() and the mailbox/L2T
-install.  Do these three writes need to be deferred until after
-validation and successful install, so that a filter rejected by
-validate_filter(), or one that fails allocation/mailbox/L2T setup,
-does not leave the port and adapter in a reconfigured state with no
-installed filter to justify it?
-
-Additionally, clear_filter() (cxgb4_filter.c) only tears down L2T/SMT/
-CLIP and memsets the filter entry.  It does not undo MPS_PORT_RX_OVLAN0,
-MPS_PORT_RX_CTL bit 0, or TP_INGRESS_CONFIG bit 9.  Is a corresponding
-teardown expected on filter delete/replace so that 'tc filter add' +
-'tc filter del' does not leave OVLAN matching permanently enabled and
-TP_INGRESS_CONFIG bit 9 permanently cleared?
-
-MPS_PORT_RX_OVLAN0_A is also hardcoded to slot 0 with ETH_P_8021AD as
-the TPID.  How is a second concurrent flow rule requesting a different
-outer TPID intended to be represented, given that installing it would
-clobber slot 0?
-
-> +			val = t4_read_reg(adap, ctl_reg);
-> +			t4_write_reg(adap, ctl_reg, val | 1);
-
-[High]
-This RMW on MPS_PORT_RX_CTL_A is unserialized.  If another context
-modifies other bits of the same register between the read and the
-write, that update is lost.  Is there a lock that should be held here
-(win0_lock or similar)?
-
-> +			t4_tp_wr_bits_indirect(adap, TP_INGRESS_CONFIG_A, 1U << 9, 0);
-
-[High, Medium, Medium]
-t4_tp_wr_bits_indirect() drives the TP_PIO_ADDR_A / TP_PIO_DATA_A
-indirect-register pair:
-
-    void t4_tp_wr_bits_indirect(struct adapter *adap, unsigned int addr,
-                                unsigned int mask, unsigned int val)
-    {
-        t4_write_reg(adap, TP_PIO_ADDR_A, addr);
-        val |= t4_read_reg(adap, TP_PIO_DATA_A) & ~mask;
-        t4_write_reg(adap, TP_PIO_DATA_A, val);
-    }
-
-Before this patch the only in-tree caller was probe-time
-adap_init0_tweaks().  This patch adds a runtime, user-triggerable
-caller.
-
-Can a concurrent TP_PIO user (t4_tp_pio_read/t4_tp_pio_write when LDST
-is unavailable, register-dump code, or another tc-flower install on a
-different netdev of the same adapter) interleave between the ADDR
-write and the DATA read/write and cause the wrong TP register to be
-read or written?  What serializes the TP_PIO_ADDR_A/TP_PIO_DATA_A pair
-here?
-
-Separately, the hardware bit is toggled but adap->params.tp.ingress_config
-is not updated.  That shadow is consulted throughout cxgb4_filter.c
-(validate_filter, __cxgb4_set_filter, cxgb4_set_hash_filter) and l2t.c
-to make VNIC_F / USE_ENC_IDX_F / ovlan-vs-pfvf decisions.  Should the
-shadow be kept in sync with the hardware write?
-
-Also, bit 9 of TP_INGRESS_CONFIG_A is written as the bare literal
-1U << 9, while neighboring bits of the same register are exposed as
-_S/_V/_F macros in t4_regs.h (CSUM_HAS_PSEUDO_HDR_S=10, VNIC_S=11,
-USE_ENC_IDX_S=13).  What feature does bit 9 control, and could a
-symbolic name be introduced?  The commit message enumerates three
-actions (OVLAN register, RX control enable, filter fields) but does
-not mention this fourth adapter-wide write.
-
-> +		} else {
-> +			fs->val.ivlan = vlan_tci;
-> +			fs->mask.ivlan = vlan_tci_mask;
-> +			fs->val.ivlan_vld = 1;
-> +			fs->mask.ivlan_vld = 1;
-> +
-> +			/* Chelsio adapters use ivlan_vld bit to match vlan packets
-> +			 * as 802.1Q. Also, when vlan tag is present in packets,
-> +			 * ethtype match is used then to match on ethtype of inner
-> +			 * header ie. the header following the vlan header.
-> +			 * So, set the ivlan_vld based on ethtype info supplied by
-> +			 * TC for vlan packets if its 802.1Q. And then reset the
-> +			 * ethtype value else, hw will try to match the supplied
-> +			 * ethtype value with ethtype of inner header.
-> +			 */
-> +
-> +			if (fs->val.ethtype == ETH_P_8021Q) {
-> +				fs->val.ethtype = 0;
-> +				fs->mask.ethtype = 0;
-> +			}
-
-[High]
-The preserved comment states that the hardware ethtype field matches
-the ethtype after the outer VLAN tag (the inner header), and the
-802.1Q branch resets fs->val.ethtype/fs->mask.ethtype to avoid a
-mismatch.
-
-The new 802.1ad branch above does not perform the equivalent reset.
-For a common rule such as:
-
-    tc filter add ... flower \
-        vlan_ethtype 0x88a8 vlan_id X ...
-
-FLOW_DISSECTOR_KEY_BASIC processing earlier in the same function has
-already set fs->val.ethtype = 0x88a8, but the ethtype field is matched
-against the inner header (which for real 802.1ad traffic is 0x8100 or
-an L3 protocol, never 0x88a8).  Should the 802.1ad branch clear
-fs->val.ethtype / fs->mask.ethtype the same way the 802.1Q branch
-does?
-
->  		}
->  	}
->  
-> diff --git a/drivers/net/ethernet/chelsio/cxgb4/t4_regs.h b/drivers/net/ethernet/chelsio/cxgb4/t4_regs.h
-> index 695916ba0405..38c585f3b1ad 100644
-> --- a/drivers/net/ethernet/chelsio/cxgb4/t4_regs.h
-> +++ b/drivers/net/ethernet/chelsio/cxgb4/t4_regs.h
-> @@ -1921,6 +1921,9 @@
->  #define MAC_PORT_PTP_SUM_LO_A 0x990
->  #define MAC_PORT_PTP_SUM_HI_A 0x994
->  
-> +#define MPS_PORT_RX_OVLAN0_A 0x120
-> +#define MPS_PORT_RX_CTL_A    0X100
-
-[Low]
-This isn't a bug, but the hex prefix on 0X100 is uppercase while the
-line above (and every neighboring macro) uses lowercase 0x.  Was that
-intentional?
-
-> +
->  #define MPS_CMN_CTL_A	0x9000
 -- 
-This is an AI-generated review.
-
+Thanks,
+Petr
 
