@@ -1,234 +1,167 @@
-Return-Path: <netdev+bounces-306350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306351-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oG9ZKJT1T2qRrAIAu9opvQ
-	(envelope-from <netdev+bounces-306350-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 21:25:08 +0200
+	id 4e9gNA33T2rxrAIAu9opvQ
+	(envelope-from <netdev+bounces-306351-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 21:31:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF9C2734ED0
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 21:25:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA2E3734FFF
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 21:31:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=PHrs6MxO;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306350-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306350-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Xqvi1vRp;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306351-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306351-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8058230037F4
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 19:19:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B69B1301F9DD
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 19:31:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 435AB3AE1B9;
-	Thu,  9 Jul 2026 19:19:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DF2C3BB11B;
+	Thu,  9 Jul 2026 19:31:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF5873AB26E
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 19:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06F4D3BBFD3;
+	Thu,  9 Jul 2026 19:31:02 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783624785; cv=none; b=WKmkEINpklYYmfIaICy3wiWbjVaP8R2CInYfxwE8GpWsKiWOqNWbKIVuDLcWBeCrTfuLqidGR/GAAw9blTsZStx+GO6gRZwyXqMuiv9B4M4pD2OikWOC7k25J8AiTJoKeWOzF5Q53nGZnBGMyyRazheuIM5lPAtLkrQRFHxdEhk=
+	t=1783625465; cv=none; b=fJSpn7Ochkt/7p2+O4b4zY4/uCbekbFJlQMt0BIKMgikVg2xApqeZygv7w8vB10vG5948kTmUxyeii8NcTvdYLmDsNuivFOaCLEz9qZ5WyjQl/SXq090Ek20SBCCr6zOmTTsgt6Df8RkWz0gQ1UINhGYE4jq3oDfWGaQ8AmdNM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783624785; c=relaxed/simple;
-	bh=ag2iaJNRSatXfZcIQOXwJLWZ7MP77+wFc5guU6LKKE4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a0CnNuJtWkqV6WXdRQyW7gcx3tmK5riFarcsr64tj1xZUh/1eNMg8AykkKSOCPzX9lBxzAdygWFgtPVx8RFOx4DmFpKsuaOuhUks9XMBs3UmMTnAVa+b8WNVWI1wl5nYnSRBFiRko2Rum4/1E9NjpgGhC1IIDLeyB08qoQkroEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PHrs6MxO; arc=none smtp.client-ip=209.85.219.49
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-8ff88549786so2112216d6.3
-        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 12:19:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783624783; x=1784229583; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=8lTAkLkaFfueQ/1V07Pbb9gud8KYPki4tliZP1BPO3s=;
-        b=PHrs6MxO1ELbyBow0rxKOskrO9vH7JuuPzlu+5FRPCzFOQA65F2pza394Wetas0dTP
-         7zwcIAHBmAbooaocKM1TznSzTYCEmGJKxDId3kgIwtg5UYzPPR6TIx7Lf7zgHKCvvhzf
-         31lvh6xDtSyXnVvrWCQd2m3kq5V5RvV08OhRtLksDuZh36kWClGxf//OWSz+Pgx0DOHN
-         DqrTd473rwe5maDyGq4bgBo96+CCf8SqWWog2ejisq6P/9d2a9VT9QzZ9ygUXyldosJK
-         iSh15opyzZ9LsNxMzbOHifuSM1Ne2+O+xLuuzn5baf90zYqQ8F61TNDI6+VVP1XjVWgO
-         y3aQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783624783; x=1784229583;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=8lTAkLkaFfueQ/1V07Pbb9gud8KYPki4tliZP1BPO3s=;
-        b=rduXdYlgGROUBMY7KndvJ0gsgKejjNgpaSaW0bBdW6HI+2N/L4Zyf1/hyf03iJJwOj
-         i4/2lGRPRFLkublzNKLrgKT/Sab9iw1/hpj9o2Ev6vyomXE2LWRzKX6zgXIE1yerLgHX
-         xMUwMYkT5rxxxelwQ/Xlnro4RniZf9Nq0Pq3yay5nJPQx0kA+QM5uQ//VoIGeZZY1LYa
-         nSv5wCJNkHK1i223BztSu5QaM+Q25Mel3nT1n7ghcEn2HLEuEQKpgy2H6OM5oUiBaPNp
-         AEE8cL8ozwrAS8R1Z/jDRsP450Pl8T1jjeuWglgmja0q38P7qg5XLAjHeJ0jC3/mT30K
-         SSRQ==
-X-Forwarded-Encrypted: i=1; AHgh+RrOQWyaLewARNIyBatM1NtR4U9HQWnPEvEi+QucK1dZWPxID5oD3AvlLIDaOEGakgNFZ66oUNc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOoUPQRhE9DXR2olgb+N9lo/GDVPEwE9ow1dB78+mlYRJL+38B
-	G362lI125z5rmT6gVMwGiNHBbBRT9R1TxlDFuFJHQ4q8LoijUzW3AcFx/8SnkN6D
-X-Gm-Gg: AfdE7cnp1chj8dU19jUY2puOxMNAAMbjoa1Ml0TbvZykQbDauwstV0AP0uecgfsQkWE
-	TxaPJYWasI68BP13thrGXXlrIfuQnMy7Qe8+l/YKhoWHprUCGh4botqswxJyGNitqfMxO0azy7P
-	BzobCMV/d/ZdNY1bC4nXbs2O8T/RcFa69D9VSupetO9XfmKtCBTIAFi3IGQaIE8HW7fO4npJUS1
-	5htE6MwXjQN+JGstpgYoUrY5RNRaCQQjGxnP5KoMyu25Wr+iFGCvxRLclYdPXjjKQC/+DHmSF6f
-	0Ex39AtLxIOGIVhWrJNZBMiFXHd/neXlMZEU1D7ZHDBcK9xpE6YIYU6XFXUquJ0PuV5s1U/yMUV
-	UlNoX6yotL973KgbboHIE62dsv5DU65UMK1KxWwfFGHpEqwnfHQAlWWohzlbiQIKrvwfraK1rFU
-	gBOBybKpzgGggFyHMjCm5j/IWKNsMLnyIu3lQ6PKLUoPDk61X74hrxSETJaFC62ZuSYbLXdzW+T
-	81TGIThRTw6RZJHZMNio6udpy+Wux4o
-X-Received: by 2002:a05:6214:c87:b0:8fe:49d6:fb76 with SMTP id 6a1803df08f44-8fec3810ff7mr93576996d6.57.1783624782634;
-        Thu, 09 Jul 2026 12:19:42 -0700 (PDT)
-Received: from server0.tail6e7dd.ts.net (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ffd87c8d4csm25507836d6.44.2026.07.09.12.19.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2026 12:19:42 -0700 (PDT)
-From: Michael Bommarito <michael.bommarito@gmail.com>
-To: Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>
-Cc: Geliang Tang <geliang@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Gang Yan <gang.yan@linux.dev>,
-	mptcp@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v3] mptcp: only set DATA_FIN when a mapping is present
-Date: Thu,  9 Jul 2026 15:19:25 -0400
-Message-ID: <20260709191925.2811195-1-michael.bommarito@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1783625465; c=relaxed/simple;
+	bh=nPdk0wLiglWbmv8CImFoITXX66UG323kvIOGdHTnBDE=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=LaMtC4343v/V9w/X9xeg2VXINE1AEy/46ADvGOSoxpk5WWIXnP7Ba6nLRC8ucrdg8LQqX9PjRbgau8tbamkMNsaSgPfaEkCQq3rjTaH4DVCVzDoM80N7IxCWVsfxLLLnblm0ORllQjxanrcRA7qTzbs5CnB75qTfuqigMwUmM8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xqvi1vRp; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 223CD1F00A3A;
+	Thu,  9 Jul 2026 19:31:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783625462;
+	bh=wOQPDaTUbeRaM7DIPsOUnVQ9NOIfjKXC/WmBn8dq7PE=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject;
+	b=Xqvi1vRpGOpjTgMtOfg95Z5nfPVJ5WlY4AW3sFJIaWyLOm5UETnSXxW/70+AJN4NI
+	 XnLoYyLEiZI7Wbq1dMWTD/QJil6cCmdDbkyc2KK8k84D9NB30D1Lr9FuklLSU5ojUs
+	 3bqmbtV8BF+p8i5yNRmqlD43J5aZjHJ5zJWZxnJcWYF+1NR/sUvcX3jislN+w5GBdp
+	 W053z5Gpw0Di5BI1D9pVTV5zUqhQGVWFFA8uM12seJj7xO2maDrXtzZCmRf7VS4e1a
+	 ISPlpyl+F3PDE+TQEDZ5JQvqtBrOh0/Yv+71/TqPF34vBp5aWg6wKOIs+mn4SJcWUa
+	 so/n2mSkOdbmw==
+Date: Thu, 09 Jul 2026 14:31:01 -0500
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, kuba@kernel.org, 
+ Rengarajan.S@microchip.com, edumazet@google.com, andrew+netdev@lunn.ch, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, conor+dt@kernel.org, krzk+dt@kernel.org
+To: Mikhail Lukianchikov <avermoal@gmail.com>
+In-Reply-To: <20260709181724.24682-2-avermoal@gmail.com>
+References: <20260709181724.24682-2-avermoal@gmail.com>
+Message-Id: <178362546037.1021520.7768707354122248220.robh@kernel.org>
+Subject: Re: [PATCH v2] dt-bindings: net: microchip,lan78xx: convert to DT
+ schema
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-2.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306350-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:matttbe@kernel.org,m:martineau@kernel.org,m:geliang@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:gang.yan@linux.dev,m:mptcp@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:pabeni@redhat.com,m:kuba@kernel.org,m:Rengarajan.S@microchip.com,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:conor+dt@kernel.org,m:krzk+dt@kernel.org,m:avermoal@gmail.com,m:andrew@lunn.ch,m:conor@kernel.org,m:krzk@kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[robh@kernel.org,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306351-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[devicetree.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EF9C2734ED0
+X-Rspamd-Queue-Id: DA2E3734FFF
 
-mptcp_get_options() clears only the status group of struct
-mptcp_options_received; data_seq, subflow_seq and data_len are filled in
-by mptcp_parse_option() exclusively inside the DSS mapping block, which
-runs only when the DSS M (mapping present) bit is set.
 
-A peer can send a DSS option with the DATA_FIN flag set but the mapping
-bit clear. The parser then records mp_opt->data_fin while leaving
-data_len and data_seq uninitialized. For a zero-length segment
-mptcp_incoming_options() evaluates
+On Fri, 10 Jul 2026 00:17:25 +0600, Mikhail Lukianchikov wrote:
+> Convert the Microchip LAN78xx family (LAN7800, LAN7801, LAN7850) binding
+> documentation from plain text to DT schema.
+> 
+> The conversion adds proper validation for the 'microchip,led-modes'
+> property inside the MDIO node and updates the MAINTAINERS entry.
+> 
+> Signed-off-by: Mikhail Lukianchikov <avermoal@gmail.com>
+> ---
+> Changes in v2:
+>  - Rename file to microchip,lan7800.yaml.
+>  - Keeps only one maintainer.
+>  - Code style fixed.
+>  - Example fixed, remove usb-port@1 node.
+>  - Move patternProperties for PHY inside mdio node to fix validation. (suggested by sashiko-bot)
+> 
+> Link to v1: https://lore.kernel.org/netdev/20260707165840.107409-1-avermoal@gmail.com
+> 
+>  .../bindings/net/microchip,lan7800.yaml       | 105 ++++++++++++++++++
+>  .../bindings/net/microchip,lan78xx.txt        |  53 ---------
+>  MAINTAINERS                                   |   3 +-
+>  3 files changed, 106 insertions(+), 55 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/net/microchip,lan7800.yaml
+>  delete mode 100644 Documentation/devicetree/bindings/net/microchip,lan78xx.txt
+> 
 
-	if (mp_opt.data_fin && mp_opt.data_len == 1 &&
-	    mptcp_update_rcv_data_fin(msk, mp_opt.data_seq, mp_opt.dsn64))
+My bot found errors running 'make dt_binding_check' on your patch:
 
-which reads the uninitialized data_len and data_seq; KMSAN reports an
-uninit-value in mptcp_incoming_options(). The stale data_seq can also be
-fed into the receive-side DATA_FIN sequence tracking.
+yamllint warnings/errors:
 
-Record the DATA_FIN flag only when the DSS option carries a mapping, so
-data_fin is never set without data_seq and data_len also being present.
-data_fin is part of the status group that mptcp_get_options() clears up
-front, so on the no-map path it stays zero and the zero-length DATA_FIN
-branch is simply skipped. A DATA_FIN is always transmitted together with
-a mapping (mptcp_write_data_fin() sets use_map along with data_seq and
-data_len), so legitimate DATA_FIN handling is unaffected.
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/microchip,lan7800.example.dtb: /: 'compatible' is a required property
+	from schema $id: http://devicetree.org/schemas/root-node.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/microchip,lan7800.example.dtb: /: 'model' is a required property
+	from schema $id: http://devicetree.org/schemas/root-node.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/microchip,lan7800.example.dtb: /: '#address-cells' is a required property
+	from schema $id: http://devicetree.org/schemas/root-node.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/microchip,lan7800.example.dtb: /: '#size-cells' is a required property
+	from schema $id: http://devicetree.org/schemas/root-node.yaml
+Documentation/devicetree/bindings/net/microchip,lan7800.example.dtb: /usb: failed to match any schema with compatible: ['usb-host']
 
-Move the pr_debug() that logs the parsed DSS flags below the mapping
-block, so it reports the final data_fin value instead of the stale one
-it would otherwise print before the assignment.
+doc reference errors (make refcheckdocs):
 
-Fixes: 43b54c6ee382 ("mptcp: Use full MPTCP-level disconnect state machine")
-Suggested-by: Paolo Abeni <pabeni@redhat.com>
-Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-opus-4-8
-Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
----
-v3:
- - Move the pr_debug() DSS flag log below the mapping block so it prints
-   the final data_fin value (Gang Yan).  data_fin is now assigned only
-   inside the use_map block, so logging it earlier would report a stale
-   value.  No functional change to the fix.
-v2: adopt Paolo Abeni's suggested approach - do not set mp_opt->data_fin
-    at all unless a mapping is present, rather than gating the consumer in
-    mptcp_incoming_options() (v1).  data_fin then defaults to the value
-    mptcp_get_options() already clears it to (0) on the no-map path, so
-    the uninitialized data_len/data_seq are never read.
+See https://patchwork.kernel.org/project/devicetree/patch/20260709181724.24682-2-avermoal@gmail.com
 
-Link to v1: https://lore.kernel.org/all/20260617215725.1116295-1-michael.bommarito@gmail.com/
-Link to v2: https://lore.kernel.org/all/20260707171730.2679013-1-michael.bommarito@gmail.com/
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
 
- net/mptcp/options.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
 
-diff --git a/net/mptcp/options.c b/net/mptcp/options.c
-index dff3fd5d3b559..1b74ca5b6a595 100644
---- a/net/mptcp/options.c
-+++ b/net/mptcp/options.c
-@@ -157,17 +157,11 @@ static void mptcp_parse_option(const struct sk_buff *skb,
- 		ptr++;
- 
- 		flags = (*ptr++) & MPTCP_DSS_FLAG_MASK;
--		mp_opt->data_fin = (flags & MPTCP_DSS_DATA_FIN) != 0;
- 		mp_opt->dsn64 = (flags & MPTCP_DSS_DSN64) != 0;
- 		mp_opt->use_map = (flags & MPTCP_DSS_HAS_MAP) != 0;
- 		mp_opt->ack64 = (flags & MPTCP_DSS_ACK64) != 0;
- 		mp_opt->use_ack = (flags & MPTCP_DSS_HAS_ACK);
- 
--		pr_debug("data_fin=%d dsn64=%d use_map=%d ack64=%d use_ack=%d\n",
--			 mp_opt->data_fin, mp_opt->dsn64,
--			 mp_opt->use_map, mp_opt->ack64,
--			 mp_opt->use_ack);
--
- 		expected_opsize = TCPOLEN_MPTCP_DSS_BASE;
- 
- 		if (mp_opt->use_ack) {
-@@ -178,12 +172,18 @@ static void mptcp_parse_option(const struct sk_buff *skb,
- 		}
- 
- 		if (mp_opt->use_map) {
-+			mp_opt->data_fin = (flags & MPTCP_DSS_DATA_FIN) != 0;
- 			if (mp_opt->dsn64)
- 				expected_opsize += TCPOLEN_MPTCP_DSS_MAP64;
- 			else
- 				expected_opsize += TCPOLEN_MPTCP_DSS_MAP32;
- 		}
- 
-+		pr_debug("data_fin=%d dsn64=%d use_map=%d ack64=%d use_ack=%d\n",
-+			 mp_opt->data_fin, mp_opt->dsn64,
-+			 mp_opt->use_map, mp_opt->ack64,
-+			 mp_opt->use_ack);
-+
- 		/* Always parse any csum presence combination, we will enforce
- 		 * RFC 8684 Section 3.3.0 checks later in subflow_data_ready
- 		 */
--- 
-2.53.0
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
 
 
