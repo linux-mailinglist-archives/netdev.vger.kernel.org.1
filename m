@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-306146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306147-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /dZPFMRwT2oPgwIAu9opvQ
-	(envelope-from <netdev+bounces-306146-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:58:28 +0200
+	id uag5HcxwT2oUgwIAu9opvQ
+	(envelope-from <netdev+bounces-306147-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:58:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5DDB72F391
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:58:27 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 097A872F39F
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:58:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=a1KPI0sQ;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=LCTGvwdn;
 	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306146-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306146-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306147-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306147-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id ED0C53061A43
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:56:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7933E3066569
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:56:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EDB3403EAE;
-	Thu,  9 Jul 2026 09:56:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A34403AE1;
+	Thu,  9 Jul 2026 09:56:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F3D4048BD
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 09:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D40405C3B
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 09:56:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783590995; cv=none; b=XxqLXc6QObHZvOlsu1FuxuoneJ5wUKYEdN6vsR9SS8Z8GZ7ViX1eCvhblVugnU0hFCyy7l/RaPd435gGjdpfzjTkxBbpYrixL87XstJI5iThGBP8zG+LiRlvRXTWdnsQlQ31cvrT9YmNaVX8aogiojaCItOs6sPEgoiUEd3ftVw=
+	t=1783590998; cv=none; b=PPPcEdROVRQIGiCO2RiymVzLZQGc5C7H+/H2XiGki27pr6NqOshNiy5kk0pr7nsuQ+JGxjI8iFOqcS8SGNMbpyvcZFwi+lNMAhHxbWWp6jpGHExmbU8pGNlpKeClL5IOTRzipWZnkGjmz2J9u6qAHDQrG2dDETGxxOV4adkQVyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783590995; c=relaxed/simple;
-	bh=FAPJieQbV7XaZSTa0S2ba0GGEQcNznhHuYs8YLgiQBM=;
+	s=arc-20240116; t=1783590998; c=relaxed/simple;
+	bh=rfqg0J2uyuRQEO0v7oNsbz9k7bQ9h2gGd/vVQrTiMYY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T3yBTzvgNChLfs5PhEqNdyZaEYkzzIPLXZvpjUXBa40n/KnofnbroRLVfvaqNGCCGEXKukixD4LdLmfAmgtfMDibnn6RVc3nihDPtG/UF6uTDfGYvz11ZmUzzZMGY+HKj5kYLHKH4p651BjYTlmTeDcAni686YbtU7E5pl16OeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a1KPI0sQ; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=h9cIquk7mG5X/e0oyaALu7+lXZYEatHpO2dlWS7VEh8WQpZ5Ui3pvc27vFl4G4XAGyk7tdFwf6Gr65KbcR31l8fevHesPQM9BY1tz42W3i3XhJxWfjx7JGoL3XdH4hTSFVrI9dNTTcYabzWH0yU0dORFXiVNOCBwdG97r/+3Q6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LCTGvwdn; arc=none smtp.client-ip=170.10.133.124
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783590991;
+	s=mimecast20190719; t=1783590995;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VtfAOtSy6NfFWkSnNRdeO3M23l9EHqBnB7KmtwOSs88=;
-	b=a1KPI0sQ7AYtR4c1vvZmvJWWgDcmVMBXwZVmr2dGJKpC18El+xEm8R962BldJUy7sj8zq9
-	xq5Gqwb9tUtcPje5XL5rS2o+0hCwyeasrvIh5U1SIBzmerqJ4nC62xl8iHsCPkMej4MYRU
-	A50yN1ghHrLShrDCG/Mip3bV0BeXR0s=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=t+V8ynIrTb/cwkSxXq5I+xnIBPuFzwDshiHvu6B7KTw=;
+	b=LCTGvwdngJwsAmOAdCXOR5CDmL5lsNRr922Qr6YOUO4J2GF0syX9fqvAu53i+PiAbZQAMv
+	KJwkeIpficqGkfG/CO6jxqvibPFvtIpC9yTLEWqCeEPaZcwNIi8Qjw7fgIrBA4d7HPSYLE
+	EUBiVJ9NtyqdpvsGAzeO/MqlDtamG+g=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-441-CHl1pTEvOD6NwMBHojxUVQ-1; Thu,
- 09 Jul 2026 05:56:26 -0400
-X-MC-Unique: CHl1pTEvOD6NwMBHojxUVQ-1
-X-Mimecast-MFC-AGG-ID: CHl1pTEvOD6NwMBHojxUVQ_1783590985
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-292-QJzhCcKkNYCPyjt9GKl8vA-1; Thu,
+ 09 Jul 2026 05:56:32 -0400
+X-MC-Unique: QJzhCcKkNYCPyjt9GKl8vA-1
+X-Mimecast-MFC-AGG-ID: QJzhCcKkNYCPyjt9GKl8vA_1783590991
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 037E81955F7C;
-	Thu,  9 Jul 2026 09:56:25 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1A70718052D7;
+	Thu,  9 Jul 2026 09:56:31 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.44.33.79])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 39EF5180035F;
-	Thu,  9 Jul 2026 09:56:21 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6677B180059E;
+	Thu,  9 Jul 2026 09:56:27 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: rkannoth@marvell.com
 Cc: linux-kernel@vger.kernel.org,
@@ -70,11 +70,11 @@ Cc: linux-kernel@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	sgoutham@marvell.com
-Subject: Re: [PATCH v2 net-next 5/9] octeontx2-af: PAN switch TL1 scheduling and NPC channel control
-Date: Thu,  9 Jul 2026 11:56:20 +0200
-Message-ID: <20260709095620.117353-1-pabeni@redhat.com>
-In-Reply-To: <20260702045026.2914748-6-rkannoth@marvell.com>
-References: <20260702045026.2914748-6-rkannoth@marvell.com>
+Subject: Re: [PATCH v2 net-next 6/9] octeontx2-pf: register switch notifiers for eswitch offload
+Date: Thu,  9 Jul 2026 11:56:25 +0200
+Message-ID: <20260709095625.117367-1-pabeni@redhat.com>
+In-Reply-To: <20260702045026.2914748-7-rkannoth@marvell.com>
+References: <20260702045026.2914748-7-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,7 +82,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -91,12 +91,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306146-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306147-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS(0.00)[m:rkannoth@marvell.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
@@ -115,10 +115,10 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:url,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D5DDB72F391
+X-Rspamd-Queue-Id: 097A872F39F
 
 From: AI Reviewer <ai@example.com>
 
@@ -126,289 +126,368 @@ This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 Full review at: https://netdev-ai.bots.linux.dev/sashiko/
 ---
-octeontx2-af: PAN switch TL1 scheduling and NPC channel control
+octeontx2-pf: register switch notifiers for eswitch offload
 
-This change adds NIX_TXSCH_ALLOC_FLAG_PAN so nix_txsch_alloc can request
-more than one aggregate-level (TL1) index for PAN/switch mode, adds
-TXSCHQ_FREE_PAN_TL1 to permit freeing those indices via
-nix_txschq_free_one, and adds a set_chanmask field to
-npc_install_flow_req. It also widens the NIX LF SQ bitmap allocation
-and extends struct sg_list.
+This change registers switchdev, FIB, netevent, inetaddr, inet6addr,
+and netdevice notifiers when devlink switch mode is enabled, adds
+sw_nb_v4.c/sw_nb_v6.c for family-specific handlers, and extends
+sw_nb.c with device filtering for Cavium ports behind bridges and
+VLANs.
 
-A few questions inline below.
-
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> index 7ac26629d9af..28ebf0a8d3d6 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> @@ -1157,6 +1157,8 @@ struct nix_txsch_alloc_req {
->  	/* Scheduler queue count request at each level */
->  	u16 schq_contig[NIX_TXSCH_LVL_CNT]; /* No of contiguous queues */
->  	u16 schq[NIX_TXSCH_LVL_CNT]; /* No of non-contiguous queues */
-> +#define NIX_TXSCH_ALLOC_FLAG_PAN BIT_ULL(0)
-> +	u64 flags;
->  };
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
+> index 257a2ae6a53e..e4c01ac87477 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
+> @@ -399,6 +400,9 @@ static void rvu_rep_get_stats64(struct net_device *dev,
 >  
->  struct nix_txsch_alloc_rsp {
-> @@ -1175,6 +1177,7 @@ struct nix_txsch_alloc_rsp {
->  struct nix_txsch_free_req {
->  	struct mbox_msghdr hdr;
->  #define TXSCHQ_FREE_ALL BIT_ULL(0)
-> +#define TXSCHQ_FREE_PAN_TL1 BIT_ULL(1)
->  	u16 flags;
->  	/* Scheduler queue level to be freed */
->  	u16 schq_lvl;
-
-[Critical]
-Should these two new flags be gated on the requester being the AF via
-is_pffunc_af(req->hdr.pcifunc)?
-
-Before this change, the aggregate level (TL1) was intentionally opaque
-to non-AF callers: nix_txschq_free_one() short-circuited with
-if (lvl >= hw->cap.nix_tx_aggr_lvl) return 0; and nix_txsch_alloc()
-forced a single TL queue tied to the caller's mapped Tx link.
-
-With the new flags there does not appear to be any is_pffunc_af() check
-on the alloc or free paths, so any PF/VF can pass NIX_TXSCH_ALLOC_FLAG_PAN
-to bypass the Tx-link mapping and touch TL1 slots that belong to
-other links or other pcifuncs, or pass TXSCHQ_FREE_PAN_TL1 to free a
-TL1 index. The existing comment in nix_txschq_free() says:
-
-    /* Do not clear pcifunc in txsch->pfvf_map[schq] because VF might
-     * be using this TL1 queue
-     */
-
-so if a PF frees a TL1 that a VF is still transmitting through, after
-rvu_free_rsrc(&txsch->schq, schq) and
-pfvf_map[schq] = TXSCH_MAP(0, NIX_TXSCHQ_FREE) that hardware slot is
-reallocatable while the VF still uses it. Is that intended?
-
-> @@ -2105,6 +2108,7 @@ struct npc_install_flow_req {
->  	u8 hw_prio;
->  	u8  req_kw_type; /* Key type to be written */
->  	u8 alloc_entry;	/* only for cn20k */
-> +	u8 set_chanmask;
+>  static int rvu_eswitch_config(struct otx2_nic *priv, u8 ena)
+>  {
+> +#if IS_ENABLED(CONFIG_OCTEONTX_SWITCH)
+> +	struct net_device *netdev = priv->netdev;
+> +#endif
+>  	struct devlink_port_attrs attrs = {};
+>  	struct esw_cfg_req *req;
+>  
+> @@ -414,6 +418,11 @@ static int rvu_eswitch_config(struct otx2_nic *priv, u8 ena)
+>  	memcpy(req->switch_id, attrs.switch_id.id, attrs.switch_id.id_len);
+>  	otx2_sync_mbox_msg(&priv->mbox);
+>  	mutex_unlock(&priv->mbox.lock);
+> +
+> +#if IS_ENABLED(CONFIG_OCTEONTX_SWITCH)
+> +	ena ? sw_nb_register(netdev) : sw_nb_unregister(netdev);
+> +#endif
+> +
+>  	return 0;
+>  }
 
 [Medium]
-The commit message says:
+Is the return value from sw_nb_register() and sw_nb_unregister()
+intentionally discarded here?
 
-    For NPC install flow, add set_chanmask so callers can keep a
-    non-default chan_mask when the requester is not the AF; without
-    it, chan_mask was always forced to 0xFFF for non-AF functions.
+sw_nb_register() has six register_*_notifier() calls and a full
+err1..err5 unwind path, but the ternary drops any error and the caller
+returns 0.  The mbox esw_cfg_req has already been committed to the AF
+before this line runs, so on notifier registration failure the AF sees
+switch mode enabled while the PF has no observation infrastructure,
+and devlink still reports success.
 
-Where is set_chanmask consumed? A grep across the tree finds only this
-struct field definition and no reader; the existing non-AF override in
-rvu_npc_fs.c is unchanged:
+[Medium]
+The notifier_block instances (sw_nb_fdb, sw_nb_fib, sw_nb_netevent,
+sw_nb_v4_inetaddr, sw_nb_v6_inetaddr, sw_nb_netdev) and sw_nb_pf_netdev
+are file-scope singletons in sw_nb.c.  When devlink switch mode is
+enabled on a second octeontx2 PF (multi-port CN10K parts have a devlink
+instance per PF), sw_nb_register() re-registers the same static
+notifier_block pointers.
 
-    if (!is_pffunc_af(req->hdr.pcifunc))
-            req->chan_mask = rvu_get_cpt_chan_mask(rvu);
+For notifier chains that keep a single linked list of nodes, adding the
+same node twice either fails with -EEXIST (silently, per the previous
+comment) or corrupts the chain.  sw_nb_pf_netdev is also unconditionally
+overwritten so any netdev_info/netdev_dbg(sw_nb_pf_netdev, ...) is
+attributed to the wrong PF, and once the first PF's netdev is freed
+the pointer becomes a use-after-free for any callback that still
+dereferences it.
 
-Should the corresponding "keep chan_mask" hunk that consults
-set_chanmask be part of this commit, or was it meant for a follow-up?
+Should these notifier_blocks live in a per-PF structure instead?
 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-> index d2734f6d6d92..35c91cdc50b9 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c
+> index 2d14a0590c5d..fb183265a9aa 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c
 
 [ ... ]
 
-> @@ -2138,11 +2138,14 @@ static int nix_check_txschq_alloc_req(struct rvu *rvu, int lvl, u16 pcifunc,
->  	if (!req_schq)
->  		return 0;
->  
-> -	link = nix_get_tx_link(rvu, pcifunc);
-> +	if (req->flags & NIX_TXSCH_ALLOC_FLAG_PAN)
-> +		link = hw->cgx_links + hw->lbk_links + 1;
-> +	else
-> +		link = nix_get_tx_link(rvu, pcifunc);
->  
->  	/* For traffic aggregating scheduler level, one queue is enough */
->  	if (lvl >= hw->cap.nix_tx_aggr_lvl) {
-> -		if (req_schq != 1)
-> +		if (req_schq != 1 && !(req->flags & NIX_TXSCH_ALLOC_FLAG_PAN))
->  			return NIX_AF_ERR_TLX_ALLOC_FAIL;
->  		return 0;
->  	}
-
-[Critical]
-Can this branch let a caller-controlled count reach the alloc loop
-without a MAX_TXSCHQ_PER_FUNC ceiling?
-
-For non-PAN, aggregate-level requests were previously rejected unless
-req_schq == 1. With NIX_TXSCH_ALLOC_FLAG_PAN, the check is skipped and
-this function returns 0 before the general guard further down:
-
-    if (free_cnt < req_schq || req->schq[lvl] > MAX_TXSCHQ_PER_FUNC ||
-        req->schq_contig[lvl] > MAX_TXSCHQ_PER_FUNC)
-            return NIX_AF_ERR_TLX_ALLOC_FAIL;
-
-rvu_mbox_handler_nix_txsch_alloc() later copies the request into rsp
-and iterates:
-
-    for (idx = 0; idx < req->schq_contig[lvl]; idx++) {
-            schq = rsp->schq_contig_list[lvl][idx];
-            ...
-            pfvf_map[schq] = TXSCH_MAP(pcifunc, 0);
-            nix_reset_tx_linkcfg(rvu, blkaddr, lvl, schq);
-            nix_reset_tx_shaping(rvu, blkaddr, nixlf, lvl, schq);
-            nix_reset_tx_schedule(rvu, blkaddr, lvl, schq);
-    }
-
-rsp->schq_contig_list[lvl] and rsp->schq_list[lvl] are each
-MAX_TXSCHQ_PER_FUNC entries. If req->schq_contig[lvl] exceeds
-MAX_TXSCHQ_PER_FUNC, idx runs past the array, schq is read from
-adjacent memory, and pfvf_map[schq] = TXSCH_MAP(pcifunc, 0) writes at
-an attacker-controlled offset. Should the PAN branch keep the
-MAX_TXSCHQ_PER_FUNC bound?
+> +bool sw_nb_is_valid_dev(struct net_device *netdev)
+> +{
+> +	struct netdev_nested_priv priv;
+> +	struct net_device *br;
+> +	int cnt = 0;
+> +
+> +	priv.flags = true;
+> +	priv.data = &cnt;
+> +
+> +	if (netif_is_bridge_master(netdev) || is_vlan_dev(netdev)) {
+> +		/* sw_nb_is_valid_dev() is invoked in notifier callback context, so
+> +		 * rtnl_lcok is already acquired
+> +		 */
+> +		netdev_walk_all_lower_dev(netdev, sw_nb_check_slaves, &priv);
+> +		return priv.flags && !!*(int *)priv.data;
+> +	}
+> +
+> +	if (netif_is_bridge_port(netdev)) {
+> +		br = netdev_master_upper_dev_get_rcu(netdev);
+> +		if (!br)
+> +			return false;
+> +
+> +		netdev_walk_all_lower_dev(br, sw_nb_check_slaves, &priv);
+> +		return priv.flags && !!*(int *)priv.data;
+> +	}
+> +
+> +	return sw_nb_is_cavium_dev(netdev);
+> +}
 
 [High]
-The PAN link index is computed as:
+Is the assumption in the comment ("rtnl_lcok is already acquired")
+correct for all callers?
 
-    link = hw->cgx_links + hw->lbk_links + 1;
+sw_nb_is_valid_dev() is invoked from:
 
-and the caller then does end = link + 1. For the TL1 level,
-txsch->schq.max is programmed from NIX_AF_TL1_CONST in
-nix_setup_txschq():
+  sw_nb_net_event()      - netevent chain, atomic_notifier
+  sw_nb_v4_fib_event()   - FIB chain, atomic_notifier
+  sw_nb_v6_fib_event()   - FIB chain, atomic_notifier
+  sw_nb_fdb_event()      - switchdev, atomic
+  sw_nb_netdev_event()   - netdevice chain, rtnl-held
 
-    txsch->schq.max = cfg & 0xFFFF;
+register_netevent_notifier() and register_fib_notifier() install into
+atomic notifier chains (see net/core/netevent.c and
+net/core/fib_notifier.c), so those callbacks are not guaranteed to run
+with rtnl held.
 
-Is there anything guaranteeing that hw->cgx_links + hw->lbk_links + 2
-is less than txsch->schq.max for TL1? The non-PAN path is bounded
-because nix_get_tx_link() only returns values in the range
-[0, cgx_links + lbk_links]. The new path adds one beyond that with no
-ceiling check, so set_bit(schq, txsch->schq.bmap) below and later
-NIX_AF_TL1X_CIR(schq) register writes could target undefined TL1
-indices on silicon where TL1 count is small.
+netdev_walk_all_lower_dev() (the non-RCU variant) walks
+dev->adj_list.lower without rcu_dereference, and
+netdev_master_upper_dev_get_rcu() dereferences adj_list.upper without
+an outer rcu_read_lock.  Concurrent adjacency changes under rtnl can
+then race the walk.  Also, note the typo "rtnl_lcok" in the comment.
 
-> @@ -2179,11 +2182,41 @@ static void nix_txsch_alloc(struct rvu *rvu, struct nix_txsch *txsch,
->  	struct rvu_hwinfo *hw = rvu->hw;
->  	u16 pcifunc = rsp->hdr.pcifunc;
->  	int idx, schq;
-> +	bool alloc;
->  
->  	/* For traffic aggregating levels, queue alloc is based
->  	 * on transmit link to which PF_FUNC is mapped to.
->  	 */
->  	if (lvl >= hw->cap.nix_tx_aggr_lvl) {
-> +		if (start != end) {
-> +			idx = 0;
-> +			alloc = false;
-> +			for (schq = start; schq <= end; schq++, idx++) {
-> +				if (test_bit(schq, txsch->schq.bmap))
-> +					continue;
+[ ... ]
+
+> +static int sw_nb_netdev_event(struct notifier_block *unused,
+> +			      unsigned long event, void *ptr)
+> +{
+[ ... ]
+> +}
 > +
-> +				set_bit(schq, txsch->schq.bmap);
+> +static struct notifier_block sw_nb_netdev = {
+> +	.notifier_call = sw_nb_netdev_event,
+> +};
 > +
-> +				/* A single TL queue is allocated each time */
-> +				if (rsp->schq_contig[lvl]) {
-> +					alloc = true;
-> +					rsp->schq_contig_list[lvl][idx] = schq;
-> +					continue;
-> +				}
+> +int sw_nb_unregister(struct net_device *netdev)
+> +{
+[ ... ]
+> +}
+> +EXPORT_SYMBOL(sw_nb_unregister);
 > +
-> +				if (rsp->schq[lvl]) {
-> +					alloc = true;
-> +					rsp->schq_list[lvl][idx] = schq;
-> +					continue;
-> +				}
-> +			}
+> +int sw_nb_register(struct net_device *netdev)
+> +{
+[ ... ]
+> +}
+> +EXPORT_SYMBOL(sw_nb_register);
+
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v4.c b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v4.c
+> new file mode 100644
+> index 000000000000..947dafe586a0
+> --- /dev/null
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v4.c
+
+[ ... ]
+
+> +int sw_nb_v4_inetaddr_event(struct notifier_block *nb,
+> +			    unsigned long event, void *ptr)
+> +{
+> +	struct in_ifaddr *ifa = (struct in_ifaddr *)ptr;
+> +	struct net_device *dev = ifa->ifa_dev->dev;
+> +	struct net_device *lower, *pf_dev;
+> +	struct netdev_hw_addr *dev_addr;
+> +	struct fib_entry *entry;
+> +	struct in_device *idev;
+> +	struct list_head *iter;
+> +	struct otx2_nic *pf;
 > +
-> +			if (!alloc)
-> +				dev_err(rvu->dev,
-> +					"Could not allocate schq at lvl=%u start=%u end=%u\n",
-> +					lvl, start, end);
-> +			return;
+> +	if (event != NETDEV_CHANGE &&
+> +	    event != NETDEV_UP &&
+> +	    event != NETDEV_DOWN) {
+> +		return NOTIFY_DONE;
+> +	}
+> +
+> +	idev = __in_dev_get_rtnl(dev);
+> +	if (!idev || !idev->ifa_list)
+> +		return NOTIFY_DONE;
+> +
+> +	entry = kcalloc(1, sizeof(*entry), GFP_ATOMIC);
+> +	entry->cmd = sw_nb_inetaddr_event_to_otx2_event(event, dev);
+
+[High]
+Can kcalloc() return NULL here?  The very next line dereferences entry
+without a NULL check.  The same pattern is present in
+sw_nb_net_v4_neigh_update(), sw_nb_v6_netdev_event(),
+sw_nb_v6_inetaddr_event(), and sw_nb_net_v6_neigh_update().  Two other
+handlers in this same patch (sw_nb_v4_netdev_event and
+sw_nb_v4_fib_event) do have the NULL check.
+
+These callbacks run from atomic notifier chains (netevent, inet6addr)
+during frequent events such as ARP/ND updates and address changes,
+which are triggerable by an unprivileged party sending traffic on the
+interface.
+
+[Medium]
+For the bridge-master branch below:
+
+> +	pf_dev = dev;
+> +	if (netif_is_bridge_master(dev))  {
+> +		entry->bridge = 1;
+> +		netdev_for_each_lower_dev(dev, lower, iter) {
+> +			pf_dev = lower;
+> +			break;
 > +		}
+> +	} else if (is_vlan_dev(dev)) {
+> +		entry->vlan_valid = 1;
+> +		pf_dev = vlan_dev_real_dev(dev);
+> +		entry->vlan_tag = vlan_dev_vlan_id(dev);
+> +	}
+> +
+> +	pf = netdev_priv(pf_dev);
+> +	entry->port_id = pf->pcifunc;
 
-[Critical]
-A few concerns on this new block.
+What happens when the bridge has zero slaves?  pf_dev stays equal to
+the bridge netdev itself, and netdev_priv(bridge) returns
+struct net_bridge, not struct otx2_nic.  Reading pcifunc off that
+pointer produces an out-of-type read.
 
-First, idx advances unconditionally in the for-clause even when the
-continue-on-busy path is taken. Consider start=L, end=L+1 where slot
-L is already set in the bitmap and req->schq_contig[lvl] == 1:
-
-    iter 1: schq=L busy       -> continue (idx becomes 1)
-    iter 2: schq=L+1 free     -> set_bit(L+1); rsp->schq_contig_list[lvl][1] = L+1
-
-rsp->schq_contig_list[lvl][0] stays as 0. The caller then loops
-idx = 0 .. req->schq_contig[lvl] - 1 in rvu_mbox_handler_nix_txsch_alloc()
-and picks up schq = rsp->schq_contig_list[lvl][0] = 0. That triggers
-pfvf_map[0] = TXSCH_MAP(pcifunc, 0) if NIX_TXSCHQ_CFG_DONE is not set,
-and nix_reset_tx_linkcfg/shaping/schedule(rvu, blkaddr, lvl, 0),
-disturbing TL1[0]. Can this hijack TL1[0] from its real owner?
-
-Second, this loop calls set_bit(schq, txsch->schq.bmap) once for each
-free slot in [start, end], but never decrements
-rsp->schq_contig[lvl]/rsp->schq[lvl] or otherwise reports how many
-were placed into the response list. With req->schq_contig[lvl] == 1
-and both slots free, both bits get set, but only one is reported back.
-The bit for the extra slot then has no matching entry in pfvf_map, and
-nix_txschq_free_one() gates on:
-
-    if (TXSCH_MAP_FUNC(pfvf_map[schq]) != pcifunc) {
-            rc = NIX_AF_ERR_TLX_INVALID;
-            goto err;
-    }
-
-so the client cannot free it. Is the resulting bitmap leak intended?
-
-Third, on the "no slot free" path, alloc stays false, dev_err() is
-logged, and the function returns without clearing rsp->schq_contig[lvl]
-or rsp->schq[lvl]. The mbox handler returns success, so consumers see
-non-zero counts and then read rsp->schq_contig_list[lvl][0] == 0
-(zero-initialized rsp) as a valid schq. Should this path signal
-failure back to the caller?
-
-> +		/* A single TL queue is allocated */
->  		if (rsp->schq_contig[lvl]) {
->  			rsp->schq_contig[lvl] = 1;
+Unlike sw_nb_v4_fib_event() and sw_nb_net_v4_neigh_update(), this
+handler is not gated by sw_nb_is_valid_dev(), so an empty bridge with
+no ports still reaches this code.
 
 [ ... ]
 
-> @@ -2300,11 +2333,14 @@ int rvu_mbox_handler_nix_txsch_alloc(struct rvu *rvu,
->  		rsp->schq[lvl] = req->schq[lvl];
->  		rsp->schq_contig[lvl] = req->schq_contig[lvl];
->  
-> -		link = nix_get_tx_link(rvu, pcifunc);
-> +		if (req->flags & NIX_TXSCH_ALLOC_FLAG_PAN)
-> +			link = hw->cgx_links + hw->lbk_links + 1;
-> +		else
-> +			link = nix_get_tx_link(rvu, pcifunc);
->  
->  		if (lvl >= hw->cap.nix_tx_aggr_lvl) {
->  			start = link;
-> -			end = link;
-> +			end = link + !!(req->flags & NIX_TXSCH_ALLOC_FLAG_PAN);
->  		} else if (hw->cap.nix_fixed_txschq_mapping) {
->  			nix_get_txschq_range(rvu, pcifunc, link, &start, &end);
->  		} else {
+> +int sw_nb_v4_fib_event(struct notifier_block *nb,
+> +		       unsigned long event, void *ptr)
+> +{
+[ ... ]
+> +	entries = kcalloc(fi->fib_nhs, sizeof(*entries), GFP_ATOMIC);
+> +	if (!entries)
+> +		return NOTIFY_DONE;
+> +
+> +	haddr = kcalloc(fi->fib_nhs, sizeof(u32), GFP_ATOMIC);
+> +	if (!haddr) {
+> +		kfree(entries);
+> +		return NOTIFY_DONE;
+> +	}
+[ ... ]
+> +	cnt = iter - entries;
+> +	if (!cnt)
+> +		return NOTIFY_DONE;
+> +
+> +	netdev_dbg(pf_dev, "pf_dev is %s cnt=%d\n", pf_dev->name, cnt);
+> +	kfree(entries);
+> +
+> +	if (!hcnt)
+> +		return NOTIFY_DONE;
+> +
+> +	entries = kcalloc(hcnt, sizeof(*entries), GFP_ATOMIC);
+> +	if (!entries)
+> +		return NOTIFY_DONE;
 
 [High]
-The commit message states:
+Does this leak entries and haddr on the early-return paths?
 
-    Add TXSCHQ_FREE_PAN_TL1 so TL1 entries in that path can be freed
-    via nix_txsch_free where they were previously skipped.
+The if (!cnt) return path returns before freeing entries or haddr.
 
-Is nix_txsch_free() actually updated by this patch? Only
-nix_txschq_free_one() gets a new gate. The bulk path nix_txschq_free()
-still has if (lvl >= hw->cap.nix_tx_aggr_lvl) continue; in both its
-scan and free loops, so aggregate-level bits set by the new
-nix_txsch_alloc() block above are never cleared by that path, whether
-it is reached via TXSCHQ_FREE_ALL or via nix_lf_teardown() on LF close
-or FLR. Was a matching hunk in nix_txschq_free() intended?
+The if (!hcnt) return path frees entries just above but then returns
+without freeing haddr.
 
-> @@ -2669,7 +2705,9 @@ static int nix_txschq_free_one(struct rvu *rvu,
->  	schq = req->schq;
->  	txsch = &nix_hw->txsch[lvl];
->  
-> -	if (lvl >= hw->cap.nix_tx_aggr_lvl || schq >= txsch->schq.max)
-> +	if ((lvl >= hw->cap.nix_tx_aggr_lvl &&
-> +	     !(req->flags & TXSCHQ_FREE_PAN_TL1)) ||
-> +	    schq >= txsch->schq.max)
->  		return 0;
->  
->  	pfvf_map = txsch->pfvf_map;
+The second kcalloc failure path returns having freed only the first
+entries allocation, leaving haddr allocated.
+
+FIB events fire on every route change; a system where
+sw_nb_is_valid_dev() rejects every nexthop will leak on every event.
+This appears to be addressed in the follow-up commit
+7f7c9aba2d92 ("octeontx2: offload host FIB updates to switch via AF
+mailbox") which adds kfree() calls on each branch, but the leak is
+present in this commit as-is.
+
+[ ... ]
+
+> +int sw_nb_net_v4_neigh_update(struct notifier_block *nb,
+> +			      unsigned long event, void *ptr)
+> +{
+[ ... ]
+> +	entry = kcalloc(1, sizeof(*entry), GFP_ATOMIC);
+> +	entry->cmd = OTX2_NEIGH_UPDATE;
+> +	entry->dst = (__force u32)htonl(*(u32 *)n->primary_key);
+> +	entry->dst_len = n->tbl->key_len * 8;
+> +	entry->mac_valid = 1;
+> +	entry->nud_state = n->nud_state;
+> +	neigh_ha_snapshot(entry->mac, n, n->dev);
+> +	ether_addr_copy(entry->mac, n->ha);
+
+[Medium]
+Why does this call neigh_ha_snapshot() followed immediately by a
+plain ether_addr_copy() on n->ha?
+
+neigh_ha_snapshot() uses read_seqbegin/read_seqretry against
+n->ha_lock precisely because n->ha updates from neigh_update() take
+write_seqlock(&n->ha_lock) and are not atomic word-writes on all
+architectures.  The subsequent ether_addr_copy() is an unsynchronized
+read of the same field and overwrites the snapshot with a possibly
+torn value.
+
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v6.c b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v6.c
+> new file mode 100644
+> index 000000000000..cc908f565d24
+> --- /dev/null
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v6.c
+
+[ ... ]
+
+> +int sw_nb_v6_netdev_event(struct notifier_block *unused,
+> +			  unsigned long event, void *ptr)
+> +{
+[ ... ]
+> +	i6dev = __in6_dev_get(dev);
+> +
+> +	rcu_read_lock();
+> +	ifp = list_first_entry_or_null(&i6dev->addr_list,
+> +				       struct inet6_ifaddr,  if_list);
+> +	if (!ifp) {
+> +		rcu_read_unlock();
+> +		return NOTIFY_DONE;
+> +	}
+> +
+> +	if (ipv6_addr_type(&ifp->addr) & IPV6_ADDR_LINKLOCAL) {
+> +		rcu_read_unlock();
+> +		return NOTIFY_DONE;
+> +	}
+> +
+> +	pf = netdev_priv(dev);
+> +
+> +	entry = kcalloc(1, sizeof(*entry), GFP_KERNEL);
+> +	entry->cmd = sw_nb_inetaddr_event_to_otx2_event(event, dev);
+
+[High]
+Is GFP_KERNEL safe under rcu_read_lock()?  GFP_KERNEL implies
+__GFP_DIRECT_RECLAIM and may sleep, which is illegal inside an RCU
+read-side critical section and will trip
+"BUG: sleeping function called from invalid context" with
+CONFIG_DEBUG_ATOMIC_SLEEP.
+
+Would GFP_ATOMIC, or moving the allocation outside the
+rcu_read_lock() region, be more appropriate?
+
+[High]
+Is there a missing NULL check on this kcalloc()?  The next statement
+dereferences entry unconditionally.
+
+[ ... ]
+
+> +int sw_nb_v6_inetaddr_event(struct notifier_block *nb,
+> +			    unsigned long event, void *ptr)
+> +{
+[ ... ]
+> +	entry = kcalloc(1, sizeof(*entry), GFP_ATOMIC);
+> +	entry->cmd = sw_nb_inetaddr_event_to_otx2_event(event, dev);
+
+[High]
+Same pattern as noted above - can this dereference NULL when kcalloc()
+fails under memory pressure?
+
+> +int sw_nb_net_v6_neigh_update(struct notifier_block *nb,
+> +			      unsigned long event, void *ptr)
+> +{
+[ ... ]
+> +	entry = kcalloc(1, sizeof(*entry), GFP_ATOMIC);
+> +	entry->cmd = OTX2_NEIGH_UPDATE;
+
+[High]
+Same as above - is a NULL check missing before dereferencing entry?
 -- 
 This is an AI-generated review.
 
