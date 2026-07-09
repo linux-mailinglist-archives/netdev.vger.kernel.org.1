@@ -1,206 +1,176 @@
-Return-Path: <netdev+bounces-306089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306090-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Yy50IwRdT2rtfAIAu9opvQ
-	(envelope-from <netdev+bounces-306089-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 10:34:12 +0200
+	id lT52DRJfT2qBfQIAu9opvQ
+	(envelope-from <netdev+bounces-306090-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 10:42:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FAE972E569
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 10:34:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8087472E6B1
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 10:42:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=aqOnfrwo;
-	dmarc=pass (policy=none) header.from=intel.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306089-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306089-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=avHKS5EF;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306090-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306090-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6CD5B30352CC
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 08:32:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 98CF430578F8
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 08:35:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94F433F39EE;
-	Thu,  9 Jul 2026 08:32:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A28F3F076F;
+	Thu,  9 Jul 2026 08:35:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2726E3F0AA2;
-	Thu,  9 Jul 2026 08:32:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0C93EFFDC
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 08:35:22 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783585929; cv=none; b=HQU+JByDWN0ZUxM2hpFxjTTy6xy3UFRi3ocgG7VLL85N9qhmgKVz5IFKPCFAHx+o45DPAok/DSr8lbOPOMV1foCxZUykeSNYptFu+G90Vyie94bWmg9gVFEC2NtTJ8P0yvlAT7GccBKJs2FM1mFfRwnZfPT8pDEX2l8ULNaDRx8=
+	t=1783586124; cv=none; b=ScwvgM82ZBPj2X9Id3+Je8Hdam4TA+M9IA7uMPVh+YMCCEOETJWqToGU6+YmUZXjJ50HhKX4y5LvMGyBG64qXtCYstxDZM1e5mUrHtCSsUkrsVXUGC04hAsaexpIYCNwFf00Rexw7Sf6S2OtQF6rjZN5lZhd+cystpK/eVxzUu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783585929; c=relaxed/simple;
-	bh=tesK+oxJqsB49auQK1mjbbrkVhdKYiJrkTlVS/W/lOU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QUlGTkLU892zJ5Qa+yiQZDRttOPY2a1+3aqzbioimmj1xxIEFb/OWBK1+IDhbHj1iv1BELPevDC1MWUFpWXJ+8gpj2Ek1sItm1tr+KupLysW8IRdG3H83tf6KL2c5+IcUu9j4H5LVww1VDUjVwmTGic/XnmdAlScmrIe1nTEmB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aqOnfrwo; arc=none smtp.client-ip=192.198.163.18
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1783585928; x=1815121928;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tesK+oxJqsB49auQK1mjbbrkVhdKYiJrkTlVS/W/lOU=;
-  b=aqOnfrwohYy6CTM21w0/xYpfju7bldEWmMf6w21+t4qqXOqOE4CQYOxT
-   mtCUZvh/AFq8A94AwTISTwKfI9iHSYgsMIDrG/9m77Zue8ztpIJg6dcKn
-   pNSeRVAnb7VHQwXVtBLt397GRbJIoky8Q5r66zJzUmii0MJGPlskUeat+
-   GzJIgEZ2XiYZekzgvV14D3wbuSxw7efEmLOlPkMerDYf7xsXVcd8fMrZ6
-   +Q9Uos46xhv/KA3yxY0agP5RssREnPhcVpviJQkFrG+huLVKtzhzQ+9e2
-   7PVrzzCfuXm2EeRyKHcevH0SUkD8fJtyxEUo4NrJwhIiSp6cVAGNS7K+P
-   g==;
-X-CSE-ConnectionGUID: S70fGcBKRVCq58yHvozo/g==
-X-CSE-MsgGUID: M+a8V2EeSFmcx3HSXaTIfw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="83373170"
-X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="83373170"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2026 01:32:07 -0700
-X-CSE-ConnectionGUID: EEXzGbqiQH+fSuwG0kIRwg==
-X-CSE-MsgGUID: Ubkrz2plSRGEjKFky/y1TA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="250537941"
-Received: from ettammin-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.245.235])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2026 01:31:57 -0700
-Date: Thu, 9 Jul 2026 11:31:55 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-	mkalderon@marvell.com, zyjzyj2000@gmail.com, sagi@grimberg.me,
-	mgurtovoy@nvidia.com, haris.iqbal@ionos.com, jinpu.wang@ionos.com,
-	bvanassche@acm.org, kbusch@kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, kch@nvidia.com, smfrench@gmail.com,
-	linkinjeon@kernel.org, metze@samba.org, tom@talpey.com,
-	cel@kernel.org, jlayton@kernel.org, neil@brown.name,
-	okorniev@redhat.com, Dai.Ngo@oracle.com, trondmy@kernel.org,
-	anna@kernel.org, achender@kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, kees@kernel.org, michaelgur@nvidia.com,
-	edwards@nvidia.com, phaddad@nvidia.com, eadavis@qq.com,
-	yishaih@nvidia.com, kalesh-anakkur.purayil@broadcom.com,
-	clm@meta.com, ebadger@purestorage.com, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, target-devel@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH v10 rdma-next] RDMA: Change capability fields in
- ib_device_attr from int to u32
-Message-ID: <ak9ce4PaJ5n89zW9@ashevche-desk.local>
-References: <20260709055211.2498307-1-ernis@linux.microsoft.com>
+	s=arc-20240116; t=1783586124; c=relaxed/simple;
+	bh=EmfGE2fJGvx4uo658fNYnCEeeIbHPJMH4oIWknUOE+k=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=oQdG/X6kUfth4u/mRK/xTxikRD5VvbZmqgOA6ZTTNAyvAQTLVBlfcrZkgD9b9AthORgFHjEZbE27nyqnRiu72b70cgwhdVBXC5ZA8LJzMWffAFTnySgzi0uTv7ELxDCxodORbBhRwkSMVeO3ANI7BSgQss9p8qoDNvZpVap5Vxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=avHKS5EF; arc=none smtp.client-ip=209.85.216.42
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-3825c406ffeso1735343a91.0
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 01:35:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783586122; x=1784190922; darn=vger.kernel.org;
+        h=mime-version:content-type:message-id:date:subject:cc:to:from:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=05+LHhpaaEHtiLUM/uJYO+V0R+R9kRnyL/DEaqmQD5k=;
+        b=avHKS5EFXaRFtHZNufv0ECXITwvEjsyqkxU01M4l0MXyMKW8pb8uhZ7JjlpordcyAP
+         kUw3hWmfL2m8GRTeQIYW9Ts00FBYdG1BG4HXbvVh98Qxx/HNkaY3h8Y3U4IHZfC7r8bA
+         Z3QnVPGM+4ZVKyobcDi6lofnBPI1aY/umap4O2fGOXkiLIaScehbTcY3MLeutPI+W/Qx
+         btK8/0RO79DnTF6LpLp4D7AzvAZfHnXZxzYmASUTodxtUh+VM4sPl8aSDi2/yT7YXpAZ
+         ifZQS05JOzC3Mxn6TOS/s6kUdNPi4Dt1gQ2BLXXYKHvr/41vQU6XO5QKZXQZ4fg7MuSN
+         Gpqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783586122; x=1784190922;
+        h=mime-version:content-type:message-id:date:subject:cc:to:from
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=05+LHhpaaEHtiLUM/uJYO+V0R+R9kRnyL/DEaqmQD5k=;
+        b=A9fLzwsvGXKNlQB3KsEmlRO7RmioGK1NZYxVtISzwM+RyHsKWE7pnDn9H4fb7ULkqU
+         TcBrxMd/gaTI/yB61KJNY0KbfA/fe/xUa0kRgNvlcLxMo+0fEmSVQgFKKO7db0+IAhrv
+         cVPoovtuW9wL0fIGGJ8ZViLzyopZGmw6vVm9nFkKMeYQYyk4vfAuXkXVYhHCLmvI0hfZ
+         GSpGAC/IJezGQdhIsrBZKCUgKFdBI5mp6zoOi9OPQqHhtFVkRmakRTner5os0TTS2FmH
+         CvyaqZjAO75xHTusI8DC8ujSmnSGsSiuRAcB4HNpy5Wu7mVg5pW1eBo/Ilt4MP86EphE
+         h9qg==
+X-Gm-Message-State: AOJu0YzyYHjqO0fvZaF7nluXx4VNJxmPLx99xfiKTmBTl+Rl9yY8lAtk
+	/X6KyZhYeHWjq2IT6WB7XsrqqKXbor5X3r77ucje62SEtFqvr7qK02fw2c4KhbaghNc=
+X-Gm-Gg: AfdE7cmQsRDVbgzU8SvXcrcQC/ohxKF8gpQjc9pukqWCUhinet/3z8na0I8oxYtjJTY
+	S/vDbZJ88LyLYoQDSms8Pslz33uxiN2P9kehhd42rqfPRGapEeMVU0rE5AdyJ4G/QRXOXr4QDn9
+	w1gnaDw+KcUPtfaOQIc8SXP4N1cnEXheTxa4UKea47bxhk5Uy5QKbvtw8jkAOl5AiE7iby0WcKT
+	FpcYRVqlCDUoO+UtQ0qNdebHrv7l1Qq6nlqhRh7io9iRLAV/yrUEM9nc96uqTQkNl1EiG+Q1f7j
+	lzJtgc1ICJpybUB0FhqiB1Fwq6DFJP5jJVWwUbXl8j+CC1IaRObNvcJa2f9WQMhgzQrnQtpK2jo
+	SxS8UelzbmMDOolS7nv5eWqPEfm1baYvHSpFbPMhqFeeShcrK7eXcULH0N6hN4y8iODTLUBr6rp
+	vs404r1Q==
+X-Received: by 2002:a17:90b:4a4f:b0:37f:c69d:ce69 with SMTP id 98e67ed59e1d1-389415edb6fmr6386335a91.10.1783586122340;
+        Thu, 09 Jul 2026 01:35:22 -0700 (PDT)
+Received: from [127.0.1.1] ([47.253.114.73])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38a5564f58csm811721a91.8.2026.07.09.01.35.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jul 2026 01:35:22 -0700 (PDT)
+From: Wayen Yan <win847@gmail.com>
+To: netdev@vger.kernel.org
+Cc: lorenzo@kernel.org, horms@kernel.org, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, andrew+netdev@lunn.ch, angelogioacchino.delregno@collabora.com, matthias.bgg@gmail.com, linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Subject: [PATCH net-next] ipv6: initialize ipcm6_cookie before parsing control messages
+Date: Thu, 9 Jul 2026 16:32:30 +0800
+Message-ID: <178358611790.128118.11036367713019213946@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260709055211.2498307-1-ernis@linux.microsoft.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-306090-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,google.com,lunn.ch,collabora.com,gmail.com,lists.infradead.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306089-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:ernis@linux.microsoft.com,m:jgg@ziepe.ca,m:leon@kernel.org,m:mkalderon@marvell.com,m:zyjzyj2000@gmail.com,m:sagi@grimberg.me,m:mgurtovoy@nvidia.com,m:haris.iqbal@ionos.com,m:jinpu.wang@ionos.com,m:bvanassche@acm.org,m:kbusch@kernel.org,m:axboe@kernel.dk,m:hch@lst.de,m:kch@nvidia.com,m:smfrench@gmail.com,m:linkinjeon@kernel.org,m:metze@samba.org,m:tom@talpey.com,m:cel@kernel.org,m:jlayton@kernel.org,m:neil@brown.name,m:okorniev@redhat.com,m:Dai.Ngo@oracle.com,m:trondmy@kernel.org,m:anna@kernel.org,m:achender@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kees@kernel.org,m:michaelgur@nvidia.com,m:edwards@nvidia.com,m:phaddad@nvidia.com,m:eadavis@qq.com,m:yishaih@nvidia.com,m:kalesh-anakkur.purayil@broadcom.com,m:clm@meta.com,m:ebadger@purestorage.com,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:target-devel@vger.kernel.org,m:linux-nvme@lists.infradead.org,m:linux-cifs@vger.ker
- nel.org,m:samba-technical@lists.samba.org,m:linux-nfs@vger.kernel.org,m:netdev@vger.kernel.org,m:rds-devel@oss.oracle.com,m:jgg@nvidia.com,s:lists@lfdr.de];
-	FREEMAIL_CC(0.00)[ziepe.ca,kernel.org,marvell.com,gmail.com,grimberg.me,nvidia.com,ionos.com,acm.org,kernel.dk,lst.de,samba.org,talpey.com,brown.name,redhat.com,oracle.com,davemloft.net,google.com,qq.com,broadcom.com,meta.com,purestorage.com,vger.kernel.org,lists.infradead.org,lists.samba.org,oss.oracle.com];
-	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	FORGED_SENDER(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCPT_COUNT_GT_50(0.00)[50];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:lorenzo@kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:angelogioacchino.delregno@collabora.com,m:matthias.bgg@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[win847@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[win847@gmail.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,intel.com:email,intel.com:dkim,linux.intel.com:from_mime,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,ashevche-desk.local:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1FAE972E569
+X-Rspamd-Queue-Id: 8087472E6B1
 
-On Wed, Jul 08, 2026 at 10:51:29PM -0700, Erni Sri Satya Vennela wrote:
-> The capability counter fields in struct ib_device_attr are declared
-> as signed int, but these values are inherently non-negative. Drivers
-> maintain their cached caps as u32 and assign them directly into these
-> int fields; if a cap exceeds INT_MAX the implicit narrowing yields a
-> negative value visible to the IB core.
-> 
-> Change the signed int capability fields to u32 to match the
-> underlying nature of the data. Also update consumers across the IB
-> core, ULPs, NVMe-oF target, RDS, and NFS/RDMA so the new u32 values
-> are not forced back through signed int or u8 via min()/min_t() or
-> narrowing local variables.
-> 
-> The nvmet-rdma consumer of max_srq clamps it against
-> ib_device.num_comp_vectors, which stays a signed int, so that site
-> uses min_t() instead of min() to handle the signed/unsigned mismatch.
+ip6_datagram_send_ctl() parses both SOL_IPV6 and SOL_SOCKET control
+messages. For SOL_SOCKET messages it passes ipc6->sockc to
+__sock_cmsg_send(), which updates fields such as tsflags with
+read-modify-write operations.
 
-Assuming the functionality is left untouched, from code perspective LGTM,
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+The IPV6_2292PKTOPTIONS and flowlabel option paths only set ipc6.opt
+before calling ip6_datagram_send_ctl(). If a SOL_SOCKET control message
+such as SO_TIMESTAMPING_* or SCM_TS_OPT_ID is present, this can read
+uninitialized sockc state.
 
-...
+Initialize the ipcm6_cookie with ipcm6_init_sk(), as the normal IPv6
+sendmsg paths do, before overriding ->opt with the temporary option
+buffer.
 
->  int ipoib_cm_dev_init(struct net_device *dev)
->  {
->  	struct ipoib_dev_priv *priv = ipoib_priv(dev);
-> -	int max_srq_sge, i;
-> +	u32 max_srq_sge;
-> +	int i;
->  	u8 addr;
+Signed-off-by: Wayen Yan <win847@gmail.com>
+---
+ net/ipv6/ip6_flowlabel.c | 1 +
+ net/ipv6/ipv6_sockglue.c | 1 +
+ 2 files changed, 2 insertions(+)
 
-This can keep the reversed xmas tree ordering.
-
-...
-
->  static int srq_size_set(const char *val, const struct kernel_param *kp)
->  {
-> -	int n = 0, ret;
-> +	unsigned int n;
-> +	int ret;
->  
-> -	ret = kstrtoint(val, 10, &n);
-> +	ret = kstrtouint(val, 10, &n);
->  	if (ret != 0 || n < 256)
->  		return -EINVAL;
-
-Side note (perhaps another patch?)
-
-	ret = kstrtouint(val, 10, &n);
-	if (ret)
-		return ret;
-	if (n < 256)
-		return -ERANGE,
-
-> -	return param_set_int(val, kp);
-> +	return param_set_uint(val, kp);
->  }
-
-...
-
-Have you considered also replacing min_not_zero() or do some refactoring
-around there?
-
+diff --git a/net/ipv6/ip6_flowlabel.c b/net/ipv6/ip6_flowlabel.c
+index 1ab5ad0dcf24..5cbfb82710f4 100644
+--- a/net/ipv6/ip6_flowlabel.c
++++ b/net/ipv6/ip6_flowlabel.c
+@@ -405,6 +405,7 @@ fl_create(struct net *net, struct sock *sk, struct in6_flowlabel_req *freq,
+ 		msg.msg_control = (void *)(fl->opt+1);
+ 		memset(&flowi6, 0, sizeof(flowi6));
+ 
++		ipcm6_init_sk(&ipc6, sk);
+ 		ipc6.opt = fl->opt;
+ 		err = ip6_datagram_send_ctl(net, sk, &msg, &flowi6, &ipc6);
+ 		if (err)
+diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
+index b4c977434c2e..0dcd2c224014 100644
+--- a/net/ipv6/ipv6_sockglue.c
++++ b/net/ipv6/ipv6_sockglue.c
+@@ -839,6 +839,7 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+ 		msg.msg_controllen = optlen;
+ 		msg.msg_control_is_user = false;
+ 		msg.msg_control = (void *)(opt+1);
++		ipcm6_init_sk(&ipc6, sk);
+ 		ipc6.opt = opt;
+ 
+ 		retv = ip6_datagram_send_ctl(net, sk, &msg, &fl6, &ipc6);
 -- 
-With Best Regards,
-Andy Shevchenko
+2.51.0
 
 
 
