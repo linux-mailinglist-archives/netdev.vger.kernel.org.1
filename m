@@ -1,168 +1,171 @@
-Return-Path: <netdev+bounces-306191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306192-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id GWjoHJqET2qKigIAu9opvQ
-	(envelope-from <netdev+bounces-306191-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:23:06 +0200
+	id QaWvHc5/T2oIiQIAu9opvQ
+	(envelope-from <netdev+bounces-306192-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:02:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C96DE730421
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:23:05 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D14F730010
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:02:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=HqVV3yhk;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306191-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306191-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=fail ("headers rsa verify failed") header.d=nwl.cc header.s=mail2022 header.b=kzlrHabr;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306192-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306192-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 96EAB3276E35
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 10:54:57 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DC5DD3003377
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 11:02:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C3641B352;
-	Thu,  9 Jul 2026 10:53:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452EC3859D7;
+	Thu,  9 Jul 2026 11:02:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02AD8411691;
-	Thu,  9 Jul 2026 10:53:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FCE5224AFA;
+	Thu,  9 Jul 2026 11:02:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783594410; cv=none; b=M8buuzBJEDdzC81XNf7dSB4mKyKpluw5bCftiU/htJKvclDfhlSUtsEuYF44kyWkL+VCt2q5l90ZZlJvYugeQcOSnaFkrGGf/jNF6pFKgfC0VjoL4P17QC6M/gaFIKnJzsSKT59OkZqOAyTre81sdoBER821h1dJnqWYPWtErn4=
+	t=1783594955; cv=none; b=INAzvajh6AeDBHUuu6jGdliQN2Pv1TDyUF+IdkaekZ2lHDcdyH7UUBQdTkkEGO5VaIYiXgUUBVAUoRas3b47YLHQXHEMuxCXCwsZwMybKwltdjzjrxAyXtXbiv+hdA3Vm4ye0uoX9S3dORAwZww9FcgjrBlvoNH9H31sg6jInkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783594410; c=relaxed/simple;
-	bh=QOGjg1/RGN8flpFs/dZ2Z3VqQGhz2cw/vr/wk+e5KKU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WuahY8GfEd6735V1BOHF3q+JHosLm8OO1HnQZfTvhPa7iun32KsRDe7SFNy+bUbQ5DnEmb5Hbng4vK+tnWeYFUipJPkLXVd44NrijbGKbGxWcUAXOLS2mEVth68kSSLKOSKXCwjcglNzGtW0ifYNzWdiyOm4CM/FgpNAUhNNIU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HqVV3yhk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DB433C2BCF6;
-	Thu,  9 Jul 2026 10:53:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1783594409;
-	bh=QOGjg1/RGN8flpFs/dZ2Z3VqQGhz2cw/vr/wk+e5KKU=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=HqVV3yhkSXk/HVlsmafNx1gc/znDcEQGYrEuInXS9n0c3WQ/lew3827+dp3e4xz9i
-	 RlQRusTz5tmpIryNsNt02x9fAk1MpEAb1yM0ij3YiJ086On1MYH77/750YDj1qJBTy
-	 saVtjjNAjQ0bWkOUVMHUM9ZiSISZhoQHzKnpRDLhNtdi+zwUogvYW7fplHVOMNLmiV
-	 LMPwA3VZvEJ28i1c/MHiyQ64eNVuxdTu01sIS4pMOvRpgsnaj6BfVmvxRzKtKdnWHF
-	 iilUUq7NiJgnwcjCCliJhJpcel/klV+OuWG1JcivH3ingezVrsmwvZWT6D+LZwp6oP
-	 3Mve9scPeUE5A==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA335C44506;
-	Thu,  9 Jul 2026 10:53:29 +0000 (UTC)
-From: Jack Wu via B4 Relay <devnull+jackbb_wu.compal.com@kernel.org>
-Date: Thu, 09 Jul 2026 18:53:29 +0800
-Subject: [PATCH v4 7/7] net: wwan: t9xx: Add maintainers entry
+	s=arc-20240116; t=1783594955; c=relaxed/simple;
+	bh=nnk5Rz1kYw2zZULDVt8awFwRNPvlIZWfLgoZWp7dgMg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KVpoUmObt1IEZCPLs6uYstvT8spkUxbpJXmOkoVpmNWW11jCXRAsmSHOwsZEeVp8KlqaUyLwQVoH6AjzmmVgjkL8CeXIy0H6IAnJz54Vwd9BPF556LxEfVvFE2C+4qQqSrZmJfJI+AfnC3iyvcF8Hk9BYyU6I6LWshjpkdEpuek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc; spf=pass smtp.mailfrom=nwl.cc; dkim=pass (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b=kzlrHabr; arc=none smtp.client-ip=151.80.46.58
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
+	s=mail2022; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=7xjQJMviFKnzTELuYGNmzcaww74kqC+HYMZ9FxE7SQA=; b=kzlrHabrD+u5h9b4AXLuKKICJO
+	xW6h7ZntbErzk97qbSjzUF4hiQmC/rVoGMwCul5w9PjNB4RPrc+pPjddtNT3URedcRCG4GFPfDiTY
+	1hxpK0ymyYUdteOgDLIaW8eaBu10BcC8h8gmV0ltn8j24oEUHZAaNPkZ8xeIHvZKFa/igGewICfOP
+	JpKt2bjgqyafej8eQb62zPnPBtvIq1j9jN8GKJDoI0RTWF85WOzHuCp9LA15s9/OY8ScHT3WFo8w2
+	UEt8OP/vGVaxeKjM1Q/Uu3Ewhty/ZjCLrhO+WnywVt9nH2dS0BtKPp6YwQwgCQKrsk/5muX6vRYUL
+	bA6cw3DQ==;
+Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.98.2)
+	(envelope-from <phil@nwl.cc>)
+	id 1whmWP-000000004eG-2c12;
+	Thu, 09 Jul 2026 13:02:25 +0200
+Date: Thu, 9 Jul 2026 13:02:25 +0200
+From: Phil Sutter <phil@nwl.cc>
+To: Zhixing Chen <running910@gmail.com>
+Cc: Florian Westphal <fw@strlen.de>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org
+Subject: Re: [PATCH nf] netfilter: ip6tables: set hotdrop for malformed
+ extension header matches
+Message-ID: <ak9_wZz054a6JMb5@orbyte.nwl.cc>
+References: <20260709063012.33160-1-running910@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260709-t9xx_driver_v1-v4-7-a8c009d509c5@compal.com>
-References: <20260709-t9xx_driver_v1-v4-0-a8c009d509c5@compal.com>
-In-Reply-To: <20260709-t9xx_driver_v1-v4-0-a8c009d509c5@compal.com>
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>, 
- Sergey Ryazanov <ryazanov.s.a@gmail.com>, 
- Johannes Berg <johannes@sipsolutions.net>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Jack Wu <jackbb_wu@compal.com>, Wen-Zhi Huang <wen-zhi.huang@mediatek.com>, 
- Shi-Wei Yeh <shi-wei.yeh@mediatek.com>, 
- Minano Tseng <Minano.tseng@mediatek.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <skhan@linuxfoundation.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
- linux-doc@vger.kernel.org
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1783594407; l=817;
- i=jackbb_wu@compal.com; s=20260526; h=from:subject:message-id;
- bh=r28B5Pv3emoSo+1n1DcJ9EobPmHHNOtOYu07ftmyDY8=;
- b=PiBgIiVz9ksnTjvb0CYcJcpobiGD8EdCYsdrvrKB3iyw8F0A4HI43IHVNa3bcV2KbIM2gEv8V
- C2d/d6NkbzNCEajOfj+bffGiqBWS4VOwuHSql5ANfknvjWPlSPnDkLl
-X-Developer-Key: i=jackbb_wu@compal.com; a=ed25519;
- pk=VH1prTWixNl8OEUPPSfII3p46MzJpQN8J3+ecE1tZXg=
-X-Endpoint-Received: by B4 Relay for jackbb_wu@compal.com/20260526 with
- auth_id=793
-X-Original-From: Jack Wu <jackbb_wu@compal.com>
-Reply-To: jackbb_wu@compal.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260709063012.33160-1-running910@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_REJECT(1.00)[nwl.cc:s=mail2022];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306191-lists,netdev=lfdr.de,jackbb_wu.compal.com];
-	FORGED_RECIPIENTS(0.00)[m:loic.poulain@oss.qualcomm.com,m:ryazanov.s.a@gmail.com,m:johannes@sipsolutions.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jackbb_wu@compal.com,m:wen-zhi.huang@mediatek.com,m:shi-wei.yeh@mediatek.com,m:Minano.tseng@mediatek.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:linux-doc@vger.kernel.org,m:ryazanovsa@gmail.com,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[oss.qualcomm.com,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,compal.com,mediatek.com,collabora.com,lwn.net,linuxfoundation.org];
-	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	HAS_REPLYTO(0.00)[jackbb_wu@compal.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[nwl.cc];
+	TAGGED_FROM(0.00)[bounces-306192-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:running910@gmail.com,m:fw@strlen.de,m:pablo@netfilter.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[phil@nwl.cc,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[nwl.cc:-];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[phil@nwl.cc,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,compal.com:replyto,compal.com:mid,compal.com:email,mediatek.com:email]
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,nwl.cc:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C96DE730421
+X-Rspamd-Queue-Id: 6D14F730010
 
-From: Jack Wu <jackbb_wu@compal.com>
+Hi,
 
-Add MAINTAINERS entry for the MediaTek T9XX 5G WWAN modem device
-driver.
+On Thu, Jul 09, 2026 at 02:30:12PM +0800, Zhixing Chen wrote:
+> The hbh, srh and ipv6header matches have paths that return false for
+> malformed IPv6 extension header packets without setting hotdrop.
+> 
+> For hbh, strict option parsing stops when the option type or length field
+> cannot be read, or when advancing to the next requested option would
+> exceed the available header data. Mark these packets for hotdrop instead
+> of treating them as a rule mismatch.
 
-Signed-off-by: Jack Wu <jackbb_wu@compal.com>
----
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
+There is another candidate for hotdrop in there, e.g. the "Packet
+smaller than it's length field" check in line 76. Or is this a
+legitimate non-match?
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 461a3eed6129..8155d26bff03 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16494,6 +16494,15 @@ L:	netdev@vger.kernel.org
- S:	Supported
- F:	drivers/net/wwan/t7xx/
- 
-+MEDIATEK T9XX 5G WWAN MODEM DRIVER
-+M:	Jack Wu <jackbb_wu@compal.com>
-+R:	Wen-Zhi Huang <wen-zhi.huang@mediatek.com>
-+R:	Shi-Wei Yeh <shi-wei.yeh@mediatek.com>
-+R:	Minano Tseng <Minano.tseng@mediatek.com>
-+L:	netdev@vger.kernel.org
-+S:	Supported
-+F:	drivers/net/wwan/t9xx/
-+
- MEDIATEK USB3 DRD IP DRIVER
- M:	Chunfeng Yun <chunfeng.yun@mediatek.com>
- L:	linux-usb@vger.kernel.org
+Given the many common blocks, maybe introduce a 'hotdrop' goto label to
+jump to instead of break/return?
 
--- 
-2.34.1
+> 
+> For srh, keep a missing SRH as a normal mismatch, but set hotdrop when
+> header lookup fails for other reasons, when the SRH fixed header is not
+> present, when the advertised SRH length exceeds the available skb data, or
+> when SID selector reads fail.
 
+I think the 'srh->segments_left > srh->first_segment' case is also a
+candidate:
 
+According to RFC8200, segments_left contains the "Number of route
+segments remaining, i.e., number of explicitly listed intermediate nodes
+still to be visited before reaching the final destination."
+
+RFC8754 reads: "Last Entry:  contains the index (zero based), in the
+Segment List, of the last element of the Segment List." ('first_segment'
+is called Last Entry in there.)
+
+AIUI, segments_left should never exceed first_segment in a packet.
+Though RFC8754 mentions a case where "Segments Left is greater than Last
+Entry", but it's about HMAC verification and it doesn't explain why it
+should happen.
+
+[...]
+> diff --git a/net/ipv6/netfilter/ip6t_ipv6header.c b/net/ipv6/netfilter/ip6t_ipv6header.c
+> index c52ff929c93b..0568eb99eb1c 100644
+> --- a/net/ipv6/netfilter/ip6t_ipv6header.c
+> +++ b/net/ipv6/netfilter/ip6t_ipv6header.c
+> @@ -53,8 +53,10 @@ ipv6header_mt6(const struct sk_buff *skb, struct xt_action_param *par)
+>  			break;
+>  		}
+>  		/* Is there enough space for the next ext header? */
+> -		if (len < (int)sizeof(struct ipv6_opt_hdr))
+> +		if (len < (int)sizeof(struct ipv6_opt_hdr)) {
+> +			par->hotdrop = true;
+>  			return false;
+> +		}
+
+This check is actually redundant, no? The following call to
+skb_header_pointer() should discover the skb->len underrun?
+
+Cheers, Phil
 
