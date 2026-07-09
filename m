@@ -1,191 +1,137 @@
-Return-Path: <netdev+bounces-306228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306229-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id j0aRAKqfT2rzlAIAu9opvQ
-	(envelope-from <netdev+bounces-306228-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 15:18:34 +0200
+	id TkL2KG2gT2oulQIAu9opvQ
+	(envelope-from <netdev+bounces-306229-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 15:21:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8ABCA7317BD
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 15:18:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E902373182E
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 15:21:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=0sec.ai header.s=google header.b=l9Q8teU+;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306228-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306228-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=hOBeV6Nm;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306229-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306229-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3BC0030D3C67
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 13:12:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7FB92302D0AE
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 13:14:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5C84275AF5;
-	Thu,  9 Jul 2026 13:12:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29955257423;
+	Thu,  9 Jul 2026 13:14:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA1E5273D8F
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 13:12:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1946923D7FB
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 13:14:30 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783602773; cv=none; b=duYhMBip7S71iDULCIsoyy4SEPnFitDmvzEUIHra7g2m/u/oIdafb3uYhE9p1MoEFtsppGWZJCM0RXfy/3DtMekld5J3r3AZ3bSLzBO2+bHjwLiDPQp15zyFfD5P0vDcBlNiqLbnq+5IPt11dPMXeRbMbHKORDv0pNfBnZwTO4w=
+	t=1783602872; cv=none; b=nTpw2o2KgKQKnQlMKEvLVk2arl28EosU1tE6/nelbHsHIKFg8sCMGfWY9scAzlW6xSsAYgsEptY5EXncMzFVkzK2nmXK2OQ56EpTpTmiFfXN66soAJPh+PYsELkiY1TAQzwRumMWMOi1ohxnU7X7uZh2yTVITzsJxLyyzOAInpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783602773; c=relaxed/simple;
-	bh=eXV85UOU1zgi6P7JVWPpQKScckIM/nj9u0XFq3b/aw4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ix4fFq/AFmMrYzmpFLWeMt7C6KhFPSR7NdYBggdJYat9Bd6czdqkamqwHiToxkZgFl8/06pHTtOkfM1OkR0Ss0Zcf0mWFio5/69fnHLW16nShZc9F6bTmR4+lMTU1BFzHkA+oR2/ILAdbXhT1Gu3Xv6bzX+g9zbJ+QUmBoKchNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=l9Q8teU+; arc=none smtp.client-ip=209.85.221.43
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-4629051c9d1so1043784f8f.2
-        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 06:12:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=0sec.ai; s=google; t=1783602770; x=1784207570; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=+okqiPy692T/LbXtU2xfepsNS8cELhNO3bJ/OMjed78=;
-        b=l9Q8teU+3ECZbFPdCVmRdNVCRddRzcmdJsUavDS6pylE+0jI6TAUd28Ugd5B8uh4e7
-         XlpZe+oauY+WqhhnWHe/3Hv/AHUSVYyyVazzBaA2E5V9LZLdirBcK4xIrDtPavAJPJer
-         19mf/2S42of0sq9AcsD0YfPVseRBFp+Lx8ijoFbr+9P74h96dmW8EHZPJ447/s9lHo2e
-         zkBeSs4qybOIuhDZSus1bYzRz+0eVd+fYFD/LpUgZnaoHZ2oDCTEvbDbq5oKvMAapESy
-         AkHJs4CBZZMqHRqL3d7fKDMKUzzs09JPrK/e9Ln9i6lRoDYvb0BnsM5MKfZRsI4B6SZf
-         oKzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783602770; x=1784207570;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=+okqiPy692T/LbXtU2xfepsNS8cELhNO3bJ/OMjed78=;
-        b=HSSfbjQmykiC+NAOXFvJqwnMDFqSqFTUtBAgm7Hm+BhMQiMYDUCwxMx0ljZieTXHv3
-         itd06hXmnXBtzU+xkR/UKnx6dpt9Yq0ZQZd5DbNsDYh5IKHSIZa2HvQ0A7ahaGRYuhZX
-         sapXbkXbTC+JXAw6z1Ei4Qc9VL8KU08uZC7PhX0R0zTxWktjxhUmWdJNylVmFcjVm7yW
-         ffu1NMmN3WqyGWGR7bA5iwe4FF3HlUCxh7eW8gVxOQdbjwyF0zyGnIRCDyuxN8t5YC66
-         YpQ+Lq5/5nRzCM5rF21RfSTUkEPINrw1rG4f1hZnP0xYnXUEFrf1syTZC7q6HYdKPs9K
-         30GA==
-X-Forwarded-Encrypted: i=1; AHgh+RrtBcMNZt+uT5AysL5xTmCHJqyc/giydFpWMQJ01EcVxSVEOjE9oH8ezlc3n9GlizoBfKV7OBY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywy9/qWr6RfWFSValcFubXNw8LBN1x/4ISUC8Jon/TvPaw3VKKU
-	UlB2ywignl9YoG+JMTYMKolua78F+sKnpOqCAKLQZkjxnOoMmWwsOiWRu7pmok6yAISn
-X-Gm-Gg: AfdE7cln9OVLesR19ku/UY2L4Lkqjakc/Q4qSnxe3v7e7gZKJ/moLiIp0xDfm53SECa
-	imFPnBEZdLvI9iRKzznT3VovVZdV44kW3hDW9PFBmzKrItaSxEK96Og2850dp8z4lDFrc0euJzZ
-	8i7IebPtj7WuhNYIou2nwrEQ5sU1Nq/7JU/CmzsdkWClPWi4g+or/+zCJLE1W08R6ohrhZ0rxsy
-	vmpFRpfJcrrllI3jyWA8En4+xnXRBOBYiEfgP0uarr8dvRfa13A+rRUq5KUglr3nFB3T2XUjMuN
-	qosRH220xrq4vMT9//bRLmX7vIOkqX9BWB6h4V5aC4Cxq5XLTu38guYiUa5myPN16/v6ZuOqpY0
-	exXLGSk8RWXmIAhEs167bOD1X14A4xvWc5weRbC9XkMsk+myZGDomXjFV7mHw8jypmdMC43GMLL
-	XWTekEP6hw9rbXwE4DC5P5rcn9ltAeKakeNxi98jVeuYeyHKUYYxMzYQuye08FqKt+v9uKDopLv
-	R5Ce330nNxqDvXinOMFiRfKhPTkcI112tY=
-X-Received: by 2002:a05:6000:430e:b0:476:d13f:bb74 with SMTP id ffacd0b85a97d-47df07ae2e6mr7871263f8f.15.1783602769947;
-        Thu, 09 Jul 2026 06:12:49 -0700 (PDT)
-Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.218.188])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa039ad21sm50243405f8f.20.2026.07.09.06.12.47
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 09 Jul 2026 06:12:49 -0700 (PDT)
-From: Doruk Tan Ozturk <doruk@0sec.ai>
-To: alex.aring@gmail.com,
-	stefan@datenfreihafen.org,
-	miquel.raynal@bootlin.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	phoebe.buckheister@itwm.fraunhofer.de,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Doruk Tan Ozturk <doruk@0sec.ai>
-Subject: [PATCH net] mac802154: llsec: reject frames shorter than the authentication tag
-Date: Thu,  9 Jul 2026 15:12:46 +0200
-Message-ID: <20260709131246.44517-1-doruk@0sec.ai>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1783602872; c=relaxed/simple;
+	bh=3CyFaAQ/EKPDryldJzmogM3PMRVRzL/uf6q3K8zHTa0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N+0ppWCriOBK7ZAwrk8kxBcrgXLk615GIvWFeT6MGhjNgG1+vSZw8u3Iflf/XOnnLCWdwLzjEE5ZfSvQO1+CfrnuWUIJbvi7GGi8FHmuWEerPROhfHS1Yrtu+Dyl1KpfwZkWkPX0AYItI3Gk0WQfhy9E7tXN3QhemxLa2+kNPVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hOBeV6Nm; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C66571F00ACF
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 13:14:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783602870;
+	bh=G5ss7vtgFZzZH7j5PPKNgnRxv3EGS+90GapGuoUV2n0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=hOBeV6NmI2/VWwdkKKCzhTr9V70OgiAzV6e+danD/PAs1pFdtoOapcND61wJePEab
+	 hb5TGVOkfYD30VrpcjGoWFvVzuMMbitc92qU3yas4Xe46xPlO0DnSzCi3nWbZ1joUy
+	 P2TRFPUHlNe6Akh09MvOurF9DWUAGuaskq2ZdT9dPigAi5VHYB1D/L7zAQRfEdUxu1
+	 QxhaQja0OvmDonAr9lYsDsjVhVvPKdOtS9+A47zLPsQWGgi1Hoy6DUf8x87tkfxANC
+	 B9aZavCk2B+P7VcRYD293mU9GMEZ0MbRPF5PS9NnWv089taHyXTp8+ejfkHH72+uaa
+	 FPg5KCkjzB7bA==
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5aebd52488cso2032282e87.2
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 06:14:30 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RoTBVul79osTg382NREaPyD+6NS4ohU3JABAHxZYzE49DItvQsO3AIzsq7cnjEUhS+R5HS2AH0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2CUupOJzAYYoN8lwjirpDQu9qdh/GT93W8nV/6eDo67HLj2S8
+	qSHAB5inxrUl2HbcT9rcj1xa/L4wUSPy+9duzbL8meheioZLmS+muD6RlSbwV8oq2HXC4EUzyum
+	zwC5Y/jIx5mlgUI9AvJbekeMFGTzPNnM=
+X-Received: by 2002:a05:6512:10cf:b0:5ae:b130:1e1 with SMTP id
+ 2adb3069b0e04-5b011444080mr1822805e87.28.1783602869579; Thu, 09 Jul 2026
+ 06:14:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260705001931.74149-1-pengpeng@iscas.ac.cn>
+In-Reply-To: <20260705001931.74149-1-pengpeng@iscas.ac.cn>
+From: Linus Walleij <linusw@kernel.org>
+Date: Thu, 9 Jul 2026 15:14:16 +0200
+X-Gmail-Original-Message-ID: <CAD++jLndZn-4Rgfm9S3ZB47D1eX7cGDbtKkc6mNFMxHErrqt7Q@mail.gmail.com>
+X-Gm-Features: AUfX_myRqVpIkgJPekvGUSUV1D_ZMRcchbDmPbnIZZ_0Vm28P0syyO4R0Fvlacc
+Message-ID: <CAD++jLndZn-4Rgfm9S3ZB47D1eX7cGDbtKkc6mNFMxHErrqt7Q@mail.gmail.com>
+Subject: Re: [PATCH] net: xscale: ixp4xx: add missing MODULE_DEVICE_TABLE()
+To: Pengpeng Hou <pengpeng@iscas.ac.cn>
+Cc: Imre Kaloz <kaloz@openwrt.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[0sec.ai:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-306229-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306228-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:alex.aring@gmail.com,m:stefan@datenfreihafen.org,m:miquel.raynal@bootlin.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:phoebe.buckheister@itwm.fraunhofer.de,m:linux-wpan@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:doruk@0sec.ai,m:alexaring@gmail.com,s:lists@lfdr.de];
-	DMARC_NA(0.00)[0sec.ai];
-	FORGED_SENDER(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,datenfreihafen.org,bootlin.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[0sec.ai:+];
+	FORGED_SENDER(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:pengpeng@iscas.ac.cn,m:kaloz@openwrt.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-arm-kernel@lists.infradead.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,0sec.ai:from_mime,0sec.ai:email,0sec.ai:mid,0sec.ai:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,vger.kernel.org:from_smtp,iscas.ac.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8ABCA7317BD
+X-Rspamd-Queue-Id: E902373182E
 
-llsec_do_decrypt_auth() computes the associated-data length for the
-AEAD request as
+On Sun, Jul 5, 2026 at 2:19=E2=80=AFAM Pengpeng Hou <pengpeng@iscas.ac.cn> =
+wrote:
 
-	assoclen += datalen - authlen;
+> The driver has a match table for the of bus wired into its driver
+> structure, but the table is not exported with MODULE_DEVICE_TABLE().
+>
+> Add the missing MODULE_DEVICE_TABLE() entry so module alias information
+> is generated for automatic module loading.
+>
+> This is a source-level fix.  It does not claim dynamic hardware
+> reproduction; the evidence is the driver-owned match table, its use by
+> the driver registration structure, and the missing module alias
+> publication.
+>
+> Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
 
-where datalen is the number of bytes after the MAC header and authlen
-(4, 8 or 16) is the length of the authentication tag. Nothing verifies
-that the frame actually carries at least authlen payload bytes. A
-secured frame whose payload is shorter than the tag makes
-datalen - authlen negative; assoclen is then passed to
-aead_request_set_ad() as an unsigned value close to 4 GiB, so
-crypto_aead_decrypt() walks far off the end of the scatterlist that
-only spans the real frame.
+Reviewed-by: Linus Walleij <linusw@kernel.org>
 
-The frame is fully attacker-controlled and reaches this path from any
-IEEE 802.15.4 peer in radio range. Reject frames whose payload is
-shorter than the authentication tag before the subtraction.
-
-Dynamically reproduced on a KASAN kernel as a general-protection-fault
-in the AEAD scatterwalk, and the fix confirmed.
-
-Fixes: 4c14a2fb5d14 ("mac802154: add llsec decryption method")
-Cc: stable@vger.kernel.org
-Reported-by: Doruk Tan Ozturk <doruk@0sec.ai>
-Assisted-by: 0sec:claude-opus-4-8
-Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
----
- net/mac802154/llsec.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
-index 5e7cc11fab3a..364a1ac1d771 100644
---- a/net/mac802154/llsec.c
-+++ b/net/mac802154/llsec.c
-@@ -893,6 +893,11 @@ llsec_do_decrypt_auth(struct sk_buff *skb, const struct mac802154_llsec *sec,
- 
- 	sg_init_one(&sg, skb_mac_header(skb), assoclen + datalen);
- 
-+	if (datalen < authlen) {
-+		kfree_sensitive(req);
-+		return -EBADMSG;
-+	}
-+
- 	if (!(hdr->sec.level & IEEE802154_SCF_SECLEVEL_ENC)) {
- 		assoclen += datalen - authlen;
- 		datalen = authlen;
--- 
-2.43.0
-
+Yours,
+Linus Walleij
 
