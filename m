@@ -1,109 +1,80 @@
-Return-Path: <netdev+bounces-306144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306145-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id U9IEMHdyT2qkgwIAu9opvQ
-	(envelope-from <netdev+bounces-306144-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:05:43 +0200
+	id x8C3B1VxT2pEgwIAu9opvQ
+	(envelope-from <netdev+bounces-306145-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:00:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65C6572F55B
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:05:43 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8817A72F408
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:00:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=resnulli-us.20251104.gappssmtp.com header.s=20251104 header.b=rZ0sIeyO;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306144-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306144-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b="CL/BbG1L";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306145-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306145-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 422E3303E4DF
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:56:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F1D4C30B9D0C
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:56:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CABF403E8C;
-	Thu,  9 Jul 2026 09:56:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C182404BCF;
+	Thu,  9 Jul 2026 09:56:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467AE404BD7
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 09:56:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BAEF405860
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 09:56:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783590983; cv=none; b=UB0ukVe6WeJKUn8iYpjcH4K23t6T1t52zzhTTMZJVmQrotf0eAhpq0qrHJovz8quTXhEe1ThUTbfErmIZgZkTh1uJNlmRLLO87I0/RHepk7Tago+W0AU/I8pz9EE+hJpgvp9cx89VX+M0IYot6qozMUymyqwancH7iae2ACUwzI=
+	t=1783590989; cv=none; b=IqRMg2BDADEzgRbnXm6u//S+TDKFxPe57mmuQvexD5K6qNFaA3nzpHdCkFEVEI7aQ5NgbHuxKxh6JOKODfDxaDrCmS/pkVpZIBYXGAbYGf5Vhl+4iPOOB9fUz0gApvjK6JOxy2etYFNcN/H+jHrws/oqVGEIrUJxVXu9jFHdMBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783590983; c=relaxed/simple;
-	bh=2weJseZmfhhuMkVl4mobPkyhlKlV9CmmuBH9aDTWvdk=;
+	s=arc-20240116; t=1783590989; c=relaxed/simple;
+	bh=0lLiOHvM+1jzSNmZF138AXkDxXWVgZsnRJ7laTDWbb4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GjRP6rDW2ILFN9Js5fLxDXMLITzMwPHuGKPGTRZXL/pukY4yZGg96ZhzrvEFR6hGfBh3zZZIlgX83lfp96wucDfAxvPllJ6keNPxP0IiUbA8wsJ/GJiNSKWjuQ/HmNPc6olYOx0j6qxfa3cUtsO4+kbyNtBXubj24tVdVu7oGrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=rZ0sIeyO; arc=none smtp.client-ip=209.85.221.45
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-47de0093c42so1582526f8f.3
-        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 02:56:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1783590979; x=1784195779; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=2/tf5HNf/pTiFtMMkWJrXjHDGjF4y30NaNB9JlvlgwM=;
-        b=rZ0sIeyOYmmDsf/qxuuinDtT6eXIk2Hm9TFIhDQ7VecjW/VKkcklSxIQD0MVpRYij5
-         jRIwAAUz6cY1WhECaMa1OZ2eGVygtrE+hSaKRB0XbujkoHLIhD8uZ8rZ71l0tFDbJB5I
-         1M05jxn2hNYqmelNZzHThr8Qd+MT0yuWRRdUQ9z+hVjWIFRJcsrU894zHVtW1CAW7Dp5
-         rQfCxzxCllSEF+M5r/CrOkrJj3/oD4gL7b39zZSgWa4vy4JA32Rf2Xmyfbe8Qe0FhZNp
-         OvaX0/ipUrhc0ckw4AQ+X26eYJrz2dQTNDG3VCltI8n/NDaJ252w/2bsjHXFIoIxvN2l
-         YfAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783590979; x=1784195779;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=2/tf5HNf/pTiFtMMkWJrXjHDGjF4y30NaNB9JlvlgwM=;
-        b=hxQ6nyi4f4h2Er33xeSM3fBYz+0Zkvh9VTUQJqFss0A6VkOYsyled1qqD9dVrV3XBb
-         uM34V7TueAfhoiRDe7PlQVUteuqEq8bxSuMeZVWkXCdpK3s3+I1XGntJBTWPAkZNyLP+
-         3WSLOMOsak3mI8eKn8EUCqg8sjW1SFpQAJRUI2Z1OfbWFXSix9AQXTeJc2SAB40I1Q0b
-         nG/k0YbKpFj764j0x+8UXqA/HqtWppsUVSU7ili+tlrn1Elmjx9eq8vbWR6XF4tSg24F
-         YQWjG4qXgCoMVxFEbhPiP+gSGOu2bF+FTrwTj1A6ObXebgKM+vA2oF62f4RD05D0TXiW
-         MDmg==
-X-Forwarded-Encrypted: i=1; AHgh+RpGN4an0+lZ8Wko21bvz11aHdr3ECt+B7CP1DNM8/wPK76UMVZeFRZbokiCzcVj9XG+bqWPqX8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywzg4zOdaj+oixRkz5HS5w63aRdh7+J+vU6jE7COpPMuwCNGI5G
-	7UoUdH+dBMOShF04M17pYkVsrPVECYD4u1mVXc2DYlILFNQ9ROl9C9AUEPS6fFeQekk=
-X-Gm-Gg: AfdE7ckNnw+H9GECIVeM6xO6zvjLDjnbbRLfXpc1f5qnIs0CIro/cWA6T6szUnSRxiI
-	PWCW+13d5+LfJIAz5QAGqghO3mKmWkLSDkzwGO4FHLU/QJbXVk1wGTpQfk0xMUU1IKe3TOom0PN
-	iG5rchuI8hTE2Fmo1Xpgj10EcJ75GuBFvd0z4JMsNjQIz2ZwkwQBloTQAThABpusDjlORkoOXGD
-	di72NabsOq+74KxYu4SLZwDQqPT7Hz1j8CQPNIR84hZXCBnHr8A9c4LIceQgex0QRTUvdC4YrMy
-	/Si77aKkMDoNkgC1XssG7H/G0tpJqFoE22QsT/IpQm0rvjNMmMJulON45kRZRLa6K+t6iju+SnQ
-	ytFN5zNi9XySeBOBpYT7mzaQHJV05zjdzv9j+1dGwJaP2jjchGp5bxaI7j8rZb6UuSIo/aRVg+k
-	Tos5pLJ8Rp8RTlOslp6OacPw==
-X-Received: by 2002:a05:6000:2582:b0:46d:d5da:f0a8 with SMTP id ffacd0b85a97d-47df07a9985mr6724774f8f.47.1783590978626;
-        Thu, 09 Jul 2026 02:56:18 -0700 (PDT)
-Received: from localhost ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9e4d843csm49320207f8f.14.2026.07.09.02.56.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2026 02:56:18 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: linux-rdma@vger.kernel.org
-Cc: cgroups@vger.kernel.org,
+	 MIME-Version; b=PoFhl2bUbMdmzv0io8jJ6Men93zvOzStQNwovFIfONo/7k8Ymfkqz5/B8vbmIzVOmqN3dMA8gaD8JrN/YgDD27bCutv9Ngja5rM4dnIrAp8GqBiLHZjCorZ0xsZI0oRuhpZ51i5bZkk8Hms4r6wgsPhskATj+QSpQydqY7R+cEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CL/BbG1L; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783590985;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XjnFHOpb2bksdqrCcbPAslEOpXP4Sq2lWwqlw5oI6O0=;
+	b=CL/BbG1L3fcrE3oT8helgvtRxHgnrO8c4hWaZd6qxBTUV3D6gp+DBSD16yOKtWTTrGCqI2
+	M41NJ+c2R2SYlUJzg9XU1RQipGHO3d/1Adz1zn/QQ665LHZNo4oh54m6d3EgtGj104GQpG
+	F+Y6Sjgf/pHLiDaUpU9ljXkq7I/Ti6A=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-136-qrCuYYsZPI2IPuHwU8Iybg-1; Thu,
+ 09 Jul 2026 05:56:21 -0400
+X-MC-Unique: qrCuYYsZPI2IPuHwU8Iybg-1
+X-Mimecast-MFC-AGG-ID: qrCuYYsZPI2IPuHwU8Iybg_1783590980
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0214318052DB;
+	Thu,  9 Jul 2026 09:56:20 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.33.79])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C7AD718004D4;
+	Thu,  9 Jul 2026 09:56:16 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: rkannoth@marvell.com
+Cc: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	jgg@ziepe.ca,
-	leon@kernel.org,
-	parav@nvidia.com,
-	mbloch@nvidia.com,
-	cmeiohas@nvidia.com,
-	roman.gushchin@linux.dev,
-	bvanassche@acm.org,
-	zyjzyj2000@gmail.com,
-	shuah@kernel.org,
-	tj@kernel.org,
-	mkoutny@suse.com,
-	hannes@cmpxchg.org,
-	alibuda@linux.alibaba.com,
-	dust.li@linux.alibaba.com,
-	sidraya@linux.ibm.com,
-	wenjia@linux.ibm.com
-Subject: [PATCH rdma-next 13/13] RDMA/selftests: Add rxe_netns_names test
-Date: Thu,  9 Jul 2026 11:55:32 +0200
-Message-ID: <20260709095532.855647-14-jiri@resnulli.us>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260709095532.855647-1-jiri@resnulli.us>
-References: <20260709095532.855647-1-jiri@resnulli.us>
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	sgoutham@marvell.com
+Subject: Re: [PATCH v2 net-next 2/9] octeontx2-af: switch: Add switch dev to AF mboxes
+Date: Thu,  9 Jul 2026 11:56:12 +0200
+Message-ID: <20260709095612.117341-1-pabeni@redhat.com>
+In-Reply-To: <20260702045026.2914748-3-rkannoth@marvell.com>
+References: <20260702045026.2914748-3-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -111,370 +82,471 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306144-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,ziepe.ca,kernel.org,nvidia.com,linux.dev,acm.org,gmail.com,suse.com,cmpxchg.org,linux.alibaba.com,linux.ibm.com];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[resnulli.us];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:linux-rdma@vger.kernel.org,m:cgroups@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-s390@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:jgg@ziepe.ca,m:leon@kernel.org,m:parav@nvidia.com,m:mbloch@nvidia.com,m:cmeiohas@nvidia.com,m:roman.gushchin@linux.dev,m:bvanassche@acm.org,m:zyjzyj2000@gmail.com,m:shuah@kernel.org,m:tj@kernel.org,m:mkoutny@suse.com,m:hannes@cmpxchg.org,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-306145-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:rkannoth@marvell.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[resnulli-us.20251104.gappssmtp.com:dkim,rxe_test_netdev_unregister.sh:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ALIAS_RESOLVED(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.c.6.3.0.1.0.0.e.4.0.c.3.0.0.6.2.asn6.rspamd.com:query timed out];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 65C6572F55B
+X-Rspamd-Queue-Id: 8817A72F408
 
-From: Jiri Pirko <jiri@nvidia.com>
+From: AI Reviewer <ai@example.com>
 
-Add a kselftest script that exercises per-netns RDMA device naming
-with RXE. Cover duplicate names across namespaces, move conflict
-handling, move-with-rename, and same-namespace rename requests.
-
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://netdev-ai.bots.linux.dev/sashiko/
 ---
- tools/testing/selftests/rdma/Makefile         |   3 +-
- tools/testing/selftests/rdma/config           |   2 +
- .../testing/selftests/rdma/rxe_netns_names.sh | 282 ++++++++++++++++++
- 3 files changed, 286 insertions(+), 1 deletion(-)
- create mode 100755 tools/testing/selftests/rdma/rxe_netns_names.sh
+Subject: octeontx2-af: switch: Add switch dev to AF mboxes
 
-diff --git a/tools/testing/selftests/rdma/Makefile b/tools/testing/selftests/rdma/Makefile
-index 07af7f15c1bf..a91c14c45006 100644
---- a/tools/testing/selftests/rdma/Makefile
-+++ b/tools/testing/selftests/rdma/Makefile
-@@ -3,6 +3,7 @@ TEST_PROGS := rxe_rping_between_netns.sh \
- 		rxe_ipv6.sh \
- 		rxe_socket_with_netns.sh \
- 		rxe_test_NETDEV_UNREGISTER.sh \
--		rxe_sent_rcvd_bytes.sh
-+		rxe_sent_rcvd_bytes.sh \
-+		rxe_netns_names.sh
- 
- include ../lib.mk
-diff --git a/tools/testing/selftests/rdma/config b/tools/testing/selftests/rdma/config
-index 4ffb814e253b..e1ff54ec0f57 100644
---- a/tools/testing/selftests/rdma/config
-+++ b/tools/testing/selftests/rdma/config
-@@ -1,3 +1,5 @@
- CONFIG_TUN
- CONFIG_VETH
-+CONFIG_DUMMY
-+CONFIG_NET_NS
- CONFIG_RDMA_RXE
-diff --git a/tools/testing/selftests/rdma/rxe_netns_names.sh b/tools/testing/selftests/rdma/rxe_netns_names.sh
-new file mode 100755
-index 000000000000..a7e57706fdff
---- /dev/null
-+++ b/tools/testing/selftests/rdma/rxe_netns_names.sh
-@@ -0,0 +1,282 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Exercise RDMA device name handling across network namespaces.
-+
-+source "$(dirname "$0")/../kselftest/ktap_helpers.sh"
-+
-+NAME_PREFIX="rxe_netns_names_$$"
-+NETDEV_PREFIX="rxn$$"
-+NS1="${NAME_PREFIX}ns1"
-+NS2="${NAME_PREFIX}ns2"
-+RXE_A="${NAME_PREFIX}rxe_a"
-+RXE_B="${NAME_PREFIX}rxe_b"
-+RXE_SAME="${NAME_PREFIX}rxe_same"
-+RXE_NEW="${NAME_PREFIX}rxe_new"
-+DUMMY_A="${NETDEV_PREFIX}a"
-+DUMMY_B="${NETDEV_PREFIX}b"
-+OLD_MODE=""
-+MODE_CHANGED=0
-+MODS=("dummy" "rdma_rxe")
-+TEST_SAME_NAMES="same RDMA device name can exist in two net namespaces"
-+TEST_MOVE_CONFLICT="move without rename fails on destination name conflict"
-+TEST_MOVE_RENAME="move then rename succeeds"
-+TEST_COMBINED_MOVE_RENAME="move with requested destination name succeeds"
-+TEST_SAME_NETNS_DUP_RENAME="same-netns rename rejects duplicate name"
-+TEST_TEARDOWN_RETURN="netns delete returns device to init_net and renames on conflict"
-+
-+ksft_skip()
-+{
-+	ktap_skip_all "$*"
-+	exit "$KSFT_SKIP"
-+}
-+
-+fail()
-+{
-+	ktap_exit_fail_msg "$*"
-+}
-+
-+need_cmd()
-+{
-+	command -v "$1" >/dev/null 2>&1 || ksft_skip "missing command: $1"
-+}
-+
-+rdma_ns()
-+{
-+	local ns=$1
-+
-+	shift
-+	ip netns exec "$ns" rdma "$@"
-+}
-+
-+rdma_dev_exists()
-+{
-+	local ns=$1
-+	local dev=$2
-+
-+	if [ -n "$ns" ]; then
-+		rdma_ns "$ns" dev show "$dev" >/dev/null 2>&1
-+	else
-+		rdma dev show "$dev" >/dev/null 2>&1
-+	fi
-+}
-+
-+add_dummy()
-+{
-+	local netdev=$1
-+
-+	ip link add "$netdev" type dummy || return 1
-+	ip link set "$netdev" up || return 1
-+}
-+
-+add_rxe()
-+{
-+	local dev=$1
-+	local netdev=$2
-+
-+	rdma link add "$dev" type rxe netdev "$netdev"
-+}
-+
-+rdma_dev_on_netdev()
-+{
-+	local netdev=$1
-+
-+	rdma link show 2>/dev/null | awk -v want="$netdev" '
-+		{
-+			for (i = 1; i < NF; i++)
-+				if ($i == "netdev" && $(i + 1) == want) {
-+					dev = $2
-+					sub(/\/.*/, "", dev)
-+					print dev
-+					exit
-+				}
-+		}'
-+}
-+
-+wait_rdma_dev_on_netdev()
-+{
-+	local netdev=$1
-+	local dev
-+	local i
-+
-+	for i in $(seq 1 50); do
-+		dev=$(rdma_dev_on_netdev "$netdev")
-+		if [ -n "$dev" ]; then
-+			echo "$dev"
-+			return 0
-+		fi
-+		sleep 0.1
-+	done
-+
-+	return 1
-+}
-+
-+setup_devs()
-+{
-+	cleanup_devs
-+
-+	add_dummy "$DUMMY_A" || return 1
-+	add_dummy "$DUMMY_B" || return 1
-+
-+	add_rxe "$RXE_A" "$DUMMY_A" || return 1
-+	add_rxe "$RXE_B" "$DUMMY_B" || return 1
-+}
-+
-+cleanup_devs()
-+{
-+	ip link del "$DUMMY_A" 2>/dev/null
-+	ip link del "$DUMMY_B" 2>/dev/null
-+}
-+
-+setup()
-+{
-+	OLD_MODE=$(rdma system show 2>/dev/null |
-+		   sed -n 's/.*netns \([^ ]*\).*/\1/p')
-+	[ -n "$OLD_MODE" ] || ksft_skip "failed to read RDMA netns mode"
-+
-+	rdma system set netns exclusive >/dev/null 2>&1 ||
-+		ksft_skip "rdma netns exclusive mode is not supported"
-+	MODE_CHANGED=1
-+
-+	ip netns add "$NS1" || return 1
-+	ip netns add "$NS2" || return 1
-+}
-+
-+cleanup()
-+{
-+	cleanup_devs
-+
-+	ip netns del "$NS1" 2>/dev/null
-+	ip netns del "$NS2" 2>/dev/null
-+
-+	if [ "$MODE_CHANGED" -eq 1 ]; then
-+		rdma system set netns "$OLD_MODE" 2>/dev/null
-+	fi
-+
-+	for m in "${MODS[@]}"; do
-+		modprobe -r "$m" 2>/dev/null
-+	done
-+}
-+
-+rdma_supports_combined_move_rename()
-+{
-+	rdma dev help 2>&1 | grep -Eq 'netns .*name|name .*netns'
-+}
-+
-+[ "$(id -u)" -eq 0 ] || ksft_skip "must be run as root"
-+need_cmd ip
-+need_cmd rdma
-+need_cmd modprobe
-+
-+trap cleanup EXIT
-+
-+for m in "${MODS[@]}"; do
-+	modinfo "$m" >/dev/null 2>&1 || ksft_skip "module $m not found"
-+	modprobe "$m" || fail "failed to load $m"
-+done
-+
-+setup || fail "failed to create net namespaces"
-+
-+ktap_print_header
-+ktap_set_plan 7
-+
-+if setup_devs &&
-+   rdma dev set "$RXE_A" netns "$NS1" &&
-+   rdma_ns "$NS1" dev set "$RXE_A" name "$RXE_SAME" &&
-+   rdma dev set "$RXE_B" netns "$NS2" &&
-+   rdma_ns "$NS2" dev set "$RXE_B" name "$RXE_SAME" &&
-+   rdma_dev_exists "$NS1" "$RXE_SAME" &&
-+   rdma_dev_exists "$NS2" "$RXE_SAME"; then
-+	ktap_test_pass "$TEST_SAME_NAMES"
-+else
-+	ktap_test_fail "$TEST_SAME_NAMES"
-+fi
-+cleanup_devs
-+
-+if ! setup_devs ||
-+   ! rdma dev set "$RXE_A" netns "$NS1" ||
-+   ! rdma_ns "$NS1" dev set "$RXE_A" name "$RXE_SAME" ||
-+   ! rdma dev set "$RXE_B" netns "$NS2" ||
-+   ! rdma_ns "$NS2" dev set "$RXE_B" name "$RXE_SAME"; then
-+	ktap_test_fail "$TEST_MOVE_CONFLICT"
-+elif rdma_ns "$NS1" dev set "$RXE_SAME" netns "$NS2" >/dev/null 2>&1; then
-+	ktap_test_fail "$TEST_MOVE_CONFLICT"
-+elif rdma_dev_exists "$NS1" "$RXE_SAME" &&
-+     rdma_dev_exists "$NS2" "$RXE_SAME"; then
-+	ktap_test_pass "$TEST_MOVE_CONFLICT"
-+else
-+	ktap_test_fail "$TEST_MOVE_CONFLICT"
-+fi
-+cleanup_devs
-+
-+if ! setup_devs; then
-+	ktap_test_fail "$TEST_MOVE_RENAME"
-+elif rdma dev set "$RXE_A" netns "$NS2" &&
-+     rdma_ns "$NS2" dev set "$RXE_A" name "$RXE_NEW"; then
-+	if rdma_dev_exists "$NS2" "$RXE_NEW" &&
-+	   ! rdma_dev_exists "" "$RXE_A"; then
-+		ktap_test_pass "$TEST_MOVE_RENAME"
-+	else
-+		ktap_test_fail "$TEST_MOVE_RENAME"
-+	fi
-+else
-+	ktap_test_fail "$TEST_MOVE_RENAME"
-+fi
-+cleanup_devs
-+
-+if ! rdma_supports_combined_move_rename; then
-+	ktap_test_skip "$TEST_COMBINED_MOVE_RENAME"
-+elif ! setup_devs; then
-+	ktap_test_fail "$TEST_COMBINED_MOVE_RENAME"
-+elif rdma dev set "$RXE_A" netns "$NS2" name "$RXE_NEW"; then
-+	if rdma_dev_exists "$NS2" "$RXE_NEW" &&
-+	   ! rdma_dev_exists "" "$RXE_A"; then
-+		ktap_test_pass "$TEST_COMBINED_MOVE_RENAME"
-+	else
-+		ktap_test_fail "$TEST_COMBINED_MOVE_RENAME"
-+	fi
-+else
-+	ktap_test_fail "$TEST_COMBINED_MOVE_RENAME"
-+fi
-+cleanup_devs
-+
-+if ! setup_devs; then
-+	ktap_test_fail "$TEST_SAME_NETNS_DUP_RENAME"
-+elif rdma dev set "$RXE_A" name "$RXE_SAME" &&
-+     rdma dev set "$RXE_B" name "$RXE_NEW"; then
-+	if rdma dev set "$RXE_A" name "$RXE_NEW" >/dev/null 2>&1; then
-+		ktap_test_fail "$TEST_SAME_NETNS_DUP_RENAME"
-+	elif rdma_dev_exists "" "$RXE_SAME" &&
-+	     rdma_dev_exists "" "$RXE_NEW"; then
-+		ktap_test_pass "$TEST_SAME_NETNS_DUP_RENAME"
-+	else
-+		ktap_test_fail "$TEST_SAME_NETNS_DUP_RENAME"
-+	fi
-+else
-+	ktap_test_fail "$TEST_SAME_NETNS_DUP_RENAME"
-+fi
-+cleanup_devs
-+
-+if ! setup_devs; then
-+	ktap_test_fail "$TEST_TEARDOWN_RETURN"
-+elif ! rdma dev set "$RXE_A" name "$RXE_SAME" ||
-+     ! rdma dev set "$RXE_B" netns "$NS2" ||
-+     ! rdma_ns "$NS2" dev set "$RXE_B" name "$RXE_SAME" ||
-+     ! rdma_dev_exists "$NS2" "$RXE_SAME"; then
-+	ktap_test_fail "$TEST_TEARDOWN_RETURN"
-+else
-+	ip netns del "$NS2"
-+	returned=$(wait_rdma_dev_on_netdev "$DUMMY_B")
-+	ktap_print_msg "device returned to init_net as '${returned:-<missing>}'"
-+	if rdma_dev_exists "" "$RXE_SAME" &&
-+	   [ -n "$returned" ] &&
-+	   [ "$returned" != "$RXE_SAME" ] &&
-+	   [ "${returned#ibdev}" != "$returned" ]; then
-+		ktap_test_pass "$TEST_TEARDOWN_RETURN"
-+	else
-+		ktap_test_fail "$TEST_TEARDOWN_RETURN"
-+	fi
-+fi
-+cleanup_devs
-+
-+ktap_finished
+This patch introduces a set of new AF mailbox messages so that a
+separate Marvell switch device (running its own Linux) can query
+interface topology, mcam features, mcam multi-entry stats, and
+multi-entry flow delete/free from the AF driver, and adds a stub
+swdev2af_notify handler plus two up-direction message definitions.
+
+A few questions on the diff below.
+
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> index 821895a7014e..43ff97441273 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> @@ -172,6 +172,10 @@ M(FL_NOTIFY,		0x012,  fl_notify,				\
+>  				fl_notify_req, msg_rsp)		\
+>  M(FL_GET_STATS,		0x013,  fl_get_stats,				\
+>  				fl_get_stats_req, fl_get_stats_rsp)	\
+> +M(GET_IFACE_GET_INFO,	0x014, iface_get_info, msg_req,	\
+> +				iface_get_info_rsp)			\
+
+[Low]
+The generated enum symbol for this entry becomes
+MBOX_MSG_GET_IFACE_GET_INFO, which has a duplicated GET_ prefix and
+does not match the handler/struct naming (iface_get_info,
+iface_get_info_rsp). Was IFACE_GET_INFO intended here? This enum name
+becomes part of the mbox ID namespace once released.
+
+> +M(SWDEV2AF_NOTIFY,	0x015,  swdev2af_notify,		\
+> +				swdev2af_notify_req, msg_rsp)		\
+>  /* CGX mbox IDs (range 0x200 - 0x3FF) */				\
+
+[ ... ]
+
+> @@ -1587,6 +1607,30 @@ struct npc_mcam_alloc_entry_rsp {
+>  	u16 entry_list[NPC_MAX_NONCONTIG_ENTRIES];
+>  };
+>  
+> +struct npc_flow_del_n_free_req {
+> +	struct mbox_msghdr hdr;
+> +	u16 cnt;
+> +	u16 entry[256]; /* Entry index to be freed */
+> +};
+> +
+> +struct npc_mcam_get_features_rsp {
+> +	struct mbox_msghdr hdr;
+> +	u64 rx_features;
+> +	u64 tx_features;
+> +};
+> +
+> +struct npc_mcam_get_mul_stats_req {
+> +	struct mbox_msghdr hdr;
+> +	int cnt;
+> +	u16 entry[256]; /* mcam entry */
+> +};
+> +
+> +struct npc_mcam_get_mul_stats_rsp {
+> +	struct mbox_msghdr hdr;
+> +	int cnt;
+> +	u64 stat[256];  /* counter stats */
+> +};
+
+[Low]
+Is there a reason cnt is a signed int in both the request and the
+response here, when npc_flow_del_n_free_req above uses u16 cnt?
+
+The handler validates via:
+
+    if (!req->cnt || req->cnt > 256) {
+
+which is a signed compare, so a negative req->cnt passes and rsp->cnt
+is then assigned from req->cnt.
+
+Any caller (current or future) that treats rsp->cnt as an unsigned
+length before iterating rsp->stat[] would go out of bounds. Would a
+u16 for both cnt fields be safer?
+
+> +
+>  struct npc_mcam_free_entry_req {
+>  	struct mbox_msghdr hdr;
+>  	u16 entry; /* Entry index to be freed */
+
+[ ... ]
+
+> @@ -1909,6 +1953,83 @@ struct fl_get_stats_rsp {
+>  	u64 pkts_diff;
+>  };
+>  
+> +struct af2swdev_notify_req {
+> +	struct mbox_msghdr hdr;
+> +	u64 flags;
+> +	u32 port_id;
+> +	u32 switch_id;
+> +	union {
+> +		struct {
+> +			u8 mac[6];
+> +		};
+> +		struct {
+> +			u8 cnt;
+> +			struct fib_entry entry[16];
+> +		};
+> +
+> +		struct {
+> +			unsigned long cookie;
+> +			u64 features;
+> +			struct fl_tuple tuple;
+> +		};
+> +	};
+> +};
+
+[Low]
+Is unsigned long intentional in a mailbox payload? All other structs
+in mbox.h use fixed-width types (u8/u16/u32/u64/__be16). The commit
+message notes the switch runs on a separate Linux OS, so if the two
+endpoints ever differ in bitness the on-wire size of cookie changes
+silently. Same question applies to struct fl_info below. Would u64
+be more appropriate?
+
+> +
+> +struct af2pf_fdb_refresh_req {
+> +	struct mbox_msghdr hdr;
+> +	u16 pcifunc;
+> +	u8 mac[6];
+> +};
+> +
+> +struct iface_info {
+> +	u64 is_vf :1;
+> +	u64 is_sdp :1;
+> +	u16 pcifunc;
+> +	u16 rx_chan_base;
+> +	u16 tx_chan_base;
+> +	u16 sq_cnt;
+> +	u16 cq_cnt;
+> +	u16 rq_cnt;
+> +	u8 rx_chan_cnt;
+> +	u8 tx_chan_cnt;
+> +	u8 tx_link;
+> +	u8 nix;
+> +};
+
+[Low]
+Was it intended to place is_vf and is_sdp as bitfields inside a u64
+storage unit? That reserves 8 bytes per entry for two bits, and this
+struct is embedded IFACE_MAX times in iface_get_info_rsp. Would
+u8 is_vf:1; u8 is_sdp:1; work here?
+
+> +
+> +#define IFACE_MAX (256 + 32) /* 32 PFs + 256 Vs */
+> +
+> +struct iface_get_info_rsp {
+> +	struct  mbox_msghdr hdr;
+> +	int cnt;
+> +	struct iface_info info[IFACE_MAX];
+> +};
+
+[Medium]
+Is IFACE_MAX = 288 sufficient? rvu_hwinfo.total_vfs is a u16 populated
+from a 12-bit HW register field, so total VFs can exceed 288 on some
+SoCs. The handler silently truncates (goto done) and sets rsp->cnt to
+the truncated count with no overflow indication, so the caller cannot
+distinguish "all interfaces" from "truncated". This fixed cap also
+becomes part of the effective wire layout once released.
+
+> +
+> +struct fl_info {
+> +	unsigned long cookie;
+> +	u16 mcam_idx[2];
+> +	u8 dis : 1;
+> +	u8 uni_di : 1;
+> +};
+> +
+> +struct swdev2af_notify_req {
+> +	struct  mbox_msghdr hdr;
+> +	u64 msg_type;
+> +#define SWDEV2AF_MSG_TYPE_FW_STATUS BIT_ULL(0)
+> +#define	SWDEV2AF_MSG_TYPE_REFRESH_FDB BIT_ULL(1)
+> +#define	SWDEV2AF_MSG_TYPE_REFRESH_FL BIT_ULL(2)
+> +	u16 pcifunc;
+> +	union {
+> +		bool fw_up;		// FW_STATUS message
+> +
+> +		u8 mac[ETH_ALEN];	// fdb refresh message
+> +
+> +		struct {		// fl refresh message
+> +			int cnt;
+> +			struct fl_info fl[64];
+> +		};
+> +	};
+> +};
+
+[Low]
+Is msg_type meant to be a bitmask or a selector? It is declared u64
+with BIT_ULL(0..2) flags, which suggests multiple bits may be set
+simultaneously, but the payload is an anonymous union whose members
+are mutually exclusive. Would an enum-style tag value (0/1/2) match
+the actual semantics better than BIT_ULL()? The choice is baked into
+the mailbox ABI once merged.
+
+> +
+>  struct flow_msg {
+>  	unsigned char dmac[6];
+>  	unsigned char smac[6];
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+> index ffba56ee8a60..6e10a58a0421 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+> @@ -1990,6 +1990,122 @@ int rvu_mbox_handler_msix_offset(struct rvu *rvu, struct msg_req *req,
+>  	return 0;
+>  }
+>  
+> +int rvu_mbox_handler_iface_get_info(struct rvu *rvu, struct msg_req *req,
+> +				    struct iface_get_info_rsp *rsp)
+> +{
+> +	struct iface_info *info;
+> +	struct rvu_pfvf *pfvf;
+> +	int pf, vf, numvfs;
+> +	u16 pcifunc;
+> +	int tot = 0;
+> +	u64 cfg;
+> +
+> +	info = rsp->info;
+> +	for (pf = 0; pf < rvu->hw->total_pfs; pf++) {
+
+[Medium]
+Should this handler filter what it returns based on req->hdr.pcifunc?
+As written, it walks every PF and every VF and returns pcifunc,
+rx/tx channel base+count, SQ/CQ/RQ counts, tx_link, NIX block and
+SDP flag for all of them, with no is_pffunc_af() gate and no
+ownership/privilege check.
+
+In multi-tenant SR-IOV where distinct PFs belong to distinct tenants,
+a non-privileged PF sending mbox 0x014 would receive the full
+resource layout of neighbouring PFs and VFs.
+
+Was this intended to be an AF-only or privileged-caller-only message?
+
+> +		if (tot >= IFACE_MAX)
+> +			goto done;
+> +
+
+[ ... ]
+
+> +done:
+> +	rsp->cnt = tot;
+> +
+> +	return 0;
+> +}
+> +
+
+[ ... ]
+
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+> index c7bc0b3a29b9..d797cd05776e 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+> @@ -3544,6 +3544,45 @@ int rvu_mbox_handler_npc_mcam_free_entry(struct rvu *rvu,
+>  	return rc;
+>  }
+>  
+> +int rvu_mbox_handler_npc_flow_del_n_free(struct rvu *rvu,
+> +					 struct npc_flow_del_n_free_req *mreq,
+> +					 struct msg_rsp *rsp)
+> +{
+> +	struct npc_mcam_free_entry_req sreq = { 0 };
+> +	struct npc_delete_flow_req dreq = { 0 };
+> +	struct npc_delete_flow_rsp drsp = { 0 };
+> +	bool err = false;
+> +	int ret = 0, i;
+> +
+> +	sreq.hdr.pcifunc = mreq->hdr.pcifunc;
+> +	dreq.hdr.pcifunc = mreq->hdr.pcifunc;
+> +
+> +	if (!mreq->cnt || mreq->cnt > 256) {
+> +		dev_err(rvu->dev, "Invalid cnt=%d\n", mreq->cnt);
+> +		return -EINVAL;
+> +	}
+> +
+> +	for (i = 0; i < mreq->cnt; i++) {
+> +		dreq.entry = mreq->entry[i];
+> +		ret = rvu_mbox_handler_npc_delete_flow(rvu, &dreq, &drsp);
+> +		if (ret) {
+> +			dev_err(rvu->dev, "delete flow error for i=%d entry=%d\n",
+> +				i, mreq->entry[i]);
+> +			err = true;
+> +		}
+
+[Low]
+Can this branch ever fire? Looking at rvu_mbox_handler_npc_delete_flow()
+in rvu_npc_fs.c, it unconditionally ends with return 0 and logs
+per-rule failures via dev_err inside its own loop, so ret here should
+always be 0. Is the delete-flow error handling reachable, or is this
+dead code that hides failures?
+
+> +
+> +		sreq.entry = mreq->entry[i];
+> +		ret = rvu_mbox_handler_npc_mcam_free_entry(rvu, &sreq, rsp);
+> +		if (ret) {
+> +			dev_err(rvu->dev, "free entry error for i=%d entry=%d\n",
+> +				i, mreq->entry[i]);
+> +			err = true;
+> +		}
+> +	}
+> +
+> +	return err ? -EINVAL : 0;
+> +}
+> +
+
+[ ... ]
+
+> @@ -4361,6 +4400,55 @@ int rvu_mbox_handler_npc_mcam_entry_stats(struct rvu *rvu,
+>  	return 0;
+>  }
+>  
+> +int rvu_mbox_handler_npc_mcam_mul_stats(struct rvu *rvu,
+> +					struct npc_mcam_get_mul_stats_req *req,
+> +					struct npc_mcam_get_mul_stats_rsp *rsp)
+> +{
+> +	struct npc_mcam *mcam = &rvu->hw->mcam;
+> +	u16 pcifunc = req->hdr.pcifunc;
+> +	u16 index, cntr, entry;
+> +	int blkaddr;
+> +	u64 regval;
+> +	u32 bank;
+> +
+> +	if (!req->cnt || req->cnt > 256) {
+> +		dev_err(rvu->dev, "%s invalid request cnt=%d\n",
+> +			__func__, req->cnt);
+> +		return -EINVAL;
+> +	}
+> +
+> +	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
+> +	if (blkaddr < 0)
+> +		return NPC_MCAM_INVALID_REQ;
+> +
+> +	mutex_lock(&mcam->lock);
+> +
+> +	for (int i = 0; i < req->cnt; i++) {
+> +		entry = npc_cn20k_vidx2idx(req->entry[i]);
+> +
+> +		if (npc_mcam_verify_entry(mcam, pcifunc, entry)) {
+> +			dev_err(rvu->dev, "%s invalid mcam index=%d\n",
+> +				__func__, req->entry[i]);
+> +			return -EINVAL;
+> +		}
+
+[High]
+Does this early return leak mcam->lock? mutex_lock(&mcam->lock) was
+taken just above the loop, and this path returns -EINVAL without
+calling mutex_unlock().
+
+Since req->entry[i] and req->hdr.pcifunc come from the mailbox, any
+PF/VF can send a request containing an entry it does not own or one
+that is out of range and permanently wedge mcam->lock. That mutex
+serializes all NPC MCAM operations AF-wide, so once leaked, subsequent
+allocate/free/read/enable/disable/stats operations from any PF or VF
+would block forever.
+
+Neighbouring handlers in this file (npc_mcam_entry_stats,
+npc_mcam_free_entry, npc_mcam_read_entry, npc_mcam_dis_entry) unlock
+before returning; would a "goto exit" style unlock path work here as
+well?
+
+[High]
+Should this handler branch on is_cn20k(rvu->pdev) the way
+rvu_mbox_handler_npc_mcam_entry_stats() does?
+
+The single-entry stats handler has:
+
+    if (is_cn20k(rvu->pdev)) {
+        regval = rvu_read64(rvu, blkaddr,
+                            NPC_AF_CN20K_MCAMEX_BANKX_STAT_EXT(index,
+                                                               bank));
+        rsp->stat_ena = 1;
+        rsp->stat = regval;
+        ...
+        return 0;
+    }
+
+The new multi-entry handler skips this and always issues the legacy
+STAT_ACT + MATCH_STATX sequence, which does not apply on CN20K
+silicon. Would that produce garbage (or unmapped-address) reads on
+CN20K?
+
+> +
+> +		index = entry & (mcam->banksize - 1);
+> +		bank = npc_get_bank(mcam, entry);
+> +
+> +		/* read MCAM entry STAT_ACT register */
+> +		regval = rvu_read64(rvu, blkaddr, NPC_AF_MCAMEX_BANKX_STAT_ACT(index, bank));
+> +		cntr = regval & 0x1FF;
+> +
+> +		rsp->stat[i] = rvu_read64(rvu, blkaddr, NPC_AF_MATCH_STATX(cntr));
+> +		rsp->stat[i] &= BIT_ULL(48) - 1;
+
+[Medium]
+Should this loop also check rvu->hw->npc_stat_ena before deriving cntr
+from STAT_ACT[8:0]?
+
+The single-entry handler does:
+
+    if (!(regval & rvu->hw->npc_stat_ena)) {
+        rsp->stat_ena = 0;
+        mutex_unlock(&mcam->lock);
+        return 0;
+    }
+
+For entries whose statistics counter is not enabled (a legal state),
+this new code will take whatever the low 9 bits happen to be as a
+counter index and return MATCH_STATX(random_index) to the caller as
+that entry's stat value. Would checking npc_stat_ena per entry be
+appropriate here too?
+
+> +	}
+> +
+> +	rsp->cnt = req->cnt;
+> +
+> +	mutex_unlock(&mcam->lock);
+> +	return 0;
+> +}
+> +
 -- 
-2.54.0
+This is an AI-generated review.
 
 
