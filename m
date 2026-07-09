@@ -1,184 +1,262 @@
-Return-Path: <netdev+bounces-306045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306046-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id BCk4FYI0T2pQcAIAu9opvQ
-	(envelope-from <netdev+bounces-306045-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 07:41:22 +0200
+	id YbuyNPw0T2pscAIAu9opvQ
+	(envelope-from <netdev+bounces-306046-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 07:43:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E153772CCFE
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 07:41:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0663272CD3D
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 07:43:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=PMF7MIfe;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306045-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306045-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=key1 header.b=gjsb3iVN;
+	dmarc=pass (policy=none) header.from=linux.dev;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306046-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306046-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 06EBA300E006
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 05:41:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 10CC03024183
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 05:43:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFBFC3AB26E;
-	Thu,  9 Jul 2026 05:41:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7339C3A7858;
+	Thu,  9 Jul 2026 05:43:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C533A7858;
-	Thu,  9 Jul 2026 05:41:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A182C3A9637
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 05:43:20 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783575678; cv=none; b=USzP2bWOrV6Kedt+mLsJj8wG34JRjSjOIgYDANDZTheb5phvB2WaZAouVC5KPfSmejB4HEhx6hl9h414ryXUoK1tQuRR3iRelgxQe8Sv4W7NbhQ3tocqXuW1BWd3WdC8N8WvWbKQHOlAPIz3W5dGtNVwiEqkISKTUegRyC44cWY=
+	t=1783575802; cv=none; b=rDgd3WIWuMAW/ZBsgTI+D3efZtyS2hN2AyypNwEJit2vrzQpL0cWvW13Ch+o3wFzUHHLuAK9v8q22EZvrwF+vWIbozZODSnGTaYZAIpMaNcz4dxqyWnoJ5DvwdbuE/EjeZuxfc6tbzcERb1Xq6TpX+Vis/wh4v/htQ7oHhOQpO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783575678; c=relaxed/simple;
-	bh=vd/pKHnN9hHEq/PC2ZKa5Ks5FAZG9ipiDZlCtIFKHWA=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Sz+AMAyFvMaIp2ihH/XHgskQbhUvphToTAOUip8OSlcT4ZwgVSYZ5RLdHGSqaLSFcCyqY7FP5CNKrq2Aj+R26BW153pLHwRNBXYsN+kGhdIV3R2va4LrL5luOzrWzq8KJpv4vo2BDoV3P7SdYpn9LodkJ10feZ+KCBIncmmCP5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PMF7MIfe; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EAE21F000E9;
-	Thu,  9 Jul 2026 05:40:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783575677;
-	bh=GUR46VabSVZbPyehLw4syLT30MNmMe+mudnTx0VnTpA=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=PMF7MIfeOb6sPplAJM3ptwtGVrsjDjcmNM8+KBGIZapvBcxEoEW05Z71w8wT7OiCo
-	 DpyTqd8LBQSOVV2LXf12bv3I6Pc0h9ojZxvVDoieC+rI/KlduqQsbmNYRbApokpMUS
-	 906x2f5dfccmHGNLaQwrgeNkFJeM+vrwSPjhiXoBgGmr7P/GzXUVoT8b+iN+kTpuYZ
-	 3miqhB4alxgUPujwFkL9mVwHxHABNpvGLd+MKygFosR17bCiXd9AFhTno3Tpzpr8G2
-	 W04sec2rt03zdANmLtdpyqOtx7Xh3Wl/PfkGMSLLD5Y/7X7CmPps6HOirGFsnoRUm/
-	 YRXFW3BE6RuOQ==
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Bjorn Helgaas <bhelgaas@google.com>, 
- "Vaibhaav Ram T . L" <vaibhaavram.tl@microchip.com>, 
- Kumaravel Thiagarajan <kumaravel.thiagarajan@microchip.com>, 
- Even Xu <even.xu@intel.com>, Xinpeng Sun <xinpeng.sun@intel.com>, 
- Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, 
- Jiri Kosina <jikos@kernel.org>, 
- Alexandre Belloni <alexandre.belloni@bootlin.com>, 
- Zhou Wang <wangzhou1@hisilicon.com>, Longfang Liu <liulongfang@huawei.com>, 
- Vinod Koul <vkoul@kernel.org>, Lee Jones <lee@kernel.org>, 
- Jijie Shao <shaojijie@huawei.com>, Jian Shen <shenjian15@huawei.com>, 
- Sunil Goutham <sgoutham@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Jeff Hugo <jeff.hugo@oss.qualcomm.com>, Oded Gabbay <ogabbay@kernel.org>, 
- Maciej Falkowski <maciej.falkowski@linux.intel.com>, 
- Karol Wachowski <karol.wachowski@linux.intel.com>, 
- Min Ma <mamin506@gmail.com>, Lizhi Hou <lizhi.hou@amd.com>, 
- Andreas Noever <andreas.noever@gmail.com>, 
- Mika Westerberg <westeri@kernel.org>, Will Deacon <will@kernel.org>, 
- Xinliang Liu <xinliang.liu@linaro.org>, Tian Tao <tiantao6@hisilicon.com>, 
- Davidlohr Bueso <dave@stgolabs.net>, Srujana Challa <schalla@marvell.com>, 
- Bharat Bhushan <bbhushan2@marvell.com>, Antoine Tenart <atenart@kernel.org>, 
- Herbert Xu <herbert@gondor.apana.org.au>, Raag Jadav <raag.jadav@intel.com>, 
- Hans de Goede <hansg@kernel.org>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Jiri Slaby <jirislaby@kernel.org>, Andy Shevchenko <andy@kernel.org>, 
- Mika Westerberg <mika.westerberg@linux.intel.com>, 
- Andi Shyti <andi.shyti@kernel.org>, Robert Richter <rric@kernel.org>, 
- Mark Brown <broonie@kernel.org>, 
- Nirmal Patel <nirmal.patel@linux.intel.com>, 
- Kurt Schwemmer <kurt.schwemmer@microsemi.com>, 
- Logan Gunthorpe <logang@deltatee.com>, Linus Walleij <linusw@kernel.org>, 
- Bartosz Golaszewski <brgl@kernel.org>, 
- Sakari Ailus <sakari.ailus@linux.intel.com>, 
- Bingbu Cao <bingbu.cao@intel.com>, 
- Tomasz Jeznach <tomasz.jeznach@linux.dev>, 
- Jonathan Cameron <jic23@kernel.org>, Ulf Hansson <ulfh@kernel.org>, 
- Shawn Lin <shawn.lin@rock-chips.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Benjamin Tissoires <bentiss@kernel.org>, 
- linux-input@vger.kernel.org, linux-i3c@lists.infradead.org, 
- dmaengine@vger.kernel.org, Philipp Stanner <phasta@kernel.org>, 
- netdev@vger.kernel.org, nic_swsd@realtek.com, linux-arm-msm@vger.kernel.org, 
- dri-devel@lists.freedesktop.org, linux-usb@vger.kernel.org, 
- iommu@lists.linux.dev, linux-riscv@lists.infradead.org, 
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
- linux-cxl@vger.kernel.org, linux-crypto@vger.kernel.org, 
- platform-driver-x86@vger.kernel.org, linux-serial@vger.kernel.org, 
- mhi@lists.linux.dev, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
- Jan Dabros <jsd@semihalf.com>, linux-i2c@vger.kernel.org, 
- Daniel Mack <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>, 
- linux-spi@vger.kernel.org, Jonathan Derrick <jonathan.derrick@linux.dev>, 
- linux-pci@vger.kernel.org, linux-gpio@vger.kernel.org, 
- Mauro Carvalho Chehab <mchehab@kernel.org>, linux-media@vger.kernel.org, 
- linux-mmc@vger.kernel.org
-In-Reply-To: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
-References: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
-Subject: Re: (subset) [PATCH 0/37] PCI/MSI: Enforce explicit IRQ vector
- management by removing devres auto-free
-Message-Id: <178357565325.731734.7291964273199898845.b4-ty@b4>
-Date: Thu, 09 Jul 2026 07:40:53 +0200
+	s=arc-20240116; t=1783575802; c=relaxed/simple;
+	bh=6h5p7n5No64QiJEYCYCEU+E9AgD/KFjcbLGyq0ar2ak=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=bpF6qtFRPqSzFLHsJf7dGwyPUTRtPaA+AS9rdW9ohvGfgeCNY38G18m7ogxGJG66XIRCec09JllswAMQCb1Zgm3B3bE9dq64UIVBXtpdLDNe1u6m1Z6P8RZcsyL3shDTyxlZrwA7eql27zT451wd+x0z22ilsqcpq6tx9VDrJuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gjsb3iVN; arc=none smtp.client-ip=91.218.175.173
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783575788;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OifTvRzURu2dVot9IJ7DSNor84sK2OfO99KNA1PqW3o=;
+	b=gjsb3iVNpJg/gmcCx0Qy34R7WBozs3vsPK68JOyg0MagmcNwIFUdHKAhk5RsQVcMXghLDw
+	tp+20OZUINZu6ZR8ZPElq2PdqMK/UlIrl5nJOKYjUVv6dB2RgilM3FFLUrd/g6/MwnL3QL
+	8RDGR/CLBTvt6R47KXfJ8MyOaSELXyY=
+Date: Thu, 09 Jul 2026 05:43:02 +0000
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.15.2
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: gang.yan@linux.dev
+Message-ID: <8155514655323d8c4a07da86d2b2ccdd7244c125@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH v2] mptcp: only set DATA_FIN when a mapping is present
+To: "Michael Bommarito" <michael.bommarito@gmail.com>, "Matthieu Baerts"
+ <matttbe@kernel.org>, "Mat Martineau" <martineau@kernel.org>
+Cc: "Geliang Tang" <geliang@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ mptcp@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+In-Reply-To: <20260707171730.2679013-1-michael.bommarito@gmail.com>
+References: <2edcb1cd-f2db-4d0c-a0e3-fd2b4dd820fe@redhat.com>
+ <20260707171730.2679013-1-michael.bommarito@gmail.com>
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[google.com,microchip.com,intel.com,linux.intel.com,kernel.org,bootlin.com,hisilicon.com,huawei.com,marvell.com,lunn.ch,gmail.com,davemloft.net,oss.qualcomm.com,amd.com,linaro.org,stgolabs.net,gondor.apana.org.au,linuxfoundation.org,microsemi.com,deltatee.com,linux.dev,rock-chips.com];
-	TAGGED_FROM(0.00)[bounces-306045-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306046-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
+	FORGED_SENDER(0.00)[gang.yan@linux.dev,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:bhelgaas@google.com,m:vaibhaavram.tl@microchip.com,m:kumaravel.thiagarajan@microchip.com,m:even.xu@intel.com,m:xinpeng.sun@intel.com,m:srinivas.pandruvada@linux.intel.com,m:jikos@kernel.org,m:alexandre.belloni@bootlin.com,m:wangzhou1@hisilicon.com,m:liulongfang@huawei.com,m:vkoul@kernel.org,m:lee@kernel.org,m:shaojijie@huawei.com,m:shenjian15@huawei.com,m:sgoutham@marvell.com,m:andrew+netdev@lunn.ch,m:hkallweit1@gmail.com,m:davem@davemloft.net,m:jeff.hugo@oss.qualcomm.com,m:ogabbay@kernel.org,m:maciej.falkowski@linux.intel.com,m:karol.wachowski@linux.intel.com,m:mamin506@gmail.com,m:lizhi.hou@amd.com,m:andreas.noever@gmail.com,m:westeri@kernel.org,m:will@kernel.org,m:xinliang.liu@linaro.org,m:tiantao6@hisilicon.com,m:dave@stgolabs.net,m:schalla@marvell.com,m:bbhushan2@marvell.com,m:atenart@kernel.org,m:herbert@gondor.apana.org.au,m:raag.jadav@intel.com,m:hansg@kernel.org,m:gregkh@linuxfoundation.org,m:jirislaby@kernel.org,m:andy@kernel.org,m:mika.westerberg
- @linux.intel.com,m:andi.shyti@kernel.org,m:rric@kernel.org,m:broonie@kernel.org,m:nirmal.patel@linux.intel.com,m:kurt.schwemmer@microsemi.com,m:logang@deltatee.com,m:linusw@kernel.org,m:brgl@kernel.org,m:sakari.ailus@linux.intel.com,m:bingbu.cao@intel.com,m:tomasz.jeznach@linux.dev,m:jic23@kernel.org,m:ulfh@kernel.org,m:shawn.lin@rock-chips.com,m:arnd@arndb.de,m:bentiss@kernel.org,m:linux-input@vger.kernel.org,m:linux-i3c@lists.infradead.org,m:dmaengine@vger.kernel.org,m:phasta@kernel.org,m:netdev@vger.kernel.org,m:nic_swsd@realtek.com,m:linux-arm-msm@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-usb@vger.kernel.org,m:iommu@lists.linux.dev,m:linux-riscv@lists.infradead.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:linux-cxl@vger.kernel.org,m:linux-crypto@vger.kernel.org,m:platform-driver-x86@vger.kernel.org,m:linux-serial@vger.kernel.org,m:mhi@lists.linux.dev,m:andriy.shevchenko@linux.intel.com,m:jsd@semihalf.com,m:linux-i2c@vger.kernel.org,m:daniel@zonque.org,m:haojian.zh
- uang@gmail.com,m:linux-spi@vger.kernel.org,m:jonathan.derrick@linux.dev,m:linux-pci@vger.kernel.org,m:linux-gpio@vger.kernel.org,m:mchehab@kernel.org,m:linux-media@vger.kernel.org,m:linux-mmc@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:michael.bommarito@gmail.com,m:matttbe@kernel.org,m:martineau@kernel.org,m:geliang@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:kuba@kernel.org,m:mptcp@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:michaelbommarito@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[mani@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[86];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mani@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[arndb.de,kernel.org,vger.kernel.org,lists.infradead.org,realtek.com,lists.freedesktop.org,lists.linux.dev,gmail.com,ffwll.ch,linux.intel.com,semihalf.com,zonque.org,linux.dev];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[gang.yan@linux.dev,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	FROM_NO_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E153772CCFE
+X-Rspamd-Queue-Id: 0663272CD3D
+
+July 8, 2026 at 1:17 AM, "Michael Bommarito" <michael.bommarito@gmail.com=
+ mailto:michael.bommarito@gmail.com?to=3D%22Michael%20Bommarito%22%20%3Cm=
+ichael.bommarito%40gmail.com%3E > wrote:
+
+Hi Michael
+
+Thanks for the patch.
 
 
-On Mon, 23 Feb 2026 23:29:39 +0800, Shawn Lin wrote:
-> This patch series addresses a long-standing design issue in the PCI/MSI
-> subsystem where the implicit, automatic management of IRQ vectors by
-> the devres framework conflicts with explicit driver cleanup, creating
-> ambiguity and potential resource management bugs.
-> 
-> ==== The Problem: Implicit vs. Explicit Management ====
-> Historically, `pcim_enable_device()` not only manages standard PCI resources
-> (BARs) via devres but also implicitly triggers automatic IRQ vector management
-> by setting a flag that registers `pcim_msi_release()` as a cleanup action.
-> 
-> [...]
+>=20
+>=20mptcp_get_options() clears only the status group of struct
+> mptcp_options_received; data_seq, subflow_seq and data_len are filled i=
+n
+> by mptcp_parse_option() exclusively inside the DSS mapping block, which
+> runs only when the DSS M (mapping present) bit is set.
+>=20
+>=20A peer can send a DSS option with the DATA_FIN flag set but the mappi=
+ng
+> bit clear. The parser then records mp_opt->data_fin while leaving
+> data_len and data_seq uninitialized. For a zero-length segment
+> mptcp_incoming_options() evaluates
+>=20
+>=20 if (mp_opt.data_fin && mp_opt.data_len =3D=3D 1 &&
+>  mptcp_update_rcv_data_fin(msk, mp_opt.data_seq, mp_opt.dsn64))
+>=20
+>=20which reads the uninitialized data_len and data_seq; KMSAN reports an
+> uninit-value in mptcp_incoming_options(). The stale data_seq can also b=
+e
+> fed into the receive-side DATA_FIN sequence tracking.
+>=20
+>=20Record the DATA_FIN flag only when the DSS option carries a mapping, =
+so
+> data_fin is never set without data_seq and data_len also being present.
+> data_fin is part of the status group that mptcp_get_options() clears up
+> front, so on the no-map path it stays zero and the zero-length DATA_FIN
+> branch is simply skipped. A DATA_FIN is always transmitted together wit=
+h
+> a mapping (mptcp_write_data_fin() sets use_map along with data_seq and
+> data_len), so legitimate DATA_FIN handling is unaffected.
+>=20
+>=20Fixes: 43b54c6ee382 ("mptcp: Use full MPTCP-level disconnect state ma=
+chine")
+> Suggested-by: Paolo Abeni <pabeni@redhat.com>
+> Cc: stable@vger.kernel.org
+> Assisted-by: Claude:claude-opus-4-8
+> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+> ---
+> v2: adopt Paolo Abeni's suggested approach - do not set mp_opt->data_fi=
+n
+>  at all unless a mapping is present, rather than gating the consumer in
+>  mptcp_incoming_options() (v1). data_fin then defaults to the value
+>  mptcp_get_options() already clears it to (0) on the no-map path, so
+>  the uninitialized data_len/data_seq are never read.
+>=20
+>=20 net/mptcp/options.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+>=20diff --git a/net/mptcp/options.c b/net/mptcp/options.c
+> index dff3fd5d3b559..6d003b24b969f 100644
+> --- a/net/mptcp/options.c
+> +++ b/net/mptcp/options.c
+> @@ -157,7 +157,6 @@ static void mptcp_parse_option(const struct sk_buff=
+ *skb,
+>  ptr++;
+>=20
+>=20 flags =3D (*ptr++) & MPTCP_DSS_FLAG_MASK;
+> - mp_opt->data_fin =3D (flags & MPTCP_DSS_DATA_FIN) !=3D 0;
+>  mp_opt->dsn64 =3D (flags & MPTCP_DSS_DSN64) !=3D 0;
+>  mp_opt->use_map =3D (flags & MPTCP_DSS_HAS_MAP) !=3D 0;
+>  mp_opt->ack64 =3D (flags & MPTCP_DSS_ACK64) !=3D 0;
+> @@ -178,6 +177,7 @@ static void mptcp_parse_option(const struct sk_buff=
+ *skb,
+>  }
+>=20
+>=20 if (mp_opt->use_map) {
+> + mp_opt->data_fin =3D (flags & MPTCP_DSS_DATA_FIN) !=3D 0;
+>  if (mp_opt->dsn64)
+>  expected_opsize +=3D TCPOLEN_MPTCP_DSS_MAP64;
+>  else
 
-Applied, thanks!
+One minor thing I noticed while reviewing: Sashiko previously pointed out
+in a comment that the 'pr_debug' logging 'mp_opt->data_fin' might be
+problematic because it's printed before data_fin is actually assigned
+(since data_fin is now set only inside the if (mp_opt->use_map) block).=
+=20
 
-[13/37] bus: mhi: host: Replace pci_alloc_irq_vectors() with pcim_alloc_irq_vectors()
-        commit: 256995e80fcd39cab94eee8135dd90f6da6ac744
+I=20think it would be cleaner to move the pr_debug call after the data_fi=
+n
+assignment, so the logged value is always meaningful and consistent with
+the actual parsed state, like:
 
-Best regards,
--- 
-மணிவண்ணன் சதாசிவம்
+'''
+diff --git a/net/mptcp/options.c b/net/mptcp/options.c
+index b924209a9b74..f58eb24f4d35 100644
+--- a/net/mptcp/options.c
++++ b/net/mptcp/options.c
+@@ -162,11 +162,6 @@ static void mptcp_parse_option(const struct sk_buff =
+*skb,
+                mp_opt->ack64 =3D (flags & MPTCP_DSS_ACK64) !=3D 0;
+                mp_opt->use_ack =3D (flags & MPTCP_DSS_HAS_ACK);
+=20
+-=20              pr_debug("data_fin=3D%d dsn64=3D%d use_map=3D%d ack64=
+=3D%d use_ack=3D%d\n",
+-                        mp_opt->data_fin, mp_opt->dsn64,
+-                        mp_opt->use_map, mp_opt->ack64,
+-                        mp_opt->use_ack);
+-
+                expected_opsize =3D TCPOLEN_MPTCP_DSS_BASE;
+=20
+=20               if (mp_opt->use_ack) {
+@@ -184,6 +179,11 @@ static void mptcp_parse_option(const struct sk_buff =
+*skb,
+                                expected_opsize +=3D TCPOLEN_MPTCP_DSS_MA=
+P32;
+                }
+=20
++=20              pr_debug("data_fin=3D%d dsn64=3D%d use_map=3D%d ack64=
+=3D%d use_ack=3D%d\n",
++                        mp_opt->data_fin, mp_opt->dsn64,
++                        mp_opt->use_map, mp_opt->ack64,
++                        mp_opt->use_ack);
++
+                /* Always parse any csum presence combination, we will en=
+force
+                 * RFC 8684 Section 3.3.0 checks later in subflow_data_re=
+ady
+                 */
+'''
 
+This change isn't critical to the fix itself, so feel free to let Paolo/M=
+att and
+other Maintainers decide if it should go in now, later, or not at all.
 
+A couple of additional notes for future submissions (just friendly remind=
+ers):
+
+- The subject-prefix convention for MPTCP patches is typically [PATCH mpt=
+cp-net]
+  for bug fixes targeting the net tree, or [PATCH mptcp-next] for new fea=
+tures.
+  Since this is a fix, something like [PATCH mptcp-net v2] would be more =
+appropriate.
+
+- It's also helpful to include a Link: to the previous version (v1) in th=
+e changelog,
+  so reviewers can easily track the discussion history.
+
+Looking forward to seeing more of your work on the MPTCP mailing list!
+
+Thanks,
+Gang
+> --
+> 2.53.0
+>
 
