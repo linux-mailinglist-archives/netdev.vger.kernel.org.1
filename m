@@ -1,247 +1,191 @@
-Return-Path: <netdev+bounces-306172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306173-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QazKCuCCT2rJiQIAu9opvQ
-	(envelope-from <netdev+bounces-306172-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:15:44 +0200
+	id 3ZcABex7T2qjhwIAu9opvQ
+	(envelope-from <netdev+bounces-306173-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:46:04 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C80D7301F7
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:15:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E92072FD0B
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:46:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=fail ("body hash did not verify") header.d=Nvidia.com header.s=selector2 header.b=I2sxC+Tv;
-	dmarc=fail reason="SPF not aligned (relaxed)" header.from=nvidia.com (policy=reject);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306172-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306172-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=G9aHB3RJ;
+	dkim=pass header.d=redhat.com header.s=google header.b="s/ywE89g";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306173-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306173-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9F46F300602B
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 10:23:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 83DB330B4AFD
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 10:27:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B8B3F44CB;
-	Thu,  9 Jul 2026 10:23:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCEAD406801;
+	Thu,  9 Jul 2026 10:27:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011060.outbound.protection.outlook.com [40.107.208.60])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791123AFB1B
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 10:23:03 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783592584; cv=fail; b=uYTThDWs0Bi0aOb/ZaZnsYoVqdJqSQpwyKwYW8cJPigXHYf9xwmmB+JpLZI7U0j7+5EndwHcVdWP/c/us8eOs7rTiL6J8HGntE759NyaoIkreJoKCTPnzhsfvW+I/pNSmTkpYMOchc1SHnlDnQ0Xod1PLCr9lc86EtSP69q3twU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783592584; c=relaxed/simple;
-	bh=Z4i755tCzHcrPxwXX8vg0rMKRxmAX6jlbxIfGOenqJY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ZsLPd+KVh2gZb3uCg6OzcQ56fgZGd7tlq7ixU1HjO6ckT5+WA7abcfS5XoH8vviyYAhmbRgeIb7wLHVcAQWRF2SbzsPt5hucGTnU5CIl1OZ6T/FvcBrP13mRmGV814BEJ/LRnvh0Q4K5UyxuSTkMYjRb5BSaB91uWAZPTr4IhZw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=fail (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=I2sxC+Tv reason="signature verification failed"; arc=fail smtp.client-ip=40.107.208.60
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ts+1ZF/rVCdMFu65kNMpOtKOjm/8Xxsbt423lpxb2KMjyINPN3+RkRj1oV7ocx4KCm3zjfAA8EiHSj/QSrCV6BHhm276KDjK3S6veXjO5KlTTfYuJuuYj61F5bGi5hwpiQELxSm3SmaM+Gwdd4nhK8vo1BbcN/DTl4O86Fwkdp64FsIkVsXv1zgCzwzlvLIWeEsNy2RusFbsNzT678FKfZG84sZlGSK1c005eRu6Ulk0NkjnaNrKjM6iLiDIXYwevLfl4c6/eIjMndPY1ymn/jov9Wl/LyYM+lQt40HrmMm43tJYE6VnwlQsMvbNtPWt9cczvicK3FPuUWpQ576r6g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1L8P/4dgonUAU2RoX5MZPnfyrhQ7juC3DmrIaU4YyAA=;
- b=lfwNWAEeHpNhNS0B0KpssR+xEs61gygEdyhVwW6Ye2xb+ATkPy7JOYhidZhVZaBVtMne0DFdko8dXKELWRCd1YLSd3MTqxFJn9ObSOLWML47x21u9Ne3QOrBynF7fNHEwq2n1edvW1JJqauwWqSZ+TFvn+Bq1FB7hhSNOfT812jD4L+JMxSAFBYViHizHtxdU+rZhK0UWXAqVlv7SNYfoxyAsKSkRdKHR1oxhLjNOFdX1+I7Q6W7gjXvi6QZl0ELVoqpBmiaXVqahOkyl3AteUOuGKQ7IfYmbJzxHM6qDl//C2n9IxZlTHjDZvudfv08LykbToJChh8VyvlIK7J3Zg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1L8P/4dgonUAU2RoX5MZPnfyrhQ7juC3DmrIaU4YyAA=;
- b=I2sxC+Tvaa+YP1fUe54QfczQOmRWU3GagXbJrhr/dF+Bw2fLJ8i/cb6LCMVevK0rE0IrwObk+fS5VVWqeBxp6LBZ03qOwysmeW6xg5RJpRGlsWQ4i8wCkLgDhf88OjPYFKTDJB0Y9S+K7d52KhaL2xEQGDBo+3n0RQe6imW0a3UCl4DK1CLuHZo9BlFNceT/fGPPai5ToXCdd8kvE7ueW+dsXTcnLhjN14FBQmY+9aLAnrAOcNYkJ+JWGOUktI6R17Uyc5snbiaq/t2aU5EtTV6qZCVumNWZaJtCeml4/4S54OmP+Yzmti71ecIiBYqgZlsDi1H4vRh8GykTdvhE8w==
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
- by DS0PR12MB9323.namprd12.prod.outlook.com (2603:10b6:8:1b3::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.16; Thu, 9 Jul
- 2026 10:22:59 +0000
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0181.010; Thu, 9 Jul 2026
- 10:22:59 +0000
-Date: Thu, 9 Jul 2026 13:22:47 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Jack Ma <jack4it@hotmail.com>
-Cc: David Ahern <dsahern@kernel.org>, Roopa Prabhu <roopa@nvidia.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>
-Subject: Re: VXLAN FDB nexthop groups: per-nexthop UDP dst port / VNI
- feasibility
-Message-ID: <20260709102247.GA1536940@shredder>
-References: <BL3PR17MB60675DF2E8769ABDA85CCE74E5FF2@BL3PR17MB6067.namprd17.prod.outlook.com>
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <BL3PR17MB60675DF2E8769ABDA85CCE74E5FF2@BL3PR17MB6067.namprd17.prod.outlook.com>
-X-ClientProxiedBy: FR4P281CA0077.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:cd::17) To SA3PR12MB7901.namprd12.prod.outlook.com
- (2603:10b6:806:306::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F004071C5
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 10:27:40 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783592864; cv=none; b=lAVW2g37DaKly8euz3QuUyilL5T9ZsBZ8IdhMbV3SUEM/SP3Orhf6DhrC23xJ2fceqWdfUQLiPozcBgh0N/0xQJuAqk1XQHla4etXpFFSwoMu6ehMFPUQHoSj4ylNP0frV2iRNXQueQHz/3Yn4tONnRy96zu4Z7HRpOdZ597XFw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783592864; c=relaxed/simple;
+	bh=8rw2+1N6I+CKhDNKIcPmKqR49a5NkelTqlHrQwL+yd4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KwNqneAfnrwrBO3bzVF7+raQ9AJwT8WF+qoifqj+Raep3ZSwG567jMnB13XUvzQ9iNXzMJ0rCkZXA47SAZXyhkXuIJEpLPUiIfVn3gz9EdNM70a1sSZNeLVpYscufB3pSRViokU2GL5Lk2LkzGatszSPcOsOxlzJk63q2JdlKW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G9aHB3RJ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=s/ywE89g; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783592860;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IViGw+4uEHmm4fFUeiv/BS5iug4sUEilxSd+a+plBgI=;
+	b=G9aHB3RJdWyQ18Hq54G8EthTA7bSjxydrqd6edKL+Wph8o0aViBoC+2xANTnhsU2qIcAuH
+	s7lNWxFGa5CcLLkN0E9pIfJmWdXVhoO7qnZPBi1H50VVOuGxjCmlswE0k+5iQjFin95oKV
+	xN4r4+4DOvi3bA1Mo2nYiV8ENhz7CKs=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-118-N7YAwl5BOyyKuPZ0zk7Kbg-1; Thu, 09 Jul 2026 06:27:38 -0400
+X-MC-Unique: N7YAwl5BOyyKuPZ0zk7Kbg-1
+X-Mimecast-MFC-AGG-ID: N7YAwl5BOyyKuPZ0zk7Kbg_1783592858
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-493bd1716b4so9241285e9.3
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 03:27:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1783592857; x=1784197657; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=IViGw+4uEHmm4fFUeiv/BS5iug4sUEilxSd+a+plBgI=;
+        b=s/ywE89gyFizbV4Q8eRHIrxZh4IEzbyChizTf9RmQwXB6dQp6fGebcaKbSl1EFUGaI
+         jx8/AwC8BXfwyh7fMSIOPkIWeNYIGLt0vf+wZq5vetdTQ0P6LRZHZ9b07ipG0jHQUelv
+         IFWC1nlJHn28uq+V3pzh7T3zKp/XVD3oCQnpsPj1pGp9IMzlrFc2RrAEsU6aqn9HmgEP
+         /99KSCjOmdtJyyxO8m2LtTBKPUqptfxEXHwg9ec/MMFim9p/g/9kvIfux39ZaRJVBcHz
+         FJYa1KHgfDJUEfJtrgCLMtNb3ivlWCkdR4nZ7gmRw0HFo9ncZuS0W/jTGFI518Ppc2rB
+         iCTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783592857; x=1784197657;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=IViGw+4uEHmm4fFUeiv/BS5iug4sUEilxSd+a+plBgI=;
+        b=diQQIHdQuuWIDKAAgJBfmK3S9yntrUJaJGMOb703S9BHoYM6uEqLMK9APpMRYrI4Q/
+         97rsQFpqzlp1deslnTQVAXp30E0AzVtiD9mXAEJNi8nQV66JKsAQatu1KcJbozfGebAh
+         slT0ylwpnC/9Daq/YQQmLWT0Qh7hX54DEWJ7ypK0Rm0ww2cFtwVsvvGVSmSthy3fswMU
+         hi1Po29krynW3IAsngm3wf8U6uiOqI2GXjxKQm4C2x3ahMzW7W5DihOet0RGybOyz4+f
+         y3U7KRCXhHcvlalhlv+8bu6Agtd/eywmMJEOeDsITmFwiEtXthozzn7NvkWeqMCGZibT
+         y6pg==
+X-Forwarded-Encrypted: i=1; AHgh+Rq/BZ87axgrT80+0LZ79OzNd9Mde45WSKrFX/PkJ3ii0oGK86xRcyHjftUlVozHXn/MdataDR8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxljptGBaVmE5KA3fce4ZBzAaiu18meEuFUv+tUkqZyGOn+b5PX
+	bJkquDw1PmcHZ3EljQKVus/OadC0LBmlr8I0u5h6TWyF4XZ8u9DL5e8w1KK1m1zhUtEYOzGXGz9
+	meV6YfzwfCdAk6ahQRTwISRqH2x7brGIF6BPYhv0SAxby2pBK/Go54+Rnjg==
+X-Gm-Gg: AfdE7clWlP2awKYU85DU0vFVwTFVe+g9OdmlRF00pVe6+fIxOACNRi1fBUYuMOXq2X/
+	RqO+Uy7P5MUcH10vsji8QwKYerSxdUlE41IXD3e+x3QZKBE8k/8zIjTTPxi2CDPilQ09mf56Rob
+	OhTMKAc9E81bNegrvTL345/O2sjbGW3kc9r2xs5fCcbc0NiqS5SDlgqWde7pv+iwXRmSCseMh1D
+	0CS+xahkSyobCKsUJpvuWFnAkeCfrd0XjFglIIQmd1Iq/9Oc6h5TtiR14OQlVvLRSmX6frZzygd
+	GP/ULUCQgPW85i9yw01zD/67Ng/uL0vTNdPyzA6GvLrPpr4FpOrChu2nRXZNi0M9CuYNzEYvZoi
+	wlx4VLsq5cn3ptN64rqyYWw3zGL5OOGAc8fVcK3pACtV04uHgWIl15ugtxb+dEFytLphw1LUo+W
+	ksfhnE6tnyPYuQ
+X-Received: by 2002:a05:600c:870e:b0:493:c8a6:b517 with SMTP id 5b1f17b1804b1-493e687f380mr61307875e9.38.1783592857523;
+        Thu, 09 Jul 2026 03:27:37 -0700 (PDT)
+X-Received: by 2002:a05:600c:870e:b0:493:c8a6:b517 with SMTP id 5b1f17b1804b1-493e687f380mr61307475e9.38.1783592857085;
+        Thu, 09 Jul 2026 03:27:37 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:5521:6b10:58fd:68f:7756:389d? ([2a0d:3344:5521:6b10:58fd:68f:7756:389d])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa0960816sm48492955f8f.29.2026.07.09.03.27.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jul 2026 03:27:36 -0700 (PDT)
+Message-ID: <64257110-d9fe-42df-9990-2ec1421a7c29@redhat.com>
+Date: Thu, 9 Jul 2026 12:27:35 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|DS0PR12MB9323:EE_
-X-MS-Office365-Filtering-Correlation-Id: f1ce109d-6144-4456-7fa2-08dedda40ca1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|23010399003|376014|1800799024|18002099003|22082099003|56012099006|5023799004|11063799006|6133799003;
-X-Microsoft-Antispam-Message-Info:
-	oK20DbfdLJwOBd2ojZQmhWPTJCngfXEBhovXupGztnbKHB+Fk5Yl/Ss4k+tM+vyelQ70CK2w7LDpwXy92fNZ5hrX/99IL5RibZL/2mT35Ec/qu8CNzkBerPI/F6vM8zlFfIIOBQQLrhqKMHLIAkphcqNbncXjaeRkZThVUbgQGWN/Hg6/VnTBE1jbg/UJ8Xh2Cfh1yRGWxyFG7QwzCw+mYv+X9a2yn12+8STZWxGkhkY6tPxvTac8ANZMpJLiglzpxHVKt90mTfvhY+lYhZq00U9SZgdfXGzw3GGyERxeZQh6BnAl8+tE8s0/5zbk4aYPm5Ju+dVeCl1NYmx2+2zvKfqiNjo51s3tn6hEbswZu9H0qlVisePMWYZKJwhMC3DAcQzg5ClaGRyt5+D6Vo5LbgWZNPdZTAOoulj7D1zpL+76L9FaXqoMmGePRmNnfRTCby3xq0eGnTkPzsQ4Fu/Bb52P60s6arsKvI+ZRbuVNhBoEz76X2G3DzRrvebv/a2mwQ7GPszQ2zEHObSRE4qzm7x4KmhLoilFwm5EWJHFwmIAV0Z5rD83Nw+XaELRlgVPbxSFRTyd1x555hXyQrrpNL2LUFAlp+CACeCuEilICUnhW8cklWbBUEWjPgegDhDp5Yadu/MDOG8E+ItSUdXNfw01e9MtxzqxZu7oyBciUk=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(376014)(1800799024)(18002099003)(22082099003)(56012099006)(5023799004)(11063799006)(6133799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?iso-8859-1?Q?rLeWyDkcRTrNjCAzPiU56k5AAd2uOvZ06UzEJst3N3fnFD1TJ3pPSS7V0V?=
- =?iso-8859-1?Q?+iVGbDFnjhYcGjTnSVnv8Whw3kZ5o7N+W/SqFn9Ns8yBGGABDqRGNSKzNk?=
- =?iso-8859-1?Q?jCJVZIlUd6LMXQ+1GtMBmOSBfmQmeD+YPZrPYCkRB0yvhDrQc5WiZOY4Vu?=
- =?iso-8859-1?Q?hOF1gUrtFBjwILXUHWbBKivqbvD6WZOKRhezz/mLcbL31BEZWaWysu8OCe?=
- =?iso-8859-1?Q?1CTN6WeJBNJaqPi+Mbggl7N8h0KORGZmgltKQ5v2D1dktdFiM/q7Nerpsl?=
- =?iso-8859-1?Q?mcg3thCn9S8aaGPMLCbKoK+ume/3CLPQWd68GnCY1tNSIIX+RghjCBdAsu?=
- =?iso-8859-1?Q?wibtfdRZ2NYPuFX0k/zlkDgZoIut2Dp0QJrs/McfsaXcJpA7c7B7I0z27n?=
- =?iso-8859-1?Q?csLlbkqsAWMPhpQG/FVTjVi636UcTgSaJF+cKugiO7/EfhUkrjEjJPw5Pk?=
- =?iso-8859-1?Q?lnXCPy+3oNiYDtA9xKXqCaJG57m7iGav5d5zgbSO25JyctEoXw1j5O3I9w?=
- =?iso-8859-1?Q?8kCYBsj288gjBITeaOSEiokv0m9GvIAmPoCk5qgm+qkDIr6sIQLd3y3Gnq?=
- =?iso-8859-1?Q?9RG6lmz/MdmrpgMEvy+m1//QQcoCMBdA5a50rywz4fWie7GmexOyZYGYTw?=
- =?iso-8859-1?Q?52QoOO/MwnwYm5lfcdgEJ0g+9szKSp4a+TXRmN2J2ZUT9H7kzgoxU1aDgB?=
- =?iso-8859-1?Q?1p2aKMsnZxfMiZdVXo94CK8dId7UWTh8Z8CGIOYvnkhT5C0Eo1nFjEfuRu?=
- =?iso-8859-1?Q?m3/0nRUBEy2az2cX5SAaToxTtzMffZYr1zYcMaHAqkb1f5K3spn2TLUmHx?=
- =?iso-8859-1?Q?wt7OVywobNUwa4NUBU+NLgjNYLP1+e98YETu6rJBycRfzCscq+NCR23Y4p?=
- =?iso-8859-1?Q?JZpM6uTSO05s4Lt6Yasyy6i5d2C1zT1tPIRwfgKRccQBsUHGX6SIaWp4Q1?=
- =?iso-8859-1?Q?YeUuRqOWjesnqdmK59yHAIiIFfFNBGr4oKx0MkKocWDhOAqFh1Yms/PcR7?=
- =?iso-8859-1?Q?/dBdcgR+sqLUadz/wU8SsJbEdtvwb+0y0zEaU8jScy13n7K/kn2c6Nb2d0?=
- =?iso-8859-1?Q?yKzYgDqWOtZuGAKFvF5u5lyoxD+U9YQ6Bu0KVr1iUJi70de26snfgMXFAe?=
- =?iso-8859-1?Q?TG2lTcLzwaW6TkRvvSzLuRh5t/fAp1t9PDjV2zJtP00WOOOD2EGER0Ul3b?=
- =?iso-8859-1?Q?RDPM+Jri4Wn6DAH9s1m17xDDgu8eIbiZTuB0mmINHWXRtEGDTCb+GO5z95?=
- =?iso-8859-1?Q?oPhckDbo0cncsnm1wWGt3FJgecePg7RbVlWr7G31LJ9HPCuPm5f57iIg5N?=
- =?iso-8859-1?Q?t85sCc5s18+8bAAHUnc7ojrpmzdM5JyFfR0SxTu/5iUkccTWkdjJXaumuH?=
- =?iso-8859-1?Q?OFs/HRlT2jTJZSN7+S3yxyj2gBJX9/6Ti4p7J231AqNZvudradcHFPfq6n?=
- =?iso-8859-1?Q?mY2EAet1V41akDpNWcCMkQaNTZN5Fzwb1F/mUD9tP5J4OxAX5CEIPP9rjm?=
- =?iso-8859-1?Q?aiv9P0HUwc0/O+R6NDZINJ6TlByR3eCF93/yGouHNiE2hTmlCU+cwgiOux?=
- =?iso-8859-1?Q?dcK13gBFdDFeMrDZpuRCG1rOQ1L/PvGc3c969lq2GplU8Vg3Vx5IxrRaDX?=
- =?iso-8859-1?Q?Br9/iD8W9wQDs2xoFOTEoLWjWBXEPZSSg5hC5iaZC9L1sVWQrDotM2y04X?=
- =?iso-8859-1?Q?QoWkGOriXOL/T23RmHWtzWXj/kNzW+YpboNf+4Q5dKqA5F1XEk1ypp+JZ1?=
- =?iso-8859-1?Q?r6ii7qCV0p7VhGr7ZTo+yZNgwTW6aFHUiYT6NBWxuxQoW8At83YDvdpqKg?=
- =?iso-8859-1?Q?dO43IJHlqA=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f1ce109d-6144-4456-7fa2-08dedda40ca1
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2026 10:22:59.3831
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: g3UHKgj1aZl5CRuoGfczlnCRyVQdYWL+yEEySQ9d/0Gs4AsVFT+rcxrzlDDVYVNHV9tgWSKNiPqsf2l4Fnfo7g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB9323
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 0/8] netconsole: stop charging netpoll users
+ for netconsole-only data
+To: Simon Horman <horms@kernel.org>, Breno Leitao <leitao@debian.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+ asantostc@gmail.com, gustavold@gmail.com, linux-kernel@vger.kernel.org,
+ kernel-team@meta.com
+References: <20260702-netconsole_move_more-v2-0-1ebedd921dcb@debian.org>
+ <akuUkNgyjVOTHMuz@gmail.com> <20260709101945.GN1364329@horms.kernel.org>
+From: Paolo Abeni <pabeni@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20260709101945.GN1364329@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [4.04 / 15.00];
-	DMARC_POLICY_REJECT(2.00)[nvidia.com : SPF not aligned (relaxed),reject];
-	R_DKIM_REJECT(1.00)[Nvidia.com:s=selector2];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_RHS_NOT_FQDN(0.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,lunn.ch,vger.kernel.org,gmail.com,meta.com];
+	TAGGED_FROM(0.00)[bounces-306173-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jack4it@hotmail.com,m:dsahern@kernel.org,m:roopa@nvidia.com,m:netdev@vger.kernel.org,m:razor@blackwall.org,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-306172-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[hotmail.com];
-	GREYLIST(0.00)[pass,body];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[Nvidia.com:-];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:leitao@debian.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:asantostc@gmail.com,m:gustavold@gmail.com,m:linux-kernel@vger.kernel.org,m:kernel-team@meta.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shredder:mid,ebpf.io:url,vger.kernel.org:from_smtp,nvidia.com:from_mime,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,sashiko.dev:url,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1C80D7301F7
+X-Rspamd-Queue-Id: 0E92072FD0B
 
-Please use plain text instead of HTML. Otherwise your emails won't make
-it to the list.
+On 7/9/26 12:19 PM, Simon Horman wrote:
+> On Mon, Jul 06, 2026 at 04:55:35AM -0700, Breno Leitao wrote:
+>> On Thu, Jul 02, 2026 at 05:19:44AM -0700, Breno Leitao wrote:
+>>> This work continue to untangle netconsole and netpoll, improving
+>>> memory usage for netpoll users that are not netconsole.
+>>
+>> Quick follow up on the sashiko findings. most of them are assuming that
+>> netconsole_write is called locklelly, which is not the case, except
+>> on panic (CON_NBCON_ATOMIC_UNSAFE). 
+>>
+>>
+>> There are in order as they appear in
+>> https://sashiko.dev/#/patchset/20260702-netconsole_move_more-v2-0-1ebedd921dcb%40debian.org
+>>
+>> Tl;DR: There are two pre-existing issue that I will get fixed, but
+>> I don't think they are blockers for this series (IMO).
+> 
+> Thanks, I agree.
+> 
+> For the series:
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+> I did notice that patch 2/8 now applies with some fuzz, which trips up git am.
+> You may want to consider a rebase.
 
-On Wed, Jul 08, 2026 at 05:52:05AM +0000, Jack Ma wrote:
->    Hi David, Ido, Roopa,
->    I am using VXLAN FDB nexthop groups (ip nexthop add ... fdb, then
->    bridge fdb add ... nhid) to do L2 ECMP across a set of HA endpoints.
->    In my design each leg is a distinct (VTEP IP, UDP destination port)
->    pair: several endpoints live behind the same node IP and are
->    disambiguated by the VXLAN UDP destination port.
->    Reading the current code (v6.12), it looks like an FDB nexthop can
->    only carry a gateway IP, so a per-leg port cannot be expressed:
->      * vxlan_fdb_nh_path_select() copies only nhc_gw into the synthetic
->        rdst; remote_port and remote_vni stay zero
->        (include/net/vxlan.h).
->      * vxlan_xmit_one() then falls back to the device-wide port:
->        dst_port = rdst->remote_port ? rdst->remote_port
->                                     : vxlan->cfg.dst_port
->        (drivers/net/vxlan/vxlan_core.c).
->      * rtm_to_nh_config() rejects NHA_ENCAP and NHA_OIF on fdb nexthops
->        ("Fdb attribute can not be used with encap, oif or blackhole",
->        net/ipv4/nexthop.c).
->      * vxlan_fdb_parse() rejects NDA_PORT / NDA_VNI / NDA_IFINDEX when
->        NDA_NH_ID is present ("DST, VNI, ifindex and port are mutually
->        exclusive with NH_ID").
->    The original commits (38428d68719c "nexthop: support for fdb ecmp
->    nexthops" and 1274e1cc4226 "vxlan: ecmp support for mac fdb entries")
->    say "these nexthops only have ip", which matches the EVPN multihoming
->    use case where every VTEP in the segment shares one UDP destination
->    port.
->    My questions:
->      1. Was IP-only a deliberate scoping decision for the EVPN-MH use
->         case, or is there a deeper reason a per-nexthop UDP destination
->         port (and VNI) could not be carried on an fdb nexthop, for
->         example via NHA_ENCAP / lwtunnel, which route nexthops already
->         accept?
+Yep, a rebase is needed, thanks!
 
-IP-only was specific for EVPN-MH and it simply reuses the gateway IP
-that is already present in the nexthop structure.
+Paolo
 
->      2. If legs genuinely need distinct UDP destination ports, is the
->         per-remote rdst path (bridge fdb ... dst ... port ...) the
->         intended mechanism, with the understanding that it gives
->         head-end replication semantics rather than nexthop-object ECMP?
-
-Yes, but you will get packet replication instead of load balancing,
-which I believe is not what you want.
-
->      3. Would you be open in principle to a patch that lets an fdb
->         nexthop carry a per-nexthop dst port (and VNI)? If so I am happy
->         to prototype it as an RFC.
-
-I have some questions for you before I answer yours.
-
-Can you explain why different VTEPs need to share a single IP? With
-different IPs you can simply reuse the existing FDB nexthops without any
-changes.
-
-In addition, why disambiguate by the VXLAN UDP destination port and not
-VNI? Even if we allow attaching tunnel encapsulation to FDB nexthops via
-NHA_ENCAP, there does not seem to be uAPI in place to encode the
-destination port (see ip_tun_policy).
-
-Assuming you can live with a fixed port, I think you can achieve what
-you want with BPF and no kernel changes. You can call
-bpf_skb_set_tunnel_key [1] from a TC bpf program attached to the egress
-of the VXLAN device (configured in "external" mode) and have it encode
-the relevant VTEP based on the calculated hash.
-
-[1] https://docs.ebpf.io/linux/helper-function/bpf_skb_set_tunnel_key/
 
