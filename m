@@ -1,132 +1,368 @@
-Return-Path: <netdev+bounces-306123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306124-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YP5hILVvT2q1ggIAu9opvQ
-	(envelope-from <netdev+bounces-306123-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:53:57 +0200
+	id Ya4AJP1vT2rKggIAu9opvQ
+	(envelope-from <netdev+bounces-306124-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:55:09 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72E5672F28B
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:53:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 892A272F2C7
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:55:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
+	dkim=pass header.d=resnulli-us.20251104.gappssmtp.com header.s=20251104 header.b=cUZ2jZs3;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306123-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-306123-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306124-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-306124-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8553A306C06D
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:45:12 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9B415303F164
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:46:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB7323F12E7;
-	Thu,  9 Jul 2026 09:44:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B04ED1632E7;
+	Thu,  9 Jul 2026 09:46:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607483F1AC9;
-	Thu,  9 Jul 2026 09:44:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522A73F5BD7
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 09:46:46 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783590293; cv=none; b=iGnQLpzr7t5dTfenVJB6mAGqN/YemAtI/btCh1/SaSpnYFRrU8rhYoYjXK+tymBAZtdBVvCGqcDwbSofJ/ghFDBPLNe6H9PwkUo0vBk1Uh/N4+j5RehNr/06J6rElC5D+dNV3mcpQCvFksTfWv9B4f1EZl0OvLG5GlAQEZDVvNA=
+	t=1783590413; cv=none; b=sTXYAuZSv1ScF5y+88hDPCV/abDxX4lji/7kNz1Xq0qOgB2f0MMMGAzFhoZ3dCwt9i1JEjgBzOd247U8mGeRbn6BFfXQSpACi8Yq0Z9io2qFVluMGyJAxA5dYL4LLXK1sn8VGjhtGwAUr0kYcmR/Uzu2uQlXi5Z0LRN3BjwuIuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783590293; c=relaxed/simple;
-	bh=7Ou5+3G75tDZu799wGoMAdBW6+Fh+b5nNnd6FitkyyM=;
+	s=arc-20240116; t=1783590413; c=relaxed/simple;
+	bh=QjxnfdFkEb0Z6vufY3cN0U0+kv71/r1+joErkMeCX14=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XWAsNTNtOU0n6RZ0d7Yiuty13CBUFfE0oKJP4VoeWybMCnvn03sCEkaMsqe3u6t2+UzhR9JDY4/HO4oH76KSq/49wsDY3SoGBYshfkFTBBcB6nmZXC5dEVZIvbHLLGrCjHNfBgDw+NHpv8v3lA3lZ7SuCZiPj8F+lnSX6OCU5JU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1whlJJ-000000005VW-1BkQ;
-	Thu, 09 Jul 2026 09:44:49 +0000
-Date: Thu, 9 Jul 2026 11:44:41 +0200
-From: Daniel Golle <daniel@makrotopia.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH RFC net-next 2/3] net: dsa: mxl862xx: add SMDIO clause-22
- register access
-Message-ID: <ak9tiW0qnq2veYw6@makrotopia.org>
-References: <ak0KJ6gUk2l_IwoI@makrotopia.org>
- <96c362d3-59d2-43c4-b2aa-c12dfeb6fcca@lunn.ch>
- <ak6o7Ovekjb_evPs@makrotopia.org>
- <98505e14-d684-4225-9415-f4d872113998@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FGM6grBzRUV6ZlmcBmJoqePpqPpadOACkZQ9SXiLkArz2As5AJQF1euHdBdTcvGoyiyZhxxS/NQxYYauofAb/lf9cyOtnoK0r6Thjd05ZWbkT7DI1xvS42CUif6sJlxqaDxYwzzFho1aCVfhCUT8VU8YY24bWg9RnZk1EqkK3B0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=cUZ2jZs3; arc=none smtp.client-ip=209.85.128.52
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-493b27c7451so8909465e9.0
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 02:46:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1783590405; x=1784195205; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=jCDpigf6NAvGtv4KCK1nKWmd+1oUaDS0btU+snL4BhY=;
+        b=cUZ2jZs3CBzcw9ITDguBXjdMkWvvAC214XaHjyoq90rBob86KOU/+yQyj1ktffnD9p
+         OpTMwuKs2jJPJn77eRvEO+KuEo3Zqwhfvu5lmVDP2sqxf6ygE0vj3p2h3vK0uNp9/bEO
+         pxLQSFmGbY1KUVaAZtGrd+2gH3TYx5ERTXUJ3qkgJb/44iKHwcmmuP3bk+vAr7CKJ5Dr
+         n1ZJKQ9ryNHX4+Z18cTN6QH62QAnBBNYbRSIH6K0fg0EuDNAUkV58/73PwT3wfgT5J8p
+         flHgTIZEQvAPwBAqpxZYnIgF2ySdUGbBr932kRyWkvf9IVnFT99FOLELz9uDhaw5Es8a
+         Fwlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783590405; x=1784195205;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=jCDpigf6NAvGtv4KCK1nKWmd+1oUaDS0btU+snL4BhY=;
+        b=FZImJ1NTM37p3eQd+S3Ixo7c465UpC6fTkX5vOwHVpFdUTI6WXGJ6bzIogf4RtNe0q
+         duh2C0q/WbrqKOzXSXpLihiE5sDDdpOY9HWHKhzqU4K4PYG2nSOOuCh35V0oWQffSGce
+         WXK++JgL4VnowWXcU+zoBpbgTBD4tjtjCU7ViY4Ba9mDIW+TmyUap+ZukYUopDYc2JLT
+         5GoWwMwJDOYRfC7CgwyP+VnZsU7BvtmJcH6jGnclPviXQuVdbaGpomSnHwp8HEjJbEto
+         FZTwGKXZlzelNecHtx/XQDwziMPh4aF4+tdRRZZbmqj+gIb4yHasUpvRv65vKxNHuse3
+         swag==
+X-Forwarded-Encrypted: i=1; AHgh+Rp8kKubMq4vr/lJOhD7o8mrldTrWfwJEBNDy1LVsW/8SnVebDaDTUYvC94KzaoBTG13bC36B1A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywnez+fnHG4+fYabDwaQRyjEYbXbE37gVo9GXH3ZwBUgOMyOMZn
+	8ldEzEA0pIW+pgz/poR1mj6YGnzTpM79RbRUuOzepgc96kQlg0X4TiIKC/YBftyjC44=
+X-Gm-Gg: AfdE7cn2Rw2e2W11JE3tTmQRT5mpWui/P5xpSEv4QTNu7vN9QWSibAP5iA1M13EK3WQ
+	xy21B1LrPdAwTpeJ0688+S9YdIXmVgn26LXEjJKvHvVVcBiVj4LpgyQMBvTJd8hAz4ExhYiqtT9
+	3sFAUw6JJlRlez6ksIe5LEq6oIxX8bXLuVk3HymLreRbyJyr+KqPCvjxXYD07NJV3PH0ZLIyxFz
+	B6KAaIH+2gLIk6eYVOfnkl6OaiKgj61h3xEGBWgZGCqJOYnSOlD9V8VrBvAFkkxCDPwBl+CLCZ0
+	BXl95vVMMm38nGR8DOltpbujBNmZKSjm7ct3jRFXxVj5VFGps857qsD5pbP3fI+nlVtghtxFXg4
+	vZG0SZ+bEWewCS/r0lcriMcwWYtLIL8yp3xpwuIP4szNHTmBrie+YMJQDPKp8EXE/ll8AgndvyC
+	ACx4u+MQWF7FXC7501axgq5Q==
+X-Received: by 2002:a05:6000:4602:b0:475:f0c2:75ae with SMTP id ffacd0b85a97d-47df7561a22mr2165637f8f.25.1783590404637;
+        Thu, 09 Jul 2026 02:46:44 -0700 (PDT)
+Received: from localhost ([140.209.217.211])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9de1e736sm53671269f8f.7.2026.07.09.02.46.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jul 2026 02:46:44 -0700 (PDT)
+Date: Thu, 9 Jul 2026 11:46:40 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Mark Bloch <mbloch@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+	Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next V5 4/6] devlink: Apply eswitch mode boot defaults
+Message-ID: <ak9thhKgtDBepkcD@FV6GYCPJ69>
+References: <20260707174527.425134-1-mbloch@nvidia.com>
+ <20260707174527.425134-5-mbloch@nvidia.com>
+ <ak4Muihtk40r3lfV@FV6GYCPJ69>
+ <e9445ff1-87b5-4111-8264-74016634d3bb@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <98505e14-d684-4225-9415-f4d872113998@lunn.ch>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e9445ff1-87b5-4111-8264-74016634d3bb@nvidia.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306123-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[makrotopia.org];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:mbloch@nvidia.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:andrew+netdev@lunn.ch,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-doc@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DMARC_NA(0.00)[resnulli.us];
+	FORGED_SENDER(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-306124-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,makrotopia.org:mid,makrotopia.org:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[FV6GYCPJ69:mid,vger.kernel.org:from_smtp,resnulli.us:from_mime,resnulli-us.20251104.gappssmtp.com:dkim,nvidia.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 72E5672F28B
+X-Rspamd-Queue-Id: 892A272F2C7
 
-On Thu, Jul 09, 2026 at 01:15:34AM +0200, Andrew Lunn wrote:
-> On Wed, Jul 08, 2026 at 09:45:48PM +0200, Daniel Golle wrote:
-> > On Wed, Jul 08, 2026 at 07:22:49PM +0200, Andrew Lunn wrote:
-> > > On Tue, Jul 07, 2026 at 04:16:07PM +0200, Daniel Golle wrote:
-> > > > Add mxl862xx_smdio_read() and mxl862xx_smdio_write() for clause-22
-> > > > SMDIO register access. MCUboot rescue mode only exposes clause-22
-> > > > registers; the existing clause-45 MMD interface is unavailable during
-> > > > firmware transfer. The MDIO bus lock is held per-transaction (not
-> > > > across polls) so that SB PDI polling during flash erase does not
-> > > > starve other MDIO users.
-> > > 
-> > > What other MDIO users are there? It sounds like once the switch is in
-> > > rescue mode, switch management is dead. So how can there be users?
-> > 
-> > The MDIO bus lock refers to the host bus which is used to connect
-> > the switch management interface. The same bus can also be used to
-> > connect other unrelated PHYs (eg. to provide a WAN or management
-> > interface independent of the switch).
-> 
-> Thanks for the explanation. Maybe 'does not starve other non-switch
-> MDIO users'?
-> 
-> I've not got to the rest of the patch yet, but i wondered if phylib
-> might still be trying to poll the switches PHYs.
+Thu, Jul 09, 2026 at 07:45:20AM +0200, mbloch@nvidia.com wrote:
+>
+>
+>On 08/07/2026 11:59, Jiri Pirko wrote:
+>> Tue, Jul 07, 2026 at 07:45:25PM +0200, mbloch@nvidia.com wrote:
+>>> Apply parsed devlink_eswitch_mode= defaults after devlink registration
+>>> and after successful reload.
+>>>
+>>> devl_register() may still be called before the device is ready for an
+>>> eswitch mode change. Keep the registration path passive and let the
+>>> regular devl_unlock() path queue the async apply work once the instance
+>>> is registered and the default is still pending.
+>>>
+>>> The queueing path runs while the devlink instance lock is held, so the
+>>> queued work gets its devlink reference before the caller drops the lock.
+>>> The worker then takes the devlink instance lock normally and applies the
+>>> default only if the instance is still registered and the default is still
+>>> pending.
+>> 
+>> This is very code-descriptive. What's the benefit of that?
+>
+>The point is that there is still a window before the queued work
+>runs where the user can explicitly set the eswitch mode. If they 
+>do, the default will no longer be pending, so the worker will skip
+>applying it.
+>
+>I'll reword.
+>
+>> 
+>> 
+>>>
+>>> For successful reloads that performed DRIVER_REINIT, devlink_reload()
+>>> already holds the devlink instance lock and the driver has completed
+>>> reload_up(). Clear pending work and apply the default directly from the
+>>> reload path instead of queueing work.
+>>>
+>>> Preserve the user configured mode when it is set before devlink applies
+>>> the default.
+>>>
+>> 
+>> [..]
+>> 
+>> 
+>>> +void devlink_default_esw_mode_apply_locked(struct devlink *devlink)
+>>> +{
+>>> +	const struct devlink_ops *ops = devlink->ops;
+>>> +	int err;
+>>> +
+>>> +	devl_assert_locked(devlink);
+>>> +
+>>> +	if (!devlink_default_esw_mode_match(devlink))
+>>> +		return;
+>>> +
+>>> +	if (!ops->eswitch_mode_set) {
+>>> +		if (!devlink_default_esw_mode_match_all)
+>>> +			devl_warn(devlink,
+>>> +				  "devlink_eswitch_mode= selected this device but eswitch mode setting is not supported\n");
+>>> +		return;
+>>> +	}
+>>> +
+>>> +	err = devlink_eswitch_mode_set(devlink, devlink_default_esw_mode, NULL);
+>>> +	if (err)
+>>> +		devl_warn(devlink,
+>>> +			  "Couldn't apply default eswitch mode, err %d\n",
+>>> +			  err);
+>>> +}
+>>> +
+>>> +void devlink_default_esw_mode_queue_apply_work(struct devlink *devlink)
+>> 
+>> eswitch/esw - we call it "eswitch" consistently everywhere. Why "esw"
+>> here?
+>
+>Ack
+>
+>> 
+>> 
+>> 
+>>> +{
+>>> +	devl_assert_locked(devlink);
+>>> +
+>>> +	if (!devlink_default_esw_mode_enabled || !devlink_default_esw_mode_wq)
+>>> +		return;
+>>> +	if (!devlink->default_esw_mode_apply_pending ||
+>>> +	    !__devl_is_registered(devlink))
+>>> +		return;
+>>> +	if (!devlink_try_get(devlink))
+>>> +		return;
+>>> +	if (!queue_work(devlink_default_esw_mode_wq,
+>>> +			&devlink->default_esw_mode_apply_work))
+>>> +		devlink_put(devlink);
+>>> +}
+>>> +
+>>> +static void devlink_default_esw_mode_apply_work(struct work_struct *work)
+>>> +{
+>>> +	struct devlink *devlink;
+>>> +
+>>> +	devlink = container_of(work, struct devlink,
+>>> +			       default_esw_mode_apply_work);
+>>> +
+>> 
+>> What happens if userspace eswitch mode set happens now? Any userspace
+>> attempt should cancel the default apply. I don't see such mechanism in
+>> your patches, did I miss it?
+>
+>devlink_nl_eswitch_set_doit() calls
+>devlink_default_esw_mode_apply_pending_clear(), which clears the
+>pending bit.
+>
+>So if a user sets the eswitch mode before the queued default
+>work applies it, the worker will see that the default is no longer
+>pending and will do nothing
 
-The driver takes down the CPU ports and thereby implicitely also puts
-all user-ports into admin-down state, effectively disabling PHY polling
-until the switch comes back and reprobe has happened.
+Okay.
+
+
+>
+>> 
+>> 
+>> 
+>>> +	devl_lock(devlink);
+>>> +
+>>> +	if (devl_is_registered(devlink) &&
+>>> +	    devlink->default_esw_mode_apply_pending) {
+>>> +		devlink_default_esw_mode_apply_locked(devlink);
+>>> +		devlink->default_esw_mode_apply_pending = false;
+>>> +	}
+>>> +
+>>> +	devl_unlock(devlink);
+>>> +	devlink_put(devlink);
+>>> +}
+>>> +
+>>> +void devlink_default_esw_mode_instance_init(struct devlink *devlink)
+>> 
+>> Why "_instance_"? Care to drop?
+>
+>Ack
+>
+>> 
+>> 
+>>> +{
+>>> +	INIT_WORK(&devlink->default_esw_mode_apply_work,
+>>> +		  devlink_default_esw_mode_apply_work);
+>>> +	devlink->default_esw_mode_apply_pending = true;
+>>> +}
+>>> +
+>>> +void devlink_default_esw_mode_apply_pending_clear(struct devlink *devlink)
+>>> +{
+>>> +	devl_assert_locked(devlink);
+>>> +
+>>> +	devlink->default_esw_mode_apply_pending = false;
+>>> +}
+>>> +
+>>> +void devlink_default_esw_mode_instance_cleanup(struct devlink *devlink)
+>> 
+>> Why "_instance_"? Care to drop?
+>
+>Ack
+>
+>> 
+>> 
+>>> +{
+>>> +	if (cancel_work_sync(&devlink->default_esw_mode_apply_work))
+>>> +		devlink_put(devlink);
+>>> +}
+>>> +
+>>> static int __init devlink_default_esw_mode_setup(char *str)
+>>> {
+>>> 	devlink_default_esw_mode_param = str;
+>>> @@ -228,10 +325,21 @@ int __init devlink_default_esw_mode_init(void)
+>>> 		return err;
+>>> 	}
+>>>
+>>> +	devlink_default_esw_mode_wq = alloc_workqueue("devlink_default_esw_mode",
+>>> +						      WQ_UNBOUND | WQ_MEM_RECLAIM,
+>>> +						      0);
+>>> +	if (!devlink_default_esw_mode_wq) {
+>>> +		devlink_default_esw_mode_param = NULL;
+>>> +		devlink_default_esw_mode_nodes_clear();
+>>> +		pr_warn("devlink: devlink_eswitch_mode parameter ignored, failed to allocate workqueue\n");
+>> 
+>> Why you don't "return"  here? I think that we don't need to allow the
+>> case wq is not allocated.
+>
+>The function returns right after this block. It is not treated
+
+What I ment was "return error".
+
+
+>as a valid “workqueue unavailable” mode, the parsed defaults are
+>cleared, the parameter is ignored, and no default eswitch mode will
+>be applied.
+>
+>I kept it as a non critical failure so we do not abort the whole
+>devlink init just because the default-mode workqueue could not be
+>allocated.
+
+Why to treat it like this? Is there any other example of such flow in
+devlink? I don't see the benefit, only potential confusion in very
+unlikely case the alloc_workqueue fails. Am I wrong? If not, just bail
+out here.
+
+
+
+>
+>That said, I can make this more explicit by returning 0 directly
+>from this error path.
+>
+>Mark
+>
+>> 
+>> 
+>>> +	}
+>>> +
+>>> 	return 0;
+>>> }
+>>>
+>>> void __init devlink_default_esw_mode_cleanup(void)
+>>> {
+>>> +	if (devlink_default_esw_mode_wq)
+>>> +		destroy_workqueue(devlink_default_esw_mode_wq);
+>>> 	devlink_default_esw_mode_nodes_clear();
+>>> }
+>> 
+>> [..]
+>
 
