@@ -1,271 +1,351 @@
-Return-Path: <netdev+bounces-306130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306152-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id H4XCLmVvT2qcggIAu9opvQ
-	(envelope-from <netdev+bounces-306130-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:52:37 +0200
+	id OTI9INx5T2r8hgIAu9opvQ
+	(envelope-from <netdev+bounces-306152-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:37:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50B5A72F25C
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:52:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1DEA72FB2C
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:37:15 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=resnulli-us.20251104.gappssmtp.com header.s=20251104 header.b=bMxSyS0j;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306130-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306130-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=tu-dortmund.de header.s=unimail header.b=hfU+EMeW;
+	dmarc=pass (policy=none) header.from=tu-dortmund.de;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306152-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306152-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C010D3011355
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:52:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 24578301AB9B
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 10:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C03B9400E18;
-	Thu,  9 Jul 2026 09:52:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C66140683B;
+	Thu,  9 Jul 2026 09:58:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021FF3EA94B
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 09:52:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6029A403E8D;
+	Thu,  9 Jul 2026 09:58:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783590755; cv=none; b=qMja+T5DOFfG1DEtfMsX0IToMiBPm8iInd3jxG0txDETRxjc07fEYGlGJ6VQXSuWF4vDErcyRTlYTjqiFqWLdO49jYl1RFeRiCxvwAeIHVW12XGOL++1miVqnywbboAN5FmOvnOh3CW+dMwpeUfSOWyGxCk0TsvHzAIhTcd9j+E=
+	t=1783591126; cv=none; b=UuOVRe7o1cRm4GFOnv7RuZ9lWnOt9Igo8odZPNyiGo01Hx4hxvNXZFRKYW+CxE2B6/aRqYbrSHN4PzjE7N830kSIm+pU38ponpgXVuhV1ymnmCQObtQQT0KLtr7z3EsV2ygeisPc6A6B0zueWKKRGA7tX/9SIvqcGGrytyGehkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783590755; c=relaxed/simple;
-	bh=iQNrGVvv3ujLtkwmKctK+PWCeJB+Z38/i3Nxrwmlsrs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sKDFfhPN8mz+NTIv0adJ2xVJIB0O/PwioaX9mcrJ07fo8KI5Gd6itjksCs1XST1CCIxDx4q3swuYDlpXp+KLUrwpyqGHVV0yZP7b/4ROp78oKC4BhmMGSPMDtOorv5c7nLLbmwZwzOdKClkaQVGNkku7DjZq7qbiGa1CG0JPc88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=bMxSyS0j; arc=none smtp.client-ip=209.85.128.54
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-493b61b52b6so15674125e9.1
-        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 02:52:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1783590752; x=1784195552; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=cmUvpg/LGglbFmX5TbG8S8cuP4tLEOPmrTkk7nQFQLo=;
-        b=bMxSyS0jwGsmJ9MuQogJyBz3F63LUvsACq+qyW5SuL5TGiMrFn6oWnP1raMt0zSqOs
-         KPCHAvEOkvHnkgapRFG3coOIo2t7LdYiwODMKtMHP6dhftejtSoBSnC6yt57SoDVYGyS
-         SkhTVmOi6VM6+P3CGSP2ryQE6Iv+vEm5x5RL8J8gMojBQuvog5v3dyC+em/tw/nGQ1rx
-         ewWmylZPOhEYFoL16n5oSCbtFWL0GWF8MDYlBlw3QRnx75eWGNeE4EdAJcgZMd+U8wGb
-         f1z2SUs+qsLUakRRl5k/M/CdjDwr5+6vDIdpXVIdWMeXsbGrfpJmIkoxrfLaCzmfpliB
-         iErw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783590752; x=1784195552;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=cmUvpg/LGglbFmX5TbG8S8cuP4tLEOPmrTkk7nQFQLo=;
-        b=avbsjdElyaxVU8hLLRrpn0ghQ3lQyUIOxoXRNqbFyeSfOh/iFsUuj0mteWbWMit0Ps
-         /1H9WJB+TVPRbP0cs3yn8Vkty/go6eXivYIFIbybjJ1dLKj9oVJ7fYus0DVuv9kdGyYv
-         7kotqnUJBzUtiEFL2EPMBSGIlR1fekS/9K7po5t3g2CCHAbgUr8gH9n36uq6/lpQcTYW
-         /Xa0MVZFV4Sl+hUr36byNccBPhPqwEQnUtkQ5AtNj3KVY/P+RU/Os4LB8Yd904fZHQZm
-         EE7KavGh2c0B7WLOXRnGHYYyqq7QitVcLdq+nxEBtUuTsMJQnQMmTq26xFqrkKsHwz3l
-         66TA==
-X-Forwarded-Encrypted: i=1; AHgh+RqXmrDghjYvQRfLUklKNiE6eJyAGNb6QJ3icdZRV2WvcJZiNENMJpfCR0L7ob8ffz0OIIl8gS0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yysrwl6ZUjkKaStroBIF7IZRXY2UgAGgeumJVJTfnUgkfEOP8Nn
-	4CfjAwlDjFK8Nd1NZVOF857Z73xENaL6Pj69GCctBATqAzDT+MzTFxMEca5qd7UISvk=
-X-Gm-Gg: AfdE7cluFwo7FYym8LHCnQCIP/99wwhP4AJ1Z7QITju4gwnm/TG11KuaHh7rEqgF6/o
-	iXpdVTxBphEBlPybEBs4J0mayKGdTCF6ZfhG2q2reLM4MNOEhQi22RX0W3WZR6pRCfXm5S3j+Yb
-	o3XvEN9J5e3R/yJT5N6DokKgMn3/90z8QIZursKyAFSth7Uf+ckD4ynWKol+de8r7MSC3P7ZFwJ
-	xvtt6aEH9LzUj/YV/+DW7c/fM5d75beHBB6GIy6K4pngckHTW3namqFOHAbf1g1kFznx4VavyoQ
-	SbfpCm+1xT4pcbAf1fcsGSRZTEKHVdx998jDVNpCqzzbtqbZ+Yal57/KMdmK+JEQTBZiJs9hkFz
-	W8qh8IjcIzIYq/US4lzW1no65mtaYMDlg0ct9Z/yNXevxIKtH+cTJmbtEcCB+y436tVrCJqmh/f
-	cc1Jz8rX6TT8evXcnM4QsNeYs4pGFCP2Pb
-X-Received: by 2002:a05:600c:3111:b0:493:aab3:c09c with SMTP id 5b1f17b1804b1-493e6a4a8b1mr61043955e9.28.1783590752378;
-        Thu, 09 Jul 2026 02:52:32 -0700 (PDT)
-Received: from localhost ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9de1d8cdsm53652344f8f.1.2026.07.09.02.52.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2026 02:52:31 -0700 (PDT)
-Date: Thu, 9 Jul 2026 11:52:28 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, netdev@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next V5 6/6] net/mlx5: Apply devlink eswitch mode
- boot default on probe
-Message-ID: <ak9un-lCDmhGI9tL@FV6GYCPJ69>
-References: <20260707174527.425134-1-mbloch@nvidia.com>
- <20260707174527.425134-7-mbloch@nvidia.com>
- <ak4LVcyKofmtrWcU@FV6GYCPJ69>
- <7309e57a-89bc-4e4a-97e9-d843b02efa42@nvidia.com>
+	s=arc-20240116; t=1783591126; c=relaxed/simple;
+	bh=MjexOoQqD7W7Z7SkflJSsLkpxw9/veDfOxuiFA6iOOE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PDOupiNw+Zy5P5O9FzrLN4RmxIaiJfZknRahthZGnOarV/RYlIrbTgcrEMuuGze6cuzsi3mnLFibdvWSRTYPNEftsWVdBDhj2t4c2PoO2MR3l2783L63SGf91aNFXgG3kUikLwZFvTMyToHhvOT88WCaX65Nlq8S9pB2MH8yoL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=hfU+EMeW; arc=none smtp.client-ip=129.217.128.51
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tu-dortmund.de;
+	s=unimail; t=1783590916;
+	bh=pREjUoxcrWg5nsSFCo8/8ue8BnNKXRer/1tf19TeS4g=;
+	h=From:To:Cc:Subject:Date;
+	b=hfU+EMeWdHkRNFWDmkq+kILgOCDWe7Kx+pXaYNK5Vbp/C7JoyKWuZRyI9Ycbczu6V
+	 EZtHuidtongqE/wbqnQbzSmbCIVGbHHJyqkfImQLEpCETlP7M2T0H+qmnkTMsr6fES
+	 3z3qEHdKToytcNj9kfLHoIsLj3m8xltEsP0NatcI=
+Received: from simon-Latitude-5450.cni.e-technik.tu-dortmund.de ([129.217.186.172])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.19.0.2/8.19.0.2) with ESMTPSA id 6699tETW006952
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 9 Jul 2026 11:55:14 +0200 (CEST)
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        Jason Wang <jasowangio@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org
+Cc: Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        Tim Gebauer <tim.gebauer@tu-dortmund.de>,
+        Brett Sheffield <brett@librecast.net>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Simon Schippers <simon.schippers@tu-dortmund.de>
+Subject: [PATCH net v3] tun/tap & vhost-net: make qdisc backpressure opt-in via IFF_BACKPRESSURE
+Date: Thu,  9 Jul 2026 11:55:11 +0200
+Message-ID: <20260709095511.168235-1-simon.schippers@tu-dortmund.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7309e57a-89bc-4e4a-97e9-d843b02efa42@nvidia.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:mbloch@nvidia.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:andrew+netdev@lunn.ch,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-doc@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	DMARC_NA(0.00)[resnulli.us];
-	FORGED_SENDER(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-306130-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306152-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:willemdebruijn.kernel@gmail.com,m:jasowangio@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mst@redhat.com,m:netdev@vger.kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:andrew+netdev@lunn.ch,m:tim.gebauer@tu-dortmund.de,m:brett@librecast.net,m:linux-doc@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:simon.schippers@tu-dortmund.de,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[tu-dortmund.de:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[FV6GYCPJ69:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nvidia.com:email,vger.kernel.org:from_smtp,resnulli-us.20251104.gappssmtp.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,tu-dortmund.de:from_mime,tu-dortmund.de:email,tu-dortmund.de:mid,tu-dortmund.de:dkim,librecast.net:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 50B5A72F25C
+X-Rspamd-Queue-Id: D1DEA72FB2C
 
-Thu, Jul 09, 2026 at 08:00:19AM +0200, mbloch@nvidia.com wrote:
->
->
->On 08/07/2026 11:34, Jiri Pirko wrote:
->> Tue, Jul 07, 2026 at 07:45:27PM +0200, mbloch@nvidia.com wrote:
->>> Apply devlink_eswitch_mode= boot defaults for mlx5 after the initial
->>> probe finishes device initialization while holding the devlink instance
->>> lock.
->>>
->>> At this point the devlink instance is registered and mlx5 can perform an
->>> eswitch mode change. Calling devl_apply_default_esw_mode() also clears
->>> any pending default apply work queued by devl_register(), so the queued
->>> work will not apply the same default again.
->>>
->>> Keep this call in mlx5_init_one() rather than the lower-level
->>> devl-locked init helper. That helper is also used by devlink reload, and
->>> devlink core already applies the boot default after a successful
->>> DRIVER_REINIT reload.
->>>
->>> Signed-off-by: Mark Bloch <mbloch@nvidia.com>
->>> ---
->>> drivers/net/ethernet/mellanox/mlx5/core/main.c | 13 +++++++++++++
->>> 1 file changed, 13 insertions(+)
->>>
->>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
->>> index 643b4aac2033..0712efea74cc 100644
->>> --- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
->>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
->>> @@ -1392,6 +1392,17 @@ static void mlx5_unload(struct mlx5_core_dev *dev)
->>> 	mlx5_free_bfreg(dev, &dev->priv.bfreg);
->>> }
->>>
->>> +static void mlx5_devl_apply_default_esw_mode(struct mlx5_core_dev *dev)
->>> +{
->>> +	struct devlink *devlink = priv_to_devlink(dev);
->>> +
->>> +	if (!MLX5_ESWITCH_MANAGER(dev))
->>> +		return;
->>> +
->>> +	devl_assert_locked(devlink);
->>> +	devl_apply_default_esw_mode(devlink);
->>> +}
->>> +
->>> int mlx5_init_one_devl_locked(struct mlx5_core_dev *dev)
->>> {
->>> 	bool light_probe = mlx5_dev_is_lightweight(dev);
->>> @@ -1471,6 +1482,8 @@ int mlx5_init_one(struct mlx5_core_dev *dev)
->>> 	err = mlx5_init_one_devl_locked(dev);
->>> 	if (err)
->>> 		devl_unregister(devlink);
->>> +	else
->>> +		mlx5_devl_apply_default_esw_mode(dev);
->> 
->> I don't understand why this patch is needed at all. Just leave the job
->> to the devlink core, no? That was the point to not pollute drivers with
->> code like this. Is it some kind of leftover?
->
->It was discussed with Jakub here:
->https://lore.kernel.org/all/20260611085440.4fe36bf2@kernel.org/
->
->The main reason is timing. If the default is applied only by devlink
->core, it has to wait until the driver drops the devlink lock.
+Commit 1d6e569b7d0c ("tun/tap & vhost-net: avoid ptr_ring tail-drop
+when a qdisc is present") did not show a relevant performance regression
+in my testing but on Brett Sheffield's librecast testbed it shows a
+significant performance drop in a IPv6 multicast testcase. The regression
+can be pinpointed when multiple iperf3 TCP threads are sending. For 8
+threads the performance dropped from 13.5 Gbit/s to 9.13 Gbit/s. This is
+the reason why this patch makes the qdisc backpressure behavior opt-in.
 
-I don't follow.
+One option to accomplish the opt-in would be to set the default qdisc to
+noqueue at init. However this may also break userspace as users might
+have chosen a custom qdisc even though most of the qdiscs did nothing
+for tun/tap in the past due to missing backpressure...
 
-<quote>
-	devl_lock(devlink);
-	if (dev->shd) {
-		err = devl_nested_devlink_set(dev->shd, devlink);
-		if (err)
-			goto unlock;
-	}
-	devl_register(devlink);
-	err = mlx5_init_one_devl_locked(dev);
-	if (err)
-		devl_unregister(devlink);
-unlock:
-	devl_unlock(devlink);
-</quote>
+This is the reason why in this patch, the flag IFF_BACKPRESSURE is
+introduced instead which is required to enable the backpressure logic.
+This means the stopping logic in tun_net_xmit() and the waking logic in
+__tun_wake_queue() are skipped if the flag is disabled. Setting
+IFF_BACKPRESSURE makes an attached qdisc effective by stopping the queue
+instead of tail-dropping when the internal ring is full.
 
-devlink lock is droped right after.
+To avoid a possible stall due to disabling IFF_BACKPRESSURE, the new
+helper tun_force_wake_queue() is implemented. The helper safely wakes the
+respective netdev queue and resets cons_cnt while the consumer_lock and
+the producer_lock of the ring are held. The helper is run in tun_attach()
+when a queue (re)attaches, in tun_set_iff() for attached tfiles, and
+in tun_queue_resize().
 
+The documentation in tuntap.rst is updated accordingly.
 
+Fixes: 1d6e569b7d0c ("tun/tap & vhost-net: avoid ptr_ring tail-drop when a qdisc is present")
+Reported-by: Brett Sheffield <brett@librecast.net>
+Closes: https://lore.kernel.org/netdev/akVnoOYQOrt8k-Gu@karahi.librecast.net/T/#u
+Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+---
+V2 -> V3:
+- As suggested by MST: Clarify in tuntap.rst and the UAPI header what
+  enabling IFF_BACKPRESSURE opts into: an attached qdisc becomes effective
+  instead of the driver tail-dropping when the internal ring is full.
+- Avoid lines over 75 characters.
+- Update comment in tun_net_xmit() to include IFF_BACKPRESSURE.
+- Brett: Update in commit message that the referenced tests were TCP.
 
->For mlx5, that usually happens very late in the init sequence. I
->wanted drivers to be able to apply the default as soon as the driver
->is ready for it, because on NICs with a DPU the host PF can remain
->stuck until the ECPF moves to switchdev.
->
->This API is also useful beyond the initial devlink registration path.
->Follow-up patches will use it for driver controlled paths that are
->not covered by the devlink core, such as recovery and FW reset.
->
->There is also a race window where userspace may take the devlink lock
->before the core gets a chance to apply the default. Letting the driver
->explicitly apply the default at the right point avoids that scenario.
->
->Thinking about this again, maybe the simpler approach is to apply the
->default from devl_unlock(). That would avoid the whole workqueue
->infra.
->
->I avoided doing that earlier because applying a default mode as a
->side effect of devl_unlock() feels a bit odd. But compared to adding
->dedicated workqueue handling maybe it is the lesser evil here.
->
->What do you think?
+V1 -> V2:
+- Sashiko: Ensure detached queues are woken on re-attach by calling the
+  new tun_force_wake_queue() helper from tun_attach(), and reuse it
+  across the existing wake paths.
+- Specify the failing test case in the commit message.
 
-I was under impression that you need the work to resolve nested locking.
-If not, drop it, sure.
+V1: https://lore.kernel.org/netdev/20260704112058.95421-1-simon.schippers@tu-dortmund.de/T/#u
+V2: https://lore.kernel.org/netdev/20260706094242.115992-1-simon.schippers@tu-dortmund.de/T/#u
 
+ Documentation/networking/tuntap.rst | 22 +++++++++++++
+ drivers/net/tun.c                   | 51 ++++++++++++++++++++---------
+ include/uapi/linux/if_tun.h         |  4 +++
+ tools/include/uapi/linux/if_tun.h   |  1 +
+ 4 files changed, 62 insertions(+), 16 deletions(-)
 
->
->About the extra API, I still think it's useful and would like to keep
->it if possible.
->
->Mark
->
->
->> 
->> 
->> 
->>> unlock:
->>> 	devl_unlock(devlink);
->>> 	return err;
->>> -- 
->>> 2.43.0
->>>
->
+diff --git a/Documentation/networking/tuntap.rst b/Documentation/networking/tuntap.rst
+index 4d7087f727be..5921a924c2ae 100644
+--- a/Documentation/networking/tuntap.rst
++++ b/Documentation/networking/tuntap.rst
+@@ -206,6 +206,28 @@ enable is true we enable it, otherwise we disable it::
+       return ioctl(fd, TUNSETQUEUE, (void *)&ifr);
+   }
+ 
++3.4 qdisc backpressure
++----------------------
++
++Starting with Linux 7.2, IFF_BACKPRESSURE can be set to enable qdisc
++backpressure. Without it, TX drops occur when the internal ring buffer
++is full, so any attached qdisc is effectively bypassed and applications
++only learn about congestion through those drops.
++
++With it, the kernel stops instead, letting the qdisc hold and schedule
++packets, so its AQM, shaping and fairness actually apply. This helps
++protocols like TCP, which cut throughput in reaction to packet drops.
++With IFF_BACKPRESSURE, drops then only occur as a rare race. Backpressure
++requires a qdisc to be attached and has no effect with noqueue.
++
++The txqueuelen can be reduced alongside this flag to further shift
++buffering into the qdisc and reduce bufferbloat, but comes at possible
++performance cost.
++
++When running multiple network streams in parallel through a single
++TUN/TAP queue, the flag may reduce performance due to the extra overhead
++of the backpressure mechanism.
++
+ Universal TUN/TAP device driver Frequently Asked Question
+ =========================================================
+ 
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index ffbe6f13fb1f..5941e8f302ea 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -98,7 +98,8 @@ static void tun_default_link_ksettings(struct net_device *dev,
+ #define TUN_FASYNC	IFF_ATTACH_QUEUE
+ 
+ #define TUN_FEATURES (IFF_NO_PI | IFF_ONE_QUEUE | IFF_VNET_HDR | \
+-		      IFF_MULTI_QUEUE | IFF_NAPI | IFF_NAPI_FRAGS)
++		      IFF_MULTI_QUEUE | IFF_NAPI | IFF_NAPI_FRAGS | \
++		      IFF_BACKPRESSURE)
+ 
+ #define GOODCOPY_LEN 128
+ 
+@@ -694,6 +695,20 @@ static void tun_detach_all(struct net_device *dev)
+ 		module_put(THIS_MODULE);
+ }
+ 
++static void tun_force_wake_queue(struct tun_struct *tun,
++				 struct tun_file *tfile)
++{
++	/* Ensure that the producer can not stop the
++	 * queue concurrently by taking locks.
++	 */
++	spin_lock_bh(&tfile->tx_ring.consumer_lock);
++	spin_lock(&tfile->tx_ring.producer_lock);
++	netif_wake_subqueue(tun->dev, tfile->queue_index);
++	tfile->cons_cnt = 0;
++	spin_unlock(&tfile->tx_ring.producer_lock);
++	spin_unlock_bh(&tfile->tx_ring.consumer_lock);
++}
++
+ static int tun_attach(struct tun_struct *tun, struct file *file,
+ 		      bool skip_filter, bool napi, bool napi_frags,
+ 		      bool publish_tun)
+@@ -737,11 +752,9 @@ static int tun_attach(struct tun_struct *tun, struct file *file,
+ 		goto out;
+ 	}
+ 
+-	spin_lock(&tfile->tx_ring.consumer_lock);
+-	tfile->cons_cnt = 0;
+-	spin_unlock(&tfile->tx_ring.consumer_lock);
+ 	tfile->queue_index = tun->numqueues;
+ 	tfile->socket.sk->sk_shutdown &= ~RCV_SHUTDOWN;
++	tun_force_wake_queue(tun, tfile);
+ 
+ 	if (tfile->detached) {
+ 		/* Re-attach detached tfile, updating XDP queue_index */
+@@ -1077,7 +1090,8 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+ 
+ 	spin_lock(&tfile->tx_ring.producer_lock);
+ 	ret = __ptr_ring_produce(&tfile->tx_ring, skb);
+-	if (!qdisc_txq_has_no_queue(queue) &&
++	if ((tun->flags & IFF_BACKPRESSURE) &&
++	    !qdisc_txq_has_no_queue(queue) &&
+ 	    __ptr_ring_check_produce(&tfile->tx_ring) == -ENOSPC) {
+ 		netif_tx_stop_queue(queue);
+ 		/* Paired with smp_mb() in __tun_wake_queue() */
+@@ -1088,8 +1102,8 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	spin_unlock(&tfile->tx_ring.producer_lock);
+ 
+ 	if (ret) {
+-		/* This should be a rare case if a qdisc is present, but
+-		 * can happen due to lltx.
++		/* This should be a rare case if IFF_BACKPRESSURE is enabled and
++		 * a qdisc is present, but can happen due to lltx.
+ 		 * Since skb_tx_timestamp(), skb_orphan(),
+ 		 * run_ebpf_filter() and pskb_trim() could have tinkered
+ 		 * with the SKB, returning NETDEV_TX_BUSY is unsafe and
+@@ -2151,8 +2165,12 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+ static void __tun_wake_queue(struct tun_struct *tun,
+ 			     struct tun_file *tfile, int consumed)
+ {
+-	struct netdev_queue *txq = netdev_get_tx_queue(tun->dev,
+-						tfile->queue_index);
++	struct netdev_queue *txq;
++
++	if (!(tun->flags & IFF_BACKPRESSURE))
++		return;
++
++	txq = netdev_get_tx_queue(tun->dev, tfile->queue_index);
+ 
+ 	/* Paired with smp_mb__after_atomic() in tun_net_xmit() */
+ 	smp_mb();
+@@ -2764,7 +2782,7 @@ static int tun_set_iff(struct net *net, struct file *file, struct ifreq *ifr)
+ 	struct tun_struct *tun;
+ 	struct tun_file *tfile = file->private_data;
+ 	struct net_device *dev;
+-	int err;
++	int err, i;
+ 
+ 	if (tfile->detached)
+ 		return -EINVAL;
+@@ -2893,8 +2911,12 @@ static int tun_set_iff(struct net *net, struct file *file, struct ifreq *ifr)
+ 	/* Make sure persistent devices do not get stuck in
+ 	 * xoff state.
+ 	 */
+-	if (netif_running(tun->dev))
+-		netif_tx_wake_all_queues(tun->dev);
++	if (netif_running(tun->dev)) {
++		for (i = 0; i < tun->numqueues; i++) {
++			tfile = rtnl_dereference(tun->tfiles[i]);
++			tun_force_wake_queue(tun, tfile);
++		}
++	}
+ 
+ 	strscpy(ifr->ifr_name, tun->dev->name);
+ 	return 0;
+@@ -3693,10 +3715,7 @@ static int tun_queue_resize(struct tun_struct *tun)
+ 	if (!ret) {
+ 		for (i = 0; i < tun->numqueues; i++) {
+ 			tfile = rtnl_dereference(tun->tfiles[i]);
+-			spin_lock(&tfile->tx_ring.consumer_lock);
+-			netif_wake_subqueue(tun->dev, tfile->queue_index);
+-			tfile->cons_cnt = 0;
+-			spin_unlock(&tfile->tx_ring.consumer_lock);
++			tun_force_wake_queue(tun, tfile);
+ 		}
+ 	}
+ 
+diff --git a/include/uapi/linux/if_tun.h b/include/uapi/linux/if_tun.h
+index 79d53c7a1ebd..a0ddc50a7534 100644
+--- a/include/uapi/linux/if_tun.h
++++ b/include/uapi/linux/if_tun.h
+@@ -69,6 +69,10 @@
+ #define IFF_NAPI_FRAGS	0x0020
+ /* Used in TUNSETIFF to bring up tun/tap without carrier */
+ #define IFF_NO_CARRIER	0x0040
++/* Stop the queue instead of dropping when the internal ring is full, so an
++ * attached qdisc applies backpressure instead of being bypassed.
++ */
++#define IFF_BACKPRESSURE	0x0080
+ #define IFF_NO_PI	0x1000
+ /* This flag has no real effect */
+ #define IFF_ONE_QUEUE	0x2000
+diff --git a/tools/include/uapi/linux/if_tun.h b/tools/include/uapi/linux/if_tun.h
+index 2ec07de1d73b..97b670f5bc0a 100644
+--- a/tools/include/uapi/linux/if_tun.h
++++ b/tools/include/uapi/linux/if_tun.h
+@@ -67,6 +67,7 @@
+ #define IFF_TAP		0x0002
+ #define IFF_NAPI	0x0010
+ #define IFF_NAPI_FRAGS	0x0020
++#define IFF_BACKPRESSURE	0x0080
+ #define IFF_NO_PI	0x1000
+ /* This flag has no real effect */
+ #define IFF_ONE_QUEUE	0x2000
+-- 
+2.43.0
+
 
