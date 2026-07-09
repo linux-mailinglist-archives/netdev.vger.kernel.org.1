@@ -1,198 +1,232 @@
-Return-Path: <netdev+bounces-306346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306347-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id eGnJB8XtT2oIqgIAu9opvQ
-	(envelope-from <netdev+bounces-306346-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 20:51:49 +0200
+	id ZWnPHGz0T2pKrAIAu9opvQ
+	(envelope-from <netdev+bounces-306347-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 21:20:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9E44734880
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 20:51:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFA23734E04
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 21:20:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b="k/AxyOAX";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306346-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306346-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=breiti.cc header.s=google header.b="j4a/Alaz";
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306347-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306347-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 623B43079B9D
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 18:48:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BCF2630ADF15
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 19:06:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9207743B4B1;
-	Thu,  9 Jul 2026 18:44:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DA463AFAF4;
+	Thu,  9 Jul 2026 19:04:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC03437470
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 18:44:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BBA13AC0C9
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 19:04:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783622641; cv=none; b=rC8joxh8x5KQaq59O0GHozDFJHXuDVEnJ7ZSmcaS10QI88mMk8UCmQpz5uUy6iAPOEkF5fvp8DLMdCiuKo7268UWd3CD+LQRQ1E5b4a7H1/oac2c1fBvvg7QnAITMPeGUoBDaMXMRnWNlcmBjKMsXvxiuhqiGIbX8rjIxLRbj/s=
+	t=1783623843; cv=none; b=Z/1CNWna1HtJLhhAyDbmj63IISqAq6eagurZmgTXSjdwyJ7sYFyKHJwMOPjWsXHOee1UHITNa9ha4zosbmVvUtw/9mLUIkM0cOnXYB7eA13ZCsU3jNkORfDY9mCoa2MQZLPmQhkudVlqW6vSdFCWCzdlPECHIsXQbyMAlrH4GJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783622641; c=relaxed/simple;
-	bh=AzEDPy4n/tg2P9pNqq6HFSvn16Pn7gioI4RLhq1dSCY=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=PAmIq5EgT+E1DZVcwHW6mRo8rfL/zTsJtHF7pOYx5wnYjxCb7tjiheZOkvbmiJTJyvZB2xLt8aBkas3Flu1eH8bwAFXnq4xxsfTsjtAaQFjUrYPhAnaXeXJ8ALif2he13nf+sW3oNBUJXkKC9af1NboJ0ms/IqPkiOzIHilSToM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k/AxyOAX; arc=none smtp.client-ip=209.85.128.44
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-493ed9d8c5cso900125e9.1
-        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 11:43:59 -0700 (PDT)
+	s=arc-20240116; t=1783623843; c=relaxed/simple;
+	bh=CxPMzaITnPkkWGGN055P4Bv2uTyYJu0CR569f0T/KzM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VmZyb2nP06OB6PmaJCijz+POvdv5yCUfBqW4TWDyFps+JyMtqP2GPb6NAwAQCCa5JQhytNGvTjcljdl6xSoEqBEzr0qlQ4IEHP7DyfLCk9PVBL50q+3+nBiwULwNjt3kLLUEjEA0WzwsOEG/Ri72uUigTBZbf4RxWgwTmSRaiYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=breiti.cc; spf=pass smtp.mailfrom=breiti.cc; dkim=temperror (0-bit key) header.d=breiti.cc header.i=@breiti.cc header.b=j4a/Alaz; arc=none smtp.client-ip=209.85.128.45
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-493c59f740cso1025925e9.3
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 12:04:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783622638; x=1784227438; darn=vger.kernel.org;
-        h=content-disposition:content-type:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=sBGn3ij6+2HsbaUjO7lwDiZD87M45vBU8uaHQgq/mEw=;
-        b=k/AxyOAX7qJMRw0x6qVpp4p7muM/ahM1miwmZcUqwaDoqMu8uUhIH5J5RyNg7ndtml
-         y1cn5oiPvNovwNHTvjtSaIzpx9ngA3NattfCNmSpe87vxXGDL23COese01rEcF7YZauh
-         I+ALiHQ0JeHFz+SG2qUDfTRgHQpRv1Wo0kYSx+YtTPj/EawGxURUnCNxSH3HN32IfyfQ
-         gqwCrTH8Ip47hdnuDPyt6gAHGxVkwgbr90GVcNo07VhXyZtL5POrdyqji4RlwloH3CeA
-         c97SfYt6Bh1cvXG1X2VzckG8MTO1O0um1c5egDSl0kxccs3UaWXCFYGfRFkVMsk2oVj5
-         Wz+Q==
+        d=breiti.cc; s=google; t=1783623840; x=1784228640; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=A1cFyhFd1WTGzP7I6nzPK+Il5As21ayHbm0nJT4NpM4=;
+        b=j4a/Alaz0eV+smwIF91VVKlFveTQf33JpVT5EiMVUUw62ZBpMzPmhVPpVVG+t4bHQF
+         qEimVUkIiuLykCTQ+e5U2oqBoZa+SjbPm+1nKWQVlMXwlpgBrj1FpPCj+UDWwo9HLM+L
+         7m4Fbrh9y+47DoMXX4/3Uo0fDLUSVB+G8baFg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783622638; x=1784227438;
-        h=content-disposition:content-type:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1783623840; x=1784228640;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=sBGn3ij6+2HsbaUjO7lwDiZD87M45vBU8uaHQgq/mEw=;
-        b=CUNTD/+k3WhOmQkm01p8X1K/EttAj6rH2MD7DOfvdjfAg1xs/60O1hzVAqlvgAkSOh
-         /Eiw06vdbiTpW1/IqZKenuLWwmjG0Eez679H0JKpZJt/wOtsxULx/KD2B2jDTUEhNUY2
-         mH6HBhrZkMGBS4N0VzFbVfixzxeTra+U78QFCyfuWVTNjhmgdikmLRC7xxbmwIAyNEVA
-         myZPHWxRqss+hokWPP95KwVZCWpvalyL5PeePI5Byi3o2T0ssEok9GKFws6KL40mzo7Z
-         9TdSr+vXzS2H5c+NuS9YIUfm3vMPhVUuv3l5AB8/i4aNfvUPsBAkzAMO2TOeUviFcx+X
-         AEEQ==
-X-Gm-Message-State: AOJu0YwGu5cJXUdhbDdooOAm6TugBkzcj7OM4GVKIE9RvKc9NafItztU
-	hG1m2Q43Ii3gPIuLH58XRhxNMThW5oedIPGsfIPRx+03cRfwgaPE3HLk
-X-Gm-Gg: AfdE7clhMHBs/r5/hcDJT0R+fHDSJ2m8ueIghDJKC3b1xkIhvLWDx9ThbaUVfJICqen
-	YVuxt025wE+t0wt8M6WcNpHAIjHCayY/4falqFrjcIT/JzOghDm2IDCZZcwjBPTfA6qXELBbyVJ
-	r8txWHiwOK57F44ObY0oIexZKJSwX2YyKRPtVGi9hz7NU53wD99DN83kwJUA10xC0Moyecuypa9
-	DSenxCzCQppVarAUPdIbg2UVhGzAIZa1haczE4QDON7FGzJZpqkesNvA4za7Ie5xm28B4pcHioJ
-	36s8Dcc3K/drdZ0t6ioXp1nu0jyI86sOHm+LpWtS0BJDHRUTpemU/y7/n/6pGzLafFjMW8s9AmX
-	TYj7xfswoqHU4K81TaSEAB2rkCOacfT7w7QgJm8D1KfJb0yP08V9F/KrIYRVmSVvvitsvSkubYT
-	cXRgjOaKvy5yU0/zbZDooxUXECbxDRrIHjJaqx6OtoXAWSggHPlho1ejX+/UFQE+8QMXrybuu2q
-	ImD
-X-Received: by 2002:a05:600c:4f90:b0:493:e404:3727 with SMTP id 5b1f17b1804b1-493e68c6da4mr94463245e9.23.1783622638328;
-        Thu, 09 Jul 2026 11:43:58 -0700 (PDT)
-Received: from localhost.localdomain (host86-153-201-25.range86-153.btcentralplus.com. [86.153.201.25])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493f2a2e499sm8261895e9.0.2026.07.09.11.43.57
+        bh=A1cFyhFd1WTGzP7I6nzPK+Il5As21ayHbm0nJT4NpM4=;
+        b=PSzKbxn8aG3+qSOMCw76rZwbSsMGSOY10oceuTRhYkJm6MlmDB/jImTglToRWRYE8v
+         A6qoUR6v1WnT+DreuRXc4yVfUSi26jkg+mhPsfGLZLozzy3HXqU+hSax+Xbitsv/Juqd
+         ocqMxmbuYZEN/xQZZ06UXTecKOUI8Ti3YMAo2J5S4SCXk718I7s/9ijmmQ+Hi+OqhY9y
+         6qYsOyI2DNg7vMAmjlwtLoRfBHtLZrxiUmYK3F/enzLR9uOF8kIA6FMUmeY+leA2WMS6
+         eqSj8+6kssB38u7Xs0JOyjc6my0ZTrlrkQfFCW+5V3HpIi2qkLY8daR4gwxDC18DB7oK
+         w2FA==
+X-Gm-Message-State: AOJu0YyPoSh3mMmx7tEVjJBQkdguSFb9WR71XINm9dY14tXycV+zHwU0
+	gF3Cq+BpWFLhLqq/WaavksOKr/mJWiajlxlthePGcdAZnJORYFiYSquRvtJuwZkcPNq+HScMHSu
+	0NVYn1+iu
+X-Gm-Gg: AfdE7clWqDU2pt7afPIAaSW2hffZYRwEPuHoSf5eiQ2KO4B7qH7dFIDQliJ6FDDv8N5
+	OfMCWetkcY0ICZVufHPpTh3EkETkAZm2VJ0bM51bKA2+eFb743yniyJisvKIhEkBP1HPVPaZGXj
+	vj6uo7ZBGK/j6PWX3ULuCGh9y5F8bDl+hW0OLGuZzf5zZX7+GCy2Lq2RSXWiUizSDhlm/SWq6eB
+	YfN9cFfkRFiFsCnoi9FXviT9gcgn01bItWhZaPmNcTAj/6Mm4pD3l+JBCnYT2D/nKAGYNEiG/Si
+	+CaDOIdpp80vl8fJKvzDrRgiSsVN8IrnZv/O3LoIkom88T1atB529kUNdXN6WZ7mlTrofrX7AcS
+	EWWePAXfZuq84ZAusoq4YeYRIKnBSl8T7dQhSU6fnNxgKB/hK+KZqj4yCOQiGleUJZcc1ARH3PP
+	l2VQ1YbDfJO/cqGPWO23WzVxEgtFPbR23toABI4RFGxnm9pYGMxw==
+X-Received: by 2002:a05:600c:4e0e:b0:490:e60b:6860 with SMTP id 5b1f17b1804b1-493e6892ea6mr77245815e9.7.1783623839625;
+        Thu, 09 Jul 2026 12:03:59 -0700 (PDT)
+Received: from framework.casa.breiti.cc ([2.57.48.190])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493eb6f3c42sm81810125e9.1.2026.07.09.12.03.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2026 11:43:57 -0700 (PDT)
-Date: Thu, 9 Jul 2026 19:43:56 +0100
-From: Nnamdi Onyeyiri <nnamdio@gmail.com>
-To: nnamdio@gmail.com, nnamdi.onyeyiri@squarepoint-capital.com, 
-	john.fastabend@gmail.com, jakub@cloudflare.com, jiayuan.chen@linux.dev, 
-	edumazet@google.com, ncardwell@google.com, kuniyu@google.com, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org
-Subject: [BUG] bpf, sockmap: spurious wakeup by tcp_msg_wait_data() causing
- unexpected EAGAIN in recvfrom()
-Message-ID: <ak_rR-Skd8Mvn4mH@localhost.localdomain>
+        Thu, 09 Jul 2026 12:03:59 -0700 (PDT)
+From: Markus Breitenberger <bre@breiti.cc>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Markus Breitenberger <bre@keba.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net v2] net: stmmac: intel: gate SerDes reconfig on rate
+Date: Thu,  9 Jul 2026 21:03:29 +0200
+Message-ID: <20260709190329.124432-1-bre@breiti.cc>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[breiti.cc:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306346-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:nnamdio@gmail.com,m:nnamdi.onyeyiri@squarepoint-capital.com,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:edumazet@google.com,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[nnamdio@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_TO(0.00)[gmail.com,squarepoint-capital.com,cloudflare.com,linux.dev,google.com,davemloft.net,kernel.org,redhat.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-306347-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:yong.liang.choong@linux.intel.com,m:bre@keba.com,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nnamdio@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[bre@breiti.cc,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[breiti.cc];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bre@breiti.cc,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[breiti.cc:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,localhost.localdomain:mid]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,breiti.cc:from_mime,breiti.cc:dkim,breiti.cc:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A9E44734880
+X-Rspamd-Queue-Id: AFA23734E04
 
-Hi,
+From: Markus Breitenberger <bre@keba.com>
 
-We've encounted what appears to be a bug with bpf when invoking recvfrom() on
-an ipv4 tcp socket that has been added to a sockmap.  It results in unexpected
-EAGAIN errors, that we've diagnosed as the result of spurious wakeups from
-tcp_msg_wait_data().
+intel_mac_finish() is registered as the phylink mac_finish()
+callback for the Elkhart Lake SGMII ports. phylink calls it at
+the end of every major link reconfiguration, including the
+initial one during probe.
 
-This has been confirmed to still be present on the mainline kernel, and I have
-written a reproducer at: https://github.com/Nnamdi/recvfrom_sockmap_eagain/
+The callback selects the PMC ModPHY LCPLL programming for the
+requested MAC-side interface and then power-cycles the SerDes.
+On Elkhart Lake that ModPHY is also used by the on-die AHCI
+SATA PHY. Reapplying the programming during the initial
+boot-time link-up disturbs the shared analog block while it is
+still driving SATA, so the SATA link fails to train:
 
-Attched is a patch that we found resolved this using kpatch locally.  It just
-causes spurious wakups to go round the loop again.  I'd like to get a sense of
-whether this is expected behaviour, or really is a bug, in which case, is this
-the correct fix?
+  ata1: SATA link down (SStatus 1 SControl 300)
 
-Thanks,
-Nnamdi.
+The disk carrying the root filesystem is never detected and the
+system hangs at rootwait. Ethernet itself comes up normally,
+which makes the failure look unrelated to the network driver.
 
-----8<----
-From 0e0c342363b2e435297ab1feda402cde6ad54525 Mon Sep 17 00:00:00 2001
-From: Nnamdi Onyeyiri <nnamdio@gmail.com>
-Date: Thu, 9 Jul 2026 13:06:33 +0100
-Subject: [PATCH] bpf, sockmap: handle spurious tcp_msg_wait_data() wakeup
+Before mac_finish() runs, the legacy SerDes power-up path has
+already programmed SERDES_GCR0 for the current interface. The
+1G and 2.5G ModPHY tables selected by mac_finish() correspond
+to the SerDes lane rate, so read that rate back from SERDES_GCR0
+and skip the PMC reprogramming and SerDes power-cycle when it
+already matches the selected interface.
 
-recvfrom()/recv() are documented as only returning EAGAIN for blocking sockets
-when they have a receive timeout configured.  however, adding a blocking
-ipv4 tcp socket without a receive timeout to a sockmap will cause EAGAIN errors
-sporadically.
+This keeps the disruptive reprogramming out of the boot path
+when the SerDes is configured correctly, while preserving the
+previous behavior when a real SGMII/1000BASE-X to 2500BASE-X
+rate change is needed. If the register read fails, reconfigure
+as before.
 
-this happens when tcp_msg_wait_data() wakes spuriously (returning 0) in which
-case, if no receive timeout is configured, we loop again instead of returning
--EAGAIN.
-
-Signed-off-by: Nnamdi Onyeyiri <nnamdio@gmail.com>
+Fixes: a42f6b3f1cc1 ("net: stmmac: configure SerDes according to the interface mode")
+Cc: stable@vger.kernel.org
+Assisted-by: GitHub-Copilot:claude-opus-4.8
+Signed-off-by: Markus Breitenberger <bre@keba.com>
 ---
- net/ipv4/tcp_bpf.c | 4 ++++
- 1 file changed, 4 insertions(+)
+v2:
+  - Read the current SerDes lane rate from SERDES_GCR0 instead of
+    comparing against cached phy_interface state.
+  - Rework the commit message to clarify the SerDes power-up path and
+    the rate readback check.
+  - Keep the previous reconfiguration behavior if the SERDES_GCR0 read
+    fails.
 
-diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
-index cc0bd73f3..38fd391ff 100644
---- a/net/ipv4/tcp_bpf.c
-+++ b/net/ipv4/tcp_bpf.c
-@@ -317,6 +317,8 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
- 		}
- 		if (data && !sk_psock_queue_empty(psock))
- 			goto msg_bytes_ready;
-+		if (!data && timeo == MAX_SCHEDULE_TIMEOUT)
-+			goto msg_bytes_ready;
- 		copied = -EAGAIN;
- 	}
- out:
-@@ -390,6 +392,8 @@ static int tcp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 			sk_psock_put(sk, psock);
- 			return tcp_recvmsg(sk, msg, len, flags);
- 		}
-+		if (!data && timeo == MAX_SCHEDULE_TIMEOUT)
-+			goto msg_bytes_ready;
- 		copied = -EAGAIN;
- 	}
- 	ret = copied;
+v1: https://lore.kernel.org/netdev/20260706061954.94842-1-bre@breiti.cc/
+
+ .../net/ethernet/stmicro/stmmac/dwmac-intel.c | 28 +++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+index b8d467ba6d72..fa0113597c97 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+@@ -525,6 +525,31 @@ static int intel_set_reg_access(const struct pmc_serdes_regs *regs, int max_regs
+ 	return ret;
+ }
+ 
++/* Return true if the SerDes lane rate must change to serve @interface.
++ * If the current rate cannot be determined, reconfigure as before.
++ */
++static bool intel_serdes_needs_reconfig(struct stmmac_priv *priv,
++					struct intel_priv_data *intel_priv,
++					phy_interface_t interface)
++{
++	u32 cur_rate, want_rate;
++	int data;
++
++	if (!intel_priv->mdio_adhoc_addr)
++		return true;
++
++	data = mdiobus_read(priv->mii, intel_priv->mdio_adhoc_addr,
++			    SERDES_GCR0);
++	if (data < 0)
++		return true;
++
++	cur_rate = (data & SERDES_RATE_MASK) >> SERDES_RATE_PCIE_SHIFT;
++	want_rate = interface == PHY_INTERFACE_MODE_2500BASEX ?
++			SERDES_RATE_PCIE_GEN2 : SERDES_RATE_PCIE_GEN1;
++
++	return cur_rate != want_rate;
++}
++
+ static int intel_mac_finish(struct net_device *ndev,
+ 			    void *intel_data,
+ 			    unsigned int mode,
+@@ -536,6 +561,9 @@ static int intel_mac_finish(struct net_device *ndev,
+ 	int max_regs = 0;
+ 	int ret = 0;
+ 
++	if (!intel_serdes_needs_reconfig(priv, intel_priv, interface))
++		return 0;
++
+ 	ret = intel_tsn_lane_is_available(ndev, intel_priv);
+ 	if (ret < 0) {
+ 		netdev_info(priv->dev, "No TSN lane available to set the registers.\n");
 -- 
-2.52.0
+2.55.0
 
 
