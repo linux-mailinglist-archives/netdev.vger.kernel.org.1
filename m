@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-306135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306136-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cc1WKzpwT2rYggIAu9opvQ
-	(envelope-from <netdev+bounces-306135-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:56:10 +0200
+	id 0J9nF1JwT2rmggIAu9opvQ
+	(envelope-from <netdev+bounces-306136-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:56:34 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51C0972F2F8
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:56:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97D9572F308
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:56:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=resnulli-us.20251104.gappssmtp.com header.s=20251104 header.b=e68+VnAC;
+	dkim=pass header.d=resnulli-us.20251104.gappssmtp.com header.s=20251104 header.b=CTHIOCmE;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306135-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306135-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306136-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306136-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B4532303F468
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:55:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 62793304973F
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:55:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 164204014B8;
-	Thu,  9 Jul 2026 09:55:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BAE9401A08;
+	Thu,  9 Jul 2026 09:55:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9653F403AF5
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 09:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8DE3402BAB
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 09:55:53 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783590953; cv=none; b=QxkISFKlLLcHGM2RdxdpdAdu2+10yuq3LeXPVFKhxrOqTHqNzOOUGrrJa0beSLB5kT0Rwg2O9xUvfi186V82cLVuFSNG3CevGrZcuyEhEKvKR9OWnhBqhYazogtiq1qY78eBw85rIKAwur8/VaJVgVGD57Cc37/swbl7ObIzktI=
+	t=1783590955; cv=none; b=VmCZJN6Lpz6TXD4sIuWZrhTZwMD0Sdzzf0MuuKkh6W228xwlxOTuEthrSXJx6weQhR0fm7NYNexVbIxjlOGUqUtjZIxLzA1bvIc3CH1kUo3VaM1vUGZzvo+p0ukX1D181MkaH91tCOTvvnm7Bza2rziNMQ6yiExWIdxDKBRmLx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783590953; c=relaxed/simple;
-	bh=Q+ioYosMcLR28Rk0UHBuj7VHjIKeDcYl6ZIU8ovFwzQ=;
+	s=arc-20240116; t=1783590955; c=relaxed/simple;
+	bh=K9CoRzGWe5Snmxtd8ymX7IyXAu1ar0x9Ob9wGfUGEBY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dnYESyJFZ325V6VwLp+5nq6VQ1aZESjEwKtkAJ26MEO9EqPbeTZEaBFCLMu3zU4ejI2/2jmS2tcNq2m5DITdBTwV097MRntrl7dz8MeysMScI+skipkuToYJ0gEGkhTq+LL4T8T0irxXTZaCQbPOR9ioLpcM2yfeMeEo+e0mZUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=e68+VnAC; arc=none smtp.client-ip=209.85.221.50
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-4758b2a9e2aso388558f8f.2
-        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 02:55:50 -0700 (PDT)
+	 MIME-Version; b=muz9wRLaU6clfu1E0xhW+7qgHTZPa/mkmXffRpXPgwuHh7kqSLCI6pXh8gEEiOGTcnSVvJgnaKDNCM9BvFlhM4t+IOu17O75syr3sYeBx3XOESR8hcc9mQOHJmt6B4q25tnCCyoaXIvQSlLSFQA2nutuD7ohIES8HR8MKgd3J+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=CTHIOCmE; arc=none smtp.client-ip=209.85.128.45
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-493c19bad03so15615675e9.2
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 02:55:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1783590949; x=1784195749; darn=vger.kernel.org;
+        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1783590952; x=1784195752; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=cTe/xvJ3msxEWBlJbFLbtJMtjmfOZ8+sCmPsSsQl0Tk=;
-        b=e68+VnACHZD5r0+cV/7XOA3nTEwnDSV3wqroEG/fEfl6PLGr4Ci5ZyMFZ65g+BWnW9
-         uLrjRftydX2HvPgPhOAhbw7dLzk12+4nKpZ9kngjNEIJNQjJLgBEPmNRwhYYoBTh6ZG2
-         G46vlKa/DYRXLtFIz6w6HFu7C+jXb5eNVq4xp/hDENEajydcsCHoMEnPp/7TV9n/Ggpj
-         XgrPQqU7unmGcE6cJ0yMyYg4eevxwostaqgzdrfpRuh0nY75nKUrBTSlkaG577qA+tpW
-         G0eCBH1qphKzjk2xobtR5QolJFMWpbtmiEXw97lhpWYG3CjaOt/RQn/VT9UG+IjqGkRX
-         QbbQ==
+        bh=fNmk0bmqBHuWVqJOuS5xVAk5q96ZY6RqDhKX3ikJqio=;
+        b=CTHIOCmEi9IrR73tFiRqc88ohe49m7aLkRMT3+zx6857ZhLioUfs8qKV5jS0R+fyZG
+         O7u/tdfTbOR/a1hVWZC6NsB76+wUgI4HuXhLZ+LepMpYnca8JwaBYaOl6zqLFIqUQrUO
+         IrsPnoOQvWN6rjsCjYdy2tA9e+aA7pVKxho+l1dbOfdQEFByCpDz8AvQc23KnlayLae+
+         ZNIhmUxqiVUpLcuIlM0HWFubIm8c1aCzAjNH5SuXpLU59Pq50lzpYQipkrgwh1q+0CDA
+         sKXq6uKcVMTZKCRXpnY0X94ip1CQ/yOSgUyHSeOOohU1CsJYcD4XAjRZTs2o1Ma5Q1bj
+         k/Jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783590949; x=1784195749;
+        d=1e100.net; s=20251104; t=1783590952; x=1784195752;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=cTe/xvJ3msxEWBlJbFLbtJMtjmfOZ8+sCmPsSsQl0Tk=;
-        b=qAOqlM8AoHmevLxknuUKGaI9p6Auafzv1GHb02ReZhi7fwLOGr7Zy/i+AODxS5HnYz
-         9t63WLpCaLDzO/pAzPkJPxKXxO+KmZm9fThcrf5BKdV6lbbuCWytoyqgYO+d35HWanHw
-         tHg0ty/7iXbfzpRC+Z+APwevgwKWRIAXs07ykU9mvjVId2msXDKGfLiK38HEL0fYlfSW
-         tR2CDqlTXusrTuun8MRMo3LyRLHxfW/0o5QdEq9aO+v7cV8Gr+84Nx9JaajZXw7AxnT6
-         zgGq3H3OVmQkr3436F7/FgqZqNDo8o/ztS2P20iTCah516PhXUmKRoqxrfYM3zoc3Ln6
-         kWkQ==
-X-Forwarded-Encrypted: i=1; AHgh+RryDL6CYil81r1bnS8KR9w/PNuPMDB7g4RtEnSf4rc+C63QoAeS6sZbqqmuTD9DOxF7sVBbyCg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2HfNlsuwlegvygBay0jyGjnW+tcoAZ7sXC1koqD48rrKOEJ1o
-	a8B2ZkIZJLr6RRn7U2tKnl09WMhrDCdHOxRjRU6QXd55YsXgnDQAqgXbGP8sM98gHHI=
-X-Gm-Gg: AfdE7cnmlpNJEyf8WoUMwovvsLYLIZMnbftLBXJR+GJ05A/Jo+3xexzNJRbgedaj7Cz
-	QouQvUfC1pCnnhXPmtiq6MA9/GT+3MFKDqyxHZXKMTBHcODgQcleWN84Llz4bPONXf7SAUpQ65c
-	YPOqoKMnIyozR+OatgIWUew8uKqrg7Ho3uVedhrpH49zVxDWRsAgKnLC0TgLGZ2SygRS5GmdWI8
-	oEXP6QcK0NPSlPKWrlWnEVlgHgMKAtsGyzw3DRJVqwzJo6I6ukXhwyw1JEURGT8XO37h3YRZxym
-	SjLGrHD3mf3VdBf9otNDTc94bQF2kl/4GIS4g3VN++dDveIQJEfJUbvsK8VnIbsNoD6+IRkd6W+
-	8FW/w67CeQSLFvQK89KG0/aXcbuLPUroTwm7pNQmCuwAwVQQfqsvfw6v3czkLOF5kY+8ns7p5GI
-	r1oZn745y8cDpNWMmbMmSBnQ==
-X-Received: by 2002:a05:6000:230d:b0:472:76ad:b329 with SMTP id ffacd0b85a97d-47df071bac3mr6678726f8f.6.1783590948908;
-        Thu, 09 Jul 2026 02:55:48 -0700 (PDT)
+        bh=fNmk0bmqBHuWVqJOuS5xVAk5q96ZY6RqDhKX3ikJqio=;
+        b=lkgdIh2IabU3GYqZ1UxiYzwYJUlrfkj748Io58l3vYCol/3RBinPAoymHIKHC2BvZ1
+         E3o6ibx+JYUHCpzuuBol15jyl4d+K9bGL6l0ZY3WySDw1f+xgPNq41ALXx8aCfaoCeYs
+         zsytwoMsmR9lEE0vnAGFdJHngM+8gkbK/tTgGWdX5hIFF7nUWzbzMcSvdfXjNU2AhCRz
+         RqvWSwJx7kqkj6ODVH1jSUidXFeZ0PrkSbPeicV2KtI68PjQjiHsx3erJOLYT3gY+4YO
+         LlEmQk48h/Xwe8K+cZALKUKGLuyLuhaSXezNx+rMeIvCJSHPGw0//+7HnuGmukMQxv0m
+         efpg==
+X-Forwarded-Encrypted: i=1; AHgh+Rr1g6M2HL3n/GP3kLU3MgnBNx27FCW5xTtThqrWAcnJDYXSrBIu3/79376cYJSJmy5foHgYxko=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNOYZz9maBBYN59sd0fpT8yMZ65mVRLRjwG4Tzgp9U4Yc52g2P
+	PfNbdNK9OUL+jH3ZVGu+XlHjJtYdiWh2usN3OKItGTeLEEVDLkIU/uk/B+wkIm/MDtw=
+X-Gm-Gg: AfdE7cm433CU881ASFzueGy9rfDE/fm06IsX0KrO6PjcMg4L0bw7BcD4MuZwF/+Ho6U
+	1HhM34iyvlNNMfTq9uY1dVhIfbly6WC1bmqdZNTJKpd2Ty6kGB3/n24ocN//wRWR0XGMx8RD427
+	4wCYXaQ/dbUzWSlpSccg79XpAbCyE/Mv/URN1Z3xsjMZtgArp17EDyED9JX/xYYLDv8tK4fzFWI
+	nyWp/MeP4rieZrQ2m5WIfXUmYv2U1MSvHN4edespOgjT9sCN7cZ0bYG3haNrl4W9TT2AeX3oEcz
+	dXDKG0SVRoFsqx6IqCAds+R2BckBlJK9ZXYXodeLqWm77ASbPn8tUmz9TUm0Iq8AP9omT2ppIip
+	LVnFNirIt737Z11oji26j1EEvygB59bZ/bWla2SDnG4Q/XWq5eBfgmMGtjdgcIgOrkc0UO1q2yt
+	gZRW+XxmD9MEPq7lKT9sbIyA==
+X-Received: by 2002:a05:600c:630a:b0:493:c84c:2b57 with SMTP id 5b1f17b1804b1-493e686c848mr60622675e9.29.1783590952129;
+        Thu, 09 Jul 2026 02:55:52 -0700 (PDT)
 Received: from localhost ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9de1e6ccsm50292543f8f.5.2026.07.09.02.55.48
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493e5a5d174sm148952445e9.2.2026.07.09.02.55.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2026 02:55:48 -0700 (PDT)
+        Thu, 09 Jul 2026 02:55:51 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: linux-rdma@vger.kernel.org
 Cc: cgroups@vger.kernel.org,
@@ -98,9 +98,9 @@ Cc: cgroups@vger.kernel.org,
 	dust.li@linux.alibaba.com,
 	sidraya@linux.ibm.com,
 	wenjia@linux.ibm.com
-Subject: [PATCH rdma-next 04/13] RDMA/nldev: Report net namespace move errors through extack
-Date: Thu,  9 Jul 2026 11:55:23 +0200
-Message-ID: <20260709095532.855647-5-jiri@resnulli.us>
+Subject: [PATCH rdma-next 05/13] RDMA/nldev: Allow setting the device name while changing net namespace
+Date: Thu,  9 Jul 2026 11:55:24 +0200
+Message-ID: <20260709095532.855647-6-jiri@resnulli.us>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260709095532.855647-1-jiri@resnulli.us>
 References: <20260709095532.855647-1-jiri@resnulli.us>
@@ -121,7 +121,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306135-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306136-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[vger.kernel.org,ziepe.ca,kernel.org,nvidia.com,linux.dev,acm.org,gmail.com,suse.com,cmpxchg.org,linux.alibaba.com,linux.ibm.com];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
@@ -147,119 +147,106 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,resnulli.us:mid,resnulli.us:from_mime,resnulli-us.20251104.gappssmtp.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 51C0972F2F8
+X-Rspamd-Queue-Id: 97D9572F308
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Thread extack through the existing net namespace move helper and report the
-main failure reasons from the core path. Keep the existing move UAPI shape
-unchanged.
+Accept RDMA_NLDEV_ATTR_DEV_NAME together with RDMA_NLDEV_NET_NS_FD so a
+netlink move can rename the device in the destination namespace. Keep the
+name semantics aligned with the existing RDMA rename path.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
- drivers/infiniband/core/core_priv.h |  3 ++-
- drivers/infiniband/core/device.c    | 24 ++++++++++++++++++++++--
- drivers/infiniband/core/nldev.c     |  6 ++----
- 3 files changed, 26 insertions(+), 7 deletions(-)
+ drivers/infiniband/core/device.c |  6 ++++++
+ drivers/infiniband/core/nldev.c  | 27 ++++++++++++++++++---------
+ include/uapi/rdma/rdma_netlink.h |  5 ++++-
+ 3 files changed, 28 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/infiniband/core/core_priv.h b/drivers/infiniband/core/core_priv.h
-index 3bd5bb7135a3..aaf330b0d333 100644
---- a/drivers/infiniband/core/core_priv.h
-+++ b/drivers/infiniband/core/core_priv.h
-@@ -356,7 +356,8 @@ void ib_port_unregister_client_groups(struct ib_device *ibdev, u32 port_num,
- 				     const struct attribute_group **groups);
- 
- int ib_device_set_netns_put(struct sk_buff *skb,
--			    struct ib_device *dev, u32 ns_fd, const char *name);
-+			    struct ib_device *dev, u32 ns_fd, const char *name,
-+			    struct netlink_ext_ack *extack);
- 
- int rdma_nl_net_init(struct rdma_dev_net *rnet);
- void rdma_nl_net_exit(struct rdma_dev_net *rnet);
 diff --git a/drivers/infiniband/core/device.c b/drivers/infiniband/core/device.c
-index 191f05898bae..2391bc7c8d23 100644
+index 2391bc7c8d23..8705011fab66 100644
 --- a/drivers/infiniband/core/device.c
 +++ b/drivers/infiniband/core/device.c
-@@ -1871,18 +1871,22 @@ static int rdma_dev_change_netns(struct ib_device *device, struct net *cur_net,
- }
- 
- int ib_device_set_netns_put(struct sk_buff *skb,
--			    struct ib_device *dev, u32 ns_fd, const char *name)
-+			    struct ib_device *dev, u32 ns_fd, const char *name,
-+			    struct netlink_ext_ack *extack)
- {
- 	struct net *net;
- 	int ret;
- 
- 	net = get_net_ns_by_fd(ns_fd);
- 	if (IS_ERR(net)) {
-+		NL_SET_ERR_MSG(extack, "Invalid target net namespace fd");
- 		ret = PTR_ERR(net);
- 		goto net_err;
- 	}
- 
- 	if (!netlink_ns_capable(skb, net->user_ns, CAP_NET_ADMIN)) {
-+		NL_SET_ERR_MSG(extack,
-+			       "Missing CAP_NET_ADMIN in the target net namespace");
- 		ret = -EPERM;
- 		goto ns_err;
- 	}
-@@ -1893,6 +1897,10 @@ int ib_device_set_netns_put(struct sk_buff *skb,
- 	 */
- 	if (net_eq(net, read_pnet(&dev->coredev.rdma_net))) {
- 		ret = name ? ib_device_rename(dev, name) : 0;
-+
-+		if (ret == -EEXIST)
+@@ -1901,6 +1901,9 @@ int ib_device_set_netns_put(struct sk_buff *skb,
+ 		if (ret == -EEXIST)
+ 			NL_SET_ERR_MSG(extack,
+ 				       "Device name already exists in the target net namespace");
++		else if (ret == -EINVAL && name)
 +			NL_SET_ERR_MSG(extack,
-+				       "Device name already exists in the target net namespace");
++				       "Unable to use requested device name in the target net namespace");
  		goto ns_err;
  	}
  
-@@ -1901,7 +1909,16 @@ int ib_device_set_netns_put(struct sk_buff *skb,
- 	 * changed and this cannot be blocked waiting for userspace to do
- 	 * something, so disassociation is mandatory.
- 	 */
--	if (!dev->ops.disassociate_ucontext || ib_devices_shared_netns) {
-+	if (ib_devices_shared_netns) {
+@@ -1931,6 +1934,9 @@ int ib_device_set_netns_put(struct sk_buff *skb,
+ 	if (ret == -EEXIST)
+ 		NL_SET_ERR_MSG(extack,
+ 			       "Device name already exists in the target net namespace");
++	else if (ret == -EINVAL && name)
 +		NL_SET_ERR_MSG(extack,
-+			       "Cannot change net namespace of RDMA device in shared netns mode");
-+		ret = -EOPNOTSUPP;
-+		goto ns_err;
-+	}
-+
-+	if (!dev->ops.disassociate_ucontext) {
-+		NL_SET_ERR_MSG(extack,
-+			       "Device does not support namespace changes (no disassociate support)");
- 		ret = -EOPNOTSUPP;
- 		goto ns_err;
- 	}
-@@ -1911,6 +1928,9 @@ int ib_device_set_netns_put(struct sk_buff *skb,
- 	ret = rdma_dev_change_netns(dev, current->nsproxy->net_ns, net, name,
- 				    NULL);
- 	put_device(&dev->dev);
-+	if (ret == -EEXIST)
-+		NL_SET_ERR_MSG(extack,
-+			       "Device name already exists in the target net namespace");
++			       "Unable to use requested device name in the target net namespace");
  
  	put_net(net);
  	return ret;
 diff --git a/drivers/infiniband/core/nldev.c b/drivers/infiniband/core/nldev.c
-index 3540cb0b9d4f..5fd1ef2c5050 100644
+index 5fd1ef2c5050..473bf9667f83 100644
 --- a/drivers/infiniband/core/nldev.c
 +++ b/drivers/infiniband/core/nldev.c
-@@ -1194,10 +1194,8 @@ static int nldev_set_doit(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		u32 ns_fd;
+@@ -1177,6 +1177,24 @@ static int nldev_set_doit(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	if (!device)
+ 		return -EINVAL;
  
- 		ns_fd = nla_get_u32(tb[RDMA_NLDEV_NET_NS_FD]);
--		err = ib_device_set_netns_put(skb, device, ns_fd, NULL);
--		if (err == -EEXIST)
--			NL_SET_ERR_MSG(extack,
--				       "Device name already exists in the target net namespace");
-+		err = ib_device_set_netns_put(skb, device, ns_fd, NULL,
-+					      extack);
- 		goto put_done;
++	if (tb[RDMA_NLDEV_NET_NS_FD]) {
++		char name[IB_DEVICE_NAME_MAX] = {};
++		u32 ns_fd;
++
++		if (tb[RDMA_NLDEV_ATTR_DEV_NAME]) {
++			nla_strscpy(name, tb[RDMA_NLDEV_ATTR_DEV_NAME],
++				    IB_DEVICE_NAME_MAX);
++			if (strlen(name) == 0) {
++				err = -EINVAL;
++				goto done;
++			}
++		}
++		ns_fd = nla_get_u32(tb[RDMA_NLDEV_NET_NS_FD]);
++		err = ib_device_set_netns_put(skb, device, ns_fd,
++					      name[0] ? name : NULL, extack);
++		goto put_done;
++	}
++
+ 	if (tb[RDMA_NLDEV_ATTR_DEV_NAME]) {
+ 		char name[IB_DEVICE_NAME_MAX] = {};
+ 
+@@ -1190,15 +1208,6 @@ static int nldev_set_doit(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 		goto done;
  	}
  
+-	if (tb[RDMA_NLDEV_NET_NS_FD]) {
+-		u32 ns_fd;
+-
+-		ns_fd = nla_get_u32(tb[RDMA_NLDEV_NET_NS_FD]);
+-		err = ib_device_set_netns_put(skb, device, ns_fd, NULL,
+-					      extack);
+-		goto put_done;
+-	}
+-
+ 	if (tb[RDMA_NLDEV_ATTR_DEV_DIM]) {
+ 		u8 use_dim;
+ 
+diff --git a/include/uapi/rdma/rdma_netlink.h b/include/uapi/rdma/rdma_netlink.h
+index 3af946ecbac3..ee11c3bbbae2 100644
+--- a/include/uapi/rdma/rdma_netlink.h
++++ b/include/uapi/rdma/rdma_netlink.h
+@@ -516,7 +516,10 @@ enum rdma_nldev_attr {
+ 	RDMA_NLDEV_ATTR_DEV_PROTOCOL,		/* string */
+ 
+ 	/*
+-	 * File descriptor handle of the net namespace object
++	 * File descriptor handle of the net namespace object. May be combined
++	 * with RDMA_NLDEV_ATTR_DEV_NAME (a literal device name) to also rename
++	 * the device in the destination namespace; the move fails with -EEXIST
++	 * if that name is already taken there.
+ 	 */
+ 	RDMA_NLDEV_NET_NS_FD,			/* u32 */
+ 	/*
 -- 
 2.54.0
 
