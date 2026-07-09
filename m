@@ -1,213 +1,180 @@
-Return-Path: <netdev+bounces-306226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306227-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rr7pEBKfT2rXlAIAu9opvQ
-	(envelope-from <netdev+bounces-306226-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 15:16:02 +0200
+	id sFoYHVqfT2rolAIAu9opvQ
+	(envelope-from <netdev+bounces-306227-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 15:17:14 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F7E773179E
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 15:16:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C4D487317B3
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 15:17:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=0sec.ai header.s=google header.b=0HUpb3ZZ;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306226-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306226-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=gnfLaqb3;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306227-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306227-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ACF66304BBC0
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 13:12:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1C6C9301E23A
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 13:12:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 333F72727E2;
-	Thu,  9 Jul 2026 13:12:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DB7338DF9;
+	Thu,  9 Jul 2026 13:12:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E8F1AA780
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 13:12:33 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783602755; cv=none; b=IudUYEWLcUBvEjvWZ8a88ttR3gQwePDHyyNGnpn7OlW6ff3LmMRHFrSKtOThVN3wgYDFQ0PqJgBsIenDXNO+5unRig4mIDDqBVYs3PihZVD4Eip0ugBU/RXrCk0Q+o1ACvYR7piiOSGPhXlDB9vOau3cvXSX/UMkGVbTdLiNSDI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783602755; c=relaxed/simple;
-	bh=iAyyFv/AQxA40DSCOj6cGXn3go3IfDOrY7GY4Sy9UyA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XPUpT8+2qgOq3dQ/LzGuc0daD9kijNOnXy4uXiTwZWZQ8YFsQp8bnIPcsYqpYOEXKBKYxYZJpT5ZHqOxtG6CB6piYLIRup57oFHkIhD2+HiOxdzSRQifQqNNJ5R9DAp5iHkVZUX6Qtn6dcdphIUbEVvyTCldKw/Ba+1QaYjOLbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=0HUpb3ZZ; arc=none smtp.client-ip=209.85.221.43
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-4720d22c94aso1714620f8f.1
-        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 06:12:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CFEC72623
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 13:12:49 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783602771; cv=pass; b=A93jLA1ZFmRzE9dBMtZN+bxRWM5QskQA+Dyt9hMGZoSZ5+bPljukP10kEQqRNvsQoArVYFKAXECOBvVALXGTei4VuMSV3gjVjxRg1/YUHMCXYVmabwfIrqObtkbVBnTfiUL3sBp85I7QYejiRKHH0IBb+9yMcxa2W8zeAFteJkU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783602771; c=relaxed/simple;
+	bh=LuPyH45JluGUsFbICdv0dPPjeFb1YqiZhn15J0rMzCo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fQrJIIy1Ndvy7MehLpc0NUzZ+A5U3NLdAC5ytFJDuflSDZRTqTiejDiqV09RWQO92upYmVy8F/yFOsDqCWXPCa6NddicNgDmwOaciWjcapPVjfzHdkjXuAh8lCmq/iXcpJMRQa9Kxu48U+bTRweOykkdcyMTNgc/SspWWuhUaaI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gnfLaqb3; arc=pass smtp.client-ip=209.85.128.176
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-80bb8287d99so12900597b3.1
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 06:12:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783602768; cv=none;
+        d=google.com; s=arc-20260327;
+        b=JyOxs44uPaOUByosRpzMTqvsJ495mCBR/4BnZIZoSuyQ4StKBPlTohS1HzX0Z0ypJ6
+         uALTDf76paeGkeUGdw6mWrPe7GhRIqtCBQkKMIVefxlyjUvHI7RQBtVY+MxSrQ40+a5s
+         nEDkkcEBcWwzSZkUgQvlULgiBCkX4WaECUlLrqFtZ+9MeMbbsLnKhK3yYiVJ0na7YJvI
+         quUbMUc3T+2B2Yr9CTNRdBtKYJ2TT1xdMD34GLZbC0plePi1MLgV4jT0jNYxojWK3BzE
+         M+84krmv+UKg10eRUu55fKH5baopZeIy1vXFnFF5x2muefNx9vQlyFk0O1HZ2WOI+GzF
+         AY5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Jjrc/YslrI9jNEKvWNKtjZOydztcYkfUnEU0y2FxQDk=;
+        fh=ROflBGdq8J9NlzpcqtXi6smtlTpQbG5PtzUr7jZdobg=;
+        b=VP90dwAXt25IbPEK0dS17kSshhdFU/CZ1+cWWcdHTuyMIb6edkvj0UcVH19NR6Z7UG
+         SbGXXDvnZMgT0mZZGFKB654qksaVbLoHH3WwPzMrb6HZS19D6W7wiv3uJBzsxMlWCZmn
+         ClCKzndZJr+CuJNsxU8vhSxbR1okLFaQ92yAExPeQcKkTKl/t+e1aX+g+a6YK3HYWYcU
+         gVF/w2d9JtdR/xF+qgj38/ZepjzJaMapMhds2SQ6lNc2MYOzMoWCqM0wZjfz3ZtgOu1o
+         kbkdctR+SMu+4fMhAl5uomOsFEqVX3qY4n6jdL2lAMbRFu7BEH3p8cna9BXKYKWBODRC
+         IJ2A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=0sec.ai; s=google; t=1783602752; x=1784207552; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=H9Bxn/o6bHrATO0mn2uaPiWaqZWNuvOxb6ptBdz4eyg=;
-        b=0HUpb3ZZrqe6jNid3T41CKaPgavGJH2XFVDZpU4OlrkemmGqXwgJg3skM+++7PbJoz
-         lM/OTM5QiCBi7AkhWrErNjiarEbpLIoOl2TPEoy+r24R7peg4IVt39gNKvrY1i/fUO2s
-         zHYhmDod8lllMEPZp7x+E9/yUUr7CqutmJtEW7PzEQejJcDiSDtm/cvnwv2I4B7hSiHw
-         Dj1uGvCdOEqlEdcJnMDrHkyPUE1QXT24Ep8GvRUkfBlhVqoqH3EjJYF/b/ZDGK1FBv2U
-         WQnUgusisLYMbaAqYvcFqtjMnZNp8v0G8nSsm2p8ZkIApxVhGnDmNg6/ytZN1XQeXVNn
-         oUPA==
+        d=gmail.com; s=20251104; t=1783602768; x=1784207568; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=Jjrc/YslrI9jNEKvWNKtjZOydztcYkfUnEU0y2FxQDk=;
+        b=gnfLaqb38pW03UbMgnB+dF4uuRfV7M+sJbi8lH5DjX6CvwHTPejmQygngb2jza3/EQ
+         dG4kPmVVaRw6M3eyDo0R2wjUk1JPrg8y/THDsbpy9qyzGfOnjpK+Cd59OwXmEAvLvgbL
+         9HidmzLrpO/p7h1sOKmG4/xgiY5SwBQH1Rp6Msh9u9Y5dk2h2J8vKCDg4KqaLwFILi1j
+         k7P0d0G1BCzlK9XW2ODBFNtp+fSoUSjJsZHDBvfUQqH4/F8dqylHa+u9is/OPTkrZ5uS
+         2/CTUBULnarjMOgKnTUhOnkOLdIK5Bwo81KjE6JlJF0wNh+iak4B6erPmLA5+dBd5Q8x
+         ylhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783602752; x=1784207552;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=H9Bxn/o6bHrATO0mn2uaPiWaqZWNuvOxb6ptBdz4eyg=;
-        b=MGqSgYfON5+gcuyi3VlQogRVYd2+OcAtewzPr6JnK539sH9RkD6VMJID8HCR9PxqPw
-         MBVZGTJLrLfdILuh4WULFn9lgESsO5u4BBNwa6emQvYie0QoafexJGcozfcZYLtfkQW8
-         +eU68WbkioTqmzm0FKciAW5VEQm4fRUKvzuhlzoUCjbW1DpFDdeqx5KLMQjGoVzK2u+e
-         Bvq9jpIkctnKLB1pBA+KRvYTnW2daiqC1U+7pdH7j4BJ6fTFi8PivwPlX6fx4f6VCX3T
-         M52Ia9XuF3OTaeJ1qDYnz9uqST3J01VlZb0Bte2I7GKjVtOxcTjleAmyRZTHStuWFBXX
-         ROww==
-X-Forwarded-Encrypted: i=1; AHgh+RqSoVaXI1fgD/YVlAPjpP0Csxn83rkQa8ScBZYrhtbIdTTrVNph6DJ7fHSlzQpfPEPsxq50Ew0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyl3b9RxBdvPo453x8Xuf2L5N/LibEoSzcm7/MRJFvy24quSO+t
-	VDO0KjWqpQL5filvNHPycjODZ6WMUltNUhZ70VYGfI5DewH1Idhz8a5ATq6ZwIo2iaQc
-X-Gm-Gg: AfdE7cmJNAze6BP3pIST5jBLKTtSHbJnaYnfG3d0KdSyFH6yFZgth6yxFQCTM+MxLrD
-	ZY+1/3pccMChrIQwHzxZibBxDmN0d3xnei1jpKi+JAob0xgEH4zAFAe85qDf03L93GSk05qgqoR
-	/UycgPClG+VuwJBoeqfs1fZyRy/qjY17OM3GSTXiEkrWU/XtbrsVFx69BNvKhVnwdkt/PUScORe
-	FP529//M4zjI7uVYWgI3Gt32dh+sm+bBJRLyPWL3knorIXY0VU406lS00cH/ICRHZMf+/5uij+J
-	eFn3+jc5QYkbWT7pMoYxKwviEz+H88NkM880YB+C8Ok1PY5qy5I8jJCJckqk+SwRqORBGMTM8EG
-	7Rddu7AZejOTKSU4fcjqT1vBlTpVnRYayv3amlVJwhA6+1PKDrVIuQzy90GwzLLhUM3B2GdYOAp
-	qpS6M8jZ160+72xZKr5HzjhUeBO1PdJ8z2TYuB57O4p2sb7EkUbMDpYS5YFvoQD4dvBhdG7BAmy
-	cJuNrJQ6GlO5O7o7PUxa3o856s43+9yw2w=
-X-Received: by 2002:a05:6000:290b:b0:476:e67a:dfa7 with SMTP id ffacd0b85a97d-47df073b100mr7611503f8f.7.1783602751497;
-        Thu, 09 Jul 2026 06:12:31 -0700 (PDT)
-Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.218.188])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9e4d6da9sm50439168f8f.12.2026.07.09.06.12.30
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 09 Jul 2026 06:12:31 -0700 (PDT)
-From: Doruk Tan Ozturk <doruk@0sec.ai>
-To: david@ixit.cz,
-	oe-linux-nfc@lists.linux.dev
-Cc: horms@kernel.org,
-	david.laight.linux@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Doruk Tan Ozturk <doruk@0sec.ai>
-Subject: [PATCH net v2] nfc: llcp: bound the connect_sn TLV walk to the skb
-Date: Thu,  9 Jul 2026 15:12:29 +0200
-Message-ID: <20260709131229.44477-1-doruk@0sec.ai>
-X-Mailer: git-send-email 2.53.0
+        d=1e100.net; s=20251104; t=1783602768; x=1784207568;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Jjrc/YslrI9jNEKvWNKtjZOydztcYkfUnEU0y2FxQDk=;
+        b=DDO0d49U/NGAhkKc2zmLQCKCG3prjOl6OQxQKqGEl9cbCwnOFI+X0aDpzU6TpxzJQI
+         Ilq9P+K36Ll8YET5C5LxgCmbBTqMi3Kbl1v3hEOJq0rcIrIBilXkea6DBYiAevj1+iFH
+         vNC+AzA8nWwP59se06KiuZGibNiI2vZbLonR6dSuvpXEsFxCoR3x5lk79Ayq85H/9NIv
+         I90b7+qFkGR+7imivhSIS2DDytIiYgQoqHJSEwgor6chSNLPVOOdIPYb/an4SbWKv/yD
+         AQqFdeE7Qai1dVbEqnzSsdOkbBp6lN5GkAFNGbKVYEQ2Ux960zm75CFLPn0f5J4DzRJU
+         KLYg==
+X-Forwarded-Encrypted: i=1; AHgh+Rr32oYu+uOmw7CA4jPkYiHuMKnNpj2TwXl4ZnYZhDGC+hcpd6xz6GRwrG688SsmHWkgrcj/RZQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAGfXt7vnwaf6hwzpGxlK++JiBy+9KWjqtCckkjWUyL2twqqOk
+	jrV65GKRm3mOXEyFWBAJHd/xZk1khJmcDN2sfgHR1+wbbwpdJvWBdP9brkaAd5pFGUXtQB33IFk
+	hC30H53dn4tMa6ITDiKyJ6QOKwkGTZQ0=
+X-Gm-Gg: AfdE7clH5OEzc7ao9zq9iu5owzXQzXPUBDb/V0BYVKEp9lC+JPthkJLyCxRy0wsOY5e
+	yzQDBmGb0vX7f7QWE+pyuc+46tWwtO6SrsuGAzN3IyKENij6405QgHpU0JWxY6LX2tq9AENfvMD
+	vFd6Co8bagzNc+HvB6kXV0kQIxNl8N/3uhdYhDAIjfzp1vJbawe/xa8nScpQv7Nrk4GVg2MH6Vp
+	jRA0VRDhdXuXEaxaeUkG2GVTogJMLWkMNKrBzQEFwluOrpzweJ6sv8ZShv5GwRPFuhIUz0XW4P3
+	YoLBtim7t2Tu3CAoTfEqazqXgqN+2OfcKBcp
+X-Received: by 2002:a05:690c:c0f:b0:80c:1df8:7c14 with SMTP id
+ 00721157ae682-81dbeb5c467mr57573557b3.48.1783602768316; Thu, 09 Jul 2026
+ 06:12:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <2edcb1cd-f2db-4d0c-a0e3-fd2b4dd820fe@redhat.com>
+ <20260707171730.2679013-1-michael.bommarito@gmail.com> <8155514655323d8c4a07da86d2b2ccdd7244c125@linux.dev>
+ <8d735844-dccb-4a65-b7fc-468d144ebc02@kernel.org>
+In-Reply-To: <8d735844-dccb-4a65-b7fc-468d144ebc02@kernel.org>
+From: Michael Bommarito <michael.bommarito@gmail.com>
+Date: Thu, 9 Jul 2026 09:12:37 -0400
+X-Gm-Features: AVVi8CdRFgA4cFXf-n4mZkaXWRsJYRCw57JUJkCLnvRfnyRQQEi4EQVk8jwdwKs
+Message-ID: <CAJJ9bXy29+cwu+Me8WNrf=f4qc=uoXSMCrUG3NJbR-xANJxseA@mail.gmail.com>
+Subject: Re: [PATCH v2] mptcp: only set DATA_FIN when a mapping is present
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: gang.yan@linux.dev, Geliang Tang <geliang@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, mptcp@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Mat Martineau <martineau@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[0sec.ai:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,0sec.ai];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-306226-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:david@ixit.cz,m:oe-linux-nfc@lists.linux.dev,m:horms@kernel.org,m:david.laight.linux@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:doruk@0sec.ai,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
-	DMARC_NA(0.00)[0sec.ai];
-	DKIM_TRACE(0.00)[0sec.ai:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-306227-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:matttbe@kernel.org,m:gang.yan@linux.dev,m:geliang@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:kuba@kernel.org,m:mptcp@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:martineau@kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,0sec.ai:dkim,0sec.ai:mid,0sec.ai:from_mime,0sec.ai:url,0sec.ai:email]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8F7E773179E
+X-Rspamd-Queue-Id: C4D487317B3
 
-Commit 27256cdb290e ("nfc: llcp: bound SNL TLV parsing to the skb and
-add length checks") fixed the unbounded TLV walk in nfc_llcp_recv_snl(),
-and commit d8bd2dedbde5 ("nfc: llcp: fix OOB read and u8 offset wrap in
-TLV parsers") subsequently bounded nfc_llcp_parse_gb_tlv() and
-nfc_llcp_parse_connection_tlv(). One sibling parser sharing the same
-pattern remains unbounded: nfc_llcp_connect_sn().
+On Thu, Jul 9, 2026 at 8:27=E2=80=AFAM Matthieu Baerts <matttbe@kernel.org>=
+ wrote:
 
-nfc_llcp_connect_sn() walks a TLV list, reading a two-byte header
-(type, length) followed by length bytes of value, without checking that
-the two header bytes or the declared length stay within the buffer. It
-returns a pointer to a service name of up to 255 bytes that may point
-past the end of the skb; it is subsequently consumed by memcmp() in
-nfc_llcp_sock_from_sn(). In addition tlv_array_len was computed as
-"skb->len - LLCP_HEADER_SIZE" in size_t, so a CONNECT/CC frame shorter
-than the LLCP header underflows to a huge length and the walk runs far
-past the buffer.
+> By chance, do you have a reproducer? Maybe using Packetdrill with MPTCP
+> support? [1]
+> If not, how did you discover this issue?
 
-nfc_llcp_connect_sn() is reachable from nfc_llcp_recv_connect() and
-nfc_llcp_recv_cc(), i.e. from received CONNECT and CC PDUs. A nearby
-NFC device can reach this without authentication; LLCP link activation
-happens automatically after NFC-DEP, and the nfc_llcp_rx_skb()
-dispatcher applies no minimum-length guard.
+Yup, I'll send to you offlist.  It's a custom Python/TUN/qemu setup,
+not Packetdrill, but I'm guessing it could be ported or extended for
+testing/fuzzing.
 
-Walk the TLV list by pointer, bounded by skb_tail_pointer(skb), and
-validate each declared length before use, matching the approach already
-used for nfc_llcp_recv_snl(). Starting the walk at
-&skb->data[LLCP_HEADER_SIZE] against the tail pointer also removes the
-size_t underflow for short frames.
+I discovered it with my homegrown agentic stack, which is a Rube
+Goldberg machine full of various tools (like cocci, semgrep) and
+knowledge graphs (built with libclang).  The agent logs suggest that
+it came from a family of rules that surfaces suspicious struct init
+candidates, which I can share too.
 
-Found by 0sec automated security-research tooling (https://0sec.ai).
+> If I may add, please also send new version in a separate thread, not as
+> a reply, not to confuse various tools, as mentioned in the same doc.
 
-Fixes: d646960f7986 ("NFC: Initial LLCP support")
-Cc: stable@vger.kernel.org
-Assisted-by: 0sec:claude-opus-4-8
-Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
----
-v2: drop the nfc_llcp_parse_gb_tlv() and nfc_llcp_parse_connection_tlv()
-    hunks - fixed independently by d8bd2dedbde5. This resend covers only
-    the still-unbounded nfc_llcp_connect_sn().
-v1: https://lore.kernel.org/netdev/20260705113505 net/nfc/llcp_core.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Sure, thanks to both you and Gang for the feedback.  I'll send a v3
+based on your suggestions later today.
 
-diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
-index aed5fe1afef0..0de20279e046 100644
---- a/net/nfc/llcp_core.c
-+++ b/net/nfc/llcp_core.c
-@@ -849,13 +849,16 @@ static struct nfc_llcp_sock *nfc_llcp_sock_get_sn(struct nfc_llcp_local *local,
- static const u8 *nfc_llcp_connect_sn(const struct sk_buff *skb, size_t *sn_len)
- {
- 	u8 type, length;
--	const u8 *tlv = &skb->data[2];
--	size_t tlv_array_len = skb->len - LLCP_HEADER_SIZE, offset = 0;
-+	const u8 *tlv = &skb->data[LLCP_HEADER_SIZE];
-+	const u8 *tlv_end = skb_tail_pointer(skb);
- 
--	while (offset < tlv_array_len) {
-+	while (tlv + 2 < tlv_end) {
- 		type = tlv[0];
- 		length = tlv[1];
- 
-+		if (tlv + 2 + length > tlv_end)
-+			break;
-+
- 		pr_debug("type 0x%x length %d\n", type, length);
- 
- 		if (type == LLCP_TLV_SN) {
-@@ -863,7 +866,6 @@ static const u8 *nfc_llcp_connect_sn(const struct sk_buff *skb, size_t *sn_len)
- 			return &tlv[2];
- 		}
- 
--		offset += length + 2;
- 		tlv += length + 2;
- 	}
- 
--- 
-2.43.0
-
+Thanks,
+Mike
 
