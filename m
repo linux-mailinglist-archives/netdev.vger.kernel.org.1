@@ -1,317 +1,172 @@
-Return-Path: <netdev+bounces-306120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306121-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mM68EextT2pSggIAu9opvQ
-	(envelope-from <netdev+bounces-306120-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:46:20 +0200
+	id peJREL5sT2oNggIAu9opvQ
+	(envelope-from <netdev+bounces-306121-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:41:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FE4A72F1AC
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:46:19 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 963DC72F0FC
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:41:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=mVRC4o0o;
-	dmarc=pass (policy=none) header.from=intel.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306120-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306120-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=blackwall.org header.s=google header.b=bHlLYMlA;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306121-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306121-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7951A3014650
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:39:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9D45B302A709
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:41:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA783EDE5D;
-	Thu,  9 Jul 2026 09:39:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE5093F0747;
+	Thu,  9 Jul 2026 09:41:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 925033F077F
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 09:39:01 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783589943; cv=fail; b=jrLJG6BtfoLlLZLuWwTpdoy5/NLRbD6o9mH5gxcrEPuR66yYbhCiUosM1k2wzDWi8LJQNBTtBJiXF1uuLmJfgn73SwbsfqbLgU4gBEPeZ/V05ffIQo9QOu3l2ltcRIKniqjwiVXxte+sOuJQQq75jeH+5zlzbzfACa2diOi5dGs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783589943; c=relaxed/simple;
-	bh=XDRjPVNt0zg4GUuEGj+SIkFCQW3s1ORMuYR417QTFtg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=L2ABZU7z+KH6Yd0g+1IVsalJk0s7B5iLfCRFzpqldrbyMmEQk3R+aQJEtH1pKhebuMc71U39mDymYAFWbpvpbKFZcACzk3rQmE0Y/D99152zAok2SRlHPWjxC0XrCrCMPNRG4Q1RV29BCQhqgV4ua1j7TINagglSJAUJat6KyX8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mVRC4o0o; arc=fail smtp.client-ip=198.175.65.16
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1783589942; x=1815125942;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=XDRjPVNt0zg4GUuEGj+SIkFCQW3s1ORMuYR417QTFtg=;
-  b=mVRC4o0oHSpgn91+E7qcTxImyH4luC/y61JJMa4sEaSolZG5I0QUsJpD
-   xoSTzCViXXs0EmDzFF4H2dYJmnQ57rJCwGvWpn8bWxbPBj9PKPYemXgon
-   /hCnV1A4n4hq+VPh80LCQa+wTBU++OkdwN3xO9DIQPusRIeMCPi9evFBm
-   FnDrViRIf+H2LFI37j+70Lt6rpb6BGR5HLF8P06cxChrckHSRUCASkOA1
-   Kom63AHWLmhRGCacmAW4EDmlhJSqY0lJySvpSZRcANdFzzQX+H7gaj6c7
-   D8A/uFmOBm16CIK1uN/UaJ5afXYlIekRtLHnv3rsyGvdidFfy6ktwFZz8
-   Q==;
-X-CSE-ConnectionGUID: UaKksoACQJyXlmtuDJajog==
-X-CSE-MsgGUID: YXphUNh+RG+sjxVW1Z7hKw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="84458960"
-X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="84458960"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2026 02:39:01 -0700
-X-CSE-ConnectionGUID: KZOwdekaRpOeNvBH6vwIyg==
-X-CSE-MsgGUID: ITdOBFlhSc6b6vqyq3bTxQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="258403765"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2026 02:39:01 -0700
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Thu, 9 Jul 2026 02:39:00 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43 via Frontend Transport; Thu, 9 Jul 2026 02:39:00 -0700
-Received: from BL2PR02CU003.outbound.protection.outlook.com (52.101.52.71) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Thu, 9 Jul 2026 02:39:00 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=T7Pn8Kem19/MuDXZBrhPNfPz3q1XrpUrm7jN8wCXx+/Eeieos7kkPLDIjjyNNJ03+Y3AjRYhFZAQn2kZkJ47Vyv04IU0tQoUrUb8bQv7FI33vlh8JNW061cJXZZwVASOP748Ww9fb9yYLNmXyFbZCLIoEyQJ4LAJYK146oDaZBG9VR8aQ8f0NVPvzPuN5uixNLrcZvhtAeANSd9kk6AB6Ty7ncen0mhPs41RqXLdHOTGEE8CGr8ktKLzOiJolsuMGkoiPHnnfYkdQgvRnXOQaZRO+1g6XUOD32aQoGuPKrKN7dHnP0HbBCTHhm5sUwupISVJvORVWeqc5MJq25i3Iw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kUY0PJS4oeQF+Ux/gHRlxZC088DW8/C3E+hvnw+4qms=;
- b=bmRLailgiuOaj1rUhSNa3hEqqotFpJRb4B+uwzhQ1onhxN4LgSGAuYHb5t51zxzOJcnWc3T7BiqRYHMTvqvxsannrsbupndrN3BOT0I6En6/rqQuuKxoCSSbYv3pFxCdl/rqml9ScXFN4YJhLDONaZ4UTld1mA2mIFd+2zyA7mMgG1AJQzyAdJMqzFS7jGmNPRkeGu10WaoJ7A13OLIRaLuJVY8wojEmVnKSJBJfz0odAQjnq/+15uCFdDH3HjsQXSdMO4RV8t/2KM2iLffA25eEPmQ+TXTAtpTAyBvlvqOk1xWwLDSnpBrJqvTlhq6lGhE1lR/ATc0hQVMoaTP9kw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB5902.namprd11.prod.outlook.com (2603:10b6:510:14d::19)
- by IA3PR11MB9422.namprd11.prod.outlook.com (2603:10b6:208:57e::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.15; Thu, 9 Jul
- 2026 09:38:57 +0000
-Received: from PH0PR11MB5902.namprd11.prod.outlook.com
- ([fe80::f95a:602a:34d3:5d37]) by PH0PR11MB5902.namprd11.prod.outlook.com
- ([fe80::f95a:602a:34d3:5d37%5]) with mapi id 15.21.0181.009; Thu, 9 Jul 2026
- 09:38:57 +0000
-From: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
-To: Simon Horman <horms@kernel.org>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: RE: [PATCH iwl-next v1 6/6] ixgbe: take rtnl lock before
- ixgbe_reset() is called
-Thread-Topic: [PATCH iwl-next v1 6/6] ixgbe: take rtnl lock before
- ixgbe_reset() is called
-Thread-Index: AQHdCgYnAuIsRaY0CkOC+ZL6oGfljrZj4xiAgAEV/eA=
-Date: Thu, 9 Jul 2026 09:38:57 +0000
-Message-ID: <PH0PR11MB5902025B1C50243414D0840EF0FE2@PH0PR11MB5902.namprd11.prod.outlook.com>
-References: <20260702091553.57112-7-jedrzej.jagielski@intel.com>
- <20260708170235.1514479-1-horms@kernel.org>
-In-Reply-To: <20260708170235.1514479-1-horms@kernel.org>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB5902:EE_|IA3PR11MB9422:EE_
-x-ms-office365-filtering-correlation-id: f102e103-7de3-42f4-e0bf-08dedd9de66b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|23010399003|376014|366016|1800799024|38070700021|4143699003|5023799004|11063799006|56012099006|6133799003|18002099003|22082099003;
-x-microsoft-antispam-message-info: AaRghoLq89bFlA3jSV+nMnIFZqqZFm02930e8lMRtQtYHYyUQIQ5zDpqDKddXtmNs/y+JkV/Pg2225Nje4bFnH7/neitnL6Q0F/81y4cmTI9VYBCVUazCEwgJu9ksLbpvBfcpGpXwdO7CQIWkmCelZrh4jGB/0gIOjuupA0dY40Vye3yBkDYRghmX/WcUXsaycPmzqzl19R8cjxFcPqFiviYDjqQr4PIPY74hF2Gc0KERp/g82oFe3id77NgNuqR6+ncbSfjSd/ymRNs4YK+s9ykx40/7hV9qttFOSoDQtrPYykMmww4dfymwINCSZPxEIvbuYtcWya/H/5dfP3VaHp+n1WNu14s/tdulWx0RMpPBlLvAvnv1XPYQF+O+s74lnElZZPQMlJuHmmM1qMH4p9e66wAJ6lCQIFP1eOKvseb7pqIlrK6KXNpf8JzU8g24RkHa60Bxk849/eBKeNsOKkD1QmnRp0r3+BaSJpTLTkmxeXM0gkZMjtpKVV8ZIY2WSApK2y35ODF8UoOKXgaOYqvh3Jgdjt6fDSOfGlA7v5gu9wUXZU8//fooX0eoIedS9ZiaVijf5lFOSeHrTuw+/WhCGvZy8bxMtW6C0BSngykpO2MqXyfw/vIW75TVxhPQlNnPCZ7pIoYGnM9QnXKhxC2PaUY1wKkS4T8dJNWosU=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5902.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(366016)(1800799024)(38070700021)(4143699003)(5023799004)(11063799006)(56012099006)(6133799003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?RD11KgMKdJLDf/J57G8nncolG/yYVXeLvV7eZTBd4WLYHvgQK+3QpDg8X2Dq?=
- =?us-ascii?Q?th+hRSO/4zW5tjh9fqLexV6jRyz+eV8n62XnV37WaDgonDjmJkhkl6U6o0h0?=
- =?us-ascii?Q?VKF/GBGsjCZ2FPmMnojF4oPIdhU/cGdGE932jxwOGeTGaGeslwklWyCbuIBB?=
- =?us-ascii?Q?hNc4lq3xoOz6bpVp8Ytb0Jr8/RrupqA6N21Bt2HompeWMFPwQSKUP2lNUN2u?=
- =?us-ascii?Q?mYJuo7B1vfcywmj/fSMCF39ISmXdkR10W86Gpo4jMr4q/FJXsYUz1E9fkAjp?=
- =?us-ascii?Q?FnpurpzOosnxgNyaJaGFt47YfqRkBys2YAanFaoyxTNSEeZyjilvaT4Y8NPI?=
- =?us-ascii?Q?A3asikVqzItaO33xXz1RqnOwxbXKCRl18cdCGmlOhQFPN7pXMdKutuD5Q2Xt?=
- =?us-ascii?Q?mFHoDhEnyt4C2mQfOa3EVNGjcf65rx3ERyCiXkA+VqG4GtDiQ9ghzUoipBAC?=
- =?us-ascii?Q?bijjXHgx/DfsObcgZfxUZ1CiBfRbwjvx1JdlBDUaqaNRv+8sFFTOpr9Q5oac?=
- =?us-ascii?Q?bFy3/NsI2+cKwvUjxLGVqi8v1eixDEQj4OC0rVxVgap14V90m8DZBnaGhY7N?=
- =?us-ascii?Q?Mmx7E7gbDUnYsHVl2QExM5cPRL8MQ1gmpJgON6+spzvLlMtItEd7J+wZg09U?=
- =?us-ascii?Q?T+X7IcVyRnvZ7QuQebatYS4i/K3u4SMp4WeG1HaGGI1Dl9m+sqtcuXapuifK?=
- =?us-ascii?Q?LT1TGVWBvxS2+4bGTz1BbWeROy645LmWl/CcY9d2ICrVCiiPY+dMiUvoWDMO?=
- =?us-ascii?Q?WhN+45lJo8e0LlBcL9VOCO8kMzl0/Sjf/OzOBKFPsV9kV6rwbHnNpGkW+9cU?=
- =?us-ascii?Q?N3E19rB/QyE9ibNzJvSD+mb9X141LUzcn/g2VVmnlTX92OHFSTmrYVqmGTmX?=
- =?us-ascii?Q?Y86due5ZORLT5+a/pyGszTmEjyOs7Mc6v50A6WJ0j/Lu2/+rXAaV0fhxm9fJ?=
- =?us-ascii?Q?NmWv2HAzeDIwzCQdWSoAfkuRzoMbcvmfBUyGZVuBJ4EZ5mxf7V8omMNt5oe4?=
- =?us-ascii?Q?sor9b3/VMEatrqbC3hMqWhzqN6GADOskmpewTmVAxQDnN13AKQDUcMQYVsbY?=
- =?us-ascii?Q?P0ijnsZQ1ZuWPPVAjt/iPxvyAVSm8C2T7bwHNNz+YwlBEOAZJIJ4PYhaLAvD?=
- =?us-ascii?Q?m26El8GA/yeNYb0CnIdFMDi4KtVwhOuk2w50aapHplwPx098FvGTOfwe8UdH?=
- =?us-ascii?Q?kerVPz470yMkjRBFUS6qAMcUXzImTfJA91l3vqcmIOvqdrzfaVLyF0e1g8wW?=
- =?us-ascii?Q?toYcy+gRrtRtl/ThBBW1QWRYI1mlUvTU/HbzZdmRexkkH8rtXy7UOPoPEzQe?=
- =?us-ascii?Q?lzHp4hooKnF9mbcjTeOTG7JHazEPjKEi5Ja4dH1u+cKJCEUrCUtvnopKf5JU?=
- =?us-ascii?Q?eLYb4vQf/P4LdtZnwBkGtOpzwkIEWnXf/RW1yKLzrPv5NS0xQacQAk24vM7u?=
- =?us-ascii?Q?bJxSDkbN2zSqmg34G5L6E8rrBnMavhmhjKKvQ4FC9ipMjZqD9Uu6DbGaguK0?=
- =?us-ascii?Q?3uVdfkTkYLC3O93KgYIMU1NOSejvyUQtTkF966I4ydAGtIO65KTZN6vyLIjx?=
- =?us-ascii?Q?arZ1+FqhiAzmc70aUa9l4okgkso94R1cXESiGdUq/51JB7xnLCfTs65MI/T5?=
- =?us-ascii?Q?NUiOE3qF478122mmiTD99Pi+iHyyiRM0hno0KyqtnU+ohi5Bl2UPQHwqeCL1?=
- =?us-ascii?Q?rFKCWj38vMXOe3aITVIrDqIxu1LgaWgEYOOSfEzRev3Bi90sVHHbSNcgNujI?=
- =?us-ascii?Q?XbEzFvBlNg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E7A3A718D
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 09:41:12 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783590073; cv=none; b=Tyulnuc35qT8vXdrjRZk7tTlnVB+PzdrvNijMhoiTDDbkoyk1aNMq8BWc77DEkrPSwmWh2oN1Tdt8R1AND3ESs0cczjOj5FmJeq6miyKhngajBx6cfgriBqzKLXWwFQ2PiXF2N3Me37uI1rS3B2bskGC012qDS9bOlTQBiFE5dg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783590073; c=relaxed/simple;
+	bh=/8dM9Z/CoF2L+7WNN7ITyoWlNjxyJTQlQwpQFvzkRD4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W8rGYMBzPJrEKlxkZgzAZqCMQFWAM0a850CyKvH8eq0H6xmmHlL7AA1uEvkjJXR529o2MewTS6LLFvvOGxSPVsPtBkM1XrLq2aNvgVgFnUHWg+iJS6SJdftN6xrAyCJTsf//Rc5pQsFUw1SuqnbWAZ+rW3TSMtGO38LjVkKCIV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=bHlLYMlA; arc=none smtp.client-ip=209.85.221.43
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-47d70879764so1149193f8f.2
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 02:41:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall.org; s=google; t=1783590071; x=1784194871; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=dpTA2UFoD8jIxn6LzSQQQ69wwcU0vV5c/nqe3IqCP2Q=;
+        b=bHlLYMlA01yrqUn3lbkHsAWJZqpwk1UZDwK8Bw5YvT6lxRpIp0fpuLQrnCwIPH6lfh
+         ovPDY6HKKTQwYLOyk2BKxioyQi/cplgljqxi5Ruoai5QrO2GfBX2V3w3SpvuHtgRsnCG
+         G2evJzQRqm4J7HeC0/AuDNfGuPhgdxYj8kogvU09jnds9i6gTmnAR13TS9zm7v3q1l3o
+         4fhFmnaDnxeyENix52Yi7W2RmJDLhwLv4ztwhuGJ3SA6OkVmqViUi8oCC1KeBlfxMZOf
+         PiwPF3F2YRa2WVzoBX61C+/ydkBUEUb+wth9WphBgpkdBG9kup0JiY30TUpHKN+jIKIZ
+         A5Ew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783590071; x=1784194871;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=dpTA2UFoD8jIxn6LzSQQQ69wwcU0vV5c/nqe3IqCP2Q=;
+        b=F3ewENbsTiBfHH/5Y5WkygMU7qe1ou6wm8W3rLse+lPUczcjsGo7sXOKrIwMhd2jaY
+         w3F2ebFx9PHdcqXsVavkPaQYqC4IkI+B8cS/Db5wF37LDDzNMzxH6PQVJgnR1F4Cd2Ph
+         HMyEOiI/UL93xlvAME5qNCJgaqQa3YJL1U2ZCxYpclTBhMsqhJpkI+emnLF1TtcnFWoe
+         4pwmxtiEKfi5qiIOeFTdWBjw2GrSEhqP4roZM5ZR1ucRj7NfeYgEvwyDiHrGdT8Zg9bH
+         xFkN3JqnlDi3creRCS9RkUmP7HPDWnolVvwyNDGZmgmZIVUgi7zJ9KoCPjjqMUQFXQpy
+         Fvmg==
+X-Gm-Message-State: AOJu0YxQWOniWCO8zi1YpJF2ae3sr2x7UBEhj9tB9HVO5eN8lz3cT1u4
+	17HAa7vLR7T8jbROjBxqhZc/qjzYIgU3z2UDwIJosxIe1CZT8GRBiuAJimQ8FcM2J8o=
+X-Gm-Gg: AfdE7cm7mL3hRdUchvqSCkzJfX3qS10U2j27s1AUZ6LBUP0bkrMq2Vki6Q3TYh4jlM1
+	aLgiu20mRKTSugxcwZeiVgvGNFTLTqxC38Gjm/ED+vtMzFOkpI6x0wFQ26Rqk7p1HpHmgGilE3g
+	ZD0zIuubd1Zbd7qNgrVwjwrAeMerWtETOlqATUL7fQCqGcRMZgrpBiBlegNfqWzrNsDdzUaPatF
+	b+6l5DSpn8ysj50Zck8AiD6kLWIoQlPHAi/mOYN3998uVwrtuUBnDn91Nhvn6p8bpSfSB9muG9H
+	zNPhaJtvQJBT/pfxcORBAsjE7VE/IGKb9OsC1pqVHIFYNa1chRpLhnvoWeV8CK3BotjRasPPxKw
+	g6oeaPzb4XB9qjQIc0T0kpeyidUNaLQ+4sCEz0cW5UfLDpHpcRrMTVsG3z6ok1A1FAAqKnI2jYa
+	nkkjkNGAOHhUwfPPt4KzafFiZAcxcwK9KQD0BPcI2kWG8BJMoSLpzCgA==
+X-Received: by 2002:a05:6000:2407:b0:475:f100:3604 with SMTP id ffacd0b85a97d-47df081ba52mr7354428f8f.51.1783590070132;
+        Thu, 09 Jul 2026 02:41:10 -0700 (PDT)
+Received: from [192.168.0.161] (78-154-15-182.ip.btc-net.bg. [78.154.15.182])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9de1d8f1sm50701835f8f.3.2026.07.09.02.41.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jul 2026 02:41:09 -0700 (PDT)
+Message-ID: <b0f45a47-ef6f-43df-9738-67b28df1891d@blackwall.org>
+Date: Thu, 9 Jul 2026 12:41:08 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: q3SDWl0JqSTJJlyDejToA0RBDYX+tjHQUEQOyT6eDhDT/MhTNXOF9t+w5FHe/nDedt14qTgA2D/2UDWBacjEtW5xCM2no3p+TeekoFKUchzHAoUkXGPaFuQMkmQ1X/v5WOmRF/1eOCnOlYCjGPnB5xBxBCTYpcufjw+8rIdqTrjXeq85h42TLHOZvsErDYoNmEzQeiiRk7oyC/O3M3ckiumZBpw17geLw069W49jE6337QfLPQareoXlqVt1Ye9fUraZxE4DdqXK7Pp39HJQkZTaV50TmXepikz4RhIUwNFXqJYddIUAgyL4vFEY/kM4j1+OKhrQjSPoIZBLegBbtA==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5902.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f102e103-7de3-42f4-e0bf-08dedd9de66b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jul 2026 09:38:57.8545
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: UfrVdL6PXCF2/Da1ZIbmO6I1eH6HxmyR6G3BsyBxChpa8Wnl5VPxtcGXc/MCHw46Y8Yg7F1Vh6YU5WqmnVWL/r77Utv8kzemdw6rDnv24bg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR11MB9422
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 nf-next 1/7] bridge: Add filling forward path from
+ port to port
+Content-Language: en-US, bg
+To: Eric Woudstra <ericwouds@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Pablo Neira Ayuso <pablo@netfilter.org>,
+ Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+ Ido Schimmel <idosch@nvidia.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Stanislav Fomichev <sdf.kernel@gmail.com>,
+ Samiullah Khawaja <skhawaja@google.com>, Hangbin Liu <liuhangbin@gmail.com>,
+ Krishna Kumar <krikku@gmail.com>, Martin Karsten <mkarsten@uwaterloo.ca>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ bridge@lists.linux.dev
+References: <20260707091045.967678-1-ericwouds@gmail.com>
+ <20260707091045.967678-2-ericwouds@gmail.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20260707091045.967678-2-ericwouds@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306120-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:intel-wired-lan@lists.osuosl.org,m:anthony.l.nguyen@intel.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:from_mime,intel.com:dkim,sashiko.dev:url,PH0PR11MB5902.namprd11.prod.outlook.com:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FORGED_SENDER(0.00)[jedrzej.jagielski@intel.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCPT_COUNT_THREE(0.00)[4];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jedrzej.jagielski@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:ericwouds@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:idosch@nvidia.com,m:kuniyu@google.com,m:sdf.kernel@gmail.com,m:skhawaja@google.com,m:liuhangbin@gmail.com,m:krikku@gmail.com,m:mkarsten@uwaterloo.ca,m:netdev@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:bridge@lists.linux.dev,m:andrew@lunn.ch,m:sdfkernel@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,netfilter.org,strlen.de,nwl.cc,nvidia.com,uwaterloo.ca];
+	DMARC_NA(0.00)[blackwall.org];
+	FORGED_SENDER(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306121-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[blackwall.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8FE4A72F1AC
+X-Rspamd-Queue-Id: 963DC72F0FC
 
-From: Simon Horman <horms@kernel.org>=20
-Sent: Wednesday, July 8, 2026 7:03 PM
+On 07/07/2026 12:10, Eric Woudstra wrote:
+> If a port is passed as argument instead of the master, then:
+> 
+> At br_fill_forward_path(): find the master and use it to fill the
+> forward path.
+> 
+> At br_vlan_fill_forward_path_pvid(): lookup vlan group from port
+> instead.
+> 
+> Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+> ---
+>   net/bridge/br_device.c  | 19 ++++++++++++++-----
+>   net/bridge/br_private.h |  2 ++
+>   net/bridge/br_vlan.c    |  6 +++++-
+>   3 files changed, 21 insertions(+), 6 deletions(-)
+> 
 
->This is an AI-generated review of your patch. The human sending this
->email has considered the AI review valid, or at least plausible.
->Full review at: https://sashiko.dev
->---
->ixgbe: take rtnl lock before ixgbe_reset() is called
->
->Previous commit introduced ixgbe_mac_addr_refresh which touches netdev
->struct by updating mac addr. It should operate after taking rtnl lock.
->One of the callers is ixgbe_reset(). Most of scenarios when ixgbe_reset()
->is called met taking lock requirement, but there is a ixgbe_resume() path
->which calls ixgbe_reset() -> ixgbe_mac_addr_refresh() without taking
->the lock. So there is a risk of race.
->
->Move rtnl_lock() before ixgbe_reset() is called.
->
->> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net=
-/ethernet/intel/ixgbe/ixgbe_main.c
->> index eb05c2f982e8e..aa5a61f95d883 100644
->> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
->> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
->> @@ -7535,11 +7535,11 @@ static int ixgbe_resume(struct device *dev_d)
->> =20
->>  	device_wakeup_disable(dev_d);
->> =20
->> +	rtnl_lock();
->>  	ixgbe_reset(adapter);
->
->[Severity: High]
->This patch fixes the missing rtnl_lock() in ixgbe_resume(), but is this fi=
-x=20
->incomplete?=20
+Just FYI please see my reply [1] to Pablo's email about this patch. I think
+there might be a problem that needs to be fixed.
 
-That;s the only missing path that really matters
+Cheers,
+  Nik
 
->
->It looks like there are still other paths that call ixgbe_reset() without=
-=20
->acquiring rtnl_lock(), which would trigger the same race condition and=20
->ASSERT_RTNL() warning on the MAC address update.=20
->
->For example, the PCI error recovery handler calls it directly:
->
->ixgbe_io_slot_reset() {
->	...
->	ixgbe_reset(adapter);
->	...
->}
->
->And the service task can also call it without rtnl_lock():
->
->ixgbe_handle_fw_event() {
->	...
->	ixgbe_down(adapter); /* calls ixgbe_reset() */
->	...
->}
-
-With un-attached netdev i believe there in rather no chance to race even
-if mac addr refresh would be conducted during pci error recovery
-
->
->[Severity: High]
->This isn't a bug introduced by this patch, but does ixgbe_reset() also mod=
-ify=20
->the unicast address list without the required lock?
->
->ixgbe_reset() directly calls __dev_uc_unsync(netdev, NULL) which iterates=
-=20
->over and modifies the dev->uc address list. However, __dev_uc_unsync() is =
-a=20
->lockless helper that expects the caller to hold netif_addr_lock_bh(netdev)=
-.=20
->
->Since the callers of ixgbe_reset() only hold rtnl_lock() (or no lock),=20
->could this cause list corruption or use-after-free if the device resets=20
->concurrently with unicast address modifications?
->
->[Severity: High]
->This is a pre-existing issue, but does ixgbe_reset() use an ad-hoc=20
->synchronization mechanism instead of standard primitives?
->
->Inside ixgbe_reset():
->
->	/* lock SFP init bit to prevent race conditions with the watchdog */
->	while (test_and_set_bit(__IXGBE_IN_SFP_INIT, &adapter->state))
->		usleep_range(1000, 2000);
->
->Reimplementing a lock with test_and_set_bit() and usleep_range() lacks=20
->deadlock detection (lockdep visibility), priority inheritance, and fairnes=
-s.=20
->
->Should this use a proper mutex or spinlock instead of spinning on a bit fl=
-ag?
->
->> =20
->>  	IXGBE_WRITE_REG(&adapter->hw, IXGBE_WUS, ~0);
->> =20
->> -	rtnl_lock();
->>  	err =3D ixgbe_init_interrupt_scheme(adapter);
+[1] https://lore.kernel.org/netdev/b0774436-bc41-462f-820b-6a037b6082bb@blackwall.org/T/#mfbfb071107713d420bf26c060b1b980b270ab172
 
 
-Both above notes relate to the already existing findings which i believe sh=
-ould
-not block this series since it touches different side of the driver. Addres=
-ing
-these notes would require service task refactor
 
