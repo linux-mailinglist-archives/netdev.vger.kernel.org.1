@@ -1,219 +1,219 @@
-Return-Path: <netdev+bounces-306027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306028-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id r2qsLFoCT2rbYwIAu9opvQ
-	(envelope-from <netdev+bounces-306027-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 04:07:22 +0200
+	id iKirNLoHT2pzZQIAu9opvQ
+	(envelope-from <netdev+bounces-306028-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 04:30:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4996572BDAB
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 04:07:22 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FB0172BF1A
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 04:30:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Ma4wp730;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306027-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306027-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=onsemi.com header.s=mimecast20250127 header.b=Duipelcg;
+	dmarc=pass (policy=reject) header.from=onsemi.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306028-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306028-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AC319301C420
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 02:07:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B865330478E0
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 02:29:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FACA314B6E;
-	Thu,  9 Jul 2026 02:07:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90BF7330337;
+	Thu,  9 Jul 2026 02:29:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from usb-smtp-delivery-120.mimecast.com (usb-smtp-delivery-120.mimecast.com [170.10.153.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B685630E0E9
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 02:07:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED6C2E06E4
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 02:29:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783562841; cv=none; b=UgcyDLcztc/LcRMhHMF8/BWhlu++l+CzC0nlc9rhdRwVc5Gq3b27beY918kDymCqdrN/u4EbzcjSewVV4Oy7utGbB4JU76rS7eAP2vb92f7kUb5+w/lk+1yhT5KWVcUOGOheoA/xLO2lofUYZoTn7TeYjnyF8q/98ht7et3C/Go=
+	t=1783564182; cv=none; b=PKFRTj94u6U/O4aCd6Ffg3swTqRoTqfat7XeYvHrvQmLxLFMQd0Bum309lKzWzHj3P05YxRCgh3sl4Xg0rM79MutXjV0bXMPRrCHZ/L4FeELZStXmRWKanEf7cYSfbA5U0bbuKfch23yBFYsJLzsjxVqAOlwSoVldmWe+LExhtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783562841; c=relaxed/simple;
-	bh=PoPEUr6KS0Je/aVdiGP+sFxqtUXWh++lbWgpLTbivR8=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=XD3JvOlbLzPayRTAsTclziYyF4eVB7W79GQOeUrsuomXSEW9tRTrFo5r+KJyFRF/K2AIRWu7iMLJ/okNiGqMcW+1gA8U5sxQkiYixBUv6Rp6LGd72rYQ9vhYhUq9TAEoL3lTXvQXK5cV32GfsxS4g0KgegNLKYArQAM7LocAdI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ma4wp730; arc=none smtp.client-ip=209.85.128.170
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-80cbb0688c8so21107487b3.1
-        for <netdev@vger.kernel.org>; Wed, 08 Jul 2026 19:07:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783562839; x=1784167639; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:subject
-         :references:in-reply-to:message-id:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=DiPeyVYQaEiVqx7WKQEaIVABISxwCwD67P0r37Z1zdw=;
-        b=Ma4wp730Sv4nNZnOHmCCC5/vyV55tWljs0zgQoSeoykBlsnAflLTdnjsTTDuGU2Wnf
-         CQs0kQSNDkM042f9UhB3aPhz+i9u6QV5+Zxfm4hWJAfwhNpr2wjbWo2C/jlW9OeQ+VBx
-         7pzOfEYDvgpN3PJ3vPPK6j2yXNx8JiD1io3b18sTdsoAr0w0IJegiKmPXdNSOOyfnw95
-         Ck+wyXHkH8jP7lP9CaDWkwH7xU6T0Ss6CmlHXzDKvgYtyLs0imYvY/BKEsHdzQgsDXT4
-         O8GnH1tn/cnijR8c9ypE/5pHaq6badb5OxaW5oR8dZsaQECB3zGSjJ+n/F5cI9FVunJe
-         osmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783562839; x=1784167639;
-        h=content-transfer-encoding:content-type:mime-version:subject
-         :references:in-reply-to:message-id:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=DiPeyVYQaEiVqx7WKQEaIVABISxwCwD67P0r37Z1zdw=;
-        b=JhBcJeYt96lZtUFOwURSiiJ9aOGKLbdKrhKujLlwbFiG3BdPI0PNOLRxxyZbNFNz8H
-         HRYlBmNFZ66YxDT+nkcUwn+vw6qWcAiRMfk3LCw2e/HMqmwk7bFb1570HNf4x2Vvawlr
-         /ju3RpoH8onOzBmyu5ssqdO2WWRqyDZCc8Mvt6ZauAWTg8987eyN2UgOw3vfVRV1vATy
-         xvwNBD9YnlqXxVgpwHBWGWKSfXPfkknePUGhpAM2/rm56L3UIME54rN3ggTo/ddrMDQu
-         K97TSgQLZIwdEgSJ/abh8DSYOjuF3ySe642HsQlJsmEEHOI1JxVZcxJHtE1cpNmHMPEJ
-         5etg==
-X-Forwarded-Encrypted: i=1; AHgh+RrpJctQO08rkGXy9A6/WQFRAKLdmY99Iu7sVosQj57STZHRpXQcpI3oD8YMLeg5D5CUoFi8BqI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVA7moRo5lGgCn7ZUzT8No9mkEJblppQKDGSC0OSRoZS/B4TvE
-	QTIJzchblwOcrN9sS1+9zLEX9E7jROGzfA0zKlW5gja9YWB5/OdnQVnq
-X-Gm-Gg: AfdE7cmCc/+xhysm+/zgD6sj2zEm6VTolzwNUXiHu8VOii/XYukAUxuYKss2reegrWx
-	4YanEtJbt34o/B1zRXPMc6dJZydR8h929V50EhcN7ayri8yHANKXlDA+dcLNGJVAWWtTfEioMCe
-	Up12UMDTCKPCpsKkaOc+Sxek83DjN/1drpHkx9yGGpavbgSvbrxVm9TwluEkyweoGDyxlRWaXeI
-	2ONolKb3cqxZQOpIzoaZ+Is2xnypjKviHDCm4cWI3hLfCuqyT2eUhVENHIq6KiGmpt644M9s5gK
-	/0Xr2yf7dJTA0GEX5AKS4ZV4rwO4Ema1tYtjVfohJ4P9jQXPI0BBxzfdSpHQJQCSFE5oSjofq7I
-	YJzFO7mrdTCL9XrsRHA4WrlNf5SquviQuJMex9/KEON1GdRuuJ/pliJ50a0wFhRca/twdOdAU8P
-	H/pN3QTM/EqzMpWF2pWdIiWdbkwTNXN7TnkODBLD/ohRgk3ZnjiHHvoDSlXFGTKMogBQ==
-X-Received: by 2002:a05:690c:4b90:b0:814:608a:acb4 with SMTP id 00721157ae682-81dbeb5f73emr38829227b3.27.1783562838726;
-        Wed, 08 Jul 2026 19:07:18 -0700 (PDT)
-Received: from gmail.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-81e6be904a4sm6869687b3.7.2026.07.08.19.07.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2026 19:07:18 -0700 (PDT)
-Date: Wed, 08 Jul 2026 22:07:17 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Shiming Cheng <shiming.cheng@mediatek.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- horms@kernel.org, 
- matthias.bgg@gmail.com, 
- angelogioacchino.delregno@collabora.com, 
- willemb@google.com, 
- daniel.zahka@gmail.com, 
- alice@isovalent.com, 
- sd@queasysnail.net, 
- eilaimemedsnaimel@gmail.com, 
- imv4bel@gmail.com, 
- nbd@nbd.name, 
- dsahern@kernel.org, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org
-Cc: stable@vger.kernel.org, 
- steffen.klassert@secunet.com, 
- lena.wang@mediatek.com, 
- shiming.cheng@mediatek.com
-Message-ID: <willemdebruijn.kernel.2801a1401793d@gmail.com>
-In-Reply-To: <20260709014704.3625-1-shiming.cheng@mediatek.com>
-References: <20260709014704.3625-1-shiming.cheng@mediatek.com>
-Subject: Re: [PATCH v7] net: gro: fix double aggregation of flush-marked skbs
+	s=arc-20240116; t=1783564182; c=relaxed/simple;
+	bh=h7ixAFmKcgZptEaFgwYIMwhx22MwAhDKeNBxTwFO+gk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=FhHPKDFgAeYGpICqiIE6gpoAoBRn9ZsE8im4Wc8zx9OItZlUEAMBX9vVo1MhhazkE9qacc0AED9G2Xl7F6Vp6oH/urwd2gtXf/mBZKss8GxYVmmLYTVS0S0f/EmAwXF1jLxJm8bOcTyDU3xju2GnlsF9uq0pFgY1yyemUn6Acd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com; spf=pass smtp.mailfrom=onsemi.com; dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b=Duipelcg; arc=none smtp.client-ip=170.10.153.120
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onsemi.com;
+	s=mimecast20250127; t=1783564180;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h7ixAFmKcgZptEaFgwYIMwhx22MwAhDKeNBxTwFO+gk=;
+	b=DuipelcgW0J7slaGL0HMXjByWyBK7qGVRFrnXjhxKLolub/8zO+ibffoYssiQ/pqRY2UaE
+	UNBfbVaJ4cJCFOS8zNZvsCiH1w4+e/fuPiwT6+smI9QfCgNg0HLnjyJgFPIhRgNit/lACF
+	1mixe+A3ECByXI9DSMFx4c9SqIc3ZkMq7Zadcp1HSb58KYU+Bve+KAvR0zeJyQiDbLKEOz
+	KvLVW1NhGyeuoQgkF4zVHYzlCHx8nesOQ6YWWjt4lCiR2JMDIDTgvEUSeIr6wBDpzRzhgO
+	31WLwUG6Z0iH6x4nbwYv7yJpzmGOAQN2eJKyGgKTcFqbftP6Aj/b99kT79E8Mw==
+Received: from DM5PR21CU001.outbound.protection.outlook.com
+ (mail-centralusazon11011044.outbound.protection.outlook.com [52.101.62.44])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id usb-mta-10-v36LDFo5NyKphKHIYueCfQ-1; Wed,
+ 08 Jul 2026 19:29:34 -0700
+X-MC-Unique: v36LDFo5NyKphKHIYueCfQ-1
+X-Mimecast-MFC-AGG-ID: v36LDFo5NyKphKHIYueCfQ_1783564168
+Received: from CYYPR02MB9828.namprd02.prod.outlook.com (2603:10b6:930:b8::20)
+ by BN0PR02MB7917.namprd02.prod.outlook.com (2603:10b6:408:160::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.15; Thu, 9 Jul
+ 2026 02:29:27 +0000
+Received: from CYYPR02MB9828.namprd02.prod.outlook.com
+ ([fe80::2767:f7d2:778c:8dca]) by CYYPR02MB9828.namprd02.prod.outlook.com
+ ([fe80::2767:f7d2:778c:8dca%4]) with mapi id 15.21.0181.009; Thu, 9 Jul 2026
+ 02:29:27 +0000
+From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+To: "ciprian.regus@analog.com" <ciprian.regus@analog.com>, Parthiban
+ Veerasooran <parthiban.veerasooran@microchip.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
+	<corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, Andrew Lunn
+	<andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+	<linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
+Subject: RE: [PATCH net-next v5 10/13] net: phy: add generic helpers for
+ direct C45 MMD access
+Thread-Topic: [PATCH net-next v5 10/13] net: phy: add generic helpers for
+ direct C45 MMD access
+Thread-Index: AQHdDmHokZwNZhTmyEi12dE3JLi4pLZkd5Zw
+Date: Thu, 9 Jul 2026 02:29:26 +0000
+Message-ID: <CYYPR02MB9828A0F83559EF025D01A14C83FE2@CYYPR02MB9828.namprd02.prod.outlook.com>
+References: <20260708-adin1140-driver-v5-0-4aca7b51a58b@analog.com>
+ <20260708-adin1140-driver-v5-10-4aca7b51a58b@analog.com>
+In-Reply-To: <20260708-adin1140-driver-v5-10-4aca7b51a58b@analog.com>
+Accept-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CYYPR02MB9828:EE_|BN0PR02MB7917:EE_
+x-ms-office365-filtering-correlation-id: ea9e8d8c-2f13-49cc-b343-08dedd61e5cb
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|7416014|376014|23010399003|1800799024|921020|38070700021|18002099003|22082099003|6133799003|56012099006|4143699003|11063799006
+x-microsoft-antispam-message-info: OAZxQLv4TukccaRUtc9+mcsyCHTvPE0dfQYRmkiRyZrXNSJYQFt/9zrvVu2W8IPJfxbuP0BNwmeqyYVlUWz2Ek/kLJUSJciNNyTHcVDJj1eihlkgK4xcdwJ8/qd5EKEP3YTBrNCRW2g5SCfBhF9a4TRdwddgYe2AfVJl5SsbAmRoVM1KKTekfxJZh6vHpGedBWmOhRGc50sUfBqVHtLuI1JV1HoBgNFBVo4TA+WxbWReP5VXkAVuseIhavrA+V009+pcEkav0GlsWxblZrnReLr9NVhvtcORHbsIxjx1GNiOX4HcMgqY41M0WgQ6RgY8ttv9P4YySjr4qr7Km7DMTAU7OGzYFRlsGHYd5lauAPMw49t5VuKLz2pjmylyAiV/1UqwdhcBk1ehIER/Y0cgPldAO5R+35mWHox8w+JQV/5u7zZayPYzADIGoCAFit2kxBd4OE97XEvb+cA/IV3dBBMwUhSKAUvAIdOgTm0QRHPRgrwPDtnTSKAKfhDCsPCnlUX2zYNExbNEWnfOCL14Q3qinUZeM6KioDMlQ3HZ2+0V9zBhXU7V49k1lycloe0bt3S1i9nuzvql/K3F9tioZsZUDlnS0nMZ78KCQMa3ABmei1iMkznp424nhfQeTAz7wLbODBmj0EJTemeql9coaaUIspQXVDxfbtf7igUSmSIlel/W6vEcv/MAvMUmcWxKF/suRZXqqsp0G0/HT6Xm7zvRD1P4/IiuskjXFc/JemJEGZl1fbUW3gENF+t2SHnc
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR02MB9828.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(23010399003)(1800799024)(921020)(38070700021)(18002099003)(22082099003)(6133799003)(56012099006)(4143699003)(11063799006);DIR:OUT;SFP:1101
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?T3Y5dTlKeE1GZTZiYXo4OFI2V09rdmhuSzNlRnJ3RVQycGNNc3RGK3BBUCtV?=
+ =?utf-8?B?bHVPeE1aZEpFR3lWb0ppcjlGejNVSEkrUVEwWkcrTDF6cXhHSG1jTHJMZVZa?=
+ =?utf-8?B?RFRDNTBhTUVoSTFEcmdoc1pjMnlYbnlDWllvMWREK3FaY1pGSzdJbWlYbS9H?=
+ =?utf-8?B?WVN5Q1pVNU5jWGVzR0srczR2eTR0Yi83bnRTd2F6UXdZZE9qNG1aWlFPbUcz?=
+ =?utf-8?B?WVU3bzNOS3ZPU3RsZzZNck1QcmcweFVac1RtbHd5NnYwcFlmeEpzanpCSXZy?=
+ =?utf-8?B?TGtZUkptV0x3Y205cVdTTjBjTW5Oa0puaGZGU1U1NzRkcGZFSjJ1K2NvRzc4?=
+ =?utf-8?B?a2hCUzhWSGZJUk55eWl6SElibm1oRkVKUDdDYnBURTRmRXp1S1ZZUXJWSzI4?=
+ =?utf-8?B?bTFvcHJhR3c2Zi9XRmhMUGthZk1xWUM4b0svQUVBYW9WQklNMCs0cTlabHZH?=
+ =?utf-8?B?c2wvVVJSNm1QUGtySGowWE5qZ0gzZUpndEpCU0crWnhQVy9hZkwrczcvOC8x?=
+ =?utf-8?B?Tkd2QWhVZU1NZ21pajdEelJ6b2dtdWtSRUlqQXhiaXYyVFZ6VmhBYnZBSzhS?=
+ =?utf-8?B?Z0lvTHlhR1ZaTnJZaGRpTEJHaFZzUnp0eEdkeUZ2T1VCNGtSVm83c3BSU3dZ?=
+ =?utf-8?B?TVcrRm95cVBaeTV2SGRacktTd2V1bC9ObjFrSk1McGZsMllxdVFMNUFXeHdz?=
+ =?utf-8?B?TStuTDljeFFUanN6QlhhZDY3cjI3aTRua3JmMFpKcDlmVDhUTFQ4N1Z0VW9k?=
+ =?utf-8?B?YVVydUZiblJwQjlZNVRmOVBmL0MyaDRKeWVBckFwdlpYZjNKVU5yNVFCYmg3?=
+ =?utf-8?B?bXNPd1FpNVphT2FSOUsxUkV0M1RDS1NtMnJlTGFVWW1ab0xQampKT1pmTCtF?=
+ =?utf-8?B?aEU1OWxzU0QzNkFWbzhGWkNTZVA0ZFFldWJ2UjFwMjUyanVhQmNkQ2VMMk5H?=
+ =?utf-8?B?TjNicHNqNGhqdTBpQ0lEM3VMQWdEdlltK0VpMUdnYWQrU3paSVJtWlFpMHhp?=
+ =?utf-8?B?SjJsekF2MTBoNCs5cG1FVjNGYnFBYzVmZjZJVkZKV0l0TjJJZytBYUZqb1gw?=
+ =?utf-8?B?TUhUaTdBbjg5anZxeEluYzgvZnZHb1JjTnVWUlRtMkZ2b2xxSnAxWnpFQ1c5?=
+ =?utf-8?B?SkF0QU15MW1zcW5IakZyNU82d1ZHVzlaV051R3djczZCWlVRWE5rT3RMcG1G?=
+ =?utf-8?B?UjlCQVBjaFZCZmdQYVVKZXkxUjd6MW5PcWJ6WTVOVU5EUFBpRERDSmQzKzNn?=
+ =?utf-8?B?REpqYXhZcnRjTUxrbGYwTEd0ZmppRzRkRzBVTTdvcmNxL3p3dmpWQVdmOEts?=
+ =?utf-8?B?TW53amsyOVI5MXZ5MzAxVWw4YU4xY1J2Tkoza1dsTm5WcU41NW9oL0Jybmgr?=
+ =?utf-8?B?YWl5RWR6cTJkcENqSkEwS29lTldpb3B5bGVDYWFDK1BKR0dnaG04R1cwRUJC?=
+ =?utf-8?B?bTRxbzAxeU5NZVQyRUZsZWhCYzJXYi8va3pXbEI3YVEydngzOHg1L0d0cFo3?=
+ =?utf-8?B?aFRZc1BlRVdONjNndTFjSWNNSW9uNmRnMjFnTlFpbDQxcm44dzJxc3RqUmVw?=
+ =?utf-8?B?T3RiQXowMHlCdEVQOEVRQVFlSVJtb09nckxsSjFqUzBvZnhPY1p3bHFNdFVl?=
+ =?utf-8?B?dVRMbVhhYXBOUExzNXVrKzJYSEdQQVFET2IwV0JOdUhPaE05MW82aURtU3Ix?=
+ =?utf-8?B?Vzg2dEJGdkdQd2pmQXhDTlM1YjBVbWt4eHVyL2RuMldIbVFYREtjR3ZyS2Rh?=
+ =?utf-8?B?Zm5oNFBaN0hpeklaRGt3ams4UFZlVHRjaGp0eFZaOTlUTi9KUWUySGlEVEh3?=
+ =?utf-8?B?NHgwb1BxaHBqVm1uMlVjVkVsMkRtV1JzSG80YTQrRUJFdmVXaFhpYVZUVm5Q?=
+ =?utf-8?B?ZFpmckJPbVVLWVY0S3VWZzdNcW9mSFhMQ1hIUFJsbEdlL05zUks0b1RndENG?=
+ =?utf-8?B?ay8xNndJRnlSV1p6NnFkTW4wTDZlSXY1ZDBDNUxLUUZIUnR4a3h5bm9qY0lP?=
+ =?utf-8?B?QjJicWU3eExRSXhtTUhTUVRsbjMvRXdEUGtGSTQ2cXlJcnBZSG96N01LOHVj?=
+ =?utf-8?B?OWg1UWtpU3ZUbHhrTmEyeXZHOFdNMUVIM211WWZWLzVyZFp1c1haNy9DVDhu?=
+ =?utf-8?B?TGd0a2IxRmtGZHczNHNZam9HUTZpU09RaXJFQkwzTFJ0N094a2J6VFdJN1d5?=
+ =?utf-8?B?MjluWDB2ai81VkY0MFdJSTZBOVpQRDB5L1pPbUdSWllVR1lhM3VJelRuZmla?=
+ =?utf-8?B?TDJab0JlY0haVkZuT2kxbUJpU0xiTCtNVkxGNi9td0VHOG5waHRzWmNCdzFz?=
+ =?utf-8?B?NHB6cXdKNG1MeUJRU2ZIREI1Q2lza3hFbVRWUGNNRmMxOWFBRTRUSm15eE9u?=
+ =?utf-8?Q?meVj+lKBpoKlT39g=3D?=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+X-Exchange-RoutingPolicyChecked: ezuC4Yp30IrfcPbyz+qykLsl4WV28+xQI4zcaxJ31V0KWLG6w/22KqYkizVRuxBkxzPqX6I5mxcpMkFA5pIgn///RZFC+8QX7efuFqQZnla0o4xpkO3YfC19ubOzzAnWDvBErAL8i/253KePzQyjG/yG4QTyD8ghn1GUHkAne3DtnCKrwdlpNCmYYwI7wTHoNvF3d4wUZnHGoo+vOV7faRiqi2caPeZzN8bPqCx5/r1JilCrgPB70OHNRXNpT/FBmX22cIIicbkTFA9fqCHBFuGcM89Be1EKAVNPy3XQXDmOilxIS81zOfJdncjRMoUPwZ62JfQs6U4mnvvncp8oRQ==
+X-OriginatorOrg: onsemi.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CYYPR02MB9828.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ea9e8d8c-2f13-49cc-b343-08dedd61e5cb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jul 2026 02:29:26.9607
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 04e1674b-7af5-4d13-a082-64fc6e42384c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: dAC6CMVxNRglRSLs9Bu4f6KbdAKHjCg7w3XLLvpasRKYW+lNFfYWeopcx/Xi9U+zurSRCA2DECHEvjr3BYUWCwgNBk8xacQzxbAvjxOgEh4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR02MB7917
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: YrcEm1MrEAoWw-3UsaXCy3HKb6yFBklKzMPI_NSkkJw_1783564168
+X-Mimecast-Originator: onsemi.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.44 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[onsemi.com,reject];
+	R_DKIM_ALLOW(-0.20)[onsemi.com:s=mimecast20250127];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[24];
+	FORGED_RECIPIENTS(0.00)[m:ciprian.regus@analog.com,m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:devicetree@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306027-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306028-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[mediatek.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,collabora.com,isovalent.com,queasysnail.net,nbd.name,vger.kernel.org,lists.infradead.org];
-	FORGED_RECIPIENTS(0.00)[m:shiming.cheng@mediatek.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:willemb@google.com,m:daniel.zahka@gmail.com,m:alice@isovalent.com,m:sd@queasysnail.net,m:eilaimemedsnaimel@gmail.com,m:imv4bel@gmail.com,m:nbd@nbd.name,m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:stable@vger.kernel.org,m:steffen.klassert@secunet.com,m:lena.wang@mediatek.com,m:matthiasbgg@gmail.com,m:danielzahka@gmail.com,s:lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_TO(0.00)[analog.com,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk];
+	FORGED_SENDER(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[onsemi.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mediatek.com:email]
+	MISSING_XM_UA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,CYYPR02MB9828.namprd02.prod.outlook.com:mid,onsemi.com:from_mime,onsemi.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4996572BDAB
+X-Rspamd-Queue-Id: 2FB0172BF1A
 
-Reminder to mark patches [PATCH net v7]
+DQo+ICtpbnQgZ2VucGh5X3JlYWRfbW1kX2M0NShzdHJ1Y3QgcGh5X2RldmljZSAqcGh5ZGV2LCBp
+bnQgZGV2bnVtLCB1MTYgcmVnbnVtKQ0KPiArew0KPiArIHN0cnVjdCBtaWlfYnVzICpidXMgPSBw
+aHlkZXYtPm1kaW8uYnVzOw0KPiArIGludCBhZGRyID0gcGh5ZGV2LT5tZGlvLmFkZHI7DQoNCllv
+dSBtYXkgd2FudCB0byBpbnNlcnQgdGhlIGxvY2tkZXBfYXNzZXJ0IGhlcmUuIFRoYXQnbGwgZW5z
+dXJlIHRoYXQgcmVhZC93cml0ZSBBUElzIGFyZSBjYWxsZWQNCmFmdGVyIHRoZSBtZGlvLWxvY2sg
+aXMgdGFrZW4uIEFuZHJldydzIHN1Z2dlc3Rpb24uDQoNCiAgIGxvY2tkZXBfYXNzZXJ0X2hlbGQo
+JmJ1cy0+bWRpb19sb2NrKQ0KDQoNCj4gKyByZXR1cm4gX19tZGlvYnVzX2M0NV9yZWFkKGJ1cywg
+YWRkciwgZGV2bnVtLCByZWdudW0pOw0KPiArfQ0KDQoNCj4gK2ludCBnZW5waHlfd3JpdGVfbW1k
+X2M0NShzdHJ1Y3QgcGh5X2RldmljZSAqcGh5ZGV2LCBpbnQgZGV2bnVtLCB1MTYgcmVnbnVtLA0K
+PiArIHUxNiB2YWwpDQo+ICt7DQo+ICsgc3RydWN0IG1paV9idXMgKmJ1cyA9IHBoeWRldi0+bWRp
+by5idXM7DQo+ICsgaW50IGFkZHIgPSBwaHlkZXYtPm1kaW8uYWRkcjsNCg0KDQpBbmQgaGVyZSB0
+b28uDQoNCg0KPiArIHJldHVybiBfX21kaW9idXNfYzQ1X3dyaXRlKGJ1cywgYWRkciwgZGV2bnVt
+LCByZWdudW0sIHZhbCk7DQo+ICt9DQo+ICtFWFBPUlRfU1lNQk9MKGdlbnBoeV93cml0ZV9tbWRf
+YzQ1KTsNCj4gKw0KDQo=
 
-(or PATCH net-next when targeting that tree)
-
-Shiming Cheng wrote:
-> Commit 0ab03f353d36 ("net-gro: Fix GRO flush when receiving a GSO
-> packet.") added a flush check to skb_gro_receive(), but
-> skb_gro_receive_list() lacks the same validation.
-> 
-> As a result, packets marked with NAPI_GRO_CB(skb)->flush may still be
-> re-aggregated.
-> 
-> This allows already-GRO'd packets with existing frag_list to be
-> re-aggregated into a new GRO session, corrupting the frag_list chain
-> structure. When skb_segment() attempts to unpack these malformed packets,
-> it encounters invalid state and triggers a kernel panic.
-> 
-> Scenario (Tethering/Device forwarding):
->   1. Driver: Generated aggregated packet P1 via LRO with frag_list
->   2. Dev A: Receives aggregated fraglist packet and flush flag set
->   3. Dev A: Re-enters GRO, skb_gro_receive_list() is called
->   4. Missing flush check allows re-aggregation despite flush flag
->   5. Frag_list chain becomes corrupted (loops or dangling refs)
->   6. Dev B: TX path calls skb_segment(), crashes on corrupted frag_list
-> 
-> Root cause in skb_segment():
->   The check at line ~4891:
->     if (hsize <= 0 && i >= nfrags && skb_headlen(list_skb) &&
->         (skb_headlen(list_skb) == len || sg)) {
-> 
->   When frag_list is corrupted by double aggregation, when list_skb is
->   a NULL pointer from skb->next, skb_headlen(list_skb) dereference
->   NULL/corrupted pointers occurs.
-> 
-> Call Trace:
->  skb_headlen(NULL skb)
->  skb_segment
->  tcp_gso_segment
->  tcp4_gso_segment
->  inet_gso_segment
->  skb_mac_gso_segment
->  __skb_gso_segment
->  skb_gso_segment
->  validate_xmit_skb
->  validate_xmit_skb_list
->  sch_direct_xmit
->  qdisc_restart
->  __qdisc_run
->  qdisc_run
->  net_tx_action
-> 
-> Fix: Add NAPI_GRO_CB(skb)->flush validation to the early-return check in
-> skb_gro_receive_list(), matching the defensive programming pattern of
-> skb_gro_receive().
-> 
-> Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
-
-Reviewed-by: Willem de Bruijn <willemb@google.com>
 
