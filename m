@@ -1,92 +1,98 @@
-Return-Path: <netdev+bounces-306383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306384-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vWkNF4wSUGqYswIAu9opvQ
-	(envelope-from <netdev+bounces-306383-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 23:28:44 +0200
+	id MlALGUkfUGpjtgIAu9opvQ
+	(envelope-from <netdev+bounces-306384-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 00:23:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F335735D03
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 23:28:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D47BB735FF3
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 00:23:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=JOB9dDaC;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=cc1B51YO;
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306383-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-306383-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306384-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306384-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3DAF5300B8C4
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 21:28:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8E96F3075C13
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 22:19:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BF723BB13B;
-	Thu,  9 Jul 2026 21:28:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69A534499A5;
+	Thu,  9 Jul 2026 22:19:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9D03BB106
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 21:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F1873E1209
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 22:19:04 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783632518; cv=none; b=L0wWtPHxaLL4aPXUOIgTaafULBFzxsWeRK+xYY1U9FKbyAMk7Fj++MuEld9FOSpYmj0yOldJ/9G078llXF8MzGaPJCpIzbq/5xFIV5Icr24cH3MvZaj34Cw91L+rw6X/4s9bA8gPM5uEojCBOPrDp27JI8kOE1/7Z1+45ogn5a4=
+	t=1783635546; cv=none; b=kxf9hYNLe9SanuEVHommLbsHZNFLfz9sLt0mZk4n8r914qmBuZdZqjpTmKSSczQnlRU1tIqf9gzIGeVJbRVamLr6oVFlChJexuIMHr2vSx4PMPYXAaGvspjQJtZUU2giM4rKalrkNN5A1r5jBJSep6YcG9WE7F/49HsAUGU9EFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783632518; c=relaxed/simple;
-	bh=RfK4Rc+82FAtWUKvR0czhUym4lsT1kXkCb6HVu1HCxI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lhhyw70oWKqOOzGrOpKvQuNUK4hA3Fgy1NrWSos+gtmmbqAgOPYg4guftqAfLOspzcKzPyuo79buAzVs3nRNSDJKpe8m/26DJdXNNy+UU+/9kH1wkvL+I2Su5Vu6hNjlGitf4CuSqqVYIW3rQdO41fzFejllXvSlbMIf8rueUCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JOB9dDaC; arc=none smtp.client-ip=209.85.160.178
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-51a868b6962so2159291cf.2
-        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 14:28:36 -0700 (PDT)
+	s=arc-20240116; t=1783635546; c=relaxed/simple;
+	bh=Z8Zh1AJp/esp9tFm2eyTQefg9Fl7D1o7AgqFROZ1ab8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dj0G5BZcvlJznzAx5Z5xKAdeRziSV7kS6uEH2W/hjyIOLXAF5FbgWGPttRrwjMxDwLCT69AXrgEPt1k2XJ7h0dUrSEu0PKy2gVbBoqL4DaM3rM9drkrFBZp71LwGdfDeRma+JmwDAWG0Y6XBVL8R36yIEdcJlgCCKK0HedbUbSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cc1B51YO; arc=none smtp.client-ip=209.85.128.42
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-493b1710405so1197365e9.2
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 15:19:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783632515; x=1784237315; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783635543; x=1784240343; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=UGPBGDpmMCJG1jdmjxc2zGCbnDM99IZvLsk38bHA9OQ=;
-        b=JOB9dDaCekjMUQcPq9Nzb26Xu6j+ZCsuJVfhuuSUF6Yc6UcmtQfw3gB9iXwFc+9DVE
-         YkpwNlZy6B5BevvyGGyO8sCnE9C0yEVcBfpOAwegeAnOlUXW7e71EhE2vX8taReWdMWH
-         dmDxe/XMQRNtme0hH7WU2/CVid7eI8r7gny7cWx2WGUVLlNx0P+lpS6tb4Mmy2TyOMJ/
-         ghy8QvaxCq5xWAamj9H3jrkaSj86Ya2tV1vKe1z8c6XjXcArFv0CWv5e7OFiflhVWvgB
-         8Zfbl4VefWCARFzkJQQPhTvcJJgMd01whC82f6NGK0zuH/28RTymvLHbtgsZu/xp60sd
-         M/cQ==
+        bh=BqQgw4jCCe/BvKpqMgYyZ70b1id8WmzXWyq/OSrYdlk=;
+        b=cc1B51YOtA/6A1kmzmBig9+12v9yAztZhxpH3H685lT903ZqlkL2wm+Z+wm8vttkNz
+         lKgMwnobY/phweGr4fHRs3TCP7u/azwuLQKW9j6RVCIAdpb/B+4KCLFGi7eYUWwyheeZ
+         kCJvPXXEXeKY1dNFWGsgriCdwpRga/x143RZZyYpSE8TtbNnTHsfir8emVgSpy0itoRj
+         rTUOM3248rbSnl1CdISiqEGI5QPVkI6886LwIDY6pBeBfmelDt3wl/g7Hn8gAITPi8E5
+         Evy5a50r9+WdNzdetE6fAp/LgF08xbgfvu/RL+uaZOXXc1GKv4CP53bNqr+psE/IvXDZ
+         JsHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783632515; x=1784237315;
+        d=1e100.net; s=20251104; t=1783635543; x=1784240343;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=UGPBGDpmMCJG1jdmjxc2zGCbnDM99IZvLsk38bHA9OQ=;
-        b=l5npvqGd0qgSEgyWdYfNJAU6S65iDRlHKggH8QMdZSZ2vCGWUFK3SzP1TRh3mcdPab
-         RD/WdDx79FUcGq751dPOfQm/ZWq2GC4gBnpujM7affnOK5s0r72StcrNDX70BzTZa7tS
-         aq9WXU9ji54PD+bWyFI3O/ICsMHsGPzjtP73RiUXxXxiF1PAPDgcmUtUjMvVIFC6QzDr
-         wEMmrXsGBbXk4+bmHhgmZB2mhH9fAe/ow1iGQ30rzsJy1Ynn6wdHhn39vsnZG7oOE19l
-         /gpOUGJOUS5kaW/PB4KPljcqWy/XVj9XPcXcHYUSk49MX6MzDqQDxDRFKKFG4vfvuQ0M
-         c3Wg==
-X-Gm-Message-State: AOJu0YyUK3EGzUeCg5viXILMYgD4UYHObY/mnMt7Lw7MQYJ6hW5nlua6
-	8ST9O5xupFCc9a+G2wE8V3XhQZjahE68XnQPQTnqHWERso1Kp88QaiGADgK1mw==
-X-Gm-Gg: AfdE7cmsjPTzAk1eZELMrnHqrbQkMPvyB265YX/MKf0tLI5hQIPuuOhMWhBy4QTVybd
-	MeXAThE4MqzOyM/+zXhsS2szrQ3FZNRyYFwzHvCe6BGLBtNpVSbLRgCxnbZOPCg879HTx5/Ff7D
-	UYdhklz1i7SgJB0N771+QGOjEmJB8tP8Wa0YqRJw2Hc+lZdWU4ULEk8eYTeOA6WMWyNHkZsTGnu
-	0uJY7GuKLIIfKl4j75yRLz2tUqTs9r/QLX+Iva8Hg/gLem/ODzlLDNp1rGLEuM/TX/q6t7E2AB4
-	Bk+OTrIBKrPYs8cPlTRRkx0hWcMM3nnncv3FFwRM0PDruI189Cn4WOAZZ+NRg5Pk9kpOKha6Ncx
-	hYkhjsGDxO9OhJweqwBm1yFKlF2eLyuWSCteAoLI6m0rrSUEKNYZ0pWNH+oVwgBSuFXx86Cm33I
-	cROgwCSSpshu2ZwPxUwfmksLo7lZqkTTWcwNuZWTL7MVaJ1T1qVTxkZ8hiYcXuRdhXy4OZT9OJr
-	vFAgIcQGFNuaS1WsdUDX0L72+tQpopPqqwyIC+osJvIwrGe4oF+v38Wujqkh5dQRw==
-X-Received: by 2002:ac8:5e51:0:b0:516:e10f:7140 with SMTP id d75a77b69052e-51c8b3f9775mr89854991cf.35.1783632515371;
-        Thu, 09 Jul 2026 14:28:35 -0700 (PDT)
-Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51caae206b6sm3237861cf.14.2026.07.09.14.28.33
+        bh=BqQgw4jCCe/BvKpqMgYyZ70b1id8WmzXWyq/OSrYdlk=;
+        b=J6+vVW/QuAfbN3yNvzZJ7sqhhP+wBQZrnV42OOQ6/ZtHdXgqsYjqgKiFtVEF/6SABI
+         O9JB3FOYrG/0B/zy9b4vQiyr8IqpT/BAvft5JVrhESjiAQw61/o/uAwRib2aJZNkT0X7
+         gXk/Q1sFvhCYNsnZ8sxCYFF7AU0KA4rESm8n5U7NFNF8vd/eAKknpks3NajV8mn09pJs
+         Uck3vl9eX7d4TKZYeBMU8STc3mash1Kn37f80aNv49ufDdosZ4qtSb1kvav9oEroq74j
+         S0+4AuG+NBegoSYqphZjhStUYMIlInQPccmRqY+/A2RpQqUQVK2hwPK7+Y/lFOSEVbzz
+         apIA==
+X-Forwarded-Encrypted: i=1; AHgh+RrTYR10rAAwKd3SrkP7kfwz05FLVDEVMfhtQj9zJJf+2yVRI2tOU7Wg3Xm0QvtMBQYRNTyO7WA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgEKsEv8XD4uAUC8fg+n8ziQeu40+4iVwYxXUeyrJf2BrYCgwX
+	6olpe+JP3zVmW0VkcViK5hhrZXWF7/rQ0zZgzc3V95OD83OR4U3s350s
+X-Gm-Gg: AfdE7cl4liIq1T7SmcJV50nAERy8jbUFoj4OFpJfbJ+fws4zbPwk5V0dZ4FopT+1cgp
+	DIuHWgzUz8783aLExofFnB9pp9Swavtm8yDHiaSvQkMcFPlOqZ4nJA1+hXXP22cZ9xe5E/+PSHE
+	GmNrIAiiVliZ1Ng4xitBh05y9c9KcyA0isF0mFX2dXd/wzPLshBYgOf9bO7+T4iQtIX+SAI4lxp
+	Y7GpFGpL4zArBdYQX2eOotTwEc7zk7a1/LZJfGJSfaf0jvc2zIlmy6stp+tEI7/5Iq16WnS1TRX
+	RqanVQS2L0UZjTivTHLGMlvwZwnYbRCm4XNf3K+BCookkqd2/l796QY6+V3FDLn+Npbz4pxFzHb
+	Ah2ztS9JR+wgAzMbPkc0Cbx4nbXL35VY1i75mZdYuHxvIxo0zPhRUVRwlnRum1/SMB/chgV2PJ/
+	iKVO10lgoCYVw/51EdaK1F+UHSckOeSvPwMv2oJ/8uF1amc+9XiC4Qif6L1OKnlhQFE9xXnNib
+X-Received: by 2002:a05:600c:6211:b0:493:dcad:84da with SMTP id 5b1f17b1804b1-493e683c3b2mr83501675e9.1.1783635542767;
+        Thu, 09 Jul 2026 15:19:02 -0700 (PDT)
+Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493eb6e8844sm102269415e9.10.2026.07.09.15.19.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2026 14:28:34 -0700 (PDT)
-From: Xin Long <lucien.xin@gmail.com>
-To: network dev <netdev@vger.kernel.org>,
-	linux-sctp@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
+        Thu, 09 Jul 2026 15:19:01 -0700 (PDT)
+From: David Carlier <devnexen@gmail.com>
+To: alex.aring@gmail.com
+Cc: stable@vger.kernel.org,
+	syzbot+60332fd095f8bb2946ad@syzkaller.appspotmail.com,
+	David Carlier <devnexen@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Subject: [PATCH net-next] sctp: replace cb->args[4] with a local variable in sctp_diag_dump()
-Date: Thu,  9 Jul 2026 17:28:33 -0400
-Message-ID: <e0076ec046fbd8a70d4f3facfb701473d08c3ebb.1783632513.git.lucien.xin@gmail.com>
-X-Mailer: git-send-email 2.47.1
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] ieee802154: hwsim: serialize pib updates to fix double-free
+Date: Thu,  9 Jul 2026 23:18:58 +0100
+Message-ID: <20260709221858.158063-1-devnexen@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,155 +101,116 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306383-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306384-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:marcelo.leitner@gmail.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FORGED_RECIPIENTS(0.00)[m:alex.aring@gmail.com,m:stable@vger.kernel.org,m:syzbot+60332fd095f8bb2946ad@syzkaller.appspotmail.com,m:devnexen@gmail.com,m:stefan@datenfreihafen.org,m:miquel.raynal@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-wpan@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:alexaring@gmail.com,m:syzbot@syzkaller.appspotmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,syzkaller.appspotmail.com,gmail.com,datenfreihafen.org,bootlin.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev,60332fd095f8bb2946ad];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,syzkaller.appspot.com:url,appspotmail.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3F335735D03
+X-Rspamd-Queue-Id: D47BB735FF3
 
-cb->args[4] is currently used as a temporary counter to track the assoc
-index while traversing ep->asocs in sctp_sock_dump(). However, this
-state is only needed locally within a single dump iteration and does not
-need to be preserved across callbacks.
+hwsim_update_pib() does an unserialized read-swap-free of phy->pib:
 
-Replace cb->args[4] with a local idx variable in sctp_sock_dump(), and
-update cb->args[1] directly when the dump is interrupted due to skb
-space exhaustion.
+	pib_old = rtnl_dereference(phy->pib);
+	...
+	rcu_assign_pointer(phy->pib, pib);
+	kfree_rcu(pib_old, rcu);
 
-This simplifies the dump state handling and removes the dependency on an
-extra cb->args[] slot, making the traversal logic easier to follow.
+It assumes the RTNL is held, but ->set_channel is not always called
+under it: the mac802154 scan worker changes channels via
+drv_set_channel() without the RTNL. Such an update can race an
+RTNL-held one on the same phy; both read the same pib_old and both
+kfree_rcu() it, double-freeing the object. With SLUB percpu sheaves
+batching kfree_rcu(), this surfaces as a KASAN invalid-free in
+rcu_free_sheaf().
 
-Signed-off-by: Xin Long <lucien.xin@gmail.com>
+struct hwsim_phy has no lock for pib. Add one and make the swap atomic
+with rcu_replace_pointer() under it, dropping the misleading
+rtnl_dereference().
+
+Reported-by: syzbot+60332fd095f8bb2946ad@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=60332fd095f8bb2946ad
+Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
+Signed-off-by: David Carlier <devnexen@gmail.com>
+Cc: <stable@vger.kernel.org>
 ---
- net/sctp/diag.c | 45 ++++++++++++++++++++++-----------------------
- 1 file changed, 22 insertions(+), 23 deletions(-)
+ drivers/net/ieee802154/mac802154_hwsim.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/net/sctp/diag.c b/net/sctp/diag.c
-index c2a0de2adf6f..a9bb31303613 100644
---- a/net/sctp/diag.c
-+++ b/net/sctp/diag.c
-@@ -299,18 +299,21 @@ static int sctp_sock_dump_one(struct sctp_endpoint *ep, struct sctp_transport *t
- static int sctp_sock_dump(struct sctp_endpoint *ep, struct sctp_transport *tsp, void *p)
- {
- 	struct sctp_comm_param *commp = p;
--	struct sock *sk = ep->base.sk;
-+	struct sock *sk = ep->base.sk, *nsk;
- 	struct sk_buff *skb = commp->skb;
- 	struct netlink_callback *cb = commp->cb;
- 	const struct inet_diag_req_v2 *r = commp->r;
-+	u32 portid = NETLINK_CB(cb->skb).portid;
- 	struct sctp_association *assoc;
--	int err = 0;
-+	int err = 0, idx = 0;
-+
-+	nsk = NETLINK_CB(cb->skb).sk;
+diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+index 6daa0f198b9f..a9bd1555d2dc 100644
+--- a/drivers/net/ieee802154/mac802154_hwsim.c
++++ b/drivers/net/ieee802154/mac802154_hwsim.c
+@@ -72,6 +72,8 @@ struct hwsim_phy {
+ 	struct ieee802154_hw *hw;
+ 	u32 idx;
  
- 	lock_sock(sk);
- 	if (ep != tsp->asoc->ep)
- 		goto release;
- 	list_for_each_entry(assoc, &ep->asocs, asocs) {
--		if (cb->args[4] < cb->args[1])
-+		if (idx < cb->args[1])
- 			goto next;
++	/* Serializes phy->pib_updates. */
++	spinlock_t pib_lock;
+ 	struct hwsim_pib __rcu *pib;
  
- 		if (r->id.idiag_sport != htons(assoc->base.bind_addr.port) &&
-@@ -320,32 +323,31 @@ static int sctp_sock_dump(struct sctp_endpoint *ep, struct sctp_transport *tsp,
- 		    r->id.idiag_dport)
- 			goto next;
+ 	bool suspended;
+@@ -102,8 +104,6 @@ static int hwsim_update_pib(struct ieee802154_hw *hw, u8 page, u8 channel,
+ 	if (!pib)
+ 		return -ENOMEM;
  
--		if (!cb->args[3] &&
--		    inet_sctp_diag_fill(sk, NULL, skb, r,
--					sk_user_ns(NETLINK_CB(cb->skb).sk),
--					NETLINK_CB(cb->skb).portid,
--					cb->nlh->nlmsg_seq,
--					NLM_F_MULTI, cb->nlh,
--					commp->net_admin) < 0) {
--			err = 1;
--			goto release;
-+		if (!cb->args[3]) {
-+			err = inet_sctp_diag_fill(sk, NULL, skb, r,
-+						  sk_user_ns(nsk), portid,
-+						  cb->nlh->nlmsg_seq,
-+						  NLM_F_MULTI, cb->nlh,
-+						  commp->net_admin);
-+			if (err < 0) {
-+				cb->args[1] = idx;
-+				goto release;
-+			}
- 		}
- 		cb->args[3] = 1;
+-	pib_old = rtnl_dereference(phy->pib);
+-
+ 	pib->page = page;
+ 	pib->channel = channel;
+ 	pib->filt.short_addr = filt->short_addr;
+@@ -112,7 +112,10 @@ static int hwsim_update_pib(struct ieee802154_hw *hw, u8 page, u8 channel,
+ 	pib->filt.pan_coord = filt->pan_coord;
+ 	pib->filt_level = filt_level;
  
--		if (inet_sctp_diag_fill(sk, assoc, skb, r,
--					sk_user_ns(NETLINK_CB(cb->skb).sk),
--					NETLINK_CB(cb->skb).portid,
--					cb->nlh->nlmsg_seq, 0, cb->nlh,
--					commp->net_admin) < 0) {
--			err = 1;
-+		err = inet_sctp_diag_fill(sk, assoc, skb, r, sk_user_ns(nsk),
-+					  portid, cb->nlh->nlmsg_seq, 0,
-+					  cb->nlh, commp->net_admin);
-+		if (err < 0) {
-+			cb->args[1] = idx;
- 			goto release;
- 		}
- next:
--		cb->args[4]++;
-+		idx++;
- 	}
- 	cb->args[1] = 0;
- 	cb->args[3] = 0;
--	cb->args[4] = 0;
- release:
- 	release_sock(sk);
- 	return err;
-@@ -505,14 +507,11 @@ static void sctp_diag_dump(struct sk_buff *skb, struct netlink_callback *cb,
- 	 * 1 : to record the assoc pos of this time's traversal
- 	 * 2 : to record the transport pos of this time's traversal
- 	 * 3 : to mark if we have dumped the ep info of the current asoc
--	 * 4 : to track position within ep->asocs list in sctp_sock_dump()
- 	 */
- 	pos = cb->args[2];
- 	sctp_transport_traverse_process(sctp_sock_filter, sctp_sock_dump,
- 					net, &pos, &commp);
- 	cb->args[2] = pos;
--	cb->args[1] = cb->args[4];
--	cb->args[4] = 0;
+-	rcu_assign_pointer(phy->pib, pib);
++	spin_lock_bh(&phy->pib_lock);
++	pib_old = rcu_replace_pointer(phy->pib, pib,
++				      lockdep_is_held(&phy->pib_lock));
++	spin_unlock_bh(&phy->pib_lock);
+ 	kfree_rcu(pib_old, rcu);
+ 	return 0;
  }
+@@ -952,6 +955,7 @@ static int hwsim_add_one(struct genl_info *info, struct device *dev,
+ 		goto err_pib;
+ 	}
  
- static const struct inet_diag_handler sctp_diag_handler = {
++	spin_lock_init(&phy->pib_lock);
+ 	pib->channel = 13;
+ 	pib->filt.short_addr = cpu_to_le16(IEEE802154_ADDR_BROADCAST);
+ 	pib->filt.pan_id = cpu_to_le16(IEEE802154_PANID_BROADCAST);
 -- 
-2.47.1
+2.53.0
 
 
