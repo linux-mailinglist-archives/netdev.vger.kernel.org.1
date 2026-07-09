@@ -1,121 +1,219 @@
-Return-Path: <netdev+bounces-306301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306302-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id co63JOnAT2p9nwIAu9opvQ
-	(envelope-from <netdev+bounces-306301-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 17:40:25 +0200
+	id JUebAkzDT2oMoAIAu9opvQ
+	(envelope-from <netdev+bounces-306302-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 17:50:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ABA6733084
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 17:40:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 502807331C8
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 17:50:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=AcfGPJbL;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=R7PFOk++;
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306301-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306301-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306302-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306302-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C516E3050A53
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 15:38:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8F403302BDE5
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 15:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9316F40F8F8;
-	Thu,  9 Jul 2026 15:38:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B7CE3F928B;
+	Thu,  9 Jul 2026 15:42:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC10F2D8390;
-	Thu,  9 Jul 2026 15:38:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32CE19995E;
+	Thu,  9 Jul 2026 15:42:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783611498; cv=none; b=GzfDN7PIxK3O3mfMWgJcOE2fNBVwK58OVW/fvbcvkjkVOWET5qSHpblmtjs01xrJRJyT6a9WiL6nYfpNpF97Xg7oTX39hzl5r+x0VGN9Q3ACqrXylfJx8oVQywzPiQbRvlMSSpLObDzSWLUXU4KIwlTXPfLE3QUrd7NmId00szI=
+	t=1783611723; cv=none; b=NdgVrVEwmS/Szzu8Cd3MaC1Ow81abyPF06HqSJTWOKhcdOZA0v/59j+51gRsNN1fMreFfXvMD5x8rPmFJSZZmdsYjS9nusNhjMoA6kFw+s7yb3JyiK7IVqo7VmSYLs/WacHuP/1Qd9DZ5ctvHx3b+kRt3aZbLpia657J+j01pRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783611498; c=relaxed/simple;
-	bh=CFj7c9xa8WXVuQNEY7+x6ThVvUN1GQ95be/svQIJZ80=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=gw9pSlJftJbOOzo06NTAu2LZxVIXwcmm5WrryxREfyl5XvvMXQROCuuzw4ro8xrjMURgnFwaGlCI8Dim4BBBZG8A6aedAw/D1sLLTqX7H8htBiJHowTQ6ZOC2cvGYGGxSskpTY3zoLlvQ4F3Rlla1XMNSPLoIvyJ0nAN1O6ppRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AcfGPJbL; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95BA11F000E9;
-	Thu,  9 Jul 2026 15:38:14 +0000 (UTC)
+	s=arc-20240116; t=1783611723; c=relaxed/simple;
+	bh=ufCl8aMrAz1jL1B91IWldSlGiwDY2Gd3/+SS6EBFTho=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=GZ31rNsSN2gCqtZB9u0l5e6SBUkz3b7+TV3ScsU9xyqQCH/VaRLvcB9I1z63+gweRpopVfxv6ruuhbcfsJ2TSXj/eQO5wHUUuKkDvYt6m3NaK6x3xmfMwXm8b6SLogUiHWzqWzeMXsk/hvPSk+wj0E3QXqfF6S+gFkA6MJKZDQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R7PFOk++; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BC601F000E9;
+	Thu,  9 Jul 2026 15:42:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783611494;
-	bh=MBSjCZW8DQ49yVblv0FW6CGWPq0DmAWzPqC5dFf3G5U=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc;
-	b=AcfGPJbLhmZV2GhQ752jO2Q+uwHyy+Y9tlUcDttP389RgHYeVhEr2xwX6qWb20jf6
-	 7iEuds6Sr946/cRu0bObqNZrmuEUihmp1B+JpL9v+Sh/O6Wf2EweLOkrQdX0QHqEWS
-	 Nn4UcN6rcgky7QwKumZjvBrw/gTHxKHX1aJPE0Skmcix4vFTwMU9LKdxi3/Jeqeyr9
-	 Q6k7eMh0zMpPU5whvobTm3x+hQRcF0u12Q8b30KUve4QanBuXiNK0I1ieoaPIbomAV
-	 421e/pu6w874rPB51Dor4g2Q2d/YpcGCb12CN2DQRVorrGITBfDsC6YXzgHAV/pxcE
-	 kLDPPqK+02dbA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 56C1A39250E1;
-	Thu,  9 Jul 2026 15:37:54 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v7.2-rc3
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20260709134751.242764-1-pabeni@redhat.com>
-References: <20260709134751.242764-1-pabeni@redhat.com>
-X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20260709134751.242764-1-pabeni@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-7.2-rc3
-X-PR-Tracked-Commit-Id: f5089008f90c0a7c5520dff3934e0af00adf322d
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 2c7c88a412aa6d09cd04b414211b4ef8553b5309
-Message-Id: <178361147304.3550747.3085234207222809075.pr-tracker-bot@kernel.org>
-Date: Thu, 09 Jul 2026 15:37:53 +0000
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+	s=k20260515; t=1783611721;
+	bh=rxQ6s6uIC1Xh4EK6Bix3qZbEKUNNeKF9f+msivycHww=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=R7PFOk++OXY0Hmgy4CIQn+jp2dY8n+Ca3VrhE1OOMsRicR2Fmtf5ckWlfDWBrBgAZ
+	 w3cxOob/AJqA1wE/2qBFyVJKneP1GWncZaPivTDkkeI68Qec1Q2otGxtjXzPOn5iM3
+	 A09qtIhcLvplOmSKPOLO9yc7qjGAu4ZtqV442+ZMZUInCjs1zf+Y9NKTn1jx8AjS/J
+	 VEepHxH9BIvKuuLILgGJ73luCZxz7TvW9jlMhKlfoVQosu0D789h7/ChIIdpvr8+sw
+	 9VJxqFDbEk/trsztJO3W7lF1xh1k0a4aYRO0BRBdOUJ1ksVh6E0FqtQfzFq8+uZ6qT
+	 DOkptDCFxjHUw==
+Message-ID: <a724cf77f2338776f44b465a25009c22a0ee7c43.camel@kernel.org>
+Subject: Re: [PATCH net] rds: Fix inet6_addr_lst NULL dereference when IPv6
+ is disabled
+From: Allison Henderson <achender@kernel.org>
+To: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ka-Cheong Poon
+ <ka-cheong.poon@oracle.com>, Santosh Shilimkar
+ <santosh.shilimkar@oracle.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>,  "linux-rdma@vger.kernel.org"
+ <linux-rdma@vger.kernel.org>, "rds-devel@oss.oracle.com"
+ <rds-devel@oss.oracle.com>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "lvc-project@linuxtesting.org"
+ <lvc-project@linuxtesting.org>
+Date: Thu, 09 Jul 2026 08:41:59 -0700
+In-Reply-To: <20260708115922.2226279-1-Ilia.Gavrilov@infotecs.ru>
+References: <20260708115922.2226279-1-Ilia.Gavrilov@infotecs.ru>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
+X-Spamd-Result: default: False [-5.16 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:torvalds@linux-foundation.org,m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-306301-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[pr-tracker-bot@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_RECIPIENTS(0.00)[m:Ilia.Gavrilov@infotecs.ru,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ka-cheong.poon@oracle.com,m:santosh.shilimkar@oracle.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:rds-devel@oss.oracle.com,m:linux-kernel@vger.kernel.org,m:lvc-project@linuxtesting.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306302-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pr-tracker-bot@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linuxtesting.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1ABA6733084
+X-Rspamd-Queue-Id: 502807331C8
 
-The pull request you sent on Thu,  9 Jul 2026 15:47:51 +0200:
+On Wed, 2026-07-08 at 11:59 +0000, Ilia Gavrilov wrote:
+> When booting with the 'ipv6.disable=3D1' parameter, inet6_addr_lst
+> is never initialized because inet6_init() exits before addrconf_init()
+> is called to initialize it. An attempt to bind an RDS socket to
+> an ipv6 address results in a crash in __ipv6_chk_addr_and_flags()
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-7.2-rc3
+Hello Ilia,
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/2c7c88a412aa6d09cd04b414211b4ef8553b5309
+Thanks for the catch.  Some comments below:
 
-Thank you!
+>=20
+> KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
+> RIP: 0010:__ipv6_chk_addr_and_flags+0x1df/0x7e0
+> Call Trace:
+>  <TASK>
+>  ipv6_chk_addr+0x3b/0x50
+>  rds_tcp_laddr_check+0x155/0x3b0 [rds_tcp]
+>  rds_trans_get_preferred+0x15d/0x2d0 [rds]
+>  ? trace_hardirqs_on+0x2d/0x110
+>  rds_bind+0x1433/0x1d60 [rds]
+>  ? rds_remove_bound+0xd50/0xd50 [rds]
+>  ? aa_af_perm+0x250/0x250
+>  ? __might_fault+0xde/0x190
+>  ? __sys_bind+0x1dc/0x210
+>  __sys_bind+0x1dc/0x210
+>  ? __ia32_sys_socketpair+0x100/0x100
+>  ? restore_fpregs_from_fpstate+0x53/0x100
+>  __x64_sys_bind+0x73/0xb0
+>  ? syscall_enter_from_user_mode+0x1c/0x50
+>  do_syscall_64+0x34/0x80
+>  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> RIP: 0033:0x7f47f8269ea9
+>  </TASK>
+>=20
+> The following code reproduces the issue:
+>=20
+> struct sockaddr_in6 addr;
+> s =3D socket(PF_RDS, SOCK_SEQPACKET, 0);
+>=20
+> memset(&addr, 0, sizeof(addr));
+> inet_pton(AF_INET6, ADDRESS, &addr.sin6_addr);
+> addr.sin6_family =3D AF_INET6;
+> addr.sin6_port =3D htons(PORT);
+>=20
+> bind(s, &addr, sizeof(addr);
+nit: missing paren here
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+>=20
+> Found by InfoTeCS on behalf of Linux Verification Center
+> (linuxtesting.org) with Syzkaller.
+>=20
+> Fixes: eee2fa6ab322 ("rds: Changing IP address internal representation to=
+ struct in6_addr")
+> Fixes: 1e2b44e78eea ("rds: Enable RDS IPv6 support")
+> Signed-off-by: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
+> ---
+>  net/rds/ib.c  | 4 ++++
+>  net/rds/tcp.c | 8 +++++---
+>  2 files changed, 9 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/net/rds/ib.c b/net/rds/ib.c
+> index 39f87272e071..8f9cf491984f 100644
+> --- a/net/rds/ib.c
+> +++ b/net/rds/ib.c
+> @@ -429,6 +429,10 @@ static int rds_ib_laddr_check_cm(struct net *net, co=
+nst struct in6_addr *addr,
+>  		sa =3D (struct sockaddr *)&sin;
+>  	} else {
+>  #if IS_ENABLED(CONFIG_IPV6)
+> +		if (!ipv6_mod_enabled()) {
+> +			ret =3D -EADDRNOTAVAIL;
+> +			goto out;
+> +		}
+>  		memset(&sin6, 0, sizeof(sin6));
+>  		sin6.sin6_family =3D AF_INET6;
+>  		sin6.sin6_addr =3D *addr;
+> diff --git a/net/rds/tcp.c b/net/rds/tcp.c
+> index a1de114d5e2e..955d92277d5a 100644
+> --- a/net/rds/tcp.c
+> +++ b/net/rds/tcp.c
+> @@ -366,9 +366,11 @@ int rds_tcp_laddr_check(struct net *net, const struc=
+t in6_addr *addr,
+>  		rcu_read_unlock();
+>  	}
+>  #if IS_ENABLED(CONFIG_IPV6)
+> -	ret =3D ipv6_chk_addr(net, addr, dev, 0);
+> -	if (ret)
+> -		return 0;
+> +	if (ipv6_mod_enabled()) {
+> +		ret =3D ipv6_chk_addr(net, addr, dev, 0);
+> +		if (ret)
+> +			return 0;
+> +	}
+
+There's another ipv6_chk_addr() in __rds_find_ifindex() with the same issue=
+ that affects inbound link-local IPv6
+connects.  Can you add a similar guard there too?  Then I think that should=
+ cover all the points of exposure.  Thanks
+for working on this.
+
+Allison
+
+>  #endif
+>  	return -EADDRNOTAVAIL;
+>  }
+
 
