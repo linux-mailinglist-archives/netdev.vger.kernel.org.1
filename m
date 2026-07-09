@@ -1,354 +1,145 @@
-Return-Path: <netdev+bounces-306342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306343-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id fEqBBHbmT2rEpwIAu9opvQ
-	(envelope-from <netdev+bounces-306342-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 20:20:38 +0200
+	id uCMMBYXpT2qVqAIAu9opvQ
+	(envelope-from <netdev+bounces-306343-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 20:33:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58FDB73432D
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 20:20:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BB6B7344D7
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 20:33:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=cZ4z2Go0;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306342-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306342-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=p0FYNUaJ;
+	dmarc=pass (policy=reject) header.from=google.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306343-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306343-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 409B330262D7
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 18:20:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E45C33020A91
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 18:33:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C76A4DBD89;
-	Thu,  9 Jul 2026 18:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1775A3AD531;
+	Thu,  9 Jul 2026 18:33:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38EF4DBD6B
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 18:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4FCA3563DD
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 18:33:18 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783621225; cv=none; b=Y627LsKjt/guCu2JQD0Ew/REUx7JzzlgBJIgzZDIEAKJdKCDBoIFDcTTUdup9UHs7ZX/Qe5SuPxZ8Jk1JESij3Q3iTkJPtzcrgzqO2DikcA0TU6v7FjsPq88NJ1D1eL4Npq7KtBvLrKaMPX0ihORI7GuOZ4xiSfEDUMM9GcHVYw=
+	t=1783622000; cv=none; b=TmPRZBj2+blCwNvxqDWAVLw912KQy1QSRKtVDBg/02Tz7Cbq1mltZ1D15pLn/U0vwtslGid9iTT2r5t9J83tU/LjihoIwSprslCdyKokxEOn2G5eprSjWlcK0AMvy7fQc9lRpKeOOrG0DwDGZKwh3gO5fbeprQX/YGYPKm9hKDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783621225; c=relaxed/simple;
-	bh=XYMLLDJSM4xjJT8F7RlgLCND0cDcPiqKQh/YbTNVVzU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ad4Rjxe61JxMgTi3Xfnl63QvRVqwZZ62lvE7lLM4GzxaIWobr9SkBQPu1xhlG4PyDZ14hoc9sYJdxDt73uwXJEx2V99wbSq2VRhcqLo+tUHSQPQUxtDMzTHt91niGXQSPnGNcqHsucEO+4xBivpymaHzeqvujl3H7PD0dGxXeEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cZ4z2Go0; arc=none smtp.client-ip=209.85.221.42
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-47122683cf3so126035f8f.0
-        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 11:20:23 -0700 (PDT)
+	s=arc-20240116; t=1783622000; c=relaxed/simple;
+	bh=payVMhQSUMwNCwdqze4KtENdKbHD6++fpuhUzGiHWHs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=TJxouWuavwSZ2YPxX6jo1K3BrrLpJeDgbsfuNNLvs7OEyiLMFAnz2q/xKrlrJzgubjgt6Xq37HZEF6/gZPtPcP3LsARXH92JFcpzx52ULvhfGEt5b4Id+sdRE+gZ04f6FQV4EOtWkUnPj4Hi+6iTNkvcI/PBVnnGuuFyovu04Uk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p0FYNUaJ; arc=none smtp.client-ip=209.85.210.201
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-848544a8496so52567b3a.0
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 11:33:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783621222; x=1784226022; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=EXJuaOsCL/ERnu3SR2SjgqemJAXLgbxcgVcSbRu+n3U=;
-        b=cZ4z2Go0tQusPACRos8UyUS/IRp+nsmII1BHigx/1Pj1CqgoDuroFZMh6yUxupsXX0
-         TnD1cTD6cYddsQoPhNmD8Ah3Cl15ogAPrKOiLzLtOz042r78sUgFVMhoalfBuglZuKej
-         W6vczmRYe2PgkgSR5hSh/71/1GMYthy65V/aKGG6xkXRKVTxhxj9VULUiUyUoDOguKcH
-         3tQbSnR/TuBUnhUfEmwMHvh80feKy8m9l52xiG4ZifDRSPfh7Y85z7NAcEzvQUIBlIZr
-         e148ABMFpoY5QFdGL59OcohyN4cuIj2tHuB5+KI+MzDEf7FbQDNKlpGfyCYxKDN0Rzo+
-         r+zQ==
+        d=google.com; s=20251104; t=1783621998; x=1784226798; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=GRoTGFzFJI/kqr2GgTFhVnQ4q60YusMm9G2xnzNMhCI=;
+        b=p0FYNUaJ75Kl9mC02MhfoTOttP3TgZVs+MHnguNya6TsK87ksgFNuZUVqzaG+KSEoL
+         b5ocGrr63VC0Iu4A8A8vIBuOVi8BQUkEPa3iXA0Mt44Ei1iGE+mPGlcGESDp9DNrVC2V
+         8AAT+ZKMSImUHHwSzal3qb0Z8d00u9FXjVmdVXdQ9AIKjALzofgtd5wvFhdnOUMMiwbk
+         9DXlm6vdiPJHygqbyRqD0X/s8y6nM2e53ztlAsWdmIQxlrRJHgdTIHnBqJ108v9mD5tA
+         QnXHmdoq9e/L0NVvy5LgoUJaaNiLqBZA2Tn4OWsiJ2XYtvCPwoML86U1k4wtjY9zYOo0
+         IoDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783621222; x=1784226022;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=EXJuaOsCL/ERnu3SR2SjgqemJAXLgbxcgVcSbRu+n3U=;
-        b=DAN2LVwv8eCvhzXdnkTbR594VDorGexYHqM1k/PrfsPk4BhwUTvqN5Zhvod6kmc6Ee
-         /Rlb0znQb3f0CgIqI0rT2bFl8Sxi5nVg9VpnvtH/thGf4uthD+4wqt/H0gKIBR5ipDRE
-         VYp3Mm2UigW+oSKMAyIq6PMKOaq6rV4ONleyXIqByUXKeuYTfmVip/+NJSZ7xzeI5xF9
-         SnWHoSTqp5BbPffz9WqWPN1nL7Gi+At87c7AOo8XHNXFFIsSPCTyzWgKhdwgMg/pnNCv
-         5q5ctZy4GI6p8P9B09idgWDJZuy6F4fgxDOGn5DAGmJM8jCiRd1ttOk2IwIRfW3Znnlq
-         n+YA==
-X-Forwarded-Encrypted: i=1; AHgh+RogN2YOpU7uQYSCBiq8FhwRssE1UfN0ONBVA33iHF5xLjuhEjLaTP8SWivq5LzPR+OGieXYPlE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoUSAwG717MAkMT3EK766ORjeLVMPXjYJ/7zbxe6gDvRGTqxYl
-	9AGAuXCWAjFv9V+r4hqiiCN+Ve2jvA87IUQsFXQvG22U0kECZA2Po6se
-X-Gm-Gg: AfdE7cm6SD3TbOzeGrNCGNGAkkz9jEjYjgNFxFUqEhDgxfpqyFY26T7G/pYFd4gP6C6
-	/VP8uD6D3JUFcfyp5Odj1BBoMBrIwMz1irpbu7dE+xSIWCEgoapPJKLRRmF64DkhjUA4X07k0pJ
-	Zeh4O3k3ONwmiEFl/Qf8IqvhVPBaCzqj7BMoYK9moey+JEBxhuQxV9uMdS8GF05JHFqglwuucOr
-	8tMIq0PxxV7UZMZXwSZEUsUSpFdqHWxY3ADtopXlFV3gZpx5EI7/XwUficu56KyM4EaQIy8Z3w9
-	ejfnHzM6mAvPfRZffMeBDrhZi6fFRneEUo8TsELa1oOQWBHfCz+7Rkxq2NihkSVGuL8g7iMaUuV
-	FfmifCpRRsujGaErxgOOfxkd8/q9HFzNw+RZGLKhN5JsPxHnRgzLd6xnkNNraeboLuYKuhSjFCg
-	jo82U=
-X-Received: by 2002:a05:6000:4802:b0:47d:eabc:3e87 with SMTP id ffacd0b85a97d-47df071e561mr9489283f8f.6.1783621221859;
-        Thu, 09 Jul 2026 11:20:21 -0700 (PDT)
-Received: from avermoal ([185.13.179.6])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa0960b06sm52612834f8f.28.2026.07.09.11.20.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2026 11:20:21 -0700 (PDT)
-From: Mikhail Lukianchikov <avermoal@gmail.com>
-To: Rengarajan.S@microchip.com
-Cc: avermoal@gmail.com,
-	andrew+netdev@lunn.ch,
-	conor+dt@kernel.org,
-	davem@davemloft.net,
-	devicetree@vger.kernel.org,
-	edumazet@google.com,
-	krzk+dt@kernel.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org
-Subject: [PATCH v2] dt-bindings: net: microchip,lan78xx: convert to DT schema
-Date: Fri, 10 Jul 2026 00:17:25 +0600
-Message-ID: <20260709181724.24682-2-avermoal@gmail.com>
-X-Mailer: git-send-email 2.52.0
+        d=1e100.net; s=20251104; t=1783621998; x=1784226798;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=GRoTGFzFJI/kqr2GgTFhVnQ4q60YusMm9G2xnzNMhCI=;
+        b=NUPZONNQjV4w3vxES3XrJcemeV5SK4DRkQmwf9aMeheLlMj14TBdzRcW5fxqlN4KkC
+         l6g50BLTAaxsz5DdGX65eqQfnlg6QZNHM3WPKsCvKYDPPAn8MgzikzXe8A9X/LguxYN6
+         Aw6hhsgiMwRU3Gd0XbNUOaROP5NX6S90CdX0bzP+n9u5MHouCOjq0f0lQuYFDFrcUgBM
+         eLFIT+rJNGNCG7cGbiwkZn52W72EzER8vIC1EinhwWm314xzFaFRNZUVzjmmpFbmWKJR
+         P97y3wGJ5hEfX29/DfPBZTvLfAlND9B0uNeDPr3E0mwqLNOSxKEZLyasRCr5CxDpyUdb
+         n1tQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rq3Mcto90zTKx4HsFigZdig7DKyPPIU62Y3SvfivOPfAOnS7X6mZBPOIGd0Ni8nFjY3P9QwLC0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwP761tPSDZtfEsiDwybh+8sPzBKqzZg7usrTJseTo2tQJPF56h
+	sZn6zgD0i0OyQ235rhL+G+jIJ5CsnPtg6EC3qsv67kicvGqDvhVYr9eXn8e1ihiBkqEc8O/XOKm
+	giqBPEQ==
+X-Received: from pfoa23.prod.google.com ([2002:aa7:8657:0:b0:847:99d5:ef10])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:91c7:b0:848:6447:e0a6
+ with SMTP id d2e1a72fcca58-8486447e2fcmr2177652b3a.9.1783621997988; Thu, 09
+ Jul 2026 11:33:17 -0700 (PDT)
+Date: Thu,  9 Jul 2026 18:31:38 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.795.g602f6c329a-goog
+Message-ID: <20260709183315.965751-1-kuniyu@google.com>
+Subject: [PATCH v1 net 0/2] net: Fix two issues in sk_clone() error path.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>
+Cc: Simon Horman <horms@kernel.org>, Octavian Purdila <tavip@google.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,kernel.org,davemloft.net,vger.kernel.org,google.com,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306342-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:Rengarajan.S@microchip.com,m:avermoal@gmail.com,m:andrew+netdev@lunn.ch,m:conor+dt@kernel.org,m:davem@davemloft.net,m:devicetree@vger.kernel.org,m:edumazet@google.com,m:krzk+dt@kernel.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:andrew@lunn.ch,m:conor@kernel.org,m:krzk@kernel.org,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[avermoal@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306343-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[avermoal@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:willemb@google.com,m:horms@kernel.org,m:tavip@google.com,m:daniel@iogearbox.net,m:ast@kernel.org,m:martin.lau@linux.dev,m:kuniyu@google.com,m:kuni1840@gmail.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,iogearbox.net,linux.dev,gmail.com,vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,microchip.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 58FDB73432D
+X-Rspamd-Queue-Id: 5BB6B7344D7
 
-Convert the Microchip LAN78xx family (LAN7800, LAN7801, LAN7850) binding
-documentation from plain text to DT schema.
+Sashiko reported issues in the sk_clone() error path.
 
-The conversion adds proper validation for the 'microchip,led-modes'
-property inside the MDIO node and updates the MAINTAINERS entry.
+  https://lore.kernel.org/bpf/20260709032007.9E4D61F000E9@smtp.kernel.org/
 
-Signed-off-by: Mikhail Lukianchikov <avermoal@gmail.com>
----
-Changes in v2:
- - Rename file to microchip,lan7800.yaml.
- - Keeps only one maintainer.
- - Code style fixed.
- - Example fixed, remove usb-port@1 node.
- - Move patternProperties for PHY inside mdio node to fix validation. (suggested by sashiko-bot)
+This series fixes them.
 
-Link to v1: https://lore.kernel.org/netdev/20260707165840.107409-1-avermoal@gmail.com
+Note that Sashiko may point out the same issue for sk_bpf_storage,
+but the fix was already merged in the bpf tree:
 
- .../bindings/net/microchip,lan7800.yaml       | 105 ++++++++++++++++++
- .../bindings/net/microchip,lan78xx.txt        |  53 ---------
- MAINTAINERS                                   |   3 +-
- 3 files changed, 106 insertions(+), 55 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/microchip,lan7800.yaml
- delete mode 100644 Documentation/devicetree/bindings/net/microchip,lan78xx.txt
+  7cbd0c4cebe4 ("bpf: Fix UAF in sock clone early bailouts")
 
-diff --git a/Documentation/devicetree/bindings/net/microchip,lan7800.yaml b/Documentation/devicetree/bindings/net/microchip,lan7800.yaml
-new file mode 100644
-index 000000000000..289980c23181
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/microchip,lan7800.yaml
-@@ -0,0 +1,105 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/microchip,lan7800.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Microchip LAN7800/LAN7801/LAN7850 Gigabit Ethernet controller
-+
-+maintainers:
-+  - Rengarajan Sundararajan <Rengarajan.S@microchip.com>
-+
-+description:
-+  The LAN7800/LAN7801/LAN7850 devices are usually configured by
-+  programming their OTP or with an external EEPROM, but some
-+  platforms (e.g. Raspberry Pi 3 B+) have neither. The Device Tree
-+  properties, if present, override the OTP and EEPROM.
-+
-+allOf:
-+  - $ref: /schemas/usb/usb-device.yaml#
-+  - $ref: /schemas/net/ethernet-controller.yaml#
-+
-+properties:
-+  compatible:
-+    enum:
-+      - usb424,7800
-+      - usb424,7801
-+      - usb424,7850
-+
-+  reg:
-+    maxItems: 1
-+    description: USB port number
-+
-+  local-mac-address:
-+    $ref: /schemas/types.yaml#/definitions/uint8-array
-+    minItems: 6
-+    maxItems: 6
-+    description:
-+      MAC address to use if not stored in OTP or EEPROM. If present,
-+      overrides OTP/EEPROM.
-+
-+  mdio:
-+    $ref: /schemas/net/mdio.yaml#
-+    unevaluatedProperties: false
-+
-+    patternProperties:
-+      "^ethernet-phy(@[0-9a-f]+)?$":
-+        type: object
-+        description: |
-+          PHY node for the embedded or external PHY. The PHY address is
-+          given by the 'reg' property.
-+
-+        properties:
-+          reg:
-+            maxItems: 1
-+            description: PHY address.
-+
-+          microchip,led-modes:
-+            $ref: /schemas/types.yaml#/definitions/uint32-array
-+            minItems: 1
-+            maxItems: 4
-+            description:
-+              Array of LED mode values for each of up to 4 LEDs.
-+              Omitted LEDs are turned off. Allowed values are defined
-+              in include/dt-bindings/net/microchip-lan78xx.h.
-+
-+        required:
-+          - reg
-+
-+        additionalProperties: false
-+
-+required:
-+  - compatible
-+  - reg
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/net/microchip-lan78xx.h>
-+    / {
-+        usb {
-+            compatible = "usb-host";
-+            #address-cells = <1>;
-+            #size-cells = <0>;
-+
-+            ethernet@1 {
-+                compatible = "usb424,7800";
-+                reg = <1>;
-+                local-mac-address = [00 11 22 33 44 55];
-+
-+                mdio {
-+                    #address-cells = <1>;
-+                    #size-cells = <0>;
-+                    ethernet-phy@1 {
-+                        reg = <1>;
-+                        microchip,led-modes = <
-+                            LAN78XX_LINK_1000_ACTIVITY
-+                            LAN78XX_LINK_10_100_ACTIVITY
-+                        >;
-+                    };
-+                };
-+            };
-+        };
-+    };
-+...
-diff --git a/Documentation/devicetree/bindings/net/microchip,lan78xx.txt b/Documentation/devicetree/bindings/net/microchip,lan78xx.txt
-deleted file mode 100644
-index 11a679530ae6..000000000000
---- a/Documentation/devicetree/bindings/net/microchip,lan78xx.txt
-+++ /dev/null
-@@ -1,53 +0,0 @@
--Microchip LAN78xx Gigabit Ethernet controller
--
--The LAN78XX devices are usually configured by programming their OTP or with
--an external EEPROM, but some platforms (e.g. Raspberry Pi 3 B+) have neither.
--The Device Tree properties, if present, override the OTP and EEPROM.
--
--Required properties:
--- compatible: Should be one of "usb424,7800", "usb424,7801" or "usb424,7850".
--
--The MAC address will be determined using the optional properties
--defined in ethernet.txt.
--
--Optional properties of the embedded PHY:
--- microchip,led-modes: a 0..4 element vector, with each element configuring
--  the operating mode of an LED. Omitted LEDs are turned off. Allowed values
--  are defined in "include/dt-bindings/net/microchip-lan78xx.h".
--
--Example:
--
--/* Based on the configuration for a Raspberry Pi 3 B+ */
--&usb {
--	usb-port@1 {
--		compatible = "usb424,2514";
--		reg = <1>;
--		#address-cells = <1>;
--		#size-cells = <0>;
--
--		usb-port@1 {
--			compatible = "usb424,2514";
--			reg = <1>;
--			#address-cells = <1>;
--			#size-cells = <0>;
--
--			ethernet: ethernet@1 {
--				compatible = "usb424,7800";
--				reg = <1>;
--				local-mac-address = [ 00 11 22 33 44 55 ];
--
--				mdio {
--					#address-cells = <0x1>;
--					#size-cells = <0x0>;
--					eth_phy: ethernet-phy@1 {
--						reg = <1>;
--						microchip,led-modes = <
--							LAN78XX_LINK_1000_ACTIVITY
--							LAN78XX_LINK_10_100_ACTIVITY
--						>;
--					};
--				};
--			};
--		};
--	};
--};
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f37a81950e25..157a677a284f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -27928,10 +27928,9 @@ F:	drivers/usb/isp1760/*
- USB LAN78XX ETHERNET DRIVER
- M:	Thangaraj Samynathan <Thangaraj.S@microchip.com>
- M:	Rengarajan Sundararajan <Rengarajan.S@microchip.com>
--M:	UNGLinuxDriver@microchip.com
- L:	netdev@vger.kernel.org
- S:	Maintained
--F:	Documentation/devicetree/bindings/net/microchip,lan78xx.txt
-+F:	Documentation/devicetree/bindings/net/microchip,lan7800.yaml
- F:	drivers/net/usb/lan78xx.*
- F:	include/dt-bindings/net/microchip-lan78xx.h
- 
+
+Kuniyuki Iwashima (2):
+  soreuseport: Clear sk_reuseport_cb before failure in sk_clone().
+  net: Call net_enable_timestamp() before failure in sk_clone().
+
+ net/core/sock.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
 -- 
-2.52.0
+2.55.0.795.g602f6c329a-goog
 
 
