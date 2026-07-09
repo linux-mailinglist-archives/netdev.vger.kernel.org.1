@@ -1,225 +1,142 @@
-Return-Path: <netdev+bounces-306153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306155-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rT3VGqN1T2qchAIAu9opvQ
-	(envelope-from <netdev+bounces-306153-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:19:15 +0200
+	id Ml66Gr12T2rRhAIAu9opvQ
+	(envelope-from <netdev+bounces-306155-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:23:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5E9972F80E
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:19:14 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D159272F8B5
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:23:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=CzVKGG4H;
-	dmarc=pass (policy=none) header.from=intel.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306153-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306153-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=fritz.com (policy=quarantine);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306155-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306155-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 334E13051CB0
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 10:05:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9538C30F6915
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 10:06:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A62404BDA;
-	Thu,  9 Jul 2026 10:04:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE70A405C42;
+	Thu,  9 Jul 2026 10:05:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.avm.de (mail.avm.de [212.42.244.120])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37D853C5546
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 10:04:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA633F20F4;
+	Thu,  9 Jul 2026 10:05:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783591451; cv=none; b=rT+z3Va//oHJn5cM/nEHJxJV5o+vTHMWeAOLK+9QEUHkz4V+NqSmdU02fRDmDAhIJarQR05Tk1GxaWsvbVnAreDOfkN0ty8SJ4QYDTeRfg8ORloB3xfGgiV+X24wvKz5cYAMl6PFIAbXK9Lp/6mQ+otKbP7idBY9UyvT0hYC5v8=
+	t=1783591559; cv=none; b=okZf6Ef4YXlXjPHeS1bIE79uFAZPS5rg6bdKgpTc9mpwMNpem8LsIcNbnFfXT7kkMxWNKpIzbMaNhRR+ZsbvNBSXqzmNOFvsQXDOQ7BaAPtG4h7N1ReO4k5Sx5xzI631bP7m4ii1oaqBQP2T1MJvrtwm9T9IYmOmD6pPJlpTuF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783591451; c=relaxed/simple;
-	bh=ifXbCxYpUjHu59OiIIZZCt4wGRbPAoNS773qHevYFm0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WltmzY/OApZ4dHr+z+cwrL57YlGgrAUYaTz1R8KgEOnrj9IyKa6mrKL9wflnKBG2t2dqiH3JedzORbSleDFwH39SGc14LynrHlfuZbsBDuyJoWT7HNUoViqtBEDSe+hp4FNwKQvHJ5XNzC5S1yPMiPlPlcXJaEqhy+XuFUOyNF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CzVKGG4H; arc=none smtp.client-ip=192.198.163.8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1783591450; x=1815127450;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ifXbCxYpUjHu59OiIIZZCt4wGRbPAoNS773qHevYFm0=;
-  b=CzVKGG4HaUJso/XWxJc4OEmm8hH8elWq+H5lBeQxa2wxPXgrdRhEjC8u
-   9rE3ohXFJGk3eNO2J3iFU93gNc736pbRq2v4ULZzPSlklqRAUGlGrJq+o
-   ILoKSD6oP1j3vtUse/5f82cAKFeXQzv82oXzJsxkp0GhF2VNZAF5IJ7du
-   Ws2lRnxbpbR5cbiLldKXs0hiY1W8kHsdSZPbBppJeem+/Osh/wUlF9+ye
-   LsUPcRW6yeCsriHyXHM/iifLYLkLoD+uIfy8s73kk3+wSA0kjaZBJWvDD
-   QgTOowRaP1kELXoL/ilRMMpAdAvB250euXZyurmNonr5D0JaMnMy692+d
-   A==;
-X-CSE-ConnectionGUID: HqugKl0gSDy585J8JWWyAA==
-X-CSE-MsgGUID: shQVPLnAQIesugwQa5hlGA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="101815710"
-X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="101815710"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2026 03:04:09 -0700
-X-CSE-ConnectionGUID: 8qbiF+8CQ5+VdNnlVzpgpA==
-X-CSE-MsgGUID: 9cJlt2YKT8eEZeCyv8fSqg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="250137721"
-Received: from black.igk.intel.com ([10.91.253.5])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2026 03:04:06 -0700
-Date: Thu, 9 Jul 2026 12:04:03 +0200
-From: Raag Jadav <raag.jadav@intel.com>
-To: Riana Tauro <riana.tauro@intel.com>
-Cc: intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	netdev@vger.kernel.org, aravind.iddamsetty@linux.intel.com,
-	anshuman.gupta@intel.com, rodrigo.vivi@intel.com,
-	joonas.lahtinen@linux.intel.com, kuba@kernel.org,
-	simona.vetter@ffwll.ch, airlied@gmail.com, pratik.bari@intel.com,
-	joshua.santosh.ranjan@intel.com, ashwin.kumar.kulkarni@intel.com,
-	shubham.kumar@intel.com, ravi.kishore.koppuravuri@intel.com,
-	maarten.lankhorst@linux.intel.com, mallesh.koujalagi@intel.com,
-	soham.purkait@intel.com,
-	Michal Wajdeczko <michal.wajdeczko@intel.com>
-Subject: Re: [PATCH v4 3/3] drm/xe/xe_ras: Add error-event support for CRI
-Message-ID: <ak9yEyDF_tlJe-Rx@black.igk.intel.com>
-References: <20260701094409.129131-5-riana.tauro@intel.com>
- <20260701094409.129131-8-riana.tauro@intel.com>
+	s=arc-20240116; t=1783591559; c=relaxed/simple;
+	bh=JBpBYDM9N+b1sEVvONgcjDT5IAD4DhOvZ0rfYcrdIAI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mflmZpPqrAexlDJ8cRcvVwQvPY1HXJ56QUVWczIEzDYVww3zQRKxQeWXW4xH/lVRSPLge0QVGEa+M25Q0VlMSDs06UwpAmleFLm5rRaMN37GJKFTqcXLAHTxAEdmHx+c4XkmHd8eEpq1po6l/cjpoV4Ch561IIyc+shfkNNy8Es=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com; spf=pass smtp.mailfrom=fritz.com; arc=none smtp.client-ip=212.42.244.120
+Received: from [2001:bf0:244:244::71] (helo=mail.avm.de)
+	by mail.avm.de with ESMTP (eXpurgate 4.57.1)
+	(envelope-from <t.martitz@fritz.com>)
+	id 6a4f7281-7cb1-7f0000032729-7f000001ec3a-1
+	for <multiple-recipients>; Thu, 09 Jul 2026 12:05:53 +0200
+Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [IPv6:2001:bf0:244:244::71])
+	by mail.avm.de (Postfix) with ESMTPS;
+	Thu,  9 Jul 2026 12:05:53 +0200 (CEST)
+From: Thomas Martitz <t.martitz@fritz.com>
+To: Simon Horman <horms@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	linux-kernel@vger.kernel.org (open list)
+Cc: Thomas Martitz <t.martitz@fritz.com>,
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH v2 0/1] macvlan: allow source mode devices along with passthru
+Date: Thu,  9 Jul 2026 12:05:10 +0200
+Message-ID: <20260709100512.1383421-1-t.martitz@fritz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260701094409.129131-8-riana.tauro@intel.com>
+Content-Transfer-Encoding: 8bit
+X-purgate-ID: 149429::1783591553-DE6AD1B0-19EA7216/0/0
+X-purgate-type: clean
+X-purgate-size: 1406
+X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
+X-purgate: clean
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [3.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	DMARC_POLICY_QUARANTINE(1.50)[fritz.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-306153-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:riana.tauro@intel.com,m:intel-xe@lists.freedesktop.org,m:dri-devel@lists.freedesktop.org,m:netdev@vger.kernel.org,m:aravind.iddamsetty@linux.intel.com,m:anshuman.gupta@intel.com,m:rodrigo.vivi@intel.com,m:joonas.lahtinen@linux.intel.com,m:kuba@kernel.org,m:simona.vetter@ffwll.ch,m:airlied@gmail.com,m:pratik.bari@intel.com,m:joshua.santosh.ranjan@intel.com,m:ashwin.kumar.kulkarni@intel.com,m:shubham.kumar@intel.com,m:ravi.kishore.koppuravuri@intel.com,m:maarten.lankhorst@linux.intel.com,m:mallesh.koujalagi@intel.com,m:soham.purkait@intel.com,m:michal.wajdeczko@intel.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[raag.jadav@intel.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[lists.freedesktop.org,vger.kernel.org,linux.intel.com,intel.com,kernel.org,ffwll.ch,gmail.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:t.martitz@fritz.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-306155-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[t.martitz@fritz.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[raag.jadav@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[t.martitz@fritz.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[black.igk.intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,fritz.com:mid,fritz.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B5E9972F80E
+X-Rspamd-Queue-Id: D159272F8B5
 
-On Wed, Jul 01, 2026 at 03:14:13PM +0530, Riana Tauro wrote:
-> Add error-event support for Correctable errors in CRI. Report an error
-> event to userspace for every component that has crossed the threshold on
-> receiving an interrupt.
+Hello,
 
-...
+we're trying to solve a use case on our devices where two SoC are
+connected on the same board, using the only available high-speed interface.
 
-> +static void ras_send_error_event(struct xe_device *xe, u8 severity, u8 component)
-> +{
-> +	u8 drm_severity, drm_component;
-> +	u32 value;
-> +	int ret;
-> +
-> +	drm_severity = xe_to_drm_ras_severity(severity);
-> +	if (drm_severity == DRM_XE_RAS_ERR_SEV_MAX) {
-> +		xe_warn(xe, "sysctrl: unexpected severity %u\n", severity);
+One SoC runs the main Linux system including the full routing stack
+(FRITZ!OS) and the other SoC implements most of the GPON ONT side.
 
-This is uapi and not coming from sysctrl, so the message is a bit
-misleading. But if at all it needs validation, it should be done in
-drm_ras layer.
+The high-speed interface is of course also used for the user traffic.
+Therefore we must tell the inter-SoC traffic apart from the user traffic.
 
-> +		return;
-> +	}
-> +
-> +	drm_component = xe_to_drm_ras_component(component);
-> +	if (drm_component == DRM_XE_RAS_ERR_COMP_MAX) {
-> +		xe_warn(xe, "sysctrl: unexpected component %u\n", component);
+We achieve this by matching the well-known MAC address of the ONT SoC.
+The user traffic passes through the ONT SoC without modifying MAC headers.
+Now we would like to use macvlan (with source mode devices) on the main
+SoC side for this but our routing stack requires the rx_handler to be
+available. Therefore macvlan is currently not an option.
 
-Ditto.
+With this patch macvlan becomes an option because the current limitation
+of either "one passthru device" or "any other configuration" is relaxed
+for the combination of passthru and any number of source mode devices.
 
-> +		return;
-> +	}
-> +
-> +	ret = xe_ras_get_counter(xe, drm_severity, drm_component, &value);
+This allows us to configure a source mode device for the other SoC and
+register an rx_handler for further processing on the passthru device.
 
-No, instead of converting back and forth just do get_counter() using
-sysctrl values and send_event() afterwards.
+Thanks in advance!
 
-> +	if (ret)
-> +		return;
-> +
-> +	xe_drm_ras_event(xe, drm_component, drm_severity, value, GFP_KERNEL);
-> +}
-> +
->  void xe_ras_counter_threshold_crossed(struct xe_device *xe,
->  				      struct xe_sysctrl_event_response *response)
->  {
->  	struct xe_ras_threshold_crossed *pending = (void *)&response->data;
->  	struct xe_ras_error_class *errors = pending->counters;
->  	u32 id, ncounters = pending->ncounters;
-> +	u8 sent = 0;
->  
->  	BUILD_BUG_ON(sizeof(response->data) < sizeof(*pending));
-> +	BUILD_BUG_ON(XE_RAS_COMP_MAX > (BITS_PER_BYTE * sizeof(sent)));
+Thomas Martitz (1):
+  macvlan: allow source mode devices along with passthru
 
-I prefer it the other way around. Also, have you tried using BITS_PER_TYPE()?
+ drivers/net/macvlan.c | 107 ++++++++++++++++++++++++++++--------------
+ 1 file changed, 73 insertions(+), 34 deletions(-)
 
-	BUILD_BUG_ON(BITS_PER_TYPE(sent) < XE_RAS_COMP_MAX));
+-- 
+2.54.0
 
->  	xe_device_assert_mem_access(xe);
->  
->  	if (!ncounters || ncounters > XE_RAS_NUM_COUNTERS)
-> @@ -154,6 +211,24 @@ void xe_ras_counter_threshold_crossed(struct xe_device *xe,
->  
->  		xe_warn(xe, "[RAS]: %s %s detected\n",
->  			comp_to_str(component), sev_to_str(severity));
-> +
-> +		if (severity != XE_RAS_SEV_CORRECTABLE) {
-> +			xe_warn(xe, "sysctrl: unexpected severity %s (%u)\n", sev_to_str(severity),
-> +				severity);
-
-This should be before "detected" log above.
-
-> +			continue;
-> +		}
-> +
-> +		if (component >= XE_RAS_COMP_MAX) {
-> +			xe_warn(xe, "sysctrl: unexpected component %u\n", component);
-
-Ditto. Also, use xx_to_str() in both cases or don't but be consistent.
-
-Raag
-
-> +			continue;
-> +		}
-> +
-> +		/* Send event once per component */
-> +		if (sent & BIT(component))
-> +			continue;
-> +		sent |= BIT(component);
-> +
-> +		ras_send_error_event(xe, severity, component);
->  	}
->  }
->  
-> -- 
-> 2.47.1
-> 
 
