@@ -1,141 +1,188 @@
-Return-Path: <netdev+bounces-306195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306196-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MTgYMuSBT2p6iQIAu9opvQ
-	(envelope-from <netdev+bounces-306195-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:11:32 +0200
+	id DpbLFXuHT2p2iwIAu9opvQ
+	(envelope-from <netdev+bounces-306196-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:35:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 349CE730128
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:11:32 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 464C2730695
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:35:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=nTJhozGL;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306195-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306195-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=suse.com header.s=google header.b=T3vHFBol;
+	dmarc=pass (policy=quarantine) header.from=suse.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306196-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-306196-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E84AB304ADEF
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 11:10:36 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 82A49301E805
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 11:28:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BEA7411680;
-	Thu,  9 Jul 2026 11:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 369B4411681;
+	Thu,  9 Jul 2026 11:28:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C558410D1B;
-	Thu,  9 Jul 2026 11:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7407A3F58FB
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 11:28:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783595431; cv=none; b=Y6cRiI8xJHHFjgj0kkrS+IbWz//fjbMkFdGV0jFxQEoOs7BDep9MSivq6UYCB9hIGvS9Vwk2Z28JoyKLPjr/udAd/fDNFs6jh0mpJGwBteO0rcAHvge7aJ9ZknSeRZws+QiGCE0isoJmdxoK/CbtfN39ozRc/J4itGfTGR4knoA=
+	t=1783596522; cv=none; b=HmgGbmNv+chbeZq/e9ySx2HOsEokVKLDH0SV9ulX78CkRUkYdAfr64W4L4eUq5MkaCLEcDkg7+0hgKoJSDHN/Aag0MUKf2inKueFJ4VaoFayEa68E+63+paRFXcdvsSj8kOj/Ur+2/HXKBP0yKtS0UHFMjhTHWhcPSZqtBcQcqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783595431; c=relaxed/simple;
-	bh=lj5OfcP3DHUXxKqVwSlAI50qcC8NiQQgbuP0Gh4p4tU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RvhtwPR6K7tWXzVu0RWrkMHy/Z6uOaVBVBqnlS0voJhemsQol8XGaWtc6GMOp5rql1vhBf/U4uC/jv957yv6qoyjxIALV3lqb2SI3F9tG6lFSD4+meC92XwudND7KB1LvrRHWXB5wfcdJecLOGB1KlKcxydT62ZKaTRWghqIkm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nTJhozGL; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42B491F000E9;
-	Thu,  9 Jul 2026 11:10:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783595430;
-	bh=a9u5EznytLjmKdbk3xY/dNvQ6SNeDWINs/4QAuUSQGc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=nTJhozGL/DeGhpa0P10b/BS7rKxzv5nY56IUTsJqT7Q+v0Z4DZmgup0Py8TKTSDxh
-	 LMH0VlG2rr5/IwQ4JiTwiIqUAmnGpRcO6bvsAG0BF5kbG7jFalhb/f5gxAo9w4bZF6
-	 xM0uH1u8/yuy6UU+AUEr8SEA90/Lc1/LyiX2zVOEJ6uU+myRi2BwugqpHOTwz4vvQs
-	 uWHmIEXi6sPzgXeW9pk5SL+SfC5vuDLp88XkOxPYneY3ZsHDLbJm34Dyf8CEYAxL5X
-	 Z1hTG3TkRPehmL6vZUi4+v9UFLIRBHfbpv77dt6d5u/R2lcL7WuJ+n3uLiRY+XcLKy
-	 cxuU/Bx4G+HHg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 1A11939EDE30;
-	Thu,  9 Jul 2026 11:10:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1783596522; c=relaxed/simple;
+	bh=zR5IvobiX93juVmkNYxE4pwPAFvrl3VzehnUf95zxCk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MqRtirRxq6ctIQgary16MVdI4EsWW4A4KjLvetIXTT0AK44NU41Tc6oW57jvu6S7PxmltmGv4XUD82mgNdk97X5Bh9tMXUOQ3IVudRKdUThug1EKemR/diOpFFDb4imWa2RK9VDBpi9zAkriGa6KlX8fIWZ2VPGf3aJhJKrFKsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=T3vHFBol; arc=none smtp.client-ip=209.85.221.42
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-47c6e9a694bso936423f8f.1
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 04:28:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1783596519; x=1784201319; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=MOEJtxlqclUuG5d8o3QYDqlrpx9EFuuMBV9pwtsxKdk=;
+        b=T3vHFBolJPerv4/sxeHZ4XelybmdPy1zwo5L5YJyiZWX2IkwHNdzPc0+wUkSeGCgWM
+         GAKwhS60Z9jpAD7Chbu5mdDZH44ZLGcXAAg4B3tl3Qeu6A+Z82QaxSe6A6e/69Six0vh
+         RXNbM18fAusbV0P3r5bL0hNcAT1WR6cxbePdcKMHWRJVc3MvfoclX9wrMMpogOYRbj5Q
+         Pb4r6BAC8lq7Cpg/3hqR9XJA4Gsh4uZmDxufvOQkvKUBmSU+y1qacBIjGgUcPfwxCYTr
+         WNNd+tqPFkLV/t+8c05lp67RciYKP5SlLuc/+c2JAw0hKwUeBb/FlWE7o+KDKd5i+8aO
+         Zhuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783596519; x=1784201319;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=MOEJtxlqclUuG5d8o3QYDqlrpx9EFuuMBV9pwtsxKdk=;
+        b=mfW37Wo+/xnM2dp24QgKS0WmJ7WsZTw7TJiyQm2e0O00VU0JVqmxetZSC/GAr2wQQi
+         2++XxcPO2GxzVwSiKGwZOmGR9Pp07R4JO+ALql/egVS+jpclcVdYtUqOy4aesEseaU4T
+         2+NWnFR/XXrknzqf56uhdk5l9mwVPjZ2LMv23P4GrxcNxHeEwQChu2LcMzno1jqqINe8
+         av+AyZ3FTB89hD7d0uMH7FME3xsfl1Lm3WI5yg6M7orTFcrbUvwclnix0PrKjSlwygXi
+         HbLDcmLJjQUY+tiPLOLGLDAjGB+SH4GKgodEO5qjCO33HsTYrwGZ5MGnL0VN2spahw3b
+         pEVg==
+X-Forwarded-Encrypted: i=1; AHgh+RrZ0sse0UkpvxzAx78I+zbhhNwMghMYbrn2C/QS+UIbbeJi3kmayYHWfukaHS909HTquAf4LzA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzzl2VA3DagsC0DLPqoatEOWbNnO0oHXZc+pxdw/09ooxl8RK10
+	2OyiT6Jwn2FkRH7laRWdf96rx5hN3OmFUnTQ0YV+vC7AcPJAyQc2Q6jXQLdaaImRtc8=
+X-Gm-Gg: AfdE7cmfC1jyMCF0sB9pE0+y0oRSgyXZokNmMFsLm88eq0DvOAIlqKx0vxfgMg65V7F
+	ITvh4ML7YPMQnPgoeZ6c2DkzqanxLRnWMKtDzhlPPA/rbmF6iuWuZA+uraPlrpxwpJevCtMXVWb
+	LlwwD8CkL7m5pTTwTQ4yEIzNF2B/ZiIJrpZMLD91Y+fvgUpHF8qDqEnqjmTA1NHddy4eMz0+ZrE
+	QtBq3/xfgLKR7mhABOisk8x5AGfEHb27tkMdQohbsATJzpIl1CHwSHXddBca4pBaFZzdAfhggdG
+	sOYrrdmtQ6uT83ZDK4WQbYehO4Vj3yJ8FX85zCYlBPIqJKb2pMGAa1QwzebmVE3Ku2cBBuxoYWM
+	jpMsZr0q7nmVaRpqOfkPb6mHzHWix4hGzVRtkWExmjAX60bv8zFYRN4SrQwvsGWBBmJfcABkvQF
+	7xgn45KASxPgXyXB0=
+X-Received: by 2002:a05:600c:c87:b0:493:e890:9e0b with SMTP id 5b1f17b1804b1-493eb0130c0mr30213605e9.26.1783596518799;
+        Thu, 09 Jul 2026 04:28:38 -0700 (PDT)
+Received: from pathway.suse.cz ([176.114.240.130])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493eb6ff432sm52559975e9.4.2026.07.09.04.28.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jul 2026 04:28:38 -0700 (PDT)
+Date: Thu, 9 Jul 2026 13:28:36 +0200
+From: Petr Mladek <pmladek@suse.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: linux-atm-general@lists.sourceforge.net, linux-can@vger.kernel.org,
+	linux-sctp@vger.kernel.org, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Oliver Hartkopp <socketcan@hartkopp.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Remi Denis-Courmont <courmisch@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>,
+	Kees Cook <kees@kernel.org>
+Subject: Re: [PATCH net-next] net: Convert %pK back to %p
+Message-ID: <ak-F5CA-R7LzEhFp@pathway.suse.cz>
+References: <20260706073824.xixrLxoD@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] macsec: don't read an unset MAC header in
- macsec_encrypt()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178359540864.3416587.11485245520244646782.git-patchwork-notify@kernel.org>
-Date: Thu, 09 Jul 2026 11:10:08 +0000
-References: <20260703083634.2035145-1-4ncienth@gmail.com>
-In-Reply-To: <20260703083634.2035145-1-4ncienth@gmail.com>
-To: Daehyeon Ko <4ncienth@gmail.com>
-Cc: netdev@vger.kernel.org, sd@queasysnail.net, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260706073824.xixrLxoD@linutronix.de>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306195-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:4ncienth@gmail.com,m:netdev@vger.kernel.org,m:sd@queasysnail.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306196-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:bigeasy@linutronix.de,m:linux-atm-general@lists.sourceforge.net,m:linux-can@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:herbert@gondor.apana.org.au,m:kuba@kernel.org,m:kuniyu@google.com,m:mkl@pengutronix.de,m:marcelo.leitner@gmail.com,m:ncardwell@google.com,m:socketcan@hartkopp.net,m:pabeni@redhat.com,m:courmisch@gmail.com,m:horms@kernel.org,m:steffen.klassert@secunet.com,m:willemdebruijn.kernel@gmail.com,m:lucien.xin@gmail.com,m:thomas.weissschuh@linutronix.de,m:kees@kernel.org,m:marceloleitner@gmail.com,m:willemdebruijnkernel@gmail.com,m:lucienxin@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER(0.00)[pmladek@suse.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lists.sourceforge.net,vger.kernel.org,davemloft.net,google.com,gondor.apana.org.au,kernel.org,pengutronix.de,gmail.com,hartkopp.net,redhat.com,secunet.com,linutronix.de];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pmladek@suse.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[pathway.suse.cz:mid,vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,suse.com:from_mime,suse.com:email,suse.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 349CE730128
+X-Rspamd-Queue-Id: 464C2730695
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri,  3 Jul 2026 17:36:33 +0900 you wrote:
-> macsec_encrypt() reads the Ethernet header via eth_hdr(skb)
-> (skb->head + skb->mac_header) to memmove() the 12 source/destination MAC
-> bytes forward and make room for the SecTAG.
+On Mon 2026-07-06 09:38:24, Sebastian Andrzej Siewior wrote:
+> This is a revert of commit 71338aa7d050c ("net: convert %p usage to
+> %pK") which is from 2011. Back then the default behaviour for %p was to
+> print the pointer. The %pK modifier was introduced to be able to control
+> the behaviour of specific pointer output without changing the behaviour
+> of %p for everyone. It was dedicated to avoid leaking pointers via
+> /proc.
+> There was also the idea to remove the check from formatting the string
+> and move to the open callback (of the /proc file) with some helpers but
+> this did not happen.
 > 
-> On the AF_PACKET SOCK_RAW + PACKET_QDISC_BYPASS transmit path the skb
-> reaches the macsec ndo_start_xmit() with the MAC header unset, so
-> eth_hdr(skb) resolves to skb->head + (u16)~0 and the read is out of
-> bounds: a 12-byte heap over-read that is also emitted on the wire as the
-> frame's outer source/destination MAC. KASAN reports a slab-out-of-bounds
-> read in macsec_start_xmit() on 6.0; on current mainline a CONFIG_DEBUG_NET
-> build flags it as an unset mac header in skb_mac_header().
+> Things changed over time. The default behaviour for %p is now to print a
+> hash pointer which does not leak the address but allows to
+> correlate if two pointers are equal. The pointer to hash value mapping
+> is not stable across reboots so one can not precompute the values and
+> have a lookup table. There is also the `hash_pointers' boot argument
+> which allows to disable it and print real pointers if needed. The
+> default behaviour of %pK (kptr_restrict==0) is already %p (hashed
+> pointer).
 > 
-> [...]
+> The %pK modifier brings hardly and value over %p. Removing it allows to
+> remove the policy checks from pointer formatting.
 
-Here is the summary with links:
-  - [net] macsec: don't read an unset MAC header in macsec_encrypt()
-    https://git.kernel.org/netdev/net/c/f5089008f90c
+Yes, I believe that the %pK behavior has been obsoleted by hashing
+pointers printed via %p by default and hash_pointers= boot parameter.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> My long term goal is remove the restricted_pointer() handling from
+> vsprintf. I don't see any benefit in having it and case kptr_restrict==1
+> caused problems in terms of locking. Instead of attempting to get the
+> debug/ warn infrastructure right I am for removing it.
 
+Yes, it would be nice because the locking is tricky.
 
+Acked-by: Petr Mladek <pmladek@suse.com>
+
+Best Regards,
+Petr
 
