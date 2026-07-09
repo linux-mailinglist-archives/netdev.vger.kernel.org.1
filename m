@@ -1,239 +1,215 @@
-Return-Path: <netdev+bounces-306101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306102-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id J1m+ORxkT2pPfwIAu9opvQ
-	(envelope-from <netdev+bounces-306101-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:04:28 +0200
+	id etJqMAxnT2o1gAIAu9opvQ
+	(envelope-from <netdev+bounces-306102-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:17:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42E0972EA84
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:04:28 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C529B72ECCE
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:16:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=S0XP92IX;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306101-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306101-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=BlAyjAbL;
+	dkim=pass header.d=redhat.com header.s=google header.b=VRfyHjBN;
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306102-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306102-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BD02E3182BD6
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 08:55:22 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CB87B3117D28
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 08:56:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F7B34071DB;
-	Thu,  9 Jul 2026 08:52:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A50B3FDC00;
+	Thu,  9 Jul 2026 08:54:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777CB406811;
-	Thu,  9 Jul 2026 08:52:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C118D3ED5A4
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 08:54:45 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783587171; cv=none; b=q4uMbija6Udgh9o9HN8Zjj32lW6W2/WqKeFNjVRjOdSfvEEUHGJLWVwRlwXKgpF9HRLERoesfysPmm6AFmlmNWXk7+L2Kbcolg6fzqg+ip47E/BdQT99zo56PnSO28DQaqQqeOWsQaGoztUdvWT4pHmogienYPckLr43E6TusS8=
+	t=1783587287; cv=none; b=JhbEHGyMA+LIZvJAvrV5m7gp2rRE/Pk959CEXkjOyLSf9FkJn0hlg8lM+/AY+xTfklmKaGMHNmXIZSWcILzct6DqTHljHAoLTPfWaOPD19xOy5OTS4vDF4mwSCzptb0R3xCx5h3AS8YpIzLZMhi9HAxidZRjz0kbCZKeEgm/cPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783587171; c=relaxed/simple;
-	bh=RoxtILq0DdZuTWZN5hhnXinnO9h9WbozggVBmnj5eY0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=J2QX1enNa6ZF2Uib+MAJXozbHTETzd/GqnQUXv5ff+mwMlipwucJ6NsuaFq8/YybSyv84Lr0OWC9s9oqIoJwAmkj1KQzUAZqQRel/E4bncBKqFk1oOormnypLaT4I8GyfiA4IRmYALSkDPXyz7Js/qIbmrA+S6GTfVvLiTzwn1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S0XP92IX; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D452F1F00A3D;
-	Thu,  9 Jul 2026 08:52:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783587166;
-	bh=vMBVFDSljvSf4iCDRlBQTGvBtWXGxxkV5RPlQKApDWM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=S0XP92IXyNjbyhVM7iPqEpJXW19G71PWW8a19Z/YchM55XF6VDr5MM+tBRIGnnPNL
-	 x6dKFYVXDll15LcaukTfJA5iHo5OnOLR3iaBzP5bspflciiIW79LwFPS+dTdcCVLVl
-	 htRiGX79MW7BNGxcQTro5g9CmngTwV3UraNgKTRl8vbd3yKt2omoF2ymo5vAnA6clX
-	 +mukWhOBOO+GSakD8Xp6imfaFY3Mdq/HDwe1X8090OVN0G6hmCSpYSuJsKH6m0HxIn
-	 v3Qi8fqOPuWwRbycNdmNuAwtptSpD1CxJHT4dVdniIHHDhP2IGaEippnQhjFLdNtfH
-	 KEYbINk4z1Ccg==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Thu, 09 Jul 2026 10:52:13 +0200
-Subject: [PATCH nf-next v5 6/6] selftests: netfilter: nft_flowtable.sh: add
- SIT flowtable selftest
+	s=arc-20240116; t=1783587287; c=relaxed/simple;
+	bh=wRRaBds4GutgazHTelDLWoEKQjUD+qekfGeab8oKIas=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u/1k1A9UosB7iliCA1U9FlaBZFTQwZoQOeJZokgWhIu3guZrLqiE5LZXfKmNd8VfY2++jjOblre+Mwy5Jff4rSU/OPzojE/Zal7hxCykOP0OAVyqshsylDx4scVHn10vepc/bS0Eq0ryMUn+TXJI2Bq4Tu7oQ+VCmQRZMmuDafc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BlAyjAbL; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=VRfyHjBN; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783587284;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jKBatJUUTBddrBcocZDnsS1t1LpIJaEaNIf3BrEu4hE=;
+	b=BlAyjAbLykGVnxtSiIUcYYke3Ot7vTQth/cP4NWIv/m6yme76bTdo9jqpsi3IYY+qSWdvD
+	SKW+4Du4VQksNJlpdpoG0V2F1lHYKZGzb9QLREV/M3l1h9mJ0K4HFkiHgR3ii7CKsWXGyS
+	7EePKe9LQiCImxRy38vrkBO56kdltGw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-135-RwlKtgJ2MLyFi1BIFacpTA-1; Thu, 09 Jul 2026 04:54:43 -0400
+X-MC-Unique: RwlKtgJ2MLyFi1BIFacpTA-1
+X-Mimecast-MFC-AGG-ID: RwlKtgJ2MLyFi1BIFacpTA_1783587282
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-4629f312a67so1414032f8f.2
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 01:54:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1783587282; x=1784192082; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=jKBatJUUTBddrBcocZDnsS1t1LpIJaEaNIf3BrEu4hE=;
+        b=VRfyHjBNh75myXSj6eNN9uojHY/fPLF/k/3P9YZXppPcS7iBiRZqeTWfibSaIP70v6
+         XGR8dPfKKBQF9kBq9xpuF42VD6BcpktQA7kWflvLltjUTxAocimpGwiAX00jK6WNBwkl
+         vwKNXNuj8dCSYzNRfPjR9A99k7L1oUpHYF9utMTVxIEU7TatuRs5RNPNDDTJLxi8K0Gd
+         OxEEogW7gkOBtgHO4BZpFOD4z5IYpLXMm6WsdhziMWAs3Ua7lgVYlbPEurPN9YgR7QJF
+         PZ16ptZigP6FjrVoVuAZDd8hY/eODzEveoxkPZ7hnjG+aOgR9yT5IUJADM990A/bNhJK
+         3B8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783587282; x=1784192082;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=jKBatJUUTBddrBcocZDnsS1t1LpIJaEaNIf3BrEu4hE=;
+        b=jyrIliav7vIQ3JlcXCJ8ImV1sAMAUM9R0IKxU1Jpgm3HSIF3ZzphkfKOKpwWtFHG6J
+         6FKKTnI3SIkGvwDs14RNdzci5YTVNyZASfoh7E0M3tIzafh9f86neQiJzOeRdnZx06++
+         J89qw7OZAaRxpAGMJFGyvdBH5IG9oww4njDtwMJISi9nszj5KLFRYZrKxbhZZT8YsLGe
+         CDZ6OllQZfQvIM++In4A3lLIZda5Um+fMDa9PxK9bVCpL8aEvEVtlm98L6SqAFzI5DSH
+         qPr3uk6k0T2YuVF1ao1kAF2boainTXFbpPvF75bwa21/WSgeJke9MmRxl071CLNethHk
+         7rsA==
+X-Gm-Message-State: AOJu0YwfbXL4uq4SjzXAVbATswAXdBm41Tz7Gjea4oFXVUoZme6TVctU
+	JtG4PMcZ57gEBuymkasTeDexfKypaMdAL3nnp+PGxw8URqNzpcR16JdFeNPRxkWCgRrHjwOWXcC
+	LVgvipMHgzBUqO8ihnmtypC77/FSiEedHs+7AFlHALyWUra5dGjH4yNK8Pg==
+X-Gm-Gg: AfdE7clOS4MVdjaymoLHG2pvyM0os/gK42AQOxSUOEL2mxTrcBvOpiUNWykHHWaJY63
+	XOiu9JUm5Blb8lAx7viGEu7zVIb5ToLjGk4l0cVzSKXBXTUT+HFBWdqFcitE7BxFou5GglZSlBX
+	QV0vzo6eDjhVMN/7U+HJZYB7hxsA99O0UxPxBIx5QTVm17d6ketLd+NajvSCw6KkjlxwzUTdaaz
+	+5WGLzwJRB3GMdl/v0Uqg0gbDU0ACarcrSyuwppZs0X5EcZqGp61Hhlgbsi2sCQHg8K7m+6cVCH
+	Yv8TeMJ8msE581vBGoXg7zkVmIuZeqf43y1M49D1yKZS5NOvSrjqWX0UW+RWtZdSSupLKIoI2VX
+	orbJDCDNiYq6UfBWV0ZflYgJaxsm9uiIblhCrdDTwWE6zKZQz+UB4iTwtqy5R
+X-Received: by 2002:a05:600c:1993:b0:48a:906b:14ca with SMTP id 5b1f17b1804b1-493e68c6c98mr55722895e9.20.1783587282447;
+        Thu, 09 Jul 2026 01:54:42 -0700 (PDT)
+X-Received: by 2002:a05:600c:1993:b0:48a:906b:14ca with SMTP id 5b1f17b1804b1-493e68c6c98mr55722455e9.20.1783587281922;
+        Thu, 09 Jul 2026 01:54:41 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-34-22-35.business.telecomitalia.it. [79.34.22.35])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493eb6df6d9sm54564705e9.7.2026.07.09.01.54.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jul 2026 01:54:41 -0700 (PDT)
+Date: Thu, 9 Jul 2026 10:54:34 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org, Jason Wang <jasowangio@gmail.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eric Dumazet <edumazet@google.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
+	virtualization@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>, 
+	Jason Wang <jasowang@redhat.com>, stable@vger.kernel.org, Brien Oberstein <brienpub@gmail.com>
+Subject: Re: [PATCH net v2 1/2] vsock/virtio: collapse receive queue under
+ memory pressure
+Message-ID: <ak9fGNnW7gdqVXie@sgarzare-redhat>
+References: <20260708102904.50732-1-sgarzare@redhat.com>
+ <20260708102904.50732-2-sgarzare@redhat.com>
+ <20260708065947-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260709-b4-flowtable-sw-accel-ip6ip-v5-6-828ceaf85bab@kernel.org>
-References: <20260709-b4-flowtable-sw-accel-ip6ip-v5-0-828ceaf85bab@kernel.org>
-In-Reply-To: <20260709-b4-flowtable-sw-accel-ip6ip-v5-0-828ceaf85bab@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Felix Fietkau <nbd@nbd.name>, Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
- Ido Schimmel <idosch@nvidia.com>, Pablo Neira Ayuso <pablo@netfilter.org>, 
- Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, 
- Shuah Khan <shuah@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
- linux-kselftest@vger.kernel.org
-X-Mailer: b4 0.14.3
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20260708065947-mutt-send-email-mst@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:nbd@nbd.name,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:horms@kernel.org,m:dsahern@kernel.org,m:idosch@nvidia.com,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:shuah@kernel.org,m:lorenzo@kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:linux-kselftest@vger.kernel.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,nbd.name,gmail.com,collabora.com,nvidia.com,netfilter.org,strlen.de,nwl.cc];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306102-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-306101-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS(0.00)[m:mst@redhat.com,m:netdev@vger.kernel.org,m:jasowangio@gmail.com,m:xuanzhuo@linux.alibaba.com,m:edumazet@google.com,m:eperezma@redhat.com,m:horms@kernel.org,m:stefanha@redhat.com,m:davem@davemloft.net,m:linux-kernel@vger.kernel.org,m:kvm@vger.kernel.org,m:pabeni@redhat.com,m:virtualization@lists.linux.dev,m:kuba@kernel.org,m:jasowang@redhat.com,m:stable@vger.kernel.org,m:brienpub@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,linux.alibaba.com,google.com,redhat.com,kernel.org,davemloft.net,lists.linux.dev];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nft_flowtable.sh:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,sgarzare-redhat:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 42E0972EA84
+X-Rspamd-Queue-Id: C529B72ECCE
 
-Similar to IPIP, IP6IP6 and IPv4 over IPv6, introduce specific selftest
-for SIT flowtable sw acceleration in nft_flowtable.sh
+On Wed, Jul 08, 2026 at 07:00:00AM -0400, Michael S. Tsirkin wrote:
+>On Wed, Jul 08, 2026 at 12:29:03PM +0200, Stefano Garzarella wrote:
+>> From: Stefano Garzarella <sgarzare@redhat.com>
+>>
+>> When many small packets accumulate in the receive queue, the skb overhead
+>> can exceed buf_alloc even while the payload is within bounds. This causes
+>> virtio_transport_inc_rx_pkt() to reject packets, leading to connection
+>> resets during large transfers under backpressure.
+>>
+>> The issue was reported by Brien, who has a reproducer, but it is also
+>> easily reproducible with iperf-vsock [1] using a small packet size:
+>>
+>>   iperf3 --vsock -c $CID -l 129
+>>
+>> which fails immediately without this patch but with commit 059b7dbd20a6
+>> ("vsock/virtio: fix potential unbounded skb queue").
+>>
+>> Inspired by TCP's tcp_collapse() which solves a similar problem, add
+>> virtio_transport_collapse_rx_queue() that walks the receive queue and
+>> re-copies data into compact linear skbs to reduce the overhead.
+>>
+>> The collapse is triggered proactively from when the number of skb queued
+>> is close to exceeding the overhead budget.
+>>
+>> A pre-scan counts the eligible bytes to size each allocation precisely,
+>> avoiding waste for isolated small packets. Partially consumed skbs are
+>> kept as-is to preserve buf_used/fwd_cnt accounting, EOM-marked skbs to
+>> maintain SEQPACKET message boundaries, and skbs already larger than the
+>> collapse target because they already have a good data-to-overhead ratio.
+>>
+>> Walking a large queue may take a significant amount of time and cache
+>> misses, causing traffic burstiness. To limit this, the collapse stops
+>> once enough room is freed for this packet and the next one, but may
+>> opportunistically free more to fill each collapsed skb to capacity.
+>>
+>> [1] https://github.com/stefano-garzarella/iperf-vsock
+>>
+>> Fixes: 059b7dbd20a6 ("vsock/virtio: fix potential unbounded skb queue")
+>> Cc: stable@vger.kernel.org
+>> Reported-by: Brien Oberstein <brienpub@gmail.com>
+>> Closes: https://lore.kernel.org/netdev/618701dd023e$063de350$12b9a9f0$@gmail.com/
+>> Tested-by: Brien Oberstein <brienpub@gmail.com>
+>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>
+>
+>this is the right approach
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- tools/testing/selftests/net/netfilter/config       |  1 +
- .../selftests/net/netfilter/nft_flowtable.sh       | 45 ++++++++++++++++++++++
- 2 files changed, 46 insertions(+)
+Yeah, I have a follow up to start to use skb->truesize, etc. but I guess 
+more net-next material.
 
-diff --git a/tools/testing/selftests/net/netfilter/config b/tools/testing/selftests/net/netfilter/config
-index c3c121b6f300..a212b9edbcd9 100644
---- a/tools/testing/selftests/net/netfilter/config
-+++ b/tools/testing/selftests/net/netfilter/config
-@@ -35,6 +35,7 @@ CONFIG_IP_SCTP=m
- CONFIG_IPV6=y
- CONFIG_IPV6_MULTIPLE_TABLES=y
- CONFIG_IPV6_TUNNEL=m
-+CONFIG_IPV6_SIT=m
- CONFIG_IP_VS=m
- CONFIG_IP_VS_PROTO_TCP=y
- CONFIG_IP_VS_RR=m
-diff --git a/tools/testing/selftests/net/netfilter/nft_flowtable.sh b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-index b14c80c6e372..46bd080108be 100755
---- a/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-+++ b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-@@ -597,6 +597,10 @@ ip -net "$nsr1" addr add 192.168.210.1/24 dev tun6
- ip -net "$nsr1" addr add fee1:3::1/64 dev tun6 nodad
- ip netns exec "$nsr1" sysctl net.ipv4.conf.tun6.forwarding=1 > /dev/null
- 
-+ip -net "$nsr1" link add name sit1 type sit local 192.168.10.1 remote 192.168.10.2 ttl 255
-+ip -net "$nsr1" link set sit1 up
-+ip -net "$nsr1" addr add fe01:3::1/64 dev sit1 nodad
-+
- ip -net "$nsr2" link add name tun0 type ipip local 192.168.10.2 remote 192.168.10.1
- ip -net "$nsr2" link set tun0 up
- ip -net "$nsr2" addr add 192.168.100.2/24 dev tun0
-@@ -608,6 +612,10 @@ ip -net "$nsr2" addr add 192.168.210.2/24 dev tun6
- ip -net "$nsr2" addr add fee1:3::2/64 dev tun6 nodad
- ip netns exec "$nsr2" sysctl net.ipv4.conf.tun6.forwarding=1 > /dev/null
- 
-+ip -net "$nsr2" link add name sit1 type sit local 192.168.10.2 remote 192.168.10.1 ttl 255
-+ip -net "$nsr2" link set sit1 up
-+ip -net "$nsr2" addr add fe01:3::2/64 dev sit1 nodad
-+
- ip -net "$nsr1" route change default via 192.168.100.2
- ip -net "$nsr2" route change default via 192.168.100.1
- 
-@@ -622,6 +630,7 @@ ip -6 -net "$ns2" route add default via dead:2::1
- 
- ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif tun0 accept'
- ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif tun6 accept'
-+ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif sit1 accept'
- ip netns exec "$nsr1" nft -a insert rule inet filter forward \
- 	'meta oif "veth0" tcp sport 12345 ct mark set 1 flow add @f1 counter name routed_repl accept'
- 
-@@ -648,6 +657,19 @@ if ! test_tcp_forwarding_nat "$ns1" "$ns2" 1 "IP4IP6 tunnel"; then
- 	ret=1
- fi
- 
-+ip -6 -net "$nsr1" route delete default
-+ip -6 -net "$nsr1" route add default via fe01:3::2
-+ip -6 -net "$nsr2" route delete default
-+ip -6 -net "$nsr2" route add default via fe01:3::1
-+
-+if test_tcp_forwarding "$ns1" "$ns2" 1 6 "[dead:2::99]" 12345; then
-+	echo "PASS: flow offload for ns1/ns2 SIT tunnel"
-+else
-+	echo "FAIL: flow offload for ns1/ns2 with SIT tunnel" 1>&2
-+	ip netns exec "$nsr1" nft list ruleset
-+	ret=1
-+fi
-+
- # Create vlan tagged devices for IPIP traffic.
- ip -net "$nsr1" link add link veth1 name veth1.10 type vlan id 10
- ip -net "$nsr1" link set veth1.10 up
-@@ -672,6 +694,11 @@ ip -6 -net "$nsr1" route delete default
- ip -6 -net "$nsr1" route add default via fee1:5::2
- ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif tun6.10 accept'
- 
-+ip -net "$nsr1" link add name sit1.10 type sit local 192.168.20.1 remote 192.168.20.2 ttl 255
-+ip -net "$nsr1" link set sit1.10 up
-+ip -net "$nsr1" addr add fe01:5::1/64 dev sit1.10 nodad
-+ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif sit1.10 accept'
-+
- ip -net "$nsr2" link add link veth0 name veth0.10 type vlan id 10
- ip -net "$nsr2" link set veth0.10 up
- ip -net "$nsr2" addr add 192.168.20.2/24 dev veth0.10
-@@ -689,6 +716,11 @@ ip -net "$nsr2" link set tun6.10 up
- ip -net "$nsr2" addr add 192.168.220.2/24 dev tun6.10
- ip -net "$nsr2" addr add fee1:5::2/64 dev tun6.10 nodad
- ip netns exec "$nsr2" sysctl net.ipv4.conf.tun6/10.forwarding=1 > /dev/null
-+
-+ip -net "$nsr2" link add name sit1.10 type sit local 192.168.20.2 remote 192.168.20.1 ttl 255
-+ip -net "$nsr2" link set sit1.10 up
-+ip -net "$nsr2" addr add fe01:5::2/64 dev sit1.10 nodad
-+
- ip -6 -net "$nsr2" route delete default
- ip -6 -net "$nsr2" route add default via fee1:5::1
- 
-@@ -715,6 +747,19 @@ if ! test_tcp_forwarding_nat "$ns1" "$ns2" 1 "IP4IP6 tunnel over vlan"; then
- 	ret=1
- fi
- 
-+ip -6 -net "$nsr1" route delete default
-+ip -6 -net "$nsr1" route add default via fe01:5::2
-+ip -6 -net "$nsr2" route delete default
-+ip -6 -net "$nsr2" route add default via fe01:5::1
-+
-+if test_tcp_forwarding "$ns1" "$ns2" 1 6 "[dead:2::99]" 12345; then
-+	echo "PASS: flow offload for ns1/ns2 SIT tunnel over vlan"
-+else
-+	echo "FAIL: flow offload for ns1/ns2 with SIT tunnel over vlan" 1>&2
-+	ip netns exec "$nsr1" nft list ruleset
-+	ret=1
-+fi
-+
- # Restore the previous configuration
- ip -net "$nsr1" route change default via 192.168.10.2
- ip -net "$nsr2" route change default via 192.168.10.1
+>
+>Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
--- 
-2.55.0
+Thanks,
+Stefano
 
 
