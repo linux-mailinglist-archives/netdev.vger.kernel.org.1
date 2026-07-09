@@ -1,133 +1,137 @@
-Return-Path: <netdev+bounces-306193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306194-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id b6DbOgqGT2oDiwIAu9opvQ
-	(envelope-from <netdev+bounces-306193-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:29:14 +0200
+	id iRFkMYiGT2oliwIAu9opvQ
+	(envelope-from <netdev+bounces-306194-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:31:20 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F0E5730554
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:29:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 261E67305C0
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:31:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linuxfoundation.org header.s=korg header.b=KeVOrZr9;
-	dmarc=pass (policy=none) header.from=linuxfoundation.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306193-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306193-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="a4kqZ6/R";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306194-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306194-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AC8DD30C1518
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 11:04:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3C91D3170A7C
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 11:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03B1E40758E;
-	Thu,  9 Jul 2026 11:04:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D3E340E8FC;
+	Thu,  9 Jul 2026 11:10:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF2131ED83;
-	Thu,  9 Jul 2026 11:04:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0F540E8E8;
+	Thu,  9 Jul 2026 11:10:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783595047; cv=none; b=mS5AjW7thYvK8w4q/Dm6RAjqHbXznx5IernkDJypyePGd7OKwnhkS3bgRPdICAc6G/enzkiY+JrhFiHtk5EysDZM5srdZNHOQRott//Qzv2nZhva7TbusEXAGF4tpa511be/TeQoFVXIfpD57n4BnpHGJfOcJJURD1AhidPhAeY=
+	t=1783595429; cv=none; b=NK1WTPI/w4VAtLftBvths6ktjZeKWhhcu5/11mBPv7deOKU8quvfUdCUds1ypb4L9C9YaH1s8ZIRP24lnPwfaNOb9azjHFYTbibLeyo9nRc9ApVeso6bNACk/AlUhuD0Mc6iar/YWF9wZqgM9O39x09W+ZKWejGT/z40gEXMVas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783595047; c=relaxed/simple;
-	bh=a0Siylbpou4kYnKcPL7wNvEXfvWgd5TCFMcUKiXyTl8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EqkHAEawIxdVqRUvW65J6nlZMyis9zbLiW8LV7APaN1ICBIZzAdDJYPCbvdrBcfNp+U9ZhtKKFKhpWo9+ZNymbzACeH0wxL8EZnQ6aaq21f/iMS1LjTir5pqmZ7f+v1+Qt2FwZP3jb0rJmCdUo0bgOb4WsEnPZHQ+8Soi39CK6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=KeVOrZr9; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3EFF1F000E9;
-	Thu,  9 Jul 2026 11:04:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1783595046;
-	bh=jaqLbl+X8iIgOO/YVJKeKF+iO97X7C5yc74usd3ZoMo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=KeVOrZr9G+Tl9U4Y53ZLTpbeQZr2VooekAi15A5lP9PRGFkCn5iXglCpjnjOQkvzd
-	 N2/dCqdBLSwxZT3A0XyNGlUnWX2XamduTJBftZqFkm9OsCz9pSNQo88JCoGs5szn5V
-	 r57H8f563WbujTtAC/TazuCLhV930BEbM33tq8Sk=
-Date: Thu, 9 Jul 2026 13:04:03 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Ujjal Roy <royujjal@gmail.com>
-Cc: Linux Stable <stable@vger.kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>, David Ahern <dsahern@kernel.org>,
-	Shuah Khan <shuah@kernel.org>, Andy Roulin <aroulin@nvidia.com>,
-	Yong Wang <yongwang@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	Ujjal Roy <ujjal@alumnux.com>, bridge@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: Please backport bridge multicast exponential field encoding fix
- series to 6.1.y/6.6.y/6.12.y/6.18.y/7.0.y
-Message-ID: <2026070925-delay-gauntlet-bc7c@gregkh>
-References: <20260709101327.9508-1-royujjal@gmail.com>
+	s=arc-20240116; t=1783595429; c=relaxed/simple;
+	bh=Rw2BKhBNPfDnflYVZK/NR3FWW0puEUgSEaq9wKcCVfA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=PI5fsg1dWNnwCrXRW7mevdamf+EsmdZunoaGisjPtlNe68WkZYfkbkUS5K9li/B7DxZ6B/oVctpF4l24Qk4b6+RXXWnjJhX8T4faufRHFzgGXmCOKoG00pIaBNNbrzoXR0JE/VN/0/Zoy93vdur9WgfRJAqqARrgLZxp+jvunW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a4kqZ6/R; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD07B1F000E9;
+	Thu,  9 Jul 2026 11:10:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783595428;
+	bh=76xRzWRSgOQF+7inDrTGUaUfL0VORDXioVujCWMgDUM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=a4kqZ6/RAUYCCrOjhxpWP3ir13//0nsRoUlE+Zb7C8Iuqm72hf5JMGzBCttCWezuy
+	 CGosJYYPz5oEm53ETMTHH2jji0gAVhrIny14p1LQVcj6aVNUXEbzVhEypjonfhCGQE
+	 lYFHbII2dc6Wve9xIQrVnQLDrHjId8VzvEJvOY5t5roXedoEjy07tH4Ik5vhytlTEK
+	 m7lYgR2kbiKVeckcBXyy+vxp5N2A69nRdIzMYgf/1OBBeHXFtZy2HREKr760vQf+NF
+	 XY/ZfeX2CobR8uUi8aYt05V8uMyFRx6kC3jo/aX0FQgSvnuAMYKZauiHIHRIIyep0U
+	 Ur+Shs0S+7rtw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93DD139EDE30;
+	Thu,  9 Jul 2026 11:10:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260709101327.9508-1-royujjal@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] dibs: loopback: validate offset and size in
+ move_data()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178359540740.3416587.11524899532321320638.git-patchwork-notify@kernel.org>
+Date: Thu, 09 Jul 2026 11:10:07 +0000
+References: <20260707074318.1448662-1-dust.li@linux.alibaba.com>
+In-Reply-To: <20260707074318.1448662-1-dust.li@linux.alibaba.com>
+To: Dust Li <dust.li@linux.alibaba.com>
+Cc: wintera@linux.ibm.com, wenjia@linux.ibm.com, guwen@linux.alibaba.com,
+ pabeni@redhat.com, mjambigi@linux.ibm.com, alibuda@linux.alibaba.com,
+ sidraya@linux.ibm.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org, federico.kirschbaum@xbow.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.34 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:royujjal@gmail.com,m:stable@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:razor@blackwall.org,m:idosch@nvidia.com,m:dsahern@kernel.org,m:shuah@kernel.org,m:aroulin@nvidia.com,m:yongwang@nvidia.com,m:petrm@nvidia.com,m:ujjal@alumnux.com,m:bridge@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306194-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS(0.00)[m:dust.li@linux.alibaba.com,m:wintera@linux.ibm.com,m:wenjia@linux.ibm.com,m:guwen@linux.alibaba.com,m:pabeni@redhat.com,m:mjambigi@linux.ibm.com,m:alibuda@linux.alibaba.com,m:sidraya@linux.ibm.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:federico.kirschbaum@xbow.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-306193-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linuxfoundation.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxfoundation.org:from_mime,linuxfoundation.org:dkim,vger.kernel.org:from_smtp,gregkh:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3F0E5730554
+X-Rspamd-Queue-Id: 261E67305C0
 
-On Thu, Jul 09, 2026 at 10:13:27AM +0000, Ujjal Roy wrote:
-> Hi Greg,
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Tue,  7 Jul 2026 15:43:18 +0800 you wrote:
+> The loopback move_data() performs a memcpy into the registered DMB
+> without checking whether offset + size exceeds the DMB length.  Unlike
+> real ISM hardware, which enforces memory region bounds natively, the
+> software loopback has no such protection.
 > 
-> Please consider backporting the following bridge multicast fix series to 6.1.y, 6.6.y, 6.12.y, 6.18.y and 7.0.y.
+> A peer-supplied out-of-bounds offset or oversized write would result in
+> an OOB write past the allocated kernel buffer.  Add an explicit bounds
+> check before the memcpy to reject such requests with -EINVAL.
 > 
-> 726fa7da2d8c ("ipv4: igmp: get rid of IGMPV3_{QQIC,MRC} and simplify calculation")
-> 12cfb4ecc471 ("ipv6: mld: rename mldv2_mrc() and add mldv2_qqi()")
-> 95bfd196f0dc ("ipv4: igmp: encode multicast exponential fields")
-> e51560f4220a ("ipv6: mld: encode multicast exponential fields")
-> 529dbe762de0 ("selftests: net: bridge: add MRC and QQIC field encoding tests")
+> [...]
 
-Why is any of this needed in older kernels?
+Here is the summary with links:
+  - [net] dibs: loopback: validate offset and size in move_data()
+    https://git.kernel.org/netdev/net/c/78237e3c0720
 
-And 7.0.y is long end-of-life.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-And why, if this does fix issues, was it not tagged for stable to start
-with?
 
-thanks,
-
-greg k-h
 
