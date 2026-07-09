@@ -1,194 +1,215 @@
-Return-Path: <netdev+bounces-306369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306370-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ZIChIwoGUGo9sAIAu9opvQ
-	(envelope-from <netdev+bounces-306369-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 22:35:22 +0200
+	id O7bDOX4KUGo6sQIAu9opvQ
+	(envelope-from <netdev+bounces-306370-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 22:54:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 269767356FD
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 22:35:22 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78C54735943
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 22:54:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=V1bBJ8W7;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306369-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306369-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=purestorage.com header.s=google2022 header.b=UNPLxzRf;
+	dmarc=pass (policy=quarantine) header.from=purestorage.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306370-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306370-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 68949304364D
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 20:34:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 85FE0303E9D1
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 20:54:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A3353CF1F6;
-	Thu,  9 Jul 2026 20:34:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B5B03B6C11;
+	Thu,  9 Jul 2026 20:54:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
+Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D97C63BE165
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 20:34:17 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783629259; cv=pass; b=YlhBvRITgAZVjUUomEF1MOVstDaB7H2t/tlK2kvKZPk+K9NTe3yaVxMhbc/n7erdz/GdDRsQygFxA2kD0R84S2nDafdNMu9vyQbn1XBfcBj2X0RklgS67Lm7RB8uwJhJ20H/ctGe9tQYZpVSJjefXLh0uPxFCPYb3MqkpzOe4ns=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783629259; c=relaxed/simple;
-	bh=3Itm/tg+Tm3JwuMc2zeYR8b5ySP7Uvg2IWDzrrT32NU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EzQSNUU5h6JAaql9aMTh3ft9xKfhlBis0Z7KHvyW/l8YXUE+Rbb4hyozQy7wdVlWb5oSART9B+8JnoIDFcKv7dvsnIUZHYuJ4rQXFP7lFJfJ+r3ibHwnRcmhWC+H4g14V4c4oAb0cNvOcIYJ0PyQ/Bg/rztNNeRqQBsyc7akfSc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V1bBJ8W7; arc=pass smtp.client-ip=74.125.224.49
-Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-664d4478a64so278706d50.3
-        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 13:34:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783629257; cv=none;
-        d=google.com; s=arc-20260327;
-        b=HlN8d2ImVaBTeK8TmNnB43f7t9aA75amUgKWsnHnGdzflo1J1+K9IW7xpvBiBD9Uov
-         rvZ5INr1+KilWSletIJn91P9rlm2qlVbFi57OqCAZ3HHMf3tBlGXc8d2Z+DVX5BqnhTe
-         NyyGHGGUa9l2Hf42wx/r0s1M5LyNfndFAcd4Ajm+uSebmYvrLQCW56HViFbF0ctX9VP7
-         Pn++UvI3Z/6/TXPTSuNQTT5TFvOSpgcgV+DvCbGnqXGbXgbG7Cx5+Bt5eOz9mqbn7kio
-         JaVJ46i8qT0Z2o7ggu3lcwybSvKQXQl0xQEDy8Z45sxkvJHP86oMTvg/Gv6Q+aioejzF
-         b9gQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=3Itm/tg+Tm3JwuMc2zeYR8b5ySP7Uvg2IWDzrrT32NU=;
-        fh=RZINLQcS3VeIfRr0UpZ30z0O1sedcd08lkXJ9o3FSM4=;
-        b=XiKiT9GN+Itd23df9IiCbA8viJfrj7LYNpdfIKE4FQ/AyylaVVItHAhxBe88cv/uWQ
-         BGx3VsOL8oBy85orSqOtIpX2Qy/guCumKcdHbRRf7v2lu/niGRtn7vNBatw3UaHQQzBY
-         pVMpdD6PuJIiAvjcAh/CI15KM7dqxeAm9s+x7xQFrcu1fmfQoo2GBu0t6iu5LOxoOTf7
-         HqCQwtz5YGTvMidCWV7425KeD3W79cFGebttSo3/Oe3K2IigdgjUdRIl8Qnj6k0dsCSb
-         HWDKyG77EFIXuKwbqoSn5250T8tw3rRluy5vPgU7N5bansv8cmwJwuh9GgkYk+cjgJWu
-         xXyQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35593E0223
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 20:54:16 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783630459; cv=none; b=hpty8QJPyEe4X9SDN9J0K/fy0qXn5Slan3vRc9HS2/r8gNv1PXpFdM4B4i5enJ4l4/u/5nz4PgUdRKo5oTynWyzIJ0P5Kz5jacN0B8IJOqB7v83jjFZ3lkMZT9rie+yU1JIHbT6a2T6Bb9GPzOy/XHdDW0TFgcLoDCpHU5quC+k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783630459; c=relaxed/simple;
+	bh=DN45JNwbLOwiHnKDTjLPOUjmsCP4IR6MvnRX+EnLOJ0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=E73MO4KvfdZLuceyRtFckjgJmd+zBZrD2CKw9hGp6AJoB7jc8zzTbdthDqzc7bwPQzZxOsjV0FguHcE+VoSXFQe0KxPmHMVuYViZTy8X57xNo5CkuSgx91fCfXhkBekr3V0dJk4ro4L6LfEWi2wxnIFWPAsJ8cMbmsuEzhvaLzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=UNPLxzRf; arc=none smtp.client-ip=209.85.160.41
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-448df16ab34so87166fac.1
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 13:54:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783629257; x=1784234057; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=3Itm/tg+Tm3JwuMc2zeYR8b5ySP7Uvg2IWDzrrT32NU=;
-        b=V1bBJ8W71AODDbZv/Cqpt8LY0y/VvAM0dNdV+aWKP77bP3coXPj+1Dg6RvGo4VKSEd
-         nTVOucViMuRp3Aw9YRk+GZLKispRMWnEqLCiji0wDZkxhxi+WHUrL+DJkcODiFuabe29
-         c2UcVSL/MwkXS11SIArRiGW08nZp+JZN/rdAXNsT6pXpFVgcjZml02b7Ob+c03ndA5+K
-         NXxyqA4sOhSC2RMuzBZyE5DTSCbfVgbKmdEaTOvwQiHIqgIgUsKaJ+7xLVz4yroKDkpP
-         B79p5V2h1PDDfNWw/ewhOB/F92Hu2VwpDRLOcWMPLS148gJCyiXzySrzmbxzUh3qx61Z
-         NZBw==
+        d=purestorage.com; s=google2022; t=1783630456; x=1784235256; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=0inhRMc8bQBgsG69KIZ8p4jcIVm+QaxkOqEz8+RjbL8=;
+        b=UNPLxzRfq1W1XnRCuMiZKl0wt/04uSBVexCGWoFfygbqhetAkKoCMhUVcAgtOkJO0c
+         by9myERlls2/S/g90lANmdhjXu/mFFB97/Rr/cL/5XnHCv+PooIDEZGMjFfg/H/lT3zN
+         HBhaqRP5cfV6cWT2/mhQcjzq2ADeIA4blh8+Z9viXL0PEl3Njho+5O7Wlq4k56s0f8Yu
+         dScPhV26DEz30IMJwNuSjwSLR10blzNzuYBDWU7RIe3JQkVlOtTbobjU8ndYL25+lq98
+         XasMSNmR1Vj5htjNps6FSZi8qhQ6LrneMUi1IIhbPWqprNZ9eg9iVk/nOEFhraLXNkSg
+         VEzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783629257; x=1784234057;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=3Itm/tg+Tm3JwuMc2zeYR8b5ySP7Uvg2IWDzrrT32NU=;
-        b=pIOtiI/bnpIVIhuXdoDpM8iRZgC6i6ZvKa3YGW6Ltk09ZEU09WZz5XF6PGjOZgX2RX
-         CP7FMlpRN1THZhHQ15sg8uylWcMe9VO+yvZCXva4otE7WpBWZ8k6zh5f/XUu9jtWeQXR
-         Pnk7sA2UlOtx4MKQVW6+EBScHw04Y8cPXLwGipphiPLUBwBKMuz0vxbGEwLIluRqpdWQ
-         tcoa9HmxlbtWs04/+5mFAsHSseEQJhakleCeSvjzAngtElZP67dSNPn9XcQ4Rt/r6w41
-         35GLgY8muwWvD/NVTShJgdXQlePE/YKCvN7u4zy2Vqsx9+hLJIB174SUceljnG2+9RoI
-         LDqA==
-X-Forwarded-Encrypted: i=1; AHgh+RpkoLjC5Yz9lILKYk8Dkkeeyc3eSw0CIEQ0eN9NjvPMo31wJ0I1UVmjz7s6OUSIA5sv669DQXM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0s+uQh/Q94NZg9aQGYUy+iFMEN4HFUUHKgHO8jXuLBBj/KkcP
-	uGxtBWpxwufv+DnqSpS7VS9ku3CHLIPx8+tERpRihqtXnzfpIsHGxnoJJOndCQITFrtlvk6J2PU
-	un4N6RYm2KH51Lyvx1asKu6djAQ52PTGySFVzEm729fokWag=
-X-Gm-Gg: AfdE7cnBXk9pIqtdJZ8eQixaSQJfkrQG9zoV+Of9E6w+Hp96ZUtqz/bnA3SceS6tsWK
-	feuDPUBnwYc1FJk0z9u5QBGlVBaYFKPrZ/wwjgvaYkAwnR+w9OSFCboNYciZIRVEf0Q+nk4D7kL
-	tpV5zZLe4dw4cuzEJOe3IlUITPEWAgtMjP0XcORblmQ+luRYQ27waiL2aZsiU/B5fg1d98f248e
-	Tf/cz0TRsvn94i1z9LbdLQ45Z+MrOgizXgZrf0fr7pH8dk41OdtzxENLtXIpsTDNS2zZCxolyqh
-	OI1kdKGH
-X-Received: by 2002:a05:690e:d04:b0:667:b84f:e408 with SMTP id
- 956f58d0204a3-667b84ff14dmr2662678d50.5.1783629256851; Thu, 09 Jul 2026
- 13:34:16 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1783630456; x=1784235256;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=0inhRMc8bQBgsG69KIZ8p4jcIVm+QaxkOqEz8+RjbL8=;
+        b=oyyp8R1DhO2BbjgmpAiN0Trn3lLEIfuDwv9+zQ6uvlY2TB/pS/KHgZhe6XHRdYrhGC
+         HYvQ74U8K5bHCHKVFBoZTT0/L2j/9cE7WZnO2q9jvyFa0t+/r9ntaOZli/B3e8lmMB+I
+         93Z+OIAN8RfjIN0Xtwg02jr3Z3roX5YY8KesRaDbxaagTiYeQ/LcmgRPJlB2DhMvpfdb
+         BDcDJ0nSR3WOXNHVNm838E5/AzzA1i4QnbOn5iI47t9VBzZUomgCJvvtKqHZGrAe5c5J
+         Xb/9pkPAsQowJeFEokpwFk5I/5qmsDrmlV5p7R+Ebs5jmiYRaN6dkG7PGrGnm4UZ0g4h
+         gL+Q==
+X-Gm-Message-State: AOJu0Yzs5ZRxDaevHHx5U52HM2o6g8QlsUJVSQ3WARMdkfk91RtERHV0
+	SAt0Zo92ycA4BA76CFyJzxNO7BRb5H0mCpd95eLNR/knaGi6VBwRr3vkNDY6XYVdr0M91/eoWrN
+	EV5yNDOW4M6ePFGOhs4wp9ufovvTpFi95OJzVAA6b5DLqStlrjD0z7pQ/2w6oStSvggJ4QF26TF
+	W4bUmfeA4EftvYE8M5wwZmRczmSRYffzP6ltIHTuuLSXaQ+7w=
+X-Gm-Gg: AfdE7cnzQt8ChE5CvSiePnRi+q1CSGrRFVPx4AhO9P0tdUOh8aarC+iONtZKjarczGM
+	WqWmcN/o1BxnfqdWxVLoDoxpIBX3k1pJrkuEeTt9Ua2ZW/H181kjJoNVteqKv5hyPPX0Hc6LPqn
+	vdxBS5O0o4ecSDqAZmS6fr+EoMz/bCBvRlw63qgffqTFl5fMOcqS69FZIdkQDnCKBlhitEULnDc
+	IhUP/KL+rYDIEltwnb8RBcqzg2+VBuOJxk8v7a2ALfGEP7Xg555rlVAR5GPxb++wScn8qW0R5Bt
+	1Yj5N4S036OJq7HacKeyFyOfVhGD4fCIRtt1xIXJJqoLxd8K8s25WtTXgluTIRkFkh4xKTUnt/U
+	4VfYmJEWh+4H4yoB8P4prJkBshSypyvyy2hgLoTy5fHaubV2OI446Tej2jh6r3yW/t3jw/wIc1d
+	qva31lNuRE5VDz/yjbre1yuqrZoZCPF07tFmcwJ+misNqbabysBgK5hXg89BAAJDHQJRR6VZTww
+	i4/b0Eq5xnlfYZQQ4nFgQ3PWaa2qrhhjKlnTEkiGOXwApIdBlX1faS8lpaAhTZZY2s9EK3D6Rik
+	/db8TIncT8tPkkb9Ae/7MUHHzO/gvN93Rg4=
+X-Received: by 2002:a05:6870:d622:b0:44c:a4cf:ccde with SMTP id 586e51a60fabf-45163cfbe4emr6059684fac.38.1783630455313;
+        Thu, 09 Jul 2026 13:54:15 -0700 (PDT)
+Received: from dev-rjethwani.dev.purestorage.com ([208.88.159.129])
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-451916d5cebsm3059283fac.15.2026.07.09.13.54.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jul 2026 13:54:14 -0700 (PDT)
+From: Rishikesh Jethwani <rjethwani@purestorage.com>
+To: netdev@vger.kernel.org
+Cc: saeedm@nvidia.com,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	borisp@nvidia.com,
+	john.fastabend@gmail.com,
+	kuba@kernel.org,
+	sd@queasysnail.net,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	leon@kernel.org,
+	andrew.gospodarek@broadcom.com,
+	Rishikesh Jethwani <rjethwani@purestorage.com>
+Subject: [PATCH net-next v15 0/9] tls: Add TLS 1.3 hardware offload support
+Date: Thu,  9 Jul 2026 14:53:16 -0600
+Message-Id: <20260709205325.1591196-1-rjethwani@purestorage.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260708205404.911832-1-anzaki@gmail.com> <ak_VoSJ7fozDdOzM@chamomile>
-In-Reply-To: <ak_VoSJ7fozDdOzM@chamomile>
-From: Ahmed Zaki <anzaki@gmail.com>
-Date: Thu, 9 Jul 2026 14:33:40 -0600
-X-Gm-Features: AVVi8Cdgg5kTDMa4iLOD29tsjNfKzbl4dqR0_vZdo8RWLyjTUxjqsao25hm6USY
-Message-ID: <CANczwAHgj+iNVVmZtUkSUGxsKrgxk=9VN=xAL-+6G0y47fZXkw@mail.gmail.com>
-Subject: Re: [PATCH nf] netfilter: flowtable: tear down HW offloaded flows on
- FIB route changes
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, fw@strlen.de, kuba@kernel.org, 
-	edumazet@google.com, davem@davemloft.net, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, Ahmed Zaki <anzaki@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[purestorage.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[purestorage.com:s=google2022];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:netfilter-devel@vger.kernel.org,m:fw@strlen.de,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:anzaki@gmail.com,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306369-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[anzaki@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,strlen.de,kernel.org,google.com,davemloft.net,redhat.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[nvidia.com,gmail.com,kernel.org,queasysnail.net,davemloft.net,redhat.com,google.com,broadcom.com,purestorage.com];
+	TAGGED_FROM(0.00)[bounces-306370-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:borisp@nvidia.com,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:sd@queasysnail.net,m:davem@davemloft.net,m:pabeni@redhat.com,m:edumazet@google.com,m:leon@kernel.org,m:andrew.gospodarek@broadcom.com,m:rjethwani@purestorage.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[rjethwani@purestorage.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[anzaki@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rjethwani@purestorage.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[purestorage.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,vger.kernel.org:from_smtp,netfilter.org:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 269767356FD
+X-Rspamd-Queue-Id: 78C54735943
 
-On Thu, Jul 9, 2026 at 11:08=E2=80=AFAM Pablo Neira Ayuso <pablo@netfilter.=
-org> wrote:
->
-> On Wed, Jul 08, 2026 at 02:54:04PM -0600, Ahmed Zaki wrote:
-> > Hardware-offloaded flows bypass the CPU and, unlike the software
-> > datapath, dst_check() does not invalidate them when a route changes.
-> > For ephemeral flows, this is usually not a problem as the flow expire o=
-n
-> > its own and the driver clears the entry in the HW. However, for persist=
-ent
-> > flows forwarded through the device, the HW is never informed that the
-> > route has expired.
-> >
-> > For tables marked with NF_FLOWTABLE_HW_OFFLOAD, listen to the per-net F=
-IB
-> > notifier chain and tear down the affected flows so they are re-evaluate=
-d by
-> > the SW forwarding path.
-> >
-> > A lockless list is used to reduce the work items overhead in case of a
-> > route change storm allowing many FIB events to be processed by one work
-> > item.
->
-> This walks the hashtable anyway in case of fib event, maybe simply
-> walk over the hashtable and call dst_check() to check if the cached
-> dst is still current.
+Hi all,
 
-Good idea. I will replace the tuple matches and the lockless list with a
-dst_check in the hashtable iter func: nf_flow_offload_fib_cb().
+  This series adds TLS 1.3 hardware offload support including KeyUpdate
+  (rekey) and a selftest for validation.
 
-> > Fixes: c29f74e0df7a ("netfilter: nf_flow_table: hardware offload suppor=
-t")
->
-> No, this is an enhancement, not a fix. This must be targeted to nf-next.
->
+  Patch 1: Reject TLS 1.3 offload in chcr_ktls and nfp drivers
+    These drivers only support TLS 1.2; add explicit version check.
 
-Will tag v2 to nf-next.
+  Patch 2: mlx5e TLS 1.3 hardware offload
+    Add TLS 1.3 TX/RX offload on ConnectX-6 Dx and newer.
+    Handle 12-byte IV format and TLS_1_3 context type.
 
-Thanks.
-Ahmed
+  Patch 3: Core TLS 1.3 hardware offload support
+    Extend tls_device.c for TLS 1.3 record format (content type
+    appended before tag). Handle TLS 1.3 IV construction in fallback.
+
+  Patch 4: Split tls_set_sw_offload into init/finalize
+
+  Patch 5: Prep helpers and refactors for HW offload KeyUpdate
+
+  Patch 6: TX KeyUpdate support
+
+  Patch 7: RX KeyUpdate support
+
+  Patch 8: Tracepoints for RX KeyUpdate path
+
+  Patch 9: Selftest for hardware offload
+
+  Rishikesh
+
+  Changes in v15:
+  - Added tls_dev_rx_rekey_fixup callback
+  - Addressed review comments
+
+Rishikesh Jethwani (9):
+  net: tls: reject TLS 1.3 offload in chcr_ktls and nfp drivers
+  net/mlx5e: add TLS 1.3 hardware offload support
+  tls: add TLS 1.3 hardware offload support
+  tls: split tls_set_sw_offload into init and finalize stages
+  tls: prep helpers and refactors for HW offload KeyUpdate
+  tls: device: add TX KeyUpdate support
+  tls: device: add RX KeyUpdate support
+  tls: device: add tracepoints for the KeyUpdate path
+  selftests: net: add TLS hardware offload test
+
+ MAINTAINERS                                   |   2 +
+ .../chelsio/inline_crypto/ch_ktls/chcr_ktls.c |   3 +
+ .../mellanox/mlx5/core/en_accel/ktls.c        |  10 +
+ .../mellanox/mlx5/core/en_accel/ktls.h        |   8 +-
+ .../mellanox/mlx5/core/en_accel/ktls_txrx.c   |  14 +-
+ .../net/ethernet/netronome/nfp/crypto/tls.c   |   3 +
+ include/net/tls.h                             |  90 +-
+ include/uapi/linux/snmp.h                     |   6 +
+ net/tls/tls.h                                 |  22 +-
+ net/tls/tls_device.c                          | 876 ++++++++++++++--
+ net/tls/tls_device_fallback.c                 |  82 +-
+ net/tls/tls_main.c                            |  68 +-
+ net/tls/tls_proc.c                            |   6 +
+ net/tls/tls_sw.c                              | 133 ++-
+ net/tls/trace.h                               |  98 ++
+ .../selftests/drivers/net/hw/.gitignore       |   1 +
+ .../testing/selftests/drivers/net/hw/Makefile |   2 +
+ .../selftests/drivers/net/hw/tls_hw_offload.c | 975 ++++++++++++++++++
+ .../drivers/net/hw/tls_hw_offload.py          | 295 ++++++
+ 19 files changed, 2498 insertions(+), 196 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/tls_hw_offload.c
+ create mode 100755 tools/testing/selftests/drivers/net/hw/tls_hw_offload.py
+
+-- 
+2.25.1
+
 
