@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-306148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306149-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ubXAEMJxT2pkgwIAu9opvQ
-	(envelope-from <netdev+bounces-306148-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:02:42 +0200
+	id OK94As5yT2rIgwIAu9opvQ
+	(envelope-from <netdev+bounces-306149-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:07:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F18E72F478
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:02:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54EBE72F5DB
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:07:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=D5vvyizJ;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=DrlW+UXL;
 	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306148-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306148-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306149-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306149-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C6B1730D3403
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:57:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4A44E315E1BF
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:57:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2F7C405C3B;
-	Thu,  9 Jul 2026 09:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5FE9405C4A;
+	Thu,  9 Jul 2026 09:56:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87D1A404891
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 09:56:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0BB5406819
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 09:56:49 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783591004; cv=none; b=A4+kRNRSoVOp9TmeRLMKYDUBHRqiSHlA5MoS4AvP/x44Z6X/3KTFvw1Vqz8tY168C09qIc+3CO8sPL4u53Iy4lA6y0tnyGEMK78p/JrnhX1xdem2HR3tQs4His0fxInCOxbQ0QJhMukONoQI+3MDwhbWHU+Dza0kCetX4NA6Qnk=
+	t=1783591013; cv=none; b=dCHCvNSxW18qRv7JzLP3ViySvQq6tKqhNpCZCeZcOKZ3cG3YNRt1DXG2v1pRv3i6tHsHhztC4739z/N8hqV+Sc1WIcw9uCpuaDhKur6e/cixWccCJq6DqiqDZqvS2qE+C3tGsPP+CCZAmATS2UchTKKFbJfdR43cLqSLZTx8wKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783591004; c=relaxed/simple;
-	bh=5WcIL3cSWUpEZDU38DoQZvGGTr/bqktkg71hqCML7F4=;
+	s=arc-20240116; t=1783591013; c=relaxed/simple;
+	bh=LsaJa1Hk5cTRf1WrhMI+mjnx6uNaLrbu4ssH4ZYbCcw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JovZMOVP6DKWo1BMS2PUpnepUrMdSRQWv/xVs80PPUBiSDS/8b/L2nrC2RIazq1yscfuX54/Gx5wSWRAYtoGGKY54/5tnA8FMvSrMVCYgyzDCTpkRaXNDQBW5IOSOQ+wzKZlgR4aJMa3vT4Oi2O2Y5alXHp8aqDULNA92NzFEcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D5vvyizJ; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=ogDbEccExwr36LmruvIC3rdgwL5fwIcuuN/xvsTxCYmuN46EhSARsrxgoVGRJd8ltry4aL3u6MnhWxSnC5dMcy/3xclsLDdeIVdnaUQJVr9ri7jEJfZ7zjvY57P291NSkySPOWBOf3BYVNmc1AnG6I9dkeBgWu0nMUxh7HVYG4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DrlW+UXL; arc=none smtp.client-ip=170.10.133.124
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783591001;
+	s=mimecast20190719; t=1783591008;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=zEcwmO2/t6yqPq3tkOqxY2nILck2Co7QdnedvxZZKy0=;
-	b=D5vvyizJINqcaDKhPXXheGZEnMRqe9KkZPr6N7PAfgWc5O3Km+3OulObiqsiankrbogE2D
-	cbeJC1FuXsIpbqOsEMu2iJDhWWYuttLr3OQyZNoBAW1HzBfmfdlNBHMkENSkRLE3W8hUDw
-	8v2O4JJTA8tLqb+FceiP2rAOJqj3DfE=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=0WGe1lvmO/LMcL+/x7+LWV1+ybFNtFcj2Yh7l5tol/s=;
+	b=DrlW+UXLtdvW2wKdsS8BU40BzIb+dmcwVBjW7gTlil8Mf45wWZUs91G+Cl4Ahg7UtP+lMd
+	9Masu5g5q1r2UUS0JSvrqpVXLo3pvTMnjlhlOVRAQ6UR6pE7lKnRubsvHJ/4oP08EmDAxi
+	NO2HF5DMJQDvP7jg0uxN5PwTkZtTFf0=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-679-GiVM470nOomFAa5XCbdqyA-1; Thu,
- 09 Jul 2026 05:56:40 -0400
-X-MC-Unique: GiVM470nOomFAa5XCbdqyA-1
-X-Mimecast-MFC-AGG-ID: GiVM470nOomFAa5XCbdqyA_1783590998
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-64-ltxvhWyjN7imgyJmUOAuqg-1; Thu,
+ 09 Jul 2026 05:56:45 -0400
+X-MC-Unique: ltxvhWyjN7imgyJmUOAuqg-1
+X-Mimecast-MFC-AGG-ID: ltxvhWyjN7imgyJmUOAuqg_1783591004
 Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A0B161955F41;
-	Thu,  9 Jul 2026 09:56:38 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0BC9B1955E78;
+	Thu,  9 Jul 2026 09:56:44 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.44.33.79])
-	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B86513652A;
-	Thu,  9 Jul 2026 09:56:35 +0000 (UTC)
+	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 433003652A;
+	Thu,  9 Jul 2026 09:56:41 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: rkannoth@marvell.com
 Cc: linux-kernel@vger.kernel.org,
@@ -70,55 +70,55 @@ Cc: linux-kernel@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	sgoutham@marvell.com
-Subject: Re: [PATCH v2 net-next 7/9] octeontx2: plumb bridge FDB updates through AF and switchdev
-Date: Thu,  9 Jul 2026 11:56:31 +0200
-Message-ID: <20260709095633.117381-1-pabeni@redhat.com>
-In-Reply-To: <20260702045026.2914748-8-rkannoth@marvell.com>
-References: <20260702045026.2914748-8-rkannoth@marvell.com>
+Subject: Re: [PATCH v2 net-next 8/9] octeontx2: offload host FIB updates to switch via AF mailbox
+Date: Thu,  9 Jul 2026 11:56:38 +0200
+Message-ID: <20260709095638.117394-1-pabeni@redhat.com>
+In-Reply-To: <20260702045026.2914748-9-rkannoth@marvell.com>
+References: <20260702045026.2914748-9-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.6 on 10.30.177.95
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306148-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:rkannoth@marvell.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306149-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:rkannoth@marvell.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,linux.dev:url,info.dev:url]
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9F18E72F478
+X-Rspamd-Queue-Id: 54EBE72F5DB
 
 From: AI Reviewer <ai@example.com>
 
@@ -126,595 +126,523 @@ This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 Full review at: https://netdev-ai.bots.linux.dev/sashiko/
 ---
-octeontx2: plumb bridge FDB updates through AF and switchdev
+octeontx2: offload host FIB updates to switch via AF mailbox
 
-This patch wires switchdev FDB add/delete notifications on the PF into
-mailbox fdb_notify messages toward the AF, adds an AF worker to push L2
-rules to the switchdev firmware, and introduces a new AF-to-PF/VF
-MBOX_MSG_AF2PF_FDB_REFRESH message that ends up calling
-call_switchdev_notifiers(SWITCHDEV_FDB_ADD_TO_BRIDGE, ...) on the target.
+This change wires up an IPv4/IPv6 FIB offload path: the switch PF pushes
+fib_entry batches to the RVU AF via a fib_notify mbox, and the AF forwards
+them back down to the switch PF via a new af2swdev FIB_CMD.  A pair of
+workqueues on both ends batch and post the entries.
 
-A few questions inline below.
+Some questions follow inline.
 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-> index 6e10a58a0421..0f751555338e 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-
-[ ... ]
-
-> @@ -2579,6 +2580,7 @@ static void __rvu_mbox_up_handler(struct rvu_work *mwork, int type)
->  
->  		switch (msg->id) {
->  		case MBOX_MSG_CGX_LINK_EVENT:
-> +		case MBOX_MSG_AF2PF_FDB_REFRESH:
->  			break;
->  		default:
->  			if (msg->rc)
-
-[Medium]
-Adding MBOX_MSG_AF2PF_FDB_REFRESH to the same case as MBOX_MSG_CGX_LINK_EVENT
-suppresses the msg->rc check.  If the PF returns a non-zero rc for
-AF2PF_FDB_REFRESH (for example MBOX_MSG_INVALID, see the next comment about
-PF-side dispatch), is the intent to silently swallow it here or would it
-be preferable to log it like every other message?
-
-> @@ -3821,6 +3823,8 @@ static void rvu_remove(struct pci_dev *pdev)
->  {
->  	struct rvu *rvu = pci_get_drvdata(pdev);
->  
-> +	rvu_sw_shutdown();
-> +
->  	rvu_dbg_exit(rvu);
->  	rvu_unregister_dl(rvu);
->  	rvu_unregister_interrupts(rvu);
-
-[High]
-rvu_sw_shutdown() runs at the top of rvu_remove(), well before
-rvu_mbox_destroy(&rvu->afpf_wq_info).  While rvu_sw_l2_shutdown() does
-cancel_work_sync() and destroy_workqueue() on both workqueues, it never
-clears RVU_SWITCH_FLAG_FW_READY, never nulls the file-static
-rvu_sw_l2_offl_wq / fdb_refresh_wq pointers, and does not stop new mbox
-handlers from producing.
-
-Can this race happen?
-
-  CPU0 (rvu_remove)                  CPU1 (afpf mbox worker)
-    rvu_sw_l2_shutdown()
-      cancel_work_sync(&fdb_...)
-      destroy_workqueue(fdb_refresh_wq)  /* wq freed */
-                                       rvu_mbox_handler_fdb_notify()
-                                         if (flags & FW_READY) /* still set */
-                                         queue_work(rvu_sw_l2_offl_wq, ...);
-                                                     /* UAF on freed wq */
-
-Should the shutdown order be inverted (tear down mbox producers first, or
-clear FW_READY under a lock that mbox handlers observe, then flush and
-destroy the workqueues, then null the pointers)?
-
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.c b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.c
-> index 28f8281e9219..6fc13aeff45f 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.c
-
-[ ... ]
-
-> @@ -26,5 +28,22 @@ int rvu_mbox_handler_swdev2af_notify(struct rvu *rvu,
->  				     struct swdev2af_notify_req *req,
->  				     struct msg_rsp *rsp)
->  {
-> -	return 0;
-> +	int rc = 0;
-> +
-> +	switch (req->msg_type) {
-> +	case SWDEV2AF_MSG_TYPE_FW_STATUS:
-> +		rc = rvu_sw_l2_init_offl_wq(rvu, req->pcifunc, req->fw_up);
-> +		break;
-> +
-> +	case SWDEV2AF_MSG_TYPE_REFRESH_FDB:
-> +		rc = rvu_sw_l2_fdb_list_entry_add(rvu, req->pcifunc, req->mac);
-> +		break;
-> +	}
-> +
-> +	return rc;
-> +}
-
-[High]
-Is there a reason this handler accepts SWDEV2AF messages from any pcifunc?
-There is no is_cgx_config_permitted() style check that the sender is the
-trusted switch-firmware PF.
-
-The FW_STATUS path stores the caller-supplied req->pcifunc into
-rvu->rswitch.pcifunc, and the REFRESH_FDB path forwards a caller-controlled
-(pcifunc, mac) tuple to any PF via AF2PF_FDB_REFRESH — which ends up
-invoking call_switchdev_notifiers(SWITCHDEV_FDB_ADD_TO_BRIDGE, ...) on the
-target PF's netdev.
-
-In an SR-IOV deployment, does this allow any VF to inject arbitrary
-MAC->port entries into another tenant's bridge, or hijack the switch-firmware
-identity by sending FW_STATUS(fw_up=true) with its own pcifunc?
-
-[Medium]
-The switch has no default: arm.  SWDEV2AF_MSG_TYPE_REFRESH_FL is already
-defined as BIT_ULL(2) but has no case here, so REFRESH_FL messages return
-rc = 0 with no side effect and no diagnostic.  Would returning
--EOPNOTSUPP / -EINVAL for unknown msg_type values make version-mismatch
-issues visible?
-
-[Low]
-Also, since the SWDEV2AF_MSG_TYPE_* values are BIT_ULL(0), BIT_ULL(1),
-BIT_ULL(2), the switch-equality only matches when exactly one bit is set.
-Is msg_type intended to be a bitmask (in which case case labels won't
-combine) or a plain enum (in which case using BIT_ULL() as the values is
-misleading)?
-
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.c b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.c
-> index 5f805bfa81ed..bd0fe13b1fc9 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.c
-
-[ ... ]
-
-> +/* Work queue for switchdev message handling. There is only
-> + * on switch HW per SoC, so one instance of each type of
-> + * workqueue is enough.
-> + */
-> +static struct rvu_sw_l2_work l2_offl_work;
-> +static struct workqueue_struct *rvu_sw_l2_offl_wq;
-
-[Low]
-Nit: "There is only on switch HW" is missing the word "one".
-
-[ ... ]
-
-> +static int rvu_sw_l2_fdb_refresh(struct rvu *rvu, u16 pcifunc, u8 *mac)
-> +{
-> +	struct af2pf_fdb_refresh_req *req;
-> +	int pf, vidx;
-> +
-> +	pf = rvu_get_pf(rvu->pdev, pcifunc);
-> +
-> +	mutex_lock(&rvu->mbox_lock);
-> +
-> +	if (pf) {
-> +		req = otx2_mbox_alloc_msg_af2pf_fdb_refresh(rvu, pf);
-> +		if (!req) {
-> +			mutex_unlock(&rvu->mbox_lock);
-> +			return -ENOMEM;
-> +		}
-> +
-> +		req->hdr.pcifunc = pcifunc;
-> +		ether_addr_copy(req->mac, mac);
-> +		req->pcifunc = pcifunc;
-> +
-> +		otx2_mbox_wait_for_zero(&rvu->afpf_wq_info.mbox_up, pf);
-> +		otx2_mbox_msg_send_up(&rvu->afpf_wq_info.mbox_up, pf);
-> +	} else {
-> +		vidx = pcifunc - 1;
-> +
-> +		req = (struct af2pf_fdb_refresh_req *)
-> +			otx2_mbox_alloc_msg_rsp(&rvu->afvf_wq_info.mbox_up, vidx,
-> +						sizeof(*req), sizeof(struct msg_rsp));
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> index 28ebf0a8d3d6..ae6f145a0db0 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> @@ -1968,7 +1968,7 @@ struct af2swdev_notify_req {
+>  		};
+>  		struct {
+>  			u8 cnt;
+> -			struct fib_entry entry[16];
+> +			struct fib_entry entry[12];
+>  		};
 
 [Critical]
-Where is the bounds check on pcifunc / vidx?  pcifunc originates from
-req->pcifunc of the peer-sent swdev2af_notify_req and reaches here verbatim
-via rvu_sw_l2_fdb_list_entry_add() -> l2_entry->port_id.
+Can this shrink cause an out-of-bounds write in
+rvu_sw_l3_offl_rule_push()?  The AF-side handler still accepts up to 16
+entries per fib_notify:
 
-In the else branch, when rvu_get_pf(rvu->pdev, pcifunc) == 0:
+    if (req->cnt > 16)
+        return -EINVAL;
 
-    vidx = pcifunc - 1;
-    otx2_mbox_alloc_msg_rsp(&rvu->afvf_wq_info.mbox_up, vidx, ...);
+and the batching guard in sw_l3_offl_work_handler()
 
-If a peer sends REFRESH_FDB with pcifunc == 0, vidx becomes -1 and
-otx2_mbox_alloc_msg_rsp() does:
+    if (lcnt + l3_entry->cnt > 8 && !list_empty(&l3_local_lh))
 
-    struct otx2_mbox_dev *mdev = &mbox->dev[devid];
-    spin_lock(&mdev->mbox_lock);
+only splits when the local list is already non-empty, so the first
+l3_entry in a batch is always accepted regardless of its cnt.  A single
+fib_notify with cnt in [13,16] therefore reaches
 
-which is an out-of-bounds access on mbox->dev[-1] followed by
-otx2_mbox_wait_for_zero() / otx2_mbox_msg_send_up() dereferencing the
-same address.
+    memcpy(dst, entry, sizeof(*entry) * cnt);
 
-Similarly in the if branch, pf is used as devid for
-rvu->afpf_wq_info.mbox_up without checking pf < afpf_wq_info.mbox_up.ndevs.
+writing up to 16 struct fib_entry into req->entry[12], and overflows the
+mbox message by 1..4 entries (roughly 60..240 bytes) into adjacent mbox
+memory.
 
-Would something like is_pf_func_valid() or an explicit ndevs range check
-before dispatching the message be needed here?
+Also, req->cnt is a u8 while tot_cnt is int, so any total that batches
+past 255 would silently truncate on the assignment
+
+    req->cnt = tot_cnt;
+
+Would it be clearer to either raise entry[] back to 16, cap fib_notify at
+12, or clamp/split at the memcpy site with tot_cnt validated against a
+u8?
+
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l3.c b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l3.c
+> index 2b798d5f0644..bd4ec3b20d4a 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l3.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l3.c
 
 [ ... ]
 
-> +static bool fw_is_up;
+> +static struct workqueue_struct *sw_l3_offl_wq;
 > +
-> +int rvu_sw_l2_init_offl_wq(struct rvu *rvu, u16 pcifunc, bool fw_up)
-> +{
-> +	struct rvu_switch *rswitch;
+> +struct l3_entry {
+> +	struct list_head list;
+> +	struct rvu *rvu;
+> +	u32 port_id;
+> +	int cnt;
+> +	struct fib_entry entry[];
+> +};
 > +
-> +	rswitch = &rvu->rswitch;
+> +static DEFINE_MUTEX(l3_offl_llock);
+> +static LIST_HEAD(l3_offl_lh);
+> +static bool l3_offl_work_running;
 > +
-> +	if (fw_up && !fw_is_up) {
-> +		/* Switch HW sends an MBOX message to Host once it is ready */
-> +		rswitch->pcifunc = pcifunc;
-> +		fw_is_up = true;
-> +
-> +		l2_offl_work.rvu = rvu;
-> +		INIT_WORK(&l2_offl_work.work, rvu_sw_l2_offl_rule_wq_handler);
-> +		rvu_sw_l2_offl_wq = alloc_workqueue("swdev_rvu_sw_l2_offl_wq", 0, 0);
-> +		if (!rvu_sw_l2_offl_wq) {
-> +			dev_err(rvu->dev, "L2 offl workqueue allocation failed\n");
-> +			return -ENOMEM;
-> +		}
-> +
-> +		fdb_refresh_work.rvu = rvu;
-> +		INIT_WORK(&fdb_refresh_work.work, rvu_sw_l2_fdb_refresh_wq_handler);
-> +		fdb_refresh_wq = alloc_workqueue("swdev_fdb_refresg_wq", 0, 0);
-> +		if (!fdb_refresh_wq) {
-> +			dev_err(rvu->dev, "fdb refresh workqueue allocation failed\n");
-> +			return -ENOMEM;
-> +		}
-> +
-> +		rswitch->flags |= RVU_SWITCH_FLAG_FW_READY;
-> +		return 0;
-> +	}
-> +
-> +	rswitch->flags &= ~RVU_SWITCH_FLAG_FW_READY;
-> +	flush_work(&l2_offl_work.work);
-> +	rswitch->pcifunc = -1;
-> +	return 0;
-> +}
-
-[High]
-Where does fw_is_up ever get reset back to false?  It is never cleared —
-not on fw_up=false, not on rvu_sw_l2_shutdown(), not on the -ENOMEM
-paths above.
-
-Consequences:
-
-    1. A firmware bounce (up -> down -> up) enters the second fw_up=true
-       message with fw_is_up already true.  The guard fails, and the
-       else tail runs instead — actively clearing FW_READY,
-       flush_work()ing, and setting rswitch->pcifunc = -1.
-
-    2. Any fw_up=false event after init permanently disables offload,
-       since fw_up=true never re-enters the allocation branch.
-
-    3. rswitch->pcifunc is u16 and is assigned -1, which becomes 0xFFFF,
-       then flows back into rvu_get_pf() as a bogus PF index used as
-       an mbox devid.
-
-Should fw_is_up be cleared on fw_up=false and on shutdown?
-
-[High]
-On the second alloc_workqueue failing while the first has succeeded,
-this returns -ENOMEM without destroying rvu_sw_l2_offl_wq.  Because
-fw_is_up was set to true a few lines earlier, no subsequent FW_STATUS
-message can retry the init.  Additionally, rvu_sw_l2_shutdown() begins
-with:
-
-    if (!fdb_refresh_wq)
-        return;
-
-so if the driver ends up in this partial-init state, shutdown does
-nothing and rvu_sw_l2_offl_wq (with a live worker kthread) leaks for
-the module lifetime.
-
-Could the error path destroy_workqueue(rvu_sw_l2_offl_wq), NULL the
-pointer, and clear fw_is_up before returning?
-
-[Medium]
-The tail unconditionally runs:
-
-    flush_work(&l2_offl_work.work);
-
-but INIT_WORK(&l2_offl_work.work, ...) only runs inside the if (fw_up &&
-!fw_is_up) branch.  If the very first swdev2af message received is
-FW_STATUS(fw_up=false) — or any message that misses the init branch —
-the work_struct is still BSS-zero-initialized when flush_work runs.
-__flush_work() does WARN_ON(!work->func).  Is that intended?
+> +static struct workqueue_struct *sw_l3_offl_wq;
 
 [Low]
-Also, is the workqueue name "swdev_fdb_refresg_wq" a typo of "refresh"?
-The name shows up in /proc/ and worker thread names.
+Is the second declaration of sw_l3_offl_wq intentional?  It appears once
+above the struct l3_entry definition and again immediately after, so the
+translation unit has two tentative definitions of the same object.
+
+> +static void sw_l3_offl_work_handler(struct work_struct *work);
+> +static DECLARE_DELAYED_WORK(l3_offl_work, sw_l3_offl_work_handler);
+> +
+> +static int rvu_sw_l3_offl_rule_push(struct list_head *lh)
+> +{
 
 [ ... ]
 
-> +int rvu_sw_l2_fdb_list_entry_add(struct rvu *rvu, u16 pcifunc, u8 *mac)
-> +{
-> +	struct l2_entry *l2_entry;
+> +	dst = &req->entry[0];
+> +	while ((l3_entry =
+> +		list_first_entry_or_null(lh,
+> +					 struct l3_entry, list)) != NULL) {
+> +		entry = l3_entry->entry;
+> +		cnt = l3_entry->cnt;
+> +		sz = sizeof(*entry) * cnt;
 > +
-> +	l2_entry = kcalloc(1, sizeof(*l2_entry), GFP_KERNEL);
-> +	if (!l2_entry)
-> +		return -ENOMEM;
+> +		memcpy(dst, entry, sz);
+> +		tot_cnt += cnt;
+> +		dst += cnt;
 > +
-> +	l2_entry->port_id = pcifunc;
-> +	ether_addr_copy(l2_entry->mac, mac);
+> +		list_del_init(&l3_entry->list);
+> +		kfree(l3_entry);
+> +	}
+> +	req->flags = FIB_CMD;
+> +	req->cnt = tot_cnt;
 > +
-> +	mutex_lock(&fdb_refresh_list_lock);
-> +	list_add_tail(&l2_entry->list, &fdb_refresh_lh);
-> +	mutex_unlock(&fdb_refresh_list_lock);
+> +	rc = otx2_mbox_wait_for_zero(&rvu->afpf_wq_info.mbox_up, swdev_pf);
+> +	if (rc)
+> +		otx2_mbox_msg_send_up(&rvu->afpf_wq_info.mbox_up, swdev_pf);
 > +
-> +	queue_work(fdb_refresh_wq, &fdb_refresh_work.work);
-> +	return 0;
+> +	mutex_unlock(&rvu->mbox_lock);
+> +	return rc ? 0 : -EFAULT;
 > +}
 
 [High]
-This handler is reachable directly from rvu_mbox_handler_swdev2af_notify()
-via SWDEV2AF_MSG_TYPE_REFRESH_FDB, and it does not check
-RVU_SWITCH_FLAG_FW_READY or that fdb_refresh_wq is non-NULL (the sibling
-rvu_mbox_handler_fdb_notify() below does check FW_READY).
+When otx2_mbox_wait_for_zero() returns false (mbox still busy after the
+~1ms wait), otx2_mbox_msg_send_up() is skipped but the loop above has
+already drained every l3_entry from lh and kfree()d them.
 
-If a peer sends REFRESH_FDB before any FW_STATUS(fw_up=true), fdb_refresh_wq
-is still NULL and queue_work(NULL, ...) reaches __queue_work() which
-dereferences wq->flags.  Is the mbox ordering guaranteed by some external
-mechanism, or should this path also gate on FW_READY / a non-NULL wq?
+Does this silently drop the batch?  The allocated mbox message is left
+dangling in the up-channel, the fib_entry payload has been freed, and
+the caller only logs pr_err() without any re-queue, so the switch state
+appears to permanently diverge from the host FIB whenever the mbox is
+momentarily busy.
+
+> +static atomic64_t req_cnt;
+> +static atomic64_t ack_cnt;
+> +static atomic64_t req_processed;
+> +static LIST_HEAD(l3_local_lh);
+> +static int lcnt;
+> +
+> +static void sw_l3_offl_work_handler(struct work_struct *work)
+> +{
+> +	struct l3_entry *l3_entry;
+> +	struct list_head l3lh;
+> +	u64 req, ack, proc;
+> +
+> +	INIT_LIST_HEAD(&l3lh);
+> +
+> +	mutex_lock(&l3_offl_llock);
+> +	while (1) {
+> +		l3_entry = list_first_entry_or_null(&l3_offl_lh, struct l3_entry, list);
+> +
+> +		if (!l3_entry)
+> +			break;
+> +
+> +		if (lcnt + l3_entry->cnt > 8 && !list_empty(&l3_local_lh)) {
+> +			req = atomic64_read(&req_cnt);
+> +			atomic64_set(&ack_cnt, req);
+> +			atomic64_set(&req_processed, req);
+> +			mutex_unlock(&l3_offl_llock);
+> +			goto process;
+> +		}
+> +
+> +		lcnt += l3_entry->cnt;
+> +
+> +		atomic64_inc(&req_cnt);
+> +		list_del_init(&l3_entry->list);
+> +		list_add_tail(&l3_entry->list, &l3_local_lh);
+> +	}
+> +	mutex_unlock(&l3_offl_llock);
+> +
+> +	req = atomic64_read(&req_cnt);
+> +	ack = atomic64_read(&ack_cnt);
+> +
+> +	if (req > ack) {
+> +		atomic64_set(&ack_cnt, req);
+> +		queue_delayed_work(sw_l3_offl_wq, &l3_offl_work,
+> +				   msecs_to_jiffies(100));
+> +		return;
+> +	}
+> +
+> +	proc = atomic64_read(&req_processed);
+> +	if (req == proc) {
+> +		queue_delayed_work(sw_l3_offl_wq, &l3_offl_work,
+> +				   msecs_to_jiffies(1000));
+> +		return;
+> +	}
+> +
+> +	atomic64_set(&req_processed, req);
 
 [Medium]
-This function allocates and appends unconditionally on every incoming
-REFRESH_FDB message, with no cap on list length or per-caller quota.
-Combined with the identical pattern in rvu_mbox_handler_fdb_notify()
-below, can a peer that sends messages faster than the workqueue drains
-them drive unbounded kernel memory allocation until OOM?  The workqueue
-handler processes only 16 entries per invocation before re-queueing under
-a mutex + mbox send + wait.
+Do req_cnt, ack_cnt, and req_processed model any real acknowledgement
+protocol?  They are only ever written from inside this function and
+neither otx2_mbox_wait_for_zero() nor otx2_mbox_msg_send_up() touches
+them, so the (req > ack) branch effectively only ever fires on the first
+invocation after new entries arrive and then
+
+    atomic64_set(&ack_cnt, req);
+
+immediately equalizes them.  Would this be clearer as a plain "if new
+work arrived, re-poll shortly, otherwise poll slowly" without the ack
+counters?
+
+[Medium]
+Do the two early-return branches leak the entries parked in l3_local_lh?
+
+The while loop above moves items from l3_offl_lh into the module-static
+l3_local_lh, and then both
+
+    if (req > ack) { ... return; }
+    if (req == proc) { ... return; }
+
+return without splicing l3_local_lh into l3lh for processing.  If
+rvu_sw_l3_shutdown() then runs, it only drains l3_offl_lh:
+
+    while (1) {
+        entry = list_first_entry_or_null(&l3_offl_lh,
+                                         struct l3_entry, list);
+
+so entries parked in l3_local_lh remain allocated.  Would it be safer to
+splice l3_local_lh back into l3_offl_lh before returning, or drain both
+lists in the shutdown path?
+
+> +
+> +process:
+> +	lcnt = 0;
 
 [ ... ]
 
->  int rvu_mbox_handler_fdb_notify(struct rvu *rvu,
->  				struct fdb_notify_req *req,
+> +int rvu_mbox_handler_fib_notify(struct rvu *rvu,
+>  				struct fib_notify_req *req,
 >  				struct msg_rsp *rsp)
 >  {
-> +	struct l2_entry *l2_entry;
+> +	struct l3_entry *l3_entry;
+> +	int sz;
 > +
 > +	if (!(rvu->rswitch.flags & RVU_SWITCH_FLAG_FW_READY))
 > +		return 0;
+
+[High]
+Should this return an error instead of 0 when firmware is not ready?
+Returning 0 tells the caller the update was accepted, but nothing is
+buffered or resynced later, so any FIB event that arrives during the
+pre-ready window is silently dropped.  Because FIB deltas are
+edge-triggered, a single missed add/del leaves the offload permanently
+divergent from the host FIB with no user-visible signal.
+
 > +
-> +	l2_entry = kcalloc(1, sizeof(*l2_entry), GFP_KERNEL);
-> +	if (!l2_entry)
+> +	if (req->cnt > 16)
+> +		return -EINVAL;
+> +
+> +	sz = req->cnt * sizeof(struct fib_entry);
+> +
+> +	l3_entry = kcalloc(1, sizeof(*l3_entry) + sz, GFP_KERNEL);
+> +	if (!l3_entry)
 > +		return -ENOMEM;
 > +
-> +	l2_entry->port_id = rvu_sw_port_id(rvu, req->hdr.pcifunc);
-> +	ether_addr_copy(l2_entry->mac, req->mac);
-> +	l2_entry->flags = req->flags;
+> +	l3_entry->port_id = rvu_sw_port_id(rvu, req->hdr.pcifunc);
+> +	l3_entry->rvu = rvu;
+> +	l3_entry->cnt = req->cnt;
+> +	INIT_LIST_HEAD(&l3_entry->list);
+> +	memcpy(l3_entry->entry, req->entry, sz);
 > +
-> +	mutex_lock(&l2_offl_list_lock);
-> +	list_add_tail(&l2_entry->list, &l2_offl_lh);
-> +	mutex_unlock(&l2_offl_list_lock);
+> +	mutex_lock(&l3_offl_llock);
+> +	list_add_tail(&l3_entry->list, &l3_offl_lh);
+> +	mutex_unlock(&l3_offl_llock);
 > +
-> +	queue_work(rvu_sw_l2_offl_wq, &l2_offl_work.work);
+> +	if (!l3_offl_work_running) {
+> +		sw_l3_offl_wq = alloc_workqueue("sw_af_fib_wq", 0, 0);
+> +		l3_offl_work_running = true;
+> +		queue_delayed_work(sw_l3_offl_wq, &l3_offl_work,
+> +				   msecs_to_jiffies(1000));
+> +	}
 > +
 >  	return 0;
 >  }
 
 [High]
-Is the RVU_SWITCH_FLAG_FW_READY check safe against concurrent teardown?
-The flag is read here, several statements happen (kcalloc, list mutex
-acquire/release), and then queue_work() runs.  Between the check and
-queue_work(), another thread running rvu_sw_l2_init_offl_wq(fw_up=false)
-or rvu_sw_shutdown() can clear the flag and destroy rvu_sw_l2_offl_wq,
-leaving queue_work() to touch a freed workqueue.
+Is the return value of alloc_workqueue() handled anywhere?  Under memory
+pressure it can return NULL and queue_delayed_work() will then
+dereference a NULL pool.  Additionally l3_offl_work_running is set to
+true unconditionally, so on the next invocation the branch is skipped
+and every future fib_notify piles a new l3_entry onto l3_offl_lh with
+no worker to drain it.
 
-An ad-hoc flag check without a covering lock (or RCU with
-synchronize_rcu() before destroy_workqueue()) does not provide
-synchronization.  How is this expected to work?
+[High]
+Is this check-then-set race-safe?  It runs outside l3_offl_llock, and
+mbox handlers can dispatch from separate PF worker contexts.  Two
+concurrent invocations can both observe l3_offl_work_running == false,
+both call alloc_workqueue(), and one of the pointers is then overwritten
+into sw_l3_offl_wq while the other workqueue leaks along with any
+delayed work already queued on it.
 
-> +void rvu_sw_l2_shutdown(void)
+Related: rvu_sw_l3_shutdown() destroys sw_l3_offl_wq but does not clear
+sw_l3_offl_wq to NULL or reset l3_offl_work_running:
+
+> +void rvu_sw_l3_shutdown(void)
 > +{
-> +	struct l2_entry *entry;
+> +	struct l3_entry *entry;
 > +	LIST_HEAD(tlist);
 > +
-> +	if (!fdb_refresh_wq)
+> +	if (!sw_l3_offl_wq)
 > +		return;
 > +
-> +	cancel_work_sync(&fdb_refresh_work.work);
-> +	destroy_workqueue(fdb_refresh_wq);
+> +	cancel_delayed_work_sync(&l3_offl_work);
+> +	destroy_workqueue(sw_l3_offl_wq);
 > +
-> +	mutex_lock(&fdb_refresh_list_lock);
+> +	mutex_lock(&l3_offl_llock);
 > +	while (1) {
-> +		entry = list_first_entry_or_null(&fdb_refresh_lh,
-> +						 struct l2_entry, list);
+> +		entry = list_first_entry_or_null(&l3_offl_lh,
+> +						 struct l3_entry, list);
 > +		if (!entry)
 > +			break;
 > +
 > +		list_del_init(&entry->list);
 > +		kfree(entry);
 > +	}
-> +	mutex_unlock(&fdb_refresh_list_lock);
-> +
-> +	cancel_work_sync(&l2_offl_work.work);
-> +	destroy_workqueue(rvu_sw_l2_offl_wq);
+> +	mutex_unlock(&l3_offl_llock);
+> +}
 
-[High]
-cancel_work_sync() only cancels currently-pending work; it does not stop
-new invocations.  Because RVU_SWITCH_FLAG_FW_READY is not cleared here,
-rvu_mbox_handler_fdb_notify() can still pass its FW_READY check and call
-queue_work(rvu_sw_l2_offl_wq, ...) after this destroy_workqueue().  Also,
-rvu_sw_l2_fdb_list_entry_add() has no FW_READY guard at all.
+After shutdown, if rvu_mbox_handler_fib_notify() runs again it sees
+l3_offl_work_running still true and calls queue_delayed_work() on the
+destroyed workqueue.  Would it help to move the workqueue lifetime to
+subsystem init/deinit (like rvu_sw_l2) and always clear both pieces of
+state here?
 
-Should the FW_READY flag be cleared (and the mbox handlers taught to see
-that) before cancel_work_sync + destroy_workqueue, and should the two
-global workqueue pointers be nulled at the end so the shutdown guard
-"if (!fdb_refresh_wq) return;" actually distinguishes torn-down from
-initialized?
-
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-> index b022f52c6845..4540ffacdddc 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fib.c b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fib.c
+> index 12ddf8119372..54b854aa7ffa 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fib.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fib.c
 
 [ ... ]
 
-> @@ -141,6 +142,22 @@ static int otx2vf_process_mbox_msg_up(struct otx2_nic *vf,
->  		err = otx2_mbox_up_handler_cgx_link_event(
->  				vf, (struct cgx_link_info_msg *)req, rsp);
->  		return err;
-> +
-> +	case MBOX_MSG_AF2PF_FDB_REFRESH:
-> +		rsp = (struct msg_rsp *)otx2_mbox_alloc_msg(&vf->mbox.mbox_up, 0,
-> +							    sizeof(struct msg_rsp));
-> +		if (!rsp)
-> +			return -ENOMEM;
-> +
-> +		rsp->hdr.id = MBOX_MSG_AF2PF_FDB_REFRESH;
-> +		rsp->hdr.sig = OTX2_MBOX_RSP_SIG;
-> +		rsp->hdr.pcifunc = req->pcifunc;
-> +		rsp->hdr.rc = 0;
-> +		err = otx2_mbox_up_handler_af2pf_fdb_refresh(vf,
-> +							     (struct af2pf_fdb_refresh_req *)req,
-> +							     rsp);
-> +		return err;
-> +
-
-[High]
-The AF-to-PF path is wired only in otx2_vf.c.  Is the PF-side dispatcher
-(otx2_process_mbox_msg_up() in nic/otx2_pf.c) updated in a companion patch?
-Grepping this tree, otx2_pf.c's switch expands MBOX_UP_CGX_MESSAGES,
-MBOX_UP_MCS_MESSAGES and MBOX_UP_REP_MESSAGES, but not
-MBOX_UP_AF2PF_FDB_REFRESH_MESSAGES.  When rvu_sw_l2_fdb_refresh() takes
-its if (pf) branch and sends AF2PF_FDB_REFRESH over afpf_wq_info.mbox_up,
-the receiving PF hits the default: arm and calls
-otx2_reply_invalid_msg(), so the SWITCHDEV_FDB_ADD_TO_BRIDGE notifier is
-never invoked on PF netdevs.
-
-Since bridges are typically hosted on PF netdevs, this seems to defeat
-the "invoke the switchdev notifier so the host bridge can learn the
-updated FDB entry" goal from the commit message for the PF case.
-
-[Medium]
-Looking at struct af2pf_fdb_refresh_req, there is only pcifunc + mac[6]
-— no flags — and otx2_mbox_up_handler_af2pf_fdb_refresh() hardcodes
-SWITCHDEV_FDB_ADD_TO_BRIDGE.  The downstream fdb_notify direction carries
-FDB_ADD/FDB_DEL bits in req->flags, but the upstream refresh direction
-can only add.  If firmware ages an entry out, how does the host bridge
-learn to delete it — is a delete-refresh planned, and if so should the
-mailbox structure grow a flags field now to avoid an ABI change later?
-
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.c b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.c
-> index 6842c8d91ffc..327a6efeb526 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.c
-
-[ ... ]
-
-> +static DEFINE_SPINLOCK(sw_fdb_llock);
-> +static LIST_HEAD(sw_fdb_lh);
-
-[ ... ]
-
-> +static void sw_fdb_wq_handler(struct work_struct *work)
+> +static void sw_fib_work_handler(struct work_struct *work)
 > +{
-> +	struct sw_fdb_list_entry *entry;
+> +	struct sw_fib_list_entry *lentry;
 > +	LIST_HEAD(tlist);
 > +
-> +	spin_lock(&sw_fdb_llock);
-> +	list_splice_init(&sw_fdb_lh, &tlist);
-> +	spin_unlock(&sw_fdb_llock);
+> +	spin_lock_bh(&sw_fib_llock);
+> +	list_splice_init(&sw_fib_lh, &tlist);
+> +	spin_unlock_bh(&sw_fib_llock);
+> +
+> +	while ((lentry =
+> +		list_first_entry_or_null(&tlist,
+> +					 struct sw_fib_list_entry, lh)) != NULL) {
+> +		list_del_init(&lentry->lh);
+> +		sw_fib_notify(lentry->pf, lentry->cnt, lentry->entry);
+> +		kfree(lentry->entry);
+> +		kfree(lentry);
+> +	}
 
-[ ... ]
+[High]
+Should the return value of sw_fib_notify() be checked?  It can fail via
+cnt > 16 returning -EINVAL, mbox alloc returning -ENOMEM, or
+otx2_sync_mbox_msg() transport failure, and all three paths simply drop
+the FIB delta with no retry and no diagnostic.  Because FIB updates are
+edge-triggered, a single lost message leaves the switch state
+permanently out of sync.
 
-> +	spin_lock(&sw_fdb_llock);
-> +	if (!list_empty(&sw_fdb_lh))
-> +		queue_work(sw_fdb_wq, &sw_fdb_work);
-> +	spin_unlock(&sw_fdb_llock);
+> +
+> +	spin_lock_bh(&sw_fib_llock);
+> +	if (!list_empty(&sw_fib_lh))
+> +		queue_delayed_work(sw_fib_wq, &sw_fib_work,
+> +				   msecs_to_jiffies(10));
+> +	spin_unlock_bh(&sw_fib_llock);
 > +}
 > +
-> +int sw_fdb_add_to_list(struct net_device *dev, u8 *mac, bool add_fdb)
+> +int sw_fib_add_to_list(struct net_device *dev,
+> +		       struct fib_entry *entry, int cnt)
 > +{
 > +	struct otx2_nic *pf = netdev_priv(dev);
-> +	struct sw_fdb_list_entry *entry;
+> +	struct sw_fib_list_entry *lentry;
 > +
-> +	entry = kcalloc(1, sizeof(*entry), GFP_ATOMIC);
-> +	if (!entry)
+> +	lentry = kcalloc(1, sizeof(*lentry), GFP_ATOMIC);
+> +	if (!lentry)
 > +		return -ENOMEM;
+
+[High]
+Does this leak the caller's entry on ENOMEM?  Every call site in this
+patch (sw_nb_v4_netdev_event, sw_nb_v4_inetaddr_event,
+sw_nb_v4_fib_event x2, sw_nb_net_v4_neigh_update, sw_nb_v6_netdev_event,
+sw_nb_v6_fib_event, sw_nb_net_v6_neigh_update, sw_nb_v6_inetaddr_event)
+hands ownership of the entry to this function and drops the reference:
+
+    -   kfree(entry);
+    +   sw_fib_add_to_list(pf_dev, entry, 1);
+
+The return value is ignored in every caller, so on GFP_ATOMIC failure
+the fib_entry buffer is stranded.  Would it make sense to kfree(entry)
+on the error path (or take ownership only after the lentry allocation
+succeeds)?
+
+[Medium]
+Is there a cnt upper bound?  sw_fib_notify() rejects cnt > 16 but
+sw_fib_add_to_list() does not, and sw_nb_v4_fib_event() computes
+
+    cnt = iter - entries;
+
+bounded by fi->fib_nhs.  For multipath configurations with more than 16
+next-hops the entry is happily queued and then silently discarded inside
+the worker.  Should the notifier either split the batch or refuse early
+so the sender can adjust?
+
 > +
-> +	ether_addr_copy(entry->mac, mac);
-> +	entry->add_fdb = add_fdb;
-> +	entry->pf = pf;
-> +	dev_hold(dev);
+> +	lentry->pf = pf;
+> +	lentry->cnt = cnt;
+> +	lentry->entry = entry;
+> +	INIT_LIST_HEAD(&lentry->lh);
 > +
-> +	spin_lock(&sw_fdb_llock);
-> +	list_add_tail(&entry->list, &sw_fdb_lh);
-> +	queue_work(sw_fdb_wq, &sw_fdb_work);
-> +	spin_unlock(&sw_fdb_llock);
+> +	spin_lock(&sw_fib_llock);
+> +	list_add_tail(&lentry->lh, &sw_fib_lh);
+> +	queue_delayed_work(sw_fib_wq, &sw_fib_work,
+> +			   msecs_to_jiffies(10));
+> +	spin_unlock(&sw_fib_llock);
 > +
 > +	return 0;
 > +}
 
 [High]
-Can this deadlock?  sw_fdb_add_to_list() is called from sw_nb_fdb_event()
-via call_switchdev_notifiers(), and switchdev_notif_chain is an
-ATOMIC_NOTIFIER_HEAD in net/switchdev/switchdev.c, so notifier callbacks
-run in the caller's context — including softirq/BH context from bridge
-learn paths like br_handle_frame_finish -> br_fdb_update ->
-br_switchdev_fdb_notify -> call_switchdev_notifiers.
+Is sw_fib_llock protected against softirq reentry here?  This function
+uses plain spin_lock()/spin_unlock() but sw_fib_work_handler() and
+sw_fib_deinit() both acquire the same lock with spin_lock_bh().
 
-Meanwhile sw_fdb_wq_handler() runs in process context and takes
-spin_lock(&sw_fdb_llock) without disabling BH.
+sw_nb_net_v4_neigh_update() and sw_nb_net_v6_neigh_update() are called
+from the netevent chain, which the neighbour subsystem can invoke in
+softirq context (e.g., from __neigh_update() paths driven by RX
+processing).  If CPU X is holding sw_fib_llock via spin_lock() in
+process context and a softirq on the same CPU reaches
+sw_fib_add_to_list() as well, the softirq spins waiting on a lock that
+only its preempted process context can release.
 
-    process ctx (workqueue)          softirq on same CPU
-      spin_lock(&sw_fdb_llock)       (bridge learn arrives)
-                                       call_switchdev_notifiers()
-                                         sw_nb_fdb_event()
-                                           sw_fdb_add_to_list()
-                                             spin_lock(&sw_fdb_llock)
-                                               /* spins forever */
-
-Should this be spin_lock_bh() / spin_unlock_bh() everywhere sw_fdb_llock
-is taken?
+Would spin_lock_bh() be more appropriate here?
 
 [ ... ]
 
->  int sw_fdb_init(void)
+> +void sw_fib_deinit(void)
 >  {
-> +	INIT_WORK(&sw_fdb_work, sw_fdb_wq_handler);
-> +	sw_fdb_wq = alloc_workqueue("sw_fdb_wq", 0, 0);
-> +	if (!sw_fdb_wq)
-> +		return -ENOMEM;
+> +	struct sw_fib_list_entry *lentry;
+> +	LIST_HEAD(tlist);
 > +
->  	return 0;
+> +	cancel_delayed_work_sync(&sw_fib_work);
+> +	destroy_workqueue(sw_fib_wq);
+> +
+> +	spin_lock_bh(&sw_fib_llock);
+> +	list_splice_init(&sw_fib_lh, &tlist);
+> +	spin_unlock_bh(&sw_fib_llock);
+> +
+> +	while ((lentry =
+> +		list_first_entry_or_null(&tlist,
+> +					 struct sw_fib_list_entry, lh)) != NULL) {
+> +		list_del_init(&lentry->lh);
+> +		kfree(lentry->entry);
+> +		kfree(lentry);
+> +	}
 >  }
 
 [High]
-sw_fdb_init() now returns -ENOMEM on alloc_workqueue failure, but
-sw_nb_register() (drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c)
-calls it as:
+Is there anything in this module that prevents sw_fib_add_to_list() from
+being called during or after sw_fib_deinit()?  The current caller order
+in sw_nb_unregister() unregisters notifiers first, but sw_fib.c has no
+self-contained shutdown flag or nulling of sw_fib_wq.  A stray notifier
+callback that reaches sw_fib_add_to_list() after destroy_workqueue()
+would call queue_delayed_work() on a freed workqueue pointer.  Would
+setting sw_fib_wq to NULL under the lock and checking it in
+sw_fib_add_to_list() be robust against future ordering changes?
 
-    sw_fdb_init();
-    sw_fib_init();
-    sw_fl_init();
-
-with the return value discarded.  If sw_fdb_wq stays NULL, any subsequent
-SWITCHDEV_FDB_ADD/DEL_TO_DEVICE event calls sw_fdb_add_to_list() ->
-queue_work(NULL, ...), and later sw_fdb_deinit() calls
-destroy_workqueue(NULL), each of which dereferences the NULL wq pointer.
-Would it make sense to propagate the error out of sw_nb_register()?
-
-[ ... ]
-
-> +int otx2_mbox_up_handler_af2pf_fdb_refresh(struct otx2_nic *pf,
-> +					   struct af2pf_fdb_refresh_req *req,
-> +					   struct msg_rsp *rsp)
-> +{
-> +	struct switchdev_notifier_fdb_info item = {0};
-> +
-> +	item.addr = req->mac;
-> +	item.info.dev = pf->netdev;
-> +	call_switchdev_notifiers(SWITCHDEV_FDB_ADD_TO_BRIDGE,
-> +				 item.info.dev, &item.info, NULL);
-> +
-> +	return 0;
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c
+> index 99b8b9fdfe8a..61f0ed26adfd 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c
+> @@ -301,11 +305,9 @@ static int sw_nb_netdev_event(struct notifier_block *unused,
+>  	if (idev)
+>  		sw_nb_v4_netdev_event(unused, event, ptr);
+>  
+> -#if IS_ENABLED(CONFIG_IPV6)
+>  	i6dev = __in6_dev_get(dev);
+>  	if (i6dev)
+>  		sw_nb_v6_netdev_event(unused, event, ptr);
+> -#endif
+>  
+>  	return NOTIFY_DONE;
 >  }
-> +#endif
-> +EXPORT_SYMBOL(otx2_mbox_up_handler_af2pf_fdb_refresh);
 
-[Medium]
-otx2_mbox_up_handler_af2pf_fdb_refresh() is defined and exported from
-sw_fdb.c, which the Makefile links into rvu_nicpf.  otx2_vf.c (which
-lives in rvu_nicvf) calls it, creating a hard module dependency: the VF
-driver will fail to load without the PF driver present.  Is that
-intended?  In VF-passthrough VMs, only rvu_nicvf is loaded.
+[High]
+Does this drop the guard on the wrong caller?  The other callers of the
+v6 helpers in this file (register/unregister, sw_nb_v6_fib_event,
+sw_nb_v6_inetaddr_event dispatch, netevent v6 dispatch) still sit under
+their own IS_ENABLED(CONFIG_IPV6) blocks, and drivers/net/ethernet/
+marvell/octeontx2/nic/Makefile only compiles sw_nb_v6.o under
 
-Also, is EXPORT_SYMBOL (rather than EXPORT_SYMBOL_GPL) intentional for a
-driver-internal helper?
+    ifdef CONFIG_IPV6
+
+so sw_nb_v6.c's body is wrapped in the same #if.  On
+CONFIG_OCTEONTX_SWITCH=y with CONFIG_IPV6=n, Kconfig does not select or
+depend on IPV6, so the reference to sw_nb_v6_netdev_event() would remain
+in the object file with no definition to link against.  Should this
+guard be restored, or should sw_nb_v6.h grow a static inline stub for
+!CONFIG_IPV6?
+
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v4.c b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v4.c
+> index 947dafe586a0..8fd02edaa90e 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v4.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v4.c
+> @@ -134,7 +134,7 @@ int sw_nb_v4_inetaddr_event(struct notifier_block *nb,
+>  	netdev_dbg(dev, "%s: pushing inetaddr event from HOST interface address %#x, %pM, %s\n",
+>  		   __func__, entry->dst, entry->mac, dev->name);
+>  
+> -	kfree(entry);
+> +	sw_fib_add_to_list(pf_dev, entry, 1);
+>  	return NOTIFY_DONE;
+>  }
+
+[High]
+Not introduced by this patch, but the switch to sw_fib_add_to_list()
+lengthens the exposure of a pre-existing kcalloc(GFP_ATOMIC) that is
+never NULL-checked:
+
+    entry = kcalloc(1, sizeof(*entry), GFP_ATOMIC);
+    entry->cmd = sw_nb_inetaddr_event_to_otx2_event(event, dev);
+
+Previously a NULL entry crashed here at the immediate dereference;
+now the pointer also gets stored in a work item.  The same pattern
+exists in sw_nb_net_v4_neigh_update(), sw_nb_v6_netdev_event()
+(GFP_KERNEL), sw_nb_net_v6_neigh_update(), and
+sw_nb_v6_inetaddr_event().  Could the NULL checks be added while
+touching these paths?
 -- 
 This is an AI-generated review.
 
