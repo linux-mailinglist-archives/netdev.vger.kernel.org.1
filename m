@@ -1,107 +1,65 @@
-Return-Path: <netdev+bounces-306196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306197-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DpbLFXuHT2p2iwIAu9opvQ
-	(envelope-from <netdev+bounces-306196-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:35:23 +0200
+	id TJlzECaKT2qyjAIAu9opvQ
+	(envelope-from <netdev+bounces-306197-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:46:46 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 464C2730695
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:35:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E6A2730900
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:46:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=suse.com header.s=google header.b=T3vHFBol;
-	dmarc=pass (policy=quarantine) header.from=suse.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306196-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-306196-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306197-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-306197-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 82A49301E805
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 11:28:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 58DF730011BF
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 11:46:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 369B4411681;
-	Thu,  9 Jul 2026 11:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6022409E0A;
+	Thu,  9 Jul 2026 11:46:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7407A3F58FB
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 11:28:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5AF18C008;
+	Thu,  9 Jul 2026 11:46:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783596522; cv=none; b=HmgGbmNv+chbeZq/e9ySx2HOsEokVKLDH0SV9ulX78CkRUkYdAfr64W4L4eUq5MkaCLEcDkg7+0hgKoJSDHN/Aag0MUKf2inKueFJ4VaoFayEa68E+63+paRFXcdvsSj8kOj/Ur+2/HXKBP0yKtS0UHFMjhTHWhcPSZqtBcQcqY=
+	t=1783597599; cv=none; b=g21eSbd40AJwLihlDYuriau2LkbngWvWnrSw8RVQg8q3XZQQtUUXkyKmBMTQaaOX7bkMD2Dys9gfwr2DpWq4Ej485SxlMowuJUGyC39ZFXf8Xaw1DGzghI72IjkvwdLgdBl2+IRCIt1ZVNS4fyn/tiBjQnXg+GF1sGOL2zpciUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783596522; c=relaxed/simple;
-	bh=zR5IvobiX93juVmkNYxE4pwPAFvrl3VzehnUf95zxCk=;
+	s=arc-20240116; t=1783597599; c=relaxed/simple;
+	bh=twmEzHea4QAYe+6lVhj7Zqe+nc0w7Ixcq9xJL1Mm1WI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MqRtirRxq6ctIQgary16MVdI4EsWW4A4KjLvetIXTT0AK44NU41Tc6oW57jvu6S7PxmltmGv4XUD82mgNdk97X5Bh9tMXUOQ3IVudRKdUThug1EKemR/diOpFFDb4imWa2RK9VDBpi9zAkriGa6KlX8fIWZ2VPGf3aJhJKrFKsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=T3vHFBol; arc=none smtp.client-ip=209.85.221.42
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-47c6e9a694bso936423f8f.1
-        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 04:28:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1783596519; x=1784201319; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=MOEJtxlqclUuG5d8o3QYDqlrpx9EFuuMBV9pwtsxKdk=;
-        b=T3vHFBolJPerv4/sxeHZ4XelybmdPy1zwo5L5YJyiZWX2IkwHNdzPc0+wUkSeGCgWM
-         GAKwhS60Z9jpAD7Chbu5mdDZH44ZLGcXAAg4B3tl3Qeu6A+Z82QaxSe6A6e/69Six0vh
-         RXNbM18fAusbV0P3r5bL0hNcAT1WR6cxbePdcKMHWRJVc3MvfoclX9wrMMpogOYRbj5Q
-         Pb4r6BAC8lq7Cpg/3hqR9XJA4Gsh4uZmDxufvOQkvKUBmSU+y1qacBIjGgUcPfwxCYTr
-         WNNd+tqPFkLV/t+8c05lp67RciYKP5SlLuc/+c2JAw0hKwUeBb/FlWE7o+KDKd5i+8aO
-         Zhuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783596519; x=1784201319;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=MOEJtxlqclUuG5d8o3QYDqlrpx9EFuuMBV9pwtsxKdk=;
-        b=mfW37Wo+/xnM2dp24QgKS0WmJ7WsZTw7TJiyQm2e0O00VU0JVqmxetZSC/GAr2wQQi
-         2++XxcPO2GxzVwSiKGwZOmGR9Pp07R4JO+ALql/egVS+jpclcVdYtUqOy4aesEseaU4T
-         2+NWnFR/XXrknzqf56uhdk5l9mwVPjZ2LMv23P4GrxcNxHeEwQChu2LcMzno1jqqINe8
-         av+AyZ3FTB89hD7d0uMH7FME3xsfl1Lm3WI5yg6M7orTFcrbUvwclnix0PrKjSlwygXi
-         HbLDcmLJjQUY+tiPLOLGLDAjGB+SH4GKgodEO5qjCO33HsTYrwGZ5MGnL0VN2spahw3b
-         pEVg==
-X-Forwarded-Encrypted: i=1; AHgh+RrZ0sse0UkpvxzAx78I+zbhhNwMghMYbrn2C/QS+UIbbeJi3kmayYHWfukaHS909HTquAf4LzA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzzl2VA3DagsC0DLPqoatEOWbNnO0oHXZc+pxdw/09ooxl8RK10
-	2OyiT6Jwn2FkRH7laRWdf96rx5hN3OmFUnTQ0YV+vC7AcPJAyQc2Q6jXQLdaaImRtc8=
-X-Gm-Gg: AfdE7cmfC1jyMCF0sB9pE0+y0oRSgyXZokNmMFsLm88eq0DvOAIlqKx0vxfgMg65V7F
-	ITvh4ML7YPMQnPgoeZ6c2DkzqanxLRnWMKtDzhlPPA/rbmF6iuWuZA+uraPlrpxwpJevCtMXVWb
-	LlwwD8CkL7m5pTTwTQ4yEIzNF2B/ZiIJrpZMLD91Y+fvgUpHF8qDqEnqjmTA1NHddy4eMz0+ZrE
-	QtBq3/xfgLKR7mhABOisk8x5AGfEHb27tkMdQohbsATJzpIl1CHwSHXddBca4pBaFZzdAfhggdG
-	sOYrrdmtQ6uT83ZDK4WQbYehO4Vj3yJ8FX85zCYlBPIqJKb2pMGAa1QwzebmVE3Ku2cBBuxoYWM
-	jpMsZr0q7nmVaRpqOfkPb6mHzHWix4hGzVRtkWExmjAX60bv8zFYRN4SrQwvsGWBBmJfcABkvQF
-	7xgn45KASxPgXyXB0=
-X-Received: by 2002:a05:600c:c87:b0:493:e890:9e0b with SMTP id 5b1f17b1804b1-493eb0130c0mr30213605e9.26.1783596518799;
-        Thu, 09 Jul 2026 04:28:38 -0700 (PDT)
-Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493eb6ff432sm52559975e9.4.2026.07.09.04.28.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2026 04:28:38 -0700 (PDT)
-Date: Thu, 9 Jul 2026 13:28:36 +0200
-From: Petr Mladek <pmladek@suse.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: linux-atm-general@lists.sourceforge.net, linux-can@vger.kernel.org,
-	linux-sctp@vger.kernel.org, netdev@vger.kernel.org,
+	 Content-Type:Content-Disposition:In-Reply-To; b=bE4l8EVOhtds8cZLkMfbU3g3dOAwYK8P72wVLhR0/XH+OEv1nEYl47Zo+mNtLU8RxWP2l3o6I++0WZvH0tFLDqD+PEnyFT+JMkZAjy0yy0tQfwEclD0//EJJ9JQQf0Vlj8J2KP7UrRwBOI8/1R3eXNU6oVacLOdJwLKbpz1Eszo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 0F4F260293; Thu, 09 Jul 2026 13:46:27 +0200 (CEST)
+Date: Thu, 9 Jul 2026 13:46:26 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Julian Anastasov <ja@ssi.bg>
+Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
+	Simon Horman <horms@verge.net.au>, David Ahern <dsahern@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Oliver Hartkopp <socketcan@hartkopp.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Remi Denis-Courmont <courmisch@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>,
-	Kees Cook <kees@kernel.org>
-Subject: Re: [PATCH net-next] net: Convert %pK back to %p
-Message-ID: <ak-F5CA-R7LzEhFp@pathway.suse.cz>
-References: <20260706073824.xixrLxoD@linutronix.de>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
+	Alexander Frolkin <avf@eldamar.org.uk>, netdev@vger.kernel.org,
+	lvs-devel@vger.kernel.org,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	stable@vger.kernel.org,
+	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+	Ao Wang <wangao@seu.edu.cn>, Xuewei Feng <fengxw06@126.com>,
+	Qi Li <qli01@tsinghua.edu.cn>, Ke Xu <xuke@tsinghua.edu.cn>
+Subject: Re: [PATCH nf] ipvs: make destination flags atomic
+Message-ID: <ak-KErd1a0NHGN-D@strlen.de>
+References: <20260707085706.96322-1-zhaoyz24@mails.tsinghua.edu.cn>
+ <41c3d792-af7d-5582-5057-ac3df5f7bfd6@ssi.bg>
+ <91509A0C-9E4A-4F0E-A45C-ABD29396067E@mails.tsinghua.edu.cn>
+ <afcdb34c-ec10-de8e-083c-624bcedca90e@ssi.bg>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -110,79 +68,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260706073824.xixrLxoD@linutronix.de>
+In-Reply-To: <afcdb34c-ec10-de8e-083c-624bcedca90e@ssi.bg>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	DMARC_NA(0.00)[strlen.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-306196-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:bigeasy@linutronix.de,m:linux-atm-general@lists.sourceforge.net,m:linux-can@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:herbert@gondor.apana.org.au,m:kuba@kernel.org,m:kuniyu@google.com,m:mkl@pengutronix.de,m:marcelo.leitner@gmail.com,m:ncardwell@google.com,m:socketcan@hartkopp.net,m:pabeni@redhat.com,m:courmisch@gmail.com,m:horms@kernel.org,m:steffen.klassert@secunet.com,m:willemdebruijn.kernel@gmail.com,m:lucien.xin@gmail.com,m:thomas.weissschuh@linutronix.de,m:kees@kernel.org,m:marceloleitner@gmail.com,m:willemdebruijnkernel@gmail.com,m:lucienxin@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[pmladek@suse.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[lists.sourceforge.net,vger.kernel.org,davemloft.net,google.com,gondor.apana.org.au,kernel.org,pengutronix.de,gmail.com,hartkopp.net,redhat.com,secunet.com,linutronix.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:ja@ssi.bg,m:zhaoyz24@mails.tsinghua.edu.cn,m:horms@verge.net.au,m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:pablo@netfilter.org,m:phil@nwl.cc,m:avf@eldamar.org.uk,m:netdev@vger.kernel.org,m:lvs-devel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:stable@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	TAGGED_FROM(0.00)[bounces-306197-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,verge.net.au,kernel.org,nvidia.com,davemloft.net,google.com,redhat.com,netfilter.org,nwl.cc,eldamar.org.uk,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pmladek@suse.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[suse.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[pathway.suse.cz:mid,vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,suse.com:from_mime,suse.com:email,suse.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,strlen.de:mid,strlen.de:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 464C2730695
+X-Rspamd-Queue-Id: 2E6A2730900
 
-On Mon 2026-07-06 09:38:24, Sebastian Andrzej Siewior wrote:
-> This is a revert of commit 71338aa7d050c ("net: convert %p usage to
-> %pK") which is from 2011. Back then the default behaviour for %p was to
-> print the pointer. The %pK modifier was introduced to be able to control
-> the behaviour of specific pointer output without changing the behaviour
-> of %p for everyone. It was dedicated to avoid leaking pointers via
-> /proc.
-> There was also the idea to remove the check from formatting the string
-> and move to the open callback (of the /proc file) with some helpers but
-> this did not happen.
+Julian Anastasov <ja@ssi.bg> wrote:
+> 	After looking again at the code, I think we can
+> do it in different way:
 > 
-> Things changed over time. The default behaviour for %p is now to print a
-> hash pointer which does not leak the address but allows to
-> correlate if two pointers are equal. The pointer to hash value mapping
-> is not stable across reboots so one can not precompute the values and
-> have a lookup table. There is also the `hash_pointers' boot argument
-> which allows to disable it and print real pointers if needed. The
-> default behaviour of %pK (kptr_restrict==0) is already %p (hashed
-> pointer).
+> - IP_VS_DEST_F_AVAILABLE and IP_VS_DEST_F_OVERLOAD are defined
+> in include/uapi/linux/ip_vs.h but we never export them to user
+> space. So, we are free to change them. We can move them to 
+> include/net/ip_vs.h, see below...
 > 
-> The %pK modifier brings hardly and value over %p. Removing it allows to
-> remove the policy checks from pointer formatting.
+> - IP_VS_DEST_F_AVAILABLE is changed only under service_mutex,
+> so we can keep its usage
+> 
+> - IP_VS_DEST_F_OVERLOAD needs different access methods.
+> We can add 'unsigned long flags2;', may be after l_threshold.
+> And to switch to such usage (F_OVERLOAD -> FL_OVERLOAD):
+> 
+> 	- test_bit(IP_VS_DEST_FL_OVERLOAD, &dest->flags2)
+> 	- set_bit(IP_VS_DEST_FL_OVERLOAD, &dest->flags2)
+> 
+> 		Sometimes if (test_bit()) clear_bit() can avoid
+> 		full memory barrier in ip_vs_dest_update_overload()
+> 
+> 	- clear_bit(IP_VS_DEST_FL_OVERLOAD, &dest->flags2)
+> 		test_bit() guard can help here too
+> 
+> 	As there are other races involved, something like
+> this can be a starting point for such change. It tries harder
+> to update the overload flag on dest edit/add but it does not
+> include the proposed bitops:
+>
+> diff --git a/include/net/ip_vs.h b/include/net/ip_vs.h
+> index 49297fec448a..b34631270e24 100644
 
-Yes, I believe that the %pK behavior has been obsoleted by hashing
-pointers printed via %p by default and hash_pointers= boot parameter.
+Who is supposed to do what?
 
-> My long term goal is remove the restricted_pointer() handling from
-> vsprintf. I don't see any benefit in having it and case kptr_restrict==1
-> caused problems in terms of locking. Instead of attempting to get the
-> debug/ warn infrastructure right I am for removing it.
-
-Yes, it would be nice because the locking is tricky.
-
-Acked-by: Petr Mladek <pmladek@suse.com>
-
-Best Regards,
-Petr
+I.e., are you going to submit this officially as replacement
+for the v2 of this patch or do you expect the sumbitters of
+this patch to rework their v2 along these lines?
 
