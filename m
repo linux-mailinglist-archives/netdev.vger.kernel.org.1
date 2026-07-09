@@ -1,269 +1,184 @@
-Return-Path: <netdev+bounces-306044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306045-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id yEZFBJUxT2qfbwIAu9opvQ
-	(envelope-from <netdev+bounces-306044-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 07:28:53 +0200
+	id BCk4FYI0T2pQcAIAu9opvQ
+	(envelope-from <netdev+bounces-306045-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 07:41:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 875EE72CC0A
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 07:28:52 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E153772CCFE
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 07:41:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=IgHQPNoV;
-	dmarc=pass (policy=reject) header.from=nvidia.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306044-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306044-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=PMF7MIfe;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306045-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306045-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3D0D53032074
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 05:28:43 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 06EBA300E006
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 05:41:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 220A83A5E98;
-	Thu,  9 Jul 2026 05:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFBFC3AB26E;
+	Thu,  9 Jul 2026 05:41:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012037.outbound.protection.outlook.com [52.101.43.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A97A32FD7B1;
-	Thu,  9 Jul 2026 05:28:39 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783574921; cv=fail; b=eTEa2ycvj7Bzwz2JQhPBoR9IPO1F/l4eyqzudAK5oVIclJz/kRud8ISvp/QB4kokt6X9nLica5VVhj9e0buCXbKFnEMjGuZNoT+WyfNN/pfTCDMONtV0XB30AGW/bVeZajvqnHGkpm0bcA+fML5klyPAoAXRTp6yFozsO1UsGts=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783574921; c=relaxed/simple;
-	bh=DRwWMlR5FR+BW6Qg4/STx2R2NXoIrEiGUtDVKW+zxyY=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=HDLAtdRu1tQI9D/TA+n8EthBiqtR5i44UntEBgsoUvxwicBfffYHE5yhNYqolkYL04kEuePkVl9R221bB2UHF5F6RtiGM8ke/2zxbxtKVYdG0woB3gDARdD23E0/fc5eyeeIac91j8eSXACIiOxrA2LYAl0/LlDqASYRtsMPv4s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=IgHQPNoV; arc=fail smtp.client-ip=52.101.43.37
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=u20eIQiHdgjRuyu4kF6YUyLWjqeeCXULeR79Iu+ibFIbFknG/nFBPjsb9JXNScx5HoBzhyTqPQEdufvrObGCFR0ygMM21yvo7wqQkM5IOPlgp+HyQjnbm4Ikixsi8H+QBDEPY062cLEfDFE7dFixnAUY7NkDm7bTgmxMoHqaCXHqhfTZrA6Swkjk9GQh0xg21ycRPnSU0TfsBCKbpIwqIX95srDfOCbZB+CkgFvCljiEuuMp/zWQeE3fuF896pNetu0G4wZVD7U+EGpJoXOMn4nt0G9Rx+5yNiQzrixvX2nUuPszYzDcoBHJW721pNWu1rMzmbIf/JWXJfNJiAdp8w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zP6Z7lpLRwMp+qw+vNGlPOgFdeJmdF2+GzODby0pfJI=;
- b=FeRgpCtEH+FtrKiJP0prkGt3XKfiUPfpBAf1MudJ28Nmc+HNvUvNMJJ8+tUEIs6tSkzSWb4FpLBepA359s8bbnBRnzuJbWQGFheqjvn54lKW8Je6yiCJIS23IQW/UDSw0qG8z3Kohlg1b3kWLkODCimVl6Q9+iKt9GhNjTOd7LPwBblkNIRlHre7/R2qWNzaG8xXi8216BG0BF99rP1wljk1Rvudv6iWdHyAq7lozjsP8uo+K0mEWUJzfrKyjOARsOJDlpo+7kkbqOzdyEnS0O2Usv9DjW0p1XeHPDVJts102SLgr6dAeQNu56bltz2LjxP6fl3Anr8hOOrS6hyf3g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zP6Z7lpLRwMp+qw+vNGlPOgFdeJmdF2+GzODby0pfJI=;
- b=IgHQPNoViSj0rc5f2x+BTfY7zMOdy+AL9IgYHGjkqKMV8FWrBlgWQJYngV7k5jq9umOGygDdRmrYrtPV45qtPrlDH2A4LL8CwRQHzOXDJByEfGdYhYHfWr3OGeC81tavUiQZIiyPMlmpnacn1kMIbdSKijKOnXHCo9ut20KS3NAg7R1hMTFDVcRfwrB4Zy4T3YtcAzrinHG/IlCSsh9fb5SgwtUTfYGY8+y3jCJsmRGGMGqhZpxcNgS1FbgE+H5xRZBTStbSDF7co7MZCMye6JtzEXMm7zyTOqkzLoVG5YlDER6u31ZXx/0Y8acKIrB9nGYWdUL2tzEPheYldIJj8g==
-Received: from MW6PR12MB7086.namprd12.prod.outlook.com (2603:10b6:303:238::20)
- by CY3PR12MB9678.namprd12.prod.outlook.com (2603:10b6:930:101::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.10; Thu, 9 Jul
- 2026 05:28:36 +0000
-Received: from MW6PR12MB7086.namprd12.prod.outlook.com
- ([fe80::4eb8:7fcb:fe8d:e95e]) by MW6PR12MB7086.namprd12.prod.outlook.com
- ([fe80::4eb8:7fcb:fe8d:e95e%6]) with mapi id 15.21.0181.008; Thu, 9 Jul 2026
- 05:28:36 +0000
-Message-ID: <ad63f6fc-da9c-4850-bcd4-2f3a1324ebae@nvidia.com>
-Date: Thu, 9 Jul 2026 08:28:28 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] net/mlx5e: Use sender devcom for MPV master-up
-To: Manjunath Patil <manjunath.b.patil@oracle.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Patrisious Haddad <phaddad@nvidia.com>,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-References: <20260707233911.3651139-1-manjunath.b.patil@oracle.com>
-Content-Language: en-US
-From: Tariq Toukan <tariqt@nvidia.com>
-In-Reply-To: <20260707233911.3651139-1-manjunath.b.patil@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0449.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:c6::9) To MW6PR12MB7086.namprd12.prod.outlook.com
- (2603:10b6:303:238::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C533A7858;
+	Thu,  9 Jul 2026 05:41:17 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783575678; cv=none; b=USzP2bWOrV6Kedt+mLsJj8wG34JRjSjOIgYDANDZTheb5phvB2WaZAouVC5KPfSmejB4HEhx6hl9h414ryXUoK1tQuRR3iRelgxQe8Sv4W7NbhQ3tocqXuW1BWd3WdC8N8WvWbKQHOlAPIz3W5dGtNVwiEqkISKTUegRyC44cWY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783575678; c=relaxed/simple;
+	bh=vd/pKHnN9hHEq/PC2ZKa5Ks5FAZG9ipiDZlCtIFKHWA=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=Sz+AMAyFvMaIp2ihH/XHgskQbhUvphToTAOUip8OSlcT4ZwgVSYZ5RLdHGSqaLSFcCyqY7FP5CNKrq2Aj+R26BW153pLHwRNBXYsN+kGhdIV3R2va4LrL5luOzrWzq8KJpv4vo2BDoV3P7SdYpn9LodkJ10feZ+KCBIncmmCP5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PMF7MIfe; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EAE21F000E9;
+	Thu,  9 Jul 2026 05:40:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783575677;
+	bh=GUR46VabSVZbPyehLw4syLT30MNmMe+mudnTx0VnTpA=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date;
+	b=PMF7MIfeOb6sPplAJM3ptwtGVrsjDjcmNM8+KBGIZapvBcxEoEW05Z71w8wT7OiCo
+	 DpyTqd8LBQSOVV2LXf12bv3I6Pc0h9ojZxvVDoieC+rI/KlduqQsbmNYRbApokpMUS
+	 906x2f5dfccmHGNLaQwrgeNkFJeM+vrwSPjhiXoBgGmr7P/GzXUVoT8b+iN+kTpuYZ
+	 3miqhB4alxgUPujwFkL9mVwHxHABNpvGLd+MKygFosR17bCiXd9AFhTno3Tpzpr8G2
+	 W04sec2rt03zdANmLtdpyqOtx7Xh3Wl/PfkGMSLLD5Y/7X7CmPps6HOirGFsnoRUm/
+	 YRXFW3BE6RuOQ==
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Bjorn Helgaas <bhelgaas@google.com>, 
+ "Vaibhaav Ram T . L" <vaibhaavram.tl@microchip.com>, 
+ Kumaravel Thiagarajan <kumaravel.thiagarajan@microchip.com>, 
+ Even Xu <even.xu@intel.com>, Xinpeng Sun <xinpeng.sun@intel.com>, 
+ Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, 
+ Jiri Kosina <jikos@kernel.org>, 
+ Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+ Zhou Wang <wangzhou1@hisilicon.com>, Longfang Liu <liulongfang@huawei.com>, 
+ Vinod Koul <vkoul@kernel.org>, Lee Jones <lee@kernel.org>, 
+ Jijie Shao <shaojijie@huawei.com>, Jian Shen <shenjian15@huawei.com>, 
+ Sunil Goutham <sgoutham@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jeff Hugo <jeff.hugo@oss.qualcomm.com>, Oded Gabbay <ogabbay@kernel.org>, 
+ Maciej Falkowski <maciej.falkowski@linux.intel.com>, 
+ Karol Wachowski <karol.wachowski@linux.intel.com>, 
+ Min Ma <mamin506@gmail.com>, Lizhi Hou <lizhi.hou@amd.com>, 
+ Andreas Noever <andreas.noever@gmail.com>, 
+ Mika Westerberg <westeri@kernel.org>, Will Deacon <will@kernel.org>, 
+ Xinliang Liu <xinliang.liu@linaro.org>, Tian Tao <tiantao6@hisilicon.com>, 
+ Davidlohr Bueso <dave@stgolabs.net>, Srujana Challa <schalla@marvell.com>, 
+ Bharat Bhushan <bbhushan2@marvell.com>, Antoine Tenart <atenart@kernel.org>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, Raag Jadav <raag.jadav@intel.com>, 
+ Hans de Goede <hansg@kernel.org>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Jiri Slaby <jirislaby@kernel.org>, Andy Shevchenko <andy@kernel.org>, 
+ Mika Westerberg <mika.westerberg@linux.intel.com>, 
+ Andi Shyti <andi.shyti@kernel.org>, Robert Richter <rric@kernel.org>, 
+ Mark Brown <broonie@kernel.org>, 
+ Nirmal Patel <nirmal.patel@linux.intel.com>, 
+ Kurt Schwemmer <kurt.schwemmer@microsemi.com>, 
+ Logan Gunthorpe <logang@deltatee.com>, Linus Walleij <linusw@kernel.org>, 
+ Bartosz Golaszewski <brgl@kernel.org>, 
+ Sakari Ailus <sakari.ailus@linux.intel.com>, 
+ Bingbu Cao <bingbu.cao@intel.com>, 
+ Tomasz Jeznach <tomasz.jeznach@linux.dev>, 
+ Jonathan Cameron <jic23@kernel.org>, Ulf Hansson <ulfh@kernel.org>, 
+ Shawn Lin <shawn.lin@rock-chips.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Benjamin Tissoires <bentiss@kernel.org>, 
+ linux-input@vger.kernel.org, linux-i3c@lists.infradead.org, 
+ dmaengine@vger.kernel.org, Philipp Stanner <phasta@kernel.org>, 
+ netdev@vger.kernel.org, nic_swsd@realtek.com, linux-arm-msm@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, linux-usb@vger.kernel.org, 
+ iommu@lists.linux.dev, linux-riscv@lists.infradead.org, 
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+ linux-cxl@vger.kernel.org, linux-crypto@vger.kernel.org, 
+ platform-driver-x86@vger.kernel.org, linux-serial@vger.kernel.org, 
+ mhi@lists.linux.dev, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+ Jan Dabros <jsd@semihalf.com>, linux-i2c@vger.kernel.org, 
+ Daniel Mack <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>, 
+ linux-spi@vger.kernel.org, Jonathan Derrick <jonathan.derrick@linux.dev>, 
+ linux-pci@vger.kernel.org, linux-gpio@vger.kernel.org, 
+ Mauro Carvalho Chehab <mchehab@kernel.org>, linux-media@vger.kernel.org, 
+ linux-mmc@vger.kernel.org
+In-Reply-To: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
+References: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
+Subject: Re: (subset) [PATCH 0/37] PCI/MSI: Enforce explicit IRQ vector
+ management by removing devres auto-free
+Message-Id: <178357565325.731734.7291964273199898845.b4-ty@b4>
+Date: Thu, 09 Jul 2026 07:40:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW6PR12MB7086:EE_|CY3PR12MB9678:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3345f5f4-6aa1-4c99-6c3b-08dedd7aec4a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|1800799024|7416014|376014|366016|22082099003|18002099003|56012099006|11063799006|6133799003;
-X-Microsoft-Antispam-Message-Info:
-	G74QUepF4KEf/Rz3P0JDy4YhFoogZYv1rvWSWR3WtsdQbXJn3n5BCvuDY/+Xx3MNPRgt37PcVjNW49ESO7wBOP+0EmK15u3x/h9nvoAh2C9BG0xVzZBl2658cPNAWGxZkuIADaj9M/CuK5LAqVU9V1ivP71LF6pCWOQCERr5bL9O07pT3r0rcMrwZtTv62K8NKM5oduwAVwus97NPjryaT/7dOKRuAJr0+ozXeIGMm20g5bMu50BMMvkBKDiUt+UkxeZIsIC/uusCqWPmoc+RNlnSeihrhqFsqUKVD5gdL223wqZlCBClBHqclmjEMCIhnuwWCM9T4j1oc4RIJlWE2OxC/BqSdNG/qDr1dgEwyAueRl+MDWXdLu5Nx/OlSWiprW4M8Vw3GIHk/EHyRnziM04bOpSsMmX7L7TLjhHv5arlllQyBtOZ7pnOlhUc9GcfmxVkPBJAVqWSbH0XvWY1vwBeeNDW4kHpt84wTRAuXEWHrqVrMKbP2kGu6WpnHRxP2fThC/zx0BDjSsam6+ykr34QrEciD9/Z0gxHbQZIzqe8tK4Hc3IV6hIlY547FP7kbQ6NddlFjTcZ2JhcLmHtVVP6bD7AM/72EfoPBKnrqsvBrK1UTlvjjibZ7RjRhL2lVobi/WQjgDQpCy2naPcUMN2mzmOQtdkTHPJFfQx/9Q=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW6PR12MB7086.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(7416014)(376014)(366016)(22082099003)(18002099003)(56012099006)(11063799006)(6133799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ays5Ri9wK0hFVW1YZlh6YklYZVRDVS9kVXpIRUNNcWttVDJLdjYvMitZeVVu?=
- =?utf-8?B?Q3M5bUZqeXhJcnlpZkU2NG5YTGFOczZuUnhEQk5VRmM5TjBxckdTeHpvOTJy?=
- =?utf-8?B?a3h5YmY5UVo3NHBsVkEwcCtPem5WTXJJK216L0w3cFJ0ZVJOYkFOWFhUY3Q5?=
- =?utf-8?B?aUZVWHZNZnc1NlRwSmhvejUwMG9pN3RnQnV4MXdtNU1qQ1NqUHdwM21NdHJR?=
- =?utf-8?B?TUZndVNuOG1yRlBLWC9iZ0FtRDJyUHF2UlRiS2RZOHQ2ZnpsUVQwbkd2WVV1?=
- =?utf-8?B?akFMdWFtY1JjUGJiMUxMQlFMZVZNbjFxQVAyak1pTHhxUjNRSExDem9IK3JQ?=
- =?utf-8?B?Ykdjc2dRTnJyaFNPL3ppTXZVT2lFbitQTlp5WkJndHVBdWtoWElNdDhmSm50?=
- =?utf-8?B?cElSMWI1dGhJbWNPQWJUZVdacGdYTjhWUVRyZ1dmc2JPMmhqb3AwT1BtcU43?=
- =?utf-8?B?a2cxU2Y1NlRqM3FhQWhLYThsekdieFI1NlhaYnArSGdXbDRDUDVtN2l6eS9q?=
- =?utf-8?B?WEJnWldVYk0xKzllZWVBT3EwL2ZwSWxYMTVRbXQ1S2FTYWM4Y255OE10em1H?=
- =?utf-8?B?TWo2OFlJVGxpUmhhSGRTM2NtKzlodGU5YUk0SXdQd3RyRjZTdjNCcmw0TVli?=
- =?utf-8?B?Q1k3bW1xMEdxanhhT1l4Nm5HQTh3bVdDMzdaUzRlTjZSWmh5SXVuOSsxTFJu?=
- =?utf-8?B?WFZMNjJkWVhnNWN1Z0hsVEwxejFWNDE1UzY3TENHTENTbU1QdDhWR0trcnl4?=
- =?utf-8?B?bkVjUU9hLzcwMFc5REVFdXdObGFKdGRBdVVJd3p0dXhvbmRKVGwzSElVSWxK?=
- =?utf-8?B?RjlvemgvZUZNck90M2VuSFl6bVlUY0RtSUZQMnFycWJJeFNZSDJERGZGc3dE?=
- =?utf-8?B?UjRTT2hYempUbVJnVzJ0a1FWK3BQK2JMREVnUVYvL3RRK1RiUmdVMktVamhG?=
- =?utf-8?B?akVvbEhFZGpyY2dJSzhuVHpKbTVWM0pRL0NGK2tkWTh3QzA5ZDhYeFJnNkRD?=
- =?utf-8?B?T2krbmJwZHdIVFRvODZueXR2UkQwK05TM1ZGRzBOejFPbmI3Y011UlhkLzlr?=
- =?utf-8?B?bVc1UmM2MEVKTnk1cEZWS1g2OExoWVJ2N21YeERBSWV4cTF1WmRVN2JGUStO?=
- =?utf-8?B?UVhNc2hCYUdmRW11WjMrNTFPVUlaM1hlMnZBcnVyVlB0RENEbkpKMUdjWm81?=
- =?utf-8?B?UGlLZyttcTlidnpENDdyam9JZ2lMMWkvM3FLdlRZVktsMlk2T2ZrL3NXQzVE?=
- =?utf-8?B?SmNrTHkwK0w3V0ZKOSs2Zi9vN3Y1Qlk1NElRNkxXaWJEaG54SHhlYlJoQnp6?=
- =?utf-8?B?TkxoV1plNEp4YXNFM3F3UHRWOElyNmhZaklVaVE0T1JOdUM2Rlpua3dSeXNG?=
- =?utf-8?B?U0NzTFo5cXppWlRYbmtxVTd1YTU4Ulk1dk9sb3hFdUlQQWJ5by9TRjBIamVN?=
- =?utf-8?B?Y1p5V0p5Vk04c2RwVVNZSEJkLzJWSlNlVlgyUFA1dFNBaDFtUDNreEdXRXo5?=
- =?utf-8?B?djQxbkh6eU9VemNUQjlWaWRmRTZNV2ZaMHh4YXhSdkE5azBVdHY3RTY5NEw0?=
- =?utf-8?B?U0RPdXJuWFFGS2dVVTJmYzNrZzJWdTc1S2dyWG84MFdzVytnYkh4eE02bzBH?=
- =?utf-8?B?SWRkbjl0QWYybk9lSmdvUmNCVWJ3YlBXeXJOZmFOWlJjR1ZZdVc1VFRHWWFW?=
- =?utf-8?B?SUVmZWZkbi9TU2d1UjlZayt6RlpaU3lkb2FGT2Jsc0lVSnVJcmRoWi9nY21l?=
- =?utf-8?B?VGlEN3VoRldTTW1uTGI4aEdmNlRlYUxSQjBsYllDVS9raFcwTVlzOWRRSUty?=
- =?utf-8?B?TzBvRXc5TXlhdG0wYjhKUnEzOXZQMnphZXNES1VoSWxhbjQzTmFWc3Y4NHVL?=
- =?utf-8?B?VGljdzVEWWJWVlo4anUxdWxIZmdxNVNjekgzOTVqdjF0anZkWkg5dEN6cG1F?=
- =?utf-8?B?UUpoajdKSVI3M3FyWWlKb1p1TWpOaFhvbWVDWGRGQ2dSNVRpVjdRQ0U1Yit2?=
- =?utf-8?B?TWxqbHAzSTRRNnJ0dnFZQ2tyWm8vb2NQeWV6TXh2Q053alBscHp2UnMrQmZl?=
- =?utf-8?B?ZWhTdmIxdXN5Z3JNUEZwUWI2M1pLMXZmUnpGVEFUMWsxZi9NMUhEMW9hR2ZG?=
- =?utf-8?B?aGs3YWg1YWp2MWh2Z01CYW9aeUhKTW5PQ21HOTlBaHdsMXFkdWtYajlJMzA5?=
- =?utf-8?B?dmJnWkt1cFNtY3VnVlZJUytZQmRYcHR5cEdybERIRTJ4ejJtaFFuZXdmYnpS?=
- =?utf-8?B?SDhYM2g3MjVQcVZBTUhWRHVKQjdvSDNBOHcrWHFZcHpzZmhBWlBDbkpKVi9a?=
- =?utf-8?B?ai9pZUNPQXdTbnFDSVhQQnB6eUVTNy90RFRLZ3ZFWWJTd1FDZmUvUT09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3345f5f4-6aa1-4c99-6c3b-08dedd7aec4a
-X-MS-Exchange-CrossTenant-AuthSource: MW6PR12MB7086.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2026 05:28:35.6875
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yqUL1M1RNkcvutvk0s6yI0+2Mrjkw7HIkAoDG7MyTL4NbQWc1r/jEfikAoJ+Nh9fQI3rJ9Q3wy32SNqlxyUy6Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY3PR12MB9678
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.15.2
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
+X-Spamd-Result: default: False [-3.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306044-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:manjunath.b.patil@oracle.com,m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:leon@kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:phaddad@nvidia.com,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[google.com,microchip.com,intel.com,linux.intel.com,kernel.org,bootlin.com,hisilicon.com,huawei.com,marvell.com,lunn.ch,gmail.com,davemloft.net,oss.qualcomm.com,amd.com,linaro.org,stgolabs.net,gondor.apana.org.au,linuxfoundation.org,microsemi.com,deltatee.com,linux.dev,rock-chips.com];
+	TAGGED_FROM(0.00)[bounces-306045-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:bhelgaas@google.com,m:vaibhaavram.tl@microchip.com,m:kumaravel.thiagarajan@microchip.com,m:even.xu@intel.com,m:xinpeng.sun@intel.com,m:srinivas.pandruvada@linux.intel.com,m:jikos@kernel.org,m:alexandre.belloni@bootlin.com,m:wangzhou1@hisilicon.com,m:liulongfang@huawei.com,m:vkoul@kernel.org,m:lee@kernel.org,m:shaojijie@huawei.com,m:shenjian15@huawei.com,m:sgoutham@marvell.com,m:andrew+netdev@lunn.ch,m:hkallweit1@gmail.com,m:davem@davemloft.net,m:jeff.hugo@oss.qualcomm.com,m:ogabbay@kernel.org,m:maciej.falkowski@linux.intel.com,m:karol.wachowski@linux.intel.com,m:mamin506@gmail.com,m:lizhi.hou@amd.com,m:andreas.noever@gmail.com,m:westeri@kernel.org,m:will@kernel.org,m:xinliang.liu@linaro.org,m:tiantao6@hisilicon.com,m:dave@stgolabs.net,m:schalla@marvell.com,m:bbhushan2@marvell.com,m:atenart@kernel.org,m:herbert@gondor.apana.org.au,m:raag.jadav@intel.com,m:hansg@kernel.org,m:gregkh@linuxfoundation.org,m:jirislaby@kernel.org,m:andy@kernel.org,m:mika.westerberg
+ @linux.intel.com,m:andi.shyti@kernel.org,m:rric@kernel.org,m:broonie@kernel.org,m:nirmal.patel@linux.intel.com,m:kurt.schwemmer@microsemi.com,m:logang@deltatee.com,m:linusw@kernel.org,m:brgl@kernel.org,m:sakari.ailus@linux.intel.com,m:bingbu.cao@intel.com,m:tomasz.jeznach@linux.dev,m:jic23@kernel.org,m:ulfh@kernel.org,m:shawn.lin@rock-chips.com,m:arnd@arndb.de,m:bentiss@kernel.org,m:linux-input@vger.kernel.org,m:linux-i3c@lists.infradead.org,m:dmaengine@vger.kernel.org,m:phasta@kernel.org,m:netdev@vger.kernel.org,m:nic_swsd@realtek.com,m:linux-arm-msm@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-usb@vger.kernel.org,m:iommu@lists.linux.dev,m:linux-riscv@lists.infradead.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:linux-cxl@vger.kernel.org,m:linux-crypto@vger.kernel.org,m:platform-driver-x86@vger.kernel.org,m:linux-serial@vger.kernel.org,m:mhi@lists.linux.dev,m:andriy.shevchenko@linux.intel.com,m:jsd@semihalf.com,m:linux-i2c@vger.kernel.org,m:daniel@zonque.org,m:haojian.zh
+ uang@gmail.com,m:linux-spi@vger.kernel.org,m:jonathan.derrick@linux.dev,m:linux-pci@vger.kernel.org,m:linux-gpio@vger.kernel.org,m:mchehab@kernel.org,m:linux-media@vger.kernel.org,m:linux-mmc@vger.kernel.org,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[mani@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_GT_50(0.00)[86];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	FROM_NEQ_ENVFROM(0.00)[mani@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[arndb.de,kernel.org,vger.kernel.org,lists.infradead.org,realtek.com,lists.freedesktop.org,lists.linux.dev,gmail.com,ffwll.ch,linux.intel.com,semihalf.com,zonque.org,linux.dev];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,Nvidia.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:from_mime,nvidia.com:email,nvidia.com:mid,oracle.com:email]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 875EE72CC0A
+X-Rspamd-Queue-Id: E153772CCFE
 
 
+On Mon, 23 Feb 2026 23:29:39 +0800, Shawn Lin wrote:
+> This patch series addresses a long-standing design issue in the PCI/MSI
+> subsystem where the implicit, automatic management of IRQ vectors by
+> the devres framework conflicts with explicit driver cleanup, creating
+> ambiguity and potential resource management bugs.
+> 
+> ==== The Problem: Implicit vs. Explicit Management ====
+> Historically, `pcim_enable_device()` not only manages standard PCI resources
+> (BARs) via devres but also implicitly triggers automatic IRQ vector management
+> by setting a flag that registers `pcim_msi_release()` as a cleanup action.
+> 
+> [...]
 
-On 08/07/2026 2:39, Manjunath Patil wrote:
-> After PCIe DPC recovery, mlx5 reloads the affected functions and
-> replays multiport affiliation events. In the reported failure, the
-> first relevant device error was:
-> 
->    pcieport 0000:10:01.1: DPC: containment event
->    pcieport 0000:10:01.1: PCIe Bus Error: severity=Uncorrected (Fatal)
->    pcieport 0000:10:01.1:    [ 5] SDES                   (First)
-> 
-> mlx5 recovered the PCI functions and resumed 0000:11:00.1. During
-> that resume, RDMA multiport binding replayed
-> MLX5_DRIVER_EVENT_AFFILIATION_DONE and mlx5e sent
-> MPV_DEVCOM_MASTER_UP. The host then panicked with:
-> 
->    BUG: kernel NULL pointer dereference, address: 0000000000000010
->    RIP: mlx5_devcom_comp_set_ready+0x5/0x40 [mlx5_core]
->    RDI: 0000000000000000
-> 
-> Call trace included:
-> 
->    mlx5_devcom_comp_set_ready
->    mlx5e_devcom_event_mpv
->    mlx5_devcom_send_event
->    mlx5_ib_bind_slave_port
->    mlx5r_mp_probe
->    mlx5_pci_resume
-> 
-> MPV devcom registration publishes mlx5e private data to the component
-> peer list before mlx5e_devcom_init_mpv() stores the returned component
-> device in priv->devcom. A concurrent master-up event can therefore
-> reach a peer whose private data is visible but whose priv->devcom
-> backpointer is still NULL.
-> 
-> MPV_DEVCOM_MASTER_UP already carries the sender/master mlx5e private
-> data as event_data. The ready bit is stored on the shared devcom
-> component, not on an individual peer. Use the sender devcom when
-> marking the MPV component ready.
-> 
-> This preserves the readiness transition while avoiding a NULL
-> dereference of the peer devcom pointer during affiliation replay after
-> PCI error recovery.
-> 
-> Fixes: bf11485f8419 ("net/mlx5: Register mlx5e priv to devcom in MPV mode")
-> Assisted-by: Codex:gpt-5
-> Signed-off-by: Manjunath Patil <manjunath.b.patil@oracle.com>
-> Cc: stable@vger.kernel.org # 6.7+
-> ---
-> v2:
-> - Drop defensive master_priv/master_priv->devcom check as suggested by Tariq.
-> - Resend as an independent thread per netdev posting rules.
-> 
->   drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> index 8f2b3abe0092..9b27afeb9b12 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> @@ -211,11 +211,11 @@ static void mlx5e_disable_async_events(struct mlx5e_priv *priv)
->   
->   static int mlx5e_devcom_event_mpv(int event, void *my_data, void *event_data)
->   {
-> -	struct mlx5e_priv *slave_priv = my_data;
-> +	struct mlx5e_priv *master_priv = event_data;
->   
->   	switch (event) {
->   	case MPV_DEVCOM_MASTER_UP:
-> -		mlx5_devcom_comp_set_ready(slave_priv->devcom, true);
-> +		mlx5_devcom_comp_set_ready(master_priv->devcom, true);
->   		break;
->   	case MPV_DEVCOM_MASTER_DOWN:
->   		/* no need for comp set ready false since we unregister after
-> 
-> base-commit: e43ffb69e0438cddd72aaa30898b4dc446f664f8
+Applied, thanks!
 
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+[13/37] bus: mhi: host: Replace pci_alloc_irq_vectors() with pcim_alloc_irq_vectors()
+        commit: 256995e80fcd39cab94eee8135dd90f6da6ac744
 
-Thanks for your patch.
+Best regards,
+-- 
+மணிவண்ணன் சதாசிவம்
+
+
 
