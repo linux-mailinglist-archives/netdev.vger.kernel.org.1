@@ -1,224 +1,214 @@
-Return-Path: <netdev+bounces-306221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306223-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id jy5CKKGbT2rSkwIAu9opvQ
-	(envelope-from <netdev+bounces-306221-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 15:01:21 +0200
+	id JLUjLWGcT2oelAIAu9opvQ
+	(envelope-from <netdev+bounces-306223-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 15:04:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D72A373155A
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 15:01:19 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B34B17315D7
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 15:04:32 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.alibaba.com header.s=default header.b=w7h4aSts;
-	dmarc=pass (policy=none) header.from=linux.alibaba.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306221-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306221-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=suse.com header.s=google header.b=GH6Q3lUU;
+	dmarc=pass (policy=quarantine) header.from=suse.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306223-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306223-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D7D6B302C0C4
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 12:58:24 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2CBA6301C2CF
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 13:04:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94FC1233D9E;
-	Thu,  9 Jul 2026 12:58:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7554D25742F;
+	Thu,  9 Jul 2026 13:04:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D89BE1A9FAB;
-	Thu,  9 Jul 2026 12:58:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B61B6242D88
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 13:04:27 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783601903; cv=none; b=DTlQqb48ewP2v6Yx9UzLOwsW4+R0nrlPB74EgZ+r06zk8WUCUPKDEYC7LMhOIVMogvIA71vL5iWPTIyTJhf9+ElIs5vEZZN6Z04QzOffQjo0NhwryLntn0EwCUXyfdoOzUcd7HYchzZEcapOMGONyFil7bxpT9B4YI8o0CMXX+U=
+	t=1783602269; cv=none; b=fEhPEJ6ZZSWx/319oP5wsgol9Nxr1ijJrThKK9ujrNcPWI5ynCvmUUsNnDn13SKBqEmTsQEMPau4+KTLshjG4URWM2NLIYJg65AkE+eOX/6Hcfro6/qw2F03MgghxIAkUnWwD9CMFblG4TnjErD2Km0Wa1Aooib3RPHS3BxbcY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783601903; c=relaxed/simple;
-	bh=Zh4R3yWJH807apFQ9uM2oEfV+8R4oL3tieXTel/20Wg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Al32Dd5rlB6W47at/z+uncq7gpU/QHkvMMqEvhtmqbps37U2ebdU9dchcSFGlnPcMLpkTpnWH0vaLMKZCyA060GZg3sSEJNmpzepSUIDoNt/Zwua4xtWTtira/DYoRwzHjB+Vm7Q//nJ9WicnfXDRhS92NTXxP6YY5icOXX3W/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=w7h4aSts; arc=none smtp.client-ip=115.124.30.119
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1783601897; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=GORAQ+6aUKZ7q2GoegDwlPQMfphbTVbJV2PH9DeStr8=;
-	b=w7h4aSts0e8gB8olA9I7DJUtCCFmIVth6cJTL5BqxxdzunDvqRxB6rSzVuKk4LZdwnjW910+nbYtUJfeMcjQLEDvRSLXtU/btBPrc5N7yqgm1ebeWsq54PYDCjCY0YgIy5HAniRJt+6g58aRajgJHXXlrJTX7w9DG/oEFTig7c0=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037026112;MF=lulie@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0X6kzzBo_1783601896;
-Received: from localhost(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0X6kzzBo_1783601896 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 09 Jul 2026 20:58:17 +0800
-From: Philo Lu <lulie@linux.alibaba.com>
-To: stable@vger.kernel.org
-Cc: bigeasy@linutronix.de,
-	willemb@google.com,
-	kerneljasonxing@gmail.com,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	lulie@linux.alibaba.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	dust.li@linux.alibaba.com,
-	heiko.stuebner@cherry.de
-Subject: [PATCH 6.6.y] net: Drop the lock in skb_may_tx_timestamp()
-Date: Thu,  9 Jul 2026 20:58:16 +0800
-Message-Id: <20260709125816.86769-1-lulie@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+	s=arc-20240116; t=1783602269; c=relaxed/simple;
+	bh=pomWuPe/tr64a82692VQtY4Wk2PnNc+aTLslFAls9Aw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eQ/zx5QbVkm0qPd1L/fgxQGSMhpTNsVFJaeUtYXfaf+BOqfu8iLJnk8WyKki7DmvHgWDhRSeue95AVQqIZMgNRaoEUu3MZV8xSqjt3Nuck1K5EjFTtwZa/2ru3oU1EZgX73iGf4sVTFxoq7TfpMxiWkJpqKXCeVKalHZZcSJIwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=GH6Q3lUU; arc=none smtp.client-ip=209.85.128.52
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-493ec555a26so4925715e9.0
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 06:04:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1783602266; x=1784207066; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=fOOmFkjlODizpn7Pcs0slVGKdf2bx5h/bU795bDZqXU=;
+        b=GH6Q3lUUH5Jiyx1mink2Jtohp84TSDDEwackmOd/AdtmidnqTqsXgdvLLyetR8RVeK
+         lYMoyOeS8Ai9Rwkx8+q7VssbZtSYDSxbj9whzWtRuZvOBLIWBbNx2INXa/0s+13BvPxk
+         96qyo7AZNuJCGKyKsOaXepdd5rNpoDg/1+xvjfV5rIlrbjkeHeM7CLoxCnzFl8CDlgYQ
+         jIWtgmx+/T0Ej2CKK3kpkA7HGtUg7Ii4PBMMj3tx1p8NgvtubSTu5BLVTLvXAAlpfy+L
+         6g8NY3Do4fJXTEY1MdkqcOLUL/LUMjieUgAJ8jO/P4DSceQnZvVlACJ4A/zW6HgOL/HB
+         rtLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783602266; x=1784207066;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=fOOmFkjlODizpn7Pcs0slVGKdf2bx5h/bU795bDZqXU=;
+        b=PqkXrA7eJqJnIYQjoCD8+CqTTStXPQczjoIsZD0J19USbHPnT5C6izle6UXshhzwyM
+         WaeICjyyT6uDIKisuh1RHzdwde7XqVoJM61SdfVHRlqU+/8FipBsOB1PZOEAAXYHvb/W
+         lTZPTI2vAcO0AkkmUYY0FXa0i5J3dE7oJKrmRjkKbmU+N6vIp63Dk7tWgFxTY7tFdbfY
+         5tOawWlyV4f/QHED9SDN9oeWa7OJpVfU9tFkptCfwJKCTOm+2ZeK1p4nZZfvjn12pAsU
+         80VK7u0PqkQVeM1Obt8ciIZ3KtjDVBZh651gqjIAWNF5iipuEtSD26hySbHJTDT2OJeD
+         9TCA==
+X-Forwarded-Encrypted: i=1; AHgh+RoRouaMT8iuRE6Q8XFQ6BBRjz1yhZdRqhmBjW203+oZm7utTm0HiIoOmoZHN2fBHbcOctVVlWQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXslAKYxfVFCI0herTvuKQhYY1QF4fp0IyInRHJfeNmo5K8Fek
+	wloxY2ik4zBAddlYoiMeA+brh+qolhc9FR0uUGzgM3kxaDEs+DjaYt2cMvwn2WVS6Ew=
+X-Gm-Gg: AfdE7cnbZ8ESGF/zM/xo7P+shZ3GHWJzRfxShxgLOOObXHmnca+39EE78vbnB2Zgk/w
+	y5KE+1VAzIEUekgZnUeiKHo19uVdNd0qqV/xsCYjgFUomN4ryDQJj+lu+w2Hr3P67+1LnnO/II1
+	6tjxoqCFnlA7bfwvLh+gyQKUTAfcFMIiMtohLPeMATMkw/e0bYOQA9zOtjnexBJ+R+ZA63thleX
+	bhXUYF8Hxaa/O0tLcjvngfbKL2JoTbu1C2f4KpO5sai1nzO7ov7uhgbfSAh9Sqa8xfADHwFIjcV
+	1ltQUG1U8tqDoaGIF5UQqvgasAh2wPMy+7LiGx+wGbwEULRrfJWWCLGz4Z1wXtSvShZIMyWt4Rv
+	CWnthj9Pkt0Asn+W5/7Eqf0GeR3WngZv8nyCBP1wyZ+Uq3Ef/Fy2yi1GHuKeTsuUNNT2kejQFbE
+	OAVe5BFmDceTO6TxWQL9Y6Z5Uanu/mMWJE4VrPcg==
+X-Received: by 2002:a05:600c:6206:b0:493:d078:796 with SMTP id 5b1f17b1804b1-493e6a4a8a4mr66442385e9.17.1783602266150;
+        Thu, 09 Jul 2026 06:04:26 -0700 (PDT)
+Received: from localhost.localdomain (nat2.prg.suse.com. [195.250.132.146])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493eb6fb526sm69825665e9.15.2026.07.09.06.04.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jul 2026 06:04:25 -0700 (PDT)
+Date: Thu, 9 Jul 2026 15:04:23 +0200
+From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: linux-rdma@vger.kernel.org, cgroups@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	jgg@ziepe.ca, leon@kernel.org, parav@nvidia.com, mbloch@nvidia.com, 
+	cmeiohas@nvidia.com, roman.gushchin@linux.dev, bvanassche@acm.org, 
+	zyjzyj2000@gmail.com, shuah@kernel.org, tj@kernel.org, hannes@cmpxchg.org, 
+	alibuda@linux.alibaba.com, dust.li@linux.alibaba.com, sidraya@linux.ibm.com, 
+	wenjia@linux.ibm.com
+Subject: Re: [PATCH rdma-next 08/13] RDMA/cgroup: Scope rdma cgroup device
+ visibility to the net namespace
+Message-ID: <ak-Z071LrWhnI5lK@localhost.localdomain>
+References: <20260709095532.855647-1-jiri@resnulli.us>
+ <20260709095532.855647-9-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="y2qmoqgw5gkrylpt"
+Content-Disposition: inline
+In-Reply-To: <20260709095532.855647-9-jiri@resnulli.us>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-10.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	WHITELIST_SPF_DKIM(-3.00)[alibaba.com:d:+,kernel.org:s:+];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-4.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306221-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[linutronix.de,google.com,gmail.com,redhat.com,linux.alibaba.com,davemloft.net,kernel.org,vger.kernel.org,cherry.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:bigeasy@linutronix.de,m:willemb@google.com,m:kerneljasonxing@gmail.com,m:edumazet@google.com,m:pabeni@redhat.com,m:lulie@linux.alibaba.com,m:davem@davemloft.net,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:dust.li@linux.alibaba.com,m:heiko.stuebner@cherry.de,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[lulie@linux.alibaba.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lulie@linux.alibaba.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,ziepe.ca,kernel.org,nvidia.com,linux.dev,acm.org,gmail.com,cmpxchg.org,linux.alibaba.com,linux.ibm.com];
+	TAGGED_FROM(0.00)[bounces-306223-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER(0.00)[mkoutny@suse.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FORGED_RECIPIENTS(0.00)[m:jiri@resnulli.us,m:linux-rdma@vger.kernel.org,m:cgroups@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-s390@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:jgg@ziepe.ca,m:leon@kernel.org,m:parav@nvidia.com,m:mbloch@nvidia.com,m:cmeiohas@nvidia.com,m:roman.gushchin@linux.dev,m:bvanassche@acm.org,m:zyjzyj2000@gmail.com,m:shuah@kernel.org,m:tj@kernel.org,m:hannes@cmpxchg.org,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[suse.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mkoutny@suse.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,vger.kernel.org:from_smtp,linutronix.de:email,linux.alibaba.com:from_mime,linux.alibaba.com:dkim,linux.alibaba.com:mid,alibaba.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,localhost.localdomain:mid,resnulli.us:email,suse.com:from_mime,suse.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D72A373155A
+X-Rspamd-Queue-Id: B34B17315D7
 
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
-commit 983512f3a87fd8dc4c94dfa6b596b6e57df5aad7 upstream.
+--y2qmoqgw5gkrylpt
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH rdma-next 08/13] RDMA/cgroup: Scope rdma cgroup device
+ visibility to the net namespace
+MIME-Version: 1.0
 
-skb_may_tx_timestamp() may acquire sock::sk_callback_lock. The lock must
-not be taken in IRQ context, only softirq is okay. A few drivers receive
-the timestamp via a dedicated interrupt and complete the TX timestamp
-from that handler. This will lead to a deadlock if the lock is already
-write-locked on the same CPU.
+Hi.
 
-Taking the lock can be avoided. The socket (pointed by the skb) will
-remain valid until the skb is released. The ->sk_socket and ->file
-member will be set to NULL once the user closes the socket which may
-happen before the timestamp arrives.
-If we happen to observe the pointer while the socket is closing but
-before the pointer is set to NULL then we may use it because both
-pointer (and the file's cred member) are RCU freed.
+On Thu, Jul 09, 2026 at 11:55:27AM +0200, Jiri Pirko <jiri@resnulli.us> wro=
+te:
+> index 993446ab66d0..4523c1884d67 100644
+> --- a/Documentation/admin-guide/cgroup-v2.rst
+> +++ b/Documentation/admin-guide/cgroup-v2.rst
+> @@ -2752,6 +2752,13 @@ RDMA
+>  The "rdma" controller regulates the distribution and accounting of
+>  RDMA resources.
+> =20
+> +When RDMA devices are isolated per network namespace (exclusive mode),
+> +device names are unique only within a network namespace. The device lines
+> +below are therefore scoped to the reading or writing process's network
+> +namespace: only devices accessible from that namespace are listed, and a
+> +limit is applied to the device of that name in that namespace. Configure
+> +limits from the same network namespace as the workloads.
 
-Drop the lock. Use READ_ONCE() to obtain the individual pointer. Add a
-matching WRITE_ONCE() where the pointer are cleared.
+OK.
 
-Link: https://lore.kernel.org/all/20260205145104.iWinkXHv@linutronix.de
-Fixes: b245be1f4db1a ("net-timestamp: no-payload only sysctl")
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Link: https://patch.msgid.link/20260220183858.N4ERjFW6@linutronix.de
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-[ adapted sk_set_socket() in include/net/sock.h to fix the conflict from
- not having commit 5d6b58c932ec ("net: lockless sock_i_ino()") and the
- additional previous changes required by it.
- It comes down to just now having the lines of
-    if (sock) {
-            WRITE_ONCE(sk->sk_uid, SOCK_INODE(sock)->i_uid);
-            WRITE_ONCE(sk->sk_ino, SOCK_INODE(sock)->i_ino);
-    }
- below the changed line. ]
-Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
----
-This patch is same as that in 6.12 (c770217044d9), and it can be also applied
-to 6.1/5.15/5.10 except for line number differences. I'll send patches for the
-other versions if this one looks good.
----
- include/net/sock.h |  2 +-
- net/core/skbuff.c  | 23 ++++++++++++++++++-----
- net/socket.c       |  2 +-
- 3 files changed, 20 insertions(+), 7 deletions(-)
+> --- a/include/linux/cgroup_rdma.h
+> +++ b/include/linux/cgroup_rdma.h
+> @@ -7,6 +7,7 @@
+>  #define _CGROUP_RDMA_H
+> =20
+>  #include <linux/cgroup.h>
+> +#include <net/net_namespace.h>
+> =20
+>  enum rdmacg_resource_type {
+>  	RDMACG_RESOURCE_HCA_HANDLE,
+> @@ -34,6 +35,15 @@ struct rdmacg_device {
+>  	struct list_head	dev_node;
+>  	struct list_head	rpools;
+>  	char			*name;
+> +	/*
+> +	 * Net namespace the device belongs to. @netns_shared mirrors
+> +	 * ib_devices_shared_netns: when true the device is visible from every
+> +	 * net namespace (shared mode); otherwise @net is the only namespace
+> +	 * that may see and configure it. @netns_shared is updated when the
+> +	 * sharing mode changes, so use {READ,WRITE}_ONCE() to access it.
+> +	 */
+> +	possible_net_t		net;
+> +	bool			netns_shared;
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index a6944844553af..c1f129a532b20 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -2155,7 +2155,7 @@ static inline int sk_rx_queue_get(const struct sock *sk)
+Any reason to store the netns_shared split per device? (IIUC, it's a
+global parameter.)
 
- static inline void sk_set_socket(struct sock *sk, struct socket *sock)
- {
--	sk->sk_socket = sock;
-+	WRITE_ONCE(sk->sk_socket, sock);
- }
+Thanks,
+Michal
 
- static inline wait_queue_head_t *sk_sleep(struct sock *sk)
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index c5e2ae6d0406b..732204d99822a 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -5258,15 +5258,28 @@ static void __skb_complete_tx_timestamp(struct sk_buff *skb,
+--y2qmoqgw5gkrylpt
+Content-Type: application/pgp-signature; name="signature.asc"
 
- static bool skb_may_tx_timestamp(struct sock *sk, bool tsonly)
- {
--	bool ret;
-+	struct socket *sock;
-+	struct file *file;
-+	bool ret = false;
+-----BEGIN PGP SIGNATURE-----
 
- 	if (likely(READ_ONCE(sysctl_tstamp_allow_data) || tsonly))
- 		return true;
+iJEEABYKADkWIQRCE24Fn/AcRjnLivR+PQLnlNv4CAUCak+cKRsUgAAAAAAEAA5t
+YW51MiwyLjUrMS4xMiwyLDIACgkQfj0C55Tb+AgSmgD/Vgg6K9wF0JX4NBgdz4NM
+xV33/zTua20t6++MDiv2LGQA/iiwBIKorFXkq2bd30gmVkdyXN6gNLUnmclqxnfK
++M0P
+=L3DZ
+-----END PGP SIGNATURE-----
 
--	read_lock_bh(&sk->sk_callback_lock);
--	ret = sk->sk_socket && sk->sk_socket->file &&
--	      file_ns_capable(sk->sk_socket->file, &init_user_ns, CAP_NET_RAW);
--	read_unlock_bh(&sk->sk_callback_lock);
-+	/* The sk pointer remains valid as long as the skb is. The sk_socket and
-+	 * file pointer may become NULL if the socket is closed. Both structures
-+	 * (including file->cred) are RCU freed which means they can be accessed
-+	 * within a RCU read section.
-+	 */
-+	rcu_read_lock();
-+	sock = READ_ONCE(sk->sk_socket);
-+	if (!sock)
-+		goto out;
-+	file = READ_ONCE(sock->file);
-+	if (!file)
-+		goto out;
-+	ret = file_ns_capable(file, &init_user_ns, CAP_NET_RAW);
-+out:
-+	rcu_read_unlock();
- 	return ret;
- }
-
-diff --git a/net/socket.c b/net/socket.c
-index fa242d7e51c79..ae31c54664632 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -671,7 +671,7 @@ static void __sock_release(struct socket *sock, struct inode *inode)
- 		iput(SOCK_INODE(sock));
- 		return;
- 	}
--	sock->file = NULL;
-+	WRITE_ONCE(sock->file, NULL);
- }
-
- /**
---
-2.47.3
-
+--y2qmoqgw5gkrylpt--
 
