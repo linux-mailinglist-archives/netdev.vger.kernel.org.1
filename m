@@ -1,292 +1,247 @@
-Return-Path: <netdev+bounces-306171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306172-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id p3yYAY92T2rKhAIAu9opvQ
-	(envelope-from <netdev+bounces-306171-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:23:11 +0200
+	id QazKCuCCT2rJiQIAu9opvQ
+	(envelope-from <netdev+bounces-306172-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:15:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8539872F89D
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:23:10 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C80D7301F7
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 13:15:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=XIt1Fwpq;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306171-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306171-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=fail ("body hash did not verify") header.d=Nvidia.com header.s=selector2 header.b=I2sxC+Tv;
+	dmarc=fail reason="SPF not aligned (relaxed)" header.from=nvidia.com (policy=reject);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306172-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306172-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6CC183043576
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 10:21:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9F46F300602B
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 10:23:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB53D3FC5CE;
-	Thu,  9 Jul 2026 10:21:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B8B3F44CB;
+	Thu,  9 Jul 2026 10:23:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011060.outbound.protection.outlook.com [40.107.208.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1C330DECB;
-	Thu,  9 Jul 2026 10:21:35 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783592496; cv=none; b=Z76wsN+lb9hebK+YFfBfYQi5y/HN0k/PIJEzaF8jFCZ6+X/wcfgNUlzPAKvxGXGDPcNASm6XETLRwcYEfZKzwTT22PRl9rDouaDwnk3o5pISl9bP+KQoDAN8bG1Mu6Dov6rGh2ixuQ2H4fGkJJDc0TJafm15wA35jeYzP8Yv1OM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783592496; c=relaxed/simple;
-	bh=0yfdNP6ytHgFtBc2pDX26SjfaDnnkVCAxA4mFZolUA4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZCwDtRPq2n21czU09zOl43VP/KDpdzgkl3mmGdyknOAsn8TH4bIfx86ix+LlzyTCoWFnLnYJ7C/CtbnbD6l+d9sbrY4y0V2xd4x1fX8NKk/dix1NnQ9Vt8qQoJ2W/PoNKlfzZm58zG2LdVH5m2O/iMCpLlWccRJaREO8QAJ7ris=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XIt1Fwpq; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2DCD1F00A3A;
-	Thu,  9 Jul 2026 10:21:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783592495;
-	bh=sj/JW3znLZQNwoK1Pq4M7LGw9HpiiuxxsroG/UR4DSw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=XIt1FwpqyBX9hIDI+S/yt7+4Yopx09kfCDwbxefKNlByV0F8lClNEzC7m3bjIi/8p
-	 JfypPkJwzsr1Y6+aAF91TLjEiVX7mrSwxoPVXPoM2GMjWR9m0XGLh1baaH7vhsW96u
-	 f23jWJFNVAEGZLnkicLz0370mOaDQsjjKWdMztaffvBOrYQMJefMSa+GzhOyM2lCSq
-	 478CzuSuRiPpuai4Y+J0cq3T8V008l6EJ6oRqzkjU4WqYTp47sxHsHpEFTQtL5vIHQ
-	 D15aDhXcE18m7Jg+arD0g9L52/4NyzKiNdQqFbiDFzqe2N5kGvwWPJPwsZ6jSvja04
-	 7YqQ7A+3DdGag==
-Message-ID: <1fb14039-b56d-4757-add9-22b97d3c9f44@kernel.org>
-Date: Thu, 9 Jul 2026 12:21:29 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791123AFB1B
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 10:23:03 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783592584; cv=fail; b=uYTThDWs0Bi0aOb/ZaZnsYoVqdJqSQpwyKwYW8cJPigXHYf9xwmmB+JpLZI7U0j7+5EndwHcVdWP/c/us8eOs7rTiL6J8HGntE759NyaoIkreJoKCTPnzhsfvW+I/pNSmTkpYMOchc1SHnlDnQ0Xod1PLCr9lc86EtSP69q3twU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783592584; c=relaxed/simple;
+	bh=Z4i755tCzHcrPxwXX8vg0rMKRxmAX6jlbxIfGOenqJY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ZsLPd+KVh2gZb3uCg6OzcQ56fgZGd7tlq7ixU1HjO6ckT5+WA7abcfS5XoH8vviyYAhmbRgeIb7wLHVcAQWRF2SbzsPt5hucGTnU5CIl1OZ6T/FvcBrP13mRmGV814BEJ/LRnvh0Q4K5UyxuSTkMYjRb5BSaB91uWAZPTr4IhZw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=fail (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=I2sxC+Tv reason="signature verification failed"; arc=fail smtp.client-ip=40.107.208.60
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ts+1ZF/rVCdMFu65kNMpOtKOjm/8Xxsbt423lpxb2KMjyINPN3+RkRj1oV7ocx4KCm3zjfAA8EiHSj/QSrCV6BHhm276KDjK3S6veXjO5KlTTfYuJuuYj61F5bGi5hwpiQELxSm3SmaM+Gwdd4nhK8vo1BbcN/DTl4O86Fwkdp64FsIkVsXv1zgCzwzlvLIWeEsNy2RusFbsNzT678FKfZG84sZlGSK1c005eRu6Ulk0NkjnaNrKjM6iLiDIXYwevLfl4c6/eIjMndPY1ymn/jov9Wl/LyYM+lQt40HrmMm43tJYE6VnwlQsMvbNtPWt9cczvicK3FPuUWpQ576r6g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1L8P/4dgonUAU2RoX5MZPnfyrhQ7juC3DmrIaU4YyAA=;
+ b=lfwNWAEeHpNhNS0B0KpssR+xEs61gygEdyhVwW6Ye2xb+ATkPy7JOYhidZhVZaBVtMne0DFdko8dXKELWRCd1YLSd3MTqxFJn9ObSOLWML47x21u9Ne3QOrBynF7fNHEwq2n1edvW1JJqauwWqSZ+TFvn+Bq1FB7hhSNOfT812jD4L+JMxSAFBYViHizHtxdU+rZhK0UWXAqVlv7SNYfoxyAsKSkRdKHR1oxhLjNOFdX1+I7Q6W7gjXvi6QZl0ELVoqpBmiaXVqahOkyl3AteUOuGKQ7IfYmbJzxHM6qDl//C2n9IxZlTHjDZvudfv08LykbToJChh8VyvlIK7J3Zg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1L8P/4dgonUAU2RoX5MZPnfyrhQ7juC3DmrIaU4YyAA=;
+ b=I2sxC+Tvaa+YP1fUe54QfczQOmRWU3GagXbJrhr/dF+Bw2fLJ8i/cb6LCMVevK0rE0IrwObk+fS5VVWqeBxp6LBZ03qOwysmeW6xg5RJpRGlsWQ4i8wCkLgDhf88OjPYFKTDJB0Y9S+K7d52KhaL2xEQGDBo+3n0RQe6imW0a3UCl4DK1CLuHZo9BlFNceT/fGPPai5ToXCdd8kvE7ueW+dsXTcnLhjN14FBQmY+9aLAnrAOcNYkJ+JWGOUktI6R17Uyc5snbiaq/t2aU5EtTV6qZCVumNWZaJtCeml4/4S54OmP+Yzmti71ecIiBYqgZlsDi1H4vRh8GykTdvhE8w==
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by DS0PR12MB9323.namprd12.prod.outlook.com (2603:10b6:8:1b3::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.16; Thu, 9 Jul
+ 2026 10:22:59 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0181.010; Thu, 9 Jul 2026
+ 10:22:59 +0000
+Date: Thu, 9 Jul 2026 13:22:47 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Jack Ma <jack4it@hotmail.com>
+Cc: David Ahern <dsahern@kernel.org>, Roopa Prabhu <roopa@nvidia.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>
+Subject: Re: VXLAN FDB nexthop groups: per-nexthop UDP dst port / VNI
+ feasibility
+Message-ID: <20260709102247.GA1536940@shredder>
+References: <BL3PR17MB60675DF2E8769ABDA85CCE74E5FF2@BL3PR17MB6067.namprd17.prod.outlook.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <BL3PR17MB60675DF2E8769ABDA85CCE74E5FF2@BL3PR17MB6067.namprd17.prod.outlook.com>
+X-ClientProxiedBy: FR4P281CA0077.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:cd::17) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next v11 7/7] selftests: netconsole: validate target
- resume
-Content-Language: fr
-To: Andre Carvalho <asantostc@gmail.com>
-Cc: Breno Leitao <leitao@debian.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>
-References: <20260118-netcons-retrigger-v11-0-4de36aebcf48@gmail.com>
- <20260118-netcons-retrigger-v11-7-4de36aebcf48@gmail.com>
- <f398373e-2cb4-4649-a491-9763df94d98b@kernel.org>
- <ak6jtwbct3C5lZPA@archlinux>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <ak6jtwbct3C5lZPA@archlinux>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|DS0PR12MB9323:EE_
+X-MS-Office365-Filtering-Correlation-Id: f1ce109d-6144-4456-7fa2-08dedda40ca1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|23010399003|376014|1800799024|18002099003|22082099003|56012099006|5023799004|11063799006|6133799003;
+X-Microsoft-Antispam-Message-Info:
+	oK20DbfdLJwOBd2ojZQmhWPTJCngfXEBhovXupGztnbKHB+Fk5Yl/Ss4k+tM+vyelQ70CK2w7LDpwXy92fNZ5hrX/99IL5RibZL/2mT35Ec/qu8CNzkBerPI/F6vM8zlFfIIOBQQLrhqKMHLIAkphcqNbncXjaeRkZThVUbgQGWN/Hg6/VnTBE1jbg/UJ8Xh2Cfh1yRGWxyFG7QwzCw+mYv+X9a2yn12+8STZWxGkhkY6tPxvTac8ANZMpJLiglzpxHVKt90mTfvhY+lYhZq00U9SZgdfXGzw3GGyERxeZQh6BnAl8+tE8s0/5zbk4aYPm5Ju+dVeCl1NYmx2+2zvKfqiNjo51s3tn6hEbswZu9H0qlVisePMWYZKJwhMC3DAcQzg5ClaGRyt5+D6Vo5LbgWZNPdZTAOoulj7D1zpL+76L9FaXqoMmGePRmNnfRTCby3xq0eGnTkPzsQ4Fu/Bb52P60s6arsKvI+ZRbuVNhBoEz76X2G3DzRrvebv/a2mwQ7GPszQ2zEHObSRE4qzm7x4KmhLoilFwm5EWJHFwmIAV0Z5rD83Nw+XaELRlgVPbxSFRTyd1x555hXyQrrpNL2LUFAlp+CACeCuEilICUnhW8cklWbBUEWjPgegDhDp5Yadu/MDOG8E+ItSUdXNfw01e9MtxzqxZu7oyBciUk=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(376014)(1800799024)(18002099003)(22082099003)(56012099006)(5023799004)(11063799006)(6133799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?iso-8859-1?Q?rLeWyDkcRTrNjCAzPiU56k5AAd2uOvZ06UzEJst3N3fnFD1TJ3pPSS7V0V?=
+ =?iso-8859-1?Q?+iVGbDFnjhYcGjTnSVnv8Whw3kZ5o7N+W/SqFn9Ns8yBGGABDqRGNSKzNk?=
+ =?iso-8859-1?Q?jCJVZIlUd6LMXQ+1GtMBmOSBfmQmeD+YPZrPYCkRB0yvhDrQc5WiZOY4Vu?=
+ =?iso-8859-1?Q?hOF1gUrtFBjwILXUHWbBKivqbvD6WZOKRhezz/mLcbL31BEZWaWysu8OCe?=
+ =?iso-8859-1?Q?1CTN6WeJBNJaqPi+Mbggl7N8h0KORGZmgltKQ5v2D1dktdFiM/q7Nerpsl?=
+ =?iso-8859-1?Q?mcg3thCn9S8aaGPMLCbKoK+ume/3CLPQWd68GnCY1tNSIIX+RghjCBdAsu?=
+ =?iso-8859-1?Q?wibtfdRZ2NYPuFX0k/zlkDgZoIut2Dp0QJrs/McfsaXcJpA7c7B7I0z27n?=
+ =?iso-8859-1?Q?csLlbkqsAWMPhpQG/FVTjVi636UcTgSaJF+cKugiO7/EfhUkrjEjJPw5Pk?=
+ =?iso-8859-1?Q?lnXCPy+3oNiYDtA9xKXqCaJG57m7iGav5d5zgbSO25JyctEoXw1j5O3I9w?=
+ =?iso-8859-1?Q?8kCYBsj288gjBITeaOSEiokv0m9GvIAmPoCk5qgm+qkDIr6sIQLd3y3Gnq?=
+ =?iso-8859-1?Q?9RG6lmz/MdmrpgMEvy+m1//QQcoCMBdA5a50rywz4fWie7GmexOyZYGYTw?=
+ =?iso-8859-1?Q?52QoOO/MwnwYm5lfcdgEJ0g+9szKSp4a+TXRmN2J2ZUT9H7kzgoxU1aDgB?=
+ =?iso-8859-1?Q?1p2aKMsnZxfMiZdVXo94CK8dId7UWTh8Z8CGIOYvnkhT5C0Eo1nFjEfuRu?=
+ =?iso-8859-1?Q?m3/0nRUBEy2az2cX5SAaToxTtzMffZYr1zYcMaHAqkb1f5K3spn2TLUmHx?=
+ =?iso-8859-1?Q?wt7OVywobNUwa4NUBU+NLgjNYLP1+e98YETu6rJBycRfzCscq+NCR23Y4p?=
+ =?iso-8859-1?Q?JZpM6uTSO05s4Lt6Yasyy6i5d2C1zT1tPIRwfgKRccQBsUHGX6SIaWp4Q1?=
+ =?iso-8859-1?Q?YeUuRqOWjesnqdmK59yHAIiIFfFNBGr4oKx0MkKocWDhOAqFh1Yms/PcR7?=
+ =?iso-8859-1?Q?/dBdcgR+sqLUadz/wU8SsJbEdtvwb+0y0zEaU8jScy13n7K/kn2c6Nb2d0?=
+ =?iso-8859-1?Q?yKzYgDqWOtZuGAKFvF5u5lyoxD+U9YQ6Bu0KVr1iUJi70de26snfgMXFAe?=
+ =?iso-8859-1?Q?TG2lTcLzwaW6TkRvvSzLuRh5t/fAp1t9PDjV2zJtP00WOOOD2EGER0Ul3b?=
+ =?iso-8859-1?Q?RDPM+Jri4Wn6DAH9s1m17xDDgu8eIbiZTuB0mmINHWXRtEGDTCb+GO5z95?=
+ =?iso-8859-1?Q?oPhckDbo0cncsnm1wWGt3FJgecePg7RbVlWr7G31LJ9HPCuPm5f57iIg5N?=
+ =?iso-8859-1?Q?t85sCc5s18+8bAAHUnc7ojrpmzdM5JyFfR0SxTu/5iUkccTWkdjJXaumuH?=
+ =?iso-8859-1?Q?OFs/HRlT2jTJZSN7+S3yxyj2gBJX9/6Ti4p7J231AqNZvudradcHFPfq6n?=
+ =?iso-8859-1?Q?mY2EAet1V41akDpNWcCMkQaNTZN5Fzwb1F/mUD9tP5J4OxAX5CEIPP9rjm?=
+ =?iso-8859-1?Q?aiv9P0HUwc0/O+R6NDZINJ6TlByR3eCF93/yGouHNiE2hTmlCU+cwgiOux?=
+ =?iso-8859-1?Q?dcK13gBFdDFeMrDZpuRCG1rOQ1L/PvGc3c969lq2GplU8Vg3Vx5IxrRaDX?=
+ =?iso-8859-1?Q?Br9/iD8W9wQDs2xoFOTEoLWjWBXEPZSSg5hC5iaZC9L1sVWQrDotM2y04X?=
+ =?iso-8859-1?Q?QoWkGOriXOL/T23RmHWtzWXj/kNzW+YpboNf+4Q5dKqA5F1XEk1ypp+JZ1?=
+ =?iso-8859-1?Q?r6ii7qCV0p7VhGr7ZTo+yZNgwTW6aFHUiYT6NBWxuxQoW8At83YDvdpqKg?=
+ =?iso-8859-1?Q?dO43IJHlqA=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f1ce109d-6144-4456-7fa2-08dedda40ca1
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2026 10:22:59.3831
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: g3UHKgj1aZl5CRuoGfczlnCRyVQdYWL+yEEySQ9d/0Gs4AsVFT+rcxrzlDDVYVNHV9tgWSKNiPqsf2l4Fnfo7g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB9323
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+X-Spamd-Result: default: False [4.04 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[nvidia.com : SPF not aligned (relaxed),reject];
+	R_DKIM_REJECT(1.00)[Nvidia.com:s=selector2];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306171-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:asantostc@gmail.com,m:leitao@debian.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:shuah@kernel.org,m:horms@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	HAS_ORG_HEADER(0.00)[];
-	FORGED_SENDER(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:jack4it@hotmail.com,m:dsahern@kernel.org,m:roopa@nvidia.com,m:netdev@vger.kernel.org,m:razor@blackwall.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306172-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[hotmail.com];
+	GREYLIST(0.00)[pass,body];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	TO_DN_SOME(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[Nvidia.com:-];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[shredder:mid,ebpf.io:url,vger.kernel.org:from_smtp,nvidia.com:from_mime,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8539872F89D
+X-Rspamd-Queue-Id: 1C80D7301F7
 
-Hi Andre,
+Please use plain text instead of HTML. Otherwise your emails won't make
+it to the list.
 
-Thank you for your reply!
+On Wed, Jul 08, 2026 at 05:52:05AM +0000, Jack Ma wrote:
+>    Hi David, Ido, Roopa,
+>    I am using VXLAN FDB nexthop groups (ip nexthop add ... fdb, then
+>    bridge fdb add ... nhid) to do L2 ECMP across a set of HA endpoints.
+>    In my design each leg is a distinct (VTEP IP, UDP destination port)
+>    pair: several endpoints live behind the same node IP and are
+>    disambiguated by the VXLAN UDP destination port.
+>    Reading the current code (v6.12), it looks like an FDB nexthop can
+>    only carry a gateway IP, so a per-leg port cannot be expressed:
+>      * vxlan_fdb_nh_path_select() copies only nhc_gw into the synthetic
+>        rdst; remote_port and remote_vni stay zero
+>        (include/net/vxlan.h).
+>      * vxlan_xmit_one() then falls back to the device-wide port:
+>        dst_port = rdst->remote_port ? rdst->remote_port
+>                                     : vxlan->cfg.dst_port
+>        (drivers/net/vxlan/vxlan_core.c).
+>      * rtm_to_nh_config() rejects NHA_ENCAP and NHA_OIF on fdb nexthops
+>        ("Fdb attribute can not be used with encap, oif or blackhole",
+>        net/ipv4/nexthop.c).
+>      * vxlan_fdb_parse() rejects NDA_PORT / NDA_VNI / NDA_IFINDEX when
+>        NDA_NH_ID is present ("DST, VNI, ifindex and port are mutually
+>        exclusive with NH_ID").
+>    The original commits (38428d68719c "nexthop: support for fdb ecmp
+>    nexthops" and 1274e1cc4226 "vxlan: ecmp support for mac fdb entries")
+>    say "these nexthops only have ip", which matches the EVPN multihoming
+>    use case where every VTEP in the segment shares one UDP destination
+>    port.
+>    My questions:
+>      1. Was IP-only a deliberate scoping decision for the EVPN-MH use
+>         case, or is there a deeper reason a per-nexthop UDP destination
+>         port (and VNI) could not be carried on an fdb nexthop, for
+>         example via NHA_ENCAP / lwtunnel, which route nexthops already
+>         accept?
 
-On 08/07/2026 22:24, Andre Carvalho wrote:
-> Hello Matthieu,
-> 
-> On Wed, Jul 08, 2026 at 05:50:53PM +0200, Matthieu Baerts wrote:
->>
->>> +function trigger_reactivation() {
->>> +	# Add back low level module
->>> +	modprobe netdevsim
->>> +	# Recreate namespace and two interfaces
->>> +	set_network
->>> +	# Restore MACs
->>> +	ip netns exec "${NAMESPACE}" ip link set "${DSTIF}" \
->>> +		address "${SAVED_DSTMAC}"
->>> +	if [ "${BINDMODE}" == "mac" ]; then
->>> +		ip link set dev "${SRCIF}" down
->>> +		ip link set dev "${SRCIF}" address "${SAVED_SRCMAC}"
->>> +		# Rename device in order to trigger target resume, as initial
->>> +		# when device was recreated it didn't have correct mac address.
->>> +		ip link set dev "${SRCIF}" name "${TARGET}"
->>
->> When I execute the test, the "ifname" bind mode works without issues,
->> but the "mac" one not. From what I see, the socat process doesn't get
->> any UDP packet when expected. I wonder if the problem might not come
->> from here: the interface is disabled before changing the MAC address and
->> renaming the interface, but not re-enabled at the end. Is it normal?
-> 
-> Yes, the expectation is that the target would be automatically re-enabled by
-> netconsole. That is why we don't 'up' the interface here explicitly.
+IP-only was specific for EVPN-MH and it simply reuses the gateway IP
+that is already present in the nexthop structure.
 
-OK, that's what I thought when I looked at the previous commit of this
-series, but it was still feeling "strange" :)
+>      2. If legs genuinely need distinct UDP destination ports, is the
+>         per-remote rdst path (bridge fdb ... dst ... port ...) the
+>         intended mechanism, with the understanding that it gives
+>         head-end replication semantics rather than nexthop-object ECMP?
 
-> The problem is that the test has an implict dependency on interface mac address
-> changing when we recreate them, which is why we have to do this whole down/update/rename
-> flow to trigger the reactivation in this case.
+Yes, but you will get packet replication instead of load balancing,
+which I believe is not what you want.
 
-OK!
+>      3. Would you be open in principle to a patch that lets an fdb
+>         nexthop carry a per-nexthop dst port (and VNI)? If so I am happy
+>         to prototype it as an RFC.
 
->> If I add 'up' at the end of this last line here, or if I remove the
->> whole if-statement block, the test passes.
-> 
-> For cases where the mac is persistent (e.g with systemd MACAddressPolicy=persistent),
-> the actual re-enablement should "just work", which I suspect is why it works when
-> you remove the whole if-statement block.
+I have some questions for you before I answer yours.
 
-I see, I just noticed the discussion on lore about that on the previous
-patch and on the v10. I now understand why MACAddressPolicy should be
-set to 'none', and I can do that on my side.
+Can you explain why different VTEPs need to share a single IP? With
+different IPs you can simply reuse the existing FDB nexthops without any
+changes.
 
-> I think to make the test more robust to such scenarios, we should skip the
-> if-statement block when we detect that the interface came back with the same mac
-> as previously. Something like this:
-> 
-> if [ "${BINDMODE}" == "mac" ]; then
-> 	CURR_SRCMAC=$(mac_get "${SRCIF}")
-> 	if [ "${CURR_SRCMAC}" == "${SAVED_SRCMAC}" ]; then
-> 		# Interface came back with same mac, no need to restore
-> 		return
-> 	fi
-> 	ip link set dev "${SRCIF}" down
-> 	ip link set dev "${SRCIF}" address "${SAVED_SRCMAC}"
-> 	# Rename device in order to trigger target resume, as initial
-> 	# when device was recreated it didn't have correct mac address.
-> 	ip link set dev "${SRCIF}" name "${TARGET}"
-> fi
-> 
-> Could you confirm if this fixes the selftest in your environment?
+In addition, why disambiguate by the VXLAN UDP destination port and not
+VNI? Even if we allow attaching tunnel encapsulation to FDB nexthops via
+NHA_ENCAP, there does not seem to be uAPI in place to encode the
+destination port (see ip_tun_policy).
 
-Yes, it fixes the selftest (without MACAddressPolicy=none), thank you!
+Assuming you can live with a fixed port, I think you can achieve what
+you want with BPF and no kernel changes. You can call
+bpf_skb_set_tunnel_key [1] from a TC bpf program attached to the egress
+of the VXLAN device (configured in "external" mode) and have it encode
+the relevant VTEP based on the calculated hash.
 
-And maybe this could be used to avoid the 'return':
-
-  if [ "${BINDMODE}" == "mac" ] &&
-     [ "$(mac_get "${SRCIF}")" != "${SAVED_SRCMAC}" ]; then
-
-A detail, up to you :)
-
-I think it would be interesting to have such check. If the MAC policy
-can cause issues here, it might be good to also add a warning, or to
-continue to fail, but with an explicit error message to look at this.
-
->>> +	echo "Running with bind mode: ${BINDMODE}" >&2
->>> +	# Set current loglevel to KERN_INFO(6), and default to KERN_NOTICE(5)
->>> +	echo "6 5" > /proc/sys/kernel/printk
->>
->> Can we remove this? Without that, it is hard to understand what went
->> wrong in case of issues.
-> 
-> Can you elaborate? This is typical for netconsole tests and I think required to
-> ensure the write will show up on netconsole. I'm not opposed to changing it if
-> there is a reason, but we probably want to make it consistent with other tests too.
-
-I understand, and I asked because I was not sure if this was needed for
-some tests. If it doesn't break some tests, I think it would be good not
-to change the loglevel, because on my side, all I had was:
-
-  # Running with bind mode: mac
-  not ok 1 selftests: drivers/net: netcons_resume.sh # exit=1
-
-Even with the suggested modification to have "FAIL: File was not
-generated.", that's not helpful enough to understand where the problem
-came from. Having the extra info in the console was really helpful, but
-it was not obvious I could do that.
-
-There could be a message saying "comment this to have more debug", but
-that means a CI will not get such useful debug info in case of error. So
-I think this behaviour should be changed. Or at least printing debug
-info only in case of errors.
-
->>> +	# Send the message
->>> +	echo "${MSG}: ${TARGET}" > /dev/kmsg
->>> +	# Wait until socat saves the file to disk
->>> +	busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
->>
->> In my case, the script was stopping here, without any message. I can
->> send a patch adding "|| true" to go to the next instruction, and display
->> "FAIL: File was not generated.".
->>
-> 
-> This seems reasonable to me.
-
-Good! I will send this patch.
-
-Just to avoid a deadlock, do you plan to send one to handle the MAC
-address that has not been modified (and eventually one to get more debug
-messages in case of errors)?
-
-Cheers,
-Matt
+[1] https://docs.ebpf.io/linux/helper-function/bpf_skb_set_tunnel_key/
 
