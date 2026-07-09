@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-306374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306375-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id XGsxCK8KUGpYsQIAu9opvQ
-	(envelope-from <netdev+bounces-306374-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 22:55:11 +0200
+	id OarKH7oKUGpbsQIAu9opvQ
+	(envelope-from <netdev+bounces-306375-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 22:55:22 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 819D1735966
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 22:55:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E255E735971
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 22:55:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=purestorage.com header.s=google2022 header.b=K0TpkYRw;
+	dkim=pass header.d=purestorage.com header.s=google2022 header.b=EsZOqO1A;
 	dmarc=pass (policy=quarantine) header.from=purestorage.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306374-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306374-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306375-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306375-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E9D333043EFC
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 20:54:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 88E8C303E9CD
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 20:54:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C793E0730;
-	Thu,  9 Jul 2026 20:54:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9395D3E0C42;
+	Thu,  9 Jul 2026 20:54:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43FB3E024B
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 20:54:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD803E075F
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 20:54:42 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783630481; cv=none; b=G8ZM8feyvtVlD5mRw6B6c+Y7meeT2VhGf/moM/8S2LqTpzAuH01tUADBtruQXn4mZ+00DsFnoYGXASLVl8+qSZ2lnDy1Y4EvcMgayKCbR5CvQLQVrxPtJhGZGq2zSjo4Cbdh25yoOalu0O/LtpXLdlyabGu/JBw7OFECFg2sT4M=
+	t=1783630484; cv=none; b=V6f89sVPu+cb16+LK4dr2VbX4lm5iGS34yIi1cjuBh9wXhAo8thZ3Xu5szkyhTzS4MIC/QiOTsJ3cxUtrzdQfUski6CJD6CIzgBPTwXfY1sSyt7aEcol+RZ2ntl/wm/iXvE8Qy6d4PV9nf2PFniZbXtS60xcoCoLKEdObfkwc5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783630481; c=relaxed/simple;
-	bh=1uiIxQ2lNTx8aDtvWUnAGJHbQp6IXYDFCAy0L8WuE6o=;
+	s=arc-20240116; t=1783630484; c=relaxed/simple;
+	bh=kQ8M8mjvFrapl01au+v9lpAyiEZbigezksxJIAhy2Jw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OrNPxXVFGG/p1EB224nXm4y+yxK5bicxVmGgEZeCL33pavXR3g3rBG+KnqjHY+YUvRnLaeVMAFi3+5u44z7rgpVfOHV7Yjl++YVJ77NYRdUe/A3SNwEQrZ2k+7gPrycqevLe17e5JqbWNYGrWX7ylHtkSFC1nV0JjgRWNo7qM44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=K0TpkYRw; arc=none smtp.client-ip=209.85.161.50
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-6a190528769so88995eaf.0
-        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 13:54:39 -0700 (PDT)
+	 MIME-Version; b=cCjBSjsDBWDBjo9hybRuVIQ+CVnGYKSdbQJ30q3Gltv8T9iG43iw5ghXg4uFoWKy5CuIh4hyorGsBfNFwph7qvcy3ze4Ur669+pUhxiNL09lxZf+lnwrPwzla+QrfVTc583PmcpPtJWDUWl97dRPtyoANYk5yvKhdBt8fZW+xrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=EsZOqO1A; arc=none smtp.client-ip=209.85.160.45
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-448b89f700fso125545fac.2
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 13:54:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1783630478; x=1784235278; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1783630481; x=1784235281; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=nlfxSCrKalnA4ikc1LXl/7BwxSQEPCADJP9wNT6lCVs=;
-        b=K0TpkYRwiK5WswbMmXBoiHhDX3NOb3DBUa56+PJh56KUWjo9j3pwKCRl8L/Rm5vZZC
-         oYt0YZHWfNxO1Q7R9tmCXFL39fjUpLvK5XdDO8/r0v4Fa4qOtOOWQtKAYxB8DJSiVsSC
-         4VQBMj1jE2iXTuc+Wv3gZkIeosMwO4J0V/3FC7tNRC0Bzs6PsRuIHBBoZfNwjkVt98kM
-         nUdY2fPwKzLFiYYS15L96GCd3B+eZB3b2jWDIeIUD7xuL5c/Jj5gq2lM9H6sxoWDpj5V
-         MtsIVdHeNjR07XSnnSTPDmGMrtMP36VnzUuCNxH3WxFaohKChxDS42+LrjHry+qCkkH2
-         osEQ==
+        bh=kJvIT5WUujZpVV/WUzpOXZTunWbYDYnBARUOjBAMerE=;
+        b=EsZOqO1Ajwq+ytxuUGIepX78Hg2PcDRwAT3XysEMuzESZqFk8PA+ObsCWYgmFP64mh
+         88bfS14BIs+Mcz7sZEdX6FPXfBtV3+RtBIq2zRcz9qOlj3V99UPt79JQUR2M4ibnth5H
+         RQmvxlH8St2misXWhsNuxdt2ZJ0ucTX1c9zVSYn5JKMsCBJvnJtZdJufSPoOJfpnVwyG
+         k3EvG/bMf38d/2qQ3B/BsA0FyWG+dczIazqfXdLQbB01Rdfzu/tWnNPcXLo38tAHdhIj
+         N0PfWyHmn+75h/Ka+1tgsMVoKAagZWhINi/zulLQ7HmtN3iGOZWyxWH8jal7Cpz0fc5V
+         94TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783630478; x=1784235278;
+        d=1e100.net; s=20251104; t=1783630481; x=1784235281;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=nlfxSCrKalnA4ikc1LXl/7BwxSQEPCADJP9wNT6lCVs=;
-        b=cxmxBeYtgcz2pKgGCu6UxArmqb+StjEfV3rKORtE6fHPRY7GCT3qzZXRgs2xUHDH68
-         +mAMB2L84ty2txuO54AEGJzOTVUL943yKyZvTNfDgQK+ChyCgeRrIPgQMbTAsigETCq2
-         UKISkjOpCn2ZY2VXnla4qOQ8+KUmdh5rpsVdoCVkzCChWmA93UFNWTTMJivlhCbc7LNh
-         xYzvIHRynGM/dyH3XTYrd3FWlMn524TBwcnXcq8O7SQGnDBHj3efebBqj/rr3qg6frn/
-         j3hDQwOiLxlmjAqdeomSDeVpkvWLTnF+vlb7vCLohABtzUhblBQntCbcXghXgdJqzNPa
-         NDFA==
-X-Gm-Message-State: AOJu0Yxx6w2e72wAUvAcs658isr6ukF2DJKvkWX7xdMq4ulCxkXHyJnl
-	9Z6GohRiW0LoGSgm579WOO4vJryZrLELYgtauQW77ygRUxBsCuOdRwMbMlj4cyDfdiANjOAF7T7
-	b7RENLQ/YqtAQrEvm5J+rMEX5XFVkg/4y3t4EBq79AiLndort8h85TluGicV6hvYL8K0JqxZytf
-	X062bOgarN6e/zVEi0NUl1juvq9F0n1PoIpCeIkt6kBdgwCcs=
-X-Gm-Gg: AfdE7cl6U1v2gomsh+9hXFGRdYYRNl9ePA56AvomEd78QWFS9ojUInPfT6khiHKnCSv
-	+YdKokJOoEQ9jNLxc4elPLMKWMtRcmRMAatR+q0ng8hnfDlw/awyHYY4e6SgixDYOAc2D+KbCYo
-	IrMB6EFEJYu0CVbX/WIemX/ruSGQHxPYcjZExc5rnqSmY0azPbwfMRbKJdojtod17NCXwkEAaDC
-	PM2LS+5j5FZ0TJR+jWbSCZ+l4SJt+CPw/Q9ZRIS4lSM6uNfNI5RvhrVBHHdK598IBqz5ZLGudnF
-	lCBHtoDdmPDtC3L67ZQz5O9UCg6dRHbCoijO6hmPWzAIDn7oz409btkyrgFtZD4h1+EBzBrwAhf
-	EGe/05kSS1nP2oIXUdhQqOrL4vNBXU2JMVqOVVeAcJgWeGKSrhoyuOFxrrt+oNyhzGsiPbjpF/Z
-	OJQVP9BESpj5lSAHd59oJm0n7kfbCUnHqFIvDjYeHRyMtl7mCOfSiL/iOFF8XKXeDIawSsTzap7
-	Gg1IW1cRSK0ND0iMVMMzwm9zno4ylf3lNqZNmlMM9EIjUfsiq3Rl+fLNBF5wN64EuEhlFYvmpYr
-	E8SMhExTnjm2iLU8QlN5yHT8c2kBeRFA9Z0=
-X-Received: by 2002:a05:6820:f04:b0:6a1:963d:a040 with SMTP id 006d021491bc7-6a36d865554mr6308022eaf.2.1783630478388;
-        Thu, 09 Jul 2026 13:54:38 -0700 (PDT)
+        bh=kJvIT5WUujZpVV/WUzpOXZTunWbYDYnBARUOjBAMerE=;
+        b=fCzYzv8nRx++eC27y6730nhHqiokFSREnOZ2hwYX09yOvSSW3YPO9Vo7bk1gEcbEh+
+         I87uQjZlBEwS/TXKGaigZOOiuWWulqKBMU/5RnO7KJFwFd6mC6FAj5MWSnxBWa6FToQl
+         U774/QKxqErOjIeRpNLHK3ZZ80yBaIqDv/KhXORmPUpF7Gcm//j+RKDBHAeH8JazLjRu
+         FuGrgT/4qt+/Hg+YtHGfkl8O12RL6znvB0mGhKjXuXpnHAeT2LXgEh7f6b4TMqc/d9yV
+         RMTCw9Kt34ixNaG634VHUrJxayHbIIvt1XiGpiDhDBugl7zs7lhiXoz1pGifhqr+sRDg
+         LMwg==
+X-Gm-Message-State: AOJu0Yydq97I116tIJUzkpCOUP2rLC8GOe3OlUKpYG9dKMq+Opm15ubL
+	56zZs95n9zmog3NjBPF8UqiwTG/uXaz0V80otwsHx0iExPnDYYn2n51v8pm3HTOXXpRNBLE90sd
+	c1g2xUmZE488Cgw8OOpJpUbAjbJpoCu+S308XGhpDAkV4gZAyow/3Y6LofWWNN0/ysqpqlxAtQ0
+	3VmbTisxXhUdSrbZME5mMkP389akw5MahZLski3fEeKeoG9Vs=
+X-Gm-Gg: AfdE7cmR9Ds5xy57HzoOaXe6KxT5gfgEgb7yvqVLv0e9E2pOJcVWrvC0VYkdAwK9e7h
+	IPPGwCjJo7rdnMMoGo7cyxRlpNtOcEzKi5vtSZ1xiK2Iqg2IziwoUig0TtfF5Vc/9qYTZhy7MX1
+	2mHzk89H4/GrFIaV6HYTBG2y5zdeYuEWYSepmUprKd0Lt2caJJp6X3hdVFmmBl4ZJ3ZjkcggIyj
+	bw5ASXrahTLRSN6vrdg3MkZ6Bsaiuw8VcUaxwdIVsc6PVEVWaJXW8SqgExZ3xiOKDAm0O9GHetb
+	HKVNN3fmLcEAtaFzruyba3NXDkahK2DDWh+EKT99JF8LZO59aSLQZBb/WtPY4djlejmocuEdBbl
+	FFm+U2+9XauzyQLuqkH39bjwdMXrAFunfTQmc9QzESfd+bB0nogtTyfNBwjPKOI+Gj73v2y0V43
+	yNNiB4hADz0J1RnnAtm7qROjvcvsQi0hPom7LR6qefKUrDs74uHoJbvOR3Sa2rcvgL7Ae0um/cG
+	DnMhg27S+K88fdFv2XG59BELmmgIuZKa7IUHsk6SAMUdNQI1rR3GoXxsJaavEglGjB9tzSSeS8u
+	QWUht8tpMd78RVIOO2bbyvhUpQ8jx0KZ804=
+X-Received: by 2002:a05:6870:d1ca:b0:448:558c:d839 with SMTP id 586e51a60fabf-45163d9ba1cmr6025319fac.40.1783630481311;
+        Thu, 09 Jul 2026 13:54:41 -0700 (PDT)
 Received: from dev-rjethwani.dev.purestorage.com ([208.88.159.129])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-451916d5cebsm3059283fac.15.2026.07.09.13.54.37
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-451916d5cebsm3059283fac.15.2026.07.09.13.54.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2026 13:54:37 -0700 (PDT)
+        Thu, 09 Jul 2026 13:54:40 -0700 (PDT)
 From: Rishikesh Jethwani <rjethwani@purestorage.com>
 To: netdev@vger.kernel.org
 Cc: saeedm@nvidia.com,
@@ -94,9 +94,9 @@ Cc: saeedm@nvidia.com,
 	leon@kernel.org,
 	andrew.gospodarek@broadcom.com,
 	Rishikesh Jethwani <rjethwani@purestorage.com>
-Subject: [PATCH v15 4/9] tls: split tls_set_sw_offload into init and finalize stages
-Date: Thu,  9 Jul 2026 14:53:20 -0600
-Message-Id: <20260709205325.1591196-5-rjethwani@purestorage.com>
+Subject: [PATCH v15 5/9] tls: prep helpers and refactors for HW offload KeyUpdate
+Date: Thu,  9 Jul 2026 14:53:21 -0600
+Message-Id: <20260709205325.1591196-6-rjethwani@purestorage.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260709205325.1591196-1-rjethwani@purestorage.com>
 References: <20260709205325.1591196-1-rjethwani@purestorage.com>
@@ -122,7 +122,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[14];
 	FREEMAIL_CC(0.00)[nvidia.com,gmail.com,kernel.org,queasysnail.net,davemloft.net,redhat.com,google.com,broadcom.com,purestorage.com];
-	TAGGED_FROM(0.00)[bounces-306374-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306375-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -143,182 +143,403 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,purestorage.com:from_mime,purestorage.com:email,purestorage.com:mid,purestorage.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 819D1735966
+X-Rspamd-Queue-Id: E255E735971
 
-Separate cipher context initialization from key material finalization
-to support staged setup for hardware offload fallback paths.
+Preparatory refactors for TX and RX HW rekey support; no functional
+change.
+
+  - Hoist cipher_context / tls_crypto_context above
+    tls_offload_context_tx so they can be embedded in offload
+    contexts.
+
+  - Add tls_tx_cipher_ctx() accessor and factor tls_sw_ctx_tx_init()
+    so the TX path can redirect to a temporary SW context during
+    rekey.
+
+  - Split tls_set_device_offload() into a dispatcher and
+    tls_set_device_offload_initial(); a _rekey() sibling follows.
+
+  - Factor tls_device_dev_add_tx() and tls_device_commit_start_marker()
+    so the rekey completion path can reuse them.
+
+  - Move crypto_aead_setauthsize() into the !*aead block so a fresh
+    AEAD is correctly configured when RX HW rekey allocates one.
 
 Signed-off-by: Rishikesh Jethwani <rjethwani@purestorage.com>
 ---
- net/tls/tls.h        |  4 +++
- net/tls/tls_device.c |  3 +-
- net/tls/tls_sw.c     | 77 +++++++++++++++++++++++++++++++-------------
- 3 files changed, 61 insertions(+), 23 deletions(-)
+ include/net/tls.h    |  38 +++++++-----
+ net/tls/tls.h        |   1 +
+ net/tls/tls_device.c | 139 ++++++++++++++++++++++++++-----------------
+ net/tls/tls_sw.c     |  33 +++++-----
+ 4 files changed, 127 insertions(+), 84 deletions(-)
 
-diff --git a/net/tls/tls.h b/net/tls/tls.h
-index 60a37bdaaa25..5a6ee1ea00f8 100644
---- a/net/tls/tls.h
-+++ b/net/tls/tls.h
-@@ -147,6 +147,10 @@ void tls_strp_abort_strp(struct tls_strparser *strp, int err);
- int init_prot_info(struct tls_prot_info *prot,
- 		   const struct tls_crypto_info *crypto_info,
- 		   const struct tls_cipher_desc *cipher_desc);
-+int tls_sw_ctx_init(struct sock *sk, int tx,
-+		    struct tls_crypto_info *new_crypto_info);
-+void tls_sw_ctx_finalize(struct sock *sk, int tx,
-+			 struct tls_crypto_info *new_crypto_info);
- int tls_set_sw_offload(struct sock *sk, int tx,
- 		       struct tls_crypto_info *new_crypto_info);
- void tls_update_rx_zc_capable(struct tls_context *tls_ctx);
-diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
-index a087cf3f544f..f22f8a550c82 100644
---- a/net/tls/tls_device.c
-+++ b/net/tls/tls_device.c
-@@ -1233,7 +1233,7 @@ int tls_set_device_offload_rx(struct sock *sk, struct tls_context *ctx)
- 	context->resync_nh_reset = 1;
+diff --git a/include/net/tls.h b/include/net/tls.h
+index e57bef58851e..eb258bcd62bc 100644
+--- a/include/net/tls.h
++++ b/include/net/tls.h
+@@ -155,6 +155,22 @@ struct tls_record_info {
+ 	skb_frag_t frags[MAX_SKB_FRAGS];
+ };
  
- 	ctx->priv_ctx_rx = context;
--	rc = tls_set_sw_offload(sk, 0, NULL);
-+	rc = tls_sw_ctx_init(sk, 0, NULL);
- 	if (rc)
- 		goto release_ctx;
++struct cipher_context {
++	char iv[TLS_MAX_IV_SIZE + TLS_MAX_SALT_SIZE];
++	char rec_seq[TLS_MAX_REC_SEQ_SIZE];
++};
++
++union tls_crypto_context {
++	struct tls_crypto_info info;
++	union {
++		struct tls12_crypto_info_aes_gcm_128 aes_gcm_128;
++		struct tls12_crypto_info_aes_gcm_256 aes_gcm_256;
++		struct tls12_crypto_info_chacha20_poly1305 chacha20_poly1305;
++		struct tls12_crypto_info_sm4_gcm sm4_gcm;
++		struct tls12_crypto_info_sm4_ccm sm4_ccm;
++	};
++};
++
+ #define TLS_DRIVER_STATE_SIZE_TX	16
+ struct tls_offload_context_tx {
+ 	struct crypto_aead *aead_send;
+@@ -195,22 +211,6 @@ enum tls_context_flags {
+ 	TLS_RX_DEV_CLOSED = 2,
+ };
  
-@@ -1247,6 +1247,7 @@ int tls_set_device_offload_rx(struct sock *sk, struct tls_context *ctx)
- 		goto free_sw_resources;
- 
- 	tls_device_attach(ctx, sk, netdev);
-+	tls_sw_ctx_finalize(sk, 0, NULL);
- 	up_read(&device_offload_lock);
- 
- 	dev_put(netdev);
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 9324e4ed20a3..383eab5150ce 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -2490,20 +2490,19 @@ static void tls_finish_key_update(struct sock *sk, struct tls_context *tls_ctx)
- 	ctx->saved_data_ready(sk);
+-struct cipher_context {
+-	char iv[TLS_MAX_IV_SIZE + TLS_MAX_SALT_SIZE];
+-	char rec_seq[TLS_MAX_REC_SEQ_SIZE];
+-};
+-
+-union tls_crypto_context {
+-	struct tls_crypto_info info;
+-	union {
+-		struct tls12_crypto_info_aes_gcm_128 aes_gcm_128;
+-		struct tls12_crypto_info_aes_gcm_256 aes_gcm_256;
+-		struct tls12_crypto_info_chacha20_poly1305 chacha20_poly1305;
+-		struct tls12_crypto_info_sm4_gcm sm4_gcm;
+-		struct tls12_crypto_info_sm4_ccm sm4_ccm;
+-	};
+-};
+-
+ struct tls_prot_info {
+ 	u16 version;
+ 	u16 cipher_type;
+@@ -392,6 +392,12 @@ static inline struct tls_sw_context_tx *tls_sw_ctx_tx(
+ 	return (struct tls_sw_context_tx *)tls_ctx->priv_ctx_tx;
  }
  
--int tls_set_sw_offload(struct sock *sk, int tx,
--		       struct tls_crypto_info *new_crypto_info)
-+int tls_sw_ctx_init(struct sock *sk, int tx,
-+		    struct tls_crypto_info *new_crypto_info)
++static inline struct cipher_context *tls_tx_cipher_ctx(
++		const struct tls_context *tls_ctx)
++{
++	return (struct cipher_context *)&tls_ctx->tx;
++}
++
+ static inline struct tls_offload_context_tx *
+ tls_offload_ctx_tx(const struct tls_context *tls_ctx)
  {
- 	struct tls_crypto_info *crypto_info, *src_crypto_info;
- 	struct tls_sw_context_tx *sw_ctx_tx = NULL;
- 	struct tls_sw_context_rx *sw_ctx_rx = NULL;
- 	const struct tls_cipher_desc *cipher_desc;
--	char *iv, *rec_seq, *key, *salt;
--	struct cipher_context *cctx;
- 	struct tls_prot_info *prot;
- 	struct crypto_aead **aead;
- 	struct tls_context *ctx;
- 	struct crypto_tfm *tfm;
- 	int rc = 0;
-+	char *key;
+diff --git a/net/tls/tls.h b/net/tls/tls.h
+index 5a6ee1ea00f8..bf46d3471da6 100644
+--- a/net/tls/tls.h
++++ b/net/tls/tls.h
+@@ -157,6 +157,7 @@ void tls_update_rx_zc_capable(struct tls_context *tls_ctx);
+ void tls_sw_strparser_arm(struct sock *sk, struct tls_context *ctx);
+ void tls_sw_strparser_done(struct tls_context *tls_ctx);
+ int tls_sw_sendmsg(struct sock *sk, struct msghdr *msg, size_t size);
++void tls_sw_ctx_tx_init(struct sock *sk, struct tls_sw_context_tx *sw_ctx);
+ void tls_sw_splice_eof(struct socket *sock);
+ void tls_sw_cancel_work_tx(struct tls_context *tls_ctx);
+ void tls_sw_release_resources_tx(struct sock *sk);
+diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
+index f22f8a550c82..7a98d2f6cbd3 100644
+--- a/net/tls/tls_device.c
++++ b/net/tls/tls_device.c
+@@ -138,6 +138,41 @@ static struct net_device *get_netdev_for_sock(struct sock *sk)
+ 	return lowest_dev;
+ }
  
- 	ctx = tls_get_ctx(sk);
- 	prot = &ctx->prot_info;
-@@ -2524,12 +2523,10 @@ int tls_set_sw_offload(struct sock *sk, int tx,
- 	if (tx) {
- 		sw_ctx_tx = ctx->priv_ctx_tx;
- 		crypto_info = &ctx->crypto_send.info;
--		cctx = &ctx->tx;
- 		aead = &sw_ctx_tx->aead_send;
- 	} else {
- 		sw_ctx_rx = ctx->priv_ctx_rx;
- 		crypto_info = &ctx->crypto_recv.info;
--		cctx = &ctx->rx;
- 		aead = &sw_ctx_rx->aead_recv;
++static int tls_device_dev_add_tx(struct sock *sk, struct net_device *netdev,
++				 struct tls_crypto_info *crypto_info,
++				 u32 write_seq)
++{
++	const struct tls_cipher_desc *cipher_desc;
++	char *rec_seq;
++	int rc;
++
++	cipher_desc = get_cipher_desc(crypto_info->cipher_type);
++	DEBUG_NET_WARN_ON_ONCE(!cipher_desc || !cipher_desc->offloadable);
++
++	rc = netdev->tlsdev_ops->tls_dev_add(netdev, sk, TLS_OFFLOAD_CTX_DIR_TX,
++					     crypto_info, write_seq);
++	rec_seq = crypto_info_rec_seq(crypto_info, cipher_desc);
++	trace_tls_device_offload_set(sk, TLS_OFFLOAD_CTX_DIR_TX,
++				     write_seq, rec_seq, rc);
++	return rc;
++}
++
++static void tls_device_commit_start_marker(struct sock *sk,
++					struct tls_offload_context_tx *offload_ctx,
++					struct tls_record_info *start_marker_record)
++{
++	start_marker_record->end_seq = tcp_sk(sk)->write_seq;
++	start_marker_record->len = 0;
++	start_marker_record->num_frags = 0;
++	list_add_tail_rcu(&start_marker_record->list, &offload_ctx->records_list);
++
++	/* TLS offload is greatly simplified if we don't send
++	 * SKBs where only part of the payload needs to be encrypted.
++	 * So mark the last skb in the write queue as end of record.
++	 */
++	tcp_write_collapse_fence(sk);
++}
++
+ static void destroy_record(struct tls_record_info *record)
+ {
+ 	int i;
+@@ -1068,57 +1103,31 @@ static struct tls_offload_context_tx *alloc_offload_ctx_tx(struct tls_context *c
+ 	return offload_ctx;
+ }
+ 
+-int tls_set_device_offload(struct sock *sk)
++static int tls_set_device_offload_initial(struct sock *sk,
++					  struct tls_context *ctx,
++					  struct net_device *netdev,
++					  struct tls_crypto_info *crypto_info,
++					  const struct tls_cipher_desc *cipher_desc)
+ {
++	struct tls_prot_info *prot = &ctx->prot_info;
+ 	struct tls_record_info *start_marker_record;
+ 	struct tls_offload_context_tx *offload_ctx;
+-	const struct tls_cipher_desc *cipher_desc;
+-	struct tls_crypto_info *crypto_info;
+-	struct tls_prot_info *prot;
+-	struct net_device *netdev;
+-	struct tls_context *ctx;
+ 	char *iv, *rec_seq;
+ 	int rc;
+ 
+-	ctx = tls_get_ctx(sk);
+-	prot = &ctx->prot_info;
+-
+-	if (ctx->priv_ctx_tx)
+-		return -EEXIST;
+-
+-	netdev = get_netdev_for_sock(sk);
+-	if (!netdev) {
+-		pr_err_ratelimited("%s: netdev not found\n", __func__);
+-		return -EINVAL;
+-	}
+-
+-	if (!(netdev->features & NETIF_F_HW_TLS_TX)) {
+-		rc = -EOPNOTSUPP;
+-		goto release_netdev;
+-	}
+-
+-	crypto_info = &ctx->crypto_send.info;
+-	cipher_desc = get_cipher_desc(crypto_info->cipher_type);
+-	if (!cipher_desc || !cipher_desc->offloadable) {
+-		rc = -EINVAL;
+-		goto release_netdev;
+-	}
++	iv = crypto_info_iv(crypto_info, cipher_desc);
++	rec_seq = crypto_info_rec_seq(crypto_info, cipher_desc);
+ 
+ 	rc = init_prot_info(prot, crypto_info, cipher_desc);
+ 	if (rc)
+-		goto release_netdev;
+-
+-	iv = crypto_info_iv(crypto_info, cipher_desc);
+-	rec_seq = crypto_info_rec_seq(crypto_info, cipher_desc);
++		return rc;
+ 
+ 	memcpy(ctx->tx.iv + cipher_desc->salt, iv, cipher_desc->iv);
+ 	memcpy(ctx->tx.rec_seq, rec_seq, cipher_desc->rec_seq);
+ 
+ 	start_marker_record = kmalloc_obj(*start_marker_record);
+-	if (!start_marker_record) {
+-		rc = -ENOMEM;
+-		goto release_netdev;
+-	}
++	if (!start_marker_record)
++		return -ENOMEM;
+ 
+ 	offload_ctx = alloc_offload_ctx_tx(ctx);
+ 	if (!offload_ctx) {
+@@ -1130,20 +1139,11 @@ int tls_set_device_offload(struct sock *sk)
+ 	if (rc)
+ 		goto free_offload_ctx;
+ 
+-	start_marker_record->end_seq = tcp_sk(sk)->write_seq;
+-	start_marker_record->len = 0;
+-	start_marker_record->num_frags = 0;
+-	list_add_tail(&start_marker_record->list, &offload_ctx->records_list);
++	tls_device_commit_start_marker(sk, offload_ctx, start_marker_record);
+ 
+ 	clean_acked_data_enable(tcp_sk(sk), &tls_tcp_clean_acked);
+ 	ctx->push_pending_record = tls_device_push_pending_record;
+ 
+-	/* TLS offload is greatly simplified if we don't send
+-	 * SKBs where only part of the payload needs to be encrypted.
+-	 * So mark the last skb in the write queue as end of record.
+-	 */
+-	tcp_write_collapse_fence(sk);
+-
+ 	/* Avoid offloading if the device is down
+ 	 * We don't want to offload new flows after
+ 	 * the NETDEV_DOWN event
+@@ -1159,11 +1159,8 @@ int tls_set_device_offload(struct sock *sk)
  	}
  
-@@ -2545,10 +2542,7 @@ int tls_set_sw_offload(struct sock *sk, int tx,
+ 	ctx->priv_ctx_tx = offload_ctx;
+-	rc = netdev->tlsdev_ops->tls_dev_add(netdev, sk, TLS_OFFLOAD_CTX_DIR_TX,
+-					     &ctx->crypto_send.info,
+-					     tcp_sk(sk)->write_seq);
+-	trace_tls_device_offload_set(sk, TLS_OFFLOAD_CTX_DIR_TX,
+-				     tcp_sk(sk)->write_seq, rec_seq, rc);
++	rc = tls_device_dev_add_tx(sk, netdev, crypto_info,
++				   tcp_sk(sk)->write_seq);
  	if (rc)
- 		goto free_priv;
+ 		goto release_lock;
  
--	iv = crypto_info_iv(src_crypto_info, cipher_desc);
- 	key = crypto_info_key(src_crypto_info, cipher_desc);
--	salt = crypto_info_salt(src_crypto_info, cipher_desc);
--	rec_seq = crypto_info_rec_seq(src_crypto_info, cipher_desc);
+@@ -1175,7 +1172,6 @@ int tls_set_device_offload(struct sock *sk)
+ 	 * by the netdev's xmit function.
+ 	 */
+ 	smp_store_release(&sk->sk_validate_xmit_skb, tls_validate_xmit_skb);
+-	dev_put(netdev);
  
- 	if (!*aead) {
- 		*aead = crypto_alloc_aead(cipher_desc->cipher_name, 0, 0);
-@@ -2592,19 +2586,6 @@ int tls_set_sw_offload(struct sock *sk, int tx,
+ 	return 0;
+ 
+@@ -1188,6 +1184,43 @@ int tls_set_device_offload(struct sock *sk)
+ 	ctx->priv_ctx_tx = NULL;
+ free_marker_record:
+ 	kfree(start_marker_record);
++	return rc;
++}
++
++int tls_set_device_offload(struct sock *sk)
++{
++	const struct tls_cipher_desc *cipher_desc;
++	struct tls_crypto_info *crypto_info;
++	struct net_device *netdev;
++	struct tls_context *ctx;
++	int rc;
++
++	ctx = tls_get_ctx(sk);
++
++	if (ctx->priv_ctx_tx)
++		return -EEXIST;
++
++	netdev = get_netdev_for_sock(sk);
++	if (!netdev) {
++		pr_err_ratelimited("%s: netdev not found\n", __func__);
++		return -EINVAL;
++	}
++
++	if (!(netdev->features & NETIF_F_HW_TLS_TX)) {
++		rc = -EOPNOTSUPP;
++		goto release_netdev;
++	}
++
++	crypto_info = &ctx->crypto_send.info;
++	cipher_desc = get_cipher_desc(crypto_info->cipher_type);
++	if (!cipher_desc || !cipher_desc->offloadable) {
++		rc = -EINVAL;
++		goto release_netdev;
++	}
++
++	rc = tls_set_device_offload_initial(sk, ctx, netdev, crypto_info,
++					    cipher_desc);
++
+ release_netdev:
+ 	dev_put(netdev);
+ 	return rc;
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 383eab5150ce..b8e06b751efe 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -555,11 +555,11 @@ static int tls_do_encryption(struct sock *sk,
+ 		break;
+ 	}
+ 
+-	memcpy(&rec->iv_data[iv_offset], tls_ctx->tx.iv,
++	memcpy(&rec->iv_data[iv_offset], tls_tx_cipher_ctx(tls_ctx)->iv,
+ 	       prot->iv_size + prot->salt_size);
+ 
+ 	tls_xor_iv_with_seq(prot, rec->iv_data + iv_offset,
+-			    tls_ctx->tx.rec_seq);
++			    tls_tx_cipher_ctx(tls_ctx)->rec_seq);
+ 
+ 	sge->offset += prot->prepend_size;
+ 	sge->length -= prot->prepend_size;
+@@ -610,7 +610,7 @@ static int tls_do_encryption(struct sock *sk,
+ 
+ 	/* Unhook the record from context if encryption is not failure */
+ 	ctx->open_rec = NULL;
+-	tls_advance_record_sn(sk, prot, &tls_ctx->tx);
++	tls_advance_record_sn(sk, prot, tls_tx_cipher_ctx(tls_ctx));
+ 	return rc;
+ }
+ 
+@@ -676,7 +676,7 @@ static int tls_push_record(struct sock *sk, int flags,
+ 	sg_chain(rec->sg_aead_out, 2, &msg_en->sg.data[i]);
+ 
+ 	tls_make_aad(rec->aad_space, msg_pl->sg.size + prot->tail_size,
+-		     tls_ctx->tx.rec_seq, record_type, prot);
++		     tls_tx_cipher_ctx(tls_ctx)->rec_seq, record_type, prot);
+ 
+ 	tls_fill_prepend(tls_ctx,
+ 			 page_address(sg_page(&msg_en->sg.data[i])) +
+@@ -2369,6 +2369,15 @@ static void tx_work_handler(struct work_struct *work)
+ 	}
+ }
+ 
++void tls_sw_ctx_tx_init(struct sock *sk, struct tls_sw_context_tx *sw_ctx)
++{
++	crypto_init_wait(&sw_ctx->async_wait);
++	atomic_set(&sw_ctx->encrypt_pending, 1);
++	INIT_LIST_HEAD(&sw_ctx->tx_list);
++	INIT_DELAYED_WORK(&sw_ctx->tx_work.work, tx_work_handler);
++	sw_ctx->tx_work.sk = sk;
++}
++
+ static bool tls_is_tx_ready(struct tls_sw_context_tx *ctx)
+ {
+ 	struct tls_rec *rec;
+@@ -2420,11 +2429,7 @@ static struct tls_sw_context_tx *init_ctx_tx(struct tls_context *ctx, struct soc
+ 		sw_ctx_tx = ctx->priv_ctx_tx;
+ 	}
+ 
+-	crypto_init_wait(&sw_ctx_tx->async_wait);
+-	atomic_set(&sw_ctx_tx->encrypt_pending, 1);
+-	INIT_LIST_HEAD(&sw_ctx_tx->tx_list);
+-	INIT_DELAYED_WORK(&sw_ctx_tx->tx_work.work, tx_work_handler);
+-	sw_ctx_tx->tx_work.sk = sk;
++	tls_sw_ctx_tx_init(sk, sw_ctx_tx);
+ 
+ 	return sw_ctx_tx;
+ }
+@@ -2551,6 +2556,10 @@ int tls_sw_ctx_init(struct sock *sk, int tx,
+ 			*aead = NULL;
+ 			goto free_priv;
+ 		}
++
++		rc = crypto_aead_setauthsize(*aead, prot->tag_size);
++		if (rc)
++			goto free_aead;
+ 	}
+ 
+ 	ctx->push_pending_record = tls_sw_push_pending_record;
+@@ -2567,12 +2576,6 @@ int tls_sw_ctx_init(struct sock *sk, int tx,
  			goto free_aead;
  	}
  
--	memcpy(cctx->iv, salt, cipher_desc->salt);
--	memcpy(cctx->iv + cipher_desc->salt, iv, cipher_desc->iv);
--	memcpy(cctx->rec_seq, rec_seq, cipher_desc->rec_seq);
--
--	if (new_crypto_info) {
--		unsafe_memcpy(crypto_info, new_crypto_info,
--			      cipher_desc->crypto_info,
--			      /* size was checked in do_tls_setsockopt_conf */);
--		memzero_explicit(new_crypto_info, cipher_desc->crypto_info);
--		if (!tx)
--			tls_finish_key_update(sk, ctx);
+-	if (!new_crypto_info) {
+-		rc = crypto_aead_setauthsize(*aead, prot->tag_size);
+-		if (rc)
+-			goto free_aead;
 -	}
 -
- 	goto out;
+ 	if (!tx && !new_crypto_info) {
+ 		tfm = crypto_aead_tfm(sw_ctx_rx->aead_recv);
  
- free_aead:
-@@ -2623,3 +2604,55 @@ int tls_set_sw_offload(struct sock *sk, int tx,
- out:
- 	return rc;
- }
-+
-+void tls_sw_ctx_finalize(struct sock *sk, int tx,
-+			 struct tls_crypto_info *new_crypto_info)
-+{
-+	struct tls_crypto_info *crypto_info, *src_crypto_info;
-+	const struct tls_cipher_desc *cipher_desc;
-+	struct tls_context *ctx = tls_get_ctx(sk);
-+	struct cipher_context *cctx;
-+	char *iv, *salt, *rec_seq;
-+
-+	if (tx) {
-+		crypto_info = &ctx->crypto_send.info;
-+		cctx = &ctx->tx;
-+	} else {
-+		crypto_info = &ctx->crypto_recv.info;
-+		cctx = &ctx->rx;
-+	}
-+
-+	src_crypto_info = new_crypto_info ?: crypto_info;
-+	cipher_desc = get_cipher_desc(src_crypto_info->cipher_type);
-+
-+	iv = crypto_info_iv(src_crypto_info, cipher_desc);
-+	salt = crypto_info_salt(src_crypto_info, cipher_desc);
-+	rec_seq = crypto_info_rec_seq(src_crypto_info, cipher_desc);
-+
-+	memcpy(cctx->iv, salt, cipher_desc->salt);
-+	memcpy(cctx->iv + cipher_desc->salt, iv, cipher_desc->iv);
-+	memcpy(cctx->rec_seq, rec_seq, cipher_desc->rec_seq);
-+
-+	if (new_crypto_info) {
-+		unsafe_memcpy(crypto_info, new_crypto_info,
-+			      cipher_desc->crypto_info,
-+			      /* size was checked in do_tls_setsockopt_conf */);
-+		memzero_explicit(new_crypto_info, cipher_desc->crypto_info);
-+
-+		if (!tx)
-+			tls_finish_key_update(sk, ctx);
-+	}
-+}
-+
-+int tls_set_sw_offload(struct sock *sk, int tx,
-+		       struct tls_crypto_info *new_crypto_info)
-+{
-+	int rc;
-+
-+	rc = tls_sw_ctx_init(sk, tx, new_crypto_info);
-+	if (rc)
-+		return rc;
-+
-+	tls_sw_ctx_finalize(sk, tx, new_crypto_info);
-+	return 0;
-+}
 -- 
 2.25.1
 
