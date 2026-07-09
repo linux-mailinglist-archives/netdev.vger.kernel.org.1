@@ -1,168 +1,143 @@
-Return-Path: <netdev+bounces-306151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306157-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id degdOZVyT2qtgwIAu9opvQ
-	(envelope-from <netdev+bounces-306151-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:06:13 +0200
+	id CnjlHoZ3T2oKhQIAu9opvQ
+	(envelope-from <netdev+bounces-306157-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:27:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6856972F576
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:06:13 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C970172F937
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 12:27:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=RnpOXyE1;
-	dmarc=pass (policy=reject) header.from=bootlin.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306151-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306151-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=NFppqISm;
+	dmarc=pass (policy=none) header.from=realsil.com.cn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306157-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306157-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B3B523083912
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:58:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4835E3058A3B
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 10:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC5A403B1A;
-	Thu,  9 Jul 2026 09:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC11C4071EF;
+	Thu,  9 Jul 2026 10:09:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412B1404BF4
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 09:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83836407572;
+	Thu,  9 Jul 2026 10:09:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783591064; cv=none; b=J5hOeq2afyMonmuH9vZbcNTeznFkmiB1h3UDrSdPjfZIDDhDe7RKA6U2rEzVx5tUgdsh73KF5UP/or1jjbspzHDVloTH7lZ76Es/a17EV43LeAVWfu38iBVxxi1UX8wUVh4O+kyRZk1vSauQ9HJzpnn5nwE6wtMunIqbZfKi9tU=
+	t=1783591745; cv=none; b=kkDfYGw7yFG6qeA/2G+4yCyPchVYqln0E92ensZ1yib8dBzrnUdc0Q6DAZMvSwTnnsDm5FYutO/7eMecE6eYO8GNIfsM4E72LyGnRxfwIf2uMs/Byra+isqcboMvItCLEyQ+48EdQ6I8iLQP/b7szlHxeaWcfXIFTS5A4T2s9+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783591064; c=relaxed/simple;
-	bh=Pzovs7+ceuL9Gbq7CF1bSTvbNZrIKxrZaUVNj+KFrLU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RLV7TWbblELnKC1ZOcqvlTX558iskJjq2FQ5vmUBON3acCqyCcluCyMPVS3mElZ5I8alV9wSNWqNjYZ4y/dQlxoSrOFm84NoAU/6hMprfNM+Rjw41anXWZ3qG1fCLrPw/5GkrwKKdNsRlcr9CsOpScHRKmVHlHdt8wflNGQSSYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=RnpOXyE1; arc=none smtp.client-ip=185.171.202.116
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 4B0C8C2F4C0
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 09:57:49 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id EB2A35FF03;
-	Thu,  9 Jul 2026 09:57:34 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 04C9311BC372F;
-	Thu,  9 Jul 2026 11:57:28 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1783591054; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=/gkI1MXnCEYH3Di825+Sh3B3L9iCOKimmTxO6EW759A=;
-	b=RnpOXyE16ndyZJ/dMZSZ7JBLpKIqyfsthPU6taRnVRv7UodYqcjYd6Q9uCpZHoD/xQ2bQl
-	a9YLpVXww/on8k8TZIut0aEvyMo2D+YGgbmxq8ikCx34FQcROgiEqgiJ0WGV5Kr3xKKSeg
-	Mk3ah6yzyZjaR2O4aGsrZAEfQao2P3VcIPck2WOSjIXgHFCuItRqK3H2+RNwzpNiwbflG1
-	OLatsWGIC/HCthDIGz1vFrqB3LzTluYTUYpTBaV+tYx5Gq0gTOkc48RaMgrz81utbI959i
-	Rs1mcFIdJpW9tyv2ySb/Hhts4rS0zFllMtLoiW5a2nnVYbby8e0TAbIjTBq9zQ==
-Message-ID: <9d4bab68-6383-4b8d-a9d0-144b348e937c@bootlin.com>
-Date: Thu, 9 Jul 2026 11:57:28 +0200
+	s=arc-20240116; t=1783591745; c=relaxed/simple;
+	bh=b2LM1DBpGPa87yNnInaMs3XraVNXEaoJ77Jl0uv5QpQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MYSiDwV34/ZIOhaYOlati1+OVduLRLAsyWN5UJ+WgaEZDTqRr3JQfcGAwTE7STSiKnwHWHPW2wk4K6RGRo/4156SWjodI3iyRrL0cQiPAGCLz6nCxNNetDyLfHPQ0t/ScE4qUOagE+bMf9gO9w0h0nE9RbI/p2Pi8c7Ly7Z2OQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=NFppqISm; arc=none smtp.client-ip=211.75.126.72
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 669A2mGqA2982778, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
+	s=dkim; t=1783591369;
+	bh=Gm0XorlIeqAZWxxh0XB2NLHt31NlXXFC9cxnABxfQXQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=NFppqISmXQyJidfCY+PmgviPpCaftroR1DjPZZZIlvgh+XTx0poqtAULicykV0uE8
+	 j6EPGkFswKpZvA4u04AUdku/W9Z4FM5kk5Fw6woeqVDjJGip9tId1nTn8K79B12L/r
+	 f9gAjJ0P+Rla+5jakzO1CdeF+4zroqz4qx+Qk+mILsYCbwEGrcF01c3Y0svZ13RObI
+	 Vf3knVcxG5CcqEDsu0qvACb8CXGB3eDBLzaNl+Ipu5UOoURMQJOsUU1llKhRkJdEeq
+	 3Zrzl2Lsbc4pi0nFdUP3x9lH1pvx1gq9fpvrgsTsgelb9lqOmIKvEplUB1ICjt+Nnx
+	 YfNzLtFeKX2Rg==
+Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
+	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 669A2mGqA2982778
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 9 Jul 2026 18:02:49 +0800
+Received: from RS-EX-MBS2.realsil.com.cn (172.29.17.102) by
+ RS-EX-MBS2.realsil.com.cn (172.29.17.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Thu, 9 Jul 2026 18:02:49 +0800
+Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS2.realsil.com.cn
+ (172.29.17.102) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
+ Transport; Thu, 9 Jul 2026 18:02:49 +0800
+From: javen <javen_xu@realsil.com.cn>
+To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <maxime.chevallier@bootlin.com>, <horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<daniel@makrotopia.org>, <linux@armlinux.org.uk>, <enelsonmoore@gmail.com>,
+	<daniel@thingy.jp>, Javen Xu <javen_xu@realsil.com.cn>
+Subject: [PATCH net-next v6 0/7] r8169: add support for phylink
+Date: Thu, 9 Jul 2026 18:02:29 +0800
+Message-ID: <20260709100237.541-1-javen_xu@realsil.com.cn>
+X-Mailer: git-send-email 2.50.1.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Question: net: phy: realtek: RTL8211FS SGMII bridge mode support
-To: Jacky Huang <jackyhuang@nvidia.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Russell King <linux@armlinux.org.uk>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Daniel Golle <daniel@makrotopia.org>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260709035244.3008436-1-jackyhuang@nvidia.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20260709035244.3008436-1-jackyhuang@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306157-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jackyhuang@nvidia.com,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:daniel@makrotopia.org,m:vladimir.oltean@nxp.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[nvidia.com,lunn.ch,gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-306151-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_SENDER(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:maxime.chevallier@bootlin.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:linux@armlinux.org.uk,m:enelsonmoore@gmail.com,m:daniel@thingy.jp,m:javen_xu@realsil.com.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,makrotopia.org,armlinux.org.uk,gmail.com,thingy.jp,realsil.com.cn];
+	DKIM_TRACE(0.00)[realsil.com.cn:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,bootlin.com:from_mime,bootlin.com:dkim,bootlin.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,realsil.com.cn:from_mime,realsil.com.cn:email,realsil.com.cn:mid,realsil.com.cn:dkim,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6856972F576
+X-Rspamd-Queue-Id: C970172F937
 
-Hi,
+From: Javen Xu <javen_xu@realsil.com.cn>
 
-On 7/9/26 05:52, Jacky Huang wrote:
-> Hi,
-> 
-> RTL8211FS is the SGMII-capable variant of RTL8211F. Besides the standard
-> copper/RGMII mode, it supports hardware-strapped RGMII-to-SGMII bridge mode,
-> where the MAC side uses RGMII and the line side uses SGMII.
-> 
-> The in-tree realtek driver currently does not handle this mode. RTL8211FS
-> shares the same PHY ID as RTL8211F (0x001cc916), so the driver binds it
-> as a standard RTL8211F and follows the existing copper/RGMII path. In
-> RGMII-to-SGMII bridge mode, this means read_status() does not observe the
-> SGMII-side link and the link stays down.
-> 
-> We have discussed this with Realtek. They confirmed that the current mode
-> can be detected from a vendor mode-selection register shared by RTL8211F
-> variants, and that this case is application-dependent rather than generic
-> copper PHY behavior.
-> 
-> Our plan is to add RTL8211FS bridge mode support inside the realtek
-> driver, gated on the detected mode. The driver would only read this
-> register for detection and would not use it to override the hardware
-> strapping. For that mode, config_init() would program the SGMII side as
-> needed, and read_status() would read the SGMII-side link status instead
-> of relying on the copper path. The existing RTL8211F copper/RGMII behavior
-> would be left unchanged.
-> 
-> Does this approach sound acceptable for upstream? If you prefer a
-> different model, or if there is already related work that we should build
-> on, please let me know.
+This series patch adds support for phylink. RTL8116af is a fiber mode
+card, link status and speed can not be read from standard phy reg. So
+we read link status and speed from serdes reg by pcs. So as RTL8127atf.
 
-If you can tell the mode based on the straps, that's OK :) There are other drivers
-that do the same, for example the TI dp83869 (it's not based on a strap value,
-but rather a custom DT property, but it's the same idea), or some broadcom
-drivers that read strap state from registers and switch to fiber mode.
+Javen Xu (7):
+  r8169: add speed in private struct
+  net: phy: phylink: add helper to modify pause
+  r8169: add support for phylink
+  r8169: add support for RTL8116af
+  r8169: add support for RTL8127atf
+  r8169: add ltr support for RTL8117 series
+  r8169: fix RTL8116af can not enter s0idle and c10
 
-What's missing is proper support for what comes after the SGMII bridge, if you
-have an SFP after for example, there's all the plumbing to support handling that
-SFP module, however there's no way (yet) to handle the PHY within that module,
-as you'll have :
+ drivers/net/ethernet/realtek/Kconfig      |   2 +-
+ drivers/net/ethernet/realtek/r8169_main.c | 673 +++++++++++++++++-----
+ drivers/net/phy/phylink.c                 |  87 +++
+ drivers/net/phy/realtek/realtek_main.c    |  54 --
+ include/linux/phylink.h                   |   2 +
+ include/net/phy/realtek_phy.h             |   7 -
+ 6 files changed, 619 insertions(+), 206 deletions(-)
+ delete mode 100644 include/net/phy/realtek_phy.h
 
-MAC - RGMII - PHY - SGMII - PHY
-                             ^
-                             |
-     nothing handles the state machine of that
-     one PHY
+-- 
+2.43.0
 
-If you have a DSA switch on that SGMII link though, it may "just work" as long as
-you correctly read the status and configure inband aned on the SGMII side.
-
-Maxime
 
