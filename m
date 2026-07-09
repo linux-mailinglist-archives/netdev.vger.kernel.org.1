@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-306122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306123-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FduREjdvT2qYggIAu9opvQ
-	(envelope-from <netdev+bounces-306122-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:51:51 +0200
+	id YP5hILVvT2q1ggIAu9opvQ
+	(envelope-from <netdev+bounces-306123-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:53:57 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2765A72F24B
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:51:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 72E5672F28B
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 11:53:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306122-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-306122-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306123-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-306123-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3A41A3007236
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:43:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8553A306C06D
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 09:45:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C9153EFFCF;
-	Thu,  9 Jul 2026 09:43:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB7323F12E7;
+	Thu,  9 Jul 2026 09:44:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821AB3E3142;
-	Thu,  9 Jul 2026 09:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607483F1AC9;
+	Thu,  9 Jul 2026 09:44:52 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783590207; cv=none; b=utAkjkqqc6HaWiEb/9XsqXk6/2NerqxGKuqskYWoELepjN18utPKmmwb0RufF1OwzSf8aBPoQz7r9WWP5YIBqe5+NhQeANhq6v4vV0LJfDey3pDp5xRyj+XldmJw9f8pVLXg+ADBa4qn2nTFIV2LMewOty5yEBfwBX4oFbraLv8=
+	t=1783590293; cv=none; b=iGnQLpzr7t5dTfenVJB6mAGqN/YemAtI/btCh1/SaSpnYFRrU8rhYoYjXK+tymBAZtdBVvCGqcDwbSofJ/ghFDBPLNe6H9PwkUo0vBk1Uh/N4+j5RehNr/06J6rElC5D+dNV3mcpQCvFksTfWv9B4f1EZl0OvLG5GlAQEZDVvNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783590207; c=relaxed/simple;
-	bh=0jcnfEcNzuF2aaI+oTB0yec5mlAuEeNt4FMCRkykrww=;
+	s=arc-20240116; t=1783590293; c=relaxed/simple;
+	bh=7Ou5+3G75tDZu799wGoMAdBW6+Fh+b5nNnd6FitkyyM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f3mBl+8swG4M/m29Ch5PxLVT+PYSpdNWAACE3WFHcwc4jYwsllkFkXJYy2P3GFVc1Q9xQmipoX+8QTBJjtg9ipddtpRmbJZG27BzRZbzstnbXzbijwHq5lFlZrbtCht0UgkbBVm1cGW2/6ScrVcKO75eCC1q5NEs3NBq2nTioDk=
+	 Content-Type:Content-Disposition:In-Reply-To; b=XWAsNTNtOU0n6RZ0d7Yiuty13CBUFfE0oKJP4VoeWybMCnvn03sCEkaMsqe3u6t2+UzhR9JDY4/HO4oH76KSq/49wsDY3SoGBYshfkFTBBcB6nmZXC5dEVZIvbHLLGrCjHNfBgDw+NHpv8v3lA3lZ7SuCZiPj8F+lnSX6OCU5JU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1whlHq-000000005Uq-3AXh;
-	Thu, 09 Jul 2026 09:43:18 +0000
-Date: Thu, 9 Jul 2026 11:43:03 +0200
+	id 1whlJJ-000000005VW-1BkQ;
+	Thu, 09 Jul 2026 09:44:49 +0000
+Date: Thu, 9 Jul 2026 11:44:41 +0200
 From: Daniel Golle <daniel@makrotopia.org>
 To: Andrew Lunn <andrew@lunn.ch>
 Cc: Vladimir Oltean <olteanv@gmail.com>,
@@ -49,13 +49,13 @@ Cc: Vladimir Oltean <olteanv@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: Re: [PATCH RFC net-next 3/3] net: dsa: mxl862xx: add devlink
- flash_update and info_get
-Message-ID: <ak9tJ0NGMu2rvnlc@makrotopia.org>
-References: <ak0KOrM5E2_sPIHf@makrotopia.org>
- <42792433-a95c-431f-ba0c-dc0644dcbdb5@lunn.ch>
- <ak6s363rweBPZhQZ@makrotopia.org>
- <b3fc69ba-9139-4933-9a4f-455393a7cfaa@lunn.ch>
+Subject: Re: [PATCH RFC net-next 2/3] net: dsa: mxl862xx: add SMDIO clause-22
+ register access
+Message-ID: <ak9tiW0qnq2veYw6@makrotopia.org>
+References: <ak0KJ6gUk2l_IwoI@makrotopia.org>
+ <96c362d3-59d2-43c4-b2aa-c12dfeb6fcca@lunn.ch>
+ <ak6o7Ovekjb_evPs@makrotopia.org>
+ <98505e14-d684-4225-9415-f4d872113998@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,7 +64,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b3fc69ba-9139-4933-9a4f-455393a7cfaa@lunn.ch>
+In-Reply-To: <98505e14-d684-4225-9415-f4d872113998@lunn.ch>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -72,7 +72,7 @@ X-Spamd-Result: default: False [-1.46 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306122-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306123-lists,netdev=lfdr.de];
 	DMARC_NA(0.00)[makrotopia.org];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
@@ -99,53 +99,34 @@ X-Spamd-Result: default: False [-1.46 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,makrotopia.org:mid,makrotopia.org:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2765A72F24B
+X-Rspamd-Queue-Id: 72E5672F28B
 
-On Thu, Jul 09, 2026 at 01:24:49AM +0200, Andrew Lunn wrote:
-> On Wed, Jul 08, 2026 at 10:02:39PM +0200, Daniel Golle wrote:
-> > On Wed, Jul 08, 2026 at 07:27:21PM +0200, Andrew Lunn wrote:
-> > > > + * The flash process takes approximately 15 minutes. Progress is
-> > > > + * reported via devlink status notifications. After a successful (or
-> > > > + * failed) flash the driver reprobes the device automatically.
+On Thu, Jul 09, 2026 at 01:15:34AM +0200, Andrew Lunn wrote:
+> On Wed, Jul 08, 2026 at 09:45:48PM +0200, Daniel Golle wrote:
+> > On Wed, Jul 08, 2026 at 07:22:49PM +0200, Andrew Lunn wrote:
+> > > On Tue, Jul 07, 2026 at 04:16:07PM +0200, Daniel Golle wrote:
+> > > > Add mxl862xx_smdio_read() and mxl862xx_smdio_write() for clause-22
+> > > > SMDIO register access. MCUboot rescue mode only exposes clause-22
+> > > > registers; the existing clause-45 MMD interface is unavailable during
+> > > > firmware transfer. The MDIO bus lock is held per-transaction (not
+> > > > across polls) so that SB PDI polling during flash erase does not
+> > > > starve other MDIO users.
 > > > 
-> > > Have you tested the failed use case?
-> > > 
-> > > I assume if the firmware in the flash is invalid, the bootloader does
-> > > not boot it, and it remains in the bootloader waiting for another
-> > > attempt. Does this DSA driver still load, so devlink can be used to
-> > > try again?
+> > > What other MDIO users are there? It sounds like once the switch is in
+> > > rescue mode, switch management is dead. So how can there be users?
 > > 
-> > No. Without a running the firmware the driver doesn't probe and only
-> > a special rescue tool allows to recover the hardware.
-> > Having the DSA driver detect the presence of the switch stuck in
-> > mcuboot mode and probe without registering any user or CPU ports
-> > also isn't straight forward.
+> > The MDIO bus lock refers to the host bus which is used to connect
+> > the switch management interface. The same bus can also be used to
+> > connect other unrelated PHYs (eg. to provide a WAN or management
+> > interface independent of the switch).
 > 
-> And that special rescue tool exists?
+> Thanks for the explanation. Maybe 'does not starve other non-switch
+> MDIO users'?
+> 
+> I've not got to the rest of the patch yet, but i wondered if phylib
+> might still be trying to poll the switches PHYs.
 
-Yes, but it's basically a custom bootable Linux image, based on a
-patched/old Linux Kernel and vendor SDK driver.
-It cannot just run from userspace because (apart from the out-of-tree
-mdio-netlink API) there isn't any standard way to access the MDIO bus
-from userspace.
-
-> Why not wrap it in a script which unloads the DSA driver, let it do
-> its thing, and then reload the DSA driver?
-
-It would need to be yet another driver binding the device on the
-MDIO bus, check if the mcuboot C22 MDIO interface responds and if not
-fire the firmware API request to put reset the device into mcuboot mode.
-And this, issueing a firmware API command, is why it is easier to make
-it part of the existing DSA driver which already got a robust and
-endian-safe implementation of the firmware API protocol.
-
-> All the other users of devlink flash that i know of can operate while
-> the device is still running. So it makes sense for it to be part of
-> the driver, it is something just going on in the background. This
-> device is different, so i don't really see the advantage of making it
-> part of the driver.
-
-The controlled teardown/reprobe/reconfigure as well as the ability to
-issue the reboot-into-mcuboot firmware API command are good arguments
-imho.
+The driver takes down the CPU ports and thereby implicitely also puts
+all user-ports into admin-down state, effectively disabling PHY polling
+until the switch comes back and reprobe has happened.
 
