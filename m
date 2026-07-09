@@ -1,117 +1,125 @@
-Return-Path: <netdev+bounces-306041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306042-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id XZkhLWorT2o5bgIAu9opvQ
-	(envelope-from <netdev+bounces-306041-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 07:02:34 +0200
+	id abdhEJIuT2rnbgIAu9opvQ
+	(envelope-from <netdev+bounces-306042-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 07:16:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D9FB72CACC
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 07:02:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E1D372CB6F
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 07:16:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=lXnD1TU2;
+	dkim=pass header.d=intel.com header.s=Intel header.b=nL47WXmX;
 	dmarc=pass (policy=none) header.from=intel.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306041-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306041-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306042-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306042-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 92AAD303F64A
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 05:01:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C89113015CB5
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 05:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338DC3403FD;
-	Thu,  9 Jul 2026 05:01:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82F4C33121F;
+	Thu,  9 Jul 2026 05:15:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE81B149C6F
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 05:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309511F91E3
+	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 05:15:54 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783573281; cv=fail; b=UzDjeAg3q6hvEOI4nufma3ha/jeIN4eipyrE6F7OtK73qNZ2kT1mMi6FNQOmY3BnuyJMhzKgw9/qrD3eQdBijE9b1/Fkl2JQZMOWM5XVIYDzWrBzX2+Wnai2fFD/xYCEbmHOD0nF9Qi7Xd9FB1gCWi5yr01DLL7IMmf3ADbtad0=
+	t=1783574157; cv=fail; b=i8PODMNKmzLRetCFD8vnesWPv8t4T038LAk+6AI75zSrOKT7pz0lHL60PIXiRrS/JLbS8JkG/SH/FbuGAeC34sAvWO5IlP6NK3pYBGCj5CWWVQhmKJ/Ob7AOyVI7awSdjX5KnzL1qSRL/rGe2za48SUZh6SsrpSds3eZ17Qt6y0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783573281; c=relaxed/simple;
-	bh=XimaVBohseAywOgGHyf7YqHXKOwxfgNY+fxzdRPF5JE=;
-	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ol8D5Fr+h8ckRT6Qri1U0dQvJfh3l+CZ45D7yReXpvKc3Mxkstl1L3yM2eoYia4mk+leDz349TxmYKfHl/k4MC0MoktOgNMOOecYzgurWAJkY7mBsZm/jbeO4OTrzvoKlZp+F1a2DJXv8wXxKxphL5lktMWTh0H7j+fa9/GV+Ew=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lXnD1TU2; arc=fail smtp.client-ip=192.198.163.16
+	s=arc-20240116; t=1783574157; c=relaxed/simple;
+	bh=2zVa0o+sSQr+l6bZOVmGw5u413sl+ZhoPQUiyh1Qyfk=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=MIP1eZkpcb3FawNkEODAxpDtNIctwM3uF/1I3lARzTRT6ztPNhtct83exNQhwtoSEH+9eHrp5dPr0DFYfYIHQiJi0R1DXoIAHEGIrY6dGZ+rHUoQedqa4Axw8OHN8hCtyvjuehQSnXE0CkM4Cftn0ajrlTF+aqXjKb2nyvHJ5iw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nL47WXmX; arc=fail smtp.client-ip=192.198.163.15
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1783573279; x=1815109279;
-  h=date:from:to:cc:subject:message-id:in-reply-to:
-   mime-version;
-  bh=XimaVBohseAywOgGHyf7YqHXKOwxfgNY+fxzdRPF5JE=;
-  b=lXnD1TU2VfFCW3Qzv++l8SCghC/tpBgc4AsXBtv1OsZ2fgjir3WZwbxm
-   t+QNCzU8EpAdI6JDGwq9vmJ3eVWZGuX+H0CcNYgJrJmsvboV/a25X1Av+
-   AW+Wyt67sKBcfTL+YvxfaqVPs5/WJUVDHp+2Xh5J0FO2Po19iJyf0NuI+
-   Bynxd6BrArBlrEMKdDQos++6uWwjCZh6bZgPznlcdHhqqNBYTORANybLh
-   2Z87AtVBddCo3Qb4oxfK6wKHgNoJb3PMyS+c3x30lOd4pZzaCBa2PKDbT
-   CC1djhSCSlMIMyzv+gEVXt6bT5K9+7XqQbqZ7kEVuP49TGqmGnDOlqr4/
+  t=1783574155; x=1815110155;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=2zVa0o+sSQr+l6bZOVmGw5u413sl+ZhoPQUiyh1Qyfk=;
+  b=nL47WXmXqLILuEDfvwO4EjpwIaoBEarqjnjSYmtns8mFP5MoXWvt7f9n
+   IL9xTTebpKfeLmoZOIEJd/tQm0d9xsiRfG0rVRF9jCI7rwGorOkJnRFkS
+   mTfin01b+DPhvyFIorHSGWFTqQ127pZPV+tJFoJzcJ+ck9h+V/F9KR9Db
+   jrsW8ONzIe5lVn1Ym2SUKEw/HVkxGodTd2gpknQAWOGRVxZUOdYTWGTBA
+   Hi01CNV6LcbFFcVQMaGbGIAmChrWjp70PXqMb8EQAukV0dZqhcH1tGaqP
+   i/UoFGsLeMEf9ywEIC1dZPwJvIeGj9Wdq5Y/EZDXKuphNJc3ZaM1snakf
    w==;
-X-CSE-ConnectionGUID: FeDtCCxDSuOWe0b9opeDCw==
-X-CSE-MsgGUID: vzrBnBwUTA2kozYbhHke4A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="71766389"
+X-CSE-ConnectionGUID: QQ2+I0LkSsSRH8UH0bW4ig==
+X-CSE-MsgGUID: KPhxfp4yTH+SClhyEqJzrA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="84359961"
 X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="71766389"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2026 22:01:18 -0700
-X-CSE-ConnectionGUID: 9pGLt1cxQGi7j96ZaWpG4w==
-X-CSE-MsgGUID: ADkoM9ZqR2OjsFsD2t7EnA==
+   d="scan'208";a="84359961"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2026 22:15:52 -0700
+X-CSE-ConnectionGUID: 5hVdYoIAQ9yJnfgTJHCDsA==
+X-CSE-MsgGUID: Dp+AsZASTb+mKADGJEA3oQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="278868975"
+   d="scan'208";a="248115268"
 Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2026 22:01:18 -0700
+  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2026 22:15:53 -0700
 Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
  fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Wed, 8 Jul 2026 22:01:17 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ 15.2.2562.43; Wed, 8 Jul 2026 22:15:52 -0700
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
  FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43 via Frontend Transport; Wed, 8 Jul 2026 22:01:17 -0700
-Received: from CO1PR03CU002.outbound.protection.outlook.com (52.101.46.57) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ 15.2.2562.43 via Frontend Transport; Wed, 8 Jul 2026 22:15:52 -0700
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.18)
+ by edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Wed, 8 Jul 2026 22:01:16 -0700
+ 15.2.2562.43; Wed, 8 Jul 2026 22:15:51 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KhFJcaCJq8huuwcDRe1RIIdCHRk5RWMk9WzwjkHnXvfq/D//1XdwxQAtIy2YyMSvGKfedw/4trEPxkXgcskIxnncClXx6Fj9Jhvu2Y+SxkUbB5jh4X6jn8Vvi7hbWZHCKQAibgZhKoZtC8CqnKR+EsyDHC15ru3ouvsgAZaj3xlSQs6f1VE9szgEkubkyUyRfJ5xhauhqvFGgNDXlIGsKS+Dq7JvDng/6r9JghAS7o3lbJGToFI7UrUzPPAzJJj2uBV5uylN6EPxystYa47oa+z8EpwAE4NJfI4Og6st7usfeSGzqWvHDIUisLIK2JVKA/CVc4Eo0JLPF0x+QVTIdQ==
+ b=f/bRldOCYkg1UQTWxbQmCiBXdZCk5Q3PJ6GdGZX+3XV2x3sPQqicDQWhQ9lNNkmxriTMKOCv3REZv/L5TYX/XHRT50FopnBrbIiuJcuKlGgXW6bAa2M7nXIyp3SfTTXjuNyUOD31HANEAGRorGnLCXG8ctQes8lY6Q3pupMSTiPZXvMfCCuGGL/gXEvNWM5U/kOcUfJneK1vys+SWhk9oUBk95SoCmWW0J/Z8qeJk5vEyY7QCZRhBVqYvWzJser7FX/DqUoh+zfJSUY5zsB4AhFQtX2eQuN+lJblUKoyCWi0H+3ZRPaYwet794BY91+SWS+LncOlVr0N/EEjvS3wRw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nZJonRnehsv5eF8jfZwYtvZHxz3BJl/2hpnVP0pLFOk=;
- b=g8+oaMR1Uh9A5bJc7IbgtGp0y+HCaOFaTwlDI9uRWmNKzJYZdrkOaRdnlHhAoWltdz6JM6qACC6jyqLFlM5qhdD8ufxqR9/oxfTi50oRLZvBOKyL/NZjIdMmq+LDAMzcPze3CZHftSsSW1ytfLse8Cjyl4XbMh/iIUS6bCQmaPYib8ne8dz9Xwxdmnt/L8Rtgkf5NnZElqAc5YYr7AMt8W+85NY/H/qtIGY+jLuOCDDL33P+e9sA9WdQmKVB11GMvm1Oh61g+taGko08ySTwVuU9OIP+W9fp3hp++NyE69Hnea1Qgc0UbFtMkJNhRi54rXlwcefdd3jUGwGswMoJdg==
+ bh=WDN/KQQsxUXg+JHS38DFB1BtgNu8Nm7TIDlQsTyiR8Q=;
+ b=KRXQX6t8/FjOm2PF3AS415bW6DRDFW8UyaKFLvxWcpMM/FwKNmjT5/qQl2s0BtKxir37zOk6lD1cpEz2vxaQS/anNFTb7M9qeMpQI3hfzKal6n+K8qHuw3l61tVc1wvVxBGcyTI9MU3aFn0KZ6F5dQKjenEWEAQxkGTFvMHWlckw74owwLjsJ0xiEFtbh6zIO8KVcEYpZlaIJp+S7zcvwyzCYcUnP4DsXsEXOyPMPpg8VhxYIDh9EzhbAqC8NCalcp+M1NTLzxjtEYsA+EWFw0vgW+PqBHhhlljZpnWZjwyqW9SdDk9n93lB39Px9xkYCA5eGIHUj+wduVKxB2MTZg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB5832.namprd11.prod.outlook.com (2603:10b6:510:141::7)
- by PH7PR11MB7124.namprd11.prod.outlook.com (2603:10b6:510:20f::6) with
+Received: from DS0PR11MB7958.namprd11.prod.outlook.com (2603:10b6:8:f9::19) by
+ SN7PR11MB6923.namprd11.prod.outlook.com (2603:10b6:806:2aa::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Thu, 9 Jul 2026
- 05:01:10 +0000
-Received: from PH0PR11MB5832.namprd11.prod.outlook.com
- ([fe80::106e:78dd:4c96:d707]) by PH0PR11MB5832.namprd11.prod.outlook.com
- ([fe80::106e:78dd:4c96:d707%5]) with mapi id 15.21.0181.008; Thu, 9 Jul 2026
- 05:01:09 +0000
-Date: Thu, 9 Jul 2026 13:00:58 +0800
-From: kernel test robot <oliver.sang@intel.com>
-To: Eric Dumazet <edumazet@google.com>
-CC: <oe-lkp@lists.linux.dev>, <lkp@intel.com>, <netdev@vger.kernel.org>,
-	<ltp@lists.linux.it>, "David S . Miller" <davem@davemloft.net>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, David Ahern
-	<dsahern@kernel.org>, <eric.dumazet@gmail.com>, Eric Dumazet
-	<edumazet@google.com>,
-	<syzbot+d5d0d598a4cfdfafdc3b@syzkaller.appspotmail.com>,
-	<oliver.sang@intel.com>
-Subject: Re: [PATCH net] net: clear transport header during tunnel
- decapsulation
-Message-ID: <202607091154.8fb0e88c-lkp@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260624073209.3703492-1-edumazet@google.com>
-X-ClientProxiedBy: KU2P306CA0045.MYSP306.PROD.OUTLOOK.COM
- (2603:1096:d10:3c::17) To PH0PR11MB5832.namprd11.prod.outlook.com
- (2603:10b6:510:141::7)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.18; Thu, 9 Jul
+ 2026 05:15:42 +0000
+Received: from DS0PR11MB7958.namprd11.prod.outlook.com
+ ([fe80::8cb2:cffc:b684:9a99]) by DS0PR11MB7958.namprd11.prod.outlook.com
+ ([fe80::8cb2:cffc:b684:9a99%4]) with mapi id 15.21.0181.009; Thu, 9 Jul 2026
+ 05:15:40 +0000
+Message-ID: <d96a4c3f-e0e7-42d7-bb8a-994b2f408dea@intel.com>
+Date: Thu, 9 Jul 2026 10:45:27 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/3] drm/drm_ras: Add drm_ras netlink error event
+To: Rodrigo Vivi <rodrigo.vivi@intel.com>, <raag.jadav@intel.com>,
+	<kuba@kernel.org>, <aravind.iddamsetty@linux.intel.com>
+CC: <intel-xe@lists.freedesktop.org>, <anshuman.gupta@intel.com>,
+	<joonas.lahtinen@linux.intel.com>, <simona.vetter@ffwll.ch>,
+	<airlied@gmail.com>, <pratik.bari@intel.com>,
+	<joshua.santosh.ranjan@intel.com>, <ashwin.kumar.kulkarni@intel.com>,
+	<shubham.kumar@intel.com>, <ravi.kishore.koppuravuri@intel.com>,
+	<maarten.lankhorst@linux.intel.com>, <mallesh.koujalagi@intel.com>,
+	<soham.purkait@intel.com>, Zack McKevitt <zachary.mckevitt@oss.qualcomm.com>,
+	Lijo Lazar <lijo.lazar@amd.com>, Hawking Zhang <Hawking.Zhang@amd.com>,
+	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>, <dri-devel@lists.freedesktop.org>,
+	<netdev@vger.kernel.org>
+References: <20260701094409.129131-5-riana.tauro@intel.com>
+ <20260701094409.129131-6-riana.tauro@intel.com>
+ <202f6d3a-c29b-491b-979f-1d8223f59108@intel.com> <ak6xThf9qeB0wqgK@intel.com>
+Content-Language: en-US
+From: "Tauro, Riana" <riana.tauro@intel.com>
+In-Reply-To: <ak6xThf9qeB0wqgK@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MA5PR01CA0038.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a01:1d6::18) To DS0PR11MB7958.namprd11.prod.outlook.com
+ (2603:10b6:8:f9::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -119,346 +127,474 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB5832:EE_|PH7PR11MB7124:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4a050934-1817-4c69-c113-08dedd7716da
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7958:EE_|SN7PR11MB6923:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0417d9d0-1c23-4f17-1fc6-08dedd791e22
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|23010399003|366016|1800799024|376014|22082099003|18002099003|3023799007|11063799006|56012099006|6133799003;
-X-Microsoft-Antispam-Message-Info: aSAdVzSwFtv7kvhAEIYmjYPL8cds2sX25pChHb/DYGu5gj1GbUjdDRU7BPmRmwk1UmTAijN6X3NinyW3OqhpFu67hxFOVrghlJKSsk/MvoxRF84dMSQss+eoXqe85oI/ER7IWruvx1OrxBB6B5QB2unJ/bCNTkusm9UTgp8XKFVxcM2AW7uCJL8G++RS9l9iPP9/R7enXyBd5lW73vAlQvzYM7P+iU2y7KEcLrdYyOy8k/hdYxa3+BaXr3PZQfMI0sF5v7Jc1ZEyzJ57ULWcac69S+mzJ143/J3PU/90+ZbHk4hSKjw0HpzjmMpX07UdQxr1wEf7DeMHPO0JTEuc2NpjjLJpxxXD387RQ4+njM4M3QESOouPy+R+qPhJIWGRjn//E+lNv5gLeycT/o3ABtnfhamQJJG/j7Q3OZGBIPfuIYm5gFQc6jGy6EpR9EeCpBMZzRBDAVtDuKEp3uPxvkUvPrO+qIOanYKbBNl7yXHz/wzHBNgjt//ifba5xodVFvsRWsAlUVbq5K0dEJowWeQGmiYJ5jkEuql9oSu3RYzRV80CpGG/TmvYWrz1LdKuwMZCRvQVphWxT/yvK3vi2IlnztqwAs4wsuFBhTSOjoY=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5832.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(23010399003)(366016)(1800799024)(376014)(22082099003)(18002099003)(3023799007)(11063799006)(56012099006)(6133799003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|23010399003|1800799024|7416014|366016|56012099006|22082099003|6133799003|4143699003|18002099003|3023799007|11063799006;
+X-Microsoft-Antispam-Message-Info: gKze6Q+4LyEVenWpSp3DYtlPD0f8okCHBQK+D148QTyoFOSIQ6tuNA3WkztcUCdZMZYlUvPlZVm6kMf7baGNTuTGU/y9M4aBcMdzwhUOn79eoSg7+zscMzL1tDodzWhT8rzkbqhJcgxDB+cUUUGhFPRmXA4IknDvAg57Hu1fiOnOYk6HPWkHXHQ4N/iql7/vgcGUuRMWIKkXCwOTEhFTME5h/CiUhboa4k1qarU/8p2v51b+lo0RoK0yZNbyRvDoLtGOEDHXUWfQ0NsW+YivHAFG4CHeZrZbqya433fPyqDTwjpuRhqh87lT1p03b6Ouncw9Qi8CEIZSkSXzkWqh4+i9NcqCqbHbcyFtzh88FTH56WPMeMZrAKxnMkg+nsPvjOACBXpH237Ai9PPaeFEPjYzYMvM9WuV1qkVWwZpJipL+0wQdWoGxJ4Jv3F+2zEPmx+/nlozLOkXJXG6+W63jcpHgpaiEex4C8wjgCAFpiIfUGhQf/4C7h7c9/y9slbsZGq4+vDUpQznj4ARaLVCJH4Qpe5SiB/oA9cG/Q/i0Fo2ROiTHVAkf52C3sHkbxea817Hjqtj+5cj83mmVzXQXl02RHkR/3S9JkUOsEW3dBmL094r7ARJQSAoChZWDr9V9oxP2hcuMq2+zAAzGlQxoy2KgKA+TNj5XC54PXnczaM=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7958.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(23010399003)(1800799024)(7416014)(366016)(56012099006)(22082099003)(6133799003)(4143699003)(18002099003)(3023799007)(11063799006);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?k2qCLuaChqt22w608YovCCccVDdxNN4IS1RLLNBltYKzLwJlfIz5PAB3wLt9?=
- =?us-ascii?Q?JsrrdbdJCAI2S58D/cN35ojeKCZ6BAE8QP5UrXLB/6cSEAJcIC23rkk9T71d?=
- =?us-ascii?Q?bTmFF+kALN0fZQdnCPScCa/RW/SWSCuGkMTbj6JDo0EO6MUY8QMc8hlcqYPE?=
- =?us-ascii?Q?arFaapn7aHZwPFz3A4iG3DG/LoQnkyMz4Syojep+9+aPTXVxcHiDxz+KzAOl?=
- =?us-ascii?Q?lXlnd+eQXD4p15UoYC6ov84A/mgz9ZVC/CVpFF1lh+cxNCzeKMI4Azltrjbw?=
- =?us-ascii?Q?y8fgDXVDmlM+P3CsQlnf7h0AfJUM0yPA4BNtEuwiT7+J86QZnXqMe9TykdcL?=
- =?us-ascii?Q?uCKJJ/sFH2pEbey9SCekjNk+0qvBI6vj0lO3X/a6HjRDdRbsFv3uHjxh42wS?=
- =?us-ascii?Q?BL4HWpYV4Ves6PT3GT8NYM267jy0tAtKg2dM+zp0KdxnQf4Lc9LQmL+lfD09?=
- =?us-ascii?Q?47RvVniKDRCeoS98G1b7HvdAV1mj19+UtHAjVoAPMC72QadQHGR99+CnNwji?=
- =?us-ascii?Q?uuONIzbfjbN5RbM609sXXW+lhRnMpmxkfhsCg7YJUPM+/3gfjTXkut1Gn8LU?=
- =?us-ascii?Q?db97CUTdoP3q8UpSxjHSNacXTGDbcsr4+X6wkqNNO+mgEetshHPYrBwlbsLs?=
- =?us-ascii?Q?F7WdixGtrjYQzCfg3N4m4wdhKsMlMS10FmGRTluu7bhgwuS/qtezuyjXMnHy?=
- =?us-ascii?Q?4tgDOMg3izswdHoi+JQo9cR9DwOZAMfbYAl9fF0Qa2QQnPsq9jW5VnwvpsoB?=
- =?us-ascii?Q?qjycr+sEvAFCywg9MXk6MLP/7XPhsUzzqrx/TjjW+w6BNnXzjcmOpRfQbzZU?=
- =?us-ascii?Q?VK6ZwixOT5PqbbMf/aNU+kYNpc5lCY22wBzH1Y3SvFFeHC1rwHiAAkzvyUE9?=
- =?us-ascii?Q?Igo25T7D5dbBvfAXdiCHtjd1plgefNZagw0CRfHP+/K7ahk3b5k6z3M4hgq2?=
- =?us-ascii?Q?zYkD1NTnZ0IMSdb9SNHJOJdTkv6QdsLpJ9SIveeCkMvcy75/CqxgfmexlgkQ?=
- =?us-ascii?Q?Ofz+MBGGL6B6P7QU6hotbrRo2R6H6oFTXJbJtFHOd4XkLS2nszu5LuBVIzOD?=
- =?us-ascii?Q?EC6UlFFU5lFIcGE8d5Ex8cweb4wczZ5wCluZyl0T/3mEU8do/o2YEesHARkf?=
- =?us-ascii?Q?JKWWGHsv7y2W4EyX/h5PZ3W30l+vCtdUJGE/35BC3rUH1Z10bqaV2o/3gsuX?=
- =?us-ascii?Q?/aHTNkb2z1FoFPSUWl9GGzi5aHvEuBlt5WkoUMA/J7RiJxi7mHkrimkKvgr7?=
- =?us-ascii?Q?1OLxIMQUQfNOZpySnkNCXYeTbua8c4pU5XaqtsE0qIHGQkj9rVPjNkG18Ina?=
- =?us-ascii?Q?XJZ3breEXicAhYdTMf6/DjCNOeeADAQqIl2wqY7Tx4RFFA17lCfiLjQN/bBa?=
- =?us-ascii?Q?/IpnBdryU+X3tL2eW77qcHmPyIwAzI37stgzuzNjC9hvV/5lN33vPXwyp5Oq?=
- =?us-ascii?Q?z9cTt1wXTUZiM6yIk1AwSBShd3AnbiPkfJ8kGYzZjXV5q8Se+KuSyvnBkNsf?=
- =?us-ascii?Q?xzmip6Aejf82VE4zBKnvIneVGm4+e/D5GfztN/RltwlSrAUFbvLxv78/30G6?=
- =?us-ascii?Q?ewrmz6FSK9O457WFpI3yzseKtYfUyQUekCee3D7NHQRforMsF5DTK6fP4YIB?=
- =?us-ascii?Q?ZRURbLCOJiHzdttMfi/0hDDVIUzMzj6/2J4z8qrkb6R/UdI5svFveUCU1xWU?=
- =?us-ascii?Q?YEw8DzUPqP4vAnL6TH/HkLy1fgmDCYc9z2RoJ6KJpsptk5QvzIOPa1lUlu+N?=
- =?us-ascii?Q?WHMkNbrZHw=3D=3D?=
-X-Exchange-RoutingPolicyChecked: FJhcyZlT3SmblmxCNQNwWQaTOqpIOjip5iS7FXJzQ8naVeR/oQmMkaJ4ZO84bJ1jtbsWzXboXQjdQXiNQvwW81v8QBHCpN9/IQ0uTqV3aPLOO9ssq7iIq4r1ZgqA/40cDTpr6NQMhKeRBQN51oalW2qUlJA3QQ8rmd7T01JXF3/3qc0e5UqbioVNqIypZtbqiybb9f6cYIqbJRhbaT9oGO5lv8IvBNYEF9cpE9phe4pBbJEmwAKUbMKCwgFRgRH1YLls4zuZMS594TXw64AFIdSccZ59Avgzqy+WPxSMkaQPCwGY0SFKjy7x5DJeL533y2GuOO0G5mWnR43YqO26Yg==
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4a050934-1817-4c69-c113-08dedd7716da
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5832.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aGV5K2s4ZmcySi9BT21DQitNdEwwbitUa3ZhSFlEdUdCUnViVFJKeFVTQmo2?=
+ =?utf-8?B?NGNEOWw5VFl2dWhUM2dQOFNmZys3RGN4Vk9GV2ljLzFvMVRRQTlMdXpGMlpZ?=
+ =?utf-8?B?ZlljZVR0VmlJYnhXeEFjamNmOWk2QUJaYnFZSnRYam9yMDhrK0Y0Z2drYjF3?=
+ =?utf-8?B?SjJFUEdFM0cvcThLWkFpWDlEZGhEQmxtUEtOZ002Y0N2WWxQWThFWDRScklt?=
+ =?utf-8?B?Z2V1NGVCbnBjY0g5TGFiZlBGeFlSSnpWcVdoclhYa1QwVkZ2a0daZnhsYzJK?=
+ =?utf-8?B?ejk2RzJwczVhSVMzeWI1RDZGVU1ObjJPQlA5eG80VXU4NURwcjJmZzg0NEli?=
+ =?utf-8?B?OEg4SkZlazg1enArZUxPWlpXRlZXUnF0R3FXS1J2WDNRL2tPMEpvbFFwb1Za?=
+ =?utf-8?B?VHNhWmlSa3NVNlg2aFVoNDZyY0Q2VTFmVWRWOCtmMEZ3b2Z0eUgzN2FFVmRk?=
+ =?utf-8?B?eExTTGxBc2YyVlYxQkpOdHQ3NjQvZzdHSnpoTGQ5emhQblczbzVNb2llVmlO?=
+ =?utf-8?B?eVJ3eXNqR3VPV1N0VXk1NzdSSTRVQ1hTYUhmTFA2VFV2eEN5cFRPQnBubjVi?=
+ =?utf-8?B?OFFHak4rNUNzSzI2MEMrcVdnRUdzTFoyOWt1eE9pV1VLT29PVGtsSTJ5U3dl?=
+ =?utf-8?B?QlA3dEFZNnBkcDFZTGIyeGdzQjlQdTBaMyt0SUtxa3ZYSVA1alJJazlGNFVh?=
+ =?utf-8?B?YkIxWkZWc05xTXc5SVVuWGY0ZzZHOWQzWEdZVGJILzZKaTJaL1NxS3Bvckp2?=
+ =?utf-8?B?R2lUN1p5MTVrK1N3cnVWNE5UUjdUclpxd3dtbjBicFkyTTE4UWZKZThEWk9l?=
+ =?utf-8?B?M056a1hycW9pdjJ1ekJSbkZGOENkb2N2bWJwMnpGVXZRRGxwWlg1NlFtcHJJ?=
+ =?utf-8?B?MVVHNnlGZ0s1ZFpJVWNyMUl5UFlmL0duS3JsWGQrNE5sb3daUXBueWdOMmlW?=
+ =?utf-8?B?UHZDdldhaVdBN1ZrZHFMWVg2VjMvdW9KanFqSEFSY0V3ditRT05oRXNURU1F?=
+ =?utf-8?B?MllrYUpva042elBTWTlQQjhoaUVZUWRZUCtEZUo5UklDUktocTk3aXNtVGFt?=
+ =?utf-8?B?eUxOeUZ2VFptUysvTklVNVp4Z1l4T2tkdzVab2lNOGtDQXg3bUhqYzhsSk5o?=
+ =?utf-8?B?V2l1UFFNNFBQTkw0N00zNDhnQ3FjRVI0SFBURGQ2T3NCUzlJYnFWYnc4Rytm?=
+ =?utf-8?B?U24xaXBaaE16K2pkN29RWi92NEJoVmVaMk9xcG9JTHlQNHU5VmJQcnFTcVNX?=
+ =?utf-8?B?MkRsQVhhWWlSVzhhUkV1dFRFMHpWNVJSVHdRejB2U1E4U0gvTUxGZXNyNkgz?=
+ =?utf-8?B?WFZiUmQwa2licWFlYUtrdDYyZ0VIT3BDL2xxMkNxK3ZNOHJWMzQxQUFhbkZC?=
+ =?utf-8?B?VmtxVEh5L1RkaWdIMUljOHdJbFlUOWZPSUUvb2h0aHBDRjNoZHRYdG9CaGxa?=
+ =?utf-8?B?V3pHbndEYngvS055bUVyN1VZVDFpcTN4UkZjVTVxUXB1bk95T295UFhYTFVx?=
+ =?utf-8?B?anAvYkw0T1dCeG1rV291RW5TMStZM0o0WmlZY1hzOWpkbWRkb0hFUzY4WjZa?=
+ =?utf-8?B?Tm5XdkVXbERYN0tBVlBPTHlzeE5lcXVqUHVaczczL0VZV3BFZ0RZTDhpeERY?=
+ =?utf-8?B?VTdhUHA3aUlqSGdseWNaNy9jMytwb1VaUG45Qm9Jc202UkFqdS9oQSt4VHVu?=
+ =?utf-8?B?SzNWeFZkNldJeUdUNkRJTXo0aVJaOFlaUmZrMERtMkJLOGVJYnpGYXpUOXRH?=
+ =?utf-8?B?Y25vVkloSXdHVVFRZW15YnZDU01mUFVuQklJWTczNmg0N2lGbWx3YXFOWDRB?=
+ =?utf-8?B?TEgyODgxcVlWdmRodkUwZ2U1VnExZ2hBTjZmRTdFZ2xXV3ViaFdoblplN1FW?=
+ =?utf-8?B?cjJBRU1sTTY0ZjZxQ0UzY3BvcDRROHBoeDV6UUhpUnlsRFgzeUh3QjJnSkIw?=
+ =?utf-8?B?TXhLaU5oaTMzemZkZ2ZqaVNGM2RzakEwWm5jSFRTNklaZGdzRGEyQ2NXUnJU?=
+ =?utf-8?B?Ym94eC9xZy9jelBHMjdLcEVrMEJ0czErWDZ1czdKbWhYUnRFU2RqU2hXRkpy?=
+ =?utf-8?B?dURGQVpCeVFNWW1VTkNwY0JtUnJJcStFVFdReVB3VE5XVVpUV0pYOXR4dFNG?=
+ =?utf-8?B?aDh3VytvUUM4Zy9UWVEvV2NTalArWTNYRHZpUWRkbHI2WmwwaTkzMy9zb2Z1?=
+ =?utf-8?B?MFJkQXZzTjNXdmZleTZXUDF3UmxIaHd5QlpwUHB3QlViL3pUQno3U2Y1aCsy?=
+ =?utf-8?B?UGwrNmNwZGoybzZCMW13cm8vRTBBUnRyME03ZGk5c0c3Z0JySUxTMXFZVzRF?=
+ =?utf-8?B?SmIrYTVvQnhoMmFMeE0vdTY0R1BLL2RSM0xpcHZSYm5hc3QvY29XZz09?=
+X-Exchange-RoutingPolicyChecked: p8UKEpamDOuCSeyF6cvCGaV8zlqYgoojfXihfNb9P2sgh5/hCHr9g1SqXSU9e/wXPdp6dbUv6Wf8I2HX0eFkj/y6AXWp14S2czcN+HGiIyTmWl7mB54Zqnwa+jg6KEmov30Hz5z/avATeUg/dpwdbDYgY/kamc8GnirjO9925TwZuGHQvzOb9kRyylmSgRArbTVeJJDmyKpR6Yqou5JIgDNW5qhNprSmxBkzOqlYiRLIDhFFNXmVEmhVx0OL2LLsRbpMExckeNbVlJkhaBeKTFw4DOau4hx67r0tQYBmyMndAy3qayPR5jGVo7yiJDvZAeLZrZUs7rHf1xc5erCQQA==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0417d9d0-1c23-4f17-1fc6-08dedd791e22
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7958.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2026 05:01:09.2477
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2026 05:15:40.5942
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rmmTLxDgScGEHh5voqLHEaxJGasJuJ99ynYfD8YTpUrm4ZRyDPeB4RUOlnE0X6m12E2rw1nRDNThqlb8IQvhCw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7124
+X-MS-Exchange-CrossTenant-UserPrincipalName: fBYuqyxTpow3eiE5dSd1GpyFieEVs0cg/nyAddiYczH4aQHIhNW9m9VIeqMTWasNbHMaFOLIYTHLpWkoX5PEWA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6923
 X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-3.16 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306041-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306042-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,01.org:url,intel.com:from_mime,intel.com:email,intel.com:mid,intel.com:dkim];
-	FORGED_SENDER(0.00)[oliver.sang@intel.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:oe-lkp@lists.linux.dev,m:lkp@intel.com,m:netdev@vger.kernel.org,m:ltp@lists.linux.it,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:dsahern@kernel.org,m:eric.dumazet@gmail.com,m:syzbot+d5d0d598a4cfdfafdc3b@syzkaller.appspotmail.com,m:oliver.sang@intel.com,m:ericdumazet@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:rodrigo.vivi@intel.com,m:raag.jadav@intel.com,m:kuba@kernel.org,m:aravind.iddamsetty@linux.intel.com,m:intel-xe@lists.freedesktop.org,m:anshuman.gupta@intel.com,m:joonas.lahtinen@linux.intel.com,m:simona.vetter@ffwll.ch,m:airlied@gmail.com,m:pratik.bari@intel.com,m:joshua.santosh.ranjan@intel.com,m:ashwin.kumar.kulkarni@intel.com,m:shubham.kumar@intel.com,m:ravi.kishore.koppuravuri@intel.com,m:maarten.lankhorst@linux.intel.com,m:mallesh.koujalagi@intel.com,m:soham.purkait@intel.com,m:zachary.mckevitt@oss.qualcomm.com,m:lijo.lazar@amd.com,m:Hawking.Zhang@amd.com,m:davem@davemloft.net,m:pabeni@redhat.com,m:edumazet@google.com,m:dri-devel@lists.freedesktop.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	FORGED_SENDER(0.00)[riana.tauro@intel.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[lists.linux.dev,intel.com,vger.kernel.org,lists.linux.it,davemloft.net,kernel.org,redhat.com,nvidia.com,gmail.com,google.com,syzkaller.appspotmail.com];
+	FREEMAIL_CC(0.00)[lists.freedesktop.org,intel.com,linux.intel.com,ffwll.ch,gmail.com,oss.qualcomm.com,amd.com,davemloft.net,redhat.com,google.com,vger.kernel.org];
 	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[oliver.sang@intel.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[riana.tauro@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,d5d0d598a4cfdfafdc3b];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
 	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0D9FB72CACC
+X-Rspamd-Queue-Id: 8E1D372CB6F
+
+
+On 09-07-2026 01:51, Rodrigo Vivi wrote:
+> On Tue, Jul 07, 2026 at 12:02:11PM +0530, Tauro, Riana wrote:
+>> Hi Rodrigo/Jakub/Aravind
+>>
+>> Please let me know if you have any feedback for this patch or can you please
+>> ack this if it looks good to you.
+> I looks good to me, but could you please double check the sashiko's comments?
+
+Sashiko has a comment regarding namespaces
+
+[Severity: Medium]Since the generic netlink family explicitly supports 
+multiple networknamespaces by setting .netnsok = true,
+  will hardcoding init_net hereprevent listeners in non-init namespaces 
+from receiving error events
+
+.netnsok = true is auto generated not explicitly added in code.
+
+But from what i see, drm device is present in the host and not 
+replicated across namespaces
+and most of the non-network implementations use inet.  (ex: Binder)
+If this really needs a fix, we can drop the has_listeners suggested by 
+raag  in previous patch.
+I don't think in an error path, allocating a new buffer would be a big 
+overhead if listeners are not present.
+
+@Raag let me know your thoughts.
+
+The 3rd patch can be floated seperately, I can drop it before merging 
+and resend if i can get an ack for this
+patch
+
+Thanks
+Riana
 
 
 
-Hello,
-
-kernel test robot noticed "KASAN:slab-use-after-free_in_vxlan_rcv[vxlan]" on:
-
-commit: 35913c60d9c1072bf8c8d4e626bde513eeffcc45 ("[PATCH net] net: clear transport header during tunnel decapsulation")
-url: https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-clear-transport-header-during-tunnel-decapsulation/20260624-153313
-base: https://git.kernel.org/cgit/linux/kernel/git/davem/net.git d87363b0edfc7504ff2b144fe4cdd8154f90f42e
-patch link: https://lore.kernel.org/all/20260624073209.3703492-1-edumazet@google.com/
-patch subject: [PATCH net] net: clear transport header during tunnel decapsulation
-
-in testcase: ltp
-version: 
-with following parameters:
-
-	test: net.features
-
-
-
-config: x86_64-rhel-9.4-ltp
-compiler: gcc-14
-test machine: 8 threads 1 sockets Intel(R) Core(TM) i7-4790T CPU @ 2.70GHz (Haswell) with 16G memory
-
-(please refer to attached dmesg/kmsg for entire log/backtrace)
-
-
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <oliver.sang@intel.com>
-| Closes: https://lore.kernel.org/oe-lkp/202607091154.8fb0e88c-lkp@intel.com
-
-
-The kernel config and materials to reproduce are available at:
-https://download.01.org/0day-ci/archive/20260709/202607091154.8fb0e88c-lkp@intel.com
-
-
-below decoded stack trace FYI:
-
-
-kern  :err   : [  836.649020] [      C2] ==================================================================
-kern  :err   : [  836.657473] [      C2] BUG: KASAN: slab-use-after-free in vxlan_rcv (kbuild/src/drivers/net/vxlan/vxlan_core.c:1567 kbuild/src/drivers/net/vxlan/vxlan_core.c:1745) vxlan
-kern  :err   : [  836.665872] [      C2] Read of size 4 at addr ffff888414b94787 by task kworker/u32:14/3114
-
-kern  :err   : [  836.677034] [      C2] CPU: 2 UID: 0 PID: 3114 Comm: kworker/u32:14 Tainted: G S                  7.1.0+ #1 PREEMPT(lazy)
-kern  :err   : [  836.677039] [      C2] Tainted: [S]=CPU_OUT_OF_SPEC
-kern  :err   : [  836.677041] [      C2] Hardware name: Gigabyte Technology Co., Ltd. Z97X-UD5H/Z97X-UD5H, BIOS F9 04/21/2015
-kern  :err   : [  836.677043] [      C2] Workqueue: ipv6_addrconf addrconf_dad_work
-kern  :err   : [  836.677051] [      C2] Call Trace:
-kern  :err   : [  836.677053] [      C2]  <IRQ>
-kern  :err   : [  836.677055] [      C2]  dump_stack_lvl (kbuild/src/lib/dump_stack.c:94 kbuild/src/lib/dump_stack.c:120)
-kern  :err   : [  836.677060] [      C2]  print_address_description+0x70/0x300
-kern  :err   : [  836.677066] [      C2]  ? vxlan_rcv (kbuild/src/drivers/net/vxlan/vxlan_core.c:1567 kbuild/src/drivers/net/vxlan/vxlan_core.c:1745) vxlan
-kern  :err   : [  836.677074] [      C2]  print_report (kbuild/src/mm/kasan/report.c:482)
-kern  :err   : [  836.677078] [      C2]  ? __virt_addr_valid (kbuild/src/include/linux/mmzone.h:2198 (discriminator 1) kbuild/src/include/linux/mmzone.h:2280 (discriminator 1) kbuild/src/arch/x86/mm/physaddr.c:54 (discriminator 1))
-kern  :err   : [  836.677093] [      C2]  ? vxlan_rcv (kbuild/src/drivers/net/vxlan/vxlan_core.c:1567 kbuild/src/drivers/net/vxlan/vxlan_core.c:1745) vxlan
-kern  :err   : [  836.677102] [      C2]  kasan_report (kbuild/src/mm/kasan/report.c:595)
-kern  :err   : [  836.677105] [      C2]  ? vxlan_rcv (kbuild/src/drivers/net/vxlan/vxlan_core.c:1567 kbuild/src/drivers/net/vxlan/vxlan_core.c:1745) vxlan
-kern  :err   : [  836.677115] [      C2] vxlan_rcv (kbuild/src/drivers/net/vxlan/vxlan_core.c:1567 kbuild/src/drivers/net/vxlan/vxlan_core.c:1745) vxlan
-kern  :err   : [  836.677146] [      C2]  ? __pfx_vxlan_rcv (kbuild/src/drivers/net/vxlan/vxlan_core.c:2327) vxlan
-kern  :err   : [  836.677153] [      C2]  ? ip6_list_rcv_finish+0x8d2/0xc30
-kern  :err   : [  836.677156] [      C2]  ? __pfx_ip6_list_rcv_finish+0x10/0x10
-kern  :err   : [  836.677158] [      C2]  ? ip6_parse_tlv (kbuild/src/net/ipv6/exthdrs.c:175)
-kern  :err   : [  836.677162] [      C2]  ? __pfx_vxlan_rcv (kbuild/src/drivers/net/vxlan/vxlan_core.c:2327) vxlan
-kern  :err   : [  836.677169] [      C2]  udp_queue_rcv_one_skb (kbuild/src/net/ipv4/udp.c:2388)
-kern  :err   : [  836.677174] [      C2]  ? ipv6_parse_hopopts (kbuild/src/net/ipv6/exthdrs.c:1081)
-kern  :err   : [  836.677177] [      C2]  udp_unicast_rcv_skb (kbuild/src/net/ipv4/udp.c:2574)
-kern  :err   : [  836.677180] [      C2]  udp_rcv (kbuild/src/net/ipv4/udp.c:2640)
-kern  :err   : [  836.677184] [      C2]  ? __pfx_udp_rcv (kbuild/src/net/ipv4/udp.c:2451 (discriminator 1))
-kern  :err   : [  836.677187] [      C2]  ? ip_mc_validate_source (kbuild/src/include/net/ip_fib.h:460 kbuild/src/net/ipv4/route.c:1729 kbuild/src/net/ipv4/route.c:1705)
-kern  :err   : [  836.677193] [      C2]  ip_protocol_deliver_rcu (kbuild/src/net/ipv4/ip_input.c:207 (discriminator 4))
-kern  :err   : [  836.677196] [      C2]  ip_local_deliver_finish (kbuild/src/net/ipv4/ip_input.c:241 (discriminator 1))
-kern  :err   : [  836.677199] [      C2]  ip_local_deliver (kbuild/src/include/linux/netfilter.h:318 kbuild/src/include/linux/netfilter.h:312 kbuild/src/net/ipv4/ip_input.c:262)
-kern  :err   : [  836.677201] [      C2]  ? __pfx_ip_local_deliver (kbuild/src/include/linux/skbuff.h:4508 (discriminator 1))
-kern  :err   : [  836.677204] [      C2]  ? ip_rcv_finish_core (kbuild/src/net/ipv4/ip_input.c:391)
-kern  :err   : [  836.677206] [      C2]  ? netif_receive_skb_list_internal (kbuild/src/include/linux/rcupdate.h:873 kbuild/src/net/core/dev.c:6440)
-kern  :err   : [  836.677210] [      C2]  ip_rcv (kbuild/src/include/net/dst.h:480 (discriminator 6) kbuild/src/net/ipv4/ip_input.c:492 (discriminator 6) kbuild/src/include/linux/netfilter.h:318 (discriminator 6) kbuild/src/include/linux/netfilter.h:312 (discriminator 6) kbuild/src/net/ipv4/ip_input.c:612 (discriminator 6))
-kern  :err   : [  836.677212] [      C2]  ? __pfx_netif_receive_skb_list_internal (kbuild/src/net/core/dev.c:6662 (discriminator 2))
-kern  :err   : [  836.677215] [      C2]  ? __pfx_ip_rcv (kbuild/src/include/net/dst.h:480 (discriminator 1))
-kern  :err   : [  836.677218] [      C2]  ? __pfx_ip_rcv (kbuild/src/include/net/dst.h:480 (discriminator 1))
-kern  :err   : [  836.677221] [      C2]  __netif_receive_skb_one_core (kbuild/src/net/core/dev.c:6206 (discriminator 4))
-kern  :err   : [  836.677223] [      C2]  ? napi_complete_done (kbuild/src/include/linux/instrumented.h:55 kbuild/src/net/core/dev.c:6831)
-kern  :err   : [  836.677226] [      C2]  ? __pfx___netif_receive_skb_one_core (kbuild/src/net/core/dev.c:6248)
-kern  :err   : [  836.677229] [      C2]  ? _raw_spin_lock_irq (kbuild/src/include/linux/instrumented.h:55 kbuild/src/include/linux/atomic/atomic-instrumented.h:1301 kbuild/src/include/asm-generic/qspinlock.h:111 kbuild/src/include/linux/spinlock.h:187 kbuild/src/include/linux/spinlock_api_smp.h:143 kbuild/src/kernel/locking/spinlock.c:174)
-kern  :err   : [  836.677235] [      C2]  process_backlog (kbuild/src/net/core/dev.c:6670)
-kern  :err   : [  836.677238] [      C2]  __napi_poll (kbuild/src/net/core/dev.c:7729)
-kern  :err   : [  836.677241] [      C2]  net_rx_action (kbuild/src/net/core/dev.c:7792 kbuild/src/net/core/dev.c:7949)
-kern  :err   : [  836.677245] [      C2]  ? __pfx_net_rx_action (kbuild/src/include/net/gro.h:525)
-kern  :err   : [  836.677248] [      C2]  ? __pfx_hrtimer_update_next_event (kbuild/src/kernel/time/hrtimer.c:195)
-kern  :err   : [  836.677253] [      C2]  ? __pfx_sched_clock_cpu (kbuild/src/include/linux/list.h:226)
-kern  :err   : [  836.677257] [      C2]  ? sched_clock (kbuild/src/arch/x86/kernel/tsc.c:297)
-kern  :err   : [  836.677261] [      C2]  ? sched_clock_cpu (kbuild/src/kernel/sched/clock.c:400)
-kern  :err   : [  836.677265] [      C2]  handle_softirqs (kbuild/src/kernel/softirq.c:622)
-kern  :err   : [  836.677269] [      C2]  do_softirq (kbuild/src/kernel/softirq.c:523 (discriminator 20) kbuild/src/kernel/softirq.c:510 (discriminator 20))
-kern  :err   : [  836.677272] [      C2]  </IRQ>
-kern  :err   : [  836.677273] [      C2]  <TASK>
-kern  :err   : [  836.677274] [      C2]  __local_bh_enable_ip (kbuild/src/kernel/softirq.c:450)
-kern  :err   : [  836.677276] [      C2]  __dev_queue_xmit (kbuild/src/include/linux/bottom_half.h:33 kbuild/src/include/linux/rcupdate.h:914 kbuild/src/net/core/dev.c:4907)
-kern  :err   : [  836.677280] [      C2]  ? unwind_next_frame (kbuild/src/include/linux/rcupdate.h:873 kbuild/src/include/linux/rcupdate.h:1183 kbuild/src/arch/x86/kernel/unwind_orc.c:495)
-kern  :err   : [  836.677284] [      C2]  ? arch_stack_walk (kbuild/src/arch/x86/include/asm/unwind.h:64 kbuild/src/arch/x86/kernel/stacktrace.c:24)
-kern  :err   : [  836.677287] [      C2]  ? kasan_save_track (kbuild/src/mm/kasan/common.c:78)
-kern  :err   : [  836.677293] [      C2]  ? __pfx___dev_queue_xmit (kbuild/src/net/core/dev.c:4735)
-kern  :err   : [  836.677296] [      C2]  ? __pfx__raw_spin_lock_bh (kbuild/src/kernel/locking/spinlock.c:159)
-kern  :err   : [  836.677299] [      C2]  ? _raw_write_lock_bh (kbuild/src/include/linux/instrumented.h:55 kbuild/src/include/linux/atomic/atomic-instrumented.h:1301 kbuild/src/include/asm-generic/qrwlock.h:98 kbuild/src/include/linux/rwlock_api_smp.h:222 kbuild/src/kernel/locking/spinlock.c:338)
-kern  :err   : [  836.677302] [      C2]  ? __asan_memcpy (kbuild/src/mm/kasan/shadow.c:106 (discriminator 1))
-kern  :err   : [  836.677306] [      C2]  ? eth_header (kbuild/src/net/ethernet/eth.c:99 (discriminator 6))
-kern  :err   : [  836.677311] [      C2]  ? neigh_resolve_output (kbuild/src/include/linux/netdevice.h:3493 kbuild/src/net/core/neighbour.c:1611 kbuild/src/net/core/neighbour.c:1596)
-kern  :err   : [  836.677316] [      C2]  ip6_finish_output2 (kbuild/src/include/net/neighbour.h:560 (discriminator 2) kbuild/src/net/ipv6/ip6_output.c:136 (discriminator 2))
-kern  :err   : [  836.677320] [      C2]  ? __pfx_ip6_finish_output2 (kbuild/src/include/net/xfrm.h:1303)
-kern  :err   : [  836.677324] [      C2]  ? kasan_save_track (kbuild/src/mm/kasan/common.c:78)
-kern  :err   : [  836.677327] [      C2]  ? __kasan_kmalloc (kbuild/src/mm/kasan/common.c:398 kbuild/src/mm/kasan/common.c:415)
-kern  :err   : [  836.677330] [      C2]  ? dst_cow_metrics_generic (kbuild/src/include/linux/slab.h:969 kbuild/src/net/core/dst.c:194)
-kern  :err   : [  836.677333] [      C2]  ? icmp6_dst_alloc (kbuild/src/include/net/dst.h:136 kbuild/src/include/net/dst.h:197 kbuild/src/net/ipv6/route.c:3359)
-kern  :err   : [  836.677336] [      C2]  ? ndisc_send_skb (kbuild/src/net/ipv6/ndisc.c:491)
-kern  :err   : [  836.677339] [      C2]  ? addrconf_dad_completed (kbuild/src/net/ipv6/addrconf.c:4395)
-kern  :err   : [  836.677342] [      C2]  ? addrconf_dad_begin (kbuild/src/net/ipv6/addrconf.c:4157)
-kern  :err   : [  836.677345] [      C2]  ? addrconf_dad_work (kbuild/src/net/ipv6/addrconf.c:4262)
-kern  :err   : [  836.677348] [      C2]  ? process_one_work (kbuild/src/kernel/workqueue.c:3314)
-kern  :err   : [  836.677350] [      C2]  ? worker_thread (kbuild/src/kernel/workqueue.c:3397 kbuild/src/kernel/workqueue.c:3478)
-kern  :err   : [  836.677352] [      C2]  ? kthread (kbuild/src/kernel/kthread.c:436)
-kern  :err   : [  836.677356] [      C2]  ? ret_from_fork (kbuild/src/arch/x86/kernel/process.c:158)
-kern  :err   : [  836.677358] [      C2]  ? ret_from_fork_asm (kbuild/src/arch/x86/entry/entry_64.S:245)
-kern  :err   : [  836.677361] [      C2]  ? addrconf_dad_work (kbuild/src/net/ipv6/addrconf.c:4262)
-kern  :err   : [  836.677364] [      C2]  ? process_one_work (kbuild/src/kernel/workqueue.c:3314)
-kern  :err   : [  836.677366] [      C2]  ? worker_thread (kbuild/src/kernel/workqueue.c:3397 kbuild/src/kernel/workqueue.c:3478)
-kern  :err   : [  836.677369] [      C2]  ip6_finish_output (kbuild/src/net/ipv6/ip6_output.c:208 kbuild/src/net/ipv6/ip6_output.c:219)
-kern  :err   : [  836.677372] [      C2]  ip6_output (kbuild/src/include/linux/netfilter.h:307 kbuild/src/net/ipv6/ip6_output.c:246)
-kern  :err   : [  836.677375] [      C2]  ? __pfx_ip6_output (kbuild/src/net/ipv6/ip6_output.c:169)
-kern  :err   : [  836.677379] [      C2]  ? _raw_spin_lock_irqsave (kbuild/src/include/linux/instrumented.h:55 kbuild/src/include/linux/atomic/atomic-instrumented.h:1301 kbuild/src/include/asm-generic/qspinlock.h:111 kbuild/src/include/linux/spinlock.h:187 kbuild/src/include/linux/spinlock_api_smp.h:133 kbuild/src/kernel/locking/spinlock.c:166)
-kern  :err   : [  836.677382] [      C2]  ? __pfx__raw_spin_lock_irqsave (kbuild/src/kernel/locking/spinlock.c:273)
-kern  :err   : [  836.677385] [      C2]  NF_HOOK+0xda/0x1f0
-kern  :err   : [  836.677388] [      C2]  ? __pfx_NF_HOOK+0x10/0x10
-kern  :err   : [  836.677391] [      C2]  ? rt6_uncached_list_add (kbuild/src/include/linux/list.h:96 kbuild/src/include/linux/list.h:158 kbuild/src/include/linux/list.h:191 kbuild/src/net/ipv6/route.c:145)
-kern  :err   : [  836.677394] [      C2]  ndisc_send_skb (kbuild/src/net/ipv6/ndisc.c:512)
-kern  :err   : [  836.677396] [      C2]  ? __pfx_ndisc_send_skb (kbuild/src/include/net/dst.h:470 (discriminator 1))
-kern  :err   : [  836.677400] [      C2]  ? ndisc_send_rs (kbuild/src/net/ipv6/ndisc.c:171 (discriminator 1) kbuild/src/net/ipv6/ndisc.c:719 (discriminator 1))
-kern  :err   : [  836.677402] [      C2]  addrconf_dad_completed (kbuild/src/net/ipv6/addrconf.c:4395)
-kern  :err   : [  836.677406] [      C2]  ? __pfx_addrconf_dad_completed (kbuild/src/net/ipv6/addrconf.c:4091 (discriminator 10))
-kern  :err   : [  836.677409] [      C2]  ? _raw_spin_lock (kbuild/src/include/linux/instrumented.h:55 kbuild/src/include/linux/atomic/atomic-instrumented.h:1301 kbuild/src/include/asm-generic/qspinlock.h:111 kbuild/src/include/linux/spinlock.h:187 kbuild/src/include/linux/spinlock_api_smp.h:159 kbuild/src/kernel/locking/spinlock.c:158)
-kern  :err   : [  836.677412] [      C2]  ? __pfx__raw_spin_lock (kbuild/src/kernel/locking/spinlock.c:331)
-kern  :err   : [  836.677416] [      C2]  ? addrconf_dad_begin (kbuild/src/net/ipv6/addrconf.c:4157)
-kern  :err   : [  836.677419] [      C2]  addrconf_dad_begin (kbuild/src/net/ipv6/addrconf.c:4157)
-kern  :err   : [  836.677422] [      C2]  ? __pfx_sched_balance_newidle (kbuild/src/kernel/sched/fair.c:13237 (discriminator 1))
-kern  :err   : [  836.677425] [      C2]  ? __pfx_addrconf_dad_begin (kbuild/src/include/net/ipv6.h:459 (discriminator 2))
-kern  :err   : [  836.677428] [      C2]  ? __pfx__raw_spin_lock_bh (kbuild/src/kernel/locking/spinlock.c:159)
-kern  :err   : [  836.677432] [      C2]  addrconf_dad_work (kbuild/src/net/ipv6/addrconf.c:4262)
-kern  :err   : [  836.677435] [      C2]  ? __pfx_addrconf_dad_work (kbuild/src/net/ipv6/addrconf.c:1568 (discriminator 2))
-kern  :err   : [  836.677438] [      C2]  ? __schedule (kbuild/src/kernel/sched/core.c:5507 kbuild/src/kernel/sched/core.c:7228)
-kern  :err   : [  836.677443] [      C2]  process_one_work (kbuild/src/kernel/workqueue.c:3314)
-kern  :err   : [  836.677446] [      C2]  ? assign_work (kbuild/src/kernel/workqueue.c:1233)
-kern  :err   : [  836.677451] [      C2]  worker_thread (kbuild/src/kernel/workqueue.c:3397 kbuild/src/kernel/workqueue.c:3478)
-kern  :err   : [  836.677454] [      C2]  ? __pfx_worker_thread (kbuild/src/kernel/workqueue.c:3405 (discriminator 1))
-kern  :err   : [  836.677456] [      C2]  kthread (kbuild/src/kernel/kthread.c:436)
-kern  :err   : [  836.677459] [      C2]  ? recalc_sigpending (kbuild/src/include/linux/instrumented.h:97 kbuild/src/include/asm-generic/bitops/instrumented-atomic.h:41 kbuild/src/include/linux/thread_info.h:109 kbuild/src/kernel/signal.c:181)
-kern  :err   : [  836.677463] [      C2]  ? __pfx_kthread (kbuild/src/include/linux/list.h:404 (discriminator 2))
-kern  :err   : [  836.677466] [      C2]  ret_from_fork (kbuild/src/arch/x86/kernel/process.c:158)
-kern  :err   : [  836.677468] [      C2]  ? __pfx_ret_from_fork (kbuild/src/arch/x86/include/asm/entry-common.h:54)
-kern  :err   : [  836.677470] [      C2]  ? switch_fpu (kbuild/src/include/linux/instrumented.h:82 kbuild/src/include/asm-generic/bitops/instrumented-non-atomic.h:141 kbuild/src/include/linux/thread_info.h:133 kbuild/src/include/linux/sched.h:2084 kbuild/src/arch/x86/include/asm/fpu/sched.h:34)
-kern  :err   : [  836.677475] [      C2]  ? __switch_to (kbuild/src/arch/x86/kernel/process_64.c:403 kbuild/src/arch/x86/kernel/process_64.c:663)
-kern  :err   : [  836.677478] [      C2]  ? __switch_to_asm (kbuild/src/arch/x86/entry/entry_64.S:206)
-kern  :err   : [  836.677481] [      C2]  ? __pfx_kthread (kbuild/src/include/linux/list.h:404 (discriminator 2))
-kern  :err   : [  836.677484] [      C2]  ret_from_fork_asm (kbuild/src/arch/x86/entry/entry_64.S:245)
-kern  :err   : [  836.677488] [      C2]  </TASK>
-
-kern  :err   : [  837.303842] [      C2] Allocated by task 121763:
-kern  :warn  : [  837.308450] [      C2]  kasan_save_stack (kbuild/src/mm/kasan/common.c:57)
-kern  :warn  : [  837.313267] [      C2]  kasan_save_track (kbuild/src/mm/kasan/common.c:78)
-kern  :warn  : [  837.318040] [      C2]  __kasan_slab_alloc (kbuild/src/mm/kasan/common.c:340 kbuild/src/mm/kasan/common.c:366)
-kern  :warn  : [  837.322991] [      C2]  kmem_cache_alloc_node_noprof (kbuild/src/include/linux/kasan.h:253 kbuild/src/mm/slub.c:4610 kbuild/src/mm/slub.c:4939 kbuild/src/mm/slub.c:4991)
-kern  :warn  : [  837.328984] [      C2]  __alloc_skb (kbuild/src/net/core/skbuff.c:704 (discriminator 2))
-kern  :warn  : [  837.333421] [      C2]  __tcp_send_ack (kbuild/src/net/ipv4/tcp_output.c:4467)
-kern  :warn  : [  837.338725] [      C2]  tcp_rcv_established (kbuild/src/net/ipv4/tcp_input.c:6168 kbuild/src/net/ipv4/tcp_input.c:6162 kbuild/src/net/ipv4/tcp_input.c:6662)
-kern  :warn  : [  837.344030] [      C2]  tcp_v6_do_rcv (kbuild/src/net/ipv6/tcp_ipv6.c:1625)
-kern  :warn  : [  837.348812] [      C2]  tcp_v6_rcv (kbuild/src/net/ipv6/tcp_ipv6.c:1902)
-kern  :warn  : [  837.353415] [      C2]  ip6_protocol_deliver_rcu (kbuild/src/net/ipv6/ip6_input.c:479 (discriminator 1))
-kern  :warn  : [  837.359180] [      C2]  ip6_input_finish (kbuild/src/net/ipv6/ip6_input.c:534)
-kern  :warn  : [  837.364172] [      C2]  ip6_input (kbuild/src/include/linux/netfilter.h:318 kbuild/src/include/linux/netfilter.h:312 kbuild/src/net/ipv6/ip6_input.c:545)
-kern  :warn  : [  837.368432] [      C2]  ip6_list_rcv_finish+0x80c/0xc30
-kern  :warn  : [  837.374685] [      C2]  ip6_sublist_rcv (kbuild/src/net/ipv6/ip6_input.c:361)
-kern  :warn  : [  837.379465] [      C2]  ipv6_list_rcv (kbuild/src/net/ipv6/ip6_input.c:395)
-kern  :warn  : [  837.384188] [      C2]  __netif_receive_skb_list_core (kbuild/src/net/core/dev.c:6249 (discriminator 1) kbuild/src/net/core/dev.c:6296 (discriminator 1))
-kern  :warn  : [  837.390302] [      C2]  netif_receive_skb_list_internal (kbuild/src/net/core/dev.c:6348 kbuild/src/net/core/dev.c:6439)
-kern  :warn  : [  837.396561] [      C2]  napi_complete_done (kbuild/src/include/net/gro.h:523 kbuild/src/include/net/gro.h:519 kbuild/src/include/net/gro.h:531 kbuild/src/net/core/dev.c:6807)
-kern  :warn  : [  837.401691] [      C2]  gro_cell_poll (kbuild/src/net/core/gro_cells.c:74)
-kern  :warn  : [  837.406397] [      C2]  __napi_poll (kbuild/src/net/core/dev.c:7729)
-kern  :warn  : [  837.410830] [      C2]  net_rx_action (kbuild/src/net/core/dev.c:7792 kbuild/src/net/core/dev.c:7949)
-kern  :warn  : [  837.415519] [      C2]  handle_softirqs (kbuild/src/kernel/softirq.c:622)
-kern  :warn  : [  837.420390] [      C2]  do_softirq (kbuild/src/kernel/softirq.c:523 (discriminator 20) kbuild/src/kernel/softirq.c:510 (discriminator 20))
-kern  :warn  : [  837.424643] [      C2]  __local_bh_enable_ip (kbuild/src/kernel/softirq.c:450)
-kern  :warn  : [  837.429767] [      C2]  __dev_queue_xmit (kbuild/src/include/linux/bottom_half.h:33 kbuild/src/include/linux/rcupdate.h:914 kbuild/src/net/core/dev.c:4907)
-kern  :warn  : [  837.434801] [      C2]  ip6_finish_output2 (kbuild/src/include/net/neighbour.h:558 kbuild/src/net/ipv6/ip6_output.c:136)
-kern  :warn  : [  837.440010] [      C2]  ip6_finish_output (kbuild/src/net/ipv6/ip6_output.c:208 kbuild/src/net/ipv6/ip6_output.c:219)
-kern  :warn  : [  837.445045] [      C2]  ip6_output (kbuild/src/include/linux/netfilter.h:307 kbuild/src/net/ipv6/ip6_output.c:246)
-kern  :warn  : [  837.449472] [      C2]  ip6_xmit (kbuild/src/include/net/dst.h:470 (discriminator 3) kbuild/src/include/linux/netfilter.h:318 (discriminator 3) kbuild/src/include/linux/netfilter.h:312 (discriminator 3) kbuild/src/net/ipv6/ip6_output.c:379 (discriminator 3))
-kern  :warn  : [  837.453809] [      C2]  inet6_csk_xmit (kbuild/src/net/ipv6/inet6_connection_sock.c:121 (discriminator 2))
-kern  :warn  : [  837.458578] [      C2]  __tcp_transmit_skb (kbuild/src/net/ipv4/tcp_output.c:1716 (discriminator 1))
-kern  :warn  : [  837.463872] [      C2]  tcp_write_xmit (kbuild/src/net/ipv4/tcp_output.c:1734 kbuild/src/net/ipv4/tcp_output.c:3062)
-kern  :warn  : [  837.468814] [      C2]  __tcp_push_pending_frames (kbuild/src/net/ipv4/tcp_output.c:3245 (discriminator 1))
-kern  :warn  : [  837.474459] [      C2]  tcp_sendmsg_locked (kbuild/src/net/ipv4/tcp.c:1414)
-kern  :warn  : [  837.479755] [      C2]  tcp_sendmsg (kbuild/src/net/ipv4/tcp.c:1451)
-kern  :warn  : [  837.484124] [      C2]  __sys_sendto (kbuild/src/net/socket.c:775 (discriminator 1) kbuild/src/net/socket.c:790 (discriminator 1) kbuild/src/net/socket.c:2252 (discriminator 1))
-kern  :warn  : [  837.488724] [      C2]  __x64_sys_sendto (kbuild/src/net/socket.c:2259 kbuild/src/net/socket.c:2255 kbuild/src/net/socket.c:2255)
-kern  :warn  : [  837.493587] [      C2]  do_syscall_64 (kbuild/src/arch/x86/entry/syscall_64.c:63 kbuild/src/arch/x86/entry/syscall_64.c:94)
-kern  :warn  : [  837.498221] [      C2]  entry_SYSCALL_64_after_hwframe (kbuild/src/arch/x86/entry/entry_64.S:121)
-
-kern  :err   : [  837.506678] [      C2] Freed by task 121763:
-kern  :warn  : [  837.510939] [      C2]  kasan_save_stack (kbuild/src/mm/kasan/common.c:57)
-kern  :warn  : [  837.515714] [      C2]  kasan_save_track (kbuild/src/mm/kasan/common.c:78)
-kern  :warn  : [  837.520491] [      C2]  kasan_save_free_info (kbuild/src/mm/kasan/generic.c:584)
-kern  :warn  : [  837.525618] [      C2]  __kasan_slab_free (kbuild/src/mm/kasan/common.c:253 kbuild/src/mm/kasan/common.c:285)
-kern  :warn  : [  837.530482] [      C2]  kmem_cache_free (kbuild/src/include/linux/kasan.h:235 kbuild/src/mm/slub.c:2700 kbuild/src/mm/slub.c:6310 kbuild/src/mm/slub.c:6437)
-kern  :warn  : [  837.535295] [      C2]  tcp_rcv_established (kbuild/src/net/ipv4/tcp_input.c:6560)
-kern  :warn  : [  837.540686] [      C2]  tcp_v6_do_rcv (kbuild/src/net/ipv6/tcp_ipv6.c:1625)
-kern  :warn  : [  837.545468] [      C2]  __release_sock (kbuild/src/include/net/sock.h:1190 (discriminator 1) kbuild/src/net/core/sock.c:3258 (discriminator 1))
-kern  :warn  : [  837.550288] [      C2]  release_sock (kbuild/src/net/core/sock.c:3857)
-kern  :warn  : [  837.554899] [      C2]  tcp_sendmsg (kbuild/src/net/ipv4/tcp.c:1452)
-kern  :warn  : [  837.559281] [      C2]  __sys_sendto (kbuild/src/net/socket.c:775 (discriminator 1) kbuild/src/net/socket.c:790 (discriminator 1) kbuild/src/net/socket.c:2252 (discriminator 1))
-kern  :warn  : [  837.563883] [      C2]  __x64_sys_sendto (kbuild/src/net/socket.c:2259 kbuild/src/net/socket.c:2255 kbuild/src/net/socket.c:2255)
-kern  :warn  : [  837.568744] [      C2]  do_syscall_64 (kbuild/src/arch/x86/entry/syscall_64.c:63 kbuild/src/arch/x86/entry/syscall_64.c:94)
-kern  :warn  : [  837.573365] [      C2]  entry_SYSCALL_64_after_hwframe (kbuild/src/arch/x86/entry/entry_64.S:121)
-
-kern  :err   : [  837.581815] [      C2] The buggy address belongs to the object at ffff888414b94780
-which belongs to the cache skbuff_head_cache of size 232
-kern  :err   : [  837.596736] [      C2] The buggy address is located 7 bytes inside of
-freed 232-byte region [ffff888414b94780, ffff888414b94868)
-
-kern  :err   : [  837.613201] [      C2] The buggy address belongs to the physical page:
-kern  :warn  : [  837.619738] [      C2] page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x414b94
-kern  :warn  : [  837.628704] [      C2] head: order:1 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-kern  :warn  : [  837.637367] [      C2] flags: 0x17ffffc0000040(head|node=0|zone=2|lastcpupid=0x1fffff)
-kern  :warn  : [  837.645332] [      C2] page_type: f5(slab)
-kern  :warn  : [  837.649452] [      C2] raw: 0017ffffc0000040 ffff8881003a2000 dead000000000100 dead000000000122
-kern  :warn  : [  837.658208] [      C2] raw: 0000000000000000 0000000800190019 00000000f5000000 0000000000000000
-kern  :warn  : [  837.666938] [      C2] head: 0017ffffc0000040 ffff8881003a2000 dead000000000100 dead000000000122
-kern  :warn  : [  837.675756] [      C2] head: 0000000000000000 0000000800190019 00000000f5000000 0000000000000000
-kern  :warn  : [  837.684572] [      C2] head: 0017ffffc0000001 ffffffffffffff81 00000000ffffffff 00000000ffffffff
-kern  :warn  : [  837.693424] [      C2] head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000002
-kern  :warn  : [  837.702280] [      C2] page dumped because: kasan: bad access detected
-
-kern  :err   : [  837.711381] [      C2] Memory state around the buggy address:
-kern  :err   : [  837.717212] [      C2]  ffff888414b94680: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-kern  :err   : [  837.725465] [      C2]  ffff888414b94700: fb fb fb fb fb fc fc fc fc fc fc fc fc fc fc fc
-kern  :err   : [  837.733699] [      C2] >ffff888414b94780: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-kern  :err   : [  837.741937] [      C2]                    ^
-kern  :err   : [  837.746228] [      C2]  ffff888414b94800: fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc
-kern  :err   : [  837.754492] [      C2]  ffff888414b94880: fc fc fc fc fc fc fc fc fa fb fb fb fb fb fb fb
-kern  :err   : [  837.762743] [      C2] ==================================================================
-
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
-
+>
+> Patch 3 still needs review I believe, then we get Jakub and drm maintainers acks
+> to get this through drm-xe-next.
+>
+> Thanks,
+> Rodrigo.
+>
+>> Thanks
+>> Riana
+>>
+>> On 01-07-2026 15:14, Riana Tauro wrote:
+>>> Define a new netlink event 'error-event' and a new multicast group
+>>> 'error-report' in drm_ras. Each event contains device name, node and
+>>> error information to identify the error triggering the event.
+>>>
+>>> Add drm_ras_nl_error_event() to trigger an event from the driver.
+>>> Userspace must subscribe to 'error-report' to receive 'error-event'
+>>> notifications.
+>>>
+>>> Usage:
+>>>
+>>> $ sudo ynl --family drm_ras --subscribe error-report
+>>>
+>>> Cc: Jakub Kicinski <kuba@kernel.org>
+>>> Cc: Zack McKevitt <zachary.mckevitt@oss.qualcomm.com>
+>>> Cc: Lijo Lazar <lijo.lazar@amd.com>
+>>> Cc: Hawking Zhang <Hawking.Zhang@amd.com>
+>>> Cc: David S. Miller <davem@davemloft.net>
+>>> Cc: Paolo Abeni <pabeni@redhat.com>
+>>> Cc: Eric Dumazet <edumazet@google.com>
+>>> Signed-off-by: Riana Tauro <riana.tauro@intel.com>
+>>> Reviewed-by: Raag Jadav <raag.jadav@intel.com>
+>>> ---
+>>> v2: remove redundant initialization
+>>>       remove unnecessary space
+>>>       use ynl in commit message and doc (Raag)
+>>>       simplify doc for error-event attrs
+>>>
+>>> v3: rename error-notify to error-report
+>>>       Replace notify with report across the file (Raag)
+>>> ---
+>>>    Documentation/gpu/drm-ras.rst            | 21 ++++++
+>>>    Documentation/netlink/specs/drm_ras.yaml | 48 +++++++++++++
+>>>    drivers/gpu/drm/drm_ras.c                | 87 ++++++++++++++++++++++++
+>>>    drivers/gpu/drm/drm_ras_nl.c             |  6 ++
+>>>    drivers/gpu/drm/drm_ras_nl.h             |  4 ++
+>>>    include/drm/drm_ras.h                    |  5 ++
+>>>    include/uapi/drm/drm_ras.h               | 15 ++++
+>>>    7 files changed, 186 insertions(+)
+>>>
+>>> diff --git a/Documentation/gpu/drm-ras.rst b/Documentation/gpu/drm-ras.rst
+>>> index 83c21853b74b..406e4c49bac1 100644
+>>> --- a/Documentation/gpu/drm-ras.rst
+>>> +++ b/Documentation/gpu/drm-ras.rst
+>>> @@ -56,6 +56,7 @@ User space tools can:
+>>>      ``node-id`` and ``error-id`` as parameters.
+>>>    * Clear specific error counters with the ``clear-error-counter`` command, using both
+>>>      ``node-id`` and ``error-id`` as parameters.
+>>> +* Subscribe to the ``error-report`` multicast group to receive ``error-event``.
+>>>    YAML-based Interface
+>>>    --------------------
+>>> @@ -111,3 +112,23 @@ Example: Clear an error counter for a given node
+>>>        sudo ynl --family drm_ras --do clear-error-counter --json '{"node-id":0, "error-id":1}'
+>>>        None
+>>> +
+>>> +Example: Subscribe to ``error-report`` multicast group
+>>> +
+>>> +.. code-block:: bash
+>>> +
+>>> +    sudo ynl --family drm_ras --output-json --subscribe error-report
+>>> +
+>>> +.. code-block:: json
+>>> +
+>>> +    {
+>>> +        "name": "error-event",
+>>> +        "msg": {
+>>> +            "device-name": "0000:03:00.0",
+>>> +            "node-id": 1,
+>>> +            "node-name": "uncorrectable-errors",
+>>> +            "error-id": 1,
+>>> +            "error-name": "error_name1",
+>>> +            "error-value": 1
+>>> +        }
+>>> +    }
+>>> diff --git a/Documentation/netlink/specs/drm_ras.yaml b/Documentation/netlink/specs/drm_ras.yaml
+>>> index e113056f8c01..8aed3d4515e5 100644
+>>> --- a/Documentation/netlink/specs/drm_ras.yaml
+>>> +++ b/Documentation/netlink/specs/drm_ras.yaml
+>>> @@ -69,6 +69,33 @@ attribute-sets:
+>>>            name: error-value
+>>>            type: u32
+>>>            doc: Current value of the requested error counter.
+>>> +  -
+>>> +    name: error-event-attrs
+>>> +    attributes:
+>>> +      -
+>>> +        name: device-name
+>>> +        type: string
+>>> +        doc: Device (PCI BDF, UUID) that reported the error.
+>>> +      -
+>>> +        name: node-id
+>>> +        type: u32
+>>> +        doc: ID of the node that reported the error.
+>>> +      -
+>>> +        name: node-name
+>>> +        type: string
+>>> +        doc: Name of the node that reported the error.
+>>> +      -
+>>> +        name: error-id
+>>> +        type: u32
+>>> +        doc: ID of the error counter.
+>>> +      -
+>>> +        name: error-name
+>>> +        type: string
+>>> +        doc: Name of the error.
+>>> +      -
+>>> +        name: error-value
+>>> +        type: u32
+>>> +        doc: Current value of the error counter.
+>>>    operations:
+>>>      list:
+>>> @@ -124,3 +151,24 @@ operations:
+>>>          do:
+>>>            request:
+>>>              attributes: *id-attrs
+>>> +    -
+>>> +      name: error-event
+>>> +      doc: >-
+>>> +           Report an error event to userspace.
+>>> +           The event includes the device, node and error information
+>>> +           of the error that triggered the event.
+>>> +      attribute-set: error-event-attrs
+>>> +      mcgrp: error-report
+>>> +      event:
+>>> +        attributes:
+>>> +          - device-name
+>>> +          - node-id
+>>> +          - node-name
+>>> +          - error-id
+>>> +          - error-name
+>>> +          - error-value
+>>> +
+>>> +mcast-groups:
+>>> +  list:
+>>> +    -
+>>> +      name: error-report
+>>> diff --git a/drivers/gpu/drm/drm_ras.c b/drivers/gpu/drm/drm_ras.c
+>>> index d6eab29a1394..77f912a4d101 100644
+>>> --- a/drivers/gpu/drm/drm_ras.c
+>>> +++ b/drivers/gpu/drm/drm_ras.c
+>>> @@ -41,6 +41,11 @@
+>>>     *    Userspace must provide Node ID, Error ID.
+>>>     *    Clears specific error counter of a node if supported.
+>>>     *
+>>> + * 4. ERROR_REPORT: Subscribe to this multicast group to receive error events
+>>> + *
+>>> + * 5. ERROR_EVENT: Report an error event to userspace. The event contains device, node
+>>> + *    and error information that triggered the event.
+>>> + *
+>>>     * Node registration:
+>>>     *
+>>>     * - drm_ras_node_register(): Registers a new node and assigns
+>>> @@ -186,6 +191,34 @@ static int msg_reply_value(struct sk_buff *msg, u32 error_id,
+>>>    			   value);
+>>>    }
+>>> +static int msg_put_error_event_attrs(struct sk_buff *msg, struct drm_ras_node *node,
+>>> +				     u32 error_id, const char *error_name, u32 value)
+>>> +{
+>>> +	int ret;
+>>> +
+>>> +	ret = nla_put_string(msg, DRM_RAS_A_ERROR_EVENT_ATTRS_DEVICE_NAME, node->device_name);
+>>> +	if (ret)
+>>> +		return ret;
+>>> +
+>>> +	ret = nla_put_u32(msg, DRM_RAS_A_ERROR_EVENT_ATTRS_NODE_ID, node->id);
+>>> +	if (ret)
+>>> +		return ret;
+>>> +
+>>> +	ret = nla_put_string(msg, DRM_RAS_A_ERROR_EVENT_ATTRS_NODE_NAME, node->node_name);
+>>> +	if (ret)
+>>> +		return ret;
+>>> +
+>>> +	ret = nla_put_u32(msg, DRM_RAS_A_ERROR_EVENT_ATTRS_ERROR_ID, error_id);
+>>> +	if (ret)
+>>> +		return ret;
+>>> +
+>>> +	ret = nla_put_string(msg, DRM_RAS_A_ERROR_EVENT_ATTRS_ERROR_NAME, error_name);
+>>> +	if (ret)
+>>> +		return ret;
+>>> +
+>>> +	return nla_put_u32(msg, DRM_RAS_A_ERROR_EVENT_ATTRS_ERROR_VALUE, value);
+>>> +}
+>>> +
+>>>    static int doit_reply_value(struct genl_info *info, u32 node_id,
+>>>    			    u32 error_id)
+>>>    {
+>>> @@ -222,6 +255,60 @@ static int doit_reply_value(struct genl_info *info, u32 node_id,
+>>>    	return genlmsg_reply(msg, info);
+>>>    }
+>>> +/**
+>>> + * drm_ras_nl_error_event() - Report an error event
+>>> + * @node: Node structure
+>>> + * @error_id: ID of the error
+>>> + * @error_name: Name of the error
+>>> + * @value: Value associated with the error
+>>> + * @flags: GFP flags for memory allocation
+>>> + *
+>>> + * Report an error-event to userspace using the error-report multicast group.
+>>> + *
+>>> + * Return: 0 on success, or negative errno on failure.
+>>> + */
+>>> +int drm_ras_nl_error_event(struct drm_ras_node *node, u32 error_id, const char *error_name,
+>>> +			   u32 value, gfp_t flags)
+>>> +{
+>>> +	struct genl_info info;
+>>> +	struct sk_buff *msg;
+>>> +	struct nlattr *hdr;
+>>> +	int ret;
+>>> +
+>>> +	if (!error_name)
+>>> +		return -EINVAL;
+>>> +
+>>> +	if (!genl_has_listeners(&drm_ras_nl_family, &init_net, DRM_RAS_NLGRP_ERROR_REPORT))
+>>> +		return 0;
+>>> +
+>>> +	genl_info_init_ntf(&info, &drm_ras_nl_family, DRM_RAS_CMD_ERROR_EVENT);
+>>> +
+>>> +	msg = genlmsg_new(NLMSG_GOODSIZE, flags);
+>>> +	if (!msg)
+>>> +		return -ENOMEM;
+>>> +
+>>> +	hdr = genlmsg_iput(msg, &info);
+>>> +	if (!hdr) {
+>>> +		ret = -EMSGSIZE;
+>>> +		goto free_msg;
+>>> +	}
+>>> +
+>>> +	ret = msg_put_error_event_attrs(msg, node, error_id, error_name, value);
+>>> +	if (ret)
+>>> +		goto cancel_msg;
+>>> +
+>>> +	genlmsg_end(msg, hdr);
+>>> +	genlmsg_multicast(&drm_ras_nl_family, msg, 0, DRM_RAS_NLGRP_ERROR_REPORT, flags);
+>>> +	return 0;
+>>> +
+>>> +cancel_msg:
+>>> +	genlmsg_cancel(msg, hdr);
+>>> +free_msg:
+>>> +	nlmsg_free(msg);
+>>> +	return ret;
+>>> +}
+>>> +EXPORT_SYMBOL(drm_ras_nl_error_event);
+>>> +
+>>>    /**
+>>>     * drm_ras_nl_get_error_counter_dumpit() - Dump all Error Counters
+>>>     * @skb: Netlink message buffer
+>>> diff --git a/drivers/gpu/drm/drm_ras_nl.c b/drivers/gpu/drm/drm_ras_nl.c
+>>> index dea1c1b2494e..9d3123cc9f9c 100644
+>>> --- a/drivers/gpu/drm/drm_ras_nl.c
+>>> +++ b/drivers/gpu/drm/drm_ras_nl.c
+>>> @@ -58,6 +58,10 @@ static const struct genl_split_ops drm_ras_nl_ops[] = {
+>>>    	},
+>>>    };
+>>> +static const struct genl_multicast_group drm_ras_nl_mcgrps[] = {
+>>> +	[DRM_RAS_NLGRP_ERROR_REPORT] = { "error-report", },
+>>> +};
+>>> +
+>>>    struct genl_family drm_ras_nl_family __ro_after_init = {
+>>>    	.name		= DRM_RAS_FAMILY_NAME,
+>>>    	.version	= DRM_RAS_FAMILY_VERSION,
+>>> @@ -66,4 +70,6 @@ struct genl_family drm_ras_nl_family __ro_after_init = {
+>>>    	.module		= THIS_MODULE,
+>>>    	.split_ops	= drm_ras_nl_ops,
+>>>    	.n_split_ops	= ARRAY_SIZE(drm_ras_nl_ops),
+>>> +	.mcgrps		= drm_ras_nl_mcgrps,
+>>> +	.n_mcgrps	= ARRAY_SIZE(drm_ras_nl_mcgrps),
+>>>    };
+>>> diff --git a/drivers/gpu/drm/drm_ras_nl.h b/drivers/gpu/drm/drm_ras_nl.h
+>>> index a398643572a5..03ec275aca92 100644
+>>> --- a/drivers/gpu/drm/drm_ras_nl.h
+>>> +++ b/drivers/gpu/drm/drm_ras_nl.h
+>>> @@ -21,6 +21,10 @@ int drm_ras_nl_get_error_counter_dumpit(struct sk_buff *skb,
+>>>    int drm_ras_nl_clear_error_counter_doit(struct sk_buff *skb,
+>>>    					struct genl_info *info);
+>>> +enum {
+>>> +	DRM_RAS_NLGRP_ERROR_REPORT,
+>>> +};
+>>> +
+>>>    extern struct genl_family drm_ras_nl_family;
+>>>    #endif /* _LINUX_DRM_RAS_GEN_H */
+>>> diff --git a/include/drm/drm_ras.h b/include/drm/drm_ras.h
+>>> index 0beede3ddc4e..8abfb7d2077b 100644
+>>> --- a/include/drm/drm_ras.h
+>>> +++ b/include/drm/drm_ras.h
+>>> @@ -80,9 +80,14 @@ struct drm_device;
+>>>    #if IS_ENABLED(CONFIG_DRM_RAS)
+>>>    int drm_ras_node_register(struct drm_ras_node *node);
+>>>    void drm_ras_node_unregister(struct drm_ras_node *node);
+>>> +int drm_ras_nl_error_event(struct drm_ras_node *node, u32 error_id, const char *error_name,
+>>> +			   u32 value, gfp_t flags);
+>>>    #else
+>>>    static inline int drm_ras_node_register(struct drm_ras_node *node) { return 0; }
+>>>    static inline void drm_ras_node_unregister(struct drm_ras_node *node) { }
+>>> +static inline int drm_ras_nl_error_event(struct drm_ras_node *node, u32 error_id,
+>>> +					 const char *error_name, u32 value, gfp_t flags)
+>>> +{ return 0; }
+>>>    #endif
+>>>    #endif
+>>> diff --git a/include/uapi/drm/drm_ras.h b/include/uapi/drm/drm_ras.h
+>>> index 218a3ee86805..eab8231aa87c 100644
+>>> --- a/include/uapi/drm/drm_ras.h
+>>> +++ b/include/uapi/drm/drm_ras.h
+>>> @@ -38,13 +38,28 @@ enum {
+>>>    	DRM_RAS_A_ERROR_COUNTER_ATTRS_MAX = (__DRM_RAS_A_ERROR_COUNTER_ATTRS_MAX - 1)
+>>>    };
+>>> +enum {
+>>> +	DRM_RAS_A_ERROR_EVENT_ATTRS_DEVICE_NAME = 1,
+>>> +	DRM_RAS_A_ERROR_EVENT_ATTRS_NODE_ID,
+>>> +	DRM_RAS_A_ERROR_EVENT_ATTRS_NODE_NAME,
+>>> +	DRM_RAS_A_ERROR_EVENT_ATTRS_ERROR_ID,
+>>> +	DRM_RAS_A_ERROR_EVENT_ATTRS_ERROR_NAME,
+>>> +	DRM_RAS_A_ERROR_EVENT_ATTRS_ERROR_VALUE,
+>>> +
+>>> +	__DRM_RAS_A_ERROR_EVENT_ATTRS_MAX,
+>>> +	DRM_RAS_A_ERROR_EVENT_ATTRS_MAX = (__DRM_RAS_A_ERROR_EVENT_ATTRS_MAX - 1)
+>>> +};
+>>> +
+>>>    enum {
+>>>    	DRM_RAS_CMD_LIST_NODES = 1,
+>>>    	DRM_RAS_CMD_GET_ERROR_COUNTER,
+>>>    	DRM_RAS_CMD_CLEAR_ERROR_COUNTER,
+>>> +	DRM_RAS_CMD_ERROR_EVENT,
+>>>    	__DRM_RAS_CMD_MAX,
+>>>    	DRM_RAS_CMD_MAX = (__DRM_RAS_CMD_MAX - 1)
+>>>    };
+>>> +#define DRM_RAS_MCGRP_ERROR_REPORT	"error-report"
+>>> +
+>>>    #endif /* _UAPI_LINUX_DRM_RAS_H */
 
