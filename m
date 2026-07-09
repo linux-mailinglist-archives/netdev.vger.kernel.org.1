@@ -1,126 +1,126 @@
-Return-Path: <netdev+bounces-306053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306054-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id PeN6FHxBT2rpcwIAu9opvQ
-	(envelope-from <netdev+bounces-306053-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 08:36:44 +0200
+	id JeuZHbtCT2pEdAIAu9opvQ
+	(envelope-from <netdev+bounces-306054-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 08:42:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A2CC72D39B
-	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 08:36:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C460072D45C
+	for <lists+netdev@lfdr.de>; Thu, 09 Jul 2026 08:42:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=est.tech header.s=selector1 header.b=cNcWthWs;
+	dkim=pass header.d=est.tech header.s=selector1 header.b=IQQwzEZB;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306053-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306053-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306054-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306054-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 868D03049FC6
-	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 06:33:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0F0403005793
+	for <lists+netdev@lfdr.de>; Thu,  9 Jul 2026 06:36:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 069853D3CE2;
-	Thu,  9 Jul 2026 06:33:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E84B3D6662;
+	Thu,  9 Jul 2026 06:36:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013005.outbound.protection.outlook.com [40.107.162.5])
+Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013034.outbound.protection.outlook.com [52.101.83.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C4E13D3D0C
-	for <netdev@vger.kernel.org>; Thu,  9 Jul 2026 06:33:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804A93D3D18;
+	Thu,  9 Jul 2026 06:36:52 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783578820; cv=fail; b=DiQ3oQkDt6sjpKGsYrab4WDIT2gHKL6ag99Mt+1nB0/IZLz5JZ/bT7lylIW0TEAkOZaqWn0ohRO3Vk1wz1q91tJgD8mswS3ysg/r3iIc5sRzBOxyPVI49FEuyP1yQasCRkEMzLo9sx6oqCQgi8YheffLtSO3SEa7hzIkCwI1+wU=
+	t=1783579015; cv=fail; b=FmQUxfF2JKbTNR+L0PiWhdOJswmvPt4MTs2L5m4AsT0/ykIgD6nd2fN/2WqOqjywzD1GiUySMH3Gnq1U2J9tzKTqtgazVVb69lrv/v9TNT9W7JKrGAr7Z6S5Qa/xPPwSMCxTN1ra9IQ0MuHLrMJsoiH4kYQ/FHRD/G/qCJQkXhM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783578820; c=relaxed/simple;
-	bh=j8uBsNQ4+qJpHPHVOXv+VfaoRNACsHsCEQQ0g4b3OK0=;
+	s=arc-20240116; t=1783579015; c=relaxed/simple;
+	bh=L0b4HPjuyp0Sx7T3p7iSrPy+hj6DWcULvGmlDpU4pOQ=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=YWCGTsISF0uBB2fhJdUVnesnRWTJWOFDAvvgpNo5tsT7H3f0GHtW3JKV+18kzCqdhxcyHmaatFzRIoreeZEG4435twA3RLwTbDycKLt4pOWQTTxOTPcFcmNYEFV6dR7om0AtFkTt2DtkRfnBwwILfiotFwNvpApBk06vRgEbtcY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=cNcWthWs; arc=fail smtp.client-ip=40.107.162.5
+	 Content-Type:MIME-Version; b=l6jIbanZXcFAsI/s632G2hn4Qsjqa1jVzNwCtcGzMwJBG4ofx1iQxXadfQK3lfqZmyiMNucBGMX+fYcjuZZt0ajxGyNa8RqcXzVhZptzb8CBi85Q0LBJ1jP2e/wyegDtLQ7owTcafMceA/rsghC8rAQvJ4u0qloN9k8IPisLeME=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=IQQwzEZB; arc=fail smtp.client-ip=52.101.83.34
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Fofvni7WgsdI6ibj7Xf/QHWVwxkQIybAvtx5bwk9gO3eBNyeDKhH17BnPQUuytEvmhMG31OBgjyeEjeCShE/QK/p3ETx8eE7mbiIQ1/1X6Ua8aQdHRSBgmPg5liIYAbuSHmYJRq+4dsBLXZlL1A/RngUC5gNQkFwBwQT/uh4T6F0OJnsERMgNa1K0uo2DIQd7i7chndGVdK8jv/gt4ndlglUfQT+cQi7jboMm+4Tiq4cYBOK0AirDAw3RC3pmEX7aUxoT0+glqWdnYfXN25i33pL5PUPtCjS4MI0bxeQn09fj9dNO+Dji8us4UQo5zTF0jI8JIqfTsT+6Ynxp+qvYA==
+ b=nug/tFAxTTnFoZdkhsmzsbWKoD66qaIAr3h2nzKzKGPNulm4Q8q3BXsSvMIknryk0zBHw/AsiGqTTRQnAtdcUezt9Zi+5z3WAEWKLx8bSHmqgroada0H/jqCaCu1ukegDU1xYu28fI5/6XTbcQnNpEmVDqUxp8bBYKjMS7W3fg50F5IF8q0dFvAYIbxT97rutE2GC4V773oo+vP/Sy3TOlu6V37qyl8stGWx0Mkzqj7sdMSYSEvSYWLGme6ZtzI4laJLVJS7SmFUKD1WvfwTRTzlYrhMWK5a4yjW3yupke4hhdFOCsd0udOG7qALLyrN7XSwkVA6ydwa6p5dGcqlzg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8F7Myo7urtcGekxwwq/I3yeJtCGE+HnL1UklTquj6OE=;
- b=TIy0+dpAjHMKXZY42zjbMg8fHjT+/IPlgSQ/Szrl6GTZxyJS5IUytryZlIwTv9vgwUVRp+SDNBmJth2nfKgqVVVPkUuEGd1XPytuQL4lnuTP28Donivd+b2jKJpTnJe2SCf/3wSYTGwDRDu7gbM9rFLNLfkO2lrxRixo1Vlyi7hAeWNLd0z1LX8AXnak50jTPmrJir84KOfo4cgxhYZc6R9nLHbmnF75GrsBUFE7flIikTv/G87BonXyocdMuMtUDJGFTcHPvWe3F8vI0TcUbgdjkqyHcAK4vd9bI+sJ02VphuBKrAFu71zVttzmpVR8yZgZ1zRRCTVV2MNtvCbgkw==
+ bh=+1QJvi9GFrfMSa/cYbwqeFQTpj+rk9uBEBKosJE8TsI=;
+ b=Ecw2+8kLUcyOVMdyPoVZPTp++JvLlPW/vOWsZ+IFrNmircL87gn3NHPo65iKurXagCh693r1Lhib0c11vWSjmcvsYdrytyyMJJAlj+omi9rIPLcSry4wbpqzEpYgCY/XKfgacuCXcvO0Roaozo7Whwr4DA6UQN7/FRT/TpGV2hclMPDaq1MGW4khGKB0wd9SLlNovTqousu27XQDwhNR1LyjWuFDvH1x7kvY5ScikIECoss+32fx6gJqEDLWiIkK6+QrluvuGT0MTUwTKnV85QG1LkSTJHWIYD/TEMVztZqAnG6wJy1EuaIRHdhf+lGe3lLaAdWp7AIo84ejHsyVpQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
  dkim=pass header.d=est.tech; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8F7Myo7urtcGekxwwq/I3yeJtCGE+HnL1UklTquj6OE=;
- b=cNcWthWsYKRxuW92PAS/FBgRL7lYomVwtiRYxV5txC2QTiTueXtljyiW9hEXfgTI72fyVmZSpCm8V0I5d8FH+7t6cpC9+6VeE1KNJ93Jtb1gbtOi5QGn4kk5gqBosre0mK2tUtMii8cKP2sHS8jTkzOaYg3GJa/9SxlOz53ZTTnusQb8lQB+55G9G2OxcZ9NAkG0SGfsU3Ckl2ljRp6kN7QtarjpDnRvNdwBLtNcCYjcJ62GqummxMvcJ8CjC28hI/3BboWje37KGrrkvaioT5Ws+J2DHjIbz3FiNCr6RBAoPh0sSCgx/HBN3dF8z/L3asPWFSg1ZaSypWDHxeBgBw==
+ bh=+1QJvi9GFrfMSa/cYbwqeFQTpj+rk9uBEBKosJE8TsI=;
+ b=IQQwzEZB9UNe2qNmBDHWqdBYJC3NhFhbBiDqpFTCJuCPUcJFoWIAbdDkDrcAVe/dYYeXiiXVDfGYX0scTtZCQr7LSHjz44yAUzE3iLM6Fif0gW+OkYg1oPshr5sa3MCNF/He/YfIljaiwDLdisOTzNaYUaqsj4u6hfRv1Jk8up8pCTpPCY8MX7JVZ1GPobnhXhuGVLtI/wmlQZwHljUGM+23AHwwQ1eOqlNv/SBo9IawncI33lYmRBy4BqM4KMIS0S1V7sCaAIm+xeSDGDLe9orcRSOC2DPiFDSm9+8iMH7a/BLcs9q2vIAN3+Af9VXiEplmbQxsv289sNMfXI9SGg==
 Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
- AS4P189MB2134.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:519::8) with Microsoft
+ VI0P189MB2765.EURP189.PROD.OUTLOOK.COM (2603:10a6:800:253::19) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.181.11; Thu, 9 Jul 2026 06:33:34 +0000
+ 15.21.181.10; Thu, 9 Jul 2026 06:36:46 +0000
 Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
  ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
  ([fe80::bfff:5391:8a49:21b7%6]) with mapi id 15.21.0181.010; Thu, 9 Jul 2026
- 06:33:33 +0000
+ 06:36:46 +0000
 From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
 To: Weiming Shi <bestswngs@gmail.com>
 CC: Xiang Mei <xmei5@asu.edu>, "netdev@vger.kernel.org"
 	<netdev@vger.kernel.org>, "tipc-discussion@lists.sourceforge.net"
-	<tipc-discussion@lists.sourceforge.net>, Jon Maloy <jmaloy@redhat.com>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "David S . Miller" <davem@davemloft.net>, Simon Horman
+	<tipc-discussion@lists.sourceforge.net>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, Jon Maloy <jmaloy@redhat.com>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
 	<horms@kernel.org>
-Subject: RE: [PATCH net] tipc: guard against empty buffer list in
- tipc_node_xmit()
-Thread-Topic: [PATCH net] tipc: guard against empty buffer list in
- tipc_node_xmit()
-Thread-Index: AQHdDvgRr26QDNc4+0aHW85v4iB7BLZkui5g
-Date: Thu, 9 Jul 2026 06:33:33 +0000
+Subject: RE: [PATCH net] tipc: fix NULL deref in tipc_lxc_xmit() on node up
+Thread-Topic: [PATCH net] tipc: fix NULL deref in tipc_lxc_xmit() on node up
+Thread-Index: AQHdDv/rRKGZNvCCMUWwNzY1DQG3/7Zku75A
+Date: Thu, 9 Jul 2026 06:36:45 +0000
 Message-ID:
- <GV1P189MB1988683F0940A1DC37094256C6FE2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-References: <20260708161324.2954113-2-bestswngs@gmail.com>
-In-Reply-To: <20260708161324.2954113-2-bestswngs@gmail.com>
+ <GV1P189MB19889F69294F168C74685630C6FE2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+References: <20260708173052.2973990-3-bestswngs@gmail.com>
+In-Reply-To: <20260708173052.2973990-3-bestswngs@gmail.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach:
 X-MS-TNEF-Correlator:
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: GV1P189MB1988:EE_|AS4P189MB2134:EE_
-x-ms-office365-filtering-correlation-id: 4cdda995-51a5-4fb8-9482-08dedd83ffbe
+x-ms-traffictypediagnostic: GV1P189MB1988:EE_|VI0P189MB2765:EE_
+x-ms-office365-filtering-correlation-id: f8ce432c-bda4-46af-187c-08dedd84728b
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|366016|23010399003|1800799024|376014|56012099006|6133799003|11063799006|18002099003|22082099003|38070700021;
+ BCL:0;ARA:13230040|376014|1800799024|23010399003|7416014|366016|38070700021|22082099003|56012099006|11063799006|5023799004|18002099003|6133799003;
 x-microsoft-antispam-message-info:
- EbQehTNpym+v2RGMdWGvR6d0edOnWkf/wdOBARDB+rxEmeZceZdxohawC1XD73XHBCWmuOB5M/vGPbVCqz++W83TrKLy2BxtfcAsnZVCFEXr8LZjLfmPailQaQQYLg8SiB2t9KH8VKKB1yrRGBNYGtc0M+XSVWLwyT8mWSfB2mtVjfVWqVX3Aazg94jBUW8pJyMeHMovxBQEOANjhQVjyCxziwPruz8pHVzFnoahmxKJWGgrCM/zNiqD8cnT6Qi9070zNRkiBfGKaOmrWGSefzMdxuasd/QWhI6CD5WrE7xQQVz83J0iQxGH2rk+x9cCDvpDCocu1kl5xbO6R9SIUjjeUBU5ubuLuyCIyC4CS56p8M5yTWfHwx/607wHQ4p+H1ApjLvnEoSUMcDS2pfqKfuP/o5G7BhWrizA7DRRiN1RmX/QfF1IktXQToZA8bBBztsN/8l1lnqcbzLnaRI+OvUGMLCrGXPZ1YM4fwvwar7xGHrh0kvc1Qnrgk6j92cLa69YOwWUXVcL+4OXmSiXUOfbwg/0XEIrxq9Xpf2op3SoiDFsZ0koS36sAUIvWeo6ZsiVUuSjDZb4860+jUwsiIgeCFuk0wgdGdsfNxxBQaWWOH7+N4j0RMQlqRHOSWur7zuuhX1I/31RrWiO0gr3VyU5mrdfRC2x/w5KtkWy5EnkgdsyTohXm7XZGV6vy/E4SzFIRcD07+Q2PzRhUq+dBmYQEdJ69rHiNkOkcmERx3Q=
+ b3vYqZ/zXaFj/msUkuQqam7roEnQ9Ox9cYbCvMd8cUA9caMjaAosmdqheNMo357OLcYGC7rqCxXkYnmO3IYOoXL/u0IdspPWk35s2XmPt6sCKupOzonR2rej/x6jny5442a6jUsqIgGebNMeDgwQschRiSvgYL4qgzqiO75ACez2W/rUBdpZYkFVwTH0nEbYbyarCwoVcjCLVQakfTpbpdUiFm73tdIKxpgGZYINr9hi8HAcVo5Dg70Ja3YkLGv7DBLG0j5uy3uTJrytrxui95zLKFMQdXRMCL+eEjNLeCueRcMoTmXsLJSDaOfuVV2T0WNOir0aazVuPolRYdq6B9Wp6klWh2PYd8+1kSan6kB1DlLTIIfzJxGYWMdNghIWeMO0CSM5b9cmoE+DJsZibltJ7JlkLEh3+Cpk5E9GhTv0QUbnod9cSNjPSnL55DswN+Z/AX7B3jFoTyN3puiJQUtFt7x7/6+/X+LOjw8NvBZB8Z3X2463Lb64bnTrOOL7/0pzNMmOLvG7nBs41SRzkQYZCSZfhdy6ztX+iGs1cSFSl7ytxqqxUDWanoqkE1g0GRHnTpSQKCXWyKhMLKkKakJxkeaSLn5rNsY+no+fGTohBtxRKOW5lFjDjLnP6k3RjJzvL2hJnnFyQawALsxn0KxLM6dOTPulL87gPU/aXnQZiBADx7F9MZ8PUVfM6sg7qJx+t0ik1BZB3c81YysaweBXqoE1HdzarMjKQaRsW6s=
 x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(23010399003)(1800799024)(376014)(56012099006)(6133799003)(11063799006)(18002099003)(22082099003)(38070700021);DIR:OUT;SFP:1101;
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(23010399003)(7416014)(366016)(38070700021)(22082099003)(56012099006)(11063799006)(5023799004)(18002099003)(6133799003);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
 x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?iAfggH+TC+nCLj4gGvSSS1gw9rttm1JZSuIqvEnKx1hUMaToZHZ+PBkf+Nca?=
- =?us-ascii?Q?y1WO4tDIYqJP3fB8UmO6vCXh7OCyYHyR5jR5ri0hleSyRXClbWppH9YHvjZ9?=
- =?us-ascii?Q?ie+PXwdbjfRh6g3J98mAD0pmiR1HBhsohcNAKJgt+ljwAf5hoZOo9+V7kRZ2?=
- =?us-ascii?Q?VpuhOZgEymV9gc25xniKXONBWeGx7qzEpt/yW4yUOiuE8WxED/7l5FclvTtV?=
- =?us-ascii?Q?qNRm7YZgPKxyvFnwSGFYkC+8vwTKsjqjyVJBvEj/tyoDb60061LYoVeOhuyy?=
- =?us-ascii?Q?HJu+vFnAsXTt8sSa/HkyKDRuAMxHotDJzYI4x45tLYIWNd8ptTFJ4bVVP94P?=
- =?us-ascii?Q?Kf6C2E2iaFUCQsoukn2KMINYrVzya/tA+WdWsNaFySmU4LEGtnJ2qq5YKLKF?=
- =?us-ascii?Q?uZ0MXFEczduYzBehoqL9pCKek7+TO5eFTCcmvL1vMd8P10SXSWpPqY/qG2F/?=
- =?us-ascii?Q?9sxKrcTPcUbuqf6sEIgS2VfLvElFI35WNlFcU1si3F6hJcPQVJZJel+kaxPZ?=
- =?us-ascii?Q?gMfa1Poymv3tzBNOBekbWYIUSPnYJHaGeO9kzSOdagonxcWGHAkyTr5iowFb?=
- =?us-ascii?Q?FxdgJxJ+BOlo3ea8NZo/DGLW1napnBPc0EXLk4hXe51GurVUn2K2n6J1xkL6?=
- =?us-ascii?Q?tYQtCr5JV2HuSfi6mTANwQu693tl2gcJSR2HTrDRBH0kDVwYEZLP1IcLAD7w?=
- =?us-ascii?Q?IdLwR7kN+Kb4oDfBs++GhhRsj1D/sUyiBfypsS7peJKog8Qs9RmPbMmLFpMb?=
- =?us-ascii?Q?jgBJSUFkdm0sDXd5j4slLduM/+VrKrNOB8YSrHvnbmARw3wgH/jyyezvUYa1?=
- =?us-ascii?Q?Qyq7UMvr/NYUMjDj3jGzIJDhDF/+himeAtTEwXqLgWOuRKbbuwC+IkBujxPP?=
- =?us-ascii?Q?r0xSXE4JcItpAqqsTU97jRCOjr/B1j/IjfY9rS+124AP2tu97q2T2RjQL06a?=
- =?us-ascii?Q?rfv5EFGiObFmawx0wfSPtN38k8k5fqwsIPvzbLYB3DjWIs/es9pn7+3A0d+p?=
- =?us-ascii?Q?/B1Ae4ONKqDSzCmjBHE67yBf/tFq3OMrWS2O/CgfA2hpo4kF9CCrMu3luAxa?=
- =?us-ascii?Q?oydeT6AdurxN9y/j9hASHAo+vx5SrZoqYX66cS3jpXsnGo/VdeHiWQ4yv5lc?=
- =?us-ascii?Q?SlHC2k0iTaX5KKeY/TFK3fxeLL+lrHxPwyN8FLC7XBy7f6RqwZLmPRhGsdmF?=
- =?us-ascii?Q?+7lQ3Ix+qJPCd8+Q4+/FccWrAL1PbxqXoBDJ4JVlY5SKjrghGYW1oMn8NpWG?=
- =?us-ascii?Q?g4/Hesh8gsdOKy9E/dfl704rItH3VGBlHFxhoWq5FP0cmQFk2tkoWyqcdjiZ?=
- =?us-ascii?Q?R48/fGAwa1hHvsa1htf5J01DKYm0179WWzN3W6egmZwV7NeAHr0MY0YKTcKq?=
- =?us-ascii?Q?ynAeYsOiBP1XgZGrVaoqdQLvhcT+pKxTN6TnIgZ57SXcIvLtyjySmTND4YyU?=
- =?us-ascii?Q?V5D6vbYjmvM3BzfAPmXjEmNzWYoNQo57BpMBysyJmiC5GfMZV8a+LrNWAP34?=
- =?us-ascii?Q?Z+2lbt18D/xP7ytGBMkDbmfEzPpRFWZ6WH5RbbM1bMcJYRZU5kUv4aMThgDE?=
- =?us-ascii?Q?inSi/ugylRqIdf1DCMPJcsDvK79emUv4VFybhXtG93jIU6ohcpJ/LB6i0Ovn?=
- =?us-ascii?Q?qEuzklcjv6t5Vj9G3b9Pae8Ye6YB857Hq6VnRHEhGYs7PUq59LjMPJMTdYOi?=
- =?us-ascii?Q?OXbJsi065HEXeENwYz6jW5lTwSUBsdcoJhzUzvwUGLgIH1ODQUpw+XNE6n/c?=
- =?us-ascii?Q?3PnN8ZmmXQ=3D=3D?=
+ =?us-ascii?Q?GufcIW4GFrCvh9xWcF9V4N8JWLcQv9m8NEv/UXvXuc58xHgw57R9zzdxAcH1?=
+ =?us-ascii?Q?WcDnnx3Afqf0MjrAJa07yjAsoEC4eSsnSKm15IeRvplggQFn3jQpuDHj6XH7?=
+ =?us-ascii?Q?y5LfxDrsicXxqs9IdfBu8a+KfAc3zG+ZH8jzLkNhFrbG/riqWomBfym+9LWK?=
+ =?us-ascii?Q?UpHBJEBmpBh3KubPYa76t8r9KVl5W2GOktZyzPwWx3KwY4xIZkwpZt2UebA0?=
+ =?us-ascii?Q?jT8YfOtY0eaUixnccrryF1bI5EaJIjs/mKQvCztj/1A2Wtp0TovihVu2sHED?=
+ =?us-ascii?Q?ZrNFQlY6DV1+IgN+QzSmRWEuYtQu5MIYY+LSb7pCv1oBDquJEVBxc97+N7/7?=
+ =?us-ascii?Q?tqzvieqlRxHTzvY89buGzxZ+5vnnqcRO5Fu46P2ixaN37ewbXcJoJUHvd9b/?=
+ =?us-ascii?Q?awXfvxRvchdmk8sqC/ryM69rqt1zXCfVl16M9HP8NKWDB/JZxl5c3jKcsWDm?=
+ =?us-ascii?Q?3hWoI2XdXiqhGAKGglLdc5nl+bhGOVtXw+csZotzRJeIfi/bjP2zr14e6A2v?=
+ =?us-ascii?Q?IeHO1DBRUWKK+qG8cOg/1Tj9P/5aPMBqUNdx/Z/DD4JD3rbdeXNxHwWC/c+r?=
+ =?us-ascii?Q?NwbDd1bbdWpibrCIFVEf2kov7pf5E3xkUKK5H9Azr4/po8FQNSCa1w4u7xXR?=
+ =?us-ascii?Q?i3OKeuLGFrmmH9n+9vzeWhpeSYpG/5EftO9Pz5J3sTtqBCElEKZcWalLm1Yg?=
+ =?us-ascii?Q?ygMi8mqXzwyXZSa7uEu5/bViFKoB1QJZukD3LORUvw/5b0CI/bjAjxZKRBXf?=
+ =?us-ascii?Q?njEzpb+A4gkjsUUjM9QEKzLKoMMZOthJrX86l3lRioLgsU+zHysO+EEQNXS2?=
+ =?us-ascii?Q?XeolX+zlz2w1PExINhFezJoIEzfDwftrd1uwm0pDSq72VZDsboo1T65MBqbg?=
+ =?us-ascii?Q?UsekguJlFA3qBxi8JxO+0AzdDdAfTMb+g3ix4ujG4a1Xn4tRDo3DBfHNmv+a?=
+ =?us-ascii?Q?Ip2mQ4Ra7YL+NcVP5rsNADJHnhKmBEY1RhE4vcjlaxT9a+xo5LO+9UpTR81w?=
+ =?us-ascii?Q?hx05oOi4gwlW/g9vcZ6+GfpQ7hzt5Hvn9vnZ/TLRL9uQoaCAoAcZrVh8goCf?=
+ =?us-ascii?Q?3tnIPxcZgzF8MUCH7SJ8ZWM1JyqqFyYMoB5r7UljCTerpUz5+i9aSxKoTqBH?=
+ =?us-ascii?Q?Ua/v1NIpf5JIsvIt2OPt5Vq6wG6h6BYqcASB9u6BzCbMkKbqvt/MRipXbg1A?=
+ =?us-ascii?Q?2N//DZHpYtNFFqzT7IuxGP7cGoDki1I1r/YNQD78zhsHIRfhu4Iecs3ZJi3K?=
+ =?us-ascii?Q?0ZzqV66e8QSKNPViu7ILif9Yw5y1HIUGf4xklfwRp8bzwzHgVmn2sV5h8CsA?=
+ =?us-ascii?Q?j7ZKjAguL2BAMDlxWh8f4XG6I8xzDlmicD2jZUlerRA/sKVhoKhrN/qvRfDn?=
+ =?us-ascii?Q?1rEw0mzXv1SccOo19mtwGZBSNBeQFAkKRTueE1x/jU3iQHJ0hJK5E0mJtgzx?=
+ =?us-ascii?Q?U1xW+eXgWigepETtBeBtIZ7xDQbcve5oEki7c2eznC6saBuUNLfYikP08NP+?=
+ =?us-ascii?Q?YvZclR95ThWiffDXLHKUW7owYzKR8Tzto5zWSdpzT50MqO3orIrOl9h8j7qh?=
+ =?us-ascii?Q?QPbN8QxLlPQXqiKCs5aE+KHkZiVuu1hvImtDpzG7s5zo//AwZwq2jZeL8qCc?=
+ =?us-ascii?Q?H/Ijd3bhoTCd9SxLP/w4KePZBPnnqBqEZR6rF9LQzhz2ynVs8E2EqtFQRGnh?=
+ =?us-ascii?Q?sAAntWZd+GiV1Z2vshKsM0TmBs/fOKFMA/gC/EDUh6cTroSDsO8iCXsERsR6?=
+ =?us-ascii?Q?6zdNkS+qAQ=3D=3D?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -132,122 +132,119 @@ MIME-Version: 1.0
 X-OriginatorOrg: est.tech
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4cdda995-51a5-4fb8-9482-08dedd83ffbe
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jul 2026 06:33:33.3131
+X-MS-Exchange-CrossTenant-Network-Message-Id: f8ce432c-bda4-46af-187c-08dedd84728b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jul 2026 06:36:45.9962
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4KbK/B4I/FK9dfdS7BFU/rdIPD6ZsH9rnLFLHR+uGtGSzsHo613CCNfAcH3ZKcYXWrQ7j12eYhFcGbnhRYB5Wd19XzD+q2sKG2Yn6i4i8dA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4P189MB2134
+X-MS-Exchange-CrossTenant-userprincipalname: Omy0n7VPg9DSuHzdeP58IvsNE41hGiLI4ApdnoEBHdqOydcGqaRklHhLF+o4/4BmE5ENoEMAveKfpOlIbBoQuh8bRvQPexvi8kAE9iBYYbM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0P189MB2765
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.34 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:bestswngs@gmail.com,m:xmei5@asu.edu,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:jmaloy@redhat.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:horms@kernel.org,s:lists@lfdr.de];
 	DMARC_NA(0.00)[est.tech];
+	FORGED_RECIPIENTS(0.00)[m:bestswngs@gmail.com,m:xmei5@asu.edu,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,s:lists@lfdr.de];
 	FREEMAIL_TO(0.00)[gmail.com];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-306054-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306053-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[est.tech:+];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,GV1P189MB1988.EURP189.PROD.OUTLOOK.COM:mid,asu.edu:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,GV1P189MB1988.EURP189.PROD.OUTLOOK.COM:mid,asu.edu:email,vger.kernel.org:from_smtp,est.tech:from_mime,est.tech:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9A2CC72D39B
+X-Rspamd-Queue-Id: C460072D45C
 
->Subject: [PATCH net] tipc: guard against empty buffer list in tipc_node_xm=
-it()
+>Subject: [PATCH net] tipc: fix NULL deref in tipc_lxc_xmit() on node up
 >
->tipc_node_xmit() dispatches a buffer list either to the bearer path via
->tipc_link_xmit() or, when the destination node lives in a sibling network
->namespace on the same host (n->peer_net set), to tipc_lxc_xmit(). The bear=
-er
->path returns early on an empty list, but tipc_node_xmit() does not, and
->tipc_lxc_xmit() dereferences the first buffer without checking:
+>tipc_named_node_up() builds a bulk of this node's cluster-scope service
+>bindings for a peer that just came up and sends it with tipc_node_xmit().
+>When cluster_scope is empty the bulk is an empty skb chain, and both
+>consumers dereference the head unconditionally: named_distribute() reads
+>buf_msg(skb_peek_tail(list)) to tag the last message, and for a same-host =
+peer
+>tipc_node_xmit() routes into tipc_lxc_xmit(), which reads
+>buf_msg(skb_peek(list)). skb_peek*() returns NULL on an empty chain, so
+>buf_msg(NULL) faults.
 >
->	struct tipc_msg *hdr =3D buf_msg(skb_peek(list));
+>cluster_scope is legitimately empty during the window in
+>tipc_net_finalize() between setting the node address, after which peers ca=
+n
+>link up and trigger tipc_named_node_up(), and tipc_nametbl_publish()
+>inserting the first self-binding. A peer linking in that window crashes th=
+e node.
+>It is reachable by an unprivileged user, who can gain CAP_NET_ADMIN in a
+>private net namespace and drive TIPC there.
 >
->named_distribute() can hand tipc_node_xmit() an empty list. It bails out e=
-arly
->when named_prepare_buf() fails its GFP_ATOMIC allocation, leaving the queu=
-e
->empty, and tipc_named_node_up() then calls tipc_node_xmit() on it
->unconditionally. On the intra-host container path skb_peek() returns NULL =
-and
->msg_user() reads through it.
+> Oops: general protection fault, probably for non-canonical address
+> KASAN: null-ptr-deref in range [0x00000000000000d8-0x00000000000000df]
+> RIP: 0010:tipc_lxc_xmit (net/tipc/node.c:1629 net/tipc/msg.h:202)
+>  tipc_node_xmit (net/tipc/node.c:1718)
+>  tipc_named_node_up (net/tipc/name_distr.c:222)
+>  tipc_node_write_unlock (net/tipc/node.c:428)
+>  tipc_rcv (net/tipc/node.c:2185)
+>  tipc_l2_rcv_msg (net/tipc/bearer.c:669)
 >
->The TIPC configuration ops are flagged GENL_UNS_ADMIN_PERM, so an
->unprivileged user can reach this via
->unshare(CLONE_NEWUSER|CLONE_NEWNET).
+>Skip the distribution when cluster_scope is empty; an empty bulk carries n=
+o
+>bindings, so not sending it changes nothing.
 >
->  Oops: general protection fault, probably for non-canonical address
->0xdffffc000000001b
->  KASAN: null-ptr-deref in range [0x00000000000000d8-0x00000000000000df]
->  CPU: 0 Comm: ksoftirqd/0
->  RIP: 0010:tipc_lxc_xmit (net/tipc/msg.h:202 net/tipc/node.c:1629)
->  Call Trace:
->   tipc_node_xmit (net/tipc/node.c:1721)
->   tipc_named_node_up (net/tipc/name_distr.c:223)
->   tipc_node_write_unlock (net/tipc/node.c:428)
->   tipc_rcv (net/tipc/node.c:2189)
->   tipc_l2_rcv_msg (net/tipc/bearer.c:670)
->
->Return early from tipc_node_xmit() when the list is empty.
->
->Fixes: f73b12812a3d ("tipc: improve throughput between nodes in netns")
+>Fixes: cad2929dc432 ("tipc: update a binding service via broadcast")
 >Reported-by: Xiang Mei <xmei5@asu.edu>
 >Assisted-by: Claude:claude-opus-4-8
+>Cc: stable@vger.kernel.org
 >Signed-off-by: Weiming Shi <bestswngs@gmail.com>
 >---
-> net/tipc/node.c | 3 +++
-> 1 file changed, 3 insertions(+)
+> net/tipc/name_distr.c | 6 ++++--
+> 1 file changed, 4 insertions(+), 2 deletions(-)
 >
->diff --git a/net/tipc/node.c b/net/tipc/node.c index
->8e4ef2630ae4..cd05269e5335 100644
->--- a/net/tipc/node.c
->+++ b/net/tipc/node.c
->@@ -1695,6 +1695,9 @@ int tipc_node_xmit(struct net *net, struct
->sk_buff_head *list,
-> 	int bearer_id;
-> 	int rc;
+>diff --git a/net/tipc/name_distr.c b/net/tipc/name_distr.c index
+>ba4f4906e13b..495e46defddb 100644
+>--- a/net/tipc/name_distr.c
+>+++ b/net/tipc/name_distr.c
+>@@ -218,8 +218,10 @@ void tipc_named_node_up(struct net *net, u32
+>dnode, u16 capabilities)
+> 	spin_unlock_bh(&tn->nametbl_lock);
 >
->+	if (skb_queue_empty(list))
->+		return 0;
->+
+> 	read_lock_bh(&nt->cluster_scope_lock);
+>-	named_distribute(net, &head, dnode, &nt->cluster_scope, seqno);
+>-	tipc_node_xmit(net, &head, dnode, 0);
+>+	if (!list_empty(&nt->cluster_scope)) {
+>+		named_distribute(net, &head, dnode, &nt->cluster_scope,
+>seqno);
+>+		tipc_node_xmit(net, &head, dnode, 0);
+>+	}
 
-Most callers of tipc_node_xmit() prepares a non-empty list before calling e=
-xcept tipc_named_node_up().
-So, it is not optimal to add this check in tipc_node_xmit().
-I can see this issue needs to be addressed as part of your existing commit:
+Your existing patch already has this check, so please use it plus checking =
+non-empty 'head' before calling tipc_node_xmit():
 https://patchwork.kernel.org/project/netdevbpf/patch/20260706163024.1205930=
 -2-bestswngs@gmail.com/
 
-Please update above patch.
 
-> 	if (in_own_node(net, dnode)) {
-> 		tipc_loopback_trace(net, list);
-> 		spin_lock_init(&list->lock);
+> 	read_unlock_bh(&nt->cluster_scope_lock);
+> }
+>
 >--
 >2.43.0
 >
