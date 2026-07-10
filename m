@@ -1,395 +1,225 @@
-Return-Path: <netdev+bounces-306398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306399-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QZuRCs88UGrMvQIAu9opvQ
-	(envelope-from <netdev+bounces-306398-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 02:29:03 +0200
+	id OQoXNms9UGrzvQIAu9opvQ
+	(envelope-from <netdev+bounces-306399-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 02:31:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62CDB7365E2
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 02:29:02 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68696736620
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 02:31:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=tesAIww0;
+	dkim=pass header.d=google.com header.s=20251104 header.b=UQc0SMPZ;
 	dmarc=pass (policy=reject) header.from=google.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306398-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306398-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306399-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306399-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 14235304706F
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 00:25:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 16F9F302FA24
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 00:29:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D991AA1D5;
-	Fri, 10 Jul 2026 00:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 474701A6825;
+	Fri, 10 Jul 2026 00:29:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5CCD1A680A
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 00:24:57 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783643099; cv=none; b=rzUfOzHUFLUMLuoR/QbiAkp2zHDrGRqwgComMHq4gMvZ31HBZ3ES4P2s6RbAVNcBTcVD5PELSTLKbhpJTFR1KpsCtURpdor+27mHDbEuyZgwRp7BzppJN7VGCG9zzk1eSyQXko2DPLHSKvCg5VJM2wrg6UFct/xqmXTe4x3Dj3E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783643099; c=relaxed/simple;
-	bh=aPeneUJ9pSTCNH1yd0Xp2mR4wGP6AFF7EJoEaS9UoiM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tpcIQaGgIRcajNtu1i2GQhsFUJlH43SHNri/bE2HfELLPgOS5m013vFAoUFff9fin5se1ErOO+f0C/YJlJJOyTVMWMVGkTjxT3+CcimSQk4Ld7HmDE22CmFfNWIwypbaYu7ax2BqTJhsw8Z2jnTbvrtmvWEFV2lGsjUfQ6Ppd7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--eddiephillips.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tesAIww0; arc=none smtp.client-ip=209.85.215.202
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c88d7a75507so547947a12.1
-        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 17:24:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C126257C9F
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 00:29:17 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783643359; cv=pass; b=tw7Z1pibR4qwykhnPqEYe2+9S3J0SyzfEgY+NRtg4+sSzHBzcj6cNJHf7Avp3Ub5LgsQMijLeA1HpjoKxDn0R9zMzEPxj5DP09YPY3v3ZLBbiDXtzaURFcL5ShJLO3DDZCPOl6WhCWNqYDl+zT5dcMAecNsEqZVA2AVNfMfdN80=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783643359; c=relaxed/simple;
+	bh=YP5VsurfK1eGz6I+enqpru1HuYNU8V4+Dhd27WIC3fw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ocelFvSheab9yvnqqqKQiUOQzz3gbbfgxjj63hMwuQ1dBAVBypef63GsgSUa16gfJ8SDdiH53XkALZc9vDOwMhk3uyy2ynewKLTZBl3nzk9N3nozXe97e4vDSifAgkJIFaEkfm2SXlR+Vu7ZAMHmUtSVcDOZNxKpjvOhARWj1IM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UQc0SMPZ; arc=pass smtp.client-ip=209.85.160.173
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-51c10e86e52so78521cf.1
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 17:29:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783643357; cv=none;
+        d=google.com; s=arc-20260327;
+        b=hxrCzgNnZ25rq6nCefk6F0SEGw8/Rks9pKR5F9SINvDl3/y8mjyvsGpCZRaArnny59
+         EBu97zAa3WKHEGiN0ytXRFLwYL/ChVQXuFJxbLp7ILaRlMVYxjPa3gqM/CCRNqfAxU3G
+         PUdqQz7a5wcIZOlXgjTT2y8Zf1K5Jtrfj4/Cc4/eJBpF6mf3hOqUxpe7Bv+3BbaHvbG/
+         ARCsg8+d8AEjoOYA0B5C/BClhDDvyVXibNSCRXl4f2UxYfpFqIOYK7Xi9LzV/b6rja5/
+         C8IzuWMcYpoSinQjiTZ+wLcZ596AhbOXnA81y8PfWBsI+yssa9/lbUr3icn/wgCpkzBT
+         Ip6g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=WROE5PFVoWMfSGv+/anRXgqnlQ9yYPFqpu9lqinJJGY=;
+        fh=JeOdY1bsFfL+4Y1hJYTM1DRjGslVy5ZTi4kc2hOiAYg=;
+        b=SqTS/DavThVo1RKma/z5RnmwHnRb742snuCN43XfsBpSGWIajRgXcBLOqjwGH7yxwC
+         iIkxv3ejb+I9uDiUZqBhdo0ADXePRsyrVGJuYbGICUVeITDS+r6n2hBkyfsASr+vUtwP
+         RgTdLpqImXb/kko/qL2HdTLlQ/7EZSHLiJBKxsHSKXoYbP91lGKc5pV71UL9wF6teNZx
+         jEhMLtX0EjuCmvG7t66BvpKTIBL+3j0PC01YuJZoRduK7QYjLY15qFF2klgUh7+DBWeS
+         tbwhskaXIkQyu1/6Knv8MXiO5xz3ZzuzTbzQYhmg89pcQtzmpL2l0x/sdDaw5LMfnzxW
+         WorQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783643097; x=1784247897; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=x5jkh5eR7LJ5Z4DoKrzx2T4miH2hlilFiG/ybzcUBjc=;
-        b=tesAIww0Xr1uFp3O34m5UisarsHxj8sKVeb2ZQIksETjU+RF8R59+SotjeC93W+xQ+
-         GAZRyDFDgeFnb4nx0rT/utzMg61xpwMCkziTDjoqQUJVhl7Ygk0AcjOvYaCNHyWcX7ib
-         dwrsjiRB727r+/Qo8BXTRS0EL9fIurq0OFFEoFXIgr9XLYESjOTxJ78usnDqQeYZdDOR
-         uMBtJnPvA/uYXWI3J2TKHnDhK9tL+RK4csKmcDKox5HpVRGMHcW8ztO1ULG3kxp3LFsY
-         Uj+wCZZ+TBf03DojMPeFjQR6Nn4isEg3Q1eJr8x+C7krQg9HQR/mDDW1w3JCe0MJCXge
-         2W2A==
+        d=google.com; s=20251104; t=1783643357; x=1784248157; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=WROE5PFVoWMfSGv+/anRXgqnlQ9yYPFqpu9lqinJJGY=;
+        b=UQc0SMPZqguD7VPdYGLlrdAh6BhAAfR6whYUaumKUUltlBNfm0VZ6tz/nQqr+aFVrY
+         GB8lQDcGEI8Ga8wGKLLKPD1P/61zn4peLYXr733Nea6vYvTiUxgwGBIiznDgwVrqM2Y/
+         d0sBwNM/nW9edoipK4AgYn2T5B2CwXByu9t5x/5VnkfNRjEmGorm+5iqfrY6PAOnbsPz
+         WmJ1zXXNrdbWGe6fUiRei13JAItptPtjY8t1aHiopahDtO0jMLZ57o3mJY9UOVu3T2cu
+         eNa5080CImpfooFjZ08Pnr8flObzMo2pIuCf2I/mV1mXrt7NzHV5rBqIzlEJ2hNvTNqG
+         PO4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783643097; x=1784247897;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=x5jkh5eR7LJ5Z4DoKrzx2T4miH2hlilFiG/ybzcUBjc=;
-        b=X95vxhXK6xDedO0bmcb4vPVwbfqf+a/ATsP/hmomv5+dam2bkyhsnbcujC8TfNbt/P
-         rdml0c7YQLIDdp+rw09OE76iRM08JW0syMT3XDfQJdQhnYF1tFKypnMje/rkU9+A8dDi
-         GFCyp5IWBk38mxgbKyoM4Snx/1fZrjN9cD67nJg9SlKsuKE1l9FMLWetJm+IFIMbFb1v
-         86fDDQx7FZplhkwE8WpRymnb2qk6KvlYbXg5InUneo6e231yl3mVbVz+IrFjujga8cH4
-         bQp7L3h9hRthKc3CbcjV0fJcOV7MkPGKkNwigHkikTSWizcLkR5T96y0Hv68xlpW5GWz
-         RzSA==
-X-Forwarded-Encrypted: i=1; AHgh+RplImaHIDKNmuvhYW7NWjkTiCnxUTHSOwkSBn5tlk3b4PfMuYay59bmA9+40fLKX7/O5f9rCks=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrmizbVtItVbgjdLJ4zDdotYqF0f+DgQaQMvfgECW8QsVEcik+
-	UfDKoYJz0DOXUuUOHBhsa6ESH8H4iK+L9UUnt2amAd3UOFP1/3+1uNpmZi6/WMHHnYpVtt/CL8t
-	e6WnMo/CO5FTYvmcq2hWUdUTsktIhYwxHTg==
-X-Received: from pgee15.prod.google.com ([2002:a63:1e0f:0:b0:c88:e5cb:265])
- (user=eddiephillips job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a20:3d0c:b0:3bf:77d7:667d with SMTP id adf61e73a8af0-3c0bccbaf9cmr11307634637.28.1783643096736;
- Thu, 09 Jul 2026 17:24:56 -0700 (PDT)
-Date: Thu,  9 Jul 2026 17:23:37 -0700
-In-Reply-To: <20260709101635.103005-1-fanwu01@zju.edu.cn>
+        d=1e100.net; s=20251104; t=1783643357; x=1784248157;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=WROE5PFVoWMfSGv+/anRXgqnlQ9yYPFqpu9lqinJJGY=;
+        b=kkzr3H/Uc0CZoIxEuRJ9SRJUc7+rQvjwUIa0m8D+4MRiQKMIFZ3+BWksQvs6cmZVIX
+         Woqwbs4+12JrdSBA4tN5Qm4Kxxezn1ueqe89sawaRsnriKKJlLL66q7U/4Jm3WnKWuSu
+         hSysnQ5uxGe/B5SOt453cB49HD9hQiCt1MYWm+/aV2U33j8kOeyBFO6uppmqfZSt1hrs
+         OAv/VYzpDirZYE9c3GNp6ExwwV2+U07ZbZVLH1yaheDCv5NuEcm2n9x370beeh0y4Nlv
+         rQr7x1mz3wjReqvVTHp6Y2RLEN3QGnawHKbZusSojjBbHmD9iKAtqu8Mc7AV9vxZQzHP
+         tKxw==
+X-Forwarded-Encrypted: i=1; AHgh+RrXQy2AR37nX3sSThbyr6nqxC9ZXtR89NNUs0DyNHPbL70U5ji1HWh78ZEjCX8wibX1jjUvTNU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRXdsrLXwGNEepgGcE4MMfZmBw6SVnuco95Z1dRyFPc4N2ROVr
+	TGZt8XDNDek2d8G0LhMR/ETdBtp5DS10YO6RHoIS67DvUrzE01EWKfXuh/0MDf8XRaBg0ri2Hks
+	VeeikBP4wG7ulJP5p7uu2AIYPVsObsLvGLCjbpRU4
+X-Gm-Gg: AfdE7cmIH8NddALt+BdcZAyFwVwxFZr2cQl/ovSlhwo4b/SANuFcRRDkQ7lVZy+qg2L
+	I7smQeIiFLebJ0JzjYEyBwsHRz37kZjZiuXEnsXvWpuf1/rszXuXvSBU8yAL7HhKiD4imCvV6fV
+	Ld517l27P7wP0b8BxkOuzT6aGePIMfYiycRCdbJ8dW7WdmB4gv4rdJvOuVK252hAGGkg8P/yJLT
+	ZNV8/NdCLduKUAaFbTj7GHp4U3GcYQTRqHenMqIGuhpx6MdHJkdQuEGqUhEJfHnxZ+eD73/tRiK
+	PeNTyI9r/l5qB4jppTTte5IokwUsqTySjAAPMpiqKVhMYjESfQJXZiK5hk0=
+X-Received: by 2002:a05:622a:5ca:b0:519:b82d:fe62 with SMTP id
+ d75a77b69052e-51cac51df7cmr2398281cf.7.1783643355883; Thu, 09 Jul 2026
+ 17:29:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260709101635.103005-1-fanwu01@zju.edu.cn>
-X-Mailer: git-send-email 2.55.0.141.g00534a21ce-goog
-Message-ID: <20260710002451.500112-1-eddiephillips@google.com>
-Subject: Re: [PATCH] wifi: brcmfmac: drain bus_reset work on device removal
-From: Eddie Phillips <eddiephillips@google.com>
-To: eddiephillips@google.com, Fan Wu <fanwu01@zju.edu.cn>
-Cc: Arend van Spriel <aspriel@gmail.com>, Kalle Valo <kvalo@kernel.org>, 
-	Franky Lin <franky.lin@broadcom.com>, Hante Meuleman <hante.meuleman@broadcom.com>, 
-	Chi-Hsien Lin <chi-hsien.lin@infineon.com>, Wright Feng <wright.feng@infineon.com>, 
-	Chung-Hsien Hsu <chung-hsien.hsu@infineon.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, linux-wireless@vger.kernel.org, 
-	brcm80211-dev-list.pdl@broadcom.com, SHA-cyfmac-dev-list@infineon.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+MIME-Version: 1.0
+References: <20260707043039.101983-1-yuyanghuang@google.com> <20260709171709.GA1749979@shredder>
+In-Reply-To: <20260709171709.GA1749979@shredder>
+From: Yuyang Huang <yuyanghuang@google.com>
+Date: Fri, 10 Jul 2026 09:28:39 +0900
+X-Gm-Features: AVVi8CfU_jK1iWSjXYkP4M_4lK6XxEw_GVPK6u5nbbJotoBAd51iMLb_UwJlC50
+Message-ID: <CADXeF1Hp7x5sRHr8uBO5TF8BKNqK8869j-kEdP4WqEz02oYV-Q@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: ipv4: clear dev->ip_ptr before destroying inetdev
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Kuniyuki Iwashima <kuniyu@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-306399-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306398-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[eddiephillips@google.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:eddiephillips@google.com,m:fanwu01@zju.edu.cn,m:aspriel@gmail.com,m:kvalo@kernel.org,m:franky.lin@broadcom.com,m:hante.meuleman@broadcom.com,m:chi-hsien.lin@infineon.com,m:wright.feng@infineon.com,m:chung-hsien.hsu@infineon.com,m:davem@davemloft.net,m:kuba@kernel.org,m:linux-wireless@vger.kernel.org,m:brcm80211-dev-list.pdl@broadcom.com,m:SHA-cyfmac-dev-list@infineon.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:idosch@nvidia.com,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:kuniyu@google.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,broadcom.com,infineon.com,davemloft.net,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FORGED_SENDER(0.00)[yuyanghuang@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[eddiephillips@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[yuyanghuang@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 62CDB7365E2
+X-Rspamd-Queue-Id: 68696736620
 
-On Thu,  9 Jul 2026 10:16:35 +0000 Fan Wu <fanwu01@zju.edu.cn> wrote:
+On Fri, Jul 10, 2026 at 2:17=E2=80=AFAM Ido Schimmel <idosch@nvidia.com> wr=
+ote:
+>
+> On Tue, Jul 07, 2026 at 01:30:39PM +0900, Yuyang Huang wrote:
+> > To prevent RCU readers from accessing a partially destroyed in_device,
+> > clear dev->ip_ptr early in inetdev_destroy() before freeing the
+> > multicast list and individual IP addresses. This aligns the IPv4 teardo=
+wn
+> > sequence with the IPv6 implementation.
+> >
+> > Cc: Ido Schimmel <idosch@nvidia.com>
+> > Cc: Kuniyuki Iwashima <kuniyu@google.com>
+> > Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
+>
+> I believe that sashiko-gemini [1] is right and you need to teach
+> prestera to ignore NETDEV_DOWN notifications in the inetaddr chain when
+> a RIF doesn't exist. Something like [2].
+>
+> Regarding ieee80211_ifa_changed(), the net device is being tore down, so
+> failing to update the firmware ARP filter probably doesn't matter, but
+> you can do something like [3] to avoid it completely.
+>
+> So, three patches where the last one aligns IPv4 with IPv6. Please check
+> if other listeners need to be adjusted (mlxsw is OK).
+>
+> Thanks
+>
+> [1] https://sashiko.dev/#/patchset/20260707043039.101983-1-yuyanghuang%40=
+google.com
+>
+> [2]
+> diff --git a/drivers/net/ethernet/marvell/prestera/prestera_router.c b/dr=
+ivers/net/ethernet/marvell/prestera/prestera_router.c
+> index b036b173a308..0c4f462baa6e 100644
+> --- a/drivers/net/ethernet/marvell/prestera/prestera_router.c
+> +++ b/drivers/net/ethernet/marvell/prestera/prestera_router.c
+> @@ -1302,10 +1302,8 @@ static int __prestera_inetaddr_port_event(struct n=
+et_device *port_dev,
+>                 dev_hold(port_dev);
+>                 break;
+>         case NETDEV_DOWN:
+> -               if (!re) {
+> -                       NL_SET_ERR_MSG_MOD(extack, "Can't find RIF");
+> -                       return -EEXIST;
+> -               }
+> +               if (!re)
+> +                       return 0;
+>                 prestera_rif_entry_destroy(port->sw, re);
+>                 dev_put(port_dev);
+>                 break;
+>
+> [3]
+> diff --git a/net/mac80211/main.c b/net/mac80211/main.c
+> index 90d295cc364f..0e7a60dd1d8d 100644
+> --- a/net/mac80211/main.c
+> +++ b/net/mac80211/main.c
+> @@ -588,9 +588,7 @@ static int ieee80211_ifa_changed(struct notifier_bloc=
+k *nb,
+>         if (sdata->vif.type !=3D NL80211_IFTYPE_STATION)
+>                 return NOTIFY_DONE;
+>
+> -       idev =3D __in_dev_get_rtnl(sdata->dev);
+> -       if (!idev)
+> -               return NOTIFY_DONE;
+> +       idev =3D ifa->ifa_dev;
+>
+>         ifmgd =3D &sdata->u.mgd;
 
-> brcmf_fw_crashed() and the debugfs "reset" entry both schedule
-> drvr->bus_reset, whose callback recovers drvr through container_of()
-> and dereferences it.  The teardown paths free drvr (brcmf_free ->
-> wiphy_free) without draining the work, so a bus_reset callback pending
-> or running during removal can outlive drvr.
-> 
-> Cancellation cannot live in brcmf_detach() or brcmf_free(): the work
-> callback reaches teardown through the bus .reset op (PCIe
-> brcmf_pcie_reset -> brcmf_detach; SDIO brcmf_sdio_bus_reset ->
-> brcmf_sdiod_remove -> brcmf_free), so cancelling there would wait for
-> the running work and deadlock.  Arming and the drain must also be
-> mutually exclusive: a debugfs writer can otherwise schedule bus_reset
-> after the drain and before the debugfs file is removed in
-> brcmf_cfg80211_detach(), re-opening the window.
-> 
-> Add a per-bus mutex and route all arming through
-> brcmf_bus_schedule_reset(), which under the lock skips when the bus is
-> marked removing.  Each bus remove entry calls
-> brcmf_bus_cancel_reset_work(), which under the same lock sets removing
-> and cancels the work.  Where applicable the remove entry first stops
-> the firmware-crash producer: on PCIe mask the mailbox and
-> synchronize_irq; on SDIO unregister the bus interrupt and cancel the
-> data worker, which also reports firmware halts through
-> brcmf_fw_crashed().  The mutex is initialized at bus allocation so it
-> is ready before any firmware-probe or removal path can reach it.  The
-> SDIO suspend power-off path frees drvr through the same
-> brcmf_sdiod_remove() and takes the same lock; resume re-allows the work
-> only on a successful re-probe.
-> 
-> This issue was found by an in-house static analysis tool.
-> 
-> Fixes: 4684997d9eea ("brcmfmac: reset PCIe bus on a firmware crash")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Fan Wu <fanwu01@zju.edu.cn>
-> Assisted-by: Codex:gpt-5.5
-> ---
->  .../broadcom/brcm80211/brcmfmac/bcmsdh.c      | 13 ++++++++
->  .../broadcom/brcm80211/brcmfmac/bus.h         |  6 ++++
->  .../broadcom/brcm80211/brcmfmac/core.c        | 33 +++++++++++++++++--
->  .../broadcom/brcm80211/brcmfmac/pcie.c        |  6 ++++
->  .../broadcom/brcm80211/brcmfmac/sdio.c        |  6 ++++
->  .../broadcom/brcm80211/brcmfmac/sdio.h        |  1 +
->  .../broadcom/brcm80211/brcmfmac/usb.c         |  3 ++
->  7 files changed, 66 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bcmsdh.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bcmsdh.c
-> index ac02244a6..c4bb32aec 100644
-> --- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bcmsdh.c
-> +++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bcmsdh.c
-> @@ -1043,6 +1043,7 @@ static int brcmf_ops_sdio_probe(struct sdio_func *func,
->  	bus_if = kzalloc(sizeof(struct brcmf_bus), GFP_KERNEL);
->  	if (!bus_if)
->  		return -ENOMEM;
-> +	mutex_init(&bus_if->bus_reset_lock);
->  	sdiodev = kzalloc(sizeof(struct brcmf_sdio_dev), GFP_KERNEL);
->  	if (!sdiodev) {
->  		kfree(bus_if);
-> @@ -1102,6 +1103,14 @@ static void brcmf_ops_sdio_remove(struct sdio_func *func)
->  		if (func->num != 1)
->  			return;
->  
-> +		/* Drain bus_reset before the shared brcmf_sdiod_remove()
-> +		 * teardown, which the SDIO reset callback also reaches.  The
-> +		 * data worker can arm bus_reset via brcmf_fw_crashed(); cancel
-> +		 * it first.
-> +		 */
-> +		brcmf_sdio_cancel_datawork(sdiodev->bus);
-> +		brcmf_bus_cancel_reset_work(bus_if);
-> +
->  		/* only proceed with rest of cleanup if func 1 */
->  		brcmf_sdiod_remove(sdiodev);
->  
-> @@ -1163,6 +1172,8 @@ static int brcmf_ops_sdio_suspend(struct device *dev)
->  	} else {
->  		/* power will be cut so remove device, probe again in resume */
->  		brcmf_sdiod_intr_unregister(sdiodev);
-> +		brcmf_sdio_cancel_datawork(sdiodev->bus);
-> +		brcmf_bus_cancel_reset_work(bus_if);
->  		ret = brcmf_sdiod_remove(sdiodev);
->  		if (ret)
->  			brcmf_err("Failed to remove device on suspend\n");
-> @@ -1188,6 +1199,8 @@ static int brcmf_ops_sdio_resume(struct device *dev)
->  		ret = brcmf_sdiod_probe(sdiodev);
->  		if (ret)
->  			brcmf_err("Failed to probe device on resume\n");
-> +		else
-> +			brcmf_bus_allow_reset_work(bus_if);
->  	} else {
->  		if (sdiodev->wowl_enabled &&
->  		    sdiodev->settings->bus.sdio.oob_irq_supported)
-> diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bus.h b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bus.h
-> index 3f5da3bb6..b606094af 100644
-> --- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bus.h
-> +++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bus.h
-> @@ -6,6 +6,7 @@
->  #ifndef BRCMFMAC_BUS_H
->  #define BRCMFMAC_BUS_H
->  
-> +#include <linux/mutex.h>
->  #include "debug.h"
->  
->  /* IDs of the 6 default common rings of msgbuf protocol */
-> @@ -149,11 +150,16 @@ struct brcmf_bus {
->  	u32 chiprev;
->  	bool always_use_fws_queue;
->  	bool wowl_supported;
-> +	bool removing;		/* device removal in progress; quiesce async work */
-> +	struct mutex bus_reset_lock;
->  
->  	const struct brcmf_bus_ops *ops;
->  	struct brcmf_bus_msgbuf *msgbuf;
->  };
->  
-> +void brcmf_bus_cancel_reset_work(struct brcmf_bus *bus_if);
-> +void brcmf_bus_allow_reset_work(struct brcmf_bus *bus_if);
-> +
->  /*
->   * callback wrappers
->   */
-> diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c
-> index fed9cd5f2..b934feb9b 100644
-> --- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c
-> +++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c
-> @@ -1164,6 +1164,35 @@ static int brcmf_revinfo_read(struct seq_file *s, void *data)
->  	return 0;
->  }
->  
-> +/* Serialize bus_reset arming (debugfs reset write, brcmf_fw_crashed) against the
-> + * teardown drain: the remove path takes bus_reset_lock, sets ->removing and cancels
-> + * the work under it, so a racing armer either schedules before the cancel (and is
-> + * drained) or observes ->removing and desists.
-> + */
-> +static void brcmf_bus_schedule_reset(struct brcmf_bus *bus_if)
-> +{
-> +	mutex_lock(&bus_if->bus_reset_lock);
-> +	if (bus_if->drvr && bus_if->drvr->bus_reset.func && !bus_if->removing)
-> +		schedule_work(&bus_if->drvr->bus_reset);
-> +	mutex_unlock(&bus_if->bus_reset_lock);
-> +}
+Thanks for the review comments; I will update prestera and ieee80211,
+as well as go through other listeners to confirm the sequence and send
+out stacked patches as suggested.
 
-Is this safe in a softIRQ context?                                                                                                        
-mutex_lock() sleeps until it can get the lock.
+Thanks,
 
-> +
-> +void brcmf_bus_cancel_reset_work(struct brcmf_bus *bus_if)
-> +{
-> +	mutex_lock(&bus_if->bus_reset_lock);
-> +	bus_if->removing = true;
-> +	if (bus_if->drvr)
-> +		cancel_work_sync(&bus_if->drvr->bus_reset);
-> +	mutex_unlock(&bus_if->bus_reset_lock);
-> +}
-
-How about if brcmf_pcie_remove() calls brcmf_bus_cancel_reset_work(),
-takes the lock and calls cancel_work_sync(), sleeps. If debugfs
-path is already running, it can invoke the worker thread. Is there
-potential that both try to reset?
-
-> +
-> +void brcmf_bus_allow_reset_work(struct brcmf_bus *bus_if)
-> +{
-> +	mutex_lock(&bus_if->bus_reset_lock);
-> +	bus_if->removing = false;
-> +	mutex_unlock(&bus_if->bus_reset_lock);
-> +}
-> +
->  static void brcmf_core_bus_reset(struct work_struct *work)
->  {
->  	struct brcmf_pub *drvr = container_of(work, struct brcmf_pub,
-> @@ -1184,7 +1213,7 @@ static ssize_t bus_reset_write(struct file *file, const char __user *user_buf,
->  	if (value != 1)
->  		return -EINVAL;
->  
-> -	schedule_work(&drvr->bus_reset);
-> +	brcmf_bus_schedule_reset(drvr->bus_if);
->  
->  	return count;
->  }
-> @@ -1408,7 +1437,7 @@ void brcmf_fw_crashed(struct device *dev)
->  
->  	brcmf_dev_coredump(dev);
->  
-> -	schedule_work(&drvr->bus_reset);
-> +	brcmf_bus_schedule_reset(bus_if);
->  }
->  
->  void brcmf_detach(struct device *dev)
-> diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
-> index 8b149996f..3c6775166 100644
-> --- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
-> +++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
-> @@ -1914,6 +1914,7 @@ brcmf_pcie_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  		ret = -ENOMEM;
->  		goto fail;
->  	}
-> +	mutex_init(&bus->bus_reset_lock);
->  	bus->msgbuf = kzalloc(sizeof(*bus->msgbuf), GFP_KERNEL);
->  	if (!bus->msgbuf) {
->  		ret = -ENOMEM;
-> @@ -1985,6 +1986,11 @@ brcmf_pcie_remove(struct pci_dev *pdev)
->  	if (devinfo->ci)
->  		brcmf_pcie_intr_disable(devinfo);
->  
-> +	if (devinfo->irq_allocated)
-> +		synchronize_irq(pdev->irq);
-> +
-> +	brcmf_bus_cancel_reset_work(bus);
-> +
->  	brcmf_detach(&pdev->dev);
->  	brcmf_free(&pdev->dev);
->  
-> diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
-> index 8effeb7a7..31e37b0d4 100644
-> --- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
-> +++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
-> @@ -4541,6 +4541,12 @@ struct brcmf_sdio *brcmf_sdio_probe(struct brcmf_sdio_dev *sdiodev)
->  	return NULL;
->  }
->  
-> +void brcmf_sdio_cancel_datawork(struct brcmf_sdio *bus)
-> +{
-> +	if (bus)
-> +		cancel_work_sync(&bus->datawork);
-> +}
-> +
->  /* Detach and free everything */
->  void brcmf_sdio_remove(struct brcmf_sdio *bus)
->  {
-> diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.h b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.h
-> index 15d2c02fa..3c68ebf8e 100644
-> --- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.h
-> +++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.h
-> @@ -373,6 +373,7 @@ int brcmf_sdiod_remove(struct brcmf_sdio_dev *sdiodev);
->  struct brcmf_sdio *brcmf_sdio_probe(struct brcmf_sdio_dev *sdiodev);
->  void brcmf_sdio_remove(struct brcmf_sdio *bus);
->  void brcmf_sdio_isr(struct brcmf_sdio *bus, bool in_isr);
-> +void brcmf_sdio_cancel_datawork(struct brcmf_sdio *bus);
->  
->  void brcmf_sdio_wd_timer(struct brcmf_sdio *bus, bool active);
->  void brcmf_sdio_wowl_config(struct device *dev, bool enabled);
-> diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
-> index 9fb68c2dc..97d65ba36 100644
-> --- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
-> +++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
-> @@ -1271,6 +1271,7 @@ static int brcmf_usb_probe_cb(struct brcmf_usbdev_info *devinfo)
->  		ret = -ENOMEM;
->  		goto fail;
->  	}
-> +	mutex_init(&bus->bus_reset_lock);
->  
->  	bus->dev = dev;
->  	bus_pub->bus = bus;
-> @@ -1336,6 +1337,8 @@ brcmf_usb_disconnect_cb(struct brcmf_usbdev_info *devinfo)
->  		return;
->  	brcmf_dbg(USB, "Enter, bus_pub %p\n", devinfo);
->  
-> +	brcmf_bus_cancel_reset_work(devinfo->bus_pub.bus);
-> +
->  	brcmf_detach(devinfo->dev);
->  	brcmf_free(devinfo->dev);
->  	kfree(devinfo->bus_pub.bus);
-> -- 
-> 2.34.1
-
-Sent using hkml (https://github.com/sjp38/hackermail)
+Yuyang
 
