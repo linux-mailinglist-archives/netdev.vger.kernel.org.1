@@ -1,63 +1,65 @@
-Return-Path: <netdev+bounces-306663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306664-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id AmnYDn9GUWrmBgMAu9opvQ
-	(envelope-from <netdev+bounces-306663-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 21:22:39 +0200
+	id sSISB4tGUWroBgMAu9opvQ
+	(envelope-from <netdev+bounces-306664-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 21:22:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D1DE73DB50
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 21:22:38 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD82E73DB5C
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 21:22:50 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b="VEZn5F/x";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b="IsOz/2px";
 	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306663-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306663-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306664-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306664-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9391030234F7
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 19:22:37 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0B0B6301B829
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 19:22:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A991F37B409;
-	Fri, 10 Jul 2026 19:22:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D41233845D0;
+	Fri, 10 Jul 2026 19:22:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB10373C1A
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 19:22:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A0A2384238
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 19:22:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783711355; cv=none; b=A19ZcXmN4eKhSRBBKYVPE+pJ9VA0CccIEhQ0FQ6pPpelCXueDr9hI0eUvRqznbc4nJsAc9R5CmlH38lsmls9yxgoEqAJCC0F6UKfiKodUbJkDvPnFlgMXMzoQ3jdmvB051cRNwP/6AZFW7pDQ+Et83dLqcXpQfkNXxvbIjEtUI8=
+	t=1783711360; cv=none; b=MB1c8o+v8XU8e4ldYfNxTwufgN8473KUbwKdxMGlvRwPLkPyw/63V7qcIiPJenrfTGTkHiGCl/GrZADv/SPauTJrWxZDKlIbmZAI6/HDrcPk5XD14U31T6nRdMuNfIeqp876k3LUN5O4iFQGeLwlyF/s4+f7qmg050feSX7W+dk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783711355; c=relaxed/simple;
-	bh=bvX6nXJHrqYkGdtITDq1Wc6yoIdBnBvAVVrgBcr7giU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r4pJ3y8ZtPvJTy1Bv2J/63oyyyLbrz1TljHWg148FVg91k/er+hvtuuqwqQ6Fp+9IhUzc19t6kQb5CjIT8PLR0Lr7cBFy0tSUHRrmZOFx8ZEw/Eo49xXogEQ6wdF6fHIM+S2AD+GupUQmrD6BKQTD1zoX+um2Om6MvTFwrZ3ogQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VEZn5F/x; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1783711360; c=relaxed/simple;
+	bh=E1DKv1zWMYA4DFk3hmqLlCOGhxl4FdyLa/Rx8tHLo+c=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lBe99Z1PstRpFida7wS6RHlsN5MeSdUbIA+TyP85faYbgoJVIm9fLlvxRaqnpdnZUYLBhFpp2zec5wlJBHUUQS7BhxREE8smuZgBzll58cBiWdiAUVOZ5W3pjpiBcOrc4REPXNqZC0T0D36R3YuoEQdAf8NhDev+BpFnwdmdWVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IsOz/2px; arc=none smtp.client-ip=170.10.133.124
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783711353;
+	s=mimecast20190719; t=1783711358;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=M4yaa8YsWwpBlkXyNkBXTvf91tU3gWrqXC4x53Vl0gQ=;
-	b=VEZn5F/xGVtnn2UTNm51JXT9CEMEh4hFPS8xPM0rmMNjbIonljZZB5ezHm3tx0AZex4Ld+
-	4YEH2T/Wt+VdDnRKJFAzFwYP0Kvoiv+5HZ9T7z1iSLO+2bAX4BF6O16rBplDM58ZX4AJsq
-	KAj9gXk4xXvh+ACxo/7ugRunpv38YIc=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NahzdypL9w7RySKlcv+DTp0PkyrUPrVJ3XH0FwVcdO8=;
+	b=IsOz/2px5Ml2KIL++FfnWMvvbGgX4GFmyK9llq3NT6x2Zrpc+S8hxP/EnCBtqBqQtmPLgr
+	eacnyj1lZYe68c+oAOlu/KmaCGGR3l2H+5m64J7U9nBPDMfKQnfKygvpRXuumzBwwDlave
+	okopYZ/LaoQ1ZS/JH0uTmTw5QIgr+EI=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-15-EICO7KdrMOW9-HN3u7EIRA-1; Fri,
- 10 Jul 2026 15:22:29 -0400
-X-MC-Unique: EICO7KdrMOW9-HN3u7EIRA-1
-X-Mimecast-MFC-AGG-ID: EICO7KdrMOW9-HN3u7EIRA_1783711348
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-668-dmHEOo56O0uibFApa7m0Ag-1; Fri,
+ 10 Jul 2026 15:22:35 -0400
+X-MC-Unique: dmHEOo56O0uibFApa7m0Ag-1
+X-Mimecast-MFC-AGG-ID: dmHEOo56O0uibFApa7m0Ag_1783711353
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6F3B919560AA;
-	Fri, 10 Jul 2026 19:22:27 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DDCC418002FF;
+	Fri, 10 Jul 2026 19:22:32 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.44.33.159])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7DCFE1956095;
-	Fri, 10 Jul 2026 19:22:23 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 06274195608E;
+	Fri, 10 Jul 2026 19:22:28 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -68,10 +70,14 @@ Cc: David Howells <dhowells@redhat.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
 	linux-afs@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2 00/16] rxrpc: Fix CHALLENGE packet handling
-Date: Fri, 10 Jul 2026 20:22:02 +0100
-Message-ID: <20260710192220.1922433-1-dhowells@redhat.com>
+	linux-kernel@vger.kernel.org,
+	Jeffrey Altman <jaltman@auristor.com>,
+	stable@kernel.org
+Subject: [PATCH net v2 01/16] afs: Fix NULL deref in afs_deliver_cb_init_call_back_state3()
+Date: Fri, 10 Jul 2026 20:22:03 +0100
+Message-ID: <20260710192220.1922433-2-dhowells@redhat.com>
+In-Reply-To: <20260710192220.1922433-1-dhowells@redhat.com>
+References: <20260710192220.1922433-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,200 +85,76 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:dhowells@redhat.com,m:marc.dionne@auristor.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-afs@lists.infradead.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306663-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306664-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:dhowells@redhat.com,m:marc.dionne@auristor.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-afs@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:jaltman@auristor.com,m:stable@kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_HAS_DN(0.00)[]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,auristor.com:email,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8D1DE73DB50
+X-Rspamd-Queue-Id: AD82E73DB5C
 
-Here's a fix for AF_RXRPC's CHALLENGE packet handling, addressing an issue
-raised by Sashiko[1], plus some miscellaneous fixes found in the process of
-fixing this, plus a number of things raised by Sashiko[2][3].
+Fix afs_deliver_cb_init_call_back_state3() to avoid a potential NULL deref
+should call->server be NULL (ie. afs_rx_new_call() failed to find a
+matching server record) when it checks the server's UUID.
 
-Firstly, the miscellaneous patches:
+Fixes: 40e8b52fe8c8 ("afs: Use the per-peer app data provided by rxrpc")
+Link: https://sashiko.dev/#/patchset/20260624163819.3017002-1-dhowells%40redhat.com
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: Jeffrey Altman <jaltman@auristor.com>
+cc: Eric Dumazet <edumazet@google.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Simon Horman <horms@kernel.org>
+cc: linux-afs@lists.infradead.org
+cc: stable@kernel.org
+---
+ fs/afs/cmservice.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
- (1) Fix a NULL deref in afs_deliver_cb_init_call_back_state3().
-
- (2) Fix rxrpc_sendmsg so that it doesn't return an error if it queued the
-     last packet of a call.  After that point, the error will be returned
-     by recvmsg() and returned it twice in two different places may
-     complicate userspace cleaning up its own structures.
-
- (3) Fix a UAF in afs_make_call() whereby it looks at the call after the
-     first send (of the request) completes to see if it should make a
-     second send (e.g. for FS.StoreData content) - but the call may have
-     been freed if the first send wasn't marked MSG_MORE.
-
- (4) Fix a couple of afs request delivery functions to pass back -EAGAIN if
-     insufficient data is yet received.
-
- (5) Fix afs_fs_fetch_data() to set call->async on calls marked as being
-     asynchronous.
-
- (6) Fix error handling in rxrpc_send_data() for if ->secure_packet()
-     returns an error.
-
- (7) Fix the update of call->pending in rxrpc_send_data() in paths when the
-     call lock has been dropped.
-
- (8) Fix the generation of notifications from rxrpc after call completion.
-
- (9) Simplify afs_call refcounting to avoid trying to take refs when async
-     call notifications come in, and worse trying to get rid of them again
-     safely if the notifier work item is already queued.  This is not
-     technically a bug fix, but the cleanup made patch 11 easier to handle.
-
-(10) Make afs_put_call() use an enum value to indicate when it happens
-     rather than recording the function return address as the return
-     address isn't sufficiently unique if functions get inlined or
-     tail-called by the compiler.  This is not a bug fix, but it made it
-     easier to debug the problem that patch 11 fixes.
-
-(11) Fix another UAF in afs_make_call() whereby the function tries to abort
-     a call if the send fails, but the call may get torn down by async
-     notification before we get there.
-
-And then there are the patches to fix CHALLENGE packet overqueuing and
-simplify RESPONSE packet generation by pre-creating the RxGK application
-data up front and passing it in a user key (thereby allowing userspace to
-partake).  This is split into five patches:
-
-(12) Add a refcount to the user key payload.
-
-(13) Make the AFS filesystem generate per-server appdata keys.
-
-(14) Pass the appdata from AFS (or userspace) to rxrpc.
-
-(15) Change over to using the appdata key to supply the appdata.
-
-(16) Remove all the OOB stuff.
-
-[!] Note that this entails a significant change in the UAPI for AF_RXRPC,
-with the CMSG types and sockopt to support the OOB queuing being removed
-and replaced with a new single CMSG type that conveys the user key ID.  I
-don't think it likely anyone is using this outside of my kafs-utils
-package.
-
-This also involves a change to the user-defined key type, making the
-payload refcounted so that it can be accessed and the length read, then a
-buffer allocated that will hold it and other data, and then the content
-copied.  The problem is that the user is perfectly at liberty to change the
-content of a user-defined key (which will RCU-replace the content of the
-key), so the length might change when we drop the RCU read lock in order to
-allocate.  This could be got around by locking the key->rwsem sharedly, but
-that might be able to deadlock part of the rxrpc protocol engine if memory
-reclaim occurs.
-
-David
-
-The patches can be found here also:
-
-	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=rxrpc-fixes
-
-Changes
-=======
-ver #2)
-- Split the CHALLENGE/RESPONSE fix into smaller patches.
-- Fixed more Sashiko-reported bugs[2][3]:
-  - Added some more patches to fix some more bugs.
-  - Get rid of the AFS_SERVER_FL_APPDATA flag and check the pointer to the
-    appdata instead.
-  - Rename the appdata key pointer in the AFS_SERVER to reflect this one is
-    only for the YFS-RxGK security class.
-  - Use barriers when reading or writing the server appdata key pointer.
-  - Ignore the appdata for RxNULL, RxKAD and OpenAFS's RxGK for now.
-  - Check that sendmsg() with RXRPC_RESPONSE_APPDATA is passed a user key.
-  - Check that the appdata key's payload isn't NULL, for instance if it
-    gets revoked.
-  - Add some error path key_put()s in rxrpc_do_sendmsg().
-
-[1] https://sashiko.dev/#/patchset/20260624163819.3017002-1-dhowells%40redhat.com
-[2] https://sashiko.dev/#/patchset/20260702144919.172295-1-dhowells%40redhat.com
-[3] https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260702144919.172295-1-dhowells%40redhat.com
-
-David Howells (16):
-  afs: Fix NULL deref in afs_deliver_cb_init_call_back_state3()
-  rxrpc: Fix sendmsg to not return an error if last packet queued
-  afs: Fix UAF when sending a message
-  afs: Fix two delivery functions to pass back -EAGAIN
-  afs: Fix afs_fs_fetch_data() to set call->async
-  rxrpc: Fix packet encryption error handling
-  rxrpc: Fix update of call->tx_pending without holding lock
-  rxrpc: Fix generation of notifications after call completion
-  afs: Simplify call refcounting
-  afs: Make afs_put_call() take trace argument
-  afs: Fix UAF in afs_make_call()
-  keys: Add refcounting to user-defined key type payload
-  afs: Create a server appdata key
-  rxrpc: Pass appdata key to rxrpc_call and thence to rxrpc_bundle
-  rxrpc: Fix CHALLENGE packet overqueuing and simplify RESPONSE
-    generation
-  rxrpc: Remove OOB challenge/response code
-
- fs/afs/cm_security.c         | 311 +++++++++++++---------------
- fs/afs/cmservice.c           |  50 ++---
- fs/afs/file.c                |  12 +-
- fs/afs/fs_operation.c        |   2 +-
- fs/afs/fs_probe.c            |   5 +
- fs/afs/fsclient.c            |   7 +-
- fs/afs/internal.h            |  63 +++---
- fs/afs/main.c                |   1 -
- fs/afs/rxrpc.c               | 137 +++++--------
- fs/afs/server.c              |   2 +-
- fs/afs/vl_probe.c            |   2 +-
- fs/afs/vlclient.c            |   8 +-
- include/keys/user-type.h     |   2 +
- include/net/af_rxrpc.h       |  21 +-
- include/trace/events/afs.h   |  46 +++--
- include/trace/events/rxrpc.h |   4 +-
- include/uapi/linux/rxrpc.h   |   6 +-
- net/dns_resolver/dns_key.c   |   1 +
- net/rxrpc/Makefile           |   1 -
- net/rxrpc/af_rxrpc.c         |  49 +----
- net/rxrpc/ar-internal.h      |  23 +--
- net/rxrpc/call_object.c      |   2 +
- net/rxrpc/call_state.c       |  57 +++++-
- net/rxrpc/conn_client.c      |   2 +
- net/rxrpc/conn_event.c       |  68 +-----
- net/rxrpc/key.c              |  37 ++++
- net/rxrpc/oob.c              | 387 -----------------------------------
- net/rxrpc/recvmsg.c          | 126 ++----------
- net/rxrpc/rxgk.c             | 128 +++---------
- net/rxrpc/rxkad.c            |  27 ---
- net/rxrpc/sendmsg.c          | 107 +++++++---
- net/rxrpc/server_key.c       |  40 ----
- security/keys/user_defined.c |  23 ++-
- 33 files changed, 546 insertions(+), 1211 deletions(-)
- delete mode 100644 net/rxrpc/oob.c
+diff --git a/fs/afs/cmservice.c b/fs/afs/cmservice.c
+index 5540ae1cad59..d579a665e3da 100644
+--- a/fs/afs/cmservice.c
++++ b/fs/afs/cmservice.c
+@@ -364,7 +364,8 @@ static int afs_deliver_cb_init_call_back_state3(struct afs_call *call)
+ 	if (!afs_check_call_state(call, AFS_CALL_SV_REPLYING))
+ 		return afs_io_error(call, afs_io_error_cm_reply);
+ 
+-	if (memcmp(call->request, &call->server->_uuid, sizeof(call->server->_uuid)) != 0) {
++	if (call->server &&
++	    memcmp(call->request, &call->server->_uuid, sizeof(call->server->_uuid)) != 0) {
+ 		pr_notice("Callback UUID does not match fileserver UUID\n");
+ 		trace_afs_cm_no_server_u(call, call->request);
+ 		return 0;
 
 
