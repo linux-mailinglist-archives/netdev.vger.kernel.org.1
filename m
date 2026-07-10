@@ -1,219 +1,139 @@
-Return-Path: <netdev+bounces-306609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306610-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 2C2mN7cJUWpx+QIAu9opvQ
-	(envelope-from <netdev+bounces-306609-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 17:03:19 +0200
+	id 3cKNFnALUWoQ+gIAu9opvQ
+	(envelope-from <netdev+bounces-306610-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 17:10:40 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42ECF73C08C
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 17:03:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A601C73C194
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 17:10:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=ikfk9ise;
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306609-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306609-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306610-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306610-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9A8DC30DCD23
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:49:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A64F43058819
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 15:00:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D48E4343E6;
-	Fri, 10 Jul 2026 14:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED894233927;
+	Fri, 10 Jul 2026 15:00:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.3ffe.de (0001.3ffe.de [159.69.201.130])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91822423A71;
-	Fri, 10 Jul 2026 14:47:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9BA6223DE7;
+	Fri, 10 Jul 2026 15:00:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783694849; cv=none; b=cjxZuYWxvMm9/Muzi0c55dclI+i7QgzSjgXLByfk73T7ge1RbBfCIAj1WLyzjpnFeSZ8rxFE+DMJdzlcQH9b+EQ7Tr6COz59QuXsWC/xxLhIdcZzYYf3CiHmDTxeaytwNLrXf0rCYQ/lKkUSS5FOw4T35rfMbW9LdszS7YcYpN4=
+	t=1783695629; cv=none; b=hTrDpCXGzJwYYg7PIQqQBZeo9vHbeimj+OLDBFohFVj3/4pI8GIq309PzM5aE5nnI/OQYz8MFNutpDiVTIxGJrAexaI4cPlDfLf/GUfA7uUdkXw/O/USnFSCoFUs8s8cjW3yFmVpdIQFl6pCh1RcNFVXAcFLLFvcvhVoT0H3X2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783694849; c=relaxed/simple;
-	bh=0jxv2UVmjG4b3H5M8fybUYp7q+5N7UU6o2pQTgtkXtc=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:From:To:
-	 References:In-Reply-To; b=GYiy1/WgHPMg9EJWx5jQqOza/lOZAGe0Zi2baGHBFs2aiLZXwd77ZDoCM5ucdqvd18IO306ndBW7mGK+uBAPqnfzB85M3Q4VtO2CINUUzlVGSOmzQJFs2sWV+31zZvYsXCq40bX7Ei6dLKn+ZFTue+nJiAFpVsoE5QNvoxe8dCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=walle.cc; arc=none smtp.client-ip=159.69.201.130
-Received: from localhost (unknown [IPv6:2a02:810b:4320:1000:4685:ff:fe12:5967])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.3ffe.de (Postfix) with ESMTPSA id 028853B7;
-	Fri, 10 Jul 2026 16:47:24 +0200 (CEST)
+	s=arc-20240116; t=1783695629; c=relaxed/simple;
+	bh=WIzAkP8OyPVA8uAWxkJkDpECORMBAFVM5Vjg+fymZw8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=L0F1Q/nsY9UorkNzPR6ggcsFJqjoDM6pi1DjKp/Hb94JFyAFsObCGON3hN2VlOEquFJ0a17lzD6vvngtZ54FXkldvBeRKmo6foS+G0KLDGRrqU7oCwTtRK8aIhYpE2XyJJViHsbdsmp4ZjS5LwEnL1devz63DR7MPYB6nC2F7fA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ikfk9ise; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B00D1F000E9;
+	Fri, 10 Jul 2026 15:00:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783695628;
+	bh=gIVfiGDljpqCKA5ERFNw/PTnn3K8M+76q6/Myzas50A=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=ikfk9ise9kwxt7eFSbbJGnpbbhtidHoXuYfeXHSjQXrGODnMTOJNQLcgKnOkwKt20
+	 qFdUnyu6cW0EZWm31VVd6nyp7Ljm3kP2l2Fvq5b0HMIM2da4IlCXKoeTtw/8E5vXOR
+	 4e3fRg7+rvgq3yJYX1ATtHtdxxDt2fpjt4gHtZ7RjcfPjSpK8zUln9voq/dtcQHz+E
+	 l9uLXTiKMr0FGHRcbskNXijPVrPIEEI18VQuG5QxQ0bA+m94XJ/fJDh2d2mcpT/TFj
+	 BRefFbpZo6+o0+NpzYQGV+A7MIgddyIe4BSuvIJpSo/+bKTYZcCMHQWm8D3XK4d+Y/
+	 pVfFMkxovGFdg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9397F3924F9B;
+	Fri, 10 Jul 2026 15:00:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 10 Jul 2026 16:47:24 +0200
-Message-Id: <DJUZ1VG8U9SL.2W0CJM7NSMK2@kernel.org>
-Subject: Re: [PATCH net v2] net: dpaa: fix mode setting
-Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-From: "Michael Walle" <mwalle@kernel.org>
-To: "Sean Anderson" <sean.anderson@linux.dev>, "Madalin Bucur"
- <madalin.bucur@nxp.com>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S .
- Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Russell
- King" <linux@armlinux.org.uk>
-X-Mailer: aerc 0.20.0
-References: <20260710143430.2276141-1-mwalle@kernel.org>
- <a5c5b8a6-85a8-7830-e19b-ffd5de750e3c@linux.dev>
-In-Reply-To: <a5c5b8a6-85a8-7830-e19b-ffd5de750e3c@linux.dev>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] sctp: validate STALE_COOKIE cause length before
+ reading
+ staleness
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178369560614.725168.2626506030480279304.git-patchwork-notify@kernel.org>
+Date: Fri, 10 Jul 2026 15:00:06 +0000
+References: <20260704033545.2438373-2-bestswngs@gmail.com>
+In-Reply-To: <20260704033545.2438373-2-bestswngs@gmail.com>
+To: Weiming Shi <bestswngs@gmail.com>
+Cc: linux-sctp@vger.kernel.org, marcelo.leitner@gmail.com,
+ lucien.xin@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, xmei5@asu.edu,
+ stable@vger.kernel.org
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MV_CASE(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306609-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[mwalle@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,asu.edu];
+	TAGGED_FROM(0.00)[bounces-306610-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:sean.anderson@linux.dev,m:madalin.bucur@nxp.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:bestswngs@gmail.com,m:linux-sctp@vger.kernel.org,m:marcelo.leitner@gmail.com,m:lucien.xin@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:xmei5@asu.edu,m:stable@vger.kernel.org,m:marceloleitner@gmail.com,m:lucienxin@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mwalle@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email,vger.kernel.org:from_smtp]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 42ECF73C08C
+X-Rspamd-Queue-Id: A601C73C194
 
-On Fri Jul 10, 2026 at 4:39 PM CEST, Sean Anderson wrote:
-> On 7/10/26 10:22, Michael Walle wrote:
->> Before converting to the phylink interface, the init function would have
->> set the correct I/F mode depending on the maximum link speed of an
->> interface. After converting to phylink, the established link speed
->> is used to determine this setting and is set in the .link_up()
->> callback. The callback isn't called because the link is never
->> established between the PCS and a connected SGMII PHY.
->> To fix it, don't use the current speed, but set the mode depending on
->> the interface (which implies the maximum speed) in .mac_config().
->>=20
->> Fixes: 5d93cfcf7360 ("net: dpaa: Convert to phylink")
->> Suggested-by: Sean Anderson <sean.anderson@linux.dev>
->> Signed-off-by: Michael Walle <mwalle@kernel.org>
->> ---
->> FWIW, I dropped setting a non-reserved mode in init(). The hardware
->> default is 0 and the mac_config() will set a valid mode anyway.
->>=20
->> Changes in v2:
->>   - the setting is/was based on the maximum speed, not the current
->>     speed. thus, move the setting into mac_config().
->>   - Link to v1: https://lore.kernel.org/r/20260706121011.1948906-1-mwall=
-e@kernel.org/
->>=20
->>   .../net/ethernet/freescale/fman/fman_dtsec.c  | 26 ++++++++++---------
->>   1 file changed, 14 insertions(+), 12 deletions(-)
->>=20
->> diff --git a/drivers/net/ethernet/freescale/fman/fman_dtsec.c b/drivers/=
-net/ethernet/freescale/fman/fman_dtsec.c
->> index fe35703c509e..7075f93bab49 100644
->> --- a/drivers/net/ethernet/freescale/fman/fman_dtsec.c
->> +++ b/drivers/net/ethernet/freescale/fman/fman_dtsec.c
->> @@ -900,22 +900,28 @@ static void dtsec_mac_config(struct phylink_config=
- *config, unsigned int mode,
->>   {
->>   	struct mac_device *mac_dev =3D fman_config_to_mac(config);
->>   	struct dtsec_regs __iomem *regs =3D mac_dev->fman_mac->regs;
->> -	u32 tmp;
->> +	u32 ecntrl, maccfg2;
->> +
->> +	maccfg2 =3D ioread32be(&regs->maccfg2);
->> +	maccfg2 &=3D ~(MACCFG2_NIBBLE_MODE | MACCFG2_BYTE_MODE);
->>  =20
->>   	switch (state->interface) {
->>   	case PHY_INTERFACE_MODE_RMII:
->> -		tmp =3D DTSEC_ECNTRL_RMM;
->> +		ecntrl =3D DTSEC_ECNTRL_RMM;
->> +		maccfg2 |=3D MACCFG2_NIBBLE_MODE;
->>   		break;
->>   	case PHY_INTERFACE_MODE_RGMII:
->>   	case PHY_INTERFACE_MODE_RGMII_ID:
->>   	case PHY_INTERFACE_MODE_RGMII_RXID:
->>   	case PHY_INTERFACE_MODE_RGMII_TXID:
->> -		tmp =3D DTSEC_ECNTRL_GMIIM | DTSEC_ECNTRL_RPM;
->> +		ecntrl =3D DTSEC_ECNTRL_GMIIM | DTSEC_ECNTRL_RPM;
->> +		maccfg2 |=3D MACCFG2_BYTE_MODE;
->>   		break;
->>   	case PHY_INTERFACE_MODE_SGMII:
->>   	case PHY_INTERFACE_MODE_1000BASEX:
->>   	case PHY_INTERFACE_MODE_2500BASEX:
->> -		tmp =3D DTSEC_ECNTRL_TBIM | DTSEC_ECNTRL_SGMIIM;
->> +		ecntrl =3D DTSEC_ECNTRL_TBIM | DTSEC_ECNTRL_SGMIIM;
->> +		maccfg2 |=3D MACCFG2_BYTE_MODE;
->>   		break;
->>   	default:
->>   		dev_warn(mac_dev->dev, "cannot configure dTSEC for %s\n",
->> @@ -923,7 +929,8 @@ static void dtsec_mac_config(struct phylink_config *=
-config, unsigned int mode,
->>   		return;
->>   	}
->>  =20
->> -	iowrite32be(tmp, &regs->ecntrl);
->> +	iowrite32be(ecntrl, &regs->ecntrl);
->> +	iowrite32be(maccfg2, &regs->maccfg2);
->>   }
->>  =20
->>   static void dtsec_link_up(struct phylink_config *config, struct phy_de=
-vice *phy,
->> @@ -948,15 +955,10 @@ static void dtsec_link_up(struct phylink_config *c=
-onfig, struct phy_device *phy,
->>   	iowrite32be(tmp, &regs->ecntrl);
->>  =20
->>   	tmp =3D ioread32be(&regs->maccfg2);
->> -	tmp &=3D ~(MACCFG2_NIBBLE_MODE | MACCFG2_BYTE_MODE | MACCFG2_FULL_DUPL=
-EX);
->> -	if (speed >=3D SPEED_1000)
->> -		tmp |=3D MACCFG2_BYTE_MODE;
->> -	else
->> -		tmp |=3D MACCFG2_NIBBLE_MODE;
->> -
->>   	if (duplex =3D=3D DUPLEX_FULL)
->>   		tmp |=3D MACCFG2_FULL_DUPLEX;
->> -
->> +	else
->> +		tmp &=3D ~MACCFG2_FULL_DUPLEX;
->
-> Did you test this when forcing 10/100 speed?
+Hello:
 
-No I didn't. Well I can't. I have a very weird board which only
-supports 1000base-X (and copper SFPs in 1000basex autoneg mode). On
-top of that there is a Marvell 88E1112 in between the SFP and the
-MAC, for which the PHY driver is completely broken. Long story
-short, I'm not able to test that (yet/at all? Not sure).
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
--michael
+On Fri,  3 Jul 2026 20:35:46 -0700 you wrote:
+> When an ERROR chunk with a STALE_COOKIE cause is received in the
+> COOKIE_ECHOED state, sctp_sf_do_5_2_6_stale() reads the 4-byte Measure
+> of Staleness that follows the cause header:
+> 
+> 	err   = (struct sctp_errhdr *)(chunk->skb->data);
+> 	stale = ntohl(*(__be32 *)((u8 *)err + sizeof(*err)));
+> 
+> [...]
 
->
->>   	iowrite32be(tmp, &regs->maccfg2);
->>  =20
->>   	mac_dev->update_speed(mac_dev, speed);
->
-> If so,
->
-> Reviewed-by: Sean Anderson <sean.anderson@linux.dev>
+Here is the summary with links:
+  - [net] sctp: validate STALE_COOKIE cause length before reading staleness
+    https://git.kernel.org/netdev/net/c/1cd23ca80784
 
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
