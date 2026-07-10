@@ -1,234 +1,300 @@
-Return-Path: <netdev+bounces-306640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306641-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5xFjJDAyUWqMAgMAu9opvQ
-	(envelope-from <netdev+bounces-306640-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 19:56:00 +0200
+	id Tl4iFQUzUWqrAgMAu9opvQ
+	(envelope-from <netdev+bounces-306641-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 19:59:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB83873D228
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 19:55:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9127A73D268
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 19:59:32 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=hpOp5hP6;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306640-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306640-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=everpuredata.com header.s=google header.b=EUM6VEht;
+	dmarc=pass (policy=quarantine) header.from=everpuredata.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306641-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306641-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AA3A930086DE
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 17:55:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 60997303CD1F
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 17:57:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E12C37756C;
-	Fri, 10 Jul 2026 17:55:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DAAB42DA56;
+	Fri, 10 Jul 2026 17:57:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80D23749E5
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 17:55:13 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783706115; cv=none; b=juTiqVYVjkiO7z+wTGIMUTvS7pJMOI9qK7D1z20vUQ6y5pjQYCFg+IgssEbUA+q0doCNnwEbV3cFzGI2wXk3di9KDhrsHoFZMb2MJdtpbqKrSTYsSvNIL4O1EH2TbYLfFcjijrGjAlpFsISP5QXiy72PgOfPXZPmD/J+QBrHnS8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783706115; c=relaxed/simple;
-	bh=q2Pq9v5SXGlcc93M8LKL/aV+CQ++fQMQq3HsJTaHEFo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WMEz0cjctcQ45v7eHvPhX/QVbShMT7MaMbg6mSHAJNVyGfXnt4xjlrBvpLMJq+8NmhaYThGUIyHJiHYCMir5Rm0tm5iaou0RVvlXwZKjXndRrjxOExLIMLLFZoYmuuRImpOY2N96+BDLF+JwZZSDh0mebTZ6j3g37t+yL8SWC9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hpOp5hP6; arc=none smtp.client-ip=209.85.216.50
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-38101f85591so1757665a91.1
-        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 10:55:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04BEC2ED860
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 17:57:01 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783706224; cv=pass; b=gwNBdPjDVUCwfCvpGLF/synQrOn5c4E2ok+NkAv1AJIR88qsdgRjYyV9Q1zkvHPdp41ivB+J6ZZB9eAjx+YoDNAL2zhWsxC4QK/YqBNIuS1zTHUkQXArZP17M0gUjcO+R1eCXZR8h2VyRXN/OCMqFXw9SnwQ72Dyvv8o7OG4bzU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783706224; c=relaxed/simple;
+	bh=sKCmj/MAcdsfDhf059d98K/uKGyICNLrAjmrzMiB4CE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EvOzY/BwpH7fNEN9oWftLKftxP2uKZELTmkQnirO9hoWHqumqoFubw1bvVM6YVYN3zCT9nZnazlZw+goV7+a4xpXuJFuGIJQAMEGMEOOTMifyvgecqrx1T9A/C8sdKVqro5vd02SvJvkzFtCfrQs1TfZz6PYc7kpaLqcu9DpvfQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=everpuredata.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=everpuredata.com header.i=@everpuredata.com header.b=EUM6VEht; arc=pass smtp.client-ip=209.85.221.174
+Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-5bfa6766cf6so778618e0c.3
+        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 10:57:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783706221; cv=none;
+        d=google.com; s=arc-20260327;
+        b=TqNd6rui+dNbqEBmFuStSYZIk/naRRt0EL5MC4BYhJRD5LBK1+Bs+JmJlTDALdQtNV
+         hoDzpwT2oeWHxbR46Ghi4iO0eVaGUsCOktrqbqw5h9lni+g/H413fICUV0MlNnztOBBU
+         o2jOCgyccZss7/VO9Y2kQsdv+BFzTOeHpJsAhoNSMpj9mYu4yb0fzblhYYj+8DvbEPYq
+         JTHBAUK48RsmEsYslzz37j68Xh7WLc+hwTpGgTEIunRfLneCVJ4HJuCcZ4050tIQTWe/
+         YlJefwkM6K3zkJPeu+KvjIX++RSkSq+EVxsAgCY6CNSOvkv9Jtb/va7vTy/jABhYLtQn
+         511g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vGLPsJSAr2LVAQzabNsffxPju3AsO91AtDgLJpKXYUs=;
+        fh=ar5Wl+s7PCxkDA6REpmk8mBtdxq/QExujRSvxSt5TZQ=;
+        b=jsGLC8fUyB2mAGZ/CUyqnIQ1aQUR11BzNDdi5XLmu0bE1Hwanq1IBLB/w5oVUoc5Z6
+         m51hdyjS9sr93YjJ0ctTh2f6W7YO39Q/yl4ifQ6RGj7Mjr0cVQX5AWxfq8EO+3zWPyfj
+         Xl/b038ZOlh+Gt0K8zyyV+Cc6mnXpULO+KBO9THU/tHu5ekNYEvzL9hpIFr33p2UkgC/
+         c4kkBX9cSWrqa3EoNFYRApG4nEf1Zsl7dmM7fbEwvpAyr0qEgwoDwYodMOleSDg6YMo0
+         BabgsINVAopEEGfllFntoExwibOqCS+0znuHL1RuyevAYVCXtQfLeoVIJb282ihifXhN
+         ehuA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783706113; x=1784310913; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=g/g6IlAQtSI8doB/Bb8hhgXDYZeL8IDA7KJYnBAyAHU=;
-        b=hpOp5hP6cRBd/LrQW2ksjdFVGQIfhOjdMt+y6NmfUg0B/EBx5pwnC2uoyBKs53pQbz
-         +amXLV3QniFfNgIhrkeSg31DxJThsJil8et3b6DXhauIfQk+lTZ241ksfblHrW7UZoQV
-         MCB2wuVyhYFANZxphVifp1GSgnYo8dQ6M6TizkX2sv6/datbAaUXmuw+imE0B7NZURiW
-         9SD22DklogXVZhN2gXoMldlX0Au+IOUXzk9nitBCJSDL8b6fS8fF/667o3DtFJWGjEwh
-         seXjczxvU09ecYAx4n1E+hUOAJfidO2OMPphrGxvj81gsbM4jGixs0UpwcZnknxl3Zda
-         NAKw==
+        d=everpuredata.com; s=google; t=1783706221; x=1784311021; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=vGLPsJSAr2LVAQzabNsffxPju3AsO91AtDgLJpKXYUs=;
+        b=EUM6VEht7JncoKRob9RnI/CPltyUlo2MHaHuLNNnBKiEu8qgyGqLCze3MPabkBqTcC
+         5qjs0HsXW+0MYcQwAnAjZJ4epZuSlvFq6rp6e3bnLl5M5sVdMjFODsH5JMqmklZkZSWs
+         agD/Icl2vujHZUxMtmoD3IFtQLGTbjkaF9nv4kR4lawDQmnbB9LtdiwuJH5rnMxH2t8T
+         0Li328ajpgP/jhC10l15dxsBIm29QjKX35EzHfZN39XVQOIhAHfFTHQeKxMnAQ2q09yV
+         RWjSJbPlM1pB7vpEu/COnmx6ML/yrLoGet3ss+GsZpdke6nSmvhRCd6rjMrc+k6ZzZoT
+         bzTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783706113; x=1784310913;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=g/g6IlAQtSI8doB/Bb8hhgXDYZeL8IDA7KJYnBAyAHU=;
-        b=OYQWY4WVRefs5mF0pzYBhYdtQdRsRImbi3Pl7FDFVrTYbouBmrRm8QhvD12eq6ggqP
-         20xUCvjND7a3RnDl5mTm/GmjXaUxLcbduc3ozE7EwAuwjNi5dUYXbrPjKhGbogniapDP
-         owXS39hNmwyx65wR2wdWYky84Z5cR3kbUEXOsTn9qbXTZq1EjBNieH/mJ2itsv/TLTFd
-         6INdtMheYwrzPgT/pqRRcyGx7uiICqHQqSra+xj3qX7LkzrvUeYJ1amfa3wooNB6W/GK
-         dzh6+e2mj4wKlnA88vnrh0JSZqh9ujQvoliU7bekqS0z5sWFZWprdJHCk7oYhplEQOGx
-         BHlA==
-X-Forwarded-Encrypted: i=1; AHgh+Rp+KcbsuZjAVYhyglV+mDNpJo2jZT2I4z7zWRe2pT8JxR0fy6fBAMf2mu8MHOehtdn9NCiyx90=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgNRl1NtwGEQ+xmv6dU3feJ2qORCy9RW42rkB4P9MmYjziI3SN
-	4slddFCwu8cYGfTb7iNVmTZ5gRGMG6Y88NjsdKVJCFebIIN9IxvbuYCo
-X-Gm-Gg: AfdE7ck2zDPFdf4S1gQdvEry5vsTFEb0m3nm478+KCsgw+sjYa04uTJeaehVc7YVY0w
-	BRzpKQVycNdWrw3Yt7pdZmsURZvaWP32P1e60oOjOH3xY2G8gaWZe8dkrjziSSQUnXhJUGciNRy
-	JSs8FFG64IhSoTFy2723fA3szcrWGVlgXnAPjXnNIPF5+mGXyAJUE0rF+C0Grh0D8e9iZ18YuUI
-	ul9TyLK0gZLkU68YzX9eBlCno2U4ZCxAPPVuksw3WtCgc1VKgXoaGC+ouI/A1253wYpf77IsYlP
-	i/GfkzZnBPjL87mzm0ZpCoWXv09B8w9+UpVM+uqku3vZuOi632rQH+zGTIer6J1XoC7TuYnIfyb
-	wWKURh8aGpIXW96jZuDFPzQDJRVb2bouBpnnVmcvBaiTqnBYerG3jFGgazOl0Av9DN3yD1Nk3AZ
-	pqiyXOx+P+vMbN/Tt1jXt0LuZJIZnW+VkTYyBSVLhYswYZ8GpaKrIR1z1/RQXyqqXQoStH
-X-Received: by 2002:a17:90b:2401:b0:38d:9eda:fa04 with SMTP id 98e67ed59e1d1-38d9edafc8emr2029326a91.2.1783706113230;
-        Fri, 10 Jul 2026 10:55:13 -0700 (PDT)
-Received: from fx.tailc0aff1.ts.net ([206.206.192.132])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-311747f596asm43051871eec.2.2026.07.10.10.55.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jul 2026 10:55:12 -0700 (PDT)
-From: Weiming Shi <bestswngs@gmail.com>
-To: David Heidelberg <david@ixit.cz>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: oe-linux-nfc@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	xmei5@asu.edu,
-	Weiming Shi <bestswngs@gmail.com>
-Subject: [PATCH net] nfc: llcp: validate TLV length before parsing to fix OOB read
-Date: Fri, 10 Jul 2026 10:55:01 -0700
-Message-ID: <20260710175500.2068564-2-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20251104; t=1783706221; x=1784311021;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=vGLPsJSAr2LVAQzabNsffxPju3AsO91AtDgLJpKXYUs=;
+        b=YPRXGtUoFRzOcSpcQ+bFaUIMQilqcn1Z8H8ZG0WyzMcb0jGX3lh+/jhT8iuTg85iPN
+         zJTqZbKBF/bh3R9Gsar9TxcPlcWI2zEQVDjDd8k/MEdfJ0d0iu3RVrKX0kgVAkVnmz7B
+         plMHtxV2mLLU49/vq6RbUE8sAw2T9BJ222oCqkmtCQKc9dh6CzibP4PIjkdNf4Axwq+U
+         MznD+iPQYaxSd31ft1+Q2c4clnHTEqPdXCUTY1/mcOmgH2ItcP4CFvlfYGl3RgNmkGHt
+         MmgM9UL70+fOXo2tJXTLUCDTcpqIT/EnYuzY0c3cB0eLTcPa2uUkyZTLRfG1Dd2sJVzY
+         yaVw==
+X-Forwarded-Encrypted: i=1; AHgh+RoLjBhmBpvVoM0ufh5A0+AO9x9vwBxncyFncTOZJcv3iw9lLbwUXyRcdKkISwZU1oZ2Oofb1yA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZ0hoqRB/4LwrQq1Ar16BG0OxWH12D7SJkyrV86zVjM29Vqwyg
+	MLYcZFB1I6w8ubwlwhkKLvfctdvS5GIYjgZQO49jolB9PF3SKwz+CvflRYBt6z8y13z6LFUqgE4
+	jyXeuBq/bgTz+y+Jwk3/k06FSxtg7e+UdTmJEE+Fyew==
+X-Gm-Gg: AfdE7cmLpyNBl57HADaRzvX8K1b+sb8axTJ8k/gpyQJ7acIM7NFa5Pn55wFlTwOTaFx
+	soerR1I0Si/5MIAidF0+ttkeNxF7ZrB6n8bBNgO4CoCutZW6hro0TbVYSyVbiqELJ/njKTU4WGM
+	2DTaOrUaeqsA7jxLdLWJbeBT2KnautYcqNGV7jFFPah5Fghq7aefJHVjzcvTvsKZybE1hKS0V8q
+	oFVsi0/kr7SyQjyaxY67ip6yckgc6vdtt9wQdrOYM6lLsdsMhVsTJwNvPFdIDKRshBpBfWrlJqC
+	UqSPPAgeKuPxiO7V8f5q4MPbjhu4Rct3sJi41pEz9DwlREx0LKYDJ+hz4XjuYL9RbaTzNvU7eth
+	HdJ+STKC75mAaWj2pobBpPjq8lS+o7qk0C9lLSidfND6IVaFxEyDTjEPxe1esEOC569A=
+X-Received: by 2002:a05:6122:1682:b0:5bf:ad8d:4f9a with SMTP id
+ 71dfb90a1353d-5bfbf141d59mr253469e0c.4.1783706219111; Fri, 10 Jul 2026
+ 10:56:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAKaoeS3RbLP=D1G6HHaSfQLj4VSi_W=HZ9EnKxKia_EjcT1vSw@mail.gmail.com>
+ <20260708060319.68063-1-nils.juenemann@gmail.com>
+In-Reply-To: <20260708060319.68063-1-nils.juenemann@gmail.com>
+From: Rishikesh Jethwani <rjethwani@everpuredata.com>
+Date: Fri, 10 Jul 2026 10:56:48 -0700
+X-Gm-Features: AUfX_mwNnjoCz1YZXZRKcXSucwnw88a0ux8VePz3UseWoj2Vrrx0p9d98btSNnQ
+Message-ID: <CAKaoeS1ym7EF-KJqF1G+xm2tqogVMaEnmBUUcXw3vHG+xSTGhw@mail.gmail.com>
+Subject: Re: [PATCH net-next v14 0/9] tls: Add TLS 1.3 hardware offload support
+To: Nils Juenemann <nils.juenemann@gmail.com>
+Cc: borisp@nvidia.com, davem@davemloft.net, edumazet@google.com, 
+	john.fastabend@gmail.com, kuba@kernel.org, leon@kernel.org, mbloch@nvidia.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, saeedm@nvidia.com, 
+	sd@queasysnail.net, tariqt@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[everpuredata.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[everpuredata.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,asu.edu,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-306640-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:nils.juenemann@gmail.com,m:borisp@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:leon@kernel.org,m:mbloch@nvidia.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:saeedm@nvidia.com,m:sd@queasysnail.net,m:tariqt@nvidia.com,m:nilsjuenemann@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:david@ixit.cz,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:xmei5@asu.edu,m:bestswngs@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[rjethwani@everpuredata.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-306641-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[everpuredata.com:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rjethwani@everpuredata.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[nvidia.com,davemloft.net,google.com,gmail.com,kernel.org,vger.kernel.org,redhat.com,queasysnail.net];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,asu.edu:email]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,everpuredata.com:from_mime,everpuredata.com:email,everpuredata.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DB83873D228
+X-Rspamd-Queue-Id: 9127A73D268
 
-nfc_llcp_parse_gb_tlv() and nfc_llcp_parse_connection_tlv() iterate over
-a TLV array supplied by the remote peer. Each iteration reads the type
-and length from tlv[0]/tlv[1] and then advances by length + 2, but the
-loop only tests offset < tlv_array_len and never checks that the 2-byte
-header fits in the remaining space. A truncated trailing entry is enough
-to read past the buffer on the tlv[1] access.
+On Tue, Jul 7, 2026 at 11:03=E2=80=AFPM Nils Juenemann <nils.juenemann@gmai=
+l.com> wrote:
+>
+> On Tue, Jul 7, 2026 at 5:31 PM Rishikesh Jethwani <rjethwani@everpuredata=
+.com> wrote:
+> >
+> > Could you post the disassembly [...] count how many distinct loads of
+> > sk+0x4f8 the compiler emitted in that region.
+>
+> objdump of mlx5e_ktls_handle_rx_skb, CQE_TLS_OFFLOAD_RESYNC branch
+> (+0x63) through RIP+0x10a; bytes match the oops Code around the fault:
+>
+>   11bd03:       48 83 82 90 01 00 00    addq   $0x1,0x190(%rdx)
+>   11bd0a:       01
+>   11bd0b:       48 8b b6 d0 00 00 00    mov    0xd0(%rsi),%rsi
+>   11bd12:       49 89 fc                mov    %rdi,%r12
+>   11bd15:       4c 8b b7 00 01 00 00    mov    0x100(%rdi),%r14
+>   11bd1c:       0f b7 46 0c             movzwl 0xc(%rsi),%eax
+>   11bd20:       4d 8b be 08 01 00 00    mov    0x108(%r14),%r15
+>   11bd27:       66 3d 81 00             cmp    $0x81,%ax
+>   11bd2b:       0f 84 a4 01 00 00       je     11bed5 <mlx5e_ktls_handle_=
+rx_skb+0x235>
+>   11bd31:       66 3d 88 a8             cmp    $0xa888,%ax
+>   11bd35:       0f 84 9a 01 00 00       je     11bed5 <mlx5e_ktls_handle_=
+rx_skb+0x235>
+>   11bd3b:       0f b7 43 78             movzwl 0x78(%rbx),%eax
+>   11bd3f:       49 89 c5                mov    %rax,%r13
+>   11bd42:       48 01 c6                add    %rax,%rsi
+>   11bd45:       45 8b 8e e0 00 00 00    mov    0xe0(%r14),%r9d
+>   11bd4c:       0f b6 06                movzbl (%rsi),%eax
+>   11bd4f:       83 e0 f0                and    $0xfffffff0,%eax
+>   11bd52:       3c 40                   cmp    $0x40,%al
+>   11bd54:       0f 84 a8 01 00 00       je     11bf02 <mlx5e_ktls_handle_=
+rx_skb+0x262>
+>   11bd5a:       44 0f b7 46 2a          movzwl 0x2a(%rsi),%r8d
+>   11bd5f:       41 8d 45 28             lea    0x28(%r13),%eax
+>   11bd63:       0f b7 56 28             movzwl 0x28(%rsi),%edx
+>   11bd67:       4c 89 ff                mov    %r15,%rdi
+>   11bd6a:       89 45 d4                mov    %eax,-0x2c(%rbp)
+>   11bd6d:       48 8d 4e 18             lea    0x18(%rsi),%rcx
+>   11bd71:       4c 8d 76 28             lea    0x28(%rsi),%r14
+>   11bd75:       48 83 c6 08             add    $0x8,%rsi
+>   11bd79:       6a 00                   push   $0x0
+>   11bd7b:       66 41 c1 c0 08          rol    $0x8,%r8w
+>   11bd80:       45 0f b7 c0             movzwl %r8w,%r8d
+>   11bd84:       e8 00 00 00 00          call   11bd89 <mlx5e_ktls_handle_=
+rx_skb+0xe9>
+>   11bd89:       49 89 c7                mov    %rax,%r15
+>   11bd8c:       58                      pop    %rax
+>   11bd8d:       4d 85 ff                test   %r15,%r15
+>   11bd90:       0f 84 4a ff ff ff       je     11bce0 <mlx5e_ktls_handle_=
+rx_skb+0x40>
+>   11bd96:       41 0f b6 47 12          movzbl 0x12(%r15),%eax
+>   11bd9b:       3c 06                   cmp    $0x6,%al
+>   11bd9d:       0f 84 cc 00 00 00       je     11be6f <mlx5e_ktls_handle_=
+rx_skb+0x1cf>
+>   11bda3:       49 8b 87 f8 04 00 00    mov    0x4f8(%r15),%rax
+>   11bdaa:       48 8b 40 30             mov    0x30(%rax),%rax
+>
+> One load of sk+0x4f8 in this range, at 11bda3 (the fault). r15 only
+> becomes sk at 11bd89 (mov %rax,%r15), so there is no sk+0x4f8
+> dereference before 11bda3 in this range. The only other sk+0x4f8
+> load in the function is 11be20, after the fault and not reached. So my
+> earlier "two independent loads, second reading NULL" was wrong.
+>
+> Thanks,
+> Nils
 
-The length byte then makes it worse. offset is a u8, so length + 2 wraps
-at 256: length == 0xff advances by 0x101 and leaves offset unchanged, so
-the loop stays live while tlv keeps moving forward. The parse walks well
-past the buffer, and the next iteration's tlv[0]/tlv[1] read lands out of
-bounds rather than the walk stopping one entry over.
+    resync_update_sn() handles CQE_TLS_OFFLOAD_RESYNC by looking up the
+    socket with inet_lookup_established() / __inet6_lookup_established()
+    and then dereferencing tls_get_ctx(sk) on the assumption that the
+    returned socket owns the TLS context that produced the CQE.
 
-nfc_llcp_parse_gb_tlv() runs on the general bytes of an activated
-NFC-DEP link. An RF_INTF_ACTIVATED_NTF in listen mode reaches it via
-nci_ntf_packet() -> nfc_tm_activated() -> nfc_llcp_set_remote_gb(), which
-copies the peer's general bytes into the 48-byte remote_gb[] field of the
-heap-allocated struct nfc_llcp_local; the wrapped walk runs off the end
-of that allocation. nfc_llcp_parse_connection_tlv() is reached the same
-way from CONNECT/CC PDUs, over tlv data taken from the received skb.
+    That assumption is not guaranteed. The established lookup matches only
+    on the 5-tuple and does not filter on TLS ULP state, so it can return a
+    TCP_ESTABLISHED socket with no TLS context attached. In that case
+    tls_get_ctx(sk) is NULL and the RX resync path dereferences it.
 
-Bound each iteration to tlv_array_len before touching the header, and
-widen offset to u16 so the advance can no longer wrap. Well-formed TLVs
-are parsed as before; a malformed trailing entry ends the loop.
+    In the observed crash, the returned socket was TCP_ESTABLISHED with bot=
+h
+    icsk_ulp_ops and icsk_ulp_data NULL, i.e. a socket without a TLS ULP
+    attached at lookup time. This can happen if a stale resync CQE is
+    matched to a different socket for the same 5-tuple, or otherwise
+    resolves to a socket without a TLS context.
 
- BUG: KASAN: slab-out-of-bounds in nfc_llcp_parse_gb_tlv (net/nfc/llcp_commands.c:204)
- Read of size 1 by task kworker/u8:3
-  nfc_llcp_parse_gb_tlv (net/nfc/llcp_commands.c:204)
-  nfc_llcp_set_remote_gb (net/nfc/llcp_core.c:681)
-  nfc_tm_activated (net/nfc/core.c:643 net/nfc/core.c:677)
-  nci_ntf_packet (net/nfc/nci/ntf.c:883 net/nfc/nci/ntf.c:1015)
-  nci_rx_work (net/nfc/nci/core.c:1564)
+    Fetch tls_get_ctx(sk) once after the TIME_WAIT check and bail out if it
+    is NULL, then pass the sampled tls_context down to the resync helpers.
 
-Fixes: d646960f7986 ("NFC: Initial LLCP support")
-Reported-by: Xiang Mei <xmei5@asu.edu>
-Assisted-by: Claude:claude-opus-4-8
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
----
- net/nfc/llcp_commands.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
-
-diff --git a/net/nfc/llcp_commands.c b/net/nfc/llcp_commands.c
-index 291f26facbf3..3f0f8eef9890 100644
---- a/net/nfc/llcp_commands.c
-+++ b/net/nfc/llcp_commands.c
-@@ -193,17 +193,21 @@ int nfc_llcp_parse_gb_tlv(struct nfc_llcp_local *local,
- 			  const u8 *tlv_array, u16 tlv_array_len)
+Patch:
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
+b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
+index c0676148a36e..754b6a45f604 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
+@@ -478,12 +478,12 @@ void mlx5e_ktls_handle_get_psv_completion(struct
+mlx5e_icosq_wqe_info *wi,
+ /* Runs in NAPI.
+  * Function elevates the refcount, unless no work is queued.
+  */
+-static bool resync_queue_get_psv(struct sock *sk)
++static bool resync_queue_get_psv(struct tls_context *tls_ctx)
  {
- 	const u8 *tlv = tlv_array;
--	u8 type, length, offset = 0;
-+	u8 type, length;
-+	u16 offset = 0;
- 
- 	pr_debug("TLV array length %d\n", tlv_array_len);
- 
- 	if (local == NULL)
- 		return -ENODEV;
- 
--	while (offset < tlv_array_len) {
-+	while (offset + 2 <= tlv_array_len) {
- 		type = tlv[0];
- 		length = tlv[1];
- 
-+		if (offset + 2 + length > tlv_array_len)
-+			break;
-+
- 		pr_debug("type 0x%x length %d\n", type, length);
- 
- 		switch (type) {
-@@ -243,17 +247,21 @@ int nfc_llcp_parse_connection_tlv(struct nfc_llcp_sock *sock,
- 				  const u8 *tlv_array, u16 tlv_array_len)
- {
- 	const u8 *tlv = tlv_array;
--	u8 type, length, offset = 0;
-+	u8 type, length;
-+	u16 offset = 0;
- 
- 	pr_debug("TLV array length %d\n", tlv_array_len);
- 
- 	if (sock == NULL)
- 		return -ENOTCONN;
- 
--	while (offset < tlv_array_len) {
-+	while (offset + 2 <= tlv_array_len) {
- 		type = tlv[0];
- 		length = tlv[1];
- 
-+		if (offset + 2 + length > tlv_array_len)
-+			break;
-+
- 		pr_debug("type 0x%x length %d\n", type, length);
- 
- 		switch (type) {
--- 
-2.43.0
+        struct mlx5e_ktls_offload_context_rx *priv_rx;
+        struct mlx5e_ktls_rx_resync_ctx *resync;
 
+-       priv_rx =3D mlx5e_get_ktls_rx_priv_ctx(tls_get_ctx(sk));
++       priv_rx =3D mlx5e_get_ktls_rx_priv_ctx(tls_ctx);
+        if (unlikely(!priv_rx))
+                return false;
+
+@@ -507,6 +507,7 @@ static void resync_update_sn(struct mlx5e_rq *rq,
+struct sk_buff *skb)
+        struct tls_offload_resync_async *resync_async;
+        struct net_device *netdev =3D rq->netdev;
+        struct net *net =3D dev_net(netdev);
++       struct tls_context *tls_ctx;
+        struct sock *sk =3D NULL;
+        unsigned int datalen;
+        struct iphdr *iph;
+@@ -545,12 +546,20 @@ static void resync_update_sn(struct mlx5e_rq
+*rq, struct sk_buff *skb)
+        if (unlikely(sk->sk_state =3D=3D TCP_TIME_WAIT))
+                goto unref;
+
+-       if (unlikely(!resync_queue_get_psv(sk)))
++       /* Established lookup is tuple-based and may return a socket withou=
+t
++        * a TLS ULP attached. Sample the TLS context once and bail out if
++        * none is present.
++        */
++       tls_ctx =3D tls_get_ctx(sk);
++       if (unlikely(!tls_ctx))
++               goto unref;
++
++       if (unlikely(!resync_queue_get_psv(tls_ctx)))
+                goto unref;
+
+        seq =3D th->seq;
+        datalen =3D skb->len - depth;
+-       resync_async =3D tls_offload_ctx_rx(tls_get_ctx(sk))->resync_async;
++       resync_async =3D tls_offload_ctx_rx(tls_ctx)->resync_async;
+        tls_offload_rx_resync_async_request_start(resync_async, seq, datale=
+n);
+        rq->stats->tls_resync_req_start++;
 
