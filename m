@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-306528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306529-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id N1VbGnzdUGox6gIAu9opvQ
-	(envelope-from <netdev+bounces-306528-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:54:36 +0200
+	id +wS4L4HdUGoy6gIAu9opvQ
+	(envelope-from <netdev+bounces-306529-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:54:41 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64E8273A73C
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:54:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D3D173A73F
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:54:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b=UiJP6mi1;
+	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b="WS/aDT0s";
 	dmarc=pass (policy=none) header.from=debian.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306528-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306528-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306529-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306529-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8B1FE3000890
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 11:54:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D0F083002D00
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 11:54:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C54F3B83F0;
-	Fri, 10 Jul 2026 11:54:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C8A41B374;
+	Fri, 10 Jul 2026 11:54:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 203224071C0;
-	Fri, 10 Jul 2026 11:54:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 306EF41CB43;
+	Fri, 10 Jul 2026 11:54:23 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783684468; cv=none; b=T9nAxEIeOvqq7O6G9IaVWLacXnNlY4SHbsPPwLRujId6+wjeTllX080S0n4dzMNPv/p3dyjCFWaQWS7jBqoUOtGyo+bRIUU2w1obYQQmhMIbagjlEHU08T6Dp/fawcYt97A4Ukscb9vBCqApzx5wtZndHdaj0MfdlIi3Wbu7gek=
+	t=1783684471; cv=none; b=V056i+2jOPJI3ar60yFR0+UbcNYLQSqZ+JgqLeaORKWWD+rxTKbEbi0UXAfMAh7xugFw7fzbhLtkXeGyracWvHqav1p+4vIEuEAX0rrJBWTRJH1MWQuSF/wR/ihqTd30IPSzWW18e9zcyJMBKWArrj8ERlGgq0fuW6LFf2yctRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783684468; c=relaxed/simple;
-	bh=JJEImsDOAoplKT7IIKdfb7HUUGsqYRZMw0laIJe5Ijs=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CTn7BhM/3F9fclpmIkq4verACruzZvZfhxHVgi5sWXhH4SSwLvdPY6hJ6se/GOeUbB6mrXzbfThTrdr7l86YZWncmrVmEjSTT0WfJfQKrkGiz6k00fOLnPiPt6YTrzMYs2lFF/rzWQav6BY/3nncgAZTnZp0sugL5cXC3Z6RVTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=UiJP6mi1; arc=none smtp.client-ip=82.195.75.108
+	s=arc-20240116; t=1783684471; c=relaxed/simple;
+	bh=FrHrWtgVfE58Feh6du91FulP4WKEswSCdpmYM3JxkIU=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=pAyEDyWKqQ1jPyHexOSUJgzoa5eMPedP+saHXR0/Gq+xoxv+9MK+hd5Q0rP59obKTT4wvYM+cn11CFHZuO1SM8Jop/9R4lH34TZRG2Oms/fgk4XUUOeitLjAEjsKR2mDYTs+W4K39MpoPYhgtyI+QNN2vnJlEAhMfPcSL93l4eM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=WS/aDT0s; arc=none smtp.client-ip=82.195.75.108
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:Message-Id:Date:Subject:From:Reply-To:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=OyEtWdpelATZm7GtucoX6ShND2X9sxAuy6C0oFS0uSo=; b=UiJP6mi1MHjmETxcflaEgizP3a
-	YpsfvO+p+Cnn883clDh6qgGG6cFEV3Vzgns6jZijn39Oq05yPfborrCSWl53yI24C5GqTpcqJkF3m
-	LKrwtq+iDnxEjFkYjFqa2QIyHngYOL8f9OVNrF+5nh2oGrDmDiuFHGim26nJXxYMYAjpJvDFpND6u
-	ig3U7UcBkkpRaFWvULyVeYenN8WLPWlAd5Kg/3wEbSYCrs4Y8QP+UP/l6N95w6jJMnSRJRe/CBQ2e
-	HGOqzxaspMRywsPiunHvqleO0gfdJANWKu+sOeEwmxp024L6so2CT2+xPkhgv48P+QWwu2kAgyDh1
-	B0aIpmvA==;
+	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:In-Reply-To:References:
+	Message-Id:Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:
+	From:Reply-To:Content-ID:Content-Description;
+	bh=xMDAPaptgDk1W5/odzMbgIuEUp9S3c4/7fP44O+s2vM=; b=WS/aDT0sRqgEvLz0UNXXrm2c0k
+	cQ81V4Vow9qI+19cYrM9TOu/cMsKfPLd+LUatn5jTJhRSQdqHypCsovshcnbXzvt7p40QWCebHf7V
+	dEryG9QKWnbFTg3+2IFZHqoMdOW5vUeXajBrHYwP0ModE9zXvYf9WaVhTQLL2vPXhK7CWMFulVdBb
+	Do6nXAJt1qjSAFf8yRDFXXyJ2cZjEFzdsOgtSrOXZGMkrFWO/7YTIfHZWla784VmEtwTIQesAGHSQ
+	8VqTKo6NMak+6WBIymD2mV10wys3+bJCJ3umfVnurzv/brU0Igp7ECdNxrpYVFOfCcmM67Ah6OwA/
+	apbYhpFw==;
 Received: from authenticated-user
 	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.96)
 	(envelope-from <leitao@debian.org>)
-	id 1wi9o7-004SXQ-33;
-	Fri, 10 Jul 2026 11:54:16 +0000
+	id 1wi9oC-004SXT-0C;
+	Fri, 10 Jul 2026 11:54:20 +0000
 From: Breno Leitao <leitao@debian.org>
-Subject: [PATCH net-next v3 0/9] netconsole: stop charging netpoll users
- for netconsole-only data
-Date: Fri, 10 Jul 2026 04:38:52 -0700
-Message-Id: <20260710-netconsole_move_more-v3-0-6f63f76b28bc@debian.org>
+Date: Fri, 10 Jul 2026 04:38:53 -0700
+Subject: [PATCH net-next v3 1/9] netconsole: clean up released targets
+ dropped before the cleanup worker
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,11 +62,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAM3ZUGoC/3XNQQvCIBjG8a8i73mGutXcTn2PiJj6bhNKQ0UWY
- 989skN02OW5/OH3rBAxWIzQkxUCZhutd9CTuiKg58FNSK2BnoBg4sSOvKEOk/Yu+jveHj5/JiC
- VUo4GWW1G3UJF4BlwtEthL+AwUYdLgmtFYLYx+fAqf5mX/qXFDp05ZbRjneGDqjupmrNBZQd38
- GEqYhY/pWViRxGUUY4KjekEN1r9Kdu2vQHqiMXdCQEAAA==
-X-Change-ID: 20260514-netconsole_move_more-888fde03dfc7
+Message-Id: <20260710-netconsole_move_more-v3-1-6f63f76b28bc@debian.org>
+References: <20260710-netconsole_move_more-v3-0-6f63f76b28bc@debian.org>
+In-Reply-To: <20260710-netconsole_move_more-v3-0-6f63f76b28bc@debian.org>
 To: "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
  Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
@@ -75,20 +73,20 @@ Cc: netdev@vger.kernel.org, asantostc@gmail.com, gustavold@gmail.com,
  linux-kernel@vger.kernel.org, Breno Leitao <leitao@debian.org>, 
  kernel-team@meta.com
 X-Mailer: b4 0.16-dev-d5d98
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4033; i=leitao@debian.org;
- h=from:subject:message-id; bh=JJEImsDOAoplKT7IIKdfb7HUUGsqYRZMw0laIJe5Ijs=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqUN1jyUYT62KVqYbm6OUM1JuFrhXO8gct7C4QV
- NcrsaH55ICJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCalDdYwAKCRA1o5Of/Hh3
- bf0JEACjWK3ZIyX1VOvOw9oO3N1zNax0ygfRTN4ctd1cK+2sMzatbQCQQFemP+Gwgb80CD3niTC
- HawD4hW8aiUULrq/gtXzvWmfvPwKfqgwpTxC1hAE0pkD168ltfE8inWCRf/Q2pIIhlpbO3zTWQk
- 8G4hv1H+qDQMu9nP6pTxHJnGqqo9/OP1SVUcteD6sMxM8IyEaAY4jm4Qndz6Rv0wrFaBmFvg0Oo
- gGgFEx5USE3SddtANThu3JBehlZvk+v4mPVl/WaZrBT1CbgWdspgZ6uuZMDBB8To5/VQSfxjDkS
- 6lVvuMj+StcAbCnM2sYrysU8XWxy/0OGXhOgAI9LM8W/LTfLL8uD94b3YXFlFvC3V8+nd22hClB
- DIjoukWB8dFNXoTWTBUEqRDZ+6v+lSxh2V1BiYfMnPqjQFORx2YrtomNosux2eXYfZEtd7XyFQl
- En4UZm3QJN+MB7q36O2crf1FfYf5s823GGSwZZa3mumMwivjbjwbMPGWeP4zRscbj+zWNOdr8+V
- DpR/T54R6I49KDEZzQTn6OI7Uo5AxQEqhLmMLHYrP0rD8nSpZGx5hvna+CS5b9Nvebdkq2sm7pL
- LqNtRhHhGcUEkOKCco79WDBzGi58Wx2+463u4e/jXayme2ZBNwLR+lVjqzwVucEOiE83iisfAfJ
- hB1O25SUJpXwZtw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1855; i=leitao@debian.org;
+ h=from:subject:message-id; bh=FrHrWtgVfE58Feh6du91FulP4WKEswSCdpmYM3JxkIU=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqUN1j2raR2AuzZH3+BiTSCbZCGUz7sCYdiB9eu
+ 5/BHjx2QMyJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCalDdYwAKCRA1o5Of/Hh3
+ bVPYD/wI9YuySwYfil4Xgr10aGR1nibWiWVwGXlRX6UmS7FkSP1umBGo7UT+tUG1ZbNRLXUx1wh
+ JF5W30wDXDyG0krYS1uCft0rUo9sKM/DQmgN9PNDZGVB1NKW2tlAbpi9POGpMsdj0/gp065a663
+ WJDLyZnFAXCajiAO+5M7zrO67/rcVa4koPInZrx7n5oOCtNRwz9bJYqN5OFmcmuHstZDHBxoqS5
+ 4TqudBDVOQ8jAIN++zdCI0U5bkb0AFuEDSHiP6riMONp52EXxeGs0Y4hK7Cgh6zw5vN9tuhMO0G
+ 6Z0rXMoU331PSatN0iH7q3iNb46hu569G2WhgyNlLoj5c7yT0DKAvxoTTV68ocrhkPsWvO42x+m
+ tFwGqwaGRn3nzh1LlvCPSzb0wVMa6qxjtkDqRgwpEacDL4Vjm5HMBfmERdvawsqYi7ENsbzMKmM
+ qnZk8zsMIvmjjACJqC3dXX1wEEKVKHr6nUJTuF4z2EaYKvzD+Lh4ISw+gltUNQm0SrCbi0bQfOq
+ sXo/L1tkdNi76AWXpJJfiiJmbdtiLS9rovEs9poZFT+dMrlC6rN3qrd+ImX/2fNSIYC5M2a+9ft
+ ufiCs6jGmg7h6lwM0Yv62XcNb1Fco0NFWWltM8/DWT1GesW43bo63SbNkSRQ3UofDEz90JGvO2o
+ jd0qh6mt59SgtgA==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 X-Debian-User: leitao
@@ -98,17 +96,17 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
 	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306528-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306529-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:asantostc@gmail.com,m:gustavold@gmail.com,m:linux-kernel@vger.kernel.org,m:leitao@debian.org,m:kernel-team@meta.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[leitao@debian.org,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:asantostc@gmail.com,m:gustavold@gmail.com,m:linux-kernel@vger.kernel.org,m:leitao@debian.org,m:kernel-team@meta.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -125,102 +123,51 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,lunn.ch:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 64E8273A73C
+X-Rspamd-Queue-Id: 0D3D173A73F
 
-This work continue to untangle netconsole and netpoll, improving
-memory usage for netpoll users that are not netconsole.
+drop_netconsole_target() might eventually tear down a target that
+netconsole_netdev_event() had moved to target_cleanup_list but that
+netconsole_process_cleanups_core() had not processed yet.
 
-struct netpoll is shared by every netpoll consumer in the tree:
-bonding, bridge, team, vlan, macvlan, dsa and netconsole. The non-
-netconsole users only need a per-port handle that lets them transmit
-SKBs.
-
-Yet struct netpoll has accumulated a pile of fields that exist only
-to serve netconsole's printk path:
-
-  - skb_pool / refill_wq: the fallback skb pool find_skb() falls back
-    on when alloc_skb() returns NULL, plus the workqueue that refills
-    it.
-  - local_port / remote_port / remote_mac: the source and destination
-    UDP ports and the destination ethernet address used to build
-    outgoing log packets.
-
-Every netpoll user that allocates a struct netpoll pays for all of
-these fields, even though it never queues a single skb on the pool,
-never sends a UDP frame and never looks at any of the addressing.
-
-Move this netconsole-only state out of the shared struct into struct
-netconsole_target, where its only consumer already lives.
-
-After the series every passive netpoll consumer drops
-sizeof(sk_buff_head) + sizeof(work_struct) + 2 * sizeof(u16) +
-ETH_ALEN bytes per port (plus padding), and struct netpoll keeps only
-what belongs to the generic poll/transmit abstraction or what netpoll
-core still reads itself.
-
-Follow-ups
-----------
-local_ip, remote_ip and ipv6 are still in struct netpoll. Moving the
-addressing additionally requires relocating netpoll_setup() -- whose
-only caller is netconsole -- and its IPv4/IPv6 helpers, so it is left
-for a follow-up to keep this series focused on a single responsibility
-transfer.
-
-This is pure code motion with no functional change. The pre-existing
-target/device teardown races reported against v1 have since been fixed
-independently (as suggested by Jakub) and are already in the tree, so,
-re-posting this one.
-
---
-
-Changes in v3:
-- Added a fix for a pre-existing cleanup-skip leak (released/joined targets).
-- Added an skb-pool init-once patch closing an init/teardown race; rebased.
-- Link to v2: https://lore.kernel.org/r/20260702-netconsole_move_more-v2-0-1ebedd921dcb@debian.org
-
-Changes in v2:
-- Rebase on net-next, now that the prerequisite netconsole
-  teardown-race fixes are merged.
-- Squash the local_port and remote_port moves into a single patch.
-- v1: https://lore.kernel.org/r/20260524-netconsole_move_more-v1-0-909d1ab398b4@debian.org
-
-To: David S. Miller <davem@davemloft.net>
-To: Eric Dumazet <edumazet@google.com>
-To: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-To: Simon Horman <horms@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: netdev@vger.kernel.org
-Cc: asantostc@gmail.com
-Cc: gustavold@gmail.com
-Cc: linux-kernel@vger.kernel.org
+Always cleanup devices that eventually have a device attached to the
+target, independent of the state.
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
-Reviewed-by: Simon Horman <horms@kernel.org>
 ---
-Breno Leitao (9):
-      netconsole: clean up released targets dropped before the cleanup worker
-      netpoll: export refill_skbs(), refill_skbs_work_handler(), skb_pool_flush()
-      netconsole: take over skb pool lifecycle from netpoll
-      netconsole: move refill_skbs_work_handler() from netpoll
-      netconsole: move refill_skbs() and skb-pool sizing macros from netpoll
-      netconsole: move skb_pool_flush() from netpoll
-      netconsole: move skb_pool / refill_wq from struct netpoll to netconsole_target
-      netconsole: move local_port / remote_port from struct netpoll to netconsole_target
-      netconsole: move remote_mac from struct netpoll to netconsole_target
+ drivers/net/netconsole.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
- drivers/net/netconsole.c | 199 +++++++++++++++++++++++++++++++++++------------
- include/linux/netpoll.h  |  18 -----
- net/core/netpoll.c       |  51 +-----------
- 3 files changed, 152 insertions(+), 116 deletions(-)
----
-base-commit: 34cf6dafc47441dfb6b356a095b89c3585a93714
-change-id: 20260514-netconsole_move_more-888fde03dfc7
+diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+index c1812a98365b7..a939daa07cf9d 100644
+--- a/drivers/net/netconsole.c
++++ b/drivers/net/netconsole.c
+@@ -1481,15 +1481,15 @@ static void drop_netconsole_target(struct config_group *group,
+ 
+ 	mutex_lock(&target_cleanup_list_lock);
+ 	spin_lock_irqsave(&target_list_lock, flags);
+-	/* A STATE_DEACTIVATED target may have been moved to
+-	 * target_cleanup_list by netconsole_netdev_event() but not yet
+-	 * processed by netconsole_process_cleanups_core(). Unlinking it below
+-	 * hides it from the cleanup worker, so this path has to clean it up
+-	 * itself. Record that the target still owns a netpoll before the
+-	 * state is downgraded.
++	/* A target moved to target_cleanup_list by netconsole_netdev_event()
++	 * but not yet processed still owns a netpoll; unlinking it below hides
++	 * it from the cleanup worker, so this path must tear it down itself.
++	 * This covers NETDEV_UNREGISTER (STATE_DEACTIVATED) and
++	 * NETDEV_RELEASE / NETDEV_JOIN (STATE_DISABLED); key off nt->np.dev,
++	 * which stays set until the netpoll is cleaned up.
+ 	 */
+ 	needs_cleanup = nt->state == STATE_ENABLED ||
+-			nt->state == STATE_DEACTIVATED;
++			nt->state == STATE_DEACTIVATED || nt->np.dev;
+ 	/* Disable deactivated target to prevent races between resume attempt
+ 	 * and target removal.
+ 	 */
 
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
+-- 
+2.53.0-Meta
 
 
