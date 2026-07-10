@@ -1,186 +1,164 @@
-Return-Path: <netdev+bounces-306719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306720-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 91hmORh4UWpPFQMAu9opvQ
-	(envelope-from <netdev+bounces-306719-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 00:54:16 +0200
+	id jWysA0t5UWp8FQMAu9opvQ
+	(envelope-from <netdev+bounces-306720-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 00:59:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6761673FA48
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 00:54:16 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C5BD73FAB6
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 00:59:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=5PEemnWD;
-	dmarc=pass (policy=none) header.from=lunn.ch;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306719-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306719-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=key1 header.b=DJbALGPY;
+	dmarc=pass (policy=none) header.from=linux.dev;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306720-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306720-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D9D43300D763
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 22:54:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 44D633025D04
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 22:57:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1691240861C;
-	Fri, 10 Jul 2026 22:54:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD5F409113;
+	Fri, 10 Jul 2026 22:57:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6623A40861E
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 22:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB5D40912B
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 22:57:22 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783724053; cv=none; b=NB8pH1H05ddbWFDRzGMdiDMQUBXjZkAlcea6VfhicGhRGCo9n7YNhpXINIr29hYH4G88sXn/gLA+zaz5AVfPgxjSydUQqIS5coFJ0x4Hf9xhvV+EJNQA8C6isz9QqMage/0MSlOwx39BARbt15oOwQj8+L/pvfp+iORUZsrL0FY=
+	t=1783724244; cv=none; b=r1lptao9mMjliA00G2V2jJ0HsvVhgvu6MgVy1iFiy9zXLF1yfvbjqSZgzoMnSRK9iUKjX7XpOMvHBdFKKb6qUmLT/zaJv2Ux7d1OaLniXohnpUGOe6nEmF/qmui7sab/c/G/bbE15PmcpinAsSbaGpNMHyCirQ+c1ApuK2rDeMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783724053; c=relaxed/simple;
-	bh=yq4rIY8Sn9xhHVMjv1cPVJ7g1E7JWDAXAtQIHDSkfOU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S7JU+MBkaPeNEhthv9d5urUN3OORVRnqggYUQzo0EjPMMDrA60OsoTvIzEcjFt5KLRScW45R/m9bJqqiMsB3a1YPkH2dhySg/EsfzPPkXeJjmdp8fn//ZyEN0eQwje0imygzhAMJvvDFp+cVN7SQNMbEsF1ncvZJ9GhiLSY7qNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5PEemnWD; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Qb+hEUDBnocfW1i1l/WFDAmbxYJvmsrhRjk5pOLX5hM=; b=5PEemnWDMB+x+S2WPKDUafXd4a
-	56e1ulnyshmquLyKyjXjb5SKFg45//2LllHPWj5ubqTY+tmrfGc6BZhOQ/q4cCRsgOu9++/Hnq3Me
-	/CEO+2DhT+SDEjjBGlEcLL0jfhatqaki/7REb645mS9ebSpaxAl9edxIDxu7R4SJIaI8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wiK6a-00BiF7-GQ; Sat, 11 Jul 2026 00:54:00 +0200
-Date: Sat, 11 Jul 2026 00:54:00 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "D H, Siddaraju" <siddaraju.dh@intel.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Michal Kubecek <mkubecek@suse.cz>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"Chintalapalle, Balaji" <balaji.chintalapalle@intel.com>,
-	"Das, Shubham" <shubham.das@intel.com>,
-	"Srinivasan, Vijay" <vijay.srinivasan@intel.com>,
-	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>,
-	"Keller, Jacob E" <jacob.e.keller@intel.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"singhai.anjali55@gmail.com" <singhai.anjali55@gmail.com>,
-	"Brandeburg, Jesse" <jbrandeburg@cloudflare.com>
-Subject: Re: Ethtool is missing C2C link modes
-Message-ID: <e3dd8e06-97d1-4943-b54c-fdd0d0e6ecaa@lunn.ch>
-References: <SN7PR11MB6900E94E718175AACB2309109AFD2@SN7PR11MB6900.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1783724244; c=relaxed/simple;
+	bh=Bh7slvYsSbYuWHBXJEdYMQfxd/TywiWv0sFj8regivI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h+ZisY5cH1sVd8nBl0aS8TKExX0CRw6H0YaB4ZQO5UufZp4lfnNZ9Kp9XCMbgfR2K0NLNm76sCFgAa+zD26LVj1vw3GVEaH//iGx8FTzW817R60Sf75xMuIXfGgVNdgSuA2IpOwLUJqL2x1ZRpHFlg3uuN0qpoaSf9QWtlNZd/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DJbALGPY; arc=none smtp.client-ip=95.215.58.177
+Message-ID: <02bbd5c1-3cd8-4e70-adda-94f5d9bafac2@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783724230;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B2nZGd4IyEPxjt0SQ0xbjh+Yz54eGjdtToqJP5YAQPM=;
+	b=DJbALGPYMI0IufykG3jtGkOC9Z8RIVD6xv+OkGLdAX/khqZVzFIIaHHB2kKL4PIKP5C1j/
+	lASMbFjdPQ60fQAetftqLvJfWaDhy9c7VKi77zjLubT/dqvFREZoV+OGmmaEeeXpPT8ctK
+	wykH0XV+DoeLSw2Z3zLtk+BWSx+zZ7s=
+Date: Fri, 10 Jul 2026 23:56:49 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SN7PR11MB6900E94E718175AACB2309109AFD2@SN7PR11MB6900.namprd11.prod.outlook.com>
+Subject: Re: [PATCH net] dpll: fix NULL pointer dereference in
+ dpll_msg_add_pin_ref_sync()
+To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Milena Olech <milena.olech@intel.com>,
+ Jakub Kicinski <kuba@kernel.org>, open list <linux-kernel@vger.kernel.org>
+References: <20260710193625.1378822-1-ivecera@redhat.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20260710193625.1378822-1-ivecera@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306719-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306720-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:siddaraju.dh@intel.com,m:maxime.chevallier@bootlin.com,m:mkubecek@suse.cz,m:netdev@vger.kernel.org,m:balaji.chintalapalle@intel.com,m:shubham.das@intel.com,m:vijay.srinivasan@intel.com,m:sridhar.samudrala@intel.com,m:jacob.e.keller@intel.com,m:anthony.l.nguyen@intel.com,m:singhai.anjali55@gmail.com,m:jbrandeburg@cloudflare.com,m:singhaianjali55@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[bootlin.com,suse.cz,vger.kernel.org,intel.com,gmail.com,cloudflare.com];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:ivecera@redhat.com,m:netdev@vger.kernel.org,m:arkadiusz.kubalewski@intel.com,m:jiri@resnulli.us,m:przemyslaw.kitszel@intel.com,m:milena.olech@intel.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lunn.ch:from_mime,lunn.ch:dkim,lunn.ch:mid]
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6761673FA48
+X-Rspamd-Queue-Id: 4C5BD73FAB6
 
-On Fri, Jul 10, 2026 at 09:45:43PM +0000, D H, Siddaraju wrote:
-> Hello Linux Ethernet team, Maxime, Andrew & Michal,
+On 10/07/2026 20:36, Ivan Vecera wrote:
+> When a dpll_pin is shared across multiple dpll_device instances and
+> those devices are being unregistered (e.g. during driver module removal),
+> a NULL pointer dereference can occur in dpll_msg_add_pin_ref_sync().
 > 
-> The IEEE AUI chip-to-chip (C2C) is the accepted standard for connecting
-> chips that handle subfunctions within the OSI physical layer. Just to
-> pick, the C2C is widely used when connecting Ethernet SoCs with retimers
-> and PCS SerDes terminated external-phys to offload PHY sublayer functions.
-
-It cannot be that widely used if Linux does not support it yet :-)
-
-> With the existing ethtool link modes, we were not able to fit these C2C
-> interfaces on any others (we fitted **SGMII interfaces to baseT link modes)
-> and we see this as a gap. If you acknowledge this, we plan to send an
-> RFC patch to define below listed C2C link modes to ethtool.
+> This happens under the following conditions:
+>   - A pin is registered with two or more dpll devices (dpll_A, dpll_B)
+>   - The pin has ref_sync pairs with other pins
+>   - During unregistration of dpll_A's pins, a ref_sync partner pin is
+>     unregistered first, removing it from dpll_A->pin_refs
+>   - But since the partner pin is still registered with dpll_B, its
+>     dpll_refs is not empty, so dpll_pin_ref_sync_pair_del() does NOT
+>     run and the partner stays in the pin's ref_sync_pins xarray
+>   - When the pin itself is then unregistered from dpll_A, the delete
+>     notification calls dpll_msg_add_pin_ref_sync() which finds the
+>     partner in ref_sync_pins, passes dpll_pin_available() (partner is
+>     still registered with dpll_B), but dpll_pin_on_dpll_priv(dpll_A,
+>     partner) returns NULL because partner was already removed from
+>     dpll_A->pin_refs
+>   - The NULL priv pointer is passed to the driver's ref_sync_get
+>     callback, which dereferences it
 > 
-> 	25G_AUI_C2C		IEEE 802.3 Annex 109A
+>   BUG: kernel NULL pointer dereference, address: 0000000000000034
+>   Oops: Oops: 0000 [#1] SMP NOPTI
+>   RIP: 0010:zl3073x_dpll_input_pin_ref_sync_get+0x73/0x80 [zl3073x]
+>   Call Trace:
+>    dpll_msg_add_pin_ref_sync+0xb8/0x200
+>    dpll_cmd_pin_get_one+0x3b6/0x4b0
+>    dpll_pin_event_send+0x72/0x140
+>    __dpll_pin_unregister+0x5a/0x2b0
+>    dpll_pin_unregister+0x49/0x70
+> 
+> Fix this by skipping ref_sync pins whose priv pointer cannot be resolved
+> for the current dpll device.
+> 
+> Fixes: 58256a26bfb3 ("dpll: add reference sync get/set")
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> ---
+>   drivers/dpll/dpll_netlink.c | 3 +++
+>   1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+> index bf729cde796a7..5703667593a7c 100644
+> --- a/drivers/dpll/dpll_netlink.c
+> +++ b/drivers/dpll/dpll_netlink.c
+> @@ -567,6 +567,9 @@ dpll_msg_add_pin_ref_sync(struct sk_buff *msg, struct dpll_pin *pin,
+>   		if (!dpll_pin_available(ref_sync_pin))
+>   			continue;
+>   		ref_sync_pin_priv = dpll_pin_on_dpll_priv(dpll, ref_sync_pin);
+> +		/* Pin may have been unregistered from this dpll already */
+> +		if (!ref_sync_pin_priv)
+> +			continue;
+>   		if (WARN_ON(!ops->ref_sync_get))
+>   			return -EOPNOTSUPP;
+>   		ret = ops->ref_sync_get(pin, pin_priv, ref_sync_pin,
 
-So 109 is about 25GBASE-R. We have the following link modes for that:
+well, a bit strange, but if you can hit this issue, we have to fix it.
 
-       ETHTOOL_LINK_MODE_25000baseCR_Full_BIT  = 31,
-       ETHTOOL_LINK_MODE_25000baseKR_Full_BIT  = 32,
-       ETHTOOL_LINK_MODE_25000baseSR_Full_BIT  = 33,
-
-Why break the pattern? Why not add:
-
-       ETHTOOL_LINK_MODE_25000baseC2C_Full_BIT
-
-Is C2C that different to CR, KR, DR?
-
-> 	200GAUI-4 C2C		IEEE 802.3 Annex 120D
-> 	100GAUI-1 C2C		IEEE 802.3ck Annex 120F
-> 	200GAUI-2 C2C		IEEE 802.3ck Clause 162
-> 	400GAUI-4 C2C		IEEE 802.3ck Clause 163
-
-If you look at the existing pattern for link modes which need to
-specify the number of lanes:
-
-        ETHTOOL_LINK_MODE_800000baseCR8_Full_BIT
-        ETHTOOL_LINK_MODE_400000baseDR4_Full_BIT
-	ETHTOOL_LINK_MODE_200000baseKR2_Full_BIT
-
-why put the number in the middle?
-
-Since you are breaking the existing pattern, it would be good to
-include a justification why you picked your pattern.
-
-Also, an architecture question...
-
-It sounds like you use this between the MAC and the PCS. The PCS can
-then be connected to a PHY, and the PHY then has a line side. (I'm
-being a bit loose with the terms here, i should probably be saying
-PMA, PMD etc.)
-
-Should ethtool be saying:
-
-Settings for eth0:
-	Supported ports: [ TP	 MII ]
-	Supported link modes:   25000baseC2C
-
-or should it be reporting:
-
-Settings for eth0:
-	Supported ports: [ TP	 MII ]
-	Supported link modes:   25000baseSR
-
-I _think_ ethtool reports the media, not some intermediary format.
-
-Is ETHTOOL_LINK_MODE_25000baseC2C_Full_BIT actually needed? I suppose
-one use case would be when you directly connect two MACs together, PMA
-to PMA. So a 25G NIC directly connected to a switch port, with no
-'media' in the middle. Then ethtool probably should report
-25000baseC2C.
-
-	Andrew
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
