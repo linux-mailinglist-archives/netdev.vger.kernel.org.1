@@ -1,276 +1,328 @@
-Return-Path: <netdev+bounces-306413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306414-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id b5+LFotoUGqcyQIAu9opvQ
-	(envelope-from <netdev+bounces-306413-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 05:35:39 +0200
+	id AoCXK59nUGpSyQIAu9opvQ
+	(envelope-from <netdev+bounces-306414-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 05:31:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0DBB73702A
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 05:35:38 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id A951D736FBC
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 05:31:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=est.tech header.s=selector1 header.b="Zh/tJWVn";
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306413-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306413-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=W1tVVrMu;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306414-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-306414-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 15F743019045
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 03:30:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CCBE43007206
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 03:31:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78A5C23392B;
-	Fri, 10 Jul 2026 03:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74AC234A797;
+	Fri, 10 Jul 2026 03:31:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010035.outbound.protection.outlook.com [52.101.84.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9B08248B;
-	Fri, 10 Jul 2026 03:30:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49C9335566
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 03:31:36 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783654222; cv=fail; b=naZuce3DnUzznWbkCxaUaiBF+rcAkmbWUfVc5IsboyDlgq3OlcisCfzCc/HAh88z3hXQTpCVfGAsJeRuvGH/CxVjpqK6c3eCBO/4TarNzvD4p58r1jytFJpGTnPz3dYdU08FA8TwNOWQ7ItoQerfPZcayhwBayZLwhYArQBwWUQ=
+	t=1783654298; cv=pass; b=L7WH8fYUgvtj1J1svOi+zBiZUsL5CLmFkQn6iRSACcBF8nOeUwPAQ/2PREUjCi9HuMUPmWoDpD5LMqCHvb4To5nZ5a/HvHgUjdX+F/Pq8csDu6OF2e3tIfd0KZXrE0UMO0K+jXW2IVK0jL+qNbp707X9mSRiYbGbz5ymi5m3m+s=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783654222; c=relaxed/simple;
-	bh=Gzjl00M+i8j+XnknPKR1RvvNPe5xAhKK5NCdyOzmNgM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=pnAj0uxZWDvuXcpWHzPPZ3/hwpwEOVojcVFfdoaeCYPxPAZ4jjfA3wPq9hE5Gw2PWHJNUm7D7RX0QtIUf/11jfDjtGMH+XZxqrcDLfRJvWl7YZLme93CmCcyuDWfDI+sxuYnc/IrqCATb7JXc+sCmipJRbEK4WV5HdC+RW0X33M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=Zh/tJWVn; arc=fail smtp.client-ip=52.101.84.35
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yCeFZAil7RFxDyllkUeR8DvlBFmKVbUhPcHpZ6VApHX5pYYqxKWqj+BoMgZmbWEBGCyFhb3EqySUZxWiu3qn5Jtg3E0woQKRwNf1ImdOsqo5s7pjxuzAGOBv23PqTS5acP1CFphvzX1NBHecxX1b1widF81NzAeclb2E8b5htQ3tvZJRWr+wfYojNUsXX7p+rvhsn8mnMMHkKeWgqLNrCgJivVICGkO1qja7HD5fWwq1oYtaeV4xczbyH0dGFwE1mkH9EncF3jU51Bk93WmSe/w2SGF6wk9A4yEvNWvZEmkql2UakFLi0oGS92wOPVRV83zqT9cuiGYFn49C6UXpjg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IAaSFBsk9G9yTMwEematZGrOKQQIpoR3/Q73p0815gw=;
- b=GVoemMyacWC1gTXFNi5XORkKwjV9mj/drqH5xLkWM6uJFO84WsSdKCJp0kPdQNnw+vt8jLALfZvoq0+1FmqtLYOV94q/2+eUZqzNyY8vJf3O51OsH8o1C5JYDBxJCYeVqHSJ7zqmRQUzxNXHafpWab0Je70mrOeXf21VTgtHSlxTrFabolTix5xhfZAt+LS0idrPtq+CNm1tHe7dhcBPzH+66+5OdFjsewv1Yt1dEIFPknMd02o8lFqwQ9TDwhL2psQ7Ochb3Ik1/0POpNHcOeIHtrXjUKSWUncOmYU2ACF3P8Qjl4d6yFj23vqGIWR8na/vALxnFPhmcunuWSNEaQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
- dkim=pass header.d=est.tech; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IAaSFBsk9G9yTMwEematZGrOKQQIpoR3/Q73p0815gw=;
- b=Zh/tJWVnIHJY3eTI5+xApwuK2xThYDj2X/gmGq6gYQIbV6kNOjyIDVwMBU8YFJc+rMeLbrOwHEfi/edHZUkojzM/yhKeldyVBr35Z/CP9bVyqcwXsPKxUlsxmnO6/5I/8BCbYktDega6TWgRmHk902Ol3iNxAxCg7/Yj2kFZVsQA1BxrztUk0v7rDOfKddelJRyN+Qi9VPK0uBTEtDJ/YrAC+kFUEMl4jqXnxspl9xGiolsE3rgeYSbT159LU2rJh92E5C4rZRc93aGKzmpnyUPrPrMIhokYuMP2bawoI+2e4JwMfP2o409thduOIM7Rz7/zrdg2RH+J5z+tX+C/Uw==
-Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
- VI1P18901MB0718.EURP189.PROD.OUTLOOK.COM (2603:10a6:800:124::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.13; Fri, 10 Jul
- 2026 03:30:15 +0000
-Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
- ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
- ([fe80::bfff:5391:8a49:21b7%6]) with mapi id 15.21.0181.010; Fri, 10 Jul 2026
- 03:30:15 +0000
-From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
-To: Daehyeon Ko <4ncienth@gmail.com>
-CC: Jon Maloy <jmaloy@redhat.com>, "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	"tipc-discussion@lists.sourceforge.net"
-	<tipc-discussion@lists.sourceforge.net>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH net] tipc: clear sock->sk on the failed-insert path in
- tipc_sk_create()
-Thread-Topic: [PATCH net] tipc: clear sock->sk on the failed-insert path in
- tipc_sk_create()
-Thread-Index: AQHdEA2+rYe7FoCWcUyy82fCjcu5s7ZmGEcQ
-Date: Fri, 10 Jul 2026 03:30:15 +0000
-Message-ID:
- <GV1P189MB19888A8F810E5DB896F9BAD5C6FD2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-References: <20260710014440.2055584-1-4ncienth@gmail.com>
-In-Reply-To: <20260710014440.2055584-1-4ncienth@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: GV1P189MB1988:EE_|VI1P18901MB0718:EE_
-x-ms-office365-filtering-correlation-id: 124d6cdd-f633-40a1-23d6-08dede338ea1
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|376014|23010399003|7416014|1800799024|56012099006|11063799006|22082099003|18002099003|38070700021;
-x-microsoft-antispam-message-info:
- 4aSk8A7hfxmHg/pyvdwArtdAmlS0SBAyyquHYLAOeFb1e2+r0KaMqxzJczKfV0eIpjhVyyfjMXvfDapHv+Cw642hG+gc3Rsfha2OaYyQbTc46zH93ZkOXGSjFTT6o8TMkOFKbY31pjvS+lUqg5jGmL0aQfCnHZxVNT5KUN5rlZTBJ3Q9rtVKS1o5NaCGr1a1osfh7kgjksc+LYEsPfxTthbJ8FEJXcyFMoMWY4iHIvu9dS9/DMAJai9s142xE3HxbRalDeVlLoMiNBWgyidqynMuLipXZLojv0Q9LMkBZmKei2eXa9DHcZ/whhbaoNcErHRGBgUDOwKwhNMMDEAijnHJ1I9Bv4BnP5j1BThDY+zJxQ7zn2346mb76OLqS3cjSYuiB+WgfyGwlpRLjrx/fGY/Ap+E+Rj7uRzKzFVXYol8FC8G/2JUyVIOqAO4Iwsvv3aPyaztbjYox4MCSVAUnMe6aSGS+gnBNG/PXgUJk3soBvHpKWr4ph/dSNeNcOKetRHUthZWdabiVW2ONLiHi0UgP7JRdhfFTPpqbx0f/IHDyV92HyquQvKcoWmqHMN3L5Ukt3rGYr7AN6O8utSnsYJz4uxY4yGkA1USSCspjyIvJ0zvHt8V0QDlPYn3UkophAU/pwhp7aqlmbptlhic1MAD2+hjMPoNkRUXmisuqfhSmSmWkWq5OurafmJNH6iYum/zGzo3eIeDyYbRVvaAHni6VR6JPAjI5BY+GjuMdLQ=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(23010399003)(7416014)(1800799024)(56012099006)(11063799006)(22082099003)(18002099003)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?Utoju4a7sRJKabWv361l0qb6FWIoE1NSlFE/j6zHWOYMVhFhe7WAd0gwVQ2M?=
- =?us-ascii?Q?9mdPhH5H48kbeq7biQrCw4C8mUw3QbPLN84LQUTeDHcGmU7+D8aQRP0kr3h0?=
- =?us-ascii?Q?PnIqPAwfVF4fR1L4AF7JLYQL2VyPaDlmobMNFlyEqZMwW9Y/8pH8mfw3RMDZ?=
- =?us-ascii?Q?UIYbKwnHV4X9817lXH8KgPsKZfaNebRhA/X+/GVt+TpwFvJrdIaEPXUQhMLe?=
- =?us-ascii?Q?FaxK6I1Sv/qi0R3fMjH2xFm9OC/7Kr43CZYEX23jQ8r4eJauMYdllADxZzFQ?=
- =?us-ascii?Q?5BBUCbkYPvT60GPZc52tvO4r4GOg6M07aDMuXdexrrlJjlNRY8TlFJBy2iQx?=
- =?us-ascii?Q?kdBxflHpaBB8bcZLuxai65r6ehiMYJy4FJulrmAK/kEMRKnF120XmTVpVpc5?=
- =?us-ascii?Q?gOCkuVoXTRq3WSsRMfUMv9dYbWuxpMfei5KPicqpi7Z0mfhyE1EaRmXhqEbW?=
- =?us-ascii?Q?9Bp7trPGX41+4/WyxGQTBG+EBP8ImNpBXGBzH2iVAIuadGct6zlgQIwLmGLP?=
- =?us-ascii?Q?Hn7rEbFFdBbDh9PTn0OzGCFr4OSOwBJF8H4JJoP6+kVX+uoT6QARKlOXNRuU?=
- =?us-ascii?Q?OLv55RWNoSLGjLseTOXEoVYK+pEZpPXBGA6+YYaIg5f9ZVPzlMuinZd621tl?=
- =?us-ascii?Q?3B1d3sWNNECbhIUz1lKztdL4R9gKjs9iGiW7XH4y/uPX9FSLreuc2FKyagaz?=
- =?us-ascii?Q?86MJW3ABQ71xniT7GkP+veuwmNfM8JFlJp09lKlCIw02mOZgFibRoKy3vK7O?=
- =?us-ascii?Q?QlbcuQT6BPJK3yzNwS7xuqFsXbLY6arvTT/VXB4kkdV52h3jdd7si7EUx5mM?=
- =?us-ascii?Q?eTi1Cc3BO9Tlj9oWP9usx+QvpgY4zGw8JYpj7rmbWIbzq2xnbX5nLqDNNIUu?=
- =?us-ascii?Q?yWmrWj/nYpST3VY9IcLWr5cPQYaZeNrxWy1eVE8KFM6ZhQhVqrwkIorfAX3y?=
- =?us-ascii?Q?I9DQXboohl+NqdWVMr0FBXNikVTwte9+o6MHbHiQv/fLJqrtkHk/Y++OCvjI?=
- =?us-ascii?Q?Pz+o8HFW8/qAZVt/TPk3G8QqwUqx/67vLWqQlwLfv/uuExo0R7dww71jRISk?=
- =?us-ascii?Q?s461wv3G4rb/ZJCeC6BK6FNwsgZupH1umipaU75l/twhbK3rNemJZN7/gyCI?=
- =?us-ascii?Q?UlqJsyzuAOiXszrxt3Pfump+rtgDVgjJHUasLRq8FloE+lYEE+6bq6m5l+nw?=
- =?us-ascii?Q?JeH/iRLnK330S2m5WXuE0Q6yIwFn0LAvzlPPDbBE69ZUCgavOp/8HhZPZo63?=
- =?us-ascii?Q?1DoCfUx82hNqFZoaAvs/XL6TjKlS9AnOJNogfOdiACI696SgkU3IWCRJWVaf?=
- =?us-ascii?Q?IeudB9R40+PGHM7b0AxG7VOe789R3Hmv6jwPqcAhJgCe2vfbujelVGDccI6v?=
- =?us-ascii?Q?j8Qo079eo9CptfMYemmT8QARWw1hU0m5wE3G134pEB72Z1Lf9D2fJDiKNycR?=
- =?us-ascii?Q?b1FetrAtGXJMfl9Pp8RKc1radvjwvVELKil+UWxUbngSY+VBvVfFrU5R8YQv?=
- =?us-ascii?Q?IN/U3J6DP1XY4W1sn3FTZa6tabHbQwOWWlo3Fhuuwj3ZI39guk8WywBMEKak?=
- =?us-ascii?Q?KeekkspKHqG8N8oPkxOJFxNX001mv9Ym/9vxKsAPi8l5uxv9ym7tM8M/MV+j?=
- =?us-ascii?Q?o6wosQrDSinbdlv4rN6r94fRoq6Nx8lGazfVzXv5qHh3Oe+zfn3N9RwJ7LhO?=
- =?us-ascii?Q?CCfDynScTIAIJtco8dqdmJQTk7urBqkhaR64ls7hH32K0wwSIsF0MkrZ426I?=
- =?us-ascii?Q?GnaZ2Ut22Q=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1783654298; c=relaxed/simple;
+	bh=7qTrYtyb4uYCjddRxsmEaBTIKdjBwNl/4bmB47HPVDQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=C5VkFVZ6ong0JrKSyONzuBF9qXQ5o6a7arbOcgphkeJp0xWIrCNmVNPvVEsR5MD7OJSzDVkY062oQiO8s3k+HScEtaz3LUu5Si4klGpSTQkLJ8K49Z+LZU8KReE6cvdOIArZPXC3Xaioze+UTliCTYSh7dPB370Ck68ZTqt478g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W1tVVrMu; arc=pass smtp.client-ip=209.85.218.42
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-c15e592da74so64085566b.1
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 20:31:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783654295; cv=none;
+        d=google.com; s=arc-20260327;
+        b=MdqRK7lniUZp3A5PkWBhGAl3Tm3bGtLauM7vuL2U0mhkg9syo5j1of9lRVUWp7trLE
+         lyi63+L1ssOFgliZCmrWyVLp7WZdgx1BQPZvc8rUuyFrZ/jnRADsLxTyKGm/eAk8KY7n
+         jNoAmI4VJF2Hl+lOJ6jRqolq6aFk6u9HFEMfQLyj4Kbb6YgDkAKwvEWz4if3ngh0l+VF
+         yAbPmIc5uc6vhjcwLtXlzpjnts8pxkmOKncatQEvdkU923pK7e8EXQnjYKB26BWy8F99
+         JTvtaanSWDOjb4pD4j0aAKLfb13+VoyxKpj73BxFZEbhBmxy3poSI9cZVWldA+IwNY7J
+         AlIw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=gCq+rIk8vt2f13kU9Q7xOWBXHO/FaeO2q0kuAbTG+ms=;
+        fh=eIPXxe7t+LUagjKKyGS1ijf/vr+XBJo8tR29eNgawFE=;
+        b=FHesvjedV9tplWZpvevb+BiyiMJCauW7CddQMNd2kHb+bHwhppFFgzTr/aowF8Gx56
+         2n8cSR69IZTaO8qlAjU85WqbeVXnHhep79gzvSKPF5rrp+E/CSBBLlsg2xwKk3Ph4SC2
+         CxWtIhEsX9PaloGTrhPcO4wvLV4/JlwopcDjDJ7tP3/b9dTFCe/VGDJ3xw2ufE/F18lD
+         gU2VdZ9FrCBhQhHebgYdzvwB5IPL2U3jvnQjB6UwY/fQ0HQrvw6McogH/aIoawqmjERz
+         ae5lhI38Cytx56YkrkVwPtR0w4vGUXQU/8Ngrx4g3g+Xl8SAK4ItGrof1tyu5bNaflOi
+         74Ww==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783654295; x=1784259095; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=gCq+rIk8vt2f13kU9Q7xOWBXHO/FaeO2q0kuAbTG+ms=;
+        b=W1tVVrMuq+kg6JuGQYnYCtiNa7cVAGYoeFQ5w+5bLrjMl9jN8PcKZFm/CZbKa28uNW
+         OVgxQkw7Ttep1NdIw9kaaQOmS7ObXH6cOfMXWKmnfEl6D8KnpjeRsRX3rgRqcvnOhrEs
+         Yx9xe3zjK8o0zeHtXc1Br2k7bDQufvGxHNX9CxQnQTZws6W0uUPgwHC5ukA7FycIGqv8
+         oj/zZ/x3vZS+AIMCe40b+0Gl6+z6lozbz7DDxCkM/xJGY7fnZ23nKWjPq4X1F55VSgiR
+         ejSordXNtYxFornh7AhAt+U2dWU9xAr1g+mPlkk8b1gRn5ECvDH8UnvoRr496roX3XUs
+         u5Dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783654295; x=1784259095;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=gCq+rIk8vt2f13kU9Q7xOWBXHO/FaeO2q0kuAbTG+ms=;
+        b=ZaPoEQ4wbNQ0uYpCeaH04aXrbKZz0M/BB+olK4TKLkQsTJwvjN9z+jCyr49dXZlITk
+         A40X99dJFXtrU0bT/X+Z37NxMZmCqEP7SR74sWqWSapUUVYjgEtkuH38jA+UVdFw/eCH
+         Y7vbpKKhUJKw5/a8TUo9q2pizQWQaTIbzSYZP7z4EL82btcwezGaVBWkugMFEArB2I2V
+         CpLhPvJnTRHm6xYBCJbvH/mUax21wZT7xcnhrGUc/Sk9QaMSAdrCebABgV1Z54EA3fZY
+         LCqhPliK481Dpt5iimoPxw79zeS8W9hDIa66f3Eeefiv/iV7btXybm7WTdBOBfCD4jYf
+         efBg==
+X-Gm-Message-State: AOJu0YzpzDKQAjxENfDoBwwgDZOhH99EvwZ4xPJWM38rn/DIttVmkLSu
+	SF5+Wl+pd15/EdFLjKi7KMPkXjVhmRBLUIKfstWV4Zhkhp1g/yINk6AgyWL1l8P5ITy6JZSpInk
+	Erg2eduUrFPErsOXEmXquw+sgJZ/Q2J8=
+X-Gm-Gg: AfdE7cnxcOQ6kGgX9iFEoBT1xDRwjYt20FkvXVEcoQgmnBXzFi1Fwdxn5OaVlXlx4IQ
+	r4a8sMgGAv91lVuj3itqJz7k1ebHu+4jY7lYL+KGIziBvR/P5Y+xSl+j3tTpBF/iruDAir9OtT4
+	3EzVmVE5u/9XIAEdGG93KwElaBfbUPCrf/CH/fBhSGf3Z82c4qOVMnH3m9vuYWoanXnMhkfsWhK
+	y5AkhBBis5PokaWitZNKfNun+vBahFc4KWQdkAr+MDbxz7hCoE08g3DfmCOjuDthjlkNIJ8CLWI
+	CHmzSlZouLq2afQrD0MMWB9Iqxid
+X-Received: by 2002:a17:906:c147:b0:c16:2a:3c7 with SMTP id
+ a640c23a62f3a-c16002a35ebmr60536166b.11.1783654294700; Thu, 09 Jul 2026
+ 20:31:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: est.tech
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 124d6cdd-f633-40a1-23d6-08dede338ea1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jul 2026 03:30:15.0742
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: JCwf6AkMnpaS3nNJ0Hu8R0fgh/15/Rf9Faz544wKpOhJJj2QdLzf3NNrLqfhcPita/v5lrAduMfl7QXgwZiVH3G7PKCtwDFhKBlSixnH16M=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1P18901MB0718
+References: <20260707164248.821265-2-bestswngs@gmail.com> <GV1P189MB1988185B47AFAA9202408186C6FE2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+In-Reply-To: <GV1P189MB1988185B47AFAA9202408186C6FE2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+From: Weiming Shi <bestswngs@gmail.com>
+Date: Fri, 10 Jul 2026 11:30:57 +0800
+X-Gm-Features: AUfX_mx5hb6WkD9DcopSOKQuKtBGIghrQBVbvxGhPe28oEimVODo5QPLirtvoRw
+Message-ID: <CANgPUi10bb4xQ+GBrYyiG7AunNG2zUvpVizrb5QACj9GUSwZ2Q@mail.gmail.com>
+Subject: Re: [PATCH net v2] tipc: serialize udp bearer replicast list updates
+To: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"tipc-discussion@lists.sourceforge.net" <tipc-discussion@lists.sourceforge.net>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Xiang Mei <xmei5@asu.edu>, 
+	Jon Maloy <jmaloy@redhat.com>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:tung.quang.nguyen@est.tech,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:xmei5@asu.edu,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:4ncienth@gmail.com,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	DMARC_NA(0.00)[est.tech];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORWARDED(0.00)[lists@lfdr.de];
 	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306413-lists,netdev=lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-306414-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[est.tech:+];
-	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[est.tech:from_mime,est.tech:dkim,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,GV1P189MB1988.EURP189.PROD.OUTLOOK.COM:mid]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid,est.tech:email,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A0DBB73702A
+X-Rspamd-Queue-Id: A951D736FBC
 
->Subject: [PATCH net] tipc: clear sock->sk on the failed-insert path in
->tipc_sk_create()
+Tung Quang Nguyen <tung.quang.nguyen@est.tech> =E4=BA=8E2026=E5=B9=B47=E6=
+=9C=889=E6=97=A5=E5=91=A8=E5=9B=9B 14:42=E5=86=99=E9=81=93=EF=BC=9A
 >
->When tipc_sk_create() fails to insert the new socket (tipc_sk_insert() ret=
-urns
->non-zero), its error path frees the sk with sk_free() but leaves
->sock->sk pointing at the freed object:
+> >Subject: [PATCH net v2] tipc: serialize udp bearer replicast list update=
+s
+> >
+> >tipc_udp_rcast_add() and cleanup_bearer() both update ub->rcast.list wit=
+h
+> >list_add_rcu() / list_del_rcu(), but nothing serializes them. The add ru=
+ns from
+> >the encap receive softirq (via tipc_udp_rcast_disc()) without rtnl_lock(=
+), so it
+> >can race the cleanup delete and corrupt the
+> >list:
+> >
+> > list_del corruption. prev->next should be ffff8880298d7ab8,
+> >   but was ffff88802449ad38. (prev=3Dffff888027e3ec98)  kernel BUG at
+> >lib/list_debug.c:62!
+> > RIP: __list_del_entry_valid_or_report+0x17a/0x200
+> > Workqueue: events cleanup_bearer
+> > Call Trace:
+> >  cleanup_bearer (net/tipc/udp_media.c:811)
+> >  process_one_work (kernel/workqueue.c:3302)
+> >  worker_thread (kernel/workqueue.c:3466)
+> >
+> >The bearer can be enabled from an unprivileged user namespace, as the
+> >TIPCv2 generic-netlink ops carry no GENL_ADMIN_PERM.
+> >
+> >Add a spinlock to struct udp_bearer and take it around the
+> >list_add_rcu() in tipc_udp_rcast_add() and the list_del_rcu() loop in
+> >cleanup_bearer() so the two writers can no longer corrupt the list.
+> >
+> >While here, switch the read-only walk in tipc_udp_is_known_peer() to
+> >list_for_each_entry_rcu(); it never deletes, so list_for_each_entry_safe=
+() was
+> >misleading.
+> >
+> >Fixes: ef20cd4dd163 ("tipc: introduce UDP replicast")
+> >Reported-by: Xiang Mei <xmei5@asu.edu>
+> >Suggested-by: Tung Nguyen <tung.quang.nguyen@est.tech>
+> >Assisted-by: Claude:claude-opus-4-8
+> >Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+> >---
+> >v2: (per Tung's review)
+> > - Narrow the lock to just list_add_rcu().
+> > - Drop the under-lock dup re-check; serializing the writers is enough.
+> > - Use list_for_each_entry_rcu() in tipc_udp_is_known_peer().
+> >
+> > net/tipc/udp_media.c | 11 +++++++++--
+> > 1 file changed, 9 insertions(+), 2 deletions(-)
+> >
+> >diff --git a/net/tipc/udp_media.c b/net/tipc/udp_media.c index
+> >62ae7f5b5840..c6aa8c3c54ce 100644
+> >--- a/net/tipc/udp_media.c
+> >+++ b/net/tipc/udp_media.c
+> >@@ -94,6 +94,7 @@ struct udp_replicast {
+> >  * @ifindex:  local address scope
+> >  * @work:     used to schedule deferred work on a bearer
+> >  * @rcast:    associated udp_replicast container
+> >+ * @rcast_lock:       serializes updates to @rcast.list
+> >  */
+> > struct udp_bearer {
+> >       struct tipc_bearer __rcu *bearer;
+> >@@ -101,6 +102,7 @@ struct udp_bearer {
+> >       u32 ifindex;
+> >       struct work_struct work;
+> >       struct udp_replicast rcast;
+> >+      spinlock_t rcast_lock; /* protects rcast.list */
+> > };
+> >
+> > static int tipc_udp_is_mcast_addr(struct udp_media_addr *addr) @@ -281,=
+7
+> >+283,7 @@ static int tipc_udp_send_msg(struct net *net, struct sk_buff *=
+skb,
+> >static bool tipc_udp_is_known_peer(struct tipc_bearer *b,
+> >                                  struct udp_media_addr *addr)
+> > {
+> >-      struct udp_replicast *rcast, *tmp;
+> >+      struct udp_replicast *rcast;
+> >       struct udp_bearer *ub;
+> >
+> >       ub =3D rcu_dereference_rtnl(b->media_ptr);
+> >@@ -290,7 +292,7 @@ static bool tipc_udp_is_known_peer(struct tipc_beare=
+r
+> >*b,
+> >               return false;
+> >       }
+> >
+> >-      list_for_each_entry_safe(rcast, tmp, &ub->rcast.list, list) {
+> >+      list_for_each_entry_rcu(rcast, &ub->rcast.list, list) {
+> >               if (!memcmp(&rcast->addr, addr, sizeof(struct
+> >udp_media_addr)))
+> >                       return true;
+> >       }
 >
->	if (tipc_sk_insert(tsk)) {
->		sk_free(sk);
->		pr_warn("Socket create failed; port number exhausted\n");
->		return -EINVAL;
->	}
+> sashiko reports:
 >
->This is harmless for plain socket(): the syscall layer clears sock->ops be=
-fore
->releasing, so tipc_release() is never called. It is not harmless on the ac=
-cept()
->path. tipc_accept() creates the pre-allocated child socket with
->tipc_sk_create(net, new_sock, 0, kern); on failure it leaves new_sock->sk
->dangling and new_sock->ops non-NULL, and do_accept() then fput()s the new
->file, so __sock_release() -> tipc_release() runs
->lock_sock(new_sock->sk) on the freed sk -- a use-after-free write of the s=
-k_lock
->spinlock.
+> ...
+> Is there a possibility of triggering a lockdep warning here?
+> Since this function is called from tipc_udp_nl_bearer_add() during Netlin=
+k
+> configuration, rtnl_lock() is held but rcu_read_lock() is not.
+> Without an explicit lockdep condition like lockdep_rtnl_is_held() passed =
+to
+> the list traversal macro, lockdep will complain about the RCU list being
+> traversed outside a reader section.
+> >                 if (!memcmp(&rcast->addr, addr, sizeof(struct udp_media=
+_addr)))
+> >                         return true;
+> >         }
+> > @@ -326,7 +328,9 @@ static int tipc_udp_rcast_add(struct tipc_bearer *b=
+,
+> >                 pr_info("New replicast peer: %pI6\n", &rcast->addr.ipv6=
+);
+> >  #endif
+> >         b->bcast_addr.broadcast =3D TIPC_REPLICAST_SUPPORT;
+> > +       spin_lock_bh(&ub->rcast_lock);
+> >         list_add_rcu(&rcast->list, &ub->rcast.list);
+> > +       spin_unlock_bh(&ub->rcast_lock);
+> >         return 0;
+> >  }
+> Could this allow duplicate peers to be added to the list?
+> The under-lock duplicate check was removed in this patch iteration. Since
+> tipc_udp_is_known_peer() is checked locklessly earlier in
+> tipc_udp_rcast_disc(), two concurrent packets from the same unknown peer
+> could both see the peer as missing.
+> They would then both acquire rcast_lock sequentially and add duplicate
+> entries, leading to memory leaks and traffic amplification when broadcast=
+ing.
+> [ ... ]
+> ...
 >
->tipc_release() already guards this exact "failed accept() releases a pre-a=
-llocated
->child" case with "if (sk =3D=3D NULL) return 0;", but the guard is bypasse=
-d because
->tipc_sk_create() left sock->sk non-NULL
->(dangling) rather than NULL.
+> I think we have to check duplicate address in tipc_udp_rcast_add() before=
+ adding and remove tipc_udp_is_known_peer().
 >
->Clear sock->sk on the failed-insert path so the existing tipc_release() NU=
-LL
->check fires and the use-after-free is avoided.
+> >@@ -326,7 +328,9 @@ static int tipc_udp_rcast_add(struct tipc_bearer *b,
+> >               pr_info("New replicast peer: %pI6\n", &rcast->addr.ipv6);
+> >#endif
+> >       b->bcast_addr.broadcast =3D TIPC_REPLICAST_SUPPORT;
+> >+      spin_lock_bh(&ub->rcast_lock);
+> >       list_add_rcu(&rcast->list, &ub->rcast.list);
+> >+      spin_unlock_bh(&ub->rcast_lock);
+> >       return 0;
+> > }
+> >
+> >@@ -679,6 +683,7 @@ static int tipc_udp_enable(struct net *net, struct
+> >tipc_bearer *b,
+> >               return -ENOMEM;
+> >
+> >       INIT_LIST_HEAD(&ub->rcast.list);
+> >+      spin_lock_init(&ub->rcast_lock);
+> >
+> >       if (!attrs[TIPC_NLA_BEARER_UDP_OPTS])
+> >               goto err;
+> >@@ -819,10 +824,12 @@ static void cleanup_bearer(struct work_struct
+> >*work)
+> >       struct udp_replicast *rcast, *tmp;
+> >       struct tipc_net *tn;
+> >
+> >+      spin_lock_bh(&ub->rcast_lock);
+> >       list_for_each_entry_safe(rcast, tmp, &ub->rcast.list, list) {
+> >               list_del_rcu(&rcast->list);
+> >               call_rcu_hurry(&rcast->rcu, rcast_free_rcu);
+> >       }
+> >+      spin_unlock_bh(&ub->rcast_lock);
+> >
+> >       tn =3D tipc_net(sock_net(ub->sk));
+> >
+> >--
+> >2.43.0
 >
->The tipc_sk_insert() failure is reached when the per-netns socket rhashtab=
-le
->hits its max_size (tsk_rht_params.max_size =3D 1048576, ~2M
->elements) -- i.e. once a netns holds ~2M TIPC sockets every insert returns=
- -
->E2BIG.
->
->  BUG: KASAN: slab-use-after-free in lock_sock_nested+0x98/0x150
->  Write of size 8 at addr ffff8880047cdc38 by task init/1
->   lock_sock_nested+0x98/0x150
->   tipc_release+0xa4/0x7a0
->   __sock_release+0x61/0x120
->   sock_close+0x10/0x20
->   __fput+0x1d6/0x490
->  Allocated by task 1:
->   sk_alloc+0x2b/0x380
->   tipc_sk_create+0x82/0xb90
->   tipc_accept+0x14c/0x650
->  Freed by task 1:
->   __sk_destruct+0x22d/0x2d0
->   tipc_sk_create+0x7b8/0xb90
->   tipc_accept+0x14c/0x650
->   do_accept+0x1d2/0x2a0
->
->Fixes: 07f6c4bc048a ("tipc: convert tipc reference table to use generic
->rhashtable")
->Cc: stable@vger.kernel.org
->Signed-off-by: Daehyeon Ko <4ncienth@gmail.com>
->---
->This was reported to security@kernel.org (Cc: the TIPC maintainer) with no
->response; posting the fix directly to netdev as it is a straightforward on=
-e-line
->fix. Full C reproducer available on request.
 
-Yes, please send me your C reproducer.
-
->
-> net/tipc/socket.c | 1 +
-> 1 file changed, 1 insertion(+)
->
->diff --git a/net/tipc/socket.c b/net/tipc/socket.c index
->e564341e0216..55e695748332 100644
->--- a/net/tipc/socket.c
->+++ b/net/tipc/socket.c
->@@ -502,6 +502,7 @@ static int tipc_sk_create(struct net *net, struct sock=
-et
->*sock,
-> 	tipc_set_sk_state(sk, TIPC_OPEN);
-> 	if (tipc_sk_insert(tsk)) {
-> 		sk_free(sk);
->+		sock->sk =3D NULL;
-> 		pr_warn("Socket create failed; port number exhausted\n");
-> 		return -EINVAL;
-> 	}
->--
->2.54.0
->
-
+Thanks for the review. v3 has been sent.
 
