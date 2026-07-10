@@ -1,234 +1,172 @@
-Return-Path: <netdev+bounces-306541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306542-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id EnqBLfDhUGqQ7AIAu9opvQ
-	(envelope-from <netdev+bounces-306541-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:13:36 +0200
+	id Z9oBJ2DiUGr37QIAu9opvQ
+	(envelope-from <netdev+bounces-306542-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:15:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 527C173A992
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:13:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFE3173AA3D
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:15:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=RpoVXz15;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306541-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306541-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=YsHYXBoU;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306542-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306542-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 124EA300D1FE
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 12:09:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 235D03046C05
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 12:12:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F049408001;
-	Fri, 10 Jul 2026 12:09:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D9CE413D6F;
+	Fri, 10 Jul 2026 12:12:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2AFA3BC696
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 12:09:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2AA199931;
+	Fri, 10 Jul 2026 12:12:18 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783685367; cv=none; b=kmCfdtPs65JWVsiZZFmsASldzfuo6LI5eUQ5Lm1OHF0PLVcDJmre54FHg5eHNX/aLjEShGjNttPrIWSacQ0FU/g0SPQcmkdgU2AUaLEjyS7xwXJbcGNiKaJWqYlI47fB7CaWwV6kO+OP8pjT01dyMn0YvCF75qGWBSZSNPrR3ac=
+	t=1783685539; cv=none; b=Db7kNDbc96aRn2HfKJIx3J4C4D9sBCdal0OPq/V8b1/RI2s8w2riNLkCy8rOig/TJuyIGwwdLB/GtpwCM3DlYnoAAvxflM7SXlGJfKyiBWzHp6JQuIfN1iFbAbFSbiVpw6e+G3VoWribTiBnZeMYSbHDX0umYapIPrN3PXSwf3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783685367; c=relaxed/simple;
-	bh=fpBBDrmrXq1aucFS/bbh7Cq7ulGOaKA6UoMOaOaAWPc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IYrC26PLxlZmyB8s5iGuhGp+4jjOHkoWUTKYmV13WFk+XXPd483v3oxwa68KmDcJZd4CJ7hyoNMNCeH9X2N3wobRc/Aglv063eXfb5xxLeaKe/poJjVNm+1vosMIyLvcNkPjtEyMYBBF0fRZZ3XbiIa7pIO36dIxC/jukknbJWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RpoVXz15; arc=none smtp.client-ip=209.85.208.175
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-39b22d0e488so7989991fa.3
-        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 05:09:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783685364; x=1784290164; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=th2W9hmS5eUL+Nc6cqk7ifaLFgN1RmzPIQ5w3HUIf9E=;
-        b=RpoVXz15WB6gFBX1WdD4QwhqynnPTfr5iJcN+Evi5iuBJn0IaqZg4IvQBAaY8WRTog
-         4COP5TrQ4+zJ/qQafTWUa1fgaJQ+3wp2Q5su7xjIXfT+rCS02loSHGvKOQt12+45OJTK
-         HlXfFjLedll9lt+9jzE4QR1FWggW8zRs3Z0CCaAle3uwWevIlIlttn+BYab3flrLGT/H
-         4kaC+qkOETzLemdymMZKtOgvCIghtJG1/jwtLKWBg9T+MsfuLSykeBVaVzUW1N7obgVs
-         J4SXiy90xhtLeK76XJwdcNM4Mr3+NNwP/Jgv+fx3bu2XGS2xqA8S+86JzcgeJrFjiYXC
-         w/Dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783685364; x=1784290164;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=th2W9hmS5eUL+Nc6cqk7ifaLFgN1RmzPIQ5w3HUIf9E=;
-        b=Z/gJUnnn+b3mJ7H948Wve+p4YDCncLMAlTG2u2UIJyG2/UeSObtJ5RtJOUcuNM/TiT
-         HcnKj4pLXEnA+OlfPDDJoO0lS/oV1Q6IJw6r0uD9ul44gz6yTd523VWZBOaToQUAaZoA
-         aNQPsprHGn+UBNfY+PiLH00wifKYJe72dYb5Bw6jQOI35WOgMED8ubvUId4wrFvZVx8c
-         BitoXYFlnRRIYWCizarEoV8IgmTI/ysjNk8nR/4QlthCn+v9C8WLY9X+Z0zK1TL2oLZc
-         VRVnKekc5xJtAkUTxH3fYtsLBtiJQ0fVIUx7f2tbsIyaS1ohx0Tq6jfieF5auFan2u+G
-         xYtg==
-X-Gm-Message-State: AOJu0YzYm/tTUfNu15IdCjbg9j21JkI1oL3NOVy6quDZVBudiq2L9xuO
-	IHuG/XjOz61QEyFoC9CdEq5MHT2ygA5zEhhjnM7zDW/oyr6EF+K1APi6XzAw+ad/27SLuQ==
-X-Gm-Gg: AfdE7ckmrXKpcW2rAhlfGdQUfSaxsbtYb695FSvIPjuMGXDsJoy3swQSgD+cA1gKDCB
-	1SqkdJBtwp2AW7JfmxguUKuAMl6LdC66wWEVVAN6qOONeiMB3IoLuE+cPngvzmTHLv6hZknIXMb
-	e2C2k4u24hU7ewegb4qITZXMiHS4iFj1F6GL8Fj+0VI//p/VaKsKAxlbMfWCXSiRc/6zOqJ1qSw
-	K/UhZ2tVMOc+B9gkmOhoro0suQBO52r7fsXsqYpQbqThMXqElaSHO/Egkl+lMu+aTPM/DxxyEQe
-	/WngDUrQoODN2kws1/JsL1QsGEhviMzbBxgz58lv6i15tMO4RiqxPDqNxVXDUMBEMc9+my/jXo1
-	PC7lov1Kme2PrkXka/0avMRJpO8spBOzmgXzLnIxFmQYWAn0u0B8NR4KkZb5GpkPTWD723lRIj+
-	/7g61e1hfr4GDh9/CuNSyugCEwzdFzT9guekAboNwSIudbisvuadqLT3wSHzwcprlBRZPPpqq8
-X-Received: by 2002:a05:6512:689:b0:5ae:a9ec:bb21 with SMTP id 2adb3069b0e04-5b0115aea8dmr3096898e87.61.1783685363678;
-        Fri, 10 Jul 2026 05:09:23 -0700 (PDT)
-Received: from usccs-nostromo.tailc718e.ts.net (91-157-100-11.elisa-laajakaista.fi. [91.157.100.11])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5b01cab1486sm544923e87.81.2026.07.10.05.09.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jul 2026 05:09:23 -0700 (PDT)
-From: vadik likholetov <vadikas@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Thierry Reding <thierry.reding@kernel.org>,
-	Jonathan Hunter <jonathanh@nvidia.com>,
-	Bhadram Varka <vbhadram@nvidia.com>,
-	linux-tegra@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] net: stmmac: enable the MAC on link up at 10G on 10GBASE-R
-Date: Fri, 10 Jul 2026 15:09:03 +0300
-Message-ID: <20260710120908.3731591-1-vadikas@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1783685539; c=relaxed/simple;
+	bh=nVuv/Hu964f3n0QjnsdrXirjEZ9hx5LnS/ajlZNJqtU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=laflhZwtvVqRLPXlGolV0FtQs+1ldgU2u7qgrD1S4cqnYEXr6jhNCTPt4vRVJAiBdJexnfva4jntJ6ZA+2qMiiUQGCYvTG6NVr6WzWttLnZrqdT1zrlSwGbBvy41q/qGKJin0kZXui6iW7zEURKsuhuiB98hefxLyOMNvpsIaVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YsHYXBoU; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F2EC1F000E9;
+	Fri, 10 Jul 2026 12:12:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783685538;
+	bh=2mX5s+LgF61GsTT2jOOQtbwBRT5YocgNpg7DpK7Idac=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=YsHYXBoUwEO/JD7uEwImzg3mv7r4evHYn6bmm/BpwFz7s+/PEwFuAjQwpC9NLZTD1
+	 uJiaFsewk7OWDBXeUTrZRYi3CisEgF1I2aAOEqad225cY6f/P7our9/zVZA9xwWjUf
+	 gWh99RMEJrfxKFrTpFsWA2bi+SyaLc9Cd6P8qCO0megJ5ZRuh7ZlTI3YW53k+vUyvV
+	 8QEaTaE63VVnw+8W2DmuU+gHjLUFXUvjCp4nuKuqEckoC1l5cvi2RdnxTeafSuYftb
+	 uui7ecoebrEKYvZpeR5W9/axJDkt1zUqKM0o3phcWbkxcx2zEVQaPpW16AabvYVH6k
+	 mcLVwF5Hg+7vA==
+Date: Fri, 10 Jul 2026 17:42:00 +0530
+From: Sumit Garg <sumit.garg@kernel.org>
+To: Bjorn Andersson <andersson@kernel.org>
+Cc: konradybcio@kernel.org, linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	freedreno@lists.freedesktop.org, linux-media@vger.kernel.org,
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+	ath12k@lists.infradead.org, linux-remoteproc@vger.kernel.org,
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	robin.clark@oss.qualcomm.com, sean@poorly.run,
+	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
+	jesszhan0024@gmail.com, marijn.suijten@somainline.org,
+	airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
+	bod@kernel.org, mchehab@kernel.org, elder@kernel.org,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, jjohnson@kernel.org,
+	mathieu.poirier@linaro.org, trilokkumar.soni@oss.qualcomm.com,
+	mukesh.ojha@oss.qualcomm.com, pavan.kondeti@oss.qualcomm.com,
+	jorge.ramirez@oss.qualcomm.com, tonyh@qti.qualcomm.com,
+	vignesh.viswanathan@oss.qualcomm.com,
+	srinivas.kandagatla@oss.qualcomm.com,
+	amirreza.zarrabi@oss.qualcomm.com, jenswi@kernel.org,
+	op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
+	skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
+	Sumit Garg <sumit.garg@oss.qualcomm.com>
+Subject: Re: (subset) [PATCH v9 00/14] firmware: qcom: Add OP-TEE PAS service
+ support
+Message-ID: <alDhkHVnzReCgU6H@sumit-xelite>
+References: <20260702115835.167602-1-sumit.garg@kernel.org>
+ <178362521364.2422497.1305957434056184382.b4-ty@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <178362521364.2422497.1305957434056184382.b4-ty@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-3.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:thierry.reding@kernel.org,m:jonathanh@nvidia.com,m:vbhadram@nvidia.com,m:linux-tegra@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306541-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[vadikas@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vadikas@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[48];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:andersson@kernel.org,m:konradybcio@kernel.org,m:linux-arm-msm@vger.kernel.org,m:devicetree@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:freedreno@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath12k@lists.infradead.org,m:linux-remoteproc@vger.kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:robin.clark@oss.qualcomm.com,m:sean@poorly.run,m:akhilpo@oss.qualcomm.com,m:lumag@kernel.org,m:abhinav.kumar@linux.dev,m:jesszhan0024@gmail.com,m:marijn.suijten@somainline.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:vikash.garodia@oss.qualcomm.com,m:bod@kernel.org,m:mchehab@kernel.org,m:elder@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jjohnson@kernel.org,m:mathieu.poirier@linaro.org,m:trilokkumar.soni@oss.qualcomm.com,m:mukesh.ojha@oss.qualcomm.com,m:pavan.kondeti@oss.qualcomm.com,m:jorge.ramirez@oss
+ .qualcomm.com,m:tonyh@qti.qualcomm.com,m:vignesh.viswanathan@oss.qualcomm.com,m:srinivas.kandagatla@oss.qualcomm.com,m:amirreza.zarrabi@oss.qualcomm.com,m:jenswi@kernel.org,m:op-tee@lists.trustedfirmware.org,m:apurupa@qti.qualcomm.com,m:skare@qti.qualcomm.com,m:linux-kernel@vger.kernel.org,m:sumit.garg@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306542-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sumit-xelite:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,qualcomm.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 527C173A992
+X-Rspamd-Queue-Id: EFE3173AA3D
 
-stmmac_mac_link_down() clears the MAC's transmit and receive enable bits.
-stmmac_mac_link_up() is expected to set them again through
-stmmac_mac_set(..., true), but it first switches on the negotiated speed
-and returns early for a speed it does not recognise.
+Hi Bjorn,
 
-The generic branch of that switch -- taken for every interface that is
-neither USXGMII nor XLGMII, which includes PHY_INTERFACE_MODE_10GBASER --
-handles only SPEED_2500, SPEED_1000, SPEED_100 and SPEED_10.
+On Thu, Jul 09, 2026 at 02:32:39PM -0500, Bjorn Andersson wrote:
+> 
+> On Thu, 02 Jul 2026 17:28:16 +0530, Sumit Garg wrote:
+> > From: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> > 
+> > Qcom platforms has the legacy of using non-standard SCM calls
+> > splintered over the various kernel drivers. These SCM calls aren't
+> > compliant with the standard SMC calling conventions which is a
+> > prerequisite to enable migration to the FF-A specifications from Arm.
+> > 
+> > [...]
+> 
+> Applied, thanks!
+> 
+> [01/14] firmware: qcom: Add a generic PAS service
+>         commit: 08314e7c2c38b9ae6a5e01c58ed10a950859404d
+> [02/14] firmware: qcom_scm: Migrate to generic PAS service
+>         commit: 5c1a2975d23c51c01aca51945d0f10a4ee4c9020
+> [03/14] firmware: qcom: Add a PAS TEE service
+>         commit: b6f7978da0c4d26fe465aa6634f5a0b48f900de0
+> [14/14] MAINTAINERS: Add maintainer entry for Qualcomm PAS TZ service
+>         commit: 6701259025d49139131a0eb2257659a066dcca22
+> 
+> This is available as an immutable branch, for other subsystems to pull at:
+>   https://git.kernel.org/pub/scm/linux/kernel/git/qcom/linux.git 20260702115835.167602-2-sumit.garg@kernel.org
+> 
+> 
+> [04/14] remoteproc: qcom_q6v5_pas: Switch over to generic PAS TZ APIs
+>         commit: 254030af0d81b12b7624d9ce85c6bdd3171629c6
+> [05/14] remoteproc: qcom_q6v5_mss: Switch to generic PAS TZ APIs
+>         commit: f3b1357673ddb37ae8b9a8fe44df73cbd2a519c5
+> [06/14] remoteproc: qcom_wcnss: Switch to generic PAS TZ APIs
+>         commit: ea3b5245f5deba916320b32a8e6510a74c034c17
+> [07/14] remoteproc: qcom: Select QCOM_PAS generic service
+>         commit: c4383254ac7a529736577e304176a10371c2ee0b
+> 
 
-MGBE on Tegra234 runs 10GBASE-R into an Aquantia AQR113C. That PHY does
-rate matching, so phylink_link_up() replaces the media speed with the
-MAC-side interface speed before calling into the MAC:
+Thanks for picking the partial set although I expected for you to pick
+the entire set given acks from all the other subsystem maintainers. Let
+me know how we should proceed further.
 
-	case RATE_MATCH_PAUSE:
-		speed = phylink_interface_max_speed(link_state.interface);
-		duplex = DUPLEX_FULL;
-
-The driver is therefore called as
-
-	stmmac_mac_link_up(interface=10GBASER, speed=10000, duplex=1)
-
-which falls through to "default: return;". The MAC is never re-enabled,
-and the interface stops passing traffic after the first link flap.
-
-The failure is easy to misread. The link still comes up, because the PHY
-is polled over MDIO and needs no MAC, so the interface reports carrier 1
-at the media speed. The DMA is untouched, so its start bits stay set and
-descriptors are still consumed. Only the MAC itself is gated off: the
-receiver counts nothing (mmc_rx_framecount_gb stops advancing, RE is 0)
-and nothing reaches the wire (TE is 0). The interface survives boot only
-because stmmac_hw_setup(), called from ndo_open, enables the MAC
-unconditionally -- so the problem appears only once the cable has been
-unplugged and plugged back in, and "ip link set dev <ethX> down && ip
-link set dev <ethX> up" appears to fix it.
-
-Handle SPEED_10000 in the generic branch, as the USXGMII and XLGMII
-branches already do. For dwxgmac2, link.xgmii.speed10000 is
-XGMAC_CONFIG_SS_10000, which is 0 and is the correct speed selection for
-a 10GBASE-R MAC: ctrl then equals old_ctrl, the register write is
-skipped, and execution reaches stmmac_mac_set(..., true).
-
-Fixes: d8ca113724e7 ("net: stmmac: tegra: Add MGBE support")
-Signed-off-by: vadik likholetov <vadikas@gmail.com>
----
-Verified on an AGX Orin devkit (Tegra234 MGBE0 + AQR113C), before and
-after, on the same board and cable. MAC registers read with
-`ethtool -d`, after a physical unplug and replug:
-
-  stock		MAC_TX_CONFIG 0x00010000 (TE=0)
-		MAC_RX_CONFIG 0x3ff022c0 (RE=0)
-		rx_packets frozen, DHCP lease lost
-
-  patched	MAC_TX_CONFIG 0x00010001 (TE=1)
-		MAC_RX_CONFIG 0x3ff022c1 (RE=1)
-		rx_packets keeps climbing, DHCP lease retained
-
-A kprobe trace of the stock kernel across a link flap shows the
-mechanism directly -- dwxgmac2_set_mac(enable=1) never follows the
-link-up:
-
-  linkdown: (stmmac_mac_link_down+0x0/0xc8) iface=27
-  setmac:   (dwxgmac2_set_mac+0x0/0x80) enable=0
-  linkup:   (stmmac_mac_link_up+0x0/0x350) iface=27 speed=10000 duplex=1
-
-(iface 27 is PHY_INTERFACE_MODE_10GBASER.)
-
-Note on the Fixes tag: the missing SPEED_10000 case in the generic branch
-predates the commit cited above. I picked d8ca113724e7 because MGBE is
-the first in-tree user to reach it -- it needs a 10GBASE-R interface
-driven by a rate-matching PHY, so that phylink hands the MAC a 10G speed
-on a link that negotiated slower. Happy to re-target the tag if you would
-rather it point at the stmmac commit that introduced the switch.
-
-Testing was done with MGBE0 handed to a VM via vfio-platform, so the
-driver ran in a guest; the MAC register evidence above is read from the
-device itself and the code path is not virtualisation-specific. I do not
-have a bare-metal AGX Orin running mainline dwmac-tegra to confirm on,
-but nothing in the analysis depends on the passthrough.
-
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -1125,6 +1125,9 @@ static void stmmac_mac_link_up(struct phylink_config *config,
- 		}
- 	} else {
- 		switch (speed) {
-+		case SPEED_10000:
-+			ctrl |= priv->hw->link.xgmii.speed10000;
-+			break;
- 		case SPEED_2500:
- 			ctrl |= priv->hw->link.speed2500;
- 			break;
---
-2.51.0
+-Sumit
 
