@@ -1,319 +1,219 @@
-Return-Path: <netdev+bounces-306522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306523-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id R8MrLIbUUGrv5wIAu9opvQ
-	(envelope-from <netdev+bounces-306522-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:16:22 +0200
+	id nLUtL7vVUGoz6AIAu9opvQ
+	(envelope-from <netdev+bounces-306523-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:21:31 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E460B73A205
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:16:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 92F9173A2CB
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:21:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=auditcode.ai header.s=zmail header.b=laKUEiYk;
-	dmarc=pass (policy=none) header.from=auditcode.ai;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306522-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306522-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=intel.com header.s=Intel header.b=Mr6DTz7r;
+	dmarc=pass (policy=none) header.from=intel.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306523-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306523-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DA20D30036F8
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 11:14:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9835B30067A0
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 11:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E92E410D32;
-	Fri, 10 Jul 2026 11:14:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E67B4192E5;
+	Fri, 10 Jul 2026 11:21:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sender-op-o17.zoho.eu (sender-op-o17.zoho.eu [136.143.169.17])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED12413245;
-	Fri, 10 Jul 2026 11:14:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74E6A413D95
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 11:20:53 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783682089; cv=pass; b=oMnMHucRoZTFBRV+uvr86qsyH2S3sWF82K8TOco27NO2pNb0fFhg2QIf6vAtA1WHi+Ch8LD2x6UDAAzAEarPWC7rj3nVKJqkeSb0C5O4vL/JMm28lx1kZAzbnSsvud8DGQ6tkivYdYmb2pNkNAbTxROR4Co3kZuAPoeofSNHl8Y=
+	t=1783682458; cv=fail; b=Xh/mLW72CwXAf3rwiKlFmC5MI96E6CCRqanDW6wKtFO4+JpUKXHonNP8l2IFRGNZyKd37QHmy/R7iA7ajuEQbGDZ6bIwgMefFibZGNS7iFQHquQlWZyTqH67fJrSBlCu5nEtUMoQlnXzhuHX0PKikeLjHaOd4tiRlv59RKvK+zU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783682089; c=relaxed/simple;
-	bh=F1KTYWnq+9g4j5MHk+R0ILEhmbsbyeXojT5qMs9y8d0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qoAmLSE9ORrH0Ri8EWjxyM+KAt94flR0A3TcR8D1tG/VS4XSfpACOYSn6I9lWE+7O08HE4FyyuW0ZvCIgXe6FWhmRjPihKZs9UMiUq/vVGTj5ocno74pJYTMP8Df8ZEr01AHjYOb26h2BhMRMWYcEL5F8Dkb5tjdwsr8u4wP6kk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=auditcode.ai; spf=pass smtp.mailfrom=auditcode.ai; dkim=pass (1024-bit key) header.d=auditcode.ai header.i=security@auditcode.ai header.b=laKUEiYk; arc=pass smtp.client-ip=136.143.169.17
-ARC-Seal: i=1; a=rsa-sha256; t=1783682040; cv=none; 
-	d=zohomail.eu; s=zohoarc; 
-	b=cC/ICZXfF1PPaasz/E3BNaljaXN+qnBbr8t0aYdAVdPzQQ3aXMlUSNFjgIpF+Z20jl9E1IDeU7jcX/IUBC+3ujOt07VwRF42Rx8aDZlR2SbuR1wS8IX62zAvyVCBIJmplwwL/uJurHzzQtam8MR7759N3/HqeS+UtO5A9vrmXgY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
-	t=1783682040; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=n2VrqkVnW4B7S1gpVF6wwy16uSMDtNg0d+SAjOSYJeg=; 
-	b=GjLHlQ+UiIysAtM4njkWSwm9tnItYHjUy+NXbcJMO33KRJEVxMhf1ugUB9ju8Ebpuu3AwMwznr3nOjYC76fF7QZ1Y4fChrOHneY0x6pc//uYCDItXwdeOrt9uj4EbkxVkOtnT0eU0VwVaPnAi5YHSnu44IdCNpyaaDuhmy9+c6M=
-ARC-Authentication-Results: i=1; mx.zohomail.eu;
-	dkim=pass  header.i=auditcode.ai;
-	spf=pass  smtp.mailfrom=security@auditcode.ai;
-	dmarc=pass header.from=<security@auditcode.ai>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1783682040;
-	s=zmail; d=auditcode.ai; i=security@auditcode.ai;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=n2VrqkVnW4B7S1gpVF6wwy16uSMDtNg0d+SAjOSYJeg=;
-	b=laKUEiYkT5R79MzktC+t7ZYJtdMShEpX7mz1OyZO73MP2eQ9B9tTGGVF2m5I3pwk
-	RRYwoCBaJsTD1M8nUsjbaseGjLQXuDiV8NRj1wp2CLoorN4p8AJvEjODsPYkB6MunsJ
-	NFr6KSTO76R3uxB6ssrBkikSfwwNt93sxX0CcoyQ=
-Received: by mx.zoho.eu with SMTPS id 1783682036480683.9563439480606;
-	Fri, 10 Jul 2026 13:13:56 +0200 (CEST)
-From: Ibrahim Hashimov <security@auditcode.ai>
-To: Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net] mac802154: flush rx_mac_cmd_list before freeing sdata
-Date: Fri, 10 Jul 2026 13:13:53 +0200
-Message-ID: <20260710111353.12138-1-security@auditcode.ai>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1783682458; c=relaxed/simple;
+	bh=jgqyp5PB8T4Fyj5VmylRRNfcbzUfJhpjI0pARwQuG20=;
+	h=Message-ID:Date:To:CC:From:Subject:Content-Type:MIME-Version; b=TYYKIWrgFT41Kp52fcsNs/OAHw90KdyMFe5TSL0vMFJrEM5oWod9oci1+OYk7559+kwkIfWDOtmDyMCMnYLChNxHh0KzCTlUcgz//Kxw2Y3OUsbVCUqldzvcJc2/ViPIh830ltSg4nX3rKnshUKcA4PZXXkUgEXkETj+V4eq3bM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Mr6DTz7r; arc=fail smtp.client-ip=192.198.163.19
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1783682454; x=1815218454;
+  h=message-id:date:to:cc:from:subject:
+   content-transfer-encoding:mime-version;
+  bh=jgqyp5PB8T4Fyj5VmylRRNfcbzUfJhpjI0pARwQuG20=;
+  b=Mr6DTz7rqk3ITWl7vYlIM6x1br7KUNuTXzBHIBozGXblwFU0hEUlXxEd
+   k2AAuwVN302ihd4ZR0dxXKArtxfMlwCASLz/AVJlZOTB9Yf/rqgvt5KbS
+   2MdchWoEBKM5nPjm6un8svEXiLtqbemgfENRaJR4izEy+scCj3bMTSYCz
+   GPAm+vaE+95cYgdWXdNYKT3A6y4rSWse3F0SRzHt9KfeyKkEs34ss7UbT
+   J74p8lm8m/78RnmnSLsi31qoZhGCGerI7shptQtw5/a2R6Ux33eqlXdVf
+   CQQJWQZdX1jszEPG02dcOHhvRRUJv7JEVk5U5V4nR5K+0lfStRLXuPJts
+   g==;
+X-CSE-ConnectionGUID: sL9Fjk2DSHyKlwpnCafM2A==
+X-CSE-MsgGUID: 4qc71tx9Qu271BTW+I7qOQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="83356558"
+X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
+   d="scan'208";a="83356558"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2026 04:20:50 -0700
+X-CSE-ConnectionGUID: P4miaysIRemSZR+VxWHQVQ==
+X-CSE-MsgGUID: VCzXHS+KTzyQ/DZixAPEBw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
+   d="scan'208";a="293061992"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2026 04:20:50 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Fri, 10 Jul 2026 04:20:49 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43 via Frontend Transport; Fri, 10 Jul 2026 04:20:49 -0700
+Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.59) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Fri, 10 Jul 2026 04:20:49 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=frnBdw/JI+76Pfttv8lpjLCkNsueONhZe7fQtgkC/uGCto9JELVqTvZWu/0NXTUdhz8xaHxrfNdfoO9vlYt+8c6AJzHxGIpLHGtAnJkWKZudskl7NWE10c7yQusi2cU53mUliFEMQiHvcP5oxBZNon2azNwiVA/UTZxtIrne5xX1VbgNcBQmSicFYcPi9c3orooKDGzBNebIPkwiOsihXgupMWlVkxrZ0SPFn4IBTNmFJBI8I5C9LCgScHmoYhUMm5iTRNgUaTQlpy4lz3plcXknIH1PBWLLBaj5II/SeCX8g7Fd0HyX46TWS7X5olo5PnYoqgZxFEtGunU3GiLhbw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=d1DN8H8xtI+e034D9WXwmYF7nR8nKIXdVudwIDulBLQ=;
+ b=UKC36DwHDjd/ReHAhI2AAXoDYsG7Kiu0IXs+EhtmMX8O6CWc57rS1vzLzV1Q2mwd6hhOlblvtIeJ9hRbmlKNRnbwqMbNphdLMAviIcHjgBIccT7Esph3PqYNAybOqlfdN8T9gMAWbJH9Mjc7fMrD+ycD9/KODdOEtuewD6e1BGIebCLeRmg1Ad6CnsWJhlLBbPLVI5U8znr1HWiTLIRDQojeAX5xAmxNOSe6CgkPzNdIxJnYIPqDaRSDrDpphSd409SP3a9ARSmTy04+TtMZHnXCSvcTzIFvRzwZ/UmkZPD5eVE1eu3ST5JXDZM4agsuinDLEOk4Gohu1z+G8HZsvg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CH3PR11MB7323.namprd11.prod.outlook.com (2603:10b6:610:152::6)
+ by PH7PR11MB7145.namprd11.prod.outlook.com (2603:10b6:510:1ec::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.17; Fri, 10 Jul
+ 2026 11:20:46 +0000
+Received: from CH3PR11MB7323.namprd11.prod.outlook.com
+ ([fe80::abb8:c470:36ca:e556]) by CH3PR11MB7323.namprd11.prod.outlook.com
+ ([fe80::abb8:c470:36ca:e556%6]) with mapi id 15.21.0181.014; Fri, 10 Jul 2026
+ 11:20:46 +0000
+Message-ID: <2c5c3c03-7a4d-4020-84eb-825bd6ed1e78@intel.com>
+Date: Fri, 10 Jul 2026 13:20:40 +0200
+User-Agent: Mozilla Thunderbird
+Content-Language: pl
+To: <kuba@kernel.org>, <netdev@vger.kernel.org>
+CC: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, <pabeni@redhat.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <horms@kernel.org>, <andrew+netdev@lunn.ch>
+From: "Pielech, Adrian" <adrian.pielech@intel.com>
+Subject: [ANN] E830 NIC join intel's netdev-ci
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: WA2PEPF000008B8.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d8::68c) To CH3PR11MB7323.namprd11.prod.outlook.com
+ (2603:10b6:610:152::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB7323:EE_|PH7PR11MB7145:EE_
+X-MS-Office365-Filtering-Correlation-Id: 559ba0df-c0ee-4c2b-22c0-08dede75494f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|23010399003|376014|18002099003|11063799006|56012099006;
+X-Microsoft-Antispam-Message-Info: 62Vicu/QfbxGdhPIMUBUgqjPTHUIVyYGnAy0IsmHVeJsww5EPN/2RBovn+ttJPQ94HHau28rpLxrSqG7G/KIObasMAwFKscd4iis98GV8ri2hHIvh9kQIH8+YnxiVKdlnA1d1E/ffEXX/FEQmKypv/EEcPn5gf60EXe4Z/rWjbKutd0doDiT6GFLWIiOZbloKqqhetQEmdDVXsyYSyjpJJm/z1+47qKA9VW8NiD0GoZD4IatKBbxbnYaP2CVBeQEglV0rC6aaKdt3p8Z7MWYrjdoiCwohbMW73zZxuvpsRxzAn0xSNakWT4LSC2tF5FOs8XqmUUzLDyu5Z4cC+tyKHRtRjM2X2ogyZsX9DG8D9Y02pcUz1eIr+WQQTtqjeWIhabtpaugj3ViKvjVEhtLkysCRM5WRgOgmx6jREtejVFAGZaU3VB+nwHzTwGYi+3KMYMw5bNDIRecb3wqSkLZsf3KI+xdzZMyIibaKIyg0WBe1wPgXbywKBqg1fK6bRIl4Ob2yCGUgxGJ71nHgKxCqGLpk61RkJNky/fhaLSHdAAvqepJKjCqvzAxoGe0SGXPR4nV7RF9DPJyA8JPvjAI6bOMeMf4sITrPI5G9+hSLfGgB2clT82ZzLfz7ijA5pL2xzmhKvi2cAXicYZHbZ1uYtcJ/92adIGYX+x0QW7RV4w=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB7323.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(23010399003)(376014)(18002099003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bTdvdTZPU1EvQWNsdk9xSFQyODVjR0xIMDhEcGJFbTFlbk9OL0VVdWFocTJj?=
+ =?utf-8?B?YysrWnArWDJKR2lDNUpRS20rUVR2YzlhdFJtTU9TQzNWcUpiK0tJM0VDY254?=
+ =?utf-8?B?M1AxY3RRaG9XR05ncW9rbDFhRVQxaTgveFZjSGZJb2E1L2FFOFNHTTlvcnNo?=
+ =?utf-8?B?ckpIL1NmY0VVdkRKQk9uTXJ2M2t1bzUrbVFJN3ZrTmhPa3VSR1EyTjM2R0Zl?=
+ =?utf-8?B?UldnUm1ram5BSDZFV3o0ZWNUYVJjT3VTVXlVMXRjRVErbkNWNTFLZVViR0VB?=
+ =?utf-8?B?U3AvTmdOcGRNZWN3d3FiWEsrd3ZQMWtORDI4cFliN3B0M0ZFcjdxbUxlbzZx?=
+ =?utf-8?B?Y0J0ZGJaV1pSMjM1RGlYVytpTFFEZ0dzSENZODZMeURzRlJuaTlHazZmd3BU?=
+ =?utf-8?B?aGRFSkc0QllHRGZGMjFTWUVmMkUwbVlVOE9mRktEeEM1QXhtaGJNNWJISTAy?=
+ =?utf-8?B?UzFJczRhcXlkU2xoMzU2a25ndWQzaHl5SHNDRTZaQnMvNEdHR0FydHlwZ0Fs?=
+ =?utf-8?B?UVl6V1RzRmp0bkZkZjI1SHZjMVg3amh3N255MHRmMW1IaGd6aFpmYXF3eGVR?=
+ =?utf-8?B?TzQ2RjBtVCs3NFhtNXZJTGVLdDRVUjlMRDFlNHJCM2xhMnVVN3JiTGwvOTlp?=
+ =?utf-8?B?ODdabzFLVzIxMTZmVTBEOWxtTWxlY2wvMFF1a3pnd1pKV0dEbituKzFlZnRx?=
+ =?utf-8?B?SGlEem82WnQ1LzUvcWlHZWlFbVFVaUtwc0haa0M5SFFBZzNNZFhxMGI4ZU8w?=
+ =?utf-8?B?dCt1Qm5Tb2VwT3dCTy81Yk9TcjdiZTBiY0JOSG5WUml5SWdFVmxXaW5GY1RY?=
+ =?utf-8?B?SWl3SkxSaTZUYXJ5QXRWWTZ5N2NUSjI0dEdGNHRreDBCQTRlS1dSdVlnUVpZ?=
+ =?utf-8?B?UTVENW1XRjNFOVlKVVk1Rk5RMHRQb2xFN3kwSUIyY2d0T3NVMXJDTDBZVFdQ?=
+ =?utf-8?B?Y2dTUzlJUnAzRmVXSTNzSjVqdXBMem1SWTg0WEZrdWJTd3pCdlFlandvaE93?=
+ =?utf-8?B?NjVQaHNpZk5NVEtUaTFsclJCV3luY2tPQ0ZZWG03MTF5OTE2T1FjVlZqa3FS?=
+ =?utf-8?B?MENCazlEcFFYV1A1MCtGSkU4cWZRV0QxZXpEcVJ2Tkc5SUZkWG4zbHR4R1l6?=
+ =?utf-8?B?c2k2em94cXRvYmkyeHkxT0tHVDlUSVdRUTU5QVJXVityRkFWUitZV3UwOUFl?=
+ =?utf-8?B?QWdZRUFUbGltanFDUG1NS0NUeHZ1L0xmMmlmY2d1bkI4b2NCbHdINUJwNVFn?=
+ =?utf-8?B?b2c2N3hJOEZNd2w0blBZRHhSdlZzQTU2SEphaGpNRjA1Tm1EY2xNdzVGKzA3?=
+ =?utf-8?B?MkhSWlREZDRRVXhwWDRSTGVPZE5hdnZoakRqcjA0bHN2M2NnM3RURG9xbmZR?=
+ =?utf-8?B?bDdGMEM2VDBpTFVJQmhmZS9Pcnh0WU1wQmtET1pLOGcvaU1UVEZTeU8xV3BQ?=
+ =?utf-8?B?THpqNm5ud2pSa2pUeWhCNHBqbmFrM0tpdk5OQTJDVUI5UU15UzVPT0NWMjc0?=
+ =?utf-8?B?UjdtMjRpamY0MFdTbFRlOGh0b05DVXpLKzhzdllKWE84ckdrY0V1UjRFRkxS?=
+ =?utf-8?B?U0x3R0NWaHlMNlBrWWo5S2tscXl4bC83Y29kUXJURDB6MTNBTmRWZXdnZnlm?=
+ =?utf-8?B?RlloNU95WVRQVkc3UXB0dHhIaW5PRHpPWHVjUlVLRDA0dzhhZUF0eGF1dy95?=
+ =?utf-8?B?ZlZBVDdkeEd5dWhISkd3K2lIVDRHVWh6bjBRNzNKSXRxMExxbU9vd0hOR252?=
+ =?utf-8?B?WFAzVWd5bEo0YnM1SXVNR1JTTHQ3RkcxT2t6NVVlUEN6MUE1dDh0dnVxV0Vh?=
+ =?utf-8?B?VzFYSndjMjU2RVhpNXRzRVlSYmhCZWhsUngzWkRuaHkxUDZVeGZIYWJTODNa?=
+ =?utf-8?B?U05ERDhBN05aU04wRVg1eFJiWEZ3OTFyY2U2aGh0NTVrS0JqKysvNGZBaEZn?=
+ =?utf-8?B?QWtYbk5YdzhBWEsxS25Xay9uWHU4dmowMUJBMjRoa1RaN1Ryd2ZXdjlyWTlP?=
+ =?utf-8?B?UWVPQSt5YnR2YXdta2tMNGdxekpNZXFWVVhadWpGN1EwMXoxZWppYUZ0eEZ5?=
+ =?utf-8?B?Q0hTYmFRQm5zZjY5cGJjT1plblZSeXB2cHZmRkIrd1NJOTh2VlJxZjVTbGhR?=
+ =?utf-8?B?Mi9yUzBJTmdNU2l6UkF3TUVyOFFQQ2YwK24zM24xYTQvSUU5Y2Q3ajNwd1pW?=
+ =?utf-8?B?SnJtajI1QS9nM0NROGtDMnozcVBXVnVtcFYrV3ZtWk9TYVNJaE1EZmVlZGZi?=
+ =?utf-8?B?Um85aGJHNkI2dk9wZWZMcjJ3MHBpTDVkeHpkK2hYL1NCQkgwSDVPVE5NNGVs?=
+ =?utf-8?B?OGF0QVVDMDFOdTNSQzV5YS9WWkJyT2xTTUFsYUx3SkpQUjlRTHFuQT09?=
+X-Exchange-RoutingPolicyChecked: gtEakDv7q5AOsIgbYfoaRU43WTySTZ+3xNQG17iXlr1yVq95i4hbS+XRbN21wn9j1I4rZf9nr4Jb0/iarAOkwROPBUqTwEF1lcZOA6TnfdJpwZiAufc9r8T+KrJ1DMM7ETGLs0MgGAdTdqtHcFvhZk6b62VhX+0UPjyr2ARDvus11IcAvy1z3RUns9fIGRRIGW1u1ejO0/aDyZebB14xVzRjbmC4XPK9Wa2jVY+tbL35X8WSXVmubETDIm04/sqhU/ZgmpaKv3nFLAzlsbKcSELHIDLgMRBJjWwLJWob/Cf+VZGIRKl6sxBnqsQCUY0neLxLElIhOZaZaocTOL+0kg==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 559ba0df-c0ee-4c2b-22c0-08dede75494f
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB7323.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2026 11:20:46.0316
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xz0mVsygcucVQkF+CqEVSfSlrUJRdMnQUulrfuRYcGYK6q2vUIehbBy7/y4XaZnvA3l17tY7POORsWK9CF2zischOzdCrxgZXUB8p47dxG8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7145
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[auditcode.ai,none];
-	R_MISSING_CHARSET(0.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[auditcode.ai:s=zmail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:alex.aring@gmail.com,m:stefan@datenfreihafen.org,m:miquel.raynal@bootlin.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-wpan@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:alexaring@gmail.com,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,datenfreihafen.org,bootlin.com,davemloft.net,google.com,kernel.org,redhat.com];
-	FORGED_SENDER(0.00)[security@auditcode.ai,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-306522-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[auditcode.ai:+];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-306523-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:netdev@vger.kernel.org,m:przemyslaw.kitszel@intel.com,m:intel-wired-lan@lists.osuosl.org,m:anthony.l.nguyen@intel.com,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[adrian.pielech@intel.com,netdev@vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:from_mime,intel.com:dkim,intel.com:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[security@auditcode.ai,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[adrian.pielech@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E460B73A205
+X-Rspamd-Queue-Id: 92F9173A2CB
 
-mac802154_rx_mac_cmd_worker() (net/mac802154/rx.c) is queued on
-local->mac_wq every time a MAC-command frame (assoc req/resp, disassoc
-notify, beacon req) is received on any interface of a given phy. Each
-queued struct cfg802154_mac_pkt stashes a *raw* pointer to the
-receiving interface's ieee802154_sub_if_data (sdata) in
-ieee802154_subif_frame():
+Hi folks,
 
-	mac_pkt->sdata = sdata;
-	list_add_tail(&mac_pkt->node, &sdata->local->rx_mac_cmd_list);
-	queue_work(sdata->local->mac_wq, &sdata->local->rx_mac_cmd_work);
+I'm pleased to announce that E830-XXVDA2 NIC from Intel Ethernet E830 
+product line joins the suite that tests ice driver against net-next-hw 
+branch.
 
-and the worker later dereferences it with no liveness check at all,
-e.g. for IEEE802154_CMD_ASSOCIATION_REQ:
-
-	if (mac_pkt->sdata->wpan_dev.iftype != NL802154_IFTYPE_COORD)
-
-Neither teardown path drains this queue before the sdata it points to
-is freed:
-
- * ieee802154_if_remove() (net/mac802154/iface.c), reached from the
-   nl802154 NL802154_CMD_DEL_INTERFACE handler, does list_del_rcu() +
-   synchronize_rcu() + unregister_netdevice(sdata->dev) -- which frees
-   sdata via priv_destructor/needs_free_netdev -- without touching
-   local->mac_wq or local->rx_mac_cmd_list at all.
-
- * ieee802154_unregister_hw() (net/mac802154/main.c) only flushes
-   local->workqueue (the DATA-path queue) before calling
-   ieee802154_remove_interfaces(), which frees every sdata on the
-   phy; local->mac_wq is drained only via destroy_workqueue() much
-   later, after the interfaces (and their sdata) are already gone.
-
-Either way, if mac802154_rx_mac_cmd_worker() is already queued (or
-races back in from a frame received just before teardown), it runs
-after the free and dereferences freed memory -- confirmed under
-KASAN: flooding a victim NODE interface with MAC_CMD frames from a
-MONITOR interface on a sibling phy, then deleting the victim via
-NL802154_CMD_DEL_INTERFACE, reliably produces:
-
-  BUG: KASAN: use-after-free in mac802154_rx_mac_cmd_worker+0x463/0x630 [mac802154]
-  Read of size 4 at addr ffff888004b22a18 by task kworker/u8:1/31
-  Workqueue: phy0-mac-cmds mac802154_rx_mac_cmd_worker [mac802154]
-  Freed by task 498: ... (the DEL_INTERFACE task, ieee802154_if_remove)
-
-Verified on the same v6.19 KASAN stand with this patch applied: the
-identical MONITOR-flood-then-DEL_INTERFACE reproducer no longer trips
-the use-after-free report in mac802154_rx_mac_cmd_worker().
-
-Fix it the same way mac802154_flush_queued_beacons() (net/mac802154/scan.c)
-already flushes local->rx_beacon_list on scan cleanup, plus a
-cancel_work_sync() step: rx_beacon_work's worker never dereferences
-sdata, so the existing sibling doesn't need it, but rx_mac_cmd_work's
-does. Add mac802154_flush_queued_mac_cmds(local, sdata):
-
- - cancel_work_sync(&local->rx_mac_cmd_work) waits out a run already
-   in flight (still safe -- nothing has been freed yet) and blocks any
-   new run from starting while we hold the RTNL;
- - every rx_mac_cmd_list entry whose ->sdata matches (or every entry,
-   when called with sdata == NULL for full-teardown) is then dropped,
-   so no future run of the worker can see it;
- - if entries belonging to *other*, still-live interfaces on the same
-   local remain, the work is re-queued so they still get processed.
-
-Call it from both teardown paths:
-
- - ieee802154_if_remove(), before unregister_netdevice(sdata->dev),
-   filtered to the sdata being removed (other interfaces on the same
-   phy may have legitimate entries in flight);
- - ieee802154_unregister_hw(), before ieee802154_remove_interfaces(),
-   with sdata == NULL since every interface on the local is going
-   away and local->workqueue's flush_workqueue() does not cover
-   local->mac_wq.
-
-This mirrors how mac80211 drains per-interface work (e.g. the
-analogous per-sdata work items cancelled from ieee80211_do_stop()
-before an interface is torn down) and the existing mac802154 scan.c
-list-flush idiom, applied to the one rx_mac_cmd_list consumer that
-actually dereferences the freed interface.
-
-Fixes: d021d218f6d9 ("mac802154: Handle received BEACON_REQ")
-Cc: stable@vger.kernel.org
-Signed-off-by: Ibrahim Hashimov <security@auditcode.ai>
-Assisted-by: AuditCode-AI:2026.07
----
- net/mac802154/ieee802154_i.h |  2 ++
- net/mac802154/iface.c        | 10 +++++++++
- net/mac802154/main.c         | 11 ++++++++++
- net/mac802154/rx.c           | 42 ++++++++++++++++++++++++++++++++++++
- 4 files changed, 65 insertions(+)
-
-diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index 8f2bff268392..e3c5c8d5b5d0 100644
---- a/net/mac802154/ieee802154_i.h
-+++ b/net/mac802154/ieee802154_i.h
-@@ -300,6 +300,8 @@ static inline bool mac802154_is_beaconing(struct ieee802154_local *local)
- }
- 
- void mac802154_rx_mac_cmd_worker(struct work_struct *work);
-+void mac802154_flush_queued_mac_cmds(struct ieee802154_local *local,
-+				     struct ieee802154_sub_if_data *sdata);
- 
- int mac802154_perform_association(struct ieee802154_sub_if_data *sdata,
- 				  struct ieee802154_pan_device *coord,
-diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index 000be60d9580..a5aa213e25a2 100644
---- a/net/mac802154/iface.c
-+++ b/net/mac802154/iface.c
-@@ -694,6 +694,16 @@ void ieee802154_if_remove(struct ieee802154_sub_if_data *sdata)
- 	mutex_unlock(&sdata->local->iflist_mtx);
- 
- 	synchronize_rcu();
-+
-+	/*
-+	 * Drop any rx_mac_cmd_list entry still pointing at this sdata
-+	 * before it is freed below: mac802154_rx_mac_cmd_worker() runs
-+	 * asynchronously on local->mac_wq and derefs mac_pkt->sdata with
-+	 * no liveness check of its own (see mac802154_flush_queued_mac_cmds()
-+	 * for details).
-+	 */
-+	mac802154_flush_queued_mac_cmds(sdata->local, sdata);
-+
- 	unregister_netdevice(sdata->dev);
- }
- 
-diff --git a/net/mac802154/main.c b/net/mac802154/main.c
-index ea1efef3572a..2f8c57e78db1 100644
---- a/net/mac802154/main.c
-+++ b/net/mac802154/main.c
-@@ -277,6 +277,17 @@ void ieee802154_unregister_hw(struct ieee802154_hw *hw)
- 	tasklet_kill(&local->tasklet);
- 	flush_workqueue(local->workqueue);
- 
-+	/*
-+	 * tasklet_kill() above stops any further frame reaching
-+	 * ieee802154_subif_frame(), but mac802154_rx_mac_cmd_worker() may
-+	 * still be queued/running on local->mac_wq and derefs the sdata of
-+	 * every interface ieee802154_remove_interfaces() is about to free
-+	 * below. flush_workqueue(local->workqueue) does not cover it --
-+	 * that is the DATA workqueue, not local->mac_wq -- so drain it
-+	 * explicitly first.
-+	 */
-+	mac802154_flush_queued_mac_cmds(local, NULL);
-+
- 	rtnl_lock();
- 
- 	ieee802154_remove_interfaces(local);
-diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-index cd8f2a11920d..0b167f76cb23 100644
---- a/net/mac802154/rx.c
-+++ b/net/mac802154/rx.c
-@@ -128,6 +128,48 @@ out:
- 	kfree(mac_pkt);
- }
- 
-+/**
-+ * mac802154_flush_queued_mac_cmds - drop pending rx_mac_cmd_list work
-+ * @local: the mac802154 device the queue belongs to
-+ * @sdata: interface being torn down, or %NULL to flush unconditionally
-+ *
-+ * Every queued &struct cfg802154_mac_pkt stashes a raw pointer to the
-+ * interface it was received on (see ieee802154_subif_frame() below) which
-+ * mac802154_rx_mac_cmd_worker() dereferences without ever checking whether
-+ * that interface is still alive. Callers must invoke this before freeing
-+ * @sdata -- or every interface on @local, when @sdata is %NULL -- so the
-+ * worker can never run against freed memory:
-+ *
-+ *  - cancel_work_sync() waits out a run already in flight. That is still
-+ *    safe to let finish because nothing has been freed yet, and it blocks
-+ *    any new run from starting for as long as we hold the RTNL.
-+ *  - every list entry pointing at @sdata (all of them, if @sdata is NULL)
-+ *    is then dropped so no future run of the worker can see it.
-+ *
-+ * Mirrors mac802154_flush_queued_beacons() in scan.c, which does not need
-+ * the cancel_work_sync() step because its worker never dereferences sdata.
-+ */
-+void mac802154_flush_queued_mac_cmds(struct ieee802154_local *local,
-+				     struct ieee802154_sub_if_data *sdata)
-+{
-+	struct cfg802154_mac_pkt *mac_pkt, *tmp;
-+
-+	cancel_work_sync(&local->rx_mac_cmd_work);
-+
-+	list_for_each_entry_safe(mac_pkt, tmp, &local->rx_mac_cmd_list, node) {
-+		if (sdata && mac_pkt->sdata != sdata)
-+			continue;
-+
-+		list_del(&mac_pkt->node);
-+		kfree_skb(mac_pkt->skb);
-+		kfree(mac_pkt);
-+	}
-+
-+	/* Other interfaces on @local may still have entries pending. */
-+	if (!list_empty(&local->rx_mac_cmd_list))
-+		queue_work(local->mac_wq, &local->rx_mac_cmd_work);
-+}
-+
- static int
- ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
- 		       struct sk_buff *skb, const struct ieee802154_hdr *hdr)
--- 
-2.50.1 (Apple Git-155)
-
+Adrian
 
