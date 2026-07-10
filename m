@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-306514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306515-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ouyjFZbQUGq55QIAu9opvQ
-	(envelope-from <netdev+bounces-306514-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 12:59:34 +0200
+	id v+mSI2rPUGqA5QIAu9opvQ
+	(envelope-from <netdev+bounces-306515-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 12:54:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8F60739EB1
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 12:59:33 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0983739E0C
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 12:54:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=flkX1559;
+	dkim=pass header.d=intel.com header.s=Intel header.b=f8g3Qlj2;
 	dmarc=pass (policy=none) header.from=intel.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306514-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306514-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306515-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306515-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C9C753055E94
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 10:54:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F045F303A73B
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 10:54:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9602412263;
-	Fri, 10 Jul 2026 10:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D96F1411699;
+	Fri, 10 Jul 2026 10:54:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E72A411687
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 10:54:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60CE540E8FC
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 10:54:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783680851; cv=none; b=HrLLIHibz0GHAtU9dcw/Fj9YyK+foZdm4+4R3tW3NsBTEZ9mjuKCJXmdNHNfud2U1KN3iY+v2jyOqQLoM429fR3uxGRF1z2egvG7aGLRFrCbFezEpk22yoguqjD4BZDAT+eW/jQAn3ssjtRn5cf8jC5qer4SWS+21b5VuZdnEMU=
+	t=1783680851; cv=none; b=G12NhTuGcZVkGrEt5neJxCRDpH1+t9OQWfsvZ8s5brgfw0qmJtuo9xwFwWF2+/tIvWtPqdmLZKDd8FV+F5EkxrCOV49KVQkA+yvdmOsikPXQEo3UhTBC5W9AN1+VgD5oXM1H4RR0qPMMlFe5iIhYBCDgZdJ5C8PPRsrKv6Dpgz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783680851; c=relaxed/simple;
-	bh=I4d/AIfY9IzTgmJQVuYw25e0drYqQCMxGHd3cq0S5pc=;
+	bh=v+lj4eItScpbsuUVoYJ361waa9gsm1oFYCEJ7e2DDWI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qbPrR1e0FDcq5a/WR7H9Rz34GMqF5682LC0YraG3I4Idi0HHa2NRVrs7JPnQH1LstvENOmpsrX+3WCzMIPur6eJgvxPqhdXftZdDx6YWjT1vrgkDnRPdeRAVcSlIuXWSUc+V5Lir+AI/17jzJVdKTd3v+2jGxF+NgGwUxL0T3Lo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=flkX1559; arc=none smtp.client-ip=192.198.163.13
+	 MIME-Version; b=BmFj6Gxzzu77chMLpPW456E6qHUZcXivy60IBXlHZXlOPv36PzyknPD4em1RJ0F3z+SyEcqMrxGy3hp70pVNnSBUIHakOzMP5sN9O38v9mZI6pKsQt2x9KlMIZsmSzCMB5WI99HtZWpwIT/kuFuSk0Q5zPUPRVOQkIC4d+Y1B8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f8g3Qlj2; arc=none smtp.client-ip=192.198.163.13
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1783680848; x=1815216848;
+  t=1783680849; x=1815216849;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=I4d/AIfY9IzTgmJQVuYw25e0drYqQCMxGHd3cq0S5pc=;
-  b=flkX1559GY7rMtRjtdSxlUYdr4bE3lg5qJZVgHEyID2V8MsvSsxskvoQ
-   4nOcsY4wa9oEs7mA0Ok0DEXa/vjT4a2rUo+Qpy5b0CL+tekq73QmIcizV
-   TySG2H9afFGyEPrP9iFMbBobHW5qutA4atLZVGKIK7QgODtE7SYeBICCn
-   4UKaM9lnj94RMS4YeKlS6MKcJdlyP/kpfubPXwz99qOs69s9Jv8/yKtAG
-   eCNdnQLngmoJLfYh1RjWsNJr1whCYet8qnc8ID095z1xfeU0hpNo9pXGD
-   V2lH9MgUbHRsxNaZVnA7EJA/sQFSTdhsS68Cjp6IKyUHTcXcsJd/mWLO7
+  bh=v+lj4eItScpbsuUVoYJ361waa9gsm1oFYCEJ7e2DDWI=;
+  b=f8g3Qlj2HcSjI3phfvAyTw9xDUFSM1XCY6l+7hQK5ZXYUNDOvZYHTpNd
+   aZH1EVPelVYSYcNs5Rl0AXAdutoHRAW5xvjedvUfth9foxERUWDLFhS8X
+   CPgXBEg+UiGw0JjP1APjKFsWbaXJ0I5sNsI+PPX/rnL7CCG7Kyjevcjfz
+   ZCe3EzOl7kCSLfD4SBsej5UMoWpaf1aKjCWFqXYemMnGsKNNlR25sEQx9
+   l07c8+HjEuGgg5qVewdPrN9DP1eSdo+RGlFi2TwqJlxP+02yBPowpY+12
+   Lgng1bsgaW6R3qQA65em8u4fKj1PDVrZM0Jcw3R9r4SxnofclCOZBls7Z
    g==;
-X-CSE-ConnectionGUID: Jgnk62frTjuyDAoqmtfLQA==
-X-CSE-MsgGUID: rEurrY8GSp6YBiv5iLCzzg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="86920267"
+X-CSE-ConnectionGUID: LaJFDV8NQtyp6yWLz/I1Ng==
+X-CSE-MsgGUID: XmWsdWwBSKuMFOi2jmNcZw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="86920269"
 X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="86920267"
+   d="scan'208";a="86920269"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2026 03:54:06 -0700
-X-CSE-ConnectionGUID: JNURY7F6RFaJER2U5JL+BA==
-X-CSE-MsgGUID: cX3cNDQ1TZ6EglZXnd2UNQ==
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2026 03:54:07 -0700
+X-CSE-ConnectionGUID: XEwqCZbuTB2AhqO+6IkBmw==
+X-CSE-MsgGUID: lAfzOR/UQHuZ3JjkMszCVA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="259750953"
+   d="scan'208";a="259750960"
 Received: from gnrd8.igk.intel.com (HELO GNRD8) ([10.123.232.137])
-  by fmviesa005.fm.intel.com with ESMTP; 10 Jul 2026 03:54:05 -0700
+  by fmviesa005.fm.intel.com with ESMTP; 10 Jul 2026 03:54:06 -0700
 From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org
-Subject: [PATCH iwl-next v1 1/2] ixgbe: Refactor device operations to check whether netdev is available
-Date: Fri, 10 Jul 2026 10:54:02 +0000
-Message-ID: <20260710105403.1050025-2-sergey.temerkhanov@intel.com>
+Subject: [PATCH iwl-next v1 2/2] ixgbe: Implement PCI reset handler
+Date: Fri, 10 Jul 2026 10:54:03 +0000
+Message-ID: <20260710105403.1050025-3-sergey.temerkhanov@intel.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260710105403.1050025-1-sergey.temerkhanov@intel.com>
 References: <20260710105403.1050025-1-sergey.temerkhanov@intel.com>
@@ -80,400 +80,164 @@ Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306515-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWO(0.00)[2];
 	FORGED_SENDER(0.00)[sergey.temerkhanov@intel.com,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306514-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWO(0.00)[2];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sergey.temerkhanov@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sergey.temerkhanov@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,intel.com:from_mime,intel.com:email,intel.com:mid,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ALIAS_RESOLVED(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C8F60739EB1
+X-Rspamd-Queue-Id: F0983739E0C
 
-Refactor several ixgbe driver operations to check whether the
-netdev they operate on is enabled. This will allow the system
-to get synchronized, for example, during the PCI resets.
+Implement PCI device reset handler to allow the network device to
+get re-initialized and function after a PCI-level reset.
+
+This is necessary for the adapter to avoid TX queue timeouts
+occurring after the PCI reset is performed via sysfs during
+its operation.
+
+The reset codepath may trigger a number of dependencies in the
+reset of the driver, so that it is necessary to check if
+the netdev is present and running there.
 
 Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+Reviewed-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
- drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  5 +++
- .../net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c   | 13 +++++--
- .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  | 34 ++++++++++++-------
- drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c | 20 ++++++++---
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 22 +++++++-----
- drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c  |  4 +--
- 6 files changed, 69 insertions(+), 29 deletions(-)
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 90 +++++++++++++++++++
+ 1 file changed, 90 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-index 594ccb28da20..e801433c5db8 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-@@ -955,6 +955,11 @@ extern char ixgbe_driver_name[];
- extern char ixgbe_default_device_descr[];
- #endif /* IXGBE_FCOE */
- 
-+static inline bool ixgbe_netif_running(struct net_device *netdev)
-+{
-+	return netif_running(netdev) && netif_device_present(netdev);
-+}
-+
- int ixgbe_open(struct net_device *netdev);
- int ixgbe_close(struct net_device *netdev);
- void ixgbe_up(struct ixgbe_adapter *adapter);
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c
-index 382d097e4b11..7c7408d32742 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c
-@@ -277,17 +277,23 @@ static void ixgbe_dcbnl_get_pfc_cfg(struct net_device *netdev, int priority,
- static void ixgbe_dcbnl_devreset(struct net_device *dev)
- {
- 	struct ixgbe_adapter *adapter = ixgbe_from_netdev(dev);
-+	bool running;
-+
-+	if (!netif_device_present(dev))
-+		return;
-+
-+	running = ixgbe_netif_running(dev);
- 
- 	while (test_and_set_bit(__IXGBE_RESETTING, &adapter->state))
- 		usleep_range(1000, 2000);
- 
--	if (netif_running(dev))
-+	if (running)
- 		dev->netdev_ops->ndo_stop(dev);
- 
- 	ixgbe_clear_interrupt_scheme(adapter);
- 	ixgbe_init_interrupt_scheme(adapter);
- 
--	if (netif_running(dev))
-+	if (running)
- 		dev->netdev_ops->ndo_open(dev);
- 
- 	clear_bit(__IXGBE_RESETTING, &adapter->state);
-@@ -515,6 +521,9 @@ static int ixgbe_dcbnl_ieee_setets(struct net_device *dev,
- 	if (!(adapter->dcbx_cap & DCB_CAP_DCBX_VER_IEEE))
- 		return -EINVAL;
- 
-+	if (!netif_device_present(dev))
-+		return -ENETDOWN;
-+
- 	if (!adapter->ixgbe_ieee_ets) {
- 		adapter->ixgbe_ieee_ets = kmalloc_obj(struct ieee_ets);
- 		if (!adapter->ixgbe_ieee_ets)
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-index 36e43b5e88d1..02aff411426d 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-@@ -466,6 +466,9 @@ static int ixgbe_set_link_ksettings(struct net_device *netdev,
- 	u32 advertised, old;
- 	int err = 0;
- 
-+	if (!netif_device_present(netdev))
-+		return -ENETDOWN;
-+
- 	if ((hw->phy.media_type == ixgbe_media_type_copper) ||
- 	    (hw->phy.multispeed_fiber)) {
- 		/*
-@@ -576,9 +579,9 @@ static void ixgbe_set_pauseparam_finalize(struct net_device *netdev,
- 	/* If the thing changed then we'll update and use new autoneg. */
- 	if (memcmp(fc, &hw->fc, sizeof(*fc))) {
- 		hw->fc = *fc;
--		if (netif_running(netdev))
-+		if (ixgbe_netif_running(netdev))
- 			ixgbe_reinit_locked(adapter);
--		else
-+		else if (netif_device_present(netdev))
- 			ixgbe_reset(adapter);
- 	}
- }
-@@ -1266,7 +1269,7 @@ static int ixgbe_set_ringparam(struct net_device *netdev,
- 	while (test_and_set_bit(__IXGBE_RESETTING, &adapter->state))
- 		usleep_range(1000, 2000);
- 
--	if (!netif_running(adapter->netdev)) {
-+	if (!ixgbe_netif_running(adapter->netdev)) {
- 		for (i = 0; i < adapter->num_tx_queues; i++)
- 			adapter->tx_ring[i]->count = new_tx_count;
- 		for (i = 0; i < adapter->num_xdp_queues; i++)
-@@ -2249,10 +2252,11 @@ static void ixgbe_diag_test(struct net_device *netdev,
- 			    struct ethtool_test *eth_test, u64 *data)
- {
- 	struct ixgbe_adapter *adapter = ixgbe_from_netdev(netdev);
--	bool if_running = netif_running(netdev);
-+	bool if_running = ixgbe_netif_running(netdev);
- 
--	if (ixgbe_removed(adapter->hw.hw_addr)) {
--		e_err(hw, "Adapter removed - test blocked\n");
-+	if (ixgbe_removed(adapter->hw.hw_addr) ||
-+	    !netif_device_present(netdev)) {
-+		e_err(hw, "Adapter removed or detached - test blocked\n");
- 		data[0] = 1;
- 		data[1] = 1;
- 		data[2] = 1;
-@@ -2466,7 +2470,7 @@ static int ixgbe_nway_reset(struct net_device *netdev)
- {
- 	struct ixgbe_adapter *adapter = ixgbe_from_netdev(netdev);
- 
--	if (netif_running(netdev))
-+	if (ixgbe_netif_running(netdev))
- 		ixgbe_reinit_locked(adapter);
- 
- 	return 0;
-@@ -2650,7 +2654,8 @@ static int ixgbe_set_coalesce(struct net_device *netdev,
- 		else
- 			/* rx only or mixed */
- 			q_vector->itr = rx_itr_param;
--		ixgbe_write_eitr(q_vector);
-+		if (netif_device_present(netdev))
-+			ixgbe_write_eitr(q_vector);
- 	}
- 
- 	/*
-@@ -3694,6 +3699,9 @@ static int ixgbe_set_eee_e610(struct net_device *netdev,
- 	    kedata->eee_enabled)
- 		return -EOPNOTSUPP;
- 
-+	if (!netif_device_present(netdev))
-+		return -ENETDOWN;
-+
- 	hw->phy.eee_speeds_advertised = kedata->eee_enabled ?
- 					hw->phy.eee_speeds_supported : 0;
- 
-@@ -3709,9 +3717,9 @@ static int ixgbe_set_eee_e610(struct net_device *netdev,
- 	else
- 		adapter->flags2 &= ~IXGBE_FLAG2_EEE_ENABLED;
- 
--	if (netif_running(netdev))
-+	if (ixgbe_netif_running(netdev))
- 		ixgbe_reinit_locked(adapter);
--	else
-+	else if (netif_device_present(netdev))
- 		ixgbe_reset(adapter);
- 
- 	return 0;
-@@ -3793,9 +3801,9 @@ static int ixgbe_set_eee(struct net_device *netdev, struct ethtool_keee *edata)
- 	}
- 
- 	/* reset link */
--	if (netif_running(netdev))
-+	if (ixgbe_netif_running(netdev))
- 		ixgbe_reinit_locked(adapter);
--	else
-+	else if (netif_device_present(netdev))
- 		ixgbe_reset(adapter);
- 
- 	return 0;
-@@ -3851,7 +3859,7 @@ static int ixgbe_set_priv_flags(struct net_device *netdev, u32 priv_flags)
- 		adapter->flags2 = flags2;
- 
- 		/* reset interface to repopulate queues */
--		if (netif_running(netdev))
-+		if (ixgbe_netif_running(netdev))
- 			ixgbe_reinit_locked(adapter);
- 	}
- 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c
-index e338ff0e6522..a22c20c73cdc 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c
-@@ -853,6 +853,10 @@ int ixgbe_fcoe_enable(struct net_device *netdev)
- {
- 	struct ixgbe_adapter *adapter = ixgbe_from_netdev(netdev);
- 	struct ixgbe_fcoe *fcoe = &adapter->fcoe;
-+	bool running;
-+
-+	if (!netif_device_present(netdev))
-+		return -ENETDOWN;
- 
- 	atomic_inc(&fcoe->refcnt);
- 
-@@ -862,12 +866,14 @@ int ixgbe_fcoe_enable(struct net_device *netdev)
- 	if (adapter->flags & IXGBE_FLAG_FCOE_ENABLED)
- 		return -EINVAL;
- 
-+	running = ixgbe_netif_running(netdev);
-+
- 	e_info(drv, "Enabling FCoE offload features.\n");
- 
- 	if (adapter->flags & IXGBE_FLAG_SRIOV_ENABLED)
- 		e_warn(probe, "Enabling FCoE on PF will disable legacy VFs\n");
- 
--	if (netif_running(netdev))
-+	if (running)
- 		netdev->netdev_ops->ndo_stop(netdev);
- 
- 	/* Allocate per CPU memory to track DDP pools */
-@@ -882,7 +888,7 @@ int ixgbe_fcoe_enable(struct net_device *netdev)
- 	ixgbe_clear_interrupt_scheme(adapter);
- 	ixgbe_init_interrupt_scheme(adapter);
- 
--	if (netif_running(netdev))
-+	if (running)
- 		netdev->netdev_ops->ndo_open(netdev);
- 
- 	return 0;
-@@ -899,6 +905,10 @@ int ixgbe_fcoe_enable(struct net_device *netdev)
- int ixgbe_fcoe_disable(struct net_device *netdev)
- {
- 	struct ixgbe_adapter *adapter = ixgbe_from_netdev(netdev);
-+	bool running;
-+
-+	if (!netif_device_present(netdev))
-+		return -ENETDOWN;
- 
- 	if (!atomic_dec_and_test(&adapter->fcoe.refcnt))
- 		return -EINVAL;
-@@ -906,8 +916,10 @@ int ixgbe_fcoe_disable(struct net_device *netdev)
- 	if (!(adapter->flags & IXGBE_FLAG_FCOE_ENABLED))
- 		return -EINVAL;
- 
-+	running = ixgbe_netif_running(netdev);
-+
- 	e_info(drv, "Disabling FCoE offload features.\n");
--	if (netif_running(netdev))
-+	if (running)
- 		netdev->netdev_ops->ndo_stop(netdev);
- 
- 	/* Free per CPU memory to track DDP pools */
-@@ -923,7 +935,7 @@ int ixgbe_fcoe_disable(struct net_device *netdev)
- 	ixgbe_clear_interrupt_scheme(adapter);
- 	ixgbe_init_interrupt_scheme(adapter);
- 
--	if (netif_running(netdev))
-+	if (running)
- 		netdev->netdev_ops->ndo_open(netdev);
- 
- 	return 0;
 diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 2ac274c73d61..42dac766c907 100644
+index 42dac766c907..1865b604ace7 100644
 --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
 +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -7420,7 +7420,7 @@ static int ixgbe_change_mtu(struct net_device *netdev, int new_mtu)
- 	/* must set new MTU before calling down or up */
- 	WRITE_ONCE(netdev->mtu, new_mtu);
- 
--	if (netif_running(netdev))
-+	if (ixgbe_netif_running(netdev))
- 		ixgbe_reinit_locked(adapter);
- 
- 	return 0;
-@@ -9917,6 +9917,7 @@ int ixgbe_setup_tc(struct net_device *dev, u8 tc)
- {
- 	struct ixgbe_adapter *adapter = ixgbe_from_netdev(dev);
- 	struct ixgbe_hw *hw = &adapter->hw;
-+	bool running = ixgbe_netif_running(dev);
- 
- 	/* Hardware supports up to 8 traffic classes */
- 	if (tc > adapter->dcb_cfg.num_tcs.pg_tcs)
-@@ -9929,7 +9930,10 @@ int ixgbe_setup_tc(struct net_device *dev, u8 tc)
- 	 * match packet buffer alignment. Unfortunately, the
- 	 * hardware is not flexible enough to do this dynamically.
- 	 */
--	if (netif_running(dev))
-+	if (!netif_device_present(dev))
-+		return -ENETDOWN;
-+
-+	if (running)
- 		ixgbe_close(dev);
- 	else
- 		ixgbe_reset(adapter);
-@@ -9942,7 +9946,7 @@ int ixgbe_setup_tc(struct net_device *dev, u8 tc)
- 			e_warn(probe, "DCB is not supported with XDP\n");
- 
- 			ixgbe_init_interrupt_scheme(adapter);
--			if (netif_running(dev))
-+			if (running)
- 				ixgbe_open(dev);
- 			return -EINVAL;
- 		}
-@@ -9977,7 +9981,7 @@ int ixgbe_setup_tc(struct net_device *dev, u8 tc)
- 
- 	ixgbe_defrag_macvlan_pools(dev);
- 
--	if (netif_running(dev))
-+	if (running)
- 		return ixgbe_open(dev);
- 
- 	return 0;
-@@ -10503,9 +10507,9 @@ void ixgbe_do_reset(struct net_device *netdev)
- {
- 	struct ixgbe_adapter *adapter = ixgbe_from_netdev(netdev);
- 
--	if (netif_running(netdev))
-+	if (ixgbe_netif_running(netdev))
- 		ixgbe_reinit_locked(adapter);
--	else
-+	else if (netif_device_present(netdev))
- 		ixgbe_reset(adapter);
+@@ -12358,6 +12358,94 @@ static pci_ers_result_t ixgbe_io_slot_reset(struct pci_dev *pdev)
+ 	return result;
  }
  
-@@ -10837,7 +10841,7 @@ static void *ixgbe_fwd_add(struct net_device *pdev, struct net_device *vdev)
- 	accel->pool = pool;
- 	accel->netdev = vdev;
- 
--	if (!netif_running(pdev))
-+	if (!ixgbe_netif_running(pdev))
- 		return accel;
- 
- 	err = ixgbe_fwd_ring_up(adapter, accel);
-@@ -10968,8 +10972,10 @@ static int ixgbe_xdp_setup(struct net_device *dev, struct bpf_prog *prog)
- 			synchronize_rcu();
- 		err = ixgbe_setup_tc(dev, adapter->hw_tcs);
- 
--		if (err)
++/**
++ * ixgbe_pci_reset_prepare - called before the pci bus is reset.
++ * @pdev: Pointer to PCI device
++ *
++ * Quiesce the driver in preparation for a PCI function reset. Called from
++ * pci_dev_save_and_disable() before the core saves config state and writes
++ * PCI_COMMAND_INTX_DISABLE to clear bus mastering and MMIO decode, so MMIO
++ * access to the device is still valid here.
++ */
++static void ixgbe_pci_reset_prepare(struct pci_dev *pdev)
++{
++	struct ixgbe_adapter *adapter = pci_get_drvdata(pdev);
++	struct net_device *netdev;
++
++	if (!adapter)
++		return;
++
++	netdev = adapter->netdev;
++
++	rtnl_lock();
++	netif_device_detach(netdev);
++	if (netif_running(netdev))
++		ixgbe_close_suspend(adapter);
++	rtnl_unlock();
++
++	/* __IXGBE_RESETTING is intentionally not set here: it is spun on
++	 * while holding rtnl by ixgbe_reinit_locked(), ixgbe_dcbnl_devreset()
++	 * and the ethtool reset paths, so holding it across the rtnl drop
++	 * would deadlock those callers against ixgbe_pci_reset_done(), which
++	 * needs to re-acquire rtnl.  During the reset window concurrent
++	 * rtnl-holding paths must treat the netdev as detached, while teardown
++	 * paths also observe __IXGBE_DOWN set by ixgbe_down() via
++	 * ixgbe_close_suspend(), matching the existing ixgbe_io_error_detected()
++	 * flow.
++	 */
++
++	if (test_bit(__IXGBE_SERVICE_INITED, &adapter->state)) {
++		/* The service timer was already stopped by ixgbe_down() via
++		 * ixgbe_close_suspend(); if the netdev was not running, the
++		 * timer is not armed.  Only the currently queued service task
++		 * (if any) still needs to be flushed here.
++		 */
++		cancel_work_sync(&adapter->service_task);
++		clear_bit(__IXGBE_SERVICE_SCHED, &adapter->state);
++	}
++}
++
++/**
++ * ixgbe_pci_reset_done - called after the pci bus has been reset.
++ * @pdev: Pointer to PCI device
++ *
++ * Re-initialize the device after a PCI function reset. The PCI core has
++ * already called pci_restore_state() before invoking this callback, so the
++ * saved Command register (including bus mastering) is back in place.
++ */
++static void ixgbe_pci_reset_done(struct pci_dev *pdev)
++{
++	struct ixgbe_adapter *adapter = pci_get_drvdata(pdev);
++	struct net_device *netdev;
++	bool running;
++	int err = 0;
++
++	if (!adapter)
++		return;
++
++	netdev = adapter->netdev;
++
++	rtnl_lock();
++	adapter->hw.hw_addr = adapter->io_addr;
++	ixgbe_reset(adapter);
++	IXGBE_WRITE_REG(&adapter->hw, IXGBE_WUS, ~0);
++	running = netif_running(netdev);
++	if (running) {
++		err = ixgbe_open(netdev);
 +		if (err) {
-+			xchg(&adapter->xdp_prog, old_prog);
- 			return -EINVAL;
++			e_dev_err("Cannot re-open netdev after PCI reset: %d. A new reset is needed.\n",
++				  err);
++			dev_close(netdev);
 +		}
- 		if (!prog)
- 			xdp_features_clear_redirect_target(dev);
- 	} else {
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-index 89f96c463f02..02820982b202 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-@@ -39,7 +39,7 @@ static int ixgbe_xsk_pool_enable(struct ixgbe_adapter *adapter,
- 	if (err)
- 		return err;
++	}
++	/* Restore presence so userspace can retry later. If ixgbe_open() failed,
++	 * dev_close() cleared IFF_UP first so netif_device_attach() will not wake
++	 * Tx queues without a successful open.
++	 */
++	netif_device_attach(netdev);
++	rtnl_unlock();
++}
++
+ /**
+  * ixgbe_io_resume - called when traffic can start flowing again.
+  * @pdev: Pointer to PCI device
+@@ -12390,6 +12478,8 @@ static const struct pci_error_handlers ixgbe_err_handler = {
+ 	.error_detected = ixgbe_io_error_detected,
+ 	.slot_reset = ixgbe_io_slot_reset,
+ 	.resume = ixgbe_io_resume,
++	.reset_prepare = ixgbe_pci_reset_prepare,
++	.reset_done = ixgbe_pci_reset_done,
+ };
  
--	if_running = netif_running(adapter->netdev) &&
-+	if_running = ixgbe_netif_running(adapter->netdev) &&
- 		     ixgbe_enabled_xdp_adapter(adapter);
- 
- 	if (if_running)
-@@ -71,7 +71,7 @@ static int ixgbe_xsk_pool_disable(struct ixgbe_adapter *adapter, u16 qid)
- 	if (!pool)
- 		return -EINVAL;
- 
--	if_running = netif_running(adapter->netdev) &&
-+	if_running = ixgbe_netif_running(adapter->netdev) &&
- 		     ixgbe_enabled_xdp_adapter(adapter);
- 
- 	if (if_running)
+ static DEFINE_SIMPLE_DEV_PM_OPS(ixgbe_pm_ops, ixgbe_suspend, ixgbe_resume);
 -- 
 2.53.0
 
