@@ -1,97 +1,71 @@
-Return-Path: <netdev+bounces-306587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306589-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lg9ZF/oAUWpC9wIAu9opvQ
-	(envelope-from <netdev+bounces-306587-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:26:02 +0200
+	id D5qgNO8AUWpA9wIAu9opvQ
+	(envelope-from <netdev+bounces-306589-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:25:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4F3473BB7F
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:26:01 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D24C73BB75
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:25:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=r+3ouwBM;
-	dmarc=pass (policy=reject) header.from=nvidia.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306587-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306587-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=CjFNZgkG;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306589-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306589-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 694513055E94
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:18:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B7C603075CFA
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7F46345CD0;
-	Fri, 10 Jul 2026 14:18:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15850348C6B;
+	Fri, 10 Jul 2026 14:20:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012006.outbound.protection.outlook.com [52.101.43.6])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8297B3446C7;
-	Fri, 10 Jul 2026 14:18:41 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783693122; cv=fail; b=cMAeviUeuxo9e9OlVb7shcY+UPTxWDrIHGNVByCVJmYJPj+MfAiX+cgXwsYpm/so0ON4KUMD407/GT8R/cOT5fPZAWDRADyKzwTTNxnQoeQQnWil5ka+NDvPgrWUI9R5vRq76yEQKVNtD3AMqi01VXvKrJjv/1JHLioFm1vtHLI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783693122; c=relaxed/simple;
-	bh=yIiyBc+5v6OzzqRq4vbdIqFeVcZDEM/wZtTmuS7zC6g=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LK+Zzm6hs7dKI5yI0141b9VUR5kbmfSuB17RrPyapbtvZ4Q1BT7kpIb/HNhiModQhjftT6Ak8Tm9fpIFLDgJqZhlE4A47DRxEuHNrikVXoMP6C4ID6CbT5EU1FPvzyne0E3nPg4vklWls/7yM1qB9QkxPixI8EyHBJGLu0H3Tvw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=r+3ouwBM; arc=fail smtp.client-ip=52.101.43.6
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gBM62ayz/2OpDovSfl28ICHojPvoys2aTqnA7xhPuq8Fvz8NG9WPKSiCpTQFjTKd1IZUlU7G0AN1KTgPagfAyXtbw5B64tlyxpjZljb/AXMj8LgQ1E3qe2hmRfU2sECOizgYu021jvDgGPu0wyEJTsNdJDqlsEmDkoMASbqjvZgzA8utNjOSBGDobK0pKH7xrEWB0HlT4v3C+YsTDjf0419pRNXf7l3neTN6HiGUKxaF+o88Ny8QloM8vmV25bSDtbB7P4TMvHfUVbLdwtIHqrFGkU9FmwcKyuYygBsGKbo9yyG7agxfiJJIfpsn0oeyuNkb+Q2sIDHFPt0PpcHC4g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PVy60BJvJiSu76jKKWhO1wmghR6+d3rmaMuwxtrnMzo=;
- b=kNYqFNIuk8W5ug/VYGmt+MCiII3YOBH7H16V3NIMTuGzuMpif41743yOwM5G6b6kIAOZ7vx44l737PD9fSNcCCxgDhxKDAWtt+ai8pJywr3c7w65Bs8SRVHfLiU+upSZkGTDUsnjpdRM8ZBRDv1s1au0gNDxxDXmqFWxumLPCwImyEpCFQZ7OzSH/nnQAoIHiS3xkv5O0rQXAdNLpJ/mO5KbB924nCNZF9GF7rZqavkLjOQAui2e3xOnOIDxYY/z9Wd59PM6xv+aDhkY1HYwaDs63bftKounvDm2NLrxjdJ5AiCk3pNoqMgHV+NQXasOTkRRWlT7zbEy9h2OdJ0I7g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=bootlin.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PVy60BJvJiSu76jKKWhO1wmghR6+d3rmaMuwxtrnMzo=;
- b=r+3ouwBMTWd9qmX6QmOnm9b6ileEVI+iQqh1k9z07U1hYS3XU8cmYg2uWrqPtMSULO/22jMmEbJKDsTDYXeSM9AT6WQ7M3TPyg2FpVrqXSCwgw+Q7sQlpvsbOQ/HGndLnCHr6B7OSEqzDH7kK9oiUvDJg/SeK7oo5PW0DB4x816jHE0HWF2VY4ZfRhttbruvqS+hdgk/2ruVKmPUYklY2N3rKC7xqzkzhKeC5FsvBQ6FM7sWlJkRlGDPm4xB/LkCEuIBvD+vd9TkCITNMioE2rKFM1Nxa2mg/MVAwS6s3f1zt86bAsgVU4Z8f4xWVHZGdoIETtWFaNsYC0xpc2r52Q==
-Received: from CY8P220CA0020.NAMP220.PROD.OUTLOOK.COM (2603:10b6:930:46::18)
- by MW4PR12MB6974.namprd12.prod.outlook.com (2603:10b6:303:207::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.17; Fri, 10 Jul
- 2026 14:18:33 +0000
-Received: from CY4PEPF0000EE33.namprd05.prod.outlook.com
- (2603:10b6:930:46:cafe::4) by CY8P220CA0020.outlook.office365.com
- (2603:10b6:930:46::18) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.202.13 via Frontend Transport; Fri,
- 10 Jul 2026 14:18:31 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CY4PEPF0000EE33.mail.protection.outlook.com (10.167.242.39) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.181.6 via Frontend Transport; Fri, 10 Jul 2026 14:18:30 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 10 Jul
- 2026 07:18:12 -0700
-Received: from nvidia.com (10.126.231.37) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 10 Jul
- 2026 07:18:10 -0700
-From: Jacky Huang <jackyhuang@nvidia.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-CC: Jacky Huang <jackyhuang@nvidia.com>, Andrew Lunn <andrew@lunn.ch>, "Heiner
- Kallweit" <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	"Jakub Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Daniel
- Golle <daniel@makrotopia.org>, Vladimir Oltean <vladimir.oltean@nxp.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: Question: net: phy: realtek: RTL8211FS SGMII bridge mode support
-Date: Fri, 10 Jul 2026 23:17:03 +0900
-Message-ID: <20260710141707.3280954-1-jackyhuang@nvidia.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <9d4bab68-6383-4b8d-a9d0-144b348e937c@bootlin.com>
-References: <20260709035244.3008436-1-jackyhuang@nvidia.com> <9d4bab68-6383-4b8d-a9d0-144b348e937c@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B269B348886;
+	Fri, 10 Jul 2026 14:20:38 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783693240; cv=none; b=O6DxJgtxt1t+6YU7S8Q2ENy54lzve7kYQXQa9pSapPUN6eQQuub/Vtz5cVSGqYFXhKTfy2TdpzQYFj0p1qgt1W7sGWJoNlbAc5fqweg1NM/TmzsFbBtYcy/VK3TW/HwF2I6GZIM8IV7gP3ju9ft0EPLzSDosLF2fJ+jm4Vcq3Os=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783693240; c=relaxed/simple;
+	bh=ECtrqPwlDWjSuIObRf2MYTZImAmEfsn/QV2p/KH8+bY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=N0EWln9buYxfPGOISsl2KhmPiQcWlpIs/+m7Czxx5Mi7+JTQmB6lp7YJL1oyuhwylJR7HczJ7WP9QRK4l0zaIH6dn52FZRrK/DAZuKuUiBnnhI7h/Od8cMkllF/9UAr8/bWWwXI8wZTcJCPbhAvH57RFMPK/ob9rHyxgvMR+sUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CjFNZgkG; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DDE61F00A3D;
+	Fri, 10 Jul 2026 14:20:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783693238;
+	bh=/pccCglUhRsC0pv3Cba+TIYCpljCUdyXdTko957Y5Xc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=CjFNZgkGcnNtKVJDBz0476l5a57ZWkbDg/lwvuGwakH3217zTRU3cj+juBSP9Mofk
+	 +fOKMOm7bLt+mZU+4s/PtUWmxg0fVkk05kMaahbUkX9R/ZiMYMqcr5T8nm59L7F5r6
+	 hURndqIw37GotN9nxu3OVOixjy3MhMgyAGxOp1Lsxic1C3IyiZtpyR8T4qC/UayWy7
+	 AKd/cns3LGvhro9cAYXhctkX2j/A+K5Q/I1e+IZfzYNh8cHm9avh2ObhGnqLpM6laa
+	 HMvvHS214iJe0N707bw7lKjn9bydtGmGMmcQByoe3mq/ZmVVRRPQB7nhShOiLj9Jtn
+	 zSIsfkSQRwAOg==
+From: Simon Horman <horms@kernel.org>
+To: Selvamani.Rajagopal@onsemi.com
+Cc: Simon Horman <horms@kernel.org>,
+	parthiban.veerasooran@microchip.com,
+	andrew+netdev@lunn.ch,
+	pier.beruto@onsemi.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	andrew@lunn.ch,
+	Parthiban.Veerasooran@microchip.com
+Subject: Re: [PATCH net v3 2/3] net: ethernet: oa_tc6: Improvement in buffer overflow handling
+Date: Fri, 10 Jul 2026 15:20:18 +0100
+Message-ID: <20260710142019.1619159-1-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260705-fix-race-condition-and-crash-v3-2-3e51841e4d08@onsemi.com>
+References: <20260705-fix-race-condition-and-crash-v3-2-3e51841e4d08@onsemi.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,92 +73,213 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE33:EE_|MW4PR12MB6974:EE_
-X-MS-Office365-Filtering-Correlation-Id: cd53ae87-fda0-4e2c-a97c-08dede8e1e3a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|23010399003|36860700016|82310400026|1800799024|6133799003|56012099006|4143699003|11063799006|22082099003|18002099003|3023799007;
-X-Microsoft-Antispam-Message-Info:
-	JSKQkAx7/OZTGTDEm9x2LXGiWpnCKnuy1UPJbhafLQr9lJ2r7JOA+HiPuZjx4GNEaHva3YIcuwXouNnc4vxduvuac+KQ3c0aqh1Y+dMSyDrkk/QqnTnxkSEstKLB46NY6Q8ADQ4DKBf8iy3C6F2Y1hCl3R1h8sI7vG7fdYDipedRh/VDEz1wTOjZ774fhuM2osNbdaDY4k3qCFrTBPvyhiG0O9zzbTAmBLj2HOm1VkW0fOLT4faSRxcJZcsOguSSYPvfgvmGqmkNFtdF+DhnT+6G1D5sm0Swcks/2wkIYlbJMWeJh0BcC2mddQRjyP8oQatoPTK0bKpEGFiS+WPWTKHaL6bTEhTRq31pEbAv8nmUwCJQCQwtI7un1Dva3kxtejtEJwIVy+MS8naIxrWEP1JX0VrOOKT08k5nDAvauuRLquWFKHaGjbAcaZt82YiFmrOcwmBQENZ5LyW9ZcuuDmDHvBdA/IBb7ScbtrB3WnE24ZplOp+GhxzX9E4q1le6+v5aSos506ZaEp9hE4qg8C/8QAkrRi3ko5zoSoD23TxcZ+PExOal/auVRO2RfUFVc4Sj7vf3TWf/jY7v5d5olIcE9da0Xe2gSYyzyTBt0auj8EChyTtvoiGBm0dDjjpzCh8HLLVSGE3Tzv+jrcKhal4+YVO1bapwLnsEOM84ZPjVnApN30jh3Cas69i6yCRBRxLTzK/2x99zXdcv4Dt1RA==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(23010399003)(36860700016)(82310400026)(1800799024)(6133799003)(56012099006)(4143699003)(11063799006)(22082099003)(18002099003)(3023799007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	0i2BqcT3KJGSBQxq6MS5PXLnBa7uDAC2Dieh8aKRYCANrmo4jaxedyxKmFoMQ4O/bp5iXLchpC248ezK1dBSxpm7chXZsjeI2nd1CL7IZKJLQHUMLpoJzSl//gtqb/CjVYEiX8vJK4UngzNK18VHe7BAS6LZvNUvV05NEVVvK0+7XESGm9OiCwZncUN8+JB16yrfwNIqVWZ2kNn+hTTv6k8icV1oiQeehBFadWdTgXnovL+EQbI2W+VXo6L4qLj/AJTx4FmGuDFHFiMBlDV2UIccWTb/UDFbrhc/mt1MioQJ6dFQ2s1nwTAICPoJq19bFJyszI9v0Fc9syHoltezqTp0pGR0k9wdnR6IOaqxrUAHOzDHe+DD9bLilFJdrq4NhFMwWXh20mCKOdf1NuduXhdsuJFA4acx95qxVpK+UWh359ZfR5TCr8tECsubzzzl
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2026 14:18:30.5782
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: cd53ae87-fda0-4e2c-a97c-08dede8e1e3a
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE33.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6974
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306587-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_CC(0.00)[nvidia.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,makrotopia.org,nxp.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306589-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:maxime.chevallier@bootlin.com,m:jackyhuang@nvidia.com,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:daniel@makrotopia.org,m:vladimir.oltean@nxp.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:Selvamani.Rajagopal@onsemi.com,m:horms@kernel.org,m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:pier.beruto@onsemi.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:Parthiban.Veerasooran@microchip.com,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[jackyhuang@nvidia.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jackyhuang@nvidia.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:mid,nvidia.com:from_mime,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,linux.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A4F3473BB7F
+X-Rspamd-Queue-Id: 3D24C73BB75
 
-Hi Maxime,
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+---
+net: ethernet: oa_tc6: Improvement in buffer overflow handling
 
-Thanks for the feedback! I had not considered the SFP or additional PHY case
-before.
+This patch teaches the oa_tc6 rx path to detect when tail + length would
+exceed skb->end, abandon the current rx_skb, and resume on the next
+data chunk carrying a start_valid bit. It also propagates -EAGAIN as a
+recoverable error through the chunk/footer processing and the outer
+SPI transfer loop.
 
-The hardware we plan to support has the SGMII side permanently connected to
-an Ethernet switch.
+> diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
+> index 5b24cce4f9b5..a6b8762f6052 100644
+> --- a/drivers/net/ethernet/oa_tc6.c
+> +++ b/drivers/net/ethernet/oa_tc6.c
 
-    MAC - RGMII - RTL8211FS - SGMII - Ethernet switch
+[ ... ]
 
-The switch is initialized from a configuration EEPROM. There is no SFP or
-separate PHY on the SGMII link.
+> @@ -931,8 +966,7 @@ static int oa_tc6_prcs_rx_chunk_payload(struct oa_tc6 *tc6, u8 *data,
+>  	/* Process the chunk with only rx frame end */
+>  	if (end_valid && !start_valid) {
+>  		size = end_byte_offset + 1;
+> -		oa_tc6_prcs_rx_frame_end(tc6, data, size);
+> -		return 0;
+> +		return oa_tc6_prcs_rx_frame_end(tc6, data, size);
+>  	}
+>  
+>  	/* Process the chunk with previous rx frame end and next rx frame
 
-I will take another look at how the SGMII-side status and in-band aneg should
-be handled.
+[High]
+Now that oa_tc6_prcs_rx_frame_end() returns int (and can return -EAGAIN
+via oa_tc6_update_rx_skb() when tail + size > end), should the
+"previous rx frame end + next rx frame start" branch also observe the
+return value?  That branch is not shown in the diff, but in the
+resulting file it reads:
 
-In addition, after reviewing the board-level strap design, I found that the
-intended mode may not always be selected reliably, so I still need to consider
-a strap-override flow.
+    if (start_valid && end_valid && start_byte_offset > end_byte_offset) {
+        if (tc6->rx_skb) {
+            size = end_byte_offset + 1;
+            oa_tc6_prcs_rx_frame_end(tc6, data, size);
+        }
+        size = OA_TC6_CHUNK_PAYLOAD_SIZE - start_byte_offset;
+        return oa_tc6_prcs_rx_frame_start(tc6,
+                                          &data[start_byte_offset],
+                                          size);
+    }
 
-Thanks again,
-Jacky
+If oa_tc6_prcs_rx_frame_end() here returns -EAGAIN, oa_tc6_look_for_new_frame()
+has already set tc6->rx_buf_overflow = true and cleared rx_skb.  Execution
+then falls through to oa_tc6_prcs_rx_frame_start(), which allocates a
+fresh rx_skb and copies the start bytes, but tc6->rx_buf_overflow stays
+true because the guard
+
+    if (start_valid && tc6->rx_buf_overflow)
+        tc6->rx_buf_overflow = false;
+
+is only evaluated on chunk entry.  Subsequent ongoing chunks (no
+start_valid) then hit the earlier
+
+    if (tc6->rx_buf_overflow)
+        return 0;
+
+path and are silently dropped, and the partial rx_skb is later thrown
+away by the next allocate_rx_skb() -> cleanup_ongoing_rx_skb(), which
+also increments rx_dropped.  Is this the intended behaviour for the
+oversubscribed/chunk-loss scenario the patch is targeting?
+
+[ ... ]
+
+> @@ -972,8 +1004,9 @@ static u32 oa_tc6_get_rx_chunk_footer(struct oa_tc6 *tc6, u16 footer_offset)
+>  static int oa_tc6_process_spi_data_rx_buf(struct oa_tc6 *tc6, u16 length)
+>  {
+>  	u16 no_of_rx_chunks = length / OA_TC6_CHUNK_SIZE;
+> +	bool retry = false;
+> +	int ret = 0;
+>  	u32 footer;
+> -	int ret;
+>  
+>  	/* All the rx chunks in the receive SPI data buffer are examined here */
+>  	for (int i = 0; i < no_of_rx_chunks; i++) {
+> @@ -982,8 +1015,11 @@ static int oa_tc6_process_spi_data_rx_buf(struct oa_tc6 *tc6, u16 length)
+>  						    OA_TC6_CHUNK_PAYLOAD_SIZE);
+>  
+>  		ret = oa_tc6_process_rx_chunk_footer(tc6, footer);
+> -		if (ret)
+> -			return ret;
+> +		if (ret) {
+> +			if (ret != -EAGAIN)
+> +				return ret;
+> +			retry = true;
+> +		}
+>  
+>  		/* If there is a data valid chunks then process it for the
+>  		 * information needed to determine the validity and the location
+> @@ -995,12 +1031,25 @@ static int oa_tc6_process_spi_data_rx_buf(struct oa_tc6 *tc6, u16 length)
+>  
+>  			ret = oa_tc6_prcs_rx_chunk_payload(tc6, payload,
+>  							   footer);
+> -			if (ret)
+> -				return ret;
+> +			if (ret) {
+> +				if (ret != -ENOMEM && ret != -EAGAIN)
+> +					return ret;
+> +				retry = true;
+> +			}
+>  		}
+>  	}
+
+[Medium]
+Is it intentional that a real -ENOMEM from oa_tc6_prcs_rx_chunk_payload()
+(originating in oa_tc6_allocate_rx_skb() -> netdev_alloc_skb_ip_align())
+is now folded into the retry path and converted to -EAGAIN at the end
+of this function?
+
+Before this patch, -ENOMEM propagated up through oa_tc6_try_spi_transfer()
+and produced a netdev_err("Device error: %d", ret) plus
+oa_tc6_free_ongoing_skbs() cleanup.  With this change, the outer while
+loop treats -EAGAIN as non-fatal, so sustained memory exhaustion is
+reported only as increments to stats.rx_dropped from
+oa_tc6_allocate_rx_skb().
+
+The commit message describes the change as being about buffer overflow
+errors; is the change in visibility for allocation failures intended?
+
+>  
+> -	return 0;
+> +	/* As a recoverable error, not bailing out on error code
+> +	 * -EAGAIN. If subsequent loop iterations, if any, succeeds,
+> +	 * error code would be overwritten. retry flag helps to
+> +	 * make the caller to continue and retry.
+> +	 */
+> +	if (retry) {
+> +		ret = -EAGAIN;
+> +		oa_tc6_look_for_new_frame(tc6);
+> +	}
+> +
+> +	return ret;
+>  }
+
+[High]
+Can this unconditional oa_tc6_look_for_new_frame() discard a frame that
+was successfully started later in the same buffer?
+
+Consider a buffer where iteration N returns -EAGAIN from
+oa_tc6_process_rx_chunk_footer() due to STATUS0 rx overflow (which
+already sets rx_buf_overflow and clears rx_skb), and a later iteration
+N+K carries a start_valid chunk that clears rx_buf_overflow via
+
+    if (start_valid && tc6->rx_buf_overflow)
+        tc6->rx_buf_overflow = false;
+
+allocates a fresh rx_skb in oa_tc6_prcs_rx_frame_start(), and writes
+the start bytes without further error.  retry is still true from
+iteration N, so on loop exit the terminal oa_tc6_look_for_new_frame()
+frees that newly-started rx_skb (incrementing rx_dropped) and re-sets
+rx_buf_overflow = true.
+
+On the next SPI transfer, the ongoing chunks of that frame are then
+dropped by the top-of-function
+
+    if (tc6->rx_buf_overflow)
+        return 0;
+
+guard in oa_tc6_prcs_rx_chunk_payload() until yet another start_valid
+arrives.  Would it be safer to only call oa_tc6_look_for_new_frame()
+here if the last iteration was still in an errored state, e.g. by
+tracking the outcome of the most recent chunk rather than an aggregate
+retry flag?
+
+[ ... ]
 
