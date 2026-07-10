@@ -1,183 +1,180 @@
-Return-Path: <netdev+bounces-306560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306558-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id N2EfEBD0UGoD9AIAu9opvQ
-	(envelope-from <netdev+bounces-306560-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 15:30:56 +0200
+	id chVQEWPyUGqn8wIAu9opvQ
+	(envelope-from <netdev+bounces-306558-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 15:23:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A10A73B444
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 15:30:55 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D734D73B35D
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 15:23:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=common-net.org header.s=mail header.b=gm2zxTpu;
-	dmarc=pass (policy=reject) header.from=common-net.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306560-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306560-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.microsoft.com header.s=default header.b=Y1YK4MIE;
+	dmarc=pass (policy=none) header.from=linux.microsoft.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306558-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306558-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 51F8B300F9C6
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:30:18 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9A4BA301D793
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:23:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9036233722;
-	Fri, 10 Jul 2026 13:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33BB842E009;
+	Fri, 10 Jul 2026 13:23:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.common-net.org (mail.common-net.org [139.28.148.254])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 333543B2AA;
-	Fri, 10 Jul 2026 13:30:13 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B754189C0;
+	Fri, 10 Jul 2026 13:23:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783690217; cv=none; b=f7K7Tuoz4modm1bgutvJM68t5eXtzGc6ku+I9G+Vc4PptAspzMj/DGtSH4UNFmoSKKw3H4oMCRQ7ozUxDWlxoZKXmOoxfgbXqb0rhGU9RXdb0gHz+/BBdMn3KSdpbR4zDCN5Tf4yPCGIV1Yw9BEGvblS2up9fBCUt9Qdi1PRQTU=
+	t=1783689818; cv=none; b=TOuMdNSLMFk8Vi5C+O08X1tJ9RLuqP4Bfmd10ZNWBprXJ57yTOv3pd6cdH8RYiLXdXiEsarwMA5EGVzafbg0+j1Wazk2wo7tBUqlifjSRrmAeGRgydes0rGtIttP3eVSEMAd8uWIF+0gT407vGSUk7ipndeWH8/CwAP5rHJd3vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783690217; c=relaxed/simple;
-	bh=37DVLOJ0C/nXxDG2gLv61Y0uJu2i22i2h5bi7umeXyU=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=GFGg2X6yCa0zVhcE+hJeiw3NHWiF9xxCoR2oYUFaLVYn8Oaf1wVxEDhM2GJ1GXkKjb1E/8xoiU93DUUsKLK4mNOuf/jEjj4216vkAOoXUpgWwnHWgdjtNm1uiZ7tsR6lTAvCV7ccQfTp+920CQOj7L/dr63o/q+MtmvrLT3vjFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=common-net.org; spf=pass smtp.mailfrom=common-net.org; dkim=pass (1024-bit key) header.d=common-net.org header.i=@common-net.org header.b=gm2zxTpu; arc=none smtp.client-ip=139.28.148.254
-Received: from lubuntu-18.04 (host-82-61-152-174.retail.telecomitalia.it [82.61.152.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mail.common-net.org (Postfix) with ESMTPSA id 867BE6D20028;
-	Fri, 10 Jul 2026 15:22:11 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=common-net.org;
-	s=mail; t=1783689731;
-	bh=37DVLOJ0C/nXxDG2gLv61Y0uJu2i22i2h5bi7umeXyU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gm2zxTpumybA5osNk06kwG/gShIjRPbJJII6j1nv05DGcMhU3EDPyCmZfqSU0JUaS
-	 sdbhV+EJUVX+GT0UMF287GMDwjlwa1BQlthhDKigp72RS27xPesgoe9d2/K6cHTVte
-	 mfxacV42SWEcP1PmoDCFIpmbuluTlWn/cFm4r0WU=
-Date: Fri, 10 Jul 2026 15:22:11 +0200
-From: Andrea Mayer <andrea@common-net.org>
-To: Alessio Faina <alessio.faina@canonical.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, Po-Hsu Lin
- <po-hsu.lin@canonical.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Shuah Khan
- <shuah@kernel.org>, stefano.salsano@uniroma2.it, Andrea Mayer
- <andrea.mayer@uniroma2.it>
-Subject: Re: [PATCH net-next] selftests/net: Skip
- srv6_end_dt46_l3vpn_test::host_vpn_tests if iproute2 too old
-Message-Id: <20260710152211.63eb25d604ea0aa2b3707d68@common-net.org>
-In-Reply-To: <20260708152745.2430714-1-alessio.faina@canonical.com>
-References: <20260708152745.2430714-1-alessio.faina@canonical.com>
-Organization: Common Net
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1783689818; c=relaxed/simple;
+	bh=9nEljnZQeIIirhHTNpz60NxuDdzoP2cR3awIo0m0qxQ=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=MiWJZ3W/xY+kLWCwJuKZBYlx8BIw+YWS0pg5zcrelQjw9Kru9L+b1pC0fvT7nqI+S8XMmL7Ofnau6qeE/GZDV6jJgyxlSegxIOBNVgCcfg8j7bI+Jv098zBEXg+wWmPlgxNHinJ7wgvQssl1+P2tqA5Yy1YDiaW9C26/xL3oR1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Y1YK4MIE; arc=none smtp.client-ip=13.77.154.182
+Received: by linux.microsoft.com (Postfix, from userid 1231)
+	id 8AECB20B716F; Fri, 10 Jul 2026 06:23:30 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8AECB20B716F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1783689810;
+	bh=tWadOobs0k+qwzIzGFvhW9CN/liX9HwGSzfTB/U2bxU=;
+	h=From:To:Subject:Date:From;
+	b=Y1YK4MIEkBtXg75v7xYxSCy2luRFY0oOTHEDKLa0wH5u9EjNWrKp+uHyZFySdxma8
+	 ju3dSXE0Dg7JkNTG5Y6tBxNYXs1hJzv5yfW6aDebReW+Zwz3/4G/0/8MzPvHRLzkGj
+	 Nsue5dmItZlTg+PJi06/Um2Af6e8/g4RAg7csQMY=
+From: Aditya Garg <gargaditya@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	longli@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	kotaranov@microsoft.com,
+	horms@kernel.org,
+	ernis@linux.microsoft.com,
+	dipayanroy@linux.microsoft.com,
+	gargaditya@linux.microsoft.com,
+	ssengar@linux.microsoft.com,
+	gargaditya@microsoft.com,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH net-next] net: mana: Add debug knob to skip TX timeout recovery reset
+Date: Fri, 10 Jul 2026 06:22:29 -0700
+Message-ID: <20260710132229.2851441-1-gargaditya@linux.microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[microsoft.com:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[common-net.org,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[common-net.org:s=mail];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306560-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:alessio.faina@canonical.com,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:po-hsu.lin@canonical.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:stefano.salsano@uniroma2.it,m:andrea.mayer@uniroma2.it,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-306558-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	FORGED_SENDER(0.00)[andrea@common-net.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[common-net.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[gargaditya@linux.microsoft.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kotaranov@microsoft.com,m:horms@kernel.org,m:ernis@linux.microsoft.com,m:dipayanroy@linux.microsoft.com,m:gargaditya@linux.microsoft.com,m:ssengar@linux.microsoft.com,m:gargaditya@microsoft.com,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrea@common-net.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[gargaditya@linux.microsoft.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,srv6_end_dt46_l3vpn_test.sh:url,canonical.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1A10A73B444
+X-Rspamd-Queue-Id: D734D73B35D
 
-On Wed,  8 Jul 2026 17:27:45 +0200
-Alessio Faina <alessio.faina@canonical.com> wrote:
+Add a per-port debugfs boolean "tx_timeout_skip_reset" that, when
+enabled, makes mana_tx_timeout() log the TX timeout and return without
+queueing the per-port detach/attach recovery work.
 
-> In case iproute2 is older than version 5.14.0, released ~Sept 1, 2021,
-> the End.DT46 support is not available and the host_vpn_tests test contained
-> in the srv6_end_dt46_l3vpn_test.sh file is failing in some kernel backports.
-> This is the result of those tests:
-> 
-> ################################################################################
-> TEST SECTION: SRv6 VPN connectivity test among hosts in the same tenant
-> ################################################################################
-> 
->     TEST: IPv6 Hosts connectivity: hs-t100-1 -> hs-t100-2 (tenant 100)  [ FAIL ]
-> 
->     TEST: IPv4 Hosts connectivity: hs-t100-1 -> hs-t100-2 (tenant 100)  [ FAIL ]
-> 
->     TEST: IPv6 Hosts connectivity: hs-t100-2 -> hs-t100-1 (tenant 100)  [ FAIL ]
-> 
->     TEST: IPv4 Hosts connectivity: hs-t100-2 -> hs-t100-1 (tenant 100)  [ FAIL ]
-> 
->     TEST: IPv6 Hosts connectivity: hs-t200-3 -> hs-t200-4 (tenant 200)  [ FAIL ]
-> 
->     TEST: IPv4 Hosts connectivity: hs-t200-3 -> hs-t200-4 (tenant 200)  [ FAIL ]
-> 
->     TEST: IPv6 Hosts connectivity: hs-t200-4 -> hs-t200-3 (tenant 200)  [ FAIL ]
-> 
->     TEST: IPv4 Hosts connectivity: hs-t200-4 -> hs-t200-3 (tenant 200)  [ FAIL ]
-> 
-> To amend this, check the current running iproute2 supports the required
-> feature and, if not, just skip the test to avoid a failure.
-> 
-> 
-> Signed-off-by: Alessio Faina <alessio.faina@canonical.com>
-> ---
->  .../selftests/net/srv6_end_dt46_l3vpn_test.sh       | 13 ++++++++-----
->  1 file changed, 8 insertions(+), 5 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/net/srv6_end_dt46_l3vpn_test.sh b/tools/testing/selftests/net/srv6_end_dt46_l3vpn_test.sh
-> index a5e959a080bb..406c6a3d253e 100755
-> --- a/tools/testing/selftests/net/srv6_end_dt46_l3vpn_test.sh
-> +++ b/tools/testing/selftests/net/srv6_end_dt46_l3vpn_test.sh
-> @@ -510,12 +510,15 @@ host2gateway_tests()
->  host_vpn_tests()
->  {
->  	log_section "SRv6 VPN connectivity test among hosts in the same tenant"
-> +	if ip route add help 2>&1 | grep -q -i End.DT46; then
-> +		check_and_log_hs_connectivity 1 2 100
-> +		check_and_log_hs_connectivity 2 1 100
->  
-> -	check_and_log_hs_connectivity 1 2 100
-> -	check_and_log_hs_connectivity 2 1 100
-> -
-> -	check_and_log_hs_connectivity 3 4 200
-> -	check_and_log_hs_connectivity 4 3 200
-> +		check_and_log_hs_connectivity 3 4 200
-> +		check_and_log_hs_connectivity 4 3 200
-> +	else
-> +		echo "SKIP: SRv6 End.DT46 is unsupported by the installed iproute2 version"
-> +	fi
->  }
+This is a debug-only aid for bringup and qualification: skipping the
+recovery reset keeps the device and queue state intact so a TX timeout
+can be correlated with hardware telemetry. The knob defaults to false,
+so production recovery behaviour is unchanged.
 
-Hi Alessio,
+Signed-off-by: Aditya Garg <gargaditya@linux.microsoft.com>
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+Reviewed-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+---
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 14 ++++++++++++++
+ include/net/mana/mana.h                       |  3 +++
+ 2 files changed, 17 insertions(+)
 
-Rather than inlining the check inside host_vpn_tests(), I think it would be
-better to follow the pattern already used in srv6_hencap_red_l3vpn_test.sh,
-where test_iproute2_supp_or_ksft_skip() is called before setup(). A similar
-function here could exit the whole script with $ksft_skip if End.DT46 is not
-supported by the installed iproute2.
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index 89e7f59f635d..a8c329bdbacf 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -892,6 +892,17 @@ static void mana_tx_timeout(struct net_device *netdev, unsigned int txqueue)
+ 	struct mana_context *ac = apc->ac;
+ 	struct gdma_context *gc = ac->gdma_dev->gdma_context;
+ 
++	/* Debug knob for bringup/qualification: when set, log the timeout and
++	 * skip the reset so the failing state is preserved for telemetry.
++	 * Disabled by default; production behaviour is unchanged.
++	 */
++	if (READ_ONCE(apc->tx_timeout_skip_reset)) {
++		netdev_warn(netdev,
++			    "TX timeout on queue %u: reset skipped (tx_timeout_skip_reset enabled)\n",
++			    txqueue);
++		return;
++	}
++
+ 	/* Already in service, hence tx queue reset is not required.*/
+ 	if (test_bit(GC_IN_SERVICE, &gc->flags))
+ 		return;
+@@ -3486,6 +3497,9 @@ static int mana_init_port(struct net_device *ndev)
+ 			   &apc->steer_cqe_coalescing);
+ 	debugfs_create_u32("current_speed", 0400, apc->mana_port_debugfs,
+ 			   &apc->speed);
++	debugfs_create_bool("tx_timeout_skip_reset", 0600,
++			    apc->mana_port_debugfs,
++			    &apc->tx_timeout_skip_reset);
+ 	return 0;
+ 
+ reset_apc:
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index 226b61504596..4d041fb8437f 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -530,6 +530,9 @@ struct mana_port_context {
+ 	struct net_device *ndev;
+ 	struct work_struct queue_reset_work;
+ 
++	/* Debug knob to log TX timeout but skip recovery reset */
++	bool tx_timeout_skip_reset;
++
+ 	u8 mac_addr[ETH_ALEN];
+ 
+ 	struct mana_eq *eqs;
+-- 
+2.43.0
 
-Thanks,
-
-Ciao
-Andrea
 
