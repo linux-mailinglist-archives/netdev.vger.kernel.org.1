@@ -1,172 +1,185 @@
-Return-Path: <netdev+bounces-306543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306544-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YqYENJPkUGrl7wIAu9opvQ
-	(envelope-from <netdev+bounces-306543-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:24:51 +0200
+	id Tg6LNRzjUGps7wIAu9opvQ
+	(envelope-from <netdev+bounces-306544-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:18:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E54E73ABDF
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:24:51 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D9C073AAF9
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:18:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=mhAZDJUG;
-	dmarc=pass (policy=none) header.from=linux.dev;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306543-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306543-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=sXr1jWkv;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306544-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306544-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4B6E630D1419
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 12:12:43 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 529A830028BC
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 12:18:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14DCE412274;
-	Fri, 10 Jul 2026 12:12:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D24841168E;
+	Fri, 10 Jul 2026 12:18:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24302413D66
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 12:12:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38EE3FBB6A
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 12:18:24 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783685563; cv=none; b=oj4kN9Sr1/yJNaVABWsYD2WUB+ylXe09k086M0PGgnHPSGpUUFTyxWX1g4YSMYOuqLg97c0Fmqt+KToiOyyL0TQCkVTICSOs4LVJ1ENAKahrJjp7WcJrdE4hgktpbVQzdoEV/ezf3P7FCOq5nyJxotvEF5RUAmyK0/+BxI3jYD4=
+	t=1783685907; cv=none; b=s1mdVW/Jc6yzNR1evbWryxZB4eqmQAx2owd+0AW2okbJFQmlHI62Ry1EQHnlPbKloSLVLN+WqmFyioay6/NpXQb8dnIBo/Q6NqyIYeQfiNlyjWCz2mrLdVgNyoTF2JrsXnMTkHvPfP2BTS/gNhUlaeCx6lMiOMbjt8AFQ8ZS2As=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783685563; c=relaxed/simple;
-	bh=kncPPJU7oSZrwqQQ6+MJyVMpyjDMZZKMch5+HSdqPOA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tgVUvx6Divd17PCHSGg7D7yY8lMuXOs2WEmbpx8xvMKAhDy9TYTcXIi20Xzy4HMrhhuwApP2aHuRkmvTcRlCyD6iZMSxtLv9StsyzPQvDnc4yIgfDeasE3IMUVnttyflyADO4kCeEYnSJqd3ifC8pemaWGssYVsMRW8JvkWthTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mhAZDJUG; arc=none smtp.client-ip=95.215.58.180
-Message-ID: <50cb9ea4-2bbb-4cfd-a036-a57bcf3b49fc@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783685548;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1FF7GVP6cib1+yqqgVU49xl+8QepM561jHpnXA6AG2A=;
-	b=mhAZDJUGNH6BGKTdRuOasWPdBYy3JzF1+Xj8G3aS9Or8AldA6HWDYqHQSCynLH7ls89RrW
-	TaIWF5RemXR+xViur/E34aThorcbSfzz1bHCYVckmFvbbIqh9SJ04WNkE4yBpugSv/Rdkb
-	NxlKWZzktOVzXjhr7XS6YcuyLJdR/9Q=
-Date: Fri, 10 Jul 2026 13:12:05 +0100
+	s=arc-20240116; t=1783685907; c=relaxed/simple;
+	bh=9SN+V+REhr2OsLoOvJrTk8maUpT32wY8pP0OMF4CJko=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=JaurMEWckGZHVn58uEe5szzZnVoPSLKGNMYKdTNZxR6FLXcG+8hgGXU1bSvadhpee6PFMlYkjYMdh6CvVfSxfF3hgqxYwbvSMCP7wR9cO7PGPUuqV9VrYxCV0CUSL8mJXe0kKFYpGuyGB8UIGb4pbEiy3EesD1eHJtyO3qDSmqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sXr1jWkv; arc=none smtp.client-ip=209.85.210.170
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-848479c9bd5so573529b3a.3
+        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 05:18:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783685901; x=1784290701; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=D1ve2Jv1wKCMGR2eux0a52sKbThvil31mifXTkYcpJg=;
+        b=sXr1jWkv+4q5Io242qq/1yNO8D8GePzJNsGINPv1U5kGzrWy7j36v/bv7GoGyrTies
+         /yEhQwhUQUoUJTQdG3n+00fTDNFTPtlQniVKf+K/vrXQ2pFzVK7NR6xhga145Z2SG1lV
+         w25NZ+xqrWAjrFXI7pJSsZHooBvt//YySMXhkawNuexbFT38Y38QXMdGbRJ8/0pnBkLC
+         U8L2MO7cRyZ8VCGfrpMPX6uOUpG1WbmaOR+QvuhCKKwS7QohU+R1yql7VsvLyUIlpRY7
+         Sd95quqz8E/jGq3hdgTKbvPB0Ik33pfxVycVGmczB/8re36JLWPhOoRJiK1bMsOR5r9T
+         WFfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783685901; x=1784290701;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=D1ve2Jv1wKCMGR2eux0a52sKbThvil31mifXTkYcpJg=;
+        b=mP3Wl5K7V67E3JnKnyBnUcU1dzD34M/9aybD7jN+ReTePaDv2uiaFP6Khc/AZQLgjn
+         1U55pOB0h1cqo4egvT/WNfK5sKfOGF0lpaUvEAzOpCBtA6JMHxVFNJJIJUpHAz1gAXaf
+         b8KtkuYaY9CkWq9DkUcF7Yobdq9QPe9YPM0I8xNtJ8QcwaTPFZtYCGjEWHmqNyBjB9dh
+         miWhPqQJS+PnAmdAi4S4cpBKysVnMesxJjasKlZeDdnCg1+IDsT36RAmtfIoAL1fv81w
+         Ijl2RjnSbqH1eUWnQooICzhhd1HQ2gjGUvtBZ1UWX0LqAtz6RmQVZEPeReQ63tqz0CQR
+         8LVQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rqf3QHqEZSMEfpB1C469c/eWWPmFR+Y6zThl/ll6Qbncs3vLVxos2dZsC7FhFZzdNZDqDmpfRQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLhjU7ohcVbdtw3tvRfUYwWY8IhtsaRBeh8HF/VmPm35ydN+YC
+	a4xJT6z0enxUQBe0eb1oUIE+yVWofMdu5yhn3o+Sxk3wEWGGXYfhV/z2
+X-Gm-Gg: AfdE7cmq/wIzniM234l7WXfAn23rN9EkJUKFhVayeCY4n6eekUFl/wZQJrhMyPuetol
+	o1cA54kllwWMfJBbqBeRBQIkBEuzM+aUzf8x9r8dJq4kmIkf6y9dsQohg02Xd2oTZff8yD3dWQ7
+	CW6FFJKNCNYj1R0eqQsGRVMttcpUq+wh3libBpyEgycY389z0qgbSrrYU4O/R+UrSL8evu83kAN
+	GB/y/SkH2EuJOpQYVlc/ZG7QCHu3U2hQIL+uLdssRuL6k7AlMSXLs3hNodnwb1UBEX+vS0ahExu
+	40jl2SFN5ycClgyWwDxFYZ/bcL9MvHL/7NuELt+fa1nafgGdstF6G9W4j7He3to/ehXRhDpbFeS
+	9f5mXGRnFaW5q48K5rWjvJ6+fcdVShb+qpjNa7KT1bdlUW6wb77GKtLwkwM75sVFoCI+7AaYCuF
+	lJbKVgQL4VO3UbLRWXoSaP9A4=
+X-Received: by 2002:a05:6a00:928a:b0:845:2ff5:b66d with SMTP id d2e1a72fcca58-84842f9f0a8mr10683689b3a.35.1783685900841;
+        Fri, 10 Jul 2026 05:18:20 -0700 (PDT)
+Received: from [163.43.103.131] ([163.43.103.131])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8480da8bab0sm8600845b3a.8.2026.07.10.05.18.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jul 2026 05:18:20 -0700 (PDT)
+From: Yuya Kusakabe <yuya.kusakabe@gmail.com>
+Subject: [PATCH RFC iproute2-next 0/2] seg6: add support for the SRv6
+ End.MAP behavior
+Date: Fri, 10 Jul 2026 21:18:17 +0900
+Message-Id: <20260710-seg6-mobile-end-map-v1-0-970275f3d80b@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v4] tipc: fix u16 MTU truncation in media and bearer
- MTU validation
-To: "Cen Zhang (Microsoft)" <blbllhy@gmail.com>, jmaloy@redhat.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org
-Cc: netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
- linux-kernel@vger.kernel.org, tung.quang.nguyen@est.tech,
- AutonomousCodeSecurity@microsoft.com, tgopinath@linux.microsoft.com,
- kys@microsoft.com
-References: <20260709211649.15623-1-blbllhy@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260709211649.15623-1-blbllhy@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-B4-Tracking: v=1; b=H4sIAAnjUGoC/yWNQQrCMBREr1L+2g81kiBuBQ/gtrho2mn9YpOQp
+ FIovbupLt8wb2alhChIdKlWivhIEu8KHA8Vdc/WjWDpC5Oqlam1OnHCaHjyVt5guJ6nNrAZtDa
+ 1Haw5g4oZIgZZfqsN3W/XPZMQ/Zyh2GHJ9Pi30mxf6PJ+QNv2Bb+QWiCNAAAA
+X-Change-ID: 20260523-seg6-mobile-end-map-6f5560bfb68e
+To: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
+Cc: Andrea Mayer <andrea.mayer@uniroma2.it>, 
+ Andrea Mayer <andrea@common-net.org>, 
+ Yuya Kusakabe <yuya.kusakabe@gmail.com>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1199;
+ i=yuya.kusakabe@gmail.com; h=from:subject:message-id;
+ bh=9SN+V+REhr2OsLoOvJrTk8maUpT32wY8pP0OMF4CJko=;
+ b=owEBbQKS/ZANAwAIASrX0XUqXRtNAcsmYgBqUOMKa4zwyt7nkWRzU0an1NR7AcksgtLlS+LNi
+ 2Ljiq4n6n+JAjMEAAEIAB0WIQTaB7usAfxNKMeqa6Yq19F1Kl0bTQUCalDjCgAKCRAq19F1Kl0b
+ TR5ZEACXDc7BUOop9//NCN4l1GJlM+ZaZ2MSDZJdD0SvDc7vNjG3U4NMKFLohU+Cz+e7714sql1
+ j08wQKq2tQ3op6PTMlJ+COIgHLmPF2qMY3uuS9nlMRJbyT18IO/2YxI/E/oYjPhnbqsT3Ku+6Xo
+ 1EQ3ISVTM5M4Aew54G3b+563+vU/ADMt/1lxsG3OUskJjw9/hTvhPkgv4FHEBjVjG6m5aR9lVS1
+ iHff0DwhM4aP8poWgpMbqWgx9Lemqm8ax8b39tuZN9ETbUkmcLVdsXruIahUhwmW0w1yQ3fNMux
+ PqfCpi2fd62D+UGu79AP4YRYAqELaPFJgjH1sZ5/cQgU19FOkmrTt9//4R9LTiqy+/uxm6rQGSL
+ ySj8/lZlPuyU1joRYIeltnItZmhWeohBmBE+UxM/rKsIILP48eN/F0z1Fe0FvWEewFZEqiQzFsT
+ kyTrpq2VI6ixXz3LlpdXTp+uVdeuA4CWEZcV27wdPxIVAWgJvkUP5DA7vs/qICRqVkyDnD6GM0d
+ 9m8USr3q/mPW8HO82eO++SKtMqJFK6DdxNWYiNfdKwIN/U9Ys/KdgzWlMtuPK38zDYx9wMXQHTK
+ CVCQFHu/vtDWnrJ64r9RuPLz1Nx1TbOfXZZ1DBejpJNdB5OBhWWhxauWaxNLIKScFvn4IAvGcs6
+ pxrkQ4+2MB3Emcg==
+X-Developer-Key: i=yuya.kusakabe@gmail.com; a=openpgp;
+ fpr=DA07BBAC01FC4D28C7AA6BA62AD7D1752A5D1B4D
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-306544-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:blbllhy@gmail.com,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:tung.quang.nguyen@est.tech,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-306543-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_TO(0.00)[gmail.com,redhat.com,davemloft.net,google.com,kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:andrea.mayer@uniroma2.it,m:andrea@common-net.org,m:yuya.kusakabe@gmail.com,m:yuyakusakabe@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[yuyakusakabe@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[uniroma2.it,common-net.org,gmail.com];
+	TO_DN_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[yuyakusakabe@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,end.map:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4E54E73ABDF
+X-Rspamd-Queue-Id: 7D9C073AAF9
 
-On 09/07/2026 22:16, Cen Zhang (Microsoft) wrote:
-> Both TIPC_NL_MEDIA_SET and TIPC_NL_BEARER_SET accept user-supplied
-> MTU values but only enforce a minimum bound, not a maximum. When a user
-> sets the MTU to a value exceeding U16_MAX (65535), it passes validation
-> but is silently truncated when assigned to u16 fields l->mtu and
-> l->advertised_mtu in tipc_link_create(). Values like 65536 (0x10000)
-> truncate to 0, causing a division by zero in tipc_link_set_queue_limits()
-> which computes TIPC_MAX_PUBL / (l->mtu / ITEM_SIZE). Other overflowing
-> values (e.g. 65537-131071) produce small incorrect MTU values, resulting
-> in link malfunction behaviors.
-> 
-> Crash stack (triggered as unprivileged user via user namespace):
-> 
->    tipc_link_set_queue_limits  net/tipc/link.c:2531
->    tipc_link_create            net/tipc/link.c:520
->    tipc_node_check_dest        net/tipc/node.c:1279
->    tipc_disc_rcv               net/tipc/discover.c:252
->    tipc_rcv                    net/tipc/node.c:2129
->    tipc_udp_recv               net/tipc/udp_media.c:392
-> 
-> Two independent paths lack the upper bound check:
-> 1. tipc_udp_mtu_bad() -- called from __tipc_nl_media_set() (MEDIA_SET)
-> 2. inline check in __tipc_nl_bearer_set() at bearer.c:1160 (BEARER_SET)
-> 
-> Fix both by rejecting MTU values above U16_MAX.
-> 
-> Fixes: 901271e0403a ("tipc: implement configuration of UDP media MTU")
-> Reported-by: AutonomousCodeSecurity@microsoft.com
-> Closes: https://lore.kernel.org/all/CAB8m9WgETt0AjmFwE=F-CKjGXsK6_WDv0=kbYRcC8-noo+amnA@mail.gmail.com
-> Signed-off-by: Cen Zhang (Microsoft) <blbllhy@gmail.com>
-> ---
-> v4: Add .min check value
-> v3: Use nla_policy check to limit MTU max value as suggested by Vadim
-> v2: Solved format issue
-> Link: https://lore.kernel.org/all/CAB8m9WgETt0AjmFwE=F-CKjGXsK6_WDv0=kbYRcC8-noo+amnA@mail.gmail.com
-> 
->   net/tipc/netlink.c | 7 ++++++-
->   1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/tipc/netlink.c b/net/tipc/netlink.c
-> index 8336a9664703..811438c44542 100644
-> --- a/net/tipc/netlink.c
-> +++ b/net/tipc/netlink.c
-> @@ -113,12 +113,17 @@ const struct nla_policy tipc_nl_node_policy[TIPC_NLA_NODE_MAX + 1] = {
->   };
->   
->   /* Properties valid for media, bearer and link */
-> +static const struct netlink_range_validation tipc_nl_mtu_range = {
-> +	.min = TIPC_MIN_BEARER_MTU,
-> +	.max = U16_MAX,
-> +};
-> +
->   const struct nla_policy tipc_nl_prop_policy[TIPC_NLA_PROP_MAX + 1] = {
->   	[TIPC_NLA_PROP_UNSPEC]		= { .type = NLA_UNSPEC },
->   	[TIPC_NLA_PROP_PRIO]		= { .type = NLA_U32 },
->   	[TIPC_NLA_PROP_TOL]		= { .type = NLA_U32 },
->   	[TIPC_NLA_PROP_WIN]		= { .type = NLA_U32 },
-> -	[TIPC_NLA_PROP_MTU]		= { .type = NLA_U32 },
-> +	[TIPC_NLA_PROP_MTU]		= NLA_POLICY_FULL_RANGE(NLA_U32, &tipc_nl_mtu_range),
->   	[TIPC_NLA_PROP_BROADCAST]	= { .type = NLA_U32 },
->   	[TIPC_NLA_PROP_BROADCAST_RATIO]	= { .type = NLA_U32 }
->   };
+This series adds support for the "seg6mobile" lightweight tunnel, the
+iproute2 counterpart of the SRv6 Mobile User Plane (RFC 9433) kernel
+RFC series [1], starting with the End.MAP behavior.
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Patch 1 imports the new UAPI headers as a standalone patch so it can
+be dropped once the matching kernel header lands.  The selftest in
+the kernel series needs the "seg6mobile" keyword to run.
+
+[1] https://lore.kernel.org/netdev/20260710-seg6-mobile-end-map-v1-0-99be02d68143@gmail.com/
+
+Signed-off-by: Yuya Kusakabe <yuya.kusakabe@gmail.com>
+---
+Yuya Kusakabe (2):
+      uapi: sync lwtunnel.h and add seg6_mobile.h
+      seg6: add support for the End.MAP behavior under seg6mobile encap
+
+ include/uapi/linux/lwtunnel.h    |   1 +
+ include/uapi/linux/seg6_mobile.h |  58 +++++++++++++
+ ip/iproute.c                     |   6 +-
+ ip/iproute_lwtunnel.c            | 173 +++++++++++++++++++++++++++++++++++++++
+ man/man8/ip-route.8.in           |  24 ++++++
+ 5 files changed, 260 insertions(+), 2 deletions(-)
+---
+base-commit: 37c491d82cebef070173878e167076a1956dcd92
+change-id: 20260523-seg6-mobile-end-map-6f5560bfb68e
+
+Best regards,
+--  
+Yuya Kusakabe <yuya.kusakabe@gmail.com>
+
 
