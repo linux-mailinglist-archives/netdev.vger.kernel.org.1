@@ -1,172 +1,173 @@
-Return-Path: <netdev+bounces-306654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306655-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id U3j+KP42UWqMAwMAu9opvQ
-	(envelope-from <netdev+bounces-306654-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 20:16:30 +0200
+	id FwFVInE5UWoFBAMAu9opvQ
+	(envelope-from <netdev+bounces-306655-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 20:26:57 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0358D73D499
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 20:16:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E430873D5B0
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 20:26:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=Xj80A0yc;
-	dmarc=pass (policy=reject) header.from=google.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306654-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306654-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="TV/7UsOl";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306655-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306655-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B05BB3019B92
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 18:13:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8015C3011BCB
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 18:23:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF48C36C0AB;
-	Fri, 10 Jul 2026 18:13:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5385537702C;
+	Fri, 10 Jul 2026 18:23:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E51720C00C
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 18:13:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C4E35AC07
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 18:23:45 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783707201; cv=none; b=KRtxLkmXpnGH+nnYHBR8FpF0DwcQFy/+2rctWdX9V1j1pyewzBUQrNefCNx9F+cFdoNUGa7549Wm3AeRqrZJfMiQcaXdr3ErnyTvwR+RA1IuGfQ8yGbaDz0PkXEgp0d4R8/YvAZAfoIOVfNePQiSGBvJV/yjT3kRqnuhyVWIIfE=
+	t=1783707828; cv=none; b=NMbylGug3YQyKRRgaqvqikYYaVwBN+TNogvVoZb7mLxvUJD+6x591oAD3BTU7RhsPqw9oDZpv8ojPq0prsaCCx84t8Utj47aXPF3HKOsaifR3w6OsWE9YugnhlgXiFlvNs+c4QpbDT/SAXxobpQ45szkEnd+lRdiV64zYWJsygs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783707201; c=relaxed/simple;
-	bh=+Vx4GshpySG7fDZG3l7TaQ2Ns+/jv8WfL74syZASVlQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=DA1dVXKKDJLXfVqEA8qaw3t92YyCY4Ra8YIAMToFu4+GP7uPvjh92qtNuPIEuuzO7jtCFiaFSGitljcS0LmuM8RY+EvT/wLj0lsD6kll9BFB3CvfO9GSt0CaHcnp8UausmHZjQEaeYePtoXdVZJE6C6/VZzhhvJnx7JPuF5+88U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xj80A0yc; arc=none smtp.client-ip=209.85.219.73
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-8f0f45415cfso16895256d6.2
-        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 11:13:20 -0700 (PDT)
+	s=arc-20240116; t=1783707828; c=relaxed/simple;
+	bh=OwrnCwQOhMDuGnx9pE7dZOEyMC8AyvBKRK+CfPd0rpA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N40w15IVywgQboL8JcwXNfTWpFDu1feRPELYIEmz6xsFp1rBOomiq3IVnTY4LvvAfwN9elEhnBBLNhPCboUNTrJVE/LiuM4QzbhYpD6Q7is3ExtKR008V5uSA9C2P7YdbEBCDw9a9B5BNhNjyqZQeM7vF5CSmHr/Y03JvqsPBE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TV/7UsOl; arc=none smtp.client-ip=209.85.219.52
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-8ff88549786so12073826d6.3
+        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 11:23:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783707199; x=1784311999; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Vs3MKxXVP0aq6vbYhNNah/NyPtH6K3InS8zr69gCZh8=;
-        b=Xj80A0ycowHZTrvzu+YsU/Wa/7PfwJ9XFGG1dzth4ljLFN1tNjMBYL/FAL3CLA4CBu
-         xFbmp590xjbI7Jtrfygklo6wO+ZpYmyKPLewaoPIa9WoIGJnN7ospEqUhDBUxbmk6rh/
-         CDUroSx9YS1c+S2cZkf+XocRx5xWHp8Eulu9M611pE9ntbjwxs4LvLYrA+luPpVV8FU+
-         SDwZOGtVkQslFy6w47N3F0zGJdL56FjnXskAH6GIgpFJKP91XzCoHUvXcC6vTteUphKC
-         ESJowH6xvMAAec526CF8M3XK1ym7MGCh7oGIWIKEN6RfHsKZ3XtOgafHoxh7WYgY+mGS
-         2rkw==
+        d=gmail.com; s=20251104; t=1783707825; x=1784312625; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=4FH0W5s30/m3phVMwbdnAjH+UYTF+M+YW+Mbz2wNV4c=;
+        b=TV/7UsOl7jbzTkFJyVsrev6F4HxcjMyz1QyZ9mh4igcuem6Y/kkMgn03E+A7EdCBbD
+         4zXw5BhLOkPSDBpB5CXlPRx3SrtQs9ODHAdcpHmFgaA8aFOgMPkwRSpm8f9IKQFmOn6O
+         HEXizeyUHHRRGBMw98CXqdb2mFOWA5bpZHjGr+YTXAjTfaq5ktJoRlEswxzRiX05Rvgt
+         KUDe76/WQp3+LBOd4+tFtTbf76VUYOzgQ68YEYWc8TLweXbZzmSwEihGD/OesqOSWDUA
+         H1Ex4M6OfHc9Q6GHo4+gDFmvxPiMod2EA49FqSpyo7JjwHgJRU6gAWG7bc5nfynbGLUl
+         bfng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783707199; x=1784311999;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Vs3MKxXVP0aq6vbYhNNah/NyPtH6K3InS8zr69gCZh8=;
-        b=LCL+H0RcYcO4L81Ak1tT5raCgnYiCs/yiulmQmY+G4RYd0Vyst+8VR++bOcP17VtxO
-         pZyXphQEcjlXDVbEEE9OQYqBv6hAdARBrvSBQ/dQ4n03SYi9wxORmGRvEuChejOAYccO
-         eX05LGwuvR2WJ+cWzraV7HNZaBJJ7xHxKH+dRBJEYtHT+/3Ybsg7XSsSOYaMPJPfF2Oy
-         kC683qIG36YCvu8BmxXaY4XyDCbg0+6paAMI/0Xh6nGkBgknDbHqF0dT3FFuz9u/MfWE
-         SAnqCf8CP3foulz1AT/KBlHHijWE0qicWMaiQfj6DyNr1TApBlDE655YEggh3usYFy7B
-         N3Vg==
-X-Forwarded-Encrypted: i=1; AHgh+RrJQcWtdr8Y6A/FXKZx9Fd0jmAoTGwQ9s6lMOCrRU4YIT2w9SkepW7g4xfdEqMNb8BcfzPQxSw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFPEM1lfv6pXtxDINGyyms0w+aqZWqAbmSArfK6xFoDkgJIevJ
-	JDvO4yzLV7NqWrLtbEq7gTe8tLuL3iXlACYluvvgOImZDXzQpCRD/fWVfu9wCu6fFoymXyY0ZHG
-	+0fDXxBwdVwU1Qg==
-X-Received: from qvwl5.prod.google.com ([2002:ad4:4bc5:0:b0:8fd:d395:b9fa])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:458d:b0:8ee:f531:4de8 with SMTP id 6a1803df08f44-9040158d998mr1685206d6.40.1783707198814;
- Fri, 10 Jul 2026 11:13:18 -0700 (PDT)
-Date: Fri, 10 Jul 2026 18:13:17 +0000
+        d=1e100.net; s=20251104; t=1783707825; x=1784312625;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=4FH0W5s30/m3phVMwbdnAjH+UYTF+M+YW+Mbz2wNV4c=;
+        b=SKSy6YsjF2VyUUFijs6OkTZgTQm9jzla4w36Xo333lXjYi1nYOxKSeIEq9MGPiO4OX
+         vFAfcqckaLAelx5dCglmY15Mir1RmthJsaNTHCz30okTqm5XpJODd/872avYvq4SFVpq
+         wQf/FpKYnlsQ5ZkW450GXSDyj3K1oflf/K1NnBwZxO1DFBey8L2PZYReJlCkp2rrRBRU
+         h1VtG8tsmgA1UNodl2zfI5m/o2tr3fCNKuPs7Y5DsGof2Z8V8kPcd6GZDeaj6HzFPk3B
+         F/YS06ue7WYhSEo/l/IbUn8cbKaabnixaEJZftwTG/wjifebPF3IhCxhXaWrZ0NNveN1
+         CZ/w==
+X-Gm-Message-State: AOJu0Yxt6X6vmyLb9O3SJJuzKF7odwXeOY0DIRNfd5AjX8dnclj4SzUy
+	w6+4Tso7icOMNtf1FkWWX2tiJ0Y5u2BH8RfSTVvWr0VEw0+anee3LEFozxXSRtPW
+X-Gm-Gg: AfdE7clz1x624f6xTmgzi4JqmxL73HDoMSM/MX+K+eS/2nl4xeXPnupgmsDvvTfoD/I
+	ntRI6b8CKAuY6nrhnePY+eDdEQIOSCSmMhLVZof3Z24Gnl+jpvV3Jr122dgsYyEOCIVDnXP5dnp
+	JBw1rAxVgT/EoDojyIdAC1CN35aXhNrsGisgX5lVw8TKx7h1jPgOS2Gv6bTddAed7zU7NDBfoiW
+	Ds8hu7R7wUwH4z5TCDxHd1NQqMR469ewJ8SaRVdto3nkeUnHcYbokMgD5DKIM8pqWIhcvdhkHl9
+	XxGz0TcUN86+RoV1Te3lVfvxk3VFRr2GrHd9VADk2OrKTEZONF3EYHZ2gx1dyi4Cw/daCc04xPK
+	Td2pqkLt5A226XxqCHzB3g92RUPHxZDDLJ5UhTY6SqYc8QApvUd0IP1w5oa/FoDge9Lb7S6Sf5K
+	lYmz3q9t73o/nAGgqdua0QZlQbsdk2Wpy3f/hb9rSP3GE3GVpnAVsxA/FtFH1vwRJ7RkPtBrS/v
+	vdAwWil0mrcZD1dQI+5XgeJvQtFUU0sgYFC107ZtCTuR1kuIh4iFBo=
+X-Received: by 2002:a05:622a:10a:b0:51b:fb82:67d1 with SMTP id d75a77b69052e-51cbf12b97amr688881cf.20.1783707825087;
+        Fri, 10 Jul 2026 11:23:45 -0700 (PDT)
+Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51cbd8efab4sm2932851cf.1.2026.07.10.11.23.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jul 2026 11:23:44 -0700 (PDT)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	linux-sctp@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Subject: [PATCH net] sctp: fix addr_wq_timer race in sctp_free_addr_wq()
+Date: Fri, 10 Jul 2026 14:23:43 -0400
+Message-ID: <5dc95f295bdb5c3f60e880dd9aa5112dc5c071cc.1783707823.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.55.0.795.g602f6c329a-goog
-Message-ID: <20260710181317.4060230-1-edumazet@google.com>
-Subject: [PATCH net] tcp: fix TIME_WAIT socket reference leak on PSP policy failure
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Daniel Zahka <daniel.zahka@gmail.com>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306654-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,m:daniel.zahka@gmail.com,m:willemdebruijn.kernel@gmail.com,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:danielzahka@gmail.com,m:willemdebruijnkernel@gmail.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	TAGGED_FROM(0.00)[bounces-306655-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:marcelo.leitner@gmail.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0358D73D499
+X-Rspamd-Queue-Id: E430873D5B0
 
-Release the TIME_WAIT socket reference and jump to discard_it
-upon PSP policy failure in both IPv4 and IPv6 receive paths.
-This prevents a memory leak of tcp_tw_bucket structures.
+sctp_free_addr_wq() previously removed addr_wq_timer using timer_delete()
+while holding addr_wq_lock. However, timer_delete() does not guarantee that
+a currently running timer handler has completed.
 
-Fixes: 659a2899a57d ("tcp: add datapath logic for PSP with inline key exchange")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+This allows a race with sctp_addr_wq_timeout_handler(), where the handler
+may still run after addr_waitq has been freed, acquire addr_wq_lock, and
+access freed memory, leading to a use-after-free.
+
+Fix this by calling timer_shutdown_sync() before taking addr_wq_lock.  This
+guarantees that any in-flight timer handler has finished and prevents the
+timer from being re-armed during teardown, making subsequent cleanup safe.
+
+Fixes: 4db67e808640 ("sctp: Make the address lists per network namespace")
+Reported-by: Sashiko <sashiko-bot@kernel.org>
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
 ---
- net/ipv4/tcp_ipv4.c | 6 ++++--
- net/ipv6/tcp_ipv6.c | 6 ++++--
- 2 files changed, 8 insertions(+), 4 deletions(-)
+ net/sctp/protocol.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 209ef7522508fcc3974ae71d35dd66cba96b73d0..4a46da375043be26bcbb282a0b0c3ba85bfc5186 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -2318,8 +2318,10 @@ int tcp_v4_rcv(struct sk_buff *skb)
- 		}
+diff --git a/net/sctp/protocol.c b/net/sctp/protocol.c
+index 587b0017a67d..cf335494bffe 100644
+--- a/net/sctp/protocol.c
++++ b/net/sctp/protocol.c
+@@ -663,8 +663,9 @@ static void sctp_free_addr_wq(struct net *net)
+ 	struct sctp_sockaddr_entry *addrw;
+ 	struct sctp_sockaddr_entry *temp;
  
- 		drop_reason = psp_twsk_rx_policy_check(inet_twsk(sk), skb);
--		if (drop_reason)
--			break;
-+		if (drop_reason) {
-+			inet_twsk_put(inet_twsk(sk));
-+			goto discard_it;
-+		}
- 	}
- 		/* to ACK */
- 		fallthrough;
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index ebe161d72fbd07a13d92812b45b5a3ce2464a015..522ba45ce9b759a6a76fd8603400097bc99c60c6 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1977,8 +1977,10 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
- 		}
- 
- 		drop_reason = psp_twsk_rx_policy_check(inet_twsk(sk), skb);
--		if (drop_reason)
--			break;
-+		if (drop_reason) {
-+			inet_twsk_put(inet_twsk(sk));
-+			goto discard_it;
-+		}
- 	}
- 		/* to ACK */
- 		fallthrough;
++	timer_shutdown_sync(&net->sctp.addr_wq_timer);
++
+ 	spin_lock_bh(&net->sctp.addr_wq_lock);
+-	timer_delete(&net->sctp.addr_wq_timer);
+ 	list_for_each_entry_safe(addrw, temp, &net->sctp.addr_waitq, list) {
+ 		list_del(&addrw->list);
+ 		kfree(addrw);
 -- 
-2.55.0.795.g602f6c329a-goog
+2.47.1
 
 
