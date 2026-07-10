@@ -1,259 +1,141 @@
-Return-Path: <netdev+bounces-306537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306527-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id O7oNEkPeUGpS6gIAu9opvQ
-	(envelope-from <netdev+bounces-306537-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:57:55 +0200
+	id hLQ5F8HbUGqY6QIAu9opvQ
+	(envelope-from <netdev+bounces-306527-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:47:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 010EB73A785
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:57:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C187173A638
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:47:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b=IjGKdqlL;
-	dmarc=pass (policy=none) header.from=debian.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306537-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306537-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=fDJZdJQI;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306527-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306527-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D68F8304220A
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 11:56:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 52127307DE07
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 11:41:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 475FE41611E;
-	Fri, 10 Jul 2026 11:55:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E1A422529;
+	Fri, 10 Jul 2026 11:41:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97754423A87;
-	Fri, 10 Jul 2026 11:54:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C801341DEE4;
+	Fri, 10 Jul 2026 11:40:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783684507; cv=none; b=mfzeS2bce8cxeAuNnBsIH8019zoQyarW6hWLKj6vwqCB04dOOf9opCUbFAgS0ufmnQKHEoYN1KeJpTJvEnBRsXOHK+f2VFRp3WUjjlPS6um/xks000xQ72FBiZuR+QS0RvquxEq/Px3S93BOuiLS4YcVfut4AwIBAH2z7+FRc1Q=
+	t=1783683658; cv=none; b=m4QhqsqSOX9OkHnpgFurNN1VW34ZJ+S5cz8mEF5KGBqEeCQHrW//TBlEqTs9oGYNKp5r49PDV51ja86f21+Tez27CwOarhM3M5rfDcu8bGEoT92ZdMtgXS0nF2wpu4tfApi7/8Xs0dUi7uWA2NhUEnllGvU0b/8/7Chd7M0kD6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783684507; c=relaxed/simple;
-	bh=E5Uuzy66c/XxxYyuV5fNIICuWCNoal1F8sjYMId5w8I=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nUwIl3kwHuTVkw6i9fFNFC6kMJYw5QXxgzk6W+eiE5r73ee14SFCEx69EeU3chkVrcTR2OGOVerO69q63Fto3rUVApbywNRQLPNlFNFVSGcOPA2Pf16doeIRjfflwrWdh5LbpE99BojhA007Qr+vk7LMeMnU6/H6222EaQnK+rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=IjGKdqlL; arc=none smtp.client-ip=82.195.75.108
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:In-Reply-To:References:
-	Message-Id:Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:
-	From:Reply-To:Content-ID:Content-Description;
-	bh=S+TpG0rNAE1sZNwsOErTcUgZBEXxg+Ruc3JdPKcoyPw=; b=IjGKdqlLmjHPzVRPyL9o+7zsMt
-	Qk77ykSUHDzwufP5tGZ6k3/km49Tea0uRcaRywZH7rL1ScnrFmlQ3IvA3VPV7fVBx/YdxRhTKWdaF
-	6g/S+Fbk8xz/0L/pydNq0Z71Wh+x/+pDMB9BqFQkgkMmRP/QDKsm47mqdgwl4BKDZ4bNfBvzY8zkF
-	sHm30bOFzWIzNXOEULmOKBEG74XkzjwrM3wCb9acqq4vfFNSem5x1jZ7+TLjrZ+8/aPRjwYxA7VAs
-	kzH782xQpSvRe0wJucn/hvZSKZEBCeK+7C3cDcEwmKKKCL7xemOvPyug+2JKx+/Mh51lk/Ifr4San
-	kT+LYREw==;
-Received: from authenticated-user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wi9oj-004SZq-17;
-	Fri, 10 Jul 2026 11:54:53 +0000
-From: Breno Leitao <leitao@debian.org>
-Date: Fri, 10 Jul 2026 04:39:01 -0700
-Subject: [PATCH net-next v3 9/9] netconsole: move remote_mac from struct
- netpoll to netconsole_target
+	s=arc-20240116; t=1783683658; c=relaxed/simple;
+	bh=Qiw8sO7D9OfWIkFKgSmfbQU5FuDCSZxhLrFe/qiy1ys=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=EVh/USz52jse7V4bXo5zBXSWMSS+XpS6vhyi6TD4i4ZYXHSaooMqzqbIxqk/9aSjwdXNMyelhK4Eavh1yv55g6GeO5WPklG6964aMB1EQtp+A7DkhdAy2DP+Sr1/WVFONaeL5pcU06kbJDqvtAg9xsjWVEGrV0A7Trbz4vaHkyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fDJZdJQI; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 950D81F000E9;
+	Fri, 10 Jul 2026 11:40:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783683632;
+	bh=wOafub/PHc72pays8fyMJ0bla9fiEDFv5P07yKezDtI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=fDJZdJQI/AgRPokdECJbmsj+7q72wFddNGi00LXMs3B1jxEiS0D+nk3gb66BW7370
+	 vejQ38EUDhYctxb62Si+0CyEL3mh1y3EPIHGPPaSYkEOUqKs9aXQxIb5LKl7ObJdeN
+	 rfXbB4v7xiBrvM6sFRYj/0gDUsrF0M3JQe9LtAzs/xoY1UD+7oMUA2C5vCRSQRFxUa
+	 I7D0MXeDmePXlPA8BS3DjodXLZJ/OYOuh3BnZKYvhiVu44Fnp3MAd/HbOnXrORN8fp
+	 9EDkVnzkt1FDB+2WB7Rpgka9beNRxSVvOdPxEJYlKwYawdigygNz3QRnL658ytcC3L
+	 WatHt9YqGmJmA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B683A3924F8A;
+	Fri, 10 Jul 2026 11:40:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260710-netconsole_move_more-v3-9-6f63f76b28bc@debian.org>
-References: <20260710-netconsole_move_more-v3-0-6f63f76b28bc@debian.org>
-In-Reply-To: <20260710-netconsole_move_more-v3-0-6f63f76b28bc@debian.org>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: netdev@vger.kernel.org, asantostc@gmail.com, gustavold@gmail.com, 
- linux-kernel@vger.kernel.org, Breno Leitao <leitao@debian.org>, 
- kernel-team@meta.com
-X-Mailer: b4 0.16-dev-d5d98
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4885; i=leitao@debian.org;
- h=from:subject:message-id; bh=E5Uuzy66c/XxxYyuV5fNIICuWCNoal1F8sjYMId5w8I=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqUN1kdM6FUNFQORkoIdqo+Dm7iW8Od1vrcvCjq
- Ow9MGIhVqOJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCalDdZAAKCRA1o5Of/Hh3
- bR8WEACANFNG+dTXMlruSIwZlXyiwvtsYNal8SLKQ034uAOvQ6kIDrCBW+pB5VgUn5wkIKboJq0
- 1K2TVVapgqxOZlc8NByaKHfJ0X8Q8gbhprpK8QOtj5CXXeHv2BrLkeZf9pNw57OYvTp+ckhBcSa
- 7vJhbRekPFZuPuZUjIRYOeU3pquEHL0Lo/LNOTuVFaZij5eLO+VGtxkRdpn4rTQxgMZzdAMGiRY
- T99Sk1Ke9XeFVLV8ZEOvOvSW3CzhOI4waAX8/wdkTDuk1nXavEnvYEAI+BZcZU4Ss5pylJOoB6L
- 4JR+reJ31u2L/1cNMkrdxF+/3/Xxojrzl8mzRACZEw4MLWYm+IEY82vc70JJFAhvmRaEtr+el4b
- T3FlYT/tJmjdYtt3AxC5QiiKH4ljZ40+X9mrFxCAYihRzctq8UqqRJOOo9tGYf/QUpPJWGeFwwB
- zW2x4N7R9X30RON8konkpfK9UKjBQXCWkCKOWE+YNtbafSuxrSh3YUQpdFRwViGm3QBzZAVWihF
- v8FYSoBv6+yei3DV+efKbvvjjxVDM284q/qjz/NTwqDo8mrc8gNqREFnriiQ/OAEWInbnS+K+1z
- MWxp98plg/qKzvzPbsVKsFYZEWf/Il9uQ4zdWk6UAsnonONqoAM+Fdl9ibNXvYDxvqGd/zKPPkc
- oi509+6JQhLMhkw==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
-X-Debian-User: leitao
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3] ppp: defer channel free to an RCU grace period to
+ fix
+ pppol2tp RX UAF
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178368361038.197766.8115253096775560860.git-patchwork-notify@kernel.org>
+Date: Fri, 10 Jul 2026 11:40:10 +0000
+References: <E793FCF2-58DE-4387-A983-C7B4BC3158BD@doyensec.com>
+In-Reply-To: <E793FCF2-58DE-4387-A983-C7B4BC3158BD@doyensec.com>
+To: Norbert Szetei <norbert@doyensec.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ qingfang.deng@linux.dev, yuehaibing@huawei.com, gnault@redhat.com,
+ kees@kernel.org, hataegu0826@gmail.com, linux-ppp@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.dev,huawei.com,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306537-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:asantostc@gmail.com,m:gustavold@gmail.com,m:linux-kernel@vger.kernel.org,m:leitao@debian.org,m:kernel-team@meta.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-306527-lists,netdev=lfdr.de,netdevbpf];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,debian.org,meta.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:norbert@doyensec.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:qingfang.deng@linux.dev,m:yuehaibing@huawei.com,m:gnault@redhat.com,m:kees@kernel.org,m:hataegu0826@gmail.com,m:linux-ppp@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[debian.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 010EB73A785
+X-Rspamd-Queue-Id: C187173A638
 
-The destination ethernet address is netconsole configuration: no other
-netpoll user (bonding, team, vlan, bridge, macvlan, dsa) references
-np->remote_mac, only netconsole's ethernet framing and its
-configfs/cmdline interface do.
+Hello:
 
-Move it into struct netconsole_target and convert push_eth() to take the
-netconsole_target; netconsole_print_banner() and
-netconsole_parser_cmdline() already take it. The configfs show/store
-handlers and alloc_and_init() reach the field directly.
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-No functional change; the remote_mac sysfs attribute is unchanged.
+On Mon, 6 Jul 2026 11:01:59 +0200 you wrote:
+> pppol2tp_recv() runs in the L2TP UDP-encap softirq RX path:
+> 
+>  l2tp_udp_encap_recv() -> l2tp_recv_common() -> pppol2tp_recv()
+>    -> ppp_input(&po->chan)
+> 
+> It runs under rcu_read_lock() holding only an l2tp_session reference and
+> takes NO reference on the internal PPP channel (struct channel,
+> chan->ppp) that ppp_input() dereferences.
+> 
+> [...]
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/netconsole.c | 20 +++++++++++---------
- include/linux/netpoll.h  |  1 -
- 2 files changed, 11 insertions(+), 10 deletions(-)
+Here is the summary with links:
+  - [net,v3] ppp: defer channel free to an RCU grace period to fix pppol2tp RX UAF
+    https://git.kernel.org/netdev/net/c/ec4215683e47
 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index d0739b45f66e1..49b2243a20b2d 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -178,9 +178,9 @@ enum target_state {
-  *		local_ip	(read-write)
-  *		remote_ip	(read-write)
-  *		local_mac	(read-only)
-- *		remote_mac	(read-write)
-  * @local_port:	Source UDP port of the target (read-write).
-  * @remote_port: Destination UDP port of the target (read-write).
-+ * @remote_mac:	Destination ethernet address of the target (read-write).
-  * @buf:	The buffer used to send the full msg to the network stack
-  * @resume_wq:	Workqueue to resume deactivated target
-  * @skb_pool:	Per-target fallback skb pool consulted by find_skb() when
-@@ -209,6 +209,7 @@ struct netconsole_target {
- 	bool			release;
- 	struct netpoll		np;
- 	u16			local_port, remote_port;
-+	u8			remote_mac[ETH_ALEN];
- 	/* protected by target_list_lock; +1 gives scnprintf() room for its
- 	 * NUL terminator so a full MAX_PRINT_CHUNK payload is not truncated
- 	 */
-@@ -462,7 +463,7 @@ static struct netconsole_target *alloc_and_init(void)
- 	strscpy(nt->np.dev_name, "eth0", IFNAMSIZ);
- 	nt->local_port = 6665;
- 	nt->remote_port = 6666;
--	eth_broadcast_addr(nt->np.remote_mac);
-+	eth_broadcast_addr(nt->remote_mac);
- 	nt->state = STATE_DISABLED;
- 	INIT_WORK(&nt->resume_wq, process_resume_target);
- 	/* Set up the skb pool primitives once; enabling only refills it. */
-@@ -516,7 +517,7 @@ static void netconsole_print_banner(struct netconsole_target *nt)
- 		np_info(np, "remote IPv6 address %pI6c\n", &np->remote_ip.in6);
- 	else
- 		np_info(np, "remote IPv4 address %pI4\n", &np->remote_ip.ip);
--	np_info(np, "remote ethernet address %pM\n", np->remote_mac);
-+	np_info(np, "remote ethernet address %pM\n", nt->remote_mac);
- }
- 
- /* Parse the string and populate the `inet_addr` union. Return 0 if IPv4 is
-@@ -672,7 +673,7 @@ static ssize_t local_mac_show(struct config_item *item, char *buf)
- 
- static ssize_t remote_mac_show(struct config_item *item, char *buf)
- {
--	return sysfs_emit(buf, "%pM\n", to_target(item)->np.remote_mac);
-+	return sysfs_emit(buf, "%pM\n", to_target(item)->remote_mac);
- }
- 
- static ssize_t transmit_errors_show(struct config_item *item, char *buf)
-@@ -1077,7 +1078,7 @@ static ssize_t remote_mac_store(struct config_item *item, const char *buf,
- 		goto out_unlock;
- 	if (buf[MAC_ADDR_STR_LEN] && buf[MAC_ADDR_STR_LEN] != '\n')
- 		goto out_unlock;
--	memcpy(nt->np.remote_mac, remote_mac, ETH_ALEN);
-+	memcpy(nt->remote_mac, remote_mac, ETH_ALEN);
- 
- 	ret = count;
- out_unlock:
-@@ -1885,14 +1886,15 @@ static void push_udp(struct netconsole_target *nt, struct sk_buff *skb, int len)
- 	netpoll_udp_checksum(np, skb, len);
- }
- 
--static void push_eth(struct netpoll *np, struct sk_buff *skb)
-+static void push_eth(struct netconsole_target *nt, struct sk_buff *skb)
- {
-+	struct netpoll *np = &nt->np;
- 	struct ethhdr *eth;
- 
- 	eth = skb_push(skb, ETH_HLEN);
- 	skb_reset_mac_header(skb);
- 	ether_addr_copy(eth->h_source, np->dev->dev_addr);
--	ether_addr_copy(eth->h_dest, np->remote_mac);
-+	ether_addr_copy(eth->h_dest, nt->remote_mac);
- 	if (np->ipv6)
- 		eth->h_proto = htons(ETH_P_IPV6);
- 	else
-@@ -1980,7 +1982,7 @@ static int netpoll_send_udp(struct netconsole_target *nt, const char *msg,
- 		push_ipv6(np, skb, len);
- 	else
- 		push_ipv4(np, skb, len);
--	push_eth(np, skb);
-+	push_eth(nt, skb);
- 	skb->dev = np->dev;
- 
- 	return (int)netpoll_send_skb(np, skb);
-@@ -2375,7 +2377,7 @@ static int netconsole_parser_cmdline(struct netconsole_target *nt, char *opt)
- 
- 	if (*cur != 0) {
- 		/* MAC address */
--		if (!mac_pton(cur, np->remote_mac))
-+		if (!mac_pton(cur, nt->remote_mac))
- 			goto parse_failed;
- 	}
- 
-diff --git a/include/linux/netpoll.h b/include/linux/netpoll.h
-index 5ca79fa7d9431..79315461a7b1e 100644
---- a/include/linux/netpoll.h
-+++ b/include/linux/netpoll.h
-@@ -35,7 +35,6 @@ struct netpoll {
- 
- 	union inet_addr local_ip, remote_ip;
- 	bool ipv6;
--	u8 remote_mac[ETH_ALEN];
- };
- 
- #define np_info(np, fmt, ...)				\
-
+You are awesome, thank you!
 -- 
-2.53.0-Meta
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
