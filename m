@@ -1,67 +1,66 @@
-Return-Path: <netdev+bounces-306480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306482-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id i5NvHVe3UGq23wIAu9opvQ
-	(envelope-from <netdev+bounces-306480-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 11:11:51 +0200
+	id MdM3OIG3UGrF3wIAu9opvQ
+	(envelope-from <netdev+bounces-306482-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 11:12:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00D24738E28
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 11:11:50 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F32C738E4F
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 11:12:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=xsSEjR12;
+	dkim=pass header.d=linux.dev header.s=key1 header.b=YckP22k1;
 	dmarc=pass (policy=none) header.from=linux.dev;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306480-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306480-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306482-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306482-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C70243087C60
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 09:07:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8114C3053907
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 09:07:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FD643DB31A;
-	Fri, 10 Jul 2026 09:07:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A27B23D669E;
+	Fri, 10 Jul 2026 09:07:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857803DB310
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 09:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C970F37A487
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 09:07:21 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783674439; cv=none; b=mYvm53vmO+U7UMi2uLPXKerqvz0th91OC5d8tNO7+dphrnb3nn8jkRykLfCED1dioj0gD3INtGVAovUiSQ4VuE4yT47uMFFvHwGdFwcisxpTly1PR8gMcMdXV/almhE1UMUBsY0Xm0YDcdKnciXg7ad2w6m0iNIeBlh1mb/XLiI=
+	t=1783674443; cv=none; b=S4odIqHYx4W6vDHPRcOOPfjK/i9BOzPhIKyoQO1AxhJkdvShWh+XvltWPqk/4PdMkCvNFr53MIX4dLGk4Xorce/PhGuV7OKdajkgaX2arJa0cKXwEfzY0VVNbME/KD4J7VEqp2ir//99G/pR8UAL8aw4sHoyWKvAuLFrPIWo6Hk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783674439; c=relaxed/simple;
-	bh=jHmMQll1ae+qhtp0WSZs4AaXAT0OmttERPZUaIEX7ds=;
+	s=arc-20240116; t=1783674443; c=relaxed/simple;
+	bh=fmTL2s8F/eTQj2Mtdl4MWB8rAQdRaiVlgmFFyz9i54U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jRlhr7juhAYtvK/EYLJq1mH2uznlx+MVzptNz1A0STNGfguJbA7w8sVJWHprW5K+VR+qCz0HTanmzowTcfmXzZRV1frhELzRk0qhJnQSDZ+SZWvSNd7ugaHim9veTyms8NeqTuSwYzPOPtYhDFuhEZxFjeSFfDQSsoaLftObPVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xsSEjR12; arc=none smtp.client-ip=91.218.175.179
+	 MIME-Version; b=eYc2IjbKotB4EQ2t7Gfs7C9xUf2irpECsLko+b1KZwh91j0imeCfAOEu6YOZj57kNExZ9uZlY4Y1ceP3zfqYL2Uw8ZROMbBuf7Ri5nG6rk27zMPQ9iDkxAZyG4yd5luQbuiT856qxjkyI5C5t8nC7FPHBSTp3C8DF3IzuBzDa2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YckP22k1; arc=none smtp.client-ip=91.218.175.173
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783674435;
+	t=1783674439;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IXP2s9du0gXWzN+9G9A/aXarqaLKl1ksW2pNWjl9v/E=;
-	b=xsSEjR12R3IRD07Zjk/jDFreAGmdxN3wrXTDR3M5+KgG3GTZLarVoWQVnwInBIS4NlpNzC
-	KPDO4nGRTYVDZmujBS3gU4EXcRxvj1awW0bXauPygKHulywdWIwTJhPXXKpKv3HOl1ZGS3
-	oU6HthHGxxo73mC/VZK/4d/+egiW/5A=
+	bh=o5M72C3L1ZgsFmb5gY5mJ3SoLciOzkeobaXpGracEas=;
+	b=YckP22k162bNqNEwPV8+gIbiLDri+6utRarOwGdBGHydCMHlfPgo8vyxD7+Hanf3loiA/X
+	v2TNFkuFvqopkH2ss2issDBHGonfMFoxOx37z8uno9EpwagzBuAjnKTz9eJ8clOFlH12Gq
+	irMwCq3cl7R2gi2OAAs7wTcRxT3jLyE=
 From: xuanqiang.luo@linux.dev
 To: netdev@vger.kernel.org
 Cc: Xuanqiang Luo <luoxuanqiang@kylinos.cn>,
-	Rasesh Mody <rmody@marvell.com>,
-	Sudarsana Kalluru <skalluru@marvell.com>,
-	GR-Linux-NIC-Dev@marvell.com,
+	Fan Gong <gongfan1@huawei.com>,
+	Xin Guo <guoxin09@huawei.com>,
+	Gur Stavi <gur.stavi@huawei.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Ivan Vecera <ivecera@redhat.com>,
 	linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH net v1 1/3] bna: fix use-after-free on DMA mapping failure
-Date: Fri, 10 Jul 2026 17:05:22 +0800
-Message-ID: <20260710090527.58354-2-xuanqiang.luo@linux.dev>
+Subject: [PATCH net v1 2/3] hinic3: fix use-after-free on DMA mapping failure
+Date: Fri, 10 Jul 2026 17:05:23 +0800
+Message-ID: <20260710090527.58354-3-xuanqiang.luo@linux.dev>
 In-Reply-To: <20260710090527.58354-1-xuanqiang.luo@linux.dev>
 References: <20260710090527.58354-1-xuanqiang.luo@linux.dev>
 Precedence: bulk
@@ -79,17 +78,17 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-306480-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-306482-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:luoxuanqiang@kylinos.cn,m:rmody@marvell.com,m:skalluru@marvell.com,m:GR-Linux-NIC-Dev@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ivecera@redhat.com,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:luoxuanqiang@kylinos.cn,m:gongfan1@huawei.com,m:guoxin09@huawei.com,m:gur.stavi@huawei.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER(0.00)[xuanqiang.luo@linux.dev,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -100,59 +99,60 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
 	FROM_NO_DN(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[xuanqiang.luo@linux.dev,netdev@vger.kernel.org]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 00D24738E28
+X-Rspamd-Queue-Id: 3F32C738E4F
 
 From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 
-If dma_map_single() fails in bnad_start_xmit(), the skb is freed, but
-head_unmap->skb was set before the mapping attempt and is not cleared. The
-producer index is not advanced, so later transmissions normally overwrite
+If hinic3_tx_map_skb() fails in hinic3_send_one_skb(), the skb is freed,
+but tx_info->skb was set before the mapping attempt and is not cleared. The
+SQ producer index is rolled back, so later transmissions normally overwrite
 the entry.
 
-However, if the interface is brought down first, bnad_txq_cleanup() scans
-the entire unmap queue, finds the stale pointer, and calls
-bnad_tx_buff_unmap() on it. That function dereferences the freed skb in
-skb_headlen(). Its zero nvecs count is decremented to -1, causing its
-while (nvecs) loop to repeatedly unmap entries around the TX ring and
-potentially hang cleanup.
+If the interface is brought down first, hinic3_free_txqs_res() calls
+free_all_tx_skbs(). It scans the entire tx_info array and finds the stale
+pointer. hinic3_tx_unmap_skb() then dereferences the freed skb in
+skb_shinfo(), before it is freed again.
 
-Set head_unmap->skb after the first DMA mapping succeeds. This prevents the
-stale entry from reaching bnad_tx_buff_unmap().
+Set tx_info->skb and its WQEBB count only after DMA mapping succeeds,
+preventing the stale pointer from reaching free_all_tx_skbs().
 
-Fixes: ba5ca7848be0 ("bna: check for dma mapping errors")
+Fixes: 17fcb3dc12bb ("hinic3: module initialization and tx/rx logic")
 Cc: stable@vger.kernel.org
 Assisted-by: Opencode:deepseek-v4-pro[1m]
 Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 ---
- drivers/net/ethernet/brocade/bna/bnad.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/huawei/hinic3/hinic3_tx.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/brocade/bna/bnad.c b/drivers/net/ethernet/brocade/bna/bnad.c
-index 8e19add764db2..8b75004ba7c9d 100644
---- a/drivers/net/ethernet/brocade/bna/bnad.c
-+++ b/drivers/net/ethernet/brocade/bna/bnad.c
-@@ -3006,7 +3006,6 @@ bnad_start_xmit(struct sk_buff *skb, struct net_device *netdev)
- 	txqent->hdr.wi.reserved = 0;
- 	txqent->hdr.wi.num_vectors = vectors;
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
+index 9306bf0020caf..5739ecb08d0d3 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
+@@ -578,8 +578,6 @@ static netdev_tx_t hinic3_send_one_skb(struct sk_buff *skb,
+ 		*wqe_combo.task = task;
  
--	head_unmap->skb = skb;
- 	head_unmap->nvecs = 0;
+ 	tx_info = &txq->tx_info[pi];
+-	tx_info->skb = skb;
+-	tx_info->wqebb_cnt = wqebb_cnt;
  
- 	/* Program the vectors */
-@@ -3018,6 +3017,7 @@ bnad_start_xmit(struct sk_buff *skb, struct net_device *netdev)
- 		BNAD_UPDATE_CTR(bnad, tx_skb_map_failed);
- 		return NETDEV_TX_OK;
+ 	err = hinic3_tx_map_skb(netdev, skb, txq, tx_info, &wqe_combo);
+ 	if (err) {
+@@ -589,6 +587,9 @@ static netdev_tx_t hinic3_send_one_skb(struct sk_buff *skb,
+ 		goto err_drop_pkt;
  	}
-+	head_unmap->skb = skb;
- 	BNA_SET_DMA_ADDR(dma_addr, &txqent->vector[0].host_addr);
- 	txqent->vector[0].length = htons(len);
- 	dma_unmap_addr_set(&unmap->vectors[0], dma_addr, dma_addr);
+ 
++	tx_info->skb = skb;
++	tx_info->wqebb_cnt = wqebb_cnt;
++
+ 	netif_subqueue_sent(netdev, txq->sq->q_id, skb->len);
+ 	netif_subqueue_maybe_stop(netdev, txq->sq->q_id,
+ 				  hinic3_wq_free_wqebbs(&txq->sq->wq),
 -- 
 2.43.0
 
