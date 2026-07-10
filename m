@@ -1,163 +1,126 @@
-Return-Path: <netdev+bounces-306410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306411-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VorpN1pXUGorxAIAu9opvQ
-	(envelope-from <netdev+bounces-306410-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 04:22:18 +0200
+	id L1UcEtxcUGrRxQIAu9opvQ
+	(envelope-from <netdev+bounces-306411-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 04:45:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9B4C736A2C
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 04:22:17 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76503736C11
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 04:45:47 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306410-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306410-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306411-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306411-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9444C301F653
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 02:22:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8039D300B768
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 02:45:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25EE523EA94;
-	Fri, 10 Jul 2026 02:22:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 917583546FB;
+	Fri, 10 Jul 2026 02:45:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.78.106])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26ECD7E792;
-	Fri, 10 Jul 2026 02:22:07 +0000 (UTC)
+Received: from out198-16.us.a.mail.aliyun.com (out198-16.us.a.mail.aliyun.com [47.90.198.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E52003546EF;
+	Fri, 10 Jul 2026 02:45:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783650135; cv=none; b=Gd/yu3VKxcDvA4QALQi6lsOS113FlCFmVap+rK2f4LxCp2e3SE+VAtVsEigqcSigepnKip91W4SxiELzoS4Pa4Np6NHivOZnD1/MTVWw3xMMk54p+xBN+LfNOC0rvAnme1nDhujzydprWu1jXwgbAV/EktW1c+yCzzX3JF6nFZM=
+	t=1783651544; cv=none; b=lVEgswm5xd1i8+p0BmiUXYtDjCu8S8gtCFwwXUETiezYtTNHQH5NjFB55NrnlPA49oXVYeTqNchspLo9G6PVX8zgPDj0SmZAXCeDTm2tzIHzu6IbMXZli8jhNJaHC9T+Na472X/JeC2bGHpRC/lX1vhyf2XyykT2Zw0z9w2VxMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783650135; c=relaxed/simple;
-	bh=vDmmFMtTx0g6s6h5HhJRmiH/58fftU5/U/sMtTERGOo=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=DrD8LEv5RSfMVX2BPziiS7Fy51ajE8xXm5JPCdgLM8EaBwzbrSdhNO+A7dNB/NNtCAFR592uQy5JPwrNN68dKN7TpPlTPefbv9DQAJHfXppJMuXM+5YsJmlDUmLxTfFBHU0pAFDvT4wEVS3QaRUj92Mqq78f2yzIPaMTutkmCK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=13.76.78.106
-Received: from zju.edu.cn (unknown [10.97.40.56])
-	by mtasvr (Coremail) with SMTP id _____wDX9RRKV1BqSewuAA--.35S3;
-	Fri, 10 Jul 2026 10:22:03 +0800 (CST)
-Received: from smtpclient.apple (unknown [10.97.40.56])
-	by mail-app3 (Coremail) with SMTP id zS_KCgBXb3FJV1BqVVoGAw--.13159S2;
-	Fri, 10 Jul 2026 10:22:02 +0800 (CST)
-Content-Type: text/plain;
-	charset=us-ascii
+	s=arc-20240116; t=1783651544; c=relaxed/simple;
+	bh=UWLptllgMKcsc4QRHADo/DDa/GmezgtR1eVvljV3t5k=;
+	h=Date:From:To:Cc:Message-ID:Subject:MIME-Version:References:
+	 In-Reply-To:Content-Type; b=rwCxhXtNx5fPbv4OdHdQ93MoAfQv/A+au9sUk5q6uPl41LFwij8qMpz2FtbBpT9ydVmVemCPbxfIp6mURdEOy2UKlGACOmh0L5VdO2a58pOt5djTNL1yQYXsvkHsiIdswY7Pt4d+9ZFXZ3fjUpdYSykBvjCDJ7UthT+5dL3+vF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com; spf=pass smtp.mailfrom=nebula-matrix.com; arc=none smtp.client-ip=47.90.198.16
+X-Alimail-AntiSpam:AC=CONTINUE;BC=0.2274032|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_system_inform|0.468193-0.0146381-0.517169;FP=17038026415964094180|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam011083013073;MF=illusion.wang@nebula-matrix.com;NM=1;PH=DW;RN=18;RT=18;SR=0;TI=W4_0.2.3_21252303_1783651412036_o7001c52b;
+Received: from WS-web (Illusion.Wang@nebula-matrix.com[W4_0.2.3_21252303_1783651412036_o7001c52b] cluster:ay29) at Fri, 10 Jul 2026 10:45:15 +0800
+Date: Fri, 10 Jul 2026 10:45:15 +0800
+From: "Illusion Wang" <Illusion.Wang@nebula-matrix.com>
+To: "Breno Leitao" <leitao@debian.org>
+Cc: "Dimon" <dimon.zhao@nebula-matrix.com>,
+  "Alvin" <alvin.wang@nebula-matrix.com>,
+  "Sam" <sam.chen@nebula-matrix.com>,
+  "netdev" <netdev@vger.kernel.org>,
+  "andrew+netdev" <andrew+netdev@lunn.ch>,
+  "corbet" <corbet@lwn.net>,
+  "kuba" <kuba@kernel.org>,
+  "horms" <horms@kernel.org>,
+  "linux-doc" <linux-doc@vger.kernel.org>,
+  "pabeni" <pabeni@redhat.com>,
+  "vadim.fedorenko" <vadim.fedorenko@linux.dev>,
+  "lukas.bulwahn" <lukas.bulwahn@redhat.com>,
+  "edumazet" <edumazet@google.com>,
+  "enelsonmoore" <enelsonmoore@gmail.com>,
+  "skhan" <skhan@linuxfoundation.org>,
+  "hkallweit1" <hkallweit1@gmail.com>,
+  "open list" <linux-kernel@vger.kernel.org>
+Reply-To: "Illusion Wang" <Illusion.Wang@nebula-matrix.com>
+Message-ID: <25d3ffc3-6f45-4baf-9c3c-ff075de14778.Illusion.Wang@nebula-matrix.com>
+Subject: =?UTF-8?B?5Zue5aSN77yaW1BBVENIIHYyMSBuZXQtbmV4dCAwMS8xMl0gbmV0L25lYnVsYS1tYXRyaXg6?=
+  =?UTF-8?B?IGFkZCBtaW5pbXVtIG5ibCBidWlsZCBmcmFtZXdvcms=?=
+X-Mailer: [Alimail-Mailagent][W4_0.2.3][null][Chrome]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.600.62\))
-Subject: Re: [PATCH] wifi: brcmfmac: drain bus_reset work on device removal
-From: Fan Wu <12321260@zju.edu.cn>
-In-Reply-To: <20260710002451.500112-1-eddiephillips@google.com>
-Date: Fri, 10 Jul 2026 10:21:51 +0800
-Cc: Fan Wu <fanwu01@zju.edu.cn>,
- Arend van Spriel <aspriel@gmail.com>,
- Kalle Valo <kvalo@kernel.org>,
- Franky Lin <franky.lin@broadcom.com>,
- Hante Meuleman <hante.meuleman@broadcom.com>,
- Chi-Hsien Lin <chi-hsien.lin@infineon.com>,
- Wright Feng <wright.feng@infineon.com>,
- Chung-Hsien Hsu <chung-hsien.hsu@infineon.com>,
- "David S . Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>,
- linux-wireless@vger.kernel.org,
- brcm80211-dev-list.pdl@broadcom.com,
- SHA-cyfmac-dev-list@infineon.com,
- netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <47D1D7A8-65F4-4EBE-ABD8-5CDBA5A5CDAC@zju.edu.cn>
-References: <20260709101635.103005-1-fanwu01@zju.edu.cn>
- <20260710002451.500112-1-eddiephillips@google.com>
-To: Eddie Phillips <eddiephillips@google.com>
-X-Mailer: Apple Mail (2.3774.600.62)
-X-CM-TRANSID:zS_KCgBXb3FJV1BqVVoGAw--.13159S2
-X-CM-SenderInfo: qrstjiaswqq6lmxovvfxof0/
-X-CM-DELIVERINFO: =?B?gXApPgXKKxbFmtjJiESix3B1w3vZ3A9ovKVTomAyoQazvoRs/NHSP8GI2EvgeEEW7R
-	sfnZPoDCNGYdHSfuFmYJL54WM8Dms9pSd1duk7P2JRh5+sy7aOgo1D8mBVqMLc1ZNCvnaO
-	PAtn46iPjtACMN8bHkqp9E6mavGmQbzmcFsnzP86
-X-Coremail-Antispam: 1Uk129KBj93XoW7uFyfZrWxuF1DGFyfGryUArc_yoW8GrWUpr
-	W3JrW5tF4qqa45KF4DZF12qa40gryS9FWDJr18Gry5tr98Jr12grW2yFyjgFWUurs5Aaya
-	vr43uw45Zan09agCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUP0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AK
-	xVW0oVCq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc804V
-	CY07AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AK
-	xVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48Icx
-	kI7VAKI48JM4x0Y48IcxkI7VAKI48G6xCjnVAKz4kxM4IIrI8v6xkF7I0E8cxan2IY04v7
-	MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr
-	0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0E
-	wIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JV
-	WxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAI
-	cVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8ructUUUUU==
+MIME-Version: 1.0
+x-aliyun-im-through: {"version":"v1.0"}
+References: <20260708064742.35391-1-illusion.wang@nebula-matrix.com> <20260708064742.35391-2-illusion.wang@nebula-matrix.com>,<ak5sjL21NQSWDB9S@gmail.com>
+x-aliyun-mail-creator: W4_0.2.3_null_EuMTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEzMy4wLjY5NDMuMTQyIFNhZmFyaS81MzcuMzYgZGluZ3RhbGstd2luLzEuMC4wIG53KDAuMTQuNykgRGluZ1RhbGsoOC4zLjIwLVJlbGVhc2UuMjYwNTE0MDAyKSBNb2pvLzEuMC4wIE5hdGl2ZSBBcHBUeXBlKHJlbGVhc2UpIENoYW5uZWwvMjAxMjAwIEFyY2hpdGVjdHVyZS94ODZfNjQgd2ViRHQvUEM=uL
+In-Reply-To: <ak5sjL21NQSWDB9S@gmail.com>
+x-aliyun-mailtrack: {"foreign-track":"0"}
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [2.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	MID_CONTAINS_FROM(1.00)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
+	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[zju.edu.cn,gmail.com,kernel.org,broadcom.com,infineon.com,davemloft.net,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-306410-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[zju.edu.cn];
-	FORGED_RECIPIENTS(0.00)[m:fanwu01@zju.edu.cn,m:aspriel@gmail.com,m:kvalo@kernel.org,m:franky.lin@broadcom.com,m:hante.meuleman@broadcom.com,m:chi-hsien.lin@infineon.com,m:wright.feng@infineon.com,m:chung-hsien.hsu@infineon.com,m:davem@davemloft.net,m:kuba@kernel.org,m:linux-wireless@vger.kernel.org,m:brcm80211-dev-list.pdl@broadcom.com,m:SHA-cyfmac-dev-list@infineon.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:eddiephillips@google.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[12321260@zju.edu.cn,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[nebula-matrix.com];
+	FORGED_SENDER(0.00)[Illusion.Wang@nebula-matrix.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS(0.00)[m:leitao@debian.org,m:dimon.zhao@nebula-matrix.com,m:alvin.wang@nebula-matrix.com,m:sam.chen@nebula-matrix.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:corbet@lwn.net,m:kuba@kernel.org,m:horms@kernel.org,m:linux-doc@vger.kernel.org,m:pabeni@redhat.com,m:vadim.fedorenko@linux.dev,m:lukas.bulwahn@redhat.com,m:edumazet@google.com,m:enelsonmoore@gmail.com,m:skhan@linuxfoundation.org,m:hkallweit1@gmail.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306411-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	HAS_REPLYTO(0.00)[Illusion.Wang@nebula-matrix.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[12321260@zju.edu.cn,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Illusion.Wang@nebula-matrix.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[nebula-matrix.com,vger.kernel.org,lunn.ch,lwn.net,kernel.org,redhat.com,linux.dev,google.com,gmail.com,linuxfoundation.org];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
-	APPLE_MAILER_COMMON(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,zju.edu.cn:mid,zju.edu.cn:from_mime]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	REPLYTO_EQ_FROM(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E9B4C736A2C
+X-Rspamd-Queue-Id: 76503736C11
 
-On Thu, Jul 09, 2026 at 05:23:37PM -0700, Eddie Phillips wrote:
-> Is this safe in a softIRQ context?
-> mutex_lock() sleeps until it can get the lock.
-
-Thanks for taking a look. I agree this is not the right interface shape.
-
-The current call sites I traced reach brcmf_fw_crashed() from the PCIe
-threaded IRQ path or from SDIO workqueue context, but brcmf_fw_crashed()
-is a core helper and the reset scheduling path should not grow a hidden
-sleepable-context requirement. I will respin this part so the arming gate
-does not use a mutex.
-
-> How about if brcmf_pcie_remove() calls brcmf_bus_cancel_reset_work(),
-> takes the lock and calls cancel_work_sync(), sleeps. If debugfs
-> path is already running, it can invoke the worker thread. Is there
-> potential that both try to reset?
-
-Yes, that is a real issue with this version. The lock only serializes
-scheduling against the cancel point. If the reset work has already started,
-cancel_work_sync() waits for it, but the worker may already be executing the
-bus reset teardown path; remove can then continue and run its own teardown
-afterwards.
-
-So the patch needs a stronger state/ownership model than just
-schedule-vs-cancel serialization. I will rework it so reset and remove cannot
-both own the same teardown sequence, and will send a v2 after auditing the
-PCIe/SDIO/USB paths again.
-
-Thanks,
-Fan
-
+Pj4gRnJvbTogaWxsdXNpb24gd2FuZyA8aWxsdXNpb24ud2FuZ0BuZWJ1bGEtbWF0cml4LmNvbT4K
+Pj4gK1N1cHBvcnQKPj4gKz09PT09PT0KPj4gKwo+PiArRm9yIG1vcmUgaW5mb3JtYXRpb24gYWJv
+dXQgbTE4MTEwLU5JQy9tMTgwMDAtTklDLCBwbGVhc2UgdmlzaXQgdGhlIGZvbGxvd2luZyBVUkw6
+Cj4+ICtodHRwczovL3d3dy5uZWJ1bGEtbWF0cml4LmNvbS8KPgo+RG8geW91IGhhdmUgYSBsaW5r
+IGZvciB0aGUgc2l0ZSBpbiBlbmdsaXNoPwoKPlRoYW5rcwoKU29ycnksIEkgd2lsbCBmaXggdGhp
+cyBpbiB0aGUgbmV4dCByZXZpc2lvbiBvZiB0aGUgcGF0Y2ggc2VyaWVzLgpPdXIgb2ZmaWNpYWwg
+RW5nbGlzaCBwcm9kdWN0IHBhZ2UgaXMgYXZhaWxhYmxlIGF0OgpodHRwczovL3d3dy5uZWJ1bGEt
+bWF0cml4LmNvbS9zbmljX3MxMDAwX2VuClRoZSBTMTAwMCBzZXJpZXMgcHJvZHVjdHMgYXJlIGJh
+c2VkIG9uIHRoZSBtMTgwMDAgY2hpcCBmYW1pbHksCmFuZCB5b3UgY2FuIGZpbmQgZnVsbCBOSUMg
+cHJvZHVjdCBpbnRyb2R1Y3Rpb25zIG9uIHRoaXMgcGFnZS4KCgoKCgo=
 
