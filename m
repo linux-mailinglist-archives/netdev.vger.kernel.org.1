@@ -1,75 +1,55 @@
-Return-Path: <netdev+bounces-306585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306586-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id z2HGJtj9UGq89gIAu9opvQ
-	(envelope-from <netdev+bounces-306585-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:12:40 +0200
+	id e+TaG3P9UGqb9gIAu9opvQ
+	(envelope-from <netdev+bounces-306586-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:10:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37DB373BA8D
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:12:40 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BEDB73BA38
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:10:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=auditcode.ai header.s=zmail header.b=L42I8ROO;
-	dmarc=pass (policy=none) header.from=auditcode.ai;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306585-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306585-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=ZFlJYMek;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306586-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306586-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8174A306C3DA
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:10:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5E887300AC98
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E80B632470A;
-	Fri, 10 Jul 2026 14:10:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB27B31813A;
+	Fri, 10 Jul 2026 14:10:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sender-op-o17.zoho.eu (sender-op-o17.zoho.eu [136.143.169.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1BA7E0FF;
-	Fri, 10 Jul 2026 14:09:59 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783692602; cv=pass; b=pvGSZvRb6bZqKrdr7VyS8jbQV5uG5nmFJT5YPLyATfpXuIsIbJH+zUFCTmgyN6Ja+lfQhv8A+yahY635qrZjbASgNsRHCc+KOYjQ5n9ks3RkC8f4tuqb12TaH/yIa6S5X5DKe/ptvXG/wmWCuQ0mIZjguT9N4ajDk4zv7LdvB4U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783692602; c=relaxed/simple;
-	bh=ljlWwhl4MSRmsGSt3hHwCd+GEOrvQNMsv6KnBv/Gqrg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e64X0EI+Un0th5yX3nv0JdH80LkwuN+P7lB7naqLgP3XqYogmT1bKoDySUwONA2kzsVxR6gAZTPMVJ5wLGEXrGWbfQIYJI0dMXbjUiVsxhMNjw5EARXMXSD6VG2dMMhYQ6//yHh42GTB/1aanY9sHowalh2iHHO5bveZWJlxxGM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=auditcode.ai; spf=pass smtp.mailfrom=auditcode.ai; dkim=pass (1024-bit key) header.d=auditcode.ai header.i=security@auditcode.ai header.b=L42I8ROO; arc=pass smtp.client-ip=136.143.169.17
-ARC-Seal: i=1; a=rsa-sha256; t=1783692572; cv=none; 
-	d=zohomail.eu; s=zohoarc; 
-	b=hZt1XXdWXnyF+M0kkOS36AutrormeCoalrRP4+WUfesRkZkJBvFbd/vXqEkwkFe+oUi3TcWm4dwN+5KcpzGzgKsX9rRn3GSy9Sa6iJKoaTzw92xMBGMfuuScxbgkZV5N6dUtMR7ggHtcCrNwu/JRZtBPMOagR6NFSdU6ziG++Ls=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
-	t=1783692572; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=QCpA9hNQb2+dY/GdVuoFivLwBHgPhQwaGW2XRacNqTc=; 
-	b=RGajrwKgKArpL0HaMw7yGQKsgxmzXauSIWadw6Lrc2k8gSCgirh7iiYirX7a+7MQ6T2NlbbfB/3F4GjcoJo1UYmcj63BlNkN4mumegs1/Yo4xGm0EEP96rKXEBJcNf9x8kxbNSiQBRvhW4xyuptpzu0Azb3YeJ51XxkA/2UlqOk=
-ARC-Authentication-Results: i=1; mx.zohomail.eu;
-	dkim=pass  header.i=auditcode.ai;
-	spf=pass  smtp.mailfrom=security@auditcode.ai;
-	dmarc=pass header.from=<security@auditcode.ai>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1783692572;
-	s=zmail; d=auditcode.ai; i=security@auditcode.ai;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=QCpA9hNQb2+dY/GdVuoFivLwBHgPhQwaGW2XRacNqTc=;
-	b=L42I8ROOJ/E7fJRbD4nEJ3eBzHmAOh1hFq+cD4Ez//jO+f4RFM6hzy5JpM/IfT33
-	5SA/1z5SWRmAGHbTTvZ9D6OTgUQyRUWw9Ia/uRt0yWsZd/x6uS00snNDpNPRjL+iWLO
-	wG7yNPh99CWhiiwIys/3/iGnKwHHgxsJ9hQR2lfU=
-Received: by mx.zoho.eu with SMTPS id 178369256977454.46577705906941;
-	Fri, 10 Jul 2026 16:09:29 +0200 (CEST)
-From: Ibrahim Hashimov <security@auditcode.ai>
-To: Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net] mac802154: hold an interface reference across the scan worker
-Date: Fri, 10 Jul 2026 16:09:27 +0200
-Message-ID: <20260710140927.13228-1-security@auditcode.ai>
-X-Mailer: git-send-email 2.50.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A290E25228C;
+	Fri, 10 Jul 2026 14:10:32 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783692633; cv=none; b=Dqlu7Ne+h7+25oEe4We2mqfBVWuYaB06dQcRr///oa0dPHZGlo97fJVsYrvae7PlOvltYDEdgh5UUz5lbPwQni+CYXewhbyAF2ZNOKBmjlCtwx8U5qJJmWeWSGAcgXRpu1Gbv7SPUTD4dyJScNaXDdJP8f1CMM7ZuuQb/UvrbK4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783692633; c=relaxed/simple;
+	bh=TB6LVnogQ5WCudz4xcq7b0N9xJRjekuPV1SKqWMUQPM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Q5Bg/1FkoEKlA7IqAHldbQL9yIw1MXpFnH+D4Tv4jGMJwOnrx+04qQimfScAa3AB5ceYDArgUyfvyBJaWfxUM8/gR/aBV2t86yCVVYQ92Mgi9PZ7KX8eenItPCdc+/7iqleJGUn8aAMRsp9eEzeOt5v1L4MHATKF4giJjhCggas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZFlJYMek; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 859A41F00A3A;
+	Fri, 10 Jul 2026 14:10:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783692632;
+	bh=N0Sm3pthzpHlYcy64+pRdWJ903nZpnSTlIILQ9Vexd8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=ZFlJYMek6zuREhxcrBwJ4vpWEi7+aoAOK4OVpTCJA3x6qOr/IXHX6htkpRXTBWLuO
+	 fYMXrqkLtR/SxjiirEJLC2U7oBrPdua1XgcbGxpXxOMZ0YIScSGWRKD78BNkGPaYer
+	 Cing/yh3ZuYbrPIxJl9MQ95hfUQojDDKNj9pAjdaFwPAQZU1urhQAX3GaSXRjfPTeI
+	 +jooqNCNIl64mV751oc7IZlqQhGhvoE57bDx8HpvvoeoO4sHCwQr8rw8skPpaCS6sN
+	 ixD9826c0iRhuO8NI6ltKYzu2Jb+Ueigi/yygktNZOwBhxr3ZAxaYVPZ6D3Jnu5AEU
+	 CxrYTtvWfvs1A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93B7A3924F95;
+	Fri, 10 Jul 2026 14:10:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,167 +57,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+Subject: Re: [PATCH net] ipv4: fib: free fib_alias with kfree_rcu() on insert
+ error path
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178369261015.702516.15852641414111977103.git-patchwork-notify@kernel.org>
+Date: Fri, 10 Jul 2026 14:10:10 +0000
+References: <20260704171421.1786806-1-bestswngs@gmail.com>
+In-Reply-To: <20260704171421.1786806-1-bestswngs@gmail.com>
+To: Weiming Shi <bestswngs@gmail.com>
+Cc: netdev@vger.kernel.org, dsahern@kernel.org, idosch@nvidia.com,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ horms@kernel.org, xmei5@asu.edu, linux-kernel@vger.kernel.org
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[auditcode.ai,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[auditcode.ai:s=zmail];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:alex.aring@gmail.com,m:stefan@datenfreihafen.org,m:miquel.raynal@bootlin.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-wpan@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:alexaring@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,datenfreihafen.org,bootlin.com,davemloft.net,google.com,kernel.org,redhat.com];
-	FORGED_SENDER(0.00)[security@auditcode.ai,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-306586-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:bestswngs@gmail.com,m:netdev@vger.kernel.org,m:dsahern@kernel.org,m:idosch@nvidia.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:horms@kernel.org,m:xmei5@asu.edu,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-306585-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[auditcode.ai:+];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[security@auditcode.ai,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,auditcode.ai:from_mime,auditcode.ai:email,auditcode.ai:mid,auditcode.ai:dkim,vger.kernel.org:from_smtp]
+	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 37DB373BA8D
+X-Rspamd-Queue-Id: 1BEDB73BA38
 
-mac802154_scan_worker() captures the scanning sub-interface once under
-RCU:
+Hello:
 
-	sdata = IEEE802154_WPAN_DEV_TO_SUB_IF(scan_req->wpan_dev);
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-and then, after rcu_read_unlock() and outside the rtnl, keeps
-dereferencing sdata->dev: in the channel-change and restart failure
-traces, in mac802154_transmit_beacon_req() (skb->dev = sdata->dev) for
-active scans, in the final dev_dbg(), and in the end_scan
-mac802154_scan_cleanup_locked() path. Nothing keeps that netdev alive
-for the duration of the worker iteration.
+On Sat,  4 Jul 2026 10:14:21 -0700 you wrote:
+> fib_table_insert() publishes new_fa into the leaf's fa_list with
+> fib_insert_alias() before calling the fib entry notifiers. When a
+> notifier fails, the error path removes new_fa with fib_remove_alias()
+> (hlist_del_rcu) and frees it right away with kmem_cache_free().
+> 
+> fib_table_lookup() walks that list under rcu_read_lock() only, so a
+> concurrent lookup that already reached new_fa keeps reading it after the
+> free:
+> 
+> [...]
 
-A concurrent teardown of the scanning interface -- userspace issuing
-NL802154_CMD_DEL_INTERFACE (ieee802154_if_remove() ->
-unregister_netdevice()), or a full PHY removal via
-ieee802154_unregister_hw() -> ieee802154_remove_interfaces() -- can run
-as soon as the worker drops the rtnl between its two short
-drv_set_channel()/drv_start() sections. The netdev is not freed
-synchronously by unregister_netdevice(): it is queued to net_todo_list
-and freed later from netdev_run_todo(), which drops the rtnl mutex
-(__rtnl_unlock()) *before* netdev_wait_allrefs_any()/free_netdev(). The
-freeing therefore runs with the rtnl not held, on whichever task next
-drains net_todo_list. Holding the rtnl in the worker does not prevent
-it, and the per-PHY IEEE802154_IS_SCANNING flag does not identify the
-specific interface: a subsequent NEW_INTERFACE + TRIGGER_SCAN re-arms
-the flag, so a stale worker iteration sails past an is-scanning recheck
-and dereferences the already-freed netdev.
+Here is the summary with links:
+  - [net] ipv4: fib: free fib_alias with kfree_rcu() on insert error path
+    https://git.kernel.org/netdev/net/c/f2f152e94a67
 
-Triggering the race requires CAP_NET_ADMIN: both
-NL802154_CMD_TRIGGER_SCAN and NL802154_CMD_DEL_INTERFACE are
-GENL_ADMIN_PERM, reachable only from the initial user namespace, so
-the attacker is a locally privileged (CAP_NET_ADMIN) user, not an
-unprivileged local user or a remote peer.
-
-KASAN slab-use-after-free, kworker reading the freed
-net_device/ieee802154_sub_if_data (kmalloc-cg-4k) allocated and freed by
-the racing NEW_INTERFACE/DEL_INTERFACE task:
-
-  BUG: KASAN: slab-use-after-free in mac802154_scan_worker+0x... [mac802154]
-  Read of size 8 ... by task kworker/u8:N
-  Workqueue: phy0-mac-cmds mac802154_scan_worker [mac802154]
-   mac802154_scan_worker
-   process_one_work
-  (also hit via ieee802154_mlme_tx_locked() from the beacon-request path
-   and via _dev_err()/__dev_printk() formatting sdata->dev->dev)
-
-Fix it by taking a reference on the interface while the RCU read lock is
-still held -- so the netdev cannot be freed before the refcount is
-raised -- and releasing it at every exit of the worker past that point.
-This keeps sdata->dev valid for the whole iteration.
-
-The reference does not defer the free indefinitely and does not
-deadlock the single-threaded mac_wq. Each worker iteration drops the
-reference before it requeues itself, and a teardown started while the
-reference is held simply blocks in netdev_run_todo() until the current
-iteration returns. It cannot be the worker's own rtnl_unlock() that
-blocks on the reference either: the unregistering task removes the
-netdev from net_todo_list under the rtnl (list_replace_init() in
-netdev_run_todo() runs before __rtnl_unlock()), so it always owns the
-todo entry, and the worker acquires the rtnl only afterwards -- the
-blocking netdev_wait_allrefs_any() therefore always runs on the
-teardown task, never on the worker.
-
-Verified on a v6.19 KASAN build: racing DEL_INTERFACE against an
-in-flight TRIGGER_SCAN reliably tripped a slab-use-after-free KASAN
-report inside mac802154_scan_worker() before this patch, and the
-same reproducer no longer triggers it with the fix applied.
-
-Fixes: 57588c71177f ("mac802154: Handle passive scanning")
-Cc: stable@vger.kernel.org
-Assisted-by: AuditCode-AI:2026.07
-Signed-off-by: Ibrahim Hashimov <security@auditcode.ai>
----
- net/mac802154/scan.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
-
-diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
-index 0a31ac8d8415..48e661031cc0 100644
---- a/net/mac802154/scan.c
-+++ b/net/mac802154/scan.c
-@@ -209,6 +209,26 @@ void mac802154_scan_worker(struct work_struct *work)
- 		return;
- 	}
- 
-+	/* From here on sdata->dev is dereferenced after rcu_read_unlock() and
-+	 * outside the rtnl: in the dev_err()/dev_dbg() traces below, in
-+	 * mac802154_transmit_beacon_req() (skb->dev = sdata->dev) and in the
-+	 * end_scan mac802154_scan_cleanup_locked() call. A concurrent teardown
-+	 * of that interface (NL802154_CMD_DEL_INTERFACE ->
-+	 * ieee802154_if_remove(), or a full PHY removal via
-+	 * ieee802154_unregister_hw()) can unregister the netdev; the actual
-+	 * free then runs asynchronously from netdev_run_todo() with the rtnl
-+	 * already dropped, so neither holding the rtnl nor the per-PHY
-+	 * IEEE802154_IS_SCANNING flag keeps sdata->dev alive here. Pin it with
-+	 * a reference taken while we still hold the RCU read lock (so the
-+	 * netdev cannot be freed before we bump the refcount) and drop it at
-+	 * every exit below. This blocks the teardown's netdev_run_todo() until
-+	 * this worker iteration is done; it cannot self-deadlock because the
-+	 * unregistering task claims the net_todo_list entry under the rtnl, so
-+	 * the blocking netdev_wait_allrefs_any() always runs on that task, not
-+	 * on this single-threaded worker.
-+	 */
-+	dev_hold(sdata->dev);
-+
- 	wpan_phy = scan_req->wpan_phy;
- 	scan_req_type = scan_req->type;
- 	scan_req_duration = scan_req->duration;
-@@ -262,12 +282,14 @@ void mac802154_scan_worker(struct work_struct *work)
- 		"Scan page %u channel %u for %ums\n",
- 		page, channel, jiffies_to_msecs(scan_duration));
- 	queue_delayed_work(local->mac_wq, &local->scan_work, scan_duration);
-+	dev_put(sdata->dev);
- 	return;
- 
- end_scan:
- 	rtnl_lock();
- 	mac802154_scan_cleanup_locked(local, sdata, false);
- 	rtnl_unlock();
-+	dev_put(sdata->dev);
- }
- 
- int mac802154_trigger_scan_locked(struct ieee802154_sub_if_data *sdata,
+You are awesome, thank you!
 -- 
-2.50.1 (Apple Git-155)
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
