@@ -1,320 +1,159 @@
-Return-Path: <netdev+bounces-306690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306691-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Q14VFV9TUWppCQMAu9opvQ
-	(envelope-from <netdev+bounces-306690-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 22:17:35 +0200
+	id P5voF39WUWrtCgMAu9opvQ
+	(envelope-from <netdev+bounces-306691-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 22:30:55 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD48273E0B6
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 22:17:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E186673E54C
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 22:30:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b="c5Ri/o4F";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306690-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306690-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=c127.dev header.s=resend header.b=CsPlirZG;
+	dkim=pass header.d=amazonses.com header.s=224i4yxa5dv7c2xz3womw6peuasteono header.b=eSh+Ajj8;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306691-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306691-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AE7613014C64
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 20:17:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BDBFA30B4391
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 20:26:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C7E384238;
-	Fri, 10 Jul 2026 20:17:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE8E139EF32;
+	Fri, 10 Jul 2026 20:26:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from a9-107.smtp-out.amazonses.com (a9-107.smtp-out.amazonses.com [54.240.9.107])
+	(using TLSv1.2 with cipher AES128-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE75E44998C
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 20:17:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7803A2549;
+	Fri, 10 Jul 2026 20:26:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783714647; cv=none; b=q3reLys1KBj7Rul00SvDt7vlzt0JJfixRmnmi1AgWVrg9fcb/0sehRzAvjhuKV279pfT280ZZ98fBHaUCGJTgSdGhLBXtqFJFc0/dNdbgfwkg3c2NWUMGLjf16Q1FksNAaXnvopEOPu0lfxoWfLV18G4Xd8vERS1/rmKhdrtQuk=
+	t=1783715194; cv=none; b=CYhHBOyevxArrfaDTTK0QB+qMKiZNRJFvTNgcekceqxjwhJTrs1yuUrIa7AhSdpytztT7qTS667eGczM1Bd7gvzxRZUXBYJNgx/51/ypmktKo+8BbW6FwITa5Kg9LICQ428VXO0taQhOS7BQy99jT0E2WhojGpxuK+E9TzW6YG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783714647; c=relaxed/simple;
-	bh=1WJtOKhF6UDkj4WFyAFClNJ8eoY0cFBd6HiAfZMZNOY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iluRv/1XuvyleUOhviw5Gdou+WGSgOoKYk4jjSBn/j1tBnEWGj6ymq9m/j48OYF2RLd+6xrTQnBmAYURry0XE/VEXTFFHFztaFQ8r9K6tMy8pQJD9k5O9ekkslmaYRMB/LK7gbNrc2sDyDLAyzE+NPhic8MIRg39M8Qi2YvzO1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c5Ri/o4F; arc=none smtp.client-ip=209.85.221.52
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-472326ca506so1049790f8f.2
-        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 13:17:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783714643; x=1784319443; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=VPZxlfa4Ktt0t/jyLkjMhd8w3yrqTEInPayeLWsP3ks=;
-        b=c5Ri/o4FyYBo79aQtEls7pO1Okym7osC1zJ7eYOT/eMIQ8eyVArBC7JOf4bq0gurrR
-         9R1JQrd/Pn13H6XPCJMapqQkARNstZeFXD1YMJ+7LtBApWPJ5Zk8526FOO6aafXimk5s
-         amNaVR9+y1Vv7dbB1M8Kl6xHr8OoaDW+5DxTcx09eOd6ARbxY2P6xH9nf/M7btPeOKHs
-         jS3qntl3BlHFne/fVR0oyIiv8cYiuOwb8SojMqL+YOPmii3/dIdPdt+LOFvKxXl/YSb3
-         zLLCcsoaNdMl9OQilRyJW433GE0qrwjb3Z32OtjBpdk9K545Lpn/oddb98owx4c6IhJ0
-         r8Cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783714643; x=1784319443;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=VPZxlfa4Ktt0t/jyLkjMhd8w3yrqTEInPayeLWsP3ks=;
-        b=gViGUmfJAoUwiEx6babwK5ZcXF2vaA4ebPsmWE89mrTMOkDO9H7KD9Vp+qyM1BUaqU
-         i92dcS84yqc9552RBVulQCtHInLCQoSjcC1wGlWhqIcG3bnHnDr6u7679eOJbjODQCf5
-         Cp/RNqxEeu5Dgb/IlTEm1L4ZElsyc5kWpb+vQe/yonxKNWxFO6wFeF8ICXvvIAxtkYB7
-         c7cf/K5Ii1kLEWeq3wixoh9KxAle+MmBXSfXK8Jb8pjJ11ob+btGWYuffA+EOmD3PqK/
-         F0RH6QxMvXC9r3vrhhm5rL9uC579wUxP3z517AfopgLPp/LhFkqKvY7HP2LSxskPG0L1
-         FVEA==
-X-Forwarded-Encrypted: i=1; AHgh+Rp7f74Pe4oIriq+ex+8s0u3YnXtNJfv27J7xWVYH0lvJAsCkqQ/5Dr4ntpxEiTpkQwyHgj/uQ4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4NBt5FDBT5ydVNIOJCEIGSEv0B3IhI1PI8dhPydaLWFoM46Jf
-	tZvrUcwiVG0RS1K+ynU90JY/ZyGZyCEyp4NbI41+o/IpRGFHfOh6tGto
-X-Gm-Gg: AfdE7cm1oWP5qxxjDPS/K61T65f4QhOW5E2ZMQcB8bfkvQos8ERR/rkEu4ftHCXZchy
-	uf4N+V5Av1or4odsLEyPc5Kaar4opfsErAK89iVFJkCuRLtF5Wnr28m0ilNKjE8br+KNM5WCwIc
-	UyBLh31gVpA2PtzMdurmBLJEoT+7UG0KAQxl5Q/bmIyroUK2J4uTOoyHvNRsmfMpojxY1hd5loZ
-	a3Xnd/xYoKt0CooA50QzT8D7Hh8DSOnnaX6Krl8ehVYTtPq1rQZD8bP4dea/oQ436tlXFr5UQ+J
-	nbsqHJ6f3dtR55UCcIZaNgupWWtTGz1BXqzFIXQsfhdgT71MRiN0/ZU1mewxw4lElZZ2R4cT0XK
-	7ie+OyKFji6kq+Eqj2QR5EjhGDepWvQTQ7jyCg3m2URHmaO4xoG9PbwAtvtfuNGPt3epW3lqhSj
-	Vlf0OyYK2U4q2m9JFA4hswx2XrinTYGejLaEjTgkY+SW4+i9TAFYWSAzhNuXtbadzvWaiP7aO3T
-	UKk
-X-Received: by 2002:a05:6000:40dd:b0:476:82f4:4dcc with SMTP id ffacd0b85a97d-47f2dcf42a1mr210963f8f.33.1783714642985;
-        Fri, 10 Jul 2026 13:17:22 -0700 (PDT)
-Received: from localhost.localdomain (host86-153-201-25.range86-153.btcentralplus.com. [86.153.201.25])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9e4d780csm62731555f8f.11.2026.07.10.13.17.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jul 2026 13:17:22 -0700 (PDT)
-Date: Fri, 10 Jul 2026 21:17:20 +0100
-From: Nnamdi Onyeyiri <nnamdio@gmail.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, john.fastabend@gmail.com, 
-	jakub@cloudflare.com, jiayuan.chen@linux.dev, edumazet@google.com, 
-	ncardwell@google.com, kuniyu@google.com, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org
-Subject: Re: [BUG] bpf, sockmap: spurious wakeup by tcp_msg_wait_data()
- causing unexpected EAGAIN in recvfrom()
-Message-ID: <alFRK66z45eDNZA7@localhost.localdomain>
-References: <ak_rR-Skd8Mvn4mH@localhost.localdomain>
- <20260709185526.E4DAB1F000E9@smtp.kernel.org>
+	s=arc-20240116; t=1783715194; c=relaxed/simple;
+	bh=ar5RGU6olEWKtUlD/snRxZGdlh4P/diNblKPURYIg3k=;
+	h=In-Reply-To:From:To:Cc:Subject:Message-ID:Date:MIME-Version:
+	 Content-Type; b=jpvlkezL6zwHLmd1qMm1scZtqmnzDy3sJKtP8SKNajj2DLyWGGk+dsKkVXhLv0WpkgFcD9b67UeaH5z0Suj4errn1bZrh+A6U3S9GFR4xG47uTyyA6W1OqtWxkhGt2J3lNN6a3d52H79aVHHbAuBRxb8XS8i+3r8LHvdZghQ4a8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c127.dev; spf=pass smtp.mailfrom=send.c127.dev; dkim=pass (1024-bit key) header.d=c127.dev header.i=@c127.dev header.b=CsPlirZG; dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b=eSh+Ajj8; arc=none smtp.client-ip=54.240.9.107
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple; s=resend;
+	d=c127.dev; t=1783715192;
+	h=In-Reply-To:From:To:Cc:Subject:Message-ID:Content-Transfer-Encoding:Date:MIME-Version:Content-Type;
+	bh=ar5RGU6olEWKtUlD/snRxZGdlh4P/diNblKPURYIg3k=;
+	b=CsPlirZGQ3zA0COMewEt+wh/pb8M35u/PEadNXFDzQu4E8VaPbDvSKPxJzCKfysz
+	KaKwQI8Cz/jPBTVlDZ47uI4xx5QXKn+Xdgouyy2n/ZXaTF2ZF8lr2y60Q514Pl0uGp8
+	pihZavZb1LFMXV4cJxtsGLmfRHRcXFdhPzZW+IOo=
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=224i4yxa5dv7c2xz3womw6peuasteono; d=amazonses.com; t=1783715192;
+	h=In-Reply-To:From:To:Cc:Subject:Message-ID:Content-Transfer-Encoding:Date:MIME-Version:Content-Type:Feedback-ID;
+	bh=ar5RGU6olEWKtUlD/snRxZGdlh4P/diNblKPURYIg3k=;
+	b=eSh+Ajj8CFVIvtuqI9oBxyp20am10efGnYf7M7lkjxBkqvS7h6g7q+TyFH75tNCS
+	d5qktT55VZpbdwTblWyBftipEe6zKcc0rdtsynZGK+IQu+1QDKU9NnzxeI3vixb6IH1
+	LMy+Vs3GgCdm1E7davvu+pFJSG/k654i9jUbGzSc=
+In-Reply-To: <be5c2567-1b1a-4155-8577-cd9ad50500bf@yahoo.com>
+From: Johan Alvarado <contact@c127.dev>
+To: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+Cc: linusw@kernel.org, alsi@bang-olufsen.dk, andrew@lunn.ch, 
+	olteanv@gmail.com, kuba@kernel.org, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, linux@armlinux.org.uk, 
+	luizluca@gmail.com, maxime.chevallier@bootlin.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 0/2] net: dsa: realtek: rtl8365mb: add
+ SGMII/HSGMII support for RTL8367S
+Message-ID: <0100019f4db5db81-aeb03b7d-b9f4-49c5-af28-b011514e5351-000000@email.amazonses.com>
+Content-Transfer-Encoding: 7bit
+Date: Fri, 10 Jul 2026 20:26:31 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260709185526.E4DAB1F000E9@smtp.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Feedback-ID: :1.us-east-1.z4rHY0qbNtjoW80ZyzVy+DEul17RQEOMT7FC66S60ffkhLWkV35D8ZWXVyxJY1/89bAuLCem4GFJq1VXsxM0u6ZfZbvT1qSjDUeuZG9/Lxk1uINIqi7CenEa93u+fNllqnJMZ0quaBrclhnmtzdFllG4KHSjZOEcaGLa1BWoSpA=:1.us-east-1.epbACCJLarUaEI78XZoGREJ9LamRjxMH5pM2kZb64rA=:AmazonSES
+X-SES-Outgoing: 2026.07.10-54.240.9.107
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[c127.dev:s=resend,amazonses.com:s=224i4yxa5dv7c2xz3womw6peuasteono];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306690-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,cloudflare.com,linux.dev,google.com,davemloft.net,kernel.org,redhat.com];
+	DMARC_NA(0.00)[c127.dev];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS(0.00)[m:namiltd@yahoo.com,m:linusw@kernel.org,m:alsi@bang-olufsen.dk,m:andrew@lunn.ch,m:olteanv@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:luizluca@gmail.com,m:maxime.chevallier@bootlin.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[nnamdio@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_RECIPIENTS(0.00)[m:sashiko-reviews@lists.linux.dev,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:edumazet@google.com,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[contact@c127.dev,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_TO(0.00)[yahoo.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-306691-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[c127.dev:+,amazonses.com:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nnamdio@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[contact@c127.dev,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,bang-olufsen.dk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk,bootlin.com,vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[localhost.localdomain:mid,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,amazonses.com:dkim,email.amazonses.com:mid,c127.dev:from_mime,c127.dev:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DD48273E0B6
+X-Rspamd-Queue-Id: E186673E54C
 
-Hi,
+Hi Mieczyslaw,
 
-The updated patch below addresses the issues raised by sashiko-bot.  The closed
-socket and signal handling code was added to tcp_bpf_recvmsg(), and the fix was
-updated to work for sockets with SO_RCVTIMEO set.
+On 7/10/2026 9:23 AM, Mieczyslaw Nalewaj wrote:
 
-Please let me know if any more changes are required, or if the patch would need
-to be submitted some other way, I'm happy to adjust as necessary.
+[...]
 
-Thanks!
+> I think you should make limiter initiation dependent on whether
+> the port is assigned to CPU. In a loop, check if the port is CPU port
+> and set limiters for it.
+> This way, newly added systems with CPU port 5 or 7 will also work.
 
-----8<----
-From 20a1275aa5ecb927ff049971454b62682356ef0e Mon Sep 17 00:00:00 2001
-From: Nnamdi Onyeyiri <nnamdio@gmail.com>
-Date: Fri, 10 Jul 2026 20:47:36 +0100
-Subject: [PATCH v2 1/1] bpf, sockmap: handle spurious tcp_msg_wait_data()
- wakeup
+I considered this, but I don't think the CPU port is the right
+condition here. Whether the limiter needs raising depends on the
+port's attainable line rate, not on its CPU role: the reset default
+of 0x1FFFF (~1.048 Gbps) only becomes a bottleneck on a port that can
+run faster than that, and in this switch family the only such port is
+the SerDes-backed external interface (physical port 6) in HSGMII
+mode. The other external interfaces are MII/TMII/RMII/RGMII, which
+top out at 1 Gbps, below the reset default - the limiter cannot
+engage there, so a system with its CPU port on port 7 already works
+today without any write.
 
-recvfrom()/recv() are documented as only returning EAGAIN for blocking sockets
-when they have a receive timeout configured.  however, adding a blocking
-ipv4 tcp socket without a receive timeout to a sockmap will cause EAGAIN errors
-sporadically.  a socket with a receive timeout may return EAGAIN before the
-timeout expires.
+A CPU-port condition would also miss the opposite case: if the SerDes
+port were ever used as a non-CPU port (say, a 2.5 Gbps cascade to
+another switch), it would still need the limiters raised, but a loop
+over CPU ports would skip it.
 
-this happens when tcp_msg_wait_data() wakes spuriously (returning 0) in which
-case, if there is no timeout, or the timeout has not yet expired, we loop
-again instead of returning.
+This also matches the vendor driver's behavior: its switch init
+raises the ingress and egress limiters unconditionally, and only for
+the SerDes-capable external interface (physical port 6). It never
+touches the port 7 limiters and never conditions any of this on which
+port faces the CPU. Physical port 5 does not host an external
+interface in this family at all, so there is no system with a CPU
+port there.
 
-Signed-off-by: Nnamdi Onyeyiri <nnamdio@gmail.com>
----
- net/ipv4/tcp_bpf.c | 55 ++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 46 insertions(+), 9 deletions(-)
+On the driver side, every chip in rtl8365mb_chip_infos declares
+SGMII/HSGMII only on external interface 1 / port 6 (the SerDes mux
+only routes there), which is why the series keys the write on
+mb->sds_supported and the fixed SerDes port. That gating also keeps
+the QoS registers of the chips without a usable SerDes
+(RTL8365MB-VC, RTL8367RB-VB) completely untouched, which I would
+rather not change without a functional reason.
 
-diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
-index cc0bd73f36b6..e3109edb9621 100644
---- a/net/ipv4/tcp_bpf.c
-+++ b/net/ipv4/tcp_bpf.c
-@@ -179,7 +179,7 @@ EXPORT_SYMBOL_GPL(tcp_bpf_sendmsg_redir);
- 
- #ifdef CONFIG_BPF_SYSCALL
- static int tcp_msg_wait_data(struct sock *sk, struct sk_psock *psock,
--			     long timeo)
-+			     long *timeo)
- {
- 	DEFINE_WAIT_FUNC(wait, woken_wake_function);
- 	int ret = 0;
-@@ -187,12 +187,12 @@ static int tcp_msg_wait_data(struct sock *sk, struct sk_psock *psock,
- 	if (sk->sk_shutdown & RCV_SHUTDOWN)
- 		return 1;
- 
--	if (!timeo)
-+	if (!(*timeo))
- 		return ret;
- 
- 	add_wait_queue(sk_sleep(sk), &wait);
- 	sk_set_bit(SOCKWQ_ASYNC_WAITDATA, sk);
--	ret = sk_wait_event(sk, &timeo,
-+	ret = sk_wait_event(sk, timeo,
- 			    !list_empty(&psock->ingress_msg) ||
- 			    !skb_queue_empty_lockless(&sk->sk_receive_queue), &wait);
- 	sk_clear_bit(SOCKWQ_ASYNC_WAITDATA, sk);
-@@ -229,6 +229,7 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
- 	int copied_from_self = 0;
- 	int copied = 0;
- 	u32 seq;
-+	long timeo;
- 
- 	if (unlikely(flags & MSG_ERRQUEUE))
- 		return inet_recv_error(sk, msg, len);
-@@ -262,6 +263,8 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
- 		}
- 	}
- 
-+	timeo = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
-+
- msg_bytes_ready:
- 	copied = __sk_msg_recvmsg(sk, psock, msg, len, flags, &copied_from_self);
- 	/* The typical case for EFAULT is the socket was gracefully
-@@ -280,7 +283,6 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
- 	}
- 	seq += copied_from_self;
- 	if (!copied) {
--		long timeo;
- 		int data;
- 
- 		if (sock_flag(sk, SOCK_DONE))
-@@ -299,7 +301,6 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
- 			goto out;
- 		}
- 
--		timeo = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
- 		if (!timeo) {
- 			copied = -EAGAIN;
- 			goto out;
-@@ -310,13 +311,15 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
- 			goto out;
- 		}
- 
--		data = tcp_msg_wait_data(sk, psock, timeo);
-+		data = tcp_msg_wait_data(sk, psock, &timeo);
- 		if (data < 0) {
- 			copied = data;
- 			goto unlock;
- 		}
- 		if (data && !sk_psock_queue_empty(psock))
- 			goto msg_bytes_ready;
-+		if (!data && timeo > 0)
-+			goto msg_bytes_ready;
- 		copied = -EAGAIN;
- 	}
- out:
-@@ -355,6 +358,7 @@ static int tcp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- {
- 	struct sk_psock *psock;
- 	int copied, ret;
-+	long timeo;
- 
- 	if (unlikely(flags & MSG_ERRQUEUE))
- 		return inet_recv_error(sk, msg, len);
-@@ -371,14 +375,45 @@ static int tcp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 		return tcp_recvmsg(sk, msg, len, flags);
- 	}
- 	lock_sock(sk);
-+
-+	timeo = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
-+
- msg_bytes_ready:
- 	copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
- 	if (!copied) {
--		long timeo;
- 		int data;
- 
--		timeo = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
--		data = tcp_msg_wait_data(sk, psock, timeo);
-+		if (sock_flag(sk, SOCK_DONE)) {
-+			ret = 0;
-+			goto unlock;
-+		}
-+
-+		if (sk->sk_err) {
-+			ret = sock_error(sk);
-+			goto unlock;
-+		}
-+
-+		if (sk->sk_shutdown & RCV_SHUTDOWN) {
-+			ret = 0;
-+			goto unlock;
-+		}
-+
-+		if (sk->sk_state == TCP_CLOSE) {
-+			ret = -ENOTCONN;
-+			goto unlock;
-+		}
-+
-+		if (!timeo) {
-+			ret = -EAGAIN;
-+			goto unlock;
-+		}
-+
-+		if (signal_pending(current)) {
-+			ret = sock_intr_errno(timeo);
-+			goto unlock;
-+		}
-+
-+		data = tcp_msg_wait_data(sk, psock, &timeo);
- 		if (data < 0) {
- 			ret = data;
- 			goto unlock;
-@@ -390,6 +425,8 @@ static int tcp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 			sk_psock_put(sk, psock);
- 			return tcp_recvmsg(sk, msg, len, flags);
- 		}
-+		if (!data && timeo > 0)
-+			goto msg_bytes_ready;
- 		copied = -EAGAIN;
- 	}
- 	ret = copied;
--- 
-2.52.0
+If a chip with SGMII/HSGMII on a different port is ever added, it
+will need its own chip_info entry and SerDes bring-up work anyway,
+and support for its rate limiters can be added then.
 
+Regards,
+Johan
 
