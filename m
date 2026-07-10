@@ -1,208 +1,163 @@
-Return-Path: <netdev+bounces-306407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306410-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 94AzHTNSUGrSwgIAu9opvQ
-	(envelope-from <netdev+bounces-306407-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 04:00:19 +0200
+	id VorpN1pXUGorxAIAu9opvQ
+	(envelope-from <netdev+bounces-306410-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 04:22:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2BBD73691A
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 04:00:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9B4C736A2C
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 04:22:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306407-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306407-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306410-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306410-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CF59F3024444
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 02:00:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9444C301F653
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 02:22:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 678DA1DA60D;
-	Fri, 10 Jul 2026 02:00:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25EE523EA94;
+	Fri, 10 Jul 2026 02:22:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A56C24677F
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 02:00:08 +0000 (UTC)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.78.106])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26ECD7E792;
+	Fri, 10 Jul 2026 02:22:07 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783648816; cv=none; b=UQtsBoZ1l3ta51qcucy/KTfDqapDM4VgdEiNKCUJu2pmeeR7noJWVJA4tNBHEnZxzGFiJaQqj8TtrdiivpDe50eOioRcod7bWAW8D1fZ1X69OF8ARX2tti+ZODg1NrHQSUnqyL6VmbF0pgdu4vLckNwLOPc1GBqUQDNw8tAr5wc=
+	t=1783650135; cv=none; b=Gd/yu3VKxcDvA4QALQi6lsOS113FlCFmVap+rK2f4LxCp2e3SE+VAtVsEigqcSigepnKip91W4SxiELzoS4Pa4Np6NHivOZnD1/MTVWw3xMMk54p+xBN+LfNOC0rvAnme1nDhujzydprWu1jXwgbAV/EktW1c+yCzzX3JF6nFZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783648816; c=relaxed/simple;
-	bh=fUSTc5xaHdwxnk4fbuxXBwQvXdAxCvyQwCRGaxDrFVQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JqRgwRJKwpRTbTE9u9QqpMXKn/2XSW+kbTCFhq8ZX0CP9regyxnSVg7sAg+VnO3/QaIE9s/2C6Z/2yPtFisMdvtiP32OZ4gbp0/BR398tEvhrmbT42RjBAKUZKQY7EJNXnZrhVkweYEHzYIVzUSCnuHEH4+RWhpCimbgD6s2bl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.206.16.166
-X-QQ-mid: esmtpgz14t1783648778t787e6e32
-X-QQ-Originating-IP: 1mkDYHdtrvUYj1qebYjWV2JSIRpZHsGZ3a3oFzpjCoc=
-Received: from localhost.localdomain ( [60.188.196.189])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 10 Jul 2026 09:59:37 +0800 (CST)
-X-QQ-SSF: 0001000000000000000000000000000
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 2500668553094967198
-EX-QQ-RecipientCnt: 7
-From: Mengyuan Lou <mengyuanlou@net-swift.com>
-To: netdev@vger.kernel.org
-Cc: jiawenwu@trustnetic.com,
-	duanqiangwen@net-swift.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: [PATCH net-next v7 2/2] net: libwx: add support for set_coalesce in wx_ethtool_ops_vf
-Date: Fri, 10 Jul 2026 09:59:25 +0800
-Message-Id: <20260710015925.34769-3-mengyuanlou@net-swift.com>
-X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20260710015925.34769-1-mengyuanlou@net-swift.com>
-References: <20260710015925.34769-1-mengyuanlou@net-swift.com>
+	s=arc-20240116; t=1783650135; c=relaxed/simple;
+	bh=vDmmFMtTx0g6s6h5HhJRmiH/58fftU5/U/sMtTERGOo=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=DrD8LEv5RSfMVX2BPziiS7Fy51ajE8xXm5JPCdgLM8EaBwzbrSdhNO+A7dNB/NNtCAFR592uQy5JPwrNN68dKN7TpPlTPefbv9DQAJHfXppJMuXM+5YsJmlDUmLxTfFBHU0pAFDvT4wEVS3QaRUj92Mqq78f2yzIPaMTutkmCK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=13.76.78.106
+Received: from zju.edu.cn (unknown [10.97.40.56])
+	by mtasvr (Coremail) with SMTP id _____wDX9RRKV1BqSewuAA--.35S3;
+	Fri, 10 Jul 2026 10:22:03 +0800 (CST)
+Received: from smtpclient.apple (unknown [10.97.40.56])
+	by mail-app3 (Coremail) with SMTP id zS_KCgBXb3FJV1BqVVoGAw--.13159S2;
+	Fri, 10 Jul 2026 10:22:02 +0800 (CST)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:net-swift.com:qybglogicsvrgz:qybglogicsvrgz5b-1
-X-QQ-XMAILINFO: MC9rDRZtSAjcWEsQXDxisAlmeU9ZseuAFD2gT1Rc/IL6h6lFwzxE/PEh
-	lV4cDi3l04O22y11mxabXoh4fnWqWA2ul1hTi9I6+Ja5W9NQODz3N43ctBog53c6YRfOnyX
-	3NPnd5kFsbg+6XmsUP6edydO1D2KMT1HNcXux5Iqlejs8ff90mu469NGEUNTJy2OdtMwIur
-	04qDSbMKvBpGelBfGxX3u96geuB3piWhaMPF82arbF1WPpnac8tyAq3iYM9zyd4wUQIjxdW
-	M2uqfKl/QpodRi+1ekRVt/me+9pLVA3KqLFWt+2Mt+T2ADkJU8STk9juAM2mSkovqQdU54W
-	NQiAgovMbRQfTvFF09OWCgsrCkLe3zkDSO8UUS3fYrkn5RfHBGzkUp2j5ra+LCx0X7TO6xb
-	9KGs26YKP8loGTE0zp54smJUD05hwadUcutPTLdSFRNSn97DdsNrJ2qR63VXpuG6pnMMb+8
-	JIWwcokJYUAU+aZjlfgFz5dqNc4vJnI+M/1ZjxUp7phqFjELgWCPjs04ffqJ8n+t39aUtvW
-	/1hn0ihrF2rrU/R6mlouq0BxbX7lBLmpwFW7wucc4V9RVr6rrAIcHzVjrNueT/z18oTaXWd
-	e+eoZZqB/pJ8dbZP0V8yH6ksHltaSXCxGgW/lmEL7N2mCiPJ6o5lSYuLvY2JRa7e+vTb7gR
-	bheFdf41LqwrtyxSB184OAzjslDrPNvpcA0gbj9TiwEfruQE+bw7tcXJGT+aLSWd6FBZZRE
-	UnkimGIIOLZCDAOjLHSlvi1p44qUkKZRSfhNPYMGLTzTJOCsnl1HlHTyxQlHvphXB4H4hp7
-	M52xaZ0RZHqmaZ5XRVmavRqxHd8tQ0jhTzcl3kWWvjDCT2GGI8JS0ykNdGkESBPYQ5Th1Dq
-	+9aP34vJHSH5Wu+eWpZkIPK5ICHfP3C4R7u71E1z56TTYfn9TAVMb0ynYXXrSoYbN9M+6Mn
-	6bVfd1F78cQVGnZo63eja/gyKhitDLGRqREtxUBS5Vyph5jN7snSZALcdXHuvRiSwbepGQT
-	mYyKFD2XyiQN9dlHjS3sZioBoyMUqheCQbz9ISY64EmwTJugJ1NDDA5KAWLqygK9uYSwUAC
-	mB4qtvf/Sd6fzhEnlMxdETDBscp8UZppxwXSMPqWwV2L7+WmxXuGLk=
-X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
-X-QQ-RECHKSPAM: 0
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.600.62\))
+Subject: Re: [PATCH] wifi: brcmfmac: drain bus_reset work on device removal
+From: Fan Wu <12321260@zju.edu.cn>
+In-Reply-To: <20260710002451.500112-1-eddiephillips@google.com>
+Date: Fri, 10 Jul 2026 10:21:51 +0800
+Cc: Fan Wu <fanwu01@zju.edu.cn>,
+ Arend van Spriel <aspriel@gmail.com>,
+ Kalle Valo <kvalo@kernel.org>,
+ Franky Lin <franky.lin@broadcom.com>,
+ Hante Meuleman <hante.meuleman@broadcom.com>,
+ Chi-Hsien Lin <chi-hsien.lin@infineon.com>,
+ Wright Feng <wright.feng@infineon.com>,
+ Chung-Hsien Hsu <chung-hsien.hsu@infineon.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>,
+ linux-wireless@vger.kernel.org,
+ brcm80211-dev-list.pdl@broadcom.com,
+ SHA-cyfmac-dev-list@infineon.com,
+ netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <47D1D7A8-65F4-4EBE-ABD8-5CDBA5A5CDAC@zju.edu.cn>
+References: <20260709101635.103005-1-fanwu01@zju.edu.cn>
+ <20260710002451.500112-1-eddiephillips@google.com>
+To: Eddie Phillips <eddiephillips@google.com>
+X-Mailer: Apple Mail (2.3774.600.62)
+X-CM-TRANSID:zS_KCgBXb3FJV1BqVVoGAw--.13159S2
+X-CM-SenderInfo: qrstjiaswqq6lmxovvfxof0/
+X-CM-DELIVERINFO: =?B?gXApPgXKKxbFmtjJiESix3B1w3vZ3A9ovKVTomAyoQazvoRs/NHSP8GI2EvgeEEW7R
+	sfnZPoDCNGYdHSfuFmYJL54WM8Dms9pSd1duk7P2JRh5+sy7aOgo1D8mBVqMLc1ZNCvnaO
+	PAtn46iPjtACMN8bHkqp9E6mavGmQbzmcFsnzP86
+X-Coremail-Antispam: 1Uk129KBj93XoW7uFyfZrWxuF1DGFyfGryUArc_yoW8GrWUpr
+	W3JrW5tF4qqa45KF4DZF12qa40gryS9FWDJr18Gry5tr98Jr12grW2yFyjgFWUurs5Aaya
+	vr43uw45Zan09agCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUP0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AK
+	xVW0oVCq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc804V
+	CY07AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AK
+	xVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48Icx
+	kI7VAKI48JM4x0Y48IcxkI7VAKI48G6xCjnVAKz4kxM4IIrI8v6xkF7I0E8cxan2IY04v7
+	MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr
+	0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0E
+	wIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JV
+	WxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAI
+	cVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8ructUUUUU==
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306407-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[net-swift.com];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:jiawenwu@trustnetic.com,m:duanqiangwen@net-swift.com,m:horms@kernel.org,m:kuba@kernel.org,m:pabeni@redhat.com,m:mengyuanlou@net-swift.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[mengyuanlou@net-swift.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[zju.edu.cn,gmail.com,kernel.org,broadcom.com,infineon.com,davemloft.net,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306410-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[zju.edu.cn];
+	FORGED_RECIPIENTS(0.00)[m:fanwu01@zju.edu.cn,m:aspriel@gmail.com,m:kvalo@kernel.org,m:franky.lin@broadcom.com,m:hante.meuleman@broadcom.com,m:chi-hsien.lin@infineon.com,m:wright.feng@infineon.com,m:chung-hsien.hsu@infineon.com,m:davem@davemloft.net,m:kuba@kernel.org,m:linux-wireless@vger.kernel.org,m:brcm80211-dev-list.pdl@broadcom.com,m:SHA-cyfmac-dev-list@infineon.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:eddiephillips@google.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[12321260@zju.edu.cn,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mengyuanlou@net-swift.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	R_DKIM_NA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[12321260@zju.edu.cn,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	APPLE_MAILER_COMMON(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,zju.edu.cn:mid,zju.edu.cn:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C2BBD73691A
+X-Rspamd-Queue-Id: E9B4C736A2C
 
-Add support for set_coalesce in wx_ethtool_ops_vf, which
-is used to set interrupt coalescing parameters.
+On Thu, Jul 09, 2026 at 05:23:37PM -0700, Eddie Phillips wrote:
+> Is this safe in a softIRQ context?
+> mutex_lock() sleeps until it can get the lock.
 
-Update wx_write_eitr_vf() to use the same interrupt
-moderation encoding as PF devices, since PF and VF share
-the same register layout. And remove the now-unused
-WX_VXITR_MASK definition.
+Thanks for taking a look. I agree this is not the right interface shape.
 
-Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
----
- drivers/net/ethernet/wangxun/libwx/wx_ethtool.c |  7 ++++++-
- drivers/net/ethernet/wangxun/libwx/wx_vf.h      |  1 -
- drivers/net/ethernet/wangxun/libwx/wx_vf_lib.c  | 13 ++++++++++++-
- 3 files changed, 18 insertions(+), 3 deletions(-)
+The current call sites I traced reach brcmf_fw_crashed() from the PCIe
+threaded IRQ path or from SDIO workqueue context, but brcmf_fw_crashed()
+is a core helper and the reset scheduling path should not grow a hidden
+sleepable-context requirement. I will respin this part so the arming gate
+does not use a mutex.
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-index eae038df6875..22037f015ded 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-@@ -10,6 +10,7 @@
- #include "wx_hw.h"
- #include "wx_lib.h"
- #include "wx_vf_common.h"
-+#include "wx_vf_lib.h"
- 
- struct wx_stats {
- 	char stat_string[ETH_GSTRING_LEN];
-@@ -488,7 +489,10 @@ int wx_set_coalesce(struct net_device *netdev,
- 		else
- 			/* rx only or mixed */
- 			q_vector->itr = rx_itr_param;
--		wx_write_eitr(q_vector);
-+		if (wx->pdev->is_virtfn)
-+			wx_write_eitr_vf(q_vector);
-+		else
-+			wx_write_eitr(q_vector);
- 	}
- 
- 	wx_update_rsc(wx);
-@@ -845,6 +849,7 @@ static const struct ethtool_ops wx_ethtool_ops_vf = {
- 	.set_ringparam		= wx_set_ringparam_vf,
- 	.get_msglevel		= wx_get_msglevel,
- 	.get_coalesce		= wx_get_coalesce,
-+	.set_coalesce		= wx_set_coalesce,
- 	.get_ts_info		= ethtool_op_get_ts_info,
- 	.get_link_ksettings	= wx_get_link_ksettings_vf,
- };
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf.h b/drivers/net/ethernet/wangxun/libwx/wx_vf.h
-index eb6ca3fe4e97..b64a4de089f2 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_vf.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_vf.h
-@@ -41,7 +41,6 @@
- #define WX_VF_MAX_RX_QUEUES      4
- 
- #define WX_VXITR(i)              (0x200 + (4 * (i))) /* i=[0,1] */
--#define WX_VXITR_MASK            GENMASK(8, 0)
- #define WX_VXITR_CNT_WDIS        BIT(31)
- #define WX_VXIVAR_MISC           0x260
- #define WX_VXIVAR(i)             (0x240 + (4 * (i))) /* i=[0,3] */
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_vf_lib.c
-index aa8be036956c..7325b475ee10 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_vf_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_vf_lib.c
-@@ -16,7 +16,18 @@ void wx_write_eitr_vf(struct wx_q_vector *q_vector)
- 	int v_idx = q_vector->v_idx;
- 	u32 itr_reg;
- 
--	itr_reg = q_vector->itr & WX_VXITR_MASK;
-+	switch (wx->mac.type) {
-+	case wx_mac_sp:
-+		itr_reg = q_vector->itr & WX_SP_MAX_EITR;
-+		break;
-+	case wx_mac_aml:
-+	case wx_mac_aml40:
-+		itr_reg = (q_vector->itr >> 3) & WX_AML_MAX_EITR;
-+		break;
-+	default:
-+		itr_reg = q_vector->itr & WX_EM_MAX_EITR;
-+		break;
-+	}
- 
- 	/* set the WDIS bit to not clear the timer bits and cause an
- 	 * immediate assertion of the interrupt
--- 
-2.30.1
+> How about if brcmf_pcie_remove() calls brcmf_bus_cancel_reset_work(),
+> takes the lock and calls cancel_work_sync(), sleeps. If debugfs
+> path is already running, it can invoke the worker thread. Is there
+> potential that both try to reset?
+
+Yes, that is a real issue with this version. The lock only serializes
+scheduling against the cancel point. If the reset work has already started,
+cancel_work_sync() waits for it, but the worker may already be executing the
+bus reset teardown path; remove can then continue and run its own teardown
+afterwards.
+
+So the patch needs a stronger state/ownership model than just
+schedule-vs-cancel serialization. I will rework it so reset and remove cannot
+both own the same teardown sequence, and will send a v2 after auditing the
+PCIe/SDIO/USB paths again.
+
+Thanks,
+Fan
 
 
