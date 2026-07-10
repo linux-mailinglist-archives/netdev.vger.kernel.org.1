@@ -1,359 +1,138 @@
-Return-Path: <netdev+bounces-306593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306594-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id smBCIhUCUWqB9wIAu9opvQ
-	(envelope-from <netdev+bounces-306593-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:30:45 +0200
+	id irkTMAUEUWrr9wIAu9opvQ
+	(envelope-from <netdev+bounces-306594-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:39:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F07A473BC0C
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:30:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1012173BCFB
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:39:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=broadcom.com header.s=google header.b="ffqC7E/X";
-	dmarc=pass (policy=reject) header.from=broadcom.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306593-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306593-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=UvvorHlY;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306594-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306594-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DE2C7301CFD7
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:26:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2C732303850C
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDA1D349CC2;
-	Fri, 10 Jul 2026 14:26:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8D7134D385;
+	Fri, 10 Jul 2026 14:30:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f228.google.com (mail-pg1-f228.google.com [209.85.215.228])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC102BF002
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 14:26:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB7EE349CE2;
+	Fri, 10 Jul 2026 14:30:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783693566; cv=none; b=qWTG8wBqbf5dTlS+ZKgIQ4tAYC6QOpv5b20mQ1DdxoCuVuUFQi8k/fSAzfp6sbDpIvRF6FlA5G1YIDYRET3VsuenrWsFiYwlOllL+9e388GRFnl5UApw5xrCPZ3s+gyVwPcaevIPO19vqv+uLOjSxsgXKitnGpaZcNg4MsVfuos=
+	t=1783693829; cv=none; b=h/IH8pqGoj8nkoVunsAf/BJaguD1Bb0jtK6Bi9pHBSaSv2vdZTyrYEokXXCDlwuj5trTowmi27DapU6OPt+7lNFGlUFmHRQj3ble+XHJ3A9pGlPg5H0AryeO4zm9cf94usZ6G9qJyQFhFLghWRX25jxMHUZaxU04wF8nUqQxQG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783693566; c=relaxed/simple;
-	bh=KyELAkWaawWQzaxEH8sUNLh294u5+HG+8ad9RqF2IDU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N3jNYQ3AnpN9vVPmiLbzLPb0Y/NZfrflhQuNRIek5cezcpQPiirSX7x7attoQWCcV9jaSXfmabRR6Flb4rhNoxZWbICUFLnCgoqHjmL2Z1nPLjWdDYnPgEFkMDNEJPKDywuL9cIUMDcZTjWQsHJBGOtyG0UV79eo4mC/D298gkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ffqC7E/X; arc=none smtp.client-ip=209.85.215.228
-Received: by mail-pg1-f228.google.com with SMTP id 41be03b00d2f7-c9ef3e1337fso651100a12.2
-        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 07:26:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783693565; x=1784298365;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:dkim-signature:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=gAiJsojsZ5KqYx05E10iKE8LVQLc9mFvRyvWtAYwrwU=;
-        b=sp8GOqwErKB4v8d3m2mmmF0DIN8gZ/83GtsGm3pLY2Co+ggwiIgN3Z2MxpO+DEym4B
-         xlaMDyD/PeG3FjvriSvNWQNmN5/B6+X44kQOrSNtmtAS5r3y6bLWs5S6O5X6+ITKN7Mh
-         tbY+THkAG5CA1RSmEW4sw7IlSoFvb0mlFV2b94TAGQ4R+0Fki2RdceujMlqI25rFZ5zC
-         jK9VnYtsc0AMTBuVHZWyTJssFNzXmCX4NCxOOfevLReneqwDdtUubIClh0ZYEYEg37sV
-         KEF8HKV6m4zw8kukKp1y+pOts2VhYYMOx8YEXdyYNxQqUTOr3WNIkVHjUhgrfPOtrsvs
-         wj2Q==
-X-Gm-Message-State: AOJu0Yzmdg4oWmACENRVyLKYCBxZXSeqg8xnskgDavJGzLjfnFiAHjIW
-	92iBUrE+fNuNfLdrFcE/pfUrPCAPw0FFlWSBajLNoBdSxGQr1KnleeJKY9itVWxOp+GZf1/ZEsu
-	sGKq14t4vLakvi6vufEkNPTW+sFcI5BcVcIcH8vn1DYp2wAeAIrGbLPHVFlArRjbiuFW5WQZCLL
-	auCMDGCdlNskbW+ojSQmOgOffGwgn6uBYEjsp52RoeM4en69PKtwSctTnS6rlVG/+hj8eGNX/yl
-	C3WLNdZLA==
-X-Gm-Gg: AfdE7ckIgfMJggWCWkE6cu+Nm8g7fj3baM29LsgvNlSnITsLSfViF0O82Q5aB61O+LJ
-	f/7Iwk3KPlp/vZo1EEeGYrXFuNigp4vFJ9U033+8eksB2wzbj5WC5yk/aOKaaw3E2Fn96ZXuRQ7
-	H673BIGPfEOMzIrjs+/Hm7x81IQIZOooj/tNotyAVpLyFFrbrTdFk2qydrHWf/ASFanFa7a5OFB
-	5OLPUVqbPBYTmun7pb/m4czUyb760i6XgISJKSitppQuM9vBbuhY1Al5MuTSYcHSzI0OJ+/gabA
-	N4RmoqVdBPJNnCCWE7mAY4mXaPvD1VnWvw1fGGs7ilaO/FHKuR+lmu3mpW2WbQx90MPDOpf4CHX
-	0h8yw5hJmPRLm/YsZIRLJDBsTe6c43CeOLPG0RI0omrF6s59FCmGk4J9zjEMceIj0CHg+2kT2a+
-	6oGbT/8KJ5YgybFTQs5SFJa8veqm3weVvWbVxsJNmU8jye
-X-Received: by 2002:a05:6a20:6a21:b0:3c0:9c1a:8939 with SMTP id adf61e73a8af0-3c0bccbae8emr13870101637.65.1783693564638;
-        Fri, 10 Jul 2026 07:26:04 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-11.dlp.protect.broadcom.com. [144.49.247.11])
-        by smtp-relay.gmail.com with ESMTPS id a92af1059eb24-13b659a054fsm239396c88.4.2026.07.10.07.26.04
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 10 Jul 2026 07:26:04 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-9692ca167ddso97912241.2
-        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 07:26:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1783693563; x=1784298363; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=gAiJsojsZ5KqYx05E10iKE8LVQLc9mFvRyvWtAYwrwU=;
-        b=ffqC7E/XNRyMZA/TsfaXXzYnShZxw5SI03Kks6ao/NLTYhHPi85Vw8nQodLwmJbr9x
-         LFk0irVgofjMSdephNg/BLkmQkMPy08QsPDumM5xV7Xk9czKBGl6JXJpdK022KX66m2Q
-         eIn4eiGFDqjKQA2cn6A8/i1wT0Yg6fyUZ9aJA=
-X-Received: by 2002:a05:6122:a0d:b0:573:a779:62cf with SMTP id 71dfb90a1353d-5bf75dca679mr6764614e0c.7.1783693563212;
-        Fri, 10 Jul 2026 07:26:03 -0700 (PDT)
-X-Received: by 2002:a05:6122:a0d:b0:573:a779:62cf with SMTP id
- 71dfb90a1353d-5bf75dca679mr6764590e0c.7.1783693562753; Fri, 10 Jul 2026
- 07:26:02 -0700 (PDT)
+	s=arc-20240116; t=1783693829; c=relaxed/simple;
+	bh=Y2Qk60/aBHEqmikQ8DRFc6QOS+mAIxRRTuaylW09lJE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qsEn+gLlVMZogUMnu/aP0HbxX7nEb2ETjuqjqShvyMaBIWHMmjsbrO3rja4beqi4e45wXX0Co5XjTUuq/ULGLKQMX6a2im7raIluk8eIqiICy5N8lbouj+SlEEQr9T+hGxTP1QscXkBuIFA8q88yTvbhpCjg+FThDpdM1xvlyt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UvvorHlY; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A0A81F000E9;
+	Fri, 10 Jul 2026 14:30:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783693828;
+	bh=4decS/j5Z05u+cHo9JLWnSsA42kMyfwxEZmjd8WNFNU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=UvvorHlYTocPstFEzsTrz5XF4J8+PGPJQ6srmagQ/TmoNkdCR5aYWTm1cezEqT70m
+	 tGXxz8sR+EtAG+AL9AdRY8ppAOh0SP/Xa9KQfmE1CiX8uea53VY4HDDzZM+r8E7DLg
+	 tDGWu5m4VxJ0uc63G/a7KcbdQtxgtnCnnxoU1JBbUzSxxung103lJb58c9PAoD7sGf
+	 xLbx4AjwJ9ZXteqKoJeFd+glADl5VT6aPhCrx8m8uoEVKtF4uQIwaq7A+evUMw9Nhz
+	 Oly/7K2bg/n8ivayzCK13+r/v1dM0CSt6cEKeUTMyBcpPecc3Zl1AAxDNlI9tRHFRP
+	 mv+5uygHoevYQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9391F3924F97;
+	Fri, 10 Jul 2026 14:30:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260704164747.1995227-1-vikas.gupta@broadcom.com> <c108a5ec-8740-431e-849d-581c136f404d@intel.com>
-In-Reply-To: <c108a5ec-8740-431e-849d-581c136f404d@intel.com>
-From: Vikas Gupta <vikas.gupta@broadcom.com>
-Date: Fri, 10 Jul 2026 19:55:50 +0530
-X-Gm-Features: AUfX_mwNTLFcnkINKbEqmfaK4Ay9J6MZJv-HX2NQIXA9unvHfUpLztD5FNK5SII
-Message-ID: <CAHLZf_tTVipQZ_MX-gud5GhqHE7KDV=44N=17mZgsrWoJfa_Gw@mail.gmail.com>
-Subject: Re: [PATCH net v2] bnge/bng_re: fix ring ID widths
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, leonro@nvidia.com, jgg@nvidia.com, 
-	bhargava.marreddy@broadcom.com, rahul-rg.gupta@broadcom.com, 
-	vsrama-krishna.nemani@broadcom.com, rajashekar.hudumula@broadcom.com, 
-	ajit.khaparde@broadcom.com, Siva Reddy Kallam <siva.kallam@broadcom.com>, 
-	Dharmender Garg <dharmender.garg@broadcom.com>, 
-	Yendapally Reddy Dhananjaya Reddy <yendapally.reddy@broadcom.com>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000003ea38c06564285ce"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net/iucv: take a reference on the socket found in
+ afiucv_hs_rcv()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178369380615.710487.10375995602211210819.git-patchwork-notify@kernel.org>
+Date: Fri, 10 Jul 2026 14:30:06 +0000
+References: <20260705-b4-disp-fc79c0dc-v1-1-d2cdcb57afa9@proton.me>
+In-Reply-To: <20260705-b4-disp-fc79c0dc-v1-1-d2cdcb57afa9@proton.me>
+To: Bryam Vargas <hexlabsecurity@proton.me>
+Cc: pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+ davem@davemloft.net, twinkler@linux.ibm.com, wintera@linux.ibm.com,
+ nagamani@linux.ibm.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-9.76 / 15.00];
-	WHITELIST_DMARC(-7.00)[broadcom.com:D:+];
-	SIGNED_SMIME(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306593-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[vikas.gupta@broadcom.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306594-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:przemyslaw.kitszel@intel.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:leonro@nvidia.com,m:jgg@nvidia.com,m:bhargava.marreddy@broadcom.com,m:rahul-rg.gupta@broadcom.com,m:vsrama-krishna.nemani@broadcom.com,m:rajashekar.hudumula@broadcom.com,m:ajit.khaparde@broadcom.com,m:siva.kallam@broadcom.com,m:dharmender.garg@broadcom.com,m:yendapally.reddy@broadcom.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS(0.00)[m:hexlabsecurity@proton.me,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:twinkler@linux.ibm.com,m:wintera@linux.ibm.com,m:nagamani@linux.ibm.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-s390@vger.kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vikas.gupta@broadcom.com,netdev@vger.kernel.org];
-	HAS_ATTACHMENT(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,mail.gmail.com:mid,vger.kernel.org:from_smtp]
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F07A473BC0C
+X-Rspamd-Queue-Id: 1012173BCFB
 
---0000000000003ea38c06564285ce
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hello:
 
-On Fri, Jul 10, 2026 at 3:36=E2=80=AFPM Przemek Kitszel
-<przemyslaw.kitszel@intel.com> wrote:
->
-> On 7/4/26 18:47, Vikas Gupta wrote:
-> > Firmware requires more than 16 bits to address TX ring IDs for its
-> > internal QP management. Widen the associated HSI ring ID fields to
-> > 32 bits. The values firmware assigns remain within 24 bits, bounded
-> > by the hardware doorbell XID field.
-> >
-> > RX, completion, and NQ ring IDs are unaffected and remain 16-bit.
->
-> Here you mention Rx is unaffected. But you touch multiple places that
-> are Rx specific (some comments below).
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-The fw_ring_id field belongs to bnge_ring_struct, a common struct
-shared by all ring types. Widening it to u32 applies uniformly across
-TX, RX, CP, and NQ rings at the struct level.
-I believe the commit message is incomplete but the intent was that
-firmware assigns values within 16-bit range for all ring types
-except TX, which requires the wider field.
-Please let me know if this clarifies.
-
->
-> [..]
->
-> > --- a/drivers/net/ethernet/broadcom/bnge/bnge.h
-> > +++ b/drivers/net/ethernet/broadcom/bnge/bnge.h
-> > @@ -36,6 +36,7 @@ struct bnge_pf_info {
-> >   };
-> >
-> >   #define INVALID_HW_RING_ID      ((u16)-1)
-> > +#define INVALID_HW_RING_ID_32BIT     (U32_MAX)
->
-> OK, there is much more usage of INVALID_HW_RING_ID than places touched
-> by this patch.
-
-INVALID_HW_RING_ID applies to 16-bit fields such as those in
-bnge_ring_grp_info (rx_fw_ring_id, agg_fw_ring_id, nq_fw_ring_id)
-and vnic fields.
-INVALID_HW_RING_ID_32BIT applies to ring_struct.fw_ring_id (u32),  all
-instances of which are updated in this patch.
-
-Thanks,
-Vikas
->
+On Sun, 05 Jul 2026 22:24:36 -0500 you wrote:
+> From: Bryam Vargas <hexlabsecurity@proton.me>
+> 
+> afiucv_hs_rcv() looks up the destination socket under iucv_sk_list.lock,
+> drops the lock, and then passes the socket to the afiucv_hs_callback_*()
+> handlers without holding a reference. AF_IUCV sockets are not
+> RCU-protected and are freed synchronously by iucv_sock_kill() ->
+> sock_put(), so a concurrent close can free the socket in the window
+> between read_unlock() and the handler, which then dereferences freed
+> memory (for example sk->sk_data_ready() in afiucv_hs_callback_syn()).
+> 
 > [...]
->
-> > +++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-> > @@ -1327,12 +1327,12 @@ static int bnge_alloc_core(struct bnge_net *bn)
-> >       return rc;
-> >   }
-> >
-> > -u16 bnge_cp_ring_for_rx(struct bnge_rx_ring_info *rxr)
-> > +u32 bnge_cp_ring_for_rx(struct bnge_rx_ring_info *rxr)
->
-> and here you change Rx ring ID width.
->
-> >   {
-> >       return rxr->rx_cpr->ring_struct.fw_ring_id;
-> >   }
-> >
-> > -u16 bnge_cp_ring_for_tx(struct bnge_tx_ring_info *txr)
-> > +u32 bnge_cp_ring_for_tx(struct bnge_tx_ring_info *txr)
-> >   {
-> >       return txr->tx_cpr->ring_struct.fw_ring_id;
-> >   }
-> > @@ -1375,12 +1375,12 @@ static void bnge_init_nq_tree(struct bnge_net *=
-bn)
-> >               struct bnge_nq_ring_info *nqr =3D &bn->bnapi[i]->nq_ring;
-> >               struct bnge_ring_struct *ring =3D &nqr->ring_struct;
-> >
-> > -             ring->fw_ring_id =3D INVALID_HW_RING_ID;
-> > +             ring->fw_ring_id =3D INVALID_HW_RING_ID_32BIT;
-> >               for (j =3D 0; j < nqr->cp_ring_count; j++) {
-> >                       struct bnge_cp_ring_info *cpr =3D &nqr->cp_ring_a=
-rr[j];
-> >
-> >                       ring =3D &cpr->ring_struct;
-> > -                     ring->fw_ring_id =3D INVALID_HW_RING_ID;
-> > +                     ring->fw_ring_id =3D INVALID_HW_RING_ID_32BIT;
-> >               }
-> >       }
-> >   }
-> > @@ -1637,7 +1637,7 @@ static void bnge_init_one_rx_ring_rxbd(struct bng=
-e_net *bn,
->
-> ditto Rx
->
-> >
-> >       ring =3D &rxr->rx_ring_struct;
-> >       bnge_init_rxbd_pages(ring, type);
-> > -     ring->fw_ring_id =3D INVALID_HW_RING_ID;
-> > +     ring->fw_ring_id =3D INVALID_HW_RING_ID_32BIT;
-> >   }
-> >
-> >   static void bnge_init_one_agg_ring_rxbd(struct bnge_net *bn,
-> > @@ -1647,7 +1647,7 @@ static void bnge_init_one_agg_ring_rxbd(struct bn=
-ge_net *bn,
->
-> ditto Rx, and in some other places too
 
---0000000000003ea38c06564285ce
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Here is the summary with links:
+  - [net] net/iucv: take a reference on the socket found in afiucv_hs_rcv()
+    https://git.kernel.org/netdev/net/c/4fa349156043
 
-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
-ZKzsTDzWEhPsCM5DcbMg/B7eD9n+rBWHxsk+yKJKdkLpkpTKdxxTd1Y5Ln+k5KCTjxlCUQQ7Q2Zz
-qYU8bfRq5ZMwUVJD3NZCqEKbEIgSX2vXFS61zdPwnLyHyaC/erAWmgHLu4kzpk/V10NcnUjX9FYK
-f/Ggi9MeMNG20gEIUbCg3RgYf89YLXUJDOuoz/Yajw/VuiVlwS81wF44DmJhAVcGzrI00uydpksG
-oQY2qVlhYsvNTqU2V/uaBrKQnyM0PkU140cCAwEAAaOCAdwwggHYMA4GA1UdDwEB/wQEAwIFoDAM
-BgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3NlY3Vy
-ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEFBQcw
-AYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1UdIARe
-MFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIBFiZo
-dHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAyhjBo
-dHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwIwYDVR0RBBww
-GoEYdmlrYXMuZ3VwdGFAYnJvYWRjb20uY29tMBMGA1UdJQQMMAoGCCsGAQUFBwMEMB8GA1UdIwQY
-MBaAFAApNp5ceroPry1QLdugI4UYsKCSMB0GA1UdDgQWBBQI6pBWVwIN47wGrC1m7lYfqN94QjAN
-BgkqhkiG9w0BAQsFAAOCAgEAOdSnSEyuTvTtsnmEilB0JfgRKx1MM7kNdv0pfWcINJhssfHD8Fc5
-wm+JzenYR9yJAkntX0Lr9yv+OG0Jqhvy7u9gKljfI4jXO4qxZ2jf1YvI+fDK29/NV3JAQuipT3Vs
-IxBI73CQO11VwMePOTsUNM1s+9cWT5zLuqOEEu+95jRo5KEtH1/4nahrToLU1Y+flylsBaAUhB72
-KoBBzdewa+psa32lY8X23AWDoczIlUBmPt0hmApBvHOUCYszSiBu4/VhVDuq2iMBtnYAj2j9Q7Ct
-pZHPj6fQv247S9dTDDym05r8arHAsUw7B29KvPfxeaqexL4gwQQjIsfdZeh88XYLXA+mvEej6OlO
-YO3546G7bczFxIjO6V9RrvYEeAb+n7udXYymuIm02XtxIkr/Uk0gRuFoOpG2Dw1OH8xsOUER1+16
-qGb2QKMgaKL/IIM3gXAuCxNVBOT+Fj/wh5hw7MFvTTXPFA8IKusoHZYpxdrr9xjoJ/wt6j4/E6K4
-IO/WuSc4nM6kshiwIu5c6r97213ZtJFOrjoITiBIYFP0WQsTsEbWvaBX/7daT5IVr9rvCOCk2JA8
-bOWwP4OYXCKJY5nZOntb0ECSI7RM0kGelGY4MAD42+OBWHxKU1Qvt5WK4kIXdKpdFp9Drv17PyCU
-dR4AvAJyWnkqZyi5QuRg/hMxggJXMIICUwIBATBiMFIxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBH
-bG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWduIEdDQyBSNiBTTUlNRSBDQSAyMDIz
-Agxt8eaxmNwH4eu5pUowDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEICi+yNART8yp
-TdOZUQNVb/YYtxwtrqjwE+33n5Np3rJIMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZI
-hvcNAQkFMQ8XDTI2MDcxMDE0MjYwM1owXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJ
-YIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUD
-BAIBMA0GCSqGSIb3DQEBAQUABIIBABcC18GABmVC4LMhbCYwTYcszNgeKyEP26rCyc0fcdob3pHr
-ixpj35F24AO+m8IJUVKLpDICHTyUAYqaxQh/+rnZKqDOWVhd7+Nc2UW+VwdmXogsy+pNe5vLhNc9
-L0BrzA1KgY5DTO7oNBcvBHAnr0obXxwSJemyg/W5uAz7bQ37UCrqeaogdwijPLdwcsH4CAs8JaSl
-lHgK123YngsaWbPWgaOzFyW+e7v0WWlcVrj7vT5NNzqlhHBRI1naP16A302s1ko6wjJ3oVqX67xB
-ibIrZNgjVvq4/Lb/2phJQQgh238wHVLQvVhbSU/p4u1Er9XXov0F0Katu9aGte5WEo4=
---0000000000003ea38c06564285ce--
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
