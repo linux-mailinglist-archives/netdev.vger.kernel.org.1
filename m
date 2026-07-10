@@ -1,234 +1,170 @@
-Return-Path: <netdev+bounces-306510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306511-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QtOTAazJUGpy5AIAu9opvQ
-	(envelope-from <netdev+bounces-306510-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 12:30:04 +0200
+	id M6ogCO3MUGr+5AIAu9opvQ
+	(envelope-from <netdev+bounces-306511-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 12:43:57 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34CDD739B55
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 12:30:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 81D29739CDC
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 12:43:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=DMxmsGQ9;
-	dmarc=pass (policy=none) header.from=intel.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306510-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306510-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=linux.dev header.s=key1 header.b=aX6EezCr;
+	dmarc=pass (policy=none) header.from=linux.dev;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306511-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306511-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 78582300B9EE
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 10:24:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D3CD9302DB67
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 10:41:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 401FC405C54;
-	Fri, 10 Jul 2026 10:24:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8607D40BCAF;
+	Fri, 10 Jul 2026 10:41:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CEF24028F9
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 10:24:25 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783679067; cv=fail; b=UaUibGap3GH5fA/NDqPKUns5YxXkQNUfRoQIoO/Ijl92jpnzeQDx8aPoGe4rwzCoaWl3WK0K5YsachalSPqLLFNWbEO49aQS7d1aAnBoOc6oZm2WQtvpnKE4cJCDmRI85opI9bKlckjjEH4u1js87JOUvgcgX91bSySvlfmdyPA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783679067; c=relaxed/simple;
-	bh=oWsSO37rzVg9gGrv0fIwNK2We7CSLP5vnbm7kTXeZgM=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=OP174QeuHfWXsByl7QzuwYVElhywvrSxh4yzrmoxpKFOTgaj2NcKnxd5sSspXVU4t2Abx5yZwHG97afFhFlZFz5B4XAtnmOVWO5dudVaCkqYPTExtIDHY7VH4OhTCGfFo7FAvSMON2Y+ZViUs89VGSg81p5tPu3Ct1V6bt+eDRs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DMxmsGQ9; arc=fail smtp.client-ip=198.175.65.20
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1783679065; x=1815215065;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=oWsSO37rzVg9gGrv0fIwNK2We7CSLP5vnbm7kTXeZgM=;
-  b=DMxmsGQ9UERUrQseYyVpr37QgnnQsDTho8N1IyQkbbCKLPtaQBqOK+mB
-   ScRbYUk5txsTuoohkEpHqL481gG3AIbSQ7rnHJyjwKrGxOuUKKvflOY/v
-   1zCWAE2wmFlfULEd3AZzs1pkek82b19ZT7Ag9/VnPyQSsYfQXnlMOk7E+
-   fKi2BXoi9/bFrORV7CoX8DaNQXnRujYVO72CWQJ7vmoqrhUSBC7kPy68z
-   fzNsS+FSZqL5Vgo3nqoJsvDdY+BK9+CIBl1ydc16M4O9ObqK7J7h6vqxH
-   B/90fEOZmLgU6z255BrpSvUnF7un8jiOnsiEDq9G6mHcSBaPgjkQ4wl7F
-   g==;
-X-CSE-ConnectionGUID: 8Zf3KQS9Se6+ib6PSUJLdw==
-X-CSE-MsgGUID: 3/bEUukZTT+G4A3xmF4r7g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="84157237"
-X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="84157237"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2026 03:24:25 -0700
-X-CSE-ConnectionGUID: BcU+PIihRNqLbvAWgluSdw==
-X-CSE-MsgGUID: Gyo0G5ISRsCcYsTN15wMsg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="258733646"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2026 03:24:24 -0700
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Fri, 10 Jul 2026 03:24:23 -0700
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43 via Frontend Transport; Fri, 10 Jul 2026 03:24:23 -0700
-Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.31) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Fri, 10 Jul 2026 03:24:23 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZP/HQyX3BEjWBY/IuFYDgD7APg4YY/l462vgMFWrxiRCxh7OJKAJNOfKzmpM3k6Q8Wk0WliPR1qscP/kXTMt0rutrwe+bESzdaUqg40i4kQMYaimt/tOvsuEv7oQrQCAIrEdPJIb0HAKQN3rz+PH/Kwmc0hHqEa/L7E/H1Ewap5la5wvDQzozv4+TDPGpaptYikh9SJUIw+bEMcwxZxOgtY6zu6Q9PHNGFVTuuw8m0Gk5sPvegQKEMp7GOBf9ER1RvUwzixdZGozUxyWFhrR50BVwmx4mmWtWqXMPVUZ+qRccfGN7EsoRL5CXZ6Pd4+UeQaC0G7rUMV2/nbhyK4zhQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rQQbkN/4ZNm25Wr9UGJz4HNOEEgvLueTMoGQY5o50yk=;
- b=GHyEaJIx8+ZG1GdRaUuOzXR4m48fe7TLogGhpQpQW5YsrWi656cv1rjwX8yDHZUVWEDRn1hyU9yJTZ/iiVAhWhWOk5WpVyDO7hkDIZRmr9yobvJCxhO0LPhKyA5MPllvrGXP4DpQdsnWP9yHHmKvJw6bvP+zeodKstvUm3iSU5Kx8zbvcew1Z0WzUvBrus3ZvwnMVHjlNAd/zh/MAO+bpMqWI4bzlhJBf3IsHvTAytq3+jI80XuqnkUZdoM7VsRQaG6JOH2lQJt7XSgjIQ0TymkjgbxYyu1bIk6qef4a0RyGygQ28bbmTy7v/Wp+NW9HVDEOQtX0bcAmxjxjVyqstA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from LV3PR11MB8508.namprd11.prod.outlook.com (2603:10b6:408:1b4::8)
- by PH0PR11MB7563.namprd11.prod.outlook.com (2603:10b6:510:286::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.11; Fri, 10 Jul
- 2026 10:24:21 +0000
-Received: from LV3PR11MB8508.namprd11.prod.outlook.com
- ([fe80::a1e8:1786:e5d1:8e51]) by LV3PR11MB8508.namprd11.prod.outlook.com
- ([fe80::a1e8:1786:e5d1:8e51%5]) with mapi id 15.21.0181.008; Fri, 10 Jul 2026
- 10:24:20 +0000
-Message-ID: <6250062a-55c0-408f-a057-16e4004127f5@intel.com>
-Date: Fri, 10 Jul 2026 12:24:16 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 2/2] net: libwx: add support for set_coalesce
- in wx_ethtool_ops_vf
-To: Mengyuan Lou <mengyuanlou@net-swift.com>
-CC: <jiawenwu@trustnetic.com>, <duanqiangwen@net-swift.com>,
-	<netdev@vger.kernel.org>, <horms@kernel.org>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-References: <20260710015925.34769-1-mengyuanlou@net-swift.com>
- <20260710015925.34769-3-mengyuanlou@net-swift.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <20260710015925.34769-3-mengyuanlou@net-swift.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DU7P251CA0028.EURP251.PROD.OUTLOOK.COM
- (2603:10a6:10:551::12) To LV3PR11MB8508.namprd11.prod.outlook.com
- (2603:10b6:408:1b4::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F8F3CC337
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 10:41:44 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783680106; cv=none; b=pUyfZlCUoYtWQU8bGj0dFyjTmoNzbw2GjHb6NOFFa0KMJ0FFqURkKXcQjfdR9QftweyCXpZJ+5d0jOOsR6FeILa4UM9p55l5Z1q4GCrv4r0hzXtZgVPpi3YV6/+6Sy5o+piAOSDwJsJSjes83kfZ2YSVNqV924zgHEzcX/zPM6k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783680106; c=relaxed/simple;
+	bh=LfhlL2W6j2hA8eOrwNmMvbP+CJ2GYmxEkNjEaH7zcYM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EsmDM0qPlkhcU+TE/7O8CjnIG2iOC0Gr1XeMjZeUJqxRU4RuEpiq/77bJR5VrYtGxNYsxrbHsdyHCEYzsTSuGp9T9F03tvj9JRO0gZ80yNQLEP8A6u6UrpG9UX5VRim5t9rDG+rdSjXVGbG4pR1wdmTgYEv91mDh8nWg/fh/5TA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aX6EezCr; arc=none smtp.client-ip=95.215.58.173
+Message-ID: <e64ac867-71bb-4068-955e-bf3e41a00497@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783680092;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WIen9J+HiKMTSP8zdU+4TxCJxWFnr4znTXA41zOFZ2E=;
+	b=aX6EezCrvR9grtaeAQkf5pCPN5DQ4LTPoMDag5wukubszdwnMo3zbjNdVI0Xg4tl1f05H5
+	VI3xi4t1eR0h9Bv/UGZN7kKPs+mKRZTYp8Bz/wmryfNxH1/ANk2+HjgRd9M7GEWbhe1pZj
+	sVrDDLQtke0mVRownXvenTIzlVUqjIU=
+Date: Fri, 10 Jul 2026 11:41:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV3PR11MB8508:EE_|PH0PR11MB7563:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4c6448e7-2ff8-4a76-1983-08dede6d678d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|23010399003|366016|56012099006|18002099003|3023799007|4143699003|22082099003|11063799006;
-X-Microsoft-Antispam-Message-Info: LMY3gTNXw+bOFU3dBe6Spy6fEcp0A7ZeV/O6d68RuCnoSimry8o6CXxh3fdvfgB5M4nB6/uf4F74lSHuIUardFxE7XcO4uarZv1haaI1lx+3zvzHnWWfkLc/jdSOE4Vff6jFwkZevk+UcU3///tJfWallwLMIgpsDJy7uiW6aF6V/PDcjoqsxjwVNVlQKMr7ME3hstY6kv8aRvHHowIC+AXZ6Ebsxe/yZULme6TR2qfSZFDNQTRuOhJ59DRabaiElbyfO5I39OGalI/snc1qv84FLFL7og9I67C4EEhauzRiCRSmC6aIpb5l++QNPZYwZbXP0UsjZ7pRvEXmJVCqOhFDhioOc4wr6Tq7AavarrGJJ+jL5B6Q27lqf6ijMLDUl3ReBZDUFvPrGB11zjzwamVXve3tXlUnc0tBdNH9Xpux9ApJMmipdA3k0Y9494YsROFCTfITRH0+D79FDcIxDrGV1/5+Vy9GaYwymM93sgYC4xVKnfTwYN78icxxtQ1yyygm1LdLVN3U8vU3nA7RUnfg5/D2ntKQBpcuvbQbdX7yRUbi/6GIztDenasaEEa2pwBSFDTpX4gh2OLhxAhKcyoW1RNrxgOx80wJx2LSuC+U0xrb3R5f+LGRbCdgEY6NvtVi1CNnF19FreLghuT/VS8XCHNcOPTmDq9k0YCpWgs=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR11MB8508.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(23010399003)(366016)(56012099006)(18002099003)(3023799007)(4143699003)(22082099003)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?L1ZvNFlJdzd6ZnlOQlJEaEpYc0JNTklSMkoyMWZGMmNwdGhNcFBncXNnZkxF?=
- =?utf-8?B?S0NQcnY4blF2d0thZC9MQjkzc01lQXR2aU1kaHRCNzc4NU1yNnM3TUtWZTk3?=
- =?utf-8?B?UGZQdlVwU0UwMXlJNXk4NnJCdEJvcHhVNEhWbmxDR2pIQThqL3IzS3YxM3VT?=
- =?utf-8?B?NWI3OHUrV3R3VlZ1NVBMYmtDM2VKd1FpMzJnWDNvemduRVE5QlZJb1dSTFQy?=
- =?utf-8?B?a202d1hWV1I3U2VHWk45TUpYbWhXcTVsM3l6a2VvWmYza3hOR2JLMndjUVJj?=
- =?utf-8?B?MWNRcG9sZ0RPempEUUtqTjIzLzdTU3JacFJnUVcxZ2xpYTBxYmFHU0xUNXZa?=
- =?utf-8?B?a0xEQy85VXYzSHExQWhkRS9mSnMzWjNSQjZXRWJTajk2bUNGZWZ2Qk85clUr?=
- =?utf-8?B?Z1JuNHMzdW5JTUdSZE9neVJHVExvc0QzZlVYcTI1ekxOMnppQnd5MmEzUjRs?=
- =?utf-8?B?QmgzUjNEL3JjNzlwdkZJUWJSL0MyaHZOTTVBUHpwaWNHaE1wanJIdzF0Uktm?=
- =?utf-8?B?NzZyR0RlMjhaeHE4SEpCakxPam5HenFDWER5OG5GMjFCM0JLZGNSSW9ZaDda?=
- =?utf-8?B?NlZtUjYvN3FyZjcvRlJ3REdVeUxRT1E2YmhqcWc1S0lTcDc3QmVPRThySXNy?=
- =?utf-8?B?MFdMelFTWUszZXpVWWk1SFlQUndramM2Sm1iUXRrMlNhaEYrcGtxbEJCaFYw?=
- =?utf-8?B?Z1VpR21KeWZobkZqbHZXM2Q5Wjk0SEVLL3pEZk5ET21Salh3OHZDbDJEUUQ3?=
- =?utf-8?B?cThyS1RwZERzMi80M01DMDRUMnVQU2xRRnhiL0VvWXcxVTZmWXFtYWN0VWx6?=
- =?utf-8?B?L3ljN2NUczhIcDV5ZzB3bjNKbVhlSDBOQThHRlVKM3pxY1YrclpqNUsrUXRU?=
- =?utf-8?B?Sk4zU2hZMGVXZlc4b0t4TzgvcFhVaFBVS0MzOW9mVERiU1BsTHJNRm9Sb0ZZ?=
- =?utf-8?B?R0Z1TWdxR1ZMK0MxY2w3R05NcVVHZ3dNakJ6cU8wRzVQZFNOUjJWQWFwQ3JT?=
- =?utf-8?B?UElLcmJIcjRaeWM1eXdPNklhaTVob1ZrYkFRRVZmdklkVGsweWc2SE56T3dH?=
- =?utf-8?B?YzFsbkFYSjQ1OE9WallKZnY5dDhjZExvYVA2cmw5YWkvY1JCTWJWc2VzRE9N?=
- =?utf-8?B?cHA5M2VOb0FBM0VDMXg2OC9hNTZGMGJ6ZHdiK252S2IzWHFRSWorSUVHbnZU?=
- =?utf-8?B?ODh0NXFES0ZzNVVicFpoVGM3YjBsdVdvVzVCNUExY3RWSTlZcEp0UU9nSE9I?=
- =?utf-8?B?eWVIVjY5K2ZWeEtyQWJjUWtmYUtBR2tFYVVCb1FOYUF2MzhhT29ENGFodnFB?=
- =?utf-8?B?UTFmcFlYZ2pnd0U1YUF0a3IrblZhS2hnSUY3MHlMT3NtdUNxSzAvZWowZGtt?=
- =?utf-8?B?WGFLcElpdy9EZTAvaFd2VmFRQ2d2eEZWd1ZET05OSU03anpEODJRZFhnY2J3?=
- =?utf-8?B?amRqZDN1RHE3bXZZbnlaUHEvQWk2T3lSU05menljWkVUN1dwS3R5MEJVdHZ6?=
- =?utf-8?B?Sm9Gd2hnSUhaUzFUckh6Qm9aMERYSU5qSVNNdVlub0swenJtNjJ2MkVnYTdZ?=
- =?utf-8?B?MjJkamNTOGdVcHNra3RqczRudUV1dzRnakNpY3lTS3ptcHRoNS9sb0xwUEQv?=
- =?utf-8?B?bXZJdDlTRVpBc2JISFF3U0RuMjR2TklZNUVhbXhTeXI4ZUNYZUJwM0h3Q2l2?=
- =?utf-8?B?UXNXaWgybWtpREJhUXNPQ2V4MWpJT0kwMkNMTlNHMHdXOFRyTTVSNUZnTEZm?=
- =?utf-8?B?WUNxM0JWV1lhenNjRXkxZE1XQ2pSd1FGSEp2ZEJqRExQemp5TG1QYXBBczZN?=
- =?utf-8?B?bXRtMWd0ejdOUGJ2aEFUYThBeThBNmpXN3RHSXQxSUZjbFBxbmdoSXJYaHVm?=
- =?utf-8?B?T3FPQndiRTc2Sis2dW9NOUhBU1hmSXpJcnNrL0NNMnIxQ3VXekMzYzBHZG83?=
- =?utf-8?B?c2wzeGRPWVZqdnJDbDZiK1ZuN2VVMjBoNHdicVVVcUIrTFBzTVdLZzk0dHNC?=
- =?utf-8?B?b1lacUpPOExTTTBNRUhPNy9nRzJibldLRm00UTk4ZXBLMnlGWTFNT2lOVXJP?=
- =?utf-8?B?cUVkK1IxNk9aY1Y2TTdCWXROeDFpekpVME15UTJ6aXZyQU4yelcwRkIwVEtm?=
- =?utf-8?B?VGVBSXRPWEUwZlRUdFpMcmVPM3N2OVRQaTdqcVBmRjdiakZoUmZ1QTBlRVJB?=
- =?utf-8?B?Y1ExNmlVbGlFeFdNV2kwMDF5K3ZJZkRzdWRDdTVXNk5RUHk4Tk0xMGxNUkcv?=
- =?utf-8?B?dWp5WWs1WDhoNGpHQUtYeUJUS1lHRGV5emNZV0UrTnJkbEp2T2hLMGU5SXV2?=
- =?utf-8?B?RGo0VU9yZXlwak5DZnUxZlJ0OGo4NXJjbWVTZ2hIa0ZkV1V2YWEzdWg2YW1B?=
- =?utf-8?Q?giNa5BiPg+q4AqIk=3D?=
-X-Exchange-RoutingPolicyChecked: hujtHlsHzoUIV95pxVUuXt4W4dmdAex8+Py0KX9NwCEVTFz/ZUIEwSGgqAtp85QDIQCgGpKSbHrUscuOwKOS2nGLXDalBKpE0W4lKY+FrXcj4iBalxbQkAzMDcOyyABmUxryvxsUvYROaLKEyViCu79Nu4XdKaKs/EFXvFHHJKshqPHxsa4n6FpVkGlkjluUKPEXRYAG/PPlasf1Tv4YyYwqVtnVxXYAlT1nLZPf8OSrqUA6n1vLP8/p5MuCkx5jhp1ydM1GSnBYjfGFRVehaB6A/8Pli2qaHGpOhxcLBfNXbGSWhqcTOJQsmoghcUVQ8SIlCXktnrPb14gBCtYQDQ==
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4c6448e7-2ff8-4a76-1983-08dede6d678d
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR11MB8508.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2026 10:24:20.4838
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: f4dDwc8AyP/jLE7i8X96ej6b6uOEwbW7nDp/3RvA/DtRv8gTsQze4A8hxNWCCRsz6gzB1PThIjDl1OdcV9JWdfoBlxcQspfnEx7uD4Pq/b0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7563
-X-OriginatorOrg: intel.com
+Subject: Re: [PATCH net v3] tipc: fix u16 MTU truncation in media and bearer
+ MTU validation
+To: "Cen Zhang (Microsoft)" <blbllhy@gmail.com>, jmaloy@redhat.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org
+Cc: netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+ linux-kernel@vger.kernel.org, tung.quang.nguyen@est.tech,
+ AutonomousCodeSecurity@microsoft.com, tgopinath@linux.microsoft.com,
+ kys@microsoft.com
+References: <20260708180212.2898-1-blbllhy@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20260708180212.2898-1-blbllhy@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306510-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,net-swift.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:from_mime,intel.com:email,intel.com:mid,intel.com:dkim];
-	FORGED_SENDER(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:blbllhy@gmail.com,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:tung.quang.nguyen@est.tech,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306511-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_TO(0.00)[gmail.com,redhat.com,davemloft.net,google.com,kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:mengyuanlou@net-swift.com,m:jiawenwu@trustnetic.com,m:duanqiangwen@net-swift.com,m:netdev@vger.kernel.org,m:horms@kernel.org,m:kuba@kernel.org,m:pabeni@redhat.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:from_mime,linux.dev:email,linux.dev:mid,linux.dev:dkim,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 34CDD739B55
+X-Rspamd-Queue-Id: 81D29739CDC
 
-On 7/10/26 03:59, Mengyuan Lou wrote:
-> Add support for set_coalesce in wx_ethtool_ops_vf, which
-> is used to set interrupt coalescing parameters.
+On 08/07/2026 19:02, Cen Zhang (Microsoft) wrote:
+> Both TIPC_NL_MEDIA_SET and TIPC_NL_BEARER_SET accept user-supplied
+> MTU values but only enforce a minimum bound, not a maximum. When a user
+> sets the MTU to a value exceeding U16_MAX (65535), it passes validation
+> but is silently truncated when assigned to u16 fields l->mtu and
+> l->advertised_mtu in tipc_link_create(). Values like 65536 (0x10000)
+> truncate to 0, causing a division by zero in tipc_link_set_queue_limits()
+> which computes TIPC_MAX_PUBL / (l->mtu / ITEM_SIZE). Other overflowing
+> values (e.g. 65537-131071) produce small incorrect MTU values, resulting
+> in link malfunction behaviors.
 > 
-> Update wx_write_eitr_vf() to use the same interrupt
-> moderation encoding as PF devices, since PF and VF share
-> the same register layout. And remove the now-unused
-> WX_VXITR_MASK definition.
+> Crash stack (triggered as unprivileged user via user namespace):
 > 
-> Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
+>    tipc_link_set_queue_limits  net/tipc/link.c:2531
+>    tipc_link_create            net/tipc/link.c:520
+>    tipc_node_check_dest        net/tipc/node.c:1279
+>    tipc_disc_rcv               net/tipc/discover.c:252
+>    tipc_rcv                    net/tipc/node.c:2129
+>    tipc_udp_recv               net/tipc/udp_media.c:392
+> 
+> Two independent paths lack the upper bound check:
+> 1. tipc_udp_mtu_bad() -- called from __tipc_nl_media_set() (MEDIA_SET)
+> 2. inline check in __tipc_nl_bearer_set() at bearer.c:1160 (BEARER_SET)
+> 
+> Fix both by rejecting MTU values above U16_MAX.
+> 
+> Fixes: 901271e0403a ("tipc: implement configuration of UDP media MTU")
+> Reported-by: AutonomousCodeSecurity@microsoft.com
+> Closes: https://lore.kernel.org/all/CAB8m9WgETt0AjmFwE=F-CKjGXsK6_WDv0=kbYRcC8-noo+amnA@mail.gmail.com
+> Signed-off-by: Cen Zhang (Microsoft) <blbllhy@gmail.com>
 > ---
->   drivers/net/ethernet/wangxun/libwx/wx_ethtool.c |  7 ++++++-
->   drivers/net/ethernet/wangxun/libwx/wx_vf.h      |  1 -
->   drivers/net/ethernet/wangxun/libwx/wx_vf_lib.c  | 13 ++++++++++++-
->   3 files changed, 18 insertions(+), 3 deletions(-)
+> v3: Use nla_policy check to limit MTU max value as suggested by Vadim
+> v2: Solved format issue
+> Link: https://lore.kernel.org/all/CAB8m9WgETt0AjmFwE=F-CKjGXsK6_WDv0=kbYRcC8-noo+amnA@mail.gmail.com
+> 
+>   net/tipc/netlink.c | 6 +++++-
+>   1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/tipc/netlink.c b/net/tipc/netlink.c
+> index 8336a9664703..1307dd1a9613 100644
+> --- a/net/tipc/netlink.c
+> +++ b/net/tipc/netlink.c
+> @@ -113,12 +113,16 @@ const struct nla_policy tipc_nl_node_policy[TIPC_NLA_NODE_MAX + 1] = {
+>   };
+>   
+>   /* Properties valid for media, bearer and link */
+> +static const struct netlink_range_validation tipc_nl_mtu_range = {
+> +	.max = U16_MAX,
+> +};
+> +
+>   const struct nla_policy tipc_nl_prop_policy[TIPC_NLA_PROP_MAX + 1] = {
+>   	[TIPC_NLA_PROP_UNSPEC]		= { .type = NLA_UNSPEC },
+>   	[TIPC_NLA_PROP_PRIO]		= { .type = NLA_U32 },
+>   	[TIPC_NLA_PROP_TOL]		= { .type = NLA_U32 },
+>   	[TIPC_NLA_PROP_WIN]		= { .type = NLA_U32 },
+> -	[TIPC_NLA_PROP_MTU]		= { .type = NLA_U32 },
+> +	[TIPC_NLA_PROP_MTU]		= NLA_POLICY_FULL_RANGE(NLA_U32, &tipc_nl_mtu_range),
+>   	[TIPC_NLA_PROP_BROADCAST]	= { .type = NLA_U32 },
+>   	[TIPC_NLA_PROP_BROADCAST_RATIO]	= { .type = NLA_U32 }
+>   };
 
-looks good,
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
