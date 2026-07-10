@@ -1,494 +1,472 @@
-Return-Path: <netdev+bounces-306436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306420-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qrzQOkd1UGp3zQIAu9opvQ
-	(envelope-from <netdev+bounces-306436-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 06:29:59 +0200
+	id Gh42BQp0UGobzQIAu9opvQ
+	(envelope-from <netdev+bounces-306420-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 06:24:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B67C73723A
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 06:29:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D0A47371CC
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 06:24:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=broadcom.com header.s=google header.b=hI9JXy9k;
-	dmarc=pass (policy=reject) header.from=broadcom.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306436-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306436-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=key1 header.b=LJGfn04S;
+	dmarc=pass (policy=none) header.from=linux.dev;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306420-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306420-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 537183021E9A
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 04:25:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CE049301DB93
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 04:24:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2282236D9EB;
-	Fri, 10 Jul 2026 04:25:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A65F36AB72;
+	Fri, 10 Jul 2026 04:24:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f228.google.com (mail-pg1-f228.google.com [209.85.215.228])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F59F36CE1E
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 04:25:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02372369D73;
+	Fri, 10 Jul 2026 04:24:35 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783657511; cv=none; b=f3Pw1APNsKCsMp5PW/0u8AQFx0qNlxjAF2N46Fb7YdNpcrwOZpawdE789/tbxn77EZdru040ncDsL/DhwaA5ZW4de/5PFAVrhTWQpcmU/DDyDubCBcDkPDItWT7MSWJaLqsfF8BWEe9Qid4McpvyiIQ8dst4JZ4F0jzshkURRTo=
+	t=1783657478; cv=none; b=Jy0e3XbSuOTF7ujVvX/nRWbzggGMTFjgyIvFY5cCWbeSuYsbruX0p4r0n/gd/PNyiEHVUaEkW7LEQpmERs/raN077jottiWaVuG/fl4QLge2ZDzaBN4ZjS6/t1SGr8uCGjFn0Fu9BSXNJWC9maLWbd/vYqi6swNQtJM+4Ve0Nq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783657511; c=relaxed/simple;
-	bh=RyrtwWb+ipbq+ET+VU7zgLYCacDD4Bzz21JNCOLAXXw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OFppqronrLxkf1c8pRUcYJW365fBEoWTaU9DbpnjFUF697YFXxutSSFklj4hIg0WzeuxIicwl4NWG3pZbgj6sWbdoh/LHxglqSt0A52FA0cJ96AJUUR4CsEaVbicADPz5Wd4tFlvd6gHWLdnTW5X81TF5gL88+Z16mYD1K6aWp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hI9JXy9k; arc=none smtp.client-ip=209.85.215.228
-Received: by mail-pg1-f228.google.com with SMTP id 41be03b00d2f7-ca00f126b7eso284693a12.2
-        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 21:25:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783657509; x=1784262309;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=gt7kMTNwMa7LrJZSfyWvpsBN6c1pA3nCecXTEXKFNHw=;
-        b=W4fJAjfhRFHeyWfpC4Ck9Chc3Qok9ZQjob78NrDgal5E+UG7Z7Sbjxrw3q9NAAa26t
-         XdYOZWUHk/PNMm+yDBZdsZK40uFyivyoQtiG/Ii0XQtaN96VpgpbhFv4lPJk6zmmweDv
-         PtZsqmhs6WRI2WkYRbzodmYVzMklkYvZ2kvWpZRc9Y95dv+v/w4vlS35YTBU30450pC5
-         2Dqv+DFoX8L1xBDAugocdIyZaqO3VP5afT+EY3JZLTMJRk4AxR0TW6z+slKl4AErkTiQ
-         FkGp/n94sTIFgyDMPHwPevnirlhMeQWQ6fVx8VA17zlbeW/4mp1MRsCXXF5F1qsQP0tX
-         VVNA==
-X-Gm-Message-State: AOJu0YyaVfwciKMqaVDYSZmr+usOTaMWIemcjCnx+SHi9rNk0Nhq/HE9
-	f1LFb+dCvrBxktfGBQnZyYBGRLsYc2tbFCW8tWbv5PmCG7b3WVyptrevpKqoR0ch99JwSQ+VWfH
-	FW6JWXs1IShCiq2pg43DrpTGdNYG+XqH3+bsljM5Rw+iXCX4BFdv0gJtiO0rIAb+uDarbveCT3o
-	ABVvRp4I6h2j86jwA3Psh64jG5Gd8VeLeMUAJcPYHY+wgsYhup/T4+phKmvBwiFvYeZW4M2XR3b
-	nmr9JANDxQ=
-X-Gm-Gg: AfdE7cmIKM5DyoK9z32A1AUB8QXvzfS73/dKi2OZf0wrUhV8gMrgbuvZ9TMdyReuwVa
-	nB7Y6XdIC7aQ9rIMmq9T6UKUE9ClI+t3HvSOwxmG1xU8+UdxWvwjrBxOlqQ7uRmfzvCZ/F1geiD
-	VSQyvLy9+Ax7yA4EmxMfM91YzByZGNnzgALJWJWhGRZgIO25zuFLJmm+sm7bjFYCR19irhaLRpT
-	eWx/Nsj2lc139lE88l6xMceeWsGzCKbr2sQF2Cz8Bby2lI7wlFgGr1VO3jKU+YZN4nWpjfUVMZu
-	biou69/RR1fmyXMQo06Eb/7+LN8ilnscY8fqJyTiLY2HhVJ3bdCpSTtkyex00E+vp0/QXbLyw42
-	JJXdJdfZ9J1FmEpfCtg32O2bhiHay1cE0x5v8hjde6DmEt3udRhy1Wa8GCzqB3tGd+A6YEtmfOQ
-	8IMc/hFhaEmaKylYDIoISRvhXKNFLFUT/uG4NdttWPz6JanA==
-X-Received: by 2002:a05:6a20:729d:b0:3bf:a624:deb8 with SMTP id adf61e73a8af0-3c0bcebc735mr12563375637.21.1783657508499;
-        Thu, 09 Jul 2026 21:25:08 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-11.dlp.protect.broadcom.com. [144.49.247.11])
-        by smtp-relay.gmail.com with ESMTPS id 5a478bee46e88-311747f0ca5sm589907eec.6.2026.07.09.21.25.07
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 09 Jul 2026 21:25:08 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-c8952346bb9so383559a12.2
-        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 21:25:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1783657506; x=1784262306; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=gt7kMTNwMa7LrJZSfyWvpsBN6c1pA3nCecXTEXKFNHw=;
-        b=hI9JXy9k+o9Xu0Mw1BQ6szZd3DsHdiMK1mWwgCD8Y+YllpsUdahB7+AwGBJrftPbHV
-         Rhpa+ANpMR7AEQPms/sJyo08fwDVz0lt/Ik9b2fg2ps+w2AEOe0Wl16841K/nGRsG04K
-         syV8aqcgqD8kGRQvEgfEksfTisaJPWSUA9Q+o=
-X-Received: by 2002:a05:6a20:729d:b0:3bf:a624:deb8 with SMTP id adf61e73a8af0-3c0bcebc735mr12563208637.21.1783657506230;
-        Thu, 09 Jul 2026 21:25:06 -0700 (PDT)
-X-Received: by 2002:a05:6a20:729d:b0:3bf:a624:deb8 with SMTP id adf61e73a8af0-3c0bcebc735mr12563165637.21.1783657505645;
-        Thu, 09 Jul 2026 21:25:05 -0700 (PDT)
-Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-313b4cbafa1sm276627eec.6.2026.07.09.21.25.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2026 21:25:04 -0700 (PDT)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com
-Subject: [PATCH net-next v5 15/15] bnxt_en: Add kTLS retransmission support
-Date: Thu,  9 Jul 2026 21:24:00 -0700
-Message-ID: <20260710042400.3996847-16-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260710042400.3996847-1-michael.chan@broadcom.com>
-References: <20260710042400.3996847-1-michael.chan@broadcom.com>
+	s=arc-20240116; t=1783657478; c=relaxed/simple;
+	bh=5vGYUhOMuE2kcV5F2F/QyOUeKJT4pi9j/suBd/skgfU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=X2aSxDz9LFoVlnCTMXPMLyI5zu2veoXIOZVjBFlzResTODLIblb4vhTgE1fiTQC6FV1so0XJHtBJa04fh4Z/McYomY3AdSShMHLZKtLz/gKH+yREDN62n4gcTeQ6nm/0dnl1/4ooKrMHvlGvo2CVYYgCUZF+f/PzcTGBH+0ZjsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LJGfn04S; arc=none smtp.client-ip=91.218.175.189
+Message-ID: <ebb4125e-6d35-44c9-b1b8-267dc3226b81@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783657473;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=48gm6OSOL1SSOirHXZF2Z0M3HkLWpnOs0tv5n6E0teY=;
+	b=LJGfn04SGFnL8UXhLSB+52PBN7KESuIh0Km2DPDIXEWCwpVcPBjjL7pNuROWfkO3PbuKb4
+	s5by1GL/2w+WeQFh6Fp0wbpSxEQCnzYDYPz5NsvnR03XOVlKjLSD4XfRhpaKmrfuJJHrAX
+	kh/MORb3lQmU3ylwe47f8YvgkCuI88Q=
+Date: Thu, 9 Jul 2026 21:24:25 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH rdma-next 13/13] RDMA/selftests: Add rxe_netns_names test
+To: Jiri Pirko <jiri@resnulli.us>, linux-rdma@vger.kernel.org,
+ "yanjun.zhu@linux.dev" <yanjun.zhu@linux.dev>
+Cc: cgroups@vger.kernel.org, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org, jgg@ziepe.ca,
+ leon@kernel.org, parav@nvidia.com, mbloch@nvidia.com, cmeiohas@nvidia.com,
+ roman.gushchin@linux.dev, bvanassche@acm.org, zyjzyj2000@gmail.com,
+ shuah@kernel.org, tj@kernel.org, mkoutny@suse.com, hannes@cmpxchg.org,
+ alibuda@linux.alibaba.com, dust.li@linux.alibaba.com, sidraya@linux.ibm.com,
+ wenjia@linux.ibm.com
+References: <20260709095532.855647-1-jiri@resnulli.us>
+ <20260709095532.855647-14-jiri@resnulli.us>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20260709095532.855647-14-jiri@resnulli.us>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[broadcom.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	TAGGED_FROM(0.00)[bounces-306436-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:pavan.chebbi@broadcom.com,m:andrew.gospodarek@broadcom.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306420-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[yanjun.zhu@linux.dev,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS(0.00)[m:jiri@resnulli.us,m:linux-rdma@vger.kernel.org,m:yanjun.zhu@linux.dev,m:cgroups@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-s390@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:jgg@ziepe.ca,m:leon@kernel.org,m:parav@nvidia.com,m:mbloch@nvidia.com,m:cmeiohas@nvidia.com,m:roman.gushchin@linux.dev,m:bvanassche@acm.org,m:zyjzyj2000@gmail.com,m:shuah@kernel.org,m:tj@kernel.org,m:mkoutny@suse.com,m:hannes@cmpxchg.org,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,s:lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,ziepe.ca,kernel.org,nvidia.com,linux.dev,acm.org,gmail.com,suse.com,cmpxchg.org,linux.alibaba.com,linux.ibm.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[yanjun.zhu@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:from_mime,broadcom.com:email,broadcom.com:mid,broadcom.com:dkim];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:from_mime,linux.dev:email,linux.dev:mid,linux.dev:dkim,nvidia.com:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,rxe_test_netdev_unregister.sh:url,rxe_ipv6.sh:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4B67C73723A
+X-Rspamd-Queue-Id: 5D0A47371CC
 
-If TCP retransmits a TLS packet that requires encryption by the NIC, the
-TCP sequence number will go backwards and the hardware will require some
-assistance from the driver.  The driver needs to retrieve the TLS record
-that covers the byte sequence of the retransmitted packet.  If the
-retransmitted packet does not include the tag, the hardware can simply
-encrypt the packet using the informtaion in the TLS record.
 
-The driver provides the TLS record information for the retransmitted
-packet in the presync TX BD.  The presync TX BD introduced in the last
-patch is treated very much like a TX push BD with inline data.  The only
-exception is that no SKB will be stored for the presync TX BD.
+在 2026/7/9 2:55, Jiri Pirko 写道:
+> From: Jiri Pirko <jiri@nvidia.com>
+>
+> Add a kselftest script that exercises per-netns RDMA device naming
+> with RXE. Cover duplicate names across namespaces, move conflict
+> handling, move-with-rename, and same-namespace rename requests.
 
-Retransmission that includes the TLS tag will be handled in future
-patches.
+This is a very comprehensive test suite for the per-netns RDMA device 
+naming infra.
 
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
----
-v5:
-Use bool instead of bit fields to keep track of kTLS states (requested by
-Paolo).
+I especially appreciate the inclusion of the 'TEST_TEARDOWN_RETURN' 
+case—ensuring
 
-v3:
-https://lore.kernel.org/netdev/20260614072407.2761092-16-michael.chan@broadcom.com/
+that the kernel's automatic renaming and fallback mechanics work 
+seamlessly during
 
-Unwind the TX ring properly if the TLS packet cannot be sent.
+netns deletion is crucial for long-term stability.
 
-Improve the OOO TLS counters.
 
-Fix endianness of the record sequence number.
+One minor thing to clean up before pushing to the tree: the script 
+declares 'ktap_set_plan 7'
 
-Check valid return address from skb_frag_address_safe().
+but actually defines 6 distinct test cases in the execution block. I 
+will fix this plan count to 6
 
-v2:
-https://lore.kernel.org/netdev/20260512212105.3488258-16-michael.chan@broadcom.com/
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  14 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   4 +
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |   4 +
- .../net/ethernet/broadcom/bnxt/bnxt_ktls.c    | 152 +++++++++++++++++-
- .../net/ethernet/broadcom/bnxt/bnxt_ktls.h    |   2 +
- 5 files changed, 167 insertions(+), 9 deletions(-)
+to avoid any "bad plan" warnings in automated CI frameworks (like KernelCI).
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 44b0787fef89..f084c19ffddd 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -482,9 +482,9 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	unsigned int length, pad = 0;
- 	u32 len, free_size, vlan_tag_flags, cfa_action, flags;
- 	struct bnxt_ktls_offload_ctx_tx *kctx_tx = NULL;
-+	u16 prod, start_prod, last_frag, txts_prod;
- 	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
- 	struct pci_dev *pdev = bp->pdev;
--	u16 prod, last_frag, txts_prod;
- 	struct bnxt_tx_ring_info *txr;
- 	struct bnxt_sw_tx_bd *tx_buf;
- 	__le32 lflags = 0;
-@@ -500,7 +500,6 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 
- 	txq = netdev_get_tx_queue(dev, i);
- 	txr = &bp->tx_ring[bp->tx_ring_map[i]];
--	prod = txr->tx_prod;
- 
- #if (MAX_SKB_FRAGS > TX_MAX_FRAGS)
- 	if (skb_shinfo(skb)->nr_frags > TX_MAX_FRAGS) {
-@@ -529,12 +528,14 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 			return NETDEV_TX_BUSY;
- 	}
- 
-+	start_prod = txr->tx_prod;
- 	skb = bnxt_ktls_xmit(bp, txr, skb, &lflags, &kid, &kctx_tx);
- 	if (unlikely(!skb)) {
- 		dev_core_stats_tx_dropped_inc(dev);
- 		return NETDEV_TX_OK;
- 	}
- 
-+	prod = txr->tx_prod;
- 	length = skb->len;
- 	len = skb_headlen(skb);
- 	last_frag = skb_shinfo(skb)->nr_frags;
-@@ -817,9 +818,16 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 			/* set SKB to err so PTP worker will clean up */
- 			ptp->txts_req[txts_prod].tx_skb = ERR_PTR(-EIO);
- 	}
-+	txr->tx_buf_ring[RING_TX(bp, txr->tx_prod)].skb = NULL;
-+	/* Unwind any kTLS presync BDs */
-+	if (unlikely(txr->tx_prod != start_prod)) {
-+		tx_buf = &txr->tx_buf_ring[RING_TX(bp, start_prod)];
-+		tx_buf->is_push = 0;
-+		tx_buf->inline_data_bds = 0;
-+		WRITE_ONCE(txr->tx_prod, start_prod);
-+	}
- 	if (txr->kick_pending)
- 		bnxt_txr_db_kick(bp, txr, txr->tx_prod);
--	txr->tx_buf_ring[RING_TX(bp, txr->tx_prod)].skb = NULL;
- 	dev_core_stats_tx_dropped_inc(dev);
- 	return NETDEV_TX_OK;
- }
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 0a60055b3e17..70947bcc3116 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1192,6 +1192,10 @@ struct bnxt_cmn_sw_stats {
- enum bnxt_ktls_data_counters {
- 	BNXT_KTLS_TX_PKTS = 0,
- 	BNXT_KTLS_TX_BYTES,
-+	BNXT_KTLS_TX_OOO_PKTS,
-+	BNXT_KTLS_TX_OOO_FALLBACK_NO_SYNC,
-+	BNXT_KTLS_TX_OOO_FALLBACK_NO_SPACE,
-+	BNXT_KTLS_TX_OOO_FALLBACK_NO_HDR,
- 
- 	BNXT_KTLS_MAX_DATA_COUNTERS,
- };
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 66a35876c00b..cee743996d3f 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -359,6 +359,10 @@ static const char *const bnxt_ring_drv_stats_arr[] = {
- static const char *const bnxt_ktls_data_stats[] = {
- 	[BNXT_KTLS_TX_PKTS]		= "tx_tls_encrypted_packets",
- 	[BNXT_KTLS_TX_BYTES]		= "tx_tls_encrypted_bytes",
-+	[BNXT_KTLS_TX_OOO_PKTS]			= "tx_tls_ooo_packets",
-+	[BNXT_KTLS_TX_OOO_FALLBACK_NO_SYNC]	= "tx_tls_ooo_fallback_no_sync",
-+	[BNXT_KTLS_TX_OOO_FALLBACK_NO_SPACE]	= "tx_tls_ooo_fallback_no_space",
-+	[BNXT_KTLS_TX_OOO_FALLBACK_NO_HDR]	= "tx_tls_ooo_fallback_no_hdr",
- };
- 
- /* kTLS control plane counter strings indexed by enum bnxt_ktls_ctrl_counters */
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.c
-index cf71356cdfcf..0cb438c5c509 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.c
-@@ -345,7 +345,8 @@ int bnxt_ktls_init(struct bnxt *bp)
- 	return 0;
- }
- 
--static void bnxt_ktls_inc_tx_stats(struct bnxt_tx_ring_info *txr, u32 bytes)
-+static void bnxt_ktls_inc_tx_stats(struct bnxt_tx_ring_info *txr, u32 bytes,
-+				   bool ooo)
- {
- 	struct bnxt_tls_sw_stats *ring_stats = txr->tls_stats;
- 
-@@ -353,6 +354,128 @@ static void bnxt_ktls_inc_tx_stats(struct bnxt_tx_ring_info *txr, u32 bytes)
- 		return;
- 	ring_stats->counters[BNXT_KTLS_TX_PKTS]++;
- 	ring_stats->counters[BNXT_KTLS_TX_BYTES] += bytes;
-+	if (ooo)
-+		ring_stats->counters[BNXT_KTLS_TX_OOO_PKTS]++;
-+}
-+
-+static void bnxt_ktls_pre_xmit(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
-+			       u32 kid, struct crypto_prefix_cmd *pre_cmd)
-+{
-+	struct bnxt_sw_tx_bd *tx_buf;
-+	struct tx_bd_presync *psbd;
-+	u32 bd_space, space;
-+	u8 *pcmd;
-+	u16 prod;
-+
-+	prod = txr->tx_prod;
-+	tx_buf = &txr->tx_buf_ring[RING_TX(bp, prod)];
-+
-+	psbd = (void *)&txr->tx_desc_ring[TX_RING(bp, prod)][TX_IDX(prod)];
-+	psbd->tx_bd_len_flags_type = CRYPTO_PRESYNC_BD_CMD;
-+	psbd->tx_bd_kid = cpu_to_le32(BNXT_KID_HW(kid));
-+	psbd->tx_bd_opaque =
-+		SET_TX_OPAQUE(bp, txr, prod, CRYPTO_PREFIX_CMD_BDS + 1);
-+
-+	prod = NEXT_TX(prod);
-+	pcmd = (void *)&txr->tx_desc_ring[TX_RING(bp, prod)][TX_IDX(prod)];
-+	bd_space = TX_DESC_CNT - TX_IDX(prod);
-+	space = bd_space * sizeof(struct tx_bd);
-+	if (space >= CRYPTO_PREFIX_CMD_SIZE) {
-+		memcpy(pcmd, pre_cmd, CRYPTO_PREFIX_CMD_SIZE);
-+		prod += CRYPTO_PREFIX_CMD_BDS;
-+	} else {
-+		memcpy(pcmd, pre_cmd, space);
-+		prod += bd_space;
-+		pcmd = (void *)&txr->tx_desc_ring[TX_RING(bp, prod)][TX_IDX(prod)];
-+		memcpy(pcmd, (u8 *)pre_cmd + space,
-+		       CRYPTO_PREFIX_CMD_SIZE - space);
-+		prod += CRYPTO_PREFIX_CMD_BDS - bd_space;
-+	}
-+	txr->tx_prod = prod;
-+	tx_buf->is_push = 1;
-+	/* Minus 1 since the header psbd is a single entry short BD */
-+	tx_buf->inline_data_bds = CRYPTO_PREFIX_CMD_BDS - 1;
-+}
-+
-+static int bnxt_ktls_tx_ooo(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
-+			    struct sk_buff *skb, u32 payload_len, u32 seq,
-+			    struct tls_context *tls_ctx)
-+{
-+	struct bnxt_tls_sw_stats *ring_stats = txr->tls_stats;
-+	struct tls_offload_context_tx *tx_tls_ctx;
-+	struct bnxt_ktls_offload_ctx_tx *kctx_tx;
-+	u32 hdr_tcp_seq, end_seq, total_bds;
-+	struct crypto_prefix_cmd pcmd = {};
-+	struct tls_record_info *record;
-+	unsigned long flags;
-+	bool fwd = false;
-+	__le64 le_rec_sn;
-+	u64 rec_sn;
-+	u8 *hdr;
-+	int rc;
-+
-+	tx_tls_ctx = tls_offload_ctx_tx(tls_ctx);
-+	kctx_tx = bnxt_get_ktls_ctx_tx(tls_ctx);
-+	end_seq = seq + skb->len - skb_tcp_all_headers(skb);
-+	if (unlikely(after(seq, kctx_tx->tcp_seq_no) ||
-+		     after(end_seq, kctx_tx->tcp_seq_no))) {
-+		fwd = true;
-+		pcmd.flags = CRYPTO_PREFIX_CMD_FLAGS_UPDATE_IN_ORDER_VAR_LE;
-+	}
-+
-+	spin_lock_irqsave(&tx_tls_ctx->lock, flags);
-+	record = tls_get_record(tx_tls_ctx, seq, &rec_sn);
-+	if (!record || !record->num_frags) {
-+		rc = -EPROTO;
-+		ring_stats->counters[BNXT_KTLS_TX_OOO_FALLBACK_NO_SYNC]++;
-+		goto unlock_exit;
-+	}
-+	hdr_tcp_seq = tls_record_start_seq(record);
-+	hdr = skb_frag_address_safe(&record->frags[0]);
-+
-+	total_bds = CRYPTO_PRESYNC_BDS + skb_shinfo(skb)->nr_frags + 2;
-+	if (bnxt_tx_avail(bp, txr) < total_bds) {
-+		rc = -ENOSPC;
-+		ring_stats->counters[BNXT_KTLS_TX_OOO_FALLBACK_NO_SPACE]++;
-+		goto unlock_exit;
-+	}
-+
-+	if (before(record->end_seq - tls_ctx->prot_info.tag_size,
-+		   seq + payload_len)) {
-+		/* retransmission includes tag bytes */
-+		rc = -EOPNOTSUPP;
-+		goto unlock_exit;
-+	}
-+	pcmd.header_tcp_seq_num = cpu_to_le32(hdr_tcp_seq);
-+	pcmd.start_tcp_seq_num = cpu_to_le32(seq);
-+	pcmd.end_tcp_seq_num = cpu_to_le32(seq + payload_len - 1);
-+	if (tls_ctx->prot_info.version == TLS_1_2_VERSION) {
-+		u32 nonce_bytes = tls_ctx->prot_info.iv_size;
-+		u32 retrans_off = seq - hdr_tcp_seq;
-+
-+		if (!hdr) {
-+			rc = -ENOBUFS;
-+			ring_stats->counters[BNXT_KTLS_TX_OOO_FALLBACK_NO_HDR]++;
-+			goto unlock_exit;
-+		}
-+		if (retrans_off > 5 && retrans_off < 5 + nonce_bytes)
-+			nonce_bytes = retrans_off - 5;
-+		memcpy(pcmd.explicit_nonce, hdr + 5, nonce_bytes);
-+	}
-+	le_rec_sn = cpu_to_le64(rec_sn);
-+	memcpy(&pcmd.record_seq_num[0], &le_rec_sn, sizeof(le_rec_sn));
-+
-+	rc = 0;
-+	bnxt_ktls_pre_xmit(bp, txr, kctx_tx->kid, &pcmd);
-+
-+	if (fwd) {
-+		kctx_tx->next_tcp_seq_no = end_seq;
-+		kctx_tx->pending_fwd = true;
-+	}
-+
-+unlock_exit:
-+	spin_unlock_irqrestore(&tx_tls_ctx->lock, flags);
-+	return rc;
- }
- 
- struct sk_buff *bnxt_ktls_xmit(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
-@@ -363,6 +486,7 @@ struct sk_buff *bnxt_ktls_xmit(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
- 	struct bnxt_ktls_offload_ctx_tx *kctx_tx;
- 	struct tls_context *tls_ctx;
- 	u32 seq, payload_len;
-+	int rc;
- 
- 	if (!IS_ENABLED(CONFIG_TLS_DEVICE) || !ktls ||
- 	    !tls_is_skb_tx_device_offloaded(skb))
-@@ -381,14 +505,25 @@ struct sk_buff *bnxt_ktls_xmit(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
- 		 */
- 		kctx_tx->next_tcp_seq_no = seq + payload_len;
- 		kctx_tx->pending_bytes = payload_len;
-+		kctx_tx->pending_ooo = false;
-+		kctx_tx->pending_fwd = true;
- 		*kid = BNXT_KID_HW(kctx_tx->kid);
- 		*kctx_tx_p = kctx_tx;
- 		*lflags |= cpu_to_le32(TX_BD_FLAGS_CRYPTO_EN |
- 				       BNXT_TX_KID_LO(*kid));
- 	} else {
--		skb = tls_encrypt_skb(skb);
--		if (!skb)
--			return NULL;
-+		kctx_tx->pending_fwd = false;
-+		rc = bnxt_ktls_tx_ooo(bp, txr, skb, payload_len, seq, tls_ctx);
-+		if (rc)
-+			return tls_encrypt_skb(skb);
-+
-+		kctx_tx->pending_bytes = payload_len;
-+		kctx_tx->pending_ooo = true;
-+		*kid = BNXT_KID_HW(kctx_tx->kid);
-+		*kctx_tx_p = kctx_tx;
-+		*lflags |= cpu_to_le32(TX_BD_FLAGS_CRYPTO_EN |
-+				       BNXT_TX_KID_LO(*kid));
-+		return skb;
- 	}
- 	return skb;
- }
-@@ -398,8 +533,13 @@ void bnxt_ktls_xmit_commit(struct bnxt_tx_ring_info *txr,
- {
- 	if (!kctx_tx)
- 		return;
--	kctx_tx->tcp_seq_no = kctx_tx->next_tcp_seq_no;
--	bnxt_ktls_inc_tx_stats(txr, kctx_tx->pending_bytes);
-+	if (kctx_tx->pending_fwd)
-+		kctx_tx->tcp_seq_no = kctx_tx->next_tcp_seq_no;
-+	bnxt_ktls_inc_tx_stats(txr, kctx_tx->pending_bytes,
-+			       kctx_tx->pending_ooo);
-+	kctx_tx->pending_bytes = 0;
-+	kctx_tx->pending_fwd = false;
-+	kctx_tx->pending_ooo = false;
- }
- 
- int bnxt_ktls_alloc_tx_ring_stats(struct bnxt *bp, struct bnxt_tx_ring_info *txr)
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.h
-index fd17d2ddb8b8..3ec56b8f08d4 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.h
-@@ -42,6 +42,8 @@ struct bnxt_ktls_offload_ctx_tx {
- 	u32		next_tcp_seq_no;/* staged tcp seq no */
- 	u32		kid;
- 	u32		pending_bytes;	/* staged payload bytes */
-+	bool		pending_fwd;
-+	bool		pending_ooo;
- };
- 
- struct bnxt_ktls_tx_driver_state {
+
+Aside from that, the cleanup paths and setup tracking are solid.
+
+Thanks for adding this.
+
+Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+
+Zhu Yanjun
+
+>
+> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+> ---
+>   tools/testing/selftests/rdma/Makefile         |   3 +-
+>   tools/testing/selftests/rdma/config           |   2 +
+>   .../testing/selftests/rdma/rxe_netns_names.sh | 282 ++++++++++++++++++
+>   3 files changed, 286 insertions(+), 1 deletion(-)
+>   create mode 100755 tools/testing/selftests/rdma/rxe_netns_names.sh
+>
+> diff --git a/tools/testing/selftests/rdma/Makefile b/tools/testing/selftests/rdma/Makefile
+> index 07af7f15c1bf..a91c14c45006 100644
+> --- a/tools/testing/selftests/rdma/Makefile
+> +++ b/tools/testing/selftests/rdma/Makefile
+> @@ -3,6 +3,7 @@ TEST_PROGS := rxe_rping_between_netns.sh \
+>   		rxe_ipv6.sh \
+>   		rxe_socket_with_netns.sh \
+>   		rxe_test_NETDEV_UNREGISTER.sh \
+> -		rxe_sent_rcvd_bytes.sh
+> +		rxe_sent_rcvd_bytes.sh \
+> +		rxe_netns_names.sh
+>   
+>   include ../lib.mk
+> diff --git a/tools/testing/selftests/rdma/config b/tools/testing/selftests/rdma/config
+> index 4ffb814e253b..e1ff54ec0f57 100644
+> --- a/tools/testing/selftests/rdma/config
+> +++ b/tools/testing/selftests/rdma/config
+> @@ -1,3 +1,5 @@
+>   CONFIG_TUN
+>   CONFIG_VETH
+> +CONFIG_DUMMY
+> +CONFIG_NET_NS
+>   CONFIG_RDMA_RXE
+> diff --git a/tools/testing/selftests/rdma/rxe_netns_names.sh b/tools/testing/selftests/rdma/rxe_netns_names.sh
+> new file mode 100755
+> index 000000000000..a7e57706fdff
+> --- /dev/null
+> +++ b/tools/testing/selftests/rdma/rxe_netns_names.sh
+> @@ -0,0 +1,282 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0
+> +#
+> +# Exercise RDMA device name handling across network namespaces.
+> +
+> +source "$(dirname "$0")/../kselftest/ktap_helpers.sh"
+> +
+> +NAME_PREFIX="rxe_netns_names_$$"
+> +NETDEV_PREFIX="rxn$$"
+> +NS1="${NAME_PREFIX}ns1"
+> +NS2="${NAME_PREFIX}ns2"
+> +RXE_A="${NAME_PREFIX}rxe_a"
+> +RXE_B="${NAME_PREFIX}rxe_b"
+> +RXE_SAME="${NAME_PREFIX}rxe_same"
+> +RXE_NEW="${NAME_PREFIX}rxe_new"
+> +DUMMY_A="${NETDEV_PREFIX}a"
+> +DUMMY_B="${NETDEV_PREFIX}b"
+> +OLD_MODE=""
+> +MODE_CHANGED=0
+> +MODS=("dummy" "rdma_rxe")
+> +TEST_SAME_NAMES="same RDMA device name can exist in two net namespaces"
+> +TEST_MOVE_CONFLICT="move without rename fails on destination name conflict"
+> +TEST_MOVE_RENAME="move then rename succeeds"
+> +TEST_COMBINED_MOVE_RENAME="move with requested destination name succeeds"
+> +TEST_SAME_NETNS_DUP_RENAME="same-netns rename rejects duplicate name"
+> +TEST_TEARDOWN_RETURN="netns delete returns device to init_net and renames on conflict"
+> +
+> +ksft_skip()
+> +{
+> +	ktap_skip_all "$*"
+> +	exit "$KSFT_SKIP"
+> +}
+> +
+> +fail()
+> +{
+> +	ktap_exit_fail_msg "$*"
+> +}
+> +
+> +need_cmd()
+> +{
+> +	command -v "$1" >/dev/null 2>&1 || ksft_skip "missing command: $1"
+> +}
+> +
+> +rdma_ns()
+> +{
+> +	local ns=$1
+> +
+> +	shift
+> +	ip netns exec "$ns" rdma "$@"
+> +}
+> +
+> +rdma_dev_exists()
+> +{
+> +	local ns=$1
+> +	local dev=$2
+> +
+> +	if [ -n "$ns" ]; then
+> +		rdma_ns "$ns" dev show "$dev" >/dev/null 2>&1
+> +	else
+> +		rdma dev show "$dev" >/dev/null 2>&1
+> +	fi
+> +}
+> +
+> +add_dummy()
+> +{
+> +	local netdev=$1
+> +
+> +	ip link add "$netdev" type dummy || return 1
+> +	ip link set "$netdev" up || return 1
+> +}
+> +
+> +add_rxe()
+> +{
+> +	local dev=$1
+> +	local netdev=$2
+> +
+> +	rdma link add "$dev" type rxe netdev "$netdev"
+> +}
+> +
+> +rdma_dev_on_netdev()
+> +{
+> +	local netdev=$1
+> +
+> +	rdma link show 2>/dev/null | awk -v want="$netdev" '
+> +		{
+> +			for (i = 1; i < NF; i++)
+> +				if ($i == "netdev" && $(i + 1) == want) {
+> +					dev = $2
+> +					sub(/\/.*/, "", dev)
+> +					print dev
+> +					exit
+> +				}
+> +		}'
+> +}
+> +
+> +wait_rdma_dev_on_netdev()
+> +{
+> +	local netdev=$1
+> +	local dev
+> +	local i
+> +
+> +	for i in $(seq 1 50); do
+> +		dev=$(rdma_dev_on_netdev "$netdev")
+> +		if [ -n "$dev" ]; then
+> +			echo "$dev"
+> +			return 0
+> +		fi
+> +		sleep 0.1
+> +	done
+> +
+> +	return 1
+> +}
+> +
+> +setup_devs()
+> +{
+> +	cleanup_devs
+> +
+> +	add_dummy "$DUMMY_A" || return 1
+> +	add_dummy "$DUMMY_B" || return 1
+> +
+> +	add_rxe "$RXE_A" "$DUMMY_A" || return 1
+> +	add_rxe "$RXE_B" "$DUMMY_B" || return 1
+> +}
+> +
+> +cleanup_devs()
+> +{
+> +	ip link del "$DUMMY_A" 2>/dev/null
+> +	ip link del "$DUMMY_B" 2>/dev/null
+> +}
+> +
+> +setup()
+> +{
+> +	OLD_MODE=$(rdma system show 2>/dev/null |
+> +		   sed -n 's/.*netns \([^ ]*\).*/\1/p')
+> +	[ -n "$OLD_MODE" ] || ksft_skip "failed to read RDMA netns mode"
+> +
+> +	rdma system set netns exclusive >/dev/null 2>&1 ||
+> +		ksft_skip "rdma netns exclusive mode is not supported"
+> +	MODE_CHANGED=1
+> +
+> +	ip netns add "$NS1" || return 1
+> +	ip netns add "$NS2" || return 1
+> +}
+> +
+> +cleanup()
+> +{
+> +	cleanup_devs
+> +
+> +	ip netns del "$NS1" 2>/dev/null
+> +	ip netns del "$NS2" 2>/dev/null
+> +
+> +	if [ "$MODE_CHANGED" -eq 1 ]; then
+> +		rdma system set netns "$OLD_MODE" 2>/dev/null
+> +	fi
+> +
+> +	for m in "${MODS[@]}"; do
+> +		modprobe -r "$m" 2>/dev/null
+> +	done
+> +}
+> +
+> +rdma_supports_combined_move_rename()
+> +{
+> +	rdma dev help 2>&1 | grep -Eq 'netns .*name|name .*netns'
+> +}
+> +
+> +[ "$(id -u)" -eq 0 ] || ksft_skip "must be run as root"
+> +need_cmd ip
+> +need_cmd rdma
+> +need_cmd modprobe
+> +
+> +trap cleanup EXIT
+> +
+> +for m in "${MODS[@]}"; do
+> +	modinfo "$m" >/dev/null 2>&1 || ksft_skip "module $m not found"
+> +	modprobe "$m" || fail "failed to load $m"
+> +done
+> +
+> +setup || fail "failed to create net namespaces"
+> +
+> +ktap_print_header
+> +ktap_set_plan 7
+> +
+> +if setup_devs &&
+> +   rdma dev set "$RXE_A" netns "$NS1" &&
+> +   rdma_ns "$NS1" dev set "$RXE_A" name "$RXE_SAME" &&
+> +   rdma dev set "$RXE_B" netns "$NS2" &&
+> +   rdma_ns "$NS2" dev set "$RXE_B" name "$RXE_SAME" &&
+> +   rdma_dev_exists "$NS1" "$RXE_SAME" &&
+> +   rdma_dev_exists "$NS2" "$RXE_SAME"; then
+> +	ktap_test_pass "$TEST_SAME_NAMES"
+> +else
+> +	ktap_test_fail "$TEST_SAME_NAMES"
+> +fi
+> +cleanup_devs
+> +
+> +if ! setup_devs ||
+> +   ! rdma dev set "$RXE_A" netns "$NS1" ||
+> +   ! rdma_ns "$NS1" dev set "$RXE_A" name "$RXE_SAME" ||
+> +   ! rdma dev set "$RXE_B" netns "$NS2" ||
+> +   ! rdma_ns "$NS2" dev set "$RXE_B" name "$RXE_SAME"; then
+> +	ktap_test_fail "$TEST_MOVE_CONFLICT"
+> +elif rdma_ns "$NS1" dev set "$RXE_SAME" netns "$NS2" >/dev/null 2>&1; then
+> +	ktap_test_fail "$TEST_MOVE_CONFLICT"
+> +elif rdma_dev_exists "$NS1" "$RXE_SAME" &&
+> +     rdma_dev_exists "$NS2" "$RXE_SAME"; then
+> +	ktap_test_pass "$TEST_MOVE_CONFLICT"
+> +else
+> +	ktap_test_fail "$TEST_MOVE_CONFLICT"
+> +fi
+> +cleanup_devs
+> +
+> +if ! setup_devs; then
+> +	ktap_test_fail "$TEST_MOVE_RENAME"
+> +elif rdma dev set "$RXE_A" netns "$NS2" &&
+> +     rdma_ns "$NS2" dev set "$RXE_A" name "$RXE_NEW"; then
+> +	if rdma_dev_exists "$NS2" "$RXE_NEW" &&
+> +	   ! rdma_dev_exists "" "$RXE_A"; then
+> +		ktap_test_pass "$TEST_MOVE_RENAME"
+> +	else
+> +		ktap_test_fail "$TEST_MOVE_RENAME"
+> +	fi
+> +else
+> +	ktap_test_fail "$TEST_MOVE_RENAME"
+> +fi
+> +cleanup_devs
+> +
+> +if ! rdma_supports_combined_move_rename; then
+> +	ktap_test_skip "$TEST_COMBINED_MOVE_RENAME"
+> +elif ! setup_devs; then
+> +	ktap_test_fail "$TEST_COMBINED_MOVE_RENAME"
+> +elif rdma dev set "$RXE_A" netns "$NS2" name "$RXE_NEW"; then
+> +	if rdma_dev_exists "$NS2" "$RXE_NEW" &&
+> +	   ! rdma_dev_exists "" "$RXE_A"; then
+> +		ktap_test_pass "$TEST_COMBINED_MOVE_RENAME"
+> +	else
+> +		ktap_test_fail "$TEST_COMBINED_MOVE_RENAME"
+> +	fi
+> +else
+> +	ktap_test_fail "$TEST_COMBINED_MOVE_RENAME"
+> +fi
+> +cleanup_devs
+> +
+> +if ! setup_devs; then
+> +	ktap_test_fail "$TEST_SAME_NETNS_DUP_RENAME"
+> +elif rdma dev set "$RXE_A" name "$RXE_SAME" &&
+> +     rdma dev set "$RXE_B" name "$RXE_NEW"; then
+> +	if rdma dev set "$RXE_A" name "$RXE_NEW" >/dev/null 2>&1; then
+> +		ktap_test_fail "$TEST_SAME_NETNS_DUP_RENAME"
+> +	elif rdma_dev_exists "" "$RXE_SAME" &&
+> +	     rdma_dev_exists "" "$RXE_NEW"; then
+> +		ktap_test_pass "$TEST_SAME_NETNS_DUP_RENAME"
+> +	else
+> +		ktap_test_fail "$TEST_SAME_NETNS_DUP_RENAME"
+> +	fi
+> +else
+> +	ktap_test_fail "$TEST_SAME_NETNS_DUP_RENAME"
+> +fi
+> +cleanup_devs
+> +
+> +if ! setup_devs; then
+> +	ktap_test_fail "$TEST_TEARDOWN_RETURN"
+> +elif ! rdma dev set "$RXE_A" name "$RXE_SAME" ||
+> +     ! rdma dev set "$RXE_B" netns "$NS2" ||
+> +     ! rdma_ns "$NS2" dev set "$RXE_B" name "$RXE_SAME" ||
+> +     ! rdma_dev_exists "$NS2" "$RXE_SAME"; then
+> +	ktap_test_fail "$TEST_TEARDOWN_RETURN"
+> +else
+> +	ip netns del "$NS2"
+> +	returned=$(wait_rdma_dev_on_netdev "$DUMMY_B")
+> +	ktap_print_msg "device returned to init_net as '${returned:-<missing>}'"
+> +	if rdma_dev_exists "" "$RXE_SAME" &&
+> +	   [ -n "$returned" ] &&
+> +	   [ "$returned" != "$RXE_SAME" ] &&
+> +	   [ "${returned#ibdev}" != "$returned" ]; then
+> +		ktap_test_pass "$TEST_TEARDOWN_RETURN"
+> +	else
+> +		ktap_test_fail "$TEST_TEARDOWN_RETURN"
+> +	fi
+> +fi
+> +cleanup_devs
+> +
+> +ktap_finished
+
 -- 
-2.51.0
+Best Regards,
+Yanjun.Zhu
 
 
