@@ -1,62 +1,96 @@
-Return-Path: <netdev+bounces-306403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306404-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 0KsGO3NIUGpPwAIAu9opvQ
-	(envelope-from <netdev+bounces-306403-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 03:18:43 +0200
+	id asQsOL1NUGqkwQIAu9opvQ
+	(envelope-from <netdev+bounces-306404-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 03:41:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D0F87367E7
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 03:18:43 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 537B6736880
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 03:41:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=khSezX9m;
-	dmarc=pass (policy=none) header.from=linux.dev;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306403-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306403-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=asu.edu header.s=google header.b=j7JoLPrI;
+	dmarc=pass (policy=none) header.from=asu.edu;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306404-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306404-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B7BC63020E90
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 01:18:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5868830221F2
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 01:41:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D658830DD1B;
-	Fri, 10 Jul 2026 01:18:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58BBE34E744;
+	Fri, 10 Jul 2026 01:41:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5853F30B535
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 01:18:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D0F34A76F
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 01:41:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783646312; cv=none; b=i9lplgMFRzY3mo69HOEZPeolTvmryW+LZRP8VLb8HzW1/zwWT5UrIlLU7oPgVeLRjyzBMBlWm4dCzigax7HmSTXlBMc0kARj1LrlvD9zO/jo367pOqdHlHDFfupZAVotmo/52m7rFdmduO/SZFkGYdr4LDkCIxGwQNg/W2dO35Q=
+	t=1783647674; cv=none; b=oswbCMutHxtZs7oTycsrehzRAGKKVVDGQk17Ij6NaeSLLzfIuplevPJcJ4t8V6NQeG1ADgOo7nTOIz2bNkd82qhEVMp6MS6lyJNK6XpSEx9q5N+fM8SBZMndvnyjMweAEAOYa9lYaGx3p/9bL3P5b3Ms+KgVm6ADzYIUEbAyz6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783646312; c=relaxed/simple;
-	bh=4oU5vwBqC2s/OF/BgDvlhZIxT9V5eYNC6nP5Ld7hIpo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Vv49Z5esmCTScwWfN3TRZEanPpK6NcViRy7rv6tdbRjD/bx9P2uHddqKvZoOxRLRh8i1L9X8pxt3ilJTjHtf2zoNEDydDe7OTR0aXRgVC0I9Q97wYwvBwfM12CGUQHCKHdVzJ8B81I5Z2iv8sw+y2nSMEMQ2DrGDuTDTpMZDi7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=khSezX9m; arc=none smtp.client-ip=91.218.175.172
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783646305;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z0mFihgDhXIZEpH6Gz5fyyFppsNsRX070ZVmoxYxoXc=;
-	b=khSezX9mxT1dvLQrVF/nfpINDSPPZ+noeph3jah3gfEfin+kveWaON0pZ21M89l59Km9/x
-	sXQSqw/8SMO46YwETViqU6A3wvkzPi0FZcQjvRQ1lMk/8ECXJlMqlJwx/PP8SCLBpNoukh
-	bRPVwI/ooCrz41IOtNWV8zY/6066m9I=
-From: Tao Cui <cui.tao@linux.dev>
-To: dsahern@kernel.org,
-	leonro@nvidia.com
-Cc: linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	cui.tao@linux.dev,
-	cuitao@kylinos.cn
-Subject: [PATCH iproute2-next v5 2/2] rdma: display resource limits in curr/max format
-Date: Fri, 10 Jul 2026 09:17:59 +0800
-Message-ID: <20260710011759.378893-3-cui.tao@linux.dev>
-In-Reply-To: <20260710011759.378893-1-cui.tao@linux.dev>
-References: <20260710011759.378893-1-cui.tao@linux.dev>
+	s=arc-20240116; t=1783647674; c=relaxed/simple;
+	bh=rueb3mLRc8OyrFqOAhY7oDfe2V0dx6Ap1m+V5a3KYwE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Sr/rT8AFytUO60SYVI+976U7qSg41b0fVpJ0+70ps+YiMWYKGhtqhRHiF5Ok8Nz74qgF4oUFRmp7SMopnnU3Rn0mFd0HfSvcpqPviJ2pBpZc2Iavpjz0OLYzbv9b1HeczO2tBVO3jNUHZHGBa+I7V1dFTiG/Vcq6NMm3IX+pMt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=j7JoLPrI; arc=none smtp.client-ip=209.85.214.177
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2ca64c3ce5fso4980955ad.3
+        for <netdev@vger.kernel.org>; Thu, 09 Jul 2026 18:41:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1783647672; x=1784252472; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=sH0oioGBZ6GXaO2NQPpwG0e7esu95aZWgdtrtZ7Ds68=;
+        b=j7JoLPrIQpSkVOo6WvmZtRrYqExMu14Vi9dcSEa50eA6OVykyvPo9XBBQRQoS0m2z3
+         rs0OPYWNvI+SOl+vyWG4zYcntg0WBMIrdQ5HXhng5Of+28b6mhA00CM82+t7Au5u87TY
+         BZS50XDD2ShyxV6OcGjBQhbQ9ZgAxsNy7y73XdmhgkqI93XVAVDr6JwkOc/7tYxVRDFZ
+         n07wMRI031vdCjsQYX0xMb65XjiuUBki1nnyQb2SzenP8zOM2HErkehKbGXyILNNesjJ
+         TX1OZNdHtMHMSbW+l35Db9S/hPudfNN5DTBUktunyWby5rzSZGJrH5tBkAV+i3waGUYK
+         ywyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783647672; x=1784252472;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=sH0oioGBZ6GXaO2NQPpwG0e7esu95aZWgdtrtZ7Ds68=;
+        b=K/S/0gGz2RaX1DC7TnRU/3WHtA8Ug+EApM/1MYEUK9q3hw3hEfK5T9/3UGxTgvQwwz
+         KuuCicIzqBadHggveuCSna3Es9hyd27P/VEUgLFPICUvI7mpM/QnzJDTL/7bk8OLfmOO
+         JFhnEfbq3YRLoQqwaOsNk6m1fuhf4EkUUFLept97j/jdh5BU0gT/21sFKGJbsaOl7A/N
+         XnlRHo7fdZ6kfufIPmqN73ZbuCIa2b5Dkf2R1qNl5waYcCUcmP8XOj9uW9upEr+J4cMP
+         cMwBMqQ7IfPuZIZtnYxOyYejiSJPyQrQ1dMA/Dhwy6lf/oUZ/Sq6eEO/ixRfmqYlDnE3
+         Zezw==
+X-Gm-Message-State: AOJu0YzAh8UXNEm0vfqr5g7TsR1Vi3iqBxDGtR+ivsl9+iZw/m/uxZeY
+	ovY/Wq4oAard4Wsf63jkycRTQ6ApkzMDS8FP6vg/o/qJbp1tbJqYF3E3WJnk/9jFwv6lmqxAqhA
+	Z1LIunA==
+X-Gm-Gg: AfdE7cnTN6N2u6H+AiaBLmUJfHax41GmPfgzvEJpX3Kbdqzci1gdy1fgtftyOZiindi
+	BsJ8zMSG7Cub3M+jd2Bm4/xRUMgBvt0TV0gPVRG4iuLqDROLZPEB8v32oSUFNOqTOJHAK0WwN6W
+	+caVtoLxRB5PbdNhJXsHyUTHc0Ojjq2UvdhW9dk4mMHGuRayFx3APdpZtH+cb367n0QlID5/5Yv
+	sK3JjazH/g4gh4oAjCz9wcpccl6z8SRQWmt0KhqDyvL76LAU/vXVHLCz/ejOc2xPGQd4Kah2eh5
+	XLK5LU3gB2152TA8SP3DGZj65J8lN97afOqaMBMG3oDWsiSWQQJwXYpSHq6xXMg3c+2EXDHnep9
+	JIEJji6uIP6f34wHr6y+KMVMVNI56doO83xpQjJHjkkbKcKSIiXSXjJFQeIpdlq2vFR79I6JR+H
+	XrkTKPVzhmRKi+2srvZQ==
+X-Received: by 2002:a17:902:fc8d:b0:2ca:73aa:b48f with SMTP id d9443c01a7336-2ccea485246mr97809255ad.35.1783647671878;
+        Thu, 09 Jul 2026 18:41:11 -0700 (PDT)
+Received: from xiang.tailc0aff1.ts.net ([20.171.14.70])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13b84d6ce15sm1640698c88.5.2026.07.09.18.41.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jul 2026 18:41:11 -0700 (PDT)
+From: "Xiang Mei (Microsoft)" <xmei5@asu.edu>
+To: Jakub Kicinski <kuba@kernel.org>,
+	Taehee Yoo <ap420073@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	AutonomousCodeSecurity@microsoft.com,
+	tgopinath@linux.microsoft.com,
+	kys@microsoft.com,
+	"Xiang Mei (Microsoft)" <xmei5@asu.edu>
+Subject: [PATCH net] amt: refresh cached IP header pointers after MLD/IGMP checks
+Date: Fri, 10 Jul 2026 01:41:09 +0000
+Message-ID: <20260710014109.536177-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,106 +98,115 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306403-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:dsahern@kernel.org,m:leonro@nvidia.com,m:linux-rdma@vger.kernel.org,m:netdev@vger.kernel.org,m:cui.tao@linux.dev,m:cuitao@kylinos.cn,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[cui.tao@linux.dev,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:ap420073@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,m:xmei5@asu.edu,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306404-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cui.tao@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[asu.edu:+];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,kylinos.cn:email,linux.dev:from_mime,linux.dev:dkim,linux.dev:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6D0F87367E7
+X-Rspamd-Queue-Id: 537B6736880
 
-From: Tao Cui <cuitao@kylinos.cn>
+amt_dev_xmit() and amt_update_handler() cache iph/ip6h before calling
+ip_mc_check_igmp() / ipv6_mc_check_mld(), which may pskb_may_pull() a
+non-linear skb and reallocate skb->head. The stale pointers are then
+read (amt_dev_xmit: group.ip{4,6} = iph/ip6h->daddr; amt_update_handler:
+ip{,v6}_eth_mc_map()), a slab-use-after-free. tx is reachable by an
+unprivileged user whose amt device has SG enabled; rx by a tunnel peer
+sending a membership update fragmented across several IP fragments.
 
-Parse the new RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX netlink attribute
-to show resource limits alongside current counts in curr/max format:
+Reload iph/ip6h after the check returns, like commit f0e42f0c4337
+("ipv6: sit: reload inner IPv6 header after GSO offloads").
 
-  Before: 0: mlx5_0: qp 123  cq 45  mr 200  pd 10
-  After:  0: mlx5_0: qp 123/131072  cq 45/65536  mr 200/1000000  pd 10/32768
+tx path:
+  BUG: KASAN: slab-use-after-free in amt_dev_xmit (drivers/net/amt.c:1238)
+  Read of size 16 by task exploit
+   amt_dev_xmit (drivers/net/amt.c:1238)
+   dev_hard_start_xmit (net/core/dev.c:3905)
+   __dev_queue_xmit (net/core/dev.c:4872)
+   packet_sendmsg (net/packet/af_packet.c:3114)
 
-JSON output provides both current and max fields per resource type
-(e.g. "qp": 123, "qp-max": 131072). Backward compatible: no output
-change when kernel lacks the new attribute.
+rx path:
+  BUG: KASAN: slab-use-after-free in amt_rcv (drivers/net/amt.c:2530)
+  Read of size 4 by task exploit
+   amt_rcv (drivers/net/amt.c:2530)
+   udp_queue_rcv_one_skb (net/ipv4/udp.c:2388)
+   ip_local_deliver (net/ipv4/ip_input.c:262)
+   ip_rcv (net/ipv4/ip_input.c:612)
 
-Signed-off-by: Tao Cui <cuitao@kylinos.cn>
-Link: https://lore.kernel.org/all/20260615003646.168704-1-cui.tao@linux.dev/
+Fixes: cbc21dc1cfe9 ("amt: add data plane of amt interface")
+Fixes: bc54e49c140b ("amt: add multicast(IGMP) report message handler")
+Fixes: b75f7095d4d4 ("amt: add mld report message handler")
+Reported-by: AutonomousCodeSecurity@microsoft.com
+Signed-off-by: Xiang Mei (Microsoft) <xmei5@asu.edu>
 ---
- rdma/res.c   | 21 ++++++++++++++++++++-
- rdma/utils.c |  1 +
- 2 files changed, 21 insertions(+), 1 deletion(-)
+ drivers/net/amt.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/rdma/res.c b/rdma/res.c
-index 062f0007..046935e2 100644
---- a/rdma/res.c
-+++ b/rdma/res.c
-@@ -55,7 +55,26 @@ static int res_print_summary(struct nlattr **tb)
+diff --git a/drivers/net/amt.c b/drivers/net/amt.c
+index 951dd10e192b..8bc61c539b0a 100644
+--- a/drivers/net/amt.c
++++ b/drivers/net/amt.c
+@@ -1210,6 +1210,7 @@ static netdev_tx_t amt_dev_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		} else {
+ 			data = true;
+ 		}
++		iph = ip_hdr(skb);
+ 		v6 = false;
+ 		group.ip4 = iph->daddr;
+ #if IS_ENABLED(CONFIG_IPV6)
+@@ -1234,6 +1235,7 @@ static netdev_tx_t amt_dev_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		} else {
+ 			data = true;
+ 		}
++		ip6h = ipv6_hdr(skb);
+ 		v6 = true;
+ 		group.ip6 = ip6h->daddr;
+ #endif
+@@ -2498,6 +2500,7 @@ static bool amt_update_handler(struct amt_dev *amt, struct sk_buff *skb)
+ 			netdev_dbg(amt->dev, "Invalid IGMP\n");
+ 			return true;
+ 		}
++		iph = ip_hdr(skb);
  
- 		name = mnl_attr_get_str(nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_NAME]);
- 		curr = mnl_attr_get_u64(nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_CURR]);
--		res_print_u64(name, curr, nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_CURR]);
-+		if (nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX]) {
-+			uint64_t max;
-+			char max_name[64];
-+
-+			max = mnl_attr_get_u64(
-+				nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX]);
-+			snprintf(max_name, sizeof(max_name), "%s-max", name);
-+			print_u64(PRINT_JSON, name, NULL, curr);
-+			print_u64(PRINT_JSON, max_name, NULL, max);
-+			if (!is_json_context()) {
-+				char buf[64];
-+
-+				snprintf(buf, sizeof(buf), "%s %" PRIu64 "/%" PRIu64 " ",
-+					 name, curr, max);
-+				pr_out("%s", buf);
-+			}
-+		} else {
-+			res_print_u64(name, curr,
-+				      nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_CURR]);
-+		}
- 	}
- 	return 0;
- }
-diff --git a/rdma/utils.c b/rdma/utils.c
-index 87003b2c..90ea1c55 100644
---- a/rdma/utils.c
-+++ b/rdma/utils.c
-@@ -480,6 +480,7 @@ static const enum mnl_attr_data_type nldev_policy[RDMA_NLDEV_ATTR_MAX] = {
- 	[RDMA_NLDEV_ATTR_EVENT_TYPE] = MNL_TYPE_U8,
- 	[RDMA_NLDEV_SYS_ATTR_MONITOR_MODE] = MNL_TYPE_U8,
- 	[RDMA_NLDEV_ATTR_STAT_OPCOUNTER_ENABLED] = MNL_TYPE_U8,
-+	[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX] = MNL_TYPE_U64,
- };
+ 		spin_lock_bh(&tunnel->lock);
+ 		amt_igmp_report_handler(amt, skb, tunnel);
+@@ -2517,6 +2520,7 @@ static bool amt_update_handler(struct amt_dev *amt, struct sk_buff *skb)
+ 			netdev_dbg(amt->dev, "Invalid MLD\n");
+ 			return true;
+ 		}
++		ip6h = ipv6_hdr(skb);
  
- static int rd_attr_check(const struct nlattr *attr, int *typep)
+ 		spin_lock_bh(&tunnel->lock);
+ 		amt_mld_report_handler(amt, skb, tunnel);
 -- 
 2.43.0
 
