@@ -1,136 +1,257 @@
-Return-Path: <netdev+bounces-306630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306631-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id hC1XMkciUWoK/wIAu9opvQ
-	(envelope-from <netdev+bounces-306630-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 18:48:07 +0200
+	id vRDaDIoiUWop/wIAu9opvQ
+	(envelope-from <netdev+bounces-306631-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 18:49:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DE9C73CB22
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 18:48:07 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 987CA73CB6E
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 18:49:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b="rT Q33as";
-	dmarc=pass (policy=none) header.from=lunn.ch;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306630-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306630-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=fWcSTkxW;
+	dmarc=pass (policy=reject) header.from=bootlin.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306631-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306631-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1991730103B6
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:42:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4D8B1307A2AD
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:44:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F83443B3D4;
-	Fri, 10 Jul 2026 16:42:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC6443B4A0;
+	Fri, 10 Jul 2026 16:44:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03862D1303;
-	Fri, 10 Jul 2026 16:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC29E43B3D4
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 16:44:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783701772; cv=none; b=Jvr5J3KEDPhb9MZQRNVbjNnE74w+1tILZ5hpb+SaWf1hxuXI1kaH/EBk4BbXkRHm88+eIDC/2wC9RLUPGwstu8MmobJreHr6EgrJTI95R8ioYwKuyLb7lzXAdV+xC+OSO1Rn31IEt/YvMOdPWKkL73edw/5viWKqWik4wfnHGyI=
+	t=1783701846; cv=none; b=hfKwd8Yydirx7/Xo+ABgQ3jhviDz9Bp9T+q8sTr0ctzZxOcsZMYJGx3Lyz34+6y4JnuiRmHxt7TqCITH5pjw1xSZDPk4deDHII97KUdeIfQPzsmIE9OV4wPs61z4+PHMbaUO74lw3ePbWvRiJSR8Jdc92zvNPlH+PrpPdStvRmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783701772; c=relaxed/simple;
-	bh=9nA8uhhcTDfyIof4mgln0Vtd+gRgUi+zZKMRB+ptwlQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sT8bTHtoT+SaO1xl1i+6jU7At0FdFw4onueZqjjlKUxdrTlYpogKkwqNOC4lU9tDz6WtAl1qh8e3KIdbtLopTUhvXzytKWLFqA72yYxMpfkzr7PeePWz6eiaG+tCdw8dB5Re/a86BzaAYw56Y8UuTVeAJg+kSlbuKf6lzUTwHUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rTQ33asI; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=JLwLbiytSY+NyZAL9Suy3UCiKJ7rIXpmNTauGzSf0qA=; b=rT
-	Q33asI7ND/klJqTsm2Y//NzF/md9BOcnx4kmTIAb2qfX9Aj2oFr5FoPlsKl/PB2AtGKpPam6603A5
-	c7HlnVtI1nDMWn2UPUKjxl9/tKxUGrqFeSYXfSRW4+SnEVyQZMzscaD1UXlbgP8YKMmW4sZO2Z+X9
-	96I+TPOA/yJGbyw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wiEJH-00BfaP-5P; Fri, 10 Jul 2026 18:42:43 +0200
-Date: Fri, 10 Jul 2026 18:42:43 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vikas Gupta <vikas.gupta@broadcom.com>
-Cc: gg@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, leonro@nvidia.com, jgg@nvidia.com,
-	bhargava.marreddy@broadcom.com, rahul-rg.gupta@broadcom.com,
-	vsrama-krishna.nemani@broadcom.com,
-	rajashekar.hudumula@broadcom.com, ajit.khaparde@broadcom.com,
-	Siva Reddy Kallam <siva.kallam@broadcom.com>,
-	Dharmender Garg <dharmender.garg@broadcom.com>,
-	Yendapally Reddy Dhananjaya Reddy <yendapally.reddy@broadcom.com>
-Subject: Re: [PATCH net v2] bnge/bng_re: fix ring ID widths
-Message-ID: <97cb56d0-24c0-4d94-9455-8c7b1b185c14@lunn.ch>
-References: <20260704164747.1995227-1-vikas.gupta@broadcom.com>
- <13ce47bb-c8e2-4ad6-8942-e0b4f8ff9e49@lunn.ch>
- <CAHLZf_vxM0uht9S3tD02uaDWLSsYyMcCnRrwmOGhkDU4UeTbrw@mail.gmail.com>
+	s=arc-20240116; t=1783701846; c=relaxed/simple;
+	bh=k/DYohfKDSxjiqdIraTgAZUOXPWe4X+vqJQlCDRJ/no=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:Subject:Cc:To:
+	 References:In-Reply-To; b=aJVA4b4jZrsDvJc0DUqqBmtGERJNWGc1AEnAd0G1H7aiWt342Y9eHER7rSGVM8zlJU39v3WJH1A3vZHIpNpDdMfP2aIpo2T8SLBStYVrGaiEiZmrsl2rG/xCVUOYEIEaZAHDyEQFYy35ebgVvDSuDOAf3Vycyj+Hx3CgzkLJzOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fWcSTkxW; arc=none smtp.client-ip=185.246.84.56
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 5E0A21A0F38;
+	Fri, 10 Jul 2026 16:44:02 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 28CE160342;
+	Fri, 10 Jul 2026 16:44:02 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6711F11BD2463;
+	Fri, 10 Jul 2026 18:43:55 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1783701841; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=5klLTY7luf2N9VlmtEJ+qRL3gV5Uke3/bj3Rh06DY0c=;
+	b=fWcSTkxWyhHL8JKpgTOxN2xozIVxTBZypNlJvyUgsrxQRH8slqs+/Op0GxLihj02cXSlXo
+	yw9iMeTzEicnruefJszL/LGcgKWGzxSorztU8r3IUwi4KVdd+chMC/OgX4uxnuE/oLu2QZ
+	xuVEU8PVZB+HVTs0Of+s8t3kMJ+WgSOoNBc/9mB4ieIPVRER4P9Mf55K5myLdsL6seSFHs
+	eSQITggZYkoemSi46v+enW0STR7BMC67fi0Cveo1rXmPaJWKu/ZW+fMLWF9JcoVQze0kfS
+	OyxwiDD6F6YPSBBaL+qAWPDE0o1g9JpsKiruJSXx92FLPbO7zvy9IFItLdN6DA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHLZf_vxM0uht9S3tD02uaDWLSsYyMcCnRrwmOGhkDU4UeTbrw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 10 Jul 2026 18:43:54 +0200
+Message-Id: <DJV1J2JKZ6KW.1RXOBM28WTVGG@bootlin.com>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: Re: [PATCH net 2/2] net: macb: mask TXUBR during TX NAPI poll to
+ prevent IRQ storms
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-rt-devel@lists.linux.dev>, <stable@vger.kernel.org>
+To: <christian.taedcke@weidmueller.com>,
+ <christian.taedcke-oss@weidmueller.com>, "Conor Dooley"
+ <conor.dooley@microchip.com>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Kevin Hao" <haokexin@gmail.com>, "Simon Horman" <horms@kernel.org>,
+ "Sebastian Andrzej Siewior" <bigeasy@linutronix.de>, "Clark Williams"
+ <clrkwllms@kernel.org>, "Steven Rostedt" <rostedt@goodmis.org>, "Robert
+ Hancock" <robert.hancock@calian.com>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260706-upstreaming-macb-irq-storm-v1-0-ab3115b5a13a@weidmueller.com> <20260706-upstreaming-macb-irq-storm-v1-2-ab3115b5a13a@weidmueller.com>
+In-Reply-To: <20260706-upstreaming-macb-irq-storm-v1-2-ab3115b5a13a@weidmueller.com>
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306630-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:vikas.gupta@broadcom.com,m:gg@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:leonro@nvidia.com,m:jgg@nvidia.com,m:bhargava.marreddy@broadcom.com,m:rahul-rg.gupta@broadcom.com,m:vsrama-krishna.nemani@broadcom.com,m:rajashekar.hudumula@broadcom.com,m:ajit.khaparde@broadcom.com,m:siva.kallam@broadcom.com,m:dharmender.garg@broadcom.com,m:yendapally.reddy@broadcom.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306631-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rt-devel@lists.linux.dev,m:stable@vger.kernel.org,m:christian.taedcke@weidmueller.com,m:christian.taedcke-oss@weidmueller.com,m:conor.dooley@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:haokexin@gmail.com,m:horms@kernel.org,m:bigeasy@linutronix.de,m:clrkwllms@kernel.org,m:rostedt@goodmis.org,m:robert.hancock@calian.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[weidmueller.com,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,goodmis.org,calian.com];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:from_mime,lunn.ch:email,lunn.ch:mid,lunn.ch:dkim]
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:from_mime,bootlin.com:url,bootlin.com:mid,bootlin.com:dkim,weidmueller.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1DE9C73CB22
+X-Rspamd-Queue-Id: 987CA73CB6E
 
-On Fri, Jul 10, 2026 at 11:40:25AM +0530, Vikas Gupta wrote:
-> Hi Andrew,
-> 
-> On Sun, Jul 5, 2026 at 12:04 AM Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > > - Backward compatibility with older firmware is not a concern.
-> >
-> > Could you expand on that please.
-> 
-> The backward compatibility concern raised in v1 does not apply. Thor
-> Ultra hardware has not yet been deployed and no firmware has been
-> released to the field. However, future revisions of HSI must maintain
-> backward compatibility.
+Hello Christian,
 
-O.K, thanks.
+My biggest gripe with this patch is the commit message. It's a massive
+block of text which goes here and there without enough structure.
 
-We take backwards compatibility seriously. The fact this hardware has
-not yet escaped the laboratory, is one of the few reasons acceptable
-for breaking backwards compatibility, so should be stated in the
-commit message. That also avoids having to answer the question again
-and again.
+Let me try to pick issues I have with it and try to give a better
+alternative (hoping I understood the topic clearly enough).
 
-    Andrew
+On Mon Jul 6, 2026 at 4:02 PM CEST, Christian Taedcke via B4 Relay wrote:
+> From: Christian Taedcke <christian.taedcke@weidmueller.com>
+>
+> macb_interrupt() defers TX completion handling to NAPI, but when it
+> schedules the poll it only masks TCOMP, even though TXUBR is enabled
+> alongside it (both are part of MACB_TX_INT_FLAGS). macb_tx_poll() is
+> asymmetric in the same way and only re-enables TCOMP. TXUBR is thus
+> left unmasked while responsibility for handling it has been deferred
+> to NAPI.
+
+Yes, so said differently:
+
+   TXUBR is acknowledged by the NAPI poll function. The IRQ signal is
+   active until then but signal is left unmasked. Do as with TCOMP and
+   mask the signal until its acknowledgment.
+
+This sounds much more straight forward to me. And it also explains what
+we do to solve the issue, which is info we expect to find in the first
+commit message paragraph. The rest is to go into details onto the
+specifics, the decisionmaking, etc.
+
+> Unlike an edge event, TXUBR is a persistent condition: the controller
+> keeps it asserted for as long as the transmitter reads a buffer
+> descriptor whose used bit is set. Leaving a level-triggered source
+> enabled while NAPI owns its processing means the interrupt refires
+> immediately after the handler returns, before the poll has had a
+> chance to clear the underlying condition. This turns into a hard
+> interrupt storm that pegs a CPU in the (threaded) MAC IRQ handler and,
+> on PREEMPT_RT, triggers RT throttling ("sched: RT throttling
+> activated"), taking the network interface down.
+
+This whole paragraph is somewhat moot to me. It highlights level versus
+edge interrupts but even with edge events the bug is present: it blocks
+any other IRQ from the HW until the TXUBR ACK (in NAPI context).
+
+Describing how the bug surfaces on your HW is interesting however.
+
+> Several situations can keep the used-bit read asserted across a poll -
+> for example unreaped completed descriptors still sitting at tx_tail,
+> or a transmit restart racing with macb_start_xmit(). The specific
+> trigger does not matter: as long as the source stays unmasked, any
+> persistent assertion is enough to storm, so the interrupt handling
+> itself must be made self-limiting.
+
+But this is unrelated? Whether TXUBR stays asserted across the poll
+processing doesn't change the fact the IRQ is unmasked until we reach
+NAPI context and the signal is still not ACKed.
+
+> Mask TXUBR together with TCOMP in the IDR write when scheduling the TX
+> NAPI, and re-enable both from the napi_complete path in
+> macb_tx_poll(), making the TX interrupt mask/unmask symmetric and
+> consistent with how the driver already treats every other
+> NAPI-serviced source. The pending TXUBR is still recorded in
+> queue->txubr_pending before masking and acted on by macb_tx_restart(),
+> so no event is lost. A persistent TXUBR now degrades to NAPI-paced
+> polling instead of a CPU-pegging hard interrupt storm.
+
+Again a lot of words for little info. Usually the patch change
+(the "mask TXUBR with TCOMP" part) belongs to the first commit message
+paragraph, we shouldn't have to wait until the last paragraph to know
+about what a patch does.
+
+Some question that is left in my head after reading, that could have
+been answered by your commit message: your approach of masking TXUBR
+until NAPI is one way, another would have been to ACK TXUBR from
+macb_interrupt(). Have you investigated that approach? The answer might
+be super straight forward.
+
+> Fixes: 138badbc21a0 ("net: macb: use NAPI for TX completion path")
+> Cc: stable@vger.kernel.org
+> Assisted-by: Claude:claude-opus-4-8
+> Signed-off-by: Christian Taedcke <christian.taedcke@weidmueller.com>
+> ---
+>  drivers/net/ethernet/cadence/macb_main.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ether=
+net/cadence/macb_main.c
+> index b11cb8f068b7..f75cf2ffdf6f 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -1971,7 +1971,7 @@ static int macb_tx_poll(struct napi_struct *napi, i=
+nt budget)
+>  		    (unsigned int)(queue - bp->queues), work_done, budget);
+> =20
+>  	if (work_done < budget && napi_complete_done(napi, work_done)) {
+> -		queue_writel(queue, IER, MACB_BIT(TCOMP));
+> +		queue_writel(queue, IER, MACB_BIT(TCOMP) | MACB_BIT(TXUBR));
+>
+>  		/* Packet completions only seem to propagate to raise
+>  		 * interrupts when interrupts are enabled at the time, so if
+> @@ -2161,7 +2161,8 @@ static irqreturn_t macb_interrupt(int irq, void *de=
+v_id)
+> =20
+>  		if (status & (MACB_BIT(TCOMP) |
+>  			      MACB_BIT(TXUBR))) {
+> -			queue_writel(queue, IDR, MACB_BIT(TCOMP));
+> +			queue_writel(queue, IDR, MACB_BIT(TCOMP) |
+> +						 MACB_BIT(TXUBR));
+>  			macb_queue_isr_clear(bp, queue, MACB_BIT(TCOMP) |
+>  							MACB_BIT(TXUBR));
+>  			if (status & MACB_BIT(TXUBR)) {
+
+We risk some race condition here, but that was present before your
+patch. macb_interrupt() already grabs bp->lock but macb_tx_poll() does
+zero efforts. (I'm not saying that macb_tx_poll() should grab bp->lock
+which would throw away the benefits of our separate queues, the solution
+is more complex.)
+
+Sashiko reports that as well.
+
+It's not up to you to fix this. Or if you do it, it should be a separate
+patch. It is weird that our IRQ handlers all grab the interface-global
+bp->lock rather than a queue-specific primitive, it would probably be a
+big rework.
+
+--
+
+TLDR: if patch 2/2 fixes your bug, I'm OK with it. Please rewrite your
+commit message though. I suspect patch 1/2 is not needed.
+
+Thanks,
+
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
 
