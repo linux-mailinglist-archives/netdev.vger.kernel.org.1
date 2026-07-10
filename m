@@ -1,134 +1,216 @@
-Return-Path: <netdev+bounces-306582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306583-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VBdRI7r7UGoU9gIAu9opvQ
-	(envelope-from <netdev+bounces-306582-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:03:38 +0200
+	id ZjweGPT9UGq+9gIAu9opvQ
+	(envelope-from <netdev+bounces-306583-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:13:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BA9E73B915
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:03:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF6C173BA95
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:13:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="g/RN9mgk";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306582-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306582-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=key1 header.b=vNgU6bC7;
+	dmarc=pass (policy=none) header.from=linux.dev;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306583-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306583-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E2675302C4A0
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:01:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DA90B301AA67
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:03:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08C4C342526;
-	Fri, 10 Jul 2026 14:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469FE2EB859;
+	Fri, 10 Jul 2026 14:03:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CA472F8EB3;
-	Fri, 10 Jul 2026 14:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7222E762C
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 14:03:25 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783692030; cv=none; b=hK45Nus9NCkthRZsOp/k6Xj2MtVbIlSW3fyTDZtcjm7BC/fPrQwrTSpv/H/lFaUzILXH7xmHLRe7mcHhP6rKe0B0MvBP58L3zRXaBqo4jVBK8pyaDtTZ6LdUtoyDdwHXek1gBShcyeOuVIS3NvNa2yra0bBCPkuTe/5WE73Z6EM=
+	t=1783692208; cv=none; b=j1ei36griH2TnxAIu+xUh2DuiURu23D6olCDVQHeBrm7rVX8qNQJ83D4p1LUgFevR5T0KbdIbLZ9Kgo/kTDBCMHzpqEiS1ANvZC+zIdF0RgOTAOcrllLjiPYiepBt+II70LVqTi5Ga0lYR97r9zlRZTmGXgosw7mSeXDGbNPmZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783692030; c=relaxed/simple;
-	bh=5xl278SyMIeXe5hjqQOVoSesKHXlOLanCZzGWAf2Le8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kNGXfr8bvNkbW8NobSJvG4VifZbwba3DultO5/ZQA7wHJxlWuINdRXX7nuXa/o3+yrxx/fsQ7Z3mCLvjL4zEluA13rQOfYBOhoF1HmSSj6MbX6UlbQrdvC7ztYNTffu1aEg+nv1kgXmlGuYvGiqmPyWysqSlC2rK5q0WIKffsR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g/RN9mgk; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84CC01F00ACA;
-	Fri, 10 Jul 2026 14:00:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783692029;
-	bh=hfTSfVuhgjiaz3JRn5CsmJKebZiPr5216oywMdpMHXw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=g/RN9mgkA0lZelzmXPeo+3dJPVUCv93XRvdZTyuQ/fnGvPkh8KsnZ/jPcDeMg1KqE
-	 ytoW0fYdXl2WBSa8/WRPXTdZItR/Y/KDdfmhAIfe2fXe6yiyxKb7kPdj4riz7g5AVe
-	 bXNcTxKSwJk0n28MvnLmcz1/ntTsMNO7cN1eCHS280vjTVeW2jdL4QOK4V2OSo4Lk8
-	 Rw3PzGsycb9CXgZug4Fr/7wCT4aMQcNHHmnpqsnR5UZGOMcDMlcuqzUDizUhq7LOGB
-	 qfUdXWwxMyXQPCbaV/iY928Q2PB/kUgYM3bPEAiUuASZ6QhuTWOzJkGNnt8tB4VTec
-	 09EnUV+UKxLOw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 938513924F95;
-	Fri, 10 Jul 2026 14:00:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1783692208; c=relaxed/simple;
+	bh=NMnp8am1BA6xzrrUXsYSHtwCeKFYEfEoZr5/9p8eS2Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B11GCHRFarwWOUXsM6rJ/n0Tf/gWCOAnv/1f8/lSMUE2hSjP8sRvL0/OhF+a+QUbZshxT2Zto97+PVrHxWmTKwTpZu3JPTnvTFiVp8dH8gqidg85dBnPozGLKc6qyKRE4UgFM8Z2OJImMi7U5WAqxby+5RNbUGcBg58UV1ApsRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vNgU6bC7; arc=none smtp.client-ip=95.215.58.183
+Message-ID: <a5bc092d-3312-4b1c-94cc-4a8bed6c6588@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783692193;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SAV48k/TGulRNnoJ6bMcRlsY0qC959NRu+LCzm6VfGU=;
+	b=vNgU6bC7d7cHwsrchD3CEuePnT26UK8tLc9gFh5By+UxHfT72+lNgxV803z8kQHaCwW82t
+	lIa1PrSB908EZcUAB7kTMOQf5G9o450BkFPdjPAbtYs0Yzjg0ku/y6kMpOx3lQPbqtr/OJ
+	h7DEyghtBuxdmr23dwAoEgkpe9VXMiM=
+Date: Fri, 10 Jul 2026 15:02:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: chelsio: cxgb4: Use str_plural() in
- mem_intr_handler()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178369200704.698057.2108068559084153307.git-patchwork-notify@kernel.org>
-Date: Fri, 10 Jul 2026 14:00:07 +0000
-References: <20260704121010.201016-3-thorsten.blum@linux.dev>
-In-Reply-To: <20260704121010.201016-3-thorsten.blum@linux.dev>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: bharat@chelsio.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v4] tipc: fix u16 MTU truncation in media and bearer
+ MTU validation
+To: Tung Quang Nguyen <tung.quang.nguyen@est.tech>,
+ "Cen Zhang (Microsoft)" <blbllhy@gmail.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "tipc-discussion@lists.sourceforge.net"
+ <tipc-discussion@lists.sourceforge.net>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "AutonomousCodeSecurity@microsoft.com"
+ <AutonomousCodeSecurity@microsoft.com>,
+ "tgopinath@linux.microsoft.com" <tgopinath@linux.microsoft.com>,
+ "kys@microsoft.com" <kys@microsoft.com>,
+ "jmaloy@redhat.com" <jmaloy@redhat.com>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>
+References: <20260709211649.15623-1-blbllhy@gmail.com>
+ <GV1P189MB1988A52C474B5F7D7A9EC00CC6FD2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <GV1P189MB1988A52C474B5F7D7A9EC00CC6FD2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306582-lists,netdev=lfdr.de,netdevbpf];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:thorsten.blum@linux.dev,m:bharat@chelsio.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:tung.quang.nguyen@est.tech,m:blbllhy@gmail.com,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[est.tech,gmail.com];
+	RCVD_COUNT_THREE(0.00)[3];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306583-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linux.dev:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:from_mime,linux.dev:dkim,linux.dev:mid,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5BA9E73B915
+X-Rspamd-Queue-Id: AF6C173BA95
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Sat,  4 Jul 2026 14:10:11 +0200 you wrote:
-> Replace the manual ternary "s" pluralization with str_plural() to
-> simplify the code.
+On 10/07/2026 13:57, Tung Quang Nguyen wrote:
+>> Subject: [PATCH net v4] tipc: fix u16 MTU truncation in media and bearer MTU
+>> validation
+>>
+>> Both TIPC_NL_MEDIA_SET and TIPC_NL_BEARER_SET accept user-supplied
+>> MTU values but only enforce a minimum bound, not a maximum. When a user
+>> sets the MTU to a value exceeding U16_MAX (65535), it passes validation but is
+>> silently truncated when assigned to u16 fields l->mtu and
+>> l->advertised_mtu in tipc_link_create(). Values like 65536 (0x10000)
+>> truncate to 0, causing a division by zero in tipc_link_set_queue_limits() which
+>> computes TIPC_MAX_PUBL / (l->mtu / ITEM_SIZE). Other overflowing values
+>> (e.g. 65537-131071) produce small incorrect MTU values, resulting in link
+>> malfunction behaviors.
 > 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-> ---
->  drivers/net/ethernet/chelsio/cxgb4/t4_hw.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> Yes, this is a bug. I can reproduce the same div-by-zero.
+> 
+>>
+>> Crash stack (triggered as unprivileged user via user namespace):
+>>
+>>   tipc_link_set_queue_limits  net/tipc/link.c:2531
+>>   tipc_link_create            net/tipc/link.c:520
+>>   tipc_node_check_dest        net/tipc/node.c:1279
+>>   tipc_disc_rcv               net/tipc/discover.c:252
+>>   tipc_rcv                    net/tipc/node.c:2129
+>>   tipc_udp_recv               net/tipc/udp_media.c:392
+>>
+>> Two independent paths lack the upper bound check:
+>> 1. tipc_udp_mtu_bad() -- called from __tipc_nl_media_set() (MEDIA_SET) 2.
+>> inline check in __tipc_nl_bearer_set() at bearer.c:1160 (BEARER_SET)
+>>
+>> Fix both by rejecting MTU values above U16_MAX.
+>>
+>> Fixes: 901271e0403a ("tipc: implement configuration of UDP media MTU")
+>> Reported-by: AutonomousCodeSecurity@microsoft.com
+>> Closes: https://lore.kernel.org/all/CAB8m9WgETt0AjmFwE=F-
+>> CKjGXsK6_WDv0=kbYRcC8-noo+amnA@mail.gmail.com
+>> Signed-off-by: Cen Zhang (Microsoft) <blbllhy@gmail.com>
+>> ---
+>> v4: Add .min check value
+>> v3: Use nla_policy check to limit MTU max value as suggested by Vadim
+>> v2: Solved format issue
+>> Link: https://lore.kernel.org/all/CAB8m9WgETt0AjmFwE=F-
+>> CKjGXsK6_WDv0=kbYRcC8-noo+amnA@mail.gmail.com
+>>
+>> net/tipc/netlink.c | 7 ++++++-
+>> 1 file changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/tipc/netlink.c b/net/tipc/netlink.c index
+>> 8336a9664703..811438c44542 100644
+>> --- a/net/tipc/netlink.c
+>> +++ b/net/tipc/netlink.c
+>> @@ -113,12 +113,17 @@ const struct nla_policy
+>> tipc_nl_node_policy[TIPC_NLA_NODE_MAX + 1] = {  };
+>>
+>> /* Properties valid for media, bearer and link */
+>> +static const struct netlink_range_validation tipc_nl_mtu_range = {
+>> +	.min = TIPC_MIN_BEARER_MTU,
+> 
+> Adding lower threshold checking introduces two issues:
+> 1. Existing function tipc_udp_mtu_bad() can never return "true".
 
-Here is the summary with links:
-  - [net-next] net: chelsio: cxgb4: Use str_plural() in mem_intr_handler()
-    https://git.kernel.org/netdev/net-next/c/d5d7554052f3
+it can. if MTU is in the range [TIPC_MIN_BEARER_MTU, TIPC_MIN_BEARER_MTU 
++ sizeof(iphdr) + sizeof(udphdr)]
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> 2. Breaking user-space applications looking for error message " Error: MTU value is out-of-range". Look at the error messages before and after your patch:
+> [Before patch]
+> node1 ~ # tipc bearer set mtu 15 media udp name UDP0
+> Error: MTU value is out-of-range.
+> kernel answers: Invalid argument
+> 
+> [After  patch]
+> node1 ~ # tipc bearer set mtu 15 media udp name UDP0
+> kernel answers: Numerical result out of range
 
+that's interesting, because this error message belongs to 9p scope...
+
+anyways, we can keep v3 of this patch with .max value set only
+
+
+> 
+>> +	.max = U16_MAX,
+>> +};
+>> +
+>> const struct nla_policy tipc_nl_prop_policy[TIPC_NLA_PROP_MAX + 1] = {
+>> 	[TIPC_NLA_PROP_UNSPEC]		= { .type = NLA_UNSPEC },
+>> 	[TIPC_NLA_PROP_PRIO]		= { .type = NLA_U32 },
+>> 	[TIPC_NLA_PROP_TOL]		= { .type = NLA_U32 },
+>> 	[TIPC_NLA_PROP_WIN]		= { .type = NLA_U32 },
+>> -	[TIPC_NLA_PROP_MTU]		= { .type = NLA_U32 },
+>> +	[TIPC_NLA_PROP_MTU]		=
+>> NLA_POLICY_FULL_RANGE(NLA_U32, &tipc_nl_mtu_range),
+>> 	[TIPC_NLA_PROP_BROADCAST]	= { .type = NLA_U32 },
+>> 	[TIPC_NLA_PROP_BROADCAST_RATIO]	= { .type = NLA_U32 }
+>> };
+>> --
+>> 2.53.0
+> 
 
 
