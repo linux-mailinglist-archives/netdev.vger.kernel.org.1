@@ -1,100 +1,98 @@
-Return-Path: <netdev+bounces-306722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306723-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id c7eZED17UWrQFQMAu9opvQ
-	(envelope-from <netdev+bounces-306722-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 01:07:41 +0200
+	id OgpkFMGDUWq9FgMAu9opvQ
+	(envelope-from <netdev+bounces-306723-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 01:44:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8E0C73FB48
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 01:07:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54A2A73FC24
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 01:44:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=PApXLIuW;
-	dmarc=pass (policy=none) header.from=asu.edu;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306722-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306722-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=fastmail.im header.s=fm2 header.b=oadeqqeQ;
+	dkim=pass header.d=messagingengine.com header.s=fm2 header.b=Mcbs+Vxk;
+	dmarc=pass (policy=none) header.from=fastmail.im;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306723-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306723-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 42C03300D1E9
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 23:07:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 23F4930238F8
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 23:43:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9B93F927B;
-	Fri, 10 Jul 2026 23:07:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CCBC3BB12D;
+	Fri, 10 Jul 2026 23:43:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C5F3F8883
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 23:07:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1D7A377566
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 23:43:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783724855; cv=none; b=TVDpdruK5WD4ph5q1HtXs4Uu28XQn9sjXPVCD8vrr6p6XyXhy6rjMXjEzFSbrHxfaDBqYDr1ZYZtKz/bLkC6kVtzEOOBOm69r5UTUkB5yf1S46+sx5UjQaYC+tu2+etsk4JQu94AEgfnOCTcHOPYpkKONINs8pfajNC3cJLU0FU=
+	t=1783727038; cv=none; b=fzOSpfiiXTFHMBkEKJn7AMFyD/s4g+eFzFdSsDFIFjwK2bO81AXSAc7qHHGFZ7IP5V6M60YH7tzWfGZcoMjV1aATsUyKQD/XuvaMrjtyL54IvqHcEVXMUmX9XnHMB7JU8OaRxddoqmHhqT1QMAQue3fSLT+U3pfiw1p8iqogcDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783724855; c=relaxed/simple;
-	bh=lKsYa42aL4Ei336BgabWgnSeHZrvwq4Zr4Q/JLNaa8w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KOFKHWVhlBFagquvVP2qZGgZIMpcThgHI28bpURC5RQ5dSdXOS51078YHZdXED3dxp6FoHVJGWC2OiEIhDp68/Aplu9IO9NVEqzVf5p2zhvpV24KfCHRQYp3YcbkYegTqsd4X/7nr3UKMKysSJUovHlDC6Pz/DJPYq4IB8ra6v0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=PApXLIuW; arc=none smtp.client-ip=209.85.214.175
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2cacd69a9c0so15521155ad.1
-        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 16:07:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1783724853; x=1784329653; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=WLB8zFNRH3nQr6RoRadithpdPEcyDjfC4QcMcMwhYBw=;
-        b=PApXLIuWzSRJfOzOSEWj7pdyljHlSToHjJzLMxv8qhPzDF5msU6xp3qN+oVbl/EsK6
-         Ge3FZYOGRX6c14oLDtrPFxvvaEycfjO1f860brey5DKDEE0DzZ3XFKYwPym1kAjxoBPi
-         KvOy+a4yRxnODxQY8GpO9gfqFWkj6usAmo4U6erzn1inJCEv43MSTL77MyObkS7ZyKrC
-         410YRq0BPHmIloYcFD8x4sQwxLj0EEeaqrlKrQ28r7V93TPhcLtZeQhvyCJUWFtYUWOo
-         DS7qDzdwdEEjThG1O/w2G5J7HgrmxeyO6o1llMJ+20+xYc2y5v3Vj4msZYTAaNMpPVqt
-         0Iaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783724853; x=1784329653;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=WLB8zFNRH3nQr6RoRadithpdPEcyDjfC4QcMcMwhYBw=;
-        b=bMJcfD/tV41k06Gcu7FArTII46xdjdHQxSumz2Stgn2nT2AR9E85fLH1W9y4SN0NsB
-         2E6OnvY1eBJj5ICxYrIaNJHKO66Kn//ZWFn+eW60MCgxTXkarIKt5Q3T+CMp0tOTXtGO
-         WoLr9N9Okn0sv2cvA3YFf//3fVOXtxbjig8hMTrWiIABen/vNFWGtuHSs+xjWKrZGqob
-         6TxyYHkb8Laqvq8zlgc3zCG6rntDK2XleZmM1oscI53T0K6zUJRIOY2P/yplygXc6SFv
-         ef2fYFyGEW7LVg6gAIIOxRzftWGDlIpK1d3fz05R6tyUapc19xA1k2WxLyWWlMrl0A/J
-         8LwA==
-X-Forwarded-Encrypted: i=1; AHgh+RoZ1sRb3bgwa9kVioPuAQYj5/F0WBgkX6I7U0nWJImOWSgTXsAu/qq7UgYjrN6zzq8yk9vSy7Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywxyf/JNeKPlQfbpD0DUhaTiQqPARLWyGG8No3MsiY7kc6SZxJB
-	F/gJ5iJbcQ0/LZEHgroVetaWTSCKgS/0PiytUx2kKGFfe+p+BQ3eE3OiTLqraY99WA==
-X-Gm-Gg: AfdE7cn1Q8pd5VcaxjvsEgxoyralxW5R3suZPdZskc8CvZX+GpacuOewo8Z0+cRqbYA
-	/EezZf1rYL4Sd/FwCOaILS6SdgCjNgrZjYa8GxL2a8c68wlyQPM6XUF0M/fQNwwLGG4scX6FZgm
-	NoAuyuK4vS/9CROT129pLOrlJdf/2MMCs/WW1PLDME9h/OKDSH8v8bwjlIL9DT/PuG7fDiC2xCD
-	ffK2sUfV8vSBDMBtk5GPPbhJmdhnxqDVCBaMQlTJKOV4mOOTlwof9pa3ABRIA0aiCtZkPdo4MZo
-	WwbBPhWSBVzjVyuYHNyQ6x+7UDZWV+JUm7As5aYSloaxV49aODedhx06XjqICaSSsYa01/ZvL3T
-	QEf3zO0azJvkjDMM/DKJnirT0QhQZeHAEnpplvWGocFQalDTlLW5RJY0IsP0RWsBrgM6YYndBj3
-	Co48g7hf8nzIdAzRCJYg==
-X-Received: by 2002:a05:6a20:b7a7:b0:3bf:6edd:9e2a with SMTP id adf61e73a8af0-3c1108bdcf3mr939801637.19.1783724853152;
-        Fri, 10 Jul 2026 16:07:33 -0700 (PDT)
-Received: from xiang.tailc0aff1.ts.net ([20.171.14.70])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13b6596681fsm53175028c88.8.2026.07.10.16.07.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jul 2026 16:07:32 -0700 (PDT)
-From: "Xiang Mei (Microsoft)" <xmei5@asu.edu>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Harald Welte <laforge@gnumonks.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Wojciech Drewek <wojciech.drewek@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	osmocom-net-gprs@lists.osmocom.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	AutonomousCodeSecurity@microsoft.com,
-	tgopinath@linux.microsoft.com,
-	kys@microsoft.com,
-	"Xiang Mei (Microsoft)" <xmei5@asu.edu>
-Subject: [PATCH net] gtp: check skb_pull_data() return in gtp1u_send_echo_resp()
-Date: Fri, 10 Jul 2026 23:07:24 +0000
-Message-ID: <20260710230724.942574-1-xmei5@asu.edu>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1783727038; c=relaxed/simple;
+	bh=3wQQb+0AYOusXKBydFdAJx9qNja7ILyNmi2KVP9wfQU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Xy8SIx9M9qiDvWjVIS26239DJhwYB70SnA3CtqyLVa8z/s6kUDPCQ+VGPUSV6rl5doudM3pJbNNFXAkyIo+X3CoAxVVr5tHrzMfrbK6N/UnEs6am56N0WFQGvt0IMjxsraWsiaU+CgUVXC/6tgjy/vCraMAMWDemWKxsQ5bB+cA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=oadeqqeQ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Mcbs+Vxk; arc=none smtp.client-ip=202.12.124.155
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 9271A7A00E2;
+	Fri, 10 Jul 2026 19:43:54 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-05.internal (MEProxy); Fri, 10 Jul 2026 19:43:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1783727034; x=1783813434; bh=GKIKYKV6UeHLtr3RH2Pkt
+	dAEffQps9fXEAUHHjR6r4o=; b=oadeqqeQjtR5NUTIaEPvQzDvsSgi9lw1RYF/I
+	8CnOObaJUPBj/ITfcZ7o1Eg6LqAGvb+xK843Hq4yz5/+zh/KneBGPoIJNUSW8RjD
+	2K8uaSje1agqFwDpxfObhr52rQ8/TrbqIJ/aGgZxiFOqVnsOq5oYwAsJky9FIJTL
+	tAC70Ajl5SmkdRETPoZ7BXizziWgTydjzclBBjhAI8vpXx80KV8u6Ed1DT9F+APH
+	8lMqfsYY2jZtlo3/YhNo/YaJKJdkJ0olJVeR7WP6ZV31DOF3jvDZVi3kketuhhPI
+	aMTHi8h6lnfq09qa3hDm5S9Y96VLD1QwtcZ5sGPTrVoonkEQg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1783727034; x=1783813434; bh=GKIKYKV6UeHLtr3RH2PktdAEffQps9fXEAU
+	HHjR6r4o=; b=Mcbs+Vxk/IWn4eUiuSSBOmf9VqFza6pP/Tw92gKfYue5pFOwbMs
+	U0guxlSY69K6zCcKuRgev6MbY1OYrG/V7t8T5iRpq1v+Ww2B0448HNhu8VPeEbFV
+	NpzfrE6JqJ0IE9ztbrXFYPQXP0wMvX9xRf6lc3HpGKCz39TejhjKlvGb5Mgb0slk
+	IhYksxXfkcr8QetizUwoa6EW06o4oG16IkrUOAmNfsCjE5C5rSuAr/0eaFDrq0bt
+	3fIB+DSs9emKNumTjNM2UhUNdJzbpqdp8EAL1ugZzvpni0/eiT4PNlFIqTcFY1F/
+	EiQNsZyJiVnU9IoeVViH/kAyxOWThnDP2Dw==
+X-ME-Sender: <xms:uoNRajA_ZbCxt5GfS0A6ox2t2cZJDuJV6Tc_EdxP7Yan5Hvrorntrw>
+    <xme:uoNRagbuTQ1yYCRch0s05PzXIMuDEs_7tR97hwtv4bh1Ce0rJVSUbubDZ2L1HShlg
+    1wBxetA5RjJty7XoHbOTSf5QHFHKC-HjrjPYPF4ju6S5NWWdR6Smdg>
+X-ME-Received: <xmr:uoNRam5PovK4k76uT7x1x9oC8evW_EOybVjGyYeE3eHOfMZOouOn7eIOfspYcC6W9tGBEG8>
+X-ME-Proxy-Cause: dmFkZTF+g2EYbqeqpwFxAE5Drwtlz0wUmeW+uHINOI7nt4t4qqPvKrsj7/KvtsdY5v7SUR
+    jNlrhzMGEoeaqLjPEQxZ6bRbjkTnCoz86hcVuZztF2uo6aMJ5VCTdWwMlkFhYN5S8zB8XE
+    HBqdUUNLnu8Nyqk1jpV1nhEIl/UthMRHsASZUjbEOM//KrK/2edReajtiZE6biBhfWDH1d
+    UkcLL3iE3Am2uQ0XQ2fnuDEYuqXioU/874aIBsJSU1MzD/bxDOXtyndBN0rSPQP0fY0zUr
+    axBwAj09fC/XY6TXZZdl/RFBXmHwCsoBBkl80/LY43Bv5FbANrMX2Cjf4DmR/E+aJ1SNpH
+    44I8GRlTtVlkWJl+OrbwYZlAf1mjT+zthh8uNXNUBnhMU8sZuYeAQaMz1HLh9JifKr11xc
+    Gzd2Ff3QW7keReA99jkCogm7gDX3lElon2vzrIWcaEsYpRNy+hGJKdOSPmNW9AHKcgca5Q
+    KCq5AE7z7Gtps15cP6pv1rl1OHn1g3EdvfBZpLZi4BhYUh6dzr/It+720+8bmcz1dFhd1P
+    QAVGq7OFqq+dzhw3UcDUly1M/gaOGwWcvaTiR0+9/56EpzWODrCnR/hysxlaaM+xruhQ1r
+    w8KFGExd/6q7HVERD7+IEPM5LDQWTkbpuvWZx8mZOVR6MdjUpPLCGgApcJJQ
+X-ME-Proxy: <xmx:uoNRahbQgUVGEX6Bk_MVxXMAULmrHqwBgbx5eGuoIkGEhzAFh8GuiQ>
+    <xmx:uoNRalgal1af571YFBQ7YZ1cDN_RfZ3__jw74i6ArEUXjeYODuQt6w>
+    <xmx:uoNRai-hHT2NgICtmXYMG0kt-7Q5M_zkJ8v9Dc5zbQjPQyiE4HuNew>
+    <xmx:uoNRagoj-1MHewwBTHF6QDid-dUSEcacOb7HKhOI5fWudgAHI85SPw>
+    <xmx:uoNRap4ckuWc_9SSD8xDMZX7-wdLOhMMwJ-geEzT9n9P3xcaeaTuCvBC>
+Feedback-ID: i559e4809:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 10 Jul 2026 19:43:53 -0400 (EDT)
+From: Alice Mikityanska <alice.kernel@fastmail.im>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org,
+	maxtram95@gmail.com,
+	Alice Mikityanska <alice@isovalent.com>,
+	Alice Mikityanska <alice.kernel@fastmail.im>
+Subject: [PATCH net] mailmap: update entry for Alice Mikityanska
+Date: Sat, 11 Jul 2026 02:43:19 +0300
+Message-ID: <20260710234319.328687-1-alice.kernel@fastmail.im>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,87 +101,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm2,messagingengine.com:s=fm2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-306722-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[fastmail.im];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,isovalent.com,fastmail.im];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306723-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:netdev@vger.kernel.org,m:maxtram95@gmail.com,m:alice@isovalent.com,m:alice.kernel@fastmail.im,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:laforge@gnumonks.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:wojciech.drewek@intel.com,m:anthony.l.nguyen@intel.com,m:osmocom-net-gprs@lists.osmocom.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,m:xmei5@asu.edu,m:andrew@lunn.ch,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[asu.edu:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[alice.kernel@fastmail.im,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alice.kernel@fastmail.im,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,asu.edu:from_mime,asu.edu:email,asu.edu:mid,asu.edu:dkim]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E8E0C73FB48
+X-Rspamd-Queue-Id: 54A2A73FC24
 
-gtp1u_send_echo_resp() ignores skb_pull_data()'s return value. Its
-caller gtp1u_udp_encap_recv() only guarantees 16 bytes (udphdr +
-gtp1_header), but the pull requests 20 (gtp1_header_long + udphdr). For
-a 16-19 byte echo request the pull fails and returns NULL without
-advancing skb->data; execution continues, and the following skb_push()
-plus the IP header pushed by iptunnel_xmit() move skb->data below
-skb->head, tripping skb_under_panic().
+Map all my corporate and old emails and update my name.
 
-Fix it by dropping the packet when skb_pull_data() fails.
-
-  skbuff: skb_under_panic: ...
-  kernel BUG at net/core/skbuff.c:214!
-  Call Trace:
-   skb_push (net/core/skbuff.c:2648)
-   iptunnel_xmit (net/ipv4/ip_tunnel_core.c:82)
-   gtp_encap_recv (drivers/net/gtp.c:701 drivers/net/gtp.c:808 drivers/net/gtp.c:920)
-   udp_queue_rcv_one_skb (net/ipv4/udp.c:2388)
-   ...
-  Kernel panic - not syncing: Fatal exception in interrupt
-
-Fixes: 9af41cc33471 ("gtp: Implement GTP echo response")
-Reported-by: AutonomousCodeSecurity@microsoft.com
-Assisted-by: Claude:claude-opus-4-8
-Signed-off-by: Xiang Mei (Microsoft) <xmei5@asu.edu>
+Signed-off-by: Alice Mikityanska <alice.kernel@fastmail.im>
 ---
- drivers/net/gtp.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ .mailmap | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-index a60ef32b35b8..f8c7b532b10c 100644
---- a/drivers/net/gtp.c
-+++ b/drivers/net/gtp.c
-@@ -669,8 +669,9 @@ static int gtp1u_send_echo_resp(struct gtp_dev *gtp, struct sk_buff *skb)
- 		return -1;
- 
- 	/* pull GTP and UDP headers */
--	skb_pull_data(skb,
--		      sizeof(struct gtp1_header_long) + sizeof(struct udphdr));
-+	if (!skb_pull_data(skb, sizeof(struct gtp1_header_long) +
-+				sizeof(struct udphdr)))
-+		return -1;
- 
- 	gtp_pkt = skb_push(skb, sizeof(struct gtp1u_packet));
- 	memset(gtp_pkt, 0, sizeof(struct gtp1u_packet));
+diff --git a/.mailmap b/.mailmap
+index 12f3acdebd72..d790f17a553d 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -66,6 +66,11 @@ Alex Hung <alexhung@gmail.com> <alex.hung@canonical.com>
+ Alex Shi <alexs@kernel.org> <alex.shi@intel.com>
+ Alex Shi <alexs@kernel.org> <alex.shi@linaro.org>
+ Alex Shi <alexs@kernel.org> <alex.shi@linux.alibaba.com>
++Alice Mikityanska <alice.kernel@fastmail.im> <maxtram95@gmail.com>
++Alice Mikityanska <alice.kernel@fastmail.im> <maximmi@mellanox.com>
++Alice Mikityanska <alice.kernel@fastmail.im> <maximmi@nvidia.com>
++Alice Mikityanska <alice.kernel@fastmail.im> <maxim@isovalent.com>
++Alice Mikityanska <alice.kernel@fastmail.im> <alice@isovalent.com>
+ Aloka Dixit <quic_alokad@quicinc.com> <alokad@codeaurora.org>
+ Al Viro <viro@ftp.linux.org.uk>
+ Al Viro <viro@zenIV.linux.org.uk>
+@@ -584,8 +589,6 @@ Mauro Carvalho Chehab <mchehab@kernel.org> <mchehab@osg.samsung.com>
+ Mauro Carvalho Chehab <mchehab@kernel.org> <mchehab@redhat.com>
+ Mauro Carvalho Chehab <mchehab@kernel.org> <m.chehab@samsung.com>
+ Mauro Carvalho Chehab <mchehab@kernel.org> <mchehab@s-opensource.com>
+-Maxim Mikityanskiy <maxtram95@gmail.com> <maximmi@mellanox.com>
+-Maxim Mikityanskiy <maxtram95@gmail.com> <maximmi@nvidia.com>
+ Maxime Ripard <mripard@kernel.org> <maxime@cerno.tech>
+ Maxime Ripard <mripard@kernel.org> <maxime.ripard@bootlin.com>
+ Maxime Ripard <mripard@kernel.org> <maxime.ripard@free-electrons.com>
 -- 
-2.43.0
+2.54.0
 
 
