@@ -1,60 +1,59 @@
-Return-Path: <netdev+bounces-306406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306409-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id XJx2MeZRUGrBwgIAu9opvQ
-	(envelope-from <netdev+bounces-306406-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 03:59:02 +0200
+	id NjEJCWlSUGrcwgIAu9opvQ
+	(envelope-from <netdev+bounces-306409-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 04:01:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD4F773690A
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 03:59:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C7B0736925
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 04:01:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306406-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306406-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306409-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306409-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8C2BD3028F2C
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 01:59:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 138DF3029278
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 02:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0E023EAA0;
-	Fri, 10 Jul 2026 01:59:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BE774964F;
+	Fri, 10 Jul 2026 02:00:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.175.55.52])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BB1F1FE471;
-	Fri, 10 Jul 2026 01:58:53 +0000 (UTC)
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F6A134CDD
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 02:00:33 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783648740; cv=none; b=smnIrFbkitDJRNLA81DY5vlzK5xmWzD3TbM9PEbF7VBSUwODrVBK6CFrRCWeWdO1WtgKrB0WNTlVGmZoTJ4xbXRFAG1BOIP1blGDff+cpyFquQEgyrPtXT8tAwJCoKrIOoboDkUbI9blaGJ6RXR0qdh/ukZoCxzi3Tx7RMgCWsU=
+	t=1783648836; cv=none; b=r2noHCK5QbiBJqBN+JtFaabC7XF+3tc77tpUw0wzEF0drYFGrFYbJ9uYkadFx7gGeK9I6pzgN30FJiKOnhvrLzKHKt742jRQVlVhV5ptcF/OT6Kgy/tHke9HqOcj+F+Aji/qDA+DptP3i3l71KprmOAjcFyYjZTw/UP1B8hjdhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783648740; c=relaxed/simple;
-	bh=f0cXaBA3jdW99H4NxUqPacfR/UpWvSvZUZpMvT1az40=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UK+/FONXrtWnWL6Oyq8wYFOdngE3KRQiPPtWkMsqGO3NpWzF1W/h9rZ8Fkjkn2Cu3DoHsn+OglvFzEHuMEDbdOvaiBOJ1yS3NPpvDgC3Y2cl+7iFqmsUlS+XkoiStpEdeNBF7WJzJu9CRYJNcveVYFsVfjFMSeZLBwhVM2ZhJr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=52.175.55.52
-Received: from zju.edu.cn (unknown [10.98.66.117])
-	by mtasvr (Coremail) with SMTP id _____wDnslLDUVBqucQuAA--.200S3;
-	Fri, 10 Jul 2026 09:58:29 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.98.66.117])
-	by mail-app4 (Coremail) with SMTP id zi_KCgCn2jHCUVBqpzAzAg--.28839S2;
-	Fri, 10 Jul 2026 09:58:26 +0800 (CST)
-From: Fan Wu <fanwu01@zju.edu.cn>
+	s=arc-20240116; t=1783648836; c=relaxed/simple;
+	bh=UZa86QtGUFcj32KOciQANkPv4buxwTnOVELBM0Mfgyo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gkzTXplLh5AbtWvDofFlsjgCNdgEJoIaMAB05EC7wAFTGEOUo54TD8eImKK8kSonj/CM8/aasY/Vjgwagp1bFepdexO1nQverF0kVH646ZX4En4LMfFcYEN4cE2nLUPLv5dCpX2Q0XbUkXcmR813V10FCGSKCpvzCPjjvI+KKPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.254.200.128
+X-QQ-mid: esmtpgz14t1783648773t105e8cb5
+X-QQ-Originating-IP: dXceXjmy0NGzGUFHs4i33qOsLtnvOIBAi+i8VF6DiM0=
+Received: from localhost.localdomain ( [60.188.196.189])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 10 Jul 2026 09:59:30 +0800 (CST)
+X-QQ-SSF: 0001000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 3318885291999861221
+EX-QQ-RecipientCnt: 7
+From: Mengyuan Lou <mengyuanlou@net-swift.com>
 To: netdev@vger.kernel.org
-Cc: shenjian15@huawei.com,
-	salil.mehta@huawei.com,
-	dingtianhong@huawei.com,
+Cc: jiawenwu@trustnetic.com,
+	duanqiangwen@net-swift.com,
 	horms@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Fan Wu <fanwu01@zju.edu.cn>
-Subject: [PATCH net v2] net: hip04: fix tx coalesce timer and IRQ teardown races
-Date: Fri, 10 Jul 2026 01:57:30 +0000
-Message-Id: <20260710015730.630775-1-fanwu01@zju.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	Mengyuan Lou <mengyuanlou@net-swift.com>
+Subject: [PATCH net-next v7 0/2] net: libwx: improve VF ethtool support
+Date: Fri, 10 Jul 2026 09:59:23 +0800
+Message-Id: <20260710015925.34769-1-mengyuanlou@net-swift.com>
+X-Mailer: git-send-email 2.30.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,261 +61,126 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zi_KCgCn2jHCUVBqpzAzAg--.28839S2
-X-CM-SenderInfo: qrstjiaswqq6lmxovvfxof0/
-X-CM-DELIVERINFO: =?B?Ll45+wXKKxbFmtjJiESix3B1w3vZ3A9ovKVTomAyoQazvoRs/NHSP8GI2EvgeEEW7R
-	sfnXz+g1OQfMo27QHy5TwQyZzn0M4BCIM3p6ZDevjuTU4/UUiz/pS3Ua37ORSf1XF+NAVA
-	hC9W9qgB9RK9HxbpaO+p9E6mavGmQbzmcFsnzP86
-X-Coremail-Antispam: 1Uk129KBj93XoW3WrW5Ar4UJF4kGr45uw4fXrc_yoW3Zr1kpa
-	yfGa93tr4vyw4SqrZxJF48tryrAa1xJFZrGw1xGrZYkwnIyr1Utr1kKFyYgF4UAFWvyrsx
-	ur4FvFWru398A3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Cr1j6rxdM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6rxl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6x
-	kI12xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v2
-	6r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2
-	Ij64vIr41lF7xvr2IYc2Ij64vIr40E4x8a64kEw24lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l
-	42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJV
-	WUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAK
-	I48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F
-	4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY
-	6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU7gAwDUUUU
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:net-swift.com:qybglogicsvrgz:qybglogicsvrgz5b-1
+X-QQ-XMAILINFO: M10PHUHiBhPoPSNuQ0ExhDOCwIiq4srW3tqp8T2b+JdfM3iYv4/rNvKf
+	R3I591AJ0nzeqoLdgToyxrH03gTwHvXSLwBcaF1Z5cLV4+D/iPz3gisPt+4+5Bey/x/iatL
+	ZcpfzZXMeDplEIs/8Vpc9pgY9jBQ1fa+M9QduK878G2pBB7CEVYUB0hse1BXxzNn3/Rc/WU
+	Vi2n/dwMrJDGbxX282k31Pk9WZ3agktc0WJvi56hkQZMg3ACHIrVm6p2L+PglVOZEfzK1FT
+	v0xMQZAhuhjAcJcIzEY8kzYfcKAhp3xSa9Mu5zAb22xrXUsHfX3Kgd4S6DdMjog0OEPTIQt
+	bB+UTbEZ9mduKNKTykrKHJ5mlhrscHKlQ7/qcwO0Fi4Qw2kUoO81AwlF4j1JWU2o7E1eEaU
+	ry4wGoTPJj3kITKDd5W782M7Ik5t34oXWf2ianE7ak5m/m4y3iXjaH/q1tnqdR7ORQCEA2h
+	5HS9NmOfOVpvFoXALV/c6jR2sEBU1q+EUAgXfPycgxwD1paXDn2kUYNAnYTklQhsF5/ZCEL
+	hqsjldP3owTMfwMKIH3os8qoD/d4SRelV5TVnw30op8NLz7RceFfV4yUK4NpneS1IR+cMwY
+	BNdhF+8U220YyA2ML+G613NlZcyvpXpDzVMv9wBQCLApqKOzMUB0U6f11MfFzaTAdqynKUq
+	X6CXTTja5x/RHF4vang5CY681e4sDqC64JDCmyUgvU8pJj21OoskRf0OSRVjMuNa0Wk6e5H
+	vRQnVC5VSXJfHB0FhyVBEg9+EVbQ5Hcx3y6CP7mAtxLrynn1Rc9MMD7gHUhtFBRdTkBh5Hs
+	SsOHHCxVZ9+puRfGdajB+P7Rc6Zho7NCFU9/qLeVlYNt5mKfwCHVQ8Vk/Y8nxz2eKm9Xb6m
+	Bu0GLfnnJ6v5kSJZbeArMcKdzQg4s97JxolY5vYk5WXT2/2tTsMcyK4lNmw8miRUQ1h1zkc
+	p8xU0SrVpr3KTYn/aMrYEiYXXzFyChIu8XNyYyplcv5xCUBaKiQAz6QdGNHEPcB8/oCGUJ4
+	0i+Y4xahp3cHZBHal/sT41QxC88/HTcsKOpFkpNF0EmWdJQHmnl435sVJOMFoYswk2yjyJ7
+	M+HvL/w+plwcTCGIGjg79mLXjV3CSlXjBHViZByZSXT
+X-QQ-XMRINFO: MSVp+SPm3vtSI1QTLgDHQqIV1w2oNKDqfg==
+X-QQ-RECHKSPAM: 0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306406-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[zju.edu.cn];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[fanwu01@zju.edu.cn,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306409-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[net-swift.com];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:jiawenwu@trustnetic.com,m:duanqiangwen@net-swift.com,m:horms@kernel.org,m:kuba@kernel.org,m:pabeni@redhat.com,m:mengyuanlou@net-swift.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[mengyuanlou@net-swift.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:shenjian15@huawei.com,m:salil.mehta@huawei.com,m:dingtianhong@huawei.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:fanwu01@zju.edu.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fanwu01@zju.edu.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mengyuanlou@net-swift.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	R_DKIM_NA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,zju.edu.cn:from_mime,zju.edu.cn:email,zju.edu.cn:mid]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[net-swift.com:mid,net-swift.com:from_mime,linux.dev:url,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CD4F773690A
+X-Rspamd-Queue-Id: 6C7B0736925
 
-The hip04 remove path frees the TX/RX rings before unregistering the
-netdev. If the interface is still up, unregister_netdev() then runs
-.ndo_stop, whose TX reclaim and NAPI poll touch the already-freed DMA
-ring memory. The TX coalesce timer and the platform IRQ also outlive
-the netdev private data they dereference.
+This series improves ethtool support for Wangxun VF drivers
+(ngbevf and txgbevf) in libwx.
 
-Reorder hip04_remove() so the netdev is unregistered (which runs .ndo_stop
-synchronously, stopping NAPI and the TX queue) before the rings are freed.
-Free the devm-managed IRQ explicitly before free_netdev(), so
-hip04_mac_interrupt() (whose dev_id is the netdev) cannot fire against
-freed memory: devm would otherwise release it only after .remove returns.
+This series extends VF support by enabling:
+ring parameter configuration via ethtool -G
+interrupt coalescing configuration via ethtool -C
 
-hip04_mac_stop() must quiesce both arming sites of the coalesce timer.
-The NAPI poll arms it, and napi_disable() returns once the poll calls
-napi_complete_done(), not when the poll function returns, so move that
-arm before napi_complete_done().  The existing early exits that jump to
-done do not call napi_complete_done(), so they remain outside the
-completion-after-arm window this change closes.  The TX xmit path also
-arms it, and mac_stop() is reached directly from hip04_tx_timeout_task()
-as well as via .ndo_stop, so use netif_tx_disable() rather than
-netif_stop_queue() to wait for an in-flight hip04_mac_start_xmit() to
-finish.  The timer is then drained with hrtimer_cancel().  A "closing"
-flag, checked at the single arming site, guards against a later arm.
+Patch 1 adds support for set_ringparam in wx_ethtool_ops_vf,
+allowing VF users to adjust TX/RX descriptor ring sizes.
+Patch 2 enables set_coalesce support for VF devices and updates
+EITR programming to use the VF-specific register access helper.
 
-hip04_tx_timeout_task() restarts the device with mac_stop() + mac_open();
-serialize that restart against .ndo_stop with rtnl_lock(), matching the
-netdev core's locking, skip it if the device is no longer running, and
-emit an error if the restart fails instead of silently leaving it down.
+Changelog:
+v7:
+- Remove patch3 and netdev_stat_ops support is deferred to a follow-up patch.
+v6: https://lore.kernel.org/all/20260701100145.23738-1-mengyuanlou@net-swift.com/
+- Patch 1:
+  Clarify comments describing wx_set_ring() failure semantics.
+- Patch 2:
+  Expand commit message to explain VF ITR encoding changes.
+- Patch 3:
+  Protect ring accesses in wx_update_stats().
+v5: https://lore.kernel.org/all/20260615104849.60444-1-mengyuanlou@net-swift.com
+- Patch 3:
+  Convert WX_NUM_{RX,TX}_QUEUES macros to take explicit netdev parameter
+  as suggested by Simon Horman.
+v4: https://lore.kernel.org/all/20260608103946.25786-1-mengyuanlou@net-swift.com
+  sashiko: https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260529075147.88398-1-mengyuanlou%40net-swift.com
+- Patch 2:
+  PF and VF share the same ITR value range. Update wx_write_eitr_vf() to apply
+  identical range clamping as the PF path, ensuring consistent coalesce behavior
+  across both device types.
+- Patch 3:
+  Remove wx_update_stats in wxvf_down.
+  Replace both WX_GLOBAL_STATS_LEN and WX_STATS_LEN macros with type-safe
+  static helpers wx_global_stats_len() and wx_stats_len().
+v3: https://lore.kernel.org/all/20260529075147.88398-1-mengyuanlou@net-swift.com
+- Patch 3:
+  Drop netdev_stat_ops support from this patch.
+v2: https://lore.kernel.org/all/20260525101115.13151-1-mengyuanlou@net-swift.com
+- Patch 3:
+  Remove some stats which can be replaced by standard stats defined in
+  include/net/netdev_queues.h.
+- Patch 1:
+  Adding a return value to wx_set_ring to make wx_set_ringparam_vf can
+  be passed back to userspace.
+  Remove freeing and requesting of IRQs. Ring resize only updates descriptor
+  resources and does not change MSI-X vector or interrupt configuration,
+  so IRQs do not need to be reallocated.
+v1: https://lore.kernel.org/all/20260514103405.42175-1-mengyuanlou@net-swift.com
 
-This issue was found by an in-house static analysis tool.
+Mengyuan Lou (2):
+  net: libwx: add support for set_ringparam in wx_ethtool_ops_vf
+  net: libwx: add support for set_coalesce in wx_ethtool_ops_vf
 
-Fixes: a41ea46a9a12 ("net: hisilicon: new hip04 ethernet driver")
-Cc: stable@vger.kernel.org
-Assisted-by: Codex:gpt-5.5
-Signed-off-by: Fan Wu <fanwu01@zju.edu.cn>
----
-v2:
-  - Address review comments from Simon Horman. Use netif_tx_disable() rather
-    than netif_stop_queue() in hip04_mac_stop() so that an in-flight
-    hip04_mac_start_xmit() finishes before the TX ring is reclaimed;
-    mac_stop() is also called directly from the tx-timeout work, not only
-    via .ndo_stop.
-  - Arm the coalesce timer in hip04_rx_poll() before napi_complete_done(), so
-    that napi_disable() observes the final arm and the subsequent cancel
-    cannot miss it.
-  - Free the devm-managed IRQ explicitly in hip04_remove() before free_netdev()
-    so that hip04_mac_interrupt() cannot run against freed memory, placing it
-    after unregister_netdev() so that the device is stopped first.
-  - Reorder hip04_remove() so that the netdev is unregistered (running .ndo_stop)
-    before the PHY is disconnected and the TX/RX rings are freed.
-  - Check the return value of hip04_mac_open() in the tx-timeout restart path.
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 68 ++++++++++++++++++-
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  9 +--
+ drivers/net/ethernet/wangxun/libwx/wx_lib.h   |  4 +-
+ drivers/net/ethernet/wangxun/libwx/wx_vf.h    |  1 -
+ .../net/ethernet/wangxun/libwx/wx_vf_common.c |  4 +-
+ .../net/ethernet/wangxun/libwx/wx_vf_common.h |  2 +
+ .../net/ethernet/wangxun/libwx/wx_vf_lib.c    | 13 +++-
+ 7 files changed, 90 insertions(+), 11 deletions(-)
 
-v1: https://lore.kernel.org/netdev/20260703050133.2445155-1-fanwu01@zju.edu.cn/
-
- drivers/net/ethernet/hisilicon/hip04_eth.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 66 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/ethernet/hisilicon/hip04_eth.c b/drivers/net/ethernet/hisilicon/hip04_eth.c
---- a/drivers/net/ethernet/hisilicon/hip04_eth.c
-+++ b/drivers/net/ethernet/hisilicon/hip04_eth.c
-@@ -15,6 +15,7 @@
- #include <linux/of_net.h>
- #include <linux/mfd/syscon.h>
- #include <linux/regmap.h>
-+#include <linux/rtnetlink.h>
- 
- #define SC_PPE_RESET_DREQ		0x026C
- 
-@@ -232,6 +233,7 @@
- 	int tx_coalesce_frames;
- 	int tx_coalesce_usecs;
- 	struct hrtimer tx_coalesce_timer;
-+	bool closing;
- 
- 	unsigned char *rx_buf[RX_DESC_NUM];
- 	dma_addr_t rx_phys[RX_DESC_NUM];
-@@ -497,6 +499,12 @@
- {
- 	unsigned long ns = priv->tx_coalesce_usecs * NSEC_PER_USEC / 2;
- 
-+	/* Do not (re-)arm the TX coalesce timer once teardown has begun.
-+	 * Both arming sites (TX xmit and NAPI rx poll) go through here.
-+	 */
-+	if (smp_load_acquire(&priv->closing))
-+		return;
-+
- 	/* allow timer to fire after half the time at the earliest */
- 	hrtimer_start_range_ns(&priv->tx_coalesce_timer, ns_to_ktime(ns),
- 			       ns, HRTIMER_MODE_REL);
-@@ -649,12 +657,15 @@
- 		priv->reg_inten |= RCV_INT;
- 		writel_relaxed(priv->reg_inten, priv->base + PPE_INTEN);
- 	}
-+	/* Arm the coalesce timer BEFORE napi_complete_done(): napi_disable()
-+	 * in hip04_mac_stop() returns once SCHED is cleared here, not when
-+	 * the poll function returns, so arming afterwards can slip past the
-+	 * stop path's hrtimer_cancel().
-+	 */
-+	if (tx_remaining)
-+		hip04_start_tx_timer(priv);
- 	napi_complete_done(napi, rx);
- done:
--	/* start a new timer if necessary */
--	if (rx < budget && tx_remaining)
--		hip04_start_tx_timer(priv);
--
- 	return rx;
- }
- 
-@@ -729,6 +740,11 @@
- 	priv->rx_cnt_remaining = 0;
- 	priv->tx_head = 0;
- 	priv->tx_tail = 0;
-+	/* A plain write is sufficient here: mac_open() runs under RTNL, so it
-+	 * cannot race mac_stop()'s store-release, and napi_enable() below orders
-+	 * this reset before any TX/NAPI traffic can resume.
-+	 */
-+	WRITE_ONCE(priv->closing, false);
- 	hip04_reset_ppe(priv);
- 
- 	for (i = 0; i < RX_DESC_NUM; i++) {
-@@ -759,8 +775,26 @@
- 	struct hip04_priv *priv = netdev_priv(ndev);
- 	int i;
- 
-+	/* Stop new timer arms before draining: set the closing flag (checked
-+	 * at the single arming site), wait for the NAPI poll and any in-flight
-+	 * TX to finish, then cancel the timer.
-+	 *
-+	 * netif_tx_disable() (not netif_stop_queue()) is required because this
-+	 * function is also called directly from hip04_tx_timeout_task(), not
-+	 * only via .ndo_stop where the core has already deactivated TX;
-+	 * netif_tx_disable() waits for an in-flight hip04_mac_start_xmit(),
-+	 * which arms the timer, to finish.
-+	 *
-+	 * Because hip04_rx_poll() arms the timer before napi_complete_done(),
-+	 * napi_disable() returning means that arm has happened, so the
-+	 * hrtimer_cancel() below cannot miss it.  The store-release pairs
-+	 * with the load in hip04_start_tx_timer().
-+	 */
-+	smp_store_release(&priv->closing, true);
-+
- 	napi_disable(&priv->napi);
--	netif_stop_queue(ndev);
-+	netif_tx_disable(ndev);
-+	hrtimer_cancel(&priv->tx_coalesce_timer);
- 	hip04_mac_disable(ndev);
- 	hip04_tx_reclaim(ndev, true);
- 	hip04_reset_ppe(priv);
-@@ -791,8 +825,21 @@
- 	struct hip04_priv *priv;
- 
- 	priv = container_of(work, struct hip04_priv, tx_timeout_task);
-+
-+	/* Bail if the device was taken down (dev_close/unregister).  The
-+	 * mac_stop() below is called directly and does not clear
-+	 * __LINK_STATE_START, so this guard does not match the restart's
-+	 * own stop; it exists only to avoid restarting a torn-down device.
-+	 */
-+	rtnl_lock();
-+	if (!netif_running(priv->ndev))
-+		goto out;
-+
- 	hip04_mac_stop(priv->ndev);
--	hip04_mac_open(priv->ndev);
-+	if (hip04_mac_open(priv->ndev))
-+		netdev_err(priv->ndev, "restart after tx timeout failed\n");
-+out:
-+	rtnl_unlock();
- }
- 
- static int hip04_get_coalesce(struct net_device *netdev,
-@@ -1026,13 +1073,24 @@
- 	struct hip04_priv *priv = netdev_priv(ndev);
- 	struct device *d = &pdev->dev;
- 
-+	unregister_netdev(ndev);
-+
-+	/* The IRQ is devm-managed and would otherwise be freed only after
-+	 * this function returns.  Free it now, after unregister_netdev() has
-+	 * run .ndo_stop to stop the device and mask its interrupt source, but
-+	 * before the manual free_netdev() below, so that hip04_mac_interrupt()
-+	 * (dev_id == ndev) cannot fire against freed memory.  free_irq() also
-+	 * drains any in-flight handler.
-+	 */
-+	devm_free_irq(d, ndev->irq, ndev);
-+	cancel_work_sync(&priv->tx_timeout_task);
-+	hrtimer_cancel(&priv->tx_coalesce_timer);
-+
- 	if (priv->phy)
- 		phy_disconnect(priv->phy);
- 
- 	hip04_free_ring(ndev, d);
--	unregister_netdev(ndev);
- 	of_node_put(priv->phy_node);
--	cancel_work_sync(&priv->tx_timeout_task);
- 	free_netdev(ndev);
- }
- 
+-- 
+2.30.1
 
 
