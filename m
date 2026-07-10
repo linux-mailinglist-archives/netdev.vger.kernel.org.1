@@ -1,253 +1,277 @@
-Return-Path: <netdev+bounces-306619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306620-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id HvgzApYQUWqw+wIAu9opvQ
-	(envelope-from <netdev+bounces-306619-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 17:32:38 +0200
+	id 1GozOCkRUWrW+wIAu9opvQ
+	(envelope-from <netdev+bounces-306620-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 17:35:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 548FE73C47E
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 17:32:37 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7249473C4D7
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 17:35:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=CP5PJfgy;
-	dkim=pass header.d=redhat.com header.s=google header.b=kefbZYpS;
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306619-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306619-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=a8oD3tTa;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306620-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306620-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9D0BA30078DC
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 15:27:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DFF033008C19
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 15:35:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BE0F3655FF;
-	Fri, 10 Jul 2026 15:26:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B97842B324;
+	Fri, 10 Jul 2026 15:35:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12301365A12
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 15:26:57 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783697219; cv=none; b=QyXDXvlNrH7gZVE4NDreJ5Twl/k09SVycnIfUpUHBSZWm3x9YGwDY2LB+1D110bR8C2zbJk6jutVtuKPFvuiqHEdVbOeeHjyH9hXkBhzKJdN5UaK7aJ9IboKtnVrQLKLppDNVeADVQTJCR3MPyMamZdpxYZL64xiiCJ5FIygR2M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783697219; c=relaxed/simple;
-	bh=PXbwaqibc8aLYtHt2AbJ3XN4O9AIlRXDUFvInPc+0KM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jRBNpv4qxnAEBcj1zgWIch4YKflomvDNO0rj7Yi3qEhCQo1Kud3OIEJTHToIo55RWi1eDAq45iVIjm4r3N9Bx6kXaPlzfE2ghXmf6wl5ZboW2bEBFuEMKhvgu0C8m4rx1gaG9+yejMfF5V09S5wNCjO8sBFaDjtzZzQVDP06kmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CP5PJfgy; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=kefbZYpS; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783697217;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h+YxD4p0SB+CCECA8qTnq1hIIPDKgloEvcPzGaAbiCo=;
-	b=CP5PJfgyUgyHF2QmzbMrkEsZyNnCZJ+ehUAfFpEG5pr5edJVeuXAwt01KEDx90oH62BNb7
-	OYEryltNjFhOrkZx4OW2ZZ9J4jzXlFMJaRaFWvp7osGmaCS6LDFuWi1lALbm9XtQC54xlL
-	xSwbhyflnzXQxSjsN60879VMoJPAuqk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-86-jorimt1CN5y0V-xrzJmuCg-1; Fri, 10 Jul 2026 11:26:55 -0400
-X-MC-Unique: jorimt1CN5y0V-xrzJmuCg-1
-X-Mimecast-MFC-AGG-ID: jorimt1CN5y0V-xrzJmuCg_1783697215
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-493b54823bdso10986305e9.0
-        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 08:26:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A2F3839B2
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 15:35:01 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783697702; cv=pass; b=pDTZ95dDLGAWA3JPCGV7Rt8/h/t+ilZFuP1VsRfEea7Tzxwe84iF/SkYzbWHRs9LiSYmOkHY47nQ518a2gF261apYERymmnhac1Av/NfJbXfgAJPQodfc/szbJXQmsH39l2c67RgB1ejqi5BjVmA4cOiqkrb9hoft2IeJABZUnI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783697702; c=relaxed/simple;
+	bh=lKiZCBDDETUpGjxrmw9i9h3I0UoRrm7LD3o1s0rYbt8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uj+V3WvdlEoATsNG6WzMaw7iRm4uOqKWEgdpFE0V3Pq8VwtRKQIMLxLSA+c25W/2zuNmEDZGgL9UEpbm/9UZ4EQhComEXb8iuw7IHE3KCfQzVTnCV/+5wyu0EV6WVHgX55sGznXFvYJW2q+TcpdYZW8jd5LaFboJyhncYGDxiWA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a8oD3tTa; arc=pass smtp.client-ip=209.85.210.172
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-84862b0d5f8so870142b3a.3
+        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 08:35:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783697700; cv=none;
+        d=google.com; s=arc-20260327;
+        b=QQvKhT6r6ysMylDvwjZoPDt6l+Wqfxy4Mg/wpxY4oQKK6/P/H5oH04CIOIOUKB//fK
+         qpcZymOAKH4Ws1puusaZ7npntJigsvBk80/eDo9pM3MXRVwzx/qrgUubdl3emA4uHtmR
+         iLz595MfidHlwLoef3jSsLeUjvpoCLQoq7ZzSEsi2DEtz+hIKj3qfyUsuGDJAsntG07t
+         bFcRiycx4lskon2Uky6FB0HvijfO4Pe5DGDXnDkMmPQdeDD/alUZrijkslYy53q1c/Ly
+         LoBUe9aSC5fBthRcO4mV2wxj0BLUqTlqnO3Ff5xrj7gB3SwXsqymK9EMjdeuSnkb095I
+         Muiw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=lfqsy36kEg0n71UWqhMQmPaJ8MvzIuF/nMwbLEQv8KY=;
+        fh=ack3tQHSP/QhJghwl9uAgZQI8e2FChbKM2a+P4uYisE=;
+        b=IdyNgB4yBprW6MyvJF0wpw68/mbKb6Yj/g3O6JLfCyE/m0cq/IgNlYOkWM93ILOaD0
+         asiKgrY3KIkLIazN4GqwN1sxUh9ABQ0SwjD0FaypI10eCnROdAfA8TPXhUfZz4XmrlHT
+         4+zc9QS21J6lQq+qHVGNkDV2lF236ZZlEz7myls+IO3rErXqbrdxv8Q8FxOWEZJwjjEY
+         iVl4xAe3CVutg2ZtEvbxMFYOECjg4V7mU7Uysr5g+U0GWY8iLeyyEBUNLDvTyWPKnlfk
+         Av4wqq1mKfrSjSJk589gSX5P1Il5q4IrkBFAthPt68Gr6/yia39EDq24Q0BO4AfeCjCz
+         gFvg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1783697214; x=1784302014; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=h+YxD4p0SB+CCECA8qTnq1hIIPDKgloEvcPzGaAbiCo=;
-        b=kefbZYpSv9+du1gzG9yOWSdd8EPUa7ftQhWK7h/7dzWqO4XEJfrqYqj6UhIW6gS89a
-         2oFQcDUEch3jD7P3X0QRayglG8KSa8hLteBThb0zNbKBLCdWYzD/8TfJv96zoNTAvvn6
-         87zF41uK6+K5fQCmop8AtUOgfoNRUD/vnOe60STfQZwMeUk/EayMEtp29lN4TWmwcZBG
-         uLN4GTHxRyCqMrbIjSY9HbVOMF353NYkcAFsNH4mPOGcYqG/UN2iT+UXkK48yv/IPQJl
-         n5pJjBw62bKpTb6xiM3r3PMx65gBLj/+CT9aTmK7oNSpLzQWh8SvMoPMXFm0qfXe/qb/
-         lobg==
+        d=gmail.com; s=20251104; t=1783697700; x=1784302500; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=lfqsy36kEg0n71UWqhMQmPaJ8MvzIuF/nMwbLEQv8KY=;
+        b=a8oD3tTaRKi4aTkrkspHVR/eFsSuVsDdmHub1TGYRTsaYEwWotKCTegELXvcOQwKL9
+         fqIxCSwukN0Jk6qnHF4ctBJZt212taAkwtLCjSm3ecBYmxtw7hSpi/QDkuMsa/EOTPJE
+         NnlnodRyG9SdC0uHp0GoreDvv4DBEXUZrbf+jHL2cSitDkS3Wn1dCHYWIUzkBZNDm+qj
+         FYcizqVrmUwZWuJ+OkofQxypC+hahkOe4J+xAuetPU2TESH+ukDSMKR9p92xSuZU3tAG
+         uxWfFx1E8OBT6xL/NAR5eg4rUa9+g1NpdGX8qLuUdsaCA1mmS7fVXKbbNeAGuapXiy7w
+         v8oQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783697214; x=1784302014;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=h+YxD4p0SB+CCECA8qTnq1hIIPDKgloEvcPzGaAbiCo=;
-        b=Nug+dZnU5NFr6vYHTKsFPN+tGihji0xpr+G7ZFvYOThalZbMUqRUSlZMqgFPYSueWd
-         rvZZPIct7p/P8oNYS5HoZWtmsEMXRNqr2i7P6j0fI6b7WQzL9n9w1A3cFYCONncOz6Fw
-         FaO7Kowy9askry80fNgqWw7xgaAcx3LK/aw71cASj+FW9sX92XGohpiGUcdfv+rxYkZp
-         9+H//dXX73cUFvvV5oBScaXfBuURdeLmsN9I79T9/Rxmlcicx/7d0ROPxx4UycDljoS+
-         TAX6+3uLgyVVWts9WQ6rNF1GpoZjae9vxePIZ+mozK5BHVgt8bzKplLVMHIO6tPZkrE2
-         K+qg==
-X-Forwarded-Encrypted: i=1; AHgh+RpExeJsn8awLK0SjRDS1dYwkO3r0PSDCY4Gw8GCKau/X66erM1SKFOswALRhai2oP9juCTateU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXm8JyiKRZqTyMjPUxF5SPehO3E76UISMmDLTE4zr7ndnxYdFz
-	W6I+ryxN2uvKFhbpAYl3qvfLwCncCobUxkUgMBcIFNIiNceP42//0YDHPxhTzofKwI75VmD0e7K
-	kYX6KtIXxj5vObQE/KV5l9fJphlOrzZgwW5zdwo3YsqNZd+Fip3dmRuR3dTpppEuGlw==
-X-Gm-Gg: AfdE7clLxiv8Sjui3W0i2E2k4nrURgGab2cxjhEfE7nD2loJaPxmqbvDwXwlrlDVUj6
-	NNNSDVL87RLve6Yf4UJ3jDR9CMiwxFjnP8MUMhUsx6soRHAntPzZSsfZ3DICZ8Log8xAwNcDPK5
-	pjMm35IublW/bC23kAlSXuKRlsgk97v9rNz4T9E5RbGyoBn2ZePMiiL/A0pJvcMYmRKyu8oHEdw
-	0TEGGL5R70MU0M39a3xJqI5KeqGXcVP8b3AGVm0954FzOA6Wpqkg4WE0Vp8phw5bVO1HYzkNNgG
-	ScSFZPGEmbIJup+Iozx3408kRIjVpao2w0flhXcdi2ve4yZgJI+JqSAsRSRFtilG8+d8E+ycT+f
-	A9KymvUaq0g63BB1P6/jIB3mBfVfFq7KPcjc+FOpixT7n3HOeUL8VPBRKcxHtjk8PURfjUCnI3z
-	PjQ56kpJft7aqu
-X-Received: by 2002:a05:600d:8445:20b0:493:e963:e671 with SMTP id 5b1f17b1804b1-493f2b24ce5mr32456975e9.3.1783697214638;
-        Fri, 10 Jul 2026 08:26:54 -0700 (PDT)
-X-Received: by 2002:a05:600d:8445:20b0:493:e963:e671 with SMTP id 5b1f17b1804b1-493f2b24ce5mr32456695e9.3.1783697214203;
-        Fri, 10 Jul 2026 08:26:54 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:5521:6b10:58fd:68f:7756:389d? ([2a0d:3344:5521:6b10:58fd:68f:7756:389d])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493f2d97527sm75852785e9.2.2026.07.10.08.26.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Jul 2026 08:26:53 -0700 (PDT)
-Message-ID: <531c4085-e7eb-4915-ae63-c53571930aa7@redhat.com>
-Date: Fri, 10 Jul 2026 17:26:52 +0200
+        d=1e100.net; s=20251104; t=1783697700; x=1784302500;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=lfqsy36kEg0n71UWqhMQmPaJ8MvzIuF/nMwbLEQv8KY=;
+        b=qpvs5UFJeVrOagM9zLNZfnsnlwaFtop0kpsh16VQ5QlxFlDE9LR4EwOMdEt/mqAgZg
+         Gc7Hg9DUPq0So47Qj6Y5s2N1wq/lkyxnNZJiTfq6Cnn5EwK9Rk23bPBM/pzS6n8aBmex
+         OOtbdl+mXSwDPQGIai2SDkobpd2LzWzvA35TZI5q5aXCgwV+EN+KDNYQbnBCCbx5kEDF
+         PAKcMFPgDQUV0ZdmWYM+iAdg3kF/tOno2u8Oz+a1hUy9gWYKeJW9tw57v7Newy7Mr4Wf
+         8ljskIzJVYmAjqYbcvJN3DYyTwlLozOItRas4I3MLeCGlnekPbkhKdaVIM9XQoduZDhP
+         6DwA==
+X-Forwarded-Encrypted: i=1; AHgh+RqemfhdzhMtBy5A8NGhF5x25VZlVTzCOC+c63i7yE6JTnv5dWHIzGp+W3hr7g4AccB0AvWHB54=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywmv0xYwhpXCexulPfOOwWoBcUspu8SWMYRF8fjjlYckR6/kYVO
+	0UUfwxxYSwOzDw4gQYKgnZDD5aIMGSnxpIvkULaC4Qg34nQziVin0SN7Rsz4JUw0ep2EdMsYwP8
+	+L+CHXru9aR+WADfElSujJS34e4HVLSk=
+X-Gm-Gg: AfdE7clKyoeyjS2fKlABLmEQERbtVYlEhtIbqmy0crZxOjZ1j7DFgUKDNiy84mkVi8Q
+	uNpBEE2iFsfMjBO52AhszyRJax/YqUW46pZXvUw/ZPzytNCg58YB1qchvwi4q+nKs5/RxxD2VEt
+	oCcXV2YDXdfh6hAKhnlo7dFTnffYK5IOxYX89E8GI6PiWDUnU5RxgzF4U2qAZkj4Ke6OYXSRQ9n
+	pF+kbUS8B8OWOCNySsQ10mYHaTH8sm30waW8Xd1Hh5PDqEDA+LLj8MH+tdUPbc5AwuPxVHnZOeL
+	oWGeAcZ3wpZAcD4Evw4dJ9PNBhkIKUb3u5DdQ1Mk0viLFAsryBqmr6Ry/js2kDqGO9eDJGvBHEO
+	A0UvkesA=
+X-Received: by 2002:a05:6a00:94ed:b0:848:42a7:1854 with SMTP id
+ d2e1a72fcca58-84843437157mr10598707b3a.39.1783697700484; Fri, 10 Jul 2026
+ 08:35:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 6/7] selftests: drv-net: extend so_txtime with hw
- offload
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- horms@kernel.org, andrew@lunn.ch, Willem de Bruijn <willemb@google.com>
-References: <20260706133433.3142805-1-willemdebruijn.kernel@gmail.com>
- <20260706133433.3142805-7-willemdebruijn.kernel@gmail.com>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260706133433.3142805-7-willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260710010718.20318-1-blbllhy@gmail.com> <20260710092559.40f37700@pumpkin>
+In-Reply-To: <20260710092559.40f37700@pumpkin>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Fri, 10 Jul 2026 11:34:47 -0400
+X-Gm-Features: AUfX_mzmhSy_FTOCbC6jONxJg6y1CF6hzGKuPLQMVmanaYtYZMtGKwJe5pMpPNs
+Message-ID: <CADvbK_cKB+t2LJOs-VQKP9svHURckHpuYdwwZB9an0+FYuomxg@mail.gmail.com>
+Subject: Re: [PATCH net v2] sctp: validate stream count in sctp_process_strreset_inreq()
+To: David Laight <david.laight.linux@gmail.com>
+Cc: "Cen Zhang (Microsoft)" <blbllhy@gmail.com>, marcelo.leitner@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	linux-sctp@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, AutonomousCodeSecurity@microsoft.com, 
+	tgopinath@linux.microsoft.com, kys@microsoft.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306619-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:david.laight.linux@gmail.com,m:blbllhy@gmail.com,m:marcelo.leitner@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-sctp@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,m:davidlaightlinux@gmail.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:willemdebruijn.kernel@gmail.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:horms@kernel.org,m:andrew@lunn.ch,m:willemb@google.com,m:willemdebruijnkernel@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-306620-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,microsoft.com,linux.microsoft.com];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 548FE73C47E
+X-Rspamd-Queue-Id: 7249473C4D7
 
-On 7/6/26 3:34 PM, Willem de Bruijn wrote:
-> @@ -38,6 +41,34 @@ def test_so_txtime(cfg, clockid, ipver, args_tx, args_rx, expect_success):
->          cmd(cmd_tx)
->  
->  
-> +def _dev_setup_pacing_offload(cfg):
-> +    """Configure pacing-offload-horizon."""
-> +    ethnl = EthtoolFamily()
-> +
-> +    try:
-> +        rings = ethnl.rings_get({'header': {'dev-index': cfg.ifindex}})
-> +    except NlError:
-> +        raise KsftSkipEx('ring-get not supported by device')
+On Fri, Jul 10, 2026 at 4:26=E2=80=AFAM David Laight
+<david.laight.linux@gmail.com> wrote:
+>
+> On Thu,  9 Jul 2026 21:07:18 -0400
+> "Cen Zhang (Microsoft)" <blbllhy@gmail.com> wrote:
+>
+> > When processing a RESET_IN_REQUEST from a peer,
+> > sctp_process_strreset_inreq() derives the stream count from the
+> > parameter length but does not check whether the resulting
+> > RESET_OUT_REQUEST would exceed SCTP_MAX_CHUNK_LEN.
+> >
+> > The OUT request header (sctp_strreset_outreq, 16 bytes) is 8 bytes
+> > larger than the IN request header (sctp_strreset_inreq, 8 bytes).
+> > Generally, the IP payload is bounded to 65535 bytes, so the stream
+> > list cannot be large enough to trigger the overflow. However, on
+> > interfaces with MTU > 65535 (e.g., loopback with IPv6 jumbograms), a
+> > stream list that fits within the incoming IN parameter can cause a
+> > __u16 overflow in sctp_make_strreset_req() when computing the OUT
+> > request size, leading to an undersized skb allocation and a kernel
+> > BUG:
+> >
+> >   net/core/skbuff.c:207         skb_panic
+> >   net/core/skbuff.c:2625        skb_put
+> >   net/sctp/sm_make_chunk.c:1535 sctp_addto_chunk
+> >   net/sctp/sm_make_chunk.c:3695 sctp_make_strreset_req
+> >   net/sctp/stream.c:655         sctp_process_strreset_inreq
+> >
+> > The local setsockopt path validates the generated reset request size.
+> > However, for an incoming-only reset, it accounts for the smaller IN
+> > request even though the peer must generate an OUT request with the same
+> > stream list. Such a request cannot be completed successfully by the
+> > peer.
+> >
+> > Reject peer IN requests whose corresponding OUT request would exceed
+> > SCTP_MAX_CHUNK_LEN. Also tighten the local check so it does not send an
+> > IN request that would require an oversized OUT request from the peer.
+> >
+> > Fixes: 7f9d68ac944e ("sctp: implement sender-side procedures for SSN Re=
+set Request Parameter")
+> > Reported-by: AutonomousCodeSecurity@microsoft.com
+> > Closes: https://lore.kernel.org/all/20260707203215.2752-1-blbllhy@gmail=
+.com/
+> > Suggested-by: Xin Long <lucien.xin@gmail.com>
+> > Signed-off-by: Cen Zhang (Microsoft) <blbllhy@gmail.com>
+> > ---
+> > v2: Add the OUT request length check to the send path, as suggested by =
+Xin Long.
+> >
+> >  net/sctp/stream.c | 6 +++++-
+> >  1 file changed, 5 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/net/sctp/stream.c b/net/sctp/stream.c
+> > index 5c2fdedea088..34ffe6c945a4 100644
+> > --- a/net/sctp/stream.c
+> > +++ b/net/sctp/stream.c
+> > @@ -308,7 +308,8 @@ int sctp_send_reset_streams(struct sctp_association=
+ *asoc,
+> >                                       goto out;
+> >
+> >                       param_len +=3D str_nums * sizeof(__u16) +
+> > -                                  sizeof(struct sctp_strreset_inreq);
+> > +                                  (out ? sizeof(struct sctp_strreset_i=
+nreq)
+> > +                                       : sizeof(struct sctp_strreset_o=
+utreq));
+>
+> Does it really make any sense to have a connection with the 32k streams
+> that would be needed in order to send a maximal length request?
+> (Or more likely a user requesting the same streams be reset multiple time=
+s.)
+> So an initial check that str_nums < SOME_CONSTANT_JUST_BELOW_32K would do=
+.
+>
+Yes, that would be a simpler fix.
 
-pylint complains:
+However, 32K is not a limit defined by the RFC. While 32K streams may seem
+excessive in practice, we cannot say that such a configuration is invalid.
+If an application legitimately needs more than that, it would be difficult
+to argue that it is not using SCTP correctly.
 
-tools/testing/selftests/drivers/net/so_txtime.py:51:8: W0707: Consider
-explicitly re-raising using 'except NlError as exc' and 'raise
-KsftSkipEx('ring-get not supported by device') from exc'
-(raise-missing-from)
+> Looking at the code I'm sure the kmalloc() shouldn't be done in the
+> 'str_nums =3D=3D 0' case either.
+> In fact it is probably worth doing the kmalloc() earlier to avoid two
+> scans of the array.
+> I even wonder if it should be possible to allocate the chunk without fill=
+ing
+> in the data and then put the values in afterwards (freeing the chunk if t=
+here
+> is an error).
+>
+> Then there is the code that reverts the state to OPEN if sctp_send_reconf=
+()
+> fails - nothing check that is the original state.
+>
+That would be another issue that we can address separately.
+It would be great if you could follow up on this one. :-)
 
-> +
-> +    if 'pacing-offload-horizon' not in rings or \
-> +       'pacing-offload-horizon-max' not in rings:
-> +        raise KsftSkipEx('pacing offload horizon not supported by device')
-> +
-> +    if rings['pacing-offload-horizon-max'] < 50_000:
-> +        raise KsftSkipEx('pacing offload max horizon too small')
-> +
-> +    cur_horizon = rings['pacing-offload-horizon']
-> +    new_horizon = 50_000
-> +    ethnl.rings_set({
-> +        'header': {'dev-index': cfg.ifindex},
-> +        'pacing-offload-horizon': new_horizon,
-> +    })
-> +    defer(ethnl.rings_set, {
-> +        'header': {'dev-index': cfg.ifindex},
-> +        'pacing-offload-horizon': cur_horizon
-> +    })
-> +
-> +
->  def _qdisc_setup(ifname, qdisc, optargs=""):
->      """Replace root qdisc. Restore the original after the test.
->  
-> @@ -56,6 +87,7 @@ def _test_variants_fq():
->              ["one_pkt", "a,10", "a,10"],
->              ["in_order", "a,10,b,20", "a,10,b,20"],
->              ["reverse_order", "a,20,b,10", "b,10,a,20"],
-> +            ["beyond_hw_horizon", "a,70", "a,70"],
->          ]:
->              name = f"v{ipver}_{testcase[0]}"
->              yield KsftNamedVariant(name, ipver, testcase[1], testcase[2])
-> @@ -64,15 +96,42 @@ def _test_variants_fq():
->  @ksft_variants(_test_variants_fq())
->  def test_so_txtime_fq_mono(cfg, ipver, args_tx, args_rx):
->      """Run all variants of monotonic (fq) tests."""
-> -    cfg.require_ipver(ipver)
->      _qdisc_setup(cfg.ifname, "fq")
->      test_so_txtime(cfg, "mono", ipver, args_tx, args_rx, True)
->  
->  
-> +@ksft_variants(_test_variants_fq())
-> +def test_so_txtime_fq_mono_hw(cfg, ipver, args_tx, args_rx):
-> +    """Run all variants of monotonic fq tests, with offload horizon."""
-> +    cfg.require_nsim(nsim_test=False)
-> +
-> +    _dev_setup_pacing_offload(cfg)
-> +    try:
-> +        _qdisc_setup(cfg.ifname, "fq", "offload_horizon 50ms")
-> +    except Exception as e:
-> +        raise KsftSkipEx("netdev does not support offload. skipping") from e
-> +
-> +    # Expect all tests to use only hw pacing, except beyond_hw_horizon.
-> +    hw_only = "-h" if args_tx != "a,70" else ""
-> +    test_so_txtime(cfg, "mono", ipver, f"{hw_only} {args_tx}", args_rx, True)
-> +
-> +
-> +@ksft_variants(_test_variants_fq())
-> +def test_so_txtime_pfifofast_mono_hw(cfg, ipver, args_tx, args_rx):
-> +    """Run all variants of monotonic tests, without fq pacing sw backup."""
-> +    cfg.require_nsim(nsim_test=False)
-> +
-> +    _dev_setup_pacing_offload(cfg)
-> +    _qdisc_setup(cfg.ifname, "pfifo_fast")
-> +
-> +    # Expect all tests to pass, except beyond_hw_horizon without sw fallback.
-> +    expect_pass = False if args_tx == "a,70" else True
+>         David
+>
+>
+> >               }
+> >
+> >               if (param_len > SCTP_MAX_CHUNK_LEN -
+> > @@ -639,6 +640,9 @@ struct sctp_chunk *sctp_process_strreset_inreq(
+> >
+> >       nums =3D (ntohs(param.p->length) - sizeof(*inreq)) / sizeof(__u16=
+);
+> >       str_p =3D inreq->list_of_streams;
+> > +     if (nums * sizeof(__u16) + sizeof(struct sctp_strreset_outreq) >
+> > +         SCTP_MAX_CHUNK_LEN - sizeof(struct sctp_reconf_chunk))
+> > +             goto out;
+> >       for (i =3D 0; i < nums; i++) {
+> >               if (ntohs(str_p[i]) >=3D stream->outcnt) {
+> >                       result =3D SCTP_STRRESET_ERR_WRONG_SSN;
+>
 
-pylint says:
+Acked-by: Xin Long <lucien.xin@gmail.com>
 
-tools/testing/selftests/drivers/net/so_txtime.py:128:18: R1719: The if
-expression can be replaced with 'not test' (simplifiable-if-expression)
-
-/P
-
+Thanks.
 
