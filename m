@@ -1,196 +1,319 @@
-Return-Path: <netdev+bounces-306521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306522-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vtmrAdfTUGpx5gIAu9opvQ
-	(envelope-from <netdev+bounces-306521-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:13:27 +0200
+	id R8MrLIbUUGrv5wIAu9opvQ
+	(envelope-from <netdev+bounces-306522-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:16:22 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D5E073A03B
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:13:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E460B73A205
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:16:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=BotuWdHA;
-	dkim=pass header.d=redhat.com header.s=google header.b=gQzTb83C;
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306521-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306521-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=auditcode.ai header.s=zmail header.b=laKUEiYk;
+	dmarc=pass (policy=none) header.from=auditcode.ai;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306522-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306522-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4E9C73002773
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 11:11:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DA20D30036F8
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 11:14:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C684E3FADE8;
-	Fri, 10 Jul 2026 11:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E92E410D32;
+	Fri, 10 Jul 2026 11:14:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from sender-op-o17.zoho.eu (sender-op-o17.zoho.eu [136.143.169.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C87C3242B0
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 11:11:22 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783681883; cv=none; b=bLUngrLEc5bDst8ItcmFtgsww4jwid1eJNP0eHrMf+1fzLMQchUhwJXS8iml4Mhxv+MQn7B9DqGTChDSWN+Gx9KnM9T8Mzb5ux7Bk+JIgK+hnJg9lSKIh9vXlG3SGubCLGSwtxGP5kcNqDfyiUz1MfvJxkdhDtb5d+cN/4gTI5w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783681883; c=relaxed/simple;
-	bh=IjwYcTEUmviI2uzN9C6VmQsKSRoMhAtF2iZWcHvltfI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gG7PWW9GsWspz1QRXjPjiU8R1yzYzvM1QLjrmMqTPhuhfPrB/9fLcU4sWrK58By3XcWDc9qCxaBPcpzVMlNWTTPxVuUPmvR1qXjKUHYsfrXF61WRTI1LnbuK2nyX9Tdu3UJxRpDmv3WD513nUvga6PBht6Tz6rIRDS++TGzZsIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BotuWdHA; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gQzTb83C; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783681881;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bVcLc6UZlaNd75973r5+79VoMznRwSRrsQ5aYsbl16s=;
-	b=BotuWdHAGWMawONSEgqPnAnZpZJhN6+hlPW7z/WZUC2yxP89iP0i0/BQPJW8KzF/5JKEoL
-	AcgBiFxoTeGd8oba1Q2SDpu1pqPdHwUyJkBLe/UdjYfaMsXXDTNl6pZODzyHN6j78o+Sdf
-	6r6imyrG+Cbl2WrH2nk6ry5mtEqeVs4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-638-DDViNrzyPrGJEWNHSnctTQ-1; Fri, 10 Jul 2026 07:11:20 -0400
-X-MC-Unique: DDViNrzyPrGJEWNHSnctTQ-1
-X-Mimecast-MFC-AGG-ID: DDViNrzyPrGJEWNHSnctTQ_1783681877
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-493bd1716b4so4032905e9.3
-        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 04:11:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1783681877; x=1784286677; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=bVcLc6UZlaNd75973r5+79VoMznRwSRrsQ5aYsbl16s=;
-        b=gQzTb83CzAIkiZgiOfvCnkQLVBBvo8nw58SeIz0UTztbKA7HQv7GxRuQ1paLYraEG7
-         Yn+RRC4hVNYirgIiTG6K69N36kIcu4gUaGqEKadshWZm0GwoQWA/xZ2edcnQiOuvLoj7
-         PyFTEJ37LEvIhbrjEdj0WJLXvRG992Bl5WaL65hEJdKOFPeqY/cN3O9DicUcF6SQhUGX
-         vesAMUtfr7e/GmuZAOQ9p9Pfp4V8ECO2JQ9/ZRXVWR+7RF2EIgGnFYfv1panjCuqE2tf
-         +4wAhK70FhOdreeQPtiT37T11mVnVB3S3K4dvHJRnqlXEirF57KzNgNMRU/zgVVIMOAb
-         KrgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783681877; x=1784286677;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=bVcLc6UZlaNd75973r5+79VoMznRwSRrsQ5aYsbl16s=;
-        b=J4DLJ5EO9nCZiQQ2W3FbmSC42UB9T9saZfijerGPOzgx5Cdn3jm5H8vb0SlAZ1lt5A
-         PxKetDJLlZmuXYjLrDAjPq88fY8inERZMMu1Byqko+1cviHA6tYOeVO91VOADFk+Zko2
-         LoylnfMcxcv0rHVm1e4lF78RdEicjPKD/qrtYdr1Sf+UVQVCA3dBtLj2MAPpo+5Nrpcz
-         CRdrhLbGvgAmpGxYualUmco//EAsc2bgNKQxKjUdqOF7jqPL+u2yBwFX0ESSXuRtBWMC
-         i9Q6zYR0EsgqJXpGD1wW8j8dM36YGlyFJybSMLv3v30TpgXHUu+iNULJmweYaf7Xqx6y
-         dHsg==
-X-Forwarded-Encrypted: i=1; AHgh+RpyZhBHZteho4fH/BlKue24noCNGLt5iF+o96u/ArYksZFPrXoiIR83u7BA+8B47socT2FpVvU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5Mnez8cFWx38MdVm06lE7AUu6lu7djTWIzf5Iea1vQSRTRq41
-	4NmNwNqb1j2W2zDMIdjPIWmkMgO+SautzkRE9o6QhHXjs4HZcBpYVcU1DBvM9HJ4hPEaTQVlVWb
-	KFFYOi8/NHvhLtHUy4G79Qf6RSKOx+GxmMMULFCQuht0os/ZN3bMvwc/qpQ==
-X-Gm-Gg: AfdE7cm2lyd2Rx/kddqyidbMqiF+V5G+YtPyxGYUnvHMd1yekAEr1wmGObbAY2lx1Ex
-	Qnn0HX33z1ywzclFE454sUi+/YegZd4UnbWVmngpgMJPHIAxeDIn2gAMiiEgJ/J2kgLnOVhPg6q
-	mkGklYjfnaCmzvKr6d9nhvhTPJbqRsHnJKcqlw0iLXzjUlQ3nK9Ji2dagMxTxy9wGUC0lOxD81L
-	V97beJSMmhJFhDb116tEFWz4UbLqDBhUqZ6guDCBZdYEImWVoF7O9h4qfcFT5U5+Y3smZHzIJ8y
-	TLKNSyFWbOq927ZWVgZiQZlvhbZrgQTR7RBKyEvH/ybviEyfJ+Wu7zl9bVJPCo9fiWX5ZsaIdR6
-	XBjSKzI3FQwYFMhe5HFOur4SaiUbPslELGh4EuIpJsmA+n+fqiVqDPvdozD+vv33nIe6ARGdD4D
-	9iIKM+c9qg4tSS
-X-Received: by 2002:a05:600c:4ed3:b0:493:e49e:f58 with SMTP id 5b1f17b1804b1-493eaf4b6e3mr68981605e9.4.1783681877078;
-        Fri, 10 Jul 2026 04:11:17 -0700 (PDT)
-X-Received: by 2002:a05:600c:4ed3:b0:493:e49e:f58 with SMTP id 5b1f17b1804b1-493eaf4b6e3mr68981235e9.4.1783681876590;
-        Fri, 10 Jul 2026 04:11:16 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:5521:6b10:58fd:68f:7756:389d? ([2a0d:3344:5521:6b10:58fd:68f:7756:389d])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9de1e736sm63287327f8f.7.2026.07.10.04.11.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Jul 2026 04:11:16 -0700 (PDT)
-Message-ID: <29350bdd-d351-478d-a036-34e4279d36f2@redhat.com>
-Date: Fri, 10 Jul 2026 13:11:14 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED12413245;
+	Fri, 10 Jul 2026 11:14:46 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783682089; cv=pass; b=oMnMHucRoZTFBRV+uvr86qsyH2S3sWF82K8TOco27NO2pNb0fFhg2QIf6vAtA1WHi+Ch8LD2x6UDAAzAEarPWC7rj3nVKJqkeSb0C5O4vL/JMm28lx1kZAzbnSsvud8DGQ6tkivYdYmb2pNkNAbTxROR4Co3kZuAPoeofSNHl8Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783682089; c=relaxed/simple;
+	bh=F1KTYWnq+9g4j5MHk+R0ILEhmbsbyeXojT5qMs9y8d0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qoAmLSE9ORrH0Ri8EWjxyM+KAt94flR0A3TcR8D1tG/VS4XSfpACOYSn6I9lWE+7O08HE4FyyuW0ZvCIgXe6FWhmRjPihKZs9UMiUq/vVGTj5ocno74pJYTMP8Df8ZEr01AHjYOb26h2BhMRMWYcEL5F8Dkb5tjdwsr8u4wP6kk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=auditcode.ai; spf=pass smtp.mailfrom=auditcode.ai; dkim=pass (1024-bit key) header.d=auditcode.ai header.i=security@auditcode.ai header.b=laKUEiYk; arc=pass smtp.client-ip=136.143.169.17
+ARC-Seal: i=1; a=rsa-sha256; t=1783682040; cv=none; 
+	d=zohomail.eu; s=zohoarc; 
+	b=cC/ICZXfF1PPaasz/E3BNaljaXN+qnBbr8t0aYdAVdPzQQ3aXMlUSNFjgIpF+Z20jl9E1IDeU7jcX/IUBC+3ujOt07VwRF42Rx8aDZlR2SbuR1wS8IX62zAvyVCBIJmplwwL/uJurHzzQtam8MR7759N3/HqeS+UtO5A9vrmXgY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
+	t=1783682040; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=n2VrqkVnW4B7S1gpVF6wwy16uSMDtNg0d+SAjOSYJeg=; 
+	b=GjLHlQ+UiIysAtM4njkWSwm9tnItYHjUy+NXbcJMO33KRJEVxMhf1ugUB9ju8Ebpuu3AwMwznr3nOjYC76fF7QZ1Y4fChrOHneY0x6pc//uYCDItXwdeOrt9uj4EbkxVkOtnT0eU0VwVaPnAi5YHSnu44IdCNpyaaDuhmy9+c6M=
+ARC-Authentication-Results: i=1; mx.zohomail.eu;
+	dkim=pass  header.i=auditcode.ai;
+	spf=pass  smtp.mailfrom=security@auditcode.ai;
+	dmarc=pass header.from=<security@auditcode.ai>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1783682040;
+	s=zmail; d=auditcode.ai; i=security@auditcode.ai;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=n2VrqkVnW4B7S1gpVF6wwy16uSMDtNg0d+SAjOSYJeg=;
+	b=laKUEiYkT5R79MzktC+t7ZYJtdMShEpX7mz1OyZO73MP2eQ9B9tTGGVF2m5I3pwk
+	RRYwoCBaJsTD1M8nUsjbaseGjLQXuDiV8NRj1wp2CLoorN4p8AJvEjODsPYkB6MunsJ
+	NFr6KSTO76R3uxB6ssrBkikSfwwNt93sxX0CcoyQ=
+Received: by mx.zoho.eu with SMTPS id 1783682036480683.9563439480606;
+	Fri, 10 Jul 2026 13:13:56 +0200 (CEST)
+From: Ibrahim Hashimov <security@auditcode.ai>
+To: Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net] mac802154: flush rx_mac_cmd_list before freeing sdata
+Date: Fri, 10 Jul 2026 13:13:53 +0200
+Message-ID: <20260710111353.12138-1-security@auditcode.ai>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 06/14] net: Add per-netns netdev
- unregistration infra.
-To: Kuniyuki Iwashima <kuniyu@google.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
- netdev@vger.kernel.org
-References: <20260703001009.1572444-1-kuniyu@google.com>
- <20260703001009.1572444-7-kuniyu@google.com>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260703001009.1572444-7-kuniyu@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[auditcode.ai,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[auditcode.ai:s=zmail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-306521-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:alex.aring@gmail.com,m:stefan@datenfreihafen.org,m:miquel.raynal@bootlin.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-wpan@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:alexaring@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com,datenfreihafen.org,bootlin.com,davemloft.net,google.com,kernel.org,redhat.com];
+	FORGED_SENDER(0.00)[security@auditcode.ai,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:kuniyu@google.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:kuni1840@gmail.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306522-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[auditcode.ai:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[security@auditcode.ai,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4D5E073A03B
+X-Rspamd-Queue-Id: E460B73A205
 
-On 7/3/26 2:09 AM, Kuniyuki Iwashima wrote:
-> When we need to unregister a netdev in a different netns, we will
-> delegate its unregistration to per-netns work.
-> 
-> There are three types of such cross-netns devices:
-> 
->   1. Paired devices (e.g., netkit, veth, vxcan)
->      -> Unregistering one device also deletes its peer, which
->         may reside in another netns.
-> 
->   2. Tunnel devices (e.g., bareudp, geneve, etc)
->      -> Destroying a netns removes devices in another netns if
->         their backend sockets reside in the dying netns
-> 
->   3. Stacked devices (e.g., ipvlan, macvlan, etc)
->      -> Removing the lower device also removes multiple upper
->         devices, each of which may reside in different namespaces.
-> 
-> In these cases, we will use unregister_netdevice_queue_net() to
-> queue such potential cross-netns devices for destruction.
-> 
-> Each driver must not call both unregister_netdevice_queue_net()
-> and unregister_netdevice_queue() for the same device.  See the
-> subsequent veth/bareudp/ipvlan patches for how they avoid double
-> queueing.
+mac802154_rx_mac_cmd_worker() (net/mac802154/rx.c) is queued on
+local->mac_wq every time a MAC-command frame (assoc req/resp, disassoc
+notify, beacon req) is received on any interface of a given phy. Each
+queued struct cfg802154_mac_pkt stashes a *raw* pointer to the
+receiving interface's ieee802154_sub_if_data (sdata) in
+ieee802154_subif_frame():
 
-Only if a repost is needed, possibly avoid the double negation above?
+	mac_pkt->sdata = sdata;
+	list_add_tail(&mac_pkt->node, &sdata->local->rx_mac_cmd_list);
+	queue_work(sdata->local->mac_wq, &sdata->local->rx_mac_cmd_work);
 
-"""
-Each driver must exactly call either unregister_netdevice_queue_net() or
-unregister_netdevice_queue()...
-"""
+and the worker later dereferences it with no liveness check at all,
+e.g. for IEEE802154_CMD_ASSOCIATION_REQ:
 
-/P
+	if (mac_pkt->sdata->wpan_dev.iftype != NL802154_IFTYPE_COORD)
+
+Neither teardown path drains this queue before the sdata it points to
+is freed:
+
+ * ieee802154_if_remove() (net/mac802154/iface.c), reached from the
+   nl802154 NL802154_CMD_DEL_INTERFACE handler, does list_del_rcu() +
+   synchronize_rcu() + unregister_netdevice(sdata->dev) -- which frees
+   sdata via priv_destructor/needs_free_netdev -- without touching
+   local->mac_wq or local->rx_mac_cmd_list at all.
+
+ * ieee802154_unregister_hw() (net/mac802154/main.c) only flushes
+   local->workqueue (the DATA-path queue) before calling
+   ieee802154_remove_interfaces(), which frees every sdata on the
+   phy; local->mac_wq is drained only via destroy_workqueue() much
+   later, after the interfaces (and their sdata) are already gone.
+
+Either way, if mac802154_rx_mac_cmd_worker() is already queued (or
+races back in from a frame received just before teardown), it runs
+after the free and dereferences freed memory -- confirmed under
+KASAN: flooding a victim NODE interface with MAC_CMD frames from a
+MONITOR interface on a sibling phy, then deleting the victim via
+NL802154_CMD_DEL_INTERFACE, reliably produces:
+
+  BUG: KASAN: use-after-free in mac802154_rx_mac_cmd_worker+0x463/0x630 [mac802154]
+  Read of size 4 at addr ffff888004b22a18 by task kworker/u8:1/31
+  Workqueue: phy0-mac-cmds mac802154_rx_mac_cmd_worker [mac802154]
+  Freed by task 498: ... (the DEL_INTERFACE task, ieee802154_if_remove)
+
+Verified on the same v6.19 KASAN stand with this patch applied: the
+identical MONITOR-flood-then-DEL_INTERFACE reproducer no longer trips
+the use-after-free report in mac802154_rx_mac_cmd_worker().
+
+Fix it the same way mac802154_flush_queued_beacons() (net/mac802154/scan.c)
+already flushes local->rx_beacon_list on scan cleanup, plus a
+cancel_work_sync() step: rx_beacon_work's worker never dereferences
+sdata, so the existing sibling doesn't need it, but rx_mac_cmd_work's
+does. Add mac802154_flush_queued_mac_cmds(local, sdata):
+
+ - cancel_work_sync(&local->rx_mac_cmd_work) waits out a run already
+   in flight (still safe -- nothing has been freed yet) and blocks any
+   new run from starting while we hold the RTNL;
+ - every rx_mac_cmd_list entry whose ->sdata matches (or every entry,
+   when called with sdata == NULL for full-teardown) is then dropped,
+   so no future run of the worker can see it;
+ - if entries belonging to *other*, still-live interfaces on the same
+   local remain, the work is re-queued so they still get processed.
+
+Call it from both teardown paths:
+
+ - ieee802154_if_remove(), before unregister_netdevice(sdata->dev),
+   filtered to the sdata being removed (other interfaces on the same
+   phy may have legitimate entries in flight);
+ - ieee802154_unregister_hw(), before ieee802154_remove_interfaces(),
+   with sdata == NULL since every interface on the local is going
+   away and local->workqueue's flush_workqueue() does not cover
+   local->mac_wq.
+
+This mirrors how mac80211 drains per-interface work (e.g. the
+analogous per-sdata work items cancelled from ieee80211_do_stop()
+before an interface is torn down) and the existing mac802154 scan.c
+list-flush idiom, applied to the one rx_mac_cmd_list consumer that
+actually dereferences the freed interface.
+
+Fixes: d021d218f6d9 ("mac802154: Handle received BEACON_REQ")
+Cc: stable@vger.kernel.org
+Signed-off-by: Ibrahim Hashimov <security@auditcode.ai>
+Assisted-by: AuditCode-AI:2026.07
+---
+ net/mac802154/ieee802154_i.h |  2 ++
+ net/mac802154/iface.c        | 10 +++++++++
+ net/mac802154/main.c         | 11 ++++++++++
+ net/mac802154/rx.c           | 42 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 65 insertions(+)
+
+diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
+index 8f2bff268392..e3c5c8d5b5d0 100644
+--- a/net/mac802154/ieee802154_i.h
++++ b/net/mac802154/ieee802154_i.h
+@@ -300,6 +300,8 @@ static inline bool mac802154_is_beaconing(struct ieee802154_local *local)
+ }
+ 
+ void mac802154_rx_mac_cmd_worker(struct work_struct *work);
++void mac802154_flush_queued_mac_cmds(struct ieee802154_local *local,
++				     struct ieee802154_sub_if_data *sdata);
+ 
+ int mac802154_perform_association(struct ieee802154_sub_if_data *sdata,
+ 				  struct ieee802154_pan_device *coord,
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index 000be60d9580..a5aa213e25a2 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -694,6 +694,16 @@ void ieee802154_if_remove(struct ieee802154_sub_if_data *sdata)
+ 	mutex_unlock(&sdata->local->iflist_mtx);
+ 
+ 	synchronize_rcu();
++
++	/*
++	 * Drop any rx_mac_cmd_list entry still pointing at this sdata
++	 * before it is freed below: mac802154_rx_mac_cmd_worker() runs
++	 * asynchronously on local->mac_wq and derefs mac_pkt->sdata with
++	 * no liveness check of its own (see mac802154_flush_queued_mac_cmds()
++	 * for details).
++	 */
++	mac802154_flush_queued_mac_cmds(sdata->local, sdata);
++
+ 	unregister_netdevice(sdata->dev);
+ }
+ 
+diff --git a/net/mac802154/main.c b/net/mac802154/main.c
+index ea1efef3572a..2f8c57e78db1 100644
+--- a/net/mac802154/main.c
++++ b/net/mac802154/main.c
+@@ -277,6 +277,17 @@ void ieee802154_unregister_hw(struct ieee802154_hw *hw)
+ 	tasklet_kill(&local->tasklet);
+ 	flush_workqueue(local->workqueue);
+ 
++	/*
++	 * tasklet_kill() above stops any further frame reaching
++	 * ieee802154_subif_frame(), but mac802154_rx_mac_cmd_worker() may
++	 * still be queued/running on local->mac_wq and derefs the sdata of
++	 * every interface ieee802154_remove_interfaces() is about to free
++	 * below. flush_workqueue(local->workqueue) does not cover it --
++	 * that is the DATA workqueue, not local->mac_wq -- so drain it
++	 * explicitly first.
++	 */
++	mac802154_flush_queued_mac_cmds(local, NULL);
++
+ 	rtnl_lock();
+ 
+ 	ieee802154_remove_interfaces(local);
+diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+index cd8f2a11920d..0b167f76cb23 100644
+--- a/net/mac802154/rx.c
++++ b/net/mac802154/rx.c
+@@ -128,6 +128,48 @@ out:
+ 	kfree(mac_pkt);
+ }
+ 
++/**
++ * mac802154_flush_queued_mac_cmds - drop pending rx_mac_cmd_list work
++ * @local: the mac802154 device the queue belongs to
++ * @sdata: interface being torn down, or %NULL to flush unconditionally
++ *
++ * Every queued &struct cfg802154_mac_pkt stashes a raw pointer to the
++ * interface it was received on (see ieee802154_subif_frame() below) which
++ * mac802154_rx_mac_cmd_worker() dereferences without ever checking whether
++ * that interface is still alive. Callers must invoke this before freeing
++ * @sdata -- or every interface on @local, when @sdata is %NULL -- so the
++ * worker can never run against freed memory:
++ *
++ *  - cancel_work_sync() waits out a run already in flight. That is still
++ *    safe to let finish because nothing has been freed yet, and it blocks
++ *    any new run from starting for as long as we hold the RTNL.
++ *  - every list entry pointing at @sdata (all of them, if @sdata is NULL)
++ *    is then dropped so no future run of the worker can see it.
++ *
++ * Mirrors mac802154_flush_queued_beacons() in scan.c, which does not need
++ * the cancel_work_sync() step because its worker never dereferences sdata.
++ */
++void mac802154_flush_queued_mac_cmds(struct ieee802154_local *local,
++				     struct ieee802154_sub_if_data *sdata)
++{
++	struct cfg802154_mac_pkt *mac_pkt, *tmp;
++
++	cancel_work_sync(&local->rx_mac_cmd_work);
++
++	list_for_each_entry_safe(mac_pkt, tmp, &local->rx_mac_cmd_list, node) {
++		if (sdata && mac_pkt->sdata != sdata)
++			continue;
++
++		list_del(&mac_pkt->node);
++		kfree_skb(mac_pkt->skb);
++		kfree(mac_pkt);
++	}
++
++	/* Other interfaces on @local may still have entries pending. */
++	if (!list_empty(&local->rx_mac_cmd_list))
++		queue_work(local->mac_wq, &local->rx_mac_cmd_work);
++}
++
+ static int
+ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
+ 		       struct sk_buff *skb, const struct ieee802154_hdr *hdr)
+-- 
+2.50.1 (Apple Git-155)
 
 
