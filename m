@@ -1,268 +1,265 @@
-Return-Path: <netdev+bounces-306486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306487-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id bkPuHR29UGqG4QIAu9opvQ
-	(envelope-from <netdev+bounces-306486-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 11:36:29 +0200
+	id WeXIAVG+UGrW4QIAu9opvQ
+	(envelope-from <netdev+bounces-306487-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 11:41:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0674F739219
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 11:36:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83341739310
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 11:41:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=oHMHumR7;
-	dmarc=pass (policy=none) header.from=intel.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306486-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306486-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=AP6GEjb4;
+	dkim=pass header.d=redhat.com header.s=google header.b=htrIYytj;
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306487-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306487-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7BF4030230C5
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 09:35:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6ABA3300D46A
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 09:39:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CBB03DC4DA;
-	Fri, 10 Jul 2026 09:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90663F58F7;
+	Fri, 10 Jul 2026 09:39:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07AD43F65E7;
-	Fri, 10 Jul 2026 09:34:49 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783676093; cv=fail; b=kGnUJd/i++FecNzemSxuc2wgXMVYF/ppr9eLoUB/vG5xWIdRW3ua3puMi3gwLDLUrChDQ4DpIz0xsuh/xYtzEBRV6BZBwjIIqVVvT79SukcrAQQcHFn6/i/q0tzqEJrtkPPMPspUptpg1qtWPmGpIpoy+xGq5DPCEMKm3yUJ+TI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783676093; c=relaxed/simple;
-	bh=ODcGxiUKiS1j9MlUipuvJOfkwE9H3HLH6IqA+SPBOYA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=q8w6SWBiEJ8F7ZjWzqfbW6qS6xU5OJnR6YxuPwZ4kz05jzOv+JG/aequ59dn42txXcGibls6CIf0rXsAtyGj4HfKzoU1YgMbqwNVAc7RO7GHfie1yzprXFN0Jb6EzG9wbswX/3NyoRIiR29n2PKKg69rVezOCYzNC/z/tUSkNjU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oHMHumR7; arc=fail smtp.client-ip=192.198.163.14
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1783676090; x=1815212090;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ODcGxiUKiS1j9MlUipuvJOfkwE9H3HLH6IqA+SPBOYA=;
-  b=oHMHumR7ZspXx4RxM98yUUpPVR7I82Rtc5y0mEhZCjh+K52EvCPGT6Uh
-   wNV5U6Y7i/5rg2D1XG6zdgHEAZWdWbx41DIx113X+rzlDVdCrVmsBnfKq
-   iA7EY0P5aGlECE0qcLx04Ns+b0pn08cI/87//+5nO6CjQyYM4wHoW1bLn
-   T5oXBqZNkf46cuebCtsAlArc3gPUhqYv2GGEMsnpQ8ezschFszQpFy1IO
-   KRbJ2UnOxAY/baIa1EH4GXGU97q0PEWNGZG0s3D6V7/dE2n677/rqHQ53
-   /p2n39k4rKHkAs/LVO3O93Tdr2PmgLgim8PwPEyzJoq8Bx/nVHpJxHEwX
-   w==;
-X-CSE-ConnectionGUID: jix8Po4hRNaji7nBUESq0Q==
-X-CSE-MsgGUID: v4nLd0AvR5KYDQl4zwxRCQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="84425524"
-X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="84425524"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2026 02:34:49 -0700
-X-CSE-ConnectionGUID: lU9ivxAcT2ackfEVLKl3gg==
-X-CSE-MsgGUID: WbJ1FO38STuDrMRwn+tN+g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="293041101"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2026 02:34:49 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Fri, 10 Jul 2026 02:34:47 -0700
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43 via Frontend Transport; Fri, 10 Jul 2026 02:34:47 -0700
-Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.30) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Fri, 10 Jul 2026 02:34:47 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=n/clDkcOwLVon3ZY+n7r6JwoYUnznk/YZdb7UWLKRa8wHnQ/wPm2N5nlyeqAsfbgEjDNbE12DKDKvuz2dSJe1AbLMi5UaLjfe7LI8fmGBDToi1C5Nf4ddBNQAvlsKuss3QR741I9mrUiBnZHd7YZLCAzAUJzHYWo9P8vRVA1u+DvBXQNeGlGL0qzSEWXMKJjMyzoO2o4alk6JEyNsIz5NsYnLRkUG2lUnxjlRTD3hMFZ1O69HD5w3nrJphJqNU950zozpJY+0j3G3/AFSPrwL9cald7O8K8yPhMnNaxBQNx/hacHUGX6vxlC7kVdmNUbci+Wk0leBzyrZhRM+zuGmQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LzIk6kJtLUE9kzb48sPhXI5DHBHAcxwAF8t1l18sDfo=;
- b=t297HHPN7786BxjbjAN9qHPklXpSW6pPFwHJGMgFX1LsepHwIImLDb/5GG2VJX7C6s6HZqc6TMZ6izkQ6d0oH9sCSdkf5qCVabHECt0HLMINJp29e8gvdTu1L95BWaVFVajGX9lXcYms/2xGJfuPSLQTickeUFq3aKfihXrr8JsDBKOQiVUc8OSy7PSsCo1YYCUgKlIKuI9Uj25Ac6B1wALCvheqBs2MNYoVn/GBPFnoeXnmpiENlX7j+m+FlhRukirI95LsjVm1/2OhjA+lz6xddVTNtkeE/h+Tgkt/6BC1i23ofue5h4H0SrALEh2lLmZ9vVerNUTOgd7tHiSHWg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB5902.namprd11.prod.outlook.com (2603:10b6:510:14d::19)
- by SA0PR11MB4655.namprd11.prod.outlook.com (2603:10b6:806:9d::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.17; Fri, 10 Jul
- 2026 09:34:40 +0000
-Received: from PH0PR11MB5902.namprd11.prod.outlook.com
- ([fe80::f95a:602a:34d3:5d37]) by PH0PR11MB5902.namprd11.prod.outlook.com
- ([fe80::f95a:602a:34d3:5d37%5]) with mapi id 15.21.0181.009; Fri, 10 Jul 2026
- 09:34:39 +0000
-From: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
-To: Hidayath Khan <hidayath@linux.ibm.com>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
-CC: "horms@kernel.org" <horms@kernel.org>, "linux-s390@vger.kernel.org"
-	<linux-s390@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "wintera@linux.ibm.com"
-	<wintera@linux.ibm.com>, "twinkler@linux.ibm.com" <twinkler@linux.ibm.com>,
-	"heiko.carstens@de.ibm.com" <heiko.carstens@de.ibm.com>, "gor@linux.ibm.com"
-	<gor@linux.ibm.com>, "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
-	"borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-	"svens@linux.ibm.com" <svens@linux.ibm.com>
-Subject: RE: [PATCH net] net/af_iucv: fix NULL deref in
- afiucv_hs_callback_syn()
-Thread-Topic: [PATCH net] net/af_iucv: fix NULL deref in
- afiucv_hs_callback_syn()
-Thread-Index: AQHdD9iMFy+KzXkWFUSXG5MLgXbKTbZmfhRg
-Date: Fri, 10 Jul 2026 09:34:39 +0000
-Message-ID: <PH0PR11MB590247B1CA37A1E9A4B4FD79F0FD2@PH0PR11MB5902.namprd11.prod.outlook.com>
-References: <20260709191732.124092-1-hidayath@linux.ibm.com>
-In-Reply-To: <20260709191732.124092-1-hidayath@linux.ibm.com>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB5902:EE_|SA0PR11MB4655:EE_
-x-ms-office365-filtering-correlation-id: 5f5de6ae-0ea2-4438-3085-08dede66770d
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024|23010399003|18002099003|22082099003|11063799006|38070700021|56012099006;
-x-microsoft-antispam-message-info: VYsnmiUTvgAMimx/YKNJM4vs2YnTeIwEtYhQQcY2rvhEXQ891bBu0uM+c5WyMAbpJjR9iHaueRuyMRqyCl1+RmzLKZvqeRUcqt8EAOt7RYKoC6sdY8vHBmtrSXzzWCUTWKwOXkcY8mqmglF7dUXwB/GsmyBQLJkRqPywM5mlE9tPzOx1wMnWUisDfFdpn/cMNspOiYAA5II7WE07s5JqTS53V1nosKPvlIAea3jKhtLULU1mdttBqYzPhBMvdhrXRVEdDM1vWUyVeoAdmEYgowBg2AFN5s5kvbk+IkqNozu6gNUwO88yvznQ6Lq5JuZw03n1rP+tGmHbG0HCT2aHuFUw/RLc+7G3UmZb7hB3oKfB/Wl7E20gz/XcGK6HW2r7+GvlPF7GuPJbSSXFLOPQW9OrUvpW81OC0+I5abRIaGi/e01SQVxaAN9HK6/AojmIWY9iuHVLozvn3O+yohAmIjzAEFG414xKixu6UJnk+4zoOfPdjr3NSTRp1NXPAaW8alE6jjq7nF3nZPB088IJAGXDfCpMjyGNB3XQTndZfj1ekVyJXrRgN7T4WJnN/b9Gu8dm/s4m0niHL4Fleah+IF764Uw6lr80jsecoUXdpZzF0j3tNPXMkifJInVvjAWdKNbQUL5d0mriuk+COnGtAi2HIs5MXXJFS+au53ox2dJG0RxbTSqdXtR9iDad+A0IKdTQrFxbjOuZiXorybdH2dX4RaHOBIrHeLXY4X1lgnk=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5902.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(23010399003)(18002099003)(22082099003)(11063799006)(38070700021)(56012099006);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?C6cmZi28P0YahRzc9FtGGVPhRHqb873kWdjSutbdQC4cigS88Q+QXfzJhZFb?=
- =?us-ascii?Q?hMMM706qY5+lBagN4Nbs0mLpHCyZccMf31zDpCkGIgdavY4NJRD1gKXX0ju/?=
- =?us-ascii?Q?/CdW4gALw7Ls3UDBucZZsewvMZnoj04k+d16mNr8eDuvIi+W8AvpOiaAd0iY?=
- =?us-ascii?Q?7gXtVn3TBT3hE4SVOCJd2rAium/hIXGbTJqg5liwJln2iG5ygeWogpnZz03x?=
- =?us-ascii?Q?5SMZ9hcsK0I4oxsVzhFrRTAoR+cLBYe0+SalXq3QZWNl9N/ZzHt0oV0rAcqh?=
- =?us-ascii?Q?0pTIWANEMiNQ9USdp4evf2PUfu59MXyDIsTs2mxzXrMo+M2rcjX6HHTE031c?=
- =?us-ascii?Q?BtQifLCUZzGRPz4Riq9CXsT7EkN9iJ44He3OA0/lN1f5MM8FnF1fc5TzzohT?=
- =?us-ascii?Q?gneGsA6tI2NtyUK+erScnIU/vGBYeCs8VoDhCab6xCoIG3O48MjoJNAeksmx?=
- =?us-ascii?Q?LxXTRBefEfQ4n+2BHbGbV+KqKFxc2SVCy7VXzZ9DOK/Gi9f1J44xOIWumi1F?=
- =?us-ascii?Q?bwgZYcn5mQxuNeOcwET173j7XJsJQZionNXgKi8PxWPYAUWw8MQInGmB8Rr7?=
- =?us-ascii?Q?Ot+I5RSB8NQ9qJ3ixOg+WFlA3PnK3Ojcl4X1sj49wmDUqmMd0K2Ar8IPV8vh?=
- =?us-ascii?Q?Y/QjLE8X0RS72xVoYQHzfcD7GN3W/iiH30WREZ1gZoULvsMtqIhVGlMhIV1q?=
- =?us-ascii?Q?nZHrkezkh7+jX1Z0tH7WGUBZFG6YpgkP3MUc3ma+SaRjZqYVBd4JtzDuuzgK?=
- =?us-ascii?Q?zZCsL+kz95xcM2RvhBPdhtApWROMWA8AmwxepVofVmtejPINCt5xET73R9AB?=
- =?us-ascii?Q?O0aF9ztMR1iK7dl7ZadA+x8T40H7XYPvHgFDwGGyStGskLOuZobVF5JSXo0n?=
- =?us-ascii?Q?b9OECCFefLB7cSsmiQMiV0Lb0TXSB0AwGGxQeubxopf3vTJzMp2aXHQnjFkg?=
- =?us-ascii?Q?MB8zkmrD5P0m6CYXprP1IiXbwekWYAKjlQL6jfpeHIktwpi/t0lZu0+dXp7M?=
- =?us-ascii?Q?TBhQARTrg7bIrcFy+eRX4HwxmKYEpQDqfYKSaxLDbheff3dBcrs8BS52a3Tv?=
- =?us-ascii?Q?tUazT9waz6kjuxeHVg2qm7hmkFCo6ITWJXvUFhTNm7mTeg4abvDwraYHzgxK?=
- =?us-ascii?Q?LMWVSqplFU2y0f0n72G/rOn3Ny6h9Nj3yFbKlMGixK4vEfpYyqDg+0ZcNsyd?=
- =?us-ascii?Q?D3r+nMe0uhySXqfMXmPKNTN698GPFXX2UYjhaOn/tOCRKPT3dK2MqUL8mORa?=
- =?us-ascii?Q?hBq084xHCX6Z3qXAwZMQzSTdwK/zvlfFM+WFEvO+kqY6oGm4GqBuL08mru5D?=
- =?us-ascii?Q?bGqIUg/hVEhRmZmI0mQswBEqqZ5hbYjGgqWm167qShVw8+sHEzYOkbZ9mpco?=
- =?us-ascii?Q?XlTz+WqXzcDxGPC8fRkfuNj4RMOg0Q/BU/Hb4WD9rOs+2gbt8f1hANmQG695?=
- =?us-ascii?Q?Po28NSBwpYOFqXVbnJaQVJuaF/8XcPjWy9qLPSnBkyrmbBbLoclIXSXdhaJE?=
- =?us-ascii?Q?v2HplaEMsc8FoWI4V46MXevT0mjN5i0fV/N9eAj1AS05Jc5hj31kLzNVUyT7?=
- =?us-ascii?Q?Kiv2O9qhXxpSqQ0G/jC5bNI797LTT8Lz7qbJGShmM08WtJwqqK64T3BqZb5Q?=
- =?us-ascii?Q?b8hiwtxXPtnpyRyVJlMRjLu2i0PVDyAWg0pJA8b7KEXJfUCzYwVmitGvOrXr?=
- =?us-ascii?Q?r76z6MvaSxHSPrc4gkofPuB5C1MeTJYRw95W974j7wle2IaWxZrQgzmuBzEQ?=
- =?us-ascii?Q?CSnYhP5XwA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6966E3F58EA
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 09:39:15 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783676356; cv=none; b=TA8ubyySMInLJxg7pqpsCQUNbInCB1XFyeky5MnWmvfmmSphvymezAllrjjkgKWKUTzczLd3Ua++cq3eNdqnGTEbuj4QoQ5Xl9xweVgE5UHD5bSkrRQKnZt/XUi7lF86tjWjX1/pwgYr7cRQPp1y0I/VhZH4yAeEnjWmyPiuwb4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783676356; c=relaxed/simple;
+	bh=tMcFLGQQp6kEB4sPtUNZgVVh+m9JR0FwtLdYZracIC8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J9SMf+wGn43WMAEDsppjSUGYl4cpsr8wsrTdiBDlkF6zLuCB2EcGEd4zlTVQZuH4xxYMI094Ffk7qCcV9MC65tiX0IV7DE0wtZ5WwM0R+06ALCwbSRfgpkz+Yb48L1BTE4JqmLq4jSi7IZi97/c1znLNZopbsbq96DTSfqUpUCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AP6GEjb4; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=htrIYytj; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783676354;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SXg0+wcS9DBXi+xElmyf+7VX+3uK9Wykzq5J/dCPMos=;
+	b=AP6GEjb490rkM1XnT5ict1sV72yymoKZS9lqWkb5UHv9017VjoZGVpJPbnfGDPeUlhKA0k
+	SvzRd+A9sDK6FAC3m3Yh+9rtVmDD7EWR2tLI72A7cbHcZ1cvZh7etn6Tbfljo3NwQmiOP8
+	tLBFvc1fz048DU3LCYNGMfk3Br/fUvg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-649-s20U7jwEO_SBomZteHPkgA-1; Fri, 10 Jul 2026 05:39:12 -0400
+X-MC-Unique: s20U7jwEO_SBomZteHPkgA-1
+X-Mimecast-MFC-AGG-ID: s20U7jwEO_SBomZteHPkgA_1783676351
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-473941177b0so601662f8f.1
+        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 02:39:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1783676351; x=1784281151; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=SXg0+wcS9DBXi+xElmyf+7VX+3uK9Wykzq5J/dCPMos=;
+        b=htrIYytjmnFUBerwB057efRfFPOADomWjSj4yawSx6mVdxeqWVJ2QTfoQG1N+Zbv3Z
+         KSCTnS7uKRnd7pQN757mTQbwyIKkyM7lq6OxkU9EiGepuScwM/YS5hYzXLeyNgk0xfMC
+         zNox7q+LHtWe8aBWAqGd1i8oHIMHLxA+GTjRuIXGBhIGJvjvfaalnZtdo8JoPped2JFG
+         zkXB3/lxVxKoDIYt3tIepR2RUCP0ROVXwxb1P4tQWyXhICQCdo69DS4tD4xdoNO7Si+I
+         ov2GYxKXiX4dAU5Q1omSqGi7iskWrXQLBjkdWKWzLe4vC8FUVtiT0qxpIgDj+1ILFDe1
+         nIMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783676351; x=1784281151;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=SXg0+wcS9DBXi+xElmyf+7VX+3uK9Wykzq5J/dCPMos=;
+        b=pgfceCDYWuDH0K+WTv4X8d8/1NrYl2hHKbpHQ5sQUpwx2gZ2ju0SaaaWDNB+F1Ov/M
+         lHeEHez7zBpAQSXvJffbQ15jmbuAVT9Q86TAIivYUahAQ8FidyWFRn7A9wL1EB1wZl0p
+         ks/dUloe9hjnHjTxuo4NNfd+6GNUiFwcOox4d6FIEhPTD9SNytHCVoDTI5+PEBqTwpmY
+         1IjOKNMhDmzryUsNqTJtUvJgkpIcWY+oRl1GqBRwppMC+U8FQlOJvmhmGFlHZqe3U4U0
+         Nb3et+nqyBvbhGpjhAnH0eo36QZ1Ry1QOZVOJeV91DBMCCFvkRD1iQ2uFNIdPaLv6+ks
+         wxoA==
+X-Forwarded-Encrypted: i=1; AHgh+Rrr6+B2MXt5wMHvKW544PkuytO+ir/2/r5gQARItR9usX4S0VvsRcbX9mWlP0Dp7aRJq86xlQs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzo8oE9KztpFkcN2zWW/fDQ9TytBnfMNLsdnKfXI1XFDlvC0WJ8
+	ixa+CnEO+DROvRdGBYVdij4WE0w8eebiRQlZHi3df9z7DmCX5FaroanWTRheObHtR1SutMdbm2D
+	RacxEKRgsR5WH39J+vNDtng8WG1uAsFGShMI7Km+UgCRtj6D2i7Ou8OoB5g==
+X-Gm-Gg: AfdE7cn2ngdHPLP1jZ0Re/ahpfAuQv8A0bRNDel6SrOYEeXRnAAHUwPsdbzkUkZIqmu
+	WynURHzYNTzot+HqmZLlTEf/3JyPUrZ+HUmUTd6Es/nqBgNIUVUn4NjwHzVeTbUoiQ13Bi52qK+
+	1lbeKcTdv8G/GOLCXknEWuYHk5qrAV449ffkhjPt+VU+1NkzdCQjooSCqMmf8J272+26CigPBGl
+	8O46+qE7sHpdCakAx/rZtMMm7oTuafxn430d6S3ECdveqIbQmvLaDqvPrHGDXQ5yRPRu8KRD6ay
+	nhlK4a88xDWclWbSFBjeQJua+Yb467ZJzVYai19sPMgN6nt/Vdb/13f2sBEryvvkVfoxSJaguR5
+	PnRkUA20+6TTLo801z61halzrYrP5TQ7IJCFCrDXowCEbSDgR81qyoXIB+2iMqdIf1xsP/0SJ45
+	jrUYp4rdeChKOU
+X-Received: by 2002:a05:600c:6286:b0:493:cc25:85cb with SMTP id 5b1f17b1804b1-493e6892d8bmr105299395e9.8.1783676351396;
+        Fri, 10 Jul 2026 02:39:11 -0700 (PDT)
+X-Received: by 2002:a05:600c:6286:b0:493:cc25:85cb with SMTP id 5b1f17b1804b1-493e6892d8bmr105299095e9.8.1783676350840;
+        Fri, 10 Jul 2026 02:39:10 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:5521:6b10:58fd:68f:7756:389d? ([2a0d:3344:5521:6b10:58fd:68f:7756:389d])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9e4d6e4csm55755378f8f.10.2026.07.10.02.39.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Jul 2026 02:39:10 -0700 (PDT)
+Message-ID: <6d6388c9-cdeb-4b91-b393-125f4a5b7e0c@redhat.com>
+Date: Fri, 10 Jul 2026 11:39:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: H+gra6gHx8rqUPwQrcnwucJsuxlSjv2fWdI7F5aa3TZATf33ZwTWYEMYN1I8FGdNdZUSItk7JKbER845F6RKYN4yM3xyXrwFbbaFlnUXXFVIsB3UYw7T+Ms8lDU5+Cr3Akykr6aJskim/ANVDHbLC0uf9HkPLMKy/vMviQZ+LOUNxOGjnivRftfNf7nrEie2moBWtc6zKD5cfTh9cgJSsaVrXgC4FBTfBx9cv2YuCA90SqZirzPZxd1tTRFKlpY9gb7f0qtyD9ryomyggI8dvz/wVn/F8Y2b9TH2VjaXC1Zf05aHaGksxCYTk6UDXLLmgYvnGClxbhN7TuGOBI1oug==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5902.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5f5de6ae-0ea2-4438-3085-08dede66770d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jul 2026 09:34:39.8309
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: tqksTs8yzed4F8CcZN2p661iprHk2Oi3h9dAxaj5eVxTVO65N6wog9hAKdQsuQQZzgPUN9uJiQHvWy53+Fzt8lc6D4dezaKaEkCQo4H9ydM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4655
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 4/4] rxrpc: Fix CHALLENGE packet overqueuing and
+ simplify RESPONSE generation
+To: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Cc: Marc Dionne <marc.dionne@auristor.com>, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Jeffrey Altman <jaltman@auristor.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org,
+ stable@kernel.org
+References: <20260702144919.172295-1-dhowells@redhat.com>
+ <20260702144919.172295-5-dhowells@redhat.com>
+From: Paolo Abeni <pabeni@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20260702144919.172295-5-dhowells@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306486-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:hidayath@linux.ibm.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:wintera@linux.ibm.com,m:twinkler@linux.ibm.com,m:heiko.carstens@de.ibm.com,m:gor@linux.ibm.com,m:agordeev@linux.ibm.com,m:borntraeger@linux.ibm.com,m:svens@linux.ibm.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-306487-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER(0.00)[jedrzej.jagielski@intel.com,netdev@vger.kernel.org];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,intel.com:from_mime,intel.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jedrzej.jagielski@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:dhowells@redhat.com,m:netdev@vger.kernel.org,m:marc.dionne@auristor.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:linux-afs@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:jaltman@auristor.com,m:jarkko@kernel.org,m:keyrings@vger.kernel.org,m:stable@kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0674F739219
+X-Rspamd-Queue-Id: 83341739310
 
-From: Hidayath Khan <hidayath@linux.ibm.com>=20
-Sent: Thursday, July 9, 2026 9:18 PM
+On 7/2/26 4:49 PM, David Howells wrote:
+> Currently, when a CHALLENGE packet comes in, it's queued in an OOB queue on
+> the AF_RXRPC socket that generated one of the calls on that connection for
+> the application (which might be in userspace) to service.  The application
+> then picks up the CHALLENGE and requests a RESPONSE packet be generated,
+> allowing the app to include app-specific data in it if appropriate.  There
+> is, however, no actual limit on the capacity of the CHALLENGE queue, and
+> this could be abused remotely - and also getting the OOB mechanism right
+> has proven tricky.
+> 
+> Further, by analogy with other AFS codebases, it's not actually necessary
+> to generate the application data in response to the CHALLENGE.  The reason
+> I did this was to set the encryption on the app-data to be the same as that
+> specified in the CHALLENGE as the server must be able to handle that.
+> However, it's sufficient to use the encoding type set in the token that is
+> going to be sent to the server; presumably the kerberos server knows that
+> the fileserver can handle that type - otherwise why tell the client to use
+> it?
+> 
+> With this in mind, make the following changes to the rxrpc server:
+> 
+>  (1) Remove the OOB queuing stuff and retire the related CMSG values and
+>      sockopt.
+> 
+>  (2) Revert to making the connection event processor work item parse the
+>      CHALLENGE and generate the RESPONSE directly.
+> 
+>  (3) Add another (optional) parameter that is passed in when an rxrpc
+>      client call is created and ends up attached to the connection bundle
+>      and is a user-type key containing the application data.
+> 
+>  (4) RESPONSE generation looks at the bundle and if the app-data is there,
+>      it will include it (if the security class is YFS-RxGK; RxKAD ignores
+>      it).
+> 
+>  (5) The AFS filesystem driver will create an app-data key when it probes a
+>      fileserver and will attach it to the afs_server struct.  This is then
+>      picked up when a call is made to that server and passed to rxrpc.
+> 
+>  (6) Direct userspace users of AF_RXRPC can partake by creating a user-type
+>      key containing the app-data they want to use and passing its serial ID
+>      in a CMSG of type RXRPC_RESPONSE_APPDATA in the initial sendmsg() of a
+>      call.
+> 
+> To support this, I've made a change outside of afs and rxrc:
+> 
+>  (7) Add a refcount to the user-type key payload.  The problem is that the
+>      RESPONSE packet generator needs to look at the length of the app-data,
+>      allocate a buffer for the packet and then copy the app-data in - but
+>      the RCU read lock cannot be held across the allocation and the key
+>      might get updated.  To get around this, a ref is taken on the payload
+>      before the allocation and then put afterwards.
+> 
+>  (8) Since the DNS resolver makes use of the user-defined type's code, but
+>      allocates the payload itself, make it initialise the refcount.
+> 
+> Fixes: 5800b1cf3fd8 ("rxrpc: Allow CHALLENGEs to the passed to the app for a RESPONSE")
+> Link: https://sashiko.dev/#/patchset/20260624163819.3017002-1-dhowells%40redhat.com
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Marc Dionne <marc.dionne@auristor.com>
+> cc: Jeffrey Altman <jaltman@auristor.com>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: Simon Horman <horms@kernel.org>
+> cc: Jarkko Sakkinen <jarkko@kernel.org>
+> cc: linux-afs@lists.infradead.org
+> cc: keyrings@vger.kernel.org
+> cc: stable@kernel.org
+> ---
+>  fs/afs/cm_security.c         | 151 ++++++--------
+>  fs/afs/fs_probe.c            |   5 +
+>  fs/afs/internal.h            |  37 ++--
+>  fs/afs/main.c                |   1 -
+>  fs/afs/rxrpc.c               |  39 ++--
+>  fs/afs/server.c              |   2 +-
+>  include/keys/user-type.h     |   2 +
+>  include/net/af_rxrpc.h       |  20 +-
+>  include/trace/events/afs.h   |   1 +
+>  include/trace/events/rxrpc.h |   2 -
+>  include/uapi/linux/rxrpc.h   |   6 +-
+>  net/dns_resolver/dns_key.c   |   1 +
+>  net/rxrpc/Makefile           |   1 -
+>  net/rxrpc/af_rxrpc.c         |  49 +----
+>  net/rxrpc/ar-internal.h      |  22 +-
+>  net/rxrpc/call_object.c      |   4 +-
+>  net/rxrpc/conn_client.c      |   2 +
+>  net/rxrpc/conn_event.c       |  68 +-----
+>  net/rxrpc/key.c              |  36 ++++
+>  net/rxrpc/oob.c              | 387 -----------------------------------
+>  net/rxrpc/recvmsg.c          |  84 +-------
+>  net/rxrpc/rxgk.c             | 128 +++---------
+>  net/rxrpc/rxkad.c            |  27 ---
+>  net/rxrpc/sendmsg.c          |  15 ++
+>  net/rxrpc/server_key.c       |  40 ----
+>  security/keys/user_defined.c |  23 ++-
+>  26 files changed, 238 insertions(+), 915 deletions(-)
+>  delete mode 100644 net/rxrpc/oob.c
 
->afiucv_hs_callback_syn() allocates the child socket with GFP_ATOMIC.
->If the allocation fails, nsk is NULL.
->
->The connection-refused path is entered when the listen state check
->fails, the accept backlog is full, or nsk is NULL. The code
->unconditionally calls iucv_sock_kill(nsk) in that path.
->
->iucv_sock_kill() does not accept a NULL socket pointer and immediately
->dereferences sk via sock_flag(sk, SOCK_ZAPPED). When nsk is NULL,
->calling iucv_sock_kill(nsk) results in a NULL pointer dereference.
->
->Only call iucv_sock_kill() when a child socket was successfully
->allocated.
->
->Fixes: 3881ac441f64 ("af_iucv: add HiperSockets transport")
->Cc: stable@vger.kernel.org
->Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
->Signed-off-by: Hidayath Khan <hidayath@linux.ibm.com>
->---
-> net/iucv/af_iucv.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
->
->diff --git a/net/iucv/af_iucv.c b/net/iucv/af_iucv.c
->index fed240b453bd..f5b1ec44b6ae 100644
->--- a/net/iucv/af_iucv.c
->+++ b/net/iucv/af_iucv.c
->@@ -1872,7 +1872,8 @@ static int afiucv_hs_callback_syn(struct sock *sk, s=
-truct sk_buff *skb)
-> 		afiucv_swap_src_dest(skb);
-> 		trans_hdr->flags =3D AF_IUCV_FLAG_SYN | AF_IUCV_FLAG_FIN;
-> 		err =3D dev_queue_xmit(skb);
->-		iucv_sock_kill(nsk);
->+		if (nsk)
+This is quite big and difficult to review, could you please someout
+break it in smaller chunk?
 
-Hi Hidayath
-
-why not to move this check into iucv_sock_kill()?
-would prevent from potential similar issues in the future
-
->+			iucv_sock_kill(nsk);
-> 		bh_unlock_sock(sk);
-> 		goto out;
-> 	}
->
->base-commit: 262b2eac463d880a664cf92af1107b4f9d84ad37
->--=20
->2.52.0
-
+/P
 
 
