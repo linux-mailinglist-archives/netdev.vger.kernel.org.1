@@ -1,85 +1,86 @@
-Return-Path: <netdev+bounces-306544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306545-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Tg6LNRzjUGps7wIAu9opvQ
-	(envelope-from <netdev+bounces-306544-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:18:36 +0200
+	id h2bKNh7jUGpt7wIAu9opvQ
+	(envelope-from <netdev+bounces-306545-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:18:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D9C073AAF9
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:18:36 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B72B973AAFE
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:18:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=sXr1jWkv;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=XG3tSn0n;
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306544-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306544-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306545-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306545-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 529A830028BC
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 12:18:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9A1D53004617
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 12:18:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D24841168E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63A4F3B14D0;
 	Fri, 10 Jul 2026 12:18:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38EE3FBB6A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D501040BCB0
 	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 12:18:24 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783685907; cv=none; b=s1mdVW/Jc6yzNR1evbWryxZB4eqmQAx2owd+0AW2okbJFQmlHI62Ry1EQHnlPbKloSLVLN+WqmFyioay6/NpXQb8dnIBo/Q6NqyIYeQfiNlyjWCz2mrLdVgNyoTF2JrsXnMTkHvPfP2BTS/gNhUlaeCx6lMiOMbjt8AFQ8ZS2As=
+	t=1783685907; cv=none; b=UZZTVbX4WV4FaABNu6M9E5yKXCN/PfhcnAiPPYDZhb09ZuP+67YH0xppqGp3joHtDgtf+bM3f9+0ukTo2AI/6GlQU3iPxiNb3SNRwzMh3pb2YtcPCl42Lp+JZZWfcCgAlC+q9yeVxnQzd1sS8fCBPcJVKUvSqy9a1tMSmFQzvwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783685907; c=relaxed/simple;
-	bh=9SN+V+REhr2OsLoOvJrTk8maUpT32wY8pP0OMF4CJko=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=JaurMEWckGZHVn58uEe5szzZnVoPSLKGNMYKdTNZxR6FLXcG+8hgGXU1bSvadhpee6PFMlYkjYMdh6CvVfSxfF3hgqxYwbvSMCP7wR9cO7PGPUuqV9VrYxCV0CUSL8mJXe0kKFYpGuyGB8UIGb4pbEiy3EesD1eHJtyO3qDSmqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sXr1jWkv; arc=none smtp.client-ip=209.85.210.170
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-848479c9bd5so573529b3a.3
+	bh=FJCKa58IC6H0MQEjqDmcHw2w07jC+tF+UFLv0awPSOU=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=AwCQnW+bS2g+WZAZKouLZviQzqm+L7cgzOZZpYQ3yKHPylAVlIOc4rskxrUwe8rAWWpCxQTeBGdrixKj3iBls8L4T8lrqJ1B8CejZ7Y2soWneZQ5pbWSwXwQ/aYlEse47n3wgLa9Hy+kwYuRy4wIumink6GWiClM/NqP/qg2ZYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XG3tSn0n; arc=none smtp.client-ip=209.85.210.171
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-84536ecfc5bso864728b3a.2
         for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 05:18:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783685901; x=1784290701; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:content-type:mime-version
-         :message-id:date:subject:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=D1ve2Jv1wKCMGR2eux0a52sKbThvil31mifXTkYcpJg=;
-        b=sXr1jWkv+4q5Io242qq/1yNO8D8GePzJNsGINPv1U5kGzrWy7j36v/bv7GoGyrTies
-         /yEhQwhUQUoUJTQdG3n+00fTDNFTPtlQniVKf+K/vrXQ2pFzVK7NR6xhga145Z2SG1lV
-         w25NZ+xqrWAjrFXI7pJSsZHooBvt//YySMXhkawNuexbFT38Y38QXMdGbRJ8/0pnBkLC
-         U8L2MO7cRyZ8VCGfrpMPX6uOUpG1WbmaOR+QvuhCKKwS7QohU+R1yql7VsvLyUIlpRY7
-         Sd95quqz8E/jGq3hdgTKbvPB0Ik33pfxVycVGmczB/8re36JLWPhOoRJiK1bMsOR5r9T
-         WFfQ==
+        d=gmail.com; s=20251104; t=1783685903; x=1784290703; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=0OCEE6Z1wOLlnnOwCFs9n15GERESAgBFscngiBSRg7M=;
+        b=XG3tSn0n0s0DGjTLWmAAOlls9sk9LaG7wXd0igQwKmHMP7S4nFU5JP1i4uAKB9U+G3
+         bwMW9Q73RlLtkoXTiUhAuAqKYwt23bUGqHf0wVxNOyl8kP6SUqmMOL3WEkSrR9mdv897
+         LkWzCBiSEqNHphAjwtTYqe9YPy9w9qk94OaF82ZEMhPxOrRmI+wk1Syai5uWSr9eW7Oz
+         ajk/hpMZgiHojfFXFOHVrp1bC0qGtv0pI4ycjdNkebP+kyOYIEgGXuAOhhstHpvqGSZF
+         198v44OxKag1nAIrVg/LL6XryRzs5fMzHz1aSIdgqZhFGXpC1/iTxOIBZbM9k+MK56oD
+         mPsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783685901; x=1784290701;
-        h=cc:to:content-transfer-encoding:content-type:mime-version
-         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=D1ve2Jv1wKCMGR2eux0a52sKbThvil31mifXTkYcpJg=;
-        b=mP3Wl5K7V67E3JnKnyBnUcU1dzD34M/9aybD7jN+ReTePaDv2uiaFP6Khc/AZQLgjn
-         1U55pOB0h1cqo4egvT/WNfK5sKfOGF0lpaUvEAzOpCBtA6JMHxVFNJJIJUpHAz1gAXaf
-         b8KtkuYaY9CkWq9DkUcF7Yobdq9QPe9YPM0I8xNtJ8QcwaTPFZtYCGjEWHmqNyBjB9dh
-         miWhPqQJS+PnAmdAi4S4cpBKysVnMesxJjasKlZeDdnCg1+IDsT36RAmtfIoAL1fv81w
-         Ijl2RjnSbqH1eUWnQooICzhhd1HQ2gjGUvtBZ1UWX0LqAtz6RmQVZEPeReQ63tqz0CQR
-         8LVQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rqf3QHqEZSMEfpB1C469c/eWWPmFR+Y6zThl/ll6Qbncs3vLVxos2dZsC7FhFZzdNZDqDmpfRQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLhjU7ohcVbdtw3tvRfUYwWY8IhtsaRBeh8HF/VmPm35ydN+YC
-	a4xJT6z0enxUQBe0eb1oUIE+yVWofMdu5yhn3o+Sxk3wEWGGXYfhV/z2
-X-Gm-Gg: AfdE7cmq/wIzniM234l7WXfAn23rN9EkJUKFhVayeCY4n6eekUFl/wZQJrhMyPuetol
-	o1cA54kllwWMfJBbqBeRBQIkBEuzM+aUzf8x9r8dJq4kmIkf6y9dsQohg02Xd2oTZff8yD3dWQ7
-	CW6FFJKNCNYj1R0eqQsGRVMttcpUq+wh3libBpyEgycY389z0qgbSrrYU4O/R+UrSL8evu83kAN
-	GB/y/SkH2EuJOpQYVlc/ZG7QCHu3U2hQIL+uLdssRuL6k7AlMSXLs3hNodnwb1UBEX+vS0ahExu
-	40jl2SFN5ycClgyWwDxFYZ/bcL9MvHL/7NuELt+fa1nafgGdstF6G9W4j7He3to/ehXRhDpbFeS
-	9f5mXGRnFaW5q48K5rWjvJ6+fcdVShb+qpjNa7KT1bdlUW6wb77GKtLwkwM75sVFoCI+7AaYCuF
-	lJbKVgQL4VO3UbLRWXoSaP9A4=
-X-Received: by 2002:a05:6a00:928a:b0:845:2ff5:b66d with SMTP id d2e1a72fcca58-84842f9f0a8mr10683689b3a.35.1783685900841;
-        Fri, 10 Jul 2026 05:18:20 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1783685903; x=1784290703;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :content-type:mime-version:subject:date:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=0OCEE6Z1wOLlnnOwCFs9n15GERESAgBFscngiBSRg7M=;
+        b=MlLhWZfEPIxd3ayPZKC+XZcoOhnVRa6MN8WpMOhNzipUxyS9UiC7A1zqURlJ9VCvPv
+         rhrOPBgRul1VKKNIm3VeZH9wZsj6lXCAnwJryVnMduhulzIEuXowOZb+yVhR9lQkMfvw
+         apf/DZ2uAHTXsQa6ngXIyGRQYQGA8YTwMR8UXZjQrOFz6AEWySaVs9gJemNEXAvBh1gf
+         oAv04f/FJSuiiBGMVjG2U7Aee5l0QJf4qK2tRoZ5kr3BAepaGu4kXGZGGgzuvWmVg8F9
+         BkwOc6j98SdDf+tp9HLfVtcsWexZrBC742ILMtppaukzNgsZJQqSfetELSZXE+ZaiPGE
+         NuIA==
+X-Forwarded-Encrypted: i=1; AHgh+Rp4wxmqZFBZSjyXHwKhAwV9KCpryMbnefV0fheTyYPki2+fM295NK9IkWU7zKomj+Gjo0xFzUM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJ8yCov8mUbYMy0/z1UiHE6sMms41MfCv/z+2gUfOwgVOFqJWL
+	mrL1jrwVcz7v8355GVDRSO7NtEguS4RgjSwNeFHk0CAAU2M+RgTp3zNe
+X-Gm-Gg: AfdE7cntoGLnRatb8wxhte9cEgjvfy5PSTdhktNP/dpHaB6GNksGv29vBidd5MyzO4e
+	BOovGYKisDgpLVjf32/LhOU5InvlyFTVe1u1hx6JbT7/dOnddBH0drWXeOALRynGKC+DnAGySYq
+	yTEPI4AYKfH03Ec5k43iL01WsKxaH2aeeeSmycNXtjbW1JbUsKjThaTViXReyWbekUH8sJ7EzEU
+	PmkvOU+88QHclk6TXprA5RcEetEs+G725S1DdP4cw+68gLqYfSiJ3j3nvowW9Psa6Pt9WuCJhje
+	8ODPo+UVYrxfDVtE4eZH2ky698VZYBNdmf8b8lkuj+r65Z+AxVJdN+Tik7iHAC4OGzuBmPMTHH0
+	F1dTCu/HJ3tuCvqoLM/D2Qy5FmgFvC0cjgNyugNHO1h3wumFWr1JI7sH3hwMKkswQpqiT0GHWtm
+	PZKwOAnjUeQMSZjFjCRHqdmYTKdQWVy8IpUg==
+X-Received: by 2002:a05:6a00:12cf:b0:848:2f84:f431 with SMTP id d2e1a72fcca58-848432cc7a0mr10846270b3a.74.1783685902780;
+        Fri, 10 Jul 2026 05:18:22 -0700 (PDT)
 Received: from [163.43.103.131] ([163.43.103.131])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8480da8bab0sm8600845b3a.8.2026.07.10.05.18.19
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8480da8bab0sm8600845b3a.8.2026.07.10.05.18.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jul 2026 05:18:20 -0700 (PDT)
+        Fri, 10 Jul 2026 05:18:21 -0700 (PDT)
 From: Yuya Kusakabe <yuya.kusakabe@gmail.com>
-Subject: [PATCH RFC iproute2-next 0/2] seg6: add support for the SRv6
- End.MAP behavior
-Date: Fri, 10 Jul 2026 21:18:17 +0900
-Message-Id: <20260710-seg6-mobile-end-map-v1-0-970275f3d80b@gmail.com>
+Date: Fri, 10 Jul 2026 21:18:18 +0900
+Subject: [PATCH RFC iproute2-next 1/2] uapi: sync lwtunnel.h and add
+ seg6_mobile.h
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,30 +89,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAnjUGoC/yWNQQrCMBREr1L+2g81kiBuBQ/gtrho2mn9YpOQp
- FIovbupLt8wb2alhChIdKlWivhIEu8KHA8Vdc/WjWDpC5Oqlam1OnHCaHjyVt5guJ6nNrAZtDa
- 1Haw5g4oZIgZZfqsN3W/XPZMQ/Zyh2GHJ9Pi30mxf6PJ+QNv2Bb+QWiCNAAAA
-X-Change-ID: 20260523-seg6-mobile-end-map-6f5560bfb68e
+Message-Id: <20260710-seg6-mobile-end-map-v1-1-970275f3d80b@gmail.com>
+References: <20260710-seg6-mobile-end-map-v1-0-970275f3d80b@gmail.com>
+In-Reply-To: <20260710-seg6-mobile-end-map-v1-0-970275f3d80b@gmail.com>
 To: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
 Cc: Andrea Mayer <andrea.mayer@uniroma2.it>, 
  Andrea Mayer <andrea@common-net.org>, 
  Yuya Kusakabe <yuya.kusakabe@gmail.com>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1199;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2698;
  i=yuya.kusakabe@gmail.com; h=from:subject:message-id;
- bh=9SN+V+REhr2OsLoOvJrTk8maUpT32wY8pP0OMF4CJko=;
- b=owEBbQKS/ZANAwAIASrX0XUqXRtNAcsmYgBqUOMKa4zwyt7nkWRzU0an1NR7AcksgtLlS+LNi
- 2Ljiq4n6n+JAjMEAAEIAB0WIQTaB7usAfxNKMeqa6Yq19F1Kl0bTQUCalDjCgAKCRAq19F1Kl0b
- TR5ZEACXDc7BUOop9//NCN4l1GJlM+ZaZ2MSDZJdD0SvDc7vNjG3U4NMKFLohU+Cz+e7714sql1
- j08wQKq2tQ3op6PTMlJ+COIgHLmPF2qMY3uuS9nlMRJbyT18IO/2YxI/E/oYjPhnbqsT3Ku+6Xo
- 1EQ3ISVTM5M4Aew54G3b+563+vU/ADMt/1lxsG3OUskJjw9/hTvhPkgv4FHEBjVjG6m5aR9lVS1
- iHff0DwhM4aP8poWgpMbqWgx9Lemqm8ax8b39tuZN9ETbUkmcLVdsXruIahUhwmW0w1yQ3fNMux
- PqfCpi2fd62D+UGu79AP4YRYAqELaPFJgjH1sZ5/cQgU19FOkmrTt9//4R9LTiqy+/uxm6rQGSL
- ySj8/lZlPuyU1joRYIeltnItZmhWeohBmBE+UxM/rKsIILP48eN/F0z1Fe0FvWEewFZEqiQzFsT
- kyTrpq2VI6ixXz3LlpdXTp+uVdeuA4CWEZcV27wdPxIVAWgJvkUP5DA7vs/qICRqVkyDnD6GM0d
- 9m8USr3q/mPW8HO82eO++SKtMqJFK6DdxNWYiNfdKwIN/U9Ys/KdgzWlMtuPK38zDYx9wMXQHTK
- CVCQFHu/vtDWnrJ64r9RuPLz1Nx1TbOfXZZ1DBejpJNdB5OBhWWhxauWaxNLIKScFvn4IAvGcs6
- pxrkQ4+2MB3Emcg==
+ bh=FJCKa58IC6H0MQEjqDmcHw2w07jC+tF+UFLv0awPSOU=;
+ b=owEBbQKS/ZANAwAIASrX0XUqXRtNAcsmYgBqUOMKv5e/vJSPBeYTAQUTE4HBxzMG3B5thHRBM
+ iX5brNy1u+JAjMEAAEIAB0WIQTaB7usAfxNKMeqa6Yq19F1Kl0bTQUCalDjCgAKCRAq19F1Kl0b
+ TfuREACLJW/nCRLMsLVygpFOlNdktDv9me+4h625hQOZEo7USJ56CATeizP4JMEsEfMFrd/fH1w
+ TAKeh/2RA7XbYkDn8Rp8o1y8jvgC53CBO14vuaUD1crlDd44sloY07ePDJKoHB/9a1BhGNBFlP8
+ KJXbywPC9V8j0LQDp/cgWhQDKyDVwub2s200kkoAJGcG34LhCsMxoEXQRxJoxXxAlakO18ZV0H+
+ JUhhdEyI/e6N4l9700NVGAFli3oR0dsQ2gr0r7SeL5VofFIT/SjL+x1jMfzQoY6PeTwfQR2GwK1
+ b5kNiaqc82VSYf23428ZzRZi24/aZOHvEMS3HZFCcUHRJnJdbLk/owtSDo7m/CY1KxO6AEsVFK7
+ Vj/V7u/hKvG+3lFU+IMFH9uQZ5kzw3MAAayc2y7y+Sf/ikuHqSUoCKtA9hXBH4HAEnX97jFayDu
+ RyHkxD8qp/eRZnI6mO64fps8mFhxzmjW6Ij3Qy5F+7C6CuRDedzaJehdmOBTQqD1GySSXz6/W/Z
+ T1cOUvd6L/Ub2G2G6UaXmB+t4BTFgUoup7Er/AMy/87DL2loZVpF2yQvdZOWC/vfuyXOsmB7Kvn
+ 543inXQxu6NVwCe1Y/YAXoKTLINXkfL+fZRJgmkbr4BVS8+YhSCuc/dfR0bjWEXInOeEPG0jKA/
+ VT2p2L/0nby0ALg==
 X-Developer-Key: i=yuya.kusakabe@gmail.com; a=openpgp;
  fpr=DA07BBAC01FC4D28C7AA6BA62AD7D1752A5D1B4D
 X-Rspamd-Action: no action
@@ -120,11 +120,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306544-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306545-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:andrea.mayer@uniroma2.it,m:andrea@common-net.org,m:yuya.kusakabe@gmail.com,m:yuyakusakabe@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[yuyakusakabe@gmail.com,netdev@vger.kernel.org];
@@ -144,42 +144,98 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,end.map:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7D9C073AAF9
-
-This series adds support for the "seg6mobile" lightweight tunnel, the
-iproute2 counterpart of the SRv6 Mobile User Plane (RFC 9433) kernel
-RFC series [1], starting with the End.MAP behavior.
-
-Patch 1 imports the new UAPI headers as a standalone patch so it can
-be dropped once the matching kernel header lands.  The selftest in
-the kernel series needs the "seg6mobile" keyword to run.
-
-[1] https://lore.kernel.org/netdev/20260710-seg6-mobile-end-map-v1-0-99be02d68143@gmail.com/
+X-Rspamd-Queue-Id: B72B973AAFE
 
 Signed-off-by: Yuya Kusakabe <yuya.kusakabe@gmail.com>
 ---
-Yuya Kusakabe (2):
-      uapi: sync lwtunnel.h and add seg6_mobile.h
-      seg6: add support for the End.MAP behavior under seg6mobile encap
+ include/uapi/linux/lwtunnel.h    |  1 +
+ include/uapi/linux/seg6_mobile.h | 58 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 59 insertions(+)
 
- include/uapi/linux/lwtunnel.h    |   1 +
- include/uapi/linux/seg6_mobile.h |  58 +++++++++++++
- ip/iproute.c                     |   6 +-
- ip/iproute_lwtunnel.c            | 173 +++++++++++++++++++++++++++++++++++++++
- man/man8/ip-route.8.in           |  24 ++++++
- 5 files changed, 260 insertions(+), 2 deletions(-)
----
-base-commit: 37c491d82cebef070173878e167076a1956dcd92
-change-id: 20260523-seg6-mobile-end-map-6f5560bfb68e
+diff --git a/include/uapi/linux/lwtunnel.h b/include/uapi/linux/lwtunnel.h
+index 9d22961be619..b5adca10a9f1 100644
+--- a/include/uapi/linux/lwtunnel.h
++++ b/include/uapi/linux/lwtunnel.h
+@@ -16,6 +16,7 @@ enum lwtunnel_encap_types {
+ 	LWTUNNEL_ENCAP_RPL,
+ 	LWTUNNEL_ENCAP_IOAM6,
+ 	LWTUNNEL_ENCAP_XFRM,
++	LWTUNNEL_ENCAP_SEG6_MOBILE,
+ 	__LWTUNNEL_ENCAP_MAX,
+ };
+ 
+diff --git a/include/uapi/linux/seg6_mobile.h b/include/uapi/linux/seg6_mobile.h
+new file mode 100644
+index 000000000000..b99eabe9a2a1
+--- /dev/null
++++ b/include/uapi/linux/seg6_mobile.h
+@@ -0,0 +1,58 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
++/*
++ *  SRv6 Mobile User Plane implementation
++ */
++#ifndef _LINUX_SEG6_MOBILE_H
++#define _LINUX_SEG6_MOBILE_H
++
++enum {
++	SEG6_MOBILE_UNSPEC,
++	SEG6_MOBILE_ACTION,
++	SEG6_MOBILE_NH6,
++	SEG6_MOBILE_COUNTERS,
++	__SEG6_MOBILE_MAX,
++};
++
++#define SEG6_MOBILE_MAX	(__SEG6_MOBILE_MAX - 1)
++
++enum {
++	SEG6_MOBILE_ACTION_UNSPEC	= 0,
++	/* swap IPv6 DA with the next SID, leave SRH untouched */
++	SEG6_MOBILE_ACTION_END_MAP	= 1,
++
++	__SEG6_MOBILE_ACTION_MAX,
++};
++
++#define SEG6_MOBILE_ACTION_MAX	(__SEG6_MOBILE_ACTION_MAX - 1)
++
++/* SRv6 Mobile Behavior counters are encoded as netlink attributes
++ * guaranteeing the correct alignment.
++ * Each counter is identified by a different attribute type (i.e.
++ * SEG6_MOBILE_CNT_PACKETS).
++ *
++ * - SEG6_MOBILE_CNT_PACKETS: identifies a counter that counts the number
++ *   of packets that have been CORRECTLY processed by an SRv6 Behavior
++ *   instance (i.e., packets that generate errors or are dropped are NOT
++ *   counted).
++ *
++ * - SEG6_MOBILE_CNT_BYTES: identifies a counter that counts the total
++ *   amount of traffic in bytes of all packets that have been CORRECTLY
++ *   processed by an SRv6 Behavior instance (i.e., packets that generate
++ *   errors or are dropped are NOT counted).
++ *
++ * - SEG6_MOBILE_CNT_ERRORS: identifies a counter that counts the number
++ *   of packets that have NOT been properly processed by an SRv6 Behavior
++ *   instance (i.e., packets that generate errors or are dropped).
++ */
++enum {
++	SEG6_MOBILE_CNT_UNSPEC,
++	SEG6_MOBILE_CNT_PACKETS,
++	SEG6_MOBILE_CNT_BYTES,
++	SEG6_MOBILE_CNT_ERRORS,
++	SEG6_MOBILE_CNT_PAD,		/* pad for 64 bits values */
++	__SEG6_MOBILE_CNT_MAX,
++};
++
++#define SEG6_MOBILE_CNT_MAX	(__SEG6_MOBILE_CNT_MAX - 1)
++
++#endif /* _LINUX_SEG6_MOBILE_H */
 
-Best regards,
---  
-Yuya Kusakabe <yuya.kusakabe@gmail.com>
+-- 
+2.50.1
 
 
