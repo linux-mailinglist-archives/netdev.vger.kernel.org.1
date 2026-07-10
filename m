@@ -1,156 +1,211 @@
-Return-Path: <netdev+bounces-306632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306633-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ghuBAR8mUWoqAAMAu9opvQ
-	(envelope-from <netdev+bounces-306632-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 19:04:31 +0200
+	id eV+0HdIlUWoZAAMAu9opvQ
+	(envelope-from <netdev+bounces-306633-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 19:03:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84B0B73CE1F
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 19:04:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA5E173CDE6
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 19:03:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=yqGM8TC8;
-	dmarc=pass (policy=none) header.from=lunn.ch;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306632-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306632-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=UXEOihJW;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306633-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306633-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2F772305894F
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:55:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AE59F3016EC8
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC44844210E;
-	Fri, 10 Jul 2026 16:49:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40978153BE9;
+	Fri, 10 Jul 2026 16:58:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 853DB4418F2;
-	Fri, 10 Jul 2026 16:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB0582BDC05
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 16:58:38 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783702172; cv=none; b=EDd6VO57MFOS+wFg0IsWdPXRvTtX2ezN+/m1kle0/mnWGapz8WKUQDm/7vbE+nem+vyPfqte3RHW6f2v8F4HzRxz4cysV7vBU7GnUDpwQJIvCyb0V37VbMXHD2q3u2cltSD399EoPeP44pwbLFun7TXVjpAXgMv0TLmE9qk36E8=
+	t=1783702720; cv=none; b=bAbRzEa5RPUsnTFi2nExYktABjPJtYHCq1aNXnIrtPZrl8rHQoX88u6FnKI4k2ilAYBBTx7I+wjQ9kuFpsRPC0l9yvlKl65/JEhuD88J7RBSVuBuD85ePvNbCLXdcKWOzhwJd1aAHyoi0y3P4SiApHu5QWrEav/BmFlvuE+Fh1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783702172; c=relaxed/simple;
-	bh=LIWX7JGoFjuB4lkn5HoQseNyWV/4TB8Hwgp7oMlg2a8=;
+	s=arc-20240116; t=1783702720; c=relaxed/simple;
+	bh=GJMLoUvNdnWE4XXTv2fh0MAyR2jvtTtGXmw8+8W8SXY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u1IWjHI8jp6ne0hHl4jGurCUuYHQUvVL1mdpSvPo1of6vLFiGdztte2lky0y5FNyc2wcGgZuJDeow81vrwVJgnQ25F/cF6jXfuhXwMYQszPrBV4Ck7yCMQ8iyMWjVPklajv+oRCBPpeCxaqRZnT4n9xNbFLZXvm/Ueuzka3x8BU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=yqGM8TC8; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ctpw6H5oitgKah3XmofQDzLZrombiT2hiX7qbOqdOHA=; b=yqGM8TC8D5G63SEgrNyIFMo1ni
-	YHDUODa82SvLG5OFbeYUUtoHPcmMBgGi901C2tNI6+g6WketgPWn3kh6zM/OHkG3cDbrXl3rwJGlX
-	Rco81EFU5kClMmBr05IrxW44tUdOQZKovbC+8sf8SYbOqt6hr9HLueV3hFlX22J5Pthg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wiEPe-00Bfjf-3w; Fri, 10 Jul 2026 18:49:18 +0200
-Date: Fri, 10 Jul 2026 18:49:18 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: vadik likholetov <vadikas@gmail.com>, netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=OCCBDhnUox0sMF6iL0fqcUonBxxuV6QWPW3gYZ8lGMEhJJ3qcIbGV21kpOrq/4GcpH2+wmsCqQpWeLMEhr1S3I7+sDWGHN1kKdgZ2ljK5sp1KFzsYXLZuTKu+jJ7GWL9s0Rw79RN+fQo/A64j/jn3EBE9Ugow5Ll1wWQ4CHBVQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UXEOihJW; arc=none smtp.client-ip=209.85.215.174
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-c96c92c0980so684606a12.3
+        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 09:58:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783702718; x=1784307518; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=UzL1Q2+7WDC/g3DuLtI+wo+3VqWALiuVF8iASl1uPEU=;
+        b=UXEOihJW19Vqc0rSCNVp5IKtJ6SOWfuNC3Zbg4X8OMuR8dHL7Il5iPLt8tH3Md58MD
+         ZKupX2NvsrAK460q2O1uBqnug0mvyIqCfYmjDv6Rj2mcVqaT3aRk/b82k4APuLDdSL12
+         vCbyosatL0yT6AWQUE6lwqaQuh1OIQZqiO2pPtlhyi9/FiF1JkcESFaEX/pSB+HGrKn4
+         PqHHWc16yn8zaSZv9Pc6stQz4lvjegWT57bNTfH/K+4puU04mX25TenXbjcBeMgII5SX
+         fjkYc+fx1UG3fI/JLlTMm0QRAMQBjXt30kE4WcIFELX1DdQMPZ+J+Zi3uaeZj+X2Wdwv
+         JPkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783702718; x=1784307518;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=UzL1Q2+7WDC/g3DuLtI+wo+3VqWALiuVF8iASl1uPEU=;
+        b=Q/5pr6GG8KhzCo1oT/EpLm2zTfYKw7oxHJSYoxKAS0JqqDaps+YtlqK+D96qOJTbR8
+         Oz7lJG2/FgiTN1aG+Ox5l9v62fl4YYZok8dCjn1Wh033IOtT5sOA5iKaP0RmWlCIGoIq
+         8humHju1ekBaPHAUgy6dPgzaCO4PFJMDtLTH7kt8iqJM+omBbnlcMRGhWBGwJKIXvP5Z
+         tVpu4d1u1sCeZ1d0KSCxTqhCs16ZJRM8SKWTMMfjEjKa7N+MjJ2G0kTRBksC4E5wimcY
+         KGhqryd0FSK4+tWkMxonw6g69Uu5ntPHWi2QCgXtXplx9P5cTQPJKtOyp94M/gdykBMG
+         2m2g==
+X-Forwarded-Encrypted: i=1; AHgh+Rov3iN6Zpj/zMM+3qQ0USc+tm898B3fMe8ofegg/Nq9AsyNTyPI3u9t1aET69V7yelTkgt3Gp4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxwuU2qW8X4+LnEK6sAyOnlmLMBjfJLY4QWTqfLDZuknqVJtRy3
+	rzOnI2+Ll2YsF/ndCzhKNw+twt970bMmwtTa2prfv4jTDrDO52+JdONIFqZ9NuRY
+X-Gm-Gg: AfdE7clXAXcWDmoc6Dtcj0xytNxnGnPrxp2hRdYr4bhEFxOmFZI8tC43EbSBnPVDFu1
+	QxOs8exU5hYPzT0tACypAfBxA48SfN878l8A+UGxfHY6sHhO+pgLRum1G3CaV82AL6bD5YsCNql
+	RpCjzCOWAHltqIUSKcM7x30AP9CPR7MlHa/naSMS8LqMx7iaESs6WrEILnzw2V3xDW+iDiLIgM1
+	0QPBNi5ws9oHC94DfNLopfUr4aO9V13q1BOh03gv7owc0oS1i0DP6E9ajxLtZ2p8+cBvXKeDtXO
+	/qAIkye6Q4NvLqmQHukIr+atKi2ayYG+Ae6nT3trDbT0zDjyqJV6LjiqPQ0GtSjisJ2jX28yYvu
+	lcep2DXiokA+IS60nkokJPABcn/oBk5mjKlu2BBaNKPHvo8t9QKZydVulL9OJpkCQ4ylWW/Fc/Z
+	D51cyfYqvGnwjexbWcUNJYBDt2kgvgM14OJt/MCVk=
+X-Received: by 2002:a05:6a21:1bc3:b0:3bd:4698:e7c4 with SMTP id adf61e73a8af0-3c0bcb7f146mr13586972637.42.1783702718181;
+        Fri, 10 Jul 2026 09:58:38 -0700 (PDT)
+Received: from DESKTOP-TIT0J8O.localdomain ([49.47.198.15])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-311747f72a6sm48876196eec.1.2026.07.10.09.58.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jul 2026 09:58:37 -0700 (PDT)
+Date: Fri, 10 Jul 2026 20:58:28 +0400
+From: Ahmed Naseef <naseefkm@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Ahmed Naseef <naseefkm@gmail.com>, netdev@vger.kernel.org,
+	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	"Chester A. Unal" <chester.a.unal@arinc9.com>,
 	"David S. Miller" <davem@davemloft.net>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Daniel Golle <daniel@makrotopia.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Thierry Reding <thierry.reding@kernel.org>,
-	Jonathan Hunter <jonathanh@nvidia.com>,
-	Bhadram Varka <vbhadram@nvidia.com>, linux-tegra@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: stmmac: enable the MAC on link up at 10G on
- 10GBASE-R
-Message-ID: <fa9ea443-a8b5-433f-a4b4-e5c73afc4b25@lunn.ch>
-References: <20260710120908.3731591-1-vadikas@gmail.com>
- <f23adbcc-6f9f-4828-8de9-b85c4450b4b7@bootlin.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Vladimir Oltean <olteanv@gmail.com>, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next 2/2] net: dsa: mt7530: add EN7528 support
+Message-ID: <alEktKWsrriHdR40@DESKTOP-TIT0J8O.localdomain>
+References: <cover.1783680864.git.naseefkm@gmail.com>
+ <1865eaedef97e593ba608764c7390209cae85b30.1783680864.git.naseefkm@gmail.com>
+ <f968d3fe-83dc-4b82-972b-0d4d477a1a52@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <f23adbcc-6f9f-4828-8de9-b85c4450b4b7@bootlin.com>
+In-Reply-To: <f968d3fe-83dc-4b82-972b-0d4d477a1a52@lunn.ch>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-306633-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306632-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:maxime.chevallier@bootlin.com,m:vadikas@gmail.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:thierry.reding@kernel.org,m:jonathanh@nvidia.com,m:vbhadram@nvidia.com,m:linux-tegra@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:naseefkm@gmail.com,m:netdev@vger.kernel.org,m:arinc.unal@arinc9.com,m:chester.a.unal@arinc9.com,m:davem@davemloft.net,m:angelogioacchino.delregno@collabora.com,m:conor+dt@kernel.org,m:dqfext@gmail.com,m:daniel@makrotopia.org,m:edumazet@google.com,m:kuba@kernel.org,m:krzk+dt@kernel.org,m:Landen.Chao@mediatek.com,m:matthias.bgg@gmail.com,m:pabeni@redhat.com,m:robh@kernel.org,m:linux@armlinux.org.uk,m:sean.wang@mediatek.com,m:olteanv@gmail.com,m:devicetree@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:linux-mediatek@lists.infradead.org,m:conor@kernel.org,m:krzk@kernel.org,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[naseefkm@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,arinc9.com,davemloft.net,collabora.com,kernel.org,makrotopia.org,google.com,mediatek.com,redhat.com,armlinux.org.uk,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,nvidia.com];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[naseefkm@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lunn.ch:from_mime,lunn.ch:dkim,lunn.ch:mid]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,DESKTOP-TIT0J8O.localdomain:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 84B0B73CE1F
+X-Rspamd-Queue-Id: CA5E173CDE6
 
-> I suggest that instead of this fix (that is ommiting the 5G case btw), we rewrite
-> the whole ctrl assignment as :
+On Fri, Jul 10, 2026 at 03:32:32PM +0200, Andrew Lunn wrote:
+> > +	/* The EN7528 LAN GPHYs advertise EEE by default, but negotiating EEE
+> > +	 * with common link partners (e.g. Realtek GbE NICs) results in an
+> > +	 * unstable link with dropped frames. Disable EEE advertisement on
+> > +	 * them.
+> > +	 */
+> > +	if (priv->id == ID_EN7528)
+> > +		for (i = EN7528_GPHY_BASE;
+> > +		     i < EN7528_GPHY_BASE + EN7528_NUM_GPHYS; i++)
+> > +			mt7531_ind_c45_phy_write(priv, i, MDIO_MMD_AN,
+> > +						 MDIO_AN_EEE_ADV, 0);
+> > +
 > 
-> 	switch (speed) {
-> 	case SPEED_100000:
-> 		ctrl |= priv->hw->link.xlgmii.speed100000;
-> 		break;
-> 	case SPEED_50000:
-> 		ctrl |= priv->hw->link.xlgmii.speed50000;
-> 		break;
-> 	case SPEED_40000:
-> 		ctrl |= priv->hw->link.xlgmii.speed40000;
-> 		break;
-> 	case SPEED_25000:
-> 		ctrl |= priv->hw->link.xlgmii.speed25000;
-> 		break;
-> 	case SPEED_10000:
-> 		ctrl |= priv->hw->link.xgmii.speed10000;
-> 		break;
-> 	case SPEED_5000:
-> 		ctrl |= priv->hw->link.xgmii.speed5000;
-> 		break;
-> 	case SPEED_2500:
-> 		if (interface == PHY_INTERFACE_MODE_USXGMII)
-> 			ctrl |= priv->hw->link.xgmii.speed2500;
-> 		else
-> 			ctrl |= priv->hw->link.speed2500;
-> 		break;
-> 	case SPEED_1000:
-> 		ctrl |= priv->hw->link.speed1000;
-> 	case SPEED_100:
-> 		ctrl |= priv->hw->link.speed100;
-> 		break;
-> 	case SPEED_10:
-> 		ctrl |= priv->hw->link.speed10;
-> 		break;
-> 	default:
-> 		return;
-> 	}
+> The problem with this is, you can still use ethtool to enable EEE.
+> 
+> Please look at phylink_bringup_phy(), where it calls
+> phy_disable_eee().
 
-The bug description makes it sound like it was not obvious to
-debug. So maybe put an error message in the default: to aid the next
-developer who hits it with SPEED_14000, or whatever comes next.
+Thanks, you are right , the register write is the wrong approach.
 
-	  Andrew
+While looking at phylink_bringup_phy(), I noticed that the mt7530
+driver sets config->lpi_capabilities but never config->lpi_interfaces.
+Since
+
+        mac_supports_eee = mac_supports_eee_ops && lpi_capabilities &&
+                           !phy_interface_empty(lpi_interfaces);
+
+that leaves mac_supports_eee false on all mt753x ports, so phylink
+already takes the phy_disable_eee() path for every port and
+phylink_ethtool_set_eee() returns -EOPNOTSUPP. On the EN7528 I
+confirmed "ethtool --set-eee lan1 eee on" reports "Not supported", so
+EEE cannot currently be enabled from userspace on this driver at all.
+That looks like it unintentionally undid the "EEE can now be enabled
+using ethtool" behaviour from commit 06dfcd4098cf ("net: dsa: mt7530:
+fix enabling EEE on MT7531 switch on all boards"), starting with commit
+9cf21773f535 ("net: dsa: mt7530: convert to phylink managed EEE"). That
+is pre-existing and outside the scope of this series, just flagging it.
+
+For the EN7528 the GPHYs report EEE capability, but the link stops
+passing traffic once LPI is entered, so EEE must stay off regardless.
+The register loop cannot express that to phylib, as you noted.
+
+My plan for v2 is to not advertise lpi_capabilities for the EN7528, so
+mac_supports_eee stays false by design and phylink disables EEE on
+these PHYs via phy_disable_eee() and refuses to enable it from
+userspace. Does that sound like the right approach to you, or would
+you prefer it handled differently?
+
+Thanks,
+Ahmed
+
+
+> 
+>     Andrew
+> 
+> ---
+> pw-bot: cr
 
