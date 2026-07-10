@@ -1,282 +1,186 @@
-Return-Path: <netdev+bounces-306718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306719-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id EppZKGFzUWpjFAMAu9opvQ
-	(envelope-from <netdev+bounces-306718-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 00:34:09 +0200
+	id 91hmORh4UWpPFQMAu9opvQ
+	(envelope-from <netdev+bounces-306719-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 00:54:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F6B973F919
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 00:34:09 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6761673FA48
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 00:54:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=FzuzfCo6;
-	dmarc=pass (policy=none) header.from=asu.edu;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306718-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306718-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=5PEemnWD;
+	dmarc=pass (policy=none) header.from=lunn.ch;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306719-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306719-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3DF2E3036E66
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 22:33:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D9D43300D763
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 22:54:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0BA2407568;
-	Fri, 10 Jul 2026 22:33:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1691240861C;
+	Fri, 10 Jul 2026 22:54:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A9923BB110
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 22:33:43 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783722826; cv=pass; b=Jojwa39BP6ILgJMtwYugdyUieu5J0L+kRVQ+aKZr5htpMStWYt6oB4lC3ApVFYNiyPtdany7bKgc2gqlcLZ02eh7KZTytfEH9scoDA3EpoJ34L056L2IlSbcHVJPBewXaAmUPTL3jFJcQ6861/f7g5j1hSfzBtXjLU1AcyDEFWM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783722826; c=relaxed/simple;
-	bh=P2CfZ/eVooz8ByYMc/X83GhAycu5z9o7K3QZsj854og=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Wzxipk7JmUjbiuxt8lVKesJ4IKRXkEcI3KoNe/8bx/qQjXEz47U5WxdOZNj3Zxl/FnkouSbRzA9A5c5Mz7T61QZquE0xBCxhtrGdsCe7WVoyp/TN6OhcDm8n0sgCg9Ycip5FHFCuT7tNhj8CAFDwV4LIU7LO9C38jGTaoLf1Mhc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=FzuzfCo6; arc=pass smtp.client-ip=209.85.210.174
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-8487b7b4066so1056091b3a.1
-        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 15:33:43 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783722823; cv=none;
-        d=google.com; s=arc-20260327;
-        b=LjET3ZbDoDr0hLdMTZ6PnzdBEeAvO/beJ+xn8zcEzfoEWGPTMZYsclR3qH1X+MBO09
-         w2bgq9aFsiDUd7OqWOQlxKmuZKM4LQcUoI7KNmQKQ7k9S4hp3Zh9z+GcC/XDO5IvXUrM
-         YClFN1jqvJN1ExzTZfJ1ExdLoQXyBuYxlsPU+1Kd/DecW0fNkiFWodhjRxK/pMhdfzaY
-         PH0xdJTgw274say/0zIHgVi1ijrtMXKCNb4980s914zvXCkdfmSnJ5FORFDRahByg0+l
-         5gIRfT9teZ5vU5GYk2ip+JRNjdaZKyopoO9/kNq/J4vOwOGnxX0m8/Yn64l5M0epJWXm
-         hhrQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=xyKVX/uPhGkx9zXyKF8UrRvoqCkGwrtRinUkfLWvnaE=;
-        fh=o3sXkhCzXvUOiP6QQPYcNpcioiJv2ISz/ivZQyfq4gg=;
-        b=p3ETSnlAmZzR8K82bC7SMEDJPmxcexUGKz5zoOClUVvbXAdnCbtZJtHuQN5nvEV38b
-         hOPSPJyzMcJEOqSLSrKErtXyB1ZNijfUGwXjAEXcuAzfcexj5rSDhl8uL9Wuq5oHGG01
-         WZUhM0nH7134ESZHRM7xJOX7YaHj12yaaRcdrqtLTb4XBeF09fpoz5w3kKxx3rMvuz73
-         YwQ/faZxYxD2oc7XLJqQdXutuqDZPgF+wHmITebH8EKWSU2YdPF4EfjFpSgkSC78z8a1
-         1UkumpdXe8o7pylRpJr5pLcq6sx8umUJJf/0nXfGxcm1IPY9b/ogaSGt5YnWWEa+gV7z
-         93Zw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1783722823; x=1784327623; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=xyKVX/uPhGkx9zXyKF8UrRvoqCkGwrtRinUkfLWvnaE=;
-        b=FzuzfCo67EgWdapvV0PsTD+8qfTUblpwmqTE7rUgQr6rjHsdVeB3xfzqB171fJHtbZ
-         ILHlxjbztGtF2GkH6E2vqrL4m1iIZ9or3XXirhXjewT2rabVrZlIN/oEbpDxV01W2C0f
-         qOIlu5dWzFJiAIqifY75QufZX8E0O2seuXhpcPTEtxBIlMMeFHzEzdQC3aSdChUhZ0lg
-         DM0QyMXQA8SpsWqD4drTkiCWP4PCj4sIQyoVtMGgDrBqNct5W09eaLDDxMszHcOgqxmp
-         8UusduZ0PPLBqdApQg6Qx9tutu3E9jbN8raJGjiBQnRu7sIQb2cjRkkf8/mgkW4pl62k
-         NU+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783722823; x=1784327623;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=xyKVX/uPhGkx9zXyKF8UrRvoqCkGwrtRinUkfLWvnaE=;
-        b=TTCMa+1+wZPZP5R7yPPbNLw6OIQqUEgkiBd0/Z8JR0a+JM7nHotawnNYoEM68QssjS
-         8WS7meHWF520JKJiivYb11d0QeezcHNj+VNtXclFmMzARcptC7UhiKnKy3pyUATUWwCB
-         iS2vd3upJDL/MFr/OnUkngvyTIoBTkX6aQtCouCRAqvC6KbgEVecxVmBQGjQYVIA8zhd
-         BXxPGj2DNc4lRD62EjGA0+Sae1QuGKAp58PySg5ayRt/yX4eq1Q6kWSOHo8FQwO7Q/+h
-         pgWMUblr3q+HB5CDIov0TYhY+iiwlL8k16yAb8aeKm5wmLsI8mWV7TfCbz7LTjAjKpYh
-         5caw==
-X-Forwarded-Encrypted: i=1; AHgh+RqAuUlG+MJSwJTkz9ImXXpS+JbyVhtfKBPovfIYaNaTBo/GnKh5eqdDwppNOcoudHE/+uJYsxI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzn0isNaG2X6WszDIZWAuXA5cNw0cmS9H/Rf/Wqk3wcrpYYSMYD
-	QgD5nc6bruRXp7K+BPkelCXDrTXOOzuMbmn7I/P9Wrnq2bGr7yp0n/2lUjtdhOMh1kQR7syBCir
-	+468Nm0xywbQVkX7nY4gcmsyliBz0+GXpfkUeJezJ
-X-Gm-Gg: AfdE7cm1kVL1DGFTVMFItMba3onxch4LKqXIsXZd9Zi2V0Wi3hlt7cOOiG1kSncjJHV
-	XTLF57NnJeWN9tmglaKLr3tDGDSDrfnD4HUL3FtUAPj5jdaXP6+GOIksZgZTqH+wp77elFGf/oT
-	33HjDFbv2dDdWozCryQ1kxPao1khpMv9E+t1teewoh+Rpjg2O7TdjR8MxenAvoSTauPFV/RRrw+
-	XwwSDDTHpGLcR0n89G1m2UQMwrZdXyZQdmx1RfKCqfHIKsTwDjj+vnrlV91ES0WER+Ek3S3GlQJ
-	86CIX1Ehc4NmmpGMfIuJ1Zz/8v9GGNNPDJfhZ8Q=
-X-Received: by 2002:a05:6a00:1486:b0:848:77b3:579a with SMTP id
- d2e1a72fcca58-848896098c0mr762210b3a.17.1783722822748; Fri, 10 Jul 2026
- 15:33:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6623A40861E
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 22:54:11 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783724053; cv=none; b=NB8pH1H05ddbWFDRzGMdiDMQUBXjZkAlcea6VfhicGhRGCo9n7YNhpXINIr29hYH4G88sXn/gLA+zaz5AVfPgxjSydUQqIS5coFJ0x4Hf9xhvV+EJNQA8C6isz9QqMage/0MSlOwx39BARbt15oOwQj8+L/pvfp+iORUZsrL0FY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783724053; c=relaxed/simple;
+	bh=yq4rIY8Sn9xhHVMjv1cPVJ7g1E7JWDAXAtQIHDSkfOU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S7JU+MBkaPeNEhthv9d5urUN3OORVRnqggYUQzo0EjPMMDrA60OsoTvIzEcjFt5KLRScW45R/m9bJqqiMsB3a1YPkH2dhySg/EsfzPPkXeJjmdp8fn//ZyEN0eQwje0imygzhAMJvvDFp+cVN7SQNMbEsF1ncvZJ9GhiLSY7qNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5PEemnWD; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Qb+hEUDBnocfW1i1l/WFDAmbxYJvmsrhRjk5pOLX5hM=; b=5PEemnWDMB+x+S2WPKDUafXd4a
+	56e1ulnyshmquLyKyjXjb5SKFg45//2LllHPWj5ubqTY+tmrfGc6BZhOQ/q4cCRsgOu9++/Hnq3Me
+	/CEO+2DhT+SDEjjBGlEcLL0jfhatqaki/7REb645mS9ebSpaxAl9edxIDxu7R4SJIaI8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wiK6a-00BiF7-GQ; Sat, 11 Jul 2026 00:54:00 +0200
+Date: Sat, 11 Jul 2026 00:54:00 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "D H, Siddaraju" <siddaraju.dh@intel.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Michal Kubecek <mkubecek@suse.cz>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"Chintalapalle, Balaji" <balaji.chintalapalle@intel.com>,
+	"Das, Shubham" <shubham.das@intel.com>,
+	"Srinivasan, Vijay" <vijay.srinivasan@intel.com>,
+	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>,
+	"Keller, Jacob E" <jacob.e.keller@intel.com>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"singhai.anjali55@gmail.com" <singhai.anjali55@gmail.com>,
+	"Brandeburg, Jesse" <jbrandeburg@cloudflare.com>
+Subject: Re: Ethtool is missing C2C link modes
+Message-ID: <e3dd8e06-97d1-4943-b54c-fdd0d0e6ecaa@lunn.ch>
+References: <SN7PR11MB6900E94E718175AACB2309109AFD2@SN7PR11MB6900.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260709074459.326345-1-xmei5@asu.edu> <e7c19015d10439cea2ff78e57a93a610c12e52b0.camel@kernel.org>
-In-Reply-To: <e7c19015d10439cea2ff78e57a93a610c12e52b0.camel@kernel.org>
-From: Xiang Mei <xmei5@asu.edu>
-Date: Fri, 10 Jul 2026 15:33:31 -0700
-X-Gm-Features: AVVi8CdSFO9ZEsWQZZfn_huEKkXHjvc00YHbFCenmr4jUMQsH-cbKpDjfXyjcI0
-Message-ID: <CAPpSM+QyU8YK1EywyAAjeW7ynYYVHVrDp9JHhUdFh7=-B3hcUw@mail.gmail.com>
-Subject: Re: [PATCH net] rds: tcp: hold the net_device across ipv6_chk_addr()
- in rds_tcp_laddr_check()
-To: Allison Henderson <achender@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, 
-	linux-kernel@vger.kernel.org, 
-	Santosh Shilimkar <santosh.shilimkar@oracle.com>, Ka-Cheong Poon <ka-cheong.poon@oracle.com>, 
-	bestswngs@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SN7PR11MB6900E94E718175AACB2309109AFD2@SN7PR11MB6900.namprd11.prod.outlook.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-306718-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306719-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_RECIPIENTS(0.00)[m:achender@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:rds-devel@oss.oracle.com,m:linux-kernel@vger.kernel.org,m:santosh.shilimkar@oracle.com,m:ka-cheong.poon@oracle.com,m:bestswngs@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:siddaraju.dh@intel.com,m:maxime.chevallier@bootlin.com,m:mkubecek@suse.cz,m:netdev@vger.kernel.org,m:balaji.chintalapalle@intel.com,m:shubham.das@intel.com,m:vijay.srinivasan@intel.com,m:sridhar.samudrala@intel.com,m:jacob.e.keller@intel.com,m:anthony.l.nguyen@intel.com,m:singhai.anjali55@gmail.com,m:jbrandeburg@cloudflare.com,m:singhaianjali55@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[bootlin.com,suse.cz,vger.kernel.org,intel.com,gmail.com,cloudflare.com];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,oss.oracle.com,oracle.com,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[asu.edu:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mail.gmail.com:mid,asu.edu:from_mime,asu.edu:email,asu.edu:dkim]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lunn.ch:from_mime,lunn.ch:dkim,lunn.ch:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1F6B973F919
+X-Rspamd-Queue-Id: 6761673FA48
 
-On Thu, Jul 9, 2026 at 9:42=E2=80=AFPM Allison Henderson <achender@kernel.o=
-rg> wrote:
->
-> On Thu, 2026-07-09 at 00:44 -0700, Xiang Mei wrote:
-> > rds_tcp_laddr_check() looks up a scoped IPv6 interface with
-> > dev_get_by_index_rcu(), drops the RCU read-side lock, and only then
-> > passes the bare struct net_device * into ipv6_chk_addr().
-> >
-> > dev_get_by_index_rcu() only keeps the device alive within the same RCU
-> > read-side section. After rcu_read_unlock(), a concurrent RTM_DELLINK ca=
-n
-> > free the net_device; ipv6_chk_addr() then dereferences the stale pointe=
-r
-> > in __ipv6_chk_addr_and_flags() (e.g. l3mdev_master_dev_rcu(dev)), readi=
-ng
-> > freed memory.
-> >
-> > Take a reference with dev_hold() before dropping the RCU lock and relea=
-se
-> > it with dev_put() after ipv6_chk_addr(), so the device cannot be freed
-> > while in use. dev_put(NULL) is a no-op, so the scope_id =3D=3D 0 path i=
-s
-> > unaffected.
-> >
-> >   BUG: KASAN: slab-use-after-free in __ipv6_chk_addr_and_flags (... net=
-/ipv6/addrconf.c:1998)
-> >   Read of size 8 at addr ffff8880106ec000 by task exploit/153
-> >   Call Trace:
-> >    ...
-> >    kasan_report (mm/kasan/report.c:595)
-> >    __ipv6_chk_addr_and_flags (... net/ipv6/addrconf.c:1998)
-> >    ipv6_chk_addr (net/ipv6/addrconf.c:2031 net/ipv6/addrconf.c:1972)
-> >    rds_tcp_laddr_check (net/rds/tcp.c:370)
-> >    rds_bind (net/rds/bind.c:248)
-> >    __sys_bind (net/socket.c:1920)
-> >    __x64_sys_bind (net/socket.c:1956)
-> >    do_syscall_64 (arch/x86/entry/syscall_64.c:63)
-> >    entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
-> >
-> > Fixes: eee2fa6ab322 ("rds: Changing IP address internal representation =
-to struct in6_addr")
-> > Reported-by: Weiming Shi <bestswngs@gmail.com>
-> > Assisted-by: Claude:claude-opus-4-8
-> > Signed-off-by: Xiang Mei <xmei5@asu.edu>
-> > ---
-> >  net/rds/tcp.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/net/rds/tcp.c b/net/rds/tcp.c
-> > index a1de114d5e2e..204dcdc33c27 100644
-> > --- a/net/rds/tcp.c
-> > +++ b/net/rds/tcp.c
-> > @@ -363,12 +363,16 @@ int rds_tcp_laddr_check(struct net *net, const st=
-ruct in6_addr *addr,
-> >                       rcu_read_unlock();
-> >                       return -EADDRNOTAVAIL;
-> >               }
-> > +             dev_hold(dev);
-> >               rcu_read_unlock();
-> >       }
-> >  #if IS_ENABLED(CONFIG_IPV6)
-> >       ret =3D ipv6_chk_addr(net, addr, dev, 0);
-> > +     dev_put(dev);
-> Hi Xiang,
->
-> Thanks for working on this.  It looks like this patch generated
-> some CI warnings for dev_hold/put that should be addressed:
-> https://patchwork.kernel.org/project/netdevbpf/patch/20260709074459.32634=
-5-1-xmei5@asu.edu/
->
-> Per the comments from include/linux/netdevice.h:4546, netdev_hold/put
-> replaced dev_hold/put, which takes a netdevice_tracker pointer.  But I
-> think the easier way to do this may be just to widen the rcu locks alread=
-y
-> in this function.  Just move rcu_read_lock(); above the scope_id check,
-> and make sure it's released before any returns.  That should get away fro=
-m
-> having to use the hold/puts all together.
->
->         rcu_read_lock();
->         if (scope_id !=3D 0) {
->                 dev =3D dev_get_by_index_rcu(net, scope_id);
->                 if (!dev) {
->                         rcu_read_unlock();
->                         return -EADDRNOTAVAIL;
->                 }
->         }
-> #if IS_ENABLED(CONFIG_IPV6)
->         ret =3D ipv6_chk_addr(net, addr, dev, 0);
->         if (ret) {
->                 rcu_read_unlock();
->                 return 0;
->         }
-> #endif
->         rcu_read_unlock();
->         return -EADDRNOTAVAIL;
->
-> Also, this patch conflicts with another submitted patch:
-> [net,v2] rds: Fix inet6_addr_lst NULL dereference when IPv6 is disabled:
-> https://patchwork.kernel.org/project/netdevbpf/patch/20260709162723.36752=
-3-1-Ilia.Gavrilov@infotecs.ru/
->
-> So, please rebase on Ilia's v2, and mention the dependency in your change
-> log so the stable folks pick them up in the right order.  Both fixes carr=
-y
-> the same Fixes: tag so they should travel together.
->
-> Thank you!
-> Allison
+On Fri, Jul 10, 2026 at 09:45:43PM +0000, D H, Siddaraju wrote:
+> Hello Linux Ethernet team, Maxime, Andrew & Michal,
+> 
+> The IEEE AUI chip-to-chip (C2C) is the accepted standard for connecting
+> chips that handle subfunctions within the OSI physical layer. Just to
+> pick, the C2C is widely used when connecting Ethernet SoCs with retimers
+> and PCS SerDes terminated external-phys to offload PHY sublayer functions.
 
-Thanks so much! Your version is better!
-I have sent v2, which rebase on Ilia's v2:
-https://lore.kernel.org/netdev/20260710223029.1307043-1-xmei5@asu.edu/T/#u
+It cannot be that widely used if Linux does not support it yet :-)
 
-Xiang
+> With the existing ethtool link modes, we were not able to fit these C2C
+> interfaces on any others (we fitted **SGMII interfaces to baseT link modes)
+> and we see this as a gap. If you acknowledge this, we plan to send an
+> RFC patch to define below listed C2C link modes to ethtool.
+> 
+> 	25G_AUI_C2C		IEEE 802.3 Annex 109A
 
+So 109 is about 25GBASE-R. We have the following link modes for that:
 
-Xiang
->
-> >       if (ret)
-> >               return 0;
-> > +#else
-> > +     dev_put(dev);
-> >  #endif
-> >       return -EADDRNOTAVAIL;
-> >  }
->
+       ETHTOOL_LINK_MODE_25000baseCR_Full_BIT  = 31,
+       ETHTOOL_LINK_MODE_25000baseKR_Full_BIT  = 32,
+       ETHTOOL_LINK_MODE_25000baseSR_Full_BIT  = 33,
+
+Why break the pattern? Why not add:
+
+       ETHTOOL_LINK_MODE_25000baseC2C_Full_BIT
+
+Is C2C that different to CR, KR, DR?
+
+> 	200GAUI-4 C2C		IEEE 802.3 Annex 120D
+> 	100GAUI-1 C2C		IEEE 802.3ck Annex 120F
+> 	200GAUI-2 C2C		IEEE 802.3ck Clause 162
+> 	400GAUI-4 C2C		IEEE 802.3ck Clause 163
+
+If you look at the existing pattern for link modes which need to
+specify the number of lanes:
+
+        ETHTOOL_LINK_MODE_800000baseCR8_Full_BIT
+        ETHTOOL_LINK_MODE_400000baseDR4_Full_BIT
+	ETHTOOL_LINK_MODE_200000baseKR2_Full_BIT
+
+why put the number in the middle?
+
+Since you are breaking the existing pattern, it would be good to
+include a justification why you picked your pattern.
+
+Also, an architecture question...
+
+It sounds like you use this between the MAC and the PCS. The PCS can
+then be connected to a PHY, and the PHY then has a line side. (I'm
+being a bit loose with the terms here, i should probably be saying
+PMA, PMD etc.)
+
+Should ethtool be saying:
+
+Settings for eth0:
+	Supported ports: [ TP	 MII ]
+	Supported link modes:   25000baseC2C
+
+or should it be reporting:
+
+Settings for eth0:
+	Supported ports: [ TP	 MII ]
+	Supported link modes:   25000baseSR
+
+I _think_ ethtool reports the media, not some intermediary format.
+
+Is ETHTOOL_LINK_MODE_25000baseC2C_Full_BIT actually needed? I suppose
+one use case would be when you directly connect two MACs together, PMA
+to PMA. So a 25G NIC directly connected to a switch port, with no
+'media' in the middle. Then ethtool probably should report
+25000baseC2C.
+
+	Andrew
 
