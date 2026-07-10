@@ -1,174 +1,184 @@
-Return-Path: <netdev+bounces-306652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306653-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id PhmTKjA2UWpyAwMAu9opvQ
-	(envelope-from <netdev+bounces-306652-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 20:13:04 +0200
+	id o2UGLNg2UWqFAwMAu9opvQ
+	(envelope-from <netdev+bounces-306653-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 20:15:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A12A73D452
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 20:13:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14DAF73D483
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 20:15:52 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=fOc1Bbfz;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Dk8ZRoeW;
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306652-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306652-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306653-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306653-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BC8E730117B3
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 18:11:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5A57A30182A7
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 18:12:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 668F0377566;
-	Fri, 10 Jul 2026 18:11:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27E0D3793CA;
+	Fri, 10 Jul 2026 18:12:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15FA1346798
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 18:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0DB379C43
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 18:12:38 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783707106; cv=none; b=Uj6Ty7V6igf7157Rkmbl7lNKIe3cbzqG7wbvrXs5lY5YAiXdPcotVdYx0kq+JtUny4OyGF30PLn24WDambG9dM92Vfj5Jo6qU5hvy/LfbqorqGrr3vpR2b2zsVMI8k0bfdhAoCH8FG4VjVbjMMspbSAX++6jF2oNYtb79MZw/OU=
+	t=1783707160; cv=none; b=plJUXTH6uI/RpnSyR2e6wyUFPANUeJ41g2l/1zWjZYHOXWiNXH/9aKqKaY29wLnxcRVmLBBmeSCnF6na/oGN9FaR8RrCLWwR8J2CjUVtBv9oliWA+W2ljEBAzYV2xH4vTH53C5l5Mj0uaDKW2sFxVMg0U71ppjm0yfnaJsHkzJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783707106; c=relaxed/simple;
-	bh=SRW1hyRy2MLVxxlmoOhn02LtikzideCrttxVVyIVT/w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lAOWfExZguN0tjaBMjUT4bD6sheHnxb9m0QGp2/w0EnQF2n8DAiBnGRU+4pAyk6nKXoGHigQWnDdwlIhrYacR1nZmjfHW3S1URfmpTusZdfi7K2AWLQ7Mb7Xe7MJDmpsPEGzArPEl5+sj5Llq0o2tzHNMBWlCZxqpbgWzPPUO00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fOc1Bbfz; arc=none smtp.client-ip=209.85.208.46
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-6983f20a8bfso1958345a12.1
-        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 11:11:44 -0700 (PDT)
+	s=arc-20240116; t=1783707160; c=relaxed/simple;
+	bh=HmVx9/LS+hVjcUQ6NyKEX8ixmWtWS09UvwEdDjuSIww=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ap3D2vF+uNJr65NZJNkgxVHEnsu+02a7YSz2LRsIPz/MRm/4ApNLWI5KKNoFnLMkAyTRcVYNryylZw/hAyoc8sWUDCfhhWtpL59Y2uV2NumV5XUsWn7bR3a6XcCisMsgBsSohr0XcrO8N/symwckhLv6OsanzRXa3AIVepVcHFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dk8ZRoeW; arc=none smtp.client-ip=209.85.222.179
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-92e5cb052edso92678385a.2
+        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 11:12:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783707103; x=1784311903; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=T+3p5jzJlBIxDNBN4ODBt7dUlm5yf6OTA6BJPqQx+TM=;
-        b=fOc1BbfzcXFZ3xcyomRun0nZ7wDLl4nmOiwkQ6YZfyRfqEeDP8Ayx4oQouydXwOFan
-         vPc70iPfrRU+3ve85y3mFUd0IlCAr6yHJa0R5InyfZaqkycT+GX1cGg+PzGcHrU0A9fv
-         VJREi/MLAVVd1d3ABaqhVIGmSr7Bk2UiSPZpvk2BhakPmlJJx8bxjyYq97rADibiYt9p
-         oJlyWqP7PXVoABlXy6OcO4oy9mJ74Je6oCyPMaguOdVLTN+ldDuV6TA2NYR7+AnG7URh
-         DgEIWfwGu1aIOk/0eHR8FrmIgpilfG8Y0RGcnO9kl0QBGnvmwVq0Gv7N99jRTdJpvDzq
-         wsVw==
+        d=gmail.com; s=20251104; t=1783707157; x=1784311957; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=/bI02IT26f9J98q2x/cBgGT2CgXZdiDxxE3v83TDsdk=;
+        b=Dk8ZRoeW6v3ERM2XnGhror4RHK6ia1PAHcdhn2ROc47GsS7rbrh459PKnbvgqkEpBL
+         S9xQOAdGpRs0LECNlAR5b6gOzg6vbrbIIY5wHTJ2qWZjsAAIS6CL8AN0T23dgidINV+8
+         fS0rpGzJSsoV6jJAuGHNQpppBtzQ/tW0No9WQls9bHnWIzDZm7mHx1dB10eAJLYgtjXM
+         TTo9bNK+tww7yWYQ4+JHi+ynWzlstT59MuWR5F1nUeAvJ/uxtDkcaU9lCrWShfCkdLn3
+         Gd52xGlXjsHynpMpe3mx3bX0yPIaGx6+Wmh7jIH4vyWTEQkgnRopPSAPZDeA0qbWNqh/
+         Y7dQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783707103; x=1784311903;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1783707157; x=1784311957;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=T+3p5jzJlBIxDNBN4ODBt7dUlm5yf6OTA6BJPqQx+TM=;
-        b=iLEMIZU/h8St6Z722THfQAwZM40VUd+VETOGlfqvZ0r8yT/3y/Ux7klbW5p4W5KU8C
-         u0zLR6RHCPD70tvCU0j6Zhgvc52h8Ba4EVEvXqfE6/Ia1yLIA0J1HGf/lDTYKTO0rRqm
-         AIynsAJ15d0Z02Sja8q7lmAnx4X2z4KFHUpn+MnI5E5JWKJj0ZNyCs0k5hewNLht8fy3
-         +E660IrPWp+5Jei7fU932W29FjJ+mPUL+CUsYvcTWqyZ76E6jJi/8/+NiKhzckwBUpFV
-         yNN6yLn9PRkxP+WhKRZBMWhdOZyBIZWjE3MLGHvzyDnrh0/BeLtVVE6T1oG92N6Wk231
-         AQpg==
-X-Forwarded-Encrypted: i=1; AHgh+RrMBK+WDHHbj2UiXk0ClcF7zzbSWK/2yqmU0cedczdhanarGgxi7H0U47/gctNtpJhSTmUclj4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/Qry2lRwL75pCHn9pjm0HPAZUgTD5yIg5JkJK6iD1A/ztbbFY
-	Ua9MAzxjxr9b8kycIUhBZpLXOn0gHULWDFGx0ewbrg1356UcxgR+dJRE
-X-Gm-Gg: AfdE7cl8VTItmeY1BD1kFEZNA844g+cppRG33K6P6cEwwrSkOLiL0FbDB8L9Q4upbjr
-	xd8a/coktiC9SOSdKsM48293BcWZnF+jdbCnfNtknGtU7rHh3/aVCB9NnANxP5nVxNAm14oV+WB
-	N5NoEhTa27S00GbHFsIqcGydavDSi08xRVhNidixjyind6STL42QNGf52XcNtBColOhs0qqBWHv
-	9/Krd5LbJ6zEuPl8aEJLDhgeoXkb3JHTaJfS/ELc9vBlqw1kswYUhIRx+8zLh+JqsU5iHTMyld6
-	ci9txJ2fim2PWJFkPAI2zHm/XazB/c+VZcyI+Kt2aYyVY3JJd83bhTbws7O74MPWdqNOoWP+LVB
-	oMtb/k64Z2i6xXqRpcH2dvqpwslR+FZVHDZucyaJ/APtoWbBTj36jTOhPCTQFoaJvc5bxD77MfF
-	dIzyF+7I2jaHoCfIzbRPBCH2m9Use3UH7POlqu/Y353jMYL8ZPpDy3uwExlP92yJ3ZUNZm304P5
-	75bnAoQmFOGmQXsQhFbZi8Mw2sPaL/ShAZEqNA3hUysE7osIKvin1yt+Srv95Q=
-X-Received: by 2002:a05:6402:40d0:b0:69a:bce:f1de with SMTP id 4fb4d7f45d1cf-69c5f22d500mr200285a12.26.1783707103268;
-        Fri, 10 Jul 2026 11:11:43 -0700 (PDT)
-Received: from [192.168.0.2] (dslb-002-205-021-241.002.205.pools.vodafone-ip.de. [2.205.21.241])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-69a19ce4b4fsm11209189a12.10.2026.07.10.11.11.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Jul 2026 11:11:41 -0700 (PDT)
-Message-ID: <da33e486-2f01-4077-af30-1dc53a6aa2bc@gmail.com>
-Date: Fri, 10 Jul 2026 20:11:40 +0200
+        bh=/bI02IT26f9J98q2x/cBgGT2CgXZdiDxxE3v83TDsdk=;
+        b=arrWHFExY2swUofPk2ldy7JNHhTIygCTpGBEf9Qqwy5J78fhQVNqZYFsvAaL0Wekla
+         LUXXigRxsa65h9GG2BIwQGzHSutArwBljb1YYZ6G7dkvH0AbAWw/pYvaT2t+Zm2NiBph
+         FlN0AnJGC1u7beg/RzweypUr5qBX1Plk+WV0G1BQql9ESSAN7e+mvYsJUpLQSgbjHH/c
+         CI/NvYPqV7cOB1Ps9V+dduTV2UFTVOHg4M7rmxvDZ2ForUESJHp3jjcaFdTELGTeAG7l
+         F2IiUzgRamuiPBLYRk7XV0AZGlqwNcLU0iy8e2VK6aow/P80Yw9Eb99H+ausRdQgdX2J
+         6mwQ==
+X-Gm-Message-State: AOJu0YxbIb5MDBHrtNa1Yohb9Q4udFtZd7SgwZi6hoA6a38m4S1n2UbA
+	ugWdqXG9Pd0lZHM+o4b9zj9Mj1V92qPYrH54biHWO5YbAyJdgPDv7UunxGut6d/4
+X-Gm-Gg: AfdE7ckHS8NkNNS+ydw89k7Pt0RpK+HePmV7B2RglF3v1gu6iYWKZJ459M+48YOW+r8
+	LGGE9hK3plqOCM0dJacv9j19lbzJtMNr4wL1/8HaErrZ0wa8ytf3IQGEgHMmmIJqOnaKKuepM/t
+	hEKSr0VRmBD4ZQBRii9B4cojpBS8BZgle28S9nQctdihUr4ayN+05pel5UvYcbnnTJuBgD2tB/4
+	WbwjCkWNe2skdFj6Dmd8tHAx7BQlWT7G4axUjjlTvnyTfEC80RBjz1rKGcLQgL+D+Am2QF8u7og
+	FHDOvUs8SsiXy5TJyQ2HF3+yBqFmX3N2xwt4BJ5FJ4JIt/wr+z3Rcr4eIAvN1vq5a62041QMp2j
+	aWAh2lGUwcGW/C6varisUGox8er6shvsoNNCMhvWtp0LUPbg6QFSLmSWp94MQ+Jy8aGUL4jP3qo
+	u55gZUrcwsD/5b5QoR+FIbGHas6Otgv1qiKoMSwt3anmqsKbbyMM2g8urA8GI/a+uQVXoq52Gjb
+	9jzxTkzr2rW5GWLLmEiAeaP4OEEL4QHXdhJRJ8TyRpRF7OES2XDoXY=
+X-Received: by 2002:a05:620a:460c:b0:92e:e2a4:ae86 with SMTP id af79cd13be357-92ef2c6b27amr32773185a.80.1783707157195;
+        Fri, 10 Jul 2026 11:12:37 -0700 (PDT)
+Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-92ee5b4b38dsm270405185a.10.2026.07.10.11.12.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jul 2026 11:12:36 -0700 (PDT)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	linux-sctp@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Yuan Tan <yuantan098@gmail.com>,
+	Xin Liu <dstsmallbird@foxmail.com>,
+	Zihan Xi <xizh2024@lzu.edu.cn>,
+	Ren Wei <enjou1224z@gmail.com>
+Subject: [PATCH net] sctp: fix auth_hmacs array size in struct sctp_cookie
+Date: Fri, 10 Jul 2026 14:12:35 -0400
+Message-ID: <634a0de0d5de29532915e6d47c92a0cbc206e03f.1783707155.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 2/2] net: dsa: mv88e6xxx: flush the ATU when the
- hash algorithm changes
-To: Luke Howard <lukeh@padl.com>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Vivien Didelot <vivien.didelot@gmail.com>,
- Gregory CLEMENT <gregory.clement@bootlin.com>, Andrew Lunn <andrew@lunn.ch>,
- Richard Cochran <richardcochran@gmail.com>
-Cc: Cedric Jehasse <cedric.jehasse@gmail.com>,
- Kieran Tyrrell <kieran@sienda.com>, Max Holtmann <mh@rme-audio.de>,
- Max Hunter <max@huntershome.org>,
- Christoph Mellauner <christoph.mellauner@joyned.at>,
- Simon Gapp <simon.gapp@gapp-audio.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260710-mv88e6x41-fixes-v2-0-e23654c65aa0@padl.com>
- <20260710-mv88e6x41-fixes-v2-2-e23654c65aa0@padl.com>
-Content-Language: en-US
-From: Jonas Gorski <jonas.gorski@gmail.com>
-In-Reply-To: <20260710-mv88e6x41-fixes-v2-2-e23654c65aa0@padl.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306652-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:lukeh@padl.com,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:vivien.didelot@gmail.com,m:gregory.clement@bootlin.com,m:andrew@lunn.ch,m:richardcochran@gmail.com,m:cedric.jehasse@gmail.com,m:kieran@sienda.com,m:mh@rme-audio.de,m:max@huntershome.org,m:christoph.mellauner@joyned.at,m:simon.gapp@gapp-audio.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:viviendidelot@gmail.com,m:cedricjehasse@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[jonasgorski@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_TO(0.00)[padl.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,lunn.ch];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306653-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:marcelo.leitner@gmail.com,m:yuantan098@gmail.com,m:dstsmallbird@foxmail.com,m:xizh2024@lzu.edu.cn,m:enjou1224z@gmail.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,sienda.com,rme-audio.de,huntershome.org,joyned.at,gapp-audio.com,vger.kernel.org];
+	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com,foxmail.com,lzu.edu.cn];
+	FORWARDED(0.00)[lists@lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jonasgorski@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1A12A73D452
+X-Rspamd-Queue-Id: 14DAF73D483
 
-Hi,
+The auth_hmacs array in struct sctp_cookie is supposed to store a complete
+SCTP_AUTH_HMAC_ALGO parameter, which consists of a struct sctp_paramhdr
+followed by N HMAC identifiers.
 
-On 10/07/2026 01:29, Luke Howard wrote:
-> Changing the ATU hash algorithm invalidates existing entries: those
-> loaded under the previous algorithm end up in different bins and read
-> back corrupted.
-> 
-> Flush the ATU whenever the hash algorithm is changed through devlink
-> and reload the default broadcast entries. Per-VLAN ATU entries and
-> any static addresses are not replayed, so the hash must be selected
-> before the FDB or MDB are configured.
+However, the array size was calculated using an extra 2 bytes instead of
+sizeof(struct sctp_paramhdr), which is 4 bytes. When four HMAC identifiers
+are configured, the HMAC-ALGO parameter stored in the endpoint is larger
+than the auth_hmacs buffer in the cookie.
 
-If changing the algorithm at runtime isn't handled fully and the hw
-AFAIU gets out of sync (i.e. static entries get lost from hw, but
-retained in the linux bridge), maybe it would make sense to reject
-changing it while e.g. a bridge exist?
+As a result, sctp_association_init() copies beyond the end of auth_hmacs
+when initializing the association, corrupting the adjacent auth_chunks
+field. This can lead to an invalid HMAC identifier being accepted and later
+cause an out-of-bounds read in sctp_auth_get_hmac().
 
-Feels like an easy foot-gun for hard to debug network issues.
+Fix the array size calculation by including the full SCTP parameter header
+size.
 
-Best regards,
-Jonas
+Fixes: 1f485649f529 ("[SCTP]: Implement SCTP-AUTH internals")
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Xin Liu <dstsmallbird@foxmail.com>
+Reported-by: Zihan Xi <xizh2024@lzu.edu.cn>
+Reported-by: Ren Wei <enjou1224z@gmail.com>
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+ include/net/sctp/structs.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/include/net/sctp/structs.h b/include/net/sctp/structs.h
+index affee44bd38e..cccc662561aa 100644
+--- a/include/net/sctp/structs.h
++++ b/include/net/sctp/structs.h
+@@ -312,7 +312,8 @@ struct sctp_cookie {
+ 
+ 	__u8 auth_random[sizeof(struct sctp_paramhdr) +
+ 			 SCTP_AUTH_RANDOM_LENGTH];
+-	__u8 auth_hmacs[SCTP_AUTH_NUM_HMACS * sizeof(__u16) + 2];
++	__u8 auth_hmacs[sizeof(struct sctp_paramhdr) +
++			SCTP_AUTH_NUM_HMACS * sizeof(__u16)];
+ 	__u8 auth_chunks[sizeof(struct sctp_paramhdr) + SCTP_AUTH_MAX_CHUNKS];
+ 
+ 	/* This is a shim for my peer's INIT packet, followed by
+-- 
+2.47.1
 
 
