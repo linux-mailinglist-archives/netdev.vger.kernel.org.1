@@ -1,209 +1,183 @@
-Return-Path: <netdev+bounces-306555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306557-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id JKm4IYDwUGo08wIAu9opvQ
-	(envelope-from <netdev+bounces-306555-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 15:15:44 +0200
+	id 7pDXIefxUGqM8wIAu9opvQ
+	(envelope-from <netdev+bounces-306557-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 15:21:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5EE473B24D
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 15:15:43 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AC4773B316
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 15:21:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linuxfoundation.org header.s=korg header.b="nlKt/KjW";
-	dmarc=pass (policy=none) header.from=linuxfoundation.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306555-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306555-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b="qa BxxKP";
+	dmarc=pass (policy=none) header.from=lunn.ch;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306557-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306557-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 92D843066E25
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:13:31 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8A9573017BAE
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:21:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1A342CB12;
-	Fri, 10 Jul 2026 13:13:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6774B42B334;
+	Fri, 10 Jul 2026 13:21:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72E0427A0C;
-	Fri, 10 Jul 2026 13:13:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A099A42A79F;
+	Fri, 10 Jul 2026 13:21:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783689207; cv=none; b=rn9nRMzREaI8G1zKoYqKNU8X+UxkLyO58bvSD204C5K9vleJ9flaPBrkncUn8GworUVCUq0MIaQB1v2/XsxLt8CJd8p0Ftx0WHxQRPTAFCl8kgynY4LEUIhFHD73+LeJFz8uebE7Velv5vTsNTuSzICZJN2ouE488KPzpMcFKa4=
+	t=1783689701; cv=none; b=gD8X49LwXgnoXM1LXjt6JNIA8uZhe/tJ1spE6ELAn/Y11RYOYSuL5Q8j5VcnLY08699nDxJTIjitJ2u+/ZrkmsDHI+2Rn0nOHYEj7jDYjhyLN9yroiY3FdAgz6+Air5aG7Rh5M5fdwv06HRtyDIjtmZ9vxoz3OqN5VsFrBU+KNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783689207; c=relaxed/simple;
-	bh=p1bnpcFfnpdahpit40SU+9PazJc1JIbRsqyAx4sUOSE=;
+	s=arc-20240116; t=1783689701; c=relaxed/simple;
+	bh=yMV9poYSLXS/3RgppG/pvEj1WqVKNCUnPlsBkB/oi9U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bkBf1usQrRtXry4o8n/wywSK4po7Vhffw7/lCT+jDA9jVlfHxPH+Pk+UDqlgSNZuWRHYNVGgvCmScqG/amc8hP1rvNWCP0gXTpOOAUfwTkm6jbOsYo7f/cx10htMvdA3vn1w8SGsw3L+2Sq6vl79hf2kF3vIq9QP578CzdpNKmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=nlKt/KjW; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78A711F000E9;
-	Fri, 10 Jul 2026 13:13:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1783689205;
-	bh=8SLwz8zRlgf02FS4auN5eAQ0f4RlgvLdBmLBFfMqDFg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=nlKt/KjWCqP4c+C1+WH5rd8CkluQch0VqzrinYyLBmwlPFCMEdw+BnIVan6HWIa1A
-	 DELXpWp9EoHAz0Of2oUqda5i/Q4LoEVjOoqbvTIUX1590WLXrSkB+e+O/8p03gWz4x
-	 /H9L2z0mq2X/sRX1ItwQEncZk+mb0b1caOp6pGos=
-Date: Fri, 10 Jul 2026 15:13:21 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Gary Guo <gary@garyguo.net>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@toke.dk>,
-	Johan Hovold <johan@kernel.org>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	Petko Manolov <petkan@nucleusys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZeUJ1dFeFstNHcIKamIb8mlJzOPFjrOsIycFO4Z8fU44SWPIza3iQvZW7bszzyfB2Piktq2UgIjVMn9GnenzpqcwbCYRzLezIX6iM7Xp9eLsLzeMHM8PqyQLQqXyBakl8+cy6JryT/+mPa213XI2z6SKRJE+0zE3HvBXoYMbEtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qaBxxKPb; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=3jUJlmtzH8od6MWoclW18ZkJp5mBapmJ5Ck79kLYAyk=; b=qa
+	BxxKPbvfNAoasihDNphVMqkx7RXwLmXxUKcGONp6rFaCvzTG9GJvlRfa++o4RxofPaXT5wzJZLb54
+	SYr4FWe5LyQZx4BM8mc8kSnGuKDlRsA6fvydOeH5p/LDpKAdu4Rfx9IWriNht/wKZ5xNJK+YZwSB1
+	iRHw51ownvBEFhw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wiBAW-00Be2B-88; Fri, 10 Jul 2026 15:21:28 +0200
+Date: Fri, 10 Jul 2026 15:21:28 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ujjal Roy <royujjal@gmail.com>
+Cc: Greg KH <gregkh@linuxfoundation.org>,
+	Linux Stable <stable@vger.kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chas Williams <3chas3@gmail.com>,
-	Alan Stern <stern@rowland.harvard.edu>, linux-usb@vger.kernel.org,
-	driver-core@lists.linux.dev, linux-wireless@vger.kernel.org,
-	linux-media@vger.kernel.org,
-	linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-	usb-storage@lists.one-eyed-alien.net, linux-kernel@vger.kernel.org,
-	Manuel Ebner <manuelebner@mailbox.org>
-Subject: Re: [PATCH v2 0/7] usb: fix UAF related to dynamic ID
-Message-ID: <2026071051-finishing-denial-d652@gregkh>
-References: <20260707-usb_dyn_id_uaf-v2-0-632dcf3adfba@garyguo.net>
+	Simon Horman <horms@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>, David Ahern <dsahern@kernel.org>,
+	Shuah Khan <shuah@kernel.org>, Andy Roulin <aroulin@nvidia.com>,
+	Yong Wang <yongwang@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	Ujjal Roy <ujjal@alumnux.com>, bridge@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: Please backport bridge multicast exponential field encoding fix
+ series to 6.1.y/6.6.y/6.12.y/6.18.y/7.0.y
+Message-ID: <797773e2-b155-451b-ae97-e8a005fd2d86@lunn.ch>
+References: <20260709101327.9508-1-royujjal@gmail.com>
+ <2026070925-delay-gauntlet-bc7c@gregkh>
+ <CAE2MWk=mm8_bkd54Gv1mdox6rfvx85Dd3AjOCxPz0fPAfyuWYA@mail.gmail.com>
+ <2026070954-activist-left-8303@gregkh>
+ <CAE2MWkmcQdhGp3LTMtpgAse3AFcfKcAcpQe89+iijfP5e0w_QQ@mail.gmail.com>
+ <2026070948-lively-exchange-a458@gregkh>
+ <CAE2MWkn3L7V3x8i0F-soGLxsBBo_Umgs1pJ3FwCw1OW7=U55zg@mail.gmail.com>
+ <14350a31-ffc7-41fd-84d3-6cfb2cb96841@lunn.ch>
+ <CAE2MWknt86W6yCtuS_RupiuwiDqXT8wZqENM2DjiW1R=eY8qdg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260707-usb_dyn_id_uaf-v2-0-632dcf3adfba@garyguo.net>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAE2MWknt86W6yCtuS_RupiuwiDqXT8wZqENM2DjiW1R=eY8qdg@mail.gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [3.84 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306555-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:royujjal@gmail.com,m:gregkh@linuxfoundation.org,m:stable@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:razor@blackwall.org,m:idosch@nvidia.com,m:dsahern@kernel.org,m:shuah@kernel.org,m:aroulin@nvidia.com,m:yongwang@nvidia.com,m:petrm@nvidia.com,m:ujjal@alumnux.com,m:bridge@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FORGED_RECIPIENTS(0.00)[m:gary@garyguo.net,m:rafael@kernel.org,m:dakr@kernel.org,m:toke@toke.dk,m:johan@kernel.org,m:mchehab@kernel.org,m:petkan@nucleusys.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:3chas3@gmail.com,m:stern@rowland.harvard.edu,m:linux-usb@vger.kernel.org,m:driver-core@lists.linux.dev,m:linux-wireless@vger.kernel.org,m:linux-media@vger.kernel.org,m:linux-atm-general@lists.sourceforge.net,m:netdev@vger.kernel.org,m:usb-storage@lists.one-eyed-alien.net,m:linux-kernel@vger.kernel.org,m:manuelebner@mailbox.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306557-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linuxfoundation.org:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,toke.dk,nucleusys.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,rowland.harvard.edu,vger.kernel.org,lists.linux.dev,lists.sourceforge.net,lists.one-eyed-alien.net,mailbox.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxfoundation.org:from_mime,linuxfoundation.org:dkim,gregkh:mid,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,garyguo.net:email]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lunn.ch:from_mime,lunn.ch:email,lunn.ch:mid,lunn.ch:dkim,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D5EE473B24D
+X-Rspamd-Queue-Id: 1AC4773B316
 
-On Tue, Jul 07, 2026 at 01:26:39PM +0100, Gary Guo wrote:
-> This is the USB version of the dynamic ID UAF fix similar to that of PCI
-> [1]. usb_match_dynamic_id returns a pointer to field of usb_dynid, which
-> can be freed when dynamic ID is removed via sysfs. It can be triggered with
-> the following sequence:
+On Fri, Jul 10, 2026 at 02:40:39PM +0530, Ujjal Roy wrote:
+> On Fri, Jul 10, 2026 at 1:31 AM Andrew Lunn <andrew@lunn.ch> wrote:
+> >
+> > > > > History: The multicast stack currently supports decoding of IGMPv3 and
+> > > > > MLDv2 exponential timer field encodings, but lacks the corresponding
+> > > > > encoding logic when generating multicast query packets.
+> >
+> > RFC 3376 says:
+> >
+> > 4.1.1. Max Resp Code
+> >
+> >    The Max Resp Code field specifies the maximum time allowed before
+> >    sending a responding report.  The actual time allowed, called the Max
+> >    Resp Time, is represented in units of 1/10 second and is derived from
+> >    the Max Resp Code as follows:
+> Here I can give you some input. Default value is 10 seconds for which
+> the protocol value sent on the wire will be 100. This means 100 *
+> (1/10 second) = 10s. Similarly, setting just 14 seconds will cause
+> issues. The protocol value transmitted on the wire is 140, which, when
+> decoded as a linear value, results in 224. Similarly, values greater
+> than 25.5 seconds cannot be represented directly in the 8-bit field.
 > 
->     echo <vid> <pid> > /sys/bus/usb/drivers/<name>/new_id
->     <probe start>
->     echo <vid> <pid> > /sys/bus/usb/drivers/<name>/remove_id
->     <probe use ID>
+> >
+> > Let me check i understand the issue. If the user configures a value >
+> > 127, linux continues to use the linear encoding, but a peer decodes it
+> > as a floating value.
+> Yes, you are right and that is what it does till now. And the Kernel
+> applies same to the QQIC field as well.
 > 
-> Fix it by making a stack copy of the ID. This does mean that the lifetime
-> of ID is scoped to probe (which is already the case but never spelled out
-> explicitly). Drivers use these device IDs creatively, so this series also
-> fix these drivers.
+> >
+> > 128 linear is 0 | 0x10) << (0 + 3) = 0x40 = 64. So the peer sends the
+> > reports earlier than required?
+> No, it is not 64. This becomes (0x10 << 3) = 0x80 = 128 again.
 > 
-> The following coccinelle script is used to find all cases that are deemed
-> suspicious. Only useful case for IDs should be access its fields, or
-> forwarding (without type cast) to functions that do so.
-> 
-> @usage@
-> identifier fn, id;
-> position p;
-> @@
->   fn(..., struct usb_device_id *id, ...)
->   {
->     ...
->     id@p
->     ...
->   }
-> 
-> // Due to cocci isomorphism this needs to be explicit
-> @bad@
-> identifier fn, id;
-> type T;
-> position usage.p;
-> @@
->   fn(..., struct usb_device_id *id, ...)
->   {
->     ...
->     (T*)id@p
->     ...
->   }
-> 
-> // Good use cases
-> @good@
-> identifier fn, id, fld;
-> expression E;
-> position usage.p;
-> @@
->   fn(..., struct usb_device_id *id, ...)
->   {
->     ...
-> (
->     id@p->fld
-> |
->     E(..., id@p, ...)
-> |
-> // Redundant checks, but ignore
->     !id@p
-> |
-> // Redundant checks, but ignore
->     id ? ... : ...
-> )
->     ...
->   }
-> 
-> @script:python depends on usage && (bad || !good)@
-> p << usage.p;
-> @@
-> coccilib.report.print_report(p[0], "suspicious use of device ID")
-> 
-> There're 3 drivers that store usb_device_id, and they're converted to just
-> use driver_info instead. The other fields of usb_device_id can be easily
-> retrieved from usb_device via descriptor.id{Vendor,Product}.
-> 
-> There're also a few users that rely on pointer arithmetics. Pegaus and
-> xusbatm are converted to use driver_info. All unusal USB mass storage
-> drivers rely on pointer arithemtic to index into a side table, because USB
-> storage subsystem is using the driver_data for flags. Luckily all these
-> drivers set no_dynamic_id. Ideally these could be fixed too but their
-> maintainers probably have a better idea of how.
-> 
-> Link: https://lore.kernel.org/driver-core/20260706-pci_id_fix-v3-0-2d48fc025acc@garyguo.net [1]
-> 
-> Signed-off-by: Gary Guo <gary@garyguo.net>
+> >
+> > 255 linear is (0xf | 0x10) << (7 + 3) = 0x1F0000 = 2031616. So the
+> > peer can send the reports much later than the 255 1/10 of a second
+> > than userspace expected.
+> Yes, you are right. But the calculation is incorrect; it becomes
+> 0x7C00, which is 31744.
 
-Thanks for these.  I had an old patch series that attempted to do some
-locking in this area to fix this up, but this version is much nicer.
-I'll go queue it up now.
+Thanks for correcting my maths.
 
-greg k-h
+> > I think a much simpler fix for stable is to clamp the user space
+> > request for setting the max response time to 127. That seems like a
+> > one line patch.
+> In mainline I encoded the value according to the RFC. We can clamp to
+> 127 in stables, if we are not willing to take the entire series. This
+> will force user to use value < 128. Also, please consider QQIC; a
+> similar encoding issue persists.
+
+It does not force the users to use a value < 128. You would need to
+return EINVAL for that, which i'm not proposing. Returning an error
+could break user space.
+
+By clamping to 127, we don't break user space, but we do avoid the
+kernel bug, and at least to my superficial reading of the RFC, we are
+"language lawyer" compliant with the RFC.
+
+	Andrew
 
