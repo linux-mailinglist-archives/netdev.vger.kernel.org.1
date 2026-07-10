@@ -1,94 +1,94 @@
-Return-Path: <netdev+bounces-306639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306640-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Sz61KDwwUWo2AgMAu9opvQ
-	(envelope-from <netdev+bounces-306639-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 19:47:40 +0200
+	id 5xFjJDAyUWqMAgMAu9opvQ
+	(envelope-from <netdev+bounces-306640-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 19:56:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F045573D1BE
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 19:47:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB83873D228
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 19:55:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=fPfeCXaU;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=hpOp5hP6;
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306639-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306639-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306640-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306640-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C3ED230037EA
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 17:47:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AA3A930086DE
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 17:55:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C79D374725;
-	Fri, 10 Jul 2026 17:47:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E12C37756C;
+	Fri, 10 Jul 2026 17:55:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66423603D3
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 17:47:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80D23749E5
+	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 17:55:13 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783705658; cv=none; b=dWWgZpGr7quOtsJ+hq2oKeIXbYZq/apzaFp6ZjWuGGwrVu1wxKINO7fHogxOfHAH8mU79C8i2yIGBCRXYE+u8c9KDPeY5R+A8TS4rzQUVTzBn1yrp7Kvb2TJkug5WerI0WTKo1ImwJkDgx6AIvMu3f/QrwXzYdfcoiGHysaQrAU=
+	t=1783706115; cv=none; b=juTiqVYVjkiO7z+wTGIMUTvS7pJMOI9qK7D1z20vUQ6y5pjQYCFg+IgssEbUA+q0doCNnwEbV3cFzGI2wXk3di9KDhrsHoFZMb2MJdtpbqKrSTYsSvNIL4O1EH2TbYLfFcjijrGjAlpFsISP5QXiy72PgOfPXZPmD/J+QBrHnS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783705658; c=relaxed/simple;
-	bh=4b0AqcIMhIJ5ZbjskxyymRxbmi9O4aj7aOWacnAUjUI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DLt16SVDtHmEy82CLXD2UXjE/CdOxTM0y361GGcu7lEB9CcgcoEXkIPMdrmldmuCt/+8DTL24dibIu5N3bYw0eEyx/DLy1PRA82G6LFCBsNzZPs6yEKoDMr6N+T/VxICqR91/Ej3eW+HXFYL6OZJfaLjlR2XfzlIJvWkZZTDq5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fPfeCXaU; arc=none smtp.client-ip=209.85.214.174
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2ca64c3ce5fso14851215ad.3
-        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 10:47:36 -0700 (PDT)
+	s=arc-20240116; t=1783706115; c=relaxed/simple;
+	bh=q2Pq9v5SXGlcc93M8LKL/aV+CQ++fQMQq3HsJTaHEFo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WMEz0cjctcQ45v7eHvPhX/QVbShMT7MaMbg6mSHAJNVyGfXnt4xjlrBvpLMJq+8NmhaYThGUIyHJiHYCMir5Rm0tm5iaou0RVvlXwZKjXndRrjxOExLIMLLFZoYmuuRImpOY2N96+BDLF+JwZZSDh0mebTZ6j3g37t+yL8SWC9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hpOp5hP6; arc=none smtp.client-ip=209.85.216.50
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-38101f85591so1757665a91.1
+        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 10:55:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783705656; x=1784310456; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783706113; x=1784310913; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=DTSVDCF45UPt8odAkpuTFIMWRAzm5GXA164W4J3m4sg=;
-        b=fPfeCXaUnLuwesQxKsAoULMN72LPWYt5DoiCh3y+Mn3PEffKK8AHo/p1FhYLbe94nv
-         C9SI0jnaC3/LrAnvmZYxjBJ3W9Ms/xeqjBcTsPNYWtp/Ndbl8GfoKwDqXYJ3+pLodYC4
-         JXf5oWdQ7rljMoOdBIW+iIrB42FvDGhHzzQSKGMRvoGkbn31aeFn2NEGAYG3jpVjl36K
-         LCT6+fWjzFvavd0JCxJ1AhRuSzsdoU/waU0dbC0T4RGGhzXXlV7rUPZ+hUU7/0OzcczL
-         gW30ra2HDWCfbR2GATNG30PTcM1maSoXizPqluOz6dbqY9jHhqQ++4tHLpqTZvvBUegB
-         Cg7A==
+        bh=g/g6IlAQtSI8doB/Bb8hhgXDYZeL8IDA7KJYnBAyAHU=;
+        b=hpOp5hP6cRBd/LrQW2ksjdFVGQIfhOjdMt+y6NmfUg0B/EBx5pwnC2uoyBKs53pQbz
+         +amXLV3QniFfNgIhrkeSg31DxJThsJil8et3b6DXhauIfQk+lTZ241ksfblHrW7UZoQV
+         MCB2wuVyhYFANZxphVifp1GSgnYo8dQ6M6TizkX2sv6/datbAaUXmuw+imE0B7NZURiW
+         9SD22DklogXVZhN2gXoMldlX0Au+IOUXzk9nitBCJSDL8b6fS8fF/667o3DtFJWGjEwh
+         seXjczxvU09ecYAx4n1E+hUOAJfidO2OMPphrGxvj81gsbM4jGixs0UpwcZnknxl3Zda
+         NAKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783705656; x=1784310456;
+        d=1e100.net; s=20251104; t=1783706113; x=1784310913;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=DTSVDCF45UPt8odAkpuTFIMWRAzm5GXA164W4J3m4sg=;
-        b=hvl7LBtDRIQJ2AEs+5ORje1dP8m4kVQj3QwHKS0wQDYL5wRAUx+QsW69qz9+tOMTYk
-         05/w2XWoKfpXm6FAm/L/S6bGapNxD98G4wCK0o3+lokDBd+KzVvyWFdM4BKW0XJ9FJry
-         t/KeKrz49rMJeglnE+Fd0/ehK2Y4HxFmiI22wBUzcLryPOqQh/SQdgpaD3dy6zhnAnFt
-         KcsmQirxYI6G0YX2yH02od4wixQK5lcLkxt9fDbZhUasHxtIAlrU/COeFo9Idso0tBn4
-         ODs+p56Hp9fUxz00lLN27rGRYyOzkQueLlF8pdpyGZnu1I6cJ2cz0h/J2kdOTno99srU
-         lVxw==
-X-Gm-Message-State: AOJu0Yw98FLJgi1kAW1OuSP0A+jZJfjmcymYkVEP8sS8Du6OvQW5Fshf
-	pTR9c8dxV+36fRO5G6sMkoxpic3WOGChEKkrDyvCyRiSujeu6CngjUZJ
-X-Gm-Gg: AfdE7cnaEGa5bkDVlZjjxpeSmrIgKlldZCzwjJ8tsuf7aH/uG8yAoD5SrFOzA7cNkjD
-	fAg7D64hb5JDMIY1Bom4A5kD2ZlO8/yW2YHwXEcCZ66eSyo9ENRzPtp9Ybd8J7M5SGtlJHogkVD
-	6I3TOiKSmaiJwG/spKon+bOl/1TyrpnQvJK4i8zdUWoMo02y+LGBaz9P9C+YG/38nyVTb9KVSUo
-	3j9mxpcjNCQLY565unBe+z5hqZVLIPlS2oigh5KBiP29h3WK7JZqgW4uY3u8UVkXF50b0UApzWf
-	a6F5sgjFFrMmVYe6Zl21ywy3CCYrlfOG/jrTyNlK1iUlLRHtSUYN/RgYSiKf7efJ7aoGSqw+ghh
-	Clt7+W4b5EPQW+vA2fjtxuHCjJUSspZaOEhpUG6yZYzHxd4z+/PAZbA2buIFHYBtKqZTYQ0fJaQ
-	PB1l/oSM4l48raqTd0FoYd7aBErX8DzehWiSdf63UIJS9YapoeaINjTfBQiA==
-X-Received: by 2002:a05:6a21:6916:b0:3bf:6c08:fb9e with SMTP id adf61e73a8af0-3c110ba1064mr22179637.50.1783705656011;
-        Fri, 10 Jul 2026 10:47:36 -0700 (PDT)
+        bh=g/g6IlAQtSI8doB/Bb8hhgXDYZeL8IDA7KJYnBAyAHU=;
+        b=OYQWY4WVRefs5mF0pzYBhYdtQdRsRImbi3Pl7FDFVrTYbouBmrRm8QhvD12eq6ggqP
+         20xUCvjND7a3RnDl5mTm/GmjXaUxLcbduc3ozE7EwAuwjNi5dUYXbrPjKhGbogniapDP
+         owXS39hNmwyx65wR2wdWYky84Z5cR3kbUEXOsTn9qbXTZq1EjBNieH/mJ2itsv/TLTFd
+         6INdtMheYwrzPgT/pqRRcyGx7uiICqHQqSra+xj3qX7LkzrvUeYJ1amfa3wooNB6W/GK
+         dzh6+e2mj4wKlnA88vnrh0JSZqh9ujQvoliU7bekqS0z5sWFZWprdJHCk7oYhplEQOGx
+         BHlA==
+X-Forwarded-Encrypted: i=1; AHgh+Rp+KcbsuZjAVYhyglV+mDNpJo2jZT2I4z7zWRe2pT8JxR0fy6fBAMf2mu8MHOehtdn9NCiyx90=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgNRl1NtwGEQ+xmv6dU3feJ2qORCy9RW42rkB4P9MmYjziI3SN
+	4slddFCwu8cYGfTb7iNVmTZ5gRGMG6Y88NjsdKVJCFebIIN9IxvbuYCo
+X-Gm-Gg: AfdE7ck2zDPFdf4S1gQdvEry5vsTFEb0m3nm478+KCsgw+sjYa04uTJeaehVc7YVY0w
+	BRzpKQVycNdWrw3Yt7pdZmsURZvaWP32P1e60oOjOH3xY2G8gaWZe8dkrjziSSQUnXhJUGciNRy
+	JSs8FFG64IhSoTFy2723fA3szcrWGVlgXnAPjXnNIPF5+mGXyAJUE0rF+C0Grh0D8e9iZ18YuUI
+	ul9TyLK0gZLkU68YzX9eBlCno2U4ZCxAPPVuksw3WtCgc1VKgXoaGC+ouI/A1253wYpf77IsYlP
+	i/GfkzZnBPjL87mzm0ZpCoWXv09B8w9+UpVM+uqku3vZuOi632rQH+zGTIer6J1XoC7TuYnIfyb
+	wWKURh8aGpIXW96jZuDFPzQDJRVb2bouBpnnVmcvBaiTqnBYerG3jFGgazOl0Av9DN3yD1Nk3AZ
+	pqiyXOx+P+vMbN/Tt1jXt0LuZJIZnW+VkTYyBSVLhYswYZ8GpaKrIR1z1/RQXyqqXQoStH
+X-Received: by 2002:a17:90b:2401:b0:38d:9eda:fa04 with SMTP id 98e67ed59e1d1-38d9edafc8emr2029326a91.2.1783706113230;
+        Fri, 10 Jul 2026 10:55:13 -0700 (PDT)
 Received: from fx.tailc0aff1.ts.net ([206.206.192.132])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13b659d87a2sm39670474c88.13.2026.07.10.10.47.34
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-311747f596asm43051871eec.2.2026.07.10.10.55.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jul 2026 10:47:35 -0700 (PDT)
+        Fri, 10 Jul 2026 10:55:12 -0700 (PDT)
 From: Weiming Shi <bestswngs@gmail.com>
-To: Jon Maloy <jmaloy@redhat.com>,
+To: David Heidelberg <david@ixit.cz>,
 	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
+Cc: oe-linux-nfc@lists.linux.dev,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Tung Nguyen <tung.quang.nguyen@est.tech>,
 	xmei5@asu.edu,
 	Weiming Shi <bestswngs@gmail.com>
-Subject: [PATCH net v4] tipc: serialize udp bearer replicast list updates
-Date: Fri, 10 Jul 2026 10:47:19 -0700
-Message-ID: <20260710174718.1969789-2-bestswngs@gmail.com>
+Subject: [PATCH net] nfc: llcp: validate TLV length before parsing to fix OOB read
+Date: Fri, 10 Jul 2026 10:55:01 -0700
+Message-ID: <20260710175500.2068564-2-bestswngs@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -99,222 +99,135 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.sourceforge.net,est.tech,asu.edu,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-306639-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:tung.quang.nguyen@est.tech,m:xmei5@asu.edu,m:bestswngs@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,asu.edu,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-306640-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:david@ixit.cz,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:xmei5@asu.edu,m:bestswngs@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,asu.edu:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F045573D1BE
+X-Rspamd-Queue-Id: DB83873D228
 
-tipc_udp_rcast_add() and cleanup_bearer() both update ub->rcast.list with
-list_add_rcu() / list_del_rcu(), but nothing serializes them. The add runs
-from the encap receive softirq (via tipc_udp_rcast_disc()) without
-rtnl_lock(), so it can race the cleanup delete and corrupt the list:
+nfc_llcp_parse_gb_tlv() and nfc_llcp_parse_connection_tlv() iterate over
+a TLV array supplied by the remote peer. Each iteration reads the type
+and length from tlv[0]/tlv[1] and then advances by length + 2, but the
+loop only tests offset < tlv_array_len and never checks that the 2-byte
+header fits in the remaining space. A truncated trailing entry is enough
+to read past the buffer on the tlv[1] access.
 
-  list_del corruption. prev->next should be ffff8880298d7ab8,
-    but was ffff88802449ad38. (prev=ffff888027e3ec98)
-  kernel BUG at lib/list_debug.c:62!
-  RIP: __list_del_entry_valid_or_report+0x17a/0x200
-  Workqueue: events cleanup_bearer
-  Call Trace:
-   cleanup_bearer (net/tipc/udp_media.c:811)
-   process_one_work (kernel/workqueue.c:3302)
-   worker_thread (kernel/workqueue.c:3466)
+The length byte then makes it worse. offset is a u8, so length + 2 wraps
+at 256: length == 0xff advances by 0x101 and leaves offset unchanged, so
+the loop stays live while tlv keeps moving forward. The parse walks well
+past the buffer, and the next iteration's tlv[0]/tlv[1] read lands out of
+bounds rather than the walk stopping one entry over.
 
-The bearer can be enabled from an unprivileged user namespace, as the
-TIPCv2 generic-netlink ops carry no GENL_ADMIN_PERM.
+nfc_llcp_parse_gb_tlv() runs on the general bytes of an activated
+NFC-DEP link. An RF_INTF_ACTIVATED_NTF in listen mode reaches it via
+nci_ntf_packet() -> nfc_tm_activated() -> nfc_llcp_set_remote_gb(), which
+copies the peer's general bytes into the 48-byte remote_gb[] field of the
+heap-allocated struct nfc_llcp_local; the wrapped walk runs off the end
+of that allocation. nfc_llcp_parse_connection_tlv() is reached the same
+way from CONNECT/CC PDUs, over tlv data taken from the received skb.
 
-Add a spinlock to struct udp_bearer and take it around the list_add_rcu()
-in tipc_udp_rcast_add() and the list_del_rcu() loop in cleanup_bearer() so
-the two writers can no longer corrupt the list.
+Bound each iteration to tlv_array_len before touching the header, and
+widen offset to u16 so the advance can no longer wrap. Well-formed TLVs
+are parsed as before; a malformed trailing entry ends the loop.
 
-Reject a duplicate peer under the same lock before allocating, and remove
-tipc_udp_is_known_peer(). The old lockless pre-check in
-tipc_udp_rcast_disc() was racy: two softirqs discovering the same peer
-could both find it absent and add it twice. Doing the check under
-rcast_lock in tipc_udp_rcast_add(), before the allocation, makes it the
-single point of truth for both the discovery and the netlink add paths and
-keeps a flood of the same address from churning the allocator.
+ BUG: KASAN: slab-out-of-bounds in nfc_llcp_parse_gb_tlv (net/nfc/llcp_commands.c:204)
+ Read of size 1 by task kworker/u8:3
+  nfc_llcp_parse_gb_tlv (net/nfc/llcp_commands.c:204)
+  nfc_llcp_set_remote_gb (net/nfc/llcp_core.c:681)
+  nfc_tm_activated (net/nfc/core.c:643 net/nfc/core.c:677)
+  nci_ntf_packet (net/nfc/nci/ntf.c:883 net/nfc/nci/ntf.c:1015)
+  nci_rx_work (net/nfc/nci/core.c:1564)
 
-Fixes: ef20cd4dd163 ("tipc: introduce UDP replicast")
+Fixes: d646960f7986 ("NFC: Initial LLCP support")
 Reported-by: Xiang Mei <xmei5@asu.edu>
-Suggested-by: Tung Nguyen <tung.quang.nguyen@est.tech>
+Assisted-by: Claude:claude-opus-4-8
 Signed-off-by: Weiming Shi <bestswngs@gmail.com>
 ---
-v4: (per Tung's review)
- - Reject a duplicate under rcast_lock before allocating rcast, so a
-   flood of the same address can't churn the allocator.
-v3:
- - Check for a duplicate peer in tipc_udp_rcast_add() under rcast_lock
-   and remove tipc_udp_is_known_peer().
-v2:
- - Narrow the lock to the list mutation.
+ net/nfc/llcp_commands.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
- net/tipc/udp_media.c | 53 ++++++++++++++++++++------------------------
- 1 file changed, 24 insertions(+), 29 deletions(-)
-
-diff --git a/net/tipc/udp_media.c b/net/tipc/udp_media.c
-index 62ae7f5b5..3f0d75d72 100644
---- a/net/tipc/udp_media.c
-+++ b/net/tipc/udp_media.c
-@@ -94,6 +94,7 @@ struct udp_replicast {
-  * @ifindex:	local address scope
-  * @work:	used to schedule deferred work on a bearer
-  * @rcast:	associated udp_replicast container
-+ * @rcast_lock:	serialize updates to @rcast.list against concurrent updaters
-  */
- struct udp_bearer {
- 	struct tipc_bearer __rcu *bearer;
-@@ -101,6 +102,7 @@ struct udp_bearer {
- 	u32 ifindex;
- 	struct work_struct work;
- 	struct udp_replicast rcast;
-+	spinlock_t rcast_lock; /* protects rcast.list */
- };
- 
- static int tipc_udp_is_mcast_addr(struct udp_media_addr *addr)
-@@ -278,26 +280,6 @@ static int tipc_udp_send_msg(struct net *net, struct sk_buff *skb,
- 	return err;
- }
- 
--static bool tipc_udp_is_known_peer(struct tipc_bearer *b,
--				   struct udp_media_addr *addr)
--{
--	struct udp_replicast *rcast, *tmp;
--	struct udp_bearer *ub;
--
--	ub = rcu_dereference_rtnl(b->media_ptr);
--	if (!ub) {
--		pr_err_ratelimited("UDP bearer instance not found\n");
--		return false;
--	}
--
--	list_for_each_entry_safe(rcast, tmp, &ub->rcast.list, list) {
--		if (!memcmp(&rcast->addr, addr, sizeof(struct udp_media_addr)))
--			return true;
--	}
--
--	return false;
--}
--
- static int tipc_udp_rcast_add(struct tipc_bearer *b,
- 			      struct udp_media_addr *addr)
+diff --git a/net/nfc/llcp_commands.c b/net/nfc/llcp_commands.c
+index 291f26facbf3..3f0f8eef9890 100644
+--- a/net/nfc/llcp_commands.c
++++ b/net/nfc/llcp_commands.c
+@@ -193,17 +193,21 @@ int nfc_llcp_parse_gb_tlv(struct nfc_llcp_local *local,
+ 			  const u8 *tlv_array, u16 tlv_array_len)
  {
-@@ -308,16 +290,34 @@ static int tipc_udp_rcast_add(struct tipc_bearer *b,
- 	if (!ub)
+ 	const u8 *tlv = tlv_array;
+-	u8 type, length, offset = 0;
++	u8 type, length;
++	u16 offset = 0;
+ 
+ 	pr_debug("TLV array length %d\n", tlv_array_len);
+ 
+ 	if (local == NULL)
  		return -ENODEV;
  
-+	/* Serialize with other updaters and reject a duplicate before
-+	 * allocating, so a flood of the same address can't churn the
-+	 * allocator.
-+	 */
-+	spin_lock_bh(&ub->rcast_lock);
-+	list_for_each_entry(rcast, &ub->rcast.list, list) {
-+		if (!memcmp(&rcast->addr, addr, sizeof(*addr))) {
-+			spin_unlock_bh(&ub->rcast_lock);
-+			return 0;
-+		}
-+	}
+-	while (offset < tlv_array_len) {
++	while (offset + 2 <= tlv_array_len) {
+ 		type = tlv[0];
+ 		length = tlv[1];
+ 
++		if (offset + 2 + length > tlv_array_len)
++			break;
 +
- 	rcast = kmalloc_obj(*rcast, GFP_ATOMIC);
--	if (!rcast)
-+	if (!rcast) {
-+		spin_unlock_bh(&ub->rcast_lock);
- 		return -ENOMEM;
-+	}
+ 		pr_debug("type 0x%x length %d\n", type, length);
  
- 	if (dst_cache_init(&rcast->dst_cache, GFP_ATOMIC)) {
-+		spin_unlock_bh(&ub->rcast_lock);
- 		kfree(rcast);
- 		return -ENOMEM;
- 	}
+ 		switch (type) {
+@@ -243,17 +247,21 @@ int nfc_llcp_parse_connection_tlv(struct nfc_llcp_sock *sock,
+ 				  const u8 *tlv_array, u16 tlv_array_len)
+ {
+ 	const u8 *tlv = tlv_array;
+-	u8 type, length, offset = 0;
++	u8 type, length;
++	u16 offset = 0;
  
- 	memcpy(&rcast->addr, addr, sizeof(struct udp_media_addr));
-+	list_add_rcu(&rcast->list, &ub->rcast.list);
-+	b->bcast_addr.broadcast = TIPC_REPLICAST_SUPPORT;
-+	spin_unlock_bh(&ub->rcast_lock);
+ 	pr_debug("TLV array length %d\n", tlv_array_len);
  
- 	if (ntohs(addr->proto) == ETH_P_IP)
- 		pr_info("New replicast peer: %pI4\n", &rcast->addr.ipv4);
-@@ -325,8 +325,6 @@ static int tipc_udp_rcast_add(struct tipc_bearer *b,
- 	else if (ntohs(addr->proto) == ETH_P_IPV6)
- 		pr_info("New replicast peer: %pI6\n", &rcast->addr.ipv6);
- #endif
--	b->bcast_addr.broadcast = TIPC_REPLICAST_SUPPORT;
--	list_add_rcu(&rcast->list, &ub->rcast.list);
- 	return 0;
- }
+ 	if (sock == NULL)
+ 		return -ENOTCONN;
  
-@@ -361,9 +359,6 @@ static int tipc_udp_rcast_disc(struct tipc_bearer *b, struct sk_buff *skb)
- 		return 0;
- 	}
+-	while (offset < tlv_array_len) {
++	while (offset + 2 <= tlv_array_len) {
+ 		type = tlv[0];
+ 		length = tlv[1];
  
--	if (likely(tipc_udp_is_known_peer(b, &src)))
--		return 0;
--
- 	return tipc_udp_rcast_add(b, &src);
- }
++		if (offset + 2 + length > tlv_array_len)
++			break;
++
+ 		pr_debug("type 0x%x length %d\n", type, length);
  
-@@ -644,9 +639,6 @@ int tipc_udp_nl_bearer_add(struct tipc_bearer *b, struct nlattr *attr)
- 		return -EINVAL;
- 	}
- 
--	if (tipc_udp_is_known_peer(b, &addr))
--		return 0;
--
- 	return tipc_udp_rcast_add(b, &addr);
- }
- 
-@@ -679,6 +671,7 @@ static int tipc_udp_enable(struct net *net, struct tipc_bearer *b,
- 		return -ENOMEM;
- 
- 	INIT_LIST_HEAD(&ub->rcast.list);
-+	spin_lock_init(&ub->rcast_lock);
- 
- 	if (!attrs[TIPC_NLA_BEARER_UDP_OPTS])
- 		goto err;
-@@ -819,10 +812,12 @@ static void cleanup_bearer(struct work_struct *work)
- 	struct udp_replicast *rcast, *tmp;
- 	struct tipc_net *tn;
- 
-+	spin_lock_bh(&ub->rcast_lock);
- 	list_for_each_entry_safe(rcast, tmp, &ub->rcast.list, list) {
- 		list_del_rcu(&rcast->list);
- 		call_rcu_hurry(&rcast->rcu, rcast_free_rcu);
- 	}
-+	spin_unlock_bh(&ub->rcast_lock);
- 
- 	tn = tipc_net(sock_net(ub->sk));
- 
+ 		switch (type) {
 -- 
 2.43.0
 
