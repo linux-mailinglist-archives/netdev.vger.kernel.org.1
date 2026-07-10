@@ -1,322 +1,365 @@
-Return-Path: <netdev+bounces-306698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306699-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YdypAqRoUWrEEAMAu9opvQ
-	(envelope-from <netdev+bounces-306698-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 23:48:20 +0200
+	id lNfUJdZpUWomEQMAu9opvQ
+	(envelope-from <netdev+bounces-306699-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 23:53:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5424473F1C6
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 23:48:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE9E473F2C1
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 23:53:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=ZolCqbTp;
+	dkim=pass header.d=intel.com header.s=Intel header.b=OfMxnKjI;
 	dmarc=pass (policy=none) header.from=intel.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306698-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306698-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306699-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306699-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1E4213009FB5
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 21:48:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9AFD33018BC2
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 21:53:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 841193939C9;
-	Fri, 10 Jul 2026 21:48:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 433E83AFD18;
+	Fri, 10 Jul 2026 21:53:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C265E3264C8
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 21:48:15 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783720097; cv=fail; b=PWBuCtfoL6lXt2Ceib2LmSrOcVIiJLUnVBorsqprHCqpfkoER1jCLGTENAWItaocJeeSNoGFI/WFfVYNHAuUPDCTpiCdK3lcr/Dtjil/T4HpqpG09ryg0kneO0c3DW++08DEjovTl6sSqsZANBsDqqvg0QUxSr81GcFiG+ceVMs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783720097; c=relaxed/simple;
-	bh=WvcfhPeFKQY/n2iGL5iAAZ0IN+xx9s+2TZWdzQcGn+g=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ib7yR42c3ZrCBBR6kOo48KHtmyHchl4MeOQnVa37P2QYCqgee9R0MAauAefrcuGRjirTx83Xs2uR8bFbac+/pFejnryCd8hAXXMOfWhnhPqPJww9cglREXcwgUixwi/tyCC92Uz5LxGeKH029KS1jxYZiLeOtULZx5Bab3ncCvQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZolCqbTp; arc=fail smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A1D030567C;
+	Fri, 10 Jul 2026 21:53:21 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783720403; cv=none; b=lpTqQegllt5sQd1vANFcHVF1ZfW6gyCRrB7glRzuDQZRU3BWePAtlCHiagNGfJ+1UeyfXOQn2rSjPH0+H43i7FrKcfOq/M159a7maH2E3S5pcjmH3qXUtOMeF6a8V5buZr3qiM6GkftweAGfhMLm4scscQZJ3PDliQIicsuS5TE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783720403; c=relaxed/simple;
+	bh=6BoU1Q9AHRZz56zPu7yOCSHAbp5seCNimVQupDnva20=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SMeqAplH8bgbCJONoI3C44rYzXCwvA0j2JZwxxJBZ0K9wsGIdlt2dwuEO2s84E0yRkEPXIB7JbMYAqXptbCzTln8tFkXhgCGMEmKphf5d/lx70tl945HlHwAylnl8ynuF9DY7x+UIAgL30dElmIo/pzpGdDHcE5vEQG3Id5fQuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OfMxnKjI; arc=none smtp.client-ip=198.175.65.9
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1783720096; x=1815256096;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=WvcfhPeFKQY/n2iGL5iAAZ0IN+xx9s+2TZWdzQcGn+g=;
-  b=ZolCqbTpyfn1f6kEVVPjFp+S+N3ZgHt2V5ei4DhF4L8tcjLYL5aI+U5z
-   +EZqfv6cdg5M0x3UFQEHztHAVrq2edXJLrk3spboIs3PkM5GJFOj55EX5
-   c0U7OM9KV4SKdcJWm5UBxLJy1m5A1rZiX0LRF9U8MLHO4bJFpOUkdrS/I
-   QzIFV1/d1dstXSC5f8nCUv0ogqvrtGmP+l6jJ8Skndwbbz1jZqIOy/QoR
-   cncRRHisjvtL3hDxAbVEBr37O0l7eLn+D0HnxjOVjUslEyrEk9aFU+R/z
-   wVYGeaeSY6AydsOmQM5hDTSV/4pS4DchFqtXgFmyDl3gUcOwplipOUX3O
+  t=1783720402; x=1815256402;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=6BoU1Q9AHRZz56zPu7yOCSHAbp5seCNimVQupDnva20=;
+  b=OfMxnKjIQvHSqmnGhCW7B4MH05+Y+nB6WA0bJSj5nDt9StMEk2Tnt1+X
+   ntouspMBxwIj+VIhsL5ZSgxmiBnNm+Us+uoft5NgALEZLNCdq++yS+yGW
+   dmAHukOgVHAKVTj6JQyHWz7Vq4K7KUfE/EB1xwVk971gSO9CorILtyvuC
+   N18irKV0Lb1+jy6X8xNS/u3Li3Vc4tO83C/Hdt4SVc9ubR9o/x+/YFhUm
+   USE3oiYr9L+csCHLu7tsTxb4fptOnpmC4MyXBTV2Go22vY446ZyEi5JeK
+   zibU0XpDy0qg8hUK0WRTFx/NV5JGLrRt70fMWVb/1WCjrWATh1hz8K5GV
    w==;
-X-CSE-ConnectionGUID: VImLQU0dQ2SlDVt9RUUkCA==
-X-CSE-MsgGUID: gE4V5FHBRJKFVeKBTFWgiw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="84276932"
+X-CSE-ConnectionGUID: 2mz7+7X+Sd6ATF016kus5g==
+X-CSE-MsgGUID: EykyifdBQx+QzwwFia1TvQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="107220695"
 X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="84276932"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2026 14:48:16 -0700
-X-CSE-ConnectionGUID: SOSf8sWeT6SDFExT5Re6VA==
-X-CSE-MsgGUID: enJY4dzYRYaHGb3XL38SUQ==
+   d="scan'208";a="107220695"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2026 14:53:21 -0700
+X-CSE-ConnectionGUID: x9FLI9bTS+SFP8+82oZUvw==
+X-CSE-MsgGUID: 7tB5Zp02QZu6FyXPeTWxKw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="285087920"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2026 14:48:15 -0700
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Fri, 10 Jul 2026 14:48:14 -0700
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43 via Frontend Transport; Fri, 10 Jul 2026 14:48:14 -0700
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (52.101.43.28) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Fri, 10 Jul 2026 14:48:14 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=anKkXMv8Ht+1v18218GK4w+sSpenO2BrwkRqt6bH+6215mRCE/34qRstIoceN3qcN+tAq+zdTAW2Gx0qvAe7LMCQXi5B8QJ/V9L506PXR0/NoXOohmRRjC3pdTkdBwSIwWKFwQGY5+4xSjj74FlHhirvludn97wh1bs631s3XI2AIFI56MazUVx7JZHbqFXaAr7VB5bjoDJON7SDqzbPR9BnmZ4Y0z0KmE8ePYZRjcCj3TjKhK3OFNP9tUGLkRAJTpdm4VZaRhZ+DLGBXrjFZS/wIRk8AxDNdrT91OldQI2oRriuVKV8KGfLcummOaxWHspS98G8LAsWpmvO7Blihw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PqCAKOvnVZKzfkGWh4/R/tZ7wFnv7/cCDAta9JqOyW8=;
- b=xaSRelm4uNHtJ5CAUkh5PXLW1qk5F0flCU8HOfCiXrPYR2xU41EXcexeKxNBlXboWY3qvqhGznCyH3bCFi2bcOivRb5ZMuxgNN7Siky9ZGnuToNvfxpzJOjlZypSctEQ4yS3bvyRBWhkd5s1yv4eTgUETPvswH0QBS1rMzLdl/adg5eHsh0Xi5zsyEZbf9M6IkIV2hLOHeys5RXXlEz21LhUkYbXpDK5T6X1JGRs3qvuOhRrFLlkY+quEIZcVRzIo+mHBuusmLl8Cxq4nB4cGh6xMhP/2SZk7AZK703z6pNAKGSExV0SDcdOm5ifWouvoyYc8adh+TPVBOV/z+Iq/A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB7381.namprd11.prod.outlook.com (2603:10b6:8:134::14)
- by PH8PR11MB9697.namprd11.prod.outlook.com (2603:10b6:510:3a5::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.17; Fri, 10 Jul
- 2026 21:48:12 +0000
-Received: from DS0PR11MB7381.namprd11.prod.outlook.com
- ([fe80::4c39:dfe6:d6dc:6f58]) by DS0PR11MB7381.namprd11.prod.outlook.com
- ([fe80::4c39:dfe6:d6dc:6f58%6]) with mapi id 15.21.0181.017; Fri, 10 Jul 2026
- 21:48:12 +0000
-Message-ID: <f2ba0aea-1d63-4dbf-8311-c9d74a752b62@intel.com>
-Date: Fri, 10 Jul 2026 14:48:11 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net v2] ice: add missing xa_destroy for sched_node_ids
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
-References: <20260706-jk-fix-missing-xa-destroy-v2-1-b83b0f02beef@intel.com>
-From: Jacob Keller <jacob.e.keller@intel.com>
-Content-Language: en-US
-In-Reply-To: <20260706-jk-fix-missing-xa-destroy-v2-1-b83b0f02beef@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0054.namprd03.prod.outlook.com
- (2603:10b6:303:8e::29) To DS0PR11MB7381.namprd11.prod.outlook.com
- (2603:10b6:8:134::14)
+   d="scan'208";a="254494609"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa008.jf.intel.com with ESMTP; 10 Jul 2026 14:53:20 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	larysa.zaremba@intel.com,
+	przemyslaw.kitszel@intel.com,
+	aleksander.lobakin@intel.com,
+	sridhar.samudrala@intel.com,
+	anjali.singhai@intel.com,
+	michal.swiatkowski@linux.intel.com,
+	maciej.fijalkowski@intel.com,
+	emil.s.tantilov@intel.com,
+	madhu.chittim@intel.com,
+	joshua.a.hay@intel.com,
+	jacob.e.keller@intel.com,
+	jayaprakash.shanmugam@intel.com,
+	jiri@resnulli.us,
+	horms@kernel.org,
+	corbet@lwn.net,
+	richardcochran@gmail.com,
+	linux-doc@vger.kernel.org
+Subject: [PATCH net-next v4 00/15][pull request] Introduce iXD driver
+Date: Fri, 10 Jul 2026 14:52:57 -0700
+Message-ID: <20260710215313.1475803-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7381:EE_|PH8PR11MB9697:EE_
-X-MS-Office365-Filtering-Correlation-Id: bf030c1b-2bce-4aa0-119c-08dedeccf093
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|23010399003|376014|18002099003|22082099003|3023799007|6133799003|56012099006|11063799006;
-X-Microsoft-Antispam-Message-Info: yagU7nL9Vpi+zLZHJUahKya+wOBcpqoIqJDM55CTZnNmDg2LNgAwRllV2J3z/a/s/FyH8a2v2oG3iYECOIugwMIl1nLvX1yrAHAs6iqrzWJSAsRVtYgsEnWhuTglbYxq07AlI8iMHr8Mc75SiU41MvVW746x+Rn1fs2uH8tbov5ZXEBrG1qE6BosftiHn4NxTYJrv1x2Pq7KO684Kazk6PrKgsmRJyf/aPnVKNNZPOWiAyLB4QIY7AGbpkokqGzs4ajCQ40iEJ2YdFjKk7HfT65fZRKePSBqIVcagNlYSjuLhpi/za0Gcqq8JGB69q8hJzX4ujhzK6QttsnHf94sR+2dH1jCGalB2201R9ZOat+pNj2BUBZ5tkw1uH1z8Vl5DimF5Oz7CEx3yF2EnM1prVPDvQ8p1ixgyiHPB4CmIowjhLJOZj47g0upj6QLu9NdYZTLp3lnOx1qKK31peapsOBVfdiPQ/Ypic/jhBzg2xkUBS/kYxlX0o8yHU2Yd4ThhqaH6dmiC4cq6wFRgV58I+dDG9Z52msgL44KDPNg29+wmfiLzATM4bvABKqnFYS7gL7gi7UDJ4xmsexgQrgRge518ddt29dtw1ZE1/b5mi9fxEG5BydiZRdPYCPbcfR0CXitGu3Xyqot6PPYQiPMoIFwPRWmI5TwhFCuJdn27sI=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7381.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(23010399003)(376014)(18002099003)(22082099003)(3023799007)(6133799003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dmNqZEtDY28yeTVaOHY3ZlBjdHVDU0UwMjNkdkZJVTBtVkM0NVVjRWxIdnRW?=
- =?utf-8?B?cmNVcDMxd1E1LzFIWXd2ckkvb1V4TzJ4WU1PV3FLeG8zTElwV1RzT0NLaWtr?=
- =?utf-8?B?NTBBRU1SODh5a052YnBRZ3JEWUtBLzVPa29VRVJ5K0owMVhXb09WZndCMDVH?=
- =?utf-8?B?QlJ2akZMK1gvQ0hmdkNCblJGMlVvcFMwcE5IVUg1enUxaXdTaitBY1JCSlZE?=
- =?utf-8?B?VUZvNlRpL1hONEFxRDg4TDJUbGxNZjVHWWdyU1hPTXo0TFIwZmN3NEFzazkr?=
- =?utf-8?B?a3ppQmlKS0U2VFJMREUrYkRsTlBJWkpCNXZHaHhZU0pUc3hGb2MrOWhLK2RW?=
- =?utf-8?B?OExtMmdvZE1MTTAvWFlzSWZsMVRvbzB4SXdPQkNQWGNXMUNIellMWWRSZDFy?=
- =?utf-8?B?MjVabmVLTzJmNnpYcnA5dkErRXhwQklVWnVMTk0rZFNmN2pvcC9wS2VNVzFR?=
- =?utf-8?B?cGRIemdZUDQxZU93c2w0M3I0d1kwRytYdzllTWpDOENmcHl0QXZBU0dGTUlw?=
- =?utf-8?B?MjJpRmRwWjUrZlAyaklpOUE1TFpRMkI2ejQ4eU5pNThRR2FIRWp4OVYvTzU0?=
- =?utf-8?B?L0NXRW9Kc1l1Zm5wQ0xFS2VzckRhcno2Q0RHc2NBbTZTbVc4NkpZSVdnNjZl?=
- =?utf-8?B?L0xReXJsSGorYUZWOG1UWUwzMzdiRDFUSDI2OStLYUpFNEZxeDJRNW5EbDln?=
- =?utf-8?B?T1ZEalVCNlBIVm9aTkJ0YlZxYmNLQ1BzZ0dZcDExTGtRcFBYV0ZuRlJ1VHFP?=
- =?utf-8?B?Zi9pZEdyMXIycW9seGhZTzRoTHVSZjUza1dRM2ZaYUJHY1JHMGFMNzQ0V3lp?=
- =?utf-8?B?b2xjUk1mNklCR0JkYklhSVhmcUNuM1gwNHNQRVBoSDVFZDNQWjRTR3R3ZnZ2?=
- =?utf-8?B?N09CQytDeUE5Qzd1VksyTk5ieTNjbGZFdVVRTlQ2VXJCczZPUUY5b2tOb3Qr?=
- =?utf-8?B?Nitrd0x2ZnlEeGxKdGFnTm1Qa0Z1MGx5M1YxN0xlejM1NGNDalRTQ2YrR2xG?=
- =?utf-8?B?dVNsWFNuclNHL3QrUStiQzBJYWJGaXVocXVBZFVwNmlRVjg3ZzVEVHNvUGpw?=
- =?utf-8?B?dmw5SENuNUNDUEIzYmRZYnV6QmV0eGt1NFEydnlmN1MveFROMWhUVUxOVWND?=
- =?utf-8?B?ejhVTldCTHdyMnZUVkFJejYzc2NOTXo0N25FU0hHcGd2M3VPdHlDMnFROHh1?=
- =?utf-8?B?UTJMb3d1WXBjTmljL1pXQTdSY0ladkVyRVZHUWpGRUNkdnk0cVB3NEM2R2c0?=
- =?utf-8?B?emtyTjViUXB6SFRrcExVSTI2UmJpNk0xemhqdUlUK3g0MVovSjlmVW1iOWxG?=
- =?utf-8?B?WGdOME8zMWJmYlk5UENvWG9zRGJyN3FGZC9FSW1vYUdQMUJNbXM1L0pvUHpB?=
- =?utf-8?B?Mk5QS3NZR0tibUZLamxqQkRXUWF2MG1lbk1pL1doOTUrVU9QeGE3dDdyTjFJ?=
- =?utf-8?B?RWZqNzBwSlo4T2t5YjVrZXpLVXFsVjNyUCtJSDJaOTVmQkdGblZDcEM1eTJx?=
- =?utf-8?B?NVMraTMwb2FuaXNNckhQZGZaN2RuWmRXdlFIbVR0azliL3FxRUpoblg3S1l0?=
- =?utf-8?B?ODVaSFI4djFNcXVCSXRlUGdLN3JMT3dSWU94b1pjQU5rb2xBK0VyV2RvTHRM?=
- =?utf-8?B?eXlscG0rTEg2YkpiNkxzMFVDQ3hITG9VWHpCRnFqdnVFQUd5RmZBRzBCZEZj?=
- =?utf-8?B?QzAzQnhOdTZVSzVUSlVlVFlnU3N4WGZBYS9NcW5FcGlMcmlsRGlkZEhMSVpT?=
- =?utf-8?B?UjhVTTJzR1oyYlY2OFh3NXNncEZQWGQ0SUpsbUx5WC8rWkk2MVJUWVAwUEto?=
- =?utf-8?B?QzQ1SWlWTXVHZ1QyR09FaUlpblBuWkZPb1lRU2J5aG5QU3J3dVBvVDdKTEto?=
- =?utf-8?B?TlRkTGRtREVvSzdpdWxPWTlzK0xXdjVRTTUvMGk3dWtsVnJZOVlKTG0ra29x?=
- =?utf-8?B?ck5CRW5oSW82QUYyemlXODBJVEppTXJlRm9LUFpGa0kxUFZOSUZZMkVZYW14?=
- =?utf-8?B?ZGpBWXpvbXdacnRlMHB0cnl1TE9DTDlwdXFmdzFYeWNxcm9wSHYxUTZvaHhH?=
- =?utf-8?B?akpzei9vMWhlejc2eGdYSEF5MW10R2tFVmpxU1NQWUduWkZjWnJBR0RtYlBK?=
- =?utf-8?B?bHVmaXYwUHRnM3RaV0Q0djhDbkp2Q3R2QTRuRmUzYjFNUUs3cEZZZGpFZklC?=
- =?utf-8?B?N29vZ2FRbkd0RGlZQ21XM3lBaWhaNmF1eHpDc0tMN1MrQkpXdFpqU3NEc2Qz?=
- =?utf-8?B?Yk9jbWFTNUF6YkpwOXkyTFI3b1NZKzQrR1lvZWhCeWpnSHZxRWptZzFqRVZ0?=
- =?utf-8?B?MzkzcHE3eituNmdIMlNySTAwVmg1Ti9qQWcyb21aRjQyQVNhSFdHZz09?=
-X-Exchange-RoutingPolicyChecked: by0YkeePFX1gXAc1EEcZHPcjrfVIVza7yEmA3RMjMje4yUIeflkSezCGdSBPiupbe4EhY2OfsMhcB4ApwkaQUW23yIdh78YGk/BVvKB16BgPEoTFT0fUxRCOAIrtpSbzJSx9SZY/d++wDwUvmBOqG7UDYnh13fM4ljnw66Bc6doT1C0DoxOATxMaFIAQ5mPR6yTqMNO6TnSLL100aijPXgSY3wb+e8ing3H4dfbXcT3d++7dQd+SxU95fMmDG5QGwIJ6knQPYHqwuoGKiAMMqkl9BqLxKHHhPJD6EkbytEnjYiNUwxYOgUcxl/Mmh89nZ88pj4wYO5sVpZMb24Nwaw==
-X-MS-Exchange-CrossTenant-Network-Message-Id: bf030c1b-2bce-4aa0-119c-08dedeccf093
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7381.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2026 21:48:12.6224
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mzfa9YPPALvAC94VhUI6a1+EtRy34QSn1Ju9Zze2nXZ7xcYBfzLJNHxm6Xa99WlbyOu/QBklcW9dC1NkX8KHhc7Nmmbxx5qdmxOi+aH4+zM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB9697
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306699-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-306698-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:anthony.l.nguyen@intel.com,m:larysa.zaremba@intel.com,m:przemyslaw.kitszel@intel.com,m:aleksander.lobakin@intel.com,m:sridhar.samudrala@intel.com,m:anjali.singhai@intel.com,m:michal.swiatkowski@linux.intel.com,m:maciej.fijalkowski@intel.com,m:emil.s.tantilov@intel.com,m:madhu.chittim@intel.com,m:joshua.a.hay@intel.com,m:jacob.e.keller@intel.com,m:jayaprakash.shanmugam@intel.com,m:jiri@resnulli.us,m:horms@kernel.org,m:corbet@lwn.net,m:richardcochran@gmail.com,m:linux-doc@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[intel.com,linux.intel.com,resnulli.us,kernel.org,lwn.net,gmail.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:from_mime,intel.com:email,intel.com:mid,intel.com:dkim];
-	RCPT_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:from_mime,intel.com:dkim,intel.com:mid,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5424473F1C6
+X-Rspamd-Queue-Id: DE9E473F2C1
 
-On 7/6/2026 4:31 PM, Jacob Keller wrote:
-> Commit 16dfa49406bc ("ice: Introduce new parameters in ice_sched_node")
-> added a sched_node_ids xarray to the port info structure, but never called
-> xa_destroy on it.
-> 
-> Since xarrays can allocate internal memory, this can result in a memory
-> leak even if every element in the xarray has been removed.
-> 
-> The xarray is currently embedded in the port_info structure. This appears
-> to have been done because its use is within functions that take the
-> port_info as a primary argument.
-> 
-> However, this complicates managing the lifecycle of the field. The
-> port_info structure is allocated in ice_init_hw() using devm, and it is
-> not released until the devm cleanup when the driver is unloaded.
-> 
-> The ice_init_hw() function is called in many places, including devlink
-> reload, and possibly during DDP load after updating the Tx scheduler
-> layout.
-> 
-> Adding a call of xa_destroy to the ice_deinit_hw() causes Sashiko to raise
-> multiple concerns due to potential ordering issues and possible ways that
-> port_info could be a dangling reference.
-> 
-> To handle this, move the sched_node_ids out of port_info and into the hw
-> structure. All users of the array already have a pointer to hw anyways, and
-> there is only one sched_node_ids per adapter. While here, remove the overly
-> verbose comment explaining the nature of the sched_node_ids xarray.
-> 
-> Add the missing xa_destroy to the cleanup path and to ice_deinit_hw(),
-> ensuring that we properly release the xarray memory.
-> 
-> This was caught by Sashiko during development of unrelated code.
-> 
-> Fixes: 16dfa49406bc ("ice: Introduce new parameters in ice_sched_node")
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> ---
+Larysa Zaremba says:
 
---8<--
+This patch series adds the iXD driver, which supports the Intel(R)
+Control Plane PCI Function on Intel E2100 and later IPUs and FNICs.
+It facilitates a centralized control over multiple IDPF PFs/VFs/SFs
+exposed by the same card. The reason for the separation is to be able
+to offload the control plane to the host different from where the data
+plane is running.
 
-> index ef1ce106f81b..04633103e3e6 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_common.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-> @@ -1146,6 +1145,8 @@ int ice_init_hw(struct ice_hw *hw)
->  	ice_cleanup_fltr_mgmt_struct(hw);
->  err_unroll_sched:
->  	ice_sched_cleanup_all(hw);
-> +err_unroll_xarray:
-> +	xa_destroy(&hw->sched_node_ids);
->  err_unroll_alloc:
->  	devm_kfree(ice_hw_to_dev(hw), hw->port_info);
+This is the first phase in the release of this driver where we implement the
+initialization of the core PCI driver. Subsequent phases will implement
+advanced features like usage of idpf ethernet aux device, link management,
+NVM update via devlink, switchdev port representors, data and exception path,
+flow rule programming, etc.
 
-Sashiko says:
-> This is a pre-existing issue, but does this error unroll path leave a dangling
-> pointer?
-> In ice_init_hw(), when hw->port_info is explicitly freed here, the pointer is
-> not set to NULL.
-> If devlink reload retry is triggered and ice_init_hw() is called again,
-> it will see a non-NULL hw->port_info and skip the allocation:
-> 	if (!hw->port_info)
-> 		hw->port_info = devm_kzalloc(ice_hw_to_dev(hw),
-> 					     sizeof(*hw->port_info),
-> 					     GFP_KERNEL);
-> Additionally, during teardown in ice_deinit_hw(), the dangling hw->port_info
-> is unconditionally dereferenced in ice_sched_cleanup_all() ->
-> ice_sched_clear_port(hw->port_info), potentially leading to a use-after-free.
-> Would it be safer to set hw->port_info to NULL immediately after freeing it?
+The first phase entails the following aspects:
 
-This issue is clearly pre-existing. I think it only affects devlink
-reload, because ice_probe() exits immediately if ice_init_hw() fails. I
-will create and submit a separate fix for this, and do not believe it
-should hold up the existing fix.
+1. Additional libie functionalities:
+Patches 1-5 introduce additional common library API for drivers to
+communicate with the control plane through mailbox communication.
+A control queue is a hardware interface which is used by the driver
+to interact with other subsystems (like firmware). The library APIs
+allow the driver to setup and configure the control queues to send and
+receive virtchnl messages. The library has an internal bookkeeping
+(XN API) mechanism to keep track of the send messages. It supports both
+synchronous as well as asynchronous way of handling the messages. The
+library also handles the timeout internally for synchronous messages
+using events. This reduces the driver's overhead in handling the timeout
+error cases.
 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_sched.c b/drivers/net/ethernet/intel/ice/ice_sched.c
-> index fff0c1afdb41..ffa18d86729a 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_sched.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_sched.c
-> @@ -977,7 +977,7 @@ ice_sched_add_elems(struct ice_port_info *pi, struct ice_sched_node *tc_node,
->  		if (!new_node->name)
->  			return -ENOMEM;
->  
-> -		status = xa_alloc(&pi->sched_node_ids, &new_node->id, NULL, XA_LIMIT(0, UINT_MAX),
-> +		status = xa_alloc(&hw->sched_node_ids, &new_node->id, NULL, XA_LIMIT(0, UINT_MAX),
->  				  GFP_KERNEL);
->  		if (status) {
->  			ice_debug(hw, ICE_DBG_SCHED, "xa_alloc failed for sched node status =%d\n",
+The current patch series supports only APIs that are needed for device
+initialization. These include APIs in the libie_pci module:
+* Allocating/freeing the DMA memory and mapping the MMIO regions for
+  BAR0, read/write APIs for drivers to access the MMIO memory
 
-Sashiko says:
-> 
-> This isn't a bug introduced by this patch, but does this allocation failure
-> leave a partially initialized node in the software tree?
-> In ice_sched_add_elems(), if kzalloc() for new_node->name or xa_alloc()
-> fails, the function returns -ENOMEM or breaks the loop without removing
-> new_node from the parent's children array. 
-> Because new_node->id remains zero-initialized, subsequent teardown via
-> ice_free_sched_node() calls xa_erase() on ID 0:
-> 	xa_erase(&hw->sched_node_ids, node->id);
-> Could this erroneously erase ID 0 from the xarray, corrupting the ID
-> allocator and potentially causing ID collisions for active scheduler nodes?
+and libie_cp module:
+* Control queue initialization and configuration
+* Transport initialization for bookkeeping
+* Blocking and asynchronous mailbox transactions
 
+Once the mailbox is initialized, the drivers can send and receive virtchnl
+messages to/from the control plane.
 
-This is also a pre-existing issue with the sched_node_ids, and likely
-requires us to do some sort of cleanup. This should also be resolved as
-a separate fix and not hold up this fix.
+The modules above are not supposed to be linked with the main libie library,
+but do share the folder with it.
 
-I plan to finish investigating and submit fixes for both of these issues
-as a follow-up.
+2. idpf:
+Patches 6-11 refactor the idpf driver to use the libie APIs for control
+queue configuration, virtchnl transaction, device initialization
+and reset and adjust related code accordingly.
 
-Thanks,
-Jake
+3. ixd:
+Patches 12-15 add the ixd driver and implement multiple pieces of the
+initialization flow as follows:
+* Add the ability to load
+* A reset is issued to ensure a clean device state, followed by
+  initialization of the mailbox
+* Device capabilities:
+  As part of initialization, the driver has to determine what the device is
+  capable of (ex. max queues, vports, etc). This information is obtained from
+  the firmware and stored by the driver.
+* Enable initial support for the devlink interface
+---
+v4:
+* use check_add_overflow() for MMIO offset+size bounds check in libie_pci
+* replace iounmap() with pci_iounmap() for MMIO regions in libie_pci
+* fix missing rx_buf->offset when constructing ctlq Rx message address
+* always zero Rx descriptor before reallocation
+* do not call complete() inside spinlock, theoretical use-after-free
+* reset async xn state to IDLE before freeing in libie_ctlq_xn_shutdown()
+* zero control queue Tx descriptor before freeing memory
+* remove unused ctx field from struct libie_ctlq_xn_clean_params
+* roll back merging of idpf_deinit_dflt_mbx() and xnm shutdown,
+  those calls are separate again (so idpf refactoring becomes more trivial)
+* introduce idpf_send_vf_reset_msg() for one-way VF reset message bypassing
+  XN manager, which is shut down by now
+* guard libie_ctlq_xn_shutdown() against NULL xnm in idpf_vc_event_task(),
+  this is needed if reset fails and reschedules
+* validate response sizes in idpf more
+* fix MAINTAINERS glob pattern for include/linux/net/intel/
+* roll back linux/{net/intel -> intel}/* change (1st patch)
+* use pci_iomap_range() to map regions in libie_pci
+* improve libie_pci commit message
+* remove broken dead code for getting RSS from idpf (new patch!)
+* use maximum alignment for control queue stack buffer in ixd
+* fix ixd_ctlq_clean_sq() usage
+* do not register ixd devlink prematurely
+* improve receive buffer size validation in idpf
+
+v3: https://lore.kernel.org/netdev/20260515224443.2772147-1-anthony.l.nguyen@intel.com/
+- lock libie ctlq transaction earlier on Rx path
+- improve ctlq Rx buffer size validation both in idpf and libie
+- fix RSS LUT buf size (will also go to stable separately)
+- improve xnm shutdown handling
+- skip zero-sized BAR regions instread of returning error in idpf
+- unify treatment of initialized and uninitialized ctlq messages
+
+v2: https://lore.kernel.org/netdev/20260403194938.3577011-1-anthony.l.nguyen@intel.com/
+- improved failure handling and input validation
+- removed cp version from devlink in ixd
+
+v1: https://lore.kernel.org/netdev/20260317230905.847744-1-anthony.l.nguyen@intel.com/
+
+The following are changes since commit 23dad2d088dfc82cae1f5a936f8ff7ffebb38dd9:
+  tun: no longer rely on RTNL in tun_fill_info()
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 200GbE
+
+Amritha Nambiar (1):
+  ixd: add devlink support
+
+Larysa Zaremba (6):
+  idpf: remove unused code for getting RSS info from device
+  idpf: make mbx_task queueing and cancelling more consistent
+  idpf: print a debug message and bail in case of non-event ctlq message
+  ixd: add basic driver framework for Intel(R) Control Plane Function
+  ixd: add reset checks and initialize the mailbox
+  ixd: add the core initialization
+
+Pavan Kumar Linga (4):
+  libeth: allow to create fill queues without NAPI
+  idpf: remove 'vport_params_reqd' field
+  idpf: refactor idpf to use libie_pci APIs
+  idpf: refactor idpf to use libie control queues
+
+Phani R Burra (3):
+  libie: add PCI device initialization helpers to libie
+  libie: add control queue support
+  libie: add bookkeeping support for control queue messages
+
+Victor Raj (1):
+  virtchnl: move virtchnl and virtchnl2 headers to
+    'include/linux/net/intel'
+
+ .../device_drivers/ethernet/index.rst         |    1 +
+ .../device_drivers/ethernet/intel/ixd.rst     |   39 +
+ Documentation/networking/devlink/index.rst    |    1 +
+ Documentation/networking/devlink/ixd.rst      |   30 +
+ MAINTAINERS                                   |    3 +-
+ drivers/net/ethernet/intel/Kconfig            |    2 +
+ drivers/net/ethernet/intel/Makefile           |    1 +
+ drivers/net/ethernet/intel/i40e/i40e.h        |    2 +-
+ drivers/net/ethernet/intel/i40e/i40e_common.c |    2 +-
+ .../net/ethernet/intel/i40e/i40e_prototype.h  |    2 +-
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.h    |    2 +-
+ drivers/net/ethernet/intel/iavf/iavf.h        |    2 +-
+ drivers/net/ethernet/intel/iavf/iavf_common.c |    2 +-
+ .../net/ethernet/intel/iavf/iavf_prototype.h  |    3 +-
+ drivers/net/ethernet/intel/iavf/iavf_types.h  |    4 +-
+ drivers/net/ethernet/intel/ice/ice.h          |    2 +-
+ drivers/net/ethernet/intel/ice/ice_common.h   |    2 +-
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h   |    2 +-
+ .../net/ethernet/intel/ice/virt/virtchnl.h    |    2 +-
+ drivers/net/ethernet/intel/idpf/Kconfig       |    1 +
+ drivers/net/ethernet/intel/idpf/Makefile      |    2 -
+ drivers/net/ethernet/intel/idpf/idpf.h        |   99 +-
+ .../net/ethernet/intel/idpf/idpf_controlq.c   |  621 ------
+ .../net/ethernet/intel/idpf/idpf_controlq.h   |  144 --
+ .../ethernet/intel/idpf/idpf_controlq_api.h   |  177 --
+ .../ethernet/intel/idpf/idpf_controlq_setup.c |  169 --
+ drivers/net/ethernet/intel/idpf/idpf_dev.c    |  101 +-
+ .../net/ethernet/intel/idpf/idpf_ethtool.c    |   28 +-
+ drivers/net/ethernet/intel/idpf/idpf_idc.c    |   38 +-
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    |   69 +-
+ drivers/net/ethernet/intel/idpf/idpf_main.c   |  115 +-
+ drivers/net/ethernet/intel/idpf/idpf_mem.h    |   20 -
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   |    4 +-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   |    4 +-
+ drivers/net/ethernet/intel/idpf/idpf_vf_dev.c |   96 +-
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 1879 +++++++----------
+ .../net/ethernet/intel/idpf/idpf_virtchnl.h   |  107 +-
+ .../ethernet/intel/idpf/idpf_virtchnl_ptp.c   |  312 +--
+ drivers/net/ethernet/intel/ixd/Kconfig        |   15 +
+ drivers/net/ethernet/intel/ixd/Makefile       |   13 +
+ drivers/net/ethernet/intel/ixd/ixd.h          |   59 +
+ drivers/net/ethernet/intel/ixd/ixd_ctlq.c     |  146 ++
+ drivers/net/ethernet/intel/ixd/ixd_ctlq.h     |   34 +
+ drivers/net/ethernet/intel/ixd/ixd_dev.c      |   89 +
+ drivers/net/ethernet/intel/ixd/ixd_devlink.c  |   97 +
+ drivers/net/ethernet/intel/ixd/ixd_devlink.h  |   50 +
+ drivers/net/ethernet/intel/ixd/ixd_lan_regs.h |   68 +
+ drivers/net/ethernet/intel/ixd/ixd_lib.c      |  174 ++
+ drivers/net/ethernet/intel/ixd/ixd_main.c     |  147 ++
+ drivers/net/ethernet/intel/ixd/ixd_virtchnl.c |  178 ++
+ drivers/net/ethernet/intel/ixd/ixd_virtchnl.h |   12 +
+ drivers/net/ethernet/intel/libeth/rx.c        |   12 +-
+ drivers/net/ethernet/intel/libie/Kconfig      |   14 +
+ drivers/net/ethernet/intel/libie/Makefile     |    8 +
+ drivers/net/ethernet/intel/libie/controlq.c   | 1223 +++++++++++
+ drivers/net/ethernet/intel/libie/pci.c        |  209 ++
+ include/linux/net/intel/libie/controlq.h      |  424 ++++
+ include/linux/net/intel/libie/pci.h           |   56 +
+ include/linux/{avf => net/intel}/virtchnl.h   |    0
+ .../linux/net/intel}/virtchnl2.h              |    0
+ .../linux/net/intel}/virtchnl2_lan_desc.h     |    0
+ include/net/libeth/rx.h                       |    4 +-
+ 62 files changed, 4226 insertions(+), 2896 deletions(-)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/intel/ixd.rst
+ create mode 100644 Documentation/networking/devlink/ixd.rst
+ delete mode 100644 drivers/net/ethernet/intel/idpf/idpf_controlq.c
+ delete mode 100644 drivers/net/ethernet/intel/idpf/idpf_controlq.h
+ delete mode 100644 drivers/net/ethernet/intel/idpf/idpf_controlq_api.h
+ delete mode 100644 drivers/net/ethernet/intel/idpf/idpf_controlq_setup.c
+ delete mode 100644 drivers/net/ethernet/intel/idpf/idpf_mem.h
+ create mode 100644 drivers/net/ethernet/intel/ixd/Kconfig
+ create mode 100644 drivers/net/ethernet/intel/ixd/Makefile
+ create mode 100644 drivers/net/ethernet/intel/ixd/ixd.h
+ create mode 100644 drivers/net/ethernet/intel/ixd/ixd_ctlq.c
+ create mode 100644 drivers/net/ethernet/intel/ixd/ixd_ctlq.h
+ create mode 100644 drivers/net/ethernet/intel/ixd/ixd_dev.c
+ create mode 100644 drivers/net/ethernet/intel/ixd/ixd_devlink.c
+ create mode 100644 drivers/net/ethernet/intel/ixd/ixd_devlink.h
+ create mode 100644 drivers/net/ethernet/intel/ixd/ixd_lan_regs.h
+ create mode 100644 drivers/net/ethernet/intel/ixd/ixd_lib.c
+ create mode 100644 drivers/net/ethernet/intel/ixd/ixd_main.c
+ create mode 100644 drivers/net/ethernet/intel/ixd/ixd_virtchnl.c
+ create mode 100644 drivers/net/ethernet/intel/ixd/ixd_virtchnl.h
+ create mode 100644 drivers/net/ethernet/intel/libie/controlq.c
+ create mode 100644 drivers/net/ethernet/intel/libie/pci.c
+ create mode 100644 include/linux/net/intel/libie/controlq.h
+ create mode 100644 include/linux/net/intel/libie/pci.h
+ rename include/linux/{avf => net/intel}/virtchnl.h (100%)
+ rename {drivers/net/ethernet/intel/idpf => include/linux/net/intel}/virtchnl2.h (100%)
+ rename {drivers/net/ethernet/intel/idpf => include/linux/net/intel}/virtchnl2_lan_desc.h (100%)
+
+-- 
+2.47.1
+
 
