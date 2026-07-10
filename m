@@ -1,232 +1,117 @@
-Return-Path: <netdev+bounces-306627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306628-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id yRgAJRscUWoI/gIAu9opvQ
-	(envelope-from <netdev+bounces-306627-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 18:21:47 +0200
+	id tXM0KkMfUWp2/gIAu9opvQ
+	(envelope-from <netdev+bounces-306628-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 18:35:15 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3805E73C8AE
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 18:21:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2272273C9B4
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 18:35:15 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ibm.com header.s=pp1 header.b=rfBwgqiU;
-	dmarc=pass (policy=none) header.from=ibm.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306627-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306627-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=f31374gC;
+	dmarc=pass (policy=none) header.from=lunn.ch;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306628-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306628-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 76B50300E2BE
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:21:13 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7776530066BF
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:35:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 480E143B3E6;
-	Fri, 10 Jul 2026 16:20:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1932368D5B;
+	Fri, 10 Jul 2026 16:35:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF12535B636;
-	Fri, 10 Jul 2026 16:20:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C5C26F293;
+	Fri, 10 Jul 2026 16:35:09 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783700455; cv=none; b=MD3ystZhZ9eGyGjuDwYAbydQUGuuX5O7xNqwF4WqoU/JvbbhJhi9OmubzbRKXhPuE98EHM3LNlJLvRauA7Db1NvvZg0xoFZYiZpjQX5w3GgHM9bFEu4qS3GgO1ZpMkfCp1YRC+DBy2t3EN2pIhGRh9rfKryxDzvw6JxWJMuzFxM=
+	t=1783701310; cv=none; b=n6SIK0QYDpk7Ri+9vFNLSyARLE2rBU/4kk6/mMQjQhNv9ngm7RZn04AiTQy0vXNs9boZCL7KgDIazDc+vpM6bOhZErlYyaJu76wnalxlYZ9RGXIVb3lyQdCGHWfVvP3ubobKjXKK0mqbe/0WCX3RORyeLrZqaaE0ZUz73kHw/n8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783700455; c=relaxed/simple;
-	bh=F/PzMlD439hjs/+LtSmm1Sln4QqVW+3ZxZ3zo5M5s3o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DEYw/KJHtlhYlfz+KVh+q5rcMVmG7hfKYRAkbPhuvLFxygtzyKYFdPe4UqfuvdrrbmtIT3aFRcb0TYAuLifwV9ZaqMsZkK3AZbon3xPmY8Q1Cwcf/WKeb4W4bEYnxaNlSinuMrRqoRIrzV40pUnszcc4T1lPk8nEXVv5zNafsjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rfBwgqiU; arc=none smtp.client-ip=148.163.156.1
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66AEmT6S1406421;
-	Fri, 10 Jul 2026 16:20:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=rvypab
-	OPgFIAwubdsxLV5tUUF/uP6jnR3fbYqNpCAnA=; b=rfBwgqiU7/t/Hb4AqKqZeb
-	bw8wCYEnBM9sry6Coq4dDYIZK5r963Ds/1zUyxiQ6EnaI+DMu1QcxrfDb23v87QU
-	XFLivW04LY9Majc7wpJasCvnbPhzC+hngUI1fYkNjqwvYVM852KlBIudkxxUgmKI
-	neeEfnYdet7/cgElWpOskF5jb5vv0BkxjHJ9PStsNxBmsy/emRFM9rMTyYlYBH+7
-	5SeCvGcrVDmRaMtLUbPiyjx07+UulSg/hPRU4OYQxw3ZMiM84cR0NH3aI2vxRD0i
-	on0Ovaj4cn5gXn7ZRL4KfJsFQH5K6/6+bWbaHi1tv+SMlkBbdwpUq5rOatki0Urw
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fafh0cwhf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jul 2026 16:20:40 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66AGJhIO009610;
-	Fri, 10 Jul 2026 16:20:39 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4f7eqgjk0u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jul 2026 16:20:39 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66AGKcDS27591350
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 Jul 2026 16:20:38 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 604855805B;
-	Fri, 10 Jul 2026 16:20:38 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 38FEE58059;
-	Fri, 10 Jul 2026 16:20:31 +0000 (GMT)
-Received: from [9.124.217.113] (unknown [9.124.217.113])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 10 Jul 2026 16:20:30 +0000 (GMT)
-Message-ID: <ce0f02ed-ec5e-4757-b95c-f8cc2645370b@linux.ibm.com>
-Date: Fri, 10 Jul 2026 21:50:28 +0530
+	s=arc-20240116; t=1783701310; c=relaxed/simple;
+	bh=QRl5+SWRonZygH8EGrKKbgj5UpBB1S6mijDUwycD9vA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qrM7CJBvvvjMLv0Fn56RmGra9SdeHGDUHPKdUiTlh4iqLirtRUO0QSXr8C2QaceqZPTQ+RDXpLKt56CqVZ5yuOyVnHy+tesFBAfD4qdSY/+MWMNveX4OewTmNOY5rqs0Memfh/gKmtv66Pj/AO37yU82+t2sLGFm+VnOyecOC4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=f31374gC; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=mKoA++2FvpRfbjJH0g7fyztWo+KTteketPfqtWfa26U=; b=f31374gCPEiuOGhG/A6F8DXIz0
+	z2Jzji9FI6+p8VuCbTHThMZlUrQcMYPVmc4AtoOcHeLZUSJXPjdHZ4wT6GBUkNSqY6l9ymWgcQ+30
+	zlk5RJq2tqF+lXPhZsQE8a/PRUa45+ltdYlq2oRObwkWDIFNsoC+IL2GzdYNB2hlO+UU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wiEBf-00BfWs-LQ; Fri, 10 Jul 2026 18:34:51 +0200
+Date: Fri, 10 Jul 2026 18:34:51 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Cen Zhang (Microsoft)" <blbllhy@gmail.com>
+Cc: jmaloy@redhat.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org, vadim.fedorenko@linux.dev,
+	tung.quang.nguyen@est.tech, AutonomousCodeSecurity@microsoft.com,
+	tgopinath@linux.microsoft.com, kys@microsoft.com
+Subject: Re: [PATCH net v4] tipc: fix u16 MTU truncation in media and bearer
+ MTU validation
+Message-ID: <3ec7b01a-270a-4b57-af9e-bdbf85313da2@lunn.ch>
+References: <20260709211649.15623-1-blbllhy@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/af_iucv: fix NULL deref in
- afiucv_hs_callback_syn()
-To: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>
-Cc: "horms@kernel.org" <horms@kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "wintera@linux.ibm.com" <wintera@linux.ibm.com>,
-        "twinkler@linux.ibm.com" <twinkler@linux.ibm.com>,
-        "heiko.carstens@de.ibm.com" <heiko.carstens@de.ibm.com>,
-        "gor@linux.ibm.com" <gor@linux.ibm.com>,
-        "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
-        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-        "svens@linux.ibm.com" <svens@linux.ibm.com>
-References: <20260709191732.124092-1-hidayath@linux.ibm.com>
- <PH0PR11MB590247B1CA37A1E9A4B4FD79F0FD2@PH0PR11MB5902.namprd11.prod.outlook.com>
-Content-Language: en-GB
-From: Hidayathulla Khan I <hidayath@linux.ibm.com>
-In-Reply-To: <PH0PR11MB590247B1CA37A1E9A4B4FD79F0FD2@PH0PR11MB5902.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=VebH+lp9 c=1 sm=1 tr=0 ts=6a511bd9 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
- a=VwQbUJbxAAAA:8 a=EGRZ104ItT1sqjb4XsEA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: lBZ6gJ55hd8rUgtCX85dNJW8K3ouhM-U
-X-Proofpoint-ORIG-GUID: B3MyERg9-DGZMCU4Xf_rkrHGdIZGgevS
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEwMDE2MyBTYWx0ZWRfX5xaq1VDW1+bK
- p2w9+6fnw01R/AkOyuRuV+gS4yO+p/buEpAOO+73llI27oUECk4DhDdYvmshGckDZgTNKLrOsOf
- V1cwhDNesxbUFzy1VwtvRvFTRBK8OFI=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEwMDE2MyBTYWx0ZWRfX/MYWQdmsHPNm
- fMe4AknV+6p/DEtKHkDYBH2mulFkHtmXK6CissaCCc1LjDwVHnGA3X8zpRX17jliwKiu1wCDsmV
- IcntUFxANKCghDSGsXSwoelzwJaiC/Ut554KHMuAQBOTbiME9wfR3JkuPKpwd6uQA99STS6DROY
- OLwfDCPxJfyQybTFwJageN5x0CJ8f9kiVQkdUKgj/xdOjo/WOkHtW6SrioHZaxPgDt9slpdS7YU
- vqaCK7mhgDsjKFBZCDMjX6kOWvxs1qoWQDEqDfeWV+lWvoi61RJgk4mk/WVgXOaVo8Hp/S6aaqO
- ijLhDGxyq5fuXoYZX5ss+uUG5qoBDsyKvzR3bVs9xLZpN6h13Yt2yZM3qoispxnwnmJElcBB6LA
- JbFJzYWAQmj3+xoUa84CWl2G0dThomJ05yTnqJhn8SbNbol6sXrBVH2UceYmZ2qmm6IVG1YrQjd
- P4B7/qElAvPRL2g58kQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-10_04,2026-07-10_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 suspectscore=0 clxscore=1011 malwarescore=0
- impostorscore=0 phishscore=0 lowpriorityscore=0 adultscore=0 spamscore=0
- bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2607100163
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260709211649.15623-1-blbllhy@gmail.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306627-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jedrzej.jagielski@intel.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:wintera@linux.ibm.com,m:twinkler@linux.ibm.com,m:heiko.carstens@de.ibm.com,m:gor@linux.ibm.com,m:agordeev@linux.ibm.com,m:borntraeger@linux.ibm.com,m:svens@linux.ibm.com,s:lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	DKIM_TRACE(0.00)[ibm.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:blbllhy@gmail.com,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:vadim.fedorenko@linux.dev,m:tung.quang.nguyen@est.tech,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306628-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[hidayath@linux.ibm.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linux.ibm.com:mid,linux.ibm.com:from_mime,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hidayath@linux.ibm.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[11]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3805E73C8AE
+X-Rspamd-Queue-Id: 2272273C9B4
 
+On Thu, Jul 09, 2026 at 05:16:49PM -0400, Cen Zhang (Microsoft) wrote:
+> Both TIPC_NL_MEDIA_SET and TIPC_NL_BEARER_SET accept user-supplied
+> MTU values but only enforce a minimum bound, not a maximum.
 
-On 10/07/26 3:04 pm, Jagielski, Jedrzej wrote:
-> From: Hidayath Khan <hidayath@linux.ibm.com>
-> Sent: Thursday, July 9, 2026 9:18 PM
->
->> afiucv_hs_callback_syn() allocates the child socket with GFP_ATOMIC.
->> If the allocation fails, nsk is NULL.
->>
->> The connection-refused path is entered when the listen state check
->> fails, the accept backlog is full, or nsk is NULL. The code
->> unconditionally calls iucv_sock_kill(nsk) in that path.
->>
->> iucv_sock_kill() does not accept a NULL socket pointer and immediately
->> dereferences sk via sock_flag(sk, SOCK_ZAPPED). When nsk is NULL,
->> calling iucv_sock_kill(nsk) results in a NULL pointer dereference.
->>
->> Only call iucv_sock_kill() when a child socket was successfully
->> allocated.
->>
->> Fixes: 3881ac441f64 ("af_iucv: add HiperSockets transport")
->> Cc: stable@vger.kernel.org
->> Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
->> Signed-off-by: Hidayath Khan <hidayath@linux.ibm.com>
->> ---
->> net/iucv/af_iucv.c | 3 ++-
->> 1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/iucv/af_iucv.c b/net/iucv/af_iucv.c
->> index fed240b453bd..f5b1ec44b6ae 100644
->> --- a/net/iucv/af_iucv.c
->> +++ b/net/iucv/af_iucv.c
->> @@ -1872,7 +1872,8 @@ static int afiucv_hs_callback_syn(struct sock *sk, struct sk_buff *skb)
->> 		afiucv_swap_src_dest(skb);
->> 		trans_hdr->flags = AF_IUCV_FLAG_SYN | AF_IUCV_FLAG_FIN;
->> 		err = dev_queue_xmit(skb);
->> -		iucv_sock_kill(nsk);
->> +		if (nsk)
-> Hi Hidayath
->
-> why not to move this check into iucv_sock_kill()?
-> would prevent from potential similar issues in the future
-Hi Jedrzej,
+I don't know the tipc code at all..
 
-Every other call to iucv_sock_kill() passes a non-NULL socket by 
-construction.
+Can this be piped through netif_set_mtu()? It will call
+dev_validate_mtu() which will validate the MTU against dev->min_mtu
+and dev->max_mtu.
 
-If iucv_sock_kill() silently accepted NULL, a future caller wrongly
-passing NULL would go unnoticed instead of being caught.
-
->
->> +			iucv_sock_kill(nsk);
->> 		bh_unlock_sock(sk);
->> 		goto out;
->> 	}
->>
->> base-commit: 262b2eac463d880a664cf92af1107b4f9d84ad37
->> -- 
->> 2.52.0
->
->
+    Andrew
 
