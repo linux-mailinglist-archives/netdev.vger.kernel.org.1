@@ -1,216 +1,191 @@
-Return-Path: <netdev+bounces-306583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306584-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ZjweGPT9UGq+9gIAu9opvQ
-	(envelope-from <netdev+bounces-306583-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:13:08 +0200
+	id Xz53F8H+UGro9gIAu9opvQ
+	(envelope-from <netdev+bounces-306584-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:16:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF6C173BA95
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:13:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1FDC73BADB
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:16:32 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=vNgU6bC7;
-	dmarc=pass (policy=none) header.from=linux.dev;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306583-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306583-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linuxfoundation.org header.s=korg header.b=kgmiif0J;
+	dmarc=pass (policy=none) header.from=linuxfoundation.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306584-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306584-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DA90B301AA67
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:03:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BE4733040440
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 14:09:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469FE2EB859;
-	Fri, 10 Jul 2026 14:03:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 867C231D72E;
+	Fri, 10 Jul 2026 14:09:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7222E762C
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 14:03:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C349221D3E4;
+	Fri, 10 Jul 2026 14:09:53 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783692208; cv=none; b=j1ei36griH2TnxAIu+xUh2DuiURu23D6olCDVQHeBrm7rVX8qNQJ83D4p1LUgFevR5T0KbdIbLZ9Kgo/kTDBCMHzpqEiS1ANvZC+zIdF0RgOTAOcrllLjiPYiepBt+II70LVqTi5Ga0lYR97r9zlRZTmGXgosw7mSeXDGbNPmZM=
+	t=1783692595; cv=none; b=rArj6CV8zmGKEd2KEMM3QjBXRXRz48DKrJ5LQPT+K2oAJVNoCWATGUzox2l54Bq/RwEZiXAVRSJgRY6aXrWgg6nYfCNtdZ+6Y9HHVZbRtnL6JKjeSut+iJHmU3AxqrT+9psMipjXaSioywBwPCn5LMQJeiQ49/ONpGUxkavFgHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783692208; c=relaxed/simple;
-	bh=NMnp8am1BA6xzrrUXsYSHtwCeKFYEfEoZr5/9p8eS2Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B11GCHRFarwWOUXsM6rJ/n0Tf/gWCOAnv/1f8/lSMUE2hSjP8sRvL0/OhF+a+QUbZshxT2Zto97+PVrHxWmTKwTpZu3JPTnvTFiVp8dH8gqidg85dBnPozGLKc6qyKRE4UgFM8Z2OJImMi7U5WAqxby+5RNbUGcBg58UV1ApsRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vNgU6bC7; arc=none smtp.client-ip=95.215.58.183
-Message-ID: <a5bc092d-3312-4b1c-94cc-4a8bed6c6588@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783692193;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SAV48k/TGulRNnoJ6bMcRlsY0qC959NRu+LCzm6VfGU=;
-	b=vNgU6bC7d7cHwsrchD3CEuePnT26UK8tLc9gFh5By+UxHfT72+lNgxV803z8kQHaCwW82t
-	lIa1PrSB908EZcUAB7kTMOQf5G9o450BkFPdjPAbtYs0Yzjg0ku/y6kMpOx3lQPbqtr/OJ
-	h7DEyghtBuxdmr23dwAoEgkpe9VXMiM=
-Date: Fri, 10 Jul 2026 15:02:51 +0100
+	s=arc-20240116; t=1783692595; c=relaxed/simple;
+	bh=JMhdtMOLaUHWXqPIXTzBNMeZuvaIhZXyYL/o5sxmfz4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ET7QZ2lPgo2Irw7+T/cf+sarPdA+1JVvm1kSlqHZpXOxHYZdeJM0fLrb3B6jf/9IkEAc/28VaBeynhgy2Z9NsVx/7HoZGr6y+ZcarB+p8MLOeaV5svY1SQ2qQE86VhlWiYXqj4+EwGy5Us9aMHcEnZ0qXmixTUNDRkGYp4Sq0Ug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=kgmiif0J; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E7411F000E9;
+	Fri, 10 Jul 2026 14:09:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1783692593;
+	bh=h1xi3IKQjbdJ53JCv2L+jzRlcSu7ApiSTvfpodjcvtk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=kgmiif0JKq2HSeSzJ7OofwRSlUD94iS3uEV1tKQ943E0Dw5HJBa/NodJ+UjhAlKNH
+	 FGbXFGZ+JEAXY3Dr+tF4ssnWwH8WP2JApHQJxCeAynEVTGBtdWPwSFCDmJ7/fOYkFW
+	 Kncg2+p1T/D/wvPa/3glV7KVkw5wq6sn17XSngyM=
+Date: Fri, 10 Jul 2026 16:09:16 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Cc: Lee Jones <lee@kernel.org>,
+	Mark Brown <broonie@opensource.wolfsonmicro.com>,
+	Thierry Reding <thierry.reding@avionic-design.de>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Srinivas Kandagatla <srini@kernel.org>,
+	Vinod Koul <vkoul@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>, Rob Herring <robh@kernel.org>,
+	Saravana Kannan <saravanak@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Doug Berger <opendmb@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Ulf Hansson <ulfh@kernel.org>, Frank Li <Frank.Li@nxp.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Peter Chen <peter.chen@kernel.org>,
+	Paul Cercueil <paul@crapouillou.net>, Bin Liu <b-liu@ti.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Maximilian Luz <luzmaximilian@gmail.com>,
+	Hans de Goede <hansg@kernel.org>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>, brgl@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-sound@vger.kernel.org,
+	driver-core@lists.linux.dev, devicetree@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-i2c@vger.kernel.org,
+	iommu@lists.linux.dev, linux-pm@vger.kernel.org,
+	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	linux-usb@vger.kernel.org, linux-mips@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org, mfd@lists.linux.dev,
+	stable@vger.kernel.org, Manuel Ebner <manuelebner@mailbox.org>,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	Konrad Dybcio <konradybcio@kernel.org>
+Subject: Re: [PATCH v3 00/20] driver core: count references of the platform
+ device's fwnode, not OF node
+Message-ID: <2026071001-limelight-stoppable-d7cb@gregkh>
+References: <20260706-pdev-fwnode-ref-v3-0-1ff028e33779@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v4] tipc: fix u16 MTU truncation in media and bearer
- MTU validation
-To: Tung Quang Nguyen <tung.quang.nguyen@est.tech>,
- "Cen Zhang (Microsoft)" <blbllhy@gmail.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "tipc-discussion@lists.sourceforge.net"
- <tipc-discussion@lists.sourceforge.net>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "AutonomousCodeSecurity@microsoft.com"
- <AutonomousCodeSecurity@microsoft.com>,
- "tgopinath@linux.microsoft.com" <tgopinath@linux.microsoft.com>,
- "kys@microsoft.com" <kys@microsoft.com>,
- "jmaloy@redhat.com" <jmaloy@redhat.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>
-References: <20260709211649.15623-1-blbllhy@gmail.com>
- <GV1P189MB1988A52C474B5F7D7A9EC00CC6FD2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <GV1P189MB1988A52C474B5F7D7A9EC00CC6FD2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260706-pdev-fwnode-ref-v3-0-1ff028e33779@oss.qualcomm.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [3.84 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_RECIPIENTS(0.00)[m:bartosz.golaszewski@oss.qualcomm.com,m:lee@kernel.org,m:broonie@opensource.wolfsonmicro.com,m:thierry.reding@avionic-design.de,m:sebastian.hesselbarth@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:srini@kernel.org,m:vkoul@kernel.org,m:rafael@kernel.org,m:dakr@kernel.org,m:robh@kernel.org,m:saravanak@kernel.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:npiggin@gmail.com,m:chleroy@kernel.org,m:andi.shyti@kernel.org,m:andriy.shevchenko@linux.intel.com,m:joro@8bytes.org,m:will@kernel.org,m:robin.murphy@arm.com,m:opendmb@gmail.com,m:florian.fainelli@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:ulfh@kernel.org,m:Frank.Li@nxp.com,m:s.hauer@pengutronix.de,m:kernel@pengutronix.de,m:festevam@gmail.com,m:matthew.brost@intel.com,m:thomas.hellstrom@linux.intel.com,m:rodrigo.vivi@intel.com,m:airlied@gmail.com,m:simona@ffwll.ch,m:peter.chen@kernel.org,m:paul@crapouillou.net,m:b-liu@ti.com
+ ,m:p.zabel@pengutronix.de,m:luzmaximilian@gmail.com,m:hansg@kernel.org,m:ilpo.jarvinen@linux.intel.com,m:krzk@kernel.org,m:benh@kernel.crashing.org,m:brgl@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-sound@vger.kernel.org,m:driver-core@lists.linux.dev,m:devicetree@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:linux-i2c@vger.kernel.org,m:iommu@lists.linux.dev,m:linux-pm@vger.kernel.org,m:imx@lists.linux.dev,m:linux-arm-kernel@lists.infradead.org,m:intel-xe@lists.freedesktop.org,m:dri-devel@lists.freedesktop.org,m:linux-usb@vger.kernel.org,m:linux-mips@vger.kernel.org,m:platform-driver-x86@vger.kernel.org,m:mfd@lists.linux.dev,m:stable@vger.kernel.org,m:manuelebner@mailbox.org,m:wsa+renesas@sang-engineering.com,m:konradybcio@kernel.org,m:sebastianhesselbarth@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:tung.quang.nguyen@est.tech,m:blbllhy@gmail.com,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[est.tech,gmail.com];
-	RCVD_COUNT_THREE(0.00)[3];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306583-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-306584-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,opensource.wolfsonmicro.com,avionic-design.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,linux.ibm.com,ellerman.id.au,linux.intel.com,8bytes.org,arm.com,broadcom.com,nxp.com,pengutronix.de,intel.com,ffwll.ch,crapouillou.net,ti.com,kernel.crashing.org,vger.kernel.org,lists.linux.dev,lists.ozlabs.org,lists.infradead.org,lists.freedesktop.org,mailbox.org,sang-engineering.com];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	RCPT_COUNT_GT_50(0.00)[70];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linuxfoundation.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,renesas];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:from_mime,linux.dev:dkim,linux.dev:mid,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linuxfoundation.org:from_mime,linuxfoundation.org:dkim,gregkh:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AF6C173BA95
+X-Rspamd-Queue-Id: B1FDC73BADB
 
-On 10/07/2026 13:57, Tung Quang Nguyen wrote:
->> Subject: [PATCH net v4] tipc: fix u16 MTU truncation in media and bearer MTU
->> validation
->>
->> Both TIPC_NL_MEDIA_SET and TIPC_NL_BEARER_SET accept user-supplied
->> MTU values but only enforce a minimum bound, not a maximum. When a user
->> sets the MTU to a value exceeding U16_MAX (65535), it passes validation but is
->> silently truncated when assigned to u16 fields l->mtu and
->> l->advertised_mtu in tipc_link_create(). Values like 65536 (0x10000)
->> truncate to 0, causing a division by zero in tipc_link_set_queue_limits() which
->> computes TIPC_MAX_PUBL / (l->mtu / ITEM_SIZE). Other overflowing values
->> (e.g. 65537-131071) produce small incorrect MTU values, resulting in link
->> malfunction behaviors.
+On Mon, Jul 06, 2026 at 02:44:12PM +0200, Bartosz Golaszewski wrote:
+> Platform device core provides helper interfaces for dealing with
+> dynamically created platform devices. Most users should use
+> platform_device_register_full() which encapsulates most of the
+> operations but some modules will want to use the split approach of
+> calling platform_device_alloc() + platform_device_add() separately for
+> various reasons.
 > 
-> Yes, this is a bug. I can reproduce the same div-by-zero.
+> With many platform devices now using dynamic software nodes as their
+> primary firmware nodes and with the platform device interface being
+> extended to also better cover the use-cases of secondary software nodes,
+> I believe it makes sense to switch to counting the references of all
+> kinds of firmware nodes.
 > 
->>
->> Crash stack (triggered as unprivileged user via user namespace):
->>
->>   tipc_link_set_queue_limits  net/tipc/link.c:2531
->>   tipc_link_create            net/tipc/link.c:520
->>   tipc_node_check_dest        net/tipc/node.c:1279
->>   tipc_disc_rcv               net/tipc/discover.c:252
->>   tipc_rcv                    net/tipc/node.c:2129
->>   tipc_udp_recv               net/tipc/udp_media.c:392
->>
->> Two independent paths lack the upper bound check:
->> 1. tipc_udp_mtu_bad() -- called from __tipc_nl_media_set() (MEDIA_SET) 2.
->> inline check in __tipc_nl_bearer_set() at bearer.c:1160 (BEARER_SET)
->>
->> Fix both by rejecting MTU values above U16_MAX.
->>
->> Fixes: 901271e0403a ("tipc: implement configuration of UDP media MTU")
->> Reported-by: AutonomousCodeSecurity@microsoft.com
->> Closes: https://lore.kernel.org/all/CAB8m9WgETt0AjmFwE=F-
->> CKjGXsK6_WDv0=kbYRcC8-noo+amnA@mail.gmail.com
->> Signed-off-by: Cen Zhang (Microsoft) <blbllhy@gmail.com>
->> ---
->> v4: Add .min check value
->> v3: Use nla_policy check to limit MTU max value as suggested by Vadim
->> v2: Solved format issue
->> Link: https://lore.kernel.org/all/CAB8m9WgETt0AjmFwE=F-
->> CKjGXsK6_WDv0=kbYRcC8-noo+amnA@mail.gmail.com
->>
->> net/tipc/netlink.c | 7 ++++++-
->> 1 file changed, 6 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/tipc/netlink.c b/net/tipc/netlink.c index
->> 8336a9664703..811438c44542 100644
->> --- a/net/tipc/netlink.c
->> +++ b/net/tipc/netlink.c
->> @@ -113,12 +113,17 @@ const struct nla_policy
->> tipc_nl_node_policy[TIPC_NLA_NODE_MAX + 1] = {  };
->>
->> /* Properties valid for media, bearer and link */
->> +static const struct netlink_range_validation tipc_nl_mtu_range = {
->> +	.min = TIPC_MIN_BEARER_MTU,
+> To that end, I identified all users of platform_device_alloc() that also
+> assign dev.of_node or dev.fwnode manually. I noticed five cases where
+> the references are not increased as they should (patches 1-5 fix these
+> users) and provided three new functions in platform_device.h that now
+> become the preferred interfaces for assigning firmware nodes to dynamic
+> platform devices (in line with platform_device_add_data(),
+> platform_device_add_resources(), etc.). The bulk of the patches in this
+> series are small driver conversions to port all users to going through
+> the new functions that now encapsulate the refcount logic. With that
+> done, the final patch seamlessly switches to counting the references of
+> all firmware node types.
 > 
-> Adding lower threshold checking introduces two issues:
-> 1. Existing function tipc_udp_mtu_bad() can never return "true".
-
-it can. if MTU is in the range [TIPC_MIN_BEARER_MTU, TIPC_MIN_BEARER_MTU 
-+ sizeof(iphdr) + sizeof(udphdr)]
-
-> 2. Breaking user-space applications looking for error message " Error: MTU value is out-of-range". Look at the error messages before and after your patch:
-> [Before patch]
-> node1 ~ # tipc bearer set mtu 15 media udp name UDP0
-> Error: MTU value is out-of-range.
-> kernel answers: Invalid argument
+> This effort is prerequisite of removing platform_device_release_full()
+> and unifying the release path for dynamic platform devices using
+> unmanaged software nodes.
 > 
-> [After  patch]
-> node1 ~ # tipc bearer set mtu 15 media udp name UDP0
-> kernel answers: Numerical result out of range
+> Merging strategy: The entire series should go through the driver core
+> tree, possibly with an immutable branch provided to solve any potential
+> conflicts though these are rather unlikely.
 
-that's interesting, because this error message belongs to 9p scope...
+I've added this to the driver-core-testing branch now, thanks!
 
-anyways, we can keep v3 of this patch with .max value set only
-
-
-> 
->> +	.max = U16_MAX,
->> +};
->> +
->> const struct nla_policy tipc_nl_prop_policy[TIPC_NLA_PROP_MAX + 1] = {
->> 	[TIPC_NLA_PROP_UNSPEC]		= { .type = NLA_UNSPEC },
->> 	[TIPC_NLA_PROP_PRIO]		= { .type = NLA_U32 },
->> 	[TIPC_NLA_PROP_TOL]		= { .type = NLA_U32 },
->> 	[TIPC_NLA_PROP_WIN]		= { .type = NLA_U32 },
->> -	[TIPC_NLA_PROP_MTU]		= { .type = NLA_U32 },
->> +	[TIPC_NLA_PROP_MTU]		=
->> NLA_POLICY_FULL_RANGE(NLA_U32, &tipc_nl_mtu_range),
->> 	[TIPC_NLA_PROP_BROADCAST]	= { .type = NLA_U32 },
->> 	[TIPC_NLA_PROP_BROADCAST_RATIO]	= { .type = NLA_U32 }
->> };
->> --
->> 2.53.0
-> 
-
+greg k-h
 
