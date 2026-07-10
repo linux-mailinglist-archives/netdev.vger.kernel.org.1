@@ -1,163 +1,215 @@
-Return-Path: <netdev+bounces-306578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306579-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 1eEuDxn7UGq49QIAu9opvQ
-	(envelope-from <netdev+bounces-306578-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:00:57 +0200
+	id b5M8Ex36UGpi9QIAu9opvQ
+	(envelope-from <netdev+bounces-306579-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 15:56:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B41B873B898
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 16:00:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9696A73B7CC
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 15:56:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=b+oIkwmj;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306578-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306578-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=lpdJeF+Q;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306579-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306579-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B517D306C070
-	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:49:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6611930E1A37
+	for <lists+netdev@lfdr.de>; Fri, 10 Jul 2026 13:49:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3939E28A72F;
-	Fri, 10 Jul 2026 13:48:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96B28261B9B;
+	Fri, 10 Jul 2026 13:49:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4DB7E0FF
-	for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 13:48:53 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783691336; cv=pass; b=fDA4CdqLIe8X9I5pJxCuGkCEhrsgNUoA13BNpkGB6MfoqSIVsQv7FD3s8ylstDPKbA4ggNED6H1YykR3gAuBIjm9EivRzAvJlt1rl+fwy85K3ebAUsBWw20jpIKKQ7govrnPXIJSKS33lmW3/KmHVId3wOPvFNXgTf6rY5BUnFU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783691336; c=relaxed/simple;
-	bh=Fk0f9NBKXxCuSGCMO1qvLKZJT4FJuEzHm/StoATrZJI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m9uTtqGkDqnNgzlQt/8IImkHixXeG+SCY2Cthzr/tQ6M+7472MpGLfh6uhVOHZMGetJoLHIMkjeJQ0XvyN9sDMU/8TPi2F4ZstPVaM9R+oMuPjPHuD2cHL6mfRleXCejLMKD7zn17CX7IacCRrM+7aMLJofkDkbV3vI5DTdgt0U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b+oIkwmj; arc=pass smtp.client-ip=209.85.221.46
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-476a130c138so1237557f8f.0
-        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 06:48:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783691331; cv=none;
-        d=google.com; s=arc-20260327;
-        b=sYzu6p+JkkRmKs8e2Df9Hd9i5imL5EUmngS2jR4DFNRN9kcPrbHwJy9Lo3JJqvXYyG
-         omOKUAsdpubBZRk3Dckc2WUxvYSp9VWIZ9OEfOTdQFvTJJOFp7EtZrZiNQlmsHDMGFHv
-         K4/XWftkp6PQkB4aIll8Kqs1ooYIA0fIUoJWXtOsjF1evlDLoadYxDUhZlVCFh6WWgfg
-         EItyw6tMdVUB7LITLFse2QeKlA/r45RGmHaC4yJmGudBtc7ZzzunQaNwVYI8SSVgCkxK
-         Ye1ISL++2M9+L01ys5YKNqh6MZFGjaWpfGFOwuUe0sdKadL12mDPvoMNqfHKgujm10Cp
-         6hXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=Fk0f9NBKXxCuSGCMO1qvLKZJT4FJuEzHm/StoATrZJI=;
-        fh=LhiquMkHX23ymoeqrhlhRws47WCbnobWGq9OyF0UqEg=;
-        b=gcTiQuQ+2spU67tpoRfakGpt4EKnBVggsM6IL+Bwro6M00y+fEhIeUBNax4xefAm8d
-         0eR8/m/dIJ3fypl1IHKo1GEvLfzCXB0QJRmVPZPgvBtmKzhKPRt0BK1cn4uBkDXXk7Mf
-         2Zg2uHNvDJYpEjQ/ybYcksD3xAW59ShwopqztyMo87okBPQsVRyOKpq+MfGcwqvtkYX3
-         cy0zP1mPKxzNuzGqtwLijmfjbxYl8r+Ajus4upl1B1hxSCf2z8WFwE1ZBBJkvD9EshOd
-         fSTrwQdMiFIykmFxJe4mCD+Abe0hvazEQkTksMm+sRS64IglyJzrcF3QwI6KEE2dYfLQ
-         TuBQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783691331; x=1784296131; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Fk0f9NBKXxCuSGCMO1qvLKZJT4FJuEzHm/StoATrZJI=;
-        b=b+oIkwmjLj7a5hRzrCUuxCMMHLbxBW5HaKP0UomN3bvFas9o8h1frzJOXv6fyVQ3v0
-         YH7NVZJxaGMamMAaBXNt/46HH01b/m91bKSA5ir7t5pxGMjzm/dQkgh7zbX3qUX/uIKj
-         R7i1hGugziHUBLXyd0nCCmLHljZRP62xLYcSeET8KGvLfSXSQAEnQWjqqT1ynDgdqiFd
-         tngBGlCno0vTUA2/5cjX9OiM3UKtrTsF44xWm8lNeQviz1u2oTStEXnj7OoT+KYq6yqe
-         AE7b28MfOg/TkQu7gXFdxz6zCcSaPvWWar2n6SqonKhgqFhWbjhrbsBDm9QObJQ7z878
-         p6qA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783691331; x=1784296131;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=Fk0f9NBKXxCuSGCMO1qvLKZJT4FJuEzHm/StoATrZJI=;
-        b=h+JjKQcppZQ1UsOKkpz7zFh4g3GbcDnI8rEalYu7sE6cRAt2z6hNfuXWCp/FWue2ut
-         NLeAA+oM90498n9EBXKCX86WpUua4EX8se1lW2lm2hySOC33Jp2sGsSDX4/dMd5FOfqz
-         r6JkjXKuk4HtJjZS8QwP1cqycXTxttWrv5v6MandwMQBteR/Iln3cXwFFdumJAdi/3zr
-         QfETj4OmK6KEmYzASSXBMJAFqcLER4WiOKsQDAz7jbbqWMqz6+p7iTWnKPn8/TtGAN3l
-         YZ1u+h96loH7pfYvq0A4hPRAxm+0C7baCJMAD0BvS0vCGUn39CDy5KhUUG7Nahk8VWbT
-         ZwPw==
-X-Forwarded-Encrypted: i=1; AHgh+Rra8YE2HtXewW97Y6soAGbjKueuqxiVywaHLtQPTQQZhRqUOTcvQkjR1A/8U5RpLwvp7MH9rGw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjiIVizrVWSNwfEkw3GUB0S1yvExsXL+SwM/jSLZgjx27wgirf
-	pKblpYKlZFBWns0GGWqbXtGDlAibhdhA0gYiAbybb1eyvdj2R0DHpZzT0QxPzhs5FplebCLQIPz
-	GqPdJfk/MHBityYudkrRw4hI3rVjgbLE=
-X-Gm-Gg: AfdE7cl7BkoyyZ3J3JhdXSpLUdy8r3U89ATAhc6gS4Z+0fmaSiqtdCFFanFfroX3xVv
-	i+iIMLk57Zqb8+CDmzNhN7lRKioeT5JmLVL0C/cVggWY5PvoE/Lty61C1qwfPHNOgTUQ2lMoZqX
-	rGPGMHeSy/YlxAwSOu/xiyo/VhIzWJw+5g8wC55CiKRznw+JeQtukowkYo9Q3GIrxEbVj/0uI5F
-	F7wed6gtN8dyTaW8MKvwmjLsm/62E6uTH/zrhpOzVFFR8I2bCe79jTd1Qr1kwdC4hY1yuVKd2aI
-	5AeDJasKBM+Efgevguk+otaQgGI=
-X-Received: by 2002:a05:6000:2007:b0:46d:1433:77ec with SMTP id
- ffacd0b85a97d-47df071567emr12423202f8f.2.1783691330567; Fri, 10 Jul 2026
- 06:48:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5564825DB1A;
+	Fri, 10 Jul 2026 13:49:16 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783691357; cv=none; b=txBN/EFYEc6JZx8IFrg3Nc6P5BkqGswCYqh9Q/GdzvWQXtL+yQ7xZAqd/iZLeObWxLV1QM7somP3HfJRPM1kiBdEOFtLMed5N/cLu1h66NC+/LUlKIaEYVR9j7GoDFMb/LUBGuRCgKJ/ERF/OOKwJOI66JAXE8NM7o97f+SVQxo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783691357; c=relaxed/simple;
+	bh=Z05OLJEB22TK9VRWOreArFil14x3dUWnZjYtYZzIuAs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Mopz95ZpoxY8tC1U9r4SLQKGGZo7UyFBhMY0Ungf0fTkKKKK5qKEEdlIucVkJO1oLcjWir1qLMUDB6aXCFaW8S/6RFjDgzQKHOCWyTY4CPaJ/SdKm5TiWumbr2wW9K7nPmj3ZYsc1ycKvfi7RMk/iP6+72i6PN6UdYn7O0L0Ejc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lpdJeF+Q; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34FE11F000E9;
+	Fri, 10 Jul 2026 13:49:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783691356;
+	bh=JAtX8AhNJx6QPGTAuQ0ZGdruw/eZPEaNb1FV9Ob5Src=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=lpdJeF+QbdQeoWjcOvuIzetth87eF9V6cQEOjv+sFxU6BXR5G3nWYVBcRZ19xxFnq
+	 m3MGtURS7GoGylsQs0RGydM1Ur9KhlBRSt2zZBo1Mpudr41I1YQaPZFnX7UCulqmyF
+	 SGmgGn3kHhiyg8T6ekTrkgsnch23wodENV5Ytjj2qIpJJ8oSkQlne968lqkrg2toCI
+	 5WlPOGjVqNlZdFtR1zfGTCjbNtGhotUIR4S3wNy0z/syGAm5goGRVUbhvFYHg4yNLd
+	 mvmob9aL6YjhmzAiwgKi4xxfg6dqfqCLyVgt2h7Ehro5Na5fMbMfjFaLZYeOtSRiJS
+	 RgZ4U9s0WpY+Q==
+From: Simon Horman <horms@kernel.org>
+To: doruk@0sec.ai
+Cc: Simon Horman <horms@kernel.org>,
+	david@ixit.cz,
+	oe-linux-nfc@lists.linux.dev,
+	david.laight.linux@gmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net] nfc: llcp: bound the remaining LLCP TLV parsers to their buffers
+Date: Fri, 10 Jul 2026 14:48:50 +0100
+Message-ID: <20260710134850.1615092-1-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260705115607.60844-1-doruk@0sec.ai>
+References: <20260705115607.60844-1-doruk@0sec.ai>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260704080653.33740-1-atharvapotdar07@gmail.com> <20260709170151.1577992-2-horms@kernel.org>
-In-Reply-To: <20260709170151.1577992-2-horms@kernel.org>
-From: Atharva Potdar <atharvapotdar07@gmail.com>
-Date: Fri, 10 Jul 2026 19:18:38 +0530
-X-Gm-Features: AUfX_mzij9uJi1NxmBfsvdi5VakX6iKjRv_IWy3odvl-DmkRIpln3GBpi1sb15A
-Message-ID: <CAF9AHvZe5sgmpZQ+Jb4s_h0NCnUdmMVODpbDhF3O213uWqTZhQ@mail.gmail.com>
-Subject: Re: [PATCH v4] r8169: migrate Rx path to page_pool, prepare for XDP
-To: Simon Horman <horms@kernel.org>
-Cc: hkallweit1@gmail.com, nic_swsd@realtek.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	romieu@fr.zoreil.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306578-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,fr.zoreil.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[atharvapotdar07@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:romieu@fr.zoreil.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,ixit.cz,lists.linux.dev,gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306579-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:doruk@0sec.ai,m:horms@kernel.org,m:david@ixit.cz,m:oe-linux-nfc@lists.linux.dev,m:david.laight.linux@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[atharvapotdar07@gmail.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B41B873B898
+X-Rspamd-Queue-Id: 9696A73B7CC
 
-Hi Simon,
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+---
+nfc: llcp: bound the remaining LLCP TLV parsers to their buffers
 
-Thanks for the review. v5 addresses all three points:
+The commit adds pointer-based bounds to nfc_llcp_parse_gb_tlv(),
+nfc_llcp_parse_connection_tlv() and nfc_llcp_connect_sn(), replacing
+the previous u8 offset walk which could wrap and produce an unbounded
+TLV loop. It cites the size_t underflow of "skb->len - LLCP_HEADER_SIZE"
+as one of the failure modes it wants to close.
 
-- Introduced tp->rx_buf_sz to fix the DMA overflow and skb_put() panic.
-- Fixed rtl8169_rx_clear() to iterate all NUM_RX_DESC entries.
-- Fixed rtl_reset_work() to repopulate NULL slots before re-arming.
+> diff --git a/net/nfc/llcp_commands.c b/net/nfc/llcp_commands.c
+> index 291f26facbf3..1a0a2f4aca70 100644
+> --- a/net/nfc/llcp_commands.c
+> +++ b/net/nfc/llcp_commands.c
 
-Will send v5 as a new thread.
+[ ... ]
 
-Atharva
+> @@ -243,17 +246,21 @@ int nfc_llcp_parse_connection_tlv(struct nfc_llcp_sock *sock,
+>  				  const u8 *tlv_array, u16 tlv_array_len)
+>  {
+>  	const u8 *tlv = tlv_array;
+> -	u8 type, length, offset = 0;
+> +	const u8 *tlv_end = tlv_array + tlv_array_len;
+> +	u8 type, length;
+>  
+>  	pr_debug("TLV array length %d\n", tlv_array_len);
+>  
+>  	if (sock == NULL)
+>  		return -ENOTCONN;
+>  
+> -	while (offset < tlv_array_len) {
+> +	while (tlv + 2 < tlv_end) {
+>  		type = tlv[0];
+>  		length = tlv[1];
+>  
+> +		if (tlv + 2 + length > tlv_end)
+> +			break;
+> +
+
+[High]
+Is the size_t underflow the commit message mentions actually addressed
+for nfc_llcp_parse_connection_tlv()?
+
+The two callers, nfc_llcp_recv_connect() and nfc_llcp_recv_cc() in
+net/nfc/llcp_core.c, still compute the length at the call site as
+skb->len - LLCP_HEADER_SIZE and hand it to the parser:
+
+    nfc_llcp_parse_connection_tlv(new_sock, &skb->data[LLCP_HEADER_SIZE],
+                                  skb->len - LLCP_HEADER_SIZE);
+
+and
+
+    nfc_llcp_parse_connection_tlv(llcp_sock, &skb->data[LLCP_HEADER_SIZE],
+                                  skb->len - LLCP_HEADER_SIZE);
+
+If skb->len is 0 or 1, that subtraction (size_t at the call site,
+truncated to the u16 tlv_array_len parameter) becomes 0xFFFE or 0xFFFF.
+
+Inside the parser, that value now feeds:
+
+    const u8 *tlv_end = tlv_array + tlv_array_len;
+
+    while (tlv + 2 < tlv_end) {
+            ...
+            if (tlv + 2 + length > tlv_end)
+                    break;
+
+so tlv_end points roughly 64 KiB past &skb->data[LLCP_HEADER_SIZE] and
+neither the loop condition nor the per-TLV check catches the walk
+leaving the skb.
+
+The commit message calls this out as one of the motivations:
+
+    "Dropping the u8 offset also removes the wrap, and for very short
+    connect frames this avoids the size_t underflow of
+    'skb->len - LLCP_HEADER_SIZE'."
+
+That mitigation is applied inside nfc_llcp_connect_sn() by using
+skb_tail_pointer(skb) directly, but the equivalent change is not made
+for the connection TLV path. nfc_llcp_rx_skb() has no minimum-length
+guard, so a received CONNECT or CC PDU with skb->len < LLCP_HEADER_SIZE
+still reaches these callers.
+
+Would it make sense to either guard skb->len >= LLCP_HEADER_SIZE
+before the two call sites, or take the same skb_tail_pointer() based
+approach used in nfc_llcp_connect_sn() so the parser derives its bound
+from the skb rather than from an untrusted subtraction?
+
+> diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+> index dc65c719f35f..5e1881199238 100644
+> --- a/net/nfc/llcp_core.c
+> +++ b/net/nfc/llcp_core.c
+> @@ -849,13 +849,16 @@ static struct nfc_llcp_sock *nfc_llcp_sock_get_sn(struct nfc_llcp_local *local,
+>  static const u8 *nfc_llcp_connect_sn(const struct sk_buff *skb, size_t *sn_len)
+>  {
+>  	u8 type, length;
+> -	const u8 *tlv = &skb->data[2];
+> -	size_t tlv_array_len = skb->len - LLCP_HEADER_SIZE, offset = 0;
+> +	const u8 *tlv = &skb->data[LLCP_HEADER_SIZE];
+> +	const u8 *tlv_end = skb_tail_pointer(skb);
+>  
+> -	while (offset < tlv_array_len) {
+> +	while (tlv + 2 < tlv_end) {
 
