@@ -1,383 +1,222 @@
-Return-Path: <netdev+bounces-306843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306844-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FRryKLMyUmo8NAMAu9opvQ
-	(envelope-from <netdev+bounces-306843-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 14:10:27 +0200
+	id kBjmN4AzUmpbNAMAu9opvQ
+	(envelope-from <netdev+bounces-306844-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 14:13:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3707A741779
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 14:10:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 650087417A9
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 14:13:52 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=qENWZoxT;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=gHFB0fSe;
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306843-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306843-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306844-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306844-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 59C46300EAB3
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 12:10:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E1E53301983D
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 12:13:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1DA23A9DA9;
-	Sat, 11 Jul 2026 12:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E271E3C5856;
+	Sat, 11 Jul 2026 12:13:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECC538AC83
-	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 12:10:18 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783771819; cv=none; b=eX8MV6GDPEPxp/DV6znLfI/13ezpXsIiv4H5mgvYSpNUL6xHc7/5aFDSjva07Cci+7FT8xyuDWVTa2BcghWf+78Sq1UO2YyDBK7Fm+wRF/eusbuUYMOurfIul4tSctYfn+5XE7lNECbmJzNueO+QyiVAJaSs/SD2Q9KNgNeW15g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783771819; c=relaxed/simple;
-	bh=S8b/4BsFSE8KlFURh/bHVzTH/0yIH3iw8lTmdGMTBMw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Dag3QGs71IetzNe1Ka0bNm0VZVNd2uIKEf+l2cbdDxuYS2gvKvPfCi8uG/crnyqe/Abb5TloGiejuvKd4Imrm4o/6Obea7JU/l2SX4N3/99wM39ZrX0etbOI3uqqCXTG5iuuOIImOcczGPe9ISnxJIKfLgJFCd/bhx0nOZvjXuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qENWZoxT; arc=none smtp.client-ip=209.85.214.181
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2c6b67d5fa1so28742895ad.2
-        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 05:10:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7DBD3C3C1E
+	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 12:13:19 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783772002; cv=pass; b=JaawQraqUdxFQR2sZsouPTeGZzBpgYw2Uc9QQrBm/1dpBSB/d6QoxoqC7I4kb3y+rgEVAIoBO5JdRZnwlpPETglmtzSURSQdh+Qy88sTaIGgAphgJDLdsz191KUWVzuYd3ApSKc8BoCpEZU9P8BFrZIJauPgBm4OkgZps09hwQQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783772002; c=relaxed/simple;
+	bh=80vo3JIjnCsKn8zo158HX4vkfRXd32w7uPzzJAtLaF0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mJL3tUWJZqdSTatxQvRa9wnGj4qGAaSeLqV0Sr+3TCI41VIGu4P3JFJIkHTBowtaMP8AFbUlgUNWlGDhIV8NDfLHK6yoEDNdguStTElctuDizPGt6c0LRYnZE+dfzdek9L+2qo/yGHM2xEGOCGZcXJu38UAHhWc09mw/f52buTY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gHFB0fSe; arc=pass smtp.client-ip=209.85.216.51
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-381f03d7be0so286571a91.1
+        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 05:13:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783771999; cv=none;
+        d=google.com; s=arc-20260327;
+        b=KUIXyvkcMmSgjG45Np5YKGFhH35aoYyh6Aa7Siq/fok9FbNiHxzjWbP1t8cH0F2Vyq
+         9FNmrzbuDSZ0yemxy761afmthMP4GUL/nDekj3CmVN2MLgEBxT+T1BBOTuoca6h59Q6V
+         +OHDTtL5Y/jyJW3VacaLNyQCQir/3mNnUBdrBz+v6rxgWqMA5ZloEalI9RJEhq4FeOew
+         HSG6CwXhZ8Fj+dOcFJ2vmctUJP/nm2DR3vTdntouErSjtwg4VIYnn99F3V3MZBgZYnWs
+         TE3x4snouALk6N0c5WstaO6Uyh9KBqrVKEXokNcvwhdMcwnv9XXfGp6V3yGELLZ6OJK2
+         atwg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=80vo3JIjnCsKn8zo158HX4vkfRXd32w7uPzzJAtLaF0=;
+        fh=epJRr6LKT9+A4VBsQX/QindxzW0mBp2BkNfE7dtt1mQ=;
+        b=bm+5z3hgFrEc915y9Sn+KGtveLi68j569GEIU6cBELVWyKjgJMpFwOr9pv2el1jN8d
+         KWT6vLIXr/ZaLFkEhrbDOOBR6AVQA0+WulGCFyu6gRs1Xed0U9lXHTdltgrgwhSCDE5k
+         bEqugv92RsmtrDvYFlx68PcHLaJdcBJFZf1rf1/J0E69vhhEvncx6wWlFnm9A5ghZO0k
+         cpLTM+aj/JguQMtoKF2djY/VvXHCG8h7kKh7VjDOYMmFJyyaXlKrvgg5BU8AGz9n4sZ9
+         WnZiTxdsfIF/mt7OCV/AVFm0qFzbWRUESe/8jMueTmU6Fmt8LSVDo7hRHQ/pGGSGJZhy
+         AHng==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783771818; x=1784376618; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=rwcep/f1okQ2Nd2drpl9IskC13P+jKJfO97boATnYJE=;
-        b=qENWZoxTladv0WZ0OjR6jzpKCKID5dHu7wwdWd91MXzFplAsDtkVCRQC0hhqhs4U/L
-         4K3TUNWr0F/tbSr749nVKhUQFc8O3IHL0Z1hPlzvumM9fXxUE+dubGkf2gMUZHd6PMvv
-         DF8bm/mAwpK3+cdxLVRnhm+vltBnlSwjTWKdHEExJGoNu1iGpP9cGWB6/d4KUROOEX/D
-         FInR+PK9RcEcpugGr9wynt8xt7dOH/1LSOw/08+NXz/UGkMMPZztNag9DqFhTCfKvPt+
-         BuVz4bqOxzl6Pqu9T9DV1NYpIr3y66BKvX4X9UJ58Vq1PNzz/FXrjnksjI6n6eH4kgcH
-         FLrA==
+        d=gmail.com; s=20251104; t=1783771999; x=1784376799; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=80vo3JIjnCsKn8zo158HX4vkfRXd32w7uPzzJAtLaF0=;
+        b=gHFB0fSemSn6s4jVp/EuBtir/qlPGO8Vq2wg3sOO56WQSEm3m1wgLV+PH+YCzCwe4w
+         40XUJ8N3llKffVv3KvwlpEx0PwjFhEP4ejwfKckXHhOrs4COlZYMuCDJVCD700HVWfby
+         Wef44AYzEvkwlRh4pmvCSPrnSSb+EuoMS7xAp1fqanhd4vgQUbVFs9DMhr/aX2ve4EZi
+         XKK9VbugY1ax8izR6ls1BpqL9Fr7yUJMtkts2rZtlWUvAdEs5tvYZoRcRU9pXB0Y6W76
+         RQw5PmUpYS6rrCfKNmEtUvADgYNWM7gb8xCEbJGzjwstKv7ju7GWWD5f6bQVByQhgD9b
+         Verg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783771818; x=1784376618;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=rwcep/f1okQ2Nd2drpl9IskC13P+jKJfO97boATnYJE=;
-        b=Qx9bLqOHNBPF3VBTobZXd6lvak9oNolugXkEHeV7MPo7suG4o1cUpdksMz6VW6xxEu
-         GG0CnzvmYATRhEcW6vncWfZQ7jyyFS3h2k9AO9YABHEdsCtxozVxQvtMeDD2zYWrgm0f
-         FZNM+eMfOAz2NrdW/Ee45YPP7zv9S+q5eop9FBhm1XCxpog7bbqO6078szr7fvde2dwJ
-         +hk4xFD5QawBl05lI0vHCIZj2DOcyDSstvVmiVMGtIDGbWtqU216Rdl1oDoY+lwmGDBi
-         e+PYYHO9LijLZkLhCS3gVm86zu5sP4eR+xs1IgQ4r6KQ8oHcbAlxo2Gq3sEUEAtCKro7
-         Kt6g==
-X-Gm-Message-State: AOJu0Yz8YHjHuA2nAMeLpAD6W5zHzpwsur6UUVazAvwsFxOCegaIkKjz
-	sp7acMANkspnbhVYR5yZK9G2eg2lV7Yqu5uG1N00xMNY189ag75jh/LM
-X-Gm-Gg: AfdE7cmiH3l6FMbOIFNgueIocspv/epiSTH1JW7WaZGUylPp0DvQXTqkCSRB+bsGQfa
-	pM/w4D6Ypio+bFVxJACXcd+eOtw+lslQXzPsJFJg6u6DD6V0BsMa6B1BEr9Dd9rsQdY6djwWA7i
-	u59PwNisAOgNxCv++17LNw7+oLXdXrhlTQ4VfuLJzZDt6JFz2c0mXM8QuGwBiEmVymU8ahpxiGu
-	hghTDPygS/T1n6TzoP6T+fm+H0OyiFup4JHel6BB3IwS+htReQ7wG9IwQFnriap3qAPHn4twZbQ
-	yWO7wtXf4tRJRy0AzWj751pab3Uj3RcfCleFD9+88iwYniAY5UPjCD3amdBxnGlIJILJaVLOGf8
-	r/RfpOmU6jp0bYjSVF9zE/Ri6v364LIPBA/hZmizNBPcNZ40CJBhTpoi++IETHUByiSuIj9xSGO
-	WfTIq5IQrPXApaEf1N6ZkVp29AstY=
-X-Received: by 2002:a17:903:1b6b:b0:2ca:9d5a:8b6c with SMTP id d9443c01a7336-2ce9e79f42bmr29829555ad.5.1783771817755;
-        Sat, 11 Jul 2026 05:10:17 -0700 (PDT)
-Received: from localhost.localdomain ([202.8.105.118])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9d3bc42sm72537085ad.63.2026.07.11.05.10.15
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 11 Jul 2026 05:10:17 -0700 (PDT)
-From: Jemmy Wong <jemmywong512@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] net/rps: consolidate RPS dispatch into helpers
-Date: Sat, 11 Jul 2026 20:10:08 +0800
-Message-ID: <20260711121009.76842-1-jemmywong512@gmail.com>
-X-Mailer: git-send-email 2.54.0
+        d=1e100.net; s=20251104; t=1783771999; x=1784376799;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=80vo3JIjnCsKn8zo158HX4vkfRXd32w7uPzzJAtLaF0=;
+        b=sjVqPROwVH9lodxX+xZGrgCTKInMIRO5wdxi5up9T0A2f/fGCvV5K59JzO4W50I/Lu
+         O+Yh07E6+tCs0NbC6YIGhjm7a39NhsdN4AQ0O2lww6CVnYYlYKjqI4EqGB96cSyYdd7j
+         qkpaYsAKtSg0XHWnqWcdH5g3FEDtHEB8MdW5v0eqnxhOEHwSvaASFsLoV1oEsjhRPcQF
+         s+4pPmtsqpaUlEiCCkuWoNpidSYC//SzQp3xn3L2VM3nQq1A6NacqEUIjxntB04EQzpW
+         8ft6matlzXHWT6TamYnnZzsdXArtXo4BdlJk8Mr4b8EPZv7h5kbxlQCver+17J+emRAH
+         +/dQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rrfx1L29DLTroRDquWhtCYq2GhgW3vtDlguZCyBtv4vn6VeVIz5XkYfTN3XzsmTOYNy2DCB/VM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaIYLWUSIp5sV3ImWIcP3qAhmTkzzLX+vS8xR8QJjN8WlO9/03
+	5UCOUsdoBXx6jHWkwCKOan92g4PJOOyPlYUkyEtdfA999jisCbOcsvx2vCN+EcvFN4K5VBGcP73
+	6+znzwfDXx395Dhrkhz3zx8uPkS1yVp4=
+X-Gm-Gg: AfdE7cninVvLUvD2Thty4QLMXFukd4Il1cuVF+Jcia1yttp5J+QOKzPxrKDql6gm/LO
+	husNtnl5+dJTMPEnHCexJoj1TOBoRuUkZTN5q2f4Pyd0cKzbX3kkBoL5g6pQAB8nFJSY+IhiAPf
+	DiuSqlc/TLsETyTC0qqqB1DJ/Cfca02rjahotpuBHjGxSFPgu3zNvYjVLO0Zdh6DAOOKmVsyJHU
+	or1CZ51avNASSrJuAlEGIuQbx6wOvNq52AXiG275AcLBNeMgC7ELTZKLoGPhNliALlddqtKtp0+
+	qrYOLXfRJoG7egS7oYGvcn6wGTzrrc0edc5TCJ3rCDdr39+cBlwuwze8HYe6skXhl4NvL5yg8RQ
+	HbDN38t/yRNsK
+X-Received: by 2002:a17:90b:4984:b0:380:9cd1:d985 with SMTP id
+ 98e67ed59e1d1-38dc7c111a8mr1909664a91.6.1783771998816; Sat, 11 Jul 2026
+ 05:13:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260706061928.66713-1-byungchul@sk.com> <20260706061928.66713-40-byungchul@sk.com>
+In-Reply-To: <20260706061928.66713-40-byungchul@sk.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Sat, 11 Jul 2026 14:13:05 +0200
+X-Gm-Features: AUfX_mwWK6GqFCLIKCx9ivosmcno3i0b64L6R15FyNFXSSwj0HKdZlNefQKWcgc
+Message-ID: <CANiq72kEo=bGcHNaSA9JZhv4iuE+YDvu0kN+Z7aopVp3=2C+Wg@mail.gmail.com>
+Subject: Re: [PATCH v19 39/40] rust: completion: Add __rust_helper to rust_helper_wait_for_completion()
+To: Byungchul Park <byungchul@sk.com>, Gary Guo <gary@garyguo.net>
+Cc: linux-kernel@vger.kernel.org, max.byungchul.park@gmail.com, 
+	kernel_team@skhynix.com, torvalds@linux-foundation.org, 
+	damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org, 
+	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org, mingo@redhat.com, 
+	peterz@infradead.org, will@kernel.org, tglx@linutronix.de, 
+	rostedt@goodmis.org, joel@joelfernandes.org, sashal@kernel.org, 
+	daniel.vetter@ffwll.ch, duyuyang@gmail.com, johannes.berg@intel.com, 
+	tj@kernel.org, tytso@mit.edu, willy@infradead.org, david@fromorbit.com, 
+	amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com, 
+	linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org, 
+	minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com, sj@kernel.org, 
+	jglisse@redhat.com, dennis@kernel.org, cl@linux.com, penberg@kernel.org, 
+	rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org, 
+	linux-block@vger.kernel.org, josef@toxicpanda.com, 
+	linux-fsdevel@vger.kernel.org, jack@suse.cz, jlayton@kernel.org, 
+	dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org, 
+	dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com, 
+	melissa.srw@gmail.com, hamohammed.sa@gmail.com, harry.yoo@oracle.com, 
+	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com, boqun.feng@gmail.com, 
+	longman@redhat.com, yunseong.kim@ericsson.com, ysk@kzalloc.com, 
+	yeoreum.yun@arm.com, netdev@vger.kernel.org, matthew.brost@intel.com, 
+	her0gyugyu@gmail.com, corbet@lwn.net, catalin.marinas@arm.com, bp@alien8.de, 
+	x86@kernel.org, hpa@zytor.com, luto@kernel.org, sumit.semwal@linaro.org, 
+	gustavo@padovan.org, christian.koenig@amd.com, andi.shyti@kernel.org, 
+	arnd@arndb.de, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, 
+	rppt@kernel.org, surenb@google.com, mcgrof@kernel.org, petr.pavlu@suse.com, 
+	da.gomez@kernel.org, samitolvanen@google.com, paulmck@kernel.org, 
+	frederic@kernel.org, neeraj.upadhyay@kernel.org, joelagnelf@nvidia.com, 
+	josh@joshtriplett.org, urezki@gmail.com, mathieu.desnoyers@efficios.com, 
+	jiangshanlai@gmail.com, qiang.zhang@linux.dev, juri.lelli@redhat.com, 
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com, bsegall@google.com, 
+	mgorman@suse.de, vschneid@redhat.com, chuck.lever@oracle.com, neil@brown.name, 
+	okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org, 
+	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de, clrkwllms@kernel.org, 
+	mark.rutland@arm.com, ada.coupriediaz@arm.com, kristina.martsenko@arm.com, 
+	wangkefeng.wang@huawei.com, broonie@kernel.org, kevin.brodsky@arm.com, 
+	dwmw@amazon.co.uk, shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com, 
+	yuzhao@google.com, baolin.wang@linux.alibaba.com, usamaarif642@gmail.com, 
+	joel.granados@kernel.org, richard.weiyang@gmail.com, geert+renesas@glider.be, 
+	tim.c.chen@linux.intel.com, linux@treblig.org, 
+	alexander.shishkin@linux.intel.com, lillian@star-ark.net, 
+	chenhuacai@kernel.org, francesco@valla.it, guoweikang.kernel@gmail.com, 
+	link@vivo.com, jpoimboe@kernel.org, masahiroy@kernel.org, brauner@kernel.org, 
+	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com, 
+	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org, 
+	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org, 
+	rcu@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	linux-rt-devel@lists.linux.dev, 2407018371@qq.com, dakr@kernel.org, 
+	neilb@ownmail.net, bagasdotme@gmail.com, wsa+renesas@sang-engineering.com, 
+	dave.hansen@intel.com, geert@linux-m68k.org, ojeda@kernel.org, 
+	alex.gaynor@gmail.com, bjorn3_gh@protonmail.com, lossin@kernel.org, 
+	a.hindborg@kernel.org, aliceryhl@google.com, tmgross@umich.edu, 
+	rust-for-linux@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306843-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[jemmywong512@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jemmywong512@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306844-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:byungchul@sk.com,m:gary@garyguo.net,m:linux-kernel@vger.kernel.org,m:max.byungchul.park@gmail.com,m:kernel_team@skhynix.com,m:torvalds@linux-foundation.org,m:damien.lemoal@opensource.wdc.com,m:linux-ide@vger.kernel.org,m:adilger.kernel@dilger.ca,m:linux-ext4@vger.kernel.org,m:mingo@redhat.com,m:peterz@infradead.org,m:will@kernel.org,m:tglx@linutronix.de,m:rostedt@goodmis.org,m:joel@joelfernandes.org,m:sashal@kernel.org,m:daniel.vetter@ffwll.ch,m:duyuyang@gmail.com,m:johannes.berg@intel.com,m:tj@kernel.org,m:tytso@mit.edu,m:willy@infradead.org,m:david@fromorbit.com,m:amir73il@gmail.com,m:gregkh@linuxfoundation.org,m:kernel-team@lge.com,m:linux-mm@kvack.org,m:akpm@linux-foundation.org,m:mhocko@kernel.org,m:minchan@kernel.org,m:hannes@cmpxchg.org,m:vdavydov.dev@gmail.com,m:sj@kernel.org,m:jglisse@redhat.com,m:dennis@kernel.org,m:cl@linux.com,m:penberg@kernel.org,m:rientjes@google.com,m:vbabka@suse.cz,m:ngupta@vflare.org,m:linux-block@vger.kernel.org,m:josef@to
+ xicpanda.com,m:linux-fsdevel@vger.kernel.org,m:jack@suse.cz,m:jlayton@kernel.org,m:dan.j.williams@intel.com,m:hch@infradead.org,m:djwong@kernel.org,m:dri-devel@lists.freedesktop.org,m:rodrigosiqueiramelo@gmail.com,m:melissa.srw@gmail.com,m:hamohammed.sa@gmail.com,m:harry.yoo@oracle.com,m:chris.p.wilson@intel.com,m:gwan-gyeong.mun@intel.com,m:boqun.feng@gmail.com,m:longman@redhat.com,m:yunseong.kim@ericsson.com,m:ysk@kzalloc.com,m:yeoreum.yun@arm.com,m:netdev@vger.kernel.org,m:matthew.brost@intel.com,m:her0gyugyu@gmail.com,m:corbet@lwn.net,m:catalin.marinas@arm.com,m:bp@alien8.de,m:x86@kernel.org,m:hpa@zytor.com,m:luto@kernel.org,m:sumit.semwal@linaro.org,m:gustavo@padovan.org,m:christian.koenig@amd.com,m:andi.shyti@kernel.org,m:arnd@arndb.de,m:lorenzo.stoakes@oracle.com,m:Liam.Howlett@oracle.com,m:rppt@kernel.org,m:surenb@google.com,m:mcgrof@kernel.org,m:petr.pavlu@suse.com,m:da.gomez@kernel.org,m:samitolvanen@google.com,m:paulmck@kernel.org,m:frederic@kernel.org,m:neeraj.upadhyay@k
+ ernel.org,m:joelagnelf@nvidia.com,m:josh@joshtriplett.org,m:urezki@gmail.com,m:mathieu.desnoyers@efficios.com,m:jiangshanlai@gmail.com,m:qiang.zhang@linux.dev,m:juri.lelli@redhat.com,m:vincent.guittot@linaro.org,m:dietmar.eggemann@arm.com,m:bsegall@google.com,m:mgorman@suse.de,m:vschneid@redhat.com,m:chuck.lever@oracle.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[miguelojedasandonis@gmail.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,skhynix.com,linux-foundation.org,opensource.wdc.com,dilger.ca,redhat.com,infradead.org,kernel.org,linutronix.de,goodmis.org,joelfernandes.org,ffwll.ch,intel.com,mit.edu,fromorbit.com,linuxfoundation.org,lge.com,kvack.org,cmpxchg.org,linux.com,google.com,suse.cz,vflare.org,toxicpanda.com,lists.freedesktop.org,oracle.com,ericsson.com,kzalloc.com,arm.com,lwn.net,alien8.de,zytor.com,linaro.org,padovan.org,amd.com,arndb.de,suse.com,nvidia.com,joshtriplett.org,efficios.com,linux.dev,suse.de,brown.name,talpey.com,huawei.com,amazon.co.uk,linux.alibaba.com,glider.be,linux.intel.com,treblig.org,star-ark.net,valla.it,vivo.com,baidu.com,lists.infradead.org,lists.linaro.org,lists.linux.dev,qq.com,ownmail.net,sang-engineering.com,linux-m68k.org,protonmail.com,umich.edu];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[165];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[miguelojedasandonis@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_RCPT(0.00)[netdev,renesas];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sk.com:email,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3707A741779
+X-Rspamd-Queue-Id: 650087417A9
 
-The RPS steering logic in netif_rx_internal(), netif_receive_skb_internal()
-and netif_receive_skb_list_internal() was open-coded three times, each with
-its own #ifdef CONFIG_RPS block and manual rcu_read_lock()/unlock() pairs.
+On Mon, Jul 6, 2026 at 8:22=E2=80=AFAM Byungchul Park <byungchul@sk.com> wr=
+ote:
+>
+> This is needed to inline these helpers into Rust code, which is required
+> for DEPT to play with wait_for_completion().
+>
+> Signed-off-by: Byungchul Park <byungchul@sk.com>
 
-Factor it into two helpers, netif_rps() for the single-skb path and
-netif_rps_list() for the list path, sharing a common __netif_rps() inner
-helper that runs the get_rps_cpu()/enqueue_to_backlog() step under RCU.
+Apart from what Gary said -- why did you need to do this in a separate
+patch in the same series?
 
-Both wrappers keep the early static_branch_unlikely(&rps_needed) check
-and only enter an RCU read-side critical section when RPS is actually
-enabled at runtime, so no extra rcu_read_lock()/unlock() is executed on
-the hot netif_rx_internal() path when RPS is compiled in but disabled.
-
-A new internal NET_RX_UNHANDLED sentinel lets a helper report "RPS did
-not take this skb" so the caller falls back to the local enqueue /
-__netif_receive_skb() path; it never escapes to callers.
-
-No functional change intended.
-
-Signed-off-by: Jemmy Wong <jemmywong512@gmail.com>
----
-Changes since v1 [1]:
-  - Move rcu_read_lock()/unlock() inside the
-    static_branch_unlikely(&rps_needed) check, so no RCU read-side section
-    is entered when RPS is compiled in but disabled at runtime. Addresses
-    Paolo's concern that netif_rx_internal() is performance critical and
-    rcu_read_lock() is not a no-op.
-  - Drop the guard(rcu) / scoped_guard(rcu) conversion; the RCU section
-    is now scoped inside netif_rps() / netif_rps_list() themselves.
-  - Split __netif_rps() out of netif_rps() so that netif_rps_list() can
-    reuse the per-skb steering step without re-testing the static branch
-    or dropping and reacquiring the RCU lock per skb.
-  - netif_rps_list() now returns int; when RPS drains the entire list,
-    netif_receive_skb_list_internal() skips the __netif_receive_skb_list()
-    fall-through instead of walking an empty list. The result is decided
-    directly from list_empty(&undo_list): drop the splice on the drained
-    path and only splice back when there is something to fall through.
-
-Verified generated code with objdump on aarch64 with CONFIG_RPS=y,
-CONFIG_XPS=y, CONFIG_SMP=y, CONFIG_PREEMPT=y (so rcu_read_lock()
-expands to a real preempt_disable(), i.e. not a no-op -- the
-specific scenario Paolo asked about [2]):
-
-  scripts/bloat-o-meter net/core/dev.o (before -> after):
-    add/remove: 2/2 grow/shrink: 1/2 up/down: 720/-716 (4)
-    Function                        old     new   delta
-    __netif_rps                       -     660    +660
-    netif_receive_skb_list_internal 640     700     +60
-    netif_rx_internal               236     200     -36
-    netif_receive_skb               204     136     -68
-    get_rps_cpu                     608       -    -608
-    Total: Before=335841, After=335849, chg +0.00%
-
-  netif_rx_internal fast path (!rps_needed, i.e. static branch not
-  taken -- the path Paolo asked about [2]):
-    - identical instruction sequence to base, no rcu_read_lock/unlock
-    - stack frame 16 bytes smaller (0x50 -> 0x40)
-    - static_branch NOP is preserved
-  netif_receive_skb_internal: inlined in both builds; caller
-    netif_receive_skb shrinks by 68 bytes.
-  netif_receive_skb_list_internal: !rps_needed fast path unchanged;
-    rps_needed=true path grows +60 bytes for LIST_HEAD(undo_list)
-    setup, the explicit list_empty(&undo_list)/list_splice_init()
-    branch and its early NET_RX_SUCCESS return.
-
-[1] https://lore.kernel.org/all/20260702152830.39065-1-jemmywong512@gmail.com/
-[2] https://lore.kernel.org/all/e53482b8-4e1d-4a04-929c-f5cb443ba59d@redhat.com/
-
- include/linux/netdevice.h |   5 +-
- net/core/dev.c            | 118 +++++++++++++++++++++++---------------
- 2 files changed, 74 insertions(+), 49 deletions(-)
-
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 9981d637f8b5..c265b78082e3 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -93,8 +93,9 @@ void netdev_set_default_ethtool_ops(struct net_device *dev,
- void netdev_sw_irq_coalesce_default_on(struct net_device *dev);
-
- /* Backlog congestion levels */
--#define NET_RX_SUCCESS		0	/* keep 'em coming, baby */
--#define NET_RX_DROP		1	/* packet dropped */
-+#define NET_RX_UNHANDLED	-1
-+#define NET_RX_SUCCESS		0
-+#define NET_RX_DROP		1
-
- #define MAX_NEST_DEV 8
-
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 4b3d5cfdf6e0..1a05ac8fdd50 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -5426,6 +5426,65 @@ static int enqueue_to_backlog(struct sk_buff *skb, int cpu,
- 	return NET_RX_DROP;
- }
-
-+#ifdef CONFIG_RPS
-+static inline int __netif_rps(struct sk_buff *skb)
-+{
-+	int cpu;
-+	int ret = NET_RX_UNHANDLED;
-+	struct rps_dev_flow voidflow, *rflow = &voidflow;
-+
-+	cpu = get_rps_cpu(skb->dev, skb, &rflow);
-+	if (cpu >= 0)
-+		ret = enqueue_to_backlog(skb, cpu, &rflow->last_qtail);
-+
-+	return ret;
-+}
-+#endif
-+
-+static inline int netif_rps(struct sk_buff *skb)
-+{
-+	int ret = NET_RX_UNHANDLED;
-+
-+#ifdef CONFIG_RPS
-+	if (!static_branch_unlikely(&rps_needed))
-+		return ret;
-+
-+	rcu_read_lock();
-+	ret = __netif_rps(skb);
-+	rcu_read_unlock();
-+#endif
-+
-+	return ret;
-+}
-+
-+static inline int netif_rps_list(struct list_head *head)
-+{
-+	int ret = NET_RX_UNHANDLED;
-+
-+#ifdef CONFIG_RPS
-+	LIST_HEAD(undo_list);
-+	struct sk_buff *skb, *next;
-+
-+	if (!static_branch_unlikely(&rps_needed))
-+		return ret;
-+
-+	rcu_read_lock();
-+	list_for_each_entry_safe(skb, next, head, list) {
-+		skb_list_del_init(skb);
-+		if (__netif_rps(skb) == NET_RX_UNHANDLED)
-+			list_add_tail(&skb->list, &undo_list);
-+	}
-+	rcu_read_unlock();
-+
-+	if (list_empty(&undo_list))
-+		ret = NET_RX_SUCCESS;
-+	else
-+		list_splice_init(&undo_list, head);
-+#endif
-+
-+	return ret;
-+}
-+
- static struct netdev_rx_queue *netif_get_rxqueue(struct sk_buff *skb)
- {
- 	struct net_device *dev = skb->dev;
-@@ -5695,34 +5754,18 @@ EXPORT_SYMBOL_GPL(do_xdp_generic);
-
- static int netif_rx_internal(struct sk_buff *skb)
- {
-+	unsigned int qtail;
- 	int ret;
-
- 	net_timestamp_check(READ_ONCE(net_hotdata.tstamp_prequeue), skb);
-
- 	trace_netif_rx(skb);
-
--#ifdef CONFIG_RPS
--	if (static_branch_unlikely(&rps_needed)) {
--		struct rps_dev_flow voidflow, *rflow = &voidflow;
--		int cpu;
--
--		rcu_read_lock();
--
--		cpu = get_rps_cpu(skb->dev, skb, &rflow);
--		if (cpu < 0)
--			cpu = smp_processor_id();
--
--		ret = enqueue_to_backlog(skb, cpu, &rflow->last_qtail);
--
--		rcu_read_unlock();
--	} else
--#endif
--	{
--		unsigned int qtail;
-+	ret = netif_rps(skb);
-+	if (ret != NET_RX_UNHANDLED)
-+		return ret;
-
--		ret = enqueue_to_backlog(skb, smp_processor_id(), &qtail);
--	}
--	return ret;
-+	return enqueue_to_backlog(skb, smp_processor_id(), &qtail);
- }
-
- /**
-@@ -6389,19 +6432,11 @@ static int netif_receive_skb_internal(struct sk_buff *skb)
- 	if (skb_defer_rx_timestamp(skb))
- 		return NET_RX_SUCCESS;
-
--	rcu_read_lock();
--#ifdef CONFIG_RPS
--	if (static_branch_unlikely(&rps_needed)) {
--		struct rps_dev_flow voidflow, *rflow = &voidflow;
--		int cpu = get_rps_cpu(skb->dev, skb, &rflow);
-+	ret = netif_rps(skb);
-+	if (ret != NET_RX_UNHANDLED)
-+		return ret;
-
--		if (cpu >= 0) {
--			ret = enqueue_to_backlog(skb, cpu, &rflow->last_qtail);
--			rcu_read_unlock();
--			return ret;
--		}
--	}
--#endif
-+	rcu_read_lock();
- 	ret = __netif_receive_skb(skb);
- 	rcu_read_unlock();
- 	return ret;
-@@ -6421,21 +6456,10 @@ void netif_receive_skb_list_internal(struct list_head *head)
- 	}
- 	list_splice_init(&sublist, head);
-
--	rcu_read_lock();
--#ifdef CONFIG_RPS
--	if (static_branch_unlikely(&rps_needed)) {
--		list_for_each_entry_safe(skb, next, head, list) {
--			struct rps_dev_flow voidflow, *rflow = &voidflow;
--			int cpu = get_rps_cpu(skb->dev, skb, &rflow);
-+	if (netif_rps_list(head) == NET_RX_SUCCESS)
-+		return;
-
--			if (cpu >= 0) {
--				/* Will be handled, remove from list */
--				skb_list_del_init(skb);
--				enqueue_to_backlog(skb, cpu, &rflow->last_qtail);
--			}
--		}
--	}
--#endif
-+	rcu_read_lock();
- 	__netif_receive_skb_list(head);
- 	rcu_read_unlock();
- }
---
-2.54.0 (Apple Git-157)
+Cheers,
+Miguel
 
