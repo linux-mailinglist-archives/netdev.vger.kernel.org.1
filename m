@@ -1,133 +1,145 @@
-Return-Path: <netdev+bounces-306897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306898-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id KuEaJJ+aUmq0RQMAu9opvQ
-	(envelope-from <netdev+bounces-306897-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 21:33:51 +0200
+	id kEGDC76eUmpSRgMAu9opvQ
+	(envelope-from <netdev+bounces-306898-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 21:51:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BC64742B47
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 21:33:51 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85EBA742BE3
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 21:51:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=oSe5W3QJ;
-	dmarc=pass (policy=reject) header.from=bootlin.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306897-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306897-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=TmBomZ9O;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306898-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306898-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CDDA530087F0
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 19:33:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 755393039DB0
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 19:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 635B182866;
-	Sat, 11 Jul 2026 19:33:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9644D326941;
+	Sat, 11 Jul 2026 19:50:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FDC930D3F7
-	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 19:33:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A9F5321F2D;
+	Sat, 11 Jul 2026 19:50:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783798426; cv=none; b=Pscp4G1fMYYA3ZlLxUeIxCK/+UekogstJP+JuX+uqSGB0vLOeNFTaEBYiPFjqcRMGHauAMyX1cCmZfmpdpCAC2dBps+Kowm/PcbHtMG+iTsMmeBQ4KrKCAfv2ZH40cIhBu1cWy/zdZFVQ5EpwzgSDcbB4//vKoRI65Dn0Nc8nuk=
+	t=1783799404; cv=none; b=de/dCvFWhV3Hq4lezVWcL5oQe9jSJg+WJ/0mtkVpVKfu1tPxV2E+oh5cUtpIV9W1tXo+NOvdB0MVfUIq1QeK/Y7vdYc92QrhqQLnoLbtKVyJyW0zQr0OAdQ4fpmSxCC7BK5GgJJ18QvewKm+64WfIlFaUealUNobRdE5mTZbjB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783798426; c=relaxed/simple;
-	bh=O5WkeiR/zs1RpUms8+jAU2ZtuF80HK8dFcrVDrHcDa4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=od/FZHE3hKnggN4NgkyKIB6rHEPO6Pj1DnLeaOL9ajNZiCrYQtZ1l17aL1q0Efrlr2BVdbzucdnXaoc2+bb+Tb/7g4jse+Ianuc0kQZvWWpNmR8fz+XiBOEw028yNtwQGtUO0+u/JRdaj7P0FFRrV6Lg8kaDAV4jPqtno1pDe1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oSe5W3QJ; arc=none smtp.client-ip=185.246.85.4
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id E9D104E41214;
-	Sat, 11 Jul 2026 19:33:35 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id BC37A6034B;
-	Sat, 11 Jul 2026 19:33:35 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A5B1111BD3396;
-	Sat, 11 Jul 2026 21:33:27 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1783798414; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=Mhr3znqPdzk4zl43zlZdcWAMeZe4rPLdwME/lipWPio=;
-	b=oSe5W3QJo41GVdLzKzA54gNzzv/rtfCFyPIHqjMtFO0Rf/c/SaYqw0BmghYV6qR5Nm8/tl
-	4UbJZMrM5hv2dJVJM6h3hM1vkpzAoI+WqTQv2mQMDavLA+/jBfI7C1xX9LnyC03U/SDhPS
-	S186BaQXir5st5OPap+gze65dxaqRZLAtVF5J8FBrrMdp89kO1ZRnWgKpgBMNPSwjXYPq2
-	cIfHH6zQeor03eb4suEobf9ssexsM0CoAMsGy3uH//WDwUYCUCOa0nXBdZkM+2a7W1g8+S
-	ZnXUd6HBeEvyR4w4z8qJFUQjY8jIMGLt2f6f2i6VFafdEAh56WVi+gQrgXA/aA==
-Message-ID: <0dc5b763-1e05-4ded-bc4d-f89867f24500@bootlin.com>
-Date: Sat, 11 Jul 2026 21:33:25 +0200
+	s=arc-20240116; t=1783799404; c=relaxed/simple;
+	bh=8/Q5mDWXhiwKvNLCp9AotYNxjJ+/7xo2GEwDK05MDNQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IBqBJDzOqQpNPTKQlU682Zl8Y/0TQe+vLZ4iYAZkeAlO/ctMsckTzpP3bjwp5yC41eFbbwlky6SfUOk23UjsgifkcdsMGTAR/tm5MfXi5J3Vu/4ij0zoP9n3eUWG1WVMf/YBJ1kzwAHr5M06WwPhIQmRjVEafeVBMp19nnswyrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TmBomZ9O; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C12CB1F000E9;
+	Sat, 11 Jul 2026 19:50:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783799403;
+	bh=962WI+WFrEgveuIYGHxMy53wrwxe3EZr+9F07EUoRAo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=TmBomZ9Oi9R6ZGBX/lkMHcvwr5Vwje4Ggmr1FEwBFoCcTJZjBTJJ253t03km8hEBL
+	 F4pEON5Xbp4n9y+n/ceCapR4juW9/4dujhRkUhLO0AVhYXmCFBvqMGFNZCrSnyB+BP
+	 F2K4KthN8CSkQsezEmi7QSq8kPcHgRwPiz8uYBS6PlJOegBN1lkiul+wYfyXCXB483
+	 lZ9Rs2YS2ktzbzQno+8mN6qGvTF14y1ijbNju9DF2vHZO13WS1gzj5wdYo4iN9WP2F
+	 qgbH8lEqTNCUqHsTLQp6HBJTnOiySF6IC8xJFRNKnUkmhVDq+6hpBfPukAkqWHtnjX
+	 txXyUQrMzhAnQ==
+From: Bjorn Andersson <andersson@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	George Moussalem <george.moussalem@outlook.com>
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	linux-arm-msm@vger.kernel.org,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Subject: Re: (subset) [PATCH v4 0/4] IPQ5018: Add and enable GEPHY RX and TX clocks
+Date: Sat, 11 Jul 2026 14:49:42 -0500
+Message-ID: <178379938611.163099.4515812802119059592.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260608-ipq5018-gephy-clocks-v4-0-fb2ccd56894b@outlook.com>
+References: <20260608-ipq5018-gephy-clocks-v4-0-fb2ccd56894b@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 2/7] net: phy: phylink: add helper to modify
- pause
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: javen <javen_xu@realsil.com.cn>, hkallweit1@gmail.com,
- nic_swsd@realtek.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, daniel@makrotopia.org,
- linux@armlinux.org.uk, enelsonmoore@gmail.com, daniel@thingy.jp
-References: <20260709100237.541-1-javen_xu@realsil.com.cn>
- <20260709100237.541-3-javen_xu@realsil.com.cn>
- <0c188a7d-3637-4e08-9ac8-c1d824b461ed@bootlin.com>
- <18a5cd81-49ab-4b97-ba68-121e22cba874@lunn.ch>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <18a5cd81-49ab-4b97-ba68-121e22cba874@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306897-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:f.fainelli@gmail.com,m:konradybcio@kernel.org,m:george.moussalem@outlook.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:konrad.dybcio@oss.qualcomm.com,m:linux-arm-msm@vger.kernel.org,m:conor.dooley@microchip.com,m:dmitry.baryshkov@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,m:ffainelli@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:javen_xu@realsil.com.cn,m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:linux@armlinux.org.uk,m:enelsonmoore@gmail.com,m:daniel@thingy.jp,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_CC(0.00)[realsil.com.cn,gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,makrotopia.org,armlinux.org.uk,thingy.jp];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[andersson@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,outlook.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306898-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andersson@kernel.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,bootlin.com:from_mime,bootlin.com:dkim,bootlin.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1BC64742B47
+X-Rspamd-Queue-Id: 85EBA742BE3
 
-Hi Andrew,
 
-On 7/10/26 19:02, Andrew Lunn wrote:
- 
-> Once you start reusing existing code, i then wounder if it is just as
-> simple to allow any of the mac_capabilities to be changed, not just
-> pause?
+On Mon, 08 Jun 2026 09:09:15 +0400, George Moussalem wrote:
+> This patch series addresses a missing hardware description issue for the
+> Qualcomm IPQ5018 Internal Ethernet PHY, where the data paths fail to
+> function correctly unless their dedicated RX and TX clocks are
+> explicitly enabled.
+> 
+> Further testing revealed that leaving these clocks unmanaged by the
+> kernel, they were inadvertently left enabled by the bootloader / QSDK
+> platform, which masked the issue. Testing a fresh network configuration
+> path exposed that the data link fails to work without explicit software
+> gating.
+> 
+> [...]
 
-Yes indeed, but should we ? There's a valid case here for dynamically
-changing a MAC's pause support based on other factors like MTU, but
-is there a point in letting the supported speeds / dpx be changed
-dynamically ?
+Applied, thanks!
 
-Maxime
+[3/4] arm64: qcom: ipq5018: Add GEPHY RX and TX clocks
+      commit: 20959cefc27e7e2e506b4e789b728e5702c77f95
+
+Best regards,
+-- 
+Bjorn Andersson <andersson@kernel.org>
 
