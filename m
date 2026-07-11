@@ -1,85 +1,53 @@
-Return-Path: <netdev+bounces-306891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306892-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id jHGXMdN1UmpzQAMAu9opvQ
-	(envelope-from <netdev+bounces-306891-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 18:56:51 +0200
+	id douXFjJ2UmqKQAMAu9opvQ
+	(envelope-from <netdev+bounces-306892-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 18:58:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B8D57424D4
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 18:56:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F05A87424E0
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 18:58:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=ojxgGIxc;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306891-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306891-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=fvCp3ikg;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306892-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306892-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 90962300909A
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 16:56:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 52F9A300D843
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 16:58:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 149023CB90F;
-	Sat, 11 Jul 2026 16:56:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0B6C3CAE74;
+	Sat, 11 Jul 2026 16:58:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED66E3C7E13
-	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 16:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90D22C21DD;
+	Sat, 11 Jul 2026 16:58:21 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783789007; cv=none; b=p2oWvZ4kxcfjZ4h+jAvKQEJRI8obeVMBiCjSxZAKEmGOQ8Dn9oTK3NLwzWC4aZoowsfPorubZF2xPtYAGk+zJ1gwttHitmzi7iSYHy9kLpRewL/18s1crWjJN+bJS8qy+Cne/rYsJC662PEefT6ue7h0wWMj/nr2jVpnIe1UKjs=
+	t=1783789102; cv=none; b=aZpYy6r6/uKIgnBDatsjl8Wkt8O5hzHOxrWoH1u9h9fnphoblFw3/YK2EvXV6hrmGEqNX+VXptZBvVx9Q6ond6ndafESFmzo8W3kcBVVQZ5ObY/MQD9iOSnjHw/xa+C5VCp4s7xSAdpEQBmV/+xcoVsKQQPuMHCD4PRCxq+YsXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783789007; c=relaxed/simple;
-	bh=yRNexKuURdoGnE8+/ijduYiw/wIId9GpmrNXVT3HAao=;
+	s=arc-20240116; t=1783789102; c=relaxed/simple;
+	bh=M19w4Ry8fPHhwy/D225jwY/+QrbYkrRhysz9x2SVmY0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Rxz7NqbBqJAOVce9iOeKqIMk7ZmGcW1UB49a82awcO1DW0wQfiF+WxXrhNVWLs+8JF5mFWqNMZV0bbFK1IDXam+1fwdBdKr7so1fnINJ6hh+0WI+GLZxJ0fClaFVmEknjMbkm8bGaMa4MsIuwASdkh/7sEuI0UOGNQlleC0LTp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ojxgGIxc; arc=none smtp.client-ip=209.85.210.42
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-7eb787dec99so1172771a34.0
-        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 09:56:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783789004; x=1784393804; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=PUPiYSrT17qhTQ8MbXJ3f9k/JMiAtFPLGBry1sQcxdg=;
-        b=ojxgGIxcHJmBeVzYgU/vbarufsnad6jQroiPgIK4GF1UydmMtPvgFYq2DvfWhNKG4x
-         UQMoKPnVqpbv2hH75CFugSX5QK0PaZFEU0hHHmFlsrjIV/BPfT5sO6Sd05vPLKoB0zWt
-         /JwEaUOXg65oe3rLJUTukDh1s3VyWLvTSYrvPbJwx6wwaBIGuC7niQHWcxZvu8MkvYja
-         B0MJLejzWTStK71EEY8uZajj4FQfsVmQgcAROItmiieEPu3NY/dJyrkd9a9fM203vhoJ
-         gKcPkl5b7fwcSxGw4qfanmp192g/LG+LvKFzADqdrslBt3jXUQJB6k85c9y/Q3MXA84i
-         pe7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783789004; x=1784393804;
-        h=content-transfer-encoding:content-type:in-reply-to:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=PUPiYSrT17qhTQ8MbXJ3f9k/JMiAtFPLGBry1sQcxdg=;
-        b=Emc4AX89iM4B3q8dursIvJyO/lvpziZJjLwUAmp3CaVu825GXeTZgAq1QaTCsir+7+
-         csB2/BCP9Rf+Deslqj6OBvnvnmrzZS0KoFa/VeDhM3/3O02HXTms2n293aQERYpxdG36
-         SASVrBSDrU830TTnXpODQdk8wYDwAX/jsq3+I7mN7Ab3jzIRHYaRa5rnsgjNWc4P/N+P
-         ZVjP/yGcXc5RVPnIw+vsQB53R8TBDC/Alrs1l/Y20zfGlbOtcCfInzwsLlHaPkkGL/uH
-         IsEWYLFqBav6QhO+lpO8Cp9iFc3xyOYGAsryZWeaREvAI52yCFvezIp2eTNaxq4EuZp8
-         JQew==
-X-Forwarded-Encrypted: i=1; AFNElJ9LBkfaoYjUZOpdJt9sfhGL5FJ1tScGXAYTgxQNKKfuNNC35vWEPNbAZOXwtKmdOU6QHkKB/oM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpbpqDTcGgQ3bo9rgtvpQH9rEOYH0hVLuul9zs7qWD11rwQ/Tl
-	6zG3WfQsSvDiRBkfgRXW9LLt15KNMfAnTlXn4SW6Q0NPrBdJQd4a+YJ/
-X-Gm-Gg: AfdE7ckm8mtEiz/pk7jtoLn6sPOX651rrGKbgu6gbFy/uUgTE/Mend98/PNp+7ao5ex
-	euX9yx1+0/VEEYCEontaz9mfXTwRA7sBlVCN/LF66CsmDtf5/90OB72JTSQi/XJ/n3wkaRxxrp+
-	uBzaUEvjjicj38XNQw+dUhQkPV6pwiVgtseyXtDiPCAOomIogzZIYGTX6aH4KSj2aRJJEJIT0L6
-	OmSAM8+CNKau0XZ67DQ0iua5TUGb4snj7BJwaZhper8Ai0lP18rBBZP2kAOQu2T5TCh31qQj46N
-	H2eRXa95nXXKoKJOLg/Mt0stFN/Tt0vJevIyb2Ssmwxcobc4FbCU+3MYhnenI3xI3BXKLGNj45x
-	SMARUEt9g3B/saO2xKsKQBAewTxIaDItezkKe75WHYCHHgJ7PMGT1lNwikmGyaSf3yV9S8NvK/N
-	xyKjamnAGxsPa8qZk+pTbLMqZsg8VYOL8/gprWpSlIJkufxMeH1Y1NnFjwOwpxA/LaqGFtK1/BO
-	B5AV0s=
-X-Received: by 2002:a05:6830:3497:b0:7e9:e860:6ee with SMTP id 46e09a7af769-7ec0983e380mr2113298a34.31.1783789003871;
-        Sat, 11 Jul 2026 09:56:43 -0700 (PDT)
-Received: from ?IPV6:2601:282:1e02:1040:c495:5538:b9fc:6fc5? ([2601:282:1e02:1040:c495:5538:b9fc:6fc5])
-        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-7ebcb2b79c9sm8973682a34.22.2026.07.11.09.56.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 11 Jul 2026 09:56:43 -0700 (PDT)
-Message-ID: <5cf2d4ee-376f-4baa-baf1-fd7bf7500251@gmail.com>
-Date: Sat, 11 Jul 2026 10:56:42 -0600
+	 In-Reply-To:Content-Type; b=KNaZspEqIi8rUHhpfXmwXHNKFDaHSvSkjULPs3f3Js1JMD7fVPPh92hSF2ekCUoq8SLnIol6Y2V/A9ep22KyazoiP9gVesTfiJmlg8wFXsH6xxE9GZMnUYplAhVOKByMfr1H02K2BOlwbTEL90K/Nmo/1UDM1tbKUMh32kkozsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fvCp3ikg; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE0AA1F000E9;
+	Sat, 11 Jul 2026 16:58:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783789101;
+	bh=8LVWF0zRZFBT7ZHQPnyxfEExZ0tbS7bYRRc3O2NjxU0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=fvCp3ikgIQBcbIo2L9bcLzPHTW/8sJz1E3vDMGgsRx+jNzNHeTMqJEHEW7L8rcgWg
+	 89luY1JaPosu9YH3amb0LyzxNXs+iDAJXtEsHYN9wPDecqZs+OD1JLIgDOjxZUUhyM
+	 aJ6kQqB685TxLKoog7qgH7UJBQmNxnS8LIIjnjVzwN5jhCF9rAhTCrFicV51tbQFDZ
+	 Vqe9xEaauuxvRs81gOe+b3chSQ55bjts7xvYVo2m3aiqtuk+fI2qXabTJqJEfkLdfL
+	 c0L/OgRkwGYccc/Sdru+qRIOf8CitdFyLk/WXgtSCUybXlMavNnEFuW6eW6bvX0tyc
+	 Mj35FsW9JtbIQ==
+Message-ID: <68630192-970b-4b1c-9dc5-d4145d3eb15f@kernel.org>
+Date: Sat, 11 Jul 2026 18:58:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,109 +55,203 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] mpls: fix NULL deref in mpls_valid_fib_dump_req() on
- CONFIG_INET=n
+Subject: Re: [PATCH v3] dt-bindings: net: microchip,lan78xx: convert to DT
+ schema
+To: Mikhail Lukianchikov <avermoal@gmail.com>, Rengarajan.S@microchip.com
+Cc: andrew+netdev@lunn.ch, conor+dt@kernel.org, davem@davemloft.net,
+ devicetree@vger.kernel.org, edumazet@google.com, krzk+dt@kernel.org,
+ kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ pabeni@redhat.com, robh@kernel.org
+References: <20260711105537.11065-2-avermoal@gmail.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
-To: Weiming Shi <bestswngs@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Cc: kuniyu@google.com, gnault@redhat.com, xmei5@asu.edu,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260711114958.1009619-3-bestswngs@gmail.com>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <20260711114958.1009619-3-bestswngs@gmail.com>
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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
+In-Reply-To: <20260711105537.11065-2-avermoal@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:avermoal@gmail.com,m:Rengarajan.S@microchip.com,m:andrew+netdev@lunn.ch,m:conor+dt@kernel.org,m:davem@davemloft.net,m:devicetree@vger.kernel.org,m:edumazet@google.com,m:krzk+dt@kernel.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:andrew@lunn.ch,m:conor@kernel.org,m:krzk@kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306891-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:bestswngs@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuniyu@google.com,m:gnault@redhat.com,m:xmei5@asu.edu,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[dsahern@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
+	FORGED_SENDER(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_TO(0.00)[gmail.com,microchip.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dsahern@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306892-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4B8D57424D4
+X-Rspamd-Queue-Id: F05A87424E0
 
-On 7/11/26 5:50 AM, Weiming Shi wrote:
-> On CONFIG_INET=n builds, mpls_valid_fib_dump_req() walks the parsed
-> attribute table itself instead of calling ip_valid_fib_dump_req(). The
-> RTA_OIF arm passes tb[RTA_OIF] to nla_get_u32() without checking it is
-> present, so an RTM_GETROUTE dump for AF_MPLS with strict checking and no
-> RTA_OIF hits a NULL dereference.
+On 11/07/2026 12:55, Mikhail Lukianchikov wrote:
+> The conversion adds proper validation for the 'microchip,led-modes'
+> property inside the MDIO node.
+
+It was in the old binding, so I don't understand this part. You list
+here changes done to the binding during conversion. I see no change, so
+what does this refer to?
+
 > 
-> RTM_GETROUTE is RTNL_KIND_GET, which rtnetlink_rcv_msg() permits without
-> CAP_NET_ADMIN, so an unprivileged user can trigger it.
-> 
->   Oops: general protection fault, probably for non-canonical address
->         0xdffffc0000000000: 0000 [#1] SMP KASAN NOPTI
->   KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
->   RIP: 0010:mpls_valid_fib_dump_req (net/mpls/af_mpls.c:2189)
->   Call Trace:
->    mpls_dump_routes (net/mpls/af_mpls.c:2236)
->    netlink_dump (net/netlink/af_netlink.c:2331)
->    __netlink_dump_start (net/netlink/af_netlink.c:2446)
->    rtnetlink_rcv_msg (net/core/rtnetlink.c:7033)
->    netlink_rcv_skb (net/netlink/af_netlink.c:2556)
->    netlink_unicast (net/netlink/af_netlink.c:1345)
->    netlink_sendmsg (net/netlink/af_netlink.c:1900)
->    __sock_sendmsg (net/socket.c:790)
->    ____sys_sendmsg (net/socket.c:2684)
->    ___sys_sendmsg (net/socket.c:2738)
->    __sys_sendmsg (net/socket.c:2770)
->    do_syscall_64 (arch/x86/entry/syscall_64.c:94)
->    entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
-> 
-> Skip unset attributes, as ip_valid_fib_dump_req() does.
-> 
-> Fixes: 196cfebf8972 ("net/mpls: Handle kernel side filtering of route dumps")
-> Assisted-by: Claude:claude-opus-4-8
-> Reported-by: Xiang Mei <xmei5@asu.edu>
-> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+> Signed-off-by: Mikhail Lukianchikov <avermoal@gmail.com>
 > ---
->  net/mpls/af_mpls.c | 3 +++
->  1 file changed, 3 insertions(+)
+> Changes in v3:
+>  - Added $ref to ethernet-phy.yaml for PHY node to use standard PHY properties.
+>  - Dropped redundant PHY description and manual 'reg' property definition.
+>  - Dropped root node and fake compatibles in the example.
 > 
-> diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
-> index ca504d9626cf..318cb7e2ac5f 100644
-> --- a/net/mpls/af_mpls.c
-> +++ b/net/mpls/af_mpls.c
-> @@ -2186,6 +2186,9 @@ static int mpls_valid_fib_dump_req(struct net *net, const struct nlmsghdr *nlh,
->  		int ifindex;
->  
->  		if (i == RTA_OIF) {
-> +			if (!tb[i])
-> +				continue;
+> Link to v2: https://lore.kernel.org/netdev/20260709181724.24682-2-avermoal@gmail.com
+> 
+>  .../bindings/net/microchip,lan7800.yaml       | 96 +++++++++++++++++++
+>  .../bindings/net/microchip,lan78xx.txt        | 53 ----------
+>  MAINTAINERS                                   |  3 +-
+>  3 files changed, 97 insertions(+), 55 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/net/microchip,lan7800.yaml
+>  delete mode 100644 Documentation/devicetree/bindings/net/microchip,lan78xx.txt
+> 
+> diff --git a/Documentation/devicetree/bindings/net/microchip,lan7800.yaml b/Documentation/devicetree/bindings/net/microchip,lan7800.yaml
+> new file mode 100644
+> index 000000000000..730999d11e8a
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/microchip,lan7800.yaml
+> @@ -0,0 +1,96 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/microchip,lan7800.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
 > +
->  			ifindex = nla_get_u32(tb[i]);
->  			filter->dev = dev_get_by_index_rcu(net, ifindex);
->  			if (!filter->dev)
+> +title: Microchip LAN7800/LAN7801/LAN7850 Gigabit Ethernet controller
+> +
+> +maintainers:
+> +  - Rengarajan Sundararajan <Rengarajan.S@microchip.com>
+> +
+> +description:
+> +  The LAN7800/LAN7801/LAN7850 devices are usually configured by
+> +  programming their OTP or with an external EEPROM, but some
+> +  platforms (e.g. Raspberry Pi 3 B+) have neither. The Device Tree
+> +  properties, if present, override the OTP and EEPROM.
+> +
+> +allOf:
+> +  - $ref: /schemas/usb/usb-device.yaml#
+> +  - $ref: /schemas/net/ethernet-controller.yaml#
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - usb424,7800
+> +      - usb424,7801
+> +      - usb424,7850
+> +
+> +  reg:
+> +    maxItems: 1
+> +    description: USB port number
+> +
+> +  local-mac-address:
+> +    $ref: /schemas/types.yaml#/definitions/uint8-array
+> +    minItems: 6
+> +    maxItems: 6
+> +    description:
+> +      MAC address to use if not stored in OTP or EEPROM. If present,
+> +      overrides OTP/EEPROM.
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+Drop local-mac-address, already coming from network-class schema.
 
+> +
+> +  mdio:
+> +    $ref: /schemas/net/mdio.yaml#
+> +    unevaluatedProperties: false
+
+
+...
+
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index f37a81950e25..157a677a284f 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -27928,10 +27928,9 @@ F:	drivers/usb/isp1760/*
+>  USB LAN78XX ETHERNET DRIVER
+>  M:	Thangaraj Samynathan <Thangaraj.S@microchip.com>
+>  M:	Rengarajan Sundararajan <Rengarajan.S@microchip.com>
+> -M:	UNGLinuxDriver@microchip.com
+
+I don't understand this change. No one requested this. Not explained in
+commit msg at all.
+
+>  L:	netdev@vger.kernel.org
+>  S:	Maintained
+> -F:	Documentation/devicetree/bindings/net/microchip,lan78xx.txt
+> +F:	Documentation/devicetree/bindings/net/microchip,lan7800.yaml
+>  F:	drivers/net/usb/lan78xx.*
+>  F:	include/dt-bindings/net/microchip-lan78xx.h
+>  
+
+
+Best regards,
+Krzysztof
 
