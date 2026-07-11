@@ -1,175 +1,200 @@
-Return-Path: <netdev+bounces-306879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306880-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id jY43BKliUmqpPAMAu9opvQ
-	(envelope-from <netdev+bounces-306879-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:35:05 +0200
+	id pfRmCb1mUmpqPQMAu9opvQ
+	(envelope-from <netdev+bounces-306880-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:52:29 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72A86742004
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:35:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 77ABB7420C6
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:52:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=dyFgxcQ8;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306879-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306879-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=HT35FGNM;
+	dkim=pass header.d=redhat.com header.s=google header.b=qrlfyFNT;
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306880-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306880-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1CC253005EAC
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 15:35:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 586FB300B563
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 15:52:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1961926B2AD;
-	Sat, 11 Jul 2026 15:35:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 156D437998C;
+	Sat, 11 Jul 2026 15:52:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006941F151C;
-	Sat, 11 Jul 2026 15:35:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 864662C21DD
+	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 15:52:22 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783784102; cv=none; b=Al7MqIZhbIwKseQhbQteIQML3R/SGYHITpAZVeAN1XuvvDAf9b2ycRKIidyscd9wQCYLD6jvIp0rYA9DIaDBZb2+1JbmvPG21dvlRyeSjh/zGmsHqsuI9S/ZqJWEJ2HdnFtWytXlR+EXxYlOOcJJKVVIyvlyJbHeRfEn6+MECiE=
+	t=1783785144; cv=none; b=gnOGLTKrB10u8BJ3K1c573FF1JNptpXujgl8YIkGdmAsSlAzAcGtBXjK3zdEa05RuvNHe/ayjFdGiwmw7GiBcKaLpV0MOiaFVxfUKEwogA2D6gNgf8jdT/oxlj6ak8SuOWOUHKvDvAEx2pHQ7Vft7YvZstcKRaEonAyMfGi65p0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783784102; c=relaxed/simple;
-	bh=cM8gFIkD/0WD/HP0g9n34l6lpiH5je95D2a8VsuTKCU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gCwlARbI1sG3sjrz2FnbtI+NT/TsIRWhZ8/vgEVfBn07JhXbUm2DXwanrRT4AmRt7CCtEzdri1YTdwBMRWz34We0+O6G2tpPywhsXV+2vYTCJpUiGSYcj394/dYt0TLePe0um0BUBpWr+iay+JtpRE99HLWJA0yuKfR2oex8nxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dyFgxcQ8; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73B861F000E9;
-	Sat, 11 Jul 2026 15:34:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783784100;
-	bh=7rEMm+UIIe8jnjVNugOISwo6rSAeeJHdltnF34dwAcs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=dyFgxcQ8Se3NX+3vE/CJGOVCuPW/WGTV9ebL2HKI2ImshI0QyKEo5IWex4eNLomFx
-	 oVkjvWE/olUk3D+BJsNqFO8qCljsAKziASzY2gDnDea5gFf47lfTS8a+D9ysCNNmam
-	 8cCgGVy7plyt4hUzngwqah/lVczBGC89YQxiPzoPT4GOyZcnICvKlL/9ZlEBkY2ev9
-	 TZPmJeNaE+qpg4wgylMKruu0Z7myBjyz7xlw25CFRNq9JEiD+EBNeBLGV7ZoqnMFZr
-	 KGoHpNDkXueThyjdFlmq0amYr5VEiPHWzqjiAFhRcjp11st+mT+lhNSPXhY9cjODWh
-	 AZ2Gs+BQSGxXQ==
-Message-ID: <faa6bc73-9561-44d1-8631-b066619a233a@kernel.org>
-Date: Sat, 11 Jul 2026 17:34:54 +0200
+	s=arc-20240116; t=1783785144; c=relaxed/simple;
+	bh=lCnQkqEcnAuVhVKI8VK8T1Nky8MXYsIIAssTgtxhdA0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bJm/AO/u8qX5ZB9ok7CXvPIAkwKQXmUTlQffU2i7LFuUZTUJn2f+jCLY5QZbzxjN6qvyjvvwvrePwGZD3w5sYEgI8LyFTS0HGh4/b0JTCiOK5d1OrTZtxxmUQ8OakjaUKTLz2nNsrKJQKb0Jqk1DB0W09HNf/rWWu6UWoh6A3HA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HT35FGNM; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qrlfyFNT; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783785141;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8GQsJAkqOxpmPMDLvAmr6k9Ihtgwa7qxpwDTrH4YfZ0=;
+	b=HT35FGNMhLLxx2tRhBsITrCo5/zjuED4XwrVet8L6a3Y3ZDOY0OFqiggik1f9eO6JK9ufH
+	IDz5gfHF4WBSa9Xfm/QHxLXy32+k52pWK7Wkl1aJ1lKTAD05B8KKGAJc6JNgkAlq54L/Rv
+	l7y0kPe6Hpl7FOvXdDFzdLvirYpEjUo=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-646-fTh6K1epPZqRXmeR3QN73g-1; Sat, 11 Jul 2026 11:52:20 -0400
+X-MC-Unique: fTh6K1epPZqRXmeR3QN73g-1
+X-Mimecast-MFC-AGG-ID: fTh6K1epPZqRXmeR3QN73g_1783785139
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-493e3ecd385so18031595e9.3
+        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 08:52:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1783785139; x=1784389939; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=8GQsJAkqOxpmPMDLvAmr6k9Ihtgwa7qxpwDTrH4YfZ0=;
+        b=qrlfyFNTmk6Vht4B+tULJd0k1c1zHpEkKIuWjHFoZnXTcy05azR54+ANowGwVFz1Y4
+         Sf9jdPsjvdKaPgkKkLFoLTXLfe3HxA+E/G1z4BbESxEi7968PVmWYvmDkZzNgUH/ZO7i
+         Pq1PP6nyv4uthMA21HdQTUKNHKsgKpE1v3f4LTSY2l79V4Fwv8eNvAkXjJ80IDRh0F7V
+         tOId22j8+FX9jJD2P6xy2G9Dr0lPx/39A4KoH2PT/4FzAO+h4XmQysWE0Ckiz2QrwDKV
+         ejg10aHlMfIiDToB0yVwJEi5YjC4U7jZAHe1O2teA3ASpQ/45slictiq+Rckl86Rj8Tx
+         WPYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783785139; x=1784389939;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=8GQsJAkqOxpmPMDLvAmr6k9Ihtgwa7qxpwDTrH4YfZ0=;
+        b=Y9nlcTSETWZCEvKcEHHg//PklLzhffTf4iqDusNMTTjCpST8ldBGS+Z9kBSX+JXVpq
+         55IzJyrdO3Z98JPHcXw1yocKhhJ/cVPwTV596nWD0Dy3wb6iZjnKgFBWjNV2yo6fY6HA
+         /e49JXwlpDowH3zLOKux+/drb5LA+U34O9vsuJ3x7SJJFGJ4hBJHSccEOhCmoQ+fjbhU
+         w21GPIcnVtD5KMODd4BeKQj/lN/JoqcBEU5+bLgsyTldo86yyO/akDxmq2fRMYe3Cy8b
+         nJUvLSelKOPcbAxkblDpTG3Jsl4IldXVQ9pVDqfdSqL9pt7BkMr1kRv+oT4g1eVw7RPO
+         Ce5g==
+X-Forwarded-Encrypted: i=1; AHgh+RrMx92tmGbOig+nGXrz9Y5EPsITLCvS9y6KreY/RqtYcNzKTd1qYm65+r4Stu1aVbxqi3s7zXI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhC9/RWZnDaOZvslZID786yQCnZFbMZ0VZ9AGoCFHOSa8FaN1c
+	/BCIALAl+rGcqXMzQ0gs/G1xUivZGpYuXm6UZIFdJPkcFbdrELRHVivXpzqZ6CEO0OQiJHbpqhK
+	rhC0VT9SUwjH9RggmhwHy2tyxQv1oHyBCNgu7ZA378r5450+80oYcP76uzg==
+X-Gm-Gg: AfdE7ckXaFtOlcLfpga951VPQ9v6kz8HjJ7m1eNo79beemnmWbCT+GLkBtvhOTEH/hh
+	y2OZUqiQHCLwhlIiE2tlavk3hqD3cy0yrfC8Hj1xKIBqK5Zo2x2YKdOc/T15zsNA2ZlyeOhDiW1
+	1yxEqlyfVSL8lwXa+eIcjcOIqs9GStJJSr49YWOmOVIyKQfVNJ5+yvp0M6SKXR6aLlSPCFMiswC
+	s/ybhpzDuIow7ZD2bHiVfYUmcRKodo9xNPcdhc07RnGwR05jFV24z4+mdXexgL2uPJZzxyOOsBs
+	5YoY4eHbJmT+auiEVZW9fmwE95S8k4nMcOkfz5Mp2Pga5mXYq/aUYMobZuYE4NjF9XsY0v3nAeF
+	2dBf7fsANBolsm98sdSZTuANzgwNFqRo04miesxnv4w==
+X-Received: by 2002:a05:600c:310f:b0:493:d115:d835 with SMTP id 5b1f17b1804b1-493f87d5800mr26790815e9.8.1783785138887;
+        Sat, 11 Jul 2026 08:52:18 -0700 (PDT)
+X-Received: by 2002:a05:600c:310f:b0:493:d115:d835 with SMTP id 5b1f17b1804b1-493f87d5800mr26790445e9.8.1783785138430;
+        Sat, 11 Jul 2026 08:52:18 -0700 (PDT)
+Received: from redhat.com (bzq-79-177-145-168.red.bezeqint.net. [79.177.145.168])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493eb6f373csm375363835e9.14.2026.07.11.08.52.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 11 Jul 2026 08:52:17 -0700 (PDT)
+Date: Sat, 11 Jul 2026 11:52:13 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Michael Bommarito <michael.bommarito@gmail.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] virtio_net: validate device stats reply records before
+ use
+Message-ID: <20260711114248-mutt-send-email-mst@kernel.org>
+References: <20260711150754.2918392-1-michael.bommarito@gmail.com>
+ <20260711111503-mutt-send-email-mst@kernel.org>
+ <CAJJ9bXwUtQ3pHqZ=AMuwaNLs16pmujiMdeBQtB5kFc6JjM-Pug@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net] selftests: netconsole: only restore MAC when it
- changed on resume
-Content-Language: fr
-To: Andre Carvalho <asantostc@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, Breno Leitao <leitao@debian.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Shuah Khan <shuah@kernel.org>
-References: <20260710-netcons-mac-reload-v1-1-3fb1bcc70b4a@gmail.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20260710-netcons-mac-reload-v1-1-3fb1bcc70b4a@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJJ9bXwUtQ3pHqZ=AMuwaNLs16pmujiMdeBQtB5kFc6JjM-Pug@mail.gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-306879-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306880-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:asantostc@gmail.com,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:leitao@debian.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:shuah@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	HAS_ORG_HEADER(0.00)[];
-	FORGED_SENDER(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:michael.bommarito@gmail.com,m:jasowang@redhat.com,m:xuanzhuo@linux.alibaba.com,m:eperezma@redhat.com,m:andrew+netdev@lunn.ch,m:kuba@kernel.org,m:pabeni@redhat.com,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:michaelbommarito@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[mst@redhat.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 72A86742004
+X-Rspamd-Queue-Id: 77ABB7420C6
 
-Hi Andre,
-
-On 11/07/2026 00:19, Andre Carvalho wrote:
-> The "mac" bind mode reactivation downs the interface, restores the saved
-> MAC and renames it to trigger a target resume. This assumes the recreated
-> interface comes back with a different MAC, which is true under
-> MACAddressPolicy=none (as on the Netdev CI) but not when MACs are
-> persistent. In the persistent case netconsole resumes the target on its
-> own, and the down/restore/rename flow instead drops it and fails the test.
+On Sat, Jul 11, 2026 at 11:29:56AM -0400, Michael Bommarito wrote:
+> On Sat, Jul 11, 2026 at 11:20 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > Why does it "matter most", or at all, there?
+> > Host can always deny guest service. In fact, this is how cloud vendors
+> > charge their clients, by denying service to whoever did not pay them.
+> ...
+> > I'm all for making things easier to debug even when the device is buggy.
+> > But I'm not inclined to add tons of hard to maintain code to
+> > that end, and I would be worried broken hosts will come to
+> > rely on drivers working around them.
 > 
-> Guard the block on the MAC having actually changed so the test passes
-> under both policies.
-Thank you for the patch, it fixed the issue on my side when not forcing
-MACAddressPolicy=none.
+> I am always confused by the CoCo threat model to be honest,
 
-Tested-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Confidential computing? It's vague at points, given the term covers a
+lot of different hardware. But one thing is clear - it's about
+confidentiality.  DoS by host is empathically outside the threat model.
+On any virtualization platform I know without exception,
+host can just exit the VM, done, service denied.
 
-Cheers,
-Matt
+> since it
+> seems like some people care a lot about maximalist reliance on the
+> contract and other people are more practical about how many other
+> vectors exist anyway.
+
+I don't really know what "vectors" or "the contract" are here.
+
+Making a guest recover from a misbehaving device has as much a chance
+to reduce security as increase it. So the only benefit is
+robustness for users/developers, not security. And that
+has to be weighted against the maintainance cost of the change.
+This one is too costly, I judge.
+
+>  No hard feelings if you want to NACK, but at
+> least it's documented publicly now for people to consider.
+> 
+> Thanks,
+> Mike
+
 
