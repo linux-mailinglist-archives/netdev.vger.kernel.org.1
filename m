@@ -1,245 +1,165 @@
-Return-Path: <netdev+bounces-306768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306769-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VK3fE/IBUmr9LAMAu9opvQ
-	(envelope-from <netdev+bounces-306768-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 10:42:26 +0200
+	id 50bWEO4IUmqwLQMAu9opvQ
+	(envelope-from <netdev+bounces-306769-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 11:12:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D619740EE6
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 10:42:25 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3E07740F90
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 11:12:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=m2w7Nr04;
-	dmarc=pass (policy=reject) header.from=bootlin.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306768-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306768-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=L3eGaEjp;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306769-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306769-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6255C3011121
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 08:42:24 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0D96B3009160
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 09:12:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F31AC37A821;
-	Sat, 11 Jul 2026 08:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E4337F721;
+	Sat, 11 Jul 2026 09:12:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B1F322083
-	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 08:42:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86B42773CA
+	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 09:12:10 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783759343; cv=none; b=hVWPjp0tDPNNVXuJjU6aokEQcw+4vgPR/Ssm4mFvmIjW+e8euDIb5dEHib4NAna0bMRH2lPp+NN8MTGX7JIGOiky2VX1ENnn5VDtj6fcHGvwSJhLnxAjbvzgUcq2I43qrpB23K0w+L7tbTTpBJbGhZWqc6hsSfquDhyIV5HTKXo=
+	t=1783761132; cv=none; b=jQ9053LP/DHvxgx4lstF3xe06ZMpt0VcJYAQ0An0ppeSc1sxSm6/GtlfDTXmnTxyL187XRsTrugN5waQfyVXwvofl2+IUqotq3jprIBV5bEjLSKDNrkdjmMYRneUHkpjgMZmfmuQgcse9s1VA6B1AYiblR2+oMATY6adhqYvLvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783759343; c=relaxed/simple;
-	bh=iS1c4hvGH/LXlRadNhieKEoeuzlGxODr9gWM+1BYuVo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fUUqUVInVOZZyDIaGWlErUtG0Qo9IUjgPOLbJLQQKL0fJbIKBrpLSSIpNQCvDrvbJUC6qAIcOo/avdum/ofaT5MugLX3Q3ciqmItoo4c3F7iDkF+/9Xz243f5KKBf7tyZEypsx3eszD52Y56QwFp4Q9nuLZ3+tQWSizIrsaaa4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=m2w7Nr04; arc=none smtp.client-ip=185.246.84.56
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id D289D1A0F61;
-	Sat, 11 Jul 2026 08:42:11 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 991DC60343;
-	Sat, 11 Jul 2026 08:42:11 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7447411BD1CD7;
-	Sat, 11 Jul 2026 10:42:06 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1783759330; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=SK7W81fF4n3/gbjdgCeCa6t2meM8xhrSq1ENEJSgQ7Q=;
-	b=m2w7Nr04oCpdms+SFBCUOFxzClexX1LAeYhPa5uaP0r2R2b2Lj/L1WcsYyA55z1O/HCYco
-	ULWtj4Ydbn1/X1ixFpAXNWKIZE8YWXWAg2+M3+IWBn+dIl/M9pWEcYkTQLp9r+VOhO9sDw
-	CXFLcoYDI1Tp7Ndv/7wVRFcXXfBnqNb5z9Dim1EgqzH5s/MzyZE0DlqiDXgO1RUsYdlMQ3
-	MEr5KbJONSDdDJGvPIxs4d/fDDynJWDZU/03+pLT2rE1NT/EhzSVmheKMJqOTm8GfcSpEc
-	chGBhofORDkhmwpqnjeIaL/DFzQ4mCm7qAi3lP67nA7Dedh6Pjw0L3FB8v4oMA==
-Message-ID: <bb7bb5c6-5643-4e5b-b26b-9363127bb2d8@bootlin.com>
-Date: Sat, 11 Jul 2026 10:42:05 +0200
+	s=arc-20240116; t=1783761132; c=relaxed/simple;
+	bh=uPaiOGoNFr7zkBX2pJiSPMuPQwkXNFMgfzCf29UXcHc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sDbHMqIejhD+Bj1RijNe4lT0Qx3TcvohUIgUxhulJymT/L2cnU2yGxH4HvkmE0+fDUBTh8VspSn9/6V46mTjV9KT9OsDDPF5q1FZmtGnPhRXB3EtVyoxX6QJvJy3SIKh/wZ/gN+Vuw+gghlB983rTCD4Hg8uGuYbZ9PPzSK/azM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L3eGaEjp; arc=none smtp.client-ip=209.85.208.47
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-693c51a8a19so2555552a12.3
+        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 02:12:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783761129; x=1784365929; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=PSFjPIB523gHDvD4Fc7ge2yKmmEA/d172Uh20iN5gWg=;
+        b=L3eGaEjptoxFEfk89oJhjPMsM75k7gHEIrDsQGsZdIagygiZWoqThfrDRd29GAPMeF
+         1jAdgaUDxcTUETI68WH7Aqu2kjgzNusRXyb0K7NdZ+4u/AIEx1udO57i4aRfrc8zdfrM
+         pN7cAwm9HCmnsYxgTvuR1RLYuP0jkyi53/eEwB1Y7EU2tvNi+B+8zJhqOIxA+bcEbUx3
+         eEUkVGFbgebixee+H0xdBULw3B7867pfYUThux4FaK2vZj3OZjCZBPidqgbe2+0fyv+k
+         e1/SpwDEVdYWZcLzVSyQ4F8aqBED6D3ioqnsRkcfx9tELs4eyQBDB8JdZpyKhjIWEIn5
+         oiBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783761129; x=1784365929;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=PSFjPIB523gHDvD4Fc7ge2yKmmEA/d172Uh20iN5gWg=;
+        b=jkPW8TU+DI6hVsamaZZnDHQUVh4AYHJEUVvx0v/wPvcXqmHp4286eufVXMmjH6VXFl
+         rdCqGHAWz0MM8RIe65kl8qn6cdlYl6ljIMi4dAz/zzlJ1j0qbw3xDBfiOkDE14k5pdwT
+         Sd5zNs7s3pOSrM4ecQ6KstLOKPuRzpPrIBHf23JS8h8NnQIisxUCj+QgLhdf5AwjWxXy
+         Ys0kl77PLN8G8Q0vmLKPsTwY0ED5wxFIPOmWYLlM6wdIb9OljMtzTGfzpQmwuc15ZwTJ
+         0ZrN7XdWjAzNa3PXYu58RNkDxmdZiIE4Uif9lrt8HdcbCIXKaBEHN69UCmsxUy7Z160m
+         P/jA==
+X-Forwarded-Encrypted: i=1; AHgh+RpqrfiOEpHoCqD0BfKyFi4oJq/6v/6QudMi9uf27PjxeAlRcCRauxUSOog7CwbLMw2TmPCECzs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6cTzFBHeUGJHncVDHUkvo3DD7Sujy/t6Y/6A7QMUNu4hzkQSZ
+	fIp8chM3ERh9sjuzFHoFYggCMc31UOUsB1tnt4yzb0NlrR6m9ltMBhhEgMFvaw==
+X-Gm-Gg: AfdE7cns5gx0xoy0AnL5NVuQlk12U8LU+LFClBEnXMfHz5rB/BxEfmp9QYRaNfk9jqV
+	/K+9bucw8gCpt/Qa+AM7f0WHMbAZtRzi5K/RMPlGqzsm2ufeRYRG5jcR93PNm2lo/AlWj/7wX5S
+	1JsHp16CaJRMwDXurYtz+9QBd5SyvhiT7CGEjnZxVH7oGa5mnLSJXtbFDNiSZDnH4YkfSQGS6oq
+	bwNuoCUnGeyW6dV2y4cXIBjETVmP+Ex3wBzBsa6gprJegOvPW2onM56+2VMoDpBViiWCuOkrUot
+	0Dl/XlUq9m1qZwGLdyJ8pl4k7Z/vZ9UMa72eKbJloiqvHawZ5j5fHre6xDrMEgfo3E414VKixSW
+	ICcWZNOGfuLJKCD4H85rASnGlLfTmN0Hz4cUBhGNuQh6TQeRUuZyRre7HxYaCd/bwjk6jTwcxSx
+	S79pC/PS8T9tvTZgMUfhRkoCkGzLoa7B0ZL6bjvdc8LuKEZkQsrN8qCIHgeeu0dceA1mXZf4XsU
+	FtLDWWTQMkTQJqrlWwWNXzV/ygeg/VqJR+KHfrxJoIdoNg=
+X-Received: by 2002:a05:6402:380b:b0:69a:44e0:7455 with SMTP id 4fb4d7f45d1cf-69c5f11721fmr871751a12.30.1783761128956;
+        Sat, 11 Jul 2026 02:12:08 -0700 (PDT)
+Received: from 127.0.0.1localhost (82-132-221-54.dab.02.net. [82.132.221.54])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-69c60d47188sm681191a12.27.2026.07.11.02.12.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 11 Jul 2026 02:12:07 -0700 (PDT)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: io-uring@vger.kernel.org
+Cc: asml.silence@gmail.com,
+	netdev@vger.kernel.org
+Subject: [PATCH review-only 00/17] zcrx RQ improvements and dynamic memory provisioning 
+Date: Sat, 11 Jul 2026 10:11:23 +0100
+Message-ID: <cover.1783616211.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Ethtool is missing C2C link modes
-To: David Laight <david.laight.linux@gmail.com>, Andrew Lunn <andrew@lunn.ch>
-Cc: "D H, Siddaraju" <siddaraju.dh@intel.com>,
- Michal Kubecek <mkubecek@suse.cz>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "Chintalapalle, Balaji" <balaji.chintalapalle@intel.com>,
- "Das, Shubham" <shubham.das@intel.com>,
- "Srinivasan, Vijay" <vijay.srinivasan@intel.com>,
- "Samudrala, Sridhar" <sridhar.samudrala@intel.com>,
- "Keller, Jacob E" <jacob.e.keller@intel.com>,
- "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
- "singhai.anjali55@gmail.com" <singhai.anjali55@gmail.com>,
- "Brandeburg, Jesse" <jbrandeburg@cloudflare.com>
-References: <SN7PR11MB6900E94E718175AACB2309109AFD2@SN7PR11MB6900.namprd11.prod.outlook.com>
- <e3dd8e06-97d1-4943-b54c-fdd0d0e6ecaa@lunn.ch>
- <20260711073128.7f94e0ac@pumpkin>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <20260711073128.7f94e0ac@pumpkin>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	SUBJECT_ENDS_SPACES(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306768-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:david.laight.linux@gmail.com,m:andrew@lunn.ch,m:siddaraju.dh@intel.com,m:mkubecek@suse.cz,m:netdev@vger.kernel.org,m:balaji.chintalapalle@intel.com,m:shubham.das@intel.com,m:vijay.srinivasan@intel.com,m:sridhar.samudrala@intel.com,m:jacob.e.keller@intel.com,m:anthony.l.nguyen@intel.com,m:singhai.anjali55@gmail.com,m:jbrandeburg@cloudflare.com,m:davidlaightlinux@gmail.com,m:singhaianjali55@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,lunn.ch];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[intel.com,suse.cz,vger.kernel.org,gmail.com,cloudflare.com];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:io-uring@vger.kernel.org,m:asml.silence@gmail.com,m:netdev@vger.kernel.org,m:asmlsilence@gmail.com,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306769-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,bootlin.com:from_mime,bootlin.com:dkim,bootlin.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:email]
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8D619740EE6
+X-Rspamd-Queue-Id: B3E07740F90
 
-Hi,
+Sending it out mainly to trigger review bots. The first half improves
+the refill queue implementation and improves refilling limits, which
+shows up when niovs are heavily fragmented like with large rx pages.
+The 2nd half adds dynamic backing memory provisioning.
 
-On 7/11/26 08:31, David Laight wrote:
-> On Sat, 11 Jul 2026 00:54:00 +0200
-> Andrew Lunn <andrew@lunn.ch> wrote:
-> 
->> On Fri, Jul 10, 2026 at 09:45:43PM +0000, D H, Siddaraju wrote:
->>> Hello Linux Ethernet team, Maxime, Andrew & Michal,
->>>
->>> The IEEE AUI chip-to-chip (C2C) is the accepted standard for connecting
->>> chips that handle subfunctions within the OSI physical layer. Just to
->>> pick, the C2C is widely used when connecting Ethernet SoCs with retimers
->>> and PCS SerDes terminated external-phys to offload PHY sublayer functions.  
->>
->> It cannot be that widely used if Linux does not support it yet :-)
-> 
-> It also seems like something that is fixed for a physical board.
-> So while a common MAC driver would need to be told how to configure
-> its output, the user wouldn't be changing the value so it would
-> be more of a DT parameter than an ethtool one.
-> 
-> ...
->> Also, an architecture question...
->>
->> It sounds like you use this between the MAC and the PCS. The PCS can
->> then be connected to a PHY, and the PHY then has a line side. (I'm
->> being a bit loose with the terms here, i should probably be saying
->> PMA, PMD etc.)
->>
->> Should ethtool be saying:
->>
->> Settings for eth0:
->> 	Supported ports: [ TP	 MII ]
->> 	Supported link modes:   25000baseC2C
->>
->> or should it be reporting:
->>
->> Settings for eth0:
->> 	Supported ports: [ TP	 MII ]
->> 	Supported link modes:   25000baseSR
->>
->> I _think_ ethtool reports the media, not some intermediary format.
-> 
-> You'd want to use ethtool to set the final link parameters of the
-> external phy?
-> So I think you's still want to be able to select (say) 100MHDX
-> for a TP link.
-> 
-> Remember the history.
-> The parameter was originally used to select between the the AUI, COAX and TP
-> connectors on a 10M ethernet card.
-> Then the internal TP gained extra speeds.
-> We then get MII for external 10M and 100M PHY, later RGMII for external Ge PHY.
-> But you rarely get boards (not MAC chips) that have a choice of interfaces
-> any more.
+Pavel Begunkov (17):
+  io_uring/zcrx: scale refilling with large pages
+  io_uring/zcrx: move RQ head/tail to separate cache lines
+  io_uring/zcrx: add RQ iterator
+  io_uring/zcrx: cache RQ tail
+  io_uring/zcrx: coalesce same-niov RQEs on refill
+  io_uring/zcrx: constify area_reg on import
+  io_uring/zcrx: add helper for deriving area token
+  io_uring/zcrx: don't pass ifq_reg to area creation
+  io_uring/zcrx: split dmabuf unmap and release
+  io_uring/zcrx: unmap under netdev lock
+  io_uring/zcrx: split append out of area creation
+  io_uring/zcrx: move freelist lock to struct zcrx
+  io_uring/zcrx: array of areas
+  io_uring/zcrx: pass area_id to __zcrx_create_area()
+  io_uring/zcrx: add dynamic area creation
+  io_urint/zcrx: narrow var scope in io_zcrx_recv_skb()
+  io_uring/zcrx: don't reload skb_shinfo
 
-Note that there's ongoing work[1] to better support nics with multiple connectors,
-which also includes reporting what the 'media-side' of a MAC / PHY can do :
+ include/uapi/linux/io_uring/zcrx.h |   7 +
+ io_uring/query.c                   |   2 +-
+ io_uring/zcrx.c                    | 445 +++++++++++++++++++++--------
+ io_uring/zcrx.h                    |  15 +-
+ 4 files changed, 345 insertions(+), 124 deletions(-)
 
-[1]: https://lore.kernel.org/netdev/20260701110427.143945-1-maxime.chevallier@bootlin.com/#t
-
-Taking the example of a combo-port (SFP + RJ45), it would look like that :
-
- ethtool --show-ports eth1
-
-Port for eth1:
-	Port id: 1
-	Supported link modes:  10baseT/Half 10baseT/Full
-	                       100baseT/Half 100baseT/Full
-	                       1000baseT/Full
-	                       10000baseT/Full
-	                       2500baseT/Full
-	                       5000baseT/Full
-	Port type: mdi
-
-Port for eth1:
-	Port id: 2
-	Supported MII interfaces : 10gbase-r
-	Port type: sfp
-
-or even
-
-# ethtool --show-ports eth3
-
-Port for eth3:
-	Port id: 1
-	Supported MII interfaces : sgmii, 1000base-x, 2500base-x
-	Port type: sfp
-
-
-Now, with this infrastucture also comes the ability to list the media-side
-interfaces that are not MDI but rather MII.
-
-The main goal is combo-port support, but also media-converters, e.g. things
-like :
-
-MAC ------ PHY ------- <something>
-     rgmii      sgmii
-
-(for now, the ongoing series focus on supporting this through SFP, but extending
-that to other link types is something I'd like to achieve)
-
-As Andrew says, when you use "ethtool ethX", the list you get is the media-side
-modes that you can use at the connector, so it's an aggregated list of the MDI
-that are usable based on the MAC, PCS, PHY you're using (MAC and PCS would limit
-speed/encoding, PHY defines the actual MDI modes)
-
-For the C2C modes, it's not clear to me if these are MDI modes, i.e:
-
-  ETHTOOL_LINK_MODE_25000baseC2C
-
-Or a phy_interface_t, i.e:
-
-  PHY_INTERFACE_MODE_25GAUI
-
-We already have XAUI and RXAUI as phy_interface_t as of today, so it looks like
-we don't want an ethool linkmode for that but rather a phy_interface_t
-
-Maxime
+-- 
+2.54.0
 
 
