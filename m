@@ -1,144 +1,191 @@
-Return-Path: <netdev+bounces-306757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306758-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id fsRhMh/zUWoNKwMAu9opvQ
-	(envelope-from <netdev+bounces-306757-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 09:39:11 +0200
+	id 0gXbBoj0UWpSKwMAu9opvQ
+	(envelope-from <netdev+bounces-306758-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 09:45:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 098B7740C03
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 09:39:11 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A83F740C94
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 09:45:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=fail ("headers rsa verify failed") header.d=0sec.ai header.s=google header.b=YfED+KZN;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306757-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306757-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=LkEOMDkm;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306758-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306758-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 583FC30078E8
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 07:39:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3B21D301C2C6
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 07:45:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FEB035E1CB;
-	Sat, 11 Jul 2026 07:39:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ED9737F729;
+	Sat, 11 Jul 2026 07:45:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50F125B0B8
-	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 07:39:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D7537C0FF;
+	Sat, 11 Jul 2026 07:45:05 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783755548; cv=none; b=fVA/vm3ogb8FTq1oxkIL6AqtDOG7S+akmL/ehfefroQasdJkO2vvfDGHvxd0fz+jR/AtwJN42ArRDJ9TpeHfJSTIz7dU7j6jihS6aYIzZlE1njvV2mlf22yek6C1SXDnWHromscsD5rJns7ZFRN6BU9Me6lgbVS0hPh0fggtpJA=
+	t=1783755905; cv=none; b=ipA5eVJAETOrh2+lcZjSnlAEPKS2RdfrRW6AsrryMbL+atYQCniynJ5prnxjQq6UDfGLa6Hpcow+tkLfzffKIAtaTGT94Xm0HfQ+cvu5u5kA2/fuPqakMudyIfnZnyVnflXkuobmVAtSOgurQEOy7S+Veqt0VHRXCze8NBV3XUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783755548; c=relaxed/simple;
-	bh=be+u06AdYrQNudktwkV4S6TmLYRJkKzVLJTnqQZnM5s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hyqDA/vLyFUlDj+6BsweYVqkinCLj6bMDFQUN5GbEYO4xs0CJfGZsPoxhpSY8E8WBbgGWdb/5Yt0iI8+eT2nfNw0SArV7RUL1qsaOqcyyh56mGXacubkwjSopM1Piwwum+PiiBylFXxCkT5EFqUZtFNUzApJOdGm1koDa/nTNaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=YfED+KZN; arc=none smtp.client-ip=209.85.128.47
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-493f75f7172so6967265e9.1
-        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 00:39:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=0sec.ai; s=google; t=1783755545; x=1784360345; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=be+u06AdYrQNudktwkV4S6TmLYRJkKzVLJTnqQZnM5s=;
-        b=YfED+KZNcRhgGwEpC1SpVy0KkDbVaRM4tSTfLLduFpqDpW+2dtSSLF+/cBvJIzV4Fy
-         6ed7haX/CEa/3vNIyJ0pQ63Hmt5tWl8TW6nKN8SKnq+I7SqMD04TwrQstyVlHOLFeebK
-         iMwmi+uii0Mhg/KqmTYV5fLVZZOwxwHcHuCajYvMkbvuPyzdoRqMZGufkNO2WczrlnGT
-         X2mJStqn5XjHvxM3vM9DNjZXI3t7jagM4PTDv007x3Mw5XfzKUGbNQwWG8MN+YNPySj5
-         smubc3wpgGgEWKL7+JgWhbB2at5tQT0nrIYkAYTSfKOVm8J1PS7omZFnPaW+IX1/Ezr9
-         2eiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783755545; x=1784360345;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=be+u06AdYrQNudktwkV4S6TmLYRJkKzVLJTnqQZnM5s=;
-        b=bfAWrWEvw6T8CLCkkmVAe9fAPYZ13TbdZLKRJ2NG/0JGq97Gs6SZF+x5LixdpLV5AZ
-         JugCI0pB/SjtT0LSemX02kws6q69Q+iuu3vwttn3Z7jSOTbIMy6S/bCUATq/4JfAxSNm
-         d60j/3KP+YBcKtnWFZbnHhQ1H7Z9G4atmUTd+tSXjQZSgfwh0oAulWEHg7ToqLZKL9LD
-         hYPWc2t6RCTg7arYPAacbxKwwAPPZbk7iX95H/f/0kFCUr5xO28zDiirt0sXYOy4iOOG
-         j22EyUrE9eugOhp2j2eE6Z7oahV8/xTv+MXaL1T+UoPPLeEkj2xNL9+tMJAh845ALChH
-         bQsQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqDGfdSqryKeTqOapDZZeseQES60eHEvm1BhW6/OgFJ2oxXDbPxALg0nI8EMpycNL8NAM6k+nw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4cZz1bjh7R8IdY5sH25UeVvu1xlg4pXeUn53x94F0UH4/EFox
-	RNF6Mh6AoEwdM9wu/ftQCVznwi6XryIrZCKpc2ygmVS2xArRi2ptSMZC+QLVQA4WhHEF
-X-Gm-Gg: AfdE7clUcyDsINN0R3JMrwcy6qB2rD/GR+UN4MRujk6sNwMYm82QIRAr2xZ/J9cP+Dn
-	T4K8uXXDAnBlJpJTbiaMrj9+iqLzYIKpB8d4vjBFqLsCps2EFoZnrhOMMRPA58kMGc7EUl0sTVd
-	o8hv4L1LTlDG+QjbnGj+3MrsPxPl4ouWBbE/3zUlWwSUv1NK4sJRQdhS529d4pOFFKJBBPzTy7r
-	Dzq5x9e/ezVGYuyz5PwpvZc4vSx7ylGAs3+2rOqwz/XO1t2j2noz5HCBfkkBWCD0cNUHaBEKqfg
-	bI2VT1Vy9owonCUz8bXLis97CkUDLj5eR9+rJK6nEIJmNpgZerlCJBM6B/j2UXtqGlNKBONgVoe
-	xEUc8vCSeUIhqecjl3Fiqqd5EsxuIEiqBkWlDXa/LVAMROeG+EeTHLZaMVOVFXsjSRPnTMyw2FN
-	WKkPwBOE8vcLxpgQMB/KTznQYXmGv0xnwCyQ4/b20eEecmtIX5Ef2yIAmw3K8tQYHsThIx5ppKO
-	7ML4gkAiYb6IgvzifMjqH2Dka16prcz7WE=
-X-Received: by 2002:a05:600c:4e90:b0:493:9b02:484c with SMTP id 5b1f17b1804b1-493f8826b9emr15373425e9.29.1783755545138;
-        Sat, 11 Jul 2026 00:39:05 -0700 (PDT)
-Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.218.188])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa0a55be4sm61374217f8f.31.2026.07.11.00.39.04
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 11 Jul 2026 00:39:04 -0700 (PDT)
-From: Doruk Tan Ozturk <doruk@0sec.ai>
-To: david@ixit.cz
-Cc: Doruk Tan Ozturk <doruk@0sec.ai>,
-	horms@kernel.org,
-	oe-linux-nfc@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] nfc: llcp: guard against short PDUs in nfc_llcp_rx_skb()
-Date: Sat, 11 Jul 2026 09:39:03 +0200
-Message-ID: <20260711073903.73366-1-doruk@0sec.ai>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260711073012.71066-1-doruk@0sec.ai>
-References: <20260711073012.71066-1-doruk@0sec.ai>
+	s=arc-20240116; t=1783755905; c=relaxed/simple;
+	bh=SKtlWD3szBtItKAM745R/SjGNiriLui2N0zipFKueYE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=bw+y7sd3HCWzTCc52ANGMFo4s1w40vM5qfFz9Z+Wwc00kF1crP7ncCK+m7XBelH7jsA2TThVlgklK90TFJ25+AzP+8ZD9PcYRNB7q5tED01wwWqxmCdoIIJIjtN9m9+6KZ7mR4JhgdsTOMAbMSyRpatJ7s5NkYa/0HsBAxYeGes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LkEOMDkm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EA79AC2BCC6;
+	Sat, 11 Jul 2026 07:45:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1783755905;
+	bh=SKtlWD3szBtItKAM745R/SjGNiriLui2N0zipFKueYE=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=LkEOMDkmz/Z/HVUq/f8NSgc4aSVB8wlo3LV4hII+8c2m4D6gLu9pE09XbNuxrkBJ4
+	 yprQBsGE6dH2yxjANmfL6WbCwrar/gs0wP0Tp7ThG7JgY4KTvhIqk/umxuX9eVfCRr
+	 E6azKIt68WtQkAvW6U++mMf/AJoHsSx/e8YX8seKnso3OWnbl09Q5HVpO2EGoZ5KEq
+	 0AxjzSS9QUQ2WDN/B6yDLVheC4+8aNhdMpp8czlAsv8jbbNW5z12IdDQFZ/QyfVAkj
+	 ltO1odCMa+56owss1vNvHX6RNIzrWR10dgTrzFrSjBBHPYBc2MxmAyYqq3Z6/ABJ4L
+	 F87DnPJRvgR2g==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6FD5C43458;
+	Sat, 11 Jul 2026 07:45:04 +0000 (UTC)
+From: Bryam Vargas via B4 Relay <devnull+hexlabsecurity.proton.me@kernel.org>
+Date: Sat, 11 Jul 2026 02:45:05 -0500
+Subject: [PATCH net] net/smc: guard the CDC receive path against an unset
+ RMB
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260711-b4-disp-c36a9798-v1-1-340b0c6053fb@proton.me>
+X-B4-Tracking: v=1; b=H4sIAID0UWoC/x3MQQqAIBBA0avErBtQK82uEi0yx5qNhUYE0d2Tl
+ m/x/wOZElOGoXog0cWZ91gg6wqWbY4rIftiUEJpYaRE16LnfODS6Nka26N0Tee8tsEbBSU7EgW
+ +/+UIkU6Y3vcDmVyAM2cAAAA=
+To: Paolo Abeni <pabeni@redhat.com>, Wen Gu <guwen@linux.alibaba.com>, 
+ Eric Dumazet <edumazet@google.com>, "D. Wythe" <alibuda@linux.alibaba.com>, 
+ Sidraya Jayagond <sidraya@linux.ibm.com>, 
+ "David S. Miller" <davem@davemloft.net>, Tony Lu <tonylu@linux.alibaba.com>, 
+ Dust Li <dust.li@linux.alibaba.com>, 
+ Mahanta Jambigi <mjambigi@linux.ibm.com>, 
+ Wenjia Zhang <wenjia@linux.ibm.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-s390@vger.kernel.org
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1783755904; l=2576;
+ i=hexlabsecurity@proton.me; s=proton; h=from:subject:message-id;
+ bh=yh7714RV6Cc4s3RDFou/eCDussZT7vcBjhLsr4ZeUcM=;
+ b=Vuf9mDuj3w2B5nPA+qf5Tbf1h0yrJMdX2RH27z3Uj+NAYdJbs56Ch06TWSEojM/H7bCWfWEJ5
+ bO8b2caGqWECB+3WZ4YOTFo63lNPdGDfV3K1ucad2XC0bayn9Jxj1hb
+X-Developer-Key: i=hexlabsecurity@proton.me; a=ed25519;
+ pk=dmppBMZNLLoPzxHi9l8tZDzEZUunPbgsYqIZYXeUrL0=
+X-Endpoint-Received: by B4 Relay for hexlabsecurity@proton.me/proton with
+ auth_id=814
+X-Original-From: Bryam Vargas <hexlabsecurity@proton.me>
+Reply-To: hexlabsecurity@proton.me
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.04 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	R_DKIM_REJECT(1.00)[0sec.ai:s=google];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306757-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[0sec.ai];
-	FORGED_RECIPIENTS(0.00)[m:david@ixit.cz,m:doruk@0sec.ai,m:horms@kernel.org,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:guwen@linux.alibaba.com,m:edumazet@google.com,m:alibuda@linux.alibaba.com,m:sidraya@linux.ibm.com,m:davem@davemloft.net,m:tonylu@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:mjambigi@linux.ibm.com,m:wenjia@linux.ibm.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:horms@kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-s390@vger.kernel.org,s:lists@lfdr.de];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[0sec.ai:-];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306758-lists,netdev=lfdr.de,hexlabsecurity.proton.me];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,0sec.ai:mid,0sec.ai:from_mime]
+	HAS_REPLYTO(0.00)[hexlabsecurity@proton.me];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,proton.me:replyto,proton.me:mid,proton.me:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 098B7740C03
+X-Rspamd-Queue-Id: 6A83F740C94
 
-Hi David,
+From: Bryam Vargas <hexlabsecurity@proton.me>
 
-Sorry, two copies of this went out by mistake. Please take the earlier
-"reject PDUs shorter than the LLCP header" and disregard the
-near-identical "guard against short PDUs in nfc_llcp_rx_skb()" that
-followed. Same one-line fix.
+The SMC CDC receive handlers look up a connection by its wire token and
+then dereference conn->rmb_desc -- smcd_cdc_rx_tsklet() reads
+rmb_desc->cpu_addr and smc_cdc_msg_recv_action() reads rmb_desc->len --
+but a connection is published to the link group's token tree in
+smc_conn_create(), before smc_buf_create() allocates its RMB.  A peer
+that sends a CDC message carrying the connection's token in that setup
+window reaches the handlers with conn->rmb_desc still NULL and crashes
+the host with a NULL pointer dereference.
 
-Doruk
+Bail out of both receive handlers when the RMB is not yet allocated, as
+they already do for a killed or out-of-sync connection.
+
+Closes: https://sashiko.dev/#/patchset/20260705-b4-disp-28a1bbca-v4-1-be089b98acc6@proton.me?part=1
+Cc: stable@vger.kernel.org
+Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
+---
+Reachability is by source inspection: smc_conn_create() registers the
+connection before smc_buf_create() allocates conn->rmb_desc, and the
+receive handlers guard only !conn/out_of_sync/killed.  Verified with an
+in-kernel KASAN model reproducing the deref with rmb_desc == NULL (fault
+at the ->len / ->cpu_addr offsets) and clean with the guard.  af_smc runs
+over an RDMA fabric or an ISM device, so this is the model rather than a
+live trigger; reproducer available on request.
+
+No Fixes: tag: the CDC receive path predates the history available here;
+the introducing commits are the original CDC support and its SMC-D
+addition -- please add whichever tag you prefer.
+---
+ net/smc/smc_cdc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/smc/smc_cdc.c b/net/smc/smc_cdc.c
+index 32d6d03df321..d60f68facbc3 100644
+--- a/net/smc/smc_cdc.c
++++ b/net/smc/smc_cdc.c
+@@ -446,7 +446,7 @@ static void smcd_cdc_rx_tsklet(struct tasklet_struct *t)
+ 	struct smcd_cdc_msg cdc;
+ 	struct smc_sock *smc;
+ 
+-	if (!conn || conn->killed)
++	if (!conn || conn->killed || !conn->rmb_desc)
+ 		return;
+ 
+ 	data_cdc = (struct smcd_cdc_msg *)conn->rmb_desc->cpu_addr;
+@@ -483,7 +483,7 @@ static void smc_cdc_rx_handler(struct ib_wc *wc, void *buf)
+ 	lgr = smc_get_lgr(link);
+ 	read_lock_bh(&lgr->conns_lock);
+ 	conn = smc_lgr_find_conn(ntohl(cdc->token), lgr);
+-	if (!conn || conn->out_of_sync) {
++	if (!conn || conn->out_of_sync || !conn->rmb_desc) {
+ 		read_unlock_bh(&lgr->conns_lock);
+ 		return;
+ 	}
+
+---
+base-commit: dd3210c47e8d3ac6b4e9141fc68acc03b38c0ba3
+change-id: 20260711-b4-disp-c36a9798-1b35bd69fd72
+
+Best regards,
+-- 
+Bryam Vargas <hexlabsecurity@proton.me>
+
+
 
