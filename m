@@ -1,64 +1,75 @@
-Return-Path: <netdev+bounces-306868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306869-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 8HwLHJRdUmp1OwMAu9opvQ
-	(envelope-from <netdev+bounces-306868-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:13:24 +0200
+	id E7YYKHReUmqkOwMAu9opvQ
+	(envelope-from <netdev+bounces-306869-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:17:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B33DE741EB1
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:13:23 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC638741EF7
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:17:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Hd1Ngnhh;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306868-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306868-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=M6O4pOGf;
+	dmarc=pass (policy=none) header.from=lunn.ch;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306869-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306869-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5DABF300EFA0
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 15:13:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 329373010BA6
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 15:16:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE18B2DB78C;
-	Sat, 11 Jul 2026 15:13:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0658922ACFA;
+	Sat, 11 Jul 2026 15:16:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 637D64C6D;
-	Sat, 11 Jul 2026 15:13:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2DF982866
+	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 15:16:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783782801; cv=none; b=srLQW8Vkf/9UrTOPLMw3ufTmzub8+TEcixlc/J79fUHgwlNKTmnZhaKM3+a8m5WZeMamtEElVNdSUpv6yMScmCPwQ5tBejZ3wUyiBXxHHF/jRq+4vxwktMv19Xf7AGQgUPMhZnDZGbo1bwkn3KX3unJVkMHpQeoYDWu+oLZZ7us=
+	t=1783783001; cv=none; b=fY4wHOo60D3wGS8Jq46NSG2QO+CaATsFyqWQKH255uTfXEKz1jiQbw6XuYl6+sgAAeijN8PjfUB5VWrYtO/rCdUygjplETAUyVglNU3b3dxxdKKNQ4xE3AD8ao1GKmd+9keUjivFbI/k9QGSpXO/74mpnBCaxfxUrBbORYQ4ZLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783782801; c=relaxed/simple;
-	bh=R38Xb2l6zfJb7ZpyPilbsuO9RtKKuZYV8eTAq+1GYM4=;
+	s=arc-20240116; t=1783783001; c=relaxed/simple;
+	bh=nh7AGmHVKrAU7t1AcaynZLcca/AOh35ebCYwatgCXp0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KHOBAjc1c1kQleNw9/lfMalYcjWHyyNG2NzET857NDHdZxdjNYtWwlbEYf5ioeiOOpnPwiKEyx6cABKMJn0+uHX0weSwppwhi4mFjSQ9JscoRtP04LAV15u76WtjXbp9oboL27E3gerOdScO6jdgZo3uFejmKvitgpzX8pJKXv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hd1Ngnhh; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0B531F000E9;
-	Sat, 11 Jul 2026 15:13:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783782800;
-	bh=Z/a4A7oYLtgOaKoFdchUug3Ikl3xGdfwhU8t5Jw5+PQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Hd1NgnhhqWx+4dC0MBuGc8GroE1EldfhxMF4Z7iBnz6Np/AmhJiyr1D4upCONjI3j
-	 LKFF19ugBYCYG5oeHpAmyq7h6/OUi1XMcGVV6kdEtfUcPreEf1tqRCvWJ22IAd/g7N
-	 7NAecWoTL3WuWJlJ+sTguIyo9jCISKuN9AZ9XuI+fcUdAUaGJnLKfadAKDdQrg6fwp
-	 hqfAXVJwHyHGzuhX+IVOQvPNQBfNsZRLFkNelefgQGEZxkuSvAlxIcFS0YgQ+bRUlO
-	 ub7kDVJkCj+drzZMVqsPBKeW40Widdu7ImOIScS5W7TlPVcxx2pfcOyeHR7uqL31H7
-	 Mg61eN/ubILew==
-Date: Sat, 11 Jul 2026 16:13:15 +0100
-From: Simon Horman <horms@kernel.org>
-To: Pengpeng Hou <pengpeng@iscas.ac.cn>
-Cc: Shahed Shaikh <shshaikh@marvell.com>,
-	Manish Chopra <manishc@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: qlcnic: validate unified ROM directory bounds
-Message-ID: <20260711151315.GA1364329@horms.kernel.org>
-References: <20260706093601.81535-1-pengpeng@iscas.ac.cn>
+	 Content-Type:Content-Disposition:In-Reply-To; b=YfVV2k1CNg9lKuB8ZF2QOnbjhE58jDNbtBRPlJY4fRT3bv8rAoajpeDx4EjRpxHzuauQ0kGRCeRPho7uJpZDlrkjJq7BbRBr/QRvKjcgQgzh8g+/Qh/mrHX7Ym7dgwwqZuhvsV+DypN8avLfBM+0DYtr6t/WuFuEA6Gh7yK3Xwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=M6O4pOGf; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=s8VVxditPMEF3PVmMbBKB0SHgQPyj5KXM+8qvAn3ZEY=; b=M6O4pOGfSSDiOeQxhgp0M6AYlK
+	gEh/4UBPIRbMhpH+oZBEErCN0qQMF9M5J2VR1ph87DBnH8QGogqVELGaoZ/CpL4AV4R1pH2ImDEdI
+	3WLoGy1VcFmmmRyzK4Q5BJVqE/asH/lJR5v7sLahrwZUdL6vCf1iUA2jePscDnEV7WgU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wiZRS-00Bn5J-GB; Sat, 11 Jul 2026 17:16:34 +0200
+Date: Sat, 11 Jul 2026 17:16:34 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: Lee Trager <lee@trager.us>, "Das, Shubham" <shubham.das@intel.com>,
+	"Srinivasan, Vijay" <vijay.srinivasan@intel.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"mkubecek@suse.cz" <mkubecek@suse.cz>,
+	"D H, Siddaraju" <siddaraju.dh@intel.com>,
+	"Chintalapalle, Balaji" <balaji.chintalapalle@intel.com>,
+	"Lindberg, Magnus" <magnus.k.lindberg@ericsson.com>,
+	"niklas.damberg@ericsson.com" <niklas.damberg@ericsson.com>,
+	"Wirandi, Jonas" <jonas.wirandi@ericsson.com>
+Subject: Re: Ethtool : PRBS feature
+Message-ID: <63b07d12-d337-465b-a4a8-b8b0771986f0@lunn.ch>
+References: <cb7921f5-cc9a-49fe-9561-cac903cf611e@lunn.ch>
+ <BL3PR11MB63854B0A4AA33A718D474C6588F62@BL3PR11MB6385.namprd11.prod.outlook.com>
+ <BL3PR11MB6385517EECD04C783E9DC42488F62@BL3PR11MB6385.namprd11.prod.outlook.com>
+ <26d44b09-d72c-4e23-84a6-3d0ea4a521ef@lunn.ch>
+ <705f6fcb-e0e2-4898-bf83-78c38f32f505@trager.us>
+ <BL3PR11MB6385468A86BACA1D8EFEF2BE88F62@BL3PR11MB6385.namprd11.prod.outlook.com>
+ <SN7PR11MB8109F7A3F491E20701BDC0DFFFF02@SN7PR11MB8109.namprd11.prod.outlook.com>
+ <46f714b7-ec6e-4b26-9ff8-b7f27f11fe33@trager.us>
+ <4ccc869f-a724-41fc-9bfc-da5332f54790@lunn.ch>
+ <CAKgT0Ue-wMYab25gPzE8iarW2abYONv=5ZBokrLS6-DfD4WFpA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,252 +78,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260706093601.81535-1-pengpeng@iscas.ac.cn>
+In-Reply-To: <CAKgT0Ue-wMYab25gPzE8iarW2abYONv=5ZBokrLS6-DfD4WFpA@mail.gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-306869-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306868-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:pengpeng@iscas.ac.cn,m:shshaikh@marvell.com,m:manishc@marvell.com,m:GR-Linux-NIC-Dev@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS(0.00)[m:alexander.duyck@gmail.com,m:lee@trager.us,m:shubham.das@intel.com,m:vijay.srinivasan@intel.com,m:maxime.chevallier@bootlin.com,m:netdev@vger.kernel.org,m:mkubecek@suse.cz,m:siddaraju.dh@intel.com,m:balaji.chintalapalle@intel.com,m:magnus.k.lindberg@ericsson.com,m:niklas.damberg@ericsson.com,m:jonas.wirandi@ericsson.com,m:alexanderduyck@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iscas.ac.cn:email,horms.kernel.org:mid]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,lunn.ch:from_mime,lunn.ch:dkim,lunn.ch:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B33DE741EB1
+X-Rspamd-Queue-Id: DC638741EF7
 
-On Mon, Jul 06, 2026 at 05:36:01PM +0800, Pengpeng Hou wrote:
-> The unified ROM parser walks directory and data descriptor tables from the
-> firmware file. The existing checks compute table and data limits with
-> base + count * size or base + size before comparing with the firmware
-> size. Those calculations use fields from the firmware image and can wrap
-> before the comparison.
-> 
-> Add range helpers that validate tables and entries with division and
-> subtraction instead of overflowing additions. Pass the firmware size into
-> the directory lookup helper, validate each directory entry before reading
-> its type field, and validate bootloader, firmware and product-table
-> entries before their descriptor fields are used.
-> 
-> Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
-> ---
->  .../net/ethernet/qlogic/qlcnic/qlcnic_init.c  | 135 +++++++++++-------
->  1 file changed, 86 insertions(+), 49 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_init.c b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_init.c
-> index 9192c5ad5a16..56620aed804b 100644
-> --- a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_init.c
-> +++ b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_init.c
-> @@ -740,21 +740,55 @@ qlcnic_has_mn(struct qlcnic_adapter *adapter)
+> Looks like they are different derivations of the polynomial for the
+> given pattern. For example PRBS11 is 1 + x^9 + x^11
 
-...
+802.3 section "72.6.10.2.6 Training pattern" agrees with you.
 
-> +static struct uni_table_desc *qlcnic_get_table_desc(const u8 *unirom,
-> +						    size_t fw_size, int section)
->  {
-> -	u32 i, entries;
->  	struct uni_table_desc *directory = (struct uni_table_desc *) &unirom[0];
-> -	entries = le32_to_cpu(directory->num_entries);
-> +	u32 entries = le32_to_cpu(directory->num_entries);
-> +	u32 entry_size = le32_to_cpu(directory->entry_size);
-> +	u32 findex = le32_to_cpu(directory->findex);
-> +	u32 i;
+, but PRBS11_0 is 1
+> + x^5 + x^6 + X^10 + x^11. That is one thing to think about. When we
+> say PRBS7 the assumption is we are all talking about 1 + x^6 + x^7 for
+> the polynomial.
 
-I realise that this isn't the existing style of this code, but where
-possible please try to move the arrangement of local variable declarations
-to follow reverse xmas tree order - longest line to shortest (seems trivial
-in this case). If necessary declarations and split should be split (with
-all declarations coming first, then a blank line (probably not necessary
-here).
+I could be missing it, but i could not quickly find PRBS7 in the
+standard!
 
->  
-> -	for (i = 0; i < entries; i++) {
-> +	if (entry_size < QLCNIC_UNI_DIR_ENTRY_MIN_SIZE ||
-> +	    !qlcnic_rom_table_valid(fw_size, findex, entries, entry_size))
-> +		return NULL;
->  
-> -		u32 offs = le32_to_cpu(directory->findex) +
-> -			   i * le32_to_cpu(directory->entry_size);
-> -		u32 tab_type = le32_to_cpu(*((__le32 *)&unirom[offs] + 8));
-> +	for (i = 0; i < entries; i++) {
-> +		size_t offs = findex + (size_t)i * entry_size;
+> We may want to have that clearly recorded somewhere so
+> there isn't any confusion on which polynomials we are using for this
+> testing as there is always a risk that somebody is playing with
+> bleeding edge hardware and ends up defining a PRBS polynomial
+> differently than what is expected.
 
-I might have declared i as a size_t to avoid this cast.
+I would probably give a reference to 802.3, at least for standard
+tests. If a vendor has made up their own test sequences then yes,
+there needs to be a clear definition of what it is.
 
-> +		u32 tab_type = le32_to_cpu(*((__le32 *)&unirom[offs] +
-> +						QLCNIC_UNI_DIR_TYPE_OFF));
->  
->  		if (tab_type == section)
-> -			return (struct uni_table_desc *) &unirom[offs];
-> +			return (struct uni_table_desc *)&unirom[offs];
 
-It seems that the only change above is an update to white space.
-Which is a cleanup separate from the intention of this patch.
-Please drop such cleanups from this patch as the add noise.
+> I almost wonder if we couldn't
+> define the sequence as a bitmap instead of an enum with each bit
+> representing which fields are in the sequence.
 
->  	}
->  
->  	return NULL;
+Not everything is a polynomial. Look at SSPQR, 120.5.11.2.3 SSPRQ test
+pattern.
 
-...
-
-> @@ -789,31 +822,33 @@ qlcnic_validate_bootld(struct qlcnic_adapter *adapter)
->  {
->  	struct uni_table_desc *tab_desc;
->  	struct uni_data_desc *descr;
-> -	u32 offs, tab_size, data_size, idx;
->  	const u8 *unirom = adapter->fw->data;
-> +	size_t offs;
-> +	u32 data_len, data_off, entry_size, findex, idx;
->  	__le32 temp;
->  
->  	temp = *((__le32 *)&unirom[adapter->file_prd_off] +
->  		 QLCNIC_UNI_BOOTLD_IDX_OFF);
->  	idx = le32_to_cpu(temp);
-> -	tab_desc = qlcnic_get_table_desc(unirom, QLCNIC_UNI_DIR_SECT_BOOTLD);
-> +	tab_desc = qlcnic_get_table_desc(unirom, adapter->fw->size,
-> +					 QLCNIC_UNI_DIR_SECT_BOOTLD);
->  
->  	if (!tab_desc)
->  		return -EINVAL;
->  
-> -	tab_size = le32_to_cpu(tab_desc->findex) +
-> -		   le32_to_cpu(tab_desc->entry_size) * (idx + 1);
-> -
-> -	if (adapter->fw->size < tab_size)
-> +	entry_size = le32_to_cpu(tab_desc->entry_size);
-> +	findex = le32_to_cpu(tab_desc->findex);
-> +	if (entry_size < sizeof(*descr) ||
-> +	    !qlcnic_rom_entry_valid(adapter->fw->size, findex, entry_size,
-> +				     idx))
->  		return -EINVAL;
->  
-> -	offs = le32_to_cpu(tab_desc->findex) +
-> -	       le32_to_cpu(tab_desc->entry_size) * idx;
-> +	offs = findex + (size_t)entry_size * idx;
->  	descr = (struct uni_data_desc *)&unirom[offs];
-> +	data_off = le32_to_cpu(descr->findex);
-> +	data_len = le32_to_cpu(descr->size);
->  
-> -	data_size = le32_to_cpu(descr->findex) + le32_to_cpu(descr->size);
-> -
-> -	if (adapter->fw->size < data_size)
-> +	if (!qlcnic_rom_range_valid(adapter->fw->size, data_off, data_len))
->  		return -EINVAL;
-
-This is one of two issues flagged by AI-generated of this patch at
-sashiko.dev that I plan to include in this email. There are other issues,
-which you may wish to look into in the context of possible follow-up. But I
-feel that these two warrant consideration in the context of this patch as
-they are closely related to it's intent.
-
-  This is a pre-existing issue, but does this validation need to enforce a
-  minimum length for the bootloader section?
-  The firmware loader unconditionally calculates a hardcoded size for the
-  bootloader section and iteratively reads this amount:
-  qlcnic_load_firmware() {
-      ...
-      size = (QLCNIC_IMAGE_START - QLCNIC_BOOTLD_START) / 8;
-      ...
-      for (i = 0; i < size; i++) {
-          data = le64_to_cpu(ptr64[i]);
-      ...
-  }
-  If an attacker provides a firmware image with a valid offset near the end
-  of the file and a small declared size, couldn't the loop in
-  qlcnic_load_firmware() read past the end of the adapter->fw->data buffer?
-
->  
->  	return 0;
-> @@ -825,29 +860,31 @@ qlcnic_validate_fw(struct qlcnic_adapter *adapter)
->  	struct uni_table_desc *tab_desc;
->  	struct uni_data_desc *descr;
->  	const u8 *unirom = adapter->fw->data;
-> -	u32 offs, tab_size, data_size, idx;
-> +	size_t offs;
-> +	u32 data_len, data_off, entry_size, findex, idx;
->  	__le32 temp;
->  
->  	temp = *((__le32 *)&unirom[adapter->file_prd_off] +
->  		 QLCNIC_UNI_FIRMWARE_IDX_OFF);
->  	idx = le32_to_cpu(temp);
-> -	tab_desc = qlcnic_get_table_desc(unirom, QLCNIC_UNI_DIR_SECT_FW);
-> +	tab_desc = qlcnic_get_table_desc(unirom, adapter->fw->size,
-> +					 QLCNIC_UNI_DIR_SECT_FW);
->  
->  	if (!tab_desc)
->  		return -EINVAL;
->  
-> -	tab_size = le32_to_cpu(tab_desc->findex) +
-> -		   le32_to_cpu(tab_desc->entry_size) * (idx + 1);
-> -
-> -	if (adapter->fw->size < tab_size)
-> +	entry_size = le32_to_cpu(tab_desc->entry_size);
-> +	findex = le32_to_cpu(tab_desc->findex);
-> +	if (entry_size < sizeof(*descr) ||
-> +	    !qlcnic_rom_entry_valid(adapter->fw->size, findex, entry_size,
-> +				     idx))
->  		return -EINVAL;
->  
-> -	offs = le32_to_cpu(tab_desc->findex) +
-> -	       le32_to_cpu(tab_desc->entry_size) * idx;
-> +	offs = findex + (size_t)entry_size * idx;
->  	descr = (struct uni_data_desc *)&unirom[offs];
-> -	data_size = le32_to_cpu(descr->findex) + le32_to_cpu(descr->size);
-> -
-> -	if (adapter->fw->size < data_size)
-> +	data_off = le32_to_cpu(descr->findex);
-> +	data_len = le32_to_cpu(descr->size);
-> +	if (!qlcnic_rom_range_valid(adapter->fw->size, data_off, data_len))
->  		return -EINVAL;
->  
->  	return 0;
-
-This is the other portion of the AI-generated review of this patch on
-sashiko.dev that I'd like to as you to consider in the context of this patch.
-
-  This is a pre-existing issue, but does this validation need to verify that
-  data_len is at least 17 bytes?
-  In qlcnic_get_fw_version(), the version string pointer is calculated like
-  this:
-  qlcnic_get_fw_version() {
-      ...
-      ver_str = fw->data + le32_to_cpu(fw_data_desc->findex) +
-                le32_to_cpu(fw_data_desc->size) - 17;
-      ...
-  }
-  If the firmware image specifies a size less than 17, won't
-  le32_to_cpu(fw_data_desc->size) - 17 wrap around due to 32-bit unsigned
-  arithmetic, leading to an out-of-bounds pointer well outside the fw->data
-  buffer?
-
-...
-
--- 
-pw-bot: changes-requested
+	Andrew
 
