@@ -1,286 +1,175 @@
-Return-Path: <netdev+bounces-306878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306879-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +bgRM99hUmp9PAMAu9opvQ
-	(envelope-from <netdev+bounces-306878-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:31:43 +0200
+	id jY43BKliUmqpPAMAu9opvQ
+	(envelope-from <netdev+bounces-306879-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:35:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 241F0741FE9
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:31:43 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72A86742004
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:35:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=F8YQJHdq;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=dyFgxcQ8;
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306878-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306878-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306879-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306879-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8B90930078EA
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 15:30:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1CC253005EAC
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 15:35:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C20B82D9787;
-	Sat, 11 Jul 2026 15:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1961926B2AD;
+	Sat, 11 Jul 2026 15:35:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A9CA26B2AD;
-	Sat, 11 Jul 2026 15:30:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006941F151C;
+	Sat, 11 Jul 2026 15:35:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783783846; cv=none; b=aimdV+7r4zSz+JBPrar1ZrDK0T5UwnwS2zdaynXWtwQ+j/p6bA3cJWFzythI5qujwYAVsw5sGcIuPUfDujrVJAytIveAPAjw1AbrL9WVfbuONpJ0qYVc2wTWcGi22q4r1NEHLLLl+0K9587GwGd/5CIiBty4Vx7OHht9SKvTXqc=
+	t=1783784102; cv=none; b=Al7MqIZhbIwKseQhbQteIQML3R/SGYHITpAZVeAN1XuvvDAf9b2ycRKIidyscd9wQCYLD6jvIp0rYA9DIaDBZb2+1JbmvPG21dvlRyeSjh/zGmsHqsuI9S/ZqJWEJ2HdnFtWytXlR+EXxYlOOcJJKVVIyvlyJbHeRfEn6+MECiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783783846; c=relaxed/simple;
-	bh=PR7EBeKQX74wOrhYbNbXF4KVKL7eF6oQjRaplZL61us=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oiflEfle3pX8uQyU3NBtterdmS8XN4PHDKgVleBWcjbR5oHqwDs/YR4sKQOdX55RDCLFipi4dfE+6s3prPy8i0dtEtzN/ytq+vAwKNOtBFf/wQP4oPppgV+UlnJeBnECFsLePz0+bTzSYyUQc9a1H74xU/a6+LKWSRf7ljEoAFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F8YQJHdq; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C51401F000E9;
-	Sat, 11 Jul 2026 15:30:42 +0000 (UTC)
+	s=arc-20240116; t=1783784102; c=relaxed/simple;
+	bh=cM8gFIkD/0WD/HP0g9n34l6lpiH5je95D2a8VsuTKCU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gCwlARbI1sG3sjrz2FnbtI+NT/TsIRWhZ8/vgEVfBn07JhXbUm2DXwanrRT4AmRt7CCtEzdri1YTdwBMRWz34We0+O6G2tpPywhsXV+2vYTCJpUiGSYcj394/dYt0TLePe0um0BUBpWr+iay+JtpRE99HLWJA0yuKfR2oex8nxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dyFgxcQ8; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73B861F000E9;
+	Sat, 11 Jul 2026 15:34:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783783845;
-	bh=1nrlVsmYTDub9fwtb1lUujMqD4oeE7tyke0Ss+01BsI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=F8YQJHdqApeofr9XQvczgXEhgiVptCuF/usmp9pjRzRgj8CocItT0LgzjUnz/ZIKh
-	 RrsPiNuGYyM8iSnfBLcMkZk1ZMaAsoJiyk+snVzqh564pHxAkVIAOJJD4j0q2UpruK
-	 LCtfSX8SjEtSDVp70TsD4qKUdInxWFnMyWs8kcPYGVa57GTwsLYNpZbVjGgV2Psb28
-	 rN85pzkRlpSfKWDxzSkJhHvf1be455idbGVuHjXNMn5iOcLAMlbB9gFOghx4nr1KZR
-	 cda+vbAMhUcMaOKwfOiev2i9EAoh4WiTgguDASp1XEZkDGrS0TZcTuaDdEY6H/Ifyl
-	 IlQIefVxnPYiA==
-From: Simon Horman <horms@kernel.org>
-To: pengpeng@iscas.ac.cn
-Cc: Simon Horman <horms@kernel.org>,
-	manishc@marvell.com,
-	rahulv@marvell.com,
-	GR-Linux-NIC-Dev@marvell.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] netxen: validate unified ROM directory bounds
-Date: Sat, 11 Jul 2026 16:30:18 +0100
-Message-ID: <20260711153017.1682131-2-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260706093702.81687-1-pengpeng@iscas.ac.cn>
-References: <20260706093702.81687-1-pengpeng@iscas.ac.cn>
+	s=k20260515; t=1783784100;
+	bh=7rEMm+UIIe8jnjVNugOISwo6rSAeeJHdltnF34dwAcs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=dyFgxcQ8Se3NX+3vE/CJGOVCuPW/WGTV9ebL2HKI2ImshI0QyKEo5IWex4eNLomFx
+	 oVkjvWE/olUk3D+BJsNqFO8qCljsAKziASzY2gDnDea5gFf47lfTS8a+D9ysCNNmam
+	 8cCgGVy7plyt4hUzngwqah/lVczBGC89YQxiPzoPT4GOyZcnICvKlL/9ZlEBkY2ev9
+	 TZPmJeNaE+qpg4wgylMKruu0Z7myBjyz7xlw25CFRNq9JEiD+EBNeBLGV7ZoqnMFZr
+	 KGoHpNDkXueThyjdFlmq0amYr5VEiPHWzqjiAFhRcjp11st+mT+lhNSPXhY9cjODWh
+	 AZ2Gs+BQSGxXQ==
+Message-ID: <faa6bc73-9561-44d1-8631-b066619a233a@kernel.org>
+Date: Sat, 11 Jul 2026 17:34:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net] selftests: netconsole: only restore MAC when it
+ changed on resume
+Content-Language: fr
+To: Andre Carvalho <asantostc@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Breno Leitao <leitao@debian.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>
+References: <20260710-netcons-mac-reload-v1-1-3fb1bcc70b4a@gmail.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
+ YBNdx5Xl74NLSgx6y/1NiMQGuKeu+2BmtnkiGxBNanfXcnl4L4Lzz+iXBvvbtCbynnnqDDqU
+ c7SPFMpMesgpcu1xFt0F6bcxE+0ojRtSCZ5HDElKlHJNYtD1uwY4UYVGWUGCF/+cY1YLmtfb
+ WdNb/SFo+Mp0HItfBC12qtDIXYvbfNUGVnA5jXeWMEyYhSNktLnpDL2gBUCsdbkov5VjiOX7
+ CRTkX0UgNWRjyFZwThaZADEvAOo12M5uSBk7h07yJ97gqvBtcx45IsJwfUJE4hy8qZqsA62A
+ nTRflBvp647IXAiCcwWsEgE5AXKwA3aL6dcpVR17JXJ6nwHHnslVi8WesiqzUI9sbO/hXeXw
+ TDSB+YhErbNOxvHqCzZEnGAAFf6ges26fRVyuU119AzO40sjdLV0l6LE7GshddyazWZf0iac
+ nEhX9NKxGnuhMu5SXmo2poIQttJuYAvTVUNwQVEx/0yY5xmiuyqvXa+XT7NKJkOZSiAPlNt6
+ VffjgOP62S7M9wDShUghN3F7CPOrrRsOHWO/l6I/qJdUMW+MHSFYPfYiFXoLUZyPvNVCYSgs
+ 3oQaFhHapq1f345XBtfG3fOYp1K2wTXd4ThFraTLl8PHxCn4ywARAQABzSRNYXR0aGlldSBC
+ YWVydHMgPG1hdHR0YmVAa2VybmVsLm9yZz7CwZEEEwEIADsCGwMFCwkIBwIGFQoJCAsCBBYC
+ AwECHgECF4AWIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZUDpDAIZAQAKCRD2t4JPQmmgcz33
+ EACjROM3nj9FGclR5AlyPUbAq/txEX7E0EFQCDtdLPrjBcLAoaYJIQUV8IDCcPjZMJy2ADp7
+ /zSwYba2rE2C9vRgjXZJNt21mySvKnnkPbNQGkNRl3TZAinO1Ddq3fp2c/GmYaW1NWFSfOmw
+ MvB5CJaN0UK5l0/drnaA6Hxsu62V5UnpvxWgexqDuo0wfpEeP1PEqMNzyiVPvJ8bJxgM8qoC
+ cpXLp1Rq/jq7pbUycY8GeYw2j+FVZJHlhL0w0Zm9CFHThHxRAm1tsIPc+oTorx7haXP+nN0J
+ iqBXVAxLK2KxrHtMygim50xk2QpUotWYfZpRRv8dMygEPIB3f1Vi5JMwP4M47NZNdpqVkHrm
+ jvcNuLfDgf/vqUvuXs2eA2/BkIHcOuAAbsvreX1WX1rTHmx5ud3OhsWQQRVL2rt+0p1DpROI
+ 3Ob8F78W5rKr4HYvjX2Inpy3WahAm7FzUY184OyfPO/2zadKCqg8n01mWA9PXxs84bFEV2mP
+ VzC5j6K8U3RNA6cb9bpE5bzXut6T2gxj6j+7TsgMQFhbyH/tZgpDjWvAiPZHb3sV29t8XaOF
+ BwzqiI2AEkiWMySiHwCCMsIH9WUH7r7vpwROko89Tk+InpEbiphPjd7qAkyJ+tNIEWd1+MlX
+ ZPtOaFLVHhLQ3PLFLkrU3+Yi3tXqpvLE3gO3LM7BTQRV4/npARAA5+u/Sx1n9anIqcgHpA7l
+ 5SUCP1e/qF7n5DK8LiM10gYglgY0XHOBi0S7vHppH8hrtpizx+7t5DBdPJgVtR6SilyK0/mp
+ 9nWHDhc9rwU3KmHYgFFsnX58eEmZxz2qsIY8juFor5r7kpcM5dRR9aB+HjlOOJJgyDxcJTwM
+ 1ey4L/79P72wuXRhMibN14SX6TZzf+/XIOrM6TsULVJEIv1+NdczQbs6pBTpEK/G2apME7vf
+ mjTsZU26Ezn+LDMX16lHTmIJi7Hlh7eifCGGM+g/AlDV6aWKFS+sBbwy+YoS0Zc3Yz8zrdbi
+ Kzn3kbKd+99//mysSVsHaekQYyVvO0KD2KPKBs1S/ImrBb6XecqxGy/y/3HWHdngGEY2v2IP
+ Qox7mAPznyKyXEfG+0rrVseZSEssKmY01IsgwwbmN9ZcqUKYNhjv67WMX7tNwiVbSrGLZoqf
+ Xlgw4aAdnIMQyTW8nE6hH/Iwqay4S2str4HZtWwyWLitk7N+e+vxuK5qto4AxtB7VdimvKUs
+ x6kQO5F3YWcC3vCXCgPwyV8133+fIR2L81R1L1q3swaEuh95vWj6iskxeNWSTyFAVKYYVskG
+ V+OTtB71P1XCnb6AJCW9cKpC25+zxQqD2Zy0dK3u2RuKErajKBa/YWzuSaKAOkneFxG3LJIv
+ Hl7iqPF+JDCjB5sAEQEAAcLBXwQYAQIACQUCVeP56QIbDAAKCRD2t4JPQmmgc5VnD/9YgbCr
+ HR1FbMbm7td54UrYvZV/i7m3dIQNXK2e+Cbv5PXf19ce3XluaE+wA8D+vnIW5mbAAiojt3Mb
+ 6p0WJS3QzbObzHNgAp3zy/L4lXwc6WW5vnpWAzqXFHP8D9PTpqvBALbXqL06smP47JqbyQxj
+ Xf7D2rrPeIqbYmVY9da1KzMOVf3gReazYa89zZSdVkMojfWsbq05zwYU+SCWS3NiyF6QghbW
+ voxbFwX1i/0xRwJiX9NNbRj1huVKQuS4W7rbWA87TrVQPXUAdkyd7FRYICNW+0gddysIwPoa
+ KrLfx3Ba6Rpx0JznbrVOtXlihjl4KV8mtOPjYDY9u+8x412xXnlGl6AC4HLu2F3ECkamY4G6
+ UxejX+E6vW6Xe4n7H+rEX5UFgPRdYkS1TA/X3nMen9bouxNsvIJv7C6adZmMHqu/2azX7S7I
+ vrxxySzOw9GxjoVTuzWMKWpDGP8n71IFeOot8JuPZtJ8omz+DZel+WCNZMVdVNLPOd5frqOv
+ mpz0VhFAlNTjU1Vy0CnuxX3AM51J8dpdNyG0S8rADh6C8AKCDOfUstpq28/6oTaQv7QZdge0
+ JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20260710-netcons-mac-reload-v1-1-3fb1bcc70b4a@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306878-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:pengpeng@iscas.ac.cn,m:horms@kernel.org,m:manishc@marvell.com,m:rahulv@marvell.com,m:GR-Linux-NIC-Dev@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306879-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:asantostc@gmail.com,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:leitao@debian.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:shuah@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	HAS_ORG_HEADER(0.00)[];
+	FORGED_SENDER(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 241F0741FE9
+X-Rspamd-Queue-Id: 72A86742004
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-Subject: netxen: validate unified ROM directory bounds
+Hi Andre,
 
-This patch updates the unified ROM parser for the netxen driver to use safer
-range validation helpers. It calculates bounds using division and subtraction
-to avoid integer overflow vulnerabilities when validating directory entries,
-bootloader, firmware, and product tables.
+On 11/07/2026 00:19, Andre Carvalho wrote:
+> The "mac" bind mode reactivation downs the interface, restores the saved
+> MAC and renames it to trigger a target resume. This assumes the recreated
+> interface comes back with a different MAC, which is true under
+> MACAddressPolicy=none (as on the Netdev CI) but not when MACs are
+> persistent. In the persistent case netconsole resumes the target on its
+> own, and the down/restore/rename flow instead drops it and fails the test.
+> 
+> Guard the block on the MAC having actually changed so the test passes
+> under both policies.
+Thank you for the patch, it fixed the issue on my side when not forcing
+MACAddressPolicy=none.
 
-> diff --git a/drivers/net/ethernet/qlogic/netxen/netxen_nic_init.c b/drivers/net/ethernet/qlogic/netxen/netxen_nic_init.c
-> index 8bc4e2b69569e..5722c55fa0cce 100644
-> --- a/drivers/net/ethernet/qlogic/netxen/netxen_nic_init.c
-> +++ b/drivers/net/ethernet/qlogic/netxen/netxen_nic_init.c
-[ ... ]
-> @@ -561,20 +561,55 @@ int netxen_pinit_from_rom(struct netxen_adapter *adapter)
-[ ... ]
-> +static struct uni_table_desc *
-> +nx_get_table_desc(const u8 *unirom, size_t fw_size, int section)
->  {
->  	struct uni_table_desc *directory = (struct uni_table_desc *) &unirom[0];
-> -	__le32 entries = cpu_to_le32(directory->num_entries);
-> +	u32 entries = cpu_to_le32(directory->num_entries);
-> +	u32 entry_size = cpu_to_le32(directory->entry_size);
-> +	u32 findex = cpu_to_le32(directory->findex);
-> +	u32 i;
->  
-> -	for (i = 0; i < entries; i++) {
-> +	if (entry_size < NX_UNI_DIR_ENTRY_MIN_SIZE ||
-> +	    !netxen_rom_table_valid(fw_size, findex, entries, entry_size))
-> +		return NULL;
->  
-> -		__le32 offs = cpu_to_le32(directory->findex) +
-> -				(i * cpu_to_le32(directory->entry_size));
-> -		__le32 tab_type = cpu_to_le32(*((u32 *)&unirom[offs] + 8));
-> +	for (i = 0; i < entries; i++) {
-> +		size_t offs = findex + (size_t)i * entry_size;
-> +		u32 tab_type = cpu_to_le32(*((u32 *)&unirom[offs] +
-> +						NX_UNI_DIR_TYPE_OFF));
+Tested-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
-[Severity: High]
-This isn't a bug introduced by this patch, but can this cast trigger an
-unaligned access panic?
-
-If findex or entry_size provided by the firmware header are unaligned,
-offs will not be a multiple of 4. Casting &unirom[offs] directly to a
-32-bit integer pointer and dereferencing it could fault on architectures that
-do not support unaligned memory accesses natively.
-
->  
->  		if (tab_type == section)
-> -			return (struct uni_table_desc *) &unirom[offs];
-> +			return (struct uni_table_desc *)&unirom[offs];
->  	}
->  
->  	return NULL;
-[ ... ]
-> @@ -611,30 +644,30 @@ netxen_nic_validate_bootld(struct netxen_adapter *adapter)
-[ ... ]
-> -	offs = cpu_to_le32(tab_desc->findex) +
-> -		(cpu_to_le32(tab_desc->entry_size) * (idx));
-> +	offs = findex + (size_t)entry_size * idx;
->  	descr = (struct uni_data_desc *)&unirom[offs];
-> +	data_off = cpu_to_le32(descr->findex);
-> +	data_len = cpu_to_le32(descr->size);
->  
-> -	data_size = cpu_to_le32(descr->findex) + cpu_to_le32(descr->size);
-> -
-> -	if (adapter->fw->size < data_size)
-> +	if (!netxen_rom_range_valid(adapter->fw->size, data_off, data_len))
->  		return -EINVAL;
-
-[Severity: High]
-This is a pre-existing issue, but does netxen_load_firmware() ignore this
-validated data_len?
-
-It appears netxen_load_firmware() uses a hardcoded copy size:
-
-netxen_load_firmware() {
-    ...
-    size = (NETXEN_IMAGE_START - NETXEN_BOOTLD_START) / 8;
-    ptr64 = (u64 *)nx_get_bootld_offs(adapter);
-    for (i = 0; i < size; i++) {
-        data = cpu_to_le64(ptr64[i]);
-    ...
-}
-
-If data_len is small, couldn't this hardcoded size cause an out-of-bounds slab
-memory read past the end of the firmware file data?
-
->  
->  	return 0;
-> @@ -646,29 +679,30 @@ netxen_nic_validate_fw(struct netxen_adapter *adapter)
-[ ... ]
-> -	offs = cpu_to_le32(tab_desc->findex) +
-> -		(cpu_to_le32(tab_desc->entry_size) * (idx));
-> +	offs = findex + (size_t)entry_size * idx;
->  	descr = (struct uni_data_desc *)&unirom[offs];
-> -	data_size = cpu_to_le32(descr->findex) + cpu_to_le32(descr->size);
-> +	data_off = cpu_to_le32(descr->findex);
-> +	data_len = cpu_to_le32(descr->size);
->  
-> -	if (adapter->fw->size < data_size)
-> +	if (!netxen_rom_range_valid(adapter->fw->size, data_off, data_len))
->  		return -EINVAL;
-
-[Severity: High]
-This is a pre-existing issue, but does this validation need to enforce a
-minimum length for data_len (size)?
-
-In nx_get_fw_version(), the version string pointer calculation relies on size:
-
-nx_get_fw_version() {
-    ...
-    ver_str = fw->data + cpu_to_le32(fw_data_desc->findex) +
-              cpu_to_le32(fw_data_desc->size) - 17;
-    for (i = 0; i < 12; i++) {
-        if (!strncmp(&ver_str[i], "REV=", 4)) {
-    ...
-}
-
-If a malformed firmware image provides an entry where size is less than 17,
-wouldn't the subtraction wrap around and result in a massive out-of-bounds
-memory read?
-
-Additionally, in netxen_load_firmware(), if the firmware data_len is not a
-multiple of 8, it seems the remainder is handled unconditionally by reading a
-full 8-byte word:
-
-netxen_load_firmware() {
-    ...
-    size = (__force u32)nx_get_fw_size(adapter) % 8;
-    if (size) {
-        data = cpu_to_le64(ptr64[i]);
-    ...
-}
-
-If fw->size is exactly data_off + data_len, wouldn't reading an 8-byte chunk
-at an unaligned remainder boundary access up to 7 bytes past the end of the
-fw->data buffer?
-
->  
->  	return 0;
-> @@ -682,39 +716,37 @@ netxen_nic_validate_product_offs(struct netxen_adapter *adapter)
-[ ... ]
->  nomn:
->  	for (i = 0; i < entries; i++) {
-> -
-> -		__le32 flags, file_chiprev, offs;
-> +		size_t offs;
-> +		__le32 flags, file_chiprev;
->  		u8 chiprev = adapter->ahw.revision_id;
->  		uint32_t flagbit;
->  
-> -		offs = cpu_to_le32(ptab_descr->findex) +
-> -				(i * cpu_to_le32(ptab_descr->entry_size));
-> +		offs = findex + (size_t)i * entry_size;
->  		flags = cpu_to_le32(*((int *)&unirom[offs] + NX_UNI_FLAGS_OFF));
-
-[Severity: High]
-This isn't a bug introduced by this patch, but can this cast to (int *) also
-trigger an unaligned access panic if the firmware supplies an unaligned
-findex or entry_size?
-
->  		file_chiprev = cpu_to_le32(*((int *)&unirom[offs] +
-> -							NX_UNI_CHIP_REV_OFF));
-> +						    NX_UNI_CHIP_REV_OFF));
->  
->  		flagbit = mn_present ? 1 : 2;
->
--- 
-pw-bot: changes-requested
+Cheers,
+Matt
 
