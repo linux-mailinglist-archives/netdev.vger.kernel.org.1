@@ -1,89 +1,89 @@
-Return-Path: <netdev+bounces-306809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306810-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id nB0oMfEdUmqiMAMAu9opvQ
-	(envelope-from <netdev+bounces-306809-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 12:41:53 +0200
+	id VyvCMAAeUmqjMAMAu9opvQ
+	(envelope-from <netdev+bounces-306810-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 12:42:08 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6839874143F
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 12:41:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BDC3741447
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 12:42:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=gptpNEyh;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=mY6WFpQ+;
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306809-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306809-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306810-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306810-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 043AB3042C4A
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 10:40:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DC2333047030
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 10:40:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E14833BB9E3;
-	Sat, 11 Jul 2026 10:40:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58F2C3BB11D;
+	Sat, 11 Jul 2026 10:40:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C4913BB684
-	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 10:40:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E4C3BB13A
+	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 10:40:49 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783766448; cv=none; b=EpcPUZdiVNnmzQXI2xv3na9/Tr1KfI0eUlEpRLGJhq+MmUZig6clDdIoFkHbgM0V0RUtoHTEcjYuT/xm86xD3vpw39eL9mdmG8m7bYGPuPtwoJ5cgj5elRoNQe1aH4Ie/uuTu9YMMc4lhFNFnU7nr9688GcCsgqOaQ+nqWkrh5E=
+	t=1783766451; cv=none; b=M/NVlTTZOh5yZf643m3qZrEw6A/BKATsWORx81nNMNYqlhl3riB5XOq9qJP42JxMKSsiffzOCZ5o00X/ggu/hkbL/V3GH2yDNL+cFKUDj6typF/04443KCA29ooOfJDh7xbaqsnj+D6ykX8eewDCKfanL5cODy1orAbym4OWIGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783766448; c=relaxed/simple;
-	bh=7ymV105ZmGGl8uhZGojt5WY8AiecF8ThAvKoxYEWg6U=;
+	s=arc-20240116; t=1783766451; c=relaxed/simple;
+	bh=y6yQSGnAR5XQ47wvKONskzfyKnoHkUX2B4v2Pz6YZH4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TJFO482iLla52d8GZLsdc+scWOkPGxvE3ecr3XLVXPMlXPfTTV5FVoJp3EuTJBrFyQKIBAFsoEAJahlUdyfaoBDE16QsIfgL0REQqbbmMv3dsM82zhkc/m5smC2Rfbwk02tdHvLwIHortENyHf1gUclNGqVcxObRLCpWGsMV0vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gptpNEyh; arc=none smtp.client-ip=209.85.218.44
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c15e3141d02so203275866b.2
-        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 03:40:47 -0700 (PDT)
+	 MIME-Version; b=pC3D1pgScvtuJlOvzj4mJtr7Adf1UXxU56O0fz7U0gIcMKyL59SnxZ9VsHA6t3UCVlTEjHWTZ8bA9gfJWOLMcqnSFOOBscKQiFCIBlWFS8FOQ9RrBHBJ7JbC+b+TRJK+iR4rr/4J+BdH5j54bciagU0kD7Pk8pCFEZ0GkJlVtGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mY6WFpQ+; arc=none smtp.client-ip=209.85.218.41
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-c15f47e6297so212944766b.0
+        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 03:40:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783766446; x=1784371246; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783766448; x=1784371248; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=Kn8FUFZkw8BUpz/Wxz48LtuZ9xzNk4cNG4d+dWzPPVE=;
-        b=gptpNEyhE+uGgbJe6OxjGk6EO3+PgRCCd08/RescpF8E2LB6Qw3iOkjoD+O08PxOHp
-         mqd6iBmhSPXAPvq0noIhtLRhwiMjTBZKfNiJxxTJiANcfworgkxqCmU6Bqpt2B9pFSr8
-         fUKX/foiiM2ObHICUlvcrLV3l33AgpekYOuq2pCKnRu4USl2CMNgv/BvTrkI6Of6aO5c
-         nGk5o2jsuitmFzPdcO93JqhtXkZDs2Dm7ID0d7vxJW1D7W4XL9qTs57Ajn/YdGuqNEmj
-         HP/m1pvPsteFUa2j9Hb7wIp/OLAyc705lyUjfNhg4HP2+KQTwLpw9U5WXiqjy7xKm2gP
-         b+wQ==
+        bh=usGHobRrb/n60uWolYcRXowPvM2AUlugjjkqCBNhRKI=;
+        b=mY6WFpQ+MPb1Lw04zw6LlT5891KSNwhd+JI7y/yKTbz92mu1sGYQsyhxag0133Sr4Y
+         mjpJFKC3SF0p+PUcFGxeRxEmFFqPjAmDF/HWBjF4cFHoqAzjwgjM3kUcshVHnGUqu4aR
+         Ivbif0oLjH8rZ54fVV2CAjxVzakHGYSYEvDGK7+5rzIEDFW8Q2DsarNpb9XDw/oCmceh
+         l0gMZL7aTjaH131I7RlHbsAUyPhtiLf9vTYzyIzMCi78aR6mdJGcMvgd9b2HUp4UxVA0
+         KdBLtyEOsKVmuV9OjwIPsBZ07i/L4DxObt+hLOwUwZIWvIKp744+/mA0rPZZsxS1eRZc
+         0d/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783766446; x=1784371246;
+        d=1e100.net; s=20251104; t=1783766448; x=1784371248;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Kn8FUFZkw8BUpz/Wxz48LtuZ9xzNk4cNG4d+dWzPPVE=;
-        b=EnPRKBmQdQy52Ed8aHo2DDOhSDtreCca0xJ7eMjWgjD0gwFSOW7xh7Saee4b0FZzyA
-         1FuGghowEtO16MYhOIthlvYxvTBWzMJU34VIEJAhCHUbt1ffcDvCeLeGN9N15MKyOFiu
-         Nh3OKTh+2Dgdhd/MzSSeCor1/WlyHcoWQ3uNKtb/M5qG8hlN9FroD7kvVmCyXiFuCY/c
-         IMBZLNDgoZGE6PIlMUQzBPWjhAPlsOfXlNV3Mx9JAYlXg8wSNc0EnPDNHW7N4mPzjVxU
-         WZ7JPG4lj0ymMFE97XIHXy7f/ua11Rs42IoyPLRgGW41mfTbJQh3OFSPAEwfxeVkVWWe
-         dWSg==
-X-Forwarded-Encrypted: i=1; AHgh+Rp6VLmdQyMOIFSM5gRP4I+vBsfVRFtzTx49jvDT7WE2xWOSm8OJDM8cIeWxYoCu4HCU5ZVWnB4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4hSlDqE/eK/P5GTTWT0de6JLj2wmUe3BOYapqUSMKysfRyogZ
-	p0+eDqCVmQgtune2KXn7AZmy9/tcCuMRFvSxwpx16TSJlpZK0XBSMq82
-X-Gm-Gg: AfdE7cnImgQyA8dicZRpqG4f+jqDvqm3iE+ndDdWZ/f3DOis0dWLYYiVjJsmzSGrPBR
-	tbVVszbTsiyRpvR0GtNjgVQmipM45NmQIRsSEXn18vaIyf9vqCoE3UYNYjeCZQnEN7mK/NF5Tdu
-	X7Ex2MpA9HhVJU3TBABq2kIvW+An5C7L786A9q02Lxs58pOwm/7bw0WI/76to6BGYlTMgy/TOcx
-	8FII7LqsQ3V8FZ70VhZ/ACXv7fsMB7o0+fWlb/EFMMlxLKGUswo1bPCC63fI3FhIa2PJLzAhOqu
-	jG6PnjEZYduXtAyEue0iVSkv1FVmLesMTrJS9vkMzRO2naAYC6/r+P+hkx+igdzcCR70dgkSFhk
-	gGsDvRiUknR48tSrH+Ihi4GliIax5D2dM783nsPSIXgKEOV+HqLZdd5zIkQk/oHyGbdMpgVpitx
-	xZRZi3X19ozYb0A2m/ekUmou0crS2qve2yFEsUbCZFOqeAX+kBzDdR85bzHXl6dna4luITGSZ3J
-	dxt1lIrbbek5myVp/r339YnUawd+54GSkYQTvRayzBoiWa6N4wi/gtxP1q3
-X-Received: by 2002:a17:906:2a09:b0:c12:a5fb:ff22 with SMTP id a640c23a62f3a-c161f442fcdmr64377966b.50.1783766445969;
-        Sat, 11 Jul 2026 03:40:45 -0700 (PDT)
+        bh=usGHobRrb/n60uWolYcRXowPvM2AUlugjjkqCBNhRKI=;
+        b=BxYy+E/bKJ6SreKnfHEnZHwdSa1kmKxg+MPZ8Wv7oGxjjn8xfYYOF2mFKATGKdXcXI
+         TcPidEKmHGigtZMEMbYdZUAB1LK+crhYGLsIyf0Ul2YK6vKj7aWVdlp2YN1Zbd8Mr1jx
+         xKLEFLU1oDOfY5AGc/Bjke87MCULWJSh3TOVP9BjTdDnnG9yfXE6dRmnl3Alc2EoXTvu
+         l0Ntjpn8eizF3h0QxkdmQclaimpYddDJp6PKAna9if4fKWWqMwfjQ6jG73oA5Uw5JCcf
+         mIBkfUFtJ427jp4sXukKf+cFWQ+oCZQHNBBTLE05muURYQ2kZfJDjaRmdit5iAy+L7z0
+         P4fQ==
+X-Forwarded-Encrypted: i=1; AHgh+RrtYr0UVlUwSODJzKTTnko1dwSIDY/T7kbgdFRd51kkSMfcNvdA8+sH5rfJKEZ3ijCFyC6yUA4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3SkF3eFpHaeG0esdvW7Dx7reTw7lav4GRGfAvFgANb8qpPHxH
+	9OA2NCkJY/KG4iIRuW8xLZdADGbJBGKn4fkzBqm9bKrzHdapHj+zjHRDg36LrA==
+X-Gm-Gg: AfdE7cnn+Rm+QGb1Ycdz4iZNWzAFqnzZC/P4b3wKYxVPRfPKuMPhE9aJHZYH/xXbvNG
+	cw/Un+DubPCoVqxZepzSTIJgPSh6Q6g4Pw3T0uO+PFhpfjrNo8l/FPPR6+5M5V097njvxFzt9Yp
+	PrX2AeFLmkvFFmViMzQjBkXao7BuABsanu/JxsvxZuY/nz82cPRLvUrQmo7li9eODEJkQIXJWlP
+	QLbWFa0McclWUAlZ4jnVnD9B+3sSar4604AOWFloqHyoScS4jwuX5S9nckSSS4bNmcoyCfGrfo3
+	7QAroGT4zLDOQyMXbhxgKddhuT5h3D+DblS25Ag6InaEonzlp1dTIWK5Cz9BhYz4e6NXtG+G9/V
+	FK7ofjZO/OztvQZ4NN5m2BCqO3DaZx1q1l+apDllOxIUnTsuCU+48EmrzA1Ty7supXqK8mFanVl
+	tpwt7GWznECjo+q63dkFF0J0MTJgG1RuJc9tvnPCI4Tl2p7Dq5Zqd5VWoqwxOeUCMhqSPbOWxYe
+	cV9XZR+4IIvjlfbocYcXJVuHdeppSscN3bn8WJbuujXs2D2w1JrJhk3ekZ4
+X-Received: by 2002:a17:907:cf87:b0:bff:738c:7a64 with SMTP id a640c23a62f3a-c161e9fbea3mr101054366b.49.1783766448241;
+        Sat, 11 Jul 2026 03:40:48 -0700 (PDT)
 Received: from 127.0.0.1localhost (82-132-222-132.dab.02.net. [82.132.222.132])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c15d5de95e6sm483041566b.39.2026.07.11.03.40.43
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c15d5de95e6sm483041566b.39.2026.07.11.03.40.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Jul 2026 03:40:44 -0700 (PDT)
+        Sat, 11 Jul 2026 03:40:47 -0700 (PDT)
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: io-uring@vger.kernel.org
 Cc: asml.silence@gmail.com,
 	netdev@vger.kernel.org
-Subject: [PATCH review-only 06/17] io_uring/zcrx: constify area_reg on import
-Date: Sat, 11 Jul 2026 11:39:59 +0100
-Message-ID: <a9f68c5d19cba8243062c5eb15afd0eefede6ade.1783616211.git.asml.silence@gmail.com>
+Subject: [PATCH review-only 07/17] io_uring/zcrx: add helper for deriving area token
+Date: Sat, 11 Jul 2026 11:40:00 +0100
+Message-ID: <1805d75d8f37c1fa412d67394e2c7805bbfa15a9.1783616211.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <cover.1783616211.git.asml.silence@gmail.com>
 References: <cover.1783616211.git.asml.silence@gmail.com>
@@ -104,7 +104,7 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306809-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306810-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -130,48 +130,50 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6839874143F
+X-Rspamd-Queue-Id: 3BDC3741447
 
-io_import_area() doesn't modify its struct io_uring_zcrx_area_reg
-argument, add const to enforce that, it'll make later modifications
-easier.
+Add zcrx_area_id_to_token() to deduplicate the way the area token is
+calculated out of the area index.
 
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- io_uring/zcrx.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ io_uring/zcrx.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-index cb73dca3c1ee..9f21ae61b862 100644
+index 9f21ae61b862..cfbfbd262f90 100644
 --- a/io_uring/zcrx.c
 +++ b/io_uring/zcrx.c
-@@ -136,7 +136,7 @@ static void io_release_dmabuf(struct io_zcrx_mem *mem)
+@@ -39,6 +39,11 @@
  
- static int io_import_dmabuf(struct io_zcrx_ifq *ifq,
- 			    struct io_zcrx_mem *mem,
--			    struct io_uring_zcrx_area_reg *area_reg)
-+			    const struct io_uring_zcrx_area_reg *area_reg)
+ #define IO_DMA_ATTR (DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING)
+ 
++static inline u64 zcrx_area_id_to_token(u32 area_id)
++{
++	return (u64)area_id << IORING_ZCRX_AREA_SHIFT;
++}
++
+ static inline struct io_zcrx_ifq *io_pp_to_ifq(struct page_pool *pp)
  {
- 	unsigned long off = (unsigned long)area_reg->addr;
- 	unsigned long len = (unsigned long)area_reg->len;
-@@ -208,7 +208,7 @@ static unsigned long io_count_account_pages(struct page **pages, unsigned nr_pag
+ 	return pp->mp_priv;
+@@ -527,7 +532,7 @@ static int io_zcrx_create_area(struct io_zcrx_ifq *ifq,
+ 	area->free_count = nr_iovs;
+ 	/* we're only supporting one area per ifq for now */
+ 	area->area_id = 0;
+-	area_reg->rq_area_token = (u64)area->area_id << IORING_ZCRX_AREA_SHIFT;
++	area_reg->rq_area_token = zcrx_area_id_to_token(area->area_id);
+ 	spin_lock_init(&area->freelist_lock);
  
- static int io_import_umem(struct io_zcrx_ifq *ifq,
- 			  struct io_zcrx_mem *mem,
--			  struct io_uring_zcrx_area_reg *area_reg)
-+			  const struct io_uring_zcrx_area_reg *area_reg)
- {
- 	struct page **pages;
- 	int nr_pages, ret;
-@@ -274,7 +274,7 @@ static void io_release_area_mem(struct io_zcrx_mem *mem)
- 
- static int io_import_area(struct io_zcrx_ifq *ifq,
- 			  struct io_zcrx_mem *mem,
--			  struct io_uring_zcrx_area_reg *area_reg)
-+			  const struct io_uring_zcrx_area_reg *area_reg)
- {
- 	int ret;
- 
+ 	ret = io_zcrx_append_area(ifq, area);
+@@ -1525,7 +1530,7 @@ static bool io_zcrx_queue_cqe(struct io_kiocb *req, struct net_iov *niov,
+ 	area = io_zcrx_iov_to_area(niov);
+ 	offset = off + (net_iov_idx(niov) << ifq->niov_shift);
+ 	rcqe = (struct io_uring_zcrx_cqe *)(cqe + 1);
+-	rcqe->off = offset + ((u64)area->area_id << IORING_ZCRX_AREA_SHIFT);
++	rcqe->off = offset + zcrx_area_id_to_token(area->area_id);
+ 	rcqe->__pad = 0;
+ 	return true;
+ }
 -- 
 2.54.0
 
