@@ -1,159 +1,253 @@
-Return-Path: <netdev+bounces-306746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306747-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id glZTMkXFUWpFIgMAu9opvQ
-	(envelope-from <netdev+bounces-306746-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 06:23:33 +0200
+	id 8P60OWbTUWptJQMAu9opvQ
+	(envelope-from <netdev+bounces-306747-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 07:23:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC6677404DA
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 06:23:32 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1E85740600
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 07:23:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306746-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-306746-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=uMLMV+aT;
+	dmarc=pass (policy=reject) header.from=google.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306747-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306747-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0738830091D1
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 04:23:11 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C7F5E300F0D9
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 05:23:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 232B82BDC28;
-	Sat, 11 Jul 2026 04:23:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E2D32EEE89;
+	Sat, 11 Jul 2026 05:23:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.175.55.52])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BD4E21CC5A;
-	Sat, 11 Jul 2026 04:23:02 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783743786; cv=none; b=cQLr9Eq9pSEQa8YqdyH0Bz0axDwcb4teDMD52GjmmSzJVFoY77xeKBa6Wj47MJktCcFv6EAfYTV+UTiwiokMxvwPrARdh+CJWp+CNRUxpW6LMnly3obqpuqURq5X10WzarACp9v9RaSV3VrPP+BlBvsfacpH2/CmFIUdGm/S5XE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783743786; c=relaxed/simple;
-	bh=Gouxmcm5kuouDRujJhN/PPdbtWpMwyVbeTWCP8xYus4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y/bw4x9hlyipvR/G4hjdfbFkNXBSrlHX71L/l+ehHYkdmpTcXNQ4tS/rc9XJjeyaztoZEhd13iTDOtHpzwkwiRrpyWF3uajq9WWyv4FO2KMAT4i2eTep0k8xt/niSAnqoHkspKd3YwwHU7PL/9ye1gXLdXcLQ0rWY3XHwIBMug4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=52.175.55.52
-Received: from enjou-Legion-Y7000P-2019 (unknown [123.114.53.210])
-	by app3 (Coremail) with SMTP id ywmowADX5vkMxVFqVnZFAA--.44345S4;
-	Sat, 11 Jul 2026 12:22:47 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: linux-sctp@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: marcelo.leitner@gmail.com,
-	lucien.xin@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	matttbe@kernel.org,
-	yuantan098@gmail.com,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	bird@lzu.edu.cn,
-	tpluszz77@gmail.com,
-	roxy520tt@gmail.com,
-	n05ec@lzu.edu.cn,
-	sashiko-bot@kernel.org
-Subject: [PATCH net v2 2/2] sctp: close UDP tunnel sockets during netns teardown
-Date: Sat, 11 Jul 2026 12:22:17 +0800
-Message-ID: <c4eed94096ce6b4f1c9ff1f7f6b59f8de33e8e31.1782745545.git.roxy520tt@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1782745545.git.roxy520tt@gmail.com>
-References: <cover.1782745545.git.roxy520tt@gmail.com>
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1FB1D95A3
+	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 05:23:34 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783747417; cv=pass; b=rAYVfyevkNg6rP1B8UV57/kZXCNAijSJqRanfkmzYmGVtdfsQ3qr0roQKOsP1ILCgDuNU2pWgNJpZvjPcsbil+hhoKhnfjRE6j+6chEH+QjxVaYC1kv6xpbZZq+tLSHYy+PSwk+Tb+IuOkS8o0sPSIXFO1JhoR6RTArIikPfD+k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783747417; c=relaxed/simple;
+	bh=Vbir7G5U1uaNCQUvONVRUrXkoAxD/zZpwy+1cUqwLTo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Zf71/8uKcUxBlRL/Ci76Ck7VX53zHS+MjuYaUNX5G1b3pB9cQ3YKclTCYvlcMLk810au6+rECSUbbDTMQ3j8NETTyP9zEhE6CF5J90Q3aqljiJcB2SKYUXDDi20EPvJMXWg14h4cq8bdnJNp2EBgv3Zp1ziX4QXB/v5Oqkb1Va0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uMLMV+aT; arc=pass smtp.client-ip=209.85.208.53
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-698411099d6so5941a12.0
+        for <netdev@vger.kernel.org>; Fri, 10 Jul 2026 22:23:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783747413; cv=none;
+        d=google.com; s=arc-20260327;
+        b=AiSeaUBFuzLpETkic2DnN71f1a9RC1z3ELIA/ukYol8h2WLO2S6P2lMNxkoW9vwwu+
+         Fbbi55coPkgnPQGLPZWR9vtDR2gigStcVLjdbqO01g0yr4aGnGqdMtl6b24FFMR4uqaj
+         2hlW+6aw7w3exXGbGhwz7jGwbOz8SG2+Bhyy5r91rhHbLsqMqZzy6HUH/Zc0QNd/Ub3G
+         Z0M8ZDTo6PgIergxZrRZOwqSZKaOVHz5xR4CwIJBa7BTFczNaN8/hEDuJcGLmy7l3Hks
+         q2cJ7w1J4LN+A7KjXZkxQavMbo/AJRr+4tulQ4Mplbve0P9eo1JdPmhQjwS5WRTGBP+i
+         isBQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=bAo1f14O296ecX5TWVkmIDxkDvBZ9MYtp70xyOPU0PI=;
+        fh=KbgZtZk1QQ0TJDGCFtZMzGtSTzSY/x4p769FudZRqjU=;
+        b=NZ/al8F11TU+syjwzAXE1UqNMFoHxhrXj2b9rtriPPh4XUlmoU1MzSBIiECYsWgdee
+         AqjHnnkPGaX+cTQ65L2x4y5oJHBkd8ci79TZ8vR7QCY0KboCpG0E4zswW90oZei7el92
+         w+d3EKX1EiX8AtFWa9Z1tlggsqWDPF5hgRmqQR4NlPhpWVK+24zqItFH8QYr7+UfpPr9
+         0LqLF0UwinoUeGozxGfW918SuQR0324CIA5+eCtRfJJziaC7NTukeaORhk6PMIJXCulh
+         6fhwcFGa5eSALpOCjF47rVKKtGgT/BNv/s+JjzHUzdhTsPCaqZtPcf+hgSTyiG8JxvuH
+         XcEg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1783747413; x=1784352213; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=bAo1f14O296ecX5TWVkmIDxkDvBZ9MYtp70xyOPU0PI=;
+        b=uMLMV+aTWkeWUHipxJyPqLC2MpcMozM30UZCy1jb/ql60bX0tr/2iJAjWKGcYTeWuc
+         rBvOBOQF04AjwvOFVSbWvnC8Z5C6zl4df/hbZ1Cyjtczz8dweZCty07TJrb9BqClY1WP
+         vnrwQmeH73mLEYg3cnRyrsPLJwnkYIev6mVnyj8de83Ze80EKQThAVSuMYf8012osHe0
+         gW8trad3BobyZ4nw3geWCwmmkVGBYrOzKZpywbyj+M/iQ7uSVR2Pajfafm/L+cYkEAts
+         vZgYDJbIstw8naA+B1eR7wKyz2hAFz9CshKi2s2lP9+uIXNSqxxy0F6ebq9zlDvZGW0A
+         sA7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783747413; x=1784352213;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=bAo1f14O296ecX5TWVkmIDxkDvBZ9MYtp70xyOPU0PI=;
+        b=FMpofQHN+wALEgxFnPx79f88HFZgECs/poIYGcHNZBQzLRhRia6U9+HLOyYBKW9BBg
+         RYIct0OeAeGrFhApGrZwj6ujL/aZyaQwYvqTHFKmawgPc3on39ZqV7Ks9AmqRieQvUJE
+         8bDXObYWN0Pc4Z1x2rHpVbPK3wsWFKUsD7tmUjmk4FzRLrGHKFflhMReNw8lUOSBso9P
+         RdDv3z3gvukvIY4Osbdb55YILsF++T+lCIl0mapj7N6eJFM71FRw9EdaBsQa8+E0YT5A
+         muSNikgBgzEjmG5ZPPnEx5TvWwyuZmJu1aqvC5+FutWJr3Ubl+xBQaqIJOZcOwzb87nr
+         bMXQ==
+X-Forwarded-Encrypted: i=1; AHgh+RpM8qhRwz7h/enq+K3aDhjoFN2zBcgEEjfIn7rfenvrTQeB4zwhbV+Uw5rj3VEEXwtI0yMUStE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzFL5qmSpXq68xg4k0dyIxnsfpE01DQB8jpc8tkKlXDtg8Gadh
+	s2KA3x3K3IsTFEXsK7g1iePZMh1PUfL0wLp+b1RAiadlyVnP7DlBzL6UdVEiZ7V9h1hDBpA4qHa
+	hBOvI92c3Vo2z6wfdvFZz9XhgDLPjJzsU6J9yFKap
+X-Gm-Gg: AfdE7cmh9S5XVO8HaDYTmKKYkMPsztSlIARBD598hq3+Tt/RV6kzXMhqzf/naYfY8Vq
+	wbwalKFlj2u5M8QVpfoE+MJzPI7aES827yGoYl1JYyXjuJ6/elAE6oya3Jp0EW3NzbTDA7By/Qc
+	jyOlnDM2Kypb0ALLknIvPDOLMnIJAQU1HlVnVqhz5zspERVYr5o0SIsMVmjfx10OYnNONyPVtZ5
+	H3OdDJVzsi9u8k8zbYsc5+ozSadXFNRVXGhXJ44zM1dHDx43z2Jj4CQZbZqeGPkL45DKt/8zE0j
+	7/FjcF/TNJahvSNeDJDuwJcclAXTrBk+GFirxJWB8QcYscP+g+1d5SN9kWiZC/g=
+X-Received: by 2002:a05:6402:564b:b0:697:9254:a66b with SMTP id
+ 4fb4d7f45d1cf-69c5f806bbdmr32702a12.6.1783747412689; Fri, 10 Jul 2026
+ 22:23:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ywmowADX5vkMxVFqVnZFAA--.44345S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7uFy7CFWkGrykCF4kKr15urg_yoW8XF4rpF
-	1fGayftFW8J34vqrn3GF48Kr1rCan5G39rCwn8Gw1rArsxGry5Ka40qrW8uF48CFW0kFWa
-	vF1vgr1DKan8AFUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB21xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
-	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
-	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
-	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
-	w2AFwI0_GFv_Wrylc2xSY4AK67AK6r45MxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1s
-	IEY20_GrWl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
-	6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0x
-	vE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE
-	42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6x
-	kF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRW9a9UUUUU
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQAFCWpQq1gLqAAAsn
+References: <20260709101635.103005-1-fanwu01@zju.edu.cn> <20260710002451.500112-1-eddiephillips@google.com>
+ <caae46b1-50c6-495d-94fe-c95229d489ce@broadcom.com>
+In-Reply-To: <caae46b1-50c6-495d-94fe-c95229d489ce@broadcom.com>
+From: Eddie Phillips <eddiephillips@google.com>
+Date: Fri, 10 Jul 2026 22:23:20 -0700
+X-Gm-Features: AUfX_mwj7DPyIzPgMc2aLdczV-n7IZVIQgU2ji0mGrRtnih3_s-rWd9eqlLTuGM
+Message-ID: <CAPBb8HnN2Q2_aMRQ5Tv=pbi6Mz=Qe3CJkAucUx858_+_AW4efA@mail.gmail.com>
+Subject: Re: [PATCH] wifi: brcmfmac: drain bus_reset work on device removal
+To: Arend van Spriel <arend.vanspriel@broadcom.com>
+Cc: Fan Wu <fanwu01@zju.edu.cn>, Arend van Spriel <aspriel@gmail.com>, Kalle Valo <kvalo@kernel.org>, 
+	Franky Lin <franky.lin@broadcom.com>, Hante Meuleman <hante.meuleman@broadcom.com>, 
+	Chi-Hsien Lin <chi-hsien.lin@infineon.com>, Wright Feng <wright.feng@infineon.com>, 
+	Chung-Hsien Hsu <chung-hsien.hsu@infineon.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, linux-wireless@vger.kernel.org, 
+	brcm80211-dev-list.pdl@broadcom.com, SHA-cyfmac-dev-list@infineon.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:arend.vanspriel@broadcom.com,m:fanwu01@zju.edu.cn,m:aspriel@gmail.com,m:kvalo@kernel.org,m:franky.lin@broadcom.com,m:hante.meuleman@broadcom.com,m:chi-hsien.lin@infineon.com,m:wright.feng@infineon.com,m:chung-hsien.hsu@infineon.com,m:davem@davemloft.net,m:kuba@kernel.org,m:linux-wireless@vger.kernel.org,m:brcm80211-dev-list.pdl@broadcom.com,m:SHA-cyfmac-dev-list@infineon.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306747-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306746-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	FORGED_RECIPIENTS(0.00)[m:linux-sctp@vger.kernel.org,m:netdev@vger.kernel.org,m:marcelo.leitner@gmail.com,m:lucien.xin@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:matttbe@kernel.org,m:yuantan098@gmail.com,m:yifanwucs@gmail.com,m:tomapufckgml@gmail.com,m:bird@lzu.edu.cn,m:tpluszz77@gmail.com,m:roxy520tt@gmail.com,m:n05ec@lzu.edu.cn,m:sashiko-bot@kernel.org,m:marceloleitner@gmail.com,m:lucienxin@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,lzu.edu.cn];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER(0.00)[eddiephillips@google.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[zju.edu.cn,gmail.com,kernel.org,broadcom.com,infineon.com,davemloft.net,vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[eddiephillips@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lzu.edu.cn:from_mime,lzu.edu.cn:email,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,broadcom.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CC6677404DA
+X-Rspamd-Queue-Id: D1E85740600
 
-From: Zhiling Zou <roxy520tt@gmail.com>
+On Fri, Jul 10, 2026 at 12:18=E2=80=AFPM Arend van Spriel
+<arend.vanspriel@broadcom.com> wrote:
+>
+> On 10/07/2026 02:23, Eddie Phillips wrote:
+> > On Thu,  9 Jul 2026 10:16:35 +0000 Fan Wu <fanwu01@zju.edu.cn> wrote:
+> >
+> >> brcmf_fw_crashed() and the debugfs "reset" entry both schedule
+> >> drvr->bus_reset, whose callback recovers drvr through container_of()
+> >> and dereferences it.  The teardown paths free drvr (brcmf_free ->
+> >> wiphy_free) without draining the work, so a bus_reset callback pending
+> >> or running during removal can outlive drvr.
+> >>
+>
+> [...]
+>
+> >>
+> >> This issue was found by an in-house static analysis tool.
+> >>
+> >> Fixes: 4684997d9eea ("brcmfmac: reset PCIe bus on a firmware crash")
+> >> Cc: stable@vger.kernel.org
+> >> Signed-off-by: Fan Wu <fanwu01@zju.edu.cn>
+> >> Assisted-by: Codex:gpt-5.5
+> >> ---
+> >>   .../broadcom/brcm80211/brcmfmac/bcmsdh.c      | 13 ++++++++
+> >>   .../broadcom/brcm80211/brcmfmac/bus.h         |  6 ++++
+> >>   .../broadcom/brcm80211/brcmfmac/core.c        | 33 +++++++++++++++++=
+--
+> >>   .../broadcom/brcm80211/brcmfmac/pcie.c        |  6 ++++
+> >>   .../broadcom/brcm80211/brcmfmac/sdio.c        |  6 ++++
+> >>   .../broadcom/brcm80211/brcmfmac/sdio.h        |  1 +
+> >>   .../broadcom/brcm80211/brcmfmac/usb.c         |  3 ++
+> >>   7 files changed, 66 insertions(+), 2 deletions(-)
+>
+> [...]
+>
+> >> diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c b=
+/drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c
+> >> index fed9cd5f2..b934feb9b 100644
+> >> --- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c
+> >> +++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c
+> >> @@ -1164,6 +1164,35 @@ static int brcmf_revinfo_read(struct seq_file *=
+s, void *data)
+> >>      return 0;
+> >>   }
+> >>
+> >> +/* Serialize bus_reset arming (debugfs reset write, brcmf_fw_crashed)=
+ against the
+> >> + * teardown drain: the remove path takes bus_reset_lock, sets ->remov=
+ing and cancels
+> >> + * the work under it, so a racing armer either schedules before the c=
+ancel (and is
+> >> + * drained) or observes ->removing and desists.
+> >> + */
+> >> +static void brcmf_bus_schedule_reset(struct brcmf_bus *bus_if)
+> >> +{
+> >> +    mutex_lock(&bus_if->bus_reset_lock);
+> >> +    if (bus_if->drvr && bus_if->drvr->bus_reset.func && !bus_if->remo=
+ving)
+> >> +            schedule_work(&bus_if->drvr->bus_reset);
+> >> +    mutex_unlock(&bus_if->bus_reset_lock);
+> >> +}
+> >
+> > Is this safe in a softIRQ context?
+> > mutex_lock() sleeps until it can get the lock.
+>
+> What softIRQ context? brcmf_fw_crashed() is called by PCIe (thread) and
+> SDIO (worker).
 
-proc_sctp_do_udp_port() starts per-net SCTP UDP tunneling sockets when
-net.sctp.udp_port is set, and stops/restarts them when the sysctl value
-changes. The netns exit path does not stop these sockets, so a namespace
-can be torn down while its SCTP UDP tunnel sockets are still installed.
+Yes, you're right. Since it's thread/worker context, sleeping is fine here.
 
-Close the UDP tunnel sockets from sctp_ctrlsock_exit() after unregistering
-the per-net sysctl table. This prevents new sysctl writes from racing in
-while the sockets are being released, and closes the sockets before the
-control socket is destroyed.
+> >> +
+> >> +void brcmf_bus_cancel_reset_work(struct brcmf_bus *bus_if)
+> >> +{
+> >> +    mutex_lock(&bus_if->bus_reset_lock);
+> >> +    bus_if->removing =3D true;
+> >> +    if (bus_if->drvr)
+> >> +            cancel_work_sync(&bus_if->drvr->bus_reset);
+> >> +    mutex_unlock(&bus_if->bus_reset_lock);
+> >> +}
+> >
+> > How about if brcmf_pcie_remove() calls brcmf_bus_cancel_reset_work(),
+> > takes the lock and calls cancel_work_sync(), sleeps. If debugfs
+> > path is already running, it can invoke the worker thread. Is there
+> > potential that both try to reset?
+>
+> What is "both" here?
 
-Fixes: 046c052b475e ("sctp: enable udp tunneling socks")
-Cc: stable@vger.kernel.org
-Reported-by: Sashiko <sashiko-bot@kernel.org>
-Closes: https://sashiko.dev/#/patchset/b9f1f02b0780ad6a719e2413f5f0bb8eb7702d94.1782585631.git.roxy520tt%40gmail.com
-Signed-off-by: Zhiling Zou <roxy520tt@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
- net/sctp/protocol.c | 1 +
- 1 file changed, 1 insertion(+)
+It may be possible that the worker thread is running and then the device is
+unplugged, causing a deadlock.
 
-diff --git a/net/sctp/protocol.c b/net/sctp/protocol.c
-index f5fe6ddf0d7d..5dbc7e9e8f06 100644
---- a/net/sctp/protocol.c
-+++ b/net/sctp/protocol.c
-@@ -1458,6 +1458,7 @@ static int __net_init sctp_ctrlsock_init(struct net *net)
- static void __net_exit sctp_ctrlsock_exit(struct net *net)
- {
- 	sctp_sysctl_net_unregister(net);
-+	sctp_udp_sock_stop(net);
- 
- 	/* Free the control endpoint.  */
- 	inet_ctl_sock_destroy(net->sctp.ctl_sock);
--- 
-2.43.0
+Another possibility here would be to just lock the state change, but both
+implementations should are fine.
 
+Best, Eddie
+
+> Regards,
+> Arend
 
