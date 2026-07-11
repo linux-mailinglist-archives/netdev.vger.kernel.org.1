@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-306761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306762-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id v+EFJDH7UWowLAMAu9opvQ
-	(envelope-from <netdev+bounces-306761-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 10:13:37 +0200
+	id CaAlMGT7UWo8LAMAu9opvQ
+	(envelope-from <netdev+bounces-306762-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 10:14:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 308CF740DD4
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 10:13:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 553B6740DF8
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 10:14:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=pigmoral.tech header.s=zmail header.b=cGvcWamh;
+	dkim=pass header.d=pigmoral.tech header.s=zmail header.b=YxVzfOy3;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306761-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306761-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306762-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306762-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 329A83022604
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 08:12:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 047383028EE5
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 08:12:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC91D37D110;
-	Sat, 11 Jul 2026 08:12:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D5A03803C7;
+	Sat, 11 Jul 2026 08:12:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F00F371D13;
-	Sat, 11 Jul 2026 08:11:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4B536A375;
+	Sat, 11 Jul 2026 08:12:12 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783757521; cv=pass; b=nJ78gh7wkZzf9wbyGnsEOiqQFZRAzDT2+soUa2lD4vKy65wihmrhlr/wDD+St/+dx6TagxLL+31yQeM58jjTvDtx9JZVTk//jGRozBUcs+a0MkwJpLfmKsX5GcMmDGLFzLUFogOpB6CGbpZ3LYgjVufr7hzWj/Wvuq+t9NaGShA=
+	t=1783757534; cv=pass; b=r+DCLH11y5/MggdhOc17CDh0zb9KVGIP7rf3zJELvaCG5+4O0yUGTpzdpQkmJVJ6QEV1ywPDJosIte39ArzEyiNqEw5FbkjGTbeGNXvjAYyMU/sXFYrUwQc3esElrUaucV8PHEWEgvuO35b81cLb4guGAuHYJ006u10G5zDbPx4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783757521; c=relaxed/simple;
-	bh=d2qtA7iLTfik94pzdZuPKHP/qM62WRwszMAeLEmr8Tk=;
+	s=arc-20240116; t=1783757534; c=relaxed/simple;
+	bh=S46nqnQR4HtBiVxTKwVN8Xf0Oi73yAlFJIYkpnhmpLM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=n2y0MEU5vQpnCXvgLdMR39gyVb4gj01IraJHJXIfhluoV5lLhaAb5WBOFF7dAE7ZMzz0P3r9ukiJJjdDnp6KFxFDSoiaqlovYM+zNc4uVZLOSAa9hQ8i3x1MHpuqQ4aUFMfKWQ2hrMMtoGCodL2tGmEt2ZfUcRzUm1MXECJSVu4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pigmoral.tech; spf=pass smtp.mailfrom=pigmoral.tech; dkim=pass (1024-bit key) header.d=pigmoral.tech header.i=junhui.liu@pigmoral.tech header.b=cGvcWamh; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal: i=1; a=rsa-sha256; t=1783757498; cv=none; 
+	 In-Reply-To:To:Cc; b=m9Uh4/+Xt0L4uEMe/6FjJJ/QOuL0t5dS9AGu2Z1WZj3xOf4O4te6LDQp5/zMn+pDpIQk1xsqe9eFGnt1X7+89SUy9KTBqQBlLWwk5l2gGxKMLdb1T88zVUmDnbWya1d9a9rEZI1aisqs6VGgZrLTg84h5k6ijqdrHyRpc74eFzo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pigmoral.tech; spf=pass smtp.mailfrom=pigmoral.tech; dkim=pass (1024-bit key) header.d=pigmoral.tech header.i=junhui.liu@pigmoral.tech header.b=YxVzfOy3; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal: i=1; a=rsa-sha256; t=1783757508; cv=none; 
 	d=zohomail.com; s=zohoarc; 
-	b=F46dP6+SvEtEwHCO/+bXMUQWsFg0zInN61tQsXAy7NcEmxHGTUTg68Hz9VIWI5/9aeQGeoUqSbNa2uTMSt11nKY0C2XFToHe3R/u78yUyKLGbkPLGCcqNmMYRjEC1VJ30sDNxbNJLAhCQPsGpVh9PcjLxRbd9bQAy2OrEef87ss=
+	b=EHNg3IbjjH4vOXk+LzpoiT2Zp8fjYHd4GjSROuaWA9zlxdZZbzpDd89HhlbVHVhR2+VJEBWJZn0V6qzR0Ru+Qa7yNRPQrNzqUtwoFNASP+yy2SUTkqOz0RB9dvO+W80QLEazIRUBRBQ//xOnw6iegWuXjQ863TJRfiKpEje5mAs=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1783757498; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=zU756I9k3XKP9xRcnXd/BZXyAs7365Ch4V9Mz+N/jXs=; 
-	b=DifDleIrspR0ETJkAfYaARugtDuGcK/6eWCnHYFQeX3l0hE6hSI4XE2xI3Q2CWK/1RBRT1sEErv93ZOS+L7ubh7Jt4beL8ilMmpGIHHFMKGn/5mBojGvyqjFrrZWhKaI30IMq/LMibUpX/76rwXLwQvqnzIicHsTxfsPkgRp4RQ=
+	t=1783757508; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=oEDoeaPjfC+KjlSXMxKhS9YgsQe6Nh5ErPkdvBaLq3M=; 
+	b=eq6+xXO5FwmQ+blUcnLNeCTubPxkO5V5Q/hcUggnpPciOnwFyre90Gl/KRauNEAwbXjc7fUWSbcEqSGxBXOXDDz/Scown4O19hclxIhK8HQkyOQaLieBpN3YbuWFIewG5jqeyUhN+ZIpJB/rrQXjqXu9wyMGixJO3RBau1Z3xcM=
 ARC-Authentication-Results: i=1; mx.zohomail.com;
 	dkim=pass  header.i=pigmoral.tech;
 	spf=pass  smtp.mailfrom=junhui.liu@pigmoral.tech;
 	dmarc=pass header.from=<junhui.liu@pigmoral.tech>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1783757498;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1783757508;
 	s=zmail; d=pigmoral.tech; i=junhui.liu@pigmoral.tech;
 	h=From:From:Date:Date:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Message-Id:References:In-Reply-To:To:To:Cc:Cc:Reply-To;
-	bh=zU756I9k3XKP9xRcnXd/BZXyAs7365Ch4V9Mz+N/jXs=;
-	b=cGvcWamha97w41d8gs1HXrl/4kmgmGmAPZXBdE7x8Z3PMibgKusS83ap5E/Nu/fD
-	/QZkqCOUGT0zlLOZ3B4QXKCwUXM4B3R/bCL1GKetxhfixYc5XBy8RVtZSHyNY0f7ehm
-	p4BdPPhRP1XEIhgA0zWuYB01vAFs9PGTrdTMGSoU=
-Received: by mx.zohomail.com with SMTPS id 1783757495184271.6818246052435;
-	Sat, 11 Jul 2026 01:11:35 -0700 (PDT)
+	bh=oEDoeaPjfC+KjlSXMxKhS9YgsQe6Nh5ErPkdvBaLq3M=;
+	b=YxVzfOy3ZxwQjeQvBk1Xgx7zGrS7yGJp6eYK20eQ6M4dPAtbvUa9z3Gu16jpYQb5
+	e9Tfc+s30s//YoRea8uqrTwnwcjF6O97y9vaGmgIlBvPlmEp3ReUtUybXS42fYL0HAa
+	BFWmIPybGsnrftnTkd2aNgbiyDNWKZJBRfYbk8gc=
+Received: by mx.zohomail.com with SMTPS id 1783757505686625.4698630082065;
+	Sat, 11 Jul 2026 01:11:45 -0700 (PDT)
 From: Junhui Liu <junhui.liu@pigmoral.tech>
-Date: Sat, 11 Jul 2026 16:10:28 +0800
-Subject: [PATCH v2 2/8] clk: sunxi-ng: sdm: Add dual patterns support
+Date: Sat, 11 Jul 2026 16:10:29 +0800
+Subject: [PATCH v2 3/8] clk: sunxi-ng: a733: Add PRCM CCU
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,7 +65,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260711-a733-clk-v2-2-974d188cbe0c@pigmoral.tech>
+Message-Id: <20260711-a733-clk-v2-3-974d188cbe0c@pigmoral.tech>
 References: <20260711-a733-clk-v2-0-974d188cbe0c@pigmoral.tech>
 In-Reply-To: <20260711-a733-clk-v2-0-974d188cbe0c@pigmoral.tech>
 To: Michael Turquette <mturquette@baylibre.com>, 
@@ -83,11 +83,11 @@ Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
  netdev@vger.kernel.org, Jerome Brunet <jbrunet@baylibre.com>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1783757449; l=5921;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1783757449; l=12190;
  i=junhui.liu@pigmoral.tech; s=20251228; h=from:subject:message-id;
- bh=d2qtA7iLTfik94pzdZuPKHP/qM62WRwszMAeLEmr8Tk=;
- b=84jPPwqEjlddvkBUSOy7Wv8kjrEQX7NZgfxdeMRpA5hAyjbQ/GM++sfgBQxS2VY6wuk+wPqJn
- 6gl+UazqLd5AllYYONBMestza65anI7hiXbBSrOsWDZ3yuuMURGL2AE
+ bh=S46nqnQR4HtBiVxTKwVN8Xf0Oi73yAlFJIYkpnhmpLM=;
+ b=evys2OJdaSxTur+l+69Hfrg9BQqrfQBOlp5QRW0y9xLR0Iq5SRYEdPK84z9McGTzQPSl7Gay3
+ gIY3jBr/EAtAlwEGLiy8jKBFROEcJtvFftuDvv+Az30FtQG8UYH7F19
 X-Developer-Key: i=junhui.liu@pigmoral.tech; a=ed25519;
  pk=3vU0qIPJAH8blXmLyqBhKx+nLOjcLwwYhZXelEpw7h4=
 X-ZohoMailClient: External
@@ -96,7 +96,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	R_DKIM_ALLOW(-0.20)[pigmoral.tech:s=zmail];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -117,167 +117,348 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[junhui.liu@pigmoral.tech,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-306761-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306762-lists,netdev=lfdr.de];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[baylibre.com:email,pigmoral.tech:from_mime,pigmoral.tech:email,pigmoral.tech:mid,pigmoral.tech:dkim,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[baylibre.com:email,allwinnertech.com:email,pigmoral.tech:from_mime,pigmoral.tech:email,pigmoral.tech:mid,pigmoral.tech:dkim,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 308CF740DD4
+X-Rspamd-Queue-Id: 553B6740DF8
 
-On newer Allwinner platforms like the A733, the Sigma-Delta Modulation
-(SDM) control logic is more complex. The SDM enable bit, which was
-previously located in the PLL register, is now moved to a second
-pattern register (PATTERN1).
+Add support for the Power Reset Clock Management (PRCM) module found in
+the Allwinner A733 SoC. This clock controller manages the clock control
+and reset functions for device modules within the CPUS domain.
 
-To support this, rename the existing "tuning" members to "pattern0" to
-align with the datasheet, and introduce the _SUNXI_CCU_SDM_DUAL_PAT
-macro to provide pattern1 register support. Related operations are also
-updated.
+The PRCM module includes the management of three primary buses: r-ahb,
+r-apb0, and r-apb1. It also provides clocking for several key
+peripherals, such as R-UART, R-I2C, R-SPI, and the R-RISCV subsystem.
+Additionally, the reset lines for these modules are integrated.
 
 Tested-by: Jerome Brunet <jbrunet@baylibre.com>
 Signed-off-by: Junhui Liu <junhui.liu@pigmoral.tech>
 ---
- drivers/clk/sunxi-ng/ccu_sdm.c | 51 +++++++++++++++++++++++++++++-------------
- drivers/clk/sunxi-ng/ccu_sdm.h | 29 +++++++++++++++---------
- 2 files changed, 54 insertions(+), 26 deletions(-)
+ drivers/clk/sunxi-ng/Kconfig             |   5 +
+ drivers/clk/sunxi-ng/Makefile            |   2 +
+ drivers/clk/sunxi-ng/ccu-sun60i-a733-r.c | 273 +++++++++++++++++++++++++++++++
+ 3 files changed, 280 insertions(+)
 
-diff --git a/drivers/clk/sunxi-ng/ccu_sdm.c b/drivers/clk/sunxi-ng/ccu_sdm.c
-index c564e5f9e610..204e25feaa36 100644
---- a/drivers/clk/sunxi-ng/ccu_sdm.c
-+++ b/drivers/clk/sunxi-ng/ccu_sdm.c
-@@ -18,7 +18,10 @@ bool ccu_sdm_helper_is_enabled(struct ccu_common *common,
- 	if (sdm->enable && !(readl(common->base + common->reg) & sdm->enable))
- 		return false;
+diff --git a/drivers/clk/sunxi-ng/Kconfig b/drivers/clk/sunxi-ng/Kconfig
+index 6af2d020e03e..202e793dc754 100644
+--- a/drivers/clk/sunxi-ng/Kconfig
++++ b/drivers/clk/sunxi-ng/Kconfig
+@@ -67,6 +67,11 @@ config SUN55I_A523_R_CCU
+ 	default ARCH_SUNXI
+ 	depends on ARM64 || COMPILE_TEST
  
--	return !!(readl(common->base + sdm->tuning_reg) & sdm->tuning_enable);
-+	if (sdm->pat1_enable && !(readl(common->base + sdm->pat1_reg) & sdm->pat1_enable))
-+		return false;
++config SUN60I_A733_R_CCU
++	tristate "Support for the Allwinner A733 PRCM CCU"
++	default ARCH_SUNXI
++	depends on ARM64 || COMPILE_TEST
 +
-+	return !!(readl(common->base + sdm->pat0_reg) & sdm->pat0_enable);
- }
- EXPORT_SYMBOL_NS_GPL(ccu_sdm_helper_is_enabled, "SUNXI_CCU");
- 
-@@ -37,18 +40,27 @@ void ccu_sdm_helper_enable(struct ccu_common *common,
- 	for (i = 0; i < sdm->table_size; i++)
- 		if (sdm->table[i].rate == rate)
- 			writel(sdm->table[i].pattern,
--			       common->base + sdm->tuning_reg);
-+			       common->base + sdm->pat0_reg);
- 
- 	/* Make sure SDM is enabled */
- 	spin_lock_irqsave(common->lock, flags);
--	reg = readl(common->base + sdm->tuning_reg);
--	writel(reg | sdm->tuning_enable, common->base + sdm->tuning_reg);
-+	reg = readl(common->base + sdm->pat0_reg);
-+	writel(reg | sdm->pat0_enable, common->base + sdm->pat0_reg);
- 	spin_unlock_irqrestore(common->lock, flags);
- 
--	spin_lock_irqsave(common->lock, flags);
--	reg = readl(common->base + common->reg);
--	writel(reg | sdm->enable, common->base + common->reg);
--	spin_unlock_irqrestore(common->lock, flags);
-+	if (sdm->enable) {
-+		spin_lock_irqsave(common->lock, flags);
-+		reg = readl(common->base + common->reg);
-+		writel(reg | sdm->enable, common->base + common->reg);
-+		spin_unlock_irqrestore(common->lock, flags);
-+	}
+ config SUN4I_A10_CCU
+ 	tristate "Support for the Allwinner A10/A20 CCU"
+ 	default ARCH_SUNXI
+diff --git a/drivers/clk/sunxi-ng/Makefile b/drivers/clk/sunxi-ng/Makefile
+index a1c4087d7241..d3702bdb7a23 100644
+--- a/drivers/clk/sunxi-ng/Makefile
++++ b/drivers/clk/sunxi-ng/Makefile
+@@ -36,6 +36,7 @@ obj-$(CONFIG_SUN50I_H616_CCU)	+= sun50i-h616-ccu.o
+ obj-$(CONFIG_SUN55I_A523_CCU)	+= sun55i-a523-ccu.o
+ obj-$(CONFIG_SUN55I_A523_MCU_CCU)	+= sun55i-a523-mcu-ccu.o
+ obj-$(CONFIG_SUN55I_A523_R_CCU)	+= sun55i-a523-r-ccu.o
++obj-$(CONFIG_SUN60I_A733_R_CCU)	+= sun60i-a733-r-ccu.o
+ obj-$(CONFIG_SUN4I_A10_CCU)	+= sun4i-a10-ccu.o
+ obj-$(CONFIG_SUN5I_CCU)		+= sun5i-ccu.o
+ obj-$(CONFIG_SUN6I_A31_CCU)	+= sun6i-a31-ccu.o
+@@ -64,6 +65,7 @@ sun50i-h616-ccu-y		+= ccu-sun50i-h616.o
+ sun55i-a523-ccu-y		+= ccu-sun55i-a523.o
+ sun55i-a523-mcu-ccu-y		+= ccu-sun55i-a523-mcu.o
+ sun55i-a523-r-ccu-y		+= ccu-sun55i-a523-r.o
++sun60i-a733-r-ccu-y		+= ccu-sun60i-a733-r.o
+ sun4i-a10-ccu-y			+= ccu-sun4i-a10.o
+ sun5i-ccu-y			+= ccu-sun5i.o
+ sun6i-a31-ccu-y			+= ccu-sun6i-a31.o
+diff --git a/drivers/clk/sunxi-ng/ccu-sun60i-a733-r.c b/drivers/clk/sunxi-ng/ccu-sun60i-a733-r.c
+new file mode 100644
+index 000000000000..a56cd3edff5f
+--- /dev/null
++++ b/drivers/clk/sunxi-ng/ccu-sun60i-a733-r.c
+@@ -0,0 +1,273 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2023 rengaomin@allwinnertech.com
++ * Copyright (C) 2026 Junhui Liu <junhui.liu@pigmoral.tech>
++ * Based on the A523 CCU driver:
++ *   Copyright (C) 2024 Arm Ltd.
++ */
 +
-+	if (sdm->pat1_enable) {
-+		spin_lock_irqsave(common->lock, flags);
-+		reg = readl(common->base + sdm->pat1_reg);
-+		writel(reg | sdm->pat1_enable, common->base + sdm->pat1_reg);
-+		spin_unlock_irqrestore(common->lock, flags);
-+	}
- }
- EXPORT_SYMBOL_NS_GPL(ccu_sdm_helper_enable, "SUNXI_CCU");
- 
-@@ -61,14 +73,23 @@ void ccu_sdm_helper_disable(struct ccu_common *common,
- 	if (!(common->features & CCU_FEATURE_SIGMA_DELTA_MOD))
- 		return;
- 
--	spin_lock_irqsave(common->lock, flags);
--	reg = readl(common->base + common->reg);
--	writel(reg & ~sdm->enable, common->base + common->reg);
--	spin_unlock_irqrestore(common->lock, flags);
-+	if (sdm->enable) {
-+		spin_lock_irqsave(common->lock, flags);
-+		reg = readl(common->base + common->reg);
-+		writel(reg & ~sdm->enable, common->base + common->reg);
-+		spin_unlock_irqrestore(common->lock, flags);
-+	}
++#include <linux/clk-provider.h>
++#include <linux/module.h>
++#include <linux/platform_device.h>
 +
-+	if (sdm->pat1_enable) {
-+		spin_lock_irqsave(common->lock, flags);
-+		reg = readl(common->base + sdm->pat1_reg);
-+		writel(reg & ~sdm->pat1_enable, common->base + sdm->pat1_reg);
-+		spin_unlock_irqrestore(common->lock, flags);
-+	}
- 
- 	spin_lock_irqsave(common->lock, flags);
--	reg = readl(common->base + sdm->tuning_reg);
--	writel(reg & ~sdm->tuning_enable, common->base + sdm->tuning_reg);
-+	reg = readl(common->base + sdm->pat0_reg);
-+	writel(reg & ~sdm->pat0_enable, common->base + sdm->pat0_reg);
- 	spin_unlock_irqrestore(common->lock, flags);
- }
- EXPORT_SYMBOL_NS_GPL(ccu_sdm_helper_disable, "SUNXI_CCU");
-@@ -123,7 +144,7 @@ unsigned long ccu_sdm_helper_read_rate(struct ccu_common *common,
- 	pr_debug("%s: clock is sigma-delta modulated\n",
- 		 clk_hw_get_name(&common->hw));
- 
--	reg = readl(common->base + sdm->tuning_reg);
-+	reg = readl(common->base + sdm->pat0_reg);
- 
- 	pr_debug("%s: pattern reg is 0x%x",
- 		 clk_hw_get_name(&common->hw), reg);
-diff --git a/drivers/clk/sunxi-ng/ccu_sdm.h b/drivers/clk/sunxi-ng/ccu_sdm.h
-index c1a7159b89c3..e94cef141c7d 100644
---- a/drivers/clk/sunxi-ng/ccu_sdm.h
-+++ b/drivers/clk/sunxi-ng/ccu_sdm.h
-@@ -33,21 +33,28 @@ struct ccu_sdm_internal {
- 	u32		table_size;
- 	/* early SoCs don't have the SDM enable bit in the PLL register */
- 	u32		enable;
--	/* second enable bit in tuning register */
--	u32		tuning_enable;
--	u16		tuning_reg;
-+	/* second enable bit in pattern0 register */
-+	u32		pat0_enable;
-+	u16		pat0_reg;
-+	/* on some platforms, the sdm enable bit in pattern1 register */
-+	u32		pat1_enable;
-+	u16		pat1_reg;
- };
- 
--#define _SUNXI_CCU_SDM(_table, _enable,			\
--		       _reg, _reg_enable)		\
--	{						\
--		.table		= _table,		\
--		.table_size	= ARRAY_SIZE(_table),	\
--		.enable		= _enable,		\
--		.tuning_enable	= _reg_enable,		\
--		.tuning_reg	= _reg,			\
-+#define _SUNXI_CCU_SDM_DUAL_PAT(_table, _enable, _pat0, _pat0_enable, _pat1, _pat1_enable) \
-+	{								\
-+		.table			= _table,			\
-+		.table_size		= ARRAY_SIZE(_table),		\
-+		.enable			= _enable,			\
-+		.pat0_enable		= _pat0_enable,			\
-+		.pat0_reg		= _pat0,			\
-+		.pat1_enable		= _pat1_enable,			\
-+		.pat1_reg		= _pat1,			\
- 	}
- 
-+#define _SUNXI_CCU_SDM(_table, _enable, _pat0, _pat0_enable)	\
-+	_SUNXI_CCU_SDM_DUAL_PAT(_table, _enable, _pat0, _pat0_enable, 0, 0)
++#include <dt-bindings/clock/sun60i-a733-r-ccu.h>
++#include <dt-bindings/reset/sun60i-a733-r-ccu.h>
 +
- bool ccu_sdm_helper_is_enabled(struct ccu_common *common,
- 			       struct ccu_sdm_internal *sdm);
- void ccu_sdm_helper_enable(struct ccu_common *common,
++#include "ccu_common.h"
++#include "ccu_reset.h"
++
++#include "ccu_div.h"
++#include "ccu_gate.h"
++#include "ccu_mp.h"
++
++static const struct clk_parent_data r_ahb_parents[] = {
++	{ .fw_name = "hosc" },
++	{ .fw_name = "losc" },
++	{ .fw_name = "iosc" },
++	{ .fw_name = "pll-periph0-200m" },
++	{ .fw_name = "pll-periph0-300m" },
++};
++static SUNXI_CCU_M_DATA_WITH_MUX(r_ahb_clk, "r-ahb", r_ahb_parents, 0x000,
++				 0, 5,	/* M */
++				 24, 3,	/* mux */
++				 0);
++
++static const struct clk_parent_data r_apb_parents[] = {
++	{ .fw_name = "hosc" },
++	{ .fw_name = "losc" },
++	{ .fw_name = "iosc" },
++	{ .fw_name = "pll-periph0-200m" },
++	{ .fw_name = "sys-24m" },
++};
++
++static SUNXI_CCU_M_DATA_WITH_MUX(r_apb0_clk, "r-apb0", r_apb_parents, 0x00c,
++				 0, 5,	/* M */
++				 24, 3,	/* mux */
++				 0);
++
++static SUNXI_CCU_M_DATA_WITH_MUX(r_apb1_clk, "r-apb1", r_apb_parents, 0x010,
++				 0, 5,	/* M */
++				 24, 3,	/* mux */
++				 0);
++
++static SUNXI_CCU_P_DATA_WITH_MUX_GATE(r_cpu_timer0, "r-timer0", r_apb_parents, 0x100,
++				      1, 3,	/* P */
++				      4, 3,	/* mux */
++				      BIT(0),	/* gate */
++				      0);
++static SUNXI_CCU_P_DATA_WITH_MUX_GATE(r_cpu_timer1, "r-timer1", r_apb_parents, 0x104,
++				      1, 3,	/* P */
++				      4, 3,	/* mux */
++				      BIT(0),	/* gate */
++				      0);
++static SUNXI_CCU_P_DATA_WITH_MUX_GATE(r_cpu_timer2, "r-timer2", r_apb_parents, 0x108,
++				      1, 3,	/* P */
++				      4, 3,	/* mux */
++				      BIT(0),	/* gate */
++				      0);
++static SUNXI_CCU_P_DATA_WITH_MUX_GATE(r_cpu_timer3, "r-timer3", r_apb_parents, 0x10c,
++				      1, 3,	/* P */
++				      4, 3,	/* mux */
++				      BIT(0),	/* gate */
++				      0);
++
++static SUNXI_CCU_GATE_HW(bus_r_timer_clk, "bus-r-timer", &r_ahb_clk.common.hw, 0x11c, BIT(0), 0);
++static SUNXI_CCU_GATE_HW(bus_r_twd_clk, "bus-r-twd", &r_apb0_clk.common.hw, 0x12c, BIT(0), 0);
++
++static const struct clk_parent_data r_pwm_parents[] = {
++	{ .fw_name = "hosc" },
++	{ .fw_name = "losc" },
++	{ .fw_name = "iosc" },
++	{ .fw_name = "sys-24m" },
++};
++static SUNXI_CCU_MUX_DATA_WITH_GATE(r_pwm_clk, "r-pwm", r_pwm_parents, 0x130,
++				    24, 2,	/* mux */
++				    BIT(31),	/* gate */
++				    0);
++static SUNXI_CCU_GATE_HW(bus_r_pwm_clk, "bus-r-pwm",
++			 &r_apb0_clk.common.hw, 0x13c, BIT(0), 0);
++
++static const struct clk_parent_data r_spi_parents[] = {
++	{ .fw_name = "hosc" },
++	{ .fw_name = "pll-periph0-200m" },
++	{ .fw_name = "pll-periph0-300m" },
++	{ .fw_name = "pll-periph1-300m" },
++	{ .fw_name = "sys-24m" },
++};
++static SUNXI_CCU_DUALDIV_MUX_GATE(r_spi_clk, "r-spi", r_spi_parents, 0x150,
++				  0, 5,		/* M */
++				  8, 5,		/* N */
++				  24, 3,	/* mux */
++				  BIT(31),	/* gate */
++				  0);
++static SUNXI_CCU_GATE_HW(bus_r_spi_clk, "bus-r-spi", &r_ahb_clk.common.hw, 0x15c, BIT(0), 0);
++
++static SUNXI_CCU_GATE_HW(bus_r_msgbox_clk, "bus-r-msgbox", &r_ahb_clk.common.hw, 0x17c, BIT(0), 0);
++
++static SUNXI_CCU_GATE_HW(bus_r_uart0_clk, "bus-r-uart0", &r_apb1_clk.common.hw, 0x18c, BIT(0), 0);
++static SUNXI_CCU_GATE_HW(bus_r_uart1_clk, "bus-r-uart1", &r_apb1_clk.common.hw, 0x18c, BIT(1), 0);
++
++static SUNXI_CCU_GATE_HW(bus_r_i2c0_clk, "bus-r-i2c0", &r_apb1_clk.common.hw, 0x19c, BIT(0), 0);
++static SUNXI_CCU_GATE_HW(bus_r_i2c1_clk, "bus-r-i2c1", &r_apb1_clk.common.hw, 0x19c, BIT(1), 0);
++static SUNXI_CCU_GATE_HW(bus_r_i2c2_clk, "bus-r-i2c2", &r_apb1_clk.common.hw, 0x19c, BIT(2), 0);
++
++static SUNXI_CCU_GATE_HW(bus_r_ppu_clk, "bus-r-ppu", &r_apb0_clk.common.hw, 0x1ac, BIT(0), 0);
++
++static SUNXI_CCU_GATE_HW(bus_r_tzma_clk, "bus-r-tzma", &r_apb0_clk.common.hw, 0x1b0, BIT(0), 0);
++static SUNXI_CCU_GATE_HW(bus_r_cpu_bist_clk, "bus-r-cpu-bist", &r_apb0_clk.common.hw,
++			 0x1bc, BIT(0), 0);
++
++static const struct clk_parent_data r_ir_rx_parents[] = {
++	{ .fw_name = "losc" },
++	{ .fw_name = "hosc" },
++	{ .fw_name = "sys-24m" },
++};
++static SUNXI_CCU_M_DATA_WITH_MUX_GATE(r_ir_rx_clk, "r-ir-rx", r_ir_rx_parents, 0x1c0,
++				      0, 5,	/* M */
++				      24, 2,	/* mux */
++				      BIT(31),	/* gate */
++				      0);
++static SUNXI_CCU_GATE_HW(bus_r_ir_rx_clk, "bus-r-ir-rx", &r_apb0_clk.common.hw, 0x1cc, BIT(0), 0);
++
++static SUNXI_CCU_GATE_HW(bus_r_rtc_clk, "bus-r-rtc", &r_ahb_clk.common.hw, 0x20c, BIT(0), 0);
++
++static const struct clk_parent_data r_riscv_parents[] = {
++	{ .fw_name = "hosc" },
++	{ .fw_name = "losc" },
++	{ .fw_name = "iosc" },
++};
++static SUNXI_CCU_MUX_DATA_WITH_GATE(r_riscv_clk, "r-riscv", r_riscv_parents, 0x210,
++				  24, 2,	/* mux */
++				  BIT(31),	/* gate */
++				  0);
++static SUNXI_CCU_GATE_HW(bus_r_riscv_clk, "bus-r-riscv", &r_apb0_clk.common.hw,
++			 0x21c, BIT(0), 0);
++static SUNXI_CCU_GATE_HW(bus_r_riscv_cfg_clk, "bus-r-riscv-cfg", &r_apb0_clk.common.hw,
++			 0x21c, BIT(1), 0);
++
++static SUNXI_CCU_GATE_HW(bus_r_cpucfg_clk, "bus-r-cpucfg", &r_apb0_clk.common.hw,
++			 0x22c, BIT(0), CLK_IS_CRITICAL);
++
++static struct ccu_common *sun60i_a733_r_ccu_clks[] = {
++	&r_ahb_clk.common,
++	&r_apb0_clk.common,
++	&r_apb1_clk.common,
++	&r_cpu_timer0.common,
++	&r_cpu_timer1.common,
++	&r_cpu_timer2.common,
++	&r_cpu_timer3.common,
++	&bus_r_timer_clk.common,
++	&bus_r_twd_clk.common,
++	&r_pwm_clk.common,
++	&bus_r_pwm_clk.common,
++	&r_spi_clk.common,
++	&bus_r_spi_clk.common,
++	&bus_r_msgbox_clk.common,
++	&bus_r_uart0_clk.common,
++	&bus_r_uart1_clk.common,
++	&bus_r_i2c0_clk.common,
++	&bus_r_i2c1_clk.common,
++	&bus_r_i2c2_clk.common,
++	&bus_r_ppu_clk.common,
++	&bus_r_tzma_clk.common,
++	&bus_r_cpu_bist_clk.common,
++	&r_ir_rx_clk.common,
++	&bus_r_ir_rx_clk.common,
++	&bus_r_rtc_clk.common,
++	&r_riscv_clk.common,
++	&bus_r_riscv_clk.common,
++	&bus_r_riscv_cfg_clk.common,
++	&bus_r_cpucfg_clk.common,
++};
++
++static struct clk_hw_onecell_data sun60i_a733_r_hw_clks = {
++	.hws = {
++		[CLK_R_AHB]		= &r_ahb_clk.common.hw,
++		[CLK_R_APB0]		= &r_apb0_clk.common.hw,
++		[CLK_R_APB1]		= &r_apb1_clk.common.hw,
++		[CLK_R_TIMER0]		= &r_cpu_timer0.common.hw,
++		[CLK_R_TIMER1]		= &r_cpu_timer1.common.hw,
++		[CLK_R_TIMER2]		= &r_cpu_timer2.common.hw,
++		[CLK_R_TIMER3]		= &r_cpu_timer3.common.hw,
++		[CLK_BUS_R_TIMER]	= &bus_r_timer_clk.common.hw,
++		[CLK_BUS_R_TWD]		= &bus_r_twd_clk.common.hw,
++		[CLK_R_PWM]		= &r_pwm_clk.common.hw,
++		[CLK_BUS_R_PWM]		= &bus_r_pwm_clk.common.hw,
++		[CLK_R_SPI]		= &r_spi_clk.common.hw,
++		[CLK_BUS_R_SPI]		= &bus_r_spi_clk.common.hw,
++		[CLK_BUS_R_MSGBOX]	= &bus_r_msgbox_clk.common.hw,
++		[CLK_BUS_R_UART0]	= &bus_r_uart0_clk.common.hw,
++		[CLK_BUS_R_UART1]	= &bus_r_uart1_clk.common.hw,
++		[CLK_BUS_R_I2C0]	= &bus_r_i2c0_clk.common.hw,
++		[CLK_BUS_R_I2C1]	= &bus_r_i2c1_clk.common.hw,
++		[CLK_BUS_R_I2C2]	= &bus_r_i2c2_clk.common.hw,
++		[CLK_BUS_R_PPU]		= &bus_r_ppu_clk.common.hw,
++		[CLK_BUS_R_TZMA]	= &bus_r_tzma_clk.common.hw,
++		[CLK_BUS_R_CPU_BIST]	= &bus_r_cpu_bist_clk.common.hw,
++		[CLK_R_IR_RX]		= &r_ir_rx_clk.common.hw,
++		[CLK_BUS_R_IR_RX]	= &bus_r_ir_rx_clk.common.hw,
++		[CLK_BUS_R_RTC]		= &bus_r_rtc_clk.common.hw,
++		[CLK_R_RISCV]		= &r_riscv_clk.common.hw,
++		[CLK_BUS_R_RISCV]	= &bus_r_riscv_clk.common.hw,
++		[CLK_BUS_R_RISCV_CFG]	= &bus_r_riscv_cfg_clk.common.hw,
++		[CLK_BUS_R_CPUCFG]	= &bus_r_cpucfg_clk.common.hw,
++	},
++	.num = CLK_BUS_R_CPUCFG + 1,
++};
++
++static struct ccu_reset_map sun60i_a733_r_ccu_resets[] = {
++	[RST_BUS_R_TIMER]	= { 0x11c, BIT(16) },
++	[RST_BUS_R_PWM]		= { 0x13c, BIT(16) },
++	[RST_BUS_R_SPI]		= { 0x15c, BIT(16) },
++	[RST_BUS_R_MSGBOX]	= { 0x17c, BIT(16) },
++	[RST_BUS_R_UART0]	= { 0x18c, BIT(16) },
++	[RST_BUS_R_UART1]	= { 0x18c, BIT(17) },
++	[RST_BUS_R_I2C0]	= { 0x19c, BIT(16) },
++	[RST_BUS_R_I2C1]	= { 0x19c, BIT(17) },
++	[RST_BUS_R_I2C2]	= { 0x19c, BIT(18) },
++	[RST_BUS_R_IR_RX]	= { 0x1cc, BIT(16) },
++	[RST_BUS_R_RTC]		= { 0x20c, BIT(16) },
++	[RST_BUS_R_RISCV_CFG]	= { 0x21c, BIT(16) },
++	[RST_BUS_R_CPUCFG]	= { 0x22c, BIT(16) },
++};
++
++static const struct sunxi_ccu_desc sun60i_a733_r_ccu_desc = {
++	.ccu_clks	= sun60i_a733_r_ccu_clks,
++	.num_ccu_clks	= ARRAY_SIZE(sun60i_a733_r_ccu_clks),
++
++	.hw_clks	= &sun60i_a733_r_hw_clks,
++
++	.resets		= sun60i_a733_r_ccu_resets,
++	.num_resets	= ARRAY_SIZE(sun60i_a733_r_ccu_resets),
++};
++
++static int sun60i_a733_r_ccu_probe(struct platform_device *pdev)
++{
++	void __iomem *reg;
++
++	reg = devm_platform_ioremap_resource(pdev, 0);
++	if (IS_ERR(reg))
++		return PTR_ERR(reg);
++
++	return devm_sunxi_ccu_probe(&pdev->dev, reg, &sun60i_a733_r_ccu_desc);
++}
++
++static const struct of_device_id sun60i_a733_r_ccu_ids[] = {
++	{ .compatible = "allwinner,sun60i-a733-r-ccu" },
++	{ /* sentinel */ }
++};
++MODULE_DEVICE_TABLE(of, sun60i_a733_r_ccu_ids);
++
++static struct platform_driver sun60i_a733_r_ccu_driver = {
++	.probe	= sun60i_a733_r_ccu_probe,
++	.driver	= {
++		.name			= "sun60i-a733-r-ccu",
++		.suppress_bind_attrs	= true,
++		.of_match_table		= sun60i_a733_r_ccu_ids,
++	},
++};
++module_platform_driver(sun60i_a733_r_ccu_driver);
++
++MODULE_IMPORT_NS("SUNXI_CCU");
++MODULE_DESCRIPTION("Support for the Allwinner A733 PRCM CCU");
++MODULE_LICENSE("GPL");
 
 -- 
 2.54.0
