@@ -1,255 +1,174 @@
-Return-Path: <netdev+bounces-306876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306877-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id u9sHFFxgUmoiPAMAu9opvQ
-	(envelope-from <netdev+bounces-306876-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:25:16 +0200
+	id mYomKYRhUmplPAMAu9opvQ
+	(envelope-from <netdev+bounces-306877-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:30:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5E2E741F7B
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:25:15 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B164741FCC
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:30:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b="ksoqK/zj";
-	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=Y9yDTbzU;
-	dmarc=pass (policy=reject) header.from=mailbox.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306876-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306876-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=ajtiv3oa;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306877-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306877-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1880330297B1
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 15:21:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1EB543008249
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 15:30:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E15C2E8DEA;
-	Sat, 11 Jul 2026 15:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BA2D3B47FF;
+	Sat, 11 Jul 2026 15:30:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5375735A3A9;
-	Sat, 11 Jul 2026 15:21:44 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783783307; cv=none; b=kmUNw8ih9tnYHNcq3BZUgX4Qu6KH7WY3iZ8NSTuritJugRHVdDlKXXOHTtFh6DI9lMrUVt61AHjLfjQJi/mUVXIjt9NEakcTzfkaeSWGEmLGuww3p3K2YADpz8bA2Yx+RUnE+6eZ0vu7tdZgSqEVWlfRmr2ZFvopHBlURDKjuiQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783783307; c=relaxed/simple;
-	bh=dA+p/e0yU5GmI2+843t83Ws3vAPk7ZHcyx+dI89Sz1U=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=L72dgViX57b74k8mX764I6qDGvTgFvTMKPaXq3uzrlj9wwhBH2NvhRRrTHJSh4cMS7011bMxHD86tcCyasEPzt97zhGH4GFsmsOoLM2sP+O53+xqVz39o89EuKd3YEfaI06hZRXGQTCNMT+U9T5JYyl8vN+8Ngdrcl9jU+BySBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=ksoqK/zj; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=Y9yDTbzU; arc=none smtp.client-ip=80.241.56.172
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA512)
-	(No client certificate requested)
-	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4gyC9208hBzMlFY;
-	Sat, 11 Jul 2026 17:21:42 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1783783302;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5zGD2166erzzmBrOUSjlgc7V6NcBK4nb2itQnBTjxms=;
-	b=ksoqK/zj+BidOqeAJJ7EKT02ziVUZdAZpUvhJMwQtSmRWjSq9Enio2FtjUZVXyDQeKcPS9
-	tz3EEt5kqcm2UE7WJdYDM3b+KpBAVSFgo0g3D5mBCTAgfgfn5uP25Y5c2Om8YP0zHfM12z
-	cTtb5RUpNqORLbagExvL5rRh5ClAY9dGm+PNTYbSKo32vko5Z12zm2a9Smho1qpekhzHJP
-	uzV29wf7UQtMAkvXzHuC0UQ1Fhw09TFGSpBly6QMQVskI/ENe8Tf4ouU54ZEFFTBXOU5Wb
-	dU/uMxvi3O5dII+fFRTJDMNJ6tw022Ppk5aZ0NZNabs/Rxu2ksDW/Y48+ev3Ew==
-From: Maurice Hieronymus <mhi@mailbox.org>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1783783300;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5zGD2166erzzmBrOUSjlgc7V6NcBK4nb2itQnBTjxms=;
-	b=Y9yDTbzUH5iQ+rWrMO26z0OIS3g+EqRjCkPCiekugHNCtM7hSviYHk68Cm/Xegt23h7q78
-	WyQla1TBoqMmPXMPzpLAKJF1spAjJXMQ7ucmmcjPMC+tglQFyfu8TAEBTLKANlbEyyZNse
-	xVN5Xf0BaS7yqkcpaFBbqTghqEybETOdS+VFYqsaZNrGvG06kQVhEK0pyytE3pStJkBp3r
-	yYH8zCv/wVf3PmL5YByhmUTOpaKMZGZYEBodK+ddHvtw+rHGcLgXRyfBX/cMV4ZB3CE9Nl
-	oVA1frLCK+jSksHMfitUChWECby6KcNDEFsVc/6uJaCeoPpBH16kWBQ82HjtTA==
-Date: Sat, 11 Jul 2026 17:21:07 +0200
-Subject: [PATCH 2/2] PCI: Replace pci_dev->broken_parity_status with
- accessors
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B8C395AEB
+	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 15:30:08 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783783810; cv=pass; b=N+Uz92v5oh4+5HyqVxommIC/oAS+28VGNFEsWnamvfcwopoQ0/8A0ZNcCuEF17K6vcSCMol+1X7+OlkgxiaF5BEBuRYHnRBmewBslq0cEM1jbIVmGkNgmNjhiHqlPdbH5EWydKENQwHOdPhNAj4UzimlNAhSAHTjWi3Bt6sLhZA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783783810; c=relaxed/simple;
+	bh=VgLcjMWmevXm7ESHz2wQzgI3sAUBCb1NgNAir+5i0GU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=glRN/MnKWf97esz3w1Sr7J76IrDD5a7DMVHgBZmlQEqc0MlpLqLYWK/Sda1DXOMLGBlQL+RMrOtipFyexWYtM4LykEl6qRRlnMlJpXXKopJlsIjDkYTVMqaebYBoSLU2xj1382GVLzMDFc9Y4D7BQDr+EgIiTDGU5MAJXpl63/s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ajtiv3oa; arc=pass smtp.client-ip=74.125.224.43
+Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-664cdeab266so3011672d50.3
+        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 08:30:08 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783783807; cv=none;
+        d=google.com; s=arc-20260327;
+        b=H9JgpK5eZ0UrThytn91pWvmABK/eodSI8oYadGJeBZt/uZ3Wkz5MTQZH/IPwb54Ytz
+         u9o2+60VLED+4NoiHxXqupQi0K5h39s2CSXhZM7s9WeJYfoAFx9KcIcFRCyeGZokae5K
+         AnkcHDE66zXO1eC3gxL/Q1o8Ie17wbgNn4QuW5ELlv6nZaHKaEMRZh/n128iVqpZ6fO0
+         u1o60eUQ6slIDnDETz/wTv71GqPiGYa1/NRAkRVUHq//QR599BZvXLkMAHEgBWA+clSt
+         6NK3S7V7tZEfyvWRrLOSJ0CcWd2t5qHzVv3NNbwPMv4YqzSwEedBkO9MbfhvYb7FInmg
+         j1aA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=+djRPG1+yP7gLniNybddU9i7XevMPm8WBoJDKoJ3OMs=;
+        fh=2jTw3kE6d/Zp6gVgJZolMgsEvR0l933NG/b+D3PUV+c=;
+        b=IopohuRilzTPNMZ05Cbzd5cABsNgutXx2zRAsO2qeLHbfI9Lbkvc/LMsRcArmmhdxe
+         Ip7Wx6JXfwfAKziXcn5hgnGQ/IQnkTn/877TRLTXGo9XZnACZca2+2vwrl5uhQp+CwmU
+         aqm/P72LnSgiNj8vK3Q+/cLYl7BWjSRF2g7O1jFj3YNoMkK9/HJkc0OpLOuH5InNQq4v
+         9+BU6cakJjPOdhQ8lKkxQJF9SSPhcoIQpprKZi00vfWWL4NcLriywGECIykO6YFdUhHj
+         zozTWUugqDtf99NXNwJ/acSNoO1R3vDE9wtpj4DFoBKluE98ovNYQGZ0ce/TEzLXhJ+q
+         9a2g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783783807; x=1784388607; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=+djRPG1+yP7gLniNybddU9i7XevMPm8WBoJDKoJ3OMs=;
+        b=ajtiv3oavXmmjMpbOwKJqH7BAIYIvgVi7IIg9dXw0KTqKp/ph2w4B417H3PMC9/sXD
+         /7AgFV5NXnEXnJfPAKh+7WbIecsq+UPWtCG4gaojfi5GSUH2cpqz8ija6B2TzVkLPedg
+         YMaS1tyT1o0bl+LrEeIdp2MoC+OS8I4R7jUc5dvuigIOODJIEYORv6K70pxrG9cqGaL5
+         j6+DWMkz66QfbcZGznOt6NUyWwoHeFH+nDRMCkRle1kbETISrnQf2kIfV1QnJs2zC9tV
+         P5umBpOZr2Vo9BpdpfGZ/qpyZVwnEQDsdSpN1ZAtq1wHgGp6WqbswLGnYM/I509tk7fU
+         8L2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783783807; x=1784388607;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=+djRPG1+yP7gLniNybddU9i7XevMPm8WBoJDKoJ3OMs=;
+        b=gn1R9sxJcwAUAPfSl5m0cgD3RY3hnkhtHPWpmK98Ls2Xp5oMDfJADFJUyXShJo9YoY
+         11ng5jAhaen08FKbak/M/uYE3aW7ojHOVGA/czJN0fMnqrVSLd6KCW71V235Rea4M09w
+         Ya+zYprHBY47wi4/IQvLPCro1IjMSdXg0gLVOFYb2vj79Kj8Y8C97k9+M4yOY5Pw7z+f
+         Jbng1NWR69PGpA6aLylizSUNvvVg8nafFSKJSoGkBjvtv5vDcTB+H8+gY7le4kFAhEuX
+         9awU0ILkGoRjULXYubPeC6DGZqphkTgYzvtT9Kiu6OmCiAZ13uiyjN6BxyMan442OghL
+         NH8Q==
+X-Forwarded-Encrypted: i=1; AHgh+RpofXTOtz3vt2mLXPjOsdl/nErkBkLViZGXw+pfkDzKlCgWaJqWv+4sKHVporxBNc3PA6VHDJ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywu8TatkHO9VkcihJIujrhLz+JEZscaltLOLTVIyHF4FsNT2rri
+	Asm1LPB56sJmz3Ew4RxLzs1kBCnfRbjR4oRhmwF029NWGRJfpLBPJJ/hg/osSO2KsY2xU64eNoO
+	Hk4Ne3g/gL9WKrVExAiHe2eMMBhHAw9w=
+X-Gm-Gg: AfdE7cm3QZV3Q1bSqO4/0vCWXH99QzwrNHJH/QI6i0xcebeUxBqa5qKxDSFUyD2kN+z
+	fCU3DuyvyGvfIhfAgEdYpCD1MR2SaUF9LVtKI1lzIUhT6eARJBgVFB4eQKdIa+feJBII6bme7/H
+	KGNOIOgqrAht2SyKGzzPbeDwmYtnrmDNeO1OVTg0k1W9ygOVN/a3LGAVj2AmXmxCQ6f9rIUJjOi
+	H0uQ9v7QByBb5r7hKBxHNx+v3Wf76+mG36O3VIXz36qXe8KefnFiS/YRTXAv2p8vOjPeT70wmWU
+	ZsB0Nw3TcibMiIqtJQzEjaQRNzJ2sRvbjKyt
+X-Received: by 2002:a05:690c:480b:b0:81e:4e5d:4849 with SMTP id
+ 00721157ae682-81e90060695mr22842997b3.16.1783783807477; Sat, 11 Jul 2026
+ 08:30:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260711-pci-dev-flags-v1-2-2fcf2811138c@mailbox.org>
-References: <20260711-pci-dev-flags-v1-0-2fcf2811138c@mailbox.org>
-In-Reply-To: <20260711-pci-dev-flags-v1-0-2fcf2811138c@mailbox.org>
-To: Edward Cree <ecree.xilinx@gmail.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Bjorn Helgaas <bhelgaas@google.com>, Justin Tee <justin.tee@broadcom.com>, 
- Paul Ely <paul.ely@broadcom.com>, 
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
- "Martin K. Petersen" <martin.petersen@oracle.com>, 
- Juergen Gross <jgross@suse.com>, 
- Stefano Stabellini <sstabellini@kernel.org>, 
- Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>, 
- Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
- Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
- Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
- Daniel Almeida <daniel.almeida@collabora.com>, 
- Tamir Duberstein <tamird@kernel.org>, 
- Alexandre Courbot <acourbot@nvidia.com>, 
- =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
- Borislav Petkov <bp@alien8.de>, Tony Luck <tony.luck@intel.com>
-Cc: Danilo Krummrich <dakr@kernel.org>, rust-for-linux@vger.kernel.org, 
- netdev@vger.kernel.org, linux-net-drivers@amd.com, 
- linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
- linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org, 
- linux-edac@vger.kernel.org, Maurice Hieronymus <mhi@mailbox.org>
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1783783272; l=3918;
- i=mhi@mailbox.org; s=20260525; h=from:subject:message-id;
- bh=dA+p/e0yU5GmI2+843t83Ws3vAPk7ZHcyx+dI89Sz1U=;
- b=2KUtaRPN52gN+DrVoSi0Gx1KvBexgp3rJLmXihe43P4Nxd7ql/LG0mNOPKmJYGQTEluKIkZ/a
- e0xF1urLLB7BZdfXCqB9rBoVHA+cFHOIyMacXK65ieb1QbtT7PbaILy
-X-Developer-Key: i=mhi@mailbox.org; a=ed25519;
- pk=AHlEkGG3hpXZHntlEzF42Ip/LFyXWOgsNUvaHqAnV80=
-X-MBO-RS-ID: c995304cfe7236ecf3e
-X-MBO-RS-META: kw8gscg45gpin8zawfowe9q3as1dmn7e
+References: <20260711150754.2918392-1-michael.bommarito@gmail.com> <20260711111503-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20260711111503-mutt-send-email-mst@kernel.org>
+From: Michael Bommarito <michael.bommarito@gmail.com>
+Date: Sat, 11 Jul 2026 11:29:56 -0400
+X-Gm-Features: AUfX_mxgD_lh4gOsRso7LSqjgvGgXmvPV1lIQqbOp9oTE3YTU5O6OP4lBsiP8lo
+Message-ID: <CAJJ9bXwUtQ3pHqZ=AMuwaNLs16pmujiMdeBQtB5kFc6JjM-Pug@mail.gmail.com>
+Subject: Re: [PATCH] virtio_net: validate device stats reply records before use
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:ecree.xilinx@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:bhelgaas@google.com,m:justin.tee@broadcom.com,m:paul.ely@broadcom.com,m:James.Bottomley@HansenPartnership.com,m:martin.petersen@oracle.com,m:jgross@suse.com,m:sstabellini@kernel.org,m:oleksandr_tyshchenko@epam.com,m:ojeda@kernel.org,m:boqun@kernel.org,m:gary@garyguo.net,m:bjorn3_gh@protonmail.com,m:lossin@kernel.org,m:a.hindborg@kernel.org,m:aliceryhl@google.com,m:tmgross@umich.edu,m:daniel.almeida@collabora.com,m:tamird@kernel.org,m:acourbot@nvidia.com,m:work@onurozkan.dev,m:bp@alien8.de,m:tony.luck@intel.com,m:dakr@kernel.org,m:rust-for-linux@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-net-drivers@amd.com,m:linux-kernel@vger.kernel.org,m:linux-pci@vger.kernel.org,m:linux-scsi@vger.kernel.org,m:xen-devel@lists.xenproject.org,m:linux-edac@vger.kernel.org,m:mhi@mailbox.org,m:ecreexilinx@gmail.com,m:andrew@lunn.ch,s:lists@lfd
- r.de];
-	TAGGED_FROM(0.00)[bounces-306876-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,broadcom.com,HansenPartnership.com,oracle.com,suse.com,epam.com,garyguo.net,protonmail.com,umich.edu,collabora.com,nvidia.com,onurozkan.dev,alien8.de,intel.com];
-	FORGED_SENDER(0.00)[mhi@mailbox.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[38];
+	TAGGED_FROM(0.00)[bounces-306877-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:mst@redhat.com,m:jasowang@redhat.com,m:xuanzhuo@linux.alibaba.com,m:eperezma@redhat.com,m:andrew+netdev@lunn.ch,m:kuba@kernel.org,m:pabeni@redhat.com,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mhi@mailbox.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mailbox.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mailbox.org:from_mime,mailbox.org:email,mailbox.org:mid,mailbox.org:dkim,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A5E2E741F7B
+X-Rspamd-Queue-Id: 3B164741FCC
 
-`broken_parity_status` shares a C bitfield word in `struct pci_dev`
-with many other bits. `broken_parity_status_store()` writes it from
-sysfs at any time without taking any lock, so userspace can make it
-race with every other writer of the same word, e.g. `pci_set_master()`
-from a runtime PM resume path, and updates of neighboring bits can be
-lost.
+On Sat, Jul 11, 2026 at 11:20=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com=
+> wrote:
+> Why does it "matter most", or at all, there?
+> Host can always deny guest service. In fact, this is how cloud vendors
+> charge their clients, by denying service to whoever did not pay them.
+...
+> I'm all for making things easier to debug even when the device is buggy.
+> But I'm not inclined to add tons of hard to maintain code to
+> that end, and I would be worried broken hosts will come to
+> rely on drivers working around them.
 
-Move the bit into the `flags` bitmap modified with atomic bitops,
-using the accessor pattern introduced by the previous commit.
+I am always confused by the CoCo threat model to be honest, since it
+seems like some people care a lot about maximalist reliance on the
+contract and other people are more practical about how many other
+vectors exist anyway.  No hard feelings if you want to NACK, but at
+least it's documented publicly now for people to consider.
 
-Signed-off-by: Maurice Hieronymus <mhi@mailbox.org>
----
- drivers/edac/edac_pci_sysfs.c | 4 ++--
- drivers/pci/pci-sysfs.c       | 4 ++--
- include/linux/pci.h           | 5 ++++-
- 3 files changed, 8 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/edac/edac_pci_sysfs.c b/drivers/edac/edac_pci_sysfs.c
-index 9f437f648e4e..fadc61235f1f 100644
---- a/drivers/edac/edac_pci_sysfs.c
-+++ b/drivers/edac/edac_pci_sysfs.c
-@@ -554,7 +554,7 @@ static void edac_pci_dev_parity_test(struct pci_dev *dev)
- 	/* check the status reg for errors on boards NOT marked as broken
- 	 * if broken, we cannot trust any of the status bits
- 	 */
--	if (status && !dev->broken_parity_status) {
-+	if (status && !pci_dev_broken_parity_status(dev)) {
- 		if (status & (PCI_STATUS_SIG_SYSTEM_ERROR)) {
- 			edac_printk(KERN_CRIT, EDAC_PCI,
- 				"Signaled System Error on %s\n",
-@@ -593,7 +593,7 @@ static void edac_pci_dev_parity_test(struct pci_dev *dev)
- 		/* check the secondary status reg for errors,
- 		 * on NOT broken boards
- 		 */
--		if (status && !dev->broken_parity_status) {
-+		if (status && !pci_dev_broken_parity_status(dev)) {
- 			if (status & (PCI_STATUS_SIG_SYSTEM_ERROR)) {
- 				edac_printk(KERN_CRIT, EDAC_PCI, "Bridge "
- 					"Signaled System Error on %s\n",
-diff --git a/drivers/pci/pci-sysfs.c b/drivers/pci/pci-sysfs.c
-index 5ec0b245a69b..5e094d1e23e3 100644
---- a/drivers/pci/pci-sysfs.c
-+++ b/drivers/pci/pci-sysfs.c
-@@ -80,7 +80,7 @@ static ssize_t broken_parity_status_show(struct device *dev,
- 					 char *buf)
- {
- 	struct pci_dev *pdev = to_pci_dev(dev);
--	return sysfs_emit(buf, "%u\n", pdev->broken_parity_status);
-+	return sysfs_emit(buf, "%u\n", pci_dev_broken_parity_status(pdev));
- }
- 
- static ssize_t broken_parity_status_store(struct device *dev,
-@@ -93,7 +93,7 @@ static ssize_t broken_parity_status_store(struct device *dev,
- 	if (kstrtoul(buf, 0, &val) < 0)
- 		return -EINVAL;
- 
--	pdev->broken_parity_status = !!val;
-+	pci_dev_assign_broken_parity_status(pdev, val);
- 
- 	return count;
- }
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 9964646bdd46..fdcd9b1b7371 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -347,10 +347,13 @@ struct rcec_ea;
-  *		bookkeeping state, maintained by pci_set_master(),
-  *		pci_clear_master() and pci_disable_device(); modifying it
-  *		does not itself change the hardware state.
-+ * @PCI_DEV_FLAG_BROKEN_PARITY_STATUS: Device generates false positive
-+ *		parity errors; set via sysfs.
-  * @PCI_DEV_FLAG_COUNT: Number of defined struct_pci_dev_flags.
-  */
- enum struct_pci_dev_flags {
- 	PCI_DEV_FLAG_BUSMASTER = 0,
-+	PCI_DEV_FLAG_BROKEN_PARITY_STATUS = 1,
- 
- 	PCI_DEV_FLAG_COUNT
- };
-@@ -482,7 +485,6 @@ struct pci_dev {
- 
- 	unsigned int	no_msi:1;		/* May not use MSI */
- 	unsigned int	block_cfg_access:1;	/* Config space access blocked */
--	unsigned int	broken_parity_status:1;	/* Generates false positive parity */
- 	unsigned int	irq_reroute_variant:2;	/* Needs IRQ rerouting variant */
- 	unsigned int	msi_enabled:1;
- 	unsigned int	msix_enabled:1;
-@@ -626,6 +628,7 @@ static inline void pci_dev_assign_##accessor_name(struct pci_dev *pdev, bool val
- }
- 
- __create_pci_dev_flag_accessors(busmaster, PCI_DEV_FLAG_BUSMASTER);
-+__create_pci_dev_flag_accessors(broken_parity_status, PCI_DEV_FLAG_BROKEN_PARITY_STATUS);
- 
- #undef __create_pci_dev_flag_accessors
- 
-
--- 
-2.51.2
-
+Thanks,
+Mike
 
