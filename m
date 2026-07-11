@@ -1,92 +1,95 @@
-Return-Path: <netdev+bounces-306866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306867-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id G3WIKhFcUmoGOwMAu9opvQ
-	(envelope-from <netdev+bounces-306866-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:06:57 +0200
+	id YViAMJRcUmoyOwMAu9opvQ
+	(envelope-from <netdev+bounces-306867-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:09:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07DAF741DF6
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:06:57 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC2D7741E5F
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:09:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=WsfjzUZY;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=YcZjIyUB;
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306866-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306866-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306867-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306867-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9C1EF3009B27
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 15:06:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2AE703007AC7
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 15:08:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4082D595B;
-	Sat, 11 Jul 2026 15:06:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF12A2EACF9;
+	Sat, 11 Jul 2026 15:08:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60066280CE5
-	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 15:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4062DB78C
+	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 15:07:59 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783782414; cv=none; b=HwAp/wPRZASjdMHLpoH3QmgwqiDFJ2RMQV4kr6nJCFJbxPR5jjGRIPIbo0bVIhESD/wZhs9UOGdIlM1n4N1FWP0Rl4DQ7uPMOnKIqd5r0PqbpQXjpMFMh4rIXhqBAWwqoHcdDp62DSX73ej0szP7OwmpWHPBSeTOJ+PFlw713hY=
+	t=1783782481; cv=none; b=Gzrogd+K1HizgzLTImoqIJYeXsZDXCRqSo0xz3MRwOArizMQZ6ewmiVj/Rh87MgKscPuFw+Ea3Q82/x/U86GYkrvcdABKoFdLtpL/hGiPHx4zHNFbOmuIPeUgrIAI8ozN6CBriuUS9sjv5Q8nPVRzqVbK2Odt1jVvE+ly65nrq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783782414; c=relaxed/simple;
-	bh=eXimup/rS3zaRoVPDBO/BpRgrc2vA3jesXZPxz7A1HE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F/PG5ScDtrDGn3QpfPPKVBBEvpzncmACOoxoWW4+SOuUoHERtpaw7MA/+ErtuiNJf/RcVUWJSqx5XY6ZPDQQ2ja0omtNB5bWYpfmQG+sKVUB1uNadj7E+toE50+Ziau/aU1ati6+6aBiqHXYeb3DXCK7ufirjCiEPuCrFfwLdgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WsfjzUZY; arc=none smtp.client-ip=209.85.222.173
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-92e6c4a867cso105494485a.0
-        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 08:06:53 -0700 (PDT)
+	s=arc-20240116; t=1783782481; c=relaxed/simple;
+	bh=iVN6Oa7DczuGg2N9AQ8E0U8qy+G8dhvBhCAjVmI+XN4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UfJBxJnf1VwWI7bxddiSsg1OOgLtLG3rdfXDZ3mJMgt8vUwh/V+3gp/ZNXNTeGtmKQQn6f0uoH1RBlQiTzbJjH+XzK3L4oYa+2F2HcQ7U7xOrKoP+dgegQ6p6Rqw5rsUQPvlaiTDbxUowHTBrWoVBLVoy3RdKv9kBK2XMpVck4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YcZjIyUB; arc=none smtp.client-ip=209.85.219.48
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-8f1a8e914a9so15909526d6.1
+        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 08:07:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783782412; x=1784387212; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783782479; x=1784387279; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=pylLKBo48mUBwphkQfLVRDh8jr+L260t0Ip5RKicSNk=;
-        b=WsfjzUZYCa4FgDfamw1gCIbpGpsUknnqziHhs4anv/fmI43rc8JpYykMoEfC0l1N13
-         VeE4P0PcX4JJOvNFlaku49Xzw4jtdY309mV30LBVxnOioEKoy8j+VjgWz7CRniUNoCKA
-         HV6Op2W7i2thGkTWgzvZWjl1zOeqiKYsrygvzO554E9OKhCvXnLsm+J/k9Z7wdsx4Eyu
-         3TZQT7l3A4cIJMIpc6nCeoBU5M2cixoA0LEdgwPWGtFuTwHWE5J2smz9qeaLdeFbNkMO
-         dhKRP6pznvHbvo3Pkno1oGE76Y3VUVDMsBWbZHMRJPlXRZyS5vzAO5dJ9pdPm0m+Wi0+
-         z6bw==
+        bh=14qOd7NMSc5W1H4WG9ru/PizsjwiaHIwQhYh9VLIk/c=;
+        b=YcZjIyUBAc8MaUivL5skDdhcMTY9UCR1eZy/ATu1JLQjHEvY0Uq/Fg14HNDHJRxbOz
+         IRpjk1cKaDSF/7atBApp1HURmXckcjR4AcQciZa+xImb9uA33cz2iW3T5ZQiKNYHEmGu
+         +uJRXcN4b1RNpK9WZCAaWgZ/+8WV9rsNrD3oFXmvXP7JeRd7Oph6aUiR0ILcgjXCb0nG
+         wHH2w7npfsqLYG4bDXOhdRWlLO8uaGp309NVivuE4pZtcuI7DeudbO4NTFu1fxxAlpZp
+         YMV0vMo7P0nOe3fsejSJzjFhVUKTOJk9bNxS9zTTpAZGCcj7dYaBCmo8bSbcRgwCk22J
+         EznQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783782412; x=1784387212;
+        d=1e100.net; s=20251104; t=1783782479; x=1784387279;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=pylLKBo48mUBwphkQfLVRDh8jr+L260t0Ip5RKicSNk=;
-        b=RYRQDFF+Fr5oMo88tfxOGg3DlI+u1qwPho4OZBlW/Cq8hXCHFKfEj9rzB/3cNztBOY
-         7kxgLbWgoesbpopMpdrbXnbu/kFQ2mP2SWUCWA1azIFfhTmROmiYnkMXRIdzQX4m39cC
-         07oEM4KiGSHMPwNdP3/VzllqUIH5rnr+JcOii1SxBHcUC9mX767aKS0ltQ5bA+suOJgy
-         gubOfajKigUWYqYX8TO5GOAUwkoYroEy7U08l/5Y/+un17cCoWV6RbB/1ff5SpwHPAWe
-         gWTLtpzT+AHpC/x2SZJ9mxWcDGiDCcXztIJmGuN23BIL8+BdJexh58GVhjZxQuqTLMv9
-         SHhQ==
-X-Forwarded-Encrypted: i=1; AHgh+RrOP8UbhDPkjv7gtF8tNnObc8bzlG2WWIUHqifMFJMPixdlmCQbXCKPYa2T1seHGmCgIUStAQ4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy94imujRYQ+xQ3zlnr5HBAr6fLp7MO+DKniCchJhzeHGOPMA8W
-	rNbWuWUkJjvKyBNDAEf3WUkgNqiQXuoiXtgTYWMVlM5cjF9QYIWh6Mbc
-X-Gm-Gg: AfdE7ckGj/TmcwB2O1qj2zW1JhcX2Ko4q1mv0/+IqHOB0aUiBfbHywTlxamGIH829VJ
-	g17U1sQ2Fhr2fAYwJBXWxlw8im2gVFdHi/KVMBRl5EDVQp6+HyaYq0Y6BKjR/g61PXLr+TtQJSW
-	x6pIfbZ/8hvEY0u/eRfIZTLhKcUn0hm/CWfFszR8GFV7b8+/+r+AAAIzsIGenps0tX1nlBByOq8
-	rPIrhvpyCTBzAjQjT1qDSK5L/O6uQ9mLbtiJtXG7zNXAtWLxsu5RZKSBCvIM3zJnYSt2vpPMlVr
-	kAX3msdp6LvnHAWsrebu/6Q5c0tgU9IsI4nffKrcICsNskt/ObwS/0BYBlX/muqGjGbIhQFYZ54
-	IUPPNVf9DXS3fCWmEJfeUW4CNeSIUEow50EHlmgPhCN5OgKc6XbqSMjaLx9lRhRIC58PGklvi8W
-	39LkSxjFw6O/Ci1n4cMb8JsgACGe1DwVkBEFjqUlHrWFUtRx2ARgFUQ99B8erSQcCoKRS+ADwMV
-	UV1LVW4zQ==
-X-Received: by 2002:a05:620a:3952:b0:92e:c116:bf00 with SMTP id af79cd13be357-92ef2f8a31fmr317346685a.93.1783782412224;
-        Sat, 11 Jul 2026 08:06:52 -0700 (PDT)
+        bh=14qOd7NMSc5W1H4WG9ru/PizsjwiaHIwQhYh9VLIk/c=;
+        b=Xur1rOacv+q1w1II5HxMemdT39nS6VCjVlxrbrS1ro4OREXfAKA61u3qpqEVsKqRaA
+         I/292P75QaY35670SotNB0revPZG2VOnV5JX31XN8xtjd3RwWiPpSK+kfYTQtfVa/u06
+         nvT0h/OUK0sl4Se6Cy96m1QJNqx+1a/v5AZOHgJyrN6axTlOVhkQcVDzVppsfI6QpcWc
+         E6x2LPgsNR5RXbfJ6NtS/fkkl3WjPRPOZ5NKctUNN8q8gvl0TFVK6SaPvzvBCTP2Uy1I
+         HIC+noJvg26Buq1oBAqnQuoGBwiS4KSBIEZJy0x1sKvkepNlUcb5HWrcyoX8kyTfEhkq
+         Y/+g==
+X-Forwarded-Encrypted: i=1; AHgh+RpX53X0mBAkfU0GhvEskjX2Le4wD7HZ8HoW+OeRZJAI9I0U9feKEMyLz0KaGV2U7r0kXmu765g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywv17UmR+DR6ahX7nsSSQNBWS1kO0im3ihs8xJMT8rGpMCggYGW
+	opDvuPGHI6k1jrXDny3PKb/S/2Bd3kxA4GgGQLae2Xjt53uqtbOkq74L
+X-Gm-Gg: AfdE7ckFGtNukxroPfBFmN1C2HNECnvcW6POggfunbfI29oEuJRL3T49kTxyUd1SaUh
+	RPy7e5z+j1SgAV0PinkHccWgNOcp0ZSJ38A/pcHPlCTNGMq6Xc3D3M9sIyCNoXvXHGeJlJK4Dk/
+	0pq92kDKH1UI799pvxNCCJIVxB/akZzQrCsHIEYt04ud53E0Say84o20zcXxWES+JNeXRb2u6mR
+	xdxX0gaQ8OspqWLVOrvG0CVOK7X+s+zJ6/K6a2vpbKL0NPsq3pEAcYzN2oQkFN2fOu5x/90TaEI
+	GGaDSZf0j5V9qKF8zRGIcyrijnwwREK7KSinHGCRY9gd7GhXTAYnDz99GRSyZHFibtYX8/WLFbC
+	tjKcInuTrW/5jvBCzIjYZ4jhfyvm3DNn5e2a9/3rnpmNaWwds9Uod2b5mCU0IzhbZ2ZnYxcjBSu
+	2v296sxpjvni4MD9FM3d3hgpVJjt+hAO4wiSXem/7/5DeJWqs8nNn8lrQ/zQrG1MhY9qHs8h9J1
+	BV/BOgH/Q==
+X-Received: by 2002:a05:622a:14ca:b0:51a:8c9b:649c with SMTP id d75a77b69052e-51cbf38da9fmr29698741cf.64.1783782478863;
+        Sat, 11 Jul 2026 08:07:58 -0700 (PDT)
 Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-92ee5b4920asm463219685a.4.2026.07.11.08.06.51
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ffd57baf8dsm69025296d6.20.2026.07.11.08.07.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Jul 2026 08:06:51 -0700 (PDT)
+        Sat, 11 Jul 2026 08:07:58 -0700 (PDT)
 From: Michael Bommarito <michael.bommarito@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>,
+To: "Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?utf-8?q?P=C3=A9rez?= <eperezma@redhat.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH net] ila: reload IPv6 header after pskb_may_pull in checksum adjust
-Date: Sat, 11 Jul 2026 11:06:48 -0400
-Message-ID: <20260711150648.2915106-1-michael.bommarito@gmail.com>
+Subject: [PATCH] virtio_net: validate device stats reply records before use
+Date: Sat, 11 Jul 2026 11:07:54 -0400
+Message-ID: <20260711150754.2918392-1-michael.bommarito@gmail.com>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -96,104 +99,156 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306866-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306867-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS(0.00)[m:mst@redhat.com,m:jasowang@redhat.com,m:xuanzhuo@linux.alibaba.com,m:eperezma@redhat.com,m:andrew+netdev@lunn.ch,m:kuba@kernel.org,m:pabeni@redhat.com,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 07DAF741DF6
+X-Rspamd-Queue-Id: BC2D7741E5F
 
-ila_csum_adjust_transport() caches ip6h = ipv6_hdr(skb) before calling
-pskb_may_pull(). On a non-linear skb whose transport header sits in a page
-fragment, pskb_may_pull() can call __pskb_pull_tail() / pskb_expand_head()
-and free the old skb head, leaving ip6h dangling; the following
-get_csum_diff(ip6h, p) then reads freed memory. ila_update_ipv6_locator()
-has the same pattern and additionally writes the new locator through the
-stale destination-address pointer.
+__virtnet_get_hw_stats() walks the device statistics reply buffer with
+"for (p = reply; p - reply < res_size; p += le16_to_cpu(hdr->size))",
+using each record's device-supplied hdr->size as the stride without
+checking that a full struct virtio_net_stats_reply_hdr remains, that
+hdr->size is nonzero and matches the expected size for hdr->type, or that
+the record fits within res_size. A backend that returns hdr->size == 0
+spins the loop forever; a short or oversized size drives out-of-bounds
+reads in virtnet_fill_stats().
 
-Impact: a remote IPv6 packet routed through a configured ILA
-csum-adjust-transport route or receive-side mapping triggers a
-slab-use-after-free in ila_update_ipv6_locator() (KASAN). The route or
-mapping requires CAP_NET_ADMIN to configure, but trigger packets are
-unauthenticated once it exists.
+Impact: a malicious or compromised virtio-net backend hangs the CPU
+running the guest's device-statistics query in an infinite loop
+(hdr->size == 0), or drives an out-of-bounds read of the reply buffer.
+This matters most for a confidential guest, where the host is outside the
+trust boundary.
 
-Reload ip6h (and the derived iaddr) after each pskb_may_pull() before use,
-matching the transport-header reload the code already performs.
+Validate each record before use: require a full header in the remaining
+bytes, a nonzero hdr->size that is at least the header size and matches the
+size expected for hdr->type, and that the record fits within res_size; stop
+the walk otherwise. Add virtnet_stats_reply_size() for the per-type size.
 
-Fixes: 33f11d16142b ("ila: Create net/ipv6/ila directory")
+Fixes: 941168f8b40e ("virtio_net: support device stats")
 Cc: stable@vger.kernel.org
 Assisted-by: Claude:claude-opus-4-8
 Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
 ---
- net/ipv6/ila/ila_common.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/net/virtio_net.c | 42 ++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 40 insertions(+), 2 deletions(-)
 
-diff --git a/net/ipv6/ila/ila_common.c b/net/ipv6/ila/ila_common.c
-index e71571455c8a0..acedc5a84e4d7 100644
---- a/net/ipv6/ila/ila_common.c
-+++ b/net/ipv6/ila/ila_common.c
-@@ -85,6 +85,7 @@ static void ila_csum_adjust_transport(struct sk_buff *skb,
- 			struct tcphdr *th = (struct tcphdr *)
- 					(skb_network_header(skb) + nhoff);
- 
-+			ip6h = ipv6_hdr(skb);
- 			diff = get_csum_diff(ip6h, p);
- 			inet_proto_csum_replace_by_diff(&th->check, skb,
- 							diff, true, true);
-@@ -96,6 +97,7 @@ static void ila_csum_adjust_transport(struct sk_buff *skb,
- 					(skb_network_header(skb) + nhoff);
- 
- 			if (uh->check || skb->ip_summed == CHECKSUM_PARTIAL) {
-+				ip6h = ipv6_hdr(skb);
- 				diff = get_csum_diff(ip6h, p);
- 				inet_proto_csum_replace_by_diff(&uh->check, skb,
- 								diff, true, true);
-@@ -110,6 +112,7 @@ static void ila_csum_adjust_transport(struct sk_buff *skb,
- 			struct icmp6hdr *ih = (struct icmp6hdr *)
- 					(skb_network_header(skb) + nhoff);
- 
-+			ip6h = ipv6_hdr(skb);
- 			diff = get_csum_diff(ip6h, p);
- 			inet_proto_csum_replace_by_diff(&ih->icmp6_cksum, skb,
- 							diff, true, true);
-@@ -151,6 +154,9 @@ void ila_update_ipv6_locator(struct sk_buff *skb, struct ila_params *p,
- 		break;
- 	}
- 
-+	ip6h = ipv6_hdr(skb);
-+	iaddr = ila_a2i(&ip6h->daddr);
-+
- 	/* Now change destination address */
- 	iaddr->loc = p->locator;
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 3e2a5876c6c8c..9cbe40d218cc4 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -3532,6 +3532,7 @@ static int virtnet_tx_resize(struct virtnet_info *vi, struct send_queue *sq,
+ 	return err;
  }
+ 
++
+ /*
+  * Send command via the control virtqueue and check status.  Commands
+  * supported by the hypervisor, as indicated by feature bits, should
+@@ -3546,6 +3547,7 @@ static bool virtnet_send_command_reply(struct virtnet_info *vi, u8 class, u8 cmd
+ 	bool ok;
+ 	int ret;
+ 
++
+ 	/* Caller should know better */
+ 	BUG_ON(!virtio_has_feature(vi->vdev, VIRTIO_NET_F_CTRL_VQ));
+ 
+@@ -4927,6 +4929,32 @@ static void virtnet_fill_stats(struct virtnet_info *vi, u32 qid,
+ 	}
+ }
+ 
++static int virtnet_stats_reply_size(u8 type)
++{
++	switch (type) {
++	case VIRTIO_NET_STATS_TYPE_REPLY_CVQ:
++		return sizeof(struct virtio_net_stats_cvq);
++	case VIRTIO_NET_STATS_TYPE_REPLY_RX_BASIC:
++		return sizeof(struct virtio_net_stats_rx_basic);
++	case VIRTIO_NET_STATS_TYPE_REPLY_RX_CSUM:
++		return sizeof(struct virtio_net_stats_rx_csum);
++	case VIRTIO_NET_STATS_TYPE_REPLY_RX_GSO:
++		return sizeof(struct virtio_net_stats_rx_gso);
++	case VIRTIO_NET_STATS_TYPE_REPLY_RX_SPEED:
++		return sizeof(struct virtio_net_stats_rx_speed);
++	case VIRTIO_NET_STATS_TYPE_REPLY_TX_BASIC:
++		return sizeof(struct virtio_net_stats_tx_basic);
++	case VIRTIO_NET_STATS_TYPE_REPLY_TX_CSUM:
++		return sizeof(struct virtio_net_stats_tx_csum);
++	case VIRTIO_NET_STATS_TYPE_REPLY_TX_GSO:
++		return sizeof(struct virtio_net_stats_tx_gso);
++	case VIRTIO_NET_STATS_TYPE_REPLY_TX_SPEED:
++		return sizeof(struct virtio_net_stats_tx_speed);
++	default:
++		return sizeof(struct virtio_net_stats_reply_hdr);
++	}
++}
++
+ static int __virtnet_get_hw_stats(struct virtnet_info *vi,
+ 				  struct virtnet_stats_ctx *ctx,
+ 				  struct virtio_net_ctrl_queue_stats *req,
+@@ -4936,7 +4964,7 @@ static int __virtnet_get_hw_stats(struct virtnet_info *vi,
+ 	struct scatterlist sgs_in, sgs_out;
+ 	void *p;
+ 	u32 qid;
+-	int ok;
++	int hdr_size, ok, remaining;
+ 
+ 	sg_init_one(&sgs_out, req, req_size);
+ 	sg_init_one(&sgs_in, reply, res_size);
+@@ -4948,8 +4976,17 @@ static int __virtnet_get_hw_stats(struct virtnet_info *vi,
+ 	if (!ok)
+ 		return ok;
+ 
+-	for (p = reply; p - reply < res_size; p += le16_to_cpu(hdr->size)) {
++	for (p = reply; p - reply < res_size; p += hdr_size) {
++		remaining = res_size - (p - reply);
++		if (remaining < sizeof(*hdr))
++			return -EINVAL;
++
+ 		hdr = p;
++		hdr_size = le16_to_cpu(hdr->size);
++		if (hdr_size < virtnet_stats_reply_size(hdr->type) ||
++		    hdr_size > remaining)
++			return -EINVAL;
++
+ 		qid = le16_to_cpu(hdr->vq_index);
+ 		virtnet_fill_stats(vi, qid, ctx, p, false, hdr->type);
+ 	}
+@@ -7305,3 +7342,4 @@ module_exit(virtio_net_driver_exit);
+ MODULE_DEVICE_TABLE(virtio, id_table);
+ MODULE_DESCRIPTION("Virtio network driver");
+ MODULE_LICENSE("GPL");
++
 -- 
 2.53.0
 
