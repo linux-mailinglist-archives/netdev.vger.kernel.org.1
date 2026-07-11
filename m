@@ -1,174 +1,199 @@
-Return-Path: <netdev+bounces-306850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306851-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id tGKqLf44UmpTNQMAu9opvQ
-	(envelope-from <netdev+bounces-306850-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 14:37:18 +0200
+	id jxkMOTQ6Ump6NQMAu9opvQ
+	(envelope-from <netdev+bounces-306851-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 14:42:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40A9C74188C
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 14:37:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F0747418B4
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 14:42:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=0sec.ai header.s=google header.b=oD4I3hle;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306850-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306850-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=C+8724DD;
+	dmarc=pass (policy=reject) header.from=google.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306851-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306851-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D4384302BFD2
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 12:36:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1CB873018BDE
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 12:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B6133C3C0E;
-	Sat, 11 Jul 2026 12:36:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADC553C5DD4;
+	Sat, 11 Jul 2026 12:42:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E11F3BD642
-	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 12:36:54 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783773416; cv=none; b=ZBm+XIkLNLatMKYrllM1YQMla1mjC+tsUUm+3dM6ooO2YaHHUWdOAYHMQWFyYo2tsjAgFBndajXeJ4XL+gmJ9yh7nDC5LnVFAcGxL97xqatPD6HGWiZoeqZ/uinkyo7wvdtEw9CjDc4psSKBPR5gound7i+TdBxevqmhL1HLor4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783773416; c=relaxed/simple;
-	bh=yuIVmBPzTzrv2Dm30aECT2hNK8SzBGa9AOom3Qlk6Is=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YI138VR/9N47t0iroFQhfQtyPp1Kt8TjMj6iTkVYQmG2ksYQzog3YPv43hND3b1Rp37gFi4Y7ptMFQMuZQqee+XNEZraFIC5U8mkRZGCkO8mdTGMR/IOMbWIA4cR1JaSJGeVZ4mw1Dg5/l1zPuvHr9Viw6Dp4FTzjcLExnRvMSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=oD4I3hle; arc=none smtp.client-ip=209.85.221.44
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-475881b9a4bso1678873f8f.3
-        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 05:36:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1879A3C141F
+	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 12:42:09 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783773732; cv=pass; b=R0hH/kGFa/XyWS80Utbd8y8tLcluicBkAODEP65JA00mObrMN56NZrMokuNHPOMWM3XGQFUOg2gKPlFkoU2+zqEU9tOb4Ilvkhl/BCQQWRh2Ch/Jz9yx0YF5cCWIs3UKuvXmkANrLBpuWe47ktndqqPJ6x0BTDZ4o+Tn/7ewa2g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783773732; c=relaxed/simple;
+	bh=HmgU9O1XNXrsSsBuGbC5dxV9v2oYeREGsOhjaG/ng6I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gdVp2IjW1N4XJaU+MHZxdf83BnJZPc6tlDvyr1wzGVasUKPnerkjkwS51oNu6dSdPflb99xxf0Q2k+bdA/tYkV+qIOQrJm1pnkNblzCkXz5cBZWyoxbfIQONVqot6oc7sIA/Mu2J8LjH3r4JLmSxq8xTfrRmcIivKJUfKTsoKjk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C+8724DD; arc=pass smtp.client-ip=209.85.214.177
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2cace91f112so14645345ad.0
+        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 05:42:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783773729; cv=none;
+        d=google.com; s=arc-20260327;
+        b=cH0CyLcEcMfa1C1VvGEQAu+u8SQPbraDBY9qsUmSbD29DOTi1xC+7f2WHc6qJShFtc
+         fw9BL7SjLAUlVebjCrDRplO5TCVjjrqbyKZCIKoorVZd/ykIc+eGapiFXvk+RjhB3PiK
+         Uo4DlW4S3vfnju1kjh6EBPcPXAmUl9UQ4z+crpwM4A+9Xjgjx0bJCDszZkyBLagEMgcS
+         /ue+LJy1EaruzuyNcrGBo3yWr6ixoyvgIHc+iALeIL8DzYW2bNHe3DNoKOcIzxYYcKhW
+         Cu3xJqayWAbbot+hGUUIi52ZmtbHt0HJ1IX7vPz0QXoSWTKlrbl65xU+SpS6vvmlfZh7
+         rkKw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=J+zgXlL6HeTawruT8FNlqO+Qy589dfVWy2jR0sGPcWI=;
+        fh=+IosjTBEKOyb9fCclIjDYkMMG/QaqSSKotbvVKWH/bs=;
+        b=bzkNjhZ6y7pDT32Y9HKUIuquZM2nKPMKYcKN3PH8pIxqW51CnV1rFr+5WuNpPqLadW
+         yw+wOM/xqA/oDkul+3VgcDV9BGEdEu6+YkPZ32OJm+/ZI+zHhFgpMNhu9pJQ9olGL8Em
+         ymWZhgqE0/Hr3aIkzRAhonxVp74o7lAXpa+Ku03BDCCa/fqk5AU80pVUbOHROlzqpcJM
+         Y4lAb1PKWrgU3c98/93Jzr7LEHQystBFnfXgfAn7mB1jXcEJwFF7abgnNYeK7qVkUllB
+         2vp4zk+bSWo6W/Ga75YlalcULN6q4T5u6MjZEcebNsHcXbRcEU50mGMgxr0BHAB6tfmN
+         TTAg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=0sec.ai; s=google; t=1783773413; x=1784378213; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=TKxklP1jarkRVxjcZK6OwpDBv6NsE5WBXhYoYNX2yBM=;
-        b=oD4I3hleSwky7wC8lEMH0NoEXAcjtj/ecd+gaCHQmDFZQ/l2HkgeypDZDIlX5AgGUC
-         UrEDyWXqxXe4Z6PNVPoYN/uBfiZe8uWMSRP82yNLZJ6uH7OWc1/sKmDIziM3mkEgaI2E
-         OchUdmz2JKAkSGwMa+BIxar+zICyEUvXml9PG1aWHQKzVeT/9vsGZd/YzFxy2TNRNrn8
-         SmGURwjDiD86+zb2FRfaC4WCJGq6GYIhq0mI+m3U33rRrfnk8YFthPSpA87xcrLQRtbt
-         ZPxF//Q59i3kKhDpFnj9M13sqZ/+8n5TIHxEtxXotnaTsntiYkrFq1964VVoYKjHKzug
-         Ptwg==
+        d=google.com; s=20251104; t=1783773729; x=1784378529; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=J+zgXlL6HeTawruT8FNlqO+Qy589dfVWy2jR0sGPcWI=;
+        b=C+8724DDZrUSk4pX4tAzjyMtW7cEczKzp2Je/hAfAyutz+ojjQkXQg/yKRfSbp/9ek
+         AY0M5yKMTyYmbhHGRE42z5IcSfOgihlAxWIpACz8rwIz1hwaDfS90ap1wY32njOfAk4U
+         lI2ClL8mOJwEwp66szeje6tC7NLYSpUGasxtG3jnxpM/1cHx7HCFTus4Lxj+F2fmhRMz
+         VsknoMGnKsAJzXy4TnSaihV6W96bPb5A90VZsZZEBQjNB8RPz7mVlJ8f05r0CoQsBSPg
+         qV2xYoMDVPT98TJimwBSmH4YG0stFvGV+oDoCWeqRrghX6I9Xl7Bhg9Knev354nGHimJ
+         GlsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783773413; x=1784378213;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=TKxklP1jarkRVxjcZK6OwpDBv6NsE5WBXhYoYNX2yBM=;
-        b=OXZ7aj91xNyqtiH1FPnSoezFOP1ygdKTdYt8SNdwSP73sBMFvi0Jo2MuMhYYK5Xro4
-         z4CkUUzfoP3HXgET/D8DtXXk5xBMNbllazol805sJ8y6b/Ad9U4ZoPIy8OLgFa7P0fGs
-         M0ml51nkoIXmoRQ4qljfwu+GLSAmqq4kvxRCyWm5IQaDYz8cUcwLNSl9RCPknDmPJVvH
-         B3nCi7pLh2TLtiBKmLqvZ8d4K2ZuiPF5LL8CWT1lZL4fK1dis6cTLPNAAY95qiqOQtUt
-         4wQPq5siqxhKj4zYsUxUhZ6vkkaBscRFRQppupZr1+uctW0Hg0zuJ/JAvnc4cWtdciHe
-         sT6w==
-X-Forwarded-Encrypted: i=1; AHgh+RrKhL4w5OQNMeGuqE8shOXanapZS2XwpnAgUwCoIvc58O++iHJH6lkcZR4vqDHSL74CwaKBvH8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzq5QhPDbN7pzrePpmXvtcwHBbSYUc/PGzTCUVpGmv60JLpl5u0
-	tmhgBXKiE+dO1voqrqAM8E/rhiZhGgbhroMHmePpu2Ojp8QgTm/pelQzopl9vWZpRif0
-X-Gm-Gg: AfdE7cmgcBwxYdfaWZACCw/Oik+BYzFHebLWYAdeYtHI+YHA4yf3iH09Lfu3HFGxDtk
-	Bl5gU1nVO0rFgfNxrSxJf7acKahny7iuKlssqalDRaZhTmkphXcgMQI2pjClJZkQhvYyK2o8cSo
-	iutzhuSXc1qSCh0bXoUbxaAgz2jnimTfkJiDhaFv+G2uyAclR5JbAQhptvg4I4DGEE+VhUHZNNi
-	H94CyYvi2KKakMcSc8q70CBGcTo++vNaFtBLnOI2QYuW7mo155pAp9leq8QYHtLx46agZGwnpHV
-	HHqI5haK3O5qh70zuPrfh5ePYuCn49/Z0Ta+38YDtOMLGep+zriE5+8mEJa+OC0UuUwDBIRMnc7
-	2Qfl+D+Byr9uVxGVVX2jEb1mO5RQrNA1VJGbg//1/haItSD1xEAcCW/dGtO0moyuZHt7FqGI9AP
-	fdM4FNZpEEgP+5p6gLJUl6oMVJEKeUPqQ8pH5hxdPg4y9IbLHCJnUfXM8XF/mfBL+/FnhjWPNuJ
-	7c0Y6uxR+paO3AmgYor0dMPkccFKWTlPj8=
-X-Received: by 2002:a05:6000:2387:b0:476:7036:f854 with SMTP id ffacd0b85a97d-47f2dce9662mr2553907f8f.21.1783773413232;
-        Sat, 11 Jul 2026 05:36:53 -0700 (PDT)
-Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.218.188])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9e4d83bdsm67690276f8f.13.2026.07.11.05.36.52
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 11 Jul 2026 05:36:52 -0700 (PDT)
-From: Doruk Tan Ozturk <doruk@0sec.ai>
-To: david@ixit.cz
-Cc: oe-linux-nfc@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net] nfc: port100: reject frames whose declared length exceeds the received data
-Date: Sat, 11 Jul 2026 14:36:51 +0200
-Message-ID: <20260711123651.32595-1-doruk@0sec.ai>
-X-Mailer: git-send-email 2.53.0
+        d=1e100.net; s=20251104; t=1783773729; x=1784378529;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=J+zgXlL6HeTawruT8FNlqO+Qy589dfVWy2jR0sGPcWI=;
+        b=OzNFBcvtHdRvrhnUv0efVMTuyK/Nyz30tPsefHghFun45p3lRvrNLKW3ShQpDoKZGs
+         ITAyDjK9+Ew4vRYIatZ+p90Ba7D+t8xQ3yvOWZuChe9fhovw+/QjzGNEkJNEPe4iViTO
+         Jthb+HdhHJOBiw45bhWvBiVnlVHbz8tyK0QYPlPVW07Yf+CWX927O6pUdFchXZ/KFEi4
+         6gsJ+h6DibnIwkVNUKBXbcsAVz2rVI4zMRJKleWbssB/pGXPsGQYu2yAWgGeM/MHuwt5
+         oNorvWOIPXSL6CPBlLw2V3JR4aUJbOCwHyD58p7Uz/ezruWhgXv7Y+ZyN7CdEywjlqqE
+         e0+w==
+X-Forwarded-Encrypted: i=1; AHgh+Rpl9NdW7M2OuGaGxbU2b8e2GDgds+X45E/BHx91VP2B/2eBhvMzfn+5mm0FhI5+SHfp9vCI/bg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyaiH2k7KlzwrqTF1F1PshXaEyIsA7vYKNHLCnyLN0uf/r1CK+A
+	YVFIg2SYooHQt5DU0+2580U/V9tJCsCqYF/J4n2is5yVhntOMnG8KDJmTHRKD8WxARQoFmZVeM1
+	JXO/upjXkohNJEuIwWb38k+2T4QSLeMDEPfiiiszx
+X-Gm-Gg: AfdE7cmJcDwTo4KM87basNb8hPh0ElG6N4mQIqD5/G28ASHzhh4Wvg6bz9wD96q7qK7
+	7jw8B7SujKZJZ0OWoJr1JPvgAvp0o0jRB/+mImtdcCw/UfLYjNT5CkjEVzCNrrQ1eqrAb9XXLmC
+	wStb99v26YbsSk/W1SiSF6LshsJb72Vt5k0YUQ0seLuPdNnoBi5+9Fe6qltfwtY/KfwV6jbW2y7
+	QykxnZJKgH8Uk3mgj18n0HzNTWglhBYIiwVmlvTClH7uXf+N1/OeCd3z1MwWMrtesBd4NtIzTPi
+	H9PvynEtLAdk38wMeaZPJDypRzmiB1amuBldKZ7SN5Jf4atnBa2MGxpzbH/gdsebqYK2Kl+UiJ0
+	xVa2nwQ1nHPErA6sMYznyISzNGcK5vCKqOoEPUAUtOg==
+X-Received: by 2002:a05:6a20:6a14:b0:3bf:76d5:4cf2 with SMTP id
+ adf61e73a8af0-3c110ad2df3mr2782490637.40.1783773728835; Sat, 11 Jul 2026
+ 05:42:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260711095147.1972419-1-albin_yang@163.com>
+In-Reply-To: <20260711095147.1972419-1-albin_yang@163.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Sat, 11 Jul 2026 05:41:57 -0700
+X-Gm-Features: AVVi8Ce6Hfh_gWzqmeGtI5FA0UADgED4rxazInXOnYdrY3XOTS6KBIiq0zMxpSQ
+Message-ID: <CAAVpQUD4gQNogO1N7iPZB7REQqH7TyU+pfzzUnBTjs4BxqpPyg@mail.gmail.com>
+Subject: Re: [PATCH] af_unix: add cond_resched() when flushing receive queue
+ on close
+To: albin_yang@163.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, albinwyang@tencent.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[0sec.ai:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:david@ixit.cz,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-306850-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[0sec.ai];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-306851-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[163.com];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:albin_yang@163.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:albinwyang@tencent.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[0sec.ai:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,0sec.ai:dkim,0sec.ai:mid,0sec.ai:from_mime,0sec.ai:url,0sec.ai:email,vger.kernel.org:from_smtp]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tencent.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 40A9C74188C
+X-Rspamd-Queue-Id: 3F0747418B4
 
-port100_recv_response() passes the URB transfer buffer to
-port100_rx_frame_is_valid(), which checksums le16_to_cpu(frame->datalen)
-bytes of frame->data. datalen is a 16-bit field supplied by the device
-and is never checked against the number of bytes actually received
-(urb->actual_length), so a device reporting a datalen larger than the
-received frame makes port100_data_checksum() read out of bounds past the
-transfer buffer.
+On Sat, Jul 11, 2026 at 2:52=E2=80=AFAM <albin_yang@163.com> wrote:
+>
+> From: Wei Yang <albinwyang@tencent.com>
+>
+> unix_release_sock() drains sk_receive_queue in a tight loop with no
+> rescheduling point.  Each iteration may do extra work depending on
+> the socket type: kfree_skb() runs unix_destruct_scm()->fput() for
+> SCM_RIGHTS fds on data sockets, and a LISTEN socket recurses into
+> unix_release_sock() for each embryonic child.
+>
+> A long receive queue can hog the CPU and trip the softlockup watchdog
+> on CONFIG_PREEMPT_NONE kernels.
 
-Reject a response whose declared frame size does not fit the received
-length before validating it.
+AFAIU, CONFIG_PREEMPT_NONE is no longer supported on
+modern arch since 7dadeaa6e851, and it also mentions how bad
+cond_resched() is.
 
-Found by 0sec (https://0sec.ai) using automated source analysis; the
-missing bound is evident from source. Compile-tested.
+I think you need to keep this patch downstream.
 
-Fixes: 562d4d59b8a1 ("NFC: Sony Port-100 Series driver")
-Cc: stable@vger.kernel.org
-Assisted-by: 0sec:claude-opus-4-8
-Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
----
- drivers/nfc/port100.c | 7 +++++++
- 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/nfc/port100.c b/drivers/nfc/port100.c
-index 5ae61d7ebcfe..30a4e09875d3 100644
---- a/drivers/nfc/port100.c
-+++ b/drivers/nfc/port100.c
-@@ -636,6 +636,13 @@ static void port100_recv_response(struct urb *urb)
- 
- 	in_frame = dev->in_urb->transfer_buffer;
- 
-+	if (urb->actual_length < PORT100_FRAME_HEADER_LEN ||
-+	    urb->actual_length < port100_rx_frame_size(in_frame)) {
-+		nfc_err(&dev->interface->dev, "Received a truncated frame\n");
-+		cmd->status = -EIO;
-+		goto sched_wq;
-+	}
-+
- 	if (!port100_rx_frame_is_valid(in_frame)) {
- 		nfc_err(&dev->interface->dev, "Received an invalid frame\n");
- 		cmd->status = -EIO;
--- 
-2.43.0
-
+>  We have reproduced this multiple
+> times under stress-ng stress testing.  Add cond_resched() as done in
+> similar teardown loops (inet_csk_listen_stop, inet_twsk_purge,
+> close_files).
+>
+> Signed-off-by: Wei Yang <albinwyang@tencent.com>
+> ---
+>  net/unix/af_unix.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index f7a9d55eee8a..8b4624ce4178 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -724,6 +724,7 @@ static void unix_release_sock(struct sock *sk, int em=
+brion)
+>
+>                 /* passed fds are erased in the kfree_skb hook */
+>                 kfree_skb_reason(skb, SKB_DROP_REASON_SOCKET_CLOSE);
+> +               cond_resched();
+>         }
+>
+>         if (path.dentry)
+> --
+> 2.43.5
+>
 
