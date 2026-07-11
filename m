@@ -1,296 +1,203 @@
-Return-Path: <netdev+bounces-306873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306874-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Yc07KIVfUmrXOwMAu9opvQ
-	(envelope-from <netdev+bounces-306873-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:21:41 +0200
+	id XYPBLclfUmr3OwMAu9opvQ
+	(envelope-from <netdev+bounces-306874-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:22:49 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F04BC741F2B
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:21:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5947C741F4E
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:22:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=agEM9sdV;
-	dkim=pass header.d=redhat.com header.s=google header.b=Ie9uGZO3;
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306873-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306873-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=eMVI1NjN;
+	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=c8kmqXI9;
+	dmarc=pass (policy=reject) header.from=mailbox.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306874-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306874-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9CE1A3024C81
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 15:20:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B8C543012D26
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 15:21:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B27381EB4;
-	Sat, 11 Jul 2026 15:20:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9DF62E8DEA;
+	Sat, 11 Jul 2026 15:21:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E072227FD76
-	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 15:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F0E2E11C7;
+	Sat, 11 Jul 2026 15:21:33 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783783240; cv=none; b=HhKh5fNc4uenbU2U67oBHsgnBOWLrj5cNo0x/WinmkEOWhYenksnLdVOdMewvkZ0gquF2Oupk6grMRxqRShxv5jt3ULPLxShVwOJGDCc9xY1xbtOS68xni+qbWfBwvnyFfvzV8iSPT/wpfO9x7lzuzS9g7NKIxHlPFrYGCbmPEY=
+	t=1783783297; cv=none; b=I5Q9V4epUKqIUKIbykZ77dYgokd3VBTc1hzzYMY4bydkdm6dKMPJx6huBLkBkAsQh3og2+a/U+zfgQjQuaUmnajUGSBmk5yFREP9eZwqLi/tJuKM2vE2cy840a0wStg5/Bn8XUH+wACmj489y2wuYwgK5iZYTbzwmNieWTgT+Zo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783783240; c=relaxed/simple;
-	bh=8PCyBlIWQjZCCPrTVN7xE+pF7wIpZzqRFJWJCP5kxbc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OVgysNmkmf3+vdn0n3ow2IoYVfi2xf12z7F8Ax1gIieoQVwOFu2lhSOxW76tVBl1BfD4Ku1MwY13urF8mgsJVMpcQEVcY2BewW+Hvt99+s+ayoF0prfYhcM3DS+h/7qrAR2pi32HSgBPesGIkpoP+q0qky4NyR5K1MlFG+or6+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=agEM9sdV; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ie9uGZO3; arc=none smtp.client-ip=170.10.129.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783783236;
+	s=arc-20240116; t=1783783297; c=relaxed/simple;
+	bh=o9XAWD66ai+0Z3WcwldrjMlSlthY+1Kqo3Oox8uMmS0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=AJHdVP17ECKnJEoLbT3u1yrqD2LndnPFjm6RkOqwmhbEQ85XaoWwapu5TwohHyImy/WrzzaK8deK/mumPkjORqv2pprAeNr0W+CR6S1x1XzzZSEnubC3hHUeu0TCZtv5m7vo/O8ugdA3YLZ3eUa6Hk70QQSYLSUgIooNriFpJ9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=eMVI1NjN; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=c8kmqXI9; arc=none smtp.client-ip=80.241.56.152
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA512)
+	(No client certificate requested)
+	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4gyC8j6jmRzKvvr;
+	Sat, 11 Jul 2026 17:21:25 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1783783285;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QmUM+RWb25XiR9LGFNREMs6O7PLt7AQAUsEOfZqyWvs=;
-	b=agEM9sdVXpRra684f77JCukQwUxJ/mh8evYBUPIhdT3NpRggmxKOEVzAqZ4TE9baCn0VJi
-	xoQ0BciPTXzdikNZAA0PdSa0HlrBtu6g0Lfl427NVxV+XmQ+52LY3nlYEcVAAdH38+XGev
-	YWl/9SjYpEijgrFQ3G6Gtcunuo9PT/4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-343-oyFeasczNMONQkLrNpg96Q-1; Sat, 11 Jul 2026 11:20:34 -0400
-X-MC-Unique: oyFeasczNMONQkLrNpg96Q-1
-X-Mimecast-MFC-AGG-ID: oyFeasczNMONQkLrNpg96Q_1783783233
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-493c20d0468so30795885e9.1
-        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 08:20:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1783783233; x=1784388033; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=QmUM+RWb25XiR9LGFNREMs6O7PLt7AQAUsEOfZqyWvs=;
-        b=Ie9uGZO3w5c+yDqEyxr6+FjgGheSV9GOHXMjwQ5WDwRVfGiKDg7juIdEo8b6FsE485
-         kYaVZNsegQ0Hyw2/OfdQ2iz/izQXH+UjThFH6K+7hcXopBgg1Izdx9JJ2lZqY2V0S8SJ
-         hpwk0CwjP4fPQO1SVPAyXdhS0NOjEbjLCZXpawppN90Pq3LJoyOweQsrQ44KZOCp07YL
-         29EZxD5PNwOPgkWyCQQfoIzAVF82TY3TQ03oj/SeCX2lb3g6pvom4folg5gcED15Wn7M
-         KQkUVcKy9r/P+G/lyQZV40wOEsbTUr+ua6RiDbSvtRXry3EECIsRvAJ9Wqx4RaFZxkUf
-         f1Dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783783233; x=1784388033;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=QmUM+RWb25XiR9LGFNREMs6O7PLt7AQAUsEOfZqyWvs=;
-        b=NBCCuwjBxCq2iVeDN4niGNPyp5l59HWgb7XD91OeLbSqsjZaV+8sDcSoCwUGkzqZDv
-         /54VvHmkpDkz2yVm5uPWBbj2Npa+dYDKlzUFwP51Zu2HoDZmW1HWRoeo0MuH7ENhbJlM
-         EBbV2OhJw6VcXuz8Wkrwn1L+NkmXHRcr6CKa1m9MYvFz7F6okqzrnWWXfQ51mbq83AkK
-         RNdSrcDlxc3/X5tX6fplBMA5bjJuLlVHuAtKGESLe+q9ourMLqP54Pyh6G78wcznzU1p
-         DyOZ0/w8AHajeqNyLvf+cRfVaX+Bzm0+QF1sMRn9K1EFZrkOjTDE4oN3+hArU9+LmuJ0
-         ZlUg==
-X-Forwarded-Encrypted: i=1; AHgh+RpxbFHxyfssIIXpF0CwvX+/ETs3n0Nh8pz8aUBOau9di33PqF4ewHJKpt3iadvKxl5NwA56dbw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7rimqZ+GqKyO+1ijr29VRJf157es2LS3L8Eyz0Ipwfc9igJXV
-	dJfsebUuY8JOPvHMVkea67/m+XYKn5aDfr6NRcturbWI386RdF8c4iyRKXJ3nU7Iwi9p851/jfd
-	XTNSGJUEtUCYdWyJnD2cJ+NnCpsZpHU561pDNO4TspWiU8X3aB3yf1ua35Q==
-X-Gm-Gg: AfdE7clyE4XyKywaLaBjk6NEdJP2Wuv53Po3iY0GRleSKc3+HorekH0lEo2HfuDW7M6
-	jjQ8eLeQHgF65egbA8MpvM1M5X41jE0ZKOBbiTPfiXkNT7fBYq6dyia83rfRLLuncZyoL3hlu3e
-	izFuVFtF3xiDRdgJTTDqzm+ec6dEd7aOvnolM7zBqyp7nYA0ZomITg0az+W6Mmf3r77HNhsew26
-	u3SS0LIwtv5gD98ygyelLOqVRuSKlSz6NJMqtNIscYI/ru/oYZH7T3GiodXYvd2nTj5sB1316YZ
-	MUU7IcNU/bFsMpEPfJxACXNw8kiDdP2GCT87i0yB0RpH1ESxuEt4ZMpUkdTwVo+jtGPsb72WEck
-	XLvY=
-X-Received: by 2002:a05:600c:3e19:b0:493:f28e:462a with SMTP id 5b1f17b1804b1-493f87e6ba2mr28363915e9.12.1783783233290;
-        Sat, 11 Jul 2026 08:20:33 -0700 (PDT)
-X-Received: by 2002:a05:600c:3e19:b0:493:f28e:462a with SMTP id 5b1f17b1804b1-493f87e6ba2mr28363605e9.12.1783783232734;
-        Sat, 11 Jul 2026 08:20:32 -0700 (PDT)
-Received: from redhat.com ([185.81.125.101])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493eb6ff6casm266286555e9.5.2026.07.11.08.20.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Jul 2026 08:20:31 -0700 (PDT)
-Date: Sat, 11 Jul 2026 11:20:28 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Michael Bommarito <michael.bommarito@gmail.com>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] virtio_net: validate device stats reply records before
- use
-Message-ID: <20260711111503-mutt-send-email-mst@kernel.org>
-References: <20260711150754.2918392-1-michael.bommarito@gmail.com>
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=kH44882xOwsD4SfCnl+qgk2oMqAUi2EehaDoPIzn3X4=;
+	b=eMVI1NjNntkXUIL2KOm2VZts3RhfTzWVqESVgkEg1PEU0iNNOTLEy4oPU1sGltwuvADktu
+	29XhMgFGgB99GHjLXkAn5ozkGwVXTnUWBBmNLahKBuKQI8RFu1nsjv2tvFKSfvmDAtyj1O
+	lXeTa0MTvdh9lMX7wH0Z4HrZUVewtjTxlWk4QbVwtZ4evIKBzLeSF4SmncAmhlmzTH6lfO
+	ksEtFi2KZ9Zd1uON+d5igIc2yOUDcSKi98kj00W2rAeb7w1IRkWpYlhnb4PTXyjwtXe5ay
+	DtFsbogadRXZ3ZyFWqIHkaejjrBvgV4yEaPRdkLhep6OOvyMJ6Ju9mGHWYSjgw==
+From: Maurice Hieronymus <mhi@mailbox.org>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1783783283;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=kH44882xOwsD4SfCnl+qgk2oMqAUi2EehaDoPIzn3X4=;
+	b=c8kmqXI9fAQXUpbVt8GLOdc11hNZaJUQQYsS5cxln0FyNygQRxXRLlPlY4A/0KF/KVlnyq
+	89csec1W7y0LP0NuHF8OvgxGL8QwqVDg/yqjlR/tZT0U7N22e4zfIfz1jks9M3hooLWyED
+	CDY1JGEot2RA0xGQ/m+LTSdmCoWb3snkaAPehAWthZ4c9C+ImtG2A76FPCgJ1/TbH/2vmO
+	HwgjxsoeMhnxjxIUpu6BvcCkHiqsrmwmJoz/XnGg32ShT1AplRvrYoSH27jRz6L7EeMPnf
+	xNMJZmtF3EhCBlrp2XnEluRXkziEHFi6I+wVebbtpQX2hdjgVnKSjqP8z4pXDQ==
+Subject: [PATCH 0/2] PCI: Convert bitfield flags to atomic accessors
+Date: Sat, 11 Jul 2026 17:21:05 +0200
+Message-Id: <20260711-pci-dev-flags-v1-0-2fcf2811138c@mailbox.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260711150754.2918392-1-michael.bommarito@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMQQqDMBBA0auEWTuQ2KK0VykuTDKjIyWVjEpBc
+ vem7fIt/j9BKQsp3M0JmQ5ReaUK1xgI85gmQonV0Nq2s71zuAbBSAfyc5wU2fvAV+abvTiozZq
+ J5f37PYa/dfcLhe07gVI+47rh/HEAAAA=
+X-Change-ID: 20260711-pci-dev-flags-fbbcf4ff9031
+To: Edward Cree <ecree.xilinx@gmail.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Bjorn Helgaas <bhelgaas@google.com>, Justin Tee <justin.tee@broadcom.com>, 
+ Paul Ely <paul.ely@broadcom.com>, 
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ Juergen Gross <jgross@suse.com>, 
+ Stefano Stabellini <sstabellini@kernel.org>, 
+ Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>, 
+ Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+ Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+ Daniel Almeida <daniel.almeida@collabora.com>, 
+ Tamir Duberstein <tamird@kernel.org>, 
+ Alexandre Courbot <acourbot@nvidia.com>, 
+ =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
+ Borislav Petkov <bp@alien8.de>, Tony Luck <tony.luck@intel.com>
+Cc: Danilo Krummrich <dakr@kernel.org>, rust-for-linux@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-net-drivers@amd.com, 
+ linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org, 
+ linux-edac@vger.kernel.org, Maurice Hieronymus <mhi@mailbox.org>
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1783783272; l=2313;
+ i=mhi@mailbox.org; s=20260525; h=from:subject:message-id;
+ bh=o9XAWD66ai+0Z3WcwldrjMlSlthY+1Kqo3Oox8uMmS0=;
+ b=4RJCYIsxz6UvLYOQ6xqvhVEQoQSh4rZQVVIc7mWtjntBUq4ccNJ2KYKolDjFHU49aAutOyaus
+ A5Eqo668VqlDuoF/ENWHgCu8gHFoRAMIBVG+FaowFqe6tBmqjHocs5w
+X-Developer-Key: i=mhi@mailbox.org; a=ed25519;
+ pk=AHlEkGG3hpXZHntlEzF42Ip/LFyXWOgsNUvaHqAnV80=
+X-MBO-RS-ID: 7fb4275b43160de9afd
+X-MBO-RS-META: o4fyj9cuc9w1urffc3xfrywcrt7anabk
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
+	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306873-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:ecree.xilinx@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:bhelgaas@google.com,m:justin.tee@broadcom.com,m:paul.ely@broadcom.com,m:James.Bottomley@HansenPartnership.com,m:martin.petersen@oracle.com,m:jgross@suse.com,m:sstabellini@kernel.org,m:oleksandr_tyshchenko@epam.com,m:ojeda@kernel.org,m:boqun@kernel.org,m:gary@garyguo.net,m:bjorn3_gh@protonmail.com,m:lossin@kernel.org,m:a.hindborg@kernel.org,m:aliceryhl@google.com,m:tmgross@umich.edu,m:daniel.almeida@collabora.com,m:tamird@kernel.org,m:acourbot@nvidia.com,m:work@onurozkan.dev,m:bp@alien8.de,m:tony.luck@intel.com,m:dakr@kernel.org,m:rust-for-linux@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-net-drivers@amd.com,m:linux-kernel@vger.kernel.org,m:linux-pci@vger.kernel.org,m:linux-scsi@vger.kernel.org,m:xen-devel@lists.xenproject.org,m:linux-edac@vger.kernel.org,m:mhi@mailbox.org,m:ecreexilinx@gmail.com,m:andrew@lunn.ch,s:lists@lfd
+ r.de];
+	TAGGED_FROM(0.00)[bounces-306874-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,broadcom.com,HansenPartnership.com,oracle.com,suse.com,epam.com,garyguo.net,protonmail.com,umich.edu,collabora.com,nvidia.com,onurozkan.dev,alien8.de,intel.com];
+	FORGED_SENDER(0.00)[mhi@mailbox.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[38];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:michael.bommarito@gmail.com,m:jasowang@redhat.com,m:xuanzhuo@linux.alibaba.com,m:eperezma@redhat.com,m:andrew+netdev@lunn.ch,m:kuba@kernel.org,m:pabeni@redhat.com,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:michaelbommarito@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[mst@redhat.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mhi@mailbox.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mailbox.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mailbox.org:from_mime,mailbox.org:email,mailbox.org:mid,mailbox.org:dkim,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F04BC741F2B
+X-Rspamd-Queue-Id: 5947C741F4E
 
-On Sat, Jul 11, 2026 at 11:07:54AM -0400, Michael Bommarito wrote:
-> __virtnet_get_hw_stats() walks the device statistics reply buffer with
-> "for (p = reply; p - reply < res_size; p += le16_to_cpu(hdr->size))",
-> using each record's device-supplied hdr->size as the stride without
-> checking that a full struct virtio_net_stats_reply_hdr remains, that
-> hdr->size is nonzero and matches the expected size for hdr->type, or that
-> the record fits within res_size. A backend that returns hdr->size == 0
-> spins the loop forever; a short or oversized size drives out-of-bounds
-> reads in virtnet_fill_stats().
-> 
-> Impact: a malicious or compromised virtio-net backend hangs the CPU
-> running the guest's device-statistics query in an infinite loop
-> (hdr->size == 0), or drives an out-of-bounds read of the reply buffer.
-> This matters most for a confidential guest, where the host is outside the
-> trust boundary.
+`struct pci_dev` keeps ~60 flags in one C bitfield. Bits sharing a
+word must not be modified concurrently, but several writers take no
+common lock: `pci_set_master()` writes `is_busmaster` and can run
+without the device lock (e.g. runtime PM resume paths),
+`pci_disable_device()` clears it, and `broken_parity_status_store()`
+writes the same word from sysfs at any time without any lock.
 
-Why does it "matter most", or at all, there?
-Host can always deny guest service. In fact, this is how cloud vendors
-charge their clients, by denying service to whoever did not pay them.
+Convert these two bits to a new public `flags` bitmap accessed with
+atomic bitops, mirroring how the driver core replaced its
+`offline`/`offline_disabled` bitfield in commit a7cc262a1135 ("driver
+core: Replace dev->offline + ->offline_disabled with accessors").
+More bits can follow the same pattern later.
 
+An alternative would be to reuse `priv_flags`, but its bit definitions
+and accessors are deliberately private to drivers/pci, while
+`is_busmaster` is accessed by xen-pciback, lpfc and sfc. Happy to
+respin that way if preferred.
 
-> Validate each record before use: require a full header in the remaining
-> bytes, a nonzero hdr->size that is at least the header size and matches the
-> size expected for hdr->type, and that the record fits within res_size; stop
-> the walk otherwise. Add virtnet_stats_reply_size() for the per-type size.
+This is also a prerequisite for the Rust device enabling API rework
+[1]: the guard object planned there calls `pci_disable_device()` from
+contexts that may run concurrently with `pci_set_master()`, which
+requires `is_busmaster` to not be part of a shared bitfield word.
 
-I'm all for making things easier to debug even when the device is buggy.
-But I'm not inclined to add tons of hard to maintain code to
-that end, and I would be worried broken hosts will come to
-rely on drivers working around them.
+Link: https://lore.kernel.org/rust-for-linux/DJOEYVBS17MJ.1YD3TNGQBWHNK@kernel.org/ [1]
+Signed-off-by: Maurice Hieronymus <mhi@mailbox.org>
+---
+Maurice Hieronymus (2):
+      PCI: Replace pci_dev->is_busmaster with accessors
+      PCI: Replace pci_dev->broken_parity_status with accessors
 
+ drivers/edac/edac_pci_sysfs.c               |  4 +--
+ drivers/net/ethernet/sfc/falcon/farch.c     |  2 +-
+ drivers/net/ethernet/sfc/siena/farch.c      |  2 +-
+ drivers/pci/pci-driver.c                    |  2 +-
+ drivers/pci/pci-sysfs.c                     |  4 +--
+ drivers/pci/pci.c                           |  6 ++---
+ drivers/scsi/lpfc/lpfc_init.c               |  4 +--
+ drivers/xen/xen-pciback/conf_space_header.c |  4 +--
+ drivers/xen/xen-pciback/pciback_ops.c       |  4 +--
+ include/linux/pci.h                         | 42 +++++++++++++++++++++++++++--
+ 10 files changed, 56 insertions(+), 18 deletions(-)
+---
+base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
+change-id: 20260711-pci-dev-flags-fbbcf4ff9031
 
-> 
-> Fixes: 941168f8b40e ("virtio_net: support device stats")
-> Cc: stable@vger.kernel.org
-> Assisted-by: Claude:claude-opus-4-8
-> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
-> ---
->  drivers/net/virtio_net.c | 42 ++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 40 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 3e2a5876c6c8c..9cbe40d218cc4 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -3532,6 +3532,7 @@ static int virtnet_tx_resize(struct virtnet_info *vi, struct send_queue *sq,
->  	return err;
->  }
->  
-> +
->  /*
->   * Send command via the control virtqueue and check status.  Commands
->   * supported by the hypervisor, as indicated by feature bits, should
-> @@ -3546,6 +3547,7 @@ static bool virtnet_send_command_reply(struct virtnet_info *vi, u8 class, u8 cmd
->  	bool ok;
->  	int ret;
->  
-> +
->  	/* Caller should know better */
->  	BUG_ON(!virtio_has_feature(vi->vdev, VIRTIO_NET_F_CTRL_VQ));
->
-
-
-we don't need this.
-  
-> @@ -4927,6 +4929,32 @@ static void virtnet_fill_stats(struct virtnet_info *vi, u32 qid,
->  	}
->  }
->  
-> +static int virtnet_stats_reply_size(u8 type)
-> +{
-> +	switch (type) {
-> +	case VIRTIO_NET_STATS_TYPE_REPLY_CVQ:
-> +		return sizeof(struct virtio_net_stats_cvq);
-> +	case VIRTIO_NET_STATS_TYPE_REPLY_RX_BASIC:
-> +		return sizeof(struct virtio_net_stats_rx_basic);
-> +	case VIRTIO_NET_STATS_TYPE_REPLY_RX_CSUM:
-> +		return sizeof(struct virtio_net_stats_rx_csum);
-> +	case VIRTIO_NET_STATS_TYPE_REPLY_RX_GSO:
-> +		return sizeof(struct virtio_net_stats_rx_gso);
-> +	case VIRTIO_NET_STATS_TYPE_REPLY_RX_SPEED:
-> +		return sizeof(struct virtio_net_stats_rx_speed);
-> +	case VIRTIO_NET_STATS_TYPE_REPLY_TX_BASIC:
-> +		return sizeof(struct virtio_net_stats_tx_basic);
-> +	case VIRTIO_NET_STATS_TYPE_REPLY_TX_CSUM:
-> +		return sizeof(struct virtio_net_stats_tx_csum);
-> +	case VIRTIO_NET_STATS_TYPE_REPLY_TX_GSO:
-> +		return sizeof(struct virtio_net_stats_tx_gso);
-> +	case VIRTIO_NET_STATS_TYPE_REPLY_TX_SPEED:
-> +		return sizeof(struct virtio_net_stats_tx_speed);
-> +	default:
-> +		return sizeof(struct virtio_net_stats_reply_hdr);
-> +	}
-> +}
-> +
->  static int __virtnet_get_hw_stats(struct virtnet_info *vi,
->  				  struct virtnet_stats_ctx *ctx,
->  				  struct virtio_net_ctrl_queue_stats *req,
-> @@ -4936,7 +4964,7 @@ static int __virtnet_get_hw_stats(struct virtnet_info *vi,
->  	struct scatterlist sgs_in, sgs_out;
->  	void *p;
->  	u32 qid;
-> -	int ok;
-> +	int hdr_size, ok, remaining;
->  
->  	sg_init_one(&sgs_out, req, req_size);
->  	sg_init_one(&sgs_in, reply, res_size);
-> @@ -4948,8 +4976,17 @@ static int __virtnet_get_hw_stats(struct virtnet_info *vi,
->  	if (!ok)
->  		return ok;
->  
-> -	for (p = reply; p - reply < res_size; p += le16_to_cpu(hdr->size)) {
-> +	for (p = reply; p - reply < res_size; p += hdr_size) {
-> +		remaining = res_size - (p - reply);
-> +		if (remaining < sizeof(*hdr))
-> +			return -EINVAL;
-> +
->  		hdr = p;
-> +		hdr_size = le16_to_cpu(hdr->size);
-> +		if (hdr_size < virtnet_stats_reply_size(hdr->type) ||
-> +		    hdr_size > remaining)
-> +			return -EINVAL;
-> +
->  		qid = le16_to_cpu(hdr->vq_index);
->  		virtnet_fill_stats(vi, qid, ctx, p, false, hdr->type);
->  	}
-
-That's a lot of fragile code for unclear benefit.
-
-
-> @@ -7305,3 +7342,4 @@ module_exit(virtio_net_driver_exit);
->  MODULE_DEVICE_TABLE(virtio, id_table);
->  MODULE_DESCRIPTION("Virtio network driver");
->  MODULE_LICENSE("GPL");
-> +
-> -- 
-> 2.53.0
+Best regards,
+-- 
+Maurice Hieronymus <mhi@mailbox.org>
 
 
