@@ -1,156 +1,184 @@
-Return-Path: <netdev+bounces-306858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306859-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zRzyMYRLUmqgOAMAu9opvQ
-	(envelope-from <netdev+bounces-306858-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 15:56:20 +0200
+	id 5p/dLXVNUmogOQMAu9opvQ
+	(envelope-from <netdev+bounces-306859-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 16:04:37 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DB76741B8B
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 15:56:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AE03741C11
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 16:04:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=anZI2NXe;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306858-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306858-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=auJzsx57;
+	dmarc=pass (policy=reject) header.from=google.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306859-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306859-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E61A73011C57
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 13:56:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BA65B305D840
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 14:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8529526056C;
-	Sat, 11 Jul 2026 13:56:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB9773C73D9;
+	Sat, 11 Jul 2026 14:00:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C0515E5DC;
-	Sat, 11 Jul 2026 13:56:17 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783778178; cv=none; b=qElnqAyzYhQE61NynNnfbzcsOpvlgJhq8LCa1i4nXG4uIWhbPRJndn7CP7PRfAgAUv9Md9S5Q/P3RWeuji+Q6I6oPVAQ+NkTB+Ib6pUeW19t5wyxuuSCrbGd9B2iwvRkA4c5jo/opiRte6nRnxmu6psx2L2/wc70H+yFREMSJjk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783778178; c=relaxed/simple;
-	bh=Ilxa91/xmSMwAQV50SahUhvBYhDXmrw6AvaV8FO5t+4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=LDd6x9S3nlXiv1klVaHAxN7ZmFlR9t8+pYILmyLLZPidiHYAHvq0Dibi1M0d1f9UAqpbS/KmbsjY09p156AxHs+fv229CYRm2SLwQ1MQl6eFeO8cvNWqCu7faOhmhJciyawef7HnEfI0Zjjre32HlswpM+63XYBYa1gdcSiPXwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=anZI2NXe; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71A4A1F000E9;
-	Sat, 11 Jul 2026 13:56:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783778177;
-	bh=VaIt5SuuNSmwgTajmIj4ItRNOiPXthdr8Oi+LYItYKo=;
-	h=From:Date:Subject:To:Cc;
-	b=anZI2NXegF0Jv+WXpfHyxi5tbL593/efATXYac0IDW0X6YqSk1IbZvErUeN60dheb
-	 mTmiUNW5IVqPthTU1/pBqpFNPlp+e9DdOTqlKFEZgyFlD4lvHpspShlEqRoUCQN54Q
-	 l1j1Efmg6lIkAfWd2oxiJ3DhXiHUOU3Rd6XYQ1WkZBynwNU6fp5KP/vrp40EvXLr8X
-	 mDmWtN1ekDCKmxcVdWEcKKJj88N+ILll5I5bmBazxxi+riIdPG49nB38D+vQITiMK9
-	 gsQJoXlBY92LRPp6LtLDKLilDlgph8yy46/kuNSGf0StoVkgkxicFohZJeh7XB0cJE
-	 P3Ws9PtQx/Z8Q==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Sat, 11 Jul 2026 15:55:57 +0200
-Subject: [PATCH nf] selftests: netfilter: nft_flowtable.sh: check offload
- counters for IP6IP6 tunnel test
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642E43C2B95
+	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 14:00:17 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783778419; cv=pass; b=XRft7XnawQmm+DDqV+L5Yr2C6gFOA4UTDoXqiSllMqxUNDI6FZiCvTaKRDegP8+Y+szTVz3icj8mHQwwToHhXVbOEn3ekmXumsNvVcXwvRx9k54frhmmx2bRC9VHt1jW0hbzKYNMKtTj8/yK01N4yo1IKyZEJILtT6Qv/iaceBk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783778419; c=relaxed/simple;
+	bh=2x8s2hRIzfzcX6kMgVsDG2qEJDcy4Ak63lIwgjF35zY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mlzajNq0yBZL8K/dEpq25cynPY640hq5ATw8C0d5OGvCXZq4pmEDj6luZMc05ZGrrvGTXEgJKKR2NMz5G3LzGmt8HO6R23Zv1y/BvDOs8cR4V6H9cIH4G93A+WssnPnznApXpi+hQs3Y5yWHbDxJgDWEzwk1FDAZTsu63WKbx9c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=auJzsx57; arc=pass smtp.client-ip=209.85.160.180
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-51c8e2e39easo13706961cf.0
+        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 07:00:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783778416; cv=none;
+        d=google.com; s=arc-20260327;
+        b=KPA64Bzk2Ik058f4XHkcsg3bk6hkLHyouklwulzv+rJFq+hfSSNOrFSVZNlmvCK91e
+         CpagCSJlK+y4Oz1CnOaCSHsbdnzHTP5d3v0sQwnqGdJUFfxKSMzQXxevyoTfa8SnZMc0
+         k9jebefAvnBlhbeEgD9MHgVnhcWCnetNLrC7eRzEa+qEpVwx984afgeOhvmx1llD89UT
+         ryf/sLUPVn7yBRBODEmIcTn3s7wOsEB8ygI3yQvninOyypoMpQ82Z5gmvIcSsFjevz6K
+         S4SEguA5AgBu9/QqxN51/stnYGCq73f/hDOjmjK9WUk0nq4W1QTbMSHydnocqLswuKgk
+         1OXw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=GqDR0IptsjWrOWRZQ2Jyt0YxUIjEB4dj30T2XPWVZdY=;
+        fh=jK0q+7F8TwV8RrE84Jz3ZQXX6FPOAlq5oHMg1Kh3aMo=;
+        b=JWJxxcysUnADDmoHDz8A+JpT7OKWSPDLzmLzAsNK+pLM/7krK8UK86zGDqerWGF2zk
+         q9JfJi1anTGT+vQqaza8jVINC64ebQpHKhtpKEDhrPUw9YEOmukaA58GBIw/+CS/pQAx
+         n3b/C9bsB3FvHv8txXT1ei+ju5c7YWYPXYrBeOHHVI6tvab3AX7wvpZa7jx3ltuYKdlR
+         UrtExyxIwxmaltuAWFbfoCIScVMIPBOInBbHXmgbspVdwafSB5/Ortq7UmikJnhKkiZE
+         z+pLlS6Be02b5+6WyXK+uMJiMBx6uEmTM0cm22T5BOEhEs7A8jUbdqpbew+Iah8Zhpd5
+         Q6RQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1783778416; x=1784383216; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=GqDR0IptsjWrOWRZQ2Jyt0YxUIjEB4dj30T2XPWVZdY=;
+        b=auJzsx57xi10LJGLIaOVxsXhfVM0fjiBx2oR6Y2FSzzlA3J5s/0CtG+K6p/ImEN6Pq
+         Q4JDugXNtrSC30C3c8oD8QT18rckS8QA3Tnkh/DKmdo/imspPHiENW7SxRc7bGzjFftK
+         KfqqJAj3hPCeO1oaE0ut7s+gLFJ4qfHRrVMfCopt85k4OXpJ7urYArr+JuNW6FyXxlv1
+         HUXaA7nIwdLbik4Rh5zlZulLgDMAKQAlUam7CndKegMSvViKmwPFW1hquVvBcGP8/DuV
+         5ggKoF3C3f7jDNeDGOCCZ+0vCCc8erQEAGbeuKfpwbCY/+4ZZTa1twjZDEf/NIbqV5vJ
+         q0jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783778416; x=1784383216;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=GqDR0IptsjWrOWRZQ2Jyt0YxUIjEB4dj30T2XPWVZdY=;
+        b=YQcpZ+q9EUylZY3fgViKIJtTHluDAf81dlZYF58UUmhvryt0d2gw8G+y2WeDuJVvcq
+         LvnU4bsUKTBao2I1NQr8sXVKG49Qh64gykK9LBo6/ZvEUiMlZ40GIeTW/t8BeM89XEha
+         zuSoAKnAoUYqJvGGdMYhu5JsMEFhasABTtIy2tp26MviCAVuz5OeGMylQ6XvoKHktANK
+         yLSLtMa6eAye2jH2UzfVrrk/EVdDwTQE8FS5fRDcViI3Vl34VryBsukWB9RMPyW+xW30
+         6B/87GoWsmmnc4uIcRJaVzu28zaaWxrLqKqA27tiIg37eYk4LCl6Z/WAIMCcz1G3MD89
+         iUFA==
+X-Forwarded-Encrypted: i=1; AHgh+Rokwfbm+R/IpDuCz+pXDHue4tXnxHvSfMWm6BLuABYOSbKClb6FrkC95rXR2rmZpcV2K8v1oqM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNrS2NMJap7LsGsAp893SQNu36nr7zB17X97jERF5reX/9ENes
+	7kMXGNfU7Aw3P/zoVRJt90HabVwHuc2aAmc/S+gVxX0XXfvxOB+vr8WxYMwtXS2tnQl85rjmqjn
+	2/GOSyRmmtZqy2TYIVw4fr7YwGTuSAhco0/NXQWig
+X-Gm-Gg: AfdE7ckWtVI0HsRegrrj2zragE8MRDL/Y7rpY5DnoWlm68YBc35u0gy0lyyfwIRre/b
+	DqJgDFy8HUIw/Xewx9Mp64ZB0u1DUj7e69oiLlACxifkRrKY0A1A7ElV8YAEZA+cwaAYoGSZTCI
+	te0TrOCB1ZRsRV8222mxgRxQTR19nDyoEKClVfzcs3U1WoSDl+R8SVB5y+5+KCne0inNg7fWbW/
+	r4Y1lIkP9+N2jE2WuNRuALwODRawj/GSMHgghMqUyuUoCxCwZo481mBNlttJTF5M9INDG2vP9Ai
+	i/+ydavstuwJ9XKBa45enWA10dpGnTr3kPzNO77cRcdlfokZsmpoWlNF843orM6hCYLzPKLWKY5
+	bSQiDCfA1
+X-Received: by 2002:a05:622a:4885:b0:51b:f0ab:2b1b with SMTP id
+ d75a77b69052e-51cbf26daddmr29126701cf.49.1783778415594; Sat, 11 Jul 2026
+ 07:00:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260711-flowtable-selftest-ip6ip6-fix-v1-1-60e9e7384df7@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2MQQqDMBAAvyJ77kISJSn9Sukh1Y1dCFGyQQvi3
- 12Eucwc5gChyiTw6g6otLHwUlTso4PxF8tMyJM6OOO8CdZiysve4jcTCuXUSBry6hVM/Mdhekb
- vejeE2IM+1kqa7/8bSoLPeV5j9sBgcwAAAA==
-X-Change-ID: 20260711-flowtable-selftest-ip6ip6-fix-4d8a623247a3
-To: Pablo Neira Ayuso <pablo@netfilter.org>, 
- Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
-Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.3
+References: <20260711134732.1385563-1-tristmd@gmail.com>
+In-Reply-To: <20260711134732.1385563-1-tristmd@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sat, 11 Jul 2026 16:00:03 +0200
+X-Gm-Features: AVVi8CcY5CaPIMoOd8xuDL4_gMxfAA225TDZjOSaO1YM-5oHGXW8erun50xkGWY
+Message-ID: <CANn89iJo1HFtp6EoUmwo7KJ9LRsq_iQqhGV4Eco-7Szw5oN92Q@mail.gmail.com>
+Subject: Re: [PATCH net] ipvlan: add xmit recursion protection
+To: Tristan Madani <tristmd@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Mahesh Bandewar <maheshb@google.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	Tristan Madani <tristan@talencesecurity.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:lorenzo@kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-306858-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306859-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:tristmd@gmail.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:maheshb@google.com,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:tristan@talencesecurity.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[talencesecurity.com:email,mail.gmail.com:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1DB76741B8B
+X-Rspamd-Queue-Id: 5AE03741C11
 
-The IP6IP6 tunnel test uses test_tcp_forwarding() which only verifies
-TCP data integrity but does not verify that flowtable offload actually
-took place. Unlike the non-tunnel and IPIP tests, it omits the
-check_counters() call.
-The reply direction for IP6IP6 tunnel traffic goes through the physical
-interface (oif=veth0), so it is already counted by the existing
-routed_repl counter rule. Add check_counters() after the IP6IP6 test to
-detect offload failures.
+On Sat, Jul 11, 2026 at 3:47=E2=80=AFPM Tristan Madani <tristmd@gmail.com> =
+wrote:
+>
+> From: Tristan Madani <tristan@talencesecurity.com>
+>
+> ipvlan devices can enter infinite transmit recursion when combined with
+> packet forwarding configurations (such as IPVS) that route traffic back
+> through the same ipvlan interface.
+>
+> The recursion path is:
+>
+>   ipvlan_start_xmit -> ipvlan_queue_xmit -> ipvlan_xmit_mode_l3
+>   -> ipvlan_process_outbound -> ip_local_out -> netfilter hooks
+>   -> dev_queue_xmit -> ipvlan_start_xmit (recurse)
+>
+> The existing per-CPU xmit recursion counter in __dev_queue_xmit()
+> (XMIT_RECURSION_LIMIT =3D 8) does detect the loop, but fires too late:
+> each recursion level consumes roughly 2KB of stack space through
+> ip_local_out and netfilter, and at 8 levels the cumulative usage
+> exceeds the 16KB kernel stack on x86_64. The resulting stack overflow
+> hits the VMAP_STACK guard page and causes a kernel panic.
+>
 
-Fixes: 5e5180352193 ("selftests: netfilter: nft_flowtable.sh: Add IP6IP6 flowtable selftest")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- tools/testing/selftests/net/netfilter/nft_flowtable.sh | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Please fix the existing mechanism. 2KB of stack space seems excessive.
 
-diff --git a/tools/testing/selftests/net/netfilter/nft_flowtable.sh b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-index 08ad07500e8a..0ea01a876c8b 100755
---- a/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-+++ b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-@@ -629,7 +629,7 @@ if ! test_tcp_forwarding_nat "$ns1" "$ns2" 1 "IPIP tunnel"; then
- fi
- 
- if test_tcp_forwarding "$ns1" "$ns2" 1 6 "[dead:2::99]" 12345; then
--	echo "PASS: flow offload for ns1/ns2 IP6IP6 tunnel"
-+	check_counters "flow offload for ns1/ns2 IP6IP6 tunnel"
- else
- 	echo "FAIL: flow offload for ns1/ns2 with IP6IP6 tunnel" 1>&2
- 	ip netns exec "$nsr1" nft list ruleset
-@@ -683,7 +683,7 @@ if ! test_tcp_forwarding_nat "$ns1" "$ns2" 1 "IPIP tunnel over vlan"; then
- fi
- 
- if test_tcp_forwarding "$ns1" "$ns2" 1 6 "[dead:2::99]" 12345; then
--	echo "PASS: flow offload for ns1/ns2 IP6IP6 tunnel over vlan"
-+	check_counters "flow offload for ns1/ns2 IP6IP6 tunnel over vlan"
- else
- 	echo "FAIL: flow offload for ns1/ns2 with IP6IP6 tunnel over vlan" 1>&2
- 	ip netns exec "$nsr1" nft list ruleset
+If this is caused by some DEBUG option, it will be just fine to limit
+XMIT_RECURSION_LIMIT to 3 for such debug kernels.
 
----
-base-commit: 3f1f755366687d051174739fb99f7d560202f60b
-change-id: 20260711-flowtable-selftest-ip6ip6-fix-4d8a623247a3
-
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
-
+Adding a workaround in every virtual driver is not an option.
 
