@@ -1,60 +1,97 @@
-Return-Path: <netdev+bounces-306887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306888-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id hWrKN4JwUmo7PwMAu9opvQ
-	(envelope-from <netdev+bounces-306887-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 18:34:10 +0200
+	id KdJFEUlxUmpbPwMAu9opvQ
+	(envelope-from <netdev+bounces-306888-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 18:37:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 499017422F4
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 18:34:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 851C6742311
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 18:37:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=uniroma2.it (policy=none);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306887-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306887-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=pyXygfDx;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306888-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306888-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B5B4F3012CA3
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 16:34:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4B212301544B
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 16:37:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE7413C2BA4;
-	Sat, 11 Jul 2026 16:34:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879A5395AEB;
+	Sat, 11 Jul 2026 16:37:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.37])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9170A391E66;
-	Sat, 11 Jul 2026 16:34:00 +0000 (UTC)
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD7F2C21E6
+	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 16:37:25 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783787644; cv=none; b=UF8VGx9fuS/eJRM9TmZeDiKyfg1oPx+ane8AJtgTBA9eF9HuuciRLAMNIXVGDhHzPploIdZE8MNh73ZmCDZl1S4nWVJj7TTW1WFGSoeZg40/FTBQyg2WSt12eTMGMptUbcOQuPXcVCk2FjX/W5UWmpZ16KAmn08DN1bDEu/65cg=
+	t=1783787846; cv=none; b=euafYArExSD6AlIhuPRmWYEwct/0cPRlr2JiuzDY9ut0pYAa4bqC7XI5EFLOEmkTk40ozYrIdN0OvBppp+7N+sZ3t1VbDHpb9SbRnQQphQg6s4F0fZw3rP46HkaBJkYUTai63PT0MTmoZsmRf81HG2rzR61fQacOtRsJv6RgCR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783787644; c=relaxed/simple;
-	bh=nUt40aBjrrcSvIRgEGCdWjDrZhllCpMVFnASRGxh6r8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qXJf+71ntPtDXthSFisJ543v+szpnsTyDNL8olat54J5A9UNTs89aTP7ZXFK/zRJPd8XBW9rFddyTRLzENmqs8wfnAjzY4Ho5ElVVOje/bDqoQ4xJYcyzK40XEtsGhyNWymksolwWJ1XVvpRgqQglqIJYiDkzxuiVVDlyNCHmHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; arc=none smtp.client-ip=160.80.4.37
-Received: from localhost.localdomain ([160.80.103.126])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 66BGTX4Y007834;
-	Sat, 11 Jul 2026 18:29:39 +0200
-From: Andrea Mayer <andrea.mayer@uniroma2.it>
-To: "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc: David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-        Justin Iurman <justin.iurman@6wind.com>,
-        Anthony Doeraene <anthony.doeraene@uclouvain.be>,
-        Stefano Salsano <stefano.salsano@uniroma2.it>,
-        Ahmed Abdelsalam <ahabdels@cisco.com>,
-        Paolo Lungaroni <paolo.lungaroni@uniroma2.it>, netdev@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Andrea Mayer <andrea.mayer@uniroma2.it>
-Subject: [PATCH net-next 2/2] selftests: seg6: add test for post-encap SID route lookup
-Date: Sat, 11 Jul 2026 18:29:07 +0200
-Message-Id: <20260711162907.6521-3-andrea.mayer@uniroma2.it>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20260711162907.6521-1-andrea.mayer@uniroma2.it>
-References: <20260711162907.6521-1-andrea.mayer@uniroma2.it>
+	s=arc-20240116; t=1783787846; c=relaxed/simple;
+	bh=o5yO6oWedpT3wJ7sOhO6mTOdoWLsdYRIo1vj7b/+a+Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FXNme/9rcwjsosR737tJn7VBS7HTkIE52ViQwSvBe/7gLV7k3+3fyfYsUQXZtT99Cpf8JbUyz/kWd+V44OA0Y2UKN+DiR+SlmDqzSPzzj38nncdg6Ga/N+PEMAj29WanJ6mh2lYG7jPd9AH+O4oWFy/UMY4VvTrGiB4UqfL+M14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pyXygfDx; arc=none smtp.client-ip=209.85.210.169
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-84862b0d5aeso1965912b3a.2
+        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 09:37:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783787844; x=1784392644; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=M6jwjtRKl24bKNWqXMmJYe7ZpBH2H/x49wjHmv81PZA=;
+        b=pyXygfDxXTlo4CT77IUjLZZPlcw/qqvpbptFT8nthc7dlUlbP4+mqPZAeeIkEXF0TN
+         EWuE2PO1Lzca3SIvhKR4SrOPjaeaSSqEsMA+S6hLWtVQEdsV+LC5OP0Zmf+UG3dLbv7M
+         eBXtQ1reDHafLUGQc7fVGTrNk7oMRuQxVkpM3x8rUbNpP66Tp16IX1SGVGTFc8vcAiLo
+         4Mb+d7TBMy+0Kr5cOciF3UuUUcQf1FDJDMYpRu4FLDjIjkMEwsuS2J3piihCq4U10TRN
+         62TiY9PogJuCVd3Ee2JrHosKXLehB8hLKqClpZFk9hJc33KNd+o6YVS2sjaVr/nsnexy
+         A8lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783787844; x=1784392644;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=M6jwjtRKl24bKNWqXMmJYe7ZpBH2H/x49wjHmv81PZA=;
+        b=Q9z8ip/U5WPyara4ligi5H364TpFEF5KcTyI7+Q2M7CqzOIdCitXP2VunCKW072rub
+         sovjVf+vg9F0hy4snCLgpxJGKY5eT81kpHpzij5Opi7/B9PUVSHrKGEZ7XSoXhhbR31B
+         LQghijx3RxwVJp5841fQO3QujqgneXQsJM51TzrWPPHaBc/2BA38gHCp2SqsBKADltZD
+         eexO6rpmwWcOl0jB8djzQodRw+LTZsvmYkMp0we8BUafO0IbCCPn5UxhnYlb+FGBHoFs
+         EIW/tYfVMVc+cr1RgEj0yVrr3/ANOoJ+dUWy2IH3ZlASyRAlK1+Hk/W2l7eqQoTwZn47
+         ZLzA==
+X-Forwarded-Encrypted: i=1; AHgh+RoSNHWZKhk/PCqupc+Ff/jclpYonarvJT4N74P1XrHba5Wo/JPzPNd9mzffyGKgPIvJWPUZeJk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrK4nSNJJTh8zC/O4/ZePW7GjbdkSxS1ZbcFoOoBQHTuoadKJ2
+	WbAi1F64rJNN0RyaQZ23/SNbna6Mt8FzZEnWVMbzNeP53NLaTlkaQN6O
+X-Gm-Gg: AfdE7cmpy+uwdvxTRcYDFUgYz5tY8FEyt2ybrXnKSVXGk3uFfUEEFjOIpg/yqvShl1O
+	T+TjhkZCzv7ElllUk1DNTU35f+67SGP1WvYHdh4qeATGi7gLTs7ClsVBPrn70AL3+haJvjNXa+y
+	nao+SGyl6FRH4BF59EFm7S0BhAYVMykQzLoYPzNd2QYLP1Kl2ljvUGx/Gyzr/tmq3BDomCiR1He
+	rnzsmBNX7aCG1KqfhKX5Voew+/QE4FvWQm9BcwFpWyUTzIdZ2fEPerRhT5rBawA+f8v+7XBnucS
+	MAxypl/26nsszDaHHr3sK9mYI9dVVUEZpyCA63tXqYiNhHQpWheq/rQhuBZFcGReXSKpFojlUOO
+	AXSwiv4efyYgPfV73Q73rooAZ2k8E5CVhLxAEMCS8gZscnDRoj4vX6X7x7grDXdiEJCXQbHUG6G
+	x1WvTJxtuhBkPFLRFKZ+cNidVCpyLOq+x0
+X-Received: by 2002:a05:6a00:14d1:b0:848:4b27:36a3 with SMTP id d2e1a72fcca58-848897d6cbbmr3430978b3a.72.1783787844451;
+        Sat, 11 Jul 2026 09:37:24 -0700 (PDT)
+Received: from haichao.tail057a43.ts.net ([2001:da8:e000:1206:3104:36f4:5e17:15b6])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-847f6b5e566sm11768948b3a.3.2026.07.11.09.37.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 11 Jul 2026 09:37:23 -0700 (PDT)
+From: Ruoyu Wang <ruoyuw560@gmail.com>
+To: Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Jacob Keller <jacob.e.keller@intel.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Vikas Gupta <vikas.gupta@broadcom.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ruoyu Wang <ruoyuw560@gmail.com>
+Subject: [PATCH net v2] bnxt_en: Handle partially initialized auxiliary devices
+Date: Sun, 12 Jul 2026 00:37:16 +0800
+Message-ID: <20260711163716.3996929-1-ruoyuw560@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,1115 +99,144 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.14 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[uniroma2.it : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-306888-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[ruoyuw560@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[intel.com,broadcom.com,vger.kernel.org,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:dsahern@kernel.org,m:horms@kernel.org,m:shuah@kernel.org,m:nicolas.dichtel@6wind.com,m:justin.iurman@6wind.com,m:anthony.doeraene@uclouvain.be,m:stefano.salsano@uniroma2.it,m:ahabdels@cisco.com,m:paolo.lungaroni@uniroma2.it,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrea.mayer@uniroma2.it,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:michael.chan@broadcom.com,m:pavan.chebbi@broadcom.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jacob.e.keller@intel.com,m:andrew.gospodarek@broadcom.com,m:vikas.gupta@broadcom.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ruoyuw560@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-306887-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[andrea.mayer@uniroma2.it,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrea.mayer@uniroma2.it,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ruoyuw560@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,uniroma2.it:from_mime,uniroma2.it:email,uniroma2.it:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 499017422F4
+X-Rspamd-Queue-Id: 851C6742311
 
-Add a selftest for the SEG6_IPTUNNEL_TABLE attribute, which selects the FIB
-table for the post-encap SID route lookup. This looks up the route for the
-first SID, the outer destination of the encapsulated packet.
+bnxt_aux_devices_init() calls auxiliary_device_init() before all fields
+used by bnxt_aux_dev_release() are initialized.  After
+auxiliary_device_init() succeeds, later errors must unwind with
+auxiliary_device_uninit(), which invokes the release callback.
 
-Two routers provide L3 VPN services over an IPv6 underlay. Each router uses
-a separate VRF per tenant, with default blackhole routes (IPv4 and IPv6)
-that drop unmatched traffic. Tenant traffic is encapsulated, then
-decapsulated with an End.DT46.
-The encap routes are installed in the tenant VRF, but the routes that match
-the first SIDs live in a separate underlay table (500). The "lookup 500"
-attribute points the lookup there rather than to the VRF.
+The release callback assumes that aux_priv->id, aux_priv->edev,
+edev->net and edev->ulp_tbl are all populated.  If allocation fails
+after auxiliary_device_init(), the release path can otherwise dereference
+or clear partially initialized state.
 
-The test covers both the input path, where forwarded host traffic triggers
-encapsulation, and the output path, where a router originates traffic from
-its own loopback inside a VRF.
-With the "lookup" attribute, traffic reaches its destination on both paths.
-Without it, on the input path the lookup stays in the VRF and hits the
-blackhole, and on the output path it falls through to the main table, which
-has no matching route.
+Allocate and attach the bnxt_en_dev and ULP table before calling
+auxiliary_device_init(), so the release callback only sees a fully
+initialized auxiliary private object.  If auxiliary_device_init() itself
+fails, free those allocations directly because device_initialize() has not
+run and the release callback will not be invoked.
 
-Signed-off-by: Andrea Mayer <andrea.mayer@uniroma2.it>
+This issue was found by a static analysis checker and confirmed by manual
+source review.
+
+Fixes: 194fad5b2781 ("bnxt_en: Refactor bnxt_rdma_aux_device_init/uninit functions")
+Signed-off-by: Ruoyu Wang <ruoyuw560@gmail.com>
 ---
- tools/testing/selftests/net/Makefile          |    1 +
- .../net/srv6_encap_lookup_l3vpn_test.sh       | 1027 +++++++++++++++++
- 2 files changed, 1028 insertions(+)
- create mode 100755 tools/testing/selftests/net/srv6_encap_lookup_l3vpn_test.sh
+v2:
+- Allocate edev and ulp before auxiliary_device_init(), as suggested by
+  Pavan Chebbi.
+v1: https://lore.kernel.org/netdev/20260708143401.3167477-1-ruoyuw560@gmail.com/
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 708d960ae07d..5df0c94ab060 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -85,6 +85,7 @@ TEST_PROGS := \
- 	rxtimestamp.sh \
- 	sctp_vrf.sh \
- 	skf_net_off.sh \
-+	srv6_encap_lookup_l3vpn_test.sh \
- 	srv6_end_dt46_l3vpn_test.sh \
- 	srv6_end_dt4_l3vpn_test.sh \
- 	srv6_end_dt6_l3vpn_test.sh \
-diff --git a/tools/testing/selftests/net/srv6_encap_lookup_l3vpn_test.sh b/tools/testing/selftests/net/srv6_encap_lookup_l3vpn_test.sh
-new file mode 100755
-index 000000000000..d6249303b7ea
---- /dev/null
-+++ b/tools/testing/selftests/net/srv6_encap_lookup_l3vpn_test.sh
-@@ -0,0 +1,1027 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# author: Andrea Mayer <andrea.mayer@uniroma2.it>
-+
-+# This test evaluates the SRv6 encap "lookup" attribute. After encapsulation
-+# the router looks up the route for the first SID, that is the outer IPv6
-+# destination of the encapsulated packet. The attribute selects the FIB table
-+# used for this post-encap SID route lookup.
-+#
-+# Two routers (rt-1, rt-2) provide L3 VPN services over an IPv6 underlay
-+# (fd00::/64). Each router uses a separate VRF per tenant, with default
-+# blackhole routes (IPv4 and IPv6) to prevent traffic from leaking out of
-+# the VRF. Tenant traffic is encapsulated, then decapsulated with an
-+# End.DT46. Each router proxies both NDP and ARP.
-+#
-+# The routes that match the first SIDs are installed in a dedicated underlay
-+# table (500) rather than the main table (254). The encap routes use
-+# "lookup 500" to select this table for the post-encap SID route lookup.
-+#
-+# Without the "lookup" attribute, the route for the first SID cannot be found:
-+#  - on the input path (forwarded traffic), the lookup stays in the VRF
-+#    and hits the blackhole;
-+#  - on the output path (locally originated traffic), the lookup falls
-+#    through to the main table, with no route to the first SID.
-+#
-+#
-+# Legend (specific per-tenant addresses are in the instantiation tables below):
-+#   X          = tenant id and VRF table id; two tenants: 100 and 200
-+#                ("tX" means tenant X, e.g. t100, t200)
-+#   a, b       = the two host ids of the tenant
-+#   HA, HB     = addresses of host a, host b
-+#   RLO1, RLO2 = rlo-X router loopback address on rt-1, rt-2 (tenant gateway
-+#                for the output path, dual-stack)
-+#   vrf-X      = per-tenant VRF on each router (table X)
-+#
-+# Constants (same for every tenant):
-+#   underlay   = table 500; post-encap SID route lookup (via "lookup 500")
-+#   localsid   = table 90; holds the decap SIDs (End.DT46)
-+#   fd00::/64  = underlay link between rt-1 and rt-2
-+#   veth-tX    = cafe::254/10.0.0.254 (tenant gateway on veth, both routers)
-+#
-+#
-+# +-------------------+                                   +-------------------+
-+# |                   |                                   |                   |
-+# |   hs-tX-a netns   |                                   |   hs-tX-b netns   |
-+# |                   |                                   |                   |
-+# |  +-------------+  |                                   |  +-------------+  |
-+# |  |    veth0    |  |                                   |  |    veth0    |  |
-+# |  |     HA      |  |                                   |  |     HB      |  |
-+# |  +-------------+  |                                   |  +-------------+  |
-+# |        .          |                                   |         .         |
-+# +-------------------+                                   +-------------------+
-+#          .                                                        .
-+#          .                                                        .
-+# +-----------------------------------+   +-----------------------------------+
-+# |        .                          |   |                         .         |
-+# | +---------------+                 |   |                 +---------------+ |
-+# | |   veth-tX     |   +----------+  |   |  +----------+   |   veth-tX     | |
-+# | |  ::254/.254   |   | localsid |  |   |  | localsid |   |  ::254/.254   | |
-+# | +-------+-------+   +----------+  |   |  +----------+   +-------+-------+ |
-+# |         |           +----------+  |   |  +----------+           |         |
-+# |    +----+----+      | underlay |  |   |  | underlay |      +----+----+    |
-+# |    | vrf-X   |      +----------+  |   |  +----------+      | vrf-X   |    |
-+# |    +----+----+                    |   |                    +----+----+    |
-+# |         |                         |   |                         |         |
-+# |   +-----+----+    +------------+  |   |  +------------+    +----+-----+   |
-+# |   |  rlo-X   |    |   veth0    |  |   |  |   veth0    |    |  rlo-X   |   |
-+# |   |   RLO1   |    | fd00::1/64 |..|...|..| fd00::2/64 |    |   RLO2   |   |
-+# |   +----------+    +------------+  |   |  +------------+    +----------+   |
-+# |              rt-1 netns           |   |          rt-2 netns               |
-+# +-----------------------------------+   +-----------------------------------+
-+#
-+#
-+# Per-tenant instantiation:
-+# +-----+------+-------------------+-------------------+
-+# |  X  | a, b | HA                | HB                |
-+# +-----+------+-------------------+-------------------+
-+# | 100 | 1, 2 | cafe::1, 10.0.0.1 | cafe::2, 10.0.0.2 |
-+# | 200 | 3, 4 | cafe::3, 10.0.0.3 | cafe::4, 10.0.0.4 |
-+# +-----+------+-------------------+-------------------+
-+#
-+# Router loopback (rlo-X) addresses, per tenant:
-+# +-----+-----------------------+-----------------------+
-+# |  X  | RLO1 (rt-1)           | RLO2 (rt-2)           |
-+# +-----+-----------------------+-----------------------+
-+# | 100 | cafe::101, 10.0.0.101 | cafe::102, 10.0.0.102 |
-+# | 200 | cafe::201, 10.0.0.201 | cafe::202, 10.0.0.202 |
-+# +-----+-----------------------+-----------------------+
-+#
-+#
-+# Network configuration
-+# =====================
-+#
-+# rt-1: localsid table (table 90)
-+# +--------+--------------------+----------------------------------+
-+# | tenant | SID                | Action                           |
-+# +--------+--------------------+----------------------------------+
-+# |  100   | fc00:2:1:100::0d46 | apply SRv6 End.DT46 vrftable 100 |
-+# |  200   | fc00:2:1:200::0d46 | apply SRv6 End.DT46 vrftable 200 |
-+# +--------+--------------------+----------------------------------+
-+#
-+# rt-1: underlay table (table 500) - post-encap SID route lookup
-+# +--------+--------------------+-------------------------------+
-+# | tenant | SID                | Action                        |
-+# +--------+--------------------+-------------------------------+
-+# |  100   | fc00:1:2:100::0d46 | forward via fd00::2 dev veth0 |
-+# |  200   | fc00:1:2:200::0d46 | forward via fd00::2 dev veth0 |
-+# +--------+--------------------+-------------------------------+
-+#
-+# rt-1: VRF tables (per tenant: vrf-X = table X)
-+# +--------+------------+------------------------------------------+
-+# | tenant | dst        | encap action                             |
-+# +--------+------------+------------------------------------------+
-+# | 100    | cafe::2    | encap segs fc00:1:2:100::0d46 lookup 500 |
-+# |        | 10.0.0.2   |                                          |
-+# |        | cafe::102  |                                          |
-+# |        | 10.0.0.102 |                                          |
-+# | 200    | cafe::4    | encap segs fc00:1:2:200::0d46 lookup 500 |
-+# |        | 10.0.0.4   |                                          |
-+# |        | cafe::202  |                                          |
-+# |        | 10.0.0.202 |                                          |
-+# +--------+------------+------------------------------------------+
-+#
-+#
-+# rt-2: localsid table (table 90)
-+# +--------+--------------------+----------------------------------+
-+# | tenant | SID                | Action                           |
-+# +--------+--------------------+----------------------------------+
-+# |  100   | fc00:1:2:100::0d46 | apply SRv6 End.DT46 vrftable 100 |
-+# |  200   | fc00:1:2:200::0d46 | apply SRv6 End.DT46 vrftable 200 |
-+# +--------+--------------------+----------------------------------+
-+#
-+# rt-2: underlay table (table 500) - post-encap SID route lookup
-+# +--------+--------------------+-------------------------------+
-+# | tenant | SID                | Action                        |
-+# +--------+--------------------+-------------------------------+
-+# |  100   | fc00:2:1:100::0d46 | forward via fd00::1 dev veth0 |
-+# |  200   | fc00:2:1:200::0d46 | forward via fd00::1 dev veth0 |
-+# +--------+--------------------+-------------------------------+
-+#
-+# rt-2: VRF tables (per tenant: vrf-X = table X)
-+# +--------+------------+------------------------------------------+
-+# | tenant | dst        | encap action                             |
-+# +--------+------------+------------------------------------------+
-+# | 100    | cafe::1    | encap segs fc00:2:1:100::0d46 lookup 500 |
-+# |        | 10.0.0.1   |                                          |
-+# |        | cafe::101  |                                          |
-+# |        | 10.0.0.101 |                                          |
-+# | 200    | cafe::3    | encap segs fc00:2:1:200::0d46 lookup 500 |
-+# |        | 10.0.0.3   |                                          |
-+# |        | cafe::201  |                                          |
-+# |        | 10.0.0.201 |                                          |
-+# +--------+------------+------------------------------------------+
-+# Within a tenant, a single SID reaches the adjacent router (its loopback)
-+# and the remote host connected to it, in both IPv4 and IPv6.
-+#
-+# For both rt-1 and rt-2, each VRF also has the connected host prefix (cafe::/64
-+# or 10.0.0.0/24) and a default blackhole (IPv4 and IPv6).
-+#
-+#
-+# Locally originated traffic (output path)
-+# ========================================
-+#
-+# The configuration above covers forwarded traffic, where packets arrive from
-+# a host and are encapsulated by the router. To also test router-originated
-+# traffic, each router pings the other router's loopback address through
-+# the VPN.
-+#
-+# Example (tenant 100), rt-1 pings cafe::102 (rt-2's loopback):
-+#   1. rt-1 looks up cafe::102 in vrf-100 and encapsulates it (SID
-+#      fc00:1:2:100::0d46), then "lookup 500" finds the route for the SID in the
-+#      underlay table (next hop fd00::2) and forwards it;
-+#   2. rt-2 decapsulates it (localsid, End.DT46) and delivers it locally
-+#      (cafe::102 is on the rlo-100 interface);
-+#   3. rt-2 replies with destination cafe::101 (rt-1's loopback). rt-2 looks up
-+#      cafe::101 in vrf-100 and encapsulates it back to rt-1 (again via "lookup
-+#      500"). rt-1 decapsulates it and delivers it.
-+
-+# shellcheck source=lib.sh
-+source lib.sh
-+
-+readonly LOCALSID_TABLE_ID=90
-+readonly UNDERLAY_TABLE_ID=500
-+readonly IPv6_RT_NETWORK=fd00
-+readonly IPv6_HS_NETWORK=cafe
-+readonly IPv4_HS_NETWORK=10.0.0
-+readonly VPN_LOCATOR_SERVICE=fc00
-+readonly DT46_FUNC=0d46
-+readonly DUMMY_DEVNAME=dum0
-+readonly IPv6_TESTS_ADDR=2001:db8::1
-+readonly TESTS_TABLE_ID=54321
-+PING_TIMEOUT_SEC=4
-+
-+SETUP_ERR=1
-+
-+ret=${ksft_skip}
-+nsuccess=0
-+nfail=0
-+
-+PAUSE_ON_FAIL=${PAUSE_ON_FAIL:=no}
-+
-+log_test()
-+{
-+	local rc="$1"
-+	local expected="$2"
-+	local msg="$3"
-+
-+	if [ "${rc}" -eq "${expected}" ]; then
-+		nsuccess=$((nsuccess+1))
-+		printf "\n    TEST: %-60s  [ OK ]\n" "${msg}"
-+	else
-+		ret=1
-+		nfail=$((nfail+1))
-+		printf "\n    TEST: %-60s  [FAIL]\n" "${msg}"
-+		if [ "${PAUSE_ON_FAIL}" = "yes" ]; then
-+			echo
-+			echo "hit enter to continue, 'q' to quit"
-+			read -r a
-+			[ "$a" = "q" ] && exit 1
-+		fi
-+	fi
-+}
-+
-+print_log_test_results()
-+{
-+	printf "\nTests passed: %3d\n" "${nsuccess}"
-+	printf "Tests failed: %3d\n"   "${nfail}"
-+
-+	# when a test fails, the value of 'ret' is set to 1 (error code).
-+	# Conversely, when all tests are passed successfully, the 'ret' value
-+	# is set to 0 (success code).
-+	if [ "${ret}" -ne 1 ]; then
-+		ret=0
-+	fi
-+}
-+
-+log_section()
-+{
-+	echo
-+	echo "################################################################################"
-+	echo "TEST SECTION: $*"
-+	echo "################################################################################"
-+}
-+
-+get_rtname()
-+{
-+	local rtid="$1"
-+
-+	echo "rt_${rtid}"
-+}
-+
-+get_rt_nsname()
-+{
-+	local rtid="$1"
-+	local varname
-+
-+	varname="$(get_rtname "${rtid}")"
-+	echo "${!varname}"
-+}
-+
-+get_hsname()
-+{
-+	local tid="$1"
-+	local hsid="$2"
-+
-+	echo "hs_t${tid}_${hsid}"
-+}
-+
-+get_hs_nsname()
-+{
-+	local tid="$1"
-+	local hsid="$2"
-+	local varname
-+
-+	varname="$(get_hsname "${tid}" "${hsid}")"
-+	echo "${!varname}"
-+}
-+
-+cleanup()
-+{
-+	ip link del veth-rt-1 2>/dev/null || true
-+	ip link del veth-rt-2 2>/dev/null || true
-+
-+	cleanup_all_ns
-+
-+	# check whether the setup phase was completed successfully or not. In
-+	# case of an error during the setup phase of the testing environment,
-+	# the selftest is considered as "skipped".
-+	if [ "${SETUP_ERR}" -ne 0 ]; then
-+		echo "SKIP: Setting up the testing environment failed"
-+		exit "${ksft_skip}"
-+	fi
-+
-+	exit "${ret}"
-+}
-+
-+# Host id of the router loopback (rlo) for a (router, tenant) pair.
-+# E.g. rt-1/tenant 100 -> 101, rt-2/tenant 200 -> 202.
-+get_rlo_hostid()
-+{
-+	local rtid="$1"
-+	local tid="$2"
-+
-+	echo "$((tid + rtid))"
-+}
-+
-+build_vpn_sid()
-+{
-+	local rtsrc="$1"
-+	local rtdst="$2"
-+	local tid="$3"
-+
-+	echo "${VPN_LOCATOR_SERVICE}:${rtsrc}:${rtdst}:${tid}::${DT46_FUNC}"
-+}
-+
-+# Install a dual-stack (IPv6 and IPv4) encap route in a VRF on the given
-+# router.
-+# args:
-+#  $1 - router id
-+#  $2 - host part of the IPv6 destination
-+#  $3 - host part of the IPv4 destination
-+#  $4 - SRv6 SID used as the encap destination
-+#  $5 - tenant id
-+#  $6 - if "true", add the "lookup" attribute to the encap route
-+__set_encap_route()
-+{
-+	local rt="$1"
-+	local dst6="$2"
-+	local dst4="$3"
-+	local sid="$4"
-+	local tid="$5"
-+	local use_lookup="$6"
-+	local lookup=''
-+	local rtname
-+
-+	rtname="$(get_rt_nsname "${rt}")"
-+
-+	if [ "${use_lookup}" = "true" ]; then
-+		lookup="lookup ${UNDERLAY_TABLE_ID}"
-+	fi
-+
-+	# shellcheck disable=SC2086
-+	ip -netns "${rtname}" -6 route replace \
-+		"${IPv6_HS_NETWORK}::${dst6}/128" vrf "vrf-${tid}" \
-+		encap seg6 mode encap segs "${sid}" ${lookup} dev veth0
-+
-+	# shellcheck disable=SC2086
-+	ip -netns "${rtname}" -4 route replace \
-+		"${IPv4_HS_NETWORK}.${dst4}/32" vrf "vrf-${tid}" \
-+		encap seg6 mode encap segs "${sid}" ${lookup} dev veth0
-+}
-+
-+# Install the dual-stack encap route for a tenant host on rt, with the
-+# "lookup" attribute so the first SID is looked up in the underlay table.
-+# args:
-+#  $1 - router id where the encap route is installed
-+#  $2 - host destination id (host part of cafe::<id>/128 and 10.0.0.<id>/32)
-+#  $3 - SRv6 SID used as the encap destination
-+#  $4 - tenant id
-+set_host_encap_route()
-+{
-+	local rt="$1"
-+	local hsdst="$2"
-+	local sid="$3"
-+	local tid="$4"
-+
-+	__set_encap_route "${rt}" "${hsdst}" "${hsdst}" "${sid}" "${tid}" true
-+}
-+
-+set_host_encap_route_nolookup()
-+{
-+	local rt="$1"
-+	local hsdst="$2"
-+	local sid="$3"
-+	local tid="$4"
-+
-+	__set_encap_route "${rt}" "${hsdst}" "${hsdst}" "${sid}" "${tid}" false
-+}
-+
-+# Install the dual-stack encap route on rtsrc toward rtdst's rlo loopback
-+# (RLO1 or RLO2, see header), with the "lookup" attribute so the first
-+# SID is looked up in the underlay table.
-+# args:
-+#  $1 - router id where the encap route is installed
-+#  $2 - router id whose loopback address is the route destination
-+#  $3 - SRv6 SID used as the encap destination
-+#  $4 - tenant id
-+set_gw_encap_route()
-+{
-+	local rtsrc="$1"
-+	local rtdst="$2"
-+	local sid="$3"
-+	local tid="$4"
-+	local dst
-+
-+	dst="$(get_rlo_hostid "${rtdst}" "${tid}")"
-+
-+	__set_encap_route "${rtsrc}" "${dst}" "${dst}" "${sid}" "${tid}" true
-+}
-+
-+set_gw_encap_route_nolookup()
-+{
-+	local rtsrc="$1"
-+	local rtdst="$2"
-+	local sid="$3"
-+	local tid="$4"
-+	local dst
-+
-+	dst="$(get_rlo_hostid "${rtdst}" "${tid}")"
-+
-+	__set_encap_route "${rtsrc}" "${dst}" "${dst}" "${sid}" "${tid}" false
-+}
-+
-+# Setup the basic networking for a router
-+setup_rt_networking()
-+{
-+	local id="$1"
-+	local nsname
-+
-+	nsname="$(get_rt_nsname "${id}")"
-+
-+	ip link set "veth-rt-${id}" netns "${nsname}"
-+	ip -netns "${nsname}" link set "veth-rt-${id}" name veth0
-+
-+	ip netns exec "${nsname}" sysctl -wq net.ipv6.conf.all.accept_dad=0
-+	ip netns exec "${nsname}" sysctl -wq net.ipv6.conf.default.accept_dad=0
-+
-+	ip -netns "${nsname}" addr add "${IPv6_RT_NETWORK}::${id}/64" dev veth0 nodad
-+	ip -netns "${nsname}" link set veth0 up
-+
-+	ip netns exec "${nsname}" sysctl -wq net.ipv4.ip_forward=1
-+	ip netns exec "${nsname}" sysctl -wq net.ipv6.conf.all.forwarding=1
-+}
-+
-+# Setup a host namespace and attach it to its gateway
-+setup_hs()
-+{
-+	local hid="$1"
-+	local rid="$2"
-+	local tid="$3"
-+	local rtveth="veth-t${tid}"
-+	local hsname
-+	local rtname
-+
-+	hsname="$(get_hs_nsname "${tid}" "${hid}")"
-+	rtname="$(get_rt_nsname "${rid}")"
-+
-+	ip netns exec "${hsname}" sysctl -wq net.ipv6.conf.all.accept_dad=0
-+	ip netns exec "${hsname}" sysctl -wq net.ipv6.conf.default.accept_dad=0
-+
-+	ip -netns "${hsname}" link add veth0 type veth peer name "${rtveth}"
-+	ip -netns "${hsname}" link set "${rtveth}" netns "${rtname}"
-+
-+	ip -netns "${hsname}" addr add \
-+		"${IPv6_HS_NETWORK}::${hid}/64" dev veth0 nodad
-+	ip -netns "${hsname}" addr add \
-+		"${IPv4_HS_NETWORK}.${hid}/24" dev veth0
-+
-+	ip -netns "${hsname}" link set veth0 up
-+}
-+
-+# Setup the per-tenant VRF on a router (gateway, loopback, blackhole)
-+setup_rt()
-+{
-+	local rid="$1"
-+	local tid="$2"
-+	local rtveth="veth-t${tid}"
-+	local rlo_dev="rlo-${tid}"
-+	local rtname
-+	local gw_addr_v6
-+	local gw_addr_v4
-+
-+	rtname="$(get_rt_nsname "${rid}")"
-+
-+	gw_addr_v6="${IPv6_HS_NETWORK}::$(get_rlo_hostid "${rid}" "${tid}")"
-+	gw_addr_v4="${IPv4_HS_NETWORK}.$(get_rlo_hostid "${rid}" "${tid}")"
-+
-+	ip -netns "${rtname}" link add "vrf-${tid}" type vrf table "${tid}"
-+	ip -netns "${rtname}" link set "vrf-${tid}" up
-+
-+	ip -netns "${rtname}" link set "${rtveth}" master "vrf-${tid}"
-+
-+	ip -netns "${rtname}" addr add \
-+		"${IPv6_HS_NETWORK}::254/64" dev "${rtveth}" nodad
-+	ip -netns "${rtname}" addr add \
-+		"${IPv4_HS_NETWORK}.254/24" dev "${rtveth}"
-+
-+	ip -netns "${rtname}" link set "${rtveth}" up
-+
-+	ip netns exec "${rtname}" \
-+		sysctl -wq "net.ipv6.conf.${rtveth}.proxy_ndp=1"
-+	ip netns exec "${rtname}" \
-+		sysctl -wq "net.ipv4.conf.${rtveth}.proxy_arp=1"
-+
-+	ip netns exec "${rtname}" sh -c "echo 1 > /proc/sys/net/vrf/strict_mode"
-+
-+	# router loopback interface for locally originated traffic
-+	ip -netns "${rtname}" link add "${rlo_dev}" type dummy
-+	ip -netns "${rtname}" link set "${rlo_dev}" master "vrf-${tid}"
-+
-+	ip -netns "${rtname}" addr add "${gw_addr_v6}/128" \
-+		dev "${rlo_dev}" nodad
-+	ip -netns "${rtname}" addr add "${gw_addr_v4}/32" \
-+		dev "${rlo_dev}"
-+
-+	ip -netns "${rtname}" link set "${rlo_dev}" up
-+
-+	# default blackhole routes in the VRF: any traffic that does not match
-+	# a specific route is dropped. Without the "lookup" attribute on the
-+	# encap route, the route for the first SID cannot be found from within
-+	# the VRF.
-+	ip -netns "${rtname}" -6 route add blackhole default metric 4278198272 \
-+		vrf "vrf-${tid}"
-+	ip -netns "${rtname}" -4 route add blackhole default metric 4278198272 \
-+		vrf "vrf-${tid}"
-+}
-+
-+# Configure a one-way VPN path towards hsdst (on rtdst) for tenant tid.
-+# The encap side is set up on rtsrc and the decap side on rtdst.
-+# args:
-+#  $1 - router id where the encap side is set up
-+#  $2 - host id of the destination host
-+#  $3 - router id of the destination router (connected to the destination host)
-+#  $4 - tenant id
-+setup_vpn_config()
-+{
-+	local rtsrc="$1"
-+	local hsdst="$2"
-+	local rtdst="$3"
-+	local tid="$4"
-+	local rtveth="veth-t${tid}"
-+	local rtsrc_name
-+	local rtdst_name
-+	local vpn_sid
-+
-+	rtsrc_name="$(get_rt_nsname "${rtsrc}")"
-+	rtdst_name="$(get_rt_nsname "${rtdst}")"
-+	vpn_sid="$(build_vpn_sid "${rtsrc}" "${rtdst}" "${tid}")"
-+
-+	ip -netns "${rtsrc_name}" -6 neigh add proxy \
-+		"${IPv6_HS_NETWORK}::${hsdst}" dev "${rtveth}"
-+	set_host_encap_route "${rtsrc}" "${hsdst}" "${vpn_sid}" "${tid}"
-+
-+	ip -netns "${rtsrc_name}" -6 route add "${vpn_sid}/128" \
-+		table "${UNDERLAY_TABLE_ID}" \
-+		via "fd00::${rtdst}" dev veth0
-+
-+	# set the decap route for decapsulating packets arriving from rtsrc
-+	# and destined to hsdst
-+	ip -netns "${rtdst_name}" -6 route add "${vpn_sid}/128" \
-+		table "${LOCALSID_TABLE_ID}" \
-+		encap seg6local action End.DT46 \
-+		vrftable "${tid}" dev "vrf-${tid}"
-+
-+	# all SIDs for VPNs start with a common locator which is fc00::/16.
-+	# Routes for handling the SRv6 End.DT* behavior instances are grouped
-+	# together in the 'localsid' table.
-+	#
-+	# NOTE: added only once
-+	if ! ip -netns "${rtdst_name}" -6 rule show | \
-+	    grep -q "to ${VPN_LOCATOR_SERVICE}::/16 lookup ${LOCALSID_TABLE_ID}"; then
-+		ip -netns "${rtdst_name}" -6 rule add \
-+			to "${VPN_LOCATOR_SERVICE}::/16" \
-+			lookup "${LOCALSID_TABLE_ID}" prio 999
-+	fi
-+}
-+
-+# Configure rtsrc to reach rtdst's loopback address through the VPN.
-+# args:
-+#  $1 - router id where the encap route is installed
-+#  $2 - router id whose loopback is the destination
-+#  $3 - tenant id
-+setup_vpn_gw_encap()
-+{
-+	local rtsrc="$1"
-+	local rtdst="$2"
-+	local tid="$3"
-+	local sid
-+
-+	sid="$(build_vpn_sid "${rtsrc}" "${rtdst}" "${tid}")"
-+
-+	set_gw_encap_route "${rtsrc}" "${rtdst}" "${sid}" "${tid}"
-+}
-+
-+setup()
-+{
-+	ip link add veth-rt-1 type veth peer name veth-rt-2
-+	setup_ns rt_1 rt_2
-+	setup_rt_networking 1
-+	setup_rt_networking 2
-+
-+	# setup two hosts for the tenant 100.
-+	#  - host hs-t100-1 is directly connected to the router rt-1;
-+	#  - host hs-t100-2 is directly connected to the router rt-2.
-+	setup_ns hs_t100_1 hs_t100_2
-+	setup_hs 1 1 100
-+	setup_hs 2 2 100
-+
-+	# setup two hosts for the tenant 200.
-+	#  - host hs-t200-3 is directly connected to the router rt-1;
-+	#  - host hs-t200-4 is directly connected to the router rt-2.
-+	setup_ns hs_t200_3 hs_t200_4
-+	setup_hs 3 1 200
-+	setup_hs 4 2 200
-+
-+	# configure each router for each tenant: VRF, blackhole routes,
-+	# router loopback interface
-+	setup_rt 1 100
-+	setup_rt 2 100
-+	setup_rt 1 200
-+	setup_rt 2 200
-+
-+	# setup the L3 VPN which connects the host hs-t100-1 and host hs-t100-2
-+	# within the same tenant 100.
-+	setup_vpn_config 1 2 2 100
-+	setup_vpn_config 2 1 1 100
-+
-+	# setup the L3 VPN which connects the host hs-t200-3 and host hs-t200-4
-+	# within the same tenant 200.
-+	setup_vpn_config 1 4 2 200
-+	setup_vpn_config 2 3 1 200
-+
-+	# allow each router to reach the other's loopback through the VPN
-+	setup_vpn_gw_encap 2 1 100
-+	setup_vpn_gw_encap 1 2 100
-+	setup_vpn_gw_encap 2 1 200
-+	setup_vpn_gw_encap 1 2 200
-+
-+	# testing environment was set up successfully
-+	SETUP_ERR=0
-+}
-+
-+check_rt_connectivity()
-+{
-+	local rtsrc="$1"
-+	local rtdst="$2"
-+	local nsname
-+
-+	nsname="$(get_rt_nsname "${rtsrc}")"
-+
-+	ip netns exec "${nsname}" ping -c 1 -W 1 "${IPv6_RT_NETWORK}::${rtdst}" \
-+		>/dev/null 2>&1
-+}
-+
-+check_and_log_rt_connectivity()
-+{
-+	local rtsrc="$1"
-+	local rtdst="$2"
-+
-+	check_rt_connectivity "${rtsrc}" "${rtdst}"
-+	log_test $? 0 "Routers connectivity: rt-${rtsrc} -> rt-${rtdst}"
-+}
-+
-+check_hs_ipv6_connectivity()
-+{
-+	local hssrc="$1"
-+	local hsdst="$2"
-+	local tid="$3"
-+	local nsname
-+
-+	nsname="$(get_hs_nsname "${tid}" "${hssrc}")"
-+
-+	ip netns exec "${nsname}" ping -c 1 -W "${PING_TIMEOUT_SEC}" \
-+		"${IPv6_HS_NETWORK}::${hsdst}" >/dev/null 2>&1
-+}
-+
-+check_hs_ipv4_connectivity()
-+{
-+	local hssrc="$1"
-+	local hsdst="$2"
-+	local tid="$3"
-+	local nsname
-+
-+	nsname="$(get_hs_nsname "${tid}" "${hssrc}")"
-+
-+	ip netns exec "${nsname}" ping -c 1 -W "${PING_TIMEOUT_SEC}" \
-+		"${IPv4_HS_NETWORK}.${hsdst}" >/dev/null 2>&1
-+}
-+
-+check_and_log_hs_connectivity()
-+{
-+	local hssrc="$1"
-+	local hsdst="$2"
-+	local tid="$3"
-+
-+	check_hs_ipv6_connectivity "${hssrc}" "${hsdst}" "${tid}"
-+	log_test $? 0 "IPv6 connectivity: hs-t${tid}-${hssrc} -> hs-t${tid}-${hsdst} (tenant ${tid})"
-+
-+	check_hs_ipv4_connectivity "${hssrc}" "${hsdst}" "${tid}"
-+	log_test $? 0 "IPv4 connectivity: hs-t${tid}-${hssrc} -> hs-t${tid}-${hsdst} (tenant ${tid})"
-+}
-+
-+check_and_log_hs_isolation()
-+{
-+	local hssrc="$1"
-+	local tidsrc="$2"
-+	local hsdst="$3"
-+	local tiddst="$4"
-+
-+	check_hs_ipv6_connectivity "${hssrc}" "${hsdst}" "${tidsrc}"
-+	log_test $? 1 "IPv6 isolation: hs-t${tidsrc}-${hssrc} -X-> hs-t${tiddst}-${hsdst}"
-+
-+	check_hs_ipv4_connectivity "${hssrc}" "${hsdst}" "${tidsrc}"
-+	log_test $? 1 "IPv4 isolation: hs-t${tidsrc}-${hssrc} -X-> hs-t${tiddst}-${hsdst}"
-+}
-+
-+check_and_log_hs2gw_connectivity()
-+{
-+	local hssrc="$1"
-+	local tid="$2"
-+
-+	check_hs_ipv6_connectivity "${hssrc}" 254 "${tid}"
-+	log_test $? 0 "IPv6 connectivity: hs-t${tid}-${hssrc} -> gw (tenant ${tid})"
-+
-+	check_hs_ipv4_connectivity "${hssrc}" 254 "${tid}"
-+	log_test $? 0 "IPv4 connectivity: hs-t${tid}-${hssrc} -> gw (tenant ${tid})"
-+}
-+
-+router_tests()
-+{
-+	log_section "IPv6 routers connectivity test"
-+
-+	check_and_log_rt_connectivity 1 2
-+	check_and_log_rt_connectivity 2 1
-+}
-+
-+host2gateway_tests()
-+{
-+	log_section "Connectivity test among hosts and gateway"
-+
-+	check_and_log_hs2gw_connectivity 1 100
-+	check_and_log_hs2gw_connectivity 2 100
-+
-+	check_and_log_hs2gw_connectivity 3 200
-+	check_and_log_hs2gw_connectivity 4 200
-+}
-+
-+host_vpn_tests()
-+{
-+	log_section "SRv6 VPN connectivity test among hosts in the same tenant"
-+
-+	check_and_log_hs_connectivity 1 2 100
-+	check_and_log_hs_connectivity 2 1 100
-+
-+	check_and_log_hs_connectivity 3 4 200
-+	check_and_log_hs_connectivity 4 3 200
-+}
-+
-+host_vpn_isolation_tests()
-+{
-+	local l1="1 2"
-+	local l2="3 4"
-+	local t1=100
-+	local t2=200
-+	local i
-+	local j
-+	local tmp
-+
-+	log_section "SRv6 VPN isolation test among hosts in different tenants"
-+
-+	for _ in 0 1; do
-+		for i in ${l1}; do
-+			for j in ${l2}; do
-+				check_and_log_hs_isolation "${i}" "${t1}" "${j}" "${t2}"
-+			done
-+		done
-+
-+		# let us test the reverse path
-+		tmp="${l1}"; l1="${l2}"; l2="${tmp}"
-+		tmp=${t1}; t1=${t2}; t2=${tmp}
-+	done
-+}
-+
-+__test_nolookup()
-+{
-+	local hssrc="$1"
-+	local hsdst="$2"
-+	local rtsrc="$3"
-+	local rtdst="$4"
-+	local tid="$5"
-+	local vpn_sid
-+
-+	vpn_sid="$(build_vpn_sid "${rtsrc}" "${rtdst}" "${tid}")"
-+
-+	# replace encap route(s) without "lookup" attribute
-+	set_host_encap_route_nolookup "${rtsrc}" "${hsdst}" "${vpn_sid}" "${tid}"
-+
-+	check_hs_ipv6_connectivity "${hssrc}" "${hsdst}" "${tid}"
-+	log_test $? 1 "IPv6 w/o lookup: hs-t${tid}-${hssrc} -X-> hs-t${tid}-${hsdst} (tenant ${tid})"
-+
-+	check_hs_ipv4_connectivity "${hssrc}" "${hsdst}" "${tid}"
-+	log_test $? 1 "IPv4 w/o lookup: hs-t${tid}-${hssrc} -X-> hs-t${tid}-${hsdst} (tenant ${tid})"
-+
-+	# restore encap route(s) with "lookup" for subsequent tests
-+	set_host_encap_route "${rtsrc}" "${hsdst}" "${vpn_sid}" "${tid}"
-+}
-+
-+host_vpn_nolookup_tests()
-+{
-+	log_section "SRv6 VPN connectivity test among hosts w/o lookup"
-+
-+	__test_nolookup 1 2 1 2 100
-+	__test_nolookup 2 1 2 1 100
-+
-+	__test_nolookup 3 4 1 2 200
-+	__test_nolookup 4 3 2 1 200
-+}
-+
-+check_gw_ipv6_connectivity()
-+{
-+	local rtsrc="$1"
-+	local rtdst="$2"
-+	local tidsrc="$3"
-+	local tiddst="$4"
-+	local rtname
-+	local src_v6
-+	local dst_v6
-+
-+	rtname="$(get_rt_nsname "${rtsrc}")"
-+	src_v6="${IPv6_HS_NETWORK}::$(get_rlo_hostid "${rtsrc}" "${tidsrc}")"
-+	dst_v6="${IPv6_HS_NETWORK}::$(get_rlo_hostid "${rtdst}" "${tiddst}")"
-+
-+	ip netns exec "${rtname}" ip vrf exec "vrf-${tidsrc}" \
-+		ping -c 1 -W "${PING_TIMEOUT_SEC}" \
-+		-I "${src_v6}" "${dst_v6}" >/dev/null 2>&1
-+}
-+
-+check_gw_ipv4_connectivity()
-+{
-+	local rtsrc="$1"
-+	local rtdst="$2"
-+	local tidsrc="$3"
-+	local tiddst="$4"
-+	local rtname
-+	local src_v4
-+	local dst_v4
-+
-+	rtname="$(get_rt_nsname "${rtsrc}")"
-+	src_v4="${IPv4_HS_NETWORK}.$(get_rlo_hostid "${rtsrc}" "${tidsrc}")"
-+	dst_v4="${IPv4_HS_NETWORK}.$(get_rlo_hostid "${rtdst}" "${tiddst}")"
-+
-+	ip netns exec "${rtname}" ip vrf exec "vrf-${tidsrc}" \
-+		ping -c 1 -W "${PING_TIMEOUT_SEC}" \
-+		-I "${src_v4}" "${dst_v4}" >/dev/null 2>&1
-+}
-+
-+check_and_log_gw_connectivity()
-+{
-+	local rtsrc="$1"
-+	local rtdst="$2"
-+	local tid="$3"
-+
-+	check_gw_ipv6_connectivity "${rtsrc}" "${rtdst}" "${tid}" "${tid}"
-+	log_test $? 0 "IPv6 connectivity: rt-${rtsrc} -> rt-${rtdst} (tenant ${tid})"
-+
-+	check_gw_ipv4_connectivity "${rtsrc}" "${rtdst}" "${tid}" "${tid}"
-+	log_test $? 0 "IPv4 connectivity: rt-${rtsrc} -> rt-${rtdst} (tenant ${tid})"
-+}
-+
-+check_and_log_gw_isolation()
-+{
-+	local rtsrc="$1"
-+	local rtdst="$2"
-+	local tidsrc="$3"
-+	local tiddst="$4"
-+
-+	check_gw_ipv6_connectivity "${rtsrc}" "${rtdst}" "${tidsrc}" "${tiddst}"
-+	log_test $? 1 "IPv6 isolation: rt-${rtsrc} -X-> rt-${rtdst} (tenants ${tidsrc}/${tiddst})"
-+
-+	check_gw_ipv4_connectivity "${rtsrc}" "${rtdst}" "${tidsrc}" "${tiddst}"
-+	log_test $? 1 "IPv4 isolation: rt-${rtsrc} -X-> rt-${rtdst} (tenants ${tidsrc}/${tiddst})"
-+}
-+
-+gw_vpn_isolation_tests()
-+{
-+	log_section "SRv6 VPN isolation test among routers in different tenants"
-+
-+	check_and_log_gw_isolation 1 2 100 200
-+	check_and_log_gw_isolation 2 1 100 200
-+
-+	check_and_log_gw_isolation 1 2 200 100
-+	check_and_log_gw_isolation 2 1 200 100
-+}
-+
-+gw_vpn_tests()
-+{
-+	log_section "SRv6 VPN connectivity test among routers in the same tenant"
-+
-+	check_and_log_gw_connectivity 1 2 100
-+	check_and_log_gw_connectivity 2 1 100
-+
-+	check_and_log_gw_connectivity 1 2 200
-+	check_and_log_gw_connectivity 2 1 200
-+}
-+
-+__test_gw_nolookup()
-+{
-+	local rtsrc="$1"
-+	local rtdst="$2"
-+	local tid="$3"
-+	local sid
-+
-+	sid="$(build_vpn_sid "${rtsrc}" "${rtdst}" "${tid}")"
-+
-+	# replace gw encap route without "lookup" attribute
-+	set_gw_encap_route_nolookup "${rtsrc}" "${rtdst}" "${sid}" "${tid}"
-+
-+	check_gw_ipv6_connectivity "${rtsrc}" "${rtdst}" "${tid}" "${tid}"
-+	log_test $? 1 "IPv6 w/o lookup: rt-${rtsrc} -X-> rt-${rtdst} (tenant ${tid})"
-+
-+	check_gw_ipv4_connectivity "${rtsrc}" "${rtdst}" "${tid}" "${tid}"
-+	log_test $? 1 "IPv4 w/o lookup: rt-${rtsrc} -X-> rt-${rtdst} (tenant ${tid})"
-+
-+	# restore gw encap route with "lookup" for subsequent tests
-+	set_gw_encap_route "${rtsrc}" "${rtdst}" "${sid}" "${tid}"
-+}
-+
-+gw_vpn_nolookup_tests()
-+{
-+	log_section "SRv6 VPN connectivity test among routers w/o lookup"
-+
-+	__test_gw_nolookup 1 2 100
-+	__test_gw_nolookup 2 1 100
-+
-+	__test_gw_nolookup 1 2 200
-+	__test_gw_nolookup 2 1 200
-+}
-+
-+test_command_or_ksft_skip()
-+{
-+	local cmd="$1"
-+
-+	if [ ! -x "$(command -v "${cmd}")" ]; then
-+		echo "SKIP: Could not run test without \"${cmd}\" tool"
-+		exit "${ksft_skip}"
-+	fi
-+}
-+
-+test_vrf_or_ksft_skip()
-+{
-+	modprobe vrf &>/dev/null || true
-+	if [ ! -e /proc/sys/net/vrf/strict_mode ]; then
-+		echo "SKIP: vrf sysctl does not exist"
-+		exit "${ksft_skip}"
-+	fi
-+}
-+
-+test_dummy_dev_or_ksft_skip()
-+{
-+	local test_netns
-+
-+	setup_ns test_netns
-+
-+	modprobe dummy &>/dev/null || true
-+	if ! ip -netns "${test_netns}" link add "${DUMMY_DEVNAME}" \
-+			type dummy; then
-+		cleanup_ns "${test_netns}"
-+		echo "SKIP: dummy dev not supported"
-+		exit "${ksft_skip}"
-+	fi
-+
-+	cleanup_ns "${test_netns}"
-+}
-+
-+test_encap_lookup_supp_or_ksft_skip()
-+{
-+	local nsname
-+
-+	setup_ns nsname
-+
-+	ip -netns "${nsname}" link add "${DUMMY_DEVNAME}" type dummy
-+	ip -netns "${nsname}" link set "${DUMMY_DEVNAME}" up
-+
-+	if ! ip -netns "${nsname}" -6 route add "${IPv6_TESTS_ADDR}/128" \
-+			encap seg6 mode encap segs fc00::1 \
-+			lookup "${TESTS_TABLE_ID}" \
-+			dev "${DUMMY_DEVNAME}" 2>/dev/null; then
-+		cleanup_ns "${nsname}"
-+		echo "SKIP: seg6 encap lookup attribute not supported"
-+		exit "${ksft_skip}"
-+	fi
-+
-+	# An old kernel with a recent iproute2 accepts the route but
-+	# silently ignores the lookup attribute. Dump the route and check
-+	# the attribute is really there, otherwise the test falsely passes.
-+	if ! ip -netns "${nsname}" -6 route show "${IPv6_TESTS_ADDR}/128" | \
-+			grep -q "lookup ${TESTS_TABLE_ID}"; then
-+		cleanup_ns "${nsname}"
-+		echo "SKIP: seg6 encap lookup attribute not supported"
-+		exit "${ksft_skip}"
-+	fi
-+
-+	cleanup_ns "${nsname}"
-+}
-+
-+if [ "$(id -u)" -ne 0 ]; then
-+	echo "SKIP: Need root privileges"
-+	exit "${ksft_skip}"
-+fi
-+
-+# required programs to carry out this selftest
-+test_command_or_ksft_skip ip
-+test_command_or_ksft_skip ping
-+test_command_or_ksft_skip sysctl
-+test_command_or_ksft_skip grep
-+
-+test_dummy_dev_or_ksft_skip
-+test_vrf_or_ksft_skip
-+test_encap_lookup_supp_or_ksft_skip
-+
-+set -e
-+trap cleanup EXIT
-+
-+setup
-+set +e
-+
-+router_tests
-+host2gateway_tests
-+host_vpn_tests
-+host_vpn_isolation_tests
-+host_vpn_nolookup_tests
-+gw_vpn_tests
-+gw_vpn_isolation_tests
-+gw_vpn_nolookup_tests
-+
-+print_log_test_results
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c | 39 ++++++++++---------
+ 1 file changed, 20 insertions(+), 19 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
+index 5c75193..a515c36 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
+@@ -566,6 +566,18 @@ void bnxt_aux_devices_init(struct bnxt *bp)
+ 		if (!aux_priv)
+ 			goto next_auxdev;
+ 
++		edev = kzalloc_obj(*edev);
++		if (!edev)
++			goto aux_priv_free;
++		aux_priv->edev = edev;
++		bnxt_set_edev_info(edev, bp);
++
++		ulp = kzalloc_obj(*ulp);
++		if (!ulp)
++			goto edev_free;
++		edev->ulp_tbl = ulp;
++		aux_priv->id = idx;
++
+ 		aux_dev = &aux_priv->aux_dev;
+ 		aux_dev->id = bp->auxdev_id;
+ 		aux_dev->name = bnxt_aux_devices[idx].name;
+@@ -573,37 +585,26 @@ void bnxt_aux_devices_init(struct bnxt *bp)
+ 		aux_dev->dev.release = bnxt_aux_dev_release;
+ 
+ 		rc = auxiliary_device_init(aux_dev);
+-		if (rc) {
+-			kfree(aux_priv);
+-			goto next_auxdev;
+-		}
++		if (rc)
++			goto ulp_free;
+ 		bp->aux_priv[idx] = aux_priv;
+ 
+ 		/* From this point, all cleanup will happen via the .release
+ 		 * callback & any error unwinding will need to include a call
+ 		 * to auxiliary_device_uninit.
+ 		 */
+-		edev = kzalloc_obj(*edev);
+-		if (!edev)
+-			goto aux_dev_uninit;
+-
+-		aux_priv->edev = edev;
+-		bnxt_set_edev_info(edev, bp);
+-
+-		ulp = kzalloc_obj(*ulp);
+-		if (!ulp)
+-			goto aux_dev_uninit;
+-
+-		edev->ulp_tbl = ulp;
+ 		bp->edev[idx] = edev;
+ 		if (idx == BNXT_AUXDEV_RDMA)
+ 			bp->ulp_num_msix_want = bnxt_set_dflt_ulp_msix(bp);
+-		aux_priv->id = idx;
+ 		bnxt_auxdev_set_state(bp, idx, BNXT_ADEV_STATE_INIT);
+ 
+ 		continue;
+-aux_dev_uninit:
+-		auxiliary_device_uninit(aux_dev);
++ulp_free:
++		kfree(ulp);
++edev_free:
++		kfree(edev);
++aux_priv_free:
++		kfree(aux_priv);
+ next_auxdev:
+ 		if (idx == BNXT_AUXDEV_RDMA)
+ 			bp->flags &= ~BNXT_FLAG_ROCE_CAP;
 -- 
-2.20.1
-
+2.51.0
 
