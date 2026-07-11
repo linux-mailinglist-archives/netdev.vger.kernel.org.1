@@ -1,193 +1,296 @@
-Return-Path: <netdev+bounces-306872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306873-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kklaLURfUmrLOwMAu9opvQ
-	(envelope-from <netdev+bounces-306872-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:20:36 +0200
+	id Yc07KIVfUmrXOwMAu9opvQ
+	(envelope-from <netdev+bounces-306873-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:21:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05207741F1B
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:20:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F04BC741F2B
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:21:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=dsyq3Cga;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306872-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306872-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=agEM9sdV;
+	dkim=pass header.d=redhat.com header.s=google header.b=Ie9uGZO3;
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306873-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306873-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6EA8C3036398
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 15:19:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9CE1A3024C81
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 15:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 483A72D7DF1;
-	Sat, 11 Jul 2026 15:19:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B27381EB4;
+	Sat, 11 Jul 2026 15:20:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1807381EB4
-	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 15:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E072227FD76
+	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 15:20:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783783185; cv=none; b=OBqS/6NLa5VM3kka46QFVbkY/DD7wGTC63nl5llAoa8Vl6nqqcXqJ99J9yEWAGskVQ/cKO0/4DcWVx6kRh+PWl2sYckmotvEeEcJnLi4f38S47bF7o7sFFQPTM2Fat1yw3nTBhBBPpmq0PQ668o//pb4Uz3ex15xoIMjJ3kamec=
+	t=1783783240; cv=none; b=HhKh5fNc4uenbU2U67oBHsgnBOWLrj5cNo0x/WinmkEOWhYenksnLdVOdMewvkZ0gquF2Oupk6grMRxqRShxv5jt3ULPLxShVwOJGDCc9xY1xbtOS68xni+qbWfBwvnyFfvzV8iSPT/wpfO9x7lzuzS9g7NKIxHlPFrYGCbmPEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783783185; c=relaxed/simple;
-	bh=LQIM3sBGvUqM9efCOb/AIjOUmu6tNvZEUwHUeE2z90I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BhN7HcoBPAahu6VDePy5kJ+GuPx8GwgPJyuZMd92pRSf9CaWdsEpGw54tdnxciLcq0qBslpS0BBNwBcCUuyUwSb41EGSTtE3MyouMGVMRUoco1z5wSUoH/MqeOPYq3lYo7qDORvDDZnvP/JLMkiS8vHKIy9YgskK7CXDosTQEY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dsyq3Cga; arc=none smtp.client-ip=209.85.222.179
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-922ff615c14so146826385a.3
-        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 08:19:43 -0700 (PDT)
+	s=arc-20240116; t=1783783240; c=relaxed/simple;
+	bh=8PCyBlIWQjZCCPrTVN7xE+pF7wIpZzqRFJWJCP5kxbc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OVgysNmkmf3+vdn0n3ow2IoYVfi2xf12z7F8Ax1gIieoQVwOFu2lhSOxW76tVBl1BfD4Ku1MwY13urF8mgsJVMpcQEVcY2BewW+Hvt99+s+ayoF0prfYhcM3DS+h/7qrAR2pi32HSgBPesGIkpoP+q0qky4NyR5K1MlFG+or6+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=agEM9sdV; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ie9uGZO3; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783783236;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QmUM+RWb25XiR9LGFNREMs6O7PLt7AQAUsEOfZqyWvs=;
+	b=agEM9sdVXpRra684f77JCukQwUxJ/mh8evYBUPIhdT3NpRggmxKOEVzAqZ4TE9baCn0VJi
+	xoQ0BciPTXzdikNZAA0PdSa0HlrBtu6g0Lfl427NVxV+XmQ+52LY3nlYEcVAAdH38+XGev
+	YWl/9SjYpEijgrFQ3G6Gtcunuo9PT/4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-343-oyFeasczNMONQkLrNpg96Q-1; Sat, 11 Jul 2026 11:20:34 -0400
+X-MC-Unique: oyFeasczNMONQkLrNpg96Q-1
+X-Mimecast-MFC-AGG-ID: oyFeasczNMONQkLrNpg96Q_1783783233
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-493c20d0468so30795885e9.1
+        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 08:20:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783783183; x=1784387983; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=BG2xjmjBbV5AQK/a/AQpxcpCL6NEh8yOHX50gnWQjos=;
-        b=dsyq3Cga9QBG6oV17iVpysC04tH+/KvLCcOnz45NsPkoGMV3inV3L7FVledU/uxZ1N
-         rtphRWj8QFYGGxfAbk0WPd3i4kNb0NDXrfgx/eFjw7qCBEJiQ1YlaVFd158Omn+3j6ep
-         KDmnGPFpUjqw2tLCCzJ/ZgMgs/trhxYIFuWfvR8+K9QC6327iHNGGoCXX/o/SCIwIJzm
-         Dj8gNLRrXkQwmnqfsYefBayJLzK3HfzMH07z8o/HHmUu9MImyZJd4edfOBdklNXkbgSs
-         AyrzPp3LKEqlqfCD3zC7wc6oODaVsoOBq6ZV1eI5m0K0Da2RcSwVtTuKf3BMvsNA4iQx
-         keEQ==
+        d=redhat.com; s=google; t=1783783233; x=1784388033; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=QmUM+RWb25XiR9LGFNREMs6O7PLt7AQAUsEOfZqyWvs=;
+        b=Ie9uGZO3w5c+yDqEyxr6+FjgGheSV9GOHXMjwQ5WDwRVfGiKDg7juIdEo8b6FsE485
+         kYaVZNsegQ0Hyw2/OfdQ2iz/izQXH+UjThFH6K+7hcXopBgg1Izdx9JJ2lZqY2V0S8SJ
+         hpwk0CwjP4fPQO1SVPAyXdhS0NOjEbjLCZXpawppN90Pq3LJoyOweQsrQ44KZOCp07YL
+         29EZxD5PNwOPgkWyCQQfoIzAVF82TY3TQ03oj/SeCX2lb3g6pvom4folg5gcED15Wn7M
+         KQkUVcKy9r/P+G/lyQZV40wOEsbTUr+ua6RiDbSvtRXry3EECIsRvAJ9Wqx4RaFZxkUf
+         f1Dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783783183; x=1784387983;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=BG2xjmjBbV5AQK/a/AQpxcpCL6NEh8yOHX50gnWQjos=;
-        b=sUhEq2T7P6i5kXqCmRtaCzqkxRfX6eWXjfbRARQnQ+u26bHxjHOvHO5P4A7LSdOzme
-         mh9aVBWU4ZRs/1qrmaCPzSxbXog+Fk0W2uOsk0FEXzbS/bxYVmPZ+Hw3XDHmfPg8cDqN
-         PjpB1YDR4MxsX7H68qQB5GddbJcLnU5z69SON1gk59zkcXWj3DkbidkGt0ZItqX4xEeo
-         L44PlxbpNyxs1NqhjJEKPndUneSJMDjkP4z0hFrgTeCiH1typcs56tez19PlDQnQip+J
-         pQxW3/VDH1frppVDUGv5ueWEPZ9/XnzYlL6wh5qd7ugbyM4rgd1wcfe8TrTbEidClcFG
-         9RLA==
-X-Gm-Message-State: AOJu0Yyai+oVbv/qYXdaZccToOvpL7KOTSsXFkBsBFjQsZnPxX3ApCY5
-	aTuR6PspdN2q0wg8FlALQgHIOlu9/AyNFQrJeSPD1S9gQ3rqka3+AJ7epcSQ8K8bs7k=
-X-Gm-Gg: AfdE7ckIIsqrWoGdIh3opS9F3EVbqXik72eOSJbbo5Y5zfauR/SgfQxvWGG2kDGR9gA
-	goaWy69l68NEy1/syIHwxKanVfhj77pXnsArcUYcanJdXnc6e+9qwxkbFmxgERf5zGg1O0hH/lr
-	efpTf7gXbzSdfwz/vDBcL7uql645vRNjsrvJle7FEfvs9nK6pCmdxo4QiZ4PVbqVC9I9wo3r7wI
-	DRJrRcQKb3nK78kSl0Jow82XOZsOerrGUqqz6YKYdEcbbH8eKwSNrvq9n/goPfRFSxeTsTT4JTA
-	aHeN0b0AvwJThAT+6KViDsG2evhoz1PzIR29uSNX6mKXM12nss3WLshGbabs7vLGwOlBACwWXYo
-	97sLOIKXbNQIxEi/2XSaAK5PFEL1VNRLkBIgw+FF/yZHXJhrFJlgKCk7WqL+JhhwgnOd4jQT9R3
-	TiY6+L2rqEWzPnm/gN4gJv+uQX6r2H43PlrkIQXdRN3oDOs72D9tOxvQhRBU95LWYW8MAUdwz0h
-	WM5FU6heA==
-X-Received: by 2002:a05:620a:2995:b0:92e:c118:18b8 with SMTP id af79cd13be357-92ef2d01681mr351641285a.87.1783783182650;
-        Sat, 11 Jul 2026 08:19:42 -0700 (PDT)
-Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-92ee5b4a082sm467704685a.7.2026.07.11.08.19.40
+        d=1e100.net; s=20251104; t=1783783233; x=1784388033;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=QmUM+RWb25XiR9LGFNREMs6O7PLt7AQAUsEOfZqyWvs=;
+        b=NBCCuwjBxCq2iVeDN4niGNPyp5l59HWgb7XD91OeLbSqsjZaV+8sDcSoCwUGkzqZDv
+         /54VvHmkpDkz2yVm5uPWBbj2Npa+dYDKlzUFwP51Zu2HoDZmW1HWRoeo0MuH7ENhbJlM
+         EBbV2OhJw6VcXuz8Wkrwn1L+NkmXHRcr6CKa1m9MYvFz7F6okqzrnWWXfQ51mbq83AkK
+         RNdSrcDlxc3/X5tX6fplBMA5bjJuLlVHuAtKGESLe+q9ourMLqP54Pyh6G78wcznzU1p
+         DyOZ0/w8AHajeqNyLvf+cRfVaX+Bzm0+QF1sMRn9K1EFZrkOjTDE4oN3+hArU9+LmuJ0
+         ZlUg==
+X-Forwarded-Encrypted: i=1; AHgh+RpxbFHxyfssIIXpF0CwvX+/ETs3n0Nh8pz8aUBOau9di33PqF4ewHJKpt3iadvKxl5NwA56dbw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7rimqZ+GqKyO+1ijr29VRJf157es2LS3L8Eyz0Ipwfc9igJXV
+	dJfsebUuY8JOPvHMVkea67/m+XYKn5aDfr6NRcturbWI386RdF8c4iyRKXJ3nU7Iwi9p851/jfd
+	XTNSGJUEtUCYdWyJnD2cJ+NnCpsZpHU561pDNO4TspWiU8X3aB3yf1ua35Q==
+X-Gm-Gg: AfdE7clyE4XyKywaLaBjk6NEdJP2Wuv53Po3iY0GRleSKc3+HorekH0lEo2HfuDW7M6
+	jjQ8eLeQHgF65egbA8MpvM1M5X41jE0ZKOBbiTPfiXkNT7fBYq6dyia83rfRLLuncZyoL3hlu3e
+	izFuVFtF3xiDRdgJTTDqzm+ec6dEd7aOvnolM7zBqyp7nYA0ZomITg0az+W6Mmf3r77HNhsew26
+	u3SS0LIwtv5gD98ygyelLOqVRuSKlSz6NJMqtNIscYI/ru/oYZH7T3GiodXYvd2nTj5sB1316YZ
+	MUU7IcNU/bFsMpEPfJxACXNw8kiDdP2GCT87i0yB0RpH1ESxuEt4ZMpUkdTwVo+jtGPsb72WEck
+	XLvY=
+X-Received: by 2002:a05:600c:3e19:b0:493:f28e:462a with SMTP id 5b1f17b1804b1-493f87e6ba2mr28363915e9.12.1783783233290;
+        Sat, 11 Jul 2026 08:20:33 -0700 (PDT)
+X-Received: by 2002:a05:600c:3e19:b0:493:f28e:462a with SMTP id 5b1f17b1804b1-493f87e6ba2mr28363605e9.12.1783783232734;
+        Sat, 11 Jul 2026 08:20:32 -0700 (PDT)
+Received: from redhat.com ([185.81.125.101])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493eb6ff6casm266286555e9.5.2026.07.11.08.20.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Jul 2026 08:19:41 -0700 (PDT)
-From: Michael Bommarito <michael.bommarito@gmail.com>
-To: Taehee Yoo <ap420073@gmail.com>,
+        Sat, 11 Jul 2026 08:20:31 -0700 (PDT)
+Date: Sat, 11 Jul 2026 11:20:28 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Michael Bommarito <michael.bommarito@gmail.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v5 2/2] amt: make the head writable before rewriting the L2 header
-Date: Sat, 11 Jul 2026 11:19:34 -0400
-Message-ID: <20260711151934.2955226-3-michael.bommarito@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260711151934.2955226-1-michael.bommarito@gmail.com>
-References: <20260711151934.2955226-1-michael.bommarito@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] virtio_net: validate device stats reply records before
+ use
+Message-ID: <20260711111503-mutt-send-email-mst@kernel.org>
+References: <20260711150754.2918392-1-michael.bommarito@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260711150754.2918392-1-michael.bommarito@gmail.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306872-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306873-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	FORGED_SENDER(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:ap420073@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:michael.bommarito@gmail.com,m:jasowang@redhat.com,m:xuanzhuo@linux.alibaba.com,m:eperezma@redhat.com,m:andrew+netdev@lunn.ch,m:kuba@kernel.org,m:pabeni@redhat.com,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:michaelbommarito@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 05207741F1B
+X-Rspamd-Queue-Id: F04BC741F2B
 
-amt_multicast_data_handler(), amt_membership_query_handler() and
-amt_update_handler() rewrite the ethernet header of the decapsulated skb
-in place (eth->h_proto, eth->h_dest and, for the query, also
-eth->h_source) before handing it up the stack.  The skb head may be
-shared, for example when a packet tap has cloned it on the underlay
-interface, so writing through it corrupts the other reader's copy.
+On Sat, Jul 11, 2026 at 11:07:54AM -0400, Michael Bommarito wrote:
+> __virtnet_get_hw_stats() walks the device statistics reply buffer with
+> "for (p = reply; p - reply < res_size; p += le16_to_cpu(hdr->size))",
+> using each record's device-supplied hdr->size as the stride without
+> checking that a full struct virtio_net_stats_reply_hdr remains, that
+> hdr->size is nonzero and matches the expected size for hdr->type, or that
+> the record fits within res_size. A backend that returns hdr->size == 0
+> spins the loop forever; a short or oversized size drives out-of-bounds
+> reads in virtnet_fill_stats().
+> 
+> Impact: a malicious or compromised virtio-net backend hangs the CPU
+> running the guest's device-statistics query in an infinite loop
+> (hdr->size == 0), or drives an out-of-bounds read of the reply buffer.
+> This matters most for a confidential guest, where the host is outside the
+> trust boundary.
 
-Call skb_cow_head() before the rewrite so the head is private.  It is
-placed before the pointers into the head are (re-)derived, so a
-reallocation caused by the copy is picked up by those derivations.
+Why does it "matter most", or at all, there?
+Host can always deny guest service. In fact, this is how cloud vendors
+charge their clients, by denying service to whoever did not pay them.
 
-Fixes: cbc21dc1cfe9 ("amt: add data plane of amt interface")
-Assisted-by: Claude:claude-opus-4-8
-Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
----
- drivers/net/amt.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
 
-diff --git a/drivers/net/amt.c b/drivers/net/amt.c
-index 35e77af76bd9d..b733309b866ff 100644
---- a/drivers/net/amt.c
-+++ b/drivers/net/amt.c
-@@ -2320,6 +2320,9 @@ static bool amt_multicast_data_handler(struct amt_dev *amt, struct sk_buff *skb)
- 	skb_reset_mac_header(skb);
- 	skb_pull(skb, sizeof(*eth));
- 
-+	if (skb_cow_head(skb, 0))
-+		return true;
-+
- 	if (!pskb_may_pull(skb, sizeof(*iph)))
- 		return true;
- 	iph = ip_hdr(skb);
-@@ -2396,6 +2399,8 @@ static bool amt_membership_query_handler(struct amt_dev *amt,
- 	skb_reset_network_header(skb);
- 	eth = eth_hdr(skb);
- 	ether_addr_copy(h_source, oeth->h_source);
-+	if (skb_cow_head(skb, 0))
-+		return true;
- 	if (!pskb_may_pull(skb, sizeof(*iph)))
- 		return true;
- 
-@@ -2521,6 +2526,9 @@ static bool amt_update_handler(struct amt_dev *amt, struct sk_buff *skb)
- 	if (!pskb_may_pull(skb, sizeof(*iph)))
- 		return true;
- 
-+	if (skb_cow_head(skb, 0))
-+		return true;
-+
- 	iph = ip_hdr(skb);
- 	if (iph->version == 4) {
- 		if (ip_mc_check_igmp(skb)) {
--- 
-2.53.0
+> Validate each record before use: require a full header in the remaining
+> bytes, a nonzero hdr->size that is at least the header size and matches the
+> size expected for hdr->type, and that the record fits within res_size; stop
+> the walk otherwise. Add virtnet_stats_reply_size() for the per-type size.
+
+I'm all for making things easier to debug even when the device is buggy.
+But I'm not inclined to add tons of hard to maintain code to
+that end, and I would be worried broken hosts will come to
+rely on drivers working around them.
+
+
+> 
+> Fixes: 941168f8b40e ("virtio_net: support device stats")
+> Cc: stable@vger.kernel.org
+> Assisted-by: Claude:claude-opus-4-8
+> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+> ---
+>  drivers/net/virtio_net.c | 42 ++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 40 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 3e2a5876c6c8c..9cbe40d218cc4 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -3532,6 +3532,7 @@ static int virtnet_tx_resize(struct virtnet_info *vi, struct send_queue *sq,
+>  	return err;
+>  }
+>  
+> +
+>  /*
+>   * Send command via the control virtqueue and check status.  Commands
+>   * supported by the hypervisor, as indicated by feature bits, should
+> @@ -3546,6 +3547,7 @@ static bool virtnet_send_command_reply(struct virtnet_info *vi, u8 class, u8 cmd
+>  	bool ok;
+>  	int ret;
+>  
+> +
+>  	/* Caller should know better */
+>  	BUG_ON(!virtio_has_feature(vi->vdev, VIRTIO_NET_F_CTRL_VQ));
+>
+
+
+we don't need this.
+  
+> @@ -4927,6 +4929,32 @@ static void virtnet_fill_stats(struct virtnet_info *vi, u32 qid,
+>  	}
+>  }
+>  
+> +static int virtnet_stats_reply_size(u8 type)
+> +{
+> +	switch (type) {
+> +	case VIRTIO_NET_STATS_TYPE_REPLY_CVQ:
+> +		return sizeof(struct virtio_net_stats_cvq);
+> +	case VIRTIO_NET_STATS_TYPE_REPLY_RX_BASIC:
+> +		return sizeof(struct virtio_net_stats_rx_basic);
+> +	case VIRTIO_NET_STATS_TYPE_REPLY_RX_CSUM:
+> +		return sizeof(struct virtio_net_stats_rx_csum);
+> +	case VIRTIO_NET_STATS_TYPE_REPLY_RX_GSO:
+> +		return sizeof(struct virtio_net_stats_rx_gso);
+> +	case VIRTIO_NET_STATS_TYPE_REPLY_RX_SPEED:
+> +		return sizeof(struct virtio_net_stats_rx_speed);
+> +	case VIRTIO_NET_STATS_TYPE_REPLY_TX_BASIC:
+> +		return sizeof(struct virtio_net_stats_tx_basic);
+> +	case VIRTIO_NET_STATS_TYPE_REPLY_TX_CSUM:
+> +		return sizeof(struct virtio_net_stats_tx_csum);
+> +	case VIRTIO_NET_STATS_TYPE_REPLY_TX_GSO:
+> +		return sizeof(struct virtio_net_stats_tx_gso);
+> +	case VIRTIO_NET_STATS_TYPE_REPLY_TX_SPEED:
+> +		return sizeof(struct virtio_net_stats_tx_speed);
+> +	default:
+> +		return sizeof(struct virtio_net_stats_reply_hdr);
+> +	}
+> +}
+> +
+>  static int __virtnet_get_hw_stats(struct virtnet_info *vi,
+>  				  struct virtnet_stats_ctx *ctx,
+>  				  struct virtio_net_ctrl_queue_stats *req,
+> @@ -4936,7 +4964,7 @@ static int __virtnet_get_hw_stats(struct virtnet_info *vi,
+>  	struct scatterlist sgs_in, sgs_out;
+>  	void *p;
+>  	u32 qid;
+> -	int ok;
+> +	int hdr_size, ok, remaining;
+>  
+>  	sg_init_one(&sgs_out, req, req_size);
+>  	sg_init_one(&sgs_in, reply, res_size);
+> @@ -4948,8 +4976,17 @@ static int __virtnet_get_hw_stats(struct virtnet_info *vi,
+>  	if (!ok)
+>  		return ok;
+>  
+> -	for (p = reply; p - reply < res_size; p += le16_to_cpu(hdr->size)) {
+> +	for (p = reply; p - reply < res_size; p += hdr_size) {
+> +		remaining = res_size - (p - reply);
+> +		if (remaining < sizeof(*hdr))
+> +			return -EINVAL;
+> +
+>  		hdr = p;
+> +		hdr_size = le16_to_cpu(hdr->size);
+> +		if (hdr_size < virtnet_stats_reply_size(hdr->type) ||
+> +		    hdr_size > remaining)
+> +			return -EINVAL;
+> +
+>  		qid = le16_to_cpu(hdr->vq_index);
+>  		virtnet_fill_stats(vi, qid, ctx, p, false, hdr->type);
+>  	}
+
+That's a lot of fragile code for unclear benefit.
+
+
+> @@ -7305,3 +7342,4 @@ module_exit(virtio_net_driver_exit);
+>  MODULE_DEVICE_TABLE(virtio, id_table);
+>  MODULE_DESCRIPTION("Virtio network driver");
+>  MODULE_LICENSE("GPL");
+> +
+> -- 
+> 2.53.0
 
 
