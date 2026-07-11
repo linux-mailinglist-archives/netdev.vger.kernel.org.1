@@ -1,96 +1,92 @@
-Return-Path: <netdev+bounces-306865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306866-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id JYzCIlBcUmohOwMAu9opvQ
-	(envelope-from <netdev+bounces-306865-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:08:00 +0200
+	id G3WIKhFcUmoGOwMAu9opvQ
+	(envelope-from <netdev+bounces-306866-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:06:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0094741E2A
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:07:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07DAF741DF6
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 17:06:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=RdER+N6g;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=WsfjzUZY;
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306865-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306865-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306866-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306866-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 43E7330429BC
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 15:06:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9C1EF3009B27
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 15:06:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAF1430E0EE;
-	Sat, 11 Jul 2026 15:06:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4082D595B;
+	Sat, 11 Jul 2026 15:06:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 472FA2C11EE
-	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 15:06:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60066280CE5
+	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 15:06:53 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783782394; cv=none; b=QaG/TuMS+khETy/zKj+oIOpGNjpiqjbzjaop+Ui9yIgui0F/bUnp4XIa5oigrlm775v5nmRgHWJmvq6r+NDjfsL2/HaT9nRzlyr/t8BXnuuv3T7xh4+VNSfFl1aMYZLpvjftv4e5YP6Y4d1P3Ktc7olEmfWllYXXQ8zcGCPJkLU=
+	t=1783782414; cv=none; b=HwAp/wPRZASjdMHLpoH3QmgwqiDFJ2RMQV4kr6nJCFJbxPR5jjGRIPIbo0bVIhESD/wZhs9UOGdIlM1n4N1FWP0Rl4DQ7uPMOnKIqd5r0PqbpQXjpMFMh4rIXhqBAWwqoHcdDp62DSX73ej0szP7OwmpWHPBSeTOJ+PFlw713hY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783782394; c=relaxed/simple;
-	bh=xfd1Qij55WSKgMYmH/iULiROavfzelZy0Gq6Ktbvt4s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X7LD5972j379NNLn/iLrzepqMi+nl73pKT2IxfsfiZKZ79CeT8fshS5vKuM8uZ+shiBPsRG+njdhZPiQATTvIwpjQ8DlkjcfnP9HmaAUulzrQY/7EF8wcxS0AJkFd1psjEAgR+Ogw24uNA2riQ6AdBwnyPTzg4N7Z6IQbOKtuuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RdER+N6g; arc=none smtp.client-ip=209.85.222.178
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-92e4fd65b2bso91603585a.0
-        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 08:06:33 -0700 (PDT)
+	s=arc-20240116; t=1783782414; c=relaxed/simple;
+	bh=eXimup/rS3zaRoVPDBO/BpRgrc2vA3jesXZPxz7A1HE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F/PG5ScDtrDGn3QpfPPKVBBEvpzncmACOoxoWW4+SOuUoHERtpaw7MA/+ErtuiNJf/RcVUWJSqx5XY6ZPDQQ2ja0omtNB5bWYpfmQG+sKVUB1uNadj7E+toE50+Ziau/aU1ati6+6aBiqHXYeb3DXCK7ufirjCiEPuCrFfwLdgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WsfjzUZY; arc=none smtp.client-ip=209.85.222.173
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-92e6c4a867cso105494485a.0
+        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 08:06:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783782392; x=1784387192; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783782412; x=1784387212; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=XSPQ4s327xjju3OZzaMxfnUi+7xam88AtuluAZAKUPI=;
-        b=RdER+N6ghm5RpSKKvj+gqtJxRBfPmMkBL8fMv4K6APpV1kKcCcxbKfb5/4cKDFpTtg
-         FwCU4a/ts9PUK1uxOiASMqHWAPZBj7oCY5/VG2TDLeMgcFI0F3pmM6OehTWfJxlWvWmA
-         ah3CqWm3AK/jmu2R6lJVPtlaj0PmN8hka8eK+DXUa/pVcf1fygS69HwuV4pENMFmziC/
-         xROgyWzftvniM5Q86qCuKbjsmDvx6lx9HgEXP8eicWeLYRGBw3muIhXTNrn1ja2P5Q29
-         q7vDzGqm5U8rmfAtaCRZJOwQdyAKP+Mx1n2TTczKw2aLxJHKKOem+CC31ZLhAyYd/enM
-         slUA==
+        bh=pylLKBo48mUBwphkQfLVRDh8jr+L260t0Ip5RKicSNk=;
+        b=WsfjzUZYCa4FgDfamw1gCIbpGpsUknnqziHhs4anv/fmI43rc8JpYykMoEfC0l1N13
+         VeE4P0PcX4JJOvNFlaku49Xzw4jtdY309mV30LBVxnOioEKoy8j+VjgWz7CRniUNoCKA
+         HV6Op2W7i2thGkTWgzvZWjl1zOeqiKYsrygvzO554E9OKhCvXnLsm+J/k9Z7wdsx4Eyu
+         3TZQT7l3A4cIJMIpc6nCeoBU5M2cixoA0LEdgwPWGtFuTwHWE5J2smz9qeaLdeFbNkMO
+         dhKRP6pznvHbvo3Pkno1oGE76Y3VUVDMsBWbZHMRJPlXRZyS5vzAO5dJ9pdPm0m+Wi0+
+         z6bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783782392; x=1784387192;
+        d=1e100.net; s=20251104; t=1783782412; x=1784387212;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=XSPQ4s327xjju3OZzaMxfnUi+7xam88AtuluAZAKUPI=;
-        b=V+3xoe3VSjePU6ByJIYC/gsg1o/WPgF+KOCBmfrrWKJqt7plpGp0m/iM2HAlZeKwxg
-         8QYEvDErcVLRHgtGBaJuHX7N3qHUNEdeOwVuAmf0iRK6mkoJxpSvxbwt3PNChcl7oBrv
-         rCBOKYZEyaHU+JvGOb+OAX9/3COKe6oYMlBlZRhOMpjX6z8qGZF57JE8wId/AS7dzNUA
-         gyWxk1ni0ulPGrMeMWmwUl1Ig+w7xkGp6nKYOfdfBiKDFFG5TuZ4E8CaU5MXWfg+fAlV
-         t/4N1s0UcSGj57F2JUj0qlGOSwDk7Gk7dd+3hkwHavyWmm2sj5U/6Rmx4m1AYLpwShER
-         Vtcw==
-X-Forwarded-Encrypted: i=1; AHgh+RoUaHItDoCsapK+xG8V0aa+6Q1m+V1zj1i3Hheye7OVYmRuEHUSZjTxu8K9bLJqhBoJZdd5EmI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIk+SEjteROtXyl165JW5ynGr+8dNDBlWRsW42+6B60UNIIVxB
-	+3KrFspfwi6bb1H3UvsCsGsPfKdNNcaUAk75n+oq0gAbOfpuuGwULgHF
-X-Gm-Gg: AfdE7cmRVcw7DEOfdK7uUcRnV9Sk+flzqcPeu7JOXJAjP+c9MRFlgXw2gB6L0/o0qpf
-	NbHYx5Im+2D4E2xqigixz/CEeKn1Nsfmx1+A53jPtj2GV462Jx0HMbfyHpb1mh2iTWIZbJu455h
-	k6D3m4NIfS5hFbxrbV/caWYKycDl/qvz0123W1XhOmW6/MrNEvBu/5oKA8LiawR01oZNOe8IGVt
-	NFNx3GHXj8IZKrCgLAEYEV1siqxifoMp/E7spC1tXM/+4+R8vNfKh+KyY/UX+hhlwUt8Kb/CLLB
-	5dPJRq2MqADAHoXZxUHceik5zRrf18z9CX5szIkze4ab/l95Eyf38mEha5iLtjlnxJ4yX3G23SO
-	5PP2hZ1wZel7MZ7amzP6G0j44dZio03QAnPLEfTA29jgTMaqYZmSdM7OqW5b+6tl8Sz5ATpmNG3
-	WJ8FAt8xBx7Enoi9eOCMUozUv97d3zPj0XeU1Yb9mkDOcYxbJ4kqbNsbFU632TdVtL9bz45etus
-	hUGLT0b5g==
-X-Received: by 2002:a05:620a:28c9:b0:92e:8e36:32a7 with SMTP id af79cd13be357-92ef2c7289amr321690985a.68.1783782392025;
-        Sat, 11 Jul 2026 08:06:32 -0700 (PDT)
+        bh=pylLKBo48mUBwphkQfLVRDh8jr+L260t0Ip5RKicSNk=;
+        b=RYRQDFF+Fr5oMo88tfxOGg3DlI+u1qwPho4OZBlW/Cq8hXCHFKfEj9rzB/3cNztBOY
+         7kxgLbWgoesbpopMpdrbXnbu/kFQ2mP2SWUCWA1azIFfhTmROmiYnkMXRIdzQX4m39cC
+         07oEM4KiGSHMPwNdP3/VzllqUIH5rnr+JcOii1SxBHcUC9mX767aKS0ltQ5bA+suOJgy
+         gubOfajKigUWYqYX8TO5GOAUwkoYroEy7U08l/5Y/+un17cCoWV6RbB/1ff5SpwHPAWe
+         gWTLtpzT+AHpC/x2SZJ9mxWcDGiDCcXztIJmGuN23BIL8+BdJexh58GVhjZxQuqTLMv9
+         SHhQ==
+X-Forwarded-Encrypted: i=1; AHgh+RrOP8UbhDPkjv7gtF8tNnObc8bzlG2WWIUHqifMFJMPixdlmCQbXCKPYa2T1seHGmCgIUStAQ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy94imujRYQ+xQ3zlnr5HBAr6fLp7MO+DKniCchJhzeHGOPMA8W
+	rNbWuWUkJjvKyBNDAEf3WUkgNqiQXuoiXtgTYWMVlM5cjF9QYIWh6Mbc
+X-Gm-Gg: AfdE7ckGj/TmcwB2O1qj2zW1JhcX2Ko4q1mv0/+IqHOB0aUiBfbHywTlxamGIH829VJ
+	g17U1sQ2Fhr2fAYwJBXWxlw8im2gVFdHi/KVMBRl5EDVQp6+HyaYq0Y6BKjR/g61PXLr+TtQJSW
+	x6pIfbZ/8hvEY0u/eRfIZTLhKcUn0hm/CWfFszR8GFV7b8+/+r+AAAIzsIGenps0tX1nlBByOq8
+	rPIrhvpyCTBzAjQjT1qDSK5L/O6uQ9mLbtiJtXG7zNXAtWLxsu5RZKSBCvIM3zJnYSt2vpPMlVr
+	kAX3msdp6LvnHAWsrebu/6Q5c0tgU9IsI4nffKrcICsNskt/ObwS/0BYBlX/muqGjGbIhQFYZ54
+	IUPPNVf9DXS3fCWmEJfeUW4CNeSIUEow50EHlmgPhCN5OgKc6XbqSMjaLx9lRhRIC58PGklvi8W
+	39LkSxjFw6O/Ci1n4cMb8JsgACGe1DwVkBEFjqUlHrWFUtRx2ARgFUQ99B8erSQcCoKRS+ADwMV
+	UV1LVW4zQ==
+X-Received: by 2002:a05:620a:3952:b0:92e:c116:bf00 with SMTP id af79cd13be357-92ef2f8a31fmr317346685a.93.1783782412224;
+        Sat, 11 Jul 2026 08:06:52 -0700 (PDT)
 Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-92ee5b88a38sm465793285a.12.2026.07.11.08.06.30
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-92ee5b4920asm463219685a.4.2026.07.11.08.06.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Jul 2026 08:06:31 -0700 (PDT)
+        Sat, 11 Jul 2026 08:06:51 -0700 (PDT)
 From: Michael Bommarito <michael.bommarito@gmail.com>
-To: Haiyang Zhang <haiyangz@microsoft.com>,
-	Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>
-Cc: "K . Y . Srinivasan" <kys@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+To: "David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
 	netdev@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH] net: mana: cap HWC init max message size to HW_CHANNEL_MAX_REQUEST_SIZE
-Date: Sat, 11 Jul 2026 11:06:28 -0400
-Message-ID: <20260711150628.2914205-1-michael.bommarito@gmail.com>
+Subject: [PATCH net] ila: reload IPv6 header after pskb_may_pull in checksum adjust
+Date: Sat, 11 Jul 2026 11:06:48 -0400
+Message-ID: <20260711150648.2915106-1-michael.bommarito@gmail.com>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -100,85 +96,104 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-306865-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306866-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:haiyangz@microsoft.com,m:decui@microsoft.com,m:longli@microsoft.com,m:kys@microsoft.com,m:wei.liu@kernel.org,m:andrew+netdev@lunn.ch,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-hyperv@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F0094741E2A
+X-Rspamd-Queue-Id: 07DAF741DF6
 
-mana_hwc_init_event_handler() in hw_channel.c stores device-advertised
-HWC_INIT_DATA_MAX_REQUEST and HWC_INIT_DATA_MAX_RESPONSE values
-without bounds checking. mana_hwc_alloc_dma_buf() later computes the
-DMA buffer size as MANA_PAGE_ALIGN(q_depth * max_msg_size) in 32-bit
-arithmetic. A malicious device returning a large max_msg_size causes
-the product to wrap, allocating a small buffer while laying out
-q_depth request slots at the unwrapped stride, placing slots outside
-the allocation.
+ila_csum_adjust_transport() caches ip6h = ipv6_hdr(skb) before calling
+pskb_may_pull(). On a non-linear skb whose transport header sits in a page
+fragment, pskb_may_pull() can call __pskb_pull_tail() / pskb_expand_head()
+and free the old skb head, leaving ip6h dangling; the following
+get_csum_diff(ip6h, p) then reads freed memory. ila_update_ipv6_locator()
+has the same pattern and additionally writes the new locator through the
+stale destination-address pointer.
 
-Impact: a compromised hypervisor device model or malicious MANA PCI
-device can cause out-of-bounds DMA buffer writes during HWC channel
-initialization. A reproducer is available on request.
+Impact: a remote IPv6 packet routed through a configured ILA
+csum-adjust-transport route or receive-side mapping triggers a
+slab-use-after-free in ila_update_ipv6_locator() (KASAN). The route or
+mapping requires CAP_NET_ADMIN to configure, but trigger packets are
+unauthenticated once it exists.
 
-Clamp both values to HW_CHANNEL_MAX_REQUEST_SIZE (4096), consistent
-with the cap already applied at the channel-create callsite.
+Reload ip6h (and the derived iaddr) after each pskb_may_pull() before use,
+matching the transport-header reload the code already performs.
 
-Fixes: ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure Network Adapter (MANA)")
+Fixes: 33f11d16142b ("ila: Create net/ipv6/ila directory")
 Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-opus-4-7
+Assisted-by: Claude:claude-opus-4-8
 Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
 ---
- drivers/net/ethernet/microsoft/mana/hw_channel.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ net/ipv6/ila/ila_common.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-index 48a9acea4ab6c..a0916b50cffce 100644
---- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
-+++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-@@ -152,10 +152,14 @@ static void mana_hwc_init_event_handler(void *ctx, struct gdma_queue *q_self,
- 			break;
+diff --git a/net/ipv6/ila/ila_common.c b/net/ipv6/ila/ila_common.c
+index e71571455c8a0..acedc5a84e4d7 100644
+--- a/net/ipv6/ila/ila_common.c
++++ b/net/ipv6/ila/ila_common.c
+@@ -85,6 +85,7 @@ static void ila_csum_adjust_transport(struct sk_buff *skb,
+ 			struct tcphdr *th = (struct tcphdr *)
+ 					(skb_network_header(skb) + nhoff);
  
- 		case HWC_INIT_DATA_MAX_REQUEST:
-+			if (val == 0 || val > HW_CHANNEL_MAX_REQUEST_SIZE)
-+				val = HW_CHANNEL_MAX_REQUEST_SIZE;
- 			hwc->hwc_init_max_req_msg_size = val;
- 			break;
++			ip6h = ipv6_hdr(skb);
+ 			diff = get_csum_diff(ip6h, p);
+ 			inet_proto_csum_replace_by_diff(&th->check, skb,
+ 							diff, true, true);
+@@ -96,6 +97,7 @@ static void ila_csum_adjust_transport(struct sk_buff *skb,
+ 					(skb_network_header(skb) + nhoff);
  
- 		case HWC_INIT_DATA_MAX_RESPONSE:
-+			if (val == 0 || val > HW_CHANNEL_MAX_REQUEST_SIZE)
-+				val = HW_CHANNEL_MAX_REQUEST_SIZE;
- 			hwc->hwc_init_max_resp_msg_size = val;
- 			break;
+ 			if (uh->check || skb->ip_summed == CHECKSUM_PARTIAL) {
++				ip6h = ipv6_hdr(skb);
+ 				diff = get_csum_diff(ip6h, p);
+ 				inet_proto_csum_replace_by_diff(&uh->check, skb,
+ 								diff, true, true);
+@@ -110,6 +112,7 @@ static void ila_csum_adjust_transport(struct sk_buff *skb,
+ 			struct icmp6hdr *ih = (struct icmp6hdr *)
+ 					(skb_network_header(skb) + nhoff);
  
++			ip6h = ipv6_hdr(skb);
+ 			diff = get_csum_diff(ip6h, p);
+ 			inet_proto_csum_replace_by_diff(&ih->icmp6_cksum, skb,
+ 							diff, true, true);
+@@ -151,6 +154,9 @@ void ila_update_ipv6_locator(struct sk_buff *skb, struct ila_params *p,
+ 		break;
+ 	}
+ 
++	ip6h = ipv6_hdr(skb);
++	iaddr = ila_a2i(&ip6h->daddr);
++
+ 	/* Now change destination address */
+ 	iaddr->loc = p->locator;
+ }
 -- 
 2.53.0
 
