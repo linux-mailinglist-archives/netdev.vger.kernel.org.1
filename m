@@ -1,209 +1,170 @@
-Return-Path: <netdev+bounces-306795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306796-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id chHPOUEMUmoqLgMAu9opvQ
-	(envelope-from <netdev+bounces-306795-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 11:26:25 +0200
+	id JYVRAC8QUmqTLgMAu9opvQ
+	(envelope-from <netdev+bounces-306796-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 11:43:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D1357410D0
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 11:26:25 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EFD774115C
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 11:43:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=TzoUuPBu;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306795-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306795-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="Ci+SD/uS";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306796-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306796-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3BDA630382BC
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 09:23:10 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id ECC9B3004620
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 09:43:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BED4388E4E;
-	Sat, 11 Jul 2026 09:23:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBC07392C4B;
+	Sat, 11 Jul 2026 09:43:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1FBC386422
-	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 09:23:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C3B3921F6
+	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 09:43:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783761789; cv=none; b=dqocjxmwTvxXw7OSJohDcM+BDobXzpWeoZMytpJ/FKr1DYJfaFux3iNF7Fu+ReNUHb0tzq7qV6nI6GoiZ8EyzKbSd3TEbke/o4cyKMxDiscreVaq2TbgXv6CjW/sqrgO89pqBzGbHMwJvBBrAUIasa9Y4M3zcBPUSeTCiiQxLyo=
+	t=1783762988; cv=none; b=YYi34uO/ETaJii//eztu7ZdaED69AQzOTYdtD+y+rlSPRfUnBEPEjpjK2BSA5jfvBvbWD4sDoRTFZoMClvo6Au/76QepXQTowcy7Gv52Kc5iwBA8ZGKzAF7sDcBFK30kJifNvoRYkoNZvNohqWZ2vNgZ3N6Jqj096KkI7BWZpGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783761789; c=relaxed/simple;
-	bh=TD0DvdzuAgcOk6opvxNJfsY619z4frlhiDPT+sR+SFo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Sqa7j2V141EJOAvioTAYFtcGbAZRTt/2iXM4Vw/xkrLSxOEhxL3WSUhJW/ODajf0ZwnMrb9102UtNGElkdIrXR/Y394/lNuGwoywj2f3nnWzH9TBvnZZTW+v/FtQluQZ3n9uYkBWPzuSW1EDa+jRXpir+R7plWGBiqjzZ1Yjec4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TzoUuPBu; arc=none smtp.client-ip=209.85.218.44
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c15ba5b151dso233167266b.3
-        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 02:23:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783761786; x=1784366586; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Gm+lTnqmWwDxeir2CXikUHR7rj6T9P4bxZUxOe+cAx0=;
-        b=TzoUuPBupoFRicy0XwHTMUPznkBhf4Or+RGhsdXH/1o+iar4MAwGj2lPwFniBzNp/M
-         Q92J0QKrYAucb1p1UpZ0Ot5iyKbz7rS6riZv7X2ePzueSN5EiGHtZf3PEgD1ewCZr+D/
-         T/Ikt4djBfTmV9Z9qDLIw/DTL4WmJycofrIZk/1dOziqFfIYFMOqbbnc7cFM50sWH99E
-         hYGphIXxUyLx8PhFsPem5o8RwSTkPClbr11zKQfsOhm4fINxKFVVCJBLHUHaMX0EdTs/
-         NOU+Qt8SyoJJYHvY2AZQmvMSGm6H7kWFwZBYDY6HK1vpT2R6n4D1ejSQL+jJ2EaFEAlE
-         R5ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783761786; x=1784366586;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Gm+lTnqmWwDxeir2CXikUHR7rj6T9P4bxZUxOe+cAx0=;
-        b=iGxmk4oK/BaPRonykIU+Y+8YBJD8N6JLwCvlWd/1maLTLzbGR9j7+NAcOJzV01CuHs
-         cS5FCk2QZXsD54Me7oEZO13P/hqyCfm62dcQ6SRXWQUYdl92uLgQjg/Ue7kHbBw03xbj
-         K5bE2+KGaOYS/vWbE/EultIDfxltxOFxa06A4JFia2i6gsGq1v1V70knGIUCL5m8rWMX
-         mkDdkGlI/h6IT4bDAqtgb+hMeKNar19XY1LRhR74rZIgdbRk0bfc2569y/zKF52tKAaX
-         vRv6ReCj20Ia/V1AfU3T7qYQB/cskxZnTZRKAgztqO/I2panBCliTpNBC4bJ9i/qIJMS
-         Wmzg==
-X-Forwarded-Encrypted: i=1; AHgh+RpJUCPPgwaxbvKn48g4s6XibOfSLep8gP2BhkIYeFBmG+Ra8D8K7/LTXxH1cOvl+PrMR+7jc/k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJ0FCnex9ZskWLpKTOUSdSHDS7qtqccDVSL1dWCbHQzsXtBa6M
-	VZ15slmubG+sJ324YX/k7I4v0LbXMDHuOY+83lg5Omw/8Hm1joi/zq5x
-X-Gm-Gg: AfdE7ck/Yyd7/SwGGith5UjqktzbG90e+E3dsn0FwYaU6iXthnfHzIT2M+8/8TLbGpN
-	7zFp6qCLV9LOqNH8t1bUSWFkwFkKrGHoWxOMUoOCeYI1ww1EKydjReIssrsdnvdNeAJfKYpNwqg
-	q2/0nrAQymcOSP9J2VqE+ejFfVclcYxliHszNQss/QWT/Xv2uDM7uA/QE1Aga+OH9o0pLc3JzCL
-	YNrpCP6RdMjYHQDPNIq3RnqLgXyRnQNEgqFoFkDEZvjdwXi08J1F7+nTQekzJVALLdQh85cKse5
-	bkocNWMZDuZGmNAb6DP6kMB9zbcnrG+/ZKvNu3Fpw6bdnE8cbSwEE1Rpg/VyyqX9dkTZkBSxDHE
-	GHGOnckRsSREdtTE/OGJSkwIGWatAvVXzgRMaAfc0emM+FUgI14YTNxWX2xSbRf9zYHEYu6V67s
-	f9YmWu2hyzXs4StAogE/c7Rb+2fqvmG6ZknmPy8PeyPzlWSP9pmBoyMFaqkNmkYqDgy7viZ3omC
-	Mqddly6hXbGfaly9bYV7AZkr2oQ/OMKqmLiCzm5VzUFHZ8=
-X-Received: by 2002:a17:907:3f9c:b0:c16:26c7:6ba8 with SMTP id a640c23a62f3a-c1626c78accmr54130766b.6.1783761786090;
-        Sat, 11 Jul 2026 02:23:06 -0700 (PDT)
-Received: from 127.0.0.1localhost (82-132-221-54.dab.02.net. [82.132.221.54])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c15d3859f69sm517493566b.27.2026.07.11.02.23.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Jul 2026 02:23:04 -0700 (PDT)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org
-Cc: io-uring@vger.kernel.org,
-	asml.silence@gmail.com
-Subject: [RFC 9/9] io_uring/zcrx: add rq_lock cache of "user" niov refs
-Date: Sat, 11 Jul 2026 10:22:19 +0100
-Message-ID: <a866ed180eb5b7512b7fba0d4d6f431fcacee650.1783619193.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <cover.1783619193.git.asml.silence@gmail.com>
-References: <cover.1783619193.git.asml.silence@gmail.com>
+	s=arc-20240116; t=1783762988; c=relaxed/simple;
+	bh=4/OveUaPFLEtTwIsyLRmNCFGeqFMYt4l6j3kWcE4VGk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=YlOmZ3hnr+TiyJXWR6qWFp2hVdd2auC+lYXVQ/RtM9EeDOHZe8BwaiHnKTUhpBXOoxVbrrNd4BLafnFOJWUpDSyK7ZUDQ2Ybav6OKKysaAKGP2yMWnmSvGH1DyhL5CDZuKJAIpe4fsf5g/m1uBHRlIytgmFURUV90BkODd0fWRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ci+SD/uS; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2D381F000E9;
+	Sat, 11 Jul 2026 09:43:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783762986;
+	bh=fcFM2DEyo0/UtZq49jKGjdddgQFFKjYqGVGv0aRtLaQ=;
+	h=From:Date:Subject:To:Cc;
+	b=Ci+SD/uSEwpbO04jlGuuw2r5a7nnMmt8ZonU5ePg4RD1Zk2niPmOtyQeeQuWAIp5D
+	 WNUree4pWkUc/agdhhKVe/bkR3pcULP3Pav2LzDLarmS/5g+7y1XZmZjs8amnzbjY6
+	 MyxtVdzYvhpOG+78PlsYaHTe8pxaxO9Nx6C7b/CWd2MqoEZYi6Q6Xt5vKBPuBfXu1z
+	 AwgETRoSTYu3dN9PBardmHf1F1PF8HD3kivdqadtfI5TQSbiHAf67m4rgXW1KfeD4D
+	 6+cgU8zxuWzbD4/4cAPtFvomXRg0X9ECe/uyXFGTEb12m3juXtZcgGP+h3C4Lvw+J1
+	 HcWqzekHIz/6A==
+From: Linus Walleij <linusw@kernel.org>
+Date: Sat, 11 Jul 2026 11:43:02 +0200
+Subject: [PATCH net-next] net: dsa: realtek: rtl8366rb: Fix up port
+ isolation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260711-rtl8366rb-fixes-v1-1-12b9210b0cce@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWMwQrCMBAFf6Xs2YU0kVj9FfGQxlddkSi7UQql/
+ 27U4zDMLGRQgdGhW0jxFpNHadBvOsrXVC5gOTcm73x0O+dZ630IMerIk8wwTvswDaFH9mlLrXo
+ qfqJFRyqoXDBXOv2NvcYbcv0OaV0/Ns4Odn0AAAA=
+X-Change-ID: 20260702-rtl8366rb-fixes-a93f831ec2a4
+To: =?utf-8?q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Linus Walleij <linusw@kernel.org>
+X-Mailer: b4 0.15.2
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306795-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:io-uring@vger.kernel.org,m:asml.silence@gmail.com,m:asmlsilence@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:alsi@bang-olufsen.dk,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linusw@kernel.org,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[bang-olufsen.dk,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306796-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4D1357410D0
+X-Rspamd-Queue-Id: 7EFD774115C
 
-Now the "user" refs are acquired and released by NAPI/page pool for the
-optimised path, cache them on the NAPI side and protect it by rq.lock.
-Store it in net_iov as we'd be touching the cache line by refilling soon
-anyway.
+Sashiko reports that we incorrectly disable isolation in the setup
+loop while what we want to do is to enable it.
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+Just delete this setting: the next loop in the setup code, over the
+user ports, isolate all the ports from each other, so only the CPU
+port can see them.
+
+Fix up the comments so it is clear what is going on, including a
+missing word in the helper function.
+
+Reported-by: Paolo Abeni <pabeni@redhat.com>
+Closes: https://sashiko.dev/#/patchset/20260630-rtl8366rb-improvements-v2-0-05eb9d6a37f5%40kernel.org
+Signed-off-by: Linus Walleij <linusw@kernel.org>
 ---
- io_uring/zcrx.c | 27 ++++++++++++++++++++++++---
- 1 file changed, 24 insertions(+), 3 deletions(-)
+ drivers/net/dsa/realtek/rtl8366rb.c | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
-diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-index 23669471a8f0..04a80d1a2b3a 100644
---- a/io_uring/zcrx.c
-+++ b/io_uring/zcrx.c
-@@ -393,9 +393,20 @@ static inline atomic_t *io_get_user_counter(struct net_iov *niov)
- 
- static bool io_zcrx_put_niov_uref(struct net_iov *niov, unsigned refs)
+diff --git a/drivers/net/dsa/realtek/rtl8366rb.c b/drivers/net/dsa/realtek/rtl8366rb.c
+index d2fa8ff6a5d0..e615814049c1 100644
+--- a/drivers/net/dsa/realtek/rtl8366rb.c
++++ b/drivers/net/dsa/realtek/rtl8366rb.c
+@@ -794,8 +794,8 @@ static int rtl8366rb_setup_all_leds_off(struct realtek_priv *priv)
+ static int rtl8366rb_port_set_isolation(struct realtek_priv *priv, int port,
+ 					u32 mask)
  {
--	atomic_t *uref = io_get_user_counter(niov);
-+	unsigned *cached_ref = &niov->mp_private;
-+	atomic_t *uref;
- 	int old;
+-	/* Bit 0 enables isolation so set this if we enable isolation
+-	 * any of the ports an clear it if we disable on all of them.
++	/* Bit 0 enables isolation so set this if we enable isolation on
++	 * any of the ports and clear it if we disable on all of them.
+ 	 */
+ 	if (mask)
+ 		mask = RTL8366RB_PORT_ISO_PORTS(mask) | RTL8366RB_PORT_ISO_EN;
+@@ -950,11 +950,6 @@ static int rtl8366rb_setup(struct dsa_switch *ds)
+ 		 */
+ 		rtl8366rb_port_stp_state_set(ds, dp->index, BR_STATE_DISABLED);
  
-+	lockdep_assert_held(&io_zcrx_iov_to_area(niov)->ifq->rq.lock);
-+
-+	if (likely(*cached_ref >= refs)) {
-+		*cached_ref -= refs;
-+		return true;
-+	}
-+	refs -= *cached_ref;
-+	*cached_ref = 0;
-+
-+	uref = io_get_user_counter(niov);
- 	old = atomic_read(uref);
- 	do {
- 		if (unlikely(old < refs))
-@@ -744,6 +755,16 @@ static void io_zcrx_scrub_area(struct io_zcrx_ifq *ifq, struct io_zcrx_area *are
- {
- 	int i;
+-		/* Start with all ports completely isolated */
+-		ret = rtl8366rb_port_set_isolation(priv, dp->index, 0);
+-		if (ret)
+-			return ret;
+-
+ 		/* Disable learning */
+ 		ret = rtl8366rb_port_set_learning(priv, dp->index, false);
+ 		if (ret)
+@@ -974,7 +969,7 @@ static int rtl8366rb_setup(struct dsa_switch *ds)
+ 		if (!dsa_port_is_user(dp))
+ 			continue;
  
-+	scoped_guard(spinlock_bh, &ifq->rq.lock) {
-+		for (i = 0; i < area->nia.num_niovs; i++) {
-+			struct net_iov *niov = &area->nia.niovs[i];
-+			unsigned *ref = &niov->mp_private;
-+
-+			atomic_add(*ref, &area->user_refs[i]);
-+			*ref = 0;
-+		}
-+	}
-+
- 	/* Reclaim back all buffers given to the user space. */
- 	for (i = 0; i < area->nia.num_niovs; i++) {
- 		struct net_iov *niov = &area->nia.niovs[i];
-@@ -1327,9 +1348,9 @@ static void zcrx_release_skbs(struct io_zcrx_ifq *ifq)
- 		for (i = 0; i < shi->nr_frags; i++) {
- 			const skb_frag_t *frag = &shi->frags[i];
- 			struct net_iov *niov = netmem_to_net_iov(frag->netmem);
-+			unsigned *ref = &niov->mp_private;
- 
--			/* Take niov references the skb holds */
--			io_zcrx_get_niov_uref(niov);
-+			*ref += 1;
- 		}
- 		shi->nr_frags = 0;
- 
--- 
-2.54.0
+-		/* Forward only to the CPU */
++		/* Forward only to the CPU, isolate from all other ports */
+ 		ret = rtl8366rb_port_set_isolation(priv, dp->index, upports_mask);
+ 		if (ret)
+ 			return ret;
+
+---
+base-commit: 23dad2d088dfc82cae1f5a936f8ff7ffebb38dd9
+change-id: 20260702-rtl8366rb-fixes-a93f831ec2a4
+
+Best regards,
+--  
+Linus Walleij <linusw@kernel.org>
 
 
