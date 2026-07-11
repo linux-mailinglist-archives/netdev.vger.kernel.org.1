@@ -1,313 +1,190 @@
-Return-Path: <netdev+bounces-306848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306849-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id OpHaOMc4UmpINQMAu9opvQ
-	(envelope-from <netdev+bounces-306848-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 14:36:23 +0200
+	id 2+SGOeI4UmpNNQMAu9opvQ
+	(envelope-from <netdev+bounces-306849-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 14:36:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 322F7741871
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 14:36:23 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7740074187F
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 14:36:50 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b="MQ0eUdX/";
-	dmarc=pass (policy=reject) header.from=google.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306848-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306848-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=0sec.ai header.s=google header.b="q3h/pdWS";
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306849-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306849-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CE297301225F
-	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 12:36:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7C27330117B5
+	for <lists+netdev@lfdr.de>; Sat, 11 Jul 2026 12:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2FA037B012;
-	Sat, 11 Jul 2026 12:36:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00E5C3C2782;
+	Sat, 11 Jul 2026 12:36:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E3D2D0C94
-	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 12:36:19 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783773380; cv=pass; b=fJHY68J+vr9yj19Drfk2VqbiMWWSG9NjQmE2JywmFypqwUwLVSUkSUffjVxBobZnu2mP6/f4UguD6Dla5KEBl7Y7yEg1Ux+1TbluPru14um+7fabsbc8ZeRg1z89wYBrFJoiWmsAwdb0JBaqZRQL0KUlHAIwCuvit57JW2egkUw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783773380; c=relaxed/simple;
-	bh=SySi6wxUjqMlb54PMbePhqAsSdMDQniN9v3lzfJ0YBc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KH1xFdVxIWEHJ7PQsTQm9PnFAjUEhR4fnyZhW2Q5EQrWsO9LXV/OMQP4CHtcg3pXUjPJKJUfYmSJ8hV5yvH0g9OL9DCSGLDdfzn6RDu3hxJCbOHg5SgCOu1YZChR5fKKEo5L2eWFZqjoEp0BjxljhFW/jbmAhfwcVKI8IFafumY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MQ0eUdX/; arc=pass smtp.client-ip=209.85.214.179
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2cabc0a1ab6so22720475ad.0
-        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 05:36:19 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783773378; cv=none;
-        d=google.com; s=arc-20260327;
-        b=ABFNvyTw1QF6RZYQv5Enwsf/IgFkUWpYiXq/sl6zjxxQIR1hgJIvcgbBfB7qCMpy1k
-         S4J6T9HyYMrp6taWgOjL6h7GAvw77i82hh5PIkycdum7g0ExMxM3Vwvh5mzYxU+H9QVp
-         5VPB5GpbGJL5gWkDNkoU4s2y362zLLH56MVxj9XJGGZD+9Ax60+Alp25t1hWwljKERgX
-         JmRFrSzjNlztEuJz8G1JO3AiVHrPB4m1a3SAaip9TAjsmoDoqDKpu92YD6rW+YYy6OMT
-         WFFjkXhF1utYm9+aHPecLH3r+TGvWmT1MxAaw6G6RQxj/y6dff4/aVTJeCBjdrpSnZ/l
-         MD2Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=p3UIKxrSmu2n2Hpeaq2hgsK+CnJAUQ4ug/QP00PQNO8=;
-        fh=dJw97ISd2fx7fIYE30lbo2f2i8MBs5+aOtlkCmCCDvI=;
-        b=c45wWZFgRVkUpLUPV0j5qJnYu/uOElLHvMulGTi87mupZreupg0eWDW4aNfzxr1tnF
-         dl7yGhcz37pE2eqRiKqybu2xST0ucsHaAlhqnY7bmx9P4EuutWNOeaEXSS+3DuQtHdl5
-         mCyOrdgtQopORrFp6wKVPhv49M8FBW6/33IGolUJ99a/DyEEK3l0pidQMptteBgBYMlT
-         2043xH8YzOAWoXxQ8KOKsoZctuG/RanmMgI3djtvJuFhAR57tcK+N6OE6BDcrO8Odx0s
-         DuCCNkG5sSrotNs8MNsLQiUk+f1kY7tBQsVMfXs+/7EL5TkmVcnQIwGPrkbAPvUTYRfC
-         B8Ag==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303BC1547C0
+	for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 12:36:45 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783773406; cv=none; b=REWJoQ439hZ4EFXYgsnoRS1egIiqsOY/6VJ6PdfwcYHOaeuznEL50DrkpD5upZ2Vt4ZoCk03Czlr+d2iYiG/venjmyFje5hsPA4XLYo1PAXXGQFxdyc5m8sRG+XVA+ml/WYtOv1oLeEZu9bLlhFWTWRRenT7XQ2deZ4VEFg707A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783773406; c=relaxed/simple;
+	bh=PhVyj9qD5Z/KlbzjKtoN1G0Qg0OHJkNtCd/AmCW/7Fk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uOhOxIaxh0Vxyha6YZlcb+P4+inVBBkSZ5o3mZXQTApaMuaWYm94IWZ2otKtzwW/9qO4epobCAg2Nso4ZHoJlZJYd5k2S96aNvwEpMVxWA+t3DdKycGh7gYfjn4F+mZOgRv5WfLbL7HiK3XGaoDPrRQK1zaJUGA/5wkDyE87ouI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=q3h/pdWS; arc=none smtp.client-ip=209.85.221.54
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-472326ca506so1359025f8f.2
+        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 05:36:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783773378; x=1784378178; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=p3UIKxrSmu2n2Hpeaq2hgsK+CnJAUQ4ug/QP00PQNO8=;
-        b=MQ0eUdX/oniybHA+rDpe+ptxDmMruUTmcmIIOOw3AgiH28xBXVMUwJS8dbNMB9u2LS
-         maJyrlSVk9CjK8fLh22CXbV/vui7wjRQ82KWYNtdVPok6kUzx8lbRaetLGY0FMVi8A17
-         wqGPoAWA45XW+Sn0+aWx1pukoIu72QWLKcA/g1oeskMWq7IpjAQYahnRuMF2oO8Zpl6y
-         XSmUylgv+ofZMqpzjeTP50fLAD7MbGPKHZ2n2btvmoDL15sWAMx/e89J9RZtyFAVqsRP
-         pNpmsJ7QyyjTOMS2cl3PdGe0AiCnRzDy/7waPCck5a53602HlJrG0rpX71pZaogDI13l
-         9ejA==
+        d=0sec.ai; s=google; t=1783773403; x=1784378203; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=iEZdacI12rwF3rcHsuyG8xQf3FKIyTovs73PN6g2MOE=;
+        b=q3h/pdWSeTe1k9K9MDviB3sBXlTBIgAjFetV8Dcydd4ZgT0Uk2freX/hQLdj9JXswk
+         sm1sMHNs1i1h1hoqxICHlVlgAsxKNFHIRH6OcNfpfVbBF/vQ7xtt8+XB+8oG0K6sg4Fh
+         FMp0s7PUqkXbBqzXJNlkWwhuITo35gcMZhFRoMolbZlPAnlDwjLjhpWIkTmHzyizuhR9
+         8O1bdNLE6Dl/WfxYn30drMzppzBAfnAi2Pwrwz0hYMfOkpPJ2WYN7eOCClKPff0fb4Vr
+         oXLWO5ju1x8AGdUWzIbsQB4Rf18SHiflb5JtwcvvITlLckjyTcjCX1MEJ4GRXLZXvIRQ
+         4HnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783773378; x=1784378178;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=p3UIKxrSmu2n2Hpeaq2hgsK+CnJAUQ4ug/QP00PQNO8=;
-        b=E7gQLxcMXhLqNSxobeXHid1pqkIITBhOZMANJc7/NtFWbo7xgEm/YdKd0GrII2ZpHM
-         NhA1gSsPrAlmktvNgH12Nt07WhwM3feQaj+xS6tsSEWAD83+0an+hMlbKhfjSooC/DnV
-         1W5rPRj9NVgIgzYSw3YXfLF6U4V14ziE0vkmOcwAEniT0U5fw1o1U0Ks4CmcBHsTbRsc
-         ykZPpE2D1c1iOGq4C+Kv+ASc4xpbobG/Tua9f5ZASJ6KoQjVROqGMpdMeF9E1VRHrDKG
-         pqpYAyfEgEu1DrTYwcP+5wajdsLhJVQ65yqbiXgACTrvllUvmXb0TFrBchoAUyn9lvTa
-         neog==
-X-Forwarded-Encrypted: i=1; AHgh+RrpLl1zleg19/GBFsPMbtMOVNTJmn4s83NemSYdYwfkneinB4c8Gt848zPaqr8k6U9EGoan87Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2jrGSQTteouorQLuufXuRtJ1Phw7zwfdTAgkQ+VyS628VI+lB
-	lkKYmd4e+BnGRPUomQ5iiTWVcTye/shXsSkBe+CncMYfVj76RZc6FiLX2f7v7rwSwA5iXKNNO/6
-	/6flGCK0+MuyTeuY4guZgyPBsONPiUC88V29zbbr7
-X-Gm-Gg: AfdE7ckQWQ2WRLzK7jweffytcbBbyuxi2JwW/n58VCBER2bpxd+WJUc2dTDSnB6VtCx
-	ac6zwHNK9uyZOc4gqbNk/VK3kHypYZ2JHzVU2reVy/WniUy7iykiWBJ+ujA7ER0HVaqZ7LkA0Zm
-	So1R5cnJyyvVjVtP8hgOvYOYO0767hPVkHJT4G+auKR8FWe5T3kqZJC0tm+Lat35WSPQX4eJukh
-	tWS9Ls1R1NQknNIWQiCM5at+/b147NxC+HeaZgTfVJ+MeOBrUq6DM4Pl0RcLq6Wrh1NHpzalgxG
-	qyCY/1vQPM0aYp9WiaFQbLcj8c2vEqz058pn4QqYt8jObeA4K8FF7kxug/JrseUu6ND+KgJ6Bmq
-	XiHwgt6KNv22v0Rx/g20Pn4Xdeb1Kuj0DcGAzoEAoBO3dUq5147qR
-X-Received: by 2002:a05:6a20:72a5:b0:398:6ea8:21d2 with SMTP id
- adf61e73a8af0-3c110a69208mr3046148637.19.1783773378103; Sat, 11 Jul 2026
- 05:36:18 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1783773403; x=1784378203;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=iEZdacI12rwF3rcHsuyG8xQf3FKIyTovs73PN6g2MOE=;
+        b=fc3J1erqtdMDGtQIMCK0SJ0GzPuxNkANLwjfxOXAbp+6pWOBUACHZBelM8xgIIBxEh
+         xNQUZRJKE3MK/f1QXSNyHb72tTv6R9gsuf3v2iSTm0x+ZVgHIhKTinpKs0Bp+QXQAiTs
+         z80u/3V3V773cGsrm2FpX0XIWMxyq6n0XghIkGc4uqT8pdEs8ECqEQzDrP2mbux3B+uu
+         Z5AfNjTA/AIaUfgnvhO9s+y0nYudwD0ov7n3pp/SEmzUEVrmMFZJhemXjzfgZ+QJh6uh
+         hOZOp4VRQIzWXHJFiTx2nwPzgrOMqX0rq8SYi++JJ6GZ0+a43cPO4OgiufPS6hCLF+F0
+         3k4g==
+X-Forwarded-Encrypted: i=1; AHgh+RoGoWA3L15KxuxhueEVGWYI1q95MwgQcWPTyokOmlAgAwI95v8gyi7JtfhQrp0+c/1B6t2HM8I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykuUMdfvNygatBxsuaTlohM9tf5bIFflVWPNoo5w/Q786R+ct2
+	+pmH9Lelzr/KMyOCsbSaxp/bi/o5VlH1za3sTgaotD4uiHnLU8CxI6+U1DjSbIOXSNl+H34SKle
+	f7OklSf3A
+X-Gm-Gg: AfdE7cknSE0NULn5FBtsbzONNiMVMfkxXR6EwJjDrk6LhFjDl4x3pW9Lu+i8msFQNd5
+	czdLWkG011z1DJwabw+NkXGw7CWhcGDNX66M/3UwK8q1VTXEMnUXyfB97gz5dT7RRuNwLMas7KC
+	g1IZz06p1BtIvdpoj7QOjqeIdoFIpQoAAfDal+yEeazIBREZeJ4tDwjEhnpIvP/Aae0U5F8wOcT
+	6zvc5gyTe2RAGQBTdXIsouYc+wq2n98Sko8UE/fL/eNwMqwovgRXF3f1vgkFoCDn82JS1l961Gh
+	A3b5QYdLna1n71+7wAu378SXur6lXITyGVr7oOc/o2ZEW0vOX4IXuv1PKfu/hYgPWdfRmZTHnDY
+	N947HRgw4WkkEoFJhOI2yvPcL7Drf8FTZMH517X13+Xf8IN3inBisIc2Y4CqyRTInRln7UQ0HUJ
+	b4ND9fnVvKD9EQ+LoMoD8nlLSwG+U/ub2oc7FP19uXePeL+mo8fFKGObnNqWRubEjFaeeXgJm9x
+	fa1Z6MsEixAKECWvAG/0i+G4Yrj71/u7JU=
+X-Received: by 2002:a5d:5849:0:b0:46d:d5db:98 with SMTP id ffacd0b85a97d-47f2dd02487mr2501924f8f.44.1783773403587;
+        Sat, 11 Jul 2026 05:36:43 -0700 (PDT)
+Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.218.188])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa0960816sm66169851f8f.29.2026.07.11.05.36.42
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sat, 11 Jul 2026 05:36:43 -0700 (PDT)
+From: Doruk Tan Ozturk <doruk@0sec.ai>
+To: david@ixit.cz
+Cc: oe-linux-nfc@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net] nfc: fdp: bound the device-supplied read size in fdp_nci_i2c_read()
+Date: Sat, 11 Jul 2026 14:36:41 +0200
+Message-ID: <20260711123641.32502-1-doruk@0sec.ai>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260620-bpf-iter-tcp-refcnt-v1-1-883bf9e69495@linux.dev>
-In-Reply-To: <20260620-bpf-iter-tcp-refcnt-v1-1-883bf9e69495@linux.dev>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Sat, 11 Jul 2026 05:36:05 -0700
-X-Gm-Features: AVVi8CcfTyzxfkzbvbHTzEquulsluAfF-rDOUv_47ONGcdu5G8dIKhY0LEnBX3Q
-Message-ID: <CAAVpQUDiLwSYwFStRGpMQkGbm3j8_KJm9LVj0ykV7V3nYQ4YTg@mail.gmail.com>
-Subject: Re: [PATCH bpf] bpf: tcp: Fix use-after-free in bpf_iter_tcp_established_batch()
-To: "Jose Fernandez (Anthropic)" <jose.fernandez@linux.dev>
-Cc: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Martin KaFai Lau <martin.lau@linux.dev>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
-	Ben Cressey <ben@cressey.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[0sec.ai:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:jose.fernandez@linux.dev,m:edumazet@google.com,m:ncardwell@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrii@kernel.org,m:yonghong.song@linux.dev,m:martin.lau@linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:ben@cressey.dev,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-306848-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:david@ixit.cz,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306849-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[0sec.ai];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FORGED_SENDER(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[0sec.ai:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
+	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mail.gmail.com:mid,linux.dev:email]
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,0sec.ai:dkim,0sec.ai:mid,0sec.ai:from_mime,0sec.ai:url,0sec.ai:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 322F7741871
+X-Rspamd-Queue-Id: 7740074187F
 
-On Fri, Jun 19, 2026 at 5:33=E2=80=AFPM Jose Fernandez (Anthropic)
-<jose.fernandez@linux.dev> wrote:
->
-> reqsk_queue_hash_req() publishes a TCP_NEW_SYN_RECV request_sock onto
-> the ehash chain (via inet_ehash_insert(), which drops the bucket lock on
-> return) and only afterwards refcount_set()s rsk_refcnt to 3.
->
-> Lockless readers such as __inet_lookup_established() account for this by
-> using refcount_inc_not_zero(), but bpf_iter_tcp_established_batch() uses
-> plain sock_hold() while holding the bucket lock, on the assumption that
-> the lock guarantees sk_refcnt > 0. That assumption does not hold for
-> request_sock:
->
->   CPU 0                                CPU 1
->   -----                                -----
->   tcp_conn_request()
->    reqsk_queue_hash_req()
->     inet_ehash_insert(req)
->      spin_lock(bucket)
->      __sk_nulls_add_node_rcu(req)      // rsk_refcnt =3D=3D 0
->      spin_unlock(bucket)
->                                        bpf_iter_tcp_established_batch()
->                                         spin_lock(bucket)
->                                         sock_hold(req)   <-- addition on =
-0
->                                         spin_unlock(bucket)
->     refcount_set(&req->rsk_refcnt, 3)  // clobbers saturated value
->
-> which surfaces as:
->
->   refcount_t: addition on 0; use-after-free.
->   WARNING: lib/refcount.c:25 at refcount_warn_saturate+0x48/0x90, CPU#1
->   Call Trace:
->    bpf_iter_tcp_established_batch+0x14e/0x170
->    bpf_iter_tcp_batch+0x53/0x200
->    bpf_iter_tcp_seq_next+0x27/0x70
->    bpf_seq_read+0x107/0x410
->    vfs_read+0xb9/0x380
->
-> refcount_warn_saturate() then saturates the count, the publishing CPU's
-> refcount_set() clobbers it, and the socket is left one reference short.
-> When the last legitimate owner drops its reference the reqsk is freed
-> while still reachable, leading to use-after-free panics in e.g.
-> inet_csk_accept() or inet_csk_listen_stop().
->
-> This reproduces in seconds with tcp_syncookies=3D0, a handful of threads
-> doing connect()/close() to a local listener while others read an
-> iter/tcp link in a tight loop.
->
-> Use refcount_inc_not_zero() and skip the socket on failure, the same way
-> every other ehash walker does. The listening hash is unaffected as
-> listeners are always inserted into lhash2 with sk_refcnt >=3D 1, so
-> bpf_iter_tcp_listening_batch() is left as-is.
->
-> If every matching socket in a bucket is mid-init, end_sk can stay at 0;
-> advance to the next bucket in that case rather than terminating the
-> whole iteration on a stale batch[0].
->
-> Fixes: 04c7820b776f ("bpf: tcp: Bpf iter batching and lock_sock")
-> Reviewed-by: Ben Cressey <ben@cressey.dev>
-> Assisted-by: Claude:unspecified
-> Signed-off-by: Jose Fernandez (Anthropic) <jose.fernandez@linux.dev>
-> ---
->  net/ipv4/tcp_ipv4.c | 35 ++++++++++++++++++++---------------
->  1 file changed, 20 insertions(+), 15 deletions(-)
->
-> diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-> index fdc81150ff6c..92342dcc6892 100644
-> --- a/net/ipv4/tcp_ipv4.c
-> +++ b/net/ipv4/tcp_ipv4.c
-> @@ -3074,25 +3074,25 @@ static unsigned int bpf_iter_tcp_established_batc=
-h(struct seq_file *seq,
->  {
->         struct bpf_tcp_iter_state *iter =3D seq->private;
->         struct hlist_nulls_node *node;
-> -       unsigned int expected =3D 1;
-> -       struct sock *sk;
-> +       unsigned int expected =3D 0;
-> +       struct sock *sk =3D *start_sk;
->
-> -       sock_hold(*start_sk);
-> -       iter->batch[iter->end_sk++].sk =3D *start_sk;
-> -
-> -       sk =3D sk_nulls_next(*start_sk);
->         *start_sk =3D NULL;
->         sk_nulls_for_each_from(sk, node) {
-> -               if (seq_sk_match(seq, sk)) {
-> -                       if (iter->end_sk < iter->max_sk) {
-> -                               sock_hold(sk);
-> -                               iter->batch[iter->end_sk++].sk =3D sk;
-> -                       } else if (!*start_sk) {
-> -                               /* Remember where we left off. */
-> -                               *start_sk =3D sk;
-> -                       }
-> -                       expected++;
-> +               if (!seq_sk_match(seq, sk))
-> +                       continue;
-> +               if (iter->end_sk < iter->max_sk) {
-> +                       /* reqsk_queue_hash_req() inserts with sk_refcnt =
-=3D=3D 0
-> +                        * and refcount_set()s it after the bucket lock d=
-rops.
-> +                        */
-> +                       if (unlikely(!refcount_inc_not_zero(&sk->sk_refcn=
-t)))
-> +                               continue;
-> +                       iter->batch[iter->end_sk++].sk =3D sk;
-> +               } else if (!*start_sk) {
-> +                       /* Remember where we left off. */
-> +                       *start_sk =3D sk;
->                 }
-> +               expected++;
+fdp_nci_i2c_read() reads a "length packet" from the FDP I2C controller and
+computes the size of the next I2C transfer from two device-supplied bytes:
 
-This should be incremented just after seq_sk_match()
-(see below)
+	phy->next_read_size = (tmp[2] << 8) + tmp[3] + 3;
 
+next_read_size is a u16 (up to 65535) and is never bounded. On the next
+loop iteration it is used directly as the length passed to
 
->         }
->
->         return expected;
-> @@ -3129,6 +3129,7 @@ static struct sock *bpf_iter_tcp_batch(struct seq_f=
-ile *seq)
->         struct sock *sk;
->         int err;
->
-> +again:
->         sk =3D bpf_iter_tcp_resume(seq);
->         if (!sk)
->                 return NULL; /* Done */
-> @@ -3167,6 +3168,10 @@ static struct sock *bpf_iter_tcp_batch(struct seq_=
-file *seq)
->         WARN_ON_ONCE(iter->end_sk !=3D expected);
+	i2c_master_recv(client, tmp, len);
 
-Let's say the batch array was smaller than the hash chain length
-and we reallocate the array based on "expected" w/ the bucket lock.
+which reads into the fixed 261-byte stack buffer
+tmp[FDP_NCI_I2C_MAX_PAYLOAD]. A malicious or malfunctioning controller
+that reports a large length thus overflows the stack buffer -- the
+r != len check runs only after the read has already happened.
 
-What happens if refcount_set(..., 3) is called during reallocation ?
-bpf_iter_fill_batch() will see the larger "expected", and WARN_ON_ONCE()
-will be triggered.
+Reject a next-read size larger than the buffer and resynchronize.
 
+Found by 0sec (https://0sec.ai) using automated source analysis; the
+missing bound is evident from source. Compile-tested.
 
->  done:
->         bpf_iter_tcp_unlock_bucket(seq);
-> +       if (unlikely(!iter->end_sk)) {
-> +               ++iter->state.bucket;
-> +               goto again;
-> +       }
->         return iter->batch[0].sk;
->  }
->
->
-> ---
-> base-commit: 4549871118cf616eecdd2d939f78e3b9e1dddc48
-> change-id: 20260619-bpf-iter-tcp-refcnt-107d52b238da
->
-> Best regards,
-> --
-> Jose Fernandez (Anthropic) <jose.fernandez@linux.dev>
->
+Fixes: a06347c04c13 ("NFC: Add Intel Fields Peak NFC solution driver")
+Cc: stable@vger.kernel.org
+Assisted-by: 0sec:claude-opus-4-8
+Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
+---
+ drivers/nfc/fdp/i2c.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/nfc/fdp/i2c.c b/drivers/nfc/fdp/i2c.c
+index c1896a1d978c..581f85f0dfa8 100644
+--- a/drivers/nfc/fdp/i2c.c
++++ b/drivers/nfc/fdp/i2c.c
+@@ -128,7 +128,7 @@ static const struct nfc_phy_ops i2c_phy_ops = {
+ 
+ static int fdp_nci_i2c_read(struct fdp_i2c_phy *phy, struct sk_buff **skb)
+ {
+-	int r, len;
++	int r = -EREMOTEIO, len;
+ 	u8 tmp[FDP_NCI_I2C_MAX_PAYLOAD], lrc, k;
+ 	u16 i;
+ 	struct i2c_client *client = phy->i2c_dev;
+@@ -140,6 +140,13 @@ static int fdp_nci_i2c_read(struct fdp_i2c_phy *phy, struct sk_buff **skb)
+ 
+ 		len = phy->next_read_size;
+ 
++		if (len > FDP_NCI_I2C_MAX_PAYLOAD) {
++			dev_dbg(&client->dev, "%s: read size %d too large\n",
++				__func__, len);
++			phy->next_read_size = FDP_NCI_I2C_MIN_PAYLOAD;
++			goto flush;
++		}
++
+ 		r = i2c_master_recv(client, tmp, len);
+ 		if (r != len) {
+ 			dev_dbg(&client->dev, "%s: i2c recv err: %d\n",
+-- 
+2.43.0
+
 
