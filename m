@@ -1,158 +1,224 @@
-Return-Path: <netdev+bounces-306990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306991-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lDD8CHEaVGpciAMAu9opvQ
-	(envelope-from <netdev+bounces-306990-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 00:51:29 +0200
+	id pvWgFmwmVGpDiwMAu9opvQ
+	(envelope-from <netdev+bounces-306991-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 01:42:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF11D746355
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 00:51:28 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E857746402
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 01:42:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="FCI/KfUQ";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306990-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306990-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=asu.edu header.s=google header.b=KazK+9mv;
+	dmarc=pass (policy=none) header.from=asu.edu;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306991-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306991-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 30A673002337
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 22:51:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 62E87300D337
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 23:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47078382F25;
-	Sun, 12 Jul 2026 22:51:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBFBB38D3EA;
+	Sun, 12 Jul 2026 23:42:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA65D346E40
-	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 22:51:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B6C0385D94
+	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 23:42:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783896687; cv=none; b=YuSjOXVjuZgqfWE3KxMZHZZYNJEiBpposzBXLWve5pAONDFBkMYnHNXuWHg9bqwhNxFyxeUfvuSaq4/TuZECFYvvDjCtsNxlil8BfRqXq11EXtlm3Q9ZnR8iVf9Lj2tUXehXuhrtZgG1xWJxgKMPEf6LXLT7xadZCLhQ4YRmlNo=
+	t=1783899729; cv=none; b=GNfaSxVBFU8k8kbNt0yXF7PpffGQCPYv97CtJEDkNVQ+FPRVB1MI6ZtEZ0uQjiuq0bfoiC2g3RhR/3C3GTmkUoqN/QWaY5VrLfK4laKIhSYnwSX29dAavUYG0+yGwZy8gtOgn5MLLGUx6LfkA9zWME7C+YimxijZfrL22YKVZqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783896687; c=relaxed/simple;
-	bh=9IOmE5mNlfjptaUGfi9UqMwAnD1cwqFpc4KgYx+CaB4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=BGRSIUoqtA5jID4oHDwc1CurG+2XdaPRnggMOdUO+28mroTP4JaPRCRSrmbwZHdC1C6APvDCDjI3zbc2I/sv1ujTeEKA9oGV0SiCF4zEfyTPrNMYfFB9RfEuFYuWU/Ot0HXfGvT+uFOZ2R/928xo8DsPGBp7B48syt03WjRaQ3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FCI/KfUQ; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 947C51F000E9;
-	Sun, 12 Jul 2026 22:51:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783896685;
-	bh=uTN9eiQpXZWak59Ktj86jwkwDyLSdgYvZipCV0ynG6Q=;
-	h=From:Date:Subject:To:Cc;
-	b=FCI/KfUQsRP2I+06OX9CH0CjS2QZ8yB6cfsNwysGEqk76UJux/bJ2r5HflsJZEgLG
-	 CKx6Pu6+uR0qnfmxJkfTVw+LbrrxMMyGNdUmhwvdq6AKKD0pdo3SZT9QONU+tI7vU7
-	 c5V3jQMiPcjd1DygRyXIH1XnOPX6xv+gxYAaxCxbXn0CM0WZ10+Z90qVFiZEbxoxgR
-	 vK9gs2IA5bK99UPLPgxkpT/dsbUn/1vPUNTz5L/MFsUc0rsGgcaFcZORl5kXGboLLS
-	 V4fUdjVma8HFrsY9YHgikJ6SgzyeuU2kxyYLzlOWw91Ewruh8XFMu/siJAiv3TRBdc
-	 rn/iTH+cyHz/g==
-From: Michael Grzeschik <mgr@kernel.org>
-Date: Mon, 13 Jul 2026 00:51:03 +0200
-Subject: [PATCH] mailmap: fix wrong canonical name for mgr@kernel.org
+	s=arc-20240116; t=1783899729; c=relaxed/simple;
+	bh=dLgwcnW4YtgNTCb07VpBnEanlIde5YMvtskoZ4n/0XU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sovEf2XzdCEeNm8W+riXDzIP31JMRjtEmD22oyXSMQvXLHtAYEXbIWL/Axnid0bVF33lbJ0iM+tYjq4N1odF0sXk1vZ2J32nYfWj8QV9vsLQGotHY5yB792sQQIgivFDrRlagT4Oy8vxbfa3tpMr47nwdcEj6DPbTJn87HqDlVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=KazK+9mv; arc=none smtp.client-ip=209.85.210.176
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-84a2dcec51cso656056b3a.3
+        for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 16:42:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1783899728; x=1784504528; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=LOSvs3VNPQa+toUMC3FY+7NtrOSPXGuDizFuqw88H7U=;
+        b=KazK+9mvzIm6kSf3mVKRNikwhV7qsyX9veCDhOWDpUb9sAwhzJc4bHYcID+0WJ3cPH
+         etJZ0eBrAl8c2+pg04d6scPGVR0SMBW9ldkxB2KFaeF4Eoq2m2qlEibLZVanv3YmQBfd
+         KE4sMxlqXtCKacaJED2LFdJUkQQx3i3O1rnCGiJJzTDOQ618/FVbARBrqF72Z4rqf1vL
+         I9WRd/mmkSqTTlA2RDwfR/XxHll5GJVsUe9xONpa6IKl5+FXTYiOGtn3JiUUccxcomrh
+         yqyAcRqM+GVUopQiqvvoEtfrXvTsk7mKrrWnvZG4DrCP66JpNEOHSuB6aX6Ysq99lYJ2
+         l1pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783899728; x=1784504528;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=LOSvs3VNPQa+toUMC3FY+7NtrOSPXGuDizFuqw88H7U=;
+        b=M70ed3GxrktLMTeb01/FTbjwEMJzdVG0+MDYV812mM2s/OY0cH/rthQLWKP8XUrmYn
+         fcXW/UqLUICJPET6/sBEyfFCr/P/o2z72wiaDctnpNk9VWhBMSReJZLvh7OAW4iOL5ae
+         urVM3gnfUgExkFqkxycSJ3JgoQQ7vEljrD9u0RZcTEPlwI4/TZwgsORAT4mFFOLpVvUU
+         wLOCdJRiI8iwoBF6fd5TYfZLMc0qOc77anvLkpes//44vGAcZt64I85DnFycrKwM3ehP
+         8vb8POijY99I6Wf+e7sq33cHm0/iWEH9waIbxeNkn5PqWms9htaNuxXogbPH7KbHeXaI
+         tnXA==
+X-Forwarded-Encrypted: i=1; AHgh+RrF6+JMqtUGzvyvUEfk9Vmu0LPYGymr7E7h2ZmTcrlz2hTtsp7MfQPosnKqqKJyxtqeiPdSF6E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAnhKJrGCsnZDX4rQMvlcqyUAyN86mzZ3aCl6EH1DvvzZxPOLm
+	iIUljX7+/jetgncG6/pP0/yEMU4DROLkyEm8+zuRnu+cmxBt3Y0ixiAlMRBkw+PQfw==
+X-Gm-Gg: AfdE7ckVu/295Ve5h3GZt5SwJQmPlg9eRF6Kbo8SAUiCwxmPJhfJabvfTQ/KDTz8WN2
+	eDUj0yo2o2TATSBxyW5Hqtu9T2rJEVoYOZeJnyz6tOtDd/af/oJSYoHSn0rer2ebj807ThkvdXG
+	qfgzAjc5CinXsIb46yPNgG02O2TpvSH9keNjimYdEtXzfyemb+yvocUHe1yVlvKXyl867bEsXUa
+	Go1XtuR6E3PR6UKTQH5u16qckblYl/vjnfC7ekbnGPaUswTXDaVVxQV0mirPtbCJlDze9lb/2R1
+	rbzdqsU8Q890ytKOz6rb5yXuxF38CNXWufB1UBVQREiV6JWd/0DQVymk8jhmBtB243MiOqBSPOv
+	z8p8DC4gc9JqvkkJr0s8RVoQvDcRbN7GnhKcyWO3Zf65rz4Qttzy6sM9Uf8mXPT27Lo+//AJCTw
+	==
+X-Received: by 2002:a05:6a00:4484:b0:848:3f07:c5a2 with SMTP id d2e1a72fcca58-8488974f8cdmr6076086b3a.4.1783899727744;
+        Sun, 12 Jul 2026 16:42:07 -0700 (PDT)
+Received: from p1.. ([2607:fb90:ec82:d7be:f961:4fa0:51a9:cde5])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ca79ac0e269sm5756646a12.3.2026.07.12.16.42.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Jul 2026 16:42:07 -0700 (PDT)
+From: Xiang Mei <xmei5@asu.edu>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Patrick McHardy <kaber@trash.net>,
+	Weiming Shi <bestswngs@gmail.com>,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH nf] netfilter: nf_conntrack_sip: widen NAT rewrite delta to s32 in sip_help_tcp()
+Date: Sun, 12 Jul 2026 16:42:01 -0700
+Message-ID: <20260712234201.3213635-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20260713-mailmap-v1-1-cb40979cb190@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAFYaVGoC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIzMDc0Nj3dzEzJzcxALdJDMzE0uzRFNLYzMLJaDqgqLUtMwKsEnRsbW1AGF
- vUAtZAAAA
-X-Change-ID: 20260713-mailmap-b66496a59368
-To: netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, Michael Grzeschik <mgr@kernel.org>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1552; i=mgr@kernel.org;
- h=from:subject:message-id; bh=9IOmE5mNlfjptaUGfi9UqMwAnD1cwqFpc4KgYx+CaB4=;
- b=owEBbQKS/ZANAwAKAb9pWET5cfSrAcsmYgBqVBprbOqVBzCRwJGuLlJuEbGlWjNH+RNFiofIN
- jgIiVWKmSKJAjMEAAEKAB0WIQQV2+2Fpbqd6fvv0Gi/aVhE+XH0qwUCalQaawAKCRC/aVhE+XH0
- q8lGD/oDzKvCqKSEaGPtQ1f3g6QSOd/wURNR3xoRd6Qbv5yFNEGWpOWWV1kIRJY00IlUHpr3ZyX
- TmrcjksOu5xuEQzLTHuIz1cI1UBnr4anW7xqrzAYZRLIVp/8UpQ3/pLi0mpKBanyECgRxJs3H+G
- 0kcpALpJiiEYv3q05iU0dPvyLEUSLZFCxDeG+tAnV3pC11THI7ifEAEbwGecOSLiDFi4al9HOfT
- tMlWItEns2FRd24iS3I7GB21YpMr2ZibKvWYmN/mw2i26B/TgYRTs3nNL3nMvkT+SlY54UlMxuZ
- XJEg2K3N7c3QId672j0WzX4riOKEzPwUg0o1MsnBkoQtFbYAXrTAU+FL55vBNugEt8QVNECYg/c
- ZidpN9YDWoOJeBt62e4fW+s9ONgYtt9IIwVvJXz+s+5ZZ2Bj5jEMcgdx4t8JVriouzXcCJIWD9G
- XcsukNqAqLu6Q77//y/cKEpSW4jvdMAGOoJOqchvFpUAKRqe0/2KIXPwti4Y2oQmzCb7f//n1AS
- 8EWmivqupFfobRSBE9hmdl55XnMkHIQDBghF7WhRuNURviqcXntSgGQIABKcjyBns8dsuuzS7/A
- YN3Pp+QtA5tdroktfcfvYh3ejCKXLFv5e06M+xg/0kq7yAfgk+Sq5JRkOXWkUeIxpE23FdIRQkj
- H8hgURDwF770Xfg==
-X-Developer-Key: i=mgr@kernel.org; a=openpgp;
- fpr=957BC452CE953D7EA60CF4FC0BE9E3157A1E2C64
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
+	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306990-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306991-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,netfilter.org,trash.net,gmail.com,asu.edu];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:kuba@kernel.org,m:mgr@kernel.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[mgr@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:kaber@trash.net,m:bestswngs@gmail.com,m:xmei5@asu.edu,s:lists@lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mgr@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[asu.edu:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,asu.edu:from_mime,asu.edu:email,asu.edu:mid,asu.edu:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AF11D746355
+X-Rspamd-Queue-Id: 9E857746402
 
-After picking up some pending patches for the kernel to work on, I
-realized my name in the mailmap file somehow got mixed up. When
-switching to my kernel.org Address some time ago, I had never the
-intention to use a scrambled variant of Polish and German used for my
-first name to be found in this file. However, so here we are. Lets fix
-it for good.
+sip_help_tcp() stores the size change of each NAT-rewritten SIP message
+in s16 diff and accumulates it in s16 tdiff, but a single message can
+grow by more than S16_MAX while the packet stays under the 65535
+enlarge_skb() limit: nf_nat_sip() rewrites every matching URI, and a long
+Contact list expands the message by tens of kilobytes. diff then wraps,
+and "datalen = datalen + diff - msglen" yields a huge unsigned datalen,
+so the next iteration's ct_sip_get_header() reads past the linearized skb
+tail.
 
-Fixes: 85fac50b58ca ('MAINTAINERS: Update address for Michael Grzeschik')
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org
-Signed-off-by: Michael Grzeschik <mgr@kernel.org>
+Widen diff, tdiff and the seq_adjust hook to s32. Both are bounded by the
+65535 byte packet limit, and the seqadj core is already s32
+(nf_ct_seqadj_set() takes s32), so no previously accepted input is
+rejected.
+
+  BUG: KASAN: use-after-free in ct_sip_get_header (net/netfilter/nf_conntrack_sip.c:464)
+  Read of size 1 at addr ffff888010800000 by task ksoftirqd/1/25
+   ct_sip_get_header (net/netfilter/nf_conntrack_sip.c:464)
+   sip_help_tcp (net/netfilter/nf_conntrack_sip.c:1694)
+   nf_confirm (net/netfilter/nf_conntrack_proto.c:183)
+   nf_hook_slow (net/netfilter/core.c:619)
+   ip6_output (net/ipv6/ip6_output.c:246)
+   ip6_forward (net/ipv6/ip6_output.c:690)
+   ipv6_rcv (net/ipv6/ip6_input.c:351)
+   __netif_receive_skb_one_core (net/core/dev.c:6212)
+   process_backlog (net/core/dev.c:6676)
+   __napi_poll (net/core/dev.c:7735)
+   net_rx_action (net/core/dev.c:7955)
+   handle_softirqs (kernel/softirq.c:622)
+   run_ksoftirqd (kernel/softirq.c:1076)
+   ...
+
+Fixes: f5b321bd37fb ("netfilter: nf_conntrack_sip: add TCP support")
+Reported-by: Weiming Shi <bestswngs@gmail.com>
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
 ---
- .mailmap | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/linux/netfilter/nf_conntrack_sip.h | 2 +-
+ net/netfilter/nf_conntrack_sip.c           | 2 +-
+ net/netfilter/nf_nat_sip.c                 | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/.mailmap b/.mailmap
-index 12f3acdebd72..0596bd04b1c7 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -594,8 +594,8 @@ Mayuresh Janorkar <mayur@ti.com>
- Md Sadre Alam <quic_mdalam@quicinc.com> <mdalam@codeaurora.org>
- Miaoqing Pan <quic_miaoqing@quicinc.com> <miaoqing@codeaurora.org>
- Michael Buesch <m@bues.ch>
--Michal Grzeschik <mgr@kernel.org> <m.grzeschik@pengutronix.de>
--Michal Grzeschik <mgr@kernel.org> <mgr@pengutronix.de>
-+Michael Grzeschik <mgr@kernel.org> <m.grzeschik@pengutronix.de>
-+Michael Grzeschik <mgr@kernel.org> <mgr@pengutronix.de>
- Michael Riesch <michael.riesch@collabora.com> <michael.riesch@wolfvision.net>
- Michal Simek <michal.simek@amd.com> <michal.simek@xilinx.com>
- Michel Dänzer <michel@tungstengraphics.com>
-
----
-base-commit: a13c140cc289c0b7b3770bce5b3ad42ab35074aa
-change-id: 20260713-mailmap-b66496a59368
-
-Best regards,
+diff --git a/include/linux/netfilter/nf_conntrack_sip.h b/include/linux/netfilter/nf_conntrack_sip.h
+index dbc614dfe0d5..aafa0c04f917 100644
+--- a/include/linux/netfilter/nf_conntrack_sip.h
++++ b/include/linux/netfilter/nf_conntrack_sip.h
+@@ -115,7 +115,7 @@ struct nf_nat_sip_hooks {
+ 			    unsigned int *datalen);
+ 
+ 	void (*seq_adjust)(struct sk_buff *skb,
+-			   unsigned int protoff, s16 off);
++			   unsigned int protoff, s32 off);
+ 
+ 	unsigned int (*expect)(struct sk_buff *skb,
+ 			       unsigned int protoff,
+diff --git a/net/netfilter/nf_conntrack_sip.c b/net/netfilter/nf_conntrack_sip.c
+index f3f90a866338..e4a70d1d77b0 100644
+--- a/net/netfilter/nf_conntrack_sip.c
++++ b/net/netfilter/nf_conntrack_sip.c
+@@ -1663,7 +1663,7 @@ static int sip_help_tcp(struct sk_buff *skb, unsigned int protoff,
+ 	unsigned int matchoff, matchlen;
+ 	unsigned int msglen, origlen;
+ 	const char *dptr, *end;
+-	s16 diff, tdiff = 0;
++	s32 diff, tdiff = 0;
+ 	int ret = NF_ACCEPT;
+ 	unsigned long clen;
+ 	bool term;
+diff --git a/net/netfilter/nf_nat_sip.c b/net/netfilter/nf_nat_sip.c
+index aea02f6aff09..a93eaf0f7d30 100644
+--- a/net/netfilter/nf_nat_sip.c
++++ b/net/netfilter/nf_nat_sip.c
+@@ -321,7 +321,7 @@ static unsigned int nf_nat_sip(struct sk_buff *skb, unsigned int protoff,
+ }
+ 
+ static void nf_nat_sip_seq_adjust(struct sk_buff *skb, unsigned int protoff,
+-				  s16 off)
++				  s32 off)
+ {
+ 	enum ip_conntrack_info ctinfo;
+ 	struct nf_conn *ct = nf_ct_get(skb, &ctinfo);
 -- 
-Michael Grzeschik <mgr@kernel.org>
+2.43.0
 
 
