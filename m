@@ -1,78 +1,58 @@
-Return-Path: <netdev+bounces-306932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306933-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7wqqI7VIU2o6ZgMAu9opvQ
-	(envelope-from <netdev+bounces-306932-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 09:56:37 +0200
+	id SNIpFBhPU2rsZgMAu9opvQ
+	(envelope-from <netdev+bounces-306933-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 10:23:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFEF07441A2
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 09:56:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99A61744269
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 10:23:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ibm.com header.s=pp1 header.b=algb8nrN;
-	dmarc=pass (policy=none) header.from=ibm.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306932-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306932-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=TworFBj1;
+	dmarc=pass (policy=reject) header.from=bootlin.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306933-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306933-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C398C300CE79
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 07:56:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 003EF300F5C5
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 08:23:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3896D33A716;
-	Sun, 12 Jul 2026 07:56:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 896A8374183;
+	Sun, 12 Jul 2026 08:23:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C71B52D6E58;
-	Sun, 12 Jul 2026 07:56:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 699FD36A03A
+	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 08:23:44 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783842993; cv=none; b=p8VzhXEqngidMzxG2SEXsU9Wgq2gZ1UXKb78ftQBz4CD8RLByoIKpcR4gBn2iLqTJb2C57s/kvg6jF9r+hW/1jbIyrT/asp1ufqkhNHUHvIr5zlymXYcqScc9r+Xm/6Iswk7g5MJzWJsWe42a2tjODsQTOrm+N64jz3aMzwJwnw=
+	t=1783844628; cv=none; b=SI/xAma0yQIqqXJOqUJVPd4QFZOy6X3WrsPftIc7LMuymGIFGmPhb2eNSngkk4gqPh6Y1cqU9jG2+MpBtknkcmryOizko2Pyk/ZqXu4rxIFFtLk6gAgcwiBdAypvlI3b8BLkZT0x83b/PT5Q3AHK/joHurkNqIujWvUNozJ8C1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783842993; c=relaxed/simple;
-	bh=E76YgbBqphZJxoUlTTDhX/IVFLNpuvLmJmgSb/GsMKA=;
+	s=arc-20240116; t=1783844628; c=relaxed/simple;
+	bh=Wm9mBxki+2Uz52W1xaFYlSEaPVE1Bz6yA7m6SVUbV+Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gtm6zJxxUZ8g7QCK6V2AmIcUQZuYY6YkWoQksv6+XXTiT7VLymKbGQWZnUuEbs8n2C7vdj6n39cCS6a9QoWiipnMo9kuSE5p/94EueQOKGfp7oWgvIkvSxs5zwI/XVuOeGjNx2d9wrOvCtNPTHy+LTQR+bEqdCGjO1wu8Ky4IbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=algb8nrN; arc=none smtp.client-ip=148.163.158.5
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66C7g4TO3223788;
-	Sun, 12 Jul 2026 07:56:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=fOgQYH
-	Ssc9X+0RUE+IcOk6pdTZOJpa3YnaBn0GjQnN4=; b=algb8nrNtYcBaZDo4bGUb6
-	KjRG6wrtd+rAa+CEqxYywQisZshxWmzAv97TtrzWe5rWV4jldnQkBiVN71qhVL+9
-	2Nq2erM860YPNeRvfrn9D/lmumKvZnUBudV6h+njeRKs/xg4bGy4W33bshgHnLtI
-	oDPTXaZ2XjxziUgh+FcDLq3uyQ+3w9/AOKB0vne3ZzBj7JFjLRJCGAIsTOG8Le+f
-	0619+OEJ4teiv9kVJoOz65pkDVvp5MfNN0fiCKygjL2zfGoTPt0PVuhkmIK2XPxn
-	OnUxFnCQyWm2KGYZOEWnTJEJ7sjTMLcmqEfeh77TGiJFb4RWiQnjLOVDfpbDmm+w
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fbegbbpqj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 12 Jul 2026 07:56:22 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66C7ncZE024732;
-	Sun, 12 Jul 2026 07:56:21 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fc05ps50d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 12 Jul 2026 07:56:21 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66C7tiXr30868068
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 12 Jul 2026 07:55:44 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 890A758052;
-	Sun, 12 Jul 2026 07:56:18 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 897CB58050;
-	Sun, 12 Jul 2026 07:56:12 +0000 (GMT)
-Received: from [9.39.28.197] (unknown [9.39.28.197])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Sun, 12 Jul 2026 07:56:12 +0000 (GMT)
-Message-ID: <d2b41ff7-03f1-4a5c-adbe-df914cac120c@linux.ibm.com>
-Date: Sun, 12 Jul 2026 13:26:10 +0530
+	 In-Reply-To:Content-Type; b=VZ6du+1tb7y+hc2M9wrrCTASXb3Oh857idsj4Jtj9DIPVVRddF+IB++7l9jR/xj1/DqtD0gE8Zx1FZY1O+vg0g/dK/EQUumYnXdZvYocWiBByRsnOvNTvVKfIQtbBL4mXVC7V9kXqszDbeId6LBPZn4G1cIfRQWhDbfrU/GzpBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=TworFBj1; arc=none smtp.client-ip=185.246.85.4
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id D44624E40D77;
+	Sun, 12 Jul 2026 08:23:42 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 7850C60341;
+	Sun, 12 Jul 2026 08:23:42 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 681C111BD0592;
+	Sun, 12 Jul 2026 10:23:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1783844621; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=WHd81YusCFbEXGMG/orhuGL4aOt5YJkijG0IowGEMpw=;
+	b=TworFBj1iKFBDZdd0hW7T35/udycdlvdJT42I5MhPY8f69eKxcAu1HCbcgbrUKkHGc053y
+	TMdoA5TgribQCRtoiSs8gtx0j4e8drmKp85I9yVeIVkHNL/Gy3Vi/xA79zKA/soTg27Yx8
+	QGVk3p+mJ1EMiv2aIx19iwKtKaL2+upK9UAlAuKnZCPDq/qDFMcLWWqh32CxJamK1hEex6
+	gUxPy4l3UYUXZXAywuKs+YeVm79ADyLx6Khsxbm+1QgEgTWbZA7wHp6wibwtcph6LkY2ZF
+	4Lxfj8MLgmtEoL6JAlmkevqy3Yamx/EwVap2126ii+k//WNhmFRuX+GLFA/vTA==
+Message-ID: <caa2b141-7131-44dc-ab01-0dd62c6e0a8a@bootlin.com>
+Date: Sun, 12 Jul 2026 10:23:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,149 +60,143 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/af_iucv: fix NULL deref in
- afiucv_hs_callback_syn()
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com
-Cc: horms@kernel.org, linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, wintera@linux.ibm.com,
-        twinkler@linux.ibm.com, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, borntraeger@linux.ibm.com, svens@linux.ibm.com
-References: <20260709191732.124092-1-hidayath@linux.ibm.com>
-Content-Language: en-GB
-From: Hidayathulla Khan I <hidayath@linux.ibm.com>
-In-Reply-To: <20260709191732.124092-1-hidayath@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH net-next v6 1/2] net: dsa: realtek: rtl8365mb: add SGMII
+ support for RTL8367S
+To: contact@c127.dev, Linus Walleij <linusw@kernel.org>,
+ =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>
+Cc: Mieczyslaw Nalewaj <namiltd@yahoo.com>,
+ Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260711-rtl8367s-sgmii-v6-0-88f7944ddca7@c127.dev>
+ <20260711-rtl8367s-sgmii-v6-1-88f7944ddca7@c127.dev>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20260711-rtl8367s-sgmii-v6-1-88f7944ddca7@c127.dev>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=fOcJG5ae c=1 sm=1 tr=0 ts=6a5348a6 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=VwQbUJbxAAAA:8
- a=VnNF1IyMAAAA:8 a=1I7zOhcRGFiCedo4MywA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEyMDA3NyBTYWx0ZWRfX9+iZhVdEp4+/
- llwX4nDIEydF0oSxoQfImQkzBDiy+j/07nhIFwVlwIpkcnSc1EsWOz7LKWb2j2Q/mvRnQaXJJR0
- wNuRtS9X0EwPuqv6Ae224sOPKYvrGL6WM4FjfyBG4BA1thf3zyu+cxo5rmbEwgBrWtdmP5lNQ2I
- FFnzuigsDX2UCC8jIP5ThHhQbhMtgDFB1aagaVOSfnIEJZq4qBsvwjRyxuPTj1S7KFzoEBiN7Wl
- mCfNoW/ZMdzzkYvmfcTQHZD9N7fSWiGis+sDyNkjhRLCHBPgX4mhJuz8ShzEEbKQdgNefhKDm9t
- +yFZN5+Bwc5i+Z9KWIsnnNA2+OLc0vQVcdRJ3TideZgKh8nwW5fjBFqIJ98y11XwZp/MUSTyfZg
- hH3YJK0tHfENv/h0YJeIZCZsHJTYU6BdXIcbmKh5v2tS7bnbsHRqLUC2RpCmktqTRhqHf9wLKxF
- V3uiv2XfucGk3YSSpbw==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEyMDA3NyBTYWx0ZWRfXw8NikXafU82e
- grtXBJnvNFYXGgH5AOx0vjYHB8zmJPNxVppdPe/4jvqbl0XgtvVn/JqLZUyPfbz3GOYoF+4smiu
- P7JjLF2160qba5puAjLWePRCm7yalnA=
-X-Proofpoint-GUID: NO_vM1gfMgxl5pQ5YPSh9ulVJ1kLbrC9
-X-Proofpoint-ORIG-GUID: om4YAekFuSA48d2Ccu-GtKCXduJRQy0G
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-12_03,2026-07-10_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 bulkscore=0 impostorscore=0 suspectscore=0 adultscore=0
- priorityscore=1501 malwarescore=0 clxscore=1015 phishscore=0
- lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2607120077
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306932-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:wintera@linux.ibm.com,m:twinkler@linux.ibm.com,m:heiko.carstens@de.ibm.com,m:gor@linux.ibm.com,m:agordeev@linux.ibm.com,m:borntraeger@linux.ibm.com,m:svens@linux.ibm.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[hidayath@linux.ibm.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306933-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:contact@c127.dev,m:linusw@kernel.org,m:alsi@bang-olufsen.dk,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:namiltd@yahoo.com,m:luizluca@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[c127.dev,kernel.org,bang-olufsen.dk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[yahoo.com,gmail.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hidayath@linux.ibm.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[11]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:from_mime,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DFEF07441A2
+X-Rspamd-Queue-Id: 99A61744269
 
-Thanks for the Sashiko AI review: On the findings it raised.
+Hi Johan,
 
-Finding 1: iucv_sock_kill() returns early unless SOCK_ZAPPED is set,
-and the flag is never set on a freshly allocated child socket, so the
-child socket and its pinned net_device leak on the error paths. I had 
-already
-spotted this leak (in afiucv_hs_callback_syn() and iucv_callback_connreq())
-and Alexandra Winter and I are looking into it.
+On 7/12/26 06:31, Johan Alvarado via B4 Relay wrote:
+> From: Johan Alvarado <contact@c127.dev>
+> 
+> The RTL8367S can mux its embedded SerDes to external interface 1,
+> which is typically used to connect the switch to a CPU port. The chip
+> info table already declares SGMII as a supported interface mode for
+> this chip, but the driver only implements RGMII so far.
+> 
+> Implement SGMII support as a phylink PCS, with the configuration
+> sequence derived from the GPL-licensed Realtek rtl8367c vendor driver
+> as distributed in the Mercusys MR80X GPL code drop:
+> 
+>  - Add accessors for the SerDes indirect access registers (SDS_INDACS),
+>    through which the SerDes internal registers are reached.
+> 
+>  - Register a phylink_pcs for the SerDes, selected from mac_select_pcs
+>    for the SGMII interface, so the SerDes handling lives in the PCS
+>    operations rather than in the MAC operations.
+> 
+>  - Probe the SerDes tuning variant from the chip option register once
+>    at setup. The vendor driver keeps two sets of SerDes tuning
+>    parameters and selects between them based on this option; only the
+>    variant for a non-zero option (which all RTL8367S parts seen so far
+>    report) has been validated on hardware, so the SerDes interface
+>    modes are only advertised in that case. An unsupported variant thus
+>    fails at phylink validation time instead of at link configuration
+>    time.
+> 
+>  - Keep the embedded DW8051 microcontroller in reset and disabled. The
+>    vendor driver loads firmware into it to manage the SerDes link, but
+>    analysis of that firmware shows it only duplicates the link
+>    management phylink already performs: it polls the port status and
+>    writes the external interface force registers behind the driver's
+>    back.
+> 
+>  - Clear the line rate bypass bit for the external interface, tune the
+>    SerDes with the vendor-prescribed parameters, mux the SerDes to MAC8
+>    in SGMII mode and only then take the SerDes out of reset, as the
+>    vendor driver does.
+> 
+>  - After deasserting the SerDes reset, reset the SerDes data path via
+>    the SerDes BMCR register to flush the FIFOs and resync the PLL.
+>    This mirrors what the vendor firmware does right after deasserting
+>    the SerDes reset, and ensures a clean link state from cold boot.
+> 
+>  - Force the SGMII link parameters (link, speed, duplex) in the SDS_MISC
+>    register from pcs_link_up(). SGMII in-band autonegotiation is not
+>    implemented, so only fixed-link and conventional PHY setups are
+>    supported, just like RGMII. This is reported to phylink through
+>    pcs_inband_caps() returning LINK_INBAND_DISABLE, so phylink never
+>    selects an in-band-enabled negotiation mode for this PCS.
+> 
+>  - Program the SerDes pause enables in SDS_MISC from the resolved
+>    pause modes when forcing the MAC external interface in mac_link_up,
+>    as the vendor driver does, rather than leaving whatever state the
+>    boot firmware left there. Flow control testing shows these bits,
+>    not the MAC force pause bits, gate pause on the SerDes external
+>    interface. This is done in the MAC layer because pcs_link_up()
+>    carries no pause information.
+> 
+>  - Implement pcs_get_state() by reading the link status from the
+>    SerDes, with the forced speed and duplex read back from SDS_MISC.
+>    Although the supported fixed-link and conventional PHY setups do not
+>    use it, the PCS owns the SerDes link state, and phylink consults
+>    pcs_get_state() to track the physical link when operating in in-band
+>    mode with autonegotiation disabled. The SerDes has no link interrupt
+>    wired up, so the PCS sets its poll flag.
+> 
+> Tested on a Mercusys MR80X v2.20, where the RTL8367S is connected to
+> the SoC over SGMII.
+> 
+> Suggested-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+> Suggested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> Suggested-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+> Signed-off-by: Johan Alvarado <contact@c127.dev>
 
-Both NULL deref and child sock leak come from the same root cause,
-the child socket is allocated before the listen-state and accept-queue 
-checks.
-I will address them together in v2 by allocating the child socket only 
-after the
-listen-state and accept-queue checks, so the refused path has nothing to
-release (no NULL to guard and no child socket to free).
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-And on the transmit-failure path release the already-constructed
-child socket directly (dev_put, unlink, put the last reference) instead of
-relying on iucv_sock_kill().
+Maxime
 
-Finding 2: missing sock_hold on the afiucv_hs_rcv() lookup. Agreed.
-Bryam Vargas has already submitted a patch for this.
-
-The other findings look valid too. I will follow up on them separately.
-
-Thanks,
-Hidayath Khan
-
-On 10/07/26 12:47 am, Hidayath Khan wrote:
-> afiucv_hs_callback_syn() allocates the child socket with GFP_ATOMIC.
-> If the allocation fails, nsk is NULL.
->
-> The connection-refused path is entered when the listen state check
-> fails, the accept backlog is full, or nsk is NULL. The code
-> unconditionally calls iucv_sock_kill(nsk) in that path.
->
-> iucv_sock_kill() does not accept a NULL socket pointer and immediately
-> dereferences sk via sock_flag(sk, SOCK_ZAPPED). When nsk is NULL,
-> calling iucv_sock_kill(nsk) results in a NULL pointer dereference.
->
-> Only call iucv_sock_kill() when a child socket was successfully
-> allocated.
->
-> Fixes: 3881ac441f64 ("af_iucv: add HiperSockets transport")
-> Cc: stable@vger.kernel.org
-> Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
-> Signed-off-by: Hidayath Khan <hidayath@linux.ibm.com>
-> ---
->   net/iucv/af_iucv.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/net/iucv/af_iucv.c b/net/iucv/af_iucv.c
-> index fed240b453bd..f5b1ec44b6ae 100644
-> --- a/net/iucv/af_iucv.c
-> +++ b/net/iucv/af_iucv.c
-> @@ -1872,7 +1872,8 @@ static int afiucv_hs_callback_syn(struct sock *sk, struct sk_buff *skb)
->   		afiucv_swap_src_dest(skb);
->   		trans_hdr->flags = AF_IUCV_FLAG_SYN | AF_IUCV_FLAG_FIN;
->   		err = dev_queue_xmit(skb);
-> -		iucv_sock_kill(nsk);
-> +		if (nsk)
-> +			iucv_sock_kill(nsk);
->   		bh_unlock_sock(sk);
->   		goto out;
->   	}
->
-> base-commit: 262b2eac463d880a664cf92af1107b4f9d84ad37
 
