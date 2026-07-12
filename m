@@ -1,201 +1,317 @@
-Return-Path: <netdev+bounces-306945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306946-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id k+4sDh6WU2o3cAMAu9opvQ
-	(envelope-from <netdev+bounces-306945-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 15:26:54 +0200
+	id 546/MhOZU2qFcAMAu9opvQ
+	(envelope-from <netdev+bounces-306946-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 15:39:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEC4C744CA0
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 15:26:51 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29D56744CFA
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 15:39:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=WLBqXh1b;
-	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306945-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306945-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=DGNTVDUL;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306946-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306946-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id ADA0A3003824
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 13:26:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 161FE300C98B
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 13:39:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B2DB3AA9C4;
-	Sun, 12 Jul 2026 13:26:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B37739A7F6;
+	Sun, 12 Jul 2026 13:39:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.78.106])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F64194AE6;
-	Sun, 12 Jul 2026 13:26:39 +0000 (UTC)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC2401A6807;
+	Sun, 12 Jul 2026 13:39:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783862806; cv=none; b=QQ+xaKs9tdHwNwiYzop828Wb0p1K5Pj/69MrvG+9p0Y1nwtT8HQpIYd8FKJ1MSozBwilHQGFWyAJT2fZPZ8cV7d3fuV18cJHHWF4TCgDOPBNUVIS4aoPEUNBVQHRwcSa6LD2pnUeKNfxLWOlLCuZgCUMI6NbUCjzGfdl4/m4N7Q=
+	t=1783863568; cv=none; b=mrti8cSBTjaIN3LTHqnHmWN018XKk+2z04K4gCnjZVDTrIoza0s31c/quQG0TEUWKDfiAWMa+gcAfEy6LS4OzWhDyBtaKACiNQZ8vaVKt4K3tVxF/+0lma3OfCbakqe3rb/9cOKhhs5nVuVKE3avCjiqfTwSw+tHuUr+bWdReaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783862806; c=relaxed/simple;
-	bh=EKFY5Ze13T4tZq5uV5SIjCZiwaAwQsy6opnmfRCZaBQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=caYuFtM5hdH5ABI/KQxqrE5+N8yZnx6XBjcIbzN6xdRLLHc5u+OmAd80ygNx27x1zPZIsiQSnkxzIiNih5QVD9h5dId47NGAtiUIIub8AMQd4np8tUBzfuqO5Y4/cYP8/TK3d+hrAA42n9R3zZlz6WcjSj7886DsrQBq3D/OsIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=WLBqXh1b; arc=none smtp.client-ip=13.76.78.106
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
-	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=wb+8y
-	+c/Nz9q76vovFSpCWxPLe0gCxO7zGZ7FSXBEFY=; b=WLBqXh1bbzz0/yaGbTWFp
-	D4FARq0K3VP6sg52z6BeZumhkGTyVU0r4+biVgpc0ygAcbJFMSJKNnf+YvrcTRAo
-	JFqWR/NCkytzN3DxAM/HjV6Gf4qjyLrM8yDJiNylm0RqdOUviu9GOPoj7epN+9DX
-	P5clKKpuJzfHXo4i0zLAl8=
-Received: from localhost.localdomain (unknown [121.229.84.192])
-	by web4 (Coremail) with SMTP id ywQGZQDHq5v5lVNqPrflAg--.6435S2;
-	Sun, 12 Jul 2026 21:26:18 +0800 (CST)
-From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-To: netdev@vger.kernel.org
-Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
-	Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
-	Ao Wang <wangao@seu.edu.cn>,
-	Xuewei Feng <fengxw06@126.com>,
-	Qi Li <qli01@tsinghua.edu.cn>,
-	Ke Xu <xuke@tsinghua.edu.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH net] tcp: reject TIME_WAIT reopens when SYN queue is full
-Date: Sun, 12 Jul 2026 21:25:30 +0800
-Message-ID: <20260712132531.33028-1-zhaoyz24@mails.tsinghua.edu.cn>
-X-Mailer: git-send-email 2.46.2
+	s=arc-20240116; t=1783863568; c=relaxed/simple;
+	bh=W6UW1PTPZxlptu0er6TLUY3G/lbgIGf2Pt7ofAYpQMM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=r1y3kOxFtbcVUhen4fdVU9sIm3khnHZhjsTTOpoH8IfTJIbhwdF9iB873psEApKxreGWcSyinOxJAtgymC7DydaCTO6LtqaZgOam+JqWOSsYqoG9eT0YrkD2k//twY2zWuxW7XUEtd06dhWpmKs1gbhCOq8I356EqmlWPQOT7T4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DGNTVDUL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 69265C2BCB7;
+	Sun, 12 Jul 2026 13:39:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1783863568;
+	bh=W6UW1PTPZxlptu0er6TLUY3G/lbgIGf2Pt7ofAYpQMM=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=DGNTVDULcs80Ua8gTIUp0YwTDe2y14WDBQqJwJLx4WjgyTJzP330kLjRzdPR6GI3K
+	 Df9LWx4b+6UqHW4fcD67fx4WNTYu/VUiXRQibPZ8szCWRv/ZgouKlg7cCvrUgnaE5p
+	 7K4A32FFGz/5llvyN6r5pXqovXag16+N2/CYONkch5tGB2+OmTlwBhrtVbYcQXXPcg
+	 SRSsdOpcJb9nFIYJnwzcWJK/5EP7pBe+3bWL6d3NXu8mE1on5jaCWp0+fllSrpDVjh
+	 BVQ09bcVehazAwTqbIrDPJdn6diYkZ8UYrrgo7lcYjXOWa0i1ixAgtRK8oDyY6bsEe
+	 uNJoJpeolaqSQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55742C43458;
+	Sun, 12 Jul 2026 13:39:28 +0000 (UTC)
+From: Northernside via B4 Relay <devnull+git.northernsi.de@kernel.org>
+Date: Sun, 12 Jul 2026 15:39:28 +0200
+Subject: [PATCH RFC net-next] tls: sw: coalesce records in
+ tls_sw_splice_read()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ywQGZQDHq5v5lVNqPrflAg--.6435S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxJw17Xr47CF47CFyDCF4xCrg_yoW5Cr1UpF
-	Z0krsrJrWDG3y7Ar92ya48ur1fWr4kuFy7uF4rGryUCFn8GF1xXF1Igr4aqF1jyF4vkF1F
-	gFWYqrs8Wr98A3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9v1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l8cAvFVAK
-	0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4
-	x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2
-	z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4
-	CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E74AGY7Cv6cx26r4r
-	Kr1UJr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc
-	8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Av
-	z4vE14v_Xr4l42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8VW8Ww4UJr1UMxC20s
-	026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
-	JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
-	v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
-	j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
-	W8JrUvcSsGvfC2KfnxnUUI43ZEXa7VU0jZX7UUUUU==
-X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAgEGAWpSwx+nOwAAs8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260712-tls-splice-coalesce-v1-1-03e073c96719@northernsi.de>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWMQQrCMBBFrxJm7UATaQW3ggdwW1ykk6mOhLRko
+ hRK796ou//4vLeCchZWOJsVMn9EZUoV7MEAPX16MEqoDK5xXXOyDktU1DkKMdLkI2sdIdghtKP
+ v3JGgmnPmUZZftYfb9WISF0y8FLj/X30PL6byDcO27QtDcV6FAAAA
+X-Change-ID: 20260712-tls-splice-coalesce-dd1bd5fa623c
+To: John Fastabend <john.fastabend@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Northernside <git@northernsi.de>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1783863567; l=6152;
+ i=git@northernsi.de; s=20260712; h=from:subject:message-id;
+ bh=owDZgaho1ntNrpexIaPlLSnhdvuDcEG4zwQ0wTkpsxA=;
+ b=qxNlMZ9xjsK0IzbT0BZc8hCiDKCzcAquUoZwFjLbV7WUeKyUPF2yozsXJybkEWU/MeFjk/lhU
+ jFD8M/yE/1sA6t3hni5tkO5Cl5h162AAG2dKN2EplhZssuiZo0prRYQ
+X-Developer-Key: i=git@northernsi.de; a=ed25519;
+ pk=BMN+nWVka4U/ivwhMm3TeWWdxHstESv4QrGNobOqNaw=
+X-Endpoint-Received: by B4 Relay for git@northernsi.de/20260712 with
+ auth_id=867
+X-Original-From: Northernside <git@northernsi.de>
+Reply-To: git@northernsi.de
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:zhaoyz24@mails.tsinghua.edu.cn,m:edumazet@google.com,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306946-lists,netdev=lfdr.de,git.northernsi.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-306945-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,google.com,davemloft.net,kernel.org,redhat.com,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:john.fastabend@gmail.com,m:kuba@kernel.org,m:sd@queasysnail.net,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:git@northernsi.de,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org,queasysnail.net,davemloft.net,google.com,redhat.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
+	HAS_REPLYTO(0.00)[git@northernsi.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CEC4C744CA0
+X-Rspamd-Queue-Id: 29D56744CFA
 
-A valid SYN that matches a TIME_WAIT socket is redirected to the
-listener with a non-zero tcp_tw_isn.  tcp_conn_request() deliberately
-exempts those requests from normal SYN queue throttling.  A peer can
-therefore create victim-side TIME_WAIT entries with short connections,
-replay valid reopen SYNs, and withhold the final ACK to allocate
-request_sock objects outside the listener's normal SYN-flood controls.
+From: Northernside <git@northernsi.de>
 
-Do not send syncookies for this path: tcp_timewait_state_process()
-derives tcp_tw_isn from tw_snd_nxt so that a direct reopen uses an ISN
-after the prior connection's sequence space.  A syncookie ISN is a
-hash-derived value and has no such ordering guarantee.
+tls_sw_splice_read() currently returns a single TLS record per call.
+It dequeues (or decrypts) one record, splices it into the pipe and
+returns. Draining a stream therefore costs one splice() syscall per
+~16KB record, unlike tls_sw_recvmsg() which already coalesces multiple
+records into the caller's buffer in a single call.
 
-Check the selected listener's SYN queue before descheduling the
-TIME_WAIT socket.  If it is full, account a request-queue drop, retain
-the TIME_WAIT socket, and discard the SYN.  Once the queue has room,
-the existing direct-reopen path and its TIME_WAIT ISN are unchanged.
-Normal SYNs continue to use syncookies when the listener is full.
+With this splice_read coalesces the same way by looping over ready
+records, splicing each into the pipe, until the requested length is
+reached, the pipe cannot take another record or a non DATA record is
+hit.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@vger.kernel.org
-Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
-Reported-by: Ao Wang <wangao@seu.edu.cn>
-Reported-by: Xuewei Feng <fengxw06@126.com>
-Reported-by: Qi Li <qli01@tsinghua.edu.cn>
-Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
-Assisted-by: Claude-Code:GLM-5.2-special
-Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Blocking behaviour is deliberately preserved.
+Only the first record may block:
+
+ - data records after the first are fetched with a nonblocking wait
+   so a short splice is returned rather than sleeping for more input
+
+ - a further record is only started if it already fits in the pipe, so
+   the loop never turns a short read into a blocking
+   skb_splice_bits() where the original single record path would not
+   have blocked
+
+A non DATA record met mid batch is left on rx_list and returned on the
+next call. The copied ?: err return masks the -EINVAL exactly as
+tls_sw_recvmsg() does for mid batch errors. When it is the first
+record the -EINVAL behaviour is unchanged.
+
+Since the loop can decrypt many records under a single reader lock,
+the socket backlog is flushed periodically between records via
+tls_read_flush_backlog(), like tls_sw_recvmsg() and tls_sw_read_sock()
+already do and the released state is fed back into the next
+tls_rx_rec_wait() call. Waits after the first record pass has_copied
+so a pending sk_err is preserved rather than consumed by a short
+splice.
+
+Measured on a single stream (TLS 1.3, AES-128-GCM, loopback, 16KB
+records), draining an upload dropped from 64 splice syscalls per MiB
+(one per record) to ~12/MiB and throughput rose from ~2.2 to
+~2.8 GiB/s, reaching parity with what tls_sw_recvmsg() achieves on
+the same workload.
+
+read()/recvmsg() users should see no change. This only brings the
+zerocopy splice path (e.g. a proxy splicing a TLS socket to a backend
+fd) to parity.
+
+Signed-off-by: Northernside <git@northernsi.de>
 ---
- net/ipv4/tcp_ipv4.c | 8 ++++++++
- net/ipv6/tcp_ipv6.c | 9 +++++++++
- 2 files changed, 17 insertions(+)
+ net/tls/tls_sw.c | 101 +++++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 69 insertions(+), 32 deletions(-)
 
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 209ef7522508fcc3974ae71d35dd66cba96b73d0..ddb5daede802d355b51b802b29b2e1ead3597bd2 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -2310,6 +2310,14 @@ int tcp_v4_rcv(struct sk_buff *skb)
- 							inet_iif(skb),
- 							sdif);
- 		if (sk2) {
-+			if (inet_csk_reqsk_queue_is_full(sk2)) {
-+				drop_reason = SKB_DROP_REASON_TCP_LISTEN_OVERFLOW;
-+				__NET_INC_STATS(net, LINUX_MIB_TCPREQQFULLDROP);
-+				tcp_listendrop(sk2);
-+				inet_twsk_put(inet_twsk(sk));
-+				goto discard_it;
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index d4afc90fd796..8bc0361e3bf4 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -1986,8 +1986,11 @@ ssize_t tls_sw_splice_read(struct socket *sock,  loff_t *ppos,
+ {
+ 	struct tls_context *tls_ctx = tls_get_ctx(sock->sk);
+ 	struct tls_sw_context_rx *ctx = tls_sw_ctx_rx(tls_ctx);
++	struct tls_prot_info *prot = &tls_ctx->prot_info;
+ 	struct strp_msg *rxm = NULL;
+ 	struct sock *sk = sock->sk;
++	size_t flushed_at = 0;
++	bool released = true;
+ 	struct tls_msg *tlm;
+ 	struct sk_buff *skb;
+ 	ssize_t copied = 0;
+@@ -1998,47 +2001,81 @@ ssize_t tls_sw_splice_read(struct socket *sock,  loff_t *ppos,
+ 	if (err < 0)
+ 		return err;
+ 
+-	if (!skb_queue_empty(&ctx->rx_list)) {
+-		skb = __skb_dequeue(&ctx->rx_list);
+-	} else {
+-		struct tls_decrypt_arg darg;
++	/* Coalesce successive DATA records into the pipe, the way
++	 * tls_sw_recvmsg() coalesces into the msg buffer, instead of
++	 * returning one record per call. Only the first record may block.
++	 */
++	while (copied < len) {
++		bool first = !copied;
+ 
+-		err = tls_rx_rec_wait(sk, flags & SPLICE_F_NONBLOCK,
+-				      true, false);
+-		if (err <= 0)
+-			goto splice_read_end;
++		if (!skb_queue_empty(&ctx->rx_list)) {
++			skb = __skb_dequeue(&ctx->rx_list);
++		} else {
++			struct tls_decrypt_arg darg;
+ 
+-		memset(&darg.inargs, 0, sizeof(darg.inargs));
++			err = tls_rx_rec_wait(sk,
++					      first ? (flags & SPLICE_F_NONBLOCK) : true,
++					      released, !first);
++			if (err <= 0)
++				goto splice_read_end;
+ 
+-		err = tls_rx_one_record(sk, NULL, &darg);
+-		if (err < 0)
+-			goto splice_read_end;
++			memset(&darg.inargs, 0, sizeof(darg.inargs));
+ 
+-		tls_rx_rec_done(ctx);
+-		skb = darg.skb;
+-	}
++			err = tls_rx_one_record(sk, NULL, &darg);
++			if (err < 0)
++				goto splice_read_end;
+ 
+-	rxm = strp_msg(skb);
+-	tlm = tls_msg(skb);
++			released = tls_read_flush_backlog(sk, prot,
++							  len - copied, 0,
++							  copied, &flushed_at);
++			tls_rx_rec_done(ctx);
++			skb = darg.skb;
++		}
+ 
+-	/* splice does not support reading control messages */
+-	if (tlm->control != TLS_RECORD_TYPE_DATA) {
+-		err = -EINVAL;
+-		goto splice_requeue;
+-	}
++		rxm = strp_msg(skb);
++		tlm = tls_msg(skb);
+ 
+-	chunk = min_t(unsigned int, rxm->full_len, len);
+-	copied = skb_splice_bits(skb, sk, rxm->offset, pipe, chunk, flags);
+-	if (copied < 0)
+-		goto splice_requeue;
++		/* splice does not support reading control messages
++		 * mid batch the record is left on rx_list for the next call
++		 */
++		if (tlm->control != TLS_RECORD_TYPE_DATA) {
++			err = -EINVAL;
++			goto splice_requeue;
++		}
+ 
+-	if (copied < rxm->full_len) {
+-		rxm->offset += copied;
+-		rxm->full_len -= copied;
+-		goto splice_requeue;
+-	}
++		/* Records after the first must not block on pipe space,
++		 * stop if this one does not already fit
++		 */
++		if (!first) {
++			unsigned int need = DIV_ROUND_UP(rxm->full_len,
++							 PAGE_SIZE);
++
++			if (pipe_occupancy(pipe->head, pipe->tail) + need >
++			    pipe->max_usage) {
++				__skb_queue_head(&ctx->rx_list, skb);
++				goto splice_read_end;
 +			}
++		}
 +
- 			inet_twsk_deschedule_put(inet_twsk(sk));
- 			sk = sk2;
- 			tcp_v4_restore_cb(skb);
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index ebe161d72fbd07a13d92812b45b5a3ce2464a015..8d3ff7184d03f5dd81f9a9c20e3ebbf174efc43a 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1969,6 +1969,15 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
- 					    sdif);
- 		if (sk2) {
- 			struct inet_timewait_sock *tw = inet_twsk(sk);
++		chunk = min_t(unsigned int, rxm->full_len, len - copied);
++		chunk = skb_splice_bits(skb, sk, rxm->offset, pipe, chunk,
++					flags);
++		if (chunk < 0) {
++			err = chunk;
++			goto splice_requeue;
++		}
+ 
+-	consume_skb(skb);
++		copied += chunk;
 +
-+			if (inet_csk_reqsk_queue_is_full(sk2)) {
-+				drop_reason = SKB_DROP_REASON_TCP_LISTEN_OVERFLOW;
-+				__NET_INC_STATS(net, LINUX_MIB_TCPREQQFULLDROP);
-+				tcp_listendrop(sk2);
-+				inet_twsk_put(tw);
-+				goto discard_it;
-+			}
++		/* pipe full, requeue the remainder */
++		if (chunk < rxm->full_len) {
++			rxm->offset += chunk;
++			rxm->full_len -= chunk;
++			goto splice_requeue;
++		}
 +
- 			inet_twsk_deschedule_put(tw);
- 			sk = sk2;
- 			tcp_v6_restore_cb(skb);
++		consume_skb(skb);
++	}
+ 
+ splice_read_end:
+ 	tls_rx_reader_unlock(sk, ctx);
 
---
-2.47.3
+---
+base-commit: f6f3b36c15ed44de1fbb44e645e4fae8c4a4453e
+change-id: 20260712-tls-splice-coalesce-dd1bd5fa623c
+
+Best regards,
+--  
+Northernside <git@northernsi.de>
+
 
 
