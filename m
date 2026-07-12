@@ -1,92 +1,98 @@
-Return-Path: <netdev+bounces-306986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306987-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id SOfPLvYRVGqkhgMAu9opvQ
-	(envelope-from <netdev+bounces-306986-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 00:15:18 +0200
+	id mzNeD40TVGoDhwMAu9opvQ
+	(envelope-from <netdev+bounces-306987-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 00:22:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B55B97461E2
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 00:15:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9520474625B
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 00:22:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=jh++NTkP;
+	dkim=pass header.d=linux.dev header.s=key1 header.b="Zlz/oish";
 	dmarc=pass (policy=none) header.from=linux.dev;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306986-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306986-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306987-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306987-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D172D3001CF2
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 22:15:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EBC0C30262F4
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 22:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F79937A83D;
-	Sun, 12 Jul 2026 22:15:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75F6F37DAAE;
+	Sun, 12 Jul 2026 22:20:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C5D37A4B9
-	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 22:15:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B662937A4B9;
+	Sun, 12 Jul 2026 22:20:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783894513; cv=none; b=ocMV9ndU9bAqiDJojvsmf0AchqdZC7KdmpB8gUpvIYU5vyIXNCUVYbDfRGGwek/1P1acwgjSYmV/W113ZhWhyC86McRh8abt0ztoTS/4l2V8wrIBGt7FoyhDPW1D7P4msBQiZfQ8cHJV9IjstIiWjV7+60lrsmdkOO0EeBMJHBM=
+	t=1783894836; cv=none; b=Ql4bnVzQgscb1td/kjdWVOPnpL7uCAaJXGm0Kwn2OTeAWHh8nODhfZS9OKuRtYfHlVGepXtN+B/GXHiD5n6P/FA2wnfhyUlee7+gl/tpfQ6wrgvefK6dAZejFpnsfiDCGNsvHE2lSWRIxyYRLtnhMtiZyOSSxv9wEGqTEwfqqzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783894513; c=relaxed/simple;
-	bh=1hgSOoWiw+HnAX87diwB++9TUNULMJEA+gJgDazuzsY=;
+	s=arc-20240116; t=1783894836; c=relaxed/simple;
+	bh=l8L1S0WVJd3eIxG600JhnGrxD1zRu3/XiIkZq2hIjPo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GSJ+Y7TaOKy9M7+3W2ZywXIq7JrstWjxVqAZ4YKJCbFF0VjdnD2+Xk9iyy+C3nqR5uYjo9R2DNKP82mORkfN/rVSIYQ+azHyTeuQpORAxl94Fp28rD2sw2kZnTqSiKMUu/RmiWb8GtvGFf3Ys/4hQesP2SIsGUdJ85XoqzK9iWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jh++NTkP; arc=none smtp.client-ip=95.215.58.178
-Message-ID: <f4b2b659-036b-49f7-8f6b-5f173a1eb380@linux.dev>
+	 In-Reply-To:Content-Type; b=Cac+eiMZJyC/I9uIwBCIVkc0Qae4H273dKog3HtzXlBzcWXVbyIjwNoxA8wCsTEG6TJF7Y2wc8lilyefXfHyKa1+br1teYWA1mYw67PjDlQBo5Ajfp2qWudYvp8ayHURczrVunGojMFfweTr4xEOK1QuVONXKafgVg79TAg6TfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Zlz/oish; arc=none smtp.client-ip=91.218.175.178
+Message-ID: <165fca2f-2259-42c0-bac7-58685a4c5ebd@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783894499;
+	t=1783894822;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CboKgCXRP0GTBlCnZOK+gyQj14lL7ieETZEex5S6D9Y=;
-	b=jh++NTkPV62UCIQg8hXCIhD1nhDLIkHnieo9pd7zi4w7eMzrD28pgxa0kyDLJT3Ouhe31O
-	4yQvFtiEwXETIihEM8yX91paFdKFJsJTsgIVwRllACL4n3O3o4sLa0XFFJUqoMUOn3qxKd
-	+Jr8Tgs/eaveyOKLBiOL23qJEgKTETA=
-Date: Sun, 12 Jul 2026 23:14:44 +0100
+	bh=6q/hlROSEnFud0PHhVOe6WrK0uQOXKUk0FXkjVG+KKw=;
+	b=Zlz/oishFwOb1KgPbTqWMa2/pW9Au8C36nuXU/NgYYU8l/sEKuyLaHd6q95t7HcLRKKN0x
+	OdofgN+is6lVy2iZdZd4PHrXEdD9DXaMjXH3Ut3EL9cN7G/SaTdpCvWkbfBG9T9aPIB5l/
+	bvQhJL10FL2Gdt6qmnkCw7s+XvqpwEk=
+Date: Sun, 12 Jul 2026 23:19:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] nfc: llcp: reject PDUs shorter than the LLCP header
-To: "Doruk (0sec)" <doruk@0sec.ai>
-Cc: david@ixit.cz, oe-linux-nfc@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20260711072702.70231-1-doruk@0sec.ai>
- <be1731eb-e6ec-4015-92e4-c09fd88019e6@linux.dev>
- <CAPdMp1p=72WXe-8w5Y9viBuB6YvZWZomNc9xQzXEg-qe1WVN0A@mail.gmail.com>
+Subject: Re: [PATCH net] net: rnpgbe: Pass an expression directly in
+ rnpgbe_rm_adapter()
+To: Markus Elfring <Markus.Elfring@web.de>, netdev@vger.kernel.org,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, MD Danish Anwar <danishanwar@ti.com>,
+ Michael Grzeschik <mgr@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+ Yibo Dong <dong100@mucse.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
+References: <7958e26e-a4f9-48ee-8d79-3797016944c5@web.de>
 Content-Language: en-US
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <CAPdMp1p=72WXe-8w5Y9viBuB6YvZWZomNc9xQzXEg-qe1WVN0A@mail.gmail.com>
+In-Reply-To: <7958e26e-a4f9-48ee-8d79-3797016944c5@web.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:doruk@0sec.ai,m:david@ixit.cz,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-306987-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[web.de,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,ti.com,redhat.com,baylibre.com,mucse.com];
 	FORGED_SENDER(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306986-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_RECIPIENTS(0.00)[m:Markus.Elfring@web.de,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:danishanwar@ti.com,m:mgr@kernel.org,m:pabeni@redhat.com,m:u.kleine-koenig@baylibre.com,m:dong100@mucse.com,m:linux-kernel@vger.kernel.org,m:kernel-janitors@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -95,118 +101,21 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:from_mime,linux.dev:dkim,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B55B97461E2
+X-Rspamd-Queue-Id: 9520474625B
 
-On 12/07/2026 17:02, Doruk (0sec) wrote:
-> Hi Vadim
+On 12/07/2026 19:35, Markus Elfring wrote:
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Sun, 12 Jul 2026 20:25:10 +0200
 > 
-> this was reproduced from userspace on unmodified
-> linux-next (bee763d5f341) without RF hardware.
-> 
-> It's the peer-RX path, not a local command skb:
-> 
-> virtual_ncidev_write (peer NCI DATA) -> nci_rx_data_packet
-> -> nfc_tm_data_received -> nfc_llcp_data_received
-> -> rx_work -> nfc_llcp_rx_skb -> nfc_llcp_recv_connect
+> The address of a data structure member was determined before
+> a corresponding null pointer check in the implementation of
+> the function “rnpgbe_rm_adapter”.
 
-Ok, fair, but in this case it's better to check skb->len in
-nfc_llcp_data_received - no need to setup a worker when skb is not
-correct.
-
-> 
-> Bring the LLCP link up via a normal NFC-DEP activation, then send
-> one NCI DATA packet with a 1-byte CONNECT PDU. skb->len - 2 wraps
-> to 0xffffffff and the TLV walk runs off the end:
-> 
-> BUG: KFENCE: out-of-bounds read in nfc_llcp_recv_connect+0x9f6/0xf80
-> nfc_llcp_recv_connect+0x9f6 -> nfc_llcp_rx_work -> process_one_work
-> read 4219B past a 704B skbuff_small_head from virtual_ncidev_write
-> R14: 00000000ffffffff (wrapped tlv_array_len)
-> 
-> With the guard: rx_skb runs for all 600 short PDUs, recv_connect
-> reached 0 times, 0 reports.
-> 
-> The bound stays "<", not "<=" -- a header-only SYMM/DISC/DM is
-> exactly 2 bytes and must still dispatch; AGF uses "<=" only
-> because an AGF frame must also carry a sub-PDU. I'll drop the
-> "same guard as AGF" line from the commit message.
-> 
-> Instantiating /dev/virtual_nci needs privilege, but that's just
-> the syzbot transport; the 1-byte CONNECT is what a remote NFC-DEP
-> peer emits, and the DEP layer imposes no minimum LLCP length.
-> Impact is a proximity OOB read (DoS).
-> 
-> I can send the full reproducer if you'd like.
-> 
-> best
-> Doruk
-> 
-> On Sun, Jul 12, 2026 02:01 PM, Vadim Fedorenko
-> <vadim.fedorenko@linux.dev> wrote:
->>
->> On 11/07/2026 08:27, Doruk Tan Ozturk wrote:
->>> nfc_llcp_rx_skb() reads the two-byte LLCP header (DSAP/SSAP/PTYPE) and
->>> dispatches by PDU type; several handlers then derive a TLV-array length as
->>> skb->len - LLCP_HEADER_SIZE. Neither nfc_llcp_rx_skb() nor its callers
->>> guarantee the frame is at least LLCP_HEADER_SIZE bytes, and a sub-header
->>
->> that's not correct. there are 2 ways to get to nfc_llcp_rx_skb() - via
->> nfc_llcp_recv_agf() or through commands/locally generated skbs. The
->> first one checks against LLCP_HEADER_SIZE, while latter one creates skb
->> payload with correct LLCP header size. Do you have a reproducer to
->> trigger the issue?
->>
->>
->>> PDU does reach it: digital_in_recv_dep_res() and digital_tg_recv_dep_req()
->>> strip the DEP header with skb_pull() after only checking the DEP header
->>> size, so a DEP I-PDU carrying a 0- or 1-byte LLCP payload is handed up as
->>> a sub-2-byte skb.
->>>
->>> For a CONNECT or CC PDU, nfc_llcp_recv_connect() and nfc_llcp_recv_cc()
->>> then pass skb->len - LLCP_HEADER_SIZE to nfc_llcp_parse_connection_tlv().
->>> For skb->len < 2 that subtraction underflows: truncated into the u16
->>> tlv_array_len parameter it becomes ~0xFFFE, and for a CONNECT to the SDP
->>> SAP, nfc_llcp_connect_sn() uses a size_t and underflows to SIZE_MAX. The
->>> TLV parsers bound their walk relative to that length, so they read far
->>> past the end of the skb.
->>>
->>> The aggregated-frame path (nfc_llcp_recv_agf()) already drops sub-PDUs
->>> shorter than the header. Apply the same guard once, in the dispatcher, so
->>
->> that not exactly correct, it drops skbs which are shorter or equal to
->> the header, the check added in this patch is not correct then.
->>
->>> every PDU type is covered.
->>>
->>> Found by 0sec (https://0sec.ai) using automated source analysis; the
->>> missing guard is evident from source. Compile-tested.
->>>
->>> Fixes: d646960f7986 ("NFC: Initial LLCP support")
->>> Cc: stable@vger.kernel.org
->>> Assisted-by: 0sec:claude-opus-4-8
->>> Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
->>> ---
->>>    net/nfc/llcp_core.c | 3 +++
->>>    1 file changed, 3 insertions(+)
->>>
->>> diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
->>> index aed5fe1afef0..e3b3077e0e83 100644
->>> --- a/net/nfc/llcp_core.c
->>> +++ b/net/nfc/llcp_core.c
->>> @@ -1481,6 +1481,9 @@ static void nfc_llcp_rx_skb(struct nfc_llcp_local *local, struct sk_buff *skb)
->>>    {
->>>        u8 dsap, ssap, ptype;
->>>
->>> +     if (skb->len < LLCP_HEADER_SIZE)
->>> +             return;
->>> +
->>>        ptype = nfc_llcp_ptype(skb);
->>>        dsap = nfc_llcp_dsap(skb);
->>>        ssap = nfc_llcp_ssap(skb);
->>
-
+The null check in rnpgbe_rm_adapter() looks more like defensive
+programming, which got into the code unnoticed. pdev will not exist if
+netdev is not allocated, where mucse is netdev private data.
 
