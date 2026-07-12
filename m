@@ -1,379 +1,308 @@
-Return-Path: <netdev+bounces-306964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306961-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rE3VNFncU2qhfgMAu9opvQ
-	(envelope-from <netdev+bounces-306964-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 20:26:33 +0200
+	id HHeiI77ZU2o8fgMAu9opvQ
+	(envelope-from <netdev+bounces-306961-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 20:15:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57286745A1E
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 20:26:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C81787459CA
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 20:15:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=yahoo.com header.s=s2048 header.b=adPiLP7q;
-	dmarc=pass (policy=reject) header.from=yahoo.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306964-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306964-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=DudX3+5d;
+	dmarc=pass (policy=reject) header.from=nvidia.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306961-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306961-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B7FB93002B1D
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 18:26:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6FCE43004603
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 18:15:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B453399356;
-	Sun, 12 Jul 2026 18:26:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAEE12989B5;
+	Sun, 12 Jul 2026 18:15:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic315-20.consmr.mail.ne1.yahoo.com (sonic315-20.consmr.mail.ne1.yahoo.com [66.163.190.146])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013056.outbound.protection.outlook.com [40.93.196.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F92372670
-	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 18:26:23 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783880788; cv=none; b=UiX01tTVXNi0y44Btd0yAQGVwLYljwsZMsgVfvlskDUQxdbXJuEu+owsOqtj9vv9OqTxZ1nBoRvOXdF5b+AlBhiyFCnvueQhLwnEoWGnPUdKRBPTqUdepVoJPmW6UPzmAjdiIpsY60JHOicE5iWGsoVKS0HbUuSuylUPrfWpJPk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783880788; c=relaxed/simple;
-	bh=P6ghZ0tPlX4H+N/TU3ATLD8RRDscZKlj7i64rQ/hT1w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rB4zVGqRSqAQ7BLiYW+UXlfI6GH51Ls1gMQaC9MTDREycMO0FY1yBdjm+NGglYuz55zuB7fHVD4rN8nmgShG7ryc1v/qHRXBd2ztfLPnb3wyF4bhl3m1JLJhO07pJB6mHir/YP2DL7aRHzOC6LhCm+Q+FumoOr4aA8VEf8WwwS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=adPiLP7q; arc=none smtp.client-ip=66.163.190.146
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1783880776; bh=7UMEu4ya97zplXTcJ4hIzqbv8+E3Xf7XQi80Xf5pnCs=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=adPiLP7qPPfLLTYLVyRRbGSOecMVKvdOizeQtMCnl+hMTZqCAcoguMJMqAl1uFaPd+YrE/x9gDN1iFSEgXDjXPta3Jaw5qIFMf4XkLRVB2vjcYs+nF1wEsz29EdysBtEsWTXqoUU+yoam54bmNYpRrEQcIajfO8bqZvzMj7o9JvGdCGjcAadkO+zfebAr17lyRq+L7ZkEzFR4ZIXGtUQNKheLTnx273LRV8dAWZSogsWtWzRljKHM/z2cQ9ThuQ7cYa1DABqYl8+SQnDEO/eNMAklPUwQO48Rn6/6YRmzqivHXLtERFQu6lzEk+vONBx3Q4OvntkLYadYlg5kQYWzQ==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1783880776; bh=btPtEQ1cme/TdHEX6hi13d8UxdpDaw83oUXPTIU8l5o=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=q3cr0nvWcKIWQIzvOysvyKh5IX9PCCAnDlZlBs8iI7CK4Wp5TpfZ5vJ+ZeyaTN8lWo4v8k73GAfOSx1lXq2M0kvVYAjAap1uCedt2gvrcPYWMVhZ3QAJmgsM+4p6t6L4pvEyBwZ3IjUyWD/H+4tzg0g/rW8NuTBd2xJ3iYWavegPDEV9KyQ9qGrrl9GXuJOlgDf0VRv09xM0pXBO3NEvKbCr88DPSY3IfsH/G41EM6jMxVZ2D7w7IFM2pUTQOuF41xL6Rq6Xx3+B0X0TWh0DOnW70HTrFVEJb5CSg5EGTKTaXffF412vUSk2iN3MjB4HjH0gA+M4/MzSArv5PrW6cw==
-X-YMail-OSG: 21tgVmAVM1lZyX3ZgLNG6V_GGeqIAJUY7uBSNqNx5PW3_Cy5JWS0iEwandc7z5O
- Kj3RqkKrgONgoRlIX5odQOObtoTfEyOaFFCOXzYiPW98dGlNJlGGahWJwRhBHtxY3NF_ez5jW8_0
- v.ucj4v0ekBUne._HiaEVdFh4tIASjYfsl_bMtpIkIUAfNhKTFARcPiw.LmjJTtc3KC6BXtPLLYz
- ayjIZ3Q_y3NQhP7yG51kHlMO5MFasQBvLBfDmpBOtNFBL9c33alrc_DgaT_DjEU2lfjAXon4fmTY
- yvbpyQWQLNz_699nAAmR7Rw2N2P7z1FCgztvCHMvytAZj.pdnF.Anzf_WmKf0phYtfUfMQ_mT7No
- GIs.5mKIJjWptyraR49C2n4DCp89IGhHq7cI96VzofSVZ0V_LgPhkPfdPZd9ORY4QR3I3dIwUkj6
- OyudlJGHVZyBACmksLdptCDkhj8CGbeoCK.ADGjCylTjw1lgb0vD8PUJKj5K6SwWEGTsGVmo_Bxk
- 7x9KoGZEp.rdiYZvvX9gLOkzURBeB9euqyNEBKls1KKiOc2_xA34fFsQUH31C_bi.3ckZIzcs6_C
- xQvUF6nX9o0t6gxDn.4sgwvb4LLjo60k2km3Ve.PZI.47X3BLNiPfb5koxLeFnlEFAIcSGBQNAJX
- SgJNVvqh47hjKVqL7lA9vnU01k8pqmZmB5HVzKZfrm7UIFucUS79m8lec_rxmehLPyMaN_S4pnLV
- tyOj7mi9BUBjF1XQWAx2cFRGqKVwOjP8tgOMg4DgmWCwqNGXohLG56FKkAOvWMwW6AujGIS36FM6
- ws5KccLeDFnvOHXCzxd8G8US7YyiC5QMUTetwqXfjDfN3FhwDbH24niCk3qYfm3pfPQvUKwV0cw.
- 8LR5H012vUhEfTxZ.ony3PPLTkghUU9if6I6qoPUwiAtFsXNLtpxfxEWbtcQN8LNyho0FBVTJ4qd
- .hS_0yETGdZJgBYsKR0SgJqP6rjGKP5lZ7_BrkygRMmtxRE.yriDOKi6DeSEWvuRyBIrpVYc_MUH
- U0gErnH.D4acb0KHv8dPUWvXH7gbcp_b2mQ3oBo5q6bW6UZAtZfIEOoL9kBjb_mpqzipa2licB22
- Dmsy0S322Ul5p9SzDrOzruPrbPQakuwcz7hdPMxJdEjKVthBDSmdjD3KFSeTyNRaIl5fyGQAU5ZM
- unufhQniXY0W9.Nhlkdn.p25AaMXYspnz9waIhTYNk6ANZxIqDqE6Thnjxgij7uvBnDXPygbwbjj
- yXyA_TYz5nChkLx97YcRrQXv6z.Fu7IITvgSPVLawPSgfu8W.5QU_8mANSRD2YzxX.ZVzst5jpNX
- jp.OWMJmHqIS6nv823Bwiflkz5rH.wwXj.Jj8YyR9iVVswvGgjv8X68eFxULIjCk3OkDbAcfuKCl
- eJKwbAy23MwTSzymlwLzMWYSbq9Lf5vIkm9Z3VNt52vMmmXpTBJ.0YQw2atfavWkIY0htToU6AhH
- 3GrWhMZvHHQSh7Yo.raSkvQSKc0KrRkE3ZdFM4S8mDKhcvMevpzCqeSLwObt4zDM6hwXg39Y6q0V
- BYw90RIaxfFPvKnGa6D.GAY4j29ac_FEBgm9OWvpQWNs3CGJsVP83E0wrPwa9f3qHtL0GGRK6vSu
- AUuKAxnrZBNwNjUTkM0i1AxVjDXO9yr.3j1dZ6RF0gjOepqhdS.Lq6lzIy10vgm9mLIjVzWzmAgy
- qtweImaNGgBkkc4RgEFIxVGfJkfiEuCD9U4UP3x_VYS_IiSCgKSbKWb8.bM4NBwG1GW4BY.yHn5W
- ORCsnKpIJVtiS9ofd4H3bgz1KzmaIE6SeX.TSM7U_nOgyQWr0MIF.jU5Ax7j6hFE9D7F9Y6dC6.S
- Rq5foVCm910d7gGOcMSK3vSPCEtinmB2c8ZvIxnystSXfVtq6k.B5IDQWJbkDFOx4E5iz5SsR.Ec
- 5VLPn7rUle6uBBMyIorUjgrwvWum7FQjGWoASbQach5m.ho5DLpW5RhhyqTW_TC9iIuoKiQTu0NX
- p1526YDOBKrpGodzl9GKHFl2kq5ZegVeGqAz12kKfEzc.oH6tPEOXdW_yqR09vVafemsenQBBsbL
- csCcfNmsK6hBascKJJzDowXLq2q.DlOy6WaB26C6XwSzGeLQUMtwdvTdqGLExjCowwOOmu9hpUGf
- VtE1c8DqtNJC5NfoCGH_dJYJKzccsw9b9Oj7n9dOQqXRYaAGpIEFUpeOdaVZi7Zlov64rYwRPL3o
- VsH0Wnh7b7EPHhNq7R3PHqmuRzk5lGKWo_xEHT6ZthAGozTKYR0CqdZh1KiZvfSx_nwmhFpjzQTO
- Jqfyt5i6dmLQGRWzYNfnPU3_V_57oJW6DO7zEelnN8Ajp
-X-Sonic-MF: <namiltd@yahoo.com>
-X-Sonic-ID: 0e7521ab-684d-494e-b6a2-2971447cffb4
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic315.consmr.mail.ne1.yahoo.com with HTTP; Sun, 12 Jul 2026 18:26:16 +0000
-Received: by hermes--production-ir2-7b48fcd765-7kk4q (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 14ffdde626cdbfdeb3ae8e42bb048280;
-          Sun, 12 Jul 2026 18:05:35 +0000 (UTC)
-Message-ID: <7b164d90-b57f-4746-8b7f-b5bb7fd7fe51@yahoo.com>
-Date: Sun, 12 Jul 2026 20:05:32 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE66F1DED5C
+	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 18:15:21 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783880123; cv=fail; b=CL/8gwu6J21yw6ht1ekfaxhOkycGg1ZBxxLZKeg+9gNmyIbae0Pc57KkZKVr1efVCSuNRIM+mV7Sv/DWAzngEJrP8gldHg6tAzBU8Jaeu6D5yQLAf75USW1ajr12yt5n7EUXN0hfgIShXEFq5/W+MoB5OVMU0n/s3RlK5ok+4/4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783880123; c=relaxed/simple;
+	bh=oOtqnnXvldi6Hjcf26e5uVItFGbzyHFs8FOINBnndpM=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=HxfCVzkNnhyCLD5iGlzy6i1wM+EnH5ET1+9yVOt/SgTrdOMCvlDHKPaqjNpGsy1FdiWdsVQw6PotlwyJ+27qjc1vtIXxqv+AfjiEp0R+KBk65U3+LqonqLepV0UxFsqLz73TzumyAP8Cf6ZlSrEQ7uieT5EB5HS3HgNwFPTB+rg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=DudX3+5d; arc=fail smtp.client-ip=40.93.196.56
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RsH1yu4pvVRsRVh0BWBcnn7hpx8sjNPH7OcrFPy8Tiw4kazTCerkcm5CW/cJZS/5WDxdC7rrHsl34ay8wczhnIX8WTsrGFv/HNqPlaOEg+Ehodpya7BDN8U0MyB3ydZVHCEu/aD3FGBcnq02hacHYT1cU+PNDDZPB2ZuXTGEHw23+FLI3rOVwTeu+7TT4un4BQi2D011FW55+fngMp3sMsBEil5Bq2p8mMqkqhfcvgUxHb3LvodS8c7dxEkQSUzZAp/+IhG8HVrzZmLiahQgC01cBpvSxDEiH7+DfjnO2pg37vhkHunDxl5t7wx6ZKloES0Ek1n68DZqhePWdvE/ng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oOtqnnXvldi6Hjcf26e5uVItFGbzyHFs8FOINBnndpM=;
+ b=SXODzySXJVB9CEvhuoe0ZWg/e1vurGOEw8UAX22wkzNqVTHRvotRBJ8Z2sUcuhZx8IvmI5Oz10sMx7bokb4xYIvq5kE+aBzhFb3BvydiCOYg8TAOVMDDFmxP3dsOTiKkCZCRHO2639w4AGtvVmQVGMcLGUI/BrOFquWnqOIdJDC6kAJ3WccvDQG3JOceAgpiZWwo1W/2zuR7mzcJb7RTXhcQpzzSZrftqatomu4tU6kejB5lCtjCwJCVoWMeb+Zq0vsVst09vbi2Qt12fl0ncFC0cD8vGbVKptiz7U4vBDF2ESV8RRyKx8PmaqrrZHC4FLmRkwKCAKrwfsqxLfdoBw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oOtqnnXvldi6Hjcf26e5uVItFGbzyHFs8FOINBnndpM=;
+ b=DudX3+5d69rXQ/WgHq4y3WizbpFH3qUnSR3Rv2JWNV88WbD7NE6yyHoe4JX4T0IGDmgfgFOJTCog3ECh4nxyjuOmhV4wVb25XN0bviPFTDnPVmA2ysNHdYdYEwrXyhHsIWAj0Epn1t2n/IwRSlZuogSKLmAz2zAScBIEw0tOEZ/QvW1WO8/MdpaFBX70hGPc1vNW6xq0+T6qye9g7M8AAoq+RNJbVkJK/6tG20E30ePq8r4iaoC+l35wsGtPLWpKgDJ63QQ3SBiK60OtMcJlh1C+lkDr2WpLplNSUuT89QMkdJ9kOiLUa6B5bFNZcKgbl1xQ2iPlQLkAoMTQ6hL7XA==
+Received: from SJ2PR12MB9008.namprd12.prod.outlook.com (2603:10b6:a03:543::19)
+ by DM4PR12MB5962.namprd12.prod.outlook.com (2603:10b6:8:69::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.181.23; Sun, 12 Jul 2026 18:15:17 +0000
+Received: from SJ2PR12MB9008.namprd12.prod.outlook.com
+ ([fe80::e25c:9cce:637a:3dfd]) by SJ2PR12MB9008.namprd12.prod.outlook.com
+ ([fe80::e25c:9cce:637a:3dfd%3]) with mapi id 15.21.0181.014; Sun, 12 Jul 2026
+ 18:15:16 +0000
+From: Danielle Ratson <danieller@nvidia.com>
+To: Aleksander Jan Bajkowski <olek2@wp.pl>, "mkubecek@suse.cz"
+	<mkubecek@suse.cz>, "andrew@lunn.ch" <andrew@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"jbe@pengutronix.de" <jbe@pengutronix.de>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: RE: [PATCH ethtool-next v2 1/2] sfpid: print all implemented options
+Thread-Topic: [PATCH ethtool-next v2 1/2] sfpid: print all implemented options
+Thread-Index: AQHdERvLUt7RqaaHQkWCU3aM3jeXx7Zp07xw
+Date: Sun, 12 Jul 2026 18:15:16 +0000
+Message-ID:
+ <SJ2PR12MB900887F3DE8B760321EE5F5BD8FB2@SJ2PR12MB9008.namprd12.prod.outlook.com>
+References: <20260711095803.257213-1-olek2@wp.pl>
+In-Reply-To: <20260711095803.257213-1-olek2@wp.pl>
+Accept-Language: en-US, he-IL
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ2PR12MB9008:EE_|DM4PR12MB5962:EE_
+x-ms-office365-filtering-correlation-id: 42fb132e-3ebc-44fe-f3d9-08dee0418688
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|1800799024|366016|10070799003|23010399003|22082099003|18002099003|11063799006|3023799007|38070700021|56012099006|6133799003;
+x-microsoft-antispam-message-info:
+ MI+jv5e5OdBy+G68Jp3dpmpVGt3TACafkhXylHzYiUc7q/aN+II5KguKv5Kd3w5YfrfPoxRIwzl3UyMXbIebWa3ciTjK9Xrx4rBHsUa7/StlmG6q7/nlrvDnwOt2RmayVb3vhBEHRbwvacph06sCIz1XMXGQRNDiyMcsnEfFW+QkiqtAMJwTV0IBS6TvyKYJeq6wwA8qSw648lUmkvwrJn/Dvj79hWru/SgRakAU5zJaKSKi4qXxZF6dY3QZ3tsFv+F4yhvufmi+e/tV/2xfN+UCVwaJH/fxcN5N36+mkoCZN8M/ukrPDm5wqYxjEnJ6GvWeilBA+u4D4b+4XzNTcguslcqXCCjtx3l/rzEKZufC6g+qLmv6AljhxivRN1tHAh24n6akaGLs91GCpQoiRFzoQxBAI1kip1dg+s8DX+hTwxZjoowrefPrR+QnjCwlOjow9JHOQg201cdio1wLs/JoaS0toFnhACC983YAu00EyFzYrJu54MGnhdCE/0MIMAlkolIxlGU/XkxdL5MshqRBtC2NxWSSjXe5ptv3J4r5WXpkfwoGp91fkfgWOy1ybqXMMX81STXola7NQuMKZ2/pYvZVasaKrXaLh/7YMQge08BHHOb73iIRwchLYxK1ewoa/tOWHvr24ZqCR1yTshgZL5IPwt5xz2qmBNm3PsWwe/t/zsbFuVxdk2i4LFNvzmgPUi6tW/ECUEFDYhGmkg==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR12MB9008.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(10070799003)(23010399003)(22082099003)(18002099003)(11063799006)(3023799007)(38070700021)(56012099006)(6133799003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 2
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?V3dSTnBwdVdFeEN1aE02OXQyWHI0RHFUL05nT1VKTEJSSERrbkRldUoxQ29j?=
+ =?utf-8?B?cDZYQkRpbHNJQldHTnFYUjB2WG9uc3BmVUZmZjJ5cTlMbTN2bTF5OVVkSGtO?=
+ =?utf-8?B?OTR4ajZWZHBURjVlZVJZUjJ6dFVIWlpHU3NmcmdXRVJUaGJJOXZuZkc2dHZY?=
+ =?utf-8?B?bkd4OFdiSjgxR1VkWW1MNTJLU24yRmlUcXpVdGRnUXJLTFdDYUVIbVVRNG1H?=
+ =?utf-8?B?VTVLa1FVWjZYamNIYndGWldUTnFnT3FET0gwQzdpY1VDQXFSQ1QvakFXN2dx?=
+ =?utf-8?B?RTRlQjZzWXY1ZTlsemk4THZHVUVVNm4zdUJnNEd0MS9ONktYeDRteGEzenBV?=
+ =?utf-8?B?b1ZUV3ZhUVVoVGtFTEpGOGZHVjJzZkcyYWRwTVJNSVBSaGJMWjJieWtuREdM?=
+ =?utf-8?B?WWpDY3gwUUxRa09Jb2tnY0VlajBoREdqT0FPbTdiN0NwaTdrZ2hpanF1SFpi?=
+ =?utf-8?B?YlBWc2JnaUs3dDVCaXpmNWp3ODI3amNmcWc5eGFxdE5pM0RTaGZTaC9yWWQ2?=
+ =?utf-8?B?NnRYSkpoL09xSWZQb1F3MnphVFVpMG5ZdUhHcitXR3k3RTYxSlUrSmxROFZ4?=
+ =?utf-8?B?UXkvUU44TmhEMUtsTjk2eTVvS09FM3Y0Ylk2a3NYRXFhYWJ5R2JhbitzdDZN?=
+ =?utf-8?B?WU5pc0t2cDEzTTFkYWhVb0NVRzFBS2VUeHA0eERhT2g2bXF1WGdVYmNFUDln?=
+ =?utf-8?B?c25VVXN0Mm5qR1NlWTJPZnJ5UEVEYU5JbytlSkdrMi82a0RHMjFmRjBaQ25C?=
+ =?utf-8?B?RHFmZGxVTUhqbXR3RkttRFFGN2xicURKbVhaZ2h6WHorYUNBWEVFUmk3dHRq?=
+ =?utf-8?B?R1Z0bmY4Ym5YUzBQSUE3TVQrWWk1Y09nK0M1aE1TYVZWYVd1MUpONlVsY2Vs?=
+ =?utf-8?B?MEtVTTNVZnhVb0ZBOVpSMDN6ZmhyMXh1dUVNYXZNbVhEcVRKVDJwdFc2NlF6?=
+ =?utf-8?B?R3JrVmtnNks1RVVjREVzQzAyd2JBZEpicFU1MlVhVGJCVTFGNHJ1OFl5ekNw?=
+ =?utf-8?B?ZFQ0QStDeUdubFFxNXFtTzQ4TGNtbUdGbkhUR25XYUtGU3JFNkRKM0ZCejhN?=
+ =?utf-8?B?WlNZVUhtWnVLTTdTWDlGemlwUG1mZ3NNcFFoOFZUOG02bHNEQUhxcEVlSHk4?=
+ =?utf-8?B?YmFucUt6ZGJGT2E2d3pndXUvalQxTDFRUjVFNWRGM0EyRk5hYVV5Q0tnSlVH?=
+ =?utf-8?B?Y1MydGY3bE1zaXNEd0pESTNyV09nWWhjMXZYOW5jNzBITWJ4Z1pHN1dzWVA1?=
+ =?utf-8?B?VzZFMDFXUUowN0ZMR1ZERHFMUE0yMEsvMTRZRDZWQVNRK2ZwdjVCYmhuaCtZ?=
+ =?utf-8?B?ZWV1L3hDWkt3WVRNVE5VNWpIb1ZISmlFbUwrbHF6YVkvT1gxZ3FhNVN0dGtB?=
+ =?utf-8?B?R05jU3B5cVpmMXdPTjFaaFlnQVgwcktjVitKRUpqTEZORzlVTElmbG9TRkds?=
+ =?utf-8?B?c2hTdXRlQVVHa2Z3NTdhZVFRRnNuVWhKdGJ3ZStqR2tyRzArZG1GSkVCcmFx?=
+ =?utf-8?B?MU9EWG4xbkZlaW9UOVl1Slp4blFmanVnYzRoY2hGNGUxWDNRVDJ3d3l5VTZl?=
+ =?utf-8?B?aXZ6MlBiOWJDczJRKzdIOSthNGQvSm1JUDVYQTNDUDVrdGNLN0ZtYlppZWFF?=
+ =?utf-8?B?RlFwY3BzVlZ1MmpuSUJ6Wk5pbW81MGR4TlVWZnZMcHlZN2FhWDMrS2NJaHZH?=
+ =?utf-8?B?OWtHcXY5T011ako4SUVRZ2xqR2xGSWI3blB0QkppdlpJVXNxNmxweTBDdEwx?=
+ =?utf-8?B?aVVNakJCMFVYSkhJVWwxcFJzTmhiZ2VYQXBjaGNETEdwTC80REMrdW91c3NX?=
+ =?utf-8?B?Nm1iNkZqQ1hFT0UrVXRLVERsd1l1SG9XVHNaYktQTnZsU05uK1pDcUVUQUpp?=
+ =?utf-8?B?VXYyNllYKzFYemJVOTlKamdoUlZvTXBtM2lmRVhqdUFyWE12MHhkcnhvdnZu?=
+ =?utf-8?B?Z1NGdkdwci9lOVh5QkR5ZjVYSlc3a0VObjVmRlJ4eXVhTW5TYWxqMFpmcXRL?=
+ =?utf-8?B?S05IaExxYkZjdG03Vll0ZkYrb3RzcGxYREhwbkdMWkV2NHFOeXlMdktCeUxi?=
+ =?utf-8?B?azRIKzhXYU5mb0tNeXNIZW5FYzlSRGRnYWsvKzVZbU44NlJyTXlhaDdrZCs1?=
+ =?utf-8?B?RGJ3bmRyUzFYUU5xZjJ1WGxIUS82OTJ4ZlQ2ZUU3Y1JZeHI3ZUluVUF3ODk1?=
+ =?utf-8?B?WTN5alZldjFGUjRSREtBSFlqRnFUS2RQa3hYaTBLZEhkdks4TmI0U2Y0NDBo?=
+ =?utf-8?B?MnZwUGEzRkZNK1A1eG1NdkJEbm9KYTZpd201R2l6cHNlMUk5bXRHcE4wYXlT?=
+ =?utf-8?B?Y251SndZZXV2SGFrSFFYYlFvRFBJNGhRM0drYklqMlI3QkkwRCtSVzhVNGY4?=
+ =?utf-8?Q?BC+hAY+OBADLYpfB9wfrg2ARnoOYKYNcCKMrKRZqBvV5d?=
+x-ms-exchange-antispam-messagedata-1: Vc3W5YUIbCqf/Q==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 2/2] net: dsa: realtek: rtl8365mb: add HSGMII
- support for RTL8367S
-To: contact@c127.dev, Linus Walleij <linusw@kernel.org>,
- =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260711-rtl8367s-sgmii-v6-0-88f7944ddca7@c127.dev>
- <20260711-rtl8367s-sgmii-v6-2-88f7944ddca7@c127.dev>
-Content-Language: pl
-From: Mieczyslaw Nalewaj <namiltd@yahoo.com>
-In-Reply-To: <20260711-rtl8367s-sgmii-v6-2-88f7944ddca7@c127.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: WebService/1.1.26136 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR12MB9008.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 42fb132e-3ebc-44fe-f3d9-08dee0418688
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jul 2026 18:15:16.7365
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: HAAxsrPdaC30dHTgkRuyHBWnnY7JNqDRbhXKU6KSn3pfzQxDeilWTT8cotPfj8MuaoSXRdjMIn7rt+f7zatIHw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5962
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[yahoo.com,reject];
-	R_DKIM_ALLOW(-0.20)[yahoo.com:s=s2048];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [-7.06 / 15.00];
+	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-306961-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:contact@c127.dev,m:linusw@kernel.org,m:alsi@bang-olufsen.dk,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:maxime.chevallier@bootlin.com,m:luizluca@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-306964-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[c127.dev,kernel.org,bang-olufsen.dk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk];
-	FORGED_SENDER(0.00)[namiltd@yahoo.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[yahoo.com];
-	FREEMAIL_CC(0.00)[bootlin.com,gmail.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:olek2@wp.pl,m:mkubecek@suse.cz,m:andrew@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jbe@pengutronix.de,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[wp.pl,suse.cz,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,pengutronix.de,vger.kernel.org];
+	FORGED_SENDER(0.00)[danieller@nvidia.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[namiltd@yahoo.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[yahoo.com:+];
+	FROM_NEQ_ENVFROM(0.00)[danieller@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,c127.dev:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 57286745A1E
+X-Rspamd-Queue-Id: C81787459CA
 
-Hi Johan
-
-On 7/12/2026 6:31 AM, Johan Alvarado via B4 Relay wrote:
-> From: Johan Alvarado <contact@c127.dev>
-> 
-> In addition to SGMII, the RTL8367S SerDes also supports HSGMII, which
-> carries 2.5 Gbps with the same signaling as SGMII at 2.5x clock rate.
-> The chip info table already declares HSGMII as a supported interface
-> mode for external interface 1.
-> 
-> Extend the SerDes PCS to handle HSGMII, which phylink represents as
-> 2500base-x:
-> 
->  - Select the HSGMII SerDes tuning parameters and external interface
->    mode, and mux the SerDes to MAC8 in HSGMII mode, from pcs_config()
->    according to the interface. The parameters are again lifted from the
->    GPL-licensed Realtek rtl8367c vendor driver, and again only cover
->    the tuning variant for a non-zero chip option, so the mode is gated
->    on the option probed at setup.
-> 
->  - Advertise 2500base-x and MAC_2500FD on ports whose external
->    interface supports HSGMII.
-> 
->  - Accept SPEED_2500 in the forced link configuration. The MAC speed
->    field has no 2.5 Gbps value: the rate is determined by the HSGMII
->    SerDes configuration, and the vendor driver programs the 1 Gbps
->    value here, so do the same.
-> 
->  - Raise the port 6 ingress and egress rate limiters to their maximum
->    at setup time, as the vendor switch init does unconditionally for
->    the whole chip family. The chip resets them to 0x1FFFF (~1.048 Gbps
->    in units of 8 Kbps), which caps the aggregate HSGMII throughput at
->    roughly 1 Gbps. The vendor documentation describes the reset
->    default as disabling the limiter, but the cap is real: on an
->    RTL8367S-based Mercusys MR85X running an OpenWrt backport of this
->    series, several clients on 1 Gbps user ports were limited to about
->    1.02 Gbps combined across the HSGMII CPU port until these limiters
->    were raised, after which throughput reached about 2 Gbps [1]. The
->    related HSGMII scheduler line rate (LINE_RATE_HSG_H) is already set
->    to its maximum by the common init jam table.
-> 
-> Tested on a Mercusys MR80X v2.20, where the RTL8367S is connected to
-> the SoC over HSGMII.
-> 
-> Link: https://github.com/openwrt/openwrt/pull/19445#issuecomment-4505613294 [1]
-> Suggested-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-> Suggested-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
-> Signed-off-by: Johan Alvarado <contact@c127.dev>
-
-Thanks for the patch, this matches what I've seen too on similar
-hardware.
-
-As discussed earlier in the thread: the rate limiter helper, as well
-as pcs_config()/RTL8365MB_SDS_BYPASS_LINE_RATE_MASK, currently assume
-the SerDes is always muxed to external interface 1 / port 6
-(RTL8365MB_SDS_EXT_INTERFACE_ID / _PORT). That's true for every chip
-currently in rtl8365mb_chip_infos[] (RTL8367S and RTL8367SB both have
-their SGMII/HSGMII-capable extint at { 6, 1, ... }), so nothing is
-broken today.
-
-I still think it's worth guarding against this ahead of time though.
-It isn't an architectural constant of the family, just something that
-happens to hold for the two chips currently in the table, and there's
-no guarantee a future chip won't mux its SerDes to a different port
-or extint id. If that happens, pcs_config() would silently program
-the wrong DIGITAL_INTERFACE_SELECT/FORCE register, and the rate
-limiter helper would write to the wrong port's registers (or need to
-guess an address it can't verify) - the kind of thing that's easy to
-miss in review since it only breaks on hardware nobody in this thread
-has to test with.
-
-Since rtl8365mb_sds_probe_option() already walks
-chip_info->extints[] looking for the SGMII/HSGMII-capable one, I'd
-like to have it cache the discovered port and id (mb->sds_port /
-mb->sds_id) instead of relying on the fixed
-RTL8365MB_SDS_EXT_INTERFACE_ID/_PORT. pcs_config() and the bypass
-line-rate mask would then use the cached values, and
-rtl8365mb_sds_raise_rate_limits() would check mb->sds_port == 6 and
-warn+skip instead of assuming, since only the port 6 register
-addresses are known/verified so far.
-
-Draft below, as a preparatory patch to go before this one. No
-functional change for RTL8367S/RTL8367SB - just removes the
-assumption for whatever comes next. Let me know what you think.
-
----
-  #define RTL8365MB_BYPASS_LINE_RATE_REG		0x03F7
-  #define RTL8365MB_BYPASS_LINE_RATE_MASK(_port)	BIT((_port) - 5)
-  
- +/* Port 6 ingress and egress rate limiter registers. Each limit is a 19-bit
- + * value in units of 8 Kbps, split across a 16-bit LSB register (CTRL0) and a
- + * 3-bit MSB field (CTRL1). The chip resets them to 0x1FFFF; see
--+ * rtl8365mb_sds_raise_rate_limits().
-++ * rtl8365mb_sds_raise_rate_limits(). Only port 6 addresses are known - every
-++ * chip currently supported muxes the SerDes to port 6 (see mb->sds_port),
-++ * but this is not guaranteed for chips that may be added later.
- + */
- +#define RTL8365MB_INGRESSBW_PORT6_RATE_CTRL0_REG	0x00CF
- +#define RTL8365MB_INGRESSBW_PORT6_RATE_CTRL1_REG	0x00D0
-@@ -30,7 +32,29 @@
-  /* SerDes indirect access registers */
-  #define RTL8365MB_SDS_INDACS_CMD_REG		0x6600
-  #define   RTL8365MB_SDS_INDACS_CMD_BUSY_MASK	0x0100
--@@ -637,6 +649,18 @@ static const struct rtl8365mb_jam_tbl_entry rtl8365mb_sds_jam_sgmii[] = {
-+@@ -270,12 +284,11 @@
-+ #define   RTL8365MB_SDS_MISC_SGMII_SPD_MASK		0x0180
-+ #define   RTL8365MB_SDS_MISC_MAC8_SEL_SGMII_MASK	0x0040
-+ 
-+-/* The embedded SerDes can only be muxed to external interface 1 (MAC8),
-+- * which is port 6.
-++/* The embedded SerDes is muxed to whichever external interface the chip's
-++ * extint table marks as SGMII/HSGMII-capable. For every chip currently
-++ * supported this is external interface 1 (MAC8) on port 6, but this is
-++ * discovered per-chip in rtl8365mb_sds_probe_option() and cached in
-++ * mb->sds_port / mb->sds_id rather than assumed, since it need not hold for
-++ * chips added in the future.
-+  */
-+-#define RTL8365MB_SDS_EXT_INTERFACE_ID		1
-+-#define RTL8365MB_SDS_EXT_INTERFACE_PORT	6
-+-
-+-/* Line rate bypass bit for the SerDes external interface */
-+-#define RTL8365MB_SDS_BYPASS_LINE_RATE_MASK \
-+-	RTL8365MB_BYPASS_LINE_RATE_MASK(RTL8365MB_SDS_EXT_INTERFACE_PORT)
-+ 
-+ /* SerDes tuning parameter variant selector. The vendor driver picks between
-+  * two sets of SerDes tuning parameters based on this chip option. Reading it
-+@@ -637,6 +650,18 @@ static const struct rtl8365mb_jam_tbl_entry rtl8365mb_sds_jam_sgmii[] = {
-  	{ 0x0424, 0xD810 }, { 0x002E, 0x83F2 },
-  };
-  
-@@ -49,25 +73,61 @@
-  enum rtl8365mb_phy_interface_mode {
-  	RTL8365MB_PHY_INTERFACE_MODE_INVAL = 0,
-  	RTL8365MB_PHY_INTERFACE_MODE_INTERNAL = BIT(0),
--@@ -1242,20 +1266,70 @@ static int rtl8365mb_sds_probe_option(struct realtek_priv *priv)
-+@@ -871,6 +896,11 @@ struct rtl8365mb {
-+ 	struct rtl8365mb_port ports[RTL8365MB_MAX_NUM_PORTS];
-+ 	struct phylink_pcs pcs;
-+ 	bool sds_supported;
-++	/* Port and extint id the SerDes is muxed to on this chip, discovered
-++	 * in rtl8365mb_sds_probe_option() from the chip's extint table.
-++	 * Valid only if sds_supported is true.
-++	 */
-++	int sds_port;
-++	int sds_id;
-+ };
-+ 
-+ #define pcs_to_rtl8365mb(_pcs) container_of((_pcs), struct rtl8365mb, pcs)
-+@@ -1229,6 +1259,9 @@ static int rtl8365mb_sds_probe_option(struct realtek_priv *priv)
-+ 	if (i == RTL8365MB_MAX_NUM_EXTINTS)
-+ 		return 0;
-+ 
-++	mb->sds_port = extint->port;
-++	mb->sds_id = extint->id;
-++
-+ 	ret = regmap_write(priv->map, RTL8365MB_SDS_OPTION_ARM_REG,
-+ 			   RTL8365MB_SDS_OPTION_ARM_KEY);
-+ 	if (ret)
-+@@ -1242,20 +1275,74 @@ static int rtl8365mb_sds_probe_option(struct realtek_priv *priv)
-  	return 0;
-  }
-  
--+/* The vendor driver raises the port 6 ingress and egress rate limiters to
--+ * their maximum in its switch init, unconditionally for the whole chip
--+ * family. The chip reset in rtl8365mb_setup() puts them back to their reset
--+ * default of 0x1FFFF, a ~1.048 Gbps limit which caps the aggregate
--+ * throughput of an HSGMII CPU port at roughly 1 Gbps. The vendor
-++/* The vendor driver raises the ingress and egress rate limiters of the
-++ * SerDes-connected port to their maximum in its switch init, unconditionally
-++ * for the whole chip family. The chip reset in rtl8365mb_setup() puts them
-++ * back to their reset default of 0x1FFFF, a ~1.048 Gbps limit which caps the
-++ * aggregate throughput of an HSGMII CPU port at roughly 1 Gbps. The vendor
- + * documentation describes the reset default as disabling the limiter, but
- + * the cap has been observed on hardware. Raise them likewise, to 0x7FFFF
- + * (~4.19 Gbps, above the HSGMII line rate). The related HSGMII scheduler
- + * line rate register (LINE_RATE_HSG_H, 0x03FA) is already set to its
- + * maximum by the common init jam table.
-++ *
-++ * Only the port 6 register addresses are known. Every chip currently
-++ * supported muxes the SerDes to port 6 (see mb->sds_port, discovered in
-++ * rtl8365mb_sds_probe_option()); if a future chip ends up muxing it
-++ * elsewhere, skip rather than guess at an address.
- + */
- +static int rtl8365mb_sds_raise_rate_limits(struct realtek_priv *priv)
- +{
-++	struct rtl8365mb *mb = priv->chip_data;
- +	int ret;
- +
-++	if (mb->sds_port != 6) {
-++		dev_warn(priv->dev,
-++			 "SerDes on port %d has no known rate limiter registers, skipping\n",
-++			 mb->sds_port);
-++		return 0;
-++	}
-++
- +	ret = regmap_write(priv->map, RTL8365MB_INGRESSBW_PORT6_RATE_CTRL0_REG,
- +			   0xFFFF);
- +	if (ret)
-@@ -96,17 +156,18 @@
-  				bool permit_pause_to_mac)
-  {
- +	const struct rtl8365mb_jam_tbl_entry *sds_jam;
-- 	const int id = RTL8365MB_SDS_EXT_INTERFACE_ID;
-  	struct rtl8365mb *mb = pcs_to_rtl8365mb(pcs);
-  	struct realtek_priv *priv;
- +	size_t sds_jam_size;
-++	int id;
- +	u32 mode;
-  	u16 val;
-  	int ret;
-  	int i;
-  
-  	priv = mb->priv;
-- 
-++	id = mb->sds_id;
-++
- +	if (interface == PHY_INTERFACE_MODE_2500BASEX) {
- +		sds_jam = rtl8365mb_sds_jam_hsgmii;
- +		sds_jam_size = ARRAY_SIZE(rtl8365mb_sds_jam_hsgmii);
-@@ -116,8 +177,15 @@
-  
-  	/* Hold the embedded DW8051 microcontroller in reset and keep it
-  	 * disabled. The vendor driver loads firmware into it to manage the
-- 	 * SerDes link, but the firmware only duplicates work that phylink
--@@ -1283,24 +1357,24 @@ static int rtl8365mb_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
-+@@ -1272,17 +1359,20 @@ static int rtl8365mb_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
-+ 	/* The vendor driver clears the line rate bypass for all interface
-+ 	 * modes except TMII.
-+ 	 */
-+ 	ret = regmap_update_bits(priv->map, RTL8365MB_BYPASS_LINE_RATE_REG,
-+-				 RTL8365MB_SDS_BYPASS_LINE_RATE_MASK, 0);
-++				 RTL8365MB_BYPASS_LINE_RATE_MASK(mb->sds_port),
-++				 0);
-+ 	if (ret)
-  		return ret;
-  
-  	/* Tune the SerDes with vendor-prescribed parameters */
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBbGVrc2FuZGVyIEphbiBCYWpr
+b3dza2kgPG9sZWsyQHdwLnBsPg0KPiBTZW50OiBTYXR1cmRheSwgMTEgSnVseSAyMDI2IDEyOjU0
+DQo+IFRvOiBEYW5pZWxsZSBSYXRzb24gPGRhbmllbGxlckBudmlkaWEuY29tPjsgbWt1YmVjZWtA
+c3VzZS5jejsNCj4gYW5kcmV3QGx1bm4uY2g7IGRhdmVtQGRhdmVtbG9mdC5uZXQ7IGVkdW1hemV0
+QGdvb2dsZS5jb207DQo+IGt1YmFAa2VybmVsLm9yZzsgcGFiZW5pQHJlZGhhdC5jb207IGpiZUBw
+ZW5ndXRyb25peC5kZTsNCj4gbmV0ZGV2QHZnZXIua2VybmVsLm9yZw0KPiBDYzogQWxla3NhbmRl
+ciBKYW4gQmFqa293c2tpIDxvbGVrMkB3cC5wbD4NCj4gU3ViamVjdDogW1BBVENIIGV0aHRvb2wt
+bmV4dCB2MiAxLzJdIHNmcGlkOiBwcmludCBhbGwgaW1wbGVtZW50ZWQgb3B0aW9ucw0KPiANCj4g
+U0ZQIG1vZHVsZXMgaW1wbGVtZW50IG11bHRpcGxlIG9wdGlvbnMuIEJlZm9yZSB0aGUg4oCcanNv
+buKAnSBvcHRpb24gd2FzDQo+IGludHJvZHVjZWQsIGFsbCBvcHRpb25zIHdlcmUgbGlzdGVkLiBD
+dXJyZW50bHksIG9ubHkgdGhlIGxhc3Qgb3B0aW9uIGlzIGxpc3RlZC4gVGhpcw0KPiBjb21taXQg
+Zml4ZXMgdGhpcyBidWcuIE9wdGlvbnMgYXJlIHJlcHJlc2VudGVkIGFzIGFycmF5Lg0KPiANCj4g
+QmVmb3JlOg0KPiAkIGV0aHRvb2wgLW0gc2ZwLXdhbg0KPiAuLi4NCj4gCU9wdGlvbiB2YWx1ZXMg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIDogMHgwMCAweDMyDQo+IAlPcHRpb24gICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICA6IFJBVEVfU0VMRUNUIGltcGxlbWVudGVkDQo+
+IC4uLg0KPiAkIGV0aHRvb2wgLS1qc29uIC1tIHNmcC13YW4NCj4gWyB7DQo+IC4uLg0KPiAgICAg
+ICAgICJvcHRpb25fdmFsdWVzIjogWyAwLDUwIF0sDQo+ICAgICAgICAgIm9wdGlvbiI6ICJSQVRF
+X1NFTEVDVCBpbXBsZW1lbnRlZCIsIC4uLg0KPiAgICAgfSBdDQo+IA0KPiBBZnRlcjoNCj4gJCBl
+dGh0b29sIC1tIHNmcC13YW4NCj4gLi4uDQo+IAlPcHRpb24gdmFsdWVzICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICA6IDB4MDAgMHgzMg0KPiAJT3B0aW9uICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgOiBSWF9MT1MgaW1wbGVtZW50ZWQNCj4gCU9wdGlvbiAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIDogVFhfRElTQUJMRSBpbXBsZW1lbnRlZA0KPiAJT3B0
+aW9uICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgOiBSQVRFX1NFTEVDVCBpbXBs
+ZW1lbnRlZA0KPiAuLi4NCj4gJCBldGh0b29sIC0tanNvbiAtbSBzZnAtd2FuDQo+IFsgew0KPiAu
+Li4NCj4gICAgICAgICAib3B0aW9uX3ZhbHVlcyI6IFsgMCw1MCBdLA0KPiAgICAgICAgICJvcHRp
+b24iOiBbICJSWF9MT1MgaW1wbGVtZW50ZWQiLCJUWF9ESVNBQkxFDQo+IGltcGxlbWVudGVkIiwi
+UkFURV9TRUxFQ1QgaW1wbGVtZW50ZWQiIF0sIC4uLg0KPiAgICAgfSBdDQo+IA0KPiBGaXhlczog
+NDA3MTg2MmY1OGQ4ICgic2ZwaWQ6IEFkZCBKU09OIG91dHB1dCBoYW5kbGluZyB0byAtLW1vZHVs
+ZS1pbmZvIGluDQo+IFNGRjgwNzkgbW9kdWxlcyIpDQo+IFNpZ25lZC1vZmYtYnk6IEFsZWtzYW5k
+ZXIgSmFuIEJhamtvd3NraSA8b2xlazJAd3AucGw+DQo+IC0tLQ0KPiBDaGFuZ2VzIGluIHYyOg0K
+PiAgLSBmaXggdHlwbyBpbnRyb2R1Y2VkIC0+IGludHJvZHVjZWQNCj4gIC0gcmVuYW1yIG1vZHVs
+ZV9wcmludF9hcnJheV9zdHJpbmcoKSAtPg0KPiBtb2R1bGVfcHJpbnRfYW55X2FycmF5X3N0cmlu
+Z19lbnRyeSgpDQo+IC0tLQ0KPiAgbW9kdWxlLWNvbW1vbi5jIHwgIDggKysrKysrKysNCj4gIG1v
+ZHVsZS1jb21tb24uaCB8ICAxICsNCj4gIHNmcGlkLmMgICAgICAgICB8IDQ4ICsrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLQ0KPiAgMyBmaWxlcyBjaGFuZ2Vk
+LCA0MSBpbnNlcnRpb25zKCspLCAxNiBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9t
+b2R1bGUtY29tbW9uLmMgYi9tb2R1bGUtY29tbW9uLmMgaW5kZXggNDJmY2NmNi4uNDNmZjY0OQ0K
+PiAxMDA2NDQNCj4gLS0tIGEvbW9kdWxlLWNvbW1vbi5jDQo+ICsrKyBiL21vZHVsZS1jb21tb24u
+Yw0KPiBAQCAtMjU4LDYgKzI1OCwxNCBAQCB2b2lkIG1vZHVsZV9wcmludF9hbnlfYm9vbChjb25z
+dCBjaGFyICpmbiwgY2hhcg0KPiAqZ2l2ZW5fanNvbl9mbiwgYm9vbCB2YWx1ZSwNCj4gIAkJcHJp
+bnRmKCJcdCUtNDFzIDogJXNcbiIsIGZuLCBzdHJfdmFsdWUpOyAgfQ0KPiANCj4gK3ZvaWQgbW9k
+dWxlX3ByaW50X2FueV9hcnJheV9zdHJpbmdfZW50cnkoY29uc3QgY2hhciAqZm4sIGNvbnN0IGNo
+YXINCj4gKyp2YWx1ZSkgew0KPiArCWlmIChpc19qc29uX2NvbnRleHQoKSkNCj4gKwkJcHJpbnRf
+c3RyaW5nKFBSSU5UX0pTT04sIE5VTEwsICIlcyIsIHZhbHVlKTsNCj4gKwllbHNlDQo+ICsJCXBy
+aW50ZigiXHQlLTQxcyA6ICVzXG4iLCBmbiwgdmFsdWUpOw0KPiArfQ0KPiArDQo+ICB2b2lkIG1v
+ZHVsZV9zaG93X3ZhbHVlX3dpdGhfdW5pdChjb25zdCBfX3U4ICppZCwgdW5zaWduZWQgaW50IHJl
+ZywNCj4gIAkJCQkgY29uc3QgY2hhciAqbmFtZSwgdW5zaWduZWQgaW50IG11bHQsDQo+ICAJCQkJ
+IGNvbnN0IGNoYXIgKnVuaXQpDQo+IGRpZmYgLS1naXQgYS9tb2R1bGUtY29tbW9uLmggYi9tb2R1
+bGUtY29tbW9uLmggaW5kZXggNDA2MzQ0OC4uZjNiYWYyYQ0KPiAxMDA2NDQNCj4gLS0tIGEvbW9k
+dWxlLWNvbW1vbi5oDQo+ICsrKyBiL21vZHVsZS1jb21tb24uaA0KPiBAQCAtMjgxLDYgKzI4MSw3
+IEBAIHZvaWQgbW9kdWxlX3ByaW50X2FueV9zdHJpbmcoY29uc3QgY2hhciAqZm4sIGNvbnN0DQo+
+IGNoYXIgKnZhbHVlKTsgIHZvaWQgbW9kdWxlX3ByaW50X2FueV9mbG9hdChjb25zdCBjaGFyICpm
+biwgZmxvYXQgdmFsdWUsIGNvbnN0DQo+IGNoYXIgKnVuaXQpOyAgdm9pZCBtb2R1bGVfcHJpbnRf
+YW55X2Jvb2woY29uc3QgY2hhciAqZm4sIGNoYXIgKmdpdmVuX2pzb25fZm4sDQo+IGJvb2wgdmFs
+dWUsDQo+ICAJCQkgICBjb25zdCBjaGFyICpzdHJfdmFsdWUpOw0KPiArdm9pZCBtb2R1bGVfcHJp
+bnRfYW55X2FycmF5X3N0cmluZ19lbnRyeShjb25zdCBjaGFyICpmbiwgY29uc3QgY2hhcg0KPiAr
+KnZhbHVlKTsNCj4gIHZvaWQgbW9kdWxlX3Nob3dfdmFsdWVfd2l0aF91bml0KGNvbnN0IF9fdTgg
+KmlkLCB1bnNpZ25lZCBpbnQgcmVnLA0KPiAgCQkJCSBjb25zdCBjaGFyICpuYW1lLCB1bnNpZ25l
+ZCBpbnQgbXVsdCwNCj4gIAkJCQkgY29uc3QgY2hhciAqdW5pdCk7DQo+IGRpZmYgLS1naXQgYS9z
+ZnBpZC5jIGIvc2ZwaWQuYw0KPiBpbmRleCA3NGE2ZjUxLi5lYzVkZDk1IDEwMDY0NA0KPiAtLS0g
+YS9zZnBpZC5jDQo+ICsrKyBiL3NmcGlkLmMNCj4gQEAgLTM5Niw3ICszOTYsNiBAQCBzdGF0aWMg
+dm9pZA0KPiBzZmY4MDc5X3Nob3dfd2F2ZWxlbmd0aF9vcl9jb3BwZXJfY29tcGxpYW5jZShjb25z
+dCBfX3U4ICppZCkgIHN0YXRpYyB2b2lkDQo+IHNmZjgwNzlfc2hvd19vcHRpb25zKGNvbnN0IF9f
+dTggKmlkKSAgew0KPiAgCXN0YXRpYyBjb25zdCBjaGFyICpwZnggPSAiT3B0aW9uIjsNCj4gLQlj
+aGFyIHZhbHVlWzY0XSA9ICIiOw0KPiANCj4gIAlpZiAoaXNfanNvbl9jb250ZXh0KCkpIHsNCj4g
+IAkJb3Blbl9qc29uX2FycmF5KCJvcHRpb25fdmFsdWVzIiwgIiIpOyBAQCAtNDA3LDM1ICs0MDYs
+NTINCj4gQEAgc3RhdGljIHZvaWQgc2ZmODA3OV9zaG93X29wdGlvbnMoY29uc3QgX191OCAqaWQp
+DQo+ICAJCXByaW50ZigiXHQlLTQxcyA6IDB4JTAyeCAweCUwMnhcbiIsICJPcHRpb24gdmFsdWVz
+IiwgaWRbNjRdLA0KPiAgCQkgICAgICAgaWRbNjVdKTsNCj4gIAl9DQo+ICsNCj4gKwlpZiAoaXNf
+anNvbl9jb250ZXh0KCkpDQo+ICsJCW9wZW5fanNvbl9hcnJheSgib3B0aW9uIiwgIiIpOw0KPiAr
+DQo+ICAJaWYgKGlkWzY1XSAmICgxIDw8IDEpKQ0KPiAtCQlzcHJpbnRmKHZhbHVlLCAiJXMiLCAi
+UlhfTE9TIGltcGxlbWVudGVkIik7DQo+ICsJCW1vZHVsZV9wcmludF9hbnlfYXJyYXlfc3RyaW5n
+X2VudHJ5KHBmeCwNCj4gKwkJCSJSWF9MT1MgaW1wbGVtZW50ZWQiKTsNCg0KSW5kZW50YXRpb24s
+IGhlcmUgYW5kIGEgbG90IG1vcmUgc2ltaWxhciBwbGFjZXMgb24gYm90aCBwYXRjaGVzLCBpcyB3
+cm9uZyBhbmQgbmVlZHMgdG8gYmUgYWxpZ25lZCB0byB0aGUgb3BlbiBwYXJlbi4gQ2hlY2twYXRj
+aCBmbGFncyB0aGF0LCBwbGVhc2UgcnVuIGl0IG9uIHRoZSBwYXRjaHNldC4NCkFsc28sIGxpa2Ug
+aW4gdGhpcyBjYXNlIGFuZCBhbHNvIHNvbWUgb3RoZXIgcGxhY2VzIGFyZSB1bm5lY2Vzc2FyaWx5
+IHdyYXBwZWQsIGV2ZW4gdGhvdWdoIHRoZXkgZml0IGluIDgwIGNvbHMuIA0KDQo+ICAJaWYgKGlk
+WzY1XSAmICgxIDw8IDIpKQ0KPiAtCQlzcHJpbnRmKHZhbHVlLCAiJXMiLCAiUlhfTE9TIGltcGxl
+bWVudGVkLCBpbnZlcnRlZCIpOw0KPiArCQltb2R1bGVfcHJpbnRfYW55X2FycmF5X3N0cmluZ19l
+bnRyeShwZngsDQo+ICsJCQkiUlhfTE9TIGltcGxlbWVudGVkLCBpbnZlcnRlZCIpOw0KPiAgCWlm
+IChpZFs2NV0gJiAoMSA8PCAzKSkNCj4gLQkJc3ByaW50Zih2YWx1ZSwgIiVzIiwgIlRYX0ZBVUxU
+IGltcGxlbWVudGVkIik7DQo+ICsJCW1vZHVsZV9wcmludF9hbnlfYXJyYXlfc3RyaW5nX2VudHJ5
+KHBmeCwNCj4gKwkJCSJUWF9GQVVMVCBpbXBsZW1lbnRlZCIpOw0KPiAgCWlmIChpZFs2NV0gJiAo
+MSA8PCA0KSkNCj4gLQkJc3ByaW50Zih2YWx1ZSwgIiVzIiwgIlRYX0RJU0FCTEUgaW1wbGVtZW50
+ZWQiKTsNCj4gKwkJbW9kdWxlX3ByaW50X2FueV9hcnJheV9zdHJpbmdfZW50cnkocGZ4LA0KPiAr
+CQkJIlRYX0RJU0FCTEUgaW1wbGVtZW50ZWQiKTsNCj4gIAlpZiAoaWRbNjVdICYgKDEgPDwgNSkp
+DQo+IC0JCXNwcmludGYodmFsdWUsICIlcyIsICJSQVRFX1NFTEVDVCBpbXBsZW1lbnRlZCIpOw0K
+PiArCQltb2R1bGVfcHJpbnRfYW55X2FycmF5X3N0cmluZ19lbnRyeShwZngsDQo+ICsJCQkiUkFU
+RV9TRUxFQ1QgaW1wbGVtZW50ZWQiKTsNCj4gIAlpZiAoaWRbNjVdICYgKDEgPDwgNikpDQo+IC0J
+CXNwcmludGYodmFsdWUsICIlcyIsICJUdW5hYmxlIHRyYW5zbWl0dGVyIHRlY2hub2xvZ3kiKTsN
+Cj4gKwkJbW9kdWxlX3ByaW50X2FueV9hcnJheV9zdHJpbmdfZW50cnkocGZ4LA0KPiArCQkJIlR1
+bmFibGUgdHJhbnNtaXR0ZXIgdGVjaG5vbG9neSIpOw0KPiAgCWlmIChpZFs2NV0gJiAoMSA8PCA3
+KSkNCj4gLQkJc3ByaW50Zih2YWx1ZSwgIiVzIiwgIlJlY2VpdmVyIGRlY2lzaW9uIHRocmVzaG9s
+ZA0KPiBpbXBsZW1lbnRlZCIpOw0KPiArCQltb2R1bGVfcHJpbnRfYW55X2FycmF5X3N0cmluZ19l
+bnRyeShwZngsDQo+ICsJCQkiUmVjZWl2ZXIgZGVjaXNpb24gdGhyZXNob2xkIGltcGxlbWVudGVk
+Iik7DQo+ICAJaWYgKGlkWzY0XSAmICgxIDw8IDApKQ0KPiAtCQlzcHJpbnRmKHZhbHVlLCAiJXMi
+LCAiTGluZWFyIHJlY2VpdmVyIG91dHB1dCBpbXBsZW1lbnRlZCIpOw0KPiArCQltb2R1bGVfcHJp
+bnRfYW55X2FycmF5X3N0cmluZ19lbnRyeShwZngsDQo+ICsJCQkiTGluZWFyIHJlY2VpdmVyIG91
+dHB1dCBpbXBsZW1lbnRlZCIpOw0KPiAgCWlmIChpZFs2NF0gJiAoMSA8PCAxKSkNCj4gLQkJc3By
+aW50Zih2YWx1ZSwgIiVzIiwgIlBvd2VyIGxldmVsIDIgcmVxdWlyZW1lbnQiKTsNCj4gKwkJbW9k
+dWxlX3ByaW50X2FueV9hcnJheV9zdHJpbmdfZW50cnkocGZ4LA0KPiArCQkJIlBvd2VyIGxldmVs
+IDIgcmVxdWlyZW1lbnQiKTsNCj4gIAlpZiAoaWRbNjRdICYgKDEgPDwgMikpDQo+IC0JCXNwcmlu
+dGYodmFsdWUsICIlcyIsICJDb29sZWQgdHJhbnNjZWl2ZXIgaW1wbGVtZW50ZWQiKTsNCj4gKwkJ
+bW9kdWxlX3ByaW50X2FueV9hcnJheV9zdHJpbmdfZW50cnkocGZ4LA0KPiArCQkJIkNvb2xlZCB0
+cmFuc2NlaXZlciBpbXBsZW1lbnRlZCIpOw0KPiAgCWlmIChpZFs2NF0gJiAoMSA8PCAzKSkNCj4g
+LQkJc3ByaW50Zih2YWx1ZSwgIiVzIiwgIlJldGltZXIgb3IgQ0RSIGltcGxlbWVudGVkIik7DQo+
+ICsJCW1vZHVsZV9wcmludF9hbnlfYXJyYXlfc3RyaW5nX2VudHJ5KHBmeCwNCj4gKwkJCSJSZXRp
+bWVyIG9yIENEUiBpbXBsZW1lbnRlZCIpOw0KPiAgCWlmIChpZFs2NF0gJiAoMSA8PCA0KSkNCj4g
+LQkJc3ByaW50Zih2YWx1ZSwgIiVzIiwgIlBhZ2luZyBpbXBsZW1lbnRlZCIpOw0KPiArCQltb2R1
+bGVfcHJpbnRfYW55X2FycmF5X3N0cmluZ19lbnRyeShwZngsDQo+ICsJCQkiUGFnaW5nIGltcGxl
+bWVudGVkIik7DQo+ICAJaWYgKGlkWzY0XSAmICgxIDw8IDUpKQ0KPiAtCQlzcHJpbnRmKHZhbHVl
+LCAiJXMiLCAiUG93ZXIgbGV2ZWwgMyByZXF1aXJlbWVudCIpOw0KPiArCQltb2R1bGVfcHJpbnRf
+YW55X2FycmF5X3N0cmluZ19lbnRyeShwZngsDQo+ICsJCQkiUG93ZXIgbGV2ZWwgMyByZXF1aXJl
+bWVudCIpOw0KPiANCj4gLQlpZiAodmFsdWVbMF0gIT0gJ1wwJykNCj4gLQkJbW9kdWxlX3ByaW50
+X2FueV9zdHJpbmcocGZ4LCB2YWx1ZSk7DQo+ICsJaWYgKGlzX2pzb25fY29udGV4dCgpKQ0KPiAr
+CQljbG9zZV9qc29uX2FycmF5KCIiKTsNCj4gIH0NCj4gDQo+ICBzdGF0aWMgdm9pZCBzZmY4MDc5
+X3Nob3dfYWxsX2NvbW1vbihjb25zdCBfX3U4ICppZCkNCj4gLS0NCj4gMi41My4wDQoNCg==
 
