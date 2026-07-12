@@ -1,119 +1,93 @@
-Return-Path: <netdev+bounces-306984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306985-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vGHeHdENVGqqhQMAu9opvQ
-	(envelope-from <netdev+bounces-306984-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 23:57:37 +0200
+	id 59vwD5EQVGpzhgMAu9opvQ
+	(envelope-from <netdev+bounces-306985-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 00:09:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9230F74614C
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 23:57:36 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A94B67461B2
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 00:09:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=broadcom.com header.s=google header.b=RZHLJiM+;
-	dmarc=pass (policy=reject) header.from=broadcom.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306984-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-306984-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=asu.edu header.s=google header.b=Eg3Dj51p;
+	dmarc=pass (policy=none) header.from=asu.edu;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306985-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306985-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A56933001F82
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 21:57:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 757D03012CCD
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 22:09:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3F9937B407;
-	Sun, 12 Jul 2026 21:57:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3319137A846;
+	Sun, 12 Jul 2026 22:09:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f98.google.com (mail-oo1-f98.google.com [209.85.161.98])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6ED37A84C
-	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 21:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C00C037205D
+	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 22:09:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783893451; cv=none; b=rOxF6UfwQAI6x8nCvtGOXjzey2TrpdLDM3noicy7A6wIlwVk5pu27atapc/SFFTwytkgF4XMIJKg2JEGpgw9/x+/VgYqr/qAA0UBIzRSpgyC5UxpmTZQgijoUEv47DeLpu1nvH86ubbxOZbjIgjHRh/69QfN+xhlHsFwsCQBzGA=
+	t=1783894148; cv=none; b=AmjKC3BpRAZ2kyv3t6YQAk3GytYvm/CF+t9Nmb1mIKem2GOiHB7L0chJZkKtDO9lv/L8VEZcAu7Yf6wjMhL0f7nojnhQ0sV3eK5tQACnzGTA+m9Vk55tw+m91+N7QA65lcxZfRy6qMj8xA9SDe+DrCOqor7o8uuhFMFhggUYefI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783893451; c=relaxed/simple;
-	bh=K4mSZwTp/u7hydGX0B9HMeu+jFvEsCWuLWVpwuqs11k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=k076i7BloB//P/I0xjjszS5IDZuiPCoDllptTviqbXiztVcSpXGG2xrF3r7q88VxI9lEpLiv1oVW913ZAyB5Z/jkt4ASa+h/ZU/NIu+ijfEpGg49WAyUkB602c7MA9bkfIMsxVVR7FWNdiWSLTxNuMlwR876FbJacKHffG1t00g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=RZHLJiM+; arc=none smtp.client-ip=209.85.161.98
-Received: by mail-oo1-f98.google.com with SMTP id 006d021491bc7-6a1160a2c42so1641816eaf.0
-        for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 14:57:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783893446; x=1784498246;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=zyr6YBFmBRz4cpGfkF4vKmM2rz6RRnkLotsCwCyQb3w=;
-        b=JOedl1ClFrurnCzTZNBak2QItJ4QNJmEI/4jO+dvXfn9aqaTLiPdyL2ImCIY7VL8K0
-         Jh6pb1EJtTzLergxMb9ypljY7cuFa9O4UOoiu7GuhxkDdPzDfryF4qHxB65aEhhsamFL
-         4Z+Ea+Ctul7SpEIkB+p3IHqeMgWDxfA0vwGkdfSsqgvJpbRdrc2h5ypHOrTbQPoe80ti
-         p+aVEiH8oRh/eq5AIZh/o0WcJZSba/NvGgpsRyJyCFPTWC0snAw5woYUEnQHVBIs4IrY
-         ipri+vQK0Q9QrBHKVKAwmmGbDSy913nUoHHAV3XfxWdOWOeXJGNb80g0RDppw0Xv/lEi
-         mThA==
-X-Forwarded-Encrypted: i=1; AFNElJ+I9ygWpWUVpuVs7sjD2XUzMAxmRMsb32y6o0lWeehk6gJHmG6+a+FEJlF+UtPqUZ4ucoyfN2w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnfQf/cI6hkmj9RuwxkROg5lxLtsLM5gioImZql6lD7iRrGJ/3
-	niyTQf0t9oRd8wZe3NYzxP6uquwyw8fhoEwKZdRNYG/931bLEY9apWN5Po/5c0VEjvt1nTlTBxl
-	mmHOJTANkil58+kEkdBjuEQX31KDAKf+Rm6W2eGU1/OzoetEfzqQoZeva3mgRZOiOrAdlHlvUYz
-	AD+YSrX2chzvNrCAiWNjUqy5gCJ2sMUUt3gLTtPlYcFdiWX5JBjF6GisDuGAZxr23bXT5iARNAX
-	cKHtTwRzz0bbJIkyw==
-X-Gm-Gg: AfdE7ckJqcEK8CJGj488EwqNqFcArg4vpN04iV2leKjkd21zyVzEkuRUmp/1n0CZljg
-	yFQIlIJ2TUdLGTf8zTXcu8O2AgVCG2hayeJL7HqGtUbLexoTbE4gUXGD/Uu1Khfm60BdTTWtQRq
-	+lJh8V3LJEGE56SJQmyXs77UryIv0BYwfld+g2n5GmzdQS0fY+EdjQ14YcCG2W2dTZdtK3Fq2Sd
-	nVfLTy4n6kTIYxy1kKkZxLzcC9s0WQVO6TEqHy48sa3WNntwbad74NQQ6H0Kbm3OP1QI1KQg22l
-	rm4ggfGTM4vj5FiAvroNqAA0krSHv4HrA7p82XyTYd0gFlJEhtz01dgOv/wmbZK89Xs1Cfd5Mis
-	KXjUMLFmWSvraSMW6/nq1Ld2wHuDyBVZcudRzaHKztom3cEUQm69TChxOd/U2oODR1WcKVa5s+L
-	OoFXW3Q8VyM+qaJM5XBkvAqCi/6bKTrcgj7uUAqvhqPxUwgTDK70ye
-X-Received: by 2002:a05:6820:209:b0:6a3:1dc5:3570 with SMTP id 006d021491bc7-6a39a623860mr4243288eaf.31.1783893446375;
-        Sun, 12 Jul 2026 14:57:26 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-117.dlp.protect.broadcom.com. [144.49.247.117])
-        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-4519134e08csm1085530fac.6.2026.07.12.14.57.24
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 12 Jul 2026 14:57:26 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-38db4fa2e25so2942131a91.1
-        for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 14:57:24 -0700 (PDT)
+	s=arc-20240116; t=1783894148; c=relaxed/simple;
+	bh=ya0YwKNn5tL15JftmzZoYB2lGcBnSqSdBe1mSe09vP4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iqy9QGZfRGiRLN3c93rCUbrRqZIodXudC4GS3Qj6pk9TlcGzrS7c3/RqZgMRTfLkrEqbmFWE+r9bwt9DPlLjv/iKfoWzol4FFYOcl3GeDzAxENVgDWDrBG4Bb5noOQUB2Me+re8qQvq/sZfG8Tr//KEVkTP6RP2I3M9dU635UqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=Eg3Dj51p; arc=none smtp.client-ip=209.85.214.171
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2cca24023edso29867345ad.1
+        for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 15:09:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1783893444; x=1784498244; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=asu.edu; s=google; t=1783894146; x=1784498946; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=FZtdvHMChIDL+dYOQDIFLigXmiDjoDs/HmzFXJgyvP8=;
+        b=Eg3Dj51phmOx/hBaypr7IONdmAEJdmjfu6dDJXnj9xiS88DDQyLCWS0SJ3lAhELcBe
+         Yi+CZrApan5MmEBBmw2rof4/HhiPBplvsn7PbSi/gyZO2m7P02miVKuXOwM45ZwA1bvt
+         d6nLhAKUSp+oxUeAaLkCfBt4hAtO9iR4tCks/vjvq1QnH6ZLzx6/Ja41+4da6io00F72
+         1EsvzWLzTIsDxL5/kEf6oZZS1Oh2Rm0d00LMqG53H4ac/ctUdT+5SQxzXYTBqGTYmFYm
+         tnwu8s+DB+lrir7AngMq9OIqRrlk4CghfDtf8YpVCSmPl477SL4ufQUxyE6a2I9wOxP3
+         MM8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783894146; x=1784498946;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=zyr6YBFmBRz4cpGfkF4vKmM2rz6RRnkLotsCwCyQb3w=;
-        b=RZHLJiM+z1ARcnvgMk2ZB+irb4SSQLgf/7cyDkG+r3gBG4FP3hMgEeFlKvYlrwb4Cr
-         zdT1HNVLczw8yg2YU5/rTvpWFxf5P1IPslYZCZpdN2agIjBGh19awqHVI0Y7+kZM8Fg1
-         Y83Cqb1X5doxo3kv2JR8r6umCaYIU3mU8FNMY=
-X-Forwarded-Encrypted: i=1; AHgh+RpOymfwsIBOzJJZkc0y+oiNr/2DtcnRPNt+nnwVwfR+IJWYftOkGAB/vSe3zV2oj9Aqq4vN/9M=@vger.kernel.org
-X-Received: by 2002:a17:90b:58ce:b0:37f:9ce3:ca96 with SMTP id 98e67ed59e1d1-38dc777c50emr6691030a91.31.1783893443854;
-        Sun, 12 Jul 2026 14:57:23 -0700 (PDT)
-X-Received: by 2002:a17:90b:58ce:b0:37f:9ce3:ca96 with SMTP id 98e67ed59e1d1-38dc777c50emr6691003a91.31.1783893443371;
-        Sun, 12 Jul 2026 14:57:23 -0700 (PDT)
-Received: from bld-bun-02.bun.broadcom.net ([192.19.176.227])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-313b4b97661sm29930583eec.7.2026.07.12.14.57.19
+        bh=FZtdvHMChIDL+dYOQDIFLigXmiDjoDs/HmzFXJgyvP8=;
+        b=cZUpn9Kj9fp+PLZsipfjeVl8itFFqyx3ZrTspiZ10VKd2+k7PsCBQxR9ThkduAbrwX
+         POze+lqLxBe+e1w23bzlpLwkk/dqop/63h8QvaJCNiIFB+6vaqh25skxW9u/GURlkpIq
+         fw6DqeMC2VWrHq7RC0t7kRickga9mFeTmm3Y/KWPg2EB/IiZteWWkwS/ZXrruJLwoXM2
+         wcgYn0+W5hl1uIuGL0GxAfkskE4Q44gK/dxJ1jsZ6crDVXE4FbOFTWzq2JTNTCvGTwcW
+         +3S1xPMqUbYoPW+RhPZEVDxe2+K5N2hqZPHgvQsDns1eOVxllIyy8ITGtDLZiPzXmDK5
+         TfAQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rp6v2tWgc4Q9Lswdyeq4s31QXk6OxKApqUUEH6UaFjP2mDe8LZKcUNN5yJnnn5yiiLUDo7tiWI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YybY+rPIFcfkewrDlM8R1FFnSa75jvnnXGinuPdp4vDBBjRU88+
+	hLm/W0y5/k9cGKryHFJQATxsg7jMV7qWKZqQrfcO0BLGc6P7puQ7S2BWMJN+2ioYBw==
+X-Gm-Gg: AfdE7cny9z4LdLplaH54tooDXWC2vZbn2MLL/d1/25Pqhx4ucpGysXppCmPscl6L8bp
+	HMdiO0dmltnzekR5dkEFOfrFpOLQ5iJSRvyv97b0UBXOkPYLXVrNafk+IAqOMhHu59vgYJP6tz4
+	paiKfzxJtsDS3ji/pHNL63DP+NCRNOnmujsKkeXB2msDAhiXm1bCd7Hs2kx7z2uWz2mYLGOII1B
+	L7yTKI6RvwBIEinT+71/QaplzyEWwN819cFnWj1D9wGE+VhgVSXuhM54rodebzLOxtjVxrsqMTg
+	lOMDnqbxKdxPASHFa60HLSF4z3I24k3AMm7OmKP9vwBG50nZ3r/yBnf1T1z94fQZHArfUabY1VG
+	o6Wpr2sUTgt+nGtU7ppjZ5SNpbYzZZEObtRUfUPxHic6I5KoiJ8ruwlCQajCYaC4QeboYEpuh
+X-Received: by 2002:a17:902:fd84:b0:2cc:5fae:cc5a with SMTP id d9443c01a7336-2ce9f188707mr65291085ad.46.1783894146108;
+        Sun, 12 Jul 2026 15:09:06 -0700 (PDT)
+Received: from p1.. ([2607:fb90:eca4:601:96a2:dc03:fbca:601e])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9d5bdddsm88368665ad.77.2026.07.12.15.09.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Jul 2026 14:57:22 -0700 (PDT)
-From: Arend van Spriel <arend.vanspriel@broadcom.com>
-To: Fan Wu <fanwu01@zju.edu.cn>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Arend van Spriel <aspriel@gmail.com>,
-	Chi-Hsien Lin <chi-hsien.lin@infineon.com>,
-	Chung-Hsien Hsu <chung-hsien.hsu@infineon.com>,
-	Franky Lin <franky.lin@broadcom.com>,
-	Hante Meuleman <hante.meuleman@broadcom.com>,
+        Sun, 12 Jul 2026 15:09:05 -0700 (PDT)
+From: Xiang Mei <xmei5@asu.edu>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Kalle Valo <kvalo@kernel.org>,
-	SHA-cyfmac-dev-list@infineon.com,
-	Wright Feng <wright.feng@infineon.com>,
-	brcm80211-dev-list.pdl@broadcom.com,
-	linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: David Ahern <dsahern@gmail.com>,
 	netdev@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] wifi: brcmfmac: drain bus_reset work on device removal
-Date: Sun, 12 Jul 2026 23:57:16 +0200
-Message-ID: <20260712215716.2170806-1-arend.vanspriel@broadcom.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260709101635.103005-1-fanwu01@zju.edu.cn>
-References: <20260709101635.103005-1-fanwu01@zju.edu.cn>
+	linux-kernel@vger.kernel.org,
+	bestswngs@gmail.com,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH net] mpls: fix NULL deref in mpls_valid_fib_dump_req() on CONFIG_INET=n
+Date: Sun, 12 Jul 2026 15:09:03 -0700
+Message-ID: <20260712220903.3131568-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -121,63 +95,102 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[broadcom.com:D:+];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306984-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_CC(0.00)[davemloft.net,gmail.com,infineon.com,broadcom.com,kernel.org,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306985-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,asu.edu];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:fanwu01@zju.edu.cn,m:davem@davemloft.net,m:aspriel@gmail.com,m:chi-hsien.lin@infineon.com,m:chung-hsien.hsu@infineon.com,m:franky.lin@broadcom.com,m:hante.meuleman@broadcom.com,m:kuba@kernel.org,m:kvalo@kernel.org,m:SHA-cyfmac-dev-list@infineon.com,m:wright.feng@infineon.com,m:brcm80211-dev-list.pdl@broadcom.com,m:linux-kernel@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:netdev@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:dsahern@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bestswngs@gmail.com,m:xmei5@asu.edu,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[arend.vanspriel@broadcom.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arend.vanspriel@broadcom.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[asu.edu:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:from_mime,asu.edu:email,asu.edu:mid,asu.edu:dkim,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9230F74614C
+X-Rspamd-Queue-Id: A94B67461B2
 
-On Thu,  9 Jul 2026 10:16:35 +0000, Fan Wu wrote:
-> brcmf_fw_crashed() and the debugfs "reset" entry both schedule
-> drvr->bus_reset, whose callback recovers drvr through container_of()
-> and dereferences it.
+On CONFIG_INET=n, mpls_valid_fib_dump_req()'s local strict-check loop
+enters the RTA_OIF arm on the index alone and calls nla_get_u32(tb[i]).
+Since nlmsg_parse_deprecated_strict() leaves tb[i] NULL for any omitted
+attribute, a dump without RTA_OIF dereferences NULL and oopses.
 
-[...]
+Skip unset attributes before dispatching on the index, mirroring
+ip_valid_fib_dump_req().
 
-The patch does not apply cleanly on wl-next/main -- a rebase is needed.
+  Oops: general protection fault, probably for non-canonical address
+  0xdffffc0000000000: 0000 [#1] SMP KASAN NOPTI
+  KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+  RIP: 0010:mpls_valid_fib_dump_req (net/mpls/af_mpls.c:2189)
+  Call Trace:
+   mpls_dump_routes (net/mpls/af_mpls.c:2236)
+   netlink_dump (net/netlink/af_netlink.c:2331)
+   __netlink_dump_start (net/netlink/af_netlink.c:2446)
+   rtnetlink_rcv_msg (net/core/rtnetlink.c:7041)
+   netlink_rcv_skb (net/netlink/af_netlink.c:2556)
+   netlink_unicast (net/netlink/af_netlink.c:1345)
+   netlink_sendmsg (net/netlink/af_netlink.c:1900)
+   __sock_sendmsg (net/socket.c:790)
+   ____sys_sendmsg (net/socket.c:2684)
+   ___sys_sendmsg (net/socket.c:2738)
+   __sys_sendmsg (net/socket.c:2770)
+   do_syscall_64 (arch/x86/entry/syscall_64.c:94)
+   entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
+  Kernel panic - not syncing: Fatal exception
 
-I looked more carefully at the cancel_work_sync-under-lock concern that was
-raised in the thread. brcmf_core_bus_reset() never acquires bus_reset_lock,
-so there is no deadlock. If the work has already started when
-brcmf_bus_cancel_reset_work() is called, cancel_work_sync() waits for it to
-finish; by then the reset op (brcmf_pcie_reset) has completed its own
-teardown and reinitialized the device, so the subsequent remove teardown acts
-on a clean device. The design is correct as submitted; only the rebase is
-needed.
+Fixes: 196cfebf8972 ("net/mpls: Handle kernel side filtering of route dumps")
+Reported-by: Weiming Shi <bestswngs@gmail.com>
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
+---
+ net/mpls/af_mpls.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Regards,
-Arend
+diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
+index ca504d9626cf..1ad07df89d5b 100644
+--- a/net/mpls/af_mpls.c
++++ b/net/mpls/af_mpls.c
+@@ -2185,13 +2185,16 @@ static int mpls_valid_fib_dump_req(struct net *net, const struct nlmsghdr *nlh,
+ 	for (i = 0; i <= RTA_MAX; ++i) {
+ 		int ifindex;
+ 
++		if (!tb[i])
++			continue;
++
+ 		if (i == RTA_OIF) {
+ 			ifindex = nla_get_u32(tb[i]);
+ 			filter->dev = dev_get_by_index_rcu(net, ifindex);
+ 			if (!filter->dev)
+ 				return -ENODEV;
+ 			filter->filter_set = 1;
+-		} else if (tb[i]) {
++		} else {
+ 			NL_SET_ERR_MSG_MOD(extack, "Unsupported attribute in dump request");
+ 			return -EINVAL;
+ 		}
+-- 
+2.43.0
+
 
