@@ -1,233 +1,248 @@
-Return-Path: <netdev+bounces-306957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306958-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Mau+OVW2U2pYeAMAu9opvQ
-	(envelope-from <netdev+bounces-306957-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 17:44:21 +0200
+	id LFs4NK26U2pseQMAu9opvQ
+	(envelope-from <netdev+bounces-306958-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 18:02:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FD657453B3
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 17:44:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62E2474548A
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 18:02:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmx.de header.s=s31663417 header.b=uCo6Ean0;
-	dmarc=pass (policy=quarantine) header.from=gmx.de;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306957-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306957-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=0sec.ai header.s=google header.b=UyzSvgh1;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306958-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306958-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DF03C3003345
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 15:44:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 13EDC300E5C0
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 16:02:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5D73033F8;
-	Sun, 12 Jul 2026 15:44:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9096E34388E;
+	Sun, 12 Jul 2026 16:02:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF08262FD0;
-	Sun, 12 Jul 2026 15:44:17 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783871059; cv=none; b=Js38EvonoD0wVOROSK/eggKabRRLCKcBvOR1wJYM1pLcQxAxhNyGj4+I+LYD5epdjCjjTEhvtDkXI1JV07gNEbSI/7o5bCSm1enB6GBRGyAOnpOhlZsxL0f2K8NFpmH07wEs1jl6XT5QYEV+/dShxYaVWkUGHCB1073FQuSZXWE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783871059; c=relaxed/simple;
-	bh=U7Cp4g+nEoFszk4NXghXxVxx5a6xpFYnr/1iXQlnVTo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SPjyRX86+nsOLxeoVpGN4VwFAL+WBHvP+NDtETtpyMNRKh9v4UqZogdzKXX4abCE6ghxuYvIRMoZSos1qnQeI9si9C/22O5BL7vbt1ztT1NLTpUFV2o6iqqj/HdTVIirafkTaqNh7YocJQs2419q4VEHwqZWJEz54dxiBX5qEsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=linosanfilippo@gmx.de header.b=uCo6Ean0; arc=none smtp.client-ip=212.227.15.15
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1783871049; x=1784475849; i=linosanfilippo@gmx.de;
-	bh=feWn3ejG0FAEiQdhZbxZIzL3jhDN9n7FiQUy7I0z35Y=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=uCo6Ean0XVGg85Tm8+q4wvIiJ/1CIiVfYzx91xW69N39NpEoI7L/lzmYw2OUFx9C
-	 3gSNu1RJzyr3Zn5HroYhBSn9yrH7Cwd3qu546tP5HHl6gcqBWxobUI+sIvohieXMW
-	 mjPdJ0ecME1JSTlWq9TfvyKtRdAnn+U/B2gD4g6QRheh3VER5Rt7gy5oOL94wW5Cq
-	 YCfyvZMI6itsLDi0buKmzzkLoYbnHcfIeKBPHo0Ckkkzm7QBnRH7PZj0yrv5BUzt6
-	 5q+NG442K/E3wtsmp4NGh7fCm/U60PpPtS3dYoADR0hwSlZgwUEnQ40vIhHoB3bhk
-	 4rENh+i43Lc5gS88VQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from client.hidden.invalid by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MWzfv-1wXh0D2Bgn-00JFkY; Sun, 12
- Jul 2026 17:44:09 +0200
-Message-ID: <9000b1b0-8993-461b-bad9-f012f9fa8605@gmx.de>
-Date: Sun, 12 Jul 2026 17:43:55 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30D9D342539
+	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 16:02:38 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783872163; cv=pass; b=JYE0OSCAtl07w2Hmj/owEY41qLnJWDdMo5DPkpX84LnWjJVqH5LMA2ScnXxFSVmC4irKxil3cXJS4sKFYp+UxJiK5FP1ZkSrmQWvkFA2y9napn4ehgRaMP4HrBJQS+Is14D56wcMrNZwMfslzKZiIO8a4n4V3zUQWovj5pocdSg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783872163; c=relaxed/simple;
+	bh=lEN1RDO1utLqCuN68G05+ujxtG3nu9JpSH8sV9ic7Ow=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=atAVzCdEiR3MEsMJdGT4GZJGBfTwPu6TOnR+ycK2xrNn3wS0IOKehBA3a9anJD4fy0KCFzT4wOAhs/huA9kaQf+6+GOAFG/veaVVkJ9AahTMKRU97qxGnRIRD2Ghfb9/x+xMS23jGHEB5Q0D0rQFy+5QIEaUVztRRUI7FDCTwxE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=UyzSvgh1; arc=pass smtp.client-ip=209.85.214.181
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2cc97653887so26523025ad.1
+        for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 09:02:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783872158; cv=none;
+        d=google.com; s=arc-20260327;
+        b=Di1ot9tWFhdSPZ7k6ZRoBEAepJ7A5v+s0+vQPJ50DTM10082UkTg/mSVib9OEWhkWU
+         6/dI0k7vuf0o7giLppb6hMeIfHsj7K8mXTpGWTv6Bj9zh+qeQyVKOKsGwJFxLyqxXeq3
+         /rP/VvUv5H7cZ6tEUYylls9gaLSAmHDV3vdKheBhvji8r2sFc/LUQX8RS4WiVdqokR+N
+         V+XGDANbaIHBXoTxOClTsneiG8XagYXKPoTLhS3gs21RcsMv0l/jqLFHuMN5oz1QDVEw
+         I8aL8eK3cO8VnxfxHD4eiOCPh+s3U55iwXZ2csoU0eJfvv14KzZKbNQe3aboLenNW2VO
+         gOrA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=y8gOd+Q3z89xRep8w0XzdPaSt7VIYP9aT1DEEYw2ULY=;
+        fh=ESLoxzSM5r87TsjnA3oWJ23t52anXaMA/8JveU5zmYY=;
+        b=ICoHHlUq1J+OMG1qMqdOPVcDlvLT0CL8uVAy8cnZtV3r65SOrw5JmyjLgpD3XYwkPI
+         7Lqrzk1VwdKy9Hx39qZPGk/kj0V24AgwaqsZRFpEd18WbgFFqRGmdAN+rCcY25RPQQyu
+         eiBwFyPwW22twVKc6O90hzlAgRGbRpw4VF4WjVd0zgdxUMuC+0ff0hUHjA4lXqTKA80C
+         vqM6uigc+uCGuGMW2H0r9PYYQS182zceHHgUNZvwzWF2BX11aQdavuqMXqqMaQO1/1gT
+         ZeaBWZguq6VpVCegNeSvJkqctEr9stgCuPTLeuSTt3xoKh4LL6ApCWap0PKslv4R04oz
+         MDvw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=0sec.ai; s=google; t=1783872158; x=1784476958; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=y8gOd+Q3z89xRep8w0XzdPaSt7VIYP9aT1DEEYw2ULY=;
+        b=UyzSvgh1DSo25sz9JUH7LAEQYx9BMF+mB73o0GzGMxtQ378cZRnGojCu+dD/ic7RZn
+         6JceGpLBw/0SgcsKVCR52kBm4F2Du2aMyjgISzHNdB812vaSwkx424f+2H+xfE+P4T6r
+         H965lm/wzQ3xU25gEcc+fevOrV+JU8g1qMjYVrF7wCzMqmljJGxeWMwUw4hahRRtNawr
+         zOt9Gd4SYOmRZdenLeLc7078SdrBqOXqedNdY/MXPKE+WK409Nc5pa+aEJju/ctXTUbB
+         eQgTYSY0c/dVfA/ortM1UDNfYh0S3opSb2paDzLnuTy3S01Gb3UtHf6RfTf0Yde5pumL
+         m6rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783872158; x=1784476958;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=y8gOd+Q3z89xRep8w0XzdPaSt7VIYP9aT1DEEYw2ULY=;
+        b=NZftsus6WqIt1CWfOePNVCnRvoPWrhuXQEeT7U1//3mLSCG/oj08ESoFg4kHXNApcH
+         0BFAcTFRiqTHOumzrS8JqI8Sig136x27YOWlIWrYXJpgHWeOVf+oz5zAKJhuhwlSVQ/V
+         lyUEQxP6ttRcHLD56UYOlGTRZlq5DQ9bPunBf304D7af4tiVlmtyDir0dmzmPQTuvWTc
+         WhCO41UKznr6P2OogvPXKrx1aXEGMQYscHM4QfLKSkllQ7W8rg4w+TRRPGVJSq/6bO06
+         xxW1znGcPB2dloY0xBsFu0cYGFFgdNaOi9GiqqVAEef7uAuD/9G1BDF1xlCAtzf1+gP1
+         4XSg==
+X-Forwarded-Encrypted: i=1; AHgh+Ro3YomQKo6MA5bOWWINJ3E84bUxCKAJz4IJie4fDe7356WLOfXHYa6uMun+p0EUYB28VNQ6Gh8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1WJmTqpieEfhHmLtnvVqPI0V9JCQmN7GkOc39EQl3IBXO9cnA
+	hrPROn3voIj8cQZuK3x8AAzZQeqk4i8dweaXYXJjzG9GfLApDg7QIbPN8i5g6LtdJM16+ZXTOuP
+	vk47nuVBf1hxMz+3LH9bgvfEWpfs7y0+iKBYF1FVvy8w=
+X-Gm-Gg: AfdE7ck9j6gAPCNbC3ihhBL4PZGZYvdjFV18iXJAfKkvrc12D32uXcqyThIuKL9eLM5
+	pmP2BtiwgEycOqhXL9kpoRwMX87Mr+APvRLg2VlsrcWU5K1E5xGxONAqN7aG8RvKBbDabc1hxQk
+	m5EdRyGkc8HVxJmWU7VKmTvfb7xS8DctiTTis8mrTH+mbEajqezGYI52RdjGSYTD1HckLQlXbXE
+	kYRb3eQNo6FlVUPJzqWDqihNdvUTe0BfT+7D5ipIRwNcad2COpi3e0FYK0QMGmQlYULKh6jz2QZ
+	UfWsrHhyki1uORqRRmHrZg9O/USQbYUYcyDgpiAtzyLoQfKTBDvNYiGMd7sW
+X-Received: by 2002:a17:903:2444:b0:2ca:c4a5:84bb with SMTP id
+ d9443c01a7336-2ce9f27e6f1mr63459385ad.38.1783872157981; Sun, 12 Jul 2026
+ 09:02:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: alacritech: add missing MODULE_DEVICE_TABLE()
-To: Pengpeng Hou <pengpeng@iscas.ac.cn>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260704152053.49780-1-pengpeng@iscas.ac.cn>
-Content-Language: en-US
-From: Lino Sanfilippo <LinoSanfilippo@gmx.de>
-In-Reply-To: <20260704152053.49780-1-pengpeng@iscas.ac.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:8RJpY7kzFsY9rgmlFPaLnFNKazilZn+/VfGwccg44FHmLcNHbJn
- aJ9+hoxMbZnY4a9ZCetnsjDTer/kKvcSgQJZbsnU+vA7rue2HnF3GN5fSbNR9MSBCZSxMzt
- 7YC2zpp+UJWIte5Ats+exEKjsUM7D2l7IPjkHzWBvLWnIW8hwnAHcqCoMPnM1b5FjTymh9N
- ixrNOd2Wm49D21/F5kBmQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:ohbvZL4CMsI=;3tROoFD2RgNjWh+z9M1KTca9jWe
- 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
- DSbflo/vZXCTOM15Zwf3R
+References: <20260711072702.70231-1-doruk@0sec.ai> <be1731eb-e6ec-4015-92e4-c09fd88019e6@linux.dev>
+In-Reply-To: <be1731eb-e6ec-4015-92e4-c09fd88019e6@linux.dev>
+From: "Doruk (0sec)" <doruk@0sec.ai>
+Date: Sun, 12 Jul 2026 18:02:26 +0200
+X-Gm-Features: AVVi8Cfuvaa8c4Hm1hNjjBfiFUfKj_52zwFcdM42IhGHFkrP4Lc2eV58kzfpMGc
+Message-ID: <CAPdMp1p=72WXe-8w5Y9viBuB6YvZWZomNc9xQzXEg-qe1WVN0A@mail.gmail.com>
+Subject: Re: [PATCH net] nfc: llcp: reject PDUs shorter than the LLCP header
+To: vadim.fedorenko@linux.dev
+Cc: david@ixit.cz, oe-linux-nfc@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmx.de,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmx.de:s=s31663417];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[0sec.ai:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306957-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:pengpeng@iscas.ac.cn,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[LinoSanfilippo@gmx.de,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:vadim.fedorenko@linux.dev,m:david@ixit.cz,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[0sec.ai];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-306958-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[0sec.ai:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[LinoSanfilippo@gmx.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmx.de:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FROM_NEQ_ENVFROM(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmx.de];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,gmx.de:from_mime,gmx.de:email,gmx.de:mid,gmx.de:dkim,iscas.ac.cn:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,0sec.ai:from_mime,0sec.ai:email,0sec.ai:url,0sec.ai:dkim,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6FD657453B3
+X-Rspamd-Queue-Id: 62E2474548A
 
-Hi,
+Hi Vadim
 
-On 04.07.26 17:20, Pengpeng Hou wrote:
-> The driver has a match table for the pci bus wired into its driver
-> structure, but the table is not exported with MODULE_DEVICE_TABLE().
->=20
-> Add the missing MODULE_DEVICE_TABLE() entry so module alias information
-> is generated for automatic module loading.
->=20
-> This is a source-level fix.  It does not claim dynamic hardware
-> reproduction; the evidence is the driver-owned match table, its use by
-> the driver registration structure, and the missing module alias
-> publication.
->=20
-> Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
-> ---
->  drivers/net/ethernet/alacritech/slicoss.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/drivers/net/ethernet/alacritech/slicoss.c b/drivers/net/eth=
-ernet/alacritech/slicoss.c
-> index c1949ca060ca..14b74c09233e 100644
-> --- a/drivers/net/ethernet/alacritech/slicoss.c
-> +++ b/drivers/net/ethernet/alacritech/slicoss.c
-> @@ -34,6 +34,7 @@ static const struct pci_device_id slic_id_tbl[] =3D {
->  		     PCI_DEVICE_ID_ALACRITECH_OASIS) },
->  	{ 0 }
->  };
-> +MODULE_DEVICE_TABLE(pci, slic_id_tbl);
-> =20
->  static const char slic_stats_strings[][ETH_GSTRING_LEN] =3D {
->  	"rx_packets",
+this was reproduced from userspace on unmodified
+linux-next (bee763d5f341) without RF hardware.
 
-Reviewed-by: Lino Sanfilippo <LinoSanfilippo@gmx.de>
+It's the peer-RX path, not a local command skb:
+
+virtual_ncidev_write (peer NCI DATA) -> nci_rx_data_packet
+-> nfc_tm_data_received -> nfc_llcp_data_received
+-> rx_work -> nfc_llcp_rx_skb -> nfc_llcp_recv_connect
+
+Bring the LLCP link up via a normal NFC-DEP activation, then send
+one NCI DATA packet with a 1-byte CONNECT PDU. skb->len - 2 wraps
+to 0xffffffff and the TLV walk runs off the end:
+
+BUG: KFENCE: out-of-bounds read in nfc_llcp_recv_connect+0x9f6/0xf80
+nfc_llcp_recv_connect+0x9f6 -> nfc_llcp_rx_work -> process_one_work
+read 4219B past a 704B skbuff_small_head from virtual_ncidev_write
+R14: 00000000ffffffff (wrapped tlv_array_len)
+
+With the guard: rx_skb runs for all 600 short PDUs, recv_connect
+reached 0 times, 0 reports.
+
+The bound stays "<", not "<=" -- a header-only SYMM/DISC/DM is
+exactly 2 bytes and must still dispatch; AGF uses "<=" only
+because an AGF frame must also carry a sub-PDU. I'll drop the
+"same guard as AGF" line from the commit message.
+
+Instantiating /dev/virtual_nci needs privilege, but that's just
+the syzbot transport; the 1-byte CONNECT is what a remote NFC-DEP
+peer emits, and the DEP layer imposes no minimum LLCP length.
+Impact is a proximity OOB read (DoS).
+
+I can send the full reproducer if you'd like.
+
+best
+Doruk
+
+On Sun, Jul 12, 2026 02:01 PM, Vadim Fedorenko
+<vadim.fedorenko@linux.dev> wrote:
+>
+> On 11/07/2026 08:27, Doruk Tan Ozturk wrote:
+> > nfc_llcp_rx_skb() reads the two-byte LLCP header (DSAP/SSAP/PTYPE) and
+> > dispatches by PDU type; several handlers then derive a TLV-array length as
+> > skb->len - LLCP_HEADER_SIZE. Neither nfc_llcp_rx_skb() nor its callers
+> > guarantee the frame is at least LLCP_HEADER_SIZE bytes, and a sub-header
+>
+> that's not correct. there are 2 ways to get to nfc_llcp_rx_skb() - via
+> nfc_llcp_recv_agf() or through commands/locally generated skbs. The
+> first one checks against LLCP_HEADER_SIZE, while latter one creates skb
+> payload with correct LLCP header size. Do you have a reproducer to
+> trigger the issue?
+>
+>
+> > PDU does reach it: digital_in_recv_dep_res() and digital_tg_recv_dep_req()
+> > strip the DEP header with skb_pull() after only checking the DEP header
+> > size, so a DEP I-PDU carrying a 0- or 1-byte LLCP payload is handed up as
+> > a sub-2-byte skb.
+> >
+> > For a CONNECT or CC PDU, nfc_llcp_recv_connect() and nfc_llcp_recv_cc()
+> > then pass skb->len - LLCP_HEADER_SIZE to nfc_llcp_parse_connection_tlv().
+> > For skb->len < 2 that subtraction underflows: truncated into the u16
+> > tlv_array_len parameter it becomes ~0xFFFE, and for a CONNECT to the SDP
+> > SAP, nfc_llcp_connect_sn() uses a size_t and underflows to SIZE_MAX. The
+> > TLV parsers bound their walk relative to that length, so they read far
+> > past the end of the skb.
+> >
+> > The aggregated-frame path (nfc_llcp_recv_agf()) already drops sub-PDUs
+> > shorter than the header. Apply the same guard once, in the dispatcher, so
+>
+> that not exactly correct, it drops skbs which are shorter or equal to
+> the header, the check added in this patch is not correct then.
+>
+> > every PDU type is covered.
+> >
+> > Found by 0sec (https://0sec.ai) using automated source analysis; the
+> > missing guard is evident from source. Compile-tested.
+> >
+> > Fixes: d646960f7986 ("NFC: Initial LLCP support")
+> > Cc: stable@vger.kernel.org
+> > Assisted-by: 0sec:claude-opus-4-8
+> > Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
+> > ---
+> >   net/nfc/llcp_core.c | 3 +++
+> >   1 file changed, 3 insertions(+)
+> >
+> > diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+> > index aed5fe1afef0..e3b3077e0e83 100644
+> > --- a/net/nfc/llcp_core.c
+> > +++ b/net/nfc/llcp_core.c
+> > @@ -1481,6 +1481,9 @@ static void nfc_llcp_rx_skb(struct nfc_llcp_local *local, struct sk_buff *skb)
+> >   {
+> >       u8 dsap, ssap, ptype;
+> >
+> > +     if (skb->len < LLCP_HEADER_SIZE)
+> > +             return;
+> > +
+> >       ptype = nfc_llcp_ptype(skb);
+> >       dsap = nfc_llcp_dsap(skb);
+> >       ssap = nfc_llcp_ssap(skb);
+>
 
