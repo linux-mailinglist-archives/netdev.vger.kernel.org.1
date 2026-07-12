@@ -1,178 +1,209 @@
-Return-Path: <netdev+bounces-306948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306954-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id LIijF+WbU2rocAMAu9opvQ
-	(envelope-from <netdev+bounces-306948-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 15:51:33 +0200
+	id mA74OKqnU2rLcwMAu9opvQ
+	(envelope-from <netdev+bounces-306954-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 16:41:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3CA1744DE9
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 15:51:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E914C74503F
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 16:41:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=d6UAqy4b;
-	dmarc=pass (policy=reject) header.from=google.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306948-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306948-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=pigmoral.tech header.s=zmail header.b=pzyy9pAT;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306954-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306954-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4E5813003622
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 13:51:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BAE8B3013D75
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 14:41:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 642BF3AA4F7;
-	Sun, 12 Jul 2026 13:51:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61B7A261B8A;
+	Sun, 12 Jul 2026 14:41:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEA9939A061
-	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 13:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9E392236F0;
+	Sun, 12 Jul 2026 14:41:41 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783864291; cv=pass; b=RIAyNzaSWpzUHT0uPBsqJwV9dSZ39zbR83dLzPI+zICnRmEQu8l2Gib7FCFV9rxlBGBX2bsR6X90Y0ZK2O1/LaVsV6Wd4kytMPBouZi8U4jDHVbFcxA2BG6oal0SnAnJPXbIZlB10UNlfX4lEDlAlvf35AfIoM9Afymk3pcKqrM=
+	t=1783867304; cv=pass; b=hnRRLpmmvZ0+dVmCoYzE0NoNTeGY4EBHhxEE1YGFx7doW25/tJ1p1PXZJcCPXKrAFYCpg7pmQOajTw9eXP1UQtY7C2RmFzXpX3Myn/bW452TFwNuMZKKZuHcxGex2lB4ak46wlDFRoE60AHvYQbNHV7yRHBgs4h5EiptSPPZ1nE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783864291; c=relaxed/simple;
-	bh=oDP0mR1EofatT0pur4pCie4dYJKereMksrCnMIlZt88=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=np4aqjWQ/yvtXieAg/m2JpQjXstm7gwaBrXi9j+l639roYKgl4tJXTyuc9sPY7a0JiPaqZrtmSL0fzMa8qzfa6/xbPqYSZv0Hv2H9vTPSCLd02Hb4twvmRIExo/Uc+cv/H+PKZlLQPgWNdbdogqjX0X4KnjiShk16pW0/bREgz8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d6UAqy4b; arc=pass smtp.client-ip=209.85.219.43
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-8efbafa1bacso18025496d6.1
-        for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 06:51:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783864289; cv=none;
-        d=google.com; s=arc-20260327;
-        b=VQG54+nSbVkAsELcUAPqXU1al+aCWFS9h+7HwkdbLrBPRkZ1L+JtY5tZ3N1n5BZC3Z
-         4559q6DRtWDTXWJmo7zAX/P/AeK+shF6NQL4ubJeOY99bKUVjUhWLc2F9RQpnGzy7CH9
-         Ppu/2N6Fq2aTISzOhjMCHd02vzMkMuilWzRT3JJF4+9yAF4VRGYnwKaRZziMFI21fSkO
-         5FQXw7jXJM9PuwPKbEUE6eii8HSnbMO7rXbfLj5ygF8Qo8HaMDBZhxRwluc6MG1aUHhf
-         t0TUfQWm5nK4yP3/PJyKgWgQVhUHPYLeQ5mUo9qsHxwMvngM24dNRTVO5cTKfuaList2
-         yrdQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=KPaDnid7id71L8MuAGH6afuYcqEb9Qc/jYvhMfY03I8=;
-        fh=v8UFJSeLPJt29zVL7fP/E9t0f4liOBi+1Pd+31yALhA=;
-        b=H4T4qF0hF7NkJVV3kPC+8FUH3o++9lr35tOKkxvz07tlxogghjxFTFUlzn09yKuYuv
-         Q3ZzGrU7gsnG08BD+hZLUCPC4fjs8+4ZxJMFs29RSBoSW/1VxwoS8gRxXoOp3NXxSaQj
-         kpZkccFRd3zE97FNAGbJE5/ExYJ2almgCpnxj1BBaRv51NGj72KJ3iw+d1zg3MO1jRVH
-         d+QSEGk9LwiwOhWyeEQXQeXJSYd2fHKba9jqO2NQoaYA3aYmvvRgdYfcKcjE0I9vwyCE
-         gdX0ajHjzmzlsWpvUxphMmOd2lc9EMl+RvzYN7Qhf5hLh71eTceQ4WEMnCdcjmdLretP
-         NRjQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783864289; x=1784469089; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=KPaDnid7id71L8MuAGH6afuYcqEb9Qc/jYvhMfY03I8=;
-        b=d6UAqy4bD8guehT/2lXLYkhjSaWDrHGdlPua9QEyr6BZBReXdyOdJ2XpyAHFKTeT/0
-         a/2g/uH8FxpOYczmZnEYFtrc0+3pk4di3Kgkbim0pKoZAfknpRVTIgtdJeY0qpG+TlGc
-         CaloSUDzIxgUbleeqT0wlReexKU61ujeiZl1wjkEG6pSWCnEsZsqB4z1YBwd1f3UTHZ9
-         EsfCapkBZ9MMeOx2jCbpfP/5YDBIvj+EXxLvkW6FnhT2hsmqdRaFQw+pOBqoZIhZzT/W
-         8YAAVmf/vyuQdA4GTxbKJn7FyHPw5ptLuonkur/SSk49WUeXYFaWPuR42+62LB35zy3F
-         +qoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783864289; x=1784469089;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=KPaDnid7id71L8MuAGH6afuYcqEb9Qc/jYvhMfY03I8=;
-        b=ay9y59gRO2Te3ExMA934Uy/TZcj1NawHLOE40fgtaWA+9dH5wt4hHDBJy/0v6AwJy4
-         2h8y7HXQ2RDAAK17bd0+8Ciwk6Ankt5U/Smquq8u6h9o3HH3sUhC343OMbKOMmYDGb3B
-         bE4Zo1jTdDy1lIChQvbw8Qou89F/Q6zKpvGX6k5dsfbiSUioGp3nSs4YD9uYzHDkQeFk
-         QeL76OJrZ//nfEmkG7cTHPlu4xgCaIrjjVbMlVPc/9Ij3yKPYkjd+Qwb9BPHQswItSmz
-         umfXPJG4bEFZzMI+9jGFYye+tfjdg105OFO49WXU0tK+51jYpD6ZOl8kzCL9vmuHRWxz
-         FaIw==
-X-Gm-Message-State: AOJu0YxvhjPbppgpMSYgRRVUb4aY807rQ11DJT0BZZ/ZdDQDbBuD0xf5
-	ohQtaZi6XGT5IfMzpH4V4PRTT54nNBWEg34oaHQOLC1Bv1oWMTGB7kKAZNvy0SsTXzEcMcrvacn
-	uts3KPfh3fQxInIPVYA3EBm8m4rmjXdsZ9md07oBC
-X-Gm-Gg: AfdE7clFj78TfU5fpZ5YXEq2Kyr8Vw+ZRmKtlU2I2DyZsd3tnpsoTqTIn1Kcyyeria6
-	8jUA+GA79MbXz4+nFx35G6VGU0dAtTwgOGL31KeHZPu/lY9jLRJYqnLuquSf7CihH3CBMv4KR9h
-	DPXir99x3EqOAg9EQB80MyRXl5fccOvcwseLfdJQmSsdTFYo/MDNpKtcRoQqKZNdQQmH3cD7mAZ
-	uBWG8ojF2XYQ91L1fpaATR9SkyRaECalYq6F/gpifEi28hiFYBTOKsjN0ENmjfBWCQ8EAo0XjlN
-	+eNDqKyJUuJP6VdUnDz0CCA8aIzHhOYhtqDsYddOW8/d7+id5DqVmo9IL5TT2vxA3b7yYD2B96o
-	ct1q5dBmA
-X-Received: by 2002:a05:6214:2aa4:b0:905:7415:d019 with SMTP id
- 6a1803df08f44-9057415d14cmr22982556d6.36.1783864288356; Sun, 12 Jul 2026
- 06:51:28 -0700 (PDT)
+	s=arc-20240116; t=1783867304; c=relaxed/simple;
+	bh=2QI14BvAQb8oCfoBa/frHwYgMG9GD4XppKxhMN+gQWM=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=ajIQPeNqUdJObraciQUBxFUVutNk5kBRJkKqy1/jLHgFsOClfuf08YwZ1XpRm8rtG+9Fuo/0v9c8xqkgL7Zk9nW5XyY3M9ggdsvfNFfRlptBVYFXtwHc0zSweZfDjwnvgby/bZ0Iko2klptzez80o4jJhXcbA1hbHqaCes19l+4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pigmoral.tech; spf=pass smtp.mailfrom=pigmoral.tech; dkim=pass (1024-bit key) header.d=pigmoral.tech header.i=junhui.liu@pigmoral.tech header.b=pzyy9pAT; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal: i=1; a=rsa-sha256; t=1783867266; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=Ua0hV+q9YwWdierF0d3tTHArRa58XYI355ifeJIbWW4LZtaawtl20H96TbVmRQjqbSO56vOFPYpJkcOKAnwZLk41DUgWI6NBLxOKHS150cqIcbguHE/i2Dzfl7xsESTR2Xl8qHs1jZdr2oxv9KJGh3bWnllNWCTo8cThhDSAgrA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1783867266; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=SLS/kMhYXvqtbxCJZsqYcevLj6Cy5NnjgCrCPkzJMk8=; 
+	b=aoh2WX9UcchPAoc6jZ2+7rUQ8S2O8lFa6QhYvdJ5DUkNr3W4qYNoX4JyGeP0uu6v9ZLglioPjgdNlVGRuy4VhhpqbgTU2hdFFv6MeypNTb7xTlgIQs5KDxKeFIUdmMH9uRKh6Vn6vNplJt9nOVb8yn+nBh+d0PJyEFPEXDJNDxI=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=pigmoral.tech;
+	spf=pass  smtp.mailfrom=junhui.liu@pigmoral.tech;
+	dmarc=pass header.from=<junhui.liu@pigmoral.tech>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1783867266;
+	s=zmail; d=pigmoral.tech; i=junhui.liu@pigmoral.tech;
+	h=Mime-Version:Content-Transfer-Encoding:Content-Type:Date:Date:Message-Id:Message-Id:Cc:Cc:Subject:Subject:From:From:To:To:References:In-Reply-To:Reply-To;
+	bh=SLS/kMhYXvqtbxCJZsqYcevLj6Cy5NnjgCrCPkzJMk8=;
+	b=pzyy9pATPvLJ5OdbAKgQIexqjPkcTp36x4ezLL3ngOF7JnVnEZGnT1j/CZzlbiP2
+	WSEhCCeBy8H27PBqBkn7L4Eby5OjedwYGAs9h65RhVrIkJzg5gpa1jjN3r5EtAYLrbt
+	6LGBXRYBXx1IwS0pbyTPypDBB5SSeHGDPQNuQAuQ=
+Received: by mx.zohomail.com with SMTPS id 1783866353179481.00549749606785;
+	Sun, 12 Jul 2026 07:25:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260712132531.33028-1-zhaoyz24@mails.tsinghua.edu.cn>
-In-Reply-To: <20260712132531.33028-1-zhaoyz24@mails.tsinghua.edu.cn>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 12 Jul 2026 15:51:16 +0200
-X-Gm-Features: AVVi8Cf9v2yHkrh7qafNb_R7r25uOxLYtf7c7-SgvEWHVnZtF95shTByiSnetF4
-Message-ID: <CANn89i+X+VQ-4a-qbM1-qmykR9stXo+sEQMOgj9AkhXSHA7LYA@mail.gmail.com>
-Subject: Re: [PATCH net] tcp: reject TIME_WAIT reopens when SYN queue is full
-To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Cc: netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-kernel@vger.kernel.org, Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>, 
-	Ao Wang <wangao@seu.edu.cn>, Xuewei Feng <fengxw06@126.com>, Qi Li <qli01@tsinghua.edu.cn>, 
-	Ke Xu <xuke@tsinghua.edu.cn>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sun, 12 Jul 2026 22:25:39 +0800
+Message-Id: <DJWNUAW00DTS.1L26UVJEYHZ0L@pigmoral.tech>
+Cc: <linux-clk@vger.kernel.org>, <devicetree@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <linux-sunxi@lists.linux.dev>,
+ <linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
+ <netdev@vger.kernel.org>, "Jerome Brunet" <jbrunet@baylibre.com>
+Subject: Re: [PATCH v2 6/8] clk: sunxi-ng: a733: Add mod clocks support
+From: "Junhui Liu" <junhui.liu@pigmoral.tech>
+To: "Junhui Liu" <junhui.liu@pigmoral.tech>, "Michael Turquette"
+ <mturquette@baylibre.com>, "Stephen Boyd" <sboyd@kernel.org>, "Brian
+ Masney" <bmasney@redhat.com>, "Rob Herring" <robh@kernel.org>, "Krzysztof
+ Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
+ "Chen-Yu Tsai" <wens@kernel.org>, "Jernej Skrabec"
+ <jernej.skrabec@gmail.com>, "Samuel Holland" <samuel@sholland.org>,
+ "Philipp Zabel" <p.zabel@pengutronix.de>, "Paul Walmsley" <pjw@kernel.org>,
+ "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>,
+ "Alexandre Ghiti" <alex@ghiti.fr>, "Richard Cochran"
+ <richardcochran@gmail.com>
+X-Mailer: aerc 0.21.0
+References: <20260711-a733-clk-v2-0-974d188cbe0c@pigmoral.tech>
+ <20260711-a733-clk-v2-6-974d188cbe0c@pigmoral.tech>
+In-Reply-To: <20260711-a733-clk-v2-6-974d188cbe0c@pigmoral.tech>
+X-ZohoMailClient: External
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[pigmoral.tech:s=zmail];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-306948-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:linux-clk@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-sunxi@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:linux-riscv@lists.infradead.org,m:netdev@vger.kernel.org,m:jbrunet@baylibre.com,m:junhui.liu@pigmoral.tech,m:mturquette@baylibre.com,m:sboyd@kernel.org,m:bmasney@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:wens@kernel.org,m:jernej.skrabec@gmail.com,m:samuel@sholland.org,m:p.zabel@pengutronix.de,m:pjw@kernel.org,m:palmer@dabbelt.com,m:aou@eecs.berkeley.edu,m:alex@ghiti.fr,m:richardcochran@gmail.com,m:krzk@kernel.org,m:conor@kernel.org,m:jernejskrabec@gmail.com,s:lists@lfdr.de];
+	DMARC_NA(0.00)[pigmoral.tech];
+	FORGED_SENDER(0.00)[junhui.liu@pigmoral.tech,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_RECIPIENTS(0.00)[m:zhaoyz24@mails.tsinghua.edu.cn,m:netdev@vger.kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	FREEMAIL_TO(0.00)[pigmoral.tech,baylibre.com,kernel.org,redhat.com,gmail.com,sholland.org,pengutronix.de,dabbelt.com,eecs.berkeley.edu,ghiti.fr];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,davemloft.net,kernel.org,redhat.com,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[pigmoral.tech:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[junhui.liu@pigmoral.tech,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306954-lists,netdev=lfdr.de];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,vger.kernel.org:from_smtp,tsinghua.edu.cn:email]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pigmoral.tech:from_mime,pigmoral.tech:dkim,pigmoral.tech:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D3CA1744DE9
+X-Rspamd-Queue-Id: E914C74503F
 
-On Sun, Jul 12, 2026 at 3:26=E2=80=AFPM Yizhou Zhao
-<zhaoyz24@mails.tsinghua.edu.cn> wrote:
->
-> A valid SYN that matches a TIME_WAIT socket is redirected to the
-> listener with a non-zero tcp_tw_isn.  tcp_conn_request() deliberately
-> exempts those requests from normal SYN queue throttling.  A peer can
-> therefore create victim-side TIME_WAIT entries with short connections,
-> replay valid reopen SYNs, and withhold the final ACK to allocate
-> request_sock objects outside the listener's normal SYN-flood controls.
->
-> Do not send syncookies for this path: tcp_timewait_state_process()
-> derives tcp_tw_isn from tw_snd_nxt so that a direct reopen uses an ISN
-> after the prior connection's sequence space.  A syncookie ISN is a
-> hash-derived value and has no such ordering guarantee.
->
-> Check the selected listener's SYN queue before descheduling the
-> TIME_WAIT socket.  If it is full, account a request-queue drop, retain
-> the TIME_WAIT socket, and discard the SYN.  Once the queue has room,
-> the existing direct-reopen path and its TIME_WAIT ISN are unchanged.
-> Normal SYNs continue to use syncookies when the listener is full.
+On Sat Jul 11, 2026 at 4:10 PM CST, Junhui Liu wrote:
 
-I do not see it as a threat, sorry.
+[...]
 
-Say no to AI hallucinations.
+> +static SUNXI_CCU_MP_DATA_WITH_MUX_GATE(timer0_clk, "timer0", timer_paren=
+ts, 0x800,
+
+I will update these to SUNXI_CCU_P_DATA_WITH_MUX_GATE in next version.
+
+> +				       0, 0,		/* no M */
+> +				       0, 3,		/* P */
+> +				       24, 3,		/* mux */
+> +				       BIT(31),		/* gate */
+> +				       0);
+> +static SUNXI_CCU_MP_DATA_WITH_MUX_GATE(timer1_clk, "timer1", timer_paren=
+ts, 0x804,
+> +				       0, 0,		/* no M */
+> +				       0, 3,		/* P */
+> +				       24, 3,		/* mux */
+> +				       BIT(31),		/* gate */
+> +				       0);
+> +static SUNXI_CCU_MP_DATA_WITH_MUX_GATE(timer2_clk, "timer2", timer_paren=
+ts, 0x808,
+> +				       0, 0,		/* no M */
+> +				       0, 3,		/* P */
+> +				       24, 3,		/* mux */
+> +				       BIT(31),		/* gate */
+> +				       0);
+> +static SUNXI_CCU_MP_DATA_WITH_MUX_GATE(timer3_clk, "timer3", timer_paren=
+ts, 0x80c,
+> +				       0, 0,		/* no M */
+> +				       0, 3,		/* P */
+> +				       24, 3,		/* mux */
+> +				       BIT(31),		/* gate */
+> +				       0);
+> +static SUNXI_CCU_MP_DATA_WITH_MUX_GATE(timer4_clk, "timer4", timer_paren=
+ts, 0x810,
+> +				       0, 0,		/* no M */
+> +				       0, 3,		/* P */
+> +				       24, 3,		/* mux */
+> +				       BIT(31),		/* gate */
+> +				       0);
+> +static SUNXI_CCU_MP_DATA_WITH_MUX_GATE(timer5_clk, "timer5", timer_paren=
+ts, 0x814,
+> +				       0, 0,		/* no M */
+> +				       0, 3,		/* P */
+> +				       24, 3,		/* mux */
+> +				       BIT(31),		/* gate */
+> +				       0);
+> +static SUNXI_CCU_MP_DATA_WITH_MUX_GATE(timer6_clk, "timer6", timer_paren=
+ts, 0x818,
+> +				       0, 0,		/* no M */
+> +				       0, 3,		/* P */
+> +				       24, 3,		/* mux */
+> +				       BIT(31),		/* gate */
+> +				       0);
+> +static SUNXI_CCU_MP_DATA_WITH_MUX_GATE(timer7_clk, "timer7", timer_paren=
+ts, 0x81c,
+> +				       0, 0,		/* no M */
+> +				       0, 3,		/* P */
+> +				       24, 3,		/* mux */
+> +				       BIT(31),		/* gate */
+> +				       0);
+> +static SUNXI_CCU_MP_DATA_WITH_MUX_GATE(timer8_clk, "timer8", timer_paren=
+ts, 0x820,
+> +				       0, 0,		/* no M */
+> +				       0, 3,		/* P */
+> +				       24, 3,		/* mux */
+> +				       BIT(31),		/* gate */
+> +				       0);
+> +static SUNXI_CCU_MP_DATA_WITH_MUX_GATE(timer9_clk, "timer9", timer_paren=
+ts, 0x824,
+> +				       0, 0,		/* no M */
+> +				       0, 3,		/* P */
+> +				       24, 3,		/* mux */
+> +				       BIT(31),		/* gate */
+> +				       0);
+
+[...]
+
+--=20
+Best regards,
+Junhui Liu
+
 
