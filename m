@@ -1,191 +1,228 @@
-Return-Path: <netdev+bounces-306931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306932-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id WDlNLGFAU2onZQMAu9opvQ
-	(envelope-from <netdev+bounces-306931-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 09:21:05 +0200
+	id 7wqqI7VIU2o6ZgMAu9opvQ
+	(envelope-from <netdev+bounces-306932-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 09:56:37 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA2AA7440C3
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 09:21:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DFEF07441A2
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 09:56:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b="RibjS0/a";
-	dmarc=pass (policy=reject) header.from=nvidia.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306931-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306931-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=ibm.com header.s=pp1 header.b=algb8nrN;
+	dmarc=pass (policy=none) header.from=ibm.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306932-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306932-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 59C5C300D69A
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 07:20:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C398C300CE79
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 07:56:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB81A352C35;
-	Sun, 12 Jul 2026 07:20:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3896D33A716;
+	Sun, 12 Jul 2026 07:56:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011002.outbound.protection.outlook.com [40.93.194.2])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9012B30EF77;
-	Sun, 12 Jul 2026 07:20:41 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783840842; cv=fail; b=SyzlGomoNYxqQm+1OfXOYGIt2/j7D5ayaKNk7wOcQD9aeXDVj4PXxcJ4s6m5p4gnPGcyV3yznHOW+6CvTqe82rhMAfeKPs4l35Dwku9MAJKP63oN1nJx2W40BQ8xvYA23v21euv/Q+X/Or/K0G1vm35wmrWZ3gQoXSDJqaeFFKo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783840842; c=relaxed/simple;
-	bh=Jig94UUIbU2c8uDNuN8z8WbS9KoOtHZ6mquJ4fgjpss=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ekvIfhuTzfB24NVuCT4RFwe0+XrzHig9Kp1qhu74ORXXERF8WC3WfLRZuB9qdCTV/2MOS6iqyqK3y3KcMq1sAKzSooOKMU5TrkHpQ5v9udHJDpgKJhK65f4QyALifGZ5WVILLSZIb2bHlVMfVxOCeCxC91DdKWUC+/MNTD6wOfQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RibjS0/a; arc=fail smtp.client-ip=40.93.194.2
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nEdfPRI77D0H61vAus85oWREzQx586gQccT9FvQYlw6LqWXJDlTiQpXWgwp4/6YeFjuL6k3J5jseVAwHFBBayiVgZjn0Vp7waM7VMDQQ9fFdwYk5cMuj1N1Dy2rsBAHMufp51z+Etz22NjnVJPS8jfKpilsRxcTdX2aW/F4m9krhbSeO5CoxrKsOptrW3UVFBQBB4JAP1Is3qEP0Cr2xDAZGG0SQ7i29lwXwQqZM9NhFRDIaJ9/vGdt4CvByTOVr2n2om3j6vAAZ0O6pkQcFQGq6QIcWn5OyJhI7A+cszW9a9DQlsKI1oYoZxmt7YZj74wFJSXEfsJzcthx29f4zcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=epmglJ7bAnkCjl9MitqHhswibEtF3s/qH/WIYCFY+bs=;
- b=LZVS8Slxd8Wz4vOpVLqHJNldtYSZ6Umqilaa9nPShvj7G4QTNoO3GgVRT/qF2iyF2hOzIK3v7SM/AbPaYkreAifDy87QB9Z2xAWvKAkOg6P01kvDdTQ2j66qQ+Ra4/046EA6p/8LN1g+aq/dAA/aB/4BdQvnnHgesQ5tt8kFmDEi29nWb+VIIrE6VL/icfMYvOFYHOmQczldjxw0Tu3WCMYeeQTWlQopiPtb7fzEqRJxgE6lAiqftY8kxXylCqzU7TmgZFSZ4RRkjeoSWvI3EKk6J8IsBPRWMRc5efDERMpxhROGXrkhrJ9asSn/QU0oAIO6mznfPX2QOiZX4bWFOw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=epmglJ7bAnkCjl9MitqHhswibEtF3s/qH/WIYCFY+bs=;
- b=RibjS0/afop6eWRaAjy8s/xCjmVomMH0L6to6nr4QxVEm3uo0Gr3qmZ1wKlJxcpAJfnsLl6PT8HHCiLqGQ5QtsJLtBBdQLkNshFZtvxW1VhJ5sftN5WONc0/J5yZD8RxoUu2LWOINsk4BvqPHU/aDvOp081Dkam/QfWGf+5xq+nWw5dX+mJ/dFxKmmCcIMVZtYy6jKIKmRzIcVEwLfUhsSAQ1IolA/Gc6t0aXVcNyj9VuTzTo5errCima1ccFRhd5jCdGmweiskd+Zx+K+2KGkl2w45CnGVosdn/rneA4oDiR/FuRz2yzqGBOP35gQ0fFGygC3qIN95eUfdP5jdylg==
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
- by DS7PR12MB8324.namprd12.prod.outlook.com (2603:10b6:8:ec::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.181.22; Sun, 12 Jul 2026 07:20:34 +0000
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0181.019; Sun, 12 Jul 2026
- 07:20:34 +0000
-Date: Sun, 12 Jul 2026 10:20:25 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	David Ahern <dsahern@kernel.org>,
-	Elad Nachman <enachman@marvell.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@google.com>
-Subject: Re: [PATCH net-next v2 3/3] net: ipv4: clear dev->ip_ptr before
- destroying inetdev
-Message-ID: <20260712072025.GA135396@shredder>
-References: <20260711005405.2861680-1-yuyanghuang@google.com>
- <20260711005405.2861680-4-yuyanghuang@google.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260711005405.2861680-4-yuyanghuang@google.com>
-X-ClientProxiedBy: FR4P281CA0003.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:c8::14) To SA3PR12MB7901.namprd12.prod.outlook.com
- (2603:10b6:806:306::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C71B52D6E58;
+	Sun, 12 Jul 2026 07:56:31 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783842993; cv=none; b=p8VzhXEqngidMzxG2SEXsU9Wgq2gZ1UXKb78ftQBz4CD8RLByoIKpcR4gBn2iLqTJb2C57s/kvg6jF9r+hW/1jbIyrT/asp1ufqkhNHUHvIr5zlymXYcqScc9r+Xm/6Iswk7g5MJzWJsWe42a2tjODsQTOrm+N64jz3aMzwJwnw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783842993; c=relaxed/simple;
+	bh=E76YgbBqphZJxoUlTTDhX/IVFLNpuvLmJmgSb/GsMKA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Gtm6zJxxUZ8g7QCK6V2AmIcUQZuYY6YkWoQksv6+XXTiT7VLymKbGQWZnUuEbs8n2C7vdj6n39cCS6a9QoWiipnMo9kuSE5p/94EueQOKGfp7oWgvIkvSxs5zwI/XVuOeGjNx2d9wrOvCtNPTHy+LTQR+bEqdCGjO1wu8Ky4IbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=algb8nrN; arc=none smtp.client-ip=148.163.158.5
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66C7g4TO3223788;
+	Sun, 12 Jul 2026 07:56:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=fOgQYH
+	Ssc9X+0RUE+IcOk6pdTZOJpa3YnaBn0GjQnN4=; b=algb8nrNtYcBaZDo4bGUb6
+	KjRG6wrtd+rAa+CEqxYywQisZshxWmzAv97TtrzWe5rWV4jldnQkBiVN71qhVL+9
+	2Nq2erM860YPNeRvfrn9D/lmumKvZnUBudV6h+njeRKs/xg4bGy4W33bshgHnLtI
+	oDPTXaZ2XjxziUgh+FcDLq3uyQ+3w9/AOKB0vne3ZzBj7JFjLRJCGAIsTOG8Le+f
+	0619+OEJ4teiv9kVJoOz65pkDVvp5MfNN0fiCKygjL2zfGoTPt0PVuhkmIK2XPxn
+	OnUxFnCQyWm2KGYZOEWnTJEJ7sjTMLcmqEfeh77TGiJFb4RWiQnjLOVDfpbDmm+w
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fbegbbpqj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 12 Jul 2026 07:56:22 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66C7ncZE024732;
+	Sun, 12 Jul 2026 07:56:21 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fc05ps50d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 12 Jul 2026 07:56:21 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66C7tiXr30868068
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 12 Jul 2026 07:55:44 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 890A758052;
+	Sun, 12 Jul 2026 07:56:18 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 897CB58050;
+	Sun, 12 Jul 2026 07:56:12 +0000 (GMT)
+Received: from [9.39.28.197] (unknown [9.39.28.197])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Sun, 12 Jul 2026 07:56:12 +0000 (GMT)
+Message-ID: <d2b41ff7-03f1-4a5c-adbe-df914cac120c@linux.ibm.com>
+Date: Sun, 12 Jul 2026 13:26:10 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|DS7PR12MB8324:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0851897e-21b8-48f3-075c-08dedfe61038
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|7416014|376014|1800799024|366016|4143699003|56012099006|11063799006|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	ou8i8LZzLT4D6z1687gBD4yu6Y8TTHAnpY68RXO/shyGuUDGAcP3KL0VRXdXT6bZwFrO/GpzEN+0Yopt4dfsSyalqUcFYvkEvkWiO+6Ru1UvMZQYP5lVunxaERUVEAFoSkwD1af8MWeQQWnJQaujsQa9aEQooWWdjz1a7SYGbnjUwgn8xpsohWFgWK+iD9powoAS0MY7zIz5ifNxpLGWws+avw8EHx5YzBWOOpLDddEx5IqHAywa82B0E6WngQblW7cNZEDzwkpni6okxZyUPiVgkDYesm26mvRstRRXSRwW9SOkp2ecFa9wBexu3FztC21jZqNzcKpPUqBOlSH4cDwEQ2bgrQVZNKyDoVVd/VIqEAiQPVGYodVmljlna0ZNHoT+CqXPkkaANZnT2Dai9zSjbkvPx4SP2NOacFN7IFGe1ongW4EWVPN4kkKBsH4BhCx2K9EFFqRDt7hB4ytE5ifJ2briPO72VBn/2CMOgpYcsyeuHGPE/DyI9m3Z8L0bmOlpMReJ1yHKU+NMM8MPakQYy2OuMBT76Hp9B8s5T09bb+Imlo44W1MtdoPal+ZK9/CGzkAQoQlFz6Bd3IMoCEq2w6Ay8V6q+fRblEYkH/dxec8z3XS/De8wxAO/GQ7x30vyJlHCM8zTeXV9ej+/lyYe767MuGCLw452xD258KM=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(376014)(1800799024)(366016)(4143699003)(56012099006)(11063799006)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Nmr8LPdh6eO3OpwWN40VHEehZunjcKLhHXG8CXstardSneldDcHsapj+VQuQ?=
- =?us-ascii?Q?IUMUe3RUjmpRrefW5ytoeawfhyg8dRo9UfhDV4HkBlx9i5cybVblOp5TNz4Q?=
- =?us-ascii?Q?Dv679cS1P0Edl4kSXSlil888Lji3GBBiO5A2g5zPJ7PZKzkhpWvWEZidORdH?=
- =?us-ascii?Q?tSt2wOzaFqI5rvhorSnRWENitqNgCgufY0pBKgUawM1PJNcD6y/ZRbztpcMM?=
- =?us-ascii?Q?U0ya41iPyypG3hfWj8WdbGMiMBa1azDIOwpmuxQoOw9hxF7jbozkO85S6Jmh?=
- =?us-ascii?Q?+piYGD1RY84I3OQqiQSlE7KIr6bBmpZAYCe6hq66/NwZKee0rncQKLxSkt8Q?=
- =?us-ascii?Q?F0VtHQE2aI1bSj7iwXRTu6qUaYxe+cAg6Kmf3MJApyOTwtwKRj5GbFeFDyJE?=
- =?us-ascii?Q?+X0N1tKJuPjBxbd+SRvSdnkkjR+UhDq1d2OiHjhSQib1CDb8klrbFwo5i0vW?=
- =?us-ascii?Q?H8802wsZoGX/A3YlxL3iYcVq2srxbOgjvjKD0ReHy0S8Xi9Nam3kSA96lbJK?=
- =?us-ascii?Q?VGbSYKB7dPvw1FBjYmFF54n/3YNpH+ui2UALUv4uZhTXgNztNPUZeLK2A6fM?=
- =?us-ascii?Q?LrO3J2YlgKp0ZbweMUCEUmKyKGxSo6RzBjoYGXlKtcFOvJmRiYRxN+1DkJDJ?=
- =?us-ascii?Q?BeRvrSYBF3UpZZ4Bi7UNz2+hPm9rRh6WFlIQgqhLnL+s7hDI2mKjjP3zmQGA?=
- =?us-ascii?Q?eApMIr5mJu4u1V1HwUqgA23tD68TPsMILKIRsqZ7laRmQlXHMbn5z7w1PGIR?=
- =?us-ascii?Q?yp/1DJ7dK9Cn10fWlu+QQqlvebkL320CRA6rgZ9NqqBTkF02WqiD8LjH8/hm?=
- =?us-ascii?Q?3kruKnGjwBGFV06l4HH5SC9z05PsibC39ggslTthDQJZq+DIQvgGOEPGKKxd?=
- =?us-ascii?Q?BwmISV/fOwKCX7GlEd+6hSUTCM1H1BI17Uk26GPW1GwC1zRIbty2x32po8kb?=
- =?us-ascii?Q?SXKRTqjZLoqKXxVyy9P26ioRxeHhlRM84ev5paspp9mx4EOxRVWqWKuVnP/o?=
- =?us-ascii?Q?pmajsKwLw3pjg6sdr5bz81yJ+9xsLSbdXwIslKgTx38qRmgKsdgzO9/w2jAB?=
- =?us-ascii?Q?YMRLrZ4/yD9zEeX5iDeiHP4JoHmIak+blYkTFbDWiBs+7ove7rXSGl05r+bk?=
- =?us-ascii?Q?bDdHlZimQ9SmyitAH5or9bKZdxgdmU3ruOsn4DDizOs2tOr6V1WqB+cXm3Rz?=
- =?us-ascii?Q?o6eMZJBpor/rm1J9hR6/m46JaotSY7jjclGBdxCEENKcenO1cZXeF6HgFjvo?=
- =?us-ascii?Q?i72S6t7dnGNycsDJ2YaDQrZz6L8e2bArYVuKc3f/fudXbohIMMb/zwXKUjKw?=
- =?us-ascii?Q?mCo/9AnmLvjwKo6L61yCyLKi5fMNq4NM52TLU2IS7Vj6PPcimPjLJx0O0yaO?=
- =?us-ascii?Q?2bNLvo4UI44jGjsaE3bltmbkrWEVZXIZhUrkSW8+UWyXZ4ZpZI1EAEYVk3FK?=
- =?us-ascii?Q?VhSFg0kD+dg+mOLg9yVHECpLmZmajA+vYKxYfYLsRwEVtVdR83mjICCDbIJO?=
- =?us-ascii?Q?HxNmKR/cAbrGIxMoEFCYQcxo3FLNWmfvqJqScRqZp0DaI9ymt812l8zYPkwI?=
- =?us-ascii?Q?ElAPh+A0q7N7BgpovDEoTK4gQK9FgKnV380Ea0AhErw30dPgvxQqRG1/d0us?=
- =?us-ascii?Q?FalcnB+ooM0UMCJ7cB4HsA30vsQfdPKUPn2MLQ3Ni13KmPHYAj+BwegDs2Qg?=
- =?us-ascii?Q?OQJWwjSumlBfi5Njhr8L728Kjc/LgwouC43SG9tqlvdE0467?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0851897e-21b8-48f3-075c-08dedfe61038
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2026 07:20:34.1903
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xAyfocI+qI1rSc9vupWq+DpnxnFudlU9Ocego7gw3PwTFSRTnmTK0okUKbmnrMX4HBsqtyG7aaxgmkIlxkEW7g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8324
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/af_iucv: fix NULL deref in
+ afiucv_hs_callback_syn()
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com
+Cc: horms@kernel.org, linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, wintera@linux.ibm.com,
+        twinkler@linux.ibm.com, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, borntraeger@linux.ibm.com, svens@linux.ibm.com
+References: <20260709191732.124092-1-hidayath@linux.ibm.com>
+Content-Language: en-GB
+From: Hidayathulla Khan I <hidayath@linux.ibm.com>
+In-Reply-To: <20260709191732.124092-1-hidayath@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=fOcJG5ae c=1 sm=1 tr=0 ts=6a5348a6 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=VwQbUJbxAAAA:8
+ a=VnNF1IyMAAAA:8 a=1I7zOhcRGFiCedo4MywA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEyMDA3NyBTYWx0ZWRfX9+iZhVdEp4+/
+ llwX4nDIEydF0oSxoQfImQkzBDiy+j/07nhIFwVlwIpkcnSc1EsWOz7LKWb2j2Q/mvRnQaXJJR0
+ wNuRtS9X0EwPuqv6Ae224sOPKYvrGL6WM4FjfyBG4BA1thf3zyu+cxo5rmbEwgBrWtdmP5lNQ2I
+ FFnzuigsDX2UCC8jIP5ThHhQbhMtgDFB1aagaVOSfnIEJZq4qBsvwjRyxuPTj1S7KFzoEBiN7Wl
+ mCfNoW/ZMdzzkYvmfcTQHZD9N7fSWiGis+sDyNkjhRLCHBPgX4mhJuz8ShzEEbKQdgNefhKDm9t
+ +yFZN5+Bwc5i+Z9KWIsnnNA2+OLc0vQVcdRJ3TideZgKh8nwW5fjBFqIJ98y11XwZp/MUSTyfZg
+ hH3YJK0tHfENv/h0YJeIZCZsHJTYU6BdXIcbmKh5v2tS7bnbsHRqLUC2RpCmktqTRhqHf9wLKxF
+ V3uiv2XfucGk3YSSpbw==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEyMDA3NyBTYWx0ZWRfXw8NikXafU82e
+ grtXBJnvNFYXGgH5AOx0vjYHB8zmJPNxVppdPe/4jvqbl0XgtvVn/JqLZUyPfbz3GOYoF+4smiu
+ P7JjLF2160qba5puAjLWePRCm7yalnA=
+X-Proofpoint-GUID: NO_vM1gfMgxl5pQ5YPSh9ulVJ1kLbrC9
+X-Proofpoint-ORIG-GUID: om4YAekFuSA48d2Ccu-GtKCXduJRQy0G
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-12_03,2026-07-10_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 bulkscore=0 impostorscore=0 suspectscore=0 adultscore=0
+ priorityscore=1501 malwarescore=0 clxscore=1015 phishscore=0
+ lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2607120077
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306931-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:yuyanghuang@google.com,m:davem@davemloft.net,m:andrew+netdev@lunn.ch,m:dsahern@kernel.org,m:enachman@marvell.com,m:edumazet@google.com,m:kuba@kernel.org,m:johannes@sipsolutions.net,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:netdev@vger.kernel.org,m:kuniyu@google.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_SENDER(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-306932-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:wintera@linux.ibm.com,m:twinkler@linux.ibm.com,m:heiko.carstens@de.ibm.com,m:gor@linux.ibm.com,m:agordeev@linux.ibm.com,m:borntraeger@linux.ibm.com,m:svens@linux.ibm.com,s:lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[hidayath@linux.ibm.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[ibm.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hidayath@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:from_mime,nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,Nvidia.com:dkim,shredder:mid,vger.kernel.org:from_smtp]
+	RCVD_COUNT_SEVEN(0.00)[11]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EA2AA7440C3
+X-Rspamd-Queue-Id: DFEF07441A2
 
-On Sat, Jul 11, 2026 at 09:54:04AM +0900, Yuyang Huang wrote:
-> To prevent RCU readers from accessing a partially destroyed in_device,
-> clear dev->ip_ptr early in inetdev_destroy() before freeing the
-> multicast list and individual IP addresses. This aligns the IPv4 teardown
-> sequence with the IPv6 implementation.
-> 
-> Cc: Ido Schimmel <idosch@nvidia.com>
-> Cc: Kuniyuki Iwashima <kuniyu@google.com>
-> Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
+Thanks for the Sashiko AI review: On the findings it raised.
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Finding 1: iucv_sock_kill() returns early unless SOCK_ZAPPED is set,
+and the flag is never set on a freshly allocated child socket, so the
+child socket and its pinned net_device leak on the error paths. I had 
+already
+spotted this leak (in afiucv_hs_callback_syn() and iucv_callback_connreq())
+and Alexandra Winter and I are looking into it.
+
+Both NULL deref and child sock leak come from the same root cause,
+the child socket is allocated before the listen-state and accept-queue 
+checks.
+I will address them together in v2 by allocating the child socket only 
+after the
+listen-state and accept-queue checks, so the refused path has nothing to
+release (no NULL to guard and no child socket to free).
+
+And on the transmit-failure path release the already-constructed
+child socket directly (dev_put, unlink, put the last reference) instead of
+relying on iucv_sock_kill().
+
+Finding 2: missing sock_hold on the afiucv_hs_rcv() lookup. Agreed.
+Bryam Vargas has already submitted a patch for this.
+
+The other findings look valid too. I will follow up on them separately.
+
+Thanks,
+Hidayath Khan
+
+On 10/07/26 12:47 am, Hidayath Khan wrote:
+> afiucv_hs_callback_syn() allocates the child socket with GFP_ATOMIC.
+> If the allocation fails, nsk is NULL.
+>
+> The connection-refused path is entered when the listen state check
+> fails, the accept backlog is full, or nsk is NULL. The code
+> unconditionally calls iucv_sock_kill(nsk) in that path.
+>
+> iucv_sock_kill() does not accept a NULL socket pointer and immediately
+> dereferences sk via sock_flag(sk, SOCK_ZAPPED). When nsk is NULL,
+> calling iucv_sock_kill(nsk) results in a NULL pointer dereference.
+>
+> Only call iucv_sock_kill() when a child socket was successfully
+> allocated.
+>
+> Fixes: 3881ac441f64 ("af_iucv: add HiperSockets transport")
+> Cc: stable@vger.kernel.org
+> Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+> Signed-off-by: Hidayath Khan <hidayath@linux.ibm.com>
+> ---
+>   net/iucv/af_iucv.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/iucv/af_iucv.c b/net/iucv/af_iucv.c
+> index fed240b453bd..f5b1ec44b6ae 100644
+> --- a/net/iucv/af_iucv.c
+> +++ b/net/iucv/af_iucv.c
+> @@ -1872,7 +1872,8 @@ static int afiucv_hs_callback_syn(struct sock *sk, struct sk_buff *skb)
+>   		afiucv_swap_src_dest(skb);
+>   		trans_hdr->flags = AF_IUCV_FLAG_SYN | AF_IUCV_FLAG_FIN;
+>   		err = dev_queue_xmit(skb);
+> -		iucv_sock_kill(nsk);
+> +		if (nsk)
+> +			iucv_sock_kill(nsk);
+>   		bh_unlock_sock(sk);
+>   		goto out;
+>   	}
+>
+> base-commit: 262b2eac463d880a664cf92af1107b4f9d84ad37
 
