@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-306975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306976-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id LqEuJRTrU2rOgAMAu9opvQ
-	(envelope-from <netdev+bounces-306975-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 21:29:24 +0200
+	id JHgZDBjrU2rPgAMAu9opvQ
+	(envelope-from <netdev+bounces-306976-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 21:29:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4D21745C03
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 21:29:23 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8455745C0E
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 21:29:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=xs4all.nl header.s=xs4all01 header.b=Ff76l4VZ;
+	dkim=pass header.d=xs4all.nl header.s=xs4all01 header.b=odHs2vLg;
 	dmarc=pass (policy=reject) header.from=xs4all.nl;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306975-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306975-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306976-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306976-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A2536300A135
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 19:29:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 65912300D901
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 19:29:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80DDA3B47CC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDE2B3B4E80;
 	Sun, 12 Jul 2026 19:29:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.185])
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722D8369981
-	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 19:29:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F5837475B
+	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 19:29:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783884558; cv=none; b=m84ex4NUKcSNgUn+fJvs5QEs0DXQ7XhsXSnyANC0T9re6FTRTIljru7nkVojTx11TbhcovU3+olivwk5PkGRogQk39U34AdHB/WS4iNOwaqQG/DdYNmpSWShmg8M7av8xAXG6cdknA7cRBJmlPSp78ZckvfsR06Y6LItNcDL6NA=
+	t=1783884558; cv=none; b=nTi3Umt2rHWRD3ndCmvHJiw5HMBs3b9quSrMFLzAhbDzNzWBLP6zvjgrl84U5VSlPXoVqoJ0tiTNMvZGOzdU1LDVNpMEiBpouuUzn8qWAccb9pi8wQDyokucwNvxbjwv1wtsXKhTns/2nb0IIutZOVA+57kH7bz5SP8OMwvbs9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783884558; c=relaxed/simple;
-	bh=7FeLZRz1lyQ0XU/V8TTu9YNCIok8MYLB4V1l1DzpssI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e/1ykABlwBwC6uVBPfHC5S4fvPlrMUYkLD5Qk/a19q/sKFRmfYBsyi+GtQnN2rmIOLsn5kqWfsBi+iWNXaLQg60uYF/GQuUyjAyWNL6fXpSfbo+OkNQHT9NnZzPg8Yuf5S6Ls/LgXgd42DlUkK7/40JL+Wl+ffoAbucBJ7z19GE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=Ff76l4VZ; arc=none smtp.client-ip=195.121.94.185
-X-KPN-MessageId: f5dfb728-7e27-11f1-9e8e-005056999439
+	bh=/hwMuqFPbV2RXCxBKoN/ZEHNqijXQT8Lwh9RVoeAq9k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=LVp7POrC81ycfbEKFDdO1vsccv7TNt67e1clZVqYl2xh+jFiUE8X0ZXBFDh9d6pknHy96FsGGuJPeUfVAURU1qmjqrO+QoF1oTg4yUhX163iu6R6oCIIyZmCLGm8gSGtfrAdMI2kmJsJOWc1jKQlIMVctcKfNAXglz1qxqQ3rlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=odHs2vLg; arc=none smtp.client-ip=195.121.94.184
+X-KPN-MessageId: f6b53a40-7e27-11f1-a59f-005056994fde
 Received: from smtp.kpnmail.nl (unknown [10.31.155.8])
 	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
-	id f5dfb728-7e27-11f1-9e8e-005056999439;
-	Sun, 12 Jul 2026 21:29:11 +0200 (CEST)
+	id f6b53a40-7e27-11f1-a59f-005056994fde;
+	Sun, 12 Jul 2026 21:29:13 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=xs4all.nl; s=xs4all01;
 	h=mime-version:message-id:date:subject:to:from;
-	bh=KPf/aoCZlxQz+vFaLELeH6sLcVCRcc/cpJwz2gB1uqY=;
-	b=Ff76l4VZAlo8WoJ/NSgZo7rqkAQLKXflzwa40rgvvddCT1bv4LwYKMs5+TIKFkNxx+4zs+hQ7f0sW
-	 Jaeln7sK+7jPCQPcNfCK4UT2kfH6QJ6u9JqJ2VsViVbHXwyyNSkWlM70kFHiJiuBElbQstlrxmqlw4
-	 jq1bf6dWYhmJ/iU4C+ZTWtntdZHNKy/kGR9Qam+fdL1F9hSIGYQeHP1fc7k1UPuRI2OL3PXGcfIqr+
-	 ri1X5hPv1KZSFRm1J8ZqLicyuyBlABgASKjxH/qWZCaQUDhweMpY0tlmTwcPPH4V2hhuRGKETgepPc
-	 y578Q3lVQp4WHn6jJktMGx2lxZW/vCg==
-X-KPN-MID: 33|NYkvUMlNyR46n+JRRCp856l9S28XqQfb+s46ITKw0XLuvpzEgl2ZEC+qYh6JX+1
- vHqmKoABwQMHh/auUzF9i+FbCL7fl0Ri+TyOaheDxL+Y=
+	bh=x7uJpPkF3ZQUrVWrgYFqwWsVpOjT67/X4ytnP1oLCCo=;
+	b=odHs2vLgRLPOqLbKwyekwuvOqYahbKcL+JC65XHkWeAIM0Y0hgqya7YQAoRyV99weSkYZnjEYslyL
+	 ZFGankDxkO5LbgcmvUfaRJqecVAE788dMFPbkSZ5rooGV2McHnx7s7plh7UPShzQ+xz7pEa9wK6ZuD
+	 mouaZ4GZmpVq4yzUA38NjeYzF9pY+3Sr/GrQ9wVHN+zX8bXOzJpzADx3Yk6l/VEQyjo0fw5sKDR4tX
+	 PAN+OQ5Ytubh8eGsvWZgT0oWkNyXaFv6N1LkSPGcYH0Q6ad0SDr8mQE1jn6z3RoPF8FRSoFIX3/P0d
+	 +uypT3d65g29wao4T+WYvWMgznhiQgg==
+X-KPN-MID: 33|aCmUk9DR42MJvYEnNg0Xnbr6u00Xeqlc/Tdp34eeaQa8IIp64EU9sbHhMeiG2xO
+ r7yi8bYDYCCzm6sdMbu1pWbo95qSfEMna1AuwxTxxLGw=
 X-KPN-VerifiedSender: Yes
-X-CMASSUN: 33|JHIEU+RzsCoWXECWdl/V5mzobVXmY34k9TsvMANEMCsS+nNjc0sUyWXN67sO1LQ
- p0KvKFx6+NwwSTjL1TbbcEw==
+X-CMASSUN: 33|hch6RI3T8pEZhkRaOvP0IjHnMogfJP0PF8nk8jIHnZM6qrB+mgTlOC+83Uc670Z
+ Pj9ZBYjWhSCx3VmwHCrsPHQ==
 Received: from daedalus.home (unknown [178.230.226.124])
 	by smtp.xs4all.nl (Halon) with ESMTPSA
-	id f09634af-7e27-11f1-8dcc-00505699d6e5;
-	Sun, 12 Jul 2026 21:29:11 +0200 (CEST)
+	id f6757dc1-7e27-11f1-8dcc-00505699d6e5;
+	Sun, 12 Jul 2026 21:29:13 +0200 (CEST)
 From: Jori Koolstra <jkoolstra@xs4all.nl>
 To: Christian Brauner <brauner@kernel.org>,
 	Aleksa Sarai <cyphar@cyphar.com>,
@@ -69,10 +70,12 @@ Cc: netdev@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Jori Koolstra <jkoolstra@xs4all.nl>
-Subject: [net-next v5 0/4] net: af_unix: useful handling of LSM denials on SCM_RIGHTS
-Date: Sun, 12 Jul 2026 21:29:54 +0200
-Message-ID: <20260712192958.1631672-1-jkoolstra@xs4all.nl>
+Subject: [net-next v5 1/4] net: af_unix: enable custom setsockopt for all socket types
+Date: Sun, 12 Jul 2026 21:29:55 +0200
+Message-ID: <20260712192958.1631672-2-jkoolstra@xs4all.nl>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260712192958.1631672-1-jkoolstra@xs4all.nl>
+References: <20260712192958.1631672-1-jkoolstra@xs4all.nl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,14 +90,14 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[xs4all.nl,reject];
 	R_DKIM_ALLOW(-0.20)[xs4all.nl:s=xs4all01];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,xs4all.nl];
 	FREEMAIL_FROM(0.00)[xs4all.nl];
-	TAGGED_FROM(0.00)[bounces-306975-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-306976-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:brauner@kernel.org,m:cyphar@cyphar.com,m:kuniyu@google.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jkoolstra@xs4all.nl,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
@@ -110,77 +113,84 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DKIM_TRACE(0.00)[xs4all.nl:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,xs4all.nl:from_mime,xs4all.nl:dkim,xs4all.nl:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,xs4all.nl:from_mime,xs4all.nl:email,xs4all.nl:mid,xs4all.nl:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E4D21745C03
+X-Rspamd-Queue-Id: C8455745C0E
 
-Right now if some LSM denies an AF_UNIX socket peer to receive a
-SCM_RIGHTS fd, the SCM_RIGHTS fd array will be cut short at
-that point, and MSG_CTRUNC is set on return of recvmsg(2). This is
-highly problematic behaviour, because it leaves the receiver
-wondering what happened. As per man page MSG_CTRUNC is supposed to
-indicate that the control buffer was sized too short, but suddenly
-a permission error might result in the exact same flag being set.
-Moreover, the receiver has no chance to determine how many fds got
-originally sent and how many were suppressed.[1]
+unix_setsockopt() and the SOCK_CUSTOM_SOCKOPT flag were only wired up
+for SOCK_STREAM (introduced along with the stream-only SO_INQ).
+Consequently custom AF_UNIX options are unreachable on SOCK_DGRAM and
+SOCK_SEQPACKET: those setsockopt() calls bypass unix_setsockopt() and
+fall through to the generic sock_setsockopt(), failing with
+-ENOPROTOOPT.
 
-Add a SO_RIGHTS_NOTRUNC option to UNIX sockets to enable more useful
-handling of LSM denials when receiving SCM_RIGHTS messages: instead of
-truncating the message at the first blocked fd, keep every fd slot
-and store the LSM errno in the blocked slot.
+Set SOCK_CUSTOM_SOCKOPT for every AF_UNIX socket type in unix_create(), and
+also for accepted sockets in unix_accept() (reachable for stream and
+seqpacket).
 
-[1]: https://github.com/uapi-group/kernel-features#useful-handling-of-lsm-denials-on-scm_rights
+This is a prerequisite for making SO_RIGHTS_NOTRUNC settable on all AF_UNIX
+socket types.
 
-Changes:
-v5:
-  - Enable SO_RIGHTS_NOTRUNC on all AF_UNIX socket types.
-  - Added required BPF CONFIG_ options to
-    tools/testing/selftests/net/af_unix/config.
-v4: https://lore.kernel.org/netdev/20260705123826.3818443-1-jkoolstra@xs4all.nl/
-  - Removed the __receive_fd() helper and moved logic into
-    scm_recv_one_fd() directly (suggested by Brauner).
-  - Moved selftest from Smack to BPF (LLM assisted).
-  - Add arch specific socket option values for SO_RIGHTS_NOTRUNC.
-  - Undo patch that replaced copy_from_sockptr() with
-    copy_safe_from_sockptr().
-v3:
-  - Separated net and vfs changes.
-  - Use kselftest_harness.h and system() to call the test script.
-v2: https://lore.kernel.org/netdev/20260616143020.3458085-2-jkoolstra@xs4all.nl/
-  - Reimplemented as a UNIX socket option instead of a per recvmsg(2) flag.
-v1: https://lore.kernel.org/netdev/20260428175125.2705296-1-jkoolstra@xs4all.nl/
+Signed-off-by: Jori Koolstra <jkoolstra@xs4all.nl>
+---
+ net/unix/af_unix.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-Jori Koolstra (4):
-  net: af_unix: enable custom setsockopt for all socket types
-  net: scm: move scm_detach_fds() from common path to scm_recv_unix()
-  net: af_unix: useful handling of LSM denials on SCM_RIGHTS
-  selftest: Add tests for useful handling of LSM denials on SCM_RIGHTS
-
- arch/alpha/include/uapi/asm/socket.h          |   2 +
- arch/mips/include/uapi/asm/socket.h           |   2 +
- arch/parisc/include/uapi/asm/socket.h         |   2 +
- arch/sparc/include/uapi/asm/socket.h          |   2 +
- include/net/af_unix.h                         |   1 +
- include/net/scm.h                             |  13 +-
- include/uapi/asm-generic/socket.h             |   2 +
- net/compat.c                                  |   4 +-
- net/core/scm.c                                |  40 ++-
- net/unix/af_unix.c                            |  19 +-
- .../testing/selftests/net/af_unix/.gitignore  |   2 +
- tools/testing/selftests/net/af_unix/Makefile  |   8 +
- tools/testing/selftests/net/af_unix/config    |   7 +
- .../net/af_unix/scm_rights_denial_lsm.bpf.c   |  36 +++
- .../net/af_unix/scm_rights_denial_lsm.c       | 285 ++++++++++++++++++
- 15 files changed, 404 insertions(+), 21 deletions(-)
- create mode 100644 tools/testing/selftests/net/af_unix/scm_rights_denial_lsm.bpf.c
- create mode 100644 tools/testing/selftests/net/af_unix/scm_rights_denial_lsm.c
-
-
-base-commit: f6f3b36c15ed44de1fbb44e645e4fae8c4a4453e
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index f7a9d55eee8a..3d256255085b 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -949,7 +949,7 @@ static int unix_setsockopt(struct socket *sock, int level, int optname,
+ 	switch (optname) {
+ 	case SO_INQ:
+ 		if (sk->sk_type != SOCK_STREAM)
+-			return -EINVAL;
++			return -ENOPROTOOPT;
+ 
+ 		if (val > 1 || val < 0)
+ 			return -EINVAL;
+@@ -1005,6 +1005,7 @@ static const struct proto_ops unix_dgram_ops = {
+ #endif
+ 	.listen =	sock_no_listen,
+ 	.shutdown =	unix_shutdown,
++	.setsockopt =	unix_setsockopt,
+ 	.sendmsg =	unix_dgram_sendmsg,
+ 	.read_skb =	unix_read_skb,
+ 	.recvmsg =	unix_dgram_recvmsg,
+@@ -1029,6 +1030,7 @@ static const struct proto_ops unix_seqpacket_ops = {
+ #endif
+ 	.listen =	unix_listen,
+ 	.shutdown =	unix_shutdown,
++	.setsockopt =	unix_setsockopt,
+ 	.sendmsg =	unix_seqpacket_sendmsg,
+ 	.recvmsg =	unix_seqpacket_recvmsg,
+ 	.mmap =		sock_no_mmap,
+@@ -1142,9 +1144,10 @@ static int unix_create(struct net *net, struct socket *sock, int protocol,
+ 	if (protocol && protocol != PF_UNIX)
+ 		return -EPROTONOSUPPORT;
+ 
++	set_bit(SOCK_CUSTOM_SOCKOPT, &sock->flags);
++
+ 	switch (sock->type) {
+ 	case SOCK_STREAM:
+-		set_bit(SOCK_CUSTOM_SOCKOPT, &sock->flags);
+ 		sock->ops = &unix_stream_ops;
+ 		break;
+ 		/*
+@@ -1864,8 +1867,7 @@ static int unix_accept(struct socket *sock, struct socket *newsock,
+ 	skb_free_datagram(sk, skb);
+ 	wake_up_interruptible(&unix_sk(sk)->peer_wait);
+ 
+-	if (tsk->sk_type == SOCK_STREAM)
+-		set_bit(SOCK_CUSTOM_SOCKOPT, &newsock->flags);
++	set_bit(SOCK_CUSTOM_SOCKOPT, &newsock->flags);
+ 
+ 	/* attach accepted sock to socket */
+ 	unix_state_lock(tsk);
 -- 
 2.55.0
 
