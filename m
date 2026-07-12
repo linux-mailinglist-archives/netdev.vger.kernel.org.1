@@ -1,428 +1,208 @@
-Return-Path: <netdev+bounces-306925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306927-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id UF5EGskYU2pxXAMAu9opvQ
-	(envelope-from <netdev+bounces-306925-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 06:32:09 +0200
+	id AVnVEsgdU2rtXQMAu9opvQ
+	(envelope-from <netdev+bounces-306927-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 06:53:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D1DC743E11
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 06:32:08 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 994F9743E7A
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 06:53:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=ZnqEtRKQ;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306925-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306925-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=ZRtEn0hr;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306927-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306927-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7AE923004635
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 04:32:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 624C53014667
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 04:53:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C835936AB5E;
-	Sun, 12 Jul 2026 04:32:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD48366575;
+	Sun, 12 Jul 2026 04:53:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1BDD21CA13;
-	Sun, 12 Jul 2026 04:32:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AEF722E3E9
+	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 04:53:23 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783830720; cv=none; b=eX0x+dtn4s7qOTXCXgNihwEIcNcgM/ikX1H78Rg9SgfiSQOyweOZ6dkczr1f/p1Mq64v9L5XQCr+c5NXEn1I/AgHUTKyFHGQ2JX9AGxvOLgXokmXWSAxb4C7x9vQn6Qwl7pb3gJEIK/F/gGvBcqti56JOLz6KMzIyCqyXrLnL8c=
+	t=1783832004; cv=none; b=pJ4BzulSoW6SR4V8ka1NxQFLVE2E/qNf9mrmXLX7iCqor4RXZRMO3qGZOWFblHQRtAJH4lFLpiJsdOyMFI3ymJJPCbDwhN7pfbTJAaGcaEXzCi7vxnBZZxN6TMhHkGDbSskrO+DpJ6lK/e4vqfrIGvL6X5R58nQw6fDreh9tJNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783830720; c=relaxed/simple;
-	bh=WaYoO+vJprdn7jwuwbQ87IhVIoxfv4yavG+6FNMYwu8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=f1lkF6508rRW6kfVpy+2cdQtcXa0oOb4ueipxq77VR2U/tscZ0vze7FTdsgPy9ZVZT6vZnCc56O+M5dqS78NWLPtOfB3Ine1Acgd70R+lLuIX0mxrqr6as4FhDHoEx2sNVIpEHA2in04NeBL15Tt0wWuq1ESWs7S4kNa+pUkLeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZnqEtRKQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 304ECC2BCF6;
-	Sun, 12 Jul 2026 04:32:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1783830720;
-	bh=WaYoO+vJprdn7jwuwbQ87IhVIoxfv4yavG+6FNMYwu8=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=ZnqEtRKQxWBlnHgkwtF8gXb8qXCz0uAFYNjrN5toemZNMJJ7xeQb8zAyQ4G4UPJOE
-	 pUl9M7veUjjzmNr8UhDY2xHdHd6uZd6m45wCiLnqx1WIFRoojGJ04NStjF4RCwMzHh
-	 N7/gjmOF0cWv/BC+cHixwTcBEoUuSpvFVjCb1Jf5FrjOkGUYTJVkphrfMHvvlHzN1Z
-	 iKJnlfiHSWO194wKRM1Ua0Y4CdirRnz7cpTdCLXr9datHra3uXmB4JFvOgHiUNXZ4H
-	 /5WMQPR5Wuf7+wuWZ7/sQkl1rY6uXdSdmXtYGr7PwncTGg+5o3UPeOULJAgRm0jPgX
-	 pzo3geA+rxeng==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1259CC44501;
-	Sun, 12 Jul 2026 04:32:00 +0000 (UTC)
-From: Johan Alvarado via B4 Relay <devnull+contact.c127.dev@kernel.org>
-Date: Sat, 11 Jul 2026 23:31:59 -0500
-Subject: [PATCH net-next v6 2/2] net: dsa: realtek: rtl8365mb: add HSGMII
- support for RTL8367S
+	s=arc-20240116; t=1783832004; c=relaxed/simple;
+	bh=shhBzf8yexRu7jj90QvU8W+4YZ4WazeRu+Yf64bVNvw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lsEvBRoR/sMcCQrw1y1sxYSyjfvMGehpmhSJzNMe2h71y0imsfruPZLW7BbzLRi9T4IBSkVgWuq/Es35n9E/IwNgtHzTcEhNz6vzek4SFlVEUeJ94YlVqycxJjFv/LNJ8o/SWJLh2ZZbipWvq99F2opD4G24eudS/IVk86Gr0Q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZRtEn0hr; arc=none smtp.client-ip=209.85.214.177
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2c6b67d5fa1so34850665ad.2
+        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 21:53:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783832003; x=1784436803; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Vtqux2brqZY3L9xWBvozGrzsW9R7W5/4mbtliRjhCrk=;
+        b=ZRtEn0hrZWiDP0SrY9SHWUQSF8WKuOnuFRGMqp7dAQf80hcPXgGf0hSz3xk5VFdWuF
+         p0zJ56IK0/2CKH2YVgBGdjURnvjI8pbFYwqxoQlMU2qUelO61llzCIDgorTd7DDoCAPN
+         YiVbOmkrvDt+E4XuDHZ05jD0U6YNFCB1CX3/kYVwS1HLJZ1gp7nuG3u5A0/V3TCklnkV
+         1Un9LRv2B99g2XkR7g4JCNkU8ySiGOjI4yhSeCCSiFFxcVncZ6HK7J+mXJGn3v10uKYP
+         hRRMetG0cdjG/QubbCpBPFJdSvXeP0U7Wd1H6C5clgZCAEl0R3tqpRQa3HQSXbEt+3Uk
+         4RAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783832003; x=1784436803;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Vtqux2brqZY3L9xWBvozGrzsW9R7W5/4mbtliRjhCrk=;
+        b=hnovwvqwRB10MX+1yHqTwxXso5DbgEOq+2aAs5y79zSX7yi/bJ02BjmQkN/B+sYSZf
+         HsdL7t6rgRfzzKw1rAFeKoDF7yiOSWaTCfWp3pMyKX9s0Z3FNTwQja05BMZXkbncQtdt
+         zJ0DbVF9L0s9Hp1CjLbrgtJ0TolZJ4bpSZROdPlD+YwyDrZXd4Yu3sNYmBgelr9AGp25
+         kASSHgVhYBaBQDkzlK6Xv4gb28wm52E+9hYdDgw7mEXwAz/X0W3d+I8+U/BMCt9elrBN
+         6e0gp5BxViH0K17sWGqXHOvMubUZPJwNeTkA00LZLskjV91tGV6CzXPx+S6u6zW+794B
+         T8Bw==
+X-Gm-Message-State: AOJu0YyLZp5LrzbEv/+2u8xgGgziKz2WT+0VN1bjSCmuk8UvNkaxC5/X
+	mWDhhZLczsN/vLKRNk+Ql1w3nc3h1AFLz0aL0o0KPiaDE4Xu2RA24tHK
+X-Gm-Gg: AfdE7ck93C5MGdEq9jtTyPs6dN8CEEc7smpw1TbyfQiE0tsXr7OBURt5+8MK9DzefSA
+	MMTafmcK9GgXWkdbFqsZNcyZC6cZqwKs3qpIPDBmfbfZE7NBNklV92dYMWNhD1TbFbQIASEB5cK
+	JCBH1sbHZC/AOjcFclJ0baTJMXXqQv/hqFrinRoUDg/1sGo+DbLWskXigiIq1rzNjjeM2sy+7/6
+	qgIkkv2um/IYdGEC4Ds4+y+or6uAL/dv3XVDO87hAORj2d3bIBt3VXhzTDd2C/ck3B8/Ezrn5ky
+	zZdiCMXX/QlaMWqMRwdt3d2ek2zXC2phT4kCX3hhjaEmB9qSy7ZG+D/sIW1F8PYCvYJxP5tZ5em
+	oxkhyDAQm2hiGlh4/hSGWXffjtb7C8x++GINHAIAJmasxZC7Xj+L1lOxA6ByKivdKDMnbRKcdDW
+	w=
+X-Received: by 2002:a17:902:f68b:b0:2ca:1eef:5096 with SMTP id d9443c01a7336-2ce9f15ccacmr45287845ad.36.1783832002767;
+        Sat, 11 Jul 2026 21:53:22 -0700 (PDT)
+Received: from localhost ([2001:da8:7001:11::cb])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9d3da55sm81624355ad.71.2026.07.11.21.53.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 11 Jul 2026 21:53:22 -0700 (PDT)
+From: Inochi Amaoto <inochiama@gmail.com>
+To: Inochi Amaoto <inochiama@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Yixun Lan <dlan@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: netdev@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	spacemit@lists.linux.dev,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	E Shattow <e@freeshell.de>,
+	Han Gao <gaohan@iscas.ac.cn>
+Subject: Failed to reinit phy of spacemit-dwmac when reset-gpio is present
+Date: Sun, 12 Jul 2026 12:52:33 +0800
+Message-ID: <20260712045233.800748-1-inochiama@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260711-rtl8367s-sgmii-v6-2-88f7944ddca7@c127.dev>
-References: <20260711-rtl8367s-sgmii-v6-0-88f7944ddca7@c127.dev>
-In-Reply-To: <20260711-rtl8367s-sgmii-v6-0-88f7944ddca7@c127.dev>
-To: Linus Walleij <linusw@kernel.org>, 
- =?utf-8?q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Russell King <linux@armlinux.org.uk>
-Cc: Mieczyslaw Nalewaj <namiltd@yahoo.com>, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Johan Alvarado <contact@c127.dev>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1783830718; l=12025;
- i=contact@c127.dev; s=20260711; h=from:subject:message-id;
- bh=fQ/7P44a2m5seFbJb9U+JQqIYjSFtFw2dsWF7H6I0eg=;
- b=/FMhqvp0bEu6u3Xpc1DaIDL1PTDjCNeZEsoCsy6JskTyd8j/Fy64+pJn/MbYj9ttLRX0MwNSV
- TCCDI/8ZGn4DGb47Itir7i4Y5bhg5eo7JcQvtvvpuM+OXQikbaYFcU/
-X-Developer-Key: i=contact@c127.dev; a=ed25519;
- pk=ZgvIq3VMEZWi50hs8D+jx3cP3dPdBRYrZZyKEosLfBQ=
-X-Endpoint-Received: by B4 Relay for contact@c127.dev/20260711 with
- auth_id=864
-X-Original-From: Johan Alvarado <contact@c127.dev>
-Reply-To: contact@c127.dev
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[kernel.org,bang-olufsen.dk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:linusw@kernel.org,m:alsi@bang-olufsen.dk,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:namiltd@yahoo.com,m:maxime.chevallier@bootlin.com,m:luizluca@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:contact@c127.dev,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-306927-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306925-lists,netdev=lfdr.de,contact.c127.dev];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[inochiama@gmail.com,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[yahoo.com,bootlin.com,gmail.com,vger.kernel.org,c127.dev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	HAS_REPLYTO(0.00)[contact@c127.dev];
-	TAGGED_RCPT(0.00)[netdev];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:inochiama@gmail.com,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:dlan@kernel.org,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:netdev@vger.kernel.org,m:linux-riscv@lists.infradead.org,m:spacemit@lists.linux.dev,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:e@freeshell.de,m:gaohan@iscas.ac.cn,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,google.com,davemloft.net,kernel.org,redhat.com,foss.st.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[inochiama@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5D1DC743E11
+X-Rspamd-Queue-Id: 994F9743E7A
 
-From: Johan Alvarado <contact@c127.dev>
+TL;DR:
 
-In addition to SGMII, the RTL8367S SerDes also supports HSGMII, which
-carries 2.5 Gbps with the same signaling as SGMII at 2.5x clock rate.
-The chip info table already declares HSGMII as a supported interface
-mode for external interface 1.
+The DWMAC on Spacemit K3 is failled to register phy after the reload
+the driver module (rmmod then insmod). Because the reset-gpio is
+asserted while unloading the driver and is not desserted before reading
+the c22 id, which leads to a fault.
 
-Extend the SerDes PCS to handle HSGMII, which phylink represents as
-2500base-x:
+Description
 
- - Select the HSGMII SerDes tuning parameters and external interface
-   mode, and mux the SerDes to MAC8 in HSGMII mode, from pcs_config()
-   according to the interface. The parameters are again lifted from the
-   GPL-licensed Realtek rtl8367c vendor driver, and again only cover
-   the tuning variant for a non-zero chip option, so the mode is gated
-   on the option probed at setup.
+In a few days ago, E Shattow reports he has sufferred the a weird issue,
+when unloading the spacemit-dwmac driver and then reloading it, he got
+the following error:
 
- - Advertise 2500base-x and MAC_2500FD on ports whose external
-   interface supports HSGMII.
+[   60.713071] mdio_bus stmmac-0: MDIO device at address 1 is missing.
 
- - Accept SPEED_2500 in the forced link configuration. The MAC speed
-   field has no 2.5 Gbps value: the rate is determined by the HSGMII
-   SerDes configuration, and the vendor driver programs the 1 Gbps
-   value here, so do the same.
+This only occurs when reloading the driver but the first initialization
+successed. After some function tracking, I found it is failed at reading
+c22 id. The call graph is as the follows:
 
- - Raise the port 6 ingress and egress rate limiters to their maximum
-   at setup time, as the vendor switch init does unconditionally for
-   the whole chip family. The chip resets them to 0x1FFFF (~1.048 Gbps
-   in units of 8 Kbps), which caps the aggregate HSGMII throughput at
-   roughly 1 Gbps. The vendor documentation describes the reset
-   default as disabling the limiter, but the cap is real: on an
-   RTL8367S-based Mercusys MR85X running an OpenWrt backport of this
-   series, several clients on 1 Gbps user ports were limited to about
-   1.02 Gbps combined across the HSGMII CPU port until these limiters
-   were raised, after which throughput reached about 2 Gbps [1]. The
-   related HSGMII scheduler line rate (LINE_RATE_HSG_H) is already set
-   to its maximum by the common init jam table.
+stmmac_mdio_register
+	mdiobus_alloc
+	of_mdiobus_register
+		__of_mdiobus_register
+		__mdiobus_register
+		__of_mdiobus_parse_phys
+			of_mdiobus_child_is_phy
+			of_mdiobus_register_phy
+				fwnode_mdiobus_register_phy
+					get_phy_device
+						get_phy_c22_id
 
-Tested on a Mercusys MR80X v2.20, where the RTL8367S is connected to
-the SoC over HSGMII.
+By checking the difference between the initialization process and the
+reloading process, I found the reset gpio is asserted in the function
+mdiobus_unregister(). And there is no any function desserted this reset
+gpio in the loading stage. And in the initialization process, the reset
+goio is deasserted.
 
-Link: https://github.com/openwrt/openwrt/pull/19445#issuecomment-4505613294 [1]
-Suggested-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Suggested-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
-Signed-off-by: Johan Alvarado <contact@c127.dev>
+This bug report is sent as I found it is hard to solve this problem
+and ask for help to fix this issue as it is related to the framework
+instead of a specific driver.
+
+The possible workaround I found is as the following, just use the phy
+id in the compatible string (Confirmed by dlan):
 ---
- drivers/net/dsa/realtek/rtl8365mb_main.c | 134 +++++++++++++++++++++++++++----
- 1 file changed, 118 insertions(+), 16 deletions(-)
+--- a/arch/riscv/boot/dts/spacemit/k3-pico-itx.dts
++++ b/arch/riscv/boot/dts/spacemit/k3-pico-itx.dts
+@@ -196,7 +196,8 @@ &eth0 {
 
-diff --git a/drivers/net/dsa/realtek/rtl8365mb_main.c b/drivers/net/dsa/realtek/rtl8365mb_main.c
-index ea03c42d0f1a..d1ba0cc9426f 100644
---- a/drivers/net/dsa/realtek/rtl8365mb_main.c
-+++ b/drivers/net/dsa/realtek/rtl8365mb_main.c
-@@ -40,8 +40,8 @@
-  * driver has only been tested with a fixed-link, but in principle it should not
-  * matter.
-  *
-- * NOTE: Currently, only the RGMII and SGMII interfaces are implemented in this
-- * driver.
-+ * NOTE: Currently, only the RGMII, SGMII and HSGMII interfaces are implemented
-+ * in this driver.
-  *
-  * The interrupt line is asserted on link UP/DOWN events. The driver creates a
-  * custom irqchip to handle this interrupt and demultiplex the events by reading
-@@ -251,6 +251,18 @@
- #define RTL8365MB_BYPASS_LINE_RATE_REG		0x03F7
- #define RTL8365MB_BYPASS_LINE_RATE_MASK(_port)	BIT((_port) - 5)
- 
-+/* Port 6 ingress and egress rate limiter registers. Each limit is a 19-bit
-+ * value in units of 8 Kbps, split across a 16-bit LSB register (CTRL0) and a
-+ * 3-bit MSB field (CTRL1). The chip resets them to 0x1FFFF; see
-+ * rtl8365mb_sds_raise_rate_limits().
-+ */
-+#define RTL8365MB_INGRESSBW_PORT6_RATE_CTRL0_REG	0x00CF
-+#define RTL8365MB_INGRESSBW_PORT6_RATE_CTRL1_REG	0x00D0
-+#define   RTL8365MB_INGRESSBW_PORT6_RATE_CTRL1_MASK	0x0007
-+#define RTL8365MB_PORT6_EGRESSBW_CTRL0_REG		0x0398
-+#define RTL8365MB_PORT6_EGRESSBW_CTRL1_REG		0x0399
-+#define   RTL8365MB_PORT6_EGRESSBW_CTRL1_MASK		0x0007
-+
- /* SerDes indirect access registers */
- #define RTL8365MB_SDS_INDACS_CMD_REG		0x6600
- #define   RTL8365MB_SDS_INDACS_CMD_BUSY_MASK	0x0100
-@@ -637,6 +649,18 @@ static const struct rtl8365mb_jam_tbl_entry rtl8365mb_sds_jam_sgmii[] = {
- 	{ 0x0424, 0xD810 }, { 0x002E, 0x83F2 },
- };
- 
-+/* HSGMII SerDes tuning parameters, lifted from the vendor driver sources. As
-+ * with the SGMII table, the vendor driver keeps several variants and selects
-+ * one based on the chip option register; these are the values for a non-zero
-+ * option, which is what RTL8367S parts seen so far report. See
-+ * rtl8365mb_sds_probe_option().
-+ */
-+static const struct rtl8365mb_jam_tbl_entry rtl8365mb_sds_jam_hsgmii[] = {
-+	{ 0x0500, 0x82F0 }, { 0x0501, 0xF195 }, { 0x0502, 0x31A2 },
-+	{ 0x0503, 0x7960 }, { 0x0504, 0x9728 }, { 0x0423, 0x9D85 },
-+	{ 0x0424, 0xD810 }, { 0x0001, 0x0F80 }, { 0x002E, 0x83F2 },
-+};
-+
- enum rtl8365mb_phy_interface_mode {
- 	RTL8365MB_PHY_INTERFACE_MODE_INVAL = 0,
- 	RTL8365MB_PHY_INTERFACE_MODE_INTERNAL = BIT(0),
-@@ -1242,20 +1266,70 @@ static int rtl8365mb_sds_probe_option(struct realtek_priv *priv)
- 	return 0;
- }
- 
-+/* The vendor driver raises the port 6 ingress and egress rate limiters to
-+ * their maximum in its switch init, unconditionally for the whole chip
-+ * family. The chip reset in rtl8365mb_setup() puts them back to their reset
-+ * default of 0x1FFFF, a ~1.048 Gbps limit which caps the aggregate
-+ * throughput of an HSGMII CPU port at roughly 1 Gbps. The vendor
-+ * documentation describes the reset default as disabling the limiter, but
-+ * the cap has been observed on hardware. Raise them likewise, to 0x7FFFF
-+ * (~4.19 Gbps, above the HSGMII line rate). The related HSGMII scheduler
-+ * line rate register (LINE_RATE_HSG_H, 0x03FA) is already set to its
-+ * maximum by the common init jam table.
-+ */
-+static int rtl8365mb_sds_raise_rate_limits(struct realtek_priv *priv)
-+{
-+	int ret;
-+
-+	ret = regmap_write(priv->map, RTL8365MB_INGRESSBW_PORT6_RATE_CTRL0_REG,
-+			   0xFFFF);
-+	if (ret)
-+		return ret;
-+
-+	ret = regmap_update_bits(priv->map,
-+				 RTL8365MB_INGRESSBW_PORT6_RATE_CTRL1_REG,
-+				 RTL8365MB_INGRESSBW_PORT6_RATE_CTRL1_MASK,
-+				 RTL8365MB_INGRESSBW_PORT6_RATE_CTRL1_MASK);
-+	if (ret)
-+		return ret;
-+
-+	ret = regmap_write(priv->map, RTL8365MB_PORT6_EGRESSBW_CTRL0_REG,
-+			   0xFFFF);
-+	if (ret)
-+		return ret;
-+
-+	return regmap_update_bits(priv->map, RTL8365MB_PORT6_EGRESSBW_CTRL1_REG,
-+				  RTL8365MB_PORT6_EGRESSBW_CTRL1_MASK,
-+				  RTL8365MB_PORT6_EGRESSBW_CTRL1_MASK);
-+}
-+
- static int rtl8365mb_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
- 				phy_interface_t interface,
- 				const unsigned long *advertising,
- 				bool permit_pause_to_mac)
- {
-+	const struct rtl8365mb_jam_tbl_entry *sds_jam;
- 	const int id = RTL8365MB_SDS_EXT_INTERFACE_ID;
- 	struct rtl8365mb *mb = pcs_to_rtl8365mb(pcs);
- 	struct realtek_priv *priv;
-+	size_t sds_jam_size;
-+	u32 mode;
- 	u16 val;
- 	int ret;
- 	int i;
- 
- 	priv = mb->priv;
- 
-+	if (interface == PHY_INTERFACE_MODE_2500BASEX) {
-+		sds_jam = rtl8365mb_sds_jam_hsgmii;
-+		sds_jam_size = ARRAY_SIZE(rtl8365mb_sds_jam_hsgmii);
-+		mode = RTL8365MB_EXT_PORT_MODE_HSGMII;
-+	} else {
-+		sds_jam = rtl8365mb_sds_jam_sgmii;
-+		sds_jam_size = ARRAY_SIZE(rtl8365mb_sds_jam_sgmii);
-+		mode = RTL8365MB_EXT_PORT_MODE_SGMII;
-+	}
-+
- 	/* Hold the embedded DW8051 microcontroller in reset and keep it
- 	 * disabled. The vendor driver loads firmware into it to manage the
- 	 * SerDes link, but the firmware only duplicates work that phylink
-@@ -1283,24 +1357,24 @@ static int rtl8365mb_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
- 		return ret;
- 
- 	/* Tune the SerDes with vendor-prescribed parameters */
--	for (i = 0; i < ARRAY_SIZE(rtl8365mb_sds_jam_sgmii); i++) {
--		ret = rtl8365mb_sds_write(priv,
--					  rtl8365mb_sds_jam_sgmii[i].reg,
--					  rtl8365mb_sds_jam_sgmii[i].val);
-+	for (i = 0; i < sds_jam_size; i++) {
-+		ret = rtl8365mb_sds_write(priv, sds_jam[i].reg,
-+					  sds_jam[i].val);
- 		if (ret)
- 			return ret;
- 	}
- 
--	/* Mux the SerDes to MAC8 in SGMII mode */
-+	/* Mux the SerDes to MAC8 in the requested mode */
- 	ret = regmap_update_bits(priv->map, RTL8365MB_SDS_MISC_REG,
- 				 RTL8365MB_SDS_MISC_MAC8_SEL_SGMII_MASK |
- 					 RTL8365MB_SDS_MISC_MAC8_SEL_HSGMII_MASK,
--				 RTL8365MB_SDS_MISC_MAC8_SEL_SGMII_MASK);
-+				 mode == RTL8365MB_EXT_PORT_MODE_SGMII ?
-+					 RTL8365MB_SDS_MISC_MAC8_SEL_SGMII_MASK :
-+					 RTL8365MB_SDS_MISC_MAC8_SEL_HSGMII_MASK);
- 	if (ret)
- 		return ret;
- 
--	val = RTL8365MB_EXT_PORT_MODE_SGMII
--	      << RTL8365MB_DIGITAL_INTERFACE_SELECT_MODE_OFFSET(id);
-+	val = mode << RTL8365MB_DIGITAL_INTERFACE_SELECT_MODE_OFFSET(id);
- 	ret = regmap_update_bits(priv->map,
- 				 RTL8365MB_DIGITAL_INTERFACE_SELECT_REG(id),
- 				 RTL8365MB_DIGITAL_INTERFACE_SELECT_MODE_MASK(id),
-@@ -1346,7 +1420,8 @@ static int rtl8365mb_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
- 
- static bool rtl8365mb_interface_is_serdes(phy_interface_t interface)
- {
--	return interface == PHY_INTERFACE_MODE_SGMII;
-+	return interface == PHY_INTERFACE_MODE_SGMII ||
-+	       interface == PHY_INTERFACE_MODE_2500BASEX;
- }
- 
- static unsigned int rtl8365mb_pcs_inband_caps(struct phylink_pcs *pcs,
-@@ -1401,7 +1476,9 @@ static void rtl8365mb_pcs_get_state(struct phylink_pcs *pcs,
- 
- 	switch (FIELD_GET(RTL8365MB_SDS_MISC_SGMII_SPD_MASK, val)) {
- 	case RTL8365MB_PORT_SPEED_1000M:
--		state->speed = SPEED_1000;
-+		state->speed =
-+			state->interface == PHY_INTERFACE_MODE_2500BASEX ?
-+				SPEED_2500 : SPEED_1000;
- 		break;
- 	case RTL8365MB_PORT_SPEED_100M:
- 		state->speed = SPEED_100;
-@@ -1426,7 +1503,11 @@ static void rtl8365mb_pcs_link_up(struct phylink_pcs *pcs,
- 	u32 r_speed;
- 	int ret;
- 
--	if (speed == SPEED_1000) {
-+	/* The speed field has no value for 2.5 Gbps: the rate is determined by
-+	 * the HSGMII SerDes configuration, and the vendor driver programs the
-+	 * 1 Gbps value here.
-+	 */
-+	if (speed == SPEED_2500 || speed == SPEED_1000) {
- 		r_speed = RTL8365MB_PORT_SPEED_1000M;
- 	} else if (speed == SPEED_100) {
- 		r_speed = RTL8365MB_PORT_SPEED_100M;
-@@ -1486,7 +1567,11 @@ static int rtl8365mb_ext_config_forcemode(struct realtek_priv *priv, int port,
- 		r_rx_pause = rx_pause ? 1 : 0;
- 		r_tx_pause = tx_pause ? 1 : 0;
- 
--		if (speed == SPEED_1000) {
-+		/* The speed field has no value for 2.5 Gbps: the rate is
-+		 * determined by the HSGMII SerDes configuration, and the
-+		 * vendor driver programs the 1 Gbps value here.
-+		 */
-+		if (speed == SPEED_2500 || speed == SPEED_1000) {
- 			r_speed = RTL8365MB_PORT_SPEED_1000M;
- 		} else if (speed == SPEED_100) {
- 			r_speed = RTL8365MB_PORT_SPEED_100M;
-@@ -1569,6 +1654,13 @@ static void rtl8365mb_phylink_get_caps(struct dsa_switch *ds, int port,
- 	    mb->sds_supported)
- 		__set_bit(PHY_INTERFACE_MODE_SGMII,
- 			  config->supported_interfaces);
-+
-+	if (extint->supported_interfaces & RTL8365MB_PHY_INTERFACE_MODE_HSGMII &&
-+	    mb->sds_supported) {
-+		__set_bit(PHY_INTERFACE_MODE_2500BASEX,
-+			  config->supported_interfaces);
-+		config->mac_capabilities |= MAC_2500FD;
-+	}
- }
- 
- static struct phylink_pcs *
-@@ -1610,8 +1702,8 @@ static void rtl8365mb_phylink_mac_config(struct phylink_config *config,
- 		return;
- 	}
- 
--	/* SGMII is handled by the SerDes PCS, configured through the
--	 * phylink_pcs ops, so there is nothing to do here for it.
-+	/* SGMII and 2500base-x are handled by the SerDes PCS, configured
-+	 * through the phylink_pcs ops, so nothing to do here for them.
- 	 */
- 	if (rtl8365mb_interface_is_serdes(state->interface))
- 		return;
-@@ -2940,6 +3032,16 @@ static int rtl8365mb_setup(struct dsa_switch *ds)
- 		goto out_error;
- 	}
- 
-+	if (mb->sds_supported) {
-+		ret = rtl8365mb_sds_raise_rate_limits(priv);
-+		if (ret) {
-+			dev_err(priv->dev,
-+				"failed to raise port rate limits: %pe\n",
-+				ERR_PTR(ret));
-+			goto out_error;
-+		}
-+	}
-+
- 	/* Set up cascading IRQs */
- 	ret = rtl8365mb_irq_setup(priv);
- 	if (ret == -EPROBE_DEFER)
+ 	mdio {
+ 		phy0: phy@1 {
+-			compatible = "ethernet-phy-ieee802.3-c22";
++			compatible = "ethernet-phy-id001c.c916",
++				     "ethernet-phy-ieee802.3-c22";
+ 			reg = <1>;
+ 			reset-gpios = <&gpio 0 15 GPIO_ACTIVE_LOW>;
+ 			reset-assert-us = <10000>;
+---
+An interesting thing is, moving the reset-gpio to the MDIO bus level
+does not solve this problem. Only setting the right phy id can mitigate
+the problem.
 
--- 
-2.55.0
-
-
+Regards,
+Inochi
 
