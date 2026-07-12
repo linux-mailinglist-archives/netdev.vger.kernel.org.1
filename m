@@ -1,100 +1,101 @@
-Return-Path: <netdev+bounces-306927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306928-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id AVnVEsgdU2rtXQMAu9opvQ
-	(envelope-from <netdev+bounces-306927-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 06:53:28 +0200
+	id O9CfJ2c6U2pNZAMAu9opvQ
+	(envelope-from <netdev+bounces-306928-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 08:55:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 994F9743E7A
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 06:53:27 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 856C274401D
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 08:55:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=ZRtEn0hr;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="PM/BIb1w";
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306927-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306927-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306928-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-306928-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 624C53014667
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 04:53:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 74FBC3004633
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 06:55:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD48366575;
-	Sun, 12 Jul 2026 04:53:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9060235DA41;
+	Sun, 12 Jul 2026 06:55:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AEF722E3E9
-	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 04:53:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B81252DA775
+	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 06:55:27 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783832004; cv=none; b=pJ4BzulSoW6SR4V8ka1NxQFLVE2E/qNf9mrmXLX7iCqor4RXZRMO3qGZOWFblHQRtAJH4lFLpiJsdOyMFI3ymJJPCbDwhN7pfbTJAaGcaEXzCi7vxnBZZxN6TMhHkGDbSskrO+DpJ6lK/e4vqfrIGvL6X5R58nQw6fDreh9tJNc=
+	t=1783839329; cv=none; b=m92/TXVPKgyDhff5JOeXvNj2srYN7sS7pJeh5Ixixib9diDCLdPQsabprvPthrIjISHnQzt5qeWFoLuvNjrGxygUqY7EawUiNp0c7N3hbqx2ehPhjOxDpfTTynQtnWQuTS8S0XSQjMGvahwrqsABnjNdXcYAQqTFudlBQTG1VNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783832004; c=relaxed/simple;
-	bh=shhBzf8yexRu7jj90QvU8W+4YZ4WazeRu+Yf64bVNvw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lsEvBRoR/sMcCQrw1y1sxYSyjfvMGehpmhSJzNMe2h71y0imsfruPZLW7BbzLRi9T4IBSkVgWuq/Es35n9E/IwNgtHzTcEhNz6vzek4SFlVEUeJ94YlVqycxJjFv/LNJ8o/SWJLh2ZZbipWvq99F2opD4G24eudS/IVk86Gr0Q4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZRtEn0hr; arc=none smtp.client-ip=209.85.214.177
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2c6b67d5fa1so34850665ad.2
-        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 21:53:23 -0700 (PDT)
+	s=arc-20240116; t=1783839329; c=relaxed/simple;
+	bh=M142CXOOcTwByypcN5mMhsYsB6RWWGbV6iR96HMm62w=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=VYMzsX4i1EmraKKuJtc64WJ6xazqwwn6qiqgENwTwEjBHh2VKU5qgAmmgYKvKO04+uE78swSlTJuX/J4u8WXqa+JqkzL9HyA0nhGxsovrVNj6eqRMNYx4qUwbii/SoFqeLyDsJCCjQn1nJIkq84mO5eEDKGEZ3C+i7hRt4i3/jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PM/BIb1w; arc=none smtp.client-ip=209.85.208.178
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-39669bcaadfso20102801fa.0
+        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 23:55:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783832003; x=1784436803; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Vtqux2brqZY3L9xWBvozGrzsW9R7W5/4mbtliRjhCrk=;
-        b=ZRtEn0hrZWiDP0SrY9SHWUQSF8WKuOnuFRGMqp7dAQf80hcPXgGf0hSz3xk5VFdWuF
-         p0zJ56IK0/2CKH2YVgBGdjURnvjI8pbFYwqxoQlMU2qUelO61llzCIDgorTd7DDoCAPN
-         YiVbOmkrvDt+E4XuDHZ05jD0U6YNFCB1CX3/kYVwS1HLJZ1gp7nuG3u5A0/V3TCklnkV
-         1Un9LRv2B99g2XkR7g4JCNkU8ySiGOjI4yhSeCCSiFFxcVncZ6HK7J+mXJGn3v10uKYP
-         hRRMetG0cdjG/QubbCpBPFJdSvXeP0U7Wd1H6C5clgZCAEl0R3tqpRQa3HQSXbEt+3Uk
-         4RAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783832003; x=1784436803;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1783839326; x=1784444126; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=Vtqux2brqZY3L9xWBvozGrzsW9R7W5/4mbtliRjhCrk=;
-        b=hnovwvqwRB10MX+1yHqTwxXso5DbgEOq+2aAs5y79zSX7yi/bJ02BjmQkN/B+sYSZf
-         HsdL7t6rgRfzzKw1rAFeKoDF7yiOSWaTCfWp3pMyKX9s0Z3FNTwQja05BMZXkbncQtdt
-         zJ0DbVF9L0s9Hp1CjLbrgtJ0TolZJ4bpSZROdPlD+YwyDrZXd4Yu3sNYmBgelr9AGp25
-         kASSHgVhYBaBQDkzlK6Xv4gb28wm52E+9hYdDgw7mEXwAz/X0W3d+I8+U/BMCt9elrBN
-         6e0gp5BxViH0K17sWGqXHOvMubUZPJwNeTkA00LZLskjV91tGV6CzXPx+S6u6zW+794B
-         T8Bw==
-X-Gm-Message-State: AOJu0YyLZp5LrzbEv/+2u8xgGgziKz2WT+0VN1bjSCmuk8UvNkaxC5/X
-	mWDhhZLczsN/vLKRNk+Ql1w3nc3h1AFLz0aL0o0KPiaDE4Xu2RA24tHK
-X-Gm-Gg: AfdE7ck93C5MGdEq9jtTyPs6dN8CEEc7smpw1TbyfQiE0tsXr7OBURt5+8MK9DzefSA
-	MMTafmcK9GgXWkdbFqsZNcyZC6cZqwKs3qpIPDBmfbfZE7NBNklV92dYMWNhD1TbFbQIASEB5cK
-	JCBH1sbHZC/AOjcFclJ0baTJMXXqQv/hqFrinRoUDg/1sGo+DbLWskXigiIq1rzNjjeM2sy+7/6
-	qgIkkv2um/IYdGEC4Ds4+y+or6uAL/dv3XVDO87hAORj2d3bIBt3VXhzTDd2C/ck3B8/Ezrn5ky
-	zZdiCMXX/QlaMWqMRwdt3d2ek2zXC2phT4kCX3hhjaEmB9qSy7ZG+D/sIW1F8PYCvYJxP5tZ5em
-	oxkhyDAQm2hiGlh4/hSGWXffjtb7C8x++GINHAIAJmasxZC7Xj+L1lOxA6ByKivdKDMnbRKcdDW
-	w=
-X-Received: by 2002:a17:902:f68b:b0:2ca:1eef:5096 with SMTP id d9443c01a7336-2ce9f15ccacmr45287845ad.36.1783832002767;
-        Sat, 11 Jul 2026 21:53:22 -0700 (PDT)
-Received: from localhost ([2001:da8:7001:11::cb])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9d3da55sm81624355ad.71.2026.07.11.21.53.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Jul 2026 21:53:22 -0700 (PDT)
-From: Inochi Amaoto <inochiama@gmail.com>
-To: Inochi Amaoto <inochiama@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Yixun Lan <dlan@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>
-Cc: netdev@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	spacemit@lists.linux.dev,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	E Shattow <e@freeshell.de>,
-	Han Gao <gaohan@iscas.ac.cn>
-Subject: Failed to reinit phy of spacemit-dwmac when reset-gpio is present
-Date: Sun, 12 Jul 2026 12:52:33 +0800
-Message-ID: <20260712045233.800748-1-inochiama@gmail.com>
-X-Mailer: git-send-email 2.55.0
+        bh=hnvNI/i6h4Bl3pvFIx+mkYbJPcSuAoOqqDQCNmGvUN8=;
+        b=PM/BIb1wYZIZbmbsz7cBTgg+uri2MQwwKCZ85uunWlJqF55odbwgZJnDy+iXavABsF
+         jyY6SuxB3bVbmukfN0JJ3HIqV5GFOFsWyyRrTrzmMszT8SIhDwat46dneBMauVLM0HtI
+         jKJD6adCgb+U8aXNFBBL1lmu8xzedaJdD2YvUWx65LGi1PKSyZpCqPISYy2XYGklQEZS
+         QhOanvFdUSkPcic3KB55Fk6Q0GICIFa0ypM9YQY9yQfbigrXFOk7wmyBnnjSkg/+1O/K
+         V7qunWseiuQ3wVtsRqbPvD5HeZ9F17NgGYYuU52FR8mKkXmdQm+sCVVpRG1szkpOkGLJ
+         r55g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783839326; x=1784444126;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=hnvNI/i6h4Bl3pvFIx+mkYbJPcSuAoOqqDQCNmGvUN8=;
+        b=beh55neU/UWqLOD1/TS7ycLYOeXE3j9Sfq9Nf1RMByVjqQfgltPzNkIYD6KJtn0Pin
+         FEjXVBWnmWUPhsQqWQLhrRmYKHUrDJ+jkEtS/wbks5EVlTkz4fVhH6uQaGCZrO1Hqxk5
+         0Adq95QG6t7d6xjej7Lvph1enVJFD2yIYpNSbnzBXPEz1hMINEq2hVyzw3RHrcJvTMhN
+         3nTBGvwewVKAAdYLxn1Q9Rluo+pAxAXz4iYHNiX+hXnu+5x2FH5VgDuRzRvNEBafbpbq
+         rM7+5pnvGADmXshf2l6VRw6Xy1JJXHstDxzwYvDWHDlyftP1fmraB2zds2p4Q2MDb3F3
+         6wUA==
+X-Gm-Message-State: AOJu0YzprlTRVxnrZp99UMxB8FxOIvAFMo2ZCYrehU6e24hXMPIAxGof
+	03S2ggKIp35eMAC3o8IcRiGJXbRMPXs4PW7PE0uobNnTndFOuijAam3BcxKZPak9C02V5Q==
+X-Gm-Gg: AfdE7cmc8I1qAinNjlJAEt+g53RNRULNKKWzWrsLigSEJFsn5FC6AY+FvDR36fKh5zM
+	NVnJYgBVqAAU4qKnpuYhrev2izs/+ktVBPGHTqSxJ0G9irup2g71zDIPTBzIzv+DTOq+n/6cIBG
+	T4Iyly1UOO9GDRXqC8ZiKVHAiJFKelw53JpPJexsxqH0XQ1r8Penzey9mazgg4CufQXrm2QSEtf
+	mKUe/ZKJEsZK66zKF9CmEGMn0T1qyt1U/ct7dlMzxaLMt7VFkYv0M2PLKeE1Zgr1g3aw5ICcuDh
+	KJThUwNeK4au+hez6ezjtdUcEr0pzBocFso+0B1r0o2sfoTZbRA9tAUbbL4vKowqrPuzIjXAGxK
+	n/9052Ned/m+44Nv4xK0e3lyZTpfWJs2IElqfujNPMec/yxCywu5YLLoWSs1uZXrfyBdsQ81qzg
+	MfetPWKHN374TsfkJhB5ZKdMtUamouu2FPCXdvKEhuacHbmQyXUwkRjC580XPxYhfc7y4DmP1oB
+	40ilA==
+X-Received: by 2002:a05:651c:19ab:b0:39c:7ae9:daa5 with SMTP id 38308e7fff4ca-39cae8d45acmr9951371fa.32.1783839325546;
+        Sat, 11 Jul 2026 23:55:25 -0700 (PDT)
+Received: from jeeves.tailc718e.ts.net (91-157-100-11.elisa-laajakaista.fi. [91.157.100.11])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-39c84ba3337sm19904631fa.36.2026.07.11.23.55.23
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sat, 11 Jul 2026 23:55:24 -0700 (PDT)
+From: vadik likholetov <vadikas@gmail.com>
+To: netdev@vger.kernel.org
+Cc: maxime.chevallier@bootlin.com,
+	andrew@lunn.ch,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	thierry.reding@kernel.org,
+	jonathanh@nvidia.com,
+	vbhadram@nvidia.com,
+	linux-tegra@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v2] net: stmmac: enable the MAC on link up for all supported speeds
+Date: Sun, 12 Jul 2026 09:55:22 +0300
+Message-ID: <20260712065522.30241-1-vadikas@gmail.com>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20260710120908.3731591-1-vadikas@gmail.com>
+References: <20260710120908.3731591-1-vadikas@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,104 +106,240 @@ Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306927-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[inochiama@gmail.com,netdev@vger.kernel.org];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:inochiama@gmail.com,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:dlan@kernel.org,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:netdev@vger.kernel.org,m:linux-riscv@lists.infradead.org,m:spacemit@lists.linux.dev,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:e@freeshell.de,m:gaohan@iscas.ac.cn,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,google.com,davemloft.net,kernel.org,redhat.com,foss.st.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306928-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:maxime.chevallier@bootlin.com,m:andrew@lunn.ch,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:thierry.reding@kernel.org,m:jonathanh@nvidia.com,m:vbhadram@nvidia.com,m:linux-tegra@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[vadikas@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[inochiama@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[vadikas@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,bootlin.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 994F9743E7A
+X-Rspamd-Queue-Id: 856C274401D
 
-TL;DR:
+stmmac_mac_link_down() clears the MAC's transmit and receive enable bits.
+stmmac_mac_link_up() is expected to set them again through
+stmmac_mac_set(..., true), but it first switches on the negotiated speed
+and returns early for a speed the switch does not list. The MAC is then
+left gated off.
 
-The DWMAC on Spacemit K3 is failled to register phy after the reload
-the driver module (rmmod then insmod). Because the reset-gpio is
-asserted while unloading the driver and is not desserted before reading
-the c22 id, which leads to a fault.
+The speed selection is split into three switches, keyed on the interface.
+The generic branch -- taken for everything that is neither USXGMII nor
+XLGMII, so including PHY_INTERFACE_MODE_10GBASER -- lists only SPEED_2500,
+SPEED_1000, SPEED_100 and SPEED_10.
 
-Description
+MGBE on Tegra234 runs 10GBASE-R into an Aquantia AQR113C. That PHY does
+rate matching, so phylink_link_up() replaces the media speed with the
+MAC-side interface speed before calling into the MAC:
 
-In a few days ago, E Shattow reports he has sufferred the a weird issue,
-when unloading the spacemit-dwmac driver and then reloading it, he got
-the following error:
+	case RATE_MATCH_PAUSE:
+		speed = phylink_interface_max_speed(link_state.interface);
+		duplex = DUPLEX_FULL;
 
-[   60.713071] mdio_bus stmmac-0: MDIO device at address 1 is missing.
+The driver is therefore called as
 
-This only occurs when reloading the driver but the first initialization
-successed. After some function tracking, I found it is failed at reading
-c22 id. The call graph is as the follows:
+	stmmac_mac_link_up(interface=10GBASER, speed=10000, duplex=1)
 
-stmmac_mdio_register
-	mdiobus_alloc
-	of_mdiobus_register
-		__of_mdiobus_register
-		__mdiobus_register
-		__of_mdiobus_parse_phys
-			of_mdiobus_child_is_phy
-			of_mdiobus_register_phy
-				fwnode_mdiobus_register_phy
-					get_phy_device
-						get_phy_c22_id
+which falls through to "default: return;". The interface stops passing
+traffic after the first link flap.
 
-By checking the difference between the initialization process and the
-reloading process, I found the reset gpio is asserted in the function
-mdiobus_unregister(). And there is no any function desserted this reset
-gpio in the loading stage. And in the initialization process, the reset
-goio is deasserted.
+The failure is easy to misread. The link still comes up, because the PHY
+is polled over MDIO and needs no MAC, so the interface reports carrier 1
+at the media speed. The DMA is untouched, so its start bits stay set and
+descriptors are still consumed. Only the MAC itself is gated off: the
+receiver counts nothing (mmc_rx_framecount_gb stops advancing, RE is 0)
+and nothing reaches the wire (TE is 0). The interface survives boot only
+because stmmac_hw_setup(), called from ndo_open, enables the MAC
+unconditionally -- so the problem appears only once the cable has been
+unplugged and plugged back in, and "ip link set dev <ethX> down && ip
+link set dev <ethX> up" appears to fix it.
 
-This bug report is sent as I found it is hard to solve this problem
-and ask for help to fix this issue as it is related to the framework
-instead of a specific driver.
+The interface is not what the speed bits depend on: with the single
+exception of 2.5G, which is selected through the XGMII block on USXGMII
+and through the regular speed bits otherwise, each speed maps to one
+field of struct mac_link. The per-interface switches are speed
+validation, and phylink already validates the speed against
+priv->hw->link.caps. So collapse the three switches into one keyed on the
+speed alone, keeping the interface test only for the 2.5G case. This
+covers 10G on 10GBASE-R, and equally 5G, and 1G/100/10 on USXGMII, all of
+which hit "default: return;" today.
 
-The possible workaround I found is as the following, just use the phy
-id in the compatible string (Confirmed by dlan):
+A core that does not support a speed leaves the corresponding mac_link
+field at 0, and phylink will not offer it that speed in the first place.
+For dwxgmac2 at 10G, link.xgmii.speed10000 is XGMAC_CONFIG_SS_10000,
+which is 0 and is the correct speed selection for a 10GBASE-R MAC: ctrl
+then equals old_ctrl, the register write is skipped, and execution
+reaches stmmac_mac_set(..., true).
+
+Log an error in the default case, since a speed with no entry here leaves
+the MAC disabled and the symptom does not point at the cause.
+
+Fixes: d8ca113724e7 ("net: stmmac: tegra: Add MGBE support")
+Suggested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Signed-off-by: vadik likholetov <vadikas@gmail.com>
 ---
---- a/arch/riscv/boot/dts/spacemit/k3-pico-itx.dts
-+++ b/arch/riscv/boot/dts/spacemit/k3-pico-itx.dts
-@@ -196,7 +196,8 @@ &eth0 {
+v2:
+ - Collapse the three per-interface switches into a single switch on the
+   speed, rather than adding SPEED_10000 to the generic branch, which
+   left SPEED_5000 and the USXGMII sub-1G speeds broken (Maxime).
+ - netdev_err() in the default case (Andrew).
 
- 	mdio {
- 		phy0: phy@1 {
--			compatible = "ethernet-phy-ieee802.3-c22";
-+			compatible = "ethernet-phy-id001c.c916",
-+				     "ethernet-phy-ieee802.3-c22";
- 			reg = <1>;
- 			reset-gpios = <&gpio 0 15 GPIO_ACTIVE_LOW>;
- 			reset-assert-us = <10000>;
----
-An interesting thing is, moving the reset-gpio to the MDIO bus level
-does not solve this problem. Only setting the right phy id can mitigate
-the problem.
+Fixes tag: the missing speeds predate the commit cited above. I picked
+d8ca113724e7 because MGBE is the first in-tree user to reach it -- it
+needs a 10GBASE-R interface driven by a rate-matching PHY, so that
+phylink hands the MAC a 10G speed. Happy to re-target it.
 
-Regards,
-Inochi
+Verified on an AGX Orin devkit (Tegra234 MGBE0 + AQR113C), before and
+after, on the same board and cable. MAC registers read with `ethtool -d`,
+after a physical unplug and replug:
+
+  stock		MAC_TX_CONFIG 0x00010000 (TE=0)
+		MAC_RX_CONFIG 0x3ff022c0 (RE=0)
+		rx_packets frozen, DHCP lease lost
+
+  patched	MAC_TX_CONFIG 0x00010001 (TE=1)
+		MAC_RX_CONFIG 0x3ff022c1 (RE=1)
+		rx_packets keeps climbing, DHCP lease retained
+
+Only the 10GBASE-R path is covered by hardware here; the other speeds are
+by inspection. Testing was done with MGBE0 handed to a VM via
+vfio-platform, so the driver ran in a guest; the MAC register evidence
+above is read from the device itself and the code path is not
+virtualisation-specific.
+
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 92 ++++++++-----------
+ 1 file changed, 37 insertions(+), 55 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 2a0d7eff8..fa9f88e51 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -1083,63 +1083,45 @@ static void stmmac_mac_link_up(struct phylink_config *config,
+ 	old_ctrl = readl(priv->ioaddr + MAC_CTRL_REG);
+ 	ctrl = old_ctrl & ~priv->hw->link.speed_mask;
+ 
+-	if (interface == PHY_INTERFACE_MODE_USXGMII) {
+-		switch (speed) {
+-		case SPEED_10000:
+-			ctrl |= priv->hw->link.xgmii.speed10000;
+-			break;
+-		case SPEED_5000:
+-			ctrl |= priv->hw->link.xgmii.speed5000;
+-			break;
+-		case SPEED_2500:
++	switch (speed) {
++	case SPEED_100000:
++		ctrl |= priv->hw->link.xlgmii.speed100000;
++		break;
++	case SPEED_50000:
++		ctrl |= priv->hw->link.xlgmii.speed50000;
++		break;
++	case SPEED_40000:
++		ctrl |= priv->hw->link.xlgmii.speed40000;
++		break;
++	case SPEED_25000:
++		ctrl |= priv->hw->link.xlgmii.speed25000;
++		break;
++	case SPEED_10000:
++		ctrl |= priv->hw->link.xgmii.speed10000;
++		break;
++	case SPEED_5000:
++		ctrl |= priv->hw->link.xgmii.speed5000;
++		break;
++	case SPEED_2500:
++		if (interface == PHY_INTERFACE_MODE_USXGMII)
+ 			ctrl |= priv->hw->link.xgmii.speed2500;
+-			break;
+-		default:
+-			return;
+-		}
+-	} else if (interface == PHY_INTERFACE_MODE_XLGMII) {
+-		switch (speed) {
+-		case SPEED_100000:
+-			ctrl |= priv->hw->link.xlgmii.speed100000;
+-			break;
+-		case SPEED_50000:
+-			ctrl |= priv->hw->link.xlgmii.speed50000;
+-			break;
+-		case SPEED_40000:
+-			ctrl |= priv->hw->link.xlgmii.speed40000;
+-			break;
+-		case SPEED_25000:
+-			ctrl |= priv->hw->link.xlgmii.speed25000;
+-			break;
+-		case SPEED_10000:
+-			ctrl |= priv->hw->link.xgmii.speed10000;
+-			break;
+-		case SPEED_2500:
+-			ctrl |= priv->hw->link.speed2500;
+-			break;
+-		case SPEED_1000:
+-			ctrl |= priv->hw->link.speed1000;
+-			break;
+-		default:
+-			return;
+-		}
+-	} else {
+-		switch (speed) {
+-		case SPEED_2500:
++		else
+ 			ctrl |= priv->hw->link.speed2500;
+-			break;
+-		case SPEED_1000:
+-			ctrl |= priv->hw->link.speed1000;
+-			break;
+-		case SPEED_100:
+-			ctrl |= priv->hw->link.speed100;
+-			break;
+-		case SPEED_10:
+-			ctrl |= priv->hw->link.speed10;
+-			break;
+-		default:
+-			return;
+-		}
++		break;
++	case SPEED_1000:
++		ctrl |= priv->hw->link.speed1000;
++		break;
++	case SPEED_100:
++		ctrl |= priv->hw->link.speed100;
++		break;
++	case SPEED_10:
++		ctrl |= priv->hw->link.speed10;
++		break;
++	default:
++		netdev_err(priv->dev,
++			   "unsupported speed %d on %s, leaving the MAC disabled\n",
++			   speed, phy_modes(interface));
++		return;
+ 	}
+ 
+ 	if (priv->plat->fix_mac_speed)
+-- 
+2.53.0
+
 
