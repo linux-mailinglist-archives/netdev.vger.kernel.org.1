@@ -1,255 +1,324 @@
-Return-Path: <netdev+bounces-306923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306924-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DMarAUAUU2oSWwMAu9opvQ
-	(envelope-from <netdev+bounces-306923-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 06:12:48 +0200
+	id kFLWM8QYU2psXAMAu9opvQ
+	(envelope-from <netdev+bounces-306924-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 06:32:04 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83FAF743C8D
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 06:12:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3988B743E07
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 06:32:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=ljVUR4LY;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306923-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306923-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=lPA4hPOA;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306924-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306924-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 612B7305B7E5
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 04:09:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1B578300E3F2
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 04:32:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 031C8370AE7;
-	Sun, 12 Jul 2026 04:09:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6AF936A35E;
+	Sun, 12 Jul 2026 04:32:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB0A936AB5A
-	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 04:09:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B6763B9;
+	Sun, 12 Jul 2026 04:32:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783829368; cv=none; b=M4pOwB4Ywczq9bFD2pm1YGIYrSz0aMZkoD5JqM7EkO/qQ5d3uU3gCrWoPiR27Nt2AmflfseefU5yFtP208ZPPuVCdGTsdlHgYhIRezJmZ9oLVkLPoelOtVqYEcifeZaPtiFAGlsM4RKI5woxHRfbNaVuJycP4yhfIkWKj34TxhM=
+	t=1783830720; cv=none; b=JwXVKUNTSR9NsXHEI8teXci17emRHkNU49/3cUCyHemhFyT6LRE+TwlPdoAFkNMDkzeBOqNBE5tqU0ba+DTkQjkLHj1WpYGw/BYVNhjNTHgyu6K6o7s0j30NZlm4OX1Vk0gPwy0A5kNnbkyazlORRKsa2wfQ8d6LHp1J/QhgtAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783829368; c=relaxed/simple;
-	bh=ht7k1vfyTfnKzBTKA4hWIj+a/zQqJ1S/l9ggwrpoISo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ouYb08yHiuF5iUjit+CFwKKqte3bJkMn9pJ17vnjZezUk0CpEAN+SFPBG2R5PIvTCW+Jk0dMsLtuA2zrCauu265m5MhJ5yNZgPNDwVOe10BmXe0Tf+qAlQwa8eDDT3LclhnSh7iFdjIf1fBiAAi8uN/WbARcQ0eG7TOFNDOi9lM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ljVUR4LY; arc=none smtp.client-ip=209.85.219.41
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-8ef7b7651ecso24745166d6.1
-        for <netdev@vger.kernel.org>; Sat, 11 Jul 2026 21:09:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783829365; x=1784434165; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=CY1zhHCs8Urd6z2dxMWVdrNocO2i3dPyfsdmlbGYaEg=;
-        b=ljVUR4LYLTjfRSI3KGhnaHhxHKA2dn/11jD/S0aF9ftwYXsuo9oxFItpkTJLbIguJm
-         5/q6bNuC9IKtit2LiIScEYlIwtYvqKLqTPjQyvPwy+nlG86o8W3mbWvDDAd0ogFHtNt6
-         fKCWxM/j75Ang57K8NwZ+APwFaZpdrBAJfhP2xftQ3h6cTi43peEQf0TpvKExTNi+IV+
-         hBq/tj7zGUyoop+CSRbDS8PkY23sfm5/1/lAgd2BMu5VVW/Yb0j92eRlRTWAk2RFhtko
-         SzcYXWphSq3jFyRdrigF2XtXAAmA1p95Bd5bnBM41ZB6kyHx3RhgqT5NuQBFDGVkKXA9
-         5pxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783829365; x=1784434165;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=CY1zhHCs8Urd6z2dxMWVdrNocO2i3dPyfsdmlbGYaEg=;
-        b=bZsZ+qPlQm9OCbM6cCspB2ldNQ3EyaohbgyCg56ze2yY/BvQDYjRhu5oW1QDIKTAiw
-         jCQXNoBYFlWAPEMKLAz1Cb4X2bDIs539a8JSBMRbl9ivvbOu8oYOnKui8HFmjZilSFhX
-         /QQhsXsLrXnkJhSS0xKjfzVk/wHdZrASjH3qiv/rdYhz1+kY2nzfDxGfhjp+FWD4QJOh
-         Vf69siAQutB+oBtFKfgr7zgeeA1I8PWc/VgnMB6FClcNrHGtIEBAJv0+l06K6UDJIKbi
-         5qFNWHSaerZm1wHBAETZpH563W6waej5EeG6M1yw0izkOIzGLcogb/436hjyLMTfWhNx
-         +R3A==
-X-Gm-Message-State: AOJu0Yy3ZGpD0v64CIXSI03IdSJEqGjvD6a+I17aY12lMfoci7H0NBoD
-	yU41I/5ss8CP3YywB5NtDwMcli8rJjqHScUF0eEdhBn6isKFHfjtM7ECkXYxqyZQ
-X-Gm-Gg: AfdE7cmCVGss5y88vLT2oy6n5KRJn0J2k+P3P1n4rbjVZ5yFhR9Yz3Vz/7fJwZIQfey
-	EYqipDu7R300om+n96HW4XGO+3VdMY3kPBCqRCCjrfe8D8CNuTLCpDWx5NJiljQuzY76k/9A1pK
-	Apwps3qDFWw1Iu+aFglKb7gIBMJfdposOgz5I/q7ut9tCI8KT51Dx77Bk4jmA7nL449gT4hKsAs
-	KNI5Yh2Oul6GRMKq6B8dBKOico9FWp2EwJUksKbGeNldf8+RLOpTvCp9w+gW3cH/PHn2QEODa6j
-	INRNHmWe0nAxQ0xKE1aG9HjIlC5zi2Et8w5HsDd/WYkNNbJRK/weuiV5RO1LlK4wlqXkffcWWEy
-	N1Zzoq0xN+Xf+9Jo9QVlfnPhRlGueE3zFogzWIrSc26hhD18vO7sQf0RMcxU+bn8ZrcuydJRrGH
-	f7xtMegcoG5iNk6FS9F4b+dZgEkBl5xJC6B1ctUnAzRc/1nyfTO132nqzs0zK8m/TIYY7+UrvYj
-	DPaXPoB0nhppQuQF8BeR7Ch/ddI3vxztbQIhB+uM/4=
-X-Received: by 2002:a05:620a:44d4:b0:92e:e728:9d03 with SMTP id af79cd13be357-92ef3cc8072mr428999985a.6.1783829365498;
-        Sat, 11 Jul 2026 21:09:25 -0700 (PDT)
-Received: from ip-172-31-15-253.ec2.internal (ec2-44-200-214-82.compute-1.amazonaws.com. [44.200.214.82])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-92ee5cf9d9bsm687147085a.28.2026.07.11.21.09.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Jul 2026 21:09:24 -0700 (PDT)
-From: Deep Shah <deepshah146@gmail.com>
-To: netdev@vger.kernel.org,
-	Richard Cochran <richardcochran@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: linux-kernel@vger.kernel.org,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	Deep Shah <deepshah146@gmail.com>
-Subject: [PATCH net 2/2] selftests: ptp: add a regression test for the frequency adjustment overflow
-Date: Sun, 12 Jul 2026 04:09:22 +0000
-Message-ID: <20260712040922.6403-3-deepshah146@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260712040922.6403-1-deepshah146@gmail.com>
-References: <20260712040922.6403-1-deepshah146@gmail.com>
+	s=arc-20240116; t=1783830720; c=relaxed/simple;
+	bh=P+6U9x8APFBzSRG71c5Zq7UgO8CTjuna1bsNOaL41Zo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=fiUeDoz3Tg/Tj5Y1zDmNA1aSHTQYrQa1ZH+dcimRl0m8bHZSsSXJkMx7Y3X0QCJZkVDQxE88AHbIcDE1OwW44lNnxDy2e7GQYqClkfN1E2FITEk4Iak4OkJRFDXP1FtJw7oze/zy1sLGN4zzcyuOmlZvXv5tQOBZK4FtF0D5mTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lPA4hPOA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1967FC2BCB7;
+	Sun, 12 Jul 2026 04:32:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1783830720;
+	bh=P+6U9x8APFBzSRG71c5Zq7UgO8CTjuna1bsNOaL41Zo=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=lPA4hPOAUarH/nCV6+Ei2xnlYTSP2fyMeULGJjNPueq++6sqA8N9c1Vu3pf7ljhKN
+	 WU1Q6CEKo7wzlttSvPG8Y1ehIRJsBz3NVQcFIC0oXRiS2AMoyzNTeYRvg8lGOWg+po
+	 f+edDIH5KoCehJlPMYDNcWSd46tysoUUUS7Heo93cHEcrWhENqSkPWDNceCwPCrpmO
+	 GI9KobXxcDGRLSr4lVVMC8WQR3pA9jAH7MDlHGC66SZ6qtTFplzljBRp6MOLw7K1y/
+	 J7hhdEYIUucZDYfg4rgrke+JsYbZF2tAL1uN7uxZOsaFGZTIk65hZXV8LPCNt4FfLo
+	 F4yU6xyjuDD1Q==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2262C43458;
+	Sun, 12 Jul 2026 04:31:59 +0000 (UTC)
+From: Johan Alvarado via B4 Relay <devnull+contact.c127.dev@kernel.org>
+Subject: [PATCH net-next v6 0/2] net: dsa: realtek: rtl8365mb: add
+ SGMII/HSGMII support for RTL8367S
+Date: Sat, 11 Jul 2026 23:31:57 -0500
+Message-Id: <20260711-rtl8367s-sgmii-v6-0-88f7944ddca7@c127.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWMwQ6CMBAFf4W8s5tQTAv6K4YDLQuu0Wq6lZAQ/
+ t2qx8lkZoNyElacqw2JF1F5xgLuUCFchzgzyVgYTd24ujWGUr53R9cq6fwQIXvyk/EdD8FalOi
+ VeJL1N7wgcqbIa0b/N/r2Nw75+8O+fwCqc0SFfAAAAA==
+X-Change-ID: 20260711-rtl8367s-sgmii-59bf1b8eac55
+To: Linus Walleij <linusw@kernel.org>, 
+ =?utf-8?q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Russell King <linux@armlinux.org.uk>
+Cc: Mieczyslaw Nalewaj <namiltd@yahoo.com>, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Johan Alvarado <contact@c127.dev>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1783830718; l=11718;
+ i=contact@c127.dev; s=20260711; h=from:subject:message-id;
+ bh=P+6U9x8APFBzSRG71c5Zq7UgO8CTjuna1bsNOaL41Zo=;
+ b=WRd9H+2PyC8tQOy0qudaE6weuB6AmmmkRyEpjMDxyuaEhRlgfFESme02Dvvx1035vyozzR3Q8
+ qU4EZGDJWS/CJIRfFzQctDI7a4ozRdLpqhxN5SbdU9oaiR+N7sE5o+C
+X-Developer-Key: i=contact@c127.dev; a=ed25519;
+ pk=ZgvIq3VMEZWi50hs8D+jx3cP3dPdBRYrZZyKEosLfBQ=
+X-Endpoint-Received: by B4 Relay for contact@c127.dev/20260711 with
+ auth_id=864
+X-Original-From: Johan Alvarado <contact@c127.dev>
+Reply-To: contact@c127.dev
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-306923-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[kernel.org,bang-olufsen.dk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:richardcochran@gmail.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:linux-kernel@vger.kernel.org,m:shuah@kernel.org,m:linux-kselftest@vger.kernel.org,m:deepshah146@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:linusw@kernel.org,m:alsi@bang-olufsen.dk,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:namiltd@yahoo.com,m:maxime.chevallier@bootlin.com,m:luizluca@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:contact@c127.dev,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com,davemloft.net,kernel.org,redhat.com,google.com,lunn.ch];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306924-lists,netdev=lfdr.de,contact.c127.dev];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[deepshah146@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[deepshah146@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[yahoo.com,bootlin.com,gmail.com,vger.kernel.org,c127.dev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	HAS_REPLYTO(0.00)[contact@c127.dev];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,phc.sh:url,vger.kernel.org:from_smtp]
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 83FAF743C8D
+X-Rspamd-Queue-Id: 3988B743E07
 
-testptp's -f option stores the requested adjustment as an int ppb and
-converts it to scaled ppm, so it cannot express the 64-bit scaled-ppm
-values needed to overflow scaled_ppm_to_ppb() and bypass the max_adj
-check enforced by ptp_clock_adjtime().
+The RTL8367S is a 5+2 port switch from the same family as the
+RTL8365MB-VC already supported by this driver. Its chip info table
+entry declares SGMII and HSGMII on external interface 1, but the
+driver so far only implements RGMII, leaving boards that wire the
+switch to the CPU over the SerDes without a working CPU port.
 
-Add a small test that crafts struct timex.freq directly and verifies that
-an overflowing frequency adjustment is rejected with -ERANGE.  The test
-skips when no frequency-adjustable PTP device is available.
+This series implements both modes. The configuration sequence and the
+SerDes tuning parameters are derived from the GPL-licensed Realtek
+rtl8367c vendor driver, as distributed in the Mercusys MR80X GPL code
+drop, and cross-checked against the real register sequence captured at
+runtime by chainloading a custom U-Boot ahead of the stock firmware
+and logging the live SerDes accesses on hardware.
 
-Signed-off-by: Deep Shah <deepshah146@gmail.com>
+The vendor driver brings up the SerDes by loading firmware into the
+switch's embedded DW8051 microcontroller. Analysis of that firmware
+(by Luiz Angelo Daros de Luca) showed it only performs a SerDes
+data-path reset right after the SerDes reset is deasserted, and then
+runs a link-polling loop that writes the external interface force
+registers -- duplicating, and racing with, the link management phylink
+already performs. This series therefore keeps the DW8051 disabled and
+performs the one necessary action (the data-path reset via the SerDes
+BMCR register) directly in the driver, avoiding both the race and a
+dependency on a redistributable firmware blob.
+
+The SerDes is modelled as a phylink PCS: mac_select_pcs() hands the
+SerDes interfaces to a phylink_pcs whose pcs_config()/pcs_link_up()
+ops own the SerDes register sequence, keeping it out of the MAC
+operations. In-band autonegotiation is not implemented; the link is
+forced (fixed-link or conventional PHY), as for RGMII, and the PCS
+reports this to phylink through pcs_inband_caps().
+
+Patch 1 adds the SerDes indirect access helpers, the PCS and SGMII
+(1 Gbps) support. Patch 2 extends the PCS to HSGMII (2.5 Gbps), which
+phylink represents as 2500base-x.
+
+Tested on a Mercusys MR80X v2.20 (RTL8367S wired to the SoC over the
+SerDes), in both SGMII and HSGMII modes with a fixed-link device tree
+description: link bring-up verified across cold boots, warm reboots,
+module reloads and link down/up cycles, with sustained traffic and no
+CRC/symbol errors. The SerDes pause enables were verified by driving
+congestion toward a 100M user port and observing pause frame emission
+on the CPU port (dot3OutPauseFrames) toggle with the SDS_MISC
+TXFC/RXFC bits. The port 6 rate limiters were verified to be live by
+lowering them to 100 Mbps at runtime and observing iperf3 throughput
+across the CPU port clamp accordingly in each direction, recovering
+once the maximum was restored. The HSGMII link is confirmed running
+at 2.5G at the register level (SoC uniphy mode and gmac clocks);
+per-direction throughput could not be pushed past ~1 Gbps on this
+board because the SoC side is driven by the IPQ5018 SSDK and the
+user-facing PHY is 1G, so full 2.5G line-rate throughput remains
+unverified on my hardware. Independently, >1 Gbps aggregate HSGMII
+throughput (~2 Gbps with multiple clients) has been observed on an
+RTL8367S-based Mercusys MR85X running an OpenWrt backport of this
+series with the rate limiters raised (see patch 2).
+
+The RTL8367SB also declares SGMII and HSGMII in its chip info entry
+and therefore gains both modes as well. The vendor driver drives the
+two chips through the same code path, keyed only on the chip option
+register (both report chip id 0x6367), so this is expected to work
+there too, but I have no RTL8367SB hardware to confirm it.
+
+Changes across versions:
+
+v6:
+  - No code changes; resend of v5. The SMTP relay used for v5 rewrote
+    the Message-IDs and dropped the References headers, so the patches
+    did not thread under the cover letter on lore and could not be
+    processed as a series. Reported by Mieczyslaw Nalewaj. This
+    version is sent through the kernel.org b4 web endpoint instead.
+v5: https://lore.kernel.org/netdev/0100019f488ec83f-cd82d418-999a-40de-b58b-135b4b2aee51-000000@email.amazonses.com/
+  - Raise the port 6 ingress and egress rate limiters to their maximum
+    at setup time, as the vendor switch init does. The chip resets them
+    to 0x1FFFF (~1.048 Gbps in units of 8 Kbps), which caps the
+    aggregate HSGMII throughput at roughly 1 Gbps; the cap was
+    confirmed on an RTL8367S-based Mercusys MR85X, where raising the
+    limiters took multi-client throughput across the HSGMII CPU port
+    from ~1.02 Gbps combined to ~2 Gbps (link in patch 2). The related
+    HSGMII scheduler line rate (LINE_RATE_HSG_H) is already set to its
+    maximum by the common init jam table. Pointed out by Mieczyslaw
+    Nalewaj.
+  - Drop the PHYLINK_PCS_NEG_INBAND_ENABLED check from pcs_config().
+    With pcs_inband_caps() returning LINK_INBAND_DISABLE, phylink can
+    never select an in-band-enabled negotiation mode for this PCS, so
+    the check was unreachable. Pointed out by Maxime Chevallier.
+  - Document the SerDes SDS_MISC pause bits as the functional pause
+    enables of the SerDes external interface, after testing flow
+    control on hardware: pause frames are only emitted with the SerDes
+    TXFC bit set, while the MAC force pause bits alone have no effect
+    on this port. Comment-only change, prompted by a question from
+    Maxime Chevallier.
+v4: https://lore.kernel.org/netdev/20260702204648.276112-1-contact@c127.dev/
+  - Drop the chip model name from the driver's NOTE comment; which
+    interfaces a given chip exposes is described by its chip_info entry,
+    not the file header. Pointed out by Luiz Angelo Daros de Luca.
+  - Build the SerDes BMCR data-path-reset values from the standard
+    BMCR_ANENABLE | BMCR_ISOLATE bits instead of a bare magic number, so
+    the meaning is in the code rather than only in a comment. Pointed
+    out by Luiz Angelo Daros de Luca.
+  - Use a temporary for the DIGITAL_INTERFACE_SELECT value instead of
+    wrapping the expression across the regmap_update_bits() arguments.
+    Pointed out by Luiz Angelo Daros de Luca.
+  - Reject the untested SerDes tuning variant. The vendor driver keeps
+    two sets of SerDes tuning parameters and selects between them based
+    on the chip option register (0x13C1); the tables in this series are
+    the variant for a non-zero option, which is what the RTL8367S parts
+    seen so far report. The option is probed once at setup and the
+    SerDes interface modes are only advertised to phylink when the
+    tuning parameters match, so an unsupported variant fails at phylink
+    validation time instead of when configuring the link. Thanks to
+    Luiz Angelo Daros de Luca for pointing out the conditional.
+  - Express the external interface line rate bypass bit through a
+    parametric macro keyed on the port number (with port 5 as the base),
+    instead of an open-coded BIT(interface id) that only matched by
+    coincidence; other RTL8367 families index this register differently.
+    Suggested by Luiz Angelo Daros de Luca.
+  - Drop the arbitrary usleep_range() after each SerDes indirect access.
+    SerDes writes are now fire-and-forget and reads poll the self-clearing
+    BUSY bit with regmap_read_poll_timeout(), matching the vendor driver,
+    which never sleeps. On the MR80X the BUSY bit is never even observed
+    set: the access completes within the register transaction. Pointed out
+    by Luiz Angelo Daros de Luca; poll approach suggested by Mieczyslaw
+    Nalewaj.
+  - Drop the always-zero SerDes index argument from the SerDes indirect
+    access helpers, along with the INDACS command index field whose
+    width was questioned during review; this chip has a single SerDes
+    block reachable through this window, so the index served no purpose.
+    Raised by Luiz Angelo Daros de Luca.
+  - Stop hardcoding external interface 1 with an early -EOPNOTSUPP in
+    the SerDes configuration path. The SerDes interface modes are now
+    advertised in phylink_get_caps() from the chip_info
+    supported_interfaces, and mac_select_pcs() returns the PCS only for
+    those modes. Pointed out by Luiz Angelo Daros de Luca.
+  - Keep the new register definitions as raw hex masks, matching the
+    prevailing style of the file. A file-wide GENMASK/BIT conversion,
+    raised by Luiz Angelo Daros de Luca during review, is left for a
+    separate cleanup patch so this series stays focused on the feature.
+  - Convert the SerDes path to a phylink_pcs, as suggested by Maxime
+    Chevallier. The SGMII/HSGMII SerDes handling now lives in
+    pcs_config()/pcs_get_state()/pcs_link_up() selected via
+    mac_select_pcs(), instead of being driven from the MAC
+    mac_config()/mac_link_up()/mac_link_down() operations. This
+    separates the MAC and SerDes layers and makes future in-band
+    autonegotiation an additive change. No functional change intended
+    for the forced-link path; retested on the MR80X v2.20. In-band
+    autonegotiation remains unimplemented and is left for a follow-up,
+    once hardware is available to validate it.
+  - Implement pcs_inband_caps(), returning LINK_INBAND_DISABLE so that
+    phylink knows this PCS cannot do in-band autonegotiation and never
+    selects an in-band-enabled negotiation mode for it. pcs_config()
+    rejects PHYLINK_PCS_NEG_INBAND_ENABLED with -EOPNOTSUPP instead of
+    the previous warn-and-force.
+  - Program the SerDes pause controls in SDS_MISC from the resolved
+    pause modes when forcing the MAC external interface, as the vendor
+    driver does, instead of leaving whatever state the boot firmware
+    left there. Done in mac_link_up() because pcs_link_up() carries no
+    pause information.
+  - Set the PCS poll flag: the SerDes has no link interrupt wired up,
+    so phylink must poll pcs_get_state() when it tracks the link
+    through the PCS (in-band mode with autonegotiation disabled).
+  - Report link down from pcs_get_state() if reading back the forced
+    speed/duplex fails, rather than reporting link up with a stale
+    state.
+  - Reword the misleading "disable in-band aneg" comment.
+v3: https://lore.kernel.org/netdev/20260613232136.24246-1-contact@c127.dev/
+  - Drop the DW8051 firmware loading entirely. Analysis of the vendor
+    firmware showed it only duplicates the link management phylink
+    already does; the one needed action (SerDes data-path reset via
+    the BMCR register) is now performed directly in the driver, with
+    the DW8051 kept disabled. This removes the dependency on the
+    rtl8367s-sgmii.bin firmware blob, which could not be redistributed
+    via linux-firmware (the GPL vendor source ships it as a byte array
+    without the corresponding microcode source). Thanks to Luiz Angelo
+    Daros de Luca for the firmware analysis.
+v2: https://lore.kernel.org/netdev/0100019eb0b1822e-ffc5626c-1b9f-4c8a-8a1a-759a9e665f4f-000000@email.amazonses.com/
+  - No code changes; resend because the SMTP provider used for v1
+    corrupted the mails and patch 1/2 never reached the list.
+v1: https://lore.kernel.org/netdev/aebccaad-eca3-4ea4-99dd-ae7edbc8981b@smtp-relay.sendinblue.com/
+
+Signed-off-by: Johan Alvarado <contact@c127.dev>
 ---
- tools/testing/selftests/ptp/Makefile          |  2 +-
- .../testing/selftests/ptp/ptp_freq_overflow.c | 74 +++++++++++++++++++
- 2 files changed, 75 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/ptp/ptp_freq_overflow.c
+Johan Alvarado (2):
+      net: dsa: realtek: rtl8365mb: add SGMII support for RTL8367S
+      net: dsa: realtek: rtl8365mb: add HSGMII support for RTL8367S
 
-diff --git a/tools/testing/selftests/ptp/Makefile b/tools/testing/selftests/ptp/Makefile
-index 8f57f88ecadd..dd7376cc9bf5 100644
---- a/tools/testing/selftests/ptp/Makefile
-+++ b/tools/testing/selftests/ptp/Makefile
-@@ -1,6 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- CFLAGS += $(KHDR_INCLUDES)
--TEST_GEN_PROGS := testptp
-+TEST_GEN_PROGS := testptp ptp_freq_overflow
- LDLIBS += -lrt
- TEST_PROGS = phc.sh
- 
-diff --git a/tools/testing/selftests/ptp/ptp_freq_overflow.c b/tools/testing/selftests/ptp/ptp_freq_overflow.c
-new file mode 100644
-index 000000000000..342b22689f67
---- /dev/null
-+++ b/tools/testing/selftests/ptp/ptp_freq_overflow.c
-@@ -0,0 +1,74 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Regression test for the scaled_ppm_to_ppb() integer overflow that allowed
-+ * a crafted clock_adjtime(ADJ_FREQUENCY) to bypass the PTP max_adj check.
-+ *
-+ * testptp's -f option stores the adjustment as an int ppb and cannot express
-+ * the 64-bit scaled-ppm values needed to overflow the conversion, so this
-+ * test crafts struct timex.freq directly.
-+ */
-+#define _GNU_SOURCE
-+#define __SANE_USERSPACE_TYPES__
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+#include <sys/timex.h>
-+#include <time.h>
-+#include <unistd.h>
-+#include <linux/ptp_clock.h>
-+#include "../kselftest.h"
-+
-+#define FD_TO_CLOCKID(fd)	((~(clockid_t)(fd) << 3) | 3)
-+
-+/* clock_adjtime is not available in GLIBC < 2.14 */
-+#if !__GLIBC_PREREQ(2, 14)
-+#include <sys/syscall.h>
-+static int clock_adjtime(clockid_t id, struct timex *tx)
-+{
-+	return syscall(__NR_clock_adjtime, id, tx);
-+}
-+#endif
-+
-+int main(int argc, char *argv[])
-+{
-+	const char *device = argc > 1 ? argv[1] : "/dev/ptp0";
-+	struct ptp_clock_caps caps;
-+	struct timex tx = { 0 };
-+	clockid_t clkid;
-+	int fd, ret;
-+
-+	ksft_print_header();
-+	ksft_set_plan(1);
-+
-+	if (sizeof(tx.freq) < 8)
-+		ksft_exit_skip("the overflow only affects 64-bit kernels\n");
-+
-+	fd = open(device, O_RDWR);
-+	if (fd < 0)
-+		ksft_exit_skip("cannot open %s: %s\n", device, strerror(errno));
-+
-+	clkid = FD_TO_CLOCKID(fd);
-+
-+	if (ioctl(fd, PTP_CLOCK_GETCAPS, &caps))
-+		ksft_exit_skip("PTP_CLOCK_GETCAPS on %s: %s\n", device, strerror(errno));
-+	if (!caps.max_adj)
-+		ksft_exit_skip("%s does not support frequency adjustment\n", device);
-+
-+	/*
-+	 * (1 + 147573952589676412) * 125 == 2^64 + 9, which overflows s64 in
-+	 * scaled_ppm_to_ppb() and wraps the result to a ppb of 0.  A kernel
-+	 * that does not detect the overflow lets this absurd frequency past
-+	 * the max_adj check; a fixed kernel rejects it with -ERANGE.
-+	 */
-+	tx.modes = ADJ_FREQUENCY;
-+	tx.freq = 147573952589676412LL;
-+
-+	ret = clock_adjtime(clkid, &tx);
-+	ksft_test_result(ret < 0 && errno == ERANGE,
-+			 "overflowing frequency adjustment is rejected (ret=%d errno=%d)\n",
-+			 ret, ret < 0 ? errno : 0);
-+
-+	close(fd);
-+	ksft_finished();
-+}
--- 
-2.43.0
+ drivers/net/dsa/realtek/rtl8365mb_main.c | 619 ++++++++++++++++++++++++++++++-
+ 1 file changed, 614 insertions(+), 5 deletions(-)
+---
+base-commit: f6f3b36c15ed44de1fbb44e645e4fae8c4a4453e
+change-id: 20260711-rtl8367s-sgmii-59bf1b8eac55
+
+Best regards,
+--  
+Johan Alvarado <contact@c127.dev>
+
 
 
