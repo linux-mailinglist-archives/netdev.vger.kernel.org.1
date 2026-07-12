@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-306967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306968-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id hz1bHSzoU2p0gAMAu9opvQ
-	(envelope-from <netdev+bounces-306967-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 21:17:00 +0200
+	id I2jHIUToU2p4gAMAu9opvQ
+	(envelope-from <netdev+bounces-306968-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 21:17:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B5A8745B62
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 21:17:00 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE8D2745B76
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 21:17:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=TlJZBupE;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=OPjCV2Si;
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306967-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306967-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306968-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306968-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 66AF63015861
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 19:16:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 74C86301AB9A
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 19:16:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 685E8372670;
-	Sun, 12 Jul 2026 19:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B168735E926;
+	Sun, 12 Jul 2026 19:16:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 089EB35C197
-	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 19:16:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63A9E3B3C1D
+	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 19:16:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783883798; cv=none; b=jdAbJ5m0jCnmWM36jhTs3fOfwhJR6Lr80EFy54gykcbQ5Dej5i8IiQKgDMFFEct4Yxu/Gm1iRmVPFiCYjFenyz9LzFVj7l/bokHZ+s3Iw1kQ4vjL4PIKa6EiJ7S7fkxKEqvXxVo4HeNDKExiWV4g40alAmDzwTjlZF2C6ND/jAY=
+	t=1783883801; cv=none; b=N6KmvHtjjYOXZi9nLcV0KzY5iT4T2fKYtQ906tJYLEPaksH+oyOdzP0opPoj4PVqEXSvinUljD+q9oJq1cTbq7LUG+Xvcsqqdh+NlsikfYKrvo6XB4iNdLlqjei79+ZXwqjeIRcK9PgxR5s3zg77jNUT/6PYuA/l4xgn7wPTEHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783883798; c=relaxed/simple;
-	bh=JrTPNvQ0flhd1tFp7KOKk0TjVPFOh/+u3dYBiZMQES0=;
+	s=arc-20240116; t=1783883801; c=relaxed/simple;
+	bh=3omQbdkzxVMUTQWPVFWGZOcimZIiLKSzRtsVqayRl6I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kdqKwdXOVSaH6Ncze/BMDoBi1FK+B5l3pkbg3xpWLD8AUiGT96bG3i5FjcuTD0KF/rQICTQewZKNqJlY0UNS55I8OXF3m67YG6ZgTUiNVFVxt9e6AfIDhwh/LagIRMFmkAWo6k0FFWsIZbLYAA9gxM/HTuEVGVYaUo8/sJsdjHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TlJZBupE; arc=none smtp.client-ip=209.85.210.177
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-8487b7b4066so2025444b3a.1
-        for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 12:16:36 -0700 (PDT)
+	 MIME-Version; b=oe7SAYx+5rDIhwY1ElkHoIVjMmYsTZDQq/NJj8kLDk91Axxchvm2LD0k1pv4osXt8+UnQSNSNzmy7sDuVBArAigKpy6Lmrm6s20FgmDFRDLzQW/ZmLiYoupw9ofl+xaYItnOJ818PAaWKUyZuCbA0nOYCANiHWr26GTD2WBdfRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OPjCV2Si; arc=none smtp.client-ip=209.85.210.174
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-84a2dcede83so743696b3a.3
+        for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 12:16:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783883796; x=1784488596; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783883800; x=1784488600; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=MXvw9tkS7HVFrKwqha0vwk13jo9XOAWNQkd/wZQoS/A=;
-        b=TlJZBupEcB85gkE4FEmh1x97+bEAqphFEC59x3y4lA5rQYmayN/qbipR03gUO1xSlu
-         oo3K8eJvnfWOnWndCUOlyGBesW9GZ/MTl3U3GsaeH2jPx6vSO79DCkKB9FTrQ24jQheX
-         7dyztGkKo9ae8MM1Gr1x9gasWBzkKRUYHJPJ6gb9WFufkqsyKByG6cO+tNU0wHdAru9O
-         T6sr1aRg0rOScgZOogKSx4cBKDZq08JThbPlaD90XAgN/SXpWkruAod83N+0hHaU+KSb
-         mVc3CtdRDpC35aGMJrNKE8477cakk5J4hd02uE6DtN6n/HgMM0IPu1u6E6uoZWSpQ2PG
-         XFbw==
+        bh=5uUX9nBMX6dend7Nz469oivKMBhodrKtUvZhGLjA08A=;
+        b=OPjCV2SifqQTkWTJ0FWmhRPFqvsoxA/pKlZu7TfAeYBDojM7ZJ1RJiR2V3ok0VfafT
+         pLGo4vX/HedlPvxZ0WNL0lgh4HzcwxFGUPP4SX3GjYa4ikZ1l0jFqNLu3czfMkrXURL3
+         YIhDqmy4ICz5dFa67x3/hp/WPJ+YhKy1elPxNrAYymifwbGq4Xa+kgNO4Eox+z9irOt7
+         Dd6ZptwYuqsXNpmnzyPMhzh3+8hWU3FKA0CXDdi7Cpj5cQfqITZ+LzB3J9FTmdr2LE8J
+         tYl7kFMCEkvW8WnZY3RSLF9xfvE6VJqhwPBdEk23l1k1406T9goChOPK2HCrAB55sMag
+         mDiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783883796; x=1784488596;
+        d=1e100.net; s=20251104; t=1783883800; x=1784488600;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=MXvw9tkS7HVFrKwqha0vwk13jo9XOAWNQkd/wZQoS/A=;
-        b=GxOLzVBryvQGAHZ6yvfwK1FzrcpLziRUWfOnuK77YkNfxHWDOgCZZk7CMYEDqflyQY
-         Ewp8dqlSZjH6EajE1fEJDxqA8/YQaaiQxLnsnTca+cNOhoiFCgQISiYYjQPBAC7P42MR
-         t96aZazxK6jcpnlfeSjJKdOswzPUzFk4niJhZm+5zDDO4JY8MbX0nVM4CiT7h0DHQZuL
-         1Vkeu0OMd6Kx04Y/L+YJOh38Ht4WvuHRVdIplsYHs0N4uwWxHClH2L1he6DCSngXgqlu
-         a6fh9eZ9hYVCdBmqpbi8V6Hx+4q7bsfjHkYtx9DEgmlQDaWLvpORpx7fjA9VUwq4Vrqk
-         eROw==
-X-Gm-Message-State: AOJu0Yy00U5xt86v5OkWqMKAiRWmTyWz6Jn4ucgZb2k+i7uZzchyxcwZ
-	nrlpk45k14lnv3WW+m8V0XtAvulPNqpaXdrhwwkd8j5rdX3giE4J9lnJtZNmadCd
-X-Gm-Gg: AfdE7cnHjlw+bmcxm7GwKpAlv2Xoq664lHKjJBGmdO9Y3rWAS3ARkUhDxJaen5Hiyv5
-	FzX6ZLXV9OwqUPSPXB6ORTWtBzcLzMt3pQEXczjkPGjH84Y70Jujt/VY0gb9A+wiDr+Njrx7F35
-	25VsPHTQbuc2zglJwPbhBJ2FNQqQXJtXucsZVglrwogoTMCrky7FOA5UqN03oqz1+o3YmCdZ1Th
-	jgvZfc50J10BaGbALtuFzPTI4VOaEJvq+5iwAx6qK07KixOhfbpMq/SBVIw1MMlSOp9URI5fn/h
-	/5Sz+XWuFrvJHszYZRFwq4q9ZdUfTQ+Vt/pT9fLCXpn8cXjrm1ugttJqfnP31rCIkZmWsvyIHtI
-	dg/W6p2+4cADnlJHLaQA2DUA9lDwCir6If6c/w+mEyaGQ3dLXJRj6JwjdxzYhnDNUGOoFbMN4PD
-	uq/K2AYrAWFyWUB43w0SRhJijnXOqQinU0mk9dzoDXsTPedekLlRwFjX17
-X-Received: by 2002:a05:6a00:18a0:b0:842:2ae0:968d with SMTP id d2e1a72fcca58-84889625055mr5396777b3a.32.1783883796276;
-        Sun, 12 Jul 2026 12:16:36 -0700 (PDT)
+        bh=5uUX9nBMX6dend7Nz469oivKMBhodrKtUvZhGLjA08A=;
+        b=dTogEcYKU2K0xWExBCupd4h/UjLc1Z9I+8gxnHpcqKLkgSJwhsTbECM4ILgp5TFXsd
+         z6OIb7pedVvRCFBagiaa8nmnvGayG6xjY7uiWN0jMclHEyyjDafZMjs29QWrWPUFQync
+         Ks9s5IOG0IOHRsCYTaaTE1UbVOA/wJ/SqAmGOzS4b75FioLtaphfAZMfKf9YVlmvm2jS
+         safMOegDWCH/TnoxEwLU3+yHrARUm9cAzytkzZPwU2cdci01hTrbzXy6d9SyUICbA5E2
+         hpShwnsY/VoEhIhPt/AsC0h7qlI93jKhu7rAXS7NaAVkdd7cS0AUPvH/Rw7zLCVvu+kA
+         B0hQ==
+X-Gm-Message-State: AOJu0YxZJYYyJY+QT1CWz/WztzIQuc0nKos/xgjZiAY9HH/nok0EOUNX
+	noC40497mFotKl38mmeiYa33mibGCGQrU2rf6Mk9tHz4xHPfe5Jlc3qt8QL/Pwr+
+X-Gm-Gg: AfdE7cnZ8wjdkqyiqDfrGUOXGRnAfWn5tZ6OwfiHxteCpFRQURZ1nqfqkcU6hz0s5K7
+	q7FA5DWm1HX6pmcx1PNTKvZIv8IJTCukk65xi0IeE+3WLwt9+TjdBb9B4n7WVnE67Vr32fQTaHX
+	gR3WCeAXJAoxtvaV2SUirsWqlI7HcpVrdpydGGpHq/a+mYCh6XHZg1pbSWmizOINn8YUCttGbhH
+	NEF5umrP0mxh737dsHHjrlEpgOfpYHread5EVGx09AU0BlDwXSFK7S3w4N+e1lxlwGVw3+pnlCk
+	8Bbpymb2ICfwNglWvd1SiapX5EVV3nvEHwR7r10bHHHpHBh9JsT8pDaHHdaj75bW9GV9HN6szcF
+	kNhwrOC2+lLRtn9Kvffe9Eag9JCwfUQKRRQKmvn9IIkaSYV508WVqpJDZahur0FxAPWXyj/h68w
+	OpbL/P3Q38XsszJJUg/ITT6nj5ewz/ZJABUqxZmuh1AdvvAA==
+X-Received: by 2002:a05:6a00:2d02:b0:842:6004:3fda with SMTP id d2e1a72fcca58-84889643027mr6044387b3a.25.1783883799726;
+        Sun, 12 Jul 2026 12:16:39 -0700 (PDT)
 Received: from CPC-mjac-HKWGEZ.redmond.corp.microsoft.com ([70.37.26.40])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-847f6ddc974sm13079371b3a.60.2026.07.12.12.16.35
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-847f6ddc974sm13079371b3a.60.2026.07.12.12.16.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Jul 2026 12:16:35 -0700 (PDT)
+        Sun, 12 Jul 2026 12:16:39 -0700 (PDT)
 From: Jack Ma <jack4it@gmail.com>
 To: netdev@vger.kernel.org,
 	David Ahern <dsahern@kernel.org>
@@ -88,9 +88,9 @@ Cc: Ido Schimmel <idosch@nvidia.com>,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Jack Ma <jack4it@gmail.com>
-Subject: [PATCH net-next 1/3] net: nexthop: add NHA_FDB_PORT for fdb nexthops
-Date: Sun, 12 Jul 2026 19:12:16 +0000
-Message-ID: <20260712191218.236-2-jack4it@gmail.com>
+Subject: [PATCH net-next 2/3] vxlan: honor per-nexthop fdb destination port
+Date: Sun, 12 Jul 2026 19:12:17 +0000
+Message-ID: <20260712191218.236-3-jack4it@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260712191218.236-1-jack4it@gmail.com>
 References: <20260712191218.236-1-jack4it@gmail.com>
@@ -105,22 +105,23 @@ X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[nvidia.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-306967-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jack4it@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[nvidia.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-306968-lists,netdev=lfdr.de];
+	URIBL_MULTI_FAIL(0.00)[vger.kernel.org:server fail,tor.lore.kernel.org:server fail];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER(0.00)[jack4it@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jack4it@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -131,132 +132,80 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2B5A8745B62
+X-Rspamd-Queue-Id: EE8D2745B76
 
-Commit 1274e1cc4226 ("vxlan: ecmp support for mac fdb entries") lets a
-single inner MAC be reached through a group of remote VTEPs, with the
-kernel flow-hashing across the group members.  Each member carries its
-own remote IP, but the UDP destination port is always taken from the
-VXLAN device (vxlan->cfg.dst_port) and cannot be set per member.
+When an fdb entry points at a nexthop group, vxlan_fdb_nh_path_select()
+resolves the selected leg's remote IP but leaves the UDP destination port
+at the device default (vxlan->cfg.dst_port).
 
-Some deployments pack several receivers behind one underlay IP and tell
-them apart by UDP port, so they need a per-nexthop destination port to
-spread flows across (IP, port) tuples rather than IP alone.
+Extend nexthop_path_fdb_result() to also return the selected nexthop's
+NHA_FDB_PORT (0 when unset) and have vxlan_fdb_nh_path_select() store it
+in rdst->remote_port.  vxlan_xmit_one() already prefers rdst->remote_port
+when non-zero and falls back to the device port otherwise, so nexthops
+without a port are unaffected.
 
-Add a netlink attribute NHA_FDB_PORT (__be16, mirroring NDA_PORT) that
-carries an optional UDP destination port on an fdb nexthop.  It is only
-accepted together with NHA_FDB and NHA_GATEWAY; it is stored in struct
-nh_info and echoed back on dump.  This patch is control-plane plumbing
-only; the VXLAN datapath is wired up in a follow-up patch, so behaviour
-is unchanged for now.
+This lets one fdb nexthop group load-balance a flow across legs that
+share an underlay IP but differ in UDP destination port.
 
 Signed-off-by: Jack Ma <jack4it@gmail.com>
 ---
- include/net/nexthop.h        |  2 ++
- include/uapi/linux/nexthop.h |  3 +++
- net/ipv4/nexthop.c           | 20 +++++++++++++++++++-
- 3 files changed, 24 insertions(+), 1 deletion(-)
+ include/net/nexthop.h | 5 ++++-
+ include/net/vxlan.h   | 5 ++++-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/include/net/nexthop.h b/include/net/nexthop.h
-index 572e69cda..9c8227996 100644
+index 9c8227996..7fb612a73 100644
 --- a/include/net/nexthop.h
 +++ b/include/net/nexthop.h
-@@ -28,6 +28,7 @@ struct nh_config {
- 	u8		nh_protocol;
- 	u8		nh_blackhole;
- 	u8		nh_fdb;
-+	__be16		nh_fdb_port;
- 	u32		nh_flags;
+@@ -576,7 +576,8 @@ struct fib_nh_common *nexthop_fdb_nhc(struct nexthop *nh)
+ }
  
- 	int		nh_ifindex;
-@@ -63,6 +64,7 @@ struct nh_info {
- 	u8			family;
- 	bool			reject_nh;
- 	bool			fdb_nh;
-+	__be16			fdb_port;
+ static inline struct fib_nh_common *nexthop_path_fdb_result(struct nexthop *nh,
+-							    int hash)
++						    int hash,
++						    __be16 *fdb_port)
+ {
+ 	struct nh_info *nhi;
+ 	struct nexthop *nhp;
+@@ -585,6 +586,8 @@ static inline struct fib_nh_common *nexthop_path_fdb_result(struct nexthop *nh,
+ 	if (unlikely(!nhp))
+ 		return NULL;
+ 	nhi = rcu_dereference(nhp->nh_info);
++	if (fdb_port)
++		*fdb_port = nhi->fdb_port;
+ 	return &nhi->fib_nhc;
+ }
+ #endif
+diff --git a/include/net/vxlan.h b/include/net/vxlan.h
+index dfba89695..de41b3746 100644
+--- a/include/net/vxlan.h
++++ b/include/net/vxlan.h
+@@ -567,8 +567,9 @@ static inline bool vxlan_fdb_nh_path_select(struct nexthop *nh,
+ 					    struct vxlan_rdst *rdst)
+ {
+ 	struct fib_nh_common *nhc;
++	__be16 fdb_port = 0;
  
- 	union {
- 		struct fib_nh_common	fib_nhc;
-diff --git a/include/uapi/linux/nexthop.h b/include/uapi/linux/nexthop.h
-index bc49baf4a..e587bbf3b 100644
---- a/include/uapi/linux/nexthop.h
-+++ b/include/uapi/linux/nexthop.h
-@@ -83,6 +83,9 @@ enum {
- 	/* u32; read-only; whether any driver collects HW stats */
- 	NHA_HW_STATS_USED,
+-	nhc = nexthop_path_fdb_result(nh, hash >> 1);
++	nhc = nexthop_path_fdb_result(nh, hash >> 1, &fdb_port);
+ 	if (unlikely(!nhc))
+ 		return false;
  
-+	/* be16; UDP destination port for an fdb nexthop (e.g. VXLAN) */
-+	NHA_FDB_PORT,
-+
- 	__NHA_MAX,
- };
- 
-diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-index 6205bd57a..5b27cc9a9 100644
---- a/net/ipv4/nexthop.c
-+++ b/net/ipv4/nexthop.c
-@@ -39,6 +39,7 @@ static const struct nla_policy rtm_nh_policy_new[] = {
- 	[NHA_ENCAP_TYPE]	= { .type = NLA_U16 },
- 	[NHA_ENCAP]		= { .type = NLA_NESTED },
- 	[NHA_FDB]		= { .type = NLA_FLAG },
-+	[NHA_FDB_PORT]		= { .type = NLA_U16 },
- 	[NHA_RES_GROUP]		= { .type = NLA_NESTED },
- 	[NHA_HW_STATS_ENABLE]	= NLA_POLICY_MAX(NLA_U32, true),
- };
-@@ -956,6 +957,9 @@ static int nh_fill_node(struct sk_buff *skb, struct nexthop *nh,
- 	} else if (nhi->fdb_nh) {
- 		if (nla_put_flag(skb, NHA_FDB))
- 			goto nla_put_failure;
-+		if (nhi->fdb_port &&
-+		    nla_put_be16(skb, NHA_FDB_PORT, nhi->fdb_port))
-+			goto nla_put_failure;
- 	} else {
- 		const struct net_device *dev;
- 
-@@ -1055,6 +1059,9 @@ static size_t nh_nlmsg_size_single(struct nexthop *nh)
+@@ -583,6 +584,8 @@ static inline bool vxlan_fdb_nh_path_select(struct nexthop *nh,
  		break;
  	}
  
-+	if (nhi->fdb_nh)
-+		sz += nla_total_size(2);	/* NHA_FDB_PORT */
++	rdst->remote_port = fdb_port;
 +
- 	if (nhi->fib_nhc.nhc_lwtstate) {
- 		sz += lwtunnel_get_encap_size(nhi->fib_nhc.nhc_lwtstate);
- 		sz += nla_total_size(2);  /* NHA_ENCAP_TYPE */
-@@ -2956,8 +2963,10 @@ static struct nexthop *nexthop_create(struct net *net, struct nh_config *cfg,
- 	nhi->family = cfg->nh_family;
- 	nhi->fib_nhc.nhc_scope = RT_SCOPE_LINK;
+ 	return true;
+ }
  
--	if (cfg->nh_fdb)
-+	if (cfg->nh_fdb) {
- 		nhi->fdb_nh = 1;
-+		nhi->fdb_port = cfg->nh_fdb_port;
-+	}
- 
- 	if (cfg->nh_blackhole) {
- 		nhi->reject_nh = 1;
-@@ -3147,6 +3156,15 @@ static int rtm_to_nh_config(struct net *net, struct sk_buff *skb,
- 		cfg->nh_fdb = nla_get_flag(tb[NHA_FDB]);
- 	}
- 
-+	if (tb[NHA_FDB_PORT]) {
-+		if (!tb[NHA_FDB] || !tb[NHA_GATEWAY]) {
-+			NL_SET_ERR_MSG(extack,
-+				       "FDB port can only be set on fdb nexthops that have a gateway");
-+			goto out;
-+		}
-+		cfg->nh_fdb_port = nla_get_be16(tb[NHA_FDB_PORT]);
-+	}
-+
- 	if (tb[NHA_GROUP]) {
- 		if (nhm->nh_family != AF_UNSPEC) {
- 			NL_SET_ERR_MSG(extack, "Invalid family for group");
 -- 
 2.43.0
 
