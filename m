@@ -1,324 +1,174 @@
-Return-Path: <netdev+bounces-306936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306937-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id aRmkMlBYU2oAaAMAu9opvQ
-	(envelope-from <netdev+bounces-306936-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 11:03:12 +0200
+	id gGC/IHRYU2oGaAMAu9opvQ
+	(envelope-from <netdev+bounces-306937-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 11:03:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C061744395
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 11:03:12 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FFE67443A3
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 11:03:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=o7dBrgpq;
-	dmarc=pass (policy=reject) header.from=bootlin.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306936-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-306936-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=nB4XO0hQ;
+	dmarc=pass (policy=reject) header.from=nvidia.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306937-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-306937-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E44B6300B611
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 09:03:10 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 75C123004DE2
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 09:03:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29B6039D3D3;
-	Sun, 12 Jul 2026 09:03:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1847639D6CC;
+	Sun, 12 Jul 2026 09:03:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013049.outbound.protection.outlook.com [40.93.196.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A0539A7F4;
-	Sun, 12 Jul 2026 09:03:05 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783846990; cv=none; b=gzLBaqyeWILYS4UCkXFYKgLfuot3ow2wroTYmp/Kj2yPydkIQELs+eBK9S1x1gfyxBvXV83iGv+3SiRM54vkDYa4V8nHXv9hfIg/RlQlkt9Bgo2Ln73HDKw0dktUYGVsHGpR3HKLGM8i86HW2KXFFVSgas85EI6ZeFeIWn7Uzdw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783846990; c=relaxed/simple;
-	bh=Y5j23no5u2H1kbaTkS7wpoU9LyBJZUE/kmGQflwVAQ0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A6/LO2eJQn5xF+VVM5IU3WbGUb1OrciuCFzDyUr1BCk1NfCzliM6u7a8UOrjmH4Fs31ki9AHH8DJez7mM04tVUah+RG1xphEd/5GIKeSE+PwvwPUa74fbDC5GPsfmfxBA6jXo2KAS6TYb0+6l994LOWGRSasIpZA1eHCAX0VEjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=o7dBrgpq; arc=none smtp.client-ip=185.246.84.56
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id D50FC1A0F80;
-	Sun, 12 Jul 2026 09:03:03 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id A7A0860341;
-	Sun, 12 Jul 2026 09:03:03 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 80F5511BD39CB;
-	Sun, 12 Jul 2026 11:02:59 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1783846982; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=BzeV9M0n32gUOxgGqEtVDv99ZeZJFZbG23By9p8ZkjY=;
-	b=o7dBrgpq5Pczd1+m6GDzkI6M5/IIRcSLO9ODKbpMQTkbcG6oayKsAQ6bhHML+EFnuN/qEk
-	zMkehK63rgADVVmQHiX4qZXH2upDiMTZQJTe4BIc3VhWXQcPK8/M6LE5OJxVntj4WiFj1r
-	bXHhLaYjzuG30T6QNzhqg7cn3WJSsl47jzBZwnDYJnb9eViIV3D3AK4WkDNnXx7itJ5fEx
-	lZ6b579+cuLcvizdm9l39fzhMq0+16IOXjfIVBk6n2zOsCIr0+BTfiu10TenEa7ycoBcgw
-	5os84svvlCXxgl0LopHE6IC0sFkWQobgsoeQzSb4LZwxVaXfORr/ieNP1GXzlA==
-Message-ID: <bab33e22-b346-47d3-9b22-4646e68c6983@bootlin.com>
-Date: Sun, 12 Jul 2026 11:02:58 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EF0F846A;
+	Sun, 12 Jul 2026 09:03:42 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783847025; cv=fail; b=En9utOKIjBIkpLy0zJJSzzgDEdGX+6JO+W8/Gv7kycbndNKCK4UWiW4r99pF+4PGpHBX/V3Is3SIDl3z9nmcPSe5vIwhruxfIjP2Q5HIp07EghUEgRdUKXy+TyTI2ZR9hR/ZFad7uoRBUT0HDo90iaNot7CG+FIikJjvzA6OsQo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783847025; c=relaxed/simple;
+	bh=BDnxVnJxBh8oBSbxYHNjvtdzZnleF5zXT8Wwy4gNHOw=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jYXGhMhkXiFhnIsifPBT58JelOAIOG5fDo4vF92Nv5sUJszgiX7z7J4fyEYGxliIxvTlHtykikdQSiITXhkn9twtRk5U3Hl1X8U3UT3iLFbQubKAcKzFH2URUKM5Gj5XhwBoSA5Smw6JGlZTBro2+Do56UXSFHEIwrBmouhyuEY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=nB4XO0hQ; arc=fail smtp.client-ip=40.93.196.49
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AyGLx4MDe88RXY2dEFIGvELwNCeFQPHBJxrtIf1DTrZU5Zt4bOX07UUYA0IiQftq38LSHuPpc0MGHNgK59efq14i1ugLnifKky6M5VBLo6Mz1I/Gkt7+vs1CWYWYtgVT3gTn5k4LHjFpWA96gvivARpUsa594Mq9KPYmFLY/jmuVkMLQTZYYlUMtq/nlEDXNW90Cms3TJoixUpwVWeGfM739timVZtCRNwAdU/mI1PL/hrRNYjm3X+a0azQdn87sd2KwDAY3UnlOHVwBdr3C0r9H/Y66FEdr2ycq5kvFuS+9aWRxDwtyVokEqC5YYLeeGqEDfPsurTnERfRKVvBR0w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AI+cgZ7nnHMavhwYNiH7apXyseO/smSbc2RaICcOLyU=;
+ b=Q2vrXvSmpKF67hYxr743MbdCLJpsvuM4MG4G8ORG8O44g4fzPYa1YCHqyfsHvNWp5RE3oaYIdUZ7HFrThPsCll48kAOQZaZLBnhukMSNiPjcuAgfFbGncaw+7QS/dMc/XGwwAk+zlzhVPzfcVIINGYPTD042qsrlSxBaJNLmyobZMfs77hdK9EgtFdEavGnxl6UhgeiiXgWLq7/rKfbKz4yCBLgjNG2SGJUUDF15BH/EChpesBvju3/Qw1h3WJehq4DzT/Yz8Akwg5CmLs677Sexdk5hgjddo4foOqExVZOpkmVF7u3BpNV4hEbOZbo0yueQIcprC654oZR3+swy+w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=linux.dev smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AI+cgZ7nnHMavhwYNiH7apXyseO/smSbc2RaICcOLyU=;
+ b=nB4XO0hQTKMxgWFBvs7511jWgC0HMFftX9Pm2fBwpBzvX4wIyhw6A0fNneoHSq4eBbKeuLEE7vLtrWvQLZEhxN/YTveb1CJYSANcP6lxtGIgzCOfmBI7Fe1cRHhKDRkvHb4M5dmOrTjkYOFpmVgduGMmbyrIoaWWVAiewGsMSAdhA1xgx+DGTqchwjXZ77BCngGFLzpA41p09ySVE6so9Vwq/xd0eJph1TBtTeYLObzGKA8gLrT2XLvJ199IEHljC/Ywb53r3nqHpEe7BaGE1F3eYNJW1J+FO/L8sN3GE/KXApSs6H6l+gZpxvgiewLy1HLp1g61RXHvV52s5rVK0w==
+Received: from BN0PR04CA0049.namprd04.prod.outlook.com (2603:10b6:408:e8::24)
+ by DS4PR12MB9796.namprd12.prod.outlook.com (2603:10b6:8:2a2::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.23; Sun, 12 Jul
+ 2026 09:03:39 +0000
+Received: from BN3PEPF0000B06E.namprd21.prod.outlook.com
+ (2603:10b6:408:e8:cafe::81) by BN0PR04CA0049.outlook.office365.com
+ (2603:10b6:408:e8::24) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.202.18 via Frontend Transport; Sun,
+ 12 Jul 2026 09:03:39 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN3PEPF0000B06E.mail.protection.outlook.com (10.167.243.73) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.223.0 via Frontend Transport; Sun, 12 Jul 2026 09:03:37 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 12 Jul
+ 2026 02:03:30 -0700
+Received: from localhost (10.126.231.37) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 12 Jul
+ 2026 02:03:29 -0700
+Date: Sun, 12 Jul 2026 12:03:25 +0300
+From: Leon Romanovsky <leonro@nvidia.com>
+To: Tao Cui <cui.tao@linux.dev>
+CC: <dsahern@kernel.org>, <linux-rdma@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <cuitao@kylinos.cn>
+Subject: Re: [PATCH iproute2-next v5 1/2] rdma: update uapi headers
+Message-ID: <20260712090325.GF33197@unreal>
+References: <20260710011759.378893-1-cui.tao@linux.dev>
+ <20260710011759.378893-2-cui.tao@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] net: stmmac: enable the MAC on link up for all
- supported speeds
-To: vadik likholetov <vadikas@gmail.com>, netdev@vger.kernel.org
-Cc: andrew@lunn.ch, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- thierry.reding@kernel.org, jonathanh@nvidia.com, vbhadram@nvidia.com,
- linux-tegra@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260710120908.3731591-1-vadikas@gmail.com>
- <20260712065522.30241-1-vadikas@gmail.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20260712065522.30241-1-vadikas@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260710011759.378893-2-cui.tao@linux.dev>
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B06E:EE_|DS4PR12MB9796:EE_
+X-MS-Office365-Filtering-Correlation-Id: 391ab070-79c5-4781-32b2-08dedff47600
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700016|23010399003|18002099003|22082099003|11063799006|4143699003|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	8vU+dioPJRguvvT3dtg5KXmazLcZi3gf8VwJ9S3b9m6mjFE7a90N1GU8HzcG8NVotwz80m0pwsMvHtw/696vu2ME8LoVSh1I7zpz7oDWL5OG/uFT/S3bUfO5Zage/3INn271X4sKLbev0VNwEyB95bjYAnqP06Vg7dzil9R+JAcnuHvOB/fY4NxHi2J0oxEKlaCNryPNja+xqtu5QuV2ZE3YXlzwuApZvq+z4DWe1XshB+xRwUUZVsk7Epumj5P0sraRM0tl5xLJ2lyoXziCq8pAZlG//1gt/PDNAkEObVPJ3qVZRDAIt7aIlcNVaJ2vWXIsqzTZ5HdSs01d6gchfVPxPDVAYKcTVd0Vz2UoYvAZg92zf6NreSfxZLlSAtIfMb90nRh023UbzPcMwKngtDdy9NijfBlDKLGSYFgZFdgBjhrB0fYsqNa4/jggQOTrnF7eowN2PGQ8eYVd6O9/f58CHs8YB8RPWOFmR/H6Au+SzRPADExZvHaQjiqqrxr1sQderdnb9cnS9Hknotar6xRLXCviUDWISAguZ8pCnLu5sKTT/2s++EJ7EJBwg9h2LFi+3Sq2d4W9WU1EYXaL3UU7oQ90GDY0oOIdQv0wipsab0/Usrtoi9RA9mWmr+Q2qxGGC61GiUD1dOXS1r+GIvzgVcLjjMF8XcNnew0LlKPfJpxKu0y2CtXUm5Yid/CeblyrQCDeR6Y484ELpqRsHw==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700016)(23010399003)(18002099003)(22082099003)(11063799006)(4143699003)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	lVME6LyR/0U32bzFf+PYq6MIXnevg2uROrwUoUEvEcmhppF8v9NuE4k4mf5pEtx2kgvLfthsTeiGHv2TmdH76KkIUI0t48iHB9tBgL7Te8UuRPv5WlFdqfvrEhPrvn0HCyLJKx85uv3ehYJlGetIiHrwKViDjgDd1cCFJRJF93H3oh+7nQxf1VJG4Kxj0BMD/F+jvrAsK8xhuy4ir+dOCoNhvac79ffZnzEwqzEu3NSnT2ZDh5Yb5MrloeLfcsQVNjXTrFlWHK8zKkdjW/VH+kHM5RP7MWUKBzAWiard0ILHp6tHXTqBQfS95+o2nCL+EgQkAODEHQ1pbRGr6YH7KIZMG6+KECwJwFZ5WdqNtUL7tdi2qdutjVBASeS0GE6Xawu2evStpsISFLc6nhptXHRSa5kK8n/56l6t5+nU418kaAN+dOD/yHmAW3HH/7as
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2026 09:03:37.5952
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 391ab070-79c5-4781-32b2-08dedff47600
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN3PEPF0000B06E.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PR12MB9796
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-6.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-306936-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_RECIPIENTS(0.00)[m:vadikas@gmail.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:thierry.reding@kernel.org,m:jonathanh@nvidia.com,m:vbhadram@nvidia.com,m:linux-tegra@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-306937-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:cui.tao@linux.dev,m:dsahern@kernel.org,m:linux-rdma@vger.kernel.org,m:netdev@vger.kernel.org,m:cuitao@kylinos.cn,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[leonro@nvidia.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,unreal:mid,Nvidia.com:dkim,nvidia.com:from_mime];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leonro@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,bootlin.com:from_mime,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1C061744395
+X-Rspamd-Queue-Id: 0FFE67443A3
 
-Hi,
+On Fri, Jul 10, 2026 at 09:17:58AM +0800, Tao Cui wrote:
+> From: Tao Cui <cuitao@kylinos.cn>
+> 
+> Update rdma_netlink.h file upto kernel commit 5911f6d6e7ce
+> ("RDMA/nldev: Add resource summary max values for usage display")
 
-When sending a new iteration, it should be a standalone thread, and not
-a reply to the previous version. Patchwork seems to have picked it up, so
-I _think_ it's ok for this one though :)
+This SHA-1 is incorrect.
+5911f6d6e7cc ("RDMA/nldev: Add resource summary max values for usage display")
 
-On 7/12/26 08:55, vadik likholetov wrote:
-> stmmac_mac_link_down() clears the MAC's transmit and receive enable bits.
-> stmmac_mac_link_up() is expected to set them again through
-> stmmac_mac_set(..., true), but it first switches on the negotiated speed
-> and returns early for a speed the switch does not list. The MAC is then
-> left gated off.
-> 
-> The speed selection is split into three switches, keyed on the interface.
-> The generic branch -- taken for everything that is neither USXGMII nor
-> XLGMII, so including PHY_INTERFACE_MODE_10GBASER -- lists only SPEED_2500,
-> SPEED_1000, SPEED_100 and SPEED_10.
-> 
-> MGBE on Tegra234 runs 10GBASE-R into an Aquantia AQR113C. That PHY does
-> rate matching, so phylink_link_up() replaces the media speed with the
-> MAC-side interface speed before calling into the MAC:
-> 
-> 	case RATE_MATCH_PAUSE:
-> 		speed = phylink_interface_max_speed(link_state.interface);
-> 		duplex = DUPLEX_FULL;
-> 
-> The driver is therefore called as
-> 
-> 	stmmac_mac_link_up(interface=10GBASER, speed=10000, duplex=1)
-> 
-> which falls through to "default: return;". The interface stops passing
-> traffic after the first link flap.
-> 
-> The failure is easy to misread. The link still comes up, because the PHY
-> is polled over MDIO and needs no MAC, so the interface reports carrier 1
-> at the media speed. The DMA is untouched, so its start bits stay set and
-> descriptors are still consumed. Only the MAC itself is gated off: the
-> receiver counts nothing (mmc_rx_framecount_gb stops advancing, RE is 0)
-> and nothing reaches the wire (TE is 0). The interface survives boot only
-> because stmmac_hw_setup(), called from ndo_open, enables the MAC
-> unconditionally -- so the problem appears only once the cable has been
-> unplugged and plugged back in, and "ip link set dev <ethX> down && ip
-> link set dev <ethX> up" appears to fix it.
-> 
-> The interface is not what the speed bits depend on: with the single
-> exception of 2.5G, which is selected through the XGMII block on USXGMII
-> and through the regular speed bits otherwise, each speed maps to one
-> field of struct mac_link. The per-interface switches are speed
-> validation, and phylink already validates the speed against
-> priv->hw->link.caps. So collapse the three switches into one keyed on the
-> speed alone, keeping the interface test only for the 2.5G case. This
-> covers 10G on 10GBASE-R, and equally 5G, and 1G/100/10 on USXGMII, all of
-> which hit "default: return;" today.
-> 
-> A core that does not support a speed leaves the corresponding mac_link
-> field at 0, and phylink will not offer it that speed in the first place.
-> For dwxgmac2 at 10G, link.xgmii.speed10000 is XGMAC_CONFIG_SS_10000,
-> which is 0 and is the correct speed selection for a 10GBASE-R MAC: ctrl
-> then equals old_ctrl, the register write is skipped, and execution
-> reaches stmmac_mac_set(..., true).
-> 
-> Log an error in the default case, since a speed with no entry here leaves
-> the MAC disabled and the symptom does not point at the cause.
-> 
-> Fixes: d8ca113724e7 ("net: stmmac: tegra: Add MGBE support")
-> Suggested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> Signed-off-by: vadik likholetov <vadikas@gmail.com>
-> ---
-> v2:
->  - Collapse the three per-interface switches into a single switch on the
->    speed, rather than adding SPEED_10000 to the generic branch, which
->    left SPEED_5000 and the USXGMII sub-1G speeds broken (Maxime).
->  - netdev_err() in the default case (Andrew).
-> 
-> Fixes tag: the missing speeds predate the commit cited above. I picked
-> d8ca113724e7 because MGBE is the first in-tree user to reach it -- it
-> needs a 10GBASE-R interface driven by a rate-matching PHY, so that
-> phylink hands the MAC a 10G speed. Happy to re-target it.
-> 
-> Verified on an AGX Orin devkit (Tegra234 MGBE0 + AQR113C), before and
-> after, on the same board and cable. MAC registers read with `ethtool -d`,
-> after a physical unplug and replug:
-> 
->   stock		MAC_TX_CONFIG 0x00010000 (TE=0)
-> 		MAC_RX_CONFIG 0x3ff022c0 (RE=0)
-> 		rx_packets frozen, DHCP lease lost
-> 
->   patched	MAC_TX_CONFIG 0x00010001 (TE=1)
-> 		MAC_RX_CONFIG 0x3ff022c1 (RE=1)
-> 		rx_packets keeps climbing, DHCP lease retained
-> 
-> Only the 10GBASE-R path is covered by hardware here; the other speeds are
-> by inspection. Testing was done with MGBE0 handed to a VM via
-> vfio-platform, so the driver ran in a guest; the MAC register evidence
-> above is read from the device itself and the code path is not
-> virtualisation-specific.
-> 
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 92 ++++++++-----------
->  1 file changed, 37 insertions(+), 55 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 2a0d7eff8..fa9f88e51 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -1083,63 +1083,45 @@ static void stmmac_mac_link_up(struct phylink_config *config,
->  	old_ctrl = readl(priv->ioaddr + MAC_CTRL_REG);
->  	ctrl = old_ctrl & ~priv->hw->link.speed_mask;
->  
-> -	if (interface == PHY_INTERFACE_MODE_USXGMII) {
-> -		switch (speed) {
-> -		case SPEED_10000:
-> -			ctrl |= priv->hw->link.xgmii.speed10000;
-> -			break;
-> -		case SPEED_5000:
-> -			ctrl |= priv->hw->link.xgmii.speed5000;
-> -			break;
-> -		case SPEED_2500:
-> +	switch (speed) {
-> +	case SPEED_100000:
-> +		ctrl |= priv->hw->link.xlgmii.speed100000;
-> +		break;
-> +	case SPEED_50000:
-> +		ctrl |= priv->hw->link.xlgmii.speed50000;
-> +		break;
-> +	case SPEED_40000:
-> +		ctrl |= priv->hw->link.xlgmii.speed40000;
-> +		break;
-> +	case SPEED_25000:
-> +		ctrl |= priv->hw->link.xlgmii.speed25000;
-> +		break;
-> +	case SPEED_10000:
-> +		ctrl |= priv->hw->link.xgmii.speed10000;
-> +		break;
-> +	case SPEED_5000:
-> +		ctrl |= priv->hw->link.xgmii.speed5000;
-> +		break;
-> +	case SPEED_2500:
-> +		if (interface == PHY_INTERFACE_MODE_USXGMII)
->  			ctrl |= priv->hw->link.xgmii.speed2500;
-> -			break;
-> -		default:
-> -			return;
-> -		}
-> -	} else if (interface == PHY_INTERFACE_MODE_XLGMII) {
-> -		switch (speed) {
-> -		case SPEED_100000:
-> -			ctrl |= priv->hw->link.xlgmii.speed100000;
-> -			break;
-> -		case SPEED_50000:
-> -			ctrl |= priv->hw->link.xlgmii.speed50000;
-> -			break;
-> -		case SPEED_40000:
-> -			ctrl |= priv->hw->link.xlgmii.speed40000;
-> -			break;
-> -		case SPEED_25000:
-> -			ctrl |= priv->hw->link.xlgmii.speed25000;
-> -			break;
-> -		case SPEED_10000:
-> -			ctrl |= priv->hw->link.xgmii.speed10000;
-> -			break;
-> -		case SPEED_2500:
-> -			ctrl |= priv->hw->link.speed2500;
-> -			break;
-> -		case SPEED_1000:
-> -			ctrl |= priv->hw->link.speed1000;
-> -			break;
-> -		default:
-> -			return;
-> -		}
-> -	} else {
-> -		switch (speed) {
-> -		case SPEED_2500:
-> +		else
->  			ctrl |= priv->hw->link.speed2500;
-> -			break;
-> -		case SPEED_1000:
-> -			ctrl |= priv->hw->link.speed1000;
-> -			break;
-> -		case SPEED_100:
-> -			ctrl |= priv->hw->link.speed100;
-> -			break;
-> -		case SPEED_10:
-> -			ctrl |= priv->hw->link.speed10;
-> -			break;
-> -		default:
-> -			return;
-> -		}
-> +		break;
-> +	case SPEED_1000:
-> +		ctrl |= priv->hw->link.speed1000;
-> +		break;
-> +	case SPEED_100:
-> +		ctrl |= priv->hw->link.speed100;
-> +		break;
-> +	case SPEED_10:
-> +		ctrl |= priv->hw->link.speed10;
-> +		break;
-> +	default:
-> +		netdev_err(priv->dev,
-> +			   "unsupported speed %d on %s, leaving the MAC disabled\n",
-> +			   speed, phy_modes(interface));
-
-You should probably be using phy_speed_to_str() to print the speed.
-
-Thanks,
-
-Maxime
-
+Thanks
 
