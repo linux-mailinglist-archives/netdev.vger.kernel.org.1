@@ -1,196 +1,212 @@
-Return-Path: <netdev+bounces-306985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-306986-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 59vwD5EQVGpzhgMAu9opvQ
-	(envelope-from <netdev+bounces-306985-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 00:09:21 +0200
+	id SOfPLvYRVGqkhgMAu9opvQ
+	(envelope-from <netdev+bounces-306986-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 00:15:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A94B67461B2
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 00:09:20 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B55B97461E2
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 00:15:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=Eg3Dj51p;
-	dmarc=pass (policy=none) header.from=asu.edu;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306985-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-306985-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=key1 header.b=jh++NTkP;
+	dmarc=pass (policy=none) header.from=linux.dev;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-306986-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-306986-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 757D03012CCD
-	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 22:09:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D172D3001CF2
+	for <lists+netdev@lfdr.de>; Sun, 12 Jul 2026 22:15:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3319137A846;
-	Sun, 12 Jul 2026 22:09:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F79937A83D;
+	Sun, 12 Jul 2026 22:15:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C00C037205D
-	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 22:09:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C5D37A4B9
+	for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 22:15:10 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783894148; cv=none; b=AmjKC3BpRAZ2kyv3t6YQAk3GytYvm/CF+t9Nmb1mIKem2GOiHB7L0chJZkKtDO9lv/L8VEZcAu7Yf6wjMhL0f7nojnhQ0sV3eK5tQACnzGTA+m9Vk55tw+m91+N7QA65lcxZfRy6qMj8xA9SDe+DrCOqor7o8uuhFMFhggUYefI=
+	t=1783894513; cv=none; b=ocMV9ndU9bAqiDJojvsmf0AchqdZC7KdmpB8gUpvIYU5vyIXNCUVYbDfRGGwek/1P1acwgjSYmV/W113ZhWhyC86McRh8abt0ztoTS/4l2V8wrIBGt7FoyhDPW1D7P4msBQiZfQ8cHJV9IjstIiWjV7+60lrsmdkOO0EeBMJHBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783894148; c=relaxed/simple;
-	bh=ya0YwKNn5tL15JftmzZoYB2lGcBnSqSdBe1mSe09vP4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iqy9QGZfRGiRLN3c93rCUbrRqZIodXudC4GS3Qj6pk9TlcGzrS7c3/RqZgMRTfLkrEqbmFWE+r9bwt9DPlLjv/iKfoWzol4FFYOcl3GeDzAxENVgDWDrBG4Bb5noOQUB2Me+re8qQvq/sZfG8Tr//KEVkTP6RP2I3M9dU635UqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=Eg3Dj51p; arc=none smtp.client-ip=209.85.214.171
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2cca24023edso29867345ad.1
-        for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 15:09:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1783894146; x=1784498946; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=FZtdvHMChIDL+dYOQDIFLigXmiDjoDs/HmzFXJgyvP8=;
-        b=Eg3Dj51phmOx/hBaypr7IONdmAEJdmjfu6dDJXnj9xiS88DDQyLCWS0SJ3lAhELcBe
-         Yi+CZrApan5MmEBBmw2rof4/HhiPBplvsn7PbSi/gyZO2m7P02miVKuXOwM45ZwA1bvt
-         d6nLhAKUSp+oxUeAaLkCfBt4hAtO9iR4tCks/vjvq1QnH6ZLzx6/Ja41+4da6io00F72
-         1EsvzWLzTIsDxL5/kEf6oZZS1Oh2Rm0d00LMqG53H4ac/ctUdT+5SQxzXYTBqGTYmFYm
-         tnwu8s+DB+lrir7AngMq9OIqRrlk4CghfDtf8YpVCSmPl477SL4ufQUxyE6a2I9wOxP3
-         MM8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783894146; x=1784498946;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=FZtdvHMChIDL+dYOQDIFLigXmiDjoDs/HmzFXJgyvP8=;
-        b=cZUpn9Kj9fp+PLZsipfjeVl8itFFqyx3ZrTspiZ10VKd2+k7PsCBQxR9ThkduAbrwX
-         POze+lqLxBe+e1w23bzlpLwkk/dqop/63h8QvaJCNiIFB+6vaqh25skxW9u/GURlkpIq
-         fw6DqeMC2VWrHq7RC0t7kRickga9mFeTmm3Y/KWPg2EB/IiZteWWkwS/ZXrruJLwoXM2
-         wcgYn0+W5hl1uIuGL0GxAfkskE4Q44gK/dxJ1jsZ6crDVXE4FbOFTWzq2JTNTCvGTwcW
-         +3S1xPMqUbYoPW+RhPZEVDxe2+K5N2hqZPHgvQsDns1eOVxllIyy8ITGtDLZiPzXmDK5
-         TfAQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rp6v2tWgc4Q9Lswdyeq4s31QXk6OxKApqUUEH6UaFjP2mDe8LZKcUNN5yJnnn5yiiLUDo7tiWI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YybY+rPIFcfkewrDlM8R1FFnSa75jvnnXGinuPdp4vDBBjRU88+
-	hLm/W0y5/k9cGKryHFJQATxsg7jMV7qWKZqQrfcO0BLGc6P7puQ7S2BWMJN+2ioYBw==
-X-Gm-Gg: AfdE7cny9z4LdLplaH54tooDXWC2vZbn2MLL/d1/25Pqhx4ucpGysXppCmPscl6L8bp
-	HMdiO0dmltnzekR5dkEFOfrFpOLQ5iJSRvyv97b0UBXOkPYLXVrNafk+IAqOMhHu59vgYJP6tz4
-	paiKfzxJtsDS3ji/pHNL63DP+NCRNOnmujsKkeXB2msDAhiXm1bCd7Hs2kx7z2uWz2mYLGOII1B
-	L7yTKI6RvwBIEinT+71/QaplzyEWwN819cFnWj1D9wGE+VhgVSXuhM54rodebzLOxtjVxrsqMTg
-	lOMDnqbxKdxPASHFa60HLSF4z3I24k3AMm7OmKP9vwBG50nZ3r/yBnf1T1z94fQZHArfUabY1VG
-	o6Wpr2sUTgt+nGtU7ppjZ5SNpbYzZZEObtRUfUPxHic6I5KoiJ8ruwlCQajCYaC4QeboYEpuh
-X-Received: by 2002:a17:902:fd84:b0:2cc:5fae:cc5a with SMTP id d9443c01a7336-2ce9f188707mr65291085ad.46.1783894146108;
-        Sun, 12 Jul 2026 15:09:06 -0700 (PDT)
-Received: from p1.. ([2607:fb90:eca4:601:96a2:dc03:fbca:601e])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9d5bdddsm88368665ad.77.2026.07.12.15.09.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Jul 2026 15:09:05 -0700 (PDT)
-From: Xiang Mei <xmei5@asu.edu>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: David Ahern <dsahern@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bestswngs@gmail.com,
-	Xiang Mei <xmei5@asu.edu>
-Subject: [PATCH net] mpls: fix NULL deref in mpls_valid_fib_dump_req() on CONFIG_INET=n
-Date: Sun, 12 Jul 2026 15:09:03 -0700
-Message-ID: <20260712220903.3131568-1-xmei5@asu.edu>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1783894513; c=relaxed/simple;
+	bh=1hgSOoWiw+HnAX87diwB++9TUNULMJEA+gJgDazuzsY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GSJ+Y7TaOKy9M7+3W2ZywXIq7JrstWjxVqAZ4YKJCbFF0VjdnD2+Xk9iyy+C3nqR5uYjo9R2DNKP82mORkfN/rVSIYQ+azHyTeuQpORAxl94Fp28rD2sw2kZnTqSiKMUu/RmiWb8GtvGFf3Ys/4hQesP2SIsGUdJ85XoqzK9iWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jh++NTkP; arc=none smtp.client-ip=95.215.58.178
+Message-ID: <f4b2b659-036b-49f7-8f6b-5f173a1eb380@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783894499;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CboKgCXRP0GTBlCnZOK+gyQj14lL7ieETZEex5S6D9Y=;
+	b=jh++NTkPV62UCIQg8hXCIhD1nhDLIkHnieo9pd7zi4w7eMzrD28pgxa0kyDLJT3Ouhe31O
+	4yQvFtiEwXETIihEM8yX91paFdKFJsJTsgIVwRllACL4n3O3o4sLa0XFFJUqoMUOn3qxKd
+	+Jr8Tgs/eaveyOKLBiOL23qJEgKTETA=
+Date: Sun, 12 Jul 2026 23:14:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] nfc: llcp: reject PDUs shorter than the LLCP header
+To: "Doruk (0sec)" <doruk@0sec.ai>
+Cc: david@ixit.cz, oe-linux-nfc@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20260711072702.70231-1-doruk@0sec.ai>
+ <be1731eb-e6ec-4015-92e4-c09fd88019e6@linux.dev>
+ <CAPdMp1p=72WXe-8w5Y9viBuB6YvZWZomNc9xQzXEg-qe1WVN0A@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <CAPdMp1p=72WXe-8w5Y9viBuB6YvZWZomNc9xQzXEg-qe1WVN0A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-306985-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,asu.edu];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:dsahern@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bestswngs@gmail.com,m:xmei5@asu.edu,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:doruk@0sec.ai,m:david@ixit.cz,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ALIAS_RESOLVED(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	DKIM_TRACE(0.00)[asu.edu:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:from_mime,asu.edu:email,asu.edu:mid,asu.edu:dkim,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	TAGGED_FROM(0.00)[bounces-306986-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A94B67461B2
+X-Rspamd-Queue-Id: B55B97461E2
 
-On CONFIG_INET=n, mpls_valid_fib_dump_req()'s local strict-check loop
-enters the RTA_OIF arm on the index alone and calls nla_get_u32(tb[i]).
-Since nlmsg_parse_deprecated_strict() leaves tb[i] NULL for any omitted
-attribute, a dump without RTA_OIF dereferences NULL and oopses.
+On 12/07/2026 17:02, Doruk (0sec) wrote:
+> Hi Vadim
+> 
+> this was reproduced from userspace on unmodified
+> linux-next (bee763d5f341) without RF hardware.
+> 
+> It's the peer-RX path, not a local command skb:
+> 
+> virtual_ncidev_write (peer NCI DATA) -> nci_rx_data_packet
+> -> nfc_tm_data_received -> nfc_llcp_data_received
+> -> rx_work -> nfc_llcp_rx_skb -> nfc_llcp_recv_connect
 
-Skip unset attributes before dispatching on the index, mirroring
-ip_valid_fib_dump_req().
+Ok, fair, but in this case it's better to check skb->len in
+nfc_llcp_data_received - no need to setup a worker when skb is not
+correct.
 
-  Oops: general protection fault, probably for non-canonical address
-  0xdffffc0000000000: 0000 [#1] SMP KASAN NOPTI
-  KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-  RIP: 0010:mpls_valid_fib_dump_req (net/mpls/af_mpls.c:2189)
-  Call Trace:
-   mpls_dump_routes (net/mpls/af_mpls.c:2236)
-   netlink_dump (net/netlink/af_netlink.c:2331)
-   __netlink_dump_start (net/netlink/af_netlink.c:2446)
-   rtnetlink_rcv_msg (net/core/rtnetlink.c:7041)
-   netlink_rcv_skb (net/netlink/af_netlink.c:2556)
-   netlink_unicast (net/netlink/af_netlink.c:1345)
-   netlink_sendmsg (net/netlink/af_netlink.c:1900)
-   __sock_sendmsg (net/socket.c:790)
-   ____sys_sendmsg (net/socket.c:2684)
-   ___sys_sendmsg (net/socket.c:2738)
-   __sys_sendmsg (net/socket.c:2770)
-   do_syscall_64 (arch/x86/entry/syscall_64.c:94)
-   entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
-  Kernel panic - not syncing: Fatal exception
-
-Fixes: 196cfebf8972 ("net/mpls: Handle kernel side filtering of route dumps")
-Reported-by: Weiming Shi <bestswngs@gmail.com>
-Assisted-by: Claude:claude-opus-4-8
-Signed-off-by: Xiang Mei <xmei5@asu.edu>
----
- net/mpls/af_mpls.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
-index ca504d9626cf..1ad07df89d5b 100644
---- a/net/mpls/af_mpls.c
-+++ b/net/mpls/af_mpls.c
-@@ -2185,13 +2185,16 @@ static int mpls_valid_fib_dump_req(struct net *net, const struct nlmsghdr *nlh,
- 	for (i = 0; i <= RTA_MAX; ++i) {
- 		int ifindex;
- 
-+		if (!tb[i])
-+			continue;
-+
- 		if (i == RTA_OIF) {
- 			ifindex = nla_get_u32(tb[i]);
- 			filter->dev = dev_get_by_index_rcu(net, ifindex);
- 			if (!filter->dev)
- 				return -ENODEV;
- 			filter->filter_set = 1;
--		} else if (tb[i]) {
-+		} else {
- 			NL_SET_ERR_MSG_MOD(extack, "Unsupported attribute in dump request");
- 			return -EINVAL;
- 		}
--- 
-2.43.0
+> 
+> Bring the LLCP link up via a normal NFC-DEP activation, then send
+> one NCI DATA packet with a 1-byte CONNECT PDU. skb->len - 2 wraps
+> to 0xffffffff and the TLV walk runs off the end:
+> 
+> BUG: KFENCE: out-of-bounds read in nfc_llcp_recv_connect+0x9f6/0xf80
+> nfc_llcp_recv_connect+0x9f6 -> nfc_llcp_rx_work -> process_one_work
+> read 4219B past a 704B skbuff_small_head from virtual_ncidev_write
+> R14: 00000000ffffffff (wrapped tlv_array_len)
+> 
+> With the guard: rx_skb runs for all 600 short PDUs, recv_connect
+> reached 0 times, 0 reports.
+> 
+> The bound stays "<", not "<=" -- a header-only SYMM/DISC/DM is
+> exactly 2 bytes and must still dispatch; AGF uses "<=" only
+> because an AGF frame must also carry a sub-PDU. I'll drop the
+> "same guard as AGF" line from the commit message.
+> 
+> Instantiating /dev/virtual_nci needs privilege, but that's just
+> the syzbot transport; the 1-byte CONNECT is what a remote NFC-DEP
+> peer emits, and the DEP layer imposes no minimum LLCP length.
+> Impact is a proximity OOB read (DoS).
+> 
+> I can send the full reproducer if you'd like.
+> 
+> best
+> Doruk
+> 
+> On Sun, Jul 12, 2026 02:01 PM, Vadim Fedorenko
+> <vadim.fedorenko@linux.dev> wrote:
+>>
+>> On 11/07/2026 08:27, Doruk Tan Ozturk wrote:
+>>> nfc_llcp_rx_skb() reads the two-byte LLCP header (DSAP/SSAP/PTYPE) and
+>>> dispatches by PDU type; several handlers then derive a TLV-array length as
+>>> skb->len - LLCP_HEADER_SIZE. Neither nfc_llcp_rx_skb() nor its callers
+>>> guarantee the frame is at least LLCP_HEADER_SIZE bytes, and a sub-header
+>>
+>> that's not correct. there are 2 ways to get to nfc_llcp_rx_skb() - via
+>> nfc_llcp_recv_agf() or through commands/locally generated skbs. The
+>> first one checks against LLCP_HEADER_SIZE, while latter one creates skb
+>> payload with correct LLCP header size. Do you have a reproducer to
+>> trigger the issue?
+>>
+>>
+>>> PDU does reach it: digital_in_recv_dep_res() and digital_tg_recv_dep_req()
+>>> strip the DEP header with skb_pull() after only checking the DEP header
+>>> size, so a DEP I-PDU carrying a 0- or 1-byte LLCP payload is handed up as
+>>> a sub-2-byte skb.
+>>>
+>>> For a CONNECT or CC PDU, nfc_llcp_recv_connect() and nfc_llcp_recv_cc()
+>>> then pass skb->len - LLCP_HEADER_SIZE to nfc_llcp_parse_connection_tlv().
+>>> For skb->len < 2 that subtraction underflows: truncated into the u16
+>>> tlv_array_len parameter it becomes ~0xFFFE, and for a CONNECT to the SDP
+>>> SAP, nfc_llcp_connect_sn() uses a size_t and underflows to SIZE_MAX. The
+>>> TLV parsers bound their walk relative to that length, so they read far
+>>> past the end of the skb.
+>>>
+>>> The aggregated-frame path (nfc_llcp_recv_agf()) already drops sub-PDUs
+>>> shorter than the header. Apply the same guard once, in the dispatcher, so
+>>
+>> that not exactly correct, it drops skbs which are shorter or equal to
+>> the header, the check added in this patch is not correct then.
+>>
+>>> every PDU type is covered.
+>>>
+>>> Found by 0sec (https://0sec.ai) using automated source analysis; the
+>>> missing guard is evident from source. Compile-tested.
+>>>
+>>> Fixes: d646960f7986 ("NFC: Initial LLCP support")
+>>> Cc: stable@vger.kernel.org
+>>> Assisted-by: 0sec:claude-opus-4-8
+>>> Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
+>>> ---
+>>>    net/nfc/llcp_core.c | 3 +++
+>>>    1 file changed, 3 insertions(+)
+>>>
+>>> diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+>>> index aed5fe1afef0..e3b3077e0e83 100644
+>>> --- a/net/nfc/llcp_core.c
+>>> +++ b/net/nfc/llcp_core.c
+>>> @@ -1481,6 +1481,9 @@ static void nfc_llcp_rx_skb(struct nfc_llcp_local *local, struct sk_buff *skb)
+>>>    {
+>>>        u8 dsap, ssap, ptype;
+>>>
+>>> +     if (skb->len < LLCP_HEADER_SIZE)
+>>> +             return;
+>>> +
+>>>        ptype = nfc_llcp_ptype(skb);
+>>>        dsap = nfc_llcp_dsap(skb);
+>>>        ssap = nfc_llcp_ssap(skb);
+>>
 
 
