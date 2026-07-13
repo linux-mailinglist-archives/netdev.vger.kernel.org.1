@@ -1,280 +1,174 @@
-Return-Path: <netdev+bounces-307090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307091-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id L/+WIK6mVGpeowMAu9opvQ
-	(envelope-from <netdev+bounces-307090-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:49:50 +0200
+	id NuknM86mVGplowMAu9opvQ
+	(envelope-from <netdev+bounces-307091-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:50:22 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB47E748EE2
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:49:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11D9B748EF9
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:50:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=leemhuis.info header.s=key2 header.b="CN/maNTN";
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307090-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307090-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=VA4SZZxk;
+	dmarc=pass (policy=reject) header.from=google.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307091-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307091-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2FA34302AF26
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 08:49:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8EA1130316DA
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 08:49:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5478C3D3488;
-	Mon, 13 Jul 2026 08:49:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E57763D3D12;
+	Mon, 13 Jul 2026 08:49:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.61.103])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 932123D1A99
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 08:49:03 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783932551; cv=none; b=b96+1gqWahQJZCO9429zz9WVqTuN5oy0e6s6B5m0lt2RlI4Fu6LqF2jy/d4aoPPHTHa6fDPwuxkhxz580P9cyMw/sqBMLDD2BzNBeTBhI0a+nlSSeqQnpL/rbyitwNJtJGOxYn7HQxjeKyNmxtrUosUuMDIGVGN2TBcUZGIxCuk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783932551; c=relaxed/simple;
-	bh=Q4qiFWad5OiVAx3/h3YdRStz3h0htREQPPpSRvOfM9s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HjW3MXT5cz/8uHiHhw/n0EAf4GJU5wPDKfLUv1MBD86LGx6iW2M/i/uP9JMYib1PO+W8ko32z3mectYvpz5nj4JTUXFtS3+TuwkNeyiCuwqqlwgnX+Cv/gYPkgi8rl6Pu7aqZ9eqgCKaWkk4HSUxf5kZaQ5hjkiK+/Y3APNgEcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=CN/maNTN; arc=none smtp.client-ip=188.68.61.103
-Received: from mors-relay-8403.netcup.net (localhost [127.0.0.1])
-	by mors-relay-8403.netcup.net (Postfix) with ESMTPS id 4gzGLt20W4z8Fw6;
-	Mon, 13 Jul 2026 10:48:54 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
-	s=key2; t=1783932534;
-	bh=Q4qiFWad5OiVAx3/h3YdRStz3h0htREQPPpSRvOfM9s=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=CN/maNTNwI/GkcTsexEXXajk3Yet7oAKbPKBIG8QsIhR4KanKgAk62TvkTPngUOEw
-	 7dwsP3tYwfIiHO3UWlviiA6iL4lTDuweaA0sAnuTx0ESIXjQr+7WSDNlHz0/CN6hRe
-	 bPjTNTbR37L1/dqmY/y0Sc8sd/Xh7op9nOK4e40Zp25TrRPJfKfKPk5+MQ5Uo3DA+W
-	 7UEYpHkXA3d8hyUE3jv6Pd+BrIoO5VdAOMtCn0a8a6niGZZr6CX5rHHlQnyP6vYhZs
-	 o7vui0DcTrXooBhNd6fkECrkO0PfwrPccPKfIHJ7WzvjhggW1uzQjDtiQOwhsQAhWY
-	 S1gOhYO0rsiIA==
-Received: from policy01-mors.netcup.net (unknown [46.38.225.35])
-	by mors-relay-8403.netcup.net (Postfix) with ESMTPS id 4gzGLt1GpZz8DYw;
-	Mon, 13 Jul 2026 10:48:54 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at policy01-mors.netcup.net
-X-Spam-Flag: NO
-X-Spam-Score: -2.898
-X-Spam-Level: 
-Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy01-mors.netcup.net (Postfix) with ESMTPS id 4gzGLs1MwMz8tbb;
-	Mon, 13 Jul 2026 10:48:52 +0200 (CEST)
-Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
-	by mxe9fb.netcup.net (Postfix) with ESMTPSA id 43FE760418;
-	Mon, 13 Jul 2026 10:48:46 +0200 (CEST)
-Received-SPF: pass (mxe9fb: connection is authenticated)
-Message-ID: <653ebbde-aebf-4526-9d55-63976a18372c@leemhuis.info>
-Date: Mon, 13 Jul 2026 10:48:45 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F533D3338
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 08:49:11 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783932554; cv=pass; b=UYH3yIIxvXgdnU1jrLwIK7l6Hxadg3U/P55aOtvBY0OxSUO3hDFN9otsECYAcK0ozw9iyjfHrZXdiVmSYiws6eAXpXeZdaaXd9nQDbxsxqoCa+/i5OaDtL/58swgl+7G0wROhxi+ZM7L/oamQVogDUCN5J4m6FGh29nAdN1QEzY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783932554; c=relaxed/simple;
+	bh=OI9kyY/eIXiwDJQlkP1NTCz1k8ZUsmR6Qz7FiRC7tgk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=otuQMhVXIgn2LZxOgt70WJdU1HZ/mvQkV4+zF6BC+jMVdvcO+rt0KEysnMh0L8eYvTl3R6p5jvKi4jCOS+ubHAaqLAvRzJudU2Va+vzdPEPJfRIcQ8+BnNUB/XQJU1SAf7xYi9FSiwUsQZZPJCe+KYAIAgkEqV/+EOKxAD6mkNY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VA4SZZxk; arc=pass smtp.client-ip=209.85.222.169
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-92f0b5ed131so37769285a.3
+        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 01:49:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783932550; cv=none;
+        d=google.com; s=arc-20260327;
+        b=k3TLCkW3tWuoyjExCg2aNve6IDsqv66+4rW62Eipp6d+TYJNN/opE0GYX9oLF1TwsE
+         zn4m+mGojjupz7zpPwMc7KsxOq8OxUH9+48wp1vBcakNiFE6vfB+AhGI86FnjQywVVsx
+         s0lQTgy83I58F8WwAPWp3qj5FUVioOkzfXhYA6tE9RR9spLJ86PisSJknySCDwOClUYf
+         BZ2WoLD3Cnu1RJ8G3BIaIRj+9Q+pf9BwvhOlIuGSqKIWBJiiqQEETABjryv4bKu0kC3B
+         9GDF0X+hxI4+984Ltj4ZR8XvKwYRV5rPAba1wiH6jQUEztgZMWzTYThkT7qKAfCUoC+D
+         UkOA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=3QeXRhEeLsJ9M/v/PCGpg6ym+QyLMSFbz+fam7a09/Y=;
+        fh=v8UFJSeLPJt29zVL7fP/E9t0f4liOBi+1Pd+31yALhA=;
+        b=MRpTwCndjw2eOzRw0H+kZrK1nZUu1pS/aOZ8tcU+rCSSY0S5BkxwtyOISs7yUcamgK
+         hAZhXtT9MVNXZUS5m5VD0dfkhNbUBfe6yp+O4rKq962IgfblQ+mvmtsw1IPhFODJo/3e
+         IfnsrmZppZd1/GZxauPCtBWlkiW4ZPOn5fsu9BbyTLQCemMH8EaU6DMkshmILyUdeX8i
+         wKknivHswEbUN+xjzLlwOCLEbox7UJqwuJKfdM0nP7YghR5BSr46upApMvCdLpQPAzMO
+         VmVcUIAgRcqUnB3ckoJr5GfdxdSMCWxvQesVsLeht85yLmWTPxDf7wPjaRDjOxlIrmHl
+         jmPw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1783932550; x=1784537350; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=3QeXRhEeLsJ9M/v/PCGpg6ym+QyLMSFbz+fam7a09/Y=;
+        b=VA4SZZxk68B31TJJyObJvL1CLRv0yrADyCT+wZYvYP3J21FtjAg/1ggyjIYf9YJzY+
+         YdDA1kMzBRwTBIvNyauUHP9433qfTnjQrCZc6SZHuuzXJ6cIOV+1PgpWeZKQdq/itCkX
+         TUFias1/p8r/eXMJzfz3PN0M1S7XE8ieh2ZFCEMxnbDbpf5b4diVDfi8g/bqs5bMHIWI
+         AJigiB+G+35TIRgNppxs7AzX+iHjMlEMG57vHhhCXIbPvL1IaaHSxObtc0vrmTFx12a/
+         4WFYkeWjrl5Agh2yT/27E0VlldCZY0d6BHMcoHMbIX217v+bou6PqpTd+bN2mkFOoE+C
+         lgFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783932550; x=1784537350;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=3QeXRhEeLsJ9M/v/PCGpg6ym+QyLMSFbz+fam7a09/Y=;
+        b=idwEBWbMwG73W0dolfczn5Z+T4Sisk8iQdET0KM29HXmtseYrIxWeNTfARaKt9Mzmn
+         rHkm22/w/nBIGmWgZeB5/BdXHjHEDyKZv3yNaQR8DjW9IEWlEFZisQyivigzW6uvmJSb
+         bwd0wuLfkZkTNfpGBEbn7aH1dQ1+EsyncMT/KATeekG507FjYqqT79gPrj1diQ1123gs
+         UYikXs5x4IQEvXG8Xls4Ss6x9NYSICds/li7HkxE3dloxoer6rnm/52WxrZbY43eg1LH
+         cf9hO8YLu99IegcVuh3YwBKMouRaqOvW7CRq9zcyur2zlOTrvrj3H9rC8K+zPVdWt547
+         jRqQ==
+X-Gm-Message-State: AOJu0Yx5XbLkvbM9qX4XFDy1P2+ddPmdNiJULk9tcjmePTkskAckBfPD
+	CSRCVvCYwRdGMfDVTmznv6Uxx7IDqsHbibxGPVX59RYTuPlbkl3SVmL62W84e0bhb5g0LewEh9a
+	VfrxTBT3yIu2kq5AIOROWUv/x9sy/PU+U6w6ZL//h
+X-Gm-Gg: AfdE7ckHPzsSW+15ruB92YYFYSon41W9CuadxMq1Hw2x7cu43UjK5DhqwWt8it6ICdY
+	V0wYiwlODM8vFKxG4MeUsSiWhxFmR6kdZbC4uu+7o3nsyNzsAI8cnpd1cMFzdRKkjwqeMekJvE4
+	s7zuvJwhlrDiOE1AFTtyQNUTcy0PQ0kzU6PCjwEGAamL2A3WHFiYprmFLDCrW48EfD5vz3WU4G7
+	sMoE3Wxk5tbdJy0jLrSTSuRZL8sYFbkMjTeIfZNmKyHLLYTyy+q7cv6lYGnj8oUtR5NFS/tgeoJ
+	rj7VotITvrOBEEhM/Feswfirs3KGWCubFfy5OJTWktQ/98uomq/5rp0Kmg3Ox/Y3K3pEo9Jkw41
+	PqsqeUDYG/No=
+X-Received: by 2002:a05:620a:4056:b0:92e:cc01:a67e with SMTP id
+ af79cd13be357-92ef2ccac2emr869849485a.76.1783932549214; Mon, 13 Jul 2026
+ 01:49:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Regression] Broken MPLS routes with multiple nexthops
-To: Kuniyuki Iwashima <kuniyu@google.com>, anthony.doeraene@uclouvain.be
-Cc: davem@davemloft.net, netdev@vger.kernel.org
-References: <036a0c95-f5d4-46ab-88e7-1eab567d7a84@uclouvain.be>
- <20260625155313.847098-1-kuniyu@google.com>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: de-DE, en-US
-X-Enigmail-Draft-Status: N11222
-Autocrypt: addr=linux@leemhuis.info; keydata=
- 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 MEK4
-In-Reply-To: <20260625155313.847098-1-kuniyu@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-PPP-Message-ID: 
- <178393252650.3576089.12727735396801431284@mxe9fb.netcup.net>
-X-NC-CID: b1S1x3EoaZF8hEqbuOzVciKIkS6OyvPAG72FH+7yKlUrKRbBx7g=
+References: <20260713081842.3119-1-zhaoyz24@mails.tsinghua.edu.cn>
+In-Reply-To: <20260713081842.3119-1-zhaoyz24@mails.tsinghua.edu.cn>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 13 Jul 2026 10:48:55 +0200
+X-Gm-Features: AVVi8CcxvHiV3rBj-_RY-o3IkJxjxcn2RPOT44y0K8E6bAHhf_6ECXqv5C1bz7g
+Message-ID: <CANn89i+jA5kPcZrjXfsY1ic_LjeEwPHi-U54kYmZdkBKHB+vTA@mail.gmail.com>
+Subject: Re: [PATCH net] tcp: initialize standalone IPv4 ACK options
+To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Cc: netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-kernel@vger.kernel.org, Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>, 
+	Ao Wang <wangao@seu.edu.cn>, Xuewei Feng <fengxw06@126.com>, Qi Li <qli01@tsinghua.edu.cn>, 
+	Ke Xu <xuke@tsinghua.edu.cn>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[leemhuis.info:s=key2];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:zhaoyz24@mails.tsinghua.edu.cn,m:netdev@vger.kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307091-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	URIBL_MULTI_FAIL(0.00)[leemhuis.info:server fail,uclouvain.be:server fail,tor.lore.kernel.org:server fail,vger.kernel.org:server fail];
-	TAGGED_FROM(0.00)[bounces-307090-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[leemhuis.info];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
-	FORGED_RECIPIENTS(0.00)[m:kuniyu@google.com,m:anthony.doeraene@uclouvain.be,m:davem@davemloft.net,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[regressions@leemhuis.info,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[leemhuis.info:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[regressions@leemhuis.info,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	URIBL_MULTI_FAIL(0.00)[mail.gmail.com:server fail,tor.lore.kernel.org:server fail,vger.kernel.org:server fail,tsinghua.edu.cn:server fail];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,davemloft.net,kernel.org,redhat.com,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DB47E748EE2
+X-Rspamd-Queue-Id: 11D9B748EF9
 
-On 6/25/26 17:51, Kuniyuki Iwashima wrote:
-> From: Anthony Doeraene <anthony.doeraene@uclouvain.be>
-> Date: Thu, 25 Jun 2026 17:07:41 +0200
->>
->> According to my experiments, it seems that ECMP with MPLS (i.e. an MPLS 
->> route with multiple
->> nexthops) is broken on the master branch of the kernel.
->>
->> Indeed, whenever adding an MPLS route with multiple nexthops, ip route 
->> show the route as
->> a dead route/link down, even if nexthops are reachable.
->> [...]
->>  From a git blame, it seems that commit 
->> f0914b8436c589b7ab32c614d8d7868eb4ebd5bf
->> broke the core logic for building nexthops.
-> 
-> Thanks for the report !
-> 
-> It was to balance refcount with netdev_put() in mpls_rt_alloc().
-> I'll post the patch below.
-> 
-> (Updating rt->rt_nhn is not strictlly needed for netdev_put()
->  because it has NULL check and rt is allocated with kzalloc(),
->  but it's a bit error prone, so I'll keep it)
+On Mon, Jul 13, 2026 at 10:18=E2=80=AFAM Yizhou Zhao
+<zhaoyz24@mails.tsinghua.edu.cn> wrote:
+>
+> tcp_v4_send_ack() constructs standalone IPv4 TCP ACK replies on the stack
+> for SYN-RECV and TIME-WAIT paths.  It currently zeroes only the TCP
+> header, not the accompanying option buffer.
+>
+> TCP-AO options may have actual lengths that are not 4-byte aligned, while
+> the transmitted TCP header length is correctly rounded up to a 4-byte
+> boundary.  tcp_ao_hash_hdr() writes only the MAC bytes, leaving the
+> TCP-AO option alignment padding in rep.opt uninitialized.  With stack
+> auto-initialization disabled, those padding bytes can be copied into the
+> network packet and sent to the peer.
+>
+> Zero the whole reply structure before writing options, so the alignment
+> padding bytes are initialized.
 
-Kuniyuki Iwashima: was this regression ever resolved? This thread looks
-stalled, but I fear I might have missed something.
-
-Ciao, Thorsten
-> ---8<---
-> diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
-> index ca504d9626cf..4a81514e919a 100644
-> --- a/net/mpls/af_mpls.c
-> +++ b/net/mpls/af_mpls.c
-> @@ -922,8 +922,7 @@ static int mpls_nh_build_multi(struct mpls_route_config *cfg,
->  	struct nlattr *nla_via, *nla_newdst;
->  	int remaining = cfg->rc_mp_len;
->  	int err = 0;
-> -
-> -	rt->rt_nhn = 0;
-> +	u8 nhs = 0;
->  
->  	change_nexthops(rt) {
->  		int attrlen;
-> @@ -959,12 +958,15 @@ static int mpls_nh_build_multi(struct mpls_route_config *cfg,
->  			rt->rt_nhn_alive--;
->  
->  		rtnh = rtnh_next(rtnh, &remaining);
-> -		rt->rt_nhn++;
-> +		nhs++;
->  	} endfor_nexthops(rt);
->  
-> +	rt->rt_nhn = nhs;
-> +
->  	return 0;
->  
->  errout:
-> +	rt->rt_nhn = nhs;
->  	return err;
->  }
->  
-> ---8<---
-> 
-> 
->>
->> This commit modified function `mpls_nx_build_multi` by setting 
->> `rt->rt_nhn` to 0 at the
->> start of the function. However, the loop `change_nexthops` just below 
->> depends on
->> `rt->rt_nhn` to know the actual number of nexthops that it should build. 
->> As `rt->rt_nhn`
->> is set to 0 just before, **no nexthop is ever built**, leading to a dead 
->> route. Even if we
->> remove this modification, this commit incorrectly increments 
->> `rt->rt_nhn` at the end of
->> the loop (`rt->rt_nhn++`),  such that the loop always end with an error 
->> as it tries to
->> constructs more nexthops that actually provided.
->>
->> Commenting these two lines fix the issue, and allows to create once 
->> again MPLS routes
->> with multiple nexthops:
->>
->> ```
->> modprobe mpls_iptunnel mpls_router
->> sysctl net.mpls.platform_labels=100000
->> ip link set dummy0 up
->> ip addr add fc00:1::1/112 dev dummy0
->> ip addr add fc00:2::1/112 dev dummy0
->> ip -M route add 16000 \
->>      nexthop via inet6 fc00:1::2 as 16001 \
->>      nexthop via inet6 fc00:2::2 as 16002
->>
->> # Check the route
->> ip -M route
->> # Output:
->> #     16000
->> #            nexthop as to 16001 via inet6 fc00:1::2 dev dummy0
->> #            nexthop as to 16002 via inet6 fc00:2::2 dev dummy0
->> #
->> # Route is accepted and present !
->> ```
->>
->> Overall, I think it would be interesting to discuss what this patch was 
->> trying to achieve,
->> and how we can conciliate both use-cases.
->>
->> Best regards and looking forward to hearing from you,
->> Doeraene Anthony
-> 
-
+Please fix TCP-AO instead of slowing down TCP (almost no TCP flow is using =
+AO)
 
