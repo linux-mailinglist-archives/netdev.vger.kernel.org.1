@@ -1,207 +1,327 @@
-Return-Path: <netdev+bounces-307156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307157-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id y8diMt/fVGrVgAAAu9opvQ
-	(envelope-from <netdev+bounces-307156-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 14:53:51 +0200
+	id CSc/CVfgVGoKgQAAu9opvQ
+	(envelope-from <netdev+bounces-307157-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 14:55:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7291974B233
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 14:53:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64C2674B280
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 14:55:50 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=MrdN4YQt;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307156-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-307156-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=akqST7Ud;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307157-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307157-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E97CC300D4C2
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 12:53:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B49A930379A5
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 12:54:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93A6340E8CA;
-	Mon, 13 Jul 2026 12:53:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 667D2407CCA;
+	Mon, 13 Jul 2026 12:54:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378E219F121;
-	Mon, 13 Jul 2026 12:53:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8513F58D9
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 12:54:04 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783947229; cv=none; b=agGjv2IZ3JPCPmfdGPwAOT+EGi1j93CCdadFK64TT1KCOJNUL+NCAgkUO7JzKtdfzvN4XfmvL+OCzMKO0whWq9G5dTz0HyRIvqJL6NS2qkIxLTuPATNzvpUoGnzSfnELcitcenFZ9OceK3a953DrYvKLECwN0WTg9YIZxZ6H95U=
+	t=1783947248; cv=none; b=lEtndNPTJdiUD3bL+Bi2B6a0avmLWaAm0HWhUPNR4PYkoeQ2rOyxtmr4ZZxmSWuFNlSznkvb/DVSnBFLIzpwhVsvRwznCnFZadOPusipqPKz64SaXZY+c1EPmeWimGG413hZkA+quu7hf0Yedsm3xWqfAePU/fYC+Rw0g+t3/4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783947229; c=relaxed/simple;
-	bh=df0/tk71ArwqJYZi6UifNS1IPX5FyJGZ3vBtfAg/bPw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=cxr3LxUFdTg5koOxXtAxkdBdbhMBKcVcQjiupRNEvEps+lI+YeTkzVisB9ToKq5hKzFV4bJsKc4aJz6TQ5IGHPYMqG40btBxUzbQn0N+lxzJKZTSaVoWROmlId0js8xkmZctQ6fgKm5ajAC+OdzVUD0BaUVeLtQSx8TIyM7901U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MrdN4YQt; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BAFF1F000E9;
-	Mon, 13 Jul 2026 12:53:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783947228;
-	bh=BYxt9eG8OStjECbJndGaUeWfB8kBjIV89GTDnz69wUw=;
-	h=From:Date:Subject:To:Cc;
-	b=MrdN4YQta14aUHZ32FcZjrjmqLhIX07Z+TFIdqOkhe638RiH/fV6xQI8lyKnHGPpi
-	 lQLVfM67eIZFImx+ylkAyiOg1HqudOEn03PTerrSZylm7tQ/0GfMVoBb9VM+DALbkr
-	 xvVCjfQDyHBOXwfZpyDDlA6uyy35Mw9wqdQymVQmWAjwW2+eO4sS7s6tFxe2/heeUm
-	 q5cf74ERgkcGFdDVj6+ZpANS6eOR52XE2aQnivXGo75rXgsASuKdROZG6/Lh3Zc+nZ
-	 eaR8X/9C0K82JwdL/+pIK6IgUX/fsWrxEn55O0iqwaDAB5Qztln8Qy6RwMdH2Bt/TU
-	 kAOvDWeXZBHrg==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Mon, 13 Jul 2026 14:53:22 +0200
-Subject: [PATCH nf v2] selftests: netfilter: nft_flowtable.sh: fix offload
- counter verification for tunnel tests
+	s=arc-20240116; t=1783947248; c=relaxed/simple;
+	bh=OehZxVccAC4wd2LYjDLh/JhSucxZ1vPgwbdr9jlaUfw=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=OQNhASR6e8AVSyFwW7k7XDQjjQ0Srad2smUHzNNC6bUGH4+v9+zxrFdGgCP9oPuWiDWkxVeW4PU1IkLvSfcmAz5VUdfWXHUz3Dq7Sp8BXkzgJMc1EGmjxWAT0oISRCgFdu9/OskKaho2VaXGshbgpQdDbkcDAB/monoTBA9PvFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=akqST7Ud; arc=none smtp.client-ip=185.246.85.4
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 4DCDF4E40D89;
+	Mon, 13 Jul 2026 12:54:03 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 0782760341;
+	Mon, 13 Jul 2026 12:54:03 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C2CDB11BD065D;
+	Mon, 13 Jul 2026 14:53:56 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1783947241; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=Mj3k62TTmvevSWsdsH8Qj5L3u63d6OuBtUz4wfOK5ds=;
+	b=akqST7UdTMzCuKRFjIrwGwSHlPOPFdcYWE6F9jUA2qAXNURZskV0DK6PyOUmjpmSB3s7Do
+	K8myJbwXXuhvQowFp63Zy9l5R/6YxiobsJzcmB5L5rCLKa726oDEqoCTvJH2wS0j/tPYBA
+	eqXro9zeKKdHa2JMYfFl/X1acfDKqeB0dM7a82y+i624zVW/vMGusR3XDobrx3xhJQXBLs
+	ymh+ric142H4bQQlZheW0eBz6qNqMLyL6tvo5m+Xb2Unz2dq04QS47nMq64EqM/DhkvEbI
+	7yNTH+QGPYiPTFCTUYrwdw8X7IoCs2Kzj3z6i961CHV+/AU7YIpZAUW9KQcmeQ==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260713-flowtable-selftest-ip6ip6-fix-v2-1-b49edb4f9620@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/42NQQrCMBBFr1Jm7UiTlqS68h7SRbSTdjAkJQlRK
- b27oScQ/ub9D+9vkCgyJbg2G0QqnDj4CvLUwHMxfibkqTLIVqpWC4HWhXc2D0eYyNlMKSOvqgY
- tf7CfBqNkJ3ttOqiONVKtD/8dvIWxdgunHOL3uCziWP60F4ECVUsX0t3QT1bfXhQ9uXOIM4z7v
- v8A0AYchc8AAAA=
-X-Change-ID: 20260711-flowtable-selftest-ip6ip6-fix-4d8a623247a3
-To: Pablo Neira Ayuso <pablo@netfilter.org>, 
- Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-Mailer: b4 0.14.3
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 13 Jul 2026 14:53:55 +0200
+Message-Id: <DJXGIM9EGPT8.4UHNYP2Y0GOP@bootlin.com>
+Subject: Re: [PATCH net-next v3 07/15] net: macb: introduce macb_context
+ struct for buffer management
+Cc: <conor.dooley@microchip.com>, <andrew+netdev@lunn.ch>,
+ <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+ <richardcochran@gmail.com>, <linux@armlinux.org.uk>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <nicolas.ferre@microchip.com>, <claudiu.beznea@tuxon.dev>,
+ <pvalerio@redhat.com>, <nb@tipi-net.de>,
+ <vladimir.kondratiev@mobileye.com>, <gregory.clement@bootlin.com>,
+ <benoit.monin@bootlin.com>, <tawfik.bayouk@mobileye.com>,
+ <thomas.petazzoni@bootlin.com>, <maxime.chevallier@bootlin.com>
+To: "Paolo Abeni" <pabeni@redhat.com>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260701-macb-context-v3-7-00268d5b1502@bootlin.com>
+ <20260708102716.169767-1-pabeni@redhat.com>
+In-Reply-To: <20260708102716.169767-1-pabeni@redhat.com>
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:lorenzo@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-307156-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307157-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FORGED_SENDER(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:conor.dooley@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:richardcochran@gmail.com,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:nicolas.ferre@microchip.com,m:claudiu.beznea@tuxon.dev,m:pvalerio@redhat.com,m:nb@tipi-net.de,m:vladimir.kondratiev@mobileye.com,m:gregory.clement@bootlin.com,m:benoit.monin@bootlin.com,m:tawfik.bayouk@mobileye.com,m:thomas.petazzoni@bootlin.com,m:maxime.chevallier@bootlin.com,m:pabeni@redhat.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,gmail.com,armlinux.org.uk,vger.kernel.org,tuxon.dev,redhat.com,tipi-net.de,mobileye.com,bootlin.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,bootlin.com:from_mime,bootlin.com:url,bootlin.com:mid,bootlin.com:dkim,linux.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7291974B233
+X-Rspamd-Queue-Id: 64C2674B280
 
-The IPIP and IP6IP6 tunnel tests call check_counters() to verify
-flowtable offloading occurred, but the flow-add rule only matches
-meta oif "veth1". When traffic is routed through a tunnel device,
-oif is the tunnel interface (tun0, tun6, etc.), not veth1, so
-the flow-add rule never fires, no flowtable entry is created,
-and counters stay at zero — producing a silent false pass.
-Fix by adding tunnel-specific flow-add rules for each tunnel
-interface. These match TCP dport 12345 traffic before the bare
-accept rule, set ct mark, add the flow to the flowtable, and
-increment routed_orig. The existing routed_repl rule on veth0
-already handles the reply direction since decapsulated reply
-packets exit through the physical interface.
-Also add check_counters() for the IP6IP6 non-VLAN and
-IP6IP6-over-VLAN tests which previously used a bare PASS message.
+Hello Paolo's LLM,
 
-Fixes: fe8313316eaf ("selftests: netfilter: nft_flowtable.sh: Add IPIP flowtable selftest")
-Fixes: 5e5180352193 ("selftests: netfilter: nft_flowtable.sh: Add IP6IP6 flowtable selftest")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
-Changes in v2:
-- Add missing tunnel-specific flow-add rules for each tunnel interface.
-- Link to v1: https://lore.kernel.org/r/20260711-flowtable-selftest-ip6ip6-fix-v1-1-60e9e7384df7@kernel.org
----
- tools/testing/selftests/net/netfilter/nft_flowtable.sh | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+On Wed Jul 8, 2026 at 12:27 PM CEST, Paolo Abeni wrote:
+> From: AI Reviewer <ai@example.com>
+>
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+> ---
+> net: macb: introduce macb_context struct for buffer management
+>
+> This patch moves per-queue ring buffers and ring-size parameters out of
+> struct macb / struct macb_queue into a new struct macb_context that is
+> allocated on open and freed on close, so future patches can swap in a
+> new context while the interface is running.
+>
+>> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethe=
+rnet/cadence/macb_main.c
+>> index 951a7f080225..dfb1d49d841c 100644
+>> --- a/drivers/net/ethernet/cadence/macb_main.c
+>> +++ b/drivers/net/ethernet/cadence/macb_main.c
+>
+> [ ... ]
+>
+>> @@ -1257,6 +1288,7 @@ static void macb_tx_error_task(struct work_struct =
+*work)
+>>  	struct macb_queue *queue =3D container_of(work, struct macb_queue,
+>>  						tx_error_task);
+>>  	unsigned int q =3D queue - queue->bp->queues;
+>> +	struct macb_txq *txq =3D macb_txq(queue);
+>>  	struct macb *bp =3D queue->bp;
+>
+> [High]
+> Can macb_tx_error_task() dereference a freed context?
+>
+> macb_tx_error_task is scheduled from macb_interrupt():
+>
+>     schedule_work(&queue->tx_error_task);
+>
+> After this patch, the very first thing the worker does is:
+>
+>     struct macb_txq *txq =3D macb_txq(queue);
+>
+> which expands to &bp->ctx->txq[q] and dereferences bp->ctx.
+>
+> Looking at macb_close():
+>
+>     macb_reset_hw(bp);
+>     ...
+>     macb_free(bp);
+>     kfree(bp->ctx);
+>     bp->ctx =3D NULL;
+>
+> There is no cancel_work_sync(&queue->tx_error_task), and macb_reset_hw()
+> does not drain the workqueue. If an interrupt scheduled the work just
+> before close, or the work was already pending, the worker can run after
+> kfree(bp->ctx) and hit a NULL dereference (and a use-after-free if
+> macb_open() re-allocates ctx concurrently via ethtool ring reconfig).
+>
+> The same reasoning applies to bp->hresp_err_bh_work, which is queued
+> from macb_interrupt() and whose handler calls
+> mog_init_rings()/macb_init_buffers() that read bp->ctx->tx_ring_size and
+> bp->ctx->{tx,rx}q[q]. cancel_work_sync(&bp->hresp_err_bh_work) is only
+> called from macb_remove(), not macb_close().
 
-diff --git a/tools/testing/selftests/net/netfilter/nft_flowtable.sh b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-index 08ad07500e8a..d9a21ca8ed2c 100755
---- a/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-+++ b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-@@ -617,7 +617,11 @@ ip -6 -net "$nsr2" route add default via fee1:3::1
- ip -net "$ns2" route add default via 10.0.2.1
- ip -6 -net "$ns2" route add default via dead:2::1
- 
-+ip netns exec "$nsr1" nft -a insert rule inet filter forward \
-+	'meta oif tun0 tcp dport 12345 ct mark set 1 flow add @f1 counter name routed_orig accept'
- ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif tun0 accept'
-+ip netns exec "$nsr1" nft -a insert rule inet filter forward \
-+	'meta oif tun6 tcp dport 12345 ct mark set 1 flow add @f1 counter name routed_orig accept'
- ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif tun6 accept'
- ip netns exec "$nsr1" nft -a insert rule inet filter forward \
- 	'meta oif "veth0" tcp sport 12345 ct mark set 1 flow add @f1 counter name routed_repl accept'
-@@ -629,7 +633,7 @@ if ! test_tcp_forwarding_nat "$ns1" "$ns2" 1 "IPIP tunnel"; then
- fi
- 
- if test_tcp_forwarding "$ns1" "$ns2" 1 6 "[dead:2::99]" 12345; then
--	echo "PASS: flow offload for ns1/ns2 IP6IP6 tunnel"
-+	check_counters "flow offload for ns1/ns2 IP6IP6 tunnel"
- else
- 	echo "FAIL: flow offload for ns1/ns2 with IP6IP6 tunnel" 1>&2
- 	ip netns exec "$nsr1" nft list ruleset
-@@ -642,6 +646,8 @@ ip -net "$nsr1" link set veth1.10 up
- ip -net "$nsr1" addr add 192.168.20.1/24 dev veth1.10
- ip -net "$nsr1" addr add fee1:4::1/64 dev veth1.10 nodad
- ip netns exec "$nsr1" sysctl net.ipv4.conf.veth1/10.forwarding=1 > /dev/null
-+ip netns exec "$nsr1" nft -a insert rule inet filter forward \
-+	'meta oif veth1.10 tcp dport 12345 ct mark set 1 flow add @f1 counter name routed_orig accept'
- ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif veth1.10 accept'
- 
- ip -net "$nsr1" link add name tun0.10 type ipip local 192.168.20.1 remote 192.168.20.2
-@@ -649,6 +655,8 @@ ip -net "$nsr1" link set tun0.10 up
- ip -net "$nsr1" addr add 192.168.200.1/24 dev tun0.10
- ip -net "$nsr1" route change default via 192.168.200.2
- ip netns exec "$nsr1" sysctl net.ipv4.conf.tun0/10.forwarding=1 > /dev/null
-+ip netns exec "$nsr1" nft -a insert rule inet filter forward \
-+	'meta oif tun0.10 tcp dport 12345 ct mark set 1 flow add @f1 counter name routed_orig accept'
- ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif tun0.10 accept'
- 
- ip -net "$nsr1" link add name tun6.10 type ip6tnl local fee1:4::1 remote fee1:4::2 encaplimit none
-@@ -656,6 +664,8 @@ ip -net "$nsr1" link set tun6.10 up
- ip -net "$nsr1" addr add fee1:5::1/64 dev tun6.10 nodad
- ip -6 -net "$nsr1" route delete default
- ip -6 -net "$nsr1" route add default via fee1:5::2
-+ip netns exec "$nsr1" nft -a insert rule inet filter forward \
-+	'meta oif tun6.10 tcp dport 12345 ct mark set 1 flow add @f1 counter name routed_orig accept'
- ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif tun6.10 accept'
- 
- ip -net "$nsr2" link add link veth0 name veth0.10 type vlan id 10
-@@ -683,7 +693,7 @@ if ! test_tcp_forwarding_nat "$ns1" "$ns2" 1 "IPIP tunnel over vlan"; then
- fi
- 
- if test_tcp_forwarding "$ns1" "$ns2" 1 6 "[dead:2::99]" 12345; then
--	echo "PASS: flow offload for ns1/ns2 IP6IP6 tunnel over vlan"
-+	check_counters "flow offload for ns1/ns2 IP6IP6 tunnel over vlan"
- else
- 	echo "FAIL: flow offload for ns1/ns2 with IP6IP6 tunnel over vlan" 1>&2
- 	ip netns exec "$nsr1" nft list ruleset
+All of this is a valid concern.
 
----
-base-commit: 3f1f755366687d051174739fb99f7d560202f60b
-change-id: 20260711-flowtable-selftest-ip6ip6-fix-4d8a623247a3
+> Pre-patch these fields lived inside the embedded struct macb_queue so a
+> late worker would touch stale-but-addressable memory; post-patch the
+> first indirection through bp->ctx faults.
 
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+This pre-series analysis is wrong however. Current upstream would crash:
+macb_tx_error_task() restarts the HW and it even assigns
+queue->tx_ring_dma which still contains the freed DMA address
+(macb_free()/macb_close() don't reset that value).
+
+Summary: this patch turns potential memory corruption into a NULL
+pointer dereference.
+
+> Would adding cancel_work_sync(&queue->tx_error_task) per queue and
+> cancel_work_sync(&bp->hresp_err_bh_work) before kfree(bp->ctx) in
+> macb_close() close this window?
+
+Yes that is the way forward. It will probably be separate and target
+net/main. Not specifically because I want it backported (it'd be nice
+but issue is super unlikely and no one reported it) but mostly because
+this series is already 15 patches long.
+
+>> @@ -3690,8 +3778,8 @@ static int macb_set_ringparam(struct net_device *n=
+etdev,
+>>  		macb_close(bp->netdev);
+>>  	}
+>> =20
+>> -	bp->rx_ring_size =3D new_rx_size;
+>> -	bp->tx_ring_size =3D new_tx_size;
+>> +	bp->configured_rx_ring_size =3D new_rx_size;
+>> +	bp->configured_tx_ring_size =3D new_tx_size;
+>> =20
+>>  	if (reset)
+>>  		macb_open(bp->netdev);
+>
+> [Medium]
+> Should the return value of macb_open() be checked here?
+>
+> This patch adds a new failure point inside macb_open():
+>
+>     bp->ctx =3D kzalloc_obj(*bp->ctx);
+>     if (!bp->ctx) {
+>         err =3D -ENOMEM;
+>         goto pm_exit;
+>     }
+>
+> On failure, bp->ctx remains NULL and the interface stays down, but
+> macb_set_ringparam() ignores the return value and reports success to
+> userspace. The commit message says the motivation is to improve
+> reliability under memory pressure, but this caller silently swallows the
+> new allocation failure.
+
+No need, this series ends with context swapping and the
+macb_context_swap_end() operation, which replaces the macb_open()
+highlighted here, cannot fail.
+
+>> @@ -5039,6 +5125,12 @@ static int at91ether_open(struct net_device *netd=
+ev)
+>>  	if (ret < 0)
+>>  		return ret;
+>> =20
+>> +	bp->ctx =3D kzalloc_obj(*bp->ctx);
+>> +	if (!bp->ctx) {
+>> +		ret =3D -ENOMEM;
+>> +		goto pm_exit;
+>> +	}
+>> +
+>>  	/* Clear internal statistics */
+>>  	ctl =3D macb_readl(bp, NCR);
+>>  	macb_writel(bp, NCR, ctl | MACB_BIT(CLRSTAT));
+>
+> [Low]
+> Should bp->ctx->rx_ring_size, tx_ring_size and rx_buffer_size be
+> initialized on this path?
+>
+> macb_open() sets them from configured_{rx,tx}_ring_size and calls
+> macb_init_rx_buffer_size(), but at91ether_open() leaves them at zero
+> after kzalloc_obj().
+>
+> Helpers such as macb_rx_ring_wrap() compute:
+>
+>     return index & (bp->ctx->rx_ring_size - 1);
+>
+> which becomes index & 0xFFFFFFFF when rx_ring_size is 0. It happens to
+> be harmless today because the at91ether path constrains indices to
+> [0, AT91ETHER_MAX_RX_DESCR-1] independently and macb_get_regs() reports
+> zeroed head/tail for the tx-less at91ether, but pre-patch macb_init_dflt(=
+)
+> unconditionally set bp->rx_ring_size =3D DEFAULT_RX_RING_SIZE.
+>
+> Any future shared helper that used tx_ring_size as a stride or divisor
+> would misbehave on at91ether.
+
+Yes. Null impact (but it would be better in theory).
+
+>> @@ -5076,6 +5171,9 @@ static int at91ether_close(struct net_device *netd=
+ev)
+>> =20
+>>  	at91ether_stop(bp);
+>> =20
+>> +	kfree(bp->ctx);
+>> +	bp->ctx =3D NULL;
+>> +
+>>  	pm_runtime_put(&bp->pdev->dev);
+>> =20
+>>  	return 0;
+>
+> [High]
+> Is there IRQ synchronization missing before freeing bp->ctx on this
+> path?
+>
+> at91ether_stop() disables MAC RX/TX and writes IDR to mask further
+> interrupts, but does not synchronize with a handler already running or
+> already dispatched on another CPU. at91ether_interrupt() calls
+> at91ether_rx(), which after this patch does:
+>
+>     struct macb_rxq *rxq =3D &bp->ctx->rxq[0];
+>     ...
+>     desc =3D macb_rx_desc(queue, rxq->tail);
+>     ...
+>     p_recv =3D rxq->buffers + rxq->tail * AT91ETHER_MAX_RBUFF_SZ;
+>
+> If the handler is in flight when kfree(bp->ctx); bp->ctx =3D NULL runs,
+> the next access through bp->ctx faults. The macb_open()/macb_close()
+> path is somewhat protected by napi_disable() before macb_free(), but
+> at91ether does not use NAPI and has no equivalent barrier.
+>
+> Would a synchronize_irq(bp->netdev->irq) between at91ether_stop() and
+> kfree(bp->ctx) close this?
+
+Ah at91ether_interrupt() doesn't grab bp->lock as macb_interrupt() does.
+Indeed synchronize_irq() would solve this.
+
+Thanks,
+
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
 
