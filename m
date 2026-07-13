@@ -1,67 +1,98 @@
-Return-Path: <netdev+bounces-307105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307106-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id USyuJB6vVGqhpQMAu9opvQ
-	(envelope-from <netdev+bounces-307105-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 11:25:50 +0200
+	id XpXbNyexVGpTpgMAu9opvQ
+	(envelope-from <netdev+bounces-307106-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 11:34:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B91F4749443
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 11:25:49 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E4E97495C7
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 11:34:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b=M6Ua+eW1;
-	dmarc=pass (policy=none) header.from=debian.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307105-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307105-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=resnulli-us.20251104.gappssmtp.com header.s=20251104 header.b=jK3b4xZu;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307106-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307106-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2D5FC3031128
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 09:22:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7AE6330292F2
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 09:34:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FBF53DDDA3;
-	Mon, 13 Jul 2026 09:22:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4173E171F;
+	Mon, 13 Jul 2026 09:34:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC4A2F363F;
-	Mon, 13 Jul 2026 09:22:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E5E23E16A5
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 09:34:17 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783934542; cv=none; b=QL8YZ3qY7GWlwCy/csO1PJU8TJ88FmMxwrvlp3XH6279R0rXBRX+tU9o9TPsv/ndNR+jqxy06bQa35yj3TDuY4PojF0+/egxVgTxXIEx+yaQdlQ6CRVqZTO/wawr9roZQT6KsAWtCuctstZLbfevBxwfz0diH52xfToOyhp/1Jg=
+	t=1783935260; cv=none; b=rgl7B1iNrK3OrfKkjve3jthlAnrPvbEQm6uSps0cAfGbvzxWf5wCuNOxVHvor8omH3WFsab0Y0srzzuXaiAFiHrl4P+WZ9UXll3srXyw2ZVyQdX/Sir8hZUzNmebS+Iw2dXf76jCffQaMxWRYCQRFoB72jTgB96rI8Xflhw79jo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783934542; c=relaxed/simple;
-	bh=qP8XOitE3bvhG4/VIko6r5b2wuxJRhlBiaYBGv1++mU=;
+	s=arc-20240116; t=1783935260; c=relaxed/simple;
+	bh=/T6nGTlY9/Sd8116vHsTUgpGQQf+hD3A6HYvzjdH4E0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ql515TV3CrG1W/p0ZtELrUZWhMyxE9XAz1VG7M0luptBDIeH8tMV/sCP9nvzARbo9RGFUVDWA/QRZdbn1wGPpJH0Xpe1JDKiTBRsWP173IbDJokfnUlVqZs2051K1fd2ASikW5eV1kMHc+6LMRa53bmAhCVQkBZGbhMbNrRSQSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=M6Ua+eW1; arc=none smtp.client-ip=82.195.75.108
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=C49UCBnagYi0u9epW2utXyNEG2RnPuwvn7fBwawWwtc=; b=M6Ua+eW1F6A9fxLU+ZwM+gg6n1
-	T7mYb5jtfJ3Yz9DLATL6teTLdNtdFxWVZq7BxdPvGfVlIIDcqSyaGe6N4+AlOUYOrSXy8HtxemKey
-	8pJg6AMZ0Bp2fErWB5POzBuzRK9OjRQqM7V3nv+DxL2Ib+hUoZXtTTD8GUmyJNEvb7Ga3zZxByJgp
-	P671arP1zGFB+1S20R+1i7ay9jKxQShlIF2kR3RvWt7Lk48/6xF4OnsTK/FmOj1eZOrRtw2swkHBF
-	RlctKSgJDHTNpSKX2Y5um71jBG/OpK3HBl8KWpTKwajLlpCc5sqB2IKUTBoXKgacxdiFWLL9XPyBp
-	UuDfMwiQ==;
-Received: from authenticated-user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wjCrc-001Oj8-1d;
-	Mon, 13 Jul 2026 09:22:12 +0000
-Date: Mon, 13 Jul 2026 02:21:59 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Andre Carvalho <asantostc@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	matttbe@kernel.org
-Subject: Re: [PATCH net] selftests: netconsole: only restore MAC when it
- changed on resume
-Message-ID: <alStwYm2uAU6yugK@gmail.com>
-References: <20260710-netcons-mac-reload-v1-1-3fb1bcc70b4a@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=CZctQN1Ex/mLDe7e4+oSsbKNJ0bWMsPbN+TpZ9eJkVaCGpIl1a09PzeJSI6BO+DJKs4/fd5GFvpGn5qvGwtZHiMw19rABfh0i58w4KT0CW7WX8bAYGI1VIZ3pweZWFnuOUZaIYiXnXEdqbDHHpc8/KsODGThsTaEuuzMo+1BYGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=jK3b4xZu; arc=none smtp.client-ip=209.85.167.42
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5b013084dc2so2322036e87.0
+        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 02:34:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1783935255; x=1784540055; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=JO+WCMaAc1ZEkPF4Q2mmZ3+RjhHJAnIrQtg7/j50Rd8=;
+        b=jK3b4xZuqPyzHx3pRi1OBVkyNbBxF721SyuQkKQZ4lsI0ymUF0PC99M6/kVcYeyy5O
+         uf0mqWJ7g3pWcaW+S+cvotn/Ml94T4Ax8DxEfAdzv266YoT1pvKja3gjs3g7R6f3qJwi
+         5VSR/NfEODcueUMVixXaU0BGP7xc8Jrp/cOvN7ip1DIeqFCwWQK78If5FKAahUR2OZJ7
+         +TYmqJpthqralDYs2bSltZVWk85MQhu8WgjKDBaQH418HNtSIMwPghtnk3UOOZmLnme/
+         gs1ua3FWUCHTy8y0CPDBF9alsyHpcDcDf8ti/Q0Dkl9kQ25Ar+TF+qq0zhZL5/bIK9rg
+         GpCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783935255; x=1784540055;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=JO+WCMaAc1ZEkPF4Q2mmZ3+RjhHJAnIrQtg7/j50Rd8=;
+        b=Vvvk5BRpnQES7AZiFfEoVNXRgsQgW1DGTOnaz3nzkUp5luJu/3d/0aypSPG5L6pgwQ
+         ckeabYEouFr6Q5LPIqtKWTM/neP3BwdcGz7+U47dtNrK0uMqZ1nuGIPq2EPznoksnFV5
+         COeoOJOFRoaOB+8pSt1aQKvCYwvfMVKA0x6fTx0xObsmOCQjmr/8Tvh2gRhh+0zExpOG
+         veQNUZEgYFUD0Or0pMtgCV15zk1Auj6pWEJG//Dc+Exd7MN0gd5osm8F5dujaKniRZqN
+         E9jwhizg2WCN7RsDSHGAG2UqVbSiA3cIPiVPfK5Ambs2Q++QEHPmkOgxzCLlY9O9AfoY
+         dvyg==
+X-Forwarded-Encrypted: i=1; AHgh+RrTJEch7LoYB0StWlu72zumAPzbUmNlRg+a8B3YVd+3eyeaCvCxeV0ApwvMtBs94MbuM68Ro/A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypnN1ig2TDRXFJhpJYY4W1Ynvi/r9vxD1ZaUS3HIQI7+M3MFmI
+	AZgTSW8k26ulnmP0ZXSqEz+gQH5jsqFQp2sIv3ruU/ymSWeTqYWBgBd5h0vhHt5rxGA=
+X-Gm-Gg: AfdE7cns7hW6wkMY+i6ll2fgCHtkIvnJ2AiftKjLyX5TgBJ1JWgm0m2Y6zD7k5IgCDR
+	a+k9ipDb2ELWb5ed6JvteFx7WhyQQgQvI9bjS+n1yKDYo5YLhyifjZffAGZ9vmd53pGKSxEfsgE
+	mlqdjBoN8NXamfW5k0iyO69TWA969ZnSdUwINJC3QwtebsQUq3QcDfD+spVP3DqL8BleXHPSTnW
+	+AU6+ORxTLc0lQNFW+k143j0Bl2pTcsAxe0jGcmkMx2mUBmeJ116HCrvXf13pKMUsdJJsbBWXks
+	4qRbNVOHA/BGdECyDJ8OZ/Dd7f7tf7VaagbAiTM/CtEPWdpiX5s5QubhkQMYIvaej1RxDZiaPUI
+	y692nyfCeFnk6rj8xfXfbkdmIlRnOPHwWvRcTpoYRVF+K9FBMcIiIYX0r/9PLIBOhcUFf0fCYFy
+	mVIzNtKIhjaVqRgjMTzF8mPQ==
+X-Received: by 2002:a05:6512:519:b0:5b0:1af0:2a2a with SMTP id 2adb3069b0e04-5b0236bd3a7mr1125113e87.61.1783935255328;
+        Mon, 13 Jul 2026 02:34:15 -0700 (PDT)
+Received: from localhost ([140.209.217.211])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5b01ca4a572sm2679126e87.2.2026.07.13.02.34.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jul 2026 02:34:14 -0700 (PDT)
+Date: Mon, 13 Jul 2026 11:34:10 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+Cc: linux-rdma@vger.kernel.org, cgroups@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	jgg@ziepe.ca, leon@kernel.org, parav@nvidia.com, mbloch@nvidia.com, 
+	cmeiohas@nvidia.com, roman.gushchin@linux.dev, bvanassche@acm.org, 
+	zyjzyj2000@gmail.com, shuah@kernel.org, tj@kernel.org, hannes@cmpxchg.org, 
+	alibuda@linux.alibaba.com, dust.li@linux.alibaba.com, sidraya@linux.ibm.com, 
+	wenjia@linux.ibm.com
+Subject: Re: [PATCH rdma-next 08/13] RDMA/cgroup: Scope rdma cgroup device
+ visibility to the net namespace
+Message-ID: <alSxB0wziQnNuyfn@FV6GYCPJ69>
+References: <20260709095532.855647-1-jiri@resnulli.us>
+ <20260709095532.855647-9-jiri@resnulli.us>
+ <ak-Z071LrWhnI5lK@localhost.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,70 +101,99 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260710-netcons-mac-reload-v1-1-3fb1bcc70b4a@gmail.com>
-X-Debian-User: leitao
+In-Reply-To: <ak-Z071LrWhnI5lK@localhost.localdomain>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_RHS_MATCH_TO(1.00)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307105-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:asantostc@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:matttbe@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[debian.org:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:mkoutny@suse.com,m:linux-rdma@vger.kernel.org,m:cgroups@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-s390@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:jgg@ziepe.ca,m:leon@kernel.org,m:parav@nvidia.com,m:mbloch@nvidia.com,m:cmeiohas@nvidia.com,m:roman.gushchin@linux.dev,m:bvanassche@acm.org,m:zyjzyj2000@gmail.com,m:shuah@kernel.org,m:tj@kernel.org,m:hannes@cmpxchg.org,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,s:lists@lfdr.de];
+	DMARC_NA(0.00)[resnulli.us];
+	FORGED_SENDER(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-307106-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,ziepe.ca,kernel.org,nvidia.com,linux.dev,acm.org,gmail.com,cmpxchg.org,linux.alibaba.com,linux.ibm.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[FV6GYCPJ69:mid,resnulli.us:from_mime,resnulli.us:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B91F4749443
+X-Rspamd-Queue-Id: 6E4E97495C7
 
-Hello Andre,
+Thu, Jul 09, 2026 at 03:04:23PM +0200, mkoutny@suse.com wrote:
+>Hi.
+>
+>On Thu, Jul 09, 2026 at 11:55:27AM +0200, Jiri Pirko <jiri@resnulli.us> wrote:
+>> index 993446ab66d0..4523c1884d67 100644
+>> --- a/Documentation/admin-guide/cgroup-v2.rst
+>> +++ b/Documentation/admin-guide/cgroup-v2.rst
+>> @@ -2752,6 +2752,13 @@ RDMA
+>>  The "rdma" controller regulates the distribution and accounting of
+>>  RDMA resources.
+>>  
+>> +When RDMA devices are isolated per network namespace (exclusive mode),
+>> +device names are unique only within a network namespace. The device lines
+>> +below are therefore scoped to the reading or writing process's network
+>> +namespace: only devices accessible from that namespace are listed, and a
+>> +limit is applied to the device of that name in that namespace. Configure
+>> +limits from the same network namespace as the workloads.
+>
+>OK.
+>
+>> --- a/include/linux/cgroup_rdma.h
+>> +++ b/include/linux/cgroup_rdma.h
+>> @@ -7,6 +7,7 @@
+>>  #define _CGROUP_RDMA_H
+>>  
+>>  #include <linux/cgroup.h>
+>> +#include <net/net_namespace.h>
+>>  
+>>  enum rdmacg_resource_type {
+>>  	RDMACG_RESOURCE_HCA_HANDLE,
+>> @@ -34,6 +35,15 @@ struct rdmacg_device {
+>>  	struct list_head	dev_node;
+>>  	struct list_head	rpools;
+>>  	char			*name;
+>> +	/*
+>> +	 * Net namespace the device belongs to. @netns_shared mirrors
+>> +	 * ib_devices_shared_netns: when true the device is visible from every
+>> +	 * net namespace (shared mode); otherwise @net is the only namespace
+>> +	 * that may see and configure it. @netns_shared is updated when the
+>> +	 * sharing mode changes, so use {READ,WRITE}_ONCE() to access it.
+>> +	 */
+>> +	possible_net_t		net;
+>> +	bool			netns_shared;
+>
+>Any reason to store the netns_shared split per device? (IIUC, it's a
+>global parameter.)
 
-Thanks for the fix.
+No reason, changed.
 
-On Fri, Jul 10, 2026 at 11:19:17PM +0100, Andre Carvalho wrote:
-> The "mac" bind mode reactivation downs the interface, restores the saved
-> MAC and renames it to trigger a target resume. This assumes the recreated
-> interface comes back with a different MAC, which is true under
-> MACAddressPolicy=none (as on the Netdev CI) but not when MACs are
-> persistent. In the persistent case netconsole resumes the target on its
-> own, and the down/restore/rename flow instead drops it and fails the test.
-> 
-> Guard the block on the MAC having actually changed so the test passes
-> under both policies.
-> 
-> Fixes: 6ecc08329bab ("selftests: netconsole: validate target resume")
-> Reported-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> Closes: https://lore.kernel.org/netdev/f398373e-2cb4-4649-a491-9763df94d98b@kernel.org/
-> Signed-off-by: Andre Carvalho <asantostc@gmail.com>
+Thanks!
 
-Reviewed-by: Breno Leitao <leitao@debian.org>
+>
+>Thanks,
+>Michal
 
-FWIW: netdev CI got yellow for this patch, but, this is not realted to this
-test.
 
-https://patchwork.kernel.org/project/netdevbpf/patch/20260710-netcons-mac-reload-v1-1-3fb1bcc70b4a@gmail.com/
 
