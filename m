@@ -1,201 +1,245 @@
-Return-Path: <netdev+bounces-307242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307243-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 17/+H98PVWocjgAAu9opvQ
-	(envelope-from <netdev+bounces-307242-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 18:18:39 +0200
+	id aCwHEHgQVWpQjgAAu9opvQ
+	(envelope-from <netdev+bounces-307243-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 18:21:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F035474D81A
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 18:18:38 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E2AC74D89A
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 18:21:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=lsivhO4L;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307242-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307242-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=oluFiQoF;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307243-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307243-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 41B6B30309B8
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 16:18:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D83CF30591B5
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 16:19:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5134E409624;
-	Mon, 13 Jul 2026 16:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D4F40BCA9;
+	Mon, 13 Jul 2026 16:18:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24D0D339872
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 16:18:05 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783959488; cv=none; b=aRWO93rqTHziCCr0Fr0MTaFXpjkiX9/Z5zNe2YPKibACoZgtjlTXVlt03IV07Bzn6G7zbggDIBr12JXxw3NYaL/G2NbvYi+HGMbfVNVGBi0CHFOpMVihOEibDOt+DeLEM2uWq9kriDT4RvbiT8DlQmF3feKPafgRutBpL812Puo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783959488; c=relaxed/simple;
-	bh=tGG0MiHN5UuJi2ociiaK6WiVbWCScdsB+jhAN+MFscQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CauDdLpCYuMQnYezAV882y0Bn5tOi3/oYo5NNLef3wUgyFMuL2+Tz31aeBBaK/eR2SsmVpNNgfvIr8PevJOpJ6S7ZY++gabAN+5+AxdI7ABV6RVbaFZ80D878XrRyOAy+jN4aSg1shbOb49uGovdybS6XpGx6O1NCf2hfvdDNWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lsivhO4L; arc=none smtp.client-ip=209.85.210.170
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-848743155bcso32860b3a.0
-        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 09:18:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E331240756E
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 16:18:56 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783959539; cv=pass; b=WjWCfeiQvSMhLZNCX3oVFWVfTwwyWl8YAEgff8EtYQVnsbvdkAyqLg4AxYrCEw9LzvFLyoXsxrnsBzjIMMWyPUdUXLUXbVH5wapj1Tr8el0i0M8AA0DSR2GL8WiRHd8ClwQ6AsPRtQSWefDCKVDMr8nkjxGvkhdGe0SvfjNlBy4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783959539; c=relaxed/simple;
+	bh=IgUBDAc7uROr6GpgG1hnysnVvrlnG6dWZhfdYiIRH5M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Pt5jbmQV0yIe9se54ot5Iuh14odNY694OwbJ4GhTv+VC2B0zV7E9aRhGjvK7KlCQxbINb5ZkbSCAnzT9/QE+nehUNz67jGyuXVWGNu1EJ5Fi8HPRa74hrSPTz1HUg3XCnyVeyiE0pnoWsEPrU9zz+ZwhNkZmsA3trjDU0wDHcq8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oluFiQoF; arc=pass smtp.client-ip=209.85.218.42
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-c15d5468673so15173866b.0
+        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 09:18:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783959535; cv=none;
+        d=google.com; s=arc-20260327;
+        b=p3WmOvel34rwQVoy0xhDGRNi6L82HFwGR4TZuDEoBAosy1vsg+Qo+wk0WCG9zPPWp5
+         itGVE/vwfFEqdk08VZ/YxJlFBHjbjGCrIH1fehsIdGCEWPi2osevwmx5/ZfSVPhwZi0r
+         i2duT1e80sMIIfs2fJSAihOssotFDTLfHcszVWLiqQV7hoRKIY5o+c7BZM8VW3tVFxON
+         vizKJYfElhoFTL3hoBMlkEPQZ+lCZoAKKdadmBo7Kc0jpjvwTODE2ABKlpe6zJrap5CX
+         XMId3OTtEg/sag55V5fkZY5ogxBU5DIOduBjCCecNMdijoNZsxYVY7Xtnz8DloX1PgvX
+         uZXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=9543NKwiKLQgsi8qtC001tzOTSQxH1KY7XkZdcSvQ5g=;
+        fh=4/cmxA0ZsVjKAH90kxLLH8zQIPMihrnm3kws1yd3UxY=;
+        b=ZCpTKr71XYvgqfe7cDWuey6Or3lZwoWE+dVYEt31SUIB3p2DMGMv5CgTanahJAzjl7
+         sNbGfIFThmMjmCG+Z0f/Cld5lf3vWsYcS76rRlZrDAKrVQTBx/9+ktxz3fOTW92zLT83
+         wFS4Al3c4EG6FacYixU7z/qTwRDFI6uj7jZPjUbp5k2rCds0+1Ayy76WdK37BX6UfQY3
+         wAnCdsUd3dpOBL0k0vwcCXBbW0eK3lI8G6f4UCOLhkIZN39LBbXF3gO+3j4JdXhrXvuJ
+         1FScDdf1tS0qYkgpq3A8ddmq8H9l6WOEveCZdFUXpExkb9eTbgdZELq/+mcWl2B54H4m
+         Xakw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783959485; x=1784564285; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=gC15aP2K1fPrSjv7xk93lFLdSIjrxFOeu3cF6pP3adg=;
-        b=lsivhO4LBOM5Nhbaonp9n+St27MCZMo9bAjhWVroii5p8C00WXOuktYah8qzD5yRHy
-         Us2fDKfnbyk+OywKaZz9ZMFqc6pn9cvIcJv7addycGgTeFnOVPF54cpzm8ywV0ebZyZ6
-         eCNMIO6pyyYx0K2YlYMv3X1npmmGnQvxUmcr0edGXlbYLwT2enMvTBLdjKimJpI9/rBJ
-         CX12HcSACJS6Ga5uni1heEvaDfl1CJHiqqi/NCKEl+wA0FV03xU04qjRQCHFw5Pp1Duy
-         37EotHlmGD+KrK0glX2Ce6wkZDCtzB6h+KkBRMCPn6gpSOB92h/iGFdAmlrLYZXT3VNA
-         R1tw==
+        d=gmail.com; s=20251104; t=1783959535; x=1784564335; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=9543NKwiKLQgsi8qtC001tzOTSQxH1KY7XkZdcSvQ5g=;
+        b=oluFiQoFYYG44r0ELqIzMDSdOfXhcfK/1ZpAgwPQEOAdAZFsjWN4n/Y9gcZUvpIMjo
+         urAIBVl41pOrgBfAOKgP7121xQKKuAP38ZQdnR1Br2l/rhsExXVnmreCvMSCIyLhG8Rl
+         rT9KPWRzX2y1DBGiuvHDSdw3MI9475mdLayVxny/7qtPbJEo18D8IFUMudxGtwlZUysv
+         mOy+lUlXoOVOY6CkoJT82m4DBZV3URGPpT6wjDh/mPuVmQ5tpxf736kUGJDkAQfDQ4+3
+         BJERIacKsBclYNGKAYZCYeHEk4n6zXB1f7r3GnkexZTBc/wTs+egNVRXZl2yalKIFTBi
+         HWBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783959485; x=1784564285;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=gC15aP2K1fPrSjv7xk93lFLdSIjrxFOeu3cF6pP3adg=;
-        b=NmoKiaFvDfyhvcg8cYBZMUSILs2JPpnwGC+yAXVzIAj1Jyn7tYn1eFO7ryPSNcjUBY
-         sLzPYFC3nuQv9IDmvRJy2pCWJflZbr0eklhGWZOJLFASvODilffhCe2NzZUXyCIYXs3c
-         0WjE33GvYxquhykX+Oeuw90Ax0f7XHSM3JNZfZBK6JcWdSpwNm37WfMizRqYTcO+ZV/2
-         w84K9HTiWk/mwSwcbBA5kYeKGouHbgBwqQm4ERrnA/Lsb+1OpU1SNRzo63+spoE7A+VI
-         5VWAXhPpRTU6aBmEJuu5FyN8v1efpMcvPKzsxH11MxyvqY05wGRQdFV8kwv+0kKGagbu
-         eKSg==
-X-Forwarded-Encrypted: i=1; AHgh+RqS3rwBj9XgLgZAelhg1hQGphygPWsxfXyGvPlK48KxJXOYPdnxVQ+PP5HN/zMjHcDQf4YDOxY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQTtSm3q9XtSbhRn5UtJi3Bz4cmtQ6MAm/XHYkMot4+FohT/Ma
-	Ox9FWq6EWrX9n5tXpWzZUND/gcdQ0G+zLa1TTzwYeVBrsGpGnk4G93Ua
-X-Gm-Gg: AfdE7clQC/go43xlDB238cranAeeIeRIl7DWlZtjCQq7elIQ4ZzJMJ2D2ky4l0OoL8w
-	JYcszoRdxHK4T0b4+xUsfmC5kkRTXK9fb8U5tD0HwMEVsmDIoFj80aE6s40z5+2028aTOVpJed5
-	T24sw3F9fIQD+T9JnhiRAIBKYxrpZvLu2TNvcD3wR+3b3vSROB1CGBB/9YGnAELwnAULNJ7W+DL
-	uE/0PeO2BUE0yhAfDlOErYTktnFrak7wnM9uJDy9AiwYDJ2DPKLml1fPAi/wb+cZp1kWYDo7nib
-	Ycs1aFApGQX/OtYBuusn3ZtUd53Re5JF1Hi/lxY8Btq4PpAOgFrf+Do29n3o+Jf+zFaJc2UJAVT
-	RxnbPevXHeyACFguqmh2mNOD5zncdQiAYNmFPAPM9r9+6k9ZXWgDxfb08uNgRB26AezoOXBO5RT
-	Taed8E/Ew4VEzCTeZbuq4NDYrJBVTjp2Fo9bsP+YqsUUN5u/mLJQ5xqSPOgQ==
-X-Received: by 2002:a05:6a21:4cca:b0:3b4:8a40:85ed with SMTP id adf61e73a8af0-3c11077686bmr9741481637.7.1783959485390;
-        Mon, 13 Jul 2026 09:18:05 -0700 (PDT)
-Received: from fx.tailc0aff1.ts.net ([206.206.192.132])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-313cb804197sm23026406eec.13.2026.07.13.09.18.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jul 2026 09:18:04 -0700 (PDT)
-From: Weiming Shi <bestswngs@gmail.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>
-Cc: netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Xiang Mei <xmei5@asu.edu>,
-	Weiming Shi <bestswngs@gmail.com>
-Subject: [PATCH nf-next v2] netfilter: ipset: skip extension destroy on hash resize replay
-Date: Mon, 13 Jul 2026 09:15:28 -0700
-Message-ID: <20260713161527.3529006-2-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <PASTE-JOZSEF-MESSAGE-ID-HERE>
-References: <PASTE-JOZSEF-MESSAGE-ID-HERE>
+        d=1e100.net; s=20251104; t=1783959535; x=1784564335;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=9543NKwiKLQgsi8qtC001tzOTSQxH1KY7XkZdcSvQ5g=;
+        b=jBueJeWMIuClGMk/1RjHzGKKKX5xF7BoazE4wMGE8pY3gQnzJ+EW/gIj7q/EpDLGey
+         esuAr7rXqV7T/docun1ZaH1x1zSTDtI7l+APLEWYCS4ZIdOeP4B+6vP80djq/SRISl1l
+         Ma0S3EtAfzKXoqieasspW/uooi5qqLn7setHz6cu4SWG4aE1tdG02FPo7M8+pJeWFU97
+         r+AxnfIxLpIWhSEenlWUXzAsx98XN24VKZ3tb+FmahDgrm9xywR4eHmQbsru1nNYqZxs
+         owFLCHBwfkQQ93BuzSVc17IzggVALx70opl2mm+79a8crEOkIF6H1qpF+SpFevKa5yS+
+         GaDg==
+X-Forwarded-Encrypted: i=1; AHgh+Rq89MiS5ovUC/CGfAXMGE9Sdm0U6aiF+u2tVExOePnX4pmNAf4P0kmiuK9Hjlfw6aNXDvgfKuE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTpRJrYftTpw8dmZffWKcFdwtGQQWBXb8ajX1/x1Ku1CqlxzHy
+	guG0GuO6c7pQn8rCBiDK5i4maRxUQormvpat4UnZQrSRySpvOleFKoGBimX4mf6+AkWEEcewxS2
+	S98FNBMSBmcEf28VFUX/W19B3WnuFRtE=
+X-Gm-Gg: AfdE7cmMZ/Yz3X6D30jChq0nL2SDVGWwl1uWmUs7iYe5VTNWXuwebMlh1oRGIgzWjGK
+	BtJ4cDVd+e0S6fDIEsVXE0FvaQAMKDsRDhJOe5DCDmY9K2KTwT7vZIEfmWs0L2HDOF0OC3+26zG
+	8+3I/1Ub4NybbiTMWPh8hqzGs2qNIGBCIigss0KDM0dc+prXK2Y/hs6Be1BhVR7jilSwPxJ2bJf
+	P0aRfeAfklfRc1lyTxvT1kC2SPvejfa6diCSI3yRD08o4Co56OHaEu/NFO4DWkcwel959sEmfYN
+	2neK/uI6RVHZ/j1+QekUVg5LbXzk
+X-Received: by 2002:a17:907:94cf:b0:c16:242a:472f with SMTP id
+ a640c23a62f3a-c16242a5889mr387661666b.23.1783959534948; Mon, 13 Jul 2026
+ 09:18:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260704062234.2625208-1-bestswngs@gmail.com> <e3bb8ad1-cb24-5d74-6ca6-a7a1e41fb133@blackhole.kfki.hu>
+In-Reply-To: <e3bb8ad1-cb24-5d74-6ca6-a7a1e41fb133@blackhole.kfki.hu>
+From: Weiming Shi <bestswngs@gmail.com>
+Date: Tue, 14 Jul 2026 00:18:16 +0800
+X-Gm-Features: AUfX_mwmodbrNCtcVBLuQvOELt3jqNJGuYrMFhI_EA5_XzVr_n3M1ChoNx00WdE
+Message-ID: <CANgPUi1akLRZjwTxw_7_JzBs2tgDx5k5M32vE3hosmkfhkM+aw@mail.gmail.com>
+Subject: Re: [PATCH nf] netfilter: ipset: skip extension destroy on hash
+ resize replay
+To: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Xiang Mei <xmei5@asu.edu>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,netfilter.org,asu.edu,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-307242-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:kadlec@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:xmei5@asu.edu,m:bestswngs@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-307243-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:kadlec@blackhole.kfki.hu,m:pablo@netfilter.org,m:kadlec@netfilter.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:xmei5@asu.edu,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:email,vger.kernel.org:from_smtp,mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,kfki.hu:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F035474D81A
+X-Rspamd-Queue-Id: 9E2AC74D89A
 
-During a hash set resize, mtype_resize() copies each element into the
-new table with memcpy(), so the new-table element shares the old-table
-element's comment extension.  An xt_SET delete on the old table during
-the resize destroys that shared comment via ip_set_ext_destroy() and
-queues a replayed delete on h->ad.  After the table swap mtype_resize()
-replays it with mtype_del() on the new table, whose copy still points at
-the freed comment, so ip_set_ext_destroy() frees it a second time:
+Jozsef Kadlecsik <kadlec@blackhole.kfki.hu> =E4=BA=8E2026=E5=B9=B47=E6=9C=
+=8813=E6=97=A5=E5=91=A8=E4=B8=80 20:59=E5=86=99=E9=81=93=EF=BC=9A
+>
+> Hi,
+>
+> On Fri, 3 Jul 2026, Weiming Shi wrote:
+>
+> > During a hash set resize, mtype_resize() copies each element into the
+> > new table with memcpy(), so the new-table element shares the old-table
+> > element's comment extension.  An xt_SET delete on the old table during
+> > the resize destroys that shared comment via ip_set_ext_destroy() and
+> > queues a replayed delete on h->ad.  After the table swap mtype_resize()
+> > replays it with mtype_del() on the new table, whose copy still points a=
+t
+> > the freed comment, so ip_set_ext_destroy() frees it a second time:
+> >
+> > ODEBUG: activate active (active state 1) object: ... object type: rcu_h=
+ead
+> > WARNING: CPU: 3 PID: 5311 at lib/debugobjects.c:514 debug_print_object
+> > Call Trace:
+> >  <IRQ>
+> >  kvfree_call_rcu (kernel/rcu/tree.c:3825)
+> >  ip_set_comment_free (net/netfilter/ipset/ip_set_core.c:397)
+> >  hash_ip4_del (net/netfilter/ipset/ip_set_hash_gen.h:1098)
+> >  hash_ip4_kadt (net/netfilter/ipset/ip_set_hash_ip.c:96)
+> >  ip_set_del (net/netfilter/ipset/ip_set_core.c:813)
+> >  set_target_v3 (net/netfilter/xt_set.c:412)
+> >  ipt_do_table (net/ipv4/netfilter/ip_tables.c:346)
+> >  __ip_local_out (net/ipv4/ip_output.c:119)
+> >  icmp_push_reply (net/ipv4/icmp.c:397)
+> >  __icmp_send (net/ipv4/icmp.c:804)
+> >  __udp4_lib_rcv (net/ipv4/udp.c:2521)
+> >  ip_local_deliver (net/ipv4/ip_input.c:254)
+> >  ip_rcv (net/ipv4/ip_input.c:569)
+> >  </IRQ>
+> >
+> > The replay passes a NULL ext (the kernel-side delete that queued it
+> > already destroyed the extensions), so skip ip_set_ext_destroy() when ex=
+t
+> > is NULL.  This also avoids the NULL ext->target dereference that was on=
+ly
+> > kept safe by the new table's ref being zero.
+> >
+> > Reachable from an unprivileged user namespace.
+> >
+> > Fixes: f66ee0410b1c ("netfilter: ipset: Fix \"INFO: rcu detected stall =
+in hash_xxx\" reports")
+> > Reported-by: Xiang Mei <xmei5@asu.edu>
+> > Assisted-by: Claude:claude-opus-4-8
+> > Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+> > ---
+> > net/netfilter/ipset/ip_set_hash_gen.h | 6 ++++--
+> > 1 file changed, 4 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/net/netfilter/ipset/ip_set_hash_gen.h b/net/netfilter/ipse=
+t/ip_set_hash_gen.h
+> > index 5e4453e9e..bc909ae2d 100644
+> > --- a/net/netfilter/ipset/ip_set_hash_gen.h
+> > +++ b/net/netfilter/ipset/ip_set_hash_gen.h
+> > @@ -1080,9 +1080,11 @@ mtype_del(struct ip_set *set, void *value, const=
+ struct ip_set_ext *ext,
+> >                       mtype_del_cidr(set, h,
+> >                                      NCIDR_PUT(DCIDR_GET(d->cidr, j)), =
+j);
+> > #endif
+> > -             ip_set_ext_destroy(set, data);
+> > +             /* On a resize replay the extensions were already destroy=
+ed. */
+> > +             if (ext)
+> > +                     ip_set_ext_destroy(set, data);
+> >
+> > -             if (atomic_read(&t->ref) && ext->target) {
+> > +             if (ext && atomic_read(&t->ref) && ext->target) {
+> >                       /* Resize is in process and kernel side del,
+> >                        * save values
+> >                        */
+>
+> Please rebase your patch against the nf-next tree
+> (git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git): th=
+e
+> second chunk of your patch is not needed as it has been fixed.
+>
+> Thank you and best regards,
+> Jozsef
 
- ODEBUG: activate active (active state 1) object: ... object type: rcu_head
- WARNING: CPU: 3 PID: 5311 at lib/debugobjects.c:514 debug_print_object
- Call Trace:
-  <IRQ>
-  kvfree_call_rcu (kernel/rcu/tree.c:3825)
-  ip_set_comment_free (net/netfilter/ipset/ip_set_core.c:397)
-  hash_ip4_del (net/netfilter/ipset/ip_set_hash_gen.h:1098)
-  hash_ip4_kadt (net/netfilter/ipset/ip_set_hash_ip.c:96)
-  ip_set_del (net/netfilter/ipset/ip_set_core.c:813)
-  set_target_v3 (net/netfilter/xt_set.c:412)
-  ipt_do_table (net/ipv4/netfilter/ip_tables.c:346)
-  __ip_local_out (net/ipv4/ip_output.c:119)
-  icmp_push_reply (net/ipv4/icmp.c:397)
-  __icmp_send (net/ipv4/icmp.c:804)
-  __udp4_lib_rcv (net/ipv4/udp.c:2521)
-  ip_local_deliver (net/ipv4/ip_input.c:254)
-  ip_rcv (net/ipv4/ip_input.c:569)
-  </IRQ>
+Hi,
 
-The replay passes a NULL ext (the kernel-side delete that queued it
-already destroyed the extensions), so skip ip_set_ext_destroy() when ext
-is NULL.
+Thanks for your review. v2 sent.
 
-Reachable from an unprivileged user namespace.
-
-Fixes: f66ee0410b1c ("netfilter: ipset: Fix \"INFO: rcu detected stall in hash_xxx\" reports")
-Reported-by: Xiang Mei <xmei5@asu.edu>
-Assisted-by: Claude:claude-opus-4-8
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
----
-v2: Rebase onto nf-next; drop the second hunk (already fixed there).
-
- net/netfilter/ipset/ip_set_hash_gen.h | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/net/netfilter/ipset/ip_set_hash_gen.h b/net/netfilter/ipset/ip_set_hash_gen.h
-index 5e4453e9e..bc909ae2d 100644
---- a/net/netfilter/ipset/ip_set_hash_gen.h
-+++ b/net/netfilter/ipset/ip_set_hash_gen.h
-@@ -1080,7 +1080,9 @@ mtype_del(struct ip_set *set, void *value, const struct ip_set_ext *ext,
- 			mtype_del_cidr(set, h,
- 				       NCIDR_PUT(DCIDR_GET(d->cidr, j)), j);
- #endif
--		ip_set_ext_destroy(set, data);
-+		/* On a resize replay the extensions were already destroyed. */
-+		if (ext)
-+			ip_set_ext_destroy(set, data);
-
- 		if (t->resizing && ext && ext->target) {
- 			/* Resize is in process and kernel side del,
---
-2.43.0
+Best regards,
+Weiming Shi
 
