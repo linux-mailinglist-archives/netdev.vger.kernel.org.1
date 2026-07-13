@@ -1,327 +1,187 @@
-Return-Path: <netdev+bounces-307157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307158-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id CSc/CVfgVGoKgQAAu9opvQ
-	(envelope-from <netdev+bounces-307157-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 14:55:51 +0200
+	id PgEbB8PjVGpCggAAu9opvQ
+	(envelope-from <netdev+bounces-307158-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 15:10:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64C2674B280
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 14:55:50 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5270F74B597
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 15:10:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=akqST7Ud;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307157-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307157-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
+	dkim=pass header.d=blackhole.kfki.hu header.s=20151130 header.b=jVlsp5vD;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307158-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307158-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=blackhole.kfki.hu;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B49A930379A5
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 12:54:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0C7A5302D4C9
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 13:05:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 667D2407CCA;
-	Mon, 13 Jul 2026 12:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C76F41325C;
+	Mon, 13 Jul 2026 13:05:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8513F58D9
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 12:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80090413221;
+	Mon, 13 Jul 2026 13:04:58 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783947248; cv=none; b=lEtndNPTJdiUD3bL+Bi2B6a0avmLWaAm0HWhUPNR4PYkoeQ2rOyxtmr4ZZxmSWuFNlSznkvb/DVSnBFLIzpwhVsvRwznCnFZadOPusipqPKz64SaXZY+c1EPmeWimGG413hZkA+quu7hf0Yedsm3xWqfAePU/fYC+Rw0g+t3/4U=
+	t=1783947902; cv=none; b=O1qf+QZC4YKVaIj4pORHOSod7bjDoA7NCoxsolOgKfD8eroHhgTae0N+4UVPJu3mh3A/7LrfzbXPvj+6fPVK6nuGwCZLFlze2O2WD/hXE+JXaelRsyiiGdcdFyin2NwHPA89L7cZp1BPofVOG1tjhEZ6cu2kVkTg8C39EdTJk3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783947248; c=relaxed/simple;
-	bh=OehZxVccAC4wd2LYjDLh/JhSucxZ1vPgwbdr9jlaUfw=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=OQNhASR6e8AVSyFwW7k7XDQjjQ0Srad2smUHzNNC6bUGH4+v9+zxrFdGgCP9oPuWiDWkxVeW4PU1IkLvSfcmAz5VUdfWXHUz3Dq7Sp8BXkzgJMc1EGmjxWAT0oISRCgFdu9/OskKaho2VaXGshbgpQdDbkcDAB/monoTBA9PvFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=akqST7Ud; arc=none smtp.client-ip=185.246.85.4
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 4DCDF4E40D89;
-	Mon, 13 Jul 2026 12:54:03 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 0782760341;
-	Mon, 13 Jul 2026 12:54:03 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C2CDB11BD065D;
-	Mon, 13 Jul 2026 14:53:56 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1783947241; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=Mj3k62TTmvevSWsdsH8Qj5L3u63d6OuBtUz4wfOK5ds=;
-	b=akqST7UdTMzCuKRFjIrwGwSHlPOPFdcYWE6F9jUA2qAXNURZskV0DK6PyOUmjpmSB3s7Do
-	K8myJbwXXuhvQowFp63Zy9l5R/6YxiobsJzcmB5L5rCLKa726oDEqoCTvJH2wS0j/tPYBA
-	eqXro9zeKKdHa2JMYfFl/X1acfDKqeB0dM7a82y+i624zVW/vMGusR3XDobrx3xhJQXBLs
-	ymh+ric142H4bQQlZheW0eBz6qNqMLyL6tvo5m+Xb2Unz2dq04QS47nMq64EqM/DhkvEbI
-	7yNTH+QGPYiPTFCTUYrwdw8X7IoCs2Kzj3z6i961CHV+/AU7YIpZAUW9KQcmeQ==
+	s=arc-20240116; t=1783947902; c=relaxed/simple;
+	bh=nSBsOjt/BXcCbYMnxmh+/Hy7Je5B9u9J+iz29ZOl1Dw=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=STEiogDtlyFS1FPIvuCRExZodAp8TKb+v5sQFOM3wQPEFno/64cDHpnPW3UUVgRr5OqWAxXURQurvyPpe2NB+BWVH7Bkt+N8zP84yl2W1Ee0sq366d56WhWJDjZ8hLGDh/1FrugU7efmKlyCVeJvC15aJpyxVZi+8wvvatW8jx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu; spf=pass smtp.mailfrom=blackhole.kfki.hu; dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b=jVlsp5vD; arc=none smtp.client-ip=148.6.0.49
+Received: from localhost (localhost [127.0.0.1])
+	by smtp0.kfki.hu (Postfix) with ESMTP id 4gzMvg4mCmz3sb0Z;
+	Mon, 13 Jul 2026 14:59:11 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	blackhole.kfki.hu; h=mime-version:references:message-id
+	:in-reply-to:from:from:date:date:received:received:received
+	:received; s=20151130; t=1783947549; x=1785761950; bh=FmHaMmV+zl
+	jiv5MVVRzY+GY2wOxMBTZW0bmwtuTIfhM=; b=jVlsp5vDyBQtoeHlmdjJlworaV
+	b9LcPpJjVzQN66RTlSYGy9JhM/k1WfDiULhnUJbUfylMlxKMGVNUFOiLS+uGuziX
+	PNwGcTFP4GItu9I8ZcOtTddxcBjLOBsvGUfLCdu9zPzFPUELSspMuB1/WQkQ1/+5
+	MmaHXoDEcn++65l/U=
+X-Virus-Scanned: Debian amavis at smtp0.kfki.hu
+Received: from smtp0.kfki.hu ([127.0.0.1])
+ by localhost (smtp0.kfki.hu [127.0.0.1]) (amavis, port 10026) with ESMTP
+ id yEh3wLIrYits; Mon, 13 Jul 2026 14:59:09 +0200 (CEST)
+Received: from blackhole.kfki.hu (blackhole.szhk.kfki.hu [148.6.240.2])
+	by smtp0.kfki.hu (Postfix) with ESMTP id 4gzMvd3tSqz3sb0N;
+	Mon, 13 Jul 2026 14:59:09 +0200 (CEST)
+Received: by blackhole.kfki.hu (Postfix, from userid 1000)
+	id 72CC934316E; Mon, 13 Jul 2026 14:59:09 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by blackhole.kfki.hu (Postfix) with ESMTP id 7129334316D;
+	Mon, 13 Jul 2026 14:59:09 +0200 (CEST)
+Date: Mon, 13 Jul 2026 14:59:09 +0200 (CEST)
+From: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
+To: Weiming Shi <bestswngs@gmail.com>
+cc: Pablo Neira Ayuso <pablo@netfilter.org>, 
+    Jozsef Kadlecsik <kadlec@netfilter.org>, netfilter-devel@vger.kernel.org, 
+    coreteam@netfilter.org, netdev@vger.kernel.org, 
+    linux-kernel@vger.kernel.org, Xiang Mei <xmei5@asu.edu>
+Subject: Re: [PATCH nf] netfilter: ipset: skip extension destroy on hash
+ resize replay
+In-Reply-To: <20260704062234.2625208-1-bestswngs@gmail.com>
+Message-ID: <e3bb8ad1-cb24-5d74-6ca6-a7a1e41fb133@blackhole.kfki.hu>
+References: <20260704062234.2625208-1-bestswngs@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 13 Jul 2026 14:53:55 +0200
-Message-Id: <DJXGIM9EGPT8.4UHNYP2Y0GOP@bootlin.com>
-Subject: Re: [PATCH net-next v3 07/15] net: macb: introduce macb_context
- struct for buffer management
-Cc: <conor.dooley@microchip.com>, <andrew+netdev@lunn.ch>,
- <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
- <richardcochran@gmail.com>, <linux@armlinux.org.uk>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <nicolas.ferre@microchip.com>, <claudiu.beznea@tuxon.dev>,
- <pvalerio@redhat.com>, <nb@tipi-net.de>,
- <vladimir.kondratiev@mobileye.com>, <gregory.clement@bootlin.com>,
- <benoit.monin@bootlin.com>, <tawfik.bayouk@mobileye.com>,
- <thomas.petazzoni@bootlin.com>, <maxime.chevallier@bootlin.com>
-To: "Paolo Abeni" <pabeni@redhat.com>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260701-macb-context-v3-7-00268d5b1502@bootlin.com>
- <20260708102716.169767-1-pabeni@redhat.com>
-In-Reply-To: <20260708102716.169767-1-pabeni@redhat.com>
-X-Last-TLS-Session-Version: TLSv1.3
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[blackhole.kfki.hu,quarantine];
+	R_DKIM_ALLOW(-0.20)[blackhole.kfki.hu:s=20151130];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307157-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FORGED_SENDER(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:conor.dooley@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:richardcochran@gmail.com,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:nicolas.ferre@microchip.com,m:claudiu.beznea@tuxon.dev,m:pvalerio@redhat.com,m:nb@tipi-net.de,m:vladimir.kondratiev@mobileye.com,m:gregory.clement@bootlin.com,m:benoit.monin@bootlin.com,m:tawfik.bayouk@mobileye.com,m:thomas.petazzoni@bootlin.com,m:maxime.chevallier@bootlin.com,m:pabeni@redhat.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307158-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:bestswngs@gmail.com,m:pablo@netfilter.org,m:kadlec@netfilter.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:xmei5@asu.edu,s:lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,asu.edu:email];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,gmail.com,armlinux.org.uk,vger.kernel.org,tuxon.dev,redhat.com,tipi-net.de,mobileye.com,bootlin.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[kadlec@blackhole.kfki.hu,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	DKIM_TRACE(0.00)[blackhole.kfki.hu:+];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kadlec@blackhole.kfki.hu,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,bootlin.com:from_mime,bootlin.com:url,bootlin.com:mid,bootlin.com:dkim,linux.dev:url]
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 64C2674B280
+X-Rspamd-Queue-Id: 5270F74B597
 
-Hello Paolo's LLM,
+Hi,
 
-On Wed Jul 8, 2026 at 12:27 PM CEST, Paolo Abeni wrote:
-> From: AI Reviewer <ai@example.com>
+On Fri, 3 Jul 2026, Weiming Shi wrote:
+
+> During a hash set resize, mtype_resize() copies each element into the
+> new table with memcpy(), so the new-table element shares the old-table
+> element's comment extension.  An xt_SET delete on the old table during
+> the resize destroys that shared comment via ip_set_ext_destroy() and
+> queues a replayed delete on h->ad.  After the table swap mtype_resize()
+> replays it with mtype_del() on the new table, whose copy still points at
+> the freed comment, so ip_set_ext_destroy() frees it a second time:
 >
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+> ODEBUG: activate active (active state 1) object: ... object type: rcu_head
+> WARNING: CPU: 3 PID: 5311 at lib/debugobjects.c:514 debug_print_object
+> Call Trace:
+>  <IRQ>
+>  kvfree_call_rcu (kernel/rcu/tree.c:3825)
+>  ip_set_comment_free (net/netfilter/ipset/ip_set_core.c:397)
+>  hash_ip4_del (net/netfilter/ipset/ip_set_hash_gen.h:1098)
+>  hash_ip4_kadt (net/netfilter/ipset/ip_set_hash_ip.c:96)
+>  ip_set_del (net/netfilter/ipset/ip_set_core.c:813)
+>  set_target_v3 (net/netfilter/xt_set.c:412)
+>  ipt_do_table (net/ipv4/netfilter/ip_tables.c:346)
+>  __ip_local_out (net/ipv4/ip_output.c:119)
+>  icmp_push_reply (net/ipv4/icmp.c:397)
+>  __icmp_send (net/ipv4/icmp.c:804)
+>  __udp4_lib_rcv (net/ipv4/udp.c:2521)
+>  ip_local_deliver (net/ipv4/ip_input.c:254)
+>  ip_rcv (net/ipv4/ip_input.c:569)
+>  </IRQ>
+>
+> The replay passes a NULL ext (the kernel-side delete that queued it
+> already destroyed the extensions), so skip ip_set_ext_destroy() when ext
+> is NULL.  This also avoids the NULL ext->target dereference that was only
+> kept safe by the new table's ref being zero.
+>
+> Reachable from an unprivileged user namespace.
+>
+> Fixes: f66ee0410b1c ("netfilter: ipset: Fix \"INFO: rcu detected stall in hash_xxx\" reports")
+> Reported-by: Xiang Mei <xmei5@asu.edu>
+> Assisted-by: Claude:claude-opus-4-8
+> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
 > ---
-> net: macb: introduce macb_context struct for buffer management
+> net/netfilter/ipset/ip_set_hash_gen.h | 6 ++++--
+> 1 file changed, 4 insertions(+), 2 deletions(-)
 >
-> This patch moves per-queue ring buffers and ring-size parameters out of
-> struct macb / struct macb_queue into a new struct macb_context that is
-> allocated on open and freed on close, so future patches can swap in a
-> new context while the interface is running.
+> diff --git a/net/netfilter/ipset/ip_set_hash_gen.h b/net/netfilter/ipset/ip_set_hash_gen.h
+> index 5e4453e9e..bc909ae2d 100644
+> --- a/net/netfilter/ipset/ip_set_hash_gen.h
+> +++ b/net/netfilter/ipset/ip_set_hash_gen.h
+> @@ -1080,9 +1080,11 @@ mtype_del(struct ip_set *set, void *value, const struct ip_set_ext *ext,
+> 			mtype_del_cidr(set, h,
+> 				       NCIDR_PUT(DCIDR_GET(d->cidr, j)), j);
+> #endif
+> -		ip_set_ext_destroy(set, data);
+> +		/* On a resize replay the extensions were already destroyed. */
+> +		if (ext)
+> +			ip_set_ext_destroy(set, data);
 >
->> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethe=
-rnet/cadence/macb_main.c
->> index 951a7f080225..dfb1d49d841c 100644
->> --- a/drivers/net/ethernet/cadence/macb_main.c
->> +++ b/drivers/net/ethernet/cadence/macb_main.c
->
-> [ ... ]
->
->> @@ -1257,6 +1288,7 @@ static void macb_tx_error_task(struct work_struct =
-*work)
->>  	struct macb_queue *queue =3D container_of(work, struct macb_queue,
->>  						tx_error_task);
->>  	unsigned int q =3D queue - queue->bp->queues;
->> +	struct macb_txq *txq =3D macb_txq(queue);
->>  	struct macb *bp =3D queue->bp;
->
-> [High]
-> Can macb_tx_error_task() dereference a freed context?
->
-> macb_tx_error_task is scheduled from macb_interrupt():
->
->     schedule_work(&queue->tx_error_task);
->
-> After this patch, the very first thing the worker does is:
->
->     struct macb_txq *txq =3D macb_txq(queue);
->
-> which expands to &bp->ctx->txq[q] and dereferences bp->ctx.
->
-> Looking at macb_close():
->
->     macb_reset_hw(bp);
->     ...
->     macb_free(bp);
->     kfree(bp->ctx);
->     bp->ctx =3D NULL;
->
-> There is no cancel_work_sync(&queue->tx_error_task), and macb_reset_hw()
-> does not drain the workqueue. If an interrupt scheduled the work just
-> before close, or the work was already pending, the worker can run after
-> kfree(bp->ctx) and hit a NULL dereference (and a use-after-free if
-> macb_open() re-allocates ctx concurrently via ethtool ring reconfig).
->
-> The same reasoning applies to bp->hresp_err_bh_work, which is queued
-> from macb_interrupt() and whose handler calls
-> mog_init_rings()/macb_init_buffers() that read bp->ctx->tx_ring_size and
-> bp->ctx->{tx,rx}q[q]. cancel_work_sync(&bp->hresp_err_bh_work) is only
-> called from macb_remove(), not macb_close().
+> -		if (atomic_read(&t->ref) && ext->target) {
+> +		if (ext && atomic_read(&t->ref) && ext->target) {
+> 			/* Resize is in process and kernel side del,
+> 			 * save values
+> 			 */
 
-All of this is a valid concern.
+Please rebase your patch against the nf-next tree 
+(git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git): the 
+second chunk of your patch is not needed as it has been fixed.
 
-> Pre-patch these fields lived inside the embedded struct macb_queue so a
-> late worker would touch stale-but-addressable memory; post-patch the
-> first indirection through bp->ctx faults.
-
-This pre-series analysis is wrong however. Current upstream would crash:
-macb_tx_error_task() restarts the HW and it even assigns
-queue->tx_ring_dma which still contains the freed DMA address
-(macb_free()/macb_close() don't reset that value).
-
-Summary: this patch turns potential memory corruption into a NULL
-pointer dereference.
-
-> Would adding cancel_work_sync(&queue->tx_error_task) per queue and
-> cancel_work_sync(&bp->hresp_err_bh_work) before kfree(bp->ctx) in
-> macb_close() close this window?
-
-Yes that is the way forward. It will probably be separate and target
-net/main. Not specifically because I want it backported (it'd be nice
-but issue is super unlikely and no one reported it) but mostly because
-this series is already 15 patches long.
-
->> @@ -3690,8 +3778,8 @@ static int macb_set_ringparam(struct net_device *n=
-etdev,
->>  		macb_close(bp->netdev);
->>  	}
->> =20
->> -	bp->rx_ring_size =3D new_rx_size;
->> -	bp->tx_ring_size =3D new_tx_size;
->> +	bp->configured_rx_ring_size =3D new_rx_size;
->> +	bp->configured_tx_ring_size =3D new_tx_size;
->> =20
->>  	if (reset)
->>  		macb_open(bp->netdev);
->
-> [Medium]
-> Should the return value of macb_open() be checked here?
->
-> This patch adds a new failure point inside macb_open():
->
->     bp->ctx =3D kzalloc_obj(*bp->ctx);
->     if (!bp->ctx) {
->         err =3D -ENOMEM;
->         goto pm_exit;
->     }
->
-> On failure, bp->ctx remains NULL and the interface stays down, but
-> macb_set_ringparam() ignores the return value and reports success to
-> userspace. The commit message says the motivation is to improve
-> reliability under memory pressure, but this caller silently swallows the
-> new allocation failure.
-
-No need, this series ends with context swapping and the
-macb_context_swap_end() operation, which replaces the macb_open()
-highlighted here, cannot fail.
-
->> @@ -5039,6 +5125,12 @@ static int at91ether_open(struct net_device *netd=
-ev)
->>  	if (ret < 0)
->>  		return ret;
->> =20
->> +	bp->ctx =3D kzalloc_obj(*bp->ctx);
->> +	if (!bp->ctx) {
->> +		ret =3D -ENOMEM;
->> +		goto pm_exit;
->> +	}
->> +
->>  	/* Clear internal statistics */
->>  	ctl =3D macb_readl(bp, NCR);
->>  	macb_writel(bp, NCR, ctl | MACB_BIT(CLRSTAT));
->
-> [Low]
-> Should bp->ctx->rx_ring_size, tx_ring_size and rx_buffer_size be
-> initialized on this path?
->
-> macb_open() sets them from configured_{rx,tx}_ring_size and calls
-> macb_init_rx_buffer_size(), but at91ether_open() leaves them at zero
-> after kzalloc_obj().
->
-> Helpers such as macb_rx_ring_wrap() compute:
->
->     return index & (bp->ctx->rx_ring_size - 1);
->
-> which becomes index & 0xFFFFFFFF when rx_ring_size is 0. It happens to
-> be harmless today because the at91ether path constrains indices to
-> [0, AT91ETHER_MAX_RX_DESCR-1] independently and macb_get_regs() reports
-> zeroed head/tail for the tx-less at91ether, but pre-patch macb_init_dflt(=
-)
-> unconditionally set bp->rx_ring_size =3D DEFAULT_RX_RING_SIZE.
->
-> Any future shared helper that used tx_ring_size as a stride or divisor
-> would misbehave on at91ether.
-
-Yes. Null impact (but it would be better in theory).
-
->> @@ -5076,6 +5171,9 @@ static int at91ether_close(struct net_device *netd=
-ev)
->> =20
->>  	at91ether_stop(bp);
->> =20
->> +	kfree(bp->ctx);
->> +	bp->ctx =3D NULL;
->> +
->>  	pm_runtime_put(&bp->pdev->dev);
->> =20
->>  	return 0;
->
-> [High]
-> Is there IRQ synchronization missing before freeing bp->ctx on this
-> path?
->
-> at91ether_stop() disables MAC RX/TX and writes IDR to mask further
-> interrupts, but does not synchronize with a handler already running or
-> already dispatched on another CPU. at91ether_interrupt() calls
-> at91ether_rx(), which after this patch does:
->
->     struct macb_rxq *rxq =3D &bp->ctx->rxq[0];
->     ...
->     desc =3D macb_rx_desc(queue, rxq->tail);
->     ...
->     p_recv =3D rxq->buffers + rxq->tail * AT91ETHER_MAX_RBUFF_SZ;
->
-> If the handler is in flight when kfree(bp->ctx); bp->ctx =3D NULL runs,
-> the next access through bp->ctx faults. The macb_open()/macb_close()
-> path is somewhat protected by napi_disable() before macb_free(), but
-> at91ether does not use NAPI and has no equivalent barrier.
->
-> Would a synchronize_irq(bp->netdev->irq) between at91ether_stop() and
-> kfree(bp->ctx) close this?
-
-Ah at91ether_interrupt() doesn't grab bp->lock as macb_interrupt() does.
-Indeed synchronize_irq() would solve this.
-
-Thanks,
-
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+Thank you and best regards,
+Jozsef
 
