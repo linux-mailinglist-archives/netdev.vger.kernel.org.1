@@ -1,190 +1,292 @@
-Return-Path: <netdev+bounces-307262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307263-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id fOLTK2YwVWqHlAAAu9opvQ
-	(envelope-from <netdev+bounces-307262-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 20:37:26 +0200
+	id dHgcMn81VWrPlQAAu9opvQ
+	(envelope-from <netdev+bounces-307263-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 20:59:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0685974E876
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 20:37:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 203E474E9F2
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 20:59:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=RQO22JJc;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307262-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307262-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=asu.edu;
+	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b="WdU4k/7w";
+	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=IjgjV8tY;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307263-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307263-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=qualcomm.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8A3DD3056FD4
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 18:36:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 77208305C802
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 18:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7D21353A70;
-	Mon, 13 Jul 2026 18:36:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68376355819;
+	Mon, 13 Jul 2026 18:58:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26E283537F7
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 18:36:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0453546C2
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 18:58:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783967778; cv=none; b=tgi3/s0cVcFWL5Q/dafguFob1lBAgQKSX768cRhOVJvOQQTz62XVqRq2lzQa7MaBaD+NwDlzytY1xw5+2ha2U06Un8xwreZETBMO6jY2DLM27D2VEmrB+r4nYwX5dVP5h9sXCV9I8fYsE2ggRK6Cjv2fYg3lMn59kp7gFEFbPQ4=
+	t=1783969123; cv=none; b=RYB5IvnW9yeZFzx+VKO9yuk5t88bOWQnAmXtensCL4bqmZ5SRIMIkRlC3424bdRHv8SyUpEr9O5BoVBMtAkRx7PGJHjKY4HpUl9SztaFhX5ATfZ00V95JXszGyF6w+1JhTy+A6eYejfLq06q2cG6Y9Q1wtUosC3t1XV2ICkbIiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783967778; c=relaxed/simple;
-	bh=d/eeuVxUleGy31a88wNlioaq+/dr9+CAscc3aVXlqtU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aCMKdJV4qFQ8TI44fXJJKdBJp106PbXmg2/9dF/zT72QkQ6M/CrN1t3FYVvZGVaFHhdTGJQcvf21J5YPRieH7qjnyEvVX2HrpP2fG1Ci5EK9jpPTSl8CyjETqhbXgSQxhiPKMnz3SC5FzHyAX2t4cjJYvz92WKMK+rrqZzvLVSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=RQO22JJc; arc=none smtp.client-ip=209.85.215.171
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-c9e7391839cso130704a12.0
-        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 11:36:16 -0700 (PDT)
+	s=arc-20240116; t=1783969123; c=relaxed/simple;
+	bh=Q4FlDRCpngp1x0aC0AgdewQ8wbrSnrUV0YCYHer0W7s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gAKLr4aLI7CaSH6z3U5a+/SpHmPVOaozL3UYTikj1wqX3Mq3gHcLz0SH9SBqQsy5DLiNgu4cPlS9wzfMwFJKCRHDXH7q0KERzyfFDW0Hi6H/b/EE78XkW9weANF6gwOiaIZVZlZi+9T0+inVitzK9UksFVaIwlUcW4yrpSlk/RY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=WdU4k/7w; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=IjgjV8tY; arc=none smtp.client-ip=205.220.180.131
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66DH6Nc22191573
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 18:58:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	EGm08z2QRTZQR1FZakby7UHoEn+vMY549zyGYn80n3k=; b=WdU4k/7wJY4565Q3
+	OBIv/l/9/g9bOCtXtJdW5RUd40bhhXJJtBGCi5XyLAHtadKYz5hVdLU8knWINlps
+	bNUIkviKqHLWLxv9gNI9iqXdGJ2UVEa6jsENcnQVNwq4EoYLEz470KHRNeHUHT8o
+	sa+g5Qw8UDN99M8RL+ra2kDJC1ovboKK5zPW4s1STq08y2RwX3+UBJFecEuQ8H0O
+	9XnFwJm6nPXYLi65NhRQ+zIzTRuprHoYo7OT+5G6P0c+/w8vIfA0qbM/PnP+tnvS
+	HmjjtQxXp4vx87eHAWKG9gGELlUiYgWMLYLOoSeiuwkqWt+92FJ1lGBo9st/xAKt
+	nCGidg==
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fd44jrd5b-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 18:58:40 +0000 (GMT)
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-c8952346bb9so2906250a12.2
+        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 11:58:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1783967776; x=1784572576; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=83OFQaO++E4joRubEA/Dmu6J46o8fWIq9Xk8WKWgSek=;
-        b=RQO22JJcAOciRBggMdebttFd6CWL9ajvG3P2sX2yJ4HWTzVDEXm4PRsQJ/PhrTgDra
-         I6Bx/cJbSQLTS+Sj+77bAlq+XkoCl68ja+wJDzIXRPgriFgG4Hw4iczGt1hINt5NRQbp
-         Hec7Z0cMCR1nkapiXP/DnpuqHxdJlJAdkG4lg2Pz4yP/hNs46ntEQEpaHog088ZvpCjr
-         EAAKcPXNVKqwIJd5yqLGHG7CuyANC1s9GZ4OJpTIAHjSlbZ6/n6MrQT9xdmvLIkm5umP
-         SPYqCO/oSSmpTEPkLX+Tq+rYa1vubcVPw1ZuwUIqARqEeEROLtuRoI1LpgrKwBRK9GML
-         ASXw==
+        d=oss.qualcomm.com; s=google; t=1783969120; x=1784573920; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=EGm08z2QRTZQR1FZakby7UHoEn+vMY549zyGYn80n3k=;
+        b=IjgjV8tYOBtwKq394jANMNx59r6lzns1gtRUHwX5v7l1Q9zJYLUKbHXNR52tQSXVUr
+         ZOeEtRot9hVlcPw7uMa7gqFshIpNN2qUSDiBIrTPtG3R3yllId9kw/DF45Fguja1uhnR
+         33otf8h84juUsW3oMxzdl7kXKZYUMfhnXsX3UnO9Uk3w5ah+ZWvmdFMM+I0FNMc9W7OW
+         360eAFp5JhphHlymvmT1BfFDfd0XE0BKmVXOQ1pf/C+89h3UDNcgc22JV/nVcYNFtJuq
+         UVPHEr1dyJsG2BkXGHj7FK6bNxx+Taj9EcloALrolP2R2SfSTrU6MC1ocUF2YO1KuG+d
+         qd/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783967776; x=1784572576;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1783969120; x=1784573920;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=83OFQaO++E4joRubEA/Dmu6J46o8fWIq9Xk8WKWgSek=;
-        b=gzQUb/6xGvODSJIfYMwnLEk4HD4otN3/6S18Xq081KRDb3PcPzPqShYeAQap87RT4C
-         TeBVI6+7qOFu/ojdYkgXe6csIKwrU7MRqux6HqLviLrRA6fJN7pyOU372FWcNNGD7Ogd
-         acENpZR82+Ehd9J2xmYBvw966YteOTet/SxdR2nGrZnY2GnSgstvuyjx1NIql7+Olzk9
-         H1uJwWjB8OxKVK+H8s3v9hEPP1Ln1XVLqHZ/ddZWAEGm/jiT0V05A8CtI/zsjCRtrBnh
-         5s14aE/xwhUyio6djwaiNLNKyjzumGvl0b752f6aYkMWFOMrlXYl/Us7mrq+DLsO/Ts2
-         CKRw==
-X-Forwarded-Encrypted: i=1; AHgh+Rpk0LvZS5WFyKjIHavDDBCq7n/Fb4wXtj+Az89ASNZBWfWLMyVzSqTRRGvNiwt4A73u+PZMOak=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYB6L2j9roZPyc/NPuyG4+TPDHdShR+Yflh9iADsJo5eqxtlxj
-	GzpT9J5Js7m5H3WDptPDCrh0EN4Xps0/XtJhNuebg/hvH5CkxfNA/bzNXWYGdK1ApiTGRSOKaDx
-	Wnx2zqw==
-X-Gm-Gg: AfdE7ckCIyNQHtQCmZIhp14KLjoV5uj34eOicCL3iaVM2YGmCNKAxxSNloCYwOTiT2I
-	OkZtKypgJqyfP0LynI32iKeeMj6AZaeW4sUgxWuZgFjMfrLY3ilAwSbXjPWYOJ7rlRDbPOn6Q3E
-	P+GmyMLUCBMYkOXBiD3unBzsSTSt948fgTDX5sk/N/xggxUtbC+Nc5hbP0GlISMaX/wn5ZI3ZR7
-	jU37kHZGUUcoK0C19Si6CDdVmauoL4boswPp7sVSAUyw3eJCrdSqHu73fp0DpStJZrL7ZHcy70w
-	sgywxaRs74hIERMafsshdB35zOdvBRvt57DMFXXfSV56WPew+nNKsJ4nWE9ZxFVTwHLhxO8w/zf
-	pVTHKdBvL5ao5yX4zVHJXUWBTuSfJCAki3G1E2Fc7NQOMwCgBj9Qa2CzyKrARDmIHwgetSJTVVb
-	aDO/vLsbiqi7ErNYPnxg==
-X-Received: by 2002:a05:6a21:1798:b0:3bf:6237:b1b3 with SMTP id adf61e73a8af0-3c110775a71mr10882651637.42.1783967776314;
-        Mon, 13 Jul 2026 11:36:16 -0700 (PDT)
-Received: from xiang.tailc0aff1.ts.net ([20.171.14.70])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3118389d9bcsm61616034eec.20.2026.07.13.11.36.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jul 2026 11:36:15 -0700 (PDT)
-From: "Xiang Mei (Microsoft)" <xmei5@asu.edu>
-To: Florian Westphal <fw@strlen.de>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Phil Sutter <phil@nwl.cc>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	AutonomousCodeSecurity@microsoft.com,
-	tgopinath@linux.microsoft.com,
-	kys@microsoft.com,
-	"Xiang Mei (Microsoft)" <xmei5@asu.edu>
-Subject: [PATCH nf] netfilter: nft_fib: bail out if input device is missing
-Date: Mon, 13 Jul 2026 18:36:14 +0000
-Message-ID: <20260713183614.2975972-1-xmei5@asu.edu>
-X-Mailer: git-send-email 2.43.0
+        bh=EGm08z2QRTZQR1FZakby7UHoEn+vMY549zyGYn80n3k=;
+        b=liqWz4Yap1ULKk03ep4mqzdWS673x3maiSZRPOG+GKZDrTgxv1UuzUJgyhQZU3KPJK
+         zrOXEWRJVkJ8hkoervTYMS9eUY/wO0dn+elqgfeWTdSCZfVoLfgqiMDWAX7sbUPRaQUL
+         jHySB35JeV/DS5EYzyUBHbaW2GHivKIoLfAdMx8BtikFM9xjbMH+A4maFel3xt05jhID
+         OMEU2JJQXHSY/oN9ARSaLCBK3uWp4BbJh1xIeW2xx2/wErqnogE54fvdIWbuBzgdXBTr
+         5cpcIMSH52Nxjdw5XuDRho4Si+N4xdkpcJXyG6SnwlohhP7R2pU3q0K2DP0SCqsfV+jo
+         bvdg==
+X-Forwarded-Encrypted: i=1; AHgh+Rpz82e9lzBa6x/J328osimjdNy1J2mFXH2uxduBAA/XGFywsAX+OBSHEAaW4qwlWAY8UxvcJBQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxU/dNSzJAjQ7l1LXSzFVC22iUbpbzhnxjbwyrpkr0pxUTwmsfE
+	8t2OzlHGAz5B/T3fot0Rd+qpGc3NuS5nCALcSgJAxXNcs0hpmpQEvmUUAtgHpLpwF0Rhh2D4ELw
+	L8flimF7r27D0pBCwNengTKegtfIRa3tgzIxVhXKtS5yDrpcv/3NF3Cnbs70=
+X-Gm-Gg: AfdE7clZBe53Sn5qmgcDQwko47jdGFAkfs4VZSLSsHyiDOw50TanipIlS9jgZXkwlsZ
+	uR4SzxPv1E5KvlEJzaNXfkDbRST5JK2bfYg7nSE5nuQEa7vbMK/cVfri0dxYu7OyZdxE40bX/cV
+	nwSm62ebexCnuVT5bl56OzNuch6mGWtdrDds+cYxWQTWYn4F3Mmu2XRNAHo+M5ZbkJoQT3IJwj+
+	MDgGvclU0nG4Sl9HuDUJBF2Lf/uDCiohRs6VWLOONC8qeRJhUsKymTk6lk+xhbrylygdFu3+kpQ
+	8Zlc2BnJOm1Ljp458oTJmxa+wxek/0cKQUPcP2MjZ+DPMNzaeuaQVgZ5HWf5F7px0zJFUWoBkef
+	vtSx7Tgo7Jqsyik5scmIpuVqa0fFjiFtkUXaL5962H8CrmpbhG/l9MRF7+HrsK8dxhWOd
+X-Received: by 2002:a05:6a20:b7a7:b0:3bf:63af:859 with SMTP id adf61e73a8af0-3c110ad2e6amr11568632637.45.1783969119592;
+        Mon, 13 Jul 2026 11:58:39 -0700 (PDT)
+X-Received: by 2002:a05:6a20:b7a7:b0:3bf:63af:859 with SMTP id adf61e73a8af0-3c110ad2e6amr11568594637.45.1783969119131;
+        Mon, 13 Jul 2026 11:58:39 -0700 (PDT)
+Received: from [192.168.1.11] (15.sub-75-218-246.myvzw.com. [75.218.246.15])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3118ee6091dsm83117734eec.14.2026.07.13.11.58.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Jul 2026 11:58:38 -0700 (PDT)
+Message-ID: <09e17504-d1b3-4e3a-b547-3c3c1040015c@oss.qualcomm.com>
+Date: Mon, 13 Jul 2026 11:58:34 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 12/14] wifi: ath12k: Switch to generic PAS TZ APIs
+To: Sumit Garg <sumit.garg@kernel.org>, andersson@kernel.org,
+        konradybcio@kernel.org
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+        linux-media@vger.kernel.org, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
+        linux-remoteproc@vger.kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+        conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
+        akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
+        jesszhan0024@gmail.com, marijn.suijten@somainline.org,
+        airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
+        bod@kernel.org, mchehab@kernel.org, elder@kernel.org,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, jjohnson@kernel.org,
+        mathieu.poirier@linaro.org, trilokkumar.soni@oss.qualcomm.com,
+        mukesh.ojha@oss.qualcomm.com, pavan.kondeti@oss.qualcomm.com,
+        jorge.ramirez@oss.qualcomm.com, tonyh@qti.qualcomm.com,
+        vignesh.viswanathan@oss.qualcomm.com,
+        srinivas.kandagatla@oss.qualcomm.com,
+        amirreza.zarrabi@oss.qualcomm.com, jenswi@kernel.org,
+        op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
+        skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
+        Sumit Garg <sumit.garg@oss.qualcomm.com>
+References: <20260702115835.167602-1-sumit.garg@kernel.org>
+ <20260702115835.167602-13-sumit.garg@kernel.org>
+From: Jeff Johnson <jeff.johnson@oss.qualcomm.com>
+Content-Language: en-US
+In-Reply-To: <20260702115835.167602-13-sumit.garg@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: YRUc0izgLDM_PdlF3dida49yTx1XIYjn
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEzMDE5NyBTYWx0ZWRfX6jXArxNzXl3r
+ siTPX3TRCxE9ymiEJt69ZQGEw1OijUXpfJrlnwKF/E/ZHP2ouGBFc8vE5ud20BxFQY+8CrHu7Ck
+ nA17NeUmX3fValMZzvwzNAL5MGuJZiGbrCW7creamY/E2zbPR1Uvwj6F3TCdjCmKnsy1i5T5+pl
+ nDS2vDCSd7GKdydTK/YmifutBqgqhvXGCkwcIlUz2I2GsETYE+J46EivWn7L8O6BTyG2J9U/qVZ
+ 9qapf+imcKGnyimpyl4tNXg+Yy4OMf5ajH6hrnLF3rZhgKSzLfipRVFOBUCSPG6PxX0x/iETbTv
+ hDIITGHO4YJJEP1mu7B4tGXvXWsKOSXOVLmA8nvPdNGZGmdAStv0zTkrp16Rt2OD/HKMqclobEN
+ +h9dldkOY1lnXITYYM6JfewM8gk/w80a7vaHvCVE05F7YRrELa+VQv1pjdr8+OfCXVQTwTAxWCN
+ Wnf0+QpXAIlLo3sK8WA==
+X-Authority-Analysis: v=2.4 cv=XonK/1F9 c=1 sm=1 tr=0 ts=6a553560 cx=c_pps
+ a=Qgeoaf8Lrialg5Z894R3/Q==:117 a=6VQYfvmiyQ8t40WkS/mQdw==:17
+ a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22
+ a=EUspDBNiAAAA:8 a=VwQbUJbxAAAA:8 a=CBpSC656wZACrugyqBAA:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10 a=x9snwWr2DeNwDh03kgHS:22
+X-Proofpoint-ORIG-GUID: YRUc0izgLDM_PdlF3dida49yTx1XIYjn
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEzMDE5NyBTYWx0ZWRfX65KRar7gkDGv
+ /IwiFfIm/41pA5021UhjSl0/IbiFBwLZ3dC8D4t2709IL1ypm6MQiw9hx/U/7q8sFYDHwk/hSAv
+ epsiQN4FFbbuIe2VDCJPNRFgKN6RUDo=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-13_04,2026-07-10_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 clxscore=1011 impostorscore=0 malwarescore=0 priorityscore=1501
+ adultscore=0 phishscore=0 bulkscore=0 lowpriorityscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607130197
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307262-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:fw@strlen.de,m:pablo@netfilter.org,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,m:xmei5@asu.edu,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[asu.edu:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[49];
+	TAGGED_FROM(0.00)[bounces-307263-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:sumit.garg@kernel.org,m:andersson@kernel.org,m:konradybcio@kernel.org,m:linux-arm-msm@vger.kernel.org,m:devicetree@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:freedreno@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath12k@lists.infradead.org,m:linux-remoteproc@vger.kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:robin.clark@oss.qualcomm.com,m:sean@poorly.run,m:akhilpo@oss.qualcomm.com,m:lumag@kernel.org,m:abhinav.kumar@linux.dev,m:jesszhan0024@gmail.com,m:marijn.suijten@somainline.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:vikash.garodia@oss.qualcomm.com,m:bod@kernel.org,m:mchehab@kernel.org,m:elder@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jjohnson@kernel.org,m:mathieu.poirier@linaro.org,m:trilokkumar.soni@oss.qualcomm.com,m:mukesh.ojha@oss.qualcomm.com,m:pavan.kondeti@oss.qualcomm
+ .com,m:jorge.ramirez@oss.qualcomm.com,m:tonyh@qti.qualcomm.com,m:vignesh.viswanathan@oss.qualcomm.com,m:srinivas.kandagatla@oss.qualcomm.com,m:amirreza.zarrabi@oss.qualcomm.com,m:jenswi@kernel.org,m:op-tee@lists.trustedfirmware.org,m:apurupa@qti.qualcomm.com,m:skare@qti.qualcomm.com,m:linux-kernel@vger.kernel.org,m:sumit.garg@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[jeff.johnson@oss.qualcomm.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,qualcomm.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oss.qualcomm.com:from_mime,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,vger.kernel.org:from_smtp];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[jeff.johnson@oss.qualcomm.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:from_mime,asu.edu:mid,asu.edu:email,asu.edu:dkim,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0685974E876
+X-Rspamd-Queue-Id: 203E474E9F2
 
-nft_fib_can_skip() dereferences the input device (indev->ifindex, and
-in->flags via nft_fib_is_loopback()) without a NULL check, assuming the
-hook switch only admits PRE_ROUTING/INGRESS/LOCAL_IN. But NF_NETDEV_EGRESS
-== NF_INET_LOCAL_IN == 1, so a netdev-family base chain on the egress hook
-passes both the switch and nft_fib_validate() (which also keys only on the
-hook number). Egress packets have no input device, so nft_fib_can_skip()
-dereferences NULL.
+On 7/2/2026 4:58 AM, Sumit Garg wrote:
+> From: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> 
+> Switch ath12k client driver over to generic PAS TZ APIs. Generic PAS TZ
+> service allows to support multiple TZ implementation backends like QTEE
+> based SCM PAS service, OP-TEE based PAS service and any further future TZ
+> backend service.
+> 
+> Acked-by: Jeff Johnson <jjohnson@kernel.org>
+> Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> ---
+>  drivers/net/wireless/ath/ath12k/Kconfig |  2 +-
+>  drivers/net/wireless/ath/ath12k/ahb.c   | 10 +++++-----
+>  2 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/wireless/ath/ath12k/Kconfig b/drivers/net/wireless/ath/ath12k/Kconfig
+> index 4a2b240f967a..0d5d1c55bfc1 100644
+> --- a/drivers/net/wireless/ath/ath12k/Kconfig
+> +++ b/drivers/net/wireless/ath/ath12k/Kconfig
+> @@ -18,7 +18,7 @@ config ATH12K_AHB
+>  	bool "Qualcomm ath12k AHB support"
+>  	depends on ATH12K && REMOTEPROC
+>  	select QCOM_MDT_LOADER
+> -	select QCOM_SCM
+> +	select QCOM_PAS
+>  	help
+>  	  Enable support for Ath12k AHB bus chipsets, example IPQ5332.
+>  
+> diff --git a/drivers/net/wireless/ath/ath12k/ahb.c b/drivers/net/wireless/ath/ath12k/ahb.c
+> index 30733a244454..69e21214e629 100644
+> --- a/drivers/net/wireless/ath/ath12k/ahb.c
+> +++ b/drivers/net/wireless/ath/ath12k/ahb.c
+> @@ -5,7 +5,7 @@
+>   */
+>  
+>  #include <linux/dma-mapping.h>
+> -#include <linux/firmware/qcom/qcom_scm.h>
+> +#include <linux/firmware/qcom/qcom_pas.h>
+>  #include <linux/of.h>
+>  #include <linux/of_device.h>
+>  #include <linux/platform_device.h>
+> @@ -420,7 +420,7 @@ static int ath12k_ahb_power_up(struct ath12k_base *ab)
+>  
+>  	if (ab_ahb->scm_auth_enabled) {
+>  		/* Authenticate FW image using peripheral ID */
+> -		ret = qcom_scm_pas_auth_and_reset(pasid);
+> +		ret = qcom_pas_auth_and_reset(pasid);
+>  		if (ret) {
+>  			ath12k_err(ab, "failed to boot the remote processor %d\n", ret);
+>  			goto err_fw2;
+> @@ -485,10 +485,10 @@ static void ath12k_ahb_power_down(struct ath12k_base *ab, bool is_suspend)
+>  		pasid = (u32_encode_bits(ab_ahb->userpd_id, ATH12K_USERPD_ID_MASK)) |
+>  			 ATH12K_AHB_UPD_SWID;
+>  		/* Release the firmware */
+> -		ret = qcom_scm_pas_shutdown(pasid);
+> +		ret = qcom_pas_shutdown(pasid);
+>  		if (ret)
+> -			ath12k_err(ab, "scm pas shutdown failed for userPD%d\n",
+> -				   ab_ahb->userpd_id);
+> +			ath12k_err(ab, "PAS shutdown failed for userPD%d: %d\n",
+> +				   ab_ahb->userpd_id, ret);
+>  	}
+>  }
+>  
 
-  KASAN: null-ptr-deref in range [0x00000000000000b0-0x00000000000000b7]
-  RIP: 0010:nft_fib4_eval (net/netfilter/nft_fib.h:19)
-   nft_do_chain (net/netfilter/nf_tables_core.c:285)
-   nft_do_chain_netdev (net/netfilter/nft_chain_filter.c:307)
-   nf_hook_slow (net/netfilter/core.c:619)
-   __dev_queue_xmit (net/core/dev.c:4799)
-   ...
-  Kernel panic - not syncing: Fatal exception in interrupt
+My code review agent is flagging:
 
-The eval path touched the device only via l3mdev_master_ifindex_rcu(),
-which tolerates NULL, until
-commit eaaff9b6702e ("netfilter: fib: avoid lookup if socket is available")
-added the sk/indev dereference. Restore the old behaviour by returning
-early when indev is NULL, so the packet takes the regular FIB lookup.
-Receive-side hooks always have an input device and are unaffected.
+**Missing probe-defer guard** (`ahb.c:422`) — `qcom_pas_is_available()` is
+explicitly documented as mandatory before any PAS call. The OP-TEE backend
+registers its ops asynchronously; without an `if (!qcom_pas_is_available())
+return -EPROBE_DEFER` in the probe path, firmware auth silently returns
+`-ENODEV` with no retry.
 
-Fixes: eaaff9b6702e ("netfilter: fib: avoid lookup if socket is available")
-Reported-by: AutonomousCodeSecurity@microsoft.com
-Signed-off-by: Xiang Mei (Microsoft) <xmei5@asu.edu>
----
- include/net/netfilter/nft_fib.h | 3 +++
- 1 file changed, 3 insertions(+)
+Is it an existing deficiency in ath12k that there is no probe deferral?
+Or did the qcom_scm_*() calls somehow guarantee something that is no longer
+true with the qcom_pas_*() calls?
 
-diff --git a/include/net/netfilter/nft_fib.h b/include/net/netfilter/nft_fib.h
-index e0422456f27b..d53e5a5214fe 100644
---- a/include/net/netfilter/nft_fib.h
-+++ b/include/net/netfilter/nft_fib.h
-@@ -33,6 +33,9 @@ static inline bool nft_fib_can_skip(const struct nft_pktinfo *pkt)
- 		return false;
- 	}
- 
-+	if (!indev)
-+		return false;
-+
- 	sk = pkt->skb->sk;
- 	if (sk && sk_fullsock(sk))
- 	       return sk->sk_rx_dst_ifindex == indev->ifindex;
--- 
-2.43.0
+And also for future cleanup:
+**Misleading field name** (`ahb.c:384`) — `scm_auth_enabled` should be
+`pas_auth_enabled` to match the backend-agnostic API it now guards.
+
+I plan on taking this patch as-is through the ath tree since it is currently
+just simple API changes. Any additional changes can come separately.
+
+/jeff
+
 
 
