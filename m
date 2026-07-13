@@ -1,201 +1,189 @@
-Return-Path: <netdev+bounces-307286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307287-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5bzgMERYVWqDnAAAu9opvQ
-	(envelope-from <netdev+bounces-307286-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 23:27:32 +0200
+	id OhCpDqZaVWoinQAAu9opvQ
+	(envelope-from <netdev+bounces-307287-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 23:37:42 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 634FF74F40C
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 23:27:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C553574F4CA
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 23:37:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=etsalapatis-com.20251104.gappssmtp.com header.s=20251104 header.b=occITeni;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307286-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307286-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=asu.edu header.s=google header.b=ILr8ar2C;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307287-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307287-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=asu.edu;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8A45A304C048
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 21:27:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2D21E3032654
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 21:33:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ADE035CB95;
-	Mon, 13 Jul 2026 21:27:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6555835F185;
+	Mon, 13 Jul 2026 21:33:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DD733A014
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 21:27:24 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783978047; cv=none; b=n3tctNL9Wojw2HUgbS0KrIzOLFUFMdCWeS9Gxx650ikXzTZcvQkMmgRneFtf1DWvr6AOOYxOvkBbz4lGIiAJattdeWfaEXB0lZd4oatNSKWfyQF0I4es5p4Rs7qeA7QFOocEsz2L4X3yM8xSgBxR7VfWfd0Jf9aVU7bvxWU1+AA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783978047; c=relaxed/simple;
-	bh=6D4BSK+3T1nAiGUpMmtNjk230tXko9pc9t83etZFzeI=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=ASeJSEUGT7/oTsm1nd9KIGu8hv/ouzjuEv7j9aEpLP1jNHg0HkZdLyhpLtnerr5lp1nvvF6DKBOgAA3mcJwu0K6Onj1F/3YCa43d4z+FLAXLZxjvtGzS50uD5sO/z9IZULe1XXePZh3fLC0T3PQVebylpJUuOig0E9QhIvpP6V0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=occITeni; arc=none smtp.client-ip=209.85.216.53
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-384c94c9414so291168a91.3
-        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 14:27:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E00350D7D
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 21:33:55 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783978437; cv=pass; b=Q1GYiHtV7IDJ6HBDvKZTcp3JElV1ZMZjZ1rSFqZuVSbk6KDYTcOzCwOZ7vZ8JABNRqimFE+faYVnbgKLEf7KgwUKSWwg/UyfSKSjOb5cUCPu3hAPz8K3vB2oIOzYB2bOKz/qVmgl2GZ/KsTUjOXnACkpUAXEpUOMMGtd6DFQrr0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783978437; c=relaxed/simple;
+	bh=ar9W89D4Ih0LFa4BPdqkCf8t2Kg9okLoqOOiffiJC1k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MhYME8kl8TOugbgUZVnW4l4nAPeqnQWtqyWRi9VztNwfNnCHFvWFIb2DMlbVZexSxVg5taSR8P3k7uGiO8nLXdC3Zc+SLmeLjWFfK2gOWRrUotQfNjDGiQctf4wKznGIFV5fcn5wXCwwxBMlkXDj2KiWjC1Fv7y+THRGBBD5Ij4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=ILr8ar2C; arc=pass smtp.client-ip=209.85.216.46
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-38dfe910e9dso1214387a91.3
+        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 14:33:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783978435; cv=none;
+        d=google.com; s=arc-20260327;
+        b=BaZYRnnhgTmimDj3WljcqLjCvXpgOrhrR13oVFLuu4Ey8WUmQlADMg7svqkwir17WH
+         Reuc0SZ7wfcn5J93JCdfhPmQ6H4BKerp5YSd1qCNfzFzdoKUnaI6s1bekBOcA72TXYNE
+         M9YlJ4dHTVag+NUs1TU/vqCLva+RfbY1rVLTVzMiq2/qouStR3qbDFN4gn3TbVwu6CJe
+         nAwh7BKHXkdL0IIY6lvzUOHB66achlrfoRvWAXbLhhtuBF77uRpopM477rq0YeFYgUBV
+         TGLuWs9+4uJOqXaw0c0RZk/Ezz2kvpQE8k9f7gYbHR6oH1s/TmQjDxyStrjLYu1sZSzW
+         /+4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Iezwh3ME7S217GUTr7unthJmQNFJnH6e1rXTj1TNmsQ=;
+        fh=DzpHLtOhV/NIXfIYZYnkvoBmTBSMRvB2S4wy4VlcQAw=;
+        b=oGotpDy3T97auX1rKGbt8bype4A4cfPMIDlG19+2s6b5VT2gtZylb+ZzQHSJRNoHgP
+         O4mWXRfWdH6qhUbKQsem9bvoFbEs0fxAGzDLe/liIA7I5io7JxU4OHcYeSrnEnxSJYci
+         FPUJCZCo6UXOCJyfFg3z1YqMvc6kNAH5Cl+AuZDw0jbSoF/HpmNTNjo7vlazWXEAPZyc
+         vAlUW+yAVTnAUQzRWycTCUI4pr2lgI+6w4VzA0HcpWbBnP43TfYH3DaQANS9rAdwDp+u
+         pHwAi7WhQtoAcBjoJrjeMEEB+iz0m2CmViAr91E+ihpRNcbU14ocXWtfxmriAvWdywvL
+         tzOg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1783978044; x=1784582844; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-type:content-transfer-encoding:mime-version:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=+USb3n4BDL969RhM6AFut2RcEXsxb0pNRXhYra/sKHA=;
-        b=occITeni3/o9TT3l1OusAcPoV8PGL/cch5kYRpqzXUZcwB1uNaULdpCcrogGpDsncp
-         Oe4HsCEUjuFcrxy3SdWykfqxz1nSjVEoyOtYf49ktgS4aQj9NnBjdND8ChOtVUSomzP3
-         2/7lY29kf0kJYnJOxT0imCbQ4F7hlNcSrc81s4AO10OVxIaz6d+FpK+6O0l3kjtXEpPw
-         euqb694AyWe1Ne6GzTQSDcRr0H2NQI8hDA+HRYrpgv7mQCLtpcvnNNPyGr3BCVVse0ig
-         jTdOkO8SlFu5Am1xJTOnp/WQoEGVzDh8VQapRd1D+9QgwvsFGieAj5IrD8DNK0/x1Rse
-         yMmQ==
+        d=asu.edu; s=google; t=1783978435; x=1784583235; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=Iezwh3ME7S217GUTr7unthJmQNFJnH6e1rXTj1TNmsQ=;
+        b=ILr8ar2CP6p3UrUSfiW9KBumpyCKw03jE9qq7xaWiv1DA8lFDTSLcPGuw1tN9SLFqu
+         HQsVzVn5atjaBRzdZgE4+EfmHkBHR4xXspgxLv/v7lYrwMSLKmN1Y3uxsTy8BxCe07Ug
+         IJfPdwnIjWzPqW0HhM/DGVkvcX7rwIHZPa7F5GxVQztDUdR8wmPOm+ht5uTVS3JxYz5q
+         n57Tq0QVwsysNjXghgVNOpCleOUcv58ZpUqI0nbm7rZNfbaoZRVt/mRwHYePFdBZIYwM
+         9Cq7VolP5kzZ5SZ4+ADokR9YSw2sslURcQufY90/kcvgWPbPn9h1loR9sms4uMudSGX1
+         b+3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783978044; x=1784582844;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-type:content-transfer-encoding:mime-version:x-gm-gg
+        d=1e100.net; s=20251104; t=1783978435; x=1784583235;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=+USb3n4BDL969RhM6AFut2RcEXsxb0pNRXhYra/sKHA=;
-        b=V5GlyJM41+kqCQVDhhVvUwFxOXQ+q9b6YdPzsK1QdtZSSMJSn9syi2b7cVcuysbnq9
-         tBbb48A28pfxMC8Gwg2ROl2830l1R0Fa0Fckepq8vNZ+qZ0ply1/JNAr4w1vrli3LXPQ
-         wRXCjrcbGNoaWrt3O2ACaoBv+iAFLYP/Wh2210jUf3XCmGeSf1Q8BiN+9vcC3r84rJVU
-         Zbu7na0ZLgDA/9Cqs4JOjOKu4LFhWRvfwZMwrF07PPxNf2nOTWC1Yob4TVdr564QXcGn
-         raxU90Z3FlbJzJAUUZ9/GHn9RS/GM2mmqjSWVKgjxHtcd5NI8bP2DF7S7/O9tX1TB6MT
-         ucKQ==
-X-Gm-Message-State: AOJu0YwlnC6YJ86Eqbw886R7HVttwk14OZnMpyJHjRkE3bbw2hPT/ihJ
-	qRT6q78czdDH0N0CBQ7cHOU635iV/i4c1ot5HlkOGrs+EC673ri0tfk1kUeoNJyrw6g=
-X-Gm-Gg: AfdE7ckSg2+IVOy3tft09GeF42X+1Rdto09TspYWo8NRZSzycU7NsIzI7lg9IBQbGCC
-	9B9RYD5wbHQpy/fe+pgzC4aZCa2uPzXu4i91dRsH+ATy0NZ75iGNW91xuKuKNCulGEvXWDtIrFT
-	BhABt+5u8aF9CYp3pGAFk1XdTakYcdGZh/nupyIQgbnOsyNIblwpdM027BvZenRao+H6xHR8Wkb
-	w3yD/6V/awMdjYm8y00hAJuAWA28cwWtImJQpx3rDuCYvVwCDYIRBrDEQbFxmGF0esauU9WbdHi
-	Q8BB3RpVvmAFtH14ucwSMgdYWl+aiJhWxq2ikTCpwBigg02KoaveFqCDiot5ieL6P9PHVr94/QS
-	BlrS7rHii+1D9OPcL6aLeYGxPHs9jXQpvM2hoJXLBE8Qhe0pRkMPUp/FnOMeFKMKyI5Olt3PPiP
-	I3mkieSrI3RB3Yo+JrVByrOAsBUJ8M77vyuziqM2888301P6ilKpFg
-X-Received: by 2002:a17:90b:2d10:b0:37f:9ce1:735f with SMTP id 98e67ed59e1d1-38dc779f507mr9978583a91.32.1783978044021;
-        Mon, 13 Jul 2026 14:27:24 -0700 (PDT)
-Received: from localhost (107-190-31-17.cpe.teksavvy.com. [107.190.31.17])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38e172faba3sm433937a91.11.2026.07.13.14.27.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Jul 2026 14:27:23 -0700 (PDT)
+        bh=Iezwh3ME7S217GUTr7unthJmQNFJnH6e1rXTj1TNmsQ=;
+        b=cuMC72h7LZNsyJkvbScSOPtI6x5Ce+5/sQpiOkvOTx2oGLc5+Rk/yQlkM1oeyuZhkY
+         I0xaA9NT7CrkqBf5Lv7Id0XUmEuf7NNqY+nefUysTSIngKzkPeNeeOrwzZ+LQ1Q9J6Gs
+         3ifQd79tCQH8QabvJE9IDS7sk3j5rSv3gsWHSUuyY9Ndu7M9LwZ9EVR/CHQTSpPu//y8
+         1sEq7OiDtXHFYz19TYfzAvpolF+SuXesKGDpiYnIvZmwNhyMqtVbFnCiPxCihstORARA
+         S2tNZQVLhCWH8O+R1kb5tmej5VbEB/hLEIhfTF5zqzU7ReTWSoCZ14G65N5nBfKdV4YX
+         HwOg==
+X-Forwarded-Encrypted: i=1; AHgh+Rooi7hR9lnPLn1hjRZq3Yv+wLr9DC/308p71ZZBTXVlKyhn2m1CD6hy+SnjPeywDOw9NRZjGBU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYAC0xv6BkQU0wtGJKo1CzlzPjjoYvU8nEOWD05tZ/ikInijN/
+	USY8nhUx3hmdfDdhGIZgyZ1AFG40PWjOQTnwKYLrs6U0AC/RKJymRoY+vE1bg9GXlLpv08EiepL
+	8fhTSxL1PvxFd/D8cs64gEV1zaoUKJEswtmyUDphk
+X-Gm-Gg: AfdE7ckTjc2kP+Ub2Bb7YBDluwtPfxMHLFG4JUM+KXvu/8TSruWlQdQ0qNQ+pe9czLc
+	kxdm81XFfee0x4NvIBUAnTLDW+Szvp7tWUgpL2hdlpb3FReysNrdBL9uwXPtSKqtcSdI1sVyAFm
+	svxI30yazXVd2zsOgn4o/gbXUBEj+GUKDNl7qPTBgGciq1Hm9+hFpY28NQIbG4breXeblsdODJJ
+	Q6pJnxM0DIDKnKyajGGt14A/kRMCKEGZO014C+8i6FvJCoB46jOk0FqlyOb9ItO2cwzr6Ptum5Y
+	M1+J1RTfkNw506PwrQltM1hedoTHML++8MJO+TM54frCnZa0
+X-Received: by 2002:a17:90b:5112:b0:381:6c5:3f63 with SMTP id
+ 98e67ed59e1d1-38e17d96405mr594631a91.6.1783978435335; Mon, 13 Jul 2026
+ 14:33:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+References: <20260713183614.2975972-1-xmei5@asu.edu> <alVUka8INN918W0K@chamomile>
+In-Reply-To: <alVUka8INN918W0K@chamomile>
+From: Xiang Mei <xmei5@asu.edu>
+Date: Mon, 13 Jul 2026 14:33:44 -0700
+X-Gm-Features: AVVi8CfWIx0IdHw9ndeEiFA6ywDR0d_SyV2cDqSjXU8pv4s3O00HljjD2IZSQ4c
+Message-ID: <CAPpSM+S6+Wu+FJn=Pob4rmOKOGUggUdKHB+pJxfueGxNv5KnoQ@mail.gmail.com>
+Subject: Re: [PATCH nf] netfilter: nft_fib: bail out if input device is missing
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	AutonomousCodeSecurity@microsoft.com, tgopinath@linux.microsoft.com, 
+	kys@microsoft.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 13 Jul 2026 17:27:22 -0400
-Message-Id: <DJXRFQTMYRTX.16Q66ORKV2WCA@etsalapatis.com>
-Cc: <netdev@vger.kernel.org>, <alexei.starovoitov@gmail.com>,
- <andrii@kernel.org>, <daniel@iogearbox.net>, <eddyz87@gmail.com>,
- <memxor@gmail.com>, <martin.lau@kernel.org>, <shakeel.butt@linux.dev>,
- <roman.gushchin@linux.dev>, <kuniyu@google.com>,
- <kerneljasonxing@gmail.com>, <kernel-team@meta.com>
-Subject: Re: [PATCH bpf-next v3 05/15] bpf: Replace prog_list_prog() check
- with direct pl->prog and pl->link check
-From: "Emil Tsalapatis" <emil@etsalapatis.com>
-To: "Amery Hung" <ameryhung@gmail.com>, <bpf@vger.kernel.org>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260706171918.317102-1-ameryhung@gmail.com>
- <20260706171918.317102-6-ameryhung@gmail.com>
-In-Reply-To: <20260706171918.317102-6-ameryhung@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:alexei.starovoitov@gmail.com,m:andrii@kernel.org,m:daniel@iogearbox.net,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@kernel.org,m:shakeel.butt@linux.dev,m:roman.gushchin@linux.dev,m:kuniyu@google.com,m:kerneljasonxing@gmail.com,m:kernel-team@meta.com,m:ameryhung@gmail.com,m:bpf@vger.kernel.org,m:alexeistarovoitov@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	FORGED_SENDER(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
-	DMARC_NA(0.00)[etsalapatis.com];
+	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307286-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-307287-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,linux.dev,google.com,meta.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[asu.edu:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:from_mime,asu.edu:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,netfilter.org:email,vger.kernel.org:from_smtp,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 634FF74F40C
+X-Rspamd-Queue-Id: C553574F4CA
 
-On Mon Jul 6, 2026 at 1:19 PM EDT, Amery Hung wrote:
-> From: Martin KaFai Lau <martin.lau@kernel.org>
+On Mon, Jul 13, 2026 at 2:11=E2=80=AFPM Pablo Neira Ayuso <pablo@netfilter.=
+org> wrote:
 >
-> prog_list_length() and compute_effective_progs() use !prog_list_prog(pl)
-> to skip a 'detaching' pl.
+> Hi,
 >
-> When pl->link is not NULL, prog_list_prog(pl) returns
-> the pl->link->link.prog. This does not work for the upcoming struct_ops
-> patch where pl->link is not NULL but pl->link->link.prog is NULL,
-> because a struct_ops map is attached to the cgroup instead of a BPF prog.
+> On Mon, Jul 13, 2026 at 06:36:14PM +0000, Xiang Mei (Microsoft) wrote:
+> > nft_fib_can_skip() dereferences the input device (indev->ifindex, and
+> > in->flags via nft_fib_is_loopback()) without a NULL check, assuming the
+> > hook switch only admits PRE_ROUTING/INGRESS/LOCAL_IN. But NF_NETDEV_EGR=
+ESS
+> > =3D=3D NF_INET_LOCAL_IN =3D=3D 1, so a netdev-family base chain on the =
+egress hook
+> > passes both the switch and nft_fib_validate() (which also keys only on =
+the
+> > hook number). Egress packets have no input device, so nft_fib_can_skip(=
+)
+> > dereferences NULL.
 >
-> To prepare for the upcoming struct_ops patch, this patch
-> replaces the prog_list_prog() test with the
-> "!pl->prog && !pl->link". In __cgroup_bpf_detach(),
-> both pl->prog and pl->link are set to NULL, so testing
-> "!pl->prog && !pl->link" is the same test to tell
-> if a pl is being detached. This change should be a no-op.
+> By reading your description, does your kernel include this patch?
 >
-> Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+Thanks for pointing this out. I just rechecked my verification script
+and found a bug that failed to pull the latest version of nf.
+(I wrongly assumed it succeeded and checked on a code-based one month older=
+).
 
-This change itself is ok, but now prog_list_prog never returns NULL
-under normal operation AFAICT. Can we add error handling in the
-remaining two call sites? prog_list_id() especially, since it blindly
-dereferences the result like so:
+Sorry for the false alarm. Nvm about this email; I fixed the issue,
+and it won't happen again.
 
-	return prog_list_prog(pl)->aux->id;
+Xiang
 
-Imo it's worth it even if the code gets slightly more verbose.
-
-> ---
->  kernel/bpf/cgroup.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> commit d07955dd34ecae17d35d8c7d0a273a3fba653a8c
+> Author: Theodor Arsenij Larionov-Trichkine <theodorlarionov@gmail.com>
+> Date:   Mon Jun 29 12:53:11 2026 +0200
 >
-> diff --git a/kernel/bpf/cgroup.c b/kernel/bpf/cgroup.c
-> index b64f6757096c..b100c04cb9c8 100644
-> --- a/kernel/bpf/cgroup.c
-> +++ b/kernel/bpf/cgroup.c
-> @@ -408,7 +408,7 @@ static u32 prog_list_length(struct hlist_head *head, =
-int *preorder_cnt)
->  	u32 cnt =3D 0;
-> =20
->  	hlist_for_each_entry(pl, head, node) {
-> -		if (!prog_list_prog(pl))
-> +		if (!pl->prog && !pl->link)
->  			continue;
->  		if (preorder_cnt && (pl->flags & BPF_F_PREORDER))
->  			(*preorder_cnt)++;
-> @@ -482,7 +482,7 @@ static int compute_effective_progs(struct cgroup *cgr=
-p,
-> =20
->  		init_bstart =3D bstart;
->  		hlist_for_each_entry(pl, &p->bpf.progs[atype], node) {
-> -			if (!prog_list_prog(pl))
-> +			if (!pl->prog && !pl->link)
->  				continue;
-> =20
->  			if (pl->flags & BPF_F_PREORDER) {
-
+>     netfilter: nft_fib: reject fib expression on the netdev egress hook
+>
 
