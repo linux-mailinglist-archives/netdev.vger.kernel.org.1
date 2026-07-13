@@ -1,215 +1,182 @@
-Return-Path: <netdev+bounces-307057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307077-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id V2BDMpacVGr4oAMAu9opvQ
-	(envelope-from <netdev+bounces-307057-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:06:46 +0200
+	id O7JsMAChVGraoQMAu9opvQ
+	(envelope-from <netdev+bounces-307077-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:25:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C73D7487E7
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:06:45 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3E03748A6A
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:25:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=163.com header.s=s110527 header.b="H VcHVJK";
-	dmarc=pass (policy=none) header.from=163.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307057-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307057-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307077-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-307077-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6DBEB30053FB
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 08:04:45 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7640F301AEF2
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 08:14:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 074F736897C;
-	Mon, 13 Jul 2026 08:04:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9B7F3B14AC;
+	Mon, 13 Jul 2026 08:12:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+Received: from eidolon.nox.tf (eidolon.nox.tf [185.142.180.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8868B3955EF
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 08:04:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923193B1032;
+	Mon, 13 Jul 2026 08:12:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783929883; cv=none; b=tqejT+xKLTeZYBkCg5WfQY4ryhmF6NAc6q9z3bQj6XvRyBT7KeezPPk85phloFBcW6NJADGMQEEy8tVtFnUuUXz3CVxndBq+Q6m22XWCHUvV7NylEJn78W8su7apIhYTMsTShycUQdcjHv7Wf6KJn7TiVPwxHIEtTEw7FOE3ur8=
+	t=1783930335; cv=none; b=DCXIelrclab8/k+JdOsrLUS6QfW8aNQxtNwRnPswSap6oBEtHkyv+EydUUSy4coNnI4WkkRZItSuavtDfOGZ1M4OpWGYwQldp/XkprIF/TjQTU5ZFlNtMsBgo/wmCgVTR7Hhn1KPzJg4GS4qi2YC5k+syIspOzpKEDCQWEocfoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783929883; c=relaxed/simple;
-	bh=kVRP38ALCF4QqtzJICmTItLqiMqqfw345qhv/RBjOGk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=u5LKKl0gJmpwaIHwlJ42Azdca+yQIWtaxzVwNoSnQfdIih19R1DEeTJY40htwddNd1NhT68QSZY8lMKMIRidDOA3IUYW78AryVV7qK47cYvdQohegRsY12vm3vK0zxT4AdYefjAij9SXoFQ8VTWk2uCjQXrcjYzv7FdVPEt2hAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=HVcHVJK0; arc=none smtp.client-ip=117.135.210.3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=kVRP38ALCF4QqtzJICmTItLqiMqqfw345qhv/RBjOGk=; b=H
-	VcHVJK0ZUlQH4j8TZ+aDdnvSVWSTf0dHRoakkLnVh7d8u0lZF3dD2duKH8e92yx5
-	bXP+pMRahyt5bnWw0qhbIpJc27ENeOB1FDr2KyGymv/nbpaHpmfbSyDWkuflx+90
-	UIhjK7rJxF2C1uDojmHA9ypZs4drCi6zZGPZPHTahM=
-Received: from 15927021679$163.com ( [116.128.244.169] ) by
- ajax-webmail-wmsvr-40-119 (Coremail) ; Mon, 13 Jul 2026 16:04:14 +0800
- (CST)
-Date: Mon, 13 Jul 2026 16:04:14 +0800 (CST)
-From: "Xiong Weimin" <15927021679@163.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: jasowang@redhat.com, xiongweimin <xiongweimin@kylinos.cn>,
-	netdev@vger.kernel.org, virtualization@lists.linux.dev
-Subject: Re:Re: [PATCH] vhost/net: Fill virtio_net_hdr GSO/csum metadata on
- RX
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20260511(2e539873) Copyright (c) 2002-2026 www.mailtech.cn 163com
-In-Reply-To: <20260713025549-mutt-send-email-mst@kernel.org>
-References: <20260713010442.331109-1-15927021679@163.com>
- <20260713025549-mutt-send-email-mst@kernel.org>
-X-NTES-SC: AL_Qu2TAfWZtkAu4imaY+kckk8Ugeg8Xsewsvgh249ec/8Eti30+AcGdm9jI0vR8sOpOxyGjSi2UTVlzvhfT4N1sOqLki8PQQvYTU36kvOrvQ==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1783930335; c=relaxed/simple;
+	bh=3ajd/nAcGp77st83VI1YpV+CMBbB7AcCAMs7VZKKiqE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=igS/+vtTUGWV9+4qYdjBxfu4hLMYQzuaiSRQxPbMnIl6FJ+ufrtufyDPy/+CJ45cVhejnNXhBioKWp0ppYrNh8ie2tmC5VS+91IWBDnDRriB1MBuJQRPjHE1u0Rx4ao3ZQsVCmA5WfwR2Mjoga/mHQ6eYr+NHLZO8ZW6YIFlapY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=diac24.net; spf=pass smtp.mailfrom=diac24.net; arc=none smtp.client-ip=185.142.180.128
+Received: from nat-wifi0.uniroma3.it ([193.204.167.180] helo=alea)
+	by eidolon.nox.tf with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <equinox@diac24.net>)
+	id 1wjBh1-00000001NmY-1iGv;
+	Mon, 13 Jul 2026 10:07:11 +0200
+Received: from equinox by alea with local (Exim 4.99.2)
+	(envelope-from <equinox@diac24.net>)
+	id 1wjBgd-00000001FAn-2Qy8;
+	Mon, 13 Jul 2026 10:06:47 +0200
+From: David 'equinox' Lamparter <equinox@diac24.net>
+To: Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>
+Cc: netdev@vger.kernel.org,
+	mptcp@lists.linux.dev,
+	David 'equinox' Lamparter <equinox@diac24.net>
+Subject: [PATCH net-next] mptcp: sockopt: implement IPV6_TCLASS
+Date: Mon, 13 Jul 2026 10:04:37 +0200
+Message-ID: <20260713080634.296011-1-equinox@diac24.net>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <4bb48033.666a.19f5a815bd7.Coremail.15927021679@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:dygvCgD3393_m1RqeMYcAA--.7291W
-X-CM-SenderInfo: jprvmjixqsilmxzbiqqrwthudrp/xtbC0R7VXmpUm-7lFwAA3t
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.06 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:mst@redhat.com,m:jasowang@redhat.com,m:xiongweimin@kylinos.cn,m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[15927021679@163.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[163.com];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-307057-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	DMARC_NA(0.00)[diac24.net];
+	FORGED_RECIPIENTS(0.00)[m:matttbe@kernel.org,m:martineau@kernel.org,m:geliang@kernel.org,m:netdev@vger.kernel.org,m:mptcp@lists.linux.dev,m:equinox@diac24.net,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[equinox@diac24.net,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[15927021679@163.com,netdev@vger.kernel.org];
-	HAS_X_PRIO_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307077-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	DKIM_TRACE(0.00)[163.com:+];
+	FROM_NEQ_ENVFROM(0.00)[equinox@diac24.net,netdev@vger.kernel.org];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,kylinos.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	R_DKIM_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,diac24.net:from_mime,diac24.net:email,diac24.net:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0C73D7487E7
+X-Rspamd-Queue-Id: B3E03748A6A
 
-CgoKSGkgTWljaGFlbCwKCgpUaGFua3MgZm9yIHRoZSByZXZpZXcuCgoKT24gd2h5IFZIT1NUX05F
-VF9GX1ZJUlRJT19ORVRfSERSOgoKCldlIGhpdCB0aGlzIHdpdGggdmhvc3QtdXNlciBiYWNrZW5k
-cyB0aGF0IGRvIG5vdCBleHBvc2UgSUZGX1ZORVRfSERSCihlLmcuIERQREsvY3VzdG9tIHNvY2tl
-dCBiYWNrZW5kcykuIFdoZW4gdGhlIGd1ZXN0IG5lZ290aWF0ZXMKVkhPU1RfTkVUX0ZfVklSVElP
-X05FVF9IRFIsIHZob3N0IGlzIHJlc3BvbnNpYmxlIGZvciBzdXBwbHlpbmcKdmlydGlvX25ldF9o
-ZHIgb24gUlguIFRoZSBjdXJyZW50IGNvZGUgYWx3YXlzIHplcm9lcyB0aGUgaGVhZGVyCihHU09f
-Tk9ORSksIHNvIGd1ZXN0cyB0aGF0IG5lZ290aWF0ZWQgR1VFU1RfVFNPKi9HVUVTVF9DU1VNIG5l
-dmVyCnJlY2VpdmUgY29ycmVjdCBvZmZsb2FkIG1ldGFkYXRhIGV2ZW4gd2hlbiB0aGUgc29ja2V0
-IHNrYiBoYXMgaXQuCgoKVGhlIGdvYWwgaXMgdG8gbWFrZSBSWCBvZmZsb2FkIG1ldGFkYXRhIGNv
-cnJlY3QgZm9yIHRoYXQgY29uZmlndXJhdGlvbi4KVFggVFNPIGlzIGludGVudGlvbmFsbHkgbGVm
-dCBmb3IgYSBmb2xsb3ctdXAgc2VyaWVzLgoKCk9uIHRoZSByYWNlIHlvdSBwb2ludGVkIG91dDoK
-CgpZb3UncmUgcmlnaHQg4oCUIHBlZWtpbmcgdGhlIHNrYiB1bmRlciBza19yZWNlaXZlX3F1ZXVl
-LmxvY2sgYW5kIHRoZW4KYnVpbGRpbmcgdGhlIGhlYWRlciBhZnRlciBkcm9wcGluZyB0aGUgbG9j
-ayBpcyByYWN5IGlmIGFub3RoZXIgY29udGV4dApjYW4gZGVxdWV1ZSB0aGUgc2tiIGJlZm9yZSBy
-ZWN2bXNnKCkgcnVucy4gSSBzZWUgd2h5IHRoZSBoZWFkZXIgZmlsbGluZwplbmRlZCB1cCBpbiB0
-dW4sIHdoZXJlIHRoZSBiYWNrZW5kIG93bnMgdGhlIHNrYiBsaWZlY3ljbGUuCgoKSSBjYW4gdGhp
-bmsgb2YgYSBmZXcgb3B0aW9uczoKwqAgYSkgRHJvcCB0aGlzIGFwcHJvYWNoIGFuZCBub3QgdXNl
-IFZIT1NUX05FVF9GX1ZJUlRJT19ORVRfSERSIGZvcgrCoCDCoCDCoHRoZXNlIGJhY2tlbmRzIChr
-ZWVwIHplcm9lZCBoZWFkZXJzIC8gbm8gZ3Vlc3Qgb2ZmbG9hZCkuCsKgIGIpIE1vdmUgdGhlIG1l
-dGFkYXRhIGV4dHJhY3Rpb24gdG8gdGhlIGJhY2tlbmQgKHNpbWlsYXIgdG8gdHVuKS4KwqAgYykg
-SG9sZCB0aGUgcmVjZWl2ZS1xdWV1ZSBsb2NrIGFjcm9zcyBwZWVrICsgcmVjdm1zZyBpZiB0aGF0
-IGlzCsKgIMKgIMKgYWNjZXB0YWJsZSBmb3IgdGhpcyBwYXRoIChJIG5lZWQgdG8gY2hlY2sgd2hl
-dGhlciByZWN2bXNnIGNhbgrCoCDCoCDCoGJlIGNhbGxlZCB1bmRlciB0aGF0IGxvY2spLgoKCkNv
-dWxkIHlvdSBzdWdnZXN0IHdoaWNoIGRpcmVjdGlvbiB5b3UnZCBwcmVmZXI/IEknbSBoYXBweSB0
-byByZXNwaW4Kb25jZSB3ZSBhZ3JlZSBvbiB0aGUgcmlnaHQgaW50ZWdyYXRpb24gcG9pbnQuCgoK
-SSdsbCBhbHNvIGZpeCB0aGUgbXVsdGlsaW5lIGNvbW1lbnQgdG8gZm9sbG93IHRoZSBuZXQgY29u
-dmVudGlvbjoKCgovKiBXaGVuIFZIT1NUX05FVF9GX1ZJUlRJT19ORVRfSERSIGlzIHNldCwgdmhv
-c3Qgc3VwcGxpZXMgdmlydGlvX25ldF9oZHIuCsKgKiBQb3B1bGF0ZSBHU08vY2hlY2tzdW0gbWV0
-YWRhdGEgZnJvbSB0aGUgc29ja2V0IHNrYiAuLi4KwqAqLwoKClRoYW5rcywKV2VpbWluCgpBdCAy
-MDI2LTA3LTEzIDE1OjAzOjM5LCAiTWljaGFlbCBTLiBUc2lya2luIiA8bXN0QHJlZGhhdC5jb20+
-IHdyb3RlOgo+T24gTW9uLCBKdWwgMTMsIDIwMjYgYXQgMDk6MDQ6NDJBTSArMDgwMCwgd2VpbWlu
-IHhpb25nIHdyb3RlOgo+PiBGcm9tOiB4aW9uZ3dlaW1pbiA8eGlvbmd3ZWltaW5Aa3lsaW5vcy5j
-bj4KPj4gCj4+IFdoZW4gVkhPU1RfTkVUX0ZfVklSVElPX05FVF9IRFIgaXMgc2V0LCB2aG9zdCBz
-dXBwbGllcyB2aXJ0aW9fbmV0X2hkciB0bwo+PiB0aGUgZ3Vlc3QgYnV0IHByZXZpb3VzbHkgYWx3
-YXlzIHdyb3RlIGEgemVyb2VkIGhlYWRlciAoR1NPX05PTkUpLiBHdWVzdHMKPj4gdGhhdCByZWx5
-IG9uIEdVRVNUX1RTTyovR1VFU1RfQ1NVTSB0aGVyZWZvcmUgbmV2ZXIgc2F3IG9mZmxvYWQgbWV0
-YWRhdGEuCj4KPlJpZ2h0LiBRdWVzdGlvbiBpcyB3aHkgYXJlIHlvdSB1c2luZyBWSE9TVF9ORVRf
-Rl9WSVJUSU9fTkVUX0hEUj8KPgo+PiAKPj4gUGVlayB0aGUgc29ja2V0IHNrYiBiZWZvcmUgcmVj
-dm1zZyBhbmQgcG9wdWxhdGUgdGhlIGhlYWRlciB3aXRoCj4+IHZpcnRpb19uZXRfaGRyX2Zyb21f
-c2tiKCkuIEFsc28gYWR2ZXJ0aXNlIHRoZSBjb3JyZXNwb25kaW5nIGd1ZXN0IG9mZmxvYWQKPj4g
-ZmVhdHVyZSBiaXRzIGZyb20gVkhPU1RfR0VUX0ZFQVRVUkVTLgo+PiAKPj4gVFggVFNPIHRvd2Fy
-ZCBiYWNrZW5kcyB3aXRob3V0IElGRl9WTkVUX0hEUiBpcyBpbnRlbnRpb25hbGx5IGxlZnQgZm9y
-IGEKPj4gZm9sbG93LXVwIHNlcmllcy4KPj4gCj4+IFNpZ25lZC1vZmYtYnk6IHhpb25nd2VpbWlu
-IDx4aW9uZ3dlaW1pbkBreWxpbm9zLmNuPgo+PiBDYzogTWljaGFlbCBTLiBUc2lya2luIDxtc3RA
-cmVkaGF0LmNvbT4KPj4gQ2M6IEphc29uIFdhbmcgPGphc293YW5nQHJlZGhhdC5jb20+Cj4+IENj
-OiB2aXJ0dWFsaXphdGlvbkB2Z2VyLmtlcm5lbC5vcmcKPj4gQ2M6IG5ldGRldkB2Z2VyLmtlcm5l
-bC5vcmcKPj4gLS0tCj4+IAo+PiAtLS0gYS9kcml2ZXJzL3Zob3N0L25ldC5jCj4+ICsrKyBiL2Ry
-aXZlcnMvdmhvc3QvbmV0LmMKPj4gQEAgLTczLDYgKzczLDEwIEBACj4+ICAJVkhPU1RfRkVBVFVS
-RVMsCj4+ICAJVkhPU1RfTkVUX0ZfVklSVElPX05FVF9IRFIsCj4+ICAJVklSVElPX05FVF9GX01S
-R19SWEJVRiwKPj4gKwlWSVJUSU9fTkVUX0ZfR1VFU1RfQ1NVTSwKPj4gKwlWSVJUSU9fTkVUX0Zf
-R1VFU1RfVFNPNCwKPj4gKwlWSVJUSU9fTkVUX0ZfR1VFU1RfVFNPNiwKPj4gKwlWSVJUSU9fTkVU
-X0ZfR1VFU1RfRUNOLAo+PiAgCVZJUlRJT19GX0FDQ0VTU19QTEFURk9STSwKPj4gIAlWSVJUSU9f
-Rl9SSU5HX1JFU0VULAo+PiAgCVZJUlRJT19GX0lOX09SREVSLAo+PiBAQCAtNjQ0LDcgKzY0OCw3
-IEBACj4+ICBzdGF0aWMgc2l6ZV90IGluaXRfaW92X2l0ZXIoc3RydWN0IHZob3N0X3ZpcnRxdWV1
-ZSAqdnEsIHN0cnVjdCBpb3ZfaXRlciAqaXRlciwKPj4gIAkJCSAgICBzaXplX3QgaGRyX3NpemUs
-IGludCBvdXQpCj4+ICB7Cj4+IC0JLyogU2tpcCBoZWFkZXIuIFRPRE86IHN1cHBvcnQgVFNPLiAq
-Lwo+PiArCS8qIFNraXAgZ3Vlc3QgdmlydGlvX25ldF9oZHI7IFRYIFRTTyBoYW5kbGVkIGluIGEg
-Zm9sbG93LXVwLiAqLwo+PiAgCXNpemVfdCBsZW4gPSBpb3ZfbGVuZ3RoKHZxLT5pb3YsIG91dCk7
-Cj4+ICAKPj4gIAlpb3ZfaXRlcl9pbml0KGl0ZXIsIElURVJfU09VUkNFLCB2cS0+aW92LCBvdXQs
-IGxlbik7Cj4+IEBAIC0xMDI1LDYgKzEwMjksMzUgQEAKPj4gIAlyZXR1cm4gbGVuOwo+PiAgfQo+
-PiAgCj4+ICsvKgo+PiArICogV2hlbiBWSE9TVF9ORVRfRl9WSVJUSU9fTkVUX0hEUiBpcyBzZXQs
-IHZob3N0IHN1cHBsaWVzIHZpcnRpb19uZXRfaGRyLgo+PiArICogUG9wdWxhdGUgR1NPL2NoZWNr
-c3VtIG1ldGFkYXRhIGZyb20gdGhlIHNvY2tldCBza2Igc28gZ3Vlc3RzIHRoYXQKPj4gKyAqIG5l
-Z290aWF0ZWQgR1VFU1RfVFNPKi9HVUVTVF9DU1VNIHJlY2VpdmUgY29ycmVjdCBvZmZsb2FkIGlu
-Zm9ybWF0aW9uLgo+PiArICovCj4KPnRoaXMgaXMgYSB3cm9uZyB0eXBlIG9mIG11bHRpbGluZSBj
-b21tZW50LiB0aGlzIGZpbGUgZm9sbG93cyBuZXQKPmNvbnZlbnRpb246Cj4KPi8qIEFBQQo+ICog
-QkJCCj4gKi8KPgo+PiArc3RhdGljIGludCB2aG9zdF9uZXRfaGRyX2Zyb21fc29jayhzdHJ1Y3Qg
-dmhvc3RfdmlydHF1ZXVlICp2cSwgc3RydWN0IHNvY2sgKnNrLAo+PiArCQkJCSAgIHN0cnVjdCB2
-aXJ0aW9fbmV0X2hkciAqaGRyKQo+PiArewo+PiArCXN0cnVjdCBza19idWZmICpza2I7Cj4+ICsJ
-dW5zaWduZWQgbG9uZyBmbGFnczsKPj4gKwlpbnQgdmxhbl9obGVuID0gMDsKPj4gKwlpbnQgcmV0
-Owo+PiArCj4+ICsJc3Bpbl9sb2NrX2lycXNhdmUoJnNrLT5za19yZWNlaXZlX3F1ZXVlLmxvY2ss
-IGZsYWdzKTsKPj4gKwlza2IgPSBza2JfcGVlaygmc2stPnNrX3JlY2VpdmVfcXVldWUpOwo+PiAr
-CWlmICghc2tiKSB7Cj4+ICsJCXNwaW5fdW5sb2NrX2lycXJlc3RvcmUoJnNrLT5za19yZWNlaXZl
-X3F1ZXVlLmxvY2ssIGZsYWdzKTsKPj4gKwkJbWVtc2V0KGhkciwgMCwgc2l6ZW9mKCpoZHIpKTsK
-Pj4gKwkJaGRyLT5nc29fdHlwZSA9IFZJUlRJT19ORVRfSERSX0dTT19OT05FOwo+PiArCQlyZXR1
-cm4gMDsKPj4gKwl9Cj4+ICsJaWYgKHNrYl92bGFuX3RhZ19wcmVzZW50KHNrYikpCj4+ICsJCXZs
-YW5faGxlbiA9IFZMQU5fSExFTjsKPj4gKwlyZXQgPSB2aXJ0aW9fbmV0X2hkcl9mcm9tX3NrYihz
-a2IsIGhkciwgdmhvc3RfaXNfbGl0dGxlX2VuZGlhbih2cSksCj4+ICsJCQkJICAgICAgdHJ1ZSwg
-dmxhbl9obGVuKTsKPj4gKwlzcGluX3VubG9ja19pcnFyZXN0b3JlKCZzay0+c2tfcmVjZWl2ZV9x
-dWV1ZS5sb2NrLCBmbGFncyk7Cj4+ICsJcmV0dXJuIHJldDsKPj4gK30KPgo+Cj5UaGlzIG1lYW5z
-IHRoZSBoZWFkZXIgd2lsbCBiZSB3cm9uZyBpZiBzb21ldGhpbmcgY29uc3VtZXMKPnRoZSBza2Ig
-YWZ0ZXIgd2UgZHJvcCB0aGUgbG9jaywgbm8/Cj4KPlRoYXQncyB3aHkgaW4gdGhlIGVuZCB3ZSBw
-dXQgdGhlIGhlYWRlciBmaWxsaW5nIGxvZ2ljCj5pbiB0dW4sIGl0IGNhbiBhdm9pZCByYWNlcyB0
-aGVyZS4KPgo+Cj4+ICsKPj4gIHN0YXRpYyBpbnQgdmhvc3RfbmV0X3J4X3BlZWtfaGVhZF9sZW4o
-c3RydWN0IHZob3N0X25ldCAqbmV0LCBzdHJ1Y3Qgc29jayAqc2ssCj4+ICAJCQkJICAgICAgYm9v
-bCAqYnVzeWxvb3BfaW50ciwgdW5zaWduZWQgaW50ICpjb3VudCkKPj4gIHsKPj4gQEAgLTEyMzks
-MTAgKzEyNzIsMTggQEAKPj4gIAkJLyogV2UgZG9uJ3QgbmVlZCB0byBiZSBub3RpZmllZCBhZ2Fp
-bi4gKi8KPj4gIAkJaW92X2l0ZXJfaW5pdCgmbXNnLm1zZ19pdGVyLCBJVEVSX0RFU1QsIHZxLT5p
-b3YsIGluLCB2aG9zdF9sZW4pOwo+PiAgCQlmaXh1cCA9IG1zZy5tc2dfaXRlcjsKPj4gLQkJaWYg
-KHVubGlrZWx5KCh2aG9zdF9obGVuKSkpIHsKPj4gLQkJCS8qIFdlIHdpbGwgc3VwcGx5IHRoZSBo
-ZWFkZXIgb3Vyc2VsdmVzCj4+IC0JCQkgKiBUT0RPOiBzdXBwb3J0IFRTTy4KPj4gKwkJaWYgKHVu
-bGlrZWx5KHZob3N0X2hsZW4pKSB7Cj4+ICsJCQkvKgo+PiArCQkJICogQnVpbGQgdmlydGlvX25l
-dF9oZHIgZnJvbSB0aGUgc29ja2V0IHNrYiBiZWZvcmUKPj4gKwkJCSAqIHJlY3Ztc2cgY29uc3Vt
-ZXMgaXQuIFNraXAgZm9yIHB0cl9yaW5nIGJhY2tlbmRzCj4+ICsJCQkgKiB3aGVyZSB0aGUgc2ti
-IGlzIG5vdCBvbiBza19yZWNlaXZlX3F1ZXVlLgo+PiAgCQkJICovCj4+ICsJCQlpZiAoIW52cS0+
-cnhfcmluZyAmJgo+PiArCQkJICAgIHZob3N0X25ldF9oZHJfZnJvbV9zb2NrKHZxLCBzb2NrLT5z
-aywgJmhkcikpIHsKPj4gKwkJCQl2cV9lcnIodnEsICJGYWlsZWQgdG8gYnVpbGQgdm5ldF9oZHIg
-ZnJvbSBza2JcbiIpOwo+PiArCQkJCXZob3N0X2Rpc2NhcmRfdnFfZGVzYyh2cSwgaGVhZGNvdW50
-LCBuZGVzYyk7Cj4+ICsJCQkJY29udGludWU7Cj4+ICsJCQl9Cj4+ICAJCQlpb3ZfaXRlcl9hZHZh
-bmNlKCZtc2cubXNnX2l0ZXIsIHZob3N0X2hsZW4pOwo+PiAgCQl9Cj4+ICAJCWVyciA9IHNvY2st
-Pm9wcy0+cmVjdm1zZyhzb2NrLCAmbXNnLAo+PiBAQCAtMTI3MCw3ICsxMzExLDYgQEAKPj4gIAkJ
-CSAqLwo+PiAgCQkJaW92X2l0ZXJfYWR2YW5jZSgmZml4dXAsIHNpemVvZihoZHIpKTsKPj4gIAkJ
-fQo+PiAtCQkvKiBUT0RPOiBTaG91bGQgY2hlY2sgYW5kIGhhbmRsZSBjaGVja3N1bS4gKi8KPj4g
-IAo+PiAgCQludW1fYnVmZmVycyA9IGNwdV90b192aG9zdDE2KHZxLCBoZWFkY291bnQpOwo+PiAg
-CQlpZiAobGlrZWx5KHNldF9udW1fYnVmZmVycykgJiYK
+The IPV6_TCLASS setsockopt just needs to be forwarded to the individual
+TCP sockets, like IP_TOS is already handled for IPv4.  The code here is
+pretty much identical, except there's no helper for IPv6 like IPv4's
+__ip_sock_set_tos().
+
+Coincidentally, ssh uses this sockopt and prints an error in the middle
+of your ongoing SSH session when it doesn't work (very annoying when
+doing SCP/SFTP on a multiplexed session.)
+
+Signed-off-by: David 'equinox' Lamparter <equinox@diac24.net>
+Cc: Matthieu Baerts <matttbe@kernel.org>
+Cc: Mat Martineau <martineau@kernel.org>
+Cc: Geliang Tang <geliang@kernel.org>
+---
+note: I wasn't entirely sure what tree this should be on top of, with the
+mptcp trees on github & kernel.org;  this is on top of net-next.  It
+shouldn't really matter though.
+---
+ net/mptcp/sockopt.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
+
+diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
+index fcf6feb2a9eb..edddafebb8de 100644
+--- a/net/mptcp/sockopt.c
++++ b/net/mptcp/sockopt.c
+@@ -394,6 +394,35 @@ static int mptcp_setsockopt_sol_socket(struct mptcp_sock *msk, int optname,
+ 	return -EOPNOTSUPP;
+ }
+ 
++static int mptcp_setsockopt_v6_set_tclass(struct mptcp_sock *msk, int optname,
++					  sockptr_t optval, unsigned int optlen)
++{
++	struct mptcp_subflow_context *subflow;
++	struct sock *sk = (struct sock *)msk;
++	int err, val;
++
++	err = ipv6_setsockopt(sk, SOL_IPV6, optname, optval, optlen);
++
++	if (err != 0)
++		return err;
++
++	lock_sock(sk);
++	sockopt_seq_inc(msk);
++	val = READ_ONCE(inet6_sk(sk)->tclass);
++	mptcp_for_each_subflow(msk, subflow) {
++		struct sock *ssk = mptcp_subflow_tcp_sock(subflow);
++		bool slow;
++
++		slow = lock_sock_fast(ssk);
++		inet6_sk(ssk)->tclass = val;
++		sk_dst_reset(ssk);
++		unlock_sock_fast(ssk, slow);
++	}
++	release_sock(sk);
++
++	return 0;
++}
++
+ static int mptcp_setsockopt_v6(struct mptcp_sock *msk, int optname,
+ 			       sockptr_t optval, unsigned int optlen)
+ {
+@@ -436,6 +465,8 @@ static int mptcp_setsockopt_v6(struct mptcp_sock *msk, int optname,
+ 
+ 		release_sock(sk);
+ 		break;
++	case IPV6_TCLASS:
++		return mptcp_setsockopt_v6_set_tclass(msk, optname, optval, optlen);
+ 	}
+ 
+ 	return ret;
+@@ -1485,6 +1516,9 @@ static int mptcp_getsockopt_v6(struct mptcp_sock *msk, int optname,
+ 	struct sock *sk = (void *)msk;
+ 
+ 	switch (optname) {
++	case IPV6_TCLASS:
++		return mptcp_put_int_option(msk, optval, optlen,
++					    READ_ONCE(inet6_sk(sk)->tclass));
+ 	case IPV6_V6ONLY:
+ 		return mptcp_put_int_option(msk, optval, optlen,
+ 					    sk->sk_ipv6only);
+-- 
+2.53.0
+
 
