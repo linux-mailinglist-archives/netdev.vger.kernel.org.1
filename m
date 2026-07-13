@@ -1,152 +1,168 @@
-Return-Path: <netdev+bounces-307082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307083-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lD1hFJCgVGq1oQMAu9opvQ
-	(envelope-from <netdev+bounces-307082-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:23:44 +0200
+	id w4ikCKyiVGpAogMAu9opvQ
+	(envelope-from <netdev+bounces-307083-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:32:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C83A2748A20
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:23:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8ECBA748B9B
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:32:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=qjjq3s+R;
-	dmarc=pass (policy=reject) header.from=google.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307082-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307082-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=lGle3H04;
+	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307083-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307083-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C4CA931014B8
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 08:17:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1608B30056CF
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 08:19:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCB463AE18C;
-	Mon, 13 Jul 2026 08:17:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5263036897C;
+	Mon, 13 Jul 2026 08:19:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 999393A63F2
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 08:17:12 +0000 (UTC)
+Received: from zg8tmtyylji0my4xnjeumjiw.icoremail.net (zg8tmtyylji0my4xnjeumjiw.icoremail.net [162.243.161.220])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 527B139DBFA;
+	Mon, 13 Jul 2026 08:18:59 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783930635; cv=none; b=SCrOcwH5U+/dp2N9tfh9Bmi3uEmN2P/kuLlnJSqih6siJmjAq/ypfAAQeJ/Ow+fM9yBNaMW/Bjb4z/LLzXckGAM2ayO633rDF2SWu8oQcGK+Ee33imL6iKQo54I2lILX3UamaL7t2XhCG4Qw6EjADAnEZKdtBUYWAasI9AAI6kk=
+	t=1783930744; cv=none; b=UhBs+yXojPrALwMBBiGyA0WwQrcvlnoFpiqnMKMZx5mlKfv6zvIVxQUHEPs/v53Ioo4YNAp0aI9Zi+ZAspcv/fzY7L2O0rHt87Xiah4wD1ddB2p1SE/7onf0AV13koLrKA14cMKRuqSs5soHInBH+R4rwBidXWQpCdTf/N06vvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783930635; c=relaxed/simple;
-	bh=e7biIQWq4ayHoPrEIMSf8dlPvUrUBRV5RYriupriJE0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=loAZ53sOChVVuD1uSB59qEt1ENU+3YntEAe33XLwz6qNASYbY9OQrdbN4s2NhD5G+IZueNMKTBLytYlN5CbNTM1sSraAuTtS5/cT2WX/cHAzjaEvwEYq3/CKaSWGHYxPvYxKMO0kn+qgqXDr6SG/H/MiVwVORah/8Wm+4u6hby4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qjjq3s+R; arc=none smtp.client-ip=209.85.128.74
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-49244130073so29403645e9.1
-        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 01:17:12 -0700 (PDT)
+	s=arc-20240116; t=1783930744; c=relaxed/simple;
+	bh=yQvdhLWJ8LZ6eGjVPDK/jPe0RYv7DHDk1LRwJrKtbzI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qOsBRb0Pa2H5TUHD8nWdTqzswLZd3QEVWZtvxAkmXa9u24ArRUBpLXjQlB2ZCHx050Lr+N3nl00ZjK/h/SwwKXEs5pD2k5Ad8V4jkCnMR9VWjtpVEq6azWs/x/MjSFQ0hrCdIUfh+eyW9GzJeK4Wyh3q6slUhyCYJIQFb0wf6Kc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=lGle3H04; arc=none smtp.client-ip=162.243.161.220
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1783930631; x=1784535431; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=e7biIQWq4ayHoPrEIMSf8dlPvUrUBRV5RYriupriJE0=;
-        b=qjjq3s+RFS6qbO3JTGK72AL/nlAHYi9B8SqBHxXSiIgAA3LpsbTlUTI2JWT6EIW/IB
-         FPxIakPznrCdq6XUTIfcG6TfRy6p7fO6l0+N9WScJeZU70/PL84ZtaYm+iO0mcvUqcB+
-         07oW4syGW2NIi7eU7rRWgl0zX+K6UFY/GwLqHFUoiRf7lgykyqIj0U7LiE1Gs+vClPlT
-         hYpSmVGiHocqOqNtpZGdaCLccVT/QtEEOyhx8C9RdM2n72ERl3cw8WIh4eRVPN6dbFQD
-         MyotRj1p2UUJAzRRbBwhPrnOn4PU8YfF63oOV41qRvIo7VrFLgqMWu5MRo5r8dzN4vtB
-         sc0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783930631; x=1784535431;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=e7biIQWq4ayHoPrEIMSf8dlPvUrUBRV5RYriupriJE0=;
-        b=K/Jh8qAU0f2D2W+kyQ5ORvMIY5bKrkWTM/UHPigsK324w3wcfmr6sgIEt2U/l+4oxr
-         u+tI7m+YgWZfqpQ7WEGiPx8PY4J4ZuUhAQQ0RRtQeq+BYru0C/FXeOw76Sbzp7fMkmd0
-         Vvjitarct+bfc9DXNFw9Q6fHUWUFQLRUePMN6nOrgxghVdg+HiH0Kamyolb27R6KJo1h
-         qi+j169Ih+outGQm94EMZBrdF6B8kJq5xBcWX37I3/qpCMGNplKGvsHyxKVoSf8NiJHJ
-         ZIdLpYurRpaNZK4PbelhJbRRUnhd34HGQN3TbYKwsBGtDgW+UrcCqAileJL9NOmz4qh/
-         u58Q==
-X-Forwarded-Encrypted: i=1; AHgh+Rr1CO9IY3b5sNr7entpqhnheX0Cs+CkysWbcPxfUbqbwm4zkN0Qow9hzg3Y5EEn287GBEReVnQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfgJUjuHHh/KIr2OP08utqNoshGYxN3Ngg+Dym0ajtswPCmtXT
-	yjECrYKy09e7b2qfbBep5ByCUoAu+PtMjnMwoEcVvh3hdMoP0jOun0bRcKAdU2F49lRZCnX6CHT
-	G/enJLwysH8b/Devbsw==
-X-Received: from wmpu18.prod.google.com ([2002:a05:600c:4d12:b0:493:f522:9fbe])
- (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:4f91:b0:493:72d3:4a81 with SMTP id 5b1f17b1804b1-493f87e5bd2mr75050475e9.16.1783930630723;
- Mon, 13 Jul 2026 01:17:10 -0700 (PDT)
-Date: Mon, 13 Jul 2026 08:17:09 +0000
-In-Reply-To: <20260713-fix-fops-owner-v8-0-2495cfa82d47@linux.dev>
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
+	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=yoaBk
+	GIVqsBzBcPxnKJVPP9RSrjDbcCn33d5TYJXsic=; b=lGle3H04Yi/22OmGIjdlJ
+	7Nx1jr0hB5dqTpSu/rDHyOUoWzxYLVqtCJzxu75RI9wKam1t5xZmlMasvlATk3Nj
+	JflmUNSOzgV7t2XQimWzQ5lt1qqfc9d/PWqzq8fCXeWf6ZlGlrkA5HH7+pRCdzIF
+	lVE658CK/uhqSBcGgSE6Ik=
+Received: from localhost.localdomain (unknown [121.229.84.192])
+	by web3 (Coremail) with SMTP id ygQGZQAHVpNln1RqkskjAw--.19778S2;
+	Mon, 13 Jul 2026 16:18:46 +0800 (CST)
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+To: netdev@vger.kernel.org
+Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
+	Eric Dumazet <edumazet@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+	Ao Wang <wangao@seu.edu.cn>,
+	Xuewei Feng <fengxw06@126.com>,
+	Qi Li <qli01@tsinghua.edu.cn>,
+	Ke Xu <xuke@tsinghua.edu.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH net] tcp: initialize standalone IPv4 ACK options
+Date: Mon, 13 Jul 2026 16:18:41 +0800
+Message-ID: <20260713081842.3119-1-zhaoyz24@mails.tsinghua.edu.cn>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260713-fix-fops-owner-v8-0-2495cfa82d47@linux.dev>
-Message-ID: <alSfBXoFjX-W_Ch1@google.com>
-Subject: Re: [PATCH v8 00/10] Fix missing fops.owner in Rust DRM/misc abstractions
-From: Alice Ryhl <aliceryhl@google.com>
-To: Alvin Sun <alvin.sun@linux.dev>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	"=?utf-8?B?QmrDtnJu?= Roy Baron" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
-	Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
-	Aaron Tomlin <atomlin@atomlin.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Daniel Almeida <daniel.almeida@collabora.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <david@davidgow.net>, 
-	Rae Moar <raemoar63@gmail.com>, Breno Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>, 
-	Dave Ertman <david.m.ertman@intel.com>, Leon Romanovsky <leon@kernel.org>, 
-	Igor Korotin <igor.korotin@linux.dev>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, 
-	"Krzysztof =?utf-8?Q?Wilczy=C5=84ski?=" <kwilczynski@kernel.org>, 
-	"Arve =?utf-8?B?SGrDuG5uZXbDpWc=?=" <arve@android.com>, Todd Kjos <tkjos@android.com>, 
-	Christian Brauner <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>, rust-for-linux@vger.kernel.org, 
-	linux-modules@vger.kernel.org, driver-core@lists.linux.dev, 
-	dri-devel@lists.freedesktop.org, nova-gpu@lists.linux.dev, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygQGZQAHVpNln1RqkskjAw--.19778S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7urWxAF1kXFyfJFy8uw1UAwb_yoW8WFWfpa
+	1IkwsayFyUGry293WkAay0vr43XF4kWFyI9w4jkF9rZFn8WF1xua4Fg3WYvF90v3ykKF1S
+	yFyjvr1Dt398ZrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9v1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l8cAvFVAK
+	0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4
+	x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2
+	z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4
+	CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E74AGY7Cv6cx26r4r
+	Kr1UJr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc
+	8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Av
+	z4vE14v_GFyl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8VW8Ww4UJr1UMxC20s
+	026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
+	JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
+	v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
+	j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
+	W8JrUvcSsGvfC2KfnxnUUI43ZEXa7VU0Ysj5UUUUU==
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQIHAWpUE7LrhwAAs2
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
+	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-307083-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307082-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:alvin.sun@linux.dev,m:ojeda@kernel.org,m:boqun@kernel.org,m:gary@garyguo.net,m:bjorn3_gh@protonmail.com,m:lossin@kernel.org,m:a.hindborg@kernel.org,m:tmgross@umich.edu,m:dakr@kernel.org,m:mcgrof@kernel.org,m:petr.pavlu@suse.com,m:da.gomez@kernel.org,m:samitolvanen@google.com,m:atomlin@atomlin.com,m:gregkh@linuxfoundation.org,m:rafael@kernel.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:daniel.almeida@collabora.com,m:arnd@arndb.de,m:brendan.higgins@linux.dev,m:david@davidgow.net,m:raemoar63@gmail.com,m:leitao@debian.org,m:axboe@kernel.dk,m:david.m.ertman@intel.com,m:leon@kernel.org,m:igor.korotin@linux.dev,m:fujita.tomonori@gmail.com,m:bhelgaas@google.com,m:kwilczynski@kernel.org,m:arve@android.com,m:tkjos@android.com,m:brauner@kernel.org,m:cmllamas@google.com,m:rust-for-linux@vger.kernel.org,m:linux-modules@vger.kernel.org,m:driver-core@lists.linux.dev,m:dri-devel@lists.freedesktop.org,m:nova-gpu@lists.linux.dev,m:linux-kselftest@vger.kernel.org,m:kunit-dev@g
- ooglegroups.com,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-pci@vger.kernel.org,m:fujitatomonori@gmail.com,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[46];
 	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:zhaoyz24@mails.tsinghua.edu.cn,m:edumazet@google.com,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,garyguo.net,protonmail.com,umich.edu,suse.com,google.com,atomlin.com,linuxfoundation.org,gmail.com,ffwll.ch,collabora.com,arndb.de,linux.dev,davidgow.net,debian.org,kernel.dk,intel.com,android.com,vger.kernel.org,lists.linux.dev,lists.freedesktop.org,googlegroups.com];
+	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,google.com,davemloft.net,kernel.org,redhat.com,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
+	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[seu.edu.cn:email,mails.tsinghua.edu.cn:from_mime,mails.tsinghua.edu.cn:dkim,mails.tsinghua.edu.cn:mid,tsinghua.edu.cn:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C83A2748A20
+X-Rspamd-Queue-Id: 8ECBA748B9B
 
-On Mon, Jul 13, 2026 at 02:45:21PM +0800, Alvin Sun wrote:
-> During tyr debugfs development, a kernel NULL pointer dereference was
-> encountered after `rmmod tyr` while gnome-shell still held /dev/card1 open:
+tcp_v4_send_ack() constructs standalone IPv4 TCP ACK replies on the stack
+for SYN-RECV and TIME-WAIT paths.  It currently zeroes only the TCP
+header, not the accompanying option buffer.
 
-I left a few minor comments, but otherwise LGTM.
+TCP-AO options may have actual lengths that are not 4-byte aligned, while
+the transmitted TCP header length is correctly rounded up to a 4-byte
+boundary.  tcp_ao_hash_hdr() writes only the MAC bytes, leaving the
+TCP-AO option alignment padding in rep.opt uninitialized.  With stack
+auto-initialization disabled, those padding bytes can be copied into the
+network packet and sent to the peer.
 
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+Zero the whole reply structure before writing options, so the alignment
+padding bytes are initialized.
+
+Fixes: decde2586b34 ("net/tcp: Add TCP-AO sign to twsk")
+Cc: stable@vger.kernel.org
+Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
+Reported-by: Ao Wang <wangao@seu.edu.cn>
+Reported-by: Xuewei Feng <fengxw06@126.com>
+Reported-by: Qi Li <qli01@tsinghua.edu.cn>
+Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
+Assisted-by: Claude-Code:GLM-5.2-special
+Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+---
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index ec09f97..327ee96 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -922,7 +922,7 @@ static void tcp_v4_send_ack(const struct sock *sk,
+ 	struct sock *ctl_sk;
+ 	u64 transmit_time;
+ 
+-	memset(&rep.th, 0, sizeof(struct tcphdr));
++	memset(&rep, 0, sizeof(rep));
+ 	memset(&arg, 0, sizeof(arg));
+ 
+ 	arg.iov[0].iov_base = (unsigned char *)&rep;
+
+--
+2.47.3
+
 
