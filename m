@@ -1,278 +1,305 @@
-Return-Path: <netdev+bounces-307011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307012-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Ldm5LztxVGpmmAMAu9opvQ
-	(envelope-from <netdev+bounces-307011-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 07:01:47 +0200
+	id mGRdECN+VGpvmgMAu9opvQ
+	(envelope-from <netdev+bounces-307012-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 07:56:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0B8F7472EB
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 07:01:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97036747615
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 07:56:50 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=est.tech header.s=selector1 header.b=Ri1y0Bmi;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307011-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307011-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=ti.com header.s=proofpoint-05-2026 header.b=PSdMY7O3;
+	dkim=pass header.d=ti.com header.s=selector1 header.b=j1HkSZhl;
+	dmarc=pass (policy=quarantine) header.from=ti.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307012-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307012-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F0325300FEE9
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 05:01:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DD3833031008
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 05:55:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2718835DA47;
-	Mon, 13 Jul 2026 05:01:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914F2361DB1;
+	Mon, 13 Jul 2026 05:54:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012003.outbound.protection.outlook.com [52.101.66.3])
+Received: from mx0a-0002e601.pphosted.com (mx0a-0002e601.pphosted.com [148.163.150.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E25C35F165;
-	Mon, 13 Jul 2026 05:01:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C85EC356749;
+	Mon, 13 Jul 2026 05:54:57 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783918904; cv=fail; b=AM+8LCsCIPG4N0ZOmhrex1yGczcNYw7H/lOXX3N9RlNlg7LJfoYUPvMmAtTpAal3++guKGxHhNnKBhqIQTc4UOdWfJtpH9C5I0yUKpqtJGAi5RcAbvhOZmcMk1J8pPcIktJxtwqXBB+tEN7/Evq7YDlMcMZM1nnKCn38hGjp12A=
+	t=1783922099; cv=fail; b=EXUDz/IBAIRsxmvp5ifRqq3kK1u66Z9laKuxPJVDKz8ikw54aDTs5GVhl9qQ2cV0Hg2LC+RD23Z5jC1toWW5wtf0CZl+rWn1K941cnyIVO91aa6NhdiaWR4FTpHiygR3/8jaju0XYSfBjzrbsA0zVjSDtnd2kl519+iBnZXKMVM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783918904; c=relaxed/simple;
-	bh=6VvdUvMHuXXeo63R0cQfyCGwH7WEcqrnC5GpoUB+nXA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=S2Y4w8TpdOyCuqgi162T3xJZTxJdBO+jahbVJUol7kuoo9w1eaAckl2jC4XT+XURxJopa7BxgVAeJRZ16IAuDQGzDZ0UNtPMt7Whdaz7kHntNEYKkTqpNr/yxqPcOP0W3MlOISqrvUZ5gEFGrx/oJ6MDSI2oAx4g5FXi2Wvogk0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=Ri1y0Bmi; arc=fail smtp.client-ip=52.101.66.3
+	s=arc-20240116; t=1783922099; c=relaxed/simple;
+	bh=fXY/FGlY9iYNyNA/wgkwd7n7wmVBQCHe32OGFnDWAg0=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=crmmCUqjpev6mORQiSsmOLUDf2Ba27yNhIHfsmnm7f4OAnnZq7Ddh/oCrJ1p3SlHmSSCJFU5lRYNbY4lnFkIhonr3RuOse58z736S2fjNq1rT7Ha79ylu+z82FZbFnpzR7SjPybWgHvhHqnnGOrHpKRfKkNxWVLo5HTut8xpr7Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (2048-bit key) header.d=ti.com header.i=@ti.com header.b=PSdMY7O3; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=j1HkSZhl; arc=fail smtp.client-ip=148.163.150.75
+Received: from pps.filterd (m0380145.ppops.net [127.0.0.1])
+	by m0380145.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 66D3AHGR2430030;
+	Mon, 13 Jul 2026 00:54:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	proofpoint-05-2026; bh=W6w+hPmhhS/RYZ7j75EZs7UsyuxXgUiWWHMWO8Pg5
+	pY=; b=PSdMY7O3WgxckH6T0YtBLAPc/U1CEbSuobnD7bgDVXEXLnvme8Ku4F0Fl
+	mxQUKf4Up7dDNMsxMD5OqpJFaY+z7ug4W1N9KMRRBcXYxZ++iSWVJbOeRpzoNDts
+	OOcaZ1E48E8YGnkzM9pESb2tz5ant11YY/SRxvvhCKLEg2h40XA6whbFPRNYpROD
+	kOLta1XlFuzJYK9C4ihCQCwYWiRFa10t64xqTS2UelxOsh75PdbbOwZ7coUNOOGk
+	e+9GtbU2xKLvUBU4aHyFnf1OjkTu2PdP7G/WL+tdfjXqkEgUburgLTMMttxAxHAr
+	O3g76gJEXqbyguvJP5ASavOi4LFvQ==
+Received: from dm5pr21cu001.outbound.protection.outlook.com (mail-centralusazon11011061.outbound.protection.outlook.com [52.101.62.61])
+	by m0380145.ppops.net (PPS) with ESMTPS id 4fc6unbxsy-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 13 Jul 2026 00:54:32 -0500 (CDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ii+x3The3cgRjWNTeYbT2JutDFX52tYk6lPrVp/GjzUsKJXnWBS6E+ErF69B5SPb6DMnYUqowxjEMYAkOKZRdBAE4ojVmiO7pM+POgxymt74kY7T9wqLfhga8t4E8pOw5kOPTRYVtZiJjUaZvb4uTYjVzfANNZ6NVZviygx2oljKEzFCcqHwQh/rSW8jos/i+DkNTt2tOmBH/SkmErGpdvApZ3ukoqOk8KgfC6y9XhdmYsqdjziVZtoaNE8EF79HbqJbFIf+NAe/5lhgdMaWJuGQCJI20sGOhQddjvHNnugHpNHUMcPQs50cfWvg2XuKDCs5E31G01IIdy6tCpOMtg==
+ b=DxCdLobeNCTJOclZNrhe2rbuMCMqI8Jf3K2p+xZKI9STBDpUxXiPNITORn6R0bQvSOiGzFbGJaZ7yEIrepo2zMeS6BVC/RG6GtdycCtDC4s/1n80kfNtSFgYjcs1nuI0zFFpZ5fIB8tdNGvjaGBo+yhAAYMGxVU8njmvQbF7fKpMqEFk1dOwAijFxTcA/eAP6qZ8MTW5VgfScCgCqHgOlx1jXS/xW4F5oeo5QxMZJoUQQk/4GuX3gK2R2qyceNEjYXZhhRypk+Ce1gvLUhe3I+y7yVkiHEU/Ih99eUAktOk/pdRaBJd56PUD+ywUK1rgOi12l3w4cJT8fiWCBuhQqw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hquoJP49SbeCbyLwMzVLp8HA4wQFuJBKqJyytcrt218=;
- b=NSKDL0M9D0SRWx9G2VqHvY67UInqw+k3sXHZ9rpBp6bGIIWcRo+pzakiaZ4m8f/DwGZf55qJQGbi9IOLgXTmFEw8mRwUxhHe27skkiS4j0yHVSDhedVjZ7dLeaXt7dDiv2IWclathBxsdBVDnlN8uZoA6E/DGaQNdxb0CQ298kZXFiFc14pjLRDzI8Trw1P6Cg99o3JyQt0VsIL4p6g2NTODV9DkJjipmL72FGBNzR4AlNeZvTo6xQ7ZWfiEae1rYjnBp12PSG8bTxphhGtWWDpiqXcy0EvY0dwPAnaOXWwwdAUNvyILriV29X9KYMM6MiyTBwCZvVO3a3TeohLi5g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
- dkim=pass header.d=est.tech; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
+ bh=W6w+hPmhhS/RYZ7j75EZs7UsyuxXgUiWWHMWO8Pg5pY=;
+ b=io6hrUsQYJX3KEYpMC97uJ6TKTKxwAY9K5AntcICusL9vE2Jm5wg3AhRqYBYATWOIA2z5Eif+tseA6qd9CAKigfbRcmQNbW+NLbTb1+NrIYZTbogWUFbwZY5xqg5P96ZHuG1ZF2lcpaGHW2CAJeTFFRil9Dcwu+24B4953HZMmFkaBfMGulieOraWbWinl5vwO17rNe/v2djZ/BW0L5aAVni/NMNinvvttgudNg37scn45nv2B7TJyETPOqC8rRun3YSaIAEzaJaHsYxvd047ytIHChlWHXW70Dw2AzgLKIrNuq8WSC6BqJ5/hJPgEhioFUmGHaoWGEQsH81FhZKpw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.23.195) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=ti.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hquoJP49SbeCbyLwMzVLp8HA4wQFuJBKqJyytcrt218=;
- b=Ri1y0BmiRQtPYwVMgPw59AlqUWPyFT1EbqoBs2kdJ8cUvNqaHTdAQZF5qmeUkGwKR3d5d5ncvFB0jQMtK7t/uC3d9wLPOFPMAZyhkqVQx5KkvOVViRmeHXvjpsb5jygaMk1OmkA5V32dFmQx57h6wAKVtX7uOT2E/8tKFpoTqZKG+r8nUP2Kump++OMvMkdBPXiQAi6gsHpxwv5w3CIk+Vpun7w7By7SZLa7KY4tpFTAxJjdbaz/yKHlleRVFeCzXcDlcT3FBfhjy0FYbEqTIgjK1uFkTdGsf4oQzqYgSx0Ih1JVd+ddDvqi0QKkn5eKNITL4AwKOnFqlqSgX4m7MQ==
-Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
- FRWP189MB3326.EURP189.PROD.OUTLOOK.COM (2603:10a6:d10:17c::17) with Microsoft
+ bh=W6w+hPmhhS/RYZ7j75EZs7UsyuxXgUiWWHMWO8Pg5pY=;
+ b=j1HkSZhlJvpfFooEq1V7h8MUuypGnEfFu60G3TCboJk+3qvbJwNpqGznMEr5KE83eC+nHr39cuSaADX5+QBY+ZTWmKP2t7Lm5PrxuGIGUt6PckHJUI13Wc6Ne1jCq3m/CuMhFM1azBYy1UDs2UTnNuhJTHGioT2o7t7QaJ7Ibnc=
+Received: from CH0P223CA0021.NAMP223.PROD.OUTLOOK.COM (2603:10b6:610:116::9)
+ by SN7PR10MB7103.namprd10.prod.outlook.com (2603:10b6:806:32b::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.202.18; Mon, 13 Jul
+ 2026 05:54:29 +0000
+Received: from DS3PEPF000099E0.namprd04.prod.outlook.com
+ (2603:10b6:610:116:cafe::a9) by CH0P223CA0021.outlook.office365.com
+ (2603:10b6:610:116::9) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.202.19 via Frontend Transport; Mon,
+ 13 Jul 2026 05:54:29 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.195)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.23.195 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.23.195; helo=lewvzet201.ext.ti.com; pr=C
+Received: from lewvzet201.ext.ti.com (198.47.23.195) by
+ DS3PEPF000099E0.mail.protection.outlook.com (10.167.17.203) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.181.10; Mon, 13 Jul 2026 05:01:38 +0000
-Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
- ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
- ([fe80::bfff:5391:8a49:21b7%6]) with mapi id 15.21.0223.008; Mon, 13 Jul 2026
- 05:01:38 +0000
-From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
-To: Daehyeon Ko <4ncienth@gmail.com>
-CC: Jon Maloy <jmaloy@redhat.com>, "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	"tipc-discussion@lists.sourceforge.net"
-	<tipc-discussion@lists.sourceforge.net>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH net] tipc: clear sock->sk on the failed-insert path in
- tipc_sk_create()
-Thread-Topic: [PATCH net] tipc: clear sock->sk on the failed-insert path in
- tipc_sk_create()
-Thread-Index: AQHdEA2+rYe7FoCWcUyy82fCjcu5s7Zq50yQ
-Date: Mon, 13 Jul 2026 05:01:38 +0000
-Message-ID:
- <GV1P189MB1988AF0F2722101E30D902E1C6FA2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-References: <20260710014440.2055584-1-4ncienth@gmail.com>
-In-Reply-To: <20260710014440.2055584-1-4ncienth@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: GV1P189MB1988:EE_|FRWP189MB3326:EE_
-x-ms-office365-filtering-correlation-id: b43bb2dc-9303-49e9-8fdf-08dee09bd213
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|23010399003|376014|366016|1800799024|7416014|38070700021|11063799006|56012099006|22082099003|18002099003;
-x-microsoft-antispam-message-info:
- UqQ6rkMp1yI8bbEDuRSV3py7JlhzU2bXkzoMhdiOb1MdMfs4ESikwNQmJXIAHTjpSkAyM/mCzG9A+i5khLM6msKhjKKir316I/tH+iUNUpELE/e1vg+Y6cHsk5eWrWefveUCnE3iXd/A12LlexNgca9vFBqi3RuRpHsGz3P5/a6Kt1DuvaL7ixunjZ/67C8LqzDfCokgTNAGiJ3mFgI6KYjtdOgFGwfOimOjsox5zplFyVf0Pm675tnu42SjbgxN6hFRHWid9+U96RxouTOHsTdGdfIwjE5FxRfbGPQ5K3nIHYZuoR9DNQD1ysXfL3YY/OrIpRgFd5aIF0DWFIeOhZ1DY8NEKuUsm0EYjemNEom6Wk1gau7O6pyV/2uqg5Z1XE0AcifyAmyp6aBWSTwGZv/LiT4z8JcWxnwuUhg9DfpJCLXmfSGbvcdF+LJURlgvJWcBraa+Ax01DXu6HYMkpc5fRI1AUG4slBShclFiol26dLtEn6bqQZk99z8/1cYiyVy8omu+bBMPddcV9nwjXnYkJXPU9DN/5Ryp3kobXQ6mhQixsvaFivk5CBTKYMIeT9iZX/WwPc3wt+/b+TXmM7ud56t15/KmS8m9svzlRKEZ3qcnupWe9mfSYUuUFiMRGwzKWP8djRUzE9qVDE+/BXgIoebsGlWFBDOAY+GuHw/tSZrG3nXhaSdu+XrjPcuS0r7tiOXL7RMr2RuznmxtvbE2YPfPhSukf3B6cQOKV7k=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(366016)(1800799024)(7416014)(38070700021)(11063799006)(56012099006)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?ZIl3Qxe0jy6wMdRQPZ38ZTMGgJNR3Y2f2HaziREoIyNKRVuDErx43yKzsQbW?=
- =?us-ascii?Q?TjCdF3iASvw/7xn1ugUS6wL4ZRA0jj7KtbhkpJ/14GAOj6RU3qUo4OUE9JoY?=
- =?us-ascii?Q?1ZQD+t4+PDT+B2w7FVNm6cBn+kFZQmxQX9lPqmql32tyxSPkH9VTKVlw3gx/?=
- =?us-ascii?Q?MUwyzgHGtdEpJ2dNAqCoyAtYShlK9C0iaM/9BFFUECtVHETuBzzzH7n5YAka?=
- =?us-ascii?Q?V/fR8lNoyP8Xuhkj6mRXQvFDlNu0JjRDhZh7wUotdL7TnGPu8fxC+T82LEaH?=
- =?us-ascii?Q?iq9/ro3DxJ7mS1ThUTmWhb4WojXODVirUZxUKbCPdXDap4M+Cn0xiYIq2ytZ?=
- =?us-ascii?Q?GWXx+UMAeTKkjfIneABf0kNRneNVm9u5IZECkUZTtE/5whS9Yt8KboAuuHD/?=
- =?us-ascii?Q?2u+3rMVPMT8GQ9wW1vi+aFnD+nbYaPkcpfoKWtDGvu0T23dS1RgjgXXre0Dd?=
- =?us-ascii?Q?iM+3xVhLvo3s4Wj1C8LgFa7NzF4OO/4CXu6NUFWE0WnCNSXh8w+h5OYUNYOf?=
- =?us-ascii?Q?klfDQh45MUIvgapdJctZHk3U4DGOBpbu/s2c8VJsbcg41nJVFRLwSeLnqczG?=
- =?us-ascii?Q?Gsvk4ztkrJmrCN7luNiNjSXZMinC1XLaK3mHFcJVKMxGQ9x4Lbne1aK3VGgB?=
- =?us-ascii?Q?EJq4uNtJai56d43Rz2nvO1gHp6Mw3Q8KpwZ9KCA05h+GAKqQ1O30vrYtF8gp?=
- =?us-ascii?Q?0LAmhNBa20EdV+gISRaPII/OavSVavvLsePlxsLggCsV5PWr+OZUKh/pA82f?=
- =?us-ascii?Q?nLhhJVs0Yah702o4ciohnuiPDq3p7N6trH/roYycXORFqm0JZBk3mliI77cY?=
- =?us-ascii?Q?fyZVUNIMvCUtlFWWncT4B0cy8V57tEv20KrAkt/Kk78MnvDCOK0oEO17BlqT?=
- =?us-ascii?Q?Bk9wVeSFFS2onvMenUOmNl2MePJ8g0TXatAzAE/eKFCogxLHKRcrXnTGg7Ar?=
- =?us-ascii?Q?yWz2KzSIDCMEIVV2nAuCoI5MfJoRdIpqKCOVT0R5yA9KIN0pvaGT2clTKmVi?=
- =?us-ascii?Q?QfvNT9xa5KoYSZ6/c0UUBlNzL+jRgTcIwe6fFL8H6Uz0cR89sRQMiuKaDec/?=
- =?us-ascii?Q?Ldrrq4QYxj3HPzpaa7kP0MayKLeLzynPAobBYDm4roJdQf2rogaYF+FT3IAj?=
- =?us-ascii?Q?eckDjxiEECUhJzFvmYOs6UAf4o/1/OtpYJ7LD3WvREFQnA63YvKmHr0tncrW?=
- =?us-ascii?Q?vpzciSqrV8evBK4VcTunmXtw2Szm4YFPHARs4KUK8l1pzf3TnxBrlw1R/6JO?=
- =?us-ascii?Q?rcRVOd3uNnN1SsuG22fsOn3VmRYf227pBtm184EwCZLp056rjqhB/CPzMyPv?=
- =?us-ascii?Q?0I2ixhaY0loxnPMC72SiIsW6NIMKIrgm2D7hzezlm6YCjVUR0OsR7/Sba8uf?=
- =?us-ascii?Q?WGIUTaFkfjqyToG/IEguMStUX0ddA2Tc7yXoKVgyejmfeqdtdF4B/hu0bLsU?=
- =?us-ascii?Q?n5WCicAnZXPbpP4iaEGbwuWXwRq+SxzuEkr9f7Zows+Mwya0wnPlX24Pqdd9?=
- =?us-ascii?Q?L/mzMAHVBR+riRrsWYbwgxE3xVbZBs+1VwC/442uV3yMrSk3jS3H6q7Vvi5R?=
- =?us-ascii?Q?9Nw5XkQv4Zjb8Cy7HTNqdOSHQ9e2KGt80BkoQRgBBeS87RnnU6eE4qWfOdCD?=
- =?us-ascii?Q?/tDj5P8RN8IrGhaE+kYpfR83NgqbtoJJuFQbWDrF+7enRcug6dNHgM2gvQgM?=
- =?us-ascii?Q?NbqNSJxeyVznU5ZLFKaD8Htuu8inT+YOYoRIxnzC2497NdCrSHecF/QqHcMp?=
- =?us-ascii?Q?fGsQN+S+0w=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ 15.21.223.9 via Frontend Transport; Mon, 13 Jul 2026 05:54:28 +0000
+Received: from DLEE206.ent.ti.com (157.170.170.90) by lewvzet201.ext.ti.com
+ (10.4.14.104) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Mon, 13 Jul
+ 2026 00:54:27 -0500
+Received: from DLEE204.ent.ti.com (157.170.170.84) by DLEE206.ent.ti.com
+ (157.170.170.90) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Mon, 13 Jul
+ 2026 00:54:27 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE204.ent.ti.com
+ (157.170.170.84) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37 via Frontend
+ Transport; Mon, 13 Jul 2026 00:54:27 -0500
+Received: from [172.24.231.152] (danish-tpc.dhcp.ti.com [172.24.231.152])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 66D5sNrM809166;
+	Mon, 13 Jul 2026 00:54:24 -0500
+Message-ID: <3d02c4e9-a271-4080-a54b-8ba4d7a86622@ti.com>
+Date: Mon, 13 Jul 2026 11:24:22 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: est.tech
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: b43bb2dc-9303-49e9-8fdf-08dee09bd213
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jul 2026 05:01:38.1870
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: ti: icssg-prueth: Fix link-local addresses being
+ forwarded out of slave ports
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Simon Horman <horms@kernel.org>, "Meghana
+ Malladi" <m-malladi@ti.com>
+CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20260701112535.4027920-1-danishanwar@ti.com>
+ <71a1bacf-c54f-45b0-80df-7175261cf2ac@redhat.com>
+ <5c9fc598-9449-49aa-aa4b-2afc247bc761@ti.com>
+Content-Language: en-US
+In-Reply-To: <5c9fc598-9449-49aa-aa4b-2afc247bc761@ti.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099E0:EE_|SN7PR10MB7103:EE_
+X-MS-Office365-Filtering-Correlation-Id: cb337d19-aa7a-441e-297a-08dee0a333b3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700016|82310400026|23010399003|376014|3023799007|6133799003|18002099003|22082099003|56012099006|4143699003|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	1PCs8YFRcerCmXyh58YJloDA0b6J4+wQWZZebroK3iN1vcdkP8Dk24KjE3QM+IJ9E8ogF+xX70N/BQlP++/cr4dkOaTNsiuj3a0Iy+xtKMbPWHTne80VEUtBMYB99DHcRs1gGRfCPsrs6EgjvBVpqkRckEE91gGO6CFQdSAWmpezwkvtoKsnMfGfOdCik2Y2K6eXBsJXck0XgEFoSI9fY5M1V0IfQgoRVXEeEmj4gS8RVgtEu2dG1KxMvnXDn1p65OQSAkmy3BWvZhphZR/f8XCO3jXAE3bpAhQkkAPDfLigxWbKMAKULiZjFfmVhYa3KK7Ns+veGBLdA47voNLXV4Wqj+fcsmWhQ5Wfc30DFXfErIbP9FcR9a5azRuxSKRO8WVmSby6z4WijdJUVAHNmkcgGMwHmIAEpdul9Ysxbf8PDwF2FPZFeZW/Cf0Vu8r/0wKlsfUklCdvDHXsds7Bv1gJiWh5Jnk66OPtOGiDapFZKrJa99tpCgUirshIYDeoF6WAbI+B/xZWOvjZO37wmZwRS76Je2ZEm7rhunfSqrY76tS5Ckf+4kmKtHeoQLonqkd+BVtiM2Rn1RYyeUueDiPq1LY6y+vcBAX70Zops7uI9mtKcO98a8ql22/6K2bbKfVmUJXyi9aznJ1SJkYuxQ==
+X-Forefront-Antispam-Report:
+	CIP:198.47.23.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet201.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700016)(82310400026)(23010399003)(376014)(3023799007)(6133799003)(18002099003)(22082099003)(56012099006)(4143699003)(13003099007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	z0jzVHTXLTejShDH5L7803/mezE6oM/SOcGBz01RqDe8ftvXOQcNNRs2XUnmfGse6Qh2M1WMzEKjT8OmHPegqLfgUeowiYG7wH2idXtVg1zpkGQPKWGVUbPbCaOpz/keSIjXvIbW4cyu+f2Rnho9vQpJuPRMYzCHE5C8EJkTLB9DLzAr14jfO6xCU/Hfe9jOgob2P+DQHjsAuWLOwpqUWp0XF2OeDfamT80x/aXEdrCcCMFgY+yXhUPqrdLlsYKarEKfgvGsJSd9P01V33OhrNaYjxLECRqytx3d7RDrDVgIvDZKGC/A2BHN0mChcE8E6ixjW+PE1Wmitg33AXWjYkwmLos3U2iX+aQc+UFvK8kEd/NOhtGQHGvfbkkFi9NYKQ0hCmaQnnxWpEOSvUnpb/Ib6hrgNbwDFJEazi6BlCm84s09Fz/9Nj8xD+JK+L1R
+X-Exchange-RoutingPolicyChecked:
+	C1/al8NQPq6T73cp+C04SUUaLlDVxi9Zx5jDvUhYc0m39cvA0XrOB2NXs20rZlTVKOtZAKgQMWReMxBfO2YulpZIJPJnA08c5kCpKz2XkVTrw2p1oxLq68elaE2oOzEWGzXtb8Dc/mTK73ON7VjqHqkax7c9bnskJlx8imcCEsVGIYvnyogdnIkhlbNY3bQ/GZeo2XLEETWcQnVPCz+CqFp4hN2WkZS0jZroB/STMarFUTob9Q1iqotxZHDsVBm6bHQwn39e4qJ+C3/s/zabVXf1DvhlINWRvfP2olm3IUnFLSfDhXgGpEihKB0Pjiy32BTC4dELpomokTSE84iUcA==
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2026 05:54:28.3828
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: gYfBj0w0ekHXg/S1jYklrXtSoJNduQA9drTqpkJsRDHMY4c+yajlL3u75zS3kEGdXdmu1L1yo12LNGoWNRjCGdlAcIxMlMAEpaBk0nCgYaI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: FRWP189MB3326
+X-MS-Exchange-CrossTenant-Network-Message-Id: cb337d19-aa7a-441e-297a-08dee0a333b3
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.195];Helo=[lewvzet201.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF000099E0.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR10MB7103
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEzMDA1OCBTYWx0ZWRfX6HEENoL8jtTx
+ 22nYp1jRtX48t1bKLI7/N1HZnwXZrVMf/bhMQOdLldmYtFM5drSQkqn7ExFBoeKl8OJqauZ357b
+ muQWpsaVOKvFwm8l1NFZQMiAPXcy5PnJnlq1Lc3Vcfvswwff7WFjRx0cDimdnXiiNsC6FVbKERA
+ hNsm/2vL69IN/SapsTM9EXOfhnkVMpTaTyr1tGbsXGQAsiMy3z1sDn/ABdIDxnlCK6hcF6JJS17
+ CH7zr48Q3vyxgpDYvVtfSG0esI5ny+8NOZSsvPOcFV3wOE5uZ8MTvvba6H/GMEpLAAQjKhUbKhl
+ s9lvq86w5RF5rXxqIspjCty7Gnr6GhZmsk8RZBYXTnOfK1ydb2RUxHaw2X1yMBAyQJ3PhM38/Xe
+ QDdpNv9isKNeRgx7zlewPx11bsv9D1989jip+I6U+ZXqe6kGhmUQWJ4awoe+2DdF+HHnGsOTkYT
+ UeNFD6SYhkOXSFJ6vTQ==
+X-Authority-Analysis: v=2.4 cv=IMQyzAvG c=1 sm=1 tr=0 ts=6a547d98 cx=c_pps
+ a=WxwGY4H08PlrDVivH1wjUg==:117 a=f+v6EHfkeJbVwR46tk4DMg==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10
+ a=s63m1ICgrNkA:10 a=V5UXEbMT0ywA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Z8NIEmU8O1QQgoT56wFK:22 a=gO1vWkAQAl3rybz1DQOp:22 a=c92rfblmAAAA:8
+ a=sozttTNsAAAA:8 a=TpfAaOI81706nv7RqeAA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=GvGzcOZaWPEFPQC_NcjD:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEzMDA1OCBTYWx0ZWRfXyriLTbEsILWz
+ W5aBT2okJIYGVLF4Le1pMdBVZjqnlRoJ8lzwlAOumN5J4a70r3OV4WJEN4BYyk22HdCkIKA4lhS
+ xIBVoufQ47W1SR1PyznaNi7iCI+zqOc=
+X-Proofpoint-ORIG-GUID: vKn8lnrHeQYb_QXBhzuM-tzMMzAGFgQe
+X-Proofpoint-GUID: vKn8lnrHeQYb_QXBhzuM-tzMMzAGFgQe
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-13_01,2026-07-10_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 bulkscore=0 adultscore=0 lowpriorityscore=0 priorityscore=1501
+ phishscore=0 impostorscore=0 suspectscore=0 malwarescore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607130058
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[ti.com:s=proofpoint-05-2026,ti.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307012-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:4ncienth@gmail.com,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	DMARC_NA(0.00)[est.tech];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307011-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[danishanwar@ti.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:horms@kernel.org,m:m-malladi@ti.com,m:linux-arm-kernel@lists.infradead.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[est.tech:+];
-	ALIAS_RESOLVED(0.00)[];
+	DKIM_TRACE(0.00)[ti.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_TWELVE(0.00)[12];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[danishanwar@ti.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,est.tech:from_mime,est.tech:dkim,GV1P189MB1988.EURP189.PROD.OUTLOOK.COM:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D0B8F7472EB
+X-Rspamd-Queue-Id: 97036747615
 
->Subject: [PATCH net] tipc: clear sock->sk on the failed-insert path in
->tipc_sk_create()
->
->When tipc_sk_create() fails to insert the new socket (tipc_sk_insert() ret=
-urns
->non-zero), its error path frees the sk with sk_free() but leaves
->sock->sk pointing at the freed object:
->
->	if (tipc_sk_insert(tsk)) {
->		sk_free(sk);
->		pr_warn("Socket create failed; port number exhausted\n");
->		return -EINVAL;
->	}
->
->This is harmless for plain socket(): the syscall layer clears sock->ops be=
-fore
->releasing, so tipc_release() is never called. It is not harmless on the ac=
-cept()
->path. tipc_accept() creates the pre-allocated child socket with
->tipc_sk_create(net, new_sock, 0, kern); on failure it leaves new_sock->sk
->dangling and new_sock->ops non-NULL, and do_accept() then fput()s the new
->file, so __sock_release() -> tipc_release() runs
->lock_sock(new_sock->sk) on the freed sk -- a use-after-free write of the s=
-k_lock
->spinlock.
->
->tipc_release() already guards this exact "failed accept() releases a pre-a=
-llocated
->child" case with "if (sk =3D=3D NULL) return 0;", but the guard is bypasse=
-d because
->tipc_sk_create() left sock->sk non-NULL
->(dangling) rather than NULL.
->
->Clear sock->sk on the failed-insert path so the existing tipc_release() NU=
-LL
->check fires and the use-after-free is avoided.
->
->The tipc_sk_insert() failure is reached when the per-netns socket rhashtab=
-le
->hits its max_size (tsk_rht_params.max_size =3D 1048576, ~2M
->elements) -- i.e. once a netns holds ~2M TIPC sockets every insert returns=
- -
->E2BIG.
->
->  BUG: KASAN: slab-use-after-free in lock_sock_nested+0x98/0x150
->  Write of size 8 at addr ffff8880047cdc38 by task init/1
->   lock_sock_nested+0x98/0x150
->   tipc_release+0xa4/0x7a0
->   __sock_release+0x61/0x120
->   sock_close+0x10/0x20
->   __fput+0x1d6/0x490
->  Allocated by task 1:
->   sk_alloc+0x2b/0x380
->   tipc_sk_create+0x82/0xb90
->   tipc_accept+0x14c/0x650
->  Freed by task 1:
->   __sk_destruct+0x22d/0x2d0
->   tipc_sk_create+0x7b8/0xb90
->   tipc_accept+0x14c/0x650
->   do_accept+0x1d2/0x2a0
->
+Hi Paoli,
 
-Thanks for your C reproducer. I can reproduce it and apply the fix. It work=
-s.
-However, Could you help decode above stack trace (using linux/decode_stackt=
-race.sh) to show readable text for later reference ?
+On 07/07/26 4:09 pm, MD Danish Anwar wrote:
+> Hi Paolo,
+> 
+> On 07/07/26 4:00 pm, Paolo Abeni wrote:
+>> On 7/1/26 1:25 PM, MD Danish Anwar wrote:
+>>> Link-local multicast addresses (01:80:c2:00:00:0x) must only be
+>>> delivered to the host port (P0) and must not be forwarded out of
+>>> the physical slave ports. icssg_fdb_add_del() was programming these
+>>> addresses with P1/P2 membership bits set, causing the firmware to
+>>> forward them out of slave ports.
+>>>
+>>> Clear P1/P2 membership and set only P0 membership when
+>>> is_link_local_ether_addr() returns true.
+>>>
+>>> Fixes: 487f7323f39a ("net: ti: icssg-prueth: Add helper functions to configure FDB")
+>>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>>> ---
+>>>  drivers/net/ethernet/ti/icssg/icssg_config.c | 10 ++++++++++
+>>>  1 file changed, 10 insertions(+)
+>>>
+>>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
+>>> index 3f8237c17d099..04a81402e3f3c 100644
+>>> --- a/drivers/net/ethernet/ti/icssg/icssg_config.c
+>>> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
+>>> @@ -732,6 +732,16 @@ int icssg_fdb_add_del(struct prueth_emac *emac, const unsigned char *addr,
+>>>  	u8 fid = vid;
+>>>  	int ret;
+>>>  
+>>> +	/* Link-local addresses (01:80:c2:00:00:0x) must only be delivered to
+>>> +	 * the host port (P0). Clear P1/P2 membership to prevent the firmware
+>>> +	 * from forwarding them out of the physical slave ports.
+>>> +	 */
+>>> +	if (is_link_local_ether_addr(addr)) {
+>>> +		fid_c2 |= ICSSG_FDB_ENTRY_P0_MEMBERSHIP;
+>>> +		fid_c2 &= ~(ICSSG_FDB_ENTRY_P1_MEMBERSHIP |
+>>> +			    ICSSG_FDB_ENTRY_P2_MEMBERSHIP);
+>>> +	}
+>>
+>> Sashiko gemeni mentioned it could be safer to reject entirely wrong masks:
+>>
+>> https://sashiko.dev/#/patchset/20260701112535.4027920-1-danishanwar%40ti.com
+>>
+>> It's not clear to me if the mentioned bad scenario is actually possibly,
+>> please have a look.
+>>
+> 
+> I had a look at the Sashiko comment. This seems to be a false positive
+> to me.
+> 
+> Link-local addresses (01:80:c2:00:00:0x) are IEEE 802.1D Table 7-10
+> reserved addresses that bridges MUST NOT forward. They are consumed
+> locally by STP, LACP, LLDP, PAE, etc.
+> 
+> No valid protocol or user configuration would add an MDB entry for these
+> addresses on a slave port — doing so is a misconfiguration regardless of
+> hardware.
+> 
+> The silent enforcement in icssg_fdb_add_del() ensures the hardware
+> always reflects the mandatory protocol behavior. Returning -EOPNOTSUPP
+> would only matter if there were a legitimate caller we needed to reject
+> — there isn't one.
+> 
+> I think silently adding host port to FDB membership for Link Local
+> addresses is OK. This Sashiko comment can be ignored.
+> 
 
->Fixes: 07f6c4bc048a ("tipc: convert tipc reference table to use generic
->rhashtable")
->Cc: stable@vger.kernel.org
->Signed-off-by: Daehyeon Ko <4ncienth@gmail.com>
->---
->This was reported to security@kernel.org (Cc: the TIPC maintainer) with no
->response; posting the fix directly to netdev as it is a straightforward on=
-e-line
->fix. Full C reproducer available on request.
->
-> net/tipc/socket.c | 1 +
-> 1 file changed, 1 insertion(+)
->
->diff --git a/net/tipc/socket.c b/net/tipc/socket.c index
->e564341e0216..55e695748332 100644
->--- a/net/tipc/socket.c
->+++ b/net/tipc/socket.c
->@@ -502,6 +502,7 @@ static int tipc_sk_create(struct net *net, struct sock=
-et
->*sock,
-> 	tipc_set_sk_state(sk, TIPC_OPEN);
-> 	if (tipc_sk_insert(tsk)) {
-> 		sk_free(sk);
->+		sock->sk =3D NULL;
-> 		pr_warn("Socket create failed; port number exhausted\n");
-> 		return -EINVAL;
-> 	}
->--
->2.54.0
->
+I have responded here to the Sashiko comment. I see that this patch is
+marked "Changes Requested" in patchwork.
+
+Since the Sashiko comment was false positive, can you please pick this
+patch if it's OK with you or do I need to send a v2?
+
+I haven't sent v2 yet as Sashiko will run again on it and give the same
+comment again.
+
+
+-- 
+Thanks and Regards,
+Danish
 
 
