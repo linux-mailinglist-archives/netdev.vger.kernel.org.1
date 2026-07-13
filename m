@@ -1,245 +1,225 @@
-Return-Path: <netdev+bounces-307255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307256-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ozDBBIIdVWp5kAAAu9opvQ
-	(envelope-from <netdev+bounces-307255-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 19:16:50 +0200
+	id YN/eGe0eVWrLkAAAu9opvQ
+	(envelope-from <netdev+bounces-307256-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 19:22:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 628BC74DEE2
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 19:16:49 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6842774DF9D
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 19:22:52 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=breiti.cc header.s=google header.b="H4Ub/jeg";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307255-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307255-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=h6CPcYBE;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307256-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-307256-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 697EA301D327
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 17:16:48 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9891630055D5
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 17:22:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32168277035;
-	Mon, 13 Jul 2026 17:16:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11A513451BB;
+	Mon, 13 Jul 2026 17:22:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56511274658
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 17:16:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D33CF233927;
+	Mon, 13 Jul 2026 17:22:45 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783963008; cv=none; b=oD10vdMQJWb2+xt80dS7+PZb55r35SONYb5M2zwohQHkf8/SeQ4+QYrxa5Z5HZ1WT4ibSXjTKJD4GenVw/HmOcJnuRC+jGkwoDGO/QJgX8KneggW5OJ5yIAcjzXf0tkj8Xy1fK845OB5e7bKilQm5edd32vwBw/6di+z11Pfg/8=
+	t=1783963367; cv=none; b=aBYUYSePecM2Pio8kcI71b99VF9U56Ui4LX8HbhFxBhTvzQKWeda0UpPJutGBbxq+1IRsk08f2sU1hg4zXYBmMQCyjHgS9jtH2rZRCR7Jv6/ikgLrh7aD6wJBvEvqwghxc2pV98zw0JUFFhADFkTEaQaF+WdZGXTIdLxmqTUKYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783963008; c=relaxed/simple;
-	bh=p1jLAlgaFAZC8YZE8WGwBXhLOIAf22MGlzvlCbicn1g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Esthn82DxSM9+Bb9TSVjM/bgMxlq+dXwn9FJfW0cIihVBvCw3TT/OJTTsUNRGmkJxeIR3DOTetOhaLncVsZuIjIHzHExlBEJRr7tMIt/o2/0sD5Vi7xHprR2YABjCTUMIxrxESdFqpj5CRNj0KlTxCHgjpGrOvPaolEWwSwwKKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=breiti.cc; spf=pass smtp.mailfrom=breiti.cc; dkim=temperror (0-bit key) header.d=breiti.cc header.i=@breiti.cc header.b=H4Ub/jeg; arc=none smtp.client-ip=209.85.221.45
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-47defd0c1c5so51895f8f.3
-        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 10:16:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=breiti.cc; s=google; t=1783963004; x=1784567804; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=D6+zJCN4uHBUySGZxMxtpjUmXPdT/OOFNXEwXFVOhXs=;
-        b=H4Ub/jegVV6xKMr4b4ZDBmeZ0ff+XupXiS9lQnnIZYqM4pT9VVV3bSGeBrmCRXsc5z
-         g1zq7Q/Jp09al8/RSz30PQaRl7O3KE7e18lo7uC+l16JFTDYLn+WEBqCc2h3XxplWNyT
-         Eyfd3QPCqAPv0bKUvjN0+/shaMoAQ6AdgF3jc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783963004; x=1784567804;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=D6+zJCN4uHBUySGZxMxtpjUmXPdT/OOFNXEwXFVOhXs=;
-        b=IwquwHmTfroxP0qZUv+zNApAZsT12pPGF6x3XLZby9dFClbf6sONbL8mJPo4OPGN1C
-         bqfxXO6uX4wFwQONWeDvblHF3Dl6IlETBsM3UKjCLWV3IZur16tKSFyiXx8zsfzsSiur
-         oi1xfE8IGkj7X1gN8t+VBxBYzCJyDTzJrmq1IS88sYCuRAb9yIhD7iScu1Z2zOFmrMrH
-         sui/dcCxgfchGBsJZWGDysSUZYCC/ljFPdEarcYJbUBPb9ofArjjba/IePH6q/h80Tl7
-         zKBPxxbK6ZcXEoXEQe+AApgX499DJwKLI4w3J9Eh65eQmFn1teCEHM83lCliN1Av0i7a
-         Jk8g==
-X-Gm-Message-State: AOJu0YwEQi7IZmVZmkeCXNAB8NunO5Pch7KeAYAVvmKhgOE7VNfRhvoi
-	TkttmSVXr3rK27WH7cqyCu35Jt+5KVHUWHxVuDDFzccScOEHOf2AcYmyTVZcCvu5Thcns0edig0
-	GK45A/JUL
-X-Gm-Gg: AfdE7cl/HbrEF6HQB4jS/ErN/E0W5G5ucxdImBZD68YMGM/or3k3oGUIPfurA4Rwy2F
-	a7cI5DGnBgoNEKgbAVljzuZxVf+qrUlE3mODXqTG/HiYID7M8IQy7fgiBlqoiGYLDX/Q8aDj2/T
-	OXnS1CNjaOsvBUEGtrjeif+TzsMjAfhU99wdawIqDCwUDphcwZqaGrLy5ZNhQ7K0vpgpYJult4O
-	7gNNdfPWjTGciso5WlITDbQzgXwolJWjDX7QteqttWYhHsSBIRKe6VY9xhIXUmNWTleMi4V4Tlh
-	8gM6K9GKEwMXPlyUpfSYpPliC6GHqv5F7oQFm5QT3RnCOIILppFJIlhStmD+eUXrQ5V1sWC9D2W
-	+w32vI3nx/aoBIHEF2VoslOHBhfMPw0hYc+Z5WLJ2K3hJIlbPM+akrKa8i0Z02afUeAecvizjrV
-	SNsuRGCL+vIQu+5EbDWhUYpR9vAASAkkS4qt90IWsHVg92+VjNhQ==
-X-Received: by 2002:a05:6000:1848:b0:476:a715:1a with SMTP id ffacd0b85a97d-47f2dce2b61mr11893647f8f.41.1783963003297;
-        Mon, 13 Jul 2026 10:16:43 -0700 (PDT)
-Received: from framework.casa.breiti.cc ([2.57.48.190])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f464a9728sm1007047f8f.21.2026.07.13.10.16.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jul 2026 10:16:42 -0700 (PDT)
-From: Markus Breitenberger <bre@breiti.cc>
-To: netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	maxime.chevallier@bootlin.com,
-	mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	rmk+kernel@armlinux.org.uk,
-	yong.liang.choong@linux.intel.com,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	stable@vger.kernel.org,
-	Markus Breitenberger <bre@keba.com>
-Subject: [PATCH net v3] net: stmmac: intel: skip SerDes reconfig when rate is unchanged
-Date: Mon, 13 Jul 2026 19:16:19 +0200
-Message-ID: <20260713171619.192452-1-bre@breiti.cc>
-X-Mailer: git-send-email 2.55.0
+	s=arc-20240116; t=1783963367; c=relaxed/simple;
+	bh=g+vhJSXwVVp0B1AdYaIbya2zpO3k0rRRtdsZQVc4uGQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BP6wV6tuQkMKFh0l0uCZ8ybzwRzds/P39q88Q1V0QNggX1i33VsicLD0cbdbdJ8X5ejP2XVI4k9jzvsR/WIPmzL2Trz0Qv1mIdsJZTXp0vojWD2+hKP56WzhajCXl2iTq55B82XWCCCNw8fNtLpehpJpM+duoQaBYkEmFNRy1do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h6CPcYBE; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60B021F000E9;
+	Mon, 13 Jul 2026 17:22:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783963365;
+	bh=f64DKGw4L3GDO0y6c1glEqqaBeuOQTvvXS+WHu+RmSI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=h6CPcYBEwzndAd4AElnUwOJ+aRCrfdQChsIzSoUabA2Q9F80bser4Hq3iV3Qbj+vI
+	 scEj+k2pGVCVW6g8EpC5VYaBtp8B30P7l5LQqVcrfh8o2DZWjAZijXG/otMyINVy9C
+	 7/LEVdBLZwzuh9WJYvHPPiths1qRMRDIIqB6QBITIX/5uGeb0g+Uw7f1HzU/Ci/PCT
+	 5Q+Z1AIuMGldFG0CJ51pm/8OB5v+mHMCIqyquFqBTZyaD7HqznDUHwM3AgE32iDCqT
+	 +vMAnFCo5jgWJdATx3NNiCinDdg1u2Aq+Ux74jcwO5EgubulQUe6DMIlhRq077mJjC
+	 X17gg5E8u5JPg==
+Date: Mon, 13 Jul 2026 12:22:44 -0500
+From: Rob Herring <robh@kernel.org>
+To: Artem Shimko <a.shimko.dev@gmail.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] dt-bindings: net: add DAPU Telecom
+ DAP8211R(I) PHY binding
+Message-ID: <20260713172244.GA2381778-robh@kernel.org>
+References: <20260713131223.279555-1-a.shimko.dev@gmail.com>
+ <20260713131223.279555-2-a.shimko.dev@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260713131223.279555-2-a.shimko.dev@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-2.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[breiti.cc:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-307255-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[bre@breiti.cc,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:maxime.chevallier@bootlin.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:rmk+kernel@armlinux.org.uk,m:yong.liang.choong@linux.intel.com,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:stable@vger.kernel.org,m:bre@keba.com,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DMARC_NA(0.00)[breiti.cc];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,gmail.com,foss.st.com,armlinux.org.uk,linux.intel.com,st-md-mailman.stormreply.com,lists.infradead.org,vger.kernel.org,keba.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307256-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:a.shimko.dev@gmail.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:linux-kernel@vger.kernel.org,m:devicetree@vger.kernel.org,m:ashimkodev@gmail.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bre@breiti.cc,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[breiti.cc:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,keba.com:email]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 628BC74DEE2
+X-Rspamd-Queue-Id: 6842774DF9D
 
-From: Markus Breitenberger <bre@keba.com>
+On Mon, Jul 13, 2026 at 04:12:22PM +0300, Artem Shimko wrote:
+> Add device tree binding documentation for the DAPU Telecom DAP8211R(I)
+> Gigabit Ethernet PHY.
+> 
+> The PHY supports TX and RX clock delays in 150 ps steps from 0 to 2250 ps,
+> with a default of 1950 ps if not specified. The tx-inverted-clk flag
+> provides a vendor-specific extension for boards where PCB trace length or
+> MAC requirements necessitate 180-degree clock phase shift.
+> 
+> Signed-off-by: Artem Shimko <a.shimko.dev@gmail.com>
+> ---
+>  .../bindings/net/dapu,dap8211r.yaml           | 78 +++++++++++++++++++
+>  1 file changed, 78 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/dapu,dap8211r.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/dapu,dap8211r.yaml b/Documentation/devicetree/bindings/net/dapu,dap8211r.yaml
+> new file mode 100644
+> index 000000000000..208a82f779d6
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/dapu,dap8211r.yaml
+> @@ -0,0 +1,78 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/dapu,dap8211r.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: DAPU Telecom DAP8211R(I) Gigabit Ethernet PHY
+> +
+> +maintainers:
+> +  - Artem Shimko <a.shimko.dev@gmail.com>
+> +
+> +description: |
+> +  The DAP8211R(I) is a Gigabit Ethernet PHY with RGMII interface,
+> +  supporting IEEE 802.3az Energy Efficient Ethernet, IEEE 1588 SyncE,
+> +  and an internal packet generator for diagnostics.
+> +
+> +  Specifications:
+> +    - 10BASE-Te, 100BASE-TX, 1000BASE-T
+> +    - RGMII with configurable TX/RX clock delays (150 ps steps, 0-2250 ps)
+> +    - IEEE 802.3az-2010 Energy Efficient Ethernet
+> +    - IEEE 1588 SyncE support
+> +    - Internal packet generator and checker for link diagnostics
+> +
+> +allOf:
+> +  - $ref: ethernet-phy.yaml#
+> +
+> +properties:
+> +  compatible:
+> +    const: ethernet-phy-id0008.011b
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  rx-internal-delay-ps:
+> +    description:
+> +      RGMII RX clock delay in picoseconds. The PHY supports 150 ps steps
+> +      from 0 to 2250 ps. If not specified, defaults to 1950 ps. If the
+> +      requested value does not exactly match a supported step, the driver
+> +      selects the nearest supported value and issues a warning.
+> +    enum: [0, 150, 300, 450, 600, 750, 900, 1050, 1200, 1350, 1500,
+> +           1650, 1800, 1950, 2100, 2250]
+> +    default: 1950
+> +
+> +  tx-internal-delay-ps:
+> +    description:
+> +      RGMII TX clock delay in picoseconds. The PHY supports 150 ps steps
+> +      from 0 to 2250 ps. If not specified, defaults to 1950 ps. If the
+> +      requested value does not exactly match a supported step, the driver
+> +      selects the nearest supported value and issues a warning.
+> +    enum: [0, 150, 300, 450, 600, 750, 900, 1050, 1200, 1350, 1500,
+> +           1650, 1800, 1950, 2100, 2250]
 
-intel_mac_finish() is registered as the phylink mac_finish()
-callback for the Elkhart Lake SGMII ports. phylink calls it at
-the end of every major link reconfiguration, including the
-initial one during probe.
+This would also work:
 
-The callback selects the PMC ModPHY LCPLL programming for the
-requested MAC-side interface and then power-cycles the SerDes.
-On Elkhart Lake that ModPHY is also used by the on-die AHCI
-SATA PHY. Reapplying the programming during the initial
-boot-time link-up disturbs the shared analog block while it is
-still driving SATA, so the SATA link fails to train:
+multipleOf: 150
+maximum: 2250
 
-  ata1: SATA link down (SStatus 1 SControl 300)
+> +    default: 1950
+> +
+> +  tx-inverted-clk:
+> +    $ref: /schemas/types.yaml#/definitions/flag
+> +    description:
+> +      If present, the RGMII TX clock to the MAC is inverted (180 degree
+> +      phase shift relative to the data lines). This is a vendor-specific
+> +      extension for boards where PCB trace length or MAC requirements
+> +      necessitate clock inversion. Only use this property after hardware
+> +      signal integrity validation.
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    mdio {
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +
+> +        ethernet-phy@1 {
+> +            compatible = "ethernet-phy-ieee802.3-c22";
+> +            reg = <1>;
+> +            rx-internal-delay-ps = <1050>;
+> +            tx-internal-delay-ps = <1150>;
+> +            tx-inverted-clk;
+> +        };
+> +    };
+> \ No newline at end of file
 
-The disk carrying the root filesystem is never detected and the
-system hangs at rootwait. Ethernet itself comes up normally,
-which makes the failure look unrelated to the network driver.
+With this fixed,
 
-Before mac_finish() runs, the legacy SerDes power-up path has
-already programmed SERDES_GCR0 for the current interface. The
-1G and 2.5G ModPHY tables selected by mac_finish() correspond
-to the SerDes lane rate, so read that rate back from SERDES_GCR0
-and skip the PMC reprogramming and SerDes power-cycle when it
-already matches the selected interface.
-
-This keeps the disruptive reprogramming out of the boot path
-when the SerDes is configured correctly, while preserving the
-previous behavior when a real SGMII/1000BASE-X to 2500BASE-X
-rate change is needed. If the register read fails, reconfigure
-as before.
-
-Fixes: a42f6b3f1cc1 ("net: stmmac: configure SerDes according to the interface mode")
-Cc: stable@vger.kernel.org
-Assisted-by: GitHub-Copilot:claude-opus-4.8
-Signed-off-by: Markus Breitenberger <bre@keba.com>
----
-v3:
-  - Update priv->plat->phy_interface before skipping SerDes reconfiguration,
-    so SGMII <-> 1000BASE-X changes still update the cached interface.
-  - Rename subject to "net: stmmac: intel: skip SerDes reconfig when rate is unchanged".
-
-v2: https://lore.kernel.org/netdev/20260709190329.124432-1-bre@breiti.cc/
-  - Read current SerDes lane rate from SERDES_GCR0 instead of comparing
-    against cached phy_interface state.
-  - Rework commit message.
-  - Keep previous behavior if SERDES_GCR0 read fails.
-
-v1: https://lore.kernel.org/netdev/20260706061954.94842-1-bre@breiti.cc/
-
- .../net/ethernet/stmicro/stmmac/dwmac-intel.c | 31 +++++++++++++++++++
- 1 file changed, 31 insertions(+)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-index b8d467ba6d72..4d207f41a43b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-@@ -525,6 +525,32 @@ static int intel_set_reg_access(const struct pmc_serdes_regs *regs, int max_regs
- 	return ret;
- }
- 
-+/*
-+ * Return true if the SerDes lane rate must change to serve @interface.
-+ * If the current rate cannot be determined, reconfigure as before.
-+ */
-+static bool intel_serdes_needs_reconfig(struct stmmac_priv *priv,
-+					struct intel_priv_data *intel_priv,
-+					phy_interface_t interface)
-+{
-+	u32 cur_rate, want_rate;
-+	int data;
-+
-+	if (!intel_priv->mdio_adhoc_addr)
-+		return true;
-+
-+	data = mdiobus_read(priv->mii, intel_priv->mdio_adhoc_addr,
-+			    SERDES_GCR0);
-+	if (data < 0)
-+		return true;
-+
-+	cur_rate = (data & SERDES_RATE_MASK) >> SERDES_RATE_PCIE_SHIFT;
-+	want_rate = interface == PHY_INTERFACE_MODE_2500BASEX ?
-+			SERDES_RATE_PCIE_GEN2 : SERDES_RATE_PCIE_GEN1;
-+
-+	return cur_rate != want_rate;
-+}
-+
- static int intel_mac_finish(struct net_device *ndev,
- 			    void *intel_data,
- 			    unsigned int mode,
-@@ -536,6 +562,11 @@ static int intel_mac_finish(struct net_device *ndev,
- 	int max_regs = 0;
- 	int ret = 0;
- 
-+	if (!intel_serdes_needs_reconfig(priv, intel_priv, interface)) {
-+		priv->plat->phy_interface = interface;
-+		return 0;
-+	}
-+
- 	ret = intel_tsn_lane_is_available(ndev, intel_priv);
- 	if (ret < 0) {
- 		netdev_info(priv->dev, "No TSN lane available to set the registers.\n");
--- 
-2.55.0
-
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
