@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-307072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307073-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 8WWIKj6hVGrwoQMAu9opvQ
-	(envelope-from <netdev+bounces-307072-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:26:38 +0200
+	id oM2JJs+fVGqFoQMAu9opvQ
+	(envelope-from <netdev+bounces-307073-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:20:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04E8E748A8E
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:26:38 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B93A74898A
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:20:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=KBiKxlCx;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b="TZr/gD2I";
 	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307072-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307072-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307073-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-307073-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 875393382EF1
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 08:12:50 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DFAB6306ADFD
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 08:13:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4641C3B38B9;
-	Mon, 13 Jul 2026 08:11:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4622D3A6B71;
+	Mon, 13 Jul 2026 08:11:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498653ADB94
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 08:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C0C3B42CC
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 08:11:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783930298; cv=none; b=r31QDNjBIx0LqZf+MKrXtI8JjzUS1E8izaKdWV6ZvNlIUldlfiHK+zP7oZhYdTkNUQZFkRJoYKPEKCrzKlsgHsHKiv985GX5w68RGVGChPPvKzIHIZsonuvgsoacMKyCoB2y8kcTUGkoRrmPTxlwkP+3dMxMq8udMNRaEH/4Yhg=
+	t=1783930304; cv=none; b=X7A0tnO1vhWMtipCWj17UktuuN84sECpQLt1XH3vMZobhtVcFTBi0e0CaQia8UWfurMixw43GeBmj6WdY6DFsHb+F2vZqlXBiZ+t1Vna5a55uLj+xAGWfl96X2R/jfj7Sn18vlm9pOwNRVUEB28T6qlVMycDcLaelY3lX09S59A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783930298; c=relaxed/simple;
-	bh=hjblG8rYj5TurNeBosr/cb3t+768FiNWOJchBQ1RHWc=;
+	s=arc-20240116; t=1783930304; c=relaxed/simple;
+	bh=6guoQXDxMm7F31VXmZjPZiL+ySmq78h0iE6of3yYXPA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LIPWC6U+SlhQEgrClPpf2lcHBW5Cf40J9sabPNA2AG2dlly44RmwHlauMOJaLs80mldlotF+2rp1X2I6lo6v0NMGe2pM1JbggtzHJYO8yaCH466uShDJ+l1f/SesAHu8zwVQVM9Po482IpVTZShl1R7df2K03QPSZ2JxCujZZPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KBiKxlCx; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=OvkNcxlxo9eH2IN4V6jnZdtkTRWgH/OuivFrxO6Hl0xeJM9Y1Sy/8GEV01A2PzW66zxG1x1jT8S41GRWrgLnkGoj3QThub9huljDi+NpNjY8qwr2CPQfic0bv4CHl9Ya/In5Zid1SzhzSP7q4/Mw2KDq7h2KcfC5GxOXKp0LvBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TZr/gD2I; arc=none smtp.client-ip=170.10.129.124
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783930295;
+	s=mimecast20190719; t=1783930301;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6BC3CTSn22J1gLHfKAYR8Fk6H4HwrsCRZq+Yw3ufvMk=;
-	b=KBiKxlCxepTtDzhEpZTDbr1I4/+CSCs3k+OheEoUCwFQoRq+r0STv+8FfU2zUWWifM4Ram
-	ZSgVnIVWEtTapehKJuOsYEumKbGLJsmXu4MEaG3ENzF6rvFv3MprXAutYCRe3NBI2kZ73H
-	q9R2uVEcBF5/HDQ0vAads+FlwRpNSlo=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=eq7llsTmsWlajzQqjB1qgWIWN4J/21bO/XvtzoPCw4c=;
+	b=TZr/gD2IcK467MuzaC+rguBXIvJ5wSykEy/leh1aIlM0cCVXRS9MGnV7jZlArUzQdeV/rr
+	ymlcosb3UXTbU2a0jz6AJXJ1RkXHCSc/m/xAcMM88NyIWpq1mRGGZekiNZrEooachmFCIF
+	kY+wFpPTokSIe/SVVUqhrn0I8ffGle0=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-335-7P4A0BZ6Pb-qyrCy6KpPhQ-1; Mon,
- 13 Jul 2026 04:11:32 -0400
-X-MC-Unique: 7P4A0BZ6Pb-qyrCy6KpPhQ-1
-X-Mimecast-MFC-AGG-ID: 7P4A0BZ6Pb-qyrCy6KpPhQ_1783930290
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-347-bP9J2-YHOUq-DyM1wuBrSA-1; Mon,
+ 13 Jul 2026 04:11:37 -0400
+X-MC-Unique: bP9J2-YHOUq-DyM1wuBrSA-1
+X-Mimecast-MFC-AGG-ID: bP9J2-YHOUq-DyM1wuBrSA_1783930295
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3178D1955E7D;
-	Mon, 13 Jul 2026 08:11:30 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8D6FD19560A1;
+	Mon, 13 Jul 2026 08:11:35 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.44.33.159])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6B987180058F;
-	Mon, 13 Jul 2026 08:11:26 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C5E1919560A6;
+	Mon, 13 Jul 2026 08:11:31 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -75,9 +75,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	Jarkko Sakkinen <jarkko@kernel.org>,
 	keyrings@vger.kernel.org,
 	stable@kernel.org
-Subject: [PATCH net v3 12/14] rxrpc: Pass appdata key to rxrpc_call and thence to rxrpc_bundle
-Date: Mon, 13 Jul 2026 09:10:18 +0100
-Message-ID: <20260713081022.2186481-13-dhowells@redhat.com>
+Subject: [PATCH net v3 13/14] rxrpc: Fix CHALLENGE packet overqueuing and simplify RESPONSE generation
+Date: Mon, 13 Jul 2026 09:10:19 +0100
+Message-ID: <20260713081022.2186481-14-dhowells@redhat.com>
 In-Reply-To: <20260713081022.2186481-1-dhowells@redhat.com>
 References: <20260713081022.2186481-1-dhowells@redhat.com>
 Precedence: bulk
@@ -87,19 +87,19 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307072-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307073-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:dhowells@redhat.com,m:marc.dionne@auristor.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-afs@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:jaltman@auristor.com,m:jarkko@kernel.org,m:keyrings@vger.kernel.org,m:stable@kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -118,11 +118,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 04E8E748A8E
+X-Rspamd-Queue-Id: 9B93A74898A
 
 Currently, when a CHALLENGE packet comes in, it's queued in an OOB queue on
 the AF_RXRPC socket that generated one of the calls on that connection for
@@ -142,13 +142,31 @@ going to be sent to the server; presumably the kerberos server knows that
 the fileserver can handle that type - otherwise why tell the client to use
 it?
 
-This is a part of the fix.  With this, the appdata key created by the AFS
-filesystem or passed in via sendmsg CMSG to a user AF_RXRPC socket is added
-to an rxrpc_call struct and will then be added to an rxrpc_bundle struct.
+This is the main part of the fix.  It switches the code over from using the
+OOB communication mechanism to get the appdata on the fly from the
+application (either the AFS filesystem or userspace) to using the appdata
+key preemptively provided by the application.
 
-Note that afs_make_op_call() has to be moved so that it can call
-afs_use_server().  afs_operation-based calls did not heretofore 'use' the
-server and server will be 'un-used' by afs_free_call().
+The following changes are made:
+
+ (1) Revert to making the connection event processor work item parse the
+     CHALLENGE and generate the RESPONSE directly.
+
+ (2) Add another (optional) parameter that is passed in when an rxrpc
+     client call is created and ends up attached to the connection bundle
+     and is a user-type key containing the application data.
+
+ (3) RESPONSE generation looks at the bundle and if the app-data is there,
+     it will include it (if the security class is YFS-RxGK; RxKAD ignores
+     it).
+
+The AFS filesystem driver creates an app-data key when it probes a
+fileserver and attaches it to the afs_server struct.  This is picked up
+when a call is made to that server and thence passed to rxrpc.
+
+Direct userspace users of AF_RXRPC can partake by creating a user-type key
+containing the app-data they want to use and passing its serial ID in a
+CMSG of type RXRPC_RESPONSE_APPDATA in the initial sendmsg() of a call.
 
 Fixes: 5800b1cf3fd8 ("rxrpc: Allow CHALLENGEs to the passed to the app for a RESPONSE")
 Link: https://sashiko.dev/#/patchset/20260624163819.3017002-1-dhowells%40redhat.com
@@ -165,310 +183,274 @@ cc: linux-afs@lists.infradead.org
 cc: keyrings@vger.kernel.org
 cc: stable@kernel.org
 ---
- fs/afs/internal.h          | 33 +++++++++++++++++----------------
- fs/afs/rxrpc.c             | 21 ++++++++++++++++++++-
- include/net/af_rxrpc.h     |  1 +
- include/trace/events/afs.h |  1 +
- include/uapi/linux/rxrpc.h |  1 +
- net/rxrpc/af_rxrpc.c       |  3 +++
- net/rxrpc/ar-internal.h    |  3 +++
- net/rxrpc/call_object.c    |  2 ++
- net/rxrpc/conn_client.c    |  2 ++
- net/rxrpc/sendmsg.c        | 25 ++++++++++++++++++++++++-
- 10 files changed, 74 insertions(+), 18 deletions(-)
+ net/rxrpc/af_rxrpc.c   |  5 +---
+ net/rxrpc/conn_event.c | 68 ++----------------------------------------
+ net/rxrpc/recvmsg.c    |  2 +-
+ net/rxrpc/rxgk.c       | 57 +++++++++++++++++++++--------------
+ 4 files changed, 39 insertions(+), 93 deletions(-)
 
-diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-index d1c29593c5d0..57519888b978 100644
---- a/fs/afs/internal.h
-+++ b/fs/afs/internal.h
-@@ -1414,22 +1414,6 @@ static inline void afs_see_call(struct afs_call *call, enum afs_call_trace why)
- 		       atomic_read(&call->net->nr_outstanding_calls));
- }
- 
--static inline void afs_make_op_call(struct afs_operation *op, struct afs_call *call,
--				    gfp_t gfp)
--{
--	struct afs_addr_list *alist = op->estate->addresses;
--
--	op->call	= afs_get_call(call, afs_call_trace_get_op_call);
--	op->type	= call->type;
--	call->op	= op;
--	call->key	= op->key;
--	call->intr	= !(op->flags & AFS_OPERATION_UNINTR);
--	call->peer	= rxrpc_kernel_get_peer(alist->addrs[op->addr_index].peer);
--	call->service_id = op->server->service_id;
--	afs_make_call(call, gfp);
--	afs_put_call(call, afs_call_trace_put_made_call);
--}
--
- static inline void afs_extract_begin(struct afs_call *call, void *buf, size_t size)
- {
- 	call->iov_len = size;
-@@ -1749,6 +1733,23 @@ static inline struct inode *AFS_VNODE_TO_I(struct afs_vnode *vnode)
- 	return &vnode->netfs.inode;
- }
- 
-+static inline void afs_make_op_call(struct afs_operation *op, struct afs_call *call,
-+				    gfp_t gfp)
-+{
-+	struct afs_addr_list *alist = op->estate->addresses;
-+
-+	op->call	= afs_get_call(call, afs_call_trace_get_op_call);
-+	op->type	= call->type;
-+	call->op	= op;
-+	call->server	= afs_use_server(op->server, false, afs_server_trace_use_call);
-+	call->key	= op->key;
-+	call->intr	= !(op->flags & AFS_OPERATION_UNINTR);
-+	call->peer	= rxrpc_kernel_get_peer(alist->addrs[op->addr_index].peer);
-+	call->service_id = op->server->service_id;
-+	afs_make_call(call, gfp);
-+	afs_put_call(call, afs_call_trace_put_made_call);
-+}
-+
- /*
-  * Note that a dentry got changed.  We need to set d_fsdata to the data version
-  * number derived from the result of the operation.  It doesn't matter if
-diff --git a/fs/afs/rxrpc.c b/fs/afs/rxrpc.c
-index 6dc6fd853832..1a110448dbdb 100644
---- a/fs/afs/rxrpc.c
-+++ b/fs/afs/rxrpc.c
-@@ -312,6 +312,7 @@ void afs_make_call(struct afs_call *call, gfp_t gfp)
- 	struct msghdr msg;
- 	struct kvec iov[1];
- 	unsigned int debug_id = call->debug_id;
-+	struct key *app_data = NULL;
- 	size_t len;
- 	bool write_iter = call->write_iter;
- 	s64 tx_total_len;
-@@ -342,8 +343,26 @@ void afs_make_call(struct afs_call *call, gfp_t gfp)
- 	if (call->async)
- 		afs_get_call(call, afs_call_trace_get_make_async_call);
- 
-+	if (call->key && call->server) {
-+		u32 krb5_enctype = 0;
-+		u8 security_index = 0;
-+
-+		rxrpc_kernel_query_key(call->key, &security_index, &krb5_enctype);
-+		switch (security_index) {
-+#ifdef CONFIG_RXGK
-+		case RXRPC_SECURITY_YFS_RXGK:
-+			/* Read the key pointer before the appdata */
-+			app_data = smp_load_acquire(&call->server->yfs_rxgk_appdata);
-+			break;
-+#endif
-+		default:
-+			break;
-+		}
-+	}
-+
- 	/* create a call */
--	rxcall = rxrpc_kernel_begin_call(call->net->socket, call->peer, call->key,
-+	rxcall = rxrpc_kernel_begin_call(call->net->socket, call->peer,
-+					 call->key, app_data,
- 					 (unsigned long)call,
- 					 tx_total_len,
- 					 call->max_lifespan,
-diff --git a/include/net/af_rxrpc.h b/include/net/af_rxrpc.h
-index c4b68049c06f..19c61a2f5af3 100644
---- a/include/net/af_rxrpc.h
-+++ b/include/net/af_rxrpc.h
-@@ -55,6 +55,7 @@ void rxrpc_kernel_set_notifications(struct socket *sock,
- struct rxrpc_call *rxrpc_kernel_begin_call(struct socket *sock,
- 					   struct rxrpc_peer *peer,
- 					   struct key *key,
-+					   struct key *app_data,
- 					   unsigned long user_call_ID,
- 					   s64 tx_total_len,
- 					   u32 hard_timeout,
-diff --git a/include/trace/events/afs.h b/include/trace/events/afs.h
-index a1963e21f034..a4f57414d527 100644
---- a/include/trace/events/afs.h
-+++ b/include/trace/events/afs.h
-@@ -160,6 +160,7 @@ enum yfs_cm_operation {
- 	EM(afs_server_trace_unuse_slist_isort,	"UNU isort") \
- 	EM(afs_server_trace_update,		"UPDATE   ") \
- 	EM(afs_server_trace_use_by_uuid,	"USE uuid ") \
-+	EM(afs_server_trace_use_call,		"USE call ") \
- 	EM(afs_server_trace_use_cm_call,	"USE cm-cl") \
- 	EM(afs_server_trace_use_get_caps,	"USE gcaps") \
- 	EM(afs_server_trace_use_give_up_cb,	"USE gvupc") \
-diff --git a/include/uapi/linux/rxrpc.h b/include/uapi/linux/rxrpc.h
-index d9735abd4c79..bcdfdf9c67a1 100644
---- a/include/uapi/linux/rxrpc.h
-+++ b/include/uapi/linux/rxrpc.h
-@@ -63,6 +63,7 @@ enum rxrpc_cmsg_type {
- 	RXRPC_RESPOND		= 17,	/* Cs-: Respond to a challenge */
- 	RXRPC_RESPONDED		= 18,	/* S-r: Data received in RESPONSE */
- 	RXRPC_RESP_RXGK_APPDATA	= 19,	/* Cs-: RESPONSE: RxGK app data to include */
-+	RXRPC_RESPONSE_APPDATA	= 20,	/* Cs-: User key holding app data for RESPONSE */
- 	RXRPC__SUPPORTED
- };
- 
 diff --git a/net/rxrpc/af_rxrpc.c b/net/rxrpc/af_rxrpc.c
-index 9ab0f22c881e..a19c0fd3c51a 100644
+index a19c0fd3c51a..9eb6ca3c5ebf 100644
 --- a/net/rxrpc/af_rxrpc.c
 +++ b/net/rxrpc/af_rxrpc.c
-@@ -318,6 +318,7 @@ EXPORT_SYMBOL(rxrpc_kernel_put_peer);
-  * @sock: The socket on which to make the call
-  * @peer: The peer to contact
-  * @key: The security context to use (defaults to socket setting)
-+ * @app_data: The security response application data (or NULL)
-  * @user_call_ID: The ID to use
-  * @tx_total_len: Total length of data to transmit during the call (or -1)
-  * @hard_timeout: The maximum lifespan of the call in sec
-@@ -340,6 +341,7 @@ EXPORT_SYMBOL(rxrpc_kernel_put_peer);
- struct rxrpc_call *rxrpc_kernel_begin_call(struct socket *sock,
- 					   struct rxrpc_peer *peer,
- 					   struct key *key,
-+					   struct key *app_data,
- 					   unsigned long user_call_ID,
- 					   s64 tx_total_len,
- 					   u32 hard_timeout,
-@@ -368,6 +370,7 @@ struct rxrpc_call *rxrpc_kernel_begin_call(struct socket *sock,
- 		key = NULL; /* a no-security key */
+@@ -598,10 +598,7 @@ static int rxrpc_sendmsg(struct socket *sock, struct msghdr *m, size_t len)
+ 		fallthrough;
+ 	case RXRPC_SERVER_BOUND:
+ 	case RXRPC_SERVER_LISTENING:
+-		if (m->msg_flags & MSG_OOB)
+-			ret = rxrpc_sendmsg_oob(rx, m, len);
+-		else
+-			ret = rxrpc_do_sendmsg(rx, m, len);
++		ret = rxrpc_do_sendmsg(rx, m, len);
+ 		/* The socket has been unlocked */
+ 		goto out;
+ 	default:
+diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
+index 611c790bc6d0..9146b9d4c2ac 100644
+--- a/net/rxrpc/conn_event.c
++++ b/net/rxrpc/conn_event.c
+@@ -279,10 +279,7 @@ static int rxrpc_process_event(struct rxrpc_connection *conn,
  
- 	memset(&p, 0, sizeof(p));
-+	p.app_data		= app_data;
- 	p.user_call_ID		= user_call_ID;
- 	p.tx_total_len		= tx_total_len;
- 	p.interruptibility	= interruptibility;
-diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
-index b6e7e8c5e96f..20c10428a50e 100644
---- a/net/rxrpc/ar-internal.h
-+++ b/net/rxrpc/ar-internal.h
-@@ -516,6 +516,7 @@ struct rxrpc_bundle {
- 	struct rxrpc_local	*local;		/* Representation of local endpoint */
- 	struct rxrpc_peer	*peer;		/* Remote endpoint */
- 	struct key		*key;		/* Security details */
-+	struct key		*app_data;	/* Security response app data */
- 	struct list_head	proc_link;	/* Link in net->bundle_proc_list */
- 	const struct rxrpc_security *security;	/* applied security module */
- 	refcount_t		ref;
-@@ -720,6 +721,7 @@ struct rxrpc_call {
- 	struct rxrpc_sock __rcu	*socket;	/* socket responsible */
- 	struct rxrpc_net	*rxnet;		/* Network namespace to which call belongs */
- 	struct key		*key;		/* Security details */
-+	struct key		*app_data;	/* Security response app data */
- 	const struct rxrpc_security *security;	/* applied security module */
- 	struct mutex		user_mutex;	/* User access mutex */
- 	struct sockaddr_rxrpc	dest_srx;	/* Destination address */
-@@ -914,6 +916,7 @@ enum rxrpc_command {
- };
+ 	switch (sp->hdr.type) {
+ 	case RXRPC_PACKET_TYPE_CHALLENGE:
+-		ret = conn->security->respond_to_challenge(conn, skb);
+-		sp->chall.conn = NULL;
+-		rxrpc_put_connection(conn, rxrpc_conn_put_challenge_input);
+-		return ret;
++		return conn->security->respond_to_challenge(conn, skb);
  
- struct rxrpc_call_params {
-+	struct key		*app_data;	/* Security response app data */
- 	s64			tx_total_len;	/* Total Tx data length (if send data) */
- 	unsigned long		user_call_ID;	/* User's call ID */
- 	struct {
-diff --git a/net/rxrpc/call_object.c b/net/rxrpc/call_object.c
-index 817ed9acb91e..9f6130d90c4c 100644
---- a/net/rxrpc/call_object.c
-+++ b/net/rxrpc/call_object.c
-@@ -211,6 +211,7 @@ static struct rxrpc_call *rxrpc_alloc_client_call(struct rxrpc_sock *rx,
- 	call->interruptibility	= p->interruptibility;
- 	call->tx_total_len	= p->tx_total_len;
- 	call->key		= key_get(cp->key);
-+	call->app_data		= key_get(p->app_data);
- 	call->peer		= rxrpc_get_peer(cp->peer, rxrpc_peer_get_call);
- 	call->local		= rxrpc_get_local(cp->local, rxrpc_local_get_call);
- 	call->security_level	= cp->security_level;
-@@ -697,6 +698,7 @@ static void rxrpc_destroy_call(struct work_struct *work)
- 	rxrpc_put_peer(call->peer, rxrpc_peer_put_call);
- 	rxrpc_put_local(call->local, rxrpc_local_put_call);
- 	key_put(call->key);
-+	key_put(call->app_data);
- 	call_rcu(&call->rcu, rxrpc_rcu_free_call);
+ 	case RXRPC_PACKET_TYPE_RESPONSE:
+ 		spin_lock_irq(&conn->state_lock);
+@@ -425,66 +422,6 @@ static void rxrpc_post_packet_to_conn(struct rxrpc_connection *conn,
+ 	rxrpc_queue_conn(conn, rxrpc_conn_queue_rx_work);
  }
  
-diff --git a/net/rxrpc/conn_client.c b/net/rxrpc/conn_client.c
-index 48519f0de185..5cbfa7b223e0 100644
---- a/net/rxrpc/conn_client.c
-+++ b/net/rxrpc/conn_client.c
-@@ -81,6 +81,7 @@ static struct rxrpc_bundle *rxrpc_alloc_bundle(struct rxrpc_call *call,
- 		bundle->local		= call->local;
- 		bundle->peer		= rxrpc_get_peer(call->peer, rxrpc_peer_get_bundle);
- 		bundle->key		= key_get(call->key);
-+		bundle->app_data	= key_get(call->app_data);
- 		bundle->security	= call->security;
- 		bundle->exclusive	= test_bit(RXRPC_CALL_EXCLUSIVE, &call->flags);
- 		bundle->upgrade		= test_bit(RXRPC_CALL_UPGRADE, &call->flags);
-@@ -118,6 +119,7 @@ static void rxrpc_free_bundle(struct rxrpc_bundle *bundle)
- 	write_unlock(&bundle->local->rxnet->conn_lock);
- 	rxrpc_put_peer(bundle->peer, rxrpc_peer_put_bundle);
- 	key_put(bundle->key);
-+	key_put(bundle->app_data);
- 	kfree(bundle);
- }
- 
-diff --git a/net/rxrpc/sendmsg.c b/net/rxrpc/sendmsg.c
-index 71343998b87d..cdf35440317d 100644
---- a/net/rxrpc/sendmsg.c
-+++ b/net/rxrpc/sendmsg.c
-@@ -12,6 +12,7 @@
- #include <linux/skbuff.h>
- #include <linux/export.h>
- #include <linux/sched/signal.h>
-+#include <keys/user-type.h>
- 
- #include <net/sock.h>
- #include <net/af_rxrpc.h>
-@@ -530,6 +531,8 @@ static int rxrpc_send_data(struct rxrpc_sock *rx,
- static int rxrpc_sendmsg_cmsg(struct msghdr *msg, struct rxrpc_send_params *p)
- {
- 	struct cmsghdr *cmsg;
-+	key_serial_t key_id;
-+	key_ref_t key;
- 	bool got_user_ID = false;
- 	int len;
- 
-@@ -614,6 +617,22 @@ static int rxrpc_sendmsg_cmsg(struct msghdr *msg, struct rxrpc_send_params *p)
- 				return -ERANGE;
- 			break;
- 
-+		case RXRPC_RESPONSE_APPDATA:
-+			if (len != sizeof(key_serial_t))
-+				return -EINVAL;
-+			if (p->call.app_data)
-+				return -EINVAL;
-+			key_id = *(key_serial_t *)CMSG_DATA(cmsg);
-+			key = lookup_user_key(key_id, 0, KEY_NEED_SEARCH);
-+			if (IS_ERR(key))
-+				return PTR_ERR(key);
-+			if (key_ref_to_ptr(key)->type == &key_type_user) {
-+				key_ref_put(key);
-+				return -EINVAL;
-+			}
-+			p->call.app_data = key_ref_to_ptr(key);
-+			break;
-+
- 		default:
- 			return -EINVAL;
+-/*
+- * Post a CHALLENGE packet to the socket of one of a connection's calls so that
+- * it can get application data to include in the packet, possibly querying
+- * userspace.
+- */
+-static bool rxrpc_post_challenge(struct rxrpc_connection *conn,
+-				 struct sk_buff *skb)
+-{
+-	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
+-	struct rxrpc_call *call = NULL;
+-	struct rxrpc_sock *rx;
+-	bool respond = false, queued = false;
+-
+-	sp->chall.conn =
+-		rxrpc_get_connection(conn, rxrpc_conn_get_challenge_input);
+-
+-	if (!conn->security->challenge_to_recvmsg) {
+-		rxrpc_post_packet_to_conn(conn, skb);
+-		return true;
+-	}
+-
+-	rcu_read_lock();
+-
+-	for (int i = 0; i < ARRAY_SIZE(conn->channels); i++) {
+-		if (conn->channels[i].call) {
+-			call = conn->channels[i].call;
+-			rx = rcu_dereference(call->socket);
+-			if (!rx) {
+-				call = NULL;
+-				continue;
+-			}
+-
+-			respond = true;
+-			if (test_bit(RXRPC_SOCK_MANAGE_RESPONSE, &rx->flags))
+-				break;
+-			call = NULL;
+-		}
+-	}
+-
+-	if (!respond) {
+-		rcu_read_unlock();
+-		rxrpc_put_connection(conn, rxrpc_conn_put_challenge_input);
+-		sp->chall.conn = NULL;
+-		return false;
+-	}
+-
+-	if (call)
+-		queued = rxrpc_notify_socket_oob(call, skb);
+-	rcu_read_unlock();
+-	if (call && !queued) {
+-		rxrpc_put_connection(conn, rxrpc_conn_put_challenge_input);
+-		sp->chall.conn = NULL;
+-		return false;
+-	}
+-
+-	if (!call)
+-		rxrpc_post_packet_to_conn(conn, skb);
+-	return true;
+-}
+-
+ /*
+  * Input a connection-level packet.
+  */
+@@ -513,7 +450,8 @@ bool rxrpc_input_conn_packet(struct rxrpc_connection *conn, struct sk_buff *skb)
  		}
-@@ -722,8 +741,10 @@ int rxrpc_do_sendmsg(struct rxrpc_sock *rx, struct msghdr *msg, size_t len)
- 			goto error_release_sock;
- 		call = rxrpc_new_client_call_for_sendmsg(rx, msg, &p);
- 		/* The socket is now unlocked... */
--		if (IS_ERR(call))
-+		if (IS_ERR(call)) {
-+			key_put(p.call.app_data);
- 			return PTR_ERR(call);
-+		}
- 		/* ... and we have the call lock. */
- 		p.call.nr_timeouts = 0;
- 		ret = 0;
-@@ -808,11 +829,13 @@ int rxrpc_do_sendmsg(struct rxrpc_sock *rx, struct msghdr *msg, size_t len)
- 		mutex_unlock(&call->user_mutex);
- error_put:
- 	rxrpc_put_call(call, rxrpc_call_put_sendmsg);
-+	key_put(p.call.app_data);
- 	_leave(" = %d", ret);
- 	return ret;
+ 		if (!conn->security->validate_challenge(conn, skb))
+ 			return false;
+-		return rxrpc_post_challenge(conn, skb);
++		rxrpc_post_packet_to_conn(conn, skb);
++		return true;
  
- error_release_sock:
- 	release_sock(&rx->sk);
-+	key_put(p.call.app_data);
- 	return ret;
+ 	case RXRPC_PACKET_TYPE_RESPONSE:
+ 		if (rxrpc_is_conn_aborted(conn)) {
+diff --git a/net/rxrpc/recvmsg.c b/net/rxrpc/recvmsg.c
+index 28b2148b5693..33577522ec02 100644
+--- a/net/rxrpc/recvmsg.c
++++ b/net/rxrpc/recvmsg.c
+@@ -405,7 +405,7 @@ int rxrpc_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+ 
+ 	trace_rxrpc_recvmsg(0, rxrpc_recvmsg_enter, 0);
+ 
+-	if (flags & (MSG_OOB | MSG_TRUNC))
++	if (flags & MSG_TRUNC)
+ 		return -EOPNOTSUPP;
+ 
+ 	timeo = sock_rcvtimeo(&rx->sk, flags & MSG_DONTWAIT);
+diff --git a/net/rxrpc/rxgk.c b/net/rxrpc/rxgk.c
+index 77a67ace1d24..f3e085b64502 100644
+--- a/net/rxrpc/rxgk.c
++++ b/net/rxrpc/rxgk.c
+@@ -11,6 +11,7 @@
+ #include <linux/skbuff.h>
+ #include <linux/slab.h>
+ #include <linux/key-type.h>
++#include <keys/user-type.h>
+ #include "ar-internal.h"
+ #include "rxgk_common.h"
+ 
+@@ -837,7 +838,7 @@ static noinline ssize_t rxgk_insert_response_header(struct rxrpc_connection *con
+  */
+ static ssize_t rxgk_construct_authenticator(struct rxrpc_connection *conn,
+ 					    struct sk_buff *challenge,
+-					    const struct krb5_buffer *appdata,
++					    const struct user_key_payload *appdata,
+ 					    struct sk_buff *response,
+ 					    size_t offset)
+ {
+@@ -859,20 +860,20 @@ static ssize_t rxgk_construct_authenticator(struct rxrpc_connection *conn,
+ 	if (ret < 0)
+ 		return -EPROTO;
+ 
+-	a.appdata_len = htonl(appdata->len);
++	a.appdata_len = htonl(appdata->datalen);
+ 
+ 	ret = skb_store_bits(response, offset, &a, sizeof(a));
+ 	if (ret < 0)
+ 		return ret;
+ 	offset += sizeof(a);
+ 
+-	if (appdata->len) {
+-		ret = skb_store_bits(response, offset, appdata->data, appdata->len);
++	if (appdata->datalen) {
++		ret = skb_store_bits(response, offset, appdata->data, appdata->datalen);
+ 		if (ret < 0)
+ 			return ret;
+-		offset += appdata->len;
++		offset += appdata->datalen;
+ 
+-		ret = rxgk_pad_out(response, appdata->len, offset);
++		ret = rxgk_pad_out(response, appdata->datalen, offset);
+ 		if (ret < 0)
+ 			return ret;
+ 		offset += ret;
+@@ -890,7 +891,7 @@ static ssize_t rxgk_construct_authenticator(struct rxrpc_connection *conn,
+ 	ret = skb_store_bits(response, offset, &b, sizeof(b));
+ 	if (ret < 0)
+ 		return ret;
+-	return sizeof(a) + xdr_round_up(appdata->len) + sizeof(b);
++	return sizeof(a) + xdr_round_up(appdata->datalen) + sizeof(b);
  }
  
+ static ssize_t rxgk_encrypt_authenticator(struct rxrpc_connection *conn,
+@@ -923,7 +924,7 @@ static ssize_t rxgk_encrypt_authenticator(struct rxrpc_connection *conn,
+  */
+ static int rxgk_construct_response(struct rxrpc_connection *conn,
+ 				   struct sk_buff *challenge,
+-				   struct krb5_buffer *appdata)
++				   const struct user_key_payload *appdata)
+ {
+ 	struct rxrpc_skb_priv *csp, *rsp;
+ 	struct rxgk_context *gk;
+@@ -936,7 +937,7 @@ static int rxgk_construct_response(struct rxrpc_connection *conn,
+ 	if (IS_ERR(gk))
+ 		return PTR_ERR(gk);
+ 
+-	auth_len = 20 + (4 + appdata->len) + 12 + (1 + 4) * 4;
++	auth_len = 20 + (4 + appdata->datalen) + 12 + (1 + 4) * 4;
+ 	authx_len = crypto_krb5_how_much_buffer(gk->krb5, KRB5_ENCRYPT_MODE,
+ 						auth_len, &auth_offset);
+ 	len = sizeof(struct rxrpc_wire_header) +
+@@ -1011,24 +1012,36 @@ static int rxgk_construct_response(struct rxrpc_connection *conn,
+  * Respond to a challenge packet.
+  */
+ static int rxgk_respond_to_challenge(struct rxrpc_connection *conn,
+-				     struct sk_buff *challenge,
+-				     struct krb5_buffer *appdata)
++				     struct sk_buff *challenge)
+ {
+-	_enter("{%d,%x}", conn->debug_id, key_serial(conn->key));
++	struct user_key_payload dummy = {}, *appdata = &dummy;
++	int ret;
++
++	_enter("{%d,%u,%x,%x}",
++	       conn->debug_id, conn->service_id,
++	       key_serial(conn->key), key_serial(conn->bundle->app_data));
+ 
+ 	if (key_validate(conn->key) < 0)
+ 		return rxrpc_abort_conn(conn, NULL, RXGK_EXPIRED, -EPROTO,
+ 					rxgk_abort_chall_key_expired);
+ 
+-	return rxgk_construct_response(conn, challenge, appdata);
+-}
++	if (conn->bundle->app_data) {
++		rcu_read_lock();
++		appdata = (struct user_key_payload *)
++			user_key_payload_rcu(conn->bundle->app_data);
++		if (appdata && !refcount_inc_not_zero(&appdata->ref))
++			appdata = NULL;
++		rcu_read_unlock();
++		if (!appdata)
++			return rxrpc_abort_conn(conn, NULL, RXGK_EXPIRED, -EKEYREVOKED,
++						rxgk_abort_chall_key_expired);
++	}
+ 
+-static int rxgk_respond_to_challenge_no_appdata(struct rxrpc_connection *conn,
+-						struct sk_buff *challenge)
+-{
+-	struct krb5_buffer appdata = {};
++	ret = rxgk_construct_response(conn, challenge, appdata);
+ 
+-	return rxgk_respond_to_challenge(conn, challenge, &appdata);
++	if (appdata != &dummy)
++		put_user_key_payload(appdata);
++	return ret;
+ }
+ 
+ /**
+@@ -1044,9 +1057,7 @@ static int rxgk_respond_to_challenge_no_appdata(struct rxrpc_connection *conn,
+ int rxgk_kernel_respond_to_challenge(struct sk_buff *challenge,
+ 				     struct krb5_buffer *appdata)
+ {
+-	struct rxrpc_skb_priv *csp = rxrpc_skb(challenge);
+-
+-	return rxgk_respond_to_challenge(csp->chall.conn, challenge, appdata);
++	return -EINVAL;
+ }
+ EXPORT_SYMBOL(rxgk_kernel_respond_to_challenge);
+ 
+@@ -1348,7 +1359,7 @@ const struct rxrpc_security rxgk_yfs = {
+ 	.validate_challenge		= rxgk_validate_challenge,
+ 	.challenge_to_recvmsg		= rxgk_challenge_to_recvmsg,
+ 	.sendmsg_respond_to_challenge	= rxgk_sendmsg_respond_to_challenge,
+-	.respond_to_challenge		= rxgk_respond_to_challenge_no_appdata,
++	.respond_to_challenge		= rxgk_respond_to_challenge,
+ 	.verify_response		= rxgk_verify_response,
+ 	.clear				= rxgk_clear,
+ 	.default_decode_ticket		= rxgk_yfs_decode_ticket,
 
 
