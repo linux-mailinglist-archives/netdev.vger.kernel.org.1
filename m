@@ -1,110 +1,67 @@
-Return-Path: <netdev+bounces-307193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307194-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id WKHFKEH2VGoyiAAAu9opvQ
-	(envelope-from <netdev+bounces-307193-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 16:29:21 +0200
+	id uNquMAv5VGroiAAAu9opvQ
+	(envelope-from <netdev+bounces-307194-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 16:41:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01FAB74C642
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 16:29:21 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88CC174C832
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 16:41:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=broadcom.com header.s=google header.b="Tfb3/ao/";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307193-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307193-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=broadcom.com;
+	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=kVh6GwrH;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307194-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307194-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5412F30A184D
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 14:11:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E1A82304E397
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 14:11:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A2ED2D7DCE;
-	Mon, 13 Jul 2026 14:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 947CF27FB2A;
+	Mon, 13 Jul 2026 14:11:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f228.google.com (mail-pl1-f228.google.com [209.85.214.228])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07C93282F01
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 14:11:21 +0000 (UTC)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.78.106])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46772D47FF;
+	Mon, 13 Jul 2026 14:11:30 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783951883; cv=none; b=dA1XuVBOnqtLdoSyFOAZ0Y6w57MK8as6KkuMZ7DKps1MfnIDQOVmgh86o7R4mbmmAjcHSlvMdRPSw9W0YMabCc52ARjvziQqMpg1vzLhyU5++bIuHr8RjUIJ0d4D/8SegMMYQA8pHETSKzD/LZF2YuprV6MM1WS/p+78bBwK+VQ=
+	t=1783951897; cv=none; b=mxTJoGEhjYyw2T3XPgbwPb8LueLZLzOJENnTGwp5sUlpAw3g0z2SN5A9n6TPw7CQv9RroxWZd9cW22lh9wRIK+Ya4MYYn3v3tOtGJlpbH20LyQ3w0xP/X2o7KgKcgUBYV1Zha6LQpeGtWi8mCG+BuBu/EWc4Lr5+Cg7SUhPKYnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783951883; c=relaxed/simple;
-	bh=ky8a078BzuCeIqNQ3LW+dhReUhSCYk+x7jWpvgUSciU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z61lsEWieXSRp1WmBHTe5gIismNyYCM628hok6PXzVmpcjGCw1eHVAW2mORjOQ2i6ojlFIb7eQ5V3h4B5fT5Lbpy8HQUUZ00sBbCM/SujTIwTpFJsBxVWTsu0SvgQZbCBKRYAYfJTZlzbrpBVBsAACaLun2gpAEClVb5+5JhgYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Tfb3/ao/; arc=none smtp.client-ip=209.85.214.228
-Received: by mail-pl1-f228.google.com with SMTP id d9443c01a7336-2c6b67d5fa1so49791435ad.2
-        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 07:11:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783951881; x=1784556681;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=hIl1om5v05Us/yKSHOl5DicDdbxl/J4daUVgzU7kfHw=;
-        b=mkStZyiCMEeKM4KcojZd8rnAaU5HrCT55pCLdSPdVVm+mV9st+iS5zI8nOQhjByqpV
-         muwRIrMg+cO6G1NlHWwb9wDajy1zfOSegNII6oQlCy95nobe30fo/uddYFiCYPN37EZL
-         zdyssEd68gJ9AaUzLh/gXA3RKSKOZYJMqQe98FNY3KdJIkhqxdDWdu80bdcqap9eBgtq
-         CNWp6gtGsx28d4n4rYmRW/+cqKA/MVAEaFTHktlffw4FdPGXjINlyWZj7pm/SQy3+a/9
-         5p6QC143OFtF+Hi0Hg+WT7rWRVq6KzpNFpzXZjjcHnnCBq68y9oXuVjoqz+bz5Dv8+sU
-         rtWw==
-X-Forwarded-Encrypted: i=1; AHgh+RoNfrTa/uNuU6QRFlInJVHep8GH533l2HNPmXHgsatlkX9s0w6e+I3C+DeT3KGvpT21SMxFUYQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7guJhSpEQrfvj9SFS6TP2njeJ4zLkJOBSTItOrLKxGRuhMOLD
-	arkVoAaz8sBNf1JqAtZvdpZcONDqZb9sSXXgSTe3RIndjTsxdasV0xCxTYmtQ7Rl2CQ4cyyBdqP
-	CksFHA7NvE8+khyvwjj6n+v51wtrTaEVLjkyaaIz68XYEGYY4auqeTy1a5utFfr+gPb7fCOZ7PM
-	at9k6iYhuubzh0v8r2RyxlWnVh+cyUMg1IQAyryXy0NaTNYkN3Ijj77hUSgs9z4x7LkLcLCRWvC
-	CoNXpNHXOO0OEdD30Au
-X-Gm-Gg: AfdE7cmPztDjWXlpuffrIKhrzCMlPu/eJWUbGCJL4WchIeoVL6V4dbBbM5Tpbgtvg6w
-	pi1Omh+co4JC5Xt7LV2xzKfat+CX3Kv6KNzi3RFPF81V8yvbfjrnSSbGpVV5FNgroQxwDdhn5b5
-	ky8Dja7dNd8ZniR16+384GBpjfu0f507Jr18bQ0FsAUpOSb29WUMpMdBVphGvZ0DWco9uRfSB+8
-	6uKtCvhnMJjm9YgaV99vf9Ep681LL+d+b8Uu9e0P07LWj71jk9OIE6fOmJoOVY8ryz2dEUfCt4Q
-	/IjzxpVt6DTj0NbuGk3LAtY1W6kYxAWCGVh/JiWhB8Dybp+kdDVsWtpAyyvWG3x6nFJYl4XbpvM
-	2IeWYnK5rm4doFuKlGAoFWSU6TbL0WA1/kY+2RznQJU+43Ucjs11QsB9hUmusm++ZsjWnagW7pv
-	2Ehr2GNdfN695KjvEBHt7DoCAq5G1T65TZPlxCf3xbCqIiUTfk7g==
-X-Received: by 2002:a17:903:240c:b0:2ce:9b49:d4a0 with SMTP id d9443c01a7336-2ce9f15cabbmr82713315ad.35.1783951881137;
-        Mon, 13 Jul 2026 07:11:21 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-0.dlp.protect.broadcom.com. [144.49.247.0])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2ccc99c3da9sm20087405ad.0.2026.07.13.07.11.20
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 13 Jul 2026 07:11:21 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-c894c1c4aa9so4675729a12.0
-        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 07:11:20 -0700 (PDT)
+	s=arc-20240116; t=1783951897; c=relaxed/simple;
+	bh=LJCUQYGqlLQ7Z4Fucuz+YHjQmMtKF8g1WcuQmRDu/Io=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uDV9df3LDX37+YD/UfQ+Jfq8agKNfRMBWB0k4UTrDeWOt9UAp9PIpJe0GUl2uJZ0QbD5qTw7ewfHCzR9pZurnU5lVrHRw7X0PJFHgA5HFjRMv7KiL3jVn9SDfk878B/JnpAZ92+rRmI7PbVeU8U+tTXLyEfajuy0B4cvHlDz678=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=kVh6GwrH; arc=none smtp.client-ip=13.76.78.106
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1783951879; x=1784556679; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=hIl1om5v05Us/yKSHOl5DicDdbxl/J4daUVgzU7kfHw=;
-        b=Tfb3/ao/nQwagIIz630vndsvShhT3uslTlFZPIs3+kfdmLgk0wLBghtpRprgJHQc9i
-         5agFbfeQdODCkQmZPMt247KEI0WUoagHpUSHqPzaGL/Jj4yhMK9CelcVlAQh22KOzsqP
-         8gtPhvSftZRL6y2FxBGTib0F/xIw7Ro4k4+Sk=
-X-Forwarded-Encrypted: i=1; AHgh+RrkCOPizuAibHylM7LQ9x6abevQWag6bUd4QF5+N7nvbRMN7ebnoGVPxLyHhK+K7pdPcHkqLhE=@vger.kernel.org
-X-Received: by 2002:a05:6a21:9216:b0:3bf:9142:ba3a with SMTP id adf61e73a8af0-3c110a77446mr10555418637.26.1783951879478;
-        Mon, 13 Jul 2026 07:11:19 -0700 (PDT)
-X-Received: by 2002:a05:6a21:9216:b0:3bf:9142:ba3a with SMTP id adf61e73a8af0-3c110a77446mr10555376637.26.1783951879034;
-        Mon, 13 Jul 2026 07:11:19 -0700 (PDT)
-Received: from lvn-dbc2448.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13b93ae3b45sm19650511c88.15.2026.07.13.07.11.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jul 2026 07:11:18 -0700 (PDT)
-From: Harshaka Narayana <harshaka.narayana@broadcom.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Cc: ronak.doshi@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com,
-	andrew+netdev@lunn.ch,
-	edumazet@google.com,
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
+	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=UmEvB
+	uHoKxdCDi8NTjNH5i/58/6HmGIdPyxE60y/ZIs=; b=kVh6GwrHztb/c5RZzAo4i
+	7lRVMMjart9bNext3/rkTWzKp5Xym6D833E5Z9L9BJb3t/XE6F3fvT7c4iScSs4M
+	1B+Xvbesjh7le9t10lskljYcnKNSVq2QQPZwvBK/C29EOM1QZ+Lyhssbuj5W3KfW
+	3MkR41XsifaS7zg2WZ6UeQ=
+Received: from localhost.localdomain (unknown [121.229.84.192])
+	by web4 (Coremail) with SMTP id ywQGZQBneJ0B8lRqb+TqAg--.18679S2;
+	Mon, 13 Jul 2026 22:11:13 +0800 (CST)
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+To: netdev@vger.kernel.org
+Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
+	David Ahern <dsahern@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
 	linux-kernel@vger.kernel.org,
-	guolin.yang@broadcom.com,
-	harshaka.narayana@broadcom.com,
-	sankararaman.jayaraman@broadcom.com
-Subject: [PATCH net v3] vmxnet3: fix BUG_ON in vmxnet3_get_hdr_len() for Geneve packets
-Date: Mon, 13 Jul 2026 07:09:15 -0700
-Message-ID: <20260713140915.3381715-1-harshaka.narayana@broadcom.com>
-X-Mailer: git-send-email 2.52.0
+	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+	Ao Wang <wangao@seu.edu.cn>,
+	Xuewei Feng <fengxw06@126.com>,
+	Qi Li <qli01@tsinghua.edu.cn>,
+	Ke Xu <xuke@tsinghua.edu.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH net] ipconfig: bound BOOTP options by UDP datagram length
+Date: Mon, 13 Jul 2026 22:11:06 +0800
+Message-ID: <20260713141107.10418-1-zhaoyz24@mails.tsinghua.edu.cn>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -112,126 +69,101 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+X-CM-TRANSID:ywQGZQBneJ0B8lRqb+TqAg--.18679S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7WF1fZF15tr18Wr4fJw4kCrg_yoW8CFWrpF
+	yxK3s3KrZrGry5A39xJFW8Wry7Ga9rWFySg34Uta48Zws8JFy8Ca4v9rsIqFWYy3yqkryj
+	yF9avFWqyw4DZ37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9m1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l8cAvFVAK
+	0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4
+	x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2
+	z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4
+	CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E74AGY7Cv6cx26r4r
+	Kr1UJr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc
+	8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Av
+	z4vE14v_Xryl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8VW8Ww4UJr1UMxC20s
+	026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
+	JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
+	v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
+	j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr
+	0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0JjVBTOUUUUU=
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAgMHAWpUphh5+gAAsE
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[broadcom.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
+	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-307194-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307193-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:ronak.doshi@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:linux-kernel@vger.kernel.org,m:guolin.yang@broadcom.com,m:harshaka.narayana@broadcom.com,m:sankararaman.jayaraman@broadcom.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[harshaka.narayana@broadcom.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:zhaoyz24@mails.tsinghua.edu.cn,m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[harshaka.narayana@broadcom.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,kernel.org,nvidia.com,davemloft.net,google.com,redhat.com,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
+	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:from_mime,broadcom.com:mid,broadcom.com:email,broadcom.com:dkim];
-	TO_DN_NONE(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,tsinghua.edu.cn:email,mails.tsinghua.edu.cn:from_mime,mails.tsinghua.edu.cn:dkim,mails.tsinghua.edu.cn:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 01FAB74C642
+X-Rspamd-Queue-Id: 88CC174C832
 
-vmxnet3_get_hdr_len() assumes gdesc->rcd.v4/v6/tcp always describe the
-outer header, but for a Geneve-encapsulated packet the device can set
-them based on the inner header instead, signalled by the
-VMXNET3_RCD_HDR_INNER_SHIFT bit in the completion descriptor. Since the
-function never skips the outer encapsulation, this mismatch triggers:
+ic_bootp_recv() accepts an IP packet whose total length exceeds its UDP
+datagram length.  This is valid at the IP layer, but DHCP/BOOTP options
+belong to the UDP payload.  The option parser nevertheless uses the IP
+total length as its end boundary.
 
-- BUG_ON(hdr.ipv4->protocol != IPPROTO_TCP), because the outer
-  protocol is UDP (Geneve), not TCP.
-- BUG_ON(hdr.eth->h_proto != ...), when the tunnel's outer and inner
-  IP versions differ (e.g. outer IPv6/inner IPv4 or vice versa).
+Consequently, an on-link attacker that can race a boot-time DHCP exchange
+can put DHCP options after the declared UDP payload and have ipconfig
+consume them.  A QEMU/KVM reproduction with ip=dhcp accepted a forged
+DHCPOFFER/DHCPACK with an IP total length of 290 and UDP length of 248;
+the tail supplied a netmask and an off-link gateway, causing boot-time
+network configuration to fail.
 
-Check VMXNET3_RCD_HDR_INNER_SHIFT up front and bail out, since the
-function cannot locate the inner header it would need to parse. Also
-convert the remaining BUG_ON()s in this function to return 0
-defensively.
+Use the UDP datagram end as the parser boundary.  The receiver already
+verifies that the UDP datagram lies within the IP packet, so this retains
+normal valid DHCP/BOOTP parsing while excluding the IP-only tail.
 
-Fixes: 45dac1d6ea04 ("vmxnet3: Changes for vmxnet3 adapter version 2 (fwd)")
-Signed-off-by: Harshaka Narayana <harshaka.narayana@broadcom.com>
-Reviewed-by: Ronak Doshi <ronak.doshi@broadcom.com>
-Reviewed-by: Sankararaman Jayaraman <sankararaman.jayaraman@broadcom.com>
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Cc: stable@vger.kernel.org
+Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
+Reported-by: Ao Wang <wangao@seu.edu.cn>
+Reported-by: Xuewei Feng <fengxw06@126.com>
+Reported-by: Qi Li <qli01@tsinghua.edu.cn>
+Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
+Assisted-by: Claude-Code:GLM-5.2-special
+Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
 ---
-v3:
-  - Combined the two early return-0 checks into one condition
-  - Replaced stacked Signed-off-by tags with Reviewed-by for Ronak
-    Doshi and Sankararaman Jayaraman
-v2: https://lore.kernel.org/netdev/20260709201654.4108084-1-harshaka.narayana@broadcom.com/
-  - Check VMXNET3_RCD_HDR_INNER_SHIFT up front to catch the Geneve
-    inner-header case directly, and convert the remaining
-    BUG_ON(hdr.eth->h_proto != ...) checks to return 0
-  - Reworded commit message to describe the root cause via
-    VMXNET3_RCD_HDR_INNER_SHIFT
-v1: https://lore.kernel.org/netdev/20260707165248.1859188-1-harshaka.narayana@broadcom.com/
----
- drivers/net/vmxnet3/vmxnet3_drv.c | 22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/vmxnet3/vmxnet3_drv.c b/drivers/net/vmxnet3/vmxnet3_drv.c
-index 40522afc0532..f8df83f9965d 100644
---- a/drivers/net/vmxnet3/vmxnet3_drv.c
-+++ b/drivers/net/vmxnet3/vmxnet3_drv.c
-@@ -1530,7 +1530,11 @@ vmxnet3_get_hdr_len(struct vmxnet3_adapter *adapter, struct sk_buff *skb,
- 		struct ipv6hdr *ipv6;
- 		struct tcphdr *tcp;
- 	} hdr;
--	BUG_ON(gdesc->rcd.tcp == 0);
-+
-+	/* v4/v6/tcp then describe the inner header, which we can't locate. */
-+	if ((le32_to_cpu(gdesc->dword[0]) & (1UL << VMXNET3_RCD_HDR_INNER_SHIFT)) ||
-+	    gdesc->rcd.tcp == 0)
-+		return 0;
+diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
+index a35ffedacc7c..192874623a24 100644
+--- a/net/ipv4/ipconfig.c
++++ b/net/ipv4/ipconfig.c
+@@ -1068,7 +1068,7 @@ static int __init ic_bootp_recv(struct sk_buff *skb, struct net_device *dev, str
+ 	/* Parse extensions */
+ 	if (ext_len >= 4 &&
+ 	    !memcmp(b->exten, ic_bootp_cookie, 4)) { /* Check magic cookie */
+-		u8 *end = (u8 *) b + ntohs(b->iph.tot_len);
++		u8 *end = (u8 *)b + sizeof(struct iphdr) + ntohs(b->udph.len);
+ 		u8 *ext;
  
- 	maplen = skb_headlen(skb);
- 	if (unlikely(sizeof(struct iphdr) + sizeof(struct tcphdr) > maplen))
-@@ -1544,15 +1548,21 @@ vmxnet3_get_hdr_len(struct vmxnet3_adapter *adapter, struct sk_buff *skb,
- 
- 	hdr.eth = eth_hdr(skb);
- 	if (gdesc->rcd.v4) {
--		BUG_ON(hdr.eth->h_proto != htons(ETH_P_IP) &&
--		       hdr.veth->h_vlan_encapsulated_proto != htons(ETH_P_IP));
-+		if (hdr.eth->h_proto != htons(ETH_P_IP) &&
-+		    hdr.veth->h_vlan_encapsulated_proto != htons(ETH_P_IP))
-+			return 0;
-+
- 		hdr.ptr += hlen;
--		BUG_ON(hdr.ipv4->protocol != IPPROTO_TCP);
-+		if (hdr.ipv4->protocol != IPPROTO_TCP)
-+			return 0;
-+
- 		hlen = hdr.ipv4->ihl << 2;
- 		hdr.ptr += hdr.ipv4->ihl << 2;
- 	} else if (gdesc->rcd.v6) {
--		BUG_ON(hdr.eth->h_proto != htons(ETH_P_IPV6) &&
--		       hdr.veth->h_vlan_encapsulated_proto != htons(ETH_P_IPV6));
-+		if (hdr.eth->h_proto != htons(ETH_P_IPV6) &&
-+		    hdr.veth->h_vlan_encapsulated_proto != htons(ETH_P_IPV6))
-+			return 0;
-+
- 		hdr.ptr += hlen;
- 		/* Use an estimated value, since we also need to handle
- 		 * TSO case.
+ #ifdef IPCONFIG_DHCP
 -- 
-2.52.0
+2.47.3
 
 
