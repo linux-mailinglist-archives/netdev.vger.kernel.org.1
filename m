@@ -1,346 +1,294 @@
-Return-Path: <netdev+bounces-307052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307055-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id BH2CFIWYVGoxoAMAu9opvQ
-	(envelope-from <netdev+bounces-307052-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 09:49:25 +0200
+	id cSMYHqmaVGqcoAMAu9opvQ
+	(envelope-from <netdev+bounces-307055-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 09:58:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DBC57485B2
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 09:49:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2B1374870E
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 09:58:32 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Xnw9RqL7;
-	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307052-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307052-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=diNDILVp;
+	dmarc=pass (policy=none) header.from=realsil.com.cn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307055-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307055-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5769F3001187
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 07:49:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 702CC3039036
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 07:53:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE5823905F5;
-	Mon, 13 Jul 2026 07:49:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05279395AD0;
+	Mon, 13 Jul 2026 07:53:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D58DB3932CE
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 07:49:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1DFB3955EF;
+	Mon, 13 Jul 2026 07:53:24 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783928959; cv=none; b=bBou+mFCSkty+BQF2WRGtKG2bOXNWqVVnMrTz5niuvcdmo1X500uslojEp94Ii28HziXA2SaucO9XXaKRWG0KY3jxi0WcGKfs7tBnz7yMyWW5AzkuMe9V2gFijslEQasOMlHRkO56IlAH+dBGYcvcQ0j0YsCwaJkwRN+Kj87zfk=
+	t=1783929207; cv=none; b=CSU15VobYzIZ441wOHKHZJMpXlfCivejniMF96H+VEJOTnV2q2+4dPQgq01uhNVaVB6xcd7TPpWla/Sl0ftGczXhYZGyF2ODCdF11ASgwGzfMNcVSOzxJ31QB3Lh/FnW77WtDMKj+fMV2U5H1zzDfbm+bPWO+DcDFgtgf+kvW+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783928959; c=relaxed/simple;
-	bh=ezsg2AOmrKM5FPpRSvwQBgIf+v7yaFU9LPan/rSwf2Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lDArwO1LSY+FybSu4LZXujfxmdPtR4p59ufC9f5XYThuEAagH5Err8Wcogf/IyuqM4KjN269x9uWjnq4rGZ4dByr3OZQYshU5OdXjiB17vuj5GFhh9jg20wuVEqCylpTt2+1J/JHR//cAcGx3SzzHV8dc1ONvL8F2Eig87Zw9Zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xnw9RqL7; arc=none smtp.client-ip=209.85.167.53
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5b021916bd3so2032985e87.3
-        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 00:49:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783928956; x=1784533756; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=IhBptR0856mA7x4upmTCTlL4N4Ll18gQEKUqog0l9So=;
-        b=Xnw9RqL7fI3e1jk6r1SIh8rS1+GAq4BlluarmYFCW/WhyDSwNj8clJYt85vqKlpUc7
-         1por4W71IxYTMG5e5rZMD45hzgBWszv3HtxtaWl99eIShL5FjgKo4NObkz88LyCTbNOD
-         +4+1sNg93OazuN336Y+Rvlqa0ybfuJmhafMwCMzM+G7LyKBZTbXIeIWNjtK62fMjR4MY
-         H1LopoMvhPaTOaAtwT3wwlDlHBgMvWJLfu2Sqxex/1gB2VtUCksT8B3E2lupB7dD8fm1
-         qlOawaYRMDlV1rgcW/Xy9Tu0iqmf6kO33NDb3b2B6gwckp45eaAeBUuwxIASrgPfGb5x
-         DBEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783928956; x=1784533756;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=IhBptR0856mA7x4upmTCTlL4N4Ll18gQEKUqog0l9So=;
-        b=U/0nIKby6ouEOrUJ1PFC0CG0IWBP/bs8HiFtqqM7ve9LbiabG3fDZ19maem8RVGDJj
-         R+RnyTXH6N2tyRf8JH8Y8hor7uS9/eymiTJZVZXFmnp3+1b2icobjCxmIKIYJhz4FRBm
-         VxAa/9JDdJZFW1yn7WAVHFjgio369M9bhsBhtfrgQF8dhMBIVUlBQam6MiGnqnujr+3U
-         P11n1rzv/Kxuf5s6TFJfl3s1Kzxb/h2ZYxILG46fB36rc1xZdt942iE3xYKdEX2D/8rO
-         pCV0nq0qPU6wlSGBDdFG8yHFNYAi5Ad1iABOyQECbWJOOvY5AAQimt+1hgEynMtG6MoZ
-         mlUQ==
-X-Gm-Message-State: AOJu0YwEQhnARbt+vYR05xiIPNet9SzyprWNvJdom/1HlVUqYhYtqcBD
-	xbJkHMvmrirU1UR0HeR1zFUVD6NhLcdRCDO6NkYeCjWEvrerwoylI8X807y5KAzU/29gAQ==
-X-Gm-Gg: AfdE7cluf5FVCWM4OJUAIBlbjnOLlYvMllqHL4RP2GE3Koo1om5ztpr+DEP8t7OHncE
-	aPIHtny5+x6sRne7VjnIIBjLIPHWUFR95n1s0qVcW4QnhK/ogRVza34CYar48/IYE2EIGWOGRbp
-	aR2seIkc2ueOCasKvA+XkL6cQySje9QZdzGkPWas0rCvs/qzoyckSscAlAW4YY2MatmaddkTJ+4
-	rKq/fSQw6LCftMIVlDBYB8x5tlOTJhweQ3rbdilqqoUmYWjthlzo9an6nGO3qFauJu6/C3A+gm1
-	j964b5js76Q1VZ12f2JYE6nL95Gekj99VmBGySHg5VJKBNfvzFDvlEJk8iEihQxA73ds09oBJXM
-	29pGDGoNm/GfObG4+BMAmwYhwj4mdZQPmdFY5uSxzCCClYM1Asy20IYGFyhba0ZYFh1gXhCbqkz
-	+uSG89LciyeHjn2jtYj0YxZax7vqtDuLT5MmJy3ZWSSC2H4kASk+UQzAaTpyqZ/QNtJwrwDzuZX
-	K00Gg==
-X-Received: by 2002:ac2:50a2:0:b0:5ae:d7dd:5815 with SMTP id 2adb3069b0e04-5b02369c7b7mr1069316e87.41.1783928955715;
-        Mon, 13 Jul 2026 00:49:15 -0700 (PDT)
-Received: from jeeves.tailc718e.ts.net (91-157-100-11.elisa-laajakaista.fi. [91.157.100.11])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5b01caab9e5sm2645037e87.67.2026.07.13.00.49.12
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 13 Jul 2026 00:49:13 -0700 (PDT)
-From: vadik likholetov <vadikas@gmail.com>
-To: netdev@vger.kernel.org
-Cc: maxime.chevallier@bootlin.com,
-	andrew@lunn.ch,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	thierry.reding@kernel.org,
-	jonathanh@nvidia.com,
-	vbhadram@nvidia.com,
-	linux-tegra@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v3] net: stmmac: enable the MAC on link up for all supported speeds
-Date: Mon, 13 Jul 2026 10:49:11 +0300
-Message-ID: <20260713074911.30090-1-vadikas@gmail.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1783929207; c=relaxed/simple;
+	bh=TeO4SovIoFogwLuhuSCMSD92+/p/b31JJowFHCzyn04=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=EdZD4vsp+JuTeHYw1rbxU8mqSDM0iX56T/z1y6uxfL2vZzby3Jr1WJKUUwbl5fMdksfReF+Ul8A6jr3afQ7DxCbub1DbwAH6CbYS/Kw2KT0kIuCmp/4dnH1srQ2by0p+Ni9XPY7BZvDl92Cb864Ey29uR4Qvjre9F8RmdUjEmlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=diNDILVp; arc=none smtp.client-ip=211.75.126.72
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 66D7psc671282893, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
+	s=dkim; t=1783929115;
+	bh=TeO4SovIoFogwLuhuSCMSD92+/p/b31JJowFHCzyn04=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=diNDILVpDHNznyeWAcXDCH9bg9AEzwBxPpHXPU5zkzEUWauslMqgQQqU/+b/a4Y9y
+	 aHIR7d0DAEOYOVdxPgmSOa4jFcIU3ERSC1lJyCWsYdOQ1ngxNWmH+rH4GdfNi2Pz+n
+	 fN2b9NlZZgRiQK4sl1StPhP5hQOAQG08SQQhk7B3ywtsbxUXSpbSGhdpKvJRozyxAu
+	 mVR7oT6BrswUS2ExMGVkFFsjD7OSAfsIymKDa9ENZ1Yv5uRw7h/2emRkJRSCHrMest
+	 R386wD/8rBiXnnRusRQXgg+UmcNxjo5z8Y60lnJHs349uieF4mPWUyD5Go73OLzBeJ
+	 VIq631IaC2FFw==
+Received: from RS-EX-MBS4.realsil.com.cn ([172.29.17.104])
+	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 66D7psc671282893
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 13 Jul 2026 15:51:55 +0800
+Received: from RS-EX-MBS3.realsil.com.cn (172.29.17.103) by
+ RS-EX-MBS4.realsil.com.cn (172.29.17.104) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Mon, 13 Jul 2026 15:51:53 +0800
+Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) by
+ RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) with mapi id 15.02.2562.017; Mon,
+ 13 Jul 2026 15:51:53 +0800
+From: Javen <javen_xu@realsil.com.cn>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>, "hkallweit1@gmail.com"
+	<hkallweit1@gmail.com>, "nic_swsd@realtek.com" <nic_swsd@realtek.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"daniel@makrotopia.org" <daniel@makrotopia.org>, "linux@armlinux.org.uk"
+	<linux@armlinux.org.uk>, "enelsonmoore@gmail.com" <enelsonmoore@gmail.com>,
+	"daniel@thingy.jp" <daniel@thingy.jp>
+Subject: RE: [PATCH net-next v6 2/7] net: phy: phylink: add helper to modify
+ pause
+Thread-Topic: [PATCH net-next v6 2/7] net: phy: phylink: add helper to modify
+ pause
+Thread-Index: AQHdD4oZroBMux4FbUmVRxSq3rFPErZmAfkAgAUT7jA=
+Date: Mon, 13 Jul 2026 07:51:53 +0000
+Message-ID: <aeed474059bc4fd7b9c5e3074ef591a4@realsil.com.cn>
+References: <20260709100237.541-1-javen_xu@realsil.com.cn>
+ <20260709100237.541-3-javen_xu@realsil.com.cn>
+ <0c188a7d-3637-4e08-9ac8-c1d824b461ed@bootlin.com>
+In-Reply-To: <0c188a7d-3637-4e08-9ac8-c1d824b461ed@bootlin.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.44 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
+	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307052-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307055-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:maxime.chevallier@bootlin.com,m:andrew@lunn.ch,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:thierry.reding@kernel.org,m:jonathanh@nvidia.com,m:vbhadram@nvidia.com,m:linux-tegra@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[vadikas@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vadikas@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:maxime.chevallier@bootlin.com,m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:linux@armlinux.org.uk,m:enelsonmoore@gmail.com,m:daniel@thingy.jp,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_TO(0.00)[bootlin.com,gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,makrotopia.org,armlinux.org.uk,gmail.com,thingy.jp];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[realsil.com.cn:+];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,bootlin.com:email]
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[realsil.com.cn:from_mime,realsil.com.cn:dkim,realsil.com.cn:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3DBC57485B2
+X-Rspamd-Queue-Id: C2B1374870E
 
-stmmac_mac_link_down() clears the MAC's transmit and receive enable bits.
-stmmac_mac_link_up() is expected to set them again through
-stmmac_mac_set(..., true), but it first switches on the negotiated speed
-and returns early for a speed the switch does not list. The MAC is then
-left gated off.
-
-The speed selection is split into three switches, keyed on the interface.
-The generic branch -- taken for everything that is neither USXGMII nor
-XLGMII, so including PHY_INTERFACE_MODE_10GBASER -- lists only SPEED_2500,
-SPEED_1000, SPEED_100 and SPEED_10.
-
-MGBE on Tegra234 runs 10GBASE-R into an Aquantia AQR113C. That PHY does
-rate matching, so phylink_link_up() replaces the media speed with the
-MAC-side interface speed before calling into the MAC:
-
-	case RATE_MATCH_PAUSE:
-		speed = phylink_interface_max_speed(link_state.interface);
-		duplex = DUPLEX_FULL;
-
-The driver is therefore called as
-
-	stmmac_mac_link_up(interface=10GBASER, speed=10000, duplex=1)
-
-which falls through to "default: return;". The interface stops passing
-traffic after the first link flap.
-
-The failure is easy to misread. The link still comes up, because the PHY
-is polled over MDIO and needs no MAC, so the interface reports carrier 1
-at the media speed. The DMA is untouched, so its start bits stay set and
-descriptors are still consumed. Only the MAC itself is gated off: the
-receiver counts nothing (mmc_rx_framecount_gb stops advancing, RE is 0)
-and nothing reaches the wire (TE is 0). The interface survives boot only
-because stmmac_hw_setup(), called from ndo_open, enables the MAC
-unconditionally -- so the problem appears only once the cable has been
-unplugged and plugged back in, and "ip link set dev <ethX> down && ip
-link set dev <ethX> up" appears to fix it.
-
-The interface is not what the speed bits depend on: with the single
-exception of 2.5G, which is selected through the XGMII block on USXGMII
-and through the regular speed bits otherwise, each speed maps to one
-field of struct mac_link. The per-interface switches are speed
-validation, and phylink already validates the speed against
-priv->hw->link.caps. So collapse the three switches into one keyed on the
-speed alone, keeping the interface test only for the 2.5G case. This
-covers 10G on 10GBASE-R, and equally 5G, and 1G/100/10 on USXGMII, all of
-which hit "default: return;" today.
-
-A core that does not support a speed leaves the corresponding mac_link
-field at 0, and phylink will not offer it that speed in the first place.
-For dwxgmac2 at 10G, link.xgmii.speed10000 is XGMAC_CONFIG_SS_10000,
-which is 0 and is the correct speed selection for a 10GBASE-R MAC: ctrl
-then equals old_ctrl, the register write is skipped, and execution
-reaches stmmac_mac_set(..., true).
-
-Log an error in the default case, since a speed with no entry here leaves
-the MAC disabled and the symptom does not point at the cause.
-
-Fixes: d8ca113724e7 ("net: stmmac: tegra: Add MGBE support")
-Suggested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Signed-off-by: vadik likholetov <vadikas@gmail.com>
----
-v3:
- - Use phy_speed_to_str() rather than %d for the speed in the error
-   message (Maxime).
- - Resend as a standalone thread rather than a reply to v1 (Maxime).
-
-v2:
- - Collapse the three per-interface switches into a single switch on the
-   speed, rather than adding SPEED_10000 to the generic branch, which
-   left SPEED_5000 and the USXGMII sub-1G speeds broken (Maxime).
- - netdev_err() in the default case (Andrew).
-
-Fixes tag: the missing speeds predate the commit cited above. I picked
-d8ca113724e7 because MGBE is the first in-tree user to reach it -- it
-needs a 10GBASE-R interface driven by a rate-matching PHY, so that
-phylink hands the MAC a 10G speed. Happy to re-target it.
-
-Verified on an AGX Orin devkit (Tegra234 MGBE0 + AQR113C), before and
-after, on the same board and cable. MAC registers read with `ethtool -d`,
-after a physical unplug and replug:
-
-  stock		MAC_TX_CONFIG 0x00010000 (TE=0)
-		MAC_RX_CONFIG 0x3ff022c0 (RE=0)
-		rx_packets frozen, DHCP lease lost
-
-  patched	MAC_TX_CONFIG 0x00010001 (TE=1)
-		MAC_RX_CONFIG 0x3ff022c1 (RE=1)
-		rx_packets keeps climbing, DHCP lease retained
-
-Only the 10GBASE-R path is covered by hardware here; the other speeds are
-by inspection. Testing was done with MGBE0 handed to a VM via
-vfio-platform, so the driver ran in a guest; the MAC register evidence
-above is read from the device itself and the code path is not
-virtualisation-specific.
-
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 92 ++++++++-----------
- 1 file changed, 37 insertions(+), 55 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 2a0d7eff8..8d3d87549 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -1083,63 +1083,45 @@ static void stmmac_mac_link_up(struct phylink_config *config,
- 	old_ctrl = readl(priv->ioaddr + MAC_CTRL_REG);
- 	ctrl = old_ctrl & ~priv->hw->link.speed_mask;
- 
--	if (interface == PHY_INTERFACE_MODE_USXGMII) {
--		switch (speed) {
--		case SPEED_10000:
--			ctrl |= priv->hw->link.xgmii.speed10000;
--			break;
--		case SPEED_5000:
--			ctrl |= priv->hw->link.xgmii.speed5000;
--			break;
--		case SPEED_2500:
-+	switch (speed) {
-+	case SPEED_100000:
-+		ctrl |= priv->hw->link.xlgmii.speed100000;
-+		break;
-+	case SPEED_50000:
-+		ctrl |= priv->hw->link.xlgmii.speed50000;
-+		break;
-+	case SPEED_40000:
-+		ctrl |= priv->hw->link.xlgmii.speed40000;
-+		break;
-+	case SPEED_25000:
-+		ctrl |= priv->hw->link.xlgmii.speed25000;
-+		break;
-+	case SPEED_10000:
-+		ctrl |= priv->hw->link.xgmii.speed10000;
-+		break;
-+	case SPEED_5000:
-+		ctrl |= priv->hw->link.xgmii.speed5000;
-+		break;
-+	case SPEED_2500:
-+		if (interface == PHY_INTERFACE_MODE_USXGMII)
- 			ctrl |= priv->hw->link.xgmii.speed2500;
--			break;
--		default:
--			return;
--		}
--	} else if (interface == PHY_INTERFACE_MODE_XLGMII) {
--		switch (speed) {
--		case SPEED_100000:
--			ctrl |= priv->hw->link.xlgmii.speed100000;
--			break;
--		case SPEED_50000:
--			ctrl |= priv->hw->link.xlgmii.speed50000;
--			break;
--		case SPEED_40000:
--			ctrl |= priv->hw->link.xlgmii.speed40000;
--			break;
--		case SPEED_25000:
--			ctrl |= priv->hw->link.xlgmii.speed25000;
--			break;
--		case SPEED_10000:
--			ctrl |= priv->hw->link.xgmii.speed10000;
--			break;
--		case SPEED_2500:
--			ctrl |= priv->hw->link.speed2500;
--			break;
--		case SPEED_1000:
--			ctrl |= priv->hw->link.speed1000;
--			break;
--		default:
--			return;
--		}
--	} else {
--		switch (speed) {
--		case SPEED_2500:
-+		else
- 			ctrl |= priv->hw->link.speed2500;
--			break;
--		case SPEED_1000:
--			ctrl |= priv->hw->link.speed1000;
--			break;
--		case SPEED_100:
--			ctrl |= priv->hw->link.speed100;
--			break;
--		case SPEED_10:
--			ctrl |= priv->hw->link.speed10;
--			break;
--		default:
--			return;
--		}
-+		break;
-+	case SPEED_1000:
-+		ctrl |= priv->hw->link.speed1000;
-+		break;
-+	case SPEED_100:
-+		ctrl |= priv->hw->link.speed100;
-+		break;
-+	case SPEED_10:
-+		ctrl |= priv->hw->link.speed10;
-+		break;
-+	default:
-+		netdev_err(priv->dev,
-+			   "unsupported speed %s on %s, leaving the MAC disabled\n",
-+			   phy_speed_to_str(speed), phy_modes(interface));
-+		return;
- 	}
- 
- 	if (priv->plat->fix_mac_speed)
--- 
-2.53.0
-
+SGksDQoNCj5UaGVyZSdzIGEgY2hhbmdlIGluIHRoZSBNQUMncyBhYmlsaXR5IHRvIHN1cHBvcnQg
+UGF1c2UsIHNvIHdlIHNob3VsZCA6DQo+DQo+IC0gUmVjb21wdXRlIHRoZSBwbC0+c3VwcG9ydGVk
+IGZpZWxkLiBVcGRhdGUgdGhlIGNvbmZpZy5tYWNfY2FwYWJpbGl0aWVzIHdpdGgNCj50aGUNCj4g
+ICBuZXcgcGF1c2Ugc2V0dGluZ3MsIGNhbGxpbmcgcGh5bGlua192YWxpZGF0ZSgpIHNob3VsZCBk
+byB0aGUgdHJpY2sgSSB0aGluaywgdGhpcw0KPiAgIHdpbGwgcmVidWlsZCB0aGUgY2FwYWJpbGl0
+eSBsaXN0Og0KPg0KPiAgIHBoeWxpbmtfdmFsaWRhdGUocGwsIHBsLT5zdXBwb3J0ZWQsICZwbC0+
+bGlua19jb25maWcpOw0KPg0KPiAtIFRoZW4gdXBkYXRlIHRoZSBwbC0+bGlua19jb25maWcucGF1
+c2UsDQo+DQo+IC0gVGhlbiB1cGRhdGUgdGhlIHBhdXNlIGFkdmVydGlzaW5nLCBsaWtlIGRvbmUg
+aW4gcGh5bGlua19zZXRwYXVzZXBhcmFtDQo+ICAgKCBJIHRoaW5rLCBldmVyeXRoaW5nIHRoYXQg
+Y29tZXMgYWZ0ZXIgcGwtPnN0YXRlX211dGV4IGdldHMgcmVsZWFzZWQgaW4NCj4gICAgcGh5bGlu
+a19ldGh0b29sX3NldF9wYXVzZXBhcmFtKQ0KPg0KPklkZWFsbHksIHRoZSBsb2dpYyB0byB1cGRh
+dGUgdGhlIGFkdmVydGlzaW5nIGFuZCByZS10cmlnZ2VyIGEgbmVnb2NpYXRpb24gc2hvdWxkDQo+
+YmUgZmFjdG9yZWQgb3V0IGluIGEgcHJpdmF0ZSBoZWxwZXIsIHRoZW4gcmV1c2VkIGZyb20gYm90
+aCB0aGlzIHBhdGggKE1BQw0KPnVwZGF0ZXMgcGF1c2Ugc3VwcG9ydCkgYW5kIHRoZSBwaHlsaW5r
+X2V0aHRvb2xfc2V0X3BhdXNlcGFyYW0gcGF0aC4NCj4NCj5NYXhpbWUNCg0KVGhhbmtzIGZvciBy
+ZXZpZXcgYW5kIGhlbHBmdWwgc3VnZ2VzdGlvbnMuDQoNCkkgYWdyZWUgd2l0aCB5b3VyIHN1Z2dl
+c3Rpb24gdG8gZmFjdG9yIG91dCB0aGUgbG9naWMgaW50byBhIHByaXZhdGUgaGVscGVyIGFuZCBy
+ZXVzZSBpdCBmb3IgYm90aCBwaHlsaW5rX2V0aHRvb2xfc2V0X3BhdXNlcGFyYW0oKSBhbmQgcGh5
+bGlua191cGRhdGVfbWFjX3BhdXNlX2NhcGFiaWxpdGllcygpLg0KDQpIZXJlIGlzIHRoZSByZWZh
+Y3RvcmVkIGxvZ2ljLiBJIHdhbnQgdG8gc2hhcmUgdGhpcyBzcGVjaWZpYyBwYXJ0IHdpdGggeW91
+IGZvciBhIHF1aWNrIGNoZWNrIGJlZm9yZSBJIHN1Ym1pdCB2NyBwYXRjaC4NCg0KLS0tDQogZHJp
+dmVycy9uZXQvcGh5L3BoeWxpbmsuYyB8IDE2NCArKysrKysrKysrKysrKysrKysrKysrKysrKy0t
+LS0tLS0tLS0tLQ0KIGluY2x1ZGUvbGludXgvcGh5bGluay5oICAgfCAgIDIgKw0KIDIgZmlsZXMg
+Y2hhbmdlZCwgMTE2IGluc2VydGlvbnMoKyksIDUwIGRlbGV0aW9ucygtKQ0KDQpkaWZmIC0tZ2l0
+IGEvZHJpdmVycy9uZXQvcGh5L3BoeWxpbmsuYyBiL2RyaXZlcnMvbmV0L3BoeS9waHlsaW5rLmMN
+CmluZGV4IDU5ZGZlMzVhZmE1NC4uNTk2YTk0Mzg3YTU2IDEwMDY0NA0KLS0tIGEvZHJpdmVycy9u
+ZXQvcGh5L3BoeWxpbmsuYw0KKysrIGIvZHJpdmVycy9uZXQvcGh5L3BoeWxpbmsuYw0KQEAgLTE4
+MjgsNiArMTgyOCwxMTkgQEAgaW50IHBoeWxpbmtfc2V0X2ZpeGVkX2xpbmsoc3RydWN0IHBoeWxp
+bmsgKnBsLA0KIH0NCiBFWFBPUlRfU1lNQk9MX0dQTChwaHlsaW5rX3NldF9maXhlZF9saW5rKTsN
+CiANCitzdGF0aWMgdm9pZCBwaHlsaW5rX3VwZGF0ZV9wYXVzZV9zdGF0ZShzdHJ1Y3QgcGh5bGlu
+ayAqcGwsIGludCBwYXVzZV9zdGF0ZSkNCit7DQorCXN0cnVjdCBwaHlsaW5rX2xpbmtfc3RhdGUg
+KmNvbmZpZyA9ICZwbC0+bGlua19jb25maWc7DQorCWJvb2wgdHhfcGF1c2UgPSAhIShwYXVzZV9z
+dGF0ZSAmIE1MT19QQVVTRV9UWCk7DQorCWJvb2wgcnhfcGF1c2UgPSAhIShwYXVzZV9zdGF0ZSAm
+IE1MT19QQVVTRV9SWCk7DQorCWJvb2wgbWFudWFsX2NoYW5nZWQ7DQorDQorCW11dGV4X2xvY2so
+JnBsLT5zdGF0ZV9tdXRleCk7DQorDQorCS8qDQorCSAqIFNlZSB0aGUgY29tbWVudHMgZm9yIGxp
+bmttb2RlX3NldF9wYXVzZSgpLCB3cnQgdGhlIGRlZmljaWVuY2llcw0KKwkgKiB3aXRoIHRoZSBj
+dXJyZW50IGltcGxlbWVudGF0aW9uLiAgQSBzb2x1dGlvbiB0byB0aGlzIGlzc3VlIHdvdWxkDQor
+CSAqIGJlOg0KKwkgKiBldGh0b29sICBMb2NhbCBkZXZpY2UNCisJICogIHJ4ICB0eCAgUGF1c2Ug
+QXN5bURpcg0KKwkgKiAgMCAgIDAgICAwICAgICAwDQorCSAqICAxICAgMCAgIDEgICAgIDENCisJ
+ICogIDAgICAxICAgMCAgICAgMQ0KKwkgKiAgMSAgIDEgICAxICAgICAxDQorCSAqIGFuZCB0aGVu
+IHVzZSB0aGUgZXRodG9vbCByeC90eCBlbmFibGVtZW50IHN0YXR1cyB0byBtYXNrIHRoZQ0KKwkg
+KiByeC90eCBwYXVzZSByZXNvbHV0aW9uLg0KKwkgKi8NCisJbGlua21vZGVfc2V0X3BhdXNlKGNv
+bmZpZy0+YWR2ZXJ0aXNpbmcsIHR4X3BhdXNlLA0KKwkJCSAgIHJ4X3BhdXNlKTsNCisNCisJbWFu
+dWFsX2NoYW5nZWQgPSAoY29uZmlnLT5wYXVzZSBeIHBhdXNlX3N0YXRlKSAmIE1MT19QQVVTRV9B
+TiB8fA0KKwkJCSAoIShwYXVzZV9zdGF0ZSAmIE1MT19QQVVTRV9BTikgJiYNCisJCQkgICAoY29u
+ZmlnLT5wYXVzZSBeIHBhdXNlX3N0YXRlKSAmIE1MT19QQVVTRV9UWFJYX01BU0spOw0KKw0KKwlj
+b25maWctPnBhdXNlID0gcGF1c2Vfc3RhdGU7DQorDQorCS8qIFVwZGF0ZSBvdXIgaW4tYmFuZCBh
+ZHZlcnRpc2VtZW50LCB0cmlnZ2VyaW5nIGEgcmVuZWdvdGlhdGlvbiBpZg0KKwkgKiB0aGUgYWR2
+ZXJ0aXNlbWVudCBjaGFuZ2VkLg0KKwkgKi8NCisJaWYgKCFwbC0+cGh5ZGV2KQ0KKwkJcGh5bGlu
+a19jaGFuZ2VfaW5iYW5kX2FkdmVydChwbCk7DQorDQorCW11dGV4X3VubG9jaygmcGwtPnN0YXRl
+X211dGV4KTsNCisNCisJLyogSWYgd2UgaGF2ZSBhIFBIWSwgYSBjaGFuZ2Ugb2YgdGhlIHBhdXNl
+IGZyYW1lIGFkdmVydGlzZW1lbnQgd2lsbA0KKwkgKiBjYXVzZSBwaHlsaWIgdG8gcmVuZWdvdGlh
+dGUgKGlmIEFOIGlzIGVuYWJsZWQpIHdoaWNoIHdpbGwgaW4gdHVybg0KKwkgKiBjYWxsIG91ciBw
+aHlsaW5rX3BoeV9jaGFuZ2UoKSBhbmQgdHJpZ2dlciBhIHJlc29sdmUuICBOb3RlIHRoYXQNCisJ
+ICogd2UgY2FuJ3QgaG9sZCBvdXIgc3RhdGUgbXV0ZXggd2hpbGUgY2FsbGluZyBwaHlfc2V0X2Fz
+eW1fcGF1c2UoKS4NCisJICovDQorCWlmIChwbC0+cGh5ZGV2KQ0KKwkJcGh5X3NldF9hc3ltX3Bh
+dXNlKHBsLT5waHlkZXYsIHJ4X3BhdXNlLCB0eF9wYXVzZSk7DQorDQorCS8qIElmIHRoZSBtYW51
+YWwgcGF1c2Ugc2V0dGluZ3MgY2hhbmdlZCwgbWFrZSBzdXJlIHdlIHRyaWdnZXIgYQ0KKwkgKiBy
+ZXNvbHZlIHRvIHVwZGF0ZSB0aGVpciBzdGF0ZTsgd2UgY2FuIG5vdCBndWFyYW50ZWUgdGhhdCB0
+aGUNCisJICogbGluayB3aWxsIGN5Y2xlLg0KKwkgKi8NCisJaWYgKG1hbnVhbF9jaGFuZ2VkKSB7
+DQorCQlwbC0+bGlua19mYWlsZWQgPSB0cnVlOw0KKwkJcGh5bGlua19ydW5fcmVzb2x2ZShwbCk7
+DQorCX0NCit9DQorDQorLyoqDQorICogcGh5bGlua191cGRhdGVfbWFjX3BhdXNlX2NhcGFiaWxp
+dGllcygpIC0gRHluYW1pY2FsbHkgdXBkYXRlIE1BQyBwYXVzZQ0KKyAqIEBwbDogYSBwb2ludGVy
+IHRvIGEgJnN0cnVjdCBwaHlsaW5rIHJldHVybmVkIGZyb20gcGh5bGlua19jcmVhdGUoKQ0KKyAq
+IEBtYWNfcGF1c2U6IHRoZSBuZXcgTUFDIHBhdXNlIGNhcGFiaWxpdGllcyBtYXNrDQorICoNCisg
+KiBUaGlzIGZ1bmN0aW9uIGFsbG93cyBhIE1BQyBkcml2ZXIgdG8gZHluYW1pY2FsbHkgY2hhbmdl
+IGl0cyBwYXVzZSBzdGF0ZSwNCisgKiBzdWNoIGFzIGxvc2luZy9nYWluaW5nIFBhdXNlIGZyYW1l
+IHN1cHBvcnQgYmFzZWQgb24gTVRVIHNpemUuDQorICogSXQgcmVjYWxjdWxhdGVzIHN1cHBvcnRl
+ZCBsaW5rIG1vZGVzIGFuZCB0cmlnZ2VycyByZW5lZ290aWF0aW9uIGlmIG5lZWRlZC4NCisgKi8N
+Cit2b2lkIHBoeWxpbmtfdXBkYXRlX21hY19wYXVzZV9jYXBhYmlsaXRpZXMoc3RydWN0IHBoeWxp
+bmsgKnBsLCB1bnNpZ25lZCBsb25nIG1hY19wYXVzZSkNCit7DQorCXN0cnVjdCBwaHlsaW5rX2xp
+bmtfc3RhdGUgKmNvbmZpZyA9ICZwbC0+bGlua19jb25maWc7DQorCXVuc2lnbmVkIGxvbmcgb2xk
+X3BhdXNlOw0KKwlpbnQgcGF1c2Vfc3RhdGU7DQorDQorCUFTU0VSVF9SVE5MKCk7DQorDQorCWlm
+IChtYWNfcGF1c2UgJiB+KE1BQ19TWU1fUEFVU0UgfCBNQUNfQVNZTV9QQVVTRSkpIHsNCisJCXBo
+eWxpbmtfZXJyKHBsLCAiQXR0ZW1wdGVkIHRvIGR5bmFtaWNhbGx5IGNoYW5nZSBub24tcGF1c2Ug
+TUFDIGNhcGFiaWxpdGllc1xuIik7DQorCQlyZXR1cm47DQorCX0NCisNCisJb2xkX3BhdXNlID0g
+cGwtPmNvbmZpZy0+bWFjX2NhcGFiaWxpdGllcyAmIChNQUNfU1lNX1BBVVNFIHwgTUFDX0FTWU1f
+UEFVU0UpOw0KKwlpZiAob2xkX3BhdXNlID09IG1hY19wYXVzZSkNCisJCXJldHVybjsNCisNCisJ
+bXV0ZXhfbG9jaygmcGwtPnN0YXRlX211dGV4KTsNCisNCisJcGwtPmNvbmZpZy0+bWFjX2NhcGFi
+aWxpdGllcyAmPSB+KE1BQ19TWU1fUEFVU0UgfCBNQUNfQVNZTV9QQVVTRSk7DQorCXBsLT5jb25m
+aWctPm1hY19jYXBhYmlsaXRpZXMgfD0gbWFjX3BhdXNlOw0KKw0KDQpXaGVuIGNoYW5naW5nIHRv
+IE1UVSA5MDAwLCBwaHlsaW5rX3ZhbGlkYXRlKCkgY2xlYXJzIHRoZSBQYXVzZSBhbmQgQXN5bV9Q
+YXVzZSBiaXRzIGluIHBsLT5zdXBwb3J0ZWQgYmVjYXVzZSBtYWNfcGF1c2UgYmVjb21lcyAwLiBX
+aGVuIHJldmVydGluZyB0byBNVFUgMTUwMCwgd2UgdXBkYXRlIG1hY19wYXVzZSBiYWNrIHRvIDEu
+IEJ1dCBpZiB3ZSBkaXJlY3RseSBjYWxsIHBoeWxpbmtfdmFsaWRhdGUoKSBhdCB0aGlzIHBvaW50
+LCBpdCB1c2VzIHRoZSBjdXJyZW50IHBsLT5zdXBwb3J0ZWQgKHdoZXJlIFBhdXNlIGlzIDApIGFz
+IGlucHV0LiAgVGh1cywgdGhlIFBhdXNlIGNhcGFiaWxpdHkgaXMgcGVybWFuZW50bHkgbG9zdCBh
+bmQgbmV2ZXIgcmVzdG9yZWQuDQpUbyBmaXggdGhpcywgSSBmb3JjZWZ1bGx5IHNldCB0aGUgUGF1
+c2UgYml0cyBpbiBwbC0+c3VwcG9ydGVkIGJlZm9yZSBjYWxsaW5nIHBoeWxpbmtfdmFsaWRhdGUo
+KS4gQnV0IHRvIHByZXZlbnQgZmFraW5nIGNhcGFiaWxpdGllcyB0aGF0IHRoZSBQSFkgZG9lc24n
+dCBhY3R1YWxseSBzdXBwb3J0LCB3ZSBjYW4gc2FmZWx5IHVzZSBsaW5rbW9kZV9hbmQoKSB3aXRo
+IHRoZSBtZWRpYSAoUEhZL1NGUCkgY2FwYWJpbGl0aWVzIGJlZm9yZSB0aGUgZmluYWwgdmFsaWRh
+dGlvbi4NCg0KKwlwaHlsaW5rX3NldChwbC0+c3VwcG9ydGVkLCBQYXVzZSk7DQorCXBoeWxpbmtf
+c2V0KHBsLT5zdXBwb3J0ZWQsIEFzeW1fUGF1c2UpOw0KKw0KKwlpZiAocGwtPnBoeWRldikNCisJ
+CWxpbmttb2RlX2FuZChwbC0+c3VwcG9ydGVkLCBwbC0+c3VwcG9ydGVkLCBwbC0+cGh5ZGV2LT5z
+dXBwb3J0ZWQpOw0KKwllbHNlIGlmIChwbC0+c2ZwX2J1cykNCisJCWxpbmttb2RlX2FuZChwbC0+
+c3VwcG9ydGVkLCBwbC0+c3VwcG9ydGVkLCBwbC0+c2ZwX3N1cHBvcnQpOw0KKw0KKwlwaHlsaW5r
+X3ZhbGlkYXRlKHBsLCBwbC0+c3VwcG9ydGVkLCBjb25maWcpOw0KKw0KKwlwYXVzZV9zdGF0ZSA9
+IGNvbmZpZy0+cGF1c2U7DQorDQorCWlmICghcGh5bGlua190ZXN0KHBsLT5zdXBwb3J0ZWQsIFBh
+dXNlKSkgew0KKwkJcGF1c2Vfc3RhdGUgJj0gfihNTE9fUEFVU0VfUlggfCBNTE9fUEFVU0VfVFgp
+Ow0KKwl9IGVsc2UgaWYgKCFwaHlsaW5rX3Rlc3QocGwtPnN1cHBvcnRlZCwgQXN5bV9QYXVzZSkp
+IHsNCisJCWlmICgocGF1c2Vfc3RhdGUgJiBNTE9fUEFVU0VfUlgpIF4gKHBhdXNlX3N0YXRlICYg
+TUxPX1BBVVNFX1RYKSkNCisJCQlwYXVzZV9zdGF0ZSAmPSB+KE1MT19QQVVTRV9SWCB8IE1MT19Q
+QVVTRV9UWCk7DQorCX0NCisNCisJbXV0ZXhfdW5sb2NrKCZwbC0+c3RhdGVfbXV0ZXgpOw0KKw0K
+KwlwaHlsaW5rX3VwZGF0ZV9wYXVzZV9zdGF0ZShwbCwgcGF1c2Vfc3RhdGUpOw0KK30NCitFWFBP
+UlRfU1lNQk9MX0dQTChwaHlsaW5rX3VwZGF0ZV9tYWNfcGF1c2VfY2FwYWJpbGl0aWVzKTsNCisN
+CiAvKioNCiAgKiBwaHlsaW5rX2NyZWF0ZSgpIC0gY3JlYXRlIGEgcGh5bGluayBpbnN0YW5jZQ0K
+ICAqIEBjb25maWc6IGEgcG9pbnRlciB0byB0aGUgdGFyZ2V0ICZzdHJ1Y3QgcGh5bGlua19jb25m
+aWcNCkBAIC0zMTkwLDggKzMzMDMsNiBAQCBFWFBPUlRfU1lNQk9MX0dQTChwaHlsaW5rX2V0aHRv
+b2xfZ2V0X3BhdXNlcGFyYW0pOw0KIGludCBwaHlsaW5rX2V0aHRvb2xfc2V0X3BhdXNlcGFyYW0o
+c3RydWN0IHBoeWxpbmsgKnBsLA0KIAkJCQkgICBzdHJ1Y3QgZXRodG9vbF9wYXVzZXBhcmFtICpw
+YXVzZSkNCiB7DQotCXN0cnVjdCBwaHlsaW5rX2xpbmtfc3RhdGUgKmNvbmZpZyA9ICZwbC0+bGlu
+a19jb25maWc7DQotCWJvb2wgbWFudWFsX2NoYW5nZWQ7DQogCWludCBwYXVzZV9zdGF0ZTsNCiAN
+CiAJQVNTRVJUX1JUTkwoKTsNCkBAIC0zMjE1LDU0ICszMzI2LDcgQEAgaW50IHBoeWxpbmtfZXRo
+dG9vbF9zZXRfcGF1c2VwYXJhbShzdHJ1Y3QgcGh5bGluayAqcGwsDQogCWlmIChwYXVzZS0+dHhf
+cGF1c2UpDQogCQlwYXVzZV9zdGF0ZSB8PSBNTE9fUEFVU0VfVFg7DQogDQotCW11dGV4X2xvY2so
+JnBsLT5zdGF0ZV9tdXRleCk7DQotCS8qDQotCSAqIFNlZSB0aGUgY29tbWVudHMgZm9yIGxpbmtt
+b2RlX3NldF9wYXVzZSgpLCB3cnQgdGhlIGRlZmljaWVuY2llcw0KLQkgKiB3aXRoIHRoZSBjdXJy
+ZW50IGltcGxlbWVudGF0aW9uLiAgQSBzb2x1dGlvbiB0byB0aGlzIGlzc3VlIHdvdWxkDQotCSAq
+IGJlOg0KLQkgKiBldGh0b29sICBMb2NhbCBkZXZpY2UNCi0JICogIHJ4ICB0eCAgUGF1c2UgQXN5
+bURpcg0KLQkgKiAgMCAgIDAgICAwICAgICAwDQotCSAqICAxICAgMCAgIDEgICAgIDENCi0JICog
+IDAgICAxICAgMCAgICAgMQ0KLQkgKiAgMSAgIDEgICAxICAgICAxDQotCSAqIGFuZCB0aGVuIHVz
+ZSB0aGUgZXRodG9vbCByeC90eCBlbmFibGVtZW50IHN0YXR1cyB0byBtYXNrIHRoZQ0KLQkgKiBy
+eC90eCBwYXVzZSByZXNvbHV0aW9uLg0KLQkgKi8NCi0JbGlua21vZGVfc2V0X3BhdXNlKGNvbmZp
+Zy0+YWR2ZXJ0aXNpbmcsIHBhdXNlLT50eF9wYXVzZSwNCi0JCQkgICBwYXVzZS0+cnhfcGF1c2Up
+Ow0KLQ0KLQltYW51YWxfY2hhbmdlZCA9IChjb25maWctPnBhdXNlIF4gcGF1c2Vfc3RhdGUpICYg
+TUxPX1BBVVNFX0FOIHx8DQotCQkJICghKHBhdXNlX3N0YXRlICYgTUxPX1BBVVNFX0FOKSAmJg0K
+LQkJCSAgIChjb25maWctPnBhdXNlIF4gcGF1c2Vfc3RhdGUpICYgTUxPX1BBVVNFX1RYUlhfTUFT
+Syk7DQotDQotCWNvbmZpZy0+cGF1c2UgPSBwYXVzZV9zdGF0ZTsNCi0NCi0JLyogVXBkYXRlIG91
+ciBpbi1iYW5kIGFkdmVydGlzZW1lbnQsIHRyaWdnZXJpbmcgYSByZW5lZ290aWF0aW9uIGlmDQot
+CSAqIHRoZSBhZHZlcnRpc2VtZW50IGNoYW5nZWQuDQotCSAqLw0KLQlpZiAoIXBsLT5waHlkZXYp
+DQotCQlwaHlsaW5rX2NoYW5nZV9pbmJhbmRfYWR2ZXJ0KHBsKTsNCi0NCi0JbXV0ZXhfdW5sb2Nr
+KCZwbC0+c3RhdGVfbXV0ZXgpOw0KLQ0KLQkvKiBJZiB3ZSBoYXZlIGEgUEhZLCBhIGNoYW5nZSBv
+ZiB0aGUgcGF1c2UgZnJhbWUgYWR2ZXJ0aXNlbWVudCB3aWxsDQotCSAqIGNhdXNlIHBoeWxpYiB0
+byByZW5lZ290aWF0ZSAoaWYgQU4gaXMgZW5hYmxlZCkgd2hpY2ggd2lsbCBpbiB0dXJuDQotCSAq
+IGNhbGwgb3VyIHBoeWxpbmtfcGh5X2NoYW5nZSgpIGFuZCB0cmlnZ2VyIGEgcmVzb2x2ZS4gIE5v
+dGUgdGhhdA0KLQkgKiB3ZSBjYW4ndCBob2xkIG91ciBzdGF0ZSBtdXRleCB3aGlsZSBjYWxsaW5n
+IHBoeV9zZXRfYXN5bV9wYXVzZSgpLg0KLQkgKi8NCi0JaWYgKHBsLT5waHlkZXYpDQotCQlwaHlf
+c2V0X2FzeW1fcGF1c2UocGwtPnBoeWRldiwgcGF1c2UtPnJ4X3BhdXNlLA0KLQkJCQkgICBwYXVz
+ZS0+dHhfcGF1c2UpOw0KLQ0KLQkvKiBJZiB0aGUgbWFudWFsIHBhdXNlIHNldHRpbmdzIGNoYW5n
+ZWQsIG1ha2Ugc3VyZSB3ZSB0cmlnZ2VyIGENCi0JICogcmVzb2x2ZSB0byB1cGRhdGUgdGhlaXIg
+c3RhdGU7IHdlIGNhbiBub3QgZ3VhcmFudGVlIHRoYXQgdGhlDQotCSAqIGxpbmsgd2lsbCBjeWNs
+ZS4NCi0JICovDQotCWlmIChtYW51YWxfY2hhbmdlZCkgew0KLQkJcGwtPmxpbmtfZmFpbGVkID0g
+dHJ1ZTsNCi0JCXBoeWxpbmtfcnVuX3Jlc29sdmUocGwpOw0KLQl9DQorCXBoeWxpbmtfdXBkYXRl
+X3BhdXNlX3N0YXRlKHBsLCBwYXVzZV9zdGF0ZSk7DQogDQogCXJldHVybiAwOw0KIH0NCmRpZmYg
+LS1naXQgYS9pbmNsdWRlL2xpbnV4L3BoeWxpbmsuaCBiL2luY2x1ZGUvbGludXgvcGh5bGluay5o
+DQppbmRleCAyYmMwZGIzZDUyYWMuLmUzYzc4MjIxMDBhYiAxMDA2NDQNCi0tLSBhL2luY2x1ZGUv
+bGludXgvcGh5bGluay5oDQorKysgYi9pbmNsdWRlL2xpbnV4L3BoeWxpbmsuaA0KQEAgLTg0Miw0
+ICs4NDIsNiBAQCB2b2lkIHBoeWxpbmtfcmVwbGF5X2xpbmtfYmVnaW4oc3RydWN0IHBoeWxpbmsg
+KnBsKTsNCiANCiB2b2lkIHBoeWxpbmtfcmVwbGF5X2xpbmtfZW5kKHN0cnVjdCBwaHlsaW5rICpw
+bCk7DQogDQordm9pZCBwaHlsaW5rX3VwZGF0ZV9tYWNfcGF1c2VfY2FwYWJpbGl0aWVzKHN0cnVj
+dCBwaHlsaW5rICpwbCwgdW5zaWduZWQgbG9uZyBtYWNfcGF1c2UpOw0KKw0KICNlbmRpZg0KLS0g
+DQoyLjQzLjANCg0KQXMgYSBzaWRlIG5vdGUsIEkgaGF2ZSBwcmFjdGljYWxseSB2ZXJpZmllZCB0
+aGlzIGxvZ2ljIG9uIG15IGhhcmR3YXJlIHVzaW5nIGV0aHRvb2wgYW5kIGlwIGxpbmsuIFdoZW4g
+Y2hhbmdpbmcgdGhlIE1UVSB0byA5MDAwLCBwYXVzZSBjYXBhYmlsaXRpZXMgYXJlIGNvcnJlY3Rs
+eSBkcm9wcGVkLiBXaGVuIHJldmVydGluZyB0byBNVFUgMTUwMCwgdGhlIGNhcGFiaWxpdHkgc3Vj
+Y2Vzc2Z1bGx5IGNvbWVzIGJhY2ssIGFuZCBJIGNhbiBtYW51YWxseSByZS1lbmFibGUgUlgvVFgg
+cGF1c2UgdmlhIGV0aHRvb2wgLUEuIFRoZSBkeW5hbWljIHN3aXRjaGluZyB3b3JrcyBwZXJmZWN0
+bHkgYXMgZXhwZWN0ZWQuDQoNClRoYW5rcyBhZ2FpbiBmb3IgeW91ciB0aW1lLiBBbnkgc3VnZ2Vz
+dGlvbiB3b3VsZCBiZSBncmVhdGx5IGFwcHJlY2lhdGVkLi4NCg0KQlJzLA0KSmF2ZW4NCg==
 
