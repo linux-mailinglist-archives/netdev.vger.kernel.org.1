@@ -1,302 +1,530 @@
-Return-Path: <netdev+bounces-307200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307201-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 9/PLI/z0VGrmhwAAu9opvQ
-	(envelope-from <netdev+bounces-307200-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 16:23:56 +0200
+	id Rm1mDST1VGruhwAAu9opvQ
+	(envelope-from <netdev+bounces-307201-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 16:24:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F85074C581
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 16:23:56 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C3CD74C595
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 16:24:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=arndb.de header.s=fm1 header.b=L51VZSt3;
-	dkim=pass header.d=messagingengine.com header.s=fm2 header.b="n qVoMSy";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307200-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-307200-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=arndb.de;
+	dkim=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307201-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307201-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=zte.com.cn (policy=none);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 933913035A1A
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 14:22:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8F49D301FB2F
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 14:24:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83D1D42DA2E;
-	Mon, 13 Jul 2026 14:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD213F39E0;
+	Mon, 13 Jul 2026 14:24:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C696B3EBF1A;
-	Mon, 13 Jul 2026 14:22:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD5B42DFF5;
+	Mon, 13 Jul 2026 14:24:30 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783952552; cv=none; b=IsNd2ms1t+DFrXvNgx1wA6lQ89/+mSLlj/QBkZ6non4+o22FawQ6HDW1jrjk5RJDNEB9oj21/2ZeuBLLoDHoxOUyGreR55Z5dWgw6IvD+T5SJCPlm7zH1HsZxKj7uSK5EGuQK9CQYKpywjaxJaPV1zSW3qWIHYQCqYGYfP//dAY=
+	t=1783952673; cv=none; b=DR32rXTr/LCZ3AISpBR7KgX2ySYFnrd2oOFMQWdS2sr09fy+kZMXTQiVHrz5zAD5Y00DfqCJlFJ+c+tSAE8NwWoAZPEDrVaZQw3JLHg/sRvIh4vOuMEqCtz1xy3Eq+1qUfpdBwkgeu3cPhQdzvlxqJ40O0brS3gjYBxwNfzFs/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783952552; c=relaxed/simple;
-	bh=EI7sexiV/X+UxTd/3TyF/EC4GLNBmSdCjLzN+4m+hOw=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=JHdYtbqhsd9BO9CP71WybrPqbUjxv/8xO1vkISx+elU4MWFlNm9OMo0hPLdnnqOp1VX40OPQ2+lcAlAXHBxUojJ1Sxcvx9HjoL6a0w7bRyo2xCIhXIvkbqjsSfe3Q7VIFUNlKdOl5vhBGOrnQE3IsSiVQ66bvvxaovqaF/f2dGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=L51VZSt3; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=nqVoMSyD; arc=none smtp.client-ip=202.12.124.153
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 447597A0071;
-	Mon, 13 Jul 2026 10:22:29 -0400 (EDT)
-Received: from phl-imap-05 ([10.202.2.95])
-  by phl-compute-04.internal (MEProxy); Mon, 13 Jul 2026 10:22:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1783952549;
-	 x=1784038949; bh=CU2l/l+grvYULNyVB/JOkonr04ETPKXJ4oV6oaYMGmQ=; b=
-	L51VZSt3D0sQZJ86eoW8TsSiS8ndpbFjh1AzuSbpFef1lFXTImKnhKGwnqu4atjm
-	vD3gpcyxTFIxm3Xqc7LZVle6bYKzTiA5qTv1FXVHHXBi8Pt+8hUDWY0kxrfD3cnb
-	zpIypaARxo0b/yD6XT5RYv4nji6H8Dk8yuvb17833RBryUvU+5mrKZo525IxqkcX
-	waBzznApG32gmMdicRWNraHjfpKGEqh+Nxqw3QXktd4GHQ61X88lLRfYmmGi3b/p
-	FFELTNvB5QomRZzkGouMwCq3PpgpBAOrTcPNgZdF+zWVTM3TnDDc2PcBMPELDhSW
-	LjW3YRpc8Uadb6v8kwkqfA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1783952549; x=
-	1784038949; bh=CU2l/l+grvYULNyVB/JOkonr04ETPKXJ4oV6oaYMGmQ=; b=n
-	qVoMSyDbNfi1FdT/UDr2Pmtq0c4QEagBtoHOn31ROZm3wzlAhgwX/9OK/4j+VYse
-	95mSIso//1Ve6Hhsw+vv/qte/MKWAaknKjjU9+4OR5TgA5i8dCf/sY3f+WzZP9W/
-	2sFYMBj0f7booKL21Zi5CjAGJ71BWPU8FbEGZfFccfDTyJQ9GFeMHoUttMv1ojxE
-	BJ0VWes/Cnly+PkwWN9kOmiI9n2FSPVArbSUJ/S+viJbPr2fwLHik6yAtpkL/5/D
-	g8kfHXEYWCL2Iq9p6QByH0Qq3Nkjlrek09CJCElXk6g19faE0oNOtHTqzuZx66Wy
-	ZQHTkhTBayQKPYDAY6rkw==
-X-ME-Sender: <xms:ovRUajBIsXUgDABx0NEfhe7XgaVGldrd2Ka8482OnxT3TUjXZlfhsg>
-    <xme:ovRUakWwJWs7-0TirTG1dAFOwv1XVAKt4OLw7b1d_zepvDu25PgHBdOQNYAeXNfJc
-    6wLyyIPLvQC3_XNkuXvAmuz7BJezLZAZekhexUWrR99ZsDSqQQ0Bw>
-X-ME-Proxy-Cause: dmFkZTFqcwJE5anyfqiojVjksH5tB/3nDJOMgzaL4MffLvJCdssvyH+hKOtcXcDpBqa4sv
-    cTYGFVIOBQ9UuPNtXjB/V0Zqrjq2GMtsrV6GHk75lf46Ay7h6x7q+TmQuo3PrHDoreROk7
-    Rcv07HJ99rDqBInAKHe1BXoCwJ/z97EBkHOElbk9m5jcVnoI2AuqwN+DxJ8VYZMDJTKbuq
-    M5pgR8hSmdmg78onYSbwY9by5uzfaixHwRa+qRiG31tv9lA6cPC3l1yBm+kPz8idmp7iP9
-    zUWHqoKULz7Tzlx7EPCTQfbjmU4/FQCEi+d6ReWBh5D0rKurgS52grVfEKaF3lHstByRaJ
-    tRJjC5lZYI7v6OxRHVK0FjPjCseguZPND9Q8O6Ey+Z2RrbOA8yFYmFfpixuIaAtbA7jjn7
-    dCMDQMpWFsOI+nUF0+NB+EpLBTqmVXFJ17eEH6JoqDVoxGGDNvXsHvIGsEm26de4dNleKM
-    cjJZYp2Ov8juw5ckS/s8lvL8GH050Q93ZvsHaQpOaHb1EIpwdVN0EZ7sOz4HSRbNIOCFSc
-    /GjrJJJUIincyR2Zr2HVRr9MssT1yPnhNiRJZwybvWfRtNur9hFstqQBWjImsPzEA81ynM
-    DeOv+MiLUy/uRo3eXwLuqJHUFYwqKN4xlwrtnXT7OI0rzXM3VqxQIJO9yr8A
-X-ME-Proxy: <xmx:ovRUatfkPdirTgbKSaNUuFYpZUVi-yf6Jy3zt2hjYoVKF7RQTOzd8g>
-    <xmx:ovRUatCE0Bv0VvBTLq0LIFG-5IA8R6k-PFMd6sSE0NfitEs32Zq8vA>
-    <xmx:ovRUaoSWQJ0la1mNQ3pta5ssq090yuqSHS37h8M_CWd7Ln8wk_EOZA>
-    <xmx:ovRUaoJ4jP15A00r9YjOT0Ixaowe-VBEseQM5fypr7gUM_SB677qSg>
-    <xmx:pfRUanEiFrJI2pBYWuIeiVy1rvQeLM-iFP9W4UBxSWImEVlJkqzN0FjA>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id DC870182007E; Mon, 13 Jul 2026 10:22:25 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1783952673; c=relaxed/simple;
+	bh=H3L4rNnMrD8rzF2GXNgaIBbAI5A/HNXlt/muugjeUmw=;
+	h=Message-ID:In-Reply-To:References:Date:Mime-Version:From:To:Cc:
+	 Subject:Content-Type; b=O4A02giuq46NMzu1TbyQI543Mz+Vd2pDcC5al5JgqUMit1m/K2s3rr5zLxOMHytnNuGfVj37gyujW+p4YZNT4cZRDEvLJLQ+Cmy4gcx8YahdjgU5e0s7+g/WxxR3vPnsj4+peINp4kaAW+ar01QoY/+nw4Fr6y6uBwgIV29xFYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.35
+Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4gzPp43pPdz8XrrM;
+	Mon, 13 Jul 2026 22:24:28 +0800 (CST)
+Received: from njy2app04.zte.com.cn ([10.40.12.64])
+	by mse-fl2.zte.com.cn with SMTP id 66DEOH6G070752;
+	Mon, 13 Jul 2026 22:24:17 +0800 (+08)
+	(envelope-from han.junyang@zte.com.cn)
+Received: from mapi (njb2app07[null])
+	by mapi (Zmail) with MAPI id mid204;
+	Mon, 13 Jul 2026 22:24:20 +0800 (CST)
+X-Zmail-TransId: 2aff6a54f51474f-c1cf1
+X-Mailer: Zmail v1.0
+Message-ID: <20260713222420704lmwNL8xT8mgOhTKbqAfRX@zte.com.cn>
+In-Reply-To: <202607132221104795CMBHxJGy8iTj3qc36Qw6@zte.com.cn>
+References: 202607132221104795CMBHxJGy8iTj3qc36Qw6@zte.com.cn
+Date: Mon, 13 Jul 2026 22:24:20 +0800 (CST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-ThreadId: ARmmoW1aQeCk
-Date: Mon, 13 Jul 2026 16:22:05 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Fernando Fernandez Mancera" <fmancera@suse.de>,
- Netdev <netdev@vger.kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "David Ahern" <dsahern@kernel.org>,
- "Simon Horman" <horms@kernel.org>, "Ido Schimmel" <idosch@nvidia.com>,
- "Jason Gunthorpe" <jgg@ziepe.ca>, "Leon Romanovsky" <leon@kernel.org>,
- "Andrew Lunn" <andrew+netdev@lunn.ch>,
- "Anthony L Nguyen" <anthony.l.nguyen@intel.com>,
- "Przemek Kitszel" <przemyslaw.kitszel@intel.com>,
- "Elad Nachman" <enachman@marvell.com>,
- "Saeed Mahameed" <saeedm@nvidia.com>, "Tariq Toukan" <tariqt@nvidia.com>,
- "Mark Bloch" <mbloch@nvidia.com>, "Petr Machata" <petrm@nvidia.com>,
- "Edward Cree" <ecree.xilinx@gmail.com>,
- "Maxime Coquelin" <mcoquelin.stm32@gmail.com>,
- "Alexandre Torgue" <alexandre.torgue@foss.st.com>,
- "Arend van Spriel" <arend.vanspriel@broadcom.com>,
- "Miri Korenblit" <miriam.rachel.korenblit@intel.com>,
- "Keith Busch" <kbusch@kernel.org>, "Jens Axboe" <axboe@kernel.dk>,
- "Christoph Hellwig" <hch@lst.de>, "Sagi Grimberg" <sagi@grimberg.me>,
- "Chaitanya Kulkarni" <kch@nvidia.com>,
- "Saurav Kashyap" <skashyap@marvell.com>,
- "Javed Hasan" <jhasan@marvell.com>,
- GR-QLogic-Storage-Upstream@marvell.com,
- "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- "Nilesh Javali" <njavali@marvell.com>,
- "Manish Rangankar" <mrangankar@marvell.com>,
- "Varun Prakash" <varun@chelsio.com>,
- "Alexander Viro" <viro@zeniv.linux.org.uk>,
- "Christian Brauner" <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>,
- "David Howells" <dhowells@redhat.com>,
- "Marc Dionne" <marc.dionne@auristor.com>,
- "Trond Myklebust" <trondmy@kernel.org>,
- "Anna Schumaker" <anna@kernel.org>, "Chuck Lever" <cel@kernel.org>,
- "Jeff Layton" <jlayton@kernel.org>, NeilBrown <neil@brown.name>,
- "Olga Kornievskaia" <okorniev@redhat.com>,
- "Dai Ngo" <Dai.Ngo@oracle.com>, "Tom Talpey" <tom@talpey.com>,
- "Marek Lindner" <marek.lindner@mailbox.org>,
- "Simon Wunderlich" <sw@simonwunderlich.de>,
- "Antonio Quartulli" <antonio@mandelbit.com>,
- "Sven Eckelmann" <sven@narfation.org>,
- "Nikolay Aleksandrov" <razor@blackwall.org>,
- "Pablo Neira Ayuso" <pablo@netfilter.org>,
- "Florian Westphal" <fw@strlen.de>, "Phil Sutter" <phil@nwl.cc>,
- "Johannes Berg" <johannes@sipsolutions.net>,
- "Matthieu Baerts" <matttbe@kernel.org>,
- "Mat Martineau" <martineau@kernel.org>,
- "Geliang Tang" <geliang@kernel.org>, "Julian Anastasov" <ja@ssi.bg>,
- "Aaron Conole" <aconole@redhat.com>,
- "Eelco Chaudron" <echaudro@redhat.com>,
- "Ilya Maximets" <i.maximets@ovn.org>,
- "Allison Henderson" <achender@kernel.org>,
- "Jamal Hadi Salim" <jhs@mojatatu.com>, "Jiri Pirko" <jiri@resnulli.us>,
- "Marcelo Ricardo Leitner" <marcelo.leitner@gmail.com>,
- "Xin Long" <lucien.xin@gmail.com>,
- "D. Wythe" <alibuda@linux.alibaba.com>,
- "Dust Li" <dust.li@linux.alibaba.com>,
- "Sidraya Jayagond" <sidraya@linux.ibm.com>,
- "Wenjia Zhang" <wenjia@linux.ibm.com>,
- "Mahanta Jambigi" <mjambigi@linux.ibm.com>,
- "Tony Lu" <tonylu@linux.alibaba.com>, "Wen Gu" <guwen@linux.alibaba.com>,
- "Jon Maloy" <jmaloy@redhat.com>,
- "Steffen Klassert" <steffen.klassert@secunet.com>,
- "Herbert Xu" <herbert@gondor.apana.org.au>,
- "Vikas Gupta" <vikas.gupta@broadcom.com>,
- "Rajashekar Hudumula" <rajashekar.hudumula@broadcom.com>,
- "Justin Chen" <justin.chen@broadcom.com>,
- "Bhargava Marreddy" <bhargava.marreddy@broadcom.com>,
- "Nicolai Buchwitz" <nb@tipi-net.de>,
- "Florian Fainelli" <florian.fainelli@broadcom.com>,
- "Heiner Kallweit" <hkallweit1@gmail.com>,
- "Krzysztof Kozlowski" <krzk@kernel.org>,
- "Russell King" <rmk+kernel@armlinux.org.uk>, "Yao Zi" <me@ziyao.cc>,
- "Yanteng Si" <siyanteng@cqsoftware.com.cn>,
- "Maxime Chevallier" <maxime.chevallier@bootlin.com>,
- "Julian Braha" <julianbraha@gmail.com>,
- "Joey Lu" <a0987203069@gmail.com>,
- "Shangjuan Wei" <weishangjuan@eswincomputing.com>,
- "Chen-Yu Tsai" <wens@kernel.org>, "Inochi Amaoto" <inochiama@gmail.com>,
- "Lad, Prabhakar" <prabhakar.mahadev-lad.rj@bp.renesas.com>,
- "Qingfang Deng" <qingfang.deng@linux.dev>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Eric Biggers" <ebiggers@kernel.org>,
- "Ethan Nelson-Moore" <enelsonmoore@gmail.com>,
- "Ard Biesheuvel" <ardb@kernel.org>,
- "Dmitry Safonov" <0x7f454c46@gmail.com>,
- "Kuniyuki Iwashima" <kuniyu@google.com>, "Alyssa Ross" <hi@alyssa.is>,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
- "open list:NETRONOME ETHERNET DRIVERS" <oss-drivers@corigine.com>,
- linux-net-drivers@amd.com, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-wireless@vger.kernel.org,
- brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
- linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
- target-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
- b.a.t.m.a.n@lists.open-mesh.org,
- "open list:ETHERNET BRIDGE" <bridge@lists.linux.dev>,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- mptcp@lists.linux.dev, lvs-devel@vger.kernel.org, dev@openvswitch.org,
- rds-devel@oss.oracle.com, linux-sctp@vger.kernel.org,
- linux-s390@vger.kernel.org,
- "open list:TIPC NETWORK LAYER" <tipc-discussion@lists.sourceforge.net>
-Message-Id: <713178ff-0fb2-4f1b-90bc-9841cd42c20e@app.fastmail.com>
-In-Reply-To: <2256daf4-d03c-4a57-9d72-7a388d823f18@suse.de>
-References: <20260712013941.4570-1-fmancera@suse.de>
- <20260712013941.4570-2-fmancera@suse.de>
- <12ffac6a-649a-4e4a-8d12-0b48171e1d95@app.fastmail.com>
- <2256daf4-d03c-4a57-9d72-7a388d823f18@suse.de>
-Subject: Re: [PATCH 01/13 RFC net-next] net: ipv4: introduce CONFIG_IPV4 to decouple
- the IPv4 stack
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+From: <han.junyang@zte.com.cn>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
+Cc: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <han.junyang@zte.com.cn>, <ran.ming@zte.com.cn>,
+        <han.chengfei@zte.com.cn>, <zhang.yanze@zte.com.cn>
+Subject: =?UTF-8?B?W1BBVENIIG5ldC1uZXh0IHY4IDEvMl0gZGluZ2hhaTogYWRkIFpURSBuZXR3b3JrIGRyaXZlciBzdXBwb3J0?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl2.zte.com.cn 66DEOH6G070752
+X-TLS: YES
+X-ENVELOPE-SENDER: han.junyang@zte.com.cn
+X-SOURCE-IP: 10.5.228.133 unknown Mon, 13 Jul 2026 22:24:28 +0800
+X-CLEAN: YES
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 6A54F51C.000/4gzPp43pPdz8XrrM
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.65 / 15.00];
+X-Spamd-Result: default: False [2.14 / 15.00];
+	SUBJ_EXCESS_BASE64(1.50)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[arndb.de,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[arndb.de:s=fm1,messagingengine.com:s=fm2];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[zte.com.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
+	TAGGED_FROM(0.00)[bounces-307201-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307200-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[arnd@arndb.de,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:fmancera@suse.de,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:dsahern@kernel.org,m:horms@kernel.org,m:idosch@nvidia.com,m:jgg@ziepe.ca,m:leon@kernel.org,m:andrew+netdev@lunn.ch,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:enachman@marvell.com,m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:petrm@nvidia.com,m:ecree.xilinx@gmail.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:arend.vanspriel@broadcom.com,m:miriam.rachel.korenblit@intel.com,m:kbusch@kernel.org,m:axboe@kernel.dk,m:hch@lst.de,m:sagi@grimberg.me,m:kch@nvidia.com,m:skashyap@marvell.com,m:jhasan@marvell.com,m:GR-QLogic-Storage-Upstream@marvell.com,m:James.Bottomley@hansenpartnership.com,m:martin.petersen@oracle.com,m:njavali@marvell.com,m:mrangankar@marvell.com,m:varun@chelsio.com,m:viro@zeniv.linux.org.uk,m:brauner@kernel.org,m:jack@suse.cz,m:dhowells@redhat.com,m:marc.dionne@auristor.co
- m,m:trondmy@kernel.org,m:anna@kernel.org,m:cel@kernel.org,m:jlayton@kernel.org,m:neil@brown.name,m:okorniev@redhat.com,m:Dai.Ngo@oracle.com,m:tom@talpey.com,m:marek.lindner@mailbox.org,m:sw@simonwunderlich.de,m:antonio@mandelbit.com,m:sven@narfation.org,m:razor@blackwall.org,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:johannes@sipsolutions.net,m:matttbe@kernel.org,m:martineau@kernel.org,m:geliang@kernel.org,m:ja@ssi.bg,m:aconole@redhat.com,m:echaudro@redhat.com,m:i.maximets@ovn.org,m:achender@kernel.org,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:marcelo.leitner@gmail.com,m:lucien.xin@gmail.com,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:jmaloy@redhat.com,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:vikas.gupta@broadcom.com,m:rajashekar.hudumula@broadcom.com,m:justin.chen@broadcom.com,m:bhargava.marreddy@broadcom.com,m:nb@t
- ipi-net.de,m:florian.fainelli@broadcom.com,m:hkallweit1@gmail.com,m:krzk@kernel.org,m:rmk+kernel@armlinux.org.uk,m:me@ziyao.cc,m:siyanteng@cqsoftware.com.cn,m:maxime.chevallier@bootlin.com,m:julianbraha@gmail.com,m:a0987203069@gmail.com,m:weishangjuan@eswincomputing.com,m:wens@kernel.org,m:inochiama@gmail.com,m:prabhakar.mahadev-lad.rj@bp.renesas.com,s:lists@lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[han.junyang@zte.com.cn,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[han.junyang@zte.com.cn,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:han.junyang@zte.com.cn,m:ran.ming@zte.com.cn,m:han.chengfei@zte.com.cn,m:zhang.yanze@zte.com.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,nvidia.com,ziepe.ca,lunn.ch,intel.com,marvell.com,gmail.com,foss.st.com,broadcom.com,kernel.dk,lst.de,grimberg.me,hansenpartnership.com,oracle.com,chelsio.com,zeniv.linux.org.uk,suse.cz,auristor.com,brown.name,talpey.com,mailbox.org,simonwunderlich.de,mandelbit.com,narfation.org,blackwall.org,netfilter.org,strlen.de,nwl.cc,sipsolutions.net,ssi.bg,ovn.org,mojatatu.com,resnulli.us,linux.alibaba.com,linux.ibm.com,secunet.com,gondor.apana.org.au,tipi-net.de,armlinux.org.uk,ziyao.cc,cqsoftware.com.cn,bootlin.com,eswincomputing.com,bp.renesas.com,linux.dev,linuxfoundation.org,alyssa.is,vger.kernel.org,lists.osuosl.org,corigine.com,amd.com,st-md-mailman.stormreply.com,lists.infradead.org,lists.linux.dev,lists.open-mesh.org,openvswitch.org,oss.oracle.com,lists.sourceforge.net];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NO_DN(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
+	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arnd@arndb.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[arndb.de:+,messagingengine.com:+];
-	RCPT_COUNT_GT_50(0.00)[134];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,messagingengine.com:dkim]
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2F85074C581
+X-Rspamd-Queue-Id: 8C3CD74C595
 
-On Mon, Jul 13, 2026, at 16:00, Fernando Fernandez Mancera wrote:
-> On 7/12/26 1:01 PM, Arnd Bergmann wrote:
->> On Sun, Jul 12, 2026, at 03:38, Fernando Fernandez Mancera wrote:
->>> Historically, the IPv4 protocol has been linked to the core INET
->>> subsystem. Because shared infrastructure like the TCP/UDP engine,
->>> routing or INET hashtables live inside net/ipv4/, it has been impossible
->>> to compile a kernel with only IPv6 support.
->>>
->>> This patch introduces the CONFIG_IPV4 Kconfig symbol, which is set to
->>> 'def_bool y' for now. This does not allow to completely disable the
->>> IPv4 stack yet but it lays the necessary build-system work for that
->>> goal.
->> 
->> I expect this will cause additional (trivial) build regression in the
->> next step when randconfig builds run into obscure corner cases, either
->> with INET=y IPV4=n IPV6=y or with INET=y IPV4=n IPV6=n.
->> 
->> I can probably give your patch (with IPV4 visible or disabled) an
->> early go on the randconfig tree to find these more quickly.
->> If I run into regressions, should I just add more 'depends on IPV4',
->> or do you have other plans?
->> 
->
-> Yes, I have a job running randconfig and verifying nothing breaks. If 
-> something breaks and it isn't core networking stack I would just make 
-> the Kconfig symbol depend on IPv4.
->
-> Then later we will have more time to write a dedicate patch so it does 
-> not depend on IPv4.
+From: Junyang Han <han.junyang@zte.com.cn>
 
-Ok
+Add basic framework for ZTE DingHai ethernet PF driver, including
+Kconfig/Makefile build support and PCIe device probe/remove skeleton.
 
->> Should we have some logic to ensure that at least one of IPV4 or
->> IPV6 is enabled? I think this would work
->> 
->> config IPV4
->>        bool "The IPv4 protocol" if IPV6
->>        default INET
->> 
->> which only allows turning IPV4 off if IPV6 has enabled.
->> 
->
-> I do wonder, should we? I mean, I didn't try it off but I don't see why 
-> we should not allow a pure L2 system..
+Signed-off-by: Junyang Han <han.junyang@zte.com.cn>
+---
+ MAINTAINERS                               |   6 +
+ drivers/net/ethernet/Kconfig              |   1 +
+ drivers/net/ethernet/Makefile             |   1 +
+ drivers/net/ethernet/zte/Kconfig          |  20 +++
+ drivers/net/ethernet/zte/Makefile         |   6 +
+ drivers/net/ethernet/zte/dinghai/Kconfig  |  34 ++++
+ drivers/net/ethernet/zte/dinghai/Makefile |  10 ++
+ drivers/net/ethernet/zte/dinghai/en_pf.c  | 195 ++++++++++++++++++++++
+ drivers/net/ethernet/zte/dinghai/en_pf.h  |  52 ++++++
+ 9 files changed, 325 insertions(+)
+ create mode 100644 drivers/net/ethernet/zte/Kconfig
+ create mode 100644 drivers/net/ethernet/zte/Makefile
+ create mode 100644 drivers/net/ethernet/zte/dinghai/Kconfig
+ create mode 100644 drivers/net/ethernet/zte/dinghai/Makefile
+ create mode 100644 drivers/net/ethernet/zte/dinghai/en_pf.c
+ create mode 100644 drivers/net/ethernet/zte/dinghai/en_pf.h
 
-I expected a pure L2 system to be CONFIG_ETHERNET=y CONFIG_INET=n.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 2fb1c75afd16..73692b09bf7b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -29440,6 +29440,12 @@ S:	Maintained
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/tiwai/sound.git
+ F:	sound/hda/codecs/senarytech.c
 
-Which user-visible parts of CONFIG_INET would you want keep working
-when both v4 and v6 are disabled?
++ZTE DINGHAI ETHERNET DRIVER
++M:	Junyang Han <han.junyang@zte.com.cn>
++L:	netdev@vger.kernel.org
++S:	Maintained
++F:	drivers/net/ethernet/zte/
++
+ THE REST
+ M:	Linus Torvalds <torvalds@linux-foundation.org>
+ L:	linux-kernel@vger.kernel.org
+diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
+index b8f70e2a1763..c2b6996b0cfe 100644
+--- a/drivers/net/ethernet/Kconfig
++++ b/drivers/net/ethernet/Kconfig
+@@ -188,5 +188,6 @@ source "drivers/net/ethernet/wangxun/Kconfig"
+ source "drivers/net/ethernet/wiznet/Kconfig"
+ source "drivers/net/ethernet/xilinx/Kconfig"
+ source "drivers/net/ethernet/xircom/Kconfig"
++source "drivers/net/ethernet/zte/Kconfig"
 
-     Arnd
+ endif # ETHERNET
+diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
+index 57344fec6ce0..a34bcbd4df4e 100644
+--- a/drivers/net/ethernet/Makefile
++++ b/drivers/net/ethernet/Makefile
+@@ -104,3 +104,4 @@ obj-$(CONFIG_NET_VENDOR_XIRCOM) += xircom/
+ obj-$(CONFIG_NET_VENDOR_SYNOPSYS) += synopsys/
+ obj-$(CONFIG_NET_VENDOR_PENSANDO) += pensando/
+ obj-$(CONFIG_OA_TC6) += oa_tc6.o
++obj-$(CONFIG_NET_VENDOR_ZTE) += zte/
+diff --git a/drivers/net/ethernet/zte/Kconfig b/drivers/net/ethernet/zte/Kconfig
+new file mode 100644
+index 000000000000..b95c2fc7db77
+--- /dev/null
++++ b/drivers/net/ethernet/zte/Kconfig
+@@ -0,0 +1,20 @@
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# ZTE driver configuration
++#
++
++config NET_VENDOR_ZTE
++    bool "ZTE devices"
++    default y
++    help
++      If you have a network (Ethernet) card belonging to this class, say Y.
++      Note that the answer to this question doesn't directly affect the
++      kernel: saying N will just cause the configurator to skip all
++      the questions about Zte cards. If you say Y, you will be asked
++      for your specific card in the following questions.
++
++if NET_VENDOR_ZTE
++
++source "drivers/net/ethernet/zte/dinghai/Kconfig"
++
++endif # NET_VENDOR_ZTE
+diff --git a/drivers/net/ethernet/zte/Makefile b/drivers/net/ethernet/zte/Makefile
+new file mode 100644
+index 000000000000..cd9929b61559
+--- /dev/null
++++ b/drivers/net/ethernet/zte/Makefile
+@@ -0,0 +1,6 @@
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# Makefile for the ZTE device drivers
++#
++
++obj-$(CONFIG_DINGHAI) += dinghai/
+diff --git a/drivers/net/ethernet/zte/dinghai/Kconfig b/drivers/net/ethernet/zte/dinghai/Kconfig
+new file mode 100644
+index 000000000000..121be3bf7707
+--- /dev/null
++++ b/drivers/net/ethernet/zte/dinghai/Kconfig
+@@ -0,0 +1,34 @@
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# ZTE DingHai Ethernet driver configuration
++#
++
++config DINGHAI
++    bool "ZTE DingHai Ethernet driver"
++    depends on PCI
++    select NET_DEVLINK
++    help
++      This driver supports ZTE DingHai Ethernet devices.
++
++      DingHai is a high-performance Ethernet controller that supports
++      multiple features including hardware offloading, SR-IOV, and
++      advanced virtualization capabilities.
++
++      If you say Y here, you can select specific driver variants below.
++
++      If unsure, say N.
++
++if DINGHAI
++
++config DINGHAI_PF
++    tristate "ZTE DingHai PF (Physical Function) driver"
++    help
++      This driver supports ZTE DingHai PCI Express Ethernet
++      adapters (PF).
++
++      To compile this driver as a module, choose M here. The module
++      will be named dinghai10e.
++
++      If unsure, say N.
++
++endif # DINGHAI
+diff --git a/drivers/net/ethernet/zte/dinghai/Makefile b/drivers/net/ethernet/zte/dinghai/Makefile
+new file mode 100644
+index 000000000000..f55a8de518be
+--- /dev/null
++++ b/drivers/net/ethernet/zte/dinghai/Makefile
+@@ -0,0 +1,10 @@
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# Makefile for ZTE DingHai Ethernet driver
++#
++
++ccflags-y += -I$(src)
++
++obj-$(CONFIG_DINGHAI_PF) += dinghai10e.o
++dinghai10e-y := en_pf.o
++
+diff --git a/drivers/net/ethernet/zte/dinghai/en_pf.c b/drivers/net/ethernet/zte/dinghai/en_pf.c
+new file mode 100644
+index 000000000000..034b8519a71c
+--- /dev/null
++++ b/drivers/net/ethernet/zte/dinghai/en_pf.c
+@@ -0,0 +1,195 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * ZTE DingHai Ethernet driver
++ * Copyright (c) 2022-2026, ZTE Corporation.
++ */
++
++#include <linux/module.h>
++#include <linux/pci.h>
++#include <net/devlink.h>
++#include <linux/dma-mapping.h>
++#include "en_pf.h"
++
++MODULE_AUTHOR("Junyang Han <han.junyang@zte.com.cn>");
++MODULE_DESCRIPTION("ZTE DingHai series Ethernet driver");
++MODULE_LICENSE("GPL");
++
++static const struct devlink_ops dh_pf_devlink_ops = {};
++
++static const struct pci_device_id dh_pf_pci_table[] = {
++	{ PCI_DEVICE(ZXDH_PF_VENDOR_ID, ZXDH_PF_DEVICE_ID) },
++	{ PCI_DEVICE(ZXDH_PF_VENDOR_ID, ZXDH_VF_DEVICE_ID) },
++	{ }
++};
++
++MODULE_DEVICE_TABLE(pci, dh_pf_pci_table);
++
++void *dh_core_alloc_priv(struct dh_core_dev *dh_dev, size_t size)
++{
++	void *priv = kzalloc(size, GFP_KERNEL);
++
++	if (priv)
++		dh_dev->priv = priv;
++	return priv;
++}
++
++void dh_core_free_priv(struct dh_core_dev *dh_dev)
++{
++	kfree(dh_dev->priv);
++}
++
++static int dh_pf_pci_init(struct dh_core_dev *dev)
++{
++	struct zxdh_pf_device *pf_dev = dev->priv;
++	int ret;
++
++	pci_set_drvdata(dev->pdev, dev);
++
++	ret = pci_enable_device(dev->pdev);
++	if (ret) {
++		dev_err(dev->device, "pci_enable_device failed: %d\n", ret);
++		return ret;
++	}
++
++	ret = dma_set_mask_and_coherent(dev->device, DMA_BIT_MASK(64));
++	if (ret) {
++		ret = dma_set_mask_and_coherent(dev->device, DMA_BIT_MASK(32));
++		if (ret) {
++			dev_err(dev->device, "dma_set_mask_and_coherent failed: %d\n", ret);
++			goto err_pci;
++		}
++	}
++
++	ret = pci_request_selected_regions(dev->pdev,
++					   pci_select_bars(dev->pdev, IORESOURCE_MEM),
++					   "dh-pf");
++	if (ret) {
++		dev_err(dev->device, "pci_request_selected_regions failed: %d\n", ret);
++		goto err_pci;
++	}
++
++	pci_set_master(dev->pdev);
++	ret = pci_save_state(dev->pdev);
++	if (ret) {
++		dev_err(dev->device, "pci_save_state failed: %d\n", ret);
++		goto err_pci_save_state;
++	}
++
++	if (!(pci_resource_flags(dev->pdev, 0) & IORESOURCE_MEM)) {
++		ret = -ENODEV;
++		dev_err(dev->device, "BAR 0 is not an MMIO resource\n");
++		goto err_pci_save_state;
++	}
++
++	pf_dev->pci_ioremap_addr[0] =
++		ioremap(pci_resource_start(dev->pdev, 0),
++			pci_resource_len(dev->pdev, 0));
++	if (!pf_dev->pci_ioremap_addr[0]) {
++		ret = -ENOMEM;
++		dev_err(dev->device, "dh pf pci ioremap failed\n");
++		goto err_pci_save_state;
++	}
++
++	return 0;
++
++err_pci_save_state:
++	pci_release_selected_regions(dev->pdev,
++				     pci_select_bars(dev->pdev, IORESOURCE_MEM));
++err_pci:
++	pci_disable_device(dev->pdev);
++	return ret;
++}
++
++void dh_pf_pci_close(struct dh_core_dev *dev)
++{
++	struct zxdh_pf_device *pf_dev = dev->priv;
++
++	iounmap(pf_dev->pci_ioremap_addr[0]);
++	pci_release_selected_regions(dev->pdev,
++				     pci_select_bars(dev->pdev, IORESOURCE_MEM));
++	pci_disable_device(dev->pdev);
++}
++
++static int dh_pf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
++{
++	struct zxdh_pf_device *pf_dev;
++	struct dh_core_dev *dh_dev;
++	struct devlink *devlink;
++	int ret;
++
++	devlink = devlink_alloc(&dh_pf_devlink_ops, sizeof(struct dh_core_dev),
++				&pdev->dev);
++	if (!devlink) {
++		dev_err(&pdev->dev, "dh_pf devlink alloc failed\n");
++		return -ENOMEM;
++	}
++
++	dh_dev = devlink_priv(devlink);
++	dh_dev->device = &pdev->dev;
++	dh_dev->pdev = pdev;
++	dh_dev->devlink = devlink;
++
++	pf_dev = dh_core_alloc_priv(dh_dev, sizeof(*pf_dev));
++	if (!pf_dev) {
++		dev_err(&pdev->dev, "dh_pf_dev alloc failed\n");
++		ret = -ENOMEM;
++		goto err_pf_dev;
++	}
++
++	pf_dev->bar_chan_valid = false;
++	pf_dev->vepa = false;
++	mutex_init(&dh_dev->lock);
++	mutex_init(&pf_dev->irq_lock);
++
++	dh_dev->coredev_type = GET_COREDEV_TYPE(pdev);
++
++	ret = dh_pf_pci_init(dh_dev);
++	if (ret) {
++		dev_err(&pdev->dev, "dh_pf_pci_init failed: %d\n", ret);
++		goto err_cfg_init;
++	}
++
++	devlink_register(devlink);
++
++	return 0;
++
++err_cfg_init:
++	mutex_destroy(&pf_dev->irq_lock);
++	mutex_destroy(&dh_dev->lock);
++	dh_core_free_priv(dh_dev);
++err_pf_dev:
++	devlink_free(devlink);
++	return ret;
++}
++
++static void dh_pf_remove(struct pci_dev *pdev)
++{
++	struct dh_core_dev *dh_dev = pci_get_drvdata(pdev);
++	struct devlink *devlink = priv_to_devlink(dh_dev);
++	struct zxdh_pf_device *pf_dev = dh_dev->priv;
++
++	devlink_unregister(devlink);
++	dh_pf_pci_close(dh_dev);
++	mutex_destroy(&pf_dev->irq_lock);
++	mutex_destroy(&dh_dev->lock);
++	dh_core_free_priv(dh_dev);
++	devlink_free(devlink);
++	pci_set_drvdata(pdev, NULL);
++}
++
++static void dh_pf_shutdown(struct pci_dev *pdev)
++{
++	if (system_state == SYSTEM_POWER_OFF)
++		pci_set_power_state(pdev, PCI_D3hot);
++	pci_disable_device(pdev);
++}
++
++static struct pci_driver dh_pf_driver = {
++	.name = "dinghai10e",
++	.id_table = dh_pf_pci_table,
++	.probe = dh_pf_probe,
++	.remove = dh_pf_remove,
++	.shutdown = dh_pf_shutdown,
++};
++
++module_pci_driver(dh_pf_driver);
+diff --git a/drivers/net/ethernet/zte/dinghai/en_pf.h b/drivers/net/ethernet/zte/dinghai/en_pf.h
+new file mode 100644
+index 000000000000..87fa29b2d13d
+--- /dev/null
++++ b/drivers/net/ethernet/zte/dinghai/en_pf.h
+@@ -0,0 +1,52 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * ZTE DingHai Ethernet driver - PF header
++ * Copyright (c) 2022-2026, ZTE Corporation.
++ */
++
++#ifndef __ZXDH_EN_PF_H__
++#define __ZXDH_EN_PF_H__
++
++#include <linux/types.h>
++#include <linux/pci.h>
++#include <linux/mutex.h>
++#include <linux/device.h>
++#include <linux/slab.h>
++
++#define ZXDH_PF_VENDOR_ID	0x1cf2
++#define ZXDH_PF_DEVICE_ID	0x8040
++#define ZXDH_VF_DEVICE_ID	0x8041
++
++enum dh_coredev_type {
++	DH_COREDEV_PF,
++	DH_COREDEV_VF,
++	DH_COREDEV_SF,
++	DH_COREDEV_MPF
++};
++
++struct devlink;
++
++struct dh_core_dev {
++	struct device *device;
++	enum dh_coredev_type coredev_type;
++	struct pci_dev *pdev;
++	struct devlink *devlink;
++	struct mutex lock; /* Protects device configuration */
++	void *priv;
++};
++
++struct zxdh_pf_device {
++	void __iomem *pci_ioremap_addr[6];
++	bool bar_chan_valid;
++	bool vepa;
++	struct mutex irq_lock; /* Protects IRQ operations */
++};
++
++#define GET_COREDEV_TYPE(pdev) \
++	((pdev)->device == ZXDH_VF_DEVICE_ID ? DH_COREDEV_VF : DH_COREDEV_PF)
++
++void *dh_core_alloc_priv(struct dh_core_dev *dh_dev, size_t size);
++void dh_core_free_priv(struct dh_core_dev *dh_dev);
++void dh_pf_pci_close(struct dh_core_dev *dev);
++
++#endif /* __ZXDH_EN_PF_H__ */
+-- 
+2.27.0
 
