@@ -1,312 +1,278 @@
-Return-Path: <netdev+bounces-307010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307011-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id J3BwMDNmVGpFlgMAu9opvQ
-	(envelope-from <netdev+bounces-307010-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 06:14:43 +0200
+	id Ldm5LztxVGpmmAMAu9opvQ
+	(envelope-from <netdev+bounces-307011-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 07:01:47 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A83CC74711B
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 06:14:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D0B8F7472EB
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 07:01:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=xDOBaWfl;
-	dmarc=pass (policy=none) header.from=linux.dev;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307010-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307010-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=est.tech header.s=selector1 header.b=Ri1y0Bmi;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307011-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307011-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7CA48300E72B
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 04:14:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F0325300FEE9
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 05:01:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B008341650;
-	Mon, 13 Jul 2026 04:14:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2718835DA47;
+	Mon, 13 Jul 2026 05:01:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012003.outbound.protection.outlook.com [52.101.66.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01CE334E75A
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 04:14:36 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783916079; cv=none; b=qiEVbwYvG6RyAI4lW5tzapEXq2j6Hrq3M9eMAnMNrZviA3zi1gONCGMOa8ZiHPj/BLJfkaPsSAWL7ioIXMCz5TT4myvBKdNKjpifXknk7EH9CICRHjZvuLkCWv2f6eYw49pTCOvdmnUuIV2XEP5PAh3MN8V7Q9PMhsZrVQ0G+hU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783916079; c=relaxed/simple;
-	bh=y1Yt2fykqjsWvs7kXOwQ+eAkXv958ODFE7VheXPWId0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BdWSfbxmtLR8TQNAo+GJ+jgVG4fwuAHJEzTS25a3m0TrRC6YutkOZvOnEN2pnGPBhGXolW+UEqnjZ1F61Hv3c86f1fxPF0GaOuk6a6rnQi4kVojlXAmggNcV5WZG0MdKI02HOEkVVcar4Dp4gz4pm0zO3KFlgPMtWTWKrtLp50A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xDOBaWfl; arc=none smtp.client-ip=91.218.175.172
-Message-ID: <5b07d2ab-84ee-46ae-84c9-7542499d26d7@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783916064;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nUYIJ9DN/aj3dekLHrJVHchQB1flIZYdeNNZTWSaweE=;
-	b=xDOBaWfl3M9diHS22ZehJhE9K0+bazKqg07i01Jz9Bxz5GvdXr5OMrd8A2frtvubdRqQf2
-	KNaR7BSVLYCk4kvDUpn6sOVgWTELSYzKr3EAaQ382ThUJO86Njg7vByw2X+XVJWvxMzXAO
-	K3k54fLG9xNwnnEFPgf6NqboCdsm6Ow=
-Date: Mon, 13 Jul 2026 12:14:07 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E25C35F165;
+	Mon, 13 Jul 2026 05:01:41 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783918904; cv=fail; b=AM+8LCsCIPG4N0ZOmhrex1yGczcNYw7H/lOXX3N9RlNlg7LJfoYUPvMmAtTpAal3++guKGxHhNnKBhqIQTc4UOdWfJtpH9C5I0yUKpqtJGAi5RcAbvhOZmcMk1J8pPcIktJxtwqXBB+tEN7/Evq7YDlMcMZM1nnKCn38hGjp12A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783918904; c=relaxed/simple;
+	bh=6VvdUvMHuXXeo63R0cQfyCGwH7WEcqrnC5GpoUB+nXA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=S2Y4w8TpdOyCuqgi162T3xJZTxJdBO+jahbVJUol7kuoo9w1eaAckl2jC4XT+XURxJopa7BxgVAeJRZ16IAuDQGzDZ0UNtPMt7Whdaz7kHntNEYKkTqpNr/yxqPcOP0W3MlOISqrvUZ5gEFGrx/oJ6MDSI2oAx4g5FXi2Wvogk0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=Ri1y0Bmi; arc=fail smtp.client-ip=52.101.66.3
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ii+x3The3cgRjWNTeYbT2JutDFX52tYk6lPrVp/GjzUsKJXnWBS6E+ErF69B5SPb6DMnYUqowxjEMYAkOKZRdBAE4ojVmiO7pM+POgxymt74kY7T9wqLfhga8t4E8pOw5kOPTRYVtZiJjUaZvb4uTYjVzfANNZ6NVZviygx2oljKEzFCcqHwQh/rSW8jos/i+DkNTt2tOmBH/SkmErGpdvApZ3ukoqOk8KgfC6y9XhdmYsqdjziVZtoaNE8EF79HbqJbFIf+NAe/5lhgdMaWJuGQCJI20sGOhQddjvHNnugHpNHUMcPQs50cfWvg2XuKDCs5E31G01IIdy6tCpOMtg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hquoJP49SbeCbyLwMzVLp8HA4wQFuJBKqJyytcrt218=;
+ b=NSKDL0M9D0SRWx9G2VqHvY67UInqw+k3sXHZ9rpBp6bGIIWcRo+pzakiaZ4m8f/DwGZf55qJQGbi9IOLgXTmFEw8mRwUxhHe27skkiS4j0yHVSDhedVjZ7dLeaXt7dDiv2IWclathBxsdBVDnlN8uZoA6E/DGaQNdxb0CQ298kZXFiFc14pjLRDzI8Trw1P6Cg99o3JyQt0VsIL4p6g2NTODV9DkJjipmL72FGBNzR4AlNeZvTo6xQ7ZWfiEae1rYjnBp12PSG8bTxphhGtWWDpiqXcy0EvY0dwPAnaOXWwwdAUNvyILriV29X9KYMM6MiyTBwCZvVO3a3TeohLi5g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
+ dkim=pass header.d=est.tech; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hquoJP49SbeCbyLwMzVLp8HA4wQFuJBKqJyytcrt218=;
+ b=Ri1y0BmiRQtPYwVMgPw59AlqUWPyFT1EbqoBs2kdJ8cUvNqaHTdAQZF5qmeUkGwKR3d5d5ncvFB0jQMtK7t/uC3d9wLPOFPMAZyhkqVQx5KkvOVViRmeHXvjpsb5jygaMk1OmkA5V32dFmQx57h6wAKVtX7uOT2E/8tKFpoTqZKG+r8nUP2Kump++OMvMkdBPXiQAi6gsHpxwv5w3CIk+Vpun7w7By7SZLa7KY4tpFTAxJjdbaz/yKHlleRVFeCzXcDlcT3FBfhjy0FYbEqTIgjK1uFkTdGsf4oQzqYgSx0Ih1JVd+ddDvqi0QKkn5eKNITL4AwKOnFqlqSgX4m7MQ==
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
+ FRWP189MB3326.EURP189.PROD.OUTLOOK.COM (2603:10a6:d10:17c::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.181.10; Mon, 13 Jul 2026 05:01:38 +0000
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7%6]) with mapi id 15.21.0223.008; Mon, 13 Jul 2026
+ 05:01:38 +0000
+From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
+To: Daehyeon Ko <4ncienth@gmail.com>
+CC: Jon Maloy <jmaloy@redhat.com>, "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	"tipc-discussion@lists.sourceforge.net"
+	<tipc-discussion@lists.sourceforge.net>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: [PATCH net] tipc: clear sock->sk on the failed-insert path in
+ tipc_sk_create()
+Thread-Topic: [PATCH net] tipc: clear sock->sk on the failed-insert path in
+ tipc_sk_create()
+Thread-Index: AQHdEA2+rYe7FoCWcUyy82fCjcu5s7Zq50yQ
+Date: Mon, 13 Jul 2026 05:01:38 +0000
+Message-ID:
+ <GV1P189MB1988AF0F2722101E30D902E1C6FA2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+References: <20260710014440.2055584-1-4ncienth@gmail.com>
+In-Reply-To: <20260710014440.2055584-1-4ncienth@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: GV1P189MB1988:EE_|FRWP189MB3326:EE_
+x-ms-office365-filtering-correlation-id: b43bb2dc-9303-49e9-8fdf-08dee09bd213
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|23010399003|376014|366016|1800799024|7416014|38070700021|11063799006|56012099006|22082099003|18002099003;
+x-microsoft-antispam-message-info:
+ UqQ6rkMp1yI8bbEDuRSV3py7JlhzU2bXkzoMhdiOb1MdMfs4ESikwNQmJXIAHTjpSkAyM/mCzG9A+i5khLM6msKhjKKir316I/tH+iUNUpELE/e1vg+Y6cHsk5eWrWefveUCnE3iXd/A12LlexNgca9vFBqi3RuRpHsGz3P5/a6Kt1DuvaL7ixunjZ/67C8LqzDfCokgTNAGiJ3mFgI6KYjtdOgFGwfOimOjsox5zplFyVf0Pm675tnu42SjbgxN6hFRHWid9+U96RxouTOHsTdGdfIwjE5FxRfbGPQ5K3nIHYZuoR9DNQD1ysXfL3YY/OrIpRgFd5aIF0DWFIeOhZ1DY8NEKuUsm0EYjemNEom6Wk1gau7O6pyV/2uqg5Z1XE0AcifyAmyp6aBWSTwGZv/LiT4z8JcWxnwuUhg9DfpJCLXmfSGbvcdF+LJURlgvJWcBraa+Ax01DXu6HYMkpc5fRI1AUG4slBShclFiol26dLtEn6bqQZk99z8/1cYiyVy8omu+bBMPddcV9nwjXnYkJXPU9DN/5Ryp3kobXQ6mhQixsvaFivk5CBTKYMIeT9iZX/WwPc3wt+/b+TXmM7ud56t15/KmS8m9svzlRKEZ3qcnupWe9mfSYUuUFiMRGwzKWP8djRUzE9qVDE+/BXgIoebsGlWFBDOAY+GuHw/tSZrG3nXhaSdu+XrjPcuS0r7tiOXL7RMr2RuznmxtvbE2YPfPhSukf3B6cQOKV7k=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(366016)(1800799024)(7416014)(38070700021)(11063799006)(56012099006)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?ZIl3Qxe0jy6wMdRQPZ38ZTMGgJNR3Y2f2HaziREoIyNKRVuDErx43yKzsQbW?=
+ =?us-ascii?Q?TjCdF3iASvw/7xn1ugUS6wL4ZRA0jj7KtbhkpJ/14GAOj6RU3qUo4OUE9JoY?=
+ =?us-ascii?Q?1ZQD+t4+PDT+B2w7FVNm6cBn+kFZQmxQX9lPqmql32tyxSPkH9VTKVlw3gx/?=
+ =?us-ascii?Q?MUwyzgHGtdEpJ2dNAqCoyAtYShlK9C0iaM/9BFFUECtVHETuBzzzH7n5YAka?=
+ =?us-ascii?Q?V/fR8lNoyP8Xuhkj6mRXQvFDlNu0JjRDhZh7wUotdL7TnGPu8fxC+T82LEaH?=
+ =?us-ascii?Q?iq9/ro3DxJ7mS1ThUTmWhb4WojXODVirUZxUKbCPdXDap4M+Cn0xiYIq2ytZ?=
+ =?us-ascii?Q?GWXx+UMAeTKkjfIneABf0kNRneNVm9u5IZECkUZTtE/5whS9Yt8KboAuuHD/?=
+ =?us-ascii?Q?2u+3rMVPMT8GQ9wW1vi+aFnD+nbYaPkcpfoKWtDGvu0T23dS1RgjgXXre0Dd?=
+ =?us-ascii?Q?iM+3xVhLvo3s4Wj1C8LgFa7NzF4OO/4CXu6NUFWE0WnCNSXh8w+h5OYUNYOf?=
+ =?us-ascii?Q?klfDQh45MUIvgapdJctZHk3U4DGOBpbu/s2c8VJsbcg41nJVFRLwSeLnqczG?=
+ =?us-ascii?Q?Gsvk4ztkrJmrCN7luNiNjSXZMinC1XLaK3mHFcJVKMxGQ9x4Lbne1aK3VGgB?=
+ =?us-ascii?Q?EJq4uNtJai56d43Rz2nvO1gHp6Mw3Q8KpwZ9KCA05h+GAKqQ1O30vrYtF8gp?=
+ =?us-ascii?Q?0LAmhNBa20EdV+gISRaPII/OavSVavvLsePlxsLggCsV5PWr+OZUKh/pA82f?=
+ =?us-ascii?Q?nLhhJVs0Yah702o4ciohnuiPDq3p7N6trH/roYycXORFqm0JZBk3mliI77cY?=
+ =?us-ascii?Q?fyZVUNIMvCUtlFWWncT4B0cy8V57tEv20KrAkt/Kk78MnvDCOK0oEO17BlqT?=
+ =?us-ascii?Q?Bk9wVeSFFS2onvMenUOmNl2MePJ8g0TXatAzAE/eKFCogxLHKRcrXnTGg7Ar?=
+ =?us-ascii?Q?yWz2KzSIDCMEIVV2nAuCoI5MfJoRdIpqKCOVT0R5yA9KIN0pvaGT2clTKmVi?=
+ =?us-ascii?Q?QfvNT9xa5KoYSZ6/c0UUBlNzL+jRgTcIwe6fFL8H6Uz0cR89sRQMiuKaDec/?=
+ =?us-ascii?Q?Ldrrq4QYxj3HPzpaa7kP0MayKLeLzynPAobBYDm4roJdQf2rogaYF+FT3IAj?=
+ =?us-ascii?Q?eckDjxiEECUhJzFvmYOs6UAf4o/1/OtpYJ7LD3WvREFQnA63YvKmHr0tncrW?=
+ =?us-ascii?Q?vpzciSqrV8evBK4VcTunmXtw2Szm4YFPHARs4KUK8l1pzf3TnxBrlw1R/6JO?=
+ =?us-ascii?Q?rcRVOd3uNnN1SsuG22fsOn3VmRYf227pBtm184EwCZLp056rjqhB/CPzMyPv?=
+ =?us-ascii?Q?0I2ixhaY0loxnPMC72SiIsW6NIMKIrgm2D7hzezlm6YCjVUR0OsR7/Sba8uf?=
+ =?us-ascii?Q?WGIUTaFkfjqyToG/IEguMStUX0ddA2Tc7yXoKVgyejmfeqdtdF4B/hu0bLsU?=
+ =?us-ascii?Q?n5WCicAnZXPbpP4iaEGbwuWXwRq+SxzuEkr9f7Zows+Mwya0wnPlX24Pqdd9?=
+ =?us-ascii?Q?L/mzMAHVBR+riRrsWYbwgxE3xVbZBs+1VwC/442uV3yMrSk3jS3H6q7Vvi5R?=
+ =?us-ascii?Q?9Nw5XkQv4Zjb8Cy7HTNqdOSHQ9e2KGt80BkoQRgBBeS87RnnU6eE4qWfOdCD?=
+ =?us-ascii?Q?/tDj5P8RN8IrGhaE+kYpfR83NgqbtoJJuFQbWDrF+7enRcug6dNHgM2gvQgM?=
+ =?us-ascii?Q?NbqNSJxeyVznU5ZLFKaD8Htuu8inT+YOYoRIxnzC2497NdCrSHecF/QqHcMp?=
+ =?us-ascii?Q?fGsQN+S+0w=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [BUG] bpf, sockmap: spurious wakeup by tcp_msg_wait_data()
- causing unexpected EAGAIN in recvfrom()
-To: Nnamdi Onyeyiri <nnamdio@gmail.com>, sashiko-reviews@lists.linux.dev
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, john.fastabend@gmail.com,
- jakub@cloudflare.com, edumazet@google.com, ncardwell@google.com,
- kuniyu@google.com, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org
-References: <ak_rR-Skd8Mvn4mH@localhost.localdomain>
- <20260709185526.E4DAB1F000E9@smtp.kernel.org>
- <alFRK66z45eDNZA7@localhost.localdomain>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-In-Reply-To: <alFRK66z45eDNZA7@localhost.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-OriginatorOrg: est.tech
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: b43bb2dc-9303-49e9-8fdf-08dee09bd213
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jul 2026 05:01:38.1870
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: gYfBj0w0ekHXg/S1jYklrXtSoJNduQA9drTqpkJsRDHMY4c+yajlL3u75zS3kEGdXdmu1L1yo12LNGoWNRjCGdlAcIxMlMAEpaBk0nCgYaI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: FRWP189MB3326
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	TAGGED_FROM(0.00)[bounces-307010-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,lists.linux.dev];
-	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_RECIPIENTS(0.00)[m:nnamdio@gmail.com,m:sashiko-reviews@lists.linux.dev,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:edumazet@google.com,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	FORGED_SENDER(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,cloudflare.com,google.com,davemloft.net,kernel.org,redhat.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:4ncienth@gmail.com,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	DMARC_NA(0.00)[est.tech];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307011-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[est.tech:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:from_mime,linux.dev:dkim,linux.dev:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,est.tech:from_mime,est.tech:dkim,GV1P189MB1988.EURP189.PROD.OUTLOOK.COM:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A83CC74711B
+X-Rspamd-Queue-Id: D0B8F7472EB
 
-
-On 7/11/26 4:17 AM, Nnamdi Onyeyiri wrote:
-> Hi,
+>Subject: [PATCH net] tipc: clear sock->sk on the failed-insert path in
+>tipc_sk_create()
 >
-> The updated patch below addresses the issues raised by sashiko-bot.  The closed
-> socket and signal handling code was added to tcp_bpf_recvmsg(), and the fix was
-> updated to work for sockets with SO_RCVTIMEO set.
+>When tipc_sk_create() fails to insert the new socket (tipc_sk_insert() ret=
+urns
+>non-zero), its error path frees the sk with sk_free() but leaves
+>sock->sk pointing at the freed object:
 >
-> Please let me know if any more changes are required, or if the patch would need
-> to be submitted some other way, I'm happy to adjust as necessary.
+>	if (tipc_sk_insert(tsk)) {
+>		sk_free(sk);
+>		pr_warn("Socket create failed; port number exhausted\n");
+>		return -EINVAL;
+>	}
 >
-> Thanks!
-
-
-Thanks for the report.
-
-
-What's your use case here? With a verdict prog attached, we'd normally
-
-expect the data to be redirected in kernel rather than read back via
-
-  recvmsg(). Are you using SK_PASS? If so, please state that in the
-
-commit message instead of the email body.
-
-
-Also, this message could be included into commit message.
-
+>This is harmless for plain socket(): the syscall layer clears sock->ops be=
+fore
+>releasing, so tipc_release() is never called. It is not harmless on the ac=
+cept()
+>path. tipc_accept() creates the pre-allocated child socket with
+>tipc_sk_create(net, new_sock, 0, kern); on failure it leaves new_sock->sk
+>dangling and new_sock->ops non-NULL, and do_accept() then fput()s the new
+>file, so __sock_release() -> tipc_release() runs
+>lock_sock(new_sock->sk) on the freed sk -- a use-after-free write of the s=
+k_lock
+>spinlock.
 >
-> ----8<----
->  From 20a1275aa5ecb927ff049971454b62682356ef0e Mon Sep 17 00:00:00 2001
-> From: Nnamdi Onyeyiri <nnamdio@gmail.com>
-> Date: Fri, 10 Jul 2026 20:47:36 +0100
-> Subject: [PATCH v2 1/1] bpf, sockmap: handle spurious tcp_msg_wait_data()
->   wakeup
+>tipc_release() already guards this exact "failed accept() releases a pre-a=
+llocated
+>child" case with "if (sk =3D=3D NULL) return 0;", but the guard is bypasse=
+d because
+>tipc_sk_create() left sock->sk non-NULL
+>(dangling) rather than NULL.
 >
-> recvfrom()/recv() are documented as only returning EAGAIN for blocking sockets
-> when they have a receive timeout configured.  however, adding a blocking
-> ipv4 tcp socket without a receive timeout to a sockmap will cause EAGAIN errors
-> sporadically.  a socket with a receive timeout may return EAGAIN before the
-> timeout expires.
+>Clear sock->sk on the failed-insert path so the existing tipc_release() NU=
+LL
+>check fires and the use-after-free is avoided.
 >
-> this happens when tcp_msg_wait_data() wakes spuriously (returning 0) in which
-> case, if there is no timeout, or the timeout has not yet expired, we loop
-> again instead of returning.
-
-Also please add a selftest and send both as a patchset.
-
-
+>The tipc_sk_insert() failure is reached when the per-netns socket rhashtab=
+le
+>hits its max_size (tsk_rht_params.max_size =3D 1048576, ~2M
+>elements) -- i.e. once a netns holds ~2M TIPC sockets every insert returns=
+ -
+>E2BIG.
 >
-> Signed-off-by: Nnamdi Onyeyiri <nnamdio@gmail.com>
-> ---
->   net/ipv4/tcp_bpf.c | 55 ++++++++++++++++++++++++++++++++++++++--------
->   1 file changed, 46 insertions(+), 9 deletions(-)
+>  BUG: KASAN: slab-use-after-free in lock_sock_nested+0x98/0x150
+>  Write of size 8 at addr ffff8880047cdc38 by task init/1
+>   lock_sock_nested+0x98/0x150
+>   tipc_release+0xa4/0x7a0
+>   __sock_release+0x61/0x120
+>   sock_close+0x10/0x20
+>   __fput+0x1d6/0x490
+>  Allocated by task 1:
+>   sk_alloc+0x2b/0x380
+>   tipc_sk_create+0x82/0xb90
+>   tipc_accept+0x14c/0x650
+>  Freed by task 1:
+>   __sk_destruct+0x22d/0x2d0
+>   tipc_sk_create+0x7b8/0xb90
+>   tipc_accept+0x14c/0x650
+>   do_accept+0x1d2/0x2a0
 >
-> diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
-> index cc0bd73f36b6..e3109edb9621 100644
-> --- a/net/ipv4/tcp_bpf.c
-> +++ b/net/ipv4/tcp_bpf.c
-> @@ -179,7 +179,7 @@ EXPORT_SYMBOL_GPL(tcp_bpf_sendmsg_redir);
->   
->   #ifdef CONFIG_BPF_SYSCALL
->   static int tcp_msg_wait_data(struct sock *sk, struct sk_psock *psock,
-> -			     long timeo)
-> +			     long *timeo)
->   {
->   	DEFINE_WAIT_FUNC(wait, woken_wake_function);
->   	int ret = 0;
-> @@ -187,12 +187,12 @@ static int tcp_msg_wait_data(struct sock *sk, struct sk_psock *psock,
->   	if (sk->sk_shutdown & RCV_SHUTDOWN)
->   		return 1;
->   
-> -	if (!timeo)
-> +	if (!(*timeo))
->   		return ret;
 
-'if (!*timeo)'  is enough
+Thanks for your C reproducer. I can reproduce it and apply the fix. It work=
+s.
+However, Could you help decode above stack trace (using linux/decode_stackt=
+race.sh) to show readable text for later reference ?
 
+>Fixes: 07f6c4bc048a ("tipc: convert tipc reference table to use generic
+>rhashtable")
+>Cc: stable@vger.kernel.org
+>Signed-off-by: Daehyeon Ko <4ncienth@gmail.com>
+>---
+>This was reported to security@kernel.org (Cc: the TIPC maintainer) with no
+>response; posting the fix directly to netdev as it is a straightforward on=
+e-line
+>fix. Full C reproducer available on request.
+>
+> net/tipc/socket.c | 1 +
+> 1 file changed, 1 insertion(+)
+>
+>diff --git a/net/tipc/socket.c b/net/tipc/socket.c index
+>e564341e0216..55e695748332 100644
+>--- a/net/tipc/socket.c
+>+++ b/net/tipc/socket.c
+>@@ -502,6 +502,7 @@ static int tipc_sk_create(struct net *net, struct sock=
+et
+>*sock,
+> 	tipc_set_sk_state(sk, TIPC_OPEN);
+> 	if (tipc_sk_insert(tsk)) {
+> 		sk_free(sk);
+>+		sock->sk =3D NULL;
+> 		pr_warn("Socket create failed; port number exhausted\n");
+> 		return -EINVAL;
+> 	}
+>--
+>2.54.0
+>
 
->   
->   	add_wait_queue(sk_sleep(sk), &wait);
->   	sk_set_bit(SOCKWQ_ASYNC_WAITDATA, sk);
-> -	ret = sk_wait_event(sk, &timeo,
-> +	ret = sk_wait_event(sk, timeo,
->   			    !list_empty(&psock->ingress_msg) ||
->   			    !skb_queue_empty_lockless(&sk->sk_receive_queue), &wait);
->   	sk_clear_bit(SOCKWQ_ASYNC_WAITDATA, sk);
-> @@ -229,6 +229,7 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
->   	int copied_from_self = 0;
->   	int copied = 0;
->   	u32 seq;
-> +	long timeo;
->   
->   	if (unlikely(flags & MSG_ERRQUEUE))
->   		return inet_recv_error(sk, msg, len);
-> @@ -262,6 +263,8 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
->   		}
->   	}
->   
-> +	timeo = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
-> +
->   msg_bytes_ready:
->   	copied = __sk_msg_recvmsg(sk, psock, msg, len, flags, &copied_from_self);
->   	/* The typical case for EFAULT is the socket was gracefully
-> @@ -280,7 +283,6 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
->   	}
->   	seq += copied_from_self;
->   	if (!copied) {
-> -		long timeo;
->   		int data;
->   
->   		if (sock_flag(sk, SOCK_DONE))
-> @@ -299,7 +301,6 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
->   			goto out;
->   		}
->   
-> -		timeo = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
->   		if (!timeo) {
->   			copied = -EAGAIN;
->   			goto out;
-> @@ -310,13 +311,15 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
->   			goto out;
->   		}
->   
-> -		data = tcp_msg_wait_data(sk, psock, timeo);
-> +		data = tcp_msg_wait_data(sk, psock, &timeo);
->   		if (data < 0) {
->   			copied = data;
->   			goto unlock;
->   		}
->   		if (data && !sk_psock_queue_empty(psock))
->   			goto msg_bytes_ready;
-> +		if (!data && timeo > 0)
-> +			goto msg_bytes_ready;
->   		copied = -EAGAIN;
->   	}
->   out:
-> @@ -355,6 +358,7 @@ static int tcp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
->   {
->   	struct sk_psock *psock;
->   	int copied, ret;
-> +	long timeo;
->   
->   	if (unlikely(flags & MSG_ERRQUEUE))
->   		return inet_recv_error(sk, msg, len);
-> @@ -371,14 +375,45 @@ static int tcp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
->   		return tcp_recvmsg(sk, msg, len, flags);
->   	}
->   	lock_sock(sk);
-> +
-> +	timeo = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
-> +
->   msg_bytes_ready:
->   	copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
->   	if (!copied) {
-> -		long timeo;
->   		int data;
->   
-> -		timeo = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
-> -		data = tcp_msg_wait_data(sk, psock, timeo);
-> +		if (sock_flag(sk, SOCK_DONE)) {
-> +			ret = 0;
-> +			goto unlock;
-> +		}
-> +
-> +		if (sk->sk_err) {
-> +			ret = sock_error(sk);
-> +			goto unlock;
-> +		}
-> +
-> +		if (sk->sk_shutdown & RCV_SHUTDOWN) {
-> +			ret = 0;
-> +			goto unlock;
-> +		}
-> +
-> +		if (sk->sk_state == TCP_CLOSE) {
-> +			ret = -ENOTCONN;
-> +			goto unlock;
-> +		}
-> +
-> +		if (!timeo) {
-> +			ret = -EAGAIN;
-> +			goto unlock;
-> +		}
-> +
-> +		if (signal_pending(current)) {
-> +			ret = sock_intr_errno(timeo);
-> +			goto unlock;
-> +		}
-> +
-> +		data = tcp_msg_wait_data(sk, psock, &timeo);
->   		if (data < 0) {
->   			ret = data;
->   			goto unlock;
-> @@ -390,6 +425,8 @@ static int tcp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
->   			sk_psock_put(sk, psock);
->   			return tcp_recvmsg(sk, msg, len, flags);
->   		}
-> +		if (!data && timeo > 0)
-> +			goto msg_bytes_ready;
->   		copied = -EAGAIN;
->   	}
->   	ret = copied;
 
