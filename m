@@ -1,292 +1,337 @@
-Return-Path: <netdev+bounces-307263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307264-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id dHgcMn81VWrPlQAAu9opvQ
-	(envelope-from <netdev+bounces-307263-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 20:59:11 +0200
+	id Z9SSFfs1VWrzlQAAu9opvQ
+	(envelope-from <netdev+bounces-307264-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 21:01:15 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 203E474E9F2
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 20:59:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60BE674EA19
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 21:01:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b="WdU4k/7w";
-	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=IjgjV8tY;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307263-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307263-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=qualcomm.com;
+	dkim=pass header.d=etsalapatis-com.20251104.gappssmtp.com header.s=20251104 header.b="Su0MyR4/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307264-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307264-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 77208305C802
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 18:58:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2C3D73042271
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 19:01:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68376355819;
-	Mon, 13 Jul 2026 18:58:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F8A2E8DEB;
+	Mon, 13 Jul 2026 19:01:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0453546C2
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 18:58:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684BA28DC4
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 19:01:10 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783969123; cv=none; b=RYB5IvnW9yeZFzx+VKO9yuk5t88bOWQnAmXtensCL4bqmZ5SRIMIkRlC3424bdRHv8SyUpEr9O5BoVBMtAkRx7PGJHjKY4HpUl9SztaFhX5ATfZ00V95JXszGyF6w+1JhTy+A6eYejfLq06q2cG6Y9Q1wtUosC3t1XV2ICkbIiA=
+	t=1783969272; cv=none; b=VuY6aufBnsk9sZ/c8KaF3+IQyyiPHSfBjvJXelgfM2gHRwSUEdd4MIgKG6x0SMWjB2tbx4+4Oe7RQeQb1kiGdEu0m9SVOKsvxXaQukf6FgO6yWk62XNqXhatFpEu0AvPqS8thNmlPPiFor1Z5EG9hJOiD+Cx2sj9WMJOFqLaMU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783969123; c=relaxed/simple;
-	bh=Q4FlDRCpngp1x0aC0AgdewQ8wbrSnrUV0YCYHer0W7s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gAKLr4aLI7CaSH6z3U5a+/SpHmPVOaozL3UYTikj1wqX3Mq3gHcLz0SH9SBqQsy5DLiNgu4cPlS9wzfMwFJKCRHDXH7q0KERzyfFDW0Hi6H/b/EE78XkW9weANF6gwOiaIZVZlZi+9T0+inVitzK9UksFVaIwlUcW4yrpSlk/RY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=WdU4k/7w; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=IjgjV8tY; arc=none smtp.client-ip=205.220.180.131
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66DH6Nc22191573
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 18:58:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	EGm08z2QRTZQR1FZakby7UHoEn+vMY549zyGYn80n3k=; b=WdU4k/7wJY4565Q3
-	OBIv/l/9/g9bOCtXtJdW5RUd40bhhXJJtBGCi5XyLAHtadKYz5hVdLU8knWINlps
-	bNUIkviKqHLWLxv9gNI9iqXdGJ2UVEa6jsENcnQVNwq4EoYLEz470KHRNeHUHT8o
-	sa+g5Qw8UDN99M8RL+ra2kDJC1ovboKK5zPW4s1STq08y2RwX3+UBJFecEuQ8H0O
-	9XnFwJm6nPXYLi65NhRQ+zIzTRuprHoYo7OT+5G6P0c+/w8vIfA0qbM/PnP+tnvS
-	HmjjtQxXp4vx87eHAWKG9gGELlUiYgWMLYLOoSeiuwkqWt+92FJ1lGBo9st/xAKt
-	nCGidg==
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fd44jrd5b-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 18:58:40 +0000 (GMT)
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-c8952346bb9so2906250a12.2
-        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 11:58:40 -0700 (PDT)
+	s=arc-20240116; t=1783969272; c=relaxed/simple;
+	bh=keB0QlMp0KvxU7I46dLXT8uUdep8rMfKLdyK7+9q1IA=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
+	 References:In-Reply-To; b=NmHy7OWiICFZfG5Dno4Z9ea3/WsUb4JNNYg8uLjMDwbk+7JuA8ZXLX0rftQcSi7LH8LE5XE2fmXw7MOEPUJzONY5f1jjyq9mP7LqNWXCIgGahNTumJDQSXJNo5bKNs+ZZPS8ghSxKcWGK6nrgdYV+DPDerOYtPB//bU8N8+dcig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=Su0MyR4/; arc=none smtp.client-ip=209.85.216.54
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-38e08baf860so953110a91.2
+        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 12:01:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1783969120; x=1784573920; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=EGm08z2QRTZQR1FZakby7UHoEn+vMY549zyGYn80n3k=;
-        b=IjgjV8tYOBtwKq394jANMNx59r6lzns1gtRUHwX5v7l1Q9zJYLUKbHXNR52tQSXVUr
-         ZOeEtRot9hVlcPw7uMa7gqFshIpNN2qUSDiBIrTPtG3R3yllId9kw/DF45Fguja1uhnR
-         33otf8h84juUsW3oMxzdl7kXKZYUMfhnXsX3UnO9Uk3w5ah+ZWvmdFMM+I0FNMc9W7OW
-         360eAFp5JhphHlymvmT1BfFDfd0XE0BKmVXOQ1pf/C+89h3UDNcgc22JV/nVcYNFtJuq
-         UVPHEr1dyJsG2BkXGHj7FK6bNxx+Taj9EcloALrolP2R2SfSTrU6MC1ocUF2YO1KuG+d
-         qd/g==
+        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1783969270; x=1784574070; darn=vger.kernel.org;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
+         :content-type:content-transfer-encoding:mime-version:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=VJARKbZxQw+5xLSwPuHaI/jl5Lgqh19eFRVAg6BGDE0=;
+        b=Su0MyR4/Td1dbX30PfVtcVJlega3yJRbvdpYlT9DAaoMEP9UhmTAs12DRzMcN18dLW
+         imF/vnKnS+CRq8jQ+sZkDa1DrGG886SVJon4B8hCX1o+QSz1gEeo2yKWKd/gsFWGXofa
+         6/VBwdo3Gj1ovzmYjGaxFix38XOcqStBBkcBBcZT4pg4VuzJ4e3OWqiyoq5Kbe/ZsW8d
+         LeuBvUa6x9UEUAl5Rb2XptfmSqlUBbZ4wHPRMAgTwSZLNfggAFQWP2O5SfhON+sGU27L
+         lLKzgXKKuj3LKnTXXSkV02z4+o40OkXYLa8CgTuC++HM9UnbDsv27MZpQxm3KZleqW+i
+         lhhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783969120; x=1784573920;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=EGm08z2QRTZQR1FZakby7UHoEn+vMY549zyGYn80n3k=;
-        b=liqWz4Yap1ULKk03ep4mqzdWS673x3maiSZRPOG+GKZDrTgxv1UuzUJgyhQZU3KPJK
-         zrOXEWRJVkJ8hkoervTYMS9eUY/wO0dn+elqgfeWTdSCZfVoLfgqiMDWAX7sbUPRaQUL
-         jHySB35JeV/DS5EYzyUBHbaW2GHivKIoLfAdMx8BtikFM9xjbMH+A4maFel3xt05jhID
-         OMEU2JJQXHSY/oN9ARSaLCBK3uWp4BbJh1xIeW2xx2/wErqnogE54fvdIWbuBzgdXBTr
-         5cpcIMSH52Nxjdw5XuDRho4Si+N4xdkpcJXyG6SnwlohhP7R2pU3q0K2DP0SCqsfV+jo
-         bvdg==
-X-Forwarded-Encrypted: i=1; AHgh+Rpz82e9lzBa6x/J328osimjdNy1J2mFXH2uxduBAA/XGFywsAX+OBSHEAaW4qwlWAY8UxvcJBQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxU/dNSzJAjQ7l1LXSzFVC22iUbpbzhnxjbwyrpkr0pxUTwmsfE
-	8t2OzlHGAz5B/T3fot0Rd+qpGc3NuS5nCALcSgJAxXNcs0hpmpQEvmUUAtgHpLpwF0Rhh2D4ELw
-	L8flimF7r27D0pBCwNengTKegtfIRa3tgzIxVhXKtS5yDrpcv/3NF3Cnbs70=
-X-Gm-Gg: AfdE7clZBe53Sn5qmgcDQwko47jdGFAkfs4VZSLSsHyiDOw50TanipIlS9jgZXkwlsZ
-	uR4SzxPv1E5KvlEJzaNXfkDbRST5JK2bfYg7nSE5nuQEa7vbMK/cVfri0dxYu7OyZdxE40bX/cV
-	nwSm62ebexCnuVT5bl56OzNuch6mGWtdrDds+cYxWQTWYn4F3Mmu2XRNAHo+M5ZbkJoQT3IJwj+
-	MDgGvclU0nG4Sl9HuDUJBF2Lf/uDCiohRs6VWLOONC8qeRJhUsKymTk6lk+xhbrylygdFu3+kpQ
-	8Zlc2BnJOm1Ljp458oTJmxa+wxek/0cKQUPcP2MjZ+DPMNzaeuaQVgZ5HWf5F7px0zJFUWoBkef
-	vtSx7Tgo7Jqsyik5scmIpuVqa0fFjiFtkUXaL5962H8CrmpbhG/l9MRF7+HrsK8dxhWOd
-X-Received: by 2002:a05:6a20:b7a7:b0:3bf:63af:859 with SMTP id adf61e73a8af0-3c110ad2e6amr11568632637.45.1783969119592;
-        Mon, 13 Jul 2026 11:58:39 -0700 (PDT)
-X-Received: by 2002:a05:6a20:b7a7:b0:3bf:63af:859 with SMTP id adf61e73a8af0-3c110ad2e6amr11568594637.45.1783969119131;
-        Mon, 13 Jul 2026 11:58:39 -0700 (PDT)
-Received: from [192.168.1.11] (15.sub-75-218-246.myvzw.com. [75.218.246.15])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3118ee6091dsm83117734eec.14.2026.07.13.11.58.36
+        d=1e100.net; s=20251104; t=1783969270; x=1784574070;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
+         :content-type:content-transfer-encoding:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=VJARKbZxQw+5xLSwPuHaI/jl5Lgqh19eFRVAg6BGDE0=;
+        b=CEbwsTkKQ14yegcwQeIzzJfryBM2GvPrghD+I6yau7UAKb24b6SFxEtNUCr0PjxXws
+         WU11BRRd7EC+ExStRKDRLJ5/7Ni0fsogL/hg7Rb3AGhVYqD6B9YZbxY2BJbZqzZUMeRt
+         K/P8yDlepfjxzF43AydroG2M2/T79qzQrliL4tsjhyGDl1hSFUWicUnsGhpfmc0P2Uvu
+         07u0Q/Ho53r01UPyxxcMGS7lkMot1hUy8g2lM6XAdS8l2/YetTtnQtSSAEfZA+elnFou
+         5iTtOdofqQue8Cm5zMPGHTBWXfCGlJwCtOQuCFtei1yjQSR4D25X+mW5q+jXK8PTGnpu
+         77Eg==
+X-Gm-Message-State: AOJu0YxKaecUKEOdVUuj2EVYZAxLuLZk3XdEdYVHiP0sU1Ux44fvXvXH
+	qbYzPXOTkXDbTWWQRyHU/cA1x8sa7I/nKATWJl60TXr4VoEhxxi4+0/PczBs6iK4VTHucICpwsO
+	ZB1P6LiI=
+X-Gm-Gg: AfdE7cmoamXh1OaTDCyFOVzOoETdzKa2U8v0K8RN/J4bZdoEIDEVLX1GAZpvbvRhCPN
+	0OiOwSGfulNi7YkBEXkuLIgU6NPzaF3q+a/+k+BsN2Jxqxp93oWhyvyiGYE1tJpk96bmiXb0hgJ
+	FRISpR17u8Z245zyiFNkuzAuITKS97nwAXffjLLz2dPrY8gcbSfhtEX+7e2eBGaXK/Dht6kDJNf
+	FNx4vgh/fsmIaI+1gFrsEUK513wmTaKGzbGNqCjEW+XoFe2d/xmgt2Fis2YHIEv371N9pNPoHE7
+	bJ57ajMQ5Qy2yaja5MUadsdBoocY4dMw0cot7YWtlUJUCyHaw4IfZikUI5Fuzf/88r0okfjbo0i
+	Qj3B/MOw5zH8OlXiGHhUmuyyeyH9A6a2Imf8d2zle+U1BvZ2lrCHmuSJ49Ybc12eSckeSA3hiIT
+	sROGilEVj0SUrd/R5qOcHSavZ8WmLeP3Shm66k3qfc5w==
+X-Received: by 2002:a17:90b:554d:b0:381:cef1:11b0 with SMTP id 98e67ed59e1d1-38dc77a4517mr9473576a91.33.1783969269613;
+        Mon, 13 Jul 2026 12:01:09 -0700 (PDT)
+Received: from localhost (107-190-31-17.cpe.teksavvy.com. [107.190.31.17])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38deea72fc3sm1146162a91.2.2026.07.13.12.01.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Jul 2026 11:58:38 -0700 (PDT)
-Message-ID: <09e17504-d1b3-4e3a-b547-3c3c1040015c@oss.qualcomm.com>
-Date: Mon, 13 Jul 2026 11:58:34 -0700
+        Mon, 13 Jul 2026 12:01:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 12/14] wifi: ath12k: Switch to generic PAS TZ APIs
-To: Sumit Garg <sumit.garg@kernel.org>, andersson@kernel.org,
-        konradybcio@kernel.org
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
-        linux-media@vger.kernel.org, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
-        linux-remoteproc@vger.kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-        conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
-        akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
-        jesszhan0024@gmail.com, marijn.suijten@somainline.org,
-        airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
-        bod@kernel.org, mchehab@kernel.org, elder@kernel.org,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, jjohnson@kernel.org,
-        mathieu.poirier@linaro.org, trilokkumar.soni@oss.qualcomm.com,
-        mukesh.ojha@oss.qualcomm.com, pavan.kondeti@oss.qualcomm.com,
-        jorge.ramirez@oss.qualcomm.com, tonyh@qti.qualcomm.com,
-        vignesh.viswanathan@oss.qualcomm.com,
-        srinivas.kandagatla@oss.qualcomm.com,
-        amirreza.zarrabi@oss.qualcomm.com, jenswi@kernel.org,
-        op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
-        skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
-        Sumit Garg <sumit.garg@oss.qualcomm.com>
-References: <20260702115835.167602-1-sumit.garg@kernel.org>
- <20260702115835.167602-13-sumit.garg@kernel.org>
-From: Jeff Johnson <jeff.johnson@oss.qualcomm.com>
-Content-Language: en-US
-In-Reply-To: <20260702115835.167602-13-sumit.garg@kernel.org>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: YRUc0izgLDM_PdlF3dida49yTx1XIYjn
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEzMDE5NyBTYWx0ZWRfX6jXArxNzXl3r
- siTPX3TRCxE9ymiEJt69ZQGEw1OijUXpfJrlnwKF/E/ZHP2ouGBFc8vE5ud20BxFQY+8CrHu7Ck
- nA17NeUmX3fValMZzvwzNAL5MGuJZiGbrCW7creamY/E2zbPR1Uvwj6F3TCdjCmKnsy1i5T5+pl
- nDS2vDCSd7GKdydTK/YmifutBqgqhvXGCkwcIlUz2I2GsETYE+J46EivWn7L8O6BTyG2J9U/qVZ
- 9qapf+imcKGnyimpyl4tNXg+Yy4OMf5ajH6hrnLF3rZhgKSzLfipRVFOBUCSPG6PxX0x/iETbTv
- hDIITGHO4YJJEP1mu7B4tGXvXWsKOSXOVLmA8nvPdNGZGmdAStv0zTkrp16Rt2OD/HKMqclobEN
- +h9dldkOY1lnXITYYM6JfewM8gk/w80a7vaHvCVE05F7YRrELa+VQv1pjdr8+OfCXVQTwTAxWCN
- Wnf0+QpXAIlLo3sK8WA==
-X-Authority-Analysis: v=2.4 cv=XonK/1F9 c=1 sm=1 tr=0 ts=6a553560 cx=c_pps
- a=Qgeoaf8Lrialg5Z894R3/Q==:117 a=6VQYfvmiyQ8t40WkS/mQdw==:17
- a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22
- a=EUspDBNiAAAA:8 a=VwQbUJbxAAAA:8 a=CBpSC656wZACrugyqBAA:9 a=3ZKOabzyN94A:10
- a=QEXdDO2ut3YA:10 a=x9snwWr2DeNwDh03kgHS:22
-X-Proofpoint-ORIG-GUID: YRUc0izgLDM_PdlF3dida49yTx1XIYjn
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEzMDE5NyBTYWx0ZWRfX65KRar7gkDGv
- /IwiFfIm/41pA5021UhjSl0/IbiFBwLZ3dC8D4t2709IL1ypm6MQiw9hx/U/7q8sFYDHwk/hSAv
- epsiQN4FFbbuIe2VDCJPNRFgKN6RUDo=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-13_04,2026-07-10_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 clxscore=1011 impostorscore=0 malwarescore=0 priorityscore=1501
- adultscore=0 phishscore=0 bulkscore=0 lowpriorityscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607130197
+Date: Mon, 13 Jul 2026 15:01:08 -0400
+Message-Id: <DJXOBRV3S89L.3OLMFO3UY0WS8@etsalapatis.com>
+Subject: Re: [PATCH bpf-next v3 02/15] bpf: Make struct_ops tasks_rcu grace
+ period optional
+From: "Emil Tsalapatis" <emil@etsalapatis.com>
+To: "Amery Hung" <ameryhung@gmail.com>, <bpf@vger.kernel.org>
+Cc: <netdev@vger.kernel.org>, <alexei.starovoitov@gmail.com>,
+ <andrii@kernel.org>, <daniel@iogearbox.net>, <eddyz87@gmail.com>,
+ <memxor@gmail.com>, <martin.lau@kernel.org>, <shakeel.butt@linux.dev>,
+ <roman.gushchin@linux.dev>, <kuniyu@google.com>,
+ <kerneljasonxing@gmail.com>, <kernel-team@meta.com>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260706171918.317102-1-ameryhung@gmail.com>
+ <20260706171918.317102-3-ameryhung@gmail.com>
+In-Reply-To: <20260706171918.317102-3-ameryhung@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[49];
-	TAGGED_FROM(0.00)[bounces-307263-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:sumit.garg@kernel.org,m:andersson@kernel.org,m:konradybcio@kernel.org,m:linux-arm-msm@vger.kernel.org,m:devicetree@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:freedreno@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath12k@lists.infradead.org,m:linux-remoteproc@vger.kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:robin.clark@oss.qualcomm.com,m:sean@poorly.run,m:akhilpo@oss.qualcomm.com,m:lumag@kernel.org,m:abhinav.kumar@linux.dev,m:jesszhan0024@gmail.com,m:marijn.suijten@somainline.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:vikash.garodia@oss.qualcomm.com,m:bod@kernel.org,m:mchehab@kernel.org,m:elder@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jjohnson@kernel.org,m:mathieu.poirier@linaro.org,m:trilokkumar.soni@oss.qualcomm.com,m:mukesh.ojha@oss.qualcomm.com,m:pavan.kondeti@oss.qualcomm
- .com,m:jorge.ramirez@oss.qualcomm.com,m:tonyh@qti.qualcomm.com,m:vignesh.viswanathan@oss.qualcomm.com,m:srinivas.kandagatla@oss.qualcomm.com,m:amirreza.zarrabi@oss.qualcomm.com,m:jenswi@kernel.org,m:op-tee@lists.trustedfirmware.org,m:apurupa@qti.qualcomm.com,m:skare@qti.qualcomm.com,m:linux-kernel@vger.kernel.org,m:sumit.garg@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:ameryhung@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:alexei.starovoitov@gmail.com,m:andrii@kernel.org,m:daniel@iogearbox.net,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@kernel.org,m:shakeel.butt@linux.dev,m:roman.gushchin@linux.dev,m:kuniyu@google.com,m:kerneljasonxing@gmail.com,m:kernel-team@meta.com,m:alexeistarovoitov@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DMARC_NA(0.00)[etsalapatis.com];
+	FORGED_SENDER(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[jeff.johnson@oss.qualcomm.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,qualcomm.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oss.qualcomm.com:from_mime,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,vger.kernel.org:from_smtp];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jeff.johnson@oss.qualcomm.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-307264-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,linux.dev,google.com,meta.com];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,etsalapatis.com:from_mime,etsalapatis.com:email,etsalapatis.com:mid,etsalapatis-com.20251104.gappssmtp.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 203E474E9F2
+X-Rspamd-Queue-Id: 60BE674EA19
 
-On 7/2/2026 4:58 AM, Sumit Garg wrote:
-> From: Sumit Garg <sumit.garg@oss.qualcomm.com>
-> 
-> Switch ath12k client driver over to generic PAS TZ APIs. Generic PAS TZ
-> service allows to support multiple TZ implementation backends like QTEE
-> based SCM PAS service, OP-TEE based PAS service and any further future TZ
-> backend service.
-> 
-> Acked-by: Jeff Johnson <jjohnson@kernel.org>
-> Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
+On Mon Jul 6, 2026 at 1:19 PM EDT, Amery Hung wrote:
+> From: Martin KaFai Lau <martin.lau@kernel.org>
+>
+> bpf_struct_ops_map_free() currently waits for both a regular RCU grace
+> period and a tasks RCU grace period for every struct_ops map through
+> synchronize_rcu_mult(call_rcu, call_rcu_tasks).
+>
+> A regular RCU grace period is still required for all struct_ops maps
+> because the struct_ops trampoline ksyms requires a rcu grace period
+> (take a look at the list_del_rcu in __bpf_ksym_del).
+> Add a map_free_pre_rcu() callback so the struct_ops map can remove
+> ksyms before bpf_map_put() wait for the regular rcu grace period.
+>
+> The tasks RCU grace period is only needed by tcp_congestion_ops.
+> Add free_after_tasks_rcu_gp only to struct bpf_struct_ops instead
+> of the bpf_map.
+>
+> When CONFIG_TASKS_RCU=3Dn, synchronize_rcu_tasks() is the same as
+> synchronize_rcu(). Since all struct_ops maps now complete a regular RCU
+> grace period before bpf_struct_ops_map_free() runs, skip the extra
+> synchronize_rcu_tasks() call in this case.
+>
+> This cleanup prepares for a later patch that needs to support
+> free_after_mult_rcu_gp.
+>
+> Reviewed-by: Eduard Zingerman <eddyz87@gmail.com>
+> Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+
+Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
+
+The Sashiko issue looks spurious to me. bpf_prog_dissoc_progs() is not
+related to the availability of the struct_ops methods. It is valid for
+it to be after the end of the grace period.
+
 > ---
->  drivers/net/wireless/ath/ath12k/Kconfig |  2 +-
->  drivers/net/wireless/ath/ath12k/ahb.c   | 10 +++++-----
->  2 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/wireless/ath/ath12k/Kconfig b/drivers/net/wireless/ath/ath12k/Kconfig
-> index 4a2b240f967a..0d5d1c55bfc1 100644
-> --- a/drivers/net/wireless/ath/ath12k/Kconfig
-> +++ b/drivers/net/wireless/ath/ath12k/Kconfig
-> @@ -18,7 +18,7 @@ config ATH12K_AHB
->  	bool "Qualcomm ath12k AHB support"
->  	depends on ATH12K && REMOTEPROC
->  	select QCOM_MDT_LOADER
-> -	select QCOM_SCM
-> +	select QCOM_PAS
->  	help
->  	  Enable support for Ath12k AHB bus chipsets, example IPQ5332.
->  
-> diff --git a/drivers/net/wireless/ath/ath12k/ahb.c b/drivers/net/wireless/ath/ath12k/ahb.c
-> index 30733a244454..69e21214e629 100644
-> --- a/drivers/net/wireless/ath/ath12k/ahb.c
-> +++ b/drivers/net/wireless/ath/ath12k/ahb.c
-> @@ -5,7 +5,7 @@
+>  include/linux/bpf.h         |  7 +++++++
+>  kernel/bpf/bpf_struct_ops.c | 31 +++++++++++++------------------
+>  kernel/bpf/syscall.c        |  3 +++
+>  net/ipv4/bpf_tcp_ca.c       | 16 ++++++++++++++++
+>  4 files changed, 39 insertions(+), 18 deletions(-)
+>
+> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+> index 7719f6528445..7ac8873839f4 100644
+> --- a/include/linux/bpf.h
+> +++ b/include/linux/bpf.h
+> @@ -90,6 +90,7 @@ struct bpf_map_ops {
+>  	struct bpf_map *(*map_alloc)(union bpf_attr *attr);
+>  	void (*map_release)(struct bpf_map *map, struct file *map_file);
+>  	void (*map_free)(struct bpf_map *map);
+> +	void (*map_free_pre_rcu)(struct bpf_map *map);
+>  	int (*map_get_next_key)(struct bpf_map *map, void *key, void *next_key)=
+;
+>  	void (*map_release_uref)(struct bpf_map *map);
+>  	void *(*map_lookup_elem_sys_only)(struct bpf_map *map, void *key);
+> @@ -2099,6 +2100,11 @@ struct btf_member;
+>   *	   unloaded while in use.
+>   * @name: The name of the struct bpf_struct_ops object.
+>   * @func_models: Func models
+> + * @free_after_tasks_rcu_gp: Set to true if it needs the bpf core to wai=
+t for
+> + *                           a tasks_rcu gp before freeing the struct_op=
+s map
+> + *                           and its progs. It is unnecessary if the @un=
+reg
+> + *                           has waited for the correct rcu gp or the @u=
+nreg
+> + *                           has ensured all struct_ops prog has finishe=
+d running.
 >   */
->  
->  #include <linux/dma-mapping.h>
-> -#include <linux/firmware/qcom/qcom_scm.h>
-> +#include <linux/firmware/qcom/qcom_pas.h>
->  #include <linux/of.h>
->  #include <linux/of_device.h>
->  #include <linux/platform_device.h>
-> @@ -420,7 +420,7 @@ static int ath12k_ahb_power_up(struct ath12k_base *ab)
->  
->  	if (ab_ahb->scm_auth_enabled) {
->  		/* Authenticate FW image using peripheral ID */
-> -		ret = qcom_scm_pas_auth_and_reset(pasid);
-> +		ret = qcom_pas_auth_and_reset(pasid);
->  		if (ret) {
->  			ath12k_err(ab, "failed to boot the remote processor %d\n", ret);
->  			goto err_fw2;
-> @@ -485,10 +485,10 @@ static void ath12k_ahb_power_down(struct ath12k_base *ab, bool is_suspend)
->  		pasid = (u32_encode_bits(ab_ahb->userpd_id, ATH12K_USERPD_ID_MASK)) |
->  			 ATH12K_AHB_UPD_SWID;
->  		/* Release the firmware */
-> -		ret = qcom_scm_pas_shutdown(pasid);
-> +		ret = qcom_pas_shutdown(pasid);
->  		if (ret)
-> -			ath12k_err(ab, "scm pas shutdown failed for userPD%d\n",
-> -				   ab_ahb->userpd_id);
-> +			ath12k_err(ab, "PAS shutdown failed for userPD%d: %d\n",
-> +				   ab_ahb->userpd_id, ret);
->  	}
+>  struct bpf_struct_ops {
+>  	const struct bpf_verifier_ops *verifier_ops;
+> @@ -2117,6 +2123,7 @@ struct bpf_struct_ops {
+>  	struct module *owner;
+>  	const char *name;
+>  	struct btf_func_model func_models[BPF_STRUCT_OPS_MAX_NR_MEMBERS];
+> +	bool free_after_tasks_rcu_gp;
+>  };
+> =20
+>  /* Every member of a struct_ops type has an instance even a member is no=
+t
+> diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
+> index d06b3d9bcc13..c422ce41873e 100644
+> --- a/kernel/bpf/bpf_struct_ops.c
+> +++ b/kernel/bpf/bpf_struct_ops.c
+> @@ -984,9 +984,18 @@ static void __bpf_struct_ops_map_free(struct bpf_map=
+ *map)
+>  	bpf_map_area_free(st_map);
 >  }
->  
-
-My code review agent is flagging:
-
-**Missing probe-defer guard** (`ahb.c:422`) — `qcom_pas_is_available()` is
-explicitly documented as mandatory before any PAS call. The OP-TEE backend
-registers its ops asynchronously; without an `if (!qcom_pas_is_available())
-return -EPROBE_DEFER` in the probe path, firmware auth silently returns
-`-ENODEV` with no retry.
-
-Is it an existing deficiency in ath12k that there is no probe deferral?
-Or did the qcom_scm_*() calls somehow guarantee something that is no longer
-true with the qcom_pas_*() calls?
-
-And also for future cleanup:
-**Misleading field name** (`ahb.c:384`) — `scm_auth_enabled` should be
-`pas_auth_enabled` to match the backend-agnostic API it now guards.
-
-I plan on taking this patch as-is through the ath tree since it is currently
-just simple API changes. Any additional changes can come separately.
-
-/jeff
-
+> =20
+> +static void bpf_struct_ops_map_free_pre_rcu(struct bpf_map *map)
+> +{
+> +	struct bpf_struct_ops_map *st_map =3D (struct bpf_struct_ops_map *)map;
+> +
+> +	bpf_struct_ops_map_del_ksyms(st_map);
+> +}
+> +
+>  static void bpf_struct_ops_map_free(struct bpf_map *map)
+>  {
+>  	struct bpf_struct_ops_map *st_map =3D (struct bpf_struct_ops_map *)map;
+> +	struct bpf_struct_ops *st_ops =3D st_map->st_ops_desc->st_ops;
+> +	bool tasks_rcu =3D st_ops->free_after_tasks_rcu_gp;
+> =20
+>  	/* st_ops->owner was acquired during map_alloc to implicitly holds
+>  	 * the btf's refcnt. The acquire was only done when btf_is_module()
+> @@ -997,24 +1006,8 @@ static void bpf_struct_ops_map_free(struct bpf_map =
+*map)
+> =20
+>  	bpf_struct_ops_map_dissoc_progs(st_map);
+> =20
+> -	bpf_struct_ops_map_del_ksyms(st_map);
+> -
+> -	/* The struct_ops's function may switch to another struct_ops.
+> -	 *
+> -	 * For example, bpf_tcp_cc_x->init() may switch to
+> -	 * another tcp_cc_y by calling
+> -	 * setsockopt(TCP_CONGESTION, "tcp_cc_y").
+> -	 * During the switch,  bpf_struct_ops_put(tcp_cc_x) is called
+> -	 * and its refcount may reach 0 which then free its
+> -	 * trampoline image while tcp_cc_x is still running.
+> -	 *
+> -	 * A vanilla rcu gp is to wait for all bpf-tcp-cc prog
+> -	 * to finish. bpf-tcp-cc prog is non sleepable.
+> -	 * A rcu_tasks gp is to wait for the last few insn
+> -	 * in the tramopline image to finish before releasing
+> -	 * the trampoline image.
+> -	 */
+> -	synchronize_rcu_mult(call_rcu, call_rcu_tasks);
+> +	if (tasks_rcu && IS_ENABLED(CONFIG_TASKS_RCU))
+> +		synchronize_rcu_tasks();
+> =20
+>  	__bpf_struct_ops_map_free(map);
+>  }
+> @@ -1123,6 +1116,7 @@ static struct bpf_map *bpf_struct_ops_map_alloc(uni=
+on bpf_attr *attr)
+> =20
+>  	mutex_init(&st_map->lock);
+>  	bpf_map_init_from_attr(map, attr);
+> +	map->free_after_rcu_gp =3D true;
+> =20
+>  	return map;
+> =20
+> @@ -1155,6 +1149,7 @@ const struct bpf_map_ops bpf_struct_ops_map_ops =3D=
+ {
+>  	.map_alloc_check =3D bpf_struct_ops_map_alloc_check,
+>  	.map_alloc =3D bpf_struct_ops_map_alloc,
+>  	.map_free =3D bpf_struct_ops_map_free,
+> +	.map_free_pre_rcu =3D bpf_struct_ops_map_free_pre_rcu,
+>  	.map_get_next_key =3D bpf_struct_ops_map_get_next_key,
+>  	.map_lookup_elem =3D bpf_struct_ops_map_lookup_elem,
+>  	.map_delete_elem =3D bpf_struct_ops_map_delete_elem,
+> diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
+> index 6db306d23b47..b07acf37ad1d 100644
+> --- a/kernel/bpf/syscall.c
+> +++ b/kernel/bpf/syscall.c
+> @@ -956,6 +956,9 @@ void bpf_map_put(struct bpf_map *map)
+>  		/* bpf_map_free_id() must be called first */
+>  		bpf_map_free_id(map);
+> =20
+> +		if (map->ops->map_free_pre_rcu)
+> +			map->ops->map_free_pre_rcu(map);
+> +
+>  		WARN_ON_ONCE(atomic64_read(&map->sleepable_refcnt));
+>  		/* RCU tasks trace grace period implies RCU grace period. */
+>  		if (READ_ONCE(map->free_after_mult_rcu_gp))
+> diff --git a/net/ipv4/bpf_tcp_ca.c b/net/ipv4/bpf_tcp_ca.c
+> index 791e15063237..e224ecafbd69 100644
+> --- a/net/ipv4/bpf_tcp_ca.c
+> +++ b/net/ipv4/bpf_tcp_ca.c
+> @@ -339,6 +339,22 @@ static struct bpf_struct_ops bpf_tcp_congestion_ops =
+=3D {
+>  	.validate =3D bpf_tcp_ca_validate,
+>  	.name =3D "tcp_congestion_ops",
+>  	.cfi_stubs =3D &__bpf_ops_tcp_congestion_ops,
+> +	/* The struct_ops's function may switch to another struct_ops.
+> +	 *
+> +	 * For example, bpf_tcp_cc_x->init() may switch to
+> +	 * another tcp_cc_y by calling
+> +	 * setsockopt(TCP_CONGESTION, "tcp_cc_y").
+> +	 * During the switch,  bpf_struct_ops_put(tcp_cc_x) is called
+> +	 * and its refcount may reach 0 which then free its
+> +	 * trampoline image while tcp_cc_x is still running.
+> +	 *
+> +	 * A vanilla rcu gp is to wait for all bpf-tcp-cc prog
+> +	 * to finish. bpf-tcp-cc prog is non sleepable.
+> +	 * A rcu_tasks gp is to wait for the last few insn
+> +	 * in the tramopline image to finish before releasing
+> +	 * the trampoline image.
+> +	 */
+> +	.free_after_tasks_rcu_gp =3D true,
+>  	.owner =3D THIS_MODULE,
+>  };
+> =20
 
 
