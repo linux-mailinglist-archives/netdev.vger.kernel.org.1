@@ -1,193 +1,169 @@
-Return-Path: <netdev+bounces-307125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307126-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YxBBLe3EVGriSgAAu9opvQ
-	(envelope-from <netdev+bounces-307125-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 12:58:53 +0200
+	id 9FLLHbXFVGoXSwAAu9opvQ
+	(envelope-from <netdev+bounces-307126-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 13:02:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC16874A116
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 12:58:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA98374A184
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 13:02:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=HJWZBPzv;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307125-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307125-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=SlEx8YZX;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307126-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307126-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A797C3041A1C
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:57:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 143DE3041A3E
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:59:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 159273E9589;
-	Mon, 13 Jul 2026 10:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 938643E63A6;
+	Mon, 13 Jul 2026 10:59:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [4.193.249.245])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D8C367B7B;
-	Mon, 13 Jul 2026 10:56:53 +0000 (UTC)
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3043C37CD52;
+	Mon, 13 Jul 2026 10:59:20 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783940220; cv=none; b=cFGe/BVuuv4rU2ZS50Rh/wXzf7lL+7kAqTEXrDgLmYCbBN3OvyB4CXW6d0eb+0bAHUjwxNC2VFPu/uIkNxWOHdQ7ZpyBYPGrEID4lsaXghOvuCmSJX1OkfyfHv483879a9AmK5cMKRTd2jNIEP6aGTFOtAn2O+nMtZ1NjRT/9xQ=
+	t=1783940365; cv=none; b=HTJDpJ0MV8htT90+Y5AR6xbOLt7amRxP0h0o8R5D9mXTjtKwLAPhU3ebK672TVUUDklnjNAZSv0eoDUz68C44qsskgC/JH8M+wEzmHSsUxBeEdiM3MmK1NiTSKGwF+NRzD+b+gWf0ruqMh37ZcWh+JcOohqBTVNSHq8icrc50yQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783940220; c=relaxed/simple;
-	bh=X+GUCZSY7VaPmAb1eZdsudVEsWE4IID3rjLysW22MPc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JecE+kgQTInIYqyiHjxKAC9UMaI9KnRzKcItFh7zMbAI7h/u5f4PMKGvybewaQ9+A5XkGbNFEgK2Kl5bU8vK/mQLlQQwFKX6ij1Mn7gIay32amk7GEIaLuU/njaaGzLPWD6QPVAZWrzYsZfwIosxD/6K8sWJ159iEoHgCrC0f+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=HJWZBPzv; arc=none smtp.client-ip=4.193.249.245
+	s=arc-20240116; t=1783940365; c=relaxed/simple;
+	bh=hMUzyfPsZITC71r2AApuo/5sd8jeSwkGVY9URMR8w9A=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=C6FkYNpfIZ1UtknvwcJ0PBzlOXacyw4BFg/m1VcT8GI+HkvhIUMUN2HCzS0vHFa4m/N830wR51hsoqay3KlDh1xs4wIRp+nmO2PvFi1py4z9JHMqpnTLRoMf0dma9LMST96wHfcxOKWaIETU+4S8tYuuW0PdqfgE/1JqYT6IwBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=SlEx8YZX; arc=none smtp.client-ip=206.189.21.223
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
-	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=ViK3v
-	pQvfAzETPkp1jCexkPmLiNdIgNhDxZkKvpJvL0=; b=HJWZBPzvYNSAOK2kIGY9Q
-	noDewbswtmg/Bvmkuxp9eUuDEtCNLS2KrFEgfzfTmXnbXSQ/Lw0TlIm9Epq1FlP8
-	osxS4DGkLrt6sBOP28N16pfpuc4vtAy1qosZ892jQE8amjNSXd0rUkdURalbgm/R
-	qL5brTyF25zG5HQqywr/Y8=
-Received: from localhost.localdomain (unknown [121.229.84.192])
-	by web3 (Coremail) with SMTP id ygQGZQAndJFjxFRqT1wkAw--.20921S2;
-	Mon, 13 Jul 2026 18:56:36 +0800 (CST)
-From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-To: netdev@vger.kernel.org
-Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
-	Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
-	Ao Wang <wangao@seu.edu.cn>,
-	Xuewei Feng <fengxw06@126.com>,
-	Qi Li <qli01@tsinghua.edu.cn>,
-	Ke Xu <xuke@tsinghua.edu.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH net v2] tcp: initialize standalone TCP-AO response padding
-Date: Mon, 13 Jul 2026 18:56:30 +0800
-Message-ID: <20260713105631.8616-1-zhaoyz24@mails.tsinghua.edu.cn>
-X-Mailer: git-send-email 2.46.2
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:Content-Type:
+	Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	Content-Transfer-Encoding:Message-Id:References:To; bh=i0slMDNhK
+	lMyKtTXMPPaVwgKTGbRsXdDj4D0CFNyp8s=; b=SlEx8YZXNk65B/21Jeyn0TMPf
+	bGaUytD4QtgkPr8NfjoqxsMMTm1uUSHjzUUSeI1K9dJvkwYLgW9CJAsk7KJtp89P
+	gk+45V4WloGbN4qjuvMBd90gthy/XU843t8wdmLeSHpfwfHBqXpDKXzoswDgVclF
+	JWtgDm7xbj5pgcNZxA=
+Received: from smtpclient.apple (unknown [121.229.84.192])
+	by web3 (Coremail) with SMTP id ygQGZQDHE5EAxVRqfF4kAw--.20159S2;
+	Mon, 13 Jul 2026 18:59:12 +0800 (CST)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygQGZQAndJFjxFRqT1wkAw--.20921S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxJw47JF13Xw4UXF1fCrWkXrb_yoW5ArWfpa
-	yxCrsayr9F9ry3Awn2kw109r45C3yDuFyIgr4UtFy3Gr1DWF9rJF18K3yrKF9IvFWIkFyF
-	vryjqr4UtF98ArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9q1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l8cAvFVAK
-	0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4
-	x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28E
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.600.51.1.1\))
+Subject: Re: [PATCH net] tcp: initialize standalone IPv4 ACK options
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+In-Reply-To: <CANn89i+jA5kPcZrjXfsY1ic_LjeEwPHi-U54kYmZdkBKHB+vTA@mail.gmail.com>
+Date: Mon, 13 Jul 2026 18:59:02 +0800
+Cc: netdev@vger.kernel.org,
+ Neal Cardwell <ncardwell@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ linux-kernel@vger.kernel.org,
+ Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+ Ao Wang <wangao@seu.edu.cn>,
+ Xuewei Feng <fengxw06@126.com>,
+ Qi Li <qli01@tsinghua.edu.cn>,
+ Ke Xu <xuke@tsinghua.edu.cn>,
+ stable@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <4A9A9EE6-1859-4F1E-B8DE-2ACE839D5274@mails.tsinghua.edu.cn>
+References: <20260713081842.3119-1-zhaoyz24@mails.tsinghua.edu.cn>
+ <CANn89i+jA5kPcZrjXfsY1ic_LjeEwPHi-U54kYmZdkBKHB+vTA@mail.gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+X-Mailer: Apple Mail (2.3864.600.51.1.1)
+X-CM-TRANSID:ygQGZQDHE5EAxVRqfF4kAw--.20159S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrur4fJFyxCFy5XryrAw4xZwb_yoWkurXEkF
+	W7G39rWwn7ZFWktrnakr4qkry5Xayj9r4ftrnYgF17WryfAa1rtFs5Cr9avFyxGr18tF47
+	urnIvF1jyr9IgjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb-kFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wA2ocxC64kI
+	II0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7
+	xvwVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28E
 	F7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzx
 	vE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VCjz48v1sIEY20_GrWk
 	Jr1UJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5c
 	I20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxkIecxE
 	wVAFwVW8twCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26r4rKr1UJr1l4I8I3I
 	0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWU
-	GVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI
+	GVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI
 	0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0
-	rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r
-	4UJbIYCTnIWIevJa73UjIFyTuYvjfUs4rWDUUUU
-X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQEHAWpUpbI3sAAAso
+	rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4UJV
+	WxJrUvcSsGvfC2KfnxnUUI43ZEXa7VU0kWrtUUUUU==
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQAHAWpUpbI4RgAAsQ
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:zhaoyz24@mails.tsinghua.edu.cn,m:edumazet@google.com,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307126-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,m:edumazet@google.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-307125-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,davemloft.net,kernel.org,redhat.com,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,google.com,davemloft.net,kernel.org,redhat.com,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
+	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mails.tsinghua.edu.cn:from_mime,mails.tsinghua.edu.cn:dkim,mails.tsinghua.edu.cn:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DC16874A116
+X-Rspamd-Queue-Id: BA98374A184
 
-tcp_v4_send_ack() and tcp_v6_send_response() construct standalone TCP
-responses with TCP-AO options.  The option length carries the actual MAC
-length, but the TCP header length includes the option rounded up to a
-four-byte boundary.
 
-tcp_ao_hash_hdr() writes the MAC only.  Thus, when the MAC length is not
-four-byte aligned, the one to three bytes after the MAC are left
-uninitialized and may be transmitted.  For the normal TCP-AO hashing
-mode, those bytes also have to be initialized before computing the MAC.
+Thanks for your review.
 
-Initialize only the alignment padding in the TCP-AO branches, before
-hashing the header.  Use TCPOPT_NOP, as in the normal TCP-AO output path.
-This avoids adding work to non-AO TCP responses while preserving a valid
-authenticated header.
+> On Jul 13, 2026, at 16:48, Eric Dumazet <edumazet@google.com> wrote:
+>=20
+> On Mon, Jul 13, 2026 at 10:18=E2=80=AFAM Yizhou Zhao
+> <zhaoyz24@mails.tsinghua.edu.cn> wrote:
+>>=20
+>> tcp_v4_send_ack() constructs standalone IPv4 TCP ACK replies on the =
+stack
+>> for SYN-RECV and TIME-WAIT paths.  It currently zeroes only the TCP
+>> header, not the accompanying option buffer.
+>>=20
+>> TCP-AO options may have actual lengths that are not 4-byte aligned, =
+while
+>> the transmitted TCP header length is correctly rounded up to a 4-byte
+>> boundary.  tcp_ao_hash_hdr() writes only the MAC bytes, leaving the
+>> TCP-AO option alignment padding in rep.opt uninitialized.  With stack
+>> auto-initialization disabled, those padding bytes can be copied into =
+the
+>> network packet and sent to the peer.
+>>=20
+>> Zero the whole reply structure before writing options, so the =
+alignment
+>> padding bytes are initialized.
+>=20
+> Please fix TCP-AO instead of slowing down TCP (almost no TCP flow is =
+using AO)
 
-Fixes: decde2586b34 ("net/tcp: Add TCP-AO sign to twsk")
-Fixes: da7dfaa6d6f7 ("net/tcp: Consistently align TCP-AO option in the header")
-Cc: stable@vger.kernel.org
-Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
-Reported-by: Ao Wang <wangao@seu.edu.cn>
-Reported-by: Xuewei Feng <fengxw06@126.com>
-Reported-by: Qi Li <qli01@tsinghua.edu.cn>
-Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
-Assisted-by: Claude-Code:GLM-5.2-special
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
----
-Changes in v2:
-- Fix TCP-AO path only to avoid slowing down other TCP paths, suggested
-by Eric.
-- Fix the IPv6 path either.
-- Link to v1: https://lore.kernel.org/netdev/20260713081842.3119-1-zhaoyz24@mails.tsinghua.edu.cn/
----
- net/ipv4/tcp_ipv4.c | 3 +++
- net/ipv6/tcp_ipv6.c | 2 ++
- 2 files changed, 5 insertions(+)
+We have posted a v2 patch following your suggestions:
+=
+https://lore.kernel.org/netdev/20260713105631.8616-1-zhaoyz24@mails.tsingh=
+ua.edu.cn/
 
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 209ef7522508..2f6ff630a0e5 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -971,6 +971,9 @@ static void tcp_v4_send_ack(const struct sock *sk,
- 					  key->rcv_next);
- 		arg.iov[0].iov_len += tcp_ao_len_aligned(key->ao_key);
- 		rep.th.doff = arg.iov[0].iov_len / 4;
-+		memset((u8 *)&rep.opt[offset] + tcp_ao_maclen(key->ao_key),
-+		       TCPOPT_NOP, tcp_ao_len_aligned(key->ao_key) -
-+				    tcp_ao_len(key->ao_key));
- 
- 		tcp_ao_hash_hdr(AF_INET, (char *)&rep.opt[offset],
- 				key->ao_key, key->traffic_key,
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index ebe161d72fbd..0bc89014653d 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -923,6 +923,8 @@ static void tcp_v6_send_response(const struct sock *sk, struct sk_buff *skb, u32
- 				(tcp_ao_len(key->ao_key) << 16) |
- 				(key->ao_key->sndid << 8) |
- 				(key->rcv_next));
-+		memset((u8 *)topt + tcp_ao_maclen(key->ao_key), TCPOPT_NOP,
-+		       tcp_ao_len_aligned(key->ao_key) - tcp_ao_len(key->ao_key));
- 
- 		tcp_ao_hash_hdr(AF_INET6, (char *)topt, key->ao_key,
- 				key->traffic_key,
--- 
-2.47.3
+Regards,
+Yizhou=
 
 
