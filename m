@@ -1,62 +1,72 @@
-Return-Path: <netdev+bounces-307103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307104-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vSwbO5etVGpCpQMAu9opvQ
-	(envelope-from <netdev+bounces-307103-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 11:19:19 +0200
+	id cRi2HguvVGqepQMAu9opvQ
+	(envelope-from <netdev+bounces-307104-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 11:25:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAB3D74937B
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 11:19:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C526F749440
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 11:25:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=sSmh4Y7K;
-	dmarc=pass (policy=none) header.from=linux.dev;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307103-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307103-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b="FapGF/n7";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307104-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307104-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 069EC3001199
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 09:19:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D58AC3022621
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 09:21:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40CDF3DE441;
-	Mon, 13 Jul 2026 09:19:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60F372F532F;
+	Mon, 13 Jul 2026 09:21:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85CCC390204
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 09:19:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1072F363F
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 09:21:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783934353; cv=none; b=KCuOxv51bJT1Nb9dL0ZCaQqAwS4qPH6Fffj770fGZHHGhqmkrl0hO6UswFZepYqsg8weemYF7NVOaOkbkcQQCcWFwDASdEdPNSfCjlKJguEKSGwOGFxTPd9ZdAD+pPX+xJ5N6FPlBtQ7X+zPmvLpGGAjXSC1dbWv7G8TVPCYge8=
+	t=1783934490; cv=none; b=MbxNbNfmP9iLklEhMSJ+s4E6JFYyHGF/g40DZ5RRVvvHIl6om+LHjYra306lQvja7iBvEIOwdJP59xlh2gzeiEdsWs0vnqqpuqGwfDKSo3O6MmZtutTa5hjvXsXIA1tEIsasA4PP3fqF/XTQtaGXeEEGpVYyxEnYGz8s+Zz2kOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783934353; c=relaxed/simple;
-	bh=MP/mraMYPzMCsg/a5Ny4sp39c4ZUBsePrVPYbxMVRQ8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=c6gXOuvwaDaJahN9gMYUrLzwT/FUVv8oRNnk7GICz5JpW4316alDjKp3Af29VKxwW9JorqfXxOQutkzgTCbBW47R+MINHMINU+hfpFTqk55fvcLlnCA2gjG1Ch5ZFOxmWI3cgucNH8BfIPsYeAN0jaRKZeiW6EiHXECr0CBvD1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sSmh4Y7K; arc=none smtp.client-ip=95.215.58.173
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783934349;
+	s=arc-20240116; t=1783934490; c=relaxed/simple;
+	bh=FDdkI+0TwLs1WDyCmmW1+RSfKece1PCSOkFIXdgyJqw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Lzz8t8LvsvIpCcwTLJA86ltT6U/Sh1RaBKDct+dDJWS4uWVSoiX9UeK9anyX+DThPVXBBMBlIZLNJko8+WOBKJyazLRlS3Ix4+Cbq4KpTiw9MP1DfxifR1dVL3dhqEKdS7lUiNQuIaOz05DkUQTYbY+qfMdaEHKof1njtZ0A3YE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FapGF/n7; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783934487;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=TfurWKfkQ/L/AF2s3gX9ZPsRLKGrIjeB4Q2OBHdEoYY=;
-	b=sSmh4Y7KlODc31q/R4GP//R7098tdBA4zhKubhcKGSgahsYRp/CmH/eAFnu+bWTGl2IaN0
-	GHM4dMHq2EwJ2S93kcAdinpQ9ZYm6QPA1zjpRX44VjGicthGQllnhHjMIqf6FakRrgakG3
-	CkfvLDygRP5Gax4vAjVlg1kkR+/tnG4=
-From: Chenguang Zhao <chenguang.zhao@linux.dev>
-To: jiawenwu@trustnetic.com,
-	mengyuanlou@net-swift.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: chenguang.zhao@linux.dev,
-	netdev@vger.kernel.org,
-	Chenguang Zhao <zhaochenguang@kylinos.cn>
-Subject: [PATCH net] net: txgbe: fix FDIR filter leak on remove
-Date: Mon, 13 Jul 2026 17:19:11 +0800
-Message-Id: <20260713091911.1614795-1-chenguang.zhao@linux.dev>
+	bh=RfMiJG4sSQI5dapo/fTxHG11a+NsK6QryBoFpds8mH4=;
+	b=FapGF/n7jWlhE/ayhXdVz6JaIZysb9r6JbbinQ2hvuYc/jZa+oZ3Yf9ZWHkl5hMuHPawo7
+	6rbH7/rHCt4U/HtR5rF18WJEQkwqiiZSgXWbaMEIbbWLaQaWWiiJmHqTYveE9eMLG7oJs/
+	Nz8WuGWwpvSXSESyNFPK3E/PO0c2q8c=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-145-LLQjRM_ZOOmFY3Q9VjPnQQ-1; Mon,
+ 13 Jul 2026 05:21:24 -0400
+X-MC-Unique: LLQjRM_ZOOmFY3Q9VjPnQQ-1
+X-Mimecast-MFC-AGG-ID: LLQjRM_ZOOmFY3Q9VjPnQQ_1783934483
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C48E71955DB8;
+	Mon, 13 Jul 2026 09:21:22 +0000 (UTC)
+Received: from p16v.redhat.com (unknown [10.44.34.53])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 77CA13000B50;
+	Mon, 13 Jul 2026 09:21:20 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Jiri Pirko <jiri@resnulli.us>,
+	Petr Oros <poros@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH iproute2-next] ip: display DPLL pin information in link details
+Date: Mon, 13 Jul 2026 11:21:19 +0200
+Message-ID: <20260713092119.1536385-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,82 +74,89 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307103-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[chenguang.zhao@linux.dev,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:jiawenwu@trustnetic.com,m:mengyuanlou@net-swift.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:chenguang.zhao@linux.dev,m:netdev@vger.kernel.org,m:zhaochenguang@kylinos.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307104-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:jiri@resnulli.us,m:poros@redhat.com,m:dsahern@kernel.org,m:stephen@networkplumber.org,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chenguang.zhao@linux.dev,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:from_mime,linux.dev:dkim,linux.dev:mid,kylinos.cn:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DAB3D74937B
+X-Rspamd-Queue-Id: C526F749440
 
-From: Chenguang Zhao <zhaochenguang@kylinos.cn>
+Parse the IFLA_DPLL_PIN nested attribute and display the associated
+DPLL pin ID in 'ip link show' detail output. This allows users to see
+which DPLL recovered clock pin is associated with a network interface
+without having to cross-reference with 'dpll pin show'.
 
-Perfect FDIR filters can be added while the interface is down and are
-kept on the software list for later restore. unregister_netdev() only
-calls ndo_stop when the device is up, so txgbe_fdir_filter_exit() in
-txgbe_close() is skipped in that case and the filters are leaked on
-driver remove. Free the filter list from txgbe_remove() as well.
+Example output:
+  $ ip -d link show eth0
+  ... parentbus pci parentdev 0000:51:00.0 dpll-pin 4
 
-Fixes: 4bdb441105dc ("net: txgbe: support Flow Director perfect filters")
-Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 ---
-Reproduction:
- 1. Load the driver (interface remains down after probe).
- 2. Enable ntuple filters: ethtool -K <dev> ntuple on
- 3. Add a perfect FDIR rule while the interface is down:
-   ethtool -N <dev> flow-type ...
- 4. Keep the interface down (do not bring it up).
- 5. Unload the driver (rmmod / PCI unbind).
-   unregister_netdev() skips ndo_stop because the device is not IFF_UP,
-   and without freeing the software filter list in remove, each rule
-   leaks sizeof(struct txgbe_fdir_filter).
+ ip/ipaddress.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
- drivers/net/ethernet/wangxun/txgbe/txgbe_main.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index 20c5a295c6c2..c277863baf67 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -945,6 +945,7 @@ static void txgbe_remove(struct pci_dev *pdev)
- 	netdev = wx->netdev;
- 	wx_disable_sriov(wx);
- 	unregister_netdev(netdev);
-+	txgbe_fdir_filter_exit(wx);
+diff --git a/ip/ipaddress.c b/ip/ipaddress.c
+index 6017bc8370cb..bf470961182e 100644
+--- a/ip/ipaddress.c
++++ b/ip/ipaddress.c
+@@ -25,6 +25,7 @@
+ #include <linux/if_infiniband.h>
+ #include <linux/sockios.h>
+ #include <linux/net_namespace.h>
++#include <linux/dpll.h>
  
- 	timer_shutdown_sync(&wx->service_timer);
- 	cancel_work_sync(&wx->service_task);
+ #include "rt_names.h"
+ #include "utils.h"
+@@ -1294,6 +1295,18 @@ int print_linkinfo(struct nlmsghdr *n, void *arg)
+ 				     "parentdev %s ",
+ 				     rta_getattr_str(tb[IFLA_PARENT_DEV_NAME]));
+ 		}
++
++		if (tb[IFLA_DPLL_PIN]) {
++			struct rtattr *dp[DPLL_A_PIN_MAX + 1];
++
++			parse_rtattr_nested(dp, DPLL_A_PIN_MAX,
++					    tb[IFLA_DPLL_PIN]);
++			if (dp[DPLL_A_PIN_ID])
++				print_uint(PRINT_ANY,
++					   "dpll_pin",
++					   "dpll-pin %u ",
++					   rta_getattr_u32(dp[DPLL_A_PIN_ID]));
++		}
+ 	}
+ 
+ 	if ((do_link || show_details) && tb[IFLA_IFALIAS]) {
 -- 
-2.25.1
+2.53.0
 
 
