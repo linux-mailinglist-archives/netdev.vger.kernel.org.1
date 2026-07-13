@@ -1,187 +1,124 @@
-Return-Path: <netdev+bounces-307014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307015-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id pwHaGWiAVGrJmgMAu9opvQ
-	(envelope-from <netdev+bounces-307014-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 08:06:32 +0200
+	id vJhiOwGEVGpSmwMAu9opvQ
+	(envelope-from <netdev+bounces-307015-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 08:21:53 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53C667476E1
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 08:06:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE9F37477D1
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 08:21:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307014-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307014-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=i2AQ7Qq0;
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307015-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307015-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 20BD43005D2A
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 06:06:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 273383008A6C
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 06:21:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A16D135F61A;
-	Mon, 13 Jul 2026 06:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D3C37C10C;
+	Mon, 13 Jul 2026 06:21:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2D03546F9
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 06:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434F4261B70;
+	Mon, 13 Jul 2026 06:21:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783922788; cv=none; b=nk8dUh4mUHNoyjSuzkjf8caUjt8Fq+5NpbHKuyYemibKcTf+okDT3GynUMZYSHhBtBHsUShhgDoUxEzUsS9uaerTR66CnyTVRAOVGcVDfm2bZ87vRLq2S51TANEJP9CsfVrl7AHPenhnH6YvaDIz03ZcAXmXhHoHm36oTpSh6zM=
+	t=1783923711; cv=none; b=inEjbE6bA6/HtF3sx8jH4ARSjjB2SvM6Bde0nKuGpmlJLzLyyx3gycSM/qo2Ni2xhlnVjvqupK1OQMf7xhto4akqzBbQORL/e06mTA7vzQbrJQKmk9CdITfBMl/8kHozV2LR7RMyZ/HznG351h9o+9YydHLkjzJt3SBN9Syibqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783922788; c=relaxed/simple;
-	bh=e5qZ4+Wlajgb1J0bwFb075tcbSzwvf2omA8U6fIppCY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LxRXEe+Uv3pcdfWV3CiNI4fktyt9sJoyl0vySGMFSMdXgfH6fbr7nU25n2DG8ND0vnmXWcwYwf+Lr/Z6uW4OimvgrQ9CWrWF7zc1QpiMlXjntUKZ6zkslYqAqho6CtxEwLknSo++GbwLEoZSwbYzeqPvJ1fgygWd2ZocVkx33+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.132.163.193
-X-QQ-mid: esmtpgz11t1783922712t9e4a88f9
-X-QQ-Originating-IP: 0O2L8YFXDsn/ebqyk79I3flUdYvXWavi88mbT2cqNjs=
-Received: from w-MS-7E16.trustnetic.com ( [115.200.247.46])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 13 Jul 2026 14:05:05 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 9343770031080650761
-EX-QQ-RecipientCnt: 13
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org
-Cc: Duanqiang Wen <duanqiangwen@net-swift.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Kees Cook <kees@kernel.org>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v2] net: libwx: disable TX VLAN offload for packets with >2 VLAN tags
-Date: Mon, 13 Jul 2026 14:04:41 +0800
-Message-ID: <069DF89AA8029189+20260713060441.276612-1-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1783923711; c=relaxed/simple;
+	bh=jNDNfyooiOnQ4+cl8linfC1qrE3LXmwVhskMhrutDQw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cm9kX9It3YVnS44ffKp1Qrm/cuxXlPLscnSdT0z8z4CBMtACVDwmUknRIW7cvWJMO7LDmlwkFAFSMbdBW23IWbNOhpLD9OLufmav9Nfr0Z+s61AuCcxWUtJcUx6vXlvWDztpkGViQw+kP0rSW/clV21tEobAF0Ru9BMetQcY33U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i2AQ7Qq0; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9A751F000E9;
+	Mon, 13 Jul 2026 06:21:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783923709;
+	bh=kaTNv3bKzOu84AByAd/Y5/b77Y1B8vZd+CffeqsQ3tk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=i2AQ7Qq0KQFRL1idrKsEbe3jRCUAcOwNXf3LPx7/5PnmWw+/y1nB9Bm48XVizpGQQ
+	 QdTXNYZLr16kFuTidjdPnOSVWzcciYpTv7ktmXqEyfTgIiOteZZ5Pw5nCkxX4Br/8T
+	 PzwHNCY+ZM+1lyPscMKDesbjzAJhD+sHe3xruzf+7Q/wah0wLYkQjJrqHQ3fK5d2qV
+	 dWg27f3PkOL5A8rCNZUmQ/pFemAQroIpeMURU6Y2OMS3PrJDEqxDW7rZVAVuSPwYHT
+	 tjXd6LU+OnF5w/cnxitI39fbNHe25EMmlJZiR4k6VWmMsn+gu3ZIj4OYnjMGhSeBvT
+	 qdNdHeyljBwnQ==
+Date: Mon, 13 Jul 2026 08:21:45 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Mikhail Lukianchikov <avermoal@gmail.com>
+Cc: Thangaraj.S@microchip.com, Rengarajan.S@microchip.com, 
+	andrew+netdev@lunn.ch, conor+dt@kernel.org, davem@davemloft.net, 
+	devicetree@vger.kernel.org, edumazet@google.com, krzk+dt@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, robh@kernel.org
+Subject: Re: [PATCH v4] dt-bindings: net: microchip,lan78xx: convert to DT
+ schema
+Message-ID: <20260713-polite-industrious-herring-2fb6c0@quoll>
+References: <20260712113821.12543-1-avermoal@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: NzSDQCFWCzVTXwRgF/InEXkkATSd3OYfEpZCOgGMxopRi6dtQpktDD9l
-	+e5BgvyEFQuo2d1jeE9wo63p8oxkDTEajr//saWge7LqlkFDFNa6iwQmM8T+eS7XYOGku5F
-	agwLVPZxsKcMwicAHIh/CQ4+4xUOtu+PrLpTlkexLhIc3wEMngNMbOwq72/ZFk1YwS0r/0F
-	1ugqywBOvcBEDbxvdyEq7O+MwyysnVz/B+alE73UTx1QpfyNHGXvcHl+3Nt9upF/UpR/Bbl
-	7CA5TOQrg/RXjOVhtlI/w/YufcV1QSOlxlkUnI8W6r3vMqhXb19M1DSLZZgABZun5XTopdt
-	DaiV9vZhDxq7yZY/Vd4PUXUveAoqTI+dmcNaGl50Z4+bxN+CJDQpvzsjaz5OmdWmkP0nh7Q
-	K6pOG43tLqy7U7igz+I01v6ohnhhKYuov2emvAhfTLnCa5hQ/Ppj8+YEVheG/S1IqDdzcWf
-	fqEGd5ovtTR556W61c3akAqWHnqaDWX8nNHs+3S+F7lvmSM8ou2cNvh6U09F7zNQX63lq8K
-	mBDo1SMZ4qtxOz8cG/ilJ/RGvpWJ0TbllwEJMrrkyoIzPUyKU5CBIqko1Y6itdV5nvCpN7S
-	3UVo7bhJhcM3ppNwErp0NvR2qANb0cVF0TXWgFwlgFjXB2CM0QdDNV7dNcwWfqeR56mZmHF
-	f+ArP0Kmx0SfZW0ZQMYoQtTvYktECWYZQKt/yzYILFpnseAki9MSCNv+JqlhlE4raGbOaWx
-	ojCMBd1Nwvuew3Zh+j/X84ihGAlNpBi6JRYGcsLxKFSjXtjhc/ipxGEBg5CwKP2XoaXD6nz
-	ctPhSFS4wAjy2R3X1vFIEg0RiEnwjk0eKCVKdks/h2WogR/7ArcbrLXuhbptWLHZ8OZD3t0
-	kc9LOi9yYQrb3pYNAkgXXJvxjYrPR++8F4ANvfPd2y7VuCWFTM0qp1OBKUksmRS4UrDBbDc
-	9xPUkDlOpE9LiEtaR8ELMD4O90uOXkbywxHu926UpKb8AEtlLCrKK1AVUDgXS/4GqecJXKt
-	AucaEKt1UAoGsfOANB1krbpagkvzsRSODqiEbLslYCTergNFljLmCDsm+SQnI+BCy588/UA
-	DDmczxan20KqtFUZmIU//M=
-X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260712113821.12543-1-avermoal@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.54 / 15.00];
+X-Spamd-Result: default: False [-3.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[trustnetic.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307014-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:duanqiangwen@net-swift.com,m:mengyuanlou@net-swift.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jacob.e.keller@intel.com,m:kees@kernel.org,m:przemyslaw.kitszel@intel.com,m:jiawenwu@trustnetic.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:avermoal@gmail.com,m:Thangaraj.S@microchip.com,m:Rengarajan.S@microchip.com,m:andrew+netdev@lunn.ch,m:conor+dt@kernel.org,m:davem@davemloft.net,m:devicetree@vger.kernel.org,m:edumazet@google.com,m:krzk+dt@kernel.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:andrew@lunn.ch,m:conor@kernel.org,m:krzk@kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	R_DKIM_NA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-307015-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 53C667476E1
+X-Rspamd-Queue-Id: AE9F37477D1
 
-The current hardware does not support TX VLAN offload for packets with
-three or more VLAN tags. When such packets are transmitted with hardware
-VLAN offload enabled, the hardware may malfunction or produce corrupted
-frames.
+On Sun, Jul 12, 2026 at 05:38:21PM +0600, Mikhail Lukianchikov wrote:
+> Convert the Microchip LAN78xx family (LAN7800, LAN7801, LAN7850) binding
+> documentation from plain text to DT schema.
+> 
+> Restoring a mistakenly deleted email in MAINTAINERS file and fixing
+> microchip,lan7800.yaml.
+> 
+> Signed-off-by: Mikhail Lukianchikov <avermoal@gmail.com>
+> ---
+> Changes in v3:
 
-Add a check in wx_features_check() to parse the VLAN depth of the
-skb. If more than two VLAN tags are detected (including both the
-hardware tag and in-band tags), strip NETIF_F_HW_VLAN_CTAG_TX and
-NETIF_F_HW_VLAN_STAG_TX from the feature set. This forces the
-kernel networking stack to handle VLAN insertion in software for
-these specific packets, ensuring correct transmission.
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
-v2:
-- Remove redundant 'parse_depth'.
-- Optimize the loop.
-
-v1: https://lore.kernel.org/all/C1BF77C0E073A40C+20260710071831.210196-1-jiawenwu@trustnetic.com
----
- drivers/net/ethernet/wangxun/libwx/wx_lib.c | 24 +++++++++++++++++++++
- 1 file changed, 24 insertions(+)
-
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-index 814d88d2aee4..34542b3dc884 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -3228,6 +3228,30 @@ netdev_features_t wx_features_check(struct sk_buff *skb,
- 				    netdev_features_t features)
- {
- 	struct wx *wx = netdev_priv(netdev);
-+	__be16 type = skb->protocol;
-+	u16 vlan_depth = ETH_HLEN;
-+	u32 vlan_num = 0;
-+
-+	if (skb_vlan_tag_present(skb))
-+		vlan_num++;
-+
-+	while (eth_type_vlan(type)) {
-+		struct vlan_hdr vhdr, *vh;
-+
-+		vh = skb_header_pointer(skb, vlan_depth, sizeof(vhdr), &vhdr);
-+		if (unlikely(!vh))
-+			break;
-+
-+		type = vh->h_vlan_encapsulated_proto;
-+		vlan_depth += VLAN_HLEN;
-+		vlan_num++;
-+
-+		if (vlan_num > 2) {
-+			features &= ~(NETIF_F_HW_VLAN_CTAG_TX |
-+				      NETIF_F_HW_VLAN_STAG_TX);
-+			break;
-+		}
-+	}
- 
- 	if (!skb->encapsulation)
- 		return features;
--- 
-2.51.0
+Best regards,
+Krzysztof
 
 
