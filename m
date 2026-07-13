@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-307204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307206-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id czP9LZb4VGrRiAAAu9opvQ
-	(envelope-from <netdev+bounces-307204-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 16:39:18 +0200
+	id 5hqCNHb4VGrJiAAAu9opvQ
+	(envelope-from <netdev+bounces-307206-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 16:38:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03FC174C7E9
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 16:39:18 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4725E74C7C8
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 16:38:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=codeconstruct.com.au header.s=2022a header.b=flOucNVq;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307204-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307204-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=codeconstruct.com.au header.s=2022a header.b="O0k9r/UJ";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307206-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307206-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=codeconstruct.com.au;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4CACF3048ADD
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 14:33:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F24383061961
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 14:33:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A39438004;
-	Mon, 13 Jul 2026 14:33:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71EC643934F;
+	Mon, 13 Jul 2026 14:33:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E41A437467;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E362265629;
 	Mon, 13 Jul 2026 14:33:09 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783953191; cv=none; b=hsJ1KQ6RJBFhjpN2FO8qXZdzFRLHfkHY1GnZUVQuNePDhRiu0SxVVKVbvdfJt/fcwf8bFKOUouEWA534E2rDUY7tfreM+5kW3IFclcy9jyGdSBUbcv2WibsTFCpl3HB21G2W26cM8jTYsa+YnfA3n+ou8isWz/8zVEi08Bt8fM8=
+	t=1783953192; cv=none; b=qRlLcO9lMZP77GZMHj8wdxyCNPocYI9GZcXfa1Ke/3h+MVtjmKqH4JbJfJQiB0AweH+y57Lt4Rzd+qkijTOEq6PNoSuzxS8LiTghjrqLUoM7ZB01omxtCs6aUdf7LqBy/58eFjB5nZ++ZZB2uOcB01Lu/T21N6YUmLNiq4M6gW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783953191; c=relaxed/simple;
-	bh=6C2aQ3OVzfFeWOqmuyUxDSSpH4CnsC/zaQWSXxLFvJQ=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=E0Mbxk67cFKvw6lJya5BD2gzcEbTfoAE2H8PV0pG8+oNBGLTj8ABTI6noDDuOwBnbjyQrPFkMqDf/C96L9CQvjrtRj17wDL1yKGtbFW2dJ/1A7JpaIieQmwYKpCGXG5ardrRVrW2fBvJqiXiS8iQpxVrR6IuFj4O4gVmvYIQ71g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=flOucNVq; arc=none smtp.client-ip=203.29.241.158
+	s=arc-20240116; t=1783953192; c=relaxed/simple;
+	bh=/2Ier6FRdzjPO3Emli1gXM2xVhA3IkF3e6eshK4zg2E=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=m+RgVgV1y4N/2MsF2UM9BIKRBGjJSxgYKK8l2mEvoronl0jZXwBbmVBQ/8lll8v6zOiJ5a7KPjvoZDAy5V6jt5aLH3ztPQYAvinrrt/oO5OhImLW4DP9w8q83vp060FadgKoHII7jHdCuqCzChUUigPb/qROQp2VF2oAEovbh94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=O0k9r/UJ; arc=none smtp.client-ip=203.29.241.158
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=codeconstruct.com.au; s=2022a; t=1783953181;
-	bh=DxJjoWdah3u6q21ag1mMWsH7fK1mx2/2QlQVzyTxgLE=;
-	h=From:Subject:Date:To:Cc;
-	b=flOucNVqfl/hEQ3v9C9dpPzKGXcNU7sVMB7w1eEVPgYgkmkDeBh5eRzHvROt2CVBz
-	 dN3aEP1x0lnKRJmlAE7MPUyoa2NdsABR/Tnsx5OS6J2dpLfQ+8rFiOWrulkmix/GQ1
-	 qQavF9RXGi3kpkVWgXjWBZOQvAsX7vlzPUvstZ5h08GJzYDRB7UFtvSwykBEGNN8u1
-	 soJjT4wP4hKDclUiWFMh06XbobcbAmva9shCNecDvneeG0M39Ba8ukhG7ugUNdqGt2
-	 yOnISIyojJxG925uQWfgCFIlc3bdEX6t1btD973h7/TvScBDfM2dB6FbiVb5aQ5r0t
-	 AU7ZYRgBDKMTg==
+	bh=bjKgiEdKsT7lRbJrX1xrLVJ5yD4EUl26YxZG1ln3Jpw=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc;
+	b=O0k9r/UJ8xXRXrJh6gRJcj7xs9HEqjMy6cffQO+sM6X83OQWyZsphdyW6oKi5PBEZ
+	 fBDKYGrFhBDFuA4FX6emHSyz1KojBgoO5R43Q2FxE3mJBfZiRwtVHyLGLY+Vj37lC6
+	 og5neBHBM86kL6dqkn9WWjrq0s+qOTe77a9y1KbotVF08xL8gxJhLB2ncDKMdM7KhZ
+	 rZN2sS/oXA2Cdbigqc2At1ffXQ7cQS1VpFP6yuY2MdRuARBbxQduRxZO7ig64yb/z0
+	 PqJn1iG1sQUwm6tmIvU6r5VbViSl7ZYURo4OQRinp5VZS4voovJ/47U/Nsuea+0wyF
+	 XPjtrR0k5dmlQ==
 Received: by codeconstruct.com.au (Postfix, from userid 10000)
-	id 02E1D608EF; Mon, 13 Jul 2026 22:33:01 +0800 (AWST)
+	id 4A1B965614; Mon, 13 Jul 2026 22:33:01 +0800 (AWST)
 From: Jeremy Kerr <jk@codeconstruct.com.au>
-Subject: [PATCH net-next v4 00/12] net: mctp: usb: Add support for
- MCTP-over-USB v1.1
-Date: Mon, 13 Jul 2026 22:32:53 +0800
-Message-Id: <20260713-dev-mctp-usb-1-1-v4-0-4ae8de764a01@codeconstruct.com.au>
+Date: Mon, 13 Jul 2026 22:32:54 +0800
+Subject: [PATCH net-next v4 01/12] net: mctp: usb: Include version
+ indicator in max packet size defines
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,12 +58,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIABX3VGoC/33OzU7DMAwH8FeZciZTXLdp2In3QByaxGVBWjLyp
- aGp707WIoHEQD5Ztn9/X1mi6Cixw+7KIlWXXPCt6R92zBwn/0rc2dazTnRSSNFzS5WfTD7zkjS
- HVnK2augnC0iKtbNzpNldVvKZecrc0yWzl22Sin4jk2/i126k99JS83ZwWzu6lEP8WF+qsDJbO
- orf6RW44EpOCDAbOerxyQRLJviUYzF5b8JpP5U1vnbf1ijwjtU1SwpsjJKgEf+x8Kel7ljYrEc
- aQcAwGKvnP6xlWT4BbI2gK4QBAAA=
-X-Change-ID: 20260604-dev-mctp-usb-1-1-6fd854ad13e8
+Message-Id: <20260713-dev-mctp-usb-1-1-v4-1-4ae8de764a01@codeconstruct.com.au>
+References: <20260713-dev-mctp-usb-1-1-v4-0-4ae8de764a01@codeconstruct.com.au>
+In-Reply-To: <20260713-dev-mctp-usb-1-1-v4-0-4ae8de764a01@codeconstruct.com.au>
 To: Matt Johnston <matt@codeconstruct.com.au>, 
  Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -76,12 +73,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307204-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307206-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
@@ -101,103 +98,80 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,codeconstruct.com.au:from_mime,codeconstruct.com.au:mid,codeconstruct.com.au:email,codeconstruct.com.au:dkim,linuxfoundation.org:email,lunn.ch:email,davemloft.net:email,msgid.link:url]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,codeconstruct.com.au:from_mime,codeconstruct.com.au:mid,codeconstruct.com.au:email,codeconstruct.com.au:dkim,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 03FC174C7E9
+X-Rspamd-Queue-Id: 4725E74C7C8
 
-Version 1.1.0 of DSP0283 (MCTP over USB transport binding) has been
-released, this patch series updates our current v1.0.1 support for the
-changes in v1.1.x.
+DSP0283 v1.1.0 will introduce larger maximum packet sizes. In
+preparation, indicate that the current maxima are specific to v1.0.x.
 
-The major change in v1.1 is the introduction of "packet spanning" mode,
-where a single MCTP packet may be split over multiple USB packets
-(themselves forming a single USB bulk transfer). This relaxes the
-requirement for USB high-speed mode, as we can now send MCTP packets
-contained over multiple 64-byte full-speed USB bulk transfers, and gives
-us an increase in the maximum MCTP packet size - we now have 13 bits of
-packet length (previously 8) in the transport header.
-
-Handling packet spanning introduces some complexity in the transmit and
-receive paths, as we lose some constraints on where packet boundaries
-may correspond to USB transfer boundaries, and may need to retain state
-across separate transfers. To contain this complexity, we introduce a
-new library for the transfer packing- and unpacking implementations,
-"mctp-usblib". The host driver is a consumer of this library, and a
-future gadget driver can use the same implementations. We can now also
-implement tests on the API boundary of the library.
-
-The series implements an incremental shift to mctp-usblib, then
-implements packet spanning mode in the new library. We have a few
-changes to prepare for this, in altering a few constants and
-behaviours as v1.0-specific. Once packet spanning is implemented in
-mctp-usblib, we enable it in the host-side driver.
-
-To: Matt Johnston <matt@codeconstruct.com.au>
-To: Andrew Lunn <andrew+netdev@lunn.ch>
-To: "David S. Miller" <davem@davemloft.net>
-To: Eric Dumazet <edumazet@google.com>
-To: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: netdev@vger.kernel.org
-Cc: linux-usb@vger.kernel.org
 Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
-
-Changes in v4:
-- fix missing rx cancel on IN urb EPIPE
-- add retries for usb_clear_halt
-- validate wMaxPacketSize before using for alignment
-- don't KUNIT_ASSERT in test cleanup
-- Link to v3: https://patch.msgid.link/20260708-dev-mctp-usb-1-1-v3-0-9e710155cdbf@codeconstruct.com.au
-
-Changes in v3:
-- split rx urb status handling to a separate change, handle stalls
-- merge tx anchor usage into initial usblib implementation
-- add skb drop reasons
-- prevent unnecessary skb reallocation
-- Link to v2: https://patch.msgid.link/20260703-dev-mctp-usb-1-1-v2-0-60367b861b33@codeconstruct.com.au
-
-Changes in v2:
-- address sashiko reviews:
-  - rx mac_header correction
-  - rx/tx stats fixes
-  - limit non-spanned packets (where we have no ZLP) to max size
-  - handle transient rx urb error status
-  - set skb_drop_reasons
-  - kunit early-exit cleanups, take rntl lock where needed
-- rework tx_qmem locking and anchor handling (we don't need to unanchor
-  on completion)
-- Link to v1: https://patch.msgid.link/20260630-dev-mctp-usb-1-1-v1-0-86a311fc67b7@codeconstruct.com.au
-
 ---
-Jeremy Kerr (12):
-      net: mctp: usb: Include version indicator in max packet size defines
-      net: mctp: usb: Use packet-length max for maximum packet-size check
-      net: mctp: usblib: Move RX transfer processing to a new mctp-usblib
-      net: mctp: usb: Improve IN endpoint status handling
-      net: mctp: usblib: Move TX transfer processing to mctp-usblib
-      net: mctp: usblib: Add support for multi-packet transmit
-      net: mctp: usb: Accommodate DSP0283 v1.1 header format
-      net: mctp: usblib: Implement receive-side packet spanning
-      net: mctp: usblib: Implement transmit-side packet spanning
-      net: mctp: usblib: Add initial kunit tests
-      net: mctp: usb: enable v1.1 packet spanning
-      net: mctp: usb: Allow multiple urbs in flight
+ drivers/net/mctp/mctp-usb.c  | 8 ++++----
+ include/linux/usb/mctp-usb.h | 5 +++--
+ 2 files changed, 7 insertions(+), 6 deletions(-)
 
- drivers/net/mctp/Kconfig            |  16 +
- drivers/net/mctp/Makefile           |   1 +
- drivers/net/mctp/mctp-usb.c         | 347 +++++++++++---------
- drivers/net/mctp/mctp-usblib-test.c | 412 ++++++++++++++++++++++++
- drivers/net/mctp/mctp-usblib.c      | 625 ++++++++++++++++++++++++++++++++++++
- include/linux/usb/mctp-usb.h        |  88 ++++-
- 6 files changed, 1335 insertions(+), 154 deletions(-)
----
-base-commit: b85966adbf5de0668a815c6e3527f87e0c387fb4
-change-id: 20260604-dev-mctp-usb-1-1-6fd854ad13e8
+diff --git a/drivers/net/mctp/mctp-usb.c b/drivers/net/mctp/mctp-usb.c
+index fade65f2f269..545eff06322c 100644
+--- a/drivers/net/mctp/mctp-usb.c
++++ b/drivers/net/mctp/mctp-usb.c
+@@ -76,7 +76,7 @@ static netdev_tx_t mctp_usb_start_xmit(struct sk_buff *skb,
+ 
+ 	plen = skb->len;
+ 
+-	if (plen + sizeof(*hdr) > MCTP_USB_XFER_SIZE)
++	if (plen + sizeof(*hdr) > MCTP_USB_1_0_XFER_SIZE)
+ 		goto err_drop;
+ 
+ 	rc = skb_cow_head(skb, sizeof(*hdr));
+@@ -128,7 +128,7 @@ static int mctp_usb_rx_queue(struct mctp_usb *mctp_usb, gfp_t gfp)
+ 	struct sk_buff *skb;
+ 	int rc;
+ 
+-	skb = __netdev_alloc_skb(mctp_usb->netdev, MCTP_USB_XFER_SIZE, gfp);
++	skb = __netdev_alloc_skb(mctp_usb->netdev, MCTP_USB_1_0_XFER_SIZE, gfp);
+ 	if (!skb) {
+ 		rc = -ENOMEM;
+ 		goto err_retry;
+@@ -136,7 +136,7 @@ static int mctp_usb_rx_queue(struct mctp_usb *mctp_usb, gfp_t gfp)
+ 
+ 	usb_fill_bulk_urb(mctp_usb->rx_urb, mctp_usb->usbdev,
+ 			  usb_rcvbulkpipe(mctp_usb->usbdev, mctp_usb->ep_in),
+-			  skb->data, MCTP_USB_XFER_SIZE,
++			  skb->data, MCTP_USB_1_0_XFER_SIZE,
+ 			  mctp_usb_in_complete, skb);
+ 
+ 	rc = usb_submit_urb(mctp_usb->rx_urb, gfp);
+@@ -301,7 +301,7 @@ static void mctp_usb_netdev_setup(struct net_device *dev)
+ 
+ 	dev->mtu = MCTP_USB_MTU_MIN;
+ 	dev->min_mtu = MCTP_USB_MTU_MIN;
+-	dev->max_mtu = MCTP_USB_MTU_MAX;
++	dev->max_mtu = MCTP_USB_1_0_MTU_MAX;
+ 
+ 	dev->hard_header_len = sizeof(struct mctp_usb_hdr);
+ 	dev->tx_queue_len = DEFAULT_TX_QUEUE_LEN;
+diff --git a/include/linux/usb/mctp-usb.h b/include/linux/usb/mctp-usb.h
+index a2f6f1e04efb..47e2e3931d63 100644
+--- a/include/linux/usb/mctp-usb.h
++++ b/include/linux/usb/mctp-usb.h
+@@ -21,10 +21,11 @@ struct mctp_usb_hdr {
+ 	u8	len;
+ } __packed;
+ 
+-#define MCTP_USB_XFER_SIZE	512
++/* max transfer size for DSP0283 v1.0 */
++#define MCTP_USB_1_0_XFER_SIZE	512
+ #define MCTP_USB_BTU		68
+ #define MCTP_USB_MTU_MIN	MCTP_USB_BTU
+-#define MCTP_USB_MTU_MAX	(U8_MAX - sizeof(struct mctp_usb_hdr))
++#define MCTP_USB_1_0_MTU_MAX	(U8_MAX - sizeof(struct mctp_usb_hdr))
+ #define MCTP_USB_DMTF_ID	0x1ab4
+ 
+ #endif /*  __LINUX_USB_MCTP_USB_H */
 
-Best regards,
---  
-Jeremy Kerr <jk@codeconstruct.com.au>
+-- 
+2.47.3
 
 
