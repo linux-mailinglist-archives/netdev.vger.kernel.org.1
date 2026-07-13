@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-307269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307270-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id nsrGEiNAVWpcmAAAu9opvQ
-	(envelope-from <netdev+bounces-307269-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 21:44:35 +0200
+	id NWsPECpAVWpgmAAAu9opvQ
+	(envelope-from <netdev+bounces-307270-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 21:44:42 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9842674ED8D
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 21:44:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D5DE374ED95
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 21:44:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=0sec.ai header.s=google header.b="ZEka/sdd";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307269-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307269-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=0sec.ai header.s=google header.b="Rt0Okg/R";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307270-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307270-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 683B9311D86A
+	by sea.lore.kernel.org (Postfix) with ESMTP id BF41E3120F64
 	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 19:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D82A35AC1E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D8AB35AC28;
 	Mon, 13 Jul 2026 19:40:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98178359A6C
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 19:40:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D0435A952
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 19:40:21 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783971623; cv=none; b=WdBQ08hqy+SdV5Vw2eqvyxRbrfwfcEUQd3+J7v4CBCewjRvQcrL87IZbmyx22dZ3ADXYlcleYgYFvz36ZbucYU0a3DunqtiqoTuXcbgcHo9eTcBM//atYq0yOtPCpxctvXtRL/ygWcv2MguTrkYdeP3J5O1F9hsqzdd2aPRGz4M=
+	t=1783971623; cv=none; b=ulPXDOzKgpbKywKQROTl3ywYnaDF8K405dDRld2T1d1ZDd1mqQQM4KcWwBBinBLvBrJVAVA2CQwXZLQNNSA7jGvc6nmXJvU0gMbLMA9kMDqtDQmABLO+nW7aHDMGfAV4L/yjsLNOxJCV0betLlvTnP7/NGgQ6ySr5eIn4Ca8Tpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783971623; c=relaxed/simple;
-	bh=ZElYX+gf59pRPgluKzpGvx9WiCEsZq+Swc8cluTkDzo=;
+	bh=Qb2HIoMSqWqjQCWpGfmBQN/eCpG6jcj8qiqVtJGiIdc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=li4jwEahM5uUuLxRu1maCaKdpid2sw9IZ37wWPedDwz0rKzNt+39l1Qx9hYbJ8ccMqoo5EoPCYmnBaPHLbG00nbLG55vGcVbkXZkGlJ69/Y719K5+e8RvYNtDcM/1rXfv/dhJBoH4uQ7IdDg4JhASljuYj8Y9kvmV6e22VMVn2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=ZEka/sdd; arc=none smtp.client-ip=209.85.221.43
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-4758b2a9e2aso2183916f8f.2
-        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 12:40:19 -0700 (PDT)
+	 MIME-Version; b=R5rlgfkB9FTxNkdyjGbyTyj1WlBWUqn1luaGkR6dXAqFilbai0g1M7g1VFceW/IVlvFAJgj1a08P3bcbBsU7uoqdgviyFeOHBZPUtiIJqe9re26Sxob319yeoN6KEhyAR7+Z8QvXmifJylO2g9XIK9IQwXeIK37yo53cvp+EvpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=Rt0Okg/R; arc=none smtp.client-ip=209.85.221.50
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-4703bc0a99aso2006682f8f.3
+        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 12:40:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=0sec.ai; s=google; t=1783971618; x=1784576418; darn=vger.kernel.org;
+        d=0sec.ai; s=google; t=1783971620; x=1784576420; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=2Anq+ZgEfX5t6X9Q7TePAbPIwtsyngsq62Z1m8/YM/k=;
-        b=ZEka/sddEpto7RUMFCIQb5azkrkfoCdYr8etYSkVMWZO4ISCu/iad8n56x1S3UkYt7
-         XpNtEycCBk0zqhZUN8/F4j8Q+gleArHpn8qeMlXD6G55tv73Yt7JZcg5Y+4AiJ5Imydu
-         yhTc0xH4X0s4HZK7NOph4LgugRFZ0eCK2hk2cR5qA8yqzVNwpJ2VTgDpWswdoC4DwrZe
-         7Jvn4MuqaMmjuqwveOJiuZbv1MTGRHm4iiAuIttR9wVV4gx1DveX7VerssR79FE7USfT
-         ivHn4PH/Yt4RQGEf0GdB/hQ/jDHWNfL3EOfCX9HaWKEp4tvffW2fmOxelNeZA+EV+Gjj
-         OQtA==
+        bh=8SE6mH/eebwrYuJdjdXRg/YfI81pgkyA3KxLJxVspBM=;
+        b=Rt0Okg/R7m2LYzMem/ylCjKCEzz69c8dLbMOcZti5wRcXsg1ktmSA7lar8vT1POltc
+         eA/DCf7sMTam6DmzQZ/uEG2ycSY6mvUcI4pFSQ0BCat8nNIZKSEZDAYqO29MgEKL7meO
+         1jCh+8ortx6Q5Z4RMUuxOsoyX4yl5iHU+ST0bVip6L2s+VseD+vroJwrM0SVba7N1hlP
+         Y2g6GRcfneRw45jJH8hU29kg2YDHdPXmIqHdMnSCLSZlvXHPuhDbTWFG33wlqeLNGhUI
+         fmt9B2yuuAk74yNuvkCKFGFWNVYwvqsoQTr098cRgvM8Ilcb9jQsQCXblbI6Bj2EnJm9
+         grrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783971618; x=1784576418;
+        d=1e100.net; s=20251104; t=1783971620; x=1784576420;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=2Anq+ZgEfX5t6X9Q7TePAbPIwtsyngsq62Z1m8/YM/k=;
-        b=OhaUOv387Ykz3uFk91mY4QLR01GIKZ0Zfh3mz50PfgZ3F7wTNxMVRyAxlC/Cs8pvqI
-         CFChb7M4thReLqLIwps25fvQd+WOU6xljsWfpyoD4h76l0E4Ox1Nji0JEjfQyF2Xtdqe
-         5vNPiP7x7IG4A4BWjw6lhQoDV4vTKaRENzm7z7xa39PfCvGnsHRMGuz+fblQuBJA0CNb
-         uWdu+X52qeVuttkyiMNkjxXqbAnYtc9cZnI0BmrAqIOg/d3MNd0OdpU3o4zYg6VcaN0J
-         Z7RG0Vl2OUYp2CvGJ+C6ZlE5fYLh0y2pex6ueOBHBMDPwyLnyZ4/cwENipwk5i/Tsjdd
-         6RIA==
-X-Gm-Message-State: AOJu0Yzinqk265t7AXZAvsMrs7aDC0T94DnTYqQ0pb89row/O8U/O5LF
-	/k+eCfbEc+E1j2z3dgJXe2Xg2mg/HmeKVhIflvUlWGpYvt+oKTYGFmIbFecgcHPIPICH
-X-Gm-Gg: AfdE7ckEd53mQ0yQ1dUMKChBFGM6xKeEZYM/YMzSvWt8ULR7D8B3igEqo9HsaDqcWuz
-	Ibz/GHEfxcqZyFjZUaNcYmslc7PzYZSc9DvT6ASQxhG3BhyaF38M0A4xIkbfHeYeYiMYLiY5cYY
-	lE12Au3losl6BXTGsIs5yallh0uK0dE55ILfwKB5Ye1AgDd8ZhBnXznMKx1NU2GPk6VDVrREMRt
-	gd4fQbLEJBGQCl1+HOEMvDqAKDmV9AY7E5maV5CiZnRK/6tV7Gb7d/n+N3QoCWoyHxt/+ZIC+wR
-	iwOLn+CrLVShJ6vj5v4Mf+5p6KL9+XwuuVdOoekFvk2eF/b4pIGXSOGP2tPkyFEu2u6pYRPbt7f
-	6mkAhNTeCa/WZh5GyqvcMXVRApeHTTLWczB9CuFnzRYXiveNA//Ou5XSDh0WavSXHIx3fCyZ81g
-	kNwKCh5Wkgd9KzgC9b3zhaJgOEeQCZPlFgaR83AC3p4fiL+Z1hMKJcKiYyiGl18IpW+JEX25821
-	qfzofcgyuq/+rJQHq3c7C4lO1poE5KfMlfIMV2nnreVWA==
-X-Received: by 2002:a05:6000:2908:b0:46d:9871:1a44 with SMTP id ffacd0b85a97d-47f2dcc5c1amr11070214f8f.32.1783971617968;
-        Mon, 13 Jul 2026 12:40:17 -0700 (PDT)
+        bh=8SE6mH/eebwrYuJdjdXRg/YfI81pgkyA3KxLJxVspBM=;
+        b=pumed2L7Gp9G2cGlrArOOjUwtfV6HSjzxOw15rDbIUkn1yapK5zCVIhG995Jt/msgV
+         gatgK47W69jO7u+2KRLaOreEhK8cu5M7cl71RMgCnrpgpCBzQzKxbg/gI12DvH1+CXXH
+         QyhQVOy4Zu4d40L042c8y0Nxyf43qs2f60xT+s6Te2HmW/GiVUCBIlzExbpPtHeyM21f
+         +KXE2oHkv4G6BneSpe3hh952CKaKXe2yaWcxaj9gvVb3DF0CtopIEWOk4iJP0MZkX8bv
+         qOn5Y5Ayekz0SRnWHGsKod3oBpAZz9ZvueuN24KNRvV2o4A/5vQdD5drip633tnR7DwM
+         RMUQ==
+X-Gm-Message-State: AOJu0Yzg6Hd/d40JDUJKf6kPJfOjTe28lGSR/+f40tFlFRbsBFJJ/Uiq
+	D7UXxyRc6jFbNzU6C0HhveUWzcavso52EJaJNiiRKC6bBmYBx1W93bQUvFawayVERl0E
+X-Gm-Gg: AfdE7clMh/Zi355KKrFuUkrJzWU011IE4QwgEhrk+v8F8p/eBvysyKVTwHVdHO42W6h
+	Yg/ITD3W/aI0d9mJhkDfpuIuV+F/dA6Y2Ylj2003eWbQ//jw2gd3tTlQVKz6L0KSh9iXebge9CX
+	pyEmHN1t9Ob1HofWxwE4ZJfBAEY7GItwnrvFFaAd75et+k9MFXFkeDoMoA8LoaAkWoFGdfabx2n
+	QPkNqUMDx1kmhE/sx2JUn3fIohpGzXZROWdYOKybiYhbWoyHI60TdAV3ZMdGEUnXD1B323gjHlN
+	1Ho8nbca5aab8X7fx1yZI8tWyhA6G7EGQkaPkvKX0Ijzukzdxbvo8K99EdmIqrTIVi0wVI3Fo8+
+	pNymiNF6FejBKxAgBAuYzzSwPiRxYpTsuF28SVNOVJPRT5amnAc8TEM6I1nCbdvQyd2dMajxCFe
+	FQlNWrgwnQNCUGET49oMyxRlj1i4Q17vj26uo8zw57dGYABKyWJbtyd2dJogw3Gsxf8Tg2grSs5
+	L145ydKAotjP0tVlcJP/ds2PVb3+YEmihc=
+X-Received: by 2002:a5d:5846:0:b0:474:9002:c74a with SMTP id ffacd0b85a97d-47f2dced169mr11560342f8f.35.1783971619960;
+        Mon, 13 Jul 2026 12:40:19 -0700 (PDT)
 Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.218.188])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f464c4320sm1648928f8f.32.2026.07.13.12.40.16
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f464c4320sm1648928f8f.32.2026.07.13.12.40.18
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 13 Jul 2026 12:40:17 -0700 (PDT)
+        Mon, 13 Jul 2026 12:40:19 -0700 (PDT)
 From: Doruk Tan Ozturk <doruk@0sec.ai>
 To: Vladimir Oltean <olteanv@gmail.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -95,9 +95,9 @@ Cc: netdev@vger.kernel.org,
 	Michael Ellerman <mpe@ellerman.id.au>,
 	Doruk Tan Ozturk <doruk@0sec.ai>,
 	stable@vger.kernel.org
-Subject: [PATCH net 2/3] net: dsa: tag_ksz: don't read an unset MAC header in lan937x_xmit()
-Date: Mon, 13 Jul 2026 21:40:09 +0200
-Message-ID: <20260713194010.54642-3-doruk@0sec.ai>
+Subject: [PATCH net 3/3] ibmveth: don't read an unset MAC header on transmit
+Date: Mon, 13 Jul 2026 21:40:10 +0200
+Message-ID: <20260713194010.54642-4-doruk@0sec.ai>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260713194010.54642-1-doruk@0sec.ai>
 References: <20260713194010.54642-1-doruk@0sec.ai>
@@ -121,7 +121,7 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307269-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307270-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:olteanv@gmail.com,m:andrew+netdev@lunn.ch,m:f.fainelli@gmail.com,m:woojung.huh@microchip.com,m:nnac123@linux.ibm.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:sd@queasysnail.net,m:arun.ramadoss@microchip.com,m:UNGLinuxDriver@microchip.com,m:mpe@ellerman.id.au,m:doruk@0sec.ai,m:stable@vger.kernel.org,m:andrew@lunn.ch,m:ffainelli@gmail.com,s:lists@lfdr.de];
 	DMARC_NA(0.00)[0sec.ai];
 	FORGED_SENDER(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
@@ -142,14 +142,12 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,0sec.ai:email,0sec.ai:dkim,0sec.ai:url,0sec.ai:from_mime,0sec.ai:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,0sec.ai:email,0sec.ai:dkim,0sec.ai:url,0sec.ai:from_mime,0sec.ai:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9842674ED8D
+X-Rspamd-Queue-Id: D5DE374ED95
 
-lan937x_xmit() reads the Ethernet header via eth_hdr(skb) to test the
-destination address. The sibling xmit paths in this file (ksz8795_xmit,
-ksz9477_xmit, ksz9893_xmit) already use skb_eth_hdr(); lan937x_xmit() is
-the lone hold-out.
+ibmveth_is_packet_unsupported(), called from ibmveth_start_xmit(), reads
+the Ethernet header via eth_hdr(skb) to test the destination address.
 
 On the AF_PACKET SOCK_RAW + PACKET_QDISC_BYPASS transmit path the skb
 reaches ndo_start_xmit() with the MAC header unset, so eth_hdr(skb)
@@ -160,28 +158,28 @@ done for the same class by
 commit f5089008f90c ("macsec: don't read an unset MAC header in macsec_encrypt()")
 and commit 96cc4b69581d ("macvlan: do not assume mac_header is set in macvlan_broadcast()").
 
-Fixes: 092f875131dc ("net: dsa: tag_ksz: add tag handling for Microchip LAN937x")
+Fixes: 6f2275433a2f ("ibmveth: Detect unsupported packets before sending to the hypervisor")
 Cc: stable@vger.kernel.org
 Found by 0sec automated security-research tooling (https://0sec.ai).
 Assisted-by: 0sec:claude-opus-4-8
 Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
 ---
- net/dsa/tag_ksz.c | 2 +-
+ drivers/net/ethernet/ibm/ibmveth.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/dsa/tag_ksz.c b/net/dsa/tag_ksz.c
-index 67fa89f102e0..4f74336ae396 100644
---- a/net/dsa/tag_ksz.c
-+++ b/net/dsa/tag_ksz.c
-@@ -430,7 +430,7 @@ static struct sk_buff *lan937x_xmit(struct sk_buff *skb,
- 	u16 queue_mapping = skb_get_queue_mapping(skb);
- 	u8 prio = netdev_txq_to_tc(dev, queue_mapping);
- 	struct dsa_port *dp = dsa_user_to_port(dev);
--	const struct ethhdr *hdr = eth_hdr(skb);
-+	const struct ethhdr *hdr = skb_eth_hdr(skb);
- 	__be16 *tag;
- 	u16 val;
+diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
+index 73e051d26b9d..88e8bdfbcd11 100644
+--- a/drivers/net/ethernet/ibm/ibmveth.c
++++ b/drivers/net/ethernet/ibm/ibmveth.c
+@@ -1218,7 +1218,7 @@ static int ibmveth_is_packet_unsupported(struct sk_buff *skb,
+ 	struct ethhdr *ether_header;
+ 	int ret = 0;
  
+-	ether_header = eth_hdr(skb);
++	ether_header = skb_eth_hdr(skb);
+ 
+ 	if (ether_addr_equal(ether_header->h_dest, netdev->dev_addr)) {
+ 		netdev_dbg(netdev, "veth doesn't support loopback packets, dropping packet.\n");
 -- 
 2.43.0
 
