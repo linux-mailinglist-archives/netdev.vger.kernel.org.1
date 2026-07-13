@@ -1,169 +1,190 @@
-Return-Path: <netdev+bounces-307126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307127-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 9FLLHbXFVGoXSwAAu9opvQ
-	(envelope-from <netdev+bounces-307126-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 13:02:13 +0200
+	id b1ZGOa/GVGo/SwAAu9opvQ
+	(envelope-from <netdev+bounces-307127-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 13:06:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA98374A184
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 13:02:12 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5913C74A1F4
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 13:06:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=SlEx8YZX;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307126-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307126-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=RkI+xStK;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307127-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307127-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 143DE3041A3E
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:59:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0570A3022933
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 11:06:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 938643E63A6;
-	Mon, 13 Jul 2026 10:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC27E380FEE;
+	Mon, 13 Jul 2026 11:06:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3043C37CD52;
-	Mon, 13 Jul 2026 10:59:20 +0000 (UTC)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 536FA374183;
+	Mon, 13 Jul 2026 11:06:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783940365; cv=none; b=HTJDpJ0MV8htT90+Y5AR6xbOLt7amRxP0h0o8R5D9mXTjtKwLAPhU3ebK672TVUUDklnjNAZSv0eoDUz68C44qsskgC/JH8M+wEzmHSsUxBeEdiM3MmK1NiTSKGwF+NRzD+b+gWf0ruqMh37ZcWh+JcOohqBTVNSHq8icrc50yQ=
+	t=1783940772; cv=none; b=p4w95O64EnWCJ2Lbho+tY6lA3pAqlidlfunj+lXQU1WzTTaae2vyGyJWt1FVdcg7CAqpis8eZ6fII87m67ZYgqiQdEiFy5KikIoV70nMJzujAOu0W0UatAPr+uPC+lZHQCiba+qfgheXyhRYnNG3mUXHvnX2oxXveOnXvuJ+de4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783940365; c=relaxed/simple;
-	bh=hMUzyfPsZITC71r2AApuo/5sd8jeSwkGVY9URMR8w9A=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=C6FkYNpfIZ1UtknvwcJ0PBzlOXacyw4BFg/m1VcT8GI+HkvhIUMUN2HCzS0vHFa4m/N830wR51hsoqay3KlDh1xs4wIRp+nmO2PvFi1py4z9JHMqpnTLRoMf0dma9LMST96wHfcxOKWaIETU+4S8tYuuW0PdqfgE/1JqYT6IwBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=SlEx8YZX; arc=none smtp.client-ip=206.189.21.223
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=mails.tsinghua.edu.cn; s=dkim; h=Received:Content-Type:
-	Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	Content-Transfer-Encoding:Message-Id:References:To; bh=i0slMDNhK
-	lMyKtTXMPPaVwgKTGbRsXdDj4D0CFNyp8s=; b=SlEx8YZXNk65B/21Jeyn0TMPf
-	bGaUytD4QtgkPr8NfjoqxsMMTm1uUSHjzUUSeI1K9dJvkwYLgW9CJAsk7KJtp89P
-	gk+45V4WloGbN4qjuvMBd90gthy/XU843t8wdmLeSHpfwfHBqXpDKXzoswDgVclF
-	JWtgDm7xbj5pgcNZxA=
-Received: from smtpclient.apple (unknown [121.229.84.192])
-	by web3 (Coremail) with SMTP id ygQGZQDHE5EAxVRqfF4kAw--.20159S2;
-	Mon, 13 Jul 2026 18:59:12 +0800 (CST)
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1783940772; c=relaxed/simple;
+	bh=5J5cXQBce5VR8QN/VQA2lP1ZEY9o5RmO3bKYd7gsR4M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tBtPRbHOld1MlPf67lpZdsM5z0Gtv7QDq50NWpvOZYjqAPUCD6VXdzbXM/jQfgmm/n1rNO+Jo0VGwOUfpzJt70Wr2Qf2+T/7h/G14ApNjHstlS9Icah9OWyLaP8Tapr1BJDaSYgYbRXDD22egAo5x/sVkIdXmAjrMigM60MzpZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RkI+xStK; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 674A21F000E9;
+	Mon, 13 Jul 2026 11:06:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783940771;
+	bh=ohWt3aTjQf0vTG1RtHrEvL2ptFIhsw5uqjt4ZWrEnKY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=RkI+xStK+i5l7Pn35q729ItMVQWfTxXMiFNBhgXdb633nBInoqHaH0tj2RRIM3f65
+	 nGSwBGneATqRQHA//dJN9FdW4E8mSG+AyPiVgaBrZWI3900wnIGrPiiZMKdYvB6K+J
+	 4wysIZzlV07mc6ZMyeIALIq5TckUiRk57o6s2PB0efIybAVGDE13eKRIo2bWJRyaZU
+	 LyVrW+MvyMPLy5x+XLTTAzimaEbDQC+ToeYa224bYA+9FeoEe3nzpWTXt1hNdm2TMl
+	 DhoSdaQq/+cSOl+xnGhl9kf16qme23ObV+1OYe2s3XNEZSyNmmDIFz1BDhJsixrHyE
+	 ttnR2m53/5xnA==
+Date: Mon, 13 Jul 2026 12:06:06 +0100
+From: Simon Horman <horms@kernel.org>
+To: Maoyi Xie <maoyixie.tju@gmail.com>
+Cc: Veerasenareddy Burru <vburru@marvell.com>,
+	Sathesh Edara <sedara@marvell.com>,
+	Satananda Burla <sburla@marvell.com>,
+	Shinas Rasheed <srasheed@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Guangshuo Li <lgs201920130244@gmail.com>,
+	David Carlier <devnexen@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v4 1/3] octeon_ep: fix skb frags overflow in the RX
+ path
+Message-ID: <20260713110606.GD1364329@horms.kernel.org>
+References: <20260706150208.2944898-1-maoyixie.tju@gmail.com>
+ <20260706150208.2944898-2-maoyixie.tju@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.600.51.1.1\))
-Subject: Re: [PATCH net] tcp: initialize standalone IPv4 ACK options
-From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-In-Reply-To: <CANn89i+jA5kPcZrjXfsY1ic_LjeEwPHi-U54kYmZdkBKHB+vTA@mail.gmail.com>
-Date: Mon, 13 Jul 2026 18:59:02 +0800
-Cc: netdev@vger.kernel.org,
- Neal Cardwell <ncardwell@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>,
- "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org,
- Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
- Ao Wang <wangao@seu.edu.cn>,
- Xuewei Feng <fengxw06@126.com>,
- Qi Li <qli01@tsinghua.edu.cn>,
- Ke Xu <xuke@tsinghua.edu.cn>,
- stable@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <4A9A9EE6-1859-4F1E-B8DE-2ACE839D5274@mails.tsinghua.edu.cn>
-References: <20260713081842.3119-1-zhaoyz24@mails.tsinghua.edu.cn>
- <CANn89i+jA5kPcZrjXfsY1ic_LjeEwPHi-U54kYmZdkBKHB+vTA@mail.gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-X-Mailer: Apple Mail (2.3864.600.51.1.1)
-X-CM-TRANSID:ygQGZQDHE5EAxVRqfF4kAw--.20159S2
-X-Coremail-Antispam: 1UD129KBjvdXoWrur4fJFyxCFy5XryrAw4xZwb_yoWkurXEkF
-	W7G39rWwn7ZFWktrnakr4qkry5Xayj9r4ftrnYgF17WryfAa1rtFs5Cr9avFyxGr18tF47
-	urnIvF1jyr9IgjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb-kFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wA2ocxC64kI
-	II0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7
-	xvwVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28E
-	F7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzx
-	vE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VCjz48v1sIEY20_GrWk
-	Jr1UJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5c
-	I20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxkIecxE
-	wVAFwVW8twCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26r4rKr1UJr1l4I8I3I
-	0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWU
-	GVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI
-	0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0
-	rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4UJV
-	WxJrUvcSsGvfC2KfnxnUUI43ZEXa7VU0kWrtUUUUU==
-X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQAHAWpUpbI4RgAAsQ
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260706150208.2944898-2-maoyixie.tju@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307126-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,m:edumazet@google.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307127-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:maoyixie.tju@gmail.com,m:vburru@marvell.com,m:sedara@marvell.com,m:sburla@marvell.com,m:srasheed@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:maciej.fijalkowski@intel.com,m:lgs201920130244@gmail.com,m:devnexen@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:maoyixietju@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,davemloft.net,kernel.org,redhat.com,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[marvell.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,vger.kernel.org];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mails.tsinghua.edu.cn:from_mime,mails.tsinghua.edu.cn:dkim,mails.tsinghua.edu.cn:mid]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,sashiko.dev:url,intel.com:email,ntu.edu.sg:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BA98374A184
+X-Rspamd-Queue-Id: 5913C74A1F4
 
+On Mon, Jul 06, 2026 at 11:02:06PM +0800, Maoyi Xie wrote:
+> __octep_oq_process_rx() builds an skb for a multi-buffer packet by adding
+> one fragment per buffer_size chunk:
+> 
+> 	data_len = buff_info->len - oq->max_single_buffer_size;
+> 	while (data_len) {
+> 		...
+> 		skb_add_rx_frag(skb, shinfo->nr_frags, buff_info->page, 0,
+> 				buff_info->len, buff_info->len);
+> 		...
+> 	}
+> 
+> buff_info->len comes from the device response header
+> (be64_to_cpu(resp_hw->length)). Nothing bounds the fragment count against
+> MAX_SKB_FRAGS. data_len can be close to 65535. buffer_size defaults to
+> about 3776 on 4K pages, so a full packet yields about 18 fragments. That
+> is one more than the default MAX_SKB_FRAGS of 17, so skb_add_rx_frag()
+> writes past shinfo->frags[].
+> 
+> The fragment count is now checked before build_skb(). A packet that needs
+> more fragments than the skb can hold is dropped. octep_oq_drop_rx()
+> consumes its descriptors like the build_skb failure path. The same class
+> was fixed in other RX paths, including commit 5ffcb7b890f6 ("net: atlantic:
+> fix fragment overflow handling in RX path") and commit f0813bcd2d9d ("net:
+> wwan: t7xx: fix potential skb->frags overflow in RX path").
+> 
+> Fixes: 37d79d059606 ("octeon_ep: add Tx/Rx processing and interrupt support")
+> Co-developed-by: Kaixuan Li <kaixuan.li@ntu.edu.sg>
+> Signed-off-by: Kaixuan Li <kaixuan.li@ntu.edu.sg>
+> Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
+> Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> ---
+>  drivers/net/ethernet/marvell/octeon_ep/octep_rx.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c b/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c
+> index e6ebc7e44a..bdbed58c7b 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c
+> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c
+> @@ -453,6 +453,15 @@ static int __octep_oq_process_rx(struct octep_device *oct,
+>  
+>  		octep_oq_next_pkt(oq, buff_info, &read_idx, &desc_used);
+>  
+> +		if (buff_info->len > oq->max_single_buffer_size) {
+> +			u16 data_len = buff_info->len - oq->max_single_buffer_size;
+> +
+> +			if (DIV_ROUND_UP(data_len, oq->buffer_size) > MAX_SKB_FRAGS) {
+> +				octep_oq_drop_rx(oq, buff_info, &read_idx, &desc_used);
+> +				continue;
+> +			}
+> +		}
 
-Thanks for your review.
+The AI-generated review of this patch on sashiko.dev flags that
+this cannot occur for 4K pages. I believe this can be
+addressed by changing the type of data_len to u32.
+I also believe that a similar problem exists in patch 3/3.
 
-> On Jul 13, 2026, at 16:48, Eric Dumazet <edumazet@google.com> wrote:
->=20
-> On Mon, Jul 13, 2026 at 10:18=E2=80=AFAM Yizhou Zhao
-> <zhaoyz24@mails.tsinghua.edu.cn> wrote:
->>=20
->> tcp_v4_send_ack() constructs standalone IPv4 TCP ACK replies on the =
-stack
->> for SYN-RECV and TIME-WAIT paths.  It currently zeroes only the TCP
->> header, not the accompanying option buffer.
->>=20
->> TCP-AO options may have actual lengths that are not 4-byte aligned, =
-while
->> the transmitted TCP header length is correctly rounded up to a 4-byte
->> boundary.  tcp_ao_hash_hdr() writes only the MAC bytes, leaving the
->> TCP-AO option alignment padding in rep.opt uninitialized.  With stack
->> auto-initialization disabled, those padding bytes can be copied into =
-the
->> network packet and sent to the peer.
->>=20
->> Zero the whole reply structure before writing options, so the =
-alignment
->> padding bytes are initialized.
->=20
-> Please fix TCP-AO instead of slowing down TCP (almost no TCP flow is =
-using AO)
+   "Does truncating the data_len calculation to u16 introduce a regression
+    by bypassing the MAX_SKB_FRAGS check?
 
-We have posted a v2 patch following your suggestions:
-=
-https://lore.kernel.org/netdev/20260713105631.8616-1-zhaoyz24@mails.tsingh=
-ua.edu.cn/
+    If buff_info->len is unexpectedly large, the u16 truncation of data_len
+    could wrap around to a small value. This would bypass the check,
+    leaving unconsumed fragments in the ring that might be incorrectly
+    parsed as new packet headers."
 
-Regards,
-Yizhou=
-
+> +
+>  		skb = build_skb((void *)resp_hw, PAGE_SIZE);
+>  		if (!skb) {
+>  			octep_oq_drop_rx(oq, buff_info,
+> -- 
+> 2.34.1
+> 
 
