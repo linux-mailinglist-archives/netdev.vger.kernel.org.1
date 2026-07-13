@@ -1,499 +1,899 @@
-Return-Path: <netdev+bounces-307099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307100-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7SGAHueqVGqApAMAu9opvQ
-	(envelope-from <netdev+bounces-307099-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 11:07:51 +0200
+	id EZHNEaSrVGqtpAMAu9opvQ
+	(envelope-from <netdev+bounces-307100-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 11:11:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B75DD7491DF
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 11:07:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8742874925F
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 11:10:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=resnulli-us.20251104.gappssmtp.com header.s=20251104 header.b=dEo1Mewv;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307099-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307099-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=lQX+kF5d;
+	dmarc=pass (policy=none) header.from=gmail.com;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307100-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307100-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 028CA3018280
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 09:02:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2C525300B606
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 09:05:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 718063DC4CF;
-	Mon, 13 Jul 2026 09:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB9583DC87B;
+	Mon, 13 Jul 2026 09:05:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E2B53DBD76
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 09:02:37 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783933359; cv=none; b=qFqa2aefOyMiV23fel4aqTxlUysG9Xk6K0tvUrqy0Qj0vEf9/4yu1Wp7RJZfeLIWUqCCRIj9dTaU0YGwu/R8uFurC2rGxb/DXBqKjwh14zQTkTAXMrKizi2W40w8W2rKdBeEgqwtAG6rs83V4mX05dBFupLISSrXI1pbF+XpKlY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783933359; c=relaxed/simple;
-	bh=ZMnTzIIYD3ryqWvmxnS7KPltVp7erW0leC7SgcT6FFE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pge0Pe3oQ/DII/6otj2xjLKTGo1JNyHqW05ucR/UPKS8kUqdNsUaro+hr0D4tRua+bdyBthR9g0u1S/VJbeWKE2hltUwRrRRwAfKMAQ7beMjegKSEH9mU/B6J6+U6RfkoEijJDCYvmnvTeM4jsat6EExoQ5dW9xGzOz3zOEAwUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=dEo1Mewv; arc=none smtp.client-ip=209.85.167.48
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5aeb6d00883so2634515e87.1
-        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 02:02:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1219E3BED30
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 09:05:31 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783933534; cv=pass; b=GBb5dwdHL/HC/0CKFXDYgs+jwYS6JN10HnHzszaa4P8YOyX/BPqor4lq8pzLWoX4CXNKz//1WKN/jsU2mt4psauLLxnEs/WuC8pxFxQVb0acNusnHYpmdWxNJKyLBF3jbaSUNd9ZQ04X/Je8/CGkSkZeQo2Qzc0pVZ0ScyIxaXU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783933534; c=relaxed/simple;
+	bh=auMZdWe1zpPrfohK8rnEb1n2d++1ZQoEuP34TJKygyw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RmFHfovHk5XLpdwDFv2IfDQreyqNXlqHsX4PbwouHNrRvYVF5tVyJRYJAiIZsO4AYQvWPxyiuepKTnRaS4ll0aLv+HUNRBpdJaeXEKyaHklqEPwyiCBH6CsD8e0v5IfgSbjdFGxY53ZWOzr1WjI/aYBrlo8iOE4LUjV0BsV/vuc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lQX+kF5d; arc=pass smtp.client-ip=209.85.160.179
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-51c15a5b265so357581cf.0
+        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 02:05:31 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783933531; cv=none;
+        d=google.com; s=arc-20260327;
+        b=JFAar3wzbaaXF51VYMYb9LsVPjD549DZEBp8Txx7OxPCNB1BKkR0OQUv1KEGcql3O4
+         rgzRD2LpajqQcea2xAMAdMjhioLwxSSh7CaCL+jPzo3dybKNbkOD2mO8c4iUEyuPtgKd
+         4xPF1Pd5aI2fW0fQ9M7dCpiOEOLwu1W2ixDvVUy8INL2IV61mtWxnPF42CTz7UtiD0wJ
+         OLfD605EMrYRJ3n2Cf7GrijFkLFjb6C8fhFSN6AT4COKiEvmoElXeB4Z7w7+jlOdPfux
+         ckkHZFgPN2mGMdj+y6tVf218BWMK65zIAsrZGdrm6LNrW4NAjoSWFmMTuJdkXSKaDAce
+         9IBA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=AJ5PzOhHCuJUpnI86QVi4NQ+FC15w4PgaoBYaYUGBbg=;
+        fh=oe/yb0ClPAOaKd5TvCi8rVZtYYWITc6mbK5c8eEE95o=;
+        b=r38bu2qazwKGWa/nVN8GSoFX8MXuR7PpMITNysLAsgmipPhUzuSeUkKZwgRCiS+541
+         fQx9cJtlfbmQgyJACUCdi5ivsI0z7r7zf8BQBDt400IpVWA70d2ygNvt9dW0YGHCmwu8
+         detSfENXykerB9JQ+RYO6NNst7MlZV+qmtTPOmJThSggaVX1U6ZSffaW6zkoyJKf8OaY
+         MxsqyqI5hP3/pCHupAfedzZkpEmVkOWeBeTqgR5C9KFide3AOb6znQK6sp3dr1TdRZoi
+         H7o1+QJ1wTvNs6rvggmPE4jT3ZoQNVS6B6IDcBgX5rinNkB2tGk2eA/DF/U5lmnRrTDI
+         oQPQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1783933355; x=1784538155; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+        d=gmail.com; s=20251104; t=1783933531; x=1784538331; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=JmJBQdQ4elBFSV3TDptElk8IGzQWnD9GFf/e4lmq0eU=;
-        b=dEo1MewvM6WVrTO3QDvtPCjC/VqjyYBM9skqvyFMwPKBtM8yq2R8Y25kbhDUJ6jWfs
-         f0Cu3WR9L4UYqWpBjybNUr2F/8r/fmM4k1D8W6W1DVpV4YFkY7kU1sBF931YgUK7F3SR
-         6YaueeH6f6hW19Tx6fRpdYnhpr5O7p5nOlJjFN7u+7HlQq0y9l7EBnZ42wSYRdz2u+NO
-         g5EVs8CZU/hHeAOou6eVQWdBIx5DcD1vvtoN6MJ/RG6ZzL03vx1Pik6kmavbOErDpfNB
-         AV4IPEl4nnJ1VNW3J+D2rpGnQQ+39GtKSTVUJxb6wlkGex8eB++k64IrQg49z7gf4wwu
-         Fh6A==
+        bh=AJ5PzOhHCuJUpnI86QVi4NQ+FC15w4PgaoBYaYUGBbg=;
+        b=lQX+kF5dDd+PCBBMQFFybsW02E6QNoJ4VJT5W+Pd1zWyuOpZGvEWZZHsZRnkdPjILU
+         xEpKO/VNa81lROSmONW5DdnI5lcOIDFs1ZGXsXK51ZXBd4Na3NTZN7hBWrkFkMANhANP
+         XqZaiKe4ZsMQAIOFj9REQagSVznV5F/Hza750zfZtBKWZXXc3jUGND38+HKtC1FWdWFP
+         1NDnx/p/yIbn6c+l9lunBSmpkuyfT4u1Qoh3ZMNjGWfMFrN8ibukgr2yBDJkH9v/6JvF
+         1RD2jO1w9OXpXDC6nDzCpdd3rS8yO6al2XDlBrgeDkc8aMxCv4qRcGnocHI7FoeoO2nx
+         5G5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783933355; x=1784538155;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
+        d=1e100.net; s=20251104; t=1783933531; x=1784538331;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=JmJBQdQ4elBFSV3TDptElk8IGzQWnD9GFf/e4lmq0eU=;
-        b=dM7gcqKKzCR/Zb94rOpYvdVwPP6DX/O/ElTQgSosY6mKoNLlyzWc+gRDYnVJKC7Ro2
-         MG9jZ3wVvaBWWgpzEZ8cJB5Pp5lF4VBhGO2sB+Ue5Xrb2QbiwNFJU3UbOQ4jF6LGQby3
-         gX5aZAAZYpnI2O0qjLZN+xoA5Zjcg7BgpHppWPhFEFx90TvBhf5hBz/JZBs0nzhQPBG+
-         AShBwLdzVz1XZbyHcJ8+rFaIkVaCOgxisLO9yEWlAwXADWz60VUty4yUaLECbmu8a/Ne
-         lIZwihldjBWAYdlNvmQf4sHypkM+QC7jY2RkcbpXn6qyG/btHDxPBCM5/2FrRbQdEPbN
-         GSRA==
-X-Forwarded-Encrypted: i=1; AHgh+Ro8G2doshCJnVZRxYOspDdKVubYSIizdw9e3MzPvPX8FHimDzXq5jUMKwvnG+FEm2O4NMZxZxQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1kjYg/oqvFlMmor6A2hJNFIbqzWmLpr6S++u7TULraKKPhbGy
-	S0mRPqoNMT8k1uzBFeznghn4RKE9yw4PoI7D9HR95hcm4/TYgi6rOXrmolqzJ7XbMKw=
-X-Gm-Gg: AfdE7cndBXOA+SmcWdQ7pGIrjWmAR9bwiJ0OsiCXERRxF7wHkHn8jd3LadtkPZ20yl+
-	3xWBiamLEPe5lltXP+nHVhJphN6I6Eu7oBkWchKTYGzEBImO1CwbCFvG+MVlc1bpzYTItLX8aO2
-	MgxNhWcp/wacXBb9bLOA3/raEOXpQ1URGyj0RDAp9D5eE+9DzggOrE0E+GZ0aotJ/NOUVzdbgMP
-	9qyu+E02vl0NuQL16k5YfcuvAL+Wd0hNFW4JE4zfbsPtmtXH+m3kg4IBbKIQOJ5DMC0gtKFLMLh
-	lnBqwdZ3v6K6Pdoyxa0Bc4F1lyu955VZuNYMHZBtfL0nCV0cApun4X/J+we3yqfHevHX7O5fgcy
-	RxJq728+/2fXImre5q9Dc2O3V+LcvaQAKvvSu7FDR398PWQ3+yqrBzDDS6ebrnu03St9W3Qlvn5
-	0JuYcWC7Z8LDVcDNsltiYm2Q==
-X-Received: by 2002:a05:6512:23d2:b0:5b0:1ae2:8b7a with SMTP id 2adb3069b0e04-5b0236ab3e8mr1256753e87.45.1783933355519;
-        Mon, 13 Jul 2026 02:02:35 -0700 (PDT)
-Received: from localhost ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5b01caa66b4sm2731890e87.64.2026.07.13.02.02.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jul 2026 02:02:34 -0700 (PDT)
-Date: Mon, 13 Jul 2026 11:02:30 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: "yanjun.zhu" <yanjun.zhu@linux.dev>
-Cc: linux-rdma@vger.kernel.org, cgroups@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	jgg@ziepe.ca, leon@kernel.org, parav@nvidia.com, mbloch@nvidia.com, 
-	cmeiohas@nvidia.com, roman.gushchin@linux.dev, bvanassche@acm.org, 
-	zyjzyj2000@gmail.com, shuah@kernel.org, tj@kernel.org, mkoutny@suse.com, 
-	hannes@cmpxchg.org, alibuda@linux.alibaba.com, dust.li@linux.alibaba.com, 
-	sidraya@linux.ibm.com, wenjia@linux.ibm.com
-Subject: Re: [PATCH rdma-next 13/13] RDMA/selftests: Add rxe_netns_names test
-Message-ID: <alSoztLdt2of_6rf@FV6GYCPJ69>
-References: <20260709095532.855647-1-jiri@resnulli.us>
- <20260709095532.855647-14-jiri@resnulli.us>
- <2aec2d14-0000-4595-aa2a-73aa5ae41060@linux.dev>
+        bh=AJ5PzOhHCuJUpnI86QVi4NQ+FC15w4PgaoBYaYUGBbg=;
+        b=nHbNUz1uMe6goWMnFQaxQWuydmwGxPQE4qXh+M/C3SU0dmVYK8gQuNHfyNbC6UdRqo
+         Y6R9xnnT1eDh76l4xcTKeYOxxNWFeoWJrB+22rvRT/RIBudOxH4ViyEKARHtTy8E33bC
+         L4c+8aDsOvrPgVfIJS1RNCstjshYDZUC7W3w91HLL0D4avCQGpWNhkF3A6rFN3PHAiQM
+         90uJ0YSXPuN8W+gz2D93KVuRY3d/Cnego+ctLF4k+JmRJoLH/m4JLSEbUyOXfZZgxGjy
+         JkPJiBfOrw5jT/n1gJyIzELss4N8x1F3fEq+WGB1hZl9YFs8yVmo0MfoO0PYAk/rAqZA
+         vdWw==
+X-Gm-Message-State: AOJu0YyU9S6cYuLItNjR6X9lbqxhkNT6qWXNVCp7MZTFL8TKoi6mPAox
+	5bUiHEcgtd2e5Q17ByMQoiIUjZGagtd3hRp0Nb/miBomykzcjzgQnvu42BO9IxCE2r6wHZ/mLKU
+	C2psSQ0mwnrh/Ononkz1jYGZqP9m7VK3MgmJvnBlnPkQpoAY7WX1ap1o+QXk=
+X-Gm-Gg: AfdE7cl1DKuD8hkQPOZm44Flplcg7T4LKzrT5bWUbmJDS37LB04S36/woE1oNuuyF3Q
+	wtihWXAkfqP/GcDDrYWdB7riY2GL3pLTZYl0qNNJhfQ0IE139tprSdbHwXuYU0DQOD/0DlF+DBp
+	7iHwHQUGAR+ORL1xT8gBaAIxJCOJybd/IIoo7D3JfAsdDOCPOFqolY8a54PmrHT2p3HFFN3erQP
+	RHVaPxLl+WrNZTFWdeOLf9pmcr0AaVHRjkPAZxZynoiFWnKLRnlz9RAp+rIfad/HQCKJXT/HxY=
+X-Received: by 2002:a05:622a:5598:b0:51c:7a90:a799 with SMTP id
+ d75a77b69052e-51d8385acdemr597941cf.25.1783933529929; Mon, 13 Jul 2026
+ 02:05:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2aec2d14-0000-4595-aa2a-73aa5ae41060@linux.dev>
+References: <20260713081606.950892-1-maze@google.com>
+In-Reply-To: <20260713081606.950892-1-maze@google.com>
+From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <zenczykowski@gmail.com>
+Date: Mon, 13 Jul 2026 11:05:17 +0200
+X-Gm-Features: AUfX_mwpxsSzMZv_dMp_HZkiNHms7pfHKNqWVdACO4R0V0r0rgF0Pu8q5dunz3c
+Message-ID: <CANP3RGfhR5F8wM1D9ek6gQVUasUNgUMpbT0rtf_dsVZrgxOMmw@mail.gmail.com>
+Subject: Re: [PATCH] [RFC] net-ipv6: ipv4 emulation support
+To: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <zenczykowski@gmail.com>
+Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, Fernando Fernandez Mancera <fmancera@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307100-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:yanjun.zhu@linux.dev,m:linux-rdma@vger.kernel.org,m:cgroups@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-s390@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:jgg@ziepe.ca,m:leon@kernel.org,m:parav@nvidia.com,m:mbloch@nvidia.com,m:cmeiohas@nvidia.com,m:roman.gushchin@linux.dev,m:bvanassche@acm.org,m:zyjzyj2000@gmail.com,m:shuah@kernel.org,m:tj@kernel.org,m:mkoutny@suse.com,m:hannes@cmpxchg.org,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,s:lists@lfdr.de];
-	DMARC_NA(0.00)[resnulli.us];
-	FORGED_SENDER(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	TAGGED_FROM(0.00)[bounces-307099-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:zenczykowski@gmail.com,m:netdev@vger.kernel.org,m:fmancera@suse.de,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[zenczykowski@gmail.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,ziepe.ca,kernel.org,nvidia.com,linux.dev,acm.org,gmail.com,suse.com,cmpxchg.org,linux.alibaba.com,linux.ibm.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zenczykowski@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B75DD7491DF
+X-Rspamd-Queue-Id: 8742874925F
 
-Sat, Jul 11, 2026 at 01:51:45AM +0200, yanjun.zhu@linux.dev wrote:
->On 7/9/26 2:55 AM, Jiri Pirko wrote:
->> From: Jiri Pirko <jiri@nvidia.com>
->> 
->> Add a kselftest script that exercises per-netns RDMA device naming
->> with RXE. Cover duplicate names across namespaces, move conflict
->> handling, move-with-rename, and same-namespace rename requests.
->
-># timeout set to 45
-># selftests: rdma: rxe_netns_names.sh
-># TAP version 13
-># 1..6
-># ok 1 same RDMA device name can exist in two net namespaces
-># ok 2 move without rename fails on destination name conflict
-># ok 3 move then rename succeeds
-># ok 4 move with requested destination name succeeds # SKIP     < --- This
->testcase skip
->
-># ok 5 same-netns rename rejects duplicate name
-># # device returned to init_net as 'ibdev35'
-># ok 6 netns delete returns device to init_net and renames on conflict
-># # 1 skipped test(s) detected.  Consider enabling relevant config options to
->improve coverage.
-># # Totals: pass:5 fail:0 xfail:0 xpass:0 skip:1 error:0
->ok 6 selftests: rdma: rxe_netns_names.sh
->
->The above are my test results. But one testcase is skipped.
+Note that this is absolutely ancient - it's a patch from March 2012
+against 3.18 ;-)
+But maybe something like this could be pursued?
+From what I (vaguely) remember I was able to boot my linux workstation
+to a working GUI with this.
 
-Yep, you need patched iproute2:
-https://github.com/jpirko/iproute2_mlxsw/commit/cfb61f715fb16fc2b6d007408e048786ef3ed3f6
-
-Plan to send this one after this patchset is merged.
-
-
+On Mon, Jul 13, 2026 at 10:16=E2=80=AFAM Maciej =C5=BBenczykowski <maze@goo=
+gle.com> wrote:
 >
->Zhu Yanjun
+> Change-Id: Ibab1a59f4730f3fd0a7d14fffc5100a02a170ac6
+> ---
+>  gconfigs/Gconfig.net-configs.ipv6 |   2 +
+>  include/linux/ipv6.h              |   6 +-
+>  include/linux/socket.h            |   5 +-
+>  include/net/compat.h              |   2 +-
+>  net/compat.c                      |   6 +-
+>  net/core/iovec.c                  |   4 +-
+>  net/ipv6/Kconfig                  |  19 +++
+>  net/ipv6/af_inet6.c               |   5 +
+>  net/ipv6/ipv6_sockglue.c          |   8 +-
+>  net/ipv6/sysctl_net_ipv6.c        |  26 ++++
+>  net/socket.c                      | 211 +++++++++++++++++++++++++++---
+>  11 files changed, 260 insertions(+), 34 deletions(-)
+>  create mode 100644 gconfigs/Gconfig.net-configs.ipv6
 >
->> 
->> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
->> ---
->>   tools/testing/selftests/rdma/Makefile         |   3 +-
->>   tools/testing/selftests/rdma/config           |   2 +
->>   .../testing/selftests/rdma/rxe_netns_names.sh | 282 ++++++++++++++++++
->>   3 files changed, 286 insertions(+), 1 deletion(-)
->>   create mode 100755 tools/testing/selftests/rdma/rxe_netns_names.sh
->> 
->> diff --git a/tools/testing/selftests/rdma/Makefile b/tools/testing/selftests/rdma/Makefile
->> index 07af7f15c1bf..a91c14c45006 100644
->> --- a/tools/testing/selftests/rdma/Makefile
->> +++ b/tools/testing/selftests/rdma/Makefile
->> @@ -3,6 +3,7 @@ TEST_PROGS := rxe_rping_between_netns.sh \
->>   		rxe_ipv6.sh \
->>   		rxe_socket_with_netns.sh \
->>   		rxe_test_NETDEV_UNREGISTER.sh \
->> -		rxe_sent_rcvd_bytes.sh
->> +		rxe_sent_rcvd_bytes.sh \
->> +		rxe_netns_names.sh
->>   include ../lib.mk
->> diff --git a/tools/testing/selftests/rdma/config b/tools/testing/selftests/rdma/config
->> index 4ffb814e253b..e1ff54ec0f57 100644
->> --- a/tools/testing/selftests/rdma/config
->> +++ b/tools/testing/selftests/rdma/config
->> @@ -1,3 +1,5 @@
->>   CONFIG_TUN
->>   CONFIG_VETH
->> +CONFIG_DUMMY
->> +CONFIG_NET_NS
->>   CONFIG_RDMA_RXE
->> diff --git a/tools/testing/selftests/rdma/rxe_netns_names.sh b/tools/testing/selftests/rdma/rxe_netns_names.sh
->> new file mode 100755
->> index 000000000000..a7e57706fdff
->> --- /dev/null
->> +++ b/tools/testing/selftests/rdma/rxe_netns_names.sh
->> @@ -0,0 +1,282 @@
->> +#!/bin/bash
->> +# SPDX-License-Identifier: GPL-2.0
->> +#
->> +# Exercise RDMA device name handling across network namespaces.
->> +
->> +source "$(dirname "$0")/../kselftest/ktap_helpers.sh"
->> +
->> +NAME_PREFIX="rxe_netns_names_$$"
->> +NETDEV_PREFIX="rxn$$"
->> +NS1="${NAME_PREFIX}ns1"
->> +NS2="${NAME_PREFIX}ns2"
->> +RXE_A="${NAME_PREFIX}rxe_a"
->> +RXE_B="${NAME_PREFIX}rxe_b"
->> +RXE_SAME="${NAME_PREFIX}rxe_same"
->> +RXE_NEW="${NAME_PREFIX}rxe_new"
->> +DUMMY_A="${NETDEV_PREFIX}a"
->> +DUMMY_B="${NETDEV_PREFIX}b"
->> +OLD_MODE=""
->> +MODE_CHANGED=0
->> +MODS=("dummy" "rdma_rxe")
->> +TEST_SAME_NAMES="same RDMA device name can exist in two net namespaces"
->> +TEST_MOVE_CONFLICT="move without rename fails on destination name conflict"
->> +TEST_MOVE_RENAME="move then rename succeeds"
->> +TEST_COMBINED_MOVE_RENAME="move with requested destination name succeeds"
->> +TEST_SAME_NETNS_DUP_RENAME="same-netns rename rejects duplicate name"
->> +TEST_TEARDOWN_RETURN="netns delete returns device to init_net and renames on conflict"
->> +
->> +ksft_skip()
->> +{
->> +	ktap_skip_all "$*"
->> +	exit "$KSFT_SKIP"
->> +}
->> +
->> +fail()
->> +{
->> +	ktap_exit_fail_msg "$*"
->> +}
->> +
->> +need_cmd()
->> +{
->> +	command -v "$1" >/dev/null 2>&1 || ksft_skip "missing command: $1"
->> +}
->> +
->> +rdma_ns()
->> +{
->> +	local ns=$1
->> +
->> +	shift
->> +	ip netns exec "$ns" rdma "$@"
->> +}
->> +
->> +rdma_dev_exists()
->> +{
->> +	local ns=$1
->> +	local dev=$2
->> +
->> +	if [ -n "$ns" ]; then
->> +		rdma_ns "$ns" dev show "$dev" >/dev/null 2>&1
->> +	else
->> +		rdma dev show "$dev" >/dev/null 2>&1
->> +	fi
->> +}
->> +
->> +add_dummy()
->> +{
->> +	local netdev=$1
->> +
->> +	ip link add "$netdev" type dummy || return 1
->> +	ip link set "$netdev" up || return 1
->> +}
->> +
->> +add_rxe()
->> +{
->> +	local dev=$1
->> +	local netdev=$2
->> +
->> +	rdma link add "$dev" type rxe netdev "$netdev"
->> +}
->> +
->> +rdma_dev_on_netdev()
->> +{
->> +	local netdev=$1
->> +
->> +	rdma link show 2>/dev/null | awk -v want="$netdev" '
->> +		{
->> +			for (i = 1; i < NF; i++)
->> +				if ($i == "netdev" && $(i + 1) == want) {
->> +					dev = $2
->> +					sub(/\/.*/, "", dev)
->> +					print dev
->> +					exit
->> +				}
->> +		}'
->> +}
->> +
->> +wait_rdma_dev_on_netdev()
->> +{
->> +	local netdev=$1
->> +	local dev
->> +	local i
->> +
->> +	for i in $(seq 1 50); do
->> +		dev=$(rdma_dev_on_netdev "$netdev")
->> +		if [ -n "$dev" ]; then
->> +			echo "$dev"
->> +			return 0
->> +		fi
->> +		sleep 0.1
->> +	done
->> +
->> +	return 1
->> +}
->> +
->> +setup_devs()
->> +{
->> +	cleanup_devs
->> +
->> +	add_dummy "$DUMMY_A" || return 1
->> +	add_dummy "$DUMMY_B" || return 1
->> +
->> +	add_rxe "$RXE_A" "$DUMMY_A" || return 1
->> +	add_rxe "$RXE_B" "$DUMMY_B" || return 1
->> +}
->> +
->> +cleanup_devs()
->> +{
->> +	ip link del "$DUMMY_A" 2>/dev/null
->> +	ip link del "$DUMMY_B" 2>/dev/null
->> +}
->> +
->> +setup()
->> +{
->> +	OLD_MODE=$(rdma system show 2>/dev/null |
->> +		   sed -n 's/.*netns \([^ ]*\).*/\1/p')
->> +	[ -n "$OLD_MODE" ] || ksft_skip "failed to read RDMA netns mode"
->> +
->> +	rdma system set netns exclusive >/dev/null 2>&1 ||
->> +		ksft_skip "rdma netns exclusive mode is not supported"
->> +	MODE_CHANGED=1
->> +
->> +	ip netns add "$NS1" || return 1
->> +	ip netns add "$NS2" || return 1
->> +}
->> +
->> +cleanup()
->> +{
->> +	cleanup_devs
->> +
->> +	ip netns del "$NS1" 2>/dev/null
->> +	ip netns del "$NS2" 2>/dev/null
->> +
->> +	if [ "$MODE_CHANGED" -eq 1 ]; then
->> +		rdma system set netns "$OLD_MODE" 2>/dev/null
->> +	fi
->> +
->> +	for m in "${MODS[@]}"; do
->> +		modprobe -r "$m" 2>/dev/null
->> +	done
->> +}
->> +
->> +rdma_supports_combined_move_rename()
->> +{
->> +	rdma dev help 2>&1 | grep -Eq 'netns .*name|name .*netns'
->> +}
->> +
->> +[ "$(id -u)" -eq 0 ] || ksft_skip "must be run as root"
->> +need_cmd ip
->> +need_cmd rdma
->> +need_cmd modprobe
->> +
->> +trap cleanup EXIT
->> +
->> +for m in "${MODS[@]}"; do
->> +	modinfo "$m" >/dev/null 2>&1 || ksft_skip "module $m not found"
->> +	modprobe "$m" || fail "failed to load $m"
->> +done
->> +
->> +setup || fail "failed to create net namespaces"
->> +
->> +ktap_print_header
->> +ktap_set_plan 7
->> +
->> +if setup_devs &&
->> +   rdma dev set "$RXE_A" netns "$NS1" &&
->> +   rdma_ns "$NS1" dev set "$RXE_A" name "$RXE_SAME" &&
->> +   rdma dev set "$RXE_B" netns "$NS2" &&
->> +   rdma_ns "$NS2" dev set "$RXE_B" name "$RXE_SAME" &&
->> +   rdma_dev_exists "$NS1" "$RXE_SAME" &&
->> +   rdma_dev_exists "$NS2" "$RXE_SAME"; then
->> +	ktap_test_pass "$TEST_SAME_NAMES"
->> +else
->> +	ktap_test_fail "$TEST_SAME_NAMES"
->> +fi
->> +cleanup_devs
->> +
->> +if ! setup_devs ||
->> +   ! rdma dev set "$RXE_A" netns "$NS1" ||
->> +   ! rdma_ns "$NS1" dev set "$RXE_A" name "$RXE_SAME" ||
->> +   ! rdma dev set "$RXE_B" netns "$NS2" ||
->> +   ! rdma_ns "$NS2" dev set "$RXE_B" name "$RXE_SAME"; then
->> +	ktap_test_fail "$TEST_MOVE_CONFLICT"
->> +elif rdma_ns "$NS1" dev set "$RXE_SAME" netns "$NS2" >/dev/null 2>&1; then
->> +	ktap_test_fail "$TEST_MOVE_CONFLICT"
->> +elif rdma_dev_exists "$NS1" "$RXE_SAME" &&
->> +     rdma_dev_exists "$NS2" "$RXE_SAME"; then
->> +	ktap_test_pass "$TEST_MOVE_CONFLICT"
->> +else
->> +	ktap_test_fail "$TEST_MOVE_CONFLICT"
->> +fi
->> +cleanup_devs
->> +
->> +if ! setup_devs; then
->> +	ktap_test_fail "$TEST_MOVE_RENAME"
->> +elif rdma dev set "$RXE_A" netns "$NS2" &&
->> +     rdma_ns "$NS2" dev set "$RXE_A" name "$RXE_NEW"; then
->> +	if rdma_dev_exists "$NS2" "$RXE_NEW" &&
->> +	   ! rdma_dev_exists "" "$RXE_A"; then
->> +		ktap_test_pass "$TEST_MOVE_RENAME"
->> +	else
->> +		ktap_test_fail "$TEST_MOVE_RENAME"
->> +	fi
->> +else
->> +	ktap_test_fail "$TEST_MOVE_RENAME"
->> +fi
->> +cleanup_devs
->> +
->> +if ! rdma_supports_combined_move_rename; then
->> +	ktap_test_skip "$TEST_COMBINED_MOVE_RENAME"
->> +elif ! setup_devs; then
->> +	ktap_test_fail "$TEST_COMBINED_MOVE_RENAME"
->> +elif rdma dev set "$RXE_A" netns "$NS2" name "$RXE_NEW"; then
->> +	if rdma_dev_exists "$NS2" "$RXE_NEW" &&
->> +	   ! rdma_dev_exists "" "$RXE_A"; then
->> +		ktap_test_pass "$TEST_COMBINED_MOVE_RENAME"
->> +	else
->> +		ktap_test_fail "$TEST_COMBINED_MOVE_RENAME"
->> +	fi
->> +else
->> +	ktap_test_fail "$TEST_COMBINED_MOVE_RENAME"
->> +fi
->> +cleanup_devs
->> +
->> +if ! setup_devs; then
->> +	ktap_test_fail "$TEST_SAME_NETNS_DUP_RENAME"
->> +elif rdma dev set "$RXE_A" name "$RXE_SAME" &&
->> +     rdma dev set "$RXE_B" name "$RXE_NEW"; then
->> +	if rdma dev set "$RXE_A" name "$RXE_NEW" >/dev/null 2>&1; then
->> +		ktap_test_fail "$TEST_SAME_NETNS_DUP_RENAME"
->> +	elif rdma_dev_exists "" "$RXE_SAME" &&
->> +	     rdma_dev_exists "" "$RXE_NEW"; then
->> +		ktap_test_pass "$TEST_SAME_NETNS_DUP_RENAME"
->> +	else
->> +		ktap_test_fail "$TEST_SAME_NETNS_DUP_RENAME"
->> +	fi
->> +else
->> +	ktap_test_fail "$TEST_SAME_NETNS_DUP_RENAME"
->> +fi
->> +cleanup_devs
->> +
->> +if ! setup_devs; then
->> +	ktap_test_fail "$TEST_TEARDOWN_RETURN"
->> +elif ! rdma dev set "$RXE_A" name "$RXE_SAME" ||
->> +     ! rdma dev set "$RXE_B" netns "$NS2" ||
->> +     ! rdma_ns "$NS2" dev set "$RXE_B" name "$RXE_SAME" ||
->> +     ! rdma_dev_exists "$NS2" "$RXE_SAME"; then
->> +	ktap_test_fail "$TEST_TEARDOWN_RETURN"
->> +else
->> +	ip netns del "$NS2"
->> +	returned=$(wait_rdma_dev_on_netdev "$DUMMY_B")
->> +	ktap_print_msg "device returned to init_net as '${returned:-<missing>}'"
->> +	if rdma_dev_exists "" "$RXE_SAME" &&
->> +	   [ -n "$returned" ] &&
->> +	   [ "$returned" != "$RXE_SAME" ] &&
->> +	   [ "${returned#ibdev}" != "$returned" ]; then
->> +		ktap_test_pass "$TEST_TEARDOWN_RETURN"
->> +	else
->> +		ktap_test_fail "$TEST_TEARDOWN_RETURN"
->> +	fi
->> +fi
->> +cleanup_devs
->> +
->> +ktap_finished
+> diff --git a/gconfigs/Gconfig.net-configs.ipv6 b/gconfigs/Gconfig.net-con=
+figs.ipv6
+> new file mode 100644
+> index 000000000000..9eb5694bae8e
+> --- /dev/null
+> +++ b/gconfigs/Gconfig.net-configs.ipv6
+> @@ -0,0 +1,2 @@
+> +CONFIG_IPV6_IPV4_EMULATE=3Dy
+> +CONFIG_IPV6_IPV4_EMULATE_SYSCTL_DEFAULT=3Dy
+> diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
+> index ff560537dd61..8bc5306094b5 100644
+> --- a/include/linux/ipv6.h
+> +++ b/include/linux/ipv6.h
+> @@ -157,11 +157,13 @@ struct ipv6_pinfo {
+>  #if defined(__BIG_ENDIAN_BITFIELD)
+>         /* Packed in 16bits. */
+>         __s16                   mcast_hops:9;
+> -       __u16                   __unused_2:6,
+> +       __u16                   __unused_2:5,
+> +                               ipv4emu:1,
+>                                 mc_loop:1;
+>  #else
+>         __u16                   mc_loop:1,
+> -                               __unused_2:6;
+> +                               ipv4emu:1,
+> +                               __unused_2:5;
+>         __s16                   mcast_hops:9;
+>  #endif
+>         int                     ucast_oif;
+> diff --git a/include/linux/socket.h b/include/linux/socket.h
+> index bb9b83640070..4ae959a3443b 100644
+> --- a/include/linux/socket.h
+> +++ b/include/linux/socket.h
+> @@ -8,6 +8,7 @@
+>  #include <linux/types.h>               /* pid_t                        *=
+/
+>  #include <linux/compiler.h>            /* __user                       *=
+/
+>  #include <uapi/linux/socket.h>
+> +struct sock;                           /* from net/sock.h              *=
+/
 >
+>  struct pid;
+>  struct cred;
+> @@ -312,8 +313,8 @@ extern int csum_partial_copy_fromiovecend(unsigned ch=
+ar *kdata,
+>  extern unsigned long iov_pages(const struct iovec *iov, int offset,
+>                                unsigned long nr_segs);
+>
+> -extern int verify_iovec(struct msghdr *m, struct iovec *iov, struct sock=
+addr_storage *address, int mode);
+> -extern int move_addr_to_kernel(void __user *uaddr, int ulen, struct sock=
+addr_storage *kaddr);
+> +extern int verify_iovec(struct sock *sk, struct msghdr *m, struct iovec =
+*iov, struct sockaddr_storage *address, int mode);
+> +extern int move_addr_to_kernel(struct sock *sk, void __user *uaddr, int =
+*ulen, struct sockaddr_storage *kaddr);
+>  extern int put_cmsg(struct msghdr*, int level, int type, int len, void *=
+data);
+>
+>  struct timespec;
+> diff --git a/include/net/compat.h b/include/net/compat.h
+> index 3b603b199c01..b9ee7aa5a31f 100644
+> --- a/include/net/compat.h
+> +++ b/include/net/compat.h
+> @@ -41,7 +41,7 @@ int compat_sock_get_timestampns(struct sock *, struct t=
+imespec __user *);
+>  #endif /* defined(CONFIG_COMPAT) */
+>
+>  int get_compat_msghdr(struct msghdr *, struct compat_msghdr __user *);
+> -int verify_compat_iovec(struct msghdr *, struct iovec *,
+> +int verify_compat_iovec(struct sock *, struct msghdr *, struct iovec *,
+>                         struct sockaddr_storage *, int);
+>  asmlinkage long compat_sys_sendmsg(int, struct compat_msghdr __user *,
+>                                    unsigned int);
+> diff --git a/net/compat.c b/net/compat.c
+> index bc8aeefddf3f..f66bd6552204 100644
+> --- a/net/compat.c
+> +++ b/net/compat.c
+> @@ -80,15 +80,15 @@ int get_compat_msghdr(struct msghdr *kmsg, struct com=
+pat_msghdr __user *umsg)
+>  }
+>
+>  /* I've named the args so it is easy to tell whose space the pointers ar=
+e in. */
+> -int verify_compat_iovec(struct msghdr *kern_msg, struct iovec *kern_iov,
+> +int verify_compat_iovec(struct sock *sk, struct msghdr *kern_msg, struct=
+ iovec *kern_iov,
+>                    struct sockaddr_storage *kern_address, int mode)
+>  {
+>         int tot_len;
+>
+>         if (kern_msg->msg_name && kern_msg->msg_namelen) {
+>                 if (mode =3D=3D VERIFY_READ) {
+> -                       int err =3D move_addr_to_kernel(kern_msg->msg_nam=
+e,
+> -                                                     kern_msg->msg_namel=
+en,
+> +                       int err =3D move_addr_to_kernel(sk, kern_msg->msg=
+_name,
+> +                                                     &kern_msg->msg_name=
+len,
+>                                                       kern_address);
+>                         if (err < 0)
+>                                 return err;
+> diff --git a/net/core/iovec.c b/net/core/iovec.c
+> index e1ec45ab1e63..a7a393cae2a7 100644
+> --- a/net/core/iovec.c
+> +++ b/net/core/iovec.c
+> @@ -35,7 +35,7 @@
+>   *     in any case.
+>   */
+>
+> -int verify_iovec(struct msghdr *m, struct iovec *iov, struct sockaddr_st=
+orage *address, int mode)
+> +int verify_iovec(struct sock *sk, struct msghdr *m, struct iovec *iov, s=
+truct sockaddr_storage *address, int mode)
+>  {
+>         int size, ct, err;
+>
+> @@ -43,7 +43,7 @@ int verify_iovec(struct msghdr *m, struct iovec *iov, s=
+truct sockaddr_storage *a
+>                 if (mode =3D=3D VERIFY_READ) {
+>                         void __user *namep;
+>                         namep =3D (void __user __force *) m->msg_name;
+> -                       err =3D move_addr_to_kernel(namep, m->msg_namelen=
+,
+> +                       err =3D move_addr_to_kernel(sk, namep, &m->msg_na=
+melen,
+>                                                   address);
+>                         if (err < 0)
+>                                 return err;
+> diff --git a/net/ipv6/Kconfig b/net/ipv6/Kconfig
+> index 438a73aa777c..69924a6c2257 100644
+> --- a/net/ipv6/Kconfig
+> +++ b/net/ipv6/Kconfig
+> @@ -21,6 +21,25 @@ menuconfig IPV6
+>
+>  if IPV6
+>
+> +config IPV6_IPV4_EMULATE
+> +       bool "IPv6: IPv4 socket interface emulation support"
+> +       default n
+> +       depends on IPV6=3Dy
+> +       ---help---
+> +         Whether to include support code which allows using a kernel IPv=
+6
+> +         socket from userspace as if it was an IPv4 socket.
+> +
+> +         ie. this is a userspace-kernel IP address translation shim laye=
+r.
+> +
+> +config IPV6_IPV4_EMULATE_SYSCTL_DEFAULT
+> +       bool "IPv6: IPv4 socket emulation - default sysctl setting"
+> +       default n
+> +       depends on IPV6_IPV4_EMULATE
+> +       ---help---
+> +         Default value for /proc/sys/net/ipv6/ipv4_emulation
+> +         The content of this sysctl file determines whether userspace as=
+king
+> +         for IPv4 sockets gets IPv6 sockets with IPv4 emulation turned o=
+n.
+> +
+>  config IPV6_ROUTER_PREF
+>         bool "IPv6: Router Preference (RFC 4191) support"
+>         ---help---
+> diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
+> index e8c4400f23e9..4f08abdf06e0 100644
+> --- a/net/ipv6/af_inet6.c
+> +++ b/net/ipv6/af_inet6.c
+> @@ -476,6 +476,11 @@ int inet6_ioctl(struct socket *sock, unsigned int cm=
+d, unsigned long arg)
+>         struct sock *sk =3D sock->sk;
+>         struct net *net =3D sock_net(sk);
+>
+> +#if defined(CONFIG_IPV6_IPV4_EMULATE)
+> +       if (inet6_sk(sk)->ipv4emu)
+> +               return inet_ioctl(sock, cmd, arg);
+> +#endif
+> +
+>         switch (cmd) {
+>         case SIOCGSTAMP:
+>                 return sock_get_timestamp(sk, (struct timeval __user *)ar=
+g);
+> diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
+> index e1a9583bb419..2e97c6d55b62 100644
+> --- a/net/ipv6/ipv6_sockglue.c
+> +++ b/net/ipv6/ipv6_sockglue.c
+> @@ -857,7 +857,7 @@ int ipv6_setsockopt(struct sock *sk, int level, int o=
+ptname,
+>         if (level =3D=3D SOL_IP && sk->sk_type !=3D SOCK_RAW)
+>                 return udp_prot.setsockopt(sk, level, optname, optval, op=
+tlen);
+>
+> -       if (level !=3D SOL_IPV6)
+> +       if ((level !=3D SOL_IPV6) || (inet6_sk(sk)->ipv4emu))
+>                 return -ENOPROTOOPT;
+>
+>         err =3D do_ipv6_setsockopt(sk, level, optname, optval, optlen);
+> @@ -888,7 +888,7 @@ int compat_ipv6_setsockopt(struct sock *sk, int level=
+, int optname,
+>                 return udp_prot.setsockopt(sk, level, optname, optval, op=
+tlen);
+>         }
+>
+> -       if (level !=3D SOL_IPV6)
+> +       if ((level !=3D SOL_IPV6) || (inet6_sk(sk)->ipv4emu))
+>                 return -ENOPROTOOPT;
+>
+>         if (optname >=3D MCAST_JOIN_GROUP && optname <=3D MCAST_MSFILTER)
+> @@ -1297,7 +1297,7 @@ int ipv6_getsockopt(struct sock *sk, int level, int=
+ optname,
+>         if (level =3D=3D SOL_IP && sk->sk_type !=3D SOCK_RAW)
+>                 return udp_prot.getsockopt(sk, level, optname, optval, op=
+tlen);
+>
+> -       if (level !=3D SOL_IPV6)
+> +       if ((level !=3D SOL_IPV6) || (inet6_sk(sk)->ipv4emu))
+>                 return -ENOPROTOOPT;
+>
+>         err =3D do_ipv6_getsockopt(sk, level, optname, optval, optlen, 0)=
+;
+> @@ -1334,7 +1334,7 @@ int compat_ipv6_getsockopt(struct sock *sk, int lev=
+el, int optname,
+>                 return udp_prot.getsockopt(sk, level, optname, optval, op=
+tlen);
+>         }
+>
+> -       if (level !=3D SOL_IPV6)
+> +       if ((level !=3D SOL_IPV6) || (inet6_sk(sk)->ipv4emu))
+>                 return -ENOPROTOOPT;
+>
+>         if (optname =3D=3D MCAST_MSFILTER)
+> diff --git a/net/ipv6/sysctl_net_ipv6.c b/net/ipv6/sysctl_net_ipv6.c
+> index c5c10fafcfe2..0ab6a8d5aa57 100644
+> --- a/net/ipv6/sysctl_net_ipv6.c
+> +++ b/net/ipv6/sysctl_net_ipv6.c
+> @@ -6,6 +6,7 @@
+>   */
+>
+>  #include <linux/mm.h>
+> +#include <linux/module.h>
+>  #include <linux/sysctl.h>
+>  #include <linux/in6.h>
+>  #include <linux/ipv6.h>
+> @@ -18,6 +19,20 @@
+>
+>  static int one =3D 1;
+>
+> +#if defined(CONFIG_IPV6_IPV4_EMULATE)
+> +static int zero;
+> +
+> +# if defined(CONFIG_IPV6_IPV4_EMULATE_SYSCTL_DEFAULT)
+> +bool sysctl_ipv4_emulation =3D true;
+> +# else
+> +bool sysctl_ipv4_emulation =3D false;
+> +# endif
+> +
+> +module_param_named(ipv4_emulation, sysctl_ipv4_emulation, bool, S_IRUGO|=
+S_IWUSR);
+> +MODULE_PARM_DESC(ipv4_emulation,
+> +                "Auto promote PF_INET sockets into PF_INET6 sockets, wit=
+h IPv4 API emulation.");
+> +#endif
+> +
+>  static struct ctl_table ipv6_table_template[] =3D {
+>         {
+>                 .procname       =3D "bindv6only",
+> @@ -73,6 +88,17 @@ static struct ctl_table ipv6_rotable[] =3D {
+>                 .proc_handler   =3D proc_dointvec_minmax,
+>                 .extra1         =3D &one
+>         },
+> +#if defined(CONFIG_IPV6_IPV4_EMULATE)
+> +       {
+> +               .procname       =3D "ipv4_emulation",
+> +               .data           =3D &sysctl_ipv4_emulation,
+> +               .maxlen         =3D sizeof(bool),
+> +               .mode           =3D 0644,
+> +               .proc_handler   =3D proc_dointvec_minmax,
+> +               .extra1         =3D &zero,
+> +               .extra2         =3D &one,
+> +       },
+> +#endif
+>         { }
+>  };
+>
+> diff --git a/net/socket.c b/net/socket.c
+> index fe20c319a0bb..e7d2f5281ff3 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -101,6 +101,7 @@
+>  #include <linux/netfilter.h>
+>
+>  #include <linux/if_tun.h>
+> +#include <linux/ipv6.h>
+>  #include <linux/ipv6_route.h>
+>  #include <linux/route.h>
+>  #include <linux/sockios.h>
+> @@ -178,30 +179,171 @@ static DEFINE_PER_CPU(int, sockets_in_use);
+>   * divide and look after the messy bits.
+>   */
+>
+> +static int ipv6_promote_ipv4_address(struct sock *sk,
+> +       struct sockaddr_storage * kaddr, int * addr_len)
+> +{
+> +#if defined(CONFIG_IPV6_IPV4_EMULATE)
+> +       if (!sk) {
+> +               pr_warning("ipv6_promote_ipv4_address: no sk\n");
+> +               return 0;
+> +       }
+> +
+> +       if (sk->sk_family !=3D PF_INET6) {
+> +               //pr_warning("ipv6_promote_ipv4_address: sk_family =3D=3D=
+ %d\n", sk->sk_family);
+> +               return 0;
+> +       }
+> +
+> +       if (!inet6_sk(sk)->ipv4emu) {
+> +               //pr_warning("ipv6_promote_ipv4_address: not ipv4emu\n");
+> +               return 0;
+> +       }
+> +
+> +       if (kaddr->ss_family =3D=3D AF_UNSPEC) {
+> +               //pr_warning("ipv6_promote_ipv4_address: unspec\n");
+> +               return 0;
+> +       }
+> +
+> +       if (kaddr->ss_family !=3D AF_INET) {
+> +               pr_warning("ipv6_promote_ipv4_address: addr is %d\n", kad=
+dr->ss_family);
+> +               return -EAFNOSUPPORT;
+> +       }
+> +
+> +       if (*addr_len < sizeof(struct sockaddr_in)) {
+> +               pr_warning("ipv6_promote_ipv4_address: addr_len =3D=3D %d=
+\n", *addr_len);
+> +               return -EINVAL;
+> +       }
+> +
+> +       {
+> +               const struct sockaddr_in * kaddr4 =3D (const struct socka=
+ddr_in *)kaddr;
+> +               struct sockaddr_in6 * kaddr6 =3D (struct sockaddr_in6 *)k=
+addr;
+> +               __be16 port =3D kaddr4->sin_port;
+> +               __be32 ipv4 =3D kaddr4->sin_addr.s_addr;
+> +
+> +               //*addr_len =3D sizeof(struct sockaddr_in6);
+> +               *addr_len =3D 24; //SIN6_LEN_RFC2133; /* 24 =3D 2+2+4+16,=
+ ie. without scope id */
+> +// Why not fill in scope_id with 0 ?
+> +// One way to avoid the magic 24 constant is to use offsetof(struct sock=
+addr_in6, scope_id)
+> +               kaddr6->sin6_family =3D AF_INET6;
+> +               kaddr6->sin6_port =3D port;
+> +               kaddr6->sin6_flowinfo =3D htonl(0);
+> +               kaddr6->sin6_addr.s6_addr32[0] =3D htonl(0);
+> +               kaddr6->sin6_addr.s6_addr32[1] =3D htonl(0);
+> +               kaddr6->sin6_addr.s6_addr32[2] =3D ntohl(ipv4) ? htonl(0x=
+FFFF) : htonl(0);
+> +               kaddr6->sin6_addr.s6_addr32[3] =3D ipv4;
+> +               kaddr6->sin6_scope_id =3D 0;
+> +
+> +               pr_debug("ipv6_promote_ipv4_address: ok [%08X:%d]\n", nto=
+hl(ipv4), ntohs(port));
+> +       }
+> +#endif
+> +       return 0;
+> +}
+> +
+> +static int ipv6_demote_ipv6_address(struct sock *sk, struct sockaddr_sto=
+rage * kaddr, int * addr_len) {
+> +#if defined(CONFIG_IPV6_IPV4_EMULATE)
+> +       if (!sk) {
+> +               pr_warning("ipv6_demote_ipv6_address: no sk\n");
+> +               return 0;
+> +       }
+> +
+> +       if (sk->sk_family !=3D PF_INET6) {
+> +               //pr_warning("ipv6_demote_ipv6_address: sk_family =3D=3D =
+%d\n", sk->sk_family);
+> +               return 0;
+> +       }
+> +
+> +       if (!inet6_sk(sk)->ipv4emu) {
+> +               //pr_warning("ipv6_demote_ipv6_address: not ipv4emu\n");
+> +               return 0;
+> +       }
+> +
+> +       if (kaddr->ss_family !=3D AF_INET6) {
+> +               pr_warning("ipv6_demote_ipv6_address: addr is %d\n", kadd=
+r->ss_family);
+> +               return -EAFNOSUPPORT;
+> +       }
+> +
+> +       if (*addr_len < sizeof(struct sockaddr_in6)) {
+> +               pr_warning("ipv6_demote_ipv6_address: addr_len =3D=3D %d\=
+n", *addr_len);
+> +               return -EINVAL;
+> +       }
+> +
+> +       {
+> +               struct sockaddr_in6 const * kaddr6 =3D (struct sockaddr_i=
+n6 const *)kaddr;
+> +               struct sockaddr_in * kaddr4 =3D (struct sockaddr_in *)kad=
+dr;
+> +               __be16 port =3D kaddr6->sin6_port;
+> +               __be32 ipv6a =3D kaddr6->sin6_addr.s6_addr32[0];
+> +               __be32 ipv6b =3D kaddr6->sin6_addr.s6_addr32[1];
+> +               __be32 ipv6c =3D kaddr6->sin6_addr.s6_addr32[2];
+> +               __be32 ipv4 =3D kaddr6->sin6_addr.s6_addr32[3];
+> +
+> +// please use ipv6_addr_v4mapped()
+> +
+> +               if (ipv6a) {
+> +                       pr_warning("ipv6_demote_ipv6_address: not mapped =
+[1]\n");
+> +                       return -EINVAL;
+> +               }
+> +
+> +               if (ipv6b) {
+> +                       pr_warning("ipv6_demote_ipv6_address: not mapped =
+[2]\n");
+> +                       return -EINVAL;
+> +               }
+> +
+> +               if ((ipv6c !=3D htonl(0)) && (ipv6c !=3D htonl(0xFFFF))) =
+{
+> +                       pr_warning("ipv6_demote_ipv6_address: not mapped =
+[3]\n");
+> +                       return -EINVAL;
+> +               }
+> +
+> +               if ((ipv6c =3D=3D htonl(0)) && (ipv4 !=3D htonl(0))) {
+> +                       pr_warning("ipv6_demote_ipv6_address: not mapped =
+[4]\n");
+> +                       return -EINVAL;
+> +               }
+> +
+> +// Really avoid those magic values...
+> +// Since I doubt this is performance critical, just do the whole struct =
+clear at the beginning:
+> +// memset(uaddr4, 0, sizeof(*uaddr4));
+> +
+> +               *addr_len =3D sizeof(struct sockaddr_in); // 2 + 2 + 4 + =
+8 padding
+> +               kaddr4->sin_family =3D AF_INET;
+> +               kaddr4->sin_port =3D port;
+> +               kaddr4->sin_addr.s_addr =3D ipv4;
+> +               memset(kaddr4->sin_zero, 0, 8);
+> +
+> +               pr_debug("ipv6_demote_ipv6_address: ok [%08X:%d]\n", ntoh=
+l(ipv4), ntohs(port));
+> +       }
+> +#endif
+> +       return 0;
+> +}
+> +
+>  /**
+>   *     move_addr_to_kernel     -       copy a socket address into kernel=
+ space
+> + *     @sk: socket which is receiving the address (or NULL)
+>   *     @uaddr: Address in user space
+>   *     @kaddr: Address in kernel space
+> - *     @ulen: Length in user space
+> + *     @ulen: pointer to user space length
+>   *
+>   *     The address is copied into kernel space. If the provided address =
+is
+>   *     too long an error code of -EINVAL is returned. If the copy gives
+>   *     invalid addresses -EFAULT is returned. On a success 0 is returned=
+.
+>   */
+>
+> -int move_addr_to_kernel(void __user *uaddr, int ulen, struct sockaddr_st=
+orage *kaddr)
+> +int move_addr_to_kernel(struct sock *sk, void __user *uaddr, int *ulen,
+> +                       struct sockaddr_storage *kaddr)
+>  {
+> -       if (ulen < 0 || ulen > sizeof(struct sockaddr_storage))
+> +       int err;
+> +
+> +       if (*ulen < 0 || *ulen > sizeof(struct sockaddr_storage))
+>                 return -EINVAL;
+> -       if (ulen =3D=3D 0)
+> +       if (*ulen =3D=3D 0)
+>                 return 0;
+> -       if (copy_from_user(kaddr, uaddr, ulen))
+> +       if (copy_from_user(kaddr, uaddr, *ulen))
+>                 return -EFAULT;
+> -       return audit_sockaddr(ulen, kaddr);
+> +       err =3D audit_sockaddr(*ulen, kaddr);
+> +       if (err)
+> +               return err;
+> +       return ipv6_promote_ipv4_address(sk, kaddr, ulen);
+>  }
+>
+>  /**
+>   *     move_addr_to_user       -       copy an address to user space
+> + *     @sk: socket which is generating the address (or NULL)
+>   *     @kaddr: kernel space address
+>   *     @klen: length of address in kernel
+>   *     @uaddr: user space address
+> @@ -217,7 +359,7 @@ int move_addr_to_kernel(void __user *uaddr, int ulen,=
+ struct sockaddr_storage *k
+>   *     specified. Zero is returned for a success.
+>   */
+>
+> -static int move_addr_to_user(struct sockaddr_storage *kaddr, int klen,
+> +static int move_addr_to_user(struct sock *sk, struct sockaddr_storage *k=
+addr, int klen,
+>                              void __user *uaddr, int __user *ulen)
+>  {
+>         int err;
+> @@ -225,6 +367,9 @@ static int move_addr_to_user(struct sockaddr_storage =
+*kaddr, int klen,
+>
+>         BUG_ON(klen > sizeof(struct sockaddr_storage));
+>         err =3D get_user(len, ulen);
+> +       if (err)
+> +               return err;
+> +       err =3D ipv6_demote_ipv6_address(sk, kaddr, &klen);
+>         if (err)
+>                 return err;
+>         if (len > klen)
+> @@ -1249,12 +1394,19 @@ call_kill:
+>  }
+>  EXPORT_SYMBOL(sock_wake_async);
+>
+> +#if defined(CONFIG_IPV6_IPV4_EMULATE)
+> +extern bool sysctl_ipv4_emulation;
+> +#endif
+> +
+>  int __sock_create(struct net *net, int family, int type, int protocol,
+>                          struct socket **res, int kern)
+>  {
+>         int err;
+>         struct socket *sock;
+>         const struct net_proto_family *pf;
+> +#if defined(CONFIG_IPV6_IPV4_EMULATE)
+> +       bool ipv4emu =3D false;
+> +#endif
+>
+>         /*
+>          *      Check protocol is in range
+> @@ -1283,6 +1435,13 @@ int __sock_create(struct net *net, int family, int=
+ type, int protocol,
+>         if (err)
+>                 return err;
+>
+> +#if defined(CONFIG_IPV6_IPV4_EMULATE)
+> +       if (sysctl_ipv4_emulation && !kern && family =3D=3D PF_INET) {
+> +               family =3D PF_INET6;
+> +               ipv4emu =3D true;
+> +       }
+> +#endif
+> +
+>         /*
+>          *      Allocate the socket and allow the family to set things up=
+. if
+>          *      the protocol is 0, the family is instructed to select an =
+appropriate
+> @@ -1328,6 +1487,14 @@ int __sock_create(struct net *net, int family, int=
+ type, int protocol,
+>         if (err < 0)
+>                 goto out_module_put;
+>
+> +#if defined(CONFIG_IPV6_IPV4_EMULATE)
+> +       if (ipv4emu) {
+> +               inet6_sk(sock->sk)->ipv4emu =3D 1;
+> +               /* we need to clear ipv6only, since it could have default=
+ed to true via sysctl */
+> +               sock->sk->sk_ipv6only =3D 0;
+> +       }
+> +#endif
+> +
+>         /*
+>          * Now to bump the refcnt of the [loadable] module that owns this
+>          * socket at sock_release time we decrement its refcnt.
+> @@ -1532,7 +1699,7 @@ SYSCALL_DEFINE3(bind, int, fd, struct sockaddr __us=
+er *, umyaddr, int, addrlen)
+>
+>         sock =3D sockfd_lookup_light(fd, &err, &fput_needed);
+>         if (sock) {
+> -               err =3D move_addr_to_kernel(umyaddr, addrlen, &address);
+> +               err =3D move_addr_to_kernel(sock->sk, umyaddr, &addrlen, =
+&address);
+>                 if (err >=3D 0) {
+>                         err =3D security_socket_bind(sock,
+>                                                    (struct sockaddr *)&ad=
+dress,
+> @@ -1646,7 +1813,7 @@ SYSCALL_DEFINE4(accept4, int, fd, struct sockaddr _=
+_user *, upeer_sockaddr,
+>                         err =3D -ECONNABORTED;
+>                         goto out_fd;
+>                 }
+> -               err =3D move_addr_to_user(&address,
+> +               err =3D move_addr_to_user(newsock->sk, &address,
+>                                         len, upeer_sockaddr, upeer_addrle=
+n);
+>                 if (err < 0)
+>                         goto out_fd;
+> @@ -1695,7 +1862,7 @@ SYSCALL_DEFINE3(connect, int, fd, struct sockaddr _=
+_user *, uservaddr,
+>         sock =3D sockfd_lookup_light(fd, &err, &fput_needed);
+>         if (!sock)
+>                 goto out;
+> -       err =3D move_addr_to_kernel(uservaddr, addrlen, &address);
+> +       err =3D move_addr_to_kernel(sock->sk, uservaddr, &addrlen, &addre=
+ss);
+>         if (err < 0)
+>                 goto out_put;
+>
+> @@ -1735,7 +1902,7 @@ SYSCALL_DEFINE3(getsockname, int, fd, struct sockad=
+dr __user *, usockaddr,
+>         err =3D sock->ops->getname(sock, (struct sockaddr *)&address, &le=
+n, 0);
+>         if (err)
+>                 goto out_put;
+> -       err =3D move_addr_to_user(&address, len, usockaddr, usockaddr_len=
+);
+> +       err =3D move_addr_to_user(sock->sk, &address, len, usockaddr, uso=
+ckaddr_len);
+>
+>  out_put:
+>         fput_light(sock->file, fput_needed);
+> @@ -1767,7 +1934,7 @@ SYSCALL_DEFINE3(getpeername, int, fd, struct sockad=
+dr __user *, usockaddr,
+>                     sock->ops->getname(sock, (struct sockaddr *)&address,=
+ &len,
+>                                        1);
+>                 if (!err)
+> -                       err =3D move_addr_to_user(&address, len, usockadd=
+r,
+> +                       err =3D move_addr_to_user(sock->sk, &address, len=
+, usockaddr,
+>                                                 usockaddr_len);
+>                 fput_light(sock->file, fput_needed);
+>         }
+> @@ -1806,7 +1973,7 @@ SYSCALL_DEFINE6(sendto, int, fd, void __user *, buf=
+f, size_t, len,
+>         msg.msg_controllen =3D 0;
+>         msg.msg_namelen =3D 0;
+>         if (addr) {
+> -               err =3D move_addr_to_kernel(addr, addr_len, &address);
+> +               err =3D move_addr_to_kernel(sock->sk, addr, &addr_len, &a=
+ddress);
+>                 if (err < 0)
+>                         goto out_put;
+>                 msg.msg_name =3D (struct sockaddr *)&address;
+> @@ -1871,7 +2038,7 @@ SYSCALL_DEFINE6(recvfrom, int, fd, void __user *, u=
+buf, size_t, size,
+>         err =3D sock_recvmsg(sock, &msg, size, flags);
+>
+>         if (err >=3D 0 && addr !=3D NULL) {
+> -               err2 =3D move_addr_to_user(&address,
+> +               err2 =3D move_addr_to_user(sock->sk, &address,
+>                                          msg.msg_namelen, addr, addr_len)=
+;
+>                 if (err2 < 0)
+>                         err =3D err2;
+> @@ -2042,9 +2209,9 @@ static int ___sys_sendmsg(struct socket *sock, stru=
+ct msghdr __user *msg,
+>
+>         /* This will also move the address data into kernel space */
+>         if (MSG_CMSG_COMPAT & flags) {
+> -               err =3D verify_compat_iovec(msg_sys, iov, &address, VERIF=
+Y_READ);
+> +               err =3D verify_compat_iovec(sock->sk, msg_sys, iov, &addr=
+ess, VERIFY_READ);
+>         } else
+> -               err =3D verify_iovec(msg_sys, iov, &address, VERIFY_READ)=
+;
+> +               err =3D verify_iovec(sock->sk, msg_sys, iov, &address, VE=
+RIFY_READ);
+>         if (err < 0)
+>                 goto out_freeiov;
+>         total_len =3D err;
+> @@ -2258,9 +2425,9 @@ static int ___sys_recvmsg(struct socket *sock, stru=
+ct msghdr __user *msg,
+>         uaddr =3D (__force void __user *)msg_sys->msg_name;
+>         uaddr_len =3D COMPAT_NAMELEN(msg);
+>         if (MSG_CMSG_COMPAT & flags)
+> -               err =3D verify_compat_iovec(msg_sys, iov, &addr, VERIFY_W=
+RITE);
+> +               err =3D verify_compat_iovec(sock->sk, msg_sys, iov, &addr=
+, VERIFY_WRITE);
+>         else
+> -               err =3D verify_iovec(msg_sys, iov, &addr, VERIFY_WRITE);
+> +               err =3D verify_iovec(sock->sk, msg_sys, iov, &addr, VERIF=
+Y_WRITE);
+>         if (err < 0)
+>                 goto out_freeiov;
+>         total_len =3D err;
+> @@ -2280,7 +2447,7 @@ static int ___sys_recvmsg(struct socket *sock, stru=
+ct msghdr __user *msg,
+>         len =3D err;
+>
+>         if (uaddr !=3D NULL) {
+> -               err =3D move_addr_to_user(&addr,
+> +               err =3D move_addr_to_user(sock->sk, &addr,
+>                                         msg_sys->msg_namelen, uaddr,
+>                                         uaddr_len);
+>                 if (err < 0)
+> @@ -3159,7 +3326,11 @@ static int routing_ioctl(struct net *net, struct s=
+ocket *sock,
+>         u32 rtdev;
+>         mm_segment_t old_fs =3D get_fs();
+>
+> -       if (sock && sock->sk && sock->sk->sk_family =3D=3D AF_INET6) { /*=
+ ipv6 */
+> +       if (sock && sock->sk && sock->sk->sk_family =3D=3D AF_INET6
+> +#if defined(CONFIG_IPV6_IPV4_EMULATE)
+> +           && !inet6_sk(sock->sk)->ipv4emu
+> +#endif
+> +          ) { /* ipv6 */
+>                 struct in6_rtmsg32 __user *ur6 =3D argp;
+>                 ret =3D copy_from_user(&r6.rtmsg_dst, &(ur6->rtmsg_dst),
+>                         3 * sizeof(struct in6_addr));
+> --
+> 2.55.0.795.g602f6c329a-goog
+>
+
+--
+Maciej =C5=BBenczykowski, Kernel Networking Developer @ Google
 
