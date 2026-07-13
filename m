@@ -1,179 +1,235 @@
-Return-Path: <netdev+bounces-307001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307002-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 9fiPGCZXVGphkwMAu9opvQ
-	(envelope-from <netdev+bounces-307001-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 05:10:30 +0200
+	id aFyHJCNYVGqRkwMAu9opvQ
+	(envelope-from <netdev+bounces-307002-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 05:14:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5231746DBA
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 05:10:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF854746E06
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 05:14:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=qQIOpN3h;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=qk7XkgvT;
 	dmarc=pass (policy=none) header.from=gmail.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307001-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307001-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307002-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307002-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B0B1D300D9FE
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 03:10:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 86C943007F5F
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 03:14:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68A8937755A;
-	Mon, 13 Jul 2026 03:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83B2F379EEF;
+	Mon, 13 Jul 2026 03:14:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E065B3659EE
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 03:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC4013783C1
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 03:14:36 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783912228; cv=pass; b=U2tjTMOmRu4ndwQVWqB7L75dvges6YO0JctX+1EhIh8/K9iT/FC38iihwF2oxKwsIMFBnmaMepyDHTS6etuNakfluRUvGs21HasSgMhWys2Pg+X7KkV/QBGtxLDanrxdkEXO+ksb9v+F4OlBiCwSprAgyN51bJZiRVoN2zLdvWM=
+	t=1783912479; cv=pass; b=LY4TSK/+N0fExWddasCFygZhRr7bxZiuumLWo9c6/ts6zwNAWqqQ2iX+36pmgPU9qHkyMeLOiTKpZdeMu+gMQq62+6lbSSUg4O2dYAprqQbprJpZrSL3eOXVCHtGDy2DiEGP230LOQAL7dSs4skXOe8qGQ2bIkHf3+c+n+Pv6jw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783912228; c=relaxed/simple;
-	bh=snbQm3CdmGNBpMwSTg0euodzn2P+zqYJrnjlEEblrKw=;
+	s=arc-20240116; t=1783912479; c=relaxed/simple;
+	bh=CPD/0XlyAARmraJmzg7jnRHlK3R3tszjtH+8RTpqJ1A=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sajyXotJVV3ZtDsWoTAOMwiNl7h4XPe8jHUsQI1cx6LNEIspoqmfhmO6qDZsFz2DXzICrpzlaUjGxW+8jzlSq/kxgV8qQVTPo3su0R3aPk6cIQ5ExuxoTstvbDcPusLoD9tlt9BeHBK6oGpbeJx1LdGdvDMOAMz27HW7CwAoNMI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qQIOpN3h; arc=pass smtp.client-ip=209.85.218.47
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-c15d3cd51b2so314571466b.3
-        for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 20:10:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783912225; cv=none;
+	 To:Cc:Content-Type; b=r5leVKskdaTFCYq9wCxNsGrYx5hkRthZ1zUxULpc7EMGCuh/wlSXbIyRy2R9JroN36xZ/v+06//bkXYQCD236usv7Qk5o9in306iu55KYcHJQs+LEumgGISvWsLk/NTYDR8gQN3bZ7rLmfqRPpPQcrovdkL3FvbZx91KIc86HtY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qk7XkgvT; arc=pass smtp.client-ip=209.85.218.47
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-c15ca7a7ca9so255780666b.0
+        for <netdev@vger.kernel.org>; Sun, 12 Jul 2026 20:14:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783912474; cv=none;
         d=google.com; s=arc-20260327;
-        b=WEu6FoNSddiE0ml1T4Q6kA1qsciAY07mMX2GMmu+2LAJ0TH7wBciHAr2F+ztQ2WIJZ
-         1qL2+f3cmQD4pUPNRKLcARTndTN2dxzuOK+S50hUoMrXuwRS/wmUEnmBH2hoTH+1tCUZ
-         spcjZZ/jGh0WRTA9lLuW0oOU9QsH5KiVg8Q6ihZR6NSxXGsQKnxzEGMtHd111q03GN4b
-         i6z3rV64f6C0RaUzJYQMsahuqPNddTY86TFbUn1G0AMA6fsLVLAuGrHdO6npkBYGMxrb
-         5Pr9vgLbvqtNY0SHJQoZp4j+NdmAhQqkspjRFSZgYGeZ+RN8flANS2P5ONcyeIv9Snxx
-         fFEg==
+        b=Nrm1hgUwyGNPnKTELmpWPbsozVFMZj6QPxtBX65ihHBFCt8l63ipH/uhtWS6C7X2r4
+         P3SsqkqKzOY/jbi9Nrm+atUb9nEmVRsvQjeow4LHyLoK3ngG9lWTiwsPXa/A96vqW4ok
+         cD2jNKOAxvNk4w/a6CMA3rkPQU9b5W9AdxDSRr423aWbdT+506lJ7NghY1E82mKyxbiF
+         YHSWfEdE63eDFeAEV5ofEIcdraZNjKTWQMeB8ezeKBwNL9VR1EkfsaEons46cyZKh6v9
+         BRu3FBTqvyXHb7UzVS8cG5IlF4FpsGnFAGJLY5US0grLtKv6b/kbX9CIDdnG30R7wYcF
+         Lwyg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=snbQm3CdmGNBpMwSTg0euodzn2P+zqYJrnjlEEblrKw=;
-        fh=q1FOxyidBAft5Eynazo/02r7J+Z7ny5g1Da1/U8dYVk=;
-        b=dH4LYvJyZPZoWHUm6ywfq2nn7glxav/lYZ+uioGOqKjJnPlJT+YJye6CuzhtSDuAq3
-         wVWIpf9ozFEzfAgRky21gQUWvsfU0+Roc91NeNizsnTzFIphv4V3L6iq9tBbkAMlwcNq
-         4/Fz+375eyuWuhNmMJYbmBqpN4e6uy4nhGZ1xkMWM4RmFecUIDgVbRiq38/6g6wfvugC
-         6QPwUhlyOm4yoyAjv1FZiwhhtdIIBbt11pA1YOb5QltDz2B+O3VG9KlQ31RduhQi/V6u
-         OBIE4WIknp5dk0Y2vWSAt93FlY1SlZ2ikV/bVYXHhABNpm94H8e1BMAPYlSIiYOg0mZv
-         LXkA==;
+        bh=CrZSorjwa2TS/XaHQL6b8DW5cquE7SdFPuFZ8FDE7Vw=;
+        fh=h7zFk9h9o+ePDaDD4L4G8fDB0UB/kEMIGRqP/uzd+M8=;
+        b=gT/nCU1Knla6abYjiI1g1bLabWomJkLFr0MnXHsfSfN3DBOwDKpRgFUY2srahtXzt7
+         eB++SRHu6o6EI0Hx+R2ZBKGQczQiCSH1TAOeBWQSAmGLOkjDjVFWx3fzrC1y9jwYXT+j
+         N6RUWvVs0sWgaQCgPJbbDd3m//lnUbBxKTULx59txUv2HAwLuuaZGUnEUlOXL6WPJi/l
+         sGtkV00p0KVE1ux58fOo7xOoUCNfl75Z3NBb48BEHIMeymdpUoiZFDVtXjOwWV9TEhjb
+         VQAV50j9B3L9/BqWkVer91DN768lt7uEHzQpZmIsLUi0LjnweadRgltm7KSMMNoZdI6r
+         JjCA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783912225; x=1784517025; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783912474; x=1784517274; darn=vger.kernel.org;
         h=content-type:cc:to:subject:message-id:date:from:in-reply-to
          :references:mime-version:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=snbQm3CdmGNBpMwSTg0euodzn2P+zqYJrnjlEEblrKw=;
-        b=qQIOpN3hm5ph5vr/p5B+kRdd32XXu1Xwez28v/pNX9vcDcrjZMToco8LwN+LdLZtBY
-         dc/PZzutHteVy7zQFvn/nzrGERhw5z379vmPXH2hKg80L8CA3Vy+EOklI37dPkgZLS7b
-         bH9uKixehRsxaGsehRQD6VA81/dP/hk5aWqvzFihww9/fmkYcLdoFHdFFChI4siIK0tf
-         m2txI1brnKgO1BFhhNfLft0fx/Nu7JrTNVldeRer+Bo9oXgTGzJzn99q1RcNUgn10Utz
-         RmJCPkherz84rn1Ffm9wlI6OE9oB50FQuVUAzzPP1Svce2xj4Eji2bSYjGGOp/sSJV3V
-         h3DA==
+        bh=CrZSorjwa2TS/XaHQL6b8DW5cquE7SdFPuFZ8FDE7Vw=;
+        b=qk7XkgvTnMtUa91TBdo/NLATK/JWMYWwGgzss3qJzJ9hAROV8K6YbfCZrguUHYv2l+
+         DkPzM4VAvS3MusyOozFILtRAjmwqpFqeGgdPVpYLo3eZeTUv1aBbtjmDd9V5nJDLr2ll
+         J57n/vBRuwyBKzICMnb6oPeH4TFZFT0xl1fDEbQrc6IePRf8COY/FdP3huuzAitrM2XN
+         TeW0p0JU2v46EKFepps2r02YwRJvwTQOZhweMB7deNsQNN4/1SC6O2SvBusCZSqWnQQd
+         oQONsa9E4QWbK5S97l3Rvh5i/4dICoHI5FChjSvQjFF9qdogAJ/rcp55a9aSOf4WNkdF
+         QYLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783912225; x=1784517025;
+        d=1e100.net; s=20251104; t=1783912474; x=1784517274;
         h=content-type:cc:to:subject:message-id:date:from:in-reply-to
          :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=snbQm3CdmGNBpMwSTg0euodzn2P+zqYJrnjlEEblrKw=;
-        b=R/8pYYFhHPKC65EAe0cidE/RNP7PFKhZAvNGikyuTWSWzhv1sbZHdlEqdeVqJINVZi
-         g7Q2tV7imt3SJ/vwAgwaojkrTCsDxW/4z5Szwqle+phsxOypa2JQHL3hfjDRx1ijRuyo
-         3aRHgu5QFirKKkRkXZvpuYTpIEltz54bq9PNlmlPgEb5L+zc7FIE35csuWulObk4AMaK
-         FLqCTejSfV74xsQMj+3UOe8VnAN/zd2bui0POVjGuUjlPksnKTTY7T+X3YraWx4scQYM
-         asGzGRiVNRQffGiJDhaEVcyGxKFdBNhyTeDdfQaTAS4x4056VdQYmP9lWEALzcrZlxPZ
-         8mzg==
-X-Forwarded-Encrypted: i=1; AHgh+RqTM7y9QiF1LPuNccd5peDyu96PiobrX+VWCthWYNLrgOKbZPhCGjNZsmRHMQoyjxMfaD6S+B8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCJkv0F5/ShCbVL12087IZK+ntSVrgSlzUrGrSA8ULzGDK1p+k
-	eGBOjwOUYFbD6qNRcO3UsdeYUi0LS6Z9aaYO0sb6jq+HlmPwzqRCp6tiO/iy5p6KJGRsukLLY2y
-	RhE2/ztrBG39rjDvobToBIQenkfm5lao=
-X-Gm-Gg: AfdE7cnMbh+SbQpA+9tsfuY1C+WNe1Y5UIjU1iGsippbLdvxwv4th31EK1SJC7IU30e
-	8IerEu2XYFQHsBKoX50AnNeKJZISgKIiE9zqPUv4zqUjd1n8+Uk69VGdzD2jtw7/YsuhDQaiP5Y
-	atCAtJViuTVXQ0zBl0o4fcIgFF6qvT1AGsS8LfZaM8+H76nKzCOREbjpvPCjwhq43mABR121Zb8
-	KfpFoZYKImd0EGIdZo6Lq3x2p8Bvszws1NzChD9RermvoBfUkbQIG7Htf5C3g7jL+zBexg=
-X-Received: by 2002:a17:906:c149:b0:c12:9b2d:67de with SMTP id
- a640c23a62f3a-c161f388078mr261421866b.61.1783912225130; Sun, 12 Jul 2026
- 20:10:25 -0700 (PDT)
+        bh=CrZSorjwa2TS/XaHQL6b8DW5cquE7SdFPuFZ8FDE7Vw=;
+        b=qOQcqGSFDtF32dbdykkkiXPiX9XAunuThBNSZMBwrfHn2jYyzKJCLZlRjSs0BR46f7
+         UUTMFx9oV6EQFwhUSJQjJx2SwH4bjghyQcjEnT9JQqr0XJ7dy8BPVIUOuYq9EsmO8rzr
+         8tfGMcydm2JR9Vhv/xiG1V3dFn0JW7Vrz/36zf6Iy2owXibxiReboGbBHSsDg0atOWXC
+         AbVcZnfYTBTL9bzxyii/qRit/TUuSoKAahlq05AB6Id8F8JJhDNZ8AekkIssxLkck/Xa
+         9lyqCd5LTFvwlF+b+joMxTslIHOCARkHW+u1c+Y3Fju6V5+6cAptc/LYxvES/IdFF4i2
+         XSTA==
+X-Forwarded-Encrypted: i=1; AHgh+RrnVuVWRH/b+OXYi6HdYy342YPeLyl6aAhbpqoOUGa5emMnGM2WmzlfF8P5BNcgeDY6oJK1CMw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcrfnvD8T+YFFX4x5w4jU1DaNEpwk0X9m7xBOfb7IcgEvYutjF
+	Ax2vO2nLqvE/oGKJ+jUrU0gWJ0I4HQA1qKldJJrcdRrZgXxwUzkCfGam6vD7ZTFov8i1+iVZuct
+	Pjmy5WhUAxVHr/jtkuY+Aai/9QEn9E8c=
+X-Gm-Gg: AfdE7cnQM+L9ywydDt/w5CjfW/4U6uhKQYn8IbsdxnjfYUdM8wN3KjX0rIsoAx9CwGO
+	pH9kmB5h9cbXn4lUQHvhEJsjeNddfUKuRTPcHsYIqMdoZWdxShKz88AFuE7m3hREeCGYMgvnL0z
+	kZP+Js9eo8SL4aYB+HENyj4G8o8pJk4OJZ32nS+Exz6T8l6LAYR0lSvdtZ0Ldx8yO4j7e1PPyJq
+	a1gLzeEWaOvv9+CpeBF2nvJ56gTQf2dHirJqqkokH3716U8Lde/P2ijrXXqqwZtL1KQk7v2OA2a
+	7k26BRXQV+U45XhDsCKjO/s8cLIEug==
+X-Received: by 2002:a17:907:7201:b0:c16:e14:b8ec with SMTP id
+ a640c23a62f3a-c161f44bb17mr300374866b.58.1783912474382; Sun, 12 Jul 2026
+ 20:14:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260709063012.33160-1-running910@gmail.com> <ak9_wZz054a6JMb5@orbyte.nwl.cc>
-In-Reply-To: <ak9_wZz054a6JMb5@orbyte.nwl.cc>
-From: Zhixing Chen <running910@gmail.com>
-Date: Mon, 13 Jul 2026 11:10:13 +0800
-X-Gm-Features: AUfX_mwxGXvwgTE6oy5EXU__Jfy1OQZvXPr-yq7oHlr7ByZwFljnkmdYU_NfKlc
-Message-ID: <CAMyuFdWjGnoQvE4owtnwANTiaxbq=dtvFri9+vQbPhTEL2aWgA@mail.gmail.com>
-Subject: Re: [PATCH nf] netfilter: ip6tables: set hotdrop for malformed
- extension header matches
-To: Phil Sutter <phil@nwl.cc>
-Cc: Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	netdev@vger.kernel.org
+References: <20260711-rtl8366rb-fixes-v1-1-12b9210b0cce@kernel.org>
+ <CAJq09z5s39bg34cPZpheBQWyZHROR-ja1nvrD9E-w9Ya45t0vw@mail.gmail.com> <CAD++jLkS67rEytYFhb6057Q1QyKhaK+fU+iJ7cebRT7gHw=LKQ@mail.gmail.com>
+In-Reply-To: <CAD++jLkS67rEytYFhb6057Q1QyKhaK+fU+iJ7cebRT7gHw=LKQ@mail.gmail.com>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Mon, 13 Jul 2026 00:14:22 -0300
+X-Gm-Features: AUfX_mxNEkBAgOHJ0e4msy5dnFMg8ImRM6B38dmiNn7DnpcOrNZotMYDQ-awSnk
+Message-ID: <CAJq09z6kAM0uidC_cG6qJwQGF86Q6xtNG4Xi-BbyXDpmgB__1Q@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: dsa: realtek: rtl8366rb: Fix up port isolation
+To: Linus Walleij <linusw@kernel.org>
+Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307001-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307002-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:phil@nwl.cc,m:fw@strlen.de,m:pablo@netfilter.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:linusw@kernel.org,m:alsi@bang-olufsen.dk,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[bang-olufsen.dk,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER(0.00)[running910@gmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[running910@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C5231746DBA
+X-Rspamd-Queue-Id: DF854746E06
 
-Hi Phil,
+> > > -               /* Start with all ports completely isolated */
+> > > -               ret = rtl8366rb_port_set_isolation(priv, dp->index, 0);
+> > > -               if (ret)
+> > > -                       return ret;
+> >
+> > If you don't isolate the ports, what is the default port status?
+>
+> Hm as I wrote in the commit message:
+>
+> "the next loop in the setup code, over the
+> user ports, isolate all the ports from each other, so only the CPU
+> port can see them."
+>
+> It looks like this:
+>
+>         /* Configure user ports */
+>         dsa_switch_for_each_port(dp, ds) {
+>                 if (!dsa_port_is_user(dp))
+>                         continue;
+>
+>                 /* Forward only to the CPU, isolate from all other ports */
+>                 ret = rtl8366rb_port_set_isolation(priv, dp->index,
+> upports_mask);
+>                 if (ret)
+>                         return ret;
+>
+>                 /* If we support cascade switches, it should also include the
+>                  * downstream DSA ports.
+>                  */
+>                 downports_mask |= BIT(dp->index);
+>         }
+>
+> upports_mask is the bitmask for all CPU ports, so that should do what is
+> expected?
 
-Thanks a lot for the review.
+The first loop originally acted as a catch-all to isolate all ports
+upfront (whether unused, dsa, cpu, or user). The second and third
+loops then explicitly opened the forwarding paths for user and CPU
+ports.
+If you exclude the isolation step from the initial loop, unused ports
+isolation won't be touched by the subsequent configuration loops
+either. As a result, those unused ports will remain in their hardware
+default isolation state.
 
-> There is another candidate for hotdrop in there, e.g. the "Packet
-> smaller than it's length field" check in line 76. Or is this a
-> legitimate non-match?
+If the hardware default is to allow forwarding (which is common for
+unconfigured ports), those unused ports could potentially forward
+traffic between themselves, or even leak to active ports (user or
+CPU). Even if the DSA core currently disables unused ports at the
+MAC/PHY level, relying on that as the sole layer of defense is risky
+if that behavior ever changes or if a port is briefly enabled during
+setup.
 
-This should already be covered in the current nf/net tree by the previous
-IPv6 extension header hotdrop fix, but I will double-check the base before
-sending v2.
+We shouldn't leave the hardware forwarding matrix in an unknown or
+default state for unused ports. It should explicitly disable
+forwarding by setting a 0 mask for ports that are unused (or all of
+them as intended).
 
-> Given the many common blocks, maybe introduce a 'hotdrop' goto label to
-> jump to instead of break/return?
+Looking at the current implementation,
+rtl8366rb_port_set_isolation(priv, port, mask) should not use mask ==
+0 as a way to disable isolation. It breaks the expected semantics and
+completely prevents a caller from isolating a port entirely. This also
+causes a collision of meaning, where passing a mask of 0 is equivalent
+as if you passed a mask of ALL_PORTS.
 
-That makes sense to me for the repeated hbh error paths. I will look at
-the flow again and use a hotdrop label where it keeps the code clearer.
+The function is currently trying to do two things at once:
+1) Enable or disable the hardware isolation feature itself.
+2) Set the isolation destination bitmask.
 
-> I think the 'srh->segments_left > srh->first_segment' case is also a
-> candidate:
+We should either remove the feature's enable/disable logic from this
+function entirely, or expand its signature to include an explicit
+boolean argument, like: rtl8366rb_port_set_isolation(priv, port, bool
+enable, u32 mask)
 
-I will revisit this one and check it against RFC8200/RFC8754. My current
-understanding is that this looks more like malformed input than a normal
-rule mismatch, so I will account for it in v2 if the check fits cleanly.
+For the newer RTL8367C family (and some other variants), Realtek
+actually dropped this dedicated "enable" bit entirely, allowing
+isolation to be controlled purely by setting all target port bits to 0
+or 1. However, for this specific older hardware where the explicit bit
+exists, we shouldn't mash both concepts into a single mask parameter.
 
-Thanks,
-Zhixing
+Regards,
+
+Luiz
 
