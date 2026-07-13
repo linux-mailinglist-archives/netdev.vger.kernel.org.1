@@ -1,191 +1,345 @@
-Return-Path: <netdev+bounces-307140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307141-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +BbMEiPXVGqqfgAAu9opvQ
-	(envelope-from <netdev+bounces-307140-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 14:16:35 +0200
+	id Ic3PE8HYVGoUfwAAu9opvQ
+	(envelope-from <netdev+bounces-307141-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 14:23:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B49E574AD55
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 14:16:34 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D31BA74AE5F
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 14:23:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=nxp.com header.s=selector1 header.b=LAIPNUq8;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307140-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307140-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=nxp.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=I7aVqvmt;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307141-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307141-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=marvell.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 976F5344C7E8
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 12:10:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4499D303099F
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 12:19:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345C3407CCA;
-	Mon, 13 Jul 2026 12:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DD7E4071C5;
+	Mon, 13 Jul 2026 12:19:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011014.outbound.protection.outlook.com [52.101.70.14])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B68AF406805;
-	Mon, 13 Jul 2026 12:10:30 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783944632; cv=fail; b=Stkd0JICrTRYw9yi23FECFwYo3EeNySqzPGMakKpS0O7vmfZTXoK8G4HcMy54ntFmc73s1FmjDbp3IIK0jCV3i9Yb8ByXEtNP6J35ZKWSVrvQScxUSZoXA/6EQ+KxQEiJcBkrV6DXkc5rAkS3EZXNZ2d+ld7FMXQyWLpb86BlWU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783944632; c=relaxed/simple;
-	bh=ondMywSYXONkmnqQRlLa/sVHYLc15lIOiHdLrL+Ot64=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=PNR14mfrXFzJnykYhHCArb5bggA1Erp3kqkCA2FtA2O61pWmSKZFet6qmJAbHTIkm7JolY00OuWYK27kyPgyed+HOOwMZFj6XkdGNM93fLXEYKgIRPe2b/DtQdxvbcAbKWq4KrOIZemRnivJPbZkcCUJMCPokXXhUnJOs5FO3+Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=LAIPNUq8; arc=fail smtp.client-ip=52.101.70.14
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=h19jJPmxRMBo47oktgKLsHhM8Bj5GgIjl5GmfGZpSmuFiFifQHshFC/oOGMYY30jgqHmhEmDj9aNm4HNG4ItWaeAaZUcDBzB3PDzCRlyrD1XlFrwzVGF786xVneF3A7rjctG9pNpDgB+dlItQkn4HcPdLw9nlxYR6qfg+SF1WAAhF/GGBP4Qurrb9nVmb+X9vB+mWMv9DafTnBgs7NTeyFRNfTJsL5bVckdQO8GKjU+AK92FwSMvX5HK+3b4txrDQmyBLrfDHaDUrtH4X6k/ryWLk6jDmm6kM9JEZwMbZHOF2tgGf4Nz9MQ/wD3OEHMQ+C7BNGoOsFNNxCLZa8DeDg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cBYTmP5QRAfHlTUoMc5yPiYhQtJRdx5zoMB8/VspJW8=;
- b=dKZiES3TnElT1dKfAIsWelHtz8ZlTG/AjeAidTdyu94NWcQTBg5TdZa/kD9ICavYy5SXzoeXU9jxzl5btqNyEajsjhyAjmJhnU0POlgf3J9dOHb2k1Fotd9RtzpY6sv2oocvzYCgKLcTg4UpiZiH88lBw4mku5PW+sko9mGVQQGV6d5lHxKfL0w9Zg7zm+sM2b4Alqp22Mcw0iwB2mpUsIg3UDsOLznDwX+WClIKaEojuK6K/hdIlIpS4WIrOpvkpb0sebzg9LnIp+38R7HnOgUzUX9SpsTf9iAWapu1Mx10BZpSX4GyXTu1LcW3bKnpjkgB5oJ7V0m8GbtMle1owQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cBYTmP5QRAfHlTUoMc5yPiYhQtJRdx5zoMB8/VspJW8=;
- b=LAIPNUq8hqNUSWfnFIUNwUrgqDEP7NyOZvrTUaOjtSNP2jaWBGl+OXZKbCdHZe0W9ckufZPKAu6Jqwr5GiTzZBx/fnrFaxIes+Ml8lU8j0GJd5gPt2x5EApCsU6eWGCMw5SV9i5O9evTBAp3yBW3m4St5K70EhmTzknBaV2w1pHg/qBOw/BhDu9Uy8Y5xxWbPcw2CPpcWDaBHmPMGltmgV46DlTD8kvIJ2kLP9lgaZaDO3Bo5S5Q+/FVjZqI3royzFYyJc53psMf7qCE2K7C/RarJJDOQcFRwMc3H8q6ANy73DRPbr1cbBU+Wuaic+xm2Rd+u0u55xGpIUSdrecDBQ==
-Received: from GVXPR04MB12290.eurprd04.prod.outlook.com
- (2603:10a6:150:319::13) by PA6PR04MB11886.eurprd04.prod.outlook.com
- (2603:10a6:102:517::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.19; Mon, 13 Jul
- 2026 12:10:27 +0000
-Received: from GVXPR04MB12290.eurprd04.prod.outlook.com
- ([fe80::1739:3404:2175:33dd]) by GVXPR04MB12290.eurprd04.prod.outlook.com
- ([fe80::1739:3404:2175:33dd%6]) with mapi id 15.21.0181.014; Mon, 13 Jul 2026
- 12:10:27 +0000
-Date: Mon, 13 Jul 2026 15:10:23 +0300
-From: Ioana Ciornei <ioana.ciornei@nxp.com>
-To: Guangshuo Li <lgs201920130244@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] dpaa2-eth: put MAC endpoint device on disconnect
-Message-ID: <qewrevjyvknd7uxiinxggebb3r6ctt7p7okp2hwybn7aimppbh@lhhybhsc3xal>
-References: <20260708111738.750391-1-lgs201920130244@gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260708111738.750391-1-lgs201920130244@gmail.com>
-X-ClientProxiedBy: FR2P281CA0076.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:9a::18) To GVXPR04MB12290.eurprd04.prod.outlook.com
- (2603:10a6:150:319::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85C4A3F54A0;
+	Mon, 13 Jul 2026 12:19:47 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783945189; cv=none; b=FknsJi8JiTDQmeHUrEWVjI2HXLqtav13GP9A4KJQVpoI18k1aPi481wJ7BskF+4wDqSF+1QSMhGqpxY/9QWQACv7aHnfjLGsRQJGEwDZbnbm8e0T6BAlbxTqJOnuATYzEVAjo33/I0+zYMkqfo+Lk31PNViHdK+1DB2zb6bpEac=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783945189; c=relaxed/simple;
+	bh=/n93W2PzyhcpKYJLUM7AROH7bZwOEdWgSIfpbjJGtT8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lxWj5KrBr/0M4fxjwZPoBjTexBDi9uwYuh7l3BjNgYppdWArNqLaJhsy+k/7ZkvQiWPaS6IdoZj1AKzZg+HcltKbF5xMiBZwD/Vi71Er80hDSJIAOJXZlpx5tmv0T5DdyC1D/+hfxFglyiBpLMI+/hNsTxeZmbGBsihCzwWV9/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=I7aVqvmt; arc=none smtp.client-ip=67.231.148.174
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66DCEAHd1647590;
+	Mon, 13 Jul 2026 05:19:27 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=SQMcdr5oGAdLAN6lhUQf9K/
+	AsH+liZy0cj3ipt6Mtxo=; b=I7aVqvmt0ykWMSarOTroQJsL3RwzBfBIlXxwrD9
+	lZ9QMNq11nSxLM38CvfjrnqM0pm7hRpHpb7KbvzNOGLm8f/nGBGIzlt78QaLj2EF
+	Wjc/fsRlf74mBNIjRN7B2UD/ClPT2sQ2DrRlWpbmnlt4HNny0TKXxGlwZWPY/JEG
+	KZFAPWyRo5ysdo3+AQKodAgRT4dAmEXuLWQUal9mINlhDa23BMszdMKTspxlYQDo
+	r+yY4wrnr0WXE4i67KfpIIQB1HEEHEkaX95W8LHyTJjw3hwQVuJhJ1LMkxp4MsHI
+	WpBfFJBlamLm8WWmOf+AO53l9qWjgosrHGlB//esgS0G1jw==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4fcwvc087q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 13 Jul 2026 05:19:26 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 13 Jul 2026 05:19:25 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Mon, 13 Jul 2026 05:19:25 -0700
+Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 2A18C3F7068;
+	Mon, 13 Jul 2026 05:19:21 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <davem@davemloft.net>, <gakula@marvell.com>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <sgoutham@marvell.com>
+CC: <andrew+netdev@lunn.ch>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, Hariprasad Kelam <hkelam@marvell.com>,
+        Ratheesh Kannoth
+	<rkannoth@marvell.com>
+Subject: [PATCH v3 net] octeontx2-af: Block VFs from clobbering special CGX PKIND state
+Date: Mon, 13 Jul 2026 17:49:02 +0530
+Message-ID: <20260713121902.3938875-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: GVXPR04MB12290:EE_|PA6PR04MB11886:EE_
-X-MS-Office365-Filtering-Correlation-Id: a86ecd44-0a47-4cc6-d110-08dee0d7b9dd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|19092799006|1800799024|366016|23010399003|376014|18002099003|56012099006|11063799006|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	PXjgSGHDc3+ZL0s0bDfYmKTqajgUKEkQf9ZuVNnQo+Ohcv7CESHB5DCd/CJtW4XB0FaI4eONsihiVjLR8T1CwzTPPpiLXjpNqnmVz2v/rF7C9SrrcwhRRj40mEGlXI7pLpAueNDO+P+IkqG60KQZF2atcqgYsHG6ozj5C1pTZ4HVFSOzQE0LKvsorE40vyAklfogjLO+0O3sJ4hD3LGKIXEHT561fjt275GRtiCxoOmGFS2r5HdnlRdy5jXbcQWfakbcE9ZyMfWgQLJ5Sn6c4GuUy1t8t5ekzXd9A9oGwJbntWAeAcysKtrVFxkCooYeI7fVJbTFgp3kHwQvt0mvzubT9pS3flxnp+UqxdpKWvqyEPeWr1c5+sWDws89YEgAGrkm8SNd4svMhOqDdDnHYBUrHCzFmLiK9XlpYrcBEVnUsxehhDNB/eFmDJhVJUbD2WyGAUYImkhBDx75ytAwzKSFK3E72qed7XDUwCjJUEjry9U5Vy+eM7El+zyGmhTJFdX3NxGaeULn4+ICH2RPfxAnh7dj3qDFly9hbx556DdxXRd30i8EC4ON+pp/hKgzL6th1UlxC9gDGnQ7EowvXXTprpqbizZxtaXRBnQsF7OyFihRcF9c+DKJhMwNL5uANzZF/3qQS00cJ5T8boPv0ZdPs9efsM6ovziu/jfvpH4=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GVXPR04MB12290.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(1800799024)(366016)(23010399003)(376014)(18002099003)(56012099006)(11063799006)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?w4fmAacxOkXM2N85+9M9lmZazzr3DfRouNSIYW4QzPljwLIvuLhU4/5WlBZq?=
- =?us-ascii?Q?pRjlA+PW2fy8Etr9jugTRIJPmZpxllXRedvnS9V7KDqf/E6iROZkdd7PG2vv?=
- =?us-ascii?Q?CPMSTpvvn1vk2iBVNZWhHJniyy8DiZmmnSifKfWEbuRRt2UXidM1dnEkAsv4?=
- =?us-ascii?Q?4stQ4LQPtaEUyxL4s06aXGp7K0I5eLuWN+w5wsGR6o959vEWTJu1FSAl28gn?=
- =?us-ascii?Q?5HEh+LN+Nzo87pzypuRihnVu/b6M7To0ziCnvG+7InuVX6LSquXExF9oO5g0?=
- =?us-ascii?Q?x/uCNxD/62aFtApEdACALlS/jAvuoimqFQBxSOFYamgEim1eMLRC6iSX8tcS?=
- =?us-ascii?Q?NZWjMq923mJclgIwiSCJnjNgn8Ol8KeKt2T7b6piLYoFnu7OpVbCEPtP/niK?=
- =?us-ascii?Q?U+877/uL7PXxqajWzhGUBPb9GLpodEY0PqBwg/Zn8Erv1Uqz20CunHchn5o9?=
- =?us-ascii?Q?P4S592k2WQiKPgu2BUEmTqBwbJUhht9FbknzoNvgn+w78pMw4H1aQqSAGOPe?=
- =?us-ascii?Q?Ho/q07uB+dCZzBcj5t05kOYS1hCHuB11/hA1Om8umsj18xMud9GxF3YJDCXB?=
- =?us-ascii?Q?fLn8SQHKR03aDhHVvuhuEFD66mxzk1Etc3wAng3LGJ0mKbJP57tkJMnbndSk?=
- =?us-ascii?Q?e3BUTJ5OI4quwcThd5uOwUrAIV/qOSm7dN6xKQB5OKyTOWYdCfs/8b1qwHfI?=
- =?us-ascii?Q?0KQZT7nqRZIOi9Bzc0otNVul96yAVz7S/0R4DU/dfRvTR+Wdnx2DCegyziGA?=
- =?us-ascii?Q?X47VWtCjQRy5/RyDbJZD4068hKzPRezj7x+MG4ESAmwXbMAyxQHFib1/cI91?=
- =?us-ascii?Q?PgHNFYITu+4/MkF+3YDAzJKmx5yLEV5Wskqnm9JokYNax1VFf22APHk4pF0n?=
- =?us-ascii?Q?mDyyfCSEYUBoSaRF2r81srrwfKKadzWSHYY0qtyIfK+7kImRbZVmopG8wvhK?=
- =?us-ascii?Q?NQVVaGWXNW8XDLyf9EU1B0XDcMtEEtEbckkR0c+CCmvmfLCU3rs3mFI2xBAB?=
- =?us-ascii?Q?7pjAWRO7oneaosSkFwza0ZKEk7Ts1Nos5RLPnzWSoNUr4+rGCu9+q7eaojhg?=
- =?us-ascii?Q?FAx90rlTPmHfSOuWOR3WrCutAD2/8/1MmAmAtM8+VZC5G7FsLz+NYsh0ViWH?=
- =?us-ascii?Q?xJ34QYhhK9R+6T7RBPq3CpU/GfqPh5bpXAJ/T+BwVn//tFR6pkfT/kkmJTWS?=
- =?us-ascii?Q?YN2+tuSEfCke+tGvhtVQKESTMEN5MzaE3K+4V/fXJmLHjA+HKHJcQxFL1Wn9?=
- =?us-ascii?Q?1fZ28gyHzcjSzBZZJ374fUZDdnehhm7m45DB41Wvrpx9IqW6SM5xzXxySSuN?=
- =?us-ascii?Q?xOdhgn0Gy1CzscZx7SqHl5pXusChVRghlQBMZcqvK2FRbrhdVg8CoGYASts1?=
- =?us-ascii?Q?9O+wFHbYzJEW6m11Q4qFsYRfr3LkHRRzhYFs/m0qGbL83gpVGGLLOPUX1Ctj?=
- =?us-ascii?Q?XgaW0ZQqb1iq92/skitomZw9QIGgrUe5fdWwo8XY+ZIkXtNiNQsXmcK72Nqb?=
- =?us-ascii?Q?Q7/v5ZhRxWz1WMH4KXjlV/7lFcdeeP5HAe64bQEerJtrOfcZ+VfV0MpH0vW8?=
- =?us-ascii?Q?6dxO///NvaCPbgqV4vYfG4ZbIk/aWkKVajwy/JHZdWP8VRWhjOYKcGXzIpkW?=
- =?us-ascii?Q?WaTbnc+Zc19iTIomCA3+Rh/Tgd0bVApUqBBQq1QMUPkEO8Kj0yai7cGzR3o9?=
- =?us-ascii?Q?TbsKVMB/hDkcyst4ipRDfWOjPVo06U/z2r6aE9DfxST+dE/0BP6pNABacwX7?=
- =?us-ascii?Q?HrC+aIeRQw=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a86ecd44-0a47-4cc6-d110-08dee0d7b9dd
-X-MS-Exchange-CrossTenant-AuthSource: GVXPR04MB12290.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2026 12:10:27.4946
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 50kfWKAOp6RqVWcYJI7bmZTLjWYpzh93ZE3dOCeKUXx8z5Q05i6niqcRBhCIRYGN21Flpu6QA2h4+7GA0tFnmA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA6PR04MB11886
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: iRwgqnJwEnhLSmPVsQsv686mU_5fhbR8
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEzMDEyNyBTYWx0ZWRfX9xH4nzhNDJIe
+ u05j/iIwAdj8+Rt94Ehq5dZZzE/k5YBICO/GsO6/2ZbWa0OHAZPZnVhKaDAQABY/j9uCdn79oJG
+ CDscEJoqYUsXV3iQYtUrFS6xz8zFip8=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEzMDEyNyBTYWx0ZWRfX0MlyuJId8ewy
+ ik8/Usd4znKJeXKb64akZBkc+rWXeZSNsstPLnWuw8ga+C9h5ehuGDAfPInJe9vkM0HoW5YsVtN
+ DNrpGsl57epwKw5i6fMVGgq9AHLdbuoPSKe6T8ruFueODzZgxVI0axaEKmX1g4U53Iwr0048Lrc
+ 6GaTRD3Xf9kUYRDN2Jr9+gxEkiw16pCqcvIxTA222JgJbr6Zmg3ATq7CXdsu/9d6i2d85sJf1Dw
+ DI/bHmiQ/gsc2a4GSv+kgqJtRkeTGLaKJUtXAusV6pLw3dmmntbaKwm+WMtHXjP/8heg8L4MPkV
+ 8debVS2H0mzFDrAA0Auyd4mhGx6eMyJK1YZa4F092wBnYnmOGjFarwuBTYIU4jt78ltu9oO2AOd
+ Q22BdQHZuI9lDKI6yEsvQRNMWifkT9sazQA2vSXzCUeQiHxKMXx2sG1xaIiT4kUNjcN/asdgWrU
+ KVW/2xll0HBWxNK3B7A==
+X-Authority-Analysis: v=2.4 cv=cIXQdFeN c=1 sm=1 tr=0 ts=6a54d7ce cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
+ a=EAYMVhzMl8SCOHhVQcBL:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
+ a=ZSlNZ2RTXUNskQ7JDYEA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: iRwgqnJwEnhLSmPVsQsv686mU_5fhbR8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-13_03,2026-07-10_01,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.84 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307140-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:lgs201920130244@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307141-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:gakula@marvell.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:sgoutham@marvell.com,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:hkelam@marvell.com,m:rkannoth@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[nxp.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:from_mime,nxp.com:email,nxp.com:dkim,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lhhybhsc3xal:mid]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B49E574AD55
+X-Rspamd-Queue-Id: D31BA74AE5F
 
-On Wed, Jul 08, 2026 at 07:17:37PM +0800, Guangshuo Li wrote:
-> fsl_mc_get_endpoint() returns the MAC endpoint device with a reference
-> taken through device_find_child(). The Ethernet connect path stores that
-> device in mac->mc_dev and keeps it for the lifetime of the connected MAC
-> object.
-> 
-> However, the disconnect path only disconnects and closes the MAC before
-> freeing the dpaa2_mac object. It does not drop the endpoint device
-> reference stored in mac->mc_dev, so every successful connect leaks that
-> device reference when the MAC is later disconnected.
-> 
-> Drop the endpoint device reference after closing the MAC and before
-> freeing the dpaa2_mac object.
-> 
-> Fixes: 719479230893 ("dpaa2-eth: add MAC/PHY support through phylink")
-> Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
+From: Hariprasad Kelam <hkelam@marvell.com>
 
-Reviewed-by: Ioana Ciornei <ioana.ciornei@nxp.com>
+PF and VF NIX LFs that share a CGX LMAC reuse the same hardware PKIND
+programming. When HiGig2 or EDSA parsing is enabled, a VF NIX LF alloc must
+not reset the LMAC RX PKIND or default TX parse config over the PF setup.
+
+Add cgx_get_pkind() and rvu_cgx_is_pkind_config_permitted() so VFs skip
+cgx_set_pkind(), rvu_npc_set_pkind(), and NIX_AF_LFX_TX_PARSE_CFG updates
+when the LMAC is using NPC_RX_HIGIG_PKIND or NPC_RX_EDSA_PKIND.
+
+Fixes: 94d942c5fb97 ("octeontx2-af: Config pkind for CGX mapped PFs")
+Cc: Geetha sowjanya <gakula@marvell.com>
+Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+
+---
+v2 -> v3: Addressed simon comments
+	https://lore.kernel.org/netdev/20260709122648.1552103-2-horms@kernel.org/
+v1 -> v2: Addressed simon comments
+	https://lore.kernel.org/netdev/20260619041002.1773822-1-rkannoth@marvell.com/
+---
+ .../net/ethernet/marvell/octeontx2/af/cgx.c   | 12 +++++++
+ .../net/ethernet/marvell/octeontx2/af/cgx.h   |  1 +
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |  1 +
+ .../ethernet/marvell/octeontx2/af/rvu_cgx.c   | 32 +++++++++++++++++++
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   | 18 ++++++++---
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 11 +++++--
+ 6 files changed, 69 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+index 2e94d5105016..f5fd6138c352 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+@@ -518,6 +518,18 @@ int cgx_set_pkind(void *cgxd, u8 lmac_id, int pkind)
+ 	return 0;
+ }
+ 
++int cgx_get_pkind(void *cgxd, u8 lmac_id, int *pkind)
++{
++	struct cgx *cgx = cgxd;
++
++	if (!is_lmac_valid(cgx, lmac_id))
++		return -ENODEV;
++
++	*pkind = cgx_read(cgx, lmac_id, cgx->mac_ops->rxid_map_offset);
++	*pkind = *pkind & 0x3F;
++	return 0;
++}
++
+ static u8 cgx_get_lmac_type(void *cgxd, int lmac_id)
+ {
+ 	struct cgx *cgx = cgxd;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.h b/drivers/net/ethernet/marvell/octeontx2/af/cgx.h
+index 92ccf343dfe0..8411a75dd723 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.h
+@@ -141,6 +141,7 @@ int cgx_get_cgxid(void *cgxd);
+ int cgx_get_lmac_cnt(void *cgxd);
+ void *cgx_get_pdata(int cgx_id);
+ int cgx_set_pkind(void *cgxd, u8 lmac_id, int pkind);
++int cgx_get_pkind(void *cgxd, u8 lmac_id, int *pkind);
+ int cgx_lmac_evh_register(struct cgx_event_cb *cb, void *cgxd, int lmac_id);
+ int cgx_lmac_evh_unregister(void *cgxd, int lmac_id);
+ int cgx_get_tx_stats(void *cgxd, int lmac_id, int idx, u64 *tx_stat);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+index 7f3505ae6860..bb671e2150aa 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+@@ -1115,6 +1115,7 @@ void npc_read_mcam_entry(struct rvu *rvu, struct npc_mcam *mcam,
+ 			 u8 *intf, u8 *ena);
+ int npc_config_cntr_default_entries(struct rvu *rvu, bool enable);
+ bool is_cgx_config_permitted(struct rvu *rvu, u16 pcifunc);
++bool rvu_cgx_is_pkind_config_permitted(struct rvu *rvu, u16 pcifunc);
+ bool is_mac_feature_supported(struct rvu *rvu, int pf, int feature);
+ u32  rvu_cgx_get_fifolen(struct rvu *rvu);
+ void *rvu_first_cgx_pdata(struct rvu *rvu);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+index 4ff3935ed3fe..2be1da3476ac 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+@@ -1355,3 +1355,35 @@ void rvu_mac_reset(struct rvu *rvu, u16 pcifunc)
+ 	if (mac_ops->mac_reset(cgxd, lmac, !is_vf(pcifunc)))
+ 		dev_err(rvu->dev, "Failed to reset MAC\n");
+ }
++
++/* Do not allow CGX-mapped VFs to overwrite PKIND when special parse kinds
++ * (HiGig, EDSA, etc.) are in use on the shared LMAC.
++ */
++bool rvu_cgx_is_pkind_config_permitted(struct rvu *rvu, u16 pcifunc)
++{
++	int pf, err, rxpkind;
++	u8 cgx_id, lmac_id;
++	void *cgxd;
++
++	pf = rvu_get_pf(rvu->pdev, pcifunc);
++
++	if (!(pcifunc & RVU_PFVF_FUNC_MASK))
++		return true;
++
++	if (!is_pf_cgxmapped(rvu, pf))
++		return true;
++
++	rvu_get_cgx_lmac_id(rvu->pf2cgxlmac_map[pf], &cgx_id, &lmac_id);
++	cgxd = rvu_cgx_pdata(cgx_id, rvu);
++	err = cgx_get_pkind(cgxd, lmac_id, &rxpkind);
++	if (err)
++		return false;
++
++	switch (rxpkind) {
++	case NPC_RX_HIGIG_PKIND:
++	case NPC_RX_EDSA_PKIND:
++		return false;
++	default:
++		return true;
++	}
++}
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+index 6a0ce2665031..040eb4c9b8d1 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+@@ -338,6 +338,7 @@ static int nix_interface_init(struct rvu *rvu, u16 pcifunc, int type, int nixlf,
+ 	struct sdp_node_info *sdp_info;
+ 	int pkind, pf, vf, lbkid, vfid;
+ 	u8 cgx_id, lmac_id;
++	struct cgx *cgxd;
+ 	bool from_vf;
+ 	int err;
+ 
+@@ -363,8 +364,15 @@ static int nix_interface_init(struct rvu *rvu, u16 pcifunc, int type, int nixlf,
+ 		pfvf->tx_chan_cnt = 1;
+ 		rsp->tx_link = cgx_id * hw->lmac_per_cgx + lmac_id;
+ 
+-		cgx_set_pkind(rvu_cgx_pdata(cgx_id, rvu), lmac_id, pkind);
+-		rvu_npc_set_pkind(rvu, pkind, pfvf);
++		cgxd = rvu_cgx_pdata(cgx_id, rvu);
++
++		mutex_lock(&cgxd->lock);
++		if (rvu_cgx_is_pkind_config_permitted(rvu, pcifunc)) {
++			cgx_set_pkind(rvu_cgx_pdata(cgx_id, rvu), lmac_id,
++				      pkind);
++			rvu_npc_set_pkind(rvu, pkind, pfvf);
++		}
++		mutex_unlock(&cgxd->lock);
+ 		break;
+ 	case NIX_INTF_TYPE_LBK:
+ 		vf = (pcifunc & RVU_PFVF_FUNC_MASK) - 1;
+@@ -1685,8 +1693,10 @@ int rvu_mbox_handler_nix_lf_alloc(struct rvu *rvu,
+ 	rvu_write64(rvu, blkaddr, NIX_AF_LFX_RX_CFG(nixlf), req->rx_cfg);
+ 
+ 	/* Configure pkind for TX parse config */
+-	cfg = NPC_TX_DEF_PKIND;
+-	rvu_write64(rvu, blkaddr, NIX_AF_LFX_TX_PARSE_CFG(nixlf), cfg);
++	if (rvu_cgx_is_pkind_config_permitted(rvu, pcifunc)) {
++		cfg = NPC_TX_DEF_PKIND;
++		rvu_write64(rvu, blkaddr, NIX_AF_LFX_TX_PARSE_CFG(nixlf), cfg);
++	}
+ 
+ 	if (is_rep_dev(rvu, pcifunc)) {
+ 		pfvf->tx_chan_base = RVU_SWITCH_LBK_CHAN;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+index c7bc0b3a29b9..1297c6681a01 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+@@ -17,6 +17,7 @@
+ #include "npc_profile.h"
+ #include "rvu_npc_hash.h"
+ #include "cn20k/npc.h"
++#include "lmac_common.h"
+ #include "rvu_npc.h"
+ #include "cn20k/reg.h"
+ 
+@@ -4204,6 +4205,7 @@ int rvu_npc_set_parse_mode(struct rvu *rvu, u16 pcifunc, u64 mode, u8 dir,
+ 	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	u64 rxpkind, txpkind;
+ 	u8 cgx_id, lmac_id;
++	struct cgx *cgxd;
+ 
+ 	/* use default pkind to disable edsa/higig */
+ 	rxpkind = rvu_npc_get_pkind(rvu, pf);
+@@ -4228,9 +4230,11 @@ int rvu_npc_set_parse_mode(struct rvu *rvu, u16 pcifunc, u64 mode, u8 dir,
+ 		if (!is_cgx_config_permitted(rvu, pcifunc))
+ 			return 0;
+ 		rvu_get_cgx_lmac_id(rvu->pf2cgxlmac_map[pf], &cgx_id, &lmac_id);
++		cgxd = rvu_cgx_pdata(cgx_id, rvu);
+ 
+-		rc = cgx_set_pkind(rvu_cgx_pdata(cgx_id, rvu), lmac_id,
+-				   rxpkind);
++		mutex_lock(&cgxd->lock);
++		rc = cgx_set_pkind(cgxd, lmac_id, rxpkind);
++		mutex_unlock(&cgxd->lock);
+ 		if (rc)
+ 			return rc;
+ 	}
+@@ -4241,6 +4245,9 @@ int rvu_npc_set_parse_mode(struct rvu *rvu, u16 pcifunc, u64 mode, u8 dir,
+ 		if (rc)
+ 			return rc;
+ 
++		if (!rvu_cgx_is_pkind_config_permitted(rvu, pcifunc))
++			return -EINVAL;
++
+ 		rvu_write64(rvu, blkaddr, NIX_AF_LFX_TX_PARSE_CFG(nixlf),
+ 			    txpkind);
+ 	}
+-- 
+2.43.0
+
 
