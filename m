@@ -1,205 +1,211 @@
-Return-Path: <netdev+bounces-307230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307231-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qClpEFb/VGqTigAAu9opvQ
-	(envelope-from <netdev+bounces-307230-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 17:08:06 +0200
+	id faCpOWoAVWrZigAAu9opvQ
+	(envelope-from <netdev+bounces-307231-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 17:12:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EC8174CD02
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 17:08:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4961774CDD5
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 17:12:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b="k/CknA1O";
-	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=ji8rIqni;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307230-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307230-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=qualcomm.com;
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=BAdeQwP9;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307231-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307231-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AA92C303E8D8
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 14:59:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DEF093150D67
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 15:05:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE81D3546D2;
-	Mon, 13 Jul 2026 14:59:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A873F3DDDDD;
+	Mon, 13 Jul 2026 15:04:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 510AC35202D
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 14:59:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E9F133A033
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 15:04:51 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783954746; cv=none; b=DPogzkYgCMJCx2kP26UQ1YZJf6YDu9ExWdaGniEh6qjW4cGh+F0mf4UiTtTUaiUZi2LnFuw8/+uwVJXW7VOSgLeamfWV3Ik6l+58gBm8J7kcyVKZYVvYA36HH+APNjhf2x5zvVz4mzND7ET7AhKETpehe9+i466Rs9Dysq7WGQ0=
+	t=1783955094; cv=none; b=t2ip/zeNdIR0sIxWnK3YB0LZMxcdHYSKA1xCPCkNmaVqHMWJSZG0FWALLV/tknab8mcq09/66388BAQZ798+zSr0lpf4MpayT43FawVkD6kB+V9frpyLh0G41MLv61ABOuc1PK+s1kuPNKEPrR8G13neplVk1sg68cO08N5Ab3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783954746; c=relaxed/simple;
-	bh=lkIgxWjwf/sFNbQZls9lXBmTHyrWhCv7iqGMHOrl1TA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gTOs4w/3+g/RFGHaja4tf8Y/BdhHYl+Uaxcuu8YkpnJxbsxQfDHavyu4/SRBz2DWNajEZIcqINCVmiAkN5/dWVv9aiIZCJAzCohdcis6iA2dbfv8SB/37vYjZDVBouXXtK3C3b1f4zW6yxSemIkPtLQb57ZvMSs0lQBnjrqZw28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=k/CknA1O; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=ji8rIqni; arc=none smtp.client-ip=205.220.180.131
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66DCDkQh1398831
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 14:59:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=Y0B/Toi++qviIsvH3wfVq2MiAIIVK6Q0fCt
-	d190RJhY=; b=k/CknA1OSczHCEG6uycRAnm5Hcq3NAN0oR7cqwGm83rbmAswce/
-	8AraklXfNNdy72spR/hK6WQEBiKhdazNMtH/2/V+gmRGIhQB/oFPPOTZM2j6ovu2
-	CEn/fwL/nXuwLHjxxjrtWLmd55Ehx9CAuJA/s7qyfuctis+vVJNgMEsft4Walnjq
-	quM/uMR4AL+6OO1DJsLDzAwEnea/uuMoNbInqeXwH+cvOU9Odo1KVFP9YACD2Ty9
-	2cwnKPC6RpLsacAutAr1kX9jVYK9GkBBNfPiRsvaKNMs2x92TaXHM9lDoA7Vlg5q
-	LpK3JTWDkz8wMvyvaE21qELMurRTFqeOyKQ==
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fcwu4s5st-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 14:59:04 +0000 (GMT)
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-5174a236220so49027001cf.3
-        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 07:59:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1783954744; x=1784559544; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Y0B/Toi++qviIsvH3wfVq2MiAIIVK6Q0fCtd190RJhY=;
-        b=ji8rIqnitntbUCXjzM9Hb7NVgX54bLQIOeWSTsd76iXiE5fSfEagIu0WrVfqYD5qjF
-         80cBUIVXTTN70CYuJzycO+f45GRuptEBBy5tV8iMRia13510+qFMgc6XqpAKSwPJDSrJ
-         sA8ZzPyMw3UKpoJVriZsvj2MypQ6w+MYNomwkHQyzjeyt6ISUDVhQ08pZPBLCdGBTI8A
-         /7o1r4G1qPCmv/bbBigogNwrM9120wmbDbE775I8Q5ePBzeSWuJ/V6VCcjw1m7O56rIS
-         jWZqkLwCMIacd/cnlYfpmsGO3AG11mZM8JSdFdkeQgGS3Z3NsaBjP2fx6C2P9DMuWf6L
-         USRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783954744; x=1784559544;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Y0B/Toi++qviIsvH3wfVq2MiAIIVK6Q0fCtd190RJhY=;
-        b=MV4Xw+69BmfCBR1gMBAjZUVkwEy00ZzfDHNw/fT/pV4zJi1PzzQtGFQc7Ql/vzF1HM
-         aPQBm6xWiz5oA9RcPSmaEs3XOuv8bk+40QQG4MAs1LnYtXTJXPCFwh37HBjU6sdl/fvD
-         SXVwIehyhdPV0fVtPrqJhe9gFCSsTw0qpgGyvUteOs5dWLoNRQi60uozAjZzjIkuRyyl
-         DuLO6HoSuwwk+HS4WQzb9zVu9BxJbPg3tKaPyqgE4wocAD3zus7aYyA1YIqBObqI/07Z
-         XMs4H80NQGmLfR3SnPoyAWloYrILjj36Jh10SVqnLq1JNmHpzoh7RcQUoSdXGKLxuN3g
-         M74Q==
-X-Forwarded-Encrypted: i=1; AHgh+RoTO6cPeH/JFc/fbalhnFI1oekPgtwMVH+izulN0IPVRnuJ3owZiC89N+2U04jB4o/Q+76hONM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZMoXNt0gR7kjQSM3zlmeOJqiMf0nmPiOtFGXQj61Ba316zqDA
-	vKKIzm4Cl568hKXYttzswsGHpK30vOhfL+MClzvbsgbfWRWiUAeXqy/IvHr+v3USdsY7xuR1qrW
-	3Fx4LEZteCmu4nvkjnpltX/WG6DstKQkIU/K/Vt0GwL4WvL3Oa8xs1qL/C/o=
-X-Gm-Gg: AfdE7cn4ujwwoHKRG4B1OPvdg+AYOjbI2cPq2NTcH7xNRHu2Npaixutsp7O9+i5xnrO
-	ApnYgBwqT3jnoS8Q+jDI8fuPwhoDLaOy1DUd/dz5YS3mlIwrpW6zjrvnoWOGPB41eXoB4ir5vkB
-	yYr0PKymb3P+hMxY8Cx0k0FpabJtoFqXW8lM4TA+6xiyHEgPIrg2t1kyuBCd/LCVMFlJMVWYSNS
-	6BFEvLGLM9qT/8Rz+RxFDiVzd8zMowdJbirEPJxvxC23yEeZ/3cYWuhAeeE/NJpl0SXHx9/bMnw
-	LUIESMY09aWnR/Vwx1x15wBgSssuT/ePmCRha/X2wKpRJ6yBehoh5ikEM9pjQjg7e9fRPFAURIP
-	HRKS+YJ7Vkw+j16rqxe1h5xUOkSWCMHtbpaR2RUYEjFtNm8n0+nE=
-X-Received: by 2002:a05:622a:1b8f:b0:51b:fddc:1de8 with SMTP id d75a77b69052e-51cbf30423amr92118351cf.65.1783954743672;
-        Mon, 13 Jul 2026 07:59:03 -0700 (PDT)
-X-Received: by 2002:a05:622a:1b8f:b0:51b:fddc:1de8 with SMTP id d75a77b69052e-51cbf30423amr92118091cf.65.1783954743140;
-        Mon, 13 Jul 2026 07:59:03 -0700 (PDT)
-Received: from hu-yabdulra-ams.qualcomm.com ([212.136.9.4])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c15fc29937esm542450066b.22.2026.07.13.07.59.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jul 2026 07:59:02 -0700 (PDT)
-From: Youssef Samir <youssef.abdulrahman@oss.qualcomm.com>
-To: mani@kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, horms@kernel.org
-Cc: jeff.hugo@oss.qualcomm.com, linux-arm-msm@vger.kernel.org,
-        netdev@vger.kernel.org, stable@vger.kernel.org
-Subject: [PATCH] net: qrtr: ns: Raise node count limit to 512
-Date: Mon, 13 Jul 2026 16:59:01 +0200
-Message-ID: <20260713145901.212396-1-youssef.abdulrahman@oss.qualcomm.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1783955094; c=relaxed/simple;
+	bh=aZsghplprXQkanjC/2ViaOIi2RUUIO+lCIWfWBh7wtY=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=k0Lz2oihP3E5uFAxisjwK4fySO9mH7duTsUAx5Kb4iCd8pqIzy8PVDzc9KI3VrW2BssyWE2lh+CKtVpQvv7Qn0NlzX122bXXaK9hP5ted4hnq2qkLgb23uiInYVEQqTG37eyxOH1Gm0S4JeskhAfISUGEcv4aMOrM9S2OjOS2sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BAdeQwP9; arc=none smtp.client-ip=185.246.84.56
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 38D011A0FA0;
+	Mon, 13 Jul 2026 15:04:49 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 0980360345;
+	Mon, 13 Jul 2026 15:04:49 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5D6A511BD3A4E;
+	Mon, 13 Jul 2026 17:04:43 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1783955088; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=CmJzIfsuUG4qmBib+pba3w+zKMKmXhM7aYF0ATHO3+U=;
+	b=BAdeQwP91W5eXZExZD46BqTCXvuoF0hhXB7ln5oAzT9igHxeBKTSvQufG0MyExrWVjNPgv
+	UPsYi+TXVLilTFNQPEdcJJDxt9UuvwY4vGNXlzz434KZYBrhBV/4NkTTm6b/y6RBBB4Lzn
+	YziC9bfLYcVmZ/Nr5oc+aoHaAVaUGQ28EII9LArXOtV+6BjlzQurD7As8IAi5nDLX4QWCz
+	+Tf0DiOdAI7KEjrbtNzsju+X81IQE1hIkQ7/wQMWIejon8TNyQT/fX8UMCfyG3spzl/IL8
+	wGDPmtk7xnakfDdpNU1tyNjvn2d1WIrGw7otqEJsboaBBBUswIR9lTgcdTs6Zg==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authority-Analysis: v=2.4 cv=FMErAeos c=1 sm=1 tr=0 ts=6a54fd38 cx=c_pps
- a=EVbN6Ke/fEF3bsl7X48z0g==:117 a=dNlqnMcrdpbb+gQrTujlOQ==:17
- a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22 a=VwQbUJbxAAAA:8
- a=EUspDBNiAAAA:8 a=BAFur2-UtLnwWEDNYK0A:9 a=a_PwQJl-kcHnX1M80qC6:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEzMDE1NiBTYWx0ZWRfX4StjB8tU/qbb
- WZvlR/EuRou06sfYsWRLhZUFcGtcKq0LfkTtiOnGj8F+pZUeutJyHoQhLxGL0JPzpHn3jcfYk72
- jorzzvnxXoZxo41SeOtCZpnrhcm+rVM=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEzMDE1NiBTYWx0ZWRfXxFikT2zBG4cR
- JEOgJQrLFnfqzfme1JtHCtLQAZgwdwaXKl8YgR78bP2TI/xm5SCGxZSp2fvOBVSyR5qCSaBZOtK
- 27XSmUXx6n+gzf4RBs5tTSScC+eqRpJDjQSGXUE9upI8qXzIW2sP3wfl3Ei8UQ+Xm3VJ9uNLLKL
- o4gyoj3qxQ9wQOzky9cSDtzVkJ/PNvU27ZyvD4dyKJRXK+YxQ/GeJ9KLqt4Wm7CxeIj3uWN6vXB
- gx8VitR6Eazo9/AEAxPbyNslezsyQB02vUwZX/68AJvFrVts913tefZtw7WvzSZgU+Q6oqX1gDM
- GjWEebP6ounwS7eH8VmcuQaJdg09IThkIFjIQQmYjZm4nPChEfdera+e5uhoJnoHx6V1Kb9o1An
- yZJ11hLJ1YIezkyMVuWrbhj1thvZGU4ofuM802vpsgFOfFVOf9K8+EujjWtqsA1MTjDEF6xBCiw
- 0G3WbkXmEqw2RJiD+kg==
-X-Proofpoint-ORIG-GUID: iwenQbwmOJglsYlfdYcW0mc4pLrrqbw6
-X-Proofpoint-GUID: iwenQbwmOJglsYlfdYcW0mc4pLrrqbw6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-13_03,2026-07-10_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 adultscore=0 bulkscore=0 malwarescore=0 impostorscore=0
- suspectscore=0 priorityscore=1501 phishscore=0 spamscore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607130156
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 13 Jul 2026 17:04:42 +0200
+Message-Id: <DJXJAR4XVB70.1NT2W8SA233GF@bootlin.com>
+Subject: Re: [PATCH net-next v3 13/15] net: macb: re-read ISR inside IRQ
+ handler locked section
+Cc: "Conor Dooley" <conor.dooley@microchip.com>, "Andrew Lunn"
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, "Richard Cochran" <richardcochran@gmail.com>,
+ "Russell King" <linux@armlinux.org.uk>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, "Nicolas Ferre"
+ <nicolas.ferre@microchip.com>, "Claudiu Beznea" <claudiu.beznea@tuxon.dev>,
+ "Paolo Valerio" <pvalerio@redhat.com>, "Nicolai Buchwitz" <nb@tipi-net.de>,
+ "Vladimir Kondratiev" <vladimir.kondratiev@mobileye.com>, "Gregory CLEMENT"
+ <gregory.clement@bootlin.com>, =?utf-8?q?Beno=C3=AEt_Monin?=
+ <benoit.monin@bootlin.com>, "Tawfik Bayouk" <tawfik.bayouk@mobileye.com>,
+ "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>, "Maxime Chevallier"
+ <maxime.chevallier@bootlin.com>
+To: "Conor Dooley" <conor@kernel.org>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260701-macb-context-v3-0-00268d5b1502@bootlin.com>
+ <20260701-macb-context-v3-13-00268d5b1502@bootlin.com>
+ <20260703-faction-system-20af97e12412@spud>
+In-Reply-To: <20260703-faction-system-20af97e12412@spud>
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	TAGGED_FROM(0.00)[bounces-307231-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:conor.dooley@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:nicolas.ferre@microchip.com,m:claudiu.beznea@tuxon.dev,m:pvalerio@redhat.com,m:nb@tipi-net.de,m:vladimir.kondratiev@mobileye.com,m:gregory.clement@bootlin.com,m:benoit.monin@bootlin.com,m:tawfik.bayouk@mobileye.com,m:thomas.petazzoni@bootlin.com,m:maxime.chevallier@bootlin.com,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:mani@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jeff.hugo@oss.qualcomm.com,m:linux-arm-msm@vger.kernel.org,m:netdev@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[youssef.abdulrahman@oss.qualcomm.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-307230-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org,tuxon.dev,tipi-net.de,mobileye.com,bootlin.com];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[youssef.abdulrahman@oss.qualcomm.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,qualcomm.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,oss.qualcomm.com:from_mime,oss.qualcomm.com:dkim,oss.qualcomm.com:mid];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9EC8174CD02
+X-Rspamd-Queue-Id: 4961774CDD5
 
-The current node limit of 64 breaks the functionality for a number of AI200
-deployments that have up to 384 nodes. Raise the limit to 512.
+Hello Conor,
 
-Fixes: 27d5e84e810b ("net: qrtr: ns: Limit the total number of nodes")
-Cc: stable@vger.kernel.org
-Signed-off-by: Youssef Samir <youssef.abdulrahman@oss.qualcomm.com>
----
- net/qrtr/ns.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Fri Jul 3, 2026 at 2:09 PM CEST, Conor Dooley wrote:
+> Hey,
+>
+> I'll admit to being a bit confused by this patch..
+>
+> On Wed, Jul 01, 2026 at 05:59:16PM +0200, Th=C3=A9o Lebrun wrote:
+>> The IRQ handler reads ISR register into the `status` stack variable.
+>> If empty, it early returns. Else, it grabs bp->lock and iterates on
+>> the status bits.
+>>=20
+>> If we tried grabbing bp->lock while already acquired, we might have
+>> slept and the status might have been updated. Our most likely
+>
+> This mention of sleeping I think should be removed, it implies sleeping
+> is required for the status to be updated.
 
-diff --git a/net/qrtr/ns.c b/net/qrtr/ns.c
-index b3f9bbcf9ab9..e5b2adb161d9 100644
---- a/net/qrtr/ns.c
-+++ b/net/qrtr/ns.c
-@@ -76,11 +76,11 @@ struct qrtr_node {
-  * requirements. If the requirement changes in the future, these values can be
-  * increased.
-  */
--#define QRTR_NS_MAX_NODES   64
-+#define QRTR_NS_MAX_NODES   512
- #define QRTR_NS_MAX_SERVERS 256
- #define QRTR_NS_MAX_LOOKUPS 64
- 
--static u8 node_count;
-+static u16 node_count;
- 
- static struct qrtr_node *node_get(unsigned int node_id)
- {
--- 
-2.43.0
+Yes "slept" wasn't the right word, "waiting" would have been more
+appropriate. Or it could be a race even if bp->lock acquired
+immediately.
+
+>> competitor in this race (condition) is a swap operation, used in
+>> change_mtu and set_ringparam. It is the only MACB codepath that resets
+>> interrupts and HW inside a bp->lock critical section. Other codepaths
+>> that clear HW IRQ status do so outside the bp->lock critical section.
+>
+> Where do change_mtu and set_ringparam take the bp lock?
+> As far as I can see, they don't. The commit message should reflect how
+> the code behaves at the time of the patch, not at some point in the
+> future after it.
+
+You are correct: this commit doesn't see change_mtu/set_ringparam take
+bp->lock. It only will happen in the future. Will fix.
+
+>
+>> We can only detect spurious interrupts before grabbing bp->lock if
+>> MACB_CAPS_ISR_CLEAR_ON_WRITE. If we don't, then we only read ISR once.
+>>=20
+>> Signed-off-by: Th=C3=A9o Lebrun <theo.lebrun@bootlin.com>
+>> ---
+>>  drivers/net/ethernet/cadence/macb_main.c | 16 ++++++++++++----
+>>  1 file changed, 12 insertions(+), 4 deletions(-)
+>>=20
+>> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethe=
+rnet/cadence/macb_main.c
+>> index 7245c345c78f..5a32d5cb759e 100644
+>> --- a/drivers/net/ethernet/cadence/macb_main.c
+>> +++ b/drivers/net/ethernet/cadence/macb_main.c
+>> @@ -2184,13 +2184,21 @@ static irqreturn_t macb_interrupt(int irq, void =
+*dev_id)
+>>  	struct net_device *netdev =3D bp->netdev;
+>>  	u32 status;
+>> =20
+>> -	status =3D queue_readl(queue, ISR);
+>> -
+>> -	if (unlikely(!status))
+>> -		return IRQ_NONE;
+>> +	/* detect spurious interrupts without grabbing bp->lock */
+>> +	if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE) {
+>> +		status =3D queue_readl(queue, ISR);
+>> +		if (unlikely(!status))
+>> +			return IRQ_NONE;
+>> +	}
+>
+> To be honest, this check feels like penalising the likely^2 case* with an
+> extra read favour of the unlikely case where there's contention on the
+> lock and the contending function is capable of affecting the status
+> register. Could we get away with just the single check of the register
+> with the lock taken?
+
+I agree!
+
+> * although I don't know what percentage of hardware supports this cap,
+> so maybe most devices will never run this code
+
+I expect all modern(TM) MACB blocks to be write-to-clear, at least
+that's what I heard but I don't remember from where.
+
+Thanks,
+
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
 
