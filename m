@@ -1,226 +1,169 @@
-Return-Path: <netdev+bounces-307226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307227-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ttxdB0n6VGoviQAAu9opvQ
-	(envelope-from <netdev+bounces-307226-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 16:46:33 +0200
+	id 8sxVOsT5VGoRiQAAu9opvQ
+	(envelope-from <netdev+bounces-307227-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 16:44:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67F7074C90C
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 16:46:32 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADCE274C8AC
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 16:44:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307226-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307226-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=Yegq7VlQ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307227-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-307227-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=marvell.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B16073165634
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 14:40:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C023D302FBC7
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 14:43:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D47DB43932C;
-	Mon, 13 Jul 2026 14:39:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4962842B746;
+	Mon, 13 Jul 2026 14:43:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm2-f11.google.com (mail-wm2-f11.google.com [74.125.225.139])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC4E265629
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 14:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C046332AAB5;
+	Mon, 13 Jul 2026 14:43:07 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783953561; cv=none; b=PjiQwtoMROHky5cxsIx/W6+oyj+Bt6IFcSEQPqkWO63AP6r0i3LRNnVWCvOYhsEypp6ARMFD8P79ZqObkLcGHTvlopxuyl7bVW0AA2CSLuQ157sK+jmuWeoDggMVcqsORM2iqtyoUGiO3SHYsYBlP/jki00IgAmglKunlAmXgks=
+	t=1783953789; cv=none; b=WQjT4vqQGwtSBzHanT/nDnEtYRF+rj9Ya3LnNH8AjcjN15jgOJgULjnc3aBpGE9lMpDLLDWmc0CGAgqZnv1Of8tyDgMN8gBJqlDc/6e0WtAdY3avLHl9PxEqf1Zacoe6a8YYeRGcLiTvSbSRb8j3pdE/6arKiEEOsftC3D+/sgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783953561; c=relaxed/simple;
-	bh=7SVwThqf5Y8uGT7Wl/bLXED8qdBAA+y2a5is8Se2K/I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZsOdp29Xk8OVzJ1x06GDVlYGXv7tkfkgH9Zf7X+coSkIKhou/8k3g2JYxO5+ZiGLi1seCqmVH11Ifue7DvEp/ccSf8sZiEAIUc9cttppBPDY9TjBR72HKWmmv9JHbL0FosNSmfe3CwKzNkmsLGjgPb7Amfx4gWIVbv6OcnRDtVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=74.125.225.139
-Received: by mail-wm2-f11.google.com with SMTP id 5b1f17b1804b1-493f17dc838so11128125e9.1
-        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 07:39:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783953557; x=1784558357;
-        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Ewxn1tc8oBqL++u0cfoxvHt4MAjgPzVty+SbSTp042s=;
-        b=NJ1evmC2qgRUCdlCIGNhji1DvExNbpxhFOKwnQBz5kYo0XUzVAPLJDDFp9sFWJopZB
-         RzIe2NACqF5wwpdo+9JQoUAsOf3FHKB6Gk2Wiqjb7RTpeHc+GZfK3GuZatbJ/3R+Mb2B
-         lzCc+cmiHI+P6mV8VwNmtMQG+wYOJaIQkAeUOo9ezlwQkKKdWDjbdFkvdy04m2Jzqa7u
-         e8G+Ewu2G2Mnqh+/RnULNItRTHVou2KaMnsvCsUYkvuBE4PqbjPd1DJehp2SecF3ZhwF
-         TbCSyfCmhHa8F96O/T238nrch8vRz/0FKI4vk2qW3VuQCLVMTibYJ3gP7W3LRKn4AkO4
-         Lv6Q==
-X-Forwarded-Encrypted: i=1; AHgh+Rorm9kzRKpL/qhCNDdpGyV4rBf8LTS7uHuUnalKpQWB478VhKnN5Gd1kQ8/j8DfroDJVctD6y4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzw0RJDx4wi7JCeNoDIpWJ9dPGnzG96LvfPZX3rXcesbfXhINA+
-	X+hmLOQD/qeus5bDD28+ltjf1R7yFmBSSP3sdUbx9oYpfN53rKfkFhkL
-X-Gm-Gg: AfdE7cmwgc/sXukNilz8nNJfRmx3f6H63LjFdTCLCjzZ3MBCpAUK9i5CeaBUMeQ3Iku
-	a/lmCF/l1cre64mtvayMwJzhUHYHRPeoo1ZD0d0NpphEQGJDYP2n3NKRVJ3GYbyI6tBq8yieg+E
-	VyNEG5TqX1LvC3chggidfNeHXskeBR2DlqO1Z8mSz0BWKz/c5tWROz7LWYM2bgMhH5q8befRWOv
-	71GKKe8d5Iyt3prxJ1eQlj7OkxxAnz+4gOFg8rUnpb+3zVY4m+5Th+0j+igvhA9M98uzrNM9is8
-	pa9G9/mlJs0lYyd015y3ZgGP55IeNFb7OR4+zQM++AN49IDU8eGiQIQX4Rhu1pm7sifhTgXY6VS
-	rQZ+MhPbZa/Lf7/m1T7Q0uWcoipGvQ77aqJvIubpwHOwv7uOfLRg4E/Byc8i3DTErVyvC6LH6Kt
-	nPza9XkJEOZgZ+8fTm1pcjoGxALJeOo3dfEOeowCwLDylR5SYm5w==
-X-Received: by 2002:a05:600c:4e46:b0:493:efcd:b809 with SMTP id 5b1f17b1804b1-49401d2d054mr40539925e9.6.1783953556854;
-        Mon, 13 Jul 2026 07:39:16 -0700 (PDT)
-Received: from [192.168.88.241] (78-80-108-129.customers.tmcz.cz. [78.80.108.129])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493f86556acsm185096295e9.1.2026.07.13.07.39.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Jul 2026 07:39:16 -0700 (PDT)
-Message-ID: <f92c4b8a-601a-4e22-822a-ba00705fe60c@ovn.org>
-Date: Mon, 13 Jul 2026 16:39:14 +0200
+	s=arc-20240116; t=1783953789; c=relaxed/simple;
+	bh=ezVyzJwUCwOlF1Moexni1BsQt2cCvqFMreLUWsOz4KU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DFUDDQJJ5U7CiKbRRgJDCRVMsyR8dAniog9O1kEKmxrEdN5GWVeTPgpOZrkwv4H9mekfZKMDpjTci49iuZIaYfgHjhlTLIh49Teplvta4dbUK8wyNR9uxH4FOfNcTQupJ5EXDAezZ4ohRjfhOIsYyEeQ15RqFtYqaUyVMMNgZN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Yegq7VlQ; arc=none smtp.client-ip=67.231.148.174
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66DCFuxD403014;
+	Mon, 13 Jul 2026 07:42:59 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=LB08cVqHy+2xItakMU5cT+e
+	rTaCsaqCahVDMTJD9Z/U=; b=Yegq7VlQSyCGNAs2UYe1Af4aqyM3yAxO9Qmg1ft
+	VcS0kJjVhRtQJ08Ynrz3RYjuFuEHDCMc7FoCWiAKsalWpnrLJipzYvIUkFX/wosV
+	bg9yOGbbxE3dQ7tppG4c7V8/DbJydA0WX+9OkffBJguaFxOk9DCFGP+p2CZgP32Y
+	TWhWgBXIOD3/QeEqMhk//Qzr+6TciilNoCXmK1x1svRkr58gV0sYPqRRMoYnkIWb
+	F2yIko706qQXH1/ELaRXncdKxejDgUvoEkDOClgq3B7m5tJdbAZkWXAgiktY0igX
+	XFFA2qpTL4k67Lw+70Iic5b89HuQ2glwHQEcuqf4jP7JBbQ==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4fca36jraa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 13 Jul 2026 07:42:59 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 13 Jul 2026 07:42:58 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Mon, 13 Jul 2026 07:42:58 -0700
+Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 0F4C43F7067;
+	Mon, 13 Jul 2026 07:42:55 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>,
+        "Hariprasad
+ Kelam" <hkelam@marvell.com>,
+        Ratheesh Kannoth <rkannoth@marvell.com>
+Subject: [PATCH net-next] octeontx2-af: npc: Warn on NPC_IPSEC_SPI key overlap
+Date: Mon, 13 Jul 2026 20:12:47 +0530
+Message-ID: <20260713144247.545592-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] selftests/net/openvswitch: add SCTP flow key
- test
-To: Minxi Hou <houminxi@gmail.com>, netdev@vger.kernel.org
-Cc: aconole@redhat.com, echaudro@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- shuah@kernel.org, dev@openvswitch.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, i.maximets@ovn.org
-References: <20260707034718.2717982-1-houminxi@gmail.com>
-Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <20260707034718.2717982-1-houminxi@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEzMDE1MyBTYWx0ZWRfX3eWjK1ixDf8x
+ y9n9fT+/xVWmwLKgd6Cw+RIRvXqb8PwKTUy5ViJN7XQR2MQAlBcx8lSQVkXw3Cbf6bI/i18nGR7
+ hEEeL25aYkAlGqGtQ7fAAmzdx9lrSi0TnqQTx18Zl2wM3KqN22XKFDgqGVu4T5GmOWWxZPpN51l
+ AGX0KpY1GQA3Nyz452ILL40Qt9WikCs3kCUW7Nt3opvjGUG4DCLHjmzbEfe9meRI9Z0i1W/Jy5g
+ ChDKmxJyGQLoC6Wd0saUe5gzvsyfaEmzL78cDAhoXRwXBJXC9YMVPfheWkGluxxmXXnlozgzWOD
+ dk1XSKlYiW4gKY1XSn0iulUXF2LBK626O6N6IlzRjuRnRlabAhFzApFdrXItwXgBpxZQVvsF4kz
+ eN4qhHBillHfXWWVisdKDXtJo98Hm5tSZZy4HOhAwTyQ0GLZJpktKb06+/rYGEOCvCDmuLJTleB
+ C31K30OfWFBe5qBicHw==
+X-Authority-Analysis: v=2.4 cv=EeT4hvmC c=1 sm=1 tr=0 ts=6a54f973 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
+ a=TtqV-g6YmW1Jfm2GSLaY:22 a=M5GUcnROAAAA:8 a=6BDruIGW9xnf_RptPNEA:9
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEzMDE1MyBTYWx0ZWRfX84JA/OrIfwEp
+ E9obAoYL4weqhLYmnS8xu5vYFAn35mBpAO63J75Cg2QpM98DM3KuDDKtMozMX8Uog1hK90X3/cH
+ mqJ3tRCdvj4rGrm93ECEd6OQpsS7Ms4=
+X-Proofpoint-ORIG-GUID: 5Nh611um3R6D7Rb6mGFW2t9rwwrvg2L0
+X-Proofpoint-GUID: 5Nh611um3R6D7Rb6mGFW2t9rwwrvg2L0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-13_03,2026-07-10_01,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[ovn.org];
-	TAGGED_FROM(0.00)[bounces-307226-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:houminxi@gmail.com,m:netdev@vger.kernel.org,m:aconole@redhat.com,m:echaudro@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:dev@openvswitch.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:i.maximets@ovn.org,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	FORGED_SENDER(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307227-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:hkelam@marvell.com,m:rkannoth@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,marvell.com:from_mime,marvell.com:mid,marvell.com:email,marvell.com:dkim];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ovn.org:from_mime,ovn.org:mid]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 67F7074C90C
+X-Rspamd-Queue-Id: ADCE274C8AC
 
-On 7/7/26 5:47 AM, Minxi Hou wrote:
-> Register OVS_KEY_ATTR_SCTP in the flow key parser so that sctp()
-> can be used in flow specifications. The ovs_key_sctp class already
-> exists (with src/dst fields matching the TCP/UDP siblings) but was
-> not wired into the parser, so the token was silently dropped and the
-> kernel rejected the flow.
-> 
-> Add test_sctp_connect_v4 exercising the SCTP flow key with
-> port-specific matching: sctp(dst=4443) for client-to-server and
-> sctp(src=4443) for server-to-client.
-> 
-> Wait for ncat readiness with ovs_wait instead of a fixed sleep so
-> the test does not race against ncat startup. Use grep -c on the
-> listening message to distinguish between successive ncat instances
-> that share the same stderr log. Kill the previous server before
-> respawning to avoid EADDRINUSE on the SCTP port.
-> 
-> Signed-off-by: Minxi Hou <houminxi@gmail.com>
-> ---
-> v1 -> v2: replace sleep with ovs_wait on ncat listening output,
->           kill previous ncat server before respawning to avoid
->           port conflict (Aaron review feedback)
-> 
->  .../selftests/net/openvswitch/openvswitch.sh  | 102 ++++++++++++++++++
->  .../selftests/net/openvswitch/ovs-dpctl.py    |   5 +
->  2 files changed, 107 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> index 2954245129a2..9c364eeb2ec2 100755
-> --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> @@ -32,6 +32,7 @@ tests="
->  	dec_ttl					ttl: dec_ttl decrements IP TTL
->  	flow_set				flow-set: Flow modify
->  	action_set				set: SET action rewrites fields
-> +	sctp_connect_v4				sctp: SCTP flow key matching
->  	psample					psample: Sampling packets with psample"
->  
->  info() {
-> @@ -443,6 +444,107 @@ test_action_set() {
->  	return 0
->  }
->  
-> +# sctp_connect_v4 test
-> +# - sctp(dst=4443) matches client-to-server INIT
-> +# - sctp(src=4443) matches server-to-client INIT-ACK
-> +# - remove flows and verify connection fails, reinstall and recover
-> +test_sctp_connect_v4() {
-> +	local t="test_sctp_connect_v4"
-> +
-> +	which ncat >/dev/null 2>&1 || return $ksft_skip
+From: Hariprasad Kelam <hkelam@marvell.com>
 
-Not a full review, but can we avoid ncat?  We already use nc in other
-tests, using different implementations of the same thing in different
-tests doesn't sound like a good idea.  On mnay systems nc and ncat
-will be different implementations with different options and behavior.
+When scanning the MKEX profile to determine supported NPC features, warn
+if the SPI extraction field overlaps with other key fields. AH and ESP
+may legitimately use the same key offset for SPI, so continue to
+advertise NPC_IPSEC_SPI via npc_is_field_present() instead of treating
+the overlap as a hard failure.
 
-Best regards, Ilya Maximets.
+Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+index 91b5947dae06..b217c1c19810 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+@@ -730,6 +730,9 @@ static void npc_set_features(struct rvu *rvu, int blkaddr, u8 intf)
+ 			*features &= ~BIT_ULL(NPC_OUTER_VID);
+ 
+ 	/* Allow extracting SPI field from AH and ESP headers at same offset */
++	if (npc_check_overlap(rvu, blkaddr, NPC_IPSEC_SPI, 0, intf))
++		dev_warn(rvu->dev, "Overlap detected the field NPC_IPSEC_SPI\n");
++	/* Set SPI flag only if AH/ESP and IPSEC_SPI are in the key */
+ 	if (npc_is_field_present(rvu, NPC_IPSEC_SPI, intf) &&
+ 	    (*features & (BIT_ULL(NPC_IPPROTO_ESP) | BIT_ULL(NPC_IPPROTO_AH))))
+ 		*features |= BIT_ULL(NPC_IPSEC_SPI);
+-- 
+2.43.0
+
 
