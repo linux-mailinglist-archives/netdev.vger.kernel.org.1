@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-307290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307291-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id GmjGHktfVWr7nQAAu9opvQ
-	(envelope-from <netdev+bounces-307290-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 23:57:31 +0200
+	id g15fGllfVWr+nQAAu9opvQ
+	(envelope-from <netdev+bounces-307291-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 23:57:45 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01E6D74F5E6
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 23:57:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CA8EE74F5ED
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 23:57:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=etsalapatis-com.20251104.gappssmtp.com header.s=20251104 header.b=bb0Ru0yS;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307290-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307290-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=etsalapatis-com.20251104.gappssmtp.com header.s=20251104 header.b=E84QfuNT;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307291-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307291-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0C597302A79C
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 21:57:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CFB88302811B
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 21:57:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D800B35E1BF;
-	Mon, 13 Jul 2026 21:57:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B8436C0AB;
+	Mon, 13 Jul 2026 21:57:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C102735E1B5
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 21:57:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A425369D6D
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 21:57:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783979844; cv=none; b=jvF2omiAUfGMBUN+YU619l9CZzeUW+xDrEmE+VZWZiK31Ek74zGXXdwioPFiSZXrJBNI4/FPsa2q+a4w0WuFAjF0eSBr+JHERp0c9BCys7ITTto/Eb19aV4SI7BoIRRFwEhL8xXBxENybpi5ikwc/OyUFm3Ek57a/VyDoHgHT8E=
+	t=1783979861; cv=none; b=PxwUyuQlZoQ3OIdcyUTDUrcFIQaPF7W/zpuu9d0g9cf7Rf8Gdl3xWr4YPaPfe3XtLvZ5cV0K/XwcurqsWdaDZbR0039aVuxyj6+14OYdHRc47Ls40mGZsDs+vIpJ2PkNawXxkmRKZnKTNhzqahP02ieHhKy7og652zEBDiDc9fQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783979844; c=relaxed/simple;
-	bh=coTO6PwuDxPx0SSZlTNrbu8MbSA08SuMKb4lakXTOBw=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
-	 References:In-Reply-To; b=YUgzHRpEPE4qdCx2m8xlKWHphy6midAawtxMMzUibQpUmS6uklTD6zN+X5SSeZJ5/KCZZgpwVzyQngRnvKkyU9sWjH11NuNEAhdIo8UE9TPhnxUNIDJdMRYHSbcCcybGtqf/ybdDJKnhqphCzWH7o2WIlm5VelB0b2FAN8/lfTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=bb0Ru0yS; arc=none smtp.client-ip=209.85.210.182
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-8487088510aso3460309b3a.0
-        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 14:57:21 -0700 (PDT)
+	s=arc-20240116; t=1783979861; c=relaxed/simple;
+	bh=l2HeouvYQiBlOik9N5RDS+J9OXY/j0FBrbam0gPdL6s=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
+	 References:In-Reply-To; b=bJX6C5TxTli5Sq1U/gvrFPUCEKcA9y1yMN+a/8o6JgPMzP3zuTv6MOknfA8qwt1Bet3SPjf3Z08tvYoter1aKeakDNGoWaeLXvuKsM1P+wm/SjDEp3V4X9roUYlq0srdoGnPoK7SiJnDUxyhGH1bfxNLkIzwyB0H1Gt13ISJ4RM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=E84QfuNT; arc=none smtp.client-ip=209.85.214.169
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2cabc0a1ab6so46209965ad.0
+        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 14:57:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1783979841; x=1784584641; darn=vger.kernel.org;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
+        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1783979860; x=1784584660; darn=vger.kernel.org;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
          :content-type:content-transfer-encoding:mime-version:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=UrqBoQyrxvBcos5JbUmwXjWeYzr52NLOmMrsaM2Ub/k=;
-        b=bb0Ru0ySsnkiOLTtWS5HDN9DQ1SqhJ1n4BYvijkz8/uPRIIfhcvcvjIe9t3LkeesoH
-         TAK0Qbheuv+7gAgIHKKMSgfCtiWu+aBqtFyO3+V1eFFuI3HvFbgeKxC4RkYz1a7D0PBb
-         NgxoxachohereFVr38xS/NCgypn8lfXqNaaBUHV+pL9Dby0+exIj+HEZQpDkg/lJ9xpt
-         NglAYV+WKWg2oNKuMRObWZWZ/Z5ISNT0akjdY8xz8oHoZFpQVrVrnZSuCSTErfqp3rE+
-         ULJHzPbmMqF/sbNTZtigAinBwA8/Wlr662VWMLPylskLUvo9jkVcGYxFDXksSXR1YF4g
-         m29Q==
+        bh=At8KsE6lJsmXZegcPrwsTNDpPIz3pgQ9ysWfzm54lJA=;
+        b=E84QfuNTkz6WdVH1avsdSoTlQ9lmJWGb0uu7prs72OZs3M7CnlA1ZD6mkuh6R3YKeE
+         TLSNe7Ky9y6vRiBs3sDjTM4c6iv7kEI1brlHmE69ohfGCv/hod7QUEwXQOIYIorrO4tI
+         Jmv8VhdNnc/wTYOoWXfUa567CMNerMw84kq6BJRatrhJVC3KplWSYCTz8Sfkl5zW1bWG
+         v87gfLmavbi0HOp99tDxSlUKXlN0wd2vE5dmuehLeHbf3nerwVGzOaqP7yfZZU7WPkT2
+         41vz33kzG5vWfWIJrs+wqlQ6ikS8d7VCNQBHlY33f8dKEdgrbSnGOPa0zTW/2pIpwfGb
+         ex3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783979841; x=1784584641;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
+        d=1e100.net; s=20251104; t=1783979860; x=1784584660;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
          :content-type:content-transfer-encoding:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=UrqBoQyrxvBcos5JbUmwXjWeYzr52NLOmMrsaM2Ub/k=;
-        b=gmqHfFAPFqjJ19fEgZJgDNjNe1RMp2A8RIItG1xIhKMo/8W5YV74QQEmOMBDyv1eaY
-         6kN0Le1k9LKusdF/AD8Xm5Y+0pCUCbcxea13EzlHjSUNyqXwuv5qbyHa20Ayul2ZzZ9h
-         UiPh9zNNwyALGwR+2KJGknu4rpx89IEM5BK76PtXe1W8zXqvVDfm6NDpBVpf+UfxoU0u
-         mcRTzDYCaFuaEaSJeqEZ2gWiRRqpFyZrv9AOWFwMYXnSlYTCdV/b5rRQWOVXt6Yr4xTu
-         ym2qHfFe6D15hgiT+eczmpqi0vhS75I7jsJ0mgxCM+aXmTOHWCsyyahfEXu8kk514AxD
-         aBAA==
-X-Gm-Message-State: AOJu0YxH8HC0fE4dJHXKQPU810hXrsgx2LP1E3Oku6rRzrRVahmlTZAn
-	VVf//CYD7pEivA3OKA0YQkeaXoChEkXHK+Lwum4j6oLjGxLHiSSVHe4lWAtAZaPDxA4=
-X-Gm-Gg: AfdE7cnlAQ7LHE0qHxZp3+CeQjj1C9VWVmfGLLPn1VcqRn0BISva4r+S8xbjGDIM02g
-	zAFCRaFRgvoiS1Jx13VPG/7aIh+ENmnS9/dk4d10ZVQgcagwZsbzisDkWYxjsSx9HGyGl+3Fnib
-	x6FBQoNDyw2d7EvdTOinviZ9fo783gczLJiH3dEtnMzS3K4eZZF5NLkzMCN0RkLSbDawK+FWSlD
-	y4kJqgo1wwemDzpUcDAW23NxeFoD/e+znLpVPsqrMdLXcA56unkdJyyromzt/Il291+E4kNnvCt
-	lti257IF+YMY1+pSLfdYq1UaOH9YbJxWJSl9zDT/DSgPEgHaZRyECpiXsJzumwn3P14sg1+GlDV
-	IiP3xsiJCBdg2nL3YuHz0U+wqJB5rfscPUCyfSdi6YU1fB7C8w5XZvr89I4a2rhsAVUenVgkQzJ
-	NaiH0Ti2rKmoDXQAyihTroVMwMhE5ZBMlfbbnKfDNESQ==
-X-Received: by 2002:a05:6a00:983:b0:848:79aa:5d37 with SMTP id d2e1a72fcca58-84a5162f3admr637079b3a.55.1783979840901;
-        Mon, 13 Jul 2026 14:57:20 -0700 (PDT)
+        bh=At8KsE6lJsmXZegcPrwsTNDpPIz3pgQ9ysWfzm54lJA=;
+        b=V/oPj9AJl7Ur2pwQB4Om10P9/FwzJf2Kl1sSfziZt38vA0YEQiAu50uJFzBVApDt6B
+         ocUv7BL75QnbmzJ8kyTOZvwFoCLyNwqVJ9eNSmdp0wpmcKU4qLGZSdi+lFpnZa5jNu/d
+         7qIDe486e8XY7nnFdEYmZJHnDQkG7c5fzprUyauxRLolIWQhad4+IT7dkSddv+ctVmOC
+         PnCa5tzzrefM7Vgr5tVNwlQTBL7+GeB9pO2Mh+W96fXSycGCEJUUqkWUNNfK5LmYuvq+
+         Y9Jt22l4TR5dm5CQm7Shcp9sVsNiVEc6eQbKB8jUFqxlvQzvBPj2j8dqLvogcPi7K+Df
+         Z1bg==
+X-Gm-Message-State: AOJu0Yw0MBvZ0C/TXdA85Lh0tY7D6vc1tqxh3L4gZ3l4WKtoSJ2y5xfJ
+	m8tcZ/obQta4e33fClgAHdSdn3iHias285LTonp++ZG3GQ9GMOKwr/kXFXR5Hj8Xa9U=
+X-Gm-Gg: AfdE7clw1YzQcpWP3BvwfGKnvh517stzW2MLT8SIbl9K7mSPURyEw4O6zZ4Mjt1N3l3
+	uj+OWCIy+enwtW4bwMSBiKIWED8FKLxHsaiWV/55Dg1l8zlgUUUfZ9TBVD/bOlpZJuMJxe0wWPS
+	sR6H+76kW/EU7oXoAkR2uP38QsNnvOsEj0/5PzHnU1iwWp7yvNFG8cqeAx3SLsRCH8l8TF0HH4y
+	wHXipH6ZcFjZyzGpkKhyH+44YGWOg6EZD4ce8CzRgO/KHse3CV+7A/3jrhuycfChg9Y1qF6lXFQ
+	73GQpJIIQP5eVVZzLX+3nr7DSrooBVa0miZqv/zpNSJVkq8SCVBXk0TpVYcT/ckd7ppkUwxz6Fr
+	vULncJ/g+kBg0xLGt/hjRbcdxvyK1lQDdN+6rp+YS0aoyt1eSHGH4yYeBA7yMU6br3EqL8vzcoK
+	6alZhF7LY8utmHBQv3CdNL4tO42xYebv80Gv1MwoPHxw==
+X-Received: by 2002:a17:903:3205:b0:2c7:f4bd:91b5 with SMTP id d9443c01a7336-2cee98446f9mr9888315ad.0.1783979859553;
+        Mon, 13 Jul 2026 14:57:39 -0700 (PDT)
 Received: from localhost (107-190-31-17.cpe.teksavvy.com. [107.190.31.17])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ca5b3643cd6sm9131766a12.26.2026.07.13.14.57.20
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9d3d57bsm104668175ad.59.2026.07.13.14.57.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Jul 2026 14:57:20 -0700 (PDT)
+        Mon, 13 Jul 2026 14:57:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,8 +84,10 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Mon, 13 Jul 2026 17:57:19 -0400
-Message-Id: <DJXS2O9LFN5T.8BCWIJOB6N4M@etsalapatis.com>
+Date: Mon, 13 Jul 2026 17:57:38 -0400
+Message-Id: <DJXS2WYYPTBK.F3KORRKBRAGY@etsalapatis.com>
+Subject: Re: [PATCH bpf-next v3 07/15] bpf: Move LSM trampoline unlink into
+ bpf_cgroup_link_auto_detach()
 From: "Emil Tsalapatis" <emil@etsalapatis.com>
 To: "Amery Hung" <ameryhung@gmail.com>, <bpf@vger.kernel.org>
 Cc: <netdev@vger.kernel.org>, <alexei.starovoitov@gmail.com>,
@@ -93,12 +95,10 @@ Cc: <netdev@vger.kernel.org>, <alexei.starovoitov@gmail.com>,
  <memxor@gmail.com>, <martin.lau@kernel.org>, <shakeel.butt@linux.dev>,
  <roman.gushchin@linux.dev>, <kuniyu@google.com>,
  <kerneljasonxing@gmail.com>, <kernel-team@meta.com>
-Subject: Re: [PATCH bpf-next v3 08/15] bpf: Add a few bpf_cgroup_array_*
- helper functions
 X-Mailer: aerc 0.21.0-0-g5549850facc2
 References: <20260706171918.317102-1-ameryhung@gmail.com>
- <20260706171918.317102-9-ameryhung@gmail.com>
-In-Reply-To: <20260706171918.317102-9-ameryhung@gmail.com>
+ <20260706171918.317102-8-ameryhung@gmail.com>
+In-Reply-To: <20260706171918.317102-8-ameryhung@gmail.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -119,7 +119,7 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	FORGED_SENDER(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
 	DMARC_NA(0.00)[etsalapatis.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307290-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307291-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
@@ -135,244 +135,58 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[etsalapatis.com:from_mime,etsalapatis.com:email,etsalapatis.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,etsalapatis-com.20251104.gappssmtp.com:dkim,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,etsalapatis.com:from_mime,etsalapatis.com:email,etsalapatis.com:mid,etsalapatis-com.20251104.gappssmtp.com:dkim,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 01E6D74F5E6
+X-Rspamd-Queue-Id: CA8EE74F5ED
 
 On Mon Jul 6, 2026 at 1:19 PM EDT, Amery Hung wrote:
 > From: Martin KaFai Lau <martin.lau@kernel.org>
 >
-> In the upcoming patch, the array can store a struct_ops map.
-> The array could have a cfi_stubs acting as a dummy instead of
-> the dummy_bpf_prog. The array logic will need to skip the cfi_stubs
-> also in order to support storing struct_ops map in the array.
+> Move the LSM trampoline unlink into bpf_cgroup_link_auto_detach().
+> The purpose is to consolidate the auto_detach cleanup logic.
 >
-> bpf_cgroup_array_length(), bpf_cgroup_array_copy_to_user(), and
-> bpf_cgroup_array_delete_safe_at() are added as a preparation work
-> to allow skipping the cfi_stubs in the upcoming patch. This patch
-> only skips the dummy_bpf_prog which is the same as the existing behavior.
-> The current bpf_prog_array_*() callers are changed to call the new
-> bpf_cgroup_array_*(). This is a no-op change.
+> It prepares for the upcoming struct_ops cgroup attachment patch where
+> bpf_cgroup_link_auto_detach() will need to handle the struct_ops case
+> (link->map !=3D NULL).
 >
-> Unlike bpf_prog_array_copy_to_user(), bpf_cgroup_array_copy_to_user()
-> does not need a temporary buffer. The cgroup caller already holds
-> cgroup_mutex and dereferences the effective array with
-> rcu_dereference_protected(), so it does not copy to userspace
-> from an RCU read-side critical section. Details in commit 0911287ce32b.
->
-> Another addition is the bpf_cgroup_array_free(). This prepares
-> the array to have a different rcu gp for the struct_ops use case,
-> for example, a struct_ops could have mix of sleepable ops and
-> non-sleepable ops. In this patch, bpf_cgroup_array_free() only
-> goes through the regular rcu gp. This is a no-op change also.
->
-> bpf_prog_dummy() is also added to return the global dummy_bpf_prog.
->
-> bpf_cgroup_array_dummy() is added to decide the sentinel based on atype.
-> It now always returns bpf_prog_dummy(). In the upcoming patch,
-> it can return a cfi_stubs if the atype belongs to a struct_ops.
+> This is a no-op change.
 >
 > Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
 > Signed-off-by: Amery Hung <ameryhung@gmail.com>
 
 Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
 
-One style issue below.
-
 > ---
->  include/linux/bpf.h |  1 +
->  kernel/bpf/cgroup.c | 79 +++++++++++++++++++++++++++++++++++++++------
->  kernel/bpf/core.c   |  5 +++
->  3 files changed, 76 insertions(+), 9 deletions(-)
+>  kernel/bpf/cgroup.c | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
 >
-> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> index 047ffc029666..e371a4733135 100644
-> --- a/include/linux/bpf.h
-> +++ b/include/linux/bpf.h
-> @@ -2561,6 +2561,7 @@ int bpf_prog_array_copy(struct bpf_prog_array *old_=
-array,
->  			struct bpf_prog *include_prog,
->  			u64 bpf_cookie,
->  			struct bpf_prog_array **new_array);
-> +struct bpf_prog *bpf_prog_dummy(void);
-> =20
->  struct bpf_run_ctx {};
-> =20
 > diff --git a/kernel/bpf/cgroup.c b/kernel/bpf/cgroup.c
-> index 7abbe12e108f..081d81de1816 100644
+> index b43f0bff184c..7abbe12e108f 100644
 > --- a/kernel/bpf/cgroup.c
 > +++ b/kernel/bpf/cgroup.c
-> @@ -319,6 +319,67 @@ static void bpf_cgroup_link_auto_detach(struct bpf_c=
-group_link *link)
+> @@ -313,6 +313,8 @@ static void bpf_cgroup_storages_link(struct bpf_cgrou=
+p_storage *storages[],
+>   */
+>  static void bpf_cgroup_link_auto_detach(struct bpf_cgroup_link *link)
+>  {
+> +	if (link->link.prog->expected_attach_type =3D=3D BPF_LSM_CGROUP)
+> +		bpf_trampoline_unlink_cgroup_shim(link->link.prog);
+>  	cgroup_put(link->cgroup);
 >  	link->cgroup =3D NULL;
 >  }
-> =20
-> +static void bpf_cgroup_array_free(struct bpf_prog_array *array)
-> +{
-> +	if (!array || array =3D=3D &bpf_empty_prog_array)
-> +		return;
-> +	kfree_rcu(array, rcu);
-> +}
-> +
-> +static void *bpf_cgroup_array_dummy(enum cgroup_bpf_attach_type atype)
-> +{
-> +	return bpf_prog_dummy();
-> +}
-> +
-> +static int bpf_cgroup_array_length(struct bpf_prog_array *array,
-> +				   enum cgroup_bpf_attach_type atype)
-> +{
-> +	struct bpf_prog_array_item *item;
-> +	int cnt =3D 0;
-> +
-> +	for (item =3D array->items; item->prog; item++)
-> +		if (item->prog !=3D bpf_cgroup_array_dummy(atype))
-> +			cnt++;
-
-The outer parenthesis needs braces since its body is an if-statement.
-
-> +
-> +	return cnt;
-> +}
-> +
-> +static int bpf_cgroup_array_copy_to_user(struct bpf_prog_array *array,
-> +					 __u32 __user *prog_ids, int cnt,
-> +					 enum cgroup_bpf_attach_type atype)
-> +{
-> +	struct bpf_prog_array_item *item;
-> +	int i =3D 0;
-> +	u32 id;
-> +
-> +	for (item =3D array->items; item->prog && i < cnt; item++) {
-> +		if (item->prog =3D=3D bpf_cgroup_array_dummy(atype))
-> +			continue;
-> +		id =3D item->prog->aux->id;
-> +		if (copy_to_user(prog_ids + i, &id, sizeof(id)))
-> +			return -EFAULT;
-> +		i++;
-> +	}
-> +	return item->prog ? -ENOSPC : 0;
-> +}
-> +
-> +static int bpf_cgroup_array_delete_safe_at(struct bpf_prog_array *array,
-> +					   int index, enum cgroup_bpf_attach_type atype)
-> +{
-> +	struct bpf_prog_array_item *item;
-> +
-> +	for (item =3D array->items; item->prog; item++) {
-> +		if (item->prog =3D=3D bpf_cgroup_array_dummy(atype))
-> +			continue;
-> +		if (!index) {
-> +			WRITE_ONCE(item->prog, bpf_cgroup_array_dummy(atype));
-> +			return 0;
-> +		}
-> +		index--;
-> +	}
-> +	return -ENOENT;
-> +}
-> +
->  /**
->   * cgroup_bpf_release() - put references of all bpf programs and
->   *                        release all cgroup bpf data
-> @@ -356,7 +417,7 @@ static void cgroup_bpf_release(struct work_struct *wo=
-rk)
->  		old_array =3D rcu_dereference_protected(
->  				cgrp->bpf.effective[atype],
->  				lockdep_is_held(&cgroup_mutex));
-> -		bpf_prog_array_free(old_array);
-> +		bpf_cgroup_array_free(old_array);
->  	}
-> =20
->  	list_for_each_entry_safe(storage, stmp, storages, list_cg) {
-> @@ -530,7 +591,7 @@ static void activate_effective_progs(struct cgroup *c=
-grp,
->  	/* free prog array after grace period, since __cgroup_bpf_run_*()
->  	 * might be still walking the array
->  	 */
-> -	bpf_prog_array_free(old_array);
-> +	bpf_cgroup_array_free(old_array);
->  }
-> =20
->  /**
-> @@ -570,7 +631,7 @@ static int cgroup_bpf_inherit(struct cgroup *cgrp)
->  	return 0;
->  cleanup:
->  	for (i =3D 0; i < NR; i++)
-> -		bpf_prog_array_free(arrays[i]);
-> +		bpf_cgroup_array_free(arrays[i]);
-> =20
->  	for (p =3D cgroup_parent(cgrp); p; p =3D cgroup_parent(p))
->  		cgroup_bpf_put(p);
-> @@ -625,7 +686,7 @@ static int update_effective_progs(struct cgroup *cgrp=
-,
-> =20
->  		if (percpu_ref_is_zero(&desc->bpf.refcnt)) {
->  			if (unlikely(desc->bpf.inactive)) {
-> -				bpf_prog_array_free(desc->bpf.inactive);
-> +				bpf_cgroup_array_free(desc->bpf.inactive);
->  				desc->bpf.inactive =3D NULL;
+> @@ -346,11 +348,8 @@ static void cgroup_bpf_release(struct work_struct *w=
+ork)
+>  					bpf_trampoline_unlink_cgroup_shim(pl->prog);
+>  				bpf_prog_put(pl->prog);
 >  			}
->  			continue;
-> @@ -644,7 +705,7 @@ static int update_effective_progs(struct cgroup *cgrp=
-,
->  	css_for_each_descendant_pre(css, &cgrp->self) {
->  		struct cgroup *desc =3D container_of(css, struct cgroup, self);
-> =20
-> -		bpf_prog_array_free(desc->bpf.inactive);
-> +		bpf_cgroup_array_free(desc->bpf.inactive);
->  		desc->bpf.inactive =3D NULL;
->  	}
-> =20
-> @@ -1166,7 +1227,7 @@ static void purge_effective_progs(struct cgroup *cg=
-rp, struct bpf_prog_list *pl,
->  				lockdep_is_held(&cgroup_mutex));
-> =20
->  		/* Remove the program from the array */
-> -		WARN_ONCE(bpf_prog_array_delete_safe_at(progs, pos),
-> +		WARN_ONCE(bpf_cgroup_array_delete_safe_at(progs, pos, atype),
->  			  "Failed to purge a prog from array at index %d", pos);
->  	}
->  }
-> @@ -1296,7 +1357,7 @@ static int __cgroup_bpf_query(struct cgroup *cgrp, =
-const union bpf_attr *attr,
->  		if (effective_query) {
->  			effective =3D rcu_dereference_protected(cgrp->bpf.effective[atype],
->  							      lockdep_is_held(&cgroup_mutex));
-> -			total_cnt +=3D bpf_prog_array_length(effective);
-> +			total_cnt +=3D bpf_cgroup_array_length(effective, atype);
->  		} else {
->  			total_cnt +=3D prog_list_length(&cgrp->bpf.progs[atype], NULL);
+> -			if (pl->link) {
+> -				if (pl->link->link.prog->expected_attach_type =3D=3D BPF_LSM_CGROUP)
+> -					bpf_trampoline_unlink_cgroup_shim(pl->link->link.prog);
+> +			if (pl->link)
+>  				bpf_cgroup_link_auto_detach(pl->link);
+> -			}
+>  			kfree(pl);
+>  			static_branch_dec(&cgroup_bpf_enabled_key[atype]);
 >  		}
-> @@ -1326,8 +1387,8 @@ static int __cgroup_bpf_query(struct cgroup *cgrp, =
-const union bpf_attr *attr,
->  		if (effective_query) {
->  			effective =3D rcu_dereference_protected(cgrp->bpf.effective[atype],
->  							      lockdep_is_held(&cgroup_mutex));
-> -			cnt =3D min_t(int, bpf_prog_array_length(effective), total_cnt);
-> -			ret =3D bpf_prog_array_copy_to_user(effective, prog_ids, cnt);
-> +			cnt =3D min_t(int, bpf_cgroup_array_length(effective, atype), total_c=
-nt);
-> +			ret =3D bpf_cgroup_array_copy_to_user(effective, prog_ids, cnt, atype=
-);
->  		} else {
->  			struct hlist_head *progs;
->  			struct bpf_prog_list *pl;
-> diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
-> index 649cce41e13f..1837bb7bb4e9 100644
-> --- a/kernel/bpf/core.c
-> +++ b/kernel/bpf/core.c
-> @@ -2740,6 +2740,11 @@ void bpf_prog_array_free_sleepable(struct bpf_prog=
-_array *progs)
->  	call_rcu_tasks_trace(&progs->rcu, __bpf_prog_array_free_sleepable_cb);
->  }
-> =20
-> +struct bpf_prog *bpf_prog_dummy(void)
-> +{
-> +	return &dummy_bpf_prog.prog;
-> +}
-> +
->  int bpf_prog_array_length(struct bpf_prog_array *array)
->  {
->  	struct bpf_prog_array_item *item;
 
 
