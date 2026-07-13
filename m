@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-307070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307071-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cSoRBzWfVGpioQMAu9opvQ
-	(envelope-from <netdev+bounces-307070-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:17:57 +0200
+	id fmj4N2WfVGproQMAu9opvQ
+	(envelope-from <netdev+bounces-307071-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:18:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22F82748919
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:17:56 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB46874892E
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:18:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=TiDQuqkx;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=Vyzqcs80;
 	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307070-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-307070-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307071-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307071-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7EE1F3053ADD
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 08:12:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4F6783014227
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 08:12:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D01B23A6F00;
-	Mon, 13 Jul 2026 08:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA8CD3ACF05;
+	Mon, 13 Jul 2026 08:11:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45BE63ACA5F
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 08:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB533B2D1A
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 08:11:30 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783930286; cv=none; b=tZFKOyVxCBfQvlD6AsAp7reIHp+9VnhvhUxLPyYVUsm0dVOMGqATeaBpbGH4sMUMXT1nlUAp7cEP8ORWdNCaz7MGMxsK0rZT4O5hLVqB6nRom7pzj+wxUDOhAfMB14dgpH7/nVixPbS+r/4C3xnvAOxHCPLfWMR0DPdarb8EkS4=
+	t=1783930292; cv=none; b=bq44EAwgGxyVhVNYX3wwNwR7zxLvRcn/mcj81hL6tHFOPH148w/pzwQE5rxuFjw6CDUJOlYXcHKbK9BE1zLXoms66AawCVkBiHaqDelV/QhYSUo7arABoRjS094cFYiafnKSHc/2AhYiRAuM8QdA9C6WEht2akv5IJRZSNSYbnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783930286; c=relaxed/simple;
-	bh=8xYe1xVOymzfUL3FY35nN2xScs1Bzzf+To/adTMsX10=;
+	s=arc-20240116; t=1783930292; c=relaxed/simple;
+	bh=udmPVYKPVsXFcPfJiJHImVLewtIuCcJElDtxi6KNqYs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Pg8ZmbZsM/+1F+cRcXo4IWBYYJCtt/RUpdWXwc83Lnqo3TysAkjPSUmN4JxcYrDciin6Vd40dGG9G3teoMYOlCTjwLohxkn+ivd1Nr3TDsmyJsgcn7aVUj7GqBzcHNgubOYJWT7dsqadS4utsRXdeiACrdgSyylPhHYoH8gVeNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TiDQuqkx; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=QaOAaX3wLgPRJwt+0cN5GI5T0qvjXDs7Xl0sly0lcYH2VvJ5LaMumULdWJSFtBxh4hh7lS2OY5YMv1VbdwQBDc8XCk9DODl82VIwLCC9nKQQhKXOLzsBJY0JSkF4esbFBSRFMwbD76AHnOrj8aG1LfNYwd+AFCNuJd700x1R3eQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vyzqcs80; arc=none smtp.client-ip=170.10.129.124
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783930284;
+	s=mimecast20190719; t=1783930290;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6bsxuWrGjCNJ9G3R3V0fM/GxuviKNyJjBl9DCZXobyc=;
-	b=TiDQuqkxE71lpdFwidp76/HtRELDdXOZ1xT9eYyonOOuo24BgnbK1DQbCaJqXkU7BV/d5/
-	8sk9ndA8uo921L4prF3Xv8V30VqSqL2a5k4QhlXizU3vMGTdEfYIu87f75WtdZh8PRu2yn
-	ktm+pdPar75ZBdvqMqfYSXLH6Kufc98=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+	bh=Hh5ODOBVtLvyUTVkwW8KCZFUWQ5fc6kLpTC+yDp7g/I=;
+	b=Vyzqcs80uxJmN9rn2BbS8wTAy6xvmxi/pm1eLKZvGcsNjiUppbkOZtkGLdy2eAPjgYnuO0
+	osXtFXVu6FCN78bdxIeawB5MvuQuZnpAQ075cqj3itTWKvOUI/TpqtoXHOOGSX0B5iRfxT
+	M/9Der+p+mMDc52uWRXcfWwN1Z1dZwU=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-225-uUD2OqNcNgqn2ob82L3oFQ-1; Mon,
- 13 Jul 2026 04:11:21 -0400
-X-MC-Unique: uUD2OqNcNgqn2ob82L3oFQ-1
-X-Mimecast-MFC-AGG-ID: uUD2OqNcNgqn2ob82L3oFQ_1783930279
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-203-9zM9RAN3NkG1DoKYs1-X-Q-1; Mon,
+ 13 Jul 2026 04:11:26 -0400
+X-MC-Unique: 9zM9RAN3NkG1DoKYs1-X-Q-1
+X-Mimecast-MFC-AGG-ID: 9zM9RAN3NkG1DoKYs1-X-Q_1783930284
+Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4C53418052F2;
-	Mon, 13 Jul 2026 08:11:19 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A5AAA1800A3C;
+	Mon, 13 Jul 2026 08:11:24 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.44.33.159])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 829F719560A0;
-	Mon, 13 Jul 2026 08:11:15 +0000 (UTC)
+	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DD4021686;
+	Mon, 13 Jul 2026 08:11:20 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -75,9 +75,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	Jarkko Sakkinen <jarkko@kernel.org>,
 	keyrings@vger.kernel.org,
 	stable@kernel.org
-Subject: [PATCH net v3 10/14] keys: Add refcounting to user-defined key type payload
-Date: Mon, 13 Jul 2026 09:10:16 +0100
-Message-ID: <20260713081022.2186481-11-dhowells@redhat.com>
+Subject: [PATCH net v3 11/14] afs: Create a server appdata key
+Date: Mon, 13 Jul 2026 09:10:17 +0100
+Message-ID: <20260713081022.2186481-12-dhowells@redhat.com>
 In-Reply-To: <20260713081022.2186481-1-dhowells@redhat.com>
 References: <20260713081022.2186481-1-dhowells@redhat.com>
 Precedence: bulk
@@ -87,19 +87,19 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Scanned-By: MIMEDefang 3.6 on 10.30.177.95
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307070-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307071-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:dhowells@redhat.com,m:marc.dionne@auristor.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-afs@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:jaltman@auristor.com,m:jarkko@kernel.org,m:keyrings@vger.kernel.org,m:stable@kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -118,20 +118,35 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 22F82748919
+X-Rspamd-Queue-Id: DB46874892E
 
-Add refcounting to user-defined key type payload so that a kernel service
-wanting to use such a key can hold onto the payload without the RCU read
-lock held in order that it can do an allocation without having to be
-concerned with the key getting updated.
+Currently, when a CHALLENGE packet comes in, it's queued in an OOB queue on
+the AF_RXRPC socket that generated one of the calls on that connection for
+the application (which might be in userspace) to service.  The application
+then picks up the CHALLENGE and requests a RESPONSE packet be generated,
+allowing the app to include app-specific data in it if appropriate.  There
+is, however, no actual limit on the capacity of the CHALLENGE queue, and
+this could be abused remotely - and also getting the OOB mechanism right
+has proven tricky.
 
-This is the first part of the fix for the AF_RXRPC challenge response
-generation code.
+Further, by analogy with other AFS codebases, it's not actually necessary
+to generate the application data in response to the CHALLENGE.  The reason
+I did this was to set the encryption on the app-data to be the same as that
+specified in the CHALLENGE as the server must be able to handle that.
+However, it's sufficient to use the encoding type set in the token that is
+going to be sent to the server; presumably the kerberos server knows that
+the fileserver can handle that type - otherwise why tell the client to use
+it?
 
+This is a part of the fix.  With this, the AFS filesystem creates an
+appdata key for each fileserver it talks to with RxGK and attaches it to
+the afs_server record.
+
+Fixes: 5800b1cf3fd8 ("rxrpc: Allow CHALLENGEs to the passed to the app for a RESPONSE")
 Link: https://sashiko.dev/#/patchset/20260624163819.3017002-1-dhowells%40redhat.com
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Marc Dionne <marc.dionne@auristor.com>
@@ -146,109 +161,373 @@ cc: linux-afs@lists.infradead.org
 cc: keyrings@vger.kernel.org
 cc: stable@kernel.org
 ---
- include/keys/user-type.h     |  2 ++
- net/dns_resolver/dns_key.c   |  1 +
- security/keys/user_defined.c | 23 ++++++++++++++++-------
- 3 files changed, 19 insertions(+), 7 deletions(-)
+ fs/afs/cm_security.c   | 232 +++++++++++++++++++++++++++++++++++++++++
+ fs/afs/fs_probe.c      |   5 +
+ fs/afs/internal.h      |   2 +
+ fs/afs/server.c        |   1 +
+ include/net/af_rxrpc.h |   2 +
+ net/rxrpc/key.c        |  37 +++++++
+ 6 files changed, 279 insertions(+)
 
-diff --git a/include/keys/user-type.h b/include/keys/user-type.h
-index 386c31432789..7002a993a472 100644
---- a/include/keys/user-type.h
-+++ b/include/keys/user-type.h
-@@ -26,6 +26,7 @@
+diff --git a/fs/afs/cm_security.c b/fs/afs/cm_security.c
+index 103168c70dd4..36907a04efd0 100644
+--- a/fs/afs/cm_security.c
++++ b/fs/afs/cm_security.c
+@@ -6,7 +6,9 @@
   */
- struct user_key_payload {
- 	struct rcu_head	rcu;		/* RCU destructor */
-+	refcount_t	ref;
- 	unsigned short	datalen;	/* length of this data */
- 	char		data[] __aligned(__alignof__(u64)); /* actual data */
- };
-@@ -37,6 +38,7 @@ struct key_preparsed_payload;
  
- extern int user_preparse(struct key_preparsed_payload *prep);
- extern void user_free_preparse(struct key_preparsed_payload *prep);
-+void put_user_key_payload(struct user_key_payload *payload);
- extern int user_update(struct key *key, struct key_preparsed_payload *prep);
- extern void user_revoke(struct key *key);
- extern void user_destroy(struct key *key);
-diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
-index c3c8c3240ef9..aa3c058f4095 100644
---- a/net/dns_resolver/dns_key.c
-+++ b/net/dns_resolver/dns_key.c
-@@ -208,6 +208,7 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
- 		kleave(" = -ENOMEM");
- 		return -ENOMEM;
- 	}
-+	refcount_set(&upayload->ref, 1);
+ #include <linux/slab.h>
++#include <linux/key-type.h>
+ #include <crypto/krb5.h>
++#include <keys/user-type.h>
+ #include "internal.h"
+ #include "afs_cm.h"
+ #include "afs_fs.h"
+@@ -23,6 +25,236 @@ static int afs_create_yfs_cm_token(struct sk_buff *challenge,
+ 				   struct afs_server *server);
+ #endif
  
- 	upayload->datalen = result_len;
- 	memcpy(upayload->data, data, result_len);
-diff --git a/security/keys/user_defined.c b/security/keys/user_defined.c
-index 6f88b507f927..90c1bd5d7dfe 100644
---- a/security/keys/user_defined.c
-+++ b/security/keys/user_defined.c
-@@ -67,6 +67,7 @@ int user_preparse(struct key_preparsed_payload *prep)
- 	upayload = kmalloc_flex(*upayload, data, datalen);
- 	if (!upayload)
- 		return -ENOMEM;
-+	refcount_set(&upayload->ref, 1);
- 
- 	/* attach the data */
- 	prep->quotalen = datalen;
-@@ -88,12 +89,22 @@ EXPORT_SYMBOL_GPL(user_free_preparse);
- 
- static void user_free_payload_rcu(struct rcu_head *head)
- {
--	struct user_key_payload *payload;
-+	struct user_key_payload *payload =
-+		container_of(head, struct user_key_payload, rcu);
- 
--	payload = container_of(head, struct user_key_payload, rcu);
- 	kfree_sensitive(payload);
- }
- 
++#ifdef CONFIG_RXGK
 +/*
-+ * Free a user defined key payload.
++ * As the YFS RxGK appdata to be passed in the YFS.FS-service RESPONSE packet,
++ * create a GSS token to use as a ticket to the specified fileserver.
 + */
-+void put_user_key_payload(struct user_key_payload *payload)
++static int afs_create_yfs_rxgk_cm_appdata(struct afs_server *server, u32 enctype)
 +{
-+	if (payload && refcount_dec_and_test(&payload->ref))
-+		call_rcu(&payload->rcu, user_free_payload_rcu);
++	const struct krb5_enctype *conn_krb5, *token_krb5;
++	const struct krb5_buffer *token_key;
++	struct crypto_aead *aead;
++	struct scatterlist sg;
++	struct afs_net *net = server->cell->net;
++	const struct key *cm_key = net->fs_cm_token_key;
++	struct key *appdata_key = NULL;
++	size_t keysize, uuidsize, authsize, toksize, encsize, contsize;
++	size_t adatasize, offset;
++	__be32 caps[1] = {
++		[0] = htonl(AFS_CAP_ERROR_TRANSLATION),
++	};
++	__be32 *xdr;
++	void *appdata, *K0, *encbase;
++	int ret;
++
++	if (!cm_key)
++		return -ENOKEY;
++
++	/* Assume that the fileserver is happy to use the same encoding type as
++	 * we were told to use by the token obtained by the user.
++	 */
++	conn_krb5 = crypto_krb5_find_enctype(enctype);
++	if (!conn_krb5)
++		return -ENOPKG;
++	token_krb5 = cm_key->payload.data[0];
++	token_key = (const struct krb5_buffer *)&cm_key->payload.data[2];
++
++	/* struct rxgk_key {
++	 *	afs_uint32	enctype;
++	 *	opaque		key<>;
++	 * };
++	 */
++	keysize = 4 + xdr_len_object(conn_krb5->key_len);
++
++	/* struct RXGK_AuthName {
++	 *	afs_int32	kind;
++	 *	opaque		data<AUTHDATAMAX>;
++	 *	opaque		display<AUTHPRINTABLEMAX>;
++	 * };
++	 */
++	uuidsize = sizeof(server->uuid);
++	authsize = 4 + xdr_len_object(uuidsize) + xdr_len_object(0);
++
++	/* struct RXGK_Token {
++	 *	rxgk_key		K0;
++	 *	RXGK_Level		level;
++	 *	rxgkTime		starttime;
++	 *	afs_int32		lifetime;
++	 *	afs_int32		bytelife;
++	 *	rxgkTime		expirationtime;
++	 *	struct RXGK_AuthName	identities<>;
++	 * };
++	 */
++	toksize = keysize + 8 + 4 + 4 + 8 + xdr_len_object(authsize);
++
++	offset = 0;
++	encsize = crypto_krb5_how_much_buffer(token_krb5, KRB5_ENCRYPT_MODE, toksize, &offset);
++
++	/* struct RXGK_TokenContainer {
++	 *	afs_int32	kvno;
++	 *	afs_int32	enctype;
++	 *	opaque		encrypted_token<>;
++	 * };
++	 */
++	contsize = 4 + 4 + xdr_len_object(encsize);
++
++	/* struct YFSAppData {
++	 *	opr_uuid	initiatorUuid;
++	 *	opr_uuid	acceptorUuid;
++	 *	Capabilities	caps;
++	 *	afs_int32	enctype;
++	 *	opaque		callbackKey<>;
++	 *	opaque		callbackToken<>;
++	 * };
++	 */
++	adatasize = 16 + 16 +
++		xdr_len_object(sizeof(caps)) +
++		4 +
++		xdr_len_object(conn_krb5->key_len) +
++		xdr_len_object(contsize);
++
++	ret = -ENOMEM;
++	appdata = kzalloc(adatasize, GFP_KERNEL);
++	if (!appdata)
++		goto out;
++	xdr = appdata;
++
++	memcpy(xdr, &net->uuid, 16);		/* appdata.initiatorUuid */
++	xdr += 16 / 4;
++	memcpy(xdr, &server->uuid, 16);		/* appdata.acceptorUuid */
++	xdr += 16 / 4;
++	*xdr++ = htonl(ARRAY_SIZE(caps));	/* appdata.caps.len */
++	memcpy(xdr, &caps, sizeof(caps));	/* appdata.caps */
++	xdr += ARRAY_SIZE(caps);
++	*xdr++ = htonl(conn_krb5->etype);	/* appdata.enctype */
++
++	*xdr++ = htonl(conn_krb5->key_len);	/* appdata.callbackKey.len */
++	K0 = xdr;
++	get_random_bytes(K0, conn_krb5->key_len); /* appdata.callbackKey.data */
++	xdr += xdr_round_up(conn_krb5->key_len) / 4;
++
++	*xdr++ = htonl(contsize);		/* appdata.callbackToken.len */
++	*xdr++ = htonl(1);			/* cont.kvno */
++	*xdr++ = htonl(token_krb5->etype);	/* cont.enctype */
++	*xdr++ = htonl(encsize);		/* cont.encrypted_token.len */
++
++	encbase = xdr;
++	xdr += offset / 4;
++	*xdr++ = htonl(conn_krb5->etype);	/* token.K0.enctype */
++	*xdr++ = htonl(conn_krb5->key_len);	/* token.K0.key.len */
++	memcpy(xdr, K0, conn_krb5->key_len);	/* token.K0.key.data */
++	xdr += xdr_round_up(conn_krb5->key_len) / 4;
++
++	*xdr++ = htonl(RXRPC_SECURITY_ENCRYPT);	/* token.level */
++	*xdr++ = htonl(0);			/* token.starttime */
++	*xdr++ = htonl(0);			/* " */
++	*xdr++ = htonl(0);			/* token.lifetime */
++	*xdr++ = htonl(0);			/* token.bytelife */
++	*xdr++ = htonl(0);			/* token.expirationtime */
++	*xdr++ = htonl(0);			/* " */
++	*xdr++ = htonl(1);			/* token.identities.count */
++	*xdr++ = htonl(0);			/* token.identities[0].kind */
++	*xdr++ = htonl(uuidsize);		/* token.identities[0].data.len */
++	memcpy(xdr, &server->uuid, uuidsize);
++	xdr += xdr_round_up(uuidsize) / 4;
++	*xdr++ = htonl(0);			/* token.identities[0].display.len */
++
++	xdr = encbase + xdr_round_up(encsize);
++
++	if ((unsigned long)xdr - (unsigned long)appdata != adatasize)
++		pr_err("Appdata size incorrect %lx != %zx\n",
++		       (unsigned long)xdr - (unsigned long)appdata, adatasize);
++
++	aead = crypto_krb5_prepare_encryption(token_krb5, token_key, RXGK_SERVER_ENC_TOKEN,
++					      GFP_KERNEL);
++	if (IS_ERR(aead)) {
++		ret = PTR_ERR(aead);
++		goto out_token;
++	}
++
++	sg_init_one(&sg, encbase, encsize);
++	ret = crypto_krb5_encrypt(token_krb5, aead, &sg, 1, encsize, offset, toksize, false);
++	if (ret < 0)
++		goto out_aead;
++
++	appdata_key = key_alloc(&key_type_user, "rxrpc: afs rxgk appdata",
++				GLOBAL_ROOT_UID, GLOBAL_ROOT_GID, current_cred(),
++				KEY_POS_VIEW | KEY_POS_SEARCH | KEY_USR_VIEW,
++				KEY_ALLOC_NOT_IN_QUOTA, NULL);
++	if (IS_ERR(appdata_key)) {
++		ret = PTR_ERR(appdata_key);
++		goto out_aead;
++	}
++
++	ret = key_instantiate_and_link(appdata_key, appdata, adatasize, NULL, NULL);
++	if (ret < 0) {
++		key_put(appdata_key);
++		goto out_aead;
++	}
++
++	/* Store the appdata before the key pointer */
++	smp_store_release(&server->yfs_rxgk_appdata, appdata_key);
++
++out_aead:
++	crypto_free_aead(aead);
++out_token:
++	kfree(appdata);
++out:
++	return ret;
 +}
-+EXPORT_SYMBOL_GPL(put_user_key_payload);
++#endif /* CONFIG_RXGK */
++
++/*
++ * Create the application data to go in a RESPONSE packet a server's CHALLENGE
++ * from the parameters contained in a key.  The key specifies the security
++ * index and other appropriate parameters such as the encoding type for RxGK.
++ */
++int afs_create_server_appdata(struct afs_server *server, struct key *key)
++{
++	u32 krb5_enctype;
++	int ret;
++	u8 security_index;
++
++	if (!key)
++		return 0;
++
++	rxrpc_kernel_query_key(key, &security_index, &krb5_enctype);
++
++	_enter("%u,%u", security_index, krb5_enctype);
++
++	switch (security_index) {
++#ifdef CONFIG_RXGK
++	case RXRPC_SECURITY_YFS_RXGK:
++		/* Read the key pointer before the appdata */
++		if (smp_load_acquire(&server->yfs_rxgk_appdata))
++			return 0;
++		break;
++#endif
++	default:
++		return 0;
++	}
++
++	ret = 0;
++	mutex_lock(&server->cm_token_lock);
++
++	switch (security_index) {
++#ifdef CONFIG_RXGK
++	case RXRPC_SECURITY_YFS_RXGK:
++		/* Read the key pointer before the appdata */
++		if (smp_load_acquire(&server->yfs_rxgk_appdata))
++			break;
++		ret = afs_create_yfs_rxgk_cm_appdata(server, krb5_enctype);
++		break;
++#endif
++	default:
++		break;
++	}
++
++	mutex_unlock(&server->cm_token_lock);
++	return ret;
++}
 +
  /*
-  * update a user defined key
-  * - the key's semaphore is write-locked
-@@ -115,8 +126,7 @@ int user_update(struct key *key, struct key_preparsed_payload *prep)
- 	rcu_assign_keypointer(key, prep->payload.data[0]);
- 	prep->payload.data[0] = NULL;
+  * Respond to an RxGK challenge, adding appdata.
+  */
+diff --git a/fs/afs/fs_probe.c b/fs/afs/fs_probe.c
+index a91ad1938d07..e26f7f1e30a2 100644
+--- a/fs/afs/fs_probe.c
++++ b/fs/afs/fs_probe.c
+@@ -241,9 +241,14 @@ int afs_fs_probe_fileserver(struct afs_net *net, struct afs_server *server,
+ 	struct afs_endpoint_state *estate, *old;
+ 	struct afs_addr_list *old_alist = NULL, *alist;
+ 	unsigned long unprobed;
++	int ret;
  
--	if (zap)
--		call_rcu(&zap->rcu, user_free_payload_rcu);
-+	put_user_key_payload(zap);
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(user_update);
-@@ -134,7 +144,7 @@ void user_revoke(struct key *key)
+ 	_enter("%pU", &server->uuid);
  
- 	if (upayload) {
- 		rcu_assign_keypointer(key, NULL);
--		call_rcu(&upayload->rcu, user_free_payload_rcu);
-+		put_user_key_payload(upayload);
- 	}
- }
- 
-@@ -147,9 +157,8 @@ void user_destroy(struct key *key)
- {
- 	struct user_key_payload *upayload = key->payload.data[0];
- 
--	kfree_sensitive(upayload);
-+	put_user_key_payload(upayload);
- }
--
- EXPORT_SYMBOL_GPL(user_destroy);
- 
++	ret = afs_create_server_appdata(server, key);
++	if (ret < 0)
++		return ret;
++
+ 	estate = kzalloc_obj(*estate);
+ 	if (!estate)
+ 		return -ENOMEM;
+diff --git a/fs/afs/internal.h b/fs/afs/internal.h
+index 645fe2f12dc5..d1c29593c5d0 100644
+--- a/fs/afs/internal.h
++++ b/fs/afs/internal.h
+@@ -548,6 +548,7 @@ struct afs_server {
+ 	struct timer_list	timer;		/* Management timer */
+ 	struct mutex		cm_token_lock;	/* Lock governing creation of appdata */
+ 	struct krb5_buffer	cm_rxgk_appdata; /* Appdata to be included in RESPONSE packet */
++	struct key		*yfs_rxgk_appdata; /* Appdata to be included in RESPONSE packet */
+ 	time64_t		unuse_time;	/* Time at which last unused */
+ 	unsigned long		flags;
+ #define AFS_SERVER_FL_RESPONDING 0		/* The server is responding */
+@@ -1088,6 +1089,7 @@ extern bool afs_cm_incoming_call(struct afs_call *);
  /*
+  * cm_security.c
+  */
++int afs_create_server_appdata(struct afs_server *server, struct key *key);
+ void afs_process_oob_queue(struct work_struct *work);
+ #ifdef CONFIG_RXGK
+ int afs_create_token_key(struct afs_net *net, struct socket *socket);
+diff --git a/fs/afs/server.c b/fs/afs/server.c
+index 0fe162ea2a36..b08d9080b0c5 100644
+--- a/fs/afs/server.c
++++ b/fs/afs/server.c
+@@ -399,6 +399,7 @@ static void afs_server_rcu(struct rcu_head *rcu)
+ 			       afs_estate_trace_put_server);
+ 	afs_put_cell(server->cell, afs_cell_trace_put_server);
+ 	kfree(server->cm_rxgk_appdata.data);
++	key_put(server->yfs_rxgk_appdata);
+ 	kfree(server);
+ }
+ 
+diff --git a/include/net/af_rxrpc.h b/include/net/af_rxrpc.h
+index 0fb4c41c9bbf..c4b68049c06f 100644
+--- a/include/net/af_rxrpc.h
++++ b/include/net/af_rxrpc.h
+@@ -109,6 +109,8 @@ int rxkad_kernel_respond_to_challenge(struct sk_buff *challenge);
+ u32 rxgk_kernel_query_challenge(struct sk_buff *challenge);
+ int rxgk_kernel_respond_to_challenge(struct sk_buff *challenge,
+ 				     struct krb5_buffer *appdata);
++void rxrpc_kernel_query_key(const struct key *key, u8 *_security_index,
++			    u32 *_krb5_enctype);
+ u8 rxrpc_kernel_query_call_security(struct rxrpc_call *call,
+ 				    u16 *_service_id, u32 *_enctype);
+ 
+diff --git a/net/rxrpc/key.c b/net/rxrpc/key.c
+index a0aa78d89289..16bab72e6f07 100644
+--- a/net/rxrpc/key.c
++++ b/net/rxrpc/key.c
+@@ -893,3 +893,40 @@ static long rxrpc_read(const struct key *key,
+ 	_leave(" = %zu", size);
+ 	return size;
+ }
++
++/**
++ * rxrpc_kernel_query_key - Query parameters from an rxrpc key
++ * @key: The key to query
++ * @_security_index: Where to return the security index
++ * @_krb5_enctype: Where to return the krb5 encryption type if applicable
++ *
++ * Query an rxrpc authentication key, extracting the security index from the
++ * first token therein.
++ */
++void rxrpc_kernel_query_key(const struct key *key, u8 *_security_index,
++			    u32 *_krb5_enctype)
++{
++	const struct rxrpc_key_token *token;
++
++	token = key->payload.data[0];
++	if (!token) {
++		*_security_index = 0;
++		*_krb5_enctype = 0;
++		return;
++	}
++
++	*_security_index = token->security_index;
++	switch (token->security_index) {
++	case RXRPC_SECURITY_RXKAD:
++		*_krb5_enctype = 0;
++		break;
++	case RXRPC_SECURITY_YFS_RXGK:
++		*_krb5_enctype = token->rxgk->enctype;
++		break;
++	default:
++		WARN_ON_ONCE(1);
++		*_krb5_enctype = 0;
++		break;
++	}
++}
++EXPORT_SYMBOL(rxrpc_kernel_query_key);
 
 
