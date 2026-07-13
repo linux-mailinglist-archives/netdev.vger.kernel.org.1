@@ -1,174 +1,137 @@
-Return-Path: <netdev+bounces-307175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307163-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id W5BvIzroVGrEgwAAu9opvQ
-	(envelope-from <netdev+bounces-307175-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 15:29:30 +0200
+	id 8HfwAUnlVGrHggAAu9opvQ
+	(envelope-from <netdev+bounces-307163-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 15:16:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEAAE74B972
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 15:29:29 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A87CF74B705
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 15:16:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=blackhole.kfki.hu header.s=20151130 header.b=jsuZad9b;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307175-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307175-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=blackhole.kfki.hu;
+	dkim=pass header.d=linux.dev header.s=key1 header.b=xxxH5CWL;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307163-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307163-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AF5A53048DE3
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 13:22:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 54B4B30217CA
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 13:13:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E93431E4C;
-	Mon, 13 Jul 2026 13:21:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB3F541C2FE;
+	Mon, 13 Jul 2026 13:13:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.51])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60285426EA8;
-	Mon, 13 Jul 2026 13:21:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45F5B41CB23
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 13:13:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783948892; cv=none; b=DjoEOhnE631cUjljICY7QxXiSeVhhDyXQSNqz49F8vgpYHEtRHkG6GH1TYIHJyJJMT8ASOMaHp6Fid94Kr4X2HBMOdMLFQc6kac3Er9pGncKngdEE9UF05q30pKynae2oK/ht/EZAyal3XGrazs0p8kwqU7FvteXP+OXBtjL5LU=
+	t=1783948382; cv=none; b=CPkagQ2w2o4UZXESvvv9xs8PhFrK3awJ5llHe9pCwZGsZsotY39IIXdnai1fjJeGycuLYFZMTyd+tvyya9DoQlHTAx5TnUDXsHTkVhdcib2zATfZbtAdnt3lsCmU25kEEQsndMzCY6crXQhvH3o/y+gb0k0cEPEba06C5RmlaGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783948892; c=relaxed/simple;
-	bh=CLvOMuTGzK0B9UMbrs4BcMOxKRHnFjD8dC/fxRzRXiY=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=l9iM0PRurGnR6ywG9zy0fgLybP5lB/Zaw+WUlv2RrhBSjEtxqTlnwgusDsQOlQdDqPmf780wKErsrgkziLp9OkMePSVs3xe7b1H4tLTrYFZaWTQTU3KrHrPlaCp72/q/8ClCBSkVwUXw9GUpRxK9r5qKNblqJKi7KXBIFH3RmJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu; spf=pass smtp.mailfrom=blackhole.kfki.hu; dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b=jsuZad9b; arc=none smtp.client-ip=148.6.0.51
-Received: from localhost (localhost [127.0.0.1])
-	by smtp2.kfki.hu (Postfix) with ESMTP id 4gzNC64STBz7s7wb;
-	Mon, 13 Jul 2026 15:12:34 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	blackhole.kfki.hu; h=mime-version:references:message-id
-	:in-reply-to:from:from:date:date:received:received:received
-	:received; s=20151130; t=1783948352; x=1785762753; bh=bU3QVDxuYL
-	ifBEDECxq11ROerf4rx5150fNX0c5ItPU=; b=jsuZad9bJ4Zvd34yJl5KRB1YeQ
-	HIBhprnbt/jelZDAs8Cduhs6srZdPjKr8gSvvJUSHsf2nLl6YFGvpzVRvnMQMhro
-	Ui64n7c5ycE7XKiIYMIPImZwLhOVmMiNpLpFdHADN7eKweAZMejXEhV9ekUrkkns
-	uEzyTjEe/DrYMuJLY=
-X-Virus-Scanned: Debian amavis at smtp2.kfki.hu
-Received: from smtp2.kfki.hu ([127.0.0.1])
- by localhost (smtp2.kfki.hu [127.0.0.1]) (amavis, port 10026) with ESMTP
- id ktaVqrb7ZuZ4; Mon, 13 Jul 2026 15:12:32 +0200 (CEST)
-Received: from blackhole.kfki.hu (blackhole.szhk.kfki.hu [148.6.240.2])
-	by smtp2.kfki.hu (Postfix) with ESMTP id 4gzNC41S29z7s7wX;
-	Mon, 13 Jul 2026 15:12:32 +0200 (CEST)
-Received: by blackhole.kfki.hu (Postfix, from userid 1000)
-	id 1FC6B34316E; Mon, 13 Jul 2026 15:12:32 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by blackhole.kfki.hu (Postfix) with ESMTP id 1E4DF34316D;
-	Mon, 13 Jul 2026 15:12:32 +0200 (CEST)
-Date: Mon, 13 Jul 2026 15:12:32 +0200 (CEST)
-From: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
-To: David Lee <david.lee@trailofbits.com>
-cc: Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, 
-    Jozsef Kadlecsik <kadlec@netfilter.org>, Phil Sutter <phil@nwl.cc>, 
-    Dominik 'Disconnect3d' Czarnota <dominik.czarnota@trailofbits.com>, 
-    netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-    stable@vger.kernel.org
-Subject: Re: [PATCH nf] netfilter: ipset: do not update comments from
- kernel-side hash adds
-In-Reply-To: <20260713095918.173450-1-david.lee@trailofbits.com>
-Message-ID: <288616cf-27fa-eed8-2e4c-898d723cc283@blackhole.kfki.hu>
-References: <20260713095918.173450-1-david.lee@trailofbits.com>
+	s=arc-20240116; t=1783948382; c=relaxed/simple;
+	bh=956xMFVwozemfL7mtYNdI4SlIWWqBnG7b5uwkcojwm4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CQh4EwVTPIE2ITKbr2LGdPgrmiiwy2Ukd7Zqo6P3BEVBfu9hdOeFDigUgE2ABjtJ9SfVgMfMAucN+ZlyCgWnph4xzxe62XzqF8rROwNofKZLRGldkzUwBXw8ue1hyxd1cQFcPbQS7zmOd4hk1wFZe+8QZ0gfMKlfsQHaxaxUEIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xxxH5CWL; arc=none smtp.client-ip=95.215.58.173
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783948378;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=pD0xLc3ojA6rSvSgLR0YiYwMwbJS+q5TEOT37BYZouU=;
+	b=xxxH5CWLcq93SQTzQ3VapDKG/5dTt2XnuRfj+FebtfGMQeJkv9/4LnBrPISkd/Pbs02mk9
+	a+yjUhH0K/FLJmsMv6e4Jo8eOkwOXJ0L9FYw9UNv6J46EDT75zMadO38RjWQra3G7nvFUX
+	Ea+VNjqJsy9tjbmZE/wiUqQp8dpbmeQ=
+From: Tao Cui <cui.tao@linux.dev>
+To: dsahern@kernel.org,
+	leonro@nvidia.com
+Cc: linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Tao Cui <cuitao@kylinos.cn>
+Subject: [PATCH iproute2-next v6 0/2] rdma: display resource limits in curr/max format
+Date: Mon, 13 Jul 2026 21:12:36 +0800
+Message-ID: <20260713131238.955962-1-cui.tao@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[blackhole.kfki.hu,quarantine];
-	R_DKIM_ALLOW(-0.20)[blackhole.kfki.hu:s=20151130];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307175-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:david.lee@trailofbits.com,m:pablo@netfilter.org,m:fw@strlen.de,m:kadlec@netfilter.org,m:phil@nwl.cc,m:dominik.czarnota@trailofbits.com,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,blackhole.kfki.hu:from_mime,blackhole.kfki.hu:dkim,blackhole.kfki.hu:mid,netfilter.org:email];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[blackhole.kfki.hu:+];
+	TAGGED_FROM(0.00)[bounces-307163-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:dsahern@kernel.org,m:leonro@nvidia.com,m:linux-rdma@vger.kernel.org,m:netdev@vger.kernel.org,m:cuitao@kylinos.cn,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[kadlec@blackhole.kfki.hu,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[cui.tao@linux.dev,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kadlec@blackhole.kfki.hu,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[cui.tao@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:from_mime,linux.dev:dkim,linux.dev:mid,kylinos.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DEAAE74B972
+X-Rspamd-Queue-Id: A87CF74B705
 
-Hi,
+From: Tao Cui <cuitao@kylinos.cn>
 
-On Mon, 13 Jul 2026, David Lee wrote:
+This series adds support for displaying RDMA device resource limits in
+curr/max format in the rdma tool, building on the kernel uapi attribute
+RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX which has landed in linux-next
+(kernel commit 5911f6d6e7cc [1]).
 
-> mtype_resize() copies comment pointers with memcpy(), not the comment objects
-> themselves. During the window after an entry has been copied but before the
-> table swap and backlog replay, the old table is still published for
-> packet-side updates while the replacement-table entry already holds the same
-> ip_set_comment_rcu pointer.
->
-> If xt_SET --add-set ... --exist hits that old entry in this window,
-> mtype_add() calls ip_set_init_comment() even though packet-side adds carry no
-> comment payload. That call frees the shared comment through the old entry, so
-> the replacement-table entry now holds a stale pointer. When the queued add is
-> replayed on the new table, mtype_add() calls ip_set_init_comment() again and
-> strlen() dereferences the stale pointer.
->
-> Fix this in mtype_add() by skipping ip_set_init_comment() when ext->target
-> marks a packet-side add. Userspace adds still update comments, while
-> packet-side adds can no longer free comment storage shared with a resize copy.
->
-> Fixes: f66ee0410b1c ("netfilter: ipset: Fix "INFO: rcu detected stall in hash_xxx" reports")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: David Lee <david.lee@trailofbits.com>
-> Assisted-by: Codex:gpt-5.5
-> ---
-> A reproducer triggers a KASAN slab-use-after-free in strlen() from
-> ip_set_init_comment() during hash_ip4_resize().
->
-> Trail of Bits has a privilege escalation PoC for this bug on a
-> custom kernel, which can be shared further if needed.
->
-> net/netfilter/ipset/ip_set_hash_gen.h | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/netfilter/ipset/ip_set_hash_gen.h b/net/netfilter/ipset/ip_set_hash_gen.h
-> index 8231317b0f1f..b2d77973272d 100644
-> --- a/net/netfilter/ipset/ip_set_hash_gen.h
-> +++ b/net/netfilter/ipset/ip_set_hash_gen.h
-> @@ -1005,7 +1005,7 @@ mtype_add(struct ip_set *set, void *value, const struct ip_set_ext *ext,
-> #endif
-> 	if (SET_WITH_COUNTER(set))
-> 		ip_set_init_counter(ext_counter(data, set), ext);
-> -	if (SET_WITH_COMMENT(set))
-> +	if (SET_WITH_COMMENT(set) && !ext->target)
-> 		ip_set_init_comment(set, ext_comment(data, set), ext);
-> 	if (SET_WITH_SKBINFO(set))
-> 		ip_set_init_skbinfo(ext_skbinfo(data, set), ext);
-> --
+Patch 1 syncs the rdma_netlink.h uapi header from the kernel.
+Patch 2 updates the rdma tool to parse the new attribute and display
+resource usage in curr/max format:
 
-Thanks! Resize is a can of worms for edge cases and hopefully all of them 
-caught one by one.
+  $ rdma resource show
+  0: mlx5_0: qp 123/131072  cq 45/65536  mr 200/1000000  pd 10/32768
 
-Acked-by: Jozsef Kadlecsik <kadlec@netfilter.org>
+[1]:
+Link: https://lore.kernel.org/all/20260615003646.168704-1-cui.tao@linux.dev/
 
-Best regards,
-Jozsef
+Tao Cui (2):
+  rdma: update uapi headers
+  rdma: display resource limits in curr/max format
+
+ rdma/include/uapi/rdma/rdma_netlink.h |  5 +++++
+ rdma/res.c                            | 21 ++++++++++++++++++++-
+ rdma/utils.c                          |  1 +
+ 3 files changed, 26 insertions(+), 1 deletion(-)
+
+---
+Changes in v6:
+- Fix the incorrect kernel commit SHA referenced in the uapi headers
+  sync message (5911f6d6e7cc, not 5911f6d6e7ce).
+Changes in v5:
+- Split the rdma_netlink.h update into its own commit following the
+  uapi headers sync format ("rdma: update uapi headers").
+Changes in v4:
+- Add a Link: reference to the kernel patch; re-send now that the
+  kernel side has landed in linux-next.
+-- 
+2.43.0
 
