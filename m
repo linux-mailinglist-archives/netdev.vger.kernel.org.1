@@ -1,96 +1,67 @@
-Return-Path: <netdev+bounces-307124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307125-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Iyq0IGnCVGoTSQAAu9opvQ
-	(envelope-from <netdev+bounces-307124-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 12:48:09 +0200
+	id YxBBLe3EVGriSgAAu9opvQ
+	(envelope-from <netdev+bounces-307125-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 12:58:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79011749F41
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 12:48:08 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC16874A116
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 12:58:52 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=trailofbits.com header.s=google header.b=SCNJLHdV;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307124-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-307124-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=trailofbits.com;
+	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=HJWZBPzv;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307125-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307125-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 505C83009E22
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:48:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A797C3041A1C
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:57:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE44D3E2AB1;
-	Mon, 13 Jul 2026 10:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 159273E9589;
+	Mon, 13 Jul 2026 10:57:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727E830FC03
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 10:47:55 +0000 (UTC)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [4.193.249.245])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D8C367B7B;
+	Mon, 13 Jul 2026 10:56:53 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783939677; cv=none; b=Ytli39zk8tQYcmE8SCO6u2dljl3cn75AxH3YMQBFzXOwjsyBDwrt96WMYUr5ois746HSRaZpS1muLPMs+2LkSRXlAPOe1psB5j3KBCMVR0bs6QyE9OElGdnr/YjtJgsBFDChBxh0680FXe3YNEEzQp1BHCkw/9qTrIUaDGYnzdk=
+	t=1783940220; cv=none; b=cFGe/BVuuv4rU2ZS50Rh/wXzf7lL+7kAqTEXrDgLmYCbBN3OvyB4CXW6d0eb+0bAHUjwxNC2VFPu/uIkNxWOHdQ7ZpyBYPGrEID4lsaXghOvuCmSJX1OkfyfHv483879a9AmK5cMKRTd2jNIEP6aGTFOtAn2O+nMtZ1NjRT/9xQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783939677; c=relaxed/simple;
-	bh=GxG/GDWpn5mwK1tIal/l0Dw5POK+wIXBW12wM/0SicE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dg+rhR361aM+gCHTF49o8fBZ3LmO/jlJkGthbujFC8ongWizs8RX+EysMYupTofiGju4pNhVT0Okps+QCakjeU/KroPooBuTO6EfFD9vFiZs1mQvSM+oMOLPRXS6CHgiOrVBe9trc0Z6ywX6BsYh6aS+emtBOTZ4KvDWLaGwrNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=SCNJLHdV; arc=none smtp.client-ip=209.85.222.180
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-92e85499ffbso235297385a.0
-        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 03:47:55 -0700 (PDT)
+	s=arc-20240116; t=1783940220; c=relaxed/simple;
+	bh=X+GUCZSY7VaPmAb1eZdsudVEsWE4IID3rjLysW22MPc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JecE+kgQTInIYqyiHjxKAC9UMaI9KnRzKcItFh7zMbAI7h/u5f4PMKGvybewaQ9+A5XkGbNFEgK2Kl5bU8vK/mQLlQQwFKX6ij1Mn7gIay32amk7GEIaLuU/njaaGzLPWD6QPVAZWrzYsZfwIosxD/6K8sWJ159iEoHgCrC0f+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=HJWZBPzv; arc=none smtp.client-ip=4.193.249.245
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=trailofbits.com; s=google; t=1783939674; x=1784544474; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=djDZZW+WjRlIj682sN8PrAtMnjaRhZOc5mbUij8u74g=;
-        b=SCNJLHdVIYR2vI17FYhRc6vMgRd72AMHsMdRQ2KdsC2Klv15BaH19iXc/C0zJDHJnV
-         13LKalp32u9aLgo83/OlgzCrRH/y2bKncA2TqrT72u793a//UnkIHQx3YYlWvvZolQRL
-         YetGEv/2CoaxkYzO2UN+cEzHndQhLyywNBYIppkE7OwEk9LSiUaPMhDjkiTUM6oQwgib
-         Xv/jYw5nBqXpfRNxW4Ec/C24bSerdnlm/00lkVWCtAziw6f/hQiwef98V8eGi8e1E80x
-         V+Qik5b7VOgrVcZoo0TEsScFDeedDSBLp83T5XegPuLFBIMbJkBIjmJO3s5qlOoTcb7j
-         /bDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783939674; x=1784544474;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=djDZZW+WjRlIj682sN8PrAtMnjaRhZOc5mbUij8u74g=;
-        b=JuQXAUe5HbKt/z2J0xPtsxlhuMwQxJFJfXFLuyDQ4ssjFVOFwvXZFsEifLrnzgmX2+
-         +kC+5sqiMHVyl1eycIA/NV4Ay+/LLBADwmQk/2jKuBgtL8NuvnANjQXul1Hyknjmvnzq
-         3vZFPrrOpe3x8Ms+uMu7hQuJQluC3C7c0cak55GcLBl+xyaCbhe8mrUGd9RqsYhgC60g
-         8bPbh3r+IELpXwnopQ58otS8h0huNJHVX162mUDIgHUzov72QaP87NOeqAXJX2apDOdn
-         rY7TDumBiBgBKzY8X4xc/AjXYpXEFS82mrrfqledNmPOI4HfndIHiTnUiKvGsRQxiVdx
-         P7Ig==
-X-Forwarded-Encrypted: i=1; AHgh+RrlObZaSJMDH2Hul/IhmN9F21667MAg3JhPeeN7TE9ExPZX/AtdjFL61eSz7XyyY2PuonaoRl4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSDEdAMSOLiYTe/QJXzM5aQMhwpS/jsa/vLJW1fxcUEm8YF2vn
-	M6j0pCtUe3HlduhCmPUMwDFDcJ4HHMQMbCFQvcg0MQeCif+jeJ+I9RssrvAElmVyXrA=
-X-Gm-Gg: AfdE7cm9EqwNurieFlbHDSpUK3KzhAdyNTNhi/7MjadEDCINp58OQ2YWBqS3U8fXNNp
-	5+uJUc5sn8SlJFojdoFrTqnYs4BxpymrTWMdFAol8YRhjMy1JVUgaJNzI1Cz8SotyVim8xQhP21
-	gH3lxHv+dy907vXK95w0HcUOHis0Nkd7wb85d6QVEJ/ED5HNE7ODIgn4BJTyuxMZ9qSPyHFicUs
-	ZZsKwLkGbG2eDFuqehH7tatG+mtDaZJOWbtlymnTe+5FtAegYKqHPsPHvEBwrjPJN3OApdZlPl6
-	7mm9Vz5M/c+5C+ThEAMfi/5lbWjpTaCUsG7a8vRyBF/Tjsx97k6ZxDPio7XtJYRMI/6invOvL+p
-	b9hg0c5BchS5HdoEIrhdD/o0R2ZcWMgeDmQOT/wiW51Gg1ORsEKtoBUrbAEnZ7h9A76yfIZgL42
-	YZUm5FLANgDs/I8Dsp+g==
-X-Received: by 2002:a05:620a:25d1:b0:92e:71bb:d1ac with SMTP id af79cd13be357-92ef2aeb554mr848155785a.19.1783939674393;
-        Mon, 13 Jul 2026 03:47:54 -0700 (PDT)
-Received: from localhost ([146.190.222.192])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-92ee59223e7sm1031429685a.0.2026.07.13.03.47.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Jul 2026 03:47:54 -0700 (PDT)
-From: David Lee <david.lee@trailofbits.com>
-To: Martin Schiller <ms@dev.tdt.de>
-Cc: David Lee <david.lee@trailofbits.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
+	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=ViK3v
+	pQvfAzETPkp1jCexkPmLiNdIgNhDxZkKvpJvL0=; b=HJWZBPzvYNSAOK2kIGY9Q
+	noDewbswtmg/Bvmkuxp9eUuDEtCNLS2KrFEgfzfTmXnbXSQ/Lw0TlIm9Epq1FlP8
+	osxS4DGkLrt6sBOP28N16pfpuc4vtAy1qosZ892jQE8amjNSXd0rUkdURalbgm/R
+	qL5brTyF25zG5HQqywr/Y8=
+Received: from localhost.localdomain (unknown [121.229.84.192])
+	by web3 (Coremail) with SMTP id ygQGZQAndJFjxFRqT1wkAw--.20921S2;
+	Mon, 13 Jul 2026 18:56:36 +0800 (CST)
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+To: netdev@vger.kernel.org
+Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
 	Eric Dumazet <edumazet@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	Dominik 'Disconnect3d' Czarnota <dominik.czarnota@trailofbits.com>,
-	linux-x25@vger.kernel.org,
-	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
+	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+	Ao Wang <wangao@seu.edu.cn>,
+	Xuewei Feng <fengxw06@126.com>,
+	Qi Li <qli01@tsinghua.edu.cn>,
+	Ke Xu <xuke@tsinghua.edu.cn>,
 	stable@vger.kernel.org
-Subject: [PATCH net] net/x25: fix use-after-free in x25_kill_by_neigh()
-Date: Mon, 13 Jul 2026 10:47:50 +0000
-Message-ID: <20260713104752.241175-1-david.lee@trailofbits.com>
-X-Mailer: git-send-email 2.43.0
+Subject: [PATCH net v2] tcp: initialize standalone TCP-AO response padding
+Date: Mon, 13 Jul 2026 18:56:30 +0800
+Message-ID: <20260713105631.8616-1-zhaoyz24@mails.tsinghua.edu.cn>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,97 +69,125 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygQGZQAndJFjxFRqT1wkAw--.20921S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxJw47JF13Xw4UXF1fCrWkXrb_yoW5ArWfpa
+	yxCrsayr9F9ry3Awn2kw109r45C3yDuFyIgr4UtFy3Gr1DWF9rJF18K3yrKF9IvFWIkFyF
+	vryjqr4UtF98ArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9q1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l8cAvFVAK
+	0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4
+	x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28E
+	F7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzx
+	vE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VCjz48v1sIEY20_GrWk
+	Jr1UJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5c
+	I20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxkIecxE
+	wVAFwVW8twCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26r4rKr1UJr1l4I8I3I
+	0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWU
+	GVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI
+	0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0
+	rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r
+	4UJbIYCTnIWIevJa73UjIFyTuYvjfUs4rWDUUUU
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQEHAWpUpbI3sAAAso
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[trailofbits.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[trailofbits.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:zhaoyz24@mails.tsinghua.edu.cn,m:edumazet@google.com,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307124-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[david.lee@trailofbits.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:ms@dev.tdt.de,m:david.lee@trailofbits.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:dominik.czarnota@trailofbits.com,m:linux-x25@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307125-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[david.lee@trailofbits.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[trailofbits.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,google.com,davemloft.net,kernel.org,redhat.com,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[trailofbits.com:from_mime,trailofbits.com:mid,trailofbits.com:email,trailofbits.com:dkim,vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 79011749F41
+X-Rspamd-Queue-Id: DC16874A116
 
-x25_kill_by_neigh() walks the global X.25 socket list looking for sockets
-attached to a terminating neighbour. x25_list_lock protects list membership
-while the lookup is in progress, but it does not pin a socket's lifetime
-after the lock is dropped.
+tcp_v4_send_ack() and tcp_v6_send_response() construct standalone TCP
+responses with TCP-AO options.  The option length carries the actual MAC
+length, but the TCP header length includes the option rounded up to a
+four-byte boundary.
 
-The function currently drops x25_list_lock before calling lock_sock(s). A
-concurrent close can run x25_release(), remove the same socket from
-x25_list, and drop the last socket reference in that window. The neighbour
-teardown path can then lock or inspect a freed struct sock/struct x25_sock.
+tcp_ao_hash_hdr() writes the MAC only.  Thus, when the MAC length is not
+four-byte aligned, the one to three bytes after the MAC are left
+uninitialized and may be transmitted.  For the normal TCP-AO hashing
+mode, those bytes also have to be initialized before computing the MAC.
 
-Take sock_hold(s) while x25_list_lock still proves that the list entry is
-live, then drop the temporary reference after the socket has been locked,
-rechecked, and released. Recheck x25_sk(s)->neighbour after lock_sock(),
-because another path may have disconnected the socket before this path
-acquired the socket lock. Restart the list walk after each disconnect
-because the list lock was dropped and the previous iterator state may no
-longer be valid.
+Initialize only the alignment padding in the TCP-AO branches, before
+hashing the header.  Use TCPOPT_NOP, as in the normal TCP-AO output path.
+This avoids adding work to non-AO TCP responses while preserving a valid
+authenticated header.
 
-A QEMU/KASAN run against origin/master reproduced a slab-use-after-free in
-x25_kill_by_neigh().
-
-Fixes: 7781607938c8 ("net/x25: Fix null-ptr-deref caused by x25_disconnect")
+Fixes: decde2586b34 ("net/tcp: Add TCP-AO sign to twsk")
+Fixes: da7dfaa6d6f7 ("net/tcp: Consistently align TCP-AO option in the header")
 Cc: stable@vger.kernel.org
-Signed-off-by: David Lee <david.lee@trailofbits.com>
-Assisted-by: Codex:gpt-5.5
+Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
+Reported-by: Ao Wang <wangao@seu.edu.cn>
+Reported-by: Xuewei Feng <fengxw06@126.com>
+Reported-by: Qi Li <qli01@tsinghua.edu.cn>
+Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
+Assisted-by: Claude-Code:GLM-5.2-special
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
 ---
-Trail of Bits has a reproducer that triggers kernel panic demonstrating the bug, and can share it if needed.
+Changes in v2:
+- Fix TCP-AO path only to avoid slowing down other TCP paths, suggested
+by Eric.
+- Fix the IPv6 path either.
+- Link to v1: https://lore.kernel.org/netdev/20260713081842.3119-1-zhaoyz24@mails.tsinghua.edu.cn/
+---
+ net/ipv4/tcp_ipv4.c | 3 +++
+ net/ipv6/tcp_ipv6.c | 2 ++
+ 2 files changed, 5 insertions(+)
 
-net/x25/af_x25.c |    8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index 209ef7522508..2f6ff630a0e5 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -971,6 +971,9 @@ static void tcp_v4_send_ack(const struct sock *sk,
+ 					  key->rcv_next);
+ 		arg.iov[0].iov_len += tcp_ao_len_aligned(key->ao_key);
+ 		rep.th.doff = arg.iov[0].iov_len / 4;
++		memset((u8 *)&rep.opt[offset] + tcp_ao_maclen(key->ao_key),
++		       TCPOPT_NOP, tcp_ao_len_aligned(key->ao_key) -
++				    tcp_ao_len(key->ao_key));
+ 
+ 		tcp_ao_hash_hdr(AF_INET, (char *)&rep.opt[offset],
+ 				key->ao_key, key->traffic_key,
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index ebe161d72fbd..0bc89014653d 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -923,6 +923,8 @@ static void tcp_v6_send_response(const struct sock *sk, struct sk_buff *skb, u32
+ 				(tcp_ao_len(key->ao_key) << 16) |
+ 				(key->ao_key->sndid << 8) |
+ 				(key->rcv_next));
++		memset((u8 *)topt + tcp_ao_maclen(key->ao_key), TCPOPT_NOP,
++		       tcp_ao_len_aligned(key->ao_key) - tcp_ao_len(key->ao_key));
+ 
+ 		tcp_ao_hash_hdr(AF_INET6, (char *)topt, key->ao_key,
+ 				key->traffic_key,
+-- 
+2.47.3
 
-diff --git a/net/x25/af_x25.c b/net/x25/af_x25.c
-index c31d2af5dd22..8aae9273b7c1 100644
---- a/net/x25/af_x25.c
-+++ b/net/x25/af_x25.c
-@@ -1768,15 +1768,19 @@ void x25_kill_by_neigh(struct x25_neigh *nb)
- {
- 	struct sock *s;
- 
-+again:
- 	write_lock_bh(&x25_list_lock);
- 
- 	sk_for_each(s, &x25_list) {
- 		if (x25_sk(s)->neighbour == nb) {
-+			sock_hold(s);
- 			write_unlock_bh(&x25_list_lock);
- 			lock_sock(s);
--			x25_disconnect(s, ENETUNREACH, 0, 0);
-+			if (x25_sk(s)->neighbour == nb)
-+				x25_disconnect(s, ENETUNREACH, 0, 0);
- 			release_sock(s);
--			write_lock_bh(&x25_list_lock);
-+			sock_put(s);
-+			goto again;
- 		}
- 	}
- 	write_unlock_bh(&x25_list_lock);
 
