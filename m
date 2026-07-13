@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-307067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307068-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id yGXVDyafVGpgoQMAu9opvQ
-	(envelope-from <netdev+bounces-307067-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:17:42 +0200
+	id avPuA9meVGpLoQMAu9opvQ
+	(envelope-from <netdev+bounces-307068-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:16:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAC5C748911
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:17:41 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EA8D7488D9
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 10:16:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=cL0ShYrQ;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=HHdZwnP+;
 	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307067-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307067-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307068-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-307068-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A787B305661C
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 08:12:03 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A2337304D2F4
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 08:12:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93AF23A9DB9;
-	Mon, 13 Jul 2026 08:11:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E06F3B1016;
+	Mon, 13 Jul 2026 08:11:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4BD63A544F
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 08:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7E23A9015
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 08:11:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783930275; cv=none; b=fJfZkWIjrYpYC27OyK/C/b89q82LpJAqDfs5WAUwYk7HfnLcR/kfVWpHCwZvjmcfKVkJ+/9vVYX43ks5ZD+Kc9+OvScSGCNT6WchkgaV7k/QJRH3rZlLdj7nDwwBZpUVfmbowukmQuTyhGl6wpFiJJW00rLykbgsAPUy57dkVqs=
+	t=1783930276; cv=none; b=o52mLxo+t63nUroBhwIQV0wxK17q7LusFjtwdJfx8chmxjuSU078+laBb4S0JYB1C0T7K2sNawp9JDyRjDiSjZnZuc66E+R9ubLWCdr9eictZC70MpmyKEg6sjDLvsQCuQoSECkgVB7GmvJgd9jjU/YsDS689kwcCHb4NDDdIpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783930275; c=relaxed/simple;
-	bh=fH9PoXCyIlFnZSeO5S7KAc+KiFPN9psvq1q9mQZOGbI=;
+	s=arc-20240116; t=1783930276; c=relaxed/simple;
+	bh=yIdV7gkMrothlRw1nIxJBgNaDFr9FexOqxBLQ13zHlg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OMrAIwokS36XsscP/x3dl/5jdniqsuMBXxIGnRnU6pnEcBrpdOmODBSDwbhJHexkJh3lf/Pzm+zPTDI8fKe75co8gdBFiDTRCaTO5bJ69k/7S90aOt9F6rG7zX5YFKo4mNNVrCNDoJ5WFwEvV1zNaH9/2GuVH94tpyKCa6fkDe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cL0ShYrQ; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=iLsjURI+PLce4XhR1tegCdPnaC54/pgmz0/gbV0eHwNoBqkY8XbSk6R+aoe1xa6nrWW6BQ5aK7oR0KUDKXbKfGIyap4gF9sZAkrq9zzb9C663+3EvuJllxuIdWH/MNL+jPsrokSYPm7I3/J5856oFBDgrcE2J9ar9jNZvzvn10A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HHdZwnP+; arc=none smtp.client-ip=170.10.133.124
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783930272;
+	s=mimecast20190719; t=1783930273;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=R0Wv8j/SsBkcIqut4rXhApQ4srhvttZcN9wllI+HXYk=;
-	b=cL0ShYrQF3rikK/bwYwDo0zmxXJB4r9S/SXYdZX96+LI2yxRLk0Mu+UuRqdBQddtgX7VoM
-	m3LQqvm8R2WhsBlTiw7jUwKkecAWXi3GWcC7OE5V4a0rKj/VCGFpf/DOBbv3b09Ivms7lC
-	IcB27RlB8uMrmYwmC22bBLEuLXnQ+2M=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=HmaQ+z81XvDwrbaoGbipH/iozNJa7b0A3DkToai5LFE=;
+	b=HHdZwnP+N5FRT/Tfy4YQINBFDZStyGGDA0EzWIvnsCUW55LQgHLckDm0+l0j0PQ48NOxxz
+	k34thq+EvJfTNo6Wa37voHlQgQT0jEzHNklx/duODS8+tBhh4UuxIzYBkkM+z+VLHvWzSC
+	3wFKDF3/siYdMOslrv+PxZk1aJ7GdA4=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-110-I_2UDJZ_OiyFJlA36mSrtA-1; Mon,
- 13 Jul 2026 04:11:06 -0400
-X-MC-Unique: I_2UDJZ_OiyFJlA36mSrtA-1
-X-Mimecast-MFC-AGG-ID: I_2UDJZ_OiyFJlA36mSrtA_1783930265
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-632-_KaV8wsiNVuMIjTTuPGQhA-1; Mon,
+ 13 Jul 2026 04:11:10 -0400
+X-MC-Unique: _KaV8wsiNVuMIjTTuPGQhA-1
+X-Mimecast-MFC-AGG-ID: _KaV8wsiNVuMIjTTuPGQhA_1783930269
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 50C1B1805A0A;
-	Mon, 13 Jul 2026 08:11:04 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EFA081955D91;
+	Mon, 13 Jul 2026 08:11:08 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.44.33.159])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3F04830001A1;
-	Mon, 13 Jul 2026 08:11:01 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E0A5C18005A0;
+	Mon, 13 Jul 2026 08:11:05 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -72,9 +72,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-afs@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Jeffrey Altman <jaltman@auristor.com>
-Subject: [PATCH net v3 07/14] afs: Simplify call refcounting
-Date: Mon, 13 Jul 2026 09:10:13 +0100
-Message-ID: <20260713081022.2186481-8-dhowells@redhat.com>
+Subject: [PATCH net v3 08/14] afs: Make afs_put_call() take trace argument
+Date: Mon, 13 Jul 2026 09:10:14 +0100
+Message-ID: <20260713081022.2186481-9-dhowells@redhat.com>
 In-Reply-To: <20260713081022.2186481-1-dhowells@redhat.com>
 References: <20260713081022.2186481-1-dhowells@redhat.com>
 Precedence: bulk
@@ -84,14 +84,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -100,12 +100,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-307067-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307068-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:dhowells@redhat.com,m:marc.dionne@auristor.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-afs@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:jaltman@auristor.com,s:lists@lfdr.de];
 	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -117,25 +117,13 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,infradead.org:email,vger.kernel.org:from_smtp,auristor.com:email,davemloft.net:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,infradead.org:email,davemloft.net:email,vger.kernel.org:from_smtp,auristor.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BAC5C748911
+X-Rspamd-Queue-Id: 0EA8D7488D9
 
-Simplify afs_call refcounting so that a queued work item doesn't hold a ref
-on the call.  Rather, for async calls, put the retaining ref when the call
-completes.  For synchronous calls, the caller of afs_make_call() holds its
-own ref.  This means that queuing a call's async work doesn't require a ref
-to be taken first on a call - and then there's no need to try and revert
-the ref taken from the context of the rxrpc I/O thread if the call is
-already queued.
-
-Further, the AFS cache manager server RPC handler functions (SRXAFSCB_*)
-are then called directly from afs_deliver_to_call() rather then being
-dispatched to a different workqueue.  With that, call->work is changed to
-a function pointer.
-
-Also, there is no longer a need to keep an extra ref on an async call and
-call->drop_ref can be removed.
+Make afs_put_call() take trace argument to display in the afs_call trace
+line and stop showing the function return address (which isn't unique due
+to inlining and tail-calling).
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Marc Dionne <marc.dionne@auristor.com>
@@ -147,382 +135,376 @@ cc: Paolo Abeni <pabeni@redhat.com>
 cc: Simon Horman <horms@kernel.org>
 cc: linux-afs@lists.infradead.org
 ---
- fs/afs/cmservice.c         | 33 ++++++------------
- fs/afs/file.c              | 10 +++---
- fs/afs/internal.h          | 18 ++--------
- fs/afs/rxrpc.c             | 69 +++++++++++---------------------------
- include/trace/events/afs.h |  1 +
- 5 files changed, 39 insertions(+), 92 deletions(-)
+ fs/afs/file.c              |  4 ++--
+ fs/afs/fs_operation.c      |  2 +-
+ fs/afs/fsclient.c          |  4 ++--
+ fs/afs/internal.h          |  8 +++-----
+ fs/afs/rxrpc.c             | 39 ++++++++++++++------------------------
+ fs/afs/vl_probe.c          |  2 +-
+ fs/afs/vlclient.c          |  8 ++++----
+ include/trace/events/afs.h | 38 +++++++++++++++++++++----------------
+ 8 files changed, 49 insertions(+), 56 deletions(-)
 
-diff --git a/fs/afs/cmservice.c b/fs/afs/cmservice.c
-index db394f101fc6..32120bc1dcb0 100644
---- a/fs/afs/cmservice.c
-+++ b/fs/afs/cmservice.c
-@@ -23,11 +23,11 @@ static int afs_deliver_cb_callback(struct afs_call *);
- static int afs_deliver_cb_probe_uuid(struct afs_call *);
- static int afs_deliver_cb_tell_me_about_yourself(struct afs_call *);
- static void afs_cm_destructor(struct afs_call *);
--static void SRXAFSCB_CallBack(struct work_struct *);
--static void SRXAFSCB_InitCallBackState(struct work_struct *);
--static void SRXAFSCB_Probe(struct work_struct *);
--static void SRXAFSCB_ProbeUuid(struct work_struct *);
--static void SRXAFSCB_TellMeAboutYourself(struct work_struct *);
-+static void SRXAFSCB_CallBack(struct afs_call *call);
-+static void SRXAFSCB_InitCallBackState(struct afs_call *call);
-+static void SRXAFSCB_Probe(struct afs_call *call);
-+static void SRXAFSCB_ProbeUuid(struct afs_call *call);
-+static void SRXAFSCB_TellMeAboutYourself(struct afs_call *call);
- 
- static int afs_deliver_yfs_cb_callback(struct afs_call *);
- 
-@@ -161,10 +161,8 @@ static void afs_abort_service_call(struct afs_call *call, u32 abort_code, int er
- /*
-  * The server supplied a list of callbacks that it wanted to break.
-  */
--static void SRXAFSCB_CallBack(struct work_struct *work)
-+static void SRXAFSCB_CallBack(struct afs_call *call)
- {
--	struct afs_call *call = container_of(work, struct afs_call, work);
--
- 	_enter("");
- 
- 	/* We need to break the callbacks before sending the reply as the
-@@ -180,7 +178,6 @@ static void SRXAFSCB_CallBack(struct work_struct *work)
- 	}
- 
- 	afs_send_empty_reply(call);
--	afs_put_call(call);
- 	_leave("");
- }
- 
-@@ -284,16 +281,13 @@ static int afs_deliver_cb_callback(struct afs_call *call)
- /*
-  * allow the fileserver to request callback state (re-)initialisation
-  */
--static void SRXAFSCB_InitCallBackState(struct work_struct *work)
-+static void SRXAFSCB_InitCallBackState(struct afs_call *call)
- {
--	struct afs_call *call = container_of(work, struct afs_call, work);
--
- 	_enter("{%p}", call->server);
- 
- 	if (call->server)
- 		afs_init_callback_state(call->server);
- 	afs_send_empty_reply(call);
--	afs_put_call(call);
- 	_leave("");
- }
- 
-@@ -380,13 +374,10 @@ static int afs_deliver_cb_init_call_back_state3(struct afs_call *call)
- /*
-  * allow the fileserver to see if the cache manager is still alive
-  */
--static void SRXAFSCB_Probe(struct work_struct *work)
-+static void SRXAFSCB_Probe(struct afs_call *call)
- {
--	struct afs_call *call = container_of(work, struct afs_call, work);
--
- 	_enter("");
- 	afs_send_empty_reply(call);
--	afs_put_call(call);
- 	_leave("");
- }
- 
-@@ -413,9 +404,8 @@ static int afs_deliver_cb_probe(struct afs_call *call)
-  * Allow the fileserver to quickly find out if the cache manager has been
-  * rebooted.
-  */
--static void SRXAFSCB_ProbeUuid(struct work_struct *work)
-+static void SRXAFSCB_ProbeUuid(struct afs_call *call)
- {
--	struct afs_call *call = container_of(work, struct afs_call, work);
- 	struct afs_uuid *r = call->request;
- 
- 	_enter("");
-@@ -425,7 +415,6 @@ static void SRXAFSCB_ProbeUuid(struct work_struct *work)
- 	else
- 		afs_abort_service_call(call, 1, 1, afs_abort_probeuuid_negative);
- 
--	afs_put_call(call);
- 	_leave("");
- }
- 
-@@ -489,9 +478,8 @@ static int afs_deliver_cb_probe_uuid(struct afs_call *call)
- /*
-  * allow the fileserver to ask about the cache manager's capabilities
-  */
--static void SRXAFSCB_TellMeAboutYourself(struct work_struct *work)
-+static void SRXAFSCB_TellMeAboutYourself(struct afs_call *call)
- {
--	struct afs_call *call = container_of(work, struct afs_call, work);
- 	int loop;
- 
- 	struct {
-@@ -523,7 +511,6 @@ static void SRXAFSCB_TellMeAboutYourself(struct work_struct *work)
- 	reply.cap.capcount = htonl(1);
- 	reply.cap.caps[0] = htonl(AFS_CAP_ERROR_TRANSLATION);
- 	afs_send_simple_reply(call, &reply, sizeof(reply));
--	afs_put_call(call);
- 	_leave("");
- }
- 
 diff --git a/fs/afs/file.c b/fs/afs/file.c
-index 0467742bfeee..35d68f7f498d 100644
+index 35d68f7f498d..625dc67f79f3 100644
 --- a/fs/afs/file.c
 +++ b/fs/afs/file.c
-@@ -316,15 +316,17 @@ void afs_fetch_data_async_rx(struct work_struct *work)
- 	struct afs_call *call = container_of(work, struct afs_call, async_work);
- 
- 	afs_read_receive(call);
+@@ -298,7 +298,7 @@ static void afs_read_receive(struct afs_call *call)
+ 	op->call_responded	= call->responded;
+ 	op->call		= NULL;
+ 	call->op		= NULL;
 -	afs_put_call(call);
-+
-+	if (call->state == AFS_CALL_COMPLETE) {
-+		cancel_work(&call->async_work);
-+		afs_put_call(call);
-+	}
- }
++	afs_put_call(call, afs_call_trace_put_read_op);
  
- void afs_fetch_data_immediate_cancel(struct afs_call *call)
- {
- 	if (call->async) {
--		afs_get_call(call, afs_call_trace_wake);
--		if (!queue_work(afs_async_calls, &call->async_work))
--			afs_deferred_put_call(call);
-+		queue_work(afs_async_calls, &call->async_work);
- 		flush_work(&call->async_work);
+ 	/* If the call failed, then we need to crank the server rotation
+ 	 * handle and try the next.
+@@ -319,7 +319,7 @@ void afs_fetch_data_async_rx(struct work_struct *work)
+ 
+ 	if (call->state == AFS_CALL_COMPLETE) {
+ 		cancel_work(&call->async_work);
+-		afs_put_call(call);
++		afs_put_call(call, afs_call_trace_put_read_complete);
  	}
  }
+ 
+diff --git a/fs/afs/fs_operation.c b/fs/afs/fs_operation.c
+index 20801b29521d..b887047398b9 100644
+--- a/fs/afs/fs_operation.c
++++ b/fs/afs/fs_operation.c
+@@ -296,7 +296,7 @@ void afs_wait_for_operation(struct afs_operation *op)
+ 			op->call_abort_code = op->call->abort_code;
+ 			op->call_error = op->call->error;
+ 			op->call_responded = op->call->responded;
+-			afs_put_call(op->call);
++			afs_put_call(op->call, afs_call_trace_put_wait_op);
+ 		}
+ 	}
+ 
+diff --git a/fs/afs/fsclient.c b/fs/afs/fsclient.c
+index 626e1d37b915..9acad5017fba 100644
+--- a/fs/afs/fsclient.c
++++ b/fs/afs/fsclient.c
+@@ -1662,7 +1662,7 @@ int afs_fs_give_up_all_callbacks(struct afs_net *net, struct afs_server *server,
+ 	ret = call->error;
+ 	if (call->responded)
+ 		set_bit(AFS_SERVER_FL_RESPONDING, &server->flags);
+-	afs_put_call(call);
++	afs_put_call(call, afs_call_trace_put_giveupcallbacks);
+ 	return ret;
+ }
+ 
+@@ -1778,7 +1778,7 @@ bool afs_fs_get_capabilities(struct afs_net *net, struct afs_server *server,
+ 
+ 	trace_afs_make_fs_call(call, NULL);
+ 	afs_make_call(call, GFP_NOFS);
+-	afs_put_call(call);
++	afs_put_call(call, afs_call_trace_put_get_capabilities);
+ 	return true;
+ }
+ 
 diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-index 601f01e5c15f..e55363f1d5ab 100644
+index e55363f1d5ab..4901d0acbe14 100644
 --- a/fs/afs/internal.h
 +++ b/fs/afs/internal.h
-@@ -129,7 +129,7 @@ struct afs_call {
- 	const struct afs_call_type *type;	/* type of call */
- 	wait_queue_head_t	waitq;		/* processes awaiting completion */
- 	struct work_struct	async_work;	/* async I/O processor */
--	struct work_struct	work;		/* actual work processor */
-+	void (*work)(struct afs_call *call);	/* Worker function */
- 	struct work_struct	free_work;	/* Deferred free processor */
- 	struct rxrpc_call	*rxcall;	/* RxRPC call handle */
- 	struct rxrpc_peer	*peer;		/* Remote endpoint */
-@@ -169,7 +169,6 @@ struct afs_call {
- 	unsigned		reply_max;	/* maximum size of reply */
- 	unsigned		count2;		/* count used in unmarshalling */
- 	unsigned char		unmarshall;	/* unmarshalling phase */
--	bool			drop_ref;	/* T if need to drop ref for incoming call */
- 	bool			need_attention;	/* T if RxRPC poked us */
- 	bool			async;		/* T if asynchronous */
- 	bool			upgrade;	/* T to request service upgrade */
-@@ -208,7 +207,7 @@ struct afs_call_type {
- 	void (*async_rx)(struct work_struct *work);
- 
- 	/* Work function */
--	void (*work)(struct work_struct *work);
-+	void (*work)(struct afs_call *call);
- 
- 	/* Call done function (gets called immediately on success or failure) */
- 	void (*done)(struct afs_call *call);
-@@ -1381,7 +1380,6 @@ extern int __net_init afs_open_socket(struct afs_net *);
+@@ -1379,7 +1379,7 @@ extern struct workqueue_struct *afs_async_calls;
+ extern int __net_init afs_open_socket(struct afs_net *);
  extern void __net_exit afs_close_socket(struct afs_net *);
  extern void afs_charge_preallocation(struct work_struct *);
- extern void afs_put_call(struct afs_call *);
--void afs_deferred_put_call(struct afs_call *call);
+-extern void afs_put_call(struct afs_call *);
++void afs_put_call(struct afs_call *call, enum afs_call_trace trace);
  void afs_make_call(struct afs_call *call, gfp_t gfp);
  void afs_deliver_to_call(struct afs_call *call);
  void afs_wait_for_call_to_complete(struct afs_call *call);
-@@ -1494,7 +1492,6 @@ static inline void afs_set_call_complete(struct afs_call *call,
- 					 int error, u32 remote_abort)
- {
- 	enum afs_call_state state;
--	bool ok = false;
+@@ -1400,8 +1400,7 @@ static inline struct afs_call *afs_get_call(struct afs_call *call,
+ 	__refcount_inc(&call->ref, &r);
  
- 	spin_lock_bh(&call->state_lock);
- 	state = call->state;
-@@ -1504,19 +1501,8 @@ static inline void afs_set_call_complete(struct afs_call *call,
- 		call->state = AFS_CALL_COMPLETE;
- 		trace_afs_call_state(call, state, AFS_CALL_COMPLETE,
- 				     error, remote_abort);
--		ok = true;
- 	}
- 	spin_unlock_bh(&call->state_lock);
--	if (ok) {
--		trace_afs_call_done(call);
--
--		/* Asynchronous calls have two refs to release - one from the alloc and
--		 * one queued with the work item - and we can't just deallocate the
--		 * call because the work item may be queued again.
--		 */
--		if (call->drop_ref)
--			afs_put_call(call);
--	}
+ 	trace_afs_call(call->debug_id, why, r + 1,
+-		       atomic_read(&call->net->nr_outstanding_calls),
+-		       __builtin_return_address(0));
++		       atomic_read(&call->net->nr_outstanding_calls));
+ 	return call;
  }
  
- /*
+@@ -1410,8 +1409,7 @@ static inline void afs_see_call(struct afs_call *call, enum afs_call_trace why)
+ 	int r = refcount_read(&call->ref);
+ 
+ 	trace_afs_call(call->debug_id, why, r,
+-		       atomic_read(&call->net->nr_outstanding_calls),
+-		       __builtin_return_address(0));
++		       atomic_read(&call->net->nr_outstanding_calls));
+ }
+ 
+ static inline void afs_make_op_call(struct afs_operation *op, struct afs_call *call,
 diff --git a/fs/afs/rxrpc.c b/fs/afs/rxrpc.c
-index 06c711c75f55..a404b6f0cc7c 100644
+index a404b6f0cc7c..a1b9ced4e0f4 100644
 --- a/fs/afs/rxrpc.c
 +++ b/fs/afs/rxrpc.c
-@@ -177,7 +177,6 @@ static struct afs_call *afs_alloc_call(struct afs_net *net,
- 	call->debug_id = atomic_inc_return(&rxrpc_debug_id);
- 	refcount_set(&call->ref, 1);
- 	INIT_WORK(&call->async_work, type->async_rx ?: afs_process_async_call);
--	INIT_WORK(&call->work, call->type->work);
- 	INIT_WORK(&call->free_work, afs_deferred_free_worker);
- 	init_waitqueue_head(&call->waitq);
- 	spin_lock_init(&call->state_lock);
-@@ -244,37 +243,6 @@ static void afs_deferred_free_worker(struct work_struct *work)
- 	afs_free_call(call);
+@@ -138,7 +138,7 @@ void afs_close_socket(struct afs_net *net)
+ 	cancel_work_sync(&net->charge_preallocation_work);
+ 
+ 	if (net->spare_incoming_call) {
+-		afs_put_call(net->spare_incoming_call);
++		afs_put_call(net->spare_incoming_call, afs_call_trace_put_spare_svc);
+ 		net->spare_incoming_call = NULL;
+ 	}
+ 
+@@ -183,14 +183,14 @@ static struct afs_call *afs_alloc_call(struct afs_net *net,
+ 	call->iter = &call->def_iter;
+ 
+ 	o = atomic_inc_return(&net->nr_outstanding_calls);
+-	trace_afs_call(call->debug_id, afs_call_trace_alloc, 1, o,
+-		       __builtin_return_address(0));
++	trace_afs_call(call->debug_id, afs_call_trace_alloc, 1, o);
+ 	return call;
  }
  
--/*
-- * Dispose of a reference on a call, deferring the cleanup to a workqueue
-- * to avoid lock recursion.
-- */
--void afs_deferred_put_call(struct afs_call *call)
--{
--	struct afs_net *net = call->net;
--	unsigned int debug_id = call->debug_id;
--	bool zero;
--	int r, o;
+ static void afs_free_call(struct afs_call *call)
+ {
+ 	struct afs_net *net = call->net;
++	unsigned int debug_id = call->debug_id;
+ 	int o;
+ 
+ 	ASSERT(!work_pending(&call->async_work));
+@@ -207,13 +207,10 @@ static void afs_free_call(struct afs_call *call)
+ 
+ 	afs_unuse_server_notime(call->net, call->server, afs_server_trace_unuse_call);
+ 	kfree(call->request);
 -
--	zero = __refcount_dec_and_test(&call->ref, &r);
 -	o = atomic_read(&net->nr_outstanding_calls);
+-	trace_afs_call(call->debug_id, afs_call_trace_free, 0, o,
+-		       __builtin_return_address(0));
+ 	kfree(call);
+ 
+ 	o = atomic_dec_return(&net->nr_outstanding_calls);
++	trace_afs_call(debug_id, afs_call_trace_free, 0, o);
+ 	if (o == 0)
+ 		wake_up_var(&net->nr_outstanding_calls);
+ }
+@@ -221,7 +218,7 @@ static void afs_free_call(struct afs_call *call)
+ /*
+  * Dispose of a reference on a call.
+  */
+-void afs_put_call(struct afs_call *call)
++void afs_put_call(struct afs_call *call, enum afs_call_trace trace)
+ {
+ 	struct afs_net *net = call->net;
+ 	unsigned int debug_id = call->debug_id;
+@@ -230,8 +227,7 @@ void afs_put_call(struct afs_call *call)
+ 
+ 	zero = __refcount_dec_and_test(&call->ref, &r);
+ 	o = atomic_read(&net->nr_outstanding_calls);
 -	trace_afs_call(debug_id, afs_call_trace_put, r - 1, o,
 -		       __builtin_return_address(0));
--	if (zero)
--		schedule_work(&call->free_work);
--}
--
--/*
-- * Queue the call for actual work.
-- */
--static void afs_queue_call_work(struct afs_call *call)
--{
--	if (call->type->work) {
--		afs_get_call(call, afs_call_trace_work);
--		if (!queue_work(afs_wq, &call->work))
--			afs_put_call(call);
--	}
--}
--
- /*
-  * allocate a call with flat request and reply buffers
-  */
-@@ -375,10 +343,8 @@ void afs_make_call(struct afs_call *call, gfp_t gfp)
- 	/* If the call is going to be asynchronous, we need an extra ref for
++	trace_afs_call(debug_id, trace, r - 1, o);
+ 	if (zero)
+ 		afs_free_call(call);
+ }
+@@ -276,7 +272,7 @@ struct afs_call *afs_alloc_flat_call(struct afs_net *net,
+ 	return call;
+ 
+ nomem_free:
+-	afs_put_call(call);
++	afs_put_call(call, afs_call_trace_put_oom);
+ nomem_call:
+ 	return NULL;
+ }
+@@ -344,7 +340,7 @@ void afs_make_call(struct afs_call *call, gfp_t gfp)
  	 * the call to hold itself so the caller need not hang on to its ref.
  	 */
--	if (call->async) {
-+	if (call->async)
- 		afs_get_call(call, afs_call_trace_get);
--		call->drop_ref = true;
--	}
+ 	if (call->async)
+-		afs_get_call(call, afs_call_trace_get);
++		afs_get_call(call, afs_call_trace_get_make_async_call);
  
  	/* create a call */
  	rxcall = rxrpc_kernel_begin_call(call->net->socket, call->peer, call->key,
-@@ -479,8 +445,7 @@ void afs_make_call(struct afs_call *call, gfp_t gfp)
- 	if (call->rxcall)
- 		rxrpc_kernel_shutdown_call(call->net->socket, call->rxcall);
+@@ -418,7 +414,7 @@ void afs_make_call(struct afs_call *call, gfp_t gfp)
+ 					RX_USER_ABORT, ret,
+ 					afs_abort_send_data_error);
  	if (call->async) {
--		if (cancel_work_sync(&call->async_work))
--			afs_put_call(call);
-+		cancel_work_sync(&call->async_work);
- 		afs_set_call_complete(call, ret, 0);
+-		afs_see_call(call, afs_call_trace_async_abort);
++		afs_see_call(call, afs_call_trace_see_async_abort);
+ 		return;
  	}
  
-@@ -566,7 +531,8 @@ void afs_deliver_to_call(struct afs_call *call)
- 		switch (ret) {
- 		case 0:
- 			call->responded = true;
--			afs_queue_call_work(call);
-+			if (call->work)
-+				call->work(call);
- 			if (state == AFS_CALL_CL_PROC_REPLY) {
- 				if (call->op)
- 					set_bit(AFS_SERVER_FL_MAY_HAVE_CB,
-@@ -616,6 +582,7 @@ void afs_deliver_to_call(struct afs_call *call)
- 	}
+@@ -434,7 +430,7 @@ void afs_make_call(struct afs_call *call, gfp_t gfp)
+ 	trace_afs_call_done(call);
+ error_kill_call:
+ 	if (call->async)
+-		afs_see_call(call, afs_call_trace_async_kill);
++		afs_see_call(call, afs_call_trace_see_async_kill);
+ 	if (call->type->immediate_cancel)
+ 		call->type->immediate_cancel(call);
  
- done:
-+	trace_afs_call_done(call);
- 	if (call->type->done)
- 		call->type->done(call);
- out:
-@@ -704,19 +671,16 @@ static void afs_wake_up_async_call(struct sock *sk, struct rxrpc_call *rxcall,
- 				   unsigned long call_user_ID)
- {
- 	struct afs_call *call = (struct afs_call *)call_user_ID;
--	int r;
- 
+@@ -675,11 +671,7 @@ static void afs_wake_up_async_call(struct sock *sk, struct rxrpc_call *rxcall,
  	trace_afs_notify_call(rxcall, call);
  	call->need_attention = true;
  
--	if (__refcount_inc_not_zero(&call->ref, &r)) {
--		trace_afs_call(call->debug_id, afs_call_trace_wake, r + 1,
--			       atomic_read(&call->net->nr_outstanding_calls),
--			       __builtin_return_address(0));
-+	trace_afs_call(call->debug_id, afs_call_trace_wake,
-+		       refcount_read(&call->ref),
-+		       atomic_read(&call->net->nr_outstanding_calls),
-+		       __builtin_return_address(0));
- 
--		if (!queue_work(afs_async_calls, &call->async_work))
--			afs_deferred_put_call(call);
--	}
-+	queue_work(afs_async_calls, &call->async_work);
+-	trace_afs_call(call->debug_id, afs_call_trace_wake,
+-		       refcount_read(&call->ref),
+-		       atomic_read(&call->net->nr_outstanding_calls),
+-		       __builtin_return_address(0));
+-
++	afs_see_call(call, afs_call_trace_see_async_wake);
+ 	queue_work(afs_async_calls, &call->async_work);
  }
  
- /*
-@@ -729,12 +693,20 @@ static void afs_process_async_call(struct work_struct *work)
+@@ -693,10 +685,7 @@ static void afs_process_async_call(struct work_struct *work)
  
  	_enter("");
  
-+	trace_afs_call(call->debug_id, afs_call_trace_async_process,
-+		       refcount_read(&call->ref),
-+		       atomic_read(&call->net->nr_outstanding_calls),
-+		       __builtin_return_address(0));
-+
+-	trace_afs_call(call->debug_id, afs_call_trace_async_process,
+-		       refcount_read(&call->ref),
+-		       atomic_read(&call->net->nr_outstanding_calls),
+-		       __builtin_return_address(0));
++	afs_see_call(call, afs_call_trace_see_async_process);
+ 
  	if (call->state < AFS_CALL_COMPLETE && call->need_attention) {
  		call->need_attention = false;
- 		afs_deliver_to_call(call);
- 	}
+@@ -705,7 +694,7 @@ static void afs_process_async_call(struct work_struct *work)
  
--	afs_put_call(call);
-+	if (call->state == AFS_CALL_COMPLETE) {
-+		cancel_work(&call->async_work);
-+		afs_put_call(call);
-+	}
+ 	if (call->state == AFS_CALL_COMPLETE) {
+ 		cancel_work(&call->async_work);
+-		afs_put_call(call);
++		afs_put_call(call, afs_call_trace_put_async_complete);
+ 	}
  	_leave("");
  }
+@@ -758,7 +747,7 @@ static void afs_rx_discard_new_call(struct rxrpc_call *rxcall,
+ 	struct afs_call *call = (struct afs_call *)user_call_ID;
  
-@@ -760,7 +732,6 @@ void afs_charge_preallocation(struct work_struct *work)
- 			if (!call)
- 				break;
+ 	call->rxcall = NULL;
+-	afs_put_call(call);
++	afs_put_call(call, afs_call_trace_put_discard_prealloc);
+ }
  
--			call->drop_ref = true;
- 			call->async = true;
- 			call->state = AFS_CALL_SV_AWAIT_OP_ID;
- 			init_waitqueue_head(&call->waitq);
-@@ -836,7 +807,7 @@ static int afs_deliver_cm_op_id(struct afs_call *call)
- 							     &call->enctype);
- 
- 	trace_afs_cb_call(call);
--	call->work.func = call->type->work;
-+	call->work = call->type->work;
- 
- 	/* pass responsibility for the remainder of this message off to the
- 	 * cache manager op */
+ /*
+diff --git a/fs/afs/vl_probe.c b/fs/afs/vl_probe.c
+index 3d2e0c925460..1d70887c9f31 100644
+--- a/fs/afs/vl_probe.c
++++ b/fs/afs/vl_probe.c
+@@ -186,7 +186,7 @@ static bool afs_do_probe_vlserver(struct afs_net *net,
+ 					       server_index);
+ 		if (!IS_ERR(call)) {
+ 			afs_prioritise_error(_e, call->error, call->abort_code);
+-			afs_put_call(call);
++			afs_put_call(call, afs_call_trace_put_vl_get_caps);
+ 			in_progress = true;
+ 		} else {
+ 			afs_prioritise_error(_e, PTR_ERR(call), 0);
+diff --git a/fs/afs/vlclient.c b/fs/afs/vlclient.c
+index a40b43464cfa..8a4c8c9a1e39 100644
+--- a/fs/afs/vlclient.c
++++ b/fs/afs/vlclient.c
+@@ -153,7 +153,7 @@ struct afs_vldb_entry *afs_vl_get_entry_by_name_u(struct afs_vl_cursor *vc,
+ 	vc->call_abort_code	= call->abort_code;
+ 	vc->call_error		= call->error;
+ 	vc->call_responded	= call->responded;
+-	afs_put_call(call);
++	afs_put_call(call, afs_call_trace_put_vl_call);
+ 	if (vc->call_error) {
+ 		kfree(entry);
+ 		return ERR_PTR(vc->call_error);
+@@ -303,7 +303,7 @@ struct afs_addr_list *afs_vl_get_addrs_u(struct afs_vl_cursor *vc,
+ 	vc->call_error		= call->error;
+ 	vc->call_responded	= call->responded;
+ 	alist			= call->ret_alist;
+-	afs_put_call(call);
++	afs_put_call(call, afs_call_trace_put_vl_call);
+ 	if (vc->call_error) {
+ 		afs_put_addrlist(alist, afs_alist_trace_put_getaddru);
+ 		return ERR_PTR(vc->call_error);
+@@ -666,7 +666,7 @@ struct afs_addr_list *afs_yfsvl_get_endpoints(struct afs_vl_cursor *vc,
+ 	vc->call_error		= call->error;
+ 	vc->call_responded	= call->responded;
+ 	alist			= call->ret_alist;
+-	afs_put_call(call);
++	afs_put_call(call, afs_call_trace_put_vl_call);
+ 	if (vc->call_error) {
+ 		afs_put_addrlist(alist, afs_alist_trace_put_getaddru);
+ 		return ERR_PTR(vc->call_error);
+@@ -784,7 +784,7 @@ char *afs_yfsvl_get_cell_name(struct afs_vl_cursor *vc)
+ 	vc->call_error		= call->error;
+ 	vc->call_responded	= call->responded;
+ 	cellname		= call->ret_str;
+-	afs_put_call(call);
++	afs_put_call(call, afs_call_trace_put_vl_call);
+ 	if (vc->call_error) {
+ 		kfree(cellname);
+ 		return ERR_PTR(vc->call_error);
 diff --git a/include/trace/events/afs.h b/include/trace/events/afs.h
-index cf7218efb861..4f18a2a5b9f6 100644
+index 4f18a2a5b9f6..df397c11df85 100644
 --- a/include/trace/events/afs.h
 +++ b/include/trace/events/afs.h
-@@ -123,6 +123,7 @@ enum yfs_cm_operation {
- 	EM(afs_call_trace_alloc,		"ALLOC") \
- 	EM(afs_call_trace_async_abort,		"ASYAB") \
- 	EM(afs_call_trace_async_kill,		"ASYKL") \
-+	EM(afs_call_trace_async_process,	"ASYPR") \
- 	EM(afs_call_trace_free,			"FREE ") \
- 	EM(afs_call_trace_get,			"GET  ") \
- 	EM(afs_call_trace_put,			"PUT  ") \
+@@ -120,15 +120,24 @@ enum yfs_cm_operation {
+  * Declare tracing information enums and their string mappings for display.
+  */
+ #define afs_call_traces \
+-	EM(afs_call_trace_alloc,		"ALLOC") \
+-	EM(afs_call_trace_async_abort,		"ASYAB") \
+-	EM(afs_call_trace_async_kill,		"ASYKL") \
+-	EM(afs_call_trace_async_process,	"ASYPR") \
+-	EM(afs_call_trace_free,			"FREE ") \
+-	EM(afs_call_trace_get,			"GET  ") \
+-	EM(afs_call_trace_put,			"PUT  ") \
+-	EM(afs_call_trace_wake,			"WAKE ") \
+-	E_(afs_call_trace_work,			"QUEUE")
++	EM(afs_call_trace_alloc,		"ALLOC      ") \
++	EM(afs_call_trace_free,			"FREE       ") \
++	EM(afs_call_trace_get_make_async_call,	"GET a-make ") \
++	EM(afs_call_trace_put_async_complete,	"PUT a-cmpl ") \
++	EM(afs_call_trace_put_discard_prealloc,	"PUT dis-pre") \
++	EM(afs_call_trace_put_get_capabilities,	"PUT get-cap") \
++	EM(afs_call_trace_put_giveupcallbacks,	"PUT gvup-cb") \
++	EM(afs_call_trace_put_oom,		"PUT oom    ") \
++	EM(afs_call_trace_put_read_complete,	"PUT rd-cpl ") \
++	EM(afs_call_trace_put_read_op,		"PUT rd-op  ") \
++	EM(afs_call_trace_put_spare_svc,	"PUT spare-s") \
++	EM(afs_call_trace_put_vl_call,		"PUT vl-call") \
++	EM(afs_call_trace_put_vl_get_caps,	"PUT vl-gcap") \
++	EM(afs_call_trace_put_wait_op,		"PUT wt-op  ") \
++	EM(afs_call_trace_see_async_abort,	"SEE a-abort") \
++	EM(afs_call_trace_see_async_kill,	"SEE a-kill ") \
++	EM(afs_call_trace_see_async_process,	"SEE a-proc ") \
++	E_(afs_call_trace_see_async_wake,	"SEE a-wake ")
+ 
+ #define afs_server_traces \
+ 	EM(afs_server_trace_callback,		"CALLBACK ") \
+@@ -694,16 +703,15 @@ TRACE_EVENT(afs_cb_call,
+ 
+ TRACE_EVENT(afs_call,
+ 	    TP_PROTO(unsigned int call_debug_id, enum afs_call_trace op,
+-		     int ref, int outstanding, const void *where),
++		     int ref, int outstanding),
+ 
+-	    TP_ARGS(call_debug_id, op, ref, outstanding, where),
++	    TP_ARGS(call_debug_id, op, ref, outstanding),
+ 
+ 	    TP_STRUCT__entry(
+ 		    __field(unsigned int,		call)
+ 		    __field(int,			op)
+ 		    __field(int,			ref)
+ 		    __field(int,			outstanding)
+-		    __field(const void *,		where)
+ 			     ),
+ 
+ 	    TP_fast_assign(
+@@ -711,15 +719,13 @@ TRACE_EVENT(afs_call,
+ 		    __entry->op = op;
+ 		    __entry->ref = ref;
+ 		    __entry->outstanding = outstanding;
+-		    __entry->where = where;
+ 			   ),
+ 
+-	    TP_printk("c=%08x %s r=%d o=%d sp=%pSR",
++	    TP_printk("c=%08x %s r=%d o=%d",
+ 		      __entry->call,
+ 		      __print_symbolic(__entry->op, afs_call_traces),
+ 		      __entry->ref,
+-		      __entry->outstanding,
+-		      __entry->where)
++		      __entry->outstanding)
+ 	    );
+ 
+ TRACE_EVENT(afs_make_fs_call,
 
 
