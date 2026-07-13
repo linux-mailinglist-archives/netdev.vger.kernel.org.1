@@ -1,234 +1,206 @@
-Return-Path: <netdev+bounces-307284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307285-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mtlqKdFUVWr5mwAAu9opvQ
-	(envelope-from <netdev+bounces-307284-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 23:12:49 +0200
+	id 0vkmOZZVVWoenAAAu9opvQ
+	(envelope-from <netdev+bounces-307285-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 23:16:06 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B2E974F335
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 23:12:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 41EBA74F358
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 23:16:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=0sec.ai header.s=google header.b=AuwGr0lG;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307284-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307284-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Do7EiwmZ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307285-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307285-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 827CB306DAB2
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 21:12:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1B510303740A
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 21:16:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0A5F35F17D;
-	Mon, 13 Jul 2026 21:12:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F83733E348;
+	Mon, 13 Jul 2026 21:16:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F69735E1D4
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 21:12:21 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783977142; cv=pass; b=pg3Gtx8bW62jUfgSpVshEkGNWjI513+qNW83Lu8OrmG+hOKlhQhKGYUGGmAYOd2J0Vq4H1KccwdbWfkcMD2u9TiW1lJtckhdC8VoMgBw4JLYUFN2j0PCK0EgCg14lmxK7XC3/GHd6ZP3d0P1qUSbJkf1BzZBRSqryMkrZHSDeZE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783977142; c=relaxed/simple;
-	bh=8PXVs/vJwXci6zYoPKQ+hpQ4HKNdygv1qoTYmsjQx5Q=;
-	h=In-Reply-To:References:MIME-Version:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SBeNOV9p1lTKoUP2GnOt8zplwLqGXlfKKY3ZQb8sb0xi26SndRxl28Ha4UBSk1UOFGSX2KCBAY1JYsD3COM5MhT8ITfP+2kzrzvS0Vfds9sX6vx+YYAMBWXhLbCFvh2fR7gP8IkVctncUBmqfFc7eEeMjpbkCDocV8dqujUpiis=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=AuwGr0lG; arc=pass smtp.client-ip=209.85.214.172
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2cc891373e0so41571405ad.2
-        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 14:12:21 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783977140; cv=none;
-        d=google.com; s=arc-20260327;
-        b=m5w6v6eYdNI6EUML2Rl7paSFsC3GtivPB2xZ7y0TSYrNNHsYBl9fDYwZyQWsV3smzU
-         PxtJ/iW+45CSHzEhg9lCsdOh/fMFGs9zwxmx3YLwOd7avhhhuDjdbJGrVuYpA9Qx0MRK
-         iNKpu2yepW4c8SKJFCKhz7tc8aiG6fYLQQF5+hRvecsR0Q+et88xMjZufJwWz4Yg5HRh
-         KizWMP/EHQRJUpRL+77HeHl/fM8GgNKM06xsAK+z11wicudUr5azSzC+znO2w1qRwath
-         hrptNFhy5oAe5dom+vzQeUoVpFCAoQVo8C8d8Pplfbr6ozUmXn5SdA1N1Bq5LFsRp0rN
-         DcQg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:mime-version:references
-         :in-reply-to:dkim-signature;
-        bh=qUBCghi6kjnH1ka8HUmHkrbbiY09NwwjNH5EUa3nwfI=;
-        fh=fr59jz4y/jo64MLSSKguX5xgAvW5/nQnxKR6cLM608M=;
-        b=mmAImXEux6gW5X4RF91s3RbGUfwLKxg8zoD1tpc5G49x+QSjpDuieCZ24E+AwKeK9m
-         6iN0zbSxuzPUMlT7HSnPZzt5O+JDP3PqVOl8cba5yVQfXJAtxhyCf8LYgZACDNd9VoZR
-         UbbIciy4XDLGfPKdse0geFyekzHFTL5zioe4fEwYiEBzGrvGREHJTeIQdf7y6g0wPNYx
-         IH0aDZDs8DFzhPXqlcH5/REiYGPYJHAMIEsx+8ZQt9m2fyVd8iN5hsV6LzKZXfNDFjbL
-         /zAqHcB/zJdX0lweCl028UCUFFyYDsiCvSMKEcbhLfOKUtKEPwKIc8s+ye3G6PTheisr
-         I/RA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B37E2652A2
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 21:16:00 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783977362; cv=none; b=qRLuPFIp4EHfh5wpcSnJEpDeg+mvLlXAkRwWaR6LDR/cepYYlwrKbjBa7epWGClxLKIoL0Inso9QPRnWEJOiHku96fars4k5dsZMULGOj0TnBBH92BOUMXE5c4e6ii9rigoXZZEcgRsjIRTyYYtMEhxzRQt/FFEKSnkDY5O2orY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783977362; c=relaxed/simple;
+	bh=OjupI1J8Uf6ZmRz+nFaqT/63B4bo16S2X+GqHuBV27E=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=b2uR5o+05PGPLBcyxMS+AFGDD9NM/Jm8GGAvHM0+cWgeTGMvu0yB48jpDULfcNyAA9NRzWAI3rlqriRCt3nY4Snnr7AmrcKK8JUNcous9GWPsyKxrHqi9yWp++GsyMpCki1IYtYyrAlJswb6RzOhnoh8IBFnvDiudaSvejtWSBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Do7EiwmZ; arc=none smtp.client-ip=209.85.128.52
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-493f140ca8eso22418355e9.1
+        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 14:16:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=0sec.ai; s=google; t=1783977140; x=1784581940; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:mime-version
-         :references:in-reply-to:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=qUBCghi6kjnH1ka8HUmHkrbbiY09NwwjNH5EUa3nwfI=;
-        b=AuwGr0lGDDCHJtNm9lXTNc3DAbpSxBMnkBqNpX4312yBpmq5Q24mtRGrI3uPPLgQH9
-         OMYgIz3Sr+2vC20tljuj9F0rhHDa5utb8guwLtVG2CRLfrzdBvrp+asMiPEiUkV9LSyK
-         8bWdtWL40Zxx3PxkhwMqJni22W+CchbzzZ/xChuoib8HlT0/mTnORhSmc5LsJObSywMY
-         3S2zBTJZO2p1wMesvG561TV0GfZCNj6646x3r8ZDoWwNy9CFa79KPFCRpum6lx5mrsna
-         kgv6SdZSPoqoBn/Ht8yNUo212gCUSeK2EslvC9VDcW4UIK9pWR3ij80TRyD+WkkRJUCc
-         1PLQ==
+        d=gmail.com; s=20251104; t=1783977359; x=1784582159; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=2wQJEgASjgsy4yDd4CAOFiJYx60jS5AQH+okUrcyglg=;
+        b=Do7EiwmZjZewBwE5xIaH16fPw5ti35pFMVzdFswhPRtuCuRgMmzQj/bcYHXi88RJey
+         EkIff1FRN+EUdwI3KFX7a5qnq3/ou+PP3tv1nRH7pcqcOmtWVo2YYU7g4sD5ahVvbXyP
+         yQkVufcyd8z5A76iPwg03lwqM+p8QNzKkMH+vk7E8OR1DJamSHuDQTzaW/IPJfe142Y9
+         HG9rylTBXOxomReUX2BXVK/rnhs6WPHoaGYAo4sqfLjW+SOC0/RszY81sM5RpS25FEKu
+         P9h5phXcT+qDgw4Ju7Vil+2M5mUdFyn+LiAAUjRnkidokAgo6LAz72swbQKZM1Go3FBz
+         CcmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783977140; x=1784581940;
-        h=content-type:cc:to:subject:message-id:date:from:mime-version
-         :references:in-reply-to:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=qUBCghi6kjnH1ka8HUmHkrbbiY09NwwjNH5EUa3nwfI=;
-        b=VerYnyOTXS8CskRqPFP1QX2GW6AWKy/gVNlDtBoqPzZQU/HmHwQEBID0rlLhPnR4yL
-         7TVn+Rx5t2zUf7F6d6KJiresq5BH9PHB3saDb4D4eRqz0HeSl2O+TG7/2efrbyXVyMun
-         1LE2gxxma2+HroFXpOrflWKu0MNgjw0Pf74+IPymm8oLLSKKyjKnMSGn7WViKeUYKTbz
-         pyNGsBo5PNlR8iR64PJd/1A5bVMrpyBqSYe+Hjs4a96u3dNzhWYL6zvG+vJdBDpF3Cky
-         CE1tkdxfTMEEn15iynSdCafZ1cYqRutmriJEu66/tlQQvcKFDpsJIpgKdEfnBepQjaU4
-         vFog==
-X-Forwarded-Encrypted: i=1; AHgh+RpC8/tTBj0ErYTaF6jY4EYlRjA4/jCEKjts2uOXDqa1rqMUsexHEdC7RwuCMJswrizCVc1JzKw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzH/KvxeUCqhQkRYqimnh8vI6XDL12Oz+rAYTfIxfuwdO6+uZv8
-	ZrQgToxZ/4zvQEsyfX++o6v3ipROfH0X22OsETmLWKpCYL/crg2kC8n0pIGPKjXlnue3VBQKaxt
-	7FI9sxZppSXqDaJRswzRxjvrublI6Wz4Ps8QT4bW9HqUph6eZUNWF3Q==
-X-Gm-Gg: AfdE7cnwP++CBMhEUh1CCpR5/lOezD6YSBOVdUFGl4r4xtq296cihqeWxHwtvYqMqla
-	53QAMRq+ZDO1ayKWl3AakQabSc7fkQgln36YDAJnGfoUY2Wvw4QWEMfYrR/0+8wMw72ZFgLGboa
-	h+WYgD0Ve80eUQFBdQNdKhjqTm4lGdHwLVGqIh88S/GtlydSMzPtVO4i4FP3J15yE2xIwtNCXVs
-	Tpmo0oTeDiIUOpUmPFlJBM2v3uFfr8ndV/ojrsANQ4+fZmqhwdvlTjXEWnxnMjRBIw3wrZM+hS9
-	tmtgZaMaSwJbBqD+JqDt5ZuGqOken7v/YC0kNJyyq5J9ZFIBZGqlv4PYdA==
-X-Received: by 2002:a17:903:2301:b0:2ca:ed41:d331 with SMTP id
- d9443c01a7336-2ce9f27eb79mr100834245ad.45.1783977140474; Mon, 13 Jul 2026
- 14:12:20 -0700 (PDT)
-Received: from 77377267392 named unknown by gmailapi.google.com with HTTPREST;
- Mon, 13 Jul 2026 16:12:20 -0500
-Received: from 77377267392 named unknown by gmailapi.google.com with HTTPREST;
- Mon, 13 Jul 2026 16:12:20 -0500
-In-Reply-To: <20260713200417.dghlrj4ca27b6nd4@skbuf>
-References: <20260713194010.54642-1-doruk@0sec.ai> <20260713194010.54642-2-doruk@0sec.ai>
- <20260713200417.dghlrj4ca27b6nd4@skbuf>
+        d=1e100.net; s=20251104; t=1783977359; x=1784582159;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=2wQJEgASjgsy4yDd4CAOFiJYx60jS5AQH+okUrcyglg=;
+        b=fxF/EZ4NiklVpuRxAmCSft6h/4YzZ/2nBRgmcdpsJmg+4ixxAT/ZVpVus2iv+TsjtD
+         nMHDu0Fu8HszyugboU1GSk03U7PgSPzoF5QOYTykXWau3HSB8WH3SVe+SYferPxXLNAv
+         NnLIktzMD6GIW4ZLxZiW/4ryU2PctJmmNc50d55wD/PWxcJ3/4b6BZC4IaWmgL8XMlEN
+         CwwNpVzDYfEVq4L7p3SvIXanIqa/5rtXSkd5Jb1HZbs4pA4/8Tvl0w6rUPY139DYf1BR
+         BY9ixaktgI3EzwQzHhQoxTCQ2983z3ACHwEC/BJPaMPbyDsM2woh3FuRwnoqMRpVUSXr
+         Qw3w==
+X-Forwarded-Encrypted: i=1; AHgh+RqREJGqaDvxMLeA0pXQPHm76NzAhWsE1wBjTIbli1tvlR1nZx/6faNQ4EgyWRShioJCO3f7G/0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvIvIJDIjikbZeeI39jsvl1gvimd7LvnGTEGWoZQKMdBk1unBE
+	kz/OEg1fVy9irDJg32EN3a/WYicBRaeoAYPT8av720UgnrEgK+AqunRx
+X-Gm-Gg: AfdE7ck7wNY7ikFFrstkV0w5w0jONMNSnZbFN+Q0PF1h3K7o2Y1wwmTrydXxbT8zHdc
+	x8tRyoaB+TNPgN0uYe65xcCAycoJKWLD0gku5sJOabCtzvzXNIDwMYIH78o1EtV/+GZlsrJ3qmj
+	qO+V0fu6tmRqK4jbvREsdEZf46JkWiEfxjrkWUnEneMnPAPvipOzQh6SPoIYrDhX+xOhA8vU2K6
+	USzg7pekd1OD2oqZTuNvEaO2bEEdLe3I6DgeEPypV/elj3oXVzpt3Wbo9ccj+kEukH8k8ScDbWz
+	ygfJSOli04p8MCLwKoU34wJrgJeXw9Nu0ZTWnVnyO7HxZ4GR0MQIOBWULtZflYYOuy4ae2MMaL3
+	NX1hqyTqkvH/eJLVo8PwPEPtW0bpZT7g4vyz/MHje1x+Ie5IKFPQMiIvt22W9RR5y+8kMsPqnk0
+	8j4Q6hbPKtVNNQlrFhQkYObwXp0GcV1JPIzHQ50K9zvOINLrPT8+sqWsCUSDJz
+X-Received: by 2002:a05:600c:464a:b0:492:7083:e5a with SMTP id 5b1f17b1804b1-493f882b117mr72487425e9.31.1783977358718;
+        Mon, 13 Jul 2026 14:15:58 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f462e0cb2sm2500839f8f.0.2026.07.13.14.15.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jul 2026 14:15:58 -0700 (PDT)
+Date: Mon, 13 Jul 2026 22:15:56 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Doruk Tan Ozturk <doruk@0sec.ai>
+Cc: david@ixit.cz, vadim.fedorenko@linux.dev, horms@kernel.org,
+ oe-linux-nfc@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v2] nfc: llcp: reject PDUs shorter than the LLCP
+ header
+Message-ID: <20260713221556.13a830b8@pumpkin>
+In-Reply-To: <20260713155848.55530-1-doruk@0sec.ai>
+References: <20260713155848.55530-1-doruk@0sec.ai>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Doruk (0sec)" <doruk@0sec.ai>
-Date: Mon, 13 Jul 2026 16:12:20 -0500
-X-Gm-Features: AVVi8Ccf64lA0azySl9H8ulwhmt3h2F_jWjPpkuQXsHGkD6_OCbSPA-I2DgzOTY
-Message-ID: <CAPdMp1qf4q42MAaRqqzYnhYyU9KvdryGQR+TWsFNvJ1oCTnPKw@mail.gmail.com>
-Subject: Re: [PATCH net 1/3] net: dsa: tag_ocelot_8021q: don't read an unset
- MAC header on transmit
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Woojung Huh <woojung.huh@microchip.com>, Nick Child <nnac123@linux.ibm.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	Sabrina Dubroca <sd@queasysnail.net>, Arun Ramadoss <arun.ramadoss@microchip.com>, 
-	UNGLinuxDriver@microchip.com, Michael Ellerman <mpe@ellerman.id.au>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[0sec.ai:s=google];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307284-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:olteanv@gmail.com,m:andrew+netdev@lunn.ch,m:f.fainelli@gmail.com,m:woojung.huh@microchip.com,m:nnac123@linux.ibm.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:sd@queasysnail.net,m:arun.ramadoss@microchip.com,m:UNGLinuxDriver@microchip.com,m:mpe@ellerman.id.au,m:stable@vger.kernel.org,m:andrew@lunn.ch,m:ffainelli@gmail.com,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[0sec.ai];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-307285-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,microchip.com,linux.ibm.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,lists.ozlabs.org,queasysnail.net,ellerman.id.au];
+	FORGED_RECIPIENTS(0.00)[m:doruk@0sec.ai,m:david@ixit.cz,m:vadim.fedorenko@linux.dev,m:horms@kernel.org,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[0sec.ai:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[]
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3B2E974F335
+X-Rspamd-Queue-Id: 41EBA74F358
 
-Hi Vladimir,
+On Mon, 13 Jul 2026 17:58:48 +0200
+Doruk Tan Ozturk <doruk@0sec.ai> wrote:
 
-Thanks for the review.
+> Every LLCP PDU begins with a two-byte header (DSAP/SSAP + PTYPE), but the
+> receive path never checked that a frame is at least LLCP_HEADER_SIZE bytes
+> before parsing it.
 
-I checked the DSA cases with CONFIG_NET_DSA_LOOP=y. Since dsa_loop
-normally uses DSA_TAG_PROTO_NONE, I used a local repro-only override
-of dsa_loop_get_protocol() to select the relevant tagger, then sent an
-AF_PACKET/SOCK_RAW frame with PACKET_QDISC_BYPASS and
-sll_protocol=ETH_P_IP through lan1.
+Is there a similar problem with non-linear skb?
+Maybe they can't get into this code, but who knows what can happen
+with unusual configs.
 
-That leaves skb->mac_header unset (65535) on the direct-xmit path.
+	David
 
-For tag_ocelot_8021q, the eth_hdr(skb) version reproduces as:
 
-  BUG: KASAN: slab-out-of-bounds in ocelot_xmit()
+> A peer LLCP PDU travels: NFC-DEP frame -> nfc_tm_data_received() (target /
+> NCI path) or nfc_llcp_recv() (initiator data-exchange callback) ->
+> __nfc_llcp_recv() -> rx_work -> nfc_llcp_rx_skb() ->
+> nfc_llcp_recv_connect(). For a CONNECT (or CC) PDU nfc_llcp_recv_connect()
+> computes
+> 
+> 	tlv_array_len = skb->len - LLCP_HEADER_SIZE;
+> 
+> as a size_t and hands it to the TLV walk. When skb->len is 0 or 1 the
+> subtraction wraps to a huge value and the walk runs far past the skb,
+> causing an out-of-bounds read; nfc_llcp_ptype()/nfc_llcp_ssap() likewise
+> read pdu->data[1] for such a short frame.
+> 
+> A nearby NFC device can reach this without authentication; LLCP link
+> activation happens automatically after NFC-DEP.
+> 
+> Reject PDUs shorter than the LLCP header in __nfc_llcp_recv(), the common
+> choke point shared by both the target (nfc_llcp_data_received()) and
+> initiator (nfc_llcp_recv()) receive paths, so a short skb is freed before
+> the rx_work worker is scheduled.
+> 
+> Reproduced with a KFENCE out-of-bounds read via /dev/virtual_nci on
+> linux-next.
+> 
+> Found by 0sec (https://0sec.ai) using automated source analysis.
+> 
+> Fixes: d646960f7986 ("NFC: Initial LLCP support")
+> Cc: stable@vger.kernel.org
+> Assisted-by: 0sec:claude-opus-4-8
+> Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
+> ---
+> v2: move the check into __nfc_llcp_recv() so a short skb is dropped
+>     before the rx_work worker is scheduled (Vadim Fedorenko), which also
+>     covers the initiator nfc_llcp_recv() path. Reword the commit message
+>     (drop the "same guard as AGF" wording) and add a KFENCE reproduction
+>     note.
+> 
+>  net/nfc/llcp_core.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+> index aed5fe1afef0..72b6e707ad0c 100644
+> --- a/net/nfc/llcp_core.c
+> +++ b/net/nfc/llcp_core.c
+> @@ -1565,6 +1565,11 @@ static void nfc_llcp_rx_work(struct work_struct *work)
+>  
+>  static void __nfc_llcp_recv(struct nfc_llcp_local *local, struct sk_buff *skb)
+>  {
+> +	if (skb->len < LLCP_HEADER_SIZE) {
+> +		kfree_skb(skb);
+> +		return;
+> +	}
+> +
+>  	local->rx_pending = skb;
+>  	timer_delete(&local->link_timer);
+>  	schedule_work(&local->rx_work);
 
-Switching that site to skb_eth_hdr(skb) makes the same reproducer run clean.
-
-I also checked the LAN937X path the same way by forcing
-DSA_TAG_PROTO_LAN937X. The eth_hdr(skb) version reproduces as:
-
-  BUG: KASAN: slab-out-of-bounds in lan937x_xmit()
-
-and the skb_eth_hdr(skb) version runs clean with the same packet sender.
-
-So yes, for these DSA TX paths this is a real bug on the
-PACKET_QDISC_BYPASS path, not just a future-proofing cleanup. I have
-not yet checked ibmveth with a pseries/ibmveth setup.
-
-For the older DSA commits you listed, I think they should be treated
-as stable candidates if they remove eth_hdr()/skb_mac_header() use
-from the same TX path. I can go through those individually and send a
-follow-up with the exact stable list if that would be useful.
-
-Thanks,
-Doruk
-
-On Mon, 13 Jul 2026 23:04:17 +0300, Vladimir Oltean <olteanv@gmail.com> wrote:
-> On Mon, Jul 13, 2026 at 09:40:08PM +0200, Doruk Tan Ozturk wrote:
-> > ocelot_xmit() reads the Ethernet header via eth_hdr(skb) to test the
-> > destination address against the link-local range.
-> >
-> > On the AF_PACKET SOCK_RAW + PACKET_QDISC_BYPASS transmit path the skb
-> > reaches ndo_start_xmit() with the MAC header unset, so eth_hdr(skb)
-> > resolves to skb->head + (u16)~0 and the read is out of bounds.
-> >
-> > On the TX path the L2 header is at skb->data, so use skb_eth_hdr(), as
-> > done for the same class by
-> > commit f5089008f90c ("macsec: don't read an unset MAC header in macsec_encrypt()")
-> > and commit 96cc4b69581d ("macvlan: do not assume mac_header is set in macvlan_broadcast()").
-> >
-> > Fixes: 43ba33b4f143 ("net: dsa: tag_ocelot_8021q: fix inability to inject STP BPDUs into BLOCKING ports")
-> > Cc: stable@vger.kernel.org
-> > Found by 0sec automated security-research tooling (https://0sec.ai).
-> > Assisted-by: 0sec:claude-opus-4-8
-> > Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
-> > ---
->
-> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
->
-> I was not aware of the bug introduced by commit d346a3fae3ff ("packet:
-> introduce PACKET_QDISC_BYPASS socket option"). Commits
-> eabb1494c9f2 ("net: dsa: tag_ocelot: do not rely on skb_mac_header() for VLAN xmit")
-> 499b2491d550 ("net: dsa: tag_ksz: do not rely on skb_mac_header() in TX paths")
-> f9346f00b5af ("net: dsa: tag_sja1105: don't rely on skb_mac_header() in TX paths")
-> 0bcf2e4aca6c ("net: dsa: tag_ocelot: call only the relevant portion of __skb_vlan_pop() on TX")
->
-> were made assuming that the bug to avoid would be exclusively a future
-> one (the revert of commit 6d1ccff62780 ("net: reset mac header in
-> dev_start_xmit()")) and thus they were not marked as bug fixes.
->
-> Are they true bug fixes, as in "can we reproduce these [using
-> CONFIG_NET_DSA_LOOP=y on virtually any network adapter]"? If so, should
-> all the commits above also be backported to stable?
 
