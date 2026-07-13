@@ -1,102 +1,64 @@
-Return-Path: <netdev+bounces-307271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307272-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qw4fCcxEVWofmQAAu9opvQ
-	(envelope-from <netdev+bounces-307271-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 22:04:28 +0200
+	id ccIlAkVKVWramQAAu9opvQ
+	(envelope-from <netdev+bounces-307272-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 22:27:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6231974EEF7
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 22:04:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49CD874F059
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 22:27:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=HgkFk3n1;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307271-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307271-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=weissschuh.net header.s=mail header.b="lKZT/mcJ";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307272-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307272-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=weissschuh.net;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CE4023039C99
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 20:04:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 11101304CA59
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 20:27:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 886AA351C25;
-	Mon, 13 Jul 2026 20:04:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B8D35AC05;
+	Mon, 13 Jul 2026 20:27:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1472B3382F4
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 20:04:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79E834888F;
+	Mon, 13 Jul 2026 20:27:43 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783973064; cv=none; b=jNnEiGEAvtLKQVexE53/FVUQlEyPAQJ1/LHOkT/3iRC4Ag834EfgWVDbbDYhgpEjBTTtTmsJ6KElX1xAdOrOY5avxi5i7z1axNQROKNcycL8vtVGoX/QGQUTSur8cyaDtRbnkYyAybi4nusSpGLQEqt0EE0hVXYfwBHCqAmtGwc=
+	t=1783974466; cv=none; b=HLW9weeCka2dFPrpcptc2KuM8zwaP3xfWiExf2DAZzoY2R4/Ilt4R/a+CKkR9Vt/8XTxjivwn6yen57HxkTRkDwjG3RWvtQ1VrxhI4rQfTk9kkPWkMkiHStxi1FUm4Hiuuty1Uhr1eyimoquO1bQh1bYtrDDH1wpVDhyG4Sj1cY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783973064; c=relaxed/simple;
-	bh=YF+KOotGzZmW5OzmRDV//DtHveaZ5nJeRsKupPRkt7Q=;
+	s=arc-20240116; t=1783974466; c=relaxed/simple;
+	bh=Ngzkz5tvzhM82Dga29utEzWhgCbugFKT03qJQGOrNoA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=six++qbpMpgOUrionsw+QghAlKSoSx/fhxpSxjAbvI0O0RBWzPBicsPHALnmEV5Ew8vC5ySFPRnGVkmArkU0+g2mLN3fB4Xs/tsRuZA+/Mks1tNm4dE0KCj6DfGbOmOPjxo7BhFbW+0N+lvLVKKO8obIA9ny9A9vkwXv0qnf54U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HgkFk3n1; arc=none smtp.client-ip=209.85.221.47
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-46f88060e8dso549854f8f.2
-        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 13:04:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783973061; x=1784577861; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=JTj575AcHAom2fz7OwDDRttEo4AE92OOBeJUOqyrws8=;
-        b=HgkFk3n111Uu2CWlsOwuDk71tx53WKuPJM4XSbnq8Ii8Al8FgRS7/TN9Ooc0SzS8Ih
-         0z/155WlWBOAq8NfjKLt3MkWhLffWp4QKiOrJ1R+AWFtFmg6CofXbl8wSUQeCCfu7Bao
-         rWKrDmeloj9iIvvyP4b5W1CuS+URN+R5CwHxvAuTgAygpTLENCSBV52PH7hi9PZ9H3Ac
-         JG2QsBOeFw+RtnTSsWOselL9mWGqKryCSshJEjD38J0WcGBHAtSaFFpfgWceDYroEJWN
-         I8OiG7NNZA6OsENsVIQ4PWzKDF1zXnjayvMoIVtbZv6QiyCcb67sCUbP5bkbMNXs6UcP
-         Z7BA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783973061; x=1784577861;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=JTj575AcHAom2fz7OwDDRttEo4AE92OOBeJUOqyrws8=;
-        b=debKZ4Z6Xqz8t2je5YMFb745bZnmQteqRPmEEmhu63DkgVemplnLsRXh/xD5FVucg6
-         DdK42GypD9gXzpS5qYJqdfETSOoVG4J7asIGyuYi/6fG+d567pK3xJplI2mGoj4W06fR
-         F7Jw98csF8y4GTZTMRvr5KQ1Dc8St1KAwjydmZIzRl45DGygN/XIgb1zEq7YtxT5puEP
-         WlqUsdrLbUm8h/BRnsoChW1dtA61clU24VzE3b2WyBVKw7zf+cYoab31FLxz0bEzkMDL
-         hm6y49IALSFsiom+Vz3EvZk8g+oT7ympvSdcP4EQdOhEoF7Up6wzJK1IfMbCJOypdGK8
-         KePA==
-X-Forwarded-Encrypted: i=1; AHgh+Rrf4jMpA16tUUE0oIAFijUgNOgKomCknwZa0YejQM0gQ0HoM6BR23dggWu+sPcCDLOT72YTnoU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx76x7HRDb1IhKBJcwwk+oAq4BR3eqB2HpDSrJWWdcWvPsJJzO7
-	wgqx+kkqHVe0ZXJoFvjD7lWquctbE6qRcZ9X5PRwKyrMdMcy4NIXDkiu
-X-Gm-Gg: AfdE7clxUbg5XRvs/Q8KU67MoHMYVR9qbcs/CW6UZCIflGy2oMsEcY3UajLhAXv+hlO
-	f9kC9yoR2GolqfkWtmO51M0MjLjOAeVMZGBaAuBeUpsc6CJpGBAEasX/wnlxW+uhr2d2v9yvX8v
-	xwmy8CCABlePHx6M0shLtoGme/VBNU+Aq9Xwbw3AapIUrxOvSorLA3JUzKlpWHBP2IfvuMfWXWM
-	GICmmnh19dgr7SDfhNzYsKbmMev0a1AnG8N72L2+M+GiPM0j9tbiALFg8MFfwXZo9OCkx2D+RCl
-	tiQuFiEgjzr7wVa5eXPQ7d6a+jdmiKuVwLTUlU5bCKlRR0Pu76Px3/H1Pr7zgCtozYkdclxE6rm
-	NOojE7qNs/UAob2AaBKlY4JRXdvf4ajE6uJ0sADzHh36rvbdS68Yc0+/Zxua5pb7Bx80pa86AQq
-	JKPtoA
-X-Received: by 2002:a05:600c:4f94:b0:492:1e4d:d44b with SMTP id 5b1f17b1804b1-493f8835228mr59867925e9.8.1783973061275;
-        Mon, 13 Jul 2026 13:04:21 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d40e:d500:d8f0:7a38:1703:914b])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4950a322c86sm17366115e9.11.2026.07.13.13.04.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jul 2026 13:04:20 -0700 (PDT)
-Date: Mon, 13 Jul 2026 23:04:17 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Doruk Tan Ozturk <doruk@0sec.ai>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Nick Child <nnac123@linux.ibm.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, Sabrina Dubroca <sd@queasysnail.net>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	UNGLinuxDriver@microchip.com, Michael Ellerman <mpe@ellerman.id.au>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net 1/3] net: dsa: tag_ocelot_8021q: don't read an unset
- MAC header on transmit
-Message-ID: <20260713200417.dghlrj4ca27b6nd4@skbuf>
-References: <20260713194010.54642-1-doruk@0sec.ai>
- <20260713194010.54642-2-doruk@0sec.ai>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GYxngCyji4Bdi5Fp2GLDenEqq/ump9VdbZfJdFNr0KKnOe6XRYJ7B7DtKSYA8aNgr8LsZJZYnITDWiZ+cYHXuu/ZbGqJbDOmSSjngkJJZ9qXa56k3PRZqW2mGc6IPldT8oiBnyduM1YZLBOz986Qncv50hwBdRtUdIKRB+cEX3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=lKZT/mcJ; arc=none smtp.client-ip=159.69.126.157
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1783974455;
+	bh=Ngzkz5tvzhM82Dga29utEzWhgCbugFKT03qJQGOrNoA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lKZT/mcJFEGIzu/eU9wxhcOuc+BQLmuxQrSfLLXpxXrKi/getm2ck64j4oQmMSvoV
+	 lqgmwJxubwYsUZaQ22VQAd9krJGNulG8lOHtKof7GfcVpNHH26w3+hNdTrVx9gHzsI
+	 Qxdmf4hDe3O7rRvGY2iZSoEdJlCt2ZLQt3sfBCNs=
+Date: Mon, 13 Jul 2026 22:27:35 +0200
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
+To: Rong Zhang <i@rong.moe>
+Cc: Lee Jones <lee@kernel.org>, Pavel Machek <pavel@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
+	Benson Leung <bleung@chromium.org>, Guenter Roeck <groeck@chromium.org>, 
+	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>, Mark Pearson <mpearson-lenovo@squebb.ca>, 
+	"Derek J. Clark" <derekjohn.clark@gmail.com>, Hans de Goede <hansg@kernel.org>, 
+	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, Ike Panhc <ikepanhc@gmail.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, 
+	Vishnu Sankar <vishnuocv@gmail.com>, Vishnu Sankar <vsankar@lenovo.com>, linux-leds@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	chrome-platform@lists.linux.dev, platform-driver-x86@vger.kernel.org
+Subject: Re: [PATCH RFC v2 1/9] leds: Add callback offloaded() to query the
+ state of hardware control trigger
+Message-ID: <2b1c347b-6598-4169-8b07-601a8b41faed@t-8ch.de>
+References: <20260618-leds-trigger-hw-changed-v2-0-c28c44053cf3@rong.moe>
+ <20260618-leds-trigger-hw-changed-v2-1-c28c44053cf3@rong.moe>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,80 +67,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260713194010.54642-2-doruk@0sec.ai>
+In-Reply-To: <20260618-leds-trigger-hw-changed-v2-1-c28c44053cf3@rong.moe>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[weissschuh.net,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[weissschuh.net:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307271-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307272-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:doruk@0sec.ai,m:andrew+netdev@lunn.ch,m:f.fainelli@gmail.com,m:woojung.huh@microchip.com,m:nnac123@linux.ibm.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:sd@queasysnail.net,m:arun.ramadoss@microchip.com,m:UNGLinuxDriver@microchip.com,m:mpe@ellerman.id.au,m:stable@vger.kernel.org,m:andrew@lunn.ch,m:ffainelli@gmail.com,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:i@rong.moe,m:lee@kernel.org,m:pavel@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:bleung@chromium.org,m:groeck@chromium.org,m:kabel@kernel.org,m:mpearson-lenovo@squebb.ca,m:derekjohn.clark@gmail.com,m:hansg@kernel.org,m:ilpo.jarvinen@linux.intel.com,m:ikepanhc@gmail.com,m:andrew+netdev@lunn.ch,m:kuba@kernel.org,m:vishnuocv@gmail.com,m:vsankar@lenovo.com,m:linux-leds@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:chrome-platform@lists.linux.dev,m:platform-driver-x86@vger.kernel.org,m:derekjohnclark@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[linux@weissschuh.net,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,microchip.com,linux.ibm.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,lists.ozlabs.org,queasysnail.net,ellerman.id.au];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,lwn.net,linuxfoundation.org,chromium.org,squebb.ca,gmail.com,linux.intel.com,lunn.ch,lenovo.com,vger.kernel.org,lists.linux.dev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[linux@weissschuh.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[weissschuh.net:+];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,0sec.ai:email,0sec.ai:url,skbuf:mid]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6231974EEF7
+X-Rspamd-Queue-Id: 49CD874F059
 
-On Mon, Jul 13, 2026 at 09:40:08PM +0200, Doruk Tan Ozturk wrote:
-> ocelot_xmit() reads the Ethernet header via eth_hdr(skb) to test the
-> destination address against the link-local range.
+On 2026-06-18 00:47:55+0800, Rong Zhang wrote:
+> There are multiple triggers implementing hardware control. However, the
+> LED core doesn't really know the hardware control state since the
+> coordination is done directly between the trigger and the LED device.
 > 
-> On the AF_PACKET SOCK_RAW + PACKET_QDISC_BYPASS transmit path the skb
-> reaches ndo_start_xmit() with the MAC header unset, so eth_hdr(skb)
-> resolves to skb->head + (u16)~0 and the read is out of bounds.
-> 
-> On the TX path the L2 header is at skb->data, so use skb_eth_hdr(), as
-> done for the same class by
-> commit f5089008f90c ("macsec: don't read an unset MAC header in macsec_encrypt()")
-> and commit 96cc4b69581d ("macvlan: do not assume mac_header is set in macvlan_broadcast()").
-> 
-> Fixes: 43ba33b4f143 ("net: dsa: tag_ocelot_8021q: fix inability to inject STP BPDUs into BLOCKING ports")
-> Cc: stable@vger.kernel.org
-> Found by 0sec automated security-research tooling (https://0sec.ai).
-> Assisted-by: 0sec:claude-opus-4-8
-> Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
+> Add an offloaded() callback so that the LED core can query the hardware
+> control state.
+
+For review it would be easier if the code using the new callback was
+introduced *before* the driver implementation.
+
+> Signed-off-by: Rong Zhang <i@rong.moe>
 > ---
+>  Documentation/leds/leds-class.rst | 5 +++++
+>  include/linux/leds.h              | 1 +
+>  2 files changed, 6 insertions(+)
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
-
-I was not aware of the bug introduced by commit d346a3fae3ff ("packet:
-introduce PACKET_QDISC_BYPASS socket option"). Commits
-eabb1494c9f2 ("net: dsa: tag_ocelot: do not rely on skb_mac_header() for VLAN xmit")
-499b2491d550 ("net: dsa: tag_ksz: do not rely on skb_mac_header() in TX paths")
-f9346f00b5af ("net: dsa: tag_sja1105: don't rely on skb_mac_header() in TX paths")
-0bcf2e4aca6c ("net: dsa: tag_ocelot: call only the relevant portion of __skb_vlan_pop() on TX")
-
-were made assuming that the bug to avoid would be exclusively a future
-one (the revert of commit 6d1ccff62780 ("net: reset mac header in
-dev_start_xmit()")) and thus they were not marked as bug fixes.
-
-Are they true bug fixes, as in "can we reproduce these [using
-CONFIG_NET_DSA_LOOP=y on virtually any network adapter]"? If so, should
-all the commits above also be backported to stable?
+(...)
 
