@@ -1,204 +1,166 @@
-Return-Path: <netdev+bounces-307101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307102-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id RjXLGfGtVGpepQMAu9opvQ
-	(envelope-from <netdev+bounces-307101-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 11:20:49 +0200
+	id rDN5JoeuVGqGpQMAu9opvQ
+	(envelope-from <netdev+bounces-307102-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 11:23:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C24A77493CD
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 11:20:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EF96749413
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 11:23:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=l28QzEYu;
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307101-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307101-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307102-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307102-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AE8B63045492
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 09:16:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8F975302A68E
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 09:19:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E9E33D954C;
-	Mon, 13 Jul 2026 09:16:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39495390204;
+	Mon, 13 Jul 2026 09:19:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD91368D4B;
-	Mon, 13 Jul 2026 09:16:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 097733CAE84
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 09:19:02 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783934195; cv=none; b=E6jqmEZ4L4J/VO+4PAOS9QrbJ3jyqaMtKTcMm4sxkNIWKkDKC4a/rljyDaW/oK7h1eaVB+B2eJsq+LM028krTDFHAv4a9Ji3uCzpelO+wUB31pEBLTbHIk/yEElpge/4SoyxFEOytuFH+yS1yUhQrMw2PxAWhxsamP22kEsarWw=
+	t=1783934349; cv=none; b=dQfetpJKnGrYgKouTG9tIPqXNsJm4KpzxXqTNEoNodLOdPo0kLdWiEhEFC4Rnf4E6L1dcGqwnab2JKAxifJDG1P2vzZo2hF1NVr8k9fkWdoL7eqk44SZhcbMEq6mB0wPe77U/Dp8WK66Pxq+Qy7au7uPFqvsHBhiHrtVvzxGgSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783934195; c=relaxed/simple;
-	bh=zyF231xatrpSZ32MNA32jgQliAUCizy7L4S9+SYQy9A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DobNERmBJKmpJOR9s1Z7Jdxwa65cvloTW2IuSKhy2nbJ7KDj1zecZHa4xWFW/UTfkByIbzmdu+oH9skmCUBHXlBfoxiP8CwFsGz51BKWxvfAJnjJBBrusFq/y5KfoPko0qsXgr55FW96xgaDV80V5n8txLfvLTkqT5qW18vE4gA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l28QzEYu; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48A721F000E9;
-	Mon, 13 Jul 2026 09:16:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783934193;
-	bh=5siJLG0LOwXZuo10jBFt4fMZPIUJHqjzh+luwyjmAXI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=l28QzEYuqIxm8425yFC4+/OlfyHCjpMbHkVM4n55jZRRNGraF61E6PUfOfjMvqNPg
-	 1PRV8ZsrPmGGWCkKBfzGi8f+WGh9hFpAk2CWiHQFs+MojCfDBavqzPRn5GEKtIzhKK
-	 cdXTO51kUqUWY0Q++mhZVX8qtwMjBV6olzEXrvXL5kOsJrPAXb4qB12rViEdtgkbxW
-	 /+OAjpUoW0E36npC8mWza+l8SpD+l/1Aw2WObkjoSuvrr+HMxCjnec1fghFzPJRwjC
-	 g9gQSByClPjI/7FS6jGUzP7MJ6kOnJkReQG/JF/gJ52hYLheFM6/F1zcrgMLDlXPBx
-	 zkxOiTwRjE0Vg==
-From: Simon Horman <horms@kernel.org>
-To: pengpeng@iscas.ac.cn
-Cc: Simon Horman <horms@kernel.org>,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	jedrzej.jagielski@intel.com,
-	aleksandr.loktionov@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	richardcochran@gmail.com,
-	jacob.e.keller@intel.com,
-	arkadiusz.kubalewski@intel.com,
-	karol.kolacinski@intel.com,
-	sergey.temerkhanov@intel.com,
-	michal.michalik@intel.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] ice: propagate ETH56G deskew read errors
-Date: Mon, 13 Jul 2026 10:16:06 +0100
-Message-ID: <20260713091605.1756659-2-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260706144325.91320-1-pengpeng@iscas.ac.cn>
-References: <20260706144325.91320-1-pengpeng@iscas.ac.cn>
+	s=arc-20240116; t=1783934349; c=relaxed/simple;
+	bh=66fnQPc6NfEMenLRaH1sCiuTu+74Ifuu6XqWtGQ7Xqo=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Y5nAaaKbA5rmTzYR7EuCXB5rzynUAhXtoXUemTqLwsN4rMhz8MX037um1rFCbwCPn9tA61pOa7MWUfiH3aEw1Sk2z4AYdvAOxl/b7PLcRWrvYF0N4X2GhNp0a6vCRbN21USXhjsb0owl88y0d1TZPsIYT0bhv62UycZ4P+JmED4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=52.59.177.22
+X-QQ-mid:tivesync1t1783934276t32a2714e
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [115.200.247.46])
+X-QQ-SSF:0000000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 11718294743674349415
+To: "'Chenguang Zhao'" <chenguang.zhao@linux.dev>,
+	<mengyuanlou@net-swift.com>,
+	<andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>
+Cc: <maxime.chevallier@bootlin.com>,
+	<netdev@vger.kernel.org>,
+	"'Chenguang Zhao'" <zhaochenguang@kylinos.cn>
+References: <20260713085111.1481884-1-chenguang.zhao@linux.dev>
+In-Reply-To: <20260713085111.1481884-1-chenguang.zhao@linux.dev>
+Subject: RE: [PATCH net] net: txgbe: fix heap overflow when reading module EEPROM
+Date: Mon, 13 Jul 2026 17:17:54 +0800
+Message-ID: <0dfc01dd12a8$7c8639c0$7592ad40$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQKttDZf9zIC+/JkuiYPfoZv8cLUjLTJ5Wcw
+X-QQ-SENDSIZE: 520
+Feedback-ID: tivesync:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: M/ESU50hZOEX0nAH8kJtyvejKuq2fN6Wa9Yququ/ny4WFqV2dG6gJumF
+	0phhly760fgg54SsuaoncMDRruNNUK4MZkM8idlm66mZKlBSCFVK8fGCCRegWaxGHY+76e8
+	fz8mZHyK4wh/MuNvf5UDu9bI8jwt15znm6JWa6QNjnHYtFBo1VTd2kfstBICyi7Rlm6sq/P
+	ylZlbN8TacdldBbSEgaGgHQ3MW6p5KX0mFMXyCT7geX5VFkA21EM+6+QdPs2oqbhWaewBbJ
+	IdYmhn0pONGU7hjdlA716+pB1EDqrnsG4FE9rXmBqyDCCG3cOJT9fCOVFY+rGb7FOTOg04w
+	PsigvsMAMNsA9B3CcRxg3uT5LqQg1N4TIv4emO/ek717TxvNB40S4KsDMIL3Bg36tXov9vj
+	6bFboOPiv32d9K6t57MujWzaaWZmUx/jGjNftirpktLbobbfApnftQ9Zvq8wFEB/lL5PTLa
+	QygRdYb9c0BdCRMlU1q65WFIlUrYEaROJr1lywcn7pfAcYAmJoPGf6/g9X9o4vGyvJYyUGn
+	Ss9LsMiffMVlSdAQ8PRuXWcaxCWkX6Zrk8TFPXUMn7jRkCWATpN0IGLZua7TQS2RX/8BRwL
+	ph7XxWmMkdE5316FVTMv7og0TAXbTrZhIiSiJYRHEMBbTXTTGHqw9hWcqeJLe3tlMsV1M14
+	qHuc4aoe33yU+sL4cUvqaDb1GdqcIZi7MBEOpyq3B29nm3NmbkgHpYaIBiHXQtTRn11gCGL
+	cOqLgl76sp4yIoOPS9sOTJRLzEAB3j8Hs58oWfMW4Rf35NvPzjIKI9PXD2ZTjgODmsHGIiG
+	NshsQ8o0srMyZpb7tYeNn+vuFbZ8tYQoKKHAhrqjQ7RomKGT84tK+wvTaqC75RBJEzNsamL
+	RJJTzI0+usi1PnnoifnTPLaHN5MUrdSBJGXQfUB1y6aXddv/h56BEPppyJze2iAaRS581vi
+	Y4S2ZpoYS9jn71+L/ggfQepJexN48BK4c7FNgrzw1t6AEFbRXqznMvMtA2zChtA/s0DYHj+
+	piX/16X553096ndIkA8X2HVWrFoUHhI+swbkL/XlZi2j8woBNDoeH4nLDjrv0lWzjhKPy2b
+	Q==
+X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
+X-QQ-RECHKSPAM: 0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	FROM_EXCESS_BASE64(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307101-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:pengpeng@iscas.ac.cn,m:horms@kernel.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:jedrzej.jagielski@intel.com,m:aleksandr.loktionov@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:jacob.e.keller@intel.com,m:arkadiusz.kubalewski@intel.com,m:karol.kolacinski@intel.com,m:sergey.temerkhanov@intel.com,m:michal.michalik@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,intel.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,lists.osuosl.org,vger.kernel.org];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307102-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[trustnetic.com];
+	FORGED_RECIPIENTS(0.00)[m:chenguang.zhao@linux.dev,m:mengyuanlou@net-swift.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:maxime.chevallier@bootlin.com,m:netdev@vger.kernel.org,m:zhaochenguang@kylinos.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,sashiko.dev:url]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	R_DKIM_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,trustnetic.com:from_mime,trustnetic.com:email,trustnetic.com:mid,kylinos.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C24A77493CD
+X-Rspamd-Queue-Id: 4EF96749413
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-ice: propagate ETH56G deskew read errors
+> From: Chenguang Zhao <zhaochenguang@kylinos.cn>
+> 
+> txgbe_read_eeprom_hostif() always copies round_up(length, 4) bytes
+> into the caller buffer, which ethtool allocates with exactly 'length'
+> bytes. A non-4-aligned length therefore causes an out-of-bounds write.
+> Copy only the remaining bytes on the final dword instead.
+> 
+> Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
+> ---
+>  drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
+> index affea1a364ef..26d0cfc58ee2 100644
+> --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
+> +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
+> @@ -96,11 +96,13 @@ int txgbe_read_eeprom_hostif(struct wx *wx,
+>  	dword_len = round_up(length, 4) >> 2;
+> 
+>  	for (i = 0; i < dword_len; i++) {
+> +		u32 copy_len = min_t(u32, 4, length - i * 4);
+> +
+>  		value = rd32a(wx, WX_FW2SW_MBOX, i + offset);
+>  		le32_to_cpus(&value);
+> 
+> -		memcpy(data, &value, 4);
+> -		data += 4;
+> +		memcpy(data, &value, copy_len);
+> +		data += copy_len;
+>  	}
+> 
+>  	return 0;
+> --
+> 2.25.1
 
-ice_ptp_calc_deskew_eth56g() returns a u32 deskew value, but it also
-returns the negative read_poll_timeout() error when the DESKEW valid bit
-never appears. That converts the negative error into a large unsigned
-deskew contribution, which can then be folded into the RX timestamp
-offset and programmed into hardware.
+Thanks for the fix.
 
-Return the deskew value through an output parameter and propagate the
-read error from ice_phy_set_offsets_eth56g() instead of using it as
-offset data.
+Fixes: 9b97b6b5635b ("net: txgbe: support getting module EEPROM by page")
+Reviewed-by: Jiawen Wu <jiawenwu@trustnetic.com>
 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-> index 8e5f97835954c..cc424518a2a67 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
 
-[ ... ]
-
-> @@ -1736,17 +1736,21 @@ static u32 ice_ptp_calc_bitslip_eth56g(struct ice_hw *hw, u8 port, u32 bs,
->   * @ds: deskew multiplier
->   * @rs: RS-FEC enabled
->   * @spd: link speed
-> + * @deskew: output parameter for the calculated deskew value
->   *
-> - * Return: calculated deskew value
-> + * Return: 0 on success, negative error code otherwise
->   */
-> -static u32 ice_ptp_calc_deskew_eth56g(struct ice_hw *hw, u8 port, u32 ds,
-> -				      bool rs, enum ice_eth56g_link_spd spd)
-> +static int ice_ptp_calc_deskew_eth56g(struct ice_hw *hw, u8 port, u32 ds,
-> +				      bool rs, enum ice_eth56g_link_spd spd,
-> +				      u32 *deskew)
->  {
->  	u32 deskew_i, deskew_f;
->  	int err;
->  
-> -	if (!ds)
-> +	if (!ds) {
-> +		*deskew = 0;
->  		return 0;
-> +	}
->  
->  	read_poll_timeout(ice_read_ptp_reg_eth56g, err,
->  			  FIELD_GET(PHY_REG_DESKEW_0_VALID, deskew_i), 500,
->  			  50 * USEC_PER_MSEC, false, hw, port, PHY_REG_DESKEW_0,
->  			  &deskew_i);
-
-[Severity: High]
-This is a pre-existing issue, but is the return value of read_poll_timeout()
-supposed to be checked here?
-
-The read_poll_timeout() macro returns -ETIMEDOUT if the condition is never
-met, but this return value doesn't appear to be assigned to any variable.
-
-The err variable will only hold the result of the inner function
-ice_read_ptp_reg_eth56g(), which might be 0 if the read succeeds but the
-VALID bit is not set.
-
-Will this cause the function to proceed as if successful, ignoring the timeout?
-
-[Severity: Medium]
-This is a pre-existing issue, but could deskew_i be read uninitialized if
-ice_read_ptp_reg_eth56g() fails?
-
-If the read fails, err receives the error code, but deskew_i may remain
-uninitialized. The loop condition in read_poll_timeout():
-
-    FIELD_GET(PHY_REG_DESKEW_0_VALID, deskew_i)
-
-will evaluate this uninitialized memory.
-
-Additionally, since the loop condition doesn't check if err == 0, won't
-this pointlessly spin for 50ms on hard read failures instead of aborting
-early?
-
->  	if (err)
->  		return err;
 
