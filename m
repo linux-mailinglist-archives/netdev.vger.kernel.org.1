@@ -1,190 +1,283 @@
-Return-Path: <netdev+bounces-307127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307129-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id b1ZGOa/GVGo/SwAAu9opvQ
-	(envelope-from <netdev+bounces-307127-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 13:06:23 +0200
+	id i6OYC4bHVGqNSwAAu9opvQ
+	(envelope-from <netdev+bounces-307129-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 13:09:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5913C74A1F4
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 13:06:23 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1AEB74A2DB
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 13:09:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=RkI+xStK;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307127-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307127-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=UQ1KLunj;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307129-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307129-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0570A3022933
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 11:06:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D0A443044107
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 11:08:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC27E380FEE;
-	Mon, 13 Jul 2026 11:06:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D40384CD6;
+	Mon, 13 Jul 2026 11:07:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 536FA374183;
-	Mon, 13 Jul 2026 11:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2B3376A15;
+	Mon, 13 Jul 2026 11:07:53 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783940772; cv=none; b=p4w95O64EnWCJ2Lbho+tY6lA3pAqlidlfunj+lXQU1WzTTaae2vyGyJWt1FVdcg7CAqpis8eZ6fII87m67ZYgqiQdEiFy5KikIoV70nMJzujAOu0W0UatAPr+uPC+lZHQCiba+qfgheXyhRYnNG3mUXHvnX2oxXveOnXvuJ+de4=
+	t=1783940874; cv=none; b=M2Gzal+/Scg3y67QfI9jP4RcCI8+N89uJxyyy8h5J0fzhIg+uu9LpprSkzzb16k/K32vj/ICCXHD3okvoeXJ1h15e7/ZPF5cHsY/vOfMHjiG50TbsvL1RW6cVftqxxwLN0EwbQPJAHE1yKKA2ajGKV2cjKdvrIlsTFVTzxyE7Zo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783940772; c=relaxed/simple;
-	bh=5J5cXQBce5VR8QN/VQA2lP1ZEY9o5RmO3bKYd7gsR4M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tBtPRbHOld1MlPf67lpZdsM5z0Gtv7QDq50NWpvOZYjqAPUCD6VXdzbXM/jQfgmm/n1rNO+Jo0VGwOUfpzJt70Wr2Qf2+T/7h/G14ApNjHstlS9Icah9OWyLaP8Tapr1BJDaSYgYbRXDD22egAo5x/sVkIdXmAjrMigM60MzpZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RkI+xStK; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 674A21F000E9;
-	Mon, 13 Jul 2026 11:06:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783940771;
-	bh=ohWt3aTjQf0vTG1RtHrEvL2ptFIhsw5uqjt4ZWrEnKY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=RkI+xStK+i5l7Pn35q729ItMVQWfTxXMiFNBhgXdb633nBInoqHaH0tj2RRIM3f65
-	 nGSwBGneATqRQHA//dJN9FdW4E8mSG+AyPiVgaBrZWI3900wnIGrPiiZMKdYvB6K+J
-	 4wysIZzlV07mc6ZMyeIALIq5TckUiRk57o6s2PB0efIybAVGDE13eKRIo2bWJRyaZU
-	 LyVrW+MvyMPLy5x+XLTTAzimaEbDQC+ToeYa224bYA+9FeoEe3nzpWTXt1hNdm2TMl
-	 DhoSdaQq/+cSOl+xnGhl9kf16qme23ObV+1OYe2s3XNEZSyNmmDIFz1BDhJsixrHyE
-	 ttnR2m53/5xnA==
-Date: Mon, 13 Jul 2026 12:06:06 +0100
-From: Simon Horman <horms@kernel.org>
-To: Maoyi Xie <maoyixie.tju@gmail.com>
-Cc: Veerasenareddy Burru <vburru@marvell.com>,
-	Sathesh Edara <sedara@marvell.com>,
-	Satananda Burla <sburla@marvell.com>,
-	Shinas Rasheed <srasheed@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Guangshuo Li <lgs201920130244@gmail.com>,
-	David Carlier <devnexen@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v4 1/3] octeon_ep: fix skb frags overflow in the RX
- path
-Message-ID: <20260713110606.GD1364329@horms.kernel.org>
-References: <20260706150208.2944898-1-maoyixie.tju@gmail.com>
- <20260706150208.2944898-2-maoyixie.tju@gmail.com>
+	s=arc-20240116; t=1783940874; c=relaxed/simple;
+	bh=MrkgFPG1ntcH+3vyM2VZISxYsAEsUAoFtiNSkdalbm0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=uZF96848OX0H4HDvcbnsZPVG4LK5A4UL0bpCD2kpS8JnsllPKTG/jKHO4Ep7C5mBrS0JKYiLuyxBG5mhiMIcEiaqfPoIajHljdtEVncLuakIQooBJiuQGSGA7r2zb50SEWxYZmIPILbMg/8g28XXo2EVB9t4i6knOT1MqHX2OUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UQ1KLunj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B6738C2BCB8;
+	Mon, 13 Jul 2026 11:07:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1783940873;
+	bh=MrkgFPG1ntcH+3vyM2VZISxYsAEsUAoFtiNSkdalbm0=;
+	h=From:Subject:Date:To:Cc:From;
+	b=UQ1KLunjhvllLUjlewYd2gM6M3y0DbhbmaH/D8daTBwHYUzFssTjzqyklB05hFLnU
+	 hmsdcn85TtTDNZXxx4sNLmXWucuSi8tNpg0cd9mG+jgtfk+28hou4uudrEQ+rOL2Ct
+	 2pgXFYhAv+xYTnfDXGnna1ltipaX1UNTdQJuzyEC9UqPVHUJVfLaZ5YW9tHjyKOxjz
+	 l7tcs2iYYAaVc85WNh3cPzxd76sNAS5iMhsXuyu8XOZA56el28Xk4UWNADP606pryW
+	 kZT7Vp4uJ0nzuwdlKcJQJ4xHqFmvhvXKDlvBrmJcdr57ZjUuLhqVq1d9URLYODawS3
+	 ZtVTaoLUuFnxA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E845C43458;
+	Mon, 13 Jul 2026 11:07:53 +0000 (UTC)
+From: Joel Granados <joel.granados@kernel.org>
+Subject: [PATCH RFC net-next v3 0/3] net: sysctl: Const Qualify sysctl
+ ctl_table arrays
+Date: Mon, 13 Jul 2026 13:07:41 +0200
+Message-Id: <20260713-jag-net_const_qualify-v3-0-7289fe9eaea6@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260706150208.2944898-2-maoyixie.tju@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAP3GVGoC/4XNTQrCMBAF4KuUrI0k6U8aV4LgAdyKlJhO22hJN
+ amhpfTuhmzEhbh8vHnfLMiB1eDQLlmQBa+dHkwI6SZBqpOmBazrkBEjrCAFE/gmW2xgrNRg3Fg
+ 9X7LXzYybDIjguail4ihsHxYaPUX3jE7HQxImYTaN6BLaTrtxsHN86mm8+eN7iikGEOW1bFRGi
+ NrfwRrot4NtI+nZh+GE/2JYYHKZq5yRlIKsv5h1Xd+Zy2E/EAEAAA==
+X-Change-ID: 20260629-jag-net_const_qualify-f4e09759dac7
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
+ Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, 
+ Phil Sutter <phil@nwl.cc>, 
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+ Xin Long <lucien.xin@gmail.com>, 
+ Steffen Klassert <steffen.klassert@secunet.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, 
+ "D. Wythe" <alibuda@linux.alibaba.com>, Dust Li <dust.li@linux.alibaba.com>, 
+ Sidraya Jayagond <sidraya@linux.ibm.com>, 
+ Wenjia Zhang <wenjia@linux.ibm.com>, 
+ Mahanta Jambigi <mjambigi@linux.ibm.com>, 
+ Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+ linux-sctp@vger.kernel.org, linux-rdma@vger.kernel.org, 
+ linux-s390@vger.kernel.org, virtualization@lists.linux.dev, 
+ Joel Granados <joel.granados@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5605;
+ i=joel.granados@kernel.org; h=from:subject:message-id;
+ bh=MrkgFPG1ntcH+3vyM2VZISxYsAEsUAoFtiNSkdalbm0=;
+ b=owJ4nAHtARL+kA0DAAoBupfNUreWQU8ByyZiAGpUxwUBiWb2tjiICva7RN2tpfHxbzpTwM4W4
+ UKZB5EucD3XFYkBswQAAQoAHRYhBK5HCVcl5jElzssnkLqXzVK3lkFPBQJqVMcFAAoJELqXzVK3
+ lkFP5JkL/A+MxgPlU8yaJs7ia4XTGTtosOYbPEVXCyU2Ww6Yryzb543+2zIx9es3Lj6g+vwlXGt
+ 4RW+l+3qgNlP3sKUdTtrMIEP7KPGw7wHYWni1KS950x7yZ51Z6eds3XURdREMBlaCFQ+NBoIPDE
+ 1fybWLptzExNy/M6hD0liBh670cgcog69+S1j9g7W8XIzSotouZptJN3LORiSj/AFYfmt5NQUcs
+ mQlcPO1fh0m2RuKH5gTQdODb03kF7EFBGX7XPsE3rQw9TuZqKa3g5XXbTh0sjiWD6bZEyOfhbH9
+ tTGrblWYx9+yXhJ4UcG/7JY25reBxA6QlDa43knUvWjH+R5vH11DM3WgpZf3JAhe13lrgnSakB0
+ BIYZCLsMRcYktQMYq4L8dJ+0jpQyknMjtQ+NGCHcKnljrkixGLjc0310sCb0d6qQ0VPRUCk8bqQ
+ zhuv7wNfOgjar4Ati0FS+ts24gK2sW/GUllcj+pm1SMp5RXCdoYGwp0W49W9o6pbqIDitcVIZX4
+ w4=
+X-Developer-Key: i=joel.granados@kernel.org; a=openpgp;
+ fpr=F1F8E46D30F0F6C4A45FF4465895FAAC338C6E77
+X-Endpoint-Received: by B4 Relay for joel.granados@kernel.org/default with
+ auth_id=239
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-307127-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:maoyixie.tju@gmail.com,m:vburru@marvell.com,m:sedara@marvell.com,m:sburla@marvell.com,m:srasheed@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:maciej.fijalkowski@intel.com,m:lgs201920130244@gmail.com,m:devnexen@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:maoyixietju@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307129-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,nvidia.com,netfilter.org,strlen.de,nwl.cc,gmail.com,secunet.com,gondor.apana.org.au,linux.alibaba.com,linux.ibm.com];
+	RCPT_COUNT_TWELVE(0.00)[32];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:dsahern@kernel.org,m:idosch@nvidia.com,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:marcelo.leitner@gmail.com,m:lucien.xin@gmail.com,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:kuniyu@google.com,m:sgarzare@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:linux-sctp@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:virtualization@lists.linux.dev,m:joel.granados@kernel.org,m:marceloleitner@gmail.com,m:lucienxin@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[joel.granados@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[marvell.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[joel.granados@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,sashiko.dev:url,intel.com:email,ntu.edu.sg:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5913C74A1F4
+X-Rspamd-Queue-Id: A1AEB74A2DB
 
-On Mon, Jul 06, 2026 at 11:02:06PM +0800, Maoyi Xie wrote:
-> __octep_oq_process_rx() builds an skb for a multi-buffer packet by adding
-> one fragment per buffer_size chunk:
-> 
-> 	data_len = buff_info->len - oq->max_single_buffer_size;
-> 	while (data_len) {
-> 		...
-> 		skb_add_rx_frag(skb, shinfo->nr_frags, buff_info->page, 0,
-> 				buff_info->len, buff_info->len);
-> 		...
-> 	}
-> 
-> buff_info->len comes from the device response header
-> (be64_to_cpu(resp_hw->length)). Nothing bounds the fragment count against
-> MAX_SKB_FRAGS. data_len can be close to 65535. buffer_size defaults to
-> about 3776 on 4K pages, so a full packet yields about 18 fragments. That
-> is one more than the default MAX_SKB_FRAGS of 17, so skb_add_rx_frag()
-> writes past shinfo->frags[].
-> 
-> The fragment count is now checked before build_skb(). A packet that needs
-> more fragments than the skb can hold is dropped. octep_oq_drop_rx()
-> consumes its descriptors like the build_skb failure path. The same class
-> was fixed in other RX paths, including commit 5ffcb7b890f6 ("net: atlantic:
-> fix fragment overflow handling in RX path") and commit f0813bcd2d9d ("net:
-> wwan: t7xx: fix potential skb->frags overflow in RX path").
-> 
-> Fixes: 37d79d059606 ("octeon_ep: add Tx/Rx processing and interrupt support")
-> Co-developed-by: Kaixuan Li <kaixuan.li@ntu.edu.sg>
-> Signed-off-by: Kaixuan Li <kaixuan.li@ntu.edu.sg>
-> Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
-> Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> ---
->  drivers/net/ethernet/marvell/octeon_ep/octep_rx.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c b/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c
-> index e6ebc7e44a..bdbed58c7b 100644
-> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c
-> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c
-> @@ -453,6 +453,15 @@ static int __octep_oq_process_rx(struct octep_device *oct,
->  
->  		octep_oq_next_pkt(oq, buff_info, &read_idx, &desc_used);
->  
-> +		if (buff_info->len > oq->max_single_buffer_size) {
-> +			u16 data_len = buff_info->len - oq->max_single_buffer_size;
-> +
-> +			if (DIV_ROUND_UP(data_len, oq->buffer_size) > MAX_SKB_FRAGS) {
-> +				octep_oq_drop_rx(oq, buff_info, &read_idx, &desc_used);
-> +				continue;
-> +			}
-> +		}
+What?
+=====
+We do two things:
+1. Reject netns-unsafe: Replace warning and file permission change with
+   an error (reject registration) when an "unsafe" net sysctl
+   registration is detected.
+2. Const qualify: Const qualify network templated ctl_table arrays and
+   unconditional kmemdup'ed ctl_table arrays.
 
-The AI-generated review of this patch on sashiko.dev flags that
-this cannot occur for 4K pages. I believe this can be
-addressed by changing the type of data_len to u32.
-I also believe that a similar problem exists in patch 3/3.
+Why?
+====
+The main motivation for this is to continue with the const qualification
+of the ctl_table arrays [1]. The permission change inside
+ensure_safe_net_sysctl disallows cons qualifiaction as it basically
+modifies the entries before running the sysctl registration.
 
-   "Does truncating the data_len calculation to u16 introduce a regression
-    by bypassing the MAX_SKB_FRAGS check?
+      ent->mode &= ~0222;
 
-    If buff_info->len is unexpectedly large, the u16 truncation of data_len
-    could wrap around to a small value. This would bypass the check,
-    leaving unconsumed fragments in the ring that might be incorrectly
-    parsed as new packet headers."
+On reject netns-unsafe?
+=======================
+* I believe that there is currently now way that the permission change
+  gets executed [2]
+* I found one case where the warning message was posted to lore
+  (vsock_sysctl_register) [3], but it made its to mainline as part of
+  the second case in [2].
+* We should error anyway because writing to the global sysctl value
+  through a child netns is indicative of a bug [4].
 
-> +
->  		skb = build_skb((void *)resp_hw, PAGE_SIZE);
->  		if (!skb) {
->  			octep_oq_drop_rx(oq, buff_info,
-> -- 
-> 2.34.1
-> 
+On Const qualification?
+=======================
+We can separate the places where network registers sysctl tables into
+three groups:
+1. Static global: The unchanged global static arrays are passed along to
+   sysctl register.
+2. Always kmemdup: The global static arrays are always kmemdup'ed before
+   passing them along to sysctl register.
+3. Dynamic global: The global static array is changed in place before
+   passing it along to sysctl register.
+
+This series handles case 1 and 2. It leaves 3 for a later point as
+const qualifying those global ctl_tables is more involved.
+
+RFC
+===
+Keeping the RFC tag for now in hope of any preliminary feedback. I would
+be very thankful if you point me to anything that I have missed in my
+analysis that shows that this cannot/shouldn't be done.
+
+Changes in v3:
+- Const qualified 2 of the 3 cases within the net directory ctl_table
+  register sites.
+- Link to v2: https://lore.kernel.org/r/20260707-jag-net_const_qualify-v2-1-5a5c52031ead@kernel.org
+
+Changes in v2:
+- Rebased on top of net-next
+- Updated subject to "RFC net-next"
+- Link to v1: https://lore.kernel.org/r/20260629-jag-net_const_qualify-v1-1-ee98b8fc400c@kernel.org
+
+Best
+
+[1]
+  https://git.kernel.org/pub/scm/linux/kernel/git/sysctl/sysctl.git/commit/?h=constfy-sysctl-6.14-rc1&id=1751f872cc97f992ed5c4c72c55588db1f0021e1
+
+[2]
+  I have identified 4 contexts relevant to the ensure_safe_net_sysctl call
+  inside the network sysctl registration.
+
+  1. When the (struct net) == &init_net (like in iw_cm_init): In this case
+     ensure_safe_net_sysctl is not executed and permission modification
+     never happens.
+
+  2. When the ctl_table data (->data) gets "manually" assigned to
+     something other init_net (like in vsock_sysctl_register): In this
+     case ensure_safe_net_sysctl *is* executed but the data that is passed
+     is neither a module address (!is_module_address) nor a kernel core
+     address (!is_kernel_core_data); so the permission modification never
+     happens.
+
+  3. When the permissions are explicitly changed on a kmemdup'ed ctl_table
+     array (like in sysctl_core_net_init): in this case
+     ensure_safe_net_sysctl *is* executed but the permission modification
+     never happens as the mode is not writable.
+
+  4. When ctl have custom proc_handlers (like in nf_lwtunnel_net_init): In
+     this case ->data is NULL so it is not a module address
+     (!is_module_address) nor a kernel core address
+     (!is_kernel_core_data), so permission modification never happens.
+
+  It seems like there is no way of executing the permission change in
+  ensure_safe_net_sysctl. Please correct me if this is inaccurate and help
+  me find the case that I missed.
+
+[3]
+  https://lore.kernel.org/all/20260302194926.90378-1-graf@amazon.com/
+
+[4]
+  The ensure_safe_net_sysctl function was introduced in Commit:
+  31c4d2f160eb7b17cbead24dc6efed06505a3fee ("net: Ensure net namespace
+  isolation of sysctls") which states that it is trying to prevent a
+  leak (indicative of a bug).
+
+---
+Signed-off-by: Joel Granados <joel.granados@kernel.org>
+
+---
+Joel Granados (3):
+      net: enforce net sysctl registration
+      net: Const qualify ctl_tables that kmemdup unconditionally
+      net: Const qualify network templated ctl_tables Arrays
+
+ include/net/net_namespace.h             |  4 +--
+ net/core/sysctl_net_core.c              | 38 +++++++++++++++--------
+ net/ipv4/devinet.c                      |  2 +-
+ net/ipv4/sysctl_net_ipv4.c              | 54 +++++++++++++++++++--------------
+ net/ipv4/xfrm4_policy.c                 | 22 +++++++++++---
+ net/ipv6/icmp.c                         |  2 +-
+ net/ipv6/route.c                        |  2 +-
+ net/ipv6/sysctl_net_ipv6.c              |  2 +-
+ net/ipv6/xfrm6_policy.c                 | 22 +++++++++++---
+ net/netfilter/nf_conntrack_standalone.c |  2 +-
+ net/netfilter/nf_hooks_lwtunnel.c       |  4 +--
+ net/sctp/sysctl.c                       |  2 +-
+ net/smc/smc_sysctl.c                    | 26 +++++++++++-----
+ net/sysctl_net.c                        | 24 +++++++--------
+ net/unix/sysctl_net_unix.c              | 21 ++++++++++---
+ net/vmw_vsock/af_vsock.c                | 25 ++++++++++-----
+ net/xfrm/xfrm_sysctl.c                  |  2 +-
+ 17 files changed, 167 insertions(+), 87 deletions(-)
+---
+base-commit: 474cff6868129755cf889edf40d7f491729fc588
+change-id: 20260629-jag-net_const_qualify-f4e09759dac7
+
+Best regards,
+-- 
+Joel Granados <joel.granados@kernel.org>
+
+
 
