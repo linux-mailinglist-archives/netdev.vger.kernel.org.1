@@ -1,192 +1,242 @@
-Return-Path: <netdev+bounces-307291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307292-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id g15fGllfVWr+nQAAu9opvQ
-	(envelope-from <netdev+bounces-307291-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 23:57:45 +0200
+	id DH6nAjtgVWp+ngAAu9opvQ
+	(envelope-from <netdev+bounces-307292-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 00:01:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA8EE74F5ED
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 23:57:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43A8074F66F
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 00:01:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=etsalapatis-com.20251104.gappssmtp.com header.s=20251104 header.b=E84QfuNT;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307291-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307291-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=0sec.ai header.s=google header.b=d4Ba279q;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307292-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307292-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CFB88302811B
-	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 21:57:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 188B630134B1
+	for <lists+netdev@lfdr.de>; Mon, 13 Jul 2026 21:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B8436C0AB;
-	Mon, 13 Jul 2026 21:57:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B5F36F411;
+	Mon, 13 Jul 2026 21:59:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A425369D6D
-	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 21:57:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B233836AB54
+	for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 21:59:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783979861; cv=none; b=PxwUyuQlZoQ3OIdcyUTDUrcFIQaPF7W/zpuu9d0g9cf7Rf8Gdl3xWr4YPaPfe3XtLvZ5cV0K/XwcurqsWdaDZbR0039aVuxyj6+14OYdHRc47Ls40mGZsDs+vIpJ2PkNawXxkmRKZnKTNhzqahP02ieHhKy7og652zEBDiDc9fQ=
+	t=1783979983; cv=none; b=MJCuBOt6uNSnso1ukAmIgydkv0fg4TTxtgmyFPXTQo+3cjhO8u5UzWgaMKeC8C4CrLFRA4/SwySzcbtp5DUCX/JZNhtEunkyREhrXzxXbTuzmxuCWWgJEDT1nQmVNQs/DqmTb1cB/+Yd//vFaT/MUat9hKA5QWCoHgNNWO5sn5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783979861; c=relaxed/simple;
-	bh=l2HeouvYQiBlOik9N5RDS+J9OXY/j0FBrbam0gPdL6s=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
-	 References:In-Reply-To; b=bJX6C5TxTli5Sq1U/gvrFPUCEKcA9y1yMN+a/8o6JgPMzP3zuTv6MOknfA8qwt1Bet3SPjf3Z08tvYoter1aKeakDNGoWaeLXvuKsM1P+wm/SjDEp3V4X9roUYlq0srdoGnPoK7SiJnDUxyhGH1bfxNLkIzwyB0H1Gt13ISJ4RM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=E84QfuNT; arc=none smtp.client-ip=209.85.214.169
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2cabc0a1ab6so46209965ad.0
-        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 14:57:40 -0700 (PDT)
+	s=arc-20240116; t=1783979983; c=relaxed/simple;
+	bh=CHryohLe/fnBYpOI8e4BvVaoKUdQxQ7HJ+W2ldsPKKc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nl+9EvZ+F5msR+7S/4rKkhNJGcEBPrYKSOUv3QmEzLtfRxtCPD0m0CtEcEa9xiIGkjk8aJ2tdHLpXvt1XQA9JAyDqJtj3DIsV00dGmBE92fDZJI4Ioan1rarckKs0/82Heq1IIaSWpaURmcw522/OSfx6QmFvID4V1/2QcJlANQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=d4Ba279q; arc=none smtp.client-ip=209.85.128.51
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-493f25d47dcso2335665e9.1
+        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 14:59:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1783979860; x=1784584660; darn=vger.kernel.org;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-type:content-transfer-encoding:mime-version:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=At8KsE6lJsmXZegcPrwsTNDpPIz3pgQ9ysWfzm54lJA=;
-        b=E84QfuNTkz6WdVH1avsdSoTlQ9lmJWGb0uu7prs72OZs3M7CnlA1ZD6mkuh6R3YKeE
-         TLSNe7Ky9y6vRiBs3sDjTM4c6iv7kEI1brlHmE69ohfGCv/hod7QUEwXQOIYIorrO4tI
-         Jmv8VhdNnc/wTYOoWXfUa567CMNerMw84kq6BJRatrhJVC3KplWSYCTz8Sfkl5zW1bWG
-         v87gfLmavbi0HOp99tDxSlUKXlN0wd2vE5dmuehLeHbf3nerwVGzOaqP7yfZZU7WPkT2
-         41vz33kzG5vWfWIJrs+wqlQ6ikS8d7VCNQBHlY33f8dKEdgrbSnGOPa0zTW/2pIpwfGb
-         ex3Q==
+        d=0sec.ai; s=google; t=1783979980; x=1784584780; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=37p3VfmrrNMS4akxO403NRH36eKSLE6Wn3AfUCl+4gA=;
+        b=d4Ba279qNkP/UzpnjQeR3R07VNfGiC7musfQDHgXQlPqo/ZZtjEKD23esT9dGQ91Tn
+         V4qnX13+i8lyy4l1VYJDvtctc9g7MdmxVeMT1i37ee2iw10bnVJoG/DKd/qJy6eGTLaD
+         VNcZCeKLzKS0rVxAd6q2nXeB7VvAWJ2TLSQyS/fbLTZ/ic9dP286KML7L8TXikk0u36k
+         wJQrOHY+9D4yfNz2hCypcXChHxyzaNEdPT3/ftsiiqEEyoujBeWrRn2wkPmciZ/21VqJ
+         3A3Mfc/A1RHvUz1lOoAUr3HG4Bcrr1zmpVVgctWaPFYuYwqr708BM/whR6LQ4qR6qdJp
+         2GmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783979860; x=1784584660;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-type:content-transfer-encoding:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=At8KsE6lJsmXZegcPrwsTNDpPIz3pgQ9ysWfzm54lJA=;
-        b=V/oPj9AJl7Ur2pwQB4Om10P9/FwzJf2Kl1sSfziZt38vA0YEQiAu50uJFzBVApDt6B
-         ocUv7BL75QnbmzJ8kyTOZvwFoCLyNwqVJ9eNSmdp0wpmcKU4qLGZSdi+lFpnZa5jNu/d
-         7qIDe486e8XY7nnFdEYmZJHnDQkG7c5fzprUyauxRLolIWQhad4+IT7dkSddv+ctVmOC
-         PnCa5tzzrefM7Vgr5tVNwlQTBL7+GeB9pO2Mh+W96fXSycGCEJUUqkWUNNfK5LmYuvq+
-         Y9Jt22l4TR5dm5CQm7Shcp9sVsNiVEc6eQbKB8jUFqxlvQzvBPj2j8dqLvogcPi7K+Df
-         Z1bg==
-X-Gm-Message-State: AOJu0Yw0MBvZ0C/TXdA85Lh0tY7D6vc1tqxh3L4gZ3l4WKtoSJ2y5xfJ
-	m8tcZ/obQta4e33fClgAHdSdn3iHias285LTonp++ZG3GQ9GMOKwr/kXFXR5Hj8Xa9U=
-X-Gm-Gg: AfdE7clw1YzQcpWP3BvwfGKnvh517stzW2MLT8SIbl9K7mSPURyEw4O6zZ4Mjt1N3l3
-	uj+OWCIy+enwtW4bwMSBiKIWED8FKLxHsaiWV/55Dg1l8zlgUUUfZ9TBVD/bOlpZJuMJxe0wWPS
-	sR6H+76kW/EU7oXoAkR2uP38QsNnvOsEj0/5PzHnU1iwWp7yvNFG8cqeAx3SLsRCH8l8TF0HH4y
-	wHXipH6ZcFjZyzGpkKhyH+44YGWOg6EZD4ce8CzRgO/KHse3CV+7A/3jrhuycfChg9Y1qF6lXFQ
-	73GQpJIIQP5eVVZzLX+3nr7DSrooBVa0miZqv/zpNSJVkq8SCVBXk0TpVYcT/ckd7ppkUwxz6Fr
-	vULncJ/g+kBg0xLGt/hjRbcdxvyK1lQDdN+6rp+YS0aoyt1eSHGH4yYeBA7yMU6br3EqL8vzcoK
-	6alZhF7LY8utmHBQv3CdNL4tO42xYebv80Gv1MwoPHxw==
-X-Received: by 2002:a17:903:3205:b0:2c7:f4bd:91b5 with SMTP id d9443c01a7336-2cee98446f9mr9888315ad.0.1783979859553;
-        Mon, 13 Jul 2026 14:57:39 -0700 (PDT)
-Received: from localhost (107-190-31-17.cpe.teksavvy.com. [107.190.31.17])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9d3d57bsm104668175ad.59.2026.07.13.14.57.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Jul 2026 14:57:39 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1783979980; x=1784584780;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=37p3VfmrrNMS4akxO403NRH36eKSLE6Wn3AfUCl+4gA=;
+        b=Byuj77Kll9Szer7gZ0Z4pOWxV0aha5s/cUeH+0/cF1EIrcodUDhDOyEZcqfzrIXjc4
+         eKBnuwIGjiyBccF5IVqmK+gy7oqPuyVJt2qjOu3iiutOiSAu4ZZjgy4pQ6qyX7TpxHzJ
+         MlthIztGCfGXA1sgSn+iwBX1sNYJcbL09LD0ililgWuQqeNUOrKiGE/pK8smzwZXqdCv
+         AEzdP6OrhAp5OLwZ3gtSiAnf/fYTmJsemeQ/K0uYlMFHMNaaqh2Du3L1R8vfuWpq0Srp
+         CL19QLZynuhCs18sp0JjgYY9aGGyZy0RSW/6ljGYwxURVkgUfx9BcwJjxmwTBDJUleS9
+         4lKQ==
+X-Forwarded-Encrypted: i=1; AHgh+RoZgTDJJR42kuYK/s6BK2wqmL0f2SIygrp/l1ifd3tHazD2h+bGU9M8S1wxJp1S0YeXnlM2mrk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyOHe0Cxw4f4Y9iRs4sO0FyYHUJn7Otbu066zfBrze5RqiLeUl
+	PUa0ZFlQLt0+IpsrGckxLylY9tMKEvvvzKIthOj2Jc0rgCrHRhfr8Stn3OUyDsWxZvIX
+X-Gm-Gg: AfdE7cnrGHQ7AtVOaGEKPgkWECIh0AmmaNmIg6Pgo2TkfFj2UXkEpz0GyKZDwi4SVoN
+	lkrl0fJ2Yrj39B+8m+o7u6PiAhFhLTCFt2qfPZka1Po7oQdTisQ22afPAyc0ltBiDV2CyMpADX3
+	m9NTMzVEQXVv4DRwM6WtXfW921g9Zu6dlPfJORDX0ig+z0KhOuXBw18jy+Ata1Ilr9mAREgBAJ1
+	7AkfNhkfA/tcxD8vOhVuFQg4YQBXoRqoLEtLPFi5J/MEPr34sthAvu9JYRCp/YFKkhdNN2znvSk
+	SZeolgVXlMfL69XS+fgrXnTWyGsAwNbGD6bYTjd4NLdrbGC+cBPAvhG5dLZc4Cah8Catr7W4YLh
+	wwU7HvA/VN2qayr/Njzew4FV2H54/vdQPkWAZWLdtol4g+EwZor5PP5Saz33ZlLe7hqfAUiZsk+
+	dCZMAEP2whZaFf2oO2vfeypBOBBDk0eCcu2rDOdl3CoQznGUTJoKAT6dy7d5CfMPjaKiGHBBgh2
+	wFV9wIuHGI4Ob2Dpoo+q52S0AodtCDoUqo=
+X-Received: by 2002:a05:600c:b90:b0:493:b967:178d with SMTP id 5b1f17b1804b1-493f881d05emr112865375e9.19.1783979980087;
+        Mon, 13 Jul 2026 14:59:40 -0700 (PDT)
+Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.218.188])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4950a2f9402sm28390785e9.13.2026.07.13.14.59.37
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 13 Jul 2026 14:59:39 -0700 (PDT)
+From: Doruk Tan Ozturk <doruk@0sec.ai>
+To: David Heidelberg <david@ixit.cz>
+Cc: oe-linux-nfc@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net] nfc: microread: validate CARD_FOUND event length before parsing targets
+Date: Mon, 13 Jul 2026 23:59:36 +0200
+Message-ID: <20260713215936.23137-1-doruk@0sec.ai>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 13 Jul 2026 17:57:38 -0400
-Message-Id: <DJXS2WYYPTBK.F3KORRKBRAGY@etsalapatis.com>
-Subject: Re: [PATCH bpf-next v3 07/15] bpf: Move LSM trampoline unlink into
- bpf_cgroup_link_auto_detach()
-From: "Emil Tsalapatis" <emil@etsalapatis.com>
-To: "Amery Hung" <ameryhung@gmail.com>, <bpf@vger.kernel.org>
-Cc: <netdev@vger.kernel.org>, <alexei.starovoitov@gmail.com>,
- <andrii@kernel.org>, <daniel@iogearbox.net>, <eddyz87@gmail.com>,
- <memxor@gmail.com>, <martin.lau@kernel.org>, <shakeel.butt@linux.dev>,
- <roman.gushchin@linux.dev>, <kuniyu@google.com>,
- <kerneljasonxing@gmail.com>, <kernel-team@meta.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260706171918.317102-1-ameryhung@gmail.com>
- <20260706171918.317102-8-ameryhung@gmail.com>
-In-Reply-To: <20260706171918.317102-8-ameryhung@gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[0sec.ai:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:ameryhung@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:alexei.starovoitov@gmail.com,m:andrii@kernel.org,m:daniel@iogearbox.net,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@kernel.org,m:shakeel.butt@linux.dev,m:roman.gushchin@linux.dev,m:kuniyu@google.com,m:kerneljasonxing@gmail.com,m:kernel-team@meta.com,m:alexeistarovoitov@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	FORGED_SENDER(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
-	DMARC_NA(0.00)[etsalapatis.com];
+	TAGGED_FROM(0.00)[bounces-307292-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:david@ixit.cz,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	DMARC_NA(0.00)[0sec.ai];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307291-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[0sec.ai:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,linux.dev,google.com,meta.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,etsalapatis.com:from_mime,etsalapatis.com:email,etsalapatis.com:mid,etsalapatis-com.20251104.gappssmtp.com:dkim,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[0sec.ai:email,0sec.ai:dkim,0sec.ai:url,0sec.ai:from_mime,0sec.ai:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CA8EE74F5ED
+X-Rspamd-Queue-Id: 43A8074F66F
 
-On Mon Jul 6, 2026 at 1:19 PM EDT, Amery Hung wrote:
-> From: Martin KaFai Lau <martin.lau@kernel.org>
->
-> Move the LSM trampoline unlink into bpf_cgroup_link_auto_detach().
-> The purpose is to consolidate the auto_detach cleanup logic.
->
-> It prepares for the upcoming struct_ops cgroup attachment patch where
-> bpf_cgroup_link_auto_detach() will need to handle the struct_ops case
-> (link->map !=3D NULL).
->
-> This is a no-op change.
->
-> Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+microread_target_discovered() parses a device-supplied MREAD_CARD_FOUND
+event into a struct nfc_target, reading fixed offsets and -- for the
+ISO-A and ISO-A-3 gates -- a variable-length NFCID1 straight out of the
+event skb. The only length check is nfcid1_len vs sizeof(targets->nfcid1);
+skb->len itself is never validated, so a short event makes every gate
+case read out of bounds past the skb:
 
-Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
+  - ISO-A / ISO-A-3: fixed ATQA/SAK/LEN reads plus a memcpy of an
+    attacker-controlled nfcid1_len bytes from the NFCID1 offset;
+  - ISO-B / NFC-T1 / NFC-T3: a fixed 4- or 8-byte NFCID1 memcpy from a
+    fixed offset.
 
-> ---
->  kernel/bpf/cgroup.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
->
-> diff --git a/kernel/bpf/cgroup.c b/kernel/bpf/cgroup.c
-> index b43f0bff184c..7abbe12e108f 100644
-> --- a/kernel/bpf/cgroup.c
-> +++ b/kernel/bpf/cgroup.c
-> @@ -313,6 +313,8 @@ static void bpf_cgroup_storages_link(struct bpf_cgrou=
-p_storage *storages[],
->   */
->  static void bpf_cgroup_link_auto_detach(struct bpf_cgroup_link *link)
->  {
-> +	if (link->link.prog->expected_attach_type =3D=3D BPF_LSM_CGROUP)
-> +		bpf_trampoline_unlink_cgroup_shim(link->link.prog);
->  	cgroup_put(link->cgroup);
->  	link->cgroup =3D NULL;
->  }
-> @@ -346,11 +348,8 @@ static void cgroup_bpf_release(struct work_struct *w=
-ork)
->  					bpf_trampoline_unlink_cgroup_shim(pl->prog);
->  				bpf_prog_put(pl->prog);
->  			}
-> -			if (pl->link) {
-> -				if (pl->link->link.prog->expected_attach_type =3D=3D BPF_LSM_CGROUP)
-> -					bpf_trampoline_unlink_cgroup_shim(pl->link->link.prog);
-> +			if (pl->link)
->  				bpf_cgroup_link_auto_detach(pl->link);
-> -			}
->  			kfree(pl);
->  			static_branch_dec(&cgroup_bpf_enabled_key[atype]);
->  		}
+The copied nfcid1 is exported to user space via nfc_targets_found(), so
+the over-read is an information leak (and a possible oops on an unmapped
+page).
+
+Reject events too short for the fields each gate case reads.
+
+Found by 0sec (https://0sec.ai).
+
+Fixes: cfad1ba87150 ("NFC: Initial support for Inside Secure microread")
+Cc: stable@vger.kernel.org
+Assisted-by: 0sec
+Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
+---
+ drivers/nfc/microread/microread.c | 31 +++++++++++++++++++++++++++++--
+ 1 file changed, 29 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/nfc/microread/microread.c b/drivers/nfc/microread/microread.c
+index 4149c5d735bd..9a7a4fd6796b 100644
+--- a/drivers/nfc/microread/microread.c
++++ b/drivers/nfc/microread/microread.c
+@@ -483,13 +483,19 @@ static void microread_target_discovered(struct nfc_hci_dev *hdev, u8 gate,
+ 
+ 	switch (gate) {
+ 	case MICROREAD_GATE_ID_MREAD_ISO_A:
++		if (skb->len < MICROREAD_EMCF_A_UID) {
++			r = -EINVAL;
++			goto exit_free;
++		}
++
+ 		targets->supported_protocols =
+ 		      nfc_hci_sak_to_protocol(skb->data[MICROREAD_EMCF_A_SAK]);
+ 		targets->sens_res =
+ 			 be16_to_cpu(*(u16 *)&skb->data[MICROREAD_EMCF_A_ATQA]);
+ 		targets->sel_res = skb->data[MICROREAD_EMCF_A_SAK];
+ 		targets->nfcid1_len = skb->data[MICROREAD_EMCF_A_LEN];
+-		if (targets->nfcid1_len > sizeof(targets->nfcid1)) {
++		if (targets->nfcid1_len > sizeof(targets->nfcid1) ||
++		    skb->len - MICROREAD_EMCF_A_UID < targets->nfcid1_len) {
+ 			r = -EINVAL;
+ 			goto exit_free;
+ 		}
+@@ -497,13 +503,19 @@ static void microread_target_discovered(struct nfc_hci_dev *hdev, u8 gate,
+ 		       targets->nfcid1_len);
+ 		break;
+ 	case MICROREAD_GATE_ID_MREAD_ISO_A_3:
++		if (skb->len < MICROREAD_EMCF_A3_UID) {
++			r = -EINVAL;
++			goto exit_free;
++		}
++
+ 		targets->supported_protocols =
+ 		      nfc_hci_sak_to_protocol(skb->data[MICROREAD_EMCF_A3_SAK]);
+ 		targets->sens_res =
+ 			 be16_to_cpu(*(u16 *)&skb->data[MICROREAD_EMCF_A3_ATQA]);
+ 		targets->sel_res = skb->data[MICROREAD_EMCF_A3_SAK];
+ 		targets->nfcid1_len = skb->data[MICROREAD_EMCF_A3_LEN];
+-		if (targets->nfcid1_len > sizeof(targets->nfcid1)) {
++		if (targets->nfcid1_len > sizeof(targets->nfcid1) ||
++		    skb->len - MICROREAD_EMCF_A3_UID < targets->nfcid1_len) {
+ 			r = -EINVAL;
+ 			goto exit_free;
+ 		}
+@@ -511,11 +523,21 @@ static void microread_target_discovered(struct nfc_hci_dev *hdev, u8 gate,
+ 		       targets->nfcid1_len);
+ 		break;
+ 	case MICROREAD_GATE_ID_MREAD_ISO_B:
++		if (skb->len < MICROREAD_EMCF_B_UID + 4) {
++			r = -EINVAL;
++			goto exit_free;
++		}
++
+ 		targets->supported_protocols = NFC_PROTO_ISO14443_B_MASK;
+ 		memcpy(targets->nfcid1, &skb->data[MICROREAD_EMCF_B_UID], 4);
+ 		targets->nfcid1_len = 4;
+ 		break;
+ 	case MICROREAD_GATE_ID_MREAD_NFC_T1:
++		if (skb->len < MICROREAD_EMCF_T1_UID + 4) {
++			r = -EINVAL;
++			goto exit_free;
++		}
++
+ 		targets->supported_protocols = NFC_PROTO_JEWEL_MASK;
+ 		targets->sens_res =
+ 			le16_to_cpu(*(u16 *)&skb->data[MICROREAD_EMCF_T1_ATQA]);
+@@ -523,6 +545,11 @@ static void microread_target_discovered(struct nfc_hci_dev *hdev, u8 gate,
+ 		targets->nfcid1_len = 4;
+ 		break;
+ 	case MICROREAD_GATE_ID_MREAD_NFC_T3:
++		if (skb->len < MICROREAD_EMCF_T3_UID + 8) {
++			r = -EINVAL;
++			goto exit_free;
++		}
++
+ 		targets->supported_protocols = NFC_PROTO_FELICA_MASK;
+ 		memcpy(targets->nfcid1, &skb->data[MICROREAD_EMCF_T3_UID], 8);
+ 		targets->nfcid1_len = 8;
+-- 
+2.43.0
 
 
