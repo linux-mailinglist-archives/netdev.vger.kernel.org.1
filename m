@@ -1,414 +1,192 @@
-Return-Path: <netdev+bounces-307574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307575-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FXVMMp2MVmqQ8wAAu9opvQ
-	(envelope-from <netdev+bounces-307574-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 21:23:09 +0200
+	id hzDHMemMVmqo8wAAu9opvQ
+	(envelope-from <netdev+bounces-307575-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 21:24:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41DFC75834C
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 21:23:09 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 457F775835B
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 21:24:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=HukgR57S;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307574-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307574-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=YkTuqxEL;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307575-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307575-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 458003039A3F
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:23:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F01F4310A426
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:23:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4756C41B8C2;
-	Tue, 14 Jul 2026 19:23:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 368F03ED5A6;
+	Tue, 14 Jul 2026 19:23:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FEDE3002D8
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 19:23:05 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784056987; cv=pass; b=TYuOlSxNFJkSUgOB1AqzpaM+sIU2XK6REWEJ/mrgVpKwybtveZoKgaUx96dApHgw1z6KAqgzln8U+ehJ5HuSfDXvQ5YUgurPvcr6BkFGc12hJujcP9bLWTgjNmq5jDcWeGchZbJVmmpm2zdWxLvNzJOhjcQ+l4Ct5CclK/I+mns=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784056987; c=relaxed/simple;
-	bh=bMQP3PPyICyOc070fIn4mMQpbzIMj2Mr7DJSKEUAshE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AtpgsyGgCSF/47MRm/3vJUA7lDNxGHlYfSvIm/I9WHzbbUAAyitSd2JSjSfBnBdju+DidOQ7KwbRKBktFkB7MQ2J++ZGxLpj4etDO+GQNTb62n6WmX+qoZ/Egb9IH6hawJjOJ0lVXPGrKcCPyPixoN21VWVH63IIpGAEI1JNDJs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HukgR57S; arc=pass smtp.client-ip=209.85.218.41
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-c15f360851aso220714366b.2
-        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 12:23:05 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784056984; cv=none;
-        d=google.com; s=arc-20260327;
-        b=JAPHpXk/WzCAF8fdiYkwtN/sOD3ezUauX1tEw17pc6Z5l6DxLIckpTuPJcllThEtgp
-         CmwM6IoDhUAq6ou9n+gKTmLF0wvlbGFOzm/D98atalbFRaAylshfwq58oWyV85DFcYm4
-         aE9e/Oi0E96MtJTBmccwulRI55RutsPzVX5Gby/5JisvRYsFGPsHSaAW4HkqQdtrXjuA
-         VFcvSN0Q2t4Bb2adJILpVcUJ6McriVsTZkEzSZNPHn1t1EfZRzgsFwfZb04gqNC0hA+9
-         XXM+ZCVCAnrUjSJ/l69c0HusVbspoGY6ddPoUrvFreWFwe/gmXI2kAYwfLWYcEzfmpSy
-         +jUA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=FXBHlNKwuIa7aGX7ZPFIURhQkWOBdmY3pojBLb5bI6w=;
-        fh=m7VR74eUURRG4a3kkxCpuPyIkXT0WZw+o1nhYgOzoVo=;
-        b=jbd0vKM62cI12nvYFLzbPZdQTXoJ07qbEQlmSflOilMl8yKaHzN1grh8pxonbKW3qo
-         3zQWdWwrHEXNVjg9xUMd/TMSxr4nLnUVMJ5AENy74QHiZlcD/RuK0IZ7UhkH0oOk1OsE
-         uULAQN/bOk5i+mVjrWSzP9tGQmTvkdSTwDbIHdSM7BQ4IDFIDTg3c3sJXJw7M0H0LPVL
-         bEH5q5OVABjXbGo3wgqwiywqAZsrwfqt0z91SiyeIyFqXHkn+pviUJmWDbqWHmhNFqvE
-         LGvjN/okA1uAoMrmMAn+eI9E1ir75n3WNu+w1QFTiqdJW8Dj+CEHLXhwoSo2V4tABtFW
-         +0RA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC04B37B01F
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 19:23:13 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784056995; cv=none; b=hzeIiHhYYbIPKJFeyK3YOvmojdKYKsbT0Bsf7lblvHoHdeelEtVgc6jN0dAhnFtXPUOqmaO/iSHQtS6uPIr+wS8NROek+tJs0pQ5eUnLpPktjJStX1ym5vRsQ3YiweVy+iUB9Vq4kGGjMsggTvm7AdrJvwx1qr9o0lWqIyfC+po=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784056995; c=relaxed/simple;
+	bh=fFBHdwS5m7mtCvyv1Trv/atViqR0huglkyQkqJ5emVk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GqTvNnyF/uVYZkL6K3441rGcSNAOwbZJEQjgVquo9IvKI8ZG5rKafZ0b1aF1ruOp0N60rWuOust3dNwEi83P9E+zjE4+gM8CDENccmnpKM+oLlisg929CI45c6BARRsbfqqBl1CGoARtx+MH2lgaIhZ8nguzAh8DGUcfkNpP7Ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YkTuqxEL; arc=none smtp.client-ip=209.85.216.43
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-38101f85591so1051331a91.1
+        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 12:23:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784056984; x=1784661784; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=FXBHlNKwuIa7aGX7ZPFIURhQkWOBdmY3pojBLb5bI6w=;
-        b=HukgR57SrCopP6ot1IlL3ypcGsWjmZpycirJ9N9KffT1LurbHZzagRy3idwxp/ZrNz
-         c/dIGN/qQJI2uggkc9bNFJOTYKNpmnPt4YpPpAKWNJ+zC/MgUktdLTWap93oFRfkrNdn
-         KmlKUGiwXTBZdisIAAtIgoE89jZ1BTLZKrYk2HLQF1u4DBQKucLnj7pE330IKggAfXWD
-         l4nZp/o3ykpu9E6rtnV8KltRhkkiA8BeH6UMCp8Tbp10NWGk9rP9QQwbC0YXtEsT4wNO
-         x8bTmUGTYErQ+2JGeBsi5kZxBFzjX1yymwyYPlDTue1BRdJdNfSZSaAXoG6fto9tITt4
-         j2Ag==
+        d=gmail.com; s=20251104; t=1784056993; x=1784661793; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=4YxMZuS3O1N4LeRTy/92z3+raTT8LPy5OGFMt00nrLg=;
+        b=YkTuqxELhYg+2qo2cr34ZYEiG2vBnymqgci+NkLWkkOs2p7m49Qd5hBDAPCV2Prbvs
+         SKhv2hW24MNDAstrOB59oPXQIz6lj8T9cKc43xZYGXieLwZL6kizKsecH3VH6cXic1NQ
+         rBevHGFSKiwf+ZTtcau5IAxm/Gsu2InnEo9lnt+BlFdWNUQeum+zLp8PDfBhoHRrO+4m
+         NIy06ypLlT8i1eC6jZadUFxtAjouHnHxWwTYxHbYD/id+Ot/2Qkf4x6JhLY/Y9/MPwBD
+         vC7QEfECzQRvWNaaBkv83tPfQJTCLm0kolU9ZruiDhiPpXGDzu81QCbE/g3+bUX3Qaph
+         SW9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784056984; x=1784661784;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=FXBHlNKwuIa7aGX7ZPFIURhQkWOBdmY3pojBLb5bI6w=;
-        b=cjm/2vjVMMhF10OMAkQLv+8Xs9lQO38BDxRKGYwyi7VyBv2qtw8eyqE+s9Aj8ew325
-         p+pVbHdiO/ZuaZtZ7bxy1D4nESzHs8zxy7u1kWPs3mouSuxqXP7XIAN5L7hq61CsPpVI
-         P8DG3JFB2ObXs/sGBnFb8rBO1NrIYvLZ/a4dinOMTzq57shsp+l9RPxy0VnjZApwrXBE
-         svid13DdScVc/RMusV7/IryBw9IMEAdiI2OX98jHIri0XvLXE0vnEUkVUN1El1rmfbk6
-         gtdYJ+PnSYwvSBJP4o1I694s9YgFZbWhclzP1dqyiaSvWnKJvWbhPllnKXemCkLwLDJ5
-         yquQ==
-X-Gm-Message-State: AOJu0YzD/WjiLNCsVe5ZQQYea4pVZ9Jq/tt+rmQG57ZvMOKC5ij5kLOx
-	XicqqcvKMFZUPXJ3tB7SvifoERkm0gHAAzCluh81K0DhnXzZ9k4AZ1kbLTA7dYx1Ng7IWWbsy95
-	JZje9pFeG4zsGlfrt4RtOz3KGb3VSJeQ=
-X-Gm-Gg: AfdE7ckWoNJvLYnM1sAgaK0GgBd/2SyCAVfr7qnYVmkC1liHIUqSQyHtpw88Yc0wLi/
-	4BGyD4fjzfSgd+YHEEdyKxVIwrfgTNRHr1F3+gr6E1KTCcpHYOUcLxm52L4PhOgd5i+XwWNqXuJ
-	RlwjqInbw2bfEampRopQIRZsjyOXjpCMYQW+6Ifhv52es6FSn7rdknXxQxi2JfsmCc5dJKs781L
-	sGieX+7d2yg14jjB5WnggF+uDaC195xuX6vt5AlGa1nqdtz+dIROJL6MPluqmoHhiD6Ffpr0yB5
-	bbwn9oYN6qYK1qDPHnCk64x/2GIG
-X-Received: by 2002:a17:907:cf87:b0:c16:1120:8e63 with SMTP id
- a640c23a62f3a-c161e9c2baamr825531566b.21.1784056983454; Tue, 14 Jul 2026
- 12:23:03 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1784056993; x=1784661793;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=4YxMZuS3O1N4LeRTy/92z3+raTT8LPy5OGFMt00nrLg=;
+        b=AiFQfcWxuzrxwy34HQnkFsYJkQvBhjvan3yY2nIwBPywdh+w68Zi8i2fdA0FFikNou
+         Rg4diff/AGH0WoX/8D672RqC4GqopwRkJT/OrUZKnKDymx+uvCNZfZQ9rjZesRzCZ4WL
+         qVUZLoRav8lMCMNrrCyIQgLpSrDBAUobDarQWUCOI0orQBtPfGBaedcdPILV/m41GIsi
+         /yE4pkfYPyvuKoB5nj129W49kTv8dkeFNzwFoCSSAdoC8r9ks34EdgqhxwkoU24LcZ7s
+         oyLHn7eK3YYN2fwRVrFRSIUEH9DU/8T5f+s5vSKnk8hEa0r/qPNieDrXmGVBw6Ad04AP
+         LFLA==
+X-Forwarded-Encrypted: i=1; AHgh+RpZffpgmB6nwiIoRSTVes+1aVvO1B74TA74bEfThY+0w4zeaX10EKKbFJmfySBV5yilP7Q96s8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJe9mO1hrW34SH01GFNi7eTxqqFdYFEB3LoO/LJ8Siik92j+Jy
+	3GokET7zl93lZJQKOpqSO2EX15YF8lI+7ZsIUm9VgK3/HCOIvuHAw1Lb
+X-Gm-Gg: AfdE7cltsuMSz/4vB9d8h1e8Xo/G2Abx5u0iN7M1/yZ4OA8xYW8p7K6hwLReJlnh3Vv
+	XGb1gLK3fD2UrDhb/sY8/lkxqINgq9Dgib8v/1lwFWA6VerLdBvB9pbMxnMVHIcUr6xFMfUIbgR
+	wnPKYt2kSHZKxjh6pOStIQoIqIDVwKtGQj6OEGPlO0N+4F56OXFR7Z1j2t4Mc9mGlyvojEC1I4T
+	tZhXL/0W7QSZvoIVtfkcDeQDh3kIYbsRaG9EkkV7mVLd24TPNaHMACzi3sV7Y6hdzMTKU58vok1
+	dXxei090VaTNsYGLs2uWwM3jfLTBhV1pjFJb4Mua7/AdbgYQgVZZyRgtql9g2UR6cT1Z5/ieNe8
+	9ED4C7YB4Rx/muob9dMKYgUDwwn6S1JJ9gU6zTamSBmkxlsog5wTJKwmkCthtDEYwDludbkB/rW
+	Ez+2xeZoGk6LGH5nqg5NgBdBHoQ2UFG8M4WIno6kew/A8w+5G6IOK5kX+jY1WXTGMx86KEC+n+2
+	YrT8ll3pi5p7M7BrTsg0aY=
+X-Received: by 2002:a17:90b:3c0f:b0:37f:f089:c81b with SMTP id 98e67ed59e1d1-38dc8071aeamr11838700a91.3.1784056993076;
+        Tue, 14 Jul 2026 12:23:13 -0700 (PDT)
+Received: from lab-kiba-ocxma-dut-01.. (191.68.231.218.rev.ocx2915.net. [218.231.68.191])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38e16e1d2e8sm1979029a91.0.2026.07.14.12.23.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jul 2026 12:23:11 -0700 (PDT)
+From: Takeru Hayasaka <hayatake396@gmail.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	marcin.szycik@linux.intel.com,
+	netdev@vger.kernel.org,
+	Takeru Hayasaka <hayatake396@gmail.com>
+Subject: [PATCH iwl-net] ice: fix empty PTYPE set for GTP RSS profiles
+Date: Tue, 14 Jul 2026 19:22:30 +0000
+Message-ID: <20260714192302.631428-1-hayatake396@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260710174718.1969789-2-bestswngs@gmail.com> <GV1P189MB1988266AEFCF1F992E0F50D3C6FA2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-In-Reply-To: <GV1P189MB1988266AEFCF1F992E0F50D3C6FA2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-From: Weiming Shi <bestswngs@gmail.com>
-Date: Wed, 15 Jul 2026 03:22:26 +0800
-X-Gm-Features: AUfX_my7g5QdTWQuYCx-jpzYSubmdLo4XZTuoSoJnDv-b0fXk7L7peilPHNJadE
-Message-ID: <CANgPUi3i0f4-dGNRK0gOMunxAHabK0t+habiC9LEBsCpNmVkPg@mail.gmail.com>
-Subject: Re: [PATCH net v4] tipc: serialize udp bearer replicast list updates
-To: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"tipc-discussion@lists.sourceforge.net" <tipc-discussion@lists.sourceforge.net>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "xmei5@asu.edu" <xmei5@asu.edu>, 
-	Jon Maloy <jmaloy@redhat.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:tung.quang.nguyen@est.tech,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:xmei5@asu.edu,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-307574-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[intel.com,lunn.ch,linux.intel.com,vger.kernel.org,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307575-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:marcin.szycik@linux.intel.com,m:netdev@vger.kernel.org,m:hayatake396@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[hayatake396@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hayatake396@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:email,vger.kernel.org:from_smtp,est.tech:email,mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 41DFC75834C
+X-Rspamd-Queue-Id: 457F775835B
 
-Tung Quang Nguyen <tung.quang.nguyen@est.tech> =E4=BA=8E2026=E5=B9=B47=E6=
-=9C=8813=E6=97=A5=E5=91=A8=E4=B8=80 20:06=E5=86=99=E9=81=93=EF=BC=9A
->
-> >Subject: [PATCH net v4] tipc: serialize udp bearer replicast list update=
-s
-> >
-> >tipc_udp_rcast_add() and cleanup_bearer() both update ub->rcast.list wit=
-h
-> >list_add_rcu() / list_del_rcu(), but nothing serializes them. The add ru=
-ns from
-> >the encap receive softirq (via tipc_udp_rcast_disc()) without rtnl_lock(=
-), so it
-> >can race the cleanup delete and corrupt the list:
-> >
-> >  list_del corruption. prev->next should be ffff8880298d7ab8,
-> >    but was ffff88802449ad38. (prev=3Dffff888027e3ec98)
-> >  kernel BUG at lib/list_debug.c:62!
-> >  RIP: __list_del_entry_valid_or_report+0x17a/0x200
-> >  Workqueue: events cleanup_bearer
-> >  Call Trace:
-> >   cleanup_bearer (net/tipc/udp_media.c:811)
-> >   process_one_work (kernel/workqueue.c:3302)
-> >   worker_thread (kernel/workqueue.c:3466)
-> >
-> >The bearer can be enabled from an unprivileged user namespace, as the
-> >TIPCv2 generic-netlink ops carry no GENL_ADMIN_PERM.
-> >
-> >Add a spinlock to struct udp_bearer and take it around the list_add_rcu(=
-) in
-> >tipc_udp_rcast_add() and the list_del_rcu() loop in cleanup_bearer() so =
-the
-> >two writers can no longer corrupt the list.
-> >
-> >Reject a duplicate peer under the same lock before allocating, and remov=
-e
-> >tipc_udp_is_known_peer(). The old lockless pre-check in
-> >tipc_udp_rcast_disc() was racy: two softirqs discovering the same peer c=
-ould
-> >both find it absent and add it twice. Doing the check under rcast_lock i=
-n
-> >tipc_udp_rcast_add(), before the allocation, makes it the single point o=
-f truth
-> >for both the discovery and the netlink add paths and keeps a flood of th=
-e same
-> >address from churning the allocator.
-> >
-> >Fixes: ef20cd4dd163 ("tipc: introduce UDP replicast")
-> >Reported-by: Xiang Mei <xmei5@asu.edu>
-> >Suggested-by: Tung Nguyen <tung.quang.nguyen@est.tech>
-> >Signed-off-by: Weiming Shi <bestswngs@gmail.com>
-> >---
-> >v4: (per Tung's review)
-> > - Reject a duplicate under rcast_lock before allocating rcast, so a
-> >   flood of the same address can't churn the allocator.
-> >v3:
-> > - Check for a duplicate peer in tipc_udp_rcast_add() under rcast_lock
-> >   and remove tipc_udp_is_known_peer().
-> >v2:
-> > - Narrow the lock to the list mutation.
-> >
-> > net/tipc/udp_media.c | 53 ++++++++++++++++++++------------------------
-> > 1 file changed, 24 insertions(+), 29 deletions(-)
-> >
-> >diff --git a/net/tipc/udp_media.c b/net/tipc/udp_media.c index
-> >62ae7f5b5..3f0d75d72 100644
-> >--- a/net/tipc/udp_media.c
-> >+++ b/net/tipc/udp_media.c
-> >@@ -94,6 +94,7 @@ struct udp_replicast {
-> >  * @ifindex:  local address scope
-> >  * @work:     used to schedule deferred work on a bearer
-> >  * @rcast:    associated udp_replicast container
-> >+ * @rcast_lock:       serialize updates to @rcast.list against concurre=
-nt
-> >updaters
-> >  */
-> > struct udp_bearer {
-> >       struct tipc_bearer __rcu *bearer;
-> >@@ -101,6 +102,7 @@ struct udp_bearer {
-> >       u32 ifindex;
-> >       struct work_struct work;
-> >       struct udp_replicast rcast;
-> >+      spinlock_t rcast_lock; /* protects rcast.list */
-> > };
-> >
-> > static int tipc_udp_is_mcast_addr(struct udp_media_addr *addr) @@ -278,=
-26
-> >+280,6 @@ static int tipc_udp_send_msg(struct net *net, struct sk_buff *=
-skb,
-> >       return err;
-> > }
-> >
-> >-static bool tipc_udp_is_known_peer(struct tipc_bearer *b,
-> >-                                 struct udp_media_addr *addr)
-> >-{
-> >-      struct udp_replicast *rcast, *tmp;
-> >-      struct udp_bearer *ub;
-> >-
-> >-      ub =3D rcu_dereference_rtnl(b->media_ptr);
-> >-      if (!ub) {
-> >-              pr_err_ratelimited("UDP bearer instance not found\n");
-> >-              return false;
-> >-      }
-> >-
-> >-      list_for_each_entry_safe(rcast, tmp, &ub->rcast.list, list) {
-> >-              if (!memcmp(&rcast->addr, addr, sizeof(struct
-> >udp_media_addr)))
-> >-                      return true;
-> >-      }
-> >-
-> >-      return false;
-> >-}
-> >-
-> > static int tipc_udp_rcast_add(struct tipc_bearer *b,
-> >                             struct udp_media_addr *addr)
-> > {
-> >@@ -308,16 +290,34 @@ static int tipc_udp_rcast_add(struct tipc_bearer *=
-b,
-> >       if (!ub)
-> >               return -ENODEV;
-> >
-> >+      /* Serialize with other updaters and reject a duplicate before
-> >+       * allocating, so a flood of the same address can't churn the
-> >+       * allocator.
-> >+       */
-> >+      spin_lock_bh(&ub->rcast_lock);
-> >+      list_for_each_entry(rcast, &ub->rcast.list, list) {
-> >+              if (!memcmp(&rcast->addr, addr, sizeof(*addr))) {
-> >+                      spin_unlock_bh(&ub->rcast_lock);
-> >+                      return 0;
-> >+              }
-> >+      }
-> >+
-> >       rcast =3D kmalloc_obj(*rcast, GFP_ATOMIC);
-> >-      if (!rcast)
-> >+      if (!rcast) {
-> >+              spin_unlock_bh(&ub->rcast_lock);
-> >               return -ENOMEM;
-> >+      }
-> >
-> >       if (dst_cache_init(&rcast->dst_cache, GFP_ATOMIC)) {
-> >+              spin_unlock_bh(&ub->rcast_lock);
-> >               kfree(rcast);
-> >               return -ENOMEM;
-> >       }
-> >
-> >       memcpy(&rcast->addr, addr, sizeof(struct udp_media_addr));
-> >+      list_add_rcu(&rcast->list, &ub->rcast.list);
-> >+      b->bcast_addr.broadcast =3D TIPC_REPLICAST_SUPPORT;
-> >+      spin_unlock_bh(&ub->rcast_lock);
->
-> sashiko reports potential memory leak when tipc_udp_nl_bearer_add() adds =
-an element to the list right after cleanup_bearer() frees all element in th=
-e list.
-> I think we need to add more code to handle this case as below:
->
-> --- a/net/tipc/udp_media.c
-> +++ b/net/tipc/udp_media.c
-> @@ -95,6 +95,7 @@ struct udp_replicast {
->   * @work:      used to schedule deferred work on a bearer
->   * @rcast:     associated udp_replicast container
->   * @rcast_lock:        serialize updates to @rcast.list against concurre=
-nt updaters
-> + * @bearer_disabled: flag to not add rcast to rcast.list if bearer was d=
-isabled
->   */
->  struct udp_bearer {
->         struct tipc_bearer __rcu *bearer;
-> @@ -103,6 +104,7 @@ struct udp_bearer {
->         struct work_struct work;
->         struct udp_replicast rcast;
->         spinlock_t rcast_lock; /* protects rcast.list */
-> +       bool bearer_disabled;
->  };
->
->  static int tipc_udp_is_mcast_addr(struct udp_media_addr *addr)
-> @@ -295,6 +297,10 @@ static int tipc_udp_rcast_add(struct tipc_bearer *b,
->          * allocator.
->          */
->         spin_lock_bh(&ub->rcast_lock);
-> +       if (ub->bearer_disabled) {
-> +               spin_unlock_bh(&ub->rcast_lock);
-> +               return 0;
-> +       }
->         list_for_each_entry(rcast, &ub->rcast.list, list) {
->                 if (!memcmp(&rcast->addr, addr, sizeof(*addr))) {
->                         spin_unlock_bh(&ub->rcast_lock);
-> @@ -817,6 +823,7 @@ static void cleanup_bearer(struct work_struct *work)
->                 list_del_rcu(&rcast->list);
->                 call_rcu_hurry(&rcast->rcu, rcast_free_rcu);
->         }
-> +       ub->bearer_disabled =3D true;
->         spin_unlock_bh(&ub->rcast_lock);
->
->         tn =3D tipc_net(sock_net(ub->sk));
->
-> >
-> >       if (ntohs(addr->proto) =3D=3D ETH_P_IP)
-> >               pr_info("New replicast peer: %pI4\n", &rcast->addr.ipv4);=
- @@
-> >-325,8 +325,6 @@ static int tipc_udp_rcast_add(struct tipc_bearer *b,
-> >       else if (ntohs(addr->proto) =3D=3D ETH_P_IPV6)
-> >               pr_info("New replicast peer: %pI6\n", &rcast->addr.ipv6);
-> >#endif
-> >-      b->bcast_addr.broadcast =3D TIPC_REPLICAST_SUPPORT;
-> >-      list_add_rcu(&rcast->list, &ub->rcast.list);
-> >       return 0;
-> > }
-> >
-> >@@ -361,9 +359,6 @@ static int tipc_udp_rcast_disc(struct tipc_bearer *b=
-,
-> >struct sk_buff *skb)
-> >               return 0;
-> >       }
-> >
-> >-      if (likely(tipc_udp_is_known_peer(b, &src)))
-> >-              return 0;
-> >-
-> >       return tipc_udp_rcast_add(b, &src);
-> > }
-> >
-> >@@ -644,9 +639,6 @@ int tipc_udp_nl_bearer_add(struct tipc_bearer *b,
-> >struct nlattr *attr)
-> >               return -EINVAL;
-> >       }
-> >
-> >-      if (tipc_udp_is_known_peer(b, &addr))
-> >-              return 0;
-> >-
-> >       return tipc_udp_rcast_add(b, &addr);
-> > }
-> >
-> >@@ -679,6 +671,7 @@ static int tipc_udp_enable(struct net *net, struct
-> >tipc_bearer *b,
-> >               return -ENOMEM;
-> >
-> >       INIT_LIST_HEAD(&ub->rcast.list);
-> >+      spin_lock_init(&ub->rcast_lock);
-> >
-> >       if (!attrs[TIPC_NLA_BEARER_UDP_OPTS])
-> >               goto err;
-> >@@ -819,10 +812,12 @@ static void cleanup_bearer(struct work_struct
-> >*work)
-> >       struct udp_replicast *rcast, *tmp;
-> >       struct tipc_net *tn;
-> >
-> >+      spin_lock_bh(&ub->rcast_lock);
-> >       list_for_each_entry_safe(rcast, tmp, &ub->rcast.list, list) {
-> >               list_del_rcu(&rcast->list);
-> >               call_rcu_hurry(&rcast->rcu, rcast_free_rcu);
-> >       }
-> >+      spin_unlock_bh(&ub->rcast_lock);
-> >
-> >       tn =3D tipc_net(sock_net(ub->sk));
-> >
-> >--
-> >2.43.0
->
+Configuring RSS for GTP flows via ethtool, e.g.
 
-v5 sent. Thanks.
+  ethtool -N <if> rx-flow-hash gtpu4 sde
+
+is accepted but has no effect: the hash of GTP-U packets does not
+include the TEID, so all traffic between a given SGW/PGW pair lands on
+a single Rx queue. The GTP RSS configurations the driver installs by
+default at VSI init are affected the same way.
+
+ice_flow_set_rss_seg_info() does not set IPV_OTHER on GTP segments, and
+such a segment carries no L4 header bit either. ice_flow_proc_seg_hdrs()
+therefore takes the "no L4" branch and ANDs the PTYPE set with
+ice_ptypes_ipv4_ofos_no_l4, or ice_ptypes_ipv4_il_no_l4 for the inner
+segment. Neither holds a GTP PTYPE, so ANDing with ice_ptypes_gtpu
+leaves the set empty: the profile matches no packet at all and the
+configured TEID field never enters the hash.
+
+Set IPV_OTHER on GTP segments so that the tunnel-inclusive PTYPE sets
+are selected instead, which do contain the GTP PTYPEs.
+
+Verified on E810 (kernel 7.2-rc2, COMMS DDP 1.3.63.0) by reading the RSS
+hash from the Rx descriptor: GTP-U traffic varying only the TEID goes
+from one constant hash on a single Rx queue to 4096 distinct hashes
+across all Rx queues. The same holds for inner IPv6 (gtpu6) and for a
+PDU session container extension header (gtpu4e); plain UDP flows are
+unaffected.
+
+Signed-off-by: Takeru Hayasaka <hayatake396@gmail.com>
+---
+ drivers/net/ethernet/intel/ice/ice_flow.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_flow.c b/drivers/net/ethernet/intel/ice/ice_flow.c
+index 121552c644cd..2156bf246921 100644
+--- a/drivers/net/ethernet/intel/ice/ice_flow.c
++++ b/drivers/net/ethernet/intel/ice/ice_flow.c
+@@ -2088,6 +2088,14 @@ ice_flow_set_rss_seg_info(struct ice_flow_seg_info *segs, u8 seg_cnt,
+ 
+ 	ICE_FLOW_SET_HDRS(seg, cfg->addl_hdrs);
+ 
++	/* A GTP segment has no L4 header bit: without IPV_OTHER the "no L4"
++	 * PTYPE sets are picked, and they hold no GTP PTYPE at all.
++	 */
++	if (seg->hdrs & (ICE_FLOW_SEG_HDR_GTPU_IP | ICE_FLOW_SEG_HDR_GTPU_EH |
++			 ICE_FLOW_SEG_HDR_GTPU_UP | ICE_FLOW_SEG_HDR_GTPU_DWN |
++			 ICE_FLOW_SEG_HDR_GTPC | ICE_FLOW_SEG_HDR_GTPC_TEID))
++		seg->hdrs |= ICE_FLOW_SEG_HDR_IPV_OTHER;
++
+ 	/* set outer most header */
+ 	if (cfg->hdr_type == ICE_RSS_INNER_HEADERS_W_OUTER_IPV4)
+ 		segs[ICE_RSS_OUTER_HEADERS].hdrs |= ICE_FLOW_SEG_HDR_IPV4 |
+
+base-commit: 1cd23ca80784223fa2204e16203f754da4e821f8
+-- 
+2.43.0
+
 
