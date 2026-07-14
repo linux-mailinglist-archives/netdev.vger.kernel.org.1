@@ -1,303 +1,303 @@
-Return-Path: <netdev+bounces-307558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307559-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id KsHbGx5+Vmpr7QAAu9opvQ
-	(envelope-from <netdev+bounces-307558-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 20:21:18 +0200
+	id +YPDE3+KVmqN8gAAu9opvQ
+	(envelope-from <netdev+bounces-307559-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 21:14:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2F46757CC0
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 20:21:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9874B758211
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 21:14:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amd.com header.s=selector1 header.b=M017rqye;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307558-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307558-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=amd.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=VG6Xj81F;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307559-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307559-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E1C23303A71A
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 18:20:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8C703300D46E
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:13:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC9831ED8B;
-	Tue, 14 Jul 2026 18:20:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8938418A56;
+	Tue, 14 Jul 2026 19:13:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013008.outbound.protection.outlook.com [40.93.201.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj2-f0.google.com (mail-pj2-f0.google.com [74.125.227.128])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5577328B7F
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 18:20:11 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784053213; cv=fail; b=KHlG4aePstUc56smvEQl5cUUhprSeIJyNjSRDxyY6i6CGCqGkMWrZbYR2XcGB8f+uNXezWzO41nQ7vuhBYzo7fdJhYr7qGBUZtulhYtzLGpcQm1Tu0Mil6LwbxW7ShjFYExVQ9UVX15PtADrAU8ElUaE3+Ay8RaYfPNWVv0Oqnc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784053213; c=relaxed/simple;
-	bh=3Jxm7/l1m/p1BX9Ces6VYQUiRX3tUW2AcOVnZ3+jgKc=;
-	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=mR5ucEx3rTScN69UWb1oGGdsQt0xO9zxnciYr/HKaofaVaJHcMa1eeCKEKSNNtwXG5yotVNXifP2icJCJbmCvlup/wlsVxXaZT65BGkBBpNi/+lImaP2KXsRPMxOFrZQXJjmImikYIIr4mlR3NvRmYN2lCbpQlxLocht5wAd/kw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=M017rqye; arc=fail smtp.client-ip=40.93.201.8
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Oo3nxgofeuHBIcNvILPMJGK5REZbXyEOUerL/ZXO9B4C4Wp24fDr9dsJRXp5ii/XrVHGV6BGiNYiu5YZ0bihYGLD+usDuttm+DIiA/y4zqMgPNaLVNtJp6qNgu6s4/iejY6kAD1/bxA/VzdRorsD+r+YxcgHWFquSDHArEZlUqGHKMcEl9/mOq1LDBuF4mgy7kmZpNiGDXlXmA52jYSwbgblD/7khN2xNimLUcP+BbvIE1DC7wctmK++1ewUPS7HWSg4EPwWbJTAi9aVu+GtC+d1QRp/43YJnXNCM9bl0jYKY5WhdwpLcx47y7Rd0/fdtv9b3HsOCROou/rsaG6Yig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OUN1jFpaxdnHBf17oqsG69asdcNKka4iL78oDRsunOM=;
- b=y5DY0/XxOAutoJhTpiRBlgsKiHjiLtynUqCPEWwdu1itR9zqDN17fU/5XhoW6DGBcM6TyXl2yyfn0hx+6RzzI4pkVahVNW5TV0YM3EvMBty1IUdd1VRHbqDZz7v2uUH/e38fonxdhwx46f29dUL2Hq8MwvFece2W11o2jMMvj647FkwQOALyvmsmG52WdWGp2bkZNCNg9iSN+h2lj7XSabfhXDyDwCyI5L8O5QJfZerV9/38X1gAxrt+S0SGigMpdXbkVLjg6a3qDgP24GdTFAzkR2w/RFLXS3z8a/szzT6w+XEbILk8VpWnuxF/pAYfcD+86LVOkxRfeOJpjZmwVw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OUN1jFpaxdnHBf17oqsG69asdcNKka4iL78oDRsunOM=;
- b=M017rqyetaMrqEQvW3DjV5HoDpLkbx/j3PR01LzEIRNEx6gftH6P5EqJcIebG+FoUUb/qdPMGxAnX/8O42wTA1z8Q+cbHhL2f7ry81H4vXNo/qK2lcMdsNmjHHe3AxMeKhYKZGzIPM1P8G+NyqcP+CM3JO8hq+6v4FMmECU3bY4=
-Received: from MN2PR12MB3485.namprd12.prod.outlook.com (2603:10b6:208:c9::22)
- by IA0PPF170E97DF1.namprd12.prod.outlook.com (2603:10b6:20f:fc04::bc9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.23; Tue, 14 Jul
- 2026 18:20:09 +0000
-Received: from MN2PR12MB3485.namprd12.prod.outlook.com
- ([fe80::7ac:5acc:f8b7:65c9]) by MN2PR12MB3485.namprd12.prod.outlook.com
- ([fe80::7ac:5acc:f8b7:65c9%4]) with mapi id 15.21.0181.019; Tue, 14 Jul 2026
- 18:20:07 +0000
-Message-ID: <0d5ce279-9491-4eeb-afd1-40cdb419a1a0@amd.com>
-Date: Tue, 14 Jul 2026 11:20:00 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 2/2] pds_core: fix use-after-free on workqueue
- during remove
-From: "Rao, Nikhil" <nikhirao@amd.com>
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: kuba@kernel.org, brett.creeley@amd.com, eric.joyner@amd.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- "Nikhil P. Rao" <nikhil.rao@amd.com>
-References: <20260629200358.2626129-1-nikhil.rao@amd.com>
- <20260629200358.2626129-3-nikhil.rao@amd.com>
- <11c0ee2b-96ff-4e27-8688-485dc4605f58@redhat.com>
- <3fb21caf-c9f8-4218-8c14-8192a71f26f2@amd.com>
-Content-Language: en-US
-In-Reply-To: <3fb21caf-c9f8-4218-8c14-8192a71f26f2@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SJ0PR03CA0258.namprd03.prod.outlook.com
- (2603:10b6:a03:3a0::23) To MN2PR12MB3485.namprd12.prod.outlook.com
- (2603:10b6:208:c9::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C0EA418A4E
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 19:13:54 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784056435; cv=none; b=gnDzgPpkC7mhrT/fmT8jnKfUwKHttSH102BtR86D/li4ugx0fxef/M30r9Fu2FCZQGOAlIpYZ0Bvun04Rc2h85TRJneDbWkqi+IzXC2qGU7Yv9FSOOIU9LAr/3soY2VSTCcMseilVtSIRg94atmvCWsmPN4AUv0jml8ruL+u2uc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784056435; c=relaxed/simple;
+	bh=OnzeXub9pWgszEs+eJAfiDhXWiRA2b94Y2FtZMmT++0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aRlYFVI95SUnC2LXjYKkTKdodJjfSofRbNPnbl0erqYcbXepXsdTtxU5tXvYFsHYNYNlXEFWtDhYJdo2MejN2cdIYNCr4gB/BwCx5JAUDd+tlysJMb5CGXUq//YFG1MLG+njJ8ynqNMhRklaPkCzlEr6HbcravEnSwC8/VkHrQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VG6Xj81F; arc=none smtp.client-ip=74.125.227.128
+Received: by mail-pj2-f0.google.com with SMTP id d9443c01a7336-2cc7a345f51so32732215ad.0
+        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 12:13:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784056434; x=1784661234; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=ZvralJAhtjQC0agihnqVt6yZC+MGkbFen1qSIili9Nc=;
+        b=VG6Xj81F5S/ZRaj0v2iVgPjJ2r14ha6lo1wSa5w+l2PWo1XW/IDkwyzUbv9MMGQs+I
+         I3CADMXKTKcTJ2NESpni75slX3bt3A4J/ZUfIIxH/GN+QLoyTHWxiuuGyTOmcWsl0Qfu
+         QLW+1jE3CVV/OJLobPl1QhgRXme8o1qVJHARIGzKZcqyd46YEA0SJ1vN8hv5IhJyu1g2
+         gTLzpJO5YLFF2BHjXBHmzpOyCflb15wDrjn7XqdSn0y+My8p8kLBTcowoZJjK9bEIFAZ
+         cjhrW1NvT0oJKsyLgpB1wLk8dBlDBJPIW76BuHMIqUybLLxPXQVHTg3IE5fu+cmnsNyh
+         mcsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784056434; x=1784661234;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=ZvralJAhtjQC0agihnqVt6yZC+MGkbFen1qSIili9Nc=;
+        b=adDuBli33IipkO3/U7KrAVV0thACqikaFoMZDcoHZSK3nkWxe4qcoogGM/nTooWyz1
+         F1LwLNA3BwtH/UoCGnjE9e41/a27B7s/uYmYQUBfj/0jpzBl1X7+jn1XGAztfdfw62Va
+         i18B3BQIvC/88SZXw9gjAGU8fEvmL3Mntl8sU6vFzGpLRSoEUU8hZ8/KuFxRw6hePb3C
+         oKkTng2YchG65zLFw6xajpmJoiyaFJqphD3r/A45+iir5vUCmvStFBooeLYaZMoPyDyi
+         nuCowK3M23tOl/Tne5x/XZuIxWTUAlODpTxz2OVqgfOq6wLyQacbO+5NN6YA33cMA7qD
+         Zi5w==
+X-Gm-Message-State: AOJu0YzHBWDMm3SZvbsBxJGzhPAtHUHaVN5rDA66w1n5tTGjT1LsJckd
+	8GsaZPKqbhRbhGWCANv2YqsHQftnMfj7BrxuHxT75mUw9F0yqJ4EZz4f
+X-Gm-Gg: AfdE7cl9Ne6fo2sN/bkGNfjCAZbgqh2IECYjMioV0GUNLhEtOERC9sLIYNnrkUx+cEV
+	Teezl0IBMpIsC/5mYcd/iUg9hZZp0iv4YK54pw8Gf6T6Wi6kqRRshABNHhOLHKHxUvggBJwYPlx
+	0/SIOeFtbuhVLxO/ntOAvqA0BTyYOKgmf/EV2WUvg7o9U4hc1tKiLgaOdMG5u0s3gwZZ0taN/OQ
+	3Lj62CXxt0JBWVoRHfQuk1daCJgHwfc52VJUY6XDJbVEHUlFSrjpQ9Hy/KwbYs69t1BV67lOUpS
+	YUBN3DJKPKhbdyZwFAT1tDr7vEMEkEz5WXaly96Ldi5VOFJkIomzmMDbmRfEf0BrqSoxkwKtI/c
+	MPHekCUVDs3NGJHADsVjOmJNN/7Al5ZM+OAXiOsar8YkEJMqqo9Fhif+2KA8Kw4q0XjfxT6f4lH
+	8CkYAD4tAcJKg=
+X-Received: by 2002:a17:903:2f0f:b0:2ce:ed59:7044 with SMTP id d9443c01a7336-2ceed597127mr47465305ad.30.1784056433646;
+        Tue, 14 Jul 2026 12:13:53 -0700 (PDT)
+Received: from server.lan ([150.230.217.250])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9d3d451sm120763245ad.65.2026.07.14.12.13.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jul 2026 12:13:53 -0700 (PDT)
+From: Coia Prant <coiaprant@gmail.com>
+To: kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	heiko@sntech.de
+Cc: netdev@vger.kernel.org,
+	linux-rockchip@lists.infradead.org,
+	devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-phy@lists.infradead.org,
+	Coia Prant <coiaprant@gmail.com>
+Subject: [RFC PATCH 00/10] net-next: add basic support for RK3568 XPCS
+Date: Wed, 15 Jul 2026 03:08:28 +0800
+Message-ID: <20260714191341.690906-1-coiaprant@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3485:EE_|IA0PPF170E97DF1:EE_
-X-MS-Office365-Filtering-Correlation-Id: bdef748b-14f5-473a-8b67-08dee1d48604
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|23010399003|18002099003|4143699003|56012099006|11063799006|22082099003|6133799003;
-X-Microsoft-Antispam-Message-Info:
-	rSpY0W2I9h5dSsTLbHiyk/RcSBWbNExQfgBUPGk4jHe70tqRfjKURc1v+4dtMVBlI4Gn/ATS13OZ4dJ6CThAVx3K/50+dEep9dH/rcrrvFSjBDbaKSVoAHFfZGRX2IKuFXtklJuP6BFiGa2t3ue80CsBZBti7n/AYIohcN3RFWjPRM+HgwJkqHAxoRvdYJ2mE6JrHDJJVOTV06hrAmzLJbFsAz6yz7bkm0/EqrjX9VVG4sYskcauPKPmOJ6Trqlcg3/qqQirzX//E71uGEVKnJKOufQaCBV/JiRboNmUDWBd1nMjnY32vlEHW3zbAjLcdL1WbR2CzytHXvXCgjU6bZyWd1uEuPItoxEyP4QSlPd45cc+/splRa4jGbxm9OyTq37Ct64WtdAO3dZ2dU9sT0dVHo3U5xdz8bgqh34sbV6voyptl8XUaUwaJQ4Z8rL+WiQl+jI8vrWdeGtldXtn07O7ScxGcME2GRRlLf8lQkzRyCalB79N/UIEhEZ48468KBiggD/dmg99JDLm5EFwqyEhnmk9HSl/cSKVNpC73TP0bJiiitWu6N/2IAOOL7xssUcfTLMmcVajr1tJjAQaZSh/odZfoVO95ZlwfHA60Kk=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3485.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(23010399003)(18002099003)(4143699003)(56012099006)(11063799006)(22082099003)(6133799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SWVNeWhpVU82YXE3Q2Z1T3pJREdmamJhTG5aTDRQM3Z1bHlCbFFYc0M3WnI2?=
- =?utf-8?B?eTZwdlNrakJqVmYzZTZIeXhEbXYxZ09mSlR3akVGdDlGcndCQkZWdTE1STh5?=
- =?utf-8?B?R2hjUTFydGw3V285REgzWlFYSGppRnhFK3YzcTBFZVp4d0F2ZmlSc2RTbmUy?=
- =?utf-8?B?ejhxT1Z0cDFlYnB2TjM4Wmx3UWNFSTE4QUxvSVdHNkxZRWl2RS80NTI0ZWpl?=
- =?utf-8?B?OUpramNEQ25UaXFwWUtkcHlVa29jdTBNWWlaakxTVFVPZ0lEWjE1RjdReERt?=
- =?utf-8?B?dDZTSC9Dekd6Uk5KdXFDSGpleHdvZlJXaXNxN0s2dVZmYkFjRUpiU1RzR2ln?=
- =?utf-8?B?K1RjUUtQb3hUa3dKbjQ3eHR1dTBMSTJZTFA1MGQwREkvYXlFNFN1SDdzU1Ni?=
- =?utf-8?B?VWZpamMxOWFWcTMwSlIrZlVFSS9JazVpVXpYcitSNzN6azhvYVprcDc4VlVG?=
- =?utf-8?B?dVVBSXpOalYrQThNNy9hUkV2MjljUTY2aDcvWUhXTXpmVmRZMncrbThTb3Nt?=
- =?utf-8?B?K0Q0OHViRTVsMGlKSWxiaEpyMlhmTnlsdTVDOFlXSVZ0ajhOUHBWL2V4dzI3?=
- =?utf-8?B?L0dSSzRrS1JvMDl2Z0xtMG43R2x1ZHp6RExNTUhxamhRV0UvRHB6L0RIbFl3?=
- =?utf-8?B?clpTL0NSa0w3bUtMcU9NbW5XZUFEWU5md3FHeEF1RnI2MkJvR2c4YlRlY1F1?=
- =?utf-8?B?aDhiS2xUU2wzdTFaaGRUZDlxcEYxYWhQWGMrZU56RTVQVzFndERqL1RwUGVa?=
- =?utf-8?B?OThXTGgzTCtXN1U0N3pjOFd3a29pRVA5ZUk1SER1UFBsVmlzdGc1d25Gdm5V?=
- =?utf-8?B?dVNGZE9sRkZQZ1NpU2cyWDRXaTE1N0JoRGRyRjdLS3B1MkUyN2xDTTNsdFUy?=
- =?utf-8?B?bExEZG9PSC9zT0Y5OFNHeHBmQU9DUXcycnMvRFkzMnVJdm5NZkhUbW9TYTdL?=
- =?utf-8?B?blZjdVpEb2x1a3M1bks2ci9mSXlkZ2VEVmtaM3FXWjNWenU4Z21ZQ3lUcHNC?=
- =?utf-8?B?OWVGeDhaVEdKQTdhSDg3bGxWNzRFaXhRWEoyaU9Ua3Jxb1JpcnovQ1NEVFMr?=
- =?utf-8?B?c2NUOEZjVU83cEhHaUhJd3ZOdncvdTZKbVcxVXdUMVh3QXNReWlFMkJmM0ow?=
- =?utf-8?B?MUw3QngxakJ4UzJKOHRsSXI1RWpocjV6NDJheHlDVm04ZmpsUmRTOTRONlRM?=
- =?utf-8?B?MURZNG1WbUp3NkhJbGdMY3FGNWNZRUUwTTZCcDdkNENMY25XaTFaUlN1WGp0?=
- =?utf-8?B?dHEwZHJIOUlGcTlXQU4ybEVwOTJwdUxUV0VIZmRzMXU4UXBudktPYVgxVHRU?=
- =?utf-8?B?MmRWbm1nWWhkK3hYY0NCRzljdHhyb3hFdk4rcGlNbXJaZ3BpUXlvUHJoRkNC?=
- =?utf-8?B?ZGVtQ0xBckE0aHdicjRDN1NvbXM1VGhlYStBSUl6NGNrRmxqeE00RDJqeE9j?=
- =?utf-8?B?WEZGSjMrMUEwWnF0NEhVS2s4U3Z2cGw1V1FTUGxaeGZxL2cxN2x2Z0MvaWs3?=
- =?utf-8?B?eHNKUWo0S1RvY3VueS9aTERLdjZyU08vb2V2MlVSZHhzREVhakcycStFR2xF?=
- =?utf-8?B?MWlKMmlIa2RvSDdVUVgvdm5CK1g5T2xYZUl3ZFNzcGVhK1JLbDRtcmZsWVJi?=
- =?utf-8?B?cHF0UTBWNWs4dGM1c1Q0blBlNnBOR2JkRm9iZ3JkZUY2aEZmYkVzbkJRQmFo?=
- =?utf-8?B?NFg1VXg3d25DQWx6S1RiWGVYaWorREJjWEJyNVB2d0M0c0lQWTRFdVJUOTVz?=
- =?utf-8?B?VzRUK3pSTFFMQ2ZFOGJSUGZ4dFJ2N1VUU2dWVEt2dnZSbU94cFBaeVVHQlBK?=
- =?utf-8?B?VTY1VmtYVER2amtPd2dRVHN5TE1Ic3g2K2lXay81amUvM0hNTU1uMEVkcTdm?=
- =?utf-8?B?NFM5bWZQbytnMTRCeVZ1U0hDd1Q4cUdaS2grTGNzeldMcDhFbFVPcUxpVi8z?=
- =?utf-8?B?aDFaWWw5eU9qK0kxUXJxbjFyejViamdqWDIvb3owOHVvY1NucVBqTVlLcGVj?=
- =?utf-8?B?SE1CaVQ5Q0pqUFkzYXNIN0tPbExLWG9DK1NiT0E5OGl0NnBpUHdjdU03RENC?=
- =?utf-8?B?cjV3M1Z1aDRNRHBlWnFsV3ZUcVhNRENPZVN3V3JOVTZ2K2dnUHJWbGhINm1k?=
- =?utf-8?B?M0FiOGY2R2R3WU1yT0puWllLbGkvNnpBc2JWa3ZzUmtWa0U2Rmdtb2xOaXpI?=
- =?utf-8?B?MkxMbVFDU1FrbUdXZkxSZW1iYWMwcGFWYzNmMVlzd3AvUnZFNUk0ejJPblg5?=
- =?utf-8?B?VEFvZkJ5SHFHM2FMM0Noa2lJTk8vUksrNlRLMjVhcXdRTnd0cjlSaElSdHc1?=
- =?utf-8?B?YlRBRVBPUjhTQmJIMFVEdUZMTGk1Z0Q1UGtiUVBpWWcrL0ZSdjFCdz09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bdef748b-14f5-473a-8b67-08dee1d48604
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3485.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2026 18:20:03.3141
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GiqmsaG5eeGRfXcKZUE+cF2HACQDqK2n/FkOjsdBpa4WmEQxWYFaOg0VnUja3l0YMU5mW0pJKGK/r1CQr5rveQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PPF170E97DF1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-307559-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307558-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[nikhirao@amd.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:brett.creeley@amd.com,m:eric.joyner@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:nikhil.rao@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[coiaprant@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:robh@kernel.org,m:krzk+dt@kernel.org,m:heiko@sntech.de,m:netdev@vger.kernel.org,m:linux-rockchip@lists.infradead.org,m:devicetree@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-phy@lists.infradead.org,m:coiaprant@gmail.com,m:andrew@lunn.ch,m:krzk@kernel.org,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,gmail.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nikhirao@amd.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[coiaprant@gmail.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A2F46757CC0
+X-Rspamd-Queue-Id: 9874B758211
 
+This series adds proper SGMII support for the Rockchip RK3568 SoC
+using the integrated Synopsys DesignWare XPCS, along with necessary
+fixes and refactoring in the stmmac core and XPCS driver.
 
-On 7/6/2026 11:29 AM, Rao, Nikhil wrote:
-> On 7/2/2026 1:13 AM, Paolo Abeni wrote:> On 6/29/26 10:03 PM, Nikhil P. 
-> Rao wrote:
->  >> In pdsc_remove(), the workqueue is destroyed before pdsc_teardown()
->  >> is called. This ordering allows two paths to queue work on the
->  >> destroyed workqueue:
->  >>
->  >> 1. If pdsc_teardown() -> pdsc_devcmd_reset() times out, the error
->  >>     path in pdsc_devcmd_locked() queues health_work.
->  >>
->  >> 2. A NotifyQ event can trigger the ISR and queue work before free_irq()
->  >>     is called in pdsc_teardown().
->  >
->  > I think this should be 2 separate patches.
-> 
-> Thanks for the review.
-> 
-> The original combined them because moving destroy_workqueue() after 
-> teardown fixed both issues.
-> 
-> But they can be split:
-> 
-> - Patch 1: Set pdsc->wq = NULL before destroying it (fixes issue 1). The 
-> devcmd error path checks pdsc->wq before queuing, so this prevents the 
-> UAF. Also avoids needless health recovery during remove.
-> 
-> - Patch 2: Move destroy_workqueue() after teardown and add 
-> cancel_work_sync() (fixes issue 2).
-> 
-> Combined, it looks like this:
-> 
-> struct workqueue_struct *wq = pdsc->wq;
-> if (wq)
->     pdsc->wq = NULL;
-> 
-> /* teardown (free IRQ, cancel work, free memory) */
-> 
-> if (wq)
->      destroy_workqueue(wq);
-> 
-Setting pdsc->wq = NULL risks a NULL deref in pdsc_adminq_isr(), so the
-split I suggested earlier doesn't hold.
+Motivation
+==========
+The RK3568 integrates a DW XPCS accessed via APB3 and connected to
+a Naneng Combo SerDes PHY.  Several boards (e.g., Ariaboard
+Photonicat) use this interface for Gigabit Ethernet.  However, the
+current upstream stmmac driver does not support this configuration,
+and the XPCS driver has issues in SGMII poll mode that cause the
+link to be reported incorrectly.
 
->  >
->  >> @@ -121,10 +122,16 @@ void pdsc_process_adminq(struct pdsc_qcq *qcq)
->  >>        qcq->accum_work += aq_work;
->  >>
->  >>   credits:
->  >> -     /* Return the interrupt credits, one for each completion */
->  >> -     pds_core_intr_credits(&pdsc->intr_ctrl[qcq->intx],
->  >> -                           nq_work + aq_work,
->  >> -                           PDS_CORE_INTR_CRED_REARM);
->  >> +     /* Return the interrupt credits, one for each completion.
->  >> +      * Use READ_ONCE to get a single consistent copy of intx since 
-> it can
->  >> +      * be set to PDS_CORE_INTR_INDEX_NOT_ASSIGNED concurrently during
->  >> +      * teardown, and skip the credits if so.
->  >> +      */
->  >> +     intx = READ_ONCE(qcq->intx);
->  >> +     if (intx != PDS_CORE_INTR_INDEX_NOT_ASSIGNED)
->  >> +             pds_core_intr_credits(&pdsc->intr_ctrl[intx],
->  >> +                                   nq_work + aq_work,
->  >> +                                   PDS_CORE_INTR_CRED_REARM);
->  > AFAICS this does not look safe.
->  >
->  > A concurrent pdsc_qcq_free()/pdsc_qcq_intr_free() may free
->  > `pdsc->intr_ctrl` before setting PDS_CORE_INTR_INDEX_NOT_ASSIGNED.
->  >
->  > I think the teardown should:
->  >
->  > - disable the IRQ
->  > - cancel the work
->  > - free the structs
->  > in the above sequence.
-> 
-> pdsc_qcq_intr_free() doesn't free intr_ctrl - it only calls free_irq(). 
-> intr_ctrl is BAR-mapped memory, freed later by pdsc_unmap_bars() after 
-> teardown completes.
-> 
-> The sequence is already as suggested above:
-> 
-> pdsc_qcq_free()
-> - pdsc_qcq_intr_free() /* calls pdsc_intr_free->free_irq() */
-> - cancel_work_sync()
-> - Frees DMA memory and structs
-> 
-> Note: the adminqcq ISR handles both adminq completions and notifyq 
-> events, so notifyq struct is freed second.
-> 
-> In the current code, qcq->intx is set to NOT_ASSIGNED in 
-> pdsc_qcq_intr_free(). Moving this to after cancel_work_sync() removes 
-> the need for READ_ONCE/WRITE_ONCE.
->
-There is no change in v3[1] beyond deleting READ_ONCE(qcq->intx) (and 
-the corresponding WRITE_ONCE):
-qcq->intx is now cleared after cancel_work_sync() in pdsc_qcq_free(), so 
-pdsc_process_adminq() finishes before it changes.
+This series addresses these issues by:
+- Fixing the XPCS driver's SGMII AN state handling
+- Refactoring stmmac PCS lifetime management to allow platform drivers
+  full control over PCS creation/destruction
+- Adding a Rockchip XPCS platform glue driver and wiring it up in
+  dwmac-rk
 
-On the Sashiko comment[2] asking whether the credit-return write could 
-hit "the hardware register of a freed OS interrupt vector" and cause an
-interrupt storm:
+Series overview
+===============
 
-The credit write in pdsc_process_adminq() targets intr_ctrl[], device
-MMIO in a PCI BAR, not the OS IRQ vector released by free_irq().
-free_irq() shuts down and masks the MSI-X vector, so even if the device
-is rearmed after free_irq(), the interrupt cannot be delivered - AFAIK,
-is no unhandled interrupt storm.
+Generic:
+  Patch 1: move XPCS lifetime management to platform drivers
+           (introduces pcs_init/pcs_exit callbacks)
 
-I will send fixes for the rest of the Sashiko review comments.
+PHY:
+  Patch 2: DT binding for Naneng Combo PHY SGMII MAC selection
+  Patch 3: implement the PHY SGMII MAC selection in driver
 
-Thanks,
-Nikhil
+RK3568 XPCS/SGMII:
+  Patch 4: DT binding for Rockchip RK3568 XPCS
+  Patch 5: add XPCS and fixed-clock nodes to rk3568.dtsi
+  Patch 6: improve SGMII AN state handling (fixes link-down recovery)
+  Patch 7: implement the Rockchip XPCS platform glue driver
+  Patch 8: wire up SGMII support in dwmac-rk
+  Patch 10: update MAINTAINERS
 
-[1] 
-https://lore.kernel.org/netdev/20260714180223.1642792-1-nikhil.rao@amd.com/T/#t
-[2] 
-https://sashiko.dev/#/patchset/20260629200358.2626129-1-nikhil.rao%40amd.com
+Board enablement:
+  Patch 9: enable SGMII LAN port on Photonicat board
+
+Key design decisions
+====================
+- The stmmac core now delegates XPCS creation entirely to platform
+  drivers via pcs_init/pcs_exit.  This is necessary because the
+  generic XPCS creation logic would override any XPCS set up by the
+  platform driver.
+
+- The Rockchip XPCS driver creates a virtual MDIO bus over the APB3
+  registers and implements address remapping.  The generic XPCS core
+  handles all PCS configuration via phylink_pcs_ops.
+
+- On RK3568 in SGMII mode, the MAC clock is fixed at 125 MHz and
+  cannot be dynamically changed.  In-band mode is used, and the
+  generic stmmac set_clk_tx_rate callback is disabled to prevent
+  incorrect clock updates that would break RX.
+
+- The SerDes and power domain are attached to the XPCS device tree
+  node rather than the MAC node. This reflects the actual hardware
+  topology and simplifies the dwmac-rk driver by keeping all PCS-related
+  resources self-contained. It also prepares for possible future QSGMII
+  support, where a single SerDes serves multiple MACs and would be
+  more naturally managed under the XPCS node.
+
+Testing
+=======
+Board: Ariaboard Photonicat (RK3568)
+OS: Armbian (trixie)
+Kernel: 6.18 (backports)
+Result: The SGMII interface obtains an IP address, SSH works, and
+        ping traffic passes without loss.
+
+Notes
+=====
+- When testing out-band mode with set_clk_tx_rate, only 1000Mbps
+  works on both TX/RX; 10/100Mbps only works on TX side.
+- I also noticed that the PHY (YT8521) reports 100Mbps/Half in out-band
+  tesing while the PCS reports 100Mbps/Full if using in-band.
+  This looks like a separate PHY driver bug.
+  I will address/report it independently after this series lands
+  (or if a maintainer points me to the right list).
+
+Dependencies
+============
+None. All patches apply cleanly on top of torvalds master tree (v7.2).
+
+Questions
+=========
+1. Patch 6 (SGMII AN state handling) touches generic pcs-xpcs code and
+   may affect Wangxun NICs.  I don't have Wangxun hardware to test.
+   The original Wangxun-specific path is kept unchanged, so I believe
+   there is no regression risk.
+
+2. Would Heiko Stuebner be willing to be listed as a co-maintainer
+   for the Rockchip XPCS driver?  I've added myself in MAINTAINERS,
+   but having a more experienced Rockchip maintainer on board would
+   be ideal.
+
+Related discussion
+==================
+Previous attempt at SGMII support on RK3568 by others:
+https://lore.kernel.org/all/20221129072714.22880-2-amadeus@jmu.edu.cn/
+
+Also related (runtime PM fix for xpcs-plat, sent separately):
+https://lore.kernel.org/all/20260704214808.1566710-1-coiaprant@gmail.com/
+
+Acknowledgments
+===============
+This work was inspired by and builds upon the excellent work of others:
+- Serge Semin's Synopsys DesignWare XPCS platform driver (pcs-xpcs-plat.c)
+- Clément Léger's Renesas MIIC driver (pcs-rzn1-miic.c)
+- The Rockchip TRM and downstream OEM drivers
+
+This is my first kernel driver series.  I've spent many nights
+debugging the hardware quirks on this board.  I hope this can finally
+replace the out-of-tree OEM code with a clean upstream solution.
+Any guidance during review is greatly appreciated.
+
+Thanks in advance,
+Coia Prant
+---
+Coia Prant (10):
+  net: stmmac: move XPCS lifetime management to platform drivers
+  dt-bindings: phy: rockchip: naneng-combphy: add rockchip,sgmii-mac-sel
+    property
+  phy: rockchip: naneng-combphy: add SGMII MAC selection for RK3568
+  dt-bindings: net: pcs: add rockchip,rk3568-xpcs binding
+  arm64: dts: rockchip: rk3568: add XPCS and fixed-clock nodes
+  net: pcs: xpcs: improve SGMII AN state handling for Rockchip RK3568
+  net: pcs: xpcs: add Rockchip RK3568 platform glue driver
+  net: stmmac: dwmac-rk: add SGMII support for RK3568
+  arm64: dts: rockchip: rk3568-photonicat: enable SGMII LAN port
+  MAINTAINERS: add entry for Rockchip XPCS driver
+
+ .../bindings/net/pcs/rockchip-dwxpcs.yaml     | 126 +++++
+ .../phy/phy-rockchip-naneng-combphy.yaml      |   7 +
+ MAINTAINERS                                   |   9 +
+ .../boot/dts/rockchip/rk3568-photonicat.dts   |  77 ++-
+ arch/arm64/boot/dts/rockchip/rk3568.dtsi      |  45 ++
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |   1 +
+ .../net/ethernet/stmicro/stmmac/dwmac-intel.c |  44 +-
+ .../stmicro/stmmac/dwmac-renesas-gbeth.c      |   7 +-
+ .../net/ethernet/stmicro/stmmac/dwmac-rk.c    |  87 ++-
+ .../net/ethernet/stmicro/stmmac/dwmac-rzn1.c  |   7 +-
+ .../ethernet/stmicro/stmmac/dwmac-socfpga.c   |   7 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_mdio.c |  37 +-
+ drivers/net/pcs/Kconfig                       |  22 +
+ drivers/net/pcs/Makefile                      |   7 +-
+ drivers/net/pcs/pcs-xpcs-rk.c                 | 526 ++++++++++++++++++
+ drivers/net/pcs/pcs-xpcs.c                    |  31 +-
+ .../rockchip/phy-rockchip-naneng-combphy.c    |   8 +
+ include/linux/pcs/pcs-xpcs-rk.h               |  11 +
+ 18 files changed, 1008 insertions(+), 51 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/pcs/rockchip-dwxpcs.yaml
+ create mode 100644 drivers/net/pcs/pcs-xpcs-rk.c
+ create mode 100644 include/linux/pcs/pcs-xpcs-rk.h
+
+-- 
+2.47.3
+
 
