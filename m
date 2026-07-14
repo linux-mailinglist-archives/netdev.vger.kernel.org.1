@@ -1,153 +1,174 @@
-Return-Path: <netdev+bounces-307395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307396-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cl4tLxz7VWpexQAAu9opvQ
-	(envelope-from <netdev+bounces-307395-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:02:20 +0200
+	id F9IxM6r7VWqExQAAu9opvQ
+	(envelope-from <netdev+bounces-307396-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:04:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7328C752A5D
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:02:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26518752A8C
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:04:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307395-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307395-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=djxYHHrk;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307396-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307396-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3A086303FAC5
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:01:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EDE57301E3D1
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:04:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 927CA3FFACC;
-	Tue, 14 Jul 2026 09:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CE5D43B4AF;
+	Tue, 14 Jul 2026 09:04:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.white.stw.pengutronix.de (mx1.white.stw.pengutronix.de [185.203.200.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C929642B750;
-	Tue, 14 Jul 2026 09:01:43 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784019706; cv=none; b=iCeiaQlJmygGjrG+wfSKppFtS/AdyZ8NwBfgDzUVnVpRfjy1DdMDOXIyRJJuna2hPYlEgWmuxjEOHHeAaCUXo2jXKoCXRTj4kKrM4p06Deru7++qd/VXJYcoM59nGjkRBNpSVSXDXbD8uteZ/6BCa+hlbkA8qLIVL1m2qe8EYo4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784019706; c=relaxed/simple;
-	bh=77Xo29AbWRs4JGrjJRKlJS1S0CmzpkZJvOtjHGGo3s4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vy6cGLWOgoMs7iBV9eTUZ06qnFT1VQf3dPyQaIb6k9QGLnqI+VmRaX/Q8otNY2W0bKtfIUSEkbhdZQ89Pa7dEgxigMZz0cWr08A/k+v5aT4cPpjApahXaEz4qLYyTwO1qWUR5UI7dUkDBDyY7x4u68QBU9/+BcztiD9+UfaYh5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.200.13
-Received: from drehscheibe.grey.stw.pengutronix.de (drehscheibe.grey.stw.pengutronix.de [IPv6:2a0a:edc0:0:c01:1d::a2])
-	(Authenticated sender: relay-from-drehscheibe.grey.stw.pengutronix.de)
-	by mx1.white.stw.pengutronix.de (Postfix) with ESMTPSA id 00059202203;
-	Tue, 14 Jul 2026 11:01:36 +0200 (CEST)
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1wjZ1E-001k6W-2q;
-	Tue, 14 Jul 2026 11:01:36 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.98.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1wjZ1E-000000092Xi-3D65;
-	Tue, 14 Jul 2026 11:01:36 +0200
-Date: Tue, 14 Jul 2026 11:01:36 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Jonas Jelonek <jelonek.jonas@gmail.com>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Daniel Golle <daniel@makrotopia.org>,
-	=?utf-8?B?QmrDuHJu?= Mork <bjorn@mork.no>
-Subject: Re: [PATCH net-next v7 4/4] net: pse-pd: realtek-pse-mcu: add UART
- transport
-Message-ID: <alX68PwC0cRdAOSp@pengutronix.de>
-References: <20260712192251.1413279-1-jelonek.jonas@gmail.com>
- <20260712192251.1413279-5-jelonek.jonas@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF2B93E6DCF
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 09:04:38 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784019880; cv=pass; b=kPQG0L8b5CkxO3njJfKnsaekn+1UeOekDEelXq4q5upjw2d+0P+5Nne+SR5mZsiWO6xc20RmN+h/OjTGg6G1cA9OTuadMdj5cJq1DoeK7ilARk3fmR/SmuEg852jz147FUEGAx6M/U55SndgEFOwOxqT4BuBhbb8aXI2ciZxi3s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784019880; c=relaxed/simple;
+	bh=iaQmmVCiE7NdWy753PwYNnwaKukj8zYSbeXA4Z5zlkQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OJ5/nRrqYgY8X8nwSaBYJ3YbU4ODXymEG+C7o2HAZPgoMr+mktCi7NXEJXAvtGhpTFdQXYrHE/bxAl12EHYzkTpIkg6aEdj7OPBZV4OTbBJZuIDAU8CPuDj0CiUlr0wmA9yZU+Sx8/6S48wTniArJjyCpXwiRBw6T7lT8DOnNdg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=djxYHHrk; arc=pass smtp.client-ip=209.85.160.170
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-51c21495722so25012341cf.3
+        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 02:04:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784019878; cv=none;
+        d=google.com; s=arc-20260327;
+        b=FZtKCa3mtDqZROeyxkcc8QNCOOcZgkO7IvdWZw+e02C7YRbQPBjdQJSLfmig806bSu
+         rv1LeSzGKUWDRh0xOaW6ojH8tSZJ5OX4U+lepokWvq9INuoNBSecmHY5JTzC6rzHDugK
+         IZP6Wy1kNAwvVyTqlSSvSFMIxvLui7RkWuHTBRGm2Qa7ittSfnB6fEEZixIMFzcXnrKG
+         qoJuKqyfaw3E5YdW5nkffY1ASRR+ARGZd4C8U7lEKs1MikFcQKMgyiDgy3QdnMmvK4qk
+         B2+Y527z6G9XkhQ0rFuDGGe+ZESNDC9A5tKzJnLrGoZ6bql+onArRFxQ4ugKkPfJHVh+
+         bj9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=XZTtUNxO6z9f4mwqOUjyr9bIYNiAKbPXuXL1XYYWBu4=;
+        fh=v8UFJSeLPJt29zVL7fP/E9t0f4liOBi+1Pd+31yALhA=;
+        b=AUY7S3WlpeRS4CT6s/RqaUDJHFuOCk7qvMk7VfjKYBD4KAHcUWrN8fQ6X7pXLXOQt8
+         lyikg7yG3++j/DeNGsZ1W/tEGn+LzRYsstHjs3qDtp6a2u0W+GRlDzSum6II4L2kOyUB
+         Tz1BAWlqa5WvcV/+zufnlx9RjkroJf+dnUMeQrK9XgcWYjxNa7xzI9DwQeuUUEEvIK48
+         DATmdZPIDt+LHB+Nqe4pPdIfqCK4QRTrMDU1aVYNUOD4VnaMQZTs/TUuffw9Mf3gq1hC
+         JjAhPAPMZpQ+6LhNmkZ5zs8P8UVqqfNsrJcJGdX8+TfeS0ULyC+FszqLETEPXAPkCbo3
+         eWlw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1784019878; x=1784624678; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=XZTtUNxO6z9f4mwqOUjyr9bIYNiAKbPXuXL1XYYWBu4=;
+        b=djxYHHrkjcgPgG7FwxC2dKlRb010Re0sfYlj5GUrAxkc//RLUzPHU9O2a1MnNWxRD2
+         JBixs7jPtAnau8tL1SxG2Rj/wUsl6sLyLvKpiis9jCKXstJK4m6/93+0BDzMQn2h7eaS
+         4ErGB30lWwyL6TFHuB6j4NcVBBnYtGIHvch85romvZIjDeaSrnYOBnoQE5vRc1nDJcMy
+         sNkVKGkGRd0aN6WWwMattICCPl3f3Z3IGiKVaAHh9nNagzvXss7RRvYszvgJMqOeO8EC
+         ue6c7d5ufHW5BZdjLgWhWWlBxqfhmOvcD1uY/4E4+oGlvzWk6SUW9l2xUsCvhAgubskC
+         DUAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784019878; x=1784624678;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=XZTtUNxO6z9f4mwqOUjyr9bIYNiAKbPXuXL1XYYWBu4=;
+        b=Kvb2rpetSCCpOKhb36dIaCCJX36KfbYltiP1bhHOAFHoM3WxM3lgBZ8seNVGAOs39D
+         SIQ9fu2WNfCtgvp43xWx27JDgosbwQsHdXXWHaF6fuf/UrhbC3CxSuodxxXCtWZiEljW
+         3855j5jhR42s9vm/OPNyQ3mYVvSbcAleUcydsfPtmD352mh10x5UFL3FwjkBf7HPWuDM
+         J1xdF80xTJpGlvBLJmSKoURkdRJI60bqIA+zInQh7hAcTTEr89VSO0tTqP4jdXtj2VMz
+         FQgqKZcQtZFPhXlqZ62cnG9gUwyNOtYfyrfTY02WMIHnfbGKFWck497aFehIn2lR1E3h
+         YilA==
+X-Gm-Message-State: AOJu0YxDHAAO/8djt+Re8pt474B6YYn9MrVBhlsYDYzuWvEgebtybftm
+	I6/Vq+9GMrl999JAoqyTCVOE4PWnIIdK/P6UkqLsIgEziYx10lCxV/YFqhVY57/DPxerutZYjSa
+	7635ssVdjftsoZdG7T5aRNulxRgKgwnSt1WlB5LlhUh69tt0bbD5EFF0OiEI=
+X-Gm-Gg: AfdE7ckPAjfhkeCLX9/qPuvXYWwW2bDSrB5vemcLeCW3Ik8Qoc68qg1aGBfIT/36VyS
+	AjfyfTywUv/VG2dT+sylYE9xJzFkSBnh9dsQYcjz+AY/W+g0vilQwP8pibIQOim8fkC8gu+wlpT
+	0E9022VGfFNXBLSjoCmD0O3UnVzq8sziREW/MzjOfbOUMO1sfgg8eySyewY0RAKLTou2qMYG2HK
+	9OrS3dQdEp2mjiIM4BKbxYfwYqFXUziEfjFrmBpAfySOQXjhKP/+chRQuQ95sKRfQD9R4FJb+du
+	U6dA3IlEtwDnscCLq9p10O7V1eC/K3u12skNAKrHzWm5NoUBSTZfc2v1BHZ9iHId6IsuygLsc0j
+	HicAOTgohpUc=
+X-Received: by 2002:a05:622a:11d2:b0:51c:e14:87ae with SMTP id
+ d75a77b69052e-51e3c1d28d6mr27490681cf.34.1784019877100; Tue, 14 Jul 2026
+ 02:04:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260712192251.1413279-5-jelonek.jonas@gmail.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
+References: <20260713105631.8616-1-zhaoyz24@mails.tsinghua.edu.cn>
+In-Reply-To: <20260713105631.8616-1-zhaoyz24@mails.tsinghua.edu.cn>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 14 Jul 2026 11:04:19 +0200
+X-Gm-Features: AVVi8Cdwh5_lQBrDRf_glhh8Szsib8QIaD1yn44tVc0VeL-V8w9Ji-fQmVY1sNQ
+Message-ID: <CANn89iJo9U6TQbu3aVcn2YY=2CGTTf8+CAhwYh4i9EyG8cnayg@mail.gmail.com>
+Subject: Re: [PATCH net v2] tcp: initialize standalone TCP-AO response padding
+To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Cc: netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-kernel@vger.kernel.org, Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>, 
+	Ao Wang <wangao@seu.edu.cn>, Xuewei Feng <fengxw06@126.com>, Qi Li <qli01@tsinghua.edu.cn>, 
+	Ke Xu <xuke@tsinghua.edu.cn>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[pengutronix.de];
-	TAGGED_FROM(0.00)[bounces-307395-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-307396-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_RECIPIENTS(0.00)[m:jelonek.jonas@gmail.com,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:bjorn@mork.no,m:jelonekjonas@gmail.com,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_RECIPIENTS(0.00)[m:zhaoyz24@mails.tsinghua.edu.cn,m:netdev@vger.kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,davemloft.net,kernel.org,redhat.com,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	R_DKIM_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,pengutronix.de:from_mime,pengutronix.de:url,pengutronix.de:email,pengutronix.de:mid]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7328C752A5D
+X-Rspamd-Queue-Id: 26518752A8C
 
-On Sun, Jul 12, 2026 at 07:22:50PM +0000, Jonas Jelonek wrote:
-> Add the serdev (UART) transport for the Realtek PSE MCU core. It registers
-> the MCU as a serdev device and provides the send/recv callbacks the core
-> uses to exchange the 12-byte frames, receiving asynchronously via the
-> serdev receive_buf callback.
-> 
-> The baud rate defaults to 19200 and can be overridden per board with the
-> "current-speed" property.
-> 
-> Signed-off-by: Jonas Jelonek <jelonek.jonas@gmail.com>
+On Mon, Jul 13, 2026 at 12:56=E2=80=AFPM Yizhou Zhao
+<zhaoyz24@mails.tsinghua.edu.cn> wrote:
+>
+> tcp_v4_send_ack() and tcp_v6_send_response() construct standalone TCP
+> responses with TCP-AO options.  The option length carries the actual MAC
+> length, but the TCP header length includes the option rounded up to a
+> four-byte boundary.
+>
+> tcp_ao_hash_hdr() writes the MAC only.  Thus, when the MAC length is not
+> four-byte aligned, the one to three bytes after the MAC are left
+> uninitialized and may be transmitted.  For the normal TCP-AO hashing
+> mode, those bytes also have to be initialized before computing the MAC.
+>
+> Initialize only the alignment padding in the TCP-AO branches, before
+> hashing the header.  Use TCPOPT_NOP, as in the normal TCP-AO output path.
+> This avoids adding work to non-AO TCP responses while preserving a valid
+> authenticated header.
+>
 
-...
-
-> +static int rtpse_mcu_uart_probe(struct serdev_device *serdev)
-> +{
-...
-> +
-> +	fwnode_property_read_u32(dev_fwnode(dev), "current-speed", &speed);
-> +	serdev_device_set_baudrate(serdev, speed);
-> +	serdev_device_set_flow_control(serdev, false);
-> +	serdev_device_set_parity(serdev, SERDEV_PARITY_NONE);
-
-Some of this functions will return errors, it will be good to get at
-least warnings, even if we decide to go with best effort initialization.
-
-Otherwise, LGTM, with this addressed you can add my:
-Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
