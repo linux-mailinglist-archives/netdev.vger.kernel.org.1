@@ -1,48 +1,49 @@
-Return-Path: <netdev+bounces-307413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307411-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id BhZDHI8EVmo1yAAAu9opvQ
-	(envelope-from <netdev+bounces-307413-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:42:39 +0200
+	id 8YK6Kp8EVmo5yAAAu9opvQ
+	(envelope-from <netdev+bounces-307411-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:42:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68356752FCD
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:42:38 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15DB5752FD8
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:42:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307413-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307413-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307411-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307411-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1657A301DEBD
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:41:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0F514304CC10
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:41:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14D9144160F;
-	Tue, 14 Jul 2026 09:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBBCE43FD03;
+	Tue, 14 Jul 2026 09:41:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from eidolon.nox.tf (eidolon.nox.tf [185.142.180.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A980409635;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E600743F4C2;
 	Tue, 14 Jul 2026 09:41:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784022097; cv=none; b=G/PT9bN87Dm+jcBER7/uuybMuhzzzWfqF0HvmK4PSj537cQq6rwreEHQmLt/YoGHd+kBvxGueo9aEX3GoDA9s3faDnhwTOkLlbM8k2ArdWzuvdiAIfvNR+IXGhh4KrA8bLyoj4L2YxONy0l3dSpPvWcDrc9dzHJVvAEY9TZq+mQ=
+	t=1784022095; cv=none; b=Jbu306fhf0mLj2VXpCt0zoih8w5NbPUHAEluaX5Ztg3Id/qrYI6mPLgV+SBoaE0wp7t0q/JQhinif95YI6Q7+ljmWYwybnlNRAueJjh8Ud/3wit3fTKlfdUpw41f5gjuu7UWMDFDW7p33LPs963RUGItvi99Kt+hel61nC6bjfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784022097; c=relaxed/simple;
-	bh=abX2ieiikA0TbFT1zTqvQszUwOCUtRg1p/sBZP+bufo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HSQiEyqVsgSUVLt3Mas8Sf2FH6+K3LFhXlve1Dv1fxzR+sMkyROlKTYzREgKaoMH/ZOths0ll2LaHAjPDGOScvSdXkI4tDxcBbw6Y/4zYrOpvwANCvm8zVCrU/+Sug9/GCiHtlZad4kUJ+rIn0ZGxFVkMRFcZfMJX3HF2tPkha4=
+	s=arc-20240116; t=1784022095; c=relaxed/simple;
+	bh=O3N4etEHLdyldh1o+j+EaZ/ML4Fadt0x4YGW9LD/JDg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ab8FyNQ2XFI3fiZV6WyXs9lP1j93pwZSuVEjYkJj5GbCfNL0qxRvpVytM4NSfbkaf9in3og4xo2Gtb3xcNCQAByHmHwHkzOyXvXeRLmYvHQA2x4p5PeMDtS+1H9/hUQ+l4S+Eo3kNVvvodvD228apKlfWetA7GqWPnpzS8HTlPk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=diac24.net; spf=pass smtp.mailfrom=diac24.net; arc=none smtp.client-ip=185.142.180.128
 Received: from nat-wifi0.uniroma3.it ([193.204.167.180] helo=alea)
 	by eidolon.nox.tf with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <equinox@diac24.net>)
-	id 1wjZdb-000000022Sj-0MVl;
-	Tue, 14 Jul 2026 11:41:15 +0200
+	id 1wjZdg-000000022Su-3zhY;
+	Tue, 14 Jul 2026 11:41:20 +0200
 Received: from equinox by alea with local (Exim 4.99.2)
 	(envelope-from <equinox@diac24.net>)
-	id 1wjZdE-00000000ZUF-3ffY;
-	Tue, 14 Jul 2026 11:40:52 +0200
+	id 1wjZdJ-00000000ZUT-1321;
+	Tue, 14 Jul 2026 11:40:57 +0200
 From: David 'equinox' Lamparter <equinox@diac24.net>
 To: Paolo Abeni <pabeni@redhat.com>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -59,11 +60,14 @@ Cc: David Ahern <dsahern@kernel.org>,
 	Patrick Rohr <prohr@google.com>,
 	netdev@vger.kernel.org,
 	linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next 0/9] RFC 6724 rule 5.5 support
-Date: Tue, 14 Jul 2026 11:40:03 +0200
-Message-ID: <20260714094030.136317-1-equinox@diac24.net>
+	linux-kselftest@vger.kernel.org,
+	David 'equinox' Lamparter <equinox@diac24.net>
+Subject: [PATCH net-next 1/9] net/ipv6: fix lookup for ::/0 (non-)subtree route
+Date: Tue, 14 Jul 2026 11:40:04 +0200
+Message-ID: <20260714094030.136317-2-equinox@diac24.net>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260714094030.136317-1-equinox@diac24.net>
+References: <20260714094030.136317-1-equinox@diac24.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,22 +80,22 @@ X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	DMARC_NA(0.00)[diac24.net];
-	TAGGED_FROM(0.00)[bounces-307413-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307411-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:kuba@kernel.org,m:idosch@nvidia.com,m:dsahern@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:fmancera@suse.de,m:lorenzo@google.com,m:maze@google.com,m:prohr@google.com,m:netdev@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-kselftest@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:kuba@kernel.org,m:idosch@nvidia.com,m:dsahern@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:fmancera@suse.de,m:lorenzo@google.com,m:maze@google.com,m:prohr@google.com,m:netdev@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:equinox@diac24.net,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FORGED_SENDER(0.00)[equinox@diac24.net,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -102,80 +106,62 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,diac24.net:from_mime,diac24.net:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,diac24.net:from_mime,diac24.net:email,diac24.net:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 68356752FCD
+X-Rspamd-Queue-Id: 15DB5752FD8
 
-Hi all,
+Assume a scenario with something like the following routes:
+default via fe80::1 dev dummy0
+2001:db8:1::/48 via fe80::10 dev dummy0
+2001:db8:1::/48 from 2001:db8:1:2::/64 via fe80::12 dev dummy0
 
+Now if a lookup happens for 2001:db8:1::2345, but with a source address
+*not* covered by the third route, the expectation is to hit the second
+one.  Unfortunately, this was broken since the code, on failing the
+lookup in the subtree, didn't consider the node itself which the subtree
+is attached to, i.e. route #2 above.
 
-this patchset implements RFC6724 rule 5.5.  For the unaquainted:
+The fix is simple, check if the subtree is attached to a node that is
+itself a valid route before backtracking to less specific destination
+prefixes.
 
-   Rule 5.5: Prefer addresses in a prefix advertised by the next-hop.
-   If SA or SA's prefix is assigned by the selected next-hop that will
-   be used to send to D and SB or SB's prefix is assigned by a different
-   next-hop, then prefer SA.  Similarly, if SB or SB's prefix is
-   assigned by the next-hop that will be used to send to D and SA or
-   SA's prefix is assigned by a different next-hop, then prefer SB.
+This case is somewhat rare for several reasons.  To begin with, subtree
+routes are most commonly attached to the default destination.
+Additionally, in the rare cases where a non-default destination prefix
+is host to subtree routes, the fallback on not hitting any subtree route
+is commonly a default route (or a subtree route on that).
 
-The way this is done is through IPv6 subtree routes.  If a router
-advertises some prefix in its RA/PIOs, source specific subtree routes
-should be created for the default route (and RIOs) installed as a result
-of processing that RA.
+(Note that this was working for the "::/0 from ::/0" case since the root
+node is special-cased.  The issue was discovered during RFC 6724 rule
+5.5 testing, trying to find edge cases.)
 
-This may initially sound like a weird way to do it, but for one RFC8028
-requires the subtree routes anyway, and also I did try the more obvious
-approaches (explicitly tracking it, putting it on the address, putting
-it on the neighbor entry) and all of them break in some scenarios.
+Signed-off-by: David 'equinox' Lamparter <equinox@diac24.net>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Lorenzo Colitti <lorenzo@google.com>
+Cc: Patrick Rohr <prohr@google.com>
+Cc: Maciej Żenczykowski <maze@google.com>
+---
+ net/ipv6/ip6_fib.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-I've put together a selftest, there's also a rather hacky test suite
-created for an IETF hackathon: https://github.com/eqvinox/rule5p5-tests
-(it's not specific to this patchset.)  I've also been dogfooding these
-patches on my personal devices for more than a year.
-
-Rule 5.5 itself has extensive history at the IETF, including changing
-from optional to mandatory in the recent 6724 update.  It is immensely
-useful (really: required) to make multihoming, renumbering and failover
-work.
-
-@Jakub you had previously asked me to resubmit the "prep" patches since
-it was at a poor time (cf. Fri, Jul 25, 2025 at 05:39:58PM -0700).
-(I had tried submitting the preparation bits on its own.)
-
-@Paolo you had looked at the lookup fix:
-On Tue, Nov 11, 2025 at 11:13:30AM +0100, Paolo Abeni wrote:
-> The patch LGTM, and I agree this should go via net-next, given that it's
-> really a corner case and I could miss nasty side-effects.
->
-> It looks like you have some testing scenario handy: it would be great to
-> include it as a paired self-test; could you please add it?
-
-Cheers,
-
-
-equi (David)
-
-
-P.S.: I also happen to be around at netdevconf in Rome, in case anyone
-happens to see this and have questions.  Of course being at a conference
-generally means not looking at random patch mails, so this is mostly
-just in case you see the Subject lines or this cover letter.  Apologies,
-it wasn't possible for me to submit this ahead of the conference.
-
-
-diffstat:
- Documentation/networking/ipv6-addrsel.rst                |  75 ++++++++++++++++++++++++++++++++
- MAINTAINERS                                              |   1 +
- include/net/addrconf.h                                   |   4 ++
- include/net/ip6_route.h                                  |  26 ------------
- net/ipv6/Kconfig                                         |  18 ++++++--
- net/ipv6/addrconf.c                                      | 144 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-----
- net/ipv6/ip6_fib.c                                       |   5 ++-
- net/ipv6/ip6_output.c                                    |  26 +++++++++---
- net/ipv6/route.c                                         |  16 +++++--
- tools/testing/selftests/net/Makefile                     |   1 +
- tools/testing/selftests/net/config                       |   1 +
- tools/testing/selftests/net/ipv6_saddr_rfc6724rule5p5.py | 231 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 12 files changed, 497 insertions(+), 51 deletions(-)
+diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+index a130cdfaebfb..273f2bfc5286 100644
+--- a/net/ipv6/ip6_fib.c
++++ b/net/ipv6/ip6_fib.c
+@@ -1656,8 +1656,11 @@ static struct fib6_node *fib6_node_lookup_1(struct fib6_node *root,
+ 					struct fib6_node *sfn;
+ 					sfn = fib6_node_lookup_1(subtree,
+ 								 args + 1);
+-					if (!sfn)
++					if (!sfn) {
++						if (fn->fn_flags & RTN_RTINFO)
++							return fn;
+ 						goto backtrack;
++					}
+ 					fn = sfn;
+ 				}
+ #endif
+-- 
+2.53.0
 
 
