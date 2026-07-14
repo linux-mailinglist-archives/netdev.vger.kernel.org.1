@@ -1,164 +1,223 @@
-Return-Path: <netdev+bounces-307592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307593-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Sa0IEDmjVmrt/QAAu9opvQ
-	(envelope-from <netdev+bounces-307592-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 22:59:37 +0200
+	id ZF+iI0ulVmpp/gAAu9opvQ
+	(envelope-from <netdev+bounces-307593-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 23:08:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56D17758D84
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 22:59:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F21F4758DE8
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 23:08:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=kWKn33aL;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307592-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-307592-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=amd.com header.s=selector1 header.b=yIegOz9Z;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307593-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307593-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=amd.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C0562301A362
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 20:58:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BC23430C6380
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 21:08:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFEA1432E77;
-	Tue, 14 Jul 2026 20:58:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D5DE2F7EF3;
+	Tue, 14 Jul 2026 21:08:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013068.outbound.protection.outlook.com [40.107.201.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C8B1429CCA
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 20:58:13 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784062695; cv=none; b=k27Ot+Ifu2bqGKLuRJAWksHajqsVpjtfHSUreRmCe47En5bTjVpo62HW32JJKYcdNYz4APx+IbQjyoTC4JkCoXkDqK4krsrBhvynzBba/51Kegy4snLV/33UeTqdRf3vhOT4qK24FkMiqx2NVuyT2yniMwc9lSRjG0xe4Os4eug=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784062695; c=relaxed/simple;
-	bh=ugFocKQNvJq5suQ2bGHSV0nqJNZHbZnZeHUn8h4L41k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RiHMmoYFQ3ib8Z/j4ygUFi+tphHciUwska/IIzBYtxHP+VtZ6fUoZ7zzhPW7u8j8pE4kHEuQ79Jl10iFff9XONnAgN6yn8K9J9SB9swHhdf7hHcOGHxhSk9cZrsWicffd1cE3cZH3U2SoQelcQAGmdtOcjLpVsgKoph6q73a1h4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kWKn33aL; arc=none smtp.client-ip=91.218.175.181
-Message-ID: <1fc10768-18c7-40f4-9287-250415c3e7a7@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784062680;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TdayDcoevcw1swGHvcsiPGuw7O5eij5Cwke7HcSMW9g=;
-	b=kWKn33aLNzr3sotFHz5u2DOaBFLv4KJNytljEJAtWGkpmO//huga3KVLdteyIubYWCnn5I
-	NYfCA+jPzEtAmwz6YaOvvRGJE81y6p7aEyYv2wTcfOeoPdixo88cWva/qxyesFtDzfua7i
-	YEVaob3fpt7gp8wI97m5QXnyosKVcXQ=
-Date: Tue, 14 Jul 2026 21:57:47 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14732F9C37
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 21:08:23 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784063305; cv=fail; b=XAT4itAxvQWwzDcAr6YjuLqhCFEYMQaVTS1BMMU0C2CfatcnxL26EurbsFgjsbR5dYSORtOSuOtoQqSHt1cP//5djAVPeFectddMIv3VilELhSEte0rmwSZ2iSOATRGgvQ7R/pLuJRuK+Jrpi2MyuBLpNMJ6gzc2ISjRmZqkpp0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784063305; c=relaxed/simple;
+	bh=3f5nXHltqa6Tw9LZWV8Xl7yFQUr18HflupCFtU1ARxs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=i91qyBoWtuFjOqmxhSyGfZsxSOQYXCy5Ur9ahB7L8fz5ZJG8LHaUlz4iLK19lk/L8uO7wdOVeMWf0wUhdwbnuffPAsnlznuSJ/nfb2XY9zUFRHKdGGVCFT8K/juKOvJvEqRdhiXqiiDupye3MdaIT/P4/Ic3LBwVkK08Ue6lPLc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=yIegOz9Z; arc=fail smtp.client-ip=40.107.201.68
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fTSrmS3fC2E69hBGQDL61zRECaeYH5KNAOM7U3zCiID0QGQh6CbjphyTbd9LQTCEKiDJE3jhGix5wa+9pdVeSfvqZPuUDjceo5TdnooX0CrFy84lOJhH2ArhXKiQArt2OjLBnOuQKw2kUev/jTXceGqLLynHNzN+nRjoVWvNdr/SkWwkkUqkFnvU5Abo7RBsS8jVBAL03NSuUm4Yhln5nvwcjGd3bnZBfjVBb9/0z6gYC4hz+j/EoOdQJCOjbtYak/xvGQyGM6FXkT9pw9UzmEbv4IakPencIR2yIQDMTybbykVBPZ1mzxEl/IHuo5BpE3Zv4FbSVkfXu4fr59CiXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kaNGYzZRKwlLOs+X0s9u5VBxi0IlngJPA8pyuuQ0jUM=;
+ b=YqxefE57qkxRLDB9kn+/Gbkk++ZS5b1zEy2Ff0DtNLWsnHQwH2Z2aoKJOIk49/OIZOepHxfW53+AGaUxaOweke2hmDhnmNz+Cd1hNVYXbIj2+Z9sdiuOAtyquKBv7etw8wdoWsWgGa+cJTR4h3Ir3niotwZ+nuCJigw5x1EXZ/iJWTOx4MPasRKVePkWvkk8mqaxE0GKOu2RnP1sdCVbMO/OdEL0nmg2/YLruk5y27FWPFP/825UprPNjN1zIv1Z9k9eWCq2WXm2WjXF7Z/QImZQANoj7ZP3n8hZQwpl0PN1S1HSiYSf+EXQGgfxuKRuCyfZRIk7lHMeXHGtkAimiA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kaNGYzZRKwlLOs+X0s9u5VBxi0IlngJPA8pyuuQ0jUM=;
+ b=yIegOz9Z13s2l2mZ9IQiaPR+8QBmDsKM2qyI8V9/M9thJK4383q4EwpF/SkVhYWbBa6z/axCTjkR93ayn91hsMNGqlWWPcsYCo+ZhKlsFUpoUp1NLjp4a0FrypI1T5QrxF7ANVa/Z3UjO75WukAF8TH0Js14nQUzf6zq+VJBYCo=
+Received: from DS7PR03CA0072.namprd03.prod.outlook.com (2603:10b6:5:3bb::17)
+ by CY8PR12MB7588.namprd12.prod.outlook.com (2603:10b6:930:9b::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.202.18; Tue, 14 Jul
+ 2026 21:08:18 +0000
+Received: from CY4PEPF0000E9D2.namprd03.prod.outlook.com
+ (2603:10b6:5:3bb:cafe::d) by DS7PR03CA0072.outlook.office365.com
+ (2603:10b6:5:3bb::17) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.223.10 via Frontend Transport; Tue,
+ 14 Jul 2026 21:08:18 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ CY4PEPF0000E9D2.mail.protection.outlook.com (10.167.241.137) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.223.9 via Frontend Transport; Tue, 14 Jul 2026 21:08:18 +0000
+Received: from amd.rund-run.pensando.io (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Tue, 14 Jul
+ 2026 16:07:57 -0500
+From: "Nikhil P. Rao" <nikhil.rao@amd.com>
+To: <netdev@vger.kernel.org>
+CC: <kuba@kernel.org>, <brett.creeley@amd.com>, <eric.joyner@amd.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<pabeni@redhat.com>, "Nikhil P. Rao" <nikhil.rao@amd.com>
+Subject: [PATCH net] pds_core: fix auxiliary device add/del races
+Date: Tue, 14 Jul 2026 21:07:45 +0000
+Message-ID: <20260714210745.1785625-1-nikhil.rao@amd.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v3] nfc: llcp: reject PDUs shorter than the LLCP
- header
-To: Doruk Tan Ozturk <doruk@0sec.ai>, david@ixit.cz
-Cc: horms@kernel.org, david.laight.linux@gmail.com,
- oe-linux-nfc@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20260714164631.75068-1-doruk@0sec.ai>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260714164631.75068-1-doruk@0sec.ai>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D2:EE_|CY8PR12MB7588:EE_
+X-MS-Office365-Filtering-Correlation-Id: 290b0950-54c2-4c18-d697-08dee1ec0749
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700016|23010399003|376014|82310400026|18002099003|5023799004|11063799006|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	+MxsX0EQ4A+3ZPiAidMTLaUiLSWUr3rKaErvzerYKnwCbuOFo42Po+Hghpmvz9FDcgscY4bQGGiDJafi4mWz44jGGDg5v3Vx+/uC4zNJUKTKPH6WlzdSZM5/7csMDTDDYX+HHRGwGkQb5E2msu1mZNteeTCTh0UXTf2G2p8iCXe2ByKugROXwfRmQ7Vtwm+bVnxinRL+tZLB/nErjz0jPPeiOKJ2kjaFOgxS4OX/a/NKTSV01CHdeuWQURmuh+UStJiq4HzGoySznUladQD9zHx3ZcR1MoBhNxBY/6AoT1CT9IEODHA6bK6uYyelTx+KPXNdIJJCtXbSr4XczhRj7pnRCUxY03woqAslDTIJi/RGFIim1tIadwywgOhYEmZx4bOuteQ4gfn104THYPyye0JECerkwCW5nSdTu+YRb5GxKlzRAKXIYdTK/0QEaYBA5ghniojjyEUPAFrN8rAUUPJOCD0G05Iyh5expmJyQXAJzWu/gAyYQ1i0DMf4YUSjLaVpZqIacPTMrZng4r5MGyEpxVFejCBx9EaPfsOW6IcLcoDt7Ztl7XtbwK08MJD+N6IBvSX8NKqMrAemmYoJzUQE0BRoLY2LtmX7TByWUssaJIArtijMe8mpQxJfE0XByKb2HzzrcRgvpfloBEBLKTiBeVeSvHL/fBpoVWyHmmKtktLBmq1deqnonUHqr6bcqiJSnKagxU0or9tp651tOA==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700016)(23010399003)(376014)(82310400026)(18002099003)(5023799004)(11063799006)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	EjidtRHYL0nXG62Bbk3XLepEk04wFxrNsRDxtoDF5Xfd3Ldmq3Ufbeb9txFBH35PgLDmiB5Ew3OtgG3SkjWtqLGxKSnaSIa5FrsOT/1iqw5eZJwQamFwLChkZek9dA+Ii8cRAroS5IIhUlGVPcj3GbGHjcRZsq2JdD7igftagvB137ciIY8HzFCFsNdxvi0LO77dd90bNlMx95SfGWnqHU7NDTq7H5qRIy0Ta376yYB1UEW4O921PwJ1lE9EtqwdZt6nO639ZCcAdGIbeIpkyOC+llC3jXs1Qq8uTU/4HSv82P0yWxDmqFMmzKDJh6IyD5CtHSy3piDzecLdvrMm/XYgXW9uHpEDzZnLGrhTaWPR5SUMmBng5XUsadNw/L0273hSRgUNJ8kPr+pG5uroAqwibmZTxasrZ5abM0iyHVbGgqiR+orUZSC9INTZpwKd
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2026 21:08:18.3125
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 290b0950-54c2-4c18-d697-08dee1ec0749
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000E9D2.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7588
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307592-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lists.linux.dev,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:doruk@0sec.ai,m:david@ixit.cz,m:horms@kernel.org,m:david.laight.linux@gmail.com,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-307593-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:kuba@kernel.org,m:brett.creeley@amd.com,m:eric.joyner@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:nikhil.rao@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:from_mime,linux.dev:mid,linux.dev:email,linux.dev:dkim,0sec.ai:email,0sec.ai:url]
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amd.com:from_mime,amd.com:mid,amd.com:email,amd.com:dkim];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 56D17758D84
+X-Rspamd-Queue-Id: F21F4758DE8
 
-On 14.07.2026 17:46, Doruk Tan Ozturk wrote:
-> Every LLCP PDU begins with a two-byte header (DSAP/SSAP + PTYPE), but the
-> receive path never checked that a frame is at least LLCP_HEADER_SIZE bytes
-> before parsing it.
-> 
-> nfc_llcp_rx_skb() reads the header via nfc_llcp_ptype()/nfc_llcp_dsap()/
-> nfc_llcp_ssap(), which dereference pdu->data[0] and pdu->data[1], and a
-> CONNECT or CC PDU then computes
-> 
-> 	tlv_array_len = skb->len - LLCP_HEADER_SIZE;
-> 
-> as a size_t and hands it to the TLV walk. When the frame is shorter than
-> the header the subtraction wraps to a huge value and the walk runs far
-> past the buffer, an out-of-bounds read.
-> 
-> A nearby NFC device can reach this without authentication; LLCP link
-> activation happens automatically after NFC-DEP.
-> 
-> Guard the common receive choke point __nfc_llcp_recv(), shared by both the
-> target (nfc_llcp_data_received()) and initiator (nfc_llcp_recv()) paths, so
-> a short skb is dropped before the rx_work worker parses it. Use
-> pskb_may_pull() rather than a skb->len test so the two header bytes are
-> guaranteed to sit in the skb linear area even for a non-linear skb,
-> matching how the sibling NCI and HCI receive paths validate their headers.
-> 
-> Reproduced with a KFENCE out-of-bounds read via /dev/virtual_nci on
-> linux-next.
-> 
-> Found by 0sec automated security-research tooling (https://0sec.ai).
-> 
-> Fixes: d646960f7986 ("NFC: Initial LLCP support")
-> Cc: stable@vger.kernel.org
-> Suggested-by: David Laight <david.laight.linux@gmail.com>
-> Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
-> ---
-> v3: use pskb_may_pull() so the guard also covers non-linear skbs and
->      guarantees the header bytes are in the linear area (David Laight).
-> v2: move the guard into __nfc_llcp_recv() so both the target and
->      initiator receive paths are covered by a single check.
-> 
-> diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
-> index aed5fe1afef0..e3b2627cb089 100644
-> --- a/net/nfc/llcp_core.c
-> +++ b/net/nfc/llcp_core.c
-> @@ -1565,6 +1565,11 @@ static void nfc_llcp_rx_work(struct work_struct *work)
->   
->   static void __nfc_llcp_recv(struct nfc_llcp_local *local, struct sk_buff *skb)
->   {
-> +	if (!pskb_may_pull(skb, LLCP_HEADER_SIZE)) {
-> +		kfree_skb(skb);
-> +		return;
-> +	}
-> +
->   	local->rx_pending = skb;
->   	timer_delete(&local->link_timer);
->   	schedule_work(&local->rx_work);
+Two paths add or delete the same slot (pf->vfs[vf_id].padev): a VF's
+pdsc_reset_done() and the PF's devlink enable_vnet/disable_vnet handler.
+They serialize on config_lock, but neither guards the slot under it
+correctly.
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+add() registers and stores a new auxiliary device without first checking
+the slot, so a second add of an already-populated slot leaks the first
+device. del() makes that check outside config_lock, so two concurrent
+dels can both pass it; the first clears the slot, and the second
+dereferences a NULL pointer.
+
+Check and update the slot under config_lock in both paths.
+
+Fixes: b699bdc720c0 ("pds_core: specify auxiliary_device to be created")
+Reported-by: sashiko-bot@kernel.org # Running on a local machine
+Signed-off-by: Nikhil P. Rao <nikhil.rao@amd.com>
+Reviewed-by: Brett Creeley <brett.creeley@amd.com>
+---
+ drivers/net/ethernet/amd/pds_core/auxbus.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/amd/pds_core/auxbus.c b/drivers/net/ethernet/amd/pds_core/auxbus.c
+index 73b3481220b1..3acafe10a6d5 100644
+--- a/drivers/net/ethernet/amd/pds_core/auxbus.c
++++ b/drivers/net/ethernet/amd/pds_core/auxbus.c
+@@ -177,17 +177,21 @@ void pdsc_auxbus_dev_del(struct pdsc *cf, struct pdsc *pf,
+ {
+ 	struct pds_auxiliary_dev *padev;
+ 
+-	if (!*pd_ptr)
+-		return;
+-
+ 	mutex_lock(&pf->config_lock);
+ 
++	/* A concurrent del may have already torn this device down and
++	 * cleared it.
++	 */
+ 	padev = *pd_ptr;
++	if (!padev)
++		goto out_unlock;
++
+ 	pds_client_unregister(pf, padev->client_id);
+ 	auxiliary_device_delete(&padev->aux_dev);
+ 	auxiliary_device_uninit(&padev->aux_dev);
+ 	*pd_ptr = NULL;
+ 
++out_unlock:
+ 	mutex_unlock(&pf->config_lock);
+ }
+ 
+@@ -210,6 +214,13 @@ int pdsc_auxbus_dev_add(struct pdsc *cf, struct pdsc *pf,
+ 
+ 	mutex_lock(&pf->config_lock);
+ 
++	/* Nothing to do if the aux device is already present.  This also
++	 * guards against a second add overwriting *pd_ptr and leaking the
++	 * first, symmetric with the check in pdsc_auxbus_dev_del().
++	 */
++	if (*pd_ptr)
++		goto out_unlock;
++
+ 	mask = BIT_ULL(PDSC_S_FW_DEAD) |
+ 	       BIT_ULL(PDSC_S_STOPPING_DRIVER);
+ 	if (cf->state & mask) {
+-- 
+2.43.0
+
 
