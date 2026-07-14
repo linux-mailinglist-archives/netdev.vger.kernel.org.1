@@ -1,183 +1,164 @@
-Return-Path: <netdev+bounces-307591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307592-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Ag4xE7ahVmp7/QAAu9opvQ
-	(envelope-from <netdev+bounces-307591-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 22:53:10 +0200
+	id Sa0IEDmjVmrt/QAAu9opvQ
+	(envelope-from <netdev+bounces-307592-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 22:59:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 780AC758CE3
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 22:53:09 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56D17758D84
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 22:59:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=ZbZtBtow;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307591-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307591-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=linux.dev header.s=key1 header.b=kWKn33aL;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307592-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-307592-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 469B93067285
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 20:53:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C0562301A362
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 20:58:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA282427F8D;
-	Tue, 14 Jul 2026 20:53:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFEA1432E77;
+	Tue, 14 Jul 2026 20:58:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B3142BC5D
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 20:53:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C8B1429CCA
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 20:58:13 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784062387; cv=none; b=LBt2926EKqgfiULmCOMONWP1XpCpBNQGdQWWUjKaaRvL2VCv6BmfaK94hWxJTTFZ6ZrxaZfGy8dduqBO1BpKTp/p5ljF7Li72vjxoHvxl4973ST4mq4D5SvG8M5OBMV2FsTQ6XgDi2rQRg49Wt+ho8r9SBBKxmjZot4jnSwUKT4=
+	t=1784062695; cv=none; b=k27Ot+Ifu2bqGKLuRJAWksHajqsVpjtfHSUreRmCe47En5bTjVpo62HW32JJKYcdNYz4APx+IbQjyoTC4JkCoXkDqK4krsrBhvynzBba/51Kegy4snLV/33UeTqdRf3vhOT4qK24FkMiqx2NVuyT2yniMwc9lSRjG0xe4Os4eug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784062387; c=relaxed/simple;
-	bh=JYol08YXW91ovkNpZaJIz1Ed+fcIPymArOeW437uj6E=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BDoRJSA8PzkkfEL8eggHDIgEzJeSxxYiMoKGbI/ChVzK7cK3rtKbwJ+Fp29hyJq+uZ/F+eSo0byeMZ8tnZQj65Z926NL79XLvMmjFS7gnD/KtW+Sca+CFEuTTqj/YAHAMo49/GIRGIw0fxKKUMMNlRLJ+4vmkJNYcmXH8ysbHEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZbZtBtow; arc=none smtp.client-ip=209.85.221.48
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-4720d22c94aso1404053f8f.1
-        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 13:53:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784062384; x=1784667184; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=hPy+9VG/Wk31EHh/SoTTpkYEXwE1ur2uoLWA6FIrzb4=;
-        b=ZbZtBtowHnKVwWhiD6W4WpkjM1/b4ytWELp6smlEUBB5giX4gp8gZHd7HyjyC1OOfY
-         LajJeYuFBpaPRAz/L2bwLnCrsOv9cynhodMK8KYLSmwYVLKbULpao6pQorQUGizkzhFD
-         JHoSvOCriqdFWVhmgBO09XVh8RYV5HHEa9jiLW9uV0vydVAzmdLou8TZe3jLJSGIj8d6
-         J3mA3HToUkf9CvaEpLyUM5uBV9rag6Ga6RIZi/TLvYG+aANH8NqVz6O0yQK453L8GIMt
-         4ewJDnzml3D2e9wQR+aEJGFHcoKbQYlv1gVoCoRhiOa+lyTFgmq3Lysw51/MfiOh3DgU
-         60RQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784062384; x=1784667184;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=hPy+9VG/Wk31EHh/SoTTpkYEXwE1ur2uoLWA6FIrzb4=;
-        b=LfXpPvVJm6AOrJOFCkWEJKZHSFtXLBS5HZXALf8GZ/bhHLbDzv/Z26XcvZhYNGkapT
-         NE5H/Q4918AJ9BkOzpagiRUio2j2cTHsaM1Byb2ZnPa1IxcuklNLLTt/1q+fWqlA76Ew
-         Z9oVgvEZg6y7ea4erlvB8VLpoHUpsODvS3UKU6J4m8g3VTNkNqEsdfiNr+Z0cLChFEx6
-         ZryjdMA4QPR7qhuUnMYHkpqEI+HQry0L5bNAyxGSWKUIZIgDon19IKIBW72heYw/tnOQ
-         AHhtnlhS1dGYBfbnNoT8VhAO+PoXj9eSD0fK5Dj/O2DZ3h5EtqOceGpBcrEFEbTAIqGa
-         Pcow==
-X-Forwarded-Encrypted: i=1; AHgh+Rqq27LoYGDKHIQGIJqJGn4lLzyC7pB0cMpmpn6Dg/JN3UgjHfX2UqUPppvybNQdJHi87hK6kqk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8qUfK35sjCoeBHTkpedKS5Bt4ZTPVTqFUhuNb6XT9OenEsKqK
-	aAh2N7HrAaNHhz2UDefhKDu6snEcG79SOFy+rmGk0OZIETQ9vf4n1X169Xl0yKBi
-X-Gm-Gg: AfdE7cmaUY56jwqe98LfZw141JoKPG65topWtzqBQ7kptbFKZICo7HpDFpQ5cKC/m8i
-	zlbASL3b4TZ9C5pB2TJ4YNPG2rq6t5steQ6kQ1em/u74hMXWnHsDpp7uSI8tWPFp9fZyupJZh2S
-	HRF+faEQhRdCEODk/+8NT333SUpE8V74FXFe+67gvfjCP+Q8wFuXdHfKSSZI3my4/0LdjGaF+1Z
-	zf4eJNNVWBVB04r+q4Lj+YyRNfqZ22nhZRFZqvBdwPOC1VGlF6YNSxY5WV1IVt+y/sC40CdO/DI
-	B++29PPMWwxMo3fuC5cZMK5Hnt9aNANH3otRGKSMDNOyDChXP7R4Hbt7khaP69CtnFjmcp+ATnW
-	oGuh5ZTPOZhmriGv4pp1QZ7tygaqb1pEihSx9BJtoDQUPnaOHr2Do7tEWK5Tc0DrNTZaqInRUvC
-	J5pp+NBhHeAsjR+OBPxXYKInSQH6d+KPdwSncuWNDhZkqs/w4VSQ==
-X-Received: by 2002:a05:6000:1866:b0:475:f0d1:eb56 with SMTP id ffacd0b85a97d-47f2dd0d63fmr18015724f8f.49.1784062384331;
-        Tue, 14 Jul 2026 13:53:04 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f4634debesm10998794f8f.8.2026.07.14.13.53.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jul 2026 13:53:04 -0700 (PDT)
-Date: Tue, 14 Jul 2026 21:53:02 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Doruk Tan Ozturk <doruk@0sec.ai>
-Cc: david@ixit.cz, vadim.fedorenko@linux.dev, horms@kernel.org,
- oe-linux-nfc@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net v2] nfc: llcp: reject PDUs shorter than the LLCP
- header
-Message-ID: <20260714215302.75d8bf72@pumpkin>
-In-Reply-To: <20260714164629.75051-1-doruk@0sec.ai>
-References: <20260713221556.13a830b8@pumpkin>
-	<20260714164629.75051-1-doruk@0sec.ai>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1784062695; c=relaxed/simple;
+	bh=ugFocKQNvJq5suQ2bGHSV0nqJNZHbZnZeHUn8h4L41k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RiHMmoYFQ3ib8Z/j4ygUFi+tphHciUwska/IIzBYtxHP+VtZ6fUoZ7zzhPW7u8j8pE4kHEuQ79Jl10iFff9XONnAgN6yn8K9J9SB9swHhdf7hHcOGHxhSk9cZrsWicffd1cE3cZH3U2SoQelcQAGmdtOcjLpVsgKoph6q73a1h4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kWKn33aL; arc=none smtp.client-ip=91.218.175.181
+Message-ID: <1fc10768-18c7-40f4-9287-250415c3e7a7@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784062680;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TdayDcoevcw1swGHvcsiPGuw7O5eij5Cwke7HcSMW9g=;
+	b=kWKn33aLNzr3sotFHz5u2DOaBFLv4KJNytljEJAtWGkpmO//huga3KVLdteyIubYWCnn5I
+	NYfCA+jPzEtAmwz6YaOvvRGJE81y6p7aEyYv2wTcfOeoPdixo88cWva/qxyesFtDzfua7i
+	YEVaob3fpt7gp8wI97m5QXnyosKVcXQ=
+Date: Tue, 14 Jul 2026 21:57:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH net v3] nfc: llcp: reject PDUs shorter than the LLCP
+ header
+To: Doruk Tan Ozturk <doruk@0sec.ai>, david@ixit.cz
+Cc: horms@kernel.org, david.laight.linux@gmail.com,
+ oe-linux-nfc@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20260714164631.75068-1-doruk@0sec.ai>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20260714164631.75068-1-doruk@0sec.ai>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-307592-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307591-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:doruk@0sec.ai,m:david@ixit.cz,m:vadim.fedorenko@linux.dev,m:horms@kernel.org,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lists.linux.dev,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:doruk@0sec.ai,m:david@ixit.cz,m:horms@kernel.org,m:david.laight.linux@gmail.com,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,0sec.ai:email,pumpkin:mid]
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:from_mime,linux.dev:mid,linux.dev:email,linux.dev:dkim,0sec.ai:email,0sec.ai:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 780AC758CE3
+X-Rspamd-Queue-Id: 56D17758D84
 
-On Tue, 14 Jul 2026 18:46:29 +0200
-Doruk Tan Ozturk <doruk@0sec.ai> wrote:
-
-> > Is there a similar problem with non-linear skb?
-> > Maybe they can't get into this code, but who knows what can happen
-> > with unusual configs.  
+On 14.07.2026 17:46, Doruk Tan Ozturk wrote:
+> Every LLCP PDU begins with a two-byte header (DSAP/SSAP + PTYPE), but the
+> receive path never checked that a frame is at least LLCP_HEADER_SIZE bytes
+> before parsing it.
 > 
-> Good question. Today every skb that reaches __nfc_llcp_recv() is
-> linear: the target path (nci_rx_data_packet -> nci_add_rx_data_frag ->
-> nfc_tm_data_received) and the initiator path (nfc_data_exchange ->
-> nfc_llcp_recv) both build the frame with alloc_skb()/nci_skb_alloc()
-> plus skb_put()/skb_put_data(), and NCI reassembly uses skb_cow_head()
-> and skb_push() into the linear area. Nothing on the NFC receive side
-> attaches page frags or a frag_list, so skb->len == skb_headlen() and the
-> v2 skb->len test was in fact sufficient for the in-tree drivers.
+> nfc_llcp_rx_skb() reads the header via nfc_llcp_ptype()/nfc_llcp_dsap()/
+> nfc_llcp_ssap(), which dereference pdu->data[0] and pdu->data[1], and a
+> CONNECT or CC PDU then computes
 > 
-> But relying on that is fragile: the parser reads the header out of the
-> linear area (pdu->data[0]/data[1]) while skb->len is the total length,
-> so a non-linear skb with a short linear head would slip past a skb->len
-> test and still over-read the linear buffer. pskb_may_pull() is the
-> right guard here -- it also covers the non-linear case, and it matches
-> how the sibling NCI and HCI receive paths already validate their
-> headers.
+> 	tlv_array_len = skb->len - LLCP_HEADER_SIZE;
 > 
-> I will send a v3 that uses:
+> as a size_t and hands it to the TLV walk. When the frame is shorter than
+> the header the subtraction wraps to a huge value and the walk runs far
+> past the buffer, an out-of-bounds read.
 > 
-> 	if (!pskb_may_pull(skb, LLCP_HEADER_SIZE)) {
-> 		kfree_skb(skb);
-> 		return;
-> 	}
+> A nearby NFC device can reach this without authentication; LLCP link
+> activation happens automatically after NFC-DEP.
 > 
-> That is strictly stronger than the v2 check and does not reject any
-> valid frame -- pskb_may_pull() pulls the two header bytes into the
-> linear area when needed.
-
-Does that help any code further down the rx path?
-It might be better to drop non-linear packets with a comment that
-they aren't expected to happen.
-
-	David
-
-
+> Guard the common receive choke point __nfc_llcp_recv(), shared by both the
+> target (nfc_llcp_data_received()) and initiator (nfc_llcp_recv()) paths, so
+> a short skb is dropped before the rx_work worker parses it. Use
+> pskb_may_pull() rather than a skb->len test so the two header bytes are
+> guaranteed to sit in the skb linear area even for a non-linear skb,
+> matching how the sibling NCI and HCI receive paths validate their headers.
 > 
-> Thanks,
-> Doruk
+> Reproduced with a KFENCE out-of-bounds read via /dev/virtual_nci on
+> linux-next.
+> 
+> Found by 0sec automated security-research tooling (https://0sec.ai).
+> 
+> Fixes: d646960f7986 ("NFC: Initial LLCP support")
+> Cc: stable@vger.kernel.org
+> Suggested-by: David Laight <david.laight.linux@gmail.com>
+> Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
+> ---
+> v3: use pskb_may_pull() so the guard also covers non-linear skbs and
+>      guarantees the header bytes are in the linear area (David Laight).
+> v2: move the guard into __nfc_llcp_recv() so both the target and
+>      initiator receive paths are covered by a single check.
+> 
+> diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+> index aed5fe1afef0..e3b2627cb089 100644
+> --- a/net/nfc/llcp_core.c
+> +++ b/net/nfc/llcp_core.c
+> @@ -1565,6 +1565,11 @@ static void nfc_llcp_rx_work(struct work_struct *work)
+>   
+>   static void __nfc_llcp_recv(struct nfc_llcp_local *local, struct sk_buff *skb)
+>   {
+> +	if (!pskb_may_pull(skb, LLCP_HEADER_SIZE)) {
+> +		kfree_skb(skb);
+> +		return;
+> +	}
+> +
+>   	local->rx_pending = skb;
+>   	timer_delete(&local->link_timer);
+>   	schedule_work(&local->rx_work);
 
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
