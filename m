@@ -1,180 +1,157 @@
-Return-Path: <netdev+bounces-307386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307387-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 2L1FNk/wVWrGwQAAu9opvQ
-	(envelope-from <netdev+bounces-307386-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:16:15 +0200
+	id /xCsNXPxVWpQwgAAu9opvQ
+	(envelope-from <netdev+bounces-307387-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:21:07 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3957D75244C
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:16:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EF4975251B
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:21:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=iv8uyQqL;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307386-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307386-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307387-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307387-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B548E3049FC3
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 08:11:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 22F8F3046EEF
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 08:15:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5134B3F6C2D;
-	Tue, 14 Jul 2026 08:11:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE1953F8899;
+	Tue, 14 Jul 2026 08:15:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.white.stw.pengutronix.de (mx1.white.stw.pengutronix.de [185.203.200.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D13C23E1D04
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 08:11:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC3903F8222;
+	Tue, 14 Jul 2026 08:15:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784016697; cv=none; b=ewny/YLu2L8u94ZWbDCaOYpp7YhVjmua7rv1PthF3N+/N29d1AXltwus59KAC9RTzPwQBOqeVr4dshp8HOvKqEGR0DbdhDyJXNOQm3Kj5bNGq1yvkdWy8JOAz42SxpX+DkDA0r57+CaAuUL4P7n1fT+gSd8m1x4M76/KYwkptnw=
+	t=1784016920; cv=none; b=WWjUgltCnLBTeYPdTtHfL4A7kTHsHJCe7Q8R8gf5y3X6hEnGuxAfLXmGZ1ZA/JQdLnHr7a2+PVKbOQs9gRhJ3RWpI0ClFxSwzl65KRAbT8VuPPgVC7xAJEDGMEGZy9lJal7stwlDZWZJ9tWAmZbqnpPUT3qsBuRGpmsB+8fnNxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784016697; c=relaxed/simple;
-	bh=ycCZlW5s2czC+w8cDs2mDX1LS/uO/v2d8xosk/RQMnM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lefa445CzYt0bJWsBSM9mwHPhxbW5s401gP+J9tycue4fKozjZkbNZSz8HHvCELgko5VxdQj/OYTVTl7kBI5j3pJXxj5Xo/eguKR9jl5hBlB2RQUTD3ZGK9gIaKcnS5Mxiffn/JySL7aSqke+F1nUQda6wUPEo798KiecgEsteY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iv8uyQqL; arc=none smtp.client-ip=209.85.216.51
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-3810c5d691bso3163608a91.1
-        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 01:11:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784016692; x=1784621492; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=s8Ipgx3lctn3cg5R9rlDTJWZ0blL0+fnY2U9hYcXA5k=;
-        b=iv8uyQqLWczAbYP0C1DTVJc8kATZmt6HEn8I6bd7A1jR/dgLnx/4peMJoGYAkQUENM
-         X6nA3EEdBaq0d3jLmsKhahtKKTD9sV2Ut3qyb+nJBX5YSLwe593YqJeNvEDxQN85/fRJ
-         aNsaZhUrn9q/TJYVKQPgPQh2lpVKCCtAoiGpy0uA+pVUEa2x5A4FtdGqRY02Ne6tM+3t
-         /s1Hm0jGTKVMd45dLHIZn2UQyY5+A81j5m0T22ga66FLtbzttnIqk9viPphxvRUQlyWZ
-         Kry9nG3eFx6ceXK10r7gMczgVkcb1awZa/Sk7eB7nOegcrcs2+4NxoOABcsQL20T57HS
-         5ivw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784016692; x=1784621492;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=s8Ipgx3lctn3cg5R9rlDTJWZ0blL0+fnY2U9hYcXA5k=;
-        b=GFcp0DeTGF0JUetl3UazWmI2a9QBBR6RYzYLmET5r8zugSQDXf1nhR5CAzNHn15lw6
-         VZTAgziGtOlRZGYKK4vt+96jNgwXrjiAbhJAGDJyWz084HLn31X/rS0X/fnl6cQUyJze
-         hKErV8yWNaUjh3HGWeiWDjku7lz3nQhQH8zcTr8h/YJNx1zqshIn4SKdYiSIq0WGL+BU
-         n2UHFek7173OmINyOOt6VnMraMp4KHcrU+Pnb0A8Tnz/n7Q7j3RXBdSdvoAw3cEGxy8r
-         1WROWE5THWvZPt+Pj5Jk5F6NTgh9l7cgozJQEwLwcOcNviFYLnPKxudDUuO2+9vK41/2
-         WmVg==
-X-Forwarded-Encrypted: i=1; AHgh+RoTK1rcino4gh/HE9T+KC0yPVmaFn/swn3yWKXYR2Mpl6toddhPDY4XJCqkNf4fifASyGtFnaQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwpNxTltyPPDHzQiwFsPXVuNIPW9mLjN37b109QIgVbbo99/Bi
-	piyrzS7fr6xvPdWnGwkBGeCExwANogQJv9W7+0hefs0GuYV1uVkIqEY=
-X-Gm-Gg: AfdE7cnfw3b5NvE9MP1uwub0jLZFl0e+mRD2O+qTF9dk7hVTD5Ryzl/x/qAFswYL20w
-	OjG+MxV/GTC6FsZjZCm5UDar6sxKU6foE1Xjq7J2lVReahK2Kb3PVU4Dygr3eu+ev4JbnFJYYVd
-	/uEf9TTAujhZn8zUn6fhCOJYiAeZdui5VRRKn4+GA8s/f/pjtJ3uBPilwOIjVVeWAYOdLazVaGi
-	u7fX+9tpI2oyEez7Sd8/rkDZlFCLl9m5QCzM84ST+RgI6e3uSbDAX07ztaVh5kSjMlOf9L6pC0o
-	F9dw1IoKFcg58IjOhgH66VrnqKlDECEDX7Vggw4RJFid3BmeFKCOX3l8CrxV/faqZ2hREQru+TQ
-	MKC1Kx8eL5pGwHSdA0EDMPb9ybtik3Dj6zn2eA9SvoCBdZa6qFpNIrjy8cZ6MmeG2gKRs+2ZZm2
-	nbR9e3wPttVcI4w1jcAhoOuMTN0xu3s5CEAY/RU1GAAkbAqzYPq4CK31uMCCfUZWCed/J5Cqy5k
-	TcvAlGOrJ6HRVDft2PgatmP6yYX7+jHpxr1XnEAyR/6QXJiiA==
-X-Received: by 2002:a17:90b:1a89:b0:36d:9e0b:3801 with SMTP id 98e67ed59e1d1-38e1add8ec6mr1362188a91.8.1784016692263;
-        Tue, 14 Jul 2026 01:11:32 -0700 (PDT)
-Received: from localhost.localdomain ([14.5.152.27])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38deea72fc3sm1427267a91.2.2026.07.14.01.11.28
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 14 Jul 2026 01:11:31 -0700 (PDT)
-From: Myeonghun Pak <mhun512@gmail.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	intel-wired-lan@lists.osuosl.org
-Cc: Milena Olech <milena.olech@intel.com>,
+	s=arc-20240116; t=1784016920; c=relaxed/simple;
+	bh=0upYgGRQu/B38VZchdINsyPj9F703eh+hxbl8OvmROw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lWCWwP3QMLBjChRfo3S00WW6hyageafoaY8l3oDShxNFigna2l8w0RfLfUbz0MvVCz949U27m0UYn/b9i2CBR940jDjlhcV1fxY2rkKAwe0Ssb8VR0mh7/m/XL7wWSoGFxqIj94+KZJBPW9P5Xo2OKte4KoIGWicNrNk6w6wGpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.200.13
+Received: from drehscheibe.grey.stw.pengutronix.de (drehscheibe.grey.stw.pengutronix.de [IPv6:2a0a:edc0:0:c01:1d::a2])
+	(Authenticated sender: relay-from-drehscheibe.grey.stw.pengutronix.de)
+	by mx1.white.stw.pengutronix.de (Postfix) with ESMTPSA id A5EFF2021FF;
+	Tue, 14 Jul 2026 10:15:08 +0200 (CEST)
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1wjYIG-001jwQ-1u;
+	Tue, 14 Jul 2026 10:15:08 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.98.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1wjYIG-000000091xV-2055;
+	Tue, 14 Jul 2026 10:15:08 +0200
+Date: Tue, 14 Jul 2026 10:15:08 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Jonas Jelonek <jelonek.jonas@gmail.com>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Myeonghun Pak <mhun512@gmail.com>,
-	Ijae Kim <ae878000@gmail.com>
-Subject: [PATCH] idpf: disable PCIe PTM on device removal
-Date: Tue, 14 Jul 2026 17:11:24 +0900
-Message-Id: <20260714081124.90962-1-mhun512@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Daniel Golle <daniel@makrotopia.org>,
+	=?utf-8?B?QmrDuHJu?= Mork <bjorn@mork.no>,
+	Conor Dooley <conor.dooley@microchip.com>
+Subject: Re: [PATCH net-next v7 1/4] dt-bindings: net: pse-pd: add bindings
+ for Realtek PSE MCU
+Message-ID: <alXwDEZsXY90Wh0N@pengutronix.de>
+References: <20260712192251.1413279-1-jelonek.jonas@gmail.com>
+ <20260712192251.1413279-2-jelonek.jonas@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260712192251.1413279-2-jelonek.jonas@gmail.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307386-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[mhun512@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	DMARC_NA(0.00)[pengutronix.de];
+	TAGGED_FROM(0.00)[bounces-307387-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:intel-wired-lan@lists.osuosl.org,m:milena.olech@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:mhun512@gmail.com,m:ae878000@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_RECIPIENTS(0.00)[m:jelonek.jonas@gmail.com,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:bjorn@mork.no,m:conor.dooley@microchip.com,m:jelonekjonas@gmail.com,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mhun512@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	R_DKIM_NA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,pengutronix.de:from_mime,pengutronix.de:url,pengutronix.de:email,pengutronix.de:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3957D75244C
+X-Rspamd-Queue-Id: 3EF4975251B
 
-idpf_probe() enables PCIe Precision Time Measurement with
-pci_enable_ptm(pdev, NULL), which programs the PTM control bits and sets
-pdev->ptm_enabled when the bus/controller supports it.  The teardown path
-in idpf_remove() releases the workqueues, vports, mutexes and the adapter
-memory but never calls pci_disable_ptm(), so PTM is left enabled on the
-device after the driver detaches.
+On Sun, Jul 12, 2026 at 07:22:47PM +0000, Jonas Jelonek wrote:
+> Add a binding for the microcontroller (MCU) that fronts the PSE silicon
+> on a range of managed Realtek-based switches. The host talks only to the
+> MCU, over I2C/SMBus or UART, using a fixed message-based protocol; the
+> PSE chips behind it never appear on the bus.
+> 
+> The device is the MCU together with its Realtek firmware: the firmware
+> and its host protocol are what the binding describes, not the
+> general-purpose microcontroller they run on. The PSE silicon behind the
+> MCU (Realtek or Broadcom) is reported by the MCU and detected at runtime,
+> so it is not described here - hence the 'realtek' vendor prefix.
+> 
+> Two protocol generations exist, both Realtek's, selected by the
+> compatible: gen1 on older boards (fronting Broadcom PSE silicon) and gen2,
+> the altered protocol used with Realtek's own PSE silicon. On an I2C
+> attachment the framing the MCU firmware expects is part of the compatible
+> as well - '-smbus' or raw '-i2c'; a UART attachment carries no framing
+> suffix, as the transport is given by the parent serial node.
+> 
+> Each board additionally carries a device-specific compatible that falls
+> back to one of the protocol compatibles above. Drivers bind on the
+> protocol compatible; the device-specific string identifies the board and
+> reserves a place for a future per-board quirk without having to retrofit
+> device trees already in the field.
+> 
+> Signed-off-by: Jonas Jelonek <jelonek.jonas@gmail.com>
+> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 
-This leaves the PCI core's software PTM state and the device's PTM control
-bits set with no bound driver.  pcim_enable_device() only arranges for
-pci_disable_device() on teardown and does not undo the PTM enable, so it
-is not a substitute here.
+Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de> 
 
-Pair the enable with pci_disable_ptm(pdev) in idpf_remove(), matching the
-igc and mlx5 drivers which already disable PTM on their remove paths.
-
-Fixes: 8d5e12c5921c ("idpf: add initial PTP support")
-Co-developed-by: Ijae Kim <ae878000@gmail.com>
-Signed-off-by: Ijae Kim <ae878000@gmail.com>
-Signed-off-by: Myeonghun Pak <mhun512@gmail.com>
----
- drivers/net/ethernet/intel/idpf/idpf_main.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
-index 0dd741dcfc..3d3471d3f7 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_main.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
-@@ -159,6 +159,7 @@ static void idpf_remove(struct pci_dev *pdev)
- 	mutex_destroy(&adapter->queue_lock);
- 	mutex_destroy(&adapter->vc_buf_lock);
- 
-+	pci_disable_ptm(pdev);
- 	pci_set_drvdata(pdev, NULL);
- 	kfree(adapter);
- }
+Thank you!
 -- 
-2.47.1
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
