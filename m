@@ -1,336 +1,272 @@
-Return-Path: <netdev+bounces-307516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307517-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id usmmLGlXVmq73gAAu9opvQ
-	(envelope-from <netdev+bounces-307516-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 17:36:09 +0200
+	id qiOfMjBaVmpl3wAAu9opvQ
+	(envelope-from <netdev+bounces-307517-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 17:48:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D67E7567D7
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 17:36:09 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8429A756971
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 17:48:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=weidmueller.com header.s=selector2 header.b=8A5iqNNH;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307516-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307516-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=weidmueller.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=SpmBG1uL;
+	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=AG1IrD6c;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307517-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307517-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=qualcomm.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 19AB530477F1
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:36:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 981F8304A666
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:47:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFFC53EB81B;
-	Tue, 14 Jul 2026 15:36:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13E0F48123D;
+	Tue, 14 Jul 2026 15:47:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013011.outbound.protection.outlook.com [40.107.159.11])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1156F33D4E1;
-	Tue, 14 Jul 2026 15:35:57 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784043362; cv=fail; b=lBihxhIIEPKSXwJnc3jymIbsEGQzj9+3GapmDzuafI5y9BO7GRCvxCO26cFduOsZw8m4prW31Int1Ebs2QU3Gmq5AWeywi71n+Tg3/KEiFPMGWAcxX66JM6mDcvk8T6HI4iFAW0x2Dj3Q4OQlF8iu2ftb4z55q3ydnqqafGl5gE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784043362; c=relaxed/simple;
-	bh=WpH3NLU37o+Ik1z8E+FXoUcvY/TFexq5Ir1qFQSpfZI=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ciItMMQapDGavvYi+klgPAynbd4+FS763oyLlXpkN5wMlrxFJDT5ZYedCCPICSTtZ2i5fBCWU7uXf5+Z1IEVy4zOGdijqjwi8wiJJjR3QCEQK7f8KOc299DaiRXxOB6a70HeAK5lMqJ9OryMmystGEBqyHT8Iy1x9e2YpPe+XYc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=weidmueller.com; spf=pass smtp.mailfrom=weidmueller.com; dkim=pass (2048-bit key) header.d=weidmueller.com header.i=@weidmueller.com header.b=8A5iqNNH; arc=fail smtp.client-ip=40.107.159.11
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uFOeHS1ZqTH6JmzrKmAZ6FCqi1cELqpk3FvC7d327hML+rr38Rm8K0+Cw/ljZPvjETosthTnMmkWsA9ZAIRJALOd7FvcFAwd49L6hLNmG6IK6q2jxrpchmW/9zUCFd0D8AxY3ACJLPF1R+6T0jNuBCiC/brvcA2kfyOSWjRpUuEfi88x/WT5pvpOk/WIJTy+gMssqUVvANkNnMMlgk7hoCUT1KIKULTOTVcXYPhuacEYl37HBYPM7GEZLvffLq641CvhMJPot9glhkX61QT3wGZRF0QuuTuj/OierNhn0zf6dNRz9P9OKLMBVxV6QjbKeKZtHaRwtrLVEAUqlN+gug==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fEfo4KwCZXBUT/e2NXE8bgL39yxiza8RzVGAN1Ulbhs=;
- b=d1mOgSxgnCuCVSdEnhpmFWKZjDK/wInIYmdrsgCLnlvPB+yXzvh71EtAf4x5/hmU5B709641q7cgQyDBtgxn9ynUcnuFOJ6YpE2sDFgsV5/nJl7whNb5S7kDTeq+zLCxjAVBHy1I4pL6G7fXDBNT57NSrTBp/wilKMT64BAyhkQB02YR5xggjKR2pWhOlK78m6uo3L+BJiha5j/no+85EFXShzAFStT9AUxWvl2gYWOfKHQRB8IWg7DuzgbAY9jAa6yVY4aDPEE+iKMeJDcBu6vAKwu33iKSXm8Gv98+KsW4BmbY5PHhNw5YKOux+5SQXc3B8LOt/mhCGRC0DHXmxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=weidmueller.com; dmarc=pass action=none
- header.from=weidmueller.com; dkim=pass header.d=weidmueller.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=weidmueller.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fEfo4KwCZXBUT/e2NXE8bgL39yxiza8RzVGAN1Ulbhs=;
- b=8A5iqNNHpQGz5P+Qn1yc+pXyn1wlTOx7h+VnPrDTFiS9pcYu+nq7Qa0gSIHueP0D/jNCrYfp7KO7fKWkiy7qhutYh5DMp9Is0A2B0Ft2SZkte/PQPaHTfJSSEasNoSiahBWPPK7sQJhXYOvpQFgfMToWre2gk9sB/lDoz/cs5D+gd/SNRYSTlF+Lt/LzHQR3S7aFG4qVyqe4q1nDcwOTG0jaSUgW9CVrrQ66yg3iDZYh0ftWCHlv347nGkOrNJC3I/TIUka5+QvxfoSdns3liA5Z64qrJmkwmNF9SL8rrwyNkk2oH7umcg/DYiDR5fUE80OpbEEwW/CVYDu36Fmcag==
-Received: from AS2PR08MB9199.eurprd08.prod.outlook.com (2603:10a6:20b:578::22)
- by GV2PR08MB11393.eurprd08.prod.outlook.com (2603:10a6:150:2a6::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.202.18; Tue, 14 Jul
- 2026 15:35:51 +0000
-Received: from AS2PR08MB9199.eurprd08.prod.outlook.com
- ([fe80::5022:16e9:45e4:f778]) by AS2PR08MB9199.eurprd08.prod.outlook.com
- ([fe80::5022:16e9:45e4:f778%2]) with mapi id 15.21.0202.018; Tue, 14 Jul 2026
- 15:35:51 +0000
-Message-ID: <52f6b231-7351-4dbf-92cf-459f1f19d150@weidmueller.com>
-Date: Tue, 14 Jul 2026 17:35:50 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] net: macb: reprogram TBQP after shuffling the TX
- ring on link-up
-To: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>,
- Kevin Hao <haokexin@gmail.com>
-Cc: christian.taedcke@weidmueller.com,
- Conor Dooley <conor.dooley@microchip.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Clark Williams <clrkwllms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
- Robert Hancock <robert.hancock@calian.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rt-devel@lists.linux.dev,
- stable@vger.kernel.org
-References: <20260706-upstreaming-macb-irq-storm-v1-0-ab3115b5a13a@weidmueller.com>
- <20260706-upstreaming-macb-irq-storm-v1-1-ab3115b5a13a@weidmueller.com>
- <akzDQrmdYwHAMMmw@xiaowei>
- <8d53c3d9-7918-456c-8c27-e9d73c896452@weidmueller.com>
- <ak2-XJHVc3Cg6ZEk@xiaowei> <DJUXYXEQMUJ4.31H82KQMG29UC@bootlin.com>
-From: "Taedcke, Christian" <christian.taedcke-oss@weidmueller.com>
-In-Reply-To: <DJUXYXEQMUJ4.31H82KQMG29UC@bootlin.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR0P281CA0077.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:1e::16) To AS2PR08MB9199.eurprd08.prod.outlook.com
- (2603:10a6:20b:578::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 864D84963A0
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 15:47:48 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784044072; cv=none; b=K6iIrjOF1uSHG4ozCuH3tmt1xrk7kJmxJlj7dJg21seOJtEv+pbTLUcqyUZno262x77NeqA9Gx7gW/V5vQR7pH3Ddss6nBOUKHKyoA/E9SdKy0MCQk0ay9AAalFk2ubHU/ixgyNcgjUUIdhbZeNW/lNLQeP5HGRoTJJQ9236Ols=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784044072; c=relaxed/simple;
+	bh=UI8L3jXrZB+lzWZFyrflCCgxBDCTbAE23u842wAsS+U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Dbkg3LWct/9MMgAUiZdFWJCxucoF+cgUbEqaaX7c1AQ8uHJPPkprY+Xzmy62fLEbNZMWCDYhRcD01IXNdGIh1FQUGiYfnhTWsQXWzwsgTx7OYHa3xRtHZK0MPFY4+lu9mP1wzkCC2FYM/JL9Lnv0h/c7192JRihvyWeOwZjAk6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=SpmBG1uL; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=AG1IrD6c; arc=none smtp.client-ip=205.220.180.131
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66EEcVma800335
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 15:47:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	UI8L3jXrZB+lzWZFyrflCCgxBDCTbAE23u842wAsS+U=; b=SpmBG1uLM3jPrS2Y
+	rF5VeXmIvrCcz1zJhsUKFYaokICHjyy2q5iiKCWnhuOLGQkuwSgPJa7UE+q1c9pL
+	6eO1+PgmNTsttc8O6RW14lOueTnB1cgSN5HpLSODq9uj6WtE5HD14/he3j7ZJ0AU
+	UdbuJzN2nj804VCS3JaFucnmYtaSMLB/rcBTemL1NTNLSg3B/2pncNmMCZJHrOeN
+	U56pnf4nOnBkWmwnyhxNQmjgNtZnt2wq36oH+JvJH/5Tgs2Lo+yPuKJV6Ng/HpG9
+	011nJBUpTyMMoIdgtfA82ZiT/bQ82kW85F8+0YG1GM39YAQ9CFvXv2dIY3Ynekii
+	fWTKFQ==
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com [209.85.216.72])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fdnnr0q6h-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 15:47:46 +0000 (GMT)
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-3811279d51aso2190574a91.1
+        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 08:47:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1784044066; x=1784648866; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=UI8L3jXrZB+lzWZFyrflCCgxBDCTbAE23u842wAsS+U=;
+        b=AG1IrD6cw4iZnarjVNKDpmq+cSgI9bK+EPITZPNzKX5ZvNKWwgF/PQyy9utoO4tSZq
+         6A4WSKLbkkDd5KM1MDSVmY6LBjWalkUjagvqjCMUov9pWmKwE1bAadavdEb/Aaz55MaR
+         k5SKKb7wdy79Z780oT2HX62W0RG6BPMAVAFehQzKR5JS3EqfwST8nLkiYCOs0ZEyGV9E
+         3yR7kpLSaxChp3E208N/KjGO511bS4dXCxtlrG/ITmESF0sT3fl9aps/W5dWYmzs5OZf
+         bwUE3HCLKs034ckMaY/O6tonyL4UUJXBa0GLA3NiZCFywwz7DDIzo0ezI6hiGBoTKX7W
+         IKnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784044066; x=1784648866;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=UI8L3jXrZB+lzWZFyrflCCgxBDCTbAE23u842wAsS+U=;
+        b=FNtk1VaqTeBZM9mMi1c1IQjAmCVRagaUp5SdGJJ72/BkXtjNRDeFmlwIyymldGRFgl
+         HNStImTtRc5148M3ScIGroWwJ9bxupOTsnXWOvzJwVe8LzBlMcjAeRnwGtErKgYKYcvD
+         ka+AN/BF4uRG/bBaaGpj1VRdPC1qvdKUje6f2CRBtyQQxuE9GryFeptBfQ+IPUEGrBP6
+         9msrtYvXZwSzMajl5GKhtsW+0jJyBdCDp1K+Ma5LKPW8B80jiTqpHTlDc9IUZXoJDMdK
+         p1p5adHsI5ygVPQvmV3NyWRnfF+RH4vRN8QmaYCowrSBgnzKD+VdD0NoVWz+8fqNajJE
+         tQog==
+X-Forwarded-Encrypted: i=1; AHgh+RotIOuyeDt8ZVUa/xUiX83BE3wIl33vKStgacPPFsX/tO4oF4nQ8PU2Q903upGDxpxmWw3aHzs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5roB8UPNY/9iDj6Q2sNiZbGGe8UG9l/TaoQ94TXhlmkL0GkQR
+	2GzRctUlMN4HC3Nr+BdTxt1yi/fdWHYOQ6IJlh0mpGgUltrld/J1JjWSKqIRwdJdDG0G6aIqh+3
+	WnVwrg+K9QhBS1up5YBzUZCVhuZfSEWBSuUrR/2PI0LDOc7qm1VUegFwVQqY=
+X-Gm-Gg: AfdE7cm+6PKjGtFpKUZ9GU/YjRvIw5hOBK/hz+dy7KTL7+diVHy+upszS/E7ox9hARF
+	kWUe0c+Mdk+WQL3qVko8FNjbB2pJiqSqAu7VFG1AIh9bf3WyBvRO/n0HvRw7e4/T7Tx4e3GOlVr
+	wTzg8yicDgFei6QcqnPpQUFn56QfNlrk0bcOIXqp3YhuAfzVlGQsQJlc0l7PAkW/yrzW6Xkku8Z
+	8BkeH9MRlfe8B0AFomDDJY7/h+UoRr0/r2lNibSK497Oq2XtR6XACPahnCtVc6JEVJnD89c2wdp
+	aTeYEBCosIWoBdQHur3a15oUSdYkfINzXpEVDk5HLlqdkrAgZTd5gESPjoRYNkWEWu8+oZJKpYU
+	zk5ycsTW9b6vrhcSZZvrINMqXtKoj27DujVd7gf28Srfqkhw=
+X-Received: by 2002:a17:90b:38c8:b0:38d:dbc7:5178 with SMTP id 98e67ed59e1d1-38ddbc75254mr11115628a91.22.1784044065762;
+        Tue, 14 Jul 2026 08:47:45 -0700 (PDT)
+X-Received: by 2002:a17:90b:38c8:b0:38d:dbc7:5178 with SMTP id 98e67ed59e1d1-38ddbc75254mr11115587a91.22.1784044065298;
+        Tue, 14 Jul 2026 08:47:45 -0700 (PDT)
+Received: from [192.168.0.116] ([124.123.151.85])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31174accb0esm84444133eec.30.2026.07.14.08.47.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Jul 2026 08:47:44 -0700 (PDT)
+Message-ID: <582d12f5-bb73-4702-9e10-234d46b3fc93@oss.qualcomm.com>
+Date: Tue, 14 Jul 2026 21:17:37 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS2PR08MB9199:EE_|GV2PR08MB11393:EE_
-X-MS-Office365-Filtering-Correlation-Id: 41af9c90-a329-4062-c89f-08dee1bd95ce
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|23010399003|4133799003|11063799006|56012099006|4143699003|6133799003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	t7bOR/enL+kzccG2WcyLvJ2JZ6NIkyn7Zcj3lJm84Imi2ejLz16bKHOWxHh/OtKyBoipVsMc8PekcDI+if3CzhTzCSYc7ALd+Pu2KU+LOR84BFiesex8s1ulTBK8tLuDLgggxXlZ+D2qhQzPw1s2JzkgHYjfVkfWOB9BthnFDCcfMx+/HxTRZr9W6uW2KsS/N/P2Sj4PrL5QVp3EqxgiEQ5AHwCDQLIon6nuTvOoYe5Es6DrqLgn+HyaMDDbmdb+mGz6X3XBd8UieyzrUG1NzstRcpq52p15HUxvmK/qRAEfnBWekT9pfB+XTxtd439PhZriZF7UAA4CjzLR8rTk1lQJqVCWsXMw3ELoekY3WMWa62yoaloaWEyfXI0FNnKYRmwUr9qRRTLityKEPwflrA8I0Pc0F/b/K4kIVMLLpEdQ7z3mvC7sC6nLI6lJcmqEqJwFUbs8x+rgh1OIXJKuO6uiCYwHAGOkPgy9JnW3QMgm5Wp+YlwYa5KAG8usePJQZrniuioLSDPLt+iBa08FHNcB7RiK+skfe+2AbkLODUJHy4CBbqNeWEF9yd8zYxxCq2Bk3z8WEqlt0HzNBXIwH2Qq+aDvw6MEVeMjByDG4U4=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS2PR08MB9199.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(23010399003)(4133799003)(11063799006)(56012099006)(4143699003)(6133799003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WGFINUZRNHM0V2F6Y1dic3ZQS2hEcjM1N1JkMVBEUVFKM2tyQ0NWQU5CTnN6?=
- =?utf-8?B?UWlxTWRDQUJEQTFsVThURk91eVgza1J3NjZwRCtwNkZaME44YVZCMHJ1cjNq?=
- =?utf-8?B?U24rSDJRQ0JwU25TU1VuQ1RWNVNxdGxCOG5yMStzU01JVEt3L2hhNmhwZDgy?=
- =?utf-8?B?VTBaNU5yUVR4dFB5ZStwbjd5YnQ5NmFPWUFPU0hxTGtycEdVY3NRU0dBMDUy?=
- =?utf-8?B?cHlYOUkycXhkSTNLaVEveERVcmd1Q2J0RmZ3OVdYNlN2VzBvQlJSZHYySnNR?=
- =?utf-8?B?QkNYWVJ1NjBSbUQ0S3EyN3l5RHBBNlFhN2NkRHZKTFlxRUFIZUUzV1BNTkYy?=
- =?utf-8?B?MlhXNUZOMXNUM2MrdTE0VThsa1UwZ1RQaW1PSEk2dWdBblZzVldZUUE4dk9x?=
- =?utf-8?B?TTR4V3pJd2tORWp2Tmkxb2U4VG9KMHQvK2lNOEpSNVhwNy9udFBDeUxtVzV4?=
- =?utf-8?B?V09udjVtekI1RFhqV1MrZlNraVVDd0JKNXZRQ3ZaOTE4M0FHdW4yVmN4ekxs?=
- =?utf-8?B?UGpuMjNHMDRzbFhpUGtHcEpwcVpLcXdxUU5oampwdG5PcndvdmdMUlptdjdB?=
- =?utf-8?B?U3p1SFF4bVEvU0daT0dWOGtVNmNLdGJWS1BSaVpmb2NhaitQVmM2Qmx5MW1Y?=
- =?utf-8?B?VVRUMllWRVRONW51TXpqZzNLMG9iS01OblZzVFhnVWRNMVJYVHo2QmpvY05h?=
- =?utf-8?B?WVpLOGZoSVRCOGN6YXFUTXNIZnR4MGtCN1RlOUhKaXYybVVrN3owblQxaTNl?=
- =?utf-8?B?amJpMGZwNHIxcVRUS2UrMFZ0V3lsSDFlbGxMVjdBblcrZForOUUwSjd4bDFs?=
- =?utf-8?B?RTRTYlhEd3hnTjF1VHB6YzVMbUxVc0JmUTFQT2FXSVlmV2t2L0VzQWd1SVZO?=
- =?utf-8?B?MFJFYndFL0ZPN28wdEsrTEpUaHl3bDVKMzhrbXZlUk9VOWpSVXB1bmlhbUls?=
- =?utf-8?B?NlB6WGIxS21nUmF6QnpTR1BoL1dLMzdnSDNyc2ZwbC9CYXdUclcrZ1VpWUNQ?=
- =?utf-8?B?akRHdkFoWW4vQjUwZlNraW9CNHN5Lzg0VkdlZDhpaGx4bHFCQ2tsSk00Smgx?=
- =?utf-8?B?ZVdRbloyWmZDdk93VU9lRVhWcTI5MEpST3RYbWhGcS9GYU5DcFVhYzJucUlR?=
- =?utf-8?B?ZngxQldoSThmTDAyZGk2Z1YvVHVKRHp4L00wSUdGNW9XVit2OHYvdnFnL1ZU?=
- =?utf-8?B?b2o3M3hZQ2hGdmRTWXlZdUh0QkdHeDRDK2NJTnpldit1QW8wSUJEYUtsSHY1?=
- =?utf-8?B?bTdUQ2R2Qzd6SXlOT1dIckppY25sNmZ2cFlJalFzcFg2SWhPU1kxSTJMRWVj?=
- =?utf-8?B?UzJkd1JDNkFIYmliUUZGUHVXU0FiUUQ1OU1JVDc2N1FKa0JvZjBKUHJldmVi?=
- =?utf-8?B?YURPdThQTU0zenhqY1I5b3RITU9CQmhOeFF5aHZhcm9kMUxDaGI5QVMzZlVG?=
- =?utf-8?B?WUF4N2pnUTF3NEdESmwwUWNSelRacUd2ZGNBUC9PcFE0Rm9UMFVnRS9YUDAw?=
- =?utf-8?B?VDhpZHp2ckVIK2NNSTdlY3ozd0ZHV2M0ampaZCtLSXZ0ZFRneDNiQnJSMXdR?=
- =?utf-8?B?WFR4cVNDUkd4U0J0MGgwOEFHZDdBNXFaa2FKY3FRZkk0aS9KTzYwV0NkV3Vl?=
- =?utf-8?B?NG1GbW4rNVZiL2tzdHRnNGZTWnh1QmZsUFBzR0RMYlRBRCtab2xjdlRTaDF5?=
- =?utf-8?B?OWh6T1oyWW5CMzQ2VVJSV1c1eXBCQ1lmdGNkQmZteTluWEpRU0g1NEwza3Vr?=
- =?utf-8?B?OVJHQXlKNWxlVG9uSHZlckVTVGE3ZEl4US9GRnc1ZTZwQmxnc0NlSU5ycWVN?=
- =?utf-8?B?cThZR1c2WWZYTWNtSzhaanl3eUdFSzZLQU5OV2lSVmkvZHRYZkVkWVlyem92?=
- =?utf-8?B?aUxUdWJraVlhS0M3Y2VqM0h2Zlo4KzVzUER1c2lCc1MyaXpiTkRObnltT1FV?=
- =?utf-8?B?dDNNZ1lhd3VVUkltL2VpUWNCVEZieHBFVGU1WldBdWt3WVB5L2oxNGtOeE5S?=
- =?utf-8?B?dzAxdWkwaG0yQkVHaEtNdjN6dm5XWXFTaGxqUHh0d1AxN09KNVpjcXpCcjVI?=
- =?utf-8?B?OGJFbXBVSkdTL2doejc2cU9RZEpMMU4rUG9PblR0RjhBQmJhWXRtTUc4elI5?=
- =?utf-8?B?V3MxU1JyWGVvS0ROcHFvZUNIcXk4UlNhNFllYlVYeUcxTnJoVlhkVGxSR2VB?=
- =?utf-8?B?dWNpM2VOcDE5NmxVS29Pb1Q3dEYvY3hTU0xYTkNBbDQ0QXVuNWJzSlR2QzZ0?=
- =?utf-8?B?S1IxTmhJNnNUZkFLSGtTWENhYUxRRDVqbDZZQVppS2RSdE5iYm5JTVNSVmsy?=
- =?utf-8?B?Rm5RWXBhRVBHOFBNVDFEbUlpRm5ZUXRHR1pNelpxZ0lZQ1cyV1B2S3BqVGZC?=
- =?utf-8?Q?bKeLaqYwxE3KVeDZtDHomYscjkO4+ovg1JuVP?=
-X-OriginatorOrg: weidmueller.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 41af9c90-a329-4062-c89f-08dee1bd95ce
-X-MS-Exchange-CrossTenant-AuthSource: AS2PR08MB9199.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2026 15:35:51.2633
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: e4289438-1c5f-4c95-a51a-ee553b8b18ec
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8nGnR6H/0nm9npMSM/SMsrSwsqRSK2d2FXPg7y8ejLeyZ5lQF9xAUIygln+Ok+TBCZPmHUvIzpfxmA9i3AthBCW/MNNzQPPUeaZNTKfdJjPLTKX3VqCTYynKOkgGBnUA
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR08MB11393
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] net: wwan: qcom_bam_dmux: Alloc RX buffers as a
+ single coherent block
+To: Stephan Gerhold <stephan.gerhold@linaro.org>
+Cc: Stephan Gerhold <stephan@gerhold.net>,
+        Andrew Lunn
+ <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Loic Poulain <loic.poulain@oss.qualcomm.com>,
+        Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        chris.lew@oss.qualcomm.com,
+        Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>
+References: <20260714-qcom-bam-dmux-vmid-ext-v1-0-3f29da7cca76@oss.qualcomm.com>
+ <20260714-qcom-bam-dmux-vmid-ext-v1-2-3f29da7cca76@oss.qualcomm.com>
+ <alXm0rp3NK62G3-3@linaro.org>
+Content-Language: en-US
+From: Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>
+In-Reply-To: <alXm0rp3NK62G3-3@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzE0MDE2NCBTYWx0ZWRfXykRgH8N2UaY4
+ topeERmq7vCUh7JD8lJK8Uy3Z2WZplK20Y7CM1fqStbwHobOlh6RCne6/PL8ynqPJ9BHDXyFtny
+ a+hkdgajBWENVszzxZ8Zjcx7lIJyheg=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzE0MDE2NCBTYWx0ZWRfX8Jop+OcS0DPF
+ 9CNoXqRRCDf1Tmsh5IP7U/X9JaEeDGtn0g1emgnerwpLklwYRxBZL4amO1lpTVYSQExalHVlO5e
+ l9LQJz5wTir1MuukTgKjx9RSmD+val7cYvQdT36yVQfzkpvyt78vN/79xE5t/2hyDbvKa2L7sWY
+ rZOmTAn3dljien8NeSSLblyGGZJeTPbqCDEToinVGmZb3qSkFR+Z2ql8PFD46ZnHgpgnNkdRJQC
+ 5tgs9t/hTH9Mh7oxegfFcpKUWe86xQw5f+bkfWFcQjmYfykekD2HWWXpvtQ5RLhFTVnJCGdBZq2
+ Rs9kfpZngOzqVt9l1ZXWnyd58qtwTxoH6Dw5p0nT2AnTzoA/EW6R5x28V7sPjVeiYkpQhCJatJD
+ 3N+uCB/Rd4OcKAFOPkRBWoIW8tIzYjovY3S3TZCp00SPuhgzdJEYEc3FQ3vS5rqrVGQbV5YBLom
+ q6e8Z0It2lHlYF/uXxw==
+X-Proofpoint-ORIG-GUID: eEEa_HPzOxH8QegI4dTjBVgSb_2_BiMh
+X-Authority-Analysis: v=2.4 cv=NfPWEWD4 c=1 sm=1 tr=0 ts=6a565a22 cx=c_pps
+ a=RP+M6JBNLl+fLTcSJhASfg==:117 a=ziBI+Y3eO/H+UwYWWny9Hg==:17
+ a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=ZpdpYltYx_vBUK5n70dp:22
+ a=EUspDBNiAAAA:8 a=2eDN7aXksB4whfXZn5AA:9 a=QEXdDO2ut3YA:10
+ a=iS9zxrgQBfv6-_F4QbHw:22
+X-Proofpoint-GUID: eEEa_HPzOxH8QegI4dTjBVgSb_2_BiMh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-14_03,2026-07-14_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 malwarescore=0 phishscore=0 clxscore=1015 spamscore=0
+ suspectscore=0 bulkscore=0 impostorscore=0 adultscore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607140164
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[weidmueller.com,reject];
-	R_DKIM_ALLOW(-0.20)[weidmueller.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307516-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[bootlin.com,gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:theo.lebrun@bootlin.com,m:haokexin@gmail.com,m:christian.taedcke@weidmueller.com,m:conor.dooley@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:bigeasy@linutronix.de,m:clrkwllms@kernel.org,m:rostedt@goodmis.org,m:robert.hancock@calian.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rt-devel@lists.linux.dev,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[christian.taedcke-oss@weidmueller.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-307517-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:stephan.gerhold@linaro.org,m:stephan@gerhold.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:loic.poulain@oss.qualcomm.com,m:ryazanov.s.a@gmail.com,m:johannes@sipsolutions.net,m:linux-arm-msm@vger.kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:chris.lew@oss.qualcomm.com,m:deepak.singh@oss.qualcomm.com,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:ryazanovsa@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[weidmueller.com:+];
+	FORGED_SENDER(0.00)[vishnu.santhosh@oss.qualcomm.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gerhold.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,oss.qualcomm.com,gmail.com,sipsolutions.net,vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,qualcomm.com:dkim,oss.qualcomm.com:from_mime,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[christian.taedcke-oss@weidmueller.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vishnu.santhosh@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[weidmueller.com:from_mime,weidmueller.com:dkim,weidmueller.com:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amd.com:url]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0D67E7567D7
+X-Rspamd-Queue-Id: 8429A756971
 
-Hello Kevin & Théo,
 
-i recorded some traces and include 2 of them here.
-
-On 7/10/2026 3:56 PM, Théo Lebrun wrote:
-> Hello Kevin & Christian,
-> 
-> On Wed Jul 8, 2026 at 5:05 AM CEST, Kevin Hao wrote:
->>> I agree that the TRM says the transmit pointer is reset while TE is low. My
->>> question is whether this describes an internal pointer being reloaded from TBQP,
->>> or whether TBQP itself is restored to the original ring base.
+On 14-07-2026 01:05 pm, Stephan Gerhold wrote:
+> On Tue, Jul 14, 2026 at 11:02:32AM +0530, Vishnu Santhosh wrote:
+>> On Qualcomm SoCs where the modem (e.g. the mDSP on Shikra, VMID 43 /
+>> NAV) is the AXI master for BAM-DMUX RX transfers and the XPU enforces
+>> per-region access control, each individually DMA-mapped RX buffer
+>> requires its own XPU resource group (RG). With ~16 RGs available, the
+>> 32 per-buffer dma_map_single() calls exhaust the table and the first
+>> inbound transfer faults with an XPU violation.
 >>
->> The Zynq UltraScale TRM [1] describes the receive-buffer queue pointer as follows:
+>> BAM-DMUX is a singleton (exactly one instance per SoC), so the
+>> destination VMID does not need to be a DT property; it is looked up
+>> from the compatible string's match data instead. Add struct
+>> bam_dmux_data with a single vmid field, and a shikra_data instance
+>> hardcoding QCOM_SCM_VMID_NAV for qcom,shikra-bam-dmux.
 >>
->>   An internal counter represents the receive-buffer queue pointer and it is not
->>   visible through the CPU interface.
+>> When match data is present, allocate all BAM_DMUX_NUM_SKB RX buffers as
+>> a single contiguous dma_alloc_coherent() block and SCM-assign that
+>> block to HLOS plus the VMID once at probe. This reduces RG consumption
+>> from 32 to 1. The block is never reclaimed across a modem power cycle
+>> (bam_dmux_power_off() does not touch it), so the probe-time assignment
+>> covers every subsequent restart without re-assigning or reclaiming. It
+>> is reclaimed to HLOS only once, at remove or on a probe error, and if
+>> that reclaim fails it is leaked rather than returned to the page
+>> allocator.
 >>
->> I could not find a similar description for the transmit-buffer queue pointer,
->> but I believe it behaves the same way. From a software perspective, it should
->> be safe to assume that the TBQP is reset to point to the start of the transmit
->> descriptor list upon reset. This assumption is supported by the description
->> of the transmit_q_ptr (GEM) Register [2]:
+>> Each rx_skbs[] slot is pre-assigned its virtual and DMA address from
+>> the block, so no per-buffer mapping is needed at power-on. Because the
+>> coherent block is not page-backed, received payload is copied into a
+>> regular netdev skb before handoff to the network stack; this is an
+>> unavoidable extra copy on the XPU-enforced RX path.
 >>
->>   Reading this register returns the location of the descriptor currently being accessed.
->>   Since the DMA handles two frames at once, this may not necessarily be pointing to the
->>   current frame being transmitted.
+>> Platforms without match data are unaffected: rx_virt stays NULL, no
+>> coherent memory is allocated, and the per-buffer dma_map_single() path
+>> is unchanged.
 >>
->> [1] https://docs.amd.com/v/u/en-US/ug1085-zynq-ultrascale-trm
->> [2] https://docs.amd.com/r/en-US/ug1087-zynq-ultrascale-registers/transmit_q_ptr-GEM-Register
-> 
-> For what it's worth, I agree with Kevin.
-> 
-> It should be rather easy to detect if the patch is needed, with more
-> logging. Dump TBQP before link-down & dump it at link-up. The code
-> expects TBQP to reset to the ring start automatically whereas this
-> commit message says the TBQP after link-up is some offset into the ring.
-
-These traces were captured on a zynqmp device. The patches in this series were not applied.
-
-The traces contain information from both tx queues (q0 and q1).
-tbqp contains the value returned by queue_readl(queue, TBQP).
-base is lower_32_bits(queue->tx_ring_dma).
-tbqp_ctrl contains macb_tx_desc(queue, tbqp_idx)->ctrl.
-tail_ctrl contains macb_tx_desc(queue, queue->tx_tail)->ctrl.
-
-At the beginning the link is up and communication over ethernet is working.
-The cpu is not at 100% load, everything worked fine.
-
-
-Trace 1 (everythink works as expected, no high cpu load):
-
-The ethernet link goes down.
-
-Trace from macb_mac_link_down():
-
-     kworker/0:4-1679    [000] .N...   141.796925: macb_tx_hw_state: macb_tx_hw_state q0 linkdown_pre_te tbqp=67cd0030 base=67cd0000 ncr=0010001c tsr=00000021 imr=3fffffff head=2 tail=2 tbqp_idx=343 tbqp_ctrl=80000000(used=1) tail_ctrl=80000000(used=1)
-     kworker/0:4-1679    [000] .....   141.796958: macb_tx_hw_state: macb_tx_hw_state q1 linkdown_pre_te tbqp=67cda598 base=67cd8000 ncr=0010001c tsr=00000021 imr=00000ce6 head=3985 tail=3985 tbqp_idx=59 tbqp_ctrl=80000036(used=1) tail_ctrl=80000000(used=1)
-
-ctrl = macb_readl(bp, NCR) & ~(MACB_BIT(RE) | MACB_BIT(TE));
-macb_writel(bp, NCR, ctrl);
-
-     kworker/0:4-1679    [000] .....   141.796961: macb_tx_hw_state: macb_tx_hw_state q0 linkdown_post_te tbqp=67cd0030 base=67cd0000 ncr=00100010 tsr=00000021 imr=3fffffff head=2 tail=2 tbqp_idx=343 tbqp_ctrl=80000000(used=1) tail_ctrl=80000000(used=1)
-     kworker/0:4-1679    [000] .....   141.796964: macb_tx_hw_state: macb_tx_hw_state q1 linkdown_post_te tbqp=67cd8000 base=67cd8000 ncr=00100010 tsr=00000021 imr=00000ce6 head=3985 tail=3985 tbqp_idx=170 tbqp_ctrl=0000800f(used=0) tail_ctrl=80000000(used=1)
-
-Ethernet link goes up.
-
-Trace from macb_mac_link_up():
-
-     kworker/0:3-190     [000] .....   152.966203: macb_tx_hw_state: macb_tx_hw_state q0 linkup_post_shuffle tbqp=67cd0030 base=67cd0000 ncr=00100010 tsr=00000021 imr=3ffff305 head=0 tail=0 tbqp_idx=343 tbqp_ctrl=80000000(used=1) tail_ctrl=80018040(used=1)
-     kworker/0:3-190     [000] .....   152.966206: macb_tx_hw_state: macb_tx_hw_state q1 linkup_post_shuffle tbqp=67cd8000 base=67cd8000 ncr=00100010 tsr=00000021 imr=00000004 head=0 tail=0 tbqp_idx=170 tbqp_ctrl=0000800f(used=0) tail_ctrl=0000800f(used=0)
-
-macb_writel(bp, NCR, ctrl | MACB_BIT(RE) | MACB_BIT(TE));
-
-     kworker/0:3-190     [000] .....   152.966209: macb_tx_hw_state: macb_tx_hw_state q0 linkup_post_te tbqp=67cd0030 base=67cd0000 ncr=0010001c tsr=00000021 imr=3ffff305 head=0 tail=0 tbqp_idx=343 tbqp_ctrl=80000000(used=1) tail_ctrl=80018040(used=1)
-     kworker/0:3-190     [000] .....   152.966211: macb_tx_hw_state: macb_tx_hw_state q1 linkup_post_te tbqp=67cd8000 base=67cd8000 ncr=0010001c tsr=00000021 imr=00000004 head=0 tail=0 tbqp_idx=170 tbqp_ctrl=0000800f(used=0) tail_ctrl=0000800f(used=0)
-
-CPU load is normal, no issue in this trace.
-tbqp on q0 is not reset to base. But in this case it did not result in the interrupt storm.
-
-
-Trace 2 (results in interrupt storm):
-
-The ethernet link goes down.
-
-Trace from macb_mac_link_down():
-
-     kworker/0:3-95      [000] .N...   459.682957: macb_tx_hw_state: macb_tx_hw_state q0 linkdown_pre_te tbqp=67cd2cb8 base=67cd0000 ncr=0010001c tsr=00000021 imr=3fffffff head=4061 tail=4061 tbqp_idx=306 tbqp_ctrl=0000800f(used=0) tail_ctrl=80000000(used=1)
-     kworker/0:3-95      [000] .....   459.682991: macb_tx_hw_state: macb_tx_hw_state q1 linkdown_pre_te tbqp=67cd85a0 base=67cd8000 ncr=0010001c tsr=00000021 imr=00000ce6 head=60 tail=60 tbqp_idx=230 tbqp_ctrl=80000036(used=1) tail_ctrl=80000000(used=1)
-
-ctrl = macb_readl(bp, NCR) & ~(MACB_BIT(RE) | MACB_BIT(TE));
-macb_writel(bp, NCR, ctrl);
-
-     kworker/0:3-95      [000] .....   459.682994: macb_tx_hw_state: macb_tx_hw_state q0 linkdown_post_te tbqp=67cd2cb8 base=67cd0000 ncr=00100010 tsr=00000021 imr=3fffffff head=4061 tail=4061 tbqp_idx=306 tbqp_ctrl=0000800f(used=0) tail_ctrl=80000000(used=1)
-     kworker/0:3-95      [000] .....   459.682996: macb_tx_hw_state: macb_tx_hw_state q1 linkdown_post_te tbqp=67cd8000 base=67cd8000 ncr=00100010 tsr=00000021 imr=00000ce6 head=60 tail=60 tbqp_idx=170 tbqp_ctrl=80000036(used=1) tail_ctrl=80000000(used=1)
-
-Ethernet link goes up.
-
-Trace from macb_mac_link_up():
-
-     kworker/0:3-95      [000] .....   470.292877: macb_tx_hw_state: macb_tx_hw_state q0 linkup_post_shuffle tbqp=67cd2cb8 base=67cd0000 ncr=00100010 tsr=00000021 imr=3ffff305 head=0 tail=0 tbqp_idx=306 tbqp_ctrl=0000800f(used=0) tail_ctrl=0000800f(used=0)
-     kworker/0:3-95      [000] .....   470.292879: macb_tx_hw_state: macb_tx_hw_state q1 linkup_post_shuffle tbqp=67cd8000 base=67cd8000 ncr=00100010 tsr=00000021 imr=00000004 head=0 tail=0 tbqp_idx=170 tbqp_ctrl=80000036(used=1) tail_ctrl=80018040(used=1)
-
-macb_writel(bp, NCR, ctrl | MACB_BIT(RE) | MACB_BIT(TE));
-
-     kworker/0:3-95      [000] .....   470.292882: macb_tx_hw_state: macb_tx_hw_state q0 linkup_post_te tbqp=67cd2cb8 base=67cd0000 ncr=0010001c tsr=00000021 imr=3ffff305 head=0 tail=0 tbqp_idx=306 tbqp_ctrl=0000800f(used=0) tail_ctrl=0000800f(used=0)
-     kworker/0:3-95      [000] .....   470.292884: macb_tx_hw_state: macb_tx_hw_state q1 linkup_post_te tbqp=67cd8000 base=67cd8000 ncr=0010001c tsr=00000021 imr=00000004 head=0 tail=0 tbqp_idx=170 tbqp_ctrl=80000036(used=1) tail_ctrl=80018040(used=1)
-
-After that sequence one CPU core is at 100% load continously executing the macb irq handler.
-
-The issue seems to be q0. tbqp of q1 is properly reset to its base address.
-tbqp of q0 is not changed as expected in link down when tx is disabled.
-
-Are there any other details i could put into the trace to determine the root cause?
-I suspect that some packet is still in transmission/ being processed and this might be the
-reason why tbqp of q0 is not being reset. But i do not see that in this trace.
-
-
-> 
-> Lastly, the cover letter mentions that [PATCH 1/2] alone isn't enough.
-> But it doesn't mention that [PATCH 2/2] alone doesn't solve the issue.
-> This would be a useful test as well.
-> 
-> On Tue Jul 7, 2026 at 3:36 PM CEST, Taedcke, Christian wrote:
->> Thank you for the quick review! This is my first Linux kernel
->> contribution, so I appreciate your feedback here.
-> 
-> Welcome!
-> 
+>> Co-developed-by: Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>
+>> Signed-off-by: Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>
+>> Signed-off-by: Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>
+> So how do you handle TX buffers? Right now, they are just passed on from
+> the net subsystem. There can be up to 32 TX buffers in progress as well.
+>
+> Overall, I have mixed feelings about this patch. It looks reasonably
+> simple, but fundamentally I don't understand why we need to go back to
+> the old days of implementing protection using a highly limited MPU (in
+> your case: the xPU).
+>
+> Why does the setup of BAM-DMUX differ e.g. from the setup for the crypto
+> engine? Crypto is also using bam-dma, but it avoids this inflexibility
+> by making use of the &apps_smmu. Is BAM-DMUX not covered by the SMMU? Or
+> did you just decide to bypass the SMMU in this case? (If so: Why?)
+>
+> If you had BAM-DMUX mapped using the SMMU you would get all of this for
+> free. No changes would be needed in the BAM-DMUX driver ...
+>
 > Thanks,
-> 
-> --
-> Théo Lebrun, Bootlin
-> Embedded Linux and Kernel engineering
-> https://bootlin.com/
-> 
+> Stephan
 
-Regards,
-Christian
+Thanks for pointing out. We were seeing XPU violations on descriptor
+FIFO accesses in the RX path. This series resolves the RX-side faults,
+which is why we posted it. It appears that the TX path requires equivalent
+handling, and we'll include the necessary TX changes in v2 of this series.
+
+Currently, the SMMU does not cover this A2 BAM instance on Shikra, which
+is why we opted for the SCM-assign approach. I'll check with the hardware
+team to better understand why BAM-DMUX is not behind the SMMU, gather the
+relevant details, and get back.
+
+Thanks,
+Vishnu
 
 
