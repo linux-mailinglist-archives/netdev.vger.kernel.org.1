@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-307538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307539-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +RBTOih1Vmrp5wAAu9opvQ
-	(envelope-from <netdev+bounces-307538-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:43:04 +0200
+	id E5l+K1V1VmoG6AAAu9opvQ
+	(envelope-from <netdev+bounces-307539-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:43:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DC6B757923
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:43:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2198275793F
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:43:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=pzgvaeY5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307538-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307538-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Es1qqCFz;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307539-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307539-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8DA3D314CED9
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 17:41:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ABBC831631E2
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 17:41:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FF534156FF;
-	Tue, 14 Jul 2026 17:41:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CD9B306752;
+	Tue, 14 Jul 2026 17:41:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B293A412C0E
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 17:41:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2EC2F12AB
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 17:41:23 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784050885; cv=none; b=DEzBlg+in7IBy04/eGu0WA+NEUzinnuFs0yu6DSXaWG9L5HODBUr7LsGhHjjjUnG5TFKhzk/wHa3NJHFklNdgXYNYf5c/WsC9c01cmV5IHBciH2yy+zletnHd8P9KOZSl2xpfv0gVutfo4HRepnhqideZe3OxZ8NP2rE6aKkHeM=
+	t=1784050886; cv=none; b=oytATA+aO5zXDDv2onKGROwqR2TCX3e6qyn0kVsyDPj/ik8LptF6x4KyIo2jR6cVco7029PWvyflGaVSALujsVYv2P5E3PBSLp4KGbU7GfXg+xpJ6WTfAFWS92Guj9tPLtLauF6/YZ7SH5+dz5S+nVAIg944bMR0lVHaLcSBqVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784050885; c=relaxed/simple;
-	bh=/8kwpS51oEAHEw6EL4bUzPsL8La9wbzGzhSRkOOzhFs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dkv0BBZTSGeBeyIi1BSZFsKqc4RbWktwPkYVQ2TbZaNVBt5LoMlM7Z2UOJ/hyGPU191fLP7pfDtBCcDIozIQp4sSo+GaWYffrDJBdi1Yd5yihbreyC+z4HAHMKSJHBE8TxDlPp8Mupr9HY93+QgSgpU55iKd7fPH919dCSIGsTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pzgvaeY5; arc=none smtp.client-ip=209.85.214.172
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2c6b67d5fa1so77254545ad.2
-        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 10:41:20 -0700 (PDT)
+	s=arc-20240116; t=1784050886; c=relaxed/simple;
+	bh=uwYEAAseGuiIqJKLvH0j4d0K5nxF8ikHm9QDZEG7tls=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=E6vXN0ax8Sf9hqZQusLmV/71u8hdK6mKLY1vzI14XWiHuc9Rt8RnkhZoN+g9LWXPiKg9vvJrIxixMDwImY8FqJAdWuJeHBLlph3pNKEWKHRM0NzZVDUGwMgAu0LVDAkOziXFpyzb1C8wLQwGOP4YseIqtGoWNr9c3eicwoy8inQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Es1qqCFz; arc=none smtp.client-ip=209.85.216.47
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-3847e8b0f3aso3843296a91.3
+        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 10:41:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784050880; x=1784655680; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=11t9d++r0bmMhzQdiTZcpMyL88ikh+EriVNoFZhMUAE=;
-        b=pzgvaeY5hJUBe35j86/xzRYNAapiLHnWP2fsSZCPw53h8g4lU2+gR46zSP/WPsZAaJ
-         GT4c3j8hYxdDU2YZPwXL5s3yu41s2YNICen+3urnMH8ifE5iqVwFX7uVshD6Sze1bv2O
-         2ELclrhnUgew7Mp/6WESn2MtUDJkZ46VC2zWqConFPQP7Ihj7JAPGvSUSGXGjG0XFKd1
-         5L39HaSyCO6hoGlr2WwWd7oXybc6FYbwqKxucpYtB8fZRPT8VeXzzpXTBylUKw1qrekd
-         KFNtp5MWvv7u9ePJYETRkKR74WPEy2pZyejUozJWj9b52rURHZFR52GKYhDq+9AY8iF4
-         jK+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784050880; x=1784655680;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1784050881; x=1784655681; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=11t9d++r0bmMhzQdiTZcpMyL88ikh+EriVNoFZhMUAE=;
-        b=KJs2ozVNRTfCLLV9K4wlugK7cW9/oMIJry5Zy/zkYXZydLhFXu4cI+EOQZ3XLkiGBr
-         YBfwIMRCSqX9dMjmiaE/0ruq2EigJWk9mUO/gAIqoafcw1D6Jr3zrlnxKdK3pR0AsSTX
-         JFtUS8PsTpa5L2LKXw9MOioAblSU229qCCRgeiwV+hDIw4r2cNWQM1TJTwwQMSo8QiTS
-         xv4ei2ro2gKorXxEZf+8UU4F3+16I9YrvD7Kzzt4/Q9elOdSlxyksVkhvDl+vOvrhkKM
-         U0PCYSrCmh28CJYq6gG/gXH0en/E64JlGC/xlypgGuM5WqZQtwx3V+BxR95FjAbQgBFM
-         /KDA==
-X-Forwarded-Encrypted: i=1; AHgh+Rrnj5vcrlWqcFN+zS2Mni94geOxaLLi2m6Ncbda/l4m3oxwvsiCOjMkK1u7arCNb6I0jw5/W0Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzt+DkJ+PXJuCZBiA2MBqZuupGPsirQcVx5WKav/mnB9clJpw09
-	836DNqWwq71NLIRStY4DcuxuS8XTJyqI332eKjGhv6u5sPBbBruITy7d
-X-Gm-Gg: AfdE7ckqRqBLb0lJjMl9dNj4A7iEC38hXjlwZz1eAmpJy1Eq8YbgCCqt/D0kwsA6KJ8
-	fRRyOuFdhTvtMAdzmOCNYJBPsnNL+wnbT/lJ/DDsBO3T0vV8hcwwWfwzlDEFtEVjsGq35LQmdef
-	uNo1++l7eMe149qd1UOX6PYa0lkatE0GsfmBYoxsnQTeq8h1X9osAJujSh/+uYy56byqtM1VSsB
-	Nnpzo+NSFGAUNn5pUfQm4W0BHoHXTMlRHo4bTEF3nfCj2y0ErG+1oRbjaOSEHLEAw2qi4knOVu1
-	eJP3C0M02D+J1roX+s3+H2rmsqNcu7ajlPN8WkgkgVg6uflKchLLTCe7ciJA2CW3GQXeHoZ9EAc
-	1U9uc7WFnrXCi69n79V8n9Y1ZVBka0Zs9UBrZS7+IX9pDSRegJPIHnVii2OR0B+BzJIKHtGQO57
-	dweuXQOLiivQwqP4HgrYIQzVSYuFgEycQUFw7v780zddwioxawR1t/z/BSAd/uEWwfKj01
-X-Received: by 2002:a05:6a21:3282:b0:3bf:6c08:4ec6 with SMTP id adf61e73a8af0-3c357263c10mr3492675637.59.1784050879544;
-        Tue, 14 Jul 2026 10:41:19 -0700 (PDT)
+        bh=YtAAp1v2R1o5+64p5FOI9tTm+W9MNlFWebATHzuqp8E=;
+        b=Es1qqCFzTZa+y9cY4OP1PWSnjIwDi/N0ORq2RyugmEOm4IEP6Myk3dcY6cBAzJH8Lt
+         A6ZHjfyM8Up0KwYLqVm55m3y3X2bPIByrR8+j0g+118aUGREd9gHFufNoiHWGcwmPkKU
+         XeYtH/UDXOwbGg9zalz6n0fjz1J/8umotVZ0UTNlYxNTuSBYTuiv46QttH/uy/TCjQgx
+         CygQEYz330DFJtJH9pikqMkkT+Gzzr71f8ZxXVR+YgtqLou5IdR/NCNAjmD0Y+NDUhJC
+         39PemLbZMWfvcsxtPmD28LwD0e0p51TkP9H76mR7np8NPCwEHNxZ4xpFQ0fwS9C9UFJV
+         eslw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784050881; x=1784655681;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=YtAAp1v2R1o5+64p5FOI9tTm+W9MNlFWebATHzuqp8E=;
+        b=FqglEOPUnKfyofHTD8sYbRtNZWKeHeYngKFPCtnR9nlR2s+9/J1a7VGmwcQMNQP50X
+         5VVXPeqf0fY/n8GImFjrZb0v8LyG01gdSbfvWJRt371BmAtCfrT4PoNBYvnhdNwvtMSl
+         WO0jTx6puRB5f0zB6pkXpYYPEQyB+uFXwUHEfHzxSp0h+oeHbY3sTJ/6oZbGpkDs4DUX
+         lbH6apmhL2XsgXdnB5moifwRx2BFbKnDnYDdhwMMrxwpbD3ePMjSNKeVVMqk/Tbf0oI3
+         xI66iHWoGrbm6kGPyvxrKSLjjo5yvt4e0MdIVx46PlT0v6XnPqNv+wjZK1L/mol6+pOi
+         LaWA==
+X-Forwarded-Encrypted: i=1; AHgh+Rqdu/M8OppAXNECNbo02jjzAx8cAsIIm1FXSnAEsUYGnVXK1ykEIlbSZ3zh3IWLt/NKbYfl7i8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YywI7yuT/du60QroNARoKiZH7Za8zL2g7ZpSMLT0zSmiq8SWiLq
+	NEKTRghhB31mTgqTwCFDQLkiqfIkHmukFkjBV4FNkb0MyFAxQ3HHXoRWxZ5bh7xI
+X-Gm-Gg: AfdE7cl6WOaNtw6NV1LsPXONPEB1w0p/Ov3xr8mKB035KN/6d1RoEioxTjCXxY7tQj0
+	5w1W4ldbR+mtVRs669CdgSEDI284Lk8vjYHeEd6cJk71+oEnRIXuVBMhf6QhB6Cbr6bhSRKYO3T
+	jFoylOB3o3mikTJ8mIo64sa+RZN6pYks0EuDpchTxBt3ENrPE+KyjBF5PDWPImtF1QWJITTdYgN
+	0++myA7U2BUdDEyBrVKIOENVPI1wrCFNZ7vGoStQbcSnF5B2+Bh4zgogy3ydBY8W8GInqCxKxmk
+	zZX0bAPxvXXCt5TepLEiwL0YLqeXy+vTi7j3VtWVHqhSHwUV1VU+x/Gajxz0zcnFnM7Wa0vhQza
+	4U/1CQ40Y3mNrT2jZT1FmJ2xl1fHgR4FHgGSTwxmmKgKNte/51PPtt5XYTxtlxcyEsALEF27k4/
+	m4q74MwwqRgryw8mleLPPrQ29hGoARL+b7r10osC5Dfxu2GMSniAxAtsSn3w==
+X-Received: by 2002:a05:6a21:730c:b0:3bf:6c08:fb94 with SMTP id adf61e73a8af0-3c110a207b0mr17047615637.54.1784050881193;
+        Tue, 14 Jul 2026 10:41:21 -0700 (PDT)
 Received: from fx.tailc0aff1.ts.net ([206.206.192.132])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13b87b92b27sm38055954c88.6.2026.07.14.10.41.18
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13b87b92b27sm38055954c88.6.2026.07.14.10.41.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jul 2026 10:41:18 -0700 (PDT)
+        Tue, 14 Jul 2026 10:41:20 -0700 (PDT)
 From: Weiming Shi <bestswngs@gmail.com>
 To: Jon Maloy <jmaloy@redhat.com>,
 	netdev@vger.kernel.org,
@@ -88,10 +90,12 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	Tung Quang Nguyen <tung.quang.nguyen@est.tech>,
 	linux-kernel@vger.kernel.org,
 	Weiming Shi <bestswngs@gmail.com>
-Subject: [PATCH net v3 0/2] tipc: fix NULL deref in tipc_named_node_up() on empty publication list
-Date: Tue, 14 Jul 2026 10:41:08 -0700
-Message-ID: <20260714174110.1571033-1-bestswngs@gmail.com>
+Subject: [PATCH net v3 1/2] tipc: guard against empty list in tipc_node_xmit()
+Date: Tue, 14 Jul 2026 10:41:09 -0700
+Message-ID: <20260714174110.1571033-2-bestswngs@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260714174110.1571033-1-bestswngs@gmail.com>
+References: <20260714174110.1571033-1-bestswngs@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -106,14 +110,14 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,dektech.com.au,asu.edu,est.tech,vger.kernel.org,gmail.com];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-307538-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307539-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:hoang.h.le@dektech.com.au,m:xmei5@asu.edu,m:tung.quang.nguyen@est.tech,m:linux-kernel@vger.kernel.org,m:bestswngs@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
@@ -129,54 +133,43 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,asu.edu:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3DC6B757923
+X-Rspamd-Queue-Id: 2198275793F
 
-named_distribute() stamps the last_bulk flag on the tail skb of the
-publication list. When the list is empty no skb is enqueued and the tail
-access dereferences NULL. tipc_named_node_up() hits this on an empty
-cluster_scope, which happens with a node-id configuration where
-cluster_scope is populated only later by tipc_net_finalize(). It is
-reachable by an unprivileged user over a UDP bearer in a user+net
-namespace.
+tipc_node_xmit() passes @list to tipc_lxc_xmit(), which dereferences
+buf_msg(skb_peek(list)) without checking, so an empty list causes a NULL
+pointer dereference. named_distribute() can hand it an empty list when a
+bulk allocation fails. tipc_link_xmit() was already guarded in commit
+b77413446408 ("tipc: fix NULL deref in tipc_link_xmit()"); guard
+tipc_node_xmit() itself so the tipc_lxc_xmit() path is covered too.
 
-Patch 1 guards tipc_node_xmit() against an empty list, so the allocation-
-failure path in named_distribute() cannot pass an empty list down to
-tipc_lxc_xmit(), which has the same tail-of-empty-list deref.
+Fixes: f73b12812a3d ("tipc: improve throughput between nodes in netns")
+Reported-by: Xiang Mei <xmei5@asu.edu>
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+---
+ net/tipc/node.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Patch 2 emits an item-less bulk when the publication list is empty, so the
-peer still receives the last_bulk flag and does not stall this node's later
-name updates.
-
-Changes in v3:
- - Split into two patches; add patch 1 to guard tipc_node_xmit() against
-   the tipc_lxc_xmit() deref reachable via the allocation-failure path.
- - Break out of the build loop on allocation failure instead of returning,
-   so the last_bulk flag is still applied to the last queued skb.
-
-Changes in v2:
- - Instead of returning early on an empty cluster_scope (which would stall
-   the peer, since it waits for a bulk with the last_bulk flag before
-   accepting later name updates), emit an item-less bulk so the peer opens
-   normally.
-
-Thanks to Tung Quang Nguyen for the review of v1.
-
-Weiming Shi (2):
-  tipc: guard against empty list in tipc_node_xmit()
-  tipc: fix NULL deref in tipc_named_node_up() on empty publication list
-
- net/tipc/name_distr.c | 16 +++++++++++++++-
- net/tipc/node.c       |  3 +++
- 2 files changed, 18 insertions(+), 1 deletion(-)
-
-
-base-commit: 4595d2c77ea4bfe4ae0efa38770a59ee5d2f06d3
+diff --git a/net/tipc/node.c b/net/tipc/node.c
+index 97aa970a0d83..fc241e7b0c1f 100644
+--- a/net/tipc/node.c
++++ b/net/tipc/node.c
+@@ -1695,6 +1695,9 @@ int tipc_node_xmit(struct net *net, struct sk_buff_head *list,
+ 	int bearer_id;
+ 	int rc;
+ 
++	if (skb_queue_empty(list))
++		return 0;
++
+ 	if (in_own_node(net, dnode)) {
+ 		tipc_loopback_trace(net, list);
+ 		spin_lock_init(&list->lock);
 -- 
 2.43.0
 
