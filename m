@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-307485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307486-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ItfyOmRHVmrz2gAAu9opvQ
-	(envelope-from <netdev+bounces-307485-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 16:27:48 +0200
+	id F40bA0BFVmpk2gAAu9opvQ
+	(envelope-from <netdev+bounces-307486-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 16:18:40 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B66F755CCD
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 16:27:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F71D755B1F
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 16:18:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=goy5Y0GV;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307485-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307485-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=intel.com header.s=Intel header.b=GTbxMx11;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307486-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307486-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=intel.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 129B835E23CF
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 14:11:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A947F3119E95
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 14:11:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A931481A81;
-	Tue, 14 Jul 2026 14:08:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3371F481666;
+	Tue, 14 Jul 2026 14:08:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13CCE481256;
-	Tue, 14 Jul 2026 14:08:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E60B481248;
+	Tue, 14 Jul 2026 14:08:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784038114; cv=none; b=b2Bs415vA+F89OU1RKVn6J062m9tJnAIJlJueAtOhzJEp0ZKmzflCFYzIrn1TMVopAzyTJtmHo5PtHGYdZsSaUgIPpD7gN2M1oyQWEIS0Y9BEs6P2P30fCZD+gQknIh+F66gwLRGp+MjJfYc2552qy+tfMg7t3EIxHZsXRrZOnQ=
+	t=1784038116; cv=none; b=R0gZ/vOkgrdsx8MaS1alXUFP5HBamkdMOshHSjiUCscr4aXmZ6WUKdqHXma7tFA6aWLFw+8RqyoQBRRXwTyPj2ln/nizvdKuvIjy2t5setY+CJ3zLVduF1tTWz8RNe9sqp0efT7ZYQVFMK9CoYChYfhcHMCR6o9mCEeBCs3QXjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784038114; c=relaxed/simple;
-	bh=u478NMbtsRva1LZrqkCrRxxL0J701DD1osUrLGCq5mQ=;
+	s=arc-20240116; t=1784038116; c=relaxed/simple;
+	bh=woEMa072B6FgiX3OZeS/66WbdJR6hpOoNhGZbMu0y18=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XmIXrAwtCuAwfdYdPQ/k83NXXIx9TGyeOQBB/7RA9k2IHYUaZjtquYgs+1PoH+Yh7wng/h+nBFkzPfLR9DH5YBA3ydUiurGQ4H2PF+M96m7AVudBaTsY3lzGLzuptfRDNaAph1PKtwEx5jmSwnoQonzSVBR+t9wjsBMRxhm6QLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=goy5Y0GV; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version; b=twmv1UOJVvebdna9yXiyNrxuUVqhanAgmvtm3XT+wxxzb2rSzhFA9/1w3/FXsf6vFh72wVpdN7WI9X54X6plW5GnOfdJnE+PNn5TEGON7atch3DTo/Q+ScTB5vpD7EA4HIPoYzsqlgac/it0EDujBBBKPila/GEs6XiT05I2JGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GTbxMx11; arc=none smtp.client-ip=192.198.163.7
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1784038111; x=1815574111;
+  t=1784038113; x=1815574113;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=u478NMbtsRva1LZrqkCrRxxL0J701DD1osUrLGCq5mQ=;
-  b=goy5Y0GViqu+7o9z+VwYzjhHMXuOInkws70JFSY66+QrdsKclGyujt/M
-   nzMSwmxKUi9i50BG0thFF6QfZeaq9kpTU4O6uGLLjKRvgR+Oa9TmJarj8
-   /bn9+xkvltksQYO/WNILzCZquaS5+yt8Gsa+NI8ng9dnE3J5ABzkPTo4t
-   MjbqZ8tvq6z3gRBOdSrvmPHC5FCxx0X8nvfzVvXKT2eeRBSsnHZ209dTV
-   V6qCfla9jyW1OVDLRdN9XD+dsevm92Ygwd6EcDD3+eLNFW1ItB92aIs68
-   YjUQQKA2LoF/H3nAfopbS5xEzGaTOpxic30M2j9xqJTeixDzBuDfcM3jQ
+  bh=woEMa072B6FgiX3OZeS/66WbdJR6hpOoNhGZbMu0y18=;
+  b=GTbxMx11iw4i8hBQ4YOR5ewgN/peaqr3Sa0GA7oF8VUIGq8L7q6bEsQQ
+   GTNiO/BwkoJ4wLKmOQ898aeE6suAa8D8aSsedXZ4ag2EYNYSl1dKZesOt
+   ONZui4rcqkgvd4uKk56AV7zscg5wUs9TP2s54oo1fi5oRfIpsAb68wLFG
+   ycDeJ1DVtAJeonYsRL/v0+2z613qDUQwI/XJqPohGbLqJwI1WyVCLgPyF
+   dZrXrwfOXx8O6JWRnSYHyBBaKq2Q5roKcl1aj7LxE5nQCitqeXPZbXvnk
+   TrrG1mvaSxM5zcTkHoywdqM8Be0LOPlIOoplgg9T7gszDxShe+4SfUONH
    A==;
-X-CSE-ConnectionGUID: RkHLrAR0RHSTyBv4uO5CxQ==
-X-CSE-MsgGUID: TaqVG9E0SSmTYaAEwLxz2g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11846"; a="110207051"
+X-CSE-ConnectionGUID: X4x0v+OiQu+1gtqVB68xKA==
+X-CSE-MsgGUID: 2/Mu5uuMSn6taW6Qypl66w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11846"; a="110207061"
 X-IronPort-AV: E=Sophos;i="6.25,163,1779174000"; 
-   d="scan'208";a="110207051"
+   d="scan'208";a="110207061"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2026 07:07:44 -0700
-X-CSE-ConnectionGUID: eFka8kkZSdyoxMLIf7jTfA==
-X-CSE-MsgGUID: iysSx90RTc+8oaVGGglN4g==
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2026 07:07:47 -0700
+X-CSE-ConnectionGUID: LBaNqolsQTS9JQzZKuphXg==
+X-CSE-MsgGUID: Uf9VzH+uQECcXzyKY+6UnQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.25,163,1779174000"; 
-   d="scan'208";a="254120996"
+   d="scan'208";a="254121008"
 Received: from boxer.igk.intel.com ([10.102.20.173])
-  by orviesa006.jf.intel.com with ESMTP; 14 Jul 2026 07:07:42 -0700
+  by orviesa006.jf.intel.com with ESMTP; 14 Jul 2026 07:07:44 -0700
 From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 To: netdev@vger.kernel.org
 Cc: bpf@vger.kernel.org,
@@ -72,9 +72,9 @@ Cc: bpf@vger.kernel.org,
 	bjorn@kernel.org,
 	kerneljasonxing@gmail.com,
 	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: [PATCH v3 net 5/6] selftests/xsk: fix too-many-frags multi-buffer Tx test
-Date: Tue, 14 Jul 2026 16:07:21 +0200
-Message-Id: <20260714140722.111645-6-maciej.fijalkowski@intel.com>
+Subject: [PATCH v3 net 6/6] selftests/xsk: account invalid multi-buffer Tx descriptors
+Date: Tue, 14 Jul 2026 16:07:22 +0200
+Message-Id: <20260714140722.111645-7-maciej.fijalkowski@intel.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20260714140722.111645-1-maciej.fijalkowski@intel.com>
 References: <20260714140722.111645-1-maciej.fijalkowski@intel.com>
@@ -102,7 +102,7 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-307485-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307486-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:magnus.karlsson@intel.com,m:stfomichev@gmail.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:bjorn@kernel.org,m:kerneljasonxing@gmail.com,m:maciej.fijalkowski@intel.com,s:lists@lfdr.de];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
@@ -118,22 +118,24 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:from_mime,intel.com:mid,intel.com:email,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,intel.com:from_mime,intel.com:mid,intel.com:email,intel.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4B66F755CCD
+X-Rspamd-Queue-Id: 6F71D755B1F
 
-The too-many-frags test describes a packet that is valid from the Tx
-ring ownership point of view, but invalid for transmission because it
-exceeds the supported number of fragments.
+Invalid descriptors in the middle of a multi-buffer packet still belong
+to the packet being consumed from the Tx ring. The tests should therefore
+count the whole invalid packet as outstanding in verbatim mode, even
+though the packet must not be expected on the Rx side.
 
-Keep the generated Tx descriptors valid so that __send_pkts() accounts
-them as outstanding descriptors that must be reclaimed through the CQ.
-Then mark the corresponding Rx packet invalid so the test still does
-not expect the oversized packet to appear on the receive side.
+Make fragment counting follow the packet boundary instead of stopping at
+the first invalid fragment. Update custom stream generation so invalid
+middle fragments terminate the generated Rx packet while Tx accounting
+still covers all descriptors consumed from the invalid multi-buffer
+packet.
 
-Add a valid synchronization packet after the oversized packet so the
-test can verify that the Tx path drains the bad packet and resumes at
-the next packet boundary.
+Also add explicit end fragments after invalid middle descriptors. This
+exercises the kernel drain logic and verifies that subsequent valid
+packets are not interpreted as continuations of the invalid packet.
 
 Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 ---
@@ -141,57 +143,88 @@ Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
  1 file changed, 15 insertions(+), 9 deletions(-)
 
 diff --git a/tools/testing/selftests/bpf/prog_tests/test_xsk.c b/tools/testing/selftests/bpf/prog_tests/test_xsk.c
-index 6eb9096d084c..de17dd48f176 100644
+index de17dd48f176..7abb4935edf9 100644
 --- a/tools/testing/selftests/bpf/prog_tests/test_xsk.c
 +++ b/tools/testing/selftests/bpf/prog_tests/test_xsk.c
-@@ -2270,7 +2270,7 @@ int testapp_too_many_frags(struct test_spec *test)
- 		max_frags += 1;
+@@ -427,14 +427,14 @@ static u32 pkt_nb_frags(u32 frame_size, struct pkt_stream *pkt_stream, struct pk
  	}
  
--	pkts = calloc(2 * max_frags + 2, sizeof(struct pkt));
-+	pkts = calloc(2 * max_frags + 3, sizeof(struct pkt));
- 	if (!pkts)
- 		return TEST_FAILURE;
+ 	/* Search for the end of the packet in verbatim mode */
+-	if (!pkt_continues(pkt->options) || !pkt->valid)
++	if (!pkt_continues(pkt->options))
+ 		return nb_frags;
  
-@@ -2288,24 +2288,30 @@ int testapp_too_many_frags(struct test_spec *test)
+ 	next_frag = pkt_stream->current_pkt_nb;
+ 	pkt++;
+ 	while (next_frag++ < pkt_stream->nb_pkts) {
+ 		nb_frags++;
+-		if (!pkt_continues(pkt->options) || !pkt->valid)
++		if (!pkt_continues(pkt->options))
+ 			break;
+ 		pkt++;
  	}
- 	pkts[max_frags].options = 0;
+@@ -665,11 +665,11 @@ static struct pkt_stream *__pkt_stream_generate_custom(struct ifobject *ifobj, s
+ 			if (!frame->valid || !pkt_continues(frame->options))
+ 				payload++;
+ 		} else {
+-			if (frame->valid)
++			if (frame->valid) {
+ 				len += frame->len;
+-			if (frame->valid && pkt_continues(frame->options))
+-				continue;
+-
++				if (pkt_continues(frame->options))
++					continue;
++			}
+ 			pkt->pkt_nb = pkt_nb;
+ 			pkt->len = len;
+ 			pkt->valid = frame->valid;
+@@ -1209,6 +1209,7 @@ static int __send_pkts(struct ifobject *ifobject, struct xsk_socket_info *xsk,
+ 	for (i = 0; i < xsk->batch_size; i++) {
+ 		struct pkt *pkt = pkt_stream_get_next_tx_pkt(pkt_stream);
+ 		u32 nb_frags_left, nb_frags, bytes_written = 0;
++		struct pkt *first_pkt = pkt;
  
--	/* An invalid packet with the max amount of frags but signals packet
--	 * continues on the last frag
--	 */
--	for (i = max_frags + 1; i < 2 * max_frags + 1; i++) {
-+	/* An invalid packet with the max + 1 amount of frags */
-+	for (i = max_frags + 1; i < 2 * max_frags + 2; i++) {
- 		pkts[i].len = MIN_PKT_SIZE;
- 		pkts[i].options = XDP_PKT_CONTD;
--		pkts[i].valid = false;
-+		pkts[i].valid = true;
+ 		if (!pkt)
+ 			break;
+@@ -1253,6 +1254,8 @@ static int __send_pkts(struct ifobject *ifobject, struct xsk_socket_info *xsk,
+ 		if (pkt && pkt->valid) {
+ 			valid_pkts++;
+ 			valid_frags += nb_frags;
++		} else if (pkt_stream->verbatim && pkt_continues(first_pkt->options)) {
++			valid_frags += nb_frags;
+ 		}
  	}
-+	pkts[2 * max_frags + 1].options = 0;
  
- 	/* Valid packet for synch */
--	pkts[2 * max_frags + 1].len = MIN_PKT_SIZE;
--	pkts[2 * max_frags + 1].valid = true;
-+	pkts[2 * max_frags + 2].len = MIN_PKT_SIZE;
-+	pkts[2 * max_frags + 2].valid = true;
+@@ -2099,13 +2102,16 @@ int testapp_invalid_desc_mb(struct test_spec *test)
+ 		{0, 0, 0, false, 0},
+ 		/* Invalid address in the second frame */
+ 		{0, XSK_UMEM__LARGE_FRAME_SIZE, 0, false, XDP_PKT_CONTD},
+-		{umem_sz, XSK_UMEM__LARGE_FRAME_SIZE, 0, false, XDP_PKT_CONTD},
++		{umem_sz * 2, XSK_UMEM__LARGE_FRAME_SIZE, 0, false, XDP_PKT_CONTD},
++		{0, MIN_PKT_SIZE, 0, false, 0},
+ 		/* Invalid len in the middle */
+ 		{0, XSK_UMEM__LARGE_FRAME_SIZE, 0, false, XDP_PKT_CONTD},
+ 		{0, XSK_UMEM__INVALID_FRAME_SIZE, 0, false, XDP_PKT_CONTD},
++		{0, MIN_PKT_SIZE, 0, false, 0},
+ 		/* Invalid options in the middle */
+ 		{0, XSK_UMEM__LARGE_FRAME_SIZE, 0, false, XDP_PKT_CONTD},
+ 		{0, XSK_UMEM__LARGE_FRAME_SIZE, 0, false, XSK_DESC__INVALID_OPTION},
++		{0, MIN_PKT_SIZE, 0, false, 0},
+ 		/* Transmit 2 frags, receive 3 */
+ 		{0, XSK_UMEM__MAX_FRAME_SIZE, 0, true, XDP_PKT_CONTD},
+ 		{0, XSK_UMEM__MAX_FRAME_SIZE, 0, true, 0},
+@@ -2117,8 +2123,8 @@ int testapp_invalid_desc_mb(struct test_spec *test)
  
--	if (pkt_stream_generate_custom(test, pkts, 2 * max_frags + 2)) {
-+	if (pkt_stream_generate_custom(test, pkts, 2 * max_frags + 3)) {
- 		free(pkts);
- 		return TEST_FAILURE;
+ 	if (umem->unaligned_mode) {
+ 		/* Crossing a chunk boundary allowed */
+-		pkts[12].valid = true;
+-		pkts[13].valid = true;
++		pkts[15].valid = true;
++		pkts[16].valid = true;
  	}
  
-+	/* The generated Tx stream must keep the too-big packet valid so that
-+	 * __send_pkts() accounts its descriptors in outstanding_tx. The Rx
-+	 * stream, however, must not expect this packet on the wire.
-+	 */
-+	test->ifobj_rx->xsk->pkt_stream->pkts[2].valid = false;
-+	test->ifobj_rx->xsk->pkt_stream->nb_valid_entries--;
-+
- 	ret = testapp_validate_traffic(test);
- 	free(pkts);
- 	return ret;
+ 	test->mtu = MAX_ETH_JUMBO_SIZE;
 -- 
 2.43.0
 
