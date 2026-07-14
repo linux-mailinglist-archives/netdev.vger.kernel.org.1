@@ -1,156 +1,162 @@
-Return-Path: <netdev+bounces-307382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307383-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id gd4BIMjtVWrnwAAAu9opvQ
-	(envelope-from <netdev+bounces-307382-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:05:28 +0200
+	id dkM6M/btVWrzwAAAu9opvQ
+	(envelope-from <netdev+bounces-307383-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:06:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABE0A7522A0
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:05:22 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CA207522BE
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:06:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.alibaba.com header.s=default header.b=JAu2Ukq7;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307382-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307382-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.alibaba.com;
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=UUhvAR3D;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307383-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307383-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B8CA33001A43
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 08:05:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E8A8D300ACAD
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 08:06:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0EE41A38F9;
-	Tue, 14 Jul 2026 08:05:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE9E3F44EB;
+	Tue, 14 Jul 2026 08:06:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21326145B3F;
-	Tue, 14 Jul 2026 08:05:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891153F482D
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 08:06:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784016316; cv=none; b=liisoo5PEsFDLtgoRbQ06ewCYIlpe9yBgYiQbrURzcuCiUAKbWfFgCJ3ybYfmOcYvOMhBUWzeAOMVwj0+a0yf+6n+VkC61QtSEH54nnNYp0c1J+LPD5qKT8Atv3A/uxG15Qd8mTWeYQzEH4KBb550/9bQpBIqEIFPOYnjHnAs9w=
+	t=1784016369; cv=none; b=W5vIrkmGL/HIbev9EvSGx+mC0n3NBqc+DMIbFDqlYLu76wqyHvK8052pZipe7KMSdgEvsL6LfbEVMJ1kQk1zDxpW6HSfpp1qTUE7ltKailPxw3nSkrVh8QFwNX++BvX1tEJZ5nAGZU1Nu1Di+F1aiTHIgb0Ac1PTTdVLwn5VRNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784016316; c=relaxed/simple;
-	bh=TiLVHWKy4mlkeS41lVKDXWkDRcTjPNnk1QZCzNu8HGI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rhX4W4UOW2EzU/rDryAPeZ1l6QgUPBjj5rw7TCVEAdtZBK/5N01+zLdqBRbTgTptjX39gF2MkbkWwfYOn8zCW6kL1rC9hpoc9Bd7GruJujPvUV+sJVy/EJTGhMauulWzJMdMBuUEt5kjTQvzEmRU2RJVICd0N6eVJvhIg7pMR1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=JAu2Ukq7; arc=none smtp.client-ip=115.124.30.119
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1784016307; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=XcY9oAzuAkEa1Ucn4QLvsDCT9v6MfjC/iYTifozKeGQ=;
-	b=JAu2Ukq7luEl7zWZrpMjgntfqDBfZyrZWmAEHpV28RQ24dgSH+f/nTcJ4m2ZdOz7QK5MIIcVrGkdOChWFfR4V2uUQrq8v7rTGMPR20Fz+YJAoHn5N5E3QCnxnkYLRffRIP08j/C290j3CzJQWcEUD7nc2Y+PZ5v96dy5lAob590=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032089153;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0X73dCz._1784016306;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0X73dCz._1784016306 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 14 Jul 2026 16:05:06 +0800
-Date: Tue, 14 Jul 2026 16:05:06 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: "D. Wythe" <alibuda@linux.alibaba.com>, mjambigi@linux.ibm.com,
-	wenjia@linux.ibm.com, wintera@linux.ibm.com,
-	tonylu@linux.alibaba.com, guwen@linux.alibaba.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-	pabeni@redhat.com, edumazet@google.com, sidraya@linux.ibm.com,
-	jaka@linux.ibm.com
-Subject: Re: [PATCH net-next v3 1/3] net/smc: clear the correct v2 slot and
- buffer in smc_wr_tx_put_slot()
-Message-ID: <alXtstsR477AuKPD@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20260710033356.16460-1-alibuda@linux.alibaba.com>
- <20260710033356.16460-2-alibuda@linux.alibaba.com>
+	s=arc-20240116; t=1784016369; c=relaxed/simple;
+	bh=iEdFzK7xpXCvHtMu35ZXOvPgRl4ORJgloYuTHHBTGNY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PSylVkxZeklcTyA0kPhu7P7d4NXPIqghfwY31Fzmi2jtyF1z86GlgBHUClYky0UFwtvVv0Hb9pvu4xTUND12p7XX3Yr48DxBvOzOQsBmLVIRLadhz35GfgfC2tIwlwYLdHuzJXj3ZjVDJ5yO0n0FSkLcamtZmH4BUxpm14wWEVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=UUhvAR3D; arc=none smtp.client-ip=185.246.84.56
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 26D991A0FC7;
+	Tue, 14 Jul 2026 08:06:03 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id E510B60346;
+	Tue, 14 Jul 2026 08:06:02 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B570111BD3B23;
+	Tue, 14 Jul 2026 10:05:53 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1784016361; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=0Tr5FyN1yFpthV3VK225kkpXsZ1+Q0ewXRFUsrX48A0=;
+	b=UUhvAR3DyUsKeZ48khLzz/RdRv84xOY22/Qhm3XoX9CbNw1gs0svpqNBm/qEokdnu5EIv6
+	v2O/ILj+ugqfNoSd/d+H1e62p6axvHGjlaSXuvAcTKF4VTXhJzWNhGSnE/SVr6yPSn+k0r
+	ZPD5zjXlnrjRtF45RE5zTLOb7ltACN5ehJNzBp5GKmphkdqLx9VWvnWm9gmaIAI3Dgvox4
+	D50HMojooGQIcwQyNqnlsi3y9KknvFb5Np3S4K71bQH0De5Hva7q0n9O8bT7W7gE16xm5E
+	49uaXhN7Pj7/ukVgFASP2sPi635Tf+Cv0ce3x0zd9vLu2iscHZYFFubD1syBGw==
+Message-ID: <edc373ca-fef8-46e4-8b4f-8afc257c2349@bootlin.com>
+Date: Tue, 14 Jul 2026 10:05:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260710033356.16460-2-alibuda@linux.alibaba.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] net: stmmac: intel: skip SerDes reconfig when rate
+ is unchanged
+To: Markus Breitenberger <bre@breiti.cc>, netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+ alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk,
+ yong.liang.choong@linux.intel.com, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org,
+ Markus Breitenberger <bre@keba.com>
+References: <20260713171619.192452-1-bre@breiti.cc>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20260713171619.192452-1-bre@breiti.cc>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-12.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	WHITELIST_SPF_DKIM(-3.00)[alibaba.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	REPLYTO_DOM_EQ_TO_DOM(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307383-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:bre@breiti.cc,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:rmk+kernel@armlinux.org.uk,m:yong.liang.choong@linux.intel.com,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:stable@vger.kernel.org,m:bre@keba.com,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:alibuda@linux.alibaba.com,m:mjambigi@linux.ibm.com,m:wenjia@linux.ibm.com,m:wintera@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:linux-s390@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:sidraya@linux.ibm.com,m:jaka@linux.ibm.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,linux.intel.com,st-md-mailman.stormreply.com,lists.infradead.org,vger.kernel.org,keba.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[dust.li@linux.alibaba.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-307382-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dust.li@linux.alibaba.com,netdev@vger.kernel.org];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	HAS_REPLYTO(0.00)[dust.li@linux.alibaba.com];
-	RBL_SEM_IPV6_FAIL(0.00)[2600:3c15:e001:75::12fc:5321:query timed out];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:from_mime,linux.alibaba.com:mid,linux.alibaba.com:dkim,linux.alibaba.com:replyto,alibaba.com:email,vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[keba.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: ABE0A7522A0
+X-Rspamd-Queue-Id: 0CA207522BE
 
-On 2026-07-10 11:33:54, D. Wythe wrote:
->smc_wr_tx_put_slot() tries to reset the v2 pending slot and buffer with
->memset(&link->wr_tx_v2_pend, 0, sizeof(link->wr_tx_v2_pend)) and the
->equivalent for wr_tx_buf_v2. Both are pointers, so this zeroes the 8-byte
->pointer variable instead of the structure it points to. The pending slot
->and buffer are therefore never actually cleared, and the pointers get
->overwritten with NULL.
->
->Pass the pointers directly and use sizeof(*pointer) so the intended
->structures are cleared.
->
->Fixes: 8799e310fb3f ("net/smc: add v2 support to the work request layer")
->Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+Hi Markus,
 
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-
-Best regards,
-Dust
-
-
->---
-> net/smc/smc_wr.c | 8 ++++----
-> 1 file changed, 4 insertions(+), 4 deletions(-)
->
->diff --git a/net/smc/smc_wr.c b/net/smc/smc_wr.c
->index 59c92b46945c..6b5add922993 100644
->--- a/net/smc/smc_wr.c
->+++ b/net/smc/smc_wr.c
->@@ -288,10 +288,10 @@ int smc_wr_tx_put_slot(struct smc_link *link,
-> 	} else if (link->lgr->smc_version == SMC_V2 &&
-> 		   pend->idx == link->wr_tx_cnt) {
-> 		/* Large v2 buffer */
->-		memset(&link->wr_tx_v2_pend, 0,
->-		       sizeof(link->wr_tx_v2_pend));
->-		memset(&link->lgr->wr_tx_buf_v2, 0,
->-		       sizeof(link->lgr->wr_tx_buf_v2));
->+		memset(link->wr_tx_v2_pend, 0,
->+		       sizeof(*link->wr_tx_v2_pend));
->+		memset(link->lgr->wr_tx_buf_v2, 0,
->+		       sizeof(*link->lgr->wr_tx_buf_v2));
-> 		return 1;
-> 	}
+On 7/13/26 19:16, Markus Breitenberger wrote:
+> From: Markus Breitenberger <bre@keba.com>
 > 
->-- 
->2.45.0
+> intel_mac_finish() is registered as the phylink mac_finish()
+> callback for the Elkhart Lake SGMII ports. phylink calls it at
+> the end of every major link reconfiguration, including the
+> initial one during probe.
+> 
+> The callback selects the PMC ModPHY LCPLL programming for the
+> requested MAC-side interface and then power-cycles the SerDes.
+> On Elkhart Lake that ModPHY is also used by the on-die AHCI
+> SATA PHY. Reapplying the programming during the initial
+> boot-time link-up disturbs the shared analog block while it is
+> still driving SATA, so the SATA link fails to train:
+> 
+>   ata1: SATA link down (SStatus 1 SControl 300)
+> 
+> The disk carrying the root filesystem is never detected and the
+> system hangs at rootwait. Ethernet itself comes up normally,
+> which makes the failure look unrelated to the network driver.
+> 
+> Before mac_finish() runs, the legacy SerDes power-up path has
+> already programmed SERDES_GCR0 for the current interface. The
+> 1G and 2.5G ModPHY tables selected by mac_finish() correspond
+> to the SerDes lane rate, so read that rate back from SERDES_GCR0
+> and skip the PMC reprogramming and SerDes power-cycle when it
+> already matches the selected interface.
+> 
+> This keeps the disruptive reprogramming out of the boot path
+> when the SerDes is configured correctly, while preserving the
+> previous behavior when a real SGMII/1000BASE-X to 2500BASE-X
+> rate change is needed. If the register read fails, reconfigure
+> as before.
+> 
+> Fixes: a42f6b3f1cc1 ("net: stmmac: configure SerDes according to the interface mode")
+> Cc: stable@vger.kernel.org
+> Assisted-by: GitHub-Copilot:claude-opus-4.8
+> Signed-off-by: Markus Breitenberger <bre@keba.com>
+
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+Maxime
+
 
