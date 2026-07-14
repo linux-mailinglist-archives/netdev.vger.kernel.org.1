@@ -1,192 +1,153 @@
-Return-Path: <netdev+bounces-307575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307576-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id hzDHMemMVmqo8wAAu9opvQ
-	(envelope-from <netdev+bounces-307575-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 21:24:25 +0200
+	id Do6zKjCNVmrE8wAAu9opvQ
+	(envelope-from <netdev+bounces-307576-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 21:25:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 457F775835B
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 21:24:25 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70EBC758377
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 21:25:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=YkTuqxEL;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307575-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307575-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=okDiCOV+;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307576-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307576-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F01F4310A426
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:23:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DF3B13036284
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:25:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 368F03ED5A6;
-	Tue, 14 Jul 2026 19:23:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A52A481666;
+	Tue, 14 Jul 2026 19:25:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC04B37B01F
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 19:23:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9CA47DD6A
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 19:25:33 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784056995; cv=none; b=hzeIiHhYYbIPKJFeyK3YOvmojdKYKsbT0Bsf7lblvHoHdeelEtVgc6jN0dAhnFtXPUOqmaO/iSHQtS6uPIr+wS8NROek+tJs0pQ5eUnLpPktjJStX1ym5vRsQ3YiweVy+iUB9Vq4kGGjMsggTvm7AdrJvwx1qr9o0lWqIyfC+po=
+	t=1784057135; cv=none; b=IpXHPNVdxfvjxhXUJSUrjbYNDCLD8MnRYyiW1h9EH6Z3m3wJa/X7ua5bGk3rGjJsY9aqBBFGuelSQyY6B69ae8qXgHt7m5gitvx0fMHv4X98naunYsRvaJBjhZ+6O8QHFWG6VICgCQHCBv1FUEA/5nVP0FBfVulO4MBjGUYn49s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784056995; c=relaxed/simple;
-	bh=fFBHdwS5m7mtCvyv1Trv/atViqR0huglkyQkqJ5emVk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GqTvNnyF/uVYZkL6K3441rGcSNAOwbZJEQjgVquo9IvKI8ZG5rKafZ0b1aF1ruOp0N60rWuOust3dNwEi83P9E+zjE4+gM8CDENccmnpKM+oLlisg929CI45c6BARRsbfqqBl1CGoARtx+MH2lgaIhZ8nguzAh8DGUcfkNpP7Ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YkTuqxEL; arc=none smtp.client-ip=209.85.216.43
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-38101f85591so1051331a91.1
-        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 12:23:13 -0700 (PDT)
+	s=arc-20240116; t=1784057135; c=relaxed/simple;
+	bh=xbmsLjvkZg/eOOT0pgQJu5EFYeDfVNq+y7NlJmF/jKM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HJ3Kl3Zjs4OwQBAYoSS7UfJ286zTtryi6Xu356Bl8JaPnbpp34f+SVu+nYdV6GrKAPafVUcDfdNZOq3JurIfGT81W4pCO5bQ2DccCIbSkZNdt2Nm8/eQ9uBvp3MMIV2fdACIsyhRf/LFVANBAN5FBvevI8yif53ir9tUem8pOD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=okDiCOV+; arc=none smtp.client-ip=209.85.210.174
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-848479c9bd5so1164398b3a.3
+        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 12:25:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784056993; x=1784661793; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=4YxMZuS3O1N4LeRTy/92z3+raTT8LPy5OGFMt00nrLg=;
-        b=YkTuqxELhYg+2qo2cr34ZYEiG2vBnymqgci+NkLWkkOs2p7m49Qd5hBDAPCV2Prbvs
-         SKhv2hW24MNDAstrOB59oPXQIz6lj8T9cKc43xZYGXieLwZL6kizKsecH3VH6cXic1NQ
-         rBevHGFSKiwf+ZTtcau5IAxm/Gsu2InnEo9lnt+BlFdWNUQeum+zLp8PDfBhoHRrO+4m
-         NIy06ypLlT8i1eC6jZadUFxtAjouHnHxWwTYxHbYD/id+Ot/2Qkf4x6JhLY/Y9/MPwBD
-         vC7QEfECzQRvWNaaBkv83tPfQJTCLm0kolU9ZruiDhiPpXGDzu81QCbE/g3+bUX3Qaph
-         SW9g==
+        d=gmail.com; s=20251104; t=1784057133; x=1784661933; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=xbmsLjvkZg/eOOT0pgQJu5EFYeDfVNq+y7NlJmF/jKM=;
+        b=okDiCOV+3P92TI+p1rRGPjtaWibaZlYz9en4uzovrh1JEHTwvrf8wKV8pcBnhyWejB
+         cCYdDKiZ9qC1SEDVf2bsj7PwupV+lqsg7CpB78IgijfV9DPt/PcpQJrZytxq3L2cGPwR
+         laW6yKnVJcISpx5OofxgwM0BE4JhhEmR9bHQqEN686UkmC1gVu/1461DntdIdWBKV45j
+         6bczfklNterDGYn5VE7euC9RnDnwoHkqecMyLhnoRnPnrARtjNyEbDiLj46gDCa0aRqc
+         uLvHIptAQNh1vsNR8FMsQGOrrfl0rQhE5gvE9aoIuuM+bkB0Y6fux/er9rbz4cBObNPo
+         tmpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784056993; x=1784661793;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=4YxMZuS3O1N4LeRTy/92z3+raTT8LPy5OGFMt00nrLg=;
-        b=AiFQfcWxuzrxwy34HQnkFsYJkQvBhjvan3yY2nIwBPywdh+w68Zi8i2fdA0FFikNou
-         Rg4diff/AGH0WoX/8D672RqC4GqopwRkJT/OrUZKnKDymx+uvCNZfZQ9rjZesRzCZ4WL
-         qVUZLoRav8lMCMNrrCyIQgLpSrDBAUobDarQWUCOI0orQBtPfGBaedcdPILV/m41GIsi
-         /yE4pkfYPyvuKoB5nj129W49kTv8dkeFNzwFoCSSAdoC8r9ks34EdgqhxwkoU24LcZ7s
-         oyLHn7eK3YYN2fwRVrFRSIUEH9DU/8T5f+s5vSKnk8hEa0r/qPNieDrXmGVBw6Ad04AP
-         LFLA==
-X-Forwarded-Encrypted: i=1; AHgh+RpZffpgmB6nwiIoRSTVes+1aVvO1B74TA74bEfThY+0w4zeaX10EKKbFJmfySBV5yilP7Q96s8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJe9mO1hrW34SH01GFNi7eTxqqFdYFEB3LoO/LJ8Siik92j+Jy
-	3GokET7zl93lZJQKOpqSO2EX15YF8lI+7ZsIUm9VgK3/HCOIvuHAw1Lb
-X-Gm-Gg: AfdE7cltsuMSz/4vB9d8h1e8Xo/G2Abx5u0iN7M1/yZ4OA8xYW8p7K6hwLReJlnh3Vv
-	XGb1gLK3fD2UrDhb/sY8/lkxqINgq9Dgib8v/1lwFWA6VerLdBvB9pbMxnMVHIcUr6xFMfUIbgR
-	wnPKYt2kSHZKxjh6pOStIQoIqIDVwKtGQj6OEGPlO0N+4F56OXFR7Z1j2t4Mc9mGlyvojEC1I4T
-	tZhXL/0W7QSZvoIVtfkcDeQDh3kIYbsRaG9EkkV7mVLd24TPNaHMACzi3sV7Y6hdzMTKU58vok1
-	dXxei090VaTNsYGLs2uWwM3jfLTBhV1pjFJb4Mua7/AdbgYQgVZZyRgtql9g2UR6cT1Z5/ieNe8
-	9ED4C7YB4Rx/muob9dMKYgUDwwn6S1JJ9gU6zTamSBmkxlsog5wTJKwmkCthtDEYwDludbkB/rW
-	Ez+2xeZoGk6LGH5nqg5NgBdBHoQ2UFG8M4WIno6kew/A8w+5G6IOK5kX+jY1WXTGMx86KEC+n+2
-	YrT8ll3pi5p7M7BrTsg0aY=
-X-Received: by 2002:a17:90b:3c0f:b0:37f:f089:c81b with SMTP id 98e67ed59e1d1-38dc8071aeamr11838700a91.3.1784056993076;
-        Tue, 14 Jul 2026 12:23:13 -0700 (PDT)
-Received: from lab-kiba-ocxma-dut-01.. (191.68.231.218.rev.ocx2915.net. [218.231.68.191])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38e16e1d2e8sm1979029a91.0.2026.07.14.12.23.10
+        d=1e100.net; s=20251104; t=1784057133; x=1784661933;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=xbmsLjvkZg/eOOT0pgQJu5EFYeDfVNq+y7NlJmF/jKM=;
+        b=XOq3Jb8r0KsR+9sqM3VKLjpuW6/fjGcNkQksDmngDDaenDPGDjMPUa1/14zajh7zKe
+         mcWtCEW05NiUHtkM4G5VzXAFK9g/439WrDFsme2SOpJCXaVc0ZhMljFX5/ipPD9UM1D5
+         11CFwyjIWf5V2euii2fpVp+oneQ4pbYvNBMk5pXMQzxXbj/rAWkSQHXGYu06I3ORoW4d
+         oTOm8GcDI6T59zE/ou1U8HUIEcHzhY3gHYLMhno0fgYeN+AbDWK8VlgheUqBcJft7PGk
+         lBjpdNJNq+89+Vl7uqjVfduRsajPwX0jNOXF/7j58J0eqYcVjInyrWD22AsLugWDH7eN
+         1vKg==
+X-Forwarded-Encrypted: i=1; AHgh+RrAgT2h/UUj7gJphUHjftjUGqPgP+LVMMklM5hadCBNrihVuPf9y5KVooLuAhIFg91a67csc60=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEVw/3SF8tJc7itRLW3lOY89fD4xMAvYlRe5vdCnkykgxlrVAL
+	JIjDJkk5UyKTdUUotpMGkekUR3yQfIQRJVgRngz4tCtNEo5I2s6oIoiE
+X-Gm-Gg: AfdE7cnzyjLSCNdEg2ArI2dhGc1ageAjHWgXNzXG92WWqdLLvIlTOXWOjMUvRrCez8D
+	GsliB0CifEIgaCkgu7oj6t6kZiHW6+si6W4ARbHPnaqibvPjP+WUQcDQBC3Q6zy0Zm1tjX7u38a
+	NsUm6qMgKvLe1/8ZO1ZqIyNddM9j4yzTnHyUBlZ+lAQnPb4W2AHpez4f46nIGSyMp2wWDdylFYH
+	gf03oba8H7nuGAw+ujqV8m6QD5DzD3Qqb3FfmNhVnegYrHgkKUEXi7qdCgqvjiE/zTSekkChWta
+	OsD7fTV1OtGfhcvmaEFRSsAJDiL7MN06uc0AKGDMEwWrSCtQVionuomzEAuZ4+Wey9i0fkob0Tg
+	Rz7tnIS2ylVj0fg5YPS3MBK05H69FdFLuX/PLOVmmsmaGD+zknLZT7xsVxHCiNqKYQCeFKmE9cS
+	HzWl2b6E6u4g==
+X-Received: by 2002:a05:6a00:4fcf:b0:847:84a1:9782 with SMTP id d2e1a72fcca58-8488971547emr13217705b3a.26.1784057133193;
+        Tue, 14 Jul 2026 12:25:33 -0700 (PDT)
+Received: from john-p8 ([98.97.42.39])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84a4f239f01sm2008654b3a.10.2026.07.14.12.25.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jul 2026 12:23:11 -0700 (PDT)
-From: Takeru Hayasaka <hayatake396@gmail.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	marcin.szycik@linux.intel.com,
-	netdev@vger.kernel.org,
-	Takeru Hayasaka <hayatake396@gmail.com>
-Subject: [PATCH iwl-net] ice: fix empty PTYPE set for GTP RSS profiles
-Date: Tue, 14 Jul 2026 19:22:30 +0000
-Message-ID: <20260714192302.631428-1-hayatake396@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Tue, 14 Jul 2026 12:25:32 -0700 (PDT)
+Date: Tue, 14 Jul 2026 12:25:30 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: mattia.meleleo@coralogix.com
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jakub Sitnicki <jakub@cloudflare.com>, Jiayuan Chen <jiayuan.chen@linux.dev>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Emil Tsalapatis <emil@etsalapatis.com>
+Subject: Re: [PATCH bpf v3 2/2] selftests/bpf: Test FIONREAD on a sockmap
+ socket without a verdict program
+Message-ID: <alaNAFBtlPy_acv-@john-p8>
+References: <20260708-fionread-no-verdict-v3-0-b4ee31b3af53@coralogix.com>
+ <20260708-fionread-no-verdict-v3-2-b4ee31b3af53@coralogix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20260708-fionread-no-verdict-v3-2-b4ee31b3af53@coralogix.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[intel.com,lunn.ch,linux.intel.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-307576-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,cloudflare.com,linux.dev,gmail.com,etsalapatis.com];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:mattia.meleleo@coralogix.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:memxor@gmail.com,m:emil@etsalapatis.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307575-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:marcin.szycik@linux.intel.com,m:netdev@vger.kernel.org,m:hayatake396@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[johnfastabend@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[hayatake396@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hayatake396@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[johnfastabend@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:email,etsalapatis.com:email,john-p8:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 457F775835B
+X-Rspamd-Queue-Id: 70EBC758377
 
-Configuring RSS for GTP flows via ethtool, e.g.
+On Wed, Jul 08, 2026 at 06:55:01PM +0200, Mattia Meleleo via B4 Relay wrote:
+>From: Mattia Meleleo <mattia.meleleo@coralogix.com>
+>
+>Add a test validating that FIONREAD on a TCP socket in a sockmap
+>without a verdict program reports data pending in sk_receive_queue.
+>
+>Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+>Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
+>Signed-off-by: Mattia Meleleo <mattia.meleleo@coralogix.com>
+>---
 
-  ethtool -N <if> rx-flow-hash gtpu4 sde
+LGTM we could improve IO_TIMEOUT_SEC across all the tests if we wanted
+per bot suggestion.
 
-is accepted but has no effect: the hash of GTP-U packets does not
-include the TEID, so all traffic between a given SGW/PGW pair lands on
-a single Rx queue. The GTP RSS configurations the driver installs by
-default at VSI init are affected the same way.
-
-ice_flow_set_rss_seg_info() does not set IPV_OTHER on GTP segments, and
-such a segment carries no L4 header bit either. ice_flow_proc_seg_hdrs()
-therefore takes the "no L4" branch and ANDs the PTYPE set with
-ice_ptypes_ipv4_ofos_no_l4, or ice_ptypes_ipv4_il_no_l4 for the inner
-segment. Neither holds a GTP PTYPE, so ANDing with ice_ptypes_gtpu
-leaves the set empty: the profile matches no packet at all and the
-configured TEID field never enters the hash.
-
-Set IPV_OTHER on GTP segments so that the tunnel-inclusive PTYPE sets
-are selected instead, which do contain the GTP PTYPEs.
-
-Verified on E810 (kernel 7.2-rc2, COMMS DDP 1.3.63.0) by reading the RSS
-hash from the Rx descriptor: GTP-U traffic varying only the TEID goes
-from one constant hash on a single Rx queue to 4096 distinct hashes
-across all Rx queues. The same holds for inner IPv6 (gtpu6) and for a
-PDU session container extension header (gtpu4e); plain UDP flows are
-unaffected.
-
-Signed-off-by: Takeru Hayasaka <hayatake396@gmail.com>
----
- drivers/net/ethernet/intel/ice/ice_flow.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_flow.c b/drivers/net/ethernet/intel/ice/ice_flow.c
-index 121552c644cd..2156bf246921 100644
---- a/drivers/net/ethernet/intel/ice/ice_flow.c
-+++ b/drivers/net/ethernet/intel/ice/ice_flow.c
-@@ -2088,6 +2088,14 @@ ice_flow_set_rss_seg_info(struct ice_flow_seg_info *segs, u8 seg_cnt,
- 
- 	ICE_FLOW_SET_HDRS(seg, cfg->addl_hdrs);
- 
-+	/* A GTP segment has no L4 header bit: without IPV_OTHER the "no L4"
-+	 * PTYPE sets are picked, and they hold no GTP PTYPE at all.
-+	 */
-+	if (seg->hdrs & (ICE_FLOW_SEG_HDR_GTPU_IP | ICE_FLOW_SEG_HDR_GTPU_EH |
-+			 ICE_FLOW_SEG_HDR_GTPU_UP | ICE_FLOW_SEG_HDR_GTPU_DWN |
-+			 ICE_FLOW_SEG_HDR_GTPC | ICE_FLOW_SEG_HDR_GTPC_TEID))
-+		seg->hdrs |= ICE_FLOW_SEG_HDR_IPV_OTHER;
-+
- 	/* set outer most header */
- 	if (cfg->hdr_type == ICE_RSS_INNER_HEADERS_W_OUTER_IPV4)
- 		segs[ICE_RSS_OUTER_HEADERS].hdrs |= ICE_FLOW_SEG_HDR_IPV4 |
-
-base-commit: 1cd23ca80784223fa2204e16203f754da4e821f8
--- 
-2.43.0
-
+Reviewed-by: John Fastabend <john.fastabend@gmail.com>
 
