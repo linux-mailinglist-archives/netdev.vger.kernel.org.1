@@ -1,181 +1,217 @@
-Return-Path: <netdev+bounces-307374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307375-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id uVpXCT3kVWpOuwAAu9opvQ
-	(envelope-from <netdev+bounces-307374-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:24:45 +0200
+	id UPh7NwvlVWrEuwAAu9opvQ
+	(envelope-from <netdev+bounces-307375-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:28:11 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F8E2751CF3
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:24:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E6F6751D82
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:28:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=tpEoW0AV;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307374-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307374-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=MrQKtzVE;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307375-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307375-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6C9973013A5F
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 07:24:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7D89D3023361
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 07:28:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E8F3ECBC7;
-	Tue, 14 Jul 2026 07:24:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EAF33EDE42;
+	Tue, 14 Jul 2026 07:28:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pz2-f0.google.com (mail-pz2-f0.google.com [74.125.228.0])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B9F43EC2EF
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 07:24:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25CF331EB5
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 07:28:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784013859; cv=none; b=qlVC2MkghUVjMs7vR6qomX1v0NpK11O9q77888CLBI/Eng423vnPGhNUSCvhb9mhDGhEz8nCw8pA/ODrp9VxEWMVRbzsbGoaP/Z5JAinXRszZ52iuU/rsSplne2YkFBiDewO6Qp08uneqFA4m69/E7SUwRScI5gIo0TUQ4XvCSM=
+	t=1784014088; cv=none; b=BlXKw8ti7nm/GOd/8MKn4hLjhVXcjxvRAr3v+kRPu9r+EFCT9Lv0nbsILW6G5NjhGUJesxdDm6goD5uOUMlaH4A93oSokS7igXWntpvgS7TCshmtM1HUov2M/Fp+bR1e5rwqMHR7oww3nSonyiPnyRURVpLgPSL+5ZTFfF1dK5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784013859; c=relaxed/simple;
-	bh=mSUr/6R1qiFv0b+xxtketCI/fOxw7qno1faBeXUm8OA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PvvWZhqSncwk5zm5dyvY8+h4pNBRO9jyVrdm0ZP47oXpvsPHBcNN93QCsTrz4xpyndt5oNea8FPLK3dDg/wtLsEWmlSfLUBArjmZBTmUxU469LkFJP5Aoqjd0tc1hcR7DmzbnoN9TxaBAVbUogzmPCGwjDLDjA45fxqpY1FP0Xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tpEoW0AV; arc=none smtp.client-ip=91.218.175.189
-Message-ID: <2cbf31f4-f9f8-4130-86b6-e4c8c7125bda@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784013855;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K9WCeTIyFhenUiyWcHq2wH+tqrW6j+TlfUmjN94wNZ4=;
-	b=tpEoW0AVA84DU56yWhaOjzid4WiKCmPnhFOa7wv0/xbnxC3JpohZNB4Sz7Dzji9WzA3tKA
-	CXBZylL3pNVuk9SsElkFwMLnOea6bZu8K4y7rxSfDeGgUlWLYFTgKKrdyKIW1oroM6keGr
-	51lcTYbOOWY/5TnXF9I/bUKZzC77C3Q=
-Date: Tue, 14 Jul 2026 08:24:09 +0100
+	s=arc-20240116; t=1784014088; c=relaxed/simple;
+	bh=VV6RH/yKbbXGqbCZVlFLWMvC2IkSZjVrbZxP+GH89A0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B5zBfRkY49T2ut2gIpSQmu3Y3wgvvmUMyXfojVnH3Ks0nT8J5FfVlstBGdoWiM7LpGzThoNQXUMi8Pv8mtZqoJaQEiPwephojU+4zO315hyBUm7UNALz7xhzoEg4ggVo1HfjCwQrdywPdbWcRscV6g17PW3cybm7u7kSl1U2bss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MrQKtzVE; arc=none smtp.client-ip=74.125.228.0
+Received: by mail-pz2-f0.google.com with SMTP id 41be03b00d2f7-c96739a46acso2409540a12.1
+        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 00:28:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784014086; x=1784618886; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=UL4JsWWFy5+1VcD51BCzcQnL+AOhOLYxnY1WLoSce4c=;
+        b=MrQKtzVEK6cC864IUWe3vPOz+tNabRozEn2LOjqLNDT7Mv/1qS6ZzvJN0jatk/6BYD
+         0aXrWJV2LEUGzI9NhlgvcOd5p4zhDf4cgjbeeI0FWswQnA2/2zKSrCCtP9b3ndmXNqM3
+         t4WIyKTou7pBYd+W3WEh+5r9L/B5SwdaHZSODinrUXFSe30b5p5D+nuNkCpZ8YtFaK7K
+         yu0y6V3EjupH6oWVGXEOHWbW65pOw8C2Qcne+Vt1YF05S/glcnzK1dXXqVUKI92LL772
+         UHPwNy5lO92nmraNgsz7wgHEZjCpICyJmlCJcmsCgLSrcm3gW5rphIFAySpSY1cFQ2BO
+         BLqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784014086; x=1784618886;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=UL4JsWWFy5+1VcD51BCzcQnL+AOhOLYxnY1WLoSce4c=;
+        b=Yasal6UvE23RZk+UkwJrLzqHEgLWp72RyEuyTSkc62tLeOKefBXWUEqj9NtFsFfrZz
+         ng5thOaB9ZeMUP857WDSz87RgP9FSsU/oomMU3UekxytuY0F9boAglzLK0wnK89hD5cZ
+         Z6/blb2DzalhMbiHbsmAMqVwzEGZEcKpjdmmK4q7OJz8FKZd78oyT+oXHmXcj0vc5Zfy
+         6MpUnCmjQJfA7XZhPOpEl22VF2ee1f9ZRsbvPKkEqgIc/BLrmCuIn/rVzzfUr+4mmYIl
+         TkjwnjqizTq1jc7D/7xXNpSoUoG59LJfiUiAezwBd4sEwGqbzuTiEQ0D+RA6Ky5zwYyb
+         SoYw==
+X-Gm-Message-State: AOJu0YxTAOBho2m0zMfhUNHEKHWv1ZUKXvgH5QGuHHbHhyOPjxTDQXh7
+	CRvinYN5GoOYphADAuR22et/ZWHGBhFFDfJPVHEv0Up6z2IXD4pW0VmY1xVK+ZCuUOw3x6cI
+X-Gm-Gg: AfdE7cmSOtI9f6CZqmy313NzgkfNwlkSNSgKGDCPV72jgXCj9ewTlzuq1maV2M29JEW
+	kwIZ7R2XJDr5mF4ahh/KDtliRA5QAIldNwLyTryhKYW0xqky2pW//7KstpcTLj+K67tFJCBgacW
+	fSxBeVcdADEt1gW1kBT3wGyTEmhCO7XbUt4x5TT2Dws6b0cuFtKk8AfDpE7IFZCrHzr82KLCXZl
+	YJJXQ6Bax7bqz6zLa8Ed1jSHPv+Qh/ZZ9gpj/M1kb4/UdTIreqe2Qp3t/8TVh+RMOh/JB++IhQZ
+	89Cf/wtCgoe/HnNnTRwqndHPDpzGMjTJUDz1t5aIF4YxDd+4LjPJtZCq5DXIzSRZJSrZq1+BBwf
+	BBS8JPTAart7FfPe9V+esZ1sR5VrAZI+AfIn+d8V89IAD8WG/wlI411gIbmf3/JP39Au1x9XVp9
+	RJbFHyIUcrXkCN4/dGDbXg5JTPWj2yZD8XmQ==
+X-Received: by 2002:a05:6a00:1943:b0:841:58b0:82bb with SMTP id d2e1a72fcca58-84a5576ce8cmr1383065b3a.9.1784014086315;
+        Tue, 14 Jul 2026 00:28:06 -0700 (PDT)
+Received: from J4f-Laptop.localdomain ([2409:8a55:94d0:4771:cc5f:41a5:d797:4728])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84a4f80de8esm975471b3a.56.2026.07.14.00.28.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jul 2026 00:28:05 -0700 (PDT)
+From: Shihuang Liu <shlomojune6@gmail.com>
+To: netdev@vger.kernel.org
+Cc: ap420073@gmail.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	Shihuang Liu <shlomojune6@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] amt: fix use-after-free in AMT delayed works
+Date: Tue, 14 Jul 2026 15:27:05 +0800
+Message-ID: <20260714072705.129262-1-shlomojune6@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] ethtool: Embed FEC hist ranges as buffer in struct
-To: Eric Joyner <eric.joyner@amd.com>, netdev@vger.kernel.org
-Cc: Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>, Simon Horman <horms@kernel.org>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Brett Creeley <brett.creeley@amd.com>, Breno Leitao <leitao@debian.org>,
- "Nikhil P. Rao" <nikhil.rao@amd.com>
-References: <20260710230026.47721-1-eric.joyner@amd.com>
- <45d2be78-4e58-445e-81b2-75dbcd15402f@linux.dev>
- <303a0166-efd5-48b1-8a52-39780095b7a1@amd.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <303a0166-efd5-48b1-8a52-39780095b7a1@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307374-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:eric.joyner@amd.com,m:netdev@vger.kernel.org,m:michael.chan@broadcom.com,m:pavan.chebbi@broadcom.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:horms@kernel.org,m:maxime.chevallier@bootlin.com,m:brett.creeley@amd.com,m:leitao@debian.org,m:nikhil.rao@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307375-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:ap420073@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:shlomojune6@gmail.com,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[shlomojune6@gmail.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amd.com:email,linux.dev:from_mime,linux.dev:dkim,linux.dev:mid,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shlomojune6@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8F8E2751CF3
+X-Rspamd-Queue-Id: 2E6F6751D82
 
-On 13.07.2026 23:37, Eric Joyner wrote:
-> On 7/11/2026 2:03 PM, Vadim Fedorenko wrote:
->> Caution: This message originated from an External Source. Use proper caution
->> when opening attachments, clicking links, or responding.
->>
->>
->> On 11/07/2026 00:00, Eric Joyner wrote:
->>> When a driver's .get_fec_stats() handler is called and the driver
->>> supports FEC histogram stats, the driver supplies the histogram bin
->>> ranges via a pointer.  This pointer is assigned while under the netdev
->>> ops lock in fec_prepare_data(), but the actual data is only read after
->>> the lock is released; so this allows the driver to change the ranges
->>> (e.g. from another .get_fec_stats() call) while the current call chain
->>> is reading them in fec_fill_reply().
->>>
->>> Fix this by embedding a buffer for the driver-supplied ranges in struct
->>> ethtool_fec_hist instead of using a pointer; this ensures there's an
->>> ethtool core-owned consistent copy that can be used after the netdev ops
->>> lock is dropped and later in fec_fill_reply(). While some drivers like
->>> bnxt use a constant struct for their ranges and won't be affected by
->>> this issue, others like mlx5 (and eventually ionic) will use a
->>> dynamically constructed range struct and could potentially run into an
->>> issue.
->>
->> I didn't like the idea of dynamic range, FEC is not changing while the
->> link is UP, I don't see a reason to dynamically reconstruct histogram
->> bins every single call. And the histogram itself is stable per HW per
->> FEC, can be constant pre-defined struct in a driver, like in bnxt.
->>
->> But if dynamic allocation is the only option, then yes, we have to
->> change this ABI.
-> 
-> We can discuss this more.
-> 
-> I think overall drivers aren't going to need to dynamically allocate a range; I
-> mention ionic but at the moment I think there's only going to be two possible
-> FEC ranges; the sixteen bin one for RS(544,514) and I think what should be a
-> reduced size eight bin one for low latency RS-FEC RS(272,258) (unlike the 802.3
-> spec the Ethernet Consortium Spec for LL RS-FEC doesn't talk about a histogram,
-> but FEC math says those parameters can only correct up to 7-bit errors).
-> 
-> So one option could be to have the pointer be required to point to static
-> memory; or possibly a pre-defined histogram range entry in the kernel? I don't
-> see any other drivers currently combining multiple bit-error counts into one bin
-> and I wasn't sure if that's something the mlx5 driver actually uses, too.
+When an AMT device is removed, pending delayed works can still access
+the freed amt_dev structure, which may result in kernel crashes or
+memory corruption.
 
-The problem of mlx5 driver is that for RS(528,514) CX6 firmware returns only 4
-bins with merged ranges, while newer generations have 7 bins for the same FEC.
-That means core kernel won't have all possible options and the drivers have to
-have their own static lists of ranges. But it's still stable list per HW per FEC
-as I stated before.
+amt_dev_stop() cancels req_wq and discovery_wq with
+cancel_delayed_work_sync(), but these works can be scheduled again
+from event_wq after the cancellation. This allows delayed works to
+access the freed amt_dev structure after the netdev has been released.
 
-> OTOH, doing this dynamic range calculation should be computationally pretty
-> cheap overall, and provides flexibility without keeping or adding new
-> concurrency problems (which is an important concern!), so I don't mind the
-> current approach even if it does look wasteful.
-> 
-> - Eric
-> 
->>
->>> Since the kernel API changed here, change the in-tree drivers that
->>> report FEC histogram stats to copy their ranges instead of just
->>> supplying a pointer.
->>>
->>> Fixes: cc2f08129925 ("ethtool: add FEC bins histogram report")
->>> Signed-off-by: Eric Joyner <eric.joyner@amd.com>
-> 
+The following is a simple race scenario:
+
+CPU0                         CPU1
+
+amt_dev_stop()
+cancel_delayed_work_sync()
+                             amt_event_work()
+                             mod_delayed_work(req_wq)
+free netdev
+                             req_wq accesses freed amt_dev
+
+Use disable_delayed_work_sync() in amt_dev_stop() to prevent req_wq and
+discovery_wq from being queued again and wait for running work items
+to complete.
+
+The delayed works are disabled after initialization in
+amt_newlink() and enabled only when the device is successfully opened.
+This keeps the delayed work lifecycle synchronized with the lifetime
+of the AMT device.
+
+Fixes: cbc21dc1cfe9 ("amt: add data plane of amt interface")
+Cc: stable@vger.kernel.org
+Signed-off-by: Shihuang Liu <shlomojune6@gmail.com>
+---
+ drivers/net/amt.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/amt.c b/drivers/net/amt.c
+index 951dd10e192b..7eb871b9b7e1 100644
+--- a/drivers/net/amt.c
++++ b/drivers/net/amt.c
+@@ -2995,9 +2995,15 @@ static int amt_dev_open(struct net_device *dev)
+ 	amt->event_idx = 0;
+ 	amt->nr_events = 0;
+ 
++	enable_delayed_work(&amt->discovery_wq);
++	enable_delayed_work(&amt->req_wq);
++
+ 	err = amt_socket_create(amt);
+-	if (err)
++	if (err) {
++		disable_delayed_work(&amt->req_wq);
++		disable_delayed_work(&amt->discovery_wq);
+ 		return err;
++	}
+ 
+ 	amt->req_cnt = 0;
+ 	amt->remote_ip = 0;
+@@ -3023,8 +3029,8 @@ static int amt_dev_stop(struct net_device *dev)
+ 	struct sock *sk;
+ 	int i;
+ 
+-	cancel_delayed_work_sync(&amt->req_wq);
+-	cancel_delayed_work_sync(&amt->discovery_wq);
++	disable_delayed_work_sync(&amt->req_wq);
++	disable_delayed_work_sync(&amt->discovery_wq);
+ 	cancel_delayed_work_sync(&amt->secret_wq);
+ 
+ 	/* shutdown */
+@@ -3278,6 +3284,8 @@ static int amt_newlink(struct net_device *dev,
+ 	INIT_DELAYED_WORK(&amt->req_wq, amt_req_work);
+ 	INIT_DELAYED_WORK(&amt->secret_wq, amt_secret_work);
+ 	INIT_WORK(&amt->event_wq, amt_event_work);
++	disable_delayed_work(&amt->req_wq);
++	disable_delayed_work(&amt->discovery_wq);
+ 	INIT_LIST_HEAD(&amt->tunnel_list);
+ 	return 0;
+ err:
+-- 
+2.43.0
 
 
