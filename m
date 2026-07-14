@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-307502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307503-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vIQ7EBpJVmpq2wAAu9opvQ
-	(envelope-from <netdev+bounces-307502-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 16:35:06 +0200
+	id neRpB8JIVmpV2wAAu9opvQ
+	(envelope-from <netdev+bounces-307503-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 16:33:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30A92755E4E
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 16:35:05 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4418755E0F
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 16:33:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=resnulli-us.20251104.gappssmtp.com header.s=20251104 header.b=fqZ6Rgph;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307502-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307502-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=resnulli-us.20251104.gappssmtp.com header.s=20251104 header.b=eU3KBUJN;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307503-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-307503-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 96EA23026A1A
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 14:31:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5B0D63054323
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 14:31:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F81947F2CD;
-	Tue, 14 Jul 2026 14:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2BC0188CC9;
+	Tue, 14 Jul 2026 14:30:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC25447DD40
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 14:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14B93A8FF6
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 14:30:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784039423; cv=none; b=cZrVGyrHWWPDcH4f7YxDeLQydwpI84w/Lntix4WeCx8oLIUIU70JgHw4iXQ2aaCEGviiHDegdeReheozNqZCJyQQmbFDvY/VovA2ob+pmxQTrUCrtka9IlrqNaSyQ/fBScyE0ihV0A+6hdB8xz/ftS+NEsXiI4TczULex4jrPw8=
+	t=1784039430; cv=none; b=nkmhAQEU9aUS324rDeXZtHe/LaQbvyAMIpaYDv7iN15xlOqnpd/dd5+waLeYGN4TFj1nfhsNX7URxD7fx4JC6AhbvpopT36d9rtVCJohW2HWELBavwvKz24y+ygD89oi6R3m8iE1Fr3Vy+YfosfzVpWA7UmYzEX6XqZnb2Yz4Sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784039423; c=relaxed/simple;
-	bh=zFeWDdafDoYi7ea+8KDHKiNyfn2RCWSEnlN5ywMFr9k=;
+	s=arc-20240116; t=1784039430; c=relaxed/simple;
+	bh=AlWKq+WCpJ6jqrd7bHxM+xUmQDKopJjD0aSNOnzQ77Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AIki3hxCqTFUXK3iC1gGt+IH4w76LLFF1Axyp9AzWy5U74Mf+9pqTe+bw/IkSQQ8nwKNVMsTOyG77X8qcDAGNioNIBXuf0wF/MsWmn0IsSDIGGMw3wHCrUYV6C7oj34E5PUXOMTChurgY5fiFtliSyxAp3VF3ikveS93MKKWNmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=fqZ6Rgph; arc=none smtp.client-ip=209.85.167.52
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5aebd52488cso4711540e87.2
-        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 07:30:21 -0700 (PDT)
+	 MIME-Version; b=c9dg8uEzmtxND149tccTOWpTPTUKONkSWv/m3L1VeEanbJuz3m+akHWG9daTG9Ok4pesw9FC5QgFokuI4EGSbfJp/ZTxfwV6o85gkeGkEmu/88MfX5iViBIuTbGPM34QfhUgd6nAY63pdMkg53kv5zEqoPpU13gPoGtw6XFC0DQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=eU3KBUJN; arc=none smtp.client-ip=209.85.167.51
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5b1594c0c5eso871432e87.1
+        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 07:30:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1784039420; x=1784644220; darn=vger.kernel.org;
+        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1784039426; x=1784644226; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=myAuJMzKK/4iG9Cmnf7VPvLoMfqifqNKwX3ebA7nias=;
-        b=fqZ6Rgphmp6BfB1w3zQfLmRui03bV4pkN21UgZ8ba5Gcn1E10qX919G0ei3ilz0vOL
-         yjrfDDypdVHXPgxRRGPSLzNySRnqryAZl4sQNNFNo1XWXKs3M2/iTaRsYl9rtqeVuQlw
-         aeOqsAnJBNv6qDiuKHkJJaxQzqdknxGgmYoSglXffqwf4LsguOXRdQC0UQ9i3Sm8sCbP
-         HFrOeq3bdbjAsXd2WDs8+Xz6m7tykP9OD9Zb6QJU+cxN0OtuDK1DRr2YGYOlTt+zD3M4
-         dm18+Qdy4iEm7ZsIwvi6xmdis4jmF4CJGyxqHBO8QyUXFcsryoQxRzNmhCy6Kpyy4fsl
-         4olg==
+        bh=1DAcALuj6CLiGGxg2YU+zPjUKqyxKHB8HUr7MGOtyF0=;
+        b=eU3KBUJNoAxPw7pVvTRmdsZuqaSzCsRc5zvDXfoqhEXRqsJzYvuCRa20VFhhOE30sb
+         sWtoh0VOxwrR+Wb36oLsaQftZjmTMtTyQP12VJTgjqGIjHpLrJvZp22+mGbjtUrHEnLK
+         E1vLqDUj+W90vyHhsS3oCNcAYLtdwzSIyDEzeia2vKHmBOAnyGZ7P0q/biZofagDyyUn
+         AL/jhBP9LWECGNjpAecCcCpnOU28iuPSNFx7TOAYJrvWsa76PoYR84qCM9sVeej+/ZJC
+         wvCGEd27wgcXw3FDtvWPSGPQU2gWz6+mI4NbxdtFcOLSYzfZLHA0l+sYEJf/RPt5kGzP
+         csWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784039420; x=1784644220;
+        d=1e100.net; s=20251104; t=1784039426; x=1784644226;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=myAuJMzKK/4iG9Cmnf7VPvLoMfqifqNKwX3ebA7nias=;
-        b=kCf4jQCTeQZGFNUNJfuZXSglsdUJ/R/sj3I5ED5zk9f5JXofpHrzy6Q1f2jvZ6VOre
-         Xe1zNBgRGS4NS96CXeE305viAl3+mULN8Og9iTFiJEPMi3ys8JEvgTJ3n67RQPqviW0q
-         WhVuIIvU3amI7ft2p27rxhYSCw3dleAa2Jry3edaE6IdkSD33KsnKd1UYnKu1zJ9xIsi
-         ie8jzVlpNZFVZAAovB9TPJlbewkifR7+mIK+qv9fX0s5HkoEAwJ7JnjaFXL9nP094f0U
-         Xg6U7+mrLrwXJh0FOqC8FO2r/WCyHqJbhctHRdL1oBWOw9xDZ9oTQ+rTY1nrFcbSu3UY
-         8THQ==
-X-Forwarded-Encrypted: i=1; AHgh+RpMObz6MsU7Jv8KTw5HY2+/NI38B+zatO8jLOJL/kmpjlJE9AShNtM6oOYLWYGg40XHqViaR3c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1Hahk1o4hjht4pudob7VGCvHwpUYx0apLiBtOdQIFtT1LPGkn
-	O5jNnntqmFQoXvu2ZBCYm6apXzPMUb8QqeNKDeLPfXfSxPYbBU5Pwoj+B3bHd8B8L3w=
-X-Gm-Gg: AfdE7cmvdI4BT+Sjmq/sEH/emwirutt3P8VUNGjL8r45fk01eYCXtbYWrcbq6A/5rI8
-	Nyeg8gVKLvsdArwL+Nkz08uM7+mwMv6JafcKHSISLrR4mltsv/69EgaCFdjNuf9mEi0i8vX+0Di
-	hrH2NzASbFfvjoMFd2svDb9GneQHGx6xqs+U3DV/FMJ9G2piQmfyqCA1BKsTPaegMMNK2Dcr1bK
-	PKUDfFnUlWh1hgnfOldNU0zT6rSuwsexz+X4qmWeHohMM7ZzmkkpZqRfm6TUmr/mZarkN2hXGva
-	eU/+sbdS8ibVLon0/9QMrUzCl74YAByyaa3ndkBzAx8HWGPxIHu/qb/SOe6hMu44SHZKkSXd8CR
-	ynMA056gv1SyyFPATEtKE/JboOI9ynqfMWMfjlpJ6kJH7B6h9LfhqKQDdGdWRHCSHxkAZSKPTFg
-	OZ5aA2/RAMjcOEjsyKAh6hPA==
-X-Received: by 2002:a05:6512:21d:b0:5b0:1428:cab9 with SMTP id 2adb3069b0e04-5b0236bb426mr2001205e87.50.1784039419732;
-        Tue, 14 Jul 2026 07:30:19 -0700 (PDT)
+        bh=1DAcALuj6CLiGGxg2YU+zPjUKqyxKHB8HUr7MGOtyF0=;
+        b=aQ5HE+2Y3a3y80kiMdqpZ5clbhwgt1641UQVwXiqozabsEDHifopXtcvKEzYnF3s5/
+         sFpCefgX5VYwOJj1rC8dW3OKF4fyONXmna43v/91W5iR6/XDA+Dnt2fMGt29HT47katF
+         WkFgU6O2dSzNWZIKtrLO2Az1L3YYFSHMz5OXfn4QHoke7i9I1tHvA7mA2WR/pD7DaoKY
+         bzL1Fjx5UQEx59WsxsdrZ4IqQNvvqMYhBn35FqocZDWH+zeAStQKX6Z9jAA3oOyTj2P4
+         A2g2G4H8TPnhGURRbRNZoOaWEzbnDXbfvPG5vzmBeON1dHtKIcH0cpuvnxZEX7sYkNqe
+         2PQQ==
+X-Forwarded-Encrypted: i=1; AHgh+RqoAk4dBjOXUt+DXC7JQ69a8Njl58zmRymy3DbzgQsvT+2jsHhYRuAhoIQIuDL4ruNHhnzQ8/A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUOwYb2i74by5q8/J2XNQgS1SxN9A/5WJWtA3+UCjYAcE8xlUl
+	I2XWEbka2OzpGroKNFEekYmCwWrew7LVbfAWHhPYCmq2q3ArVCQoN/7MLfd7IftVaaE=
+X-Gm-Gg: AfdE7ck+dcqzauBPDqMJEadfmH+JgXM0j/tX+IbkSSd2LvBuK9F1iiL/7qPHhoQUeum
+	etTP4pBvAY7ubMXKMRw9m77uMxg4smFMYQAyPY70elEjEkxNbT2lbYcqj6k5ZlBd5xTpjjo8VOd
+	7zXKgyVripnZnGR9NBH3fVx59W+8cAcTETf+kIL3s4AAGsiqayf94EV9odd4q90UP9M5KBB+0KJ
+	76HM1/iA+bSQYDLbO4SwPW3tigAS7Zjf9WBFFgoM2gTXTfViMeCDkC4r9Vg3sDGzlZwbdDxAlId
+	cbzY5+kQFrMfzctK7iK+fKcM/Nsf/hffdk+Gze6sRE7DVWm1seiYZ+sGT9Y2r0j8lNRtjaIXOOs
+	UKhYIl9OG3/+NxqQ+qiXurc5KDKlJ4GjSaN/ZDdLn+4KxuRgF4+OXAKEDORZaY8nx/lcGM8QI8x
+	h2LM5W4iWr+un3rQWDTI1mDr0=
+X-Received: by 2002:ac2:51d1:0:b0:5b0:bc3:dc05 with SMTP id 2adb3069b0e04-5b02369c7cdmr2818323e87.40.1784039424734;
+        Tue, 14 Jul 2026 07:30:24 -0700 (PDT)
 Received: from localhost ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5b01ca4f90csm3589518e87.21.2026.07.14.07.30.18
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5b01ca4a2e9sm3573711e87.1.2026.07.14.07.30.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jul 2026 07:30:19 -0700 (PDT)
+        Tue, 14 Jul 2026 07:30:23 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: linux-rdma@vger.kernel.org
 Cc: cgroups@vger.kernel.org,
@@ -100,9 +100,9 @@ Cc: cgroups@vger.kernel.org,
 	wenjia@linux.ibm.com,
 	yanjun.zhu@linux.dev,
 	cui.tao@linux.dev
-Subject: [PATCH rdma-next v2 12/14] RDMA/rxe: Allow queue VMAs to outlive ucontexts
-Date: Tue, 14 Jul 2026 16:29:25 +0200
-Message-ID: <20260714142927.1298897-13-jiri@resnulli.us>
+Subject: [PATCH rdma-next v2 13/14] RDMA/rxe: Implement disassociate_ucontext callback
+Date: Tue, 14 Jul 2026 16:29:26 +0200
+Message-ID: <20260714142927.1298897-14-jiri@resnulli.us>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260714142927.1298897-1-jiri@resnulli.us>
 References: <20260714142927.1298897-1-jiri@resnulli.us>
@@ -119,11 +119,11 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307502-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307503-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[vger.kernel.org,ziepe.ca,kernel.org,nvidia.com,linux.dev,acm.org,gmail.com,suse.com,cmpxchg.org,linux.alibaba.com,linux.ibm.com];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
@@ -134,7 +134,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FORGED_SENDER(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCPT_COUNT_TWELVE(0.00)[23];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -147,86 +147,48 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,resnulli.us:from_mime,resnulli.us:mid,nvidia.com:email,resnulli-us.20251104.gappssmtp.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,resnulli.us:from_mime,resnulli.us:mid,nvidia.com:email,resnulli-us.20251104.gappssmtp.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 30A92755E4E
+X-Rspamd-Queue-Id: A4418755E0F
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Prepare queue mappings for asynchronous ucontext disassociation during
-device disable. Rely on the VMA page references to preserve mapped
-memory until the final unmap.
+Implement an empty disassociate_ucontext() callback so the RDMA core
+can move rxe devices between net namespaces. The core requires this
+callback to reset user contexts without waiting for userspace.
+
+rxe needs no teardown here: its user-mapped queues live in
+reference-counted vmalloc memory (see rxe_mmap.c) that stays valid
+while userspace holds the mappings.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
-v1->v2:
-- new patch
----
- drivers/infiniband/sw/rxe/rxe_mmap.c | 35 ++--------------------------
- 1 file changed, 2 insertions(+), 33 deletions(-)
+ drivers/infiniband/sw/rxe/rxe_verbs.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/infiniband/sw/rxe/rxe_mmap.c b/drivers/infiniband/sw/rxe/rxe_mmap.c
-index 7f723a2f3700..a4ead89ccbd3 100644
---- a/drivers/infiniband/sw/rxe/rxe_mmap.c
-+++ b/drivers/infiniband/sw/rxe/rxe_mmap.c
-@@ -11,7 +11,6 @@
- 
- #include "rxe.h"
- #include "rxe_loc.h"
--#include "rxe_queue.h"
- 
- void rxe_mmap_release(struct kref *ref)
- {
-@@ -30,29 +29,6 @@ void rxe_mmap_release(struct kref *ref)
- 	kfree(ip);
+diff --git a/drivers/infiniband/sw/rxe/rxe_verbs.c b/drivers/infiniband/sw/rxe/rxe_verbs.c
+index 1ec130fee8ea..6eb10d2f0653 100644
+--- a/drivers/infiniband/sw/rxe/rxe_verbs.c
++++ b/drivers/infiniband/sw/rxe/rxe_verbs.c
+@@ -240,6 +240,10 @@ static void rxe_dealloc_ucontext(struct ib_ucontext *ibuc)
+ 		rxe_err_uc(uc, "cleanup failed, err = %d\n", err);
  }
  
--/*
-- * open and close keep track of how many times the memory region is mapped,
-- * to avoid releasing it.
-- */
--static void rxe_vma_open(struct vm_area_struct *vma)
--{
--	struct rxe_mmap_info *ip = vma->vm_private_data;
--
--	kref_get(&ip->ref);
--}
--
--static void rxe_vma_close(struct vm_area_struct *vma)
--{
--	struct rxe_mmap_info *ip = vma->vm_private_data;
--
--	kref_put(&ip->ref, rxe_mmap_release);
--}
--
--static const struct vm_operations_struct rxe_vm_ops = {
--	.open = rxe_vma_open,
--	.close = rxe_vma_close,
--};
--
- /**
-  * rxe_mmap - create a new mmap region
-  * @context: the IB user context of the process making the mmap() call
-@@ -106,17 +82,10 @@ int rxe_mmap(struct ib_ucontext *context, struct vm_area_struct *vma)
- 	list_del_init(&ip->pending_mmaps);
- 	spin_unlock_bh(&rxe->pending_lock);
- 
--	vma->vm_ops = &rxe_vm_ops;
--	vma->vm_private_data = ip;
--
- 	ret = remap_vmalloc_range(vma, ip->obj, 0);
--	if (ret) {
--		vma->vm_private_data = NULL;
--		vma->vm_ops = NULL;
--		kref_put(&ip->ref, rxe_mmap_release);
-+	kref_put(&ip->ref, rxe_mmap_release);
-+	if (ret)
- 		rxe_dbg_dev(rxe, "err %d from remap_vmalloc_range\n", ret);
--		goto done;
--	}
- 
- done:
- 	return ret;
++static void rxe_disassociate_ucontext(struct ib_ucontext *ibuc)
++{
++}
++
+ /* pd */
+ static int rxe_alloc_pd(struct ib_pd *ibpd, struct ib_udata *udata)
+ {
+@@ -1478,6 +1482,7 @@ static const struct ib_device_ops rxe_dev_ops = {
+ 	.destroy_srq = rxe_destroy_srq,
+ 	.detach_mcast = rxe_detach_mcast,
+ 	.device_group = &rxe_attr_group,
++	.disassociate_ucontext = rxe_disassociate_ucontext,
+ 	.enable_driver = rxe_enable_driver,
+ 	.get_dma_mr = rxe_get_dma_mr,
+ 	.get_hw_stats = rxe_ib_get_hw_stats,
 -- 
 2.54.0
 
