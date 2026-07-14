@@ -1,217 +1,206 @@
-Return-Path: <netdev+bounces-307375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307376-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id UPh7NwvlVWrEuwAAu9opvQ
-	(envelope-from <netdev+bounces-307375-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:28:11 +0200
+	id TC7NIRfoVWqqvQAAu9opvQ
+	(envelope-from <netdev+bounces-307376-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:41:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E6F6751D82
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:28:11 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2D1B752008
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:41:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=MrQKtzVE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307375-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307375-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=linaro.org header.s=google header.b=PQjSbYhG;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307376-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307376-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linaro.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7D89D3023361
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 07:28:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9F57630434EB
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 07:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EAF33EDE42;
-	Tue, 14 Jul 2026 07:28:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9947C3EEAE9;
+	Tue, 14 Jul 2026 07:35:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pz2-f0.google.com (mail-pz2-f0.google.com [74.125.228.0])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25CF331EB5
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 07:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8EE33ED5C9
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 07:35:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784014088; cv=none; b=BlXKw8ti7nm/GOd/8MKn4hLjhVXcjxvRAr3v+kRPu9r+EFCT9Lv0nbsILW6G5NjhGUJesxdDm6goD5uOUMlaH4A93oSokS7igXWntpvgS7TCshmtM1HUov2M/Fp+bR1e5rwqMHR7oww3nSonyiPnyRURVpLgPSL+5ZTFfF1dK5U=
+	t=1784014552; cv=none; b=mByOWjadh+RuuST6omCcoBTDriuHioQc8FWPJPVQKt2+lTPF2NTgUXjfP0Y9mmgRoe14UPnPrjRbv6v0wozQQzDm0vpbe8V6Cr7WQgpnUSAK2cIHLxnubGBeh3wzbWpnaa2H3q11kMDhOs5FKE7728beklQMoGFfbqqegoV5FHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784014088; c=relaxed/simple;
-	bh=VV6RH/yKbbXGqbCZVlFLWMvC2IkSZjVrbZxP+GH89A0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B5zBfRkY49T2ut2gIpSQmu3Y3wgvvmUMyXfojVnH3Ks0nT8J5FfVlstBGdoWiM7LpGzThoNQXUMi8Pv8mtZqoJaQEiPwephojU+4zO315hyBUm7UNALz7xhzoEg4ggVo1HfjCwQrdywPdbWcRscV6g17PW3cybm7u7kSl1U2bss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MrQKtzVE; arc=none smtp.client-ip=74.125.228.0
-Received: by mail-pz2-f0.google.com with SMTP id 41be03b00d2f7-c96739a46acso2409540a12.1
-        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 00:28:06 -0700 (PDT)
+	s=arc-20240116; t=1784014552; c=relaxed/simple;
+	bh=thE6MKDBgxQ/2kTxtQxylJzWWa2DTPV9HWq/Oqshg8w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lNTFMRR9e6UqHBq1tE4/8/PnOvb7vNhlDwyUndu3LhdRzmCtL+CqxQctkFCbmkxaUndKpKg1c9QpEHn/AXiPISjSxPYp1LkthOdOteNcCWYuCJ4sZIVZiA/fwKaBWJKefS5eoEXBKIXyZIYy+f+ZHtEbzhIvgynargps8f2+WuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PQjSbYhG; arc=none smtp.client-ip=209.85.221.48
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-4720d22c94aso594843f8f.1
+        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 00:35:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784014086; x=1784618886; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=UL4JsWWFy5+1VcD51BCzcQnL+AOhOLYxnY1WLoSce4c=;
-        b=MrQKtzVEK6cC864IUWe3vPOz+tNabRozEn2LOjqLNDT7Mv/1qS6ZzvJN0jatk/6BYD
-         0aXrWJV2LEUGzI9NhlgvcOd5p4zhDf4cgjbeeI0FWswQnA2/2zKSrCCtP9b3ndmXNqM3
-         t4WIyKTou7pBYd+W3WEh+5r9L/B5SwdaHZSODinrUXFSe30b5p5D+nuNkCpZ8YtFaK7K
-         yu0y6V3EjupH6oWVGXEOHWbW65pOw8C2Qcne+Vt1YF05S/glcnzK1dXXqVUKI92LL772
-         UHPwNy5lO92nmraNgsz7wgHEZjCpICyJmlCJcmsCgLSrcm3gW5rphIFAySpSY1cFQ2BO
-         BLqA==
+        d=linaro.org; s=google; t=1784014549; x=1784619349; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=EZDP77brQ5bvhb37m4sjMTk+Xtc5WyoVuJCcZEy5/Us=;
+        b=PQjSbYhG7l9ASUYQmKlYFS+sKvO+M8bmtQiQpO9+yci4idNJeTkjbL0liIGnl2qYXn
+         4YwVv3dN31nMt73EBvIVlJaIKZrBvjRJabefKFt0zaxRhJl8lokR4kW3bl/I2s5E4PvT
+         q1QHKu7/4S1FuN+Y+hrRgOhQBCThOZwpqAgTV4omkYPO1e7VcnmhoV+b5STXEEe1r5JD
+         d2Bqk6T0LHKEqMVA4FWw8NzyVrUhNfycHspKydsrGqcJg6jesH7fzT3sJMZWcOGP+ZUy
+         BUXuj/2K7xFFBLBSHv8pg7qWtHmhXty2UH8Rr5vRZNuN/t0mIlCDBpsa+hcTk90njqgk
+         B31Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784014086; x=1784618886;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=UL4JsWWFy5+1VcD51BCzcQnL+AOhOLYxnY1WLoSce4c=;
-        b=Yasal6UvE23RZk+UkwJrLzqHEgLWp72RyEuyTSkc62tLeOKefBXWUEqj9NtFsFfrZz
-         ng5thOaB9ZeMUP857WDSz87RgP9FSsU/oomMU3UekxytuY0F9boAglzLK0wnK89hD5cZ
-         Z6/blb2DzalhMbiHbsmAMqVwzEGZEcKpjdmmK4q7OJz8FKZd78oyT+oXHmXcj0vc5Zfy
-         6MpUnCmjQJfA7XZhPOpEl22VF2ee1f9ZRsbvPKkEqgIc/BLrmCuIn/rVzzfUr+4mmYIl
-         TkjwnjqizTq1jc7D/7xXNpSoUoG59LJfiUiAezwBd4sEwGqbzuTiEQ0D+RA6Ky5zwYyb
-         SoYw==
-X-Gm-Message-State: AOJu0YxTAOBho2m0zMfhUNHEKHWv1ZUKXvgH5QGuHHbHhyOPjxTDQXh7
-	CRvinYN5GoOYphADAuR22et/ZWHGBhFFDfJPVHEv0Up6z2IXD4pW0VmY1xVK+ZCuUOw3x6cI
-X-Gm-Gg: AfdE7cmSOtI9f6CZqmy313NzgkfNwlkSNSgKGDCPV72jgXCj9ewTlzuq1maV2M29JEW
-	kwIZ7R2XJDr5mF4ahh/KDtliRA5QAIldNwLyTryhKYW0xqky2pW//7KstpcTLj+K67tFJCBgacW
-	fSxBeVcdADEt1gW1kBT3wGyTEmhCO7XbUt4x5TT2Dws6b0cuFtKk8AfDpE7IFZCrHzr82KLCXZl
-	YJJXQ6Bax7bqz6zLa8Ed1jSHPv+Qh/ZZ9gpj/M1kb4/UdTIreqe2Qp3t/8TVh+RMOh/JB++IhQZ
-	89Cf/wtCgoe/HnNnTRwqndHPDpzGMjTJUDz1t5aIF4YxDd+4LjPJtZCq5DXIzSRZJSrZq1+BBwf
-	BBS8JPTAart7FfPe9V+esZ1sR5VrAZI+AfIn+d8V89IAD8WG/wlI411gIbmf3/JP39Au1x9XVp9
-	RJbFHyIUcrXkCN4/dGDbXg5JTPWj2yZD8XmQ==
-X-Received: by 2002:a05:6a00:1943:b0:841:58b0:82bb with SMTP id d2e1a72fcca58-84a5576ce8cmr1383065b3a.9.1784014086315;
-        Tue, 14 Jul 2026 00:28:06 -0700 (PDT)
-Received: from J4f-Laptop.localdomain ([2409:8a55:94d0:4771:cc5f:41a5:d797:4728])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84a4f80de8esm975471b3a.56.2026.07.14.00.28.03
+        d=1e100.net; s=20251104; t=1784014549; x=1784619349;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=EZDP77brQ5bvhb37m4sjMTk+Xtc5WyoVuJCcZEy5/Us=;
+        b=PBdiNa6uDN0T+42PPRS1OoI8qa+E8mD/jVGg+iOIRCNRlPVaVYvkYH5uW8Jkjk1Jgg
+         aINGh0/wUCL6/qVz8wERNSSpJ6OPJyokMn96Vtn/EXmTRYux6LJaXjc6h9L+UxS73dFO
+         18bEN3DgoQh5Dl/archIROpFbtsETrqnB+gBxXgMDpiYjgEWdNCFAYAmkXvz0QwF1teg
+         ac4upk84TIIUvFZD+bJcPCeOOiO7v/CVjAXs2oGMa5YysVeu9Km3XLICe80HmS6rAgod
+         d9xlL9cZED/GOl5XZC0Apheexiq2DDxkpzFms/4zRuculhPx0T07ZDwThMR3w6c8pxdL
+         2NYg==
+X-Forwarded-Encrypted: i=1; AHgh+RpI1tneFMmxtL96lqFNe86pvdFbtnEiA/eZqMgKtmFsdhaE4qI4RyB82CDYBrqwVrg8r2214n0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyM9YQitB+4aYGHm68TF/y2uiqakEK2mj1F4uezY3CwZs2wI3Fr
+	FYVXhhw66+4GGYcdkNy+cfrGBTwv5OKzHbK4QtwjrybhILH13CLWbvrkhMe2BJn8JLQ=
+X-Gm-Gg: AfdE7ckG4rhtsk4EG9oRmG0EYizOYqySkxPbKkzEn6RIBDEHAyoDCrqC0vNZsMbYNNj
+	2XWXP1BxYJ5tSyOrr1P+EWcV/oNUmFp80dcPP+DZv58kTmp+cSk2X8W8/swLutRqSgscbCrFll2
+	SiaWd6NcvFyPtVixseRqNBVJ0wCaBPy/0OTjrfvsGC8yIlJgKAGw+Roow37pxW/QE6XLxLEjudZ
+	TmArDOM9IS2KiihgU/sDE1EUA8lg/t3V3tdn7W0MqxGH1RGv4FNfcwT6VB1a649DnCpdEkSLY0K
+	3lFpW9wC88t5BzebBvIrickiTy56v0NGU4eDsx2xMVNNsr6l/UDq7a/WaC/X/uLj52gOHhR+114
+	Qea8+CitMbG87Rv/9m2ztKv35tEwmJbmdmMNTE6cJZlMrwsSYhsFUBJ6Hp9hIMneCgu0QFLhxtF
+	9k+W2xix/35rGKs41hJanRYfMi
+X-Received: by 2002:a05:6000:2404:b0:473:673e:3836 with SMTP id ffacd0b85a97d-47f2dcf8a3amr14217779f8f.28.1784014549221;
+        Tue, 14 Jul 2026 00:35:49 -0700 (PDT)
+Received: from linaro.org ([2a02:2454:ff24:7210:6c30:6cbd:7b12:2745])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f464caeffsm5599960f8f.36.2026.07.14.00.35.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jul 2026 00:28:05 -0700 (PDT)
-From: Shihuang Liu <shlomojune6@gmail.com>
-To: netdev@vger.kernel.org
-Cc: ap420073@gmail.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	Shihuang Liu <shlomojune6@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] amt: fix use-after-free in AMT delayed works
-Date: Tue, 14 Jul 2026 15:27:05 +0800
-Message-ID: <20260714072705.129262-1-shlomojune6@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Tue, 14 Jul 2026 00:35:48 -0700 (PDT)
+Date: Tue, 14 Jul 2026 09:35:46 +0200
+From: Stephan Gerhold <stephan.gerhold@linaro.org>
+To: Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>
+Cc: Stephan Gerhold <stephan@gerhold.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Loic Poulain <loic.poulain@oss.qualcomm.com>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	chris.lew@oss.qualcomm.com,
+	Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>
+Subject: Re: [PATCH 2/2] net: wwan: qcom_bam_dmux: Alloc RX buffers as a
+ single coherent block
+Message-ID: <alXm0rp3NK62G3-3@linaro.org>
+References: <20260714-qcom-bam-dmux-vmid-ext-v1-0-3f29da7cca76@oss.qualcomm.com>
+ <20260714-qcom-bam-dmux-vmid-ext-v1-2-3f29da7cca76@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260714-qcom-bam-dmux-vmid-ext-v1-2-3f29da7cca76@oss.qualcomm.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[gerhold.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,oss.qualcomm.com,gmail.com,sipsolutions.net,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-307376-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:vishnu.santhosh@oss.qualcomm.com,m:stephan@gerhold.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:loic.poulain@oss.qualcomm.com,m:ryazanov.s.a@gmail.com,m:johannes@sipsolutions.net,m:linux-arm-msm@vger.kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:chris.lew@oss.qualcomm.com,m:deepak.singh@oss.qualcomm.com,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:ryazanovsa@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307375-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:ap420073@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:shlomojune6@gmail.com,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_SENDER(0.00)[stephan.gerhold@linaro.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[shlomojune6@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linaro.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shlomojune6@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[stephan.gerhold@linaro.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,linaro.org:from_mime,linaro.org:dkim,linaro.org:mid,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2E6F6751D82
+X-Rspamd-Queue-Id: D2D1B752008
 
-When an AMT device is removed, pending delayed works can still access
-the freed amt_dev structure, which may result in kernel crashes or
-memory corruption.
+On Tue, Jul 14, 2026 at 11:02:32AM +0530, Vishnu Santhosh wrote:
+> On Qualcomm SoCs where the modem (e.g. the mDSP on Shikra, VMID 43 /
+> NAV) is the AXI master for BAM-DMUX RX transfers and the XPU enforces
+> per-region access control, each individually DMA-mapped RX buffer
+> requires its own XPU resource group (RG). With ~16 RGs available, the
+> 32 per-buffer dma_map_single() calls exhaust the table and the first
+> inbound transfer faults with an XPU violation.
+> 
+> BAM-DMUX is a singleton (exactly one instance per SoC), so the
+> destination VMID does not need to be a DT property; it is looked up
+> from the compatible string's match data instead. Add struct
+> bam_dmux_data with a single vmid field, and a shikra_data instance
+> hardcoding QCOM_SCM_VMID_NAV for qcom,shikra-bam-dmux.
+> 
+> When match data is present, allocate all BAM_DMUX_NUM_SKB RX buffers as
+> a single contiguous dma_alloc_coherent() block and SCM-assign that
+> block to HLOS plus the VMID once at probe. This reduces RG consumption
+> from 32 to 1. The block is never reclaimed across a modem power cycle
+> (bam_dmux_power_off() does not touch it), so the probe-time assignment
+> covers every subsequent restart without re-assigning or reclaiming. It
+> is reclaimed to HLOS only once, at remove or on a probe error, and if
+> that reclaim fails it is leaked rather than returned to the page
+> allocator.
+> 
+> Each rx_skbs[] slot is pre-assigned its virtual and DMA address from
+> the block, so no per-buffer mapping is needed at power-on. Because the
+> coherent block is not page-backed, received payload is copied into a
+> regular netdev skb before handoff to the network stack; this is an
+> unavoidable extra copy on the XPU-enforced RX path.
+> 
+> Platforms without match data are unaffected: rx_virt stays NULL, no
+> coherent memory is allocated, and the per-buffer dma_map_single() path
+> is unchanged.
+> 
+> Co-developed-by: Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>
+> Signed-off-by: Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>
+> Signed-off-by: Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>
 
-amt_dev_stop() cancels req_wq and discovery_wq with
-cancel_delayed_work_sync(), but these works can be scheduled again
-from event_wq after the cancellation. This allows delayed works to
-access the freed amt_dev structure after the netdev has been released.
+So how do you handle TX buffers? Right now, they are just passed on from
+the net subsystem. There can be up to 32 TX buffers in progress as well.
 
-The following is a simple race scenario:
+Overall, I have mixed feelings about this patch. It looks reasonably
+simple, but fundamentally I don't understand why we need to go back to
+the old days of implementing protection using a highly limited MPU (in
+your case: the xPU).
 
-CPU0                         CPU1
+Why does the setup of BAM-DMUX differ e.g. from the setup for the crypto
+engine? Crypto is also using bam-dma, but it avoids this inflexibility
+by making use of the &apps_smmu. Is BAM-DMUX not covered by the SMMU? Or
+did you just decide to bypass the SMMU in this case? (If so: Why?)
 
-amt_dev_stop()
-cancel_delayed_work_sync()
-                             amt_event_work()
-                             mod_delayed_work(req_wq)
-free netdev
-                             req_wq accesses freed amt_dev
+If you had BAM-DMUX mapped using the SMMU you would get all of this for
+free. No changes would be needed in the BAM-DMUX driver ...
 
-Use disable_delayed_work_sync() in amt_dev_stop() to prevent req_wq and
-discovery_wq from being queued again and wait for running work items
-to complete.
-
-The delayed works are disabled after initialization in
-amt_newlink() and enabled only when the device is successfully opened.
-This keeps the delayed work lifecycle synchronized with the lifetime
-of the AMT device.
-
-Fixes: cbc21dc1cfe9 ("amt: add data plane of amt interface")
-Cc: stable@vger.kernel.org
-Signed-off-by: Shihuang Liu <shlomojune6@gmail.com>
----
- drivers/net/amt.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/amt.c b/drivers/net/amt.c
-index 951dd10e192b..7eb871b9b7e1 100644
---- a/drivers/net/amt.c
-+++ b/drivers/net/amt.c
-@@ -2995,9 +2995,15 @@ static int amt_dev_open(struct net_device *dev)
- 	amt->event_idx = 0;
- 	amt->nr_events = 0;
- 
-+	enable_delayed_work(&amt->discovery_wq);
-+	enable_delayed_work(&amt->req_wq);
-+
- 	err = amt_socket_create(amt);
--	if (err)
-+	if (err) {
-+		disable_delayed_work(&amt->req_wq);
-+		disable_delayed_work(&amt->discovery_wq);
- 		return err;
-+	}
- 
- 	amt->req_cnt = 0;
- 	amt->remote_ip = 0;
-@@ -3023,8 +3029,8 @@ static int amt_dev_stop(struct net_device *dev)
- 	struct sock *sk;
- 	int i;
- 
--	cancel_delayed_work_sync(&amt->req_wq);
--	cancel_delayed_work_sync(&amt->discovery_wq);
-+	disable_delayed_work_sync(&amt->req_wq);
-+	disable_delayed_work_sync(&amt->discovery_wq);
- 	cancel_delayed_work_sync(&amt->secret_wq);
- 
- 	/* shutdown */
-@@ -3278,6 +3284,8 @@ static int amt_newlink(struct net_device *dev,
- 	INIT_DELAYED_WORK(&amt->req_wq, amt_req_work);
- 	INIT_DELAYED_WORK(&amt->secret_wq, amt_secret_work);
- 	INIT_WORK(&amt->event_wq, amt_event_work);
-+	disable_delayed_work(&amt->req_wq);
-+	disable_delayed_work(&amt->discovery_wq);
- 	INIT_LIST_HEAD(&amt->tunnel_list);
- 	return 0;
- err:
--- 
-2.43.0
-
+Thanks,
+Stephan
 
