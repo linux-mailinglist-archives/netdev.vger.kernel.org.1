@@ -1,248 +1,239 @@
-Return-Path: <netdev+bounces-307456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307458-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 6Ky5DfczVmpn1QAAu9opvQ
-	(envelope-from <netdev+bounces-307456-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:04:55 +0200
+	id HI8yGyQzVmoZ1QAAu9opvQ
+	(envelope-from <netdev+bounces-307458-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:01:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86977754D47
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:04:54 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1A1F754CC4
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:01:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=X7UoAST0;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307456-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307456-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=lwn.net header.s=20201203 header.b="rZ/lK5jD";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307458-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-307458-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lwn.net;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 367683004C5D
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 13:00:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5C8E43009CD8
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 13:01:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8D7F450906;
-	Tue, 14 Jul 2026 13:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DF14450906;
+	Tue, 14 Jul 2026 13:01:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8565B3B42E9
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 13:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8973612DB;
+	Tue, 14 Jul 2026 13:01:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784034002; cv=none; b=eqVHfxi4oO/ffvYj/0Woabz9M5aX4jOje1yNI+S75R4n7hPuh85ZUz3m/z4vBofQiNLohlp9Z8gSiOq4SoGN+9eg5h5a0IjC6qvj684Zs0LaQq0CJxJJyCFlOwGQIbz24pt4o9ppziT38e5o9iPA8ESlnCH2BDHE+4zuR4KmO98=
+	t=1784034077; cv=none; b=mxOLyjkTZodjzf5lQfEmmSAkTmFSuzfLXx38bUjbzdwct0Xf67jeMpgNDemtUvXKYmi6MJzPjy1xd+Jl1VjjyWjDTCUcecMDitj8bQE1czQCFPso+Y/s6ODtEGiIx1v7TRwPqI3YDmMsxy6XU9IK4bzWwT17lyA1HMS3AW4GJnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784034002; c=relaxed/simple;
-	bh=H58TWC+TXK/BHRTtX4YvVrPjLOm9dbng8JwYQCqm72g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KkDFG6UMruze6srfg6nBnjihsUutm/3Ec57i2XXotdg6eN7jI7o9czUvtLCxApO/vFi3yyJXUAeY2cHhtkHvrPt/eINph/y+H/m/2rtEgOMrIN2exvQU3KJPCSggX4kO5oQsEfWlCshXSS8yEdusTKKtwE095c851cw/crERbXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X7UoAST0; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB74A1F000E9;
-	Tue, 14 Jul 2026 12:59:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784034001;
-	bh=1P/wug/qzmssJOyrjuPPOZYs1q4TmXwKDCPnEXvd4gc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=X7UoAST0BAf5quQi/hWYb9/7KmQ8gg2QSkoTKrfTgtINsPRIFFRwjvZi/aqt9ZLCq
-	 a3YcziUtVcr5f0KXxpdnUdCyRAGNjBpyeqqG7pg5f/uqSC/xcSSA8uUGKN12DISA/1
-	 iZjio3PiMymS7yYn4ihVW4iYM4TI8ItkWuU9XoSOBUoAmp7CnavZ7n0E4mEcwDjaC9
-	 S6rBJHk/5+tFYxP5SSec+hkag3hmQvojB/ArIID9XmeuMwcTMBVxa3ssvsXr8UOd/t
-	 tEvjrhduGsfacZl15DVGJ+MNglU9x6dyC9vGsG+uNbvtiq6dIvCDjoHd/5vo6Qj5OZ
-	 +idcKl/dTojHg==
-From: Simon Horman <horms@kernel.org>
-To: mmc@linux.ibm.com
-Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	bjking1@linux.ibm.com,
-	haren@linux.ibm.com,
-	ricklind@linux.ibm.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	linuxppc-dev@lists.ozlabs.org,
-	maddy@linux.ibm.com,
-	mpe@ellerman.id.au,
-	davemarq@linux.ibm.com
-Subject: Re: [PATCH net-next v3 11/15] ibmveth: Add per-queue RX and TX statistics collection and reporting
-Date: Tue, 14 Jul 2026 13:59:48 +0100
-Message-ID: <20260714125948.1841205-1-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260706193603.8039-12-mmc@linux.ibm.com>
-References: <20260706193603.8039-12-mmc@linux.ibm.com>
+	s=arc-20240116; t=1784034077; c=relaxed/simple;
+	bh=7CeV2JqxygSEcV7QVYtBYJkoFG8rn1xPd64XyHQGA9g=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=M532kVrTeyogswW3xuOpqqnoVi4qwYSW8G//M3vAnLsNO6OpcHKVZhgqZr4ApO9y7FPy61I477ptYUIH4+FhSPRxEmgXTYg4ZXxxeRdEx2apr0+Z8uG+XMoRBm5skF0BaKblxj6R1ecwSPLhKe0rlS4ioWqtGuBgYKB7cA4Ly7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=rZ/lK5jD; arc=none smtp.client-ip=45.79.88.28
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 3C6D3410E2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+	t=1784034074; bh=N7EMk0B6AUtZUiM/QA5lBMqbPP1I3abAcQ9/YZ6+Tzk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=rZ/lK5jDFFbj57Sl/24gU1iFuYlaluvoVZ5Ug1idxSk24WOPCmZ88zIRW5f+YEzVX
+	 OzhkNgXiPh9OlddACJ4HW/nAE0hrweCLvZ3Br47g8RTMD/2YI7NWfraTs/0jrI5bfA
+	 wxL1aA/kuV0bUH9ibIbKx8O5AkiBKjJbp6cqIqHf+4LNGJdlv4surZ7bloLjRvWGDB
+	 gXaXax69FImiTwDeRIWMhBVy8YdBnFw7wCtTCrrj/dpLNvTlQrRPsZ3LTIwCxxYc0E
+	 X363mMGut+t5vLTp43fHZdEuLl9FLOjoLmIz4ZpDAr5I/3Uz8a9+z0JZRgQeW/b/we
+	 S28cEuHBv0YFQ==
+Received: from localhost (unknown [IPv6:2601:280:4600:27b::1fe])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by ms.lwn.net (Postfix) with ESMTPSA id 3C6D3410E2;
+	Tue, 14 Jul 2026 13:01:14 +0000 (UTC)
+From: Jonathan Corbet <corbet@lwn.net>
+To: David 'equinox' Lamparter <equinox@diac24.net>, Paolo Abeni
+ <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Ido Schimmel
+ <idosch@nvidia.com>
+Cc: David Ahern <dsahern@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Simon Horman
+ <horms@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>, Fernando
+ Fernandez Mancera <fmancera@suse.de>, Lorenzo Colitti
+ <lorenzo@google.com>, Maciej =?utf-8?Q?=C5=BBenczykowski?=
+ <maze@google.com>, Patrick Rohr
+ <prohr@google.com>, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, David 'equinox' Lamparter
+ <equinox@diac24.net>
+Subject: Re: [PATCH net-next 9/9] net: document RFC6724 rule 5.5 implementation
+In-Reply-To: <20260714094030.136317-10-equinox@diac24.net>
+References: <20260714094030.136317-1-equinox@diac24.net>
+ <20260714094030.136317-10-equinox@diac24.net>
+Date: Tue, 14 Jul 2026 07:01:13 -0600
+Message-ID: <87zeztg1ye.fsf@trenco.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[lwn.net,none];
+	R_DKIM_ALLOW(-0.20)[lwn.net:s=20201203];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FORGED_RECIPIENTS(0.00)[m:equinox@diac24.net,m:pabeni@redhat.com,m:kuba@kernel.org,m:idosch@nvidia.com,m:dsahern@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:skhan@linuxfoundation.org,m:fmancera@suse.de,m:lorenzo@google.com,m:maze@google.com,m:prohr@google.com,m:netdev@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-kselftest@vger.kernel.org,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307456-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:mmc@linux.ibm.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:bjking1@linux.ibm.com,m:haren@linux.ibm.com,m:ricklind@linux.ibm.com,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:linuxppc-dev@lists.ozlabs.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:davemarq@linux.ibm.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307458-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[corbet@lwn.net,netdev@vger.kernel.org];
+	RSPAMD_URIBL_FAIL(0.00)[trenco.lwn.net:query timed out];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[corbet@lwn.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lwn.net:+];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,sashiko.dev:url]
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 86977754D47
+X-Rspamd-Queue-Id: E1A1F754CC4
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-ibmveth: Add per-queue RX and TX statistics collection and reporting
+David 'equinox' Lamparter <equinox@diac24.net> writes:
 
-This commit introduces per-queue statistics tracking for both receive and
-transmit paths in the ibmveth driver. The counters are aggregated for legacy
-interfaces and exposed individually via ethtool stringsets.
+> RFC6724 rule 5.5 is anything but obvious, especially if trying to do it
+> well.  (RFC8028 and its errata kinda proves the point.)
+>
+> This documents what exactly the Linux kernel does for RFC6724 rule 5.5,
+> especially what the routing table needs to look like for it to work.
+>
+> Signed-off-by: David 'equinox' Lamparter <equinox@diac24.net>
+> ---
+>  Documentation/networking/ipv6-addrsel.rst | 75 +++++++++++++++++++++++
+>  MAINTAINERS                               |  1 +
+>  2 files changed, 76 insertions(+)
+>  create mode 100644 Documentation/networking/ipv6-addrsel.rst
 
-> diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
-> index 863e5c68b42c7..4e3f49b6346fd 100644
-> --- a/drivers/net/ethernet/ibm/ibmveth.c
-> +++ b/drivers/net/ethernet/ibm/ibmveth.c
-[ ... ]
-> @@ -1655,6 +1655,10 @@ static int ibmveth_open(struct net_device *netdev)
->  	if (rc)
->  		goto out_cleanup_rx_interrupts;
->  
-> +	rc = ibmveth_alloc_tx_qstats(adapter);
-> +	if (rc)
-> +		goto out_free_tx_resources;
+You need to add this new document to the index.rst file or it won't be
+part of the docs build...you should have seen a warning when you built
+the docs.
+
+> diff --git a/Documentation/networking/ipv6-addrsel.rst b/Documentation/networking/ipv6-addrsel.rst
+> new file mode 100644
+> index 000000000000..bed032e69570
+> --- /dev/null
+> +++ b/Documentation/networking/ipv6-addrsel.rst
+> @@ -0,0 +1,75 @@
+> +.. SPDX-License-Identifier: GPL-2.0
 > +
->  	netif_tx_start_all_queues(netdev);
->  
->  	netdev_dbg(netdev, "open complete\n");
-[ ... ]
->  out_cleanup_rx_interrupts:
->  	ibmveth_cleanup_rx_interrupts(adapter);
->  out_free_tx_resources:
->  	ibmveth_free_tx_resources(adapter);
-
-[Severity: High]
-Does the goto out_free_tx_resources on ibmveth_alloc_tx_qstats() failure
-bypass the cleanup for RX interrupts?
-
-Since out_free_tx_resources is physically below out_cleanup_rx_interrupts in
-ibmveth_open(), failing here leaves the IRQs requested and NAPI enabled. If
-an interrupt subsequently fires, could the handler access the freed RX queue
-memory and cause a kernel panic?
-
-[ ... ]
-> @@ -1699,6 +1699,7 @@ static int ibmveth_close(struct net_device *netdev)
->  		}
->  	}
->  
-> +	ibmveth_free_tx_qstats(adapter);
->  	ibmveth_free_tx_resources(adapter);
->  	ibmveth_cleanup_rx_interrupts(adapter);
->  	ibmveth_update_rx_no_buffer(adapter);
-[ ... ]
->  	ibmveth_free_rx_qstats(adapter);
-
-[Severity: High]
-If ibmveth_close() is called to bring down the interface, does this
-unconditionally free adapter->tx_qstats and adapter->rx_qstats without a
-grace period?
-
-Since ibmveth_get_stats64() can be called concurrently under RCU, and
-ibmveth_start_xmit() can run concurrently if the datapath is not completely
-synchronized, could this lead to a use-after-free or NULL pointer dereference
-when these functions access the freed arrays?
-
-[ ... ]
-> @@ -1967,22 +1967,107 @@ static int ibmveth_set_features(struct net_device *dev,
-[ ... ]
-> +static void ibmveth_aggregate_rx_qstats(struct ibmveth_adapter *adapter)
-> +{
-> +	u64 total_invalid = 0;
-> +	u64 total_large = 0;
-> +	int i;
+> +====================================
+> +IPv6 source address selection trivia
+> +====================================
 > +
-> +	if (!adapter->rx_qstats)
-> +		return;
 > +
-> +	for (i = 0; i < adapter->num_rx_queues; i++) {
-> +		total_invalid += adapter->rx_qstats[i].invalid_buffers;
-> +		total_large += adapter->rx_qstats[i].large_packets;
-> +	}
+> +RFC6724 rule 5.5 support
+> +------------------------
+
+Please stick with the section markup guidelines in
+Documentation/doc-guide/sphinx.rst. 
+
+> +RFC6724 rule 5.5 is a very short paragraph in a complex RFC that has turned
+> +out quite tricky, but also immensely useful in multihoming scenarios.  For
+> +reference, it says:
 > +
-> +	adapter->rx_invalid_buffer = total_invalid;
-> +	adapter->rx_large_packets = total_large;
-> +}
+> +::
 
-[Severity: High]
-Does overwriting adapter->rx_invalid_buffer and other persistent global
-counters with the dynamically allocated adapter->rx_qstats values cause a
-permanent loss of interface statistics?
+You'll likely get more visually pleasing results if you just leave out
+the "::" here; you don't need literal formatting.
 
-When the interface is brought down and back up, ibmveth_close() frees the
-queue stats arrays and ibmveth_open() reallocates them as zeroed. Will this
-cause all historical statistics to be wiped out on every interface reset,
-breaking standard persistence behavior?
+> +   Rule 5.5: Prefer addresses in a prefix advertised by the next-hop.
+> +   If SA or SA's prefix is assigned by the selected next-hop that will
+> +   be used to send to D and SB or SB's prefix is assigned by a different
+> +   next-hop, then prefer SA.  Similarly, if SB or SB's prefix is
+> +   assigned by the next-hop that will be used to send to D and SA or
+> +   SA's prefix is assigned by a different next-hop, then prefer SB.
+> +
+> +The way this works on Linux is as follows:
+> +
+> +- prior to any source address selection happening, when receiving a RA, more
+> +  than the installation of a default route (or ::/128 route) needs to happen:
+> +  for each PIO, a source-specific (subtree) route is *additionally* installed.
+> +  The effect of this is that *after* a source address has been selected, one
+> +  of the routers that advertised it will remain in use (this is *not* RFC 6724
+> +  related, but rather RFC 8028.)  At the same time, these extra routes serve
+> +  to remember which router advertised what.
+> +
+> +- per usual, a route lookup for the IPv6 destination address in consideration
+> +  is done first.  This is passed around in kernel as a dst_entry.
+> +
+> +- the source address selection code iterates through the various rules in
+> +  RFC 6724.
+> +
+> +- if/when rule 5.5 is reached, first of all, there is a check if *any* source
+> +  specific routes exist in the routing table.  If there are none, the entire
+> +  code for 5.5 is skipped because it cannot have any effect, but is not free
+> +  to execute (can involve multiple routing lookups.)  **In applications that
+> +  use a lot of unbound (e.g. UDP) sockets, installing subtree routes should
+> +  therefore be avoided to not incur this cost on each source address selection
+> +  pass.**  Alternatively, applications should bind their sockets to a specific
+> +  source address such that the selection code is never hit.
+> +
+> +- if subtree routes do exist, the source address selection code now repeats
+> +  the routing lookup done before source address selection is entered, except
+> +  with the source address under consideration filled in.  This lookup will hit
+> +  the subtree routes that were installed (see first item), giving a fresh
+> +  dst_entry.  If the new dst_entry matches the original dst_entry, that means
+> +  the original router has in fact sent RAs with PIOs for this source address,
+> +  so it is preferred.  Otherwise it is not.
+> +
+> +
+> +There are a few caveats to consider:
+> +
+> +- the kernel currently does not create the subtree routes mentioned in the
+> +  first item.  This is a separate work item, partially done at the time of
+> +  writing this.  But this can equally well be performed in userspace processing
+> +  of RAs, e.g. NetworkManager or plain static configuration.
+> +
+> +- since addresses can also be acquired from DHCPv6, even RA/PIO combinations
+> +  that didn't result in the creation of any addresses (e.g. A=0) should have
+> +  subtree routes added.  Those routes *may* be relevant for DHCPv6-generated
+> +  addresses.
+> +
+> +- the "announce check" lookup does not backtrack.  Only the destination prefix
+> +  that provided the "unspecific" (::/128) match is checked for source prefixes
+> +  to see what routers advertised what.  This means that for e.g. RIOs, subtree
+> +  routes also have to be created.  (Backtracking for this case would further
+> +  increase the cost of source address selection, for a pretty rare situation
+> +  that has an easy fix/workaround.)
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index f3218abefd0c..4edf48362a07 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -18912,6 +18912,7 @@ F:	Documentation/netlink/specs/rt-addr.yaml
+>  F:	Documentation/netlink/specs/rt-neigh.yaml
+>  F:	Documentation/netlink/specs/rt-route.yaml
+>  F:	Documentation/netlink/specs/rt-rule.yaml
+> +F:	Documentation/networking/ipv6-addrsel.rst
 
-[ ... ]
-> +static void ibmveth_get_strings(struct net_device *dev, u32 stringset, u8 *data)
-> +{
-[ ... ]
-> +	for (i = 0; i < adapter->num_rx_queues; i++) {
-> +		ethtool_sprintf(&p, "rx%d_packets", i);
-> +		ethtool_sprintf(&p, "rx%d_bytes", i);
+It seems weird to add this one file here - I wonder why there isn't just
+an entry for Documentation/networking ?
 
-[Severity: Low]
-Are these private ethtool stringsets duplicating standard kernel statistics?
+Thanks,
 
-According to the subsystem guidelines, per-queue packet and byte statistics
-that have a standard UAPI representation (like struct netdev_queue_stats_rx
-exported via netlink) should not be duplicated as private ethtool strings.
-
-> diff --git a/drivers/net/ethernet/ibm/ibmveth.h b/drivers/net/ethernet/ibm/ibmveth.h
-> index f7b20fd01acb5..390c660af979e 100644
-> --- a/drivers/net/ethernet/ibm/ibmveth.h
-> +++ b/drivers/net/ethernet/ibm/ibmveth.h
-> @@ -316,9 +316,21 @@ struct ibmveth_rx_queue_stats {
->  	u64 no_buffer_drops;
->  };
->  
-> +struct ibmveth_tx_queue_stats {
-> +	u64 packets;
-> +	u64 bytes;
-> +	u64 large_packets;
-> +	u64 dropped_packets;
-> +	u64 send_failures;
-> +	u64 checksum_offload;
-> +};
-
-[Severity: Medium]
-Will this structure layout prevent cache line false sharing?
-
-The commit message mentions tracking transmit counters per TX queue to avoid
-cache line contention, but struct ibmveth_tx_queue_stats appears to be
-exactly 48 bytes and lacks cacheline alignment annotations like
-____cacheline_aligned. When allocated as a contiguous array, will multiple
-CPUs processing different queues end up writing to the same hardware
-cacheline?
+jon
 
