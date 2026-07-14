@@ -1,376 +1,1205 @@
-Return-Path: <netdev+bounces-307361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307363-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zH8xOODUVWpauAAAu9opvQ
-	(envelope-from <netdev+bounces-307361-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 08:19:12 +0200
+	id IHriKYnVVWqIuAAAu9opvQ
+	(envelope-from <netdev+bounces-307363-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 08:22:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70B5C7516A5
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 08:19:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E99EC751729
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 08:22:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=N4HpV764;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307361-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307361-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=nvidia.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=etsalapatis-com.20251104.gappssmtp.com header.s=20251104 header.b=fK3l6X0p;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307363-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307363-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 49A1F304D9E5
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 06:18:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A29FF303D30A
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 06:21:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C2423D9666;
-	Tue, 14 Jul 2026 06:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3581A3D5222;
+	Tue, 14 Jul 2026 06:21:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010050.outbound.protection.outlook.com [52.101.193.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958F8392C48;
-	Tue, 14 Jul 2026 06:18:21 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784009903; cv=fail; b=QQg5/F8RaNLVJDYVRyEkqVEhxWF5xj7liButEvHXw3lwgVcK1yLxKLPIP97iKRRCAhf/KObv4B75ouA/FXMgiutLmaCq/kW9nRpuJJDQ4JEIlFf2NGOKAxRsTRNbS0Wtr65l5cJwiUHfkYGaHgVI8JBNQCH6Vmcp4s111LiYHn4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784009903; c=relaxed/simple;
-	bh=S67s0rtAaTL8aHVXt47iGr5G4WSq+lEFt3JfQC4zWtk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R1Q2oFhWi2oRFrzL7XjNeLMBBdRNE1WVvVaZ6lFtAht8yQWyTHEJ8tsJkQ7QF0gl4EQInJDH24l/7pykZ3QhfeTbG9R6rVILopU5mkjFesvG0fAZPclg9U9SPPgIMTJoSqD3lnE0KcUWis8fmJL293EWmbp/YAgai6lgrw50w3c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=N4HpV764; arc=fail smtp.client-ip=52.101.193.50
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tsJdXZ89LXvybMisZyh4IW7S5j/t7PieX5F+aEhplNcxPpgjIiHi3F3NuSFFSltsdKy9eZNnqjWDbKqpdKwFDdact2fJKxz0prc87UDPy4va+B3uwh0Rf7K4/3BvSWwD/oePtpS8WrsWZLgCuICJ43po9gB0FuK1UBWl+VZ/69G6G0GKvzgfHaCUKoUwca0K/zfXlcwUm87GT7CkJH/D3qIECywGRrv0dpvYqTwjyv1OnoVe7xwKe+2nduiiTe88lUfmDxGN2tO72GlTwmTTNGw005WIeSEKt/HdIcwCr9/XuEhe0WHIa6XWwmTtgIoefWii78oG8vFCmCZOM4QYVg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ACqm/CcgzpVimUpXttDR/eUO0iskxOaU48YIpGum1cs=;
- b=IszUtwoofavT9P0IPd0tGnrFDXDdle4X5wuvT8pxvUwSsZXoQWP12UYajeM4iGiFBtnj3+wccY3TUC/n9DuKHZHTLh1QuBqtI1XYEADajWLNvm/wRlOPkwiH10wWmtWIaXUPwnTHu5D6swIZak1wfBV/nQFaFMXLkrI1F059l0jnoM0grklzar8vlMtZDgtmvdIMydY6e7o4OHslPHAsRc6ETOM1Dj1bfD0/TmLeZ/UzKnnHkNSOzgud33ahIV1k9Ju99hzjk3DImkgF1Tvv9ChZIG+phk1NiqbUVEaN7X5UP7LNDI89P/qy8SNqjrAM2bAblSRC80NKWr4xTnXMDg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=resnulli.us smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ACqm/CcgzpVimUpXttDR/eUO0iskxOaU48YIpGum1cs=;
- b=N4HpV764N86QmTCGoSde/ABj89jTZuMDwMsDigc7TquQ0PYqq8o7nRd0+9QJBbyKqIb6UJdaAljpU75FTWxY6S1W8WxZtLMEJC6y6f5aR9HYvvUVZN9sUAZZi0Fl8xQNzRbe1Frf/7ixe+9iLPzeVjUPGJa1EO3Q4VroX3xYCEoZYsTzcydlRdNRH477MCYrun6ijZhzQRD5I0HMqCnwMCPzlwSyqZ+LkpBbhSTjsPLxiXor5GM4n7U7Xi7tTHfT9f2bwxhQgYkuB7/9Nn8uemMeeyUciZElSNnpTRdc6h2MBV3d4N/qk5Qausc4KLSiQRWzBwXb9d93PEckuEcW1g==
-Received: from MN2PR18CA0011.namprd18.prod.outlook.com (2603:10b6:208:23c::16)
- by IA1PR12MB8239.namprd12.prod.outlook.com (2603:10b6:208:3f7::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.202.19; Tue, 14 Jul
- 2026 06:18:16 +0000
-Received: from BN3PEPF0000B075.namprd04.prod.outlook.com
- (2603:10b6:208:23c:cafe::55) by MN2PR18CA0011.outlook.office365.com
- (2603:10b6:208:23c::16) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.202.19 via Frontend Transport; Tue,
- 14 Jul 2026 06:18:16 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BN3PEPF0000B075.mail.protection.outlook.com (10.167.243.120) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.223.9 via Frontend Transport; Tue, 14 Jul 2026 06:18:15 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 13 Jul
- 2026 23:17:54 -0700
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 13 Jul
- 2026 23:17:54 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.7)
- with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Mon, 13
- Jul 2026 23:17:50 -0700
-From: Mark Bloch <mbloch@nvidia.com>
-To: Jiri Pirko <jiri@resnulli.us>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>
-CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, Mark Bloch <mbloch@nvidia.com>
-Subject: [PATCH net-next V6 4/4] devlink: Apply eswitch mode boot defaults
-Date: Tue, 14 Jul 2026 09:17:30 +0300
-Message-ID: <20260714061731.531849-5-mbloch@nvidia.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260714061731.531849-1-mbloch@nvidia.com>
-References: <20260714061731.531849-1-mbloch@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D15537268D
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 06:21:34 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784010097; cv=none; b=DtXTFsE1VnLM7NgXOsT1HlgjkK/xECPOG5NDd2pyczLej2WJA5xJruZGIDS2k2gfMntEfZ22bRq1+LsVzG2JO1Cbv5LKV+zPTv7lG/3ZaxZDdwMT16M0HyWbAj9oxGmbZWLcMkpponXG/ovu1FKJ4ZPfQJPsLESNCQg68roPNNk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784010097; c=relaxed/simple;
+	bh=kI0U3ZyHCl4ZIBI+Rr7RnAlEPLW2BgHXVl5FvAw7IaI=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=TZ9sI/SCkmdwcKfu1omovERlhaVOl92F405ZwmEAz0fV+y3mkxJT/W5zdOh3ujueESK4nJbJh4MuX0/Y5yrwqwrdDwnB9MavOVKWcIhT5R+bxGdvHAqh32nlLLxs8SZPSy9AIGm4LGVdZngG+3Vbd9lC0JLMwj5vHOasXKFAf4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=fK3l6X0p; arc=none smtp.client-ip=209.85.210.176
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-8486ac3f347so666027b3a.1
+        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 23:21:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1784010093; x=1784614893; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-type:content-transfer-encoding:mime-version:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=WlLst3Qz7KRr8yuur9ZCrQd60mwFUbPMcGahtbRfpRw=;
+        b=fK3l6X0p4gXL59+n6bCL6rLuuAcmKPJgevOWN083V9S8aXl03QRxmC++00YXyfFTO7
+         fqWSV3WShkcRMadIZ3Zk5MiAhUReDd90Gfx/c3t+CwZC7keGdh9bEKCsjrl0+UhF54jZ
+         q9WrRI5DPQfMO2AZ+UucEyZ1Cfyq+lshJX9jYNrB2kR4Vs7yodCvbqrPbHjEyxMBuA2q
+         z22Ff8pahZW9JiE7MRW0P1pqXc1aH0Nx1++ltLwue6pniRu+FnBY0NdxzIzdnCFLL7SK
+         D6eLQD1UOBpYVumKrJKUL7ra6qgrZCwJbXTjbnlvsGFfC95MwHC4383v/HKBbHxB0Pmw
+         oOVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784010093; x=1784614893;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-type:content-transfer-encoding:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=WlLst3Qz7KRr8yuur9ZCrQd60mwFUbPMcGahtbRfpRw=;
+        b=WcnTAqk3oIeUlMCDbGVk7gUG+u+u3h3SkKsEjIdE6bldTkanQ9zVY62d46um+wWgeE
+         7D4BB5D5ZsrDnvx1oEFsH2ibE79l1LwLAFd4pewP3GdLzJRWlNeFk5aJ0UtPG0iVeuVb
+         S9oiXQY5qas3bR7sYpbo3IftrewEZk3eU/ctzSoibRyfUJVyn/pV0rVwnhjWAP6e3tdh
+         I9bLjWXJSgmlN1E5/Ucwz+gX+5ftj2hxtFcCl+ateg8ggwQhPJZHOghikhVmdUbUSN/i
+         Sq/EjZnDJUs7LPwa1fuNtjWG7XFrogFJsZmiwbAI6jOQ9cZGyM/Rmzjf1njsql1CzRxg
+         FRWw==
+X-Gm-Message-State: AOJu0YxERCmViEDnQblaOsT9Ud/Entiz5CIwyTDJYtqJKCBSWt91/9W2
+	xYqpruCEsqW1xZAhpH55O/p9NJSPxCXCSo9O63okmOX2SItTRTTRlxxUuVD4ZFUDTzo=
+X-Gm-Gg: AfdE7cm4nDdaHkJjpGHbli3AsGZ19pgNNlmcfNcaLOKETaPqzKOC4vLHRzJ9kqE2VRN
+	g7/fRUWNsuff4REF9ngWsrQ2wWsWI0O8om/bw4NxLxGKjMV+hcn+oi4/7EwWlCzsjQjNOEQ4H1p
+	JbRtcqjT/th5SSoppUXpH/+bSnh9pW3i2Db6xNyFAN9MBBWix5gZ0u84kNw6egnR3ClXig5IAxf
+	F07I0/EPuaUNTN9+KeAvgAGQ7SepWGR4bxBh33yWa14lrGL81WFRY0ftRqsP9rmtgZyfK8wbxHJ
+	YqVVyw4T0V6UW1Vw0sBAf3BTZhF6QMkpEHLF4K/NlARuoqof4ExLKGcgDdJRhQHO49LVAlNOCSF
+	HMHM/h1TYQ6TGvvxPHM6EQTi3SSoTbvFk6oDA4yky3M1nLC5+UtkoKoTQz8KoNVGfPnMiRMOfmj
+	F14MiDwO5AgvqTMpWMmOG4emKHyeWSEg76bhb0s38raQ==
+X-Received: by 2002:a05:6a00:4f95:b0:848:55a6:fbe with SMTP id d2e1a72fcca58-8488ad099ccmr11197739b3a.35.1784010093302;
+        Mon, 13 Jul 2026 23:21:33 -0700 (PDT)
+Received: from localhost (107-190-31-17.cpe.teksavvy.com. [107.190.31.17])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84a4f271ddbsm952780b3a.18.2026.07.13.23.21.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Jul 2026 23:21:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PEPF0000B075:EE_|IA1PR12MB8239:EE_
-X-MS-Office365-Filtering-Correlation-Id: bef2cb12-68c9-4ebc-6522-08dee16fb108
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|36860700016|7416014|82310400026|23010399003|22082099003|18002099003|11063799006|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	kzxS+t7LAlwp95Oz+Tc8NervUbChPeK75ihQQFfmI0A5mI+F3ZHlrwx5AbRUYHrv2vlT/ct+XdokUihvJgrykBGjpaWeTJb5n9rw6IVr7xs7e76xzvKRNdG8gW/+/0nDPUlIpJmIJHG97mJfu7NnI75+9pJvY/sh6I/bkn2A09qY61vHdgcyIrSdAFpJYAzdxoCOv0tOs9udHFHGWL+WRsQADd0wyowGi1ezZh6gh0ytd5NBjKDAHDKsoGFfQ7Ea3UoueryPTaomS8U9/8q/9asLvkuk2WGdDrMZQVPKORpRYg7DJEAB7DCHPbqpB9/HLw5IZ6pxjV7jxo3YDNSPpIDOThu1QuGn8/5GbA3xmd1IGqT7asQhdK1zVLFeoKmWEx9MF8THZI8SC/dA9hsHtSgVFuvC+JnyNYe0PXeYQLKE68/5AblhCm+YFfyoiaHTaYZtEKIq8YMJCqqJK0SI4azC4Ff+15YL0rANOeKlx33PKXVsuzOOE8YT+etUuxSensH9r9NiQHsZ6+vB+UQeXTIlRqm2pukLTr1du0m2YTxHc9NmvbFhgOTYAm+VA5HkPd/rWBQa0FPggAFd7pTKE8eqBYn9Kct/quvCf/oZtmdUwf1zcI6Zj3zepjA2pec+u3pxgVmVr63YH5c/KQRchbGI0knatLLLlVggxXqZJruY0lG0OUuCkSAChWRr7jS7SkRWCfxwu5eoWwo8AxO/3Q==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700016)(7416014)(82310400026)(23010399003)(22082099003)(18002099003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	KQRPIA+ZP7dmBaBcrSv/qJMk9aa386UuiFdY27UJHQHrp8J7fGYT2wvLs4A7rannKWBe/SwuOxS7+qEtrfnIS/gVNBs+PnMOIjPVKaKd0CxZvLsRIueGIBtviSiGX7Y8qzkHeLWGI1gXEJS8JBE9OyYGl/+7BjhyvlIvrxo2ozyrPtuo5au8e4kOK8gN+ooL6RGYSL4Q2/vYYsWQGC/FhxAk3X68C3Tt56TRkiznoTsu8yUCADkm+d4La7OwxBya7Bm9FHgKg9N86XgG5Qw3u4Et1XCusMosdgo0YMTXyorHZfEutaisj2JodwAMDArhktxWvHk5GLzVDtLfsxp5fQ2wTJ9d087fyiM2oY604oDdIpqJoqpE5fQeKwcVehDzNfLFq7N1FOAHjMhP6KpLJJZz4AKk8R7MtC99xc4TRCgbcWW5+ephLOw31A9zuCXB
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2026 06:18:15.9074
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bef2cb12-68c9-4ebc-6522-08dee16fb108
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN3PEPF0000B075.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8239
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 14 Jul 2026 02:21:31 -0400
+Message-Id: <DJY2SPXTF9HL.10SSKCT9OMMBV@etsalapatis.com>
+Cc: <netdev@vger.kernel.org>, <alexei.starovoitov@gmail.com>,
+ <andrii@kernel.org>, <daniel@iogearbox.net>, <eddyz87@gmail.com>,
+ <memxor@gmail.com>, <martin.lau@kernel.org>, <shakeel.butt@linux.dev>,
+ <roman.gushchin@linux.dev>, <kuniyu@google.com>,
+ <kerneljasonxing@gmail.com>, <kernel-team@meta.com>
+Subject: Re: [PATCH bpf-next v3 09/15] bpf: Add infrastructure to support
+ attaching struct_ops to cgroups
+From: "Emil Tsalapatis" <emil@etsalapatis.com>
+To: "Amery Hung" <ameryhung@gmail.com>, <bpf@vger.kernel.org>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260706171918.317102-1-ameryhung@gmail.com>
+ <20260706171918.317102-10-ameryhung@gmail.com>
+In-Reply-To: <20260706171918.317102-10-ameryhung@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:alexei.starovoitov@gmail.com,m:andrii@kernel.org,m:daniel@iogearbox.net,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@kernel.org,m:shakeel.butt@linux.dev,m:roman.gushchin@linux.dev,m:kuniyu@google.com,m:kerneljasonxing@gmail.com,m:kernel-team@meta.com,m:ameryhung@gmail.com,m:bpf@vger.kernel.org,m:alexeistarovoitov@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307361-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[mbloch@nvidia.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:jiri@resnulli.us,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:andrew+netdev@lunn.ch,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-doc@vger.kernel.org,m:mbloch@nvidia.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mbloch@nvidia.com,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[etsalapatis.com];
+	FORGED_SENDER(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307363-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:from_mime,nvidia.com:email,nvidia.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,Nvidia.com:dkim];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,linux.dev,google.com,meta.com];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 70B5C7516A5
+X-Rspamd-Queue-Id: E99EC751729
 
-Apply parsed devlink_eswitch_mode= defaults after devlink registration
-and after successful reload.
+On Mon Jul 6, 2026 at 1:19 PM EDT, Amery Hung wrote:
+> From: Martin KaFai Lau <martin.lau@kernel.org>
+>
+> This patch adds necessary infrastructure to attach a struct_ops
+> map to a cgroup. The initial need was to support migrating
+> the legacy BPF_PROG_TYPE_SOCK_OPS to a struct_ops.
+> Recently, there are other struct_ops use cases that
+> need to attach struct_ops to a cgroup. For example,
+> the recent BPF OOM and memcg discussion in LSFMMBPF 2026.
+>
+> The motivation is to create a consistent expectation
+> for attaching struct_ops to cgroup instead of each subsystem
+> creating its own infrastructure. This logic includes
+> hierarchy expectation, ordering expectation,
+> attachment API, and rcu gp.
+>
+> There is already an existing implementation for attaching
+> multiple bpf progs to a cgroup. There are also tools
+> built around it for querying. Attaching a struct_ops map
+> (which is a group of bpf programs) could also adhere to
+> a similar API and potentially reuse most of the existing
+> implementation.
+>
+> A couple of ideas have been tried. One of them
+> is to use mprog.c. In terms of the amount of changes,
+> I eventually came to the same conclusion as in
+> commit 120933984460 ("bpf: Implement mprog API on top of existing cgroup =
+progs").
+> I then shifted the focus to reusing the current
+> {update,compute,activate,purge}_effective_progs() which has
+> the main logic that implements the mprog API.
+>
+> Since then, I tried to add a 'struct cgroup *cgroup' member
+> to the existing 'struct bpf_struct_ops_link' and link_create
+> will create a 'struct bpf_struct_ops_link' object to be stored
+> in the pl->link. This turns out to have more changes on
+> both cgroup.c and bpf_struct_ops.c than I like.
+>
+> This patch directly reuses the 'struct bpf_cgroup_link' which
+> cgroup.c already understands. Add 'struct bpf_map *map'
+> to 'struct bpf_cgroup_link'. In the future, as more subsystems
+> are extended by struct_ops, we may consider to make
+> 'struct bpf_map *map' as a primary citizen of a link
+> like 'struct bpf_prog *prog' and directly add
+> 'struct bpf_map *map' to the generic 'struct bpf_link'.
+>
+> The pl->link could be the traditional 'prog' link or the
+> new 'map' link. The places that need to handle them differently
+> have already been refactored into the new prog_list_*() added in
+> the earlier patch. In those new prog_list_*(), this patch will
+> check "pl->link && pl->link->map", learn that it is a 'map' link
+> and handle it correctly.
+>
+> The bpf_prog_array also needs to handle that its item can store
+> the traditional 'prog' or it can store a struct_ops map.
+> The places that need to handle them differently have also
+> been refactored into the new bpf_cgroup_array_*() added
+> in the earlier patch. The two differences are:
+>   - different sentinel (dummy_bpf_prog in prog vs cfi_stub in struct_ops)
+>   - the array for struct_ops may need to go through different
+>     rcu gp.
+> The bpf_cgroup_array_*() functions use the cgroup_bpf_attach_type (ie aty=
+pe)
+> to distinguish the array is storing prog or storing struct_ops map.
+>
+> This patch also implements a separate struct bpf_link_ops
+> "cgroup_struct_ops_link_ops" to have a separate link_ops implementation
+> that only handles the cgroup's struct_ops link.
+>
+> Questions:
+> - Although this patch did not change it, it is not obvious to me how
+>   the replace_effective_progs() and purge_effective_progs() handle
+>   cases when there are existing BPF_F_PREORDER progs attached
+>   in the hlist.
+>
+> Misc notes:
+> - CGROUP_TCP_SOCK_OPS is added to the 'enum cgroup_bpf_attach_type'.
+>   The actual implementation of the tcp_bpf_ops (a struct_ops)
+>   will be added in the next patch.
+>
+> - free_after_mult_rcu_gp is added to 'struct bpf_struct_ops' such that
+>   the bpf_prog_array can have a mix of sleepable and
+>   non-sleepable prog in a struct_ops. This can tell
+>   how the bpf_prog_array should be freed.
+>
+> - For a struct_ops that supports cgroup attachment, it does not need to
+>   implement its own reg/unreg function. reg/unreg to a cgroup is
+>   done by the common infrastructure added in this patch.
+>
+> - The cgroup's struct_ops link only supports BPF_F_ALLOW_MULTI.
+>   This is enforced internally in cgroup_bpf_struct_ops_attach.
+>   This should be consistent with the current prog's link
+>   behavior in cgroup_bpf_link_attach.
+>
+>   In the future, we may allow each subsystem to choose differently.
+>
+> - A cgroup_atype member is added to 'struct bpf_struct_ops'.
+>   When a subsystem struct_ops needs to support cgroup attachment,
+>   it needs to add a value to 'enum cgroup_bpf_attach_type'
+>   and then assign it to the newly added cgroup_atype member
+>   in the bpf_struct_ops.
+>
+> - During LINK_CREATE in syscall, the patch uses the same
+>   BPF_STRUCT_OPS (in attr->link_create.attach_type).
+>   The bpf_struct_ops_link_create learns the map and
+>   from the map it learns the st_ops. If the st_ops->cgroup_atype
+>   is not 0, it will create a cgroup's link.
+>
+> - When a subsystem registers a struct_ops that supports cgroup
+>   attachment, the struct_ops infrastructure will also ask the
+>   cgroup infrastructure to remember a few things. This is done
+>   by calling cgroup_bpf_struct_ops_register().
+>
+> Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
 
-Mark the default mode as pending when a devlink instance is allocated.
-Before devl_unlock() releases the instance lock, apply a pending default
-when the instance is registered.
+Hi Amery,
 
-Clear the pending state before calling into the driver so the boot
-default remains a one-shot operation even if the mode change fails.
+> ---
+>  include/linux/bpf-cgroup-defs.h |   1 +
+>  include/linux/bpf-cgroup.h      |  28 +++
+>  include/linux/bpf.h             |  19 +-
+>  include/uapi/linux/bpf.h        |   4 +-
+>  kernel/bpf/bpf_struct_ops.c     |  29 +++
+>  kernel/bpf/btf.c                |  23 +-
+>  kernel/bpf/cgroup.c             | 375 ++++++++++++++++++++++++++++++--
+>  kernel/bpf/syscall.c            |   1 +
+>  tools/include/uapi/linux/bpf.h  |   4 +-
+>  9 files changed, 463 insertions(+), 21 deletions(-)
+>
+> diff --git a/include/linux/bpf-cgroup-defs.h b/include/linux/bpf-cgroup-d=
+efs.h
+> index c9e6b26abab6..0147b8bec973 100644
+> --- a/include/linux/bpf-cgroup-defs.h
+> +++ b/include/linux/bpf-cgroup-defs.h
+> @@ -47,6 +47,7 @@ enum cgroup_bpf_attach_type {
+>  	CGROUP_INET6_GETSOCKNAME,
+>  	CGROUP_UNIX_GETSOCKNAME,
+>  	CGROUP_INET_SOCK_RELEASE,
+> +	CGROUP_TCP_SOCK_OPS,
+>  	CGROUP_LSM_START,
+>  	CGROUP_LSM_END =3D CGROUP_LSM_START + CGROUP_LSM_NUM - 1,
+>  	MAX_CGROUP_BPF_ATTACH_TYPE
+> diff --git a/include/linux/bpf-cgroup.h b/include/linux/bpf-cgroup.h
+> index 4d0cc65976a1..8a75a6cd7309 100644
+> --- a/include/linux/bpf-cgroup.h
+> +++ b/include/linux/bpf-cgroup.h
+> @@ -100,6 +100,8 @@ struct bpf_cgroup_storage {
+>  struct bpf_cgroup_link {
+>  	struct bpf_link link;
+>  	struct cgroup *cgroup;
+> +	struct bpf_map *map;
+> +	wait_queue_head_t wait_hup;
+>  };
+> =20
+>  struct bpf_prog_list {
+> @@ -110,6 +112,18 @@ struct bpf_prog_list {
+>  	u32 flags;
+>  };
+> =20
+> +#define bpf_cgroup_struct_ops_foreach(var, item, cgrp, atype)		\
+> +	for (item =3D rcu_dereference((cgrp)->bpf.effective[atype])->items;\
+> +	     ((var) =3D READ_ONCE(item->kdata));				\
+> +	     item++)
+> +
+> +static inline bool cgroup_bpf_is_struct_ops_atype(enum cgroup_bpf_attach=
+_type atype)
+> +{
+> +	return atype =3D=3D CGROUP_TCP_SOCK_OPS;
+> +}
+> +void cgroup_bpf_struct_ops_register(int atype, u32 type_id, void *cfi_st=
+ubs, bool mult_trace);
+> +int cgroup_bpf_struct_ops_attach(struct bpf_map *map, const union bpf_at=
+tr *attr);
+> +
+>  void __init cgroup_bpf_lifetime_notifier_init(void);
+> =20
+>  int __cgroup_bpf_run_filter_skb(struct sock *sk,
+> @@ -479,6 +493,20 @@ static inline int bpf_percpu_cgroup_storage_update(s=
+truct bpf_map *map,
+>  	return 0;
+>  }
+> =20
+> +static inline bool cgroup_bpf_is_struct_ops_atype(int atype)
+> +{
+> +	return false;
+> +}
+> +static inline void cgroup_bpf_struct_ops_register(int atype, u32 type_id=
+, void *cfi_stubs,
+> +						  bool mult_trace)
+> +{
+> +}
+> +static inline int cgroup_bpf_struct_ops_attach(struct bpf_map *map,
+> +					       const union bpf_attr *attr)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+>  #define cgroup_bpf_enabled(atype) (0)
+>  #define BPF_CGROUP_RUN_SA_PROG_LOCK(sk, uaddr, uaddrlen, atype, t_ctx) (=
+{ 0; })
+>  #define BPF_CGROUP_RUN_SA_PROG(sk, uaddr, uaddrlen, atype) ({ 0; })
+> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+> index e371a4733135..df95ae690da5 100644
+> --- a/include/linux/bpf.h
+> +++ b/include/linux/bpf.h
+> @@ -2100,11 +2100,18 @@ struct btf_member;
+>   *	   unloaded while in use.
+>   * @name: The name of the struct bpf_struct_ops object.
+>   * @func_models: Func models
+> + * @cgroup_atype: A value in enum cgroup_bpf_attach_type for cgroup atta=
+chment.
+> + *		  0 means the struct_ops type does not support cgroup attachment.
+> + *		  If cgroup_atype is non-zero, the @reg and @unreg must be NULL
+> + *		  because the attachment/detachment will be handled by the bpf core.
+>   * @free_after_tasks_rcu_gp: Set to true if it needs the bpf core to wai=
+t for
+>   *                           a tasks_rcu gp before freeing the struct_op=
+s map
+>   *                           and its progs. It is unnecessary if the @un=
+reg
+>   *                           has waited for the correct rcu gp or the @u=
+nreg
+>   *                           has ensured all struct_ops prog has finishe=
+d running.
+> + * @free_after_mult_rcu_gp: Same as @free_after_tasks_rcu_gp but waiting=
+ for
+> + *                          both tasks_trace_rcu and regular rcu grace p=
+eriod.
+> + *                          It is usually needed if the struct_ops has s=
+leepable prog.
+>   */
+>  struct bpf_struct_ops {
+>  	const struct bpf_verifier_ops *verifier_ops;
+> @@ -2123,7 +2130,9 @@ struct bpf_struct_ops {
+>  	struct module *owner;
+>  	const char *name;
+>  	struct btf_func_model func_models[BPF_STRUCT_OPS_MAX_NR_MEMBERS];
+> +	int cgroup_atype;
+>  	bool free_after_tasks_rcu_gp;
+> +	bool free_after_mult_rcu_gp;
+>  };
+> =20
+>  /* Every member of a struct_ops type has an instance even a member is no=
+t
+> @@ -2258,6 +2267,7 @@ void *bpf_struct_ops_map_cfi_stubs(struct bpf_map *=
+map);
+>  bool bpf_struct_ops_valid_to_reg(struct bpf_map *map);
+>  int bpf_struct_ops_link_update_check(struct bpf_map *new_map, struct bpf=
+_map *old_map,
+>  				     struct bpf_map *expected_old_map);
+> +int bpf_struct_ops_map_cgroup_atype(struct bpf_map *map);
+> =20
+>  #ifdef CONFIG_NET
+>  /* Define it here to avoid the use of forward declaration */
+> @@ -2330,6 +2340,10 @@ static inline u32 bpf_struct_ops_kdata_map_id(void=
+ *kdata)
+>  {
+>  	return 0;
+>  }
+> +static inline int bpf_struct_ops_map_cgroup_atype(struct bpf_map *map)
+> +{
+> +	return 0;
+> +}
+>  static inline void *bpf_struct_ops_map_cfi_stubs(struct bpf_map *map)
+>  {
+>  	return NULL;
+> @@ -2519,7 +2533,10 @@ u64 bpf_event_output(struct bpf_map *map, u64 flag=
+s, void *meta, u64 meta_size,
+>   * since other cpus are walking the array of pointers in parallel.
+>   */
+>  struct bpf_prog_array_item {
+> -	struct bpf_prog *prog;
+> +	union {
+> +		struct bpf_prog *prog;
+> +		void *kdata;
+> +	};
+>  	union {
+>  		struct bpf_cgroup_storage *cgroup_storage[MAX_BPF_CGROUP_STORAGE_TYPE]=
+;
+>  		u64 bpf_cookie;
+> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> index c91b5a4bda03..c982801ec7db 100644
+> --- a/include/uapi/linux/bpf.h
+> +++ b/include/uapi/linux/bpf.h
+> @@ -1756,7 +1756,7 @@ union bpf_attr {
+>  			__u32	prog_cnt;
+>  			__u32	count;
+>  		};
+> -		__u32		:32;
+> +		__u32		type_id;
+>  		/* output: per-program attach_flags.
+>  		 * not allowed to be set during effective query.
+>  		 */
+> @@ -6818,6 +6818,8 @@ struct bpf_link_info {
+>  		} xdp;
+>  		struct {
+>  			__u32 map_id;
+> +			__u32 :32;
+> +			__u64 cgroup_id;
+>  		} struct_ops;
+>  		struct {
+>  			__u32 pf;
+> diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
+> index 3d650a7e9f68..06d72cdca601 100644
+> --- a/kernel/bpf/bpf_struct_ops.c
+> +++ b/kernel/bpf/bpf_struct_ops.c
+> @@ -13,6 +13,7 @@
+>  #include <linux/btf_ids.h>
+>  #include <linux/rcupdate_wait.h>
+>  #include <linux/poll.h>
+> +#include <linux/bpf-cgroup.h>
+> =20
+>  struct bpf_struct_ops_value {
+>  	struct bpf_struct_ops_common_value common;
+> @@ -1076,6 +1077,11 @@ static struct bpf_map *bpf_struct_ops_map_alloc(un=
+ion bpf_attr *attr)
+>  		goto errout;
+>  	}
+> =20
+> +	if (st_ops_desc->st_ops->cgroup_atype && !(attr->map_flags & BPF_F_LINK=
+)) {
+> +		ret =3D -EOPNOTSUPP;
+> +		goto errout;
+> +	}
+> +
+>  	vt =3D st_ops_desc->value_type;
+>  	if (attr->value_size !=3D vt->size) {
+>  		ret =3D -EINVAL;
+> @@ -1116,6 +1122,7 @@ static struct bpf_map *bpf_struct_ops_map_alloc(uni=
+on bpf_attr *attr)
+> =20
+>  	mutex_init(&st_map->lock);
+>  	bpf_map_init_from_attr(map, attr);
+> +	map->free_after_mult_rcu_gp =3D st_ops_desc->st_ops->free_after_mult_rc=
+u_gp;
+>  	map->free_after_rcu_gp =3D true;
+> =20
+>  	return map;
+> @@ -1244,6 +1251,14 @@ void *bpf_struct_ops_map_kdata(struct bpf_map *map=
+)
+>  	return st_map->kvalue.data;
+>  }
+> =20
+> +int bpf_struct_ops_map_cgroup_atype(struct bpf_map *map)
+> +{
+> +	struct bpf_struct_ops_map *st_map;
+> +
+> +	st_map =3D container_of(map, struct bpf_struct_ops_map, map);
+> +	return st_map->st_ops_desc->st_ops->cgroup_atype;
+> +}
+> +
+>  void *bpf_struct_ops_map_cfi_stubs(struct bpf_map *map)
+>  {
+>  	struct bpf_struct_ops_map *st_map;
+> @@ -1419,6 +1434,7 @@ int bpf_struct_ops_link_create(union bpf_attr *attr=
+)
+>  	struct bpf_link_primer link_primer;
+>  	struct bpf_struct_ops_map *st_map;
+>  	struct bpf_map *map;
+> +	int cgroup_atype;
+>  	int err;
+> =20
+>  	map =3D bpf_map_get(attr->link_create.map_fd);
+> @@ -1432,6 +1448,19 @@ int bpf_struct_ops_link_create(union bpf_attr *att=
+r)
+>  		goto err_out;
+>  	}
+> =20
+> +	cgroup_atype =3D st_map->st_ops_desc->st_ops->cgroup_atype;
+> +	if (cgroup_atype) {
+> +		err =3D cgroup_bpf_struct_ops_attach(map, attr);
+> +		bpf_map_put(map);
+> +		return err;
+> +	}
+> +
+> +	if (memchr_inv(&attr->link_create.cgroup, 0, sizeof(attr->link_create.c=
+group)) ||
+> +	    attr->link_create.target_fd) {
+> +		err =3D -EINVAL;
+> +		goto err_out;
+> +	}
+> +
+>  	link =3D kzalloc_obj(*link, GFP_USER);
+>  	if (!link) {
+>  		err =3D -ENOMEM;
+> diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
+> index 64572f85edc8..d591f306ace5 100644
+> --- a/kernel/bpf/btf.c
+> +++ b/kernel/bpf/btf.c
+> @@ -20,6 +20,7 @@
+>  #include <linux/btf.h>
+>  #include <linux/btf_ids.h>
+>  #include <linux/bpf.h>
+> +#include <linux/bpf-cgroup.h>
+>  #include <linux/bpf_lsm.h>
+>  #include <linux/skmsg.h>
+>  #include <linux/perf_event.h>
+> @@ -9836,6 +9837,7 @@ btf_add_struct_ops(struct btf *btf, struct bpf_stru=
+ct_ops *st_ops,
+>  		   struct bpf_verifier_log *log)
+>  {
+>  	struct btf_struct_ops_tab *tab, *new_tab;
+> +	int cgroup_atype;
+>  	int i, err;
+> =20
+>  	tab =3D btf->struct_ops_tab;
+> @@ -9847,8 +9849,10 @@ btf_add_struct_ops(struct btf *btf, struct bpf_str=
+uct_ops *st_ops,
+>  		btf->struct_ops_tab =3D tab;
+>  	}
+> =20
+> +	cgroup_atype =3D st_ops->cgroup_atype;
+>  	for (i =3D 0; i < tab->cnt; i++)
+> -		if (tab->ops[i].st_ops =3D=3D st_ops)
+> +		if (tab->ops[i].st_ops =3D=3D st_ops ||
+> +		    (cgroup_atype && cgroup_atype =3D=3D tab->ops[i].st_ops->cgroup_at=
+ype))
+>  			return -EEXIST;
+> =20
+>  	if (tab->cnt =3D=3D tab->capacity) {
+> @@ -9868,6 +9872,23 @@ btf_add_struct_ops(struct btf *btf, struct bpf_str=
+uct_ops *st_ops,
+>  	if (err)
+>  		return err;
+> =20
+> +	if (cgroup_atype) {
+> +		if (!cgroup_bpf_is_struct_ops_atype(cgroup_atype) ||
 
-For successful reloads that performed DRIVER_REINIT, devlink_reload()
-already holds the devlink instance lock and the driver has completed
-reload_up(). Clear the pending state and apply the default directly from
-the reload path.
+Can we add a comment here as to why free_after_tasks_rcu_gp is always
+invalid here (which IIUC is because it's=20
+free_after_mult_rcu_gp)?
 
-Treat an explicit user eswitch mode request as consuming the pending
-default mode.
+> +		    st_ops->reg || st_ops->unreg || st_ops->free_after_tasks_rcu_gp) {
+> +			bpf_struct_ops_desc_release(&tab->ops[btf->struct_ops_tab->cnt]);
+> +			return -EINVAL;
+> +		}
+> +
+> +		/* There is no need to unregister from cgroup when the
+> +		 * btf_free(). No struct_ops map and its cgroup link
+> +		 * can be created once its btf is gone.
+> +		 */
 
-Signed-off-by: Mark Bloch <mbloch@nvidia.com>
----
- net/devlink/core.c          |  3 ++
- net/devlink/default.c       | 70 +++++++++++++++++++++++++++++++++++--
- net/devlink/dev.c           |  6 ++++
- net/devlink/devl_internal.h |  5 +++
- 4 files changed, 82 insertions(+), 2 deletions(-)
+Network-style comment, should be regular kernel-style.
 
-diff --git a/net/devlink/core.c b/net/devlink/core.c
-index fc14ee5d9dcf..cea4afc27dd9 100644
---- a/net/devlink/core.c
-+++ b/net/devlink/core.c
-@@ -317,6 +317,7 @@ EXPORT_SYMBOL_GPL(devl_trylock);
- 
- void devl_unlock(struct devlink *devlink)
- {
-+	devlink_default_esw_mode_apply_pending(devlink);
- 	mutex_unlock(&devlink->lock);
- }
- EXPORT_SYMBOL_GPL(devl_unlock);
-@@ -429,6 +430,7 @@ void devl_unregister(struct devlink *devlink)
- 	ASSERT_DEVLINK_REGISTERED(devlink);
- 	devl_assert_locked(devlink);
- 
-+	devlink_default_esw_mode_apply_pending_clear(devlink);
- 	devlink_notify_unregister(devlink);
- 	xa_clear_mark(&devlinks, devlink->index, DEVLINK_REGISTERED);
- 	devlink_rel_put(devlink);
-@@ -490,6 +492,7 @@ struct devlink *__devlink_alloc(const struct devlink_ops *ops, size_t priv_size,
- 	INIT_LIST_HEAD(&devlink->trap_group_list);
- 	INIT_LIST_HEAD(&devlink->trap_policer_list);
- 	INIT_RCU_WORK(&devlink->rwork, devlink_release);
-+	devlink_default_esw_mode_instance_init(devlink);
- 	lockdep_register_key(&devlink->lock_key);
- 	mutex_init(&devlink->lock);
- 	lockdep_set_class(&devlink->lock, &devlink->lock_key);
-diff --git a/net/devlink/default.c b/net/devlink/default.c
-index 8434af83ea69..77cc356dfac9 100644
---- a/net/devlink/default.c
-+++ b/net/devlink/default.c
-@@ -10,6 +10,7 @@
- 
- static char *devlink_default_esw_mode_param;
- static bool devlink_default_esw_mode_match_all;
-+static bool devlink_default_esw_mode_enabled;
- static enum devlink_eswitch_mode devlink_default_esw_mode;
- static LIST_HEAD(devlink_default_esw_mode_nodes);
- 
-@@ -154,6 +155,7 @@ static void __init devlink_default_esw_mode_nodes_clear(void)
- 	}
- 
- 	devlink_default_esw_mode_match_all = false;
-+	devlink_default_esw_mode_enabled = false;
- }
- 
- static int __init devlink_default_esw_mode_parse(char *str)
-@@ -180,14 +182,78 @@ static int __init devlink_default_esw_mode_parse(char *str)
- 		return err;
- 
- 	err = devlink_default_esw_mode_handles_parse(handles);
--	if (err)
-+	if (err) {
- 		devlink_default_esw_mode_nodes_clear();
--	else
-+	} else {
- 		devlink_default_esw_mode = esw_mode;
-+		devlink_default_esw_mode_enabled = true;
-+	}
- 
- 	return err;
- }
- 
-+static bool devlink_default_esw_mode_match(struct devlink *devlink)
-+{
-+	const char *bus_name = devlink_bus_name(devlink);
-+	const char *dev_name = devlink_dev_name(devlink);
-+	struct devlink_default_esw_mode_node *node;
-+
-+	if (devlink_default_esw_mode_match_all)
-+		return true;
-+
-+	node = devlink_default_esw_mode_node_find(bus_name, dev_name);
-+	return !!node;
-+}
-+
-+void devlink_default_esw_mode_apply_locked(struct devlink *devlink)
-+{
-+	const struct devlink_ops *ops = devlink->ops;
-+	int err;
-+
-+	devl_assert_locked(devlink);
-+
-+	if (!devlink_default_esw_mode_match(devlink))
-+		return;
-+
-+	if (!ops->eswitch_mode_set) {
-+		if (!devlink_default_esw_mode_match_all)
-+			devl_warn(devlink,
-+				  "devlink_eswitch_mode= selected this device but eswitch mode setting is not supported\n");
-+		return;
-+	}
-+
-+	err = devlink_eswitch_mode_set(devlink, devlink_default_esw_mode, NULL);
-+	if (err)
-+		devl_warn(devlink,
-+			  "Couldn't apply default eswitch mode, err %d\n",
-+			  err);
-+}
-+
-+void devlink_default_esw_mode_apply_pending(struct devlink *devlink)
-+{
-+	devl_assert_locked(devlink);
-+
-+	if (!devlink->default_esw_mode_apply_pending ||
-+	    !__devl_is_registered(devlink))
-+		return;
-+
-+	devlink->default_esw_mode_apply_pending = false;
-+	devlink_default_esw_mode_apply_locked(devlink);
-+}
-+
-+void devlink_default_esw_mode_instance_init(struct devlink *devlink)
-+{
-+	devlink->default_esw_mode_apply_pending =
-+		devlink_default_esw_mode_enabled;
-+}
-+
-+void devlink_default_esw_mode_apply_pending_clear(struct devlink *devlink)
-+{
-+	devl_assert_locked(devlink);
-+
-+	devlink->default_esw_mode_apply_pending = false;
-+}
-+
- static int __init devlink_default_esw_mode_setup(char *str)
- {
- 	devlink_default_esw_mode_param = str;
-diff --git a/net/devlink/dev.c b/net/devlink/dev.c
-index 119ef105d0a7..611bb6bfd492 100644
---- a/net/devlink/dev.c
-+++ b/net/devlink/dev.c
-@@ -478,6 +478,11 @@ int devlink_reload(struct devlink *devlink, struct net *dest_net,
- 		return err;
- 
- 	WARN_ON(!(*actions_performed & BIT(action)));
-+	if (*actions_performed & BIT(DEVLINK_RELOAD_ACTION_DRIVER_REINIT)) {
-+		devlink_default_esw_mode_apply_pending_clear(devlink);
-+		devlink_default_esw_mode_apply_locked(devlink);
-+	}
-+
- 	/* Catch driver on updating the remote action within devlink reload */
- 	WARN_ON(memcmp(remote_reload_stats, devlink->stats.remote_reload_stats,
- 		       sizeof(remote_reload_stats)));
-@@ -731,6 +736,7 @@ int devlink_nl_eswitch_set_doit(struct sk_buff *skb, struct genl_info *info)
- 	u16 mode;
- 
- 	if (info->attrs[DEVLINK_ATTR_ESWITCH_MODE]) {
-+		devlink_default_esw_mode_apply_pending_clear(devlink);
- 		mode = nla_get_u16(info->attrs[DEVLINK_ATTR_ESWITCH_MODE]);
- 		err = devlink_eswitch_mode_set(devlink, mode, info->extack);
- 		if (err)
-diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
-index fe9ad58515d4..97f53394b1c0 100644
---- a/net/devlink/devl_internal.h
-+++ b/net/devlink/devl_internal.h
-@@ -58,6 +58,7 @@ struct devlink {
- 	struct mutex lock;
- 	struct lock_class_key lock_key;
- 	u8 reload_failed:1;
-+	u8 default_esw_mode_apply_pending:1;
- 	refcount_t refcount;
- 	struct rcu_work rwork;
- 	struct devlink_rel *rel;
-@@ -73,6 +74,10 @@ struct devlink *__devlink_alloc(const struct devlink_ops *ops, size_t priv_size,
- 				const struct device_driver *dev_driver);
- int devlink_default_esw_mode_init(void);
- void devlink_default_esw_mode_cleanup(void);
-+void devlink_default_esw_mode_instance_init(struct devlink *devlink);
-+void devlink_default_esw_mode_apply_locked(struct devlink *devlink);
-+void devlink_default_esw_mode_apply_pending(struct devlink *devlink);
-+void devlink_default_esw_mode_apply_pending_clear(struct devlink *devlink);
- 
- #define devl_warn(devlink, format, args...)				\
- 	do {								\
--- 
-2.43.0
+In terms of the content: What happens if the struct_ops are in a module,
+then we load/unload/reload? IIUC even if the signatures are identical,
+the btf_id could be different so it's not like we can always reuse the
+previous cgroup registration.
+
+> +		cgroup_bpf_struct_ops_register(cgroup_atype,
+> +					       tab->ops[btf->struct_ops_tab->cnt].type_id,
+> +					       st_ops->cfi_stubs,
+> +					       st_ops->free_after_mult_rcu_gp);
+> +	}
+> +
+>  	btf->struct_ops_tab->cnt++;
+> =20
+>  	return 0;
+> diff --git a/kernel/bpf/cgroup.c b/kernel/bpf/cgroup.c
+> index 081d81de1816..745e826c9f61 100644
+> --- a/kernel/bpf/cgroup.c
+> +++ b/kernel/bpf/cgroup.c
+> @@ -24,6 +24,29 @@
+>  DEFINE_STATIC_KEY_ARRAY_FALSE(cgroup_bpf_enabled_key, MAX_CGROUP_BPF_ATT=
+ACH_TYPE);
+>  EXPORT_SYMBOL(cgroup_bpf_enabled_key);
+> =20
+> +static u32 struct_ops_type_id[MAX_CGROUP_BPF_ATTACH_TYPE];
+> +static void *struct_ops_cfi_stubs[MAX_CGROUP_BPF_ATTACH_TYPE];
+> +static bool struct_ops_mult_rcu[MAX_CGROUP_BPF_ATTACH_TYPE];
+
+
+Can we make a struct out of those? Right now we're carrying them loose
+into the module even though every index corresponds to a single
+registered struct_oips.
+
+> +
+> +void cgroup_bpf_struct_ops_register(int atype, u32 type_id, void *cfi_st=
+ubs, bool mult_rcu)
+> +{
+> +	struct_ops_type_id[atype] =3D type_id;
+> +	struct_ops_cfi_stubs[atype] =3D cfi_stubs;
+> +	struct_ops_mult_rcu[atype] =3D mult_rcu;
+> +}
+> +
+> +static enum cgroup_bpf_attach_type find_atype_by_struct_ops_id(u32 type_=
+id)
+> +{
+> +	enum cgroup_bpf_attach_type atype;
+> +
+> +	for (atype =3D 0; atype < MAX_CGROUP_BPF_ATTACH_TYPE; atype++) {
+> +		if (cgroup_bpf_is_struct_ops_atype(atype) &&
+> +		    struct_ops_type_id[atype] =3D=3D type_id)
+> +			return atype;
+> +	}
+> +	return CGROUP_BPF_ATTACH_TYPE_INVALID;
+> +}
+> +
+>  /*
+>   * cgroup bpf destruction makes heavy use of work items and there can be=
+ a lot
+>   * of concurrent destructions.  Use a separate workqueue so that cgroup =
+bpf
+> @@ -306,6 +329,19 @@ static void bpf_cgroup_storages_link(struct bpf_cgro=
+up_storage *storages[],
+>  		bpf_cgroup_storage_link(storages[stype], cgrp, attach_type);
+>  }
+> =20
+> +static void cgroup_struct_ops_link_detach_wake(struct bpf_cgroup_link *l=
+ink, bool wake_poll)
+> +{
+> +	cgroup_put(link->cgroup);
+> +	link->cgroup =3D NULL;
+> +
+> +	bpf_map_put(link->map);
+> +	/* READ_ONCE in cgroup_struct_ops_link_poll */
+> +	WRITE_ONCE(link->map, NULL);
+> +
+> +	if (wake_poll)
+> +		wake_up_interruptible_poll(&link->wait_hup, EPOLLHUP);
+> +}
+> +
+>  /* Called when bpf_cgroup_link is auto-detached from dying cgroup.
+>   * It drops cgroup and bpf_prog refcounts, and marks bpf_link as defunct=
+. It
+>   * doesn't free link memory, which will eventually be done by bpf_link's
+> @@ -313,21 +349,37 @@ static void bpf_cgroup_storages_link(struct bpf_cgr=
+oup_storage *storages[],
+>   */
+>  static void bpf_cgroup_link_auto_detach(struct bpf_cgroup_link *link)
+>  {
+> -	if (link->link.prog->expected_attach_type =3D=3D BPF_LSM_CGROUP)
+> -		bpf_trampoline_unlink_cgroup_shim(link->link.prog);
+> -	cgroup_put(link->cgroup);
+> -	link->cgroup =3D NULL;
+> +	if (link->map) {
+> +		cgroup_struct_ops_link_detach_wake(link, true);
+> +	} else {
+> +		if (link->link.prog->expected_attach_type =3D=3D BPF_LSM_CGROUP)
+> +			bpf_trampoline_unlink_cgroup_shim(link->link.prog);
+> +		cgroup_put(link->cgroup);
+> +		link->cgroup =3D NULL;
+> +	}
+
+Nit: If we write this as:
+	if (link->map) {
+		cgroup_struct_ops_link_detach_wake(link, true);
+		return
+	}
+
+it's slightly less churn.
+
+> +}
+> +
+> +static void bpf_cgroup_array_free_rcu(struct rcu_head *rcu)
+> +{
+> +	kfree(container_of(rcu, struct bpf_prog_array, rcu));
+>  }
+> =20
+> -static void bpf_cgroup_array_free(struct bpf_prog_array *array)
+> +static void bpf_cgroup_array_free(struct bpf_prog_array *array,
+> +				  enum cgroup_bpf_attach_type atype)
+>  {
+>  	if (!array || array =3D=3D &bpf_empty_prog_array)
+>  		return;
+> -	kfree_rcu(array, rcu);
+> +	if (struct_ops_mult_rcu[atype])
+> +		/* RCU tasks trace grace period implies RCU grace period. */
+> +		call_rcu_tasks_trace(&array->rcu, bpf_cgroup_array_free_rcu);
+> +	else
+> +		kfree_rcu(array, rcu);
+>  }
+> =20
+>  static void *bpf_cgroup_array_dummy(enum cgroup_bpf_attach_type atype)
+>  {
+> +	if (cgroup_bpf_is_struct_ops_atype(atype))
+> +		return struct_ops_cfi_stubs[atype];
+>  	return bpf_prog_dummy();
+>  }
+> =20
+> @@ -355,7 +407,12 @@ static int bpf_cgroup_array_copy_to_user(struct bpf_=
+prog_array *array,
+>  	for (item =3D array->items; item->prog && i < cnt; item++) {
+>  		if (item->prog =3D=3D bpf_cgroup_array_dummy(atype))
+
+Retroactive nit for bpf_cgroup_array_dummy: The name is pretty confusing, s=
+omething
+that explain that this is really a tombstone value would be nicer.
+Especially since we're repurposing the cfi_stubs for per-attach type
+tombstones.
+
+>  			continue;
+> -		id =3D item->prog->aux->id;
+> +
+> +		if (cgroup_bpf_is_struct_ops_atype(atype))
+> +			id =3D bpf_struct_ops_id(item->kdata);
+> +		else
+> +			id =3D item->prog->aux->id;
+> +
+>  		if (copy_to_user(prog_ids + i, &id, sizeof(id)))
+>  			return -EFAULT;
+>  		i++;
+> @@ -417,7 +474,7 @@ static void cgroup_bpf_release(struct work_struct *wo=
+rk)
+>  		old_array =3D rcu_dereference_protected(
+>  				cgrp->bpf.effective[atype],
+>  				lockdep_is_held(&cgroup_mutex));
+> -		bpf_cgroup_array_free(old_array);
+> +		bpf_cgroup_array_free(old_array, atype);
+>  	}
+> =20
+>  	list_for_each_entry_safe(storage, stmp, storages, list_cg) {
+> @@ -461,17 +518,26 @@ static struct bpf_prog *prog_list_prog(struct bpf_p=
+rog_list *pl)
+> =20
+>  static void prog_list_init_item(struct bpf_prog_list *pl, struct bpf_pro=
+g_array_item *item)
+>  {
+> -	item->prog =3D prog_list_prog(pl);
+> -	bpf_cgroup_storages_assign(item->cgroup_storage, pl->storage);
+> +	if (pl->link && pl->link->map) {
+> +		item->kdata =3D bpf_struct_ops_map_kdata(pl->link->map);
+> +	} else {
+> +		item->prog =3D prog_list_prog(pl);
+> +		bpf_cgroup_storages_assign(item->cgroup_storage, pl->storage);
+> +	}
+
+Same nit as above, an if-return avoid reformatting existing code.
+
+>  }
+> =20
+>  static void prog_list_replace_item(struct bpf_prog_list *pl, struct bpf_=
+prog_array_item *item)
+>  {
+> -	WRITE_ONCE(item->prog, pl->link->link.prog);
+> +	if (pl->link && pl->link->map)
+
+Can we somehow encapsulate the pl->link && pl->link->map to give it a
+more descriptive name? It's mentioned in previous commit descriptions
+what it is for, but as it stands it takes some thought to realize it's
+checking if this is a struct_ops item or a regular prog.
+
+> +		WRITE_ONCE(item->kdata, bpf_struct_ops_map_kdata(pl->link->map));
+> +	else
+> +		WRITE_ONCE(item->prog, pl->link->link.prog);
+>  }
+> =20
+>  static u32 prog_list_id(struct bpf_prog_list *pl)
+>  {
+> +	if (pl->link && pl->link->map)
+
+Ditto.
+
+> +		return pl->link->map->id;
+>  	return prog_list_prog(pl)->aux->id;
+>  }
+> =20
+> @@ -591,7 +657,7 @@ static void activate_effective_progs(struct cgroup *c=
+grp,
+>  	/* free prog array after grace period, since __cgroup_bpf_run_*()
+>  	 * might be still walking the array
+>  	 */
+> -	bpf_cgroup_array_free(old_array);
+> +	bpf_cgroup_array_free(old_array, atype);
+>  }
+> =20
+>  /**
+> @@ -631,7 +697,7 @@ static int cgroup_bpf_inherit(struct cgroup *cgrp)
+>  	return 0;
+>  cleanup:
+>  	for (i =3D 0; i < NR; i++)
+> -		bpf_cgroup_array_free(arrays[i]);
+> +		bpf_cgroup_array_free(arrays[i], i);
+> =20
+>  	for (p =3D cgroup_parent(cgrp); p; p =3D cgroup_parent(p))
+>  		cgroup_bpf_put(p);
+> @@ -686,7 +752,7 @@ static int update_effective_progs(struct cgroup *cgrp=
+,
+> =20
+>  		if (percpu_ref_is_zero(&desc->bpf.refcnt)) {
+>  			if (unlikely(desc->bpf.inactive)) {
+> -				bpf_cgroup_array_free(desc->bpf.inactive);
+> +				bpf_cgroup_array_free(desc->bpf.inactive, atype);
+>  				desc->bpf.inactive =3D NULL;
+>  			}
+>  			continue;
+> @@ -705,7 +771,7 @@ static int update_effective_progs(struct cgroup *cgrp=
+,
+>  	css_for_each_descendant_pre(css, &cgrp->self) {
+>  		struct cgroup *desc =3D container_of(css, struct cgroup, self);
+> =20
+> -		bpf_cgroup_array_free(desc->bpf.inactive);
+> +		bpf_cgroup_array_free(desc->bpf.inactive, atype);
+>  		desc->bpf.inactive =3D NULL;
+>  	}
+> =20
+> @@ -940,7 +1006,7 @@ static int __cgroup_bpf_attach(struct cgroup *cgrp,
+>  	if (pl) {
+>  		old_prog =3D pl->prog;
+>  	} else {
+> -		pl =3D kmalloc_obj(*pl);
+> +		pl =3D kzalloc_obj(*pl);
+>  		if (!pl) {
+>  			bpf_cgroup_storages_free(new_storage);
+>  			return -ENOMEM;
+> @@ -1337,7 +1403,17 @@ static int __cgroup_bpf_query(struct cgroup *cgrp,=
+ const union bpf_attr *attr,
+>  	if (effective_query && prog_attach_flags)
+>  		return -EINVAL;
+> =20
+> -	if (type =3D=3D BPF_LSM_CGROUP) {
+> +	if (type =3D=3D BPF_STRUCT_OPS) {
+> +		u32 type_id =3D attr->query.type_id;
+> +
+> +		atype =3D find_atype_by_struct_ops_id(type_id);
+> +		if (atype =3D=3D CGROUP_BPF_ATTACH_TYPE_INVALID)
+> +			return -ENOENT;
+> +		from_atype =3D to_atype =3D atype;
+> +		flags =3D 0;
+> +		if (!cgroup_bpf_enabled(atype))
+> +			goto skip_count;
+> +	} else if (type =3D=3D BPF_LSM_CGROUP) {
+>  		if (!effective_query && attr->query.prog_cnt &&
+>  		    prog_ids && !prog_attach_flags)
+>  			return -EINVAL;
+> @@ -1363,6 +1439,7 @@ static int __cgroup_bpf_query(struct cgroup *cgrp, =
+const union bpf_attr *attr,
+>  		}
+>  	}
+> =20
+> +skip_count:
+>  	/* always output uattr->query.attach_flags as 0 during effective query =
+*/
+>  	flags =3D effective_query ? 0 : flags;
+>  	if (copy_to_user(&uattr->query.attach_flags, &flags, sizeof(flags)))
+> @@ -2820,6 +2897,270 @@ const struct bpf_verifier_ops cg_sockopt_verifier=
+_ops =3D {
+>  const struct bpf_prog_ops cg_sockopt_prog_ops =3D {
+>  };
+> =20
+> +static int __cgroup_struct_ops_link_detach(struct bpf_link *link, bool w=
+ake_poll)
+> +{
+> +	struct bpf_cgroup_link *cg_link =3D container_of(link, struct bpf_cgrou=
+p_link, link);
+> +	enum cgroup_bpf_attach_type atype;
+> +	struct bpf_prog_list *pl;
+> +	struct bpf_map *map;
+> +	struct cgroup *cgrp;
+> +
+> +	cgroup_lock();
+> +
+> +	cgrp =3D cg_link->cgroup;
+> +	if (!cgrp) {
+> +		cgroup_unlock();
+> +		return 0;
+> +	}
+> +
+> +	map =3D cg_link->map;
+> +	atype =3D bpf_struct_ops_map_cgroup_atype(map);
+> +
+> +	hlist_for_each_entry(pl, &cgrp->bpf.progs[atype], node) {
+> +		if (pl->link =3D=3D cg_link)
+> +			break;
+> +	}
+
+What happens if the link isn't found here? Update deals this with
+-ENOENT. Even though it's only possible if there's a bug I think
+we should at least have a warning.
+
+> +
+> +	/* mark deleted so compute_effective_progs() skips it */
+> +	pl->link =3D NULL;
+> +	if (update_effective_progs(cgrp, atype)) {
+> +		pl->link =3D cg_link;
+> +		purge_effective_progs(cgrp, pl, atype);
+> +	}
+> +
+> +	hlist_del(&pl->node);
+> +	cgroup_struct_ops_link_detach_wake(cg_link, wake_poll);
+> +	cgrp->bpf.revisions[atype]++;
+> +
+> +	kfree(pl);
+> +	static_branch_dec(&cgroup_bpf_enabled_key[atype]);
+> +
+> +	cgroup_unlock();
+> +
+> +	return 0;
+> +}
+> +
+> +static int cgroup_struct_ops_link_detach(struct bpf_link *link)
+> +{
+> +	return __cgroup_struct_ops_link_detach(link, true);
+> +}
+> +
+> +static void cgroup_struct_ops_link_dealloc(struct bpf_link *link)
+> +{
+> +	struct bpf_cgroup_link *cg_link =3D container_of(link, struct bpf_cgrou=
+p_link, link);
+> +
+> +	__cgroup_struct_ops_link_detach(link, false);
+> +	kfree(cg_link);
+> +}
+> +
+> +static void cgroup_struct_ops_link_show_fdinfo(const struct bpf_link *li=
+nk, struct seq_file *seq)
+> +{
+> +	struct bpf_cgroup_link *cg_link =3D
+> +		container_of(link, struct bpf_cgroup_link, link);
+> +
+> +	cgroup_lock();
+> +	if (!cg_link->cgroup) {
+> +		cgroup_unlock();
+> +		return;
+> +	}
+> +
+> +	seq_printf(seq, "map_id:\t%u\n", cg_link->map->id);
+> +	seq_printf(seq, "cgroup_id:\t%llu\n", cgroup_id(cg_link->cgroup));
+> +	cgroup_unlock();
+> +}
+> +
+> +static int cgroup_struct_ops_link_fill_link_info(const struct bpf_link *=
+link,
+> +						 struct bpf_link_info *info)
+> +{
+> +	struct bpf_cgroup_link *cg_link =3D container_of(link, struct bpf_cgrou=
+p_link, link);
+> +
+> +	cgroup_lock();
+> +	if (!cg_link->cgroup) {
+> +		cgroup_unlock();
+> +		return 0;
+> +	}
+> +
+> +	info->struct_ops.map_id =3D cg_link->map->id;
+> +	info->struct_ops.cgroup_id =3D cgroup_id(cg_link->cgroup);
+> +	cgroup_unlock();
+> +	return 0;
+> +}
+> +
+> +static int cgroup_struct_ops_link_update(struct bpf_link *link, struct b=
+pf_map *new_map,
+> +					 struct bpf_map *expected_old_map)
+> +{
+> +	struct bpf_cgroup_link *cg_link =3D container_of(link, struct bpf_cgrou=
+p_link, link);
+> +	enum cgroup_bpf_attach_type atype;
+> +	struct bpf_prog_list *pl;
+> +	struct bpf_map *old_map;
+> +	struct cgroup *cgrp;
+> +	bool found =3D false;
+> +	int err;
+> +
+> +	if (!bpf_struct_ops_valid_to_reg(new_map))
+> +		return -EINVAL;
+> +
+> +	cgroup_lock();
+> +
+> +	cgrp =3D cg_link->cgroup;
+> +	if (!cgrp) {
+> +		err =3D -ENOLINK;
+> +		goto out;
+> +	}
+> +
+> +	old_map =3D cg_link->map;
+> +	err =3D bpf_struct_ops_link_update_check(new_map, old_map, expected_old=
+_map);
+> +	if (err)
+> +		goto out;
+> +
+> +	atype =3D bpf_struct_ops_map_cgroup_atype(new_map);
+> +
+> +	hlist_for_each_entry(pl, &cgrp->bpf.progs[atype], node) {
+> +		if (pl->link =3D=3D cg_link) {
+> +			found =3D true;
+> +			break;
+> +		}
+> +	}
+> +	if (!found) {
+> +		err =3D -ENOENT;
+> +		goto out;
+> +	}
+> +
+> +	bpf_map_inc(new_map);
+> +	WRITE_ONCE(cg_link->map, new_map);
+> +	replace_effective_prog(cgrp, atype, pl);
+> +	bpf_map_put(old_map);
+> +	cgrp->bpf.revisions[atype]++;
+> +
+> +out:
+> +	cgroup_unlock();
+> +	return err;
+> +}
+> +
+> +static __poll_t cgroup_struct_ops_link_poll(struct file *file, struct po=
+ll_table_struct *pts)
+> +{
+> +	struct bpf_cgroup_link *link =3D file->private_data;
+> +
+> +	poll_wait(file, &link->wait_hup, pts);
+> +
+> +	return READ_ONCE(link->map) ? 0 : EPOLLHUP;
+> +}
+> +
+> +static const struct bpf_link_ops cgroup_struct_ops_link_ops =3D {
+> +	.dealloc =3D cgroup_struct_ops_link_dealloc,
+> +	.detach =3D cgroup_struct_ops_link_detach,
+> +	.show_fdinfo =3D cgroup_struct_ops_link_show_fdinfo,
+> +	.fill_link_info =3D cgroup_struct_ops_link_fill_link_info,
+> +	.update_map =3D cgroup_struct_ops_link_update,
+> +	.poll =3D cgroup_struct_ops_link_poll,
+> +};
+> +
+> +int cgroup_bpf_struct_ops_attach(struct bpf_map *map, const union bpf_at=
+tr *attr)
+> +{
+> +	u32 flags =3D attr->link_create.flags;
+> +	u32 pl_flags =3D (flags & BPF_F_PREORDER) | BPF_F_ALLOW_MULTI;
+> +	enum cgroup_bpf_attach_type atype;
+> +	struct bpf_link_primer link_primer;
+> +	struct bpf_cgroup_link *link;
+> +	struct bpf_prog_list *pl =3D NULL;
+> +	struct hlist_head *progs;
+> +	struct cgroup *cgrp;
+> +	int err;
+> +
+> +	if (flags & ~BPF_F_LINK_ATTACH_MASK)
+> +		return -EINVAL;
+> +
+> +	/*
+> +	 * Attaching struct_ops to cgroup is through link only. All relative
+> +	 * position must be corresponding to a link id or fd.
+> +	 */
+> +	if (attr->link_create.cgroup.relative_fd && !(flags & BPF_F_LINK))
+> +		return -EINVAL;
+> +
+> +	link =3D kzalloc_obj(*link, GFP_USER);
+> +	if (!link)
+> +		return -ENOMEM;
+> +
+> +	bpf_link_init(&link->link, BPF_LINK_TYPE_STRUCT_OPS,
+> +		      &cgroup_struct_ops_link_ops, NULL,
+> +		      attr->link_create.attach_type);
+> +
+> +	err =3D bpf_link_prime(&link->link, &link_primer);
+> +	if (err) {
+> +		kfree(link);
+> +		return err;
+> +	}
+> +
+> +	cgrp =3D cgroup_get_from_fd(attr->link_create.target_fd);
+> +	if (IS_ERR(cgrp)) {
+> +		err =3D PTR_ERR(cgrp);
+> +		goto cleanup;
+> +	}
+> +
+> +	bpf_map_inc(map);
+> +	link->map =3D map;
+> +	link->cgroup =3D cgrp;
+> +	init_waitqueue_head(&link->wait_hup);
+> +
+> +	atype =3D bpf_struct_ops_map_cgroup_atype(map);
+> +	progs =3D &cgrp->bpf.progs[atype];
+> +
+> +	cgroup_lock();
+> +
+> +	if (attr->link_create.cgroup.expected_revision &&
+> +	    attr->link_create.cgroup.expected_revision !=3D cgrp->bpf.revisions=
+[atype]) {
+> +		err =3D -ESTALE;
+> +		goto unlock;
+> +	}
+> +
+> +	if (prog_list_length(progs, NULL) >=3D BPF_CGROUP_MAX_PROGS) {
+> +		err =3D -E2BIG;
+> +		goto unlock;
+> +	}
+> +
+> +	pl =3D kzalloc_obj(*pl);
+> +	if (!pl) {
+> +		err =3D -ENOMEM;
+> +		goto unlock;
+> +	}
+> +
+> +	pl->link =3D link;
+> +	pl->flags =3D pl_flags;
+> +	cgrp->bpf.flags[atype] =3D BPF_F_ALLOW_MULTI;
+> +
+> +	err =3D insert_pl_to_hlist(pl, progs, NULL, link,
+> +				 flags | BPF_F_ALLOW_MULTI, attr->link_create.cgroup.relative_fd);
+> +	if (err)
+> +		goto unlock;
+> +
+> +	err =3D update_effective_progs(cgrp, atype);
+> +	if (err) {
+> +		hlist_del(&pl->node);
+> +		goto unlock;
+> +	}
+> +
+> +	cgrp->bpf.revisions[atype]++;
+> +	static_branch_inc(&cgroup_bpf_enabled_key[atype]);
+> +
+> +	cgroup_unlock();
+> +
+> +	return bpf_link_settle(&link_primer);
+> +
+> +unlock:
+> +	cgroup_unlock();
+> +
+> +cleanup:
+> +	kfree(pl);
+> +	if (link->cgroup) {
+> +		cgroup_put(link->cgroup);
+> +		link->cgroup =3D NULL;
+> +		bpf_map_put(link->map);
+> +		link->map =3D NULL;
+> +	}
+> +	bpf_link_cleanup(&link_primer);
+> +	return err;
+> +}
+> +
+>  /* Common helpers for cgroup hooks. */
+>  const struct bpf_func_proto *
+>  cgroup_common_func_proto(enum bpf_func_id func_id, const struct bpf_prog=
+ *prog)
+> diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
+> index b07acf37ad1d..b439c0b0eadd 100644
+> --- a/kernel/bpf/syscall.c
+> +++ b/kernel/bpf/syscall.c
+> @@ -4813,6 +4813,7 @@ static int bpf_prog_query(const union bpf_attr *att=
+r,
+>  	case BPF_CGROUP_GETSOCKOPT:
+>  	case BPF_CGROUP_SETSOCKOPT:
+>  	case BPF_LSM_CGROUP:
+> +	case BPF_STRUCT_OPS:
+>  		return cgroup_bpf_prog_query(attr, uattr, uattr_size);
+>  	case BPF_LIRC_MODE2:
+>  		return lirc_prog_query(attr, uattr);
+> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bp=
+f.h
+> index c91b5a4bda03..c982801ec7db 100644
+> --- a/tools/include/uapi/linux/bpf.h
+> +++ b/tools/include/uapi/linux/bpf.h
+> @@ -1756,7 +1756,7 @@ union bpf_attr {
+>  			__u32	prog_cnt;
+>  			__u32	count;
+>  		};
+> -		__u32		:32;
+> +		__u32		type_id;
+>  		/* output: per-program attach_flags.
+>  		 * not allowed to be set during effective query.
+>  		 */
+> @@ -6818,6 +6818,8 @@ struct bpf_link_info {
+>  		} xdp;
+>  		struct {
+>  			__u32 map_id;
+> +			__u32 :32;
+> +			__u64 cgroup_id;
+>  		} struct_ops;
+>  		struct {
+>  			__u32 pf;
 
 
