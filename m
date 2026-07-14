@@ -1,252 +1,193 @@
-Return-Path: <netdev+bounces-307543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307545-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MMqZJDp2Vmp56AAAu9opvQ
-	(envelope-from <netdev+bounces-307543-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:47:38 +0200
+	id cgYMAIt2Vmqf6AAAu9opvQ
+	(envelope-from <netdev+bounces-307545-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:48:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 355D6757996
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:47:38 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD8BC7579B7
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:48:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=NLC58upT;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307543-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307543-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=cloudflare.com header.s=google09082023 header.b=gJXXZw9J;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307545-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-307545-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=cloudflare.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ACEFB314E0C6
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 17:44:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4BB743010DE8
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 17:48:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97C8C4156D5;
-	Tue, 14 Jul 2026 17:44:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 190CA32AAAB;
+	Tue, 14 Jul 2026 17:48:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05583909B9
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 17:44:02 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784051052; cv=pass; b=qIrOvcbq4dgQ5I9TTqdhhyFVlVFY9RhPsKvjLqpQF+t7m5xxM2+zn3u++D4DOhx53YPZdBcEkuV0b2XUN+mxfcywcQkL/W4aE5AyDjjrRwRSCDPHdbT8gtw/Wvaky95jM7Oq4IwRzWYG7eeU85HxaR6NgO7beLGXqYp/4igJd38=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784051052; c=relaxed/simple;
-	bh=JDuTfhJTWstpJvfRy/NTAtn6+ConTe3zcMRhSX3H1kY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CaOBT4LJJ8xJphLAL7aksIHZIDsCXdK1dRYTqBPA5YlRLRWICs7jI+Ze/VjKAOtUlNFPORBVAxWgXJMuQSSkWyUfnm5smVvDmEX7NaT/64MJ9TFdAlyfrjipx2T2EkCovQiKAlMX7QxIAi2cNDGU7ffL9+ecAiwGPLt75IdUj5k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NLC58upT; arc=pass smtp.client-ip=209.85.208.52
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-697cee2eb6dso1391912a12.0
-        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 10:44:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784051039; cv=none;
-        d=google.com; s=arc-20260327;
-        b=dNCbsiWsFi7YayONo0ArPAi/dTdnMkHMmMm2+PscWV5mZ/pXEJFapK6CFX9KoV98cu
-         fxWavnQCLwURt1oaTNBoqmjlMLMqH1Y9fp9RcM8JeYXpgPsi7FCWkpkxa6DKnKui+P7W
-         oRvZyA2njPIMxlqgCJCOQQQEcCad5F2L8lPJLJ6SfYcP2EqwBCm61WfYEGWfCMdL30u9
-         I60yAjNIcqI980/RyFwFt4ZsRIM2cerKq5B8fwZaJpi9OUT/jE5XEnCX0rbtqE5fcMyx
-         vw3LwqbL1viQw1w03imqjsDeVhLOxcgvvmB9fA7ndS/d/EKIZ4hxegpvJIXL1etlSXFn
-         WGhg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=zmM3GtgNw27l1Tq0fmnNqzL+GRDJtL7rqIl7qgYTkHE=;
-        fh=7vMLJMeHk2Ud5AWOyNHhspgPwF8221eOByoqAyUFh8A=;
-        b=ilopfU7ze7bo6KDVaQvdxzEWCzXIRl2vPYpvH1mj9C1OkdiFmXuiY6GpCgWRT7RkWF
-         PEXhL1zbaKxKJaDUOb3iK+/OU3s/MlQSMkIiYF01zZsy37aZtU55YpVqea7AcshymBVt
-         AVGMu9Y2snCqvuXGJ9LfxG1Vx4tUomD07gWqtVYzdhIMjE0PPZDw/0XL3aCPLQkRB0qa
-         ziO55nso5K8txKpjbK2G/dLLqNDsbwhol0gNYZlbzZXypMWd583Qd/tbMax7iVl1GYUE
-         CP4rNlFHHi/UGglWCHUN3akaDlqkBiLgCKFc0zZ+wuQ/6LdCG67HCi3wiGJSdAph3H/e
-         kP2g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F11361DB8
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 17:48:29 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784051322; cv=none; b=UO46uJAH4JAs+3iEti2AheTo+VOG7OZG579OPHqyV3PKPhmDC2OR1zmPYG0cyJVnvjyz7PQ3beXDu6q+tzBJ8/YLeBnOhFFOltVrcoYK2cM07Y71lHNixKhKSWpL6KSk3z9qPFs8slR0Ivo9XMxh+XEZou8mL0nQQv25lZt+Jjw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784051322; c=relaxed/simple;
+	bh=EieddV3CunyOQvlNz5OXYGeoAo3XqAWY40+VPURDOds=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=YMf7WBJeFWAl+KmELIbZmItHvhBh9v9y4U6UKj046HoclIE4nArY5SjVWI54eR9O3Mro3UEGAGoPNC9y72Xw+GgM5tMNmztQPmitV9zYcb7wvfriz4nCYTkY1YAgIrTYHY7iVbInVINlrz4zgHm1W4dpc3KnZNvoAeLpJaK4LsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=gJXXZw9J; arc=none smtp.client-ip=209.85.221.42
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-47ddf7b09e5so1182540f8f.1
+        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 10:48:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784051039; x=1784655839; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=zmM3GtgNw27l1Tq0fmnNqzL+GRDJtL7rqIl7qgYTkHE=;
-        b=NLC58upTQMuiESgjhiWEY3Az5lgSX08qYzabWHB7awqhuSW04/dGmIW8HdWJVEKcOb
-         CnAUAP5JD6wG7m96S/nOAv43tK7vD4dfe3jFv6tw/l8argjFWI3bNsPSpblkKtC2riKc
-         Vl4m9EUgk70RTKgFYbCBhAGUrD+UA4W1CNXtj1+jVmMkk+SyNGDCnTCRIzm1FhH97eyZ
-         UUrpfpEPleRCdgRMZBYMsThGn3cbNz7OOK5+xP/E3e/PJWGFa9UF3CpgCWm6G3i7nSTS
-         LbiY0c57Moqa4M7pAZJEBzoADcv3bywvm3l9ivgwa93XroGEIds9EKzUafm9Vfwp+6w/
-         3i2w==
+        d=cloudflare.com; s=google09082023; t=1784051307; x=1784656107; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=INgFyAIVRVhEQv6f28do5NJNurJGs9np0h5kWK/uQJw=;
+        b=gJXXZw9JLIYUzvAHmZZBlB3S4Ci+L7b1d4ceOwUHCave+v5l5631FPjLltmj2KmNrM
+         5Xp4AM5p2EHGu9QyPjLPI+HMTgPkg5cojOKPv5Wi/uIL+o8UvEz72Yo4zb5EggGjzwPg
+         tZKItL3cdsjK46i9TCgvNwLVVv3qDXhdqacJ+kCABaNNG8gSrqKfFlwoWcHWO9K9+a4x
+         T3EDQBLZ3W9YGtE0WFg1LhecqT8+PZJh0CSuXvkfeYEKe6eUiHr28CzuwtkJCQujVE13
+         3C7YKTc7HOIeF/A4iukNDplB93blglRc5P2GIxu1tBP/SRoCkfG8A/JHvOWUaA95QEFG
+         UJNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784051039; x=1784655839;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=zmM3GtgNw27l1Tq0fmnNqzL+GRDJtL7rqIl7qgYTkHE=;
-        b=sqUuinOCe0ooYfi/ArTO4peG/2/YEgbz6lw9ommgGjtvnCZ629ZxNhMVE8L4Z57CXk
-         2IWJqKJa5nhGq+ZtP+ADc9kSnJ6EB9jdR3anzSISfZcbnbk3IUz8xL/8Rzdn1Z8Z1Rff
-         i480r+uLUujY6mUvrdYvlnVmxgC4DlfT8VRlWSNEjaydmiResDPw0iVSYLICvZCvqZm1
-         v4xPmKxFwTnepj7nw7hDeuFALOMYLDtA+OkijAHf2GXmX4G39PtC2AxCCXriDha5p5iu
-         2sMf4lQvL5fsLH/dzDBNTuQWaFVeoORJuveCnyjbjQNFYyGdMmdkFiGN23FSUsK2l63p
-         4GiA==
-X-Forwarded-Encrypted: i=1; AHgh+RqVnqeMPzOGojMAs/DAxX662hJkT7XkRS7Y6er8RnbCbVbyoXcRf9Vh/+13VVzSfoVQDMi5N2w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLyKp3+uv7qdAwZNMNGraKTLkCvNjhHuLbf6T8OnbH1yQNPoba
-	nT0zS+S6g9jLHdk9yZeQpNRXCeFUhWYc751hNaXhj8OkdPXZL0mD3ZgWh63QaqyLbegxr0HatQb
-	7HSPvv+dJMeICE3ISor+wRGqG6/EommE=
-X-Gm-Gg: AfdE7cl95Ohg93r+tuDgnDPk+ZDygZFrvjAyufa6tRT+O4eu7AiQaQCnZrNcV+I1tub
-	skIOqhNkGaW41wQJX1rhZBEm2WR24sUJAhXcrQk+XS1WGwz+1MDTAQfYnXn/7BYsbfjwsJRdTbP
-	6NCD+KDh2CB0EKXdODlcu0EY3vQfpUjMp3zZ8Wf9m9aV9g5JlHor7QlpWYbrKB2E9RnUvDtMKER
-	NemBye5RmNPc/ymfOmAG/epRiOIZj2Whz3BBiHn+E8M3yJby6Qu0J4wxhwUVjjzKRec9JfbHNGU
-	dnK6HVnlM8qTHVXkm2cWEZSHhDxf
-X-Received: by 2002:a17:907:6e86:b0:c0e:4017:6471 with SMTP id
- a640c23a62f3a-c161e86871cmr681203966b.16.1784051038882; Tue, 14 Jul 2026
- 10:43:58 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1784051307; x=1784656107;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=INgFyAIVRVhEQv6f28do5NJNurJGs9np0h5kWK/uQJw=;
+        b=YSSo1QfwDzwYwIebJo9ArIoOUFiBuzU+hDT5j2pXTeiQ/ORgmY28LvMOLLf6DSPmOc
+         VRjUJDR0Pu4ZnQsCJnEBPfGpGKVk2+UzkXEoSYru6koS3IFfyGt+WytJuOm/m99MR4Qc
+         RARInqxQMUhEX/Ar2rdF79eaC1YpY7VAufZn4jphzRpHb+oSBwB3f4WNb7ywQfYuZjWu
+         cBL7FLUDmdum+5MKlpyeDPyBTWneCAG21LD1EeqTjAsu48EdZ8ZvytEi0bZFuCTwPZ8G
+         49ofAZ6862+3bOrahcaaJ23wdTfPDtDK/o3DJviL8yvBGxZ0AfoCJQT4szgteSlY22Rs
+         3mdA==
+X-Gm-Message-State: AOJu0Yxkm0syVY2jcXdQLH0s0UgIX3BByrsKkJgfPDsX4NpERBHrHobf
+	uSh90qlKfPSwW8Am68ay8MRU/0oC5bI1vA/FRxLSQYTLpUYx9LSUJK6m6S+74q7Q18Q=
+X-Gm-Gg: AfdE7cl+7yIlQwylLpEeMtUIAeD8MVk1JYAD7RKvhP7aLVyZo0DSchmDP48Ebxv5lHi
+	Zi3vOYxmNCT3J0neBGdahjF5m5lyAmTmedtlmWOCOqqxmz4vhKkxZ0ePluSrvTckAh0Ry5tPwEk
+	+9kLVRFWbqtxAI+LmKHe/3tdEHTSkAWaOi/3gZt+qvy/juAnLmJ3SqwhAeVJg92bboAWUWtvEAu
+	Irz7CRETncP/CjOLXH5nKnbux0i8hAhyR35Wbh0RkoPG/Hyz5qRI7vlpFSna9jwxMb1bH0ItFHN
+	yovnJT1FbuUMP8dMdb1rHB24K7VZYuiC7a8HJmcnuRk4lO0BSp+OCAcBtHW8JiMDDLhOxKv2TwY
+	EYMn7kJwUJYrgQ72auRtSWrHzZm8SBxxvA1SnDyyAFAZiX0CQYkjvF9lE0EMEKzBwk9mDp4RM5p
+	JogCDpbFUFrRkol1vvs1JcJ4cmSbn/aDfCUWLkkmzL9wiLtpA=
+X-Received: by 2002:a05:6000:612:b0:475:613c:c9f2 with SMTP id ffacd0b85a97d-47f2dcd1b38mr17227670f8f.5.1784051306731;
+        Tue, 14 Jul 2026 10:48:26 -0700 (PDT)
+Received: from cloudflare.com (93-57-92-86.ip163.fastwebnet.it. [93.57.92.86])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f4635a940sm9457448f8f.12.2026.07.14.10.48.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jul 2026 10:48:26 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+Subject: [PATCH RFC net-next 0/6] skb extension for BPF metadata
+Date: Tue, 14 Jul 2026 19:48:19 +0200
+Message-Id: <20260714-bpf-meta-inside-skb-ext-v1-0-5871c07a8dd6@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260706163024.1205930-2-bestswngs@gmail.com> <20260713134610.1779498-1-horms@kernel.org>
-In-Reply-To: <20260713134610.1779498-1-horms@kernel.org>
-From: Weiming Shi <bestswngs@gmail.com>
-Date: Wed, 15 Jul 2026 01:43:21 +0800
-X-Gm-Features: AUfX_myVDAgOYXdE7b544NcnLD48aV5KTXGXCZVfOr8LYmN7iu9JiFYjOoQPhlg
-Message-ID: <CANgPUi1G441VV3G-gHy0Ng8Q9A43rTXLAUnTU7OyRgCZJSicpA@mail.gmail.com>
-Subject: Re: [PATCH net v2] tipc: fix NULL deref in tipc_named_node_up() on
- empty publication list
-To: Simon Horman <horms@kernel.org>
-Cc: jmaloy@redhat.com, netdev@vger.kernel.org, 
-	tipc-discussion@lists.sourceforge.net, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	hoang.h.le@dektech.com.au, xmei5@asu.edu, linux-kernel@vger.kernel.org, 
-	tung.quang.nguyen@est.tech
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGN2VmoC/yWMQQrCMBBFr1Jm7UAToVS3ggdwKy6a9EdHMZZML
+ IXSuzfV5fu8/2ZSJIHSsZopYRSVTyxgdhX5RxfvYOkLk61tUzd2z24I/EbuWKJKD9aXY0yZQ7D
+ GH0yL1gcq7yEhyPQrX+lyPm1bROZYZLr9Bf26J3ze+rQsK0FiIniMAAAA
+X-Change-ID: 20260623-bpf-meta-inside-skb-ext-ff21c918e8cf
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org, kernel-team@cloudflare.com
+X-Mailer: b4 0.15.2
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-9.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
+	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:jmaloy@redhat.com,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:hoang.h.le@dektech.com.au,m:xmei5@asu.edu,m:linux-kernel@vger.kernel.org,m:tung.quang.nguyen@est.tech,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307543-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[cloudflare.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:kernel-team@cloudflare.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307545-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[3];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,mail.gmail.com:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[cloudflare.com:from_mime,cloudflare.com:mid,cloudflare.com:email,cloudflare.com:dkim,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 355D6757996
+X-Rspamd-Queue-Id: CD8BC7579B7
 
-Simon Horman <horms@kernel.org> =E4=BA=8E2026=E5=B9=B47=E6=9C=8813=E6=97=A5=
-=E5=91=A8=E4=B8=80 21:46=E5=86=99=E9=81=93=EF=BC=9A
->
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> Full review at: https://sashiko.dev
-> ---
-> tipc: fix NULL deref in tipc_named_node_up() on empty publication list
->
-> This commit fixes a NULL pointer dereference in tipc_named_node_up() that
-> occurs when the cluster_scope publication list is empty. The fix introduc=
-es
-> an early return to avoid calling named_distribute() with an empty list.
->
-> > diff --git a/net/tipc/name_distr.c b/net/tipc/name_distr.c
-> > index ba4f4906e13b7..60ccaa862162c 100644
-> > --- a/net/tipc/name_distr.c
-> > +++ b/net/tipc/name_distr.c
-> > @@ -218,6 +218,10 @@ void tipc_named_node_up(struct net *net, u32 dnode=
-, u16 capabilities)
-> >       spin_unlock_bh(&tn->nametbl_lock);
-> >
-> >       read_lock_bh(&nt->cluster_scope_lock);
-> > +     if (list_empty(&nt->cluster_scope)) {
-> > +             read_unlock_bh(&nt->cluster_scope_lock);
-> > +             return;
-> > +     }
->
-> [Severity: Critical]
-> Does this early return prevent the transmission of the last_bulk
-> synchronization message to the peer node?
->
-> In tipc_named_dequeue(), the peer node sets *open =3D true only when rece=
-iving
-> a message where msg_is_last_bulk(hdr) is true:
->
-> net/tipc/name_distr.c:tipc_named_dequeue() {
->         ...
->         if (*open && (*rcv_nxt =3D=3D seqno)) {
->                 (*rcv_nxt)++;
->                 __skb_unlink(skb, namedq);
->                 ...
->                 return skb;
->         }
->         ...
-> }
->
-> If *open is false, all subsequent non-bulk name publications will fail th=
-is
-> sequence check and remain in the namedq indefinitely.
->
-> Without sending the last_bulk message, could this cause a permanent stall
-> of name table updates and an unbounded memory leak of socket buffers on t=
-he
-> peer node?
->
-> >       named_distribute(net, &head, dnode, &nt->cluster_scope, seqno);
->
-> [Severity: High]
-> This isn't a bug introduced by this patch, but looking at named_distribut=
-e()
-> called here, what happens if buffer allocation fails during the loop?
->
-> Inside named_distribute():
->
-> net/tipc/name_distr.c:named_distribute() {
->         ...
->         if (!skb) {
->                 skb =3D named_prepare_buf(net, PUBLICATION, msg_rem, dnod=
-e);
->                 if (!skb) {
->                         pr_warn("Bulk publication failure\n");
->                         return;
->                 }
->         ...
-> }
->
-> If the function returns early due to allocation failure, the messages
-> already added to the queue are transmitted by tipc_node_xmit(), but none
-> of them will have the last_bulk flag set since that happens at the very e=
-nd
-> of the function.
->
-> Could this also prevent the receiving node from transitioning its named_o=
-pen
-> state to true, leading to the exact same permanent stall and memory leak =
-of
-> subsequent normal name publications?
->
-> >       tipc_node_xmit(net, &head, dnode, 0);
-> >       read_unlock_bh(&nt->cluster_scope_lock);
-> --
-> pw-bot: changes-requested
+BPF programs attached at different points in the network stack have no way
+to pass data between each other on a per-packet basis. xdp/skb->data_meta
+covers the XDP-to-TC handoff, but is not available to programs at later
+hooks like cgroup/skb, sock_ops, socket filters, tracing, or LSM.
 
+This series adds a per-packet metadata byte buffer for BPF, carried inline
+in a new skb extension (struct bpf_skb_ext). Programs access it through a
+bpf_dynptr returned by the bpf_dynptr_from_skb_ext() kfunc.
 
-Hi ,
-Thank you for the review and feedback. v3 sent.
+Pass BPF_SKB_EXT_F_CREATE to allocate (or COW) the extension and get a
+read-write dynptr; omit the flag to get a read-only view of existing
+metadata, or -ENOENT if none has been attached. The inline buffer is up to
+256 bytes, sized at build time via CONFIG_BPF_SKB_EXT_SIZE (default 64).
+
+Metadata survives across hooks (TC -> socket filter) and, when opted in
+with BPF_SKB_EXT_F_NO_SCRUB, across tunnel encap/decap and cross-netns
+forwarding. Without the flag the extension is scrubbed at the usual
+points (skb_scrub_packet).
+
+This is our third attempt at the problem. We first tried to make XDP/skb
+metadata persist across network layers and expose it as a dynptr [1], then
+turned to BPF local storage for skb's [2]. Based on the feedback from both,
+we converged on the simpler skb extension + dynptr approach.
+
+We are posting this RFC to accompany a Netdev talk on the topic [3]. We are
+currently running an experiment in a production environment to evaluate the
+performance of this approach and will follow up with results and a
+comparison to alternatives.
+
+Thanks,
+-jkbs
+
+[1] https://lore.kernel.org/all/20260107-skb-meta-safeproof-netdevs-rx-only-v3-0-0d461c5e4764@cloudflare.com/
+[2] https://lore.kernel.org/all/20260226-skb-local-storage-v1-0-4ca44f0dd9d1@cloudflare.com/
+[3] https://www.netdevconf.info/0x1A/sessions/talk/thrice-the-charm-an-skb-extension-for-bpf-metadata.html
+
+Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+---
+Jakub Sitnicki (6):
+      bpf: Introduce per-packet metadata storage for BPF programs
+      bpf: Allow access to bpf_sock_ops_kern->skb
+      bpf: Allow skb extensions to survive packet scrubbing
+      selftests/bpf: Add tests for bpf_dynptr_from_skb_ext
+      selftests/bpf: Test skb_ext scrubbing across tunnels and veths
+      selftests/bpf: Use non-trivial test payload in xdp_context tests
+
+ include/linux/bpf.h                                |  11 +
+ include/linux/filter.h                             |  26 +
+ include/linux/skbuff.h                             |   5 +
+ include/uapi/linux/bpf.h                           |   6 +
+ kernel/bpf/helpers.c                               |   7 +
+ kernel/bpf/log.c                                   |   2 +
+ kernel/bpf/verifier.c                              |  15 +-
+ net/Kconfig                                        |  20 +
+ net/core/filter.c                                  | 134 +++++
+ net/core/skbuff.c                                  |  85 ++-
+ net/ipv4/udp.c                                     |   2 +-
+ .../bpf/prog_tests/xdp_context_test_run.c          | 592 ++++++++++++++++++++-
+ tools/testing/selftests/bpf/progs/test_xdp_meta.c  | 418 ++++++++++++++-
+ 13 files changed, 1303 insertions(+), 20 deletions(-)
+
 
