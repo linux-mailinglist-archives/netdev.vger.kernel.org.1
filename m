@@ -1,69 +1,96 @@
-Return-Path: <netdev+bounces-307384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307385-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id u7S1BU/uVWoPwQAAu9opvQ
-	(envelope-from <netdev+bounces-307384-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:07:43 +0200
+	id Pv4NKR3wVWq3wQAAu9opvQ
+	(envelope-from <netdev+bounces-307385-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:15:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DD977522E9
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:07:42 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1634275242B
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:15:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=CLA7hdnV;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307384-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307384-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Ayz49cLB;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307385-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307385-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9D34E3045083
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 08:07:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F3CE030BEFFB
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 08:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BA353F4859;
-	Tue, 14 Jul 2026 08:07:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B501A3F822A;
+	Tue, 14 Jul 2026 08:10:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72F373EC2EF
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 08:07:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90AC13F788D
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 08:10:33 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784016432; cv=none; b=L66sc/+7T+JZyLKhbcFgv4+qTvZuG2Kzty/GiGEJKXcsQkmta5Pl84KMPBZqz5ligsH7RNnRFMd9Qs9pgEod3CuHXctQ0qUnuukscjc0ah8UdDX8vw6EQ/vO4/26HijQVWVxosVWB1zO+BKiSTsYR/CJMoPqWy/Inc9pNsfssDc=
+	t=1784016635; cv=none; b=pG0xIXvVeQDQfAJ65O51FYFX6jY0Fu36y6G+OOitlHedtw7rXa4mxr/2ywJfdXOLIAyxLOgAV+H1fI5uYakqUMSEMEnr8Ay9EdGSAv6dT0o7qTF9ITBQ9nhSTBiYoCGJB+a8BfWlofl1eubWOMSpjqenGF4nTmVqSp/zfiNcGCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784016432; c=relaxed/simple;
-	bh=6kdBpx1k6n9p70P4rJHoWKJrXBC5GpU4ZYVT1bFuGEI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DZ/hxF6b7aD/qRapZ4gBz5fyIhbyqFK7vGKheZJT/DdQ4GMZ23QcEeAkxFSfwzSGmhy9GUwAay5k6BtojRkKZsuiSFUaK4GkoEYYwv0yEcBZlup9b0QdLJAPkMtybG+unvdM6LkuMJZQTxqYlCDv9zZFGwf1M9/JeJe0JTduemA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CLA7hdnV; arc=none smtp.client-ip=91.218.175.173
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784016416;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=a6nIlwR0KFfATEht8COx1N7vKEIx9+CkRnNYFhKRWYs=;
-	b=CLA7hdnV+GaiVdwynuwAEqtyl5Ft3lZ1vBPRX25X0NaZXjOS694Q60lFkx42xRGinys+Mw
-	VwkGAwDZI3+aeQCn6iy1GmPhID+YYD1oKtEn3qticjnvPLlf/rfg5/BaOqev/sai+zu6V4
-	zGuPJvQKcJxVvXH8CmrdtzNZURsLGXg=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: netdev@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1784016635; c=relaxed/simple;
+	bh=91ABqFKfMNp3kIwQItRGSHlNzSqgksOirpnlbA6UxGo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=i6oO5dMf0l9LjEdbCVhw0UUvW5UioQuuBGP+Eo1hbEk3y3gn3reQqENJYOh+FkgPtOBPz0+fn7kISFBErkkSN1Neii1/3AlWVXzoBiKB9MYkpXNA+7CYq1A8ienGg1g8zokuql/KW/UsarjGSKwC+0vOacCHg2UtXiAhMea/ZY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ayz49cLB; arc=none smtp.client-ip=209.85.214.169
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2cce6a0c9c3so35753025ad.1
+        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 01:10:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784016633; x=1784621433; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ITeUKgVbKGB0qKOAiMSNRRSqKKCe5wLy1hv+dNfJzS0=;
+        b=Ayz49cLBdh1LuWGu2Kbs6myTb5liZ3oXF+wA3seEUZeo9hXUTC1LUz8fPYnaujPZSa
+         uIy61fLHXME7+vL94wNAUTVzeWuSMyja1pGzfS1jetL8KsQX/dYP3ii4e3E4BViMUeQj
+         LIN5I04hPzlkk3KVYeymomRVMPdQ/xd/TNIJ8nG1amTBRb8o72jH3WTf3QZ5903PQdm/
+         F2kfTOcgw5WjisBh3FTqmEMrRB5OTUcDU/fMePTI8+c/CpHhkZ1/qKVyU3Exw1yVXsGN
+         OrLsfJfyPZk6C1bRd+L2QCox5yWFrsyq1ToNvXN6Xa0tI9/9gb5aKRxkt2WK0HxRZDeX
+         fkdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784016633; x=1784621433;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=ITeUKgVbKGB0qKOAiMSNRRSqKKCe5wLy1hv+dNfJzS0=;
+        b=mVBgvo8Yj+YWolnYFsU38+pZhTiS5qRDAuMGuS6hhomPMR7LRPtPgd5sgIe2wPRRjR
+         oNGwBYDzmDRcnXxf7y9IZxRx0h2HNuPEsHe8E9nS3rXRr1NQobNLuQ3Atikuo34pNxZx
+         RjuBv+2O+aheZnIpa4u7RXP/gxoZJadAXAoEtH1K9Q3L2UOlDjbqMzVDChDlR2LP9Jgs
+         Fn68fTCTC7OBS4b7Qfwo2HNu1vuyeokR/c4MjnQTvHgQJ2hj3apvDzPmSYp9cbbgezTZ
+         jSk8gjj4Nyhp0V/Ebw+icL4RuSBW4E0cq3LLZYxhjTBuTuUDF2JVXD0EQ9nZAvsJ4DFU
+         uJtA==
+X-Forwarded-Encrypted: i=1; AHgh+Rp5saTC1+MPqH/XJFG5ZCJzsS/gF1ZQWhw3S19J+uet18Y12gMwLRP9Jp9oQa6rjuK9f1o3bOI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRj7lOSjUVuYIxlmzdERtZJv1zBbzhpjiZG5HzBriHgwFS/xgs
+	g2KlfSDIJLeVP1dRedD0XiiIn3UwA0CoVzDaHHed8y6LikxvluI9CmY=
+X-Gm-Gg: AfdE7cnAlY6RN0FbZv8gzGkA0eQyz+8wDAPjePmHdCmJKbL6hFN30opspFBT8f1Au1S
+	PQEqIrwZcyNRRNJkvV1VXT1dI0lrDyF5GUKznZapUrm3bzJVnHCHZWP/CB+x5c9QAPJBMecNeBv
+	m5F8mtD+aqJb3+WSS5uXmrzz8e6WiWsr+pBLvMGulab41DdIoPveoOZuM2w4jN2BukD2LV34Hy9
+	rhj6RgS9plgHFfluYHUpBaxtuIAGvWUR2Nxx6utt+Xq2XIkzxFVMXUJD8Tbw9TQcukfPbw7LvQZ
+	XlwRWH8IgXAiwfzOhOlBelJoAgz8dyYCoa/VKce1wCHt+UHvTij4U3H0P0JUryTBJIdsYEWgRjy
+	K6DmrBiYfQO7icHEASdCJoyKosKUmqmFURLe8gwGm3G9P2qc6YnKPGa/hpWGWy/06NbHbsn4sqC
+	VdihNh2HwCUIcjr6GxVJgM1m16tHiCr/Y2p+bEKD1kT6R00zlQArGqQ3X/H6voQKjTIZkuLHlXt
+	FC1mJEKVS2NCsfJEAszOzqe99SXMvJHxcKNCnP1KAKHIpJWDA==
+X-Received: by 2002:a17:903:b07:b0:2c9:cf41:adf9 with SMTP id d9443c01a7336-2cef1372613mr16919425ad.47.1784016632632;
+        Tue, 14 Jul 2026 01:10:32 -0700 (PDT)
+Received: from localhost.localdomain ([14.5.152.27])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9d3d968sm110856755ad.60.2026.07.14.01.10.29
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 14 Jul 2026 01:10:31 -0700 (PDT)
+From: Myeonghun Pak <mhun512@gmail.com>
+To: Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	=?UTF-8?q?=C5=81ukasz=20Majewski?= <lukma@nabladev.com>,
-	Fernando Fernandez Mancera <fmancera@suse.de>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Jakub Acs <acsjakub@amazon.de>,
-	Xiaoliang Yang <xiaoliang.yang_1@nxp.com>,
-	MD Danish Anwar <danishanwar@ti.com>,
-	Murali Karicheri <m-karicheri2@ti.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] net: hsr: clean up the slave VLAN filters when deleting a port
-Date: Tue, 14 Jul 2026 16:06:36 +0800
-Message-ID: <20260714080640.149654-1-jiayuan.chen@linux.dev>
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Myeonghun Pak <mhun512@gmail.com>,
+	Ijae Kim <ae878000@gmail.com>
+Subject: [PATCH net] net: mctp i3c: clean up notifier and buses if driver register fails
+Date: Tue, 14 Jul 2026 17:10:25 +0900
+Message-Id: <20260714081025.89163-1-mhun512@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,131 +98,84 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.dev,davemloft.net,google.com,kernel.org,redhat.com,nabladev.com,suse.de,gmail.com,amazon.de,nxp.com,ti.com,resnulli.us,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307384-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:jiayuan.chen@linux.dev,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kees@kernel.org,m:lukma@nabladev.com,m:fmancera@suse.de,m:liuhangbin@gmail.com,m:acsjakub@amazon.de,m:xiaoliang.yang_1@nxp.com,m:danishanwar@ti.com,m:m-karicheri2@ti.com,m:jiri@resnulli.us,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307385-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:jk@codeconstruct.com.au,m:matt@codeconstruct.com.au,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:mhun512@gmail.com,m:ae878000@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[mhun512@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	FROM_NEQ_ENVFROM(0.00)[mhun512@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:from_mime,linux.dev:mid,linux.dev:email,linux.dev:dkim,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7DD977522E9
+X-Rspamd-Queue-Id: 1634275242B
 
-Our internal syzkaller reported this warning:
+mctp_i3c_mod_init() registers the I3C bus notifier and then walks the
+existing buses with i3c_for_each_bus_locked(mctp_i3c_bus_add_new, NULL)
+before registering the I3C device driver.  If i3c_driver_register()
+fails, the function returns the error directly, leaving the notifier
+registered and every mctp_i3c_bus object created for the existing buses
+allocated.  The notifier is left pointing into the module that failed to
+load and the bus list is leaked.
 
-  netdevsim netdevsim10 eth0: entered promiscuous mode
-  netdevsim netdevsim10 eth1: entered promiscuous mode
-  netdevsim netdevsim10 eth1 (unregistering): left promiscuous mode
-  ------------[ cut here ]------------
-  WARNING: drivers/net/netdevsim/netdev.c:1208 at nsim_destroy+0x276/0x6e0, CPU#3: 1/46
-  Modules linked in:
-  CPU: 3 UID: 0 PID: 46 Comm: kworker/u16:1 Not tainted 7.2.0-rc2+ #286 PREEMPT
-  Hardware name: QEMU Ubuntu 24.04 PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-  Workqueue: netns cleanup_net
-  RIP: 0010:nsim_destroy (drivers/net/netdevsim/netdev.c:1031 drivers/net/netdevsim/netdev.c:1201)
-  RSP: 0018:ffffc90000337898 EFLAGS: 00010293
-  RAX: 0000000000000001 RBX: ffff8881036c8b00 RCX: 0000000000000000
-  RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-  RBP: ffffc900003378f0 R08: 0000000000000000 R09: 0000000000000000
-  R10: ffffffffad4186a8 R11: ffffffffad41c3db R12: ffff8881036c9268
-  R13: dffffc0000000000 R14: ffffed10206d9164 R15: 0000000000000001
-  FS:  0000000000000000(0000) GS:ffff888160866000(0000) knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 000055bcf1a2e0c4 CR3: 0000000105376003 CR4: 0000000000770ef0
-  PKRU: 55555554
-  Call Trace:
-  <TASK>
-  __nsim_dev_port_del (drivers/net/netdevsim/dev.c:1547)
-  nsim_dev_reload_destroy (drivers/net/netdevsim/dev.c:1561 drivers/net/netdevsim/dev.c:1785)
-  nsim_dev_reload_down (drivers/net/netdevsim/dev.c:1038)
-  devlink_reload (net/devlink/dev.c:462)
-  devlink_pernet_pre_exit (net/devlink/core.c:578)
-  ops_undo_list (net/core/net_namespace.c:161 net/core/net_namespace.c:235)
-  cleanup_net (net/core/net_namespace.c:706)
-  process_one_work (kernel/workqueue.c:3322)
-  worker_thread (kernel/workqueue.c:3405 kernel/workqueue.c:3486)
-  kthread (kernel/kthread.c:436)
-  ret_from_fork (arch/x86/kernel/process.c:158)
-  ret_from_fork_asm (arch/x86/entry/entry_64.S:245)
-  </TASK>
-  ---[ end trace 0000000000000000 ]---
-  netdevsim netdevsim10 eth0 (unregistering): left promiscuous mode
+Mirror the module exit path on this failure: unregister the notifier and
+tear down the buses that were added before returning the error.
 
-vlan_vids_add_by_dev() is what passes the VID filter info down to the real
-device. A virtual device does no filtering itself, so it has to push the
-VIDs down to its slaves. HSR already does this correctly on the add side:
-hsr_ndo_vlan_rx_add_vid() calls vlan_vid_add() on each slave.
-
-We just never clean the slaves up on delete. hsr_del_port() drops the port
-and leaves the VIDs sitting on the slave, so the filter entries leak.
-netdevsim keeps a bitmap of the VIDs it was told to filter and checks that
-it is empty when the netdev goes away, which is what trips the warning
-above.
-
-So do the cleanup in hsr_del_port(). We follow hsr_ndo_vlan_rx_add_vid()
-here: it only pushes the VIDs to HSR_PT_SLAVE_A and HSR_PT_SLAVE_B, so the
-del side only touches those two as well.
-
-Reproducer:
-ip netns add ns0
-ip netns exec ns0 sh -c 'echo "10 2" > /sys/bus/netdevsim/new_device'
-ip netns exec ns0 ip link add hsr0 type hsr slave1 eth0 slave2 eth1
-ip netns exec ns0 ip link add link hsr0 name hsr0.1 type vlan id 1
-ip netns del ns0
-
-Fixes: 1a8a63a5305e ("net: hsr: Add VLAN CTAG filter support")
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+Fixes: c8755b29b58e ("mctp i3c: MCTP I3C driver")
+Co-developed-by: Ijae Kim <ae878000@gmail.com>
+Signed-off-by: Ijae Kim <ae878000@gmail.com>
+Signed-off-by: Myeonghun Pak <mhun512@gmail.com>
 ---
- net/hsr/hsr_slave.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/net/mctp/mctp-i3c.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/net/hsr/hsr_slave.c b/net/hsr/hsr_slave.c
-index d9af9e65f72f..b1baefb65c7a 100644
---- a/net/hsr/hsr_slave.c
-+++ b/net/hsr/hsr_slave.c
-@@ -237,6 +237,13 @@ void hsr_del_port(struct hsr_port *port)
- 	list_del_rcu(&port->port_list);
- 
- 	if (port != master) {
-+		/* Drop the VLAN ids that hsr_ndo_vlan_rx_add_vid() pushed down
-+		 * to this slave. Only slave ports get them, see there.
-+		 */
-+		if (port->type == HSR_PT_SLAVE_A ||
-+		    port->type == HSR_PT_SLAVE_B)
-+			vlan_vids_del_by_dev(port->dev, master->dev);
+diff --git a/drivers/net/mctp/mctp-i3c.c b/drivers/net/mctp/mctp-i3c.c
+index 6d2bbae747..677e77e917 100644
+--- a/drivers/net/mctp/mctp-i3c.c
++++ b/drivers/net/mctp/mctp-i3c.c
+@@ -740,9 +740,14 @@ static __init int mctp_i3c_mod_init(void)
+
+ 	rc = i3c_driver_register(&mctp_i3c_driver);
+ 	if (rc < 0)
+-		return rc;
++		goto err_unregister_notifier;
+
+ 	return 0;
 +
- 		netdev_update_features(master->dev);
- 		dev_set_mtu(master->dev, hsr_get_max_mtu(hsr));
- 		netdev_rx_handler_unregister(port->dev);
--- 
-2.43.0
++err_unregister_notifier:
++	i3c_unregister_notifier(&mctp_i3c_notifier);
++	mctp_i3c_bus_remove_all();
++	return rc;
+ }
 
+ static __exit void mctp_i3c_mod_exit(void)
+--
+2.53.0
 
