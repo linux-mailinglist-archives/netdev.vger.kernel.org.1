@@ -1,89 +1,93 @@
-Return-Path: <netdev+bounces-307515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307516-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id i0mPCfNUVmon3gAAu9opvQ
-	(envelope-from <netdev+bounces-307515-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 17:25:39 +0200
+	id usmmLGlXVmq73gAAu9opvQ
+	(envelope-from <netdev+bounces-307516-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 17:36:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE96775666B
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 17:25:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D67E7567D7
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 17:36:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=virtuozzo.com header.s=selector2 header.b=jTJWbXu3;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307515-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-307515-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=virtuozzo.com;
+	dkim=pass header.d=weidmueller.com header.s=selector2 header.b=8A5iqNNH;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307516-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307516-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=weidmueller.com;
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C82CB30C3150
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:19:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 19AB530477F1
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:36:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F5754C0438;
-	Tue, 14 Jul 2026 15:17:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFFC53EB81B;
+	Tue, 14 Jul 2026 15:36:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11023087.outbound.protection.outlook.com [52.101.72.87])
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013011.outbound.protection.outlook.com [40.107.159.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2FDD4BC032;
-	Tue, 14 Jul 2026 15:17:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1156F33D4E1;
+	Tue, 14 Jul 2026 15:35:57 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784042224; cv=fail; b=UHhOV3s+pZ1nmby9RG4kolbV3REAEvG0zkN6ahiHPgP/DG2XHWDGnB1AOxSASto0Fz+4FD9GQo58BmdslCrXZgLUVMB4NSIbySeTrQRkNoPZf+t0tlzJIN09Ha3xktkDG+Iq8qjSQkXxARwXzZHgfXXWjS8lCSDWHxlgZlDZQVw=
+	t=1784043362; cv=fail; b=lBihxhIIEPKSXwJnc3jymIbsEGQzj9+3GapmDzuafI5y9BO7GRCvxCO26cFduOsZw8m4prW31Int1Ebs2QU3Gmq5AWeywi71n+Tg3/KEiFPMGWAcxX66JM6mDcvk8T6HI4iFAW0x2Dj3Q4OQlF8iu2ftb4z55q3ydnqqafGl5gE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784042224; c=relaxed/simple;
-	bh=7yhxoBZ/wxX+Ctp+AT/GMSPp27/7YYLiXHLe8jO/KOI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=t3/Ecdu0UblabfVQLjfnj/54mFP2idBvSePwmHDtgWUPLLDDGI5F6fNIg/r3jciMMGEZPOy1F6tXZBfvB08TbIjY7YdIDxSw3fVAW7Hia7jrtqGB/h//iw9ufct1nc3MFtBRPxfXgfGcsdEL4rvL9LnikhB6lOGQbTiSMgCk0Os=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=jTJWbXu3; arc=fail smtp.client-ip=52.101.72.87
+	s=arc-20240116; t=1784043362; c=relaxed/simple;
+	bh=WpH3NLU37o+Ik1z8E+FXoUcvY/TFexq5Ir1qFQSpfZI=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ciItMMQapDGavvYi+klgPAynbd4+FS763oyLlXpkN5wMlrxFJDT5ZYedCCPICSTtZ2i5fBCWU7uXf5+Z1IEVy4zOGdijqjwi8wiJJjR3QCEQK7f8KOc299DaiRXxOB6a70HeAK5lMqJ9OryMmystGEBqyHT8Iy1x9e2YpPe+XYc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=weidmueller.com; spf=pass smtp.mailfrom=weidmueller.com; dkim=pass (2048-bit key) header.d=weidmueller.com header.i=@weidmueller.com header.b=8A5iqNNH; arc=fail smtp.client-ip=40.107.159.11
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CIv9eZ272Nhd0XmBbF8yhHRI9pUWA+6LgzDsubtSMTwR9qVGUim2idfnr0+K6OhwBJZcA3He6r+seBxLqR8IWCvEkNUuHnGAUmh6Zuab9PIgXDnCyCj3ddUTfdMOP1KIaLztent20ofRo88RMEDpMnYqhgON8rFg4YLw99XYW2G+Rq2roQ/uuV4WEu8VTNCl+tKSU8aGUjID6nqhGFTfGzrUJxoo9Cd+ixpM57HlVRU0eZiG4vTvH/x8jd71jC8Bigc7XXKKStZRQZ9k8/PcNAv/1Me68RH0moVOyccxOuLQk8xWPgbEIeFX1cp7FtX2GseAkf1iB8dm9s85BX1CQA==
+ b=uFOeHS1ZqTH6JmzrKmAZ6FCqi1cELqpk3FvC7d327hML+rr38Rm8K0+Cw/ljZPvjETosthTnMmkWsA9ZAIRJALOd7FvcFAwd49L6hLNmG6IK6q2jxrpchmW/9zUCFd0D8AxY3ACJLPF1R+6T0jNuBCiC/brvcA2kfyOSWjRpUuEfi88x/WT5pvpOk/WIJTy+gMssqUVvANkNnMMlgk7hoCUT1KIKULTOTVcXYPhuacEYl37HBYPM7GEZLvffLq641CvhMJPot9glhkX61QT3wGZRF0QuuTuj/OierNhn0zf6dNRz9P9OKLMBVxV6QjbKeKZtHaRwtrLVEAUqlN+gug==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IENLpuB5Ml/RTZriyLBBAEVfZVZ5lSB57FR7jCjqQys=;
- b=v+L9hgfiKp1XFdSgFV9HxrTA+QYdgr2KAsZJIFHsoyASQU5QvJoS4QAgwvX09xj2eeyyBkVEHbHz5hFkAEVNkSqKmOfYuyi3xGQP4P3GCb7gEg/uBvCO3EA/pZt9/b5qQ0yXV9/NYc8zjNzRJgEQ5T38M21GgwgjihHuOdUlv8W29sIFsrChVR/IP9DN1tFVMzPF6YrZchvuwt9S3lyd9jPJ2J1itA//EzzDhjYpftp5R76jBaI3BDhozJw254sK3gzDKggas1c0GDhtKAxT/VxAzlaZKBeKjs8tToq/49u4KN/0Jznq8galo88C39XnJ9ux8rCa03EVacI+d625mA==
+ bh=fEfo4KwCZXBUT/e2NXE8bgL39yxiza8RzVGAN1Ulbhs=;
+ b=d1mOgSxgnCuCVSdEnhpmFWKZjDK/wInIYmdrsgCLnlvPB+yXzvh71EtAf4x5/hmU5B709641q7cgQyDBtgxn9ynUcnuFOJ6YpE2sDFgsV5/nJl7whNb5S7kDTeq+zLCxjAVBHy1I4pL6G7fXDBNT57NSrTBp/wilKMT64BAyhkQB02YR5xggjKR2pWhOlK78m6uo3L+BJiha5j/no+85EFXShzAFStT9AUxWvl2gYWOfKHQRB8IWg7DuzgbAY9jAa6yVY4aDPEE+iKMeJDcBu6vAKwu33iKSXm8Gv98+KsW4BmbY5PHhNw5YKOux+5SQXc3B8LOt/mhCGRC0DHXmxw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ smtp.mailfrom=weidmueller.com; dmarc=pass action=none
+ header.from=weidmueller.com; dkim=pass header.d=weidmueller.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=weidmueller.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IENLpuB5Ml/RTZriyLBBAEVfZVZ5lSB57FR7jCjqQys=;
- b=jTJWbXu3LdBm3ZIxrfogIj+D6dMi+4AAcNaB78z2uR+UwfixxrJxBiePOxBE8CvzkHhP6SG0dCzjsIjJ6GF1zowfAqrglnuP2oc7QA/l/oobr+Mgs9lKGg/Twc7wP/jy7LEZ/IoMIYmKtCZ8d7zrrWYSx4oSsc8N4KfZXht9E378rjWrD/1jXi4QBy8qtzlW/SoXti87Wadse0UgpUOSeJHUdpGNfVlb3SfP1WZmhY+4urUaHm6ENeeBfRkVCvyoTkFLNd7imkrdV1XGqe9w+ruNtHQl4cYfxGp5XcqbJ72WgjzdY7YfA3N6zohfMztimZ0cs3qw4B0qJib8pdFlIQ==
-Received: from VI0PR08MB10656.eurprd08.prod.outlook.com
- (2603:10a6:800:20a::12) by DU0PR08MB7692.eurprd08.prod.outlook.com
- (2603:10a6:10:3a4::13) with Microsoft SMTP Server (version=TLS1_2,
+ bh=fEfo4KwCZXBUT/e2NXE8bgL39yxiza8RzVGAN1Ulbhs=;
+ b=8A5iqNNHpQGz5P+Qn1yc+pXyn1wlTOx7h+VnPrDTFiS9pcYu+nq7Qa0gSIHueP0D/jNCrYfp7KO7fKWkiy7qhutYh5DMp9Is0A2B0Ft2SZkte/PQPaHTfJSSEasNoSiahBWPPK7sQJhXYOvpQFgfMToWre2gk9sB/lDoz/cs5D+gd/SNRYSTlF+Lt/LzHQR3S7aFG4qVyqe4q1nDcwOTG0jaSUgW9CVrrQ66yg3iDZYh0ftWCHlv347nGkOrNJC3I/TIUka5+QvxfoSdns3liA5Z64qrJmkwmNF9SL8rrwyNkk2oH7umcg/DYiDR5fUE80OpbEEwW/CVYDu36Fmcag==
+Received: from AS2PR08MB9199.eurprd08.prod.outlook.com (2603:10a6:20b:578::22)
+ by GV2PR08MB11393.eurprd08.prod.outlook.com (2603:10a6:150:2a6::5) with
+ Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.202.18; Tue, 14 Jul
- 2026 15:16:53 +0000
-Received: from VI0PR08MB10656.eurprd08.prod.outlook.com
- ([fe80::4e37:b189:ddcd:3dd8]) by VI0PR08MB10656.eurprd08.prod.outlook.com
- ([fe80::4e37:b189:ddcd:3dd8%7]) with mapi id 15.21.0202.014; Tue, 14 Jul 2026
- 15:16:53 +0000
-From: Andrey Drobyshev <andrey.drobyshev@virtuozzo.com>
-To: linux-kernel@vger.kernel.org
-Cc: kvm@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	sgarzare@redhat.com,
-	mst@redhat.com,
-	stefanha@redhat.com,
-	dongli.zhang@oracle.com,
-	maciej.szmigiero@oracle.com,
-	bchaney@akamai.com,
-	mark.kanda@oracle.com,
-	ptikhomirov@virtuozzo.com,
-	den@openvz.org,
-	andrey.drobyshev@virtuozzo.com
-Subject: [PATCH v4 5/5] vhost/vsock: add VHOST_RESET_OWNER ioctl
-Date: Tue, 14 Jul 2026 18:16:38 +0300
-Message-ID: <20260714151638.143019-6-andrey.drobyshev@virtuozzo.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20260714151638.143019-1-andrey.drobyshev@virtuozzo.com>
-References: <20260714151638.143019-1-andrey.drobyshev@virtuozzo.com>
+ 2026 15:35:51 +0000
+Received: from AS2PR08MB9199.eurprd08.prod.outlook.com
+ ([fe80::5022:16e9:45e4:f778]) by AS2PR08MB9199.eurprd08.prod.outlook.com
+ ([fe80::5022:16e9:45e4:f778%2]) with mapi id 15.21.0202.018; Tue, 14 Jul 2026
+ 15:35:51 +0000
+Message-ID: <52f6b231-7351-4dbf-92cf-459f1f19d150@weidmueller.com>
+Date: Tue, 14 Jul 2026 17:35:50 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] net: macb: reprogram TBQP after shuffling the TX
+ ring on link-up
+To: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>,
+ Kevin Hao <haokexin@gmail.com>
+Cc: christian.taedcke@weidmueller.com,
+ Conor Dooley <conor.dooley@microchip.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Clark Williams <clrkwllms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+ Robert Hancock <robert.hancock@calian.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rt-devel@lists.linux.dev,
+ stable@vger.kernel.org
+References: <20260706-upstreaming-macb-irq-storm-v1-0-ab3115b5a13a@weidmueller.com>
+ <20260706-upstreaming-macb-irq-storm-v1-1-ab3115b5a13a@weidmueller.com>
+ <akzDQrmdYwHAMMmw@xiaowei>
+ <8d53c3d9-7918-456c-8c27-e9d73c896452@weidmueller.com>
+ <ak2-XJHVc3Cg6ZEk@xiaowei> <DJUXYXEQMUJ4.31H82KQMG29UC@bootlin.com>
+From: "Taedcke, Christian" <christian.taedcke-oss@weidmueller.com>
+In-Reply-To: <DJUXYXEQMUJ4.31H82KQMG29UC@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: VI1PR09CA0107.eurprd09.prod.outlook.com
- (2603:10a6:803:78::30) To VI0PR08MB10656.eurprd08.prod.outlook.com
- (2603:10a6:800:20a::12)
+X-ClientProxiedBy: FR0P281CA0077.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:1e::16) To AS2PR08MB9199.eurprd08.prod.outlook.com
+ (2603:10a6:20b:578::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,162 +95,242 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VI0PR08MB10656:EE_|DU0PR08MB7692:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7845cc5b-6772-4526-4636-08dee1baee87
+X-MS-TrafficTypeDiagnostic: AS2PR08MB9199:EE_|GV2PR08MB11393:EE_
+X-MS-Office365-Filtering-Correlation-Id: 41af9c90-a329-4062-c89f-08dee1bd95ce
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|366016|376014|52116014|7416014|1800799024|56012099006|38350700014|22082099003|18002099003;
+	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|23010399003|4133799003|11063799006|56012099006|4143699003|6133799003|18002099003|22082099003;
 X-Microsoft-Antispam-Message-Info:
-	946jBYZ45mAHPBO33hxS+GK/jZRPOuJ7vB447lcUm/HVNwBZWnQr2dX9VVsOOmuFpqStIiz/5/z+CF7e5yN+PcQMp+k2lNykGIKhcQGE7cmV+8FLimRnRLM6GU4dmclyOsTMhCxRIdnlkkwohkbh0Bz1BWqnYeHbjur6wYzKzmKQJrjH5gqkbSxs1Z7epDlx+Hhgym748iV6a4COXU/lEHNLeSX8lFRmQssLVCdJW8/wIPCUhL9NATkPHRLF9bERPkOnl9p+Xm8VGhMkw0mALFlZkIREDk9EKBK/aRdBkYFq46gU1pOLegoQZG/R4igs15nVg0XvRScuKzDY+eBCvMS+94RsHG/2hVdew/iVHZRPoU4twMMeYb6Cj55Ji9HT2FR1dqGx0EEuEimNlyHKnMWPjQhJW+V98n9F71yvH/Ec6MSYfTYm1gZnIvrQkRQ3shq/LndzjRT00nNA1mXianwPTZ45Yn0eX4Lo+otLzjr7k4KOl5QNVY9iLCFgtROznOk4+Xq7pr5MR4DMKktXQtQP4x7qTO8dE37QjUrhoKVAoQJT2EyjZX8KKV+V5e5a2d1EeEvaSkgdooO+rO5Ju1MYLsvkaSPWmpUETLB//3iCwEeBKaxW90JK9tMo9JWcJ6BaIH0TTd9WHyJmO1D2Q/kxT4kh5FbjKmK/s7hwW/0Y9acySXbtrOiFBoSLifN/KvO6YalGcCrhZch7pVXDThXxIlcemW/K1CRxY+HA2v8=
+	t7bOR/enL+kzccG2WcyLvJ2JZ6NIkyn7Zcj3lJm84Imi2ejLz16bKHOWxHh/OtKyBoipVsMc8PekcDI+if3CzhTzCSYc7ALd+Pu2KU+LOR84BFiesex8s1ulTBK8tLuDLgggxXlZ+D2qhQzPw1s2JzkgHYjfVkfWOB9BthnFDCcfMx+/HxTRZr9W6uW2KsS/N/P2Sj4PrL5QVp3EqxgiEQ5AHwCDQLIon6nuTvOoYe5Es6DrqLgn+HyaMDDbmdb+mGz6X3XBd8UieyzrUG1NzstRcpq52p15HUxvmK/qRAEfnBWekT9pfB+XTxtd439PhZriZF7UAA4CjzLR8rTk1lQJqVCWsXMw3ELoekY3WMWa62yoaloaWEyfXI0FNnKYRmwUr9qRRTLityKEPwflrA8I0Pc0F/b/K4kIVMLLpEdQ7z3mvC7sC6nLI6lJcmqEqJwFUbs8x+rgh1OIXJKuO6uiCYwHAGOkPgy9JnW3QMgm5Wp+YlwYa5KAG8usePJQZrniuioLSDPLt+iBa08FHNcB7RiK+skfe+2AbkLODUJHy4CBbqNeWEF9yd8zYxxCq2Bk3z8WEqlt0HzNBXIwH2Qq+aDvw6MEVeMjByDG4U4=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI0PR08MB10656.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(376014)(52116014)(7416014)(1800799024)(56012099006)(38350700014)(22082099003)(18002099003);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS2PR08MB9199.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(23010399003)(4133799003)(11063799006)(56012099006)(4143699003)(6133799003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?o+GjTcPv04UJw7He4lKwzVv5AL2XcQPkxvuLjcMnv5QX8afjRfj4DfOl4gfR?=
- =?us-ascii?Q?UgdMkLal6RrfO1fXDv2FSRt/Pz/jTiTEx1gUg9NzXjBsvbByWAM+W0zYOkkP?=
- =?us-ascii?Q?l4yBGiRhcBWnf+BW2LZDAPbs3wotWr10s9ysvzmuOfUHu1cZWG1/VLeSiFZz?=
- =?us-ascii?Q?Y7BA95Q97JSauLP1AhRn49x+ctc55N6+AZ2ShqRw5nOuf9rPpPGVaxRU0kWr?=
- =?us-ascii?Q?hPVh7zJNQHKdPpiDAYJGHc1qZlO2LmszI1IdqBK8zJgf9j3Zj57wMKgg7T6n?=
- =?us-ascii?Q?3u5Hh9iCfMeFfXWSJj70/fABKZ2y5M6dhfcr3xEBLytMpM+07hrOqbFJ/G0f?=
- =?us-ascii?Q?wpoThggBBmX7xZKr98OScTiBJTNFRprw/xDispSth0w1ifsZRXIFo8Kljubr?=
- =?us-ascii?Q?C/RxMnP0zrne8WgLBIXTxAIM9hfdWRNi2sF1RhcnT/4XwSJMeho4igUe0kzo?=
- =?us-ascii?Q?VvrUWD0dD9d8zwLM5zbq1EdmGTzLSDjpFcsjtQS9ZiyEJTO2vM/CtGNO9xRc?=
- =?us-ascii?Q?oqhSCllmLVGZ+TrRPdm0u0+FUnQwPoVVKXa/xs2/fgnnfg7J+p+3FutdAOij?=
- =?us-ascii?Q?6WzNM6LpEuxs/0AarR0G0bvvWF4bjovojPo5pVOTGTaGjls994H2LFDcDLkC?=
- =?us-ascii?Q?qhclLDc28BBHhdkW6iJ/d5AbwklRgu+YpW2kGqJ/z1b5A/czuw/W86W8U8XW?=
- =?us-ascii?Q?rCs4dEobw5DSz7ZK9QyeRimsHNowJBVgGyCEggw4mzPKYNJAY9NtNRH18lxK?=
- =?us-ascii?Q?fbhbqATBTyIx8liXGJnrKWWF0vLTh5AC+HzfG+XqTy6xMrf4vTqEbXjLnThZ?=
- =?us-ascii?Q?IsQjYQcrz69aKLRcLXIhqFghYMmU3jsOJbUj4A2r1+9o5H0UwR+bdb1y730O?=
- =?us-ascii?Q?hEZzfyEbffoN8xqAj/2tA9kXs6gVNVEsoqV++m26hQDLRrPrB0/kr4oNCnWB?=
- =?us-ascii?Q?W5o9YhWb4E53uRntGvCtCqcm5TXVsMcc/mtqUgLRLR98oxR5EMmS232D7onW?=
- =?us-ascii?Q?+CzmLjtKdMmxZPM98OQcK5BtX+qN9ZFR/JIzvQS5E1DXrKuV9oCO+yAvzCbU?=
- =?us-ascii?Q?onLFW4m+Haz012cKwAxIpkSZZTAVMSuxYlBPp0nM/ssJsYncCFBvU6jMfRiO?=
- =?us-ascii?Q?S3FovA4xUJTGyt2RaOVm/rd+RTOjumi1XLJ9pz9T7wh1Lo9IW+fuoof5NiZ3?=
- =?us-ascii?Q?KABY1aKdLZD8Ynu4K7N46eB24aMlwu1Wcibdpynuvu6nfapmHk1UgQLtCgI6?=
- =?us-ascii?Q?Rpb6Y0j97G1RjlYvJBLvC2pQ2VUO0niouqDqSGAraY5wKory+46XkBmnPq8E?=
- =?us-ascii?Q?0mR0Tfw5MQFynzFO2m7L+XtuS1KQSpwZzLXfx7csyyXRt7zdQjLRCYmSZw+p?=
- =?us-ascii?Q?LH1bDvqzXxoBQCWB8DH04HFVLe7SWDLV81pOiPv1FPHkyF68YR6ynxVrNx48?=
- =?us-ascii?Q?djUcU+w0XXc0zdACMqC3wn4uI3s+hCrZ/rB7nrIr0/WLu5GdpQ1MHvSbm+Mc?=
- =?us-ascii?Q?TKP/C36s/zmFpylciQAMTnzrqLkGhslePyFN9j1EBoMfGx3EexxX2BBhPziM?=
- =?us-ascii?Q?Rz4WFzU8h4ksp5f0AXmEWxYjQtJ1KQTtGKld9OXpscA6aZ5ADt8zNU3xqk1P?=
- =?us-ascii?Q?0vxvBysJD8h0Tf/578lOU/bqnX+KaSb+LBBLaD2d31faXHrQD5Fv+K+Y/iSS?=
- =?us-ascii?Q?hyuRxIaPwx8BPcPZOfXKJYkQKEx8G7i+ZVpL/GG9Zgo/3qEMZk4Qh3Ak8WYl?=
- =?us-ascii?Q?3rJebhAbrCjzLhQoQEAPij20fWXQKXg=3D?=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7845cc5b-6772-4526-4636-08dee1baee87
-X-MS-Exchange-CrossTenant-AuthSource: VI0PR08MB10656.eurprd08.prod.outlook.com
+	=?utf-8?B?WGFINUZRNHM0V2F6Y1dic3ZQS2hEcjM1N1JkMVBEUVFKM2tyQ0NWQU5CTnN6?=
+ =?utf-8?B?UWlxTWRDQUJEQTFsVThURk91eVgza1J3NjZwRCtwNkZaME44YVZCMHJ1cjNq?=
+ =?utf-8?B?U24rSDJRQ0JwU25TU1VuQ1RWNVNxdGxCOG5yMStzU01JVEt3L2hhNmhwZDgy?=
+ =?utf-8?B?VTBaNU5yUVR4dFB5ZStwbjd5YnQ5NmFPWUFPU0hxTGtycEdVY3NRU0dBMDUy?=
+ =?utf-8?B?cHlYOUkycXhkSTNLaVEveERVcmd1Q2J0RmZ3OVdYNlN2VzBvQlJSZHYySnNR?=
+ =?utf-8?B?QkNYWVJ1NjBSbUQ0S3EyN3l5RHBBNlFhN2NkRHZKTFlxRUFIZUUzV1BNTkYy?=
+ =?utf-8?B?MlhXNUZOMXNUM2MrdTE0VThsa1UwZ1RQaW1PSEk2dWdBblZzVldZUUE4dk9x?=
+ =?utf-8?B?TTR4V3pJd2tORWp2Tmkxb2U4VG9KMHQvK2lNOEpSNVhwNy9udFBDeUxtVzV4?=
+ =?utf-8?B?V09udjVtekI1RFhqV1MrZlNraVVDd0JKNXZRQ3ZaOTE4M0FHdW4yVmN4ekxs?=
+ =?utf-8?B?UGpuMjNHMDRzbFhpUGtHcEpwcVpLcXdxUU5oampwdG5PcndvdmdMUlptdjdB?=
+ =?utf-8?B?U3p1SFF4bVEvU0daT0dWOGtVNmNLdGJWS1BSaVpmb2NhaitQVmM2Qmx5MW1Y?=
+ =?utf-8?B?VVRUMllWRVRONW51TXpqZzNLMG9iS01OblZzVFhnVWRNMVJYVHo2QmpvY05h?=
+ =?utf-8?B?WVpLOGZoSVRCOGN6YXFUTXNIZnR4MGtCN1RlOUhKaXYybVVrN3owblQxaTNl?=
+ =?utf-8?B?amJpMGZwNHIxcVRUS2UrMFZ0V3lsSDFlbGxMVjdBblcrZForOUUwSjd4bDFs?=
+ =?utf-8?B?RTRTYlhEd3hnTjF1VHB6YzVMbUxVc0JmUTFQT2FXSVlmV2t2L0VzQWd1SVZO?=
+ =?utf-8?B?MFJFYndFL0ZPN28wdEsrTEpUaHl3bDVKMzhrbXZlUk9VOWpSVXB1bmlhbUls?=
+ =?utf-8?B?NlB6WGIxS21nUmF6QnpTR1BoL1dLMzdnSDNyc2ZwbC9CYXdUclcrZ1VpWUNQ?=
+ =?utf-8?B?akRHdkFoWW4vQjUwZlNraW9CNHN5Lzg0VkdlZDhpaGx4bHFCQ2tsSk00Smgx?=
+ =?utf-8?B?ZVdRbloyWmZDdk93VU9lRVhWcTI5MEpST3RYbWhGcS9GYU5DcFVhYzJucUlR?=
+ =?utf-8?B?ZngxQldoSThmTDAyZGk2Z1YvVHVKRHp4L00wSUdGNW9XVit2OHYvdnFnL1ZU?=
+ =?utf-8?B?b2o3M3hZQ2hGdmRTWXlZdUh0QkdHeDRDK2NJTnpldit1QW8wSUJEYUtsSHY1?=
+ =?utf-8?B?bTdUQ2R2Qzd6SXlOT1dIckppY25sNmZ2cFlJalFzcFg2SWhPU1kxSTJMRWVj?=
+ =?utf-8?B?UzJkd1JDNkFIYmliUUZGUHVXU0FiUUQ1OU1JVDc2N1FKa0JvZjBKUHJldmVi?=
+ =?utf-8?B?YURPdThQTU0zenhqY1I5b3RITU9CQmhOeFF5aHZhcm9kMUxDaGI5QVMzZlVG?=
+ =?utf-8?B?WUF4N2pnUTF3NEdESmwwUWNSelRacUd2ZGNBUC9PcFE0Rm9UMFVnRS9YUDAw?=
+ =?utf-8?B?VDhpZHp2ckVIK2NNSTdlY3ozd0ZHV2M0ampaZCtLSXZ0ZFRneDNiQnJSMXdR?=
+ =?utf-8?B?WFR4cVNDUkd4U0J0MGgwOEFHZDdBNXFaa2FKY3FRZkk0aS9KTzYwV0NkV3Vl?=
+ =?utf-8?B?NG1GbW4rNVZiL2tzdHRnNGZTWnh1QmZsUFBzR0RMYlRBRCtab2xjdlRTaDF5?=
+ =?utf-8?B?OWh6T1oyWW5CMzQ2VVJSV1c1eXBCQ1lmdGNkQmZteTluWEpRU0g1NEwza3Vr?=
+ =?utf-8?B?OVJHQXlKNWxlVG9uSHZlckVTVGE3ZEl4US9GRnc1ZTZwQmxnc0NlSU5ycWVN?=
+ =?utf-8?B?cThZR1c2WWZYTWNtSzhaanl3eUdFSzZLQU5OV2lSVmkvZHRYZkVkWVlyem92?=
+ =?utf-8?B?aUxUdWJraVlhS0M3Y2VqM0h2Zlo4KzVzUER1c2lCc1MyaXpiTkRObnltT1FV?=
+ =?utf-8?B?dDNNZ1lhd3VVUkltL2VpUWNCVEZieHBFVGU1WldBdWt3WVB5L2oxNGtOeE5S?=
+ =?utf-8?B?dzAxdWkwaG0yQkVHaEtNdjN6dm5XWXFTaGxqUHh0d1AxN09KNVpjcXpCcjVI?=
+ =?utf-8?B?OGJFbXBVSkdTL2doejc2cU9RZEpMMU4rUG9PblR0RjhBQmJhWXRtTUc4elI5?=
+ =?utf-8?B?V3MxU1JyWGVvS0ROcHFvZUNIcXk4UlNhNFllYlVYeUcxTnJoVlhkVGxSR2VB?=
+ =?utf-8?B?dWNpM2VOcDE5NmxVS29Pb1Q3dEYvY3hTU0xYTkNBbDQ0QXVuNWJzSlR2QzZ0?=
+ =?utf-8?B?S1IxTmhJNnNUZkFLSGtTWENhYUxRRDVqbDZZQVppS2RSdE5iYm5JTVNSVmsy?=
+ =?utf-8?B?Rm5RWXBhRVBHOFBNVDFEbUlpRm5ZUXRHR1pNelpxZ0lZQ1cyV1B2S3BqVGZC?=
+ =?utf-8?Q?bKeLaqYwxE3KVeDZtDHomYscjkO4+ovg1JuVP?=
+X-OriginatorOrg: weidmueller.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 41af9c90-a329-4062-c89f-08dee1bd95ce
+X-MS-Exchange-CrossTenant-AuthSource: AS2PR08MB9199.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2026 15:16:51.6529
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2026 15:35:51.2633
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-Id: e4289438-1c5f-4c95-a51a-ee553b8b18ec
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +eZaUA0nGl029oPphJ3/jxMHtHMqW/iXtAM657Ywtm9iH8JB62qXzZs9iMswijHOWouJ1qPJAtQ9mPqXkWWi0UkDxgx5wYaS+xgXc40agM8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR08MB7692
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8nGnR6H/0nm9npMSM/SMsrSwsqRSK2d2FXPg7y8ejLeyZ5lQF9xAUIygln+Ok+TBCZPmHUvIzpfxmA9i3AthBCW/MNNzQPPUeaZNTKfdJjPLTKX3VqCTYynKOkgGBnUA
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR08MB11393
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[virtuozzo.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[virtuozzo.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[weidmueller.com,reject];
+	R_DKIM_ALLOW(-0.20)[weidmueller.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:kvm@vger.kernel.org,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:sgarzare@redhat.com,m:mst@redhat.com,m:stefanha@redhat.com,m:dongli.zhang@oracle.com,m:maciej.szmigiero@oracle.com,m:bchaney@akamai.com,m:mark.kanda@oracle.com,m:ptikhomirov@virtuozzo.com,m:den@openvz.org,m:andrey.drobyshev@virtuozzo.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[andrey.drobyshev@virtuozzo.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-307515-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[virtuozzo.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrey.drobyshev@virtuozzo.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-307516-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_TO(0.00)[bootlin.com,gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:theo.lebrun@bootlin.com,m:haokexin@gmail.com,m:christian.taedcke@weidmueller.com,m:conor.dooley@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:bigeasy@linutronix.de,m:clrkwllms@kernel.org,m:rostedt@goodmis.org,m:robert.hancock@calian.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rt-devel@lists.linux.dev,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[christian.taedcke-oss@weidmueller.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[weidmueller.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[christian.taedcke-oss@weidmueller.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,virtuozzo.com:from_mime,virtuozzo.com:mid,virtuozzo.com:email,virtuozzo.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[weidmueller.com:from_mime,weidmueller.com:dkim,weidmueller.com:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amd.com:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AE96775666B
+X-Rspamd-Queue-Id: 0D67E7567D7
 
-From: Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
+Hello Kevin & Théo,
 
-This ioctl is needed for QEMU's CPR (checkpoint-restore) migration of
-the guest with vhost-vsock device.  For this to work, we need to reset
-the device ownership on the source side by calling RESET_OWNER, and then
-claim it on the dest side by calling SET_OWNER.  We expect not to lose any
-AF_VSOCK connection while this happens.
+i recorded some traces and include 2 of them here.
 
-To that end, unlike the release path, RESET_OWNER keeps the guest CID
-hashed: established connections survive, and host sends issued while
-the device is between owners simply stay on send_pkt_queue until the
-next device start drains them.
+On 7/10/2026 3:56 PM, Théo Lebrun wrote:
+> Hello Kevin & Christian,
+> 
+> On Wed Jul 8, 2026 at 5:05 AM CEST, Kevin Hao wrote:
+>>> I agree that the TRM says the transmit pointer is reset while TE is low. My
+>>> question is whether this describes an internal pointer being reloaded from TBQP,
+>>> or whether TBQP itself is restored to the original ring base.
+>>
+>> The Zynq UltraScale TRM [1] describes the receive-buffer queue pointer as follows:
+>>
+>>   An internal counter represents the receive-buffer queue pointer and it is not
+>>   visible through the CPU interface.
+>>
+>> I could not find a similar description for the transmit-buffer queue pointer,
+>> but I believe it behaves the same way. From a software perspective, it should
+>> be safe to assume that the TBQP is reset to point to the start of the transmit
+>> descriptor list upon reset. This assumption is supported by the description
+>> of the transmit_q_ptr (GEM) Register [2]:
+>>
+>>   Reading this register returns the location of the descriptor currently being accessed.
+>>   Since the DMA handles two frames at once, this may not necessarily be pointing to the
+>>   current frame being transmitted.
+>>
+>> [1] https://docs.amd.com/v/u/en-US/ug1085-zynq-ultrascale-trm
+>> [2] https://docs.amd.com/r/en-US/ug1087-zynq-ultrascale-registers/transmit_q_ptr-GEM-Register
+> 
+> For what it's worth, I agree with Kevin.
+> 
+> It should be rather easy to detect if the patch is needed, with more
+> logging. Dump TBQP before link-down & dump it at link-up. The code
+> expects TBQP to reset to the ring start automatically whereas this
+> commit message says the TBQP after link-up is some offset into the ring.
 
-Since the device stays reachable through the CID hash, the lockless
-send/cancel paths can race with the worker teardown in
-vhost_workers_free().  The previous commit ("vhost: synchronize with
-RCU readers when freeing workers") makes that safe.
+These traces were captured on a zynqmp device. The patches in this series were not applied.
 
-Signed-off-by: Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
-Signed-off-by: Andrey Drobyshev <andrey.drobyshev@virtuozzo.com>
----
- drivers/vhost/vsock.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+The traces contain information from both tx queues (q0 and q1).
+tbqp contains the value returned by queue_readl(queue, TBQP).
+base is lower_32_bits(queue->tx_ring_dma).
+tbqp_ctrl contains macb_tx_desc(queue, tbqp_idx)->ctrl.
+tail_ctrl contains macb_tx_desc(queue, queue->tx_tail)->ctrl.
 
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index d5022d21120b..86f25ff80722 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -903,6 +903,29 @@ static int vhost_vsock_set_features(struct vhost_vsock *vsock, u64 features)
- 	return -EFAULT;
- }
- 
-+static long vhost_vsock_reset_owner(struct vhost_vsock *vsock)
-+{
-+	struct vhost_iotlb *umem;
-+	long err;
-+
-+	mutex_lock(&vsock->dev.mutex);
-+	err = vhost_dev_check_owner(&vsock->dev);
-+	if (err)
-+		goto done;
-+	umem = vhost_dev_reset_owner_prepare();
-+	if (!umem) {
-+		err = -ENOMEM;
-+		goto done;
-+	}
-+	vhost_vsock_drop_backends(vsock);
-+	vhost_vsock_flush(vsock);
-+	vhost_dev_stop(&vsock->dev);
-+	vhost_dev_reset_owner(&vsock->dev, umem);
-+done:
-+	mutex_unlock(&vsock->dev.mutex);
-+	return err;
-+}
-+
- static long vhost_vsock_dev_ioctl(struct file *f, unsigned int ioctl,
- 				  unsigned long arg)
- {
-@@ -946,6 +969,8 @@ static long vhost_vsock_dev_ioctl(struct file *f, unsigned int ioctl,
- 			return -EOPNOTSUPP;
- 		vhost_set_backend_features(&vsock->dev, features);
- 		return 0;
-+	case VHOST_RESET_OWNER:
-+		return vhost_vsock_reset_owner(vsock);
- 	default:
- 		mutex_lock(&vsock->dev.mutex);
- 		r = vhost_dev_ioctl(&vsock->dev, ioctl, argp);
--- 
-2.47.1
+At the beginning the link is up and communication over ethernet is working.
+The cpu is not at 100% load, everything worked fine.
+
+
+Trace 1 (everythink works as expected, no high cpu load):
+
+The ethernet link goes down.
+
+Trace from macb_mac_link_down():
+
+     kworker/0:4-1679    [000] .N...   141.796925: macb_tx_hw_state: macb_tx_hw_state q0 linkdown_pre_te tbqp=67cd0030 base=67cd0000 ncr=0010001c tsr=00000021 imr=3fffffff head=2 tail=2 tbqp_idx=343 tbqp_ctrl=80000000(used=1) tail_ctrl=80000000(used=1)
+     kworker/0:4-1679    [000] .....   141.796958: macb_tx_hw_state: macb_tx_hw_state q1 linkdown_pre_te tbqp=67cda598 base=67cd8000 ncr=0010001c tsr=00000021 imr=00000ce6 head=3985 tail=3985 tbqp_idx=59 tbqp_ctrl=80000036(used=1) tail_ctrl=80000000(used=1)
+
+ctrl = macb_readl(bp, NCR) & ~(MACB_BIT(RE) | MACB_BIT(TE));
+macb_writel(bp, NCR, ctrl);
+
+     kworker/0:4-1679    [000] .....   141.796961: macb_tx_hw_state: macb_tx_hw_state q0 linkdown_post_te tbqp=67cd0030 base=67cd0000 ncr=00100010 tsr=00000021 imr=3fffffff head=2 tail=2 tbqp_idx=343 tbqp_ctrl=80000000(used=1) tail_ctrl=80000000(used=1)
+     kworker/0:4-1679    [000] .....   141.796964: macb_tx_hw_state: macb_tx_hw_state q1 linkdown_post_te tbqp=67cd8000 base=67cd8000 ncr=00100010 tsr=00000021 imr=00000ce6 head=3985 tail=3985 tbqp_idx=170 tbqp_ctrl=0000800f(used=0) tail_ctrl=80000000(used=1)
+
+Ethernet link goes up.
+
+Trace from macb_mac_link_up():
+
+     kworker/0:3-190     [000] .....   152.966203: macb_tx_hw_state: macb_tx_hw_state q0 linkup_post_shuffle tbqp=67cd0030 base=67cd0000 ncr=00100010 tsr=00000021 imr=3ffff305 head=0 tail=0 tbqp_idx=343 tbqp_ctrl=80000000(used=1) tail_ctrl=80018040(used=1)
+     kworker/0:3-190     [000] .....   152.966206: macb_tx_hw_state: macb_tx_hw_state q1 linkup_post_shuffle tbqp=67cd8000 base=67cd8000 ncr=00100010 tsr=00000021 imr=00000004 head=0 tail=0 tbqp_idx=170 tbqp_ctrl=0000800f(used=0) tail_ctrl=0000800f(used=0)
+
+macb_writel(bp, NCR, ctrl | MACB_BIT(RE) | MACB_BIT(TE));
+
+     kworker/0:3-190     [000] .....   152.966209: macb_tx_hw_state: macb_tx_hw_state q0 linkup_post_te tbqp=67cd0030 base=67cd0000 ncr=0010001c tsr=00000021 imr=3ffff305 head=0 tail=0 tbqp_idx=343 tbqp_ctrl=80000000(used=1) tail_ctrl=80018040(used=1)
+     kworker/0:3-190     [000] .....   152.966211: macb_tx_hw_state: macb_tx_hw_state q1 linkup_post_te tbqp=67cd8000 base=67cd8000 ncr=0010001c tsr=00000021 imr=00000004 head=0 tail=0 tbqp_idx=170 tbqp_ctrl=0000800f(used=0) tail_ctrl=0000800f(used=0)
+
+CPU load is normal, no issue in this trace.
+tbqp on q0 is not reset to base. But in this case it did not result in the interrupt storm.
+
+
+Trace 2 (results in interrupt storm):
+
+The ethernet link goes down.
+
+Trace from macb_mac_link_down():
+
+     kworker/0:3-95      [000] .N...   459.682957: macb_tx_hw_state: macb_tx_hw_state q0 linkdown_pre_te tbqp=67cd2cb8 base=67cd0000 ncr=0010001c tsr=00000021 imr=3fffffff head=4061 tail=4061 tbqp_idx=306 tbqp_ctrl=0000800f(used=0) tail_ctrl=80000000(used=1)
+     kworker/0:3-95      [000] .....   459.682991: macb_tx_hw_state: macb_tx_hw_state q1 linkdown_pre_te tbqp=67cd85a0 base=67cd8000 ncr=0010001c tsr=00000021 imr=00000ce6 head=60 tail=60 tbqp_idx=230 tbqp_ctrl=80000036(used=1) tail_ctrl=80000000(used=1)
+
+ctrl = macb_readl(bp, NCR) & ~(MACB_BIT(RE) | MACB_BIT(TE));
+macb_writel(bp, NCR, ctrl);
+
+     kworker/0:3-95      [000] .....   459.682994: macb_tx_hw_state: macb_tx_hw_state q0 linkdown_post_te tbqp=67cd2cb8 base=67cd0000 ncr=00100010 tsr=00000021 imr=3fffffff head=4061 tail=4061 tbqp_idx=306 tbqp_ctrl=0000800f(used=0) tail_ctrl=80000000(used=1)
+     kworker/0:3-95      [000] .....   459.682996: macb_tx_hw_state: macb_tx_hw_state q1 linkdown_post_te tbqp=67cd8000 base=67cd8000 ncr=00100010 tsr=00000021 imr=00000ce6 head=60 tail=60 tbqp_idx=170 tbqp_ctrl=80000036(used=1) tail_ctrl=80000000(used=1)
+
+Ethernet link goes up.
+
+Trace from macb_mac_link_up():
+
+     kworker/0:3-95      [000] .....   470.292877: macb_tx_hw_state: macb_tx_hw_state q0 linkup_post_shuffle tbqp=67cd2cb8 base=67cd0000 ncr=00100010 tsr=00000021 imr=3ffff305 head=0 tail=0 tbqp_idx=306 tbqp_ctrl=0000800f(used=0) tail_ctrl=0000800f(used=0)
+     kworker/0:3-95      [000] .....   470.292879: macb_tx_hw_state: macb_tx_hw_state q1 linkup_post_shuffle tbqp=67cd8000 base=67cd8000 ncr=00100010 tsr=00000021 imr=00000004 head=0 tail=0 tbqp_idx=170 tbqp_ctrl=80000036(used=1) tail_ctrl=80018040(used=1)
+
+macb_writel(bp, NCR, ctrl | MACB_BIT(RE) | MACB_BIT(TE));
+
+     kworker/0:3-95      [000] .....   470.292882: macb_tx_hw_state: macb_tx_hw_state q0 linkup_post_te tbqp=67cd2cb8 base=67cd0000 ncr=0010001c tsr=00000021 imr=3ffff305 head=0 tail=0 tbqp_idx=306 tbqp_ctrl=0000800f(used=0) tail_ctrl=0000800f(used=0)
+     kworker/0:3-95      [000] .....   470.292884: macb_tx_hw_state: macb_tx_hw_state q1 linkup_post_te tbqp=67cd8000 base=67cd8000 ncr=0010001c tsr=00000021 imr=00000004 head=0 tail=0 tbqp_idx=170 tbqp_ctrl=80000036(used=1) tail_ctrl=80018040(used=1)
+
+After that sequence one CPU core is at 100% load continously executing the macb irq handler.
+
+The issue seems to be q0. tbqp of q1 is properly reset to its base address.
+tbqp of q0 is not changed as expected in link down when tx is disabled.
+
+Are there any other details i could put into the trace to determine the root cause?
+I suspect that some packet is still in transmission/ being processed and this might be the
+reason why tbqp of q0 is not being reset. But i do not see that in this trace.
+
+
+> 
+> Lastly, the cover letter mentions that [PATCH 1/2] alone isn't enough.
+> But it doesn't mention that [PATCH 2/2] alone doesn't solve the issue.
+> This would be a useful test as well.
+> 
+> On Tue Jul 7, 2026 at 3:36 PM CEST, Taedcke, Christian wrote:
+>> Thank you for the quick review! This is my first Linux kernel
+>> contribution, so I appreciate your feedback here.
+> 
+> Welcome!
+> 
+> Thanks,
+> 
+> --
+> Théo Lebrun, Bootlin
+> Embedded Linux and Kernel engineering
+> https://bootlin.com/
+> 
+
+Regards,
+Christian
 
 
