@@ -1,147 +1,420 @@
-Return-Path: <netdev+bounces-307455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307457-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YOaFBNQzVmpb1QAAu9opvQ
-	(envelope-from <netdev+bounces-307455-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:04:20 +0200
+	id 23blAgI0Vmpp1QAAu9opvQ
+	(envelope-from <netdev+bounces-307457-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:05:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4734F754D2A
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:04:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CE1E754D4F
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:05:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=resnulli-us.20251104.gappssmtp.com header.s=20251104 header.b=wupdiznG;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307455-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307455-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=eytIbY63;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307457-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307457-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C661F30E1FDB
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 12:58:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B9CF130AB961
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 13:00:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EBEC4508F8;
-	Tue, 14 Jul 2026 12:58:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C2A14534A8;
+	Tue, 14 Jul 2026 13:00:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856164483BA
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 12:58:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936203BA253
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 13:00:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784033936; cv=none; b=DpErzS36K8ygRKXIJqDLQOQAwHAoIQGZtuSZ/lNGJB568BvfZTtvmzrL2TZIIALh55mS+L4GmsT3Fb9d18IkUxOuqDnxvHPj0BE6vv+iBdO9f1vsPAYww4r5A1T6SIADfWafqOCoSCKeXluTUAst06Wyn3o7p5JzLDe4Om9biYM=
+	t=1784034003; cv=none; b=T04BkmJMkBanSGznu3VO9thLVOTGS2qKHgXoBCr35lXGR0W/kJg0dmXVQYgCcfdG9iDghv0Aye7mbIiNgvVqeZjymZF5LemXx+UTn2KC8PWphXlLV4SnxuLod+UcbIRul6zKS7XSZqmf9ips8G+bstQFSR0B0osJ0Qlmj34RV9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784033936; c=relaxed/simple;
-	bh=kh3suqL/Cm8hQIsIKe0J8PGLIi3c5/TsdDTB9lcKtKk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZvDRTbbtwQrKjIvRExdY0VRDgqdnODY2Taca5MJP/DzRVCS2NaRI0hV1WTxNV0eUF1dW/tK7/O/r7VflLckDLTitFIFzhXj5l2XRd3W67fx1zMmAOK9QmW8omelHfT4h140yy2kKnOicBqhiOciTLPGzl7LTTbwL/zJ5bCrEx0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=wupdiznG; arc=none smtp.client-ip=209.85.208.179
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-39c74722e27so10234251fa.0
-        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 05:58:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1784033932; x=1784638732; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=kh3suqL/Cm8hQIsIKe0J8PGLIi3c5/TsdDTB9lcKtKk=;
-        b=wupdiznGcYprahXhJW6o2Is6dB5DIVNgFItm+8Dj7MbdAfl1s6OvBIUfebvG2V+m9a
-         QSqwEV90UhhC2b8sXapkBBoDZM8Wv7m+itT3Lsja1S2VYPrKhlxJ1ImFSMZZsMNRcxLR
-         O8i+3nb2dVQ1vXmDDIxlB9TaBgYKL7T0NAS3dncZ0shUO2sRTceSjeS87E9NhJ6pM7MG
-         7tJ/j4mC5XdLYSi3irSeuRbK0Eo3Hv9JZWzDQ8Pl5owlIhUWCdBTE6xWNDyBi6n2unIr
-         AbpMXilmsHktYItX2xrRyHre7F8bsr6zzaBC8P163uLE5bDeyIE0HxtkmLcmNCsPdvIN
-         lK3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784033932; x=1784638732;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=kh3suqL/Cm8hQIsIKe0J8PGLIi3c5/TsdDTB9lcKtKk=;
-        b=m8Vqyy/Cc+0DvfE+QC9IwhgJT7rOmH7qXn3ojyAK+ClytpFz2qs+0bsNkYGs9jyGPE
-         tInae5piEwqChmP9b7z9zpAElkJ+l131jgiD9t/A8uv58fG+v8G1zR3Q+e3FKalh2iaE
-         CYcgFb8TXRwCbGcL7lQF4QBw65eQmxq8A74Qjhjl5N5C5bPcoTCgsJUNm7XEfASFHglg
-         f/ZNJ1MOdzi1AKDP0KLyDRIg4aJ2667C+fLe6dPTRLgMiV/Nerxu+8apuJ0iTLpDTBXj
-         LfA5MJ1eChX+S2n4LpSrKI/T+/Np9rMZ3rOhIfMr8STsGQEdpmpvnKWPTIj1D0t5MDal
-         2alg==
-X-Forwarded-Encrypted: i=1; AHgh+Rpcw3R3vDDzX9fD/E75yytm4j0d3N3aBvHmK+qe57KaLGQRbLNy29KBOO0trmSfpMQecnY/Bzg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/Ns/DdaW3y49Lic3PtasvA5s1lCmjlasefUvjo8nvz65y6zOK
-	9PdJhGXZoQK7gt9Ctf65pAvkB+TTIlHO3LnOdnGLd8Fp+ghpkL39dKfUKLKuG0MJitA=
-X-Gm-Gg: AfdE7ckIAae7rBgF/VyK0BSlL5YtOYlA84fcXThIACqRe9Ce7dHFlhl4neqhsoLBvBO
-	ivKCy6a9ta/mlFIBQ4m71qEiRT5cC05gwv2fXSwMMPtIh3gd1PFL81ntcYfAp44RLYgkR3gByEz
-	oMXsq8jZHUH6HXb8zhkV40fw6AmPpTuqeHv9coGkIvoSgSVAG6pW+kby/0CEu16eLb/M93IKQYQ
-	bfSBuuzwKdn0swrA8WLpxzRkPYVjcSQrxet1IFP2sEXPWJs0ysbDFxkGSyklAzhzyydUSLiJm4t
-	lIcdMsxvBlQLyJGoTCyUBVkxuUrxieOEHSkL/PmpC5SAhoNCCx3obMeZfTWxve2UIaB2gQ/dAIw
-	lay+FVChYlYUL/O/85dAnoqsb+TV1S7gD+JNQCkQr1IpgeJP7X27OvdwkFL0v4hgMB2OhSN7OT2
-	guvnZJ8rrCQsMidzLEVwFiuQvU8FeM45avFA==
-X-Received: by 2002:a05:651c:b26:b0:39c:753a:853f with SMTP id 38308e7fff4ca-39ca9f115d0mr30337311fa.3.1784033932550;
-        Tue, 14 Jul 2026 05:58:52 -0700 (PDT)
-Received: from localhost ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-39c849174ebsm32107621fa.7.2026.07.14.05.58.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jul 2026 05:58:52 -0700 (PDT)
-Date: Tue, 14 Jul 2026 14:58:45 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, netdev@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next V6 2/4] devlink: Factor out eswitch mode setting
-Message-ID: <alYygM-2f4NB0uJA@FV6GYCPJ69>
-References: <20260714061731.531849-1-mbloch@nvidia.com>
- <20260714061731.531849-3-mbloch@nvidia.com>
+	s=arc-20240116; t=1784034003; c=relaxed/simple;
+	bh=edGerEJ2K5myu6qiGTaeBTVDgr0lKCq+OdaQF1FfJOE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kcwTzCHi4cbld3nxt4AF8sYrwhgVGJpTeDY+NSwSP4WZHyJr9+KUhsNmUXJ6r/uLPE83UbJkxw/+ddItR+/lOS1FT8wmEoCye39xtR1K/0RFRsYcNBSlTP5W0KGoIiNDWPH4D4I8mcHwJwoW3SM+VQGe/h/694/NBbV6w1G3YqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eytIbY63; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1784034000;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=KdoVF3uvyBF3nIIOAV85VbQPsvy+M+muvRTvMX/JvCk=;
+	b=eytIbY63z2F1Zuvqfwt3PZZLTHDE1dsgl52lgMsdcIQQowa/IqY7CT3vL38H41gip9OCeC
+	8unipnBU+cVxI89u+s2fKS5KC77L21MGw6cauGHZI8grbn9+5eYd7yjb8xZ1M5NYmcVa3E
+	TlNn38+QLZ82r5EKwZ7jgswzLaeJZBY=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-442-RxiK1hhaMkC9i9zSBNT7rg-1; Tue,
+ 14 Jul 2026 08:59:58 -0400
+X-MC-Unique: RxiK1hhaMkC9i9zSBNT7rg-1
+X-Mimecast-MFC-AGG-ID: RxiK1hhaMkC9i9zSBNT7rg_1784033997
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BBCEF195605A;
+	Tue, 14 Jul 2026 12:59:56 +0000 (UTC)
+Received: from p16v (unknown [10.43.2.199])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F2065180049F;
+	Tue, 14 Jul 2026 12:59:53 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net] dpll: use pin owner's dpll ref for pin-level attribute reporting
+Date: Tue, 14 Jul 2026 14:59:44 +0200
+Message-ID: <20260714125945.1823269-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260714061731.531849-3-mbloch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:mbloch@nvidia.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:andrew+netdev@lunn.ch,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-doc@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[resnulli.us];
-	TAGGED_FROM(0.00)[bounces-307455-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307457-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:vadim.fedorenko@linux.dev,m:arkadiusz.kubalewski@intel.com,m:jiri@resnulli.us,m:aleksandr.loktionov@intel.com,m:grzegorz.nitka@intel.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4734F754D2A
+X-Rspamd-Queue-Id: 4CE1E754D4F
 
-Tue, Jul 14, 2026 at 08:17:28AM +0200, mbloch@nvidia.com wrote:
->Move the common eswitch mode set checks into a small helper and use it
->from the netlink eswitch set command. This makes the same validation
->available to the devlink core path that applies eswitch mode defaults.
->
->Signed-off-by: Mark Bloch <mbloch@nvidia.com>
+Commit c191b319f208 ("dpll: allow registering FW-identified pin with a
+different DPLL") relaxed dpll_pin_register() to let fwnode-identified pins
+register with DPLLs from a different driver. This allows, for example, the
+ICE driver to register a zl3073x-created pin with its TXC DPLL using
+ice_dpll_txclk_ops, which lack frequency_get and phase_adjust_get
+callbacks.
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+After such cross-driver registration, the pin's dpll_refs xarray contains
+refs from both drivers. dpll_cmd_pin_get_one() calls
+dpll_xa_ref_dpll_first() which returns the ref with the lowest DPLL id.
+When the foreign DPLL (e.g. ICE TXC) has a lower id than the owner DPLL
+(e.g. zl3073x), the foreign ops are used for reporting. Since those ops
+lack callbacks like frequency_get, pin-level attributes are silently
+omitted from the netlink response.
+
+For example, a zl3073x output pin that should report frequency and
+phase-adjust shows neither:
+
+Before:
+  # dpll pin show id 45
+  pin id 45:
+    module-name: zl3073x
+    clock-id: 3427468959636104019
+    board-label: 156M25_NAC0_CLKREF_SYNC
+    package-label: OUT3
+    type: synce-eth-port
+    capabilities: 0x0
+    phase-adjust-min: -2147483648
+    phase-adjust-max: 2147483647
+    phase-adjust-gran: 800
+    parent-device:
+      ...
+
+After:
+  # dpll pin show id 19
+  pin id 19:
+    module-name: zl3073x
+    clock-id: 15964355450360090479
+    board-label: 156M25_NAC0_CLKREF_SYNC
+    package-label: OUT3
+    type: synce-eth-port
+    frequency: 156250000 Hz
+    frequency-supported:
+      156250000 Hz
+    capabilities: 0x0
+    phase-adjust-min: -2147483648
+    phase-adjust-max: 2147483647
+    phase-adjust-gran: 800
+    phase-adjust: 0
+    parent-device:
+      ...
+
+Fix this by:
+
+1. Adding dpll_pin_own_dpll_ref_first() helper that returns the first ref
+   whose DPLL matches the pin's (module, clock_id) tuple — i.e. the DPLL
+   from the driver that created the pin and has the complete set of ops.
+   Return NULL if no owner ref is found.
+
+2. Using dpll_pin_own_dpll_ref_first() in dpll_cmd_pin_get_one() with a
+   fallback to dpll_xa_ref_dpll_first() for pin-on-pin child pins whose
+   dpll_refs all point to a different driver's DPLLs.
+
+3. Using dpll_pin_own_dpll_ref_first() in SET operations
+   (dpll_pin_freq_set, dpll_pin_esync_set, dpll_pin_ref_sync_state_set,
+   dpll_pin_phase_adj_set) returning -ENODEV if no owner ref exists.
+   Replacing the validation loops that rejected the entire operation when
+   any ref's ops lacked the required callback — instead validate only the
+   owner refs so that foreign DPLLs with incomplete ops no longer block
+   SET operations.
+
+4. Guarding all SET and rollback xa_for_each loops against NULL set
+   callbacks so that foreign refs without the operation are safely skipped
+   instead of causing a NULL pointer dereference.
+
+Fixes: c191b319f208 ("dpll: allow registering FW-identified pin with a different DPLL")
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ drivers/dpll/dpll_core.c    | 27 +++++++++++++++++
+ drivers/dpll/dpll_core.h    |  1 +
+ drivers/dpll/dpll_netlink.c | 60 ++++++++++++++++++++++++++++++-------
+ 3 files changed, 78 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
+index bb1e8650c9d59..245f625f4b3b4 100644
+--- a/drivers/dpll/dpll_core.c
++++ b/drivers/dpll/dpll_core.c
+@@ -1146,6 +1146,33 @@ void *dpll_pin_on_pin_priv(struct dpll_pin *parent,
+ 	return reg->priv;
+ }
+ 
++/**
++ * dpll_pin_own_dpll_ref_first - find the first owner dpll ref of a pin
++ * @pin: pointer to a dpll pin
++ *
++ * Search pin's dpll_refs for a ref whose dpll matches the pin's
++ * (module, clock_id) tuple, i.e. the dpll registered by the driver
++ * that created the pin. This ensures pin-level attributes are
++ * reported and modified using the owner's ops even when the pin is
++ * also registered with dplls from other drivers.
++ *
++ * Return: pointer to the owner's dpll_pin_ref, or NULL if no
++ * owner ref is found.
++ */
++struct dpll_pin_ref *dpll_pin_own_dpll_ref_first(struct dpll_pin *pin)
++{
++	struct dpll_pin_ref *ref;
++	unsigned long i;
++
++	xa_for_each(&pin->dpll_refs, i, ref) {
++		if (ref->dpll->module == pin->module &&
++		    ref->dpll->clock_id == pin->clock_id)
++			return ref;
++	}
++
++	return NULL;
++}
++
+ const struct dpll_pin_ops *dpll_pin_ops(struct dpll_pin_ref *ref)
+ {
+ 	struct dpll_pin_registration *reg;
+diff --git a/drivers/dpll/dpll_core.h b/drivers/dpll/dpll_core.h
+index e245771134317..da8a369556ed1 100644
+--- a/drivers/dpll/dpll_core.h
++++ b/drivers/dpll/dpll_core.h
+@@ -93,6 +93,7 @@ void *dpll_pin_on_pin_priv(struct dpll_pin *parent, struct dpll_pin *pin);
+ 
+ const struct dpll_device_ops *dpll_device_ops(struct dpll_device *dpll);
+ struct dpll_device *dpll_device_get_by_id(int id);
++struct dpll_pin_ref *dpll_pin_own_dpll_ref_first(struct dpll_pin *pin);
+ const struct dpll_pin_ops *dpll_pin_ops(struct dpll_pin_ref *ref);
+ struct dpll_pin_ref *dpll_xa_ref_dpll_first(struct xarray *xa_refs);
+ extern struct xarray dpll_device_xa;
+diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+index bf729cde796a7..b3f0cb7d3d349 100644
+--- a/drivers/dpll/dpll_netlink.c
++++ b/drivers/dpll/dpll_netlink.c
+@@ -696,7 +696,9 @@ dpll_cmd_pin_get_one(struct sk_buff *msg, struct dpll_pin *pin,
+ 	struct dpll_pin_ref *ref;
+ 	int ret;
+ 
+-	ref = dpll_xa_ref_dpll_first(&pin->dpll_refs);
++	ref = dpll_pin_own_dpll_ref_first(pin);
++	if (!ref)
++		ref = dpll_xa_ref_dpll_first(&pin->dpll_refs);
+ 	ASSERT_NOT_NULL(ref);
+ 
+ 	ret = dpll_msg_add_pin_handle(msg, pin);
+@@ -1087,12 +1089,19 @@ dpll_pin_freq_set(struct dpll_pin *pin, struct nlattr *a,
+ 
+ 	xa_for_each(&pin->dpll_refs, i, ref) {
+ 		ops = dpll_pin_ops(ref);
+-		if (!ops->frequency_set || !ops->frequency_get) {
+-			NL_SET_ERR_MSG(extack, "frequency set not supported by the device");
++		if ((!ops->frequency_set || !ops->frequency_get) &&
++		    ref->dpll->module == pin->module &&
++		    ref->dpll->clock_id == pin->clock_id) {
++			NL_SET_ERR_MSG(extack,
++				       "frequency set not supported by the device");
+ 			return -EOPNOTSUPP;
+ 		}
+ 	}
+-	ref = dpll_xa_ref_dpll_first(&pin->dpll_refs);
++	ref = dpll_pin_own_dpll_ref_first(pin);
++	if (!ref) {
++		NL_SET_ERR_MSG(extack, "pin owner dpll not found");
++		return -ENODEV;
++	}
+ 	ops = dpll_pin_ops(ref);
+ 	dpll = ref->dpll;
+ 	ret = ops->frequency_get(pin, dpll_pin_on_dpll_priv(dpll, pin), dpll,
+@@ -1106,6 +1115,8 @@ dpll_pin_freq_set(struct dpll_pin *pin, struct nlattr *a,
+ 
+ 	xa_for_each(&pin->dpll_refs, i, ref) {
+ 		ops = dpll_pin_ops(ref);
++		if (!ops->frequency_set)
++			continue;
+ 		dpll = ref->dpll;
+ 		ret = ops->frequency_set(pin, dpll_pin_on_dpll_priv(dpll, pin),
+ 					 dpll, dpll_priv(dpll), freq, extack);
+@@ -1125,6 +1136,8 @@ dpll_pin_freq_set(struct dpll_pin *pin, struct nlattr *a,
+ 		if (ref == failed)
+ 			break;
+ 		ops = dpll_pin_ops(ref);
++		if (!ops->frequency_set)
++			continue;
+ 		dpll = ref->dpll;
+ 		if (ops->frequency_set(pin, dpll_pin_on_dpll_priv(dpll, pin),
+ 				       dpll, dpll_priv(dpll), old_freq, extack))
+@@ -1148,13 +1161,19 @@ dpll_pin_esync_set(struct dpll_pin *pin, struct nlattr *a,
+ 
+ 	xa_for_each(&pin->dpll_refs, i, ref) {
+ 		ops = dpll_pin_ops(ref);
+-		if (!ops->esync_set || !ops->esync_get) {
++		if ((!ops->esync_set || !ops->esync_get) &&
++		    ref->dpll->module == pin->module &&
++		    ref->dpll->clock_id == pin->clock_id) {
+ 			NL_SET_ERR_MSG(extack,
+ 				       "embedded sync feature is not supported by this device");
+ 			return -EOPNOTSUPP;
+ 		}
+ 	}
+-	ref = dpll_xa_ref_dpll_first(&pin->dpll_refs);
++	ref = dpll_pin_own_dpll_ref_first(pin);
++	if (!ref) {
++		NL_SET_ERR_MSG(extack, "pin owner dpll not found");
++		return -ENODEV;
++	}
+ 	ops = dpll_pin_ops(ref);
+ 	dpll = ref->dpll;
+ 	ret = ops->esync_get(pin, dpll_pin_on_dpll_priv(dpll, pin), dpll,
+@@ -1178,6 +1197,8 @@ dpll_pin_esync_set(struct dpll_pin *pin, struct nlattr *a,
+ 		void *pin_dpll_priv;
+ 
+ 		ops = dpll_pin_ops(ref);
++		if (!ops->esync_set)
++			continue;
+ 		dpll = ref->dpll;
+ 		pin_dpll_priv = dpll_pin_on_dpll_priv(dpll, pin);
+ 		ret = ops->esync_set(pin, pin_dpll_priv, dpll, dpll_priv(dpll),
+@@ -1201,6 +1222,8 @@ dpll_pin_esync_set(struct dpll_pin *pin, struct nlattr *a,
+ 		if (ref == failed)
+ 			break;
+ 		ops = dpll_pin_ops(ref);
++		if (!ops->esync_set)
++			continue;
+ 		dpll = ref->dpll;
+ 		pin_dpll_priv = dpll_pin_on_dpll_priv(dpll, pin);
+ 		if (ops->esync_set(pin, pin_dpll_priv, dpll, dpll_priv(dpll),
+@@ -1235,8 +1258,11 @@ dpll_pin_ref_sync_state_set(struct dpll_pin *pin,
+ 		NL_SET_ERR_MSG(extack, "reference sync pin not available");
+ 		return -EINVAL;
+ 	}
+-	ref = dpll_xa_ref_dpll_first(&pin->dpll_refs);
+-	ASSERT_NOT_NULL(ref);
++	ref = dpll_pin_own_dpll_ref_first(pin);
++	if (!ref) {
++		NL_SET_ERR_MSG(extack, "pin owner dpll not found");
++		return -ENODEV;
++	}
+ 	ops = dpll_pin_ops(ref);
+ 	if (!ops->ref_sync_set || !ops->ref_sync_get) {
+ 		NL_SET_ERR_MSG(extack, "reference sync not supported by this pin");
+@@ -1255,6 +1281,8 @@ dpll_pin_ref_sync_state_set(struct dpll_pin *pin,
+ 		return 0;
+ 	xa_for_each(&pin->dpll_refs, i, ref) {
+ 		ops = dpll_pin_ops(ref);
++		if (!ops->ref_sync_set)
++			continue;
+ 		dpll = ref->dpll;
+ 		ret = ops->ref_sync_set(pin, dpll_pin_on_dpll_priv(dpll, pin),
+ 					ref_sync_pin,
+@@ -1277,6 +1305,8 @@ dpll_pin_ref_sync_state_set(struct dpll_pin *pin,
+ 		if (ref == failed)
+ 			break;
+ 		ops = dpll_pin_ops(ref);
++		if (!ops->ref_sync_set)
++			continue;
+ 		dpll = ref->dpll;
+ 		if (ops->ref_sync_set(pin, dpll_pin_on_dpll_priv(dpll, pin),
+ 				      ref_sync_pin,
+@@ -1468,12 +1498,18 @@ dpll_pin_phase_adj_set(struct dpll_pin *pin, struct nlattr *phase_adj_attr,
+ 
+ 	xa_for_each(&pin->dpll_refs, i, ref) {
+ 		ops = dpll_pin_ops(ref);
+-		if (!ops->phase_adjust_set || !ops->phase_adjust_get) {
++		if ((!ops->phase_adjust_set || !ops->phase_adjust_get) &&
++		    ref->dpll->module == pin->module &&
++		    ref->dpll->clock_id == pin->clock_id) {
+ 			NL_SET_ERR_MSG(extack, "phase adjust not supported");
+ 			return -EOPNOTSUPP;
+ 		}
+ 	}
+-	ref = dpll_xa_ref_dpll_first(&pin->dpll_refs);
++	ref = dpll_pin_own_dpll_ref_first(pin);
++	if (!ref) {
++		NL_SET_ERR_MSG(extack, "pin owner dpll not found");
++		return -ENODEV;
++	}
+ 	ops = dpll_pin_ops(ref);
+ 	dpll = ref->dpll;
+ 	ret = ops->phase_adjust_get(pin, dpll_pin_on_dpll_priv(dpll, pin),
+@@ -1488,6 +1524,8 @@ dpll_pin_phase_adj_set(struct dpll_pin *pin, struct nlattr *phase_adj_attr,
+ 
+ 	xa_for_each(&pin->dpll_refs, i, ref) {
+ 		ops = dpll_pin_ops(ref);
++		if (!ops->phase_adjust_set)
++			continue;
+ 		dpll = ref->dpll;
+ 		ret = ops->phase_adjust_set(pin,
+ 					    dpll_pin_on_dpll_priv(dpll, pin),
+@@ -1510,6 +1548,8 @@ dpll_pin_phase_adj_set(struct dpll_pin *pin, struct nlattr *phase_adj_attr,
+ 		if (ref == failed)
+ 			break;
+ 		ops = dpll_pin_ops(ref);
++		if (!ops->phase_adjust_set)
++			continue;
+ 		dpll = ref->dpll;
+ 		if (ops->phase_adjust_set(pin, dpll_pin_on_dpll_priv(dpll, pin),
+ 					  dpll, dpll_priv(dpll), old_phase_adj,
+-- 
+2.53.0
+
 
