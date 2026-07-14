@@ -1,270 +1,223 @@
-Return-Path: <netdev+bounces-307489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307490-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Ah+1Ag5IVmoR2wAAu9opvQ
-	(envelope-from <netdev+bounces-307489-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 16:30:38 +0200
+	id a5/yLuBHVmoD2wAAu9opvQ
+	(envelope-from <netdev+bounces-307490-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 16:29:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A35F755D36
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 16:30:37 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0BC4755CFF
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 16:29:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=gR5Fz5H3;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307489-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307489-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=resnulli-us.20251104.gappssmtp.com header.s=20251104 header.b=fHw8f9x8;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307490-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-307490-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6CA893046438
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 14:24:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8DDF3301967D
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 14:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40A46371873;
-	Tue, 14 Jul 2026 14:24:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45B0247D955;
+	Tue, 14 Jul 2026 14:29:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9063644D4;
-	Tue, 14 Jul 2026 14:24:27 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784039071; cv=fail; b=Daff4DW3jaZrcuN8xBjI1NBXIvxdrf+kMh37WOVvP6KLph4HwzCGc7ZY3MQARrqiCKUIzajF1DrlWoaliECD22oMUyYfm3XhIa280ZKTLhf95+1Fh5jN8C0Zo3JXO4PpXSgGpcj75Tc2vbDdBcvNSNKGWcjPX7aWrxy85+3UQVs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784039071; c=relaxed/simple;
-	bh=L6Z8h8qtDaHh8YtZCIEw0r/9H60zP4f4+AuDWBJFB4M=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=hwkguruUq6FQvdd+CwFIg1R3kFZGZEFLIBFgEtDNKdxlzHs3fCole1G9ZH+BZpE8nBrKZHNfqvTMrqyYkx+etCWx6N0KnPEYhV5sUT0MgD59sCZUaEcTPvd4NQX3uLvbYf07d0JNJ92IEteC0ZjwpjYAv/59INAfkWPQT6fYfL0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gR5Fz5H3; arc=fail smtp.client-ip=198.175.65.9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1784039068; x=1815575068;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=L6Z8h8qtDaHh8YtZCIEw0r/9H60zP4f4+AuDWBJFB4M=;
-  b=gR5Fz5H3ZCbTy485o2BX7X2ztaWYzt7BJDn3uKULURVwC2K4UqU4Rybb
-   1FtgjQLN6ZWgQigT7VA8K8/b9xxfZP2bw/J+oV1Vw3HkL5gqm6c4z29jy
-   kWbGf2JqhzYXB3SFQrl22Gw5NGVN3quy0Rb4sDt585e8U9nWvcwhfA84X
-   u1DqqFl4WcoftI5HpQiLu+hJ0ttKVQHr8cJKCdlOzczpmWHBqV0Tov7ER
-   UtFo0yQ9crC+EV/M3MoclsLJA9uXm5OzG1jWJqU86DqJOs3CM/0FLOkAV
-   CBeBmO+o8XrCFajIPX+rLBQMSOOxXrTOOfnkosBCAJw6TAT8CQjxNrxBM
-   w==;
-X-CSE-ConnectionGUID: adTl5YL9T7mS0YTX1JKbyQ==
-X-CSE-MsgGUID: JnhI/f7aR1qOTi19GdkSYg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11846"; a="107454638"
-X-IronPort-AV: E=Sophos;i="6.25,163,1779174000"; 
-   d="scan'208";a="107454638"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2026 07:24:27 -0700
-X-CSE-ConnectionGUID: vSeOF4w3S9WZ5bECWAYSpw==
-X-CSE-MsgGUID: IWK2rQ6uRXKV0eKEs3KdHQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,163,1779174000"; 
-   d="scan'208";a="252488247"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2026 07:24:27 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Tue, 14 Jul 2026 07:24:26 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43 via Frontend Transport; Tue, 14 Jul 2026 07:24:26 -0700
-Received: from BL0PR03CU003.outbound.protection.outlook.com (52.101.53.42) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Tue, 14 Jul 2026 07:24:26 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=zOI4rQ2TH5wJ1QVj6UdJTuPWPpWQSInt7kJG/RnxWNZ7RWnK79IoSW/dlfXgzj0NOZ19YL4wq8SYhFw0I8dcE4hcYphDIzWqFZiKNXYHI6CWskEKut8Vo1NtkxcP26pg74vh021kURzsnjaIJjT729K1os+lOrl6cfDk8ivqQ27hWuT5o2ZKMylUyShVeS/Q/MQdB0Q9UO25oIsDFIrTkM+JWdu2waQr9+gdJkDoY+nf41uhH8rMe2lGl/8GtItwZDkD78rSXwQrXdD3IiWxdcomGub/EC51F4H6MreTCzfEtdaIUp6P0MXMfe9wq2DUpGPqoRNKJ/aShXw9Jec0cA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Oyr3I05tNd8vdGvg92PZDq7hnabiyyU241YZNG+DEnM=;
- b=Kqcbh6a3KywOIn1jyjc7/Bvze3uAb3rDIAotZQfndGiBhLyPZXGpVGGlflNPDM3lFQcgfhq+wq43Lx7/cseuC7R4I26+CjVsPNVK0DzVpsXz4+sill0oUpIAH+SBXZIu9F4pCFq1A0iShzfCDHOkiYD1/BWaQ1sZtTBvzi0PwTCymAMv1hgW/bBuhCeb67gAiKPvuh+ss3k8MUpmLCLj5pnfvZZM9JYNmf7i3PwCAP2kWUUxDeRVFfqipCrpskgFIzRQKKw8B8Z/Z0moyERQMRpArJzjrNASO6JR/zGLeUSXFHlNlQ9sX3ge5ckb7h0SIocKavpvr6CZH/tX3wrpgg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by CO1PR11MB4913.namprd11.prod.outlook.com (2603:10b6:303:9f::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.223.9; Tue, 14 Jul
- 2026 14:24:17 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c%6]) with mapi id 15.21.0223.008; Tue, 14 Jul 2026
- 14:24:17 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: "xuanqiang.luo@linux.dev" <xuanqiang.luo@linux.dev>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>,
-	"Drewek, Wojciech" <wojciech.drewek@intel.com>, "piotr.raczynski@intel.com"
-	<piotr.raczynski@intel.com>, "michal.swiatkowski@linux.intel.com"
-	<michal.swiatkowski@linux.intel.com>, "Keller, Jacob E"
-	<jacob.e.keller@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, Xuanqiang Luo <luoxuanqiang@kylinos.cn>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net v1] ice: fix use-after-free in
- dynamic port cleanup
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v1] ice: fix use-after-free in
- dynamic port cleanup
-Thread-Index: AQHdE1vUxn7xPS/6+UahYPzQyRSgTbZtEiDA
-Date: Tue, 14 Jul 2026 14:24:17 +0000
-Message-ID: <IA3PR11MB89860941F0C6CEDC9FE676F7E5F92@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20260714063937.26325-1-xuanqiang.luo@linux.dev>
-In-Reply-To: <20260714063937.26325-1-xuanqiang.luo@linux.dev>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|CO1PR11MB4913:EE_
-x-ms-office365-filtering-correlation-id: 634f583f-e648-4de9-95bc-08dee1b3969b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|23010399003|1800799024|376014|18002099003|22082099003|38070700021|56012099006|11063799006|6133799003;
-x-microsoft-antispam-message-info: CyX48CPbopN5vWAq02zSQajOz/Ttt7+4JlSHEJhnQvFjKZKTOGpx42g3Ui9WF87vzYyyBBtvRXiGRcfZjty1OlX5uH7eISOyOMOZIFYUu+zM9pEuS4cozfJxCRmPjY76ATPVPFEYhE+UU1c6dB4hZVuM3PGCQLueLc47rUe0WF/psSzUcHaf7bk44Gn5Hb4t2W60imeDdUl80QIxmPC6exxSOjqMUIPo/dGMNXHHF/rFDFH9gsotFhAEkSzpA9ixPxc1pOIO6VDMgYs6g/8VOMLyjA/+tAz/M0L2X3jTxAtDozHzLJw2AnVFxHtlsfVFhQ3Lp/bthvvDgOb2fMfhdZtVmQV5Uz2ACZJaTFDDC8NCOzOyyPD898xRtdFG0PZMpLSTmNNvPiJMpwmM55M4cGoW/TuTmZZtBjYKZU4aySQ+KipKvNzTF1/j1y5OgCi3sRWQkGf6AG/nKUazFggh7xiefcAarD4NFtBWRyZYbj4jEoMm/6LNmeLfHt1OJCKIPASv/T9dOLpXjlxIcrE+yGizdxAhkwKdoGFnphQEvoghTvzXxtlznybW+YvBbgtuPox+oqAgM4FqpJd8PylGtAZwlqFiNoz0hX33X5QllxL+QYZI4Zl81Mg194DAEJMPEpO96Dt1Ask7gU1rE10sXCR5kKQnpLAeEt3OZl0Giog8rMTy1H2EN9ny7iau5oTts91OjTBd00ErirKsp3XE/2MNy6QFErJzdn1lB8UjOBI=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(1800799024)(376014)(18002099003)(22082099003)(38070700021)(56012099006)(11063799006)(6133799003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?hsy62Vcaqhrw9aycYDNUpjXtamX5SmhJFfpFz76vEzlTWFHYNEeVo9FpbfVJ?=
- =?us-ascii?Q?gAHQqlolnPtVL482ag600XoNtcC/AhLptErBj3QUJhWDq76RbwU8dG2N+rso?=
- =?us-ascii?Q?GnehXlce4IvjqOtFpvmF5ZrT0jc6r1y3gJXWHHPru8Xv0wCvecc7trreJkKb?=
- =?us-ascii?Q?EGhaTY++hJA47++r/z3SP6O7tXHXlRhIExtO0Ogjp/1C/emIK9n0DI5b38sv?=
- =?us-ascii?Q?pUidVBN2FmFtNQU+QZRkHkYPMivpjrduGWQjic+YMVkIdpCNLSd7jqih8x3Q?=
- =?us-ascii?Q?p1nIvk71laIsQpJR6Zm7AP7WpMCM3A5ko3ttH7ejxr8k/VNRBFrTUrj0s+Jh?=
- =?us-ascii?Q?KQ9Fh2IK79Y36iPuBiEuHm0vE5Q4+Ka+c+rkjZbEZyaaCYIp2psPDuvybjs4?=
- =?us-ascii?Q?JKEL8cPDainZHlAPVxDN5rDybr3DL8O+j5MbzdTrtQx67BOanmbgz+T1BPJf?=
- =?us-ascii?Q?XP7yc12A0xAoGfRLQ8Tp7GekWHm3TzDt/7tVSZLV08mqp1HoQ3XC1L/Cx9gN?=
- =?us-ascii?Q?8adF3kv21nFdHd9B4tHTETM0cQE4i9eaPhTWDlUPzCOcJXHw58q+kCyEUhNr?=
- =?us-ascii?Q?+/cWp4HuEA6bU6bzVlEK6SUFWgx746VyHOvDA0uelRkizUGMzKrj7G3MqEV8?=
- =?us-ascii?Q?Slz5Ry7HZW1hFZl6/i4P5eb7A8nZUBIypq6AV6As+1fiDPjZw2BVY7SViYaq?=
- =?us-ascii?Q?zefRkfyTKvQuRqu1mIkmOhsODbzZJZB/MtAIO+WsdTX5y0patu4/3fTIQEjA?=
- =?us-ascii?Q?YN08UO2CihrAfciTfSpWtFcu1RCi+jI/6ecuSnTN2gZXKoeCvz3nybuj1llE?=
- =?us-ascii?Q?H6Zehq35xCFil0+5AdOxkEGqb56Kiqm78I1lUpyORZQI48INpEMKTpZs8NLC?=
- =?us-ascii?Q?OW7g2C5CzqCz74tzwdlJ50h82IbNq+o0L1k32rCl5aopcHpYnohhiZa3a8wD?=
- =?us-ascii?Q?l76DToCRJUDvfsF5eINHr49JOX5tizYcjmszounkE+/HxvTFLpiv6Euyznvd?=
- =?us-ascii?Q?NFMqqz7QmYpkFAZ2CJw42LYYKr78fp2mZEXnT+xbRLvGBp49whHS+dXHMsF2?=
- =?us-ascii?Q?Akkxgxxr+mCdGmN0+ELTJKCqEAAQJPxNh9QrhRcLBhGt/Omipt7+ArII1N0f?=
- =?us-ascii?Q?+NfFLW/3/i+nXrH5tr1+S28/UEvmHJ2u1KOlwfSHIH6WT9bpEOwSmf0qfs8S?=
- =?us-ascii?Q?yFqyksjyIm5ecKxc9dapz/y2APnkqxIW9lmTrRE8nQ1ZxWYnVfTy2RB5RUF+?=
- =?us-ascii?Q?7010YgdmUAssYvrsaIkpyZ16x2prAlhqJl4MEvx3W435O67EKTmC54ytEcwB?=
- =?us-ascii?Q?HaHpxXVNej0MPT2C6oKctdcDvA7wNdhgTxJVIsCSjE4gEfgzWXxI/MQGd/dV?=
- =?us-ascii?Q?wt2jfuZCsquGjv6LK0ock5xCLgxLZHpl2u2NwF0EvowxfoxzfAzxsgjVguql?=
- =?us-ascii?Q?tvt/2VX6QsULKK2MwTkH3xSVcRnOtJvvhUHz7qvaoP78TW6hBTxZmJDjkGjn?=
- =?us-ascii?Q?lQFLWvPsVohb4rDOmzgQDIu5aL60Umjw7AoVqCNgjOChTfpbNGk06khJSh3s?=
- =?us-ascii?Q?JLfkYh0FOuqZp+XvXsag+yiFk2ICCqeo7lDgFKRebfpq8DchlU1eh5Ef4NqN?=
- =?us-ascii?Q?Zr46ii1/hFsnAaIk/pEs3J3Z0rARKbEJq15062kAzPhyLylRqpdzU4yns4Pa?=
- =?us-ascii?Q?OmPHcc4XsruG0Xujmf80I6CcdiSEnzRXNmz1oBDDtble1lxU/NuVH6IwOb2C?=
- =?us-ascii?Q?ek4NRx4GGZBbn+YFW7OsTyb6zCvulNg=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C477E47D943
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 14:29:32 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784039377; cv=none; b=rmqk2JEu7rYboAsmG9OvvAlouMJEScOZIhDryfHa33N4TwOIrUV3bWgL0V1wT1IVc/Vfnd+pLt9Hi4GPNNm4CeWfjZkPJhr98npJ9KUiStiBvu5+I3IjO13+H1S5yhB4bbqxawvJLD6SIJ6u9iqhU13C6xfF+vekgjcnvnxdOF8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784039377; c=relaxed/simple;
+	bh=HV4KXx3jCDo5tnyS2SR083CFGU4A98rHzoR25fN+NeY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u5ZXO3PfOM068/SW9XWXK02dGMW7rBzjaXr1uFWbDb0x/svvTkVo60W3PneGlMMovLD7kCM8LvDZvDw7G0GRwaoQhUmvG+iGMxI3NIcPXNEX7ZvtZYvWHI8fvhws0hXyNcMZmayyIxH07O1jPtwgcqFqk7eYguarx/25KJPSgCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=fHw8f9x8; arc=none smtp.client-ip=209.85.128.50
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-493ae59eca6so6076175e9.1
+        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 07:29:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1784039371; x=1784644171; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=nvrKYD5ArwJczv3P3+Ce5/GBU6hZFow7WIOmjK2Noeg=;
+        b=fHw8f9x8RZOOPQd8Mm2kUYt4NWzctTLq5X2G/diUH3e100eOXh2xfWHZC3lMNsx2Xl
+         FbHBTlfuqaVpv2pAX5O0iXv/ivF0qRh6D4/xBC1qfrSPafw2ykft9iy4nAitxLt9VFn2
+         +VcUlbWF/2sg7v3RViTMXZMVlHDYt0BdhY7bFIYOrVcGv3JUF5qFn524qP9RJm92lZ2q
+         oTeXvc80c5HvgK7A4q4tlRkcAcxcwuejvsEgKMP1HufBI3gnJvqcg0gKx2SggDVQ74FE
+         m4Zux397TbjkfELO+lLOP91U2j2ysQ1gdg6q/QFv7IYn9N9ps20LShRH8GY5it15bbgR
+         ksig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784039371; x=1784644171;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=nvrKYD5ArwJczv3P3+Ce5/GBU6hZFow7WIOmjK2Noeg=;
+        b=NA6mmY7f11o5ZRo3eCtYbfC7vvZMJ0wqju/v8sKlhQABeim+oP8GuwS0jK344ORlHF
+         28Qrsh5gvSr+tXvc/vxim+NNyZ+6WgDcqdlMH1o38ABgQfdBJAYG2kVYDgVPzR6K0Mbh
+         9YvEAQFH4+kd0bS+iCUlPlk8MZhiTfex9yJP+8KvEFQ4yczF49mFw8kn4FTw+SGBwpF1
+         pCRQ/c8BZqNdVcJAYDu9EAei7/C3K7U9r2r7ZUCyrKgIsG20/xm39DcMDnmDcgi54YS9
+         mc+VZfMkcifle3rAkhM9ib0xGsP28T5dHmMIlOOpoAbx7eCbG9i9PhVu9OkP+Pp0ch8r
+         65wA==
+X-Forwarded-Encrypted: i=1; AHgh+Rrh4C/PiiRzuDzYfzOiZbTki56RaC/2q9p9PMwBORt+hW64465uf6cAsKFixnSyKy7e0i1wbvE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyuETWCOueXcJxAP/bLXw74bJlzjpnrugwD9WeSlZGkq0fCCmv
+	AElNNik3E29MiKdYgjg0WPzoKTW3TPlIl6ZwLhz3Ia67oiKUxb2RubJhIsRxl4rAfCw=
+X-Gm-Gg: AfdE7cly3TOZPCOdNRe33clO3h6nb5SWfGj6dzudQd0Cnv/FJb4y0L0dEerVRW+edtO
+	+I+U3V0dLMHz/34pvdM+IC7A3VWgptcSj5P/t66TRBBOC5Genisu5nhEv4cwojZsEiVlMEqd0wV
+	+vIV1ZnGvUoWIKCx39j8VNF5Z31X7+RyLgDEoknvSQZDEgp4AYDb5Lu5hEzYtsJMzrbuC2/tO0x
+	Q0O4jvvsRoEd0H3ULwNZ3x/4bNahRW3Aav5Wene6d2OXjVQNwrYXLz3cPETr0n4d4cIMndEEBqY
+	s9QUhtMftuGNDwCAQ3kz1talRf0b5+AuDvlf0pPPYfbxoqMvUUMVAvJFQsutXxnSzcNDG1O/45F
+	mjRYhfZc8iMo3VC0E+Ji2ILn3U2MRdYXwWrsPLLJsx3h3+Vlr1zRl+80jxChtDeheIVZ4PBc2u+
+	SnhzlP9X/wY2pAw8NoBw5Y4w==
+X-Received: by 2002:a05:600c:8108:b0:495:39a9:f8bb with SMTP id 5b1f17b1804b1-49539a9f8cbmr17623035e9.27.1784039370894;
+        Tue, 14 Jul 2026 07:29:30 -0700 (PDT)
+Received: from localhost ([140.209.217.211])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49506a1fbcesm81645145e9.0.2026.07.14.07.29.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jul 2026 07:29:30 -0700 (PDT)
+From: Jiri Pirko <jiri@resnulli.us>
+To: linux-rdma@vger.kernel.org
+Cc: cgroups@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	jgg@ziepe.ca,
+	leon@kernel.org,
+	parav@nvidia.com,
+	mbloch@nvidia.com,
+	cmeiohas@nvidia.com,
+	roman.gushchin@linux.dev,
+	bvanassche@acm.org,
+	zyjzyj2000@gmail.com,
+	shuah@kernel.org,
+	tj@kernel.org,
+	mkoutny@suse.com,
+	hannes@cmpxchg.org,
+	alibuda@linux.alibaba.com,
+	dust.li@linux.alibaba.com,
+	sidraya@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	yanjun.zhu@linux.dev,
+	cui.tao@linux.dev
+Subject: [PATCH rdma-next v2 00/14] RDMA: Make device names unique per net namespace
+Date: Tue, 14 Jul 2026 16:29:13 +0200
+Message-ID: <20260714142927.1298897-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: IDwVeqLo/V/Mf/5eREN43cO6H4Ebxy3WeAUWLOB4KpRc5IyU7qg5SxcPeG2hof0PHz4wu7jXHox9XgtXPOLQlTxpeb96nFuPSbi1lLg9hA7jgvnVnqPE5rb2e+wTUTnC6B8/Ws9LFtPYjb0kNmKa5XYQic/dA1qTorzVBkiLvqQD+9gH4jyur7vaISu30Pgd3nzMbyZ9HJ2iKyADUlTEZ+F+Ayw3Iyo5g8kINAJkWp/yfNZ6xiXY+MCgmAZ0y0E0TIdv5oQ9CiOsI/bi0udvEcg1Kk40LEaD8Pg+vT3PLTQrwPvIpmB7PrnmUoVjl1JaEfBPkiwbfgKABid5hPKghg==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 634f583f-e648-4de9-95bc-08dee1b3969b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jul 2026 14:24:17.4762
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: WzY/pC1Cc68dc31UVLlsD4iTSxGShPslTJ7awqcUZKng41AOMF86LaPzF4zpIkI0iPAvF/Kid4oNRrOA0JmSGxHADM3QHzYdfxQQvGMlx+I=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4913
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-307490-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,ziepe.ca,kernel.org,nvidia.com,linux.dev,acm.org,gmail.com,suse.com,cmpxchg.org,linux.alibaba.com,linux.ibm.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307489-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_SENDER(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:xuanqiang.luo@linux.dev,m:intel-wired-lan@lists.osuosl.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:sridhar.samudrala@intel.com,m:wojciech.drewek@intel.com,m:piotr.raczynski@intel.com,m:michal.swiatkowski@linux.intel.com,m:jacob.e.keller@intel.com,m:netdev@vger.kernel.org,m:luoxuanqiang@kylinos.cn,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DMARC_NA(0.00)[resnulli.us];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:linux-rdma@vger.kernel.org,m:cgroups@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-s390@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:jgg@ziepe.ca,m:leon@kernel.org,m:parav@nvidia.com,m:mbloch@nvidia.com,m:cmeiohas@nvidia.com,m:roman.gushchin@linux.dev,m:bvanassche@acm.org,m:zyjzyj2000@gmail.com,m:shuah@kernel.org,m:tj@kernel.org,m:mkoutny@suse.com,m:hannes@cmpxchg.org,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:yanjun.zhu@linux.dev,m:cui.tao@linux.dev,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:from_mime,intel.com:email,intel.com:dkim,vger.kernel.org:from_smtp,linux.dev:email,kylinos.cn:email,IA3PR11MB8986.namprd11.prod.outlook.com:mid,osuosl.org:email,lunn.ch:email];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,resnulli.us:from_mime,resnulli.us:mid,resnulli-us.20251104.gappssmtp.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3A35F755D36
+X-Rspamd-Queue-Id: B0BC4755CFF
 
+From: Jiri Pirko <jiri@nvidia.com>
 
+RDMA device names are unique system-wide today:
+__ib_device_get_by_name() checks a requested name against every
+registered device regardless of the network namespace it lives in.
+A device in one network namespace therefore cannot use a name already
+taken in another, even in exclusive netns mode (netns_mode=0) where
+the two are otherwise isolated. Net devices have no such restriction -
+their names only need to be unique within a network namespace.
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> Of xuanqiang.luo@linux.dev
-> Sent: Tuesday, July 14, 2026 8:40 AM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
-> Przemyslaw <przemyslaw.kitszel@intel.com>; andrew+netdev@lunn.ch;
-> Samudrala, Sridhar <sridhar.samudrala@intel.com>; Drewek, Wojciech
-> <wojciech.drewek@intel.com>; piotr.raczynski@intel.com;
-> michal.swiatkowski@linux.intel.com; Keller, Jacob E
-> <jacob.e.keller@intel.com>; netdev@vger.kernel.org; Xuanqiang Luo
-> <luoxuanqiang@kylinos.cn>; stable@vger.kernel.org
-> Subject: [Intel-wired-lan] [PATCH iwl-net v1] ice: fix use-after-free
-> in dynamic port cleanup
->=20
-> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
->=20
-> ice_dealloc_dynamic_port() uses dyn_port->vsi->idx to erase the
-> dynamic port from pf->dyn_ports. However, it frees the VSI before
-> reading the index for the erase, resulting in a use-after-free.
->=20
-> Follow the reverse of the allocation order in ice_alloc_dynamic_port()
-> by erasing the xarray entry before freeing the VSI.
->=20
-> Fixes: eda69d654c7e ("ice: add basic devlink subfunctions support")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-> ---
->  drivers/net/ethernet/intel/ice/devlink/port.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/ice/devlink/port.c
-> b/drivers/net/ethernet/intel/ice/devlink/port.c
-> index 2a2e56777f9f7..3ede246490027 100644
-> --- a/drivers/net/ethernet/intel/ice/devlink/port.c
-> +++ b/drivers/net/ethernet/intel/ice/devlink/port.c
-> @@ -590,8 +590,8 @@ static void ice_dealloc_dynamic_port(struct
-> ice_dynamic_port *dyn_port)
->=20
->  	xa_erase(&pf->sf_nums, devlink_port->attrs.pci_sf.sf);
->  	ice_eswitch_detach_sf(pf, dyn_port);
-> -	ice_vsi_free(dyn_port->vsi);
->  	xa_erase(&pf->dyn_ports, dyn_port->vsi->idx);
-> +	ice_vsi_free(dyn_port->vsi);
->  	kfree(dyn_port);
->  }
->=20
-> --
-> 2.43.0
+This series makes RDMA device names unique per network namespace,
+matching net device semantics, and adapts the users that assumed
+system-wide unique names.
 
+Scoping reuses the existing rdma_dev_access_netns() predicate, so
+behavior only changes in exclusive mode:
+  - shared mode (default): names stay unique system-wide, no change;
+  - exclusive mode: names only need to be unique within a namespace;
+  - CONFIG_NET_NS=n: everything is init_net, names stay system-wide
+    unique.
 
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+There are two users that cannot be made per-namespace and are
+documented as known limitations instead of changed:
+  - the rdma_cm configfs tree: configfs has no network namespace
+    support, so it cannot represent two same-named devices;
+  - SELinux ibendport labelling: endports are labelled by (device
+    name, port) from a global policy; distinguishing same-named
+    devices would need net namespace support in the SELinux policy
+    language and tooling.
+
+Tested with the new rxe_netns_names kselftest added in the last patch.
+
+Jiri Pirko (14):
+  RDMA/core: Pass the net namespace to the device name lookups
+  RDMA/core: Handle device name conflicts when changing net namespace
+  RDMA/core: Support renaming a device when changing its net namespace
+  RDMA/nldev: Report net namespace move errors through extack
+  RDMA/nldev: Allow setting the device name while changing net namespace
+  net/smc: Look up the pnetid ib device within the net namespace
+  RDMA/srp: Make the SRP sysfs class net namespace aware
+  RDMA/cgroup: Disambiguate devices across net namespaces
+  RDMA/cma: Document that CM configfs cannot be net namespace scoped
+  RDMA/core: Document the SELinux ibendport net namespace limitation
+  RDMA/core: Make device names unique per net namespace
+  RDMA/rxe: Allow queue VMAs to outlive ucontexts
+  RDMA/rxe: Implement disassociate_ucontext callback
+  RDMA/selftests: Add rxe_netns_names test
+
+ Documentation/ABI/testing/configfs-rdma_cm    |   4 +
+ Documentation/admin-guide/cgroup-v1/rdma.rst  |   8 +
+ Documentation/admin-guide/cgroup-v2.rst       |  15 +-
+ drivers/infiniband/core/cgroup.c              |   1 +
+ drivers/infiniband/core/cma_configfs.c        |   4 +
+ drivers/infiniband/core/core_priv.h           |   3 +-
+ drivers/infiniband/core/device.c              | 245 ++++++++++++---
+ drivers/infiniband/core/nldev.c               |  26 +-
+ drivers/infiniband/core/security.c            |   6 +
+ drivers/infiniband/sw/rxe/rxe_mmap.c          |  35 +--
+ drivers/infiniband/sw/rxe/rxe_verbs.c         |   5 +
+ drivers/infiniband/ulp/srp/ib_srp.c           |  16 +-
+ include/linux/cgroup_rdma.h                   |   1 +
+ include/uapi/rdma/rdma_netlink.h              |   5 +-
+ kernel/cgroup/rdma.c                          |  71 ++++-
+ net/smc/smc_pnet.c                            |  20 +-
+ tools/testing/selftests/rdma/Makefile         |   3 +-
+ tools/testing/selftests/rdma/config           |   2 +
+ .../testing/selftests/rdma/rxe_netns_names.sh | 282 ++++++++++++++++++
+ 19 files changed, 653 insertions(+), 99 deletions(-)
+ create mode 100755 tools/testing/selftests/rdma/rxe_netns_names.sh
+
+-- 
+2.54.0
+
 
