@@ -1,69 +1,74 @@
-Return-Path: <netdev+bounces-307435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307434-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id yg/lCXEhVmqUzgAAu9opvQ
-	(envelope-from <netdev+bounces-307435-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 13:45:53 +0200
+	id iy51AV4hVmqHzgAAu9opvQ
+	(envelope-from <netdev+bounces-307434-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 13:45:34 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 939337540B7
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 13:45:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63897754085
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 13:45:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=suse.com header.s=susede1 header.b=GhVAJFsE;
-	dkim=pass header.d=suse.com header.s=susede1 header.b=GhVAJFsE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307435-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307435-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=suse.com header.s=susede1 header.b=N854Dr6o;
+	dkim=pass header.d=suse.com header.s=susede1 header.b=N854Dr6o;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307434-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307434-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=suse.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8F0E330A2981
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:44:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 53F513044090
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:44:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C1AB38AC9A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DD8738911E;
 	Tue, 14 Jul 2026 11:44:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 224FD383991
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D3E238399B
 	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 11:44:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784029476; cv=none; b=B8sgo90aXwiEMx9pXey4//cHM0P+exPnrAQJtQ2vuQk+jvcfu21ky3lpd1cYSmeBD3xqQ0kSq3kKHdg0vss9NGoB0tH5vEz6TJvt7O5EaNZPejk1oDDZId4lxFQePL/AxUq3zRPIM/AQxJl8F4XZzyCzLeNq+CYMq8n4SEnetII=
+	t=1784029476; cv=none; b=ie+7VWG4yP72zpNLII021Mfn4iFqjrhDNJDBLs1OG71BFRoaRRUw+ypHtHKz4sHfK+yG6tIMGHxVavoJN8N7FmVXT2PdD+u9uP9ENx9N+DEql4VXblqHCLiCDgqM13pKkQJIg53dpVvXgphCVLSx0l9oe5LQnY0HVrY8Lu4X2lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1784029476; c=relaxed/simple;
-	bh=IiAwkisxgCqSXAzkA5fVxAZj5V3qNCJHPw6r+cR3O2c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s4PsdOo3+1uHeY6NXgcszjNZXa9a3xQiEyCFyueyp/yubMKReJxNqHHPrp75tKb0V8JeoRBjxu/ueWsvG3N7YH8QxMl6IdEMHo5duW5RW1kZ/2T6R1mwdUXNX0AXgQ5Y4cpYNgbwcA342U8aJu1Uc3TaPrrSb+HoBpods3uKOd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=GhVAJFsE; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=GhVAJFsE; arc=none smtp.client-ip=195.135.223.131
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	bh=qkVecHnPWlWrvxbn1jGLFA7r3ztwnh+Ads2uXugq55w=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ECpJVcCtZEP3bODax2JC5FM3VuwxO+k4puj600ziZfo4wcW6mkPovNiQM0Af8MU0B+Sbgq/9IGY3GWGZxwuF7xDhbrTq6nPVnXDasnfpg4UJZ5vU048Jvq8Ez7FRMyJuWHU79dqtbMIFnNhKxkTAJ1UOjS7MyfBBVW41E3Ikjdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=N854Dr6o; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=N854Dr6o; arc=none smtp.client-ip=195.135.223.130
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 0B5943E25;
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 47D1577E2D;
 	Tue, 14 Jul 2026 11:44:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
 	t=1784029472; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=AJ/J9d0m8sPPEnZnOiP40BsYgFqu6b9H4Wr6fxKBlFc=;
-	b=GhVAJFsExd5bPK1msOHe3QaJYNcGa8GFs79pJYFibZe5tqjgbpi7xrWJI1eVKcXt1vwA3H
-	6OnVlO9jtnhzXakzSEiJ/D4lgr5VOagSQr8dB5dAFt04lUXZOd3eCFjZ6bhJhPsFZdk2DM
-	22KnF4dEQ/RljgnBlsUYteoU8fMtG2I=
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=p7SG94XJgSPoCBr54IEe+BPhmsgEhA3JqMHwvfzdzbg=;
+	b=N854Dr6o2Yhyy1zvz+jutTIowJDzFloCqjrFekHuzhCVRaJYjGzKVmyxjNX+zhz7aw/yFZ
+	MoR5c6kXSrOlY5E9YjrnJEILsTKlD/kpyRS2h47hyjzqZ3qas4UNRTSKszXaQWYIhkx00A
+	dBnPpU2KcATat23URvoOcbLSe2OGSRM=
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
 	t=1784029472; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=AJ/J9d0m8sPPEnZnOiP40BsYgFqu6b9H4Wr6fxKBlFc=;
-	b=GhVAJFsExd5bPK1msOHe3QaJYNcGa8GFs79pJYFibZe5tqjgbpi7xrWJI1eVKcXt1vwA3H
-	6OnVlO9jtnhzXakzSEiJ/D4lgr5VOagSQr8dB5dAFt04lUXZOd3eCFjZ6bhJhPsFZdk2DM
-	22KnF4dEQ/RljgnBlsUYteoU8fMtG2I=
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=p7SG94XJgSPoCBr54IEe+BPhmsgEhA3JqMHwvfzdzbg=;
+	b=N854Dr6o2Yhyy1zvz+jutTIowJDzFloCqjrFekHuzhCVRaJYjGzKVmyxjNX+zhz7aw/yFZ
+	MoR5c6kXSrOlY5E9YjrnJEILsTKlD/kpyRS2h47hyjzqZ3qas4UNRTSKszXaQWYIhkx00A
+	dBnPpU2KcATat23URvoOcbLSe2OGSRM=
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C7F9F779AE;
-	Tue, 14 Jul 2026 11:44:31 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 11776779AF;
+	Tue, 14 Jul 2026 11:44:32 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id I3fALx8hVmp+cwAAD6G6ig
-	(envelope-from <oneukum@suse.com>); Tue, 14 Jul 2026 11:44:31 +0000
+	id gLIuAyAhVmp+cwAAD6G6ig
+	(envelope-from <oneukum@suse.com>); Tue, 14 Jul 2026 11:44:32 +0000
 From: Oliver Neukum <oneukum@suse.com>
 To: andrew+netdev@lunn.ch,
 	davem@davemloft.net,
@@ -74,10 +79,12 @@ To: andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: Oliver Neukum <oneukum@suse.com>
-Subject: [PATCHv3 net-next 1/9] net: usb: move updating filter and status from cdc drivers to usbnet
-Date: Tue, 14 Jul 2026 13:44:21 +0200
-Message-ID: <20260714114429.1073434-1-oneukum@suse.com>
+Subject: [PATCHv3 net-next 2/9] net: usb: centralize usbnet_cdc_zte_rx_fixup in usbnet
+Date: Tue, 14 Jul 2026 13:44:22 +0200
+Message-ID: <20260714114429.1073434-2-oneukum@suse.com>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260714114429.1073434-1-oneukum@suse.com>
+References: <20260714114429.1073434-1-oneukum@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,8 +93,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Flag: NO
-X-Spam-Score: -1.51
 X-Spam-Level: 
+X-Spam-Score: -1.30
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -100,7 +107,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307435-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307434-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:manuelebner@mailbox.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:oneukum@suse.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[6];
@@ -121,212 +128,81 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:from_mime,suse.com:mid,suse.com:email,suse.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:from_mime,suse.com:mid,suse.com:email,suse.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 939337540B7
+X-Rspamd-Queue-Id: 63897754085
 
-These helpers are used by multiple drivers and do not depend
-on the rest. For example rndis_host will also need cdc_ether.
-Leaving them in a cdc driver means that additional drivers are loaded
-just as a library, not to support hardware by themselves.
+This helper is used by multiple drivers using usbnet.
+It is better to be provided by usbnet than one of them.
 
 Signed-off-by: Oliver Neukum <oneukum@suse.com>
 ---
 
 v2:
-- update change log entry
+- spelling issues
+- issue with lost synchronization with SPLIT packets
 
- drivers/net/usb/cdc_ether.c | 75 -----------------------------------
- drivers/net/usb/usbnet.c    | 79 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 79 insertions(+), 75 deletions(-)
+ drivers/net/usb/cdc_ether.c | 19 -------------------
+ drivers/net/usb/usbnet.c    | 19 +++++++++++++++++++
+ 2 files changed, 19 insertions(+), 19 deletions(-)
 
 diff --git a/drivers/net/usb/cdc_ether.c b/drivers/net/usb/cdc_ether.c
-index a0a5740590b9..b4df32e18461 100644
+index b4df32e18461..e688fb99c61d 100644
 --- a/drivers/net/usb/cdc_ether.c
 +++ b/drivers/net/usb/cdc_ether.c
-@@ -63,35 +63,6 @@ static const u8 mbm_guid[16] = {
- 	0xa6, 0x07, 0xc0, 0xff, 0xcb, 0x7e, 0x39, 0x2a,
- };
+@@ -404,25 +404,6 @@ static int usbnet_cdc_zte_bind(struct usbnet *dev, struct usb_interface *intf)
+ 	return status;
+ }
  
--void usbnet_cdc_update_filter(struct usbnet *dev)
+-/* Make sure packets have correct destination MAC address
+- *
+- * A firmware bug observed on some devices (ZTE MF823/831/910) is that the
+- * device sends packets with a static, bogus, random MAC address (event if
+- * device MAC address has been updated). Always set MAC address to that of the
+- * device.
+- */
+-int usbnet_cdc_zte_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 -{
--	struct net_device	*net = dev->net;
+-	if (skb->len < ETH_HLEN || !(skb->data[0] & 0x02))
+-		return 1;
 -
--	u16 cdc_filter = USB_CDC_PACKET_TYPE_DIRECTED
--			| USB_CDC_PACKET_TYPE_BROADCAST;
+-	skb_reset_mac_header(skb);
+-	ether_addr_copy(eth_hdr(skb)->h_dest, dev->net->dev_addr);
 -
--	/* filtering on the device is an optional feature and not worth
--	 * the hassle so we just roughly care about snooping and if any
--	 * multicast is requested, we take every multicast
--	 */
--	if (net->flags & IFF_PROMISC)
--		cdc_filter |= USB_CDC_PACKET_TYPE_PROMISCUOUS;
--	if (!netdev_mc_empty(net) || (net->flags & IFF_ALLMULTI))
--		cdc_filter |= USB_CDC_PACKET_TYPE_ALL_MULTICAST;
--
--	usb_control_msg(dev->udev,
--			usb_sndctrlpipe(dev->udev, 0),
--			USB_CDC_SET_ETHERNET_PACKET_FILTER,
--			USB_TYPE_CLASS | USB_RECIP_INTERFACE,
--			cdc_filter,
--			dev->intf->cur_altsetting->desc.bInterfaceNumber,
--			NULL,
--			0,
--			USB_CTRL_SET_TIMEOUT
--		);
+-	return 1;
 -}
--EXPORT_SYMBOL_GPL(usbnet_cdc_update_filter);
+-EXPORT_SYMBOL_GPL(usbnet_cdc_zte_rx_fixup);
 -
- /* We need to override usbnet_*_link_ksettings in bind() */
- static const struct ethtool_ops cdc_ether_ethtool_ops = {
- 	.get_link		= usbnet_get_link,
-@@ -400,52 +371,6 @@ EXPORT_SYMBOL_GPL(usbnet_cdc_unbind);
-  * (by Brad Hards) talked with, with more functionality.
-  */
- 
--static void speed_change(struct usbnet *dev, __le32 *speeds)
--{
--	dev->tx_speed = __le32_to_cpu(speeds[0]);
--	dev->rx_speed = __le32_to_cpu(speeds[1]);
--}
--
--void usbnet_cdc_status(struct usbnet *dev, struct urb *urb)
--{
--	struct usb_cdc_notification	*event;
--
--	if (urb->actual_length < sizeof(*event))
--		return;
--
--	/* SPEED_CHANGE can get split into two 8-byte packets */
--	if (test_and_clear_bit(EVENT_STS_SPLIT, &dev->flags)) {
--		speed_change(dev, (__le32 *) urb->transfer_buffer);
--		return;
--	}
--
--	event = urb->transfer_buffer;
--	switch (event->bNotificationType) {
--	case USB_CDC_NOTIFY_NETWORK_CONNECTION:
--		netif_dbg(dev, timer, dev->net, "CDC: carrier %s\n",
--			  event->wValue ? "on" : "off");
--		if (netif_carrier_ok(dev->net) != !!event->wValue)
--			usbnet_link_change(dev, !!event->wValue, 0);
--		break;
--	case USB_CDC_NOTIFY_SPEED_CHANGE:	/* tx/rx rates */
--		netif_dbg(dev, timer, dev->net, "CDC: speed change (len %d)\n",
--			  urb->actual_length);
--		if (urb->actual_length != (sizeof(*event) + 8))
--			set_bit(EVENT_STS_SPLIT, &dev->flags);
--		else
--			speed_change(dev, (__le32 *) &event[1]);
--		break;
--	/* USB_CDC_NOTIFY_RESPONSE_AVAILABLE can happen too (e.g. RNDIS),
--	 * but there are no standard formats for the response data.
--	 */
--	default:
--		netdev_err(dev->net, "CDC: unexpected notification %02x!\n",
--			   event->bNotificationType);
--		break;
--	}
--}
--EXPORT_SYMBOL_GPL(usbnet_cdc_status);
--
- int usbnet_cdc_bind(struct usbnet *dev, struct usb_interface *intf)
- {
- 	int				status;
+ /* Ensure correct link state
+  *
+  * Some devices (ZTE MF823/831/910) export two carrier on notifications when
 diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index 25518635b7b7..21c55d70f27c 100644
+index 21c55d70f27c..14e9f1b1e0a2 100644
 --- a/drivers/net/usb/usbnet.c
 +++ b/drivers/net/usb/usbnet.c
-@@ -22,6 +22,7 @@
- #include <linux/init.h>
- #include <linux/netdevice.h>
- #include <linux/etherdevice.h>
-+#include <linux/usb/cdc.h>
- #include <linux/ctype.h>
- #include <linux/ethtool.h>
- #include <linux/workqueue.h>
-@@ -2271,6 +2272,84 @@ int usbnet_write_cmd_async(struct usbnet *dev, u8 cmd, u8 reqtype,
- 
+@@ -2350,6 +2350,25 @@ void usbnet_cdc_status(struct usbnet *dev, struct urb *urb)
+ 	}
  }
- EXPORT_SYMBOL_GPL(usbnet_write_cmd_async);
+ EXPORT_SYMBOL_GPL(usbnet_cdc_status);
 +
-+void usbnet_cdc_update_filter(struct usbnet *dev)
++/* Make sure packets have correct destination MAC address
++ *
++ * A firmware bug observed on some devices (ZTE MF823/831/910) is that the
++ * device sends packets with a static, bogus, random MAC address (event if
++ * device MAC address has been updated). Always set MAC address to that of the
++ * device.
++ */
++int usbnet_cdc_zte_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 +{
-+	struct net_device	*net = dev->net;
++	if (skb->len < ETH_HLEN || !(skb->data[0] & 0x02))
++		return 1;
 +
-+	u16 cdc_filter = USB_CDC_PACKET_TYPE_DIRECTED
-+			| USB_CDC_PACKET_TYPE_BROADCAST;
++	skb_reset_mac_header(skb);
++	ether_addr_copy(eth_hdr(skb)->h_dest, dev->net->dev_addr);
 +
-+	/* filtering on the device is an optional feature and not worth
-+	 * the hassle so we just roughly care about snooping and if any
-+	 * multicast is requested, we take every multicast
-+	 */
-+	if (net->flags & IFF_PROMISC)
-+		cdc_filter |= USB_CDC_PACKET_TYPE_PROMISCUOUS;
-+	if (!netdev_mc_empty(net) || (net->flags & IFF_ALLMULTI))
-+		cdc_filter |= USB_CDC_PACKET_TYPE_ALL_MULTICAST;
-+
-+	usb_control_msg(dev->udev,
-+			usb_sndctrlpipe(dev->udev, 0),
-+			USB_CDC_SET_ETHERNET_PACKET_FILTER,
-+			USB_TYPE_CLASS | USB_RECIP_INTERFACE,
-+			cdc_filter,
-+			dev->intf->cur_altsetting->desc.bInterfaceNumber,
-+			NULL,
-+			0,
-+			USB_CTRL_SET_TIMEOUT
-+		);
++	return 1;
 +}
-+EXPORT_SYMBOL_GPL(usbnet_cdc_update_filter);
-+
-+static void speed_change(struct usbnet *dev, __le32 *speeds)
-+{
-+	dev->tx_speed = __le32_to_cpu(speeds[0]);
-+	dev->rx_speed = __le32_to_cpu(speeds[1]);
-+}
-+
-+void usbnet_cdc_status(struct usbnet *dev, struct urb *urb)
-+{
-+	struct usb_cdc_notification	*event;
-+
-+	if (urb->actual_length < sizeof(*event)) {
-+		/* we cannot assume the device is in sync with us*/ 
-+		clear_bit(EVENT_STS_SPLIT, &dev->flags);
-+		return;
-+	}
-+
-+	/* SPEED_CHANGE can get split into two 8-byte packets */
-+	if (test_and_clear_bit(EVENT_STS_SPLIT, &dev->flags)) {
-+		speed_change(dev, (__le32 *)urb->transfer_buffer);
-+		return;
-+	}
-+
-+	event = urb->transfer_buffer;
-+	switch (event->bNotificationType) {
-+	case USB_CDC_NOTIFY_NETWORK_CONNECTION:
-+		netif_dbg(dev, timer, dev->net, "CDC: carrier %s\n",
-+			  event->wValue ? "on" : "off");
-+		if (netif_carrier_ok(dev->net) != !!event->wValue)
-+			usbnet_link_change(dev, !!event->wValue, 0);
-+		break;
-+	case USB_CDC_NOTIFY_SPEED_CHANGE:	/* tx/rx rates */
-+		netif_dbg(dev, timer, dev->net, "CDC: speed change (len %d)\n",
-+			  urb->actual_length);
-+		if (urb->actual_length != (sizeof(*event) + 8))
-+			set_bit(EVENT_STS_SPLIT, &dev->flags);
-+		else
-+			speed_change(dev, (__le32 *)&event[1]);
-+		break;
-+	/* USB_CDC_NOTIFY_RESPONSE_AVAILABLE can happen too (e.g. RNDIS),
-+	 * but there are no standard formats for the response data.
-+	 */
-+	default:
-+		netdev_err(dev->net, "CDC: unexpected notification %02x!\n",
-+			   event->bNotificationType);
-+		break;
-+	}
-+}
-+EXPORT_SYMBOL_GPL(usbnet_cdc_status);
++EXPORT_SYMBOL_GPL(usbnet_cdc_zte_rx_fixup);
  /*-------------------------------------------------------------------------*/
  
  static int __init usbnet_init(void)
