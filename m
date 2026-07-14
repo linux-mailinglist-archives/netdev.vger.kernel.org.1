@@ -1,155 +1,196 @@
-Return-Path: <netdev+bounces-307388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307389-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id UZ15K4DyVWqpwgAAu9opvQ
-	(envelope-from <netdev+bounces-307388-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:25:36 +0200
+	id eceqLtfzVWomwwAAu9opvQ
+	(envelope-from <netdev+bounces-307389-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:31:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C6EC7525CF
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:25:36 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29AF27526B4
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:31:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307388-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307388-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="giy/cU2f";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307389-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307389-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 99AD5301AAB2
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 08:19:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 86C5C302DFB3
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 08:25:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC62A3FAE0D;
-	Tue, 14 Jul 2026 08:19:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDF473EDE40;
+	Tue, 14 Jul 2026 08:25:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.white.stw.pengutronix.de (mx1.white.stw.pengutronix.de [185.203.200.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D089E3FADFD;
-	Tue, 14 Jul 2026 08:19:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0D83F8EB7
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 08:25:19 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784017163; cv=none; b=dDi/2eWxYayhobZSByUttfL7VGOMIPySVbtVH44RIW0rCYt/wm7AzMVb0nhsar0Nnole8+TEpii73mKO2yMg4I+QJM+0A3JaBtAHNOxjD+4s8g9tAU4W/eKMf5598wyxZY/TVlGWIIViG/4ClGjkn6FXGtjs2DfiMXdzWTISL2M=
+	t=1784017524; cv=none; b=NctBPDPuPbnHZE5lSDKXIGLm38jcistACeSeeQqcpe6PgxMO2inIvQLMgxtChqXckcR+0BlDXAY4JXjjKSE3CwEcpzg1RTAgWz0qOhQ2ZtxYExiISuMynnP/WRFKh0S6QW/pMB33/jy2qDNcw2oN5UZO1LvtRnN7tCUokG/oFYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784017163; c=relaxed/simple;
-	bh=wwKTQi9cpPRih9483MgQ+Lfpv5eTWogqhsMzD1Mu8K4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rGZWZ4aUCyb3APuVj9/lK43O3oRQbRdfKY8BNKexmX1lAX8u5e7bCvwJnj2cOpLZhZ02ONRmpn/AIQx4PnvHeHQ8XTta3JedB9EkFgWJf3cAolKRwCevfrfv1SeGYu7VSNhGndxWUela1ikJgE7wKfYLKQCQph6ZFFG1YIFhV1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.200.13
-Received: from drehscheibe.grey.stw.pengutronix.de (drehscheibe.grey.stw.pengutronix.de [IPv6:2a0a:edc0:0:c01:1d::a2])
-	(Authenticated sender: relay-from-drehscheibe.grey.stw.pengutronix.de)
-	by mx1.white.stw.pengutronix.de (Postfix) with ESMTPSA id 15561202203;
-	Tue, 14 Jul 2026 10:19:10 +0200 (CEST)
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1wjYM9-001jwl-39;
-	Tue, 14 Jul 2026 10:19:09 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.98.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1wjYM9-000000091z6-3Y9T;
-	Tue, 14 Jul 2026 10:19:09 +0200
-Date: Tue, 14 Jul 2026 10:19:09 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Jonas Jelonek <jelonek.jonas@gmail.com>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Daniel Golle <daniel@makrotopia.org>,
-	=?utf-8?B?QmrDuHJu?= Mork <bjorn@mork.no>
-Subject: Re: [PATCH net-next v7 2/4] net: pse-pd: add Realtek PSE MCU core
-Message-ID: <alXw_QZfEEKQd5fr@pengutronix.de>
-References: <20260712192251.1413279-1-jelonek.jonas@gmail.com>
- <20260712192251.1413279-3-jelonek.jonas@gmail.com>
+	s=arc-20240116; t=1784017524; c=relaxed/simple;
+	bh=Mwbnhj9N+bChxzWMPQVb/tX7I1RBQGFrsOYlWCn2Wos=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mBPEbPPj/FHuWISZuGmqSixQSgD/xUOB1C/oyrHcmYvYGsjTeve5Axk1JgWEiYOvxZNCpFt46uQBcAiYu5vkGI3qE87s5WNjR6OgwbUoHHdxqgvlckkWsCTOs2APYrKtn71rtWEr/G0DjMyXHAST7t3u5OrjVVDe8mJqJqqXJ68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=giy/cU2f; arc=none smtp.client-ip=209.85.167.47
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5aec139da7eso694545e87.1
+        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 01:25:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784017517; x=1784622317; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=2aq9ASsSVVcCb27XWhYTSc8/QMqg/E/6IObcZcIPIKs=;
+        b=giy/cU2foZ00BP+AAsqLLwrFBOuhJN3Tv9QMNapN7LSoDv4f7cNGsqrWIYZ9TgYo2f
+         hVj2CYkHsRK7OQAzmWe5f3EH4GOTLD8MERZyQnxRU5bbARPIvfjmftgz5s1mvAPQzFH7
+         HF1rcXAMjYTJKHY5aM7WSCPLHfLPeuuVSIQHBGx3AlTHrn/c+mjJxA1NQvBNijEpY/4x
+         d4EmTgABNsrVN2gqUKKwEeeMm6YcQOe00T338Gc6kAghkmBBqJEoaRkaPCWSo18NVmcx
+         50MsOvFdvadzBdTTmmGX2khT4Wflq08ro3TrczpX0AsnDfIUHmkwYxciCKMwDAIG4gzA
+         m7fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784017517; x=1784622317;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=2aq9ASsSVVcCb27XWhYTSc8/QMqg/E/6IObcZcIPIKs=;
+        b=GUqaNvTsPbdySb8uDXjsHHqkriUoyRS4koy/L86c1cAOyQzK3IYaA4IsVatuixO86R
+         kyeOMBN50kH7QBcwIwXfpksPEqsPOcvn5lKDtD+A1hnytih0jy7Bu+7OtFtSf7lpUEeD
+         GmETGjLO/kCVhbr03RMtZkzyaz7w59VD4O4JIxSwjhqLADRzdWI8syTGM9AtIKHRM/qq
+         O5iQ+yZ1DwaPNSJ8ecOMk9osbZHyWdO72QUBenDB6pTMTNkJslI3U2eJ8yT28JDjN6VN
+         lB5eXGuYVSNXrMD0e7UWslptGZ11qAfTLNj/GUhUCfZKWZ0bGiRwOKUhS+yxg3jPLsww
+         zpEg==
+X-Gm-Message-State: AOJu0YxMoq5d7IzNBoutdNLvCSB8Eo2K0Y5XCXbFsS5X78dScmSLaMpC
+	AD4E1y99ycgABCpwaGGsUq+odORa9nqArDtoJX3wn4O9pnkMXM+7b3o13bJwlnTyV6o=
+X-Gm-Gg: AfdE7cl2aAnrMVsZz4K4NjjbBJw+ibD7szj1NQKFwlhigSS467FgGyXfu/wybLKr+Dg
+	obl9BBgRqHQxr1r/aP27uqqDttiYopAKTLRO86CKcaJhX/TKDUEX1YfDML/02h2Z+lE46rkJMEE
+	DPsWhyPPhb+fLfFgVOgaHbX4FHwMF17kkJmKguFPTbeL2CJtIHidmYl0Yv9KAbUM1vR3GWdCymz
+	AMxUi8MKcpA2QxNyK1qVStXZLlCWdq0Osi5fnSQV2AEdudpkeImNuBXbw9b2JbHjSz0s6KkAe2J
+	7p73E4hs98FKranBVRUvGTRanN1IwP8vqyN35RcZB8g7megBnZT3KR5an7I/aq0dN5PU42jmLml
+	nnNOlFt8kvU1vR1MSYUJo192XccZJPy3Qg1h6tCkSFSdaClHYwHNpgN0LdlFa5DqbVolRSXgb6d
+	Sq6DygtKskKBOrYmKbJJwgmxQKatGNGC8RZoAJRByHpiIoXOWKEMEzKqpdDv/wh9z/LE3DofV8c
+	iExD9Y7VdiDUKPXdw==
+X-Received: by 2002:a05:6512:22d0:b0:5ae:ba93:abe with SMTP id 2adb3069b0e04-5b01c55a3bdmr2888577e87.30.1784017516359;
+        Tue, 14 Jul 2026 01:25:16 -0700 (PDT)
+Received: from debian.localdomain (95-25-161-220.broadband.corbina.ru. [95.25.161.220])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-39c84b9382esm30676591fa.29.2026.07.14.01.25.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jul 2026 01:25:15 -0700 (PDT)
+From: Igor Putko <igorpetindev@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-kernel@vger.kernel.org,
+	Igor Putko <igorpetindev@gmail.com>
+Subject: [PATCH] net: core: use WARN_ON_ONCE in datagram iterators
+Date: Tue, 14 Jul 2026 11:25:11 +0300
+Message-ID: <20260714082511.2817-1-igorpetindev@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260712192251.1413279-3-jelonek.jonas@gmail.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307388-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[pengutronix.de];
-	FORGED_RECIPIENTS(0.00)[m:jelonek.jonas@gmail.com,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:bjorn@mork.no,m:jelonekjonas@gmail.com,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307389-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[igorpetindev@gmail.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:igorpetindev@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[igorpetindev@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	TO_DN_SOME(0.00)[]
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1C6EC7525CF
+X-Rspamd-Queue-Id: 29AF27526B4
 
-On Sun, Jul 12, 2026 at 07:22:48PM +0000, Jonas Jelonek wrote:
-> A range of managed Realtek-based PoE switches use a small microcontroller
-> on the PCB to front the actual PSE silicon. The host CPU talks to that
-> MCU over I2C/SMBus or UART using a fixed 12-byte request/response
-> protocol with a trailing checksum; the PSE chips are managed by the MCU
-> and are not accessed directly. Two generations of the protocol exist -
-> both Realtek's - diverging in opcode numbering and a few response
-> layouts; the driver handles this with a per-dialect opcode table and
-> parser hooks for the responses that differ, selected by the compatible.
-> The specific PSE chip behind the MCU is detected at runtime and only
-> influences per-chip constants (power scaling and the per-port cap).
-> 
-> This core module implements the protocol, message framing, the dialect
-> machinery and the pse_controller_ops glue, and exports a registration
-> helper for transport modules. The I2C and UART transports that drive it
-> follow in the next patches; the core (PSE_REALTEK_MCU) is selected
-> automatically by those transports and is not user-selectable on its own.
-> 
-> The realtek-pse-mcu-* files and PSE_REALTEK_MCU* symbols match the
-> realtek,pse-mcu-* compatibles (see the binding for the naming rationale).
-> The two protocol generations - gen1 on older Broadcom-PSE boards, gen2 on
-> Realtek's own PSE silicon - are both Realtek's, handled by the same shared
-> core, each selecting its dialect via the compatible.
-> 
-> Power budgeting is left to the MCU firmware; the driver advertises
-> PSE_BUDGET_EVAL_STRAT_DYNAMIC (controller-managed budget) accordingly.
-> 
-> Signed-off-by: Jonas Jelonek <jelonek.jonas@gmail.com>
+Datagram fragment iteration helpers check for invalid buffer offsets
+using WARN_ON(). In fast-path packet processing routines, a malformed
+skb or lower-level driver bug triggering this check can result in
+unbounded dmesg logging.
 
-Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Excessive console logging in data-path contexts introduces severe I/O
+latency overhead and risks triggering a DoS or system instability
+via log flooding.
 
-Thank you!
+Replace WARN_ON() with WARN_ON_ONCE() in __skb_datagram_iter() and
+skb_copy_datagram_from_iter(). This ensures anomalous conditions remain
+reportable for debugging without spamming the kernel log on repeated
+occurrences.
+
+Signed-off-by: Igor Putko <igorpetindev@gmail.com>
+---
+ net/core/datagram.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/net/core/datagram.c b/net/core/datagram.c
+index c285c6465..125b52870 100644
+--- a/net/core/datagram.c
++++ b/net/core/datagram.c
+@@ -416,7 +416,7 @@ static int __skb_datagram_iter(const struct sk_buff *skb, int offset,
+ 		int end;
+ 		const skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
+ 
+-		WARN_ON(start > offset + len);
++		WARN_ON_ONCE(start > offset + len);
+ 
+ 		end = start + skb_frag_size(frag);
+ 		if ((copy = end - offset) > 0) {
+@@ -449,7 +449,7 @@ static int __skb_datagram_iter(const struct sk_buff *skb, int offset,
+ 	skb_walk_frags(skb, frag_iter) {
+ 		int end;
+ 
+-		WARN_ON(start > offset + len);
++		WARN_ON_ONCE(start > offset + len);
+ 
+ 		end = start + frag_iter->len;
+ 		if ((copy = end - offset) > 0) {
+@@ -570,7 +570,7 @@ int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
+ 		int end;
+ 		const skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
+ 
+-		WARN_ON(start > offset + len);
++		WARN_ON_ONCE(start > offset + len);
+ 
+ 		end = start + skb_frag_size(frag);
+ 		if ((copy = end - offset) > 0) {
+@@ -594,7 +594,7 @@ int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
+ 	skb_walk_frags(skb, frag_iter) {
+ 		int end;
+ 
+-		WARN_ON(start > offset + len);
++		WARN_ON_ONCE(start > offset + len);
+ 
+ 		end = start + frag_iter->len;
+ 		if ((copy = end - offset) > 0) {
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.47.3
+
 
