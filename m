@@ -1,258 +1,252 @@
-Return-Path: <netdev+bounces-307542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307543-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /e5bBkZ1Vmr95wAAu9opvQ
-	(envelope-from <netdev+bounces-307542-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:43:34 +0200
+	id MMqZJDp2Vmp56AAAu9opvQ
+	(envelope-from <netdev+bounces-307543-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:47:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75AC2757930
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:43:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 355D6757996
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:47:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=ajleL+N1;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307542-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307542-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=asu.edu;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=NLC58upT;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307543-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307543-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0FED6303D370
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 17:43:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ACEFB314E0C6
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 17:44:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9462412C05;
-	Tue, 14 Jul 2026 17:43:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97C8C4156D5;
+	Tue, 14 Jul 2026 17:44:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFEEB37F73A
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 17:43:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05583909B9
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 17:44:02 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784051005; cv=pass; b=OehKsAP3O4GG5lSImY0xeKl+AcILgJib1KlS5Pj3lw9s9KlwnZv0Ut1EbB7foynAYGKFD5dJlhDAN1StSNhRmyoFgbh2mwNR7PbrmoYNhb5CVueBw6CWGaEYWU5S7co2BzqFcwusgfv1IqRaeOK2d19DtgIxarQmCZAq1EqPbN4=
+	t=1784051052; cv=pass; b=qIrOvcbq4dgQ5I9TTqdhhyFVlVFY9RhPsKvjLqpQF+t7m5xxM2+zn3u++D4DOhx53YPZdBcEkuV0b2XUN+mxfcywcQkL/W4aE5AyDjjrRwRSCDPHdbT8gtw/Wvaky95jM7Oq4IwRzWYG7eeU85HxaR6NgO7beLGXqYp/4igJd38=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784051005; c=relaxed/simple;
-	bh=IqZIAd0cCcHZ42lAptFGrjVXP4gbXUmtq1AaettDH3g=;
+	s=arc-20240116; t=1784051052; c=relaxed/simple;
+	bh=JDuTfhJTWstpJvfRy/NTAtn6+ConTe3zcMRhSX3H1kY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Eu4qyKoz+t9U8gPGwh3XS9ORzQE5cEbuUFSQG4SHqy6Cb6+0AOKfnwmn7lpNIj4BEFmBCPDsZCR83Ve/zJX5a4M57zyOWlbBZ0DgzqtdNJRfRa4J1Wz0dA/t3XipXiAbcnyziW5xDb5pBy6TcfAftjY1+xG2+YORAs1somVtez0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=ajleL+N1; arc=pass smtp.client-ip=209.85.214.177
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2cc6dd436c6so14988145ad.2
-        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 10:43:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784050998; cv=none;
+	 To:Cc:Content-Type; b=CaOBT4LJJ8xJphLAL7aksIHZIDsCXdK1dRYTqBPA5YlRLRWICs7jI+Ze/VjKAOtUlNFPORBVAxWgXJMuQSSkWyUfnm5smVvDmEX7NaT/64MJ9TFdAlyfrjipx2T2EkCovQiKAlMX7QxIAi2cNDGU7ffL9+ecAiwGPLt75IdUj5k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NLC58upT; arc=pass smtp.client-ip=209.85.208.52
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-697cee2eb6dso1391912a12.0
+        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 10:44:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784051039; cv=none;
         d=google.com; s=arc-20260327;
-        b=mvHyLe876GjtuusiRpp0OGXF72lViaL5NnTPNR7rLmWfbmZMKVKzuanxfdUcGxmXsl
-         FnmAj8axS3JSPk+Fvk2yV8dgrU+6K+cp/OrYuGIrqEm/BbPKd3qcWbhXJ47cK2EC6AXd
-         TPOCgSqGUTp33Y6SrjHEFzuOhYJgIC+SYnQLJXp3HnQISNpuDXwkj1Sy/cALR4qIF/U6
-         CPxDKPwIFEoo9C8hcBavi07mMOmtSiOeToOiIiqH8dK0RB4TYQGR7Rn7HAbmx7arVVP4
-         RYCIqAmvdgqX73WTOuJMgion7n/6fDtS0Hom1kvn4ow2Nftx2rDlRzqRgzlRIUlBXox+
-         uUpw==
+        b=dNCbsiWsFi7YayONo0ArPAi/dTdnMkHMmMm2+PscWV5mZ/pXEJFapK6CFX9KoV98cu
+         fxWavnQCLwURt1oaTNBoqmjlMLMqH1Y9fp9RcM8JeYXpgPsi7FCWkpkxa6DKnKui+P7W
+         oRvZyA2njPIMxlqgCJCOQQQEcCad5F2L8lPJLJ6SfYcP2EqwBCm61WfYEGWfCMdL30u9
+         I60yAjNIcqI980/RyFwFt4ZsRIM2cerKq5B8fwZaJpi9OUT/jE5XEnCX0rbtqE5fcMyx
+         vw3LwqbL1viQw1w03imqjsDeVhLOxcgvvmB9fA7ndS/d/EKIZ4hxegpvJIXL1etlSXFn
+         WGhg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=1Pz8O2vLYmfUwTbni2IlCcDAPYdfQco2elXmue1upKM=;
-        fh=T6bu6vVAEBYjj6at1/sMvSO3/HMw5M3Sha1aIv+c6nk=;
-        b=GGFY8vIqG0Y9Ew1f83Hmdh3jsq0j0tYAYV7Ue1JHk/k6rouatFLfmmIdbdbQwMvr33
-         obSEKr9O5ZD9mkN9WJXT9ajhysZEwJxSJuSra1lLoPeBjXIBi3sdXi6c8ATmd3R2lMUi
-         9LwHBp4NLpeiMFiqMMr95ep9gxEbIH+4pF8UBPaGF5Ccffi7pB5YtLZlCSmzcyX8ejbk
-         vsiTDPFKaV7/uHlZ+gvpLcmQl0BwHaXM7i2iHVupyKT/qoq7ix72fGrMi/a10VA4ihxp
-         l7QfXmL18YRV3bgNOb5+jiMfJsaoFyVRzplYygyJOsgotP4SxV5ZeWgfE306FIjZYUIm
-         9eeA==;
+        bh=zmM3GtgNw27l1Tq0fmnNqzL+GRDJtL7rqIl7qgYTkHE=;
+        fh=7vMLJMeHk2Ud5AWOyNHhspgPwF8221eOByoqAyUFh8A=;
+        b=ilopfU7ze7bo6KDVaQvdxzEWCzXIRl2vPYpvH1mj9C1OkdiFmXuiY6GpCgWRT7RkWF
+         PEXhL1zbaKxKJaDUOb3iK+/OU3s/MlQSMkIiYF01zZsy37aZtU55YpVqea7AcshymBVt
+         AVGMu9Y2snCqvuXGJ9LfxG1Vx4tUomD07gWqtVYzdhIMjE0PPZDw/0XL3aCPLQkRB0qa
+         ziO55nso5K8txKpjbK2G/dLLqNDsbwhol0gNYZlbzZXypMWd583Qd/tbMax7iVl1GYUE
+         CP4rNlFHHi/UGglWCHUN3akaDlqkBiLgCKFc0zZ+wuQ/6LdCG67HCi3wiGJSdAph3H/e
+         kP2g==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1784050998; x=1784655798; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1784051039; x=1784655839; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=1Pz8O2vLYmfUwTbni2IlCcDAPYdfQco2elXmue1upKM=;
-        b=ajleL+N16I+vqPssCUl0d78rJzJm07gNZuTqAG8FwDGgi18vvubR8aalcYLoqG8iso
-         Yk07zHRSqET3f5mAV1xEfPCY4uB1cIo3rpaC/RIqE3gIMNShrUW+Tf3p6Kl0ZCwnDnHu
-         ih3+ureE6o78qX32Pcz10zMB8LP7DLyH76Z48OVl+9mOTcnik+eAqJhINeQfNM8VzESU
-         FNPILxUEYjgY7t0gbOtSVMk5Kv50zAG0wm+b0SqUdjm5Q5eDRwJK/Zhhenaul3u9YJDE
-         Mikeh8YTWgZcW5NEEEOBBQaGzRsJDSQRiyZzkzTj6sgUD5wm1zkcVlxDRsljDyxxcFNr
-         5LRg==
+        bh=zmM3GtgNw27l1Tq0fmnNqzL+GRDJtL7rqIl7qgYTkHE=;
+        b=NLC58upTQMuiESgjhiWEY3Az5lgSX08qYzabWHB7awqhuSW04/dGmIW8HdWJVEKcOb
+         CnAUAP5JD6wG7m96S/nOAv43tK7vD4dfe3jFv6tw/l8argjFWI3bNsPSpblkKtC2riKc
+         Vl4m9EUgk70RTKgFYbCBhAGUrD+UA4W1CNXtj1+jVmMkk+SyNGDCnTCRIzm1FhH97eyZ
+         UUrpfpEPleRCdgRMZBYMsThGn3cbNz7OOK5+xP/E3e/PJWGFa9UF3CpgCWm6G3i7nSTS
+         LbiY0c57Moqa4M7pAZJEBzoADcv3bywvm3l9ivgwa93XroGEIds9EKzUafm9Vfwp+6w/
+         3i2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784050998; x=1784655798;
+        d=1e100.net; s=20251104; t=1784051039; x=1784655839;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=1Pz8O2vLYmfUwTbni2IlCcDAPYdfQco2elXmue1upKM=;
-        b=LjroNlqaPHrCLfAQ3pL7iWzGSshPpmj+MRj4YXhblzZ8v+RI4F+Xixhp54B92wy2vu
-         mSQDlNQOVx5AIvcSlffVSNq4F6T9XM4PW/7OPRqp63oWo9RglVrqv7EuBKFqixLyTMBR
-         vmetF7KWRLbOgIwXaU6EGaSUrk9zisUarMOo0tMUu/2ViUdYhFzrx3J+rkfFUzE/y2Dm
-         hxvtEsLG4V9ekqbBmr8o9HSox082QnTnTCfp+09woYIscGIKKpJez0kZ7/EVBAzD2/4x
-         VKDrkiaZtQpywzkGyg72C3wCPf+xBv0w6EU8rLjuLQsMQc/jgC+YOjNIzSbdFa/rLCgK
-         toxw==
-X-Forwarded-Encrypted: i=1; AHgh+Rqs6OSPfNCGkMC0/K4KEOSOvrwhom+WWCUlexRGAwpTLfl+K6wW6xZslne+0osOH/cMXArNWlo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyok3A48gDTDiFNvbMhaYP+UCCT0C4TU8KqU/zu6OH1ecbqBm4Y
-	TQm0AigAcMvTd8Q2EKINHOo+LgMlvpVT/UQq76EH12KZcy7qUA3qwz7EWVOumP1LzKUMUrwTByk
-	ujIPOX3V1qwlC9T5n6/EAESzFUcpnP4VCSeblP3NF
-X-Gm-Gg: AfdE7ckzzMmGNyBAJ0qFYgDB5a8P3KwFTSvaTKQayPbijOCkeaRTPaRzOOO77GRmje8
-	FDyaPk8k62wcQ2ZUgGgvIGhXox0xZ4TTvU1wryufL/l8o+q4HS0jQSltTaMPilOjaV+og7USlUB
-	KpYZ6PNliBgI8ZA3Vv3M2AMofDmxiFAEbmYXcX/CftYEjM+fEzUg8uPHVLVlplDfydbPo/6+hNI
-	/p9S3KUZz4zW1uXsN5Jj1I0psnSLqQhGH26MeQfBZWtmE+BwMdeFvhuXzaRJIaXYnCfE++B5e1H
-	YokEc6wJwc4QjYGTcaACnyq6Ois2593+y7A=
-X-Received: by 2002:a17:903:2287:b0:2ca:ce92:6e44 with SMTP id
- d9443c01a7336-2ce9eae2ae8mr145661205ad.8.1784050998398; Tue, 14 Jul 2026
- 10:43:18 -0700 (PDT)
+        bh=zmM3GtgNw27l1Tq0fmnNqzL+GRDJtL7rqIl7qgYTkHE=;
+        b=sqUuinOCe0ooYfi/ArTO4peG/2/YEgbz6lw9ommgGjtvnCZ629ZxNhMVE8L4Z57CXk
+         2IWJqKJa5nhGq+ZtP+ADc9kSnJ6EB9jdR3anzSISfZcbnbk3IUz8xL/8Rzdn1Z8Z1Rff
+         i480r+uLUujY6mUvrdYvlnVmxgC4DlfT8VRlWSNEjaydmiResDPw0iVSYLICvZCvqZm1
+         v4xPmKxFwTnepj7nw7hDeuFALOMYLDtA+OkijAHf2GXmX4G39PtC2AxCCXriDha5p5iu
+         2sMf4lQvL5fsLH/dzDBNTuQWaFVeoORJuveCnyjbjQNFYyGdMmdkFiGN23FSUsK2l63p
+         4GiA==
+X-Forwarded-Encrypted: i=1; AHgh+RqVnqeMPzOGojMAs/DAxX662hJkT7XkRS7Y6er8RnbCbVbyoXcRf9Vh/+13VVzSfoVQDMi5N2w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLyKp3+uv7qdAwZNMNGraKTLkCvNjhHuLbf6T8OnbH1yQNPoba
+	nT0zS+S6g9jLHdk9yZeQpNRXCeFUhWYc751hNaXhj8OkdPXZL0mD3ZgWh63QaqyLbegxr0HatQb
+	7HSPvv+dJMeICE3ISor+wRGqG6/EommE=
+X-Gm-Gg: AfdE7cl95Ohg93r+tuDgnDPk+ZDygZFrvjAyufa6tRT+O4eu7AiQaQCnZrNcV+I1tub
+	skIOqhNkGaW41wQJX1rhZBEm2WR24sUJAhXcrQk+XS1WGwz+1MDTAQfYnXn/7BYsbfjwsJRdTbP
+	6NCD+KDh2CB0EKXdODlcu0EY3vQfpUjMp3zZ8Wf9m9aV9g5JlHor7QlpWYbrKB2E9RnUvDtMKER
+	NemBye5RmNPc/ymfOmAG/epRiOIZj2Whz3BBiHn+E8M3yJby6Qu0J4wxhwUVjjzKRec9JfbHNGU
+	dnK6HVnlM8qTHVXkm2cWEZSHhDxf
+X-Received: by 2002:a17:907:6e86:b0:c0e:4017:6471 with SMTP id
+ a640c23a62f3a-c161e86871cmr681203966b.16.1784051038882; Tue, 14 Jul 2026
+ 10:43:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260710014109.536177-1-xmei5@asu.edu> <CAMArcTVGfCzcnOrrKFRqD0a6Q2LgC19Yge1Lh2fvKMx2oqwtmw@mail.gmail.com>
-In-Reply-To: <CAMArcTVGfCzcnOrrKFRqD0a6Q2LgC19Yge1Lh2fvKMx2oqwtmw@mail.gmail.com>
-From: Xiang Mei <xmei5@asu.edu>
-Date: Tue, 14 Jul 2026 10:43:07 -0700
-X-Gm-Features: AUfX_mzxZz5-0OHc6Eq88oWLu-8Ky5UYJXDLo69nU9efd4veEXkajBOF9HRXstA
-Message-ID: <CAPpSM+RSrDuH4nvM8LYiFLYBR2818hYGaTT3uPHg_ez2W3=WEw@mail.gmail.com>
-Subject: Re: [PATCH net] amt: refresh cached IP header pointers after MLD/IGMP checks
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	AutonomousCodeSecurity@microsoft.com, tgopinath@linux.microsoft.com, 
-	kys@microsoft.com
+References: <20260706163024.1205930-2-bestswngs@gmail.com> <20260713134610.1779498-1-horms@kernel.org>
+In-Reply-To: <20260713134610.1779498-1-horms@kernel.org>
+From: Weiming Shi <bestswngs@gmail.com>
+Date: Wed, 15 Jul 2026 01:43:21 +0800
+X-Gm-Features: AUfX_myVDAgOYXdE7b544NcnLD48aV5KTXGXCZVfOr8LYmN7iu9JiFYjOoQPhlg
+Message-ID: <CANgPUi1G441VV3G-gHy0Ng8Q9A43rTXLAUnTU7OyRgCZJSicpA@mail.gmail.com>
+Subject: Re: [PATCH net v2] tipc: fix NULL deref in tipc_named_node_up() on
+ empty publication list
+To: Simon Horman <horms@kernel.org>
+Cc: jmaloy@redhat.com, netdev@vger.kernel.org, 
+	tipc-discussion@lists.sourceforge.net, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	hoang.h.le@dektech.com.au, xmei5@asu.edu, linux-kernel@vger.kernel.org, 
+	tung.quang.nguyen@est.tech
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307542-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:ap420073@gmail.com,m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:jmaloy@redhat.com,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:hoang.h.le@dektech.com.au,m:xmei5@asu.edu,m:linux-kernel@vger.kernel.org,m:tung.quang.nguyen@est.tech,s:lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307543-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[asu.edu:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,asu.edu:from_mime,asu.edu:email,asu.edu:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,mail.gmail.com:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 75AC2757930
+X-Rspamd-Queue-Id: 355D6757996
 
-Thanks for the reminder.
+Simon Horman <horms@kernel.org> =E4=BA=8E2026=E5=B9=B47=E6=9C=8813=E6=97=A5=
+=E5=91=A8=E4=B8=80 21:46=E5=86=99=E9=81=93=EF=BC=9A
+>
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://sashiko.dev
+> ---
+> tipc: fix NULL deref in tipc_named_node_up() on empty publication list
+>
+> This commit fixes a NULL pointer dereference in tipc_named_node_up() that
+> occurs when the cluster_scope publication list is empty. The fix introduc=
+es
+> an early return to avoid calling named_distribute() with an empty list.
+>
+> > diff --git a/net/tipc/name_distr.c b/net/tipc/name_distr.c
+> > index ba4f4906e13b7..60ccaa862162c 100644
+> > --- a/net/tipc/name_distr.c
+> > +++ b/net/tipc/name_distr.c
+> > @@ -218,6 +218,10 @@ void tipc_named_node_up(struct net *net, u32 dnode=
+, u16 capabilities)
+> >       spin_unlock_bh(&tn->nametbl_lock);
+> >
+> >       read_lock_bh(&nt->cluster_scope_lock);
+> > +     if (list_empty(&nt->cluster_scope)) {
+> > +             read_unlock_bh(&nt->cluster_scope_lock);
+> > +             return;
+> > +     }
+>
+> [Severity: Critical]
+> Does this early return prevent the transmission of the last_bulk
+> synchronization message to the peer node?
+>
+> In tipc_named_dequeue(), the peer node sets *open =3D true only when rece=
+iving
+> a message where msg_is_last_bulk(hdr) is true:
+>
+> net/tipc/name_distr.c:tipc_named_dequeue() {
+>         ...
+>         if (*open && (*rcv_nxt =3D=3D seqno)) {
+>                 (*rcv_nxt)++;
+>                 __skb_unlink(skb, namedq);
+>                 ...
+>                 return skb;
+>         }
+>         ...
+> }
+>
+> If *open is false, all subsequent non-bulk name publications will fail th=
+is
+> sequence check and remain in the namedq indefinitely.
+>
+> Without sending the last_bulk message, could this cause a permanent stall
+> of name table updates and an unbounded memory leak of socket buffers on t=
+he
+> peer node?
+>
+> >       named_distribute(net, &head, dnode, &nt->cluster_scope, seqno);
+>
+> [Severity: High]
+> This isn't a bug introduced by this patch, but looking at named_distribut=
+e()
+> called here, what happens if buffer allocation fails during the loop?
+>
+> Inside named_distribute():
+>
+> net/tipc/name_distr.c:named_distribute() {
+>         ...
+>         if (!skb) {
+>                 skb =3D named_prepare_buf(net, PUBLICATION, msg_rem, dnod=
+e);
+>                 if (!skb) {
+>                         pr_warn("Bulk publication failure\n");
+>                         return;
+>                 }
+>         ...
+> }
+>
+> If the function returns early due to allocation failure, the messages
+> already added to the queue are transmitted by tipc_node_xmit(), but none
+> of them will have the last_bulk flag set since that happens at the very e=
+nd
+> of the function.
+>
+> Could this also prevent the receiving node from transitioning its named_o=
+pen
+> state to true, leading to the exact same permanent stall and memory leak =
+of
+> subsequent normal name publications?
+>
+> >       tipc_node_xmit(net, &head, dnode, 0);
+> >       read_unlock_bh(&nt->cluster_scope_lock);
+> --
+> pw-bot: changes-requested
 
-Xiang
 
-On Tue, Jul 14, 2026 at 6:16=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wro=
-te:
->
-> On Fri, Jul 10, 2026 at 10:41=E2=80=AFAM Xiang Mei (Microsoft) <xmei5@asu=
-.edu> wrote:
-> >
->
-> Hi Xiang Mei,
-> Sorry for the late reply.
->
-> > amt_dev_xmit() and amt_update_handler() cache iph/ip6h before calling
-> > ip_mc_check_igmp() / ipv6_mc_check_mld(), which may pskb_may_pull() a
-> > non-linear skb and reallocate skb->head. The stale pointers are then
-> > read (amt_dev_xmit: group.ip{4,6} =3D iph/ip6h->daddr; amt_update_handl=
-er:
-> > ip{,v6}_eth_mc_map()), a slab-use-after-free. tx is reachable by an
-> > unprivileged user whose amt device has SG enabled; rx by a tunnel peer
-> > sending a membership update fragmented across several IP fragments.
-> >
-> > Reload iph/ip6h after the check returns, like commit f0e42f0c4337
-> > ("ipv6: sit: reload inner IPv6 header after GSO offloads").
-> >
-> > tx path:
-> >   BUG: KASAN: slab-use-after-free in amt_dev_xmit (drivers/net/amt.c:12=
-38)
-> >   Read of size 16 by task exploit
-> >    amt_dev_xmit (drivers/net/amt.c:1238)
-> >    dev_hard_start_xmit (net/core/dev.c:3905)
-> >    __dev_queue_xmit (net/core/dev.c:4872)
-> >    packet_sendmsg (net/packet/af_packet.c:3114)
-> >
-> > rx path:
-> >   BUG: KASAN: slab-use-after-free in amt_rcv (drivers/net/amt.c:2530)
-> >   Read of size 4 by task exploit
-> >    amt_rcv (drivers/net/amt.c:2530)
-> >    udp_queue_rcv_one_skb (net/ipv4/udp.c:2388)
-> >    ip_local_deliver (net/ipv4/ip_input.c:262)
-> >    ip_rcv (net/ipv4/ip_input.c:612)
-> >
-> > Fixes: cbc21dc1cfe9 ("amt: add data plane of amt interface")
-> > Fixes: bc54e49c140b ("amt: add multicast(IGMP) report message handler")
-> > Fixes: b75f7095d4d4 ("amt: add mld report message handler")
-> > Reported-by: AutonomousCodeSecurity@microsoft.com
-> > Signed-off-by: Xiang Mei (Microsoft) <xmei5@asu.edu>
->
-> Thanks a lot for this work.
-> However Michael Bommarito is already working on this.
-> https://lore.kernel.org/netdev/20260711151934.2955226-2-michael.bommarito=
-@gmail.com/
->
-> Thanks,
-> Taehee Yoo
->
-> > ---
-> >  drivers/net/amt.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/drivers/net/amt.c b/drivers/net/amt.c
-> > index 951dd10e192b..8bc61c539b0a 100644
-> > --- a/drivers/net/amt.c
-> > +++ b/drivers/net/amt.c
-> > @@ -1210,6 +1210,7 @@ static netdev_tx_t amt_dev_xmit(struct sk_buff *s=
-kb, struct net_device *dev)
-> >                 } else {
-> >                         data =3D true;
-> >                 }
-> > +               iph =3D ip_hdr(skb);
-> >                 v6 =3D false;
-> >                 group.ip4 =3D iph->daddr;
-> >  #if IS_ENABLED(CONFIG_IPV6)
-> > @@ -1234,6 +1235,7 @@ static netdev_tx_t amt_dev_xmit(struct sk_buff *s=
-kb, struct net_device *dev)
-> >                 } else {
-> >                         data =3D true;
-> >                 }
-> > +               ip6h =3D ipv6_hdr(skb);
-> >                 v6 =3D true;
-> >                 group.ip6 =3D ip6h->daddr;
-> >  #endif
-> > @@ -2498,6 +2500,7 @@ static bool amt_update_handler(struct amt_dev *am=
-t, struct sk_buff *skb)
-> >                         netdev_dbg(amt->dev, "Invalid IGMP\n");
-> >                         return true;
-> >                 }
-> > +               iph =3D ip_hdr(skb);
-> >
-> >                 spin_lock_bh(&tunnel->lock);
-> >                 amt_igmp_report_handler(amt, skb, tunnel);
-> > @@ -2517,6 +2520,7 @@ static bool amt_update_handler(struct amt_dev *am=
-t, struct sk_buff *skb)
-> >                         netdev_dbg(amt->dev, "Invalid MLD\n");
-> >                         return true;
-> >                 }
-> > +               ip6h =3D ipv6_hdr(skb);
-> >
-> >                 spin_lock_bh(&tunnel->lock);
-> >                 amt_mld_report_handler(amt, skb, tunnel);
-> > --
-> > 2.43.0
-> >
+Hi ,
+Thank you for the review and feedback. v3 sent.
 
