@@ -1,166 +1,238 @@
-Return-Path: <netdev+bounces-307404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307405-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zzq8Ftb+VWpRxgAAu9opvQ
-	(envelope-from <netdev+bounces-307404-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:18:14 +0200
+	id H9SlFGn/VWqCxgAAu9opvQ
+	(envelope-from <netdev+bounces-307405-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:20:41 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B85E2752BD7
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:18:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B7C4D752C4B
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:20:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=vVpMQ8aI;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307404-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307404-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=smu.edu.sg header.s=selector1 header.b=fcy2+L+J;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307405-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307405-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=smu.edu.sg;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 84F0D3063180
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:17:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 52D31304DA1D
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:19:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B09B43F8B0;
-	Tue, 14 Jul 2026 09:16:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 528003EC2EF;
+	Tue, 14 Jul 2026 09:19:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from TYPPR03CU001.outbound.protection.outlook.com (mail-japaneastazon11022077.outbound.protection.outlook.com [52.101.126.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52EE343FD0C
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 09:16:53 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784020616; cv=none; b=IiaZPN69dP1XwcR+spp7DTQPdwWhuG8r7QoMZoUlVosUXjz7F28DkwblH79jn70lzLmAslTizsteUf07SB+CIRlDxtM+VmIAFBZD2wswVnROQyYPE39KKq7rMhK+8r2JitUyO6vhL4eTaCOWPxGZA6MMyH9pIDqQ2ysQlYd6IRQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784020616; c=relaxed/simple;
-	bh=g3LxXL/bvX2bnISy9b4ZFDkVoL1rBQWGDWX5ygHH/3c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d8SpCKHymswxvH7xgOpualY2zaRueSc5B93fJtBe1X1NTXsySLkuTQ2KFIlOy6gLuALjR1TjBEfuYtvVKov8rS817+Rf2gSb4b5fwJX27LU/vRoHRdZxePwdeembBPPMEApZCEAyav+cANj28CqKQQWuKBuEFcVoMF7x8V8CalQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=vVpMQ8aI; arc=none smtp.client-ip=185.246.84.56
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 70EC41A0FC7;
-	Tue, 14 Jul 2026 09:16:51 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 2D19660346;
-	Tue, 14 Jul 2026 09:16:51 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9B25A11BD3A89;
-	Tue, 14 Jul 2026 11:16:43 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1784020610; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=+igQ6FzMbOLztFG+oaE9DCg38qBYL0qFipuVHL6mZH4=;
-	b=vVpMQ8aIRCtPeKC/dS6IOaTvt1L4dVPjdFph3JZii8GgqDGHklhF5hmXhlcPwy56jhHlug
-	jk09GLxzL3G/+C2VKRzxIGRX/r3lTKohAGbTQDOsufGfVEzDVyzmiWL6lQ8E8elJ/0pUSq
-	jCri259fW7OSNo/lWnFtTjPTHLIc9b56tgJOJ2qYYE2l0g6fJ9wEhBBF84jHnFrhNIdATA
-	0vcrihtoTiisjN+JCp3wIUbFqyI2OmX/W8jy6LZVp1wM1S2tAmUtCIwik2fXspXhqXkdUX
-	eVulAx37xz/WMGlyRrrdZ71pzPb6w9PKfZgo/hgQ56b2rKHVtAqu0rjWP+VmYw==
-Message-ID: <044a9996-1cd0-49c4-892b-fb267037c568@bootlin.com>
-Date: Tue, 14 Jul 2026 11:16:41 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45B82DB7BD;
+	Tue, 14 Jul 2026 09:19:10 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784020756; cv=fail; b=c5otyO0CCp/FqGko6YFD0soqsut3ng2zoDVdxmQQL0gpHVQWZ6j/le1Vg/3W8g9gg/BS5zHncPWIyhtMr88j/oGRyUqi+zbtJtt+/ic1Z/T1W9toBuMsxmaQpovn+kVWOXhtQmuuKozx8PFY6eC1Rdl8P4nS9H0LKmRS6scBd2w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784020756; c=relaxed/simple;
+	bh=Cx5lg4j784fg62doZ0WootStYcgiz/YdvWhb2d2ogto=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=tsLJ85ww1kxPMeXmwUrzvfgLfcHMGm+NSi8e0RXqkv6t8kVICCeR6hyruUioC7tAr0IytZVKlZ7B+L/jwfDcnwlGwM7BWUAWzeieo2RITvpB9Kl2s2UUKi8QGmn1X4NUoMOaY8PrmgjR+B4WkFjVj3Hxwmhe3xL2T66K2rrOFZI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=smu.edu.sg; spf=pass smtp.mailfrom=smu.edu.sg; dkim=pass (2048-bit key) header.d=smu.edu.sg header.i=@smu.edu.sg header.b=fcy2+L+J; arc=fail smtp.client-ip=52.101.126.77
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=x99NGkXRq/BhL92KnJDI6Ql10GOkwQenH25rAStq2dIBXKnfERMhSdwgtPoCsgsce8Y3vaoia0SXCkhfRYZTIE0nLNV99sjW1oQs9RoI8ZC2LfYy7TGeQZ7mGNRSLzt50uGDLahwcJ7opuiZTNwacncwPMbnac6VBslpQunarKqBhSjFFElU+wRFQDjOd5XxB0pFim7SwN9EgYXDeRHmqzdgaN5ENqeVvwq6U2O/Ff0o0TTEgh+46gDAtZ0V4aiJ80EG9tQPWXLDPiW/d/pGcHEpQJzyrOGgWUTeUfu0p+tU79Z5F3KiPJ9Z6O/vt++RPksa+i2GHy24Ehx2EIJwQQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kFEPdT5nteN2CBLjqqc5IuMFb8hVYbt1UJf5qfE8+fI=;
+ b=UXaq9i3g/bgALocrA+d6jCRSIcOwb8+rfwgQ/CXSoxwM9/eLpXfgoDdiX/Tkw7dhXPs2f2wq/yeaBbJs8R1FXZUP7E95oMF7WtzEOc+c8ysILtOgySLgfAibOnsJSR92X5im5nv3B0YyJKmTSyRl5QK6AyYco1DjX41xxwdhTW7yU3vdF0inCSjeRrVOu6EYW1sdirURJDAvq6lDN2RHSWUC4h+niZ3enTS4QMnjegAiHt5vbj8NSb3fm+1kL3A/7NrS3XLVJYiZ5Sy67oPCkkiU3Zr24DEuxUagOg4a80Mf+D15DbsXB9AQXXaJ1YBGBqLPSN4zgAWRXe4KsQuTjA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=smu.edu.sg; dmarc=pass action=none header.from=smu.edu.sg;
+ dkim=pass header.d=smu.edu.sg; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=smu.edu.sg;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kFEPdT5nteN2CBLjqqc5IuMFb8hVYbt1UJf5qfE8+fI=;
+ b=fcy2+L+JyzMG57sL5eLz5ZZoTgLpcodcYxiwZBWL64CbFqvrN82KuOSXhZZfZm3xP4YFBhO7KTXMBP4nekaOcZBEA0DwaT7U8LbpN2JJDIpaBXuliyOT48UTWkCRFF+msu+hy/XZnabcNHLjVpQ4FQKAAeJeMSzmlfL6fU3RZlG/yVHLJjT1aSF/1YIwd6bb4bJIL38RpydNx/nOQdQdUz+UW0RdW5GY5kTBJohs4DvH4zmAJmzgsl66aryxgZxQQBQ+rNxLg6ZA0L9eFmsrccRcc/HDEklgdxOo3EMYQUVY/H0PvZAlEtlpw4MHGi/ib1R8rLK5FQQEKnEA6q0u2g==
+Received: from KUXPR01MB7791.apcprd01.prod.exchangelabs.com
+ (2603:1096:d10:3f::9) by SG2PPFA603A64E4.apcprd01.prod.exchangelabs.com
+ (2603:1096:f:fff6::440) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.202.20; Tue, 14 Jul
+ 2026 09:19:06 +0000
+Received: from KUXPR01MB7791.apcprd01.prod.exchangelabs.com
+ ([fe80::6bd0:d704:7d90:a595]) by KUXPR01MB7791.apcprd01.prod.exchangelabs.com
+ ([fe80::6bd0:d704:7d90:a595%5]) with mapi id 15.21.0202.014; Tue, 14 Jul 2026
+ 09:19:06 +0000
+From: Huihui Huang <hhhuang@smu.edu.sg>
+To: linux-wireless@vger.kernel.org
+Cc: Huihui Huang <hhhuang@smu.edu.sg>,
+	Ajay Singh <ajay.kathat@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	netdev@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH wireless] wifi: wilc1000: validate assoc response length before subtracting header
+Date: Tue, 14 Jul 2026 17:17:58 +0800
+Message-ID: <20260714091811.3596126-1-hhhuang@smu.edu.sg>
+X-Mailer: git-send-email 2.50.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SI3PR03CA0013.apcprd03.prod.outlook.com
+ (2603:1096:4:297::19) To KUXPR01MB7791.apcprd01.prod.exchangelabs.com
+ (2603:1096:d10:3f::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 2/7] net: phy: phylink: add helper to modify
- pause
-To: Javen <javen_xu@realsil.com.cn>,
- "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
- "nic_swsd@realtek.com" <nic_swsd@realtek.com>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "daniel@makrotopia.org" <daniel@makrotopia.org>,
- "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
- "enelsonmoore@gmail.com" <enelsonmoore@gmail.com>,
- "daniel@thingy.jp" <daniel@thingy.jp>
-References: <20260709100237.541-1-javen_xu@realsil.com.cn>
- <20260709100237.541-3-javen_xu@realsil.com.cn>
- <0c188a7d-3637-4e08-9ac8-c1d824b461ed@bootlin.com>
- <aeed474059bc4fd7b9c5e3074ef591a4@realsil.com.cn>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <aeed474059bc4fd7b9c5e3074ef591a4@realsil.com.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: KUXPR01MB7791:EE_|SG2PPFA603A64E4:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9f313fe8-f327-4fc8-7477-08dee188f42b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|786006|366016|52116014|376014|23010399003|11063799006|56012099006|18002099003|3023799007|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	e5plu51BadXL6WO3ucaSjoSKTBBsDAw5YpOCBz2uLPHxcppWqO3t+L5SOIq8FBB9HnNGu8bkiVFFPIn07UtDpHTr7tQUU5YSIjKxJ+IDLvw1aseeDcj0R4bDEYWK4SBcA3unpOCNB/m6CuHSujhPNnJQytooz/aRo/hTfEGzGH9C/hVO6A8az6pw8rb7znqrE7BNzhyRedjPSnVN7tAAnub5WGdeWa57Y+7BpL03iN5Ht9jtyQwOd3UE3f/esIWZMGOdo8eP7KxgoutCUqxY85nQBEhpfO2g33tCLtTvSnFsTnQ7deozlxodj8Z78l0SwTtmO0Fxq9GMdl8jKNZgI8s5Z6f1wTy2lVuWlZkXods0ogYTA7UA+rWTPamThwe3sg3SOrTg7/QDYQBOodrK05tHzJs4Q2yS8+WWx1ruJyPoW5f9/+gXNoken7kotzr68i9LV7TES16LAzYSnB6ZMItK/GK1inhJHvW/GpruNp0+WTwDs8AWK3HixyHwhBIgXKaZEJc6BTo7SYTNaorSjP1Qv+T/iMDFBZD/8+LQJvGtsbRDaiV6MVdNF/uuxxuWbI+OUypCsIky9i44rHpsy4pBqlRKcDjW8F9T8L122I670lATYdEht5aywCpWLLnKuqootaII4iNS9eDgbeZjZBO352kLIOjqpzsCtF+DAX6MGClHEOSnVtVTR9VtXC1k8Y/OCdVHpSWyBIhBIeJ8wcTD8RkrNIoa5WJORzYTidQ=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:KUXPR01MB7791.apcprd01.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(786006)(366016)(52116014)(376014)(23010399003)(11063799006)(56012099006)(18002099003)(3023799007)(38350700014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?iml3W1VX12ARo2/bYVqvqvujksvFyeQGwexKNlOvA9jEfwkjDXUG1g2Mj+fB?=
+ =?us-ascii?Q?g/+eKsculispi6kdm4IplWLRSk44RZhGZadbdoLvvOA16xIoKfcFBonHvL5h?=
+ =?us-ascii?Q?W674y4ACiC9JixwxDHlGwXR8BnO/+JMfDup8CXE7f6tBfB0w/4i1QRxarX9Z?=
+ =?us-ascii?Q?sSu6TINIJ+erHNv/XeT1VJKpacV9nDToKDmAm+JsYMf/iXWpfzntb6uPVEE7?=
+ =?us-ascii?Q?zOsejv3lkXm2plCbocUuEhprCFm6Gj+t1jPX9rDIuJlL8/oHhnKtHz4vZpO3?=
+ =?us-ascii?Q?cmVfo4Lnkm+8cw1Rxb2kvXLQm6JAKeXeXNXMa+ENDvSpwyZfoUPT8EfSE/Ek?=
+ =?us-ascii?Q?9lB+UCvIJ+8Lg3UYUnlSU2iFsSodMnr6TKF5Dpm0pjYLIYthX4NK0/d2zati?=
+ =?us-ascii?Q?5YzM84HAYxUE2vZgpudU128P9ZbNBm4567RHrUganXj4He80SV4wpvC/8aTY?=
+ =?us-ascii?Q?NaxjFVKY9livBfXC2GYNuyYdIjenfWE8TsbtqB7wij3H2iPRzuqk6/FpSAu7?=
+ =?us-ascii?Q?0evaEe6ZwmtvmkQma65dH4bq2rtuyb6m7rFypSydudsMb7T50yMtPsCW9lcx?=
+ =?us-ascii?Q?sijkVrj0pShhPdUFBotFDib25p+hoR5S2ZbtVFLsTykENA6bAyLGBOniFZhh?=
+ =?us-ascii?Q?GchkqRaKI0RVorBhietnz1ZsrngUctBej10VV4unLo0ggd33jqpjK1TVznSC?=
+ =?us-ascii?Q?8MDJVvCbfO7B5zn76uZYVvQJk+Y19ySOcsOcspeSvsTQP91ZqQ+1LjsraTm+?=
+ =?us-ascii?Q?+zhNWWDcMM5G7w+N7RhyD3ZkHNydVjUw1s3+SL9A7DMrYrlZAI6R8ipVavhR?=
+ =?us-ascii?Q?992s23uR1krXvSGQt5uSXmdS9TzrrZNCBFw55aGxvVjVhjYk46HGiicoTjFE?=
+ =?us-ascii?Q?xg2fnTQ905vy3ixqRlbFx7DN+KN4P625YOtnSHL14d7XI4qOCL6AAgE4okNe?=
+ =?us-ascii?Q?XhDbtUleaDKblZ96wtRIWD8OzDvVmJRhs4Tt9kWYX0xhiBrPyk4yZ9DkzfBw?=
+ =?us-ascii?Q?PKfRrrwZPfaD3VExi+Mx05+eh6Ooi1vkPRjL0bOihGD69D0KXvsybnFSo1yy?=
+ =?us-ascii?Q?CYYgLJjrwkC449L1apxDqSKMcroQqzSPKXkuxTSXQWO5dJzZjPsysfbokPCx?=
+ =?us-ascii?Q?nIezjaJNVmp2kGCk2ZIbbEIJ40J2qSV60OViGFAoCFDRYW/Keej2MkPg9zNp?=
+ =?us-ascii?Q?NmDtF4WmXCL1VTfYAs6/IYXFOZlyojMmqbUSYLPZd7GUwvJn4DPAUyORn0ec?=
+ =?us-ascii?Q?MlNZDEAqYfcJ2rLwwHWUmmIZp2CDf9b3sZdUWIbUvSclGCisoPI0fG6rCFKe?=
+ =?us-ascii?Q?+FRI+0b/ZRyUCSoOrGMEYB02/+tSUVzDyxURkNAJAA/YYNX/ynW0HpfVya8E?=
+ =?us-ascii?Q?p4YWK/e2N5InyxIr4vtTn8t4zoVziZGOJEz5rUbWT7xTyRE/rqDnw+/5ZBRn?=
+ =?us-ascii?Q?VqKqu69UXniXX9QcXCZLynHuAw5mBPIjqmv0oNBAolByPWTlGTaMTeFYeZtO?=
+ =?us-ascii?Q?vIOf9zBVj/xIZlCSkRG4uSsOUuTBU9VlBrZTm/NcSvrymgClkj9/Y18hLHG5?=
+ =?us-ascii?Q?pSIAY7nw/gjgWXCyLS2YxYeZD9GLmJXv4MRyooOZJZbl0lWfbk+V5ZCHbN0i?=
+ =?us-ascii?Q?YUfSv+X7kPVBELldkqbSqP8wKEmUFJ+wwvlao8JDeKykivbc5Ih3zlXTQJQs?=
+ =?us-ascii?Q?7iWjcovRUSJilUJU+dUy/BgrZxmrd1c1qT/BbUyKvR7GIVGwdB3/GQMqsMNd?=
+ =?us-ascii?Q?CqoBXpQpyw=3D=3D?=
+X-OriginatorOrg: smu.edu.sg
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9f313fe8-f327-4fc8-7477-08dee188f42b
+X-MS-Exchange-CrossTenant-AuthSource: KUXPR01MB7791.apcprd01.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2026 09:19:06.5410
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: c98a79ca-5a9a-4791-a243-f06afd67464d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sJwE+ygbK4fERQjSaUNFNLgbh4lu0NOXzWuienbZ9FSMl+uXxh0e/KG1M2/BzYg8x1WaI9el8qoYl1bIinjIuw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SG2PPFA603A64E4
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[smu.edu.sg,quarantine];
+	R_DKIM_ALLOW(-0.20)[smu.edu.sg:s=selector1];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307404-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[realsil.com.cn,gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,makrotopia.org,armlinux.org.uk,gmail.com,thingy.jp];
-	FORGED_RECIPIENTS(0.00)[m:javen_xu@realsil.com.cn,m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:linux@armlinux.org.uk,m:enelsonmoore@gmail.com,m:daniel@thingy.jp,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307405-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[hhhuang@smu.edu.sg,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:linux-wireless@vger.kernel.org,m:hhhuang@smu.edu.sg,m:ajay.kathat@microchip.com,m:claudiu.beznea@tuxon.dev,m:netdev@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hhhuang@smu.edu.sg,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	DKIM_TRACE(0.00)[smu.edu.sg:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:from_mime,bootlin.com:dkim,bootlin.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,smu.edu.sg:from_mime,smu.edu.sg:mid,smu.edu.sg:email,smu.edu.sg:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B85E2752BD7
+X-Rspamd-Queue-Id: B7C4D752C4B
 
-Hi Javen,
+wilc_parse_assoc_resp_info() computes the trailing IE length as
 
-On 7/13/26 09:51, Javen wrote:
-> Hi,
-> 
->> There's a change in the MAC's ability to support Pause, so we should :
->>
->> - Recompute the pl->supported field. Update the config.mac_capabilities with
->> the
->>   new pause settings, calling phylink_validate() should do the trick I think, this
->>   will rebuild the capability list:
->>
->>   phylink_validate(pl, pl->supported, &pl->link_config);
->>
->> - Then update the pl->link_config.pause,
->>
->> - Then update the pause advertising, like done in phylink_setpauseparam
->>   ( I think, everything that comes after pl->state_mutex gets released in
->>    phylink_ethtool_set_pauseparam)
->>
->> Ideally, the logic to update the advertising and re-trigger a negociation should
->> be factored out in a private helper, then reused from both this path (MAC
->> updates pause support) and the phylink_ethtool_set_pauseparam path.
->>
->> Maxime
-> 
-> Thanks for review and helpful suggestions.
-> 
-> I agree with your suggestion to factor out the logic into a private helper and reuse it for both phylink_ethtool_set_pauseparam() and phylink_update_mac_pause_capabilities().
-> 
-> Here is the refactored logic. I want to share this specific part with you for a quick check before I submit v7 patch.
+	ies_len = buffer_len - sizeof(*res);
 
-I'm currently attending the netdev conference, It'll take a few days for me to
-look at this, sorry about that :/
+without first checking that buffer_len is at least sizeof(struct
+wilc_assoc_resp) (6 bytes). buffer_len is the length reported for a
+received association response (host_int_parse_assoc_resp_info() passes
+hif_drv->assoc_resp / assoc_resp_info_len straight in) and must be
+validated before the driver accesses the fixed header.
 
-Maxime
+For a frame shorter than the 6-byte fixed header, the subtraction wraps.
+For a four-byte response the result is truncated to a u16 ies_len of
+65534, so kmemdup() then attempts to copy 65534 bytes starting at
+buffer + sizeof(*res), beyond the valid association-response data
+(CWE-125). A response shorter than four bytes can also cause an
+out-of-bounds read of res->status_code at offsets 2 and 3.
+
+Reject frames too short to hold the fixed header before touching the
+header or computing ies_len. Also set the connection status to a failure
+on this path: the caller falls through to a
+"conn_info->status == WLAN_STATUS_SUCCESS" check after the parser
+returns, so leaving the status untouched could let a malformed short
+response be treated as a successful association.
+
+Fixes: c5c77ba18ea6 ("staging: wilc1000: Add SDIO/SPI 802.11 driver")
+Cc: stable@vger.kernel.org
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Huihui Huang <hhhuang@smu.edu.sg>
+---
+ drivers/net/wireless/microchip/wilc1000/hif.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+Confirmed on Linux v7.2-rc2 with a temporary KUnit test that calls the
+static wilc_parse_assoc_resp_info() on a 4-byte association-response frame
+(status_code zeroed, i.e. WLAN_STATUS_SUCCESS). Verbatim KUnit output
+(timestamps stripped):
+
+  before this change:
+    # wilc_assoc_resp_short_frame_test: ret=0 resp_ies=ffff888008890000 resp_ies_len=65534 (want -EINVAL / NULL / 0)
+  after this change:
+    # wilc_assoc_resp_short_frame_test: ret=-22 resp_ies=0000000000000000 resp_ies_len=0 (want -EINVAL / NULL / 0)
+
+So a 4-byte frame drives a 65534-byte kmemdup() over-read before the fix,
+and is rejected with -EINVAL after it. The test also asserts the rejected
+frame does not leave conn_info->status at WLAN_STATUS_SUCCESS.
+
+diff --git a/drivers/net/wireless/microchip/wilc1000/hif.c b/drivers/net/wireless/microchip/wilc1000/hif.c
+index 009c477..60fe5f0 100644
+--- a/drivers/net/wireless/microchip/wilc1000/hif.c
++++ b/drivers/net/wireless/microchip/wilc1000/hif.c
+@@ -600,6 +600,11 @@ static s32 wilc_parse_assoc_resp_info(u8 *buffer, u32 buffer_len,
+ 	u16 ies_len;
+ 	struct wilc_assoc_resp *res = (struct wilc_assoc_resp *)buffer;
+ 
++	if (buffer_len < sizeof(*res)) {
++		ret_conn_info->status = WLAN_STATUS_UNSPECIFIED_FAILURE;
++		return -EINVAL;
++	}
++
+ 	ret_conn_info->status = le16_to_cpu(res->status_code);
+ 	if (ret_conn_info->status == WLAN_STATUS_SUCCESS) {
+ 		ies = &buffer[sizeof(*res)];
+
+base-commit: a0d82fb8505326cbc53dc9a0c08f97d11197bb30
+-- 
+2.50.1
 
 
