@@ -1,268 +1,175 @@
-Return-Path: <netdev+bounces-307391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307392-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 1lYeNer3VWp1xAAAu9opvQ
-	(envelope-from <netdev+bounces-307391-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:48:42 +0200
+	id TyEQLSf4VWqCxAAAu9opvQ
+	(envelope-from <netdev+bounces-307392-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:49:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 496F0752912
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:48:42 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12B50752927
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 10:49:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=O9c8oGb6;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307391-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307391-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=ibm.com header.s=pp1 header.b=PbALgW0K;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307392-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307392-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=ibm.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C4331304BB41
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 08:46:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DEF56300BC8A
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 08:49:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0205143803E;
-	Tue, 14 Jul 2026 08:46:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FEED42DFE4;
+	Tue, 14 Jul 2026 08:49:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4AE433BAB;
-	Tue, 14 Jul 2026 08:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F34F73F5BD8;
+	Tue, 14 Jul 2026 08:49:35 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784018817; cv=none; b=t1gnTd7MxD5d/p709QnvvdxdX0OKDQ03Shw+Lxs8yjdWrA3vMWe2RhcLMEv+HyORF2OU0vUX7lzsNIo7BiNqsmolqRzElUWFw9GmRIuGo6XTXl1+bE47BO3bMBj45Z0BuMYhzxOPMjrWPjiM5YyTOLpm12rZYvvQ0EgFmrJl+YE=
+	t=1784018977; cv=none; b=nssIUQqVRbAOh1AimzfnJC03bfYMjGqMX957z3jVHCl44OBowzYpjYeKPCoijVm+ZH749cWJKwany0CNLdmYzq6/WGgBkXYjLxSMU+UtaYvU7hhgWUEZtbRuhdxnXUSbT7YqyoGgm8jBzT/ODHXCXln0QCxWXx85V04B9N2Xgjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784018817; c=relaxed/simple;
-	bh=TVJMpbsiwRRjuht3Nz7W/nP7ZkFj5oulhXQhTSbPElg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M59GtQjSegqHFfb90AupM+91J4KjHP0GXZzVQ9n4b/ejEbz56kS0heXogNcJVjcm4CtEHEqHkU72Ntus4jFKOtPOLYwfa3ZDZA0MZn2TPCrrie93Px47aOOpRqNs+e0vtJlJ8O9IhkHRv8ASq7gVDNNszx2r7DsAqRSZ1LuRhyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O9c8oGb6; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B913B1F000E9;
-	Tue, 14 Jul 2026 08:46:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784018816;
-	bh=2EHiWynX4kWDLT80bfs6CVHLXHNonAAFPnmP0XhdkgY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=O9c8oGb6TFoNluP268z/7KWY5mix9GYujKq5Yn0AhZ0vArWkYFYIEMou2mnjso07D
-	 RuEeWyRXnItCYRBGEZ9ya1F4XWbQ8h+7m0iyaUGdHzgBcZD95rBOYmA0FzoQ089REN
-	 vovkpGV/ZuZNp/nXhVGyHDsZWVCmzQk3fr1qta3IguIlvcaKf2mgZna8sfQTvE7Gwi
-	 div/+ZH4nhzZAMHwglPPrYbofACyMT/aLKQomjztu33bkZ2Q2iP+EUoUbU4d2urRB4
-	 Bc+voH3FFAS+w2/fGD9fa2IpQjX1oc+zb0R7MnE3hMxpZAyGpzLeH/LEE/0dIieliK
-	 BQlsHrFbpZo6g==
-Date: Tue, 14 Jul 2026 11:46:52 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Chenguang Zhao <chenguang.zhao@linux.dev>
-Cc: jgg@ziepe.ca, saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, Chenguang Zhao <zhaochenguang@kylinos.cn>
-Subject: Re: [PATCH v2] RDMA/core: quiesce CQ polling before device shutdown
- on reboot
-Message-ID: <20260714084652.GB19233@unreal>
-References: <20260702073422.279820-1-chenguang.zhao@linux.dev>
- <20260714075558.1420384-1-chenguang.zhao@linux.dev>
+	s=arc-20240116; t=1784018977; c=relaxed/simple;
+	bh=sX0cb8eJVKYmF14n700J9YTymRHEE1kNsXQvXnwmazQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rluXyjf6hSvydd0HLNh/SmItuWMvGJ3jz9YFvJDuqVqa5+4HSwHYedeuu2imCZ+t7y8WXWTNqkuJJ33DEQLYaUtJDi02I46IRBF2IPCLShShv+tXb2o7vNeVJzUROmh9asiRQ6hL53ks1hgztfcjG0Kz1oT3LojjySarNb4F8mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PbALgW0K; arc=none smtp.client-ip=148.163.156.1
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66E6fbpc569512;
+	Tue, 14 Jul 2026 08:49:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=BqqN5s3KZtrBEboiMRGPxLk/FyFcPfkljCdQdX9ur
+	HU=; b=PbALgW0K8Ln8KSBQkatBGdt/fAcde0XikM9rEFBNAdJGsWMYmO0MJUafh
+	2QHpiETEwBq0zdEh85vtgQa/1HrZkX2iXfl/ppxuPTNx4F1tpX9ZFGFVmRk8YCYE
+	3s54xAGVjowgsEweRcSI8XHdqiQcnG+NvrTV0natBKgADChM5BGKc9Da8dxB2Qnd
+	8Bd0kBWVVPqyWUPYHO59lz4zdynZmwtvNyUOClHDJ0da+uGi4mx67U+03vic3Kl5
+	5EkYLVyK/NC0CzGQ6n5DngSvjFpUO1FQrpqTGGwiOuhTBxGJ21/aGtyj1xFL2+8f
+	fuNIzx0s5oRZX65WGna5hKsAicu7w==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fbegt563x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 14 Jul 2026 08:49:30 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66E8Ybsc019589;
+	Tue, 14 Jul 2026 08:49:29 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fc2cg9mt3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 14 Jul 2026 08:49:29 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66E8nQt515073782
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 14 Jul 2026 08:49:26 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 159812004B;
+	Tue, 14 Jul 2026 08:49:26 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DED8E20043;
+	Tue, 14 Jul 2026 08:49:25 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Tue, 14 Jul 2026 08:49:25 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55390)
+	id C60B3161595; Tue, 14 Jul 2026 10:49:25 +0200 (CEST)
+From: Sven Schnelle <svens@linux.ibm.com>
+To: Richard Cochran <richardcochran@gmail.com>
+Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Subject: [PATCH 0/2] Fix two issues in ptp_s390 driver
+Date: Tue, 14 Jul 2026 10:49:19 +0200
+Message-ID: <20260714084921.3926697-1-svens@linux.ibm.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260714075558.1420384-1-chenguang.zhao@linux.dev>
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-ORIG-GUID: mR2lzrDtNna0Gg4WlUN8jVr6KsuqQJ3U
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzE0MDA5MCBTYWx0ZWRfXyE6gIDl/aY/I
+ /NjlY3bEMEhPugHGrW1dVA/uDrAhxVLjFVbvpmJUAFFNexqS2e6ALvWaSMBEMEXVvU1lxJMcM9+
+ JOgzT6yPlzfGS0P/wss3YQzTNZiSzd8=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzE0MDA5MCBTYWx0ZWRfX2uyHj8xN2VH6
+ NCIubP7pSAdF5OLVlfc4G6xNActCYi0iXECHd/IYEJ0aXO0UERMuchCS8qT7OQh3KpECqMaojVr
+ 6HzGZnrdj3Oy6WJqKoYsCHXRXKMV9Dz1siEr1VCc+LRbH60TWHgDtaMdwhZJZREQq75HeOGH5s/
+ zZuulB7dz9mqyaJNwgU023iYmfi+FdRin1HHAaTBpqYELCsZqNdOLzQXgckPKq+Sh/4X7F15jf7
+ fLGdwxFOT+9qREbTp7sMBFydn/scnPJ4nYB6n7H9duf2es8LViwbfD/6ts1iPvqlbwQP5oCLKaP
+ ciVSrmCZs2H8ZrhCdGZhrZ3FpdUPaAZaIfxyHx/Am70KupGwhDv+gOrh2J6yH1yGsZHQ7o4MpKH
+ 1NxYV4WwJEFWEJdXyYRxV4Ts5H0mCle7COFa7PTxY7A4RF7f+6Fvn5QNLiUrLRxtBwzG/RLcVEF
+ 8aP5nzpdLkARVcKTrHg==
+X-Authority-Analysis: v=2.4 cv=IqMutr/g c=1 sm=1 tr=0 ts=6a55f81b cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
+ a=U7nrCbtTmkRpXpFmAIza:22 a=MSVIXEMOONsUDu1Crz8A:9
+X-Proofpoint-GUID: NZrGNzA7ITfD6bggICRj1RxaDNyE4IeJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-14_02,2026-07-10_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 clxscore=1011 impostorscore=0 malwarescore=0 adultscore=0
+ phishscore=0 suspectscore=0 priorityscore=1501 bulkscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607140090
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:chenguang.zhao@linux.dev,m:jgg@ziepe.ca,m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-rdma@vger.kernel.org,m:netdev@vger.kernel.org,m:zhaochenguang@kylinos.cn,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307392-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:richardcochran@gmail.com,m:netdev@vger.kernel.org,m:linux-s390@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:hca@linux.ibm.com,m:gor@linux.ibm.com,m:agordeev@linux.ibm.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[svens@linux.ibm.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-307391-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[ibm.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[svens@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_TWELVE(0.00)[12];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,kylinos.cn:email,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.ibm.com:from_mime,linux.ibm.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 496F0752912
+X-Rspamd-Queue-Id: 12B50752927
 
-On Tue, Jul 14, 2026 at 03:55:58PM +0800, Chenguang Zhao wrote:
-> From: Chenguang Zhao <zhaochenguang@kylinos.cn>
-> 
-> On reboot -f with NFS over RDMA, mlx5 shutdown can tear the device
-> down while ib-comp-wq still polls live CQs, leading to UAF in
-> wr_cqe->done().
-> Mark the device shutting down before teardown, and skip CQ poll/arm
-> and SYS_ERROR completion delivery while that flag is set.
-> 
-> Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
-> ---
-> 1. Set the SHUTTING_DOWN flag at the mlx5 PCI/SF shutdown entry.
-> 
-> 2. Skip SYS_ERROR notifications during shutdown to avoid the
->    internal error path re-arming CQs.
-> 
-> 3. Make mlx5_ib_poll_cq / mlx5_ib_arm_cq return immediately while
->    that flag is set, so completions are no longer delivered.
-> 
->  drivers/infiniband/hw/mlx5/cq.c                       |  6 ++++++
->  drivers/infiniband/hw/mlx5/main.c                     | 11 +++++++++++
->  drivers/net/ethernet/mellanox/mlx5/core/health.c      |  3 +++
->  drivers/net/ethernet/mellanox/mlx5/core/main.c        |  1 +
->  .../net/ethernet/mellanox/mlx5/core/sf/dev/driver.c   |  1 +
->  include/linux/mlx5/driver.h                           |  6 ++++++
->  6 files changed, 28 insertions(+)
-> 
-> diff --git a/drivers/infiniband/hw/mlx5/cq.c b/drivers/infiniband/hw/mlx5/cq.c
-> index 49b4bf148a4a..584445e6d2fc 100644
-> --- a/drivers/infiniband/hw/mlx5/cq.c
-> +++ b/drivers/infiniband/hw/mlx5/cq.c
-> @@ -618,6 +618,9 @@ int mlx5_ib_poll_cq(struct ib_cq *ibcq, int num_entries, struct ib_wc *wc)
->  	int soft_polled = 0;
->  	int npolled;
->  
-> +	if (mlx5_core_is_shutting_down(mdev))
-> +		return 0;
-> +
+This patchset fixes two issues in the ptp_s390 driver:
 
-1. Send patches as standalone messages, not as replies.
-2. Add the target tree to the patch subject, for example:
-   [PATCH rdma-next v2]
-3. This is racy; nothing prevents MLX5_INTERFACE_STATE_SHUTTING_DOWN from being set
-   immediately after this check.
+a) Missing check of condition code in qpt query function. When PTFF QPT i=
+s
+   not supported ptp_s390_qpt_gettime() would just return without storing
+   the physical time.
 
-Thanks
+b) Missing test for presence of facility 28 during driver registration.
 
->  	spin_lock_irqsave(&cq->lock, flags);
->  	if (mdev->state == MLX5_DEVICE_STATE_INTERNAL_ERROR) {
->  		/* make sure no soft wqe's are waiting */
-> @@ -653,6 +656,9 @@ int mlx5_ib_arm_cq(struct ib_cq *ibcq, enum ib_cq_notify_flags flags)
->  	unsigned long irq_flags;
->  	int ret = 0;
->  
-> +	if (mlx5_core_is_shutting_down(mdev))
-> +		return 0;
-> +
->  	spin_lock_irqsave(&cq->lock, irq_flags);
->  	if (cq->notify_flags != IB_CQ_NEXT_COMP)
->  		cq->notify_flags = flags & IB_CQ_SOLICITED_MASK;
-> diff --git a/drivers/infiniband/hw/mlx5/main.c b/drivers/infiniband/hw/mlx5/main.c
-> index 02809114fc79..265c95129fad 100644
-> --- a/drivers/infiniband/hw/mlx5/main.c
-> +++ b/drivers/infiniband/hw/mlx5/main.c
-> @@ -2976,6 +2976,9 @@ static void mlx5_ib_handle_internal_error(struct mlx5_ib_dev *ibdev)
->  	unsigned long flags_cq;
->  	unsigned long flags;
->  
-> +	if (mlx5_core_is_shutting_down(ibdev->mdev))
-> +		return;
-> +
->  	INIT_LIST_HEAD(&cq_armed_list);
->  
->  	/* Go over qp list reside on that ibdev, sync with create/destroy qp.*/
-> @@ -3200,6 +3203,9 @@ static void mlx5_ib_handle_sys_error_event(struct work_struct *_work)
->  	struct mlx5_ib_dev *ibdev = work->dev;
->  	struct ib_event ibev;
->  
-> +	if (mlx5_core_is_shutting_down(ibdev->mdev))
-> +		goto out;
-> +
->  	ibev.event = IB_EVENT_DEVICE_FATAL;
->  	mlx5_ib_handle_internal_error(ibdev);
->  	ibev.element.port_num = (u8)(unsigned long)work->param;
-> @@ -3222,10 +3228,15 @@ static int mlx5_ib_sys_error_event(struct notifier_block *nb,
->  				   unsigned long event, void *param)
->  {
->  	struct mlx5_ib_event_work *work;
-> +	struct mlx5_ib_dev *ibdev;
->  
->  	if (event != MLX5_DEV_EVENT_SYS_ERROR)
->  		return NOTIFY_DONE;
->  
-> +	ibdev = container_of(nb, struct mlx5_ib_dev, sys_error_events);
-> +	if (mlx5_core_is_shutting_down(ibdev->mdev))
-> +		return NOTIFY_OK;
-> +
->  	work = kmalloc_obj(*work, GFP_ATOMIC);
->  	if (!work)
->  		return NOTIFY_DONE;
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/health.c b/drivers/net/ethernet/mellanox/mlx5/core/health.c
-> index aeeb136f5ebc..d9cc42c4c310 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/health.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/health.c
-> @@ -202,6 +202,9 @@ static void enter_error_state(struct mlx5_core_dev *dev, bool force)
->  		mlx5_cmd_flush(dev);
->  	}
->  
-> +	if (mlx5_core_is_shutting_down(dev))
-> +		return;
-> +
->  	mlx5_notifier_call_chain(dev->priv.events, MLX5_DEV_EVENT_SYS_ERROR, (void *)1);
->  }
->  
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-> index 643b4aac2033..078114bfb357 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-> @@ -2192,6 +2192,7 @@ static void shutdown(struct pci_dev *pdev)
->  	int err;
->  
->  	mlx5_core_info(dev, "Shutdown was called\n");
-> +	set_bit(MLX5_INTERFACE_STATE_SHUTTING_DOWN, &dev->intf_state);
->  	set_bit(MLX5_BREAK_FW_WAIT, &dev->intf_state);
->  	mlx5_drain_fw_reset(dev);
->  	mlx5_drain_health_wq(dev);
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c b/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c
-> index 4391ef0bab5d..6f8242bfb455 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c
-> @@ -111,6 +111,7 @@ static void mlx5_sf_dev_shutdown(struct auxiliary_device *adev)
->  	struct mlx5_sf_dev *sf_dev = container_of(adev, struct mlx5_sf_dev, adev);
->  	struct mlx5_core_dev *mdev = sf_dev->mdev;
->  
-> +	set_bit(MLX5_INTERFACE_STATE_SHUTTING_DOWN, &mdev->intf_state);
->  	set_bit(MLX5_BREAK_FW_WAIT, &mdev->intf_state);
->  	mlx5_drain_health_wq(mdev);
->  	mlx5_unload_one(mdev, false);
-> diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
-> index b1871c0821d0..a9efc37cd254 100644
-> --- a/include/linux/mlx5/driver.h
-> +++ b/include/linux/mlx5/driver.h
-> @@ -653,8 +653,14 @@ enum mlx5_device_state {
->  enum mlx5_interface_state {
->  	MLX5_INTERFACE_STATE_UP = BIT(0),
->  	MLX5_BREAK_FW_WAIT = BIT(1),
-> +	MLX5_INTERFACE_STATE_SHUTTING_DOWN = BIT(2),
->  };
->  
-> +static inline bool mlx5_core_is_shutting_down(struct mlx5_core_dev *dev)
-> +{
-> +	return test_bit(MLX5_INTERFACE_STATE_SHUTTING_DOWN, &dev->intf_state);
-> +}
-> +
->  enum mlx5_pci_status {
->  	MLX5_PCI_STATUS_DISABLED,
->  	MLX5_PCI_STATUS_ENABLED,
-> -- 
-> 2.25.1
-> 
-> 
+Sven Schnelle (2):
+  ptp: ptp_s390: Add missing CC check for ptff()
+  ptp: ptp_s390: Add missing facility check
+
+ drivers/ptp/ptp_s390.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+--=20
+2.53.0
+
 
