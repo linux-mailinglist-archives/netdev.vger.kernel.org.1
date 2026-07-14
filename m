@@ -1,71 +1,94 @@
-Return-Path: <netdev+bounces-307465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307460-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id hesjFzw2Vmob1gAAu9opvQ
-	(envelope-from <netdev+bounces-307465-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:14:36 +0200
+	id LkUWKCI1VmrF1QAAu9opvQ
+	(envelope-from <netdev+bounces-307460-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:09:54 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DC17754F20
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:14:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 063CB754E1A
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:09:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=XwyYkiEo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307465-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307465-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=fail ("headers rsa verify failed") header.d=0sec.ai header.s=google header.b=oXNuM1us;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307460-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307460-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3967B32BEB6E
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 13:08:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0A47231E044F
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 13:04:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFD1D47CC8B;
-	Tue, 14 Jul 2026 13:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A17F47799C;
+	Tue, 14 Jul 2026 13:03:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FCE0478E53
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 13:06:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D373472790
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 13:03:54 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784034388; cv=none; b=eOJbpurtp/Yrf8upNYckSO3eazPIxc1REh7VYofGO5lXG9DSkqedyNPzkRFf4JK6qP17VbetqBne+mXmBNfAu5Lt8M9hQfWF1dLkbje/zum1MxhfdLPhzCYXHNLML3uiY4nBOnjWgZ2cPXXcojiZt+J/ToX6NBoCGE35r+JGV4A=
+	t=1784034238; cv=none; b=pajurRalMvIa+kW1irvMkoVhFNwUNRXJVvKbUW2aYzju8Ve/ZQqt135iRyEOqE+HArQ5hpXfuH1/A2XbQd210L93kGBBaUBi5HFJZ+RrOK/FPEdRoeAnhQyjFRpRO7cGAFkh+FtfoQiiKw+dJ5CRq9BkHQbe/0PMlRAUVpnTpHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784034388; c=relaxed/simple;
-	bh=71fgk7/pjKbIL3/bv557fkIpwYnWwWChravaY+wLfFg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JLrvvGZHNDK2WjKPdjMNFO39KYvi+MZc4bGQRbAUpUbRdyzq5QRxekVsDc+4uB8SjzXqMqILCgCQASO5P1Vx4+EBYE+cQdQJfikI1BJUGq9bK2blzDZCtnSPHh5+jnND2aQRGqVdDJfJzUN+2Pcxsn3ZPR6U+9C1ygV8xQv7G4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XwyYkiEo; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C10D1F00AC4;
-	Tue, 14 Jul 2026 13:06:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784034387;
-	bh=n5uZic2yQEf6J+MPzYVAL97zNM1jCY/8xBbV5VkLom0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=XwyYkiEoqtwMmiD4xVL+MBmHsJCedGnMjYjtF7ZQ2NLepWSeWorhUpxLfvE/DFku0
-	 +u3EAX8QG/xj9D79OwLnv8xgPquStq1bk0cMgkhwzpV/AlRtLyaHxTZETFvRpDOm+4
-	 O88eKBCgFzRf4rwO4X6bT9pTudZEI9WDJOXd3ZaZeoZbsCpCH9R3aUGTjqvdtSExIm
-	 zv8FOfz7QH8Q91sBi96FI/BCUFv9qYnkcKbQ+yhrTwwZ3+kKLjnKmwDsQ8CxYIILRH
-	 iPx6zwiqznikPOtZohxKfLMaPiNMDSI5Mc7Syj0ixv5XpCr4vZJOI+E9u9HK5tXd2C
-	 9hqISmIpo4bLg==
-From: Simon Horman <horms@kernel.org>
-To: mmc@linux.ibm.com
-Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	bjking1@linux.ibm.com,
-	haren@linux.ibm.com,
-	ricklind@linux.ibm.com,
-	kuba@kernel.org,
+	s=arc-20240116; t=1784034238; c=relaxed/simple;
+	bh=+9LSkEaOqHP5J+gwKCY481xJEYJYJF7buSxUcCGkD+Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bNjXedmGbTIk2zzX5XY713htJfidfNi8hd329SMb5MBWofobTb9d5KVMMHV5pqDw0GZgcYJ1hJS4NhOFI5bkX0cj3uCXBd4vPlv83f1beqzSnFBmhu87x9UVivalXY+QupicZje5DgFtjqJBwjga6rl+T2lvDjS+J8qIqARqbyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=oXNuM1us; arc=none smtp.client-ip=209.85.221.54
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-470174001a0so499497f8f.0
+        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 06:03:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=0sec.ai; s=google; t=1784034232; x=1784639032; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=QcF0L770TQKMQqDorbzgjGu6vJT+Lw4syVjdxxXe8x0=;
+        b=oXNuM1us0X+T1LlQf5qFfxZTFuukMAx5HuDd/w/MKIKoGVq19fqeVU3x57f0cm8Cah
+         LIhWDgLE8aH+KyAq2iKrCHVUP8hLN7eG/c9N2/X0qEMEoGTa6oaY3G9kBDghZwaXY0U5
+         fshcOKovEIbIjcshNdzTP0yfbO0Oc40zUPcLsasVvjivAQ9V4AX3BVGEEnq7+QAuNEiB
+         FNgyo7sjQHVfrgdOKSJrVLBaqjuSgJ6kq1SmD+CqD9XT7BlFIOvp1M3LYbP49chPEjvz
+         XFSIwbZmL9aDC5MqfwuleqLiHR783CX9QfW1fnOs/XLsHIiHEwyLnlGqJj9ZkGjeTaDT
+         kzQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784034232; x=1784639032;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=QcF0L770TQKMQqDorbzgjGu6vJT+Lw4syVjdxxXe8x0=;
+        b=dmYPOhh0qV50cfe3j8Gg4eW61p9K5jBki5q+HsLBFn/ylxhxaXwOO2UmD0LLm1YBnD
+         zy5A7t/p4L43RhGiLyfEW9vLmxOr5M6OduZmbDztMXJrENaQgjUTNp+DPOa8OxEH4BVw
+         0s4iE+yYjW0+J53MqG69kT0ufSoFGxsAZgK4XzblhOeHhgOh03rDI0wNQ27kfO6BQjF6
+         sy+s7dz5/Te00vMo03gDI1PcQgJDMaAqVHmGilZqoxjVYKn8d/tJ+H9yDAJYzqPBoofV
+         E642l3abwUpsffYcgh6RVsXydXGtVi1znl1TVsXDsOPiVYlUlKz+ThAkrIUHKR0vPch8
+         wzkg==
+X-Gm-Message-State: AOJu0Yz9hsMBKj6b2moWhVhJolptCXCncBexuQ2y5b4TFJH5Cq+5r2Kh
+	eZ6SW5Z333xo/mVPLy0bSjhVhIgskUGUiWUeWcXCYIh4nQ6i8E/17GrqShk6sbYBt/sk
+X-Gm-Gg: AfdE7clEPXLrg3qwgOUyWpBaEpD+rDr1wfk7u1bx5nsvmh78B0Ro20dyXpYgFVHWkRt
+	UoF2lzRIbJ3A0Rn4uobXv+DAMH+6gtGFbQoZqY6uGawmEeeoSfkOHa4ThRY7qHBYJel933sx3pk
+	/VYluDqH/zFH25FZFBdWDfyGK6Z1W+kZNSYYFi0KjiT/wjDkrveISXOX2KJtGTBpafoaA5kFm1B
+	kqzTYXEpDpc8xT1lPo7JczPl6Yrx6nGDydg+2vKrCv/HNdzxLswwnwkjRUUAt1b5MQcyqYVachg
+	TKTfTJ10VKscJFkZCnt5x8Igk9bnTeLOk5FxVvLPfgBb0bloOQ5fEfgmKkAoj1pHCDZ4zJ0j7hp
+	LC19+CbVjuCY83gFtavadyAcwQJnnNX8nzyPxW665U3rctblaiYEPv1OKQoYRPSWvSFOQ6AkKtS
+	R/FWgVN9/acz0QjMRu/WCPKZqrhpjnl7LN1BLjSRuDdtVUiLE43ujf5oQNejazsji0Lf3wxnitW
+	WAihQHyxhJadfcxe8npq6FYjo/kkBGfaE8=
+X-Received: by 2002:a05:600c:e54a:20b0:493:a573:179b with SMTP id 5b1f17b1804b1-493f8829b05mr88159195e9.30.1784034231418;
+        Tue, 14 Jul 2026 06:03:51 -0700 (PDT)
+Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.218.188])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4950a2f951asm79484005e9.14.2026.07.14.06.03.49
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 14 Jul 2026 06:03:51 -0700 (PDT)
+From: Doruk Tan Ozturk <doruk@0sec.ai>
+To: jk@codeconstruct.com.au,
+	matt@codeconstruct.com.au,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
 	edumazet@google.com,
-	pabeni@redhat.com,
-	linuxppc-dev@lists.ozlabs.org,
-	maddy@linux.ibm.com,
-	mpe@ellerman.id.au,
-	davemarq@linux.ibm.com
-Subject: Re: [PATCH net-next v3 13/15] ibmveth: Implement incremental MQ RX queue resize
-Date: Tue, 14 Jul 2026 14:03:46 +0100
-Message-ID: <20260714130344.1841551-3-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260706193603.8039-14-mmc@linux.ibm.com>
-References: <20260706193603.8039-14-mmc@linux.ibm.com>
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net] mctp: serial: reject zero-length frames to prevent rx buffer overflow
+Date: Tue, 14 Jul 2026 15:03:48 +0200
+Message-ID: <20260714130348.72716-1-doruk@0sec.ai>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,193 +97,117 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [2.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	R_DKIM_REJECT(1.00)[0sec.ai:s=google];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307465-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:mmc@linux.ibm.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:bjking1@linux.ibm.com,m:haren@linux.ibm.com,m:ricklind@linux.ibm.com,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:linuxppc-dev@lists.ozlabs.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:davemarq@linux.ibm.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[0sec.ai:-];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[0sec.ai];
+	FORGED_RECIPIENTS(0.00)[m:jk@codeconstruct.com.au,m:matt@codeconstruct.com.au,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307460-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,0sec.ai:from_mime,0sec.ai:url,0sec.ai:email,0sec.ai:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7DC17754F20
+X-Rspamd-Queue-Id: 063CB754E1A
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
+The MCTP serial receive state machine reads a frame length byte in
+mctp_serial_push_header() case 2 and validates it upper-bound-only:
+
+	if (c > MCTP_SERIAL_FRAME_MTU) {
+		dev->rxstate = STATE_ERR;
+	} else {
+		dev->rxlen = c;
+		dev->rxpos = 0;
+		dev->rxstate = STATE_DATA;
+		...
+	}
+
+A length of zero passes this check, so rxlen is set to 0 and the state
+machine advances to STATE_DATA. In mctp_serial_push() STATE_DATA, the
+incoming byte is stored and rxpos incremented before the terminator is
+tested:
+
+	dev->rxbuf[dev->rxpos] = c;
+	dev->rxpos++;
+	dev->rxstate = STATE_DATA;
+	if (dev->rxpos == dev->rxlen) {
+		dev->rxpos = 0;
+		dev->rxstate = STATE_TRAILER;
+	}
+
+With rxlen == 0 the "rxpos == rxlen" terminator can never fire (rxpos is
+already 1 on the first data byte), so subsequent bytes are written past
+the end of the fixed 74-byte rxbuf, which is the last member of the
+netdev private area. Every following data byte is an attacker-controlled
+1-byte out-of-bounds heap write, and the overflow continues until a
+frame (0x7e) or escape byte resets the parser -- effectively unbounded.
+
+Reaching this requires CAP_NET_ADMIN to attach the N_MCTP line
+discipline and bring the resulting mctpserialN netdev up, after which
+the bytes arrive via the tty receive path.
+
+Reject a zero-length frame in the header parser, matching the existing
+upper-bound rejection.
+
+KASAN, on a frame of 0x7e 0x01 0x00 followed by data bytes:
+
+  UBSAN: array-index-out-of-bounds in drivers/net/mctp/mctp-serial.c:370
+  index 74 is out of range for type 'u8 [74]'
+  BUG: KASAN: slab-out-of-bounds in mctp_serial_tty_receive_buf
+  Write of size 1 at addr ... by task kworker/u16:0
+   mctp_serial_tty_receive_buf
+   tty_ldisc_receive_buf
+   flush_to_ldisc
+  Allocated by task 152:
+   alloc_netdev_mqs
+   mctp_serial_open
+
+Found by 0sec (https://0sec.ai).
+Fixes: a0c2ccd9b5ad ("mctp: Add MCTP-over-serial transport binding")
+Cc: stable@vger.kernel.org
+Assisted-by: 0sec
+Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
 ---
-Date:   Mon Jul 6 19:36:01 2026 +0000
+ drivers/net/mctp/mctp-serial.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-ibmveth: Implement incremental MQ RX queue resize
-    
-Add helpers to register/deregister individual RX queues and scale
-queue count up or down while the netdev stays up. Surviving queues
-keep PHYP handles, buffer pools, and IRQ state across resize.
+diff --git a/drivers/net/mctp/mctp-serial.c b/drivers/net/mctp/mctp-serial.c
+index 26c9a33fd636..1e3d285c0500 100644
+--- a/drivers/net/mctp/mctp-serial.c
++++ b/drivers/net/mctp/mctp-serial.c
+@@ -313,7 +313,7 @@ static void mctp_serial_push_header(struct mctp_serial *dev, u8 c)
+ 		}
+ 		break;
+ 	case 2:
+-		if (c > MCTP_SERIAL_FRAME_MTU) {
++		if (c == 0 || c > MCTP_SERIAL_FRAME_MTU) {
+ 			dev->rxstate = STATE_ERR;
+ 		} else {
+ 			dev->rxlen = c;
+-- 
+2.43.0
 
-> diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
-> index ecc472ee8f71f..ac4d89a66a8db 100644
-> --- a/drivers/net/ethernet/ibm/ibmveth.c
-> +++ b/drivers/net/ethernet/ibm/ibmveth.c
-
-[ ... ]
-
-> @@ -1080,6 +1132,138 @@ static void ibmveth_free_buffer_pools(struct ibmveth_adapter *adapter)
-> +static int
-> +ibmveth_alloc_single_rx_queue(struct ibmveth_adapter *adapter, int queue_idx,
-> +			      int rxq_entries)
-> +{
-
-[ ... ]
-
-> +	for (i = 0; i < IBMVETH_NUM_BUFF_POOLS; i++) {
-> +		adapter->rx_buff_pool[queue_idx][i].size =
-> +			adapter->rx_buff_pool[0][i].size;
-> +		adapter->rx_buff_pool[queue_idx][i].buff_size =
-> +			adapter->rx_buff_pool[0][i].buff_size;
-> +		adapter->rx_buff_pool[queue_idx][i].threshold =
-> +			adapter->rx_buff_pool[0][i].threshold;
-> +		adapter->rx_buff_pool[queue_idx][i].active =
-> +			adapter->rx_buff_pool[0][i].active;
-> +	}
-
-[Severity: Critical]
-Does this loop miss initializing pool->index?
-
-If pool->index remains 0 for all buffer pools on the new queue, when
-replenishing, 0 is shifted into the correlator.
-
-Then when receiving, ibmveth_remove_buffer_from_pool() will extract pool=0,
-which fetches from the wrong pool and could corrupt the free map of pool 0,
-leading to a use-after-free or leak.
-
-[ ... ]
-
-> @@ -1192,6 +1376,49 @@ static int ibmveth_rxq_harvest_buffer(struct ibmveth_adapter *adapter,
-> +static int
-> +ibmveth_drain_rx_queue(struct ibmveth_adapter *adapter, int queue_index)
-> +{
-
-[ ... ]
-
-> +	while (drained < limit &&
-> +	       ibmveth_rxq_pending_buffer(adapter, queue_index)) {
-> +		rc = ibmveth_rxq_harvest_buffer(adapter, queue_index, true);
-
-Simon says: I think we can consider the issue below in the context of
-            possible follow-up, because I believe the use of this pattern
-	    predates this patch.
-
-[Severity: High]
-Is a read memory barrier needed between reading the toggle bit in
-ibmveth_rxq_pending_buffer() and reading the correlator in
-ibmveth_rxq_harvest_buffer()?
-
-Since the hypervisor could be actively writing new descriptors while this is
-called, could a weakly-ordered CPU reorder the correlator load before the
-toggle bit load, causing us to recycle the wrong buffer?
-
-[ ... ]
-
-> @@ -1491,6 +1718,175 @@ ibmveth_deregister_single_rx_queue(struct ibmveth_adapter *adapter,
-> +static int
-> +ibmveth_resize_rx_queues_incremental(struct ibmveth_adapter *adapter,
-> +				     int new_count, int rxq_entries)
-> +{
-
-[ ... ]
-
-> +			rc = ibmveth_enable_irq(adapter, i);
-> +			if (rc) {
-> +				netdev_err(netdev,
-> +					   "Failed to enable IRQ for queue %d: %d\n",
-> +					   i, rc);
-> +				ibmveth_cleanup_single_rx_interrupt(adapter, i);
-> +				ibmveth_deregister_single_rx_queue(adapter, i);
-> +				ibmveth_free_single_rx_queue(adapter, i);
-> +				goto cleanup_new_queues;
-> +			}
-> +
-> +			napi_enable(&adapter->napi[i]);
-> +		}
-> +
-> +		adapter->num_rx_queues = new_count;
-
-[Severity: High]
-What happens if an interrupt fires on the newly added queue before
-adapter->num_rx_queues is updated?
-
-If an interrupt fires between ibmveth_enable_irq() and the update of
-adapter->num_rx_queues, ibmveth_interrupt() might evaluate:
-    WARN_ON(qindex < 0 || qindex >= adapter->num_rx_queues)
-to true and return IRQ_NONE without masking the interrupt.
-
-Could this lead to an unhandled interrupt storm?
-
-[ ... ]
-
-> +	} else {
-> +		netdev_dbg(netdev, "Scale-down: removing queues %d-%d\n",
-> +			   new_count, old_count - 1);
-> +
-> +		for (i = new_count; i < old_count; i++)
-> +			napi_disable(&adapter->napi[i]);
-> +
-> +		for (i = new_count; i < old_count; i++)
-> +			ibmveth_drain_rx_queue(adapter, i);
-> +
-> +		synchronize_net();
-
-[Severity: High]
-Can disabling NAPI before disabling the hardware interrupts create an
-interrupt storm window?
-
-If the hypervisor asserts an interrupt during synchronize_net(), the hardware
-IRQ handler runs. Since NAPI is disabled, it returns IRQ_HANDLED without
-masking the interrupt source at the hypervisor, leading immediately to an
-IRQ storm and CPU lockup.
-
-> +
-> +		rc = netif_set_real_num_rx_queues(netdev, new_count);
-> +		if (rc) {
-> +			netdev_err(netdev, "Failed to set real RX queues to %d: %d\n",
-> +				   new_count, rc);
-> +			for (i = new_count; i < old_count; i++)
-> +				napi_enable(&adapter->napi[i]);
-> +			return rc;
-> +		}
-
-[Severity: High]
-Is it possible for this error path to permanently stall the RX queues?
-
-It calls napi_enable() but doesn't call ibmveth_replenish_task(). Since the
-queues were completely drained of their buffers by ibmveth_drain_rx_queue(),
-will the hypervisor have any buffers to place incoming packets?
-
-Without buffers, no interrupts will fire for these queues, and NAPI will
-never run again.
 
