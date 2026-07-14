@@ -1,120 +1,131 @@
-Return-Path: <netdev+bounces-307610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307611-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id HwAhKti7VmqkAgEAu9opvQ
-	(envelope-from <netdev+bounces-307610-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 00:44:40 +0200
+	id pMRBDg69Vmq/AgEAu9opvQ
+	(envelope-from <netdev+bounces-307611-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 00:49:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C85275942B
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 00:44:39 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D09F759452
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 00:49:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=kFoAi3hQ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307610-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307610-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b="Sr IfeGW";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307611-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-307611-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 96A5F3008604
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 22:44:36 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2C34A3002F54
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 22:49:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73BD0423EAF;
-	Tue, 14 Jul 2026 22:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 842F236A004;
+	Tue, 14 Jul 2026 22:49:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A301A423E8F;
-	Tue, 14 Jul 2026 22:44:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E78373438BD
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 22:49:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784069075; cv=none; b=egvV0XMjTNn1AZqwcZ+18fyGtJ+xJnsbYRrUrL9Wm1CJN0WkiqCobQFqQtiFdQBxN77xoAnua7nP60YhRoZKPX+4hELFH4bfUDI+wBIJk3Fvl0wGKPfUrIsH1lcMM51usxvRbjgLTW1fVhkBnEMrVmn85fxnwWX8LWgbZPuTnCs=
+	t=1784069383; cv=none; b=RH4SsMHhkFAzoojtgp8pzR3lDtW9TJYIeirq/Qw7s6S1mU7fOe/UFq1WAPGaIbMeuEf1EGyH6nBooTxWcdBrFeFEbAEXKqbTkQjqc9+7NU9z1f3+U4+/lFwbpL9u39PUHUPRS4/TGLl1FTZQpMigmv8tC9eRDQiduvQKr65A7VE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784069075; c=relaxed/simple;
-	bh=7sSNu+JVL5JbFf/nTSwy1UCi3y3uyNXH7XtkW2AQ6WY=;
+	s=arc-20240116; t=1784069383; c=relaxed/simple;
+	bh=ZDrpHTBUm1Rn6LxWraDOjPohEcFxzPW2bzWVTM5tMRg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LmITMnnAq1ZH0xDLDsNcx/yf0PyjOk+BLXIlWEnAO2qAAoovA88PWma0a+RL0lQRqDPeqDdQA+IYq51rM6PmfH9CnNFzxAY6u1WZ2L61GHO1y1qXqIE0GqEGqFFYGPvIYGrUB5aJETUMTSbHTG/3gPjkEoYkybJRE0L1X2PIuys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kFoAi3hQ; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=p/HrmfaKu4CUrSpKz+fCRlKyQg0QguhUtL9mXmvvu5W3lntW8GTbcJVc1U9F7+6ie9uGaFBUgEMeLRmFzMdHOI1xgfYwFOci4adsb5lGVrA6128OF4rqlteYxfODayVnmAcmI3FH7yRswQoS75dYn9TTp2Dq6bKLtMUEk/i0+Ek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SrIfeGWJ; arc=none smtp.client-ip=156.67.10.101
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=msQsONzw5o/yMkbC/i1/jrHLiW0z7BfiinQ4NyKa5wQ=; b=kFoAi3hQmzxNwiJL33pGWZ2uyg
-	pFtj7bkHrUVDSbAy6SZNLBAU360iI1pPJXgduH9vKNpekFhlv+ohsyV5c5Yk+3wV+GyeQqhOFM8ta
-	Y9ZuiCv7e5SZJ7JdaVGumtRPw/c0gubnK7LSznsvMotK7U9KSvuo9hjFyJHo//q5gryw=;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=ITT/4zjN4cVnbt0glFUSDPu5R/RjT52XbGfsiZLD+h8=; b=Sr
+	IfeGWJVUGtBhITWOnsFfvyGGnXeaQ1Kk/W+P0h7kpYWgn70HYrsK19a+TZqhpsvFoUZnqfPYcxV1t
+	4aC7ni1E5C/SEVagI6joTbTeg2dj3AgQV4C8/Wf2Lfw6IBgaD5wr9asxRq8wWEH2YivzhTn7He2sN
+	hLKYxT64Xtwy/4A=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1wjlrP-00CGLo-Fq; Wed, 15 Jul 2026 00:44:19 +0200
-Date: Wed, 15 Jul 2026 00:44:19 +0200
+	id 1wjlwY-00CGO6-Vm; Wed, 15 Jul 2026 00:49:38 +0200
+Date: Wed, 15 Jul 2026 00:49:38 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Coia Prant <coiaprant@gmail.com>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, robh@kernel.org,
-	krzk+dt@kernel.org, heiko@sntech.de, netdev@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-phy@lists.infradead.org
-Subject: Re: [RFC PATCH 06/10] net: pcs: xpcs: improve SGMII AN state
- handling for Rockchip RK3568
-Message-ID: <464cbdf3-2e9e-43ea-b30a-75b3d1b8a188@lunn.ch>
-References: <20260714191341.690906-1-coiaprant@gmail.com>
- <20260714191341.690906-7-coiaprant@gmail.com>
+To: Nathan Whitehorn <nwhitehorn@pa.msu.edu>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: macb: add support for 1000BASE-X
+ autonegotiation to PCS
+Message-ID: <9593fdad-af6e-411d-ab3e-1f5927bee735@lunn.ch>
+References: <20260714200904.70428-1-nwhitehorn@pa.msu.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20260714191341.690906-7-coiaprant@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260714200904.70428-1-nwhitehorn@pa.msu.edu>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:coiaprant@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:robh@kernel.org,m:krzk+dt@kernel.org,m:heiko@sntech.de,m:netdev@vger.kernel.org,m:linux-rockchip@lists.infradead.org,m:devicetree@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-phy@lists.infradead.org,m:andrew@lunn.ch,m:krzk@kernel.org,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-307610-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:nwhitehorn@pa.msu.edu,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	RCPT_COUNT_TWO(0.00)[2];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307611-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,lunn.ch:from_mime,lunn.ch:dkim,lunn.ch:mid]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,davemloft.net:email,bootlin.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,microchip.com:email,lunn.ch:from_mime,lunn.ch:mid,lunn.ch:email,lunn.ch:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9C85275942B
+X-Rspamd-Queue-Id: 1D09F759452
 
-On Wed, Jul 15, 2026 at 03:08:34AM +0800, Coia Prant wrote:
-> Commit 2a22b7ae2fa3 ("net: pcs: xpcs: adapt Wangxun NICs for SGMII mode")
+On Tue, Jul 14, 2026 at 04:09:04PM -0400, Nathan Whitehorn wrote:
+> The current PCS code unconditionally uses SGMII autonegotiation, though
+> the hardware supports both SGMII and 1000BASE-X modes. Decouple the
+> choice of PCS enablement from use of the SGMII mode when running at
+> gigabit rates and announce to phylink that 1000BASE-X is a supported
+> operating mode. This enables direct attachment of the PCS to e.g. an
+> SFP.
 
-You do not appear to Cc: the Wangxun NIC people. It would be good to
-have there comments on this change.
+linux$ ./scripts/get_maintainer.pl drivers/net/ethernet/cadence/macb_main.c 
+"Théo Lebrun" <theo.lebrun@bootlin.com> (maintainer:ATMEL MACB ETHERNET DRIVER)
+Conor Dooley <conor.dooley@microchip.com> (reviewer:ATMEL MACB ETHERNET DRIVER)
+Andrew Lunn <andrew+netdev@lunn.ch> (maintainer:NETWORKING DRIVERS)
+"David S. Miller" <davem@davemloft.net> (maintainer:NETWORKING DRIVERS)
+Eric Dumazet <edumazet@google.com> (maintainer:NETWORKING DRIVERS)
+Jakub Kicinski <kuba@kernel.org> (maintainer:NETWORKING DRIVERS)
+Paolo Abeni <pabeni@redhat.com> (maintainer:NETWORKING DRIVERS)
+netdev@vger.kernel.org (open list:NETWORKING DRIVERS)
+linux-kernel@vger.kernel.org (open list)
 
-> Fixes: 2a22b7ae2fa3 ("net: pcs: xpcs: adapt Wangxun NICs for SGMII mode")
-> Signed-off-by: Coia Prant <coiaprant@gmail.com>
+You did not Cc: the two developers who know the most about this
+hardware.
 
-Please don't mix fixed and new code. Is this a real fix? Should it be
-back ported to stable?
+https://docs.kernel.org/process/submitting-patches.html
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
 
-     Andrew
+    Andrew
+
+---
+pw-bot: cr
 
