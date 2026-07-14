@@ -1,172 +1,285 @@
-Return-Path: <netdev+bounces-307445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307446-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id JAs7JS8mVmpQ0AAAu9opvQ
-	(envelope-from <netdev+bounces-307445-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 14:06:07 +0200
+	id dD1wOYoqVmoZ0gAAu9opvQ
+	(envelope-from <netdev+bounces-307446-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 14:24:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58B8B75442B
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 14:06:07 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEC0B7547CF
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 14:24:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=resnulli-us.20251104.gappssmtp.com header.s=20251104 header.b=xloPNrV3;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307445-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307445-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307446-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307446-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1481B3047AC4
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 12:03:00 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 82702306E162
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 12:17:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A08738D6BD;
-	Tue, 14 Jul 2026 12:02:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41C9B3C1992;
+	Tue, 14 Jul 2026 12:17:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-wm2-f11.google.com (mail-wm2-f11.google.com [74.125.225.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14359371868
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 12:02:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF9B3C1966
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 12:17:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784030554; cv=none; b=QDYW9HQJxZfRgrReUxAvTVIWKSyWB9HbtYR6gcZ16tTijZKJLLiGri87e5swhh82BJ8bFCRCNqpfZU3ffoFLerSO6lxs116cp+Ph73AZia8Kwwg+ELWEyAenvCYRqNYVr1sB2qzLcBdRh5UavGD0eSGM0b1zfxCkYV5vMkXGJmA=
+	t=1784031438; cv=none; b=Fd1Y8AxAi3pPy2O6Uxh+/PjCkyKIj6LJ9qD2LsFlDMlDhdUlG7t7rVuzBR1ttIcL3yZfMkTILqNIbIAFw0YaEGooJ/VjDLEMvhKCp5EUMVnLVoTUwIl5WaSNRVZe9G/dUtxjkUvQ2ONd8dg+P3E9G5XiotFpD8NP/672cKnvuyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784030554; c=relaxed/simple;
-	bh=MxGbzJ1EXIdULAavSutQBPVkV2UhDVudqdZG1CWBmp8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JCNGZkyEDtyLHoxVVxE0tbTxcaye4Qx1M3h7Oc7MFksh4+QgMjfcnq0w8D41Bwi463D669kqmXD3C+TVazQMCcd/MAOcCClVy+xChg+8q/dPt4pUPJ12rNOESwkCTpHdbFDANUbPh93iblOg0AyTyJqnXOaMKNf+18n+mBw00Ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=xloPNrV3; arc=none smtp.client-ip=209.85.221.44
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-471eeac43bfso4151101f8f.3
-        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 05:02:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1784030549; x=1784635349; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=MxGbzJ1EXIdULAavSutQBPVkV2UhDVudqdZG1CWBmp8=;
-        b=xloPNrV3q0dsouuiGc5bUzJJ6bnxilhSIXwGOplClvayzzm6Ah2r3bsykgU0U2Os+e
-         wOWh+yiGW8fcuU5rky5Evy6iXTIQKcCkSFXY8KZImeB1J8C08m2oKYln9lIIznjY1Zct
-         DJX0fzJ6KIV/CB93zTxcQbxy5cryxF3hXYiE/Li2nG8xF4M4cWevWZ1KIRG6WJpccxlI
-         wfj9ddFB7N8Z4YP/NXHbxO3jvLO2x3sFRT5C/kD7Gl/jWquGXSRwOWmBIekE8R82irLb
-         mvwtasVMxsK6/qlM5kwsHk9QiM+vbfmJsl5eDdtTO9E2m77O18rBN/wyfvOu+wigyu/q
-         3tlw==
+	s=arc-20240116; t=1784031438; c=relaxed/simple;
+	bh=YEpNs6pmYVxz4PQh8SzmAkXFrjWAYq6cWXXi9C3jIkw=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Z0OlzAvXm6jrqOxvJqHN73hS67TttPkmLtqoIrAl4WdckU8ACQbIOeyptvzIpV/cdVXVYLiRm8J6FCraXVXEKiNxXGZcJk9SbeIBW/675ssM7dZFvyH7YJvEmStdAm2kaHdX31U1DV1Sxs/naEXhHhxV95kXK9Wd01Rr9RqmMs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=74.125.225.139
+Received: by mail-wm2-f11.google.com with SMTP id 5b1f17b1804b1-493d43b6c28so3783195e9.1
+        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 05:17:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784030549; x=1784635349;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=MxGbzJ1EXIdULAavSutQBPVkV2UhDVudqdZG1CWBmp8=;
-        b=duWq0xZb/OsGsBnJHOkPh+COYO/XQnd9oBscqFxA1Q+ZgQDafo4E9nuYhR3+owrmUC
-         Cl1I+T+KZcRli1+KmhbvUc0SG6BWbc/mqDz85qDC8aqCee6BdZG3hDBXvOXZBXIDVvwh
-         vFUjknckuMVtnDhlwgmEAoddZHJB5wiGSoUPxoHzQAWf8r+TuBjLJoRcJpcCEnukNIhp
-         D30vOSkhQ7nxtBqQTm+D6JLwRpIVoOdNvshSUTnCsTBcP7oEgtvD0A6XfVy2ZF/gy0im
-         rh/7mzurxu9eAS2TrnyL2mz9cc7pAMZ7Lbj2Rri4wylbkEiM25ToABofFKHbHdG2Niln
-         vtDg==
-X-Forwarded-Encrypted: i=1; AHgh+RqN1e0enqlD6/P9UOgRSRtxIBc6QyNA4OYfE9XJXVwfT8U9TSuOgOlLlyNYNsY3ASX8zoP783M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGGCRStwDNGnPNJRsOR90WX/3j8X2G7CK30TDFYnZWrUKEBv4N
-	vVyyzTI0XDG0F0hGFs+nqom+i47mJJoSMVq3NcY2e4Pw+vkvILSQKJjUCiF2FZ8DffI=
-X-Gm-Gg: AfdE7cmOO3bvYIV3KqzpWdVQwUm/RKrBP5G+RK/hMuZfnFhTBaPQJNi37Uw93VYl1Y8
-	M1V54qvEMpQhpGcAXo3C42bJ+cl9sh4z8bBnY834nOtvR5YDKYybworhpw5Migb/NjnoWGvAh9/
-	asy0kDbKYAiFnCoOnjKteBBZSqtvAJ3FTvv9vpJIhj1XnLaGOWdafo4iISpimzk7Edoy14cRqnY
-	EEBaV+A0VWFHQ2vCYdIHDsdrNDgjIYwMuYRtJxbRUw3Lq8RlZKQv2pddu/HYRdm4q2wSGPjbz0Y
-	SG2z5t3uEBxC9IDGLwGCfNqk7IvAlBokFYj/Yts7wqqsZAY0dnZKhLqutt3zul3YniCTRlgKolg
-	+XMUas17M2XCa+SAf1oOsce2R32RXIY0j75/4T/RuXTtpuIFJdYY7oJVvzh3tTycNrK+E2SNYsr
-	O54xxr4YGm5bw+G/4/UaD4Zg==
-X-Received: by 2002:a05:600c:6b17:b0:492:4a56:690b with SMTP id 5b1f17b1804b1-493f8834e5emr94066915e9.35.1784030548728;
-        Tue, 14 Jul 2026 05:02:28 -0700 (PDT)
-Received: from localhost ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f4635ac2esm7854172f8f.13.2026.07.14.05.02.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jul 2026 05:02:28 -0700 (PDT)
-Date: Tue, 14 Jul 2026 14:02:24 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, netdev@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next V6 4/4] devlink: Apply eswitch mode boot defaults
-Message-ID: <alYkm08MpcIXnFl9@FV6GYCPJ69>
-References: <20260714061731.531849-1-mbloch@nvidia.com>
- <20260714061731.531849-5-mbloch@nvidia.com>
+        d=1e100.net; s=20251104; t=1784031433; x=1784636233;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:cc:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=egZiSxqHD1w/P79BBVFkvOie28f1koI4NWZWuHndLxE=;
+        b=WfWjP3fzUERWaaofdp0Mxq//Co1L/WuWKoz8PO8Yx4ehFaWu9EcJdpq9oqRppwKR3y
+         Cc5em8d5WgzZfuEQWhDXm5JvIJDmkZSh46xskrdq2wT61eNtRNcqxy27vOvSgRLNOWti
+         8Z0PO5f4tOZX7/TDY14ZhVmN68yEi2SqwyK1a2CXh1BIhkmU9oY7vXO1svhyyYSDArEx
+         YTtdMAb8bCFXFutMgItWaeW9DZd11rgVPlEjpiLukEP1Iog15YwRKmvFMgNxLGdjJdn9
+         tv6QVQ+Vq92JVi5NGELmkAZeBxaD63I12AQFXz0wQoP4agYPxyERKJBTNY5wDsIyrG9Q
+         pfbw==
+X-Forwarded-Encrypted: i=1; AHgh+Rq/ORs7bS7kSPzkyVLbhh1ARvzpZRUpbtIheJ98p2sXQTUowYTJju+PDwg3FIjvw/jDuG0P0vw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsRV9FDN8/2Ev/1yNSuuqauf8VxhauHiWEfHx9zhD/0RsmGkpS
+	LFkZSj3QAl7kcBFPcJut6XjymfhVW6BNXoLnSw9IPV0Qt+Dq1hMqyojK
+X-Gm-Gg: AfdE7cnbl5QTmDDeh2ufxv0Yy89hTMDflSaNA3JUSSz7ArALhjKLE8yasXOzpVjgIuR
+	XmnAJvfp17mYln1eLku4Ilg21MOM1WY+UML85g3mkqjOFGCrKYSEUrpv6SOjSSmPhtShvCtFY9l
+	Ddc/EK+QPSxqcK1ryqZNhFTyuN1dTYz08JYJQFHhOoeaUbTBOmVC0PwJADBJH+MJArxITBPnoVL
+	VEdh2HTyI9NXitGchOOxtWVGpDxk/dLtoxh6FaClHJTftcLVih53qQrhfESOOKDWGhJin0rtwE5
+	BYrnAPsH+YKV+7CBBo7wQLmrxbA9mJYxsLSd8pckFWsfyA87I+0s9VOxmpr7oXJTUvkvZFrJNim
+	ho2srQ19AOvSNeZqrevFefvVwBowOjaBgmv6ORVddc3jzU4HlzvE2nDu0asTuz5JDzKLl94W4+h
+	qGozZwCxOXvWOn4CrSerYvrGnc0rNy3arJpolmWrfTF1kdY5eUvQ==
+X-Received: by 2002:a05:600c:1f87:b0:493:f870:fbf0 with SMTP id 5b1f17b1804b1-493f88b3693mr166046515e9.34.1784031432765;
+        Tue, 14 Jul 2026 05:17:12 -0700 (PDT)
+Received: from [192.168.88.241] (78-80-108-129.customers.tmcz.cz. [78.80.108.129])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4950871cbd6sm84393335e9.3.2026.07.14.05.17.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Jul 2026 05:17:12 -0700 (PDT)
+Message-ID: <87f03ccc-5f60-4e8e-a6ef-8f5f8dcb4e12@ovn.org>
+Date: Tue, 14 Jul 2026 14:17:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260714061731.531849-5-mbloch@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Cc: i.maximets@ovn.org, dev@openvswitch.org, linux-kselftest@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, edumazet@google.com,
+ horms@kernel.org, kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org,
+ davem@davemloft.net
+Subject: Re: [ovs-dev] [PATCH net-next v2] selftests/net/openvswitch: add SCTP
+ flow key test
+To: =?UTF-8?B?5L6v5pWP54aZ?= <houminxi@gmail.com>
+References: <20260707034718.2717982-1-houminxi@gmail.com>
+ <f92c4b8a-601a-4e22-822a-ba00705fe60c@ovn.org>
+ <CAJ0BgHeDpvS1-stvrDp0HpUgQY8ZSdJZvAiw7fLpL2EHPeRwHg@mail.gmail.com>
+ <CAJ0BgHc_3fRLFpaUkb2P2jY4avtB3XJQmk0jE-4UC=1abtKLaQ@mail.gmail.com>
+Content-Language: en-US
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ xsFNBF77bOMBEADVZQ4iajIECGfH3hpQMQjhIQlyKX4hIB3OccKl5XvB/JqVPJWuZQRuqNQG
+ /B70MP6km95KnWLZ4H1/5YOJK2l7VN7nO+tyF+I+srcKq8Ai6S3vyiP9zPCrZkYvhqChNOCF
+ pNqdWBEmTvLZeVPmfdrjmzCLXVLi5De9HpIZQFg/Ztgj1AZENNQjYjtDdObMHuJQNJ6ubPIW
+ cvOOn4WBr8NsP4a2OuHSTdVyAJwcDhu+WrS/Bj3KlQXIdPv3Zm5x9u/56NmCn1tSkLrEgi0i
+ /nJNeH5QhPdYGtNzPixKgPmCKz54/LDxU61AmBvyRve+U80ukS+5vWk8zvnCGvL0ms7kx5sA
+ tETpbKEV3d7CB3sQEym8B8gl0Ux9KzGp5lbhxxO995KWzZWWokVUcevGBKsAx4a/C0wTVOpP
+ FbQsq6xEpTKBZwlCpxyJi3/PbZQJ95T8Uw6tlJkPmNx8CasiqNy2872gD1nN/WOP8m+cIQNu
+ o6NOiz6VzNcowhEihE8Nkw9V+zfCxC8SzSBuYCiVX6FpgKzY/Tx+v2uO4f/8FoZj2trzXdLk
+ BaIiyqnE0mtmTQE8jRa29qdh+s5DNArYAchJdeKuLQYnxy+9U1SMMzJoNUX5uRy6/3KrMoC/
+ 7zhn44x77gSoe7XVM6mr/mK+ViVB7v9JfqlZuiHDkJnS3yxKPwARAQABzSJJbHlhIE1heGlt
+ ZXRzIDxpLm1heGltZXRzQG92bi5vcmc+wsGUBBMBCAA+AhsDBQsJCAcCBhUKCQgLAgQWAgMB
+ Ah4BAheAFiEEh+ma1RKWrHCY821auffsd8gpv5YFAmfB9JAFCQyI7q0ACgkQuffsd8gpv5YQ
+ og/8DXt1UOznvjdXRHVydbU6Ws+1iUrxlwnFH4WckoFgH4jAabt25yTa1Z4YX8Vz0mbRhTPX
+ M/j1uORyObLem3of4YCd4ymh7nSu++KdKnNsZVHxMcoiic9ILPIaWYa8kTvyIDT2AEVfn9M+
+ vskM0yDbKa6TAHgr/0jCxbS+mvN0ZzDuR/LHTgy3e58097SWJohj0h3Dpu+XfuNiZCLCZ1/G
+ AbBCPMw+r7baH/0evkX33RCBZwvh6tKu+rCatVGk72qRYNLCwF0YcGuNBsJiN9Aa/7ipkrA7
+ Xp7YvY3Y1OrKnQfdjp3mSXmknqPtwqnWzXvdfkWkZKShu0xSk+AjdFWCV3NOzQaH3CJ67NXm
+ aPjJCIykoTOoQ7eEP6+m3WcgpRVkn9bGK9ng03MLSymTPmdINhC5pjOqBP7hLqYi89GN0MIT
+ Ly2zD4m/8T8wPV9yo7GRk4kkwD0yN05PV2IzJECdOXSSStsf5JWObTwzhKyXJxQE+Kb67Wwa
+ LYJgltFjpByF5GEO4Xe7iYTjwEoSSOfaR0kokUVM9pxIkZlzG1mwiytPadBt+VcmPQWcO5pi
+ WxUI7biRYt4aLriuKeRpk94ai9+52KAk7Lz3KUWoyRwdZINqkI/aDZL6meWmcrOJWCUMW73e
+ 4cMqK5XFnGqolhK4RQu+8IHkSXtmWui7LUeEvO/OwU0EXvts4wEQANCXyDOic0j2QKeyj/ga
+ OD1oKl44JQfOgcyLVDZGYyEnyl6b/tV1mNb57y/YQYr33fwMS1hMj9eqY6tlMTNz+ciGZZWV
+ YkPNHA+aFuPTzCLrapLiz829M5LctB2448bsgxFq0TPrr5KYx6AkuWzOVq/X5wYEM6djbWLc
+ VWgJ3o0QBOI4/uB89xTf7mgcIcbwEf6yb/86Cs+jaHcUtJcLsVuzW5RVMVf9F+Sf/b98Lzrr
+ 2/mIB7clOXZJSgtV79Alxym4H0cEZabwiXnigjjsLsp4ojhGgakgCwftLkhAnQT3oBLH/6ix
+ 87ahawG3qlyIB8ZZKHsvTxbWte6c6xE5dmmLIDN44SajAdmjt1i7SbAwFIFjuFJGpsnfdQv1
+ OiIVzJ44kdRJG8kQWPPua/k+AtwJt/gjCxv5p8sKVXTNtIP/sd3EMs2xwbF8McebLE9JCDQ1
+ RXVHceAmPWVCq3WrFuX9dSlgf3RWTqNiWZC0a8Hn6fNDp26TzLbdo9mnxbU4I/3BbcAJZI9p
+ 9ELaE9rw3LU8esKqRIfaZqPtrdm1C+e5gZa2gkmEzG+WEsS0MKtJyOFnuglGl1ZBxR1uFvbU
+ VXhewCNoviXxkkPk/DanIgYB1nUtkPC+BHkJJYCyf9Kfl33s/bai34aaxkGXqpKv+CInARg3
+ fCikcHzYYWKaXS6HABEBAAHCwXwEGAEIACYCGwwWIQSH6ZrVEpascJjzbVq59+x3yCm/lgUC
+ Z8H0qQUJDIjuxgAKCRC59+x3yCm/loAdD/wJCOhPp9711J18B9c4f+eNAk5vrC9Cj3RyOusH
+ Hebb9HtSFm155Zz3xiizw70MSyOVikjbTocFAJo5VhkyuN0QJIP678SWzriwym+EG0B5P97h
+ FSLBlRsTi4KD8f1Ll3OT03lD3o/5Qt37zFgD4mCD6OxAShPxhI3gkVHBuA0GxF01MadJEjMu
+ jWgZoj75rCLG9sC6L4r28GEGqUFlTKjseYehLw0s3iR53LxS7HfJVHcFBX3rUcKFJBhuO6Ha
+ /GggRvTbn3PXxR5UIgiBMjUlqxzYH4fe7pYR7z1m4nQcaFWW+JhY/BYHJyMGLfnqTn1FsIwP
+ dbhEjYbFnJE9Vzvf+RJcRQVyLDn/TfWbETf0bLGHeF2GUPvNXYEu7oKddvnUvJK5U/BuwQXy
+ TRFbae4Ie96QMcPBL9ZLX8M2K4XUydZBeHw+9lP1J6NJrQiX7MzexpkKNy4ukDzPrRE/ruui
+ yWOKeCw9bCZX4a/uFw77TZMEq3upjeq21oi6NMTwvvWWMYuEKNi0340yZRrBdcDhbXkl9x/o
+ skB2IbnvSB8iikbPng1ihCTXpA2yxioUQ96Akb+WEGopPWzlxTTK+T03G2ljOtspjZXKuywV
+ Wu/eHyqHMyTu8UVcMRR44ki8wam0LMs+fH4dRxw5ck69AkV+JsYQVfI7tdOu7+r465LUfg==
+In-Reply-To: <CAJ0BgHc_3fRLFpaUkb2P2jY4avtB3XJQmk0jE-4UC=1abtKLaQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	DMARC_NA(0.00)[ovn.org];
+	TAGGED_FROM(0.00)[bounces-307446-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:mbloch@nvidia.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:andrew+netdev@lunn.ch,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-doc@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	DMARC_NA(0.00)[resnulli.us];
-	FORGED_SENDER(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-307445-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:i.maximets@ovn.org,m:dev@openvswitch.org,m:linux-kselftest@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:edumazet@google.com,m:horms@kernel.org,m:kuba@kernel.org,m:pabeni@redhat.com,m:shuah@kernel.org,m:davem@davemloft.net,m:houminxi@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
+	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,FV6GYCPJ69:mid,nvidia.com:email,resnulli-us.20251104.gappssmtp.com:dkim]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,ovn.org:from_mime,ovn.org:email,ovn.org:mid,conntrack_sctp_collision.sh:url,sctp_vrf.sh:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,openvswitch.org:email,openvswitch.org:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 58B8B75442B
+X-Rspamd-Queue-Id: DEC0B7547CF
 
-Tue, Jul 14, 2026 at 08:17:30AM +0200, mbloch@nvidia.com wrote:
->Apply parsed devlink_eswitch_mode= defaults after devlink registration
->and after successful reload.
->
->Mark the default mode as pending when a devlink instance is allocated.
->Before devl_unlock() releases the instance lock, apply a pending default
->when the instance is registered.
->
->Clear the pending state before calling into the driver so the boot
->default remains a one-shot operation even if the mode change fails.
->
->For successful reloads that performed DRIVER_REINIT, devlink_reload()
->already holds the devlink instance lock and the driver has completed
->reload_up(). Clear the pending state and apply the default directly from
->the reload path.
->
->Treat an explicit user eswitch mode request as consuming the pending
->default mode.
->
+On 7/14/26 2:01 PM, 侯敏熙 wrote:
+> Hi Ilya,
+> 
+> Thanks for pointing this out.  I looked into this and found that
+> nc (netcat-openbsd) on Debian/Ubuntu does not have SCTP support at
+> all. The upstream OpenBSD nc only handles TCP, UDP, and
+> Unix-domain sockets, and the Debian patches don't add SCTP either.
 
-Looks fine to me now. One nit below:
+AFAICT, 'nc' in netdev CI is the nmap version of netcat, it's not
+the openbsd one.  Does nmap version support sctp?  Google seems to
+think so at least.  The test should be skipped though if sctp is
+not supported.
 
+Note: sashiko had some comments on the daemon pid handling in v2.
 
-[..]
+Best regards, Ilya Maximets.
 
->+void devlink_default_esw_mode_instance_init(struct devlink *devlink)
+> 
+> I see two cleaner alternatives that already have precedent in the
+> kernel selftests:
+> 
+> 1. socat: net/netfilter/nft_queue.sh already uses
+>    "socat -u SCTP-LISTEN:PORT STDOUT" for SCTP data-plane testing.
+>    Many drivers/net/ selftests already gate on require_cmd("socat").
+> 
+> 2. A small C helper: similar to sctp_hello.c used by sctp_vrf.sh
+>    and conntrack_sctp_collision.sh.  The shell test would call
+>    "./sctp_test server/client IP PORT" instead of ncat.
+> 
+> Which approach would you prefer for v3?
+> 
+> Best regards,
+> Minxi
+> 
+> 侯敏熙 <houminxi@gmail.com> 于2026年7月13日周一 11:02写道：
+> 
+>> Ah so many thanks for your suggestions, Please forgive me,
+>> I've always used ncat to write test cases.
+>>
+>> I will re-spin this patch.
+>>
+>> Ilya Maximets <i.maximets@ovn.org> 于2026年7月13日周一 10:39写道：
+>>
+>>> On 7/7/26 5:47 AM, Minxi Hou wrote:
+>>>> Register OVS_KEY_ATTR_SCTP in the flow key parser so that sctp()
+>>>> can be used in flow specifications. The ovs_key_sctp class already
+>>>> exists (with src/dst fields matching the TCP/UDP siblings) but was
+>>>> not wired into the parser, so the token was silently dropped and the
+>>>> kernel rejected the flow.
+>>>>
+>>>> Add test_sctp_connect_v4 exercising the SCTP flow key with
+>>>> port-specific matching: sctp(dst=4443) for client-to-server and
+>>>> sctp(src=4443) for server-to-client.
+>>>>
+>>>> Wait for ncat readiness with ovs_wait instead of a fixed sleep so
+>>>> the test does not race against ncat startup. Use grep -c on the
+>>>> listening message to distinguish between successive ncat instances
+>>>> that share the same stderr log. Kill the previous server before
+>>>> respawning to avoid EADDRINUSE on the SCTP port.
+>>>>
+>>>> Signed-off-by: Minxi Hou <houminxi@gmail.com>
+>>>> ---
+>>>> v1 -> v2: replace sleep with ovs_wait on ncat listening output,
+>>>>           kill previous ncat server before respawning to avoid
+>>>>           port conflict (Aaron review feedback)
+>>>>
+>>>>  .../selftests/net/openvswitch/openvswitch.sh  | 102 ++++++++++++++++++
+>>>>  .../selftests/net/openvswitch/ovs-dpctl.py    |   5 +
+>>>>  2 files changed, 107 insertions(+)
+>>>>
+>>>> diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh
+>>> b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+>>>> index 2954245129a2..9c364eeb2ec2 100755
+>>>> --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
+>>>> +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+>>>> @@ -32,6 +32,7 @@ tests="
+>>>>       dec_ttl                                 ttl: dec_ttl decrements
+>>> IP TTL
+>>>>       flow_set                                flow-set: Flow modify
+>>>>       action_set                              set: SET action rewrites
+>>> fields
+>>>> +     sctp_connect_v4                         sctp: SCTP flow key
+>>> matching
+>>>>       psample                                 psample: Sampling packets
+>>> with psample"
+>>>>
+>>>>  info() {
+>>>> @@ -443,6 +444,107 @@ test_action_set() {
+>>>>       return 0
+>>>>  }
+>>>>
+>>>> +# sctp_connect_v4 test
+>>>> +# - sctp(dst=4443) matches client-to-server INIT
+>>>> +# - sctp(src=4443) matches server-to-client INIT-ACK
+>>>> +# - remove flows and verify connection fails, reinstall and recover
+>>>> +test_sctp_connect_v4() {
+>>>> +     local t="test_sctp_connect_v4"
+>>>> +
+>>>> +     which ncat >/dev/null 2>&1 || return $ksft_skip
+>>>
+>>> Not a full review, but can we avoid ncat?  We already use nc in other
+>>> tests, using different implementations of the same thing in different
+>>> tests doesn't sound like a good idea.  On mnay systems nc and ncat
+>>> will be different implementations with different options and behavior.
+>>>
+>>> Best regards, Ilya Maximets.
+>>>
+>>
+> _______________________________________________
+> dev mailing list
+> dev@openvswitch.org
+> https://mail.openvswitch.org/mailman/listinfo/ovs-dev
+> 
 
-
-Forgotten "instance" here. With this fixed, feel free to add my
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-
-[..]
 
