@@ -1,173 +1,159 @@
-Return-Path: <netdev+bounces-307345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307346-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +8+hGF6kVWo9rQAAu9opvQ
-	(envelope-from <netdev+bounces-307345-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 04:52:14 +0200
+	id yqzoCbGmVWqbrQAAu9opvQ
+	(envelope-from <netdev+bounces-307346-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 05:02:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD4DE7507BB
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 04:52:13 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B2E8750898
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 05:02:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=QQz8sqWv;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307345-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307345-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=KTDz+vIM;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307346-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307346-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=marvell.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4872D3027964
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 02:51:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 95F2E3019C91
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 03:02:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 998133672B4;
-	Tue, 14 Jul 2026 02:51:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2EA23859D3;
+	Tue, 14 Jul 2026 03:02:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5AD83624B2
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 02:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D61363C79;
+	Tue, 14 Jul 2026 03:02:02 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783997480; cv=none; b=ahB3Oa6JxBK9hxTPYYisg9aHp0vEB/AU1lqxMTMOKt3wpQ5hvpC+8CpzNGLhe0b0DbxmIy3DiBVCD+aYbo9sjk0Z1baBx8F1DcL3P6HZwNBUoshB1qPiq4Oer0ihHtemRielGnbx4JXhxIdyn9tzbNJMkMIST69SYuEC27rl3IE=
+	t=1783998125; cv=none; b=Dt7mN1lfaR+wYlfXJWcCYhX582PIJ8OY1Py7NzJkPlD+pq6578mYZa6wMK6f2I47VYEsC154oBEnGzoexgXk9sMojUiHULt4TBaZ1mTWjHthTHCOMmUViMX/ZYfz8NUn6xCgKNK0/F4D20QxFqoqxmVlucP07aHqQvmD+96QazQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783997480; c=relaxed/simple;
-	bh=IhJKUha7Vru/eebXQzvCgZziJBMxY6hk2b1f6wSTowI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GlkO+hkLkNf7pB5EDZAjDA3qBzjC0UgQLYgzb3Qc+HadhkEVKhgdxViXt9KuZoTX5AtCinnEJ3MIL/11bmodmCpDNkt8paJuIiDZyyjYo3DKh19XZrghxptlu+1Gb8cJaLBCEN2nn8hN9FXsOrwrtMQwEFnfc285oEPGhnqYBaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QQz8sqWv; arc=none smtp.client-ip=91.218.175.182
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783997476;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=1rEnfawiH1rUI2ixdzp/X50M5aPlt9DKDjE68QCryO8=;
-	b=QQz8sqWvGo25reDkdkR+CV3dThlr38KgDGv4EIeVdeRR+NcrRp0uQp2ijyp3lwrOHlmboF
-	Er0wHUXKlhdYNutFT/9LwL7+7p1SLF0Vuc2QCOnN/Rgp9qFDIrNlxWIav18w1BUuBwdd2V
-	ZRBrygMk6WTxmsXoUqYyWbacuVZEfHI=
-From: Chenguang Zhao <chenguang.zhao@linux.dev>
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	chenguang.zhao@linux.dev,
-	Chenguang Zhao <zhaochenguang@kylinos.cn>
-Subject: [PATCH net] i40e: xsk: fix multi-buffer XDP_PASS skb construction
-Date: Tue, 14 Jul 2026 10:51:12 +0800
-Message-Id: <20260714025112.284724-1-chenguang.zhao@linux.dev>
+	s=arc-20240116; t=1783998125; c=relaxed/simple;
+	bh=iphtxwI81/ReusPNWbjjIVdb6z7aD2/w/hPXYkymjLk=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TY//dFxE5fdss1j7e5GKciCKxSeBkRY1wapAtQ3JYedye9lsbBePUk/Cxm6p7Pc+DyOSRoR5o/Eqk6Io9v+GoN24Fp4BXwDnmEvnDiSErLuYP2UfXXOZ49Pyr0sQF+UfbAfeTIZ7BD31bw0UtmkrDHyFKbzfuM/1nRVLJlIzYGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=KTDz+vIM; arc=none smtp.client-ip=67.231.156.173
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66DNmkp91677539;
+	Mon, 13 Jul 2026 20:01:54 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=iphtxwI81/ReusPNWbjjIVdb6
+	z7aD2/w/hPXYkymjLk=; b=KTDz+vIMgYv0HM06msaMyzbWBV07rdQVBFMMELZb1
+	gCgIMyoAkWImyh+FuOnK+G9ZvVjRcfBTVDwre0maeyvIZ59edX3/3GfRsCYUwSgY
+	LBbBSVdjCsPyID3rxyZNH19g3o4kR8dZZ3L5MALt8DK/b1IxyGecsWiAyVTq4RoO
+	e+1iCuUxvFyVnQtmO5KqKCsvB/UkJZl2zrtUQRfN4b6DKnUF3wdMdncqrOhAZ14e
+	LSq+Znzb3BWr0j2VbqAIjIOlYG795vbpm1SJ5hc3qlta9qB4J9pO4ZttWaOaO4MV
+	oknctpTfgzvpn9yHIGGT1aFWGEDCBXsjwWSPkTSsvRFBg==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4fc6k9mpd1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 13 Jul 2026 20:01:53 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 13 Jul 2026 20:01:52 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Mon, 13 Jul 2026 20:01:52 -0700
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 5004C3F7045;
+	Mon, 13 Jul 2026 20:01:49 -0700 (PDT)
+Date: Tue, 14 Jul 2026 08:31:48 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>,
+        Satha Rao
+	<skoteshwar@marvell.com>
+Subject: Re: [PATCH net-next] octeontx2-af: add new mbox to support sync
+ cycle on rx path
+Message-ID: <alWmnExX4qYMWQmu@rkannoth-OptiPlex-7090>
+References: <20260714020723.1811237-1-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260714020723.1811237-1-rkannoth@marvell.com>
+X-Proofpoint-ORIG-GUID: 0sKgBs15AtzWagAVzq67oF5RgYA6Edgr
+X-Proofpoint-GUID: 0sKgBs15AtzWagAVzq67oF5RgYA6Edgr
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzE0MDAyOSBTYWx0ZWRfX3AvfaqNFmcDf
+ V2Xf1ZPGoe0bBqaN2le69Lfqsw9xyR0dgmUC422xvPUXpJLyLIUIBXFOECv1FHupYaQbHFw6WpR
+ yY1kuoodGQtpVk61EfrEO2brrLe088Y=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzE0MDAyOSBTYWx0ZWRfXw8NgRzoCA8ha
+ VxFUMo3iHN3171soschLI6kQrOTyqjQ7fKoyCdsEE9M4BG5QOj5tA8C70SBJ/QN51HHdQEID6cG
+ Rxg4FOEeFVBfb2QsxI0dFiQ0Iqm4Bgwtzk9doL0y8TTq5WrCLLJXiueR/srsrbPyG5HbfRxgupI
+ f5VkhH9bH+qvCzRWwA6TeUudkkbGVCeg9ynMbISkH2oCHVNSRdXugCkYiDOLLQophwP/WbnC6H0
+ AjS9bTR0I4S89pk+ppOTnL/ZZvsR+DA6hzDqoJYbsdXWuuM6LU2BFuk5pLbCwC5/9PzwS3C8rTD
+ 2kYuq1+b4J0U+hNObljCIztRx7fCN3jn03DunsA/unEgipY38VCAZyQyszCEnSCC8MmVAGLCgCr
+ t72J6irqgO7766H8pb0g6SEOFp0TFmSn92XV8Uel1CVM7W2NApd+BapRnIHLGbXR6+Pz2FQdXBJ
+ EMtBma1WilIvjAAFXKQ==
+X-Authority-Analysis: v=2.4 cv=ULLt2ify c=1 sm=1 tr=0 ts=6a55a6a1 cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=kj9zAlcOel0A:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=qit2iCtTFQkLgVSMPQTB:22 a=M5GUcnROAAAA:8
+ a=0Ahe-tVRJ49jlj4yYy0A:9 a=CjuIK1q_8ugA:10 a=ZXulRonScM0A:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22 a=Oh551-UHZqmTy8JkqTUo:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-13_06,2026-07-10_01,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307345-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[chenguang.zhao@linux.dev,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-307346-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:skoteshwar@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:chenguang.zhao@linux.dev,m:zhaochenguang@kylinos.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chenguang.zhao@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AD4DE7507BB
+X-Rspamd-Queue-Id: 8B2E8750898
 
-From: Chenguang Zhao <zhaochenguang@kylinos.cn>
+On 2026-07-14 at 07:37:23, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
+> From: Satha Rao <skoteshwar@marvell.com>
+>
+> sync ensures that all packets that were in flight are flushed out to
+> memory. This can be used to assist in the tearing down of an active RQ.
+>
+> To complete disabling RQs or disabling SMQ and its SQs, LF software
+> send mbox to AF to complete RX_SW_SYNC.
+>
+> Change-Id: Iaadf5e6b26a7920693fca9921b2050af0e8e2322
+> Signed-off-by: Satha Rao <skoteshwar@marvell.com>
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 
-When AF_XDP ZC receives a multi-buffer frame and the XDP program
-returns XDP_PASS, i40e_construct_skb_zc() copies frags into a new
-skb. The copy used skb_frag_page() as the memcpy source (page
-metadata instead of packet data) and passed a virtual address to
-__skb_fill_page_desc_noacc(), which expects a struct page *.
+Please ignore the previous submission. It accidentally included a Gerrit Change-Id
+and caught a CI warning. I will resubmit a clean version.
 
-Use skb_frag_address() for the copy, attach frags with
-skb_add_rx_frag() so len/data_len/truesize are updated, and on
-dev_alloc_page() failure free the skb via the shared out path so
-xsk_buff_free() still runs and previously attached pages are
-released by kfree_skb.
+"ERROR: Remove Gerrit Change-Id's before submitting upstream WARNING in CI."
 
-Fixes: 1c9ba9c14658 ("i40e: xsk: add RX multi-buffer support")
-Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
----
- - Fix memcpy source: use skb_frag_address() instead of skb_frag_page(),
-   which was copying page metadata rather than packet data.
-
- - Fix frag attachment: pass the allocated struct page * to the skb frag
-   helper instead of the page virtual address.
-
- - Use skb_add_rx_frag() so skb->len, data_len and truesize are updated
-   when attaching copied frags.
-
- - On mid-loop dev_alloc_page() failure, go through the shared out path
-   so previously attached pages are released via kfree_skb and
-   xsk_buff_free() is still called.
-
- drivers/net/ethernet/intel/i40e/i40e_xsk.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_xsk.c b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-index 9f47388eaba5..a4247710c85b 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-@@ -318,22 +318,19 @@ static struct sk_buff *i40e_construct_skb_zc(struct i40e_ring *rx_ring,
- 		goto out;
- 
- 	for (int i = 0; i < nr_frags; i++) {
--		struct skb_shared_info *skinfo = skb_shinfo(skb);
- 		skb_frag_t *frag = &sinfo->frags[i];
-+		unsigned int frag_size = skb_frag_size(frag);
- 		struct page *page;
--		void *addr;
- 
- 		page = dev_alloc_page();
- 		if (!page) {
- 			dev_kfree_skb(skb);
--			return NULL;
-+			skb = NULL;
-+			goto out;
- 		}
--		addr = page_to_virt(page);
- 
--		memcpy(addr, skb_frag_page(frag), skb_frag_size(frag));
--
--		__skb_fill_page_desc_noacc(skinfo, skinfo->nr_frags++,
--					   addr, 0, skb_frag_size(frag));
-+		memcpy(page_to_virt(page), skb_frag_address(frag), frag_size);
-+		skb_add_rx_frag(skb, i, page, 0, frag_size, PAGE_SIZE);
- 	}
- 
- out:
--- 
-2.25.1
-
+pw-bot: changes-requested
 
