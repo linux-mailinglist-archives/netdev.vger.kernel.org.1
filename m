@@ -1,236 +1,193 @@
-Return-Path: <netdev+bounces-307377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307378-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id C0YZBdPoVWoavgAAu9opvQ
-	(envelope-from <netdev+bounces-307377-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:44:19 +0200
+	id wmiIEM/pVWrPvgAAu9opvQ
+	(envelope-from <netdev+bounces-307378-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:48:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DB4275206E
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:44:18 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E2307520F3
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:48:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=resnulli-us.20251104.gappssmtp.com header.s=20251104 header.b=MXGbOTxb;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307377-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307377-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=samsung.com header.s=mail20170921 header.b=JE90R8US;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307378-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307378-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=samsung.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 397373045AB5
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 07:40:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 43719300A4DA
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 07:48:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55443F076E;
-	Tue, 14 Jul 2026 07:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E06D3F1AC0;
+	Tue, 14 Jul 2026 07:48:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5EE03EF649
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 07:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0246F3F2100
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 07:48:04 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784014803; cv=none; b=UBX/nudkrAliDQgSNMs/riaNjAmWng+yJFSnHCKKuNon/SmCFytUJ2Wqy4QdHJ97X1/gDtGbwLv+SZQH4m0NzwrGZhdYOp6dgboNNR+JNubAXOEtKokI3qstkgUFZSqDP58cLrfg1LLG186wFOmckJm6pnOE5v4x3uoKAotIUKs=
+	t=1784015288; cv=none; b=gPolb5uDIfNF/NVeiqgCE9idBRrm2O2eRA65fOGxYEvDicPxMWmXWhjqDVjbHY128NxDynA4O2TsCjM4ZeW2ON4NFbnktTqsNEiaVMlE3jYneiyeF+VXHkxsyqsyYKfhVP1H7CqAlExFA17e/ISgoPd7NubjO+NFhYTQnKNV2AQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784014803; c=relaxed/simple;
-	bh=Ii4QglIlNfk2AF9Ta5Xci6IGgX7bNyNYfS9+14rJzNM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tzMRmTdAWT8eJaalzdkTwFAvSnDDLwtzByQmj9/Y+p9G4lMqvmBvU+/P5DSVqkjGvx2Q5QIZaRrH0iNtSkIHBdzIzrDeMltSpT/+ren8vnLKhyVSu15UaDyTEwULW4JL1/g4+F+qVH53+mpCGBf5Vh0lD319WGweAFRiQU1c9SI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=MXGbOTxb; arc=none smtp.client-ip=209.85.128.48
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-493b77b150aso4641995e9.2
-        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 00:39:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1784014798; x=1784619598; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=7C5iWjcphG9+X8eLvvIf+CpqUo2Z4rnWqlw/CwVzzuA=;
-        b=MXGbOTxb/bWGnJSaW6/5X7OBDtdY5cRnC3WhClHMgp+BSOmlZyRVXImcF77gCuruCm
-         JABkSDaLE4PVCwElIQtzeRBaqXfMR3PpBt6qPdPC5uBXSlyAuFjCMHaLLjfp0Mt7swqP
-         as9OJpiGN+iybBbWENmIMOzoGxLznGHJzWF3KkEYSRddBIqZlhxs1IgNh5COjZRpafJa
-         VsA3ozpE/9f7aJ7SPQkdjW7lQxqUD0sNDYZYhXNmaNxtXjaSjL+h8DSkLZ828gGWtcT0
-         Rln1x8RKDBYr+cxoGWwi6+x6sb7xkooEkMGJHt+njcSi4vLJZlcWfPoK9ojLCvFIP0Zv
-         lhSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784014798; x=1784619598;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=7C5iWjcphG9+X8eLvvIf+CpqUo2Z4rnWqlw/CwVzzuA=;
-        b=cmC9oSuHfaV1/luYFQyzkHX4Jx4snGc3bd2beLdweRm7B07cEWzSKAO9vH4wWV9sBf
-         4+8/JkiZTCYC7REH7R+s2QrmzQqFx82fMlWlV5RQmrStCLUlf+1e3GFch1ZschIg01XN
-         JFXBFJZTnlXZH5ninZX4cDL0eBnvM75JpXjx0hfOtOsCLjdxNY8TwDuD94MMLSbxQlIs
-         RSfi68Zpf6EM+ZvhOcNcx5bTjmZrJ8pJEktMYKLASJBKAfGFZLSfmVIJfqbbVm18API5
-         Pfc9tAOCuiB1TGa4d9DAHsDN61zDVDTh9IMsGZTbD+V7hnip0Cg3YT2MXrzuBdVDmYz1
-         DGFQ==
-X-Forwarded-Encrypted: i=1; AHgh+RrIGf4SuxtjEPjSqSurXlLh7qdAaFepSuE3Uc+cDawuPiXVhPROZ0awDRVnfT2QMgnA9/dGuSA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAE2k6h+g1AECQzntbmpPtxpYh0zLSf0TCfMNHy9YUJ6VaNB/X
-	TTIuUZCJ/sCJDPXVmmDIki5Pah2UBFqQqvqfkKe0fkdWqSjs/sabParRdgfOVCjb5mY=
-X-Gm-Gg: AfdE7ckJGsXOeAR4BDv7pZLymB7ov/u/8Q+imvWxnh3cMpLcNiGExAV/TpxgnxzteyC
-	M/1KQKSHiNYh4R6336R84bZiGi3VeX4uP9fOKbU5lm+ZUZo18bxMArQv+J5WttgzgEB4gLXZdQG
-	LFCoxzTNSXlolbmF3hMgVZrggRJGbKU4bAYWtybAXoqqbKYYQqxVI2vgoPp1pozjbLRGqB+IRfG
-	DBvSBcPCWWCIRHJDM8SmjyvXKjijxA60TCeEJOw0wt0zFPqCyytZAhZFFkJoxngLfxJAESStSOo
-	/B60+dDH2gkLL4Q+VMqtwE46+Wri1FM5pqp8eJvEAu/ZBpcL6LYliu1LxHNgLj+oK953kqeMU3G
-	TzpEJqC4TmrmXETAUbYe4vdbaQcyKaL2NC00iPPqLcFqALLZaJfdPXWX9rbHKgB0QJytJshRHgy
-	+fcdH8q0xgRlatiEc6w9PJYQ==
-X-Received: by 2002:a05:600c:1f87:b0:493:f870:fbf0 with SMTP id 5b1f17b1804b1-493f88b3693mr153093885e9.34.1784014797971;
-        Tue, 14 Jul 2026 00:39:57 -0700 (PDT)
-Received: from localhost ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4950a322bcbsm63449225e9.9.2026.07.14.00.39.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jul 2026 00:39:57 -0700 (PDT)
-Date: Tue, 14 Jul 2026 09:39:53 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Tao Cui <cui.tao@linux.dev>
-Cc: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
-	linux-rdma@vger.kernel.org, cgroups@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org, jgg@ziepe.ca, leon@kernel.org, 
-	parav@nvidia.com, mbloch@nvidia.com, cmeiohas@nvidia.com, roman.gushchin@linux.dev, 
-	bvanassche@acm.org, zyjzyj2000@gmail.com, shuah@kernel.org, tj@kernel.org, 
-	hannes@cmpxchg.org, alibuda@linux.alibaba.com, dust.li@linux.alibaba.com, 
-	sidraya@linux.ibm.com, wenjia@linux.ibm.com
-Subject: Re: [PATCH rdma-next 08/13] RDMA/cgroup: Scope rdma cgroup device
- visibility to the net namespace
-Message-ID: <alXmwzDASDFaeVNZ@FV6GYCPJ69>
-References: <20260709095532.855647-1-jiri@resnulli.us>
- <20260709095532.855647-9-jiri@resnulli.us>
- <ak-Z071LrWhnI5lK@localhost.localdomain>
- <alSxB0wziQnNuyfn@FV6GYCPJ69>
- <2fc297ce-7259-4410-9d86-ccc32485622f@linux.dev>
+	s=arc-20240116; t=1784015288; c=relaxed/simple;
+	bh=beptTUop73IP0ckhVixMn1P+tWXgPikbHXSCtKKGRZk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=Hy8h+JP9IgQc8YmP6UmZHJRyrlUv0ScNzVkF17z2ecscV4RzhsUhQSwNM07dg+tW4RvKGC5DZJ2ujEvsuO6UrcMOGsxODx1ydBTU/UKe/4VPFh/dMnJKTolj+a+Sdc957Wo0/TA2cmECur8SZNuwI81j+6jJAzSL4PrrMIgXUQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=JE90R8US; arc=none smtp.client-ip=210.118.77.11
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20260714074757euoutp019c755ae0240628464e374a925616e85f~CGHFA4a-22857728577euoutp01f
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 07:47:57 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20260714074757euoutp019c755ae0240628464e374a925616e85f~CGHFA4a-22857728577euoutp01f
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1784015277;
+	bh=9/MMMAfaD7jcUR+QaEIK4dkYOFXzzXelyYlMpGJ9h7I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JE90R8USu9kjMDegx7Ba8rykmUvXjmiB75WKdNjOsWdg7jG5hFiVF0dVrN1j++MCO
+	 c6YVR/G4eg6w86OgOJJNnpndZx3Vm93b8dGC2XYXkuderMS5zSKUTx/winNHc4L16r
+	 mb0X/CHNiquH6H3InAfcv+Gq4aT7NMLgpTXgVnT4=
+Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20260714074756eucas1p1f342d5332d22cb1f10c364de4c311fa6~CGHEsLIUU3273632736eucas1p1M;
+	Tue, 14 Jul 2026 07:47:56 +0000 (GMT)
+Received: from AMDC4622.eu.corp.samsungelectronics.net (unknown
+	[106.120.77.34]) by eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20260714074756eusmtip2b7c3af04b4d864a29449219fd05421cc~CGHELaUfv1687316873eusmtip2m;
+	Tue, 14 Jul 2026 07:47:56 +0000 (GMT)
+Date: Tue, 14 Jul 2026 09:47:53 +0200
+From: Jakub Raczynski <j.raczynski@samsung.com>
+To: muhammad.nazim.amirul.nazle.asmade@altera.com
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	rmk+kernel@armlinux.org.uk, maxime.chevallier@bootlin.com,
+	Jose.Abreu@synopsys.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v3 0/3] net: stmmac: L3/L4 filter bug fixes
+Message-ID: <alXpqbP4SGZXozt6@AMDC4622.eu.corp.samsungelectronics.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2fc297ce-7259-4410-9d86-ccc32485622f@linux.dev>
+In-Reply-To: <20260714023716.29865-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
+X-CMS-MailID: 20260714074756eucas1p1f342d5332d22cb1f10c364de4c311fa6
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----BPbw8mQRoEt0u-7Bumi.mWTL05vKK99i-nO8JDZ4gq6NpdnW=_2873b_"
+X-RootMTR: 20260714074756eucas1p1f342d5332d22cb1f10c364de4c311fa6
+X-EPHeader: CA
+X-CMS-RootMailID: 20260714074756eucas1p1f342d5332d22cb1f10c364de4c311fa6
+References: <20260714023716.29865-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
+	<CGME20260714074756eucas1p1f342d5332d22cb1f10c364de4c311fa6@eucas1p1.samsung.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-2.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[samsung.com:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:cui.tao@linux.dev,m:mkoutny@suse.com,m:linux-rdma@vger.kernel.org,m:cgroups@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-s390@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:jgg@ziepe.ca,m:leon@kernel.org,m:parav@nvidia.com,m:mbloch@nvidia.com,m:cmeiohas@nvidia.com,m:roman.gushchin@linux.dev,m:bvanassche@acm.org,m:zyjzyj2000@gmail.com,m:shuah@kernel.org,m:tj@kernel.org,m:hannes@cmpxchg.org,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,s:lists@lfdr.de];
-	DMARC_NA(0.00)[resnulli.us];
-	FORGED_SENDER(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	TAGGED_FROM(0.00)[bounces-307377-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[samsung.com:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[suse.com,vger.kernel.org,ziepe.ca,kernel.org,nvidia.com,linux.dev,acm.org,gmail.com,cmpxchg.org,linux.alibaba.com,linux.ibm.com];
+	FORGED_SENDER(0.00)[j.raczynski@samsung.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-307378-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:muhammad.nazim.amirul.nazle.asmade@altera.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:rmk+kernel@armlinux.org.uk,m:maxime.chevallier@bootlin.com,m:Jose.Abreu@synopsys.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MIME_TRACE(0.00)[0:+,1:+,2:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[j.raczynski@samsung.com,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[resnulli-us.20251104.gappssmtp.com:dkim,resnulli.us:email,resnulli.us:from_mime,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:email,FV6GYCPJ69:mid,suse.com:email]
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[altera.com:email,vger.kernel.org:from_smtp,samsung.com:from_mime,samsung.com:email,samsung.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6DB4275206E
+X-Rspamd-Queue-Id: 9E2307520F3
 
-Tue, Jul 14, 2026 at 04:28:01AM +0200, cui.tao@linux.dev wrote:
->
->
->在 2026/7/13 17:34, Jiri Pirko 写道:
->> Thu, Jul 09, 2026 at 03:04:23PM +0200, mkoutny@suse.com wrote:
->>> Hi.
->>>
->>> On Thu, Jul 09, 2026 at 11:55:27AM +0200, Jiri Pirko <jiri@resnulli.us> wrote:
->>>> index 993446ab66d0..4523c1884d67 100644
->>>> --- a/Documentation/admin-guide/cgroup-v2.rst
->>>> +++ b/Documentation/admin-guide/cgroup-v2.rst
->>>> @@ -2752,6 +2752,13 @@ RDMA
->>>>  The "rdma" controller regulates the distribution and accounting of
->>>>  RDMA resources.
->>>>  
->>>> +When RDMA devices are isolated per network namespace (exclusive mode),
->>>> +device names are unique only within a network namespace. The device lines
->>>> +below are therefore scoped to the reading or writing process's network
->>>> +namespace: only devices accessible from that namespace are listed, and a
->>>> +limit is applied to the device of that name in that namespace. Configure
->>>> +limits from the same network namespace as the workloads.
->>>
->>> OK.
->>>
->>>> --- a/include/linux/cgroup_rdma.h
->>>> +++ b/include/linux/cgroup_rdma.h
->>>> @@ -7,6 +7,7 @@
->>>>  #define _CGROUP_RDMA_H
->>>>  
->>>>  #include <linux/cgroup.h>
->>>> +#include <net/net_namespace.h>
->>>>  
->>>>  enum rdmacg_resource_type {
->>>>  	RDMACG_RESOURCE_HCA_HANDLE,
->>>> @@ -34,6 +35,15 @@ struct rdmacg_device {
->>>>  	struct list_head	dev_node;
->>>>  	struct list_head	rpools;
->>>>  	char			*name;
->>>> +	/*
->>>> +	 * Net namespace the device belongs to. @netns_shared mirrors
->>>> +	 * ib_devices_shared_netns: when true the device is visible from every
->>>> +	 * net namespace (shared mode); otherwise @net is the only namespace
->>>> +	 * that may see and configure it. @netns_shared is updated when the
->>>> +	 * sharing mode changes, so use {READ,WRITE}_ONCE() to access it.
->>>> +	 */
->>>> +	possible_net_t		net;
->>>> +	bool			netns_shared;
->>>
->>> Any reason to store the netns_shared split per device? (IIUC, it's a
->>> global parameter.)
->> 
->> No reason, changed.
->> 
->Hi Jiri,
->
->A question on the v2 you mentioned to Michal.
->
->Once netns_shared stops being cached per rdmacg_device,
->rdmacg_device_visible() in kernel/cgroup/rdma.c still needs the current
->sharing mode, whose authoritative value lives in the IB core
->(ib_devices_shared_netns). How do you plan to expose it there without
->the generic cgroup controller reaching back into drivers/infiniband/?
->Exporting the global, or keeping an IB-side update hook, both feel a bit
->awkward; it would be good to see which direction you took.
+------BPbw8mQRoEt0u-7Bumi.mWTL05vKK99i-nO8JDZ4gq6NpdnW=_2873b_
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
 
-Exposing this from ib side is not doable, as IB may be compiled as a
-module. So what I do is I intrododuce "static bool rdmacg_netns_shared"
-in cgroup/rdma.c and exported function rdmacg_set_netns_shared() to set
-it from IB.
+On Mon, Jul 13, 2026 at 07:37:12PM -0700, muhammad.nazim.amirul.nazle.asmade@altera.com wrote:
+> From: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
+> 
+> This series fixes three bugs in the stmmac L3/L4 TC flower filter
+> implementation for the XGMAC2 core. All three patches target net.
+> 
+> The L3/L4 filter match count statistics patch (originally patch 4/4)
+> has been split out and will be sent separately against net-next per
+> Andrew Lunn's review of v1.
+> 
+> Patch 1 fixes a register corruption bug in the L4 filter port configuration.
+> The XGMAC_L4_ADDR register holds both source and destination port match
+> values in a single register. The original code overwrites the entire register
+> when setting either field, silently erasing the other. This is fixed by
+> using a read-modify-write sequence.
+> 
+> Patch 2 fixes the basic flow match parser to properly reject unsupported
+> offload requests with -EOPNOTSUPP instead of silently accepting them.
+> Unsupported cases include partial protocol masks, non-IPv4 network proto,
+> and non-TCP/UDP transport proto. Extack messages are now included so users
+> know exactly which part of the match is unsupported. The -EOPNOTSUPP is
+> also now returned directly instead of using break, which was silently
+> discarding the error on FLOW_CLS_REPLACE operations.
+> 
+> Patch 3 fixes a stale action bug on filter deletion. When a filter entry
+> with a drop action is deleted, the action field was not reset, causing
+> it to persist and potentially affect subsequent filter configurations.
+> 
+> All three patches fix the original L3/L4 filter implementation introduced in
+> 425eabddaf0f ("net: stmmac: Implement L3/L4 Filters using TC Flower").
+> 
+> Changes in v3:
+> - Patch 2: add extack messages to each -EOPNOTSUPP return (Jakub Kicinski)
+> - Patch 2: return -EOPNOTSUPP directly instead of break to avoid silently
+>   reporting success on unsupported FLOW_CLS_REPLACE (Sashiko review)
+> 
+> Changes in v2:
+> - Split patch 4/4 (ethtool stats) out to net-next per Andrew Lunn's review
+> 
+> Nazim Amirul (3):
+>   net: stmmac: xgmac: fix l4 filter port overwrite on register update
+>   net: stmmac: fix l3l4 filter rejecting unsupported offload requests
+>   net: stmmac: reset residual action in L3L4 filters on delete
+> 
+>  .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 28 ++++++++-------
+>  .../net/ethernet/stmicro/stmmac/stmmac_tc.c   | 35 +++++++++++++++++++
+>  2 files changed, 51 insertions(+), 12 deletions(-)
+>
+
+I think you probably should have done [PATCH RESEND] and it looks bit
+funky on mailing list (double cover letter ?), but is fine on patchwork.
+
+One nit:
+- Not sure EOPNOTSUPP is optimal, as this is just wrong config and maybe
+  something like EINVAL would be better? But thats whatever
+
+I have no means to test this now, but 1st patch seems to solve lot of
+encountered issues.
+
+For the series:
+Reviewed-by: Jakub Raczynski <j.raczynski@samsung.com>
+
+BR
+Jakub Raczynski 
+
+------BPbw8mQRoEt0u-7Bumi.mWTL05vKK99i-nO8JDZ4gq6NpdnW=_2873b_
+Content-Type: text/plain; charset="utf-8"
 
 
->
->On the mechanism itself: it's the right call that rdmacg_try_charge()
->stays out of the scoping. Charging takes the rdmacg_device pointer
->directly (no name lookup), and a task can only charge a device it
->already holds a handle to, so applying visibility there would be wrong.
->The scoping deliberately touches only the name-based lookup (the write
->path) and the enumeration (read/show) paths -- worth keeping that
->invariant in mind so a later patch doesn't grow the filter.
->
->Thanks,
->Tao> Thanks!
->> 
->>>
->>> Thanks,
->>> Michal
->> 
->> 
->> 
->
+------BPbw8mQRoEt0u-7Bumi.mWTL05vKK99i-nO8JDZ4gq6NpdnW=_2873b_--
 
