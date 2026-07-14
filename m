@@ -1,208 +1,239 @@
-Return-Path: <netdev+bounces-307351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307352-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id i3vAAA24VWrTrwAAu9opvQ
-	(envelope-from <netdev+bounces-307351-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 06:16:13 +0200
+	id /vmbCvy4VWr3rwAAu9opvQ
+	(envelope-from <netdev+bounces-307352-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 06:20:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A38C750C77
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 06:16:12 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B046A750CA4
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 06:20:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=hWTfgGQD;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307351-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307351-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=gFRniAjb;
+	dkim=pass header.d=redhat.com header.s=google header.b=JyvLq3GP;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307352-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307352-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D9CC93035F31
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 04:15:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 010BA300D1CC
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 04:20:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A44F261388;
-	Tue, 14 Jul 2026 04:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF24C2D0C8F;
+	Tue, 14 Jul 2026 04:20:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17D2426CE11
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 04:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 382EA27FB1F
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 04:20:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784002550; cv=none; b=WQWzr/ImfkBo4pGwmaF55BPxQqUl9ODNDyybgumEhx3LVvdHUu3q+Vi31UoXxVUAT3vt6FGgKOqMViGC943QQ34+ygXLtEMl691xCdPmbwao+41WaLJmjayBYUcU9+GSzoExA+6IfvdpeJ1o7lbBhDVvwv0nax0Wo+Nkw2ZOlws=
+	t=1784002809; cv=none; b=Vxh01D4L4wwnM4HrDI/W1jiXTks1fdbokl1ysWHlgfWrQQjDLhk3tUmYbmMvpGEEmw+DdZX4N6wwq+dakN2yytWDUBZUYxWazSqj+tI0RvGaHLKwMlhxdsI9K2LdpdkBFL2ZKbAhQf8v9rmbmUADDCpON05vrPyDd7kKcaLWQLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784002550; c=relaxed/simple;
-	bh=afWvLS/cYXFxAHMXBcJzv64tOj8yN68WbzwctXYShxA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CCcTdlU+AVePJEE0rKehUjAjvXPBS08xTUuVFFlvJyesspfvCT0Rw2ltfNZtBVV+jqId4SPEU30SfH3ye0F3vDyD+24Kho9oqNqc2tguLWQwdGvMIouqm6usgiZ7uBoIbRn+eQp58MxrQKHvpJFEP6HlG0FvNim0Czy3oysH8AI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hWTfgGQD; arc=none smtp.client-ip=209.85.128.181
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-81eaf3709b4so12539277b3.0
-        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 21:15:44 -0700 (PDT)
+	s=arc-20240116; t=1784002809; c=relaxed/simple;
+	bh=XM7NEXOYbLEOlVK7b+ErnVKUAU0qhKE/jPtFLL0SHYo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ar4WKFgEbWg9iE+uKdACfE5oY94PoGvW0AccFwUfdHKBUNeIU5xP+su5Bzssgs2i08AgUcGQINMj2QYCcKjDoICzjVEihLvtoFKnDBA/6oB1dmdKna5791deDS5gvD71m2XZsWC0fk/Mwx94SBOVtgC24I3Q+edzpu6vjv+BSQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gFRniAjb; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=JyvLq3GP; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1784002807;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=1HupOzpJp3e8c0sikfAglH5/ggvC1reaC6Xy3JGlOtc=;
+	b=gFRniAjblkwFMnoAgzKDIEDWv0W8cI27jN2MHYJjWeXXRPs9rW9ytXykRLebaVWGZUmuIv
+	56C42kA3UCvUrhBesEjgsYdfwEsuA+1wDNAq7dKUk8eCg+cLZSXUVXrlP+/35XpWgtiQPL
+	vxeScp/UtrR9TKoRNNWZJbkI/fXfxac=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-403-gfHU0-X4OwmizztLikDGFg-1; Tue, 14 Jul 2026 00:20:05 -0400
+X-MC-Unique: gfHU0-X4OwmizztLikDGFg-1
+X-Mimecast-MFC-AGG-ID: gfHU0-X4OwmizztLikDGFg_1784002804
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-493b0fe95b6so23435935e9.1
+        for <netdev@vger.kernel.org>; Mon, 13 Jul 2026 21:20:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784002544; x=1784607344; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=ESYEMWGchpciIMXe2q22eOlRAskbyQ0zJX6joLipNeE=;
-        b=hWTfgGQD/M69mkpStt7U3nn8xG2Ofemt5RXsFp3VKNtFTWDEP1DL4ng14Q/3hj2bSK
-         FvVdApuJdwAZ8wNP6dnBAvZrTn+s2ItlkLvlSUTpM1gRtF7Gd586x3Z2KC6SpaiVBpKm
-         XGDTF8Mriu8f8OxcwjmCw3tvaZNaMjR6xGIz/a9xbmS7LfsEpiAs0XK+j02YPTBKghZ1
-         h03qvFG+R5zpv2YnhDQn98BUI1HOoQ2S0xhZUg/PCPnfvon9xfC0Jr1u0yZUCClA0s8r
-         0O6hzO/gHIkKsfyhn+8+vSCIK5zZEycF0o6Gs7o7++/EIow7DqXxJbPsyrtmjwMidWRr
-         MTdQ==
+        d=redhat.com; s=google; t=1784002804; x=1784607604; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=1HupOzpJp3e8c0sikfAglH5/ggvC1reaC6Xy3JGlOtc=;
+        b=JyvLq3GPtLlHWnEiDBR/z5cZLIdPHYhJWPnhQmiKRexAV20u7ZOxhYlHX2b/O4YUZ4
+         NAHx6jP9zMjEqH+GhmLwsJ7qLY51UaZrHSzzBN3wH0xHPimZVXdINWpuuKfCYCs4QMcx
+         yhjQ2KBRFX99SIQqiuthrlPZKvzADGmFc6t5bZncssUFInSp4Pee5ISUgRq1DYP21JNU
+         RgZ4rltxnJrqdj7EHU9ttHkwzqcTg+VhyoUR7BsT3/S2UOkFycy9RKINJCspuIIOnoZ+
+         FjTah1jwXQBFMatBubfb6GAPUJJpg8Xw8rMTzMXUdQ0+9V28h+JDgDZImAdX2MA2StOv
+         du7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784002544; x=1784607344;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=ESYEMWGchpciIMXe2q22eOlRAskbyQ0zJX6joLipNeE=;
-        b=JpmGA/c+FACqQ2lU4++dN8a5swKtyUZuBF8/Og0Ie0bag6l8edm+z1lh4A6n1Hi8jv
-         r04FD3GbzehCOyxxYP0pZGixTmUHPjK1M1EIhX+ieqrd10jV4faJI8XpfCexDcpbOXog
-         V/ilsRUepK84t+cImXgTXoZtuUTl58VNCgVy/wJ8f0QB8QxRp/9u51xYuuhQOmiIidL9
-         nY9YMK5eEoeGUD7NI8rmsBlQ+wMuM52MTUpgnQTfM+DTMoMNmO4A3VL5KMEhMd4YZTJ6
-         cRK7fDEatmKUB/mHEw2I35x48a+pcfEtQUK/GpgkPa4eGr6NLQUbShB7tS2eJZUfyaMr
-         8wtQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rr++y91I3gdEK2ghN7HenmD83xkOYrPr6kmckbXRdnMC9MdS13xGPkt1DKWjaybYnhctM/DtjQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxk9lqHZ68nOwQQrT6GovWqQ0AM/0VcPGG5nkYVumiT9yVCq07i
-	+2UrevAJX+Fh15XQryYe19DbrGaYVQe/HKJkHsk5Wr2UQIKRuYgJaUOo
-X-Gm-Gg: AfdE7cmtmiTMTuE4tqjZVOtmostEtZ7PPImVaC2J4r62c+wHRBGuf6awwX5KXPWTVDq
-	9VfOysucTsfumSkXguQsDTh9+R24Az4qSGgNGqBxqlzSFhrW/J7NB9K+HiTucAzJSyLgBEeEK+U
-	Wilcft8Nt7EDGO6E+ESikNoANRq0OC0IOsQ1pJJRYmQ4sy1sH+N3Q7HbkBipBFgAJPzLOyg7Aj4
-	xOQvtuqHc6/P+D10rfF+ihlyxwRFd7oAUbfOlHhOisYi4sqVBIq/qB5htB78XvGom5CwOimYm+I
-	01nLMahVhA94XbJy/Y2P9BlNiy/6c/9IuEFVSddv2VFTDydBqxoOBH31QTj5xfCz37205Cs6I6Q
-	Id8MhucGtreZ8upj0uMti/tPiyBa0P/bMJU496X1uIthK4JR4SAWVFOvLlSLNfmIS+wCYQ+Q4E2
-	8C7iKnQlDTIudvk1HbyGee93nHaDfEJQ==
-X-Received: by 2002:a05:690c:6908:b0:80c:76fd:f732 with SMTP id 00721157ae682-81ebfda5ec5mr5483077b3.26.1784002543913;
-        Mon, 13 Jul 2026 21:15:43 -0700 (PDT)
-Received: from LAPTOP-83ECOPAB.localdomain ([136.55.173.105])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-81e6c22441csm132955717b3.43.2026.07.13.21.15.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jul 2026 21:15:43 -0700 (PDT)
-From: "Cen Zhang (Microsoft)" <blbllhy@gmail.com>
-To: jmaloy@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: andrew@lunn.ch,
-	netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
-	linux-kernel@vger.kernel.org,
-	vadim.fedorenko@linux.dev,
-	tung.quang.nguyen@est.tech,
-	AutonomousCodeSecurity@microsoft.com,
-	tgopinath@linux.microsoft.com,
-	kys@microsoft.com,
-	blbllhy@gmail.com
-Subject: [PATCH net v5] tipc: fix u16 MTU truncation in media and bearer MTU  validation
-Date: Tue, 14 Jul 2026 00:15:41 -0400
-Message-ID: <20260714041541.307702-1-blbllhy@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        d=1e100.net; s=20251104; t=1784002804; x=1784607604;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=1HupOzpJp3e8c0sikfAglH5/ggvC1reaC6Xy3JGlOtc=;
+        b=D/BxPzNVY0EFKk2tvSJhHTiPEbNPkqjeNRAdC+Z7MULyj/vI84UAshtcAWWG6d6vgl
+         5cQ+/6wivmESpUFW0YTGgTEHnfsROsz2yqrI0bAVxeDRnhG40KcrzH7m95bbIFMmQ6Dz
+         n11i/hkIJZ0skYXK97Vo7QkBa/rRrgQBu54hS/5jnJxizDnu1C3I/Tx/KkoyUMOO+jRJ
+         zu6HnNu6kOQI5LX75W+E5ARiMkD63Ug1A3DZjYzhDiz3WzFNCv7byuQFFxJYKGw0S53A
+         vEFHYHVo1ZdhUf+u19+4ne9xyMOTuIIUFVIieOksouZqRlD7YY95m5fVAetRPVR7OJQd
+         iSlw==
+X-Gm-Message-State: AOJu0YxMZJvqV/3lb8H+JPTmh36gNM3JHymHwz8ANbH8lwANMIynZyBQ
+	gtEQ9vpTWF7GRRt1An68D/3+YcQPTsh5F+p7Cmj3ZGkp55ZZEvyLExWKsNM6EznbI6kN05gphg5
+	mlBQv8RfvIHBt1OGqOCXnrijdzgiG9rofeQB+Otf32R0XgXYKtVbfqId6cQ==
+X-Gm-Gg: AfdE7cnfGBp4uiqCU3f0x5nENYkDh6hRgVjiIyc80JC0js+3sbWNrQig4XliTh9tRoT
+	ZbpktJz4n5V+3yKO5O8sj4EfWgLs2UNLERTqrg5/rKuIccAgrXRVzMmsO/zpw9V2KGrlnfneUX8
+	5l1fpVAn+2rzC5tPdb4zI9rexsyqo32vDcAzxAgJ2pmoMLYJs4t0Xwx8ImBCC+LBYPYn7njzP0u
+	EWUg3pwPrOqOeQV6p0TUW0LgE4CjMAu8HDnlKaaXY2xPFIxWhxfdmVzk4Lz17+Cm1BcBAV2T8K3
+	F1RWqtWxCmPKziveRYLsJYge1WhOrbgSKwKoU5SzmdmNgaBeG2s3Hx7E4iBgbPoDwzKgNxtbUk2
+	llxrT0T12
+X-Received: by 2002:a05:600c:3e1b:b0:493:e890:9e0b with SMTP id 5b1f17b1804b1-493f883157bmr120878755e9.26.1784002804068;
+        Mon, 13 Jul 2026 21:20:04 -0700 (PDT)
+X-Received: by 2002:a05:600c:3e1b:b0:493:e890:9e0b with SMTP id 5b1f17b1804b1-493f883157bmr120878625e9.26.1784002803737;
+        Mon, 13 Jul 2026 21:20:03 -0700 (PDT)
+Received: from [192.168.0.9] ([47.64.112.144])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4950871cbd6sm52708055e9.3.2026.07.13.21.20.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Jul 2026 21:20:03 -0700 (PDT)
+Message-ID: <c4796562-699c-4ac2-87ea-290708ff577a@redhat.com>
+Date: Tue, 14 Jul 2026 06:20:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] crypto: pcrypt - Remove pcrypt
+To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
+ Herbert Xu <herbert@gondor.apana.org.au>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ linux-s390 <linux-s390@vger.kernel.org>
+References: <20260713223234.24812-1-ebiggers@kernel.org>
+ <20260713223234.24812-2-ebiggers@kernel.org>
+From: Thomas Huth <thuth@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20260713223234.24812-2-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew@lunn.ch,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:vadim.fedorenko@linux.dev,m:tung.quang.nguyen@est.tech,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,m:blbllhy@gmail.com,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_CC(0.00)[lunn.ch,vger.kernel.org,lists.sourceforge.net,linux.dev,est.tech,microsoft.com,linux.microsoft.com,gmail.com];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-307351-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307352-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[blbllhy@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[blbllhy@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[thuth@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:ebiggers@kernel.org,m:linux-crypto@vger.kernel.org,m:herbert@gondor.apana.org.au,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:steffen.klassert@secunet.com,m:linux-s390@vger.kernel.org,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:email,vger.kernel.org:from_smtp]
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[thuth@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,stackexchange.com:url,secunet.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6A38C750C77
+X-Rspamd-Queue-Id: B046A750CA4
 
-Both TIPC_NL_MEDIA_SET and TIPC_NL_BEARER_SET accept user-supplied
-MTU values but only enforce a minimum bound, not a maximum. When a user
-sets the MTU to a value exceeding U16_MAX (65535), it passes validation
-but is silently truncated when assigned to u16 fields l->mtu and
-l->advertised_mtu in tipc_link_create(). Values like 65536 (0x10000)
-truncate to 0, causing a division by zero in tipc_link_set_queue_limits()
-which computes TIPC_MAX_PUBL / (l->mtu / ITEM_SIZE). Other overflowing
-values (e.g. 65537-131071) produce small incorrect MTU values, resulting
-in link malfunction behaviors.
+On 14/07/2026 00.32, Eric Biggers wrote:
+> pcrypt was originally intended to improve IPsec performance.  However,
+> it's no longer useful for that.  Reports from the rare cases that anyone
+> has actually tried to use it over the years indicate that it actually
+> reduces IPsec performance, e.g.:
+> 
+> * https://github.com/libreswan/libreswan/wiki/Internals:-Cryptographic-Acceleration#obsoleted-ipsec-accelerations
+> * https://users.strongswan.narkive.com/liqTaTq8/strongswan-problem-with-pcrypt
+> * https://unix.stackexchange.com/questions/594336/ipsec-multithreading-via-pcrypt-worse-than-single-thread
+> 
+> It's also undocumented and quite difficult to actually use.  Its design
+> is also broken, in that any unprivileged program can enable pcrypt
+> systemwide at any time (by instantiating it using AF_ALG).
+> 
+> Meanwhile, pcrypt has been a regular source of bugs, including at least
+> four that have received CVEs.
+> 
+> Let's just remove it.  No one seems to care about it anymore other than
+> people looking for vulnerabilities.
+> 
+> Cc: Steffen Klassert <steffen.klassert@secunet.com>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+>   MAINTAINERS                                 |   7 -
+>   arch/loongarch/configs/loongson32_defconfig |   1 -
+>   arch/loongarch/configs/loongson64_defconfig |   1 -
+>   arch/s390/configs/debug_defconfig           |   1 -
+>   arch/s390/configs/defconfig                 |   1 -
+>   crypto/Kconfig                              |  10 -
+>   crypto/Makefile                             |   1 -
+>   crypto/pcrypt.c                             | 394 --------------------
+>   include/crypto/pcrypt.h                     |  39 --
+>   tools/crypto/tcrypt/tcrypt_speed_compare.py |   7 +-
+>   10 files changed, 2 insertions(+), 460 deletions(-)
+>   delete mode 100644 crypto/pcrypt.c
+>   delete mode 100644 include/crypto/pcrypt.h
 
-Crash stack (triggered as unprivileged user via user namespace):
+Thanks!
 
-  tipc_link_set_queue_limits  net/tipc/link.c:2531
-  tipc_link_create            net/tipc/link.c:520
-  tipc_node_check_dest        net/tipc/node.c:1279
-  tipc_disc_rcv               net/tipc/discover.c:252
-  tipc_rcv                    net/tipc/node.c:2129
-  tipc_udp_recv               net/tipc/udp_media.c:392
-
-Two independent paths lack the upper bound check:
-1. tipc_udp_mtu_bad() -- called from __tipc_nl_media_set() (MEDIA_SET)
-2. inline check in __tipc_nl_bearer_set() at bearer.c:1160 (BEARER_SET)
-
-Fix both by rejecting MTU values above U16_MAX.
-
-Fixes: 901271e0403a ("tipc: implement configuration of UDP media MTU")
-Reported-by: AutonomousCodeSecurity@microsoft.com
-Closes: https://lore.kernel.org/all/CAB8m9WgETt0AjmFwE=F-CKjGXsK6_WDv0=kbYRcC8-noo+amnA@mail.gmail.com
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Signed-off-by: Cen Zhang (Microsoft) <blbllhy@gmail.com>
----
-v5: Drop .min from range struct (min check already in handler)
-v4: Add .min check value
-v3: Use nla_policy check to limit MTU max value as suggested by Vadim
-v2: Solved format issue
-Link: https://lore.kernel.org/all/CAB8m9WgETt0AjmFwE=F-CKjGXsK6_WDv0=kbYRcC8-noo+amnA@mail.gmail.com
-
- net/tipc/netlink.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/net/tipc/netlink.c b/net/tipc/netlink.c
-index 8336a9664703..1307dd1a9613 100644
---- a/net/tipc/netlink.c
-+++ b/net/tipc/netlink.c
-@@ -113,12 +113,16 @@ const struct nla_policy tipc_nl_node_policy[TIPC_NLA_NODE_MAX + 1] = {
- };
- 
- /* Properties valid for media, bearer and link */
-+static const struct netlink_range_validation tipc_nl_mtu_range = {
-+	.max = U16_MAX,
-+};
-+
- const struct nla_policy tipc_nl_prop_policy[TIPC_NLA_PROP_MAX + 1] = {
- 	[TIPC_NLA_PROP_UNSPEC]		= { .type = NLA_UNSPEC },
- 	[TIPC_NLA_PROP_PRIO]		= { .type = NLA_U32 },
- 	[TIPC_NLA_PROP_TOL]		= { .type = NLA_U32 },
- 	[TIPC_NLA_PROP_WIN]		= { .type = NLA_U32 },
--	[TIPC_NLA_PROP_MTU]		= { .type = NLA_U32 },
-+	[TIPC_NLA_PROP_MTU]		= NLA_POLICY_FULL_RANGE(NLA_U32, &tipc_nl_mtu_range),
- 	[TIPC_NLA_PROP_BROADCAST]	= { .type = NLA_U32 },
- 	[TIPC_NLA_PROP_BROADCAST_RATIO]	= { .type = NLA_U32 }
- };
--- 
-2.53.0
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
