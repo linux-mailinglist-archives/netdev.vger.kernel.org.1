@@ -1,170 +1,152 @@
-Return-Path: <netdev+bounces-307447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307448-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id y57fHecrVmqn0gAAu9opvQ
-	(envelope-from <netdev+bounces-307447-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 14:30:31 +0200
+	id 1VF3CvsuVmrS0wAAu9opvQ
+	(envelope-from <netdev+bounces-307448-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 14:43:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3B347548F8
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 14:30:29 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D3DC754AE4
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 14:43:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=Q27ato9S;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307447-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-307447-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=d3z4fMr6;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307448-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307448-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D0883303F4F8
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 12:28:56 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D121C300530F
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 12:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F109844CF52;
-	Tue, 14 Jul 2026 12:27:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58A57366541;
+	Tue, 14 Jul 2026 12:43:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.187.6.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEFE9448CE2;
-	Tue, 14 Jul 2026 12:27:14 +0000 (UTC)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D1C036404B
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 12:43:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784032044; cv=none; b=cxdRQ8qaIvt0yJRx9tR4AVEK+qyFlj08L8dF2OTXfUhJDuE95HIJZ8Yn5jpf8plSbTTSIambmqrUj3i96BBUYuH+hTNwzVtB2PQJbbfiK/tyTAXDg+i1OOOM/Kvj0PZBDoLUw+Mb21dIUFkspW/AdyPJXUQgNH7NIUOyJIN04iM=
+	t=1784033013; cv=none; b=o+PaZolk9faSoat3VpUzPO0FjWDruqqoLYhU5W3GmI8yGf92pqh8HE/Uvw3DN0fFH77Q2iJKzLVcBCpIpcON5blI7DP3CfGtgOjuNo2T9uY2pfwW51KC+bX5t8YXGjpxalvhkfT2pfCQYFQ3mHwY5ntBcuQ3JQB6onbqSQJQwG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784032044; c=relaxed/simple;
-	bh=mf25ywtL9Q+yeI6sh6gKZ7VdxR4ouIUbPFmGFmgMWAM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GVDc8w9lRTSx2ch3BuKGhkS40MYGj0+MUFIJiuuYYMckvLpza8/zYm4OOL7lazXC2zNwldzCd0nkgwfGgGsL2DMli+jlbYSmEt61S2SUqwsdGAL8Z9H+hVa9r13CEt3uovPfSNKbMORG87DvNkcAEv7lyJlVVmXBYZXDunyNMnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=Q27ato9S; arc=none smtp.client-ip=52.187.6.220
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
-	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=u9Zo4
-	ytzjqMfIxJVTDUl3YZj8WOW1rECCH+9hIcKu90=; b=Q27ato9SHUIWqr2+ru74m
-	r9Ymjm3f0fp2y22iGa/EWjNlZB0/kzQW6rVJUxt5IObsVRvY7E8sed5hk79GO4Md
-	esjG8tK9e4/SYP2toOsi/E2MaXuhuHG/7yqY7NGgordfzZilhM5lvU1N4Mw0pC0b
-	PhShHeC2l66kU+J7ceERek=
-Received: from localhost.localdomain (unknown [121.229.84.192])
-	by web4 (Coremail) with SMTP id ywQGZQB3W5vvKlZqS77vAg--.16019S2;
-	Tue, 14 Jul 2026 20:26:24 +0800 (CST)
-From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-To: netdev@vger.kernel.org
-Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
-	David Ahern <dsahern@kernel.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
-	Ao Wang <wangao@seu.edu.cn>,
-	Xuewei Feng <fengxw06@126.com>,
-	Qi Li <qli01@tsinghua.edu.cn>,
-	Ke Xu <xuke@tsinghua.edu.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH net] ipv4: require matching source address for route hint reuse
-Date: Tue, 14 Jul 2026 20:26:17 +0800
-Message-ID: <20260714122618.21698-1-zhaoyz24@mails.tsinghua.edu.cn>
-X-Mailer: git-send-email 2.46.2
+	s=arc-20240116; t=1784033013; c=relaxed/simple;
+	bh=DoBlsJBMV+ydLQIRle1rjneEXEPQd9FDvvSvjECBnjQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nK35tXkm781mNsWJLnIK82XnCJnGL/ppF6FyhEW8fGXo5ggTAfzYNRjmjHkktoymrDp3lX8WjU+vCRJzHQgSeeZstkAaPT0/s7KX0gMbEwr72s8lDluEgzRVQeGkdi5A+q3gfgip9ZM9S1u98wlBVXuIyWimwo2tMSSG66f8ImE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d3z4fMr6; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 916281F000E9;
+	Tue, 14 Jul 2026 12:43:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784033011;
+	bh=uDuJzr30NAJlJiPFtUSwPwG1ACdjUZ2KotIIPHp9q54=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=d3z4fMr6YW8/gKFJNOklBhP/5QHWLH+5FioqyN7UMdD8PVpGIoyCJpuAKuH97dhMD
+	 35+7s2wV31ELe175wsrIJNMpRthd/JbxDbCQvFWco4FSaKSUfJd83h7X1j/E7xDcdm
+	 6vSSkaYeZodBN7h/DZ60TCIfPy6EZBILeCh4ooSI4wpBe2/8k8MhbZJpPBc6riAmNX
+	 3erVnpBel8lVTy/egpqG07XnVFzo5nmv0RdaFesxM7UIWl4rGMGx4ok4bqGfF36LX5
+	 2h+uPjYHJFBBNNv7eqNYZqQmQ1J11TC84ENI3pJ2QbJsuujt7h3yVgzNm7SK4sYfrv
+	 rzDTJgFzAbdtQ==
+Date: Tue, 14 Jul 2026 13:43:27 +0100
+From: Simon Horman <horms@kernel.org>
+To: Mingming Cao <mmc@linux.ibm.com>
+Cc: netdev@vger.kernel.org, bjking1@linux.ibm.com, haren@linux.ibm.com,
+	ricklind@linux.ibm.com, kuba@kernel.org, edumazet@google.com,
+	pabeni@redhat.com, linuxppc-dev@lists.ozlabs.org,
+	maddy@linux.ibm.com, mpe@ellerman.id.au,
+	Dave Marquardt <davemarq@linux.ibm.com>
+Subject: Re: [PATCH net-next v3 05/15] ibmveth: Refactor RX interrupt control
+ for MQ RX queues
+Message-ID: <20260714124327.GJ1364329@horms.kernel.org>
+References: <20260706193603.8039-1-mmc@linux.ibm.com>
+ <20260706193603.8039-6-mmc@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ywQGZQB3W5vvKlZqS77vAg--.16019S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cw1fZw1xCFWUWF4rGrW8Crg_yoW8Cw17pa
-	yjkrZ5tFyxGry7uwn7t3W7AryfArWvkrWagr15tay3uan8Ka40yF4xtFy5CFs8CrWqkryj
-	vrW2v3yjyrn8uaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9v1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l8cAvFVAK
-	0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4
-	x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2
-	z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4
-	CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E74AGY7Cv6cx26r4r
-	Kr1UJr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc
-	8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Av
-	z4vE14v_Xr1l42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8VW8Ww4UJr1UMxC20s
-	026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
-	JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
-	v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
-	j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
-	W8JrUvcSsGvfC2KfnxnUUI43ZEXa7VU0FksPUUUUU==
-X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAgUIAWpWBJIxoAAAs1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260706193603.8039-6-mmc@linux.ibm.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
-	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307447-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:zhaoyz24@mails.tsinghua.edu.cn,m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:mmc@linux.ibm.com,m:netdev@vger.kernel.org,m:bjking1@linux.ibm.com,m:haren@linux.ibm.com,m:ricklind@linux.ibm.com,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:linuxppc-dev@lists.ozlabs.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:davemarq@linux.ibm.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-307448-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,kernel.org,nvidia.com,davemloft.net,google.com,redhat.com,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
-	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mails.tsinghua.edu.cn:from_mime,mails.tsinghua.edu.cn:dkim,mails.tsinghua.edu.cn:mid]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B3B347548F8
+X-Rspamd-Queue-Id: 0D3DC754AE4
 
-IPv4 list receive can reuse a route from the previous skb in the same
-receive batch. The current eligibility check only compares the destination
-address and TOS before calling ip_route_use_hint().
+On Mon, Jul 06, 2026 at 12:35:53PM -0700, Mingming Cao wrote:
+> Queue 0 and subordinate RX queues use different interrupt control
+> interfaces in PHYP:
+> 
+>   - queue 0: h_vio_signal() after h_register_logical_lan()
+>   - queue N: H_VIOCTL against the queue handle/hwirq mapping
+> 
+> The current code is single-queue oriented and cannot safely scale to
+> multiple RX queues in poll completion and open/close IRQ setup.
+> 
+> Introduce queue-indexed interrupt helpers:
+> 
+>   ibmveth_enable_irq(adapter, queue_index)
+>   ibmveth_disable_irq(adapter, queue_index)
+>   ibmveth_setup_rx_interrupts()
+>   ibmveth_cleanup_rx_interrupts()
+> 
+> These helpers centralize queue0-vs-subordinate dispatch and make IRQ
+> lifecycle symmetric across open/close and future resize paths.
+> 
+> request_irq() is wired with &adapter->napi[i] as dev_id per queue, so
+> interrupt ownership follows the NAPI instance that services that RX
+> queue.
+> 
+> Signed-off-by: Mingming Cao <mmc@linux.ibm.com>
+> Reviewed-by: Dave Marquardt <davemarq@linux.ibm.com>
 
-For forwarded routes, ip_route_use_hint() skips fib_validate_source()
-unless the hinted route is local. This means a packet with a different
-source address can reuse a forwarding dst created for an earlier packet
-and avoid source validation such as strict rp_filter.
+Although it is added later in this patch set, I believe linux/irqdomain.h
+needs to be included in this patch so that irq_dispose_mapping is defined.
 
-In a KASAN QEMU router with strict rp_filter on the ingress device, a 
-bad-only burst was dropped entirely, however, a paired valid/bad burst 
-with the same destination/TOS made all of the bad packets pass rp_filter.
+Also, I think it would be best to add these helpers in the same patch(es)
+that they are first used.  As this will avoid temporal compiler warnings
+about declared but otherwise unused functions. Similarly for patch 13/15.
 
-Require the source address to match before reusing the hint. Packets from
-the same source/destination/TOS still take the fast path; packets whose
-source changes go through the normal route lookup and source validation
-path.
+Overall, please make sure that when each patch of the series is applied
+no new warnings or errors are introduced for allmodconfig W=1 builds.
 
-Fixes: 02b24941619f ("ipv4: use dst hint for ipv4 list receive")
-Cc: stable@vger.kernel.org
-Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
-Reported-by: Ao Wang <wangao@seu.edu.cn>
-Reported-by: Xuewei Feng <fengxw06@126.com>
-Reported-by: Qi Li <qli01@tsinghua.edu.cn>
-Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
-Assisted-by: Claude-Code:GLM-5.2-special
-Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
----
-diff --git a/net/ipv4/ip_input.c b/net/ipv4/ip_input.c
-index 9860178752b8..970a2c11ec2a 100644
---- a/net/ipv4/ip_input.c
-+++ b/net/ipv4/ip_input.c
-@@ -316,6 +316,7 @@ static bool ip_can_use_hint(const struct sk_buff *skb, const struct iphdr *iph,
- 			    const struct sk_buff *hint)
- {
- 	return hint && !skb_dst(skb) && ip_hdr(hint)->daddr == iph->daddr &&
-+	       ip_hdr(hint)->saddr == iph->saddr &&
- 	       ip_hdr(hint)->tos == iph->tos;
- }
- 
+FWIIW, I exercised this using gcc 16.1 from
+https://www.kernel.org/pub/tools/crosstool/
+
+...
+
 -- 
-2.47.3
-
+pw-bot: changes-requested
 
