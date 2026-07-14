@@ -1,86 +1,97 @@
-Return-Path: <netdev+bounces-307537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307538-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Rbg5IKNyVmoE5wAAu9opvQ
-	(envelope-from <netdev+bounces-307537-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:32:19 +0200
+	id +RBTOih1Vmrp5wAAu9opvQ
+	(envelope-from <netdev+bounces-307538-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:43:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 695BD757761
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:32:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DC6B757923
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 19:43:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=TwMF7Ci3;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307537-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307537-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=pzgvaeY5;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307538-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307538-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C7127300F7B3
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 17:32:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8DA3D314CED9
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 17:41:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C48013093CF;
-	Tue, 14 Jul 2026 17:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FF534156FF;
+	Tue, 14 Jul 2026 17:41:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8347330675F;
-	Tue, 14 Jul 2026 17:32:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B293A412C0E
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 17:41:20 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784050330; cv=none; b=N4PVFJOYZkLerEAbWQQ8awoGNIIN5WjPjrM+cdKCYNJfZWowf7hc7mBf0BejlCcvxYgZytpuN006FnIL3NFUYBOC/tyD/huIyEbt2nwXMaAL3yNxjNh+FfE8rGmomgC97kR3KJKW5IAJELVoLLZQ+0E1LIaSDJb2uoKpT0rY7Sk=
+	t=1784050885; cv=none; b=DEzBlg+in7IBy04/eGu0WA+NEUzinnuFs0yu6DSXaWG9L5HODBUr7LsGhHjjjUnG5TFKhzk/wHa3NJHFklNdgXYNYf5c/WsC9c01cmV5IHBciH2yy+zletnHd8P9KOZSl2xpfv0gVutfo4HRepnhqideZe3OxZ8NP2rE6aKkHeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784050330; c=relaxed/simple;
-	bh=CmvrkjVaGQ6MN//Cd8aKji1ytmpktL5xVzNiSdfE/nQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y7QL+Gm5QZ3Se9n6EzIRKogkoOFqXcRUWEmcy+JaiioI1x1GJnXvc0CJifV/gRl3YogXWyMn4wPU7dqFi5n7855+stnqqrz2/aim701jf0ByZ1thOMtccdGgxt88/JcTpXjoK9kuey3xIT8zSyiItfxmcQmgBqX8c5bwczQoXOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TwMF7Ci3; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C9751F000E9;
-	Tue, 14 Jul 2026 17:32:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784050329;
-	bh=hChZb/2vVYNOySAV5fErj2Dtv3qUxLzms3YMHDC+iJo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=TwMF7Ci3I1oEymvv8ZbZKczzhf5SXnPIhnvI/khf841KbVsKM2h6/AZ5B1c4RZX1o
-	 Ya+Vavn5/UZOM1QUd1M4m8zDFW6owFb26wGChXoIzlf5nnY7Y6clmJjHtgpz2R1Gtf
-	 q16jwigAxeuDQlNpUsh4WtcqnP4h4alz5kaxKw8TWlPASY8kHAZlvCqix6zfedZaRS
-	 vhzl/4uOWo4DHFhLK0pjAvO6VJpLTHUHZopU3ky4Hx3xsNHgm2/nqXCNo54c0UlWK7
-	 pA7uHREgU7pSQT2mIydWNmc1M+mJkkusnz6RYr+xuqwR1Uwe6znR26X73yHbFroKIU
-	 /dcGadmEcBD/Q==
-From: Simon Horman <horms@kernel.org>
-To: tariqt@nvidia.com
-Cc: Simon Horman <horms@kernel.org>,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
+	s=arc-20240116; t=1784050885; c=relaxed/simple;
+	bh=/8kwpS51oEAHEw6EL4bUzPsL8La9wbzGzhSRkOOzhFs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dkv0BBZTSGeBeyIi1BSZFsKqc4RbWktwPkYVQ2TbZaNVBt5LoMlM7Z2UOJ/hyGPU191fLP7pfDtBCcDIozIQp4sSo+GaWYffrDJBdi1Yd5yihbreyC+z4HAHMKSJHBE8TxDlPp8Mupr9HY93+QgSgpU55iKd7fPH919dCSIGsTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pzgvaeY5; arc=none smtp.client-ip=209.85.214.172
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2c6b67d5fa1so77254545ad.2
+        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 10:41:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784050880; x=1784655680; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=11t9d++r0bmMhzQdiTZcpMyL88ikh+EriVNoFZhMUAE=;
+        b=pzgvaeY5hJUBe35j86/xzRYNAapiLHnWP2fsSZCPw53h8g4lU2+gR46zSP/WPsZAaJ
+         GT4c3j8hYxdDU2YZPwXL5s3yu41s2YNICen+3urnMH8ifE5iqVwFX7uVshD6Sze1bv2O
+         2ELclrhnUgew7Mp/6WESn2MtUDJkZ46VC2zWqConFPQP7Ihj7JAPGvSUSGXGjG0XFKd1
+         5L39HaSyCO6hoGlr2WwWd7oXybc6FYbwqKxucpYtB8fZRPT8VeXzzpXTBylUKw1qrekd
+         KFNtp5MWvv7u9ePJYETRkKR74WPEy2pZyejUozJWj9b52rURHZFR52GKYhDq+9AY8iF4
+         jK+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784050880; x=1784655680;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=11t9d++r0bmMhzQdiTZcpMyL88ikh+EriVNoFZhMUAE=;
+        b=KJs2ozVNRTfCLLV9K4wlugK7cW9/oMIJry5Zy/zkYXZydLhFXu4cI+EOQZ3XLkiGBr
+         YBfwIMRCSqX9dMjmiaE/0ruq2EigJWk9mUO/gAIqoafcw1D6Jr3zrlnxKdK3pR0AsSTX
+         JFtUS8PsTpa5L2LKXw9MOioAblSU229qCCRgeiwV+hDIw4r2cNWQM1TJTwwQMSo8QiTS
+         xv4ei2ro2gKorXxEZf+8UU4F3+16I9YrvD7Kzzt4/Q9elOdSlxyksVkhvDl+vOvrhkKM
+         U0PCYSrCmh28CJYq6gG/gXH0en/E64JlGC/xlypgGuM5WqZQtwx3V+BxR95FjAbQgBFM
+         /KDA==
+X-Forwarded-Encrypted: i=1; AHgh+Rrnj5vcrlWqcFN+zS2Mni94geOxaLLi2m6Ncbda/l4m3oxwvsiCOjMkK1u7arCNb6I0jw5/W0Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzt+DkJ+PXJuCZBiA2MBqZuupGPsirQcVx5WKav/mnB9clJpw09
+	836DNqWwq71NLIRStY4DcuxuS8XTJyqI332eKjGhv6u5sPBbBruITy7d
+X-Gm-Gg: AfdE7ckqRqBLb0lJjMl9dNj4A7iEC38hXjlwZz1eAmpJy1Eq8YbgCCqt/D0kwsA6KJ8
+	fRRyOuFdhTvtMAdzmOCNYJBPsnNL+wnbT/lJ/DDsBO3T0vV8hcwwWfwzlDEFtEVjsGq35LQmdef
+	uNo1++l7eMe149qd1UOX6PYa0lkatE0GsfmBYoxsnQTeq8h1X9osAJujSh/+uYy56byqtM1VSsB
+	Nnpzo+NSFGAUNn5pUfQm4W0BHoHXTMlRHo4bTEF3nfCj2y0ErG+1oRbjaOSEHLEAw2qi4knOVu1
+	eJP3C0M02D+J1roX+s3+H2rmsqNcu7ajlPN8WkgkgVg6uflKchLLTCe7ciJA2CW3GQXeHoZ9EAc
+	1U9uc7WFnrXCi69n79V8n9Y1ZVBka0Zs9UBrZS7+IX9pDSRegJPIHnVii2OR0B+BzJIKHtGQO57
+	dweuXQOLiivQwqP4HgrYIQzVSYuFgEycQUFw7v780zddwioxawR1t/z/BSAd/uEWwfKj01
+X-Received: by 2002:a05:6a21:3282:b0:3bf:6c08:4ec6 with SMTP id adf61e73a8af0-3c357263c10mr3492675637.59.1784050879544;
+        Tue, 14 Jul 2026 10:41:19 -0700 (PDT)
+Received: from fx.tailc0aff1.ts.net ([206.206.192.132])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13b87b92b27sm38055954c88.6.2026.07.14.10.41.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jul 2026 10:41:18 -0700 (PDT)
+From: Weiming Shi <bestswngs@gmail.com>
+To: Jon Maloy <jmaloy@redhat.com>,
 	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	aleksandr.loktionov@intel.com,
-	borisp@nvidia.com,
-	cmi@nvidia.com,
-	cratiu@nvidia.com,
-	daniel.zahka@gmail.com,
-	dtatulea@nvidia.com,
-	gal@nvidia.com,
-	jacob.e.keller@intel.com,
-	jianbol@nvidia.com,
-	lkayal@nvidia.com,
-	leon@kernel.org,
+	tipc-discussion@lists.sourceforge.net
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Hoang Huu Le <hoang.h.le@dektech.com.au>,
+	Xiang Mei <xmei5@asu.edu>,
+	Tung Quang Nguyen <tung.quang.nguyen@est.tech>,
 	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	mbloch@nvidia.com,
-	raeds@nvidia.com,
-	rrameshbabu@nvidia.com,
-	saeedm@nvidia.com,
-	sdf@fomichev.me,
-	sdf.kernel@gmail.com,
-	willemdebruijn.kernel@gmail.com
-Subject: Re: [PATCH net-next 15/15] net/mlx5e: psp: Report PSP dev registration errors
-Date: Tue, 14 Jul 2026 18:31:52 +0100
-Message-ID: <20260714173151.1863310-2-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260707130858.969928-16-tariqt@nvidia.com>
-References: <20260707130858.969928-16-tariqt@nvidia.com>
+	Weiming Shi <bestswngs@gmail.com>
+Subject: [PATCH net v3 0/2] tipc: fix NULL deref in tipc_named_node_up() on empty publication list
+Date: Tue, 14 Jul 2026 10:41:08 -0700
+Message-ID: <20260714174110.1571033-1-bestswngs@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,90 +100,84 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307537-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:tariqt@nvidia.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:aleksandr.loktionov@intel.com,m:borisp@nvidia.com,m:cmi@nvidia.com,m:cratiu@nvidia.com,m:daniel.zahka@gmail.com,m:dtatulea@nvidia.com,m:gal@nvidia.com,m:jacob.e.keller@intel.com,m:jianbol@nvidia.com,m:lkayal@nvidia.com,m:leon@kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:mbloch@nvidia.com,m:raeds@nvidia.com,m:rrameshbabu@nvidia.com,m:saeedm@nvidia.com,m:sdf@fomichev.me,m:sdf.kernel@gmail.com,m:willemdebruijn.kernel@gmail.com,m:andrew@lunn.ch,m:danielzahka@gmail.com,m:sdfkernel@gmail.com,m:willemdebruijnkernel@gmail.com,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,dektech.com.au,asu.edu,est.tech,vger.kernel.org,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-307538-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:hoang.h.le@dektech.com.au,m:xmei5@asu.edu,m:tung.quang.nguyen@est.tech,m:linux-kernel@vger.kernel.org,m:bestswngs@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,vger.kernel.org,redhat.com,intel.com,nvidia.com,gmail.com,fomichev.me];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sashiko.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 695BD757761
+X-Rspamd-Queue-Id: 3DC6B757923
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
---- Patch [15]: [PATCH net-next 15/15] net/mlx5e: psp: Report PSP dev registration errors ---
-commit 76afe7de4d1e708e7c01d267ef1fb9cf946de937
-Author: Cosmin Ratiu <cratiu@nvidia.com>
+named_distribute() stamps the last_bulk flag on the tail skb of the
+publication list. When the list is empty no skb is enqueued and the tail
+access dereferences NULL. tipc_named_node_up() hits this on an empty
+cluster_scope, which happens with a node-id configuration where
+cluster_scope is populated only later by tipc_net_finalize(). It is
+reachable by an unprivileged user over a UDP bearer in a user+net
+namespace.
 
-net/mlx5e: psp: Report PSP dev registration errors
+Patch 1 guards tipc_node_xmit() against an empty list, so the allocation-
+failure path in named_distribute() cannot pass an empty list down to
+tipc_lxc_xmit(), which has the same tail-of-empty-list deref.
 
-This commit updates mlx5e_psp_register() to return an error code instead
-of void when psp_dev_create() fails. The caller, mlx5e_nic_enable(), is
-also updated to check this return value and abort if PSP registration fails.
+Patch 2 emits an item-less bulk when the publication list is empty, so the
+peer still receives the last_bulk flag and does not stall this node's later
+name updates.
 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> @@ -6199,7 +6199,9 @@ static int mlx5e_nic_enable(struct mlx5e_priv *priv)
->  
->  	mlx5e_fs_init_l2_addr(priv->fs, netdev);
->  	mlx5e_ipsec_init(priv);
-> -	mlx5e_psp_register(priv);
-> +	err = mlx5e_psp_register(priv);
-> +	if (err)
-> +		goto out_ipsec_cleanup;
+Changes in v3:
+ - Split into two patches; add patch 1 to guard tipc_node_xmit() against
+   the tipc_lxc_xmit() deref reachable via the allocation-failure path.
+ - Break out of the build loop on allocation failure instead of returning,
+   so the last_bulk flag is still applied to the last queued skb.
 
-[Severity: High]
-Could propagating this error cause the entire network interface to fail if
-the optional PSP offload fails to register?
+Changes in v2:
+ - Instead of returning early on an empty cluster_scope (which would stall
+   the peer, since it waits for a bulk with the last_bulk flag before
+   accepting later name updates), emit an item-less bulk so the peer opens
+   normally.
 
-If psp_dev_create() fails (e.g., due to memory pressure or ID exhaustion
-in xa_alloc_cyclic), mlx5e_nic_enable() will now abort, resulting in a
-complete loss of networking capability for the device.
+Thanks to Tung Quang Nguyen for the review of v1.
 
-Notice how the code immediately following this handles MACsec initialization
-failures by logging the error and allowing the NIC to continue operating:
+Weiming Shi (2):
+  tipc: guard against empty list in tipc_node_xmit()
+  tipc: fix NULL deref in tipc_named_node_up() on empty publication list
 
-	err = mlx5e_macsec_init(priv);
-	if (err)
-		mlx5_core_err(mdev, "MACsec initialization failed, %d\n", err);
+ net/tipc/name_distr.c | 16 +++++++++++++++-
+ net/tipc/node.c       |  3 +++
+ 2 files changed, 18 insertions(+), 1 deletion(-)
 
-Should PSP registration failure fall back gracefully and allow the core NIC
-to function without the offload, similar to how MACsec is handled?
 
->  
->  	err = mlx5e_macsec_init(priv);
->  	if (err)
->  		mlx5_core_err(mdev, "MACsec initialization failed, %d\n", err);
+base-commit: 4595d2c77ea4bfe4ae0efa38770a59ee5d2f06d3
+-- 
+2.43.0
+
 
