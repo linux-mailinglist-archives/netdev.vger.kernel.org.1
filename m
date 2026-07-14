@@ -1,198 +1,266 @@
-Return-Path: <netdev+bounces-307462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307465-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +s8rE6c0Vmqa1QAAu9opvQ
-	(envelope-from <netdev+bounces-307462-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:07:51 +0200
+	id hesjFzw2Vmob1gAAu9opvQ
+	(envelope-from <netdev+bounces-307465-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:14:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84094754DB9
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:07:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DC17754F20
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 15:14:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ibm.com header.s=pp1 header.b=G05lOHnz;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307462-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307462-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=ibm.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=XwyYkiEo;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307465-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307465-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4D01630AC3E2
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 13:04:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3967B32BEB6E
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 13:08:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE61F46AF1E;
-	Tue, 14 Jul 2026 13:04:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFD1D47CC8B;
+	Tue, 14 Jul 2026 13:06:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C814246AF05;
-	Tue, 14 Jul 2026 13:04:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FCE0478E53
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 13:06:27 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784034257; cv=none; b=lSjDI3gmX7tdOFt0a7JSFKOFAb9e7RqUZ9W8mrZKviucd8ix/MsqSFXFKc47JsTW9K+I+i+YNQIXKeRq6ehACY+MmK5EFWLF7ELXuOFD9/1yUSUdR7in0Q8u1r/Ek5W5v9lg1F7OfuovDFwFmDm26z2wRYypfv7iJhX72rToDH8=
+	t=1784034388; cv=none; b=eOJbpurtp/Yrf8upNYckSO3eazPIxc1REh7VYofGO5lXG9DSkqedyNPzkRFf4JK6qP17VbetqBne+mXmBNfAu5Lt8M9hQfWF1dLkbje/zum1MxhfdLPhzCYXHNLML3uiY4nBOnjWgZ2cPXXcojiZt+J/ToX6NBoCGE35r+JGV4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784034257; c=relaxed/simple;
-	bh=u6Y4cZi6tzUrGstUrSdbyH2IwuPZh3HQWfr0VcpVZ5g=;
+	s=arc-20240116; t=1784034388; c=relaxed/simple;
+	bh=71fgk7/pjKbIL3/bv557fkIpwYnWwWChravaY+wLfFg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AYzz8fz6COXSh9bD6kYC+hcAPxT5QR2vrSeAphtxE870PxVWdiEwYeiDo0LXBS1dd6DZE3cuFerWOlnrizEX1W3Lzc9teGTAS5lCZvhaOGLK7p3HYyZ9TQUkZMe4cV/AMbE1xuJZIQ/jPUqbhkmGc8kyGTza9gCOWoVR7Ve6LuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=G05lOHnz; arc=none smtp.client-ip=148.163.158.5
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66EBg0Hr1195053;
-	Tue, 14 Jul 2026 13:04:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=cHjbBjagGNXJRbi52
-	imbwuO2vVnHqFzUUUIrp5kwSlk=; b=G05lOHnzKb9sdvFxQFhcBy0FewIButqar
-	HmZHT9JAgimjLFwibsa9FEJzeT4cg9p0EE8LS+VU3Ww1ZXb0hyLf9EE0dIz/iEul
-	Lu2dCFEsQ9uIVn8p634lZOM/310HpCj3Z+wEM9DbcjWu7N3A7AHMzZi3bOuh9MuR
-	rKFpFFOlv7MpAg7JbcvEVdUVHi9Nf8kN7kC8/9A3VUP7qwpIH9swxMNKfP9oY8EM
-	IOpsNi/w3obAWMlnhb9dhI/zMx9+IVsZfVONJviJB7Y/RyVK6Z83D6T/QKgq2IBR
-	E6TYqXWj/l7Yo2Kg7i+cYWjVvmasPBnDR9PVKGtVuciPGLdiHTDAA==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fbegbnt5p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Jul 2026 13:04:09 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66ECnfU4012006;
-	Tue, 14 Jul 2026 13:04:08 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fc2cgantk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Jul 2026 13:04:08 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66ED44Gb49479984
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 14 Jul 2026 13:04:04 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7D1FA20063;
-	Tue, 14 Jul 2026 13:04:04 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 532D720043;
-	Tue, 14 Jul 2026 13:04:04 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Tue, 14 Jul 2026 13:04:04 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55390)
-	id 3AEA3162605; Tue, 14 Jul 2026 15:04:04 +0200 (CEST)
-From: Sven Schnelle <svens@linux.ibm.com>
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Subject: [PATCH v2 2/2] ptp: ptp_s390: Add missing facility check
-Date: Tue, 14 Jul 2026 15:03:42 +0200
-Message-ID: <20260714130342.1971700-3-svens@linux.ibm.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260714130342.1971700-1-svens@linux.ibm.com>
-References: <20260714130342.1971700-1-svens@linux.ibm.com>
+	 MIME-Version; b=JLrvvGZHNDK2WjKPdjMNFO39KYvi+MZc4bGQRbAUpUbRdyzq5QRxekVsDc+4uB8SjzXqMqILCgCQASO5P1Vx4+EBYE+cQdQJfikI1BJUGq9bK2blzDZCtnSPHh5+jnND2aQRGqVdDJfJzUN+2Pcxsn3ZPR6U+9C1ygV8xQv7G4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XwyYkiEo; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C10D1F00AC4;
+	Tue, 14 Jul 2026 13:06:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784034387;
+	bh=n5uZic2yQEf6J+MPzYVAL97zNM1jCY/8xBbV5VkLom0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=XwyYkiEoqtwMmiD4xVL+MBmHsJCedGnMjYjtF7ZQ2NLepWSeWorhUpxLfvE/DFku0
+	 +u3EAX8QG/xj9D79OwLnv8xgPquStq1bk0cMgkhwzpV/AlRtLyaHxTZETFvRpDOm+4
+	 O88eKBCgFzRf4rwO4X6bT9pTudZEI9WDJOXd3ZaZeoZbsCpCH9R3aUGTjqvdtSExIm
+	 zv8FOfz7QH8Q91sBi96FI/BCUFv9qYnkcKbQ+yhrTwwZ3+kKLjnKmwDsQ8CxYIILRH
+	 iPx6zwiqznikPOtZohxKfLMaPiNMDSI5Mc7Syj0ixv5XpCr4vZJOI+E9u9HK5tXd2C
+	 9hqISmIpo4bLg==
+From: Simon Horman <horms@kernel.org>
+To: mmc@linux.ibm.com
+Cc: Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	bjking1@linux.ibm.com,
+	haren@linux.ibm.com,
+	ricklind@linux.ibm.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	linuxppc-dev@lists.ozlabs.org,
+	maddy@linux.ibm.com,
+	mpe@ellerman.id.au,
+	davemarq@linux.ibm.com
+Subject: Re: [PATCH net-next v3 13/15] ibmveth: Implement incremental MQ RX queue resize
+Date: Tue, 14 Jul 2026 14:03:46 +0100
+Message-ID: <20260714130344.1841551-3-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260706193603.8039-14-mmc@linux.ibm.com>
+References: <20260706193603.8039-14-mmc@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=fOcJG5ae c=1 sm=1 tr=0 ts=6a5633c9 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=RzCfie-kr_QcCd8fBx8p:22 a=VnNF1IyMAAAA:8 a=VwQbUJbxAAAA:8
- a=QjX40KQ7ckxDZ_rv0CQA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzE0MDEzMiBTYWx0ZWRfX9SaK97QAH6Xm
- AdWfAWW6k3rSi1OErN8OjxueiojAfZ0dGGzOXwGmHlwqpaOn8wCj9qsHqik0JnUUBsesmsxIB+a
- 2Vi5BuCgniaXmx67VIBd4tDgsdbOveFUSaKXZ+bk3gNPHaLaT5L2bbfkIEP3miPMYMMgPzXeBKH
- 1tWqol+qIGfjkAQbeBaKu4YEd8/Q7oki/Ifo3B/Lnuz5kyG+id3asRFx5k2zPrHZWSg7/6heEn5
- bW/5JJCJu/Yvb8l5oWu465C5b9d95UelqqzRGvcLQUEPm76dqV/pTkN5PwB1mHfWTng93bmuAs+
- lSvni47fZr8Minc0l5Bg+sgT8ss5ryYI5onNFaLJNBOThnQdb1zB+64UW0YM3mmJO92Tdc3ZJ8l
- NblIw8wSqtf1tzU/TBVd8mmA975VKF4cjZw6rGNU6VrASdwLBoGyKBseBa2IfJw1hhWaa7fYYYL
- QPSDmKB8EPnFyX97bbw==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzE0MDEzMiBTYWx0ZWRfX2J7OYxh8osWr
- +BqfC0Djeqm8blxijUIB5q8rvrZTvpcPOUqaLjxwosCaOnjfFJkuiPgwvQPy32B3o9al8Kzj73c
- H9yrxMCd821Gbh3zCR7ePh0TC5cakmI=
-X-Proofpoint-GUID: OFjLOZJ4ceWp2H49yGxilT2FpSCLnUMP
-X-Proofpoint-ORIG-GUID: LY2LUNy6qIyRtiM9ab_9ugjXcmIGi807
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-14_03,2026-07-10_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 bulkscore=0 impostorscore=0 suspectscore=0 adultscore=0
- priorityscore=1501 malwarescore=0 clxscore=1015 phishscore=0
- lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2607140132
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307462-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:richardcochran@gmail.com,m:netdev@vger.kernel.org,m:linux-s390@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:hca@linux.ibm.com,m:gor@linux.ibm.com,m:agordeev@linux.ibm.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[svens@linux.ibm.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-307465-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:mmc@linux.ibm.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:bjking1@linux.ibm.com,m:haren@linux.ibm.com,m:ricklind@linux.ibm.com,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:linuxppc-dev@lists.ozlabs.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:davemarq@linux.ibm.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[svens@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_TWELVE(0.00)[12];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linux.ibm.com:from_mime,linux.ibm.com:mid]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 84094754DB9
+X-Rspamd-Queue-Id: 7DC17754F20
 
-Only register the physical clock when facility 28 is installed
-and PTFF QAF returns that PTFF QPT is available.
-
-Fixes: 2d7de7a3010d ("s390/time: Add PtP driver")
-Signed-off-by: Sven Schnelle <svens@linux.ibm.com>
-Cc: stable@kernel.org
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
 ---
- drivers/ptp/ptp_s390.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Date:   Mon Jul 6 19:36:01 2026 +0000
 
-diff --git a/drivers/ptp/ptp_s390.c b/drivers/ptp/ptp_s390.c
-index 29618eb9bf44..02d624d89a0a 100644
---- a/drivers/ptp/ptp_s390.c
-+++ b/drivers/ptp/ptp_s390.c
-@@ -107,6 +107,9 @@ static __init int ptp_s390_init(void)
- 	if (IS_ERR(ptp_stcke_clock))
- 		return PTR_ERR(ptp_stcke_clock);
-=20
-+	if (!test_facility(28) || !ptff_query(PTFF_QPT))
-+		return 0;
-+
- 	ptp_qpt_clock =3D ptp_clock_register(&ptp_s390_qpt_info, NULL);
- 	if (IS_ERR(ptp_qpt_clock)) {
- 		ptp_clock_unregister(ptp_stcke_clock);
-@@ -117,7 +120,8 @@ static __init int ptp_s390_init(void)
-=20
- static __exit void ptp_s390_exit(void)
- {
--	ptp_clock_unregister(ptp_qpt_clock);
-+	if (ptp_qpt_clock)
-+		ptp_clock_unregister(ptp_qpt_clock);
- 	ptp_clock_unregister(ptp_stcke_clock);
- }
-=20
---=20
-2.55.0
+ibmveth: Implement incremental MQ RX queue resize
+    
+Add helpers to register/deregister individual RX queues and scale
+queue count up or down while the netdev stays up. Surviving queues
+keep PHYP handles, buffer pools, and IRQ state across resize.
 
+> diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
+> index ecc472ee8f71f..ac4d89a66a8db 100644
+> --- a/drivers/net/ethernet/ibm/ibmveth.c
+> +++ b/drivers/net/ethernet/ibm/ibmveth.c
+
+[ ... ]
+
+> @@ -1080,6 +1132,138 @@ static void ibmveth_free_buffer_pools(struct ibmveth_adapter *adapter)
+> +static int
+> +ibmveth_alloc_single_rx_queue(struct ibmveth_adapter *adapter, int queue_idx,
+> +			      int rxq_entries)
+> +{
+
+[ ... ]
+
+> +	for (i = 0; i < IBMVETH_NUM_BUFF_POOLS; i++) {
+> +		adapter->rx_buff_pool[queue_idx][i].size =
+> +			adapter->rx_buff_pool[0][i].size;
+> +		adapter->rx_buff_pool[queue_idx][i].buff_size =
+> +			adapter->rx_buff_pool[0][i].buff_size;
+> +		adapter->rx_buff_pool[queue_idx][i].threshold =
+> +			adapter->rx_buff_pool[0][i].threshold;
+> +		adapter->rx_buff_pool[queue_idx][i].active =
+> +			adapter->rx_buff_pool[0][i].active;
+> +	}
+
+[Severity: Critical]
+Does this loop miss initializing pool->index?
+
+If pool->index remains 0 for all buffer pools on the new queue, when
+replenishing, 0 is shifted into the correlator.
+
+Then when receiving, ibmveth_remove_buffer_from_pool() will extract pool=0,
+which fetches from the wrong pool and could corrupt the free map of pool 0,
+leading to a use-after-free or leak.
+
+[ ... ]
+
+> @@ -1192,6 +1376,49 @@ static int ibmveth_rxq_harvest_buffer(struct ibmveth_adapter *adapter,
+> +static int
+> +ibmveth_drain_rx_queue(struct ibmveth_adapter *adapter, int queue_index)
+> +{
+
+[ ... ]
+
+> +	while (drained < limit &&
+> +	       ibmveth_rxq_pending_buffer(adapter, queue_index)) {
+> +		rc = ibmveth_rxq_harvest_buffer(adapter, queue_index, true);
+
+Simon says: I think we can consider the issue below in the context of
+            possible follow-up, because I believe the use of this pattern
+	    predates this patch.
+
+[Severity: High]
+Is a read memory barrier needed between reading the toggle bit in
+ibmveth_rxq_pending_buffer() and reading the correlator in
+ibmveth_rxq_harvest_buffer()?
+
+Since the hypervisor could be actively writing new descriptors while this is
+called, could a weakly-ordered CPU reorder the correlator load before the
+toggle bit load, causing us to recycle the wrong buffer?
+
+[ ... ]
+
+> @@ -1491,6 +1718,175 @@ ibmveth_deregister_single_rx_queue(struct ibmveth_adapter *adapter,
+> +static int
+> +ibmveth_resize_rx_queues_incremental(struct ibmveth_adapter *adapter,
+> +				     int new_count, int rxq_entries)
+> +{
+
+[ ... ]
+
+> +			rc = ibmveth_enable_irq(adapter, i);
+> +			if (rc) {
+> +				netdev_err(netdev,
+> +					   "Failed to enable IRQ for queue %d: %d\n",
+> +					   i, rc);
+> +				ibmveth_cleanup_single_rx_interrupt(adapter, i);
+> +				ibmveth_deregister_single_rx_queue(adapter, i);
+> +				ibmveth_free_single_rx_queue(adapter, i);
+> +				goto cleanup_new_queues;
+> +			}
+> +
+> +			napi_enable(&adapter->napi[i]);
+> +		}
+> +
+> +		adapter->num_rx_queues = new_count;
+
+[Severity: High]
+What happens if an interrupt fires on the newly added queue before
+adapter->num_rx_queues is updated?
+
+If an interrupt fires between ibmveth_enable_irq() and the update of
+adapter->num_rx_queues, ibmveth_interrupt() might evaluate:
+    WARN_ON(qindex < 0 || qindex >= adapter->num_rx_queues)
+to true and return IRQ_NONE without masking the interrupt.
+
+Could this lead to an unhandled interrupt storm?
+
+[ ... ]
+
+> +	} else {
+> +		netdev_dbg(netdev, "Scale-down: removing queues %d-%d\n",
+> +			   new_count, old_count - 1);
+> +
+> +		for (i = new_count; i < old_count; i++)
+> +			napi_disable(&adapter->napi[i]);
+> +
+> +		for (i = new_count; i < old_count; i++)
+> +			ibmveth_drain_rx_queue(adapter, i);
+> +
+> +		synchronize_net();
+
+[Severity: High]
+Can disabling NAPI before disabling the hardware interrupts create an
+interrupt storm window?
+
+If the hypervisor asserts an interrupt during synchronize_net(), the hardware
+IRQ handler runs. Since NAPI is disabled, it returns IRQ_HANDLED without
+masking the interrupt source at the hypervisor, leading immediately to an
+IRQ storm and CPU lockup.
+
+> +
+> +		rc = netif_set_real_num_rx_queues(netdev, new_count);
+> +		if (rc) {
+> +			netdev_err(netdev, "Failed to set real RX queues to %d: %d\n",
+> +				   new_count, rc);
+> +			for (i = new_count; i < old_count; i++)
+> +				napi_enable(&adapter->napi[i]);
+> +			return rc;
+> +		}
+
+[Severity: High]
+Is it possible for this error path to permanently stall the RX queues?
+
+It calls napi_enable() but doesn't call ibmveth_replenish_task(). Since the
+queues were completely drained of their buffers by ibmveth_drain_rx_queue(),
+will the hypervisor have any buffers to place incoming packets?
+
+Without buffers, no interrupts will fire for these queues, and NAPI will
+never run again.
 
