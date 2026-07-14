@@ -1,190 +1,320 @@
-Return-Path: <netdev+bounces-307430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307431-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zWVPMlcaVmrgzAAAu9opvQ
-	(envelope-from <netdev+bounces-307430-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 13:15:35 +0200
+	id F0zeM7oaVmrxzAAAu9opvQ
+	(envelope-from <netdev+bounces-307431-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 13:17:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F8B8753CF2
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 13:15:35 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0291E753D24
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 13:17:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=egkuiVe3;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307430-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307430-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
+	dkim=pass header.d=ssi.bg header.s=ssi header.b="h3/bqy6Q";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307431-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307431-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=ssi.bg;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A68613070D24
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:13:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5B12E3046D79
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:17:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D12037F8B3;
-	Tue, 14 Jul 2026 11:13:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF7A438B7DB;
+	Tue, 14 Jul 2026 11:17:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BB9F37DE98
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 11:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FBC03655EA;
+	Tue, 14 Jul 2026 11:17:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784027626; cv=none; b=VCNrAgKPUK6IyDpuN5KvK366OedZ9zHX2EokIH1G2beAJRNQpm8qwOtutRcVamjflcNtjJVEkxoADK/21fbWyH4Qg/zmN1gGoJOnabPA93hcCvNAdA6kaaQkGHBwLHWfiJbC4YTjANu/idv/iZ8HXLRJaTaDM1qPF7/QWf7J3DU=
+	t=1784027829; cv=none; b=d0J4IwHezLQG+WwXx6cQcoPjUASvq84Ns352ag7R3NdLFN0yl3frYtGrywLZkvnZd4P8gKkXqt6255QEXOBb5CJH4OBiqK2IONyh7IJ+L3TWn09fQA+HLJPDu+Uucrix7/SvUwxYm5chCsn4Jee7lUHKvbuPialNjjHHXjjENwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784027626; c=relaxed/simple;
-	bh=gFmm8OhmJgg+3uRmLjOxHc2kjU1UK7NWYxJrINbn7+Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CxQ+NeSdlV84tlglNbAWH5NWAvYE9Ynvt6XpSa6H98AMJkIVGGrvqUsyENVI7DKLsT0+VuY9POu++s/HDSTsM4pzn39LwxWbN18Jk6Zb+oPKvXJzgwTCzNW9jvczPRlJtcRu5QktkX4ZsGODSp1GQsFjGH65dJwkambWKs494Q4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=egkuiVe3; arc=none smtp.client-ip=91.218.175.188
-Message-ID: <29dc5f0e-1ddc-4655-99a7-756a5e020495@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784027613;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=79zXcDEPlxrNcOqS0crvZ4z9J9iujdc4lV84ElCi0oE=;
-	b=egkuiVe3UUyFoCDgYvEZPngKvvlzzorZkUxsiaufMqUMWWb/h4P/OOo9nh/dNSH3/I172/
-	cutwSAOVgNTq8eTtdCGM+EqecxQQXqZGpEtbUL4d5iNqtk6u+UZFxq1c3a/XWhcxJYoB0H
-	0ovp7mj3cI7nh0uSX6CG4mU9Tn7yOYw=
-Date: Tue, 14 Jul 2026 19:13:20 +0800
+	s=arc-20240116; t=1784027829; c=relaxed/simple;
+	bh=3sznWqZahOX3dGYSqEcnCcyFoW7K0dYNJqYsNgXlrQo=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=AW8QCMnlRcP2FXyYMKCfLvQq6cwVGJ8t8qfHacNdiuKLnWNiGSgZQ944nwLSSWC4fuNfJ/lk9QchtEFQbTghYp/uWJXMyBSqfcgvkbZ4X1VC7xYM+B3TeEyLyiKbY5GUuvj3NA2/dII4M+H0w4DJIoEhvkUXHe0XCYOKDmAGj5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=h3/bqy6Q; arc=none smtp.client-ip=193.238.174.39
+Received: from mx.ssi.bg (localhost [127.0.0.1])
+	by mx.ssi.bg (Potsfix) with ESMTP id AB82821B1A;
+	Tue, 14 Jul 2026 14:16:59 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
+	:content-type:content-type:date:from:from:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
+	 bh=2AYue9V/xyYnT/GTe0/pexAq27BPH889PPznAkkDRSE=; b=h3/bqy6Q+bNL
+	5yzOKQCLasFLLpACDDqR4QAxUh8X2ODepl2qoDbZ+5+66XDBsg+smwvwVdE7Rxrk
+	4WCHKT1kzq/nqtfv+meobmEbZLw9CSIE9OB2Xq4se8jiFghyEVZJ9cpSN/i8xei5
+	5JvkSCfxvPTtAWC+UY8S8VdO6kJyZYK1i4ibyWVGskNZtUIXEtruJsCZCxptWXaN
+	ADigaVN5Cveniav4QM3K9GXbfsD3F8Cf/+HkTWe4wUET8bASQ49+ZVIn37gj0Zu+
+	UMaiom3K8UH3+b/UpeSh5zDTlixYcTzSi1un7fKzR+NuEbG1v5sFzwIXESMQQrNm
+	jn5VlwjxzAjjK1PtKP9TBWe0EzZb6qB1zDsugyD+9uSRHcIjO3KzD3sADphCxwBq
+	2XPAYZYyRQJmrBsbhgnOxf5pFmjsUn8gXgPttg7ndAuGANlIduFa10o5UWcMcCEs
+	2G6/05MvN0QRUcUZ6ErpiWGY2SZMmcC6KJoN4m6M5qCEz6IEnjaTH3jtB8pA1rcV
+	4uk76FTb61SoSEqVN7H/kj0gctuj+00PjSf/nnThnQOkOiTKkEy0j1/XjFHxIvST
+	OQ4QVhxd7Njv5z8KGaex4L04hePOYdEz7Qi7hi6ZPdygneU68KvHj09hPEyyJT+P
+	tJrcPj25NyLYUj8qhWRGZk/l9PkiQCk=
+Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
+	by mx.ssi.bg (Potsfix) with ESMTPS;
+	Tue, 14 Jul 2026 14:16:59 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by box.ssi.bg (Potsfix) with ESMTPSA id 310F0608A4;
+	Tue, 14 Jul 2026 14:17:00 +0300 (EEST)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.2/8.18.2) with ESMTP id 66EBGrHQ029875;
+	Tue, 14 Jul 2026 14:16:54 +0300
+Date: Tue, 14 Jul 2026 14:16:53 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+cc: David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+        Simon Horman <horms@verge.net.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+        netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, stable@vger.kernel.org,
+        Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+        Ao Wang <wangao@seu.edu.cn>, Xuewei Feng <fengxw06@126.com>,
+        Qi Li <qli01@tsinghua.edu.cn>, Ke Xu <xuke@tsinghua.edu.cn>
+Subject: Re: [PATCH nf v3 2/2] ipvs: use bitops for destination overload
+ state
+In-Reply-To: <edc095e05c89cc6481613126de5f2a91ed601fa9.1783931964.git.zhaoyz24@mails.tsinghua.edu.cn>
+Message-ID: <a82b528b-2710-3978-fc18-ef902fd903e1@ssi.bg>
+References: <cover.1783931964.git.zhaoyz24@mails.tsinghua.edu.cn> <edc095e05c89cc6481613126de5f2a91ed601fa9.1783931964.git.zhaoyz24@mails.tsinghua.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] net: hsr: clean up the slave VLAN filters when
- deleting a port
-To: Felix Maurer <fmaurer@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Kees Cook <kees@kernel.org>,
- =?UTF-8?Q?=C5=81ukasz_Majewski?= <lukma@nabladev.com>,
- Fernando Fernandez Mancera <fmancera@suse.de>,
- Hangbin Liu <liuhangbin@gmail.com>, Jakub Acs <acsjakub@amazon.de>,
- Xiaoliang Yang <xiaoliang.yang_1@nxp.com>,
- MD Danish Anwar <danishanwar@ti.com>, Murali Karicheri
- <m-karicheri2@ti.com>, Jiri Pirko <jiri@resnulli.us>,
- linux-kernel@vger.kernel.org
-References: <20260714080640.149654-1-jiayuan.chen@linux.dev>
- <alYYhIPZBbMo5qMe@thinkpad>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-In-Reply-To: <alYYhIPZBbMo5qMe@thinkpad>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
+	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307430-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307431-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:fmaurer@redhat.com,m:edumazet@google.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kees@kernel.org,m:lukma@nabladev.com,m:fmancera@suse.de,m:liuhangbin@gmail.com,m:acsjakub@amazon.de,m:xiaoliang.yang_1@nxp.com,m:danishanwar@ti.com,m:m-karicheri2@ti.com,m:jiri@resnulli.us,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,redhat.com,nabladev.com,suse.de,gmail.com,amazon.de,nxp.com,ti.com,resnulli.us];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,verge.net.au,davemloft.net,google.com,redhat.com,netfilter.org,strlen.de,nwl.cc,vger.kernel.org,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,seu.edu.cn:email,sashiko.dev:url,ssi.bg:from_mime,ssi.bg:mid,ssi.bg:email,ssi.bg:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	FORGED_SENDER(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FORGED_RECIPIENTS(0.00)[m:zhaoyz24@mails.tsinghua.edu.cn,m:dsahern@kernel.org,m:idosch@nvidia.com,m:horms@verge.net.au,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:netdev@vger.kernel.org,m:lvs-devel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:stable@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[ssi.bg:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2F8B8753CF2
+X-Rspamd-Queue-Id: 0291E753D24
 
 
-On 7/14/26 7:07 PM, Felix Maurer wrote:
-> On Tue, Jul 14, 2026 at 04:06:36PM +0800, Jiayuan Chen wrote:
->> Our internal syzkaller reported this warning:
->>
->>    netdevsim netdevsim10 eth0: entered promiscuous mode
->>    netdevsim netdevsim10 eth1: entered promiscuous mode
->>    netdevsim netdevsim10 eth1 (unregistering): left promiscuous mode
->>    ------------[ cut here ]------------
->>    WARNING: drivers/net/netdevsim/netdev.c:1208 at nsim_destroy+0x276/0x6e0, CPU#3: 1/46
->>    Modules linked in:
->>    CPU: 3 UID: 0 PID: 46 Comm: kworker/u16:1 Not tainted 7.2.0-rc2+ #286 PREEMPT
->>    Hardware name: QEMU Ubuntu 24.04 PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
->>    Workqueue: netns cleanup_net
->>    RIP: 0010:nsim_destroy (drivers/net/netdevsim/netdev.c:1031 drivers/net/netdevsim/netdev.c:1201)
->>    RSP: 0018:ffffc90000337898 EFLAGS: 00010293
->>    RAX: 0000000000000001 RBX: ffff8881036c8b00 RCX: 0000000000000000
->>    RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
->>    RBP: ffffc900003378f0 R08: 0000000000000000 R09: 0000000000000000
->>    R10: ffffffffad4186a8 R11: ffffffffad41c3db R12: ffff8881036c9268
->>    R13: dffffc0000000000 R14: ffffed10206d9164 R15: 0000000000000001
->>    FS:  0000000000000000(0000) GS:ffff888160866000(0000) knlGS:0000000000000000
->>    CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>    CR2: 000055bcf1a2e0c4 CR3: 0000000105376003 CR4: 0000000000770ef0
->>    PKRU: 55555554
->>    Call Trace:
->>    <TASK>
->>    __nsim_dev_port_del (drivers/net/netdevsim/dev.c:1547)
->>    nsim_dev_reload_destroy (drivers/net/netdevsim/dev.c:1561 drivers/net/netdevsim/dev.c:1785)
->>    nsim_dev_reload_down (drivers/net/netdevsim/dev.c:1038)
->>    devlink_reload (net/devlink/dev.c:462)
->>    devlink_pernet_pre_exit (net/devlink/core.c:578)
->>    ops_undo_list (net/core/net_namespace.c:161 net/core/net_namespace.c:235)
->>    cleanup_net (net/core/net_namespace.c:706)
->>    process_one_work (kernel/workqueue.c:3322)
->>    worker_thread (kernel/workqueue.c:3405 kernel/workqueue.c:3486)
->>    kthread (kernel/kthread.c:436)
->>    ret_from_fork (arch/x86/kernel/process.c:158)
->>    ret_from_fork_asm (arch/x86/entry/entry_64.S:245)
->>    </TASK>
->>    ---[ end trace 0000000000000000 ]---
->>    netdevsim netdevsim10 eth0 (unregistering): left promiscuous mode
->>
->> vlan_vids_add_by_dev() is what passes the VID filter info down to the real
->> device. A virtual device does no filtering itself, so it has to push the
->> VIDs down to its slaves. HSR already does this correctly on the add side:
->> hsr_ndo_vlan_rx_add_vid() calls vlan_vid_add() on each slave.
->>
->> We just never clean the slaves up on delete. hsr_del_port() drops the port
->> and leaves the VIDs sitting on the slave, so the filter entries leak.
->> netdevsim keeps a bitmap of the VIDs it was told to filter and checks that
->> it is empty when the netdev goes away, which is what trips the warning
->> above.
->>
->> So do the cleanup in hsr_del_port(). We follow hsr_ndo_vlan_rx_add_vid()
->> here: it only pushes the VIDs to HSR_PT_SLAVE_A and HSR_PT_SLAVE_B, so the
->> del side only touches those two as well.
->>
->> Reproducer:
->> ip netns add ns0
->> ip netns exec ns0 sh -c 'echo "10 2" > /sys/bus/netdevsim/new_device'
->> ip netns exec ns0 ip link add hsr0 type hsr slave1 eth0 slave2 eth1
->> ip netns exec ns0 ip link add link hsr0 name hsr0.1 type vlan id 1
->> ip netns del ns0
-> Thank you for your patch! The explanation and the patch look very
-> similar to a fix that Eric posted a week ago [1]. Can you check if
-> Eric's patch also fixes you reproducer? And if it does, please add your
-> Tested-by and/or Reviewed-by to the thread?
->
-> Thanks,
->     Felix
->
->
-> [1]: https://lore.kernel.org/netdev/20260707082327.3238690-1-edumazet@google.com/
+	Hi Yizhou,
+
+On Mon, 13 Jul 2026, Yizhou Zhao wrote:
+
+> IPVS destination schedulers read the overload state from packet processing
+> paths, while connection accounting and destination updates can change it
+> concurrently. IP_VS_DEST_F_OVERLOAD currently shares dest->flags with
+> IP_VS_DEST_F_AVAILABLE, so plain read-modify-write operations on the two
+> independent states can race and lose either update.
+> 
+> KCSAN reports the race with the SH scheduler and an upper connection
+> threshold configured:
+> 
+>   BUG: KCSAN: data-race in __ip_vs_update_dest / ip_vs_sh_schedule
+> 
+> IP_VS_DEST_F_AVAILABLE is changed under service_mutex. Keep it in the
+> existing flags word, but move the overload state to a separate unsigned
+> long and access it with bitops. Use test_bit() in scheduler paths and
+> set_bit()/clear_bit() in ip_vs_dest_update_overload(). This serializes the
+> overload bit accesses and prevents updates to the available and overload
+> states from clobbering each other.
+> 
+> The destination flags are not exposed by the IPVS sockopt or netlink
+> interfaces, so move their definitions out of the UAPI header. Place the
+> new overload word next to weight, which keeps the existing flags,
+> conn_flags and weight offsets unchanged. On x86-64 this grows struct
+> ip_vs_dest from 472 to 480 bytes.
+> 
+> test_bit() does not add reader-side ordering. Schedulers can still observe
+> stale destination state, as they could before this change; this does not
+> provide a fresh cross-field snapshot.
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Cc: stable@vger.kernel.org
+> Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+> Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
+> Reported-by: Ao Wang <wangao@seu.edu.cn>
+> Reported-by: Xuewei Feng <fengxw06@126.com>
+> Reported-by: Qi Li <qli01@tsinghua.edu.cn>
+> Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
+> Assisted-by: Claude-Code:GLM-5.2
+> Suggested-by: Julian Anastasov <ja@ssi.bg>
+> Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+> ---
+>  include/net/ip_vs.h              | 8 ++++++++
+>  include/uapi/linux/ip_vs.h       | 6 ------
+>  net/netfilter/ipvs/ip_vs_conn.c  | 7 ++++---
+>  net/netfilter/ipvs/ip_vs_dh.c    | 4 ++--
+>  net/netfilter/ipvs/ip_vs_fo.c    | 2 +-
+>  net/netfilter/ipvs/ip_vs_lblc.c  | 4 ++--
+>  net/netfilter/ipvs/ip_vs_lblcr.c | 8 ++++----
+>  net/netfilter/ipvs/ip_vs_lc.c    | 2 +-
+>  net/netfilter/ipvs/ip_vs_mh.c    | 2 +-
+>  net/netfilter/ipvs/ip_vs_nq.c    | 2 +-
+>  net/netfilter/ipvs/ip_vs_ovf.c   | 2 +-
+>  net/netfilter/ipvs/ip_vs_rr.c    | 2 +-
+>  net/netfilter/ipvs/ip_vs_sed.c   | 4 ++--
+>  net/netfilter/ipvs/ip_vs_sh.c    | 2 +-
+>  net/netfilter/ipvs/ip_vs_twos.c  | 4 ++--
+>  net/netfilter/ipvs/ip_vs_wlc.c   | 4 ++--
+>  net/netfilter/ipvs/ip_vs_wrr.c   | 2 +-
+>  17 files changed, 34 insertions(+), 31 deletions(-)
+> 
+> diff --git a/include/net/ip_vs.h b/include/net/ip_vs.h
+> index 3fc864a320fb..5e8e55f82b04 100644
+> --- a/include/net/ip_vs.h
+> +++ b/include/net/ip_vs.h
+> @@ -36,6 +36,13 @@
+>  #define IP_VS_HDR_INVERSE	1
+>  #define IP_VS_HDR_ICMP		2
+>  
+> +/* Destination Server Flags */
+> +#define IP_VS_DEST_F_AVAILABLE	0x0001		/* server is available */
+> +
+> +enum {
+> +	IP_VS_DEST_FL_OVERLOAD,
+> +};
+> +
+>  /* conn_tab limits (as per Kconfig) */
+>  #define IP_VS_CONN_TAB_MIN_BITS	8
+>  #if BITS_PER_LONG > 32
+> @@ -976,6 +983,7 @@ struct ip_vs_dest {
+>  	volatile unsigned int	flags;		/* dest status flags */
+
+	Sashiko has some comments that we should fix somehow:
+
+https://sashiko.dev/#/patchset/cover.1783931964.git.zhaoyz24%40mails.tsinghua.edu.cn
+
+	One option is IP_VS_DEST_F_AVAILABLE to become
+IP_VS_DEST_CF_AVAILABLE (CF=Config Flag)
+
+>  	atomic_t		conn_flags;	/* flags to copy to conn */
+>  	atomic_t		weight;		/* server weight */
+> +	unsigned long		flags2;		/* dest status flags */
+
+	unsigned long		cfg_flags;
+
+	We then put IP_VS_DEST_CF_AVAILABLE in this new cache line
+that most of the schedulers will not read until dest is selected.
+DH even should not check the IP_VS_DEST_F_AVAILABLE flag,
+only lblc/lblcr should use this flag.
+
+	We can preserve IP_VS_DEST_F_OVERLOAD in 'flags',
+even we may not need to use bitops if we start to use
+spin_lock_bh(&dest->dst_lock), as this lock is already
+present in the dest structure. See below...
+
+>  	atomic_t		last_weight;	/* server latest weight */
+>  	__u16			tun_type;	/* tunnel type */
+>  	__be16			tun_port;	/* tunnel port */
+
+> diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_conn.c
+> index fa3fbd597f3f..2591f4e143f8 100644
+> --- a/net/netfilter/ipvs/ip_vs_conn.c
+> +++ b/net/netfilter/ipvs/ip_vs_conn.c
+> @@ -1006,7 +1006,7 @@ __always_inline void ip_vs_dest_update_overload(struct ip_vs_dest *dest)
+
+	We can add new arg 'bool locked'. Also, we will
+return false if caller should retry under lock.
+It will happen when we change IP_VS_DEST_F_OVERLOAD and
+require its changes to be synchronized with the
+thresholds and the number of connections.
+
+>  		goto unset;
+>  	conns = ip_vs_dest_totalconns(dest);
+>  	if (conns >= u) {
+> -		dest->flags |= IP_VS_DEST_F_OVERLOAD;
+> +		set_bit(IP_VS_DEST_FL_OVERLOAD, &dest->flags2);
 
 
-Thanks, It seems my patch is duplicated.
+	if (conns >= u) {
+		if (!locked)
+			return false;
+		dest->flags |= IP_VS_DEST_F_OVERLOAD;
+		return true;
+	}
+
+>  		return;
+>  	}
+>  	/* Low threshold defaults to 75% of upper threshold */
+> @@ -1015,7 +1015,8 @@ __always_inline void ip_vs_dest_update_overload(struct ip_vs_dest *dest)
+>  		return;
+>  
+>  unset:
+> -	dest->flags &= ~IP_VS_DEST_F_OVERLOAD;
+> +	if (test_bit(IP_VS_DEST_FL_OVERLOAD, &dest->flags2))
+> +		clear_bit(IP_VS_DEST_FL_OVERLOAD, &dest->flags2);
+
+	if (dest->flags & IP_VS_DEST_F_OVERLOAD) {
+		if (!locked)
+			return false;
+		dest->flags &= ~IP_VS_DEST_F_OVERLOAD;
+	}
+	return true;
+
+>  }
+>  
+>  /*
+> @@ -1174,7 +1175,7 @@ static inline void ip_vs_unbind_dest(struct ip_vs_conn *cp)
+>  		atomic_dec(&dest->persistconns);
+>  	}
+>  
+> -	if (dest->flags & IP_VS_DEST_F_OVERLOAD)
+> +	if (test_bit(IP_VS_DEST_FL_OVERLOAD, &dest->flags2))
+>  		ip_vs_dest_update_overload(dest);
+
+	if (dest->flags & IP_VS_DEST_F_OVERLOAD) {
+		if (!ip_vs_dest_update_overload(dest, false)) {
+			spin_lock_bh(&dest->dst_lock);
+			ip_vs_dest_update_overload(dest, true);
+			spin_unlock_bh(&dest->dst_lock);
+		}
+	}
+
+	In __ip_vs_update_dest() we will always use lock:
+
+		spin_lock_bh(&dest->dst_lock);
+		WRITE_ONCE(dest->u_threshold, udest->u_threshold);
+		WRITE_ONCE(dest->l_threshold, udest->l_threshold);
+		ip_vs_dest_update_overload(dest, true);
+		spin_unlock_bh(&dest->dst_lock);
+
+	The goal is to avoid the lock for the common case
+when flag does not change. What do you think?
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
 
 
