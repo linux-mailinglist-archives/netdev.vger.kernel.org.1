@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-307401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307402-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +/oXINL9VWoLxgAAu9opvQ
-	(envelope-from <netdev+bounces-307401-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:13:54 +0200
+	id l4UOH+H9VWoMxgAAu9opvQ
+	(envelope-from <netdev+bounces-307402-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:14:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF42F752B5A
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:13:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF913752B5E
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 11:14:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="mWFGx/eG";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307401-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307401-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=U2C2VGDp;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307402-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307402-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BC55A3024966
-	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:11:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A6ADB303E48A
+	for <lists+netdev@lfdr.de>; Tue, 14 Jul 2026 09:11:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEB0541B36C;
-	Tue, 14 Jul 2026 09:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F4DA43C05B;
+	Tue, 14 Jul 2026 09:11:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3DD232AAA0
-	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 09:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34F7F32AAA0
+	for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 09:11:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784020287; cv=none; b=DHWLG8kaiWJZpiqsMzEJpZ2UFa51IN4V+H0S50vK7K5ZEztjxl1RwHW0X4r1l0Vjx9gHZnZOdkZa4dJL9E49cQtbSF63+IFE+q5iRl3VrZof9LWW+Ubg4tNwJkmkqgYR8J1Z+W+eV4huaHFWEoQuiwi8dnCMP1qmpTZvjpUWY+c=
+	t=1784020298; cv=none; b=BW5uPzKQOr+3qaUQfYIWpLdnDUmeNYCW0yVj8QaXOfoqp8mbnw/TpWiS6aWEGa02qyajxqClHzWuzwnf9WQT/mfcJ5UWgc/tR1DwlME5FMQ63+YRNAt3/QLApwPInfPNDL5u05Km7cq6kVXOksLFMhcCVVYtaedn7a2kcSRRS38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784020287; c=relaxed/simple;
-	bh=hmqYnkqLMl5fodv6f58MXefjHkuvGk/CLmAhE37t90k=;
+	s=arc-20240116; t=1784020298; c=relaxed/simple;
+	bh=HPdAQlnMPdudq/CCxqExYCW4QQEZsFbd2zN+BYpyO4U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T0OKitooIaMy/iMyZB9mIvZqcgpr/D5q5WN3jvs7pUHq0u5geqzKMUZVkOQoH3CUTV/thRm7+pNCBN+0FjFgK3nkK1x11+atKE276iCsUXjELC+mzqlzDjjZMhIkhGEy8lxM/Qi09kn8l7K1h9kfxM51Kojw33CG52/OG316AHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mWFGx/eG; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84DC81F00A3A;
-	Tue, 14 Jul 2026 09:11:22 +0000 (UTC)
+	 MIME-Version; b=DspLFalTOeel0tz+bbt5+OgcByXa2fdqBdzRyY3pPO8RP06Sr/lwa9R/rmz8U+WJlzeLdyUdaNTr44JZT3ZrVx9fA8Z0JFlC6TANo6BjhH8c380HZ4ZDrWfEedBZjYb7U2Jbwt/eYikiuRyR18lFey0wwBIJ5/aI685VzBhRGqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U2C2VGDp; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EACE1F000E9;
+	Tue, 14 Jul 2026 09:11:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784020286;
-	bh=IINPYP0zFv5P6kZBIYvDO4JsKAiXHzz0lpzI0/NUFlk=;
+	s=k20260515; t=1784020296;
+	bh=8GSEN31dIhMc8TnKPz0+iVPDekCaH2QphQJRQeIJNBk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=mWFGx/eGkGLANtU2vK2cWxFT9ebPV2xAH+gh/2CQ6OAnxpmqSMgnIzL9yipEZ+Snr
-	 TgJ686HUE89CMW3Y2lTfRoa30rKXYCK946ZkVKkwbQfuDF0x579EvCkwyNMjNmPLzV
-	 ZzXbM36yVSay8aNZUBxUPfr7st9vmkZl1GmADLT92AdEb+VxET9PLKAAeSrm0ub943
-	 5UvrT1Xc1ekFejy8WpuaQv4oIJK9FfehqINsHx9X76VgCVnuUl0k1u3HWcJeaehVt6
-	 cTZWM0TMH1qUaZvECobHOg1ANRVepZ/UKd3czWZHCxCsNJWvS0pIrVtJdcBGuGgUh3
-	 vu/Wd3VKvdJgA==
+	b=U2C2VGDpNPl548J9rMQXG824o/QQRu/NYojatKRqM4qbRYFgVVdesLYiSSHPSBzAI
+	 klKKdTfFXgxIFn+VHhENvYDhExzUixcgTq6TNYuCn7/uwOn626uz3Y/DKbpicRAxfK
+	 2meJQ/E10YJ69fK0B6+OMbgDIGfRpvOz9NZkMmVVAN+6qXrRzMxnpVchJ1RS51Ts1W
+	 H4tSX4BfcyFiIkObxSByxP4qWe1VhB5OlY3UIcJr6WT2pBKm3j/9s53VSWB1EHZYiK
+	 uCGyeFpnKu+uyENWnEuhojeDmBaVN4w1qktEARMWXDwYv/RepJWlfc6FCb4X0+o9Ds
+	 l8ZTxIyLb1g9w==
 From: Simon Horman <horms@kernel.org>
 To: jiawenwu@trustnetic.com
 Cc: Simon Horman <horms@kernel.org>,
@@ -69,12 +69,12 @@ Cc: Simon Horman <horms@kernel.org>,
 	weirongguang@kylinos.cn,
 	larysa.zaremba@intel.com,
 	fabio.baltieri@gmail.com
-Subject: Re: [PATCH net-next v10 4/5] net: wangxun: implement soft quiesce for PCIe error recovery
-Date: Tue, 14 Jul 2026 10:11:13 +0100
-Message-ID: <20260714091113.1815787-1-horms@kernel.org>
+Subject: Re: [PATCH net-next v10 5/5] net: wangxun: add pcie error handler
+Date: Tue, 14 Jul 2026 10:11:29 +0100
+Message-ID: <20260714091129.1815871-1-horms@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260707061455.39564-5-jiawenwu@trustnetic.com>
-References: <20260707061455.39564-5-jiawenwu@trustnetic.com>
+In-Reply-To: <20260707061455.39564-6-jiawenwu@trustnetic.com>
+References: <20260707061455.39564-6-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,11 +91,11 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307401-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307402-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:jiawenwu@trustnetic.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:mengyuanlou@net-swift.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:linux@armlinux.org.uk,m:aleksandr.loktionov@intel.com,m:jacob.e.keller@intel.com,m:michal.swiatkowski@linux.intel.com,m:kees@kernel.org,m:joe@dama.to,m:leitao@debian.org,m:shaojijie@huawei.com,m:u.kleine-koenig@baylibre.com,m:weirongguang@kylinos.cn,m:larysa.zaremba@intel.com,m:fabio.baltieri@gmail.com,m:andrew@lunn.ch,m:fabiobaltieri@gmail.com,s:lists@lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[22];
@@ -115,103 +115,129 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,sashiko.dev:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CF42F752B5A
+X-Rspamd-Queue-Id: BF913752B5E
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 Full review at: https://sashiko.dev
 ---
---- Patch [4]: [PATCH net-next v10 4/5] net: wangxun: implement soft quiesce for PCIe error recovery ---
-commit 1b8a0e5e722ffb89c8fe24492e80dca44f3410f2
+--- Patch [5]: [PATCH net-next v10 5/5] net: wangxun: add pcie error handler ---
+commit 91baa4e77d07ab6772569a7d37ed86cfda625c00
 Author: Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: net: wangxun: add pcie error handler
 
-net: wangxun: implement soft quiesce for PCIe error recovery
+This commit adds PCIe error handling support (AER) to the wangxun drivers
+(ngbe and txgbe). It detects hardware errors, attempts to soft quiesce,
+and registers standard PCI error handler callbacks.
 
-This commit introduces a soft quiesce path for PCIe error recovery. It adds
-WX_STATE_DOWN and WX_STATE_RESETTING state checks to subtasks to block
-execution, explicitly avoiding a cancellation of the service task to speed
-up recovery.
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.c b/drivers/net/ethernet/wangxun/libwx/wx_err.c
+> index ee27f96735dc7..0cb99e456a1c9 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/wx_err.c
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_err.c
 
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-> index c8a4822d38194..a65312c8078fa 100644
-> --- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-> +++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
 [ ... ]
-> @@ -3383,5 +3383,23 @@ void wx_service_timer(struct timer_list *t)
->  }
->  EXPORT_SYMBOL(wx_service_timer);
->  
-> +void wx_soft_quiesce(struct wx *wx)
+
+> +static void wx_io_resume(struct pci_dev *pdev)
 > +{
-> +	if (!netif_running(wx->netdev) ||
-> +	    test_and_set_bit(WX_STATE_DOWN, wx->state))
-> +		return;
+> +	struct wx *wx = pci_get_drvdata(pdev);
+> +	struct net_device *netdev;
+> +	int err;
 > +
-> +	pci_clear_master(wx->pdev);
-> +	netif_tx_stop_all_queues(wx->netdev);
-> +	netif_carrier_off(wx->netdev);
-> +	netif_tx_disable(wx->netdev);
-> +	wx_napi_disable_all(wx);
-> +	wx_ptp_quiesce(wx);
-> +
-> +	clear_bit(WX_FLAG_NEED_PF_RESET, wx->flags);
-> +	timer_delete_sync(&wx->service_timer);
+> +	netdev = wx->netdev;
+> +	rtnl_lock();
+> +	if (netif_running(netdev)) {
+> +		err = netdev->netdev_ops->ndo_open(netdev);
 
 [Severity: High]
-The commit message notes the service task is deliberately not cancelled here
-to avoid delaying PCIe error recovery. However, does omitting
-cancel_work_sync(&wx->service_task) open a race window with the subtasks
-that rely on the WX_STATE_DOWN flag?
+Does this sequence risk corrupting the hw_tc_lock seqlock?
 
-> +}
-> +EXPORT_SYMBOL(wx_soft_quiesce);
+During AER recovery, wx_io_slot_reset() calls down_suspend(), which bypasses
+wx_ptp_stop(). This leaves the PTP clock registered and potentially in use by
+userspace.
+
+When wx_io_resume() then calls ndo_open(), this triggers txgbe_up() or
+ngbe_up(), which in turn calls wx_ptp_init(). Since wx_ptp_init()
+unconditionally calls seqlock_init(&wx->hw_tc_lock), won't this corrupt the
+lock if userspace is actively issuing PTP ioctls?
+
+> +		if (err) {
+> +			wx_err(wx, "Failed to open netdev after reset\n");
+
+[ ... ]
+
+> diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+> index 92895f5035118..56d4b63387fd6 100644
+> --- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+> +++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+
+[ ... ]
+
+> @@ -413,6 +428,9 @@ static void ngbe_disable_device(struct wx *wx)
+>  
+>  static void ngbe_reset(struct wx *wx)
+>  {
+> +	if (test_bit(WX_FLAG_NEED_PCIE_RECOVERY, wx->flags))
+> +		return;
+> +
+>  	wx_flush_sw_mac_table(wx);
+
+[Severity: High]
+Is the hardware properly reinitialized here after an AER slot reset?
+
+In wx_io_slot_reset(), the hardware needs to be restarted from scratch.
+While txgbe_reset() calls txgbe_reset_hw(), ngbe_reset() only flushes the
+software MAC tables and skips calling ngbe_reset_hw(). 
+
+Because this patch registers wx_err_handler for the ngbe driver, won't this
+leave the hardware uninitialized and the interface broken after a PCIe slot
+reset?
+
+[ ... ]
+
+> @@ -529,12 +548,16 @@ static int ngbe_close(struct net_device *netdev)
+>  {
+>  	struct wx *wx = netdev_priv(netdev);
+>  
+> +	if (test_bit(WX_STATE_RES_FREED, wx->state))
+> +		goto out;
+> +
+>  	wx_ptp_stop(wx);
+
+[Severity: High]
+Does this early return cause a use-after-free for the PTP clock?
+
+If a PCI error occurs, down_suspend() sets WX_STATE_RES_FREED but
+intentionally skips wx_ptp_stop(). If the interface is subsequently closed or
+unregistered, ngbe_close() will return early here and never call
+wx_ptp_stop().
+
+Because the PTP clock device is never unregistered, it remains exposed to
+userspace after the driver's memory is freed. Can this lead to a
+use-after-free if userspace interacts with the clock later?
+
+[ ... ]
 
 > diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-> index a8773712cff82..a7bde03a98feb 100644
+> index a7bde03a98feb..d85ee83192e4f 100644
 > --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
 > +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+
 [ ... ]
-> @@ -94,6 +94,10 @@ static void txgbe_module_detection_subtask(struct wx *wx)
+
+> @@ -530,12 +549,16 @@ static int txgbe_close(struct net_device *netdev)
 >  {
->  	int err;
+>  	struct wx *wx = netdev_priv(netdev);
 >  
-> +	if (test_bit(WX_STATE_DOWN, wx->state) ||
-> +	    test_bit(WX_STATE_RESETTING, wx->state))
-> +		return;
+> +	if (test_bit(WX_STATE_RES_FREED, wx->state))
+> +		goto out;
 > +
+>  	wx_ptp_stop(wx);
 
 [Severity: High]
-Does this state check adequately protect against concurrent MMIO access
-during a PCIe reset?
-
-If the task passes this check, it subsequently sleeps for 200ms:
-
-txgbe_main.c:txgbe_module_detection_subtask() {
-    ...
-    if (!test_and_clear_bit(WX_FLAG_NEED_MODULE_RESET, wx->flags))
-        return;
-
-    /* wait for SFF module ready */
-    msleep(200);
-
-    err = txgbe_identify_module(wx);
-    ...
-}
-
-If wx_soft_quiesce() runs on another CPU during this msleep(), it will set
-WX_STATE_DOWN and begin a hardware reset. 
-
-When the task wakes up from the sleep, will it call txgbe_identify_module()
-and perform MMIO reads (such as rd32(wx, WX_GPIO_EXT)) while the device is
-in reset?
-
-Could this time-of-check to time-of-use race lead to Master Aborts or
-fatal PCIe errors during AER recovery?
-
->  	if (!test_and_clear_bit(WX_FLAG_NEED_MODULE_RESET, wx->flags))
->  		return;
+Similar to ngbe_close() above, does this early return skip wx_ptp_stop() and
+lead to a use-after-free if the txgbe device is closed after an AER suspend?
 
