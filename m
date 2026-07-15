@@ -1,200 +1,156 @@
-Return-Path: <netdev+bounces-307680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307681-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 0ekQGP41V2qoHQEAu9opvQ
-	(envelope-from <netdev+bounces-307680-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 09:25:50 +0200
+	id 01fhHWs3V2r+HQEAu9opvQ
+	(envelope-from <netdev+bounces-307681-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 09:31:55 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CADF775B68E
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 09:25:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DA44C75B72E
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 09:31:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=LuPuuhcy;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307680-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307680-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307681-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307681-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 84496300D154
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 07:25:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 551EE30157C1
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 07:31:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD2E32931D1;
-	Wed, 15 Jul 2026 07:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BFBC331EB6;
+	Wed, 15 Jul 2026 07:30:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FBEA3C1F4F
-	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 07:25:28 +0000 (UTC)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.78.106])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86771312826;
+	Wed, 15 Jul 2026 07:30:46 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784100336; cv=none; b=e/P4gaijG2NqOYYYKEPyLeul1kyssuv3b4F2qdbTDm2tvUWQ4T+iMyHxL0mhzCzdGMEwuV/UN1N5R+tVSiRFGVlcKgOuxkJvb1EHTzHTRfaC4rsOqE5PD1Y0a6qKFqu5FGx8vXVaoffnnVYSfsdqzZAheUyY6Ljz+IFfthY05S8=
+	t=1784100657; cv=none; b=s4rmlokvucUyIZibsGyDiY+FMQtzmZ8OfkDeJAFU7vYVqAe+W/1a3xflH6ogi+Za9ivzsjjI+MK1U4qwfYKgCfhxLroR2xbiIuYRuJdXODMEHxSJtVQ7yRnGSy0zFNBAU+ZrjzTlgkaKGbkO7GtGDEfP8RQBqgiW7wfH/8N+K4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784100336; c=relaxed/simple;
-	bh=+xNeKad0my5Lxbp051jpwUdn5q02n5i0vkLtt1z+Qw8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=umfXILrwJlkI3QtQM7RF3v4pZUmFWnjEgHhXIru65mGZC7lp/ll3UKq2muLN212s2juF4f4RoWkynKdFNcUyr5nE7zX4G8aqUixTKJaLZ/ciuL0TTS/pXNno/05XDv9Chc3nRLRRFhdVdlUD4oJkTAwcfPb1sBHWsE38OJfD/AA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LuPuuhcy; arc=none smtp.client-ip=209.85.210.180
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-8487214ad2bso2584910b3a.1
-        for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 00:25:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784100325; x=1784705125; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=GGt2cr+LeB3UkXqtVqaVVeyWXI4uRWYJcILUaXR46qQ=;
-        b=LuPuuhcynMq3MywZoXProRlXalVJEwi/ll9aIT9TNS/BF9r+m1sfmGhFlZbSzxuYrv
-         RyzKz1iNvhjNIAVsCHfxIVoloU8oOHRFoWUSlnX1dJ965vFTwLgD9GtL4Ut3PTcHnpKQ
-         Vonq5G+RxRxeK/z6yPaqyPsJmvSmFx9rGGWkb+1YIMU3bj+FWuSgGKA10urkOtSmov57
-         KvhFTu9jmp3mxnYpFzbfOFSpSeaSefKc5roaLYrmf2/eP4cBkaQziKifazzgpcUbxamf
-         ApZh0ZA8cDt2H+KolPQ4rz0Q0DiOZnseRdeL8XUHAnzJxCpcs9WE06v4wa+5vLwC89iI
-         5sfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784100325; x=1784705125;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=GGt2cr+LeB3UkXqtVqaVVeyWXI4uRWYJcILUaXR46qQ=;
-        b=JeA/8CcCE7U9R5NH4qP9QFmRD3Od1EgXeY5M0la8wjWtXibaAZe/D938AGjhjOIhGj
-         lsQRIAui3an1DnB8UGkjOJ1HhWii848EjV2Rx+Nya+kbP+iCh7dk1JyGzLWhwIXtfW/2
-         XJPlb7fGy9iB7kM3xRFGkfGA96lo1JGDoQ0K3+NtSLw4rtDeehHvAzgMhG6hf08PkJuZ
-         in0EbBqZku+ZROXcQxpXzVLMKdDDMeBozZept8kNbX6u8mvzyijlaTJQCFpRV3Tral//
-         yIJyE2bGBvUs5jBJ4MQXa/8cujVbYf7JPKvVWI/GxAr65Horlw7c3YS7oostxpKplu/h
-         Nyqw==
-X-Forwarded-Encrypted: i=1; AHgh+RpGt6cC00v9Uo7Zk87WRpEGxkI/yhqnXII8gY9BitE9pBYT9NjSS3I80BQaI5bM9iDL6xGsbnc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx992e/g3qa0xlWp/wNuLnt9tQYfXLsENY2kB7ATkAFV46/YWNj
-	yJAu/dbREtTOBEmAOVS2DeX+eYW0x9ri8NYMGJwKUW/8y3wgRslGAKQ=
-X-Gm-Gg: AfdE7ckVW4b7gMXO1RPA3B1c5p89yDAxwC6UMffAOiamF9pI7uJnQTTa83a+27MWHzR
-	fZAFCaRYReI9fypmz0RORO+Go8fEnq7ebNidNWzKuCb6YbUrPnK0POiPxTfM4CK9/ddMZl9RPc2
-	hYh5IGA1X90VSnSHUp3J3is/CbuawQesaxW82EhCCF+n/e5LWFTgOu7IHfJ4+2ijPzoF5kFMOqM
-	ZNs3sE9wMVaj+ejtSdLjXioBvRaI/30Ay5Jq4Lk2rOkI05iTEN7zZYo6hq9XJ8fSN1AJnVQYMpm
-	fGf9ghMuruZzgFgDU/t9zRpznNPGOXNu6bGeoY2U63GzoXL6WVGWJhnybNJ5oQT6fzwi1nF+8an
-	7lkubmvYRLaov3LNUL9RGG13GSki7UEfbE83DXZjQzDyBDpcPnx61uLnY2E0HXPheAuAWE9x+d0
-	QvwY5gCaV8qPjnvV81TswDdHE5HvBMwvjqUkdKaYcGx1dNiijif8s7Qu2TrTHLDbXtVzQrEtDdj
-	ImQgRVXKLMVkKk68AlLBhnppfdzookSn01kLicON9WzeR84WiRq0aLqGn8I
-X-Received: by 2002:a05:6a00:3d4b:b0:847:8bf0:b82 with SMTP id d2e1a72fcca58-84889758b03mr15624999b3a.60.1784100325483;
-        Wed, 15 Jul 2026 00:25:25 -0700 (PDT)
-Received: from localhost.localdomain ([14.5.152.27])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ca5afbc1363sm10759807a12.8.2026.07.15.00.25.21
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 15 Jul 2026 00:25:24 -0700 (PDT)
-From: Myeonghun Pak <mhun512@gmail.com>
-To: Jeremy Kerr <jk@codeconstruct.com.au>,
-	Matt Johnston <matt@codeconstruct.com.au>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Myeonghun Pak <mhun512@gmail.com>,
-	Ijae Kim <ae878000@gmail.com>
-Subject: [PATCH net v2] net: mctp i3c: clean up notifier and buses if driver register fails
-Date: Wed, 15 Jul 2026 16:25:17 +0900
-Message-Id: <20260715072517.13216-1-mhun512@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1784100657; c=relaxed/simple;
+	bh=rL8hLMujvacVYSA7witLeIejqtHG7AcgFZld+ZY6lZA=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=GlDlJjHlcnGtTqkAc6PdmMP4ArUBGtz6qAFpBr6m3RM6pq4Yy+i+Lo4T3cuFd3D/DpnZFVNdCgp4+wPYvT5NMK0RLUbSaDCVqneJf6UnhBu4SiPzSBdP9PBNgz5p4stU6vXc0gSG706yILa+cx6MLJv3fBQKCCLJ0LLHIMYZAkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=13.76.78.106
+Received: from zju.edu.cn (unknown [10.190.161.1])
+	by mtasvr (Coremail) with SMTP id _____wA3RhQXN1dqdhRUAA--.4770S3;
+	Wed, 15 Jul 2026 15:30:32 +0800 (CST)
+Received: from smtpclient.apple (unknown [10.190.161.1])
+	by mail-app4 (Coremail) with SMTP id zi_KCgCn2TATN1dqaLtRAg--.7181S2;
+	Wed, 15 Jul 2026 15:30:28 +0800 (CST)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.600.62\))
+Subject: Re: [PATCH net] net: hip04: fix RX buffer leak on build_skb failure
+From: Fan Wu <12321260@zju.edu.cn>
+In-Reply-To: <a361aa28-7f55-4476-9072-aa392a34b735@intel.com>
+Date: Wed, 15 Jul 2026 15:30:17 +0800
+Cc: Fan Wu <fanwu01@zju.edu.cn>,
+ netdev@vger.kernel.org,
+ przemyslaw.kitszel@intel.com,
+ Simon Horman <horms@kernel.org>,
+ shenjian15@huawei.com,
+ salil.mehta@huawei.com,
+ dingtianhong@huawei.com,
+ andrew+netdev@lunn.ch,
+ davem@davemloft.net,
+ edumazet@google.com,
+ kuba@kernel.org,
+ pabeni@redhat.com,
+ linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <190A7669-E0EC-4257-B65E-817FFA1ACCDC@zju.edu.cn>
+References: <20260712142729.2057636-1-fanwu01@zju.edu.cn>
+ <a361aa28-7f55-4476-9072-aa392a34b735@intel.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+X-Mailer: Apple Mail (2.3774.600.62)
+X-CM-TRANSID:zi_KCgCn2TATN1dqaLtRAg--.7181S2
+X-CM-SenderInfo: qrstjiaswqq6lmxovvfxof0/
+X-CM-DELIVERINFO: =?B?dTAZ5wXKKxbFmtjJiESix3B1w3vZ3A9ovKVTomAyoQazvoRs/NHSP8GI2EvgeEEW7R
+	sfnXz+g1OQfMo27QHy5TwQyZzFg6QqpdDXDgMm1kEV24G8cSZoMjKBt5ZSGVWwqOiPFB+t
+	uHd4o4L3Eo6XtrIyZJQ=
+X-Coremail-Antispam: 1Uk129KBj9xXoW7XrWfGF15Ww4UJw1fWr1fXwc_yoWkGFX_u3
+	40qryUJ34kCFn7Awn5KF43AFZ7u3W09FyrZrykKwsxt348JFs8ur4vk340yrZrKw4Yyrn8
+	Cryvva4a9r13uosvyTuYvTs0mTUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbDxYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	W8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6rxl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6x
+	kI12xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v2
+	6r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2
+	Ij64vIr41lF7xvr2IYc2Ij64vIr40E4x8a64kEw24lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l
+	42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJV
+	WUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAK
+	I48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F
+	4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY
+	6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU7gAwDUUUU
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307680-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[mhun512@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jk@codeconstruct.com.au,m:matt@codeconstruct.com.au,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:mhun512@gmail.com,m:ae878000@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307681-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[zju.edu.cn];
+	FORGED_RECIPIENTS(0.00)[m:fanwu01@zju.edu.cn,m:netdev@vger.kernel.org,m:przemyslaw.kitszel@intel.com,m:horms@kernel.org,m:shenjian15@huawei.com,m:salil.mehta@huawei.com,m:dingtianhong@huawei.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:jacob.e.keller@intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[12321260@zju.edu.cn,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mhun512@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[12321260@zju.edu.cn,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	APPLE_MAILER_COMMON(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CADF775B68E
+X-Rspamd-Queue-Id: DA44C75B72E
 
-mctp_i3c_mod_init() registers the I3C bus notifier and then walks the
-existing buses with i3c_for_each_bus_locked(mctp_i3c_bus_add_new, NULL)
-before registering the I3C device driver.  If i3c_driver_register()
-fails, the function returns the error directly, leaving the notifier
-registered and every mctp_i3c_bus object created for the existing buses
-allocated.  The notifier is left pointing into the module that failed to
-load and the bus list is leaked.
+Hi Jacob,
 
-Mirror the module exit path on this failure: unregister the notifier and
-tear down the buses that were added before returning the error.
+Thanks for the review. I agree this is a rare allocation-failure path.
 
-This issue was identified during our ongoing static-analysis research while
-reviewing kernel code.
+The leak is nevertheless deterministic from the ownership contract and
+the driver's control flow. __build_skb() documents that, on failure, it
+returns NULL without freeing the caller-provided data.
 
-Fixes: c8755b29b58e ("mctp i3c: MCTP I3C driver")
-Co-developed-by: Ijae Kim <ae878000@gmail.com>
-Signed-off-by: Ijae Kim <ae878000@gmail.com>
-Signed-off-by: Myeonghun Pak <mhun512@gmail.com>
----
-Changes in v2:
-- Remove the unmatched i3c_driver_unregister() from the notifier
-  registration failure path, as suggested by Jeremy.
-- Add Simon Horman to Cc.
+hip04_rx_poll() currently jumps to refill before dma_unmap_single().
+Refill then replaces rx_buf[rx_head] and rx_phys[rx_head], so the old
+fragment and its streaming DMA mapping are no longer reachable. The
+stop and free-ring paths only operate on entries still referenced by
+those arrays.
 
- drivers/net/mctp/mctp-i3c.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+The fix leaves the slot, descriptor, rx_head, and rx_cnt_remaining
+unchanged, and returns budget. This tells NAPI that RX work remains
+outstanding and retries build_skb() using the same buffer. The additional
+skb_free_frag() handles the separate case where a replacement fragment
+was allocated but dma_map_single() failed before it was installed.
 
-diff --git a/drivers/net/mctp/mctp-i3c.c b/drivers/net/mctp/mctp-i3c.c
-index 6d2bbae747..88d9e36cd4 100644
---- a/drivers/net/mctp/mctp-i3c.c
-+++ b/drivers/net/mctp/mctp-i3c.c
-@@ -731,18 +731,21 @@ static __init int mctp_i3c_mod_init(void)
- 	int rc;
- 
- 	rc = i3c_register_notifier(&mctp_i3c_notifier);
--	if (rc < 0) {
--		i3c_driver_unregister(&mctp_i3c_driver);
-+	if (rc < 0)
- 		return rc;
--	}
- 
- 	i3c_for_each_bus_locked(mctp_i3c_bus_add_new, NULL);
- 
- 	rc = i3c_driver_register(&mctp_i3c_driver);
- 	if (rc < 0)
--		return rc;
-+		goto err_unregister_notifier;
+I hope this clarifies why the failure path is a deterministic leak even
+though I do not have a dynamic reproduction on HIP04 hardware.
 
- 	return 0;
-+
-+err_unregister_notifier:
-+	i3c_unregister_notifier(&mctp_i3c_notifier);
-+	mctp_i3c_bus_remove_all();
-+	return rc;
- }
+Thanks,
+Fan
 
- static __exit void mctp_i3c_mod_exit(void)
---
-2.53.0
 
