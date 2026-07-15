@@ -1,196 +1,258 @@
-Return-Path: <netdev+bounces-307676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307677-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id iI5lCj81V2qNHQEAu9opvQ
-	(envelope-from <netdev+bounces-307676-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 09:22:39 +0200
+	id C41MJMs1V2qbHQEAu9opvQ
+	(envelope-from <netdev+bounces-307677-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 09:24:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 697BE75B655
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 09:22:38 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D51A575B672
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 09:24:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=hjikmKGu;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307676-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307676-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=marvell.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b=F9+1denp;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307677-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307677-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 457EC3029E76
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 07:21:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D91C730062F4
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 07:24:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E9503C2788;
-	Wed, 15 Jul 2026 07:21:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F3953C3457;
+	Wed, 15 Jul 2026 07:24:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63A63C10AD;
-	Wed, 15 Jul 2026 07:21:16 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784100081; cv=none; b=JpOxQmSw4D5HENIR1Tkvf2caC9csIS68MazOntbN+mbz6orUxR3I8zgoxMVrNerk3ATUcgRaF9ABZlGOccC6bKLI8Q7e/hUir9zllhbPxx8o4euy8rgD11JYo5+qeAJ9FoyT/2Lb1uRDZikvkfeP1WT5kNWqqDsQDfMWA3Fjh3o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784100081; c=relaxed/simple;
-	bh=jTGdG+EAJACxYYJsgC3JAQaXCtp3vUY2N6D6hZSnDyA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eZqL4RYppDJchzKlUud7yXaDy1Zj72Dpd14GvcsEwB7cUvkBGDc0jEsFSF/aRsRCJTGrjez7vrb8rOuPZjgqbitubZE/0GcZJJcfmdKIP1QmoBuC91zSLlyVhss/IwCK3eDPs6L6TyZPJT/5K0jpogW96CgnyxAFUw7Jx126UOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=hjikmKGu; arc=none smtp.client-ip=67.231.156.173
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66F3mCq31918373;
-	Wed, 15 Jul 2026 00:20:51 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=20982SUSx9yGDSIR6xkSnuV
-	1AXcg0T/sUg7crxYKTl4=; b=hjikmKGu3ZaCmACr9+9UMQCNhoQ5r69FFac76o+
-	Pw7udUlhATdrd/UpCbcQo1pJtaPr2IUO1Qr7eIlcrL6hIMKSxZeNUKg7bl1o5Ftz
-	E6H6gUsC/VM3hcT3KzF3RVpx+ZWgHfkTqQKK4PnOrbsL6IE/f17/pRhbCQm1eDLw
-	ukfULljVkdKesMIEVuDzLXccmJLaorJX/18TW2vYvWhxCKZtPQDIOLGrYXBAxtN/
-	NKiLVal1Pm/xcC+wMACUYkYdoOiu1xcKS8q9zcp0elhy+vZmxflCtiV7p2VoEtTG
-	vYJB7whsoClgE40cDQzWoDTWdeBerAqJ04swWZdfBC0KRnQ==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4fdpw4awes-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Jul 2026 00:20:51 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C263C1F59;
+	Wed, 15 Jul 2026 07:24:44 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784100293; cv=fail; b=EBTcQIIuvN4OOArhnlM6ZEAWpb+NH88xOT9JC3PWv1oHafg441Uxz/w41ZikBM2T+9qPFiHvh0PPckVSqqB6LsG5Z74Pmfyo+wSmA2UCCOtNdq7QkYWc9/gOejD/GO0zIlVOOUgQMlkKgbYGKGMZ6ap8mXSypyF8wECM1ZEFZ1c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784100293; c=relaxed/simple;
+	bh=/yR0dnfq/ZwhCZwff0tvSR2p71cYWqGpESNfFcjWfpk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=nT1rAZxTRs5B1JlZNw0nfmLib2gi+W6638GMQwKrvUilvKfzuF3AnMKRbXmahLxq+j221SqjC5QfPOwle3Kn4ONH4kwFNq/Zi0iTv7HB3+08mEKnURbJ2q4b03ItGCzF5yxYmUesOO/uN0e5Di89gulZXTJPLyWN2ZMHhGrKc6Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F9+1denp; arc=fail smtp.client-ip=198.175.65.12
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1784100286; x=1815636286;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=/yR0dnfq/ZwhCZwff0tvSR2p71cYWqGpESNfFcjWfpk=;
+  b=F9+1denpITZfIwivPaNa5q3LXpln8JOzkPnqMwIuhYiEpmI0tsGqK6n+
+   g05VMu/w41shS54LKURYa8SNt5vUM9xDPv24PXjH2X+4eOWKR/HbDfyc6
+   nff/QbHjj2YOGvcZOtKXz7k3Uohx+G3kv1Ndp2pxczDeBr7trbTmfn2z0
+   ns4Q2qw1Nf2xkcxyRRP8APoAUb2Cr/bYVLm/Gr3aebTLZ6q38w/ChytaC
+   JwxXRYk+gb9bqitUT6P5Gg0UQ+SnA/kEpbMrE8XPzOfWXormnJ6PO561N
+   e4MrQxyHdfq7x+eWVGeqTNP6B5lKnFuaxPy26BqZQgytVlDTga4HtGFA/
+   A==;
+X-CSE-ConnectionGUID: ukQbu6HyT6e962aD7vG/0w==
+X-CSE-MsgGUID: r7VpkI+RQLWIDl2cnEAB0g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11847"; a="96242796"
+X-IronPort-AV: E=Sophos;i="6.25,165,1779174000"; 
+   d="scan'208";a="96242796"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2026 00:24:40 -0700
+X-CSE-ConnectionGUID: QAF8CBFYSUy6PhAMk4CO7Q==
+X-CSE-MsgGUID: HtvFJpk1T/ym/HQ2F3KP7g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,165,1779174000"; 
+   d="scan'208";a="256738606"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2026 00:24:41 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 15 Jul 2026 00:20:50 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Wed, 15 Jul 2026 00:20:50 -0700
-Received: from kernel-ep2.caveonetworks.com (unknown [10.29.36.53])
-	by maili.marvell.com (Postfix) with ESMTP id DABBF3F7044;
-	Wed, 15 Jul 2026 00:20:45 -0700 (PDT)
-From: <nshettyj@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Satheesh Paul A <psatheesh@marvell.com>,
-        Nitin Shetty J
-	<nshettyj@marvell.com>,
-        Sunil Goutham <sgoutham@marvell.com>,
-        "Ratheesh
- Kannoth" <rkannoth@marvell.com>,
-        Geetha sowjanya <gakula@marvell.com>,
-        Subbaraya Sundeep <sbhatta@marvell.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] octeontx2-af: add support for custom L2 header
-Date: Wed, 15 Jul 2026 12:50:34 +0530
-Message-ID: <20260715072035.617544-1-nshettyj@marvell.com>
-X-Mailer: git-send-email 2.48.1
+ 15.2.2562.43; Wed, 15 Jul 2026 00:24:39 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43 via Frontend Transport; Wed, 15 Jul 2026 00:24:39 -0700
+Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.39) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Wed, 15 Jul 2026 00:24:38 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jtGsLe/EC/PPCRkb8/rJv6FvZ7wGNJAI050ap4xENYf1ysCB+hJDBRaClZXhp8pw6ulWMjq79z0wEv5DrgKvXUgL4crk93Zf1iNKt+IesibE+D7eqvM9ftazWgFvtGksKOFgDqh/TWRunwyiPfVTiKY0TfIhMe1XPbGZdYz/jDDTU1Me1ewM4LkR1ja/lfJ5XsQC3o+MApCzvp+J9NBhVarhR41KZTTxaT0sLU+vzod3I19vfC0UrmGPSeR1WCpFEh29aoT8fGUQgKEA2mWnYA98y10QBvYrTzcvUrIhxw99cOqkwJdjvA3+yxsG7/HQX+sbPRZKsNuGWIaz5p8yzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1ctq+pAKQMMmuGeo4NLb3z6sWuILwVZo5w3yvJvRuas=;
+ b=INkUuJ/uzxqad1K7zU41G3J+Uo5Ty6DMPtxCNJYmKTMsTWzoA9REbmMLGy20ZfgYrpG+KoZPnlvWQ6jHbrtVWF51S7TzJYH0RNtyr5PpnpB08BaRJTcpUITpHuQYO9/fFFTy2dMfB5v1nMhDxtKC9k3Y5DmeaGSS2X2hQdR2cAkvSAaH01m2rCmMgPHdnZvOxCPHhj+Ir2mP74IMq726mnL8c77+FWI3DAzwLMg6Yrnxsdilg/XieBWsMlpcGyUv+XWKKqze5rB0xKTPXdUlWudEDS4F7MUDZAz0CCY9nJV0wde417EjNHTCRvwGqKtOOw5Xsu9ZzeHnwRrb5friUg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB5902.namprd11.prod.outlook.com (2603:10b6:510:14d::19)
+ by IA4PR11MB9442.namprd11.prod.outlook.com (2603:10b6:208:55f::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.202.18; Wed, 15 Jul
+ 2026 07:24:31 +0000
+Received: from PH0PR11MB5902.namprd11.prod.outlook.com
+ ([fe80::f95a:602a:34d3:5d37]) by PH0PR11MB5902.namprd11.prod.outlook.com
+ ([fe80::f95a:602a:34d3:5d37%4]) with mapi id 15.21.0223.008; Wed, 15 Jul 2026
+ 07:24:30 +0000
+From: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
+To: "xuanqiang.luo@linux.dev" <xuanqiang.luo@linux.dev>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, Mitch Williams
+	<mitch.a.williams@intel.com>, Greg Rose <gregory.v.rose@intel.com>, "Sudheer
+ Mogilappagari" <sudheer.mogilappagari@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, Xuanqiang Luo <luoxuanqiang@kylinos.cn>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: RE: [PATCH iwl-net v1 1/2] iavf: fix ASQ command buffer leak on init
+ failure
+Thread-Topic: [PATCH iwl-net v1 1/2] iavf: fix ASQ command buffer leak on init
+ failure
+Thread-Index: AQHdFCEXjoIycWGQz0mzIraZebrD47ZuLQVg
+Date: Wed, 15 Jul 2026 07:24:30 +0000
+Message-ID: <PH0PR11MB590272FD2023440F52E95689F0F82@PH0PR11MB5902.namprd11.prod.outlook.com>
+References: <20260715061131.34420-1-xuanqiang.luo@linux.dev>
+ <20260715061131.34420-2-xuanqiang.luo@linux.dev>
+In-Reply-To: <20260715061131.34420-2-xuanqiang.luo@linux.dev>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB5902:EE_|IA4PR11MB9442:EE_
+x-ms-office365-filtering-correlation-id: 18fd2c62-369e-4d32-6902-08dee2421c98
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|23010399003|376014|366016|1800799024|38070700021|6133799003|56012099006|22082099003|18002099003|4143699003|11063799006;
+x-microsoft-antispam-message-info: 0nb7Gi1eEJObH5sGAjTbY6TcwRsoE+feqMsP2GhX5sbaolWkRmM/nYPh/mVExEwlPNKPrwDP2B1Byi074HM1f0oWaXsSjP41o9Xg9tp6m+6EsVRkqIg2V1BRNTxmhNZoqdEz2AM+5Tlndlh8t2R5kXiVepMpYQMWQj5Jobz5pRHz3arYFQyYfzvkhrnnhUC9roIHhQXcFc2ysbUkuyOk/UqxLxzP5APd1lu7MLLirQv7pe0WqQIza0QH+T08Dyzd6JSvv9cJ/Nv395KUGPUUciJBtYD+fiNaYnbLqBd5f+n6YQwMVJovC8PGmcEQlF/3j5eh+7Uqm8mLXHouj0qdsbHvIrsxz3snr2L8XksXFU/QksFfwwurAoUFm7VaVbZ8hxP0NCH57G2rd2cbKCBOmRTikeL8TeoBNEin+WPrDRunko0wtAMWEj30xltxlg/CZOVO3Fe61fld13i5cwa2oZk+WJrnsKVN+AitGfk9NgqwuBalptx8Yq4uoYDQLQaHvBnajK9Fm1qxOCha9P9FWultskFr6qbSmwaAlmC6d52aqaKLPWHVzjiZ0bDNz4wB/pBWUl5JrSXHDaEH7MK0K9AG7q1fF+AhfK4O5ES0JXTUzKvl2eBt4ZznXMoGWvFkQN2/8iG+7zpLTfKXp6VjEqcjuuCL3MylvVxTnkoN1ZsmjoapaQsJOV7UWkvohc2v5IsI1NFcnXgd68Oi7g/ZKrPXDUFr7qWbuDEWN/WGXp0=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5902.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(366016)(1800799024)(38070700021)(6133799003)(56012099006)(22082099003)(18002099003)(4143699003)(11063799006);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?ZfOHIpwA60YtNI44hIkvYIXq8xvhvgGVEJ4hZjiqcl9AI746muiN90jj/xqX?=
+ =?us-ascii?Q?RQPEllyhyQm/KC7GjXmSogqfNrdW/71RtaVnQsOpgDGuvxVGsXvZJnPqd1ZX?=
+ =?us-ascii?Q?+XqeaHeWjUHgWzCEftjN5h/3uibwbnT4l8nBw1RwjDLs2iZLLA+UuW7XCKSP?=
+ =?us-ascii?Q?TGTIWj2Ksi7aVvPAXUTvl5nx6TysMJv237i2B+8v7t2a7/tXpnidjyICmovj?=
+ =?us-ascii?Q?TlVN6guw8hLek+PhcKSB1NH9ouSui8UloHiftF83Hpnzku+z/HeYoHb5cvxS?=
+ =?us-ascii?Q?AyozAkA4Yo1B+rTrN6o3tCZQ4AiMOPUdZQy3TB1BFh6oJ+kavH8Wy9VDuqtW?=
+ =?us-ascii?Q?WYosspWIxgBHtXQLaxGz2a3kprTTG6QadSHVLF/pKZ7xELq1ne2ybPWBxAX4?=
+ =?us-ascii?Q?aiceJBrTWAilY1abToNWkwQdkhy9NV8N16BxwyGZbc5sCUvH1ckHgO6LU7ib?=
+ =?us-ascii?Q?XOfHMea+qE/08lj9ymqDYoCRC29+TX3fPRjXno+WEBPgjEeNp8Ai40EUHq3l?=
+ =?us-ascii?Q?qlSFBwXYuISbPhvCoc4BdNq28mIXv8c2/utcd5lG7vD8/8BoaQ7jOH/+RALv?=
+ =?us-ascii?Q?5G7KPWmjmtvjsJj/WhM3JTxIsY4EXXcBuiGOn5LtejZxbx7/IdZLbs7gHoUs?=
+ =?us-ascii?Q?zTTB1LnT8EyUEkdzIZGGhvKuFrAWtByO4zWoIQNpHSzGed58mrwp2Rxxdl8U?=
+ =?us-ascii?Q?1uhqgV2UcPJbtn4r6mFNNu2KQTWsVSe/jB4/+0X9Ke+TdH6X8SsnwAcyqgF5?=
+ =?us-ascii?Q?ngsGRv6WyTcB7GJmcE9st7apY8KXW2EI1swAmQJ59iD9DxvuZDkLgpdqm16+?=
+ =?us-ascii?Q?zhifNVl/Vo33jTDCDerNT3Th4zAouuiTM3KvWSRWBF45aoVGBj144PnEXz8C?=
+ =?us-ascii?Q?Mz35q0ujp5ePi7l+4rU+fu7o9ar9mwwKHQKcekgYv30NuMKH0QW6sxm/nPUs?=
+ =?us-ascii?Q?zzcWQj8LsHiCmmEBtMwv+a3y4j5IPXlGYVh5Z1u4K/sq+VCywdEmFJftmYLT?=
+ =?us-ascii?Q?9DO0msq/CAGEx+e93z2K8JkYYsqYxt8YRvS4Sx+y0gpeI2kbc9CTsZVy7dt8?=
+ =?us-ascii?Q?UfO8MaGjfpoCV6NVNACWS/2WvJJjLnwSEkTFcy530Bho1VhiVDlCjkRUOzVB?=
+ =?us-ascii?Q?KC0e5CGBMD7Iii7M95X5BiQXinv7UBk2Nf5xtreV2+2Sryx7229hGdblifXj?=
+ =?us-ascii?Q?Pry4lSe/Q400lF2y96+Laee6uPkQjSiGajpWIvAUj5cTweY1gENFil/R46T9?=
+ =?us-ascii?Q?tImee+XTRwNy3fd6Ux8ZEpSHJoUjWnS/XI91XQwIAjgSilPb8K3/q4cv+TaT?=
+ =?us-ascii?Q?5B33eoZMsd4+7sFy7ovePyDh5J2aq9QKAKDgMtIdTTqJAYarCPnt63tNUs3m?=
+ =?us-ascii?Q?127FD0QPWFCKH/Kh6azt6i1v9zUZx3w8QJYKtOw8Zd1HVj6DeWM1xmoHpUyG?=
+ =?us-ascii?Q?kwZToYnscap1Prn93vjRrkm1z0JMQxw0KoYAm3lvgX0sNja6pKq9hNrR81C2?=
+ =?us-ascii?Q?PcSfJoN8t7ez9u5gAR2yB+22FM2sSojTRRHooghqmY5i7eaTsuMQw26WQZF2?=
+ =?us-ascii?Q?ppleyIGF33kWoqQCoRjz46ZlyzGsNznaD9BkqtmIuYxlF4HUVpit1rrwWSMC?=
+ =?us-ascii?Q?QBgsxarxV6jonHrPOvJ9dwo+Jx6fFWWPxybcg4lBLN89kfktGgkFwfXffCPD?=
+ =?us-ascii?Q?Fpdjx1jUibJ4DM9K+YkcKz9zrjCSD/xX1O6+/vsa56Mb4sr3gI+cHub60pZL?=
+ =?us-ascii?Q?ONfe1P0Kow=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=SoGgLvO0 c=1 sm=1 tr=0 ts=6a5734d3 cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=QXcCYyLzdtTjyudCfB6f:22 a=M5GUcnROAAAA:8 a=SVl1XXPbahHPMHDWaqIA:9
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: PnNuiDvPzZ7FHGX2s9cUxCvGfqG5k_AH
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzE1MDA2OSBTYWx0ZWRfX568bvNhV67hX
- uuhTbior7yKRlxEQCa9ydoad7N2bHcmdstvrvSdCRDtBU34TadHA9iu0MqVMvTv1/elw2Og/4N9
- UKgVTXcxDie/Kou7jWehEpTiGHstn63c/oLE46eLi+INL719mv6Ey2WM8VGExzKKD8vHjxm79ih
- E8U+cKz6uYcqBhsHzr2nu92QKFI0tPUKm6QX9dRUd2CmNRyY4EtxQut6IfzebhtLD0s5I7m/T0g
- EwOYtCLUDb9ArPs9aURuxdshznZ9Dv09AubbYxMV4B7WoeKbFSAGz3Uzfhaau/8MKbY9ty6qagp
- ITGmujHidvXnspxcuQJlNBa0Y7O76Ye8GxHwHWkhCPIjLoGSAhPOenUFwmUB+0U5pvz8FM83P8s
- R5EWg3OBRgOHOHlN3d5SsUodH3i5QAU91YKsGXoFKH5VanU8e8Q6EUaWWXS8vpb0cJgDamvDB7A
- z3URJshJHxDsJY824aA==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzE1MDA2OSBTYWx0ZWRfX967JN51O9f+G
- mkQp3a3IJhcstTBcDTsbZVqsEBHp051odu7XNfMtvmcqhYPk9MKARugDT+HfxRLGQVHy83ekpXj
- PdfgPcREsgT029TJzaKV5hUF650Z1n4=
-X-Proofpoint-ORIG-GUID: PqBvhfpfduX7U1sAfKu3G5GjmJ_xEEtb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-15_02,2026-07-14_01,2025-10-01_01
+X-Exchange-RoutingPolicyChecked: ezH0Zj44iA2d6pAIC8+wqdJDXIKey1lsNvMXwrE9ezuOU79wXabGcuMxul7/wrOACtILf4AjTjwc5c8zxB+Ph57uQKDa5PTiVHwk9aEGKem87LoGFvvot5yViCq/clRcnbEZKUJR+V03737umz34qQkNk2/6y7gy0bbmkCr06Xlr7sxLz1JoYMqB5UHbRz4beX/HyVGFZUgvHIWCVxy0LtZfeCCpNilaqHXxSQKo08g6vzqvDZgbn5xsBukbfXRIVonsSCO+MiF4LXIBC/OlPrkkDyIuw6yGxOv2ABJmPVHN9N3cSWsFs13uA3KWysPJjTn6+Cra7wMWh1wiwF8AXw==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5902.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 18fd2c62-369e-4d32-6902-08dee2421c98
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jul 2026 07:24:30.8097
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: mKX3Jgt1+QFHy4CKfMKEi4LGOH2agypQNz8DuDO5MFRm1Zfdgo2YZP5tqShfgfipG6amVOcKmKUu/76pTOavz/zPwIHKtp/WSI2SPxq5NeU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA4PR11MB9442
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307676-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[nshettyj@marvell.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:psatheesh@marvell.com,m:nshettyj@marvell.com,m:sgoutham@marvell.com,m:rkannoth@marvell.com,m:gakula@marvell.com,m:sbhatta@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307677-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,marvell.com:from_mime,marvell.com:mid,marvell.com:email,marvell.com:dkim,vger.kernel.org:from_smtp];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:xuanqiang.luo@linux.dev,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:intel-wired-lan@lists.osuosl.org,m:andrew+netdev@lunn.ch,m:mitch.a.williams@intel.com,m:gregory.v.rose@intel.com,m:sudheer.mogilappagari@intel.com,m:netdev@vger.kernel.org,m:luoxuanqiang@kylinos.cn,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[jedrzej.jagielski@intel.com,netdev@vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:from_mime,intel.com:dkim,kylinos.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,linux.dev:email,PH0PR11MB5902.namprd11.prod.outlook.com:mid];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nshettyj@marvell.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[marvell.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jedrzej.jagielski@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 697BE75B655
+X-Rspamd-Queue-Id: D51A575B672
 
-From: Satheesh Paul A <psatheesh@marvell.com>
+From: xuanqiang.luo@linux.dev <xuanqiang.luo@linux.dev>=20
+Sent: Wednesday, July 15, 2026 8:12 AM
 
-Add packet parsing support for custom L2 headers. Also add support
-to include a field from the custom header for flow tag generation.
+>From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+>
+>iavf_alloc_adminq_asq_ring() allocates cmd_buf before the remaining ASQ
+>resources. If iavf_alloc_asq_bufs() or iavf_config_asq_regs() fails, the
+>unwind path elides cmd_buf while freeing the other allocations.
+>
+>The ASQ count is not set until initialization succeeds, so the shutdown
+>path cannot reclaim the buffer. Free cmd_buf in the common unwind path.
+>
+>Fixes: d358aa9a7a2d ("i40evf: init code and hardware support")
+>Cc: stable@vger.kernel.org
+>Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+>---
+> drivers/net/ethernet/intel/iavf/iavf_adminq.c | 1 +
+> 1 file changed, 1 insertion(+)
+>
+>diff --git a/drivers/net/ethernet/intel/iavf/iavf_adminq.c b/drivers/net/e=
+thernet/intel/iavf/iavf_adminq.c
+>index 6937b7dd44cbb..82a32f8e78c12 100644
+>--- a/drivers/net/ethernet/intel/iavf/iavf_adminq.c
+>+++ b/drivers/net/ethernet/intel/iavf/iavf_adminq.c
+>@@ -346,6 +346,7 @@ static enum iavf_status iavf_init_asq(struct iavf_hw *=
+hw)
+> 	iavf_free_virt_mem(hw, &hw->aq.asq.dma_head);
+>=20
+> init_adminq_free_rings:
+>+	iavf_free_virt_mem(hw, &hw->aq.asq.cmd_buf);
 
-Introduce a new flow key type NIX_FLOW_KEY_TYPE_CH_LEN_90B which
-maps to the NPC_LT_LA_CUSTOM_L2_90B_ETHER layer type. This extracts
-a 2-byte field at a 24-byte offset in layer A to be used in flow
-tag generation.
+Hi Xuanqiang
+much thanks for the patches!
 
-Signed-off-by: Satheesh Paul A <psatheesh@marvell.com>
-Signed-off-by: Nitin Shetty J <nshettyj@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/mbox.h    | 1 +
- drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c | 7 +++++++
- 2 files changed, 8 insertions(+)
+how about moving that line directly into iavf_free_adminq_asq()?
+then free func would be paired 1:1 with alloc func=20
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-index 253dfee9646e..10552e9cf519 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-@@ -1263,6 +1263,7 @@ struct nix_rss_flowkey_cfg {
- #define NIX_FLOW_KEY_TYPE_INNR_UDP      BIT(15)
- #define NIX_FLOW_KEY_TYPE_INNR_SCTP     BIT(16)
- #define NIX_FLOW_KEY_TYPE_INNR_ETH_DMAC BIT(17)
-+#define NIX_FLOW_KEY_TYPE_CH_LEN_90B    BIT(18)
- #define NIX_FLOW_KEY_TYPE_CUSTOM0	BIT(19)
- #define NIX_FLOW_KEY_TYPE_VLAN		BIT(20)
- #define NIX_FLOW_KEY_TYPE_IPV4_PROTO	BIT(21)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-index c5bddd2ad920..dade7bb6deb7 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-@@ -4288,6 +4288,13 @@ static int set_flowkey_fields(struct nix_rx_flowkey_alg *alg, u32 flow_cfg)
- 			field->ltype_match = NPC_LT_LC_CUSTOM0;
- 			field->ltype_mask = 0xF;
- 			break;
-+		case NIX_FLOW_KEY_TYPE_CH_LEN_90B:
-+			field->lid = NPC_LID_LA;
-+			field->hdr_offset = 24;
-+			field->bytesm1 = 1; /* 2 Bytes*/
-+			field->ltype_match = NPC_LT_LA_CUSTOM_L2_90B_ETHER;
-+			field->ltype_mask = 0xF;
-+			break;
- 		case NIX_FLOW_KEY_TYPE_VLAN:
- 			field->lid = NPC_LID_LB;
- 			field->hdr_offset = 2; /* Skip TPID (2-bytes) */
--- 
-2.48.1
+> 	iavf_free_adminq_asq(hw);
+>=20
+> init_adminq_exit:
+>--=20
+>2.43.0
 
 
