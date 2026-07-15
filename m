@@ -1,245 +1,161 @@
-Return-Path: <netdev+bounces-307771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307770-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QvFII2ifV2pIYAAAu9opvQ
-	(envelope-from <netdev+bounces-307771-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 16:55:36 +0200
+	id RtaoN1GfV2o/YAAAu9opvQ
+	(envelope-from <netdev+bounces-307770-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 16:55:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2A8675FA49
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 16:55:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 289E075FA29
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 16:55:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tu-dortmund.de header.s=unimail header.b=A2Jl5qrr;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307771-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307771-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=tu-dortmund.de;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=jvT+oBVU;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307770-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307770-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 74CF032EDDA7
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 14:41:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7A564333A786
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 14:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABB8842BC48;
-	Wed, 15 Jul 2026 14:36:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE4A844685C;
+	Wed, 15 Jul 2026 14:35:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 417FF381EB1;
-	Wed, 15 Jul 2026 14:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C90242BC37
+	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 14:35:58 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784126173; cv=none; b=F+ky4aqEVnpTIJ7cT0FUawMOD7IHv+zTmEsAJ4U4Jm42iAaJiEPBUSCOP1fyQIBxE9dglFEiscapZMeEqjtv5afTteFJNma/+dZDNnB860m4J3xs7ilo0hEIlvWZPjcyozE7OQAgvYOFucmCLc/sp4X8TC4O+P/Y/xF1rgcE66s=
+	t=1784126159; cv=none; b=C//vZsNKvtI46mz7lUb4z40kBco5sPVam4GBzb+IcdGR+SsaWGFgt41ixdQ4f1eY8QBki/EwLgnJBgx74FoRq4oXGK2DiGkue6ndeib0rz65zfpAzSgjb+gcxYAvZ1MW6Mxt54k+y/zNNZbwG/JiZOdlHDFRD+qNfyGhDmg0epU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784126173; c=relaxed/simple;
-	bh=QtZDZDVONdUZUtMj/Oeqj3zOMKZGrQ3+llUPARk9BSY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ETlYxzdNuaNvY1EAy8hRcIR4Ai+Jb5+K03Nnw/bdz2wMbxjNK4X5X6m5CwXyXz7r8vQ4yRNy/9ZENXR60usuuvwoE8rxirZ4Ron8h6ZDeoCpxDId551VdqShiRZQMnJ1onrPAlEfp+FKN7KDaK2AaCOiOZugLxDQCQFUeFtG+WI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=A2Jl5qrr; arc=none smtp.client-ip=129.217.128.51
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tu-dortmund.de;
-	s=unimail; t=1784125948;
-	bh=hKJ6Qg2LWg5gq7q/ZPC3JQm9ffFjxx+05nF4JeAwcqc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=A2Jl5qrrddCcR+p2mk1pHk/z/FT4JJL21XVrsZZ0UN/wRXMp6U0CsjKJnMc2gYKkP
-	 esPVyRoLI+s4+rcMlQYe8RIPqp6jLbMkjFCZNCWv5Y5xPcB+uAOAxXp3A9JbdNwOET
-	 9dFxUSvXhZpQvoujnRh5pZRArIJkiwuDeq5dPrvg=
-Received: from [129.217.186.229] ([129.217.186.229])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.19.0.2/8.19.0.2) with ESMTPSA id 66FEWQm2000998
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 15 Jul 2026 16:32:26 +0200 (CEST)
-Message-ID: <1ecf0eb8-17ef-4f9c-ba87-da69d207e4d4@tu-dortmund.de>
-Date: Wed, 15 Jul 2026 16:32:26 +0200
+	s=arc-20240116; t=1784126159; c=relaxed/simple;
+	bh=hxmKRPMmqGMKGywEfTu9KROw+Ys4d3cc+jYzBoXbH1A=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=WQFXfTB05jIKGN1S4Vv8T0ctCqhcQjtYQJFzueetIFbeHhrEuLJtkpQH7VyCu5yIxpFc53+e1f+U6/3KZoh7cP9yHvmEiuegNETnHhsxh3+u1msfKW5YA6VS6hnLSXHaNSJEyX11hlGub/foeUGrmsU172chR2iBDPVXaSeG4JI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jvT+oBVU; arc=none smtp.client-ip=209.85.215.178
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-ca00f126b7eso3533006a12.2
+        for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 07:35:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784126158; x=1784730958; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:sender:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=z3P+ay8dWFUyLvh92+wpcw02jxXPVk53CiD8LmKlD/k=;
+        b=jvT+oBVUxc+9uR00Ulxnxc9l1TVjSUAaJWNrjsnWQJd/DjIjZx5gnV1J3dIVUep/dX
+         jAPjoUOW5xX8hRqkxm++CIEigTCXnQ/1eIaB1WrJA8cR7DiNa5H4FuQO1eNTUbxyZhm7
+         iTwSl7Jj3bs9jX47Lowr956C2t5HEmSBVLYSKmqQ0lPPw8XeDwuRtyWivnwExxNyNHe7
+         890kQOUgNB72SJUSjLTB8wC1+kzpHyIYp01vLBVSw0PFJQ1TViJqgclP5nhvu4Cf+Jx/
+         PluddWa/+0GiOCuvAa3/bhyxtrXjmJF6tUHIFbGH5Pg4JcYtvFURBZWPSyzGWzzpRt02
+         2cdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784126158; x=1784730958;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=z3P+ay8dWFUyLvh92+wpcw02jxXPVk53CiD8LmKlD/k=;
+        b=UgjuzXNi03hkZtW+xBYV4Lb2cbUg0wbhCxF5FxQvNYSpbXMdYB6oaphSedJjIqmE1M
+         alPiAP6e3Q5z/K6y7qfCNCf1lFftGqmkLJwcl0cVYtxW7ZHW7ixzfBz+LVeq0U0MDLvL
+         kXMrMLegOpheoT94hjaADgyvsdrXnW/jRXBkFXQphBWPNzadLE/GgChmmUTQfef9ljma
+         pKEZNVtz/zVN+mMDQbkdgmJR9srInd4da2qkvR8zhOMgYsEzQFKAKFxeK2I+4DldKbO+
+         aw5DOklM5NKoTYkq6Gjleii2Bl8bdjOY6KYT0xWKGKbE4q2WfFqOt+BiHIYoDFsfw/Zt
+         xJeg==
+X-Forwarded-Encrypted: i=1; AHgh+Rq0bp+49OatzZd6GaOWg6ZfyAbzMvJz/eG1XhrRJTvQiabRkktVrKhdo0iaHgqjKIaVQ3MkkpQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQmbrhkvUEPsZJOtEXjNn3PFRJWd8FT0O9hChil5T646LmnOyu
+	9WBYQaNnErMPMiUOpb8INbgdG3afGtC5fLMG859qgAxZmSV9GJz6w/oK
+X-Gm-Gg: AfdE7cn1MgBQz3Ju2GYYA+uikTBJENB30amMm2x9U0X2TxF0M6P1qugs82lTBfNAI9Z
+	iU9fgn7hmoUl8IAB9Rxt2aaQU+OnNgKq8NfVhy1qMDbfNmfitftL/v4zdmfct53EiJVrTY1YuXE
+	MlTTpMhsz+l8KU+K70bQCq5VfYlUvcYuIn1utvUWHlHoe201Y7M2vcuE7dEbG92bPLY4yy8rKg3
+	v0R1cQxBQXVWmLzzmE/LS2DJIllaeEVX6kkpuK96PeJY9nj1g3PASqC9uVkU5nhBmsis41sTJhK
+	eqWhYPhPGbybyo3I4Nyy5p5eXqoqGFqRxCaL12uUpc2xv8ZqcKuQpm7OQ9WufAJcoBktW4+e7Uf
+	xojJYOwfRQXtYdoFwAVvnU37GTU4UY4u9SzFfHEWvRwqfzQg3CL4v3cgRD8+gAzR4AWO6RPwnLy
+	5aAXdoQZ4EJ6ZAYjnb2TJzG2YGTj4CfGcWlF9WxVG0a7kVVIeQncQ=
+X-Received: by 2002:a05:6300:6d85:10b0:3c3:7a0a:18a6 with SMTP id adf61e73a8af0-3c37a199b18mr757383637.18.1784126157664;
+        Wed, 15 Jul 2026 07:35:57 -0700 (PDT)
+Received: from localhost.localdomain ([2406:7400:90:2db1:3066:c473:74d2:497d])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3140e4fcd31sm2370744eec.4.2026.07.15.07.35.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jul 2026 07:35:57 -0700 (PDT)
+Sender: Deepak Rao Gaikwad <deepaksraog@gmail.com>
+From: deepakraog <gaikwad.dcg@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: selftests: fix typo in ip_defrag comment
+Date: Wed, 15 Jul 2026 20:05:48 +0530
+Message-ID: <20260715143549.14094-1-gaikwad.dcg@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3] tun/tap & vhost-net: make qdisc backpressure
- opt-in via IFF_BACKPRESSURE
-To: kernel test robot <oliver.sang@intel.com>
-Cc: oe-lkp@lists.linux.dev, lkp@intel.com,
-        Brett Sheffield <brett@librecast.net>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, ltp@lists.linux.it,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        Jason Wang <jasowangio@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Tim Gebauer <tim.gebauer@tu-dortmund.de>, linux-doc@vger.kernel.org
-References: <202607151550.5d829a99-lkp@intel.com>
-Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <202607151550.5d829a99-lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
-	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307771-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FORGED_RECIPIENTS(0.00)[m:oliver.sang@intel.com,m:oe-lkp@lists.linux.dev,m:lkp@intel.com,m:brett@librecast.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ltp@lists.linux.it,m:willemdebruijn.kernel@gmail.com,m:jasowangio@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mst@redhat.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:andrew+netdev@lunn.ch,m:tim.gebauer@tu-dortmund.de,m:linux-doc@vger.kernel.org,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[lists.linux.dev,intel.com,librecast.net,vger.kernel.org,lists.linux.it,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,lunn.ch,tu-dortmund.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tu-dortmund.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-307770-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[gaikwaddcg@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[gaikwaddcg@gmail.com,netdev@vger.kernel.org];
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,tu-dortmund.de:dkim,tu-dortmund.de:mid,tu-dortmund.de:from_mime,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,01.org:url,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E2A8675FA49
+X-Rspamd-Queue-Id: 289E075FA29
 X-Rspamd-Action: no action
 
-On 7/15/26 16:01, kernel test robot wrote:
-> 
-> 
-> Hello,
-> 
-> kernel test robot noticed "ltp.ioctl03.fail" on:
+Correct "thourough" to "thorough" in a comment describing the
+non-overlap reassembly test loop.
 
-ioctl03.c does not know about IFF_BACKPRESSURE which is introduced here,
-consequently it fails.
-See [1] where it compares TUN features with known_flags.
+Signed-off-by: deepakraog <gaikwad.dcg@gmail.com>
+---
+ tools/testing/selftests/net/ip_defrag.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks.
+diff --git a/tools/testing/selftests/net/ip_defrag.c b/tools/testing/selftests/net/ip_defrag.c
+index f9ed749fd..146f2a2a5 100644
+--- a/tools/testing/selftests/net/ip_defrag.c
++++ b/tools/testing/selftests/net/ip_defrag.c
+@@ -378,7 +378,7 @@ static void run_test(struct sockaddr *addr, socklen_t alen, bool ipv6)
+ 		} else {
+ 			/* Without overlaps, each packet reassembly (== one
+ 			 * send/receive pair below) takes very little time to
+-			 * run, so we can easily afford more thourough testing
++			 * run, so we can easily afford more thorough testing
+ 			 * with a nested loop: the full non-overlap test takes
+ 			 * less than one second).
+ 			 */
+-- 
+Deepak Rao Gaikwad
 
-[1] Link: https://github.com/linux-test-project/ltp/blob/master/testcases/kernel/syscalls/ioctl/ioctl03.c#L82
-
-> 
-> commit: 09154ff2072e36b86ba2d92d436b7f27df153ed1 ("[PATCH net v3] tun/tap & vhost-net: make qdisc backpressure opt-in via IFF_BACKPRESSURE")
-> url: https://github.com/intel-lab-lkp/linux/commits/Simon-Schippers/tun-tap-vhost-net-make-qdisc-backpressure-opt-in-via-IFF_BACKPRESSURE/20260709-181234
-> base: https://git.kernel.org/cgit/linux/kernel/git/davem/net.git fabb881df322da25442f98d23f5fa371e3c78ec4
-> patch link: https://lore.kernel.org/all/20260709095511.168235-1-simon.schippers@tu-dortmund.de/
-> patch subject: [PATCH net v3] tun/tap & vhost-net: make qdisc backpressure opt-in via IFF_BACKPRESSURE
-> 
-> in testcase: ltp
-> version: 
-> with following parameters:
-> 
-> 	disk: 1HDD
-> 	fs: ext4
-> 	test: syscalls-03
-> 
-> 
-> 
-> config: x86_64-rhel-9.4-ltp
-> compiler: gcc-14
-> test machine: 4 threads 1 sockets Intel(R) Core(TM) i3-3220 CPU @ 3.30GHz (Ivy Bridge) with 8G memory
-> 
-> (please refer to attached dmesg/kmsg for entire log/backtrace)
-> 
-> 
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <oliver.sang@intel.com>
-> | Closes: https://lore.kernel.org/oe-lkp/202607151550.5d829a99-lkp@intel.com
-> 
-> 
-> ....
-> 
-> [1;37mgetuid03: [0m[1;32mpass[0m  (0.028s)
-> [1;37mioctl03: [0m[1;31mfail[0m  (0.047s)     <-----
-> [1;37mioctl05: [0m[1;32mpass[0m  (0.471s)
-> 
-> ....
-> 
-> Execution time: 3m 35s
-> 
-> Disconnecting from SUT: default
-> 
-> Target information
-> ──────────────────
-> Kernel:   Linux 7.2.0-rc1+ #1 SMP PREEMPT_DYNAMIC Sun Jul 12 07:25:38 CST 2026
-> Cmdline:  ip=::::lkp-ivb-d04::dhcp
->           root=/dev/ram0
->           RESULT_ROOT=/result/ltp/1HDD-ext4-syscalls-03/lkp-ivb-d04/debian-13-x86_64-20250902.cgz/x86_64-rhel-9.4-ltp/gcc-14/09154ff2072e36b86ba2d92d436b7f27df153ed1/0
->           BOOT_IMAGE=/pkg/linux/x86_64-rhel-9.4-ltp/gcc-14/09154ff2072e36b86ba2d92d436b7f27df153ed1/vmlinuz-7.2.0-rc1+
->           branch=linux-devel/devel-hourly-20260709-190759
->           job=/lkp/jobs/scheduled/lkp-ivb-d04/ltp-1HDD-ext4-syscalls-03-debian-13-x86_64-20250902.cgz-09154ff2072e-20260712-19649-tc8bu6-0.yaml
->           user=lkp
->           ARCH=x86_64
->           kconfig=x86_64-rhel-9.4-ltp
->           commit=09154ff2072e36b86ba2d92d436b7f27df153ed1
->           intremap=posted_msi
->           max_uptime=7200
->           LKP_SERVER=internal-lkp-server
->           nokaslr
->           selinux=0
->           debug
->           apic=debug
->           sysrq_always_enabled
->           rcupdate.rcu_cpu_stall_timeout=100
->           net.ifnames=0
->           printk.devkmsg=on
->           panic=-1
->           softlockup_panic=1
->           nmi_watchdog=panic
->           oops=panic
->           load_ramdisk=2
->           prompt_ramdisk=0
->           drbd.minor_count=8
->           systemd.log_level=err
->           ignore_loglevel
->           console=tty0
->           earlyprintk=ttyS0,115200
->           console=ttyS0,115200
->           vga=normal
->           rw
->           keep_initrds=/osimage/pkg/debian-13-x86_64-20250902.cgz/ltp-x86_64-ed2758122-1_20260711.cgz
->           acpi_rsdp=0x000f0490
-> Machine:  unknown
-> Arch:     x86_64
-> RAM:      6895596 kB
-> Swap:     0 kB
-> Distro:   debian 13
-> 
-> ────────────────────────
->       TEST SUMMARY
-> ────────────────────────
-> Suite:   syscalls-03
-> Runtime: 3m 24s
-> Runs:    183
-> 
-> Results:
->     Passed:   2144
->     Failed:   1
->     Broken:   0
->     Skipped:  222
->     Warnings: 0
-> 
-> [1;31mFailures:[0m
->     • ioctl03
-> 
-> 
-> 
-> The kernel config and materials to reproduce are available at:
-> https://download.01.org/0day-ci/archive/20260715/202607151550.5d829a99-lkp@intel.com
-> 
-> 
-> 
 
