@@ -1,168 +1,220 @@
-Return-Path: <netdev+bounces-307660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307661-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DV+OMKQYV2qSFQEAu9opvQ
-	(envelope-from <netdev+bounces-307660-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 07:20:36 +0200
+	id giDlDIkaV2rJFQEAu9opvQ
+	(envelope-from <netdev+bounces-307661-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 07:28:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30EEC75AA38
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 07:20:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A24E75AAE0
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 07:28:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=TWjhYcGO;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307660-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307660-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=marvell.com;
+	dkim=pass header.d=web.de header.s=s29768273 header.b=GziIJdyU;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307661-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307661-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=web.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3BE7930233D1
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 05:20:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6C132301D078
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 05:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EB993B38AB;
-	Wed, 15 Jul 2026 05:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60163B5E10;
+	Wed, 15 Jul 2026 05:28:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mout.web.de (mout.web.de [212.227.15.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA36130674C;
-	Wed, 15 Jul 2026 05:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D78381B1F;
+	Wed, 15 Jul 2026 05:28:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784092832; cv=none; b=rUN/FUxxoZzsbfHbQhd7IjTiim8g8/kTMhLkAfLipQVjFiroBf63+AdY7YEoyjUueIGCcBhLP8QlN5v4OMAugzUT1x5PLC9hVzPQdpl3qJCBg4O8brX/D4ciPdvH/jgwn2tKSzpslW6Z7IECIW+XfIzgKZiJ3sZnS01LmmHpt7Y=
+	t=1784093318; cv=none; b=LGHeJH0LhmxW79460cSWhzdEa2y/7qtLHy5BA/JOx38MnX3PylXX01FdHRKzflu31yPpWf0ArDmP31ph1fEVA8tZY5I6wXO1E5xHSOCoIhNRDOpAGw2F+JLFfraq/sFfANIhPoN5vmiVKDvTCV7tWqef+mQ6AOnH8bRVbxPqneE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784092832; c=relaxed/simple;
-	bh=74hbp5RIsZZ1HGju9OLQxht1hMNz77VQTQMSe0fDZS8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=h252Iz2BbLfdqNDM/TZzXTDiRzH5xrQSJs9e7eAiFymQu0Lf0+no+qIh+2gYowq6rMIXgJriuZNngxJYM08242lWVA+iVKc4w0lOrVFceq5J/gZbGKhZY219X+Pg3HDArK4Kki5NYmstqDOU/kDax/mN6RJAfVKs3bkAshOcn58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=TWjhYcGO; arc=none smtp.client-ip=67.231.148.174
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66F3lP6m1893117;
-	Tue, 14 Jul 2026 22:20:22 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=SEC91u/GllDbmAgCSxPxauZ
-	wi1lzs12NXORWD7bWBPo=; b=TWjhYcGOYcvce2kHSL7oW+dnBI9IuUQXFwNfVkz
-	/BEq9DJAsBI5VJnRBeu1WTFp4JxN8o05NC6/ieDBrrx47KBleO3pgNpLNHVfU5rS
-	tkygdTaqKi34XQVGda9pKDpUdDrrNwjPGfWj0L3pWvK4MDdXqVDIS6X5zz8smb05
-	duEbS4i+MGHKHtDI/fdcm2cbzk4CF9N2eEcJohd0boA7JP09amMhS46h6Mr3qP1j
-	rIOrXNI1uVy3jFCknmcBt91xVzMb91SJc9B34DanYwu7Ptq9Qhh3e4RhFWnJmsXO
-	Ca72G905DiyqBYh13Zvpk4TvKHcTFUcPDxb7jhTGx9W8pvA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4fdkdc3agy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Jul 2026 22:20:22 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 14 Jul 2026 22:20:21 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Tue, 14 Jul 2026 22:20:21 -0700
-Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id 7C9F4626761;
-	Tue, 14 Jul 2026 22:20:18 -0700 (PDT)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <davem@davemloft.net>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <sbhatta@marvell.com>,
-        <sgoutham@marvell.com>
-CC: <andrew+netdev@lunn.ch>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, Suman Ghosh <sumang@marvell.com>,
-        Ratheesh Kannoth
-	<rkannoth@marvell.com>
-Subject: [PATCH net] octeontx2-vf: set TC flower flag on MCAM entry allocation
-Date: Wed, 15 Jul 2026 10:50:07 +0530
-Message-ID: <20260715052007.2099851-1-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1784093318; c=relaxed/simple;
+	bh=t+MFqbIS7aPa095ttTtlnUWjL9Jf/yk6MV51ukISM94=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GKTqtUA0V1/bLmeROZutyyw5ZwrVUw3SkblE7y1wPyT+0oVA7h3fLoze47fb+sZPtf4zkAX1GTr6gdHeeGBt6VCTI4/o5gjlpsDDPyyG1AM6eFv7LQoMRu+p9gz1LFG9aNOknM2PNEf71HxC358LEVcQ5l5sQy+W2Gs/ONgP53U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=GziIJdyU; arc=none smtp.client-ip=212.227.15.14
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1784093314; x=1784698114; i=markus.elfring@web.de;
+	bh=t+MFqbIS7aPa095ttTtlnUWjL9Jf/yk6MV51ukISM94=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=GziIJdyUvZY56e5lQBE/mLSeEp1/c5aGdACxYdTHHhU4kbsBVzag9usbrR9b5TDQ
+	 2yj4LaOqH8xMXIN7VX2WZKbLyvuPXWb9mAtFc0SvybNiziXUVLxLGxC/Liym3/oS2
+	 DVg/yr78g8Rk059JpvqBuHr5RG8WtwsmIPHNBJAXsEzSCkn1UCm8kmTkWW3T6tF18
+	 XSJI6J5wIQVYvi/0AvPFAp/6DLCWqzv5Z7W+mXae5rmaukXRhwfDNNWvo3YWQR+80
+	 gTw4m53pwt0nyEOccdSY+iPy8nsqUFA4RXgsJuj8TzhWdHbXk6Ekn64xqHYZOz9oK
+	 ItvouYVnKvp3jNtf2Q==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from client.hidden.invalid by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MnX17-1xQfYR3AVJ-00prRu; Wed, 15
+ Jul 2026 07:22:38 +0200
+Message-ID: <10a32f39-2a5f-4e52-973d-d9a71b9b956e@web.de>
+Date: Wed, 15 Jul 2026 07:22:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzE1MDA0NyBTYWx0ZWRfXwS+JBPnZlyDl
- 2zjPCFw2upTn09JuP+63t/6C8pJTq08q6nrlWDMF+J2CXACaR6bZG7e1PQisl5T+nHJmaddV/m/
- RQ5cIXvBms543QduljsYCoAkNMviU1Y=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzE1MDA0NyBTYWx0ZWRfX6RCp3q7tKfcd
- OBuBZDKyUkiyyCKTJoNZA+Z8+1bvzknjhgPI5tslQfN/K5g6/NxUY7WM9ZUkiT32QmGDTuqdhqM
- Vdq0sx1kDtLrwrBZMRfpgE1J28kgFZoeX3qjAqhOnXZG08WgJyKmomwHJ0d7hh0VVnFq7v/LutB
- n4/T5lvINWg6UxbNicV69opSCPE8Qo8vkbvXOSkG+fTfFYJaS2kpepnwzFQL7Y1dMaCE8ho67i1
- bhTWBeRCuGTXT5ZBHBaWg7EUpWhSoDl1ixr2YFnMrkBxEYZZQa8qH3aHEettvfivIbowV0ExpJi
- iW3Ez+p326h3/SJ2rxT/aYJNS3Vzr7hSM31lzQ3NckrX4QFxkgruEqulG6Ns1oQFUBMVOrvqu4m
- yhTOiAbx10SEUAizHjxl/hibUQurYObxhi7tn3ecaw2vdS31pWRnN31St7kls0AgqiGP+peE7Dz
- 12zN9FXPRCgVhZbtXpg==
-X-Proofpoint-GUID: SBI03zPrdNvgDm7WU3SxHiDsAuUJyptA
-X-Authority-Analysis: v=2.4 cv=WsYb99fv c=1 sm=1 tr=0 ts=6a571896 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=EAYMVhzMl8SCOHhVQcBL:22 a=M5GUcnROAAAA:8 a=-f_R5ig3iYYmKcMtsT0A:9
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: SBI03zPrdNvgDm7WU3SxHiDsAuUJyptA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-15_02,2026-07-14_01,2025-10-01_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: net: rnpgbe: Pass an expression directly in rnpgbe_rm_adapter()
+To: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, MD Danish Anwar <danishanwar@ti.com>,
+ Michael Grzeschik <mgr@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, Yibo Dong <dong100@mucse.com>,
+ LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
+References: <7958e26e-a4f9-48ee-8d79-3797016944c5@web.de>
+ <dd0bb5df-22eb-481a-9274-7feb725172d0@lunn.ch>
+Content-Language: en-GB, de-DE
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <dd0bb5df-22eb-481a-9274-7feb725172d0@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:tnYofw33Wv8/DzgTwSCgS4ev6+OuA/8hyLpcxsWRzooJfHG4q+R
+ fqdVMFkIn8ealB9YnmjRtwOnAE2W+MrF23l140CwWweAmCjwss3rIqg6p9GSavalrg4o6cm
+ lYwjX1tdTdFq+pjyKB5NlyT3YUzn3RY20nPd8W34KDVEqc8q4e3QBkyPVI9G/qX9e9LuJ79
+ jI2TSQpDjKt/c49QrgL3w==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:VPOFs+2aRk8=;+5iuowrTzYk5qHAawBY4sX9ClMt
+ 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
+ fz+vc1hUM/dd88EQUI=
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	DMARC_POLICY_ALLOW(-0.50)[web.de,quarantine];
+	R_DKIM_ALLOW(-0.20)[web.de:s=s29768273];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-307661-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:danishanwar@ti.com,m:mgr@kernel.org,m:pabeni@redhat.com,m:u.kleine-koenig@baylibre.com,m:vadim.fedorenko@linux.dev,m:dong100@mucse.com,m:linux-kernel@vger.kernel.org,m:kernel-janitors@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307660-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:sbhatta@marvell.com,m:sgoutham@marvell.com,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:sumang@marvell.com,m:rkannoth@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[Markus.Elfring@web.de,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[web.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Markus.Elfring@web.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[web.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 30EEC75AA38
+X-Rspamd-Queue-Id: 9A24E75AAE0
 
-From: Suman Ghosh <sumang@marvell.com>
+>> The address of a data structure member was determined before
+>> a corresponding null pointer check in the implementation of
+>> the function =E2=80=9Crnpgbe_rm_adapter=E2=80=9D.
+>=20
+> Please can you show the path taken that mucse is actually NULL.
 
-When MCAM entries are allocated for a VF netdev via the devlink
-mcam_count parameter, only OTX2_FLAG_NTUPLE_SUPPORT was set. That
-enabled ethtool ntuple filters but not tc flower offload. Also set
-OTX2_FLAG_TC_FLOWER_SUPPORT when entries are successfully allocated.
+The applied sanity check indicates a corresponding possibility.
 
-Fixes: 2da489432747 ("octeontx2-pf: devlink params support to set mcam entry count")
-Signed-off-by: Suman Ghosh <sumang@marvell.com>
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c | 1 +
- 1 file changed, 1 insertion(+)
+Which result representations would you find helpful for the requested
+data flow analysis?
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-index 5dd0591fed99..99d78fc5a2c4 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-@@ -272,6 +272,7 @@ int otx2_alloc_mcam_entries(struct otx2_nic *pfvf, u16 count)
- 	if (allocated) {
- 		pfvf->flags |= OTX2_FLAG_MCAM_ENTRIES_ALLOC;
- 		pfvf->flags |= OTX2_FLAG_NTUPLE_SUPPORT;
-+		pfvf->flags |= OTX2_FLAG_TC_FLOWER_SUPPORT;
- 	}
- 
- 	if (allocated != count)
--- 
-2.43.0
 
+> I tend to agree, that the correct change is to remove the NULL pointer
+> test.
+Will the omission of such a check gain wider acceptance?
+
+Regards,
+Markus
 
