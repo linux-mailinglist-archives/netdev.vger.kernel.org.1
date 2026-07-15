@@ -1,110 +1,110 @@
-Return-Path: <netdev+bounces-307762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307763-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FZ1qOkWLV2qAWgAAu9opvQ
-	(envelope-from <netdev+bounces-307762-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 15:29:41 +0200
+	id wp5bG06MV2rWWgAAu9opvQ
+	(envelope-from <netdev+bounces-307763-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 15:34:06 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E9B875EAE2
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 15:29:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD6D875EBAB
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 15:34:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=broadcom.com header.s=google header.b=gqXzYput;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307762-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307762-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=broadcom.com header.s=google header.b=LxC4ANdc;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307763-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307763-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=broadcom.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DB1E73106DAB
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 13:23:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A62A4302496F
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 13:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9E9D435AAB;
-	Wed, 15 Jul 2026 13:23:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69FDD435A8A;
+	Wed, 15 Jul 2026 13:26:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f100.google.com (mail-yx1-f100.google.com [74.125.224.100])
+Received: from mail-oa1-f100.google.com (mail-oa1-f100.google.com [209.85.160.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C8E40EB98
-	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 13:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69BA3C9885
+	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 13:26:54 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784121836; cv=none; b=ZBWwnYEUAIXvAN+joVHNcZRMM32X2uMNRlPi4G09sN2Ua+7Qg+LzXY690Eu2MKhm7GR+TG96jpeleDKjMDbHkSvKnMqdLs6Az5XGZ9lt7KiMNWqMidRqlH12bENhuiTYC7TjS4sIec0aWXS+i4qtRHS2odEYBgme57YK9kkvw/g=
+	t=1784122016; cv=none; b=C2PaECQdXZY+GyCuncopdo12rM1UwL3asFFtZeGvRR0HvqhR45zmhjg+WK1WCCiLxwSQPaZW7rfZP8fRU3c0rZXakojAXzTR51mzeAvijQ0jZY1fXwauzOi2mM5p393iH+XCbJRfscFnwJ6sfXv6oFnR6sJy59q48KvTcbcGyt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784121836; c=relaxed/simple;
-	bh=z94vYiCWJsCpE51Ld9e0KMG2WhHZ/LQoO/A/z0yptoA=;
+	s=arc-20240116; t=1784122016; c=relaxed/simple;
+	bh=dBC3Z8uXmkFSh9w/cqxAVgka/NKgXkVEqxLrBxboKZM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cDxLCg5tBUX0ZXoBCoiuuuFBYyzfFtbChyaf+LEWH6+PYxckJBXO4Cpce82LZzMYOxvKrOXI2sHAZJ9OkIi0fUOxTUzJ9SWnM+CiteCAB+Eh6tJDtE9mDWcUtZ9Cp2t6IScxUITSkWgTmR41DYLy6p1JsRwC/V9ZjfG1fcAk7JU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=gqXzYput; arc=none smtp.client-ip=74.125.224.100
-Received: by mail-yx1-f100.google.com with SMTP id 956f58d0204a3-6662551100bso6192073d50.0
-        for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 06:23:54 -0700 (PDT)
+	 To:Cc:Content-Type; b=iqqI2H5eA8F80nol75lMZUotdur5STfNjOhO1YGu3etSKTAoZB/VNU1EGxK3KatlWxbhfeq4jGmR+W5WIavDXxJm4JrVZM6pSSObLkT03V//hQHTCB4AmHI1DPiBSry/s3ERXSEhcaneh1PXB2wXqVoS4jFH7hCKtcO8GlgXZ/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=LxC4ANdc; arc=none smtp.client-ip=209.85.160.100
+Received: by mail-oa1-f100.google.com with SMTP id 586e51a60fabf-44aeefa1c00so2949954fac.0
+        for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 06:26:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784121834; x=1784726634;
+        d=1e100.net; s=20251104; t=1784122013; x=1784726813;
         h=content-type:cc:to:subject:message-id:date:from:in-reply-to
          :references:mime-version:dkim-signature:x-gm-gg:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=mlj2yyIYZQvOQ+9gXa3zB5uIZdF945nYgwvVmyQmbA4=;
-        b=Tz9fk+2aNPMinyA2Fa6NTMZo6RmAgdUjy+OL18QZEfxfAAgBisGhuNUpdx/EKTSOcP
-         1Wt2LLoeUApjnoJoJiTTB9A0xOW1+5GamyvAaYuk9LSgA2mVeZsEgZZVYQsyFMiN3cW6
-         BTZTWriE8gyVtw5mrEmgbkjPAONNdFRPGfvyrY+7A3ypxpuIlC0KJLarJP4FoVKfbgIn
-         K9Rxh7zGMG84UO2AUSUvVuppJQm13b/uWj3WWveNa3SevZRm1Vu23i06BR38pjg/rB3Q
-         WPqt01ZWdrcrqmlHgWQeutBrrK/TV88fINC/mU8u0aB+IN3o7HNg3PcL8W4cXNRTRkkM
-         FSBQ==
-X-Gm-Message-State: AOJu0Yy/2b0d0BHKOdIo4ZvVyb0VIze1PzVnDf1FxvltglitIun1cepX
-	xrcWc5Tl+kvQUWfbqFiZHhu9rVTYAqOSQMfbH8CFD27mTLFRKjXxn8QmrBGfABHSBSg3SOg5g13
-	ZlF8fdcxRSLH5qrWtdBbsPNPOPWn9FtzhDcddw+ZTzDMmcHelA97crFr3TYqM2uXbEnxuYF9X2r
-	vM5HZERCsB+zz4vYe79HMlW+iIt8KFy+zhrktr5Ag6yhvX/uqzKqH69+VRYGK1K6kd4ubar/wWD
-	jeUxlhp0fQ=
-X-Gm-Gg: AfdE7cnw8mATT1/jed7GqYXp5hxR5Lvl0QlIFmrAqS6trcpLQyH6lUP9V3l0stI6xeA
-	ah6BkB5/IosUWDoT12J8z6TO42xOOOSkS1nFZ6YcrCiqlAdGkn8hv+nlRi/MwpEpKehvpnyo1ev
-	zKub1XuneTTwmNVeihkHnwKnnC4bPT9VaW63iW0kJVdYRh3PgLKuY7K12GzaUUHa0A/wF6XrZUW
-	CqcV4WOspwPNqovGmRW/jX/VuDNp3Yx2R/cBr4apc1s4p0Nn7AwAXo95V89F16eJtC/UcHyPe2c
-	Ge+jed47BD6MWIi67SzWbP6puTt2KGHdi8wdHcUU1kf0tHfKttPZOylx0d8T911HzSc/EhAQGQV
-	jGf/0T+J5IwujXAVGngHLCORVnDeGVsGwxXEtoDGQgdlGNSTuY0MwvOxaxnF1xaYNkvHlJffKF9
-	4ekN1Z0l77HfUTnFM7c/sOGRdY1qAbwLCrodrgt3C+vkEj8Xzi
-X-Received: by 2002:a53:d009:0:b0:667:95f9:bcda with SMTP id 956f58d0204a3-668078c2546mr3352787d50.100.1784121833601;
-        Wed, 15 Jul 2026 06:23:53 -0700 (PDT)
+        bh=vpqaoOJo6BlmyTMjokw/+KGDcJlFn3tQI+TzxF8JdOM=;
+        b=L8OfhWUdL/0fh7seVI7GDxG7ACqxgvF+lsax1vz0cP6/tB8/S8ndHWwR2fVmLDyPqw
+         XGqfNrTvY1C5tyGJHHn3JLrIz4kONao/ZpigjYzNIUtDsBDyTZW70HZpKCeZs/DKyIuR
+         7/EqR40DE4waA4hq3P/+u5tFEJqInaFWjJ4RHWc6AVki4AM2BqaHwHewj4hi83NPNB2u
+         eYfSfH7xc4c35j+PYTvLV3vIZaGnum6H7pogZxQUlgNFtM/3dNPX1JUzPKqrw0x6Nb0x
+         z26s5VHUiLPtidkZlhN746G8FqLUZP84RPCfe78Lp5pZxP1l+EV0YHkhD63OcH5h0OHt
+         Rtow==
+X-Gm-Message-State: AOJu0Yy+sJQdtshJeiVOJamOU+unyEmMWcGPhFC7heI8IKAnPMJC3Q22
+	bn2Ffz05LZiM+w97fP4O3WvzZbsxAUY3fe1O1DxJftzchlc2xpHSj7c229ctHA9x+xA2obXU6Ha
+	Jyr/9EZaRfoaOoYL6PDKtNDob8xOfTK9WXHtgFsGINxkoMhIa5sDHRsC5VFEqbrvEHXRyt5lo4y
+	PCGRjG15zj5TlAULACGw5B1dffTIhmlLkXCvS4rKnDeVsVLj9gS4I8q9a0RcPi1bDUUECBHZxMt
+	QAphbp5wAQ=
+X-Gm-Gg: AfdE7cn8Nbo1rbPkJPnvJrwyla28UeQtSmR1icJ+QaZsCpeW/q2zw2+o1raVop0Gen7
+	SkKJFLCgt0RjtEmXLlqEYjZkDCuvvtXIiFIjsvI6OFamxMkv6r2IGoxZNvcdBCSWJtZ8fuipZ4i
+	4RbF9RZ4Y6dcPNnqU1lW2XejsmJ1+34K9nLCiYNzzBB1wlfw+ltoE256mxyCDgQOH5kSrPLAkuZ
+	/let1gzUi2Vvc/gPUMd9/Akle4DBAL1zsaP+x1mm7UD3nVty7f/ZI+wgh772xj3iz9kBhP9XajX
+	qW32bbh2kn5SSjrpHM+yiyEi1U2bdULvgaFbi2ubikC10WXgyThg+B/Df98irryBTDhspAxOV51
+	6KKWuYnSyhu4iS092GlcmF7NNZ8eguZwmPHL6m8q7YdBWkCLPtYKP8+tbYNRZ+E7y/i6nkYyLe3
+	XhX2Y1OfackgXO4JXX+g735dXtwmmrvMfayju50KYfojZsgSTs
+X-Received: by 2002:a05:6871:5386:b0:43b:891d:7c89 with SMTP id 586e51a60fabf-451f279c84cmr8790348fac.11.1784122013020;
+        Wed, 15 Jul 2026 06:26:53 -0700 (PDT)
 Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-117.dlp.protect.broadcom.com. [144.49.247.117])
-        by smtp-relay.gmail.com with ESMTPS id 956f58d0204a3-6681fd7b5c9sm22422d50.18.2026.07.15.06.23.53
+        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-4561f268930sm381739fac.13.2026.07.15.06.26.52
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 15 Jul 2026 06:23:53 -0700 (PDT)
+        Wed, 15 Jul 2026 06:26:53 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-c167e032f03so79525666b.1
-        for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 06:23:53 -0700 (PDT)
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-c15deb3377eso494559866b.3
+        for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 06:26:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1784121832; x=1784726632; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1784122011; x=1784726811; darn=vger.kernel.org;
         h=content-type:cc:to:subject:message-id:date:from:in-reply-to
          :references:mime-version:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=mlj2yyIYZQvOQ+9gXa3zB5uIZdF945nYgwvVmyQmbA4=;
-        b=gqXzYputsTeGAx+2STHI1GWbkc+RAO4Lp6mXT0q3NaBAelTcy/SYx3avUdS0rt9PH+
-         OAojYXhKTdFfD7L+10iSWsaRj0ZHRQck8lluB5p7v90FixOCSKezpRus+rUKv3vmDi9j
-         xCSGnGv6Z469w6ntwqJARmnZWx7O0zzLGPc5M=
-X-Received: by 2002:a17:907:3909:b0:c16:12ff:dc86 with SMTP id a640c23a62f3a-c1679447aaamr192202166b.36.1784121831893;
-        Wed, 15 Jul 2026 06:23:51 -0700 (PDT)
-X-Received: by 2002:a17:907:3909:b0:c16:12ff:dc86 with SMTP id
- a640c23a62f3a-c1679447aaamr192198966b.36.1784121831382; Wed, 15 Jul 2026
- 06:23:51 -0700 (PDT)
+        bh=vpqaoOJo6BlmyTMjokw/+KGDcJlFn3tQI+TzxF8JdOM=;
+        b=LxC4ANdcBNjN6rFnuY4iuH5OzwubcVSBBJ2Ii1KLZuqG3U/yF+7NYYjSdjeOvl7VqR
+         TQOeV1h356+vO4ZTlxSmDVj1QsmVU53L7pIqt9xzQ1Zj4BeVYlCkBjmmnqTjt12F77bc
+         bbHlqxtfccsCu/2X/vuuP0UHBzCV80jJokiwY=
+X-Received: by 2002:a17:907:7211:b0:c15:ce72:9352 with SMTP id a640c23a62f3a-c1667ad84damr389451766b.33.1784122011063;
+        Wed, 15 Jul 2026 06:26:51 -0700 (PDT)
+X-Received: by 2002:a17:907:7211:b0:c15:ce72:9352 with SMTP id
+ a640c23a62f3a-c1667ad84damr389448466b.33.1784122010599; Wed, 15 Jul 2026
+ 06:26:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260714210745.1785625-1-nikhil.rao@amd.com>
-In-Reply-To: <20260714210745.1785625-1-nikhil.rao@amd.com>
+References: <20260714212713.1788438-1-nikhil.rao@amd.com>
+In-Reply-To: <20260714212713.1788438-1-nikhil.rao@amd.com>
 From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Date: Wed, 15 Jul 2026 18:53:36 +0530
-X-Gm-Features: AUfX_mwfsXrAno7FzTXbmBwZpB0WMy5JBr8Si3rDWb5KbzehZPFpo4J3dG7DSyo
-Message-ID: <CALs4sv1dBCLDtWBrYLizmKH=E4+ZNgNCmyubqd46Yk9OHodrbw@mail.gmail.com>
-Subject: Re: [PATCH net] pds_core: fix auxiliary device add/del races
+Date: Wed, 15 Jul 2026 18:56:34 +0530
+X-Gm-Features: AUfX_mx_rDfWi9_lva-GWK3sTnq_7PK_k1V78bTX7CRazR_Cw-Rtk7Ay3eK8ZGc
+Message-ID: <CALs4sv1-o7td8RnCO2TCTY5F+zMKC3P3XjQL921MFt7ZRmxAcQ@mail.gmail.com>
+Subject: Re: [PATCH net] pds_core: check for workqueue allocation failure
 To: "Nikhil P. Rao" <nikhil.rao@amd.com>
 Cc: netdev@vger.kernel.org, kuba@kernel.org, brett.creeley@amd.com, 
 	eric.joyner@amd.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
 	edumazet@google.com, pabeni@redhat.com
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000000d42550656a63c0a"
+	boundary="000000000000bbe66c0656a646c1"
 X-Spamd-Result: default: False [-9.76 / 15.00];
 	WHITELIST_DMARC(-7.00)[broadcom.com:D:+];
 	SIGNED_SMIME(-2.00)[];
@@ -116,7 +116,7 @@ X-Spamd-Result: default: False [-9.76 / 15.00];
 	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307762-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307763-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:nikhil.rao@amd.com,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:brett.creeley@amd.com,m:eric.joyner@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[pavan.chebbi@broadcom.com,netdev@vger.kernel.org];
@@ -138,97 +138,38 @@ X-Spamd-Result: default: False [-9.76 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,vger.kernel.org:from_smtp,amd.com:email,broadcom.com:dkim,broadcom.com:email,broadcom.com:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,broadcom.com:dkim,broadcom.com:email,broadcom.com:from_mime,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4E9B875EAE2
+X-Rspamd-Queue-Id: BD6D875EBAB
 X-Rspamd-Action: no action
 
---0000000000000d42550656a63c0a
+--000000000000bbe66c0656a646c1
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 15, 2026 at 2:38=E2=80=AFAM Nikhil P. Rao <nikhil.rao@amd.com> =
+On Wed, Jul 15, 2026 at 2:57=E2=80=AFAM Nikhil P. Rao <nikhil.rao@amd.com> =
 wrote:
 >
-> Two paths add or delete the same slot (pf->vfs[vf_id].padev): a VF's
-> pdsc_reset_done() and the PF's devlink enable_vnet/disable_vnet handler.
-> They serialize on config_lock, but neither guards the slot under it
-> correctly.
+> pdsc_init_pf() does not check whether create_singlethread_workqueue()
+> succeeded.
 >
-> add() registers and stores a new auxiliary device without first checking
-> the slot, so a second add of an already-populated slot leaks the first
-> device. del() makes that check outside config_lock, so two concurrent
-> dels can both pass it; the first clears the slot, and the second
-> dereferences a NULL pointer.
+> Fail probe on failure. The workqueue is set up before the timer and
+> mutexes, so its failure path must unwind only the earlier setup.
 >
-> Check and update the slot under config_lock in both paths.
->
-> Fixes: b699bdc720c0 ("pds_core: specify auxiliary_device to be created")
-> Reported-by: sashiko-bot@kernel.org # Running on a local machine
+> Fixes: c2dbb0904310 ("pds_core: health timer and workqueue")
+> Reported-by: sashiko-bot <sashiko-bot@kernel.org>
+> Closes: https://sashiko.dev/#/patchset/20260629200358.2626129-1-nikhil.ra=
+o%40amd.com?part=3D2
 > Signed-off-by: Nikhil P. Rao <nikhil.rao@amd.com>
 > Reviewed-by: Brett Creeley <brett.creeley@amd.com>
 > ---
->  drivers/net/ethernet/amd/pds_core/auxbus.c | 17 ++++++++++++++---
->  1 file changed, 14 insertions(+), 3 deletions(-)
+>  drivers/net/ethernet/amd/pds_core/main.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 >
-> diff --git a/drivers/net/ethernet/amd/pds_core/auxbus.c b/drivers/net/eth=
-ernet/amd/pds_core/auxbus.c
-> index 73b3481220b1..3acafe10a6d5 100644
-> --- a/drivers/net/ethernet/amd/pds_core/auxbus.c
-> +++ b/drivers/net/ethernet/amd/pds_core/auxbus.c
-> @@ -177,17 +177,21 @@ void pdsc_auxbus_dev_del(struct pdsc *cf, struct pd=
-sc *pf,
->  {
->         struct pds_auxiliary_dev *padev;
->
-> -       if (!*pd_ptr)
-> -               return;
-> -
->         mutex_lock(&pf->config_lock);
->
-> +       /* A concurrent del may have already torn this device down and
-> +        * cleared it.
-> +        */
->         padev =3D *pd_ptr;
-> +       if (!padev)
-> +               goto out_unlock;
-> +
->         pds_client_unregister(pf, padev->client_id);
->         auxiliary_device_delete(&padev->aux_dev);
->         auxiliary_device_uninit(&padev->aux_dev);
->         *pd_ptr =3D NULL;
->
-> +out_unlock:
->         mutex_unlock(&pf->config_lock);
->  }
->
-> @@ -210,6 +214,13 @@ int pdsc_auxbus_dev_add(struct pdsc *cf, struct pdsc=
- *pf,
->
->         mutex_lock(&pf->config_lock);
->
-> +       /* Nothing to do if the aux device is already present.  This also
-> +        * guards against a second add overwriting *pd_ptr and leaking th=
-e
-> +        * first, symmetric with the check in pdsc_auxbus_dev_del().
-> +        */
 
-Are these AI-generated-appearing comments really necessary?
-Anyway, it is your driver.
 Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
-> +       if (*pd_ptr)
-> +               goto out_unlock;
-> +
->         mask =3D BIT_ULL(PDSC_S_FW_DEAD) |
->                BIT_ULL(PDSC_S_STOPPING_DRIVER);
->         if (cf->state & mask) {
-> --
-> 2.43.0
->
->
-
---0000000000000d42550656a63c0a
+--000000000000bbe66c0656a646c1
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -321,14 +262,14 @@ eIj4fd2b29HwMCvfX78QR4JQM9dkDoD1ZFClV17bxRPtxhwEU8DzzcGlLfKJhj8IxkLoww9hqNul
 Md+LwA5kUTLPBBl9irP7Rn3jfftdK1MgrNyomyZUZSI1pisbv0Zn/ru3KD3QZLE17esvHAqCfXAZ
 a2vE+o+ZbomB5XkihtQpb/DYrfjAMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
 ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
-MjAyMwIMClwVCDIzIfrgd31IMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCDFj28T
-B13k375+eVG9LEga/PEsYwkCQlzrWi98BV1g0zAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
-CSqGSIb3DQEJBTEPFw0yNjA3MTUxMzIzNTJaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
+MjAyMwIMClwVCDIzIfrgd31IMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCCEXtCZ
+DNWKmztwDVMbSVtGyu3EhGWmYSHQTPJcUvYBbTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
+CSqGSIb3DQEJBTEPFw0yNjA3MTUxMzI2NTFaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
 MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
-SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQB74nkgq9ljUsmI45A9XoXanJ/W/wjAp9tqe/dGU4rq
-XkwZoWSeex9Sbn+OtNKKzNy1V6Wu3lQPvUvyaimIQXPz49gn0l8LdH+cmFoyjMscSqKOGYxzR0+h
-d96odOCbGfg/CGhqVBgOQlxKe0J03CvlZ7l9vw6e8G+RjaluI4TH5O7TOw4wEXFZBoL+DW9apE4r
-ATX8pXTj5Js/K09hw+bxzjkaNKS5uCT47YkedBnonVZkesciDp8tol1DuWOg23fAPvWEssnto2Hv
-OzfUjtbwpYaoixJvf2cK0eCfOer/BOpCaxCT4zCCP7dhOhZGqDD3hlVfpuBDUQHWmtkxKpyA
---0000000000000d42550656a63c0a--
+SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAhmVYKTVPxo+JzTFFTBSpankadx7I5YF6LExDwmYzx
+ElFfjKtXHBiXCLmc/zV1DEY03wUPHaQ1yyVCxm+zLuY81jK3RRlcAJ9BY178b9qKTA8l5cxnXfGv
+JJW1pkYXI9Nwbl5Ew+3dvZZ9HLH4SqMeMEbBnKquwsigFnaIzrb+7UAhyY5prV/CI5abQKxPfyWv
+PaDGfjb8qgIEdPcgPj0QT8xhe22kwR7eLtpfqeIna/qVvm9gqcqBWI31WNTu3cJJKbV/98uO0TM3
+qyr1kQdX33x+aQGn9kU8TITjMTFqVovn+pPTxfez7v/3hK1jvxsHGqkgyq93+JVkeNRd1wdh
+--000000000000bbe66c0656a646c1--
 
