@@ -1,193 +1,143 @@
-Return-Path: <netdev+bounces-307683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307682-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 2gTFIaU3V2oZHgEAu9opvQ
-	(envelope-from <netdev+bounces-307683-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 09:32:53 +0200
+	id k57xOZY3V2oVHgEAu9opvQ
+	(envelope-from <netdev+bounces-307682-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 09:32:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEB4A75B76D
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 09:32:52 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5372C75B75C
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 09:32:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b="Cu/NfRTn";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307683-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307683-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=marvell.com;
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=xCZht4U0;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307682-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307682-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E5339301F480
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 07:31:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4A88D30104AD
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 07:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D4A3112DA;
-	Wed, 15 Jul 2026 07:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EFCF37E5F9;
+	Wed, 15 Jul 2026 07:31:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379BA3019C3;
-	Wed, 15 Jul 2026 07:31:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D063019C3
+	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 07:31:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784100705; cv=none; b=MnSl1u/+ySs9qJ8uDOgdLvLw2eJ/kQDwBFAwYUAGcvW/3sfl3sjFpIQmGG6pyF0OGx6l5qt3xBIVOs8VxhC1vTseGs0lZbjexKb7iN3FV09m1C6olGEfv0Ssmv7pCLfG3tzdULcD9NlEbhIgFbbTryonaTxrAGqgsNJ58H/OVBo=
+	t=1784100699; cv=none; b=EMfZMR/fMISPHbkn9WI3EuiCWXyRKgkjwQSJil1Pp8/wDvHaOjdY0laA29cqpQ71TLvCV3pWpxMMxEI7IJMsNWJV/WabHl8R301m8WgVJCpRAsGW8zok2KuHjiMUpoaK6cxHJsDDRerEjaw9MRCAXgaGldMyKxaBO9KWWmW/LxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784100705; c=relaxed/simple;
-	bh=uEdkfiJrOo9VyHc0Ck0Ar4SOPXpkPzT4/Oj905lrKqs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Y3hrK5rXDZF5HjrE1MOCqifz5o4Id12gMm2BE6JzU5H9C/6xdORvaNIyP9nxjp2/Tl6OLGY+as+c0fDyNJ15urRRmKBkQefzYVuOrHEp6QBm+JpwCNzm/08fGqRIThRQc3tYfWkrUJRpYtcErIoHs6N1VOZuknt5wBqS6UP100k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Cu/NfRTn; arc=none smtp.client-ip=67.231.148.174
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66F3lO2d1893071;
-	Wed, 15 Jul 2026 00:31:36 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=RcJRDN43yaxKPhIDRT7I3C7
-	OcsVbvhyi4prds4LBzOo=; b=Cu/NfRTnHXJipMxnP3LNcv7lp6BgVsV7lqe2axz
-	hlpx3ZzVomToG0WKknsTwuGlNd41Kn55j6DUwcKFKD77JRgerlDrMm+uoP8eMA/7
-	mkfo/UWwffW+dBcKmCUWTqIv9oIQXXITXHHQLCKMErMxTQ4AyyAZf1WqLx3GshV4
-	DKgs6H23Kl3ebE3pEOASSawWssrMGS2cC+2avHksrhZj9QhJQZUQh8/14oYD0KnJ
-	1EXZyMnc9h+3w+DHuxy4e24DxRb1YrW/1GZJ5O7lIledhjOkU6VUaIAs2CgvxdFH
-	ZXte4ERnimnttDpijm2VrXmJ1GhPJW68NpAY05ItaOI8D1Q==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4fdkdc3nsv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Jul 2026 00:31:35 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 15 Jul 2026 00:31:34 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Wed, 15 Jul 2026 00:31:34 -0700
-Received: from kernel-ep2.caveonetworks.com (unknown [10.29.36.53])
-	by maili.marvell.com (Postfix) with ESMTP id 6180B3F7044;
-	Wed, 15 Jul 2026 00:31:30 -0700 (PDT)
-From: <nshettyj@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Shijith Thotton <sthotton@marvell.com>,
-        Nitin Shetty J
-	<nshettyj@marvell.com>,
-        Sunil Goutham <sgoutham@marvell.com>,
-        "Ratheesh
- Kannoth" <rkannoth@marvell.com>,
-        Geetha sowjanya <gakula@marvell.com>,
-        Subbaraya Sundeep <sbhatta@marvell.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] octeontx2-af: return VWQE timer delay in NIX HW info
-Date: Wed, 15 Jul 2026 13:01:11 +0530
-Message-ID: <20260715073112.622662-1-nshettyj@marvell.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1784100699; c=relaxed/simple;
+	bh=NkZnIY0ZJuD3kKkIQpTpSf9zNSsMF2kyntzkO6gNTb0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mizxXgo+8Lqa5Vl+ZamENT1f/kYUDS2+o6JtcnG8Bc7jAL/3fODit3r8/NUzdSHnp6qEVTTlGZXM/nLyCxTGvTk93oiob4qUWCDQW1F/tu08TFNIWnovpUXR+7yVYwBO2b+G7PEm1rg3QBEjTaNKJFlVUhxU+cT7WjJXGg73wBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=xCZht4U0; arc=none smtp.client-ip=185.171.202.116
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 23358C2B9C3;
+	Wed, 15 Jul 2026 07:31:51 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 2B90B6035C;
+	Wed, 15 Jul 2026 07:31:34 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B5BFB11BD3BAD;
+	Wed, 15 Jul 2026 09:31:27 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1784100693; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=cXCHgsII61RG+BUBR7dsv7oD4lN1OAQX9QZyrYgHcvA=;
+	b=xCZht4U04fO/TOsAkFDrKLYpZe1uko0+yNhTkhKLYV0ZEv+3eqD4UtcWXskfavCsrolDcR
+	NFxZ3wQdjcKFa+RY6/xRQDnO1bE0wu4Jh1lfp2lUchK8hLun1idHajZmvE1bpN6ubuCgon
+	otdq3TlljGiyQPUJxFWAOpqs8gTm33txPz0cTwKtS0rMQoW3lKe1gQ8r/lRTfmVuXno+aO
+	G4mB2VF6oh3dgaWwkO7FkmHqTk06eL+7WQv3927/CHT768lK30Fpjds4I/4x1ftOCqpsc0
+	DOGMvje48XYFUqfRj7bcusaxmbaW+ktUD4PPjCy9Eq1wzmCGryTs6PE1uE5deQ==
+Message-ID: <dc21b2fc-ae11-4fde-a5b9-09e2c6bee5c9@bootlin.com>
+Date: Wed, 15 Jul 2026 09:31:25 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzE1MDA3MSBTYWx0ZWRfX8FBdLPMmM5Vj
- pw6fggXubWDa+tpLzio9etpI25BShyKVx2eN7Bq2B2QxbL6b30pGj9UwrXixBFzYRzxCvq8Nj7V
- u/s2Y/0ZsfBeD1BGEI2+Vw6XXPVfw34=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzE1MDA3MSBTYWx0ZWRfX6xD7mYxSW0tU
- UDsa+wYs79dUfVLSUXt68mXpzvyD7hisJfuy26j5ifkWUNCRS1F99nd/Tc5FGyKb/DN58FlBNHE
- PbzDQTinMoPkjZlz4PtKvZcwyU4X7TsLZRo2llu7h3BujbArNAWqaxaUdSCFsUiDuBAk/LlDGS8
- 7NIasszl2eLYO498FAaVcd0r75J60yN6BRurVK4kslWi0qFJXnWHfp0kvvqTCLdQP3uV/JIv7bi
- b/pg6qbKNvpZqmNhxQlLpXIMm7/OXDKJz/lxu+DIHemf/gndM1iDUH6FPCjeoWazSdCCPFT8p55
- rL7NJsqnfB0H9Ea1gnNTRvLX8RXn4F/GWPKItXUsLyja4cQvgOZtAMUWmJmN/NanmsL4USbEeNZ
- DkZ4cq/4Monz9rY7YLouoj55+thc9APcShioBDeTP2Zb/7vCQMKnFekGEHtO25EKU3I1u/ZY/AM
- VOylG0VQKnYBtjLTCTQ==
-X-Proofpoint-GUID: PnxuLbFT6fYnDLwKmwiSIMYISMF97ZcY
-X-Authority-Analysis: v=2.4 cv=WsYb99fv c=1 sm=1 tr=0 ts=6a573757 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=EAYMVhzMl8SCOHhVQcBL:22 a=M5GUcnROAAAA:8 a=PdPszD-o5J0UizkRgOIA:9
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: lsHfrib_NPs1pby_IMi5S6yIQYurtN6s
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-15_02,2026-07-14_01,2025-10-01_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 01/10] net: stmmac: move XPCS lifetime management to
+ platform drivers
+To: Coia Prant <coiaprant@gmail.com>, kuba@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
+ robh@kernel.org, krzk+dt@kernel.org, heiko@sntech.de
+Cc: netdev@vger.kernel.org, linux-rockchip@lists.infradead.org,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-phy@lists.infradead.org, Christian Marangi <ansuelsmth@gmail.com>
+References: <20260714191341.690906-1-coiaprant@gmail.com>
+ <20260714191341.690906-2-coiaprant@gmail.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20260714191341.690906-2-coiaprant@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307683-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307682-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,lunn.ch,sntech.de];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_RECIPIENTS(0.00)[m:coiaprant@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:robh@kernel.org,m:krzk+dt@kernel.org,m:heiko@sntech.de,m:netdev@vger.kernel.org,m:linux-rockchip@lists.infradead.org,m:devicetree@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-phy@lists.infradead.org,m:ansuelsmth@gmail.com,m:andrew@lunn.ch,m:krzk@kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[nshettyj@marvell.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:sthotton@marvell.com,m:nshettyj@marvell.com,m:sgoutham@marvell.com,m:rkannoth@marvell.com,m:gakula@marvell.com,m:sbhatta@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,marvell.com:from_mime,marvell.com:mid,marvell.com:email,marvell.com:dkim];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nshettyj@marvell.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[marvell.com:+];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,bootlin.com:from_mime,bootlin.com:dkim,bootlin.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EEB4A75B76D
+X-Rspamd-Queue-Id: 5372C75B75C
 
-From: Shijith Thotton <sthotton@marvell.com>
+Hi,
 
-Update the NIX_GET_HW_INFO mailbox message to return the VWQE timer
-delay, which is used for vector packet wait time calculation.
-Repurpose the existing rsvs16 reserved field in struct nix_hw_info
-to vwqe_delay and populate it by reading the NIX_AF_VWQE_TIMER
-register (applicable for non-OTX2 silicon).
++Christian
 
-Signed-off-by: Shijith Thotton <sthotton@marvell.com>
-Signed-off-by: Nitin Shetty J <nshettyj@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/mbox.h    | 2 +-
- drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c | 5 +++++
- 2 files changed, 6 insertions(+), 1 deletion(-)
+On 7/14/26 21:08, Coia Prant wrote:
+> The current XPCS creation logic in stmmac_pcs_setup() is problematic
+> for several reasons.
+> 
+> First, if a device tree specifies a "pcs-handle" but no select_pcs()
+> callback is provided by the platform driver, the created XPCS is never
+> used. The phylink framework requires select_pcs() to actually return
+> the PCS to the core, so the pcs-handle property becomes effectively
+> useless without the matching callback. This is confusing for developers
+> who expect that specifying a pcs-handle in their device tree should be
+> sufficient to enable the PCS.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-index f87cdf1b971d..253dfee9646e 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-@@ -1463,7 +1463,7 @@ struct nix_inline_ipsec_lf_cfg {
- 
- struct nix_hw_info {
- 	struct mbox_msghdr hdr;
--	u16 rsvs16;
-+	u16 vwqe_delay;
- 	u16 max_mtu;
- 	u16 min_mtu;
- 	u32 rpm_dwrr_mtu;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-index 78667a0977c0..c5bddd2ad920 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-@@ -3936,6 +3936,11 @@ int rvu_mbox_handler_nix_get_hw_info(struct rvu *rvu, struct msg_req *req,
- 	if (blkaddr < 0)
- 		return NIX_AF_ERR_AF_LF_INVALID;
- 
-+	rsp->vwqe_delay = 0;
-+	if (!is_rvu_otx2(rvu))
-+		rsp->vwqe_delay = rvu_read64(rvu, blkaddr, NIX_AF_VWQE_TIMER) &
-+				  GENMASK_ULL(9, 0);
-+
- 	if (is_lbk_vf(rvu, pcifunc))
- 		rvu_get_lbk_link_max_frs(rvu, &rsp->max_mtu);
- 	else
--- 
-2.48.1
+I think Christian's work on fwnode PCS would help a lot with that PCS
+handling in stmmac:
 
+https://lore.kernel.org/netdev/20260618125752.1223-1-ansuelsmth@gmail.com/
+
+I don't know when Christian plans to iterate, it could be worth using
+that new fwnode mechanism here ?
+
+Maxime
 
