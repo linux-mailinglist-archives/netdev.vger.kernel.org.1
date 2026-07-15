@@ -1,372 +1,217 @@
-Return-Path: <netdev+bounces-307716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307717-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id uucgEKVSV2ofJQEAu9opvQ
-	(envelope-from <netdev+bounces-307716-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 11:28:05 +0200
+	id RkGmKhtSV2r2JAEAu9opvQ
+	(envelope-from <netdev+bounces-307717-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 11:25:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CED4575C7C0
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 11:28:04 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D94B75C742
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 11:25:47 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=broadcom.com header.s=google header.b=hxdvQzQb;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307716-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307716-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=broadcom.com;
+	dkim=pass header.d=uniroma2.it header.s=ed201904 header.b=dMaDKKWr;
+	dkim=pass header.d=uniroma2.it header.s=rsa201904 header.b=xbfU6vi2;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307717-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307717-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=uniroma2.it;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 76F513031E8A
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 09:15:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 588EB30F66E6
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 09:16:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A2863FC5D3;
-	Wed, 15 Jul 2026 09:15:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D444B41CB23;
+	Wed, 15 Jul 2026 09:16:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f99.google.com (mail-oo1-f99.google.com [209.85.161.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E77FC3F9F3C
-	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 09:15:10 +0000 (UTC)
+Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.37])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88753F0743;
+	Wed, 15 Jul 2026 09:16:24 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784106912; cv=none; b=N4Ywm5cZ1LE+W5k+O725eEk6oo3ZercdNu2uy5iTnqq9btcxMZGFgOKg94b4WO3XHlj71zWaNQsv+Qc7OmORPLVjhPKS4zU4LXKo/MEalGNwrYPCI6M7cgwKOEk4UY7DvygfiWzr1QZVphxdTfak0zQrHXgMi+Hb6IXNwkkYaxo=
+	t=1784106991; cv=none; b=uxqmABbwp3bsCgBoeu8g2q9uzuTEYgdU5Dps+DuO0fKg9wwGAXWor0BSzjIAAO45c/kcWlquWkbXu1F49LQeBFPDO9nWkpPNyisEgdMRsSSnNX79SVnjzEF7XVmfPdAYI+BMCKSUd1yqSpjga2nFyDrN4qazC9rM3QE8nJ2baEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784106912; c=relaxed/simple;
-	bh=S0EUauMZcWwf73BcvJmk0NUmkTz2LNZdip7iPFIlc2s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Re8pk5Du6BX28H8hl0QYdsP9W/so+R3jqFb2UAk13lH0IXj7tpl4UAFWaGrmwCwo9s97ONPv1fRK0HX7DKWDo7g4wjXh+F54v10IyVgb3LwQvgjW6aB68cFmvSjXwHY1ge5NdMARzgL+l+NpcifykIyjEvORN5l/ND8jgevFENc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hxdvQzQb; arc=none smtp.client-ip=209.85.161.99
-Received: by mail-oo1-f99.google.com with SMTP id 006d021491bc7-6a374c190beso1714676eaf.2
-        for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 02:15:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784106910; x=1784711710;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:dkim-signature:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=voLf9I5VTo7QtN2Dbg3QtVuPvEHIYK7HEvxveh0NjwI=;
-        b=QNjXD0/FQZa9DEpMzKAIPQThJGPkeRfG4zWFnwXJBcpzpQbErZmEgeCHKzdRD0FsJV
-         R76QiI4Tbo1ex+1nfQ8PmU9+q6fhdl7JL/Mk/Y4ryQFKbTUgXKbShbypq0RcvGT5HxUm
-         OWQt2dy/WIgMwuaVdf89/XsPYa16k7YEa8JIu1ZppKWMdLK/rYl0ixGz72z9YrObEma1
-         J48+Dpv/ID53+iQQOC5NIbIGhCVpHRl85bV92JMRUj89CgbZoVpeCwisrADmgJx6iBGH
-         W/O/igkhwr/B5UxjdVKdUjVpsQsUYzyJXes2dGSZ4juGHeoo+nMNdHfhBMvg39S6iih7
-         E8rw==
-X-Forwarded-Encrypted: i=1; AHgh+RoXjlP9T9POKY/PPbv6j7CDN1YSGCrTpp13WNpTzOZ0CQx/0zO09otJvYfY4pbZO4nk7W1KSoo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMIszueKmwmMzKOtql+WMixgKJl6G1QGUaAQjZ0YFBEDcaam1G
-	L1MhGJo2GlDqQoS39ETTRHi14u/nGTO422IJ5nkGbJblR8hvx8SNLiFzuOw0DbK93EjEwJ5dptW
-	Vru8z/p2rEdo+Ssm2+lhUkx9Ltbcq33WOHPy13Gw5eyANVwI8w4wPEcIooNiHBbjYfUOFxVFK8S
-	If5iYJ9cTybfmmu0gr2d3M7bsM5ja4nEBPFDrfFlfQgpRcPa7EfFOKXF3Rub6S70aWwDov7Cjsg
-	7IwgRAjDY1ZI3OmSGKZXmn7
-X-Gm-Gg: AfdE7cnls9DK5woEjWiymxPazfx3a4NL3x71yElBewM2LSq41BRplBIDSp/fEtRp+oa
-	3MiU0GGY0UR3C+ImUj9aTSk8HdzTGS1cslig1461ko829vCODx/UVq8U9uqK67/GaIZmUZd5UYh
-	Tvwv7f9Om1CztazKWx1jR6lUrUbFYDS+pUg5LFXEPaLAHyaLPzgaePiy2iu6SFC4RR0Pzf916pg
-	k61KokG43PKQ4SxXgBMrKE8jpUFPgGzx9JBIwp+YsqLNxs1rLNFE19WmZpsy95X362S09EbrRkv
-	8JBmQ49fvu0/+/v+dKGM22SKQp103+T8m9Q0wiuVXbOC2Wf38FxkyvFmf1MxWdzstq9Len7plYa
-	QM01TkkMLsiuqaRTPdSVEG4viwx0mrOYaNgBj+gGDSt3EBYJziYCsix69iFc5nFYQwzmj+xLerC
-	fNCm+082vn+iA3rCFH6ziH0y7vu7wEK7yo6ighzitRFHCh6BP6P5pNg9sUZNSZ0w==
-X-Received: by 2002:a4a:e909:0:b0:6a3:8b32:3ed7 with SMTP id 006d021491bc7-6a3d9eb559amr1241739eaf.2.1784106909537;
-        Wed, 15 Jul 2026 02:15:09 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-117.dlp.protect.broadcom.com. [144.49.247.117])
-        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-451913555e2sm1963429fac.5.2026.07.15.02.15.08
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 15 Jul 2026 02:15:09 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-847a00bcbd0so6946123b3a.0
-        for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 02:15:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1784106908; x=1784711708; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=voLf9I5VTo7QtN2Dbg3QtVuPvEHIYK7HEvxveh0NjwI=;
-        b=hxdvQzQbngvQ4VnhlN4wHRSt1/aZep2FNKEtP+9uxi2jphVBS7hyT7BdWjEAOR2Qpl
-         61ArHDkP5Yy1CmpMMHQoVZOikSAorgcfC3MNhUaqN1uVEYwhInHxSP8mrtNN7jhGOnsm
-         ttn1yZpoNcNNGrmZgi5dJhSCTZSavzSAwN7Es=
-X-Forwarded-Encrypted: i=1; AHgh+RrjxI/famMpUywQTeZjJ1BK5LH1jTpbkS6TMS6glY6V+QrJPaDeQO5asYHNp1r7ejhF7cgk15g=@vger.kernel.org
-X-Received: by 2002:a05:6a00:9a4:b0:848:420a:9cd5 with SMTP id d2e1a72fcca58-84a67361eabmr1750605b3a.53.1784106907647;
-        Wed, 15 Jul 2026 02:15:07 -0700 (PDT)
-X-Received: by 2002:a05:6a00:9a4:b0:848:420a:9cd5 with SMTP id
- d2e1a72fcca58-84a67361eabmr1750569b3a.53.1784106907201; Wed, 15 Jul 2026
- 02:15:07 -0700 (PDT)
+	s=arc-20240116; t=1784106991; c=relaxed/simple;
+	bh=it0O+ZF2QyzbqdhO80kfLC0oTrX0i9Ft1KXBQyLlJ0U=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=VhZV37q9zjlB8lZcOhN6tuRfrYcCngvI44H+MuxJVhoIyJUnUPDHZa47bDXUpKZICEJcJOAXM5O1iUPm0C6iWm+IXWUZFrtujLq+gWe1rOqOzdRvut6TasNwsHgJ7Na2cmZtaofeekRb5twdzGsdyzjKaALyU0lvrTwgmgX4ays=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=dMaDKKWr; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=xbfU6vi2; arc=none smtp.client-ip=160.80.4.37
+Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
+	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 66F9FhS5019396;
+	Wed, 15 Jul 2026 11:15:48 +0200
+Received: from lubuntu-18.04 (unknown [193.205.142.15])
+	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 7E461121DD4;
+	Wed, 15 Jul 2026 11:15:38 +0200 (CEST)
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
+	s=ed201904; t=1784106938; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bKaYzjAFT65TNNuzhNUDk0YMB60ddOLXXUlPIbwHf74=;
+	b=dMaDKKWrCc1wSAoVOH6ehHOnV4SYminjJHLBER49iUO8q/QbHrn8Czvju4zmc8uxpj8PEe
+	8jjPv6S+6ZCsATCA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
+	t=1784106938; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bKaYzjAFT65TNNuzhNUDk0YMB60ddOLXXUlPIbwHf74=;
+	b=xbfU6vi23nhtei0F29Dte9Bz5wJWCeb20FgUXKCPAAHBp5hMuUZLL4Oy2C3+/Vsvqqk/xV
+	uLm+XfqWnDrbP09I+l1t3Sk+WsWowr+Xw6e1GpfNhEqrWUf/guNOl9n58H/LJaWC5A1AaW
+	HVfqR1DP2Lj/4HKJPN7YeJhvOVGXdruW2i7Y0Vb5ke9LlYMpINeUJzpqPsufcRI5h0j6n3
+	tP0WeQl0Y7OxR9zGzhBRaoEyS+j7tHsa+qsYo1bTaqpOmG6cHh4HvhRz9qt3R3971CvEcj
+	OPjMKB4ycy/J3LGUzcRdvj08gdqSxAfpLVmUYukMEu1tjzgPozE7jAuRrylijw==
+Date: Wed, 15 Jul 2026 11:15:30 +0200
+From: Andrea Mayer <andrea.mayer@uniroma2.it>
+To: Alessio Faina <alessio.faina@canonical.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Po-Hsu Lin
+ <po-hsu.lin@canonical.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Shuah Khan
+ <shuah@kernel.org>,
+        Andrea Mayer <andrea.mayer@uniroma2.it>, stefano.salsano@uniroma2.it
+Subject: Re: [PATCH net-next v2] selftests/net: Skip
+ srv6_end_dt46_l3vpn_test::host_vpn_tests if iproute2 too old
+Message-Id: <20260715111530.fc982bdd10eb499cef8e9196@uniroma2.it>
+In-Reply-To: <20260713095750.2671173-1-alessio.faina@canonical.com>
+References: <20260713095750.2671173-1-alessio.faina@canonical.com>
+X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260715-kmem-dupliate-name-v1-1-85551c328155@nvidia.com>
-In-Reply-To: <20260715-kmem-dupliate-name-v1-1-85551c328155@nvidia.com>
-From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Wed, 15 Jul 2026 14:44:53 +0530
-X-Gm-Features: AUfX_mxyDvPMnQycMHJRST7BFAmd3INWrCweEeZQZpwhXGP6iwQch34PDFtgGRY
-Message-ID: <CAH-L+nOh8UFgEHHrYanthQ8QTnvz6kh+Oqns=BPLuvvNDi5=CQ@mail.gmail.com>
-Subject: Re: [PATCH net] net/mlx5: Use unique names for software steering caches
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alex Vesker <valex@nvidia.com>, Yevgeny Kliteynik <kliteyn@nvidia.com>, netdev@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000007f20240656a2c2b7"
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
+X-Virus-Status: Clean
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-9.76 / 15.00];
-	WHITELIST_DMARC(-7.00)[broadcom.com:D:+];
-	SIGNED_SMIME(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[uniroma2.it,none];
+	R_DKIM_ALLOW(-0.20)[uniroma2.it:s=ed201904,uniroma2.it:s=rsa201904];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-307717-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307716-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[kalesh-anakkur.purayil@broadcom.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:leon@kernel.org,m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:valex@nvidia.com,m:kliteyn@nvidia.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:borntraeger@linux.ibm.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_RECIPIENTS(0.00)[m:alessio.faina@canonical.com,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:po-hsu.lin@canonical.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:andrea.mayer@uniroma2.it,m:stefano.salsano@uniroma2.it,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[andrea.mayer@uniroma2.it,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[uniroma2.it:+];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kalesh-anakkur.purayil@broadcom.com,netdev@vger.kernel.org];
-	HAS_ATTACHMENT(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrea.mayer@uniroma2.it,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,broadcom.com:from_mime,broadcom.com:email,broadcom.com:dkim]
+	MID_RHS_MATCH_FROM(0.00)[];
+	REDIRECTOR_URL(0.00)[urldefense.com];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,uniroma2.it:from_mime,uniroma2.it:dkim,uniroma2.it:mid,canonical.com:email,srv6_end_dt46_l3vpn_test.sh:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CED4575C7C0
+X-Rspamd-Queue-Id: 0D94B75C742
 
---0000000000007f20240656a2c2b7
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Mon, 13 Jul 2026 11:57:50 +0200
+Alessio Faina <alessio.faina@canonical.com> wrote:
 
-On Wed, Jul 15, 2026 at 1:53=E2=80=AFPM Leon Romanovsky <leon@kernel.org> w=
-rote:
->
-> From: Leon Romanovsky <leonro@nvidia.com>
->
-> Each software steering domain creates its own slab caches, but all
-> domains use the same names. When domains for two devices are alive at
-> once, the second kmem_cache_create() triggers the following splat:
->
-> WARNING: mm/slab_common.c:111 at __kmem_cache_create_args+0xca/0x480, CPU=
-#18: devlink/331372
-> Modules linked in: act_mirred act_skbedit cls_matchall act_gact cls_flowe=
-r sch_ingress
-> vhost_vdpa veth nfnetlink_cttimeout openvswitch macvtap macvlan vfio_ap k=
-vm nf_nat_tftp
-> nf_conntrack_tftp nsh nf_conncount vfio_pci_core irqbypass scsi_debug vho=
-st_net tap tun
-> vhost_vsock vmw_vsock_virtio_transport_common vsock vhost nft_masq nft_re=
-ject_ipv4 act_csum
-> cls_u32 sch_htb smc_diag smc ppp_deflate bsd_comp ppp_async crc_ccitt ppp=
-_generic slhc loop
-> algif_hash af_alg nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reje=
-ct_inet nf_reject_ipv4
-> nf_reject_ipv6 nft_reject nft_ct nft_chain_nat nf_nat nf_conntrack nf_def=
-rag_ipv6 nf_defrag_ipv4
-> nf_tables mlx5_vdpa vdpa mlx5_ib dm_service_time ib_uverbs_support vringh=
- ib_core vhost_iotlb
-> mlx5_core s390_trng eadm_sch vfio_ccw mdev vfio_iommu_type1 vfio sch_fq_c=
-odel drm i2c_core
-> dm_multipath drm_panel_orientation_quirks uvdevice diag288_wdt watchdog h=
-mac_s390 prng aes_s390
-> zfcp scsi_transport_fc pkey_pckmo pkey_cca pkey_ep11 zcrypt paes_s390 phm=
-ac_s390 rng_core
-> scsi_dh_alua pkey scsi_dh_rdac scsi_dh_emc crypto_engine autofs4 ecdsa_ge=
-neric ecc sha512 [last unloaded: openvswitch]
-> CPU: 18 UID: 0 PID: 331372 Comm: devlink Tainted: G        W           7.=
-2.0-20260712.rc2.git0.e3321fa3034d.300.fc44.s390x+debug #1 PREEMPT
-> Tainted: [W]=3DWARN
-> Hardware name: IBM 9175 ME1 701 (LPAR)
-> Krnl PSW : 0704c00180000000 0000038139a6771a (__kmem_cache_create_args+0x=
-da/0x480)
->             R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 CC:0 PM:0 RI:0 EA:3
-> Krnl GPRS: 0000000000000000 0000000000000000 000003813b7de578 00000380b9e=
-b8974
->             00000276c417f690 00000380b9eb8974 0000030144623348 0000027723=
-4a1660
->             0000000000000020 00000380b9eb8974 00000277234a1600 000003813b=
-686d30
->             0000000000000000 00000380b9e9a810 0000038139a6771a 0000030144=
-623238
-> Krnl Code: 0000038139a6770a: c02000ebb737       larl    %r2,000003813b7de=
-578
->             0000038139a67710: b9040039           lgr     %r3,%r9
->            *0000038139a67714: c0e5006e2eb2       brasl   %r14,000003813a8=
-2d478
->            >0000038139a6771a: a7390020           lghi    %r3,32
->             0000038139a6771e: b9040029           lgr     %r2,%r9
->             0000038139a67722: c0e5006cf98f       brasl   %r14,000003813a8=
-06a40
->             0000038139a67728: ec26018e007c       cgij    %r2,0,6,00000381=
-39a67a44
->             0000038139a6772e: 58d0f0a4           l       %r13,164(%r15)
-> Call Trace:
->   [<0000038139a6771a>] __kmem_cache_create_args+0xda/0x480
-> ([<0000038139a676a2>] __kmem_cache_create_args+0x62/0x480)
->   [<00000380b9da1c70>] dr_domain_init_mem_resources+0x80/0x240 [mlx5_core=
-]
->   [<00000380b9da226e>] dr_domain_init_resources.constprop.0+0x7e/0x2c0 [m=
-lx5_core]
->   [<00000380b9da28b2>] mlx5dr_domain_create+0x132/0x250 [mlx5_core]
->   [<00000380b9dc1e20>] mlx5_cmd_dr_create_ns+0x30/0x90 [mlx5_core]
->   [<00000380b9cd8dbe>] mlx5_flow_namespace_set_mode+0x6e/0x130 [mlx5_core=
-]
->   [<00000380b9d846ec>] esw_create_offloads_fdb_tables+0xac/0x5a0 [mlx5_co=
-re]
->   [<00000380b9d865b6>] esw_offloads_steering_init+0x1c6/0x480 [mlx5_core]
->   [<00000380b9d86e8e>] esw_offloads_enable+0x13e/0x410 [mlx5_core]
->   [<00000380b9d7b04a>] mlx5_eswitch_enable_locked+0x36a/0x540 [mlx5_core]
->   [<00000380b9d84ff0>] esw_offloads_start+0x50/0x1d0 [mlx5_core]
->   [<00000380b9d8774a>] mlx5_devlink_eswitch_mode_set+0x35a/0x3f0 [mlx5_co=
-re]
->   [<000003813a791e68>] devlink_nl_eswitch_set_doit+0x88/0x120
->   [<000003813a5b93ea>] genl_family_rcv_msg_doit+0xea/0x150
->   [<000003813a5b95c2>] genl_family_rcv_msg+0x172/0x210
->   [<000003813a5b96c2>] genl_rcv_msg+0x62/0xc0
->   [<000003813a5b7cac>] netlink_rcv_skb+0x5c/0x120
->   [<000003813a5b8f0c>] genl_rcv+0x3c/0x50
->   [<000003813a5b74a4>] netlink_unicast+0x1f4/0x2b0
->   [<000003813a5b783c>] netlink_sendmsg+0x2dc/0x460
->   [<000003813a4c9764>] __sock_sendmsg+0x64/0xd0
->   [<000003813a4cc878>] __sys_sendto+0x108/0x160
->   [<000003813a4cdf50>] __do_sys_socketcall+0x350/0x460
->   [<000003813a8184d2>] __do_syscall+0x172/0x750
->   [<000003813a82d5d2>] system_call+0x72/0x90
->
-> Prefix each cache name with the device name to make it unique.
->
-> Fixes: fd785e5213f0 ("net/mlx5: DR, Allocate icm_chunks from their own sl=
-ab allocator")
-> Fixes: fb628b71fb2a ("net/mlx5: DR, Allocate htbl from its own slab alloc=
-ator")
-> Reported-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-> Closes: https://lore.kernel.org/all/a3cea501-4d1f-47d5-b6d0-fcda9a0aab16@=
-linux.ibm.com/
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> In case iproute2 is older than version 5.14.0, released ~Sept 1, 2021,
+> the End.DT46 support is not available and the host_vpn_tests test contained
+> in the srv6_end_dt46_l3vpn_test.sh file is failing in some kernel backports.
+> This is the result of those tests:
+> 
+> ################################################################################
+> TEST SECTION: SRv6 VPN connectivity test among hosts in the same tenant
+> ################################################################################
+> 
+>     TEST: IPv6 Hosts connectivity: hs-t100-1 -> hs-t100-2 (tenant 100)  [ FAIL ]
+> 
+>     TEST: IPv4 Hosts connectivity: hs-t100-1 -> hs-t100-2 (tenant 100)  [ FAIL ]
+> 
+>     TEST: IPv6 Hosts connectivity: hs-t100-2 -> hs-t100-1 (tenant 100)  [ FAIL ]
+> 
+>     TEST: IPv4 Hosts connectivity: hs-t100-2 -> hs-t100-1 (tenant 100)  [ FAIL ]
+> 
+>     TEST: IPv6 Hosts connectivity: hs-t200-3 -> hs-t200-4 (tenant 200)  [ FAIL ]
+> 
+>     TEST: IPv4 Hosts connectivity: hs-t200-3 -> hs-t200-4 (tenant 200)  [ FAIL ]
+> 
+>     TEST: IPv6 Hosts connectivity: hs-t200-4 -> hs-t200-3 (tenant 200)  [ FAIL ]
+> 
+>     TEST: IPv4 Hosts connectivity: hs-t200-4 -> hs-t200-3 (tenant 200)  [ FAIL ]
+> 
+> To amend this, check the current running iproute2 supports the required
+> feature and, if not, just skip the test to avoid a failure.
+> 
+> 
+> Signed-off-by: Alessio Faina <alessio.faina@canonical.com>
 
-LGTM,
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
---=20
-Regards,
-Kalesh AP
+Hi Alessio,
 
---0000000000007f20240656a2c2b7
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Thanks for the v2, the code looks good to me.
 
-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
-tJVewHuOmXgWQxNWV7Oiszu1d9xAcqyj65s1PrEIIaHnxEM3eTK+teecLEy8QymZjjDTrCHg4x36
-2AczdlQAIiq5TSAucGja5VP8g1zTnfL/RAxEZvLS471GABptArolXY2hMVHdVEYcTduZlu8aHARc
-phXveOB5/l3bPqpMVf2aFalv4ab733Aw6cPuQkbtwpMFifp9Y3s/0HGBfADomK4OeDTDJfuvCp8g
-a907E48SjOJBGkh6c6B3ace2XH+CyB7+WBsoK6hsrV5twAXSe7frgP4lN/4Cm2isQl3D7vXM3PBQ
-ddI2aZzmewTfbgZptt4KCUhZh+t7FGB6ZKppQ++Rx0zsGN1s71MtjJnhXvJyPs9UyL1n7KQPTEX/
-07kwIwdMjxC/hpbZmVq0mVccpMy7FYlTuiwFD+TEnhmxGDTVTJ267fcfrySVBHioA7vugeXaX3yL
-SqGQdCWnsz5LyCxWvcfI7zjiXJLwefechLp0LWEBIH5+0fJPB1lfiy1DUutGDJTh9WZHeXfVVFsf
-rSQ3y0VaTqBESMjYsJnFFYQJ9tZJScBluOYacW6gqPGC6EU+bNYC1wpngwVayaQQMIIGtzCCBJ+g
-AwIBAgIMEvVs5DNhf00RSyR0MA0GCSqGSIb3DQEBCwUAMFIxCzAJBgNVBAYTAkJFMRkwFwYDVQQK
-ExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWduIEdDQyBSNiBTTUlNRSBDQSAy
-MDIzMB4XDTI1MDYyMDEzNDI1N1oXDTI3MDYyMTEzNDI1N1owgfUxCzAJBgNVBAYTAlVTMRMwEQYD
-VQQIEwpDYWxpZm9ybmlhMREwDwYDVQQHEwhTYW4gSm9zZTEZMBcGA1UEYRMQTlRSVVMrREUtNjYx
-MDExNzEYMBYGA1UEBBMPQW5ha2t1ciBQdXJheWlsMQ8wDQYDVQQqEwZLYWxlc2gxFjAUBgNVBAoT
-DUJST0FEQ09NIElOQy4xLDAqBgNVBAMMI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20u
-Y29tMTIwMAYJKoZIhvcNAQkBFiNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29tLmNvbTCC
-ASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOG5Nf+oQkB79NOTXl/T/Ixz4F6jXeF0+Qnn
-3JsEcyfkKD4bFwFz3ruqhN2XmFFaK0T8gjJ3ZX5J7miihNKl0Jxo5asbWsM4wCQLdq3/+QwN/xAm
-+ZAt/5BgDoPqdN61YPyPs8KNAQ8zHt8iZA0InZgmNkDcHhnOJ38cszc1S0eSlOqFa4W9TiQXDRYT
-NFREznPoL3aCNNbDPWAkAc+0/X1XdV1kt4D9jrei4RoDevg15euOaij9X7stUsj+IMgzCt2Fyp7+
-CeElPmNQ0YOba2ws52no4x/sT5R2k3DTPisRieErWuQNhePfW2fZFFXYv7N2LMgfMi9hiLi2Q3eO
-1jMCAwEAAaOCAecwggHjMA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcB
-AQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQv
-Z3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEFBQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2ln
-bi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1UdIAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAy
-ASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNv
-bS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAyhjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29t
-L2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwLgYDVR0RBCcwJYEja2FsZXNoLWFuYWtrdXIucHVyYXlp
-bEBicm9hZGNvbS5jb20wEwYDVR0lBAwwCgYIKwYBBQUHAwQwHwYDVR0jBBgwFoAUACk2nlx6ug+v
-LVAt26AjhRiwoJIwHQYDVR0OBBYEFJ/R8BNY0JEVQpirvzzFQFgflqtJMA0GCSqGSIb3DQEBCwUA
-A4ICAQCLsxTSA9ERT90FGuX/UM2ZQboBpTPs7DwZPq12XIrkD58GkHWgWAYS2xL1yyvD7pEtN28N
-8d4+o6IcPz7yPrfWUCCpAitaeSbu0QiZzIAZlFWNUaOXCgZmHam8Oc+Lp/+XJFrRLhNkzczcw3zT
-cyViuRF/upsrQ3KY/kqimiQjR9BduvKiX/w/tMWDib1UhbVhXxuhuWMr8j8sja2/QR9fk670ViD9
-amx7b5x595AulQfiDhcN0qxG4fr7L22Y/RYX8fCoBAGo0SF7IpxSukVsp6z5uZp5ggdNr2Cq88qk
-if7GG/Oy1beosYD9I5S5dIRcP25oNbcJkbCb/GuvWegzGfxCCBuirb09mTSZRxaBmb1P6dANmPvh
-PdqGqxfFrXagvwbO15DN46GarD9KiHa8QHyTtWghL3q+G6ZHlZUWnyS4YMacrx8Ngy0x7HR4dNdT
-pqAqOOsOwDmQFBNRYomMdAaOXm6x6MFDnp51sIWVNGWK2u4le2VI6RJMzEqLzMZKL0vTW+HPqMaT
-hWv2s5x6cJdLio1vP63rDxJS7vH++zMaY0Jcptrx6eAhzfcq+y/TkHJaZ4dWrtbof1yw3z5EpCvT
-YDxV0XFQiCRLNKuZhkVvQ8dtmVhcpiT/mENrWKWOt0DwNEeC/3Fr1ruoyriggbnRmBQt1bC5uxfv
-+CEHcDGCAlcwggJTAgEBMGIwUjELMAkGA1UEBhMCQkUxGTAXBgNVBAoTEEdsb2JhbFNpZ24gbnYt
-c2ExKDAmBgNVBAMTH0dsb2JhbFNpZ24gR0NDIFI2IFNNSU1FIENBIDIwMjMCDBL1bOQzYX9NEUsk
-dDANBglghkgBZQMEAgEFAKCBxzAvBgkqhkiG9w0BCQQxIgQgrmS27G/YuJbSfXN15UDSZZbVRTZK
-9+A187Le6BivBoUwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjYw
-NzE1MDkxNTA4WjBcBgkqhkiG9w0BCQ8xTzBNMAsGCWCGSAFlAwQBKjALBglghkgBZQMEARYwCwYJ
-YIZIAWUDBAECMAoGCCqGSIb3DQMHMAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcN
-AQEBBQAEggEALiOBJBqI1OAnGRA5sW/y3zutD5hXYYukiW2BalGmV5Chbr02EuZ3+T46FTy13ih7
-yRaRSW7aEvhy6vOppNiPSzg3R7G1S5zyizWRHPicRwW/5TnNM4XsMZgz8FxCPu/MSqu0K2uSzLf3
-eqqaUB2zkKF4k/4xh2vlgDXFqX4DoXpjJDtyzJav1HkiYP4zrm0/9yOq9BKZf+oMUQfletIB0GNo
-NqrB0BCIt56Rgyb+/02GGgIAmkcCQNIOfSOZ4cvEGMMeeKHdi9Trdl7uws1eEWKwlP2FaKZWmZLe
-bjp9F/0Z1E3Nj/ZESqJtQIQ6CkjgiIaCqlr/vDzQCh0EyiXGfg==
---0000000000007f20240656a2c2b7--
+One question: since the check now exits the entire script before setup(),
+should the subject drop the "::host_vpn_tests" part?
+
+just a nit: test_iproute2_supp_or_ksft_skip() uses spaces, but most of this
+file uses tabs.
+
+Ciao
+Andrea
+
+> ---
+> v2: 
+> 	- skip entire test suite if iproute2 is too old
+> v1: https://urldefense.com/v3/__https://lore.kernel.org/netdev/20260708152745.2430714-1-alessio.faina@canonical.com/__;!!O5Bi4QcV!CGb1HmTUSZ4JwCff0mVcoY_KnoHJmrGDAdGnPOEYWRVFi-J05H-ZtpLVZBNK12kwLaNmhzw7mrQw4M_eY5uuSft8PRuFHqU$ 
+> 
+>  .../testing/selftests/net/srv6_end_dt46_l3vpn_test.sh  | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/net/srv6_end_dt46_l3vpn_test.sh b/tools/testing/selftests/net/srv6_end_dt46_l3vpn_test.sh
+> index a5e959a080bb..cd7ac03e3907 100755
+> --- a/tools/testing/selftests/net/srv6_end_dt46_l3vpn_test.sh
+> +++ b/tools/testing/selftests/net/srv6_end_dt46_l3vpn_test.sh
+> @@ -536,6 +536,14 @@ host_vpn_isolation_tests()
+>  	done
+>  }
+>  
+> +test_iproute2_supp_or_ksft_skip()
+> +{
+> +        if ! ip route add help 2>&1 | grep -qo "End.DT46"; then
+> +                echo "SKIP: Missing SRv6 End.DT46 support in iproute2"
+> +                exit "${ksft_skip}"
+> +        fi
+> +}
+> +
+>  if [ "$(id -u)" -ne 0 ];then
+>  	echo "SKIP: Need root privileges"
+>  	exit $ksft_skip
+> @@ -546,6 +554,8 @@ if [ ! -x "$(command -v ip)" ]; then
+>  	exit $ksft_skip
+>  fi
+>  
+> +test_iproute2_supp_or_ksft_skip
+> +
+>  modprobe vrf &>/dev/null
+>  if [ ! -e /proc/sys/net/vrf/strict_mode ]; then
+>          echo "SKIP: vrf sysctl does not exist"
+> -- 
+> 2.43.0
+> 
 
