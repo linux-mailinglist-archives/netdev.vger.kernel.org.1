@@ -1,147 +1,293 @@
-Return-Path: <netdev+bounces-307750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307751-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id GAdvCEmDV2oVUgAAu9opvQ
-	(envelope-from <netdev+bounces-307750-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 14:55:37 +0200
+	id L98uL7aEV2pfWAAAu9opvQ
+	(envelope-from <netdev+bounces-307751-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 15:01:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1380275E60C
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 14:55:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F31E75E6BC
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 15:01:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=fail ("headers rsa verify failed") header.d=0sec.ai header.s=google header.b=geGSBEMV;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307750-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307750-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=fail ("headers rsa verify failed") header.d=couthit.com header.s=default header.b=fMpWoh43;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307751-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307751-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed)" header.from=couthit.com (policy=none);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 41744301E813
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 12:46:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D0CBE30548AA
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 13:00:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72489478E50;
-	Wed, 15 Jul 2026 12:46:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6116347DF8B;
+	Wed, 15 Jul 2026 12:53:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875483E639F
-	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 12:46:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDCA147B425;
+	Wed, 15 Jul 2026 12:53:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784119604; cv=none; b=XHKczkD+xDTNUMFmgC6DWTFA2s1ajiaqQ6rh2oScQeY8QZZSnCcTzeniK+8u0nEeK1Jy4FPUZIb6b/OY3nsn+KYA2hg5FTphwDbisvmdq7O7FAIv8DgclPEwK5ikiwtoeTR5tnMaMCZPiXSXaCVoV+WrwsIDFoQNCoEpcwxxVn0=
+	t=1784120011; cv=none; b=LQgdWw/SeECuukpW77Fy1odtuaSwvrqM4Rbc4BG1p1PMfq92l/1adiUfoK4efKuxxAQ0fLOqJX6FSHfg7DhUY1E5JTQmVvUOPaST5Hdk+ZXRDmKX85BPXCSXl5pj85Cz37rF25M//kMfq2/rPq1wVfTgXMMVXTJ7dR/vEfadA2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784119604; c=relaxed/simple;
-	bh=MZBr5WxEHZ2y0pV8ggGK3k1uymGa6RNkY5bjprO9bjE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fUysb2Ao6HyopO+zt+msH1OqFRUpr7M2+vrj/uX30ZpRa3/CImDzCpY4SDJwB4+GCjjGOjjFSEcFcFO5buxU/Fi6agO6pQXvs/mk2IoPfIXaGjHFuQLunUzUHhbHQpuuIgy3CBrHbvNeRnxCaLcX+hbjJQJeLqpm8++hcSoVxP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=geGSBEMV; arc=none smtp.client-ip=209.85.128.44
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-493c19bad03so48267875e9.2
-        for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 05:46:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=0sec.ai; s=google; t=1784119594; x=1784724394; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=MZBr5WxEHZ2y0pV8ggGK3k1uymGa6RNkY5bjprO9bjE=;
-        b=geGSBEMV04zHY92wLISbC4kUhq5apmlcT7YHQtsgwXRFhpDP0+CefDTmRiS/c/Dved
-         jFE9PU4Vqcj4hwnt3WXTh8eT5eudnckKDXMAqZwM7UPaGWmvWIhbfKNjK4ARHzu00VhJ
-         YMiFZgtX+AHT73Gyvt6HGm8U5Fwwd5bt4o8mrsF9Q++vPD7cp2k9MKu/O2FsA+OTtxdX
-         IymacceUVgf/25eCFPICdUpi22DbYQNvLuTd7SQMre9ljx/lCJlG1Xj2ERTnen+268aB
-         GKaj6OKKhdph7nYGPPf6CHHyH8nYoNtOkFGj1SLFV22VMSc48Ug1BZZ95WFTfv0TT+GR
-         /evA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784119594; x=1784724394;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=MZBr5WxEHZ2y0pV8ggGK3k1uymGa6RNkY5bjprO9bjE=;
-        b=mQ/3sV6TmtA1M8SdMKDz+o5OBUWU8+28dFF0dd86z3cif6V4XpzPRN/PXDmtD9xNL0
-         mt3iEZe79ogl1ClvKjLROHVcITUrTLTTiVoCguX+Oql5X836pcGgrYQykoX6dY4SWBZ6
-         nQjy9wszBBXWPrgrgmiw21HVpWfaT8P7a8fzCIOF7gOfRZ9+G8JVC4AX3Gd9XEKWTm4Y
-         FXepI7kOJmeyTWzysFkd9RKZs7XMvix/0gyPlBtV87e5iZ0KV3RNoW1MT9VuFW8d2IxC
-         0XStx5KYlyT5V/9G/vV+sxLQJYAaUnNFxywRZaSRhfJ6EkBfLOheCcGz2xY1/AHOS+KB
-         BL5g==
-X-Forwarded-Encrypted: i=1; AHgh+RpH/HCQmCSursnaJ00c+NzZV+/kfmTsiKhI4oPu4Osx7H1XdpJeBXr42livICKFmXoknTBKqbA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yymmh3p9tRl+ybQoXzdEfBXrP8H3LKwByvzvyEh5Mizux1qQEsq
-	IdKuu2gYvdPbjhPfIxCVeEzIKKavcFARKpGV+CICQYsls2c5eCRofoCtltpwpFyettVW
-X-Gm-Gg: AfdE7ckYP0h/anmr0mdsv945MJW7Odysr3B53rtDJvyBm2DV8cLhNifWDmeKWh2iTsK
-	/44al4aEAU4BpX5OUdKtoxufaNNutfdk1IF7ggZXhM3MLxxLiWn4B9LlwozWTnVDq/KM3bMoIcg
-	zcK+MDQwkraKVItOMEsbZUd6rK2Bj99w/n37NkDYxRljMZL4sL2YduOiWFuWTpj6vCIT7KCjMO5
-	8m7i5laioBmPw05kg7M0dG1IEQuWhmOmKSoy8Gj8tdLgqtTcbIzBccrwbA92cYC90ME9ZCMC6xI
-	E9AvJysaBigWnVAUp/NwrdoIEQkCOvTXkCiu9vNDUkPlQiXyzAvVLJ5aQo9W1GE9rNf6DTd+vQ8
-	MG54Gpv4eZUhSwOKdBAwKjrEnsSB60bO6yPIZLgTEKBf7YiVlUv58eq8MjKgIgCIgGlzHVRmqGU
-	2JgcnHwRwoCf+8PaZB85cwb+5m17IbWnAlJ7g+CL90rmX+HXAFEtFX2e6FMwszcbjsRfGtfoIeH
-	8wvVBZ4vt3owPYwTTq+nwO2EfOTu/ZlVt2pPaVEUMYqDw==
-X-Received: by 2002:a05:600c:42c8:b0:490:d354:bcf4 with SMTP id 5b1f17b1804b1-4953c28b5edmr18893235e9.27.1784119593604;
-        Wed, 15 Jul 2026 05:46:33 -0700 (PDT)
-Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.218.188])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4950a2f635dsm157035235e9.12.2026.07.15.05.46.31
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 15 Jul 2026 05:46:33 -0700 (PDT)
-From: Doruk Tan Ozturk <doruk@0sec.ai>
-To: fmancera@suse.de
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	sd@queasysnail.net,
-	linville@tuxdriver.com,
-	mschiffer@universe-factory.net,
-	maoyixie.tju@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 1/2] vxlan: require CAP_NET_ADMIN in the device netns for changelink
-Date: Wed, 15 Jul 2026 14:46:30 +0200
-Message-ID: <20260715124630.41929-1-doruk@0sec.ai>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1784120011; c=relaxed/simple;
+	bh=o+8gjlkkIUbCquLzezvoIJqnERkBe2IcsrvkWGP4NNA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=enPXyiR1vmujfh9R0xk0ZqNzulVLCvBdaTynA8INpK86CyX1JdfM98kEp3YtYZTLCrXOXwlL1TPEDzEn/zvm0VS8RnZ005nNRnPc6sGGAGs0EA/IMVk9ajAjp+nqEC6AQDnHY9s2WtJRzzAROaZibNszXJ5CFDoSxF1AJKkNf4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=fMpWoh43; arc=none smtp.client-ip=162.240.164.96
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=2j8qNg1TZAuuoBuFwSmVDdooQbzuPXNTIeMajXTwQh0=; b=fMpWoh43dW0oiLVc5h0q/lxYvg
+	JZLp0vpajZcawbfYhFtg2GdYanzOAgok90Lv6roEWBptUftVznC9uJZNgu+OnAnauEVQEeiQlocwe
+	GbfhRaXGfbT0ZL/UezZB49LDTQVxApzwvUk8XYbZ30DICTt/KaakOVxv3gJ+BuxWSfYHvTVsfRfMH
+	k6xUGXa/u+sNW4cI+EC/a8n54vpu3t5MDCRy0VVOlOL3s3WQk2k2LFSa1/S7Vt75Ep9cpFJlt+H4Z
+	JeFKCvQZGjhPl2eLQfD8fjf5aOL41aA3vh8OQouK/iSfnKb7WN0e3V6E/dFIIC9vEVsmZtqGp7wzX
+	NdAgT7YQ==;
+Received: from [115.246.246.98] (port=16428 helo=zimbra.couthit.local)
+	by server.couthit.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.99.4)
+	(envelope-from <parvathi@couthit.com>)
+	id 1wjz70-00000003gyD-1ffo;
+	Wed, 15 Jul 2026 08:53:18 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id 8F4D71A074AB;
+	Wed, 15 Jul 2026 18:23:12 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+ by localhost (zimbra.couthit.local [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id j6AoR9ENA7iZ; Wed, 15 Jul 2026 18:23:09 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id D8FF11A0738B;
+	Wed, 15 Jul 2026 18:23:09 +0530 (IST)
+X-Virus-Scanned: amavis at couthit.local
+Received: from zimbra.couthit.local ([127.0.0.1])
+ by localhost (zimbra.couthit.local [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id JRtNYSvA4aok; Wed, 15 Jul 2026 18:23:09 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id B617D1A074AB;
+	Wed, 15 Jul 2026 18:23:09 +0530 (IST)
+Date: Wed, 15 Jul 2026 18:23:09 +0530 (IST)
+From: Parvathi Pudi <parvathi@couthit.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: parvathi <parvathi@couthit.com>, andrew+netdev <andrew+netdev@lunn.ch>, 
+	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
+	kuba <kuba@kernel.org>, danishanwar <danishanwar@ti.com>, 
+	rogerq <rogerq@kernel.org>, pmohan <pmohan@couthit.com>, 
+	afd <afd@ti.com>, basharath <basharath@couthit.com>, 
+	arnd <arnd@arndb.de>, linux-kernel <linux-kernel@vger.kernel.org>, 
+	netdev <netdev@vger.kernel.org>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	pratheesh <pratheesh@ti.com>, j-rameshbabu <j-rameshbabu@ti.com>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
+	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	m-malladi <m-malladi@ti.com>, krishna <krishna@couthit.com>, 
+	mohan <mohan@couthit.com>
+Message-ID: <1628011287.1652279.1784119989651.JavaMail.zimbra@couthit.local>
+In-Reply-To: <20260706091338.134754-1-pabeni@redhat.com>
+References: <20260630124958.894360-4-parvathi@couthit.com> <20260706091338.134754-1-pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2 3/3] net: ti: icssm-prueth: Support
+ duplicate HW offload feature for HSR and PRP
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [3.54 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 9.0.0_ZEXTRAS_20240927 (ZimbraWebClient - GC150 (Linux)/9.0.0_ZEXTRAS_20240927)
+Thread-Topic: icssm-prueth: Support duplicate HW offload feature for HSR and PRP
+Thread-Index: 8eRlRYgRYydSxPavBiZeI1p59ppDYA==
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+	R_DKIM_REJECT(1.00)[couthit.com:s=default];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[0sec.ai:s=google];
-	FAKE_REPLY(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[couthit.com : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:fmancera@suse.de,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:sd@queasysnail.net,m:linville@tuxdriver.com,m:mschiffer@universe-factory.net,m:maoyixie.tju@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:maoyixietju@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-307750-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:parvathi@couthit.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:danishanwar@ti.com,m:rogerq@kernel.org,m:pmohan@couthit.com,m:afd@ti.com,m:basharath@couthit.com,m:arnd@arndb.de,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:pratheesh@ti.com,m:j-rameshbabu@ti.com,m:vigneshr@ti.com,m:praneeth@ti.com,m:srk@ti.com,m:rogerq@ti.com,m:m-malladi@ti.com,m:krishna@couthit.com,m:mohan@couthit.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,lunn.ch,queasysnail.net,tuxdriver.com,universe-factory.net,gmail.com,vger.kernel.org];
-	DMARC_NA(0.00)[0sec.ai];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,couthit.com:from_mime,couthit.local:mid];
+	HAS_X_AS(0.00)[smtp@couthit.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MIME_TRACE(0.00)[0:+];
+	HAS_X_GMSV(0.00)[smtp@couthit.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[parvathi@couthit.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307751-lists,netdev=lfdr.de];
+	HAS_X_SOURCE(0.00)[];
+	DKIM_TRACE(0.00)[couthit.com:-];
 	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[parvathi@couthit.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[0sec.ai:-];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,0sec.ai:from_mime,0sec.ai:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	HAS_X_ANTIABUSE(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1380275E60C
+X-Rspamd-Queue-Id: 7F31E75E6BC
 X-Rspamd-Action: no action
 
-> It should be:
-> Fixes: 8bcdc4f3a20b ("vxlan: add changelink support")
+Hi,
 
-Thanks, agreed. I'll fix both tags in v2 (geneve too, 5b861f6baa3a).
+> From: AI Reviewer <ai@example.com>
+> 
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://sashiko.dev/
+> ---
+> net: ti: icssm-prueth: Support duplicate HW offload feature for HSR and PRP
+> 
+> This commit introduces hardware duplicate offload for HSR and PRP modes. It
+> implements a common shared queue between the two ports, writing frames once
+> to OCMC RAM and relying on the firmware to replicate the transmission.
+> 
+>> diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.c
+>> b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
+>> index 2ab78a98f8568..cbe666a212c3b 100644
+>> --- a/drivers/net/ethernet/ti/icssm/icssm_prueth.c
+>> +++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
+>> @@ -97,6 +125,17 @@ static void icssm_prueth_write_reg(struct prueth *prueth,
+>>  static enum pruss_mem pruss_mem_ids[] = { PRUSS_MEM_DRAM0, PRUSS_MEM_DRAM1,
+>>  					  PRUSS_MEM_SHRD_RAM2 };
+>>  
+>> +struct prp_txopt_rct {
+>> +	__be16 sequence_nr;
+>> +	__be16 lan_id_and_lsdu_size;
+>> +	__be16 prp_suffix;
+>> +};
+> 
+> [Severity: High]
+> Does this structure definition need the __packed attribute?
+> 
+> This struct consists of three 16-bit fields but lacks the __packed attribute,
+> so it inherits a 2-byte alignment requirement.  Later in
+> icssm_prueth_tx_enqueue, a pointer to this structure is derived directly
+> from skb_tail_pointer.
+> 
+> If an ethernet frame payload has an odd byte length, wouldn't casting and
+> dereferencing this pointer cause an unaligned 16-bit memory access, resulting
+> in hardware traps or panics on architectures that do not support it?
 
-Doruk
+The __packed attribute is not needed as this will be handled by C packing rules. See feedback
+from an earlier series: https://lore.kernel.org/all/20250708175301.599c82b8@kernel.org/
+
+> 
+> [ ... ]
+>> @@ -549,15 +588,24 @@ static int icssm_prueth_tx_enqueue(struct prueth_emac
+>> *emac,
+> [ ... ]
+>> +	other_emac = emac->prueth->emac[(emac->port_id == PRUETH_PORT_MII0) ?
+>> +				PRUETH_PORT_MII1 - 1 : PRUETH_PORT_MII0 - 1];
+>> +
+>> +	if (prueth_is_lre(prueth) && (emac->link || other_emac->link))
+>> +		link_up = true;
+> 
+> [Severity: High]
+> Could this logical OR cause the shared transmission queue to stall completely
+> if only one of the slave links goes down?
+> 
+> If one port loses its link, its emac->link is 0, but the other active port
+> will still evaluate link_up as true. The active port would continue sending
+> duplicate frames to the shared queue.
+
+No. emac->link only reflects the PHY carrier state and does not indicate whether the
+firmware servicing the shared queue is running. When one PHY link goes down, the
+corresponding firmware continues to consume descriptors and simply discards the frames.
+Therefore, using OR here does not cause the shared transmission queue to stall.
+
+> 
+> [ ... ]
+>> @@ -605,6 +659,29 @@ static int icssm_prueth_tx_enqueue(struct prueth_emac
+>> *emac,
+> [ ... ]
+>> +		if (free_blocks_other_port < free_blocks)
+>> +			free_blocks = free_blocks_other_port;
+>> +	}
+> 
+> [Severity: High]
+> Following up on the link_up logic above, since the available queue space is
+> bounded by the slowest reader here, wouldn't the inactive port's read pointer
+> remain frozen?
+> 
+> This appears to exhaust the free_blocks pool, causing the active port to
+> eventually spin and return -ENOBUFS permanently, defeating the redundancy.
+
+The inactive port's rd_ptr does not remain frozen just because its PHY link is down.
+The firmware continues advancing the read pointer while dropping the frames, so free_blocks
+is not exhausted in this scenario. We confirmed this behavior by testing.
+
+Unplugging one link does not stall transmission or lead to a permanent -ENOBUFS. A stall
+occurs only if the firmware itself stops running, which is a different failure mode.
+
+> 
+> [ ... ]
+>> +		} else {
+>> +			/* Read PRP RCT to extract sequence number and LAN ID */
+>> +			struct prp_txopt_rct *rct =
+>> +				(struct prp_txopt_rct *)(skb_tail_pointer(skb) -
+>> +							 ICSSM_LRE_TAG_SIZE);
+>> +
+>> +			if (rct->prp_suffix == htons(ETH_P_PRP)) {
+> 
+> [Severity: High]
+> Is it safe to directly dereference rct->prp_suffix here?
+> 
+> As mentioned above regarding the struct definition, this might lead to an
+> unaligned memory access on certain architectures. Perhaps using the
+> get_unaligned_be16 helper would be safer here, or adding the __packed
+> attribute to the structure definition.
+
+The __packed attribute is not needed as this will be handled by C packing rules. See feedback
+from an earlier series: https://lore.kernel.org/all/20250708175301.599c82b8@kernel.org/
+
+> 
+> [ ... ]
+>> @@ -1341,18 +1516,30 @@ static enum netdev_tx icssm_emac_ndo_start_xmit(struct
+>> sk_buff *skb,
+> [ ... ]
+>> +	raw_spin_lock(lock_queue);
+>> +	ret = icssm_prueth_tx_enqueue(emac, skb, qid);
+>> +	raw_spin_unlock(lock_queue);
+> 
+> [Severity: High]
+> Does this need to use the irqsave variant to protect against cross-device
+> deadlocks with netpoll?
+> 
+> The lre_host_queue_lock is shared between the two ports. If a hardirq
+> preempts a CPU while it holds this lock during a transmission, and the
+> interrupt handler invokes a printk that triggers netconsole over the second
+> interface, netpoll might bypass the netif_tx_lock.
+> 
+> When the second interface calls into ndo_start_xmit, it would attempt to
+> acquire the exact same lre_host_queue_lock, causing it to spin forever on
+> the same CPU.
+> --
+
+We will address this in the next version
+
+Thanks and Regards,
+Parvathi.
 
