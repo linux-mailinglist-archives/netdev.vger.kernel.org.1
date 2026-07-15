@@ -1,79 +1,78 @@
-Return-Path: <netdev+bounces-307724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307725-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id gUGHOoReV2ozKgEAu9opvQ
-	(envelope-from <netdev+bounces-307724-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 12:18:44 +0200
+	id 4nJPHGVeV2opKgEAu9opvQ
+	(envelope-from <netdev+bounces-307725-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 12:18:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 565CE75CE25
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 12:18:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA3D575CDFA
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 12:18:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=secunet.com header.s=202301 header.b=u2L4GyO4;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307724-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307724-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=secunet.com header.s=202301 header.b=Ni7SGsFz;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307725-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307725-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=secunet.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B1AAD3056FF0
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 10:13:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 644C5308A279
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 10:14:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EB153EBF07;
-	Wed, 15 Jul 2026 10:13:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92FDD43C7AC;
+	Wed, 15 Jul 2026 10:14:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5873E51EF
-	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 10:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E6ED3EAC9B;
+	Wed, 15 Jul 2026 10:13:58 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784110383; cv=none; b=ZCQxX6RbLPoB+/fVBt5xmNVBsKvsx8GCnzMW/I+czqVy6L2gn7zgNwkjGasftqB1n29D+P2QSrtRhHaSeHrevcOhBFNPFTQ+mCCZCIcC7I2QOxX95Gg9p9bonFcD/cFzJnI5RRTlr4BoCUZCLorBUmhu8YxMT5/vZ2qbDkDcxts=
+	t=1784110440; cv=none; b=KBvbU1tMYna0wzLbpEz3MDzaV38+d+G+GKidKVqdlacgOGh3wr4Ug8lM/e+HrRU+8kMWiru7rdvJddshlcW2wCVtyITODwmqxarCOQUjkU2ywH89rdtlJNTXZhHq9HEjKOYzadJYmY6iBqjnvBowFjsAUIOdsMAnaFMkJkijCEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784110383; c=relaxed/simple;
-	bh=LFCEaDlwL9cNp9v1FObooaiKQquWh/FRDHIhUalHqew=;
+	s=arc-20240116; t=1784110440; c=relaxed/simple;
+	bh=dznAcgeibEjN5/Xb9OznAx0ywgJh5zCe/GLG45FruNY=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cOIz6a4bsXY2LAUd6Tb14LnvagPeojEu1+fKS/wX6cVC9/xif4NtqWgYoZXzID0YJDdsQBIMDNs7QnHyj87U45GnmPmu2IzW0zZelNiTdz+RJSOeV1IQz9l9ho45EODRHRu1kH0VY0r6wJKvq8y4jxH1rAnSfkltLyIiwaPrtC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=u2L4GyO4; arc=none smtp.client-ip=62.96.220.36
+	 Content-Type:Content-Disposition:In-Reply-To; b=vCFqjzta9QoKKmoGg4s9645mO0Wljw2xYJ5o5U0/N++vaf9rSTp49XU+VGG/sz5soQ5rp3j2liTHeonxX8sLYdJoYHSA45cunFBDqccFzc0yNsla/aWBjxQqIPYoeq82vaZtQ1qndbOg6JMrx3YP0e+i/5530wHuQD/z3c65MRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=Ni7SGsFz; arc=none smtp.client-ip=62.96.220.36
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 2296820704;
-	Wed, 15 Jul 2026 12:12:52 +0200 (CEST)
+	by mx1.secunet.com (Postfix) with ESMTP id 9C69720684;
+	Wed, 15 Jul 2026 12:13:56 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 51TTMTvMCrsd; Wed, 15 Jul 2026 12:12:51 +0200 (CEST)
+ with ESMTP id 6iOoDMKxnsTn; Wed, 15 Jul 2026 12:13:56 +0200 (CEST)
 Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 78F07205CF;
-	Wed, 15 Jul 2026 12:12:51 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 78F07205CF
+	by mx1.secunet.com (Postfix) with ESMTPS id 0FCF9205CF;
+	Wed, 15 Jul 2026 12:13:56 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 0FCF9205CF
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1784110371;
-	bh=QveCguXAVzVCk9cJnko5Xk0qUwVgWcQY/UdWt24PyBQ=;
+	s=202301; t=1784110436;
+	bh=uAguo58+adgfuGry8xKS5mrXnN+Rcg5dlUr4HpI7O0c=;
 	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=u2L4GyO4vx9sIm054l4+KvG5dzj31dtKFScD3VzPhNkcjBGmmRkD8/4273Tddx0WZ
-	 RRSm1YiPE96YfJZUea8N0GX3YrFOpsKhUTRGglaMxjt+MK/rHQ2J7Ic6FVzofB8JF4
-	 858P0za+AlnPGrIjsYZXi0emfIFcJSZugxTIZkSS+ZrzBfEiglP60kbBj7lN5s8DH0
-	 pQ9yhc6olCNzLY8kR84lZsM8USTvIbE0gVaSrP9iX6sXqkJrtGWVzvgdSG5VAOhb1u
-	 EnkBXFNQnwPLpTQePkctN3MbOMtk/dqmjt75j42MZb5tJAq/c7RYThTcyF+fi7GMmm
-	 aEYnIvaMr0cjA==
+	b=Ni7SGsFzlXhvFvjTsMhMq386z5nh3x6YWZu+daTART1IaMVJpXApqDNgP0wYQP5R3
+	 AVXkLry6JsEGHIw0yNOTkQLCiwhYLhyOnHabh3KpAxyilwnR/rfWeDEJp2QEFFqOzA
+	 xvRY1/2oqEayXa4EHbsMAoJa0W5TyqUr7bgaUvg5vzzjTY25SHV6AbYgIuNBusOrn7
+	 pE1JJU8HwEDujT0RSN2YF+x56T2BdhnymJe/zXc+dwAXlJDwONCRgw9YRTcTSn+DX/
+	 t/LgSdtEmZcgyy/6ilYbU/NoWiJsRE9OEMNkFH6MD2LK9Z1SjHCkMwmvC2xYUfU6DX
+	 Nf1v8r8/JsMcA==
 Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 15 Jul
- 2026 12:12:51 +0200
-Received: (nullmailer pid 699358 invoked by uid 1000);
-	Wed, 15 Jul 2026 10:12:50 -0000
-Date: Wed, 15 Jul 2026 12:12:50 +0200
+ 2026 12:13:55 +0200
+Received: (nullmailer pid 699512 invoked by uid 1000);
+	Wed, 15 Jul 2026 10:13:54 -0000
+Date: Wed, 15 Jul 2026 12:13:54 +0200
 From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Xiang Mei <xmei5@asu.edu>
+To: Maher Azzouzi <maherazz04@gmail.com>
 CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<nakam@linux-ipv6.org>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <netdev@vger.kernel.org>,
-	<bestswngs@gmail.com>
-Subject: Re: [PATCH ipsec] xfrm6: fix out-of-bounds write in
- xfrm6_input_addr() when secpath is full
-Message-ID: <alddIi8ArJ13ytSC@secunet.com>
-References: <20260704210333.668216-1-xmei5@asu.edu>
+	<netdev@vger.kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <w@1wt.eu>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] esp: do not unref managed frag pages in
+ esp_ssg_unref()
+Message-ID: <alddYsnyQXXU2E1I@secunet.com>
+References: <20260712170530.9807-1-maherazz04@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,27 +81,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20260704210333.668216-1-xmei5@asu.edu>
-X-ClientProxiedBy: EXCH-02.secunet.de (10.32.0.172) To EXCH-01.secunet.de
+In-Reply-To: <20260712170530.9807-1-maherazz04@gmail.com>
+X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-01.secunet.de
  (10.32.0.171)
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307724-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[gondor.apana.org.au,davemloft.net,linux-ipv6.org,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:xmei5@asu.edu,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:nakam@linux-ipv6.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:bestswngs@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307725-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:maherazz04@gmail.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:w@1wt.eu,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
 	FORGED_SENDER(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[secunet.com:+];
 	MISSING_XM_UA(0.00)[];
@@ -115,40 +114,39 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 565CE75CE25
+X-Rspamd-Queue-Id: DA3D575CDFA
 
-On Sat, Jul 04, 2026 at 02:03:32PM -0700, Xiang Mei wrote:
-> The depth check in xfrm6_input_addr() is off by one:
+On Sun, Jul 12, 2026 at 06:05:30PM +0100, Maher Azzouzi wrote:
+> esp_ssg_unref() releases the page references held on the source
+> scatterlist after the AEAD operation completes.  It calls
+> skb_page_unref() on every frag page for an out-of-place transform
+> (req->src != req->dst), and in the error path of esp_output_tail()
+> (already_unref == true) on the request's own scatterlist.
 > 
->   if (1 + sp->len == XFRM_MAX_DEPTH)
->           goto drop;
->   ...
->   sp->xvec[sp->len++] = x;
+> This is wrong when the skb carries managed frags
+> (SKBFL_MANAGED_FRAG_REFS).  Managed frags are owned by a zerocopy ubuf
+> and the skb does not hold a per-frag page reference; io_uring SEND_ZC
+> with a registered buffer attaches the bvec pages this way via
+> io_sg_from_iter().  The rest of the stack honours this invariant:
+> skb_release_data() skips the per-frag unref when SKBFL_MANAGED_FRAG_REFS
+> is set, and skb_zcopy_managed() is the guard used at the other unref
+> sites.
 > 
-> xfrm_input() can leave sp->len == XFRM_MAX_DEPTH, and the transport-mode
-> receive path re-enters IPv6 input via xfrm_trans_reinject() with that
-> secpath preserved. If the inner packet carries a destination-options HAO
-> option or a type-2 routing header, xfrm6_input_addr() is called with
-> sp->len == XFRM_MAX_DEPTH; the check (1 + 6 == 6) is false, so
-> sp->xvec[sp->len++] writes one slot past the 6-element xvec[]. The write
-> stays within the sec_path allocation (invisible to KASAN); UBSAN_BOUNDS
-> flags it and panics under panic_on_warn.
+> esp_ssg_unref() is missing that guard, so for a managed-frag skb it
+> drops a page reference the skb never acquired.  This can underflow the
+> page reference count and free a page that is still in use.
 > 
-> Use "sp->len >= XFRM_MAX_DEPTH", matching xfrm_input(). This also
-> restores one chain level the old check rejected at sp->len == 5.
+> Guard the function with skb_zcopy_managed() so both unref paths are
+> skipped for managed-frag skbs, matching skb_release_data().
 > 
->   UBSAN: array-index-out-of-bounds in net/ipv6/xfrm6_input.c:309:10
->   index 6 is out of range for type 'xfrm_state *[6]'
-> 
-> Fixes: 9473e1f631de ("[XFRM] MIPv6: Fix to input RO state correctly.")
-> Reported-by: Weiming Shi <bestswngs@gmail.com>
-> Assisted-by: Claude:claude-opus-4-8
-> Signed-off-by: Xiang Mei <xmei5@asu.edu>
+> Fixes: cac2661c53f3 ("esp4: Avoid skb_cow_data whenever possible")
+> Fixes: 03e2a30f6a27 ("esp6: Avoid skb_cow_data whenever possible")
+> Signed-off-by: Maher Azzouzi <maherazz04@gmail.com>
 
-Applied, thanks a lot!
+Applied to the ipsec tree, thanks a lot!
 
