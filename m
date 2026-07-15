@@ -1,199 +1,139 @@
-Return-Path: <netdev+bounces-307731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307732-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id p5rOCNdqV2pdNQEAu9opvQ
-	(envelope-from <netdev+bounces-307731-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 13:11:19 +0200
+	id ZZQTO9ZrV2rbNgEAu9opvQ
+	(envelope-from <netdev+bounces-307732-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 13:15:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C1A975D638
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 13:11:18 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C07F75D760
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 13:15:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=ai83GQU1;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=mAvO173l;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=ai83GQU1;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=mAvO173l;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307731-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307731-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=suse.de;
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=bzUt7K+j;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307732-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307732-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 194A8302E788
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 11:07:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 979B33012CCA
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 11:15:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B238442105;
-	Wed, 15 Jul 2026 11:07:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB62F44682E;
+	Wed, 15 Jul 2026 11:15:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB5444163E
-	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 11:07:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8254483B2
+	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 11:15:29 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784113675; cv=none; b=Btixsd/EXyJn4gNUs3D63W3wB4TtOx4/1p9j2GX+FdpFvU1o2OJ9UdNNs2f70DJdjE3/v9PIxUNc/axPN9ONHCrOO/h8RTh0E1v1WxVEFBwFJh5FwNG8hEuwvqXgLh1MsCz0hwlvI4F48T//83TQth9u2pJbx6wvm9ZSuu++ZCw=
+	t=1784114131; cv=none; b=YHzTA01lQL8IMBxhHq4QH6m2f/LH+T5Qmy+KbbKS6L8AwN+ff96zKN9C1SzR1zReZybjTY763+gj/Ct2qZKHcRo7T6L1WdaerzeYQuss4waY59L091CYW6VXA175AwmKBZvg4EdlCZXy5p/AefVazevbOkA3hCdMmGj9nIeIZvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784113675; c=relaxed/simple;
-	bh=Hc514JNshgqWceOMm9U2mfrHvFSvhhnQoBZQ351+jAs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hkoIKcuWiwaeFbFMfQtBM0SQpldbErtXKGCt0BILqEtfk1uKUJjmqB944KRchuEBWezXVr6eUD7vvaNT6E+4Izo4NghDnDzL1U38D3C+Wob7BktFjyh/1nmq18DKNfWiD+7VZc3V/oKRrjITNnTIdGHbXQcAbK1sp3T4TK80tK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ai83GQU1; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=mAvO173l; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ai83GQU1; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=mAvO173l; arc=none smtp.client-ip=195.135.223.130
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 07A567837A;
-	Wed, 15 Jul 2026 11:07:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1784113672; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nioUefq1xbXjtodWxvKxZTWQPlbxpqryGWIKwDtgw9w=;
-	b=ai83GQU1QSLW4HMqQLHqkTNNKJcdnVJeYTkcJczwLEkaWbE4HH08Sgzz4Zi3FfHHLXKF0w
-	BUqWf9xtp+Poz7MSTvJxVILX1rJ1fg0J0/12EhNSXj8Ts27FocAgBdZZtHRJP2E0SYcjVW
-	dRLsXyhi36zD9Vi640oinf7YuU/RvAU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1784113672;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nioUefq1xbXjtodWxvKxZTWQPlbxpqryGWIKwDtgw9w=;
-	b=mAvO173lFLygJBfvjytDRj9llSE+d8jC3KzkTwirCPAfOhdFiZxPmaq14VxHUPIQnWNtTe
-	BMuK6oUQqZjAcqAw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1784113672; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nioUefq1xbXjtodWxvKxZTWQPlbxpqryGWIKwDtgw9w=;
-	b=ai83GQU1QSLW4HMqQLHqkTNNKJcdnVJeYTkcJczwLEkaWbE4HH08Sgzz4Zi3FfHHLXKF0w
-	BUqWf9xtp+Poz7MSTvJxVILX1rJ1fg0J0/12EhNSXj8Ts27FocAgBdZZtHRJP2E0SYcjVW
-	dRLsXyhi36zD9Vi640oinf7YuU/RvAU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1784113672;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nioUefq1xbXjtodWxvKxZTWQPlbxpqryGWIKwDtgw9w=;
-	b=mAvO173lFLygJBfvjytDRj9llSE+d8jC3KzkTwirCPAfOhdFiZxPmaq14VxHUPIQnWNtTe
-	BMuK6oUQqZjAcqAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0E927779AE;
-	Wed, 15 Jul 2026 11:07:51 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id iqBNAAdqV2ooAwAAD6G6ig
-	(envelope-from <pfalcato@suse.de>); Wed, 15 Jul 2026 11:07:51 +0000
-Date: Wed, 15 Jul 2026 12:07:49 +0100
-From: Pedro Falcato <pfalcato@suse.de>
-To: Harry Yoo <harry@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Jason Xing <kerneljasonxing@gmail.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, Kees Cook <kees@kernel.org>, 
-	linux-mm@kvack.org, Vlastimil Babka <vbabka@kernel.org>
-Subject: Re: [PATCH net-next v3] net: skb: isolate skb data area allocations
- into a separate bucket
-Message-ID: <aldpAY6nXwgayHL0@pedro-suse.lan>
-References: <20260702170728.168755-1-pfalcato@suse.de>
- <04debe19-bbe8-4b5f-9668-753d1f97832d@redhat.com>
- <ak4w2k4Woj55E0On@pedro-suse>
- <529e3997-d26f-4d8e-ad90-3329fe90e555@kernel.org>
+	s=arc-20240116; t=1784114131; c=relaxed/simple;
+	bh=4909ZvzqE/qBkcTGctD2aEwJFWkjePdcil0/KSV46/U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VnDW9o4tek26nPs5PunIOEydcBrMGlRV0yCyyJKBz1WTTQJlIjZzIqJ2aAo9qSsHx8bbMRi1eL/7FfT5k6nMW98w0iGbD5Ono9mHJBWZyNWc0I2+7+jfw9t2YUGqekuQBfRHD21ccK+vGDQCQIMBkvifW13LhHgRcqTV18dnaBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=bzUt7K+j; arc=none smtp.client-ip=185.171.202.116
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 270ADC2B9CE;
+	Wed, 15 Jul 2026 11:15:44 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 28C9D6035C;
+	Wed, 15 Jul 2026 11:15:27 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 382CA11BD1518;
+	Wed, 15 Jul 2026 13:15:15 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1784114126; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=4909ZvzqE/qBkcTGctD2aEwJFWkjePdcil0/KSV46/U=;
+	b=bzUt7K+jxAzqnf65ic/3Zie1qUXtfMBGduxbcKwUfBdB1KeAAZfgZ/B7xaRDidQOL2PpN4
+	yqdRp3nwCPDU1UsC51v/JUPSWtl6syPTBbMZesdWBiW8crQ7Tn5NG2pzEAgQEoa736/qlg
+	6pgk8z0Abu7J7saLFLyPNtIvH5eufO7hAgGl9F8cFkTDLW+9DiziKVZovPCqzYVibM9h+9
+	uR7FlrzvlVezzkPZ9llu9KcYfSjuv0KpAJ8p23dA4G3z7pw6l++foLmhk6BV3U+eBhLSTk
+	UBZAUdFnCQM1bSyWnheRIsBLKNr9VE2INnZ8TJ1TrZkcN2oSRwBPvOL7GziK2A==
+Message-ID: <f81a233a-ad96-499f-8a79-c3418dc99ac3@bootlin.com>
+Date: Wed, 15 Jul 2026 13:15:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <529e3997-d26f-4d8e-ad90-3329fe90e555@kernel.org>
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
-X-Spam-Level: 
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 01/10] net: stmmac: move XPCS lifetime management to
+ platform drivers
+To: Christian Marangi <ansuelsmth@gmail.com>, Coia Prant <coiaprant@gmail.com>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, robh@kernel.org,
+ krzk+dt@kernel.org, heiko@sntech.de, netdev@vger.kernel.org,
+ linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-phy@lists.infradead.org
+References: <20260714191341.690906-1-coiaprant@gmail.com>
+ <20260714191341.690906-2-coiaprant@gmail.com>
+ <dc21b2fc-ae11-4fde-a5b9-09e2c6bee5c9@bootlin.com>
+ <CALj3r0gWyfHHp0S4=71M1-TjgHKcgGax4Lr0DzPi37Q69-iCwA@mail.gmail.com>
+ <6a574873.3027643f.39eab0.b4c0@mx.google.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <6a574873.3027643f.39eab0.b4c0@mx.google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307731-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,google.com,kernel.org,gmail.com,vger.kernel.org,kvack.org];
+	TAGGED_FROM(0.00)[bounces-307732-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[pfalcato@suse.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_RECIPIENTS(0.00)[m:harry@kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:horms@kernel.org,m:kerneljasonxing@gmail.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-hardening@vger.kernel.org,m:kees@kernel.org,m:linux-mm@kvack.org,m:vbabka@kernel.org,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_RECIPIENTS(0.00)[m:ansuelsmth@gmail.com,m:coiaprant@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:robh@kernel.org,m:krzk+dt@kernel.org,m:heiko@sntech.de,m:netdev@vger.kernel.org,m:linux-rockchip@lists.infradead.org,m:devicetree@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-phy@lists.infradead.org,m:andrew@lunn.ch,m:krzk@kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[suse.de:+];
-	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pfalcato@suse.de,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:from_mime,suse.de:dkim,pedro-suse.lan:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6C1A975D638
+X-Rspamd-Queue-Id: 8C07F75D760
 
-On Wed, Jul 08, 2026 at 10:27:54PM +0900, Harry Yoo wrote:
-> 
-> 
-> On 7/8/26 8:16 PM, Pedro Falcato wrote:
-> > On Wed, Jul 08, 2026 at 10:30:50AM +0200, Paolo Abeni wrote:
-> >> On 7/2/26 7:07 PM, Pedro Falcato wrote:> @@ -586,6 +586,8 @@ struct
-> >> sk_buff *napi_build_skb(void *data, unsigned int frag_size)
-> >>>  }
-> >>>  EXPORT_SYMBOL(napi_build_skb);
-> >>>  
-> >>> +static kmem_buckets *skb_data_buckets __ro_after_init;
-> >>> +
-> >>>  static void *kmalloc_pfmemalloc(size_t obj_size, gfp_t flags, int node)
-> >>>  {
-> >>>  	if (!gfp_pfmemalloc_allowed(flags))
-> >>> @@ -593,7 +595,8 @@ static void *kmalloc_pfmemalloc(size_t obj_size, gfp_t flags, int node)
-> >>>  	if (!obj_size)
-> >>>  		return kmem_cache_alloc_node(net_hotdata.skb_small_head_cache,
-> >>>  					     flags, node);
-> >>> -	return kmalloc_node_track_caller(obj_size, flags, node);
-> >>> +	return kmem_buckets_alloc_node_track_caller(skb_data_buckets, obj_size,
-> >>> +						    flags, node);
-> >>
-> >> Sashiko noted that some drivers may require GFP_DMA buckets, and the
-> >> above may break them:
-> >>
-> >> https://sashiko.dev/#/patchset/20260702170728.168755-1-pfalcato%40suse.de
-> > 
-> > Oh, this is really awkward. Adding linux-mm and slab maintainers for input here.
-> > 
-> > Considering the current slab bucketing does not seem to duplicate DMA or
-> > CGROUP caches, could it make sense to duplicate those as well?
-> 
-> Could we specify what kmalloc types the user needs when creating
-> kmem_buckets and duplicate caches for the requested kmalloc types only?
+Hi Christian,
 
-Perhaps. But do the users themselves know? alloc_skb() allows users to specify
-random __GFP flags. We're bound to see some random caller do
-alloc_skb(__GFP_ACCOUNT) ;)
+> I think the idea of Maxime is to test that series on most Scenario as
+> possible to verify for fragility or regression on it.
 
-In all honesty, I'm not quite sure what the best way forward here is. The most
-transparent way is to bucket those other kmalloc types as well, but that might
-very trivially result in a lot more caches (and possibly memory usage) for no
-great reason. So perhaps specifying caches might do.
+I've tested your RFC on a few boards that use the .select_pcs() callback,
+and didn't find any regressions :)
+> (but just for Maxime the feature is getting actively used on OpenWrt by 3
+> different SoC and no complain for now)
 
--- 
-Pedro
+I have no doubt that the fwnode PCS registration works, however there's no
+user of the .fill_available_pcs() path in this series. You may not have access
+to HW to test this though, but this is my main concern that we discover issues
+when using "internal" PCS with the new API.
+
+I _may_ have time to play around with is on mvpp2, hard to say when though, but
+feel free to send another iteration for review :)
+
+Maxime
 
