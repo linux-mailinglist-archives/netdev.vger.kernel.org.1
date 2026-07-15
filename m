@@ -1,273 +1,187 @@
-Return-Path: <netdev+bounces-307727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307728-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VjehAaVfV2qSKgEAu9opvQ
-	(envelope-from <netdev+bounces-307727-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 12:23:33 +0200
+	id TghXOxphV2oDKwEAu9opvQ
+	(envelope-from <netdev+bounces-307728-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 12:29:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67C0475CF0F
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 12:23:32 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 623D175D014
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 12:29:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=canonical.com header.s=20251003 header.b=CZxq1ET2;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307727-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307727-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=canonical.com;
+	dkim=pass header.d=suse.com header.s=google header.b=Bwo7DQec;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307728-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307728-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=suse.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2ABF73011A62
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 10:23:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 089443076087
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 10:28:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D5C343F8C7;
-	Wed, 15 Jul 2026 10:22:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62418441622;
+	Wed, 15 Jul 2026 10:28:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F26943F8AB
-	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 10:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10B044163C
+	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 10:28:16 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784110979; cv=pass; b=ZuHSFRn0q/TVxJw7HfeBE1FfAOWZtVV0SbvrIgluDV0WvIM5r3cOqoc4SECqKrQukiLGkiAxMCwGq5Aw7cU8i1zyOrroOCR49zbJy9K+pz3L6eWkbpBlMvJ/KVBLkDFnvAovIsvx6yUubzvsayaJ7nhZCP5gPl+CkhedxqRwYy0=
+	t=1784111298; cv=pass; b=rpkIrE3kljDO5dpqvKAFCp6T0sP1D1ks2WJujlL1NylOFN55TJV08DvQfQnzvie5YytSmcj/qugUt+Ei3zc01kyKaLzCRJJ36LR3pES4+1SzsKW86D0N2mx2fgNbxHMwIrdptGwcQiLXvPsnor8CdvYtcf97fv6Po1GFF0ChTig=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784110979; c=relaxed/simple;
-	bh=2Bc8wdh2fo7HegHxnOQ5YULYEYQtyN8WVrxPFLUtBbo=;
+	s=arc-20240116; t=1784111298; c=relaxed/simple;
+	bh=sdz/WAGfFG2PTmUZ1wJMxa5wHauvvFsHiUboiywwFiA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bnS4R25RCz+dqiYdHkRNHyxDyNdLyAZbmMpNbBHvxUeMCzRG9ytyuQ3/NODDPBALA1W9SZuPvAHnQFOI0Wr9sMb2nCZ7ary0pBFWN0/8X59Mtq+cAtLdXI3fV5pSkz/wxaLK79eV7HNnn9baU9RAIaoalM/xSN6RXz0ykKh+YD4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=CZxq1ET2; arc=pass smtp.client-ip=185.125.188.123
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com [209.85.218.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 7660A3F60A
-	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 10:22:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1784110974;
-	bh=fZC27ShXa7hl4qW+78jwKRMiG2RSdKURS3G8/4lCd3w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=CZxq1ET2dVhqq/XR1QaV/aivsbZrJ2rGEVNzhH0BJg5KQ64ZJUMvKedw7xOkQtKaq
-	 /k4XyOaG2wwSbBfx0NrqGhsKy7HurviDDzFbPNhpHEO1HgIZ5vWOsr+V+m8IzWqoCp
-	 3aVKmTKkLkGmH0qbBvCPxbkmlS3Hg4mdYTNymgiudb8/6CncLLk5Lmk1nquJ9x2JiH
-	 XxI521rJM2MVzprGrJR+0dWzIZnKTKNTD+3UGHSUe2zmyPv2cxqQBqXZV4IH34bocv
-	 fOAlIOoDKrlwwDMdWsV69sf1TAM4uXrccshg4B/r27OzGnfcc6M6AKs7kID5A+kmlm
-	 BSL/RbwM7UdP9iyWgYIOCWXkgh9b+3WmkxF2amNadmyIGwRRUayEDa6RkBr7AJgrns
-	 gtYmXtpUhpUSlPxMOO2BKZ9P/UIw7DtcY+e8f/XvYG8S2S2B/X+EIAXxhQuyTJSSid
-	 SlTJmlR82b/tt+bEnnAxu9tDV7rJVyILodhKfBlH364rffj52fRfhsl/RnZn6w2wNn
-	 ZzcR3iVh1MpILtcOJLX1qP0oVT+f/5yj5hSP6EWmefEJ/G3bPMYlWGRXxt1QzTthax
-	 F6qVvQrCeyBQrlYjzRLC74cZKEvQSzqwDdNEoSsK3OXxvuMtBGouR7W9SqLhtG6p4C
-	 RlSSikZlxAiKC2se/vuqlH18=
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-c15ddb61f13so579075066b.0
-        for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 03:22:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784110974; cv=none;
+	 To:Cc:Content-Type; b=aB1MfhtcGut73jwdZjtJLdcdmpiQdi1Cfc9k45hG41aV7g/WY/Ae+Y9DqnjPIKugcmfoTiq0IA2vANojdypq/4NhfgCbSLM4ZYGbIFScj945DlZxv4Rs6Jcl++zBeZi6ZuThCEgdtxURx2k3iGkO+9r0XBvVtOowwUvrFsOTEU4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Bwo7DQec; arc=pass smtp.client-ip=209.85.167.49
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5b018fe8318so1645497e87.3
+        for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 03:28:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784111295; cv=none;
         d=google.com; s=arc-20260327;
-        b=ltGVfK4wpYM7xOCepPBVGFtMrvtNyl7LNJkNhUXjko+vQzsBsjpn3UyVGJDal9hMg7
-         xj9DIePPmjGuTDS5E1Ll+2zFR7Vnry2ACC6K0UBxHMQuFuEplf9gCKxQ3KSh63AQoA9S
-         HPO7FXCgtCzRsOQL2Hib9rJNGE+LVLqo2cPlrNW/VCIFSkRLGtLH1oKVc03uuiITtX0g
-         HWWlg7iYgiVozMG4bm+HOdWb+H2RbFNsHj+6VnJova9FXNK6DwZbfVIHrVUel2U34uEA
-         q4lVL7l5yZpkGl7lkOwadeAyqxXkAnCo3OGGho9+d4HniaN/PixrmMf77ndkiAngwvUa
-         9J6Q==
+        b=gouSYXha0DfLqdhV4EKCbrU0SPUYE49MSQCLWizrR/RXjLd9WQJ36ywp5f66i+xB2x
+         FyVg8KxEkDmH/lHkSMwt9U4iru3XFxEFy1F7+f3wprNUMPRinSJnujh7Iyeo0ZeQbutI
+         U1OkY9jPxmsvf1elYFMmh3jBpeDv3NZvarrwZXB+VSOycz7jGAvKkMf/oncreIzag+84
+         gng645aBgbKSUvbObm1D3YkiN1mNLF2wKNsryJVuP9gL5483LEErQ2vvPTaMY7V2bwc8
+         LrDVqfKs31yuFs8CcfH5mQ6CJ1/N3hBOUMM8o+SGz+1Rzx4ixMr+xPi7BUf8CPaEPjcW
+         hcqg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version;
-        bh=fZC27ShXa7hl4qW+78jwKRMiG2RSdKURS3G8/4lCd3w=;
-        fh=F8Tn5PTIshcOtL+5JUsHjH0LI4ihkX4ZpC8zEnfXwXg=;
-        b=gItFym4mvciI4R+rCp3e+EZApJOk9c9cdkFX7GdcJbFvuZ0yD/LnE57ppw9x/EUmmf
-         8gcJTf7tv3jb+YtaKm1F3ZoS+G5zv9USi7Bq0NSf+NIMi89q0AecMkvTJAvmQfV6dJSf
-         ziyb0mUdmb5Z4Q+8RIZTqisANH488qELiG90iBGL0m/fcOmsPZzcQti5UpM6CI8W1BJe
-         lJ0HRKxaSa2VZsDU5KU7VKmUPimGgMKL+AUjxTiHKvJcphqBi0lhiVu0Gptli0dYWNg1
-         qsxxf7INkVw13vDDEFrjwQ/AUcNYOhqNw/6z26piBtO0CR+a8b/IkxToxuJCGgWJWXiq
-         MKsg==;
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=QPvnZmvDyFwzWB/pCYkhKpUQPg4ZobgLnpg06TR5Pn4=;
+        fh=l9mLQurEZzaKnCzEcsD3+B3Wip9ZUYM8nAeltVLK/ew=;
+        b=iswYecvnLB4iRHjqBbtUv63pY6UQSlSN21W4CqAPrNLM1d4e1b2LedoWHb3rl0hKkw
+         6lNaUNPeNp5DZT1NC1DfbZ6+KITzdwZ2evWz8VBD1mZhq0t521TaBkDj3EfB21f08N6W
+         6a1sCEfM/ukKVT5jzO5D6OV2A+oBuQ6AxtnTtPXduT8h4TlCnJQaVDG1ta49mLPv4m9E
+         fRk0GqRVvqn+QkMLD9rHIIkYotpg8jHAcG/7NLlZx7ElewBCQK4Z1yXhKowpq3lhlJt6
+         MU4IgslKyjiFIWv4ah55MWYwyQxfWcjZbSaofVXY82yNatU6DPeX6KPveeB95DI54e/z
+         KEvQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1784111295; x=1784716095; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=QPvnZmvDyFwzWB/pCYkhKpUQPg4ZobgLnpg06TR5Pn4=;
+        b=Bwo7DQecg64hOObF+sx2++MDKhXaiv4agJ07HxwHn7su3lqodxrQvVMWXuX1OQoWM3
+         N39fgEzc20gHI4YBcm9STY23S490oE6PONDUbU/f4rmyX7ZNSgxdQQrn/sDItDYsbet+
+         RhvjeyD8IF1w+hYWSLLAV15lGgt7U6M5XLLSD7OeKQJbE+gsUReYgikcghGzIyuYKLfm
+         yz21dxwRkzy3oqtCvNws0kx+syk2u3tkVGHBneS2I1Ofnqnjeikl4PWyWPCF4N3q6z8o
+         E9Zq3lPUCCrLMrA7u5hBzwhHr4xE+kR2GZdW8o9ZFJyejxt8O5BdRSDCSi9iSWKi4ylJ
+         2TKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784110974; x=1784715774;
+        d=1e100.net; s=20251104; t=1784111295; x=1784716095;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=fZC27ShXa7hl4qW+78jwKRMiG2RSdKURS3G8/4lCd3w=;
-        b=CP4EqjTfBX85lPvvJV5a+PZCVQVeAbw2f3CuWsv0Af4XBRKU28XH/nXG89hdR0a19J
-         El7lj+NZPFVN55jLseZHvthf+CMA0UdeeEzp8C1l4DO4afXT4HHhFBTu/hgHVhZ2hIAS
-         IJxu4dlTsMDyv3HUmcfyqm8qwBB/s/DFi9/lqxtqG3D7mbUmhGxbb5lQ1/P0goSHd9Cm
-         SFKYi6oMhrv/DIUMX3fGeUe81DCeXKWQVXpxl87bJ56MGzJwtVeOpory71hRFdT4oJ9e
-         9FKqnvXZ9naPEtBreNECwJFurIG7CB1hSeaji7TOvrO52rH+o/x9mYVCqN4yazpkowsu
-         QNRA==
-X-Forwarded-Encrypted: i=1; AHgh+RoA+4a32cDBFb5dpANv6l8wlUMVbs08xvhbtKxYfSmRNt9SB8yiran53vsSuOpaj8BgR8GccJQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxE+kuuxch68l5rQBPt5yteNMGCeU2YyqjlDB90/TSV46l/a9bT
-	2HriMUS4Ltw9Zi59EY/6ANhq3qfRKEByyA11w4Pw9NZHDKphrNZKe9MJTf/QyAG6QterQH8/sBb
-	cC1OSxPMuK1fZMJ7FvDqc7RoS8l4j3apnCSDknC3EYJFW9qizb6D1pE4xjEeerqBE9kD9ZFGPC4
-	3HxowcD9XjAkaW2kVz57zGyM5e0kxLkMtmiSXhevSTOvFiDLKb
-X-Gm-Gg: AfdE7cmzEGcTicB7F7eeVODxu1ZQLAUiiAbxIrlTP7TgzsN5rpkhKFWQ0AqKF4MlCf4
-	JeWiYgHY9cLBabWPPFUWESW0xp1QVIKBptD+EcY3hoo7jnX2Hfe4kCbXge1wJSFQL6xgR7hdv/i
-	wyH6NieI4twBnkmvqOV+vGQH3PffhYZbZzduuvTaMqOHckyZKBpUBKSRBOFdwT1txBAYef
-X-Received: by 2002:a17:907:6d26:b0:c12:713b:e199 with SMTP id a640c23a62f3a-c16616a3b18mr421708366b.25.1784110974065;
-        Wed, 15 Jul 2026 03:22:54 -0700 (PDT)
-X-Received: by 2002:a17:907:6d26:b0:c12:713b:e199 with SMTP id
- a640c23a62f3a-c16616a3b18mr421705666b.25.1784110973609; Wed, 15 Jul 2026
- 03:22:53 -0700 (PDT)
+        bh=QPvnZmvDyFwzWB/pCYkhKpUQPg4ZobgLnpg06TR5Pn4=;
+        b=SJBSnQ+jUGTe3YbQkTFXR4sJGV5YtUrsG5/blHnqZWY0oHG4DYYcHI8m2Sz1MsFLT/
+         YtMY3ZHFa+YUaG9UO+t6ZxgAiHolFzr0E90XydGGS/xOgikE6/CqRupfHYb6RyH7Jaew
+         /V/oBpRMeTShJlA7DA2Oyojqa145Jyy9dk13RVfwaa8zBA9JepdD5r9gwcpN55jKlPiH
+         C1Lu6aWa3wOUhsbvC1DyZzN9fEcRhJKg5CX3jLhPUJkkV8FqDTJCGwrQ/XmERE0DcSuV
+         ovt/DVCBEsVTplDgRua09SLEmA2RnZBY0KuvrRAMjYD/QIVT95Kr4q7Har9xh6rERW+X
+         0ALw==
+X-Forwarded-Encrypted: i=1; AHgh+Ro2zEJQLrUcDm0++Cyx+0r8qA0TzfCll+FPUIt9bDZoRx16czKHV0Hh8tDoMAU4n2H6zGxes+E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YznuIYfayTFUVLQhtks22Pvj6If0lhc7t78qEreunJrC0QdG7xl
+	+DB6nhIJAsCG/yOwxzxrVM1R6f9t2fs6LQMqm0e1ujgpMxikC5pbOA5WrFVBrDuWQir81xj9j/u
+	+V4bVsAj5r3LeJvdLsm72A98BMmfGlTUJ3kPxU+13HA==
+X-Gm-Gg: AfdE7cnm9rm3vSjHr5AuS0cOJDVkitRkUwXX0mPT+zFu1u5Up7s6h47ZW7YA73GukDX
+	haAnjXL87KHed/J0DnVwGQq92kCDHW99cEmDzjJ565uxydUbTgbrQkvQ7JbdXc6WejFRmCqSTI8
+	X/964vAKnpTybJHQHvZEh+n1MCq41QfiA4JE+g3Jp4sncrleUGL0u6BPgSqbSaARqQgw6uUN1Fx
+	zSPukoJUPU01vVGu5swXb8LU68kZSmI2mP6Y7Xi5GhCEE7/ND+LKK2S4rFYng78GJO7iVfP
+X-Received: by 2002:a05:6512:66cd:20b0:5b0:1eed:f702 with SMTP id
+ 2adb3069b0e04-5b0236b7a0bmr2733808e87.54.1784111294764; Wed, 15 Jul 2026
+ 03:28:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260703103245.374800-1-robert.malz@canonical.com> <bc89cccb-3f22-42c9-9f96-382586d12fcf@intel.com>
-In-Reply-To: <bc89cccb-3f22-42c9-9f96-382586d12fcf@intel.com>
-From: Robert Malz <robert.malz@canonical.com>
-Date: Wed, 15 Jul 2026 12:22:42 +0200
-X-Gm-Features: AUfX_myIE6AiN9iz-hnLIP40Cqa9z96HpTUcSSSXEmslFfKlKzSUSBFpuMLkV9w
-Message-ID: <CADcc-bxLMg1NujF+jE2rOXGc38quv_XqZfv5K+yGQFfhc03avA@mail.gmail.com>
-Subject: Re: [PATCH iwl] ice: acquire NVM lock around each flash read
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Jacob Keller <jacob.e.keller@intel.com>, 
-	Jesse Brandeburg <jbrandeb@kernel.org>, intel-wired-lan@lists.osuosl.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260706134033.244295-2-marco.crivellari@suse.com> <20260711164434.1691221-3-horms@kernel.org>
+In-Reply-To: <20260711164434.1691221-3-horms@kernel.org>
+From: Marco Crivellari <marco.crivellari@suse.com>
+Date: Wed, 15 Jul 2026 12:28:02 +0200
+X-Gm-Features: AUfX_mxDB8UQzuGBAa50_CUwUbLgAP9_s8ih_XJWsAHI5lvvyskjdwGSmzvPwq0
+Message-ID: <CAAofZF4JQebhYv6FTHZuygnPge32CPJam=JHmVc+QVT75Jp5Cw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/5] ibmvnic: Move long delayed work on system_dfl_long_wq
+To: Simon Horman <horms@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, tj@kernel.org, 
+	jiangshanlai@gmail.com, frederic@kernel.org, bigeasy@linutronix.de, 
+	mhocko@suse.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	enelsonmoore@gmail.com, linux-usb@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[canonical.com,reject];
-	R_DKIM_ALLOW(-0.20)[canonical.com:s=20251003];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-307727-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:tj@kernel.org,m:jiangshanlai@gmail.com,m:frederic@kernel.org,m:bigeasy@linutronix.de,m:mhocko@suse.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:enelsonmoore@gmail.com,m:linux-usb@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307728-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:aleksander.lobakin@intel.com,m:jacob.e.keller@intel.com,m:jbrandeb@kernel.org,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[robert.malz@canonical.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[marco.crivellari@suse.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[robert.malz@canonical.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[canonical.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[suse.com:+];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,mail.gmail.com:mid,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,canonical.com:from_mime,canonical.com:dkim]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marco.crivellari@suse.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com,linutronix.de,suse.com,lunn.ch,davemloft.net,google.com,redhat.com];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,suse.com:from_mime,suse.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 67C0475CF0F
+X-Rspamd-Queue-Id: 623D175D014
 
-Hey Tony,
-Thanks for the review.
+Hi,
 
-On Wed, Jul 15, 2026 at 1:47=E2=80=AFAM Tony Nguyen <anthony.l.nguyen@intel=
-.com> wrote:
+On Sat, Jul 11, 2026 at 6:46=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
+te:
 >
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://sashiko.dev
 >
+> Simon says: While I think that the pre-existing issue flagged below is
+>             orthogonal to this patch, I wonder if you could respond
+>             to the question regarding scope raised in the first
+>             issue flagged below.
 >
-> On 7/3/2026 3:32 AM, Robert Malz wrote:
+> [...]
 >
-> ...
+> [Severity: Medium]
+> Will this leave the primary reset path bound to the per-cpu system_long_w=
+q?
 >
-> > @@ -92,12 +98,28 @@ ice_read_flat_nvm(struct ice_hw *hw, u32 offset, u3=
-2 *length, u8 *data,
-> >
-> >               last_cmd =3D !(bytes_read + read_size < inlen);
-> >
-> > +             status =3D ice_acquire_nvm(hw, ICE_RES_READ);
-> > +             if (status)
-> > +                     break;
-> > +
-> >               status =3D ice_aq_read_nvm(hw, ICE_AQC_NVM_START_POINT,
-> >                                        offset, read_size,
-> >                                        data + bytes_read, last_cmd,
-> >                                        read_shadow_ram, NULL);
->
-> Sashiko says:
->
-> If this chunk has last_cmd =3D false, doesn't releasing the NVM lock
-> immediately
-> after ice_aq_read_nvm() allow other entities to acquire the lock and issu=
-e
-> their own NVM commands in the middle of our open read sequence?
+> While this patch partially migrates delayed reset works to system_dfl_lon=
+g_wq,
+> the initial reset work enqueued in ibmvnic_reset() is still bound to the
+> per-CPU system_long_wq:
 
-[RM] I do think that is intended behavior. Reads should not be
-stateful and there is no open read sequence to interrupt.
-Each ice_aq_read_nvm call takes an absolute offset from the starting point.
+I will double check the code but converting that workqueue seems doable.
 
-> Also, if ice_acquire_nvm() fails on the next loop iteration, the loop bre=
-aks
-> and we never send a command with last_cmd =3D true. Will this permanently=
- leak
-> the sequence state in the firmware?
 
-[RM] I don't think there is a leak as there is no FW read sequence
-state. As far as I know, lack of last_cmd does not leave anything
-dangling in the FW.
+Thanks!
+--
 
->
-> [TN] I'm seeing conflicting documentation on whether this bit matters
-> for the read command. I'm working on getting clarification. If it does
-> matter, we'll likely need to adjust this.
+Marco Crivellari
 
-[RM] I'm happy to adjust the patch once you have more details on it.
-
->
-> > -             if (status)
-> > +             if (status) {
-> > +                     /* ice_release_nvm() issues an AQ command that wo=
-uld
-> > +                      * overwrite sq_last_status, which some callers
-> > +                      * inspect after a failed read. Preserve the read=
-'s
-> > +                      * AQ error across the release.
-> > +                      */
-> > +                     aq_err =3D hw->adminq.sq_last_status;
-> > +
-> > +                     ice_release_nvm(hw);
-> > +                     hw->adminq.sq_last_status =3D aq_err;
->
-> Does restoring hw->adminq.sq_last_status here without holding the Admin
-> Queue
-> lock risk overwriting the status of a concurrent AdminQ command?
-> If another thread acquires the lock and sends a command immediately after
-> ice_release_nvm(hw), this lockless write could corrupt its error status.
->
-> [TN] I don't believe the AQ lock will work as desired we can't guarantee
-> that we will have the lock directly following the release in order to
-> restore the AQ error. Similar to the NVM lock issue, I think this is a
-> small window but wanted to bring this here in case others had
-> thoughts/comments on this.
-
-[RM] Agree, this can cause issues. We can't drop sq_last_status as
-ice_discover_flash_size depends on it.
-Proposed fix: drop the save/restore sq_last_status and propagate the
-read AQ error through a real return path instead of the shared global.
-I could add optional enum libie_aq_err *read_aq_err out param to
-ice_read_flat_nvm(), capture sq_last_status before the
-ice_release_nvm, and have ice_discover_flash_size() test that instead.
-The log-only callers (devlink/ethtool) don't care about it.
-Let me know what you think about it.
-
->
-> Thanks,
-> Tony
->
-> >                       break;
-> > +             }
-> > +
-> > +             ice_release_nvm(hw);
-> >
-> >               bytes_read +=3D read_size;
-> >               offset +=3D read_size;
->
->
-
-Regards,
-Robert
+SUSE Labs
 
