@@ -1,153 +1,225 @@
-Return-Path: <netdev+bounces-307642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307643-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ME/bOKb3VmrXDgEAu9opvQ
-	(envelope-from <netdev+bounces-307642-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 04:59:50 +0200
+	id MnVkKFP9VmoYEAEAu9opvQ
+	(envelope-from <netdev+bounces-307643-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 05:24:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62BF475A2A3
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 04:59:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D50D575A428
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 05:24:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=Fa4VIWrw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307642-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307642-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
+	dkim=pass header.d=codeconstruct.com.au header.s=2022a header.b=jII5BIJ5;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307643-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307643-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=codeconstruct.com.au;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6BA5F301454D
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 02:59:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A38E8304D245
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 03:24:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 280213AC0C8;
-	Wed, 15 Jul 2026 02:59:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CEC138BF89;
+	Wed, 15 Jul 2026 03:24:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DA193A9638
-	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 02:59:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D869C3655ED;
+	Wed, 15 Jul 2026 03:23:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784084379; cv=none; b=RqYivkZWkx7nsLlJWKYsUZkSkXI1HDsXyPYDeAh1IO8dn3xhSyyXBBFGoQI+8xKskCeN0QS35jZf8Tdl1k0GRp4Ya8YZQEu6XQYnSMx/kOT2kEqydKVcjmzQR3sb9muueTi0LqZluMRZsRdjwszBuUNeyCmWagxchL6CIAymrGY=
+	t=1784085840; cv=none; b=Xjx2trGU3fGEANeyHSCKmjHGEGmChlEaj8U6IbdYobsVPv/O0YcYKD13mG1zPsSDnCVAXH1vivp2yfnfVRKb8V/BNnlwZwgRa4NVl17s3Gyn4mfKdcu78/p/4l6vUIJ8hePoQ6Hb9iZcnWSusC5EervXLrDl9nVQ/cmmXPN6LkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784084379; c=relaxed/simple;
-	bh=pz5x7Uful+e4tpdXxod5EqSQ03Jk4ZCGvC9DnrUEPWU=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=SUfVlPHkt3m9z+zhzFh+V+4BD53r6uQqy8+5+5/Otr4pnn+CwxalAm1OUHF8JKLUFe8HS8lyMGduIkeQ6LS9G9T4PfsIs8TxWIlZ7GVgveOe8Vhm16+kOyMBMea+MAMs0oCpnUNwMKmtvG8JO9cypgyyhgegJW8Bjj6lNgOFGO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Fa4VIWrw; arc=none smtp.client-ip=91.218.175.181
-Message-ID: <2a1e5d38-1035-4f09-b4af-5a63ec04f1d1@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784084365;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9xtif7wKWcaLEOyxIVo71CFUEZSMX5hpVYfkaAXiiXA=;
-	b=Fa4VIWrwA70DjAtWZ6OLqi+x7I0FG2AAc4HkAt2Ya5VS11rRMFOUSxztd/U6TqXh40wKC3
-	W3aJ3vLjjPPeywQZ6wUcxbDQtgpRROjdXaSBkI8LppJ0qCd3j9bNR+6gJfhUEqDtoCq9Ay
-	MfIFCyr0D0BNc90gzhb3BTn2R2U+ANI=
-Date: Wed, 15 Jul 2026 10:58:32 +0800
+	s=arc-20240116; t=1784085840; c=relaxed/simple;
+	bh=XLWRLtrarHBQnKUHNoSPGQePR+GNNJjY2jAcX6E6fTg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=WJCQt4Y0BZcmiVIxtmTN4ZaFQQT5dbU9mFyQZk2DlgTRe8R0Lop5vz/kQ+fE/E3uyeWtA/qnL41qdowuxoVfyUtWmWQnmOyG4Zo3Fq+Za3iHjym5y8uJ4SC+G0dFlixZoQnYC+x8rWE9D+G/skk5R3wvoVoaPX0ZsIOueJkl/34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=jII5BIJ5; arc=none smtp.client-ip=203.29.241.158
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1784085835;
+	bh=YFnYNXhGRn1jDH2k6Osbkyxy71RMq9U1pB7B6ANqqvs=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=jII5BIJ5psAegctVrJdvqCjjq4lznxyxQp969yvZL5+zpIMISBiZ1jkgWQS9/b4as
+	 LrY5/VY/w27w5vt/lRj6NFiIJRyCfDhTEi4CtG+H1f2XjTcSZWocXf6SIudi0f3LzK
+	 ls5IfacRNXLe0hMstyya1jnf6jy0h0Q37YFAFg972ntp5O50lGYMEoyP86mYWhjCIj
+	 ZL2TnmfMG9Smtm3mLwPboeG1tlC8wEa8JegIlCqd/UmcC8UP8y9YweUFMHUBknBb2E
+	 prKDyjOO9boq5vMM/rTRcA9YmjJDeAg6/nfIlnqVb9cMjPUjY2enlwQJ0p9xlwXAEE
+	 9UrNUryVhRuGw==
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 0F12C655A4;
+	Wed, 15 Jul 2026 11:23:53 +0800 (AWST)
+Message-ID: <1a69cae2f078e24726bfdef5ee2e6575759c8dda.camel@codeconstruct.com.au>
+Subject: Re: [PATCH net] mctp: serial: reject zero-length frames to prevent
+ rx buffer overflow
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Doruk Tan Ozturk <doruk@0sec.ai>, matt@codeconstruct.com.au, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, 	pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Date: Wed, 15 Jul 2026 11:23:53 +0800
+In-Reply-To: <20260714130348.72716-1-doruk@0sec.ai>
+References: <20260714130348.72716-1-doruk@0sec.ai>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2-0+deb13u1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: luoxuanqiang <xuanqiang.luo@linux.dev>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1] ice: fix use-after-free in
- dynamic port cleanup
-To: Marcin Szycik <marcin.szycik@linux.intel.com>,
- intel-wired-lan@lists.osuosl.org
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, sridhar.samudrala@intel.com,
- wojciech.drewek@intel.com, piotr.raczynski@intel.com,
- michal.swiatkowski@linux.intel.com, jacob.e.keller@intel.com,
- netdev@vger.kernel.org, Xuanqiang Luo <luoxuanqiang@kylinos.cn>,
- stable@vger.kernel.org
-References: <20260714063937.26325-1-xuanqiang.luo@linux.dev>
- <36c68c94-0382-4d31-b114-fde2a5ad35cf@linux.intel.com>
-In-Reply-To: <36c68c94-0382-4d31-b114-fde2a5ad35cf@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
+	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307642-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:marcin.szycik@linux.intel.com,m:intel-wired-lan@lists.osuosl.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:sridhar.samudrala@intel.com,m:wojciech.drewek@intel.com,m:piotr.raczynski@intel.com,m:michal.swiatkowski@linux.intel.com,m:jacob.e.keller@intel.com,m:netdev@vger.kernel.org,m:luoxuanqiang@kylinos.cn,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[xuanqiang.luo@linux.dev,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307643-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:doruk@0sec.ai,m:matt@codeconstruct.com.au,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xuanqiang.luo@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:from_mime,linux.dev:mid,linux.dev:email,linux.dev:dkim,vger.kernel.org:from_smtp,intel.com:email,kylinos.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,codeconstruct.com.au:from_mime,codeconstruct.com.au:dkim,codeconstruct.com.au:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 62BF475A2A3
+X-Rspamd-Queue-Id: D50D575A428
+
+Hi Doruk,
+
+Thanks for the report. The analysis looks solid, but I do have a
+recommendation for a different fix. One comment inline too.
+
+> The MCTP serial receive state machine reads a frame length byte in
+> mctp_serial_push_header() case 2 and validates it upper-bound-only:
+>=20
+> 	if (c > MCTP_SERIAL_FRAME_MTU) {
+> 		dev->rxstate =3D STATE_ERR;
+> 	} else {
+> 		dev->rxlen =3D c;
+> 		dev->rxpos =3D 0;
+> 		dev->rxstate =3D STATE_DATA;
+> 		...
+> 	}
+>=20
+> A length of zero passes this check, so rxlen is set to 0 and the state
+> machine advances to STATE_DATA. In mctp_serial_push() STATE_DATA, the
+> incoming byte is stored and rxpos incremented before the terminator is
+> tested:
+>=20
+> 	dev->rxbuf[dev->rxpos] =3D c;
+> 	dev->rxpos++;
+> 	dev->rxstate =3D STATE_DATA;
+> 	if (dev->rxpos =3D=3D dev->rxlen) {
+> 		dev->rxpos =3D 0;
+> 		dev->rxstate =3D STATE_TRAILER;
+> 	}
+>=20
+> With rxlen =3D=3D 0 the "rxpos =3D=3D rxlen" terminator can never fire (r=
+xpos is
+> already 1 on the first data byte), so subsequent bytes are written past
+> the end of the fixed 74-byte rxbuf, which is the last member of the
+> netdev private area. Every following data byte is an attacker-controlled
+> 1-byte out-of-bounds heap write, and the overflow continues until a
+> frame (0x7e) or escape byte resets the parser -- effectively unbounded.
+>=20
+> Reaching this requires CAP_NET_ADMIN to attach the N_MCTP line
+> discipline and bring the resulting mctpserialN netdev up, after which
+> the bytes arrive via the tty receive path.
+>=20
+> Reject a zero-length frame in the header parser, matching the existing
+> upper-bound rejection.
+>=20
+> KASAN, on a frame of 0x7e 0x01 0x00 followed by data bytes:
+>=20
+> =C2=A0 UBSAN: array-index-out-of-bounds in drivers/net/mctp/mctp-serial.c=
+:370
+> =C2=A0 index 74 is out of range for type 'u8 [74]'
+> =C2=A0 BUG: KASAN: slab-out-of-bounds in mctp_serial_tty_receive_buf
+> =C2=A0 Write of size 1 at addr ... by task kworker/u16:0
+> =C2=A0=C2=A0 mctp_serial_tty_receive_buf
+> =C2=A0=C2=A0 tty_ldisc_receive_buf
+> =C2=A0=C2=A0 flush_to_ldisc
+> =C2=A0 Allocated by task 152:
+> =C2=A0=C2=A0 alloc_netdev_mqs
+> =C2=A0=C2=A0 mctp_serial_open
+>=20
+> Found by 0sec (https://0sec.ai).
+> Fixes: a0c2ccd9b5ad ("mctp: Add MCTP-over-serial transport binding")
+> Cc: stable@vger.kernel.org
+> Assisted-by: 0sec
+
+I assume this needs to be in the Assisted-by format.
+
+> Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
+> ---
+> =C2=A0drivers/net/mctp/mctp-serial.c | 2 +-
+> =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
+
+> diff --git a/drivers/net/mctp/mctp-serial.c b/drivers/net/mctp/mctp-seria=
+l.c
+> index 26c9a33fd636..1e3d285c0500 100644
+> --- a/drivers/net/mctp/mctp-serial.c
+> +++ b/drivers/net/mctp/mctp-serial.c
+> @@ -313,7 +313,7 @@ static void mctp_serial_push_header(struct mctp_seria=
+l *dev, u8 c)
+> =C2=A0		}
+> =C2=A0		break;
+> =C2=A0	case 2:
+> -		if (c > MCTP_SERIAL_FRAME_MTU) {
+> +		if (c =3D=3D 0 || c > MCTP_SERIAL_FRAME_MTU) {
+> =C2=A0			dev->rxstate =3D STATE_ERR;
+> =C2=A0		} else {
+> =C2=A0			dev->rxlen =3D c;
+
+We probably want to advance directly to STATE_TRAILER instead, in order
+to consume the trailer and framing bytes for cases when it's a
+legitimate (although somewhat useless) zero-length frame.
+
+Perhaps:
+
+--- a/drivers/net/mctp/mctp-serial.c
++++ b/drivers/net/mctp/mctp-serial.c
+@@ -318,7 +318,7 @@ static void mctp_serial_push_header(struct mctp_serial =
+*dev, u8 c)
+                } else {
+                        dev->rxlen =3D c;
+                        dev->rxpos =3D 0;
+-                       dev->rxstate =3D STATE_DATA;
++                       dev->rxstate =3D c > 0 ? STATE_DATA : STATE_TRAILER=
+;
+                        dev->rxfcs =3D crc_ccitt_byte(dev->rxfcs, c);
+                }
+                break;
+
+We'll still land in STATE_ERROR on incorrect framing, but just during
+trailer parse instead.
+
+We could then add an early error path rather than creating a zero-length
+skb (which then gets rejected by the MCTP core), but that would be best
+done separately.
+
+Cheers,
 
 
-在 2026/7/14 22:14, Marcin Szycik 写道:
-> On 14.07.2026 08:39,xuanqiang.luo@linux.dev wrote:
->> From: Xuanqiang Luo<luoxuanqiang@kylinos.cn>
->>
->> ice_dealloc_dynamic_port() uses dyn_port->vsi->idx to erase the dynamic
->> port from pf->dyn_ports. However, it frees the VSI before reading the
->> index for the erase, resulting in a use-after-free.
->>
->> Follow the reverse of the allocation order in ice_alloc_dynamic_port()
->> by erasing the xarray entry before freeing the VSI.
->>
->> Fixes: eda69d654c7e ("ice: add basic devlink subfunctions support")
->> Cc:stable@vger.kernel.org
->> Signed-off-by: Xuanqiang Luo<luoxuanqiang@kylinos.cn>
-> Reviewed-by: Marcin Szycik<marcin.szycik@linux.intel.com>
->
-> Thank you!
-> I wonder how such a glaring issue survived in the codebase for so long.
-> Perhaps ice_vsi_free() exited early for some reason.
-
-Thanks for the review!
-
-Hard to say—maybe the window is quite small and the freed slab still
-holds the old idx most of the time, so nothing obvious shows up.
-
->> ---
->>   drivers/net/ethernet/intel/ice/devlink/port.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/ethernet/intel/ice/devlink/port.c b/drivers/net/ethernet/intel/ice/devlink/port.c
->> index 2a2e56777f9f7..3ede246490027 100644
->> --- a/drivers/net/ethernet/intel/ice/devlink/port.c
->> +++ b/drivers/net/ethernet/intel/ice/devlink/port.c
->> @@ -590,8 +590,8 @@ static void ice_dealloc_dynamic_port(struct ice_dynamic_port *dyn_port)
->>   
->>   	xa_erase(&pf->sf_nums, devlink_port->attrs.pci_sf.sf);
->>   	ice_eswitch_detach_sf(pf, dyn_port);
->> -	ice_vsi_free(dyn_port->vsi);
->>   	xa_erase(&pf->dyn_ports, dyn_port->vsi->idx);
->> +	ice_vsi_free(dyn_port->vsi);
->>   	kfree(dyn_port);
->>   }
->>   
+Jeremy
 
