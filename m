@@ -1,225 +1,169 @@
-Return-Path: <netdev+bounces-307643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307644-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MnVkKFP9VmoYEAEAu9opvQ
-	(envelope-from <netdev+bounces-307643-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 05:24:03 +0200
+	id j7ekNr/+VmpQEAEAu9opvQ
+	(envelope-from <netdev+bounces-307644-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 05:30:07 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D50D575A428
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 05:24:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 34BF075A453
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 05:30:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=codeconstruct.com.au header.s=2022a header.b=jII5BIJ5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307643-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307643-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=codeconstruct.com.au;
+	dkim=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307644-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307644-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=microsoft.com (policy=reject);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A38E8304D245
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 03:24:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EA707304CA74
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 03:30:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CEC138BF89;
-	Wed, 15 Jul 2026 03:24:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84F85282F25;
+	Wed, 15 Jul 2026 03:30:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D869C3655ED;
-	Wed, 15 Jul 2026 03:23:57 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F1E83921DD;
+	Wed, 15 Jul 2026 03:30:04 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784085840; cv=none; b=Xjx2trGU3fGEANeyHSCKmjHGEGmChlEaj8U6IbdYobsVPv/O0YcYKD13mG1zPsSDnCVAXH1vivp2yfnfVRKb8V/BNnlwZwgRa4NVl17s3Gyn4mfKdcu78/p/4l6vUIJ8hePoQ6Hb9iZcnWSusC5EervXLrDl9nVQ/cmmXPN6LkU=
+	t=1784086205; cv=none; b=GuasjNqZ8RZbT/sVbkMj8TEU62Y4z0MNCl13tIjHAJPWP/nDK3DcL/iIe/lJarBjNa9lZxvDs/3iZ83b/gmq9BnrHs4BJY6lC6GNBejReZqrHEMbezU6mwFnhOA/J84nTCI4+Mr8UItAvOjsVAcnrGnzj8lR2mKY9wMTYUA7oKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784085840; c=relaxed/simple;
-	bh=XLWRLtrarHBQnKUHNoSPGQePR+GNNJjY2jAcX6E6fTg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=WJCQt4Y0BZcmiVIxtmTN4ZaFQQT5dbU9mFyQZk2DlgTRe8R0Lop5vz/kQ+fE/E3uyeWtA/qnL41qdowuxoVfyUtWmWQnmOyG4Zo3Fq+Za3iHjym5y8uJ4SC+G0dFlixZoQnYC+x8rWE9D+G/skk5R3wvoVoaPX0ZsIOueJkl/34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=jII5BIJ5; arc=none smtp.client-ip=203.29.241.158
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1784085835;
-	bh=YFnYNXhGRn1jDH2k6Osbkyxy71RMq9U1pB7B6ANqqvs=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=jII5BIJ5psAegctVrJdvqCjjq4lznxyxQp969yvZL5+zpIMISBiZ1jkgWQS9/b4as
-	 LrY5/VY/w27w5vt/lRj6NFiIJRyCfDhTEi4CtG+H1f2XjTcSZWocXf6SIudi0f3LzK
-	 ls5IfacRNXLe0hMstyya1jnf6jy0h0Q37YFAFg972ntp5O50lGYMEoyP86mYWhjCIj
-	 ZL2TnmfMG9Smtm3mLwPboeG1tlC8wEa8JegIlCqd/UmcC8UP8y9YweUFMHUBknBb2E
-	 prKDyjOO9boq5vMM/rTRcA9YmjJDeAg6/nfIlnqVb9cMjPUjY2enlwQJ0p9xlwXAEE
-	 9UrNUryVhRuGw==
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 0F12C655A4;
-	Wed, 15 Jul 2026 11:23:53 +0800 (AWST)
-Message-ID: <1a69cae2f078e24726bfdef5ee2e6575759c8dda.camel@codeconstruct.com.au>
-Subject: Re: [PATCH net] mctp: serial: reject zero-length frames to prevent
- rx buffer overflow
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Doruk Tan Ozturk <doruk@0sec.ai>, matt@codeconstruct.com.au, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, 	pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Date: Wed, 15 Jul 2026 11:23:53 +0800
-In-Reply-To: <20260714130348.72716-1-doruk@0sec.ai>
-References: <20260714130348.72716-1-doruk@0sec.ai>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2-0+deb13u1 
+	s=arc-20240116; t=1784086205; c=relaxed/simple;
+	bh=XQHjrjwOb6CCDALTtfR4DOdZJaA9AaPWzpgyD1WW8jA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EK+Q9ngFCmzWWFd8BB7r4mviGZCwf9mQAjEBjTPKAJrU9T8RfEOqgYIVsanL3+4UfaUbmhEuWTf2q7jH3fsTbCLaW8AZe5xJIOCUrOxrOkiGQrwkTtnZA4NSjRkPJd2TQNY7JgDQE0SwsjvSQg4VdnMca8DCNYoBe1eptPaTrK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; arc=none smtp.client-ip=13.77.154.182
+Received: by linux.microsoft.com (Postfix, from userid 1202)
+	id 603E420B7167; Tue, 14 Jul 2026 20:29:55 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 603E420B7167
+From: Long Li <longli@microsoft.com>
+To: Long Li <longli@microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K . Y . Srinivasan" <kys@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	shradhagupta@linux.microsoft.com,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/7] net: mana: harden the HWC and add dynamic queue depth
+Date: Tue, 14 Jul 2026 20:29:34 -0700
+Message-ID: <20260715032942.3945317-1-longli@microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [3.54 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[microsoft.com : SPF not aligned (relaxed), No valid DKIM,reject];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
-	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307643-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[longli@microsoft.com,netdev@vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:doruk@0sec.ai,m:matt@codeconstruct.com.au,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:longli@microsoft.com,m:kotaranov@microsoft.com,m:kuba@kernel.org,m:davem@davemloft.net,m:pabeni@redhat.com,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:jgg@ziepe.ca,m:leon@kernel.org,m:haiyangz@microsoft.com,m:kys@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:shradhagupta@linux.microsoft.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-hyperv@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-307644-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[longli@microsoft.com,netdev@vger.kernel.org];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	R_DKIM_NA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,codeconstruct.com.au:from_mime,codeconstruct.com.au:dkim,codeconstruct.com.au:mid]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D50D575A428
+X-Rspamd-Queue-Id: 34BF075A453
 
-Hi Doruk,
+This series hardens the MANA Hardware Channel (HWC) control-plane path
+and then builds on that to support a dynamic HWC queue depth.
 
-Thanks for the report. The analysis looks solid, but I do have a
-recommendation for a different fix. One comment inline too.
+The HWC is the command channel the driver uses to talk to the device.
+Today it is created at a fixed depth of one outstanding request, and
+several of its lookup and teardown paths predate the RCU and DMA-lifetime
+rules they now need to follow.  Raising the queue depth and allowing
+concurrent commands makes those latent races reachable, so the fixes come
+first and the feature builds on them.
 
-> The MCTP serial receive state machine reads a frame length byte in
-> mctp_serial_push_header() case 2 and validates it upper-bound-only:
->=20
-> 	if (c > MCTP_SERIAL_FRAME_MTU) {
-> 		dev->rxstate =3D STATE_ERR;
-> 	} else {
-> 		dev->rxlen =3D c;
-> 		dev->rxpos =3D 0;
-> 		dev->rxstate =3D STATE_DATA;
-> 		...
-> 	}
->=20
-> A length of zero passes this check, so rxlen is set to 0 and the state
-> machine advances to STATE_DATA. In mctp_serial_push() STATE_DATA, the
-> incoming byte is stored and rxpos incremented before the terminator is
-> tested:
->=20
-> 	dev->rxbuf[dev->rxpos] =3D c;
-> 	dev->rxpos++;
-> 	dev->rxstate =3D STATE_DATA;
-> 	if (dev->rxpos =3D=3D dev->rxlen) {
-> 		dev->rxpos =3D 0;
-> 		dev->rxstate =3D STATE_TRAILER;
-> 	}
->=20
-> With rxlen =3D=3D 0 the "rxpos =3D=3D rxlen" terminator can never fire (r=
-xpos is
-> already 1 on the first data byte), so subsequent bytes are written past
-> the end of the fixed 74-byte rxbuf, which is the last member of the
-> netdev private area. Every following data byte is an attacker-controlled
-> 1-byte out-of-bounds heap write, and the overflow continues until a
-> frame (0x7e) or escape byte resets the parser -- effectively unbounded.
->=20
-> Reaching this requires CAP_NET_ADMIN to attach the N_MCTP line
-> discipline and bring the resulting mctpserialN netdev up, after which
-> the bytes arrive via the tty receive path.
->=20
-> Reject a zero-length frame in the header parser, matching the existing
-> upper-bound rejection.
->=20
-> KASAN, on a frame of 0x7e 0x01 0x00 followed by data bytes:
->=20
-> =C2=A0 UBSAN: array-index-out-of-bounds in drivers/net/mctp/mctp-serial.c=
-:370
-> =C2=A0 index 74 is out of range for type 'u8 [74]'
-> =C2=A0 BUG: KASAN: slab-out-of-bounds in mctp_serial_tty_receive_buf
-> =C2=A0 Write of size 1 at addr ... by task kworker/u16:0
-> =C2=A0=C2=A0 mctp_serial_tty_receive_buf
-> =C2=A0=C2=A0 tty_ldisc_receive_buf
-> =C2=A0=C2=A0 flush_to_ldisc
-> =C2=A0 Allocated by task 152:
-> =C2=A0=C2=A0 alloc_netdev_mqs
-> =C2=A0=C2=A0 mctp_serial_open
->=20
-> Found by 0sec (https://0sec.ai).
-> Fixes: a0c2ccd9b5ad ("mctp: Add MCTP-over-serial transport binding")
-> Cc: stable@vger.kernel.org
-> Assisted-by: 0sec
+Patches 1-5 are fixes for pre-existing HWC bugs, each with a Fixes: tag:
 
-I assume this needs to be in the Assisted-by format.
+  1: cq_table was a plain pointer array freed with no grace period while
+     the EQ interrupt handler dereferenced it; put it under RCU.
+  2: the HWC RQ and SQ were sized with each other's message size, so a
+     response could overflow the RQ buffer and the RX slot stride was
+     computed with the wrong size.
+  3: comp_buf was freed before the EQ was destroyed, so a late completion
+     handler could touch freed memory.
+  4: the RX path consumed device-supplied lengths and indices without
+     validation; validate them before use (this matters for confidential
+     VMs, where the DMA buffer is shared with the host).
+  5: a failed mana_hwc_establish_channel() could leave live MST entries
+     while the driver freed the queue buffers, and destroy_channel() freed
+     the TXQ/RXQ before the EQ was quiesced; add a setup_active teardown
+     gate and destroy the CQ first.
 
-> Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
-> ---
-> =C2=A0drivers/net/mctp/mctp-serial.c | 2 +-
-> =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
+Patches 6-7 add the feature:
 
-> diff --git a/drivers/net/mctp/mctp-serial.c b/drivers/net/mctp/mctp-seria=
-l.c
-> index 26c9a33fd636..1e3d285c0500 100644
-> --- a/drivers/net/mctp/mctp-serial.c
-> +++ b/drivers/net/mctp/mctp-serial.c
-> @@ -313,7 +313,7 @@ static void mctp_serial_push_header(struct mctp_seria=
-l *dev, u8 c)
-> =C2=A0		}
-> =C2=A0		break;
-> =C2=A0	case 2:
-> -		if (c > MCTP_SERIAL_FRAME_MTU) {
-> +		if (c =3D=3D 0 || c > MCTP_SERIAL_FRAME_MTU) {
-> =C2=A0			dev->rxstate =3D STATE_ERR;
-> =C2=A0		} else {
-> =C2=A0			dev->rxlen =3D c;
+  6: replace the depth-1 semaphore with a slot bitmap and per-slot
+     synchronization so several management commands can be in flight,
+     with teardown that drains in-flight senders before freeing the HWC.
+  7: bootstrap the HWC at depth 1, query the device maximum and, if it is
+     larger, tear down and rebuild the queues at that depth.  The reported
+     dimensions are validated before they size DMA allocations, and the
+     capability is advertised so firmware enables it only when the driver
+     supports it.
 
-We probably want to advance directly to STATE_TRAILER instead, in order
-to consume the trailer and framing bytes for cases when it's a
-legitimate (although somewhat useless) zero-length frame.
+The fixes are grouped ahead of the feature they enable rather than sent
+separately to net, since the HWC runs at depth 1 today and the races are
+reached only once the later patches raise the depth.
 
-Perhaps:
+Long Li (7):
+  net: mana: RCU-protect gc->cq_table lookups against concurrent CQ
+    destroy
+  net: mana: fix HWC RQ/SQ buffer size swap
+  net: mana: free HWC comp_buf after destroying the EQ
+  net: mana: validate hardware-supplied values in the HWC RX path
+  net: mana: fix HWC teardown safety with setup_active flag and destroy
+    ordering
+  net: mana: support concurrent HWC requests with proper synchronization
+  net: mana: add dynamic HWC queue depth with reinit path
 
---- a/drivers/net/mctp/mctp-serial.c
-+++ b/drivers/net/mctp/mctp-serial.c
-@@ -318,7 +318,7 @@ static void mctp_serial_push_header(struct mctp_serial =
-*dev, u8 c)
-                } else {
-                        dev->rxlen =3D c;
-                        dev->rxpos =3D 0;
--                       dev->rxstate =3D STATE_DATA;
-+                       dev->rxstate =3D c > 0 ? STATE_DATA : STATE_TRAILER=
-;
-                        dev->rxfcs =3D crc_ccitt_byte(dev->rxfcs, c);
-                }
-                break;
-
-We'll still land in STATE_ERROR on incorrect framing, but just during
-trailer parse instead.
-
-We could then add an early error path rather than creating a zero-length
-skb (which then gets rejected by the MCTP core), but that would be best
-done separately.
-
-Cheers,
+ drivers/infiniband/hw/mana/cq.c               |  46 +-
+ .../net/ethernet/microsoft/mana/gdma_main.c   |  78 +-
+ .../net/ethernet/microsoft/mana/hw_channel.c  | 707 ++++++++++++++++--
+ drivers/net/ethernet/microsoft/mana/mana_en.c |  22 +-
+ include/net/mana/gdma.h                       |  48 +-
+ include/net/mana/hw_channel.h                 |  40 +-
+ 6 files changed, 849 insertions(+), 92 deletions(-)
 
 
-Jeremy
+base-commit: f6f3b36c15ed44de1fbb44e645e4fae8c4a4453e
+-- 
+2.43.0
+
 
