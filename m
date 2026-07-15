@@ -1,286 +1,168 @@
-Return-Path: <netdev+bounces-307656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307657-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5QslJegNV2qiEgEAu9opvQ
-	(envelope-from <netdev+bounces-307656-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 06:34:48 +0200
+	id p7XqDmIPV2oOEwEAu9opvQ
+	(envelope-from <netdev+bounces-307657-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 06:41:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1808975A79F
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 06:34:48 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0C9175A7E6
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 06:41:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=sUyrUB8e;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307656-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307656-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="aex/A7gd";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307657-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307657-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3F0BC30413AE
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 04:34:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A4AF430138A6
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 04:41:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A57E34CFCF;
-	Wed, 15 Jul 2026 04:34:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1095F3ACF0A;
+	Wed, 15 Jul 2026 04:41:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C13231A21;
-	Wed, 15 Jul 2026 04:34:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB8A225B0AC;
+	Wed, 15 Jul 2026 04:41:02 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784090083; cv=none; b=KBtfjALDZSMsRlGCSJ78H0xulMQggvs/E8wShDcB3hfExMXcDJajU4kq87nx2VnDtzIz+qwPbujbgbh6tHHRdkV7amUXq74rHSD24QFC+5preUfucVouo38fBp5THnyFUBtVR2lU43pc4T+hchS2k6WTw18dY1iOnU3EVpr+kkM=
+	t=1784090464; cv=none; b=lae7Ibzn7vUKMZsijpq14I1GC7IBc5ZLX5Sa/N7L58+T2Zf1dVMqZOL3v1aaS43lirlAr2L/zyuwZUpvXnKzA8q2oVOS2+38fV1JjhekXkA6IWwliJ6u9znKc/QLv05Rro9OYGfZAcU4HpwE5Jws0ItQosdskyzLJafOkzGhq8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784090083; c=relaxed/simple;
-	bh=rH+f3KaxbEK3Yk7pODNj76lVdviFxGc5DFDvPRSqoBA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=umgTB3l8ZZalM+biDoYpgBDmf14wUPQIpugcNN/a5NfLS3wK7JQ+/81A5i/KuGjuaG0dL3ysWvLOscbF5xlNET5l9lcfvdwmuzmywDQp20SXGBX59tA8udjDvLKvcgDWXBpfSrBt/ajs1Dtl72j2WFfRCC+2Ci7X2nrd/o9KE+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sUyrUB8e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8ECB1C2BCB7;
-	Wed, 15 Jul 2026 04:34:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1784090082;
-	bh=rH+f3KaxbEK3Yk7pODNj76lVdviFxGc5DFDvPRSqoBA=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=sUyrUB8eir7gHAuvp5pg37VL0xsZrwzXixr9oZ9xhQT/KIQ4Np7NmW0wLvK3Ar3Je
-	 7llnD8E9fembGx3Cecc/c2Ein8OiFwschIb+TW5foitRQcIsdcyuBNlFJM4hzA3v1B
-	 NcPS2PonIXunDfnUQAeuwNd/krI2YAmcuJVe6u7GbFN7Wq2Jq6n80BRkv+CTw2g4RB
-	 n/Tr8KcYPRnppvXEX6VwvdpGgn+wGfGW1aqZDgu6fcTN9Le3cBv/70NsUsDL7xUOo0
-	 tq3WsiS/Ci+Hg2sD0RsBB9UYkr9sR1gCU1Q3+sHj1CR/hBs6W8sxTLGcLheJl9ERqH
-	 rDrEcIx0uYPvQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68733C4450A;
-	Wed, 15 Jul 2026 04:34:42 +0000 (UTC)
-From: Bryam Vargas via B4 Relay <devnull+hexlabsecurity.proton.me@kernel.org>
-Date: Tue, 14 Jul 2026 23:34:42 -0500
-Subject: [PATCH net v2] net/smc: order the CDC receive path against buffer
- publication
+	s=arc-20240116; t=1784090464; c=relaxed/simple;
+	bh=hKoGFECUi/3InM3ZPXFHWz3dS1jyvwTBc1uKKVUiHrE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Kfnr33YxMotbjoO27Lco0wXnsayqHK0xeJ+RUqO0RX2mIYLc493N3OiljvWddVHAn1zzIL8N8GRmtQQAxMTK7+ia55bK8B744fJ2IrxZWTX7MnGOTv9mwk0Z7FjRN7+tRNyN+Oa+vmONKp1pLLtBnH/JOGZokRc3zBdBhVU5pY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aex/A7gd; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 393501F000E9;
+	Wed, 15 Jul 2026 04:40:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784090462;
+	bh=WjEzw35TC58e6csvk75HKV93jMDXKg31T0XVEdHNe88=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=aex/A7gdN0LT8iFabDmNmjzxPHYMHOW6nrH731QXQAeN617AzNwuflhwT3XCLPvrq
+	 OysIO7/TL6496eISU9gDbcdXZzNTIIHh+51/qiwB7JCj/fNheaBluoklzhZP/6GA8I
+	 MdfwdOBddAyBpqoh8vi8Zqsn9+p1NysOdmpcC78xS/QHXpmStxTuUKxRokC0+GSXX4
+	 AxJ2kfd85xpQp0wsWR91D+N/tb/1NXbz/qRVptp5jcmTuPwJ2n/CIKDtitv/L7a3gn
+	 QzOHpJ4ARDpV3DcsqBZuQc5Is0SwroaX3Iw3Jd6XiHXPfYd5bXbqbM3cXDhIzX4y3z
+	 QxvN0xdF4ToDA==
+Message-ID: <12aa6550-1476-45dd-915a-2a761cbc800a@kernel.org>
+Date: Wed, 15 Jul 2026 06:40:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/4] dt-bindings: arm: altera: Add Agilex5 SoCDK TSN
+ Config2 board
+To: muhammad.nazim.amirul.nazle.asmade@altera.com, dinguyen@kernel.org,
+ maxime.chevallier@bootlin.com
+Cc: rmk+kernel@armlinux.org.uk, krzk+dt@kernel.org, conor+dt@kernel.org,
+ robh@kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260714021303.30042-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
+ <20260714021303.30042-2-muhammad.nazim.amirul.nazle.asmade@altera.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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
+In-Reply-To: <20260714021303.30042-2-muhammad.nazim.amirul.nazle.asmade@altera.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260714-b4-disp-835288a6-v2-1-581555ef2145@proton.me>
-X-B4-Tracking: v=1; b=H4sIAOENV2oC/x3MTQqAIBBA4avErBvI6UfpKtHCcqzZWGhEEN49a
- fkt3nshcRROMFYvRL4lyREKqK5g3W3YGMUVAzU0NFp1uHToJJ1o2p6MsQMqr8l747TVCkp2Rvb
- y/MsJAl8w5/wBB6Gs1mcAAAA=
-To: Sidraya Jayagond <sidraya@linux.ibm.com>, 
- Wenjia Zhang <wenjia@linux.ibm.com>, Dust Li <dust.li@linux.alibaba.com>, 
- "D. Wythe" <alibuda@linux.alibaba.com>, Paolo Abeni <pabeni@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
- Mahanta Jambigi <mjambigi@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>, 
- Eric Dumazet <edumazet@google.com>, Tony Lu <tonylu@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Simon Horman <horms@kernel.org>, linux-s390@vger.kernel.org, 
- linux-rdma@vger.kernel.org
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1784090081; l=7310;
- i=hexlabsecurity@proton.me; s=proton; h=from:subject:message-id;
- bh=2xz4cjDnqoAG1H/FZ06+DlrFtR6erHNnU+ZElifwqQs=;
- b=1ZcEFXlHow9qiTEgF62ozWBR3XP1RmBrt3w4BuchwclJvBZ5VwhHh4vUPYdZCfZpWAYZSDbXU
- 1vUitCp2sylCks4GvsFDSIS0P7jVG+BS99BotcywZGX1OQAQ8mlklP1
-X-Developer-Key: i=hexlabsecurity@proton.me; a=ed25519;
- pk=dmppBMZNLLoPzxHi9l8tZDzEZUunPbgsYqIZYXeUrL0=
-X-Endpoint-Received: by B4 Relay for hexlabsecurity@proton.me/proton with
- auth_id=814
-X-Original-From: Bryam Vargas <hexlabsecurity@proton.me>
-Reply-To: hexlabsecurity@proton.me
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:dust.li@linux.alibaba.com,m:alibuda@linux.alibaba.com,m:pabeni@redhat.com,m:davem@davemloft.net,m:kuba@kernel.org,m:mjambigi@linux.ibm.com,m:guwen@linux.alibaba.com,m:edumazet@google.com,m:tonylu@linux.alibaba.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:horms@kernel.org,m:linux-s390@vger.kernel.org,m:linux-rdma@vger.kernel.org,s:lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307657-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307656-lists,netdev=lfdr.de,hexlabsecurity.proton.me];
+	FORGED_SENDER(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:muhammad.nazim.amirul.nazle.asmade@altera.com,m:dinguyen@kernel.org,m:maxime.chevallier@bootlin.com,m:rmk+kernel@armlinux.org.uk,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:robh@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:devicetree@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:rmk@armlinux.org.uk,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	HAS_REPLYTO(0.00)[hexlabsecurity@proton.me];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,altera.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1808975A79F
+X-Rspamd-Queue-Id: A0C9175A7E6
 
-From: Bryam Vargas <hexlabsecurity@proton.me>
+On 14/07/2026 04:13, muhammad.nazim.amirul.nazle.asmade@altera.com wrote:
+> From: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
+> 
+> Add compatible string for the Intel SoCFPGA Agilex5 SoCDK TSN Config2
+> board variant. This board enables gmac1 as a TSN port with an FPGA
+> GMII-to-RGMII converter providing the RGMII clock delays.
+> 
+> Signed-off-by: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
+> Acked-by: Krzysztof Kozlowski <krzk+dt@kernel.org>
 
-The SMC CDC receive handlers dereference conn->rmb_desc, and on the
-SMC-D DMB-nocopy path conn->sndbuf_desc, but both are published after
-the connection is already reachable to a peer: rmb_desc after
-smc_conn_create() registers it in the link group's token tree,
-sndbuf_desc after __smc_buf_create() arms the ISM tasklet via
-smc_ism_set_conn().  A CDC in that window reaches the handlers with the
-buffer unset.  The store is plain, so a handler can load it as NULL, or
-on a weakly ordered CPU see it non-NULL while its buffer is still
-uninitialised -- a host crash or a stale-buffer read.
-
-Publish both buffers with smp_store_release() and consume them with
-smp_load_acquire(), bailing while unset as the handlers already do for
-a killed or out-of-sync connection.  Conforming peers are unaffected.
-
-Closes: https://sashiko.dev/#/patchset/20260711-b4-disp-c36a9798-v1-1-340b0c6053fb@proton.me?part=1
-Cc: stable@vger.kernel.org
-Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
----
-v2: order both CDC-reachable buffers with smp_store_release()/smp_load_acquire()
-    instead of the plain NULL guard v1 used.  The rmb_desc ordering is what the
-    Sashiko review of v1 asked for (the Closes: link above); the sndbuf_desc case
-    (SMC-D DMB-nocopy, smc_cdc_msg_recv_action()) is the same-window sibling found
-    by inspection -- smcd_buf_attach() sets the ghost sndbuf_desc after
-    smc_ism_set_conn() already armed the tasklet.  Release/acquire closes the NULL
-    deref on all arches and the stale-buffer read on weakly ordered ones.
-    v1: https://lore.kernel.org/all/20260711-b4-disp-c36a9798-v1-1-340b0c6053fb@proton.me/
-
-Happy to split this: the sndbuf_desc hunks only apply where the DMB-nocopy path
-exists and can carry their own Fixes: tag for a cleaner stable backport, while the
-rmb_desc ordering predates the git history here.  No Fixes: added -- please add
-whichever you prefer.
-
-Both orderings are modelled with LKMM message-passing litmus tests (herd7): plain
-accesses allow the "pointer published, buffer stale" outcome and flag a data race;
-smp_store_release()/smp_load_acquire() forbid it.  The patched build was exercised
-over an SMC-D loopback under KASAN with no regression; the rmb_desc NULL-deref arm
-is reproduced with an in-kernel KASAN model faulting at the ->cpu_addr / ->len
-offsets.  af_smc runs over an RDMA fabric or an ISM device, so the weak-memory arm
-is model-level; litmus tests and reproducer available on request.
----
- net/smc/smc_cdc.c  | 29 +++++++++++++++++++++++++----
- net/smc/smc_core.c | 16 ++++++++++++++--
- 2 files changed, 39 insertions(+), 6 deletions(-)
-
-diff --git a/net/smc/smc_cdc.c b/net/smc/smc_cdc.c
-index 32d6d03df321..2cd0ee7b51c2 100644
---- a/net/smc/smc_cdc.c
-+++ b/net/smc/smc_cdc.c
-@@ -332,6 +332,7 @@ static void smc_cdc_msg_recv_action(struct smc_sock *smc,
- {
- 	union smc_host_cursor cons_old, prod_old;
- 	struct smc_connection *conn = &smc->conn;
-+	struct smc_buf_desc *sndbuf_desc;
- 	int diff_cons, diff_prod, diff_tx;
- 
- 	smc_curs_copy(&prod_old, &conn->local_rx_ctrl.prod, conn);
-@@ -353,12 +354,20 @@ static void smc_cdc_msg_recv_action(struct smc_sock *smc,
- 		 * peer RMB, then update tx_curs_fin and sndbuf_space
- 		 * here since peer has already consumed the data.
- 		 */
-+		/* Pair with smp_store_release() in smcd_buf_attach(): the ghost
-+		 * sndbuf_desc is attached after the connection is reachable to
-+		 * the ISM device, so acquire it and skip the update while it is
-+		 * unset -- avoids a NULL deref and a load of an uninitialised
-+		 * buffer.
-+		 */
-+		sndbuf_desc = smp_load_acquire(&conn->sndbuf_desc);
- 		if (conn->lgr->is_smcd &&
--		    smc_ism_support_dmb_nocopy(conn->lgr->smcd)) {
-+		    smc_ism_support_dmb_nocopy(conn->lgr->smcd) &&
-+		    sndbuf_desc) {
- 			/* Calculate consumed data and
- 			 * increment free send buffer space.
- 			 */
--			diff_tx = smc_curs_diff(conn->sndbuf_desc->len,
-+			diff_tx = smc_curs_diff(sndbuf_desc->len,
- 						&conn->tx_curs_fin,
- 						&conn->local_rx_ctrl.cons);
- 			/* increase local sndbuf space and fin_curs */
-@@ -443,13 +452,21 @@ static void smcd_cdc_rx_tsklet(struct tasklet_struct *t)
- {
- 	struct smc_connection *conn = from_tasklet(conn, t, rx_tsklet);
- 	struct smcd_cdc_msg *data_cdc;
-+	struct smc_buf_desc *rmb_desc;
- 	struct smcd_cdc_msg cdc;
- 	struct smc_sock *smc;
- 
- 	if (!conn || conn->killed)
- 		return;
-+	/* Pair with smp_store_release() in __smc_buf_create(): the connection
-+	 * is published before its RMB is allocated, so bail while rmb_desc is
-+	 * unset to avoid a NULL deref and a load of an uninitialised buffer.
-+	 */
-+	rmb_desc = smp_load_acquire(&conn->rmb_desc);
-+	if (!rmb_desc)
-+		return;
- 
--	data_cdc = (struct smcd_cdc_msg *)conn->rmb_desc->cpu_addr;
-+	data_cdc = (struct smcd_cdc_msg *)rmb_desc->cpu_addr;
- 	smcd_curs_copy(&cdc.prod, &data_cdc->prod, conn);
- 	smcd_curs_copy(&cdc.cons, &data_cdc->cons, conn);
- 	smc = container_of(conn, struct smc_sock, conn);
-@@ -483,7 +500,11 @@ static void smc_cdc_rx_handler(struct ib_wc *wc, void *buf)
- 	lgr = smc_get_lgr(link);
- 	read_lock_bh(&lgr->conns_lock);
- 	conn = smc_lgr_find_conn(ntohl(cdc->token), lgr);
--	if (!conn || conn->out_of_sync) {
-+	/* Pair with smp_store_release() in __smc_buf_create(): bail while the
-+	 * RMB is unset (smc_cdc_msg_recv_action() dereferences it) to avoid a
-+	 * NULL deref and a stale-buffer read in the connection setup window.
-+	 */
-+	if (!conn || conn->out_of_sync || !smp_load_acquire(&conn->rmb_desc)) {
- 		read_unlock_bh(&lgr->conns_lock);
- 		return;
- 	}
-diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
-index cf6b620fef05..d94b728c0d68 100644
---- a/net/smc/smc_core.c
-+++ b/net/smc/smc_core.c
-@@ -2499,7 +2499,13 @@ static int __smc_buf_create(struct smc_sock *smc, bool is_smcd, bool is_rmb)
- 	}
- 
- 	if (is_rmb) {
--		conn->rmb_desc = buf_desc;
-+		/* Publish with release semantics: the connection is already in
-+		 * the link group's token tree, so a concurrent CDC receive
-+		 * handler must observe a fully initialised buffer once it sees
-+		 * a non-NULL rmb_desc.  Pairs with the smp_load_acquire() in
-+		 * the CDC receive path.
-+		 */
-+		smp_store_release(&conn->rmb_desc, buf_desc);
- 		conn->rmbe_size_comp = bufsize_comp;
- 		smc->sk.sk_rcvbuf = bufsize * 2;
- 		atomic_set(&conn->bytes_to_rcv, 0);
-@@ -2599,7 +2605,13 @@ int smcd_buf_attach(struct smc_sock *smc)
- 	buf_desc->cpu_addr =
- 		(u8 *)buf_desc->cpu_addr + sizeof(struct smcd_cdc_msg);
- 	buf_desc->len -= sizeof(struct smcd_cdc_msg);
--	conn->sndbuf_desc = buf_desc;
-+	/* Publish with release semantics: the connection is already reachable
-+	 * to the ISM device (smc_ism_set_conn() ran in __smc_buf_create()), so
-+	 * the CDC receive tasklet must observe a fully initialised ghost buffer
-+	 * once it sees a non-NULL sndbuf_desc.  Pairs with smp_load_acquire()
-+	 * in smc_cdc_msg_recv_action().
-+	 */
-+	smp_store_release(&conn->sndbuf_desc, buf_desc);
- 	conn->sndbuf_desc->used = 1;
- 	atomic_set(&conn->sndbuf_space, conn->sndbuf_desc->len);
- 	return 0;
-
----
-base-commit: 3f1f755366687d051174739fb99f7d560202f60b
-change-id: 20260714-b4-disp-835288a6-1f72ff8d7a71
+NAK, you cannot invent tags.
 
 Best regards,
--- 
-Bryam Vargas <hexlabsecurity@proton.me>
-
-
+Krzysztof
 
