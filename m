@@ -1,225 +1,245 @@
-Return-Path: <netdev+bounces-307769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307771-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id u1VVGKCaV2ouXwAAu9opvQ
-	(envelope-from <netdev+bounces-307769-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 16:35:12 +0200
+	id QvFII2ifV2pIYAAAu9opvQ
+	(envelope-from <netdev+bounces-307771-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 16:55:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90D1A75F740
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 16:35:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2A8675FA49
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 16:55:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tipi-net.de header.s=dkim header.b=o+sR6kY1;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307769-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307769-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=tu-dortmund.de header.s=unimail header.b=A2Jl5qrr;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307771-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307771-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=tu-dortmund.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 22BAC31605F0
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 14:15:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 74CF032EDDA7
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 14:41:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80AE736F413;
-	Wed, 15 Jul 2026 14:13:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABB8842BC48;
+	Wed, 15 Jul 2026 14:36:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A50AC31B130;
-	Wed, 15 Jul 2026 14:13:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 417FF381EB1;
+	Wed, 15 Jul 2026 14:36:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784124794; cv=none; b=hqt3L3CzMR87IFT1adPLog0PKrubCAlKj1zfH6DkMsuD1laR0oeRBPZstjVjh9bsPtlisl6UtNeK4Jx+b9UuiL/No28fsDd42V1WzeboHygFagdMU6ifogzw4bS48cHjrs10XQh9cLFqVvftOaWazldNLu/H7Ulofq0iVwAVdiI=
+	t=1784126173; cv=none; b=F+ky4aqEVnpTIJ7cT0FUawMOD7IHv+zTmEsAJ4U4Jm42iAaJiEPBUSCOP1fyQIBxE9dglFEiscapZMeEqjtv5afTteFJNma/+dZDNnB860m4J3xs7ilo0hEIlvWZPjcyozE7OQAgvYOFucmCLc/sp4X8TC4O+P/Y/xF1rgcE66s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784124794; c=relaxed/simple;
-	bh=7RcPmoCf9XH1oY2JDlvttQRnKxT/yye3zSHLT4O7nKo=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=A9SrD6uWSK8tpkngMFVj4ySlKKDupgxexjIplCkAAPmH6B1RehYIn1dqmaVCUc6oydQIR5lVzOPAMaWVgNguP70+iOZAepR1BXwvy1/4lPVwm/Nc8NIig1uaVuDOgo5aR6rUPOKmPJIcpW3S7UL2Cg7plpDVuVA3cbTCXRt/BvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=o+sR6kY1; arc=none smtp.client-ip=194.13.80.246
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 994DEA5188;
-	Wed, 15 Jul 2026 16:13:02 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1784124786; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=dFP4b15ezb3GF5jTFRUAT5mkZf73hGVmktkG09Chtz4=;
-	b=o+sR6kY1zL+PXpOBhrUNtcfOJTm4DrEI7n6/ck5tEE80xSt1149HFX8XMEfrSv14Xy9gzc
-	fmbiNmmlcomjAjInGPGYye7YzmmO6LVlMfm32WsHvtJU23PlQVtuKp648Z3+pabEALQaQw
-	ozCJIhMRbN26wlVYvczKbnDSp0hZ+VrJD3D7tKowdae4W+XgpJi479lVm6l1cvrqp8/mtr
-	G6n0bgBCuh054sHgKyfKuWKSkaF8ojZgvc2zFwTUddArrw9LEOyPUe7zbDys6szVKdj5jt
-	3dzX7utX4zHbhxEJLLkrtCm3NnUmtmNHyH1B7UwpSJx2Yp9qBf3HxmcB/ZLnSw==
-Date: Wed, 15 Jul 2026 16:12:58 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: =?ISO-8859-1?Q?Th=E9o_Lebrun?= <theo.lebrun@bootlin.com>
-CC: Conor Dooley <conor.dooley@microchip.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
- Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Paolo Valerio <pvalerio@redhat.com>,
- Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>,
- Gregory CLEMENT <gregory.clement@bootlin.com>,
- =?ISO-8859-1?Q?Beno=EEt_Monin?= <benoit.monin@bootlin.com>,
- Tawfik Bayouk <tawfik.bayouk@mobileye.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_net-next_v3_06/15=5D_net=3A_macb=3A_alloca?=
- =?US-ASCII?Q?te_tieoff_descriptor_once_across_device_lifetime?=
-User-Agent: Thunderbird for Android
-In-Reply-To: <DJZ6XCJDMFE8.PPNN42W2TGSQ@bootlin.com>
-References: <20260701-macb-context-v3-0-00268d5b1502@bootlin.com> <20260701-macb-context-v3-6-00268d5b1502@bootlin.com> <6e449ee7d40ec885e8a53fa18fe70e86@tipi-net.de> <DJXFDPIB17FW.2BN105BPCBSKB@bootlin.com> <DJZ6XCJDMFE8.PPNN42W2TGSQ@bootlin.com>
-Message-ID: <DB3DD915-341A-4995-B438-1613363C3205@tipi-net.de>
+	s=arc-20240116; t=1784126173; c=relaxed/simple;
+	bh=QtZDZDVONdUZUtMj/Oeqj3zOMKZGrQ3+llUPARk9BSY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ETlYxzdNuaNvY1EAy8hRcIR4Ai+Jb5+K03Nnw/bdz2wMbxjNK4X5X6m5CwXyXz7r8vQ4yRNy/9ZENXR60usuuvwoE8rxirZ4Ron8h6ZDeoCpxDId551VdqShiRZQMnJ1onrPAlEfp+FKN7KDaK2AaCOiOZugLxDQCQFUeFtG+WI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=A2Jl5qrr; arc=none smtp.client-ip=129.217.128.51
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tu-dortmund.de;
+	s=unimail; t=1784125948;
+	bh=hKJ6Qg2LWg5gq7q/ZPC3JQm9ffFjxx+05nF4JeAwcqc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=A2Jl5qrrddCcR+p2mk1pHk/z/FT4JJL21XVrsZZ0UN/wRXMp6U0CsjKJnMc2gYKkP
+	 esPVyRoLI+s4+rcMlQYe8RIPqp6jLbMkjFCZNCWv5Y5xPcB+uAOAxXp3A9JbdNwOET
+	 9dFxUSvXhZpQvoujnRh5pZRArIJkiwuDeq5dPrvg=
+Received: from [129.217.186.229] ([129.217.186.229])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.19.0.2/8.19.0.2) with ESMTPSA id 66FEWQm2000998
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 15 Jul 2026 16:32:26 +0200 (CEST)
+Message-ID: <1ecf0eb8-17ef-4f9c-ba87-da69d207e4d4@tu-dortmund.de>
+Date: Wed, 15 Jul 2026 16:32:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [1.05 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] tun/tap & vhost-net: make qdisc backpressure
+ opt-in via IFF_BACKPRESSURE
+To: kernel test robot <oliver.sang@intel.com>
+Cc: oe-lkp@lists.linux.dev, lkp@intel.com,
+        Brett Sheffield <brett@librecast.net>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ltp@lists.linux.it,
+        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        Jason Wang <jasowangio@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        Tim Gebauer <tim.gebauer@tu-dortmund.de>, linux-doc@vger.kernel.org
+References: <202607151550.5d829a99-lkp@intel.com>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <202607151550.5d829a99-lkp@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	SUBJ_EXCESS_QP(1.20)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
+	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-307771-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:theo.lebrun@bootlin.com,m:conor.dooley@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:nicolas.ferre@microchip.com,m:claudiu.beznea@tuxon.dev,m:pvalerio@redhat.com,m:vladimir.kondratiev@mobileye.com,m:gregory.clement@bootlin.com,m:benoit.monin@bootlin.com,m:tawfik.bayouk@mobileye.com,m:thomas.petazzoni@bootlin.com,m:maxime.chevallier@bootlin.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[20];
-	DMARC_NA(0.00)[tipi-net.de];
+	FORGED_RECIPIENTS(0.00)[m:oliver.sang@intel.com,m:oe-lkp@lists.linux.dev,m:lkp@intel.com,m:brett@librecast.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ltp@lists.linux.it,m:willemdebruijn.kernel@gmail.com,m:jasowangio@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mst@redhat.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:andrew+netdev@lunn.ch,m:tim.gebauer@tu-dortmund.de,m:linux-doc@vger.kernel.org,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-307769-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
+	FREEMAIL_CC(0.00)[lists.linux.dev,intel.com,librecast.net,vger.kernel.org,lists.linux.it,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,lunn.ch,tu-dortmund.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org,tuxon.dev,mobileye.com,bootlin.com];
+	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tu-dortmund.de:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid,tipi-net.de:from_mime,bootlin.com:url,bootlin.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,tu-dortmund.de:dkim,tu-dortmund.de:mid,tu-dortmund.de:from_mime,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,01.org:url,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 90D1A75F740
+X-Rspamd-Queue-Id: E2A8675FA49
 X-Rspamd-Action: no action
 
-Hi Th=C3=A9o
+On 7/15/26 16:01, kernel test robot wrote:
+> 
+> 
+> Hello,
+> 
+> kernel test robot noticed "ltp.ioctl03.fail" on:
 
-On July 15, 2026 3:48:18 PM GMT+02:00, "Th=C3=A9o Lebrun" <theo=2Elebrun@b=
-ootlin=2Ecom> wrote:
->On Mon Jul 13, 2026 at 2:00 PM CEST, Th=C3=A9o Lebrun wrote:
->> On Thu Jul 2, 2026 at 12:54 PM CEST, Nicolai Buchwitz wrote:
->>> On 1=2E7=2E2026 17:59, Th=C3=A9o Lebrun wrote:
->>>> The tieoff descriptor is a RX DMA descriptor ring of size one=2E It g=
-ets
->>>> configured onto queues for Wake-on-LAN during system-wide suspend whe=
-n
->>>> hardware does not support disabling individual queues
->>>> (MACB_CAPS_QUEUE_DISABLE)=2E
->>>>=20
->>>> MACB/GEM driver allocates it alongside the main RX ring
->>>> inside macb_alloc() at open=2E Free is done by macb_free() at close=
-=2E
->>>>=20
->>>> Change to allocate once at probe and free on probe failure or device
->>>> removal=2E This makes the tieoff descriptor lifetime much longer,
->>>> avoiding repeating coherent buffer allocation on each open/close cycl=
-e=2E
->>>>=20
->>>> Main benefit: we dissociate its lifetime from the main ring's lifetim=
-e=2E
->>>> That way there is less work to be doing on resources (re)alloc=2E Thi=
-s
->>>> currently happens on close/open, but will soon also happen on context
->>>> swap operations (set_ringparam, change_mtu, set_channels, etc)=2E
->>>>=20
->>>> Signed-off-by: Th=C3=A9o Lebrun <theo=2Elebrun@bootlin=2Ecom>
->>>> ---
->>>>  drivers/net/ethernet/cadence/macb_main=2Ec | 75=20
->>>> +++++++++++++++++---------------
->>>>  1 file changed, 41 insertions(+), 34 deletions(-)
->>>>=20
->>>> diff --git a/drivers/net/ethernet/cadence/macb_main=2Ec=20
->>>> b/drivers/net/ethernet/cadence/macb_main=2Ec
->>>> index 8b52122bc134=2E=2E951a7f080225 100644
->>>> --- a/drivers/net/ethernet/cadence/macb_main=2Ec
->>>> +++ b/drivers/net/ethernet/cadence/macb_main=2Ec
->>>
->>>> [=2E=2E=2E]
->>>
->>>>  static void macb_init_rings(struct macb *bp)
->>>> @@ -2832,8 +2801,6 @@ static void macb_init_rings(struct macb *bp)
->>>>  	bp->queues[0]=2Etx_head =3D 0;
->>>>  	bp->queues[0]=2Etx_tail =3D 0;
->>>>  	desc->ctrl |=3D MACB_BIT(TX_WRAP);
->>>> -
->>>> -	macb_init_tieoff(bp);
->>>>  }
->>>>=20
->>>>  static void macb_reset_hw(struct macb *bp)
->>>> @@ -5518,6 +5485,38 @@ static int eyeq5_init(struct platform_device=
-=20
->>>> *pdev)
->>>>  	return ret;
->>>>  }
->>>>=20
->>>> +static int macb_alloc_tieoff(struct macb *bp)
->>>> +{
->>>> +	/* Tieoff is a workaround in case HW cannot disable queues, for PM=
-=2E=20
->>>> */
->>>> +	if (bp->caps & MACB_CAPS_QUEUE_DISABLE)
->>>> +		return 0;
->>>
->>> Before, the tieoff was allocated in macb_alloc(), which the at91ether=
-=20
->>> path
->>> never called=2E Now it's allocated from macb_probe() for all variants,=
-=20
->>> gated only
->>> on MACB_CAPS_QUEUE_DISABLE, so EMAC gets a coherent descriptor it neve=
-r=20
->>> uses=2E
->>>
->>> Add MACB_CAPS_MACB_IS_EMAC to the if statement?
->>
->> Clearly=2E That EMAC distinction keeps being annoying=2E
->
->Well well well=2E Under AT91 with WOL active there is nothing preventing
->the tieoff from being used in macb_suspend()=2E Meaning the tieoff is
->being used zero-initialised=2E Not advisable=2E
->
->So I withdraw my previous comment: we won't shield macb_alloc_tieoff()
->from IS_EMAC and maybe it will fix a bug=2E
+ioctl03.c does not know about IFF_BACKPRESSURE which is introduced here,
+consequently it fails.
+See [1] where it compares TUN features with known_flags.
 
-Sounds reasonable=2E
+Thanks.
 
-Reviewed-by: Nicolai Buchwitz <nb@tipi-net=2Ede>
+[1] Link: https://github.com/linux-test-project/ltp/blob/master/testcases/kernel/syscalls/ioctl/ioctl03.c#L82
 
-Thanks,
-Nicolai
-
->
->Thanks,
->
->--
->Th=C3=A9o Lebrun, Bootlin
->Embedded Linux and Kernel engineering
->https://bootlin=2Ecom
->
+> 
+> commit: 09154ff2072e36b86ba2d92d436b7f27df153ed1 ("[PATCH net v3] tun/tap & vhost-net: make qdisc backpressure opt-in via IFF_BACKPRESSURE")
+> url: https://github.com/intel-lab-lkp/linux/commits/Simon-Schippers/tun-tap-vhost-net-make-qdisc-backpressure-opt-in-via-IFF_BACKPRESSURE/20260709-181234
+> base: https://git.kernel.org/cgit/linux/kernel/git/davem/net.git fabb881df322da25442f98d23f5fa371e3c78ec4
+> patch link: https://lore.kernel.org/all/20260709095511.168235-1-simon.schippers@tu-dortmund.de/
+> patch subject: [PATCH net v3] tun/tap & vhost-net: make qdisc backpressure opt-in via IFF_BACKPRESSURE
+> 
+> in testcase: ltp
+> version: 
+> with following parameters:
+> 
+> 	disk: 1HDD
+> 	fs: ext4
+> 	test: syscalls-03
+> 
+> 
+> 
+> config: x86_64-rhel-9.4-ltp
+> compiler: gcc-14
+> test machine: 4 threads 1 sockets Intel(R) Core(TM) i3-3220 CPU @ 3.30GHz (Ivy Bridge) with 8G memory
+> 
+> (please refer to attached dmesg/kmsg for entire log/backtrace)
+> 
+> 
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <oliver.sang@intel.com>
+> | Closes: https://lore.kernel.org/oe-lkp/202607151550.5d829a99-lkp@intel.com
+> 
+> 
+> ....
+> 
+> [1;37mgetuid03: [0m[1;32mpass[0m  (0.028s)
+> [1;37mioctl03: [0m[1;31mfail[0m  (0.047s)     <-----
+> [1;37mioctl05: [0m[1;32mpass[0m  (0.471s)
+> 
+> ....
+> 
+> Execution time: 3m 35s
+> 
+> Disconnecting from SUT: default
+> 
+> Target information
+> ──────────────────
+> Kernel:   Linux 7.2.0-rc1+ #1 SMP PREEMPT_DYNAMIC Sun Jul 12 07:25:38 CST 2026
+> Cmdline:  ip=::::lkp-ivb-d04::dhcp
+>           root=/dev/ram0
+>           RESULT_ROOT=/result/ltp/1HDD-ext4-syscalls-03/lkp-ivb-d04/debian-13-x86_64-20250902.cgz/x86_64-rhel-9.4-ltp/gcc-14/09154ff2072e36b86ba2d92d436b7f27df153ed1/0
+>           BOOT_IMAGE=/pkg/linux/x86_64-rhel-9.4-ltp/gcc-14/09154ff2072e36b86ba2d92d436b7f27df153ed1/vmlinuz-7.2.0-rc1+
+>           branch=linux-devel/devel-hourly-20260709-190759
+>           job=/lkp/jobs/scheduled/lkp-ivb-d04/ltp-1HDD-ext4-syscalls-03-debian-13-x86_64-20250902.cgz-09154ff2072e-20260712-19649-tc8bu6-0.yaml
+>           user=lkp
+>           ARCH=x86_64
+>           kconfig=x86_64-rhel-9.4-ltp
+>           commit=09154ff2072e36b86ba2d92d436b7f27df153ed1
+>           intremap=posted_msi
+>           max_uptime=7200
+>           LKP_SERVER=internal-lkp-server
+>           nokaslr
+>           selinux=0
+>           debug
+>           apic=debug
+>           sysrq_always_enabled
+>           rcupdate.rcu_cpu_stall_timeout=100
+>           net.ifnames=0
+>           printk.devkmsg=on
+>           panic=-1
+>           softlockup_panic=1
+>           nmi_watchdog=panic
+>           oops=panic
+>           load_ramdisk=2
+>           prompt_ramdisk=0
+>           drbd.minor_count=8
+>           systemd.log_level=err
+>           ignore_loglevel
+>           console=tty0
+>           earlyprintk=ttyS0,115200
+>           console=ttyS0,115200
+>           vga=normal
+>           rw
+>           keep_initrds=/osimage/pkg/debian-13-x86_64-20250902.cgz/ltp-x86_64-ed2758122-1_20260711.cgz
+>           acpi_rsdp=0x000f0490
+> Machine:  unknown
+> Arch:     x86_64
+> RAM:      6895596 kB
+> Swap:     0 kB
+> Distro:   debian 13
+> 
+> ────────────────────────
+>       TEST SUMMARY
+> ────────────────────────
+> Suite:   syscalls-03
+> Runtime: 3m 24s
+> Runs:    183
+> 
+> Results:
+>     Passed:   2144
+>     Failed:   1
+>     Broken:   0
+>     Skipped:  222
+>     Warnings: 0
+> 
+> [1;31mFailures:[0m
+>     • ioctl03
+> 
+> 
+> 
+> The kernel config and materials to reproduce are available at:
+> https://download.01.org/0day-ci/archive/20260715/202607151550.5d829a99-lkp@intel.com
+> 
+> 
+> 
 
