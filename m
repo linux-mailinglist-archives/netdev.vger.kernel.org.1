@@ -1,395 +1,372 @@
-Return-Path: <netdev+bounces-307715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307716-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mssNHRJQV2paJAEAu9opvQ
-	(envelope-from <netdev+bounces-307715-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 11:17:06 +0200
+	id uucgEKVSV2ofJQEAu9opvQ
+	(envelope-from <netdev+bounces-307716-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 11:28:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A22F875C593
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 11:17:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CED4575C7C0
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 11:28:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=fastmail.im header.s=fm2 header.b=RSCwVxn2;
-	dkim=pass header.d=messagingengine.com header.s=fm2 header.b="F vzY+MM";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307715-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307715-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=fastmail.im;
+	dkim=pass header.d=broadcom.com header.s=google header.b=hxdvQzQb;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307716-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307716-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=broadcom.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 476EB3091879
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 09:07:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 76F513031E8A
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 09:15:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53B3E3EB0F6;
-	Wed, 15 Jul 2026 09:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A2863FC5D3;
+	Wed, 15 Jul 2026 09:15:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-a7-smtp.messagingengine.com (flow-a7-smtp.messagingengine.com [103.168.172.142])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f99.google.com (mail-oo1-f99.google.com [209.85.161.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A473C2B80
-	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 09:07:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E77FC3F9F3C
+	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 09:15:10 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784106437; cv=none; b=iyiJH/j9e3c8YhSCporEfb76gog33y/cDN/smfhoNYN+EDVzkLmtoDBdLt9BJy6Q8bKmDgYWd3nG6JhB6xshaODKezP7FgF14EvZmyaer2VYNn6qkKW71+ZIJ2X0U+t0bVzj2zKetgdfQ2nmkI38IpZK/3U3ZpnufnBmPVC9bjE=
+	t=1784106912; cv=none; b=N4Ywm5cZ1LE+W5k+O725eEk6oo3ZercdNu2uy5iTnqq9btcxMZGFgOKg94b4WO3XHlj71zWaNQsv+Qc7OmORPLVjhPKS4zU4LXKo/MEalGNwrYPCI6M7cgwKOEk4UY7DvygfiWzr1QZVphxdTfak0zQrHXgMi+Hb6IXNwkkYaxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784106437; c=relaxed/simple;
-	bh=GYrJ/0FAhOiqcnhdZ6VGpsC8yVn5h4fiX6kDivkZ2WE=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=U2gdJuFp/7eCtGd5b2RJ9uWebgFdCJ4jvP1uNcw2FXbbVAtMpMMr4TEzoK5AgwwuAqlrV8CZPoK6B0/STY+CU28p2nIsobcPc3Sh5N7gCfq2i74sOXAlN8xC9ZGJwS+IBPj2+LUjPHEJPLWzwyRdlKH9kkLQobZlWQiM33pcWxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=RSCwVxn2; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=FvzY+MMC; arc=none smtp.client-ip=103.168.172.142
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailflow.phl.internal (Postfix) with ESMTP id 295C51380017;
-	Wed, 15 Jul 2026 05:07:13 -0400 (EDT)
-Received: from phl-imap-03 ([10.202.2.93])
-  by phl-compute-10.internal (MEProxy); Wed, 15 Jul 2026 05:07:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1784106433;
-	 x=1784113633; bh=mBLbhtUzs6efT6n92VdCknqZiLLsM3XciT2X2Wkrp78=; b=
-	RSCwVxn2HE4Mhob5jllxAzsmzutoV+ciH3BirwFlrZ9TB3p8MJzhPaZ4qWvBwl32
-	Tg6z8D/Qbc+Q98r6fXmRSwllJdl830PJGFV54RJ20Fb29vPz1pjsrB9C2mSUvVjF
-	vrtbPL1BEIWygIU4qjuQGHUxPWaHPOgcN5xB4Uh4uO9euQct5f/QBFF5bo3V2u4B
-	UmZoQ5iK1RJAZ/8nmuM6RNNtZTrf7rBOt6pR+Pz/0ZsDt4Sp3bhsJduIPXhh3H/7
-	f6cFue49WsIOL7/TnzhiKc2pdpCc8u3Gjo9KGcmHUP4UfjLhHPKk0Ok30i0GVHWq
-	mazCfVy8+ZY6wnGmEDivCw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1784106433; x=
-	1784113633; bh=mBLbhtUzs6efT6n92VdCknqZiLLsM3XciT2X2Wkrp78=; b=F
-	vzY+MMCZtZMV8TzeL+OJcoKDxl+dqHQlkEXAdGe6NuXhk44McqXpj7rp/tYZzCzf
-	bAKzPGbbW+jGmXBcjwcS+/ctHYmaQ14ZWjAk0Ii8PH1nJeYQc90peRPjUbJOYNaL
-	YEWj6NKTudBiRIxxrZ2GnX9kOC1tXZhulNLXYitAJkaWjdHrhgXkasCO4Ko9o3zF
-	ZipYhdPNpJeEcHEV6RU8kfUfIPukCj74Jj/cTfg8WxAlKKZDHt2o0zEZt0jRbHfB
-	k9+2EFuhUZNLy+/G6FgS9WRWOQkJ0BKg1mbwKGrHhi4v8QT7f+E9OdOWg/nw1Ubz
-	kJ1cjwyfm5tkt993npDsQ==
-X-ME-Sender: <xms:v01Xak2B028_E8AuUMovwcVabMVBqLNd6WHGWDs2sawXhvONImzjyA>
-    <xme:v01Xap4PxHebWQ8gDEvzAa0yGk3NdG9wCuY1wON1dQJii94_a7IiT1UYjMT2EuaTS
-    29mu6gxHFvh56m_W4FHwdekuuOUvi-WhYANNJJmvSKJ-DbAs0RhgAQ>
-X-ME-Proxy-Cause: dmFkZTF0ivpkm8c2GkqassHOsFbpF4p2wG8S8Cfs7zYx0qh76U7ML0VVnC7dz5u9O3Agya
-    CohnpNWhv1LmnRzdn/oe53qtuyZg9eJ8RiG9AWzrbKNyDK71x49kChKH8r9KjwByKdfvjF
-    eYvXJC4r6djQ/brr3dkiy4GtbZP4Ysi0RRYB30IthZ292dwBJmBWXchDh2JBXOi4y3gOfk
-    Tlqu2FzpWXIiLFJweUzWuAuxsKebtaarT9W1RCcwzac/mVfsp2jUxacTPuD31FzK7WiiF/
-    NXjKJsbWktUzitJ8ZXYHHgqQVT7O46Y84lifUKHp+3e5vGn/Z1Md6/e644BqDRyvi4/cDe
-    4Bs9QdzvQethkdLMeEqUp1zt95ZmBSizX9R65wnHDB/ER51CEUmQxkLjZw56gTgPcPxemz
-    RBoxGDVumUslHeOffoRZsr20DMxGQdW7nozDmXN3pnCQSOrSXb34eGSdL9fAVCGg27uHD0
-    3WfqlM1vFZaJAyaOYxT+ZTB9BLXcjvb8TkHf9dIvCPkaytHn2qxVyjdExFtiTbWmUmIFaU
-    Jlzmrz+b2zadwYUgkAieopgmuqxgQDhklzmTijonA45b9hMVv/fMZs0AI+L8lysQXEVdWV
-    bbZeVENljJiK9jo7hfL/JNjx0i539ioJLunL4PqUgWxbQWanjHBYw0/Ly/jA
-X-ME-Proxy: <xmx:v01XavGsTysH8h4PoJk5xCafKf5orA1d5h7Q6tNyUtPcGfvXlbZ3xQ>
-    <xmx:v01Xaph_sYhakldqK8IBmSZbbE9da8tlYLc_WM-dTTry_1yrVjWtxQ>
-    <xmx:v01XalpcDRQM8yDjhFjzlN2bqJVrH5ly0hccL8PyZyVoqoRzswJB0w>
-    <xmx:v01XapQ1as_T-Jf4fA1-5yzDaV82U6IsdjM3m4Dvqqntq53vKZcoZw>
-    <xmx:wU1XavITWTuIl_oicrJVX2VzSk0cZaZqyhjMRvlaeelhmlfw9qaA1nLE>
-Feedback-ID: i559e4809:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id C7DA718E0074; Wed, 15 Jul 2026 05:07:11 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1784106912; c=relaxed/simple;
+	bh=S0EUauMZcWwf73BcvJmk0NUmkTz2LNZdip7iPFIlc2s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Re8pk5Du6BX28H8hl0QYdsP9W/so+R3jqFb2UAk13lH0IXj7tpl4UAFWaGrmwCwo9s97ONPv1fRK0HX7DKWDo7g4wjXh+F54v10IyVgb3LwQvgjW6aB68cFmvSjXwHY1ge5NdMARzgL+l+NpcifykIyjEvORN5l/ND8jgevFENc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hxdvQzQb; arc=none smtp.client-ip=209.85.161.99
+Received: by mail-oo1-f99.google.com with SMTP id 006d021491bc7-6a374c190beso1714676eaf.2
+        for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 02:15:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784106910; x=1784711710;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:dkim-signature:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=voLf9I5VTo7QtN2Dbg3QtVuPvEHIYK7HEvxveh0NjwI=;
+        b=QNjXD0/FQZa9DEpMzKAIPQThJGPkeRfG4zWFnwXJBcpzpQbErZmEgeCHKzdRD0FsJV
+         R76QiI4Tbo1ex+1nfQ8PmU9+q6fhdl7JL/Mk/Y4ryQFKbTUgXKbShbypq0RcvGT5HxUm
+         OWQt2dy/WIgMwuaVdf89/XsPYa16k7YEa8JIu1ZppKWMdLK/rYl0ixGz72z9YrObEma1
+         J48+Dpv/ID53+iQQOC5NIbIGhCVpHRl85bV92JMRUj89CgbZoVpeCwisrADmgJx6iBGH
+         W/O/igkhwr/B5UxjdVKdUjVpsQsUYzyJXes2dGSZ4juGHeoo+nMNdHfhBMvg39S6iih7
+         E8rw==
+X-Forwarded-Encrypted: i=1; AHgh+RoXjlP9T9POKY/PPbv6j7CDN1YSGCrTpp13WNpTzOZ0CQx/0zO09otJvYfY4pbZO4nk7W1KSoo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMIszueKmwmMzKOtql+WMixgKJl6G1QGUaAQjZ0YFBEDcaam1G
+	L1MhGJo2GlDqQoS39ETTRHi14u/nGTO422IJ5nkGbJblR8hvx8SNLiFzuOw0DbK93EjEwJ5dptW
+	Vru8z/p2rEdo+Ssm2+lhUkx9Ltbcq33WOHPy13Gw5eyANVwI8w4wPEcIooNiHBbjYfUOFxVFK8S
+	If5iYJ9cTybfmmu0gr2d3M7bsM5ja4nEBPFDrfFlfQgpRcPa7EfFOKXF3Rub6S70aWwDov7Cjsg
+	7IwgRAjDY1ZI3OmSGKZXmn7
+X-Gm-Gg: AfdE7cnls9DK5woEjWiymxPazfx3a4NL3x71yElBewM2LSq41BRplBIDSp/fEtRp+oa
+	3MiU0GGY0UR3C+ImUj9aTSk8HdzTGS1cslig1461ko829vCODx/UVq8U9uqK67/GaIZmUZd5UYh
+	Tvwv7f9Om1CztazKWx1jR6lUrUbFYDS+pUg5LFXEPaLAHyaLPzgaePiy2iu6SFC4RR0Pzf916pg
+	k61KokG43PKQ4SxXgBMrKE8jpUFPgGzx9JBIwp+YsqLNxs1rLNFE19WmZpsy95X362S09EbrRkv
+	8JBmQ49fvu0/+/v+dKGM22SKQp103+T8m9Q0wiuVXbOC2Wf38FxkyvFmf1MxWdzstq9Len7plYa
+	QM01TkkMLsiuqaRTPdSVEG4viwx0mrOYaNgBj+gGDSt3EBYJziYCsix69iFc5nFYQwzmj+xLerC
+	fNCm+082vn+iA3rCFH6ziH0y7vu7wEK7yo6ighzitRFHCh6BP6P5pNg9sUZNSZ0w==
+X-Received: by 2002:a4a:e909:0:b0:6a3:8b32:3ed7 with SMTP id 006d021491bc7-6a3d9eb559amr1241739eaf.2.1784106909537;
+        Wed, 15 Jul 2026 02:15:09 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-117.dlp.protect.broadcom.com. [144.49.247.117])
+        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-451913555e2sm1963429fac.5.2026.07.15.02.15.08
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 15 Jul 2026 02:15:09 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-847a00bcbd0so6946123b3a.0
+        for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 02:15:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1784106908; x=1784711708; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=voLf9I5VTo7QtN2Dbg3QtVuPvEHIYK7HEvxveh0NjwI=;
+        b=hxdvQzQbngvQ4VnhlN4wHRSt1/aZep2FNKEtP+9uxi2jphVBS7hyT7BdWjEAOR2Qpl
+         61ArHDkP5Yy1CmpMMHQoVZOikSAorgcfC3MNhUaqN1uVEYwhInHxSP8mrtNN7jhGOnsm
+         ttn1yZpoNcNNGrmZgi5dJhSCTZSavzSAwN7Es=
+X-Forwarded-Encrypted: i=1; AHgh+RrjxI/famMpUywQTeZjJ1BK5LH1jTpbkS6TMS6glY6V+QrJPaDeQO5asYHNp1r7ejhF7cgk15g=@vger.kernel.org
+X-Received: by 2002:a05:6a00:9a4:b0:848:420a:9cd5 with SMTP id d2e1a72fcca58-84a67361eabmr1750605b3a.53.1784106907647;
+        Wed, 15 Jul 2026 02:15:07 -0700 (PDT)
+X-Received: by 2002:a05:6a00:9a4:b0:848:420a:9cd5 with SMTP id
+ d2e1a72fcca58-84a67361eabmr1750569b3a.53.1784106907201; Wed, 15 Jul 2026
+ 02:15:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 15 Jul 2026 12:06:51 +0300
-From: "Alice Mikityanska" <alice.kernel@fastmail.im>
-To: "zebang.li" <zebang.li@samsung.com>
-Cc: "Alice Mikityanska" <alice@isovalent.com>,
- "Andrew Lunn" <andrew+netdev@lunn.ch>,
- "Daniel Borkmann" <daniel@iogearbox.net>,
- "David S. Miller" <davem@davemloft.net>, "David Ahern" <dsahern@kernel.org>,
- "Eric Dumazet" <edumazet@google.com>, "Florian Westphal" <fw@strlen.de>,
- "Simon Horman" <horms@kernel.org>, "Jakub Kicinski" <kuba@kernel.org>,
- "Xin Long" <lucien.xin@gmail.com>, netdev@vger.kernel.org,
- "Paolo Abeni" <pabeni@redhat.com>,
- "Nikolay Aleksandrov" <razor@blackwall.org>, "Shuah Khan" <shuah@kernel.org>,
- "Stanislav Fomichev" <stfomichev@gmail.com>,
- "Willem de Bruijn" <willemb@google.com>,
- "Willem de Bruijn" <willemdebruijn.kernel@gmail.com>, nh78.kim@samsung.com,
- kwangho2.kim@samsung.com, h10.kim@samsung.com, hongfei.tang@samsung.com,
- yajie.yan@samsung.com
-Message-Id: <ad089459-361c-4209-9fdc-675cc4a658bc@app.fastmail.com>
-In-Reply-To: <a6f4c117-f58f-4cd7-910a-0fff3c3aeb27@blackwall.org> <(raw)>
-References: <20260710134242.216538-1-alice.kernel@fastmail.im>
- <CGME20260715061259epcas5p378f743489493da324fc9092ed2dfe147@epcas5p3.samsung.com>
- <a6f4c117-f58f-4cd7-910a-0fff3c3aeb27@blackwall.org> <(raw)>
-Subject: Re: [PATCH net-next v9 0/9] BIG TCP for UDP tunnels
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+References: <20260715-kmem-dupliate-name-v1-1-85551c328155@nvidia.com>
+In-Reply-To: <20260715-kmem-dupliate-name-v1-1-85551c328155@nvidia.com>
+From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
+Date: Wed, 15 Jul 2026 14:44:53 +0530
+X-Gm-Features: AUfX_mxyDvPMnQycMHJRST7BFAmd3INWrCweEeZQZpwhXGP6iwQch34PDFtgGRY
+Message-ID: <CAH-L+nOh8UFgEHHrYanthQ8QTnvz6kh+Oqns=BPLuvvNDi5=CQ@mail.gmail.com>
+Subject: Re: [PATCH net] net/mlx5: Use unique names for software steering caches
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alex Vesker <valex@nvidia.com>, Yevgeny Kliteynik <kliteyn@nvidia.com>, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000007f20240656a2c2b7"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.65 / 15.00];
+X-Spamd-Result: default: False [-9.76 / 15.00];
+	WHITELIST_DMARC(-7.00)[broadcom.com:D:+];
+	SIGNED_SMIME(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm2,messagingengine.com:s=fm2];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:zebang.li@samsung.com,m:alice@isovalent.com,m:andrew+netdev@lunn.ch,m:daniel@iogearbox.net,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:fw@strlen.de,m:horms@kernel.org,m:kuba@kernel.org,m:lucien.xin@gmail.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:razor@blackwall.org,m:shuah@kernel.org,m:stfomichev@gmail.com,m:willemb@google.com,m:willemdebruijn.kernel@gmail.com,m:nh78.kim@samsung.com,m:kwangho2.kim@samsung.com,m:h10.kim@samsung.com,m:hongfei.tang@samsung.com,m:yajie.yan@samsung.com,m:andrew@lunn.ch,m:lucienxin@gmail.com,m:willemdebruijnkernel@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[alice.kernel@fastmail.im,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-307716-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[kalesh-anakkur.purayil@broadcom.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[fastmail.im];
-	TAGGED_FROM(0.00)[bounces-307715-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
 	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:leon@kernel.org,m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:valex@nvidia.com,m:kliteyn@nvidia.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:borntraeger@linux.ibm.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[broadcom.com:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alice.kernel@fastmail.im,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[isovalent.com,lunn.ch,iogearbox.net,davemloft.net,kernel.org,google.com,strlen.de,gmail.com,vger.kernel.org,redhat.com,blackwall.org,samsung.com];
+	FROM_NEQ_ENVFROM(0.00)[kalesh-anakkur.purayil@broadcom.com,netdev@vger.kernel.org];
+	HAS_ATTACHMENT(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,sashiko.dev:url,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,app.fastmail.com:mid,isovalent.com:email,fastmail.im:from_mime,fastmail.im:dkim]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,broadcom.com:from_mime,broadcom.com:email,broadcom.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A22F875C593
+X-Rspamd-Queue-Id: CED4575C7C0
 
-On Wed, Jul 15, 2026, at 09:11, zebang.li wrote:
-> On 10/07/2026 16:42, Alice Mikityanska wrote:
->> From: Alice Mikityanska <alice@isovalent.com>
->> 
->> This series is a follow-up to "BIG TCP without HBH in IPv6", and it adds
->> support for BIG TCP IPv4/IPv6 workloads in vxlan and geneve. Now that
->> IPv6 BIG TCP doesn't require stripping the HBH in all various
->> combinations in tunneled traffic, adding BIG TCP becomes feasible.
->> 
->> Patch 01 adds accessors for the length field in the UDP header, as
->> suggested by Paolo in review. The usage of udp_set_len is then added in
->> the following patches that start using length=0 in BIG TCP UDP packets.
->> 
->> Patches 02-04 close the gaps that prevent BIG TCP packets from going
->> through UDP tunnel code.
->> 
->> Patch 05 validates packets in udp_gro_receive to exclude packets with
->> length=0 from GRO aggregation.
->> 
->> Patch 06 is for proper formatting in tcpdump (set UDP len to 0 rather
->> than a trimmed value on overflow).
->> 
->> Patches 07-08 bump up tso_max_size for VXLAN and GENEVE.
->> 
->> Patch 09 adds selftests.
->> 
->> Thanks all!
->> 
->> v9 changes: Converted the selftest to iptables counters to avoid the
->> issue with tcpdump pcaps taking all space in /tmp.
->> 
->> v8: https://lore.kernel.org/netdev/20260706181941.385672-1-alice.kernel@fastmail.im/
->> 
->> v8 changes: Addressed Paolo's and Jason's review comments. Made the
->> selftest more robust, added checks for SACK and mode with disabled tx
->> checksum offload on lower veth netdevs. Added details to commit
->> messages. Kept skb_segment logic unchanged, because the frags overflow
->> issue is not specific to BIG TCP.
->> 
->> v7: https://lore.kernel.org/netdev/20260611192955.604661-1-alice.kernel@fastmail.im/
->> 
->> v7 changes: Addressed Paolo's comments to properly block malformed
->> packets with UDP length=0 at udp_rcv level.
->> 
->> v6: https://lore.kernel.org/netdev/20260602093931.516281-1-alice.kernel@fastmail.im/
->> 
->> v6 changes: Lowered the packets threshold in the selftest to pass
->> upstream CI on debug kernels, also made it configurable.
->> 
->> v5: https://lore.kernel.org/netdev/20260526161200.1135899-1-alice.kernel@fastmail.im/
->> 
->> v5 changes: Rebased, dropped one of the patches that came in via the net
->> tree, addressed an overflow in nsim_do_psp found by Sashiko.
->> 
->> v4: https://lore.kernel.org/netdev/20260512165648.386518-1-alice.kernel@fastmail.im/
->> 
->> v4 changes: Rebased, addressed Sashiko AI review [1] and Willem's
->> comment about netperf flags.
->> 
->> My comments on Sashiko AI review per patch:
->> 
->> 01: I'd prefer to keep the cases that I haven't tested outside of the
->> scope of this series, which is for VXLAN/GENEVE tunnels, not for ESP.
->> 
->> 02: The patch doesn't have behavioral changes other than fixing the
->> checksum. The final uh->len assignment assigns the actual length, not
->> 64k.
->> 
->> 03: The check can't be loosened, because total_len is also assigned to
->> UDP length. BIG TCP works in the mode without GRO hint option.
->> 
->> 04: Fixed the fallback value for udplen. BIG TCP is fine, it's the
->> uh->len = 0 case, uh->len can't exceed 64k.
->> 
->> 05: In the BIG TCP case, partial GSO splits the SKB in two. If full
->> segmentation is needed, the SKB is split in many MSS-sized SKBs without
->> fragments.
->> 
->> 06: Invalid packets from the wire are addressed in 08.
->> 
->> 07: __udp_gso_segment only handles UDP GSO packets, which can't be
->> bigger than 64k. Kept udp_set_len_short in nf_nat_mangle_udp_packet, as
->> the function doesn't support BIG TCP packets anyway (see
->> mangle_contents).
->> 
->> 08: udp_gro_receive handles packets before aggregation, there are no BIG
->> TCP packets at this point. RFC 768 doesn't say that padded UDP packets
->> are valid. Real jumbograms don't seem to be supported in this path
->> anyway.
->> 
->> 09: The packet goes to skb_udp_tunnel_segment, not __udp_gso_segment.
->> __skb_udp_tunnel_segment handles this case.
->> 
->> 12: Improved process cleanup by killing everything inside netns before
->> deleting them, and by avoiding killing netserver outside of netns.
->> netperf with -r in TCP_STREAM mode works, and the option has the
->> intended effect, but I replaced it with -m. Added dependency check for
->> tcpdump.
->> 
->> [1]: https://sashiko.dev/#/patchset/20260410150943.993350-1-alice.kernel%40fastmail.im
->> 
->> v3: https://lore.kernel.org/netdev/20260410150943.993350-1-alice.kernel@fastmail.im/
->> 
->> v3 changes: Fixed the redirect in the selftest, rebased over my L2TP fix
->> [2] for the syzbot report [3].
->> 
->> [2]: https://lore.kernel.org/netdev/20260403174949.843941-1-alice.kernel@fastmail.im/
->> [3]: https://lore.kernel.org/netdev/69a1dfba.050a0220.3a55be.0026.GAE@google.com/
->> 
->> v2: https://lore.kernel.org/netdev/20260226201600.222044-1-alice.kernel@fastmail.im/
->> 
->> v2 changes: Addressed the review comments: added UDP len helpers,
->> consolidated UDP len sanity checks in patch 08 into one, added
->> selftests. Added fixups to related code (patch 01-03).
->> 
->> v1: https://lore.kernel.org/netdev/20250923134742.1399800-1-maxtram95@gmail.com/
->> 
->> Alice Mikityanska (8):
->>    net: Use helpers to get/set UDP len tree-wide
->>    net: Enable BIG TCP with partial GSO
->>    udp: Support BIG TCP GSO packets where they can occur
->>    udp: Support gro_ipv4_max_size > 65536
->>    udp: Validate UDP length in udp_gro_receive
->>    udp: Set length in UDP header to 0 for big GSO packets
->>    vxlan: Enable BIG TCP packets
->>    selftests: net: Add a test for BIG TCP in UDP tunnels
->> 
->> Daniel Borkmann (1):
->>    geneve: Enable BIG TCP packets
->> 
->>   drivers/infiniband/core/lag.c                 |   2 +-
->>   drivers/infiniband/sw/rxe/rxe_net.c           |   4 +-
->>   drivers/net/amt.c                             |   6 +-
->>   drivers/net/ethernet/intel/i40e/i40e_txrx.c   |   2 +-
->>   drivers/net/ethernet/intel/iavf/iavf_txrx.c   |   2 +-
->>   drivers/net/ethernet/intel/ice/ice_txrx.c     |   2 +-
->>   drivers/net/ethernet/intel/idpf/idpf_txrx.c   |   2 +-
->>   .../marvell/octeontx2/nic/otx2_txrx.c         |   2 +-
->>   .../net/ethernet/mellanox/mlx5/core/en_rx.c   |   4 +-
->>   .../ethernet/mellanox/mlx5/core/en_selftest.c |   2 +-
->>   drivers/net/ethernet/sfc/falcon/selftest.c    |   4 +-
->>   drivers/net/ethernet/sfc/selftest.c           |   4 +-
->>   drivers/net/ethernet/sfc/siena/selftest.c     |   4 +-
->>   drivers/net/ethernet/sfc/tc_encap_actions.c   |   2 +-
->>   .../stmicro/stmmac/stmmac_selftests.c         |   4 +-
->>   drivers/net/geneve.c                          |   4 +-
->>   drivers/net/netconsole.c                      |   2 +-
->>   drivers/net/netdevsim/dev.c                   |   2 +-
->>   drivers/net/netdevsim/psample.c               |   2 +-
->>   drivers/net/netdevsim/psp.c                   |   8 +-
->>   drivers/net/vxlan/vxlan_core.c                |   2 +
->>   drivers/net/wireguard/receive.c               |   2 +-
->>   include/linux/udp.h                           |  27 +++
->>   include/trace/events/icmp.h                   |   2 +-
->>   lib/tests/blackhole_dev_kunit.c               |   2 +-
->>   net/6lowpan/nhc_udp.c                         |  10 +-
->>   net/core/pktgen.c                             |   4 +-
->>   net/core/selftests.c                          |   4 +-
->>   net/core/skbuff.c                             |  10 +-
->>   net/core/tso.c                                |   3 +-
->>   net/ipv4/esp4.c                               |   2 +-
->>   net/ipv4/fou_core.c                           |   2 +-
->>   net/ipv4/ipconfig.c                           |   6 +-
->>   net/ipv4/netfilter/nf_nat_snmp_basic_main.c   |   4 +-
->>   net/ipv4/route.c                              |   2 +-
->>   net/ipv4/udp.c                                |   7 +-
->>   net/ipv4/udp_offload.c                        |  49 ++---
->>   net/ipv4/udp_tunnel_core.c                    |   2 +-
->>   net/ipv6/esp6.c                               |   5 +-
->>   net/ipv6/fou6.c                               |   2 +-
->>   net/ipv6/ip6_udp_tunnel.c                     |   2 +-
->>   net/ipv6/udp.c                                |   7 +-
->>   net/ipv6/udp_offload.c                        |   2 +-
->>   net/l2tp/l2tp_core.c                          |   2 +-
->>   net/netfilter/ipvs/ip_vs_xmit.c               |   2 +-
->>   net/netfilter/nf_conntrack_proto_udp.c        |  15 +-
->>   net/netfilter/nf_log_syslog.c                 |   2 +-
->>   net/netfilter/nf_nat_helper.c                 |   2 +-
->>   net/psp/psp_main.c                            |   2 +-
->>   net/sched/act_csum.c                          |   4 +-
->>   net/xfrm/xfrm_nat_keepalive.c                 |   2 +-
->>   tools/testing/selftests/net/Makefile          |   1 +
->>   .../testing/selftests/net/big_tcp_tunnels.sh  | 188 ++++++++++++++++++
->>   53 files changed, 340 insertions(+), 102 deletions(-)
->>   create mode 100755 tools/testing/selftests/net/big_tcp_tunnels.sh
->> 
->
->
-> Hi Alice,
->
-> This patch looks promising, but I noticed that it does not include a 
-> modification for `skb_gro_receive`.
->
-> Currently, for UDP data aggregated via GRO, if the resulting packet 
-> size exceeds 65536 (`GRO_LEGACY_MAX_SIZE`), this check will return 
-> `-E2BIG`.
->
-> To allow UDP GRO aggregation beyond this limit (similar to the existing 
-> TCP behavior), we should update the condition to include `IPPROTO_UDP`.
+--0000000000007f20240656a2c2b7
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for the feedback! That's a good idea for future development,
-however, I'd like to keep the scope of this effort limited to BIG TCP.
-The series is already big enough, and adding UDP GRO might be not as
-trivial as it seems. At the very least, it requires adding another
-selftest to cover the new paths. In the worst case, it might need more
-tweaks in the datapath in case something breaks at later points in the
-pipeline. Moreover, since UDP GRO is not transparent for the userspace
-(unlike BIG TCP), the userspace might rely on assumptions about max
-aggregation size, and this topic needs additional research.
-
-To sum up, it's a good direction for further research, which can be done
-independently after merging this series, but I'd rather keep the scope
-of this series clear and limited to BIG TCP. Note that the current
-version of skb_gro_receive doesn't block tunneled BIG TCP traffic, which
-is proved by the selftest and manual testing.
-
-Thanks,
-Alice
-
-> I suggest the following modification:
+On Wed, Jul 15, 2026 at 1:53=E2=80=AFPM Leon Romanovsky <leon@kernel.org> w=
+rote:
 >
-> diff --git a/net/core/gro.c b/net/core/gro.c
-> index 35f2f708f010..01e56ad629c2 100644
-> --- a/net/core/gro.c
-> +++ b/net/core/gro.c
-> @@ -117,7 +117,7 @@ int skb_gro_receive(struct sk_buff *p, struct 
-> sk_buff *skb)
->                 return -E2BIG;
->         if (unlikely(p->len + len >= GRO_LEGACY_MAX_SIZE)) {
-> -               if (NAPI_GRO_CB(skb)->proto != IPPROTO_TCP ||
-> +               if ((NAPI_GRO_CB(skb)->proto != IPPROTO_TCP && 
-> NAPI_GRO_CB(skb)->proto != IPPROTO_UDP) ||
->                     p->encapsulation)
->                         return -E2BIG;
->         }
+> From: Leon Romanovsky <leonro@nvidia.com>
 >
-> Thanks,
-> zebang
+> Each software steering domain creates its own slab caches, but all
+> domains use the same names. When domains for two devices are alive at
+> once, the second kmem_cache_create() triggers the following splat:
+>
+> WARNING: mm/slab_common.c:111 at __kmem_cache_create_args+0xca/0x480, CPU=
+#18: devlink/331372
+> Modules linked in: act_mirred act_skbedit cls_matchall act_gact cls_flowe=
+r sch_ingress
+> vhost_vdpa veth nfnetlink_cttimeout openvswitch macvtap macvlan vfio_ap k=
+vm nf_nat_tftp
+> nf_conntrack_tftp nsh nf_conncount vfio_pci_core irqbypass scsi_debug vho=
+st_net tap tun
+> vhost_vsock vmw_vsock_virtio_transport_common vsock vhost nft_masq nft_re=
+ject_ipv4 act_csum
+> cls_u32 sch_htb smc_diag smc ppp_deflate bsd_comp ppp_async crc_ccitt ppp=
+_generic slhc loop
+> algif_hash af_alg nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reje=
+ct_inet nf_reject_ipv4
+> nf_reject_ipv6 nft_reject nft_ct nft_chain_nat nf_nat nf_conntrack nf_def=
+rag_ipv6 nf_defrag_ipv4
+> nf_tables mlx5_vdpa vdpa mlx5_ib dm_service_time ib_uverbs_support vringh=
+ ib_core vhost_iotlb
+> mlx5_core s390_trng eadm_sch vfio_ccw mdev vfio_iommu_type1 vfio sch_fq_c=
+odel drm i2c_core
+> dm_multipath drm_panel_orientation_quirks uvdevice diag288_wdt watchdog h=
+mac_s390 prng aes_s390
+> zfcp scsi_transport_fc pkey_pckmo pkey_cca pkey_ep11 zcrypt paes_s390 phm=
+ac_s390 rng_core
+> scsi_dh_alua pkey scsi_dh_rdac scsi_dh_emc crypto_engine autofs4 ecdsa_ge=
+neric ecc sha512 [last unloaded: openvswitch]
+> CPU: 18 UID: 0 PID: 331372 Comm: devlink Tainted: G        W           7.=
+2.0-20260712.rc2.git0.e3321fa3034d.300.fc44.s390x+debug #1 PREEMPT
+> Tainted: [W]=3DWARN
+> Hardware name: IBM 9175 ME1 701 (LPAR)
+> Krnl PSW : 0704c00180000000 0000038139a6771a (__kmem_cache_create_args+0x=
+da/0x480)
+>             R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 CC:0 PM:0 RI:0 EA:3
+> Krnl GPRS: 0000000000000000 0000000000000000 000003813b7de578 00000380b9e=
+b8974
+>             00000276c417f690 00000380b9eb8974 0000030144623348 0000027723=
+4a1660
+>             0000000000000020 00000380b9eb8974 00000277234a1600 000003813b=
+686d30
+>             0000000000000000 00000380b9e9a810 0000038139a6771a 0000030144=
+623238
+> Krnl Code: 0000038139a6770a: c02000ebb737       larl    %r2,000003813b7de=
+578
+>             0000038139a67710: b9040039           lgr     %r3,%r9
+>            *0000038139a67714: c0e5006e2eb2       brasl   %r14,000003813a8=
+2d478
+>            >0000038139a6771a: a7390020           lghi    %r3,32
+>             0000038139a6771e: b9040029           lgr     %r2,%r9
+>             0000038139a67722: c0e5006cf98f       brasl   %r14,000003813a8=
+06a40
+>             0000038139a67728: ec26018e007c       cgij    %r2,0,6,00000381=
+39a67a44
+>             0000038139a6772e: 58d0f0a4           l       %r13,164(%r15)
+> Call Trace:
+>   [<0000038139a6771a>] __kmem_cache_create_args+0xda/0x480
+> ([<0000038139a676a2>] __kmem_cache_create_args+0x62/0x480)
+>   [<00000380b9da1c70>] dr_domain_init_mem_resources+0x80/0x240 [mlx5_core=
+]
+>   [<00000380b9da226e>] dr_domain_init_resources.constprop.0+0x7e/0x2c0 [m=
+lx5_core]
+>   [<00000380b9da28b2>] mlx5dr_domain_create+0x132/0x250 [mlx5_core]
+>   [<00000380b9dc1e20>] mlx5_cmd_dr_create_ns+0x30/0x90 [mlx5_core]
+>   [<00000380b9cd8dbe>] mlx5_flow_namespace_set_mode+0x6e/0x130 [mlx5_core=
+]
+>   [<00000380b9d846ec>] esw_create_offloads_fdb_tables+0xac/0x5a0 [mlx5_co=
+re]
+>   [<00000380b9d865b6>] esw_offloads_steering_init+0x1c6/0x480 [mlx5_core]
+>   [<00000380b9d86e8e>] esw_offloads_enable+0x13e/0x410 [mlx5_core]
+>   [<00000380b9d7b04a>] mlx5_eswitch_enable_locked+0x36a/0x540 [mlx5_core]
+>   [<00000380b9d84ff0>] esw_offloads_start+0x50/0x1d0 [mlx5_core]
+>   [<00000380b9d8774a>] mlx5_devlink_eswitch_mode_set+0x35a/0x3f0 [mlx5_co=
+re]
+>   [<000003813a791e68>] devlink_nl_eswitch_set_doit+0x88/0x120
+>   [<000003813a5b93ea>] genl_family_rcv_msg_doit+0xea/0x150
+>   [<000003813a5b95c2>] genl_family_rcv_msg+0x172/0x210
+>   [<000003813a5b96c2>] genl_rcv_msg+0x62/0xc0
+>   [<000003813a5b7cac>] netlink_rcv_skb+0x5c/0x120
+>   [<000003813a5b8f0c>] genl_rcv+0x3c/0x50
+>   [<000003813a5b74a4>] netlink_unicast+0x1f4/0x2b0
+>   [<000003813a5b783c>] netlink_sendmsg+0x2dc/0x460
+>   [<000003813a4c9764>] __sock_sendmsg+0x64/0xd0
+>   [<000003813a4cc878>] __sys_sendto+0x108/0x160
+>   [<000003813a4cdf50>] __do_sys_socketcall+0x350/0x460
+>   [<000003813a8184d2>] __do_syscall+0x172/0x750
+>   [<000003813a82d5d2>] system_call+0x72/0x90
+>
+> Prefix each cache name with the device name to make it unique.
+>
+> Fixes: fd785e5213f0 ("net/mlx5: DR, Allocate icm_chunks from their own sl=
+ab allocator")
+> Fixes: fb628b71fb2a ("net/mlx5: DR, Allocate htbl from its own slab alloc=
+ator")
+> Reported-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+> Closes: https://lore.kernel.org/all/a3cea501-4d1f-47d5-b6d0-fcda9a0aab16@=
+linux.ibm.com/
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+
+LGTM,
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+
+--=20
+Regards,
+Kalesh AP
+
+--0000000000007f20240656a2c2b7
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+tJVewHuOmXgWQxNWV7Oiszu1d9xAcqyj65s1PrEIIaHnxEM3eTK+teecLEy8QymZjjDTrCHg4x36
+2AczdlQAIiq5TSAucGja5VP8g1zTnfL/RAxEZvLS471GABptArolXY2hMVHdVEYcTduZlu8aHARc
+phXveOB5/l3bPqpMVf2aFalv4ab733Aw6cPuQkbtwpMFifp9Y3s/0HGBfADomK4OeDTDJfuvCp8g
+a907E48SjOJBGkh6c6B3ace2XH+CyB7+WBsoK6hsrV5twAXSe7frgP4lN/4Cm2isQl3D7vXM3PBQ
+ddI2aZzmewTfbgZptt4KCUhZh+t7FGB6ZKppQ++Rx0zsGN1s71MtjJnhXvJyPs9UyL1n7KQPTEX/
+07kwIwdMjxC/hpbZmVq0mVccpMy7FYlTuiwFD+TEnhmxGDTVTJ267fcfrySVBHioA7vugeXaX3yL
+SqGQdCWnsz5LyCxWvcfI7zjiXJLwefechLp0LWEBIH5+0fJPB1lfiy1DUutGDJTh9WZHeXfVVFsf
+rSQ3y0VaTqBESMjYsJnFFYQJ9tZJScBluOYacW6gqPGC6EU+bNYC1wpngwVayaQQMIIGtzCCBJ+g
+AwIBAgIMEvVs5DNhf00RSyR0MA0GCSqGSIb3DQEBCwUAMFIxCzAJBgNVBAYTAkJFMRkwFwYDVQQK
+ExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWduIEdDQyBSNiBTTUlNRSBDQSAy
+MDIzMB4XDTI1MDYyMDEzNDI1N1oXDTI3MDYyMTEzNDI1N1owgfUxCzAJBgNVBAYTAlVTMRMwEQYD
+VQQIEwpDYWxpZm9ybmlhMREwDwYDVQQHEwhTYW4gSm9zZTEZMBcGA1UEYRMQTlRSVVMrREUtNjYx
+MDExNzEYMBYGA1UEBBMPQW5ha2t1ciBQdXJheWlsMQ8wDQYDVQQqEwZLYWxlc2gxFjAUBgNVBAoT
+DUJST0FEQ09NIElOQy4xLDAqBgNVBAMMI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20u
+Y29tMTIwMAYJKoZIhvcNAQkBFiNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29tLmNvbTCC
+ASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOG5Nf+oQkB79NOTXl/T/Ixz4F6jXeF0+Qnn
+3JsEcyfkKD4bFwFz3ruqhN2XmFFaK0T8gjJ3ZX5J7miihNKl0Jxo5asbWsM4wCQLdq3/+QwN/xAm
++ZAt/5BgDoPqdN61YPyPs8KNAQ8zHt8iZA0InZgmNkDcHhnOJ38cszc1S0eSlOqFa4W9TiQXDRYT
+NFREznPoL3aCNNbDPWAkAc+0/X1XdV1kt4D9jrei4RoDevg15euOaij9X7stUsj+IMgzCt2Fyp7+
+CeElPmNQ0YOba2ws52no4x/sT5R2k3DTPisRieErWuQNhePfW2fZFFXYv7N2LMgfMi9hiLi2Q3eO
+1jMCAwEAAaOCAecwggHjMA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcB
+AQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQv
+Z3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEFBQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2ln
+bi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1UdIAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAy
+ASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNv
+bS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAyhjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29t
+L2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwLgYDVR0RBCcwJYEja2FsZXNoLWFuYWtrdXIucHVyYXlp
+bEBicm9hZGNvbS5jb20wEwYDVR0lBAwwCgYIKwYBBQUHAwQwHwYDVR0jBBgwFoAUACk2nlx6ug+v
+LVAt26AjhRiwoJIwHQYDVR0OBBYEFJ/R8BNY0JEVQpirvzzFQFgflqtJMA0GCSqGSIb3DQEBCwUA
+A4ICAQCLsxTSA9ERT90FGuX/UM2ZQboBpTPs7DwZPq12XIrkD58GkHWgWAYS2xL1yyvD7pEtN28N
+8d4+o6IcPz7yPrfWUCCpAitaeSbu0QiZzIAZlFWNUaOXCgZmHam8Oc+Lp/+XJFrRLhNkzczcw3zT
+cyViuRF/upsrQ3KY/kqimiQjR9BduvKiX/w/tMWDib1UhbVhXxuhuWMr8j8sja2/QR9fk670ViD9
+amx7b5x595AulQfiDhcN0qxG4fr7L22Y/RYX8fCoBAGo0SF7IpxSukVsp6z5uZp5ggdNr2Cq88qk
+if7GG/Oy1beosYD9I5S5dIRcP25oNbcJkbCb/GuvWegzGfxCCBuirb09mTSZRxaBmb1P6dANmPvh
+PdqGqxfFrXagvwbO15DN46GarD9KiHa8QHyTtWghL3q+G6ZHlZUWnyS4YMacrx8Ngy0x7HR4dNdT
+pqAqOOsOwDmQFBNRYomMdAaOXm6x6MFDnp51sIWVNGWK2u4le2VI6RJMzEqLzMZKL0vTW+HPqMaT
+hWv2s5x6cJdLio1vP63rDxJS7vH++zMaY0Jcptrx6eAhzfcq+y/TkHJaZ4dWrtbof1yw3z5EpCvT
+YDxV0XFQiCRLNKuZhkVvQ8dtmVhcpiT/mENrWKWOt0DwNEeC/3Fr1ruoyriggbnRmBQt1bC5uxfv
++CEHcDGCAlcwggJTAgEBMGIwUjELMAkGA1UEBhMCQkUxGTAXBgNVBAoTEEdsb2JhbFNpZ24gbnYt
+c2ExKDAmBgNVBAMTH0dsb2JhbFNpZ24gR0NDIFI2IFNNSU1FIENBIDIwMjMCDBL1bOQzYX9NEUsk
+dDANBglghkgBZQMEAgEFAKCBxzAvBgkqhkiG9w0BCQQxIgQgrmS27G/YuJbSfXN15UDSZZbVRTZK
+9+A187Le6BivBoUwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjYw
+NzE1MDkxNTA4WjBcBgkqhkiG9w0BCQ8xTzBNMAsGCWCGSAFlAwQBKjALBglghkgBZQMEARYwCwYJ
+YIZIAWUDBAECMAoGCCqGSIb3DQMHMAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcN
+AQEBBQAEggEALiOBJBqI1OAnGRA5sW/y3zutD5hXYYukiW2BalGmV5Chbr02EuZ3+T46FTy13ih7
+yRaRSW7aEvhy6vOppNiPSzg3R7G1S5zyizWRHPicRwW/5TnNM4XsMZgz8FxCPu/MSqu0K2uSzLf3
+eqqaUB2zkKF4k/4xh2vlgDXFqX4DoXpjJDtyzJav1HkiYP4zrm0/9yOq9BKZf+oMUQfletIB0GNo
+NqrB0BCIt56Rgyb+/02GGgIAmkcCQNIOfSOZ4cvEGMMeeKHdi9Trdl7uws1eEWKwlP2FaKZWmZLe
+bjp9F/0Z1E3Nj/ZESqJtQIQ6CkjgiIaCqlr/vDzQCh0EyiXGfg==
+--0000000000007f20240656a2c2b7--
 
