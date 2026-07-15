@@ -1,296 +1,195 @@
-Return-Path: <netdev+bounces-307664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307665-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id GJREBLEeV2pTFgEAu9opvQ
-	(envelope-from <netdev+bounces-307664-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 07:46:25 +0200
+	id qybEK1sgV2qJFgEAu9opvQ
+	(envelope-from <netdev+bounces-307665-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 07:53:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6497B75ABDD
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 07:46:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 080F575AC24
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 07:53:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=canonical.com header.s=20251003 header.b=P7xPp+mX;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307664-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-307664-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=canonical.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=gDxZ+LTV;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307665-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307665-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 314EF3037F70
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 05:46:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C5DDF3038C6A
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 05:53:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB54D353A9E;
-	Wed, 15 Jul 2026 05:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 536563B4E9B;
+	Wed, 15 Jul 2026 05:53:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243B830674C
-	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 05:46:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25B43B38A2
+	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 05:53:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784094382; cv=none; b=o+iZZv0dcbM+HvFL/jLRVv6jYi21nwDD3aSV7E+xFYsGc+bnD0YsqC+Vk3DYSuE0zrhNu8ZsFUrE8Z+kf4mdN1/lL/QE0zVawg6UFWchlLsY24FqjUJPkVzvmcrC7nd8pEIEQgc59aawJ+tMpHPq9YzkeDm8ocCe2+o+FpOL420=
+	t=1784094808; cv=none; b=rkpbA1szqQ0kOiZiDOh1i7l+GEdEg9sqWQEYPuqeuUlc9JQj1M4+gjsqrA1gll8cMH0y0+NuwwB/Ffr/h6bWloHLuPU1i94Lj1rGqsSF0VtW1tV4c+7DH/QRYAHXbZgbzvRufOc2lBZIIg0t9PbU8kEtSzn/Y+ekFpDXpFPmLFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784094382; c=relaxed/simple;
-	bh=8w4wrmXPFzBzLWihNpLauxrKxi09MS/mQ4dCsI7xtSQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bdXGfM/C9EQ08WcOIA4te9yzJ7UsWHJ5N8TYRrrchwy/8J8nW03OUBXoqIuaCzTl+lCK8PQE/Syp6mKfSrUbpzyXOmDUU4lupzpbIxI1Rvlaa6CQQ7vISq21Rv2nq0NSJ0Wp+gk7g67QHXeyyqOYymnqycyfrgNvB45hDwIJ2vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=P7xPp+mX; arc=none smtp.client-ip=185.125.188.123
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 935A03F61E
-	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 05:46:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1784094378;
-	bh=IoG1Whp3gfhDFJ0umUwcIOIJfD5L91Xz9sc0pOou7vk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:In-Reply-To;
-	b=P7xPp+mXbUEhruHoV7a+jX1u/PIuspN3CGYNetDZMRpmFordWnqQ6go4PteBc1M/o
-	 Z5JkKwabJHkN81bNkudLJdpdsNfCPO91NLNFS0pEs2TwchK68t2LTzrx5zuri4H9vN
-	 bfmXtAHPYp/6mGn5jv9dPJS4ESF9FuUbZb7HUA1pEJa71MwCToakOnBvXVyj7sPzVU
-	 KFSy6eq4dgHL64+9jdgRBwn+RxUOaXHMc7CrmLDhFEjIZYiNHuKaNT4X4wZ0U9GT4t
-	 LI8dDuKTZID5K05Ac8O5k6+YT2yPOvCo/b6t+2y4niTE+N0vFRSgwVGRWcbMbWl0dV
-	 6Jk8sefcEYAP2GFvWJFWvSMet3Q00QAUgLDglQvdGXkCBu/HQ1O97lLRl0GqqZV7RK
-	 Ko5dGfPjrFUqY+XhEQLPcmN3OdZ+GCgsvzIxwyaF+DjkmPy8fzNrAba+v1xNxSvV42
-	 nw5Awz5mt5hCTwUqkSdabwLQ+S1b+yJfd9wU4GL0HNP7/BdhiUR9gd3ZT+rkmyL9ym
-	 2cbOjEfyzVNIReqOwu6AW3Chki5JXr6jX/h+xh40j8cLz+siZJ/QiV+iKeOBqDaKL9
-	 JGkfYfA2AZn0u9Q7ZdLOGX+XpIt5fmlyGwplXVKdo2ildXs06FrvXMns6Lw9fuH22d
-	 0EU8E0LTH6BGjG5/jt1bkfKo=
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-38e2237bc43so1903301a91.1
-        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 22:46:18 -0700 (PDT)
+	s=arc-20240116; t=1784094808; c=relaxed/simple;
+	bh=cv/py1C2nLATOuxnjEQyvp5MmxbEmsJSCheT3nEyXzU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=j+jFnYz1C5ZkOd5uCr9DYJmqVppEZkTyYo7US12bSHZ41/lO0PL2UPc+3AzdqWqFCW/Id6D7mbJB460ij4HO2ad5Z7e7iB8os8bfMNtI6htZDsZRDSVaVE//q0VqTQFPSx5lppRyMf3rLjyv5UtexIcv82loOglq0/jyANq/MQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gDxZ+LTV; arc=none smtp.client-ip=209.85.160.173
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-51bfad59921so42211491cf.0
+        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 22:53:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784094806; x=1784699606; darn=vger.kernel.org;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=VYantbV19BJGNggt8/qq3SXPjrD8WHX/QjRV00onfwg=;
+        b=gDxZ+LTVUmXaOu27gQMgMGDVd9WAM+l67JyUvSTbwnnW+jk18loxOt8dzWfScklqDu
+         tFaskTOA7GxByk8m0Ycd2va8WgH+XhdznZXfh/3IFoRfJfVubQjyyUH5nIXuWu+j+q9f
+         yB9cB51VI/eT7I4rmcoStPsNl7clDKfrgcRmS7H2vuenxYFAm7tMuOIN1SDQk34sj0Mq
+         ctfyW5yskOv8vwSzq7BVARDcVNa7Fk6Hg0HwP/xohIMjMYTRdt374i26luLpmwJsbD+d
+         roX646zKf2RJXaEeck1d/Pq3QmVDsSk0OJlqA5FMMara2/iG1vb+ioJba1whvhlFRohB
+         P5ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784094377; x=1784699177;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=IoG1Whp3gfhDFJ0umUwcIOIJfD5L91Xz9sc0pOou7vk=;
-        b=eykYFqGTIoFGnkpzITGi9RcjYS9v/bw6PPzciYBvvk0XVDtaFngQyarnTpae8xt7Rb
-         Bt75oN3Aft0j5WR88HQSVkktt9pGFxPhSpDn1L9rj+AhPgGECPKQkdeY36vrK7twB2SQ
-         MdD0NCdCvBa+lDiZ8KRK3ZovtTs/gTkR4qw3t0IqUJ9tZmOL3LP7l1FyUmJcF0l92kM1
-         UK3NynpBJQWlisx3jmGnmDyPCDi1AYLKM4LkcyMQQqgpLn26fwjBLOhJPMZUaucNqqFp
-         l5uzQqtl7KQOaqKMW/R5u+Y8Lrr3EFS8LqJT9PLY1/kmEUBYvDQIPpzvrIKO0riqjYlH
-         /F9A==
-X-Forwarded-Encrypted: i=1; AHgh+RqRuG77P9A2V++4pkhNJub8HWlJ61jczxIFyO4eZvVq1joBce5wY0YGDZK5qbVqUSKwZl5djoQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxto9TtW5hIUywt+vHVhNOZ0XEa3zC9Lu7fC3iaoAC0CAGplk8R
-	pGArXtCoTEIRgFRcXPM2fu7uCPaSfNca9ZsfmP/1s4VZDMR16L1nCAnj24AI3yjsRMG59Br+Y/u
-	a89bZUTU12V8GMnVOYhyOox9Rx7GqXhwRxGRq2tXZJZJ3WWTMj+F4h0ANEuWW0Q7j8TC+4oLevQ
-	==
-X-Gm-Gg: AfdE7clhfgmnMU71ZU5U/SCAeo5Pb/rCBrC/EzzCEPpVY4blb74eKxGp5TnzeD8CDuU
-	qWV0YTVLnW3engc4+H5CkkE7sN9QMJn81V3WyehRLG2MFa+wQ8VA5Kl0FSynlOau+B/zZkHHrv7
-	5XB9/sPAEHQjDiNnTbEfZf3BZSAubWEJhL0hA3rWefWi4Jx2SCq8W7aiNumrLxeyRG2Es5bIc2w
-	HruSOznoKJpVKAZso5SbJDQ7fEASWTQNUsOB2Hfd7pQe3OCb9pshhVbuucshDHOn8I2LTfNxIq1
-	CsFAZ/lAAGMni5GElujwN5ejyX+4xF59CCFmi8mbJowsGguXeR/HhHY5cYQRU4UO/ISHBz2F0sg
-	I0fhFOCGonUDwTEPsZETX7U7wF3NAq3skyY9nlmXG1EWGvX5PQ0vID2lx8q9r8wVuhDk=
-X-Received: by 2002:a17:90b:28c4:b0:38d:fda6:4873 with SMTP id 98e67ed59e1d1-38e17db7bd5mr6184610a91.10.1784094376917;
-        Tue, 14 Jul 2026 22:46:16 -0700 (PDT)
-X-Received: by 2002:a17:90b:28c4:b0:38d:fda6:4873 with SMTP id 98e67ed59e1d1-38e17db7bd5mr6184580a91.10.1784094376304;
-        Tue, 14 Jul 2026 22:46:16 -0700 (PDT)
-Received: from acelan-Precision-5480 (211-75-139-220.hinet-ip.hinet.net. [211.75.139.220])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-313b4cbafa1sm86874914eec.6.2026.07.14.22.46.12
+        d=1e100.net; s=20251104; t=1784094806; x=1784699606;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=VYantbV19BJGNggt8/qq3SXPjrD8WHX/QjRV00onfwg=;
+        b=J1uF/Qv2xoOBtx+R4CtMIO3fO5IibLtXso+THit5Sm5cx8D5JFAAC9D/vNc5Mc8Gsb
+         SXMwlCZ5oVVs0DJOppPAFcA8MTW24hAraqWGmgYRZ/hUcg3zpyDS1MQcArSbN1STA+A+
+         dpBKxJvevSn1wHFxD/wokHO1f0OLkWusAdoLGwwmvbeNtEt6GYawdccL7bjnKgmWYhB1
+         Ayn39c1dKINQi1dvxtXJvaCCFI+8GL/PDutMhmtSsuRcT/2vALWCLo8WV3Vnu02jPwTC
+         4bEb9gOS/IhU/1wcihSsPHfaepcV6uC7gp7K6ohVzt01UG8jhMYQ6E6RfSZ+KoYvSbzG
+         YkwA==
+X-Forwarded-Encrypted: i=1; AHgh+Ro9APTcGBsJ3nnl3v+oJuv5NYg0Na/OQBjw5JZRO7swbLGFci30xSNlGkJyM9ZiU8qioZueg/E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzS8w5y3qkOElQs/j7YMr+FMzE2ErcVt32l8epDL/c1lP4nBEh8
+	l+Z/epWW8yrhsCvC40L/B6GQJiHXHaCFXgnPHAHkBVRyU8a4K0qc7rruaRNmsJC5
+X-Gm-Gg: AfdE7cnnml+czIqnP+vP/0iOol9zWfsxeBcXmhJz82YnUlwaiQ1J85pggcTSirFXjlb
+	DiYA9jiiNlB8AHqaueG23JXco43ODMu2G7E/6Wrpq/8aP6/OlkVPUw0EpnrsCtwCAEo+MzsOada
+	r5WEk4+o5aT3NT7oYVUaoouatc25WON670hcLfmB7/3+6KNeKJAGrLLuGxXWN3ApWrHah9vwt0h
+	zA481KhE/4QxHLvO9+ismYkjD49ZijFQYS4TO8a0+EnY34NTMrpcDUOVcsoCBHAr2jiw8nH1RRP
+	x4iryney9W5n2Ok7r6Jngn1QpbPSexayIvAhUDDulpVt1eTZM/lQjwF4A8XA3bxGIMznKoxnaFj
+	3TycU5OVxIItNV4x+1y9ALGppajgUjVRKCibYSqgqJ4RbDJeKg5T3TFBF9AJyzI7FWftK/xPsA5
+	qmE69nwPsa3JHK3k/JOFIAIQvuQTNzr6Iy8jtrvgUV1JsEpdNdMByGbXO0ZLC5
+X-Received: by 2002:a05:622a:142:b0:51c:17cd:1fd4 with SMTP id d75a77b69052e-51e424808f6mr49106881cf.41.1784094805630;
+        Tue, 14 Jul 2026 22:53:25 -0700 (PDT)
+Received: from localhost.localdomain ([4.15.194.220])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51caafd8b4fsm131928181cf.31.2026.07.14.22.53.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jul 2026 22:46:15 -0700 (PDT)
-Date: Wed, 15 Jul 2026 13:46:09 +0800
-From: "Chia-Lin Kao (AceLan)" <acelan.kao@canonical.com>
-To: "Ruinskiy, Dima" <dima.ruinskiy@intel.com>
-Cc: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>, 
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, 
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [Intel-wired-lan] [PATCH 1/2] igc: Wait for MAC passthrough
- after reset
-Message-ID: <alcd_FnUdrQug5cm@acelan-Precision-5480>
-Mail-Followup-To: "Chia-Lin Kao (AceLan)" <acelan.kao@canonical.com>, 
-	"Ruinskiy, Dima" <dima.ruinskiy@intel.com>, "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>, 
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, 
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20260618073324.1843310-1-acelan.kao@canonical.com>
- <IA3PR11MB8986B77F49DF672178FEE4BCE5E32@IA3PR11MB8986.namprd11.prod.outlook.com>
- <c3030882-55c8-486f-8ff3-571d001b99a1@intel.com>
- <ajiHH-RaHUjgraMh@acelan-Precision-5480>
- <1d6c3aae-c9b1-42da-b5fa-6f8ee9ebcae1@intel.com>
+        Tue, 14 Jul 2026 22:53:25 -0700 (PDT)
+From: Vimal Agrawal <avimalin@gmail.com>
+X-Google-Original-From: Vimal Agrawal <vimal.agrawal@sophos.com>
+To: pabeni@redhat.com,
+	netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	kuniyu@google.com,
+	edumazet@google.com,
+	vimal.agrawal@sophos.com
+Subject: [PATCH v4 net-next] net: neigh: avoid calling neigh_forced_gc on every alloc when table is full
+Date: Wed, 15 Jul 2026 05:53:11 +0000
+Message-Id: <20260715055311.90403-1-vimal.agrawal@sophos.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20260714133909.82424-1-vimal.agrawal@sophos.com>
+References: <20260714133909.82424-1-vimal.agrawal@sophos.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1d6c3aae-c9b1-42da-b5fa-6f8ee9ebcae1@intel.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[canonical.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[canonical.com:s=20251003];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-307664-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[acelan.kao@canonical.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS(0.00)[m:dima.ruinskiy@intel.com,m:aleksandr.loktionov@intel.com,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[canonical.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:kuniyu@google.com,m:edumazet@google.com,m:vimal.agrawal@sophos.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307665-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[avimalin@gmail.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[acelan.kao@canonical.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[avimalin@gmail.com,netdev@vger.kernel.org];
+	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,canonical.com:from_mime,canonical.com:email,canonical.com:dkim,vger.kernel.org:from_smtp,acelan-Precision-5480:mid]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,sophos.com:email,sophos.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6497B75ABDD
+X-Rspamd-Queue-Id: 080F575AC24
 
-On Mon, Jun 29, 2026 at 07:42:43PM +0300, Ruinskiy, Dima wrote:
-> Hi AceLan,
->
-> Some more comments below.
->
-> On 22/06/2026 4:57, Chia-Lin Kao (AceLan) wrote:
->
-> > >
-> > > Because 100 iterations of 100msec each - this translates to up-to 10
-> > > seconds, no?
-> > Yes, just in case it takes longer.
-> > I think 5 seconds should be enough if you feel this is feasible.
-> 5 seconds also sounds excessive, assuming the majority of the systems do not
-> support / enable MAC passthrough via the FW feature (and I have a hunch it
-> is the case). 2 seconds... maybe, but then you say that in some rare cases
-> it exceeds 2 seconds as well. What if in some even rare cases it exceeds
-> 5/10 seconds? Perhaps because of some glitch it will not come up at all on
-> this cycle. Should the driver always wait?
->
-> > I wish we can detect if the MAC passthrough is enabled, so that we
-> > know if we need to poll for the MAC address.
-> Unfortunately, like you I am not aware of any way for the driver to know
-> whether MAC passthrough via FW is enabled. Because of this we have been
-> exploring a simpler way to support this feature via ACPI objects (which are
-> set by the BIOS when MAC passthrough is enabled and are easy for the driver
-> to query). I know some vendors have already implemented it, and I am
-> currently drafting a patch to send.
-Any good news about this patch?
+Once the neighbour table exceeds gc_thresh3, neigh_forced_gc() is called
+on every allocation attempt with no rate limiting. In workloads with mostly
+active/reachable entries, the GC walk traverses a large portion of the
+neighbour table without reclaiming entries, holding tbl->lock for an
+extended period. This causes severe lock contention and allocation
+latencies exceeding 16ms under sustained neighbour creation.
 
->
-> > For the FW interrupt mechanism also needs BIOS support, and we don't
-> > have the power to push this.
-> The mechanism I have in mind does not require BIOS support - the I225/I226
-> FW already supports the required interrupt, AFAIK - it merely needs to be
-> enabled in the igc driver. With that said, there still remains the question
-> of how to notify the network stack above us that the MAC address has changed
-> post-probe - and whether it is even supported.
->
-> --Dima
->
-> >
-> > >
-> > > Thanks,
-> > > Dima.
-> > >
-> > > >
-> > > > > Signed-off-by: Chia-Lin Kao (AceLan) <acelan.kao@canonical.com>
-> > > > > ---
-> > > > >    drivers/net/ethernet/intel/igc/igc_main.c | 48
-> > > > > +++++++++++++++++++++++
-> > > > >    1 file changed, 48 insertions(+)
-> > > > >
-> > > > > diff --git a/drivers/net/ethernet/intel/igc/igc_main.c
-> > > > > b/drivers/net/ethernet/intel/igc/igc_main.c
-> > > > > index 2c9e2dfd8499..fa9752ed8bc5 100644
-> > > > > --- a/drivers/net/ethernet/intel/igc/igc_main.c
-> > > > > +++ b/drivers/net/ethernet/intel/igc/igc_main.c
-> > > > > @@ -11,6 +11,7 @@
-> > > > >    #include <net/pkt_sched.h>
-> > > > >    #include <linux/bpf_trace.h>
-> > > > >    #include <net/xdp_sock_drv.h>
-> > > > > +#include <linux/etherdevice.h>
-> > > > >    #include <linux/pci.h>
-> > > > >    #include <linux/mdio.h>
-> > > > >
-> > > > > @@ -69,6 +70,52 @@ static const struct pci_device_id igc_pci_tbl[] = {
-> > > > >
-> > > > >    MODULE_DEVICE_TABLE(pci, igc_pci_tbl);
-> > > > >
-> > > > > +static void igc_read_rar0(struct igc_hw *hw, u8 *addr, u32 *ral, u32
-> > > > > +*rah) {
-> > > > > +	*ral = rd32(IGC_RAL(0));
-> > > > > +	*rah = rd32(IGC_RAH(0));
-> > > > > +
-> > > > > +	addr[0] = *ral & 0xff;
-> > > > > +	addr[1] = (*ral >> 8) & 0xff;
-> > > > > +	addr[2] = (*ral >> 16) & 0xff;
-> > > > > +	addr[3] = (*ral >> 24) & 0xff;
-> > > > > +	addr[4] = *rah & 0xff;
-> > > > > +	addr[5] = (*rah >> 8) & 0xff;
-> > > > > +}
-> > > > > +
-> > > > > +static bool igc_is_lmvp_device(struct pci_dev *pdev) {
-> > > > > +	switch (pdev->device) {
-> > > > > +	case IGC_DEV_ID_I225_LMVP:
-> > > > > +	case IGC_DEV_ID_I226_LMVP:
-> > > > > +		return true;
-> > > > > +	default:
-> > > > > +		return false;
-> > > > > +	}
-> > > > > +}
-> > > > > +
-> > > > > +static void igc_wait_for_lmvp_mac_passthrough(struct pci_dev *pdev,
-> > > > > +					      struct igc_hw *hw)
-> > > > > +{
-> > > > > +	u8 addr[ETH_ALEN] __aligned(2);
-> > > > > +	u32 orig_ral, orig_rah;
-> > > > > +	u32 ral, rah;
-> > > > > +	int i;
-> > > > > +
-> > > > > +	if (!igc_is_lmvp_device(pdev))
-> > > > > +		return;
-> > > > > +
-> > > > > +	igc_read_rar0(hw, addr, &orig_ral, &orig_rah);
-> > > > > +
-> > > > > +	for (i = 0; i < 100; i++) {
-> > > > > +		msleep(100);
-> > > > > +		igc_read_rar0(hw, addr, &ral, &rah);
-> > > > > +		if ((ral != orig_ral || rah != orig_rah) &&
-> > > > > +		    is_valid_ether_addr(addr))
-> > > > > +			return;
-> > > > > +	}
-> > > > > +}
-> > > > > +
-> > > > >    enum latency_range {
-> > > > >    	lowest_latency = 0,
-> > > > >    	low_latency = 1,
-> > > > > @@ -7259,6 +7306,7 @@ static int igc_probe(struct pci_dev *pdev,
-> > > > >    	 * known good starting state
-> > > > >    	 */
-> > > > >    	hw->mac.ops.reset_hw(hw);
-> > > > > +	igc_wait_for_lmvp_mac_passthrough(pdev, hw);
-> > > > >
-> > > > >    	if (igc_get_flash_presence_i225(hw)) {
-> > > > >    		if (hw->nvm.ops.validate(hw) < 0) {
-> > > > > --
-> > > > > 2.53.0
-> > > >
-> > >
->
+Add a pre-lock check in neigh_forced_gc() to skip the GC run if one was
+performed within the last 50 ms, but only when the table actually contains
+NEIGH_FORCED_GC_LARGE_TABLE_THRESH (16384) or more entries. This avoids
+repeated full table scans and lock acquisitions on the hot allocation path
+while leaving tables with few entries completely unaffected regardless of
+how gc_thresh3 is configured.
+
+Profiling of neigh_create() shows ~3 orders of magnitude latency
+improvement with this change.
+
+Link: https://lore.kernel.org/netdev/CALkUMdSCpx_ywYCx_ePLdm6yioO1nQWx7sSM=AEgsq0kywHxTw@mail.gmail.com/
+Signed-off-by: Vimal Agrawal <vimal.agrawal@sophos.com>
+---
+v4: Rate-limit based on actual gc_entries count (>= 16384) rather than
+    gc_thresh3 configuration, so tables with few entries are never
+    rate-limited regardless of how gc_thresh3 is configured.
+v3: Restrict rate limiting to tables with gc_thresh3 >= 16384 to avoid
+    breaking selftests and default deployments (gc_thresh3=1024).
+v2: Changed rate-limit window from 1s (HZ) to 50ms (msecs_to_jiffies(50))
+    based on profiling data showing 44% -> 2.56% CPU reduction.
+
+ net/core/neighbour.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+index 1349c0eed..9977b9f32 100644
+--- a/net/core/neighbour.c
++++ b/net/core/neighbour.c
+@@ -250,6 +250,8 @@ bool neigh_remove_one(struct neighbour *n)
+ 	return retval;
+ }
+ 
++#define NEIGH_FORCED_GC_LARGE_TABLE_THRESH    16384
++
+ static int neigh_forced_gc(struct neigh_table *tbl)
+ {
+ 	int max_clean = atomic_read(&tbl->gc_entries) -
+@@ -260,6 +262,15 @@ static int neigh_forced_gc(struct neigh_table *tbl)
+ 	int shrunk = 0;
+ 	int loop = 0;
+ 
++	/*
++	 * For large neighbor tables, repeated forced GC passes can spend
++	 * significant CPU scanning neighbor entries when most remain active.
++	 * Rate-limit consecutive forced GC passes to reduce CPU overhead.
++	 */
++	if (atomic_read(&tbl->gc_entries) >= NEIGH_FORCED_GC_LARGE_TABLE_THRESH &&
++	    time_before(jiffies, READ_ONCE(tbl->last_flush) + msecs_to_jiffies(50)))
++		return 0;
++
+ 	NEIGH_CACHE_STAT_INC(tbl, forced_gc_runs);
+ 
+ 	spin_lock_bh(&tbl->lock);
+-- 
+2.43.0
+
 
