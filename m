@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-307737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307738-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id OpJnMvx1V2pOOgEAu9opvQ
-	(envelope-from <netdev+bounces-307737-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 13:58:52 +0200
+	id k2BUErB4V2opOwEAu9opvQ
+	(envelope-from <netdev+bounces-307738-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 14:10:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7138575DDA1
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 13:58:51 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89E3675DF1D
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 14:10:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307737-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307737-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307738-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307738-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=motor-comm.com (policy=none);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B28A1301EC4A
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 11:57:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2253E329EFA1
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 12:02:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE041448391;
-	Wed, 15 Jul 2026 11:57:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F345744CAF8;
+	Wed, 15 Jul 2026 12:00:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out28-122.mail.aliyun.com (out28-122.mail.aliyun.com [115.124.28.122])
+Received: from out28-220.mail.aliyun.com (out28-220.mail.aliyun.com [115.124.28.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4CFD44C641;
-	Wed, 15 Jul 2026 11:57:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7066A3CAA49;
+	Wed, 15 Jul 2026 12:00:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784116629; cv=none; b=cofpW7Y8EsPuL7ncZk1DIih24GmPh2PzPrf+QpW3MsYxhfZYNzkE5A0I6b1vcoZQm3Zk7AwgR0ALKIg2BtJE2Pnaf1rZqKLnQ7t1cHUQoeLcbw8YAyk3gVmsrFi3jCNjFJSZ8o/UPId5NbdOzqVvRs2ntQ9g2TODbszYBjspdXE=
+	t=1784116815; cv=none; b=VLj35V/DsKTGVVZkWBZgkkd8CgblCRjWAYVXoGZgf5/ctMHoNbnHxxg5tNxzo7E9XM6bMxQLgwVxocf+gQkIpEAsFB3JmMRaZgz3nMvtckv0i0iJt7Z5l/HpeOcP2Arrtq2xO9y5S7HVSfdWMOA1R5s99CjIbZW8pFcVdROEu2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784116629; c=relaxed/simple;
-	bh=db1L9OnnXwHnIHYUhA6U0FpDLSkQ8Hwlej3bT2npRbQ=;
+	s=arc-20240116; t=1784116815; c=relaxed/simple;
+	bh=mH3qArF2dKOYqYwlfBDDrx9WweSING/NqjZALu8/69k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PRUQ1zKmTR1Iit2y4Z4M7d48gFj/RDQBOLtQ85/aRpgC3jPUvGAHVFTHfV1wNTtYhXuo4mXOxGYYg/7KUWpQv5j4oPAknMs2eIoXYOZqdnSffXiYBpBrkbfZNJaCAA6VsVcmTAXI+Zhilp0hukceigNx+zQC+eF1UntdMKKRB5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.122
-X-Alimail-AntiSpam:AC=CONTINUE;BC=0.0725335|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_alarm|0.00787841-0.119412-0.87271;FP=18372274822953045179|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam033045018182;MF=kyle.switch@motor-comm.com;NM=1;PH=DS;RN=14;RT=14;SR=0;TI=SMTPD_---.iM2Pum6_1784116614;
-Received: from 10.30.1.98(mailfrom:kyle.switch@motor-comm.com fp:SMTPD_---.iM2Pum6_1784116614 cluster:ay29)
+	 In-Reply-To:Content-Type; b=jgaB8KtUPo+tZRmdPSXxekkLW88Uh6DsdnybuCl1orOd9Ss3f+ydT0Wb8CLFzYn/8ujU22oHKW0C3uLmtamwSikZRw8M4XGGG06lJJ6gx70uMOqh91u4uhe8JMN3qOX4ZFghwLgztYrpoP3pM2t0BcnW0733D5yQs0lWZtviY/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.220
+X-Alimail-AntiSpam:AC=CONTINUE;BC=0.2697289|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_regular_dialog|0.022684-0.000293287-0.977023;FP=14913588932206190439|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam033037017159;MF=kyle.switch@motor-comm.com;NM=1;PH=DS;RN=14;RT=14;SR=0;TI=SMTPD_---.iM32tT9_1784116796;
+Received: from 10.30.1.98(mailfrom:kyle.switch@motor-comm.com fp:SMTPD_---.iM32tT9_1784116796 cluster:ay29)
           by smtp.aliyun-inc.com;
-          Wed, 15 Jul 2026 19:56:56 +0800
-Message-ID: <50549cc2-c5e4-42b1-9b81-8b9e7bebd60a@motor-comm.com>
-Date: Wed, 15 Jul 2026 19:56:53 +0800
+          Wed, 15 Jul 2026 20:00:00 +0800
+Message-ID: <47b67113-2903-49b5-a25e-84e704ac017d@motor-comm.com>
+Date: Wed, 15 Jul 2026 19:59:55 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,16 +55,16 @@ Cc: Frank.Sae@motor-comm.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
  jianmin.wang@motor-comm.com, ming.xu@motor-comm.com,
  xiaolin.xu@motor-comm.com, jie.han@motor-comm.com
 References: <20260714111203.3852126-1-kyle.switch@motor-comm.com>
- <a0e43216-d215-4c81-9954-c5e497b2d50f@lunn.ch>
+ <46c380a2-74ab-4690-a289-6050cb33c1a4@lunn.ch>
 Content-Language: en-US
 From: Kyle Switch <kyle.switch@motor-comm.com>
-In-Reply-To: <a0e43216-d215-4c81-9954-c5e497b2d50f@lunn.ch>
+In-Reply-To: <46c380a2-74ab-4690-a289-6050cb33c1a4@lunn.ch>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	DMARC_POLICY_SOFTFAIL(0.10)[motor-comm.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
@@ -75,7 +75,7 @@ X-Spamd-Result: default: False [-1.36 / 15.00];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER(0.00)[kyle.switch@motor-comm.com,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-307737-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307738-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -89,95 +89,31 @@ X-Spamd-Result: default: False [-1.36 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	R_DKIM_NA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp,motor-comm.com:from_mime,motor-comm.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,motor-comm.com:from_mime,motor-comm.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7138575DDA1
+X-Rspamd-Queue-Id: 89E3675DF1D
 
 
 
-On 7/15/26 05:43, Andrew Lunn wrote:
-> On Tue, Jul 14, 2026 at 07:12:03PM +0800, Kyle Switch wrote:
->> Add a driver for motorcomm yt8824 quad 2.5G ethernet phy, supports
->> 2.5G/1000M/100M/10M speed.
-> 
-> Please take a read of:
-> 
-> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-> 
-> and set the Subject line correctly.
-> 
->> +#define REG_MII_MMD_CTRL			0x0D
->> +#define REG_MII_MMD_DATA			0x0E
-> 
-> include/uapi/linux/mii.h
-> 
-> #define	MII_MMD_CTRL		0x0d	/* MMD Access Control Register */
-> #define	MII_MMD_DATA		0x0e	/* MMD Access Data Register */
-> 
-> Please don't repeat something which already exists. But i also wounder
-> why you need these.
-> 
->> +static int ytphy_write_mmd(struct phy_device *phydev,
->> +			   u16 device, u16 reg,
->> +			   u16 value)
+On 7/15/26 05:46, Andrew Lunn wrote:
+>> +static inline int ytphy_top_write(struct phy_device *phydev, u32 regnum,
+>> +				  u16 val)
 >> +{
->> +	int ret;
+>> +	struct yt8521_priv *priv = phydev->priv;
+>> +	struct mii_bus *bus = phydev->mdio.bus;
 >> +
->> +	ret = __phy_write(phydev, REG_MII_MMD_CTRL, device);
->> +	if (ret)
->> +		return ret;
->> +	ret = __phy_write(phydev, REG_MII_MMD_DATA, reg);
->> +	if (ret)
->> +		return ret;
->> +	ret = __phy_write(phydev, REG_MII_MMD_CTRL, device | 0x4000);
->> +	if (ret)
->> +		return ret;
->> +	ret = __phy_write(phydev, REG_MII_MMD_DATA, value);
->> +
->> +	return ret;
+>> +	return bus->write(bus, priv->top_phy_addr, regnum, val);
 >> +}
 > 
-> Why are you reinventing these functions when they already exist?
-Ans: Sorry, I didn't notice the existing interface before. next patch, i will remove 
-the duplicate functional interfaces include REG_MII_MMD_CTRL, REG_MII_MMD_DATA, and
-ytphy_mmd_write api.
-
->> +
->>  /**
->>   * ytphy_get_wol() - report whether wake-on-lan is enabled
->>   * @phydev: a pointer to a &struct phy_device
->> @@ -3059,99 +3187,1620 @@ static int yt8821_resume(struct phy_device *phydev)
->>  	return yt8821_modify_utp_fiber_bmcr(phydev, BMCR_PDOWN, 0);
->>  }
->>  
->> -static struct phy_driver motorcomm_phy_drvs[] = {
->> -	{
->> -		PHY_ID_MATCH_EXACT(PHY_ID_YT8511),
->> -		.name		= "YT8511 Gigabit Ethernet",
->> -		.config_init	= yt8511_config_init,
->> -		.suspend	= genphy_suspend,
->> -		.resume		= genphy_resume,
->> -		.read_page	= yt8511_read_page,
->> -		.write_page	= yt8511_write_page,
->> -	},
->> -	{
->> -		PHY_ID_MATCH_EXACT(PHY_ID_YT8521),
->> -		.name		= "YT8521 Gigabit Ethernet",
->> -		.get_features	= yt8521_get_features,
->> -		.probe		= yt8521_probe,
+> Please could you explain the architecture in detail. It seems like you
+> are accessing registers of some other device on the bus.
 > 
-> Why are these all stoppering? diff would not remove them unless
-> something is changing.
-> 
+> Maybe you need to use the code in phy_package.c?
 
-Ans: after double check, no existing code logic has been modified. I guess the possible reason
-is that git diff employs the Diff Algorithm, a "context minimization" strategy adopted to 
-represent changes in the most compact manner. It consolidates modifications into a single block.
-
->     Andrew
+Ans: YT8824 contains top extend reg space, and the addr is fixed, for 
+internal phy8824 the value is 9, and external phy8824 is (baseaddr + 4).
 > 
-> ---
-> pw-bot: cr
+>       Andrew
 
