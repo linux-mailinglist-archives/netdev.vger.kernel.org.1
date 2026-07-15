@@ -1,96 +1,61 @@
-Return-Path: <netdev+bounces-307652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307653-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cHhFKvoAV2rhEAEAu9opvQ
-	(envelope-from <netdev+bounces-307652-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 05:39:38 +0200
+	id kqZfEIAEV2pUEQEAu9opvQ
+	(envelope-from <netdev+bounces-307653-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 05:54:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DC1A75A57E
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 05:39:38 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C1C675A5FC
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 05:54:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b="DNnqsjS/";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307652-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307652-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307653-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-307653-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 94824313278F
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 03:36:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 289DB300AD4F
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 03:54:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C8CE3B19BA;
-	Wed, 15 Jul 2026 03:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4165E3AEF4A;
+	Wed, 15 Jul 2026 03:54:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F58D3B2FF9
-	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 03:35:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B63862FFF9D;
+	Wed, 15 Jul 2026 03:54:30 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784086566; cv=none; b=Fu7kCdKF2jvu93crHtggcT64I9f/Xdjm2xvMae4Pfoq70Ms8Cv64d3hb4YlQPrFd9Zv2pPLXV0Pm4tkFaZTEN+3+xowWQlrDP8MPcEv84J8hYyOCQaQQPQa925lmvjlVPluZLiaPiiBstlonJ6yOHK/HmDuwyRWeahvfNPD8NWs=
+	t=1784087674; cv=none; b=mOXJmqYIv/ExDJvn/UvtYNlz+nCaRIP2WUKP6aYpc5OQuv5L7guzMOb69Cf5I31PjeghZWe/RsGFXr/HhewOvdFUhVYg0m1gIHdEhc47DjpyfR2mT1TUw5ra1Mv+U8zaLmHLrO/hjir/QHKrPilDdSKJOQ7KVmBBO8gfGDx6jPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784086566; c=relaxed/simple;
-	bh=tl9QUY60ANTH63SkBkkbYRa0mh0qVb/cgU5n6BRSkZs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ddcdtGn72/caPDHNwFZbhdWU/+JZKsnlUyIzfSeUQoOQOg2FLQncNC0U8gEEVRQO2/ArfZVB4HQ+0d5Dr86KCQiyeihtn/N6F3nLZwflzlRamCInAOCg9adPImZ97dEXyw6mYKCqLuBxwXZjenPSNwdrkoT4nPjPfwL0Co7M2A4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DNnqsjS/; arc=none smtp.client-ip=209.85.214.174
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2caea3f742bso59048285ad.0
-        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 20:35:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784086546; x=1784691346; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=ymvDeDodxFq3HgKKLyUeM3rErvPvsmK6UFUvd0diOrc=;
-        b=DNnqsjS/SImdPVPfjMWu7EObi0d4fFvdi6Qh/LoBCMXyzl6EC2z9KefqXjWnBTBo/k
-         49qF5y4HmxaVTxTTsUnDB5CBWczBe9sl0fmax03fbyy1eGd8Wh49AvM5HgoOYXNbC4o4
-         bfQAqVsfoksuVfsPqg8SvDSRBlo2UxdqaVuPs6V4LjVhcnNYU+S/RjmwBTNlHCajx720
-         5cT+k/4qL+wt+37uCRMQq6+iQ6I9UlQ7YhCJReFrw7mT2xGGoWGRYBzNIJ9ewhodzSeu
-         T/B4rZzBzPwxcKVOuHFtPJfBkT3btPaI4TmsBx40K9wJ4/Rw1gZ59kai9/+DHpMXVaPw
-         dIDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784086546; x=1784691346;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=ymvDeDodxFq3HgKKLyUeM3rErvPvsmK6UFUvd0diOrc=;
-        b=Z04eH5oP0w66Vm8gI6Y8I6GDx8U6lWL5wlRvSjEVG116/pvU04TvtaEgD9ddEleMll
-         STDvXp62bQsZhy+sT2z6Xj/dKjNK6oS1Eo63kAWQfdV20yVGdNAAYsLVuoR13V9M3FG7
-         qOwkUkUPQ24PUI99rlL0A/v1Si07S7ATbxhzGN4Nqmk+/8nl9s3C4Av4KacT3Zu/+CQa
-         mDuAFTOYVsP8AW6m0elnyYmkWU5BNUudvN75sA+dxs/rPFJimjlIDFqs+nmH1dYBlPxC
-         Euwof53ScSGkt+ophV5Aeh1xMKo8Sc8c9j/0Ozm6/3huWuS4ZYuOSSiWOksXwNG+xokm
-         2WNg==
-X-Forwarded-Encrypted: i=1; AHgh+RqfPxvVhttGdgVrTLDlh/dNmeg3iFL2dVZHl2SGuWd8UfSqTNZLQkCTzRys2hBRgPeaTOirjs4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAX5OSCk3Gz57/9hFe+yyFH9FXrNUoDeM8t63jBtknbgJ3k4dr
-	Es3+3j/nslB48WL6dAj+auO2gMHDbc3AwqzoX2YBNPXTzu0l/F1RHRkX
-X-Gm-Gg: AfdE7cliLQ6atiBntQ+w+WM0M3R4nrKa2zAA3vOI0lhzzZZ1VRpP8xrFokVskRaALzR
-	spIY2/AcP0voC5hpSyQ/a5Z4MskID3/MOQ0/YcixiYW3fnaK6wFabjXiIzTetdzrl9o/1GvSyx/
-	8GonFwnOBfVIhHqftTdTLYYBPqEX/R8Nb/5yqGeS0nw65WP/Y0dnxg60ud8zeWIvDNXuZX0YQPP
-	FH6zuE5B5g6wsfoy5uwzgZnvt4RGnVS4z3r6+YmBtRiXB1YZTPVMC+hyQd+PVOcaUSyehPaurMN
-	V4ahzZAnLTdznede1m6C24GAytklYr5gekzM3oKTfssUxptccbM9TI40GmNF5yAeUA3M9JHQNMs
-	dImZrRaZtTDsjWNik6U8l9OMTTJdZdlaEV17NiB3XR6Dd6QovnKKm8JmNcj3sBmMlwYtDD8UvxL
-	AK5/Jz8xxVSsMpifXlD452eWMwu7T7ZD2vtAeTkYP1ppSH
-X-Received: by 2002:a17:903:2a88:b0:2cc:5f9f:54ed with SMTP id d9443c01a7336-2cef12fe180mr53236485ad.27.1784086546202;
-        Tue, 14 Jul 2026 20:35:46 -0700 (PDT)
-Received: from localhost.localdomain ([2404:2280:2000:8007:d87:748:d87:748])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9d3d451sm125464325ad.65.2026.07.14.20.35.41
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 14 Jul 2026 20:35:45 -0700 (PDT)
-From: MingXuan <omeux327@gmail.com>
-To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1784087674; c=relaxed/simple;
+	bh=Ap2bX1N52xsUYa/oDNVUeAu8kc3nrwHlEwvknFQwdQU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LL4IGJJ1GHkMvoLJfx63PeXymApKC1+2pGv3PQxzdzNopy1hbWhPJhehE9ibhRs9jBzvO95bzAqgEDyEABLBUfmBT/ydKVvkatueAsBxixHjsMEIAOVe6O7ZzjSn8+qseM15+Z6Dx2L6pDl7k3lk0VpEGnEBI7embmRTlcvBYlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Received: from mail.maildlp.com (unknown [172.19.163.170])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4h0MjZ2qmmzKHMWP;
+	Wed, 15 Jul 2026 11:53:54 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 2208040571;
+	Wed, 15 Jul 2026 11:54:26 +0800 (CST)
+Received: from ultra.huawei.com (unknown [10.90.53.71])
+	by APP1 (Coremail) with UTF8SMTPA id cCh0CgC3FHFwBFdqr2kdBQ--.13537S2;
+	Wed, 15 Jul 2026 11:54:25 +0800 (CST)
+From: Pu Lehui <pulehui@huaweicloud.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-sctp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	MingXuan <omeux327@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] sctp: diag: fix uninitialized stack leak via INET_DIAG_LOCALS/PEERS
-Date: Wed, 15 Jul 2026 11:35:36 +0800
-Message-ID: <20260715033536.64963-1-omeux327@gmail.com>
-X-Mailer: git-send-email 2.50.1
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] e1000e: Fix out-of-bounds MMIO access by validating BAR0 size
+Date: Wed, 15 Jul 2026 03:58:50 +0000
+Message-Id: <20260715035850.588070-1-pulehui@huaweicloud.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,109 +63,147 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgC3FHFwBFdqr2kdBQ--.13537S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxWFyUtr1rZFWrGF4rKrWUXFb_yoWrCFWUpa
+	y3Ga47Cr4rJr17X3W8Jr4UGFZ8Cayjyay5Cry2gwsY9FyUG348Jry7tFW3Gr4xZrWkJF9x
+	tryUZ34Ikr4qyaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUyKb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI
+	7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
+	Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY
+	6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6x
+	AIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
+	1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUF1v3UUUUU
+X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-307652-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-307653-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[huaweicloud.com];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[omeux327@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:marcelo.leitner@gmail.com,m:lucien.xin@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-sctp@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:omeux327@gmail.com,m:stable@vger.kernel.org,m:marceloleitner@gmail.com,m:lucienxin@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[omeux327@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[pulehui@huaweicloud.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pulehui@huaweicloud.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	R_DKIM_NA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,huaweicloud.com:from_mime,huaweicloud.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0DC1A75A57E
+X-Rspamd-Queue-Id: 1C1C675A5FC
 
-inet_diag_msg_sctpladdrs_fill() copies sizeof(union sctp_addr) (28 bytes,
-the size of sockaddr_in6) from each sctp_sockaddr_entry.a into the netlink
-INET_DIAG_LOCALS attribute and then only zeroes the bytes from offset 28 to
-sizeof(sockaddr_storage).  The same pattern is used by
-inet_diag_msg_sctpaddrs_fill() for INET_DIAG_PEERS.
+From: Pu Lehui <pulehui@huawei.com>
 
-The IPv4 address-filling helpers sctp_v4_from_addr_param() and
-sctp_v4_from_skb() only initialize the sockaddr_in portion (16 bytes) of the
-union sctp_addr; the trailing 12 bytes (offset 16..27, the sockaddr_in6-only
-region) are left uninitialized.  Those bytes are propagated verbatim through
-sctp_add_bind_addr() (which copies sizeof(union sctp_addr)=28 bytes) and then
-copied straight to userspace by the diag fill functions, leaking 12 bytes of
-kernel stack residue per local/peer address to any process that can issue a
-SOCK_DIAG_BY_FAMILY dump for IPPROTO_SCTP.
+Syzkaller reported a kernel panic caused by an out-of-bounds MMIO
+access in the e1000e driver.
 
-Fix it by computing the actually-initialized length of the address from its
-sa_family (struct sockaddr_in for AF_INET, the whole union otherwise) and
-copying only that many bytes into an already-zeroed sockaddr_storage slot, so
-the uninitialized tail is never read and never reaches userspace.
+[   82.868719][  T404] e1000e 0000:00:02.0: The NVM Checksum Is Not Valid
+[   82.872328][  T404] Unable to handle kernel paging request at virtual address ffff80008894e090
+[   83.085218][  T404] CPU: 2 UID: 0 PID: 404 Comm: bash Not tainted 7.2.0-rc2-g3f1f75536668 #1 PREEMPTLAZY
+[   83.129013][  T404] pc : e1000_get_cfg_done_82571+0x70/0x158
+[   83.140092][  T404] lr : e1000_get_cfg_done_82571+0x68/0x158
+[   83.151196][  T404] sp : ffff80008ac37410
+[   83.158922][  T404] x29: ffff80008ac37410 x28: ffff0000cd6a11b8 x27: ffff0000c58190d0
+[   83.173919][  T404] x26: ffff0000cd6a11b8 x25: ffff0000cd6a0bc0 x24: ffff0000cd6a0000
+[   83.189417][  T404] x23: 0000000000001010 x22: ffff0000cd6a11c0 x21: ffff0000cd6a11b8
+[   83.205195][  T404] x20: 0000000000000064 x19: ffff80008894e090 x18: 0000000000000000
+[   83.220545][  T404] x17: ffff800081c1a3f4 x16: ffff800081c19c10 x15: ffff800081e86510
+[   83.235764][  T404] x14: 0000000000000001 x13: 0000000000000001 x12: ffff60001bc8a8b3
+[   83.251301][  T404] x11: 1fffe0001bc8a8b2 x10: ffff60001bc8a8b2 x9 : ffff800081eae25c
+[   83.266705][  T404] x8 : 00009fffe437574e x7 : ffff0000de454593 x6 : 0000000000000001
+[   83.281919][  T404] x5 : ffff0000cf2b9640 x4 : 0000000000000000 x3 : dfff800000000000
+[   83.297317][  T404] x2 : 0000000000000007 x1 : ffff0000cd6a11c0 x0 : 0000000000000000
+[   83.312601][  T404] Call trace:
+[   83.318662][  T404]  e1000_get_cfg_done_82571+0x70/0x158 (P)
+[   83.329748][  T404]  e1000e_phy_hw_reset_generic+0x17c/0x1a8
+[   83.341541][  T404]  e1000_probe+0xbd8/0x1988
+[   83.350334][  T404]  local_pci_probe+0x84/0x130
 
-Fixes: 8f840e47f190cbe61a96945c13e9551048d42cef ("sctp: add the sctp_diag.c file")
-Cc: stable@vger.kernel.org
-Signed-off-by: MingXuan <omeux327@gmail.com>
+Repetition steps:
+1. Find PCI device which BAR0 size <= 4K. If it's:
+   Device Addr: 0000:00:02.0   BAR0 SIZE: 4K
+   Vendor/Device ID: 0x1af4 0x1004
+2. Unbind the above PCI device
+   echo '0000:00:02.0' > /sys/bus/pci/devices/0000:00:02.0/driver/unbind
+3. Set the above device to e1000e new_id
+   echo '1af4 1004' > /sys/bus/pci/drivers/e1000e/new_id
+
+During e1000_probe(), the driver maps the device's BAR0 memory region.
+If the device has a 4K BAR0, ioremap() maps only 4K of space. Later in
+the probe process, when the NVM checksum validation fails, the driver
+attempts to perform a hardware reset and falls back to the err_eeprom
+cleanup path.
+
+This cleanup path will trigger an OOB access kernel panic:
+e1000_phy_hw_reset
+  e1000e_phy_hw_reset_generic
+    e1000_get_cfg_done_82571
+      er32(EEMNGCTL)
+        readl(hw->hw_addr + EEMNGCTL); <-- EEMNGCTL(0x1010) > 4K, OOB access
+
+Fix this by ensuring the MMIO length (pci_resource_len(pdev, 0)) is at
+least 64K (0x10000) before proceeding with ioremap(). The 64K minimum
+safely covers the maximum register offset accessed by the e1000e driver.
+
+Fixes: bc7f75fa9788 ("[E1000E]: New pci-express e1000 driver (currently for ICH9 devices only)")
+Signed-off-by: Pu Lehui <pulehui@huawei.com>
 ---
- net/sctp/diag.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/intel/e1000e/netdev.c | 5 +++++
+ drivers/net/ethernet/intel/e1000e/regs.h   | 3 +++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/net/sctp/diag.c b/net/sctp/diag.c
-index d758f5c3e06e..12557e924cc2 100644
---- a/net/sctp/diag.c
-+++ b/net/sctp/diag.c
-@@ -85,8 +85,12 @@ static int inet_diag_msg_sctpladdrs_fill(struct sk_buff *skb,
- 	info = nla_data(attr);
- 	rcu_read_lock();
- 	list_for_each_entry_rcu(laddr, address_list, list) {
--		memcpy(info, &laddr->a, sizeof(laddr->a));
--		memset(info + sizeof(laddr->a), 0, addrlen - sizeof(laddr->a));
-+		size_t addr_len = laddr->a.sa.sa_family == AF_INET ?
-+				  sizeof(struct sockaddr_in) :
-+				  sizeof(struct sockaddr_in6);
-+
-+		memset(info, 0, addrlen);
-+		memcpy(info, &laddr->a, addr_len);
- 		info += addrlen;
+diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
+index 844f31ab37ad..46e58e926f7b 100644
+--- a/drivers/net/ethernet/intel/e1000e/netdev.c
++++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+@@ -7450,6 +7450,11 @@ static int e1000_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	mmio_len = pci_resource_len(pdev, 0);
  
- 		if (!--addrcnt)
-@@ -113,9 +117,12 @@ static int inet_diag_msg_sctpaddrs_fill(struct sk_buff *skb,
- 	info = nla_data(attr);
- 	list_for_each_entry(from, &asoc->peer.transport_addr_list,
- 			    transports) {
--		memcpy(info, &from->ipaddr, sizeof(from->ipaddr));
--		memset(info + sizeof(from->ipaddr), 0,
--		       addrlen - sizeof(from->ipaddr));
-+		size_t addr_len = from->ipaddr.sa.sa_family == AF_INET ?
-+				  sizeof(struct sockaddr_in) :
-+				  sizeof(struct sockaddr_in6);
+ 	err = -EIO;
++	if (mmio_len < E1000_MMIO_LEN_MIN) {
++		dev_err(&pdev->dev, "MMIO len is too small\n");
++		goto err_ioremap;
++	}
 +
-+		memset(info, 0, addrlen);
-+		memcpy(info, &from->ipaddr, addr_len);
- 		info += addrlen;
- 	}
+ 	adapter->hw.hw_addr = ioremap(mmio_start, mmio_len);
+ 	if (!adapter->hw.hw_addr)
+ 		goto err_ioremap;
+diff --git a/drivers/net/ethernet/intel/e1000e/regs.h b/drivers/net/ethernet/intel/e1000e/regs.h
+index 6c0cd8cab3ef..b63adeea1563 100644
+--- a/drivers/net/ethernet/intel/e1000e/regs.h
++++ b/drivers/net/ethernet/intel/e1000e/regs.h
+@@ -242,4 +242,7 @@
+ /* PHY registers */
+ #define I82579_DFT_CTRL	PHY_REG(769, 20)
  
++/* Minimum MMIO (BAR0) len, the largest offset is lower than 64K */
++#define E1000_MMIO_LEN_MIN	0x10000
++
+ #endif
 -- 
-2.50.1 (Apple Git-155)
+2.34.1
 
 
