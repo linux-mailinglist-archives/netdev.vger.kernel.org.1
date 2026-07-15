@@ -1,195 +1,251 @@
-Return-Path: <netdev+bounces-307665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-307666-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qybEK1sgV2qJFgEAu9opvQ
-	(envelope-from <netdev+bounces-307665-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 07:53:31 +0200
+	id LeXKHhghV2q5FgEAu9opvQ
+	(envelope-from <netdev+bounces-307666-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 07:56:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 080F575AC24
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 07:53:31 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D62975AC75
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 07:56:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=gDxZ+LTV;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307665-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-307665-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=google.com header.s=20251104 header.b=rMMAatdQ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-307666-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-307666-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C5DDF3038C6A
-	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 05:53:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 078F8302F42C
+	for <lists+netdev@lfdr.de>; Wed, 15 Jul 2026 05:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 536563B4E9B;
-	Wed, 15 Jul 2026 05:53:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E6B3B6359;
+	Wed, 15 Jul 2026 05:55:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25B43B38A2
-	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 05:53:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713F2288B8
+	for <netdev@vger.kernel.org>; Wed, 15 Jul 2026 05:55:44 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784094808; cv=none; b=rkpbA1szqQ0kOiZiDOh1i7l+GEdEg9sqWQEYPuqeuUlc9JQj1M4+gjsqrA1gll8cMH0y0+NuwwB/Ffr/h6bWloHLuPU1i94Lj1rGqsSF0VtW1tV4c+7DH/QRYAHXbZgbzvRufOc2lBZIIg0t9PbU8kEtSzn/Y+ekFpDXpFPmLFY=
+	t=1784094946; cv=none; b=p/84nNAydPc1K6ESFnyy1kagZBL0FlHD6hJGnYmHtfiFn8wAkA0WDBsgH+hG6k54EV0cH8i0c6X68+WYiYQZd9eQsKm3F/AyO6rzllYXFaPJrz913WJ5Z/Don6CnloI2NIR9091N1EF85kphYM/EGfNFxyH5VAAtQrTBe6fhfF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784094808; c=relaxed/simple;
-	bh=cv/py1C2nLATOuxnjEQyvp5MmxbEmsJSCheT3nEyXzU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=j+jFnYz1C5ZkOd5uCr9DYJmqVppEZkTyYo7US12bSHZ41/lO0PL2UPc+3AzdqWqFCW/Id6D7mbJB460ij4HO2ad5Z7e7iB8os8bfMNtI6htZDsZRDSVaVE//q0VqTQFPSx5lppRyMf3rLjyv5UtexIcv82loOglq0/jyANq/MQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gDxZ+LTV; arc=none smtp.client-ip=209.85.160.173
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-51bfad59921so42211491cf.0
-        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 22:53:26 -0700 (PDT)
+	s=arc-20240116; t=1784094946; c=relaxed/simple;
+	bh=53XfI/KkF0mmY5A9JJmrFjOmjJhgDNUEArjHoTmn+MQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ExyUbB/GHfcxCy6VXEWDon8SYjSkcMsqP5SbYEvyo9HH7IsPa5nDbpY/31rDmadA6lksotZWw7jBW7zFttQ8zz58rPM+SmgM+XHY26RnbqP0iZGxT8i0Hp8vBjWyo9206cZTLlVSSMUDzFcL2TnNICnH69cigsJpJwO9cILd418=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rMMAatdQ; arc=none smtp.client-ip=209.85.219.74
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-8efe7db1c42so87979816d6.3
+        for <netdev@vger.kernel.org>; Tue, 14 Jul 2026 22:55:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784094806; x=1784699606; darn=vger.kernel.org;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=VYantbV19BJGNggt8/qq3SXPjrD8WHX/QjRV00onfwg=;
-        b=gDxZ+LTVUmXaOu27gQMgMGDVd9WAM+l67JyUvSTbwnnW+jk18loxOt8dzWfScklqDu
-         tFaskTOA7GxByk8m0Ycd2va8WgH+XhdznZXfh/3IFoRfJfVubQjyyUH5nIXuWu+j+q9f
-         yB9cB51VI/eT7I4rmcoStPsNl7clDKfrgcRmS7H2vuenxYFAm7tMuOIN1SDQk34sj0Mq
-         ctfyW5yskOv8vwSzq7BVARDcVNa7Fk6Hg0HwP/xohIMjMYTRdt374i26luLpmwJsbD+d
-         roX646zKf2RJXaEeck1d/Pq3QmVDsSk0OJlqA5FMMara2/iG1vb+ioJba1whvhlFRohB
-         P5ew==
+        d=google.com; s=20251104; t=1784094943; x=1784699743; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=O1DRXJ9qvEDCtJ8qta/t+BdzBvjJWf+O4Oh/glnl8ig=;
+        b=rMMAatdQCi/HPCgt1GIGMFM/XPsWYRh2aPa2UVywsBtmsHhUG7bpCNvzz200QRfxAh
+         qF5tp+NNgCVIhdJA6FfbfzH89Ex1Mn7+AdtBntHzGrVj98miUTG/MKD1T9nYVfi6CN3k
+         TIHJes6wm7a2FKX9l/ujeDWtfsAT9Oo78jH02cWadceOa9arCABZXuMQ+sKU+D5YdHt0
+         poCBELuMK2MH+KTFcnc9OuEfbmlD6swc7jsVja8fv5GxfNaz9zrKiYQte6h6rgLH/HdW
+         Ewppg9iyy67447csgcJzPFzAY5rVoOhCAPpwwV1uDduXLS59wWi0fXSFp2S3xgc8U0G+
+         VDuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784094806; x=1784699606;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
+        d=1e100.net; s=20251104; t=1784094943; x=1784699743;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=VYantbV19BJGNggt8/qq3SXPjrD8WHX/QjRV00onfwg=;
-        b=J1uF/Qv2xoOBtx+R4CtMIO3fO5IibLtXso+THit5Sm5cx8D5JFAAC9D/vNc5Mc8Gsb
-         SXMwlCZ5oVVs0DJOppPAFcA8MTW24hAraqWGmgYRZ/hUcg3zpyDS1MQcArSbN1STA+A+
-         dpBKxJvevSn1wHFxD/wokHO1f0OLkWusAdoLGwwmvbeNtEt6GYawdccL7bjnKgmWYhB1
-         Ayn39c1dKINQi1dvxtXJvaCCFI+8GL/PDutMhmtSsuRcT/2vALWCLo8WV3Vnu02jPwTC
-         4bEb9gOS/IhU/1wcihSsPHfaepcV6uC7gp7K6ohVzt01UG8jhMYQ6E6RfSZ+KoYvSbzG
-         YkwA==
-X-Forwarded-Encrypted: i=1; AHgh+Ro9APTcGBsJ3nnl3v+oJuv5NYg0Na/OQBjw5JZRO7swbLGFci30xSNlGkJyM9ZiU8qioZueg/E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzS8w5y3qkOElQs/j7YMr+FMzE2ErcVt32l8epDL/c1lP4nBEh8
-	l+Z/epWW8yrhsCvC40L/B6GQJiHXHaCFXgnPHAHkBVRyU8a4K0qc7rruaRNmsJC5
-X-Gm-Gg: AfdE7cnnml+czIqnP+vP/0iOol9zWfsxeBcXmhJz82YnUlwaiQ1J85pggcTSirFXjlb
-	DiYA9jiiNlB8AHqaueG23JXco43ODMu2G7E/6Wrpq/8aP6/OlkVPUw0EpnrsCtwCAEo+MzsOada
-	r5WEk4+o5aT3NT7oYVUaoouatc25WON670hcLfmB7/3+6KNeKJAGrLLuGxXWN3ApWrHah9vwt0h
-	zA481KhE/4QxHLvO9+ismYkjD49ZijFQYS4TO8a0+EnY34NTMrpcDUOVcsoCBHAr2jiw8nH1RRP
-	x4iryney9W5n2Ok7r6Jngn1QpbPSexayIvAhUDDulpVt1eTZM/lQjwF4A8XA3bxGIMznKoxnaFj
-	3TycU5OVxIItNV4x+1y9ALGppajgUjVRKCibYSqgqJ4RbDJeKg5T3TFBF9AJyzI7FWftK/xPsA5
-	qmE69nwPsa3JHK3k/JOFIAIQvuQTNzr6Iy8jtrvgUV1JsEpdNdMByGbXO0ZLC5
-X-Received: by 2002:a05:622a:142:b0:51c:17cd:1fd4 with SMTP id d75a77b69052e-51e424808f6mr49106881cf.41.1784094805630;
-        Tue, 14 Jul 2026 22:53:25 -0700 (PDT)
-Received: from localhost.localdomain ([4.15.194.220])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51caafd8b4fsm131928181cf.31.2026.07.14.22.53.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jul 2026 22:53:25 -0700 (PDT)
-From: Vimal Agrawal <avimalin@gmail.com>
-X-Google-Original-From: Vimal Agrawal <vimal.agrawal@sophos.com>
-To: pabeni@redhat.com,
-	netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	kuniyu@google.com,
-	edumazet@google.com,
-	vimal.agrawal@sophos.com
-Subject: [PATCH v4 net-next] net: neigh: avoid calling neigh_forced_gc on every alloc when table is full
-Date: Wed, 15 Jul 2026 05:53:11 +0000
-Message-Id: <20260715055311.90403-1-vimal.agrawal@sophos.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20260714133909.82424-1-vimal.agrawal@sophos.com>
-References: <20260714133909.82424-1-vimal.agrawal@sophos.com>
+        bh=O1DRXJ9qvEDCtJ8qta/t+BdzBvjJWf+O4Oh/glnl8ig=;
+        b=CVmU6zqCUKoTsgc2VYRMAx4pFjOP3a4XZ6io+UI1/Zk30/7OcwDnNiy6fYd8IOg3Zy
+         EgHXQ+CtWhP8CwZMwMo8s3NqXhl79pWrbQR13bpeqYGqqm7iiAex3wQlD7GwJHzdPLbl
+         ns16jmRaJpeDxv9epgZSR6OkQEMFUmAQ71mRTIX94H91U8R1KvjOjL/r8+LaXDKo74wp
+         qE3qSUEC7+bRTaYeSTZ77gvDAZmF1Z2rLHMUygEFGM8NE2R+McM9N7hrQfXJcul8JFS5
+         6p0joXBzxCAiWtKNI6Bzho6wjK23ustdFHWRCWKXOiKR4pfhm+v6IVvePOKoSzyyzTIP
+         Rtdg==
+X-Forwarded-Encrypted: i=1; AHgh+RqeoP4z4F8KajSpwcJeiUS8Hz6V+R3IBTCfnX3pDTekaiJ99hXwYBvgAZvfAf77Cgack0N0gJ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOWx7sBx0RiNUXEa78L1u5smYVX7EhOvSaed1ey0fY5l62GpKZ
+	uNhHSYK1K8tQzT6zXwP0KwM0c/O8e/vn3ONaEJnxfijcl14roEagP1xshW2fmZW5ohGUhb0b5OI
+	lBnnrqBe+8EwPcA==
+X-Received: from qvop1.prod.google.com ([2002:a0c:fac1:0:b0:8dd:6cbd:afab])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:800a:b0:907:5516:3d61 with SMTP id 6a1803df08f44-90755163e96mr34199166d6.21.1784094943070;
+ Tue, 14 Jul 2026 22:55:43 -0700 (PDT)
+Date: Wed, 15 Jul 2026 05:55:41 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.141.g00534a21ce-goog
+Message-ID: <20260715055541.1147542-1-edumazet@google.com>
+Subject: [PATCH net] ppp: annotate concurrent dev->stats accesses
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:kuniyu@google.com,m:edumazet@google.com,m:vimal.agrawal@sophos.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-307665-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[avimalin@gmail.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-307666-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:andrew@lunn.ch,m:ericdumazet@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[avimalin@gmail.com,netdev@vger.kernel.org];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,vger.kernel.org,gmail.com,google.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,sophos.com:email,sophos.com:mid]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 080F575AC24
+X-Rspamd-Queue-Id: 0D62975AC75
 
-Once the neighbour table exceeds gc_thresh3, neigh_forced_gc() is called
-on every allocation attempt with no rate limiting. In workloads with mostly
-active/reachable entries, the GC walk traverses a large portion of the
-neighbour table without reclaiming entries, holding tbl->lock for an
-extended period. This causes severe lock contention and allocation
-latencies exceeding 16ms under sustained neighbour creation.
+dev->stats fields can be updated concurrently from multiple CPUs
+without synchronization.
 
-Add a pre-lock check in neigh_forced_gc() to skip the GC run if one was
-performed within the last 50 ms, but only when the table actually contains
-NEIGH_FORCED_GC_LARGE_TABLE_THRESH (16384) or more entries. This avoids
-repeated full table scans and lock acquisitions on the hot allocation path
-while leaving tables with few entries completely unaffected regardless of
-how gc_thresh3 is configured.
+Use DEV_STATS_INC() for stats increments and DEV_STATS_READ()
+when reading dev->stats in ppp_get_stats64() and ppp_get_stats()
+to avoid data races.
 
-Profiling of neigh_create() shows ~3 orders of magnitude latency
-improvement with this change.
-
-Link: https://lore.kernel.org/netdev/CALkUMdSCpx_ywYCx_ePLdm6yioO1nQWx7sSM=AEgsq0kywHxTw@mail.gmail.com/
-Signed-off-by: Vimal Agrawal <vimal.agrawal@sophos.com>
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
-v4: Rate-limit based on actual gc_entries count (>= 16384) rather than
-    gc_thresh3 configuration, so tables with few entries are never
-    rate-limited regardless of how gc_thresh3 is configured.
-v3: Restrict rate limiting to tables with gc_thresh3 >= 16384 to avoid
-    breaking selftests and default deployments (gc_thresh3=1024).
-v2: Changed rate-limit window from 1s (HZ) to 50ms (msecs_to_jiffies(50))
-    based on profiling data showing 44% -> 2.56% CPU reduction.
+ drivers/net/ppp/ppp_generic.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
- net/core/neighbour.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 1349c0eed..9977b9f32 100644
---- a/net/core/neighbour.c
-+++ b/net/core/neighbour.c
-@@ -250,6 +250,8 @@ bool neigh_remove_one(struct neighbour *n)
- 	return retval;
+diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
+index 717c1d3aa95380da64eb5ae6fc1da6e4dfaa9d87..ef54e0a0462a175bb989db8dda895e9ae755965f 100644
+--- a/drivers/net/ppp/ppp_generic.c
++++ b/drivers/net/ppp/ppp_generic.c
+@@ -1482,7 +1482,7 @@ ppp_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 
+  outf:
+ 	kfree_skb(skb);
+-	++dev->stats.tx_dropped;
++	DEV_STATS_INC(dev, tx_dropped);
+ 	return NETDEV_TX_OK;
  }
  
-+#define NEIGH_FORCED_GC_LARGE_TABLE_THRESH    16384
-+
- static int neigh_forced_gc(struct neigh_table *tbl)
+@@ -1532,11 +1532,11 @@ ppp_net_siocdevprivate(struct net_device *dev, struct ifreq *ifr,
+ static void
+ ppp_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats64)
  {
- 	int max_clean = atomic_read(&tbl->gc_entries) -
-@@ -260,6 +262,15 @@ static int neigh_forced_gc(struct neigh_table *tbl)
- 	int shrunk = 0;
- 	int loop = 0;
+-	stats64->rx_errors        = dev->stats.rx_errors;
+-	stats64->tx_errors        = dev->stats.tx_errors;
+-	stats64->rx_dropped       = dev->stats.rx_dropped;
+-	stats64->tx_dropped       = dev->stats.tx_dropped;
+-	stats64->rx_length_errors = dev->stats.rx_length_errors;
++	stats64->rx_errors        = DEV_STATS_READ(dev, rx_errors);
++	stats64->tx_errors        = DEV_STATS_READ(dev, tx_errors);
++	stats64->rx_dropped       = DEV_STATS_READ(dev, rx_dropped);
++	stats64->tx_dropped       = DEV_STATS_READ(dev, tx_dropped);
++	stats64->rx_length_errors = DEV_STATS_READ(dev, rx_length_errors);
+ 	dev_fetch_sw_netstats(stats64, dev->tstats);
+ }
  
-+	/*
-+	 * For large neighbor tables, repeated forced GC passes can spend
-+	 * significant CPU scanning neighbor entries when most remain active.
-+	 * Rate-limit consecutive forced GC passes to reduce CPU overhead.
-+	 */
-+	if (atomic_read(&tbl->gc_entries) >= NEIGH_FORCED_GC_LARGE_TABLE_THRESH &&
-+	    time_before(jiffies, READ_ONCE(tbl->last_flush) + msecs_to_jiffies(50)))
-+		return 0;
-+
- 	NEIGH_CACHE_STAT_INC(tbl, forced_gc_runs);
+@@ -1889,7 +1889,7 @@ ppp_prepare_tx_skb(struct ppp *ppp, struct sk_buff **pskb)
  
- 	spin_lock_bh(&tbl->lock);
+  drop:
+ 	kfree_skb(skb);
+-	++ppp->dev->stats.tx_errors;
++	DEV_STATS_INC(ppp->dev, tx_errors);
+ 	return 1;
+ }
+ 
+@@ -2156,7 +2156,7 @@ static int ppp_mp_explode(struct ppp *ppp, struct sk_buff *skb)
+  err_linearize:
+ 	if (ppp->debug & 1)
+ 		netdev_err(ppp->dev, "PPP: no memory (fragment)\n");
+-	++ppp->dev->stats.tx_errors;
++	DEV_STATS_INC(ppp->dev, tx_errors);
+ 	++ppp->nxseq;
+ 	return 1;	/* abandon the frame */
+ }
+@@ -2329,7 +2329,7 @@ ppp_input(struct ppp_channel *chan, struct sk_buff *skb)
+ 	if (!ppp_decompress_proto(skb)) {
+ 		kfree_skb(skb);
+ 		if (ppp) {
+-			++ppp->dev->stats.rx_length_errors;
++			DEV_STATS_INC(ppp->dev, rx_length_errors);
+ 			ppp_receive_error(ppp);
+ 		}
+ 		goto done;
+@@ -2391,7 +2391,7 @@ ppp_receive_frame(struct ppp *ppp, struct sk_buff *skb, struct channel *pch)
+ static void
+ ppp_receive_error(struct ppp *ppp)
+ {
+-	++ppp->dev->stats.rx_errors;
++	DEV_STATS_INC(ppp->dev, rx_errors);
+ 	if (ppp->vj)
+ 		slhc_toss(ppp->vj);
+ }
+@@ -2658,7 +2658,7 @@ ppp_receive_mp_frame(struct ppp *ppp, struct sk_buff *skb, struct channel *pch)
+ 	 */
+ 	if (seq_before(seq, ppp->nextseq)) {
+ 		kfree_skb(skb);
+-		++ppp->dev->stats.rx_dropped;
++		DEV_STATS_INC(ppp->dev, rx_dropped);
+ 		ppp_receive_error(ppp);
+ 		return;
+ 	}
+@@ -2694,7 +2694,7 @@ ppp_receive_mp_frame(struct ppp *ppp, struct sk_buff *skb, struct channel *pch)
+ 		if (pskb_may_pull(skb, 2))
+ 			ppp_receive_nonmp_frame(ppp, skb);
+ 		else {
+-			++ppp->dev->stats.rx_length_errors;
++			DEV_STATS_INC(ppp->dev, rx_length_errors);
+ 			kfree_skb(skb);
+ 			ppp_receive_error(ppp);
+ 		}
+@@ -2800,7 +2800,7 @@ ppp_mp_reconstruct(struct ppp *ppp)
+ 		if (lost == 0 && (PPP_MP_CB(p)->BEbits & E) &&
+ 		    (PPP_MP_CB(head)->BEbits & B)) {
+ 			if (len > ppp->mrru + 2) {
+-				++ppp->dev->stats.rx_length_errors;
++				DEV_STATS_INC(ppp->dev, rx_length_errors);
+ 				netdev_printk(KERN_DEBUG, ppp->dev,
+ 					      "PPP: reconstructed packet"
+ 					      " is too long (%d)\n", len);
+@@ -2855,7 +2855,7 @@ ppp_mp_reconstruct(struct ppp *ppp)
+ 					      "  missed pkts %u..%u\n",
+ 					      ppp->nextseq,
+ 					      PPP_MP_CB(head)->sequence-1);
+-			++ppp->dev->stats.rx_dropped;
++			DEV_STATS_INC(ppp->dev, rx_dropped);
+ 			ppp_receive_error(ppp);
+ 		}
+ 
+@@ -3322,8 +3322,8 @@ ppp_get_stats(struct ppp *ppp, struct ppp_stats *st)
+ 		st->p.ppp_opackets += tx_packets;
+ 		st->p.ppp_obytes += tx_bytes;
+ 	}
+-	st->p.ppp_ierrors = ppp->dev->stats.rx_errors;
+-	st->p.ppp_oerrors = ppp->dev->stats.tx_errors;
++	st->p.ppp_ierrors = DEV_STATS_READ(ppp->dev, rx_errors);
++	st->p.ppp_oerrors = DEV_STATS_READ(ppp->dev, tx_errors);
+ 	if (!vj)
+ 		return;
+ 	st->vj.vjs_packets = vj->sls_o_compressed + vj->sls_o_uncompressed;
 -- 
-2.43.0
+2.55.0.141.g00534a21ce-goog
 
 
